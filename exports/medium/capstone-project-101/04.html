@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Organizing Requirements</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Organizing Requirements</h1>
+<blockquote>
+<p>Capstone Project 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> is a <em>feature list alone</em> not enough?</p>
+<blockquote>
+<p>Without <em>non-functional</em> needs and <em>priorities</em>, <em>decisions</em> will <em>shake</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>User stories</em></li>
+<li><em>Non-functional</em> needs</li>
+<li>Setting <em>priority</em></li>
+<li><em>Acceptance</em> criteria</li>
+<li>Requirement <em>traceability</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Requirements must become a <em>spec</em> so <em>changes</em> can be <em>traced</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[User Story] --&gt; A[Accept]
+    A --&gt; N[Non-Functional]
+    N --&gt; P[Priority]
+    P --&gt; T[Trace]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>user story</strong>: <em>user-perspective</em> request.</li>
+<li><strong>acceptance</strong>: <em>accept</em> criteria.</li>
+<li><strong>non-functional</strong>: <em>non functional</em> need.</li>
+<li><strong>MoSCoW</strong>: <em>priority</em> labels.</li>
+<li><strong>traceability</strong>: <em>trace links</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A <em>list of features</em>.</p>
+<p><strong>After</strong>: <em>Stories + criteria + priority</em>.</p>
+<h2>Hands-on: Requirements Table</h2>
+<p><strong>Step 1 — User story</strong></p>
+<pre><code class="language-python">story = &quot;as a student I want instant conflict detection&quot;
+</code></pre>
+<p><strong>Step 2 — Acceptance criteria</strong></p>
+<pre><code class="language-python">accept = [&quot;input 5s&quot;, &quot;result 1s&quot;, &quot;error clear&quot;]
+</code></pre>
+<p><strong>Step 3 — Non-functional</strong></p>
+<pre><code class="language-python">nf = [&quot;mobile&quot;, &quot;no_signup&quot;, &quot;korean_first&quot;]
+</code></pre>
+<p><strong>Step 4 — Priority</strong></p>
+<pre><code class="language-python">prio = {&quot;core&quot;: &quot;Must&quot;, &quot;share&quot;: &quot;Should&quot;, &quot;ai&quot;: &quot;Could&quot;}
+</code></pre>
+<p><strong>Step 5 — Trace</strong></p>
+<pre><code class="language-python">trace = {&quot;ST-1&quot;: [&quot;F-1&quot;, &quot;F-2&quot;]}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Stories</em> start with <em>verbs</em>.</li>
+<li><em>Criteria</em> combine <em>numbers</em> and <em>readability</em>.</li>
+<li><em>Trace</em> uses <em>IDs</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>The <em>story</em> drifts into <em>feature description</em>.</strong></li>
+<li><strong>Forgetting <em>non-functional</em> needs.</strong></li>
+<li><strong><em>Everything Must</em>.</strong></li>
+<li><strong>Subjective <em>criteria</em>.</strong></li>
+<li><strong>No <em>traceability</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startup PMs use <em>Must/Should/Could</em> labels every week.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Stories</em> stay <em>short</em>.</li>
+<li><em>Criteria</em> are <em>measurable</em>.</li>
+<li><em>Priority</em> is <em>three or four buckets</em>.</li>
+<li><em>Non-functional</em> is <em>separate</em>.</li>
+<li><em>Trace</em> is <em>documented</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Five+ stories</em>.</li>
+<li>[ ] <em>Acceptance criteria</em>.</li>
+<li>[ ] <em>Non-functional</em> table.</li>
+<li>[ ] <em>Priority</em> labels.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>user story</em> in one line.</li>
+<li>Define <em>acceptance criteria</em> in one line.</li>
+<li>State the meaning of <em>MoSCoW</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Splitting Team Roles</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
+<li><strong>Organizing Requirements (current)</strong></li>
+<li>Splitting Team Roles (upcoming)</li>
+<li>Designing the MVP (upcoming)</li>
+<li>Choosing the Tech Stack (upcoming)</li>
+<li>Schedule Management (upcoming)</li>
+<li>Building Presentation Materials (upcoming)</li>
+<li>Project Retrospective (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mountaingoatsoftware.com/books/user-stories-applied">User Stories Applied - Mike Cohn</a></li>
+<li><a href="https://www.atlassian.com/agile/product-management/requirements">MoSCoW Method - Atlassian</a></li>
+<li><a href="https://gojko.net/books/specification-by-example/">Specification by Example</a></li>
+<li><a href="https://www.agilealliance.org/glossary/invest/">INVEST in Good Stories</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, Requirements, Spec, Scope, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTML, CSS, and JavaScript</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HTML, CSS, and JavaScript</h1>
+<blockquote>
+<p>Web Development 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is one web page split into <em>three</em> different languages?</p>
+<blockquote>
+<p>Because separating structure, style, and behavior lets each one change without breaking the others.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>structure</em> HTML draws</li>
+<li>The <em>style</em> CSS applies</li>
+<li>The <em>behavior</em> JavaScript adds</li>
+<li>How the three work together</li>
+<li>The flexibility separation creates</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When all three live in one file, fixing one line breaks another. <em>Separation</em> is the starting point of teamwork and maintenance — designers touch CSS, frontend engineers touch JS, content owners touch HTML.</p>
+<blockquote>
+<p>Good web code keeps roles separate.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    HTML[&quot;HTML (structure)&quot;] --&gt; Page[&quot;Web page&quot;]
+    CSS[&quot;CSS (style)&quot;] --&gt; Page
+    JS[&quot;JavaScript (behavior)&quot;] --&gt; Page
+</code></pre>
+<p>Three pillars build one page.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>HTML</strong>: meaningful <em>structure</em> (headings, paragraphs, links, forms).</li>
+<li><strong>CSS</strong>: visible <em>style</em> (colors, fonts, layout).</li>
+<li><strong>JavaScript</strong>: dynamic <em>behavior</em> (clicks, input, async calls).</li>
+<li><strong>Selector</strong>: rule that picks where CSS applies.</li>
+<li><strong>Event</strong>: signal that lets JS react to user input.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (everything mixed)</strong></p>
+<pre><code class="language-html">&lt;h1 style=&quot;color:red&quot; onclick=&quot;alert('hi')&quot;&gt;Title&lt;/h1&gt;
+</code></pre>
+<p><strong>After (roles separated)</strong></p>
+<pre><code class="language-html">&lt;h1 class=&quot;title&quot;&gt;Title&lt;/h1&gt;
+</code></pre>
+<pre><code class="language-css">.title { color: red; }
+</code></pre>
+<pre><code class="language-js">document.querySelector(&quot;.title&quot;).addEventListener(&quot;click&quot;, () =&gt; alert(&quot;hi&quot;));
+</code></pre>
+<p>Same result, <em>much easier to change</em>.</p>
+<h2>Hands-on: Build a Separated Page in 5 Steps</h2>
+<p><strong>Step 1 — Basic HTML structure</strong></p>
+<pre><code class="language-html">&lt;!-- index.html --&gt;
+&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;Hello&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot;&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1 class=&quot;title&quot;&gt;Hello there&lt;/h1&gt;
+    &lt;button id=&quot;say&quot;&gt;Greet&lt;/button&gt;
+    &lt;script src=&quot;app.js&quot; defer&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>Step 2 — Add style with CSS</strong></p>
+<pre><code class="language-css">/* style.css */
+body { font-family: system-ui; }
+.title { color: steelblue; }
+button { padding: 8px 16px; }
+</code></pre>
+<p><strong>Step 3 — Add behavior with JS</strong></p>
+<pre><code class="language-js">// app.js
+document.getElementById(&quot;say&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  alert(&quot;Nice to meet you&quot;);
+});
+</code></pre>
+<p><strong>Step 4 — Open in a browser</strong></p>
+<pre><code class="language-bash">python3 -m http.server 8000
+# Open http://localhost:8000
+</code></pre>
+<p><strong>Step 5 — Inspect the tree</strong></p>
+<pre><code class="language-text">F12 → Elements tab → see DOM tree and applied styles
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>HTML <code>class</code> and <code>id</code> are the <em>hooks</em> CSS and JS use.</li>
+<li><code>defer</code> makes JS run after HTML parsing finishes.</li>
+<li>CSS <em>cascades</em> — multiple rules merge by priority.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Overusing <code>style="..."</code> inline.</strong> The CSS file becomes pointless.</li>
+<li><strong>Big <code>&lt;script&gt;</code> blocks inside HTML.</strong> Hurts readability and caching.</li>
+<li><strong>Reusing the same <code>id</code> on many elements.</strong> An <code>id</code> must be unique on a page.</li>
+<li><strong>Ignoring CSS specificity.</strong> Reaching for <code>!important</code> to win the fight.</li>
+<li><strong>Manipulating styles only with JS.</strong> Toggling a CSS class is simpler.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Even huge sites reduce to these three languages. React and Vue are tools that ultimately produce <em>HTML, CSS, and JS</em> for the browser. Understanding the separation principle keeps you grounded in any framework.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Write <em>meaningful</em> HTML first (semantic tags).</li>
+<li>Style with <em>reusable</em> classes.</li>
+<li>Keep JS responsible for <em>behavior only</em>.</li>
+<li>Consider accessibility from the start.</li>
+<li>Design so a single change happens in one place.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name each language's responsibility in one sentence.</li>
+<li>[ ] You know the difference between inline and external CSS.</li>
+<li>[ ] You can read the DOM tree and CSS rules in DevTools.</li>
+<li>[ ] You know the difference between <code>defer</code> and <code>async</code>.</li>
+<li>[ ] You can refactor mixed code into separated files.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Take an HTML file full of inline styles and move them into a CSS file.</li>
+<li>Build five buttons that toggle background color via a CSS class.</li>
+<li>Pick a favorite site and find five <em>semantic tags</em> in its HTML.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Three languages model the principle of <em>separation of concerns</em>. Next, we look at how the browser turns HTML into a tree (the DOM).</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><strong>HTML, CSS, and JavaScript (current)</strong></li>
+<li>The Browser and the DOM (upcoming)</li>
+<li>HTTP and APIs (upcoming)</li>
+<li>Frontend and Backend (upcoming)</li>
+<li>Authentication and Sessions (upcoming)</li>
+<li>Connecting to a Database (upcoming)</li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics">HTML basics (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics">CSS basics (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Semantics">Semantic HTML (MDN)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, HTML, CSS, JavaScript, Frontend</p>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Compiler?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Compiler?</h1>
+<blockquote>
+<p>Compilers 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How many stages sit between writing <code>2 + 3 * 4</code> and getting the result <code>14</code>?</p>
+<blockquote>
+<p>A compiler is a program that translates a program written in one language into another (usually less abstract). The translation does not happen in one step — it runs as a <strong>pipeline</strong>: lexer, parser, semantic analyzer, IR, optimizer, code generator. Once you can draw this pipeline in your head, every compiler, interpreter, and transpiler looks like a variation of the same picture.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A one-line definition of a compiler</li>
+<li>The six stages of the standard compiler pipeline</li>
+<li>How interpreters and transpilers reuse those same stages</li>
+<li>Why the "frontend vs backend" split matters</li>
+<li>How to build one slice of a compiler in Python</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The meaning of error messages ("is this syntax or semantic?"), why builds are slow ("optimization is expensive"), how new languages get built — all of it is about which stage of the pipeline you are in. Knowing the stages makes the tools usable.</p>
+<blockquote>
+<p>Knowing compilers means being able to answer "how far did this line get translated, and where did it stop?"</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;source code&quot;] --&gt; B[&quot;lexer (tokens)&quot;]
+    B --&gt; C[&quot;parser (AST)&quot;]
+    C --&gt; D[&quot;semantic analyzer (types/scope)&quot;]
+    D --&gt; E[&quot;intermediate representation&quot;]
+    E --&gt; F[&quot;optimizer&quot;]
+    F --&gt; G[&quot;code generator&quot;]
+    G --&gt; H[&quot;target (bytecode/native)&quot;]
+</code></pre>
+<p>These six nodes are also the table of contents for this series. We take them one at a time.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Compiler</strong>: A program that translates one (source) language into another (target).</li>
+<li><strong>Interpreter</strong>: A program that executes the source directly. Usually shares the front-end stages with a compiler.</li>
+<li><strong>Transpiler</strong>: A compiler between two languages of similar abstraction (TS to JS).</li>
+<li><strong>Pipeline</strong>: A structure that transforms input stage by stage.</li>
+<li><strong>Frontend / Backend</strong>: Stages closer to the source / closer to the target.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — "compilation is magic"</strong></p>
+<pre><code class="language-text">.c → ??? → a.out
+</code></pre>
+<p><strong>After — a pipeline with stages</strong></p>
+<pre><code class="language-text">.c → lex → parse → check → IR → optimize → codegen → a.out
+</code></pre>
+<p>Each stage acts like a function with a defined input and output. That is the power of separation.</p>
+<h2>Hands-on: One Expression's Journey</h2>
+<p><strong>Step 1 — Tokenize: text into meaningful chunks</strong></p>
+<pre><code class="language-python"># 1_lex.py
+import re
+from dataclasses import dataclass
+
+@dataclass
+class Token:
+    kind: str
+    text: str
+
+PATTERNS = [
+    (&quot;NUM&quot;, r&quot;\d+&quot;),
+    (&quot;OP&quot;,  r&quot;[+\-*/]&quot;),
+    (&quot;WS&quot;,  r&quot;\s+&quot;),
+]
+
+def lex(src: str) -&gt; list[Token]:
+    tokens, i = [], 0
+    while i &lt; len(src):
+        for kind, pat in PATTERNS:
+            m = re.match(pat, src[i:])
+            if m:
+                if kind != &quot;WS&quot;:
+                    tokens.append(Token(kind, m.group()))
+                i += m.end()
+                break
+        else:
+            raise SyntaxError(src[i])
+    return tokens
+
+print(lex(&quot;2 + 3 * 4&quot;))
+</code></pre>
+<p>A string becomes <code>[NUM 2, OP +, NUM 3, OP *, NUM 4]</code> — meaningful units.</p>
+<p><strong>Step 2 — Parse: tokens into a tree</strong></p>
+<pre><code class="language-python"># 2_parse.py
+from dataclasses import dataclass
+@dataclass
+class Num: value: int
+@dataclass
+class BinOp: op: str; left: object; right: object
+
+# input: 2 + 3 * 4 (precedence ignored for this sketch)
+def parse(tokens):
+    def parse_expr(i):
+        left = Num(int(tokens[i].text)); i += 1
+        while i &lt; len(tokens) and tokens[i].kind == &quot;OP&quot;:
+            op = tokens[i].text; i += 1
+            right = Num(int(tokens[i].text)); i += 1
+            left = BinOp(op, left, right)
+        return left, i
+    tree, _ = parse_expr(0)
+    return tree
+
+# Real precedence handling shows up in ep03. For now we just need a tree.
+</code></pre>
+<p>Now we have a <strong>tree</strong> rather than text. A much better shape for asking semantic questions.</p>
+<p><strong>Step 3 — Semantic analysis: "does this make sense?"</strong></p>
+<pre><code class="language-python"># 3_check.py
+def check(node):
+    if isinstance(node, Num):
+        return &quot;int&quot;
+    t1 = check(node.left); t2 = check(node.right)
+    if t1 != &quot;int&quot; or t2 != &quot;int&quot;:
+        raise TypeError(&quot;only int supported&quot;)
+    return &quot;int&quot;
+</code></pre>
+<p>This stage answers "do the types line up?" and "are variables declared?"</p>
+<p><strong>Step 4 — Evaluation (a tiny interpreter)</strong></p>
+<pre><code class="language-python"># 4_eval.py
+def evaluate(node):
+    if isinstance(node, Num):
+        return node.value
+    a, b = evaluate(node.left), evaluate(node.right)
+    return {&quot;+&quot;: a+b, &quot;-&quot;: a-b, &quot;*&quot;: a*b, &quot;/&quot;: a//b}[node.op]
+</code></pre>
+<p>If we stop here, the program is an <strong>interpreter</strong>. Send the same tree on to code generation and it becomes a compiler.</p>
+<p><strong>Step 5 — Code generation (a fake assembly)</strong></p>
+<pre><code class="language-python"># 5_codegen.py
+def emit(node, out=None):
+    out = out if out is not None else []
+    if hasattr(node, &quot;value&quot;):
+        out.append(f&quot;PUSH {node.value}&quot;)
+        return out
+    emit(node.left, out)
+    emit(node.right, out)
+    out.append({&quot;+&quot;:&quot;ADD&quot;,&quot;-&quot;:&quot;SUB&quot;,&quot;*&quot;:&quot;MUL&quot;,&quot;/&quot;:&quot;DIV&quot;}[node.op])
+    return out
+</code></pre>
+<p>The same AST emits assembly (or bytecode) — the last stage of a compiler.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same AST evaluated is an interpreter; emitted as code, it is a compiler.</li>
+<li>Each stage has clean inputs and outputs, so unit testing is straightforward.</li>
+<li>The frontend (lex → check) is decided by the language; the backend (IR → codegen) is decided by the target.</li>
+<li>Tokens and ASTs are <strong>shapes that are easy to reason about</strong> — much easier than text.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing lexer and parser in one function.</strong> Debugging blows up — always split into stages.</li>
+<li><strong>Doing semantic analysis on raw text.</strong> Precedence and nesting collapse.</li>
+<li><strong>Folding type checking into code generation.</strong> Errors surface far too late.</li>
+<li><strong>Believing "an interpreter is simpler than a compiler."</strong> They share the front end; only the last stage differs.</li>
+<li><strong>Forgetting to attach line/column to errors.</strong> Every stage should carry source position with it.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The same pipeline lives inside GCC, Clang, V8, CPython, Babel, and TypeScript. LLVM is the canonical modular backend — many languages share its lower stages. When you build an internal DSL, the pattern repeats: <code>tokenize → parse → AST → walk</code>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Asks "where does the frontend end and the backend begin?" first.</li>
+<li>Reaches for PEG/ANTLR before writing a parser by hand.</li>
+<li>Treats error message quality as a result of stage separation.</li>
+<li>Always attaches positions to AST nodes.</li>
+<li>Sees interpreters, compilers, and transpilers as variants of the same picture.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you define a compiler in one line?</li>
+<li>[ ] Can you sketch the six-stage pipeline?</li>
+<li>[ ] Can you say which stages an interpreter shares?</li>
+<li>[ ] Can you say in one line why an AST is easier than text?</li>
+<li>[ ] Can you state the benefit of frontend/backend separation in one line?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Combine steps 1-5 into a single script that prints tokens, AST, evaluated result (<code>14</code>), and fake assembly for <code>2 + 3 * 4</code> (precedence is fixed in the next episode).</li>
+<li>Add a CLI flag that runs your tiny compiler in interpreter mode or code-emit mode.</li>
+<li>Write a paragraph on where the frontend/backend boundary sits in a language you use often (Python, JavaScript).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A compiler is a system that only makes sense once you decompose it into stages. Next we look at the very first stage in detail — lexical analysis, where text becomes tokens.</p>
+<ul>
+<li><strong>What Is a Compiler? (current)</strong></li>
+<li>Lexical Analysis (upcoming)</li>
+<li>Parsing and the AST (upcoming)</li>
+<li>Semantic Analysis (upcoming)</li>
+<li>Symbol Tables and Scope (upcoming)</li>
+<li>Intermediate Representation (upcoming)</li>
+<li>Optimization Basics (upcoming)</li>
+<li>Code Generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>Build a Tiny Interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://suif.stanford.edu/dragonbook/">Compilers: Principles, Techniques, and Tools (Aho et al.)</a></li>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters (Robert Nystrom)</a></li>
+<li><a href="https://llvm.org/">LLVM Project</a></li>
+<li><a href="https://peps.python.org/pep-0339/">PEP 339 — Design of the CPython compiler</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, Pipeline, AST, Bytecode, Frontend</p>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exploratory Data Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Exploratory Data Analysis</h1>
+<blockquote>
+<p>Data Science 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Before you build any model, how do you read the <em>shape of the data</em> — <em>quickly</em> and <em>correctly</em>?</p>
+<blockquote>
+<p><em>EDA is the </em>data's self-introduction<em> you must read before any model.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>purpose</em> and <em>order</em> of EDA</li>
+<li>Reading <em>1-D and 2-D distributions</em></li>
+<li><em>Missing patterns</em> and what <em>correlation</em> means</li>
+<li>A 5-step EDA exercise</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Weak EDA produces <em>the wrong model</em>. Skipping the <em>data's self-introduction</em> and jumping to decisions leads to deep regret later.</p>
+<blockquote>
+<p><em>A model only </em>imitates<em> the data it was given.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Shape[&quot;Shape &amp; dtypes&quot;] --&gt; Dist[&quot;1D Distribution&quot;]
+    Dist --&gt; Pair[&quot;2D Relations&quot;]
+    Pair --&gt; Miss[&quot;Missing Patterns&quot;]
+    Miss --&gt; Corr[&quot;Correlation&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Skewness</strong>: how <em>asymmetric</em> a distribution is.</li>
+<li><strong>Outlier</strong>: a value <em>statistically far</em> from the rest.</li>
+<li><strong>Cardinality</strong>: the <em>number of unique values</em> in a category.</li>
+<li><strong>Correlation</strong>: the <em>strength of a linear relationship</em>.</li>
+<li><strong>MCAR / MAR / MNAR</strong>: classes of <em>missingness mechanisms</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: you look at <code>mean</code> and <em>misread</em> the typical value.</p>
+<p><strong>After</strong>: you look at <em>distribution + quantiles + outliers</em> together and see the <em>full shape</em>.</p>
+<h2>Hands-on: 5-step EDA</h2>
+<p><strong>Step 1 — Shape and dtypes</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;orders.csv&quot;)
+print(df.shape)
+print(df.dtypes)
+print(df.head())
+</code></pre>
+<p><strong>Step 2 — 1-D distribution</strong></p>
+<pre><code class="language-python">print(df[&quot;amount&quot;].describe())
+df[&quot;amount&quot;].plot.hist(bins=30, title=&quot;amount&quot;)
+</code></pre>
+<p><strong>Step 3 — Categorical cardinality</strong></p>
+<pre><code class="language-python">print(df.select_dtypes(&quot;object&quot;).nunique().sort_values(ascending=False))
+print(df[&quot;country&quot;].value_counts(normalize=True).head())
+</code></pre>
+<p><strong>Step 4 — 2-D relations</strong></p>
+<pre><code class="language-python">import seaborn as sns
+sns.scatterplot(data=df.sample(2000), x=&quot;quantity&quot;, y=&quot;amount&quot;)
+</code></pre>
+<p><strong>Step 5 — Missingness and correlation</strong></p>
+<pre><code class="language-python">print(df.isna().mean().sort_values(ascending=False).head())
+print(df.select_dtypes(&quot;number&quot;).corr().round(2))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>describe</code> is a <em>starting point</em>, not the answer — always pair with a <em>distribution plot</em>.</li>
+<li><em>Correlation is not causation</em>.</li>
+<li><em>Cardinality</em> shapes which models will work well.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Deciding from the <em>mean alone</em>.</strong> You miss the <em>shape</em> of the distribution.</li>
+<li><strong>Reading correlation as <em>causation</em>.</strong> A classic trap.</li>
+<li><strong>Plotting <em>the entire dataset</em>.</strong> You blow up memory and time — sample first.</li>
+<li><strong>Ignoring <em>cardinality</em>.</strong> One-hot encoding <em>explodes</em>.</li>
+<li><strong>Assuming <em>MCAR</em> without checking.</strong> You bake in bias.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Teams keep an <em>EDA notebook</em> next to the model code. Key distributions live in <em>dashboards</em> that monitor <em>drift</em>. EDA is not a one-time event — it repeats.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Order: <em>distribution → relations → missing → correlation</em>.</li>
+<li>Look at <em>correlation cautiously</em>.</li>
+<li>Attach the <em>EDA notebook</em> to the PR.</li>
+<li><em>Sampling</em> buys time.</li>
+<li>Re-run EDA <em>periodically</em> to detect <em>drift</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I look at <em>describe + distribution</em> together.</li>
+<li>[ ] I know what <em>cardinality</em> is.</li>
+<li>[ ] I know <em>correlation ≠ causation</em>.</li>
+<li>[ ] I can classify <em>missingness patterns</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Run a <em>5-step EDA</em> on Iris or Titanic.</li>
+<li>List 3 cases of <em>high correlation but no causation</em>.</li>
+<li>Describe how <em>cardinality</em> affected your <em>model choice</em> in a real project.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>EDA is <em>time spent listening to the data</em>. Next we will look at <em>visualization</em> — showing what we heard.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><strong>Exploratory Data Analysis (current)</strong></li>
+<li>Visualization (upcoming)</li>
+<li>Modeling (upcoming)</li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/user_guide/basics.html#descriptive-statistics">pandas — Descriptive Statistics</a></li>
+<li><a href="https://seaborn.pydata.org/tutorial.html">seaborn — Tutorial</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Missing_data">Wikipedia — Missing Data Patterns</a></li>
+<li><a href="https://archive.org/details/exploratorydataa00tuke_0">Tukey — Exploratory Data Analysis</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, EDA, Pandas, Statistics, Beginner</p>
+</body>
+</html>

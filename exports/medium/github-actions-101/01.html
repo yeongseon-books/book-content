@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is GitHub Actions?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is GitHub Actions?</h1>
+<blockquote>
+<p>GitHub Actions 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where do you start so that <em>one push</em> triggers <em>test, lint, and deploy</em> automatically?</p>
+<blockquote>
+<p>Automation belongs in <em>code, not in hands</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and place of <em>GitHub Actions</em></li>
+<li>The relationship between <em>Workflow / Job / Step</em></li>
+<li>How to author your first workflow</li>
+<li><em>Why GitHub Actions</em> (vs. Jenkins/CircleCI)</li>
+<li>Five common misconceptions</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>CI/CD determines <em>team speed and quality</em>. <em>GitHub Actions</em> runs <em>next to your code</em> as a default automation engine, with no servers to operate.</p>
+<blockquote>
+<p>Real CI starts at the moment a <em>PR is merged</em>, not when a human remembers.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Push[&quot;git push&quot;] --&gt; Trigger[&quot;event&quot;]
+    Trigger --&gt; Workflow[&quot;workflow.yml&quot;]
+    Workflow --&gt; Job[&quot;job: test&quot;]
+    Job --&gt; Step[&quot;step: pytest&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Workflow</strong>: a complete <em>automation unit</em> in <code>.github/workflows/*.yml</code>.</li>
+<li><strong>Event</strong>: what <em>starts</em> a workflow (push, PR, etc.).</li>
+<li><strong>Job</strong>: a unit of execution; jobs run <em>in parallel</em> by default.</li>
+<li><strong>Step</strong>: a single <em>command</em> or an <em>Action call</em> inside a Job.</li>
+<li><strong>Runner</strong>: the <em>machine</em> that runs a Job (e.g., ubuntu-latest).</li>
+<li><strong>Action</strong>: a reusable <em>Step</em> (e.g., <code>actions/checkout</code>).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every PR you run tests <em>locally</em> and <em>paste results into Slack</em>.</p>
+<p><strong>After</strong>: opening a PR runs tests <em>automatically</em> and a <em>check mark</em> appears on the PR.</p>
+<h2>Hands-on: Your First Workflow in 5 Steps</h2>
+<p><strong>Step 1 — Create the directory</strong></p>
+<pre><code class="language-bash">mkdir -p .github/workflows
+</code></pre>
+<p><strong>Step 2 — Write the workflow file</strong></p>
+<pre><code class="language-yaml"># .github/workflows/ci.yml
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.11&quot;
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+</code></pre>
+<p><strong>Step 3 — Trigger via push</strong></p>
+<pre><code class="language-bash">git add .github/workflows/ci.yml
+git commit -m &quot;ci: add first workflow&quot;
+git push
+</code></pre>
+<p><strong>Step 4 — Check results in the Actions tab</strong></p>
+<pre><code class="language-text">Repo &gt; Actions tab
+- The workflow run log appears.
+- Each step prints its output and time.
+</code></pre>
+<p><strong>Step 5 — Use it as a PR check</strong></p>
+<pre><code class="language-text">In branch protection, enable &quot;Require status checks to pass.&quot;
+A failed test now blocks merge.
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>single YAML file</em> defines the <em>whole automation</em>.</li>
+<li><em>checkout</em> is the first step in <em>almost every</em> workflow.</li>
+<li><em>runs-on</em> selects the <em>execution environment</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Wrong workflow location.</strong> It must be exactly <code>.github/workflows/</code>.</li>
+<li><strong>Missing <code>on:</code>.</strong> A workflow with <em>no trigger</em> never runs.</li>
+<li><strong>Skipping <code>actions/checkout</code>.</strong> Without code, every later step fails.</li>
+<li><strong>Running heavy steps on every PR.</strong> Wastes time and money.</li>
+<li><strong>Hardcoding secrets in YAML.</strong> Use <code>${{ secrets.* }}</code> only.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams split <em>test / lint / typecheck / build / deploy</em> into <em>separate workflows</em> and share <em>organization-wide standards</em> through <em>reusable workflows</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>No CI, no new feature</em>.</li>
+<li><em>YAML is code</em> — review it.</li>
+<li><em>Run time</em> equals <em>cost plus feedback latency</em>.</li>
+<li><em>Secrets never mix with code</em>.</li>
+<li><em>Workflows</em> are <em>decomposed</em>, just like services.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] A <code>.github/workflows/</code> directory exists.</li>
+<li>[ ] Triggers fire on both <em>push and PR</em>.</li>
+<li>[ ] Results appear as <em>PR checks</em>.</li>
+<li>[ ] <em>Secrets</em> use only <code>secrets.*</code>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Create a workflow that prints <em>Hello World</em> only.</li>
+<li>Add a <em>matrix</em> that runs on <em>Ubuntu and macOS</em>.</li>
+<li>Intentionally <em>break</em> the test and see the <em>PR check</em> fail.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>GitHub Actions is <em>automation that lives next to your code</em>. The next post explores <em>Workflow and Job</em> structure in depth.</p>
+<ul>
+<li><strong>What Is GitHub Actions? (current)</strong></li>
+<li>Workflows and Jobs (upcoming)</li>
+<li>Understanding Triggers (upcoming)</li>
+<li>Python Test Automation (upcoming)</li>
+<li>Lint and Type Check (upcoming)</li>
+<li>Build Artifacts (upcoming)</li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions">GitHub Actions Documentation</a></li>
+<li><a href="https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions">Workflow syntax</a></li>
+<li><a href="https://github.com/sdras/awesome-actions">Awesome Actions</a></li>
+<li><a href="https://github.com/marketplace?type=actions">Actions Marketplace</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, CICD, Automation, DevOps, Workflow</p>
+</body>
+</html>

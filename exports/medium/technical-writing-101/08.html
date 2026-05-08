@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing Tutorials</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing Tutorials</h1>
+<blockquote>
+<p>Technical Writing 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you make a <em>tutorial</em> that simply <em>works</em> when the reader <em>follows</em> it?</p>
+<blockquote>
+<p>Every <em>step</em> must be <em>verified</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Where a tutorial sits in <em>Diátaxis</em></li>
+<li>Stating <em>prerequisites</em></li>
+<li>Designing a <em>small win</em></li>
+<li><em>Error recovery</em> notes</li>
+<li>The <em>wrap-up</em> and <em>next step</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>first success</em> creates the will to keep <em>learning</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Prereq] --&gt; S[Step]
+    S --&gt; W[Win]
+    W --&gt; N[Next]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>tutorial</strong>: A <em>learning</em> oriented post.</li>
+<li><strong>prerequisite</strong>: A <em>pre-condition</em>.</li>
+<li><strong>small win</strong>: A <em>small success</em>.</li>
+<li><strong>recovery</strong>: An <em>error recovery</em> path.</li>
+<li><strong>next step</strong>: The <em>next thing to learn</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "Let us learn about <em>FastAPI</em>." (lecture)</p>
+<p><strong>After</strong>: "<em>Run Hello World in five minutes</em>." (tutorial)</p>
+<h2>Hands-on: A Five Minute Tutorial</h2>
+<p><strong>Step 1 — Prerequisites</strong></p>
+<pre><code class="language-bash">python3 --version  # 3.11 or newer
+</code></pre>
+<p><strong>Step 2 — Install</strong></p>
+<pre><code class="language-bash">pip install &quot;fastapi[standard]&quot;
+</code></pre>
+<p><strong>Step 3 — Code</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+def root():
+    return {&quot;hello&quot;: &quot;world&quot;}
+</code></pre>
+<p><strong>Step 4 — Run</strong></p>
+<pre><code class="language-bash">fastapi dev main.py
+</code></pre>
+<p><strong>Step 5 — Verify</strong></p>
+<pre><code class="language-text">{&quot;hello&quot;:&quot;world&quot;}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Prerequisites</em> go <em>first</em>.</li>
+<li><em>Commands</em> are <em>ordered</em>.</li>
+<li>The <em>result</em> is <em>stated</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>No <em>prerequisites</em>.</strong></li>
+<li><strong><em>Commands</em> in the wrong <em>order</em>.</strong></li>
+<li><strong>No <em>small win</em>.</strong></li>
+<li><strong>No <em>error recovery</em> notes.</strong></li>
+<li><strong>No <em>next step</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Great libraries finish their <em>official tutorial</em> in <em>under five minutes</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Prerequisites</em> are <em>stated</em>.</li>
+<li><em>Small win</em> arrives in <em>three minutes</em>.</li>
+<li>Every error has a <em>recovery</em> line.</li>
+<li>The <em>next step</em> is a <em>small jump</em>.</li>
+<li>A <em>tutorial</em> is <em>learning</em>, not <em>reference</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Prerequisites</em> stated.</li>
+<li>[ ] <em>Five steps or fewer</em>.</li>
+<li>[ ] One <em>small win</em>.</li>
+<li>[ ] <em>Next step</em> shown.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the definition of <em>tutorial</em> in one line.</li>
+<li>Write the meaning of <em>small win</em> in one line.</li>
+<li>Write an example of <em>recovery</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The next post is <em>Blog vs Documentation</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">What Is Technical Writing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/02-defining-the-reader.md">Defining the Reader</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/03-title-and-structure.md">Title and Structure</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/04-explaining-concepts.md">Explaining Concepts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/05-explaining-example-code.md">Explaining Example Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/06-using-figures-and-tables.md">Using Figures and Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/07-writing-the-readme.md">Writing the README</a></li>
+<li><strong>Writing Tutorials (current)</strong></li>
+<li>Blog vs Documentation (upcoming)</li>
+<li>Pre-publish Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://diataxis.fr/">Diátaxis Framework</a></li>
+<li><a href="https://docs.djangoproject.com/en/stable/intro/tutorial01/">Django Tutorial Style</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/">FastAPI Tutorial</a></li>
+<li><a href="https://www.writethedocs.org/guide/writing/beginners-guide-to-docs/">Teach Tech with Tutorials - Write the Docs</a></li>
+</ul>
+<p class="tags-line">Tags: TechnicalWriting, Tutorial, Learning, HandsOn, Beginner</p>
+</body>
+</html>

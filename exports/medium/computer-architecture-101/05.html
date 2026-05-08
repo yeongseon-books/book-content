@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memory Organization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Memory Organization</h1>
+<blockquote>
+<p>Computer Architecture 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Two processes can hold different values at the same address <code>0x400000</code>, and both run correctly. How is that possible?</p>
+<blockquote>
+<p>Memory looks like a giant array of addressed bytes, but the memory a process sees is not real RAM. It is a virtual address space that the operating system and the CPU's MMU build together. On top of that space, code, data, stack, and heap each take their assigned region, and every variable lives somewhere inside it. This article draws that map.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The address model of RAM and word alignment</li>
+<li>Virtual memory and the page concept</li>
+<li>A process's memory layout (text, data, heap, stack)</li>
+<li>The difference between stack and heap, and the memory model behind function calls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without a memory model in your head, you keep meeting the same bugs: stack overflow, memory leaks, dangling pointers, alignment faults. They all come from missing one piece of memory organization. Virtual memory is also one of the single largest performance factors in any system — a page fault can make code 10,000 times slower in a single instruction.</p>
+<blockquote>
+<p>"Where does this variable live?" is the starting question for both memory safety and performance.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Each process gets its own virtual address space, and the MMU maps virtual addresses to physical RAM. Inside one process, the layout has fixed regions: text (code), initialized data, BSS (zero-initialized data), heap (grows up), and stack (grows down).</p>
+</blockquote>
+<pre><code class="language-text">   +------------------+  high addresses
+   |     STACK        |  &lt;- function calls, locals
+   |        |         |
+   |        v         |
+   |                  |
+   |        ^         |
+   |        |         |
+   |     HEAP         |  &lt;- malloc, new, dynamic allocation
+   +------------------+
+   |     BSS          |  &lt;- uninitialized globals
+   +------------------+
+   |     DATA         |  &lt;- initialized globals
+   +------------------+
+   |     TEXT         |  &lt;- executable code
+   +------------------+  low addresses
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Address space</strong><br>
+- Description: The memory range a process can see</p>
+<p><strong>Virtual address</strong><br>
+- Description: The address the process uses</p>
+<p><strong>Physical address</strong><br>
+- Description: The actual address in RAM</p>
+<p><strong>MMU</strong><br>
+- Description: Hardware that translates virtual to physical</p>
+<p><strong>Page</strong><br>
+- Description: The smallest mapping unit (typically 4KB)</p>
+<p><strong>Alignment</strong><br>
+- Description: Placing data at addresses matching its type size</p>
+<h2>Before / After</h2>
+<p><strong>Before — "memory is a flat byte array":</strong></p>
+<pre><code class="language-python">data = [0] * 1_000_000
+data[12345] = 42
+# &quot;It just goes into slot 12345&quot;
+</code></pre>
+<p><strong>After — "that address is virtual, and it goes through pages":</strong></p>
+<pre><code class="language-text">Process virtual address: 0x7f8a4c001000 + 12345*8
+                         |
+                         v  (MMU + page table)
+                         |
+Physical RAM address:    0x00000000abcd1000
+                         |
+                         v  (cache -&gt; DRAM cell)
+</code></pre>
+<p>The same index access actually traverses virtual address, physical address, cache, and DRAM in turn.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Inspect a variable's actual address</strong></p>
+<pre><code class="language-python">import ctypes
+
+x = ctypes.c_int(42)
+y = ctypes.c_int(99)
+print(hex(ctypes.addressof(x)))
+print(hex(ctypes.addressof(y)))
+print(f&quot;distance: {ctypes.addressof(y) - ctypes.addressof(x)} bytes&quot;)
+</code></pre>
+<p>C-compatible types have real addresses. The distance between two variables gives you intuition for how memory gets laid out.</p>
+<p><strong>Step 2: Observe alignment</strong></p>
+<pre><code class="language-python">import ctypes
+
+class Misaligned(ctypes.Structure):
+    _fields_ = [(&quot;a&quot;, ctypes.c_char), (&quot;b&quot;, ctypes.c_int), (&quot;c&quot;, ctypes.c_char)]
+
+class Aligned(ctypes.Structure):
+    _fields_ = [(&quot;b&quot;, ctypes.c_int), (&quot;a&quot;, ctypes.c_char), (&quot;c&quot;, ctypes.c_char)]
+
+print(ctypes.sizeof(Misaligned))   # usually 12 (with padding)
+print(ctypes.sizeof(Aligned))       # usually 8
+</code></pre>
+<p>Same fields, different order, different padding, different size. Memory alignment is the invisible cost in struct design.</p>
+<p><strong>Step 3: Compare stack and heap addresses</strong></p>
+<pre><code class="language-python">import ctypes
+
+def stack_var():
+    x = ctypes.c_int(1)
+    return ctypes.addressof(x)
+
+heap_var = ctypes.c_int(2)
+print(&quot;global address:&quot;, hex(ctypes.addressof(heap_var)))
+print(&quot;stack address: &quot;, hex(stack_var()))
+</code></pre>
+<p>A stack variable has a different (and usually higher) address per call, while globals and dynamic allocations sit at stable addresses. The exact ranges differ per system.</p>
+<p><strong>Step 4: Check the page size</strong></p>
+<pre><code class="language-python">import resource
+
+print(&quot;page size:&quot;, resource.getpagesize(), &quot;bytes&quot;)  # usually 4096
+print(&quot;RSS (KB):&quot;, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+</code></pre>
+<p>The OS deals with memory in pages (4KB). Touching one variable brings an entire page into RAM. This connects directly to the cache friendliness story in the next article.</p>
+<p><strong>Step 5: Hit the stack-depth limit</strong></p>
+<pre><code class="language-python">import sys
+
+def recurse(n):
+    return n if n == 0 else recurse(n - 1) + 1
+
+print(sys.getrecursionlimit())
+try:
+    recurse(2000)
+except RecursionError as e:
+    print(&quot;stack limit hit:&quot;, e)
+</code></pre>
+<p>The stack is a fixed-size region reserved up front, and deep recursion hits that limit as a stack overflow. The heap can grow dynamically; the stack cannot.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every variable has a virtual address; the MMU translates it to physical</li>
+<li>Field order in a struct affects padding and total size</li>
+<li>The stack is small and fast; the heap is large and slower</li>
+<li>Memory is managed in page units (4KB)</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Deep recursion</strong><br>
+- Problem: Stack overflow<br>
+- Fix: Use iteration or an explicit stack</p>
+<p><strong>Large objects on the stack</strong><br>
+- Problem: Stack size exceeded<br>
+- Fix: Allocate on the heap (malloc, new)</p>
+<p><strong>Ignoring field alignment</strong><br>
+- Problem: Wasted memory<br>
+- Fix: Order fields large to small</p>
+<p><strong>Treating virtual as physical</strong><br>
+- Problem: Bad address comparisons, bad caching<br>
+- Fix: Keep virtual and physical distinct</p>
+<p><strong>Ignoring page faults</strong><br>
+- Problem: Sudden 10,000x slowdown<br>
+- Fix: mlock, prefetch, shrink working set</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Database engines: page-sized I/O and buffer pool management</li>
+<li>Game engines: cache-friendly struct layouts (SoA vs AoS)</li>
+<li>Embedded systems: explicit split of stack and heap regions in fixed RAM</li>
+<li>Security: ASLR and NX-bit protection of the address space</li>
+<li>Systems programming: mmap to map files directly into memory</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer monitors process memory in RSS (Resident Set Size) terms. The goal is not "use less memory" in the abstract but "shrink the working set" — the set of pages you touch frequently. That single idea shrinks both page faults and cache misses.</p>
+<p>A senior is also aware of struct memory layout. The same data as Array of Structs and Struct of Arrays produce completely different cache behavior, and the right choice depends on the access pattern. Memory layout is the hidden dimension of data structure choice.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can state the difference between virtual and physical addresses</li>
+<li>[ ] You know that page size is typically 4KB</li>
+<li>[ ] You can describe the stack-vs-heap difference in one sentence</li>
+<li>[ ] You understand how field order affects struct size</li>
+<li>[ ] You can explain why deep recursion is dangerous</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>With <code>ctypes.Structure</code>, define two structs with the same fields (char, int, char, double) — one ordered largest-first, one smallest-first — and compare <code>sizeof</code>.</p>
+</li>
+<li>
+<p>Try allocating a 1MB array (a) on the stack and (b) on the heap. (In Python use <code>numpy.zeros</code> and <code>ctypes.c_int * N</code>.) Observe which is more likely to fail.</p>
+</li>
+<li>
+<p>On your OS, check the stack size with <code>ulimit -s</code> (macOS/Linux) or <code>sys.getrecursionlimit()</code>. Measure what recursion depth that translates to.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Memory looks like a flat byte array, but that flatness is an illusion built by virtual memory. In reality it is mapped in pages, divided into text/data/heap/stack regions, and shaped by alignment and padding. Once that model is in your head, the next chapter — caches — falls into place naturally.</p>
+<p>Next we look at the cache that sits between memory and the CPU, why it exists, what locality is, and how cache-aware code differs from cache-blind code.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
+<li><strong>Memory Organization (current)</strong></li>
+<li>Cache and Locality (upcoming)</li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Virtual_memory">Wikipedia — Virtual memory</a></li>
+<li><a href="https://www.akkadia.org/drepper/cpumemory.pdf">What Every Programmer Should Know About Memory (Ulrich Drepper)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Data_structure_alignment">Wikipedia — Data structure alignment</a></li>
+<li><a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/index.html">Linux Memory Management Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Memory, Virtual Memory, Address Space, Stack and Heap</p>
+</body>
+</html>

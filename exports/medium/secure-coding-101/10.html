@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Safe Logging and Audit</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Safe Logging and Audit</h1>
+<blockquote>
+<p>Secure Coding 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When an incident hits, can we <em>reconstruct exactly what happened</em>? And does that record <em>avoid becoming the attacker's ladder</em>?</p>
+<blockquote>
+<p><em>Logs are </em>evidence and risk<em>. Real logging needs </em>masking<em> and </em>tamper evidence<em> together.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>application log</em> and <em>audit log</em></li>
+<li><em>Sensitive-field masking</em> policy</li>
+<li><em>Tamper evidence</em> and <em>retention</em></li>
+<li>The role of a <em>SIEM</em></li>
+<li>A five-step routine and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The first question in incident response is <em>when, who, what</em>. If you cannot answer, the <em>incident never ends</em>. Meanwhile, if passwords, tokens, or card numbers slip into logs, the <em>incident doubles</em>.</p>
+<blockquote>
+<p><em>Record everything precisely. Never record secrets.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;App&quot;] --&gt;|JSON log| Mask[&quot;Masking&quot;]
+    Mask --&gt; Storage[&quot;Immutable storage&quot;]
+    Storage --&gt; SIEM[&quot;SIEM / alerts&quot;]
+    Audit[&quot;Auth / authz / payments&quot;] --&gt; Storage
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Application log</strong>: ordinary logs for <em>debugging and operations</em>.</li>
+<li><strong>Audit log</strong>: <em>legal evidence</em> of <em>who did what</em>.</li>
+<li><strong>Tamper evidence</strong>: ability to <em>detect modifications</em>.</li>
+<li><strong>Retention</strong>: <em>how long</em> the log is kept.</li>
+<li><strong>SIEM</strong>: a system that <em>collects, analyzes, alerts</em> on security logs.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>print</code> lines containing the <em>raw password</em>. <em>No retention policy</em>. No way to tell <em>who deleted what</em>.</p>
+<p><strong>After</strong>: Structured <em>JSON logs</em>, sensitive fields <em>masked</em>, <em>append-only</em> storage, explicit <em>retention</em>.</p>
+<h2>Hands-on: Safe Logging in Five Steps</h2>
+<p><strong>Step 1 — Structured logs</strong></p>
+<pre><code class="language-python">import json, time
+def log_event(event, **fields):
+    print(json.dumps({&quot;ts&quot;: time.time(), &quot;event&quot;: event, **fields}))
+</code></pre>
+<p><strong>Step 2 — Mask sensitive fields</strong></p>
+<pre><code class="language-python">SENSITIVE = {&quot;password&quot;, &quot;token&quot;, &quot;card_number&quot;, &quot;ssn&quot;}
+
+def mask(d):
+    return {k: (&quot;***&quot; if k in SENSITIVE else v) for k, v in d.items()}
+
+log_event(&quot;login&quot;, **mask({&quot;user&quot;: &quot;ana&quot;, &quot;password&quot;: &quot;x&quot;}))
+</code></pre>
+<p><strong>Step 3 — Separate the audit log</strong></p>
+<pre><code class="language-python">def audit(actor, action, target, result):
+    log_event(
+        &quot;audit&quot;, actor=actor, action=action,
+        target=target, result=result,
+    )
+</code></pre>
+<p><strong>Step 4 — Append-only storage</strong></p>
+<pre><code class="language-bash"># Object storage with Object Lock or immutability turned on
+aws s3api put-object-lock-configuration ...
+</code></pre>
+<p><strong>Step 5 — Retention policy</strong></p>
+<pre><code class="language-text">- application log: 30 days
+- audit log: 1+ year (per regulation)
+- integrity check every quarter
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Audit log</em> is <em>separate</em> from the application log.</li>
+<li>Masking is the <em>default</em>; you opt out, not in.</li>
+<li>Append-only storage <em>leaves traces</em> of any tampering.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Letting <em>passwords or tokens</em> flow into logs.</strong> One line is enough.</li>
+<li><strong>Mixing <em>audit and application</em> logs.</strong> Investigation becomes <em>impossible</em>.</li>
+<li><strong>Keeping logs only on <em>server disks</em>.</strong> Attackers <em>delete them</em>.</li>
+<li><strong>Inconsistent timezones.</strong> Local time instead of UTC.</li>
+<li><strong>Infinite retention.</strong> Cost <em>explodes</em> and incidents <em>get worse</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams pipe <em>JSON logs</em> through a collector (<em>Fluent Bit</em>, <em>Vector</em>) into <em>central storage</em> (<em>Loki</em>, <em>Elasticsearch</em>, <em>S3</em>), and a <em>SIEM</em> (<em>Splunk</em>, <em>Datadog</em>, <em>Wazuh</em>) raises alerts on <em>audit patterns</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Logs are both </em>asset and risk<em>.</em></li>
+<li><em>The audit log directly affects </em>business trust<em>.</em></li>
+<li><em>Storage must be </em>immutable<em> to mean anything.</em></li>
+<li><em>Masking is the </em>default<em>; opt-out only.</em></li>
+<li><em>Retention is a </em>policy decision<em>, written down.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Sensitive fields are <em>masked</em>.</li>
+<li>[ ] <em>Audit logs</em> are <em>separated</em>.</li>
+<li>[ ] Storage is <em>append-only</em> or <em>immutable</em>.</li>
+<li>[ ] <em>Retention</em> is documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List five <em>audit events</em> in your service.</li>
+<li>Implement a <em>masking</em> function that runs on a <em>Pydantic model</em>.</li>
+<li>Two scenarios where <em>append-only</em> could be broken.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>That closes <em>Secure Coding 101</em>: validation → auth → authz → storage → secrets → DB → browser → dependencies → logging. Avoid the <em>most common pitfalls</em> at every step and your system gains <em>security that buys time</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">SQL Injection and Safe ORM Usage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/08-xss-and-csrf.md">XSS and CSRF Defense</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/09-dependency-vulnerabilities.md">Managing Dependency Vulnerabilities</a></li>
+<li><strong>Safe Logging and Audit (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP Logging Cheat Sheet</a></li>
+<li><a href="https://csrc.nist.gov/publications/detail/sp/800-92/final">NIST 800-92 — Log Management</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Logging</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html">AWS S3 Object Lock</a></li>
+</ul>
+<p class="tags-line">Tags: Logging, AuditLog, SecureCoding, Compliance, SIEM</p>
+</body>
+</html>

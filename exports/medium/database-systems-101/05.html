@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Transactions and ACID</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Transactions and ACID</h1>
+<blockquote>
+<p>Database Systems 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does a power outage in the middle of a bank transfer not end up "subtracting one hundred dollars twice"?</p>
+<blockquote>
+<p>A transaction bundles several SQL statements into one unit and promises "all or nothing." The way the database keeps that promise is called ACID. Once you have this vocabulary, concurrency, recovery, and failure scenarios all start sounding like the same conversation.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a transaction is and why we need it</li>
+<li>What the four letters of ACID actually guarantee</li>
+<li>How to use BEGIN, COMMIT, and ROLLBACK</li>
+<li>The intuition behind a Write-Ahead Log (WAL)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Almost every business operation — money transfers, inventory adjustments, order creation — has to bundle two or more changes together. Stop in the middle and the data goes inconsistent. Without transactions, the application has to compensate by hand, which in practice does not work.</p>
+<blockquote>
+<p>"All or nothing." That single phrase is the whole essence of a transaction.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;BEGIN&quot;] --&gt; B[&quot;UPDATE A balance -100&quot;]
+    B --&gt; C[&quot;UPDATE B balance +100&quot;]
+    C --&gt; D{&quot;success?&quot;}
+    D --&gt;|&quot;YES&quot;| E[&quot;COMMIT&quot;]
+    D --&gt;|&quot;NO&quot;| F[&quot;ROLLBACK&quot;]
+</code></pre>
+<p>You begin a transaction, run several changes, then either COMMIT them all at once or ROLLBACK. From the outside, every change appears to happen at the same instant.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Transaction</strong>: A unit of work composed of several SQL statements.</li>
+<li><strong>Atomicity</strong>: All changes apply, or none do.</li>
+<li><strong>Consistency</strong>: Integrity constraints must hold before and after the transaction.</li>
+<li><strong>Isolation</strong>: Concurrent transactions appear as if they ran one after another (deep dive next post).</li>
+<li><strong>Durability</strong>: A committed change survives a power loss.</li>
+<li><strong>WAL</strong>: Before changing data, write the intent to a log. The foundation of recovery.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — transferring money without a transaction</strong></p>
+<pre><code class="language-sql">UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+-- (power outage here)
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+-- 100 dollars vanish
+</code></pre>
+<p><strong>After — wrapping the transfer in a transaction</strong></p>
+<pre><code class="language-sql">BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+-- A power outage rolls everything back to BEGIN. No money lost.
+</code></pre>
+<p>That single line of atomicity decides the trustworthiness of the system.</p>
+<h2>Hands-on: Working With Transactions</h2>
+<p><strong>Step 1 — Set up the accounts table</strong></p>
+<pre><code class="language-python"># setup.py
+import sqlite3
+
+with sqlite3.connect(&quot;bank.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        DROP TABLE IF EXISTS accounts;
+        CREATE TABLE accounts (
+            id      INTEGER PRIMARY KEY,
+            owner   TEXT NOT NULL,
+            balance INTEGER NOT NULL CHECK (balance &gt;= 0)
+        );
+        INSERT INTO accounts VALUES (1, 'Alice', 1000), (2, 'Bob', 1000);
+    &quot;&quot;&quot;)
+</code></pre>
+<p>We add a <code>balance &gt;= 0</code> constraint to the schema. Soon we will see how it blocks consistency violations (the C in ACID).</p>
+<p><strong>Step 2 — A normal transfer</strong></p>
+<pre><code class="language-python">import sqlite3
+
+def transfer(src: int, dst: int, amount: int) -&gt; None:
+    with sqlite3.connect(&quot;bank.db&quot;) as db:
+        try:
+            db.execute(&quot;BEGIN&quot;)
+            db.execute(&quot;UPDATE accounts SET balance = balance - ? WHERE id = ?&quot;, (amount, src))
+            db.execute(&quot;UPDATE accounts SET balance = balance + ? WHERE id = ?&quot;, (amount, dst))
+            db.execute(&quot;COMMIT&quot;)
+        except Exception:
+            db.execute(&quot;ROLLBACK&quot;)
+            raise
+
+transfer(1, 2, 100)
+</code></pre>
+<p>When the two UPDATEs sit between BEGIN and COMMIT, both apply or neither does.</p>
+<p><strong>Step 3 — Consistency violation triggers automatic rollback</strong></p>
+<pre><code class="language-python">try:
+    transfer(1, 2, 99999)  # more than Alice has
+except sqlite3.IntegrityError as e:
+    print(&quot;rolled back:&quot;, e)
+
+with sqlite3.connect(&quot;bank.db&quot;) as db:
+    print(db.execute(&quot;SELECT * FROM accounts&quot;).fetchall())
+</code></pre>
+<p>The moment the CHECK constraint fails, the transaction breaks and rolls back. Balances stay untouched.</p>
+<p><strong>Step 4 — Explicit ROLLBACK</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;bank.db&quot;) as db:
+    db.execute(&quot;BEGIN&quot;)
+    db.execute(&quot;UPDATE accounts SET balance = balance - 50 WHERE id = 1&quot;)
+    # simulate user cancellation
+    db.execute(&quot;ROLLBACK&quot;)
+    print(db.execute(&quot;SELECT balance FROM accounts WHERE id = 1&quot;).fetchone())
+</code></pre>
+<p>ROLLBACK is just "forget every change made since BEGIN." Nothing has actually hit the data file.</p>
+<p><strong>Step 5 — Be conscious of Durability</strong></p>
+<pre><code class="language-python">import sqlite3
+
+with sqlite3.connect(&quot;bank.db&quot;) as db:
+    db.execute(&quot;PRAGMA journal_mode=WAL&quot;)
+    db.execute(&quot;BEGIN&quot;)
+    db.execute(&quot;UPDATE accounts SET balance = balance + 1 WHERE id = 1&quot;)
+    db.execute(&quot;COMMIT&quot;)
+</code></pre>
+<p>WAL mode writes the change to a log before touching the data file. At COMMIT time, all that has to be guaranteed on disk is the log. That is enough for durability.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Transactions are <strong>explicit</strong>. Auto-commit mode is convenient, but it commits one statement at a time.</li>
+<li>If an exception fires, you must ROLLBACK. Otherwise the next call starts in a strange state.</li>
+<li>CHECK and FOREIGN KEY constraints are the practical tools of consistency (C).</li>
+<li>WAL is the practical tool of durability (D).</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Holding a transaction open too long.</strong> Putting user input or external API calls inside a transaction stretches locks and stalls everyone else.</li>
+<li><strong>Forgetting ROLLBACK in the exception path.</strong> Do not assume "it'll roll back implicitly" — make it explicit.</li>
+<li><strong>Doing batch work with auto-commit on.</strong> N inserts become N commits, and performance collapses.</li>
+<li><strong>Wrapping every SELECT in a transaction.</strong> Keep read-only work short and group writes together.</li>
+<li><strong>Treating ROLLBACK as "recovery."</strong> ROLLBACK undoes database changes, not side effects (sent emails, payment calls).</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>ORMs and frameworks usually start and end transactions per function. Python's SQLAlchemy <code>Session</code> and Django's <code>@transaction.atomic</code> are typical. The trick is matching transaction boundaries to business units like "create order."</p>
+<p>Transactions are also the starting point for incident analysis. Asking "how far did this transaction get?" reveals partial updates, deadlocks, and side-effect ownership. Side effects (email, payment) live outside the transaction whenever possible, with idempotency to make retries safe.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They line up transaction boundaries with business units.</li>
+<li>They avoid external calls inside a transaction.</li>
+<li>They keep asking "is this rollback safe?" Anything with side effects gets pulled out.</li>
+<li>A long-running transaction triggers immediate suspicion about lock contention.</li>
+<li>Integrity constraints (NOT NULL, CHECK, FK) are defined at the data model layer.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do business units and transaction boundaries match?</li>
+<li>[ ] Does the transaction avoid external calls and user input waits?</li>
+<li>[ ] Is ROLLBACK guaranteed in every exception path?</li>
+<li>[ ] Are integrity constraints in active use?</li>
+<li>[ ] Are side effects handled outside the transaction with idempotency?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain in one sentence why inserting 10,000 rows is much faster inside one transaction than with auto-commit on.</li>
+<li>A payment API call is wrapped inside a transaction, and a slow response causes the transaction to time out. Describe what could go wrong and how to design it more safely.</li>
+<li>Which letter of ACID guarantees that "a committed change survives a power outage"?</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A transaction is the "all or nothing" promise; ACID refines that promise across four properties (atomicity, consistency, isolation, durability). WAL and constraints are the actual mechanisms that keep the promise. The next post zooms into the I — isolation — and walks through what READ COMMITTED, REPEATABLE READ, and SERIALIZABLE prevent and what they still allow.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Indexes</a></li>
+<li><strong>Transactions and ACID (current)</strong></li>
+<li>Isolation Levels (upcoming)</li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/tutorial-transactions.html">PostgreSQL — Transactions</a></li>
+<li><a href="https://www.sqlite.org/lang_transaction.html">SQLite — Transactions</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Chapter 7</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ACID">Wikipedia — ACID</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, Transactions, ACID, WAL, Concurrency</p>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ETL and ELT</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>ETL and ELT</h1>
+<blockquote>
+<p>Data Warehouse 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Should we transform <em>before</em> loading or <em>after</em>? The answer hinges on <em>how warehouse compute has evolved</em>.</p>
+<blockquote>
+<p><em>Yesterday it was </em>transform then load<em>. Today it is </em>load then transform in SQL<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>ETL</em> and <em>ELT</em></li>
+<li><em>Where</em> to put transformations</li>
+<li>Why modern warehouses lean toward <em>ELT</em></li>
+<li>Five-step pipeline hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>As warehouse <em>compute became cheap</em>, loading the <em>raw source</em> and <em>transforming with SQL</em> turned into the <em>default</em>. Transformations live as <em>SQL files</em> under <em>version control</em>, and <em>replay is easy</em>.</p>
+<blockquote>
+<p><em>Pull transforms into SQL. Visibility and reproducibility come along for the ride.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Src[&quot;Source&quot;] --&gt; ELoad[&quot;Load (raw)&quot;]
+    ELoad --&gt; DW[&quot;Warehouse&quot;]
+    DW --&gt; Transform[&quot;Transform (SQL)&quot;]
+    Transform --&gt; Mart[&quot;Mart&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>ETL</strong>: Extract → Transform → Load. Transform <em>before</em> loading.</li>
+<li><strong>ELT</strong>: Extract → Load → Transform. Transform <em>after</em> loading.</li>
+<li><strong>Staging</strong>: The first layer that <em>preserves the raw source</em>.</li>
+<li><strong>dbt</strong>: A SQL-based <em>transformation tool</em> with <em>built-in tests</em>.</li>
+<li><strong>Idempotent</strong>: Multiple runs yield <em>the same result</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A mid-ETL <em>transform fails</em>; replaying is painful because the <em>raw is already gone</em>.</p>
+<p><strong>After</strong>: Raw stays in <em>staging</em>; rerunning the <em>SQL transform</em> is a 30-minute job.</p>
+<h2>Hands-on: Pipeline in Five Steps</h2>
+<p><strong>Step 1 — Load raw</strong></p>
+<pre><code class="language-sql">COPY raw.orders
+FROM 's3://bucket/orders/2026-05-04/'
+FORMAT AS PARQUET;
+</code></pre>
+<p><strong>Step 2 — Staging model</strong></p>
+<pre><code class="language-sql">CREATE OR REPLACE TABLE staging.orders AS
+SELECT
+    order_id::BIGINT AS order_id,
+    user_id::BIGINT AS user_id,
+    amount::NUMERIC(12, 2) AS amount,
+    created_at::TIMESTAMP AS created_at
+FROM raw.orders;
+</code></pre>
+<p><strong>Step 3 — Transform model</strong></p>
+<pre><code class="language-sql">CREATE OR REPLACE TABLE marts.fact_orders AS
+SELECT
+    order_id,
+    user_id,
+    amount,
+    DATE(created_at) AS order_date
+FROM staging.orders
+WHERE amount &gt; 0;
+</code></pre>
+<p><strong>Step 4 — Test</strong></p>
+<pre><code class="language-sql">-- No negative amounts allowed
+SELECT COUNT(*) AS bad
+FROM marts.fact_orders
+WHERE amount &lt;= 0;
+</code></pre>
+<p><strong>Step 5 — Rerun</strong></p>
+<pre><code class="language-sql">-- Raw stays put; only the transform replays
+TRUNCATE marts.fact_orders;
+INSERT INTO marts.fact_orders SELECT ...;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The flow is <em>raw → staging → mart</em>, three layers.</li>
+<li>Transformation lives in <em>one SQL file</em>.</li>
+<li>The rerun is <em>idempotent</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Overwriting the <em>raw source</em>.</strong> <em>Point-in-time replay</em> becomes <em>impossible</em>.</li>
+<li><strong>Hiding transforms inside <em>Python functions</em>.</strong> <em>Visibility drops</em> and <em>debugging suffers</em>.</li>
+<li><strong>Loading without <em>tests</em>.</strong> Bad data leaks into <em>dashboards</em>.</li>
+<li><strong>Reruns <em>change the result</em>.</strong> Without idempotency, <em>trust collapses</em>.</li>
+<li><strong>Stuffing all transforms into <em>one model</em>.</strong> <em>Smaller models</em> are <em>easier to maintain</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Fivetran/Airbyte</em> for loading, <em>dbt</em> for transforms, <em>Airflow/Dagster</em> for orchestration — this combo is the <em>current standard</em>. Transformations live as <em>SQL models</em> in <em>Git</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Treat raw as a </em>legal record<em> — preserve it.</em></li>
+<li><em>Concentrate transforms in </em>SQL files<em>.</em></li>
+<li><em>Every model lives next to a </em>test<em>.</em></li>
+<li><em>Idempotency</em> is another name for <em>reproducibility</em>.</li>
+<li><em>Version-control the </em>pipeline itself<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>ETL</em> from <em>ELT</em>.</li>
+<li>[ ] You know what <em>staging</em> is for.</li>
+<li>[ ] You can define <em>idempotent</em>.</li>
+<li>[ ] You can attach a <em>test</em> to a transform.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Name a case where <em>ETL is better</em>.</li>
+<li>List <em>three</em> risks of skipping <em>staging</em>.</li>
+<li>Give an example of a <em>non-idempotent</em> transform.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>ELT is the shape of the <em>SQL era</em>. Next, we look at <em>BI and dashboards</em> — turning data into a story.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/05-partition-and-clustering.md">Partition and Clustering</a></li>
+<li><strong>ETL and ELT (current)</strong></li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.getdbt.com/docs/introduction">dbt — What Is dbt?</a></li>
+<li><a href="https://www.fivetran.com/blog/elt-vs-etl">Fivetran — ELT vs ETL</a></li>
+<li><a href="https://airbyte.com/blog/modern-data-stack">Airbyte — Modern Data Stack</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, ETL, ELT, Pipeline, Analytics</p>
+</body>
+</html>

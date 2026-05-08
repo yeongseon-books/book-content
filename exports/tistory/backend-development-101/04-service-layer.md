@@ -1,0 +1,218 @@
+
+# Service Layer
+
+> Backend Development 101 시리즈 (4/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: "비즈니스 로직"은 *어디에* 두어야 하나요?
+
+> Controller도 아니고 Repository도 아닌 *Service Layer* 입니다. 한 행동(register, transfer, refund)을 한 함수로 묶어 의미를 만듭니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- Service Layer의 정의와 역할
+- Controller / Service / Repository의 책임 분리
+- 트랜잭션을 어디서 시작할지
+- Service에 의존성을 주입하는 패턴
+- 도메인 이벤트가 끼어드는 자리
+
+## 왜 중요한가
+
+Controller에 비즈니스 로직을 넣으면 같은 규칙이 *세 군데* 에 흩어집니다 — REST, gRPC, 배치 작업. Service에 모으면 *어느 입구로 들어와도 같은 규칙* 이 적용됩니다. 이 한 가지 원칙이 서비스 수명을 결정합니다.
+
+> 비즈니스 규칙은 *입구가 바뀌어도 변하지 않습니다.*
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    Ctrl["Controller"] --> Svc["Service"]
+    Svc --> Repo["Repository"]
+    Svc --> Ext["External API"]
+    Svc --> Bus["Event bus"]
+```
+
+Service는 *오케스트레이터* — Repo, 외부 API, 이벤트 버스를 *조율* 합니다.
+
+## 핵심 용어 정리
+
+- **Service**: 한 비즈니스 행동(use case)을 담당하는 객체.
+- **Use case**: "주문 생성", "환불 처리" 같은 *시나리오*.
+- **Transaction boundary**: 한 단위로 commit/rollback 되는 범위.
+- **Domain event**: 비즈니스 행동이 끝났음을 알리는 메시지.
+- **DI(Dependency Injection)**: 의존 객체를 *생성자나 인자로* 받기.
+
+## Before/After
+
+**Before (Controller가 모든 일을 함)**
+
+```python
+@app.post("/orders")
+def create_order(payload, db, mail):
+    if payload.amount <= 0:
+        raise HTTPException(400)
+    order = db.insert("orders", payload.dict())
+    mail.send(payload.email, "ordered")
+    return order
+```
+
+**After (Service가 책임)**
+
+```python
+# services/order_service.py
+class OrderService:
+    def __init__(self, repo, mailer):
+        self.repo = repo
+        self.mailer = mailer
+
+    def create(self, payload):
+        if payload.amount <= 0:
+            raise ValueError("amount must be > 0")
+        order = self.repo.save(payload)
+        self.mailer.send(payload.email, "ordered")
+        return order
+
+# routers/orders.py
+@router.post("")
+def create_order(payload, svc: OrderService = Depends(get_order_service)):
+    return svc.create(payload)
+```
+
+Controller는 *얇아지고* , 같은 service를 배치 작업에서 재사용할 수 있습니다.
+
+## 실습: Service 설계 5단계
+
+### 1단계 — 가장 작은 service
+
+```python
+# 1_service.py
+class GreetService:
+    def hello(self, name: str) -> str:
+        return f"hello, {name}"
+```
+
+### 2단계 — 의존성 주입
+
+```python
+# 2_di.py
+class UserService:
+    def __init__(self, repo):
+        self.repo = repo
+
+    def register(self, name: str):
+        return self.repo.insert({"name": name})
+```
+
+### 3단계 — 트랜잭션 경계
+
+```python
+# 3_tx.py
+class TransferService:
+    def __init__(self, accounts, tx):
+        self.accounts = accounts
+        self.tx = tx
+
+    def transfer(self, src, dst, amount):
+        with self.tx.begin():
+            self.accounts.debit(src, amount)
+            self.accounts.credit(dst, amount)
+```
+
+### 4단계 — 외부 호출 통합
+
+```python
+# 4_external.py
+class CheckoutService:
+    def __init__(self, repo, payment_gw):
+        self.repo = repo
+        self.gw = payment_gw
+
+    def checkout(self, cart):
+        receipt = self.gw.charge(cart.total)
+        return self.repo.save_order(cart, receipt.id)
+```
+
+### 5단계 — 도메인 이벤트 발행
+
+```python
+# 5_event.py
+class OrderService:
+    def __init__(self, repo, bus):
+        self.repo = repo
+        self.bus = bus
+
+    def place(self, payload):
+        order = self.repo.save(payload)
+        self.bus.publish("OrderPlaced", {"id": order.id})
+        return order
+```
+
+## 이 코드에서 주목할 점
+
+- Service는 *언제나* 의존성을 *받아옵니다* — 직접 만들지 않습니다.
+- 트랜잭션은 *Service 안* 에서 시작합니다 — Repository가 아닙니다.
+- 외부 호출은 *결과를 검증* 한 뒤 다음 단계로 넘깁니다.
+
+## 자주 하는 실수 5가지
+
+1. **Service에서 Request 객체를 직접 받는다.** Service는 *플레인 입력* 만 다룹니다.
+2. **Service에서 HTTP 예외(`HTTPException`)를 던진다.** Controller에서 변환해야 합니다.
+3. **트랜잭션을 Repository에서 연다.** 한 use case가 두 개의 트랜잭션으로 쪼개집니다.
+4. **Service가 다른 Service를 직접 import한다.** 순환 의존이 생깁니다 — 이벤트 버스로 분리합니다.
+5. **모든 함수를 한 service에 넣는다.** 한 service = 한 도메인이 좋습니다.
+
+## 실무에서는 이렇게 쓰입니다
+
+큰 백엔드는 도메인 단위로 service 디렉터리를 둡니다(`services/orders/`, `services/payments/`). 한 use case는 *한 service의 한 메서드* — 이 단순한 규칙이 새 팀원도 30분 만에 적응하게 만듭니다. DDD를 본격적으로 도입하지 않더라도 이 정도 분리는 *모든* 백엔드에 도움이 됩니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 한 use case는 한 메서드 — 길어지면 *분리 신호* 다.
+- Service는 *입력 → 결과* 의 함수처럼 본다.
+- 트랜잭션 경계를 *명시적* 으로 만든다.
+- 외부 호출은 *재시도 정책* 을 service 안에서 결정한다.
+- Service만 보고 *비즈니스 규칙* 을 설명할 수 있어야 한다.
+
+## 체크리스트
+
+- [ ] Controller / Service / Repository의 책임을 말할 수 있다.
+- [ ] Service에 의존성을 주입할 수 있다.
+- [ ] 트랜잭션을 Service에서 열 수 있다.
+- [ ] HTTP 예외와 도메인 예외를 구분한다.
+- [ ] 도메인 이벤트가 무엇인지 안다.
+
+## 연습 문제
+
+1. `RefundService.refund(order_id)` 를 만들고 잘못된 ID에 대해 `RefundError` 를 던지세요.
+2. `TransferService` 에 *잔액 부족* 검증을 추가하세요.
+3. 한 service의 메서드가 길어졌다면, 새 service로 분리하는 리팩터링을 시도하세요.
+
+## 정리 및 다음 단계
+
+Service는 *비즈니스 규칙의 집* 입니다. 다음 글에서는 그 아래에서 데이터를 다루는 *Database Layer* 를 봅니다.
+
+- [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
+- [HTTP 서버 만들기](./02-building-an-http-server.md)
+- [Routing과 Controller](./03-routing-and-controllers.md)
+- **Service Layer (현재 글)**
+- Database Layer (예정)
+- 인증과 권한 (예정)
+- Logging과 Error Handling (예정)
+- 백엔드 테스트 (예정)
+- 백엔드 배포 (예정)
+- 운영 가능한 백엔드 구조 (예정)
+## 참고 자료
+
+- [Service Layer pattern (Martin Fowler)](https://martinfowler.com/eaaCatalog/serviceLayer.html)
+- [DDD reference (Eric Evans)](https://www.domainlanguage.com/ddd/reference/)
+- [Architecture Patterns with Python](https://www.cosmicpython.com/)
+- [FastAPI dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
+
+Tags: Backend, Architecture, DesignPatterns, Python, DDD
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

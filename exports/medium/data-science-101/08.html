@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evaluation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Evaluation</h1>
+<blockquote>
+<p>Data Science 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Does <em>high accuracy</em> really mean a <em>good model</em>? Which <em>metric</em> should you use <em>when</em>?</p>
+<blockquote>
+<p><em>Choosing a metric is the </em>same act<em> as defining the problem.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How <em>accuracy can mislead</em></li>
+<li>Classification: <em>precision / recall / F1 / ROC AUC</em></li>
+<li>Regression: <em>MAE / RMSE / R²</em></li>
+<li>A 5-step evaluation exercise</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If the metric <em>misaligns with the problem</em>, the model learns the <em>wrong direction</em>. Encoding <em>business cost</em> into the metric makes <em>decisions land</em>.</p>
+<blockquote>
+<p><em>Metrics are </em>what you optimize<em> — choose them carefully.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Cls[&quot;Classification&quot;] --&gt; P[&quot;Precision&quot;]
+    Cls --&gt; R[&quot;Recall&quot;]
+    Cls --&gt; F[&quot;F1&quot;]
+    Cls --&gt; A[&quot;ROC AUC&quot;]
+    Reg[&quot;Regression&quot;] --&gt; MAE[&quot;MAE&quot;]
+    Reg --&gt; RMSE[&quot;RMSE&quot;]
+    Reg --&gt; R2[&quot;R-squared&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Confusion matrix</strong>: TP / FP / FN / TN table.</li>
+<li><strong>Precision</strong>: of <em>predicted positives</em>, how many are right.</li>
+<li><strong>Recall</strong>: of <em>actual positives</em>, how many we caught.</li>
+<li><strong>F1</strong>: <em>harmonic mean</em> of P and R.</li>
+<li><strong>ROC AUC</strong>: threshold-independent <em>separability</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: fraud model hits <em>99% accuracy</em>, but <em>recall is 5%</em> — most fraud is missed.</p>
+<p><strong>After</strong>: <em>recall</em> is the primary metric, with <em>F1 / cost</em> as secondary.</p>
+<h2>Hands-on: 5-step Evaluation</h2>
+<p><strong>Step 1 — Confusion matrix</strong></p>
+<pre><code class="language-python">from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+print(cm)
+</code></pre>
+<p><strong>Step 2 — Precision / Recall / F1</strong></p>
+<pre><code class="language-python">from sklearn.metrics import precision_score, recall_score, f1_score
+print(precision_score(y_test, y_pred))
+print(recall_score(y_test, y_pred))
+print(f1_score(y_test, y_pred))
+</code></pre>
+<p><strong>Step 3 — ROC AUC</strong></p>
+<pre><code class="language-python">from sklearn.metrics import roc_auc_score
+proba = model.predict_proba(X_test)[:, 1]
+print(roc_auc_score(y_test, proba))
+</code></pre>
+<p><strong>Step 4 — Regression metrics</strong></p>
+<pre><code class="language-python">from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np
+
+print(&quot;MAE :&quot;, mean_absolute_error(y_test, y_pred))
+print(&quot;RMSE:&quot;, np.sqrt(mean_squared_error(y_test, y_pred)))
+print(&quot;R^2 :&quot;, r2_score(y_test, y_pred))
+</code></pre>
+<p><strong>Step 5 — Encode business cost</strong></p>
+<pre><code class="language-python"># A false negative costs 5x a false positive
+cost = 5 * cm[1, 0] + 1 * cm[0, 1]
+print(&quot;expected cost:&quot;, cost)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>confusion matrix</em> is the <em>root</em> of every classification metric.</li>
+<li><em>Probability-based</em> metrics like ROC AUC are <em>threshold-independent</em>.</li>
+<li><em>Business cost</em> should be computed <em>directly</em> and treated as a metric.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Watching only <em>accuracy</em>.</strong> Misleading on imbalanced data.</li>
+<li><strong>Looking at only <em>one threshold</em>.</strong> Always pair with <em>ROC</em>.</li>
+<li><strong>Watching only <em>RMSE</em>.</strong> It's <em>too sensitive</em> to outliers.</li>
+<li><strong>Tuning the <em>threshold on the test set</em>.</strong> That's <em>data leakage</em>.</li>
+<li><strong>Ignoring <em>business cost</em>.</strong> Decisions and metrics drift apart.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Teams pair a <em>primary metric</em> with <em>guardrail metrics</em>. Example: primary = <em>recall</em>, guardrail = <em>precision &gt;= 0.7</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Pick the <em>metric with the problem</em>.</li>
+<li>Document the <em>cost matrix</em> in writing.</li>
+<li>Separate <em>primary</em> from <em>guardrails</em>.</li>
+<li>Tune <em>thresholds on validation</em>, never on test.</li>
+<li>Treat <em>metric changes</em> as <em>PR-worthy</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the difference between <em>Precision / Recall / F1</em>.</li>
+<li>[ ] I understand <em>ROC AUC</em>.</li>
+<li>[ ] I know the difference between <em>MAE / RMSE / R²</em>.</li>
+<li>[ ] I can build a <em>cost matrix</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>On <em>imbalanced data</em>, build a case where <em>accuracy and recall disagree</em>.</li>
+<li>Plot a <em>ROC curve</em> and observe the <em>threshold trade-off</em>.</li>
+<li>Define a <em>cost-based metric</em> and pick the <em>optimal threshold</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Evaluation is the <em>conversation</em> between problem and model. Next we look at how to <em>interpret</em> the results into a <em>decision</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/07-modeling.md">Modeling</a></li>
+<li><strong>Evaluation (current)</strong></li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn — Model Evaluation</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course/classification">Google — Classification Metrics</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Wikipedia — Receiver Operating Characteristic</a></li>
+<li><a href="https://github.com/ageron/handson-ml3">Aurelien Geron — Hands-On ML</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, Evaluation, Metrics, ScikitLearn, Beginner</p>
+</body>
+</html>

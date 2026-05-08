@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Collection</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Collection</h1>
+<blockquote>
+<p>Data Science 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Where</em> and <em>how</em> do you actually collect the data your analysis needs — and how do you tell the <em>original</em> from a <em>copy</em>?</p>
+<blockquote>
+<p><em>Every analysis starts by writing down </em>where the data came from<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Four common <em>data sources</em>: files, APIs, databases, event logs</li>
+<li>The difference between <em>original</em>, <em>copy</em>, and <em>snapshot</em></li>
+<li>The role of a <em>data dictionary</em></li>
+<li>A 5-step collection exercise</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A missing record at the <em>collection step</em> haunts you all the way to the final report. The small habit of <em>writing down the source</em> is what gives you <em>reproducibility</em>.</p>
+<blockquote>
+<p><em>Only </em>traceable<em> data is </em>trustworthy<em> data.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    File[&quot;File / CSV&quot;] --&gt; Stage[&quot;Staging&quot;]
+    API[&quot;API&quot;] --&gt; Stage
+    DB[&quot;Database&quot;] --&gt; Stage
+    Log[&quot;Event Log&quot;] --&gt; Stage
+    Stage --&gt; Analysis[&quot;Analysis&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Source of truth</strong>: the <em>authoritative origin</em> of the data.</li>
+<li><strong>Snapshot</strong>: a <em>frozen copy</em> taken at a specific moment.</li>
+<li><strong>Schema</strong>: the <em>shape and types</em> of the data.</li>
+<li><strong>Data dictionary</strong>: a <em>table that documents</em> what each column means.</li>
+<li><strong>Provenance</strong>: the data's <em>origin and history</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: a teammate sends an <em>Excel file</em>. You don't know <em>when</em> it was pulled or <em>where</em> it came from.</p>
+<p><strong>After</strong>: you pull the same data with <em>SQL from the warehouse</em>, recording the <em>hash and timestamp</em>. You can <em>reproduce</em> the analysis months later.</p>
+<h2>Hands-on: 5-step Collection</h2>
+<p><strong>Step 1 — From a file</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;data/users-2026-05-04.csv&quot;)
+print(df.shape)
+</code></pre>
+<p><strong>Step 2 — From an API</strong></p>
+<pre><code class="language-python">import requests
+resp = requests.get(&quot;https://api.example.com/users&quot;, timeout=10)
+resp.raise_for_status()
+users = resp.json()
+</code></pre>
+<p><strong>Step 3 — From a database</strong></p>
+<pre><code class="language-python">from sqlalchemy import create_engine
+engine = create_engine(&quot;postgresql://user:pass@host/db&quot;)
+df = pd.read_sql(
+    &quot;SELECT id, signup_at FROM users WHERE signup_at &gt; '2026-01-01'&quot;,
+    engine,
+)
+</code></pre>
+<p><strong>Step 4 — From an event log</strong></p>
+<pre><code class="language-python"># JSONL — one JSON event per line
+import json
+with open(&quot;events.jsonl&quot;) as f:
+    events = [json.loads(line) for line in f]
+</code></pre>
+<p><strong>Step 5 — Record provenance</strong></p>
+<pre><code class="language-python">import hashlib
+import datetime
+
+meta = {
+    &quot;source&quot;: &quot;postgres://prod-replica/users&quot;,
+    &quot;fetched_at&quot;: datetime.datetime.utcnow().isoformat(),
+    &quot;row_count&quot;: len(df),
+    &quot;sha256&quot;: hashlib.sha256(
+        pd.util.hash_pandas_object(df).values.tobytes()
+    ).hexdigest()[:16],
+}
+print(meta)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Always record the <em>source and timestamp</em> together.</li>
+<li>A <em>hash</em> is a cheap way to detect <em>whether the data changed</em>.</li>
+<li><em>Never modify originals</em> — make all changes downstream in <em>staging</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Overwriting the <em>original</em> in Excel.</strong> No way to roll back.</li>
+<li><strong>Ignoring API <em>rate limits</em>.</strong> You will get throttled or blocked.</li>
+<li><strong>Not documenting the <em>schema</em>.</strong> Column meaning evaporates.</li>
+<li><strong>Not tracking <em>log format changes</em>.</strong> Analyses <em>silently break</em>.</li>
+<li><strong>Storing <em>sensitive data</em> on a personal laptop.</strong> Security incident waiting to happen.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Data teams run collection scripts in <em>Airflow / dbt</em>. Every load adds <em>load_id, fetched_at, source</em> columns. The <em>data dictionary</em> lives in <em>Notion or Confluence</em> and updates with every PR.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Never modify the <em>original</em>.</li>
+<li>Record <em>source, timestamp, hash</em> by reflex.</li>
+<li>Catch <em>schema changes</em> with <em>alerts</em>.</li>
+<li>Mask <em>sensitive data</em> before analysis.</li>
+<li>The <em>data dictionary</em> is your best documentation.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the four common <em>sources</em>.</li>
+<li>[ ] I understand what a <em>snapshot</em> is.</li>
+<li>[ ] I can write a <em>data dictionary</em>.</li>
+<li>[ ] I record <em>provenance</em> by default.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a <em>public API</em>, collect a small sample, and write the <em>metadata</em>.</li>
+<li>Sketch the <em>original → staging → analysis</em> flow as a diagram.</li>
+<li>Document a <em>case where a schema changed</em> and how it affected analyses.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Collection is the <em>recording step</em>. Next, we will look at how to <em>clean</em> the data we have collected.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><strong>Data Collection (current)</strong></li>
+<li>Data Cleaning (upcoming)</li>
+<li>Exploratory Data Analysis (upcoming)</li>
+<li>Visualization (upcoming)</li>
+<li>Modeling (upcoming)</li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://requests.readthedocs.io/en/latest/user/quickstart/">requests — Quickstart</a></li>
+<li><a href="https://pandas.pydata.org/docs/user_guide/io.html">pandas — IO Tools</a></li>
+<li><a href="https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/dags.html">Airflow — Concepts</a></li>
+<li><a href="https://research.google/pubs/data-validation-for-machine-learning/">Google — Data Validation for Machine Learning</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, DataCollection, API, Database, Beginner</p>
+</body>
+</html>

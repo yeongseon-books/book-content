@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is DevOps?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is DevOps?</h1>
+<blockquote>
+<p>DevOps 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Where does it start to go wrong when <em>the dev team</em> and <em>the ops team</em> keep <em>blaming each other</em>?</p>
+<blockquote>
+<p>DevOps is <em>not a tool</em> but <em>a culture</em> — a way of working where you <em>build together and own together</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>DevOps</em> and the context that produced it</li>
+<li>The <em>pain</em> of the era when <em>Dev</em> and <em>Ops</em> were separated</li>
+<li>The <em>three principles</em> of DevOps</li>
+<li>The <em>minimum tools</em> to start with</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Software produces no value when <em>only built</em>. It must be <em>deployed</em> and <em>operated</em> to reach users. <em>DevOps</em> is the practice of keeping that flow <em>unbroken</em>.</p>
+<blockquote>
+<p><em>Fast deploys</em> and <em>stable operations</em> are <em>not in conflict</em>. They go together.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;Write code&quot;] --&gt; Build[&quot;Build/Test&quot;]
+    Build --&gt; Deploy[&quot;Deploy&quot;]
+    Deploy --&gt; Operate[&quot;Operate/Monitor&quot;]
+    Operate --&gt; Code
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Dev</strong>: <em>Development</em>.</li>
+<li><strong>Ops</strong>: <em>Operations</em>.</li>
+<li><strong>CI</strong>: <em>Auto-integrate and validate</em> every commit.</li>
+<li><strong>CD</strong>: <em>Auto-deploy</em> validated code.</li>
+<li><strong>SRE</strong>: <em>Site Reliability Engineering</em>. The role that treats operations <em>as code</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (separated organizations)</strong></p>
+<pre><code class="language-text">- Dev team: &quot;It works on my laptop&quot;
+- Ops team: &quot;You broke it again&quot;
+- Deploys *once a quarter*, every time a *weekend overtime*
+</code></pre>
+<p><strong>After (DevOps)</strong></p>
+<pre><code class="language-text">- Every PR is merged after *passing CI*
+- Capable of *dozens of deploys per day*
+- Incidents are handled *together*; postmortems are run *together*
+</code></pre>
+<h2>Hands-on: Five Steps to Start with DevOps</h2>
+<p><strong>Step 1 - Git-based collaboration</strong></p>
+<pre><code class="language-bash">git checkout -b feat/login
+# after changes
+git commit -m &quot;feat(auth): add login form&quot;
+git push origin feat/login
+# open a PR
+</code></pre>
+<p><strong>Step 2 - Automate CI</strong></p>
+<pre><code class="language-yaml"># .github/workflows/ci.yml
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pytest
+</code></pre>
+<p><strong>Step 3 - Add one auto-deploy line</strong></p>
+<pre><code class="language-yaml">deploy:
+  needs: test
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  steps:
+    - run: ./deploy.sh
+</code></pre>
+<p><strong>Step 4 - Attach monitoring</strong></p>
+<pre><code class="language-python"># a one-line health check
+@app.get(&quot;/health&quot;)
+def health(): return {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<p><strong>Step 5 - Start incident postmortems</strong></p>
+<pre><code class="language-text">- What happened
+- Why was the discovery late
+- How will we know faster next time
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Start from <em>small automation</em>. It is not a grand transformation.</li>
+<li><em>Dev and Ops</em> look at <em>the same repository</em>.</li>
+<li>Everything is expressed <em>as code</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Making DevOps a <em>department name</em>.</strong> It is <em>culture</em>, not an <em>org chart</em>.</li>
+<li><strong>Adopting tools while <em>keeping the same process</em>.</strong> Installing Jenkins is meaningless if you still ship quarterly.</li>
+<li><strong>Pushing <em>all responsibility</em> onto ops.</strong> <em>Own it together</em>.</li>
+<li><strong>Over-investing in automation.</strong> Do not build a <em>3-day automation</em> for a <em>one-shot task</em>.</li>
+<li><strong>Blaming people after incidents.</strong> Blame the <em>system</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Successful teams start <em>small</em>. Auto tests on PRs -&gt; auto deploy -&gt; monitoring -&gt; postmortem culture, settling in over <em>six months</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Every manual step</em> is an automation candidate.</li>
+<li><em>Deploy frequency</em> is a <em>health indicator</em> of the organization.</li>
+<li><em>Incidents are learning opportunities</em> for the system.</li>
+<li><em>Dev and Ops</em> are <em>one team</em>.</li>
+<li>The <em>length of the feedback loop</em> decides everything.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Every PR</em> runs automated tests.</li>
+<li>[ ] A <em>main merge</em> triggers <em>automatic deployment</em>.</li>
+<li>[ ] Basic <em>monitoring</em> exists.</li>
+<li>[ ] <em>Postmortems</em> are held regularly.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List every <em>manual deploy step</em> in your project.</li>
+<li>Mark <em>three of them</em> as automation candidates.</li>
+<li>Summarize your <em>most recent incident</em> postmortem in <em>three sentences</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>DevOps is a <em>cultural shift</em>. In the next post we go deep on its first lever — the <em>CI pipeline</em>.</p>
+<ul>
+<li><strong>What Is DevOps? (current)</strong></li>
+<li>CI Pipeline (upcoming)</li>
+<li>CD and Deployment Strategies (upcoming)</li>
+<li>Environments and Configuration (upcoming)</li>
+<li>Infrastructure as Code (upcoming)</li>
+<li>Containers and Build (upcoming)</li>
+<li>Monitoring and Alerting (upcoming)</li>
+<li>Logging and Analysis (upcoming)</li>
+<li>Incident Response and On-Call (upcoming)</li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://itrevolution.com/product/the-phoenix-project/">The Phoenix Project (Gene Kim)</a></li>
+<li><a href="https://sre.google/books/">Google SRE Book</a></li>
+<li><a href="https://www.atlassian.com/devops">Atlassian DevOps Guide</a></li>
+<li><a href="https://dora.dev/">DORA State of DevOps</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, Culture, CI, CD, Engineering</p>
+</body>
+</html>

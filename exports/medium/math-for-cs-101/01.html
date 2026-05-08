@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why Math for CS</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why Math for CS</h1>
+<blockquote>
+<p>Math for CS 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If you can already <em>code</em>, <em>why</em> do you need <em>math</em>?</p>
+<blockquote>
+<p><em>Math</em> is the <em>common language</em> of <em>abstraction</em>, <em>proof</em>, <em>modeling</em>, and <em>analysis</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>role</em> of math</li>
+<li><em>Abstraction</em> and <em>proof</em></li>
+<li><em>Modeling</em> and <em>analysis</em></li>
+<li>The big picture across <em>nine areas</em></li>
+<li>A <em>learning</em> order</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Half of what makes a <em>problem</em> feel <em>hard</em> is missing <em>mathematical vocabulary</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Math[&quot;math&quot;] --&gt; Abs[&quot;abstraction&quot;]
+    Math --&gt; Proof[&quot;proof&quot;]
+    Math --&gt; Model[&quot;modeling&quot;]
+    Math --&gt; Anal[&quot;analysis&quot;]
+    Anal --&gt; CS[&quot;computer science&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>abstraction</strong>: <em>extracting</em> common patterns.</li>
+<li><strong>proof</strong>: a <em>logical</em> guarantee of <em>truth</em>.</li>
+<li><strong>modeling</strong>: turning <em>reality</em> into <em>equations</em>.</li>
+<li><strong>analysis</strong>: <em>measuring</em> behavior.</li>
+<li><strong>invariant</strong>: a property that <em>does not change</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: if the <em>code runs</em>, you're done.</p>
+<p><strong>After</strong>: explain <em>why it runs</em> with <em>math</em>.</p>
+<h2>Hands-on: Five Steps to Mathematical Thinking</h2>
+<p><strong>Step 1 — Extract the pattern</strong></p>
+<pre><code class="language-python">def common(a, b):
+    return [x for x in a if x in b]
+</code></pre>
+<p><strong>Step 2 — Check the invariant</strong></p>
+<pre><code class="language-python">def invariant(items):
+    assert sum(items) &gt;= 0
+    return True
+</code></pre>
+<p><strong>Step 3 — Model</strong></p>
+<pre><code class="language-python">def model(rate, time):
+    return rate * time
+</code></pre>
+<p><strong>Step 4 — Measure complexity</strong></p>
+<pre><code class="language-python">def linear(n):
+    return [i for i in range(n)]
+</code></pre>
+<p><strong>Step 5 — Sketch a proof</strong></p>
+<pre><code class="language-python">def proof_sketch(claim):
+    return f&quot;assume {claim}; derive contradiction&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Common</em> is a <em>set</em> operation.</li>
+<li>An <em>invariant</em> is one <em>assert</em>.</li>
+<li><em>Complexity</em> is a function of <em>input size</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>math</em> as just <em>formulas</em>.</strong></li>
+<li><strong>Trusting <em>intuition</em> without a <em>proof</em>.</strong></li>
+<li><strong>Confusing the <em>model</em> with <em>reality</em>.</strong></li>
+<li><strong>Substituting a <em>benchmark</em> for a <em>complexity</em> analysis.</strong></li>
+<li><strong>Memorizing <em>symbols</em> without meaning.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Recommenders</em> lean on <em>linear algebra</em>; <em>distributed systems</em> on <em>logic</em> and <em>probability</em>; <em>AI</em> on <em>calculus</em> and <em>information theory</em>. Math is the <em>shared language</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Math</em> is <em>vocabulary</em>.</li>
+<li><em>Verify</em> intuition with <em>math</em>.</li>
+<li><em>Complexity</em> is a <em>prediction</em> tool.</li>
+<li><em>Proof</em> is a <em>debugging</em> tool.</li>
+<li>The <em>nine areas</em> form a <em>ladder</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Comfortable with <em>proofs</em>.</li>
+<li>[ ] <em>Analyze</em> complexity.</li>
+<li>[ ] <em>Distinguish</em> model from reality.</li>
+<li>[ ] State <em>invariants</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>abstraction</em> in one line.</li>
+<li>Define <em>invariant</em> in one line.</li>
+<li>Define <em>modeling</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>logic and proofs</em>.</p>
+<ul>
+<li><strong>Why Math for CS (current)</strong></li>
+<li>Logic and Proofs (upcoming)</li>
+<li>Sets and Functions (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Probability (upcoming)</li>
+<li>Linear Algebra (upcoming)</li>
+<li>Calculus (upcoming)</li>
+<li>Information Theory (upcoming)</li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Concrete_Mathematics">Concrete Mathematics - Knuth, Graham, Patashnik</a></li>
+<li><a href="https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-fall-2010/">Mathematics for Computer Science - MIT OCW</a></li>
+<li><a href="https://cacm.acm.org/magazines/2014/2/171688-mathematical-foundations-of-computer-science/">Mathematical Foundations of CS - ACM</a></li>
+<li><a href="https://dev.to/codenameone/the-importance-of-math-in-programming-21k0">The Importance of Math in Programming - Dev.to</a></li>
+</ul>
+<p class="tags-line">Tags: Math, CS, Foundations, Learning, Beginner</p>
+</body>
+</html>

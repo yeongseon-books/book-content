@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Software Engineering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Software Engineering</h1>
+<blockquote>
+<p>Computer Science 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: What separates a small script you wrote alone from a system that 100 people maintain for 10 years?</p>
+<blockquote>
+<p>Coding is making a program that works. Software engineering is making a system that keeps working as time passes and people change. Tests are the safety net for change, version control is the foundation for collaboration, code review is the last quality gate, and refactoring is the tool for paying down technical debt. This article walks the path from coding to engineering through these four pillars.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between coding and software engineering</li>
+<li>The effect tests have on code quality</li>
+<li>A Git-based collaboration model</li>
+<li>Refactoring and managing technical debt</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The ability to write code that works will plateau by year five. The same code has to be kind to your future self and your teammates, and it must not break under change. Engineering habits — tests, reviews, small commits, clear names — make the difference.</p>
+<blockquote>
+<p>Code is written once and read a hundred times.</p>
+</blockquote>
+<p>Good code is not the code that's quickest to write today; it's the code that's easiest to change for years.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."</p>
+</blockquote>
+<pre><code class="language-text">Coding only
+  requirements -&gt; write -&gt; verify it runs -&gt; deploy
+
+Software engineering
+  requirements -&gt; design -&gt; write + test -&gt; review -&gt; CI -&gt; deploy -&gt; monitor -&gt; refactor
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Unit test</strong><br>
+- Description: Verifies that a small unit (function/class) behaves as intended</p>
+<p><strong>Version control</strong><br>
+- Description: A system that tracks code history and enables collaboration (Git)</p>
+<p><strong>Code review</strong><br>
+- Description: The process where another engineer reads a change and gives feedback</p>
+<p><strong>Refactoring</strong><br>
+- Description: A change that improves internal structure while preserving external behavior</p>
+<p><strong>CI/CD</strong><br>
+- Description: Automated build, test, and deploy pipelines</p>
+<p><strong>Technical debt</strong><br>
+- Description: The accumulated cost of structural improvements deferred for short-term convenience</p>
+<h2>Before / After</h2>
+<p><strong>Before — a function written without tests:</strong></p>
+<pre><code class="language-python">def calc_discount(price, user_type):
+    if user_type == &quot;vip&quot;:
+        return price * 0.7
+    elif user_type == &quot;member&quot;:
+        return price * 0.9
+    else:
+        return price
+# You don't know which input will break it until production calls it
+</code></pre>
+<p><strong>After — a function whose behavior is specified by tests:</strong></p>
+<pre><code class="language-python"># discount.py
+def calc_discount(price: float, user_type: str) -&gt; float:
+    if price &lt; 0:
+        raise ValueError(&quot;price must be non-negative&quot;)
+    rates = {&quot;vip&quot;: 0.7, &quot;member&quot;: 0.9}
+    return price * rates.get(user_type, 1.0)
+
+# test_discount.py
+import pytest
+from discount import calc_discount
+
+def test_vip_gets_30_percent_off():
+    assert calc_discount(100, &quot;vip&quot;) == 70
+
+def test_member_gets_10_percent_off():
+    assert calc_discount(100, &quot;member&quot;) == 90
+
+def test_unknown_user_type_pays_full_price():
+    assert calc_discount(100, &quot;guest&quot;) == 100
+
+def test_negative_price_raises():
+    with pytest.raises(ValueError):
+        calc_discount(-1, &quot;vip&quot;)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Your first test with pytest</strong></p>
+<pre><code class="language-bash"># In a virtual environment
+pip install pytest
+
+# Place the two files above in the same folder and run
+pytest -v
+</code></pre>
+<p><strong>Step 2: Use regression tests to keep bugs from coming back</strong></p>
+<pre><code class="language-python"># When you find a bug, first write a test that reproduces it
+def test_zero_price_returns_zero():
+    &quot;&quot;&quot;A 0-priced item bought by a VIP must still be 0 (was broken in a previous version).&quot;&quot;&quot;
+    assert calc_discount(0, &quot;vip&quot;) == 0
+</code></pre>
+<p><strong>Step 3: A Git workflow</strong></p>
+<pre><code class="language-bash"># Create a new feature branch
+git checkout -b feature/discount-vip
+
+# Work and commit in small units
+git add discount.py test_discount.py
+git commit -m &quot;feat: add VIP discount tier&quot;
+
+# Push and open a PR
+git push origin feature/discount-vip
+# Open a Pull Request on GitHub/GitLab
+</code></pre>
+<p><strong>Step 4: Refactoring — same behavior, better structure</strong></p>
+<pre><code class="language-python"># Before: the function grows every time a new tier is added
+def calc_discount(price, user_type):
+    if user_type == &quot;vip&quot;:
+        return price * 0.7
+    if user_type == &quot;member&quot;:
+        return price * 0.9
+    if user_type == &quot;student&quot;:
+        return price * 0.85
+    return price
+
+# After: pulled out into a data table — adding a tier is one line
+DISCOUNT_RATES = {
+    &quot;vip&quot;:     0.70,
+    &quot;member&quot;:  0.90,
+    &quot;student&quot;: 0.85,
+}
+
+def calc_discount(price: float, user_type: str) -&gt; float:
+    return price * DISCOUNT_RATES.get(user_type, 1.0)
+
+# If the same tests still pass, this is a safe refactor
+</code></pre>
+<p><strong>Step 5: A simple CI setup (GitHub Actions)</strong></p>
+<pre><code class="language-yaml"># .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: &quot;3.12&quot;
+      - run: pip install pytest
+      - run: pytest -v
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>With tests, refactoring stops being scary.</li>
+<li>Small commits with clear messages are letters to your future self.</li>
+<li>Expressing branching as data shortens functions and makes change easy.</li>
+<li>CI handles the verification a human will eventually forget to run.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>"I'll add tests later"</strong><br>
+- Problem: They never get added; regressions show up<br>
+- Fix: At least one test alongside every new feature</p>
+<p><strong>One huge commit</strong><br>
+- Problem: Impossible to review, hard to revert<br>
+- Fix: Small, frequent commits per logical unit</p>
+<p><strong>Pushing straight to main without review</strong><br>
+- Problem: Human errors accumulate<br>
+- Fix: PRs with at least one approver</p>
+<p><strong>Leaving "temporary" TODOs forever</strong><br>
+- Problem: Tech debt piles up<br>
+- Fix: Each TODO carries an issue ID and a deadline</p>
+<p><strong>Trying to write every line perfectly</strong><br>
+- Problem: Late releases, over-engineering<br>
+- Fix: YAGNI — only what's needed now</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>CI that runs lint, type check, and tests automatically on every change.</li>
+<li>PR templates that capture intent and impact area of the change.</li>
+<li>A unified branching strategy — trunk-based development or Git Flow.</li>
+<li>Feature flags for partial rollouts and instant rollbacks.</li>
+<li>Regular refactoring sprints to repay technical debt.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer spends more time reading and polishing code than writing it. They clean up existing code before adding a feature, and they become the first reviewer of their own PR before opening it. The yardstick is: "Will the teammate who reads this in six months be angry?"</p>
+<p>They also value changeability over perfection. Rather than designing for every possible future, they ship something small and make it easy to fix quickly. Tests and reviews are the safety net that makes that fixing safe.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I add a test whenever I add a new function</li>
+<li>[ ] My commit messages tell — in one line — what changed and why</li>
+<li>[ ] I read other people's PRs honestly and give real feedback</li>
+<li>[ ] I consider refactoring when I see the same code twice</li>
+<li>[ ] I belong to a team where a broken CI is fixed immediately</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Add a new tier (<code>partner</code>, 80% discount) to <code>calc_discount</code> above and write tests for it.</p>
+</li>
+<li>
+<p>Pick an old function of yours over 50 lines long and refactor it by extracting functions and improving names — keeping behavior identical. Verify with tests.</p>
+</li>
+<li>
+<p>Build a GitHub Actions workflow that runs <code>pytest</code> and <code>ruff</code> in parallel, and surfaces both results on the PR.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Software engineering is the practice of writing code that survives time. Tests are the safety net for change, version control is the foundation of collaboration, review is the quality gate, and refactoring is the prescription for technical debt. The difference in great engineers is not the speed of writing new code; it's the willingness to touch old code without fear.</p>
+<p>The next article ties everything together — how all of this CS foundation feeds into AI and data science, and what to study next.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><strong>Software Engineering (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer — David Thomas, Andrew Hunt</a></li>
+<li><a href="https://martinfowler.com/books/refactoring.html">Refactoring — Martin Fowler</a></li>
+<li><a href="https://docs.pytest.org/">pytest — Documentation</a></li>
+<li><a href="https://git-scm.com/book/en/v2">Pro Git — Scott Chacon (free)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Software Engineering, Testing, Version Control, Code Review, Refactoring</p>
+</body>
+</html>

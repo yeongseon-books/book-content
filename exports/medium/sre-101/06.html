@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Incident Response</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Incident Response</h1>
+<blockquote>
+<p>SRE 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When an <em>outage hits</em>, how should the <em>team</em> <em>move</em>?</p>
+<blockquote>
+<p><em>Incident response</em> is a <em>team activity</em> with fixed <em>roles</em> and a fixed <em>order</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of an <em>incident</em></li>
+<li><em>Severity</em> classification</li>
+<li><em>Roles</em> and <em>responsibilities</em></li>
+<li><em>Communication</em> channels</li>
+<li><em>Closure</em> and <em>handover</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Chaos</em> magnifies <em>impact</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Detect[&quot;detect&quot;] --&gt; Triage[&quot;triage&quot;]
+    Triage --&gt; Mitigate[&quot;mitigate&quot;]
+    Mitigate --&gt; Resolve[&quot;resolve&quot;]
+    Resolve --&gt; PM[&quot;postmortem&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>incident</strong>: an <em>abnormal</em> condition with <em>impact</em>.</li>
+<li><strong>severity</strong>: the level of <em>impact</em>.</li>
+<li><strong>IC</strong>: the <em>Incident Commander</em>.</li>
+<li><strong>ops lead</strong>: the operational lead.</li>
+<li><strong>comms lead</strong>: the communications lead.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: at <em>start</em>, everyone <em>responds at once</em>.</p>
+<p><strong>After</strong>: <em>roles</em> and <em>channels</em> are <em>fixed</em> up front.</p>
+<h2>Hands-on: Defining the Process</h2>
+<p><strong>Step 1 — Severity mapping</strong></p>
+<pre><code class="language-python">def severity(impact_users, duration_min):
+    if impact_users &gt; 10000 or duration_min &gt; 60:
+        return &quot;SEV1&quot;
+    if impact_users &gt; 1000:
+        return &quot;SEV2&quot;
+    return &quot;SEV3&quot;
+</code></pre>
+<p><strong>Step 2 — Assign IC</strong></p>
+<pre><code class="language-python">def assign_ic(on_call):
+    return on_call[0]
+</code></pre>
+<p><strong>Step 3 — Create the channel</strong></p>
+<pre><code class="language-python">def channel(name):
+    return f&quot;#inc-{name}&quot;
+</code></pre>
+<p><strong>Step 4 — Status updates</strong></p>
+<pre><code class="language-python">def update(channel, msg, every_min=15):
+    return {&quot;channel&quot;: channel, &quot;msg&quot;: msg, &quot;every&quot;: every_min}
+</code></pre>
+<p><strong>Step 5 — Closure check</strong></p>
+<pre><code class="language-python">def can_close(mitigated, customer_impact_zero):
+    return mitigated and customer_impact_zero
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Severity</em> is defined by <em>impact</em>, not feel.</li>
+<li>The <em>IC</em> is the <em>single</em> decision-maker.</li>
+<li>A separate <em>channel</em> preserves the <em>record</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Delaying decisions by <em>consensus</em> instead of using an <em>IC</em>.</strong></li>
+<li><strong>Estimating <em>impact</em> <em>subjectively</em>.</strong></li>
+<li><strong>Skipping <em>customer communication</em>.</strong></li>
+<li><strong>Vague <em>closure</em> criteria.</strong></li>
+<li><strong>Returning to work without a <em>record</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>PagerDuty</em>, <em>Statuspage</em>, and <em>Slack</em> integrations <em>automate</em> roles and customer comms.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Response</em> gets <em>faster</em> with <em>training</em>.</li>
+<li>The <em>IC</em> decides; <em>experts</em> do the work.</li>
+<li><em>Communication</em> is the <em>axis of trust</em>.</li>
+<li><em>Closure</em> is done <em>carefully</em>.</li>
+<li><em>Training</em> happens <em>before</em> the call.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Severity</em> defined.</li>
+<li>[ ] <em>IC</em> rotation.</li>
+<li>[ ] <em>Communication</em> templates.</li>
+<li>[ ] <em>Closure</em> criteria.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define the <em>IC</em> role in one line.</li>
+<li>Define <em>severity</em> in one line.</li>
+<li>Define the role of a <em>Statuspage</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>postmortems</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><strong>Incident Response (current)</strong></li>
+<li>Postmortem (upcoming)</li>
+<li>Reducing Toil (upcoming)</li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/managing-incidents/">Managing Incidents - Google SRE Book</a></li>
+<li><a href="https://response.pagerduty.com/">Incident Response - PagerDuty</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Incident_Command_System">Incident Command System</a></li>
+<li><a href="https://www.atlassian.com/incident-management/handbook">Atlassian Incident Handbook</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, Incident, Response, OnCall, Operations</p>
+</body>
+</html>

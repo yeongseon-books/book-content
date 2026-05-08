@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Technical Writing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Technical Writing</h1>
+<blockquote>
+<p>Technical Writing 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How is <em>technical writing</em> different from <em>everyday writing</em>?</p>
+<blockquote>
+<p>The reader must be able to <em>act</em> on it.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A definition of <em>technical writing</em></li>
+<li>The difference from <em>everyday</em> prose</li>
+<li>The <em>three purposes</em></li>
+<li>The reader's <em>action</em></li>
+<li>The shape of a <em>series</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Writing tends to <em>outlive</em> the <em>code</em> it describes.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[Reader] --&gt; Q[Question]
+    Q --&gt; A[Answer]
+    A --&gt; X[Action]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>technical writing</strong>: Prose that <em>delivers technical information</em>.</li>
+<li><strong>audience</strong>: The <em>reader</em>.</li>
+<li><strong>task</strong>: A <em>job to do</em>.</li>
+<li><strong>outcome</strong>: A <em>result</em>.</li>
+<li><strong>scope</strong>: The <em>boundary</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "<em>Python</em> is a <em>great language</em>."</p>
+<p><strong>After</strong>: "A <em>beginner</em> can <em>run Hello World</em> in <em>five minutes</em>."</p>
+<h2>Hands-on: One Technical Paragraph</h2>
+<p><strong>Step 1 — Pick the audience</strong></p>
+<pre><code class="language-python">audience = &quot;Python beginners&quot;
+</code></pre>
+<p><strong>Step 2 — Pick the task</strong></p>
+<pre><code class="language-python">task = &quot;Create and activate a virtual environment&quot;
+</code></pre>
+<p><strong>Step 3 — The commands</strong></p>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+</code></pre>
+<p><strong>Step 4 — The result</strong></p>
+<pre><code class="language-python">result = &quot;(.venv) shows up in the prompt&quot;
+</code></pre>
+<p><strong>Step 5 — The next action</strong></p>
+<pre><code class="language-python">next_step = &quot;pip install requests&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>reader</em> comes <em>first</em>.</li>
+<li>The <em>commands</em> are <em>short</em>.</li>
+<li>The <em>result</em> is <em>visible</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>A <em>vague</em> audience.</strong></li>
+<li><strong>Too much <em>theory</em>.</strong></li>
+<li><strong>Commands that are <em>not copy paste safe</em>.</strong></li>
+<li><strong>No <em>visible result</em>.</strong></li>
+<li><strong>No <em>next step</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Internal company docs, open source READMEs, and conference talk slides are all <em>technical writing</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Saves the <em>reader's time</em>.</li>
+<li>Commands work <em>as written</em>.</li>
+<li>Results are <em>visible</em>.</li>
+<li>Stale information is <em>deleted</em>.</li>
+<li>Links are <em>alive</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] The <em>audience</em> is <em>named</em>.</li>
+<li>[ ] The <em>task</em> is <em>one line</em>.</li>
+<li>[ ] The <em>commands</em> run.</li>
+<li>[ ] The <em>result</em> is stated.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the definition of <em>technical writing</em> in one line.</li>
+<li>Write the meaning of <em>audience</em> in one line.</li>
+<li>Write the definition of <em>outcome</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The next post is <em>Defining the Reader</em>.</p>
+<ul>
+<li><strong>What Is Technical Writing (current)</strong></li>
+<li>Defining the Reader (upcoming)</li>
+<li>Title and Structure (upcoming)</li>
+<li>Explaining Concepts (upcoming)</li>
+<li>Explaining Example Code (upcoming)</li>
+<li>Using Figures and Tables (upcoming)</li>
+<li>Writing the README (upcoming)</li>
+<li>Writing Tutorials (upcoming)</li>
+<li>Blog vs Documentation (upcoming)</li>
+<li>Pre-publish Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docsfordevelopers.com/">Docs for Developers - Bhatti et al.</a></li>
+<li><a href="https://developers.google.com/style">Google Developer Documentation Style Guide</a></li>
+<li><a href="https://learn.microsoft.com/en-us/style-guide/welcome/">Microsoft Writing Style Guide</a></li>
+<li><a href="https://www.writethedocs.org/">Write the Docs Community</a></li>
+</ul>
+<p class="tags-line">Tags: TechnicalWriting, Writing, Documentation, Communication, Beginner</p>
+</body>
+</html>

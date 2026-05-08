@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Defining the Reader</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Defining the Reader</h1>
+<blockquote>
+<p>Technical Writing 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does a post for <em>everyone</em> end up <em>helping no one</em>?</p>
+<blockquote>
+<p>A <em>clear reader</em> makes <em>clear sentences</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Building a <em>persona</em></li>
+<li>Mapping <em>prior knowledge</em></li>
+<li>Aligning the <em>goal</em></li>
+<li>Tightening the <em>scope</em></li>
+<li>Matching example <em>difficulty</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A blurry <em>reader</em> leads to blurry <em>sentences</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Persona] --&gt; K[Knowledge]
+    K --&gt; G[Goal]
+    G --&gt; S[Scope]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>persona</strong>: A <em>model of the reader</em>.</li>
+<li><strong>prerequisite</strong>: <em>Prior knowledge</em>.</li>
+<li><strong>goal</strong>: <em>What the reader does next</em>.</li>
+<li><strong>scope</strong>: What the post <em>covers</em>.</li>
+<li><strong>non-goal</strong>: What the post <em>does not cover</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "A post for <em>developers</em>."</p>
+<p><strong>After</strong>: "A post for a <em>first-year Python</em> engineer learning <em>FastAPI</em>."</p>
+<h2>Hands-on: A Persona Card</h2>
+<p><strong>Step 1 — Name and role</strong></p>
+<pre><code class="language-python">persona = {&quot;name&quot;: &quot;Jimin&quot;, &quot;role&quot;: &quot;First-year Python backend&quot;}
+</code></pre>
+<p><strong>Step 2 — Prior knowledge</strong></p>
+<pre><code class="language-python">knows = [&quot;variables&quot;, &quot;functions&quot;, &quot;git basics&quot;]
+</code></pre>
+<p><strong>Step 3 — Gaps</strong></p>
+<pre><code class="language-python">unknown = [&quot;async&quot;, &quot;type hints&quot;]
+</code></pre>
+<p><strong>Step 4 — Goal</strong></p>
+<pre><code class="language-python">goal = &quot;Ship the first FastAPI endpoint&quot;
+</code></pre>
+<p><strong>Step 5 — Non-goal</strong></p>
+<pre><code class="language-python">non_goal = [&quot;deployment&quot;, &quot;DB migrations&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The persona has a <em>name</em>.</li>
+<li>The persona has <em>gaps</em>.</li>
+<li>The persona has <em>non-goals</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Targeting <em>everyone</em>.</strong></li>
+<li><strong>Skipping <em>prerequisites</em>.</strong></li>
+<li><strong>Vague <em>goals</em>.</strong></li>
+<li><strong>Missing <em>non-goals</em>.</strong></li>
+<li><strong>Examples that are <em>too hard</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>API references, user guides, and tutorials all split by <em>persona</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The reader feels like <em>one person</em>.</li>
+<li><em>Non-goals</em> shrink the post.</li>
+<li>Examples sit <em>inside</em> the prior knowledge.</li>
+<li>Goals are written as <em>verbs</em>.</li>
+<li>The <em>future you</em> in two weeks is also a reader.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] One <em>persona</em>.</li>
+<li>[ ] Three <em>prerequisites</em>.</li>
+<li>[ ] One <em>goal</em> line.</li>
+<li>[ ] At least one <em>non-goal</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the definition of <em>persona</em> in one line.</li>
+<li>Write the meaning of <em>non-goal</em> in one line.</li>
+<li>Write an example of a <em>prerequisite</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The next post is <em>Title and Structure</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/technical-writing-101/en/01-what-is-technical-writing.md">What Is Technical Writing</a></li>
+<li><strong>Defining the Reader (current)</strong></li>
+<li>Title and Structure (upcoming)</li>
+<li>Explaining Concepts (upcoming)</li>
+<li>Explaining Example Code (upcoming)</li>
+<li>Using Figures and Tables (upcoming)</li>
+<li>Writing the README (upcoming)</li>
+<li>Writing Tutorials (upcoming)</li>
+<li>Blog vs Documentation (upcoming)</li>
+<li>Pre-publish Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.elsevier.com/books/the-persona-lifecycle/pruitt/978-0-12-566251-2">The Persona Lifecycle - Pruitt &amp; Adlin</a></li>
+<li><a href="https://www.wiley.com/en-us/About+Face%3A+The+Essentials+of+Interaction+Design%2C+4th+Edition-p-9781118766576">About Face - Cooper et al.</a></li>
+<li><a href="https://www.nngroup.com/articles/persona/">Nielsen Norman Group on Personas</a></li>
+<li><a href="https://www.writingfordevelopers.com/">Writing for Developers - Karl Hughes</a></li>
+</ul>
+<p class="tags-line">Tags: TechnicalWriting, Audience, Persona, Writing, Beginner</p>
+</body>
+</html>

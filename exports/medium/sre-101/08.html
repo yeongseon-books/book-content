@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reducing Toil</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Reducing Toil</h1>
+<blockquote>
+<p>SRE 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How much of the <em>team's time</em> is being <em>eaten by repetitive work</em>?</p>
+<blockquote>
+<p><em>Toil</em> is <em>manual labor</em> that <em>automation</em> can <em>remove</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>toil</em></li>
+<li>How to <em>measure</em> it</li>
+<li>How to <em>prioritize automation</em></li>
+<li><em>Savings</em> strategies</li>
+<li>The relation to <em>technical debt</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When <em>toil</em> exceeds <em>50%</em>, <em>improvement stops</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Manual[&quot;manual&quot;] --&gt; Toil[&quot;toil&quot;]
+    Toil --&gt; Automate[&quot;automate&quot;]
+    Automate --&gt; Saved[&quot;time saved&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>toil</strong>: <em>repetitive, automatable</em> work.</li>
+<li><strong>runbook</strong>: a <em>manual procedure</em> document.</li>
+<li><strong>automation</strong>: <em>code</em> that does the work.</li>
+<li><strong>toil ratio</strong>: the <em>fraction of time</em> spent on toil.</li>
+<li><strong>break-even</strong>: when <em>automation</em> pays <em>back</em> its build cost.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every <em>night call</em> requires <em>manual recovery</em>.</p>
+<p><strong>After</strong>: a <em>recovery script</em> handles it <em>automatically</em>.</p>
+<h2>Hands-on: Measure and Automate Toil</h2>
+<p><strong>Step 1 — Log toil time</strong></p>
+<pre><code class="language-python">def log_toil(task, minutes):
+    return {&quot;task&quot;: task, &quot;minutes&quot;: minutes}
+</code></pre>
+<p><strong>Step 2 — Toil ratio</strong></p>
+<pre><code class="language-python">def toil_ratio(toil_min, total_min):
+    return toil_min / total_min
+</code></pre>
+<p><strong>Step 3 — Score automation candidates</strong></p>
+<pre><code class="language-python">def score(freq_per_week, minutes_each):
+    return freq_per_week * minutes_each
+</code></pre>
+<p><strong>Step 4 — Break-even</strong></p>
+<pre><code class="language-python">def break_even(saved_per_week, build_minutes):
+    return build_minutes / saved_per_week
+</code></pre>
+<p><strong>Step 5 — Write the automation</strong></p>
+<pre><code class="language-python">def auto_restart(service):
+    return f&quot;systemctl restart {service}&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Measurement</em> is the start of <em>prioritization</em>.</li>
+<li>A <em>score</em> sorts the <em>candidates</em>.</li>
+<li><em>Break-even</em> drives the <em>invest-or-not</em> call.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>No <em>measurement</em> of toil.</strong></li>
+<li><strong>Automating by <em>gut feel</em> without a <em>score</em>.</strong></li>
+<li><strong>Stacking <em>runbooks</em> without turning them into <em>code</em>.</strong></li>
+<li><strong>Letting <em>automation debt</em> pile up.</strong></li>
+<li><strong>Ignoring the <em>post-launch</em> operational cost of automation.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Recovery automation</em> turns <em>MTTR</em> from tens of minutes into <em>single minutes</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Toil</em> is <em>debt</em>.</li>
+<li><em>Automation</em> lives on top of <em>repetition</em>.</li>
+<li><em>50%</em> is the <em>line</em> in the sand.</li>
+<li>Without <em>measurement</em>, no <em>priority</em>.</li>
+<li><em>Automation</em> needs <em>maintenance</em>, too.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Toil ratio</em> measured.</li>
+<li>[ ] <em>Candidate list</em>.</li>
+<li>[ ] <em>Break-even</em> calculated.</li>
+<li>[ ] <em>Automation owner</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>toil</em> in one line.</li>
+<li>Define <em>runbook</em> in one line.</li>
+<li>Define <em>break-even</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>capacity planning</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">Postmortem</a></li>
+<li><strong>Reducing Toil (current)</strong></li>
+<li>Capacity Planning (upcoming)</li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/eliminating-toil/">Eliminating Toil - Google SRE Book</a></li>
+<li><a href="https://sre.google/workbook/eliminating-toil/">Identifying and Tracking Toil - Google SRE Workbook</a></li>
+<li><a href="https://sre.google/sre-book/automation-at-google/">Automating Operations - Google SRE Book</a></li>
+<li><a href="https://www.atlassian.com/incident-management/devops/toil">Toil Reduction - Atlassian</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, Toil, Automation, Productivity, Operations</p>
+</body>
+</html>

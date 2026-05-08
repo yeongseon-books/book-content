@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dynamic Programming</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Dynamic Programming</h1>
+<blockquote>
+<p>Algorithms 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do we keep recomputing the same subproblems, and how can we recognise that pattern in the wild?</p>
+<blockquote>
+<p>Dynamic programming (DP) applies when (1) the same subproblems repeat and (2) the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation. DP feels hard not because of the algorithm but because state design is a skill — one that grows by writing classic problems with your own hands.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The two conditions DP needs: overlapping subproblems and optimal substructure</li>
+<li>The difference between memoization (top-down) and tabulation (bottom-up)</li>
+<li>How to define a state and write a recurrence</li>
+<li>Classic DP problems: Fibonacci, 0/1 knapsack, longest common subsequence</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>DP is the backbone of algorithm interviews and shows up in production for optimisation, scheduling, and string comparison. The same way of thinking extends to value functions in reinforcement learning, dynamic-programming-based control, and decoders in sequence-to-sequence models.</p>
+<blockquote>
+<p>DP starts from one principle: never solve the same subproblem twice.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>DP defines a recurrence over a state space and solves it. Memoization is recursion plus a cache and feels intuitive. Tabulation fills small states first and tends to be faster and lighter on memory. The hard part — and the one worth practising — is choosing what the state means. That choice is 90% of the solution.</p>
+</blockquote>
+<pre><code class="language-text">DP applicability signals
+    1) The same subproblem appears many times (overlapping subproblems)
+    2) Optimal subproblem solutions compose into optimal whole (optimal substructure)
+
+Two implementations
+    Top-down  (memoization) : recursion + cache, computes only needed states
+    Bottom-up (tabulation)  : iteration,         fills every state in order
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>State</strong><br>
+- Description: A single cell of the DP table — what subproblem it represents</p>
+<p><strong>Recurrence</strong><br>
+- Description: The relation between states</p>
+<p><strong>Overlapping subproblems</strong><br>
+- Description: The same subproblem appears repeatedly</p>
+<p><strong>Optimal substructure</strong><br>
+- Description: The optimum of parts forms the optimum of the whole</p>
+<p><strong>Memoization</strong><br>
+- Description: Caching results to remove duplicate work</p>
+<h2>Before / After</h2>
+<p><strong>Before — Fibonacci with no memo, O(2^n):</strong></p>
+<pre><code class="language-python">def fib(n):
+    if n &lt;= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+# fib(40) and beyond becomes painfully slow
+</code></pre>
+<p><strong>After — memoization, O(n):</strong></p>
+<pre><code class="language-python">from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n &lt;= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: See the overlapping subproblems</strong></p>
+<pre><code class="language-python">calls = 0
+def fib_naive(n):
+    global calls
+    calls += 1
+    if n &lt;= 1:
+        return n
+    return fib_naive(n - 1) + fib_naive(n - 2)
+
+fib_naive(20)
+print(calls)   # 13529 — explosive in n
+</code></pre>
+<p>You can watch the same <code>fib(k)</code> getting recomputed many times. That repetition is the starting point for DP.</p>
+<p><strong>Step 2: Top-down (memoization)</strong></p>
+<pre><code class="language-python">from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n &lt;= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(100))   # 354224848179261915075
+</code></pre>
+<p>The recursive structure stays exactly the same; one decorator adds the cache. It is intuitive and easy to extend.</p>
+<p><strong>Step 3: Bottom-up (tabulation)</strong></p>
+<pre><code class="language-python">def fib_tab(n):
+    if n &lt;= 1:
+        return n
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]
+    return dp[n]
+
+print(fib_tab(100))
+</code></pre>
+<p>We fill from small states up. There is no recursion depth to worry about, and we can collapse the array down to two rolling variables for even less memory.</p>
+<p><strong>Step 4: 0/1 knapsack — practising state definition</strong></p>
+<pre><code class="language-python">def knapsack(weights, values, W):
+    n = len(weights)
+    dp = [[0] * (W + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        w, v = weights[i - 1], values[i - 1]
+        for cap in range(W + 1):
+            dp[i][cap] = dp[i - 1][cap]
+            if w &lt;= cap:
+                dp[i][cap] = max(dp[i][cap], dp[i - 1][cap - w] + v)
+    return dp[n][W]
+
+print(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 5))   # 7
+</code></pre>
+<p>State: <code>dp[i][cap]</code> is the best value using the first <code>i</code> items with capacity <code>cap</code>. Once the state is clearly written, the recurrence almost writes itself.</p>
+<p><strong>Step 5: Longest common subsequence (LCS) — DP across two sequences</strong></p>
+<pre><code class="language-python">def lcs(a, b):
+    n, m = len(a), len(b)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if a[i - 1] == b[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    return dp[n][m]
+
+print(lcs(&quot;ABCBDAB&quot;, &quot;BDCABC&quot;))   # 4
+</code></pre>
+<p>We fill a table indexed by all pairs of prefixes. This is the algorithm under diff tools, DNA alignment, and document comparison.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>State definition is 90% of the solution</li>
+<li>Top-down feels natural; bottom-up is usually faster and lighter on memory</li>
+<li>For 2D DP, one row is often enough — rolling array</li>
+<li>The same problem can have very different costs depending on how the state is defined</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Coding before defining the state</strong><br>
+- Problem: Confused recurrence<br>
+- Fix: Write a one-line meaning of <code>dp[...]</code> first</p>
+<p><strong>Missing base case</strong><br>
+- Problem: Wrong answer<br>
+- Fix: Initialise <code>dp[0]</code>, <code>dp[i][0]</code> explicitly</p>
+<p><strong>Mutable cache keys</strong><br>
+- Problem: Cache misses<br>
+- Fix: Convert to tuple</p>
+<p><strong>Applying DP without overlap</strong><br>
+- Problem: Plain divide and conquer fits better<br>
+- Fix: Verify subproblems actually repeat</p>
+<p><strong>Memory blow-up</strong><br>
+- Problem: OOM for large inputs<br>
+- Fix: Use a rolling array to drop a dimension</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>diff/patch algorithms (an LCS application)</li>
+<li>String similarity (edit distance)</li>
+<li>Dynamic time warping in speech recognition</li>
+<li>Join-order selection in database query optimisers</li>
+<li>Value-function updates in reinforcement learning (Bellman equations)</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer first asks "do the same subproblems show up here?" If yes, they define the state and write the recurrence. They typically solve it top-down for clarity, then convert to bottom-up if performance demands it, and only then squeeze memory.</p>
+<p>A senior engineer also thinks of DP as "divide and conquer that remembers." If recursion plus a cache feels natural, that is already DP. It is more efficient to learn DP by writing the recursion first, adding memoization, and only then translating to a table — not by drawing tables from scratch.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you check the two conditions for DP?</li>
+<li>[ ] Can you state the meaning of a state and recurrence in one sentence?</li>
+<li>[ ] Can you write both top-down and bottom-up versions?</li>
+<li>[ ] Have you reduced memory with a rolling array?</li>
+<li>[ ] Can you spot the applicability signals?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Given coin denominations and a target amount, write a function that returns the minimum number of coins. Define the state and recurrence in words first, then translate to code.</p>
+</li>
+<li>
+<p>Compute the edit distance (Levenshtein) between two strings, treating insertion, deletion, and substitution as cost 1 each.</p>
+</li>
+<li>
+<p>In a graph with positive weights, design a DP that counts paths between two nodes whose total length is at most 5. The state holds the current node and the remaining length.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>DP starts from "do not solve the same subproblem twice." It applies whenever the same subproblems repeat and parts compose into a whole. State definition is almost the entire solution, and starting top-down then refining to bottom-up is usually the smoothest path to learn it.</p>
+<p>The next article covers greedy algorithms — when greedy actually works (exchange arguments, matroid intuition), classic problems, and cases where what looks greedy actually requires DP.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><strong>Dynamic Programming (current)</strong></li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Graph Algorithms (upcoming)</li>
+<li>String Algorithm Basics (upcoming)</li>
+<li>Algorithm Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache">Python <code>functools.lru_cache</code></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Dynamic_programming">Wikipedia — Dynamic programming</a></li>
+<li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition">CLRS — Introduction to Algorithms, Chapter 15</a></li>
+<li><a href="https://cses.fi/book/book.pdf">Competitive Programmer's Handbook — Chapter 7</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Dynamic Programming, Memoization, Tabulation, Optimal Substructure</p>
+</body>
+</html>

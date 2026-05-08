@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deployment Automation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Deployment Automation</h1>
+<blockquote>
+<p>GitHub Actions 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you express the policy "<em>staging is automatic, production needs approval</em>" in code?</p>
+<blockquote>
+<p><em>Deploy frequently and small</em>; gate the <em>risky parts</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>GitHub Environments</em> and <em>required reviewers</em></li>
+<li><em>OIDC</em> for short-lived <em>AWS/GCP</em> credentials</li>
+<li>The <em>staging -&gt; production</em> promotion pattern</li>
+<li>A <em>rollback</em> workflow</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Manual deploys</em> are the cause of <em>weekend pages</em>. Automation gives you <em>reproducibility</em>, not just speed.</p>
+<blockquote>
+<p>If the <em>deployment runbook</em> lives only in someone's head, an <em>incident is coming</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Merge[&quot;main merge&quot;] --&gt; Stg[&quot;staging deploy&quot;]
+    Stg --&gt; Approve[&quot;required reviewer&quot;]
+    Approve --&gt; Prod[&quot;production deploy&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Environment</strong>: GitHub's <em>deployment environment</em> (staging, production).</li>
+<li><strong>Required reviewers</strong>: per-environment <em>approvers</em>.</li>
+<li><strong>OIDC</strong>: a <em>short-lived token</em> trust with the cloud.</li>
+<li><strong>Promotion</strong>: moving <em>staging to production</em>.</li>
+<li><strong>Rollback</strong>: returning to the <em>previous deployment</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: someone runs <code>kubectl apply</code> <em>locally</em>. No record of what was deployed.</p>
+<p><strong>After</strong>: PR merge -&gt; <em>automatic staging deploy</em> -&gt; <em>approval</em> -&gt; <em>production</em>. Everything traceable in <em>Actions logs</em>.</p>
+<h2>Hands-on: Deploy Automation in 5 Steps</h2>
+<p><strong>Step 1 — Define environments (UI)</strong></p>
+<pre><code class="language-text">Repo &gt; Settings &gt; Environments
+- staging: no protection rules
+- production: 1 required reviewer, 5-min wait timer
+</code></pre>
+<p><strong>Step 2 — Auto-deploy to staging</strong></p>
+<pre><code class="language-yaml">deploy-staging:
+  needs: build
+  environment: staging
+  runs-on: ubuntu-latest
+  steps:
+    - run: kubectl apply -f k8s/staging/
+</code></pre>
+<p><strong>Step 3 — Production approval gate</strong></p>
+<pre><code class="language-yaml">deploy-production:
+  needs: deploy-staging
+  environment:
+    name: production
+    url: https://app.example.com
+  runs-on: ubuntu-latest
+  steps:
+    - run: kubectl apply -f k8s/production/
+</code></pre>
+<p><strong>Step 4 — OIDC for AWS short-lived credentials</strong></p>
+<pre><code class="language-yaml">permissions:
+  id-token: write
+  contents: read
+steps:
+  - uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::123456789012:role/gha-deploy
+      aws-region: us-west-2
+  - run: aws s3 sync ./build s3://my-bucket
+</code></pre>
+<p><strong>Step 5 — Rollback workflow</strong></p>
+<pre><code class="language-yaml">on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: &quot;git sha to roll back to&quot;
+        required: true
+jobs:
+  rollback:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./deploy.sh ${{ inputs.sha }}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A single <em>environment</em> line attaches an <em>approval gate</em>.</li>
+<li><em>OIDC</em> eliminates <em>long-lived keys</em>.</li>
+<li><em>Rollback</em> is also <em>codified as a workflow</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>No <em>required reviewers</em> on <code>production</code>.</strong> Anyone can deploy.</li>
+<li><strong>Storing long-lived <em>AWS keys</em> in secrets.</strong> Leak risk.</li>
+<li><strong>Rollback procedure <em>only in docs</em>.</strong> Unfindable at 3 AM.</li>
+<li><strong>Different manifests for staging and production.</strong> Drift creeps in.</li>
+<li><strong>No deploy notifications to <em>Slack/Issues</em>.</strong> History is lost.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams chain <em>PR merge -&gt; canary -&gt; blue/green -&gt; full rollout</em> in <em>one workflow</em>, with <em>automated metric checks</em> against Datadog/Grafana.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Deploys are code</em>; <em>manual commands leave no trace</em>.</li>
+<li><em>Production</em> always has <em>gates</em>.</li>
+<li><em>Short-lived credentials</em> are the standard.</li>
+<li><em>Rollback is a workflow</em>, too.</li>
+<li><em>staging == production</em> — same manifest.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Environments</em> are defined.</li>
+<li>[ ] <em>production</em> has <em>required reviewers</em>.</li>
+<li>[ ] <em>OIDC</em> authenticates to the cloud.</li>
+<li>[ ] A <em>rollback</em> workflow exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define a <em>staging</em> environment that auto-deploys on <em>main push</em>.</li>
+<li>Add an <em>approval gate</em> to <em>production</em>.</li>
+<li>Build a <em>workflow_dispatch</em> rollback workflow.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Deployment automation defines your <em>cost of change</em>. Next: <em>Secret management</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/07-docker-build.md">Docker Build</a></li>
+<li><strong>Deployment Automation (current)</strong></li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment">Using environments for deployment</a></li>
+<li><a href="https://docs.github.com/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services">Configuring OpenID Connect in AWS</a></li>
+<li><a href="https://github.com/aws-actions/configure-aws-credentials">aws-actions/configure-aws-credentials</a></li>
+<li><a href="https://github.com/google-github-actions/auth">google-github-actions/auth</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Deploy, Environments, OIDC, CICD</p>
+</body>
+</html>

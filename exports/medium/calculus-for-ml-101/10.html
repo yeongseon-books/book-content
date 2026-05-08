@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculus in Deep Learning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Calculus in Deep Learning</h1>
+<blockquote>
+<p>Calculus for ML 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does the <em>calculus</em> from this series come together in the <em>deep learning training loop</em>?</p>
+<blockquote>
+<p><em>Networks</em>, <em>losses</em>, <em>backprop</em>, and <em>optimizers</em> all run on calculus inside <em>one cycle</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>5 stages</em> of the training loop</li>
+<li><em>Forward pass</em></li>
+<li><em>Loss computation</em></li>
+<li><em>Backward pass</em></li>
+<li><em>Weight update</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>This <em>capstone</em> synthesizes the series and lets you implement the <em>common skeleton</em> shared by every ML training run.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F[Forward] --&gt; L[Loss]
+    L --&gt; B[Backward]
+    B --&gt; U[Update]
+    U --&gt; F
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>forward</strong>: produce a <em>prediction</em>.</li>
+<li><strong>loss</strong>: measure the <em>error</em>.</li>
+<li><strong>backward</strong>: compute <em>gradients</em>.</li>
+<li><strong>update</strong>: adjust <em>weights</em>.</li>
+<li><strong>epoch</strong>: <em>one full pass</em> over the data.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: use the framework as a <em>black box</em>.</p>
+<p><strong>After</strong>: know <em>why</em> each stage of the loop exists.</p>
+<h2>Hands-on: Mini Training Loop</h2>
+<p><strong>Step 1 — Model</strong></p>
+<pre><code class="language-python">import math
+
+def model(x, w, b):
+    return sigmoid(w * x + b)
+
+def sigmoid(z):
+    return 1 / (1 + math.exp(-z))
+</code></pre>
+<p><strong>Step 2 — Loss (BCE)</strong></p>
+<pre><code class="language-python">def bce(y, p, eps=1e-7):
+    return -(y * math.log(p + eps) + (1 - y) * math.log(1 - p + eps))
+</code></pre>
+<p><strong>Step 3 — Analytical Gradients</strong></p>
+<pre><code class="language-python">def grads(x, y, w, b):
+    p = model(x, w, b)
+    err = p - y
+    return err * x, err
+</code></pre>
+<p><strong>Step 4 — One Update Step</strong></p>
+<pre><code class="language-python">def step(x, y, w, b, lr=0.1):
+    dw, db = grads(x, y, w, b)
+    return w - lr * dw, b - lr * db
+</code></pre>
+<p><strong>Step 5 — Training Loop</strong></p>
+<pre><code class="language-python">def train(data, epochs=100, lr=0.1):
+    w, b = 0.0, 0.0
+    for _ in range(epochs):
+        for x, y in data:
+            w, b = step(x, y, w, b, lr)
+    return w, b
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>forward pass</em> yields a <em>prediction</em>.</li>
+<li>The <em>loss</em> gives a <em>direction</em>.</li>
+<li><em>Backprop</em> allocates <em>responsibility</em>.</li>
+<li>The <em>optimizer</em> applies the <em>update</em>.</li>
+<li><em>Iteration</em> is <em>learning</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping <em>learning rate</em> tuning.</strong></li>
+<li><strong>Forgetting <em>zero_grad</em>.</strong></li>
+<li><strong>Computing gradients during <em>evaluation</em>.</strong></li>
+<li><strong>Mixing <em>eval/train</em> modes (Dropout, BN).</strong></li>
+<li><strong>Forgetting to <em>seed</em> for reproducibility.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Image classification</em>, <em>language models</em>, <em>recommenders</em>, and <em>RL</em> all share the <em>same skeleton</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The training loop fits in <em>5 lines</em>.</li>
+<li><em>Frameworks</em> are convenience; <em>principles</em> are essence.</li>
+<li><em>Monitoring</em> is <em>debugging</em>.</li>
+<li><em>Reproducibility</em> is <em>productivity</em>.</li>
+<li><em>Numerical stability</em> is the last line of defense.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Forward</em> pass correct.</li>
+<li>[ ] <em>Loss</em> appropriate.</li>
+<li>[ ] <em>zero_grad</em> called.</li>
+<li>[ ] One <em>backward</em> pass.</li>
+<li>[ ] <em>Optimizer</em> update applied.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>5 stages</em> of the training loop in one line each.</li>
+<li>State where <em>zero_grad</em> belongs in one line.</li>
+<li>State the meaning of <em>eval mode</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This post wraps the <em>Calculus for ML 101</em> series. <em>Calculus</em> is the <em>mathematical essence</em> of what we mean by <em>deep learning learns</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Gradient Descent</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/08-optimization.md">Optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/09-backpropagation-intuition.md">Backpropagation Intuition</a></li>
+<li><strong>Calculus in Deep Learning (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.deeplearningbook.org/">Deep Learning Book - Goodfellow et al.</a></li>
+<li><a href="https://pytorch.org/tutorials/">PyTorch Tutorials</a></li>
+<li><a href="https://cs231n.stanford.edu/">CS231n - Convolutional Neural Networks</a></li>
+<li><a href="https://pytorch.org/docs/stable/notes/randomness.html">Reproducibility - PyTorch</a></li>
+</ul>
+<p class="tags-line">Tags: Calculus, ML, DeepLearning, Capstone, Beginner</p>
+</body>
+</html>

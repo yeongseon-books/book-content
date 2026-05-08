@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Software Engineering?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Software Engineering?</h1>
+<blockquote>
+<p>Software Engineering 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If you can write code, are you a software engineer?</p>
+<blockquote>
+<p>Code is only part of the deliverable. Engineering is code plus time plus people.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between coding and software engineering</li>
+<li>The five areas an engineer owns</li>
+<li>Balancing "the right thing" and "doing it right"</li>
+<li>Looking at systems on the time axis</li>
+<li>The big picture of this whole series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most learning stops at "how to write code". Real work is code + collaboration + operations. Understanding this gap shapes the next decade of your learning.</p>
+<blockquote>
+<p>Code that runs once and a system that survives five years are different things.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;Requirements&quot;] --&gt; D[&quot;Design&quot;]
+    D --&gt; I[&quot;Implementation&quot;]
+    I --&gt; T[&quot;Test&quot;]
+    T --&gt; O[&quot;Operate&quot;]
+    O --&gt; M[&quot;Maintain&quot;]
+    M --&gt; R
+</code></pre>
+<p>Engineering is a loop that does not break.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Software Engineering</strong>: development that accounts for time and collaboration.</li>
+<li><strong>Requirements</strong>: agreement on what to build.</li>
+<li><strong>Design</strong>: decisions about how to build it.</li>
+<li><strong>Maintenance</strong>: every change after delivery — usually the longest phase.</li>
+<li><strong>Quality attributes</strong>: correctness, reliability, performance, security, maintainability.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — A coder's view</strong></p>
+<pre><code class="language-text">need -&gt; code -&gt; works -&gt; done
+</code></pre>
+<p><strong>After — An engineer's view</strong></p>
+<pre><code class="language-text">need -&gt; design -&gt; code -&gt; test -&gt; operate -&gt; change -&gt; reflect -&gt; repeat
+</code></pre>
+<p>Same code, different time horizon.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — "Run Once" Code</strong></p>
+<pre><code class="language-python"># 1_quick.py
+import sys
+n = int(sys.argv[1])
+print(sum(range(n)))
+</code></pre>
+<p>Works today, that's enough.</p>
+<p><strong>Step 2 — "Others Will Use It" Code</strong></p>
+<pre><code class="language-python"># 2_reusable.py
+def sum_to(n: int) -&gt; int:
+    &quot;&quot;&quot;Sum of 0..n-1.&quot;&quot;&quot;
+    if n &lt; 0: raise ValueError(&quot;n must be &gt;= 0&quot;)
+    return n * (n - 1) // 2
+</code></pre>
+<p>Types, docstring, and input validation appear.</p>
+<p><strong>Step 3 — "Production" Code</strong></p>
+<pre><code class="language-python"># 3_prod.py
+import logging
+log = logging.getLogger(__name__)
+
+def sum_to(n: int) -&gt; int:
+    if n &lt; 0:
+        log.warning(&quot;invalid input n=%s&quot;, n)
+        raise ValueError(&quot;n must be &gt;= 0&quot;)
+    return n * (n - 1) // 2
+</code></pre>
+<p>Logging and observability arrive.</p>
+<p><strong>Step 4 — Add Tests</strong></p>
+<pre><code class="language-python"># 4_test.py
+import pytest
+from prod import sum_to
+
+def test_sum_to_basic(): assert sum_to(5) == 10
+def test_sum_to_zero(): assert sum_to(0) == 0
+def test_sum_to_negative():
+    with pytest.raises(ValueError): sum_to(-1)
+</code></pre>
+<p>Without tests, you cannot change the code.</p>
+<p><strong>Step 5 — Documentation</strong></p>
+<pre><code class="language-text"># 5_README.md
+## sum_to
+- input: non-negative integer
+- output: sum of 0..n-1
+- complexity: O(1)
+- history: 2026-05 v1
+</code></pre>
+<p>Minimum guidance for the next engineer.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same function takes on more responsibility per step.</li>
+<li>Code grows; cognitive cost shrinks.</li>
+<li>Each step looks at a different time horizon.</li>
+<li>Engineering is the explicit pricing of trade-offs.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Coding the moment you hear the requirement.</strong> The fastest path to solving the wrong problem.</li>
+<li><strong>Writing tests "later".</strong> Later almost never arrives.</li>
+<li><strong>Treating docs as luxury.</strong> It is theft of the next engineer's time.</li>
+<li><strong>Operations is "their job".</strong> The author knows the system best.</li>
+<li><strong>Deciding alone.</strong> Good decisions come from agreement.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large organizations record decisions through RFCs and ADRs. SRE is collaboration with engineering, not a separate department. Code review, pair programming, and retrospectives are daily practice.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The goal is "operable", not just "works".</li>
+<li>The reasons behind decisions are written down.</li>
+<li>More time goes into agreement than into code.</li>
+<li>Code is written for the future self and team.</li>
+<li>Learning is built into the daily routine.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between coding and engineering?</li>
+<li>[ ] Can you list the five areas an engineer owns?</li>
+<li>[ ] Can you separate "the right thing" from "doing it right"?</li>
+<li>[ ] Can you classify your own code into one of the five steps?</li>
+<li>[ ] Can you sketch your next decade of learning?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick one piece of code you wrote recently and classify it across the five steps.</li>
+<li>Describe a time when "the right thing" and "doing it right" pulled in different directions.</li>
+<li>Choose your weakest area among the next episodes (requirements, design, review, testing, operations).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Engineering is not just another word for code. Next up, where everything starts — understanding requirements.</p>
+<ul>
+<li><strong>What Is Software Engineering? (current)</strong></li>
+<li>Understanding Requirements (upcoming)</li>
+<li>Design vs Implementation (upcoming)</li>
+<li>Code Review (upcoming)</li>
+<li>Testing Strategy (upcoming)</li>
+<li>Version Control and Release (upcoming)</li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.computer.org/education/bodies-of-knowledge/software-engineering">IEEE — SWEBOK Guide v3</a></li>
+<li><a href="https://abseil.io/resources/swe-book">Software Engineering at Google (free book)</a></li>
+<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer — David Thomas, Andrew Hunt</a></li>
+<li><a href="https://martinfowler.com/articles.html">Martin Fowler — Articles</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Engineering, Process, Quality, Career</p>
+</body>
+</html>

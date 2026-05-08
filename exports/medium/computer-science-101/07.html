@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Networks</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Networks</h1>
+<blockquote>
+<p>Computer Science 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: When you type an address into a browser, how does data from another computer end up on your screen?</p>
+<blockquote>
+<p>A network is built from layered agreements (protocols). IP decides where a packet should go, TCP guarantees reliability on top of IP, and HTTP rides on top of TCP to exchange meaningful requests and responses. Once you understand the layered structure, you can quickly narrow down where a failure happened or why a response is slow. This article covers TCP/IP, HTTP, DNS, and the basics of socket programming.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The roles of the four TCP/IP layers</li>
+<li>The structure of an HTTP request and response</li>
+<li>DNS and how name resolution works</li>
+<li>Talking to a server directly using the socket API</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When an API response is slow, when a certificate error pops up, when an odd timeout occurs — the cause is somewhere in the network stack. Knowing the layers lets you ask, and answer, "Which layer is the problem?"</p>
+<blockquote>
+<p>Network = layered agreements.</p>
+</blockquote>
+<p>Each layer trusts the one below it and focuses on its own job.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.</p>
+</blockquote>
+<pre><code class="language-text">Layer (TCP/IP)        Example protocols          Unit
+────────────────────────────────────────────────────────
+Application           HTTP, DNS, SMTP, SSH       message
+Transport             TCP, UDP                   segment
+Internet              IP, ICMP                   packet
+Network Access        Ethernet, Wi-Fi            frame
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>IP</strong><br>
+- Description: Protocol that delivers a packet to the destination host (addressing)</p>
+<p><strong>Port</strong><br>
+- Description: Identifies which process on the host should receive the data (0–65535)</p>
+<p><strong>TCP</strong><br>
+- Description: Connection-oriented protocol that guarantees reliability, ordering, and retransmission</p>
+<p><strong>UDP</strong><br>
+- Description: Lightweight, connectionless protocol with no reliability guarantees</p>
+<p><strong>HTTP</strong><br>
+- Description: The web's application-layer protocol (request/response model)</p>
+<p><strong>DNS</strong><br>
+- Description: The system that translates domain names into IP addresses</p>
+<h2>Before / After</h2>
+<p><strong>Before — code that treats HTTP as magic:</strong></p>
+<pre><code class="language-python">import urllib.request
+
+# You have no idea what is actually exchanged
+data = urllib.request.urlopen(&quot;https://httpbin.org/get&quot;).read()
+print(data[:80])
+</code></pre>
+<p><strong>After — code that looks at HTTP one line at a time:</strong></p>
+<pre><code class="language-python">import socket
+import ssl
+
+# HTTPS = TCP + TLS + HTTP
+ctx = ssl.create_default_context()
+with socket.create_connection((&quot;httpbin.org&quot;, 443)) as sock:
+    with ctx.wrap_socket(sock, server_hostname=&quot;httpbin.org&quot;) as tls:
+        request = (
+            &quot;GET /get HTTP/1.1\r\n&quot;
+            &quot;Host: httpbin.org\r\n&quot;
+            &quot;Connection: close\r\n\r\n&quot;
+        )
+        tls.send(request.encode())
+        response = b&quot;&quot;
+        while chunk := tls.recv(4096):
+            response += chunk
+
+print(response.split(b&quot;\r\n\r\n&quot;, 1)[0].decode())   # response headers
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Run a DNS lookup yourself</strong></p>
+<pre><code class="language-python">import socket
+
+host = &quot;www.python.org&quot;
+ip = socket.gethostbyname(host)
+print(f&quot;{host} -&gt; {ip}&quot;)
+
+# Find every address (IPv4, IPv6)
+for info in socket.getaddrinfo(host, 443):
+    family, _, _, _, sockaddr = info
+    print(family.name, sockaddr)
+</code></pre>
+<p><strong>Step 2: A TCP echo server and client</strong></p>
+<pre><code class="language-python"># server.py — a simple echo server that accepts one client
+import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as srv:
+    srv.bind((&quot;127.0.0.1&quot;, 5050))
+    srv.listen(1)
+    print(&quot;listening on 127.0.0.1:5050&quot;)
+    conn, addr = srv.accept()
+    with conn:
+        print(&quot;connected:&quot;, addr)
+        while data := conn.recv(1024):
+            conn.sendall(data)               # echo back exactly what came in
+</code></pre>
+<pre><code class="language-python"># client.py — sends a message to the server above and prints the reply
+import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cli:
+    cli.connect((&quot;127.0.0.1&quot;, 5050))
+    cli.sendall(b&quot;Hello, network!&quot;)
+    print(cli.recv(1024).decode())
+</code></pre>
+<p><strong>Step 3: Build an HTTP request by hand</strong></p>
+<pre><code class="language-python">import socket
+
+with socket.create_connection((&quot;example.com&quot;, 80)) as sock:
+    sock.send(b&quot;GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n&quot;)
+    raw = b&quot;&quot;
+    while chunk := sock.recv(4096):
+        raw += chunk
+
+header, _, body = raw.partition(b&quot;\r\n\r\n&quot;)
+print(header.decode())
+print(&quot;body bytes:&quot;, len(body))
+</code></pre>
+<p><strong>Step 4: TCP vs UDP</strong></p>
+<pre><code class="language-python"># UDP sends without a connection and does not guarantee delivery
+import socket
+
+with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
+    udp.sendto(b&quot;ping&quot;, (&quot;8.8.8.8&quot;, 53))     # just fire a datagram
+    udp.settimeout(2)
+    try:
+        data, addr = udp.recvfrom(1024)
+        print(&quot;received:&quot;, len(data), &quot;bytes from&quot;, addr)
+    except socket.timeout:
+        print(&quot;no reply — UDP does not retransmit&quot;)
+</code></pre>
+<p><strong>Step 5: Measure response time per layer</strong></p>
+<pre><code class="language-python">import socket
+import time
+import urllib.request
+
+host = &quot;www.python.org&quot;
+
+t0 = time.perf_counter()
+ip = socket.gethostbyname(host)
+t1 = time.perf_counter()
+
+with socket.create_connection((ip, 443)) as sock:
+    t2 = time.perf_counter()
+
+t3 = time.perf_counter()
+urllib.request.urlopen(f&quot;https://{host}/&quot;).read()
+t4 = time.perf_counter()
+
+print(f&quot;DNS    : {(t1 - t0) * 1000:6.1f} ms&quot;)
+print(f&quot;TCP    : {(t2 - t1) * 1000:6.1f} ms&quot;)
+print(f&quot;HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)&quot;)
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>HTTP is, in the end, a chunk of text where headers and body are separated by a blank line.</li>
+<li>TCP requires a connection and guarantees order and retransmission — UDP does not.</li>
+<li>DNS lookups have their own cost; caching dominates response time.</li>
+<li>HTTPS adds a TLS handshake on top of the TCP connection.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Opening a new TCP connection per request</strong><br>
+- Problem: Handshake overhead piles up<br>
+- Fix: Use HTTP keep-alive and a connection pool</p>
+<p><strong>Skipping DNS caching</strong><br>
+- Problem: Tens of milliseconds per request<br>
+- Fix: Use the OS or library DNS cache</p>
+<p><strong>Assuming <code>recv</code> returns the full message</strong><br>
+- Problem: Truncated data<br>
+- Fix: Length-prefixed or delimiter-based parsing</p>
+<p><strong>Disabling HTTPS certificate verification</strong><br>
+- Problem: Vulnerable to MITM<br>
+- Fix: Fix the certificate, do not turn verification off</p>
+<p><strong>Expecting reliability from UDP</strong><br>
+- Problem: Silent loss on packet drop<br>
+- Fix: Use TCP, or build reliability into the protocol</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Choosing HTTP/2 or gRPC and tuning keep-alive between microservices.</li>
+<li>DNS caching and CDNs to give global users consistent latency.</li>
+<li>Monitoring P50/P95 latencies broken down into DNS, TCP, TLS, and server time.</li>
+<li>API gateways handling TLS termination, load balancing, and retries.</li>
+<li>UDP and QUIC for games and real-time transport to keep latency low.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When a senior engineer hears "it's slow," their first move is to separate where the time is spent. DNS, TCP handshake, TLS, server processing, body download — each is measured on its own. You can only prescribe a fix once you can point at a single layer.</p>
+<p>They also write code assuming the network always fails. Timeouts, retries, circuit breakers, and idempotency are defaults, not options. "Network code that only handles the happy path explodes in production" is a saying earned the hard way.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can describe each TCP/IP layer in one sentence</li>
+<li>[ ] I know the wire format of an HTTP request and response</li>
+<li>[ ] I am aware that DNS lookup time is part of total latency</li>
+<li>[ ] I pick TCP or UDP based on the workload</li>
+<li>[ ] I set a timeout on every network call</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Using only <code>socket</code>, write a multi-client echo server that handles many clients at once (use <code>select</code> or threads).</p>
+</li>
+<li>
+<p>Call the same URL 100 times with both <code>urllib.request</code> and <code>requests</code>, and compare average response times to measure the keep-alive effect.</p>
+</li>
+<li>
+<p>Write a tiny profiler that takes a domain and prints DNS lookup time, TCP connect time, TLS handshake time, and HTTP response time separately.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A network is a stack of agreements, where each layer trusts the layer below and focuses on its own job. HTTP is a text protocol on top of TCP, and TCP is the reliability layer on top of IP. Breaking down a response time layer by layer is where senior debugging begins.</p>
+<p>The next article moves beyond the network to how we store data permanently and query it efficiently — databases.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><strong>Networks (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9110.html">HTTP/1.1 RFC 9110</a></li>
+<li><a href="https://beej.us/guide/bgnet/">Beej's Guide to Network Programming</a></li>
+<li><a href="https://hpbn.co/">High Performance Browser Networking — Ilya Grigorik</a></li>
+<li><a href="https://www.cloudflare.com/learning/dns/what-is-dns/">Cloudflare Learning Center — DNS</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networks, TCP/IP, HTTP, DNS, Sockets</p>
+</body>
+</html>

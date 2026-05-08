@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Data Science?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Data Science?</h1>
+<blockquote>
+<p>Data Science 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What is <em>data science</em>, and how is it different from <em>analysis</em> — and why has it become its own <em>job</em>?</p>
+<blockquote>
+<p><em>Data science is the </em>job of bridging<em> a problem and the data behind it.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A working <em>definition</em> of data science</li>
+<li>The <em>differences</em> between analyst, scientist, and engineer</li>
+<li>A typical <em>5-step workflow</em></li>
+<li>Common questions from <em>beginners</em></li>
+<li>Five common misconceptions</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In a field full of <em>overlapping titles</em>, the boundaries blur fast. A clear <em>big picture</em> tells you <em>which tools to learn first</em> and <em>why</em>.</p>
+<blockquote>
+<p><em>Learning without a </em>big picture<em> is just a pile of fragments.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Problem[&quot;Business Problem&quot;] --&gt; Data[&quot;Data&quot;]
+    Data --&gt; Model[&quot;Model / Insight&quot;]
+    Model --&gt; Decision[&quot;Decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Data Analyst</strong>: answers <em>business questions</em> through <em>metrics and dashboards</em>.</li>
+<li><strong>Data Scientist</strong>: builds <em>models</em> and runs <em>experiments</em>.</li>
+<li><strong>ML Engineer</strong>: takes models and <em>puts them into production</em>.</li>
+<li><strong>Data Engineer</strong>: builds <em>pipelines</em> and the <em>warehouse</em>.</li>
+<li><strong>EDA</strong>: Exploratory Data Analysis — looking at the data before modeling.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: you <em>have data</em>, so you analyze <em>something</em> and hope it sticks. Results feel <em>fuzzy</em>.</p>
+<p><strong>After</strong>: you frame <em>one problem</em> in one sentence and only look at the <em>data that matters</em>. Results are <em>clear</em>.</p>
+<h2>Hands-on: 5-step Workflow</h2>
+<p><strong>Step 1 — Define the problem</strong></p>
+<pre><code class="language-text">&quot;Each week, pick 100 users most likely to churn&quot;
+</code></pre>
+<p><strong>Step 2 — Collect data</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;users.csv&quot;)
+print(df.shape, df.columns.tolist())
+</code></pre>
+<p><strong>Step 3 — Clean and EDA</strong></p>
+<pre><code class="language-python">df = df.dropna(subset=[&quot;last_login&quot;])
+df[&quot;days_since_login&quot;] = (
+    pd.Timestamp.today() - pd.to_datetime(df[&quot;last_login&quot;])
+).dt.days
+print(df[&quot;days_since_login&quot;].describe())
+</code></pre>
+<p><strong>Step 4 — Model or rule</strong></p>
+<pre><code class="language-python">candidates = (
+    df[df[&quot;days_since_login&quot;] &gt; 30]
+      .sort_values(&quot;amount_total&quot;, ascending=False)
+      .head(100)
+)
+</code></pre>
+<p><strong>Step 5 — Tie back to a decision</strong></p>
+<pre><code class="language-text">Email campaign for 100 users → measure conversion → adjust next week
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>One sentence of problem</em> sets the direction for <em>every line</em>.</li>
+<li>The data flow is simple: <em>read → clean → explore → decide</em>.</li>
+<li>A model or dashboard only has value when it ends in a <em>decision</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Learning <em>tools first</em>.</strong> Without a problem, tools have <em>no direction</em>.</li>
+<li><strong>Optimizing only for <em>model accuracy</em>.</strong> Watch the <em>business metric</em> too.</li>
+<li><strong>Skipping EDA and <em>fixing a hypothesis</em> too early.</strong> You miss what the data is actually telling you.</li>
+<li><strong>Ignoring <em>role boundaries</em>.</strong> Hiring and collaboration get <em>tangled</em>.</li>
+<li><strong>Not connecting results to <em>decisions</em>.</strong> Reports go straight to a <em>drawer</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startup data teams often look like a <em>mini-org</em> of analyst + scientist + engineer. They run on <em>topic-level OKRs</em>, and every week they tie <em>dashboards or models</em> back to <em>concrete decisions</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Problem framing</em> is more expensive than <em>modeling</em>.</li>
+<li>Never <em>skimp on EDA</em>.</li>
+<li>Always <em>close the loop</em> with a decision.</li>
+<li><em>Document</em> the boundaries between roles.</li>
+<li><em>Data quality</em> is everyone's job, not just the engineer's.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can describe the difference between <em>analyst, scientist, engineer</em>.</li>
+<li>[ ] I know what <em>EDA</em> is.</li>
+<li>[ ] I understand the <em>problem → data → decision</em> flow.</li>
+<li>[ ] I know why a <em>business metric</em> matters.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick a <em>recent dashboard</em> you saw and write down the <em>decision</em> it led to.</li>
+<li>Write <em>3 things in common</em> between analyst and scientist roles.</li>
+<li>Write <em>3 problem statements</em> in one sentence each.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Data science is the <em>job of bridging</em> problems and data. Next, we will see how to <em>turn a problem</em> into a <em>data problem</em> you can actually work on.</p>
+<ul>
+<li><strong>What Is Data Science? (current)</strong></li>
+<li>Turning a Problem into a Data Problem (upcoming)</li>
+<li>Data Collection (upcoming)</li>
+<li>Data Cleaning (upcoming)</li>
+<li>Exploratory Data Analysis (upcoming)</li>
+<li>Visualization (upcoming)</li>
+<li>Modeling (upcoming)</li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://drewconway.com/zia/2013/3/26/the-data-science-venn-diagram">Drew Conway — The Data Science Venn Diagram</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of Machine Learning</a></li>
+<li><a href="https://r4ds.hadley.nz/">Hadley Wickham — R for Data Science</a></li>
+<li><a href="https://multithreaded.stitchfix.com/">Stitch Fix — Multithreaded Engineering Blog</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, Introduction, Workflow, Analytics, Beginner</p>
+</body>
+</html>

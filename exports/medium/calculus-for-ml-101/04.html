@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gradient</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Gradient</h1>
+<blockquote>
+<p>Calculus for ML 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When we collect <em>all partial derivatives</em> into a <em>single vector</em>, what does it <em>mean</em>?</p>
+<blockquote>
+<p>A <em>gradient</em> is the <em>vector</em> pointing in the direction of <em>steepest loss increase</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>gradient</em></li>
+<li><em>Direction</em> and <em>magnitude</em></li>
+<li>Intuition for <em>contour lines</em></li>
+<li>The <em>steepest ascent</em> direction</li>
+<li>The meaning of the <em>opposite</em> direction</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Gradient descent</em> takes <em>one step</em> in the <em>opposite</em> direction of the gradient.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Partials] --&gt; G[Gradient Vector]
+    G --&gt; D[Direction]
+    G --&gt; M[Magnitude]
+    D --&gt; S[Steepest Ascent]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>gradient</strong>: vector of <em>partial derivatives</em>.</li>
+<li><strong>direction</strong>: a <em>unit vector</em>.</li>
+<li><strong>magnitude</strong>: the <em>length</em>.</li>
+<li><strong>contour</strong>: a <em>level set</em> line.</li>
+<li><strong>steepest</strong>: the <em>fastest-growing</em> direction.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: see each variable <em>separately</em>.</p>
+<p><strong>After</strong>: bundle them into <em>one vector</em>.</p>
+<h2>Hands-on: Mini Gradient Kit</h2>
+<p><strong>Step 1 — Gradient Function</strong></p>
+<pre><code class="language-python">def grad(f, x, h=1e-5):
+    g = []
+    for i in range(len(x)):
+        xp = x.copy(); xm = x.copy()
+        xp[i] += h; xm[i] -= h
+        g.append((f(xp) - f(xm)) / (2 * h))
+    return g
+</code></pre>
+<p><strong>Step 2 — Loss</strong></p>
+<pre><code class="language-python">def loss(w):
+    return (w[0] - 1) ** 2 + (w[1] + 2) ** 2
+</code></pre>
+<p><strong>Step 3 — Compute Gradient</strong></p>
+<pre><code class="language-python">g = grad(loss, [0.0, 0.0])  # about [-2, 4]
+</code></pre>
+<p><strong>Step 4 — Magnitude</strong></p>
+<pre><code class="language-python">import math
+
+def norm(v):
+    return math.sqrt(sum(x ** 2 for x in v))
+</code></pre>
+<p><strong>Step 5 — One Opposite Step</strong></p>
+<pre><code class="language-python">def step(w, g, lr=0.1):
+    return [wi - lr * gi for wi, gi in zip(w, g)]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A gradient is a <em>vector</em>.</li>
+<li>The <em>opposite</em> direction <em>reduces</em> loss.</li>
+<li><em>Magnitude</em> is the <em>signal strength</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating the <em>gradient</em> as a <em>scalar</em>.</strong></li>
+<li><strong>Flipping the <em>sign</em> incorrectly.</strong></li>
+<li><strong>Confusing <em>learning rate</em> with <em>gradient magnitude</em>.</strong></li>
+<li><strong>Ignoring <em>contour-line</em> intuition.</strong></li>
+<li><strong>Misaligning <em>coordinates</em> with <em>weights</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Backpropagation</em> computes the <em>whole-model gradient</em> in <em>one pass</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A gradient is a <em>map</em>.</li>
+<li>The <em>opposite</em> direction is the <em>progress</em> direction.</li>
+<li><em>Magnitude</em> diagnoses <em>state</em>.</li>
+<li><em>Coordinate alignment</em> is <em>fixed</em>.</li>
+<li><em>Vectorization</em> drives <em>speed</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Verify the <em>vector</em> shape.</li>
+<li>[ ] Inspect the <em>sign</em>.</li>
+<li>[ ] Monitor the <em>magnitude</em>.</li>
+<li>[ ] Lock the <em>coordinate order</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define a <em>gradient</em> in one line.</li>
+<li>State the meaning of the <em>opposite</em> direction in one line.</li>
+<li>State the meaning of <em>gradient magnitude</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Chain Rule</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
+<li><strong>Gradient (current)</strong></li>
+<li>Chain Rule (upcoming)</li>
+<li>Loss Function (upcoming)</li>
+<li>Gradient Descent (upcoming)</li>
+<li>Optimization (upcoming)</li>
+<li>Backpropagation Intuition (upcoming)</li>
+<li>Calculus in Deep Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivative-and-gradient-articles">Gradient - Khan Academy</a></li>
+<li><a href="https://www.3blue1brown.com/topics/calculus">Vector Calculus - 3Blue1Brown</a></li>
+<li><a href="https://www.deeplearningbook.org/contents/numerical.html">Deep Learning Book - Numerical Computation</a></li>
+<li><a href="https://pytorch.org/docs/stable/notes/autograd.html">PyTorch Autograd Mechanics</a></li>
+</ul>
+<p class="tags-line">Tags: Calculus, ML, Gradient, Vector, Beginner</p>
+</body>
+</html>

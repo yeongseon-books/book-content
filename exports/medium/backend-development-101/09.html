@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deploying the Backend</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Deploying the Backend</h1>
+<blockquote>
+<p>Backend Development 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does "it works on my laptop" so often <em>break</em> in production?</p>
+<blockquote>
+<p>Production has different OS, dependencies, secrets, and networks. Deployment is the work of <em>freezing</em> those differences in code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The pieces that make up a deployment environment</li>
+<li>How a Dockerfile creates a <em>reproducible environment</em></li>
+<li>How to manage env vars and secrets</li>
+<li>What healthchecks and readiness probes do</li>
+<li>The basic idea behind zero-downtime deployment</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When deploys become <em>scary</em>, release frequency drops, and rare deploys carry <em>more change</em> and <em>more risk</em>. Making deploys boring is one of the most senior things you can do.</p>
+<blockquote>
+<p>A great deploy has <em>no drama</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;Source&quot;] --&gt; Build[&quot;Build&quot;]
+    Build --&gt; Image[&quot;Container image&quot;]
+    Image --&gt; Reg[&quot;Registry&quot;]
+    Reg --&gt; Run[&quot;Runner&quot;]
+    Run --&gt; LB[&quot;Load balancer&quot;]
+    LB --&gt; Users[&quot;Users&quot;]
+</code></pre>
+<p>Code becomes an <em>image</em>; the image runs the same way <em>everywhere</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Container</strong>: a unit that runs <em>with its dependencies inside it</em>.</li>
+<li><strong>Image</strong>: the blueprint of a container.</li>
+<li><strong>Registry</strong>: the storage for images.</li>
+<li><strong>Healthcheck</strong>: an endpoint that tells the runner whether the container is <em>alive</em>.</li>
+<li><strong>Rolling update</strong>: replacing the old version <em>gradually</em> with the new one.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (manual deploy)</strong></p>
+<pre><code class="language-bash">ssh server
+git pull
+pip install -r requirements.txt
+systemctl restart app
+</code></pre>
+<p><strong>After (Dockerized — same image runs everywhere)</strong></p>
+<pre><code class="language-bash">docker build -t myapp:1.2.3 .
+docker push registry/myapp:1.2.3
+# Production pulls the same image and runs it
+</code></pre>
+<h2>Hands-on: Five Steps to a Deploy</h2>
+<p><strong>Step 1 — Dockerfile</strong></p>
+<pre><code class="language-dockerfile"># Dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD [&quot;uvicorn&quot;, &quot;main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]
+</code></pre>
+<p><strong>Step 2 — Build and run</strong></p>
+<pre><code class="language-bash">docker build -t myapp:0.1 .
+docker run -p 8000:8000 myapp:0.1
+</code></pre>
+<p><strong>Step 3 — Environment variables</strong></p>
+<pre><code class="language-python"># main.py
+import os
+DB_URL = os.environ[&quot;DATABASE_URL&quot;]
+JWT_SECRET = os.environ[&quot;JWT_SECRET&quot;]
+</code></pre>
+<pre><code class="language-bash">docker run -e DATABASE_URL=postgres://... -e JWT_SECRET=... myapp:0.1
+</code></pre>
+<p><strong>Step 4 — Healthcheck endpoint</strong></p>
+<pre><code class="language-python"># health.py
+@app.get(&quot;/healthz&quot;)
+def healthz():
+    return {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<p>In <code>docker-compose.yml</code>:</p>
+<pre><code class="language-yaml">healthcheck:
+  test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:8000/healthz&quot;]
+  interval: 10s
+  retries: 3
+</code></pre>
+<p><strong>Step 5 — Rolling update</strong></p>
+<pre><code class="language-bash"># Kubernetes, ECS, Docker Swarm — same idea
+# 1) deploy the new image
+# 2) wait for healthcheck to pass
+# 3) shift traffic gradually
+# 4) remove the old version
+</code></pre>
+<p>The key is to <em>prove the new version is healthy</em> before traffic moves.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Secrets <em>do not</em> go inside the image.</li>
+<li>Options like <code>--no-cache-dir</code> keep the image lean.</li>
+<li>The application provides its own healthcheck.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Deploying the <code>latest</code> tag in production.</strong> You cannot tell <em>which version</em> is live.</li>
+<li><strong>Baking secrets into the image.</strong> A leaked image leaks the secrets.</li>
+<li><strong>Skipping healthchecks behind a load balancer.</strong> Traffic flows to dead instances.</li>
+<li><strong>Running migrations <em>manually</em> in production.</strong> Deploy automation loses its point.</li>
+<li><strong>Not preparing a rollback procedure.</strong> Incident response becomes <em>unrehearsed</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use <em>Docker + GitHub Actions + an orchestrator (Kubernetes/ECS)</em>. A merged PR triggers CI: build the image, push it, deploy. Operators stop <em>running commands</em> and start <em>watching the system</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Every deploy must be <em>reversible</em>.</li>
+<li>Secrets live only in a <em>secret manager</em>.</li>
+<li>Smaller images mean faster builds and deploys.</li>
+<li>Migrations are designed to be <em>backward compatible</em>.</li>
+<li>A deploy that pages someone is, by definition, a <em>bad deploy</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can write a Dockerfile and build the image.</li>
+<li>[ ] You can split config out into environment variables.</li>
+<li>[ ] You can add a <code>/healthz</code> endpoint.</li>
+<li>[ ] You can keep secrets out of the image.</li>
+<li>[ ] You can describe the rolling update flow.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Dockerize your FastAPI app and run it locally.</li>
+<li>Use a <code>.env</code> file with <code>docker run --env-file</code> to externalize config.</li>
+<li>Break the healthcheck on purpose and observe the container status.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Deployment is a <em>reproducibility</em> problem. In the final chapter, we tie all the layers together into a <em>production-ready backend structure</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/07-logging-and-error-handling.md">Logging and Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/08-testing-the-backend.md">Testing the Backend</a></li>
+<li><strong>Deploying the Backend (current)</strong></li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/get-started/">Docker get-started</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/">Kubernetes probes</a></li>
+<li><a href="https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python">GitHub Actions for Python</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Deployment, Docker, DevOps, Python</p>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Computer Architecture?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Computer Architecture?</h1>
+<blockquote>
+<p>Computer Architecture 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you write a single line of Python, what actually happens on the transistors below?</p>
+<blockquote>
+<p>Computer architecture is the abstraction that explains how a program runs on hardware. High-level code is compiled or interpreted into machine instructions, and the CPU pulls those instructions and their data from memory one cycle at a time. This series follows that path end to end and shows where decisions about performance, memory, and concurrency really begin.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A working definition of computer architecture</li>
+<li>The five components of the von Neumann model</li>
+<li>The abstraction stack from language down to circuits</li>
+<li>Why developers benefit from knowing this layer</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The same algorithm can run ten times faster or slower depending on memory access patterns, branch behavior, and instruction mix. Every abstraction eventually leaks, and when a system slows down the cause is almost always one layer below where you were looking. Without architecture knowledge, performance debugging is mostly guessing.</p>
+<blockquote>
+<p>Computer architecture does not explain why your code is fast. It explains why it is only this fast.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The von Neumann model places code and data in the same memory. The CPU fetches one instruction at a time, the ALU and control unit execute it, and results travel back through memory to output devices. Almost every general-purpose computer today is a variant of this model.</p>
+</blockquote>
+<pre><code class="language-text">  +-----------+      +-------------------+      +-----------+
+  |  Input    | ---&gt; |  CPU              | ---&gt; |  Output   |
+  |  Device   |      |  +------+ +-----+ |      |  Device   |
+  +-----------+      |  | ALU  | | CU  | |      +-----------+
+                     |  +------+ +-----+ |
+                     +---------+---------+
+                               |
+                               v
+                       +---------------+
+                       |    Memory     |
+                       |  (code + data)|
+                       +---------------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>ISA</strong><br>
+- Description: Instruction Set Architecture, the contract the CPU exposes</p>
+<p><strong>Microarchitecture</strong><br>
+- Description: The internal circuit design implementing an ISA</p>
+<p><strong>Clock</strong><br>
+- Description: The CPU's heartbeat; one cycle is one step</p>
+<p><strong>Memory hierarchy</strong><br>
+- Description: Registers to caches to RAM to disk</p>
+<p><strong>Abstraction stack</strong><br>
+- Description: Language to assembly to machine code to circuits</p>
+<h2>Before / After</h2>
+<p><strong>Before — "code just runs":</strong></p>
+<pre><code class="language-python">total = 0
+for n in range(10**7):
+    total += n
+print(total)
+</code></pre>
+<p>This looks like simple addition. In reality it triggers ten million integer additions, branch predictions, memory reads, and cache hits or misses.</p>
+<p><strong>After — following one cycle at a time:</strong></p>
+<pre><code class="language-text">1. PC (program counter) holds the next instruction address
+2. CPU fetches the instruction from memory (Fetch)
+3. The instruction is interpreted (Decode)
+4. The ALU performs the addition (Execute)
+5. The result is stored in a register (Writeback)
+6. PC advances to the next instruction
+</code></pre>
+<p>Even one line of code is the result of these five steps repeated tens of millions of times.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Look at Python's bytecode</strong></p>
+<pre><code class="language-python">import dis
+
+def add_one(x):
+    return x + 1
+
+dis.dis(add_one)
+</code></pre>
+<p>Sample output:</p>
+<pre><code class="language-text">  2           0 LOAD_FAST                0 (x)
+              2 LOAD_CONST               1 (1)
+              4 BINARY_ADD
+              6 RETURN_VALUE
+</code></pre>
+<p>A single line decomposes into four virtual instructions. CPython turns these into C calls, which the C compiler turns into machine code.</p>
+<p><strong>Step 2: Look at compiled assembly</strong></p>
+<pre><code class="language-text"># C source:  int add_one(int x) { return x + 1; }
+# gcc -S output (excerpt):
+#   add_one:
+#       lea     eax, [rdi + 1]
+#       ret
+</code></pre>
+<p>The same meaning compiles down to two instructions. The cost of an interpreter becomes visible.</p>
+<p><strong>Step 3: Build intuition for one cycle</strong></p>
+<pre><code class="language-python">CLOCK_GHZ = 3.0  # assume 3 GHz
+ns_per_cycle = 1.0 / CLOCK_GHZ
+
+print(f&quot;One cycle: ~{ns_per_cycle:.3f} ns&quot;)
+print(f&quot;L1 cache hit ~ 4 cycles -&gt; {4 * ns_per_cycle:.2f} ns&quot;)
+print(f&quot;Main memory access ~ 200 cycles -&gt; {200 * ns_per_cycle:.2f} ns&quot;)
+</code></pre>
+<p>A single cycle is around 0.3 ns; main memory is more than 200 times slower. This asymmetry is the reason caches and locality exist.</p>
+<p><strong>Step 4: See how access patterns matter</strong></p>
+<pre><code class="language-python">import time
+
+N = 10_000_000
+data = [0] * N
+
+start = time.perf_counter()
+for i in range(N):
+    data[i] += 1
+print(f&quot;Sequential: {time.perf_counter() - start:.2f} s&quot;)
+
+start = time.perf_counter()
+for i in range(0, N, 16):
+    data[i] += 1
+print(f&quot;Strided (1/16th of work): {time.perf_counter() - start:.2f} s&quot;)
+</code></pre>
+<p>The amount of arithmetic looks similar but the cache behavior is not. Without architecture knowledge you cannot explain the gap.</p>
+<p><strong>Step 5: Sketch the abstraction stack</strong></p>
+<pre><code class="language-text">[Application]      Python, JavaScript
+       |
+[Runtime / VM]     CPython, V8, JVM
+       |
+[Compiler / OS]    GCC, LLVM, Linux kernel
+       |
+[ISA]              x86-64, ARMv8, RISC-V
+       |
+[Microarchitecture] caches, pipeline, branch prediction
+       |
+[Digital circuits]  gates, flip-flops, transistors
+</code></pre>
+<p>Each layer hides the one below behind a simple interface. Computer architecture mostly lives between ISA and microarchitecture.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A single Python line becomes bytecode and then machine code</li>
+<li>Identical results can have very different instruction and memory costs</li>
+<li>One cycle ~0.3 ns versus main memory ~60 ns is the central asymmetry</li>
+<li>Abstractions are convenient until performance forces you down a layer</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Reasoning only at the top layer</strong><br>
+- Problem: Cannot find performance root cause<br>
+- Fix: Drop one layer down</p>
+<p><strong>Treating clock speed as performance</strong><br>
+- Problem: Ignores IPC and cache behavior<br>
+- Fix: Track cache misses too</p>
+<p><strong>Assuming flat memory</strong><br>
+- Problem: Same algorithm, N times slower<br>
+- Fix: Respect the memory hierarchy</p>
+<p><strong>Confusing ISA with microarchitecture</strong><br>
+- Problem: Same code, different chips, different speed<br>
+- Fix: Keep the two separate</p>
+<p><strong>Equating interpreter and compiler speed</strong><br>
+- Problem: 10 to 100 times difference<br>
+- Fix: Compile hot paths</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Backend tuning: profiling cache misses and branch mispredictions in hot functions</li>
+<li>Embedded development: fitting code into fixed ISAs and tight power budgets</li>
+<li>Machine learning: laying out matrices for GPU memory hierarchies</li>
+<li>Security: understanding side-channel attacks like Spectre</li>
+<li>Database engines: cache-friendly data structures and SIMD use</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer who hears "this code is slow" first asks which layer is at fault. Algorithm? Interpreter? Memory access? I/O? Each layer has its own measurement tools and its own remedies. Holding the architecture map in your head turns guesses into hypotheses you can test.</p>
+<p>A senior also knows that abstractions are convenient but never free. Garbage collectors, virtual memory, and caches all stay invisible until they hand you the bill at the worst possible moment. Reading that bill is the practical value of architecture knowledge.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name the five components of the von Neumann model</li>
+<li>[ ] You can explain ISA versus microarchitecture</li>
+<li>[ ] You know roughly how a cycle compares to a memory access</li>
+<li>[ ] You can sketch the abstraction stack top to bottom</li>
+<li>[ ] You sense that "performance issues live one layer down"</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Use <code>dis</code> on two functions you wrote and compare the bytecode lengths. Do execution times correlate with instruction counts?</p>
+</li>
+<li>
+<p>Write a program that sums one million integers in (a) sequential order and (b) random order, and time both. Explain the gap in terms of the memory hierarchy.</p>
+</li>
+<li>
+<p>Look up your laptop's CPU model. Note its clock speed, core count, and L1/L2/L3 cache sizes, and compare them to the cycle costs above.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Computer architecture explains how code actually runs on hardware. The von Neumann model is the starting point and the abstraction stack stretches from language all the way down to transistors. Performance issues almost always live one layer below where you were looking; you need the map to find them.</p>
+<p>The next article starts at the bottom and works back up. We look at how computers represent everything they handle: bits, bytes, integers, and floating point.</p>
+<ul>
+<li><strong>What Is Computer Architecture? (current)</strong></li>
+<li>Data Representation — Bit, Byte, Integer, Floating Point (upcoming)</li>
+<li>CPU and Instructions (upcoming)</li>
+<li>Registers and the ALU (upcoming)</li>
+<li>Memory Organization (upcoming)</li>
+<li>Cache and Locality (upcoming)</li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1">Patterson &amp; Hennessy — Computer Organization and Design</a></li>
+<li><a href="https://www.elsevier.com/books/computer-architecture/hennessy/978-0-12-811905-1">Hennessy &amp; Patterson — Computer Architecture: A Quantitative Approach</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Von_Neumann_architecture">Wikipedia — Von Neumann Architecture</a></li>
+<li><a href="https://csapp.cs.cmu.edu/">CS:APP — Computer Systems: A Programmer's Perspective</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Hardware, Foundations, Systems, Von Neumann</p>
+</body>
+</html>

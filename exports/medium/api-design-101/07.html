@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Designing Error Responses</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Designing Error Responses</h1>
+<blockquote>
+<p>API Design 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What should an error response <em>contain</em> so that clients can branch precisely and humans can read and understand it?</p>
+<blockquote>
+<p>A <em>status code + a stable body shape + a stable error code</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four parts of an error response</li>
+<li>RFC 7807 <code>application/problem+json</code></li>
+<li>How to express validation errors</li>
+<li>Separating human messages from machine codes</li>
+<li>Balancing security and debuggability</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>There is one success path and <em>hundreds of error paths</em>. If the shape is inconsistent, clients must handle each one separately — and users see only "unknown error".</p>
+<blockquote>
+<p>A good error response cuts <em>debugging time</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;request&quot;] --&gt; H[&quot;handler&quot;]
+    H --&gt;|&quot;bad input&quot;| V[&quot;422 + problem+json&quot;]
+    H --&gt;|&quot;not allowed&quot;| F[&quot;403 + problem+json&quot;]
+    H --&gt;|&quot;internal&quot;| S[&quot;500 + problem+json&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Status code</strong>: the broad category — <code>4xx</code> user, <code>5xx</code> server.</li>
+<li><strong>Error code</strong>: a stable <em>string identifier</em> — <code>user.not_found</code>.</li>
+<li><strong>Title</strong>: a short message for humans.</li>
+<li><strong>Detail</strong>: a longer message for humans.</li>
+<li><strong>Errors[]</strong>: per-field list for validation failures.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (free form)</strong></p>
+<pre><code class="language-json">{&quot;error&quot;: &quot;something went wrong&quot;}
+</code></pre>
+<p><strong>After (RFC 7807 + code)</strong></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;https://example.com/errors/user-not-found&quot;,
+  &quot;title&quot;: &quot;User not found&quot;,
+  &quot;status&quot;: 404,
+  &quot;code&quot;: &quot;user.not_found&quot;,
+  &quot;detail&quot;: &quot;User 42 does not exist.&quot;
+}
+</code></pre>
+<h2>Hands-on: Five Steps for Error Responses</h2>
+<p><strong>Step 1 — Standard envelope</strong></p>
+<pre><code class="language-python"># 1_envelope.py
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+def problem(status, code, title, detail):
+    body = {&quot;type&quot;: &quot;about:blank&quot;, &quot;title&quot;: title,
+            &quot;status&quot;: status, &quot;code&quot;: code, &quot;detail&quot;: detail}
+    return jsonify(body), status, {&quot;Content-Type&quot;: &quot;application/problem+json&quot;}
+
+@app.get(&quot;/users/&lt;int:uid&gt;&quot;)
+def user(uid):
+    return problem(404, &quot;user.not_found&quot;, &quot;User not found&quot;, f&quot;User {uid} does not exist.&quot;)
+</code></pre>
+<p><strong>Step 2 — Validation errors</strong></p>
+<pre><code class="language-python"># 2_validation.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+@app.post(&quot;/users&quot;)
+def create():
+    body = request.get_json() or {}
+    errs = []
+    if &quot;name&quot; not in body: errs.append({&quot;field&quot;: &quot;name&quot;, &quot;code&quot;: &quot;required&quot;})
+    if &quot;email&quot; not in body: errs.append({&quot;field&quot;: &quot;email&quot;, &quot;code&quot;: &quot;required&quot;})
+    if errs:
+        return jsonify(title=&quot;Validation failed&quot;, status=422,
+                       code=&quot;validation_error&quot;, errors=errs), 422
+    return jsonify(ok=True), 201
+</code></pre>
+<p>Wrap <em>per-field</em> failures in <code>errors[]</code>.</p>
+<p><strong>Step 3 — Stable error codes</strong></p>
+<pre><code>user.not_found
+order.payment_required
+order.already_paid
+</code></pre>
+<p>The code is a <em>string</em> — <em>more stable than the status code</em>.</p>
+<p><strong>Step 4 — Avoid leaking secrets</strong></p>
+<pre><code class="language-python"># 4_safe.py
+# Bad : detail=&quot;No password match for user 'yeongseon'&quot;
+# Good: detail=&quot;Invalid credentials.&quot;
+</code></pre>
+<p>Do not even reveal whether an account exists.</p>
+<p><strong>Step 5 — trace id</strong></p>
+<pre><code class="language-python"># 5_trace.py
+import uuid
+from flask import Flask, jsonify, g, request
+app = Flask(__name__)
+
+@app.before_request
+def set_trace():
+    g.trace_id = request.headers.get(&quot;X-Trace-Id&quot;) or uuid.uuid4().hex
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify(title=&quot;Internal&quot;, status=500, trace_id=g.trace_id), 500
+</code></pre>
+<p>A trace id turns a <em>support ticket</em> into a five-minute lookup.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The body always has the <em>same shape</em>.</li>
+<li>Human (<code>title</code> / <code>detail</code>) and machine (<code>code</code>) are separated.</li>
+<li>The trace id rides along on every response.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Error body as a <em>string</em>.</strong> Clients cannot parse it.</li>
+<li><strong><code>title</code> only, no error code.</strong> Branching breaks after translation.</li>
+<li><strong>A single message for validation.</strong> No way to know which field.</li>
+<li><strong>Stack traces in the body.</strong> A direct path to a security incident.</li>
+<li><strong>No trace id.</strong> Every support request becomes a detective novel.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Stripe's error object (<code>type</code>, <code>code</code>, <code>param</code>, <code>message</code>) has become the de facto standard. Most large internal APIs use <em>RFC 7807</em> or a close variant — the point is <em>shape stability</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Implement the error envelope as a <em>shared module</em>.</li>
+<li>Add new errors as new <em>codes</em>; never change the shape.</li>
+<li>Return the trace id on 4xx responses too.</li>
+<li>Always review the user-visible message — for both security and UX.</li>
+<li>Document the most common errors <em>near the top</em> of the docs.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do all errors share the <em>same envelope</em>?</li>
+<li>[ ] Are error codes stable strings?</li>
+<li>[ ] Are validation failures broken down per field?</li>
+<li>[ ] Does <code>detail</code> avoid leaking secrets?</li>
+<li>[ ] Is a trace id present on every response?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define stable <em>code names</em> for the five most common 4xx responses in your API.</li>
+<li>Add a <em>minimum length</em> check to Step 2.</li>
+<li>Outline a migration from free-form errors to an RFC 7807 envelope.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Error responses are the API's <em>second face</em>. The next episode brings every promise into one place — OpenAPI and Swagger.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
+<li><strong>Designing Error Responses (current)</strong></li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc7807">RFC 7807 — Problem Details for HTTP APIs</a></li>
+<li><a href="https://stripe.com/docs/api/errors">Stripe API: Errors</a></li>
+<li><a href="https://docs.github.com/en/rest/overview/troubleshooting">GitHub REST API: Errors</a></li>
+<li><a href="https://github.com/microsoft/api-guidelines/blob/vNext/Guidelines.md">Microsoft REST API Guidelines: Errors</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, Errors, RFC7807, Validation, Backend</p>
+</body>
+</html>

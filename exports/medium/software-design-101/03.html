@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Modules and Boundaries</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Modules and Boundaries</h1>
+<blockquote>
+<p>Software Design 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What makes a module boundary good?</p>
+<blockquote>
+<p>A small surface area and the absence of leaks from internal changes to external callers.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A definition of a module</li>
+<li>Deep vs shallow modules</li>
+<li>Public API design principles</li>
+<li>Encapsulation and information hiding</li>
+<li>Signals from package structure</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Module boundaries are walls that contain change. Good walls keep changes on one side from leaking to the other.</p>
+<blockquote>
+<p>A good boundary permits ignorance.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[&quot;Public API&quot;] -. small .-&gt; M[&quot;Module&quot;]
+    M -. deep .-&gt; I[&quot;Internal&quot;]
+    I --&gt; R[&quot;Rich behavior&quot;]
+</code></pre>
+<p>Small surface, deep interior.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Module</strong>: A unit of code grouped by responsibility.</li>
+<li><strong>Public API</strong>: The promise a module makes to the outside.</li>
+<li><strong>Deep module</strong>: Small surface, rich interior.</li>
+<li><strong>Encapsulation</strong>: Hide internals; communicate only via the interface.</li>
+<li><strong>Information hiding (Parnas)</strong>: Hide volatile decisions inside the module.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python"># Shallow module: each function exposed
+def open_file(p): ...
+def read_chunk(f, n): ...
+def close_file(f): ...
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python"># Deep module: one surface, full responsibility
+def read_file(path) -&gt; bytes: ...
+</code></pre>
+<p>Callers do not need to know the internals.</p>
+<h2>Hands-on: Five Steps to Good Boundaries</h2>
+<p><strong>Step 1 — Shrink the surface</strong></p>
+<pre><code class="language-python"># 1_surface.py
+# Ten public symbols expose ten dependencies.
+# Export only what truly needs to be exported.
+__all__ = [&quot;read_file&quot;]
+</code></pre>
+<p>Use <code>__all__</code> / <code>index.ts</code> to control the surface.</p>
+<p><strong>Step 2 — Make the interior deep</strong></p>
+<pre><code class="language-python"># 2_deep.py
+def read_file(path):
+    f = _open(path)
+    try: return _read_all(f)
+    finally: _close(f)
+</code></pre>
+<p>Callers can finish in one line.</p>
+<p><strong>Step 3 — Isolate volatile decisions</strong></p>
+<pre><code class="language-python"># 3_hide.py
+class CacheBackend:  # outside knows only the interface
+    def get(self, k): ...
+    def set(self, k, v): ...
+</code></pre>
+<p>Redis vs in-memory is an internal decision.</p>
+<p><strong>Step 4 — Limit data exposure</strong></p>
+<pre><code class="language-python"># 4_dto.py
+# Do not expose internal models directly; use DTOs.
+def public_user(u): return {&quot;id&quot;: u.id, &quot;name&quot;: u.name}
+</code></pre>
+<p>Internal changes do not break the external contract.</p>
+<p><strong>Step 5 — One-way dependencies</strong></p>
+<pre><code class="language-python"># 5_one_way.py
+# Domain must not know about infra.
+# Infra imports the domain.
+</code></pre>
+<p>Direction reinforces the boundary.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The surface is small and intentional.</li>
+<li>Internal changes do not leak.</li>
+<li>Callers know little but accomplish much.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Everything public.</strong> No real boundary.</li>
+<li><strong>Returning internal data structures.</strong> External code couples to internals.</li>
+<li><strong>Too many tiny modules.</strong> Dependency graph explodes.</li>
+<li><strong>Only shallow modules.</strong> Abstraction adds no value.</li>
+<li><strong>Exposing volatile decisions.</strong> Zero design freedom left.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Great libraries (e.g., <code>requests</code>) have a tiny surface and a deep interior. Easy to use, free to evolve.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Modules should be deep.</li>
+<li>The surface conveys intent.</li>
+<li>Volatile decisions stay inside.</li>
+<li>Protect internal models with DTOs.</li>
+<li>Direction strengthens the boundary.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the module surface small?</li>
+<li>[ ] Is the interior rich?</li>
+<li>[ ] Are external contracts protected by DTOs?</li>
+<li>[ ] Are volatile decisions hidden inside?</li>
+<li>[ ] Are dependencies one-way?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Halve the public surface of one of your modules.</li>
+<li>Wrap an exposed data structure in a DTO.</li>
+<li>Identify one volatile decision inside a module.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good boundaries contain change. Next we look at another weapon a boundary carries: dependency direction.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
+<li><strong>Modules and Boundaries (current)</strong></li>
+<li>Dependency Direction (upcoming)</li>
+<li>Interfaces and Abstraction (upcoming)</li>
+<li>Layered Architecture (upcoming)</li>
+<li>Data Flow Design (upcoming)</li>
+<li>Reducing Change Impact (upcoming)</li>
+<li>Design Principles (upcoming)</li>
+<li>Practicing Design with a Small Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.win.tue.nl/~wstomv/edu/2ip30/references/criteria_for_modularization.pdf">Parnas — On the Criteria To Be Used in Decomposing Systems into Modules</a></li>
+<li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design — Deep Modules</a></li>
+<li><a href="https://www.oracle.com/technical-resources/articles/java/bloch-effective-08-qa.html">Effective Java — API Design</a></li>
+<li><a href="https://martinfowler.com/bliki/BoundedContext.html">Domain-Driven Design — Bounded Context</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign</p>
+</body>
+</html>

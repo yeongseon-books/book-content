@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Model Evaluation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Model Evaluation</h1>
+<blockquote>
+<p>Machine Learning 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When someone asks which model is better and you do not push back with "by which metric," you are already in trouble.</p>
+<blockquote>
+<p><em>Model evaluation is where you prove, in code, that picking the metric comes before picking the model.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Classification metrics: accuracy, precision, recall, F1, ROC-AUC, PR-AUC</li>
+<li>Regression metrics: MAE, MSE, RMSE, R-squared</li>
+<li>The anatomy of a confusion matrix</li>
+<li>When to choose ROC over PR (and vice versa)</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Pred[&quot;predictions&quot;] --&gt; CM[&quot;confusion matrix&quot;]
+    CM --&gt; P[&quot;precision&quot;]
+    CM --&gt; R[&quot;recall&quot;]
+    CM --&gt; F[&quot;F1&quot;]
+    Prob[&quot;probabilities&quot;] --&gt; ROC[&quot;ROC-AUC&quot;]
+    Prob --&gt; PR[&quot;PR-AUC&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>TP / FP / FN / TN</strong>: the four quadrants of the confusion matrix.</li>
+<li><strong>Accuracy</strong>: fraction of correct predictions.</li>
+<li><strong>Precision</strong>: fraction of predicted positives that are right.</li>
+<li><strong>Recall</strong>: fraction of actual positives caught.</li>
+<li><strong>AUC</strong>: average performance across thresholds.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A single accuracy number in the report.</p>
+<p><strong>After</strong>: Metric table, confusion matrix, and PR or ROC curves together.</p>
+<h2>Hands-on: 5 Steps of Evaluation</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+</code></pre>
+<p><strong>Step 2 — Model</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+m = LogisticRegression(max_iter=2000).fit(Xtr, ytr)
+prob = m.predict_proba(Xte)[:, 1]
+pred = (prob &gt;= 0.5).astype(int)
+</code></pre>
+<p><strong>Step 3 — Confusion matrix</strong></p>
+<pre><code class="language-python">from sklearn.metrics import confusion_matrix
+print(confusion_matrix(yte, pred))
+</code></pre>
+<p><strong>Step 4 — Classification metrics</strong></p>
+<pre><code class="language-python">from sklearn.metrics import classification_report, roc_auc_score, average_precision_score
+print(classification_report(yte, pred))
+print(&quot;ROC-AUC:&quot;, roc_auc_score(yte, prob))
+print(&quot;PR-AUC :&quot;, average_precision_score(yte, prob))
+</code></pre>
+<p><strong>Step 5 — Regression metrics</strong></p>
+<pre><code class="language-python">from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np
+yt, yp = np.array([3.0, 5.0, 2.5]), np.array([2.8, 5.4, 2.1])
+print(&quot;MAE:&quot;, mean_absolute_error(yt, yp))
+print(&quot;RMSE:&quot;, mean_squared_error(yt, yp) ** 0.5)
+print(&quot;R^2:&quot;, r2_score(yt, yp))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>AUC is independent of the threshold.</li>
+<li>PR-AUC is more informative on imbalanced data.</li>
+<li>RMSE and MAE differ in their sensitivity to outliers.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Reporting accuracy on imbalanced data.</li>
+<li>Trusting ROC-AUC on heavy class imbalance.</li>
+<li>Ignoring threshold tuning while optimizing F1.</li>
+<li>Reporting only one of MAE or RMSE for regression.</li>
+<li>Repeated evaluation on the same test set leaks information.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A/B testing, model gates, and MLOps monitoring all rest on the metric definition. The metric is the language of organizational agreement.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Order: business cost, then metric, then threshold.</li>
+<li>The PR curve is the truth on imbalance.</li>
+<li>Maximize recall when missing positives is catastrophic.</li>
+<li>Calibration is part of evaluation, not optional.</li>
+<li>One metric is rarely enough.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I always print a confusion matrix.</li>
+<li>[ ] I look at ROC and PR together.</li>
+<li>[ ] I report MAE and RMSE for regression.</li>
+<li>[ ] I touch the test set exactly once at the end.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare accuracy and F1 on imbalanced data.</li>
+<li>Plot ROC and PR curves side by side.</li>
+<li>Construct a dataset where MAE and RMSE strongly disagree.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Evaluation is the language of model selection. Next, we close the series with the end-to-end ML project workflow.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/07-clustering.md">Clustering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/08-overfitting-and-regularization.md">Overfitting and Regularization</a></li>
+<li><strong>Model Evaluation (current)</strong></li>
+<li>The ML Project Workflow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn — Model evaluation</a></li>
+<li><a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html">scikit-learn — ROC and PR curves</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course/classification/precision-and-recall">Google — Classification metrics</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Confusion_matrix">Wikipedia — Confusion matrix</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, Evaluation, Metrics, ROC, scikit-learn</p>
+</body>
+</html>

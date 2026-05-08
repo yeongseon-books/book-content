@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Small Design Practice</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Small Design Practice</h1>
+<blockquote>
+<p>Software Design 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you actually use all the tools from this series in one project?</p>
+<blockquote>
+<p>By building a small URL shortener and unfolding separation of concerns, dependency direction, layers, and data flow line by line.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to start design on a small project</li>
+<li>The flow of writing the domain first</li>
+<li>Blocking infrastructure with adapters</li>
+<li>Decisions about likely change points</li>
+<li>Every tool from the series in one place</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The same principles work in small code. The mini-project here is small but it is the stage for applying every tool.</p>
+<blockquote>
+<p>Good habits get built in small systems.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    HTTP[&quot;HTTP layer&quot;] --&gt; APP[&quot;shorten_use_case&quot;]
+    APP --&gt; DOM[&quot;ShortLink domain&quot;]
+    APP --&gt; REPO[&quot;LinkRepo (port)&quot;]
+    REPO --&gt; SQL[&quot;SqlLinkRepo (adapter)&quot;]
+</code></pre>
+<p>Domain → port → adapter → infrastructure.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Short link</strong>: A short key representing a long URL.</li>
+<li><strong>Use case</strong>: A single business flow.</li>
+<li><strong>Port</strong>: An interface defined by the domain.</li>
+<li><strong>Adapter</strong>: An infrastructure piece that implements a port.</li>
+<li><strong>Composition root</strong>: The single place where parts get wired together.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">@app.route(&quot;/&quot;, methods=[&quot;POST&quot;])
+def shorten():
+    long = request.json[&quot;url&quot;]
+    key = hashlib.md5(long.encode()).hexdigest()[:6]
+    db.execute(&quot;INSERT INTO links VALUES (?, ?)&quot;, (key, long))
+    return {&quot;short&quot;: &quot;/r/&quot; + key}
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">@app.route(&quot;/&quot;, methods=[&quot;POST&quot;])
+def shorten_view():
+    return shorten_use_case(request.json, repo, key_gen)
+</code></pre>
+<p>The view is thin and the domain is protected.</p>
+<h2>Hands-on: Build the URL Shortener in Five Steps</h2>
+<p><strong>Step 1 — Domain first</strong></p>
+<pre><code class="language-python"># 1_domain.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class ShortLink:
+    key: str
+    target: str
+
+    @staticmethod
+    def create(key, target):
+        if not target.startswith(&quot;http&quot;):
+            raise ValueError(&quot;invalid url&quot;)
+        return ShortLink(key=key, target=target)
+</code></pre>
+<p>Rules in the domain. Zero external dependencies.</p>
+<p><strong>Step 2 — Define ports</strong></p>
+<pre><code class="language-python"># 2_ports.py
+from typing import Protocol
+
+class LinkRepo(Protocol):
+    def save(self, link: ShortLink) -&gt; None: ...
+    def get(self, key: str) -&gt; ShortLink | None: ...
+
+class KeyGen(Protocol):
+    def __call__(self, target: str) -&gt; str: ...
+</code></pre>
+<p>The domain declares the shape it needs.</p>
+<p><strong>Step 3 — Use case</strong></p>
+<pre><code class="language-python"># 3_usecase.py
+def shorten_use_case(payload, repo: LinkRepo, key_gen: KeyGen):
+    target = payload[&quot;url&quot;]
+    key = key_gen(target)
+    link = ShortLink.create(key, target)
+    repo.save(link)
+    return {&quot;short&quot;: &quot;/r/&quot; + link.key}
+</code></pre>
+<p>Flow lives in the application layer.</p>
+<p><strong>Step 4 — Adapters</strong></p>
+<pre><code class="language-python"># 4_adapter.py
+class InMemoryLinkRepo:
+    def __init__(self): self._d = {}
+    def save(self, link): self._d[link.key] = link
+    def get(self, key): return self._d.get(key)
+
+def md5_key(target: str) -&gt; str:
+    import hashlib
+    return hashlib.md5(target.encode()).hexdigest()[:6]
+</code></pre>
+<p>The same port could host SQL or Redis adapters.</p>
+<p><strong>Step 5 — Compose and present</strong></p>
+<pre><code class="language-python"># 5_compose.py
+from flask import Flask, request
+app = Flask(__name__)
+repo = InMemoryLinkRepo()
+key_gen = md5_key
+
+@app.route(&quot;/&quot;, methods=[&quot;POST&quot;])
+def shorten_view():
+    return shorten_use_case(request.json, repo, key_gen)
+
+@app.route(&quot;/r/&lt;key&gt;&quot;)
+def redirect_view(key):
+    link = repo.get(key)
+    return (&quot;not found&quot;, 404) if not link else (&quot;&quot;, 302, {&quot;Location&quot;: link.target})
+</code></pre>
+<p>Composition at the edge, view stays thin.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The domain has no external dependencies.</li>
+<li>The ports live on the domain side.</li>
+<li>Swapping adapters does not shake the domain.</li>
+<li>Data flows in a single direction.</li>
+<li>The presentation layer is thin.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using Flask request directly inside the domain.</strong> Presentation invades the domain.</li>
+<li><strong>Putting concrete decisions like md5 in the domain.</strong> Policy and mechanism mix.</li>
+<li><strong>Stuffing every responsibility into the view.</strong> Adding a new channel becomes hard.</li>
+<li><strong>Writing only integration tests.</strong> No domain-level unit tests.</li>
+<li><strong>Introducing abstraction too early.</strong> Four adapters in the very first version.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The same pattern scales straight into bigger systems — payments, auth, notifications — keeping the domain at the center and blocking the outside with adapters.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Even small projects start from the domain.</li>
+<li>Even with one adapter at first, they keep an interface in front.</li>
+<li>They keep the presentation layer thin so channels can be swapped.</li>
+<li>They write domain unit tests first.</li>
+<li>They keep composition in one place.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the domain free of infrastructure?</li>
+<li>[ ] Are ports defined on the domain side?</li>
+<li>[ ] Is the presentation layer thin?</li>
+<li>[ ] Does data flow in one direction?</li>
+<li>[ ] Is composition concentrated in one place?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a SqlLinkRepo adapter to the code above. The domain must not change a single line.</li>
+<li>Add a CLI presentation layer that calls the same use case.</li>
+<li>Add an expiration rule to ShortLink and write a domain unit test for it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This is the end of the series. Put the domain in the center, surround it with ports, block the outside with adapters, and let data flow in one direction — that one sentence is the whole game. On the next system you build, take that sentence as the starting point.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Data Flow Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/08-reducing-change-impact.md">Reducing Change Impact</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/09-design-principles.md">Design Principles</a></li>
+<li><strong>Small Design Practice (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.cosmicpython.com/">Cosmic Python — Architecture Patterns with Python</a></li>
+<li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
+<li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture (Uncle Bob)</a></li>
+<li><a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Domain-Driven Design (Eric Evans)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture</p>
+</body>
+</html>

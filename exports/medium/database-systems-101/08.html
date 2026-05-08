@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Query Optimization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Query Optimization</h1>
+<blockquote>
+<p>Database Systems 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is the same SQL 1 ms one day and 10 seconds the next, and what should you actually look at?</p>
+<blockquote>
+<p>The optimizer is code that estimates costs from statistics and picks the cheapest-looking execution plan. When statistics are stale or the data distribution shifts, the optimizer takes the wrong road. The skill of reading EXPLAIN is the skill of auditing that decision after the fact.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The big picture of how the optimizer chooses an execution plan</li>
+<li>Why statistics are decisive</li>
+<li>How to read EXPLAIN and EXPLAIN ANALYZE</li>
+<li>Four common tuning signals</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When the same SQL suddenly slows down, the cause is almost always "the optimizer picked a different plan." Statistics, data volume, added or dropped indexes, and parameter sniffing all trigger this. Without EXPLAIN, you are debugging by guessing.</p>
+<blockquote>
+<p>Ninety percent of tuning is understanding "what does the optimizer know, and what doesn't it?"</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;SQL&quot;] --&gt; B[&quot;Parser&quot;]
+    B --&gt; C[&quot;Logical Plan&quot;]
+    C --&gt; D[&quot;Optimizer + Statistics&quot;]
+    D --&gt; E[&quot;Physical Plan&quot;]
+    E --&gt; F[&quot;Executor&quot;]
+</code></pre>
+<p>A single logical plan can produce many physical plans (index scan, sequential scan, different join algorithms). The optimizer picks one based on a statistics-driven cost.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Optimizer</strong>: the module that picks the cheapest plan among candidates.</li>
+<li><strong>Statistics</strong>: metadata about column value distribution, row counts, index selectivity.</li>
+<li><strong>Cardinality estimate</strong>: the optimizer's guess at how many rows will flow out of a step.</li>
+<li><strong>Plan node</strong>: Seq Scan, Index Scan, Hash Join, Nested Loop, Sort, Aggregate, etc.</li>
+<li><strong>EXPLAIN ANALYZE</strong>: a command that shows actual execution numbers next to the plan.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — stale stats lead to a full scan</strong></p>
+<pre><code class="language-sql">EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 7;
+-- Seq Scan on orders ... (cost=... rows=50000) (actual rows=50)
+</code></pre>
+<p><strong>After — ANALYZE then index scan</strong></p>
+<pre><code class="language-sql">ANALYZE orders;
+EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 7;
+-- Index Scan using idx_user on orders ... (cost=... rows=60) (actual rows=50)
+</code></pre>
+<p>Once the estimated and actual rows are close, the optimizer switches to the index plan.</p>
+<h2>Hands-on: Read Plans With EXPLAIN</h2>
+<p><strong>Step 1 — Set up data and indexes</strong></p>
+<pre><code class="language-python"># setup.py
+import sqlite3, random
+
+with sqlite3.connect(&quot;opt.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        DROP TABLE IF EXISTS orders;
+        CREATE TABLE orders (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            status TEXT NOT NULL,
+            total INTEGER NOT NULL
+        );
+    &quot;&quot;&quot;)
+    rows = [
+        (i, random.randint(1, 1000), random.choice([&quot;paid&quot;,&quot;pending&quot;,&quot;cancelled&quot;]), random.randint(1,1000))
+        for i in range(1, 100001)
+    ]
+    db.executemany(&quot;INSERT INTO orders VALUES (?,?,?,?)&quot;, rows)
+    db.execute(&quot;CREATE INDEX idx_user ON orders(user_id)&quot;)
+    db.execute(&quot;ANALYZE&quot;)
+</code></pre>
+<p><strong>Step 2 — A simple index scan</strong></p>
+<pre><code class="language-python">import sqlite3
+with sqlite3.connect(&quot;opt.db&quot;) as db:
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id=7&quot;).fetchall()
+    for row in plan:
+        print(row)
+</code></pre>
+<p>If the plan shows <code>SEARCH orders USING INDEX idx_user</code>, the index is in use.</p>
+<p><strong>Step 3 — Compare join algorithms</strong></p>
+<pre><code class="language-sql">EXPLAIN ANALYZE
+SELECT u.email, count(*)
+FROM users u
+JOIN orders o ON o.user_id = u.id
+GROUP BY u.email;
+</code></pre>
+<p>Depending on data volume and indexes, the optimizer picks Nested Loop, Hash Join, or Merge Join. You should be able to explain the choice from the statistics.</p>
+<p><strong>Step 4 — See the effect of refreshing statistics</strong></p>
+<pre><code class="language-sql">-- after a bulk INSERT
+ANALYZE orders;
+EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 7;
+</code></pre>
+<p>ANALYZE raises the resolution of the world the optimizer can see. Auto-statistics run on a schedule, but a manual ANALYZE after large data changes is helpful.</p>
+<p><strong>Step 5 — Function calls that kill an index</strong></p>
+<pre><code class="language-sql">EXPLAIN ANALYZE SELECT * FROM users WHERE lower(email) = 'a@x.com';
+-- Seq Scan (the index is not used)
+
+CREATE INDEX idx_users_email_lower ON users (lower(email));
+EXPLAIN ANALYZE SELECT * FROM users WHERE lower(email) = 'a@x.com';
+-- Index Scan
+</code></pre>
+<p>Wrapping a column in a function disables the regular index. You need a functional index or a precomputed column.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The optimizer's primary input is <strong>statistics</strong>. Stale stats mean bad plans.</li>
+<li>A large gap between estimated and actual rows is almost always a problem signal.</li>
+<li>The same query can switch plans when the data distribution changes.</li>
+<li>Function calls and casts in WHERE are the most common reason an index gets skipped.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Saying "it is slow" without EXPLAIN.</strong> Guess-based tuning rarely works.</li>
+<li><strong>Adding indexes without ANALYZE.</strong> The optimizer does not know about the new index until then.</li>
+<li><strong>Wrapping a WHERE column in a function.</strong> Patterns like <code>WHERE lower(email)=?</code> skip the index.</li>
+<li><strong><code>SELECT *</code> everywhere.</strong> You lose covering-index opportunities and inflate network cost.</li>
+<li><strong>Confusing OR conditions with IN.</strong> The optimizer treats them differently. Verify with EXPLAIN.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Query tuning follows a standard loop. (1) Identify the slowest queries (slow query log, APM, <code>pg_stat_statements</code>). (2) Run EXPLAIN ANALYZE on a representative one. (3) Use the gap between estimates and actuals to adjust statistics, indexes, or query shape. (4) Measure before and after.</p>
+<p>For operational systems, "regression detection" matters as much as tuning. A query that was 1 ms suddenly running 100 ms is usually a stats or distribution change. Auto-statistics, index monitoring, and slow-query alerts run together.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They validate new queries with EXPLAIN ANALYZE before merging.</li>
+<li>A 10x gap between estimate and actual immediately raises stats or distribution suspicion.</li>
+<li>An index PR includes a comment naming the query it supports.</li>
+<li>Optimizer hints are a last resort. Model, indexes, and statistics come first.</li>
+<li>"Fast today" does not mean "fast tomorrow." Monitoring and alerting protect you.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Have you run EXPLAIN ANALYZE on the critical queries at least once?</li>
+<li>[ ] Are statistics refreshed regularly?</li>
+<li>[ ] Are there no function calls or casts on WHERE columns?</li>
+<li>[ ] Is the slow query log monitored?</li>
+<li>[ ] When you add an index, do you record which query it supports?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>EXPLAIN ANALYZE shows <code>rows=10</code> estimated but <code>actual rows=10000</code>. What should you suspect first?</li>
+<li>Name one optimization the optimizer can apply when you list specific columns instead of <code>SELECT *</code>.</li>
+<li>In one sentence, explain why <code>WHERE id IN (1,2,3)</code> and <code>WHERE id=1 OR id=2 OR id=3</code> can behave differently.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The optimizer picks among possible plans using a statistics-based cost model, and EXPLAIN ANALYZE is the most reliable way to audit that choice. The next post moves beyond a single database — replication and backup. We pull together the two pillars of a system that is both fast and safe.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Indexes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/05-transactions-and-acid.md">Transactions and ACID</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/06-isolation-levels.md">Isolation Levels</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/07-normalization-and-modeling.md">Normalization and Modeling</a></li>
+<li><strong>Query Optimization (current)</strong></li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/using-explain.html">PostgreSQL — Using EXPLAIN</a></li>
+<li><a href="https://www.postgresql.org/docs/current/planner-stats.html">PostgreSQL — Statistics Used by the Planner</a></li>
+<li><a href="https://use-the-index-luke.com/">Use The Index, Luke!</a></li>
+<li><a href="https://www.sqlite.org/queryplanner-ng.html">SQLite — The Next-Generation Query Planner</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, Optimizer, Statistics, EXPLAIN, Tuning</p>
+</body>
+</html>

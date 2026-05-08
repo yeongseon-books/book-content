@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Versioning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Versioning</h1>
+<blockquote>
+<p>MLOps 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Code and models live in git, but where does the data live?</p>
+<blockquote>
+<p><em>Data versioning keeps large files in remote storage and commits only hash pointers to git.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why data needs versioning and how it works</li>
+<li>DVC versus git-LFS</li>
+<li>Synchronizing data, code, and model versions</li>
+<li>Using hashes to guarantee reproduction</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The same code with different data produces a different model. Without data versioning, reproduction is impossible.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Git[&quot;git repo&quot;] --&gt; Pointer[&quot;data.dvc pointer&quot;]
+    Pointer --&gt; Remote[&quot;remote storage&quot;]
+    Remote --&gt; File[&quot;actual data file&quot;]
+    Pointer --&gt; Pipeline[&quot;pipeline reproducer&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DVC</strong>: Data Version Control. Tracks data and models on top of git.</li>
+<li><strong>Pointer file</strong>: a <code>.dvc</code> file holding a hash and metadata.</li>
+<li><strong>Remote</strong>: S3, GCS, SSH, or local storage backing DVC.</li>
+<li><strong>Stage</strong>: a pipeline step with inputs, command, and outputs.</li>
+<li><strong>Repro</strong>: re-runs only the steps whose inputs changed.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>data_v3_final.csv</code> exists only on one teammate's laptop.</p>
+<p><strong>After</strong>: <code>git pull &amp;&amp; dvc pull</code> reproduces the exact dataset everywhere.</p>
+<h2>Hands-on: 5 Steps Through DVC</h2>
+<p><strong>Step 1 — Create sample data</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.DataFrame({&quot;x&quot;: range(100), &quot;y&quot;: [i % 2 for i in range(100)]})
+df.to_csv(&quot;data.csv&quot;, index=False)
+</code></pre>
+<p><strong>Step 2 — Initialize DVC (assumed)</strong></p>
+<pre><code class="language-bash"># pip install dvc
+# git init &amp;&amp; dvc init
+# dvc add data.csv
+# git add data.csv.dvc .gitignore
+# git commit -m &quot;track data v1&quot;
+</code></pre>
+<p><strong>Step 3 — Mimic the pointer</strong></p>
+<pre><code class="language-python">import hashlib, json
+h = hashlib.md5(open(&quot;data.csv&quot;, &quot;rb&quot;).read()).hexdigest()
+pointer = {&quot;path&quot;: &quot;data.csv&quot;, &quot;md5&quot;: h}
+with open(&quot;data.csv.ptr&quot;, &quot;w&quot;) as f:
+    json.dump(pointer, f, indent=2)
+print(pointer)
+</code></pre>
+<p><strong>Step 4 — A pipeline stage</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+import pickle
+df = pd.read_csv(&quot;data.csv&quot;)
+m = LogisticRegression().fit(df[[&quot;x&quot;]], df[&quot;y&quot;])
+with open(&quot;model.pkl&quot;, &quot;wb&quot;) as f:
+    pickle.dump(m, f)
+</code></pre>
+<p><strong>Step 5 — Change input, observe re-run signal</strong></p>
+<pre><code class="language-python">df.loc[0, &quot;y&quot;] = 1 - df.loc[0, &quot;y&quot;]
+df.to_csv(&quot;data.csv&quot;, index=False)
+new_h = hashlib.md5(open(&quot;data.csv&quot;, &quot;rb&quot;).read()).hexdigest()
+print(&quot;changed:&quot;, new_h != h)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A hash change is the retraining trigger.</li>
+<li>Only the pointer file lives in git.</li>
+<li>A pipeline stage is command, inputs, outputs.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Committing large data files directly to git.</li>
+<li>Forgetting to configure a remote, breaking reproduction for collaborators.</li>
+<li>Updating data without committing the change.</li>
+<li>Forgetting to declare DVC stage inputs and outputs.</li>
+<li>Tracking data but not models.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Vision datasets and large text corpora outgrow git-LFS quickly; DVC with an S3 backend is a typical pairing.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Git is for code; DVC is for data and models.</li>
+<li>A configured remote is the default.</li>
+<li>Commit code and data versions together.</li>
+<li>Use pipelines so only changed hashes re-run.</li>
+<li>Small samples can stay in git for tests.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Data files are tracked by DVC or LFS.</li>
+<li>[ ] A remote is configured.</li>
+<li>[ ] Models are tracked too.</li>
+<li>[ ] The reproduction command is documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Track a small CSV with DVC.</li>
+<li>Modify the data and observe the hash change.</li>
+<li>Mimic an S3 remote with a local directory.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Data versioning is the precondition for reproduction. Next, the training pipeline automates the loop.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What Is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
+<li><strong>Data Versioning (current)</strong></li>
+<li>Model Training Pipeline (upcoming)</li>
+<li>Model Deployment (upcoming)</li>
+<li>Model Monitoring (upcoming)</li>
+<li>Data Drift and Model Drift (upcoming)</li>
+<li>Retraining (upcoming)</li>
+<li>Feature Store (upcoming)</li>
+<li>Building a Production ML System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://dvc.org/doc/start">DVC — Get Started</a></li>
+<li><a href="https://git-lfs.com/">git-LFS</a></li>
+<li><a href="https://www.pachyderm.com/">Pachyderm</a></li>
+<li><a href="https://cloud.google.com/architecture/ml-on-gcp-best-practices">Google — Data versioning</a></li>
+</ul>
+<p class="tags-line">Tags: MLOps, DVC, DataVersioning, Reproducibility, DataScience</p>
+</body>
+</html>

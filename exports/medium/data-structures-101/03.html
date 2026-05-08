@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linked Lists</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Linked Lists</h1>
+<blockquote>
+<p>Data Structures 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Inserting a value in the middle of an array shifts every element by one slot. Is there a structure that avoids that?</p>
+<blockquote>
+<p>A linked list stores each value in a node that holds a pointer to the next node. Even when scattered across memory, you can visit values in order by following the pointers. Inserting or removing a node only updates the two pointers around it — that is O(1). On the other hand, indexing must follow pointers from the head and is O(n). This article walks through singly and doubly linked lists and the trade-offs between them.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The structural difference between singly and doubly linked lists</li>
+<li>The time and space comparisons between linked lists and arrays</li>
+<li>How to manipulate pointers by implementing linked lists yourself</li>
+<li>When linked lists fit a real-world workload and when they do not</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Linked lists are at the heart of system software — operating-system kernels, LRU caches, free-memory lists. They also form the foundation of more complex structures like trees and graphs. Pointer manipulation is awkward at first, but once you understand it, a far wider library of structures opens up.</p>
+<blockquote>
+<p>An array groups data by position. A linked list groups data by relationship.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A singly linked list stores only a "next" pointer per node — small memory footprint, but reverse traversal is hard. A doubly linked list keeps both directions, so both ends are fast, at the cost of an extra pointer per node.</p>
+</blockquote>
+<pre><code class="language-text">Singly linked list
+[10 | →] → [20 | →] → [30 | →] → [40 | None]
+  ↑
+ head
+
+Doubly linked list
+None ← [10 | ↔] ↔ [20 | ↔] ↔ [30 | ↔] ↔ [40] → None
+         ↑                              ↑
+        head                          tail
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Node</strong><br>
+- Meaning: A unit holding a value and pointers</p>
+<p><strong>Pointer</strong><br>
+- Meaning: The memory address of another node</p>
+<p><strong>Head</strong><br>
+- Meaning: A reference to the first node</p>
+<p><strong>Tail</strong><br>
+- Meaning: A reference to the last node (often kept in doubly linked)</p>
+<p><strong>Sentinel</strong><br>
+- Meaning: A dummy node that simplifies edge handling</p>
+<h2>Before / After</h2>
+<p><strong>Before — prepend on an array:</strong></p>
+<pre><code class="language-python">data = list(range(1_000_000))
+data.insert(0, -1)         # all 1,000,000 elements shift one slot: O(n)
+</code></pre>
+<p><strong>After — prepend on a linked list:</strong></p>
+<pre><code class="language-python">class Node:
+    __slots__ = (&quot;value&quot;, &quot;next&quot;)
+    def __init__(self, value, next=None):
+        self.value, self.next = value, next
+
+head = None
+for v in range(1_000_000):
+    head = Node(v, head)   # O(1) insert each time
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Implement a Singly Linked List</strong></p>
+<pre><code class="language-python">class Node:
+    __slots__ = (&quot;value&quot;, &quot;next&quot;)
+    def __init__(self, value, next=None):
+        self.value = value
+        self.next = next
+
+class SinglyLinkedList:
+    def __init__(self):
+        self.head = None
+        self._size = 0
+
+    def push_front(self, value):
+        self.head = Node(value, self.head)
+        self._size += 1
+
+    def pop_front(self):
+        if self.head is None:
+            raise IndexError(&quot;empty list&quot;)
+        value = self.head.value
+        self.head = self.head.next
+        self._size -= 1
+        return value
+
+    def __len__(self):
+        return self._size
+
+    def __iter__(self):
+        cur = self.head
+        while cur is not None:
+            yield cur.value
+            cur = cur.next
+
+lst = SinglyLinkedList()
+for v in [3, 2, 1]:
+    lst.push_front(v)
+print(list(lst))   # [1, 2, 3]
+</code></pre>
+<p><code>push_front</code> and <code>pop_front</code> only touch the head pointer, so both are O(1).</p>
+<p><strong>Step 2: Remove a Node in the Middle</strong></p>
+<pre><code class="language-python">def remove_value(self, target):
+    &quot;&quot;&quot;Remove the first node whose value equals target.&quot;&quot;&quot;
+    prev, cur = None, self.head
+    while cur is not None:
+        if cur.value == target:
+            if prev is None:
+                self.head = cur.next
+            else:
+                prev.next = cur.next
+            self._size -= 1
+            return True
+        prev, cur = cur, cur.next
+    return False
+
+SinglyLinkedList.remove_value = remove_value
+
+lst = SinglyLinkedList()
+for v in [3, 2, 1]:
+    lst.push_front(v)
+lst.remove_value(2)
+print(list(lst))   # [1, 3]
+</code></pre>
+<p>The deletion itself touches only two pointers (O(1)), but the search for the target node is O(n).</p>
+<p><strong>Step 3: Doubly Linked List with Sentinels</strong></p>
+<pre><code class="language-python">class DNode:
+    __slots__ = (&quot;value&quot;, &quot;prev&quot;, &quot;next&quot;)
+    def __init__(self, value):
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class DoublyLinkedList:
+    def __init__(self):
+        self._head = DNode(None)        # sentinel head
+        self._tail = DNode(None)        # sentinel tail
+        self._head.next = self._tail
+        self._tail.prev = self._head
+        self._size = 0
+
+    def push_back(self, value):
+        node = DNode(value)
+        last = self._tail.prev
+        last.next = node
+        node.prev = last
+        node.next = self._tail
+        self._tail.prev = node
+        self._size += 1
+
+    def remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+        self._size -= 1
+
+    def __iter__(self):
+        cur = self._head.next
+        while cur is not self._tail:
+            yield cur.value
+            cur = cur.next
+</code></pre>
+<p>Sentinels remove the special cases for an empty list, the front, and the back. The code shrinks and bug counts drop.</p>
+<p><strong>Step 4: Array vs Linked-List Performance</strong></p>
+<pre><code class="language-python">import time
+from collections import deque
+
+N = 100_000
+
+# 1. Prepend
+data = []
+start = time.perf_counter()
+for i in range(N):
+    data.insert(0, i)
+print(f&quot;list.insert(0): {(time.perf_counter() - start) * 1000:.0f} ms&quot;)
+
+dq = deque()
+start = time.perf_counter()
+for i in range(N):
+    dq.appendleft(i)
+print(f&quot;deque.appendleft: {(time.perf_counter() - start) * 1000:.0f} ms&quot;)
+</code></pre>
+<p>A deque is a (block-based) doubly linked list, so both-end inserts are O(1). When prepending dominates, reach for a deque.</p>
+<p><strong>Step 5: The Limit of Index Access</strong></p>
+<pre><code class="language-python">import time
+from collections import deque
+
+N = 100_000
+
+lst = list(range(N))
+dq = deque(range(N))
+
+start = time.perf_counter()
+for _ in range(1000):
+    _ = lst[N // 2]
+print(f&quot;list[mid]: {(time.perf_counter() - start) * 1e6:.0f} us&quot;)
+
+start = time.perf_counter()
+for _ in range(1000):
+    _ = dq[N // 2]
+print(f&quot;deque[mid]: {(time.perf_counter() - start) * 1e6:.0f} us&quot;)
+</code></pre>
+<p>A list indexes in O(1); a deque is closer to O(n). Choose based on whether end operations or random access dominate your workload.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Nodes scatter across memory, so cache friendliness is worse than for arrays</li>
+<li>Each node carries one or two extra pointers in memory</li>
+<li>End operations are O(1), but random access is O(n)</li>
+<li>Sentinels reduce branches and prevent bugs</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Imitating an array with index access</strong><br>
+- Problem: O(n) traversal each time<br>
+- Fix: Use an array if random access dominates</p>
+<p><strong>Losing the head pointer</strong><br>
+- Problem: The whole list is gone<br>
+- Fix: Manage head updates explicitly</p>
+<p><strong>Forgetting to update prev on delete</strong><br>
+- Problem: Doubly linked list breaks<br>
+- Fix: Always update both directions together</p>
+<p><strong>Missing the empty-list branch</strong><br>
+- Problem: NoneType errors<br>
+- Fix: Use sentinels to remove the empty case</p>
+<p><strong>Assuming memory leaks</strong><br>
+- Problem: Python's GC handles this<br>
+- Fix: In C/C++ you must <code>free</code> explicitly</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>The Linux kernel ties together almost every structure with <code>list_head</code>, a doubly linked list</li>
+<li>LRU caches combine a hash table and a doubly linked list to update in O(1)</li>
+<li>Memory allocators manage free blocks as a linked list</li>
+<li>Music players' next/previous track navigation maps neatly onto a doubly linked list</li>
+<li>Text editor line structures often use a linked-list variant called a rope</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer rarely uses the textbook singly linked list. For most real workloads, arrays and deques outperform it because of cache friendliness. Linked lists shine when (1) you only operate on the ends or (2) another structure already holds direct node references so deletion can happen in O(1).</p>
+<p>A senior engineer also draws pointer manipulation on paper before coding it. Tracking pointers in your head almost always leads to mistakes. Sketching nodes and arrows step by step is the most effective way to prevent bugs.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the structural difference between singly and doubly linked lists</li>
+<li>[ ] I understand why end inserts are O(1) and random access is O(n)</li>
+<li>[ ] I know the value of a sentinel node</li>
+<li>[ ] I can identify workloads where a linked list beats an array</li>
+<li>[ ] I know what kind of structure Python's deque is closer to</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Add a <code>reverse()</code> method to the <code>SinglyLinkedList</code> above. Do not allocate a new list; only flip pointers.</p>
+</li>
+<li>
+<p>Implement an algorithm that detects whether a singly linked list contains a cycle. Hint: use a fast and slow pointer (Floyd's Tortoise and Hare).</p>
+</li>
+<li>
+<p>Write a function that merges two sorted singly linked lists into one sorted list. Do not create new nodes — reuse the existing ones.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A linked list joins nodes through pointers, giving O(1) insertion and deletion at the ends or at known positions. In exchange, random access is O(n) and cache friendliness lags arrays. The choice between singly and doubly linked is a trade-off between the cost of an extra pointer and the ability to traverse both ways.</p>
+<p>Next we look at two ADTs built on top of arrays or linked lists — stacks and queues. We see how the simple rules LIFO and FIFO become powerful abstractions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><strong>Linked Lists (current)</strong></li>
+<li>Stacks and Queues (upcoming)</li>
+<li>Hash Tables (upcoming)</li>
+<li>Trees (upcoming)</li>
+<li>Binary Search Trees (upcoming)</li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/3_Linked_Lists.html">Open Data Structures — Chapter 3 Linked Lists</a></li>
+<li><a href="https://github.com/torvalds/linux/blob/master/include/linux/list.h">Linux Kernel <code>list.h</code></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Linked_list">Wikipedia — Linked List</a></li>
+<li><a href="https://docs.python.org/3/library/collections.html#collections.deque">Python collections.deque docs</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Linked List, Pointers, Nodes, Memory</p>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Distributed Tracing Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Distributed Tracing Basics</h1>
+<blockquote>
+<p>Observability 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When one request crosses <em>five services</em>, how do you tell <em>where it slowed down</em>?</p>
+<blockquote>
+<p><em>Distributed tracing binds </em>every span of a single request<em> under </em>one trace_id<em> and shows it as a </em>flow graph<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>span</em> and <em>trace</em></li>
+<li>What <em>context propagation</em> means</li>
+<li><em>Sampling</em> strategies</li>
+<li>Your first trace with <em>OpenTelemetry</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In a microservice world, finding the cause of a <em>slow request</em> with logs and metrics alone is <em>impossible</em>. Tracing is the <em>only answer</em>.</p>
+<blockquote>
+<p><em>Debugging a distributed system without tracing is </em>walking a maze blindfolded<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;request&quot;] --&gt; A[&quot;service A (span)&quot;]
+    A --&gt; B[&quot;service B (span)&quot;]
+    A --&gt; C[&quot;service C (span)&quot;]
+    B --&gt; D[&quot;DB span&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Trace</strong>: the <em>whole flow</em> of one request.</li>
+<li><strong>Span</strong>: a <em>single segment</em> inside a trace.</li>
+<li><strong>Parent / Child</strong>: the <em>call relationship</em> between spans.</li>
+<li><strong>Context propagation</strong>: passing <em>trace_id</em> through headers.</li>
+<li><strong>Sampling</strong>: recording only <em>some traces</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You <em>grep</em> logs and <em>guess</em> which service was slow.</p>
+<p><strong>After</strong>: The <em>slow span</em> is <em>immediately</em> visible in the trace UI.</p>
+<h2>Hands-on: Your First Trace in 5 Steps</h2>
+<p><strong>Step 1 — Install OpenTelemetry</strong></p>
+<pre><code class="language-bash">pip install opentelemetry-api opentelemetry-sdk \
+            opentelemetry-exporter-otlp
+</code></pre>
+<p><strong>Step 2 — Configure tracer</strong></p>
+<pre><code class="language-python">from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor, ConsoleSpanExporter)
+
+trace.set_tracer_provider(TracerProvider())
+trace.get_tracer_provider().add_span_processor(
+    BatchSpanProcessor(ConsoleSpanExporter()))
+tracer = trace.get_tracer(&quot;app&quot;)
+</code></pre>
+<p><strong>Step 3 — First span</strong></p>
+<pre><code class="language-python">with tracer.start_as_current_span(&quot;handle_request&quot;) as s:
+    s.set_attribute(&quot;user_id&quot;, 42)
+    with tracer.start_as_current_span(&quot;db_query&quot;):
+        pass
+</code></pre>
+<p><strong>Step 4 — Context propagation (HTTP headers)</strong></p>
+<pre><code class="language-python">from opentelemetry.propagate import inject, extract
+
+headers = {}
+inject(headers)                  # before call: inject trace_id
+ctx = extract(incoming_headers)  # at receiver: restore from headers
+</code></pre>
+<p><strong>Step 5 — Sampling</strong></p>
+<pre><code class="language-python">from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
+TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% only
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>One trace = a tree of many spans</em>.</li>
+<li>The <em>traceparent</em> header is the W3C standard.</li>
+<li><em>Sampling</em> is the heart of <em>cost control</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Storing 100% of traces.</strong> Cost <em>explodes</em>.</li>
+<li><strong>Failing to <em>propagate</em> context.</strong> Traces <em>break</em>.</li>
+<li><strong>Putting <em>too many attributes</em> on a span.</strong> Cardinality explodes.</li>
+<li><strong>Losing context in <em>async</em> code.</strong> Parent tracking fails.</li>
+<li><strong>Reading only traces and <em>ignoring metrics</em>.</strong> You miss trend.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>OpenTelemetry → <em>Tempo / Jaeger / Honeycomb</em>, then Grafana shows <em>trace ↔ log ↔ metric</em> on <em>one screen</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Trace is the </em>map<em>, log is the </em>annotation<em>.</em></li>
+<li><em>Let the </em>framework<em> propagate context.</em></li>
+<li><em>Sampling rate = </em>volume × value<em>.</em></li>
+<li><em>Span names follow </em>verb + noun<em> (<code>db_query</code>, <code>cache_get</code>).</em></li>
+<li><em>Every signal carries </em>trace_id<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You see your first span in the <em>console</em>.</li>
+<li>[ ] You understand the <em>traceparent</em> header.</li>
+<li>[ ] You set a <em>sampling</em> rate.</li>
+<li>[ ] Logs include <em>trace_id</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Connect a <em>trace</em> across two services via propagation.</li>
+<li>Use a <em>different</em> sampling rate per environment.</li>
+<li>Write a query that finds the <em>slowest span</em> (PromQL/TraceQL).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>When traces flow, <em>the flow becomes visible</em>. Next: <em>dashboard design</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><strong>Distributed Tracing Basics (current)</strong></li>
+<li>Dashboard Design (upcoming)</li>
+<li>Alerts and On-Call (upcoming)</li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry tracing</a></li>
+<li><a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a></li>
+<li><a href="https://www.jaegertracing.io/docs/latest/architecture/">Jaeger architecture</a></li>
+<li><a href="https://opentelemetry.io/docs/concepts/sampling/">Sampling strategies</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Tracing, OpenTelemetry, SRE, Microservices</p>
+</body>
+</html>

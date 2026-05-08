@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>lexical analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>lexical analysis</h1>
+<blockquote>
+<p>Compilers 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: In the single line <code>print("hello")</code>, exactly how many "words" does the compiler see?</p>
+<blockquote>
+<p>Lexical analysis (or lexing) is the step that cuts a raw string into meaningful pieces called <strong>tokens</strong>. When this step is well defined, every step above it (parser, semantic analyzer) works on clean units instead of raw text.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a token and the problem a lexer solves</li>
+<li>Regex-based lexers and the longest-match rule</li>
+<li>The standard trick for separating keywords from identifiers</li>
+<li>How to keep position information (line, column) flowing</li>
+<li>Looking at a real lexer using Python's built-in <code>tokenize</code> module</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The difference between someone who can answer "where does <code>SyntaxError: unexpected token</code> come from?" and someone who cannot is whether they have ever looked at lexical analysis. A good lexer is the starting point of good error messages.</p>
+<blockquote>
+<p>If you cut tokens wrong, every step after that is built on the same wrong split.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;raw text&quot;] --&gt; B[&quot;scanner: char by char&quot;]
+    B --&gt; C[&quot;pattern match: regex&quot;]
+    C --&gt; D[&quot;pick longest match&quot;]
+    D --&gt; E[&quot;split keyword vs identifier&quot;]
+    E --&gt; F[&quot;token + (line, col)&quot;]
+</code></pre>
+<p>The two key ideas are "pick the longest match" and "carry the position all the way through."</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Token</strong>: a meaningful unit produced by the lexer. A combination of <code>(kind, text, position)</code>.</li>
+<li><strong>Lexeme</strong>: the text part of a token.</li>
+<li><strong>Longest match</strong>: when several patterns match at the same position, pick the longest one.</li>
+<li><strong>Keyword vs identifier</strong>: <code>if</code> is a keyword, <code>iff</code> is an identifier. They start from the same pattern, so we separate them in a post-processing step.</li>
+<li><strong>Whitespace / comment</strong>: the lexer recognizes them but usually drops them from the token stream.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — branching one character at a time</strong></p>
+<pre><code class="language-python"># if/else per character makes the code explode
+def lex_naive(s):
+    out, i = [], 0
+    while i &lt; len(s):
+        if s[i].isdigit():
+            j = i
+            while j &lt; len(s) and s[j].isdigit(): j += 1
+            out.append((&quot;NUM&quot;, s[i:j])); i = j
+        elif s[i] in &quot;+-*/&quot;:
+            out.append((&quot;OP&quot;, s[i])); i += 1
+        else:
+            i += 1
+    return out
+</code></pre>
+<p><strong>After — a regex-based table</strong></p>
+<pre><code class="language-python">SPEC = [(&quot;NUM&quot;, r&quot;\d+&quot;), (&quot;OP&quot;, r&quot;[+\-*/]&quot;), (&quot;WS&quot;, r&quot;\s+&quot;)]
+</code></pre>
+<p>Adding a new token is just one more row. Maintainability and readability are much better.</p>
+<h2>Hands-on: a small lexer, step by step</h2>
+<p><strong>Step 1 — A regex-based lexer</strong></p>
+<pre><code class="language-python"># 1_regex_lex.py
+import re
+from dataclasses import dataclass
+
+@dataclass
+class Token:
+    kind: str
+    text: str
+    line: int
+    col: int
+
+SPEC = [
+    (&quot;NUM&quot;,   r&quot;\d+&quot;),
+    (&quot;ID&quot;,    r&quot;[A-Za-z_]\w*&quot;),
+    (&quot;STR&quot;,   r'&quot;[^&quot;]*&quot;'),
+    (&quot;OP&quot;,    r&quot;[+\-*/=&lt;&gt;!]+&quot;),
+    (&quot;LP&quot;,    r&quot;\(&quot;),
+    (&quot;RP&quot;,    r&quot;\)&quot;),
+    (&quot;NL&quot;,    r&quot;\n&quot;),
+    (&quot;WS&quot;,    r&quot;[ \t]+&quot;),
+]
+KEYWORDS = {&quot;if&quot;, &quot;else&quot;, &quot;while&quot;, &quot;return&quot;, &quot;True&quot;, &quot;False&quot;}
+
+def lex(src: str) -&gt; list[Token]:
+    tokens, i, line, col = [], 0, 1, 1
+    while i &lt; len(src):
+        for kind, pat in SPEC:
+            m = re.match(pat, src[i:])
+            if m:
+                text = m.group()
+                if kind == &quot;ID&quot; and text in KEYWORDS:
+                    kind = &quot;KW&quot;
+                if kind not in (&quot;WS&quot;,):
+                    tokens.append(Token(kind, text, line, col))
+                if kind == &quot;NL&quot;:
+                    line += 1; col = 1
+                else:
+                    col += len(text)
+                i += len(text)
+                break
+        else:
+            raise SyntaxError(f&quot;unexpected {src[i]!r} at {line}:{col}&quot;)
+    return tokens
+
+for t in lex('if x == 1\n  return &quot;ok&quot;\n'):
+    print(t)
+</code></pre>
+<p>One table expresses every token kind. Position information is updated at every step.</p>
+<p><strong>Step 2 — Why longest-match matters</strong></p>
+<pre><code class="language-python"># 2_longest.py
+# imagine a language that has both == and =
+SPEC = [(&quot;EQ&quot;, r&quot;==&quot;), (&quot;ASSIGN&quot;, r&quot;=&quot;)]
+import re
+src = &quot;==&quot;
+for kind, pat in SPEC:
+    m = re.match(pat, src)
+    if m:
+        print(&quot;first match:&quot;, kind, m.group())
+        break
+</code></pre>
+<p>If the order is reversed, <code>=</code> matches first and <code>==</code> is split into two tokens. Either rely on SPEC order to imitate longest-match, or sort regex alternations by length.</p>
+<p><strong>Step 3 — Separating keywords and identifiers</strong></p>
+<pre><code class="language-python"># 3_keywords.py
+import re
+KEYWORDS = {&quot;if&quot;, &quot;else&quot;, &quot;while&quot;}
+src = &quot;if iff while&quot;
+for m in re.finditer(r&quot;[A-Za-z_]\w*&quot;, src):
+    text = m.group()
+    kind = &quot;KW&quot; if text in KEYWORDS else &quot;ID&quot;
+    print(kind, text)
+</code></pre>
+<p>The standard pattern is: catch them with the same regex and compare against a keyword set in a post-processing step. Hardcoding keywords inside the regex makes adding or changing them painful.</p>
+<p><strong>Step 4 — Keeping position information</strong></p>
+<pre><code class="language-python"># 4_position.py
+# the lex from step 1 already carries line/col.
+# When we need to report an error, that info builds a nice message.
+def report(token, message):
+    print(f&quot;  File \&quot;&lt;src&gt;\&quot;, line {token.line}, col {token.col}&quot;)
+    print(f&quot;    {token.text}&quot;)
+    print(f&quot;  SyntaxError: {message}&quot;)
+</code></pre>
+<p>The starting point of good compiler error messages is a lexer that never loses position.</p>
+<p><strong>Step 5 — Python's built-in <code>tokenize</code></strong></p>
+<pre><code class="language-python"># 5_python_tokenize.py
+import tokenize, io
+
+src = &quot;x = 1 + 2  # add\n&quot;
+for tok in tokenize.generate_tokens(io.StringIO(src).readline):
+    print(tok)
+</code></pre>
+<p>You can see CPython's lexer directly. Tokens like <code>OP</code>, <code>NAME</code>, <code>NUMBER</code>, <code>NEWLINE</code>, and <code>COMMENT</code> come out with line/column information attached.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A table-based lexer turns adding or changing tokens into a data change.</li>
+<li>Longest-match is guaranteed by SPEC order or by an explicit length comparison.</li>
+<li>Keywords are not recognized by the lexer directly; they are separated in post-processing.</li>
+<li>Position information is a first-class citizen of every token.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Not guaranteeing longest-match for tokens with overlapping prefixes like <code>==</code> and <code>=</code>.</strong> The most common lexer bug.</li>
+<li><strong>Hardcoding keywords inside the regex.</strong> Adding a keyword turns into a regex change.</li>
+<li><strong>Not carrying position information.</strong> Error messages degrade to "syntax error somewhere."</li>
+<li><strong>Dropping whitespace or comments too early.</strong> Code formatters and linters need that information.</li>
+<li><strong>Building no error recovery.</strong> If the lexer dies on the first syntax error, the user experience is poor.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most language tooling uses regex-based lexers or a variant (DFA). PEG and parser combinators sometimes merge lexer and parser into one (scannerless parsing). LSP language servers call the lexer first, and syntax highlighting is essentially a visualization of the lexer's output.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>When meeting a new language, they sketch the token kinds table first.</li>
+<li>The order of the regex SPEC is part of the language specification.</li>
+<li>They know position information is core to tool quality.</li>
+<li>For an internal DSL, they first check whether <code>re</code> plus a table is enough before writing anything fancier.</li>
+<li>They design error recovery starting from the lexer.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you define a token in one sentence?</li>
+<li>[ ] Can you explain longest-match in one sentence?</li>
+<li>[ ] Do you know the standard pattern for separating keywords and identifiers?</li>
+<li>[ ] Can you answer why a lexer must carry position information?</li>
+<li>[ ] Have you ever printed the output of Python's <code>tokenize</code> module?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add <code>&lt;=</code> and <code>&gt;=</code> to the step 1 lexer with longest-match in mind, and experiment with what breaks when the order is wrong.</li>
+<li>Add error recovery so the same lexer can report multiple syntax errors in one call (the simplest strategy: "skip one character and keep going").</li>
+<li>Take the output of the <code>tokenize</code> module and build a small tool that counts keyword frequency (<code>if/while/return</code> ratio).</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The lexer is the first transformation that turns text into meaningful units. The next post looks at the step that turns that token stream into a tree (AST) — parsing.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><strong>lexical analysis (current)</strong></li>
+<li>parsing and AST (upcoming)</li>
+<li>semantic analysis (upcoming)</li>
+<li>symbol table and scope (upcoming)</li>
+<li>intermediate representation (upcoming)</li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/tokenize.html">Python — tokenize module</a></li>
+<li><a href="https://craftinginterpreters.com/scanning.html">Crafting Interpreters — Scanning</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Lex_(software)">Lex (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Regular_language">Regular language (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, Lexer, Tokens, Regex, Position</p>
+</body>
+</html>

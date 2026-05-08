@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Build Artifacts</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Build Artifacts</h1>
+<blockquote>
+<p>GitHub Actions 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>pass build outputs</em> to the <em>next job</em> or to <em>external users</em>?</p>
+<blockquote>
+<p><em>Artifacts</em> are the <em>bridge</em> between <em>build and deploy</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Using <em>upload-artifact / download-artifact</em></li>
+<li>Patterns for <em>cross-job</em> output passing</li>
+<li>Cost control with <em>retention-days</em></li>
+<li>Cutting <em>Releases</em> via <em>softprops/action-gh-release</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A workflow that <em>throws build outputs away</em> offers <em>no reuse, no trace</em>. Artifacts are <em>evidence and assets</em>.</p>
+<blockquote>
+<p><em>Every merge</em> should leave a <em>traceable build</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Build[&quot;build job&quot;] --&gt; Up[&quot;upload-artifact&quot;]
+    Up --&gt; Store[&quot;GitHub storage&quot;]
+    Store --&gt; Down[&quot;download-artifact&quot;]
+    Down --&gt; Deploy[&quot;deploy job&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Artifact</strong>: a <em>file bundle produced</em> by a workflow.</li>
+<li><strong>upload-artifact</strong>: the <em>upload</em> action.</li>
+<li><strong>download-artifact</strong>: downloads from <em>another job</em>.</li>
+<li><strong>retention-days</strong>: <em>how long</em> it's kept.</li>
+<li><strong>Release</strong>: GitHub's <em>official artifact page</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: when the build job's runner <em>vanishes</em>, <code>dist/*.whl</code> <em>vanishes with it</em>.</p>
+<p><strong>After</strong>: <code>dist/*.whl</code> is <em>stored as an artifact</em> and the <em>deploy job</em> downloads and uses it.</p>
+<h2>Hands-on: Artifacts in 5 Steps</h2>
+<p><strong>Step 1 — Upload</strong></p>
+<pre><code class="language-yaml">- run: python -m build
+- uses: actions/upload-artifact@v4
+  with:
+    name: dist
+    path: dist/*
+    retention-days: 14
+</code></pre>
+<p><strong>Step 2 — Download</strong></p>
+<pre><code class="language-yaml">deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist/
+    - run: ls dist/
+</code></pre>
+<p><strong>Step 3 — Bundle by patterns</strong></p>
+<pre><code class="language-yaml">- uses: actions/upload-artifact@v4
+  with:
+    name: reports
+    path: |
+      coverage.xml
+      report.xml
+      logs/*.log
+</code></pre>
+<p><strong>Step 4 — Auto-publish a Release</strong></p>
+<pre><code class="language-yaml">- uses: softprops/action-gh-release@v2
+  if: startsWith(github.ref, 'refs/tags/')
+  with:
+    files: dist/*
+    generate_release_notes: true
+</code></pre>
+<p><strong>Step 5 — Retention policy</strong></p>
+<pre><code class="language-yaml">- uses: actions/upload-artifact@v4
+  with:
+    name: nightly-build
+    path: dist/
+    retention-days: 7
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>retention-days</em> controls <em>storage cost</em>.</li>
+<li><em>generate_release_notes</em> writes the <em>changelog</em>.</li>
+<li><em>download-artifact</em> works only <em>within the same workflow</em> (use the API otherwise).</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><code>upload-artifact@v3</code> is <em>deprecated</em>.</strong> Upgrade to v4.</li>
+<li><strong>Uploading <em>everything</em>.</strong> Cost explodes.</li>
+<li><strong>No <code>retention-days</code>.</strong> Defaults to <em>90 days</em> and accumulates.</li>
+<li><strong>Reusing <em>artifact names</em>.</strong> A second upload with the same name <em>errors</em>.</li>
+<li><strong>No checksum on <em>Releases</em>.</strong> No tamper detection.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams emit <em>checksum + SBOM</em> with every build and <em>sign</em> releases (e.g., sigstore).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Traceable builds</em> are the start of <em>supply-chain security</em>.</li>
+<li><em>Retention</em> is <em>cost plus compliance</em>.</li>
+<li><em>Releases</em> are an <em>external interface</em>.</li>
+<li><em>Artifact names</em> must be <em>unique</em>.</li>
+<li><em>Checksums and signatures</em> are <em>culture</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Use <em>upload-artifact@v4</em>.</li>
+<li>[ ] <em>retention-days</em> is set.</li>
+<li>[ ] <em>Releases</em> are auto-published on <em>tag push</em>.</li>
+<li>[ ] <em>Checksums</em> or <em>signatures</em> are attached.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Upload <em>pytest report + coverage</em> as a <em>single artifact</em>.</li>
+<li>Have the <em>deploy job</em> download <em>build job</em> output.</li>
+<li>Auto-publish a <em>Release</em> on <em>tag push</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Artifacts are the <em>receipts of your build</em>. Next: <em>Docker build</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><strong>Build Artifacts (current)</strong></li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/actions/upload-artifact">actions/upload-artifact</a></li>
+<li><a href="https://github.com/actions/download-artifact">actions/download-artifact</a></li>
+<li><a href="https://github.com/softprops/action-gh-release">softprops/action-gh-release</a></li>
+<li><a href="https://docs.github.com/actions/using-workflows/storing-workflow-data-as-artifacts">About artifacts</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Artifact, Build, Release, CICD</p>
+</body>
+</html>

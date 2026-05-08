@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reducing Change Impact</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Reducing Change Impact</h1>
+<blockquote>
+<p>Software Design 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it take to change one line without rattling the whole system?</p>
+<blockquote>
+<p>Design that limits the blast radius of change — open/closed, expand-contract, and feature flags are the practical tools.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The blast radius of a change</li>
+<li>The Open / Closed Principle (OCP)</li>
+<li>The expand-contract migration pattern</li>
+<li>Decoupling change with feature flags</li>
+<li>Signals that you have a real safety net</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most systems are not built well from the start. They are built to change well. The smaller the impact of each change, the more often and more safely they can evolve.</p>
+<blockquote>
+<p>Code is good when it is good at being changed.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Add new path&quot;] --&gt; B[&quot;Run side by side&quot;] --&gt; C[&quot;Migrate readers&quot;] --&gt; D[&quot;Remove old path&quot;]
+</code></pre>
+<p>Expand → switch → contract.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Blast radius</strong>: How far a single change can spread.</li>
+<li><strong>OCP</strong>: Open for extension, closed for modification.</li>
+<li><strong>Expand-contract</strong>: Run old and new paths together, migrate gradually.</li>
+<li><strong>Feature flag</strong>: A switch that separates code deploy from feature activation.</li>
+<li><strong>Strangler fig</strong>: Pattern of wrapping legacy code and replacing it gradually.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def price(item, kind):
+    if kind == &quot;book&quot;: return item.cost * 0.9
+    elif kind == &quot;food&quot;: return item.cost * 0.95
+    elif kind == &quot;lux&quot;: return item.cost * 1.1
+    # adding a new category = editing this function
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class PricingRule:
+    def apply(self, item) -&gt; float: ...
+
+PRICING: dict[str, PricingRule] = {}
+
+def price(item, kind):
+    return PRICING[kind].apply(item)
+</code></pre>
+<p>A new category just registers itself in PRICING.</p>
+<h2>Hands-on: Five Steps to Shrink Change Impact</h2>
+<p><strong>Step 1 — Measure the blast radius</strong></p>
+<pre><code class="language-bash"># 1_blast.sh
+git grep -n &quot;kind ==&quot; | wc -l
+# Has one variable's comparison spread across the system?
+</code></pre>
+<p>See the current radius first.</p>
+<p><strong>Step 2 — Expand</strong></p>
+<pre><code class="language-python"># 2_expand.py
+# Add the new path only; leave the old one intact.
+def price_v2(item, kind): ...
+</code></pre>
+<p>Old callers see no impact.</p>
+<p><strong>Step 3 — Migrate gradually</strong></p>
+<pre><code class="language-python"># 3_migrate.py
+def price(item, kind):
+    if FF.use_v2: return price_v2(item, kind)
+    return price_v1(item, kind)
+</code></pre>
+<p>A feature flag flips users in stages.</p>
+<p><strong>Step 4 — Compare in parallel</strong></p>
+<pre><code class="language-python"># 4_compare.py
+def price(item, kind):
+    a, b = price_v1(item, kind), price_v2(item, kind)
+    if a != b: log.warn(&quot;price drift&quot;, a, b)
+    return a if not FF.use_v2 else b
+</code></pre>
+<p>Side-by-side comparison catches regressions.</p>
+<p><strong>Step 5 — Contract</strong></p>
+<pre><code class="language-python"># 5_contract.py
+# Once everyone is on v2, remove v1 and the flag.
+</code></pre>
+<p>Cleanup is part of the change.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Adding a new path does not touch the old one.</li>
+<li>The change is expressed as data (config, flags), not branching.</li>
+<li>Regression checks come naturally with the pattern.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Editing the existing path in place.</strong> Branching multiplies forever.</li>
+<li><strong>Expanding but never contracting.</strong> Dead code and flags pile up.</li>
+<li><strong>Keeping a flag forever.</strong> It becomes operational debt.</li>
+<li><strong>Switching with no comparison.</strong> Latent regressions ship.</li>
+<li><strong>Forcing expand-contract on every change.</strong> Overkill for a one-liner.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Schema migrations, API v1→v2 swaps, rewriting pricing or discount logic, replacing a third-party SaaS — these are the practical tools for evolving live systems safely.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They estimate blast radius first.</li>
+<li>They prefer data-driven dispatch over more branches.</li>
+<li>They run old and new in parallel to verify.</li>
+<li>They give feature flags an expiration date.</li>
+<li>The last step of any change is always cleanup.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did you estimate the blast radius?</li>
+<li>[ ] Can the new path live next to the old?</li>
+<li>[ ] Is there a way to verify regressions?</li>
+<li>[ ] Do flags have an expiration date?</li>
+<li>[ ] Is post-migration cleanup planned?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find the function with the most branches in your code and turn it into a data-driven dispatch.</li>
+<li>Pick one API and write a plan to expand-contract it to v2.</li>
+<li>List your live feature flags that have no expiration date and assign them one.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good design makes change unscary. Next up we look at the principles that compress this thinking — a tour of design principles.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/01-what-is-software-design.md">What Is Software Design?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/02-separation-of-concerns.md">Separation of Concerns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/03-modules-and-boundaries.md">Modules and Boundaries</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/04-dependency-direction.md">Dependency Direction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/05-interfaces-and-abstraction.md">Interfaces and Abstraction</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/06-layered-architecture.md">Layered Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-design-101/en/07-data-flow-design.md">Data Flow Design</a></li>
+<li><strong>Reducing Change Impact (current)</strong></li>
+<li>Design Principles (upcoming)</li>
+<li>Small Design Practice (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://web.archive.org/web/20060822033314/http://www.objectmentor.com/resources/articles/ocp.pdf">Open/Closed Principle (Robert C. Martin)</a></li>
+<li><a href="https://martinfowler.com/bliki/ParallelChange.html">ParallelChange (Expand-Contract) — Danilo Sato</a></li>
+<li><a href="https://martinfowler.com/articles/feature-toggles.html">Feature Toggles — Pete Hodgson</a></li>
+<li><a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Strangler Fig Application — Martin Fowler</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring</p>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JavaScript Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>JavaScript Basics</h1>
+<blockquote>
+<p>Frontend Development 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Where</em> should you start with JavaScript to learn it efficiently?</p>
+<blockquote>
+<p>Don't memorize every feature. <em>Variables, functions, arrays/objects, DOM, events</em> — those five cover <em>80%</em> of JavaScript.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><code>let</code>/<code>const</code> and <em>immutable thinking</em></li>
+<li>Functions, arrow functions, and a <em>minimal grasp</em> of closures</li>
+<li>Array/object methods (<code>map</code>, <code>filter</code>, <code>reduce</code>)</li>
+<li>Reading and updating the DOM</li>
+<li><em>The standard pattern</em> for event listeners</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>JavaScript stays the same <em>across frameworks</em>. Inside React components, inside Vue, inside Node.js — the <em>syntax is identical</em>. Time invested here makes <em>every framework faster to learn</em>.</p>
+<blockquote>
+<p>Good JavaScript is a sum of <em>small, separated functions</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Var[&quot;let/const&quot;] --&gt; Fn[&quot;Functions&quot;]
+    Fn --&gt; Coll[&quot;Array/Object methods&quot;]
+    Coll --&gt; DOM[&quot;DOM&quot;]
+    DOM --&gt; Evt[&quot;Events&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong><code>const</code></strong>: cannot be reassigned. Use it <em>by default</em>.</li>
+<li><strong>Arrow function</strong>: <code>() =&gt; {}</code>, the short form.</li>
+<li><strong>Closure</strong>: a function remembers <em>the environment in which it was created</em>.</li>
+<li><strong><code>map/filter/reduce</code></strong>: standard tools to transform collections <em>without for-loops</em>.</li>
+<li><strong>Event delegation</strong>: attach the listener <em>to the parent</em> and handle child events from there.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (var and for)</strong></p>
+<pre><code class="language-javascript">var arr = [1,2,3];
+var doubled = [];
+for (var i = 0; i &lt; arr.length; i++) doubled.push(arr[i] * 2);
+</code></pre>
+<p><strong>After (modern JS)</strong></p>
+<pre><code class="language-javascript">const arr = [1, 2, 3];
+const doubled = arr.map(n =&gt; n * 2);
+</code></pre>
+<h2>Hands-on: A Todo List in Five Steps</h2>
+<p><strong>Step 1 — HTML skeleton</strong></p>
+<pre><code class="language-html">&lt;input id=&quot;todo&quot;&gt;
+&lt;button id=&quot;add&quot;&gt;Add&lt;/button&gt;
+&lt;ul id=&quot;list&quot;&gt;&lt;/ul&gt;
+</code></pre>
+<p><strong>Step 2 — State variable</strong></p>
+<pre><code class="language-javascript">const todos = [];
+</code></pre>
+<p><strong>Step 3 — A render function</strong></p>
+<pre><code class="language-javascript">function render() {
+  const list = document.getElementById(&quot;list&quot;);
+  list.innerHTML = todos.map(t =&gt; `&lt;li&gt;${t}&lt;/li&gt;`).join(&quot;&quot;);
+}
+</code></pre>
+<p><strong>Step 4 — Events</strong></p>
+<pre><code class="language-javascript">document.getElementById(&quot;add&quot;).addEventListener(&quot;click&quot;, () =&gt; {
+  const input = document.getElementById(&quot;todo&quot;);
+  if (!input.value) return;
+  todos.push(input.value);
+  input.value = &quot;&quot;;
+  render();
+});
+</code></pre>
+<p><strong>Step 5 — Delete via event delegation</strong></p>
+<pre><code class="language-javascript">document.getElementById(&quot;list&quot;).addEventListener(&quot;click&quot;, (e) =&gt; {
+  if (e.target.tagName === &quot;LI&quot;) {
+    const idx = [...e.target.parentNode.children].indexOf(e.target);
+    todos.splice(idx, 1);
+    render();
+  }
+});
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>State (<code>todos</code>) and rendering (<code>render</code>) are <em>separated</em>.</li>
+<li>Every change flows <em>state → render</em>. (A <em>taste</em> of the React paradigm.)</li>
+<li>A single listener on the parent is more efficient than one per child.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <code>var</code>.</strong> Function-scoped behavior creates bugs. Use <code>const</code>/<code>let</code>.</li>
+<li><strong>Using <code>==</code>.</strong> Type coercion makes results <em>unpredictable</em>. Use <code>===</code>.</li>
+<li><strong>Updating state and DOM in parallel.</strong> You lose track of <em>the source of truth</em>.</li>
+<li><strong>Attaching a listener to every element.</strong> Wastes memory and CPU.</li>
+<li><strong>Not handling errors inside <code>async</code>.</strong> Bugs that <em>fail silently</em> appear.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams standardize on <em>TypeScript</em>, <em>ESLint</em>, and <em>Prettier</em>. JavaScript's freedom becomes a <em>risk</em> at team scale, so types and lint rules draw the <em>boundaries</em>. Yet all of those tools <em>run on top of</em> plain JS.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A function does <em>one thing</em>.</li>
+<li>Separate state from rendering.</li>
+<li><code>const</code> by default; <code>let</code> by exception; <code>var</code> never.</li>
+<li>Flatten callback hell with <code>async/await</code>.</li>
+<li><em>Reading</em> JavaScript takes longer than writing it.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the difference between <code>let</code> and <code>const</code>.</li>
+<li>[ ] You can write arrow functions.</li>
+<li>[ ] You replace for-loops with <code>map/filter/reduce</code>.</li>
+<li>[ ] You can read and modify the DOM.</li>
+<li>[ ] You have used event delegation at least once.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a <em>complete (check)</em> feature to the todo code above.</li>
+<li>Persist todos across reloads using <code>localStorage</code>.</li>
+<li>Compute an average grade using only <code>map/filter/reduce</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Plain JavaScript can build small apps on its own. As the screen grows, you need a tool that <em>binds state to rendering</em> automatically. Next up: components and state.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><strong>JavaScript Basics (current)</strong></li>
+<li>Components and State (upcoming)</li>
+<li>Routing and Pages (upcoming)</li>
+<li>API Calls and Async (upcoming)</li>
+<li>Forms and Validation (upcoming)</li>
+<li>Styling and Design Systems (upcoming)</li>
+<li>Build Tools and Bundling (upcoming)</li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide">MDN JavaScript Guide</a></li>
+<li><a href="https://javascript.info/">JavaScript.info</a></li>
+<li><a href="https://eloquentjavascript.net/">Eloquent JavaScript</a></li>
+<li><a href="https://github.com/tc39/proposals">TC39 Proposals</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, JavaScript, DOM, Web, Beginner</p>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Consensus and Raft</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Consensus and Raft</h1>
+<blockquote>
+<p>Distributed Systems 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it actually take for five nodes to agree on a single decision?</p>
+<blockquote>
+<p>Consensus is the hardest problem in distributed systems, and Raft is the algorithm that finally made the answer human-readable.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of the consensus problem and its safety/liveness properties</li>
+<li>The three roles in Raft (leader, follower, candidate)</li>
+<li>The meaning of term, log, index, and commit</li>
+<li>Why a majority (quorum) is required</li>
+<li>A one-line comparison of Paxos and Raft</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A consensus algorithm sits at the heart of etcd, ZooKeeper, Consul, and CockroachDB. The Kubernetes control plane stands on top of etcd. Once you understand consensus, half of "why does this system behave this way?" answers itself.</p>
+<blockquote>
+<p>Consensus is the value of agreement in a distributed system.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F1[&quot;follower&quot;] --&gt; L[&quot;leader&quot;]
+    F2[&quot;follower&quot;] --&gt; L
+    F3[&quot;follower&quot;] --&gt; L
+    L --&gt;|append entries| F1
+    L --&gt;|append entries| F2
+    L --&gt;|append entries| F3
+</code></pre>
+<p>A single leader receives the log and replicates it to followers. Only entries received by a majority count as committed.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Consensus</strong>: The problem of N nodes agreeing on a single value.</li>
+<li><strong>Term</strong>: A monotonically increasing epoch. Each new leader gets a new term.</li>
+<li><strong>Log</strong>: A sequence of entries, identified by index.</li>
+<li><strong>Commit</strong>: An entry received by a majority becomes a permanent promise.</li>
+<li><strong>Quorum</strong>: f+1 out of 2f+1, usually a majority.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — leader decides alone</strong></p>
+<pre><code class="language-text">fast, but consistency breaks if the leader lies
+</code></pre>
+<p><strong>After — agreement of a majority</strong></p>
+<pre><code class="language-text">slightly slower, but safe even if a node dies or lies
+</code></pre>
+<p>A majority is the safety device of distributed systems.</p>
+<h2>Hands-on: Raft's Core in Short Code</h2>
+<p><strong>Step 1 — define the state</strong></p>
+<pre><code class="language-python"># 1_state.py
+from dataclasses import dataclass, field
+@dataclass
+class Node:
+    role: str = &quot;follower&quot;
+    term: int = 0
+    log: list = field(default_factory=list)
+    commit_index: int = -1
+    voted_for: int | None = None
+</code></pre>
+<p>term, log, commit_index — the variables on the first page of the Raft paper.</p>
+<p><strong>Step 2 — election (simplified)</strong></p>
+<pre><code class="language-python"># 2_election.py
+def election_timeout(self, peers):
+    self.term += 1
+    self.role = &quot;candidate&quot;
+    self.voted_for = self.id
+    votes = 1
+    for p in peers:
+        if p.request_vote(self.term, self.id):
+            votes += 1
+    if votes &gt; len(peers) // 2 + 1:
+        self.role = &quot;leader&quot;
+</code></pre>
+<p>The first node to time out becomes a candidate and gathers votes. Win a majority and you become leader.</p>
+<p><strong>Step 3 — log replication</strong></p>
+<pre><code class="language-python"># 3_replicate.py
+def append_entries(self, term, prev_index, entries):
+    if term &lt; self.term: return False
+    if prev_index &gt;= 0 and self.log[prev_index][&quot;term&quot;] != term:
+        return False  # mismatch
+    self.log = self.log[:prev_index+1] + entries
+    return True
+</code></pre>
+<p>The leader sends its log to followers. Followers reject when entries do not match. Consistency is enforced via the previous index/term pair.</p>
+<p><strong>Step 4 — commit</strong></p>
+<pre><code class="language-python"># 4_commit.py
+def maybe_commit(self, peers):
+    for i in range(self.commit_index + 1, len(self.log)):
+        acks = 1 + sum(1 for p in peers if p.match_index &gt;= i)
+        if acks &gt; len(peers) // 2 + 1:
+            self.commit_index = i
+</code></pre>
+<p>Once a majority has the entry, commit it. From that point on the entry never disappears.</p>
+<p><strong>Step 5 — partition scenario</strong></p>
+<pre><code class="language-python"># 5_partition.py (pseudocode)
+# 5 nodes, only 2 (leader included) on one side of a partition
+# - that side has no majority -&gt; cannot elect a new leader -&gt; cannot accept writes
+# - the other side has 3 nodes -&gt; majority -&gt; elects a new leader -&gt; keeps working
+</code></pre>
+<p>The side without a majority intentionally stops. This is the core design that prevents split-brain.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The term is monotonically increasing. Messages from old terms are always rejected.</li>
+<li>Order is essential to the log — matching is checked by the (index, term) pair.</li>
+<li>Commit is the promise that "a majority has it," not "everyone has it."</li>
+<li>The right answer for a partitioned side is to stop.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Believing one leader is enough for safety.</strong> Elections must be correct for safety.</li>
+<li><strong>Treating "leader received it" as commit.</strong> Commit is the moment a majority received it.</li>
+<li><strong>Using identical timeouts on all nodes.</strong> Split votes happen often (Raft uses randomized timeouts).</li>
+<li><strong>Skipping the log-matching check.</strong> Wrong entries get committed.</li>
+<li><strong>Assuming the partitioned side can keep working.</strong> Without a majority it must stop.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>etcd (the Kubernetes data store), Consul, ZooKeeper (ZAB, a Paxos variant), CockroachDB, and TiKV all stand on top of consensus algorithms. Database leader election, distributed locks, and configuration storage are textbook use cases.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They do not call consensus often (it is expensive — only for metadata).</li>
+<li>They randomize timeouts based on measurement.</li>
+<li>They keep the node count odd (3, 5, 7).</li>
+<li>They design client retries that handle leader changes safely.</li>
+<li>They consciously decide whether reads are leader-only or use a lease.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the definition of consensus in one line?</li>
+<li>[ ] Can you explain the relationship between term, log, and commit?</li>
+<li>[ ] Can you say how many nodes can fail in a 5-node cluster?</li>
+<li>[ ] Do you know how split votes are prevented?</li>
+<li>[ ] Do you let "etcd is on top of consensus" inform your system design?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare the fault tolerance of a 3-node and a 5-node cluster.</li>
+<li>Explain how Raft's randomized election timeout reduces split votes.</li>
+<li>Write one paragraph on how you would build a distributed lock with etcd.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Consensus is the hardest problem in distributed systems, and Raft is its human-friendly form. In the next post we cover the larger picture of choosing a leader on top of consensus — leader election.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
+<li><strong>Consensus and Raft (current)</strong></li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://raft.github.io/">Raft consensus algorithm</a></li>
+<li><a href="https://raft.github.io/raft.pdf">In Search of an Understandable Consensus Algorithm (Raft paper)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Paxos_(computer_science)">Paxos (Wikipedia)</a></li>
+<li><a href="https://etcd.io/docs/">etcd documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Consensus, Raft, Paxos, Replication</p>
+</body>
+</html>

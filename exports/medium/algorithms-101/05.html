@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Recursion and Divide and Conquer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Recursion and Divide and Conquer</h1>
+<blockquote>
+<p>Algorithms 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does recursion feel hard, and why are divide-and-conquer algorithms like mergesort fast for the right reason?</p>
+<blockquote>
+<p>Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine. Cost is analysed via recurrences. When the same subproblems repeat, we cache their results, which is exactly the door to dynamic programming.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The three rules for correct recursion</li>
+<li>The call stack and what causes RecursionError</li>
+<li>Divide-and-conquer recurrences and master-theorem intuition</li>
+<li>When repeated subproblems mean memoization is needed</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without comfortable recursion, trees, graphs, divide and conquer, dynamic programming, and backtracking all feel harder than they are. With it, complex problems decompose naturally into smaller versions of themselves.</p>
+<blockquote>
+<p>Recursion is the second native language of algorithms.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A recursive function has a base case, a progress step, and a self-call. Divide and conquer breaks input into a parts of size n/b and combines results in f(n) work. The cost satisfies T(n) = a · T(n/b) + f(n); the master theorem gives the closed form. Mergesort yields O(n log n); binary search yields O(log n).</p>
+</blockquote>
+<pre><code class="language-text">Recursive shape
+    if base case: return
+    self-call(smaller input)
+    combine results
+
+Divide-and-conquer recurrence
+    T(n) = a · T(n/b) + f(n)
+    e.g. mergesort     T(n) = 2T(n/2) + O(n) = O(n log n)
+         binary search T(n) = T(n/2)   + O(1) = O(log n)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Base case</strong><br>
+- Description: Termination condition without further recursion</p>
+<p><strong>Call stack</strong><br>
+- Description: Storage of nested call contexts</p>
+<p><strong>Divide and conquer</strong><br>
+- Description: Divide → conquer → combine pattern</p>
+<p><strong>Recurrence</strong><br>
+- Description: Equation describing recursive cost</p>
+<p><strong>Memoization</strong><br>
+- Description: Caching results of repeated subproblems</p>
+<h2>Before / After</h2>
+<p><strong>Before — missing base case:</strong></p>
+<pre><code class="language-python">def factorial(n):
+    return n * factorial(n - 1)        # no termination → RecursionError
+</code></pre>
+<p><strong>After — explicit base case:</strong></p>
+<pre><code class="language-python">def factorial(n):
+    if n &lt;= 1:
+        return 1
+    return n * factorial(n - 1)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: The three rules</strong></p>
+<pre><code class="language-python">def power(base, exp):
+    if exp == 0:                           # (1) base case
+        return 1
+    return base * power(base, exp - 1)     # (2) smaller input (3) self-call
+
+print(power(2, 10))   # 1024
+</code></pre>
+<p>The base case must be reachable, and every call must move strictly closer to it.</p>
+<p><strong>Step 2: Call stack and RecursionError</strong></p>
+<pre><code class="language-python">import sys
+print(sys.getrecursionlimit())     # 1000 by default
+
+def deep(n):
+    if n == 0:
+        return 0
+    return 1 + deep(n - 1)
+
+try:
+    deep(2000)
+except RecursionError as e:
+    print(&quot;RecursionError:&quot;, e)
+
+sys.setrecursionlimit(10_000)
+print(deep(2000))
+</code></pre>
+<p>CPython has no tail-call optimisation. Deep recursion either needs a higher limit or must be rewritten as iteration.</p>
+<p><strong>Step 3: Divide and conquer for exponentiation, O(n) → O(log n)</strong></p>
+<pre><code class="language-python">def fast_power(base, exp):
+    if exp == 0:
+        return 1
+    half = fast_power(base, exp // 2)
+    if exp % 2 == 0:
+        return half * half
+    return half * half * base
+
+print(fast_power(2, 30))   # 1073741824
+</code></pre>
+<p>Halving the exponent gives O(log n) calls. The same trick appears in modular exponentiation used in cryptography.</p>
+<p><strong>Step 4: Mergesort — feel a recurrence</strong></p>
+<pre><code class="language-python">def mergesort(arr):
+    if len(arr) &lt;= 1:
+        return arr
+    mid = len(arr) // 2
+    left = mergesort(arr[:mid])
+    right = mergesort(arr[mid:])
+    return merge(left, right)
+
+def merge(a, b):
+    out, i, j = [], 0, 0
+    while i &lt; len(a) and j &lt; len(b):
+        if a[i] &lt;= b[j]:
+            out.append(a[i]); i += 1
+        else:
+            out.append(b[j]); j += 1
+    out.extend(a[i:]); out.extend(b[j:])
+    return out
+
+print(mergesort([3, 1, 4, 1, 5, 9, 2, 6]))
+</code></pre>
+<p>T(n) = 2T(n/2) + O(n) → O(n log n). The friendliest example of the recurrence in action.</p>
+<p><strong>Step 5: Repeated subproblems → memoization</strong></p>
+<pre><code class="language-python">def fib_naive(n):
+    if n &lt;= 1:
+        return n
+    return fib_naive(n - 1) + fib_naive(n - 2)
+# Same subproblems repeated exponentially, very slow
+
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib_memo(n):
+    if n &lt;= 1:
+        return n
+    return fib_memo(n - 1) + fib_memo(n - 2)
+
+print(fib_memo(100))
+</code></pre>
+<p>Caching collapses O(2^n) to O(n). This is the entry point to dynamic programming, covered in the next article.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Always check that the base case is genuinely reachable</li>
+<li>The combine cost f(n) can dominate the total complexity</li>
+<li>Spotting repeated subproblems unlocks dramatic speed-ups</li>
+<li>Deep recursion in Python is iteration in disguise — convert when needed</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Missing or unreachable base case</strong><br>
+- Problem: Infinite recursion<br>
+- Fix: Verify monotone progress</p>
+<p><strong>Sharing mutable arguments across calls</strong><br>
+- Problem: Unintended accumulation<br>
+- Fix: Copy or pass an index</p>
+<p><strong>Deep recursion in Python</strong><br>
+- Problem: RecursionError<br>
+- Fix: Iterate or raise limit</p>
+<p><strong>Ignoring the divide ratio b</strong><br>
+- Problem: Wrong complexity<br>
+- Fix: Apply master theorem</p>
+<p><strong>Missing repeated subproblems</strong><br>
+- Problem: Exponential time<br>
+- Fix: Add <code>lru_cache</code> memoization</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>File-system traversal (recursive directory walking)</li>
+<li>Compiler AST traversal and transformation</li>
+<li>Distributed reduce stages (k-way merging)</li>
+<li>Graphics quadtrees and octrees</li>
+<li>ML decision-tree learning (recursive splits)</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer chooses recursion when it expresses the problem naturally — trees almost always, deep linear chains rarely. For performance-critical paths, an explicit stack iteration is preferable to deep recursion.</p>
+<p>A senior engineer also draws the recurrence in their head when they see divide and conquer. Memorising T(n) = 2T(n/2) + O(n) → O(n log n) and T(n) = T(n/2) + O(1) → O(log n) covers most analyses you will ever do.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you check the three rules of recursion?</li>
+<li>[ ] Do you understand what RecursionError signals?</li>
+<li>[ ] Can you write a recurrence for a divide-and-conquer routine?</li>
+<li>[ ] Can you spot repeated subproblems?</li>
+<li>[ ] Can you convert deep recursion to iteration?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Sum an integer array via divide and conquer and compare with simple iteration. Write the recurrence and complexity.</p>
+</li>
+<li>
+<p>Compute the intersection of two sorted lists recursively, then improve it with binary search when the two sizes are very different.</p>
+</li>
+<li>
+<p>Solve Towers of Hanoi recursively and prove the call count is 2^n − 1 from the recurrence.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Recursion expresses a problem as smaller versions of itself. Divide and conquer is its most useful pattern, analysed via recurrences. When subproblems repeat, memoization closes the gap between recursion and dynamic programming.</p>
+<p>The next article introduces dynamic programming proper — memoization vs tabulation, the art of state design, and classic problems like 0/1 knapsack and longest common subsequence.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><strong>Recursion and Divide and Conquer (current)</strong></li>
+<li>Dynamic Programming (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Graph Algorithms (upcoming)</li>
+<li>String Algorithm Basics (upcoming)</li>
+<li>Algorithm Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/functools.html#functools.lru_cache">Python <code>functools.lru_cache</code></a></li>
+<li><a href="https://docs.python.org/3/library/sys.html#sys.setrecursionlimit">Python <code>sys.setrecursionlimit</code></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Master_theorem">Wikipedia — Master theorem</a></li>
+<li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition">CLRS — Introduction to Algorithms, Chapter 4</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Recursion, Divide and Conquer, Call Stack, Memoization</p>
+</body>
+</html>

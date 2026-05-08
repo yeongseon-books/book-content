@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authentication and Authorization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Authentication and Authorization</h1>
+<blockquote>
+<p>Information Security 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is "who are you" the same question as "what are you allowed to do"?</p>
+<blockquote>
+<p>Authentication is about identity. Authorization is about permission. Mix them up and half of your security collapses.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and difference between authentication and authorization</li>
+<li>The security models behind passwords, MFA, and biometrics</li>
+<li>Sessions vs tokens (including JWT)</li>
+<li>The skeleton of OAuth 2.0 / OIDC flows</li>
+<li>A comparison of RBAC and ABAC and how to choose</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most breaches start with stolen credentials or abused permissions. Separating authentication from authorization, and choosing the right pattern for each, closes two of the biggest doors at once.</p>
+<blockquote>
+<p>Verifying "who" and deciding "what" are different responsibilities.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;user&quot;] --&gt;|credential| AuthN[&quot;authentication&quot;]
+    AuthN --&gt;|identity| AuthZ[&quot;authorization&quot;]
+    AuthZ --&gt;|allow/deny| R[&quot;resource&quot;]
+</code></pre>
+<p>First confirm the identity, then check the permissions of that identity. The two stages are separated in time and in code.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Authentication</strong>: Confirms the identity the user claims.</li>
+<li><strong>Authorization</strong>: Decides whether that identity may access a resource.</li>
+<li><strong>MFA</strong>: Two or more of knowledge, possession, inherence.</li>
+<li><strong>Session vs Token</strong>: Server holds state vs token is self-evidence.</li>
+<li><strong>RBAC / ABAC</strong>: Role-based vs attribute-based authorization models.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — password only</strong></p>
+<pre><code class="language-text">once leaked, permanent intrusion
+</code></pre>
+<p><strong>After — password + MFA + token expiry + RBAC</strong></p>
+<pre><code class="language-text">multi-factor, time-limited, permission-split -&gt; one weak link does not break everything
+</code></pre>
+<p>Defense is layered, not single.</p>
+<h2>Hands-on: Auth in Short Code</h2>
+<p><strong>Step 1 — store passwords safely</strong></p>
+<pre><code class="language-python"># 1_password.py
+import bcrypt
+def hash_pw(pw): return bcrypt.hashpw(pw.encode(), bcrypt.gensalt(12))
+def check_pw(pw, h): return bcrypt.checkpw(pw.encode(), h)
+</code></pre>
+<p>bcrypt / argon2 / scrypt — intentionally slow hashes. SHA-256 is not a password hash.</p>
+<p><strong>Step 2 — TOTP MFA</strong></p>
+<pre><code class="language-python"># 2_totp.py
+import pyotp
+totp = pyotp.TOTP(&quot;JBSWY3DPEHPK3PXP&quot;)
+print(totp.now())                   # 6-digit code
+print(totp.verify(&quot;123456&quot;))        # bool
+</code></pre>
+<p>A possession factor (the seed in your phone) means one broken factor is not enough.</p>
+<p><strong>Step 3 — session vs JWT</strong></p>
+<pre><code class="language-python"># 3_session_vs_jwt.py
+# session: server stores sid -&gt; user (easy to revoke, stateful)
+# jwt:    token carries user/exp/sig (hard to revoke, stateless)
+import jwt
+t = jwt.encode({&quot;sub&quot;: &quot;u1&quot;, &quot;exp&quot;: 9999999999}, &quot;secret&quot;, algorithm=&quot;HS256&quot;)
+print(jwt.decode(t, &quot;secret&quot;, algorithms=[&quot;HS256&quot;]))
+</code></pre>
+<p>Sessions when revoke is frequent. JWT for stateless calls between microservices.</p>
+<p><strong>Step 4 — OAuth 2.0 authorization code (pseudocode)</strong></p>
+<pre><code class="language-text">4_oauth.txt
+client -&gt; auth server: GET /authorize?response_type=code
+user logs in &amp; consents
+auth server -&gt; client: redirect with ?code=...
+client -&gt; auth server: POST /token (code + secret) -&gt; access_token
+client -&gt; resource server: GET /api with Bearer access_token
+</code></pre>
+<p>The essence of OAuth is never giving the password to a third party.</p>
+<p><strong>Step 5 — RBAC decision</strong></p>
+<pre><code class="language-python"># 5_rbac.py
+ROLE_PERMS = {&quot;admin&quot;: {&quot;read&quot;,&quot;write&quot;,&quot;delete&quot;}, &quot;user&quot;: {&quot;read&quot;}}
+def can(role, action): return action in ROLE_PERMS.get(role, set())
+print(can(&quot;user&quot;, &quot;delete&quot;))   # False
+</code></pre>
+<p>The simplest authorization — bind a permission set to a role. Enough for small systems.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Passwords are not stored with fast hashes — slow on purpose.</li>
+<li>MFA promises "even if one factor breaks."</li>
+<li>JWT security is key management; a leaked secret allows forging every token.</li>
+<li>OAuth access tokens stay short-lived, refresh tokens stay safe.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hashing passwords with MD5/SHA.</strong> A GPU can try billions per minute.</li>
+<li><strong>Long-lived JWTs.</strong> No revocation; nothing to do after theft.</li>
+<li><strong>Authorization checks in the client.</strong> Without server checks, defenseless.</li>
+<li><strong>Bundling all permissions into one role.</strong> Violates least privilege.</li>
+<li><strong>Verbose login error messages.</strong> Enables user enumeration.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Almost every web/mobile app uses OIDC (the identity standard on top of OAuth) and SSO. Cloud IAM mixes RBAC and ABAC. Large orgs standardize on SSO + MFA + short tokens + audit logs.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They do not roll their own auth (use auth0, Keycloak, Cognito).</li>
+<li>Authorization is moved to a policy engine (e.g., OPA), separate from code.</li>
+<li>MFA is the default.</li>
+<li>Tokens expire quickly and recover via refresh.</li>
+<li>Permission changes always land in audit logs.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between authentication and authorization in one line?</li>
+<li>[ ] Can you list the requirements of a password hash function?</li>
+<li>[ ] Can you explain the tradeoff between session and JWT?</li>
+<li>[ ] Can you draw the OAuth authorization code flow?</li>
+<li>[ ] Can you decide between RBAC and ABAC?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Diagram the auth flow of your service from a session/token point of view.</li>
+<li>Write a one-page password policy (length, complexity, lockout).</li>
+<li>Pick the most dangerous permission and design an RBAC matrix around it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Authentication and authorization are the two largest doors in security. Next we cover the foundation of data protection — cryptography and hashing.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What Is Information Security?</a></li>
+<li><strong>Authentication and Authorization (current)</strong></li>
+<li>cryptography and hashing (upcoming)</li>
+<li>TLS and certificates (upcoming)</li>
+<li>web security basics (upcoming)</li>
+<li>SQL injection and XSS (upcoming)</li>
+<li>secret management (upcoming)</li>
+<li>least privilege (upcoming)</li>
+<li>logging and audit (upcoming)</li>
+<li>security incident response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP Authentication Cheat Sheet</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6749">OAuth 2.0 RFC 6749</a></li>
+<li><a href="https://openid.net/specs/openid-connect-core-1_0.html">OpenID Connect Core</a></li>
+<li><a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST SP 800-63B Digital Identity</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, Authentication, Authorization, OAuth, RBAC</p>
+</body>
+</html>

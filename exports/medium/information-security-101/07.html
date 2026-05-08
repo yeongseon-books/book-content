@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Secret Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Secret Management</h1>
+<blockquote>
+<p>Information Security 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What do we lose the moment a secret enters source code?</p>
+<blockquote>
+<p>Secret management is not about where you put them; it is about how you rotate them.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Secret types (static, dynamic, user, system)</li>
+<li>The limits of environment variables</li>
+<li>The role of vault and KMS</li>
+<li>Core rotation policy ideas</li>
+<li>Safe patterns for handling secrets in code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>More than half of large incidents start with leaked secrets. A leaked secret without rotation is a permanent risk.</p>
+<blockquote>
+<p>Secrets are liabilities, not assets — keep their lifetime short.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Application&quot;] --&gt;|&quot;request&quot;| V[&quot;Vault / KMS&quot;]
+    V --&gt;|&quot;short-lived token&quot;| A
+    V --&gt;|&quot;audit log&quot;| L[&quot;SIEM&quot;]
+</code></pre>
+<p>Code holds the right to fetch a secret, not the secret itself.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Static secret</strong>: manually configured key or password.</li>
+<li><strong>Dynamic secret</strong>: short-lived credential generated per request.</li>
+<li><strong>Vault</strong>: secret manager such as HashiCorp Vault.</li>
+<li><strong>KMS</strong>: key management service (AWS KMS, GCP KMS).</li>
+<li><strong>Rotation</strong>: regularly replacing a secret.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Plaintext <code>.env</code></strong></p>
+<pre><code class="language-text">Accidentally committed -&gt; permanent leak -&gt; rotate every environment
+</code></pre>
+<p><strong>After — Short-lived token from a vault</strong></p>
+<pre><code class="language-text">App requests a token at boot -&gt; auto-rotates on expiry
+</code></pre>
+<p>Lifetime, not location, drives security.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — Environment Variables (Bare Minimum)</strong></p>
+<pre><code class="language-python"># 1_env.py
+import os
+db_url = os.environ[&quot;DATABASE_URL&quot;]
+# Never hard-code: db_url = &quot;postgres://user:pw@...&quot;
+</code></pre>
+<p>Never commit <code>.env</code> files to git.</p>
+<p><strong>Step 2 — Fetch a Secret from Vault</strong></p>
+<pre><code class="language-python"># 2_vault.py
+import hvac
+client = hvac.Client(url=&quot;http://vault:8200&quot;, token=os.environ[&quot;VAULT_TOKEN&quot;])
+data = client.secrets.kv.read_secret_version(path=&quot;myapp/db&quot;)
+db_pw = data[&quot;data&quot;][&quot;data&quot;][&quot;password&quot;]
+</code></pre>
+<p>The vault token itself must also be short-lived (AppRole, Kubernetes SA, etc).</p>
+<p><strong>Step 3 — Encrypt Data Keys with KMS</strong></p>
+<pre><code class="language-python"># 3_kms.py
+import boto3
+kms = boto3.client(&quot;kms&quot;)
+resp = kms.generate_data_key(KeyId=&quot;alias/app&quot;, KeySpec=&quot;AES_256&quot;)
+plaintext = resp[&quot;Plaintext&quot;]      # in-memory only
+ciphertext = resp[&quot;CiphertextBlob&quot;] # store in DB
+</code></pre>
+<p>The plaintext data key only lives in memory briefly.</p>
+<p><strong>Step 4 — Secret Scanner (Prevention)</strong></p>
+<pre><code class="language-bash"># 4_scan.sh
+# pre-commit hook: trufflehog scans before commit
+trufflehog filesystem . --only-verified
+</code></pre>
+<p>Always assume git history is hostile, and block leaks early.</p>
+<p><strong>Step 5 — Rotation Pseudocode</strong></p>
+<pre><code class="language-python"># 5_rotation.py
+def rotate_db_password():
+    new_pw = generate_strong_password()
+    db.execute(f&quot;ALTER USER app WITH PASSWORD %s&quot;, (new_pw,))
+    vault.put(&quot;myapp/db&quot;, {&quot;password&quot;: new_pw})
+    notify_apps_to_reload()
+</code></pre>
+<p>Rotation must be automated.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Secrets carry the shortest possible lifetime.</li>
+<li>Plaintext secrets only live in memory.</li>
+<li>Every secret access leaves an audit trail.</li>
+<li>Rotation runs as automation, not as a runbook step.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Committing <code>.env</code>.</strong> The single most common incident.</li>
+<li><strong>One master key for everything.</strong> Cannot rotate.</li>
+<li><strong>Logging secrets in errors or app logs.</strong> Wide exposure via SIEM.</li>
+<li><strong>No rotation policy.</strong> A leak becomes an indefinite exposure.</li>
+<li><strong>Sharing secrets via Slack or email.</strong> A searchable secret is no secret.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Kubernetes uses <code>Secret</code> plus External Secrets Operator (ESO) to sync from vault. CI/CD federates with OIDC to mint short-lived credentials and removes static keys. AWS issues per-instance short-lived credentials through IAM Roles and STS.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Every secret has an expiry.</li>
+<li>Secret management is co-designed with identity (IAM).</li>
+<li><code>.env</code> is for local development only.</li>
+<li>Time-to-rotate after an incident is an SLO (e.g., under one hour).</li>
+<li>Secret scanners run at both pre-commit and CI.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does every secret have a defined rotation period?</li>
+<li>[ ] Is <code>.env</code> in <code>.gitignore</code>?</li>
+<li>[ ] Are secret accesses captured as audit logs?</li>
+<li>[ ] Is the rotation runbook documented?</li>
+<li>[ ] Are static credentials removed from CI/CD?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain the difference between environment variables and a vault in one paragraph.</li>
+<li>How would you measure a rotation SLO?</li>
+<li>Outline the safe procedure for handling a secret accidentally committed to git.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Secret management is about lifetime, not location. Next we look at what the holder of a secret should be allowed to do — least privilege.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/05-web-security-basics.md">Web Security Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/06-sql-injection-and-xss.md">SQL Injection and XSS</a></li>
+<li><strong>Secret Management (current)</strong></li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.hashicorp.com/vault/docs">HashiCorp Vault — Documentation</a></li>
+<li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/best-practices.html">AWS KMS — Best Practices</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html">OWASP — Secrets Management Cheat Sheet</a></li>
+<li><a href="https://github.com/trufflesecurity/trufflehog">trufflehog — Find Leaked Credentials</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, Secrets, Vault, KMS, Rotation</p>
+</body>
+</html>

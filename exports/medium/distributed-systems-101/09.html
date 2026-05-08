@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Distributed Transactions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Distributed Transactions</h1>
+<blockquote>
+<p>Distributed Systems 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it take to make two databases either both succeed or both fail?</p>
+<blockquote>
+<p>A distributed transaction is not the work of imitating ACID; it is the work of designing for an eventually agreed-upon outcome.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between a single-node and a distributed transaction</li>
+<li>How 2-phase commit works and where it falls short</li>
+<li>The core of Saga — compensating transactions</li>
+<li>Why idempotency is the foundation of distributed transactions</li>
+<li>The outbox pattern you will see in real systems</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>As microservices and multi-store architectures grow, "two systems in one transaction" appears more often. Single-DB ACID is far more expensive — sometimes impossible — across multiple nodes. Distributed transactions are essentially design under explicit tradeoffs.</p>
+<blockquote>
+<p>A distributed transaction is the design of "recoverable inconsistency," not an imitation of ACID.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    C[&quot;coordinator&quot;] --&gt;|prepare| A[&quot;service A (DB)&quot;]
+    C --&gt;|prepare| B[&quot;service B (DB)&quot;]
+    A --&gt;|yes| C
+    B --&gt;|yes| C
+    C --&gt;|commit| A
+    C --&gt;|commit| B
+</code></pre>
+<p>The coordinator sends prepare to both, and only commits when both answer yes. That is 2PC.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>2PC</strong>: A protocol that gathers consent from all participants in two phases (prepare, commit).</li>
+<li><strong>Saga</strong>: A pattern that undoes a sequence of local transactions via compensation.</li>
+<li><strong>Compensation</strong>: An action that semantically reverses a previously committed step.</li>
+<li><strong>Outbox</strong>: A table that bundles the DB write and the message publish into the same transaction.</li>
+<li><strong>Idempotency</strong>: The property that doing the same request many times produces the same result.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — direct calls between services</strong></p>
+<pre><code class="language-text">service A succeeds / service B fails -&gt; data inconsistency
+</code></pre>
+<p><strong>After — Saga + compensation</strong></p>
+<pre><code class="language-text">service A succeeds / service B fails -&gt; compensate A -&gt; consistent end state
+</code></pre>
+<p>In distributed systems "rollback" is not going back in time — it is adding a new event.</p>
+<h2>Hands-on: Distributed Transaction Patterns</h2>
+<p><strong>Step 1 — single-DB transaction</strong></p>
+<pre><code class="language-python"># 1_single.py
+import sqlite3
+db = sqlite3.connect(&quot;:memory:&quot;)
+db.execute(&quot;CREATE TABLE acct(id TEXT, bal INT)&quot;)
+db.execute(&quot;INSERT INTO acct VALUES ('A', 100), ('B', 0)&quot;)
+with db:
+    db.execute(&quot;UPDATE acct SET bal=bal-30 WHERE id='A'&quot;)
+    db.execute(&quot;UPDATE acct SET bal=bal+30 WHERE id='B'&quot;)
+</code></pre>
+<p>Inside one DB, ACID is enough. The hard parts begin from the next step.</p>
+<p><strong>Step 2 — 2PC (pseudocode)</strong></p>
+<pre><code class="language-python"># 2_2pc.py
+def prepare(svc): return svc.prepare()    # yes/no
+def commit(svc):  svc.commit()
+def abort(svc):   svc.abort()
+def two_pc(svcs):
+    if all(prepare(s) for s in svcs):
+        for s in svcs: commit(s)
+    else:
+        for s in svcs: abort(s)
+</code></pre>
+<p>Commit only if every participant says yes. If the coordinator dies, participants can hold locks indefinitely — timeouts are essential.</p>
+<p><strong>Step 3 — Saga (compensation)</strong></p>
+<pre><code class="language-python"># 3_saga.py
+def book_flight():  return &quot;F1&quot;
+def book_hotel():   raise RuntimeError(&quot;no room&quot;)
+def cancel_flight(f): print(f&quot;cancel {f}&quot;)
+
+def saga():
+    f = book_flight()
+    try:
+        h = book_hotel()
+    except Exception:
+        cancel_flight(f)
+        raise
+saga()
+</code></pre>
+<p>Each step is a local commit. On failure, you semantically undo what you already did.</p>
+<p><strong>Step 4 — outbox pattern</strong></p>
+<pre><code class="language-python"># 4_outbox.py (pseudocode)
+# Inside one transaction:
+#   INSERT INTO orders ...
+#   INSERT INTO outbox(event=...) VALUES (...)
+# A separate worker reads outbox and publishes to the message broker.
+</code></pre>
+<p>The DB write and the message publish ride in the same transaction, avoiding the dual-write problem.</p>
+<p><strong>Step 5 — idempotent consumer</strong></p>
+<pre><code class="language-python"># 5_idem.py
+processed = set()
+def apply(event):
+    if event[&quot;id&quot;] in processed: return
+    processed.add(event[&quot;id&quot;])
+    # actual processing
+</code></pre>
+<p>The last safety net for distributed transactions. Even if the same message arrives twice, the result happens once.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>2PC is strong but holds locks long and is fragile to coordinator failure.</li>
+<li>Saga fits environments where failures are common — the meaning of compensation is defined by the domain.</li>
+<li>Outbox turns "write to two systems at once" into a single DB write.</li>
+<li>Idempotency is the common foundation under every pattern.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using 2PC by default in microservices.</strong> Availability and performance drop sharply.</li>
+<li><strong>Starting Saga without compensation.</strong> Partial failures become permanent inconsistencies.</li>
+<li><strong>Splitting message publish and DB write via dual-write.</strong> You cannot guarantee both succeed together.</li>
+<li><strong>Setting 2PC timeouts too short.</strong> Frequent false aborts hurt the business.</li>
+<li><strong>Forgetting idempotency.</strong> A single retry can charge a customer twice.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>XA/2PC still appears in RDBMS clusters and some brokers. Saga is the standard pattern in microservice payment and booking domains. Outbox is the most common workaround for distributed transactions in Kafka + DB stacks. Global cloud databases like Spanner and CockroachDB combine consensus and 2PC internally so that the user sees ACID.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They first ask, "Does this flow really need to be atomic?"</li>
+<li>Whenever possible they keep it inside a single DB transaction and use outbox to notify the world.</li>
+<li>They confirm with domain experts that Saga compensations are actually possible in business terms.</li>
+<li>Every failure branch ships with an operational automation script.</li>
+<li>They make idempotency keys a standard for every external call.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between 2PC and Saga in one line?</li>
+<li>[ ] Can you explain the problem the outbox pattern solves?</li>
+<li>[ ] Can you name one limitation of compensating transactions?</li>
+<li>[ ] Do you have a mental picture of where the idempotency key lives?</li>
+<li>[ ] Can you justify which pattern you'd pick for a payment flow?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Design a flight + hotel booking flow as a Saga and write the compensating steps.</li>
+<li>Explain the difference between dual-write and the outbox pattern in a paragraph.</li>
+<li>Construct a scenario where retrying a payment without an idempotency key is dangerous.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Distributed transactions are not about imitating ACID — they are about designing for "eventual agreement." In the final post we tie all the tools together into patterns for operable distributed systems.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Consensus and Raft</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/07-leader-election.md">Leader Election</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/08-message-queue-and-event-sourcing.md">Message Queues and Event Sourcing</a></li>
+<li><strong>Distributed Transactions (current)</strong></li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Two-phase_commit_protocol">Two-phase commit — Wikipedia</a></li>
+<li><a href="https://microservices.io/patterns/data/saga.html">Saga pattern — microservices.io</a></li>
+<li><a href="https://microservices.io/patterns/data/transactional-outbox.html">Transactional Outbox — microservices.io</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — chapter 9</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Transactions, TwoPhaseCommit, Saga, Idempotency</p>
+</body>
+</html>

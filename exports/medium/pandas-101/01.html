@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Pandas?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Pandas?</h1>
+<blockquote>
+<p>Pandas 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>Pandas</em> just <em>a fancy spreadsheet</em>, or <em>the lingua franca of data analysis</em>?</p>
+<blockquote>
+<p><em>Pandas is </em>Python's standard library for tabular data<em>, and it is the </em>front door<em> to data science.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>Pandas</em> and where it sits</li>
+<li>The intuition behind <em>Series</em> and <em>DataFrame</em></li>
+<li>The basic <em>load → inspect → summarize</em> workflow</li>
+<li>A 5-step first hands-on</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>CSV, Excel, databases, APIs — <em>80% of real-world data</em> is <em>tabular</em>. If you cannot drive <em>Pandas</em>, you cannot start <em>data analysis</em>.</p>
+<blockquote>
+<p><em>If your data fits in memory, Pandas is usually the right answer.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Source[&quot;CSV / Excel / DB&quot;] --&gt; DF[&quot;DataFrame&quot;]
+    DF --&gt; Ops[&quot;filter / group / join&quot;]
+    Ops --&gt; Out[&quot;chart / report / model&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Series</strong>: a <em>1D labeled array</em>.</li>
+<li><strong>DataFrame</strong>: a <em>2D labeled table</em> — both rows and columns have labels.</li>
+<li><strong>Index</strong>: the <em>label that identifies a row</em>.</li>
+<li><strong>dtype</strong>: the <em>type of each column</em> (int64, float64, object, datetime64).</li>
+<li><strong>Vectorization</strong>: column-wise computation <em>without explicit loops</em> — the core Pandas idiom.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"Loop over rows like Excel"</em> — chokes at 10K rows.</p>
+<p><strong>After</strong>: <em>"One DataFrame, one million rows"</em> — <em>vectorized operations</em> that are tens of times faster.</p>
+<h2>Hands-on: Your First Five Steps</h2>
+<p><strong>Step 1 — Install and import</strong></p>
+<pre><code class="language-python"># pip install pandas
+import pandas as pd
+print(pd.__version__)
+</code></pre>
+<p><strong>Step 2 — Build a Series</strong></p>
+<pre><code class="language-python">s = pd.Series([10, 20, 30], index=[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;])
+print(s)
+print(&quot;sum:&quot;, s.sum())
+</code></pre>
+<p><strong>Step 3 — Build a DataFrame</strong></p>
+<pre><code class="language-python">df = pd.DataFrame({
+    &quot;name&quot;: [&quot;Ada&quot;, &quot;Linus&quot;, &quot;Grace&quot;],
+    &quot;age&quot;: [36, 54, 85],
+})
+print(df)
+</code></pre>
+<p><strong>Step 4 — First summary</strong></p>
+<pre><code class="language-python">print(df.shape)
+print(df.dtypes)
+print(df.describe(include=&quot;all&quot;))
+</code></pre>
+<p><strong>Step 5 — First filter</strong></p>
+<pre><code class="language-python">print(df[df[&quot;age&quot;] &gt; 40])
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>DataFrame</em> is <em>column-oriented</em> — each column has its own dtype.</li>
+<li><em>describe()</em> is your <em>first numeric summary</em>.</li>
+<li><em>Boolean indexing</em> is the Pandas equivalent of SQL's <em>WHERE</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Iterating row by row with a <em>for</em> loop</strong> instead of vectorizing.</li>
+<li><strong>Skipping <em>dtype</em> checks</strong> — numbers loaded as strings.</li>
+<li><strong>Ignoring <em>SettingWithCopyWarning</em>.</strong></li>
+<li><strong>Misunderstanding the <em>index</em></strong> and forgetting <em>reset_index</em>.</li>
+<li><strong>Not watching memory</strong> — never calling <em>df.info()</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Data cleaning, report generation, ML preprocessing, dashboard prep — <em>every data pipeline starts in Pandas</em>. <em>Jupyter + Pandas</em> is the <em>default analysis kit</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always check <em>shape, dtypes, head</em> first.</li>
+<li>Reach for <em>apply</em> only after vectorization fails.</li>
+<li>Make the <em>index</em> a <em>meaningful key</em>.</li>
+<li>Be conscious of <em>view vs copy</em>.</li>
+<li>When memory is the limit, move to <em>Polars/Dask</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can build a <em>DataFrame</em>.</li>
+<li>[ ] I call <em>shape, dtypes, describe</em>.</li>
+<li>[ ] I can filter with <em>boolean indexing</em>.</li>
+<li>[ ] I know the difference between <em>Series</em> and <em>DataFrame</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <em>3x4</em> DataFrame and print the <em>mean of each column</em>.</li>
+<li>List <em>three differences</em> between a <em>Series</em> and a Python <em>list</em>.</li>
+<li>Compare <em>describe()</em> with and without <em>include="all"</em> and note what changes.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Pandas is the <em>standard language for tabular data</em>. Next we go deep into the <em>internal structure</em> of <em>Series and DataFrame</em>.</p>
+<ul>
+<li><strong>What Is Pandas? (current)</strong></li>
+<li>Series and DataFrame (upcoming)</li>
+<li>Reading CSV and Excel (upcoming)</li>
+<li>Filtering and Selection (upcoming)</li>
+<li>Handling Missing Values (upcoming)</li>
+<li>groupby (upcoming)</li>
+<li>Merge and Join (upcoming)</li>
+<li>Time Series (upcoming)</li>
+<li>apply and Vectorization (upcoming)</li>
+<li>Real-world Data Analysis (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/">pandas — Official Documentation</a></li>
+<li><a href="https://pandas.pydata.org/docs/user_guide/10min.html">10 Minutes to pandas</a></li>
+<li><a href="https://wesmckinney.com/book/">Wes McKinney — Python for Data Analysis</a></li>
+<li><a href="https://realpython.com/learning-paths/pandas-data-science/">Real Python — Pandas Tutorials</a></li>
+</ul>
+<p class="tags-line">Tags: Pandas, Python, DataAnalysis, DataFrame, Beginner</p>
+</body>
+</html>

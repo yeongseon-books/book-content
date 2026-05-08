@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Creating Pull Requests</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Creating Pull Requests</h1>
+<blockquote>
+<p>Open Source 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does a Pull Request that maintainers <em>welcome</em> actually look like?</p>
+<blockquote>
+<p>Small change, clear description, passing tests.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>fork → branch → PR</em> flow</li>
+<li><em>Commit message</em> conventions</li>
+<li>Writing a <em>PR description</em></li>
+<li>Responding to <em>reviews</em></li>
+<li>Cleanup <em>after merge</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>PR quality decides whether your contribution lands.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F[Fork] --&gt; B[Branch]
+    B --&gt; C[Commit]
+    C --&gt; P[Push]
+    P --&gt; O[Open PR]
+    O --&gt; R[Review]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>fork</strong>: Your copy of an upstream repo.</li>
+<li><strong>branch</strong>: A working line of commits.</li>
+<li><strong>commit</strong>: A unit of change.</li>
+<li><strong>PR</strong>: A merge request.</li>
+<li><strong>review</strong>: Code inspection.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "I push directly to main."</p>
+<p><strong>After</strong>: "I follow fork, branch, PR, every time."</p>
+<h2>Hands-on: Your First PR</h2>
+<p><strong>Step 1 — Fork and Clone</strong></p>
+<pre><code class="language-bash">gh repo fork owner/repo --clone
+cd repo
+</code></pre>
+<p><strong>Step 2 — Create a Branch</strong></p>
+<pre><code class="language-bash">git checkout -b fix/login-safari
+</code></pre>
+<p><strong>Step 3 — Commit</strong></p>
+<pre><code class="language-bash">git commit -m &quot;fix: handle Safari 15 cookie quirk&quot;
+</code></pre>
+<p><strong>Step 4 — Push</strong></p>
+<pre><code class="language-bash">git push origin fix/login-safari
+</code></pre>
+<p><strong>Step 5 — Open the PR</strong></p>
+<pre><code class="language-bash">gh pr create --title &quot;fix: Safari 15 login&quot; \
+  --body &quot;Closes #42&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Keep commits small.</li>
+<li>The title is a summary.</li>
+<li>The body is context.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Working on main.</strong></li>
+<li><strong>Vague commit messages.</strong></li>
+<li><strong>Opening a PR with no tests.</strong></li>
+<li><strong>Not linking the related issue.</strong></li>
+<li><strong>Ignoring review feedback.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Companies on trunk-based development also use PRs as the basic review unit.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A PR is a conversation.</li>
+<li>Small PRs merge fast.</li>
+<li>Tests are evidence.</li>
+<li>Description is courtesy.</li>
+<li>Review is learning.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Branch separated.</li>
+<li>[ ] Tests pass.</li>
+<li>[ ] Issue linked.</li>
+<li>[ ] Description clear.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: difference between fork and clone.</li>
+<li>One line: effect of the <em>Closes #N</em> keyword.</li>
+<li>One line: advantage of a small PR.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>A Good README</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
+<li><strong>Creating Pull Requests (current)</strong></li>
+<li>A Good README (upcoming)</li>
+<li>Release and Versioning (upcoming)</li>
+<li>Community Management (upcoming)</li>
+<li>The Maintainer Role (upcoming)</li>
+<li>An Open Source Portfolio (upcoming)</li>
+<li>My First Open Source Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/pull-requests">GitHub PR docs</a></li>
+<li><a href="https://www.conventionalcommits.org/">Conventional Commits</a></li>
+<li><a href="https://cbea.ms/git-commit/">How to write a Git commit message</a></li>
+<li><a href="https://cli.github.com/manual/gh_pr_create">gh CLI</a></li>
+</ul>
+<p class="tags-line">Tags: OpenSource, PullRequest, Git, GitHub, Beginner</p>
+</body>
+</html>

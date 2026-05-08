@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Observer Pattern</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Observer Pattern</h1>
+<blockquote>
+<p>Design Patterns 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When A changes, how do B, C, and D follow naturally?</p>
+<blockquote>
+<p>A only announces "I changed". B, C, and D <em>choose</em> to listen. That is Observer.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The problem Observer solves (tight coupling)</li>
+<li>Subject, Observer, subscribe, notify</li>
+<li>Synchronous vs asynchronous notification</li>
+<li>The link to domain events</li>
+<li>What to watch for when scaling to pub/sub</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If A <em>directly calls</em> B, C, and D when it changes, A knows all three. Observer turns those calls into <em>notifications</em>, so A no longer needs to know who is listening.</p>
+<blockquote>
+<p>Observer dissolves coupling into <em>notification</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Subject[&quot;Subject&quot;] --&gt; Notify[&quot;notify(event)&quot;]
+    Notify --&gt; ObsA[&quot;Observer A&quot;]
+    Notify --&gt; ObsB[&quot;Observer B&quot;]
+    Notify --&gt; ObsC[&quot;Observer C&quot;]
+</code></pre>
+<p>Subject pushes a message; Observers listen at will.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Subject</strong>: the publisher of changes.</li>
+<li><strong>Observer</strong>: the listener of notifications.</li>
+<li><strong>Subscribe/Unsubscribe</strong>: registering and removing listeners.</li>
+<li><strong>Event</strong>: the unit of data being notified.</li>
+<li><strong>Sync/Async</strong>: in-process call vs queued processing.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">class Order:
+    def submit(self):
+        self.save()
+        send_email_to(self.user)        # direct call
+        slack_notify(self.user)         # direct call
+        warehouse.reserve(self.items)   # direct call
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class Order:
+    def __init__(self, bus): self.bus = bus
+    def submit(self):
+        self.save()
+        self.bus.publish(&quot;order_submitted&quot;, {&quot;user&quot;: self.user, &quot;items&quot;: self.items})
+</code></pre>
+<p><code>Order</code> does not know who is listening.</p>
+<h2>Hands-on: Five Steps to Practice Observer</h2>
+<p><strong>Step 1 — A simple EventBus</strong></p>
+<pre><code class="language-python"># 1_bus.py
+class EventBus:
+    def __init__(self): self._subs = {}
+    def subscribe(self, topic, fn): self._subs.setdefault(topic, []).append(fn)
+    def publish(self, topic, event):
+        for fn in self._subs.get(topic, []):
+            fn(event)
+</code></pre>
+<p>The smallest possible Subject.</p>
+<p><strong>Step 2 — Register subscribers</strong></p>
+<pre><code class="language-python"># 2_subscribe.py
+bus = EventBus()
+bus.subscribe(&quot;order_submitted&quot;, lambda e: print(&quot;EMAIL:&quot;, e[&quot;user&quot;]))
+bus.subscribe(&quot;order_submitted&quot;, lambda e: print(&quot;SLACK:&quot;, e[&quot;user&quot;]))
+</code></pre>
+<p>Add new channels — the Subject stays the same.</p>
+<p><strong>Step 3 — Publish from the Subject</strong></p>
+<pre><code class="language-python"># 3_publish.py
+bus.publish(&quot;order_submitted&quot;, {&quot;user&quot;: &quot;u1&quot;, &quot;items&quot;: [&quot;a&quot;, &quot;b&quot;]})
+</code></pre>
+<p>Subject only announces "something happened".</p>
+<p><strong>Step 4 — Sync vs async</strong></p>
+<pre><code class="language-python"># 4_async.py
+import queue, threading
+q = queue.Queue()
+
+def worker():
+    while True:
+        topic, event = q.get()
+        for fn in bus._subs.get(topic, []):
+            fn(event)
+
+threading.Thread(target=worker, daemon=True).start()
+
+def async_publish(topic, event): q.put((topic, event))
+</code></pre>
+<p>Move to async and the Subject is no longer hostage to handler latency.</p>
+<p><strong>Step 5 — Unsubscribe</strong></p>
+<pre><code class="language-python"># 5_unsubscribe.py
+def unsubscribe(bus, topic, fn):
+    bus._subs.get(topic, []).remove(fn)
+</code></pre>
+<p>Tests and dynamic handlers must be able to detach.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Subject knows neither the <em>number</em> nor the <em>kind</em> of Observers.</li>
+<li>Adding a new behavior is not a <em>Subject change</em>.</li>
+<li>A path to async notification stays open.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Cyclic notification.</strong> A→B→A loops forever.</li>
+<li><strong>Heavy work in synchronous notification.</strong> Subject slows down.</li>
+<li><strong>Observer mutating the Subject directly.</strong> Notification becomes two-way.</li>
+<li><strong>Free-form event schemas.</strong> Producers and subscribers drift.</li>
+<li><strong>Swallowing handler errors.</strong> A failed Observer disappears silently.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Django signals, Spring's <code>ApplicationEventPublisher</code>, Kafka/Redis pub-sub, GitHub Webhooks — all bigger siblings of Observer. They often appear under the name <em>domain event</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Force notifications to flow one direction.</li>
+<li>Name events in <em>past tense</em> — <code>order_submitted</code>.</li>
+<li>Make schemas explicit — dataclasses, not free-form dicts.</li>
+<li>Report handler failures on a separate channel.</li>
+<li>Leave a path open for async dispatch.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the Subject avoid knowing its subscribers?</li>
+<li>[ ] Are notifications one-directional?</li>
+<li>[ ] Do event names describe <em>what happened</em>?</li>
+<li>[ ] Are handler errors isolated?</li>
+<li>[ ] Is the structure ready to go async?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Split mail/Slack/warehouse-reserve actions on payment success into Observers.</li>
+<li>Apply a dataclass-based event schema to your EventBus.</li>
+<li>Implement <code>unsubscribe</code> and write a unit test for it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Observer dissolves coupling into notification. The next post moves to object creation — Factory and Dependency Injection.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">The Adapter Pattern</a></li>
+<li><strong>The Observer Pattern (current)</strong></li>
+<li>Factory and Dependency Injection (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.guru/design-patterns/observer">Observer Pattern (refactoring.guru)</a></li>
+<li><a href="https://martinfowler.com/eaaDev/DomainEvent.html">Domain Events (Martin Fowler)</a></li>
+<li><a href="https://docs.djangoproject.com/en/stable/topics/signals/">Django Signals</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Publish-Subscribe Pattern (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Observer, PubSub, Events, Behavioral</p>
+</body>
+</html>

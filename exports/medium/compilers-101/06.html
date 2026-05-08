@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>intermediate representation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>intermediate representation</h1>
+<blockquote>
+<p>Compilers 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why not just go from the AST straight to machine code? Why insert another stage in the middle?</p>
+<blockquote>
+<p>An intermediate representation (IR) is a language simpler than an AST and more abstract than machine code. Optimization and multi-backend support all live on top of it.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What an IR is and why it exists</li>
+<li>The shape of three-address code (3AC)</li>
+<li>The intuition for SSA (static single assignment)</li>
+<li>The structure that lets one IR target many architectures</li>
+<li>Writing AST → IR lowering by hand</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The AST is a form for humans. Machine code is a form for the CPU. Without an IR between them, optimization is tightly coupled to the AST, and supporting a new CPU means rewriting every analysis. The IR splits the compiler cleanly into two halves — frontend and backend.</p>
+<blockquote>
+<p>The bridge that turns "M languages × N architectures" into "M + N" is the IR.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;AST (frontend)&quot;] --&gt; B[&quot;IR (3AC, SSA)&quot;]
+    B --&gt; C[&quot;optimizer (IR → IR)&quot;]
+    C --&gt; D[&quot;backend (x86, ARM, RISC-V)&quot;]
+</code></pre>
+<p>Once the IR is well defined, the optimizer and the backend only need to know the IR.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>IR (intermediate representation)</strong>: the middle language used inside the compiler.</li>
+<li><strong>Three-address code</strong>: at most three operands per line, like <code>t1 = a + b</code>.</li>
+<li><strong>Basic block</strong>: a straight-line sequence of instructions with no branches.</li>
+<li><strong>CFG (control flow graph)</strong>: a graph whose nodes are basic blocks.</li>
+<li><strong>SSA</strong>: every variable is assigned exactly once. It makes optimization simple.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — tree-based evaluation</strong></p>
+<pre><code class="language-python">ast = Bin(&quot;+&quot;, Num(1), Bin(&quot;*&quot;, Num(2), Num(3)))
+# evaluate recursively over the tree
+</code></pre>
+<p><strong>After — flat instruction sequence</strong></p>
+<pre><code class="language-text">t1 = 2 * 3
+t2 = 1 + t1
+return t2
+</code></pre>
+<p>It is much easier to analyze instruction by instruction.</p>
+<h2>Hands-on: AST → IR lowering</h2>
+<p><strong>Step 1 — Define IR instructions</strong></p>
+<pre><code class="language-python"># 1_ir.py
+from dataclasses import dataclass
+@dataclass
+class Inst:
+    op: str
+    dst: str
+    src1: object
+    src2: object = None
+</code></pre>
+<p>Four fields <code>(op, dst, src1, src2)</code> express almost every arithmetic, compare, or assignment.</p>
+<p><strong>Step 2 — Generating temporaries</strong></p>
+<pre><code class="language-python"># 2_temps.py
+class TempGen:
+    def __init__(self): self.n = 0
+    def fresh(self):
+        self.n += 1; return f&quot;t{self.n}&quot;
+
+g = TempGen()
+print(g.fresh(), g.fresh(), g.fresh())  # t1 t2 t3
+</code></pre>
+<p>Each intermediate value of an expression needs a name. A counter is enough.</p>
+<p><strong>Step 3 — Expression → 3AC</strong></p>
+<pre><code class="language-python"># 3_lower.py
+def lower(node, code, g):
+    kind = node[0]
+    if kind == &quot;NUM&quot;:
+        t = g.fresh(); code.append((&quot;LOAD&quot;, t, node[1])); return t
+    if kind == &quot;BIN&quot;:
+        l = lower(node[2], code, g)
+        r = lower(node[3], code, g)
+        t = g.fresh(); code.append((node[1], t, l, r)); return t
+
+g = TempGen(); code = []
+ast = (&quot;BIN&quot;,&quot;+&quot;,(&quot;NUM&quot;,1),(&quot;BIN&quot;,&quot;*&quot;,(&quot;NUM&quot;,2),(&quot;NUM&quot;,3)))
+result = lower(ast, code, g)
+for inst in code: print(inst)
+print(&quot;result:&quot;, result)
+</code></pre>
+<p>A single tree walk produces a flat instruction list. The result is in the last temporary.</p>
+<p><strong>Step 4 — Basic blocks and the CFG</strong></p>
+<pre><code class="language-python"># 4_cfg.py
+class Block:
+    def __init__(self, name):
+        self.name, self.insts, self.next = name, [], []
+
+entry = Block(&quot;entry&quot;); body = Block(&quot;body&quot;); exit_ = Block(&quot;exit&quot;)
+entry.next = [body]; body.next = [body, exit_]   # loop
+</code></pre>
+<p>The moment conditional branches and jumps appear, the IR becomes a graph. Optimization and analysis run on top of this graph.</p>
+<p><strong>Step 5 — A taste of SSA</strong></p>
+<pre><code class="language-python"># 5_ssa.py
+# code that assigns the same variable several times
+# x = 1
+# x = x + 2
+# return x
+
+# in SSA:
+# x1 = 1
+# x2 = x1 + 2
+# return x2
+</code></pre>
+<p>Index every variable to enforce "single assignment." That is SSA. Data-flow analysis becomes very simple.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>One operation per line is the heart of an IR.</li>
+<li>You can mint temporaries freely (the register allocator cleans up later).</li>
+<li>The AST is a tree; the IR is (usually) a graph.</li>
+<li>SSA is a representation for analysis, not for execution.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to optimize directly on the AST.</strong> The form is too rich on a tree, and analysis explodes.</li>
+<li><strong>Reusing temporary names too early to "optimize."</strong> You lose the benefit of SSA.</li>
+<li><strong>Forgetting that basic blocks split at labels too, not only at branches.</strong></li>
+<li><strong>Making the IR too architecture-dependent.</strong> New backends become painful.</li>
+<li><strong>Making the IR too abstract.</strong> Good code generation becomes hard.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>LLVM IR is the canonical example. Many languages (C/C++/Rust/Swift, etc.) lower to the same IR, share the same optimizations, and emit code for diverse architectures. CPython bytecode and Java bytecode are also a kind of IR.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>When meeting a new language, they first ask "can it lower to the existing IR?"</li>
+<li>IR design is a balance between simplicity and enough expressive power.</li>
+<li>They keep SSA as the default form for analysis.</li>
+<li>They carry source-level information (line, column) all the way through the IR (debug info).</li>
+<li>They keep backends written only against the IR, separated from the frontend.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you say in one sentence why an IR exists?</li>
+<li>[ ] Can you write down the shape of three-address code?</li>
+<li>[ ] Can you state the definition of a basic block?</li>
+<li>[ ] Do you have intuition for why SSA simplifies analysis?</li>
+<li>[ ] Have you accepted that the IR is the dividing line between frontend and backend?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add comparison operators (<code>&lt;</code>, <code>&gt;</code>) to the lower function above.</li>
+<li>Convert a single line <code>if (x &lt; 10) { ... } else { ... }</code> to IR by hand.</li>
+<li>Convert code that assigns the same variable twice into SSA form by hand.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The IR is the bridge that cleanly splits the compiler in half. The next post looks at the simplest — and most frequently used — two or three optimizations that run on top of it.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
+<li><strong>intermediate representation (current)</strong></li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Three-address_code">Three-address code (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Static_single-assignment_form">Static single-assignment form (Wikipedia)</a></li>
+<li><a href="https://llvm.org/docs/LangRef.html">LLVM Language Reference</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Control-flow_graph">Control-flow graph (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, IR, ThreeAddressCode, SSA</p>
+</body>
+</html>

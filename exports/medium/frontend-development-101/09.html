@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Build Tools and Bundling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Build Tools and Bundling</h1>
+<blockquote>
+<p>Frontend Development 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do the <em>hundreds</em> of files we write turn into the <em>one or two</em> files the browser actually downloads?</p>
+<blockquote>
+<p>Build tools <em>collect modules, compress them, and split them</em>. The shape of that output decides the <em>user experience</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>role</em> of a bundler (module graph, transform, split)</li>
+<li><em>Why</em> Vite and esbuild are fast</li>
+<li>Tree shaking and dead code elimination</li>
+<li>Finding <em>large modules</em> with bundle analysis</li>
+<li>Building per environment and basic optimization</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Bundle size is paid <em>directly</em> by your users. A 1MB bundle is <em>eight seconds of white screen</em> on a 3G connection. If you do not understand the build tool, you will not understand <em>why your product gets heavy</em>.</p>
+<blockquote>
+<p>A good bundle is <em>small, cacheable, and split</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Src[&quot;src/*.{js,ts,jsx}&quot;] --&gt; Resolver[&quot;Module resolver&quot;]
+    Resolver --&gt; Trans[&quot;Transformer (Babel/SWC/esbuild)&quot;]
+    Trans --&gt; Bundle[&quot;Bundler&quot;]
+    Bundle --&gt; Out[&quot;dist/*.js + assets&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Module bundler</strong>: a tool that <em>follows the import graph</em> and merges files.</li>
+<li><strong>Tree shaking</strong>: an optimization that <em>drops</em> unused exports.</li>
+<li><strong>Code splitting</strong>: cutting one bundle into <em>multiple chunks</em>.</li>
+<li><strong>Source map</strong>: the mapping that lets you debug built code <em>as the original</em>.</li>
+<li><strong>HMR (Hot Module Replacement)</strong>: applying changes during development <em>without a full page reload</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (dozens of <code>&lt;script&gt;</code> tags)</strong></p>
+<pre><code class="language-html">&lt;script src=&quot;utils.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;auth.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p><strong>After (one <code>&lt;script&gt;</code> plus automatic split)</strong></p>
+<pre><code class="language-html">&lt;script type=&quot;module&quot; src=&quot;/dist/index-[hash].js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<h2>Hands-on: Vite in Five Steps</h2>
+<p><strong>Step 1 — Create the project</strong></p>
+<pre><code class="language-bash">npm create vite@latest my-app -- --template react-ts
+cd my-app &amp;&amp; npm install
+</code></pre>
+<p><strong>Step 2 — Dev server (HMR)</strong></p>
+<pre><code class="language-bash">npm run dev
+# Browser: http://localhost:5173
+# The page updates *automatically* on code changes
+</code></pre>
+<p><strong>Step 3 — Production build</strong></p>
+<pre><code class="language-bash">npm run build
+# Static files appear in dist/
+ls -lh dist/assets
+</code></pre>
+<p><strong>Step 4 — Bundle analysis</strong></p>
+<pre><code class="language-bash">npm install -D rollup-plugin-visualizer
+</code></pre>
+<pre><code class="language-javascript">// vite.config.ts
+import { visualizer } from &quot;rollup-plugin-visualizer&quot;;
+export default {
+  plugins: [visualizer({ open: true })],
+};
+</code></pre>
+<p>After the build, <em>see which modules are large</em> visually.</p>
+<p><strong>Step 5 — Environment variables and modes</strong></p>
+<pre><code class="language-bash"># .env.production
+VITE_API_URL=https://api.example.com
+
+# In code
+const url = import.meta.env.VITE_API_URL;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The dev server serves <em>ESM directly</em>, so <em>startup is fast</em>.</li>
+<li>Build output filenames carry a <em>hash</em>, so they are <em>cacheable forever</em>.</li>
+<li>Bundle analysis is <em>the starting point of optimization</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Doing <code>import * as _ from "lodash"</code>.</strong> All of lodash lands in the bundle. Use <code>import debounce from "lodash/debounce"</code> for <em>per-function imports</em>.</li>
+<li><strong>Assuming dev server and production build behave the <em>same</em>.</strong> HMR code and source maps are heavy <em>if they reach production</em>.</li>
+<li><strong>Never <em>analyzing the bundle</em>.</strong> You will not know which library takes <em>4MB</em>.</li>
+<li><strong>Exposing <em>source maps in production</em>.</strong> Original code becomes <em>fully readable</em>.</li>
+<li><strong>Bundling <em>unoptimized images</em>.</strong> A 1MB image goes <em>as is</em> to the user.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most new projects use a <em>Vite + esbuild + SWC</em> stack. Larger monorepos are gradually moving to next-gen bundlers like <em>Turbopack/Rspack</em>. <em>Webpack</em> is still common but is slowly disappearing from <em>the default choice</em> for new projects.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Treats bundle size as a <em>budget</em> (for example, main &lt; 200KB).</li>
+<li>Looks at <em>bundle analysis weekly</em>.</li>
+<li>Checks <em>the size of a library</em> before adding it.</li>
+<li>Sends images and fonts through a separate <em>optimization pipeline</em>.</li>
+<li>Uses the <em>slowest user as the reference</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can scaffold a Vite project.</li>
+<li>[ ] You confirmed HMR works.</li>
+<li>[ ] You inspected the files inside <code>dist/</code>.</li>
+<li>[ ] You ran a bundle analyzer at least once.</li>
+<li>[ ] You can split dev and prod through environment variables.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Scaffold a React project with Vite, run <code>npm run build</code>, and inspect the <code>dist</code> folder.</li>
+<li>Use a bundle analyzer and write down which module is largest.</li>
+<li>Compare lodash with a <em>full import</em> versus <em>per-function import</em> and measure the bundle size difference.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Build tools decide <em>how fast the first screen the user sees becomes interactive</em>. In the final post we will pull every concept so far into <em>a small frontend app</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/08-styling-and-design-system.md">Styling and Design Systems</a></li>
+<li><strong>Build Tools and Bundling (current)</strong></li>
+<li>Building a Small Frontend App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://vitejs.dev/">Vite docs</a></li>
+<li><a href="https://esbuild.github.io/">esbuild docs</a></li>
+<li><a href="https://web.dev/reduce-javascript-payloads-with-tree-shaking/">web.dev: Reduce JavaScript payloads</a></li>
+<li><a href="https://bundlephobia.com/">Bundlephobia</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, Build, Vite, Bundling, Performance</p>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building the Demo</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building the Demo</h1>
+<blockquote>
+<p>Portfolio Project 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> should a <em>demo</em> prove <em>value</em> within <em>thirty seconds</em>?</p>
+<blockquote>
+<p>Visitors leave if they cannot feel <em>value</em> in <em>three clicks</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>demo scenario</em></li>
+<li><em>Seed data</em></li>
+<li><em>Video</em> vs <em>live</em></li>
+<li>A <em>demo account</em></li>
+<li><em>Failure fallback</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When a <em>demo</em> is <em>alive</em>, the <em>project</em> is <em>alive</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    L[Land] --&gt; S[Sample]
+    S --&gt; A[Action]
+    A --&gt; R[Result]
+    R --&gt; C[CTA]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>landing</strong>: the <em>first screen</em>.</li>
+<li><strong>seed</strong>: <em>demo data</em>.</li>
+<li><strong>demo account</strong>: a <em>shared login</em>.</li>
+<li><strong>video</strong>: a <em>backup</em> clip.</li>
+<li><strong>fallback</strong>: a <em>failure</em> response.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A <em>blank</em> screen after login.</p>
+<p><strong>After</strong>: <em>Seed + core flow</em> is visible.</p>
+<h2>Hands-on: Demo Table</h2>
+<p><strong>Step 1 — Scenario</strong></p>
+<pre><code class="language-python">flow = [&quot;land&quot;, &quot;sample&quot;, &quot;action&quot;, &quot;result&quot;]
+</code></pre>
+<p><strong>Step 2 — Seed data</strong></p>
+<pre><code class="language-python">seed = {&quot;users&quot;: 5, &quot;tasks&quot;: 12}
+</code></pre>
+<p><strong>Step 3 — Demo account</strong></p>
+<pre><code class="language-python">demo = {&quot;id&quot;: &quot;guest@demo&quot;, &quot;pw&quot;: &quot;demo1234&quot;}
+</code></pre>
+<p><strong>Step 4 — Backup video</strong></p>
+<pre><code class="language-python">video_url = &quot;https://youtu.be/example&quot;
+</code></pre>
+<p><strong>Step 5 — Healthcheck</strong></p>
+<pre><code class="language-python">health = &quot;/healthz&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>first screen</em> shows the <em>seed</em>.</li>
+<li>The <em>account</em> is <em>shared</em>.</li>
+<li>The <em>video</em> is a <em>backup</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stuck at <em>login</em>.</strong></li>
+<li><strong>No <em>seed</em> data.</strong></li>
+<li><strong>The <em>account</em> is <em>private</em>.</strong></li>
+<li><strong>No <em>backup video</em>.</strong></li>
+<li><strong>No <em>healthcheck</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>SaaS companies offer a <em>30-second guest mode</em> demo.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>first screen</em> matters <em>most</em>.</li>
+<li><em>Seed</em> is <em>required</em>.</li>
+<li>The <em>shared account</em> is <em>public</em>.</li>
+<li>The <em>video</em> is the <em>backup</em>.</li>
+<li><em>Healthcheck</em> watches <em>state</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Four-step</em> scenario.</li>
+<li>[ ] <em>Seed</em> data.</li>
+<li>[ ] <em>Shared</em> account.</li>
+<li>[ ] <em>Backup</em> video.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>demo scenario</em> in one line.</li>
+<li>State the purpose of <em>seed data</em> in one line.</li>
+<li>State the role of a <em>backup video</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Deploying the Project</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
+<li><strong>Building the Demo (current)</strong></li>
+<li>Deploying the Project (upcoming)</li>
+<li>Tests and Documentation (upcoming)</li>
+<li>Recording Tech Decisions (upcoming)</li>
+<li>Summarizing as Blog Posts (upcoming)</li>
+<li>Explaining in Interviews (upcoming)</li>
+<li>Portfolio Improvement Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.amazon.com/Demo-Driven-Development-Robert-Reppel/dp/B08GFL12CJ">Demo-Driven Development - Robert Reppel</a></li>
+<li><a href="https://greatdemo.com/">Great Demo - Peter Cohan</a></li>
+<li><a href="https://basecamp.com/shapeup/2.4-chapter-09">Showing the Product</a></li>
+<li><a href="https://devcenter.heroku.com/articles/heroku-button">Heroku Buttons</a></li>
+</ul>
+<p class="tags-line">Tags: Portfolio, Demo, UX, Showcase, Beginner</p>
+</body>
+</html>

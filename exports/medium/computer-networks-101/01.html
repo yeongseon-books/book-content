@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Network?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Network?</h1>
+<blockquote>
+<p>Computer Networks 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you hear the word "network", what picture should be in your head so that IP, TCP, DNS, and HTTP all sit on the same canvas later?</p>
+<blockquote>
+<p>A network is not cables. It is a bundle of agreements. Two computers exchange data only because they have agreed who speaks first, how to cut the data into pieces, and how to put it back together. Those agreements are protocols, and the way they stack on top of each other is the layered model. Before we start the series, draw that picture in your head.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between a network and the Internet</li>
+<li>Packets as the basic unit of data</li>
+<li>Why we need a layered model (OSI / TCP-IP)</li>
+<li>What the word "protocol" actually means</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, DNS, HTTP, TLS, BGP, NAT. If you memorize them without a mental picture, you cannot see how they connect, and you forget all of them. The layered model is the bookshelf where these words go. Without a shelf, the books pile on the floor and never come out again.</p>
+<blockquote>
+<p>Learning networking is not memorizing new words. It is deciding which shelf each word belongs on.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.</p>
+</blockquote>
+<pre><code class="language-text">[Application] HTTP, DNS, SMTP, gRPC ...
+[Transport]   TCP / UDP
+[Network]     IP, ICMP, routing
+[Link]        Ethernet, Wi-Fi
+[Physical]    electrical / optical / radio signals
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Packet</strong><br>
+- Meaning: The basic unit of data flowing across a network</p>
+<p><strong>Protocol</strong><br>
+- Meaning: An agreement (format + procedure) for two nodes to communicate</p>
+<p><strong>Layered model</strong><br>
+- Meaning: A structure that splits communication responsibility into layers</p>
+<p><strong>Host</strong><br>
+- Meaning: An endpoint of communication (computer, server, phone)</p>
+<p><strong>Router</strong><br>
+- Meaning: A device that forwards packets to the next network</p>
+<h2>Before / After</h2>
+<p><strong>Before — "the Internet is magic":</strong></p>
+<pre><code class="language-text">browser  →  ???  →  server
+the middle is one big black box
+</code></pre>
+<p><strong>After — "each layer has a responsibility":</strong></p>
+<pre><code class="language-text">HTTP (message) → TCP (reliability) → IP (routing) → Ethernet (link) → signal
+each layer wraps the upper layer's data in its own envelope (encapsulation)
+</code></pre>
+<p>Once you know the responsibility of each layer, you can isolate where a problem happened — application? TCP? routing?</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: see a packet round-trip with ping</strong></p>
+<pre><code class="language-bash">ping -c 3 example.com
+# 64 bytes from 93.184.216.34: icmp_seq=1 ttl=53 time=12.3 ms
+</code></pre>
+<p>ping uses ICMP, a network-layer protocol. The output shows the packet size, the round-trip time, and the TTL.</p>
+<p><strong>Step 2: see the path with traceroute</strong></p>
+<pre><code class="language-bash">traceroute example.com    # or mtr example.com
+# 1  router.local  1.1 ms
+# 2  isp-gw        5.4 ms
+# ...
+# N  93.184.216.34 12.3 ms
+</code></pre>
+<p>It prints the routers your packets cross from your machine to the destination, one per line. The fact that the Internet is "a router of routers of routers" becomes visible.</p>
+<p><strong>Step 3: the smallest client and server</strong></p>
+<pre><code class="language-python"># server.py
+import socket
+s = socket.socket()
+s.bind(('127.0.0.1', 5000)); s.listen()
+while True:
+    c, _ = s.accept()
+    c.sendall(b'hello\n'); c.close()
+</code></pre>
+<pre><code class="language-python"># client.py
+import socket
+s = socket.socket(); s.connect(('127.0.0.1', 5000))
+print(s.recv(1024))
+</code></pre>
+<p>A socket is the network interface that the OS exposes. It will keep showing up across the series.</p>
+<p><strong>Step 4: capture the packets</strong></p>
+<pre><code class="language-bash">sudo tcpdump -i lo -nn -c 5 'port 5000'
+# Run server/client above and you will see SYN, SYN-ACK, ACK, PSH+ACK, FIN
+</code></pre>
+<p>tcpdump and Wireshark are the X-rays of all networking learning. We will use them again in episode 4 (DNS) and episode 5 (HTTP).</p>
+<p><strong>Step 5: replay the flow with the layers in mind</strong></p>
+<p>Map the flow above to the layers.</p>
+<pre><code class="language-text">client.recv() ↔ server.sendall()    ← application layer (message)
+TCP            ↔ TCP                ← transport layer (connection, order, retransmission)
+IP(loopback)   ↔ IP(loopback)       ← network layer (routing)
+loopback driver                      ← link + physical layer
+</code></pre>
+<p>A single line of code triggers a five-layer collaboration.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Data is always cut into packets and reassembled</li>
+<li>Each layer wraps the upper layer's data in its own envelope (encapsulation) and hands it down</li>
+<li>ICMP, TCP, and IP are not abstractions in a textbook — they are real things you can see in ping and tcpdump</li>
+<li>"From my machine to that server" is always a collaboration of many routers</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Treating the Internet as one system</strong><br>
+- Problem: Ignores routing, AS, latency<br>
+- Fix: Run traceroute and see the reality</p>
+<p><strong>Knowing only HTTP, not TCP/IP</strong><br>
+- Problem: Cannot diagnose connection, retransmission, NAT issues<br>
+- Fix: Sort the words by layer</p>
+<p><strong>Blaming "DNS" for every failure</strong><br>
+- Problem: Wastes diagnosis time<br>
+- Fix: Cut the problem with ping → curl → tcpdump in order</p>
+<p><strong>Assuming packets always take the same path</strong><br>
+- Problem: Tracing flows fails<br>
+- Fix: The Internet routes per packet</p>
+<p><strong>Believing TCP is always reliable, UDP always lossy</strong><br>
+- Problem: Inaccurate<br>
+- Fix: Reliability vs speed is a tradeoff (episode 3)</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Backend APIs: HTTP/HTTPS over TCP, often HTTP/2 or HTTP/3</li>
+<li>Games and video calls: custom protocols on top of UDP</li>
+<li>Containers: virtual networks built with network namespaces</li>
+<li>CDNs: routing to the closest user plus caches</li>
+<li>Monitoring: layer-specific metrics (packet loss, RTT, HTTP 5xx) observed separately</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When a senior engineer hears about a network incident, the first question is "which layer is this?". Is it a 5xx in the service, a TCP retransmission storm, a DNS resolve failure, a routing problem? Without separating the layers, the discussion goes in circles forever. The layered model is not a textbook diagram — it is the first triage table for incident analysis.</p>
+<p>A senior also stays aware of the cost of every abstraction. A single HTTP request includes DNS, TCP handshake, TLS handshake, HTTP header transfer, and N router hops. Most of the time those costs are hidden, but during an incident the bill is itemized exactly along these lines.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between "network" and "the Internet"</li>
+<li>[ ] I know what packets, protocols, and the layered model are</li>
+<li>[ ] I have used ping, traceroute, and tcpdump at least once</li>
+<li>[ ] I know which layer HTTP runs on</li>
+<li>[ ] When something breaks, I ask "which layer?" first</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Run traceroute against a site you visit often, then summarize the number of routers and average RTT in one paragraph.</p>
+</li>
+<li>
+<p>Run the client/server above and capture it with tcpdump. Identify the SYN / SYN-ACK / ACK handshake yourself.</p>
+</li>
+<li>
+<p>Imagine an HTTP request just failed. Write a five-step procedure that says which layer to check first and which tool to use at each step.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A network is not cables but a bundle of agreements. Three words — packet, protocol, layered model — become the bookshelf for the entire series. Whenever a new word appears, the habit of asking "which shelf does this go on?" decides how fast you learn.</p>
+<p>Next we move to the most basic addressing system on the Internet — IP and subnet.</p>
+<ul>
+<li><strong>What Is a Network? (current)</strong></li>
+<li>IP and subnet (upcoming)</li>
+<li>TCP and UDP (upcoming)</li>
+<li>DNS (upcoming)</li>
+<li>HTTP and HTTPS (upcoming)</li>
+<li>TLS basics (upcoming)</li>
+<li>Routing and NAT (upcoming)</li>
+<li>Load Balancer (upcoming)</li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/computer-networks/P100000875375">Tanenbaum &amp; Wetherall — Computer Networks</a></li>
+<li><a href="https://gaia.cs.umass.edu/kurose_ross/">Kurose &amp; Ross — Computer Networking: A Top-Down Approach</a></li>
+<li><a href="https://beej.us/guide/bgnet/">Beej's Guide to Network Programming</a></li>
+<li><a href="https://www.cloudflare.com/learning/network-layer/what-is-the-internet/">Cloudflare Learning — What is the Internet?</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, Internet, Packet, Layered Model, OSI</p>
+</body>
+</html>

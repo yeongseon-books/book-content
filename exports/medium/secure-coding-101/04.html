@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authorization and Permissions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Authorization and Permissions</h1>
+<blockquote>
+<p>Secure Coding 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The user is logged in. But <em>who decides whether they may touch this resource</em>?</p>
+<blockquote>
+<p><em>Authorization is decided per </em>action and resource<em>, not just per </em>role<em>. The server decides — every time.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>RBAC</em> and <em>ABAC</em></li>
+<li>What <em>IDOR</em> is and how to defend</li>
+<li><em>Least privilege</em> in real code</li>
+<li>A five-step authorization flow</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>OWASP Top 10 is often led by <em>Broken Access Control</em>. Hiding a button in the UI is <em>not a defense</em>. Every decision must happen <em>on the server</em>.</p>
+<blockquote>
+<p><em>Authorize at the </em>resource<em> level, not just the </em>route<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Request[&quot;Request&quot;] --&gt; AuthN[&quot;AuthN (who)&quot;]
+    AuthN --&gt; Resource[&quot;Load resource&quot;]
+    Resource --&gt; AuthZ[&quot;AuthZ check&quot;]
+    AuthZ --&gt; Action[&quot;Perform action&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>RBAC</strong>: <em>role-based</em> (admin, editor, viewer).</li>
+<li><strong>ABAC</strong>: <em>attribute-based</em> (owner, department, time).</li>
+<li><strong>IDOR</strong>: changing the <em>id</em> to access someone else's resource.</li>
+<li><strong>Least privilege</strong>: <em>deny by default</em>, allow only what is needed.</li>
+<li><strong>Policy</strong>: decision rules kept <em>separate from business code</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A route checks <code>if user.role == 'admin'</code> and forgets to verify <em>ownership</em>.</p>
+<p><strong>After</strong>: Every resource call goes through <code>can(user, action, resource)</code> <em>explicitly</em>.</p>
+<h2>Hands-on: Authorization in Five Steps</h2>
+<p><strong>Step 1 — Attach an <em>owner</em> to the resource</strong></p>
+<pre><code class="language-python">class Post:
+    def __init__(self, id, author_id, content):
+        self.id, self.author_id, self.content = id, author_id, content
+</code></pre>
+<p><strong>Step 2 — Write a policy function</strong></p>
+<pre><code class="language-python">def can_edit(user, post) -&gt; bool:
+    return user.id == post.author_id or user.role == &quot;admin&quot;
+</code></pre>
+<p><strong>Step 3 — Check at the resource level</strong></p>
+<pre><code class="language-python">def edit_post(user, post_id, new_text):
+    post = posts.get(post_id)
+    if not can_edit(user, post):
+        raise PermissionError(&quot;forbidden&quot;)
+    post.content = new_text
+</code></pre>
+<p><strong>Step 4 — Filter list queries too</strong></p>
+<pre><code class="language-python">def my_posts(user):
+    return [p for p in posts.all() if p.author_id == user.id]
+</code></pre>
+<p><strong>Step 5 — Default deny</strong></p>
+<pre><code class="language-python">def authorize(user, action, resource):
+    handler = POLICIES.get(action)
+    if not handler:
+        raise PermissionError(&quot;no policy&quot;)  # default deny
+    if not handler(user, resource):
+        raise PermissionError(&quot;forbidden&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Policies live in <em>one place</em>.</li>
+<li>The <em>default</em> is <em>deny</em>.</li>
+<li>Resource-level checks <em>complement</em> route-level ones.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Replacing authorization with <em>UI hiding</em>.</strong> The API is still callable.</li>
+<li><strong>Trusting <code>?id=</code> and skipping the <em>ownership check</em>.</strong> The classic <em>IDOR</em>.</li>
+<li><strong>Checking <em>role only</em> and ignoring <em>resource ownership</em>.</strong> Editors see everything.</li>
+<li><strong>Spreading policies across <em>every route</em>.</strong> Miss one place and <em>all are at risk</em>.</li>
+<li><strong>Returning lists <em>without filtering</em>.</strong> The page leaks them anyway.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams keep a <em>policy module</em> (<code>policies.py</code>) and the route just calls <code>authorize(user, action, resource)</code>. Larger orgs adopt <em>OPA</em> or <em>Cedar</em> for cross-service policy.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Authorize at the </em>resource<em> boundary.</em></li>
+<li><em>Treat policies as </em>data<em>.</em></li>
+<li><em>The default is </em>deny<em>.</em></li>
+<li><em>List APIs need </em>permission filters<em> too.</em></li>
+<li><em>Permission changes go to the </em>audit log<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>can_*</code> functions live in <em>one module</em>.</li>
+<li>[ ] <em>Default deny</em> is enforced.</li>
+<li>[ ] <em>IDOR</em> defenses exist at the resource level.</li>
+<li>[ ] <em>List APIs</em> have <em>permission filters</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Give one example of using <em>RBAC</em> and <em>ABAC</em> together.</li>
+<li>Show one line that creates an <em>IDOR</em> and one line that fixes it.</li>
+<li>Design the schema for a <em>permission-change audit log</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once authorization is <em>explicit</em>, incidents stay <em>short</em>. Next we make the <em>resource itself safe</em> — <em>safe data storage</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><strong>Authorization and Permissions (current)</strong></li>
+<li>Safe Data Storage (upcoming)</li>
+<li>Secret and Key Management (upcoming)</li>
+<li>SQL Injection and Safe ORM Usage (upcoming)</li>
+<li>XSS and CSRF Defense (upcoming)</li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/">OWASP Top 10 — Broken Access Control</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP Authorization Cheat Sheet</a></li>
+<li><a href="https://csrc.nist.gov/projects/role-based-access-control">NIST RBAC</a></li>
+<li><a href="https://www.openpolicyagent.org/">Open Policy Agent</a></li>
+</ul>
+<p class="tags-line">Tags: Authorization, RBAC, ABAC, LeastPrivilege, SecureCoding</p>
+</body>
+</html>

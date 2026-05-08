@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Designing the Learning Path</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Designing the Learning Path</h1>
+<blockquote>
+<p>Data Science Career 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: In what order should you learn what?</p>
+<blockquote>
+<p>Fundamentals to analytics to modeling to product.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>12-week roadmap</em></li>
+<li><em>Fundamentals</em> (4 weeks)</li>
+<li><em>Analytics</em> (4 weeks)</li>
+<li><em>Modeling</em> (4 weeks)</li>
+<li><em>Weekly review</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Random study burns you out. A path keeps you going.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F[Fundamentals] --&gt; A[Analytics]
+    A --&gt; M[Modeling]
+    M --&gt; P[Product]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>fundamentals</strong>: Core building blocks.</li>
+<li><strong>analytics</strong>: Question-driven analysis.</li>
+<li><strong>modeling</strong>: Predictive modeling.</li>
+<li><strong>product sense</strong>: Sense of user impact.</li>
+<li><strong>retro</strong>: Periodic reflection.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "I just buy books and stall."</p>
+<p><strong>After</strong>: "A 12-week roadmap with weekly artifacts."</p>
+<h2>Hands-on: 12-Week Learning Path</h2>
+<p><strong>Step 1 — Fundamentals (Weeks 1-4)</strong></p>
+<pre><code class="language-text">- Python syntax, pandas
+- SQL JOIN, GROUP BY
+- Statistics basics (mean, variance, p-value)
+- Visualization (matplotlib)
+</code></pre>
+<p><strong>Step 2 — Analytics (Weeks 5-8)</strong></p>
+<pre><code class="language-text">- Data cleaning
+- A/B test design
+- One dashboard
+- One case study
+</code></pre>
+<p><strong>Step 3 — Modeling (Weeks 9-12)</strong></p>
+<pre><code class="language-text">- One regression, one classification
+- scikit-learn pipeline
+- Model evaluation metrics
+- One mini project
+</code></pre>
+<p><strong>Step 4 — Weekly Artifact</strong></p>
+<pre><code class="language-markdown">- README
+- Data source
+- Code
+- Result
+- Retro
+</code></pre>
+<p><strong>Step 5 — Retro Template</strong></p>
+<pre><code class="language-text">What went well / Improve / Next
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Weekly artifacts are progress evidence.</li>
+<li>Fundamentals carry modeling.</li>
+<li>Retros close the loop.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Reading a book cover-to-cover first.</strong></li>
+<li><strong>Starting from models.</strong></li>
+<li><strong>No artifacts.</strong></li>
+<li><strong>Skipping retros.</strong></li>
+<li><strong>Switching tools frequently.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Bootcamps run on roughly the same 12-week roadmap.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Fundamentals compound.</li>
+<li>Weekly evidence wins.</li>
+<li>Retros direct you.</li>
+<li>Projects integrate.</li>
+<li>Sustainment is strategy.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] 12-week calendar.</li>
+<li>[ ] Weekly artifact template.</li>
+<li>[ ] One project.</li>
+<li>[ ] Four retros.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: define fundamentals.</li>
+<li>One line: example of a retro.</li>
+<li>One line: criterion for a weekly artifact.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>The Data Portfolio</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/01-what-is-data-career.md">What Is a Data Career</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/02-analyst-scientist-engineer.md">Analyst vs Scientist vs Engineer</a></li>
+<li><strong>Designing the Learning Path (current)</strong></li>
+<li>The Data Portfolio (upcoming)</li>
+<li>SQL and Analytics Interviews (upcoming)</li>
+<li>The ML Interview (upcoming)</li>
+<li>The Case Interview (upcoming)</li>
+<li>Settling into the First Data Job (upcoming)</li>
+<li>Building Domain Expertise (upcoming)</li>
+<li>The Path to Senior in Data (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mode.com/sql-tutorial/">Mode SQL Tutorial</a></li>
+<li><a href="https://pandas.pydata.org/docs/">pandas docs</a></li>
+<li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn user guide</a></li>
+<li><a href="https://experimentguide.com/">Trustworthy Online Controlled Experiments</a></li>
+</ul>
+<p class="tags-line">Tags: DataCareer, LearningPath, SQL, Python, Beginner</p>
+</body>
+</html>

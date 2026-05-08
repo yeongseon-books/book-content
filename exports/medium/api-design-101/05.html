@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Request and Response Schemas</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Request and Response Schemas</h1>
+<blockquote>
+<p>API Design 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you define the <em>shape of the data</em> an API exchanges so that it does not wobble?</p>
+<blockquote>
+<p>Treat the schema as a <em>contract outside the code</em>, and validate at the <em>boundary</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>JSON and content types</li>
+<li>Field naming conventions</li>
+<li>Where and how to validate</li>
+<li>Handling dates, time zones, and numbers</li>
+<li>Stability principles for response schemas</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If schemas wobble, <em>everything</em> on the client wobbles. Good schemas are <em>readable</em> and <em>evolvable</em>. Validating at the boundary keeps the inner code <em>clean</em>.</p>
+<blockquote>
+<p>A schema is the <em>grammar</em> of your data.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;client&quot;] --&gt;|&quot;JSON request&quot;| Validate[&quot;validate&quot;]
+    Validate --&gt;|&quot;typed object&quot;| Handler[&quot;handler&quot;]
+    Handler --&gt;|&quot;typed object&quot;| Serialize[&quot;serialize&quot;]
+    Serialize --&gt;|&quot;JSON response&quot;| Client
+</code></pre>
+<p>Validate at the entrance; serialize at the exit.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Schema</strong>: the format and meaning of data.</li>
+<li><strong>Content-Type</strong>: the body's representation — <code>application/json</code> and friends.</li>
+<li><strong>Validation</strong>: checking incoming data against the schema.</li>
+<li><strong>Serialization</strong>: turning internal objects into an external representation.</li>
+<li><strong>ISO 8601</strong>: the <em>standard</em> notation for dates and times.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (free form)</strong></p>
+<pre><code class="language-json">{&quot;u&quot;: &quot;Y&quot;, &quot;ct&quot;: 1714800000, &quot;act&quot;: &quot;ok&quot;}
+</code></pre>
+<p><strong>After (meaningful schema)</strong></p>
+<pre><code class="language-json">{
+  &quot;username&quot;: &quot;yeongseon&quot;,
+  &quot;created_at&quot;: &quot;2026-05-04T12:00:00Z&quot;,
+  &quot;active&quot;: true
+}
+</code></pre>
+<p>You read it once and know what it is.</p>
+<h2>Hands-on: Five Steps Through Schemas</h2>
+<p><strong>Step 1 — JSON body and headers</strong></p>
+<pre><code class="language-python"># 1_json.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+@app.post(&quot;/echo&quot;)
+def echo():
+    if request.headers.get(&quot;Content-Type&quot;) != &quot;application/json&quot;:
+        return jsonify(error=&quot;json required&quot;), 415
+    return jsonify(request.get_json())
+</code></pre>
+<p>The <em>server</em> checks the content type.</p>
+<p><strong>Step 2 — Validation library</strong></p>
+<pre><code class="language-python"># 2_validate.py
+from pydantic import BaseModel, Field
+class CreateUser(BaseModel):
+    username: str = Field(min_length=3, max_length=32)
+    email: str
+</code></pre>
+<p>Pydantic, marshmallow, and friends express schemas as <em>code</em>.</p>
+<p><strong>Step 3 — Separate response schema</strong></p>
+<pre><code class="language-python"># 3_response.py
+from pydantic import BaseModel
+class UserOut(BaseModel):
+    id: int
+    username: str
+    created_at: str   # ISO 8601 string
+</code></pre>
+<p>Input and output are <em>different schemas</em> — common naming is <code>In</code> / <code>Out</code>.</p>
+<p><strong>Step 4 — Dates and time zones</strong></p>
+<pre><code class="language-python"># 4_time.py
+from datetime import datetime, timezone
+now = datetime.now(timezone.utc).isoformat()
+print(now)   # &quot;2026-05-04T12:00:00+00:00&quot;
+</code></pre>
+<p>Store and transmit in <em>UTC + ISO 8601</em>.</p>
+<p><strong>Step 5 — Numbers and money</strong></p>
+<pre><code class="language-python"># 5_money.py
+# Money: integer minor units — 1.99 USD = 199 cents
+amount = 199
+currency = &quot;USD&quot;
+</code></pre>
+<p>Never use floats for money.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Validation and the handler are <em>separated</em>.</li>
+<li>Input and output schemas are distinct.</li>
+<li>Time is UTC, money is integer.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Validation inside the handler.</strong> The handler gets dirty and the same checks repeat.</li>
+<li><strong>Returning the internal model directly.</strong> Internal change becomes external break.</li>
+<li><strong>Ignoring time zones.</strong> Each client interprets time differently.</li>
+<li><strong>Floats for money.</strong> A cent disappears to rounding.</li>
+<li><strong>Cryptic field names.</strong> <code>u</code>, <code>ct</code>, <code>act</code> — unreadable in six months.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large APIs converge on <em>snake_case</em>, ISO 8601, and integer minor-unit currency (Stripe). Frameworks like FastAPI and NestJS turn schemas into <em>decorators</em> — schema is documentation, validation, and type, all at once.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Put the schema at the <em>first line</em> of the boundary.</li>
+<li>Make inputs strict; make outputs evolvable.</li>
+<li>Use <em>standard</em> formats for time and money.</li>
+<li>Add new fields; never reinterpret existing ones.</li>
+<li>Design responses so clients can <em>ignore unknown fields</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does every endpoint have an input schema?</li>
+<li>[ ] Are response schemas separate from input?</li>
+<li>[ ] Are timestamps in UTC + ISO 8601?</li>
+<li>[ ] Is money in integer minor units?</li>
+<li>[ ] Are field names spelled out enough to <em>read</em>?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Express your most-used response schema as a Pydantic model.</li>
+<li>Outline how to migrate data accidentally stored in KST back to UTC.</li>
+<li>Decide whether your input schema should <em>reject</em> or <em>ignore</em> unknown fields, and write down the trade-offs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Schemas are the grammar of data. The next episode tackles a topic that no list endpoint can avoid — pagination and filtering.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><strong>Request and Response Schemas (current)</strong></li>
+<li>Pagination and Filtering (upcoming)</li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://json-schema.org/">JSON Schema</a></li>
+<li><a href="https://docs.pydantic.dev/">pydantic Documentation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 Date and Time Format</a></li>
+<li><a href="https://stripe.com/docs/currencies">Stripe API: Working with Money</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, JSON, Schema, Validation, Backend</p>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Factory and Dependency Injection</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Factory and Dependency Injection</h1>
+<blockquote>
+<p>Design Patterns 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>When, where, and who</em> should create the objects in our system?</p>
+<blockquote>
+<p>Not inside the domain. Assemble them in <em>one outside place</em> and inject them. That place is the Composition Root, and the tools are Factory and DI.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The cost of scattered creation responsibility</li>
+<li>The role of the Factory</li>
+<li>The thinking behind Dependency Injection</li>
+<li>What the Composition Root is</li>
+<li>When a DI container starts to earn its keep</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When the domain creates its own dependencies, it learns <em>how to make</em> them. Factory and DI separate "<em>what</em> you use" from "<em>how</em> it is built".</p>
+<blockquote>
+<p>Separating "use" from "assembly" makes testing and substitution easy.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Root[&quot;Composition Root (main)&quot;] --&gt; F[&quot;Factory&quot;]
+    F --&gt; Obj[&quot;Object graph&quot;]
+    Root --&gt; Inj[&quot;Inject into domain&quot;]
+    Inj --&gt; Domain[&quot;Domain code&quot;]
+</code></pre>
+<p>Assemble in one place; use in many.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Factory</strong>: a function or object that encapsulates creation steps.</li>
+<li><strong>Dependency Injection</strong>: providing dependencies from outside.</li>
+<li><strong>Composition Root</strong>: the single entry point that wires the object graph.</li>
+<li><strong>Constructor injection</strong>: injection through <code>__init__</code>.</li>
+<li><strong>DI container</strong>: an automatic wiring tool (use only when needed).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">class OrderService:
+    def __init__(self):
+        self.repo = PostgresOrderRepo(&quot;dsn&quot;)
+        self.mailer = SmtpMailer(&quot;smtp.example.com&quot;)
+        self.bus = EventBus()
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class OrderService:
+    def __init__(self, repo, mailer, bus):
+        self.repo, self.mailer, self.bus = repo, mailer, bus
+</code></pre>
+<p><code>OrderService</code> does not <em>choose</em> its collaborators.</p>
+<h2>Hands-on: Five Steps to Practice Factory and DI</h2>
+<p><strong>Step 1 — Factory function</strong></p>
+<pre><code class="language-python"># 1_factory.py
+def make_mailer(env):
+    if env == &quot;prod&quot;:
+        return SmtpMailer(&quot;smtp.example.com&quot;)
+    return InMemoryMailer()
+</code></pre>
+<p>Lift the construction branch out of the domain.</p>
+<p><strong>Step 2 — Constructor injection</strong></p>
+<pre><code class="language-python"># 2_ctor.py
+class OrderService:
+    def __init__(self, repo, mailer):
+        self.repo, self.mailer = repo, mailer
+</code></pre>
+<p>The domain works with whatever is <em>given</em> to it.</p>
+<p><strong>Step 3 — Composition Root</strong></p>
+<pre><code class="language-python"># 3_main.py
+def main():
+    repo = PostgresOrderRepo(os.environ[&quot;DSN&quot;])
+    mailer = make_mailer(os.environ[&quot;ENV&quot;])
+    service = OrderService(repo, mailer)
+    service.run()
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre>
+<p>Assemble in <code>main</code> (or a bootstrap function) — one place.</p>
+<p><strong>Step 4 — Injection in tests</strong></p>
+<pre><code class="language-python"># 4_test.py
+def test_submit():
+    repo = InMemoryOrderRepo()
+    mailer = InMemoryMailer()
+    svc = OrderService(repo, mailer)
+    svc.submit(...)
+    assert mailer.sent == 1
+</code></pre>
+<p>Tests bypass <code>main</code> and assemble <em>directly</em>.</p>
+<p><strong>Step 5 — DI container (optional)</strong></p>
+<pre><code class="language-python"># 5_container.py
+# A tiny hand-rolled container — only when truly needed.
+class Container:
+    def __init__(self): self._reg = {}
+    def register(self, key, factory): self._reg[key] = factory
+    def get(self, key): return self._reg[key]()
+</code></pre>
+<p>For most projects, hand-wiring is simpler.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The domain only <em>receives</em> dependencies.</li>
+<li>Environment differences (prod/dev/test) live as a single branch in the Composition Root.</li>
+<li>Tests <em>create</em> fakes and inject them.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Domain code reading environment variables.</strong> Assembly leaks in.</li>
+<li><strong>Factory holding business logic.</strong> Creation and policy mix.</li>
+<li><strong>Overusing a DI container.</strong> Invisible magic explodes debugging cost.</li>
+<li><strong>Routing around cycles via the container.</strong> Hides a design problem.</li>
+<li><strong>Injecting a container everywhere.</strong> Heavyweight for simple work.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>FastAPI's <code>Depends</code>, Spring's <code>@Autowired</code>, Guice/Dagger, backend selection in Django settings — all DI/Factory in shape. Composition Root thinking carries straight into microservice bootstraps.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always ask "who builds this object?"</li>
+<li>Assembly <em>outside</em>, use <em>inside</em>.</li>
+<li>Reach for a container only at real scale.</li>
+<li>Environment differences belong in the Composition Root.</li>
+<li>Factories <em>create only</em> — policy stays in the domain.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the domain avoid reading environment variables?</li>
+<li>[ ] Is the Composition Root in <em>one place</em>?</li>
+<li>[ ] Does the Factory hold no policy?</li>
+<li>[ ] Have you considered whether a container is really needed?</li>
+<li>[ ] Can tests assemble objects on their own?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a Factory that returns a different Mailer per environment.</li>
+<li>Refactor <code>OrderService</code> to constructor injection and add tests.</li>
+<li>Wire DB, mailer, and event bus together in a Composition Root.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Factory and DI separate "assembly" from "use". The next post turns the lens on the <em>cost</em> of patterns — how to avoid overuse.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/05-strategy-pattern.md">The Strategy Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/06-adapter-pattern.md">The Adapter Pattern</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/07-observer-pattern.md">The Observer Pattern</a></li>
+<li><strong>Factory and Dependency Injection (current)</strong></li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.guru/design-patterns/factory-method">Factory Method (refactoring.guru)</a></li>
+<li><a href="https://martinfowler.com/articles/injection.html">Inversion of Control Containers and the Dependency Injection pattern (Martin Fowler)</a></li>
+<li><a href="https://blog.ploeh.dk/2011/07/28/CompositionRoot/">Composition Root (Mark Seemann)</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/dependencies/">FastAPI Dependencies</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Factory, DependencyInjection, Composition, IoC</p>
+</body>
+</html>

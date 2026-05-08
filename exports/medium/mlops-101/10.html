@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Production ML System</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Production ML System</h1>
+<blockquote>
+<p>MLOps 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you assemble the <em>nine pieces</em> from this series into <em>one running production system</em>?</p>
+<blockquote>
+<p><em>A production ML system runs the loop of data → training → deployment → monitoring → retraining automatically.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The full system blueprint</li>
+<li>How nine components connect</li>
+<li>Runbooks and on-call</li>
+<li>Maturity stages</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowing each tool individually does not give you a system. The wiring and the boundaries are the real work.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;data versioning&quot;] --&gt; Pipe[&quot;training pipeline&quot;]
+    Pipe --&gt; Reg[&quot;model registry&quot;]
+    Reg --&gt; Deploy[&quot;deployment&quot;]
+    Deploy --&gt; Mon[&quot;monitoring&quot;]
+    Mon --&gt; Drift[&quot;drift&quot;]
+    Drift --&gt; Retrain[&quot;retraining&quot;]
+    Retrain --&gt; Pipe
+    Feat[&quot;feature store&quot;] --&gt; Pipe
+    Feat --&gt; Deploy
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>MLOps maturity</strong>: manual → automated → autonomous stages.</li>
+<li><strong>Runbook</strong>: documented response to an alert.</li>
+<li><strong>On-call</strong>: rotating responsibility for incidents.</li>
+<li><strong>SLI/SLO</strong>: indicators and objectives.</li>
+<li><strong>Postmortem</strong>: blameless review after an incident.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: notebook training, manual deploys, users report outages.</p>
+<p><strong>After</strong>: a DAG runs data → model → alerts on its own.</p>
+<h2>Hands-on: Encode the Maturity Checklist</h2>
+<p><strong>Step 1 — Check items</strong></p>
+<pre><code class="language-python">checks = {
+    &quot;data_versioned&quot;: True,
+    &quot;pipeline_dag&quot;: True,
+    &quot;model_registry&quot;: True,
+    &quot;container_image&quot;: True,
+    &quot;metrics_endpoint&quot;: True,
+    &quot;drift_alert&quot;: False,
+    &quot;retraining_trigger&quot;: False,
+    &quot;feature_store&quot;: False,
+    &quot;runbook&quot;: True,
+}
+</code></pre>
+<p><strong>Step 2 — Maturity score</strong></p>
+<pre><code class="language-python">def maturity(checks: dict) -&gt; str:
+    score = sum(checks.values())
+    if score &gt;= 8:
+        return &quot;production&quot;
+    if score &gt;= 5:
+        return &quot;transitional&quot;
+    return &quot;early&quot;
+
+print(maturity(checks))
+</code></pre>
+<p><strong>Step 3 — Report what is missing</strong></p>
+<pre><code class="language-python">def missing(checks: dict) -&gt; list:
+    return [k for k, v in checks.items() if not v]
+
+print(missing(checks))
+</code></pre>
+<p><strong>Step 4 — Pick the next thing</strong></p>
+<pre><code class="language-python">def next_step(missing_items: list) -&gt; str:
+    priority = [&quot;drift_alert&quot;, &quot;retraining_trigger&quot;, &quot;feature_store&quot;]
+    for p in priority:
+        if p in missing_items:
+            return p
+    return &quot;done&quot;
+
+print(next_step(missing(checks)))
+</code></pre>
+<p><strong>Step 5 — Status line for the team chat</strong></p>
+<pre><code class="language-python">def status_line(checks: dict) -&gt; str:
+    return f&quot;{maturity(checks)} | next={next_step(missing(checks))}&quot;
+
+print(status_line(checks))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A checklist as code makes progress visible.</li>
+<li>The maturity score is a shared bar.</li>
+<li>Picking the <em>next</em> one item is enough to keep moving.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to install all components at once.</strong></li>
+<li><strong>Buying tools while ignoring organizational change.</strong></li>
+<li><strong>Wiring alerts before defining SLOs.</strong></li>
+<li><strong>Going on-call without runbooks.</strong></li>
+<li><strong>Repeating the same incident — no postmortem culture.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A fintech runs a payments model on Airflow + MLflow + Feast + Prometheus, with on-call engineers paged using runbooks attached to every alert.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Start small, grow one component at a time.</li>
+<li>Make boundaries explicit (teams and systems).</li>
+<li>Alerts mean <em>action</em> — informational signals belong on dashboards.</li>
+<li>Change one thing at a time.</li>
+<li>Documentation is part of the system.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Data versioning is in place.</li>
+<li>[ ] Training runs as a DAG.</li>
+<li>[ ] A model registry exists.</li>
+<li>[ ] Monitoring and drift detection are live.</li>
+<li>[ ] A retraining trigger is connected.</li>
+<li>[ ] Runbooks and on-call rotation exist.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick the three components your team lacks and draft a six-week rollout plan.</li>
+<li>Which component is most likely to break a <code>99% &lt; 200ms</code> SLO?</li>
+<li>Name two organizational risks that automated retraining introduces.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This series gave you the basic circuitry of MLOps. Now go pick <em>one</em> component and ship it inside a real project.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/01-what-is-mlops.md">What is MLOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/02-experiment-tracking.md">Experiment Tracking</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/03-data-versioning.md">Data Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/04-training-pipeline.md">Model Training Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/05-model-deployment.md">Model Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/06-model-monitoring.md">Model Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/07-data-and-model-drift.md">Data Drift and Model Drift</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/08-retraining.md">Retraining</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/mlops-101/en/09-feature-store.md">Feature Store</a></li>
+<li><strong>Building a Production ML System (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning">Google — MLOps maturity</a></li>
+<li><a href="https://learn.microsoft.com/azure/architecture/example-scenario/mlops/mlops-maturity-model">Microsoft — MLOps maturity model</a></li>
+<li><a href="https://madewithml.com/">Made With ML</a></li>
+<li><a href="https://papers.nips.cc/paper_files/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html">Hidden Technical Debt in ML Systems</a></li>
+</ul>
+<p class="tags-line">Tags: MLOps, Architecture, Production, DataScience, Pipeline</p>
+</body>
+</html>

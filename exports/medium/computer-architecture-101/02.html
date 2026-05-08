@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data Representation — Bit, Byte, Integer, Floating Point</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data Representation — Bit, Byte, Integer, Floating Point</h1>
+<blockquote>
+<p>Computer Architecture 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is <code>0.1 + 0.2 == 0.3</code> false — is that a Python bug, or is the computer telling the truth?</p>
+<blockquote>
+<p>Computers store everything as bundles of zeros and ones. Integers use two's complement, real numbers use IEEE 754 floating point, and both come with limits on range and precision. This article walks through how those limits show up in real code and how to handle them deliberately.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definitions of bit, byte, and word</li>
+<li>Integer representation (unsigned and two's complement)</li>
+<li>The structure of IEEE 754 floating point</li>
+<li>How to handle overflow and precision loss</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you do not understand representation, you meet the most common bugs head-on. Integer overflow vulnerabilities, accounting systems that fail because of float comparison, permission errors from a wrong bitmask — all of them come from ignoring the layer below the type. Every variable in every language is, in the end, a bit pattern in memory.</p>
+<blockquote>
+<p>Integers are exact but finite. Floats are wide but imprecise. Both must be used with their limits in mind.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A bit is 0 or 1; a byte is 8 bits. Integers are stored as unsigned or two's complement. Real numbers follow IEEE 754: sign, exponent, and mantissa. Single precision (float32) and double precision (float64) trade range for precision.</p>
+</blockquote>
+<pre><code class="language-text">Unsigned 8-bit:   0 to 255
+Signed 8-bit:    -128 to 127  (two's complement)
+
+float64 = | sign 1 bit | exponent 11 bits | mantissa 52 bits |
+          ~ 15 to 17 decimal digits of precision
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>bit</strong><br>
+- Description: 0 or 1, the smallest unit of information</p>
+<p><strong>byte</strong><br>
+- Description: 8 bits, the basic unit of memory addressing</p>
+<p><strong>word</strong><br>
+- Description: The CPU's natural width, often 64 bits</p>
+<p><strong>Two's complement</strong><br>
+- Description: Standard way to encode negative integers</p>
+<p><strong>IEEE 754</strong><br>
+- Description: International standard for floating point</p>
+<p><strong>Overflow</strong><br>
+- Description: A result outside the representable range</p>
+<h2>Before / After</h2>
+<p><strong>Before — code unaware of representation limits:</strong></p>
+<pre><code class="language-python">balance = 0.1 + 0.2
+if balance == 0.3:
+    print(&quot;exact&quot;)
+else:
+    print(&quot;not exact&quot;)  # this branch wins
+</code></pre>
+<p><strong>After — code aware of the limits:</strong></p>
+<pre><code class="language-python">from decimal import Decimal
+
+balance = Decimal(&quot;0.1&quot;) + Decimal(&quot;0.2&quot;)
+print(balance == Decimal(&quot;0.3&quot;))   # True
+
+import math
+print(math.isclose(0.1 + 0.2, 0.3))   # True
+</code></pre>
+<p>The same addition produces different answers depending on the representation you choose.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Inspect bit patterns directly</strong></p>
+<pre><code class="language-python">def bits(value, width=8):
+    return format(value &amp; ((1 &lt;&lt; width) - 1), f&quot;0{width}b&quot;)
+
+print(bits(0))     # 00000000
+print(bits(1))     # 00000001
+print(bits(255))   # 11111111
+print(bits(-1))    # 11111111  (8-bit two's complement)
+print(bits(-128))  # 10000000
+</code></pre>
+<p>Note how negative numbers look different from positive ones. <code>-1</code> is all ones.</p>
+<p><strong>Step 2: Compute two's complement by hand</strong></p>
+<pre><code class="language-python">def to_twos_complement(value, width=8):
+    if value &lt; 0:
+        return (1 &lt;&lt; width) + value
+    return value
+
+print(to_twos_complement(5, 8))    # 5
+print(to_twos_complement(-5, 8))   # 251 = 256 - 5
+print(bits(to_twos_complement(-5, 8)))   # 11111011
+</code></pre>
+<p>To represent <code>-x</code>, you store <code>2^n - x</code>. That is why -5 is 251 in 8 bits.</p>
+<p><strong>Step 3: Watch integer overflow</strong></p>
+<pre><code class="language-python">import numpy as np
+
+# Python int is arbitrary precision (no overflow),
+# but numpy uses fixed widths so the wrap-around is visible.
+x = np.int8(127)
+print(x + 1)   # -128 (overflow)
+
+y = np.uint8(255)
+print(y + 1)   # 0   (wrap-around)
+</code></pre>
+<p>C, Go, Java, and release-mode Rust use fixed-width integers like numpy. Overflow has a long history of producing security vulnerabilities.</p>
+<p><strong>Step 4: Look inside a float</strong></p>
+<pre><code class="language-python">import struct
+
+def float_bits(x):
+    packed = struct.pack(&quot;&gt;d&quot;, x)
+    return &quot;&quot;.join(f&quot;{byte:08b}&quot; for byte in packed)
+
+print(float_bits(0.0))
+print(float_bits(1.0))
+print(float_bits(0.1))   # 0.1 is an infinite binary fraction
+print(float_bits(0.2))
+</code></pre>
+<p>0.1 and 0.2 cannot be represented exactly in binary, so their sum cannot equal 0.3 exactly either.</p>
+<p><strong>Step 5: Measure precision loss</strong></p>
+<pre><code class="language-python">import math
+
+print(0.1 + 0.2)                       # 0.30000000000000004
+print(0.1 + 0.2 == 0.3)                # False
+print(math.isclose(0.1 + 0.2, 0.3))    # True
+
+# Large + small absorption
+big = 1e16
+small = 1.0
+print(big + small - big)   # 0.0  (the small value is absorbed)
+</code></pre>
+<p>Floats always carry relative error. When you add a very large value to a very small one, the small one disappears.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Fixed-width integers overflow, and the result is well-defined but not intuitive</li>
+<li>Floats cannot represent every decimal fraction exactly</li>
+<li>Mixing very large and very small floats can erase the small value</li>
+<li>Money and identifiers should not use floats; use integers or Decimal</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Floats for money</strong><br>
+- Problem: Cumulative cent-level errors<br>
+- Fix: Decimal or integer cents</p>
+<p><strong><code>==</code> for floats</strong><br>
+- Problem: Can always be false<br>
+- Fix: Use <code>math.isclose</code></p>
+<p><strong>Ignoring overflow</strong><br>
+- Problem: Vulnerabilities and wrong answers<br>
+- Fix: Check ranges, use wider types</p>
+<p><strong>Assuming bit width</strong><br>
+- Problem: Behavior differs across platforms<br>
+- Fix: Use explicit widths (int32, uint64)</p>
+<p><strong>Forgetting the sign bit</strong><br>
+- Problem: Wrong negative handling<br>
+- Fix: Be explicit about signed vs unsigned</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Payments and accounting: Decimal or integer cents</li>
+<li>Graphics and science: float32 (GPU) versus float64 (CPU) tradeoffs</li>
+<li>Network protocols: bit-precise header parsing</li>
+<li>Security: range checks to prevent integer overflow</li>
+<li>Machine learning: 8-bit quantization to shrink models and speed inference</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer asks about the type and width of a variable as a reflex. "Will this sum fit in int32?" "Can this multiplication overflow?" "Is this comparison happening on floats?" Whenever they meet a new language or system, the first thing they check is integer width and float standard.</p>
+<p>A senior also follows a hard rule: never use floats where exactness matters. Money, coordinate equality, identifiers — all integer or Decimal. Floats are fast and wide-ranging, but they have their proper place.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the unsigned and signed range of one byte</li>
+<li>[ ] You can sketch how -1 looks in two's complement</li>
+<li>[ ] You can name the three parts of IEEE 754 (sign, exponent, mantissa)</li>
+<li>[ ] You never use <code>==</code> for float comparison</li>
+<li>[ ] You never use floats for money</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Write a function that prints the bit pattern of every signed 8-bit integer from -128 to 127. Use <code>to_twos_complement</code>. Notice how positive and negative values differ in the most significant bit.</p>
+</li>
+<li>
+<p>Compare adding <code>0.1</code> a hundred times against <code>0.1 * 100</code>. Confirm that the results differ and find a tolerance for which <code>math.isclose</code> returns True.</p>
+</li>
+<li>
+<p>Predict what happens when you sum 1 through 200 using <code>numpy.int8</code>, then run the code and confirm where the overflow begins.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Every value in a computer is a bit pattern. Integers use two's complement, reals use IEEE 754, and each has its own range and precision limits. Respecting those limits prevents most of the common bugs; ignoring them hides the worst ones in the most sensitive parts of your system.</p>
+<p>Next we look at what acts on these bits: the CPU and the instruction set. We will see what an ISA is and what the CPU actually does in one cycle.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><strong>Data Representation — Bit, Byte, Integer, Floating Point (current)</strong></li>
+<li>CPU and Instructions (upcoming)</li>
+<li>Registers and the ALU (upcoming)</li>
+<li>Memory Organization (upcoming)</li>
+<li>Cache and Locality (upcoming)</li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754 — Wikipedia</a></li>
+<li><a href="https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">What Every Computer Scientist Should Know About Floating-Point Arithmetic</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Two%27s_complement">Two's complement — Wikipedia</a></li>
+<li><a href="https://docs.python.org/3/library/decimal.html">Python <code>decimal</code> module documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Data Representation, Integers, Floating Point, Bit Operations</p>
+</body>
+</html>

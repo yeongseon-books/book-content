@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linear Transformations</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Linear Transformations</h1>
+<blockquote>
+<p>Linear Algebra 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you <em>multiply by a matrix</em>, what does that <em>do geometrically</em>?</p>
+<blockquote>
+<p><em>A linear transformation reshapes space while keeping </em>grid lines parallel and evenly spaced<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> and <em>properties</em> of a <em>linear transformation</em></li>
+<li><em>Matrix forms</em> of <em>rotation, scaling, reflection, and shear</em></li>
+<li><em>Composition of transformations</em> via <em>matrix multiplication</em></li>
+<li>A 5-step hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Each <em>neural network layer</em> is a <em>linear transformation</em> plus a <em>nonlinear activation</em>. <em>Transformation intuition</em> equals <em>model intuition</em>.</p>
+<blockquote>
+<p><em>Every layer is a transformation of space.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Vec[&quot;Vector v&quot;] --&gt; Lin[&quot;Apply A&quot;]
+    Lin --&gt; Out[&quot;A v&quot;]
+    Out --&gt; Geom[&quot;Rotation, scaling, reflection, shear&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Linear transformation</strong>: <code>T(av + bw) = a T(v) + b T(w)</code> — preserves <em>addition and scalar multiplication</em>.</li>
+<li><strong>Rotation matrix</strong>: rotates by angle <code>theta</code>.</li>
+<li><strong>Scaling</strong>: a <em>diagonal matrix</em> that <em>stretches/shrinks</em>.</li>
+<li><strong>Reflection</strong>: <em>symmetry</em> across an axis.</li>
+<li><strong>Shear</strong>: <em>slants</em> the space along a direction.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"A matrix is just a transformation."</em> — no idea what shape.</p>
+<p><strong>After</strong>: <em>"Rotation = </em>angles<em>; scaling = </em>diagonal<em>; reflection = </em>sign flip<em>; shear = </em>off-diagonal<em>."</em></p>
+<h2>Hands-on: Five Steps</h2>
+<p><strong>Step 1 — Rotation</strong></p>
+<pre><code class="language-python">import numpy as np
+theta = np.pi / 4
+R = np.array([[np.cos(theta), -np.sin(theta)],
+              [np.sin(theta),  np.cos(theta)]])
+v = np.array([1.0, 0.0])
+print(&quot;rotated:&quot;, R @ v)
+</code></pre>
+<p><strong>Step 2 — Scaling</strong></p>
+<pre><code class="language-python">S = np.diag([2.0, 0.5])
+print(&quot;scaled:&quot;, S @ np.array([1.0, 1.0]))
+</code></pre>
+<p><strong>Step 3 — Reflection across x-axis</strong></p>
+<pre><code class="language-python">F = np.array([[1.0, 0.0], [0.0, -1.0]])
+print(&quot;reflected:&quot;, F @ np.array([1.0, 1.0]))
+</code></pre>
+<p><strong>Step 4 — Shear</strong></p>
+<pre><code class="language-python">Sh = np.array([[1.0, 1.0], [0.0, 1.0]])
+print(&quot;sheared:&quot;, Sh @ np.array([1.0, 1.0]))
+</code></pre>
+<p><strong>Step 5 — Composition</strong></p>
+<pre><code class="language-python">M = R @ S
+print(&quot;compose RS:&quot;, M @ np.array([1.0, 0.0]))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Matrix multiplication</em> is <em>composition</em> of transformations.</li>
+<li><em>Each transformation</em> has its own <em>matrix shape</em>.</li>
+<li><em>Order</em> changes the result.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mixing up <em>rotation sign</em> — clockwise vs counter-clockwise.</strong></li>
+<li><strong>A <em>negative scale</em> secretly introduces a <em>reflection</em>.</strong></li>
+<li><strong>Confusing <em>shear direction</em>.</strong></li>
+<li><strong>Reversing the <em>composition order</em>.</strong></li>
+<li><strong>Treating a <em>nonlinear transformation</em> as if it were <em>linear</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Graphics <em>model matrices</em>, <em>homographies</em> in computer vision, <em>data augmentation</em> (rotation/scaling), and neural network layers — all are <em>linear transformations</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Visualizes</em> transformations.</li>
+<li>Tracks <em>composition order</em>.</li>
+<li>Checks the <em>sign of the determinant</em> for orientation.</li>
+<li>Uses <em>eigenvectors</em> to find a transformation's <em>axes</em>.</li>
+<li>Knows that <em>nonlinear transformations</em> are a separate beast.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can build <em>rotation/scaling/reflection/shear</em> matrices.</li>
+<li>[ ] You can express <em>composition</em> as a <em>matrix product</em>.</li>
+<li>[ ] You understand the impact of <em>order</em>.</li>
+<li>[ ] You can read the <em>geometric meaning</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Verify that applying a <em>45° rotation</em> twice equals a <em>90° rotation</em>.</li>
+<li>Check whether <em>reflect-then-rotate</em> differs from <em>rotate-then-reflect</em>.</li>
+<li>Describe the <em>effect</em> of scaling by <code>(-1, -1)</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Linear transformations <em>reshape space</em>. The next post covers <em>basis and dimension</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
+<li><strong>Linear Transformations (current)</strong></li>
+<li>Basis and Dimension (upcoming)</li>
+<li>Eigenvalues and Eigenvectors (upcoming)</li>
+<li>Matrix Decomposition (upcoming)</li>
+<li>PCA (upcoming)</li>
+<li>Linear Algebra in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/lessons/linear-transformations">3Blue1Brown — Linear transformations</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Linear_map">Wikipedia — Linear map</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Rotation_matrix">Wikipedia — Rotation matrix</a></li>
+<li><a href="https://www.khanacademy.org/math/linear-algebra/matrix-transformations">Khan Academy — Transformations</a></li>
+</ul>
+<p class="tags-line">Tags: LinearAlgebra, LinearTransformation, Geometry, DataScience, Beginner</p>
+</body>
+</html>

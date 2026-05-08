@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTTP and HTTPS</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HTTP and HTTPS</h1>
+<blockquote>
+<p>Computer Networks 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What shape of message is HTTP, and what exactly does the "S" add when it appears?</p>
+<blockquote>
+<p>HTTP is a simple text-based request and response protocol. Method, path, headers, body — those four parts are enough to read every REST API and every website. HTTPS slips TLS underneath to stop eavesdropping, tampering, and impersonation. We cover TLS in detail in episode 6; today we just see its shadow.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The HTTP message structure (start line, headers, body)</li>
+<li>Common methods and status codes</li>
+<li>Important headers (Content-Type, Cache-Control, Authorization)</li>
+<li>Differences between HTTP/1.1, HTTP/2, and HTTP/3</li>
+<li>The three guarantees HTTPS provides</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>HTTP is the common language of essentially every service — backend, frontend, mobile, data, and ML serving. Misuse of methods and status codes silently breaks caching, retries, and error handling. HTTPS is the default now, but if you cannot answer "why?", certificate expiry, mixed content, and HSTS incidents stay mysteries.</p>
+<blockquote>
+<p>HTTP is "the agreed shape of a text message", and REST is a style that organizes those agreements around resources.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-text">Request
+GET /users/42 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer ...
+
+Response
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: max-age=60
+
+{&quot;id&quot;: 42, &quot;name&quot;: &quot;...&quot;}
+</code></pre>
+<p>Both requests and responses are "start line + headers + blank line + body".</p>
+<h2>Key Terms</h2>
+<p><strong>Method</strong><br>
+- Meaning: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS</p>
+<p><strong>Status code</strong><br>
+- Meaning: 1xx info, 2xx success, 3xx redirect, 4xx client error, 5xx server error</p>
+<p><strong>Header</strong><br>
+- Meaning: Metadata (type, length, cache, auth)</p>
+<p><strong>Body</strong><br>
+- Meaning: Actual data (JSON, HTML, binary)</p>
+<p><strong>TLS</strong><br>
+- Meaning: The encryption layer that makes the S in HTTPS</p>
+<h2>Before / After</h2>
+<p><strong>Before — "HTTP is magic":</strong></p>
+<pre><code class="language-text">the browser fetches a page — done.
+</code></pre>
+<p><strong>After — "HTTP is a text message on top of TCP":</strong></p>
+<pre><code class="language-text">DNS → TCP handshake → (TLS handshake) → HTTP request/response → close
+each step is measurable and debuggable
+</code></pre>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: see request and response with curl</strong></p>
+<pre><code class="language-bash">curl -v https://example.com/
+# &gt; GET / HTTP/2
+# &gt; Host: example.com
+# &lt; HTTP/2 200
+# &lt; content-type: text/html; charset=UTF-8
+</code></pre>
+<p><code>-v</code> shows headers and the TLS handshake.</p>
+<p><strong>Step 2: a Python client</strong></p>
+<pre><code class="language-python">import requests
+r = requests.get(
+    'https://api.github.com/repos/python/cpython',
+    headers={'Accept': 'application/vnd.github+json'},
+    timeout=5,
+)
+print(r.status_code, r.headers['content-type'])
+print(r.json()['stargazers_count'])
+</code></pre>
+<p><strong>Step 3: the smallest HTTP server</strong></p>
+<pre><code class="language-python"># server.py — Flask
+from flask import Flask, jsonify, request
+app = Flask(__name__)
+
+@app.get('/users/&lt;int:uid&gt;')
+def get_user(uid):
+    return jsonify(id=uid, name=f'user{uid}'), 200
+
+@app.post('/users')
+def create_user():
+    body = request.get_json()
+    return jsonify(id=99, **body), 201
+
+if __name__ == '__main__':
+    app.run(port=8000)
+</code></pre>
+<pre><code class="language-bash">curl -s localhost:8000/users/42
+curl -s -X POST localhost:8000/users -H 'Content-Type: application/json' -d '{&quot;name&quot;:&quot;a&quot;}'
+</code></pre>
+<p><strong>Step 4: experiment with cache headers</strong></p>
+<pre><code class="language-python">@app.get('/now')
+def now():
+    from datetime import datetime
+    resp = jsonify(now=datetime.utcnow().isoformat())
+    resp.headers['Cache-Control'] = 'max-age=60'
+    return resp
+</code></pre>
+<p>Browsers, CDNs, and reverse proxies cache the same response for 60 seconds. The strongest performance tool in production is one header.</p>
+<p><strong>Step 5: HTTPS verification</strong></p>
+<pre><code class="language-bash">curl -v https://expired.badssl.com/   # expired cert → curl blocks
+curl -v https://self-signed.badssl.com/   # self-signed → blocked
+</code></pre>
+<p>Browsers and curl validate the certificate chain to stop impersonating servers. We open the box in episode 6 (TLS).</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Request and response are text messages (HTTP/2 and /3 use binary frames, but the meaning is identical)</li>
+<li>Methods are meaningful verbs: GET is read-only, POST creates</li>
+<li>Status codes are signals that clients, caches, and retries depend on</li>
+<li>One cache header can cut backend load in half</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Using GET to mutate data</strong><br>
+- Problem: Proxies and retries change data unintentionally<br>
+- Fix: Mutations go in POST / PUT / PATCH / DELETE</p>
+<p><strong>Returning every error as 200</strong><br>
+- Problem: Breaks monitoring and retry policy<br>
+- Fix: Use proper 4xx / 5xx</p>
+<p><strong>Skipping Content-Type</strong><br>
+- Problem: Clients fail to parse<br>
+- Fix: Specify explicitly, e.g. <code>application/json</code></p>
+<p><strong>Disabling HTTPS verification</strong><br>
+- Problem: MITM risk<br>
+- Fix: Never disable in production</p>
+<p><strong>Sending big responses uncompressed every time</strong><br>
+- Problem: Bandwidth and latency spike<br>
+- Fix: Use gzip / br, ETag, Last-Modified</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>REST APIs: resource + method combinations for CRUD</li>
+<li>GraphQL / gRPC: run on top of HTTP/2</li>
+<li>CDN: Cache-Control and ETag for edge caching</li>
+<li>Auth: Authorization header (bearer tokens, cookies)</li>
+<li>Monitoring: 5xx rate and p99 latency are the core indicators</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When designing an API, a senior engineer looks at method, status code, headers, and body together. Designs like "this is 200 but failure is signaled with an <code>errors</code> array" break clients and the caching and retry systems together. Following HTTP semantics is what makes external tooling work.</p>
+<p>A senior also does not stop thinking at HTTP/1.1. They know how multiplexing in HTTP/2, 0-RTT in HTTP/3, and head-of-line blocking actually move user-perceived latency, and they weigh the risk and reward of adopting new features.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can name the four parts of an HTTP message</li>
+<li>[ ] I know the meaning of common methods and status codes</li>
+<li>[ ] I set Content-Type and Cache-Control correctly</li>
+<li>[ ] I can name the three HTTPS guarantees (confidentiality, integrity, identity)</li>
+<li>[ ] I can summarize HTTP/1.1, /2, and /3 in one line each</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Run <code>curl -v</code> against a favorite site, capture the request and response headers, and explain what each header means.</p>
+</li>
+<li>
+<p>Extend the Flask server above with ETag-based caching (<code>If-None-Match</code> → 304).</p>
+</li>
+<li>
+<p>Answer in one paragraph from a threat-model perspective: "Why is every site HTTPS now?"</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>HTTP is an agreement about message shape, and REST is a style that organizes that agreement around resources. HTTPS adds the security guarantees of TLS on top. Handling methods, status codes, and headers correctly raises system quality immediately.</p>
+<p>Next we open up the "S" — TLS basics.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
+<li><strong>HTTP and HTTPS (current)</strong></li>
+<li>TLS basics (upcoming)</li>
+<li>Routing and NAT (upcoming)</li>
+<li>Load Balancer (upcoming)</li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc9110">RFC 9110 — HTTP Semantics</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP">MDN — HTTP</a></li>
+<li><a href="https://flask.palletsprojects.com/">Flask Documentation</a></li>
+<li><a href="https://hpbn.co/">High Performance Browser Networking — Ilya Grigorik</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, HTTP, HTTPS, REST, Headers</p>
+</body>
+</html>

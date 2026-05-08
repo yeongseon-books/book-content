@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Secure Coding?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Secure Coding?</h1>
+<blockquote>
+<p>Secure Coding 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Code is not finished when the <em>feature works</em>. It is finished when it <em>survives an attacker</em>. How do we close that gap?</p>
+<blockquote>
+<p><em>Secure coding is the daily habit of </em>shrinking the attack surface<em> without slowing the feature down.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What <em>secure coding</em> means and <em>why</em> it matters</li>
+<li>The idea of a <em>threat model</em> and how to apply it</li>
+<li>What <em>OWASP Top 10</em> covers</li>
+<li>Five steps for a safer development flow</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most security incidents are <em>known patterns</em> repeated. <em>Skipped input validation</em>. <em>Secrets in code</em>. <em>No permission check</em>. Secure coding is not <em>exotic cryptography</em> — it is a small, daily set of rules.</p>
+<blockquote>
+<p><em>Security is not a </em>coating on top<em> of the feature. It is </em>part of the structure<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User input&quot;] --&gt; Validate[&quot;Validation&quot;]
+    Validate --&gt; Logic[&quot;App logic&quot;]
+    Logic --&gt; Storage[&quot;Storage (encrypted)&quot;]
+    Logic --&gt; Logs[&quot;Safe logs&quot;]
+    Auth[&quot;AuthN / AuthZ&quot;] --&gt; Logic
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Threat model</strong>: a <em>map</em> of who attacks, from where, and what they want.</li>
+<li><strong>Attack surface</strong>: the <em>input points</em> an attacker can touch.</li>
+<li><strong>Trust boundary</strong>: the line between <em>trusted</em> and <em>untrusted</em> zones.</li>
+<li><strong>Defense in depth</strong>: multiple <em>thin defenses</em> layered together.</li>
+<li><strong>Least privilege</strong>: grant <em>only the access needed</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Build the feature first, security <em>later</em>. When something breaks, <em>rewrite it all</em>.</p>
+<p><strong>After</strong>: Design <em>input, auth, storage, logs</em> together from day one. When something breaks, the <em>blast radius is small</em>.</p>
+<h2>Hands-on: A Safer Flow in Five Steps</h2>
+<p><strong>Step 1 — Mark the input boundary</strong></p>
+<pre><code class="language-python">def parse_age(raw: str) -&gt; int:
+    if not raw.isdigit():
+        raise ValueError(&quot;age must be digits&quot;)
+    age = int(raw)
+    if not (0 &lt; age &lt; 150):
+        raise ValueError(&quot;age out of range&quot;)
+    return age
+</code></pre>
+<p><strong>Step 2 — Separate secrets from code</strong></p>
+<pre><code class="language-python">import os
+DB_PASSWORD = os.environ[&quot;DB_PASSWORD&quot;]  # never hardcoded
+</code></pre>
+<p><strong>Step 3 — Check permission inside the function</strong></p>
+<pre><code class="language-python">def delete_post(user, post):
+    if post.author_id != user.id:
+        raise PermissionError(&quot;not your post&quot;)
+    post.delete()
+</code></pre>
+<p><strong>Step 4 — Escape on output</strong></p>
+<pre><code class="language-python">import html
+def render(name: str) -&gt; str:
+    return f&quot;&lt;p&gt;Hello, {html.escape(name)}&lt;/p&gt;&quot;
+</code></pre>
+<p><strong>Step 5 — Keep secrets out of logs</strong></p>
+<pre><code class="language-python">def log_login(user):
+    print({&quot;event&quot;: &quot;login&quot;, &quot;user_id&quot;: user.id})  # no password
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Validation happens <em>at every boundary</em>, not only the first one.</li>
+<li><em>Secrets</em> come from environment variables or a <em>secret store</em>.</li>
+<li>Permission is checked at the <em>route</em> and again <em>inside the function</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Validating only on the <em>client</em>.</strong> The server must <em>re-validate</em> every time.</li>
+<li><strong>Committing secrets to <em>git</em>.</strong> Once leaked, <em>leaked forever</em>.</li>
+<li><strong>Leaking <em>internal structure</em> in error messages.</strong> That hands attackers a <em>map</em>.</li>
+<li><strong>Hiding actions in the <em>UI</em> only.</strong> The API is <em>still callable</em>.</li>
+<li><strong>Never updating <em>dependencies</em>.</strong> Known CVEs <em>pile up</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams begin with a <em>threat-modeling workshop</em>. They draw a <em>data-flow diagram</em> and list threats at every <em>trust boundary</em>. CI runs <em>secret scanning</em>, <em>dependency scanning</em>, and <em>SAST</em> by default.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Treat input as </em>hostile by default<em>.</em></li>
+<li><em>Secrets must </em>live outside the code<em>.</em></li>
+<li><em>The server decides authorization. The UI is a </em>hint<em>.</em></li>
+<li><em>Logs are </em>evidence and risk<em> at the same time.</em></li>
+<li><em>There is no perfect security — only security that </em>buys time<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write the <em>threat model</em> in one paragraph.</li>
+<li>[ ] I can list my <em>attack surface</em>.</li>
+<li>[ ] <em>No secret</em> lives in the codebase.</li>
+<li>[ ] <em>Server-side validation</em> covers every input.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Sketch the <em>trust boundaries</em> of a service you are building.</li>
+<li>Write the <em>validation rules</em> for the three inputs you receive most often.</li>
+<li>Grep your repository for <em>strings that look like secrets</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Secure coding is a <em>habit</em>. The next post goes deep on the place that leaks most often: <em>input validation</em>.</p>
+<ul>
+<li><strong>What Is Secure Coding? (current)</strong></li>
+<li>Input Validation (upcoming)</li>
+<li>Authentication and Session (upcoming)</li>
+<li>Authorization and Permissions (upcoming)</li>
+<li>Safe Data Storage (upcoming)</li>
+<li>Secret and Key Management (upcoming)</li>
+<li>SQL Injection and Safe ORM Usage (upcoming)</li>
+<li>XSS and CSRF Defense (upcoming)</li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://owasp.org/www-project-top-ten/">OWASP Top 10</a></li>
+<li><a href="https://owasp.org/www-pdf-archive/OWASP_SCP_Quick_Reference_Guide_v2.pdf">OWASP Secure Coding Practices Quick Reference</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool">Microsoft Threat Modeling</a></li>
+<li><a href="https://security.googleblog.com/2024/01/secure-by-design.html">Google — Secure by Design</a></li>
+</ul>
+<p class="tags-line">Tags: SecureCoding, Security, OWASP, DevSecOps, AppSec</p>
+</body>
+</html>

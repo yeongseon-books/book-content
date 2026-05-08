@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Optimization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Optimization</h1>
+<blockquote>
+<p>Calculus for ML 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we <em>patch</em> the <em>weaknesses</em> of plain gradient descent?</p>
+<blockquote>
+<p><em>Momentum</em>, <em>adaptive learning rates</em>, and <em>schedules</em> boost both <em>speed</em> and <em>stability</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Momentum</em></li>
+<li><em>RMSProp</em></li>
+<li><em>Adam</em></li>
+<li><em>Learning-rate schedules</em></li>
+<li>Intuition for <em>regularization</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Modern optimizers like <em>Adam</em> work well — and you should <em>understand why</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    G[Gradient] --&gt; M[Momentum]
+    G --&gt; R[RMSProp]
+    M --&gt; A[Adam]
+    R --&gt; A
+    A --&gt; S[Schedule]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>momentum</strong>: a <em>running mean of gradients</em>.</li>
+<li><strong>RMSProp</strong>: a <em>running mean of squared gradients</em>.</li>
+<li><strong>Adam</strong>: <em>momentum</em> + <em>RMSProp</em>.</li>
+<li><strong>schedule</strong>: <em>learning rate</em> over time.</li>
+<li><strong>regularization</strong>: a <em>brake on overfitting</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: GD with a <em>fixed lr</em>.</p>
+<p><strong>After</strong>: <em>adaptive</em> updates plus <em>schedules</em>.</p>
+<h2>Hands-on: Mini Optimizer Kit</h2>
+<p><strong>Step 1 — Momentum</strong></p>
+<pre><code class="language-python">def momentum_step(w, v, g, lr=0.1, beta=0.9):
+    v = beta * v + g
+    return w - lr * v, v
+</code></pre>
+<p><strong>Step 2 — RMSProp</strong></p>
+<pre><code class="language-python">def rms_step(w, s, g, lr=0.01, beta=0.99, eps=1e-8):
+    s = beta * s + (1 - beta) * g * g
+    return w - lr * g / (s ** 0.5 + eps), s
+</code></pre>
+<p><strong>Step 3 — Adam (Toy)</strong></p>
+<pre><code class="language-python">def adam_step(w, m, v, g, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):
+    m = b1 * m + (1 - b1) * g
+    v = b2 * v + (1 - b2) * g * g
+    mh = m / (1 - b1 ** t)
+    vh = v / (1 - b2 ** t)
+    return w - lr * mh / (vh ** 0.5 + eps), m, v
+</code></pre>
+<p><strong>Step 4 — Schedule</strong></p>
+<pre><code class="language-python">def cosine_lr(step, total, lr0=0.01):
+    import math
+    return 0.5 * lr0 * (1 + math.cos(math.pi * step / total))
+</code></pre>
+<p><strong>Step 5 — L2 Regularization</strong></p>
+<pre><code class="language-python">def l2_step(w, g, lr=0.1, wd=1e-4):
+    return w - lr * (g + wd * w)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Momentum</em> adds <em>inertia</em>.</li>
+<li><em>RMSProp</em> is <em>adaptive</em>.</li>
+<li><em>Adam</em> combines both.</li>
+<li><em>Schedules</em> fine-tune <em>late training</em>.</li>
+<li><em>L2</em> aids <em>generalization</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <em>Adam</em> defaults without tuning.</strong></li>
+<li><strong>Confusing <em>weight decay</em> with <em>L2</em>.</strong></li>
+<li><strong>Using a <em>fixed lr</em> without a schedule.</strong></li>
+<li><strong>Skipping <em>warmup</em> despite early divergence.</strong></li>
+<li><strong>Failing to <em>reset</em> momentum on resume.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Transformer training</em> uses <em>Adam</em> with <em>warmup</em> and a <em>cosine schedule</em> as the standard recipe.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Pick the <em>optimizer per problem</em>.</li>
+<li><em>Warmup</em> prevents early divergence.</li>
+<li><em>Adaptive</em> methods absorb <em>scale</em> differences.</li>
+<li><em>Regularization</em> drives <em>generalization</em>.</li>
+<li>The <em>learning rate</em> decides <em>everything</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Match <em>optimizer</em> to <em>task</em>.</li>
+<li>[ ] Apply <em>warmup</em>.</li>
+<li>[ ] Design the <em>schedule</em>.</li>
+<li>[ ] Set <em>regularization</em> strength.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>momentum</em> in one line.</li>
+<li>Define <em>Adam</em> in one line.</li>
+<li>State the meaning of <em>warmup</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Backpropagation Intuition</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Gradient Descent</a></li>
+<li><strong>Optimization (current)</strong></li>
+<li>Backpropagation Intuition (upcoming)</li>
+<li>Calculus in Deep Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1412.6980">Adam - Kingma and Ba</a></li>
+<li><a href="https://www.ruder.io/optimizing-gradient-descent/">Optimizer Overview - Ruder</a></li>
+<li><a href="https://arxiv.org/abs/1608.03983">Cosine LR Schedule - Loshchilov and Hutter</a></li>
+<li><a href="https://arxiv.org/abs/1711.05101">Decoupled Weight Decay - Loshchilov and Hutter</a></li>
+</ul>
+<p class="tags-line">Tags: Calculus, ML, Optimization, Adam, Beginner</p>
+</body>
+</html>

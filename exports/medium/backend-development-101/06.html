@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authentication and Authorization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Authentication and Authorization</h1>
+<blockquote>
+<p>Backend Development 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: From the <em>server</em> point of view, what does "logged in" actually mean?</p>
+<blockquote>
+<p>A user has <em>proven who they are</em> and the server now knows <em>what they can do</em> on this request. Authentication and authorization are <em>two different problems</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between authentication and authorization</li>
+<li>Minimum safe practices for password storage</li>
+<li>Sessions vs JWT — when to use which</li>
+<li>How to build a protected endpoint in FastAPI</li>
+<li>How to model permissions as roles</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Auth is the <em>one area</em> where a single mistake can sink a company. A line that stored passwords as plain text or skipped a token check returns <em>years later</em> as a security incident.</p>
+<blockquote>
+<p>Auth code must be small, standard, and boring.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt;|&quot;id+pw&quot;| Login[&quot;/login&quot;]
+    Login --&gt;|&quot;token / cookie&quot;| User
+    User --&gt;|&quot;Authorization header&quot;| API[&quot;/api&quot;]
+    API --&gt; Verify[&quot;Verify&quot;]
+    Verify --&gt; Authz[&quot;Check role&quot;]
+    Authz --&gt; Handler[&quot;Handler&quot;]
+</code></pre>
+<p>Authentication asks <em>who</em>; authorization asks <em>can you</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Authentication</strong>: identity check.</li>
+<li><strong>Authorization</strong>: action permission.</li>
+<li><strong>Hash</strong>: an <em>irreversible</em> transformation of a password.</li>
+<li><strong>Session</strong>: server-side state that tracks a user.</li>
+<li><strong>JWT</strong>: a signed token that can be verified without server state.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (plain text password)</strong></p>
+<pre><code class="language-python">def register(name, password):
+    db.execute(&quot;INSERT INTO users(name, pw) VALUES(?, ?)&quot;, (name, password))
+</code></pre>
+<p><strong>After (hash and verify)</strong></p>
+<pre><code class="language-python">from passlib.hash import bcrypt
+def register(name, password):
+    pw_hash = bcrypt.hash(password)
+    db.execute(&quot;INSERT INTO users(name, pw_hash) VALUES(?, ?)&quot;, (name, pw_hash))
+
+def verify(name, password):
+    row = db.fetchone(&quot;SELECT pw_hash FROM users WHERE name=?&quot;, (name,))
+    return row and bcrypt.verify(password, row[&quot;pw_hash&quot;])
+</code></pre>
+<p>A leaked database no longer leaks usable passwords.</p>
+<h2>Hands-on: Five Steps Through an Auth Flow</h2>
+<p><strong>Step 1 — Hash a password</strong></p>
+<pre><code class="language-python"># 1_hash.py
+from passlib.hash import bcrypt
+hashed = bcrypt.hash(&quot;mySecret123&quot;)
+print(bcrypt.verify(&quot;mySecret123&quot;, hashed))  # True
+</code></pre>
+<p><strong>Step 2 — Issue a JWT</strong></p>
+<pre><code class="language-python"># 2_jwt.py
+import jwt, time
+SECRET = &quot;change-me&quot;
+token = jwt.encode({&quot;sub&quot;: &quot;alice&quot;, &quot;exp&quot;: time.time() + 3600}, SECRET, algorithm=&quot;HS256&quot;)
+print(token)
+</code></pre>
+<p><strong>Step 3 — Verify a JWT</strong></p>
+<pre><code class="language-python"># 3_verify.py
+import jwt
+data = jwt.decode(token, SECRET, algorithms=[&quot;HS256&quot;])
+print(data[&quot;sub&quot;])
+</code></pre>
+<p><strong>Step 4 — Protect an endpoint</strong></p>
+<pre><code class="language-python"># 4_protected.py
+from fastapi import FastAPI, Depends, HTTPException, Header
+
+app = FastAPI()
+
+def current_user(authorization: str = Header(...)):
+    try:
+        token = authorization.removeprefix(&quot;Bearer &quot;)
+        data = jwt.decode(token, SECRET, algorithms=[&quot;HS256&quot;])
+        return data[&quot;sub&quot;]
+    except Exception:
+        raise HTTPException(401)
+
+@app.get(&quot;/me&quot;)
+def me(user: str = Depends(current_user)):
+    return {&quot;user&quot;: user}
+</code></pre>
+<p><strong>Step 5 — Role-based access</strong></p>
+<pre><code class="language-python"># 5_role.py
+def require_role(role: str):
+    def _dep(user: dict = Depends(current_user_with_role)):
+        if user[&quot;role&quot;] != role:
+            raise HTTPException(403)
+        return user
+    return _dep
+
+@app.delete(&quot;/admin/users/{uid}&quot;)
+def delete_user(uid: int, _: dict = Depends(require_role(&quot;admin&quot;))):
+    return {&quot;deleted&quot;: uid}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Passwords are <em>never</em> stored as plain text.</li>
+<li>JWT secrets are <em>never</em> hard-coded — use env vars.</li>
+<li>401 (no auth) and 403 (no permission) carry <em>different meanings</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hashing passwords with MD5 or SHA-1.</strong> Use bcrypt or argon2.</li>
+<li><strong>Omitting <code>exp</code> from JWTs.</strong> Tokens become valid <em>forever</em>.</li>
+<li><strong>Storing JWTs only in localStorage.</strong> XSS can steal them — consider httpOnly cookies.</li>
+<li><strong>Doing permission checks only on the frontend.</strong> The server must always re-check.</li>
+<li><strong>Locking every endpoint behind auth.</strong> Make public ones (<code>/healthz</code>, <code>/login</code>) explicit.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most SaaS products start with <em>bcrypt + JWT + role-based access</em>. As they grow, they add OAuth2, MFA, and permission matrices, but the core stays the same — only code that <em>cleanly separates</em> authentication from authorization scales.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Auth code is <em>small</em> and uses <em>standard</em> libraries.</li>
+<li>Secrets live in environment variables and a secret manager.</li>
+<li>Tokens expire <em>quickly</em> and refresh tokens handle longevity.</li>
+<li>Permissions are modeled as <em>roles</em> or <em>policies</em>.</li>
+<li>Failed auth attempts are <em>monitored</em> — they signal brute force.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can hash and verify with bcrypt.</li>
+<li>[ ] You can issue a JWT with an expiration.</li>
+<li>[ ] You can protect a FastAPI endpoint.</li>
+<li>[ ] You can tell 401 from 403.</li>
+<li>[ ] You can write a role-based check.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a service with <code>/register</code>, <code>/login</code>, <code>/me</code> endpoints.</li>
+<li>Set the JWT expiration to one minute and verify a 401 after it expires.</li>
+<li>Add an <code>/admin</code> route accessible only to the <code>admin</code> role.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Authentication is <em>identity</em>; authorization is <em>permission</em>. Next, we look at the operator's eyes — <em>Logging and Error Handling</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
+<li><strong>Authentication and Authorization (current)</strong></li>
+<li>Logging and Error Handling (upcoming)</li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP Authentication Cheat Sheet</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/security/">FastAPI Security</a></li>
+<li><a href="https://jwt.io/introduction">JWT Introduction</a></li>
+<li><a href="https://passlib.readthedocs.io/en/stable/lib/passlib.hash.bcrypt.html">Passlib bcrypt docs</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Auth, Security, JWT, Python</p>
+</body>
+</html>

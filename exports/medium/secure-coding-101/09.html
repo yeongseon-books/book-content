@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Managing Dependency Vulnerabilities</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Managing Dependency Vulnerabilities</h1>
+<blockquote>
+<p>Secure Coding 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Most of our code was <em>written by someone else</em>. Who is responsible for <em>its security</em>?</p>
+<blockquote>
+<p><em>Dependencies are </em>part of our code<em>. Their flaws </em>become our flaws<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What <em>SCA</em> (Software Composition Analysis) means</li>
+<li>The role of an <em>SBOM</em></li>
+<li>Why a <em>lockfile</em> is non-negotiable</li>
+<li><em>Dependabot / Renovate</em> automation</li>
+<li>A five-step routine and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Log4j, event-stream, ua-parser-js — <em>supply-chain attacks</em> succeed with <em>zero lines</em> of our code. A library you <em>don't know you depend on</em> becomes the <em>door</em>.</p>
+<blockquote>
+<p><em>Dependencies are </em>assets that will leak someday<em>. Tracking them is the start of defense.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Manifest[&quot;pyproject.toml&quot;] --&gt; Lock[&quot;lockfile&quot;]
+    Lock --&gt; SCA[&quot;SCA scan&quot;]
+    SCA --&gt; Alerts[&quot;Vulnerability alerts&quot;]
+    Alerts --&gt; Update[&quot;Update PRs&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SCA</strong>: scanning dependencies for <em>known vulnerabilities</em>.</li>
+<li><strong>SBOM</strong>: a list of <em>every component</em> you ship.</li>
+<li><strong>Lockfile</strong>: pins <em>exact versions and hashes</em>.</li>
+<li><strong>Pinning</strong>: explicitly <em>fixing direct dependency</em> versions.</li>
+<li><strong>Transitive dependency</strong>: a dependency <em>of a dependency</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>requirements.txt</code> lists only <code>requests</code>. Each build picks a <em>different version</em>. You don't know <em>what came in</em>.</p>
+<p><strong>After</strong>: <code>uv.lock</code> / <code>poetry.lock</code> <em>pin hashes</em>. <em>Weekly dependency PRs</em> arrive automatically; CI gates with <em>SCA</em>.</p>
+<h2>Hands-on: Safer Dependencies in Five Steps</h2>
+<p><strong>Step 1 — Generate a lockfile</strong></p>
+<pre><code class="language-bash">uv lock          # or poetry lock, pip-compile
+</code></pre>
+<p><strong>Step 2 — Generate an SBOM</strong></p>
+<pre><code class="language-bash">syft packages dir:. -o cyclonedx-json &gt; sbom.json
+</code></pre>
+<p><strong>Step 3 — Run SCA</strong></p>
+<pre><code class="language-bash">pip-audit                # Python
+osv-scanner --lockfile=uv.lock   # generic
+</code></pre>
+<p><strong>Step 4 — Automate updates</strong></p>
+<pre><code class="language-yaml"># .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: &quot;/&quot;
+    schedule:
+      interval: weekly
+</code></pre>
+<p><strong>Step 5 — Pin and verify</strong></p>
+<pre><code class="language-bash">pip install --require-hashes -r requirements.txt
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Lockfile + hashes</em> is the heart of <em>reproducible</em> builds.</li>
+<li>An SBOM lets you check <em>blast radius in seconds</em> during an incident.</li>
+<li><em>Regular</em> updates beat <em>occasional</em> heroic ones.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <em>latest</em> with no lockfile.</strong> A target for <em>supply-chain attacks</em>.</li>
+<li><strong>Ignoring <em>SCA results</em>.</strong> Real findings get buried in noise.</li>
+<li><strong>Ignoring <em>transitive dependencies</em>.</strong> Most CVEs are <em>transitive</em>.</li>
+<li><strong>Sticking with abandoned libraries.</strong> Patches <em>never come</em>.</li>
+<li><strong>Letting auto-update PRs <em>pile up</em>.</strong> Hundreds in a month.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use <em>Renovate</em> or <em>Dependabot</em> for <em>weekly</em> PRs and put an <em>SCA gate</em> in CI. Larger orgs publish <em>SBOMs</em> alongside their builds.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Dependencies are </em>our code<em> — and our responsibility.</em></li>
+<li><em>No lockfile means no reproducibility.</em></li>
+<li><em>Small updates prevent </em>big incidents<em>.</em></li>
+<li><em>An SBOM is an </em>incident-response tool<em>.</em></li>
+<li><em>Depending less is itself security.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Lockfile</em> committed.</li>
+<li>[ ] <em>SCA</em> running in CI.</li>
+<li>[ ] <em>Auto-update PRs</em> arriving weekly.</li>
+<li>[ ] <em>SBOM</em> published.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Read one line of <em>pip-audit</em> output and explain it.</li>
+<li>Name a real CVE that came through a <em>transitive dependency</em>.</li>
+<li>List three risks of building <em>without a lockfile</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Other people's code is <em>our code</em>. The last post covers <em>safe logging and audit</em>, the evidence that survives an incident.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/05-safe-data-storage.md">Safe Data Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/06-secret-and-key-management.md">Secret and Key Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/07-sql-injection-and-orm.md">SQL Injection and Safe ORM Usage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/08-xss-and-csrf.md">XSS and CSRF Defense</a></li>
+<li><strong>Managing Dependency Vulnerabilities (current)</strong></li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/">OWASP — Vulnerable and Outdated Components</a></li>
+<li><a href="https://github.com/pypa/pip-audit">pip-audit</a></li>
+<li><a href="https://osv.dev/">OSV.dev</a></li>
+<li><a href="https://cyclonedx.org/">CycloneDX SBOM</a></li>
+</ul>
+<p class="tags-line">Tags: Dependencies, SCA, SBOM, SupplyChain, SecureCoding</p>
+</body>
+</html>

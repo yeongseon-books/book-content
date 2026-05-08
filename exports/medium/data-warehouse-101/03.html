@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fact and Dimension</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Fact and Dimension</h1>
+<blockquote>
+<p>Data Warehouse 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do we <em>separate measures from attributes</em>? What <em>breaks</em> if we put them together?</p>
+<blockquote>
+<p><em>Fact tables hold </em>how much<em>. Dimension tables hold </em>what, who, when<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>fact</em> table</li>
+<li>The definition of a <em>dimension</em> table</li>
+<li>Why this separation pays off</li>
+<li>Five-step modeling hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Analytical questions almost always read as <em>how much (measure)</em> by <em>which slice (dimension)</em>. Separating the two lets <em>aggregations stay fast</em> and <em>attribute changes stay flexible</em>.</p>
+<blockquote>
+<p><em>Split measures from attributes. Together they slow each other down.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Fact[&quot;fact_orders (amount, qty)&quot;] --&gt; DimUser[&quot;dim_user&quot;]
+    Fact --&gt; DimProduct[&quot;dim_product&quot;]
+    Fact --&gt; DimDate[&quot;dim_date&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Fact</strong>: A <em>measurable event</em>. Amount, quantity, duration — numbers.</li>
+<li><strong>Dimension</strong>: The <em>context</em> of a fact. User, product, date — attributes.</li>
+<li><strong>Grain</strong>: What <em>one row represents</em> — the <em>atomic unit</em> of the fact.</li>
+<li><strong>Surrogate key</strong>: An <em>internal identifier</em> for a dimension.</li>
+<li><strong>Conformed dimension</strong>: A dimension <em>shared</em> across multiple facts.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: One <em>order row</em> contains <em>user name and product name</em>. If a name changes, <em>every row must be updated</em>.</p>
+<p><strong>After</strong>: User name lives in <em>dim_user</em> only. <em>Facts stay untouched</em>.</p>
+<h2>Hands-on: Modeling in Five Steps</h2>
+<p><strong>Step 1 — Build a dimension</strong></p>
+<pre><code class="language-sql">CREATE TABLE dim_user (
+    user_key BIGINT PRIMARY KEY,
+    user_id BIGINT,
+    name TEXT,
+    country TEXT
+);
+</code></pre>
+<p><strong>Step 2 — Date dimension</strong></p>
+<pre><code class="language-sql">CREATE TABLE dim_date (
+    date_key INT PRIMARY KEY,
+    full_date DATE,
+    year INT,
+    month INT,
+    day_of_week INT
+);
+</code></pre>
+<p><strong>Step 3 — Build a fact</strong></p>
+<pre><code class="language-sql">CREATE TABLE fact_orders (
+    order_id BIGINT,
+    user_key BIGINT,
+    date_key INT,
+    amount NUMERIC(12, 2),
+    qty INT
+);
+</code></pre>
+<p><strong>Step 4 — Join for analysis</strong></p>
+<pre><code class="language-sql">SELECT u.country, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_user u ON u.user_key = f.user_key
+GROUP BY u.country;
+</code></pre>
+<p><strong>Step 5 — Time axis analysis</strong></p>
+<pre><code class="language-sql">SELECT d.year, d.month, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_date d ON d.date_key = f.date_key
+GROUP BY d.year, d.month
+ORDER BY 1, 2;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>fact carries only thin numbers</em>.</li>
+<li>The <em>dimension carries meaningful attributes</em>.</li>
+<li>Multiple facts <em>share</em> the same dimension.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Putting <em>string attributes</em> directly in the fact.</strong> Storage explodes when rows reach <em>hundreds of millions</em>.</li>
+<li><strong>Mixing <em>grain</em>.</strong> Combining <em>order-level</em> and <em>line-item</em> in one fact makes <em>aggregations lie</em>.</li>
+<li><strong>Using <em>natural keys only</em>.</strong> When upstream keys change, <em>every fact wobbles</em>.</li>
+<li><strong>Skipping the <em>date dimension</em>.</strong> <em>Weekend / holiday</em> analyses become <em>painful</em>.</li>
+<li><strong>Putting <em>measures</em> in the dimension.</strong> Meaning blurs and the team gets confused.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>E-commerce ships <em>fact_orders, fact_payments, fact_refunds</em> and <em>shares</em> dim_user, dim_product, dim_date. When a user <em>changes country</em>, only dim_user is updated.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>You should be able to write the </em>grain<em> in a single sentence.</em></li>
+<li><em>Treat conformed dimensions as </em>team assets<em>.</em></li>
+<li><em>Use surrogate keys to </em>absorb upstream change<em>.</em></li>
+<li><em>The date dimension is the </em>spine of all analytics<em>.</em></li>
+<li><em>Facts are </em>narrow and long<em>; dimensions are </em>wide and short<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>fact</em> from <em>dimension</em>.</li>
+<li>[ ] You can write the <em>grain</em> in one sentence.</li>
+<li>[ ] You know why <em>surrogate keys</em> matter.</li>
+<li>[ ] You see the value of a <em>date dimension</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write the <em>grain</em> of <em>fact_payments</em> in one sentence.</li>
+<li>List <em>five</em> columns for <em>dim_product</em>.</li>
+<li>Name <em>three</em> downsides of skipping <em>surrogate keys</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Splitting facts and dimensions is the <em>starting point</em> of analytical modeling. Next, we cover the <em>star schema</em> — the most common shape.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><strong>Fact and Dimension (current)</strong></li>
+<li>Star Schema (upcoming)</li>
+<li>Partition and Clustering (upcoming)</li>
+<li>ETL and ELT (upcoming)</li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/">Kimball — Fact Table Design</a></li>
+<li><a href="https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview">dbt — Dimensional Modeling</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake — Star Schema</a></li>
+<li><a href="https://cloud.google.com/bigquery/docs/schemas">BigQuery — Schema Design</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, Fact, Dimension, Modeling, Analytics</p>
+</body>
+</html>

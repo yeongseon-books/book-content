@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graphs</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Graphs</h1>
+<blockquote>
+<p>Math for CS 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>represent</em> and <em>traverse</em> data with <em>relationships</em>?</p>
+<blockquote>
+<p>A <em>graph</em> is a collection of <em>vertices</em> and <em>edges</em> — the <em>common model</em> for every <em>network</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Vertices</em> and <em>edges</em></li>
+<li><em>Directed</em> vs <em>undirected</em></li>
+<li><em>Trees</em></li>
+<li><em>Adjacency matrix</em> vs <em>list</em></li>
+<li>A starter <em>BFS</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Social networks</em>, <em>maps</em>, <em>dependencies</em>, <em>recommendations</em> — all are <em>graphs</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A((A)) --&gt; B((B))
+    A --&gt; C((C))
+    B --&gt; D((D))
+    C --&gt; D
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>vertex</strong>: a <em>node</em>.</li>
+<li><strong>edge</strong>: a <em>connection</em> between two <em>vertices</em>.</li>
+<li><strong>tree</strong>: a <em>connected</em>, <em>acyclic</em> graph.</li>
+<li><strong>adjacency</strong>: the <em>neighbor</em> relation.</li>
+<li><strong>BFS</strong>: <em>breadth-first search</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: store the graph as a <em>2-D array</em>.</p>
+<p><strong>After</strong>: use an <em>adjacency list</em> for a <em>sparse</em> representation.</p>
+<h2>Hands-on: A Mini Graph Kit</h2>
+<p><strong>Step 1 — Adjacency list</strong></p>
+<pre><code class="language-python">G = {&quot;A&quot;: [&quot;B&quot;, &quot;C&quot;], &quot;B&quot;: [&quot;D&quot;], &quot;C&quot;: [&quot;D&quot;], &quot;D&quot;: []}
+</code></pre>
+<p><strong>Step 2 — Vertex and edge counts</strong></p>
+<pre><code class="language-python">def stats(G):
+    return len(G), sum(len(v) for v in G.values())
+</code></pre>
+<p><strong>Step 3 — Neighbors</strong></p>
+<pre><code class="language-python">def neighbors(G, v):
+    return G.get(v, [])
+</code></pre>
+<p><strong>Step 4 — BFS</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(G, s):
+    seen, q = {s}, deque([s])
+    while q:
+        v = q.popleft()
+        for n in G[v]:
+            if n not in seen:
+                seen.add(n)
+                q.append(n)
+    return seen
+</code></pre>
+<p><strong>Step 5 — Tree check</strong></p>
+<pre><code class="language-python">def is_tree(G):
+    edges = sum(len(v) for v in G.values())
+    return edges == len(G) - 1
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>An <em>adjacency list</em> is just a <em>dict</em>.</li>
+<li><em>BFS</em> uses <em>one queue</em>.</li>
+<li>A <em>tree</em> has <em>edges = vertices - 1</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating a <em>directed</em> graph as <em>undirected</em>.</strong></li>
+<li><strong>Using an <em>adjacency matrix</em> on <em>sparse</em> data.</strong></li>
+<li><strong>Forgetting <em>seen</em> in <em>BFS</em>.</strong></li>
+<li><strong>Ignoring <em>connectivity</em> in tree checks.</strong></li>
+<li><strong>Not handling <em>self loops</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Friend recommendations</em>, <em>shortest path</em>, <em>dependency build order</em>, <em>rating propagation</em> — all <em>graph algorithms</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>graph</em> is the <em>model</em>.</li>
+<li><em>Sparser</em> data prefers a <em>list</em>.</li>
+<li><em>BFS</em> and <em>DFS</em> are <em>fundamentals</em>.</li>
+<li>A <em>tree</em> is a <em>subset</em> of graphs.</li>
+<li><em>Direction</em> is <em>explicit</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Decide <em>directed/undirected</em>.</li>
+<li>[ ] Pick the <em>adjacency representation</em>.</li>
+<li>[ ] Implement <em>BFS</em>.</li>
+<li>[ ] Verify <em>tree conditions</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Distinguish <em>vertex</em> and <em>edge</em> in one line.</li>
+<li>Define <em>BFS</em> in one line.</li>
+<li>Define <em>tree</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>combinatorics</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><strong>Graphs (current)</strong></li>
+<li>Combinatorics (upcoming)</li>
+<li>Probability (upcoming)</li>
+<li>Linear Algebra (upcoming)</li>
+<li>Calculus (upcoming)</li>
+<li>Information Theory (upcoming)</li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mathworld.wolfram.com/GraphTheory.html">Graph Theory - Wolfram MathWorld</a></li>
+<li><a href="https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs">Graphs - Khan Academy</a></li>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms - CLRS</a></li>
+<li><a href="https://networkx.org/">NetworkX Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Math, Graphs, DataStructure, Algorithms, Beginner</p>
+</body>
+</html>

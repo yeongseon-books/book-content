@@ -1,0 +1,155 @@
+
+# 안전한 데이터 저장
+
+> Secure Coding 101 시리즈 (5/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: 누군가 *우리 디스크 한 장* 을 가져갔을 때, 그 안의 데이터는 *얼마나 읽힐까요*?
+
+> *데이터는 *움직일 때* 와 *멈춰 있을 때* 모두 보호되어야 한다. 둘 중 하나만 안전하면 *전부 위험*.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *At-rest* 와 *in-transit* 의 차이
+- *PII* 와 *sensitive data* 분류
+- *대칭/비대칭* 암호화 개념
+- *Tokenization* 과 *pseudonymization*
+- 저장 5단계와 흔한 함정 5가지
+
+## 왜 중요한가
+
+법적으로도(GDPR, 개인정보보호법) 사고 비용 면에서도, *민감 데이터 누출* 은 가장 비싼 사고입니다. 평문 저장은 *시한폭탄* 입니다.
+
+> *민감 데이터는 *덜 모으고, 잘게 나누고, 강하게 잠근다*.*
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    App["애플리케이션"] -->|TLS| DB["데이터베이스"]
+    DB -->|At-rest 암호화| Disk["Disk"]
+    App --> KMS["KMS (키 관리)"]
+```
+
+## 핵심 용어 정리
+
+- **PII**: 개인을 *식별* 할 수 있는 정보.
+- **At-rest**: 저장된 상태의 데이터.
+- **In-transit**: 네트워크로 *이동 중* 인 데이터.
+- **KMS**: *키 자체* 를 관리하는 서비스.
+- **Tokenization**: 원본을 *대체 토큰* 으로 바꿔 저장.
+
+## Before/After
+
+**Before**: 주민번호와 카드번호를 *그대로* DB 에 저장. log 에도 *그대로*.
+
+**After**: 주민번호는 *해시*, 카드번호는 *tokenize*, 저장은 *KMS 키* 로 암호화.
+
+## 실습: 안전한 저장 5단계
+
+### 1단계 — 데이터 분류
+
+```python
+SENSITIVE = {"ssn", "card_number", "password", "address"}
+def is_sensitive(field): return field in SENSITIVE
+```
+
+### 2단계 — 전송은 TLS
+
+```python
+# 클라이언트와 DB 사이에 항상 TLS, 인증서 검증을 끄지 않는다.
+import psycopg
+conn = psycopg.connect("postgresql://...?sslmode=verify-full")
+```
+
+### 3단계 — 저장은 envelope 암호화
+
+```python
+from cryptography.fernet import Fernet
+data_key = Fernet(kms.get_data_key())
+ciphertext = data_key.encrypt(b"card-number")
+```
+
+### 4단계 — 검색이 필요하면 *결정적 해시*
+
+```python
+import hmac, hashlib
+def lookup_hash(value, key):
+    return hmac.new(key, value.encode(), hashlib.sha256).hexdigest()
+```
+
+### 5단계 — 백업도 같이 보호
+
+```bash
+# 백업 파일 자체를 암호화, 키는 별도 저장
+gpg --symmetric --cipher-algo AES256 backup.sql
+```
+
+## 이 코드에서 주목할 점
+
+- *Envelope 암호화* 는 *데이터 키* 와 *KMS 키* 를 분리한다.
+- *결정적 해시* 는 검색 가능, 단 *salt* 는 시스템 단위.
+- 전송과 저장이 *둘 다* 보호된다.
+
+## 자주 하는 실수 5가지
+
+1. **민감 데이터를 *평문* 으로 저장.** 디스크 한 장이면 끝.
+2. **암호화 키를 *코드와 함께* 둔다.** 분리하는 의미가 없다.
+3. **TLS 인증서 *검증을 끈다*.** *MITM* 에 노출.
+4. **로그에 *민감 데이터* 가 흘러간다.** 로그도 *데이터 저장소*.
+5. **백업이 *평문*.** 사고 시 가장 *큰 피해*.
+
+## 실무에서는 이렇게 쓰입니다
+
+대부분의 팀은 *KMS* (AWS KMS, GCP KMS, Vault) 로 키를 관리하고, *envelope encryption* 으로 application 데이터 키를 *주기적으로 회전* 합니다. 카드번호 같은 데이터는 *tokenization* 으로 *우리 시스템에 안 들이는* 전략을 씁니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *덜 모으는 것* 이 가장 강한 방어.*
+- *키와 데이터는 *물리적으로 분리*.*
+- *전송과 저장 둘 다 보호*, 한쪽만은 *허상*.
+- *키 회전이 *불가능* 하면 설계가 잘못됐다.*
+- *백업도 *데이터* 다.*
+
+## 체크리스트
+
+- [ ] PII 가 *목록화* 되어 있다.
+- [ ] 저장이 *KMS 기반* 으로 암호화된다.
+- [ ] 전송이 *TLS, 인증서 검증* 으로 보호된다.
+- [ ] 백업이 *암호화* 되어 있다.
+
+## 연습 문제
+
+1. 우리 서비스의 *PII 목록* 을 적어 보세요.
+2. *Envelope 암호화* 의 흐름을 그림으로.
+3. 카드번호를 *tokenize* 하는 함수를 작성해 보세요.
+
+## 정리 및 다음 단계
+
+데이터가 안전해도 *키가 새면* 무용지물입니다. 다음 글은 *secret 과 키 관리* 입니다.
+
+- [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)
+- [입력값 검증](./02-input-validation.md)
+- [인증과 세션](./03-authentication-and-session.md)
+- [인가와 권한](./04-authorization-and-permissions.md)
+- **안전한 데이터 저장 (현재 글)**
+- Secret과 키 관리 (예정)
+- SQL Injection과 ORM 안전 사용 (예정)
+- XSS와 CSRF 방어 (예정)
+- Dependency 취약점 관리 (예정)
+- 안전한 로깅과 감사 (예정)
+## 참고 자료
+
+- [OWASP Cryptographic Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html)
+- [AWS KMS — Envelope Encryption](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html)
+- [Google Cloud KMS](https://cloud.google.com/kms/docs)
+- [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
+
+Tags: Encryption, DataProtection, PII, SecureCoding, Cryptography
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

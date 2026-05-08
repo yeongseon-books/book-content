@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cost Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Cost Management</h1>
+<blockquote>
+<p>Cloud Computing 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does the cloud bill always come in higher than predicted?</p>
+<blockquote>
+<p><em>Cloud cost is tamed in four steps — visibility (tags), budgets (alerts), commitments (Savings), and optimization (rightsizing).</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Cloud cost basics</li>
+<li>Cost allocation through tags</li>
+<li>Budget alerts</li>
+<li>Savings Plans and Reserved Instances</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Tag[&quot;tag&quot;] --&gt; Visibility[&quot;visibility&quot;]
+    Budget[&quot;budget&quot;] --&gt; Alert[&quot;alert&quot;]
+    Savings[&quot;savings plan&quot;] --&gt; Discount[&quot;discount&quot;]
+    Right[&quot;right-size&quot;] --&gt; Saving[&quot;saving&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Tag</strong>: a key-value label attached to a resource.</li>
+<li><strong>Budget</strong>: a monthly cap with alerting.</li>
+<li><strong>Savings Plans</strong>: a term commitment in exchange for a discount.</li>
+<li><strong>Reserved Instance</strong>: a commitment tied to a specific instance shape.</li>
+<li><strong>Rightsizing</strong>: shrinking resources to actual usage.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every instance is <code>m5.xlarge</code> and runs around the clock.</p>
+<p><strong>After</strong>: non-prod stops at night, prod runs on Savings Plans.</p>
+<h2>Hands-on: Create a Budget</h2>
+<p><strong>Step 1 — Client</strong></p>
+<pre><code class="language-python">import boto3
+budgets = boto3.client(&quot;budgets&quot;)
+account_id = boto3.client(&quot;sts&quot;).get_caller_identity()[&quot;Account&quot;]
+</code></pre>
+<p><strong>Step 2 — Budget definition</strong></p>
+<pre><code class="language-python">budget = {
+    &quot;BudgetName&quot;: &quot;monthly-cap&quot;,
+    &quot;BudgetLimit&quot;: {&quot;Amount&quot;: &quot;500&quot;, &quot;Unit&quot;: &quot;USD&quot;},
+    &quot;TimeUnit&quot;: &quot;MONTHLY&quot;,
+    &quot;BudgetType&quot;: &quot;COST&quot;,
+}
+</code></pre>
+<p><strong>Step 3 — Notifications</strong></p>
+<pre><code class="language-python">notif = [{
+    &quot;Notification&quot;: {
+        &quot;NotificationType&quot;: &quot;ACTUAL&quot;,
+        &quot;ComparisonOperator&quot;: &quot;GREATER_THAN&quot;,
+        &quot;Threshold&quot;: 80.0,
+        &quot;ThresholdType&quot;: &quot;PERCENTAGE&quot;,
+    },
+    &quot;Subscribers&quot;: [{&quot;SubscriptionType&quot;: &quot;EMAIL&quot;, &quot;Address&quot;: &quot;ops@example.com&quot;}],
+}]
+</code></pre>
+<p><strong>Step 4 — Create</strong></p>
+<pre><code class="language-python">def create_budget():
+    budgets.create_budget(
+        AccountId=account_id,
+        Budget=budget,
+        NotificationsWithSubscribers=notif,
+    )
+</code></pre>
+<p><strong>Step 5 — Enforce tags (illustrative policy)</strong></p>
+<pre><code class="language-python">require_tags = {
+    &quot;Effect&quot;: &quot;Deny&quot;,
+    &quot;Action&quot;: &quot;ec2:RunInstances&quot;,
+    &quot;Resource&quot;: &quot;*&quot;,
+    &quot;Condition&quot;: {&quot;Null&quot;: {&quot;aws:RequestTag/Project&quot;: &quot;true&quot;}},
+}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>An 80% alert gives you reaction time.</li>
+<li>A tag-enforcement policy is a precondition for cost tracking.</li>
+<li>Budgets can be scoped per team.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Untagged resources.</strong></li>
+<li><strong>No budget alerts.</strong></li>
+<li><strong>Over-committing on Savings Plans.</strong></li>
+<li><strong>Leaving expensive instances idle.</strong></li>
+<li><strong>Ignoring NAT and data-transfer costs.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <code>Project=acme</code> tag separates team costs. A scheduled Lambda stops non-prod at night. A 1-year Savings Plan covers steady-state load. A quarterly rightsizing review trims drift.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Cost is an architectural metric.</li>
+<li>Tags are the entry point of FinOps.</li>
+<li>Commit only after you have seen real volatility.</li>
+<li>Data transfer costs hide where you cannot see them.</li>
+<li>Hold cost reviews on a regular cadence.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Every resource carries a <code>Project</code> tag.</li>
+<li>[ ] Monthly budget alert is enabled.</li>
+<li>[ ] Idle resources are reviewed periodically.</li>
+<li>[ ] SPs/RIs reviewed at least once a quarter.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain the difference between on-demand and Savings Plans in one line.</li>
+<li>List three minimum tags for cost tracking.</li>
+<li>Give one strategy to reduce NAT Gateway costs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Operations, security, and cost are all in. Time to stitch the picture together. The next post covers Cloud Architecture Basics.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/07-identity-and-security.md">Identity and Security</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/08-monitoring.md">Monitoring</a></li>
+<li><strong>Cost Management (current)</strong></li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html">AWS Billing user guide</a></li>
+<li><a href="https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html">AWS Budgets</a></li>
+<li><a href="https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html">Savings Plans</a></li>
+<li><a href="https://www.finops.org/framework/">FinOps Foundation</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, FinOps, Cost, AWS, Architecture</p>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Statistics?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Statistics?</h1>
+<blockquote>
+<p>Statistics 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does statistics actually study, and why do we need it? How do we turn a collection of formulas into a <em>language for decisions</em>?</p>
+<blockquote>
+<p><em>Statistics is the shared language of uncertainty.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>two pillars</em> of statistics — descriptive and inferential</li>
+<li>The <em>data → decision</em> thinking flow</li>
+<li>The <em>four questions</em> statistics answers</li>
+<li>A 5-step statistical thinking exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>As data piles up, the question <em>“is this really true?”</em> shows up more and more often. Statistics is the tool that <em>links hypothesis to evidence in numbers</em> — making <em>uncertain decisions less uncertain</em>.</p>
+<blockquote>
+<p><em>Good statistical thinking produces decisions, not numbers.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;Data&quot;] --&gt; Desc[&quot;Descriptive&quot;]
+    Desc --&gt; Infer[&quot;Inferential&quot;]
+    Infer --&gt; Decide[&quot;Decision&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Descriptive Statistics</strong>: statistics that <em>summarize</em> data (mean, variance, etc.).</li>
+<li><strong>Inferential Statistics</strong>: statistics that <em>infer the population</em> from a <em>sample</em>.</li>
+<li><strong>Population vs Sample</strong>: <em>all</em> vs <em>part</em>.</li>
+<li><strong>Estimate</strong>: the <em>guess</em> about the <em>true value</em> in the population.</li>
+<li><strong>Uncertainty</strong>: the error that <em>always</em> accompanies an estimate.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Revenue went up this month!”</em> — By how much? Is it statistically meaningful?</p>
+<p><strong>After</strong>: <em>“Monthly revenue is up by 6.2% on average (95% CI ±1.5%, n=30 days) — statistically significant vs last month.”</em></p>
+<h2>Hands-on: 5-step Statistical Thinking</h2>
+<p><strong>Step 1 — Define the question</strong></p>
+<pre><code class="language-text">Q: &quot;Did this month's marketing campaign improve click-through rate?&quot;
+</code></pre>
+<p><strong>Step 2 — Collect data</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_csv(&quot;clicks.csv&quot;)
+print(df.shape, df.columns.tolist())
+</code></pre>
+<p><strong>Step 3 — Summarize (descriptive)</strong></p>
+<pre><code class="language-python">print(df.groupby(&quot;group&quot;)[&quot;ctr&quot;].agg([&quot;mean&quot;, &quot;std&quot;, &quot;count&quot;]))
+</code></pre>
+<p><strong>Step 4 — Infer</strong></p>
+<pre><code class="language-python">from scipy.stats import ttest_ind
+a, b = df.loc[df.group == &quot;control&quot;, &quot;ctr&quot;], df.loc[df.group == &quot;test&quot;, &quot;ctr&quot;]
+print(ttest_ind(a, b, equal_var=False))
+</code></pre>
+<p><strong>Step 5 — Decide</strong></p>
+<pre><code class="language-text">Decision: p &lt; 0.01 &amp; lift +0.4pp → roll out the campaign to all users
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>3-tier structure</em> — <em>describe → infer → decide</em>.</li>
+<li><em>Group comparison</em> starts with a <em>t-test</em>.</li>
+<li>A <em>decision sentence</em> is what <em>closes</em> the analysis.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Looking only at the <em>mean</em>.</strong> You also need <em>variance</em> and the <em>distribution</em>.</li>
+<li><strong>Treating the <em>sample</em> like the <em>population</em>.</strong> Forgetting <em>uncertainty</em>.</li>
+<li><strong>Confusing <em>p-value</em> with <em>effect size</em>.</strong></li>
+<li><strong>Reading statistics <em>without visualization</em>.</strong> Distorted distributions slip by.</li>
+<li><strong>Ending the report <em>without a decision</em>.</strong> The point of the analysis is lost.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A/B testing, revenue forecasting, anomaly detection, quality control — <em>every data-driven decision</em> sits on a base of statistics. Even <em>one cell on a dashboard</em> is an <em>estimate</em>; reporting it <em>with its uncertainty</em> is what builds <em>trust</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Read the <em>distribution</em> before the <em>mean</em>.</li>
+<li><em>Always</em> attach <em>uncertainty</em> to an estimate.</li>
+<li>Shorten the <em>question → data → decision</em> loop.</li>
+<li>Use <em>visualization</em> and <em>statistics</em> together.</li>
+<li>Remember statistics is the <em>language of decisions</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can write the <em>question</em> in one line.</li>
+<li>[ ] I can <em>summarize</em> data with descriptive statistics.</li>
+<li>[ ] I can read <em>uncertainty</em> through inference.</li>
+<li>[ ] I close with a <em>decision sentence</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compute the mean and variance of <em>some everyday data</em> (e.g., daily study time).</li>
+<li>Explain the difference between <em>population</em> and <em>sample</em> in <em>one sentence</em>.</li>
+<li>Recall <em>one statistical report</em> that ended with a clear decision and write its structure down.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Statistics is the tool that moves <em>uncertainty</em> into <em>decisions</em>. The next episode dives into the most basic summary tools — <em>mean, median, and variance</em>.</p>
+<ul>
+<li><strong>What Is Statistics? (current)</strong></li>
+<li>Mean, Median, and Variance (upcoming)</li>
+<li>Distributions (upcoming)</li>
+<li>Sample and Population (upcoming)</li>
+<li>Estimation (upcoming)</li>
+<li>Confidence Interval (upcoming)</li>
+<li>Hypothesis Testing (upcoming)</li>
+<li>Correlation and Regression (upcoming)</li>
+<li>Understanding p-value (upcoming)</li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.khanacademy.org/math/statistics-probability">Khan Academy — Statistics and Probability</a></li>
+<li><a href="https://www.openintro.org/book/os/">OpenIntro Statistics</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">scipy.stats — Statistical Functions</a></li>
+<li><a href="https://seeing-theory.brown.edu/">Seeing Theory — Visual Introduction</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, Fundamentals, DataAnalysis, Beginner, Concept</p>
+</body>
+</html>

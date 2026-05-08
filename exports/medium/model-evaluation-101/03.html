@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Limits of Accuracy</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Limits of Accuracy</h1>
+<blockquote>
+<p>Model Evaluation 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is "95% accuracy" always a good score?</p>
+<blockquote>
+<p><em>Accuracy is fair only when classes are balanced. On imbalanced data, you need baselines and balanced accuracy.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The accuracy formula and meaning</li>
+<li>Base rates and dummy classifiers</li>
+<li>The intuition behind balanced accuracy</li>
+<li>Limits of accuracy in multiclass settings</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When the comparison standard is a single accuracy number, the entire team can drift unknowingly into wrong decisions.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Bal[&quot;balanced data&quot;] --&gt; AccOK[&quot;accuracy is fair&quot;]
+    Imb[&quot;imbalanced data&quot;] --&gt; AccBad[&quot;accuracy is misleading&quot;]
+    Imb --&gt; BAcc[&quot;balanced accuracy&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Accuracy</strong>: <code>(TP+TN)/N</code>.</li>
+<li><strong>Base rate</strong>: class proportion.</li>
+<li><strong>Dummy classifier</strong>: a constant or random predictor.</li>
+<li><strong>Balanced Accuracy</strong>: average per-class recall.</li>
+<li><strong>Top-k Accuracy</strong>: correct label appears in top-k predictions.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "acc 95%, done."</p>
+<p><strong>After</strong>: Baseline, then balanced accuracy, then per-class breakdown.</p>
+<h2>Hands-on: 5 Steps Dissecting Accuracy</h2>
+<p><strong>Step 1 — Imbalanced data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import make_classification
+X, y = make_classification(n_samples=1000, weights=[0.95, 0.05], random_state=0)
+print(&quot;base rate:&quot;, y.mean())
+</code></pre>
+<p><strong>Step 2 — Dummy classifier</strong></p>
+<pre><code class="language-python">from sklearn.dummy import DummyClassifier
+d = DummyClassifier(strategy=&quot;most_frequent&quot;).fit(X, y)
+print(&quot;dummy acc:&quot;, d.score(X, y))
+</code></pre>
+<p><strong>Step 3 — Train a model</strong></p>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+print(&quot;acc:&quot;, m.score(Xte, yte))
+</code></pre>
+<p><strong>Step 4 — Balanced accuracy</strong></p>
+<pre><code class="language-python">from sklearn.metrics import balanced_accuracy_score
+pred = m.predict(Xte)
+print(&quot;bacc:&quot;, balanced_accuracy_score(yte, pred))
+</code></pre>
+<p><strong>Step 5 — Per-class report</strong></p>
+<pre><code class="language-python">from sklearn.metrics import classification_report
+print(classification_report(yte, pred))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A 95% dummy is your real baseline.</li>
+<li>Balanced accuracy is closer to the truth on skewed data.</li>
+<li>Per-class recall reveals where the model actually fails.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Claiming superiority without comparing to a dummy classifier.</li>
+<li>Reporting only top-1 accuracy on multiclass problems.</li>
+<li>Using accuracy on heavy imbalance.</li>
+<li>Comparing accuracy after resampling.</li>
+<li>Ignoring the small-class row in the report.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spam, fraud, and rare-disease detection all sit at base rates below 5%. Accuracy is a trap in those settings.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always compare against a dummy.</li>
+<li>For imbalance, prefer balanced accuracy and PR-AUC.</li>
+<li>Per-class analysis is debugging.</li>
+<li>Top-k makes sense for ranking and recommendation.</li>
+<li>Accuracy is the closing number on balanced data, not the opener.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I compare to a dummy classifier.</li>
+<li>[ ] I report balanced accuracy.</li>
+<li>[ ] I look at per-class recall.</li>
+<li>[ ] I use top-k where appropriate.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare a dummy and a real model on a 1% base-rate dataset.</li>
+<li>Construct a dataset where balanced accuracy and accuracy diverge most.</li>
+<li>Compute top-3 accuracy on a multiclass dataset.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Accuracy is useless when its assumptions break. Next, we cover precision and recall for imbalanced evaluation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
+<li><strong>The Limits of Accuracy (current)</strong></li>
+<li>Precision and Recall (upcoming)</li>
+<li>F1 Score (upcoming)</li>
+<li>ROC and AUC (upcoming)</li>
+<li>Calibration (upcoming)</li>
+<li>Cross Validation (upcoming)</li>
+<li>Error Analysis (upcoming)</li>
+<li>Building an Evaluation Report (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html">scikit-learn — Balanced accuracy</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html">scikit-learn — DummyClassifier</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Accuracy_paradox">Wikipedia — Accuracy paradox</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course/classification/accuracy">Google — Classification metrics</a></li>
+</ul>
+<p class="tags-line">Tags: ModelEvaluation, Accuracy, ImbalancedData, BaselineModel, scikit-learn</p>
+</body>
+</html>

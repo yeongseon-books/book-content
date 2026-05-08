@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Replication</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Replication</h1>
+<blockquote>
+<p>Distributed Systems 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Putting the same data on more than one node sounds simple — why does it produce so many modes and knobs?</p>
+<blockquote>
+<p>Replication is the basic tool for durability and availability. But sync vs async, leader count, and quorum settings change visible behavior dramatically.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why we replicate, what kinds exist, and the tradeoffs</li>
+<li>The leader-follower, multi-leader, and leaderless models</li>
+<li>Sync vs async replication and the risk of data loss</li>
+<li>Quorum reads and writes and the meaning of R+W&gt;N</li>
+<li>How to measure and handle replication lag</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Replication is the lowest layer in any distributed data system. The choices here shape what you saw in episode 4 (consistency) and what you will see in episode 6 (consensus). The answer to "why does my DB behave this way?" is usually in the replication settings.</p>
+<blockquote>
+<p>Replication settings are the exchange rate between safety and speed.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    subgraph LF[leader-follower]
+        L[&quot;leader&quot;] --&gt; F1[&quot;follower 1&quot;]
+        L --&gt; F2[&quot;follower 2&quot;]
+    end
+    subgraph ML[multi-leader]
+        M1[&quot;leader A&quot;] &lt;--&gt; M2[&quot;leader B&quot;]
+    end
+    subgraph LL[leaderless]
+        N1[&quot;node&quot;] --- N2[&quot;node&quot;]
+        N2 --- N3[&quot;node&quot;]
+        N3 --- N1
+    end
+</code></pre>
+<p>These three topologies cover more than ninety percent of real systems.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Leader/follower</strong>: Writes go to one leader, reads can fan out to followers.</li>
+<li><strong>Multi-leader</strong>: Multiple leaders accept writes and synchronize with each other.</li>
+<li><strong>Leaderless</strong>: All nodes are equal; quorums decide.</li>
+<li><strong>Sync replication</strong>: The leader waits for follower acknowledgments.</li>
+<li><strong>Quorum (R, W, N)</strong>: With R+W&gt;N you guarantee reading the latest value among N replicas.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — single primary, async replica</strong></p>
+<pre><code class="language-text">fast write but possible data loss on crash
+</code></pre>
+<p><strong>After — sync to majority + read from leader</strong></p>
+<pre><code class="language-text">slower write, near-zero loss, linearizable reads possible
+</code></pre>
+<p>The same system, with one option flipped, makes a different promise.</p>
+<h2>Hands-on: Models in Code</h2>
+<p><strong>Step 1 — async leader-follower</strong></p>
+<pre><code class="language-python"># 1_async.py
+import threading, time
+leader = []
+follower = []
+def write(x):
+    leader.append(x)
+    threading.Thread(target=lambda: (time.sleep(0.5), follower.append(x))).start()
+</code></pre>
+<p>Writes are fast, but if the leader crashes you may lose half a second of data.</p>
+<p><strong>Step 2 — sync leader-follower</strong></p>
+<pre><code class="language-python"># 2_sync.py
+def write(x):
+    leader.append(x)
+    follower.append(x)   # write both before returning
+</code></pre>
+<p>A write must touch both nodes. Latency rises; loss approaches zero.</p>
+<p><strong>Step 3 — quorum write</strong></p>
+<pre><code class="language-python"># 3_quorum.py
+nodes = [[], [], []]   # N=3
+def write(x, w=2):
+    acks = 0
+    for n in nodes:
+        n.append(x); acks += 1
+        if acks &gt;= w: return &quot;ok&quot;
+def read(x_id, r=2):
+    seen = []
+    for n in nodes:
+        if any(item[&quot;id&quot;] == x_id for item in n):
+            seen.append(n)
+            if len(seen) &gt;= r: return &quot;found&quot;
+</code></pre>
+<p>R+W&gt;N guarantees at least one node has both. This is the heart of Dynamo-style systems.</p>
+<p><strong>Step 4 — multi-leader (simple last-write-wins)</strong></p>
+<pre><code class="language-python"># 4_mlw.py
+A, B = {}, {}
+def write_a(k, v): A[k] = (time.time(), v)
+def write_b(k, v): B[k] = (time.time(), v)
+def merge():
+    for k in set(A) | set(B):
+        ta, va = A.get(k, (0, None))
+        tb, vb = B.get(k, (0, None))
+        winner = (va if ta &gt;= tb else vb)
+        A[k] = B[k] = (max(ta, tb), winner)
+</code></pre>
+<p>LWW is simple but loses user input when clocks drift.</p>
+<p><strong>Step 5 — measuring replication lag</strong></p>
+<pre><code class="language-python"># 5_lag.py
+def lag(): return leader_lsn - follower_lsn
+print(&quot;replication lag rows:&quot;, lag())
+</code></pre>
+<p>Most DBs expose LSN/GTID/offset. Tracking lag as an SLO catches stale reads early.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Async is fast but can lose data.</li>
+<li>Sync is safe but slow — neither is correct in isolation; pick by workload.</li>
+<li>Quorums turn the tradeoff into a dial via R and W.</li>
+<li>Multi-leader requires you to define conflict resolution by hand.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Assuming reads from replicas are always fast.</strong> Lag produces stale reads.</li>
+<li><strong>Placing the only sync replica in one place.</strong> That one slow follower blocks the leader.</li>
+<li><strong>Using only LWW in multi-leader systems.</strong> Clock drift loses data.</li>
+<li><strong>Breaking the R+W&gt;N rule of quorums.</strong> Latest-value guarantee disappears.</li>
+<li><strong>Not monitoring lag.</strong> You discover stale reads only when users complain.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>PostgreSQL and MySQL use leader-follower by default. Cassandra and DynamoDB are leaderless quorum systems. CRDT-based systems are multi-leader. Cloud multi-AZ DBs typically blend sync to one AZ with async to another.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They write replication settings down explicitly in docs.</li>
+<li>They expose read-from-replica as a separate endpoint with a documented staleness limit.</li>
+<li>They keep at least two sync replicas to avoid a single slow point.</li>
+<li>They design application-level merge instead of relying on LWW.</li>
+<li>They track lag with an SLO and alert on it.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between sync and async replication in one line?</li>
+<li>[ ] Can you say what R+W&gt;N means?</li>
+<li>[ ] Can you name two ways to resolve conflicts in multi-leader systems?</li>
+<li>[ ] Can you sketch your DB's replication topology?</li>
+<li>[ ] Do you know how to measure replication lag?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick two screens in your service where stale reads are safe.</li>
+<li>Evaluate the availability and consistency of a quorum config (N=5, W=3, R=3).</li>
+<li>Design an application-level resolution for two concurrent writes to the same key in a multi-leader system.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Replication is the foundation of distributed data. Next we look at the algorithm by which nodes agree on what the next value is — consensus and Raft.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><strong>Replication (current)</strong></li>
+<li>consensus and Raft (upcoming)</li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Replication_(computing)">Replication (computing) — Wikipedia</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Quorum_(distributed_computing)">Quorum (distributed computing) — Wikipedia</a></li>
+<li><a href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">Amazon Dynamo paper</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — chapter 5</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Replication, LeaderFollower, QuorumWrites, Durability</p>
+</body>
+</html>

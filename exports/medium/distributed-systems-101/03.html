@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RPC and Message Passing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>RPC and Message Passing</h1>
+<blockquote>
+<p>Distributed Systems 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: RPC feels like a function call and a queue feels like a mailbox. They do similar work, so why do they end up in different places?</p>
+<blockquote>
+<p>RPC follows the intuition of synchronous function calls. Message passing follows the intuition of asynchronous mailboxes. That single intuition gap drives big differences in latency, coupling, and resilience.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definitions and differences of RPC and message passing</li>
+<li>Synchronous vs asynchronous, request/response vs publish/subscribe</li>
+<li>Strengths and weaknesses of each model and where each fits</li>
+<li>What "function-like" RPC quietly hides</li>
+<li>Patterns for blending the two</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Once you split services, the next decision is "how do they talk?" That decision drives latency budgets, blast radius, and operational complexity. Picking poorly creates RPC chains that take down the whole system when one node slows, or message flows you cannot trace.</p>
+<blockquote>
+<p>The communication model decides system coupling.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    subgraph RPC[RPC]
+        A1[&quot;client&quot;] --&gt;|request| A2[&quot;server&quot;]
+        A2 --&gt;|response| A1
+    end
+    subgraph MSG[Message Passing]
+        B1[&quot;producer&quot;] --&gt;|publish| BQ[&quot;queue / topic&quot;]
+        BQ --&gt;|consume| B2[&quot;consumer&quot;]
+    end
+</code></pre>
+<p>RPC is a two-way contract. Message passing is a one-way flow with an intermediary store.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>RPC (Remote Procedure Call)</strong>: Call a remote function as if it were local. gRPC, JSON-RPC.</li>
+<li><strong>Message passing</strong>: A producer drops a message in a broker and a consumer picks it up. Kafka, RabbitMQ.</li>
+<li><strong>Synchronous</strong>: Wait for the response.</li>
+<li><strong>Asynchronous</strong>: Do not wait for the response.</li>
+<li><strong>At-least-once / exactly-once</strong>: Delivery guarantees a broker may offer.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — every call is RPC</strong></p>
+<pre><code class="language-text">service A -&gt; B -&gt; C -&gt; D: if D slows down, A's response slows
+</code></pre>
+<p><strong>After — important boundaries use messaging</strong></p>
+<pre><code class="language-text">A drops a message and returns; D processes asynchronously
+</code></pre>
+<p>You gain blast-radius isolation and a tighter latency budget.</p>
+<h2>Hands-on: Both Models on One Screen</h2>
+<p><strong>Step 1 — RPC (FastAPI)</strong></p>
+<pre><code class="language-python"># 1_rpc_server.py
+from fastapi import FastAPI
+app = FastAPI()
+@app.post(&quot;/charge&quot;)
+def charge(amount: int):
+    # process payment synchronously
+    return {&quot;ok&quot;: True, &quot;id&quot;: &quot;txn_1&quot;}
+</code></pre>
+<pre><code class="language-python"># 1_rpc_client.py
+import requests
+r = requests.post(&quot;http://127.0.0.1:8000/charge&quot;, json={&quot;amount&quot;: 100}, timeout=2)
+print(r.json())
+</code></pre>
+<p>The next line runs only after the response arrives. Almost identical to a function call.</p>
+<p><strong>Step 2 — Message passing (in-memory queue)</strong></p>
+<pre><code class="language-python"># 2_queue.py
+from queue import Queue
+import threading, time
+
+q = Queue()
+
+def consumer():
+    while True:
+        msg = q.get()
+        time.sleep(0.5)
+        print(&quot;processed:&quot;, msg)
+
+threading.Thread(target=consumer, daemon=True).start()
+q.put({&quot;amount&quot;: 100, &quot;id&quot;: &quot;txn_1&quot;})
+print(&quot;producer returned immediately&quot;)
+</code></pre>
+<p>The producer returns instantly. The consumer drains at its own pace.</p>
+<p><strong>Step 3 — Risk of an RPC chain</strong></p>
+<pre><code class="language-python"># 3_chain.py (pseudocode)
+def order():
+    inv = rpc_inventory()    # 100ms
+    pay = rpc_payment()      # 200ms
+    ship = rpc_shipping()    # 150ms
+    return ok                # total 450ms plus retry/timeout
+</code></pre>
+<p>Every step must be alive for a response to come back. One slow node slows the whole call.</p>
+<p><strong>Step 4 — Decouple with async + queue</strong></p>
+<pre><code class="language-python"># 4_async.py (pseudocode)
+def order():
+    save_order_local()
+    publish(&quot;order.created&quot;, payload)
+    return &quot;accepted&quot;  # respond immediately
+# separate workers handle inventory/payment/shipping
+</code></pre>
+<p>The user sees a fast response and is shielded from a slow downstream step.</p>
+<p><strong>Step 5 — Delivery guarantees</strong></p>
+<pre><code class="language-python"># 5_dedup.py
+seen = set()
+def consume(msg):
+    if msg[&quot;id&quot;] in seen:
+        return  # idempotent: ignore duplicates
+    seen.add(msg[&quot;id&quot;])
+    process(msg)
+</code></pre>
+<p>Most brokers offer at-least-once. The consumer absorbs duplicates with an idempotency key.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>RPC's wait creates strong coupling.</li>
+<li>Message passing fits work that does not need to happen now.</li>
+<li>Deeper chains make RPC riskier.</li>
+<li>Exactly-once is almost always a fiction; idempotent consumers are the answer.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Making everything RPC.</strong> Chains explode in latency and failure surface.</li>
+<li><strong>Making everything queue-based.</strong> User-facing flows that need a synchronous answer suffer in UX.</li>
+<li><strong>Believing exactly-once.</strong> Reality is broker guarantee plus idempotent consumer.</li>
+<li><strong>Skipping idempotency keys.</strong> A retry can double-charge a customer.</li>
+<li><strong>Putting timeouts and retries only on the client.</strong> You also need a DLQ and retry policy on the broker.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>User paths that need an immediate answer go through RPC. Long work (sending email, generating receipts, analytics) goes through queues. Microservices commonly split modules within a company by RPC and domain boundaries by messages. Event sourcing and CQRS push the message model all the way.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They first ask, "do we really need a synchronous answer?"</li>
+<li>They cap chain depth (for example, no more than three).</li>
+<li>They embed idempotency keys from the first commit.</li>
+<li>They assume brokers are at-least-once.</li>
+<li>They treat DLQs and retry policy as operational responsibilities.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between RPC and message passing in one line?</li>
+<li>[ ] Can you explain why deep RPC chains are dangerous?</li>
+<li>[ ] Do you know what at-least-once and exactly-once mean?</li>
+<li>[ ] Have you designed an idempotency key?</li>
+<li>[ ] Can you say what a DLQ is and when to use it?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find one call in your service worth converting from RPC to a message and explain why.</li>
+<li>In one paragraph, describe a payment API that uses idempotency keys.</li>
+<li>List three conditions a consumer must meet to be safe under at-least-once delivery.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>RPC and message passing trade off sync/async, coupling, and resilience. Next we tackle the biggest tradeoff that appears the moment data lives on multiple nodes: consistency and CAP.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><strong>RPC and Message Passing (current)</strong></li>
+<li>consistency and CAP (upcoming)</li>
+<li>replication (upcoming)</li>
+<li>consensus and Raft (upcoming)</li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Remote_procedure_call">Remote procedure call (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Message_passing">Message passing (Wikipedia)</a></li>
+<li><a href="https://grpc.io/docs/">gRPC documentation</a></li>
+<li><a href="https://kafka.apache.org/documentation/">Apache Kafka documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, RPC, Messaging, Async, Idempotency</p>
+</body>
+</html>

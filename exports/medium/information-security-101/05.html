@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Web Security Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Web Security Basics</h1>
+<blockquote>
+<p>Information Security 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does the browser protect us from other origins?</p>
+<blockquote>
+<p>Browser security revolves around the concept of origin. Once origin clicks, CORS, CSP, and cookies all line up.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The exact definition of same-origin policy</li>
+<li>CORS — what is allowed and how</li>
+<li>CSP (Content Security Policy)</li>
+<li>Cookie flags (Secure, HttpOnly, SameSite)</li>
+<li>The essence of CSRF and how to defend</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>About 80% of web security is the same handful of concepts repeated. Understanding origin and cookies blocks the bulk of CSRF and XSS exposure.</p>
+<blockquote>
+<p>Origin is the security boundary.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;app.example.com&quot;] --&gt;|&quot;Same-Origin OK&quot;| A
+    A --&gt;|&quot;Cross-Origin&quot;| B[&quot;api.other.com&quot;]
+    B --&gt;|&quot;CORS header allows&quot;| A
+</code></pre>
+<p>Same origin: free. Different origin: explicit allowance.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Origin</strong>: scheme + host + port.</li>
+<li><strong>CORS</strong>: server mechanism that allows cross-origin requests.</li>
+<li><strong>CSP</strong>: header that restricts where resources can load from.</li>
+<li><strong>CSRF</strong>: forged request that abuses an authenticated session.</li>
+<li><strong>SameSite cookie</strong>: limits cookie attachment on cross-site requests.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — All cookies sent on cross-site requests</strong></p>
+<pre><code class="language-text">Malicious site triggers a request with the victim's session cookie -&gt; CSRF
+</code></pre>
+<p><strong>After — SameSite=Lax default</strong></p>
+<pre><code class="language-text">Cross-site POST omits the cookie -&gt; CSRF blocked
+</code></pre>
+<p>Stronger browser defaults sharpen the operator's responsibility.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — CORS in Flask</strong></p>
+<pre><code class="language-python"># 1_cors.py
+from flask import Flask, jsonify
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app, resources={r&quot;/api/*&quot;: {&quot;origins&quot;: &quot;https://app.example.com&quot;}})
+
+@app.get(&quot;/api/me&quot;)
+def me(): return jsonify(user=&quot;alice&quot;)
+</code></pre>
+<p>Wildcard (<code>*</code>) is forbidden with credentialed requests.</p>
+<p><strong>Step 2 — Add a CSP Header</strong></p>
+<pre><code class="language-python"># 2_csp.py
+@app.after_request
+def csp(resp):
+    resp.headers[&quot;Content-Security-Policy&quot;] = (
+        &quot;default-src 'self'; script-src 'self'; img-src 'self' data:&quot;
+    )
+    return resp
+</code></pre>
+<p>Avoiding <code>unsafe-inline</code> dramatically reduces XSS impact.</p>
+<p><strong>Step 3 — Safe Cookie Setup</strong></p>
+<pre><code class="language-python"># 3_cookie.py
+@app.get(&quot;/login&quot;)
+def login():
+    resp = app.make_response(&quot;ok&quot;)
+    resp.set_cookie(&quot;sid&quot;, &quot;xyz&quot;, secure=True, httponly=True, samesite=&quot;Lax&quot;)
+    return resp
+</code></pre>
+<p>The three flags (Secure, HttpOnly, SameSite) travel together.</p>
+<p><strong>Step 4 — CSRF Token Check (Pseudo)</strong></p>
+<pre><code class="language-python"># 4_csrf.py
+def verify_csrf(req):
+    if req.method in (&quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;):
+        if req.headers.get(&quot;X-CSRF&quot;) != session[&quot;csrf&quot;]:
+            raise PermissionError
+</code></pre>
+<p>Pick double-submit or the synchronizer pattern, but pick one.</p>
+<p><strong>Step 5 — XSS Defense: Auto Escape</strong></p>
+<pre><code class="language-python"># 5_xss.py
+from markupsafe import escape
+def render(name):
+    return f&quot;&lt;h1&gt;Hello {escape(name)}&lt;/h1&gt;&quot;
+</code></pre>
+<p>Trust the template engine's auto-escape, but escape per context (HTML, JS, URL) explicitly.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>CORS is allowance, not protection — pair it with auth.</li>
+<li>Roll out CSP gradually (Report-Only -&gt; Enforce).</li>
+<li>Cookie flags travel as a set.</li>
+<li>CSRF defense is consistent: token or SameSite, not both half-done.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>CORS <code>*</code> with credentials.</strong> Forbidden by spec.</li>
+<li><strong><code>unsafe-inline</code> in CSP.</strong> Defeats the protection.</li>
+<li><strong>Missing Secure or HttpOnly on cookies.</strong> XSS becomes session theft.</li>
+<li><strong>State-changing GETs.</strong> Vulnerable to caching, links, and CSRF.</li>
+<li><strong>Trusting Referer without Origin.</strong> Spoofable in many setups.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>CSP is rolled out gradually with nonces or hashes. Authenticated APIs combine a CORS allowlist, SameSite=Strict cookies, and CSRF tokens. Adding security headers at the edge (e.g. CloudFront Functions) is a common pattern.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Security headers are managed in one place (middleware or edge).</li>
+<li>CSP starts in Report-Only, then becomes Enforce after data review.</li>
+<li>Cookie policy changes ship with rollout plans and monitoring.</li>
+<li>CSRF and XSS defenses live in a single source of truth.</li>
+<li>Origin policy is documented with a change log.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the definition of same-origin?</li>
+<li>[ ] Who owns the CORS allowlist?</li>
+<li>[ ] Is CSP applied?</li>
+<li>[ ] Do all session cookies carry the three flags?</li>
+<li>[ ] Is the CSRF defense documented?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Are <code>https://app.example.com</code> and <code>https://app.example.com:8443</code> the same origin?</li>
+<li>Name an attack that <code>default-src 'self'</code> alone does not block.</li>
+<li>List two UX impacts of using SameSite=Strict.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The big arc of web security is origin and cookies. Next we look at the two famous code-level vulnerabilities — SQL Injection and XSS.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/04-tls-and-certificates.md">TLS and Certificates</a></li>
+<li><strong>Web Security Basics (current)</strong></li>
+<li>SQL Injection and XSS (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://owasp.org/www-project-web-security-testing-guide/">OWASP — Web Security Testing Guide</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">MDN — Same-origin policy</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">MDN — Content Security Policy</a></li>
+<li><a href="https://web.dev/articles/samesite-cookies-explained">web.dev — SameSite cookies explained</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, WebSecurity, CORS, CSP, SameOrigin</p>
+</body>
+</html>

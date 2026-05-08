@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TLS and Certificates</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>TLS and Certificates</h1>
+<blockquote>
+<p>Information Security 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does the browser padlock actually guarantee?</p>
+<blockquote>
+<p>TLS bundles three things — secrecy, integrity, and origin. Drop one and the padlock starts lying.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The stages of the TLS 1.3 handshake</li>
+<li>X.509 certificate structure and chain validation</li>
+<li>Root CAs, intermediate CAs, trust stores</li>
+<li>mTLS (mutual TLS) and where to use it</li>
+<li>Let's Encrypt and automated renewal</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>More than half of service-to-service traffic is protected by TLS. Operating without understanding it leads to expired certificates, weak ciphers, and skipped validation — all common incidents.</p>
+<blockquote>
+<p>The padlock icon is not magic; it is a precise procedure.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    C[&quot;Client&quot;] --&gt;|ClientHello| S[&quot;Server&quot;]
+    S --&gt;|&quot;Cert + Key Share&quot;| C
+    C --&gt;|&quot;Finished&quot;| S
+    S --&gt;|&quot;Application Data&quot;| C
+</code></pre>
+<p>TLS 1.3 finishes key agreement and server authentication in one round trip.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>TLS</strong>: Encryption protocol layered above TCP.</li>
+<li><strong>X.509</strong>: Standard format for certificates.</li>
+<li><strong>CA</strong>: Authority that issues certificates.</li>
+<li><strong>Chain</strong>: Server cert -&gt; intermediate CA -&gt; root CA.</li>
+<li><strong>mTLS</strong>: Client also presents a certificate.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Plain HTTP</strong></p>
+<pre><code class="language-text">A middlebox can read and modify packets -&gt; credentials leaked
+</code></pre>
+<p><strong>After — TLS 1.3</strong></p>
+<pre><code class="language-text">Key agreement + server auth + AEAD -&gt; secrecy, integrity, origin
+</code></pre>
+<p>The jump from plaintext to TLS is the baseline of modern security.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — Inspect a Certificate</strong></p>
+<pre><code class="language-bash"># 1_view_cert.sh
+openssl s_client -connect example.com:443 -servername example.com &lt;/dev/null 2&gt;/dev/null \
+  | openssl x509 -noout -subject -issuer -dates
+</code></pre>
+<p>Subject, issuer, and validity in one command.</p>
+<p><strong>Step 2 — TLS Connection in Python</strong></p>
+<pre><code class="language-python"># 2_tls_client.py
+import ssl, socket
+ctx = ssl.create_default_context()
+with socket.create_connection((&quot;example.com&quot;, 443)) as sock:
+    with ctx.wrap_socket(sock, server_hostname=&quot;example.com&quot;) as s:
+        print(s.version())          # TLSv1.3
+        print(s.cipher())
+</code></pre>
+<p><code>create_default_context()</code> ships safe defaults: verification on, modern ciphers.</p>
+<p><strong>Step 3 — Self-signed Certificate (Dev Only)</strong></p>
+<pre><code class="language-bash"># 3_selfsigned.sh
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
+  -days 365 -nodes -subj &quot;/CN=localhost&quot;
+</code></pre>
+<p>Never use in production — there is no trust chain.</p>
+<p><strong>Step 4 — Verify a Chain</strong></p>
+<pre><code class="language-bash"># 4_verify_chain.sh
+openssl verify -CAfile chain.pem server.pem
+</code></pre>
+<p>A broken chain causes browser warnings.</p>
+<p><strong>Step 5 — mTLS Server (Python)</strong></p>
+<pre><code class="language-python"># 5_mtls.py
+import ssl
+ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+ctx.verify_mode = ssl.CERT_REQUIRED
+ctx.load_cert_chain(&quot;server.pem&quot;, &quot;server.key&quot;)
+ctx.load_verify_locations(&quot;client_ca.pem&quot;)
+# server.serve_forever() ...
+</code></pre>
+<p>Service-to-service traffic verifies the client too.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Hostname verification is never disabled.</li>
+<li>Only TLS 1.2+ is enabled; 1.0 and 1.1 are off.</li>
+<li>Weak suites (RC4, 3DES) are turned off.</li>
+<li>Certificates have an automated renewal pipeline.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Disabling certificate verification.</strong> <code>verify=False</code> is forbidden in production.</li>
+<li><strong>No expiry monitoring.</strong> Surprise outages from expired certs.</li>
+<li><strong>Allowing weak suites.</strong> Opens the door to downgrade attacks.</li>
+<li><strong>Self-signed certs in production.</strong> No trust chain.</li>
+<li><strong>No key rotation in mTLS.</strong> A leak becomes permanent exposure.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Let's Encrypt plus cert-manager renews 90-day certs automatically in Kubernetes. Service meshes (Istio, Linkerd) issue and rotate mTLS certs invisibly. AWS ACM and GCP Certificate Manager integrate certs into cloud load balancers.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Certificate expiry is an automation problem, not an alert problem.</li>
+<li>Trust store changes go through change management.</li>
+<li>Service-to-service traffic is mTLS by default.</li>
+<li>TLS termination location (LB? sidecar? app?) is an explicit decision.</li>
+<li>Weak algorithms are reviewed yearly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you describe the TLS 1.3 handshake stages?</li>
+<li>[ ] Can you describe certificate chain validation?</li>
+<li>[ ] Can you state the difference between mTLS and one-way TLS?</li>
+<li>[ ] Do certificates renew automatically?</li>
+<li>[ ] Can you identify weak cipher suites?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Name two major differences between TLS 1.2 and 1.3.</li>
+<li>Describe two scenarios where mTLS is a good fit.</li>
+<li>Sketch pseudocode that alerts 30 days before certificate expiry.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>TLS bundles secrecy, integrity, and origin. Next we look at security on top of that protected web — web security basics.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/01-what-is-information-security.md">What is Information Security?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/02-authentication-and-authorization.md">Authentication and Authorization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/information-security-101/en/03-cryptography-and-hash.md">Cryptography and Hashes</a></li>
+<li><strong>TLS and Certificates (current)</strong></li>
+<li>Web Security Basics (upcoming)</li>
+<li>SQL Injection and XSS (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>Least Privilege (upcoming)</li>
+<li>Logging and Audit (upcoming)</li>
+<li>Incident Response (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc8446">RFC 8446 — TLS 1.3</a></li>
+<li><a href="https://ssl-config.mozilla.org/">Mozilla SSL Configuration Generator</a></li>
+<li><a href="https://letsencrypt.org/how-it-works/">Let's Encrypt — How It Works</a></li>
+<li><a href="https://bettertls.com/">BetterTLS — Test Suite</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Security, TLS, Certificate, PKI, mTLS</p>
+</body>
+</html>

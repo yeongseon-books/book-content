@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Triggers</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Triggers</h1>
+<blockquote>
+<p>GitHub Actions 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you build a <em>nightly job</em> that runs <em>automatically at 2 AM on weekends</em>?</p>
+<blockquote>
+<p><em>When</em> a workflow runs matters as much as <em>why</em> it runs.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>push</em> and <em>pull_request</em></li>
+<li>Scheduling with <em>schedule (cron)</em></li>
+<li>Manual runs with <em>workflow_dispatch</em></li>
+<li><em>Cost reduction</em> with <em>paths / branches</em> filters</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Trigger design dictates your <em>cost and noise</em>. Running <em>every workflow on every commit</em> leads to <em>cost explosion and alert fatigue</em>.</p>
+<blockquote>
+<p>A <em>good workflow</em> runs <em>only at the right moment</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Push[&quot;push&quot;] --&gt; WF[&quot;workflow&quot;]
+    PR[&quot;pull_request&quot;] --&gt; WF
+    Cron[&quot;schedule&quot;] --&gt; WF
+    Manual[&quot;workflow_dispatch&quot;] --&gt; WF
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>push</strong>: when <em>commits land</em> on a branch.</li>
+<li><strong>pull_request</strong>: when a PR is <em>opened or updated</em>.</li>
+<li><strong>schedule</strong>: a recurring <em>cron expression</em>.</li>
+<li><strong>workflow_dispatch</strong>: a <em>manual run</em> button.</li>
+<li><strong>paths/branches filter</strong>: <em>limits</em> triggers by <em>path/branch</em>.</li>
+<li><strong>concurrency</strong>: <em>serializes</em> concurrent runs.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: a docs-only edit triggers <em>the full build and test</em>.</p>
+<p><strong>After</strong>: a <code>paths</code> filter runs the build only when <em>code changes</em>.</p>
+<h2>Hands-on: Triggers in 5 Steps</h2>
+<p><strong>Step 1 — Separate push and PR</strong></p>
+<pre><code class="language-yaml">on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+</code></pre>
+<p><strong>Step 2 — Cut cost with paths filters</strong></p>
+<pre><code class="language-yaml">on:
+  pull_request:
+    paths:
+      - &quot;src/**&quot;
+      - &quot;tests/**&quot;
+      - &quot;pyproject.toml&quot;
+</code></pre>
+<p><strong>Step 3 — Schedule (cron) for nightlies</strong></p>
+<pre><code class="language-yaml">on:
+  schedule:
+    - cron: &quot;0 17 * * 0-4&quot;  # UTC 17:00 = KST 02:00, Sun-Thu
+</code></pre>
+<p><strong>Step 4 — workflow_dispatch for manual runs</strong></p>
+<pre><code class="language-yaml">on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: &quot;deploy target&quot;
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+</code></pre>
+<p><strong>Step 5 — concurrency to prevent duplicates</strong></p>
+<pre><code class="language-yaml">concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>paths</em> is more <em>explicit</em> than <em>paths-ignore</em>.</li>
+<li><em>cron</em> is in <em>UTC</em>; convert local times carefully.</li>
+<li><em>cancel-in-progress</em> saves cost on <em>PR push storms</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running the <em>whole workflow</em> on every trigger.</strong> Cost explodes.</li>
+<li><strong>Writing <code>schedule</code> in <em>local time</em>.</strong> UTC only.</li>
+<li><strong>Misusing <code>pull_request_target</code>.</strong> Risks <em>secret exposure</em>.</li>
+<li><strong>Missing <code>concurrency</code>.</strong> Duplicate builds clog the queue.</li>
+<li><strong><code>workflow_dispatch</code> without docs.</strong> No one knows who clicks it or how.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams split triggers by <em>role</em>: <em>PR</em> = quick checks, <em>main push</em> = full test + build, <em>nightly cron</em> = slow e2e, <em>workflow_dispatch</em> = production deploy.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Trigger design balances <em>cost and trust</em>.</li>
+<li>Think in <em>UTC</em> for cron.</li>
+<li>Add <em>concurrency</em> by default.</li>
+<li><em>Validate inputs</em> even on manual triggers.</li>
+<li>Separate <em>PR</em> and <em>main</em> workflows.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>paths filters</em> eliminate unnecessary runs.</li>
+<li>[ ] <em>cron</em> is written in <em>UTC</em>.</li>
+<li>[ ] <em>concurrency</em> is configured.</li>
+<li>[ ] <em>workflow_dispatch</em> is documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Skip the workflow on <em>docs/</em> changes.</li>
+<li>Write a cron that fires <em>daily at 03:00 KST</em>.</li>
+<li>Add an <em>environment selection</em> input to <em>workflow_dispatch</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Triggers control <em>when</em> your workflow runs. Next up: <em>Python test automation</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><strong>Understanding Triggers (current)</strong></li>
+<li>Python Test Automation (upcoming)</li>
+<li>Lint and Type Check (upcoming)</li>
+<li>Build Artifacts (upcoming)</li>
+<li>Docker Build (upcoming)</li>
+<li>Deployment Automation (upcoming)</li>
+<li>Secret Management (upcoming)</li>
+<li>A Real-World CI/CD Pipeline (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions/using-workflows/events-that-trigger-workflows">Events that trigger workflows</a></li>
+<li><a href="https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#schedule">Schedule events</a></li>
+<li><a href="https://docs.github.com/actions/using-workflows/manually-running-a-workflow">workflow_dispatch</a></li>
+<li><a href="https://docs.github.com/actions/using-jobs/using-concurrency">Concurrency</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Trigger, Event, Schedule, CICD</p>
+</body>
+</html>

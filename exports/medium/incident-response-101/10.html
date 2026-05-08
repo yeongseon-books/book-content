@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building an Incident Runbook</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building an Incident Runbook</h1>
+<blockquote>
+<p>Incident Response 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you bind everything you learned — <em>severity</em>, <em>response</em>, <em>communication</em>, <em>timeline</em>, <em>RCA</em>, <em>mitigation</em>, <em>postmortem</em>, <em>prevention</em> — into a <em>single runbook</em>?</p>
+<blockquote>
+<p>A <em>runbook</em> is <em>code-shaped documentation</em> that holds <em>SEV mapping</em> through <em>postmortem templates</em> in <em>one repository</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>SEV</em> mapping</li>
+<li><em>On-call</em> schedule</li>
+<li><em>Communication</em> templates</li>
+<li><em>Runbooks as code</em></li>
+<li><em>Drills</em> and <em>maintenance</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When <em>documents</em> are <em>scattered</em>, you do not know <em>where to start</em> at <em>3 a.m.</em></p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Sev[&quot;sev map&quot;] --&gt; OnCall[&quot;on-call&quot;]
+    OnCall --&gt; Comms[&quot;comms templates&quot;]
+    Comms --&gt; Steps[&quot;response steps&quot;]
+    Steps --&gt; PM[&quot;postmortem template&quot;]
+    PM --&gt; Repo[&quot;runbook repo&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>runbook</strong>: a collection of <em>response procedures</em>.</li>
+<li><strong>on-call</strong>: the <em>paging</em> schedule.</li>
+<li><strong>sev map</strong>: a mapping from <em>SEV</em> to <em>response</em>.</li>
+<li><strong>template</strong>: a reusable <em>form</em>.</li>
+<li><strong>drill</strong>: a <em>practice</em> exercise.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: scattered across <em>Wikis</em>, <em>Slack pins</em>, and <em>personal notes</em>.</p>
+<p><strong>After</strong>: unified as <em>code</em> in a <em>Git repository</em>.</p>
+<h2>Hands-on: Runbook Capstone</h2>
+<p><strong>Step 1 — SEV map</strong></p>
+<pre><code class="language-python">SEV = {
+    &quot;SEV1&quot;: {&quot;page&quot;: True, &quot;comms&quot;: 15},
+    &quot;SEV2&quot;: {&quot;page&quot;: True, &quot;comms&quot;: 30},
+    &quot;SEV3&quot;: {&quot;page&quot;: False, &quot;comms&quot;: 60},
+}
+</code></pre>
+<p><strong>Step 2 — On-call lookup</strong></p>
+<pre><code class="language-python">def on_call(schedule, now):
+    return next(p for p in schedule if p[&quot;from&quot;] &lt;= now &lt;= p[&quot;to&quot;])
+</code></pre>
+<p><strong>Step 3 — Communication templates</strong></p>
+<pre><code class="language-python">def comms(audience, sev, summary):
+    return {&quot;to&quot;: audience, &quot;sev&quot;: sev, &quot;text&quot;: summary}
+</code></pre>
+<p><strong>Step 4 — Response steps</strong></p>
+<pre><code class="language-python">STEPS = (&quot;ack&quot;, &quot;stabilize&quot;, &quot;communicate&quot;, &quot;investigate&quot;, &quot;resolve&quot;)
+
+def next_step(current):
+    i = STEPS.index(current)
+    return STEPS[i + 1] if i + 1 &lt; len(STEPS) else &quot;done&quot;
+</code></pre>
+<p><strong>Step 5 — Postmortem template link</strong></p>
+<pre><code class="language-python">def link_postmortem(incident_id):
+    return f&quot;runbook/postmortems/{incident_id}.md&quot;
+</code></pre>
+<p><strong>Step 6 — Integrated execution</strong></p>
+<pre><code class="language-python">def run_incident(sev, schedule, now, summary):
+    person = on_call(schedule, now)
+    msg = comms(&quot;internal&quot;, sev, summary)
+    return {
+        &quot;sev&quot;: SEV[sev],
+        &quot;ic&quot;: person[&quot;name&quot;],
+        &quot;first_msg&quot;: msg,
+        &quot;step&quot;: &quot;ack&quot;,
+        &quot;postmortem&quot;: link_postmortem(&quot;INC-001&quot;),
+    }
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Every <em>stage</em> is a <em>data structure</em>.</li>
+<li><em>State transitions</em> are <em>tuple indices</em>.</li>
+<li><em>Postmortem</em> is a <em>file link</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Keeping the <em>runbook</em> only in a <em>Wiki</em>.</strong></li>
+<li><strong>Using the <em>same procedure</em> for <em>every SEV</em>.</strong></li>
+<li><strong><em>On-call</em> info living in an <em>external</em> tool only.</strong></li>
+<li><strong>Templates that are <em>not current</em>.</strong></li>
+<li><strong>Going <em>live</em> without a <em>drill</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>runbook/</em> directory holds <em>Markdown</em> plus <em>Python scripts</em>; <em>PR review</em> tracks <em>changes</em>. <em>Quarterly drills</em> keep it <em>up to date</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A <em>runbook</em> is <em>code</em>.</li>
+<li>Without <em>practice</em>, it is <em>useless</em>.</li>
+<li><em>Quarterly drills</em> are <em>culture</em>.</li>
+<li><em>Changes</em> go through <em>PRs</em>.</li>
+<li>One procedure for <em>all SEVs</em> is <em>dangerous</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>SEV map</em>.</li>
+<li>[ ] <em>On-call schedule</em>.</li>
+<li>[ ] <em>Communication templates</em>.</li>
+<li>[ ] <em>Postmortem template</em>.</li>
+<li>[ ] <em>Quarterly drill</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>runbook</em> in one line.</li>
+<li>Define <em>drill</em> in one line.</li>
+<li>Define <em>sev map</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This series wraps up here. Next, read the <em>SRE 101</em> and <em>Information Security 101</em> series to grow <em>reliability</em> and <em>security</em> together.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/06-root-cause-analysis.md">Root Cause Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/07-mitigation-and-resolution.md">Mitigation and Resolution</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/08-postmortem.md">Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/09-prevention.md">Prevention</a></li>
+<li><strong>Building an Incident Runbook (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://response.pagerduty.com/oncall/runbooks/">Runbook Template - PagerDuty</a></li>
+<li><a href="https://sre.google/workbook/managing-load/">Runbooks as Code - Google SRE Workbook</a></li>
+<li><a href="https://www.atlassian.com/incident-management/on-call">On-Call Rotations - Atlassian</a></li>
+<li><a href="https://increment.com/reliability/game-days/">Chaos Drills and Game Days - Increment</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Runbook, OnCall, Capstone, Operations</p>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dashboard Design</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Dashboard Design</h1>
+<blockquote>
+<p>Observability 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What separates a <em>good</em> dashboard from one that is <em>wallpaper</em>?</p>
+<blockquote>
+<p><em>Good dashboards answer </em>one question<em>. Patterns like </em>USE<em> and </em>RED<em> turn panels into </em>units of meaning<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>USE</em> (Utilization, Saturation, Errors)</li>
+<li><em>RED</em> (Rate, Errors, Duration)</li>
+<li>The four <em>Golden signals</em></li>
+<li>Building dashboards as <em>question units</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most dashboards are <em>decoration</em>. If you do not know <em>where to look</em> during an incident, 30 panels are worth <em>zero</em>.</p>
+<blockquote>
+<p><em>A dashboard is a </em>tool that answers<em>. If it does not answer, delete it.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Q[&quot;question&quot;] --&gt; RED[&quot;RED: rate, error, duration&quot;]
+    Q --&gt; USE[&quot;USE: util, saturation, error&quot;]
+    Q --&gt; Golden[&quot;Golden: latency, traffic, error, saturation&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>USE</strong>: the <em>resource</em> lens.</li>
+<li><strong>RED</strong>: the <em>request</em> lens.</li>
+<li><strong>Golden signals</strong>: the four axes of <em>service health</em>.</li>
+<li><strong>Heatmap</strong>: distribution <em>over time</em>.</li>
+<li><strong>Annotation</strong>: a <em>marker</em> like a deploy.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: 30 panels, all <em>interesting</em>, none <em>answering</em>.</p>
+<p><strong>After</strong>: 6 panels; the first screen <em>immediately</em> tells you health.</p>
+<h2>Hands-on: Dashboard in 5 Steps</h2>
+<p><strong>Step 1 — RED panels (requests)</strong></p>
+<pre><code class="language-promql"># Rate
+sum(rate(http_requests_total[1m]))
+# Errors
+sum(rate(http_requests_total{status=~&quot;5..&quot;}[1m]))
+# Duration p95
+histogram_quantile(0.95, sum by (le) (rate(http_duration_seconds_bucket[5m])))
+</code></pre>
+<p><strong>Step 2 — USE panels (resources)</strong></p>
+<pre><code class="language-promql"># CPU utilization
+avg(rate(node_cpu_seconds_total{mode!=&quot;idle&quot;}[1m]))
+# Memory saturation
+1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+</code></pre>
+<p><strong>Step 3 — A Golden-signals row</strong></p>
+<pre><code class="language-text">Row: Service Health
+  Panel 1: Latency (p50/p95/p99)
+  Panel 2: Traffic (req/s)
+  Panel 3: Errors (5xx/min)
+  Panel 4: Saturation (queue depth)
+</code></pre>
+<p><strong>Step 4 — Annotation: deploy markers</strong></p>
+<pre><code class="language-yaml">annotations:
+  - name: deploy
+    datasource: prometheus
+    expr: changes(build_info[1m]) &gt; 0
+</code></pre>
+<p><strong>Step 5 — Variables to switch environment</strong></p>
+<pre><code class="language-text">$env = staging | production
+$service = api | worker | scheduler
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>RED</em> is the <em>outside view</em>; <em>USE</em> is the <em>inside view</em>.</li>
+<li>p95 reflects <em>most user experience</em>; p99 is the <em>tail</em>.</li>
+<li><em>Annotations</em> mark the <em>cause</em> of changes.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>30 panels on <em>one screen</em>.</strong> No idea <em>where to look</em>.</li>
+<li><strong>Everything as <em>averages</em>.</strong> Distribution disappears.</li>
+<li><strong>No unit labels.</strong> Meaning is <em>ambiguous</em>.</li>
+<li><strong>No thresholds.</strong> You cannot tell <em>risky</em> from <em>normal</em>.</li>
+<li><strong>Treating dashboards as <em>art</em>.</strong> They cease to answer.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The most consulted <em>Service Overview</em> dashboard collapses into 6 <em>RED + USE</em> panels. Deeper dashboards are <em>split by role</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>A dashboard's title </em>is<em> its question.</em></li>
+<li><em>Six panels per screen — the rest belongs in </em>drilldown<em> dashboards.</em></li>
+<li><em>p95/p99 is closer to </em>truth<em> than the average.</em></li>
+<li><em>Mark deploys with </em>annotations<em>.</em></li>
+<li><em>Panels that do not answer get </em>deleted<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the four <em>RED</em> queries.</li>
+<li>[ ] You know what <em>USE</em> means.</li>
+<li>[ ] The first screen is a <em>health summary</em>.</li>
+<li>[ ] Deploy <em>annotations</em> are visible.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <em>RED</em> dashboard for one service.</li>
+<li>Build a <em>USE</em> dashboard for host resources.</li>
+<li>Mark <em>deploy moments</em> with annotations.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Question-driven dashboards change <em>decision speed</em>. Next: <em>alerts and on-call</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
+<li><strong>Dashboard Design (current)</strong></li>
+<li>Alerts and On-Call (upcoming)</li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.brendangregg.com/usemethod.html">Brendan Gregg — USE Method</a></li>
+<li><a href="https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/">Tom Wilkie — RED Method</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Golden Signals</a></li>
+<li><a href="https://grafana.com/docs/grafana/latest/best-practices/">Grafana dashboard best practices</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Dashboard, Grafana, SRE, Monitoring</p>
+</body>
+</html>

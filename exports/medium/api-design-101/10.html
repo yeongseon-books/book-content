@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing Good API Documentation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing Good API Documentation</h1>
+<blockquote>
+<p>API Design 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: For the same API, <em>good docs</em> drive higher adoption — is there a <em>formula</em> for good documentation?</p>
+<blockquote>
+<p>Five minutes to first call, plus Examples, Reference, Changelog, and SDKs — these are the five axes.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The five axes of documentation</li>
+<li>Reaching the first call in <em>under five minutes</em></li>
+<li>The weight of examples</li>
+<li>The role of changelogs and SDKs</li>
+<li>How docs grow over time</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Documentation drives <em>adoption</em> more than the API itself. The same endpoint can take five minutes to call — or half a day — depending on the docs.</p>
+<blockquote>
+<p>Documentation is <em>part of the product</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Getting Started&quot;] --&gt; B[&quot;Tutorials&quot;]
+    B --&gt; C[&quot;Reference&quot;]
+    C --&gt; D[&quot;Changelog&quot;]
+    D --&gt; E[&quot;SDKs / CLIs&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Getting Started</strong>: from zero to <em>first call</em> in five minutes.</li>
+<li><strong>Tutorial</strong>: walks through one scenario <em>end to end</em>.</li>
+<li><strong>Reference</strong>: the <em>dictionary</em> of endpoints and fields.</li>
+<li><strong>Changelog</strong>: the record of every version change.</li>
+<li><strong>SDK</strong>: a per-language client library.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (reference only)</strong></p>
+<pre><code>- /users (GET, POST, ...)
+- /orders (GET, POST, ...)
+</code></pre>
+<p>The names alone don't tell you what to do.</p>
+<p><strong>After (all five axes)</strong></p>
+<pre><code>1. Getting Started — first call in five minutes
+2. Tutorials — checkout flow, sign-up flow
+3. Reference — every endpoint
+4. Changelog — versioned changes
+5. SDKs — Python, JS, Ruby
+</code></pre>
+<h2>Hands-on: Five Steps to Better Docs</h2>
+<p><strong>Step 1 — Getting Started</strong></p>
+<pre><code class="language-markdown"># Getting Started
+
+1. Sign up at https://example.com → get an API key
+2. First call (curl):
+   ```bash
+   curl https://api.example.com/v1/health \
+     -H &quot;Authorization: Bearer &lt;YOUR_KEY&gt;&quot;
+   ```
+3. Seeing `{&quot;status&quot;: &quot;ok&quot;}` means success.
+</code></pre>
+<p>The <em>five-minute rule</em> — the user must have <em>something working</em> in five minutes.</p>
+<h3>Step 2 — Tutorial (scenario-driven)</h3>
+<pre><code class="language-markdown"># Accept Your First Payment
+
+1. Create a customer (POST /v1/customers)
+2. Create a payment intent (POST /v1/payment_intents)
+3. Confirm
+4. Receive the webhook
+</code></pre>
+<p>Not a feature list — the flow toward a <em>goal</em>.</p>
+<p><strong>Step 3 — Reference + examples</strong></p>
+<pre><code class="language-markdown">## POST /v1/customers
+Input: {name, email}
+Response (201):
+```json
+{&quot;id&quot;: &quot;cus_abc&quot;, &quot;name&quot;: &quot;Y&quot;, &quot;email&quot;: &quot;y@example.com&quot;}
+</code></pre>
+<p>Errors:<br>
+<strong>validation_error</strong><br>
+- status: 422<br>
+- meaning: name or email missing</p>
+<p><strong>email.duplicate</strong><br>
+- status: 409<br>
+- meaning: email already registered</p>
+<pre><code>
+Every reference page needs *examples + an error table*.
+
+### Step 4 — Changelog
+
+```markdown
+# Changelog
+
+## 2026-05-01
+- BREAKING: removed `name` from /v1/users. Use `full_name`.
+- ADD: /v2/users gains `created_at`.
+
+## 2026-04-15
+- DEPRECATE: /v1 — sunset 2027-01-31.
+</code></pre>
+<p><em>Date and category for every change</em>.</p>
+<p><strong>Step 5 — SDKs and a try-it environment</strong></p>
+<pre><code class="language-python"># 5_sdk.py
+from example_api import Client
+c = Client(api_key=&quot;...&quot;)
+print(c.users.get(42))
+</code></pre>
+<p><em>Copy-paste-able</em> code and a <em>clickable</em> try-it surface (Swagger UI).</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The first screen is <em>Getting Started</em>.</li>
+<li>Every reference page has <em>examples</em>.</li>
+<li>The changelog reads in <em>reverse chronological</em> order.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Reference only.</strong> New users have no idea <em>where to start</em>.</li>
+<li><strong>Missing or incorrect examples.</strong> Even with copy-paste, <em>nothing runs</em>.</li>
+<li><strong>No changelog.</strong> Users cannot track changes.</li>
+<li><strong>Errors are not documented.</strong> The 4xx body is a <em>secret</em>.</li>
+<li><strong>Docs in a <em>separate repo</em>.</strong> Sync with code becomes <em>impossible</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Stripe and Twilio set the <em>gold standard</em> — their five axes are consistent and well-maintained. Treat your <em>internal</em> APIs like public ones and adoption rises while support requests fall — that is what <em>DX</em> means.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Keep docs <em>in the same repo</em> as code.</li>
+<li><em>Test</em> examples (run them in CI).</li>
+<li><em>Auto-generate</em> the changelog (PR labels → release notes).</li>
+<li><em>Measure</em> the five-minute rule — observe real users.</li>
+<li>Improve the most-visited pages first.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does Getting Started reach a first call in five minutes?</li>
+<li>[ ] Do all endpoints have examples?</li>
+<li>[ ] Is the changelog up to date?</li>
+<li>[ ] Are errors tabulated in the reference?</li>
+<li>[ ] Is there an SDK or a try-it surface?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Rewrite your API's Getting Started against the five-minute rule.</li>
+<li>Add <em>three scenario</em> examples to the most-used endpoint.</li>
+<li>Outline a CI step that <em>runs</em> example code on each PR.</li>
+</ol>
+<h2>Wrap-up and Series Conclusion</h2>
+<p>An API is the <em>sum</em> of its contracts, behaviors, and documentation. We started in episode 1 with <em>the contract</em> — and worked through REST, resources, methods, schemas, pagination, errors, OpenAPI, and versioning — finishing with <em>documentation</em>. Before moving on, build a small API end-to-end yourself. That is the deepest learning.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/04-http-methods-and-status.md">HTTP Methods and Status Codes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/05-request-and-response-schema.md">Request and Response Schemas</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/06-pagination-and-filtering.md">Pagination and Filtering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/07-error-response-design.md">Designing Error Responses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/08-openapi-and-swagger.md">OpenAPI and Swagger</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/09-api-versioning.md">API Versioning</a></li>
+<li><strong>Writing Good API Documentation (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://stripe.com/docs">Stripe Documentation</a></li>
+<li><a href="https://www.twilio.com/docs">Twilio Documentation</a></li>
+<li><a href="https://www.writethedocs.org/topic-guides/api-documentation/">Write the Docs — API documentation</a></li>
+<li><a href="https://diataxis.fr/">Diataxis Framework (tutorials/how-to/reference/explanation)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, Documentation, DeveloperExperience, Examples, Backend</p>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing the README</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing the README</h1>
+<blockquote>
+<p>Portfolio Project 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> must a <em>README</em> be <em>clear in 60 seconds</em>?</p>
+<blockquote>
+<p>Reviewers reach it <em>after</em> scanning <em>dozens</em> of projects.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A standard <em>README</em> shape</li>
+<li>A <em>problem solution</em> one-liner</li>
+<li><em>Demo</em> and <em>screenshots</em></li>
+<li><em>How to run</em></li>
+<li><em>Decision rationale</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The <em>README</em> is the <em>entry door</em> to a project.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Pitch] --&gt; D[Demo]
+    D --&gt; S[Stack]
+    S --&gt; R[Run]
+    R --&gt; N[Next]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>pitch</strong>: <em>one-line</em> summary.</li>
+<li><strong>demo</strong>: <em>URL + screenshot</em>.</li>
+<li><strong>stack</strong>: <em>technology list</em>.</li>
+<li><strong>run</strong>: <em>commands</em>.</li>
+<li><strong>next</strong>: <em>upcoming tasks</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Only <em>title + install</em>.</p>
+<p><strong>After</strong>: All <em>five sections</em> exist.</p>
+<h2>Hands-on: README Skeleton</h2>
+<p><strong>Step 1 — Pitch</strong></p>
+<pre><code class="language-markdown">&gt; A mini SaaS that fixes lost team schedules
+</code></pre>
+<p><strong>Step 2 — Demo link</strong></p>
+<pre><code class="language-markdown">[Live Demo](https://demo.example.com)
+</code></pre>
+<p><strong>Step 3 — Stack</strong></p>
+<pre><code class="language-markdown">- FastAPI, PostgreSQL, Docker
+</code></pre>
+<p><strong>Step 4 — Run</strong></p>
+<pre><code class="language-bash">docker compose up
+</code></pre>
+<p><strong>Step 5 — Next tasks</strong></p>
+<pre><code class="language-markdown">- [ ] add notifications
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>pitch</em> is <em>one</em> sentence.</li>
+<li>The <em>demo</em> is a <em>link</em>.</li>
+<li><em>Run</em> is <em>copy-paste</em> ready.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>A <em>long preface</em>.</strong></li>
+<li><strong>Only <em>screenshots</em>.</strong></li>
+<li><strong>A <em>complex</em> run command.</strong></li>
+<li><strong>No <em>decision rationale</em>.</strong></li>
+<li><strong>No <em>next tasks</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <em>top 10%</em> of OSS projects share the same five-section shape.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>pitch</em> matters <em>most</em>.</li>
+<li>The <em>demo</em> must be <em>alive</em>.</li>
+<li><em>Run</em> is <em>one line</em>.</li>
+<li><em>Decisions</em> are <em>documented</em>.</li>
+<li><em>Next</em> uses <em>checkboxes</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>One-line</em> pitch.</li>
+<li>[ ] <em>Demo</em> link.</li>
+<li>[ ] <em>Run</em> command.</li>
+<li>[ ] <em>Next</em> checkboxes.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>pitch</em> in one line.</li>
+<li>State the <em>demo</em> format in one line.</li>
+<li>State the <em>run</em> requirement in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Building the Demo</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
+<li><strong>Writing the README (current)</strong></li>
+<li>Building the Demo (upcoming)</li>
+<li>Deploying the Project (upcoming)</li>
+<li>Tests and Documentation (upcoming)</li>
+<li>Recording Tech Decisions (upcoming)</li>
+<li>Summarizing as Blog Posts (upcoming)</li>
+<li>Explaining in Interviews (upcoming)</li>
+<li>Portfolio Improvement Checklist (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">README Best Practices - GitHub</a></li>
+<li><a href="https://github.com/matiassingers/awesome-readme">Awesome README</a></li>
+<li><a href="https://www.makeareadme.com/">Make a README</a></li>
+<li><a href="https://github.com/RichardLitt/standard-readme">Standard Readme</a></li>
+</ul>
+<p class="tags-line">Tags: Portfolio, README, Documentation, Onboarding, Beginner</p>
+</body>
+</html>

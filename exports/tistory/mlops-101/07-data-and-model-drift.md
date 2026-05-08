@@ -1,0 +1,166 @@
+
+# Data Drift와 Model Drift
+
+> MLOps 101 시리즈 (7/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: *입력 분포가 바뀐 것* 과 *모델이 못 맞히는 것* 을 *어떻게 구분* 할까요?
+
+> *Data Drift 는 *입력 분포 변화*, *Model Drift* 는 *예측 품질 저하* 를 의미합니다. *통계 검정* 으로 감지합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Data Drift* vs *Concept Drift*
+- *KS 검정* 과 *PSI*
+- *기준 분포* 잡기
+- *알림 임계* 설정
+- 흔한 함정 5가지
+
+## 왜 중요한가
+
+*세상은 변합니다*. *학습 시점* 의 분포가 *영원* 하지 않습니다. *Drift* 를 못 보면 *조용한 손실* 이 누적됩니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    Train["train dist"] --> Base["baseline"]
+    Live["live dist"] --> Stat["KS / PSI"]
+    Base --> Stat
+    Stat --> Alert["alert"]
+```
+
+## 핵심 용어 정리
+
+- **Data Drift**: *입력 X* 의 *분포 변화*.
+- **Concept Drift**: *X → Y* *관계 변화*.
+- **PSI**: *Population Stability Index*. *0.1 미만* 안전.
+- **KS**: *Kolmogorov–Smirnov* 검정.
+- **Baseline**: *기준 분포* (학습 데이터).
+
+## Before/After
+
+**Before**: *정확도* 가 *떨어진 뒤* 에야 알아챔.
+
+**After**: *입력 PSI > 0.2* 가 뜨면 *조사 시작*.
+
+## 실습: PSI로 Data Drift 감지
+
+### 1단계 — 기준/현재 데이터
+
+```python
+import numpy as np
+
+base = np.random.normal(0, 1, 1000)
+live = np.random.normal(0.5, 1, 1000)
+```
+
+### 2단계 — 구간 나누기
+
+```python
+def bin_edges(x, n=10):
+    return np.quantile(x, np.linspace(0, 1, n + 1))
+```
+
+### 3단계 — PSI 계산
+
+```python
+def psi(base, live, n=10):
+    edges = bin_edges(base, n)
+    edges[0], edges[-1] = -np.inf, np.inf
+    b, _ = np.histogram(base, edges)
+    l, _ = np.histogram(live, edges)
+    bp = b / b.sum() + 1e-6
+    lp = l / l.sum() + 1e-6
+    return float(np.sum((lp - bp) * np.log(lp / bp)))
+
+print(round(psi(base, live), 3))
+```
+
+### 4단계 — KS 검정
+
+```python
+from scipy.stats import ks_2samp
+stat, p = ks_2samp(base, live)
+print(round(stat, 3), round(p, 4))
+```
+
+### 5단계 — 임계 정책
+
+```python
+def status(p_value, psi_value):
+    if psi_value > 0.2 or p_value < 0.01:
+        return "drift"
+    if psi_value > 0.1:
+        return "watch"
+    return "ok"
+```
+
+## 이 코드에서 주목할 점
+
+- *`+ 1e-6`* 은 *0 나눗셈* 방지.
+- *KS* 는 *분포 거리* 를 한 숫자로.
+- *임계* 는 *팀 합의*.
+
+## 자주 하는 실수 5가지
+
+1. ***기준* 을 *최근 며칠* 로 잡기 → *드리프트 무력화*.**
+2. ***라벨 없이* *Concept Drift* 판단.**
+3. ***개별 피처만* 보기 (다변량 무시).**
+4. ***경계 분포* (예: 0/1) 에 *KS* 그대로 사용.**
+5. ***알림만* 하고 *재학습 트리거* 없음.**
+
+## 실무에서는 이렇게 쓰입니다
+
+*리스크 모델* 은 *매일 PSI* 계산 후 *0.2 초과 시 재학습 큐* 에 *자동 등록*.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Data Drift* 는 *조기 경보*.
+- *Model Drift* 는 *지표* 로 확인.
+- *기준 분포* 는 *고정* 하고 *주기 갱신*.
+- *카테고리 변수* 는 *PSI*, *연속* 은 *KS*.
+- *드리프트 → 재학습* 은 *자동화*.
+
+## 체크리스트
+
+- [ ] *기준 분포* 가 정의됨.
+- [ ] *PSI/KS* 가 *주기 계산*.
+- [ ] *임계* 가 문서화.
+- [ ] *재학습 트리거* 가 연결.
+
+## 연습 문제
+
+1. *카테고리 피처* 용 *PSI* 함수를 작성하세요.
+2. *Concept Drift* 를 라벨 지연 환경에서 어떻게 측정할까요?
+3. *PSI 0.18* 일 때 *알림 vs 무시* 결정 기준을 설명하세요.
+
+## 정리 및 다음 단계
+
+드리프트가 보이면 *재학습* 으로 대응합니다. 다음 글은 *재학습 자동화* 입니다.
+
+- [MLOps란 무엇인가?](./01-what-is-mlops.md)
+- [실험 관리](./02-experiment-tracking.md)
+- [데이터 버전 관리](./03-data-versioning.md)
+- [모델 학습 파이프라인](./04-training-pipeline.md)
+- [모델 배포](./05-model-deployment.md)
+- [모델 모니터링](./06-model-monitoring.md)
+- **Data Drift와 Model Drift (현재 글)**
+- 재학습 (예정)
+- Feature Store (예정)
+- 운영 가능한 ML 시스템 (예정)
+## 참고 자료
+
+- [Evidently AI — Drift](https://docs.evidentlyai.com/)
+- [SciPy — KS test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html)
+- [Population Stability Index 설명](https://www.listendata.com/2015/05/population-stability-index.html)
+- [Google — ML Production Drift](https://developers.google.com/machine-learning/guides/rules-of-ml)
+
+Tags: MLOps, Drift, Monitoring, DataScience, Statistics
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

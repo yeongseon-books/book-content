@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Requirements</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Requirements</h1>
+<blockquote>
+<p>Software Engineering 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is hearing a requirement the same as understanding it?</p>
+<blockquote>
+<p>Solving the wrong problem precisely is the most expensive kind of waste.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What makes a requirement good</li>
+<li>User stories and acceptance criteria</li>
+<li>Functional vs non-functional requirements</li>
+<li>Question patterns that remove ambiguity</li>
+<li>Why requirements live in writing</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Over half of code defects originate at the requirements stage. The later you find them, the cost grows exponentially.</p>
+<blockquote>
+<p>The most expensive code is code you rewrite.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;User&quot;] --&gt; N[&quot;Need&quot;]
+    N --&gt; R[&quot;Requirement&quot;]
+    R --&gt; A[&quot;Acceptance Criteria&quot;]
+    A --&gt; T[&quot;Tests&quot;]
+</code></pre>
+<p>Requirements only become real when they map to tests.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Functional requirement</strong>: what the system does.</li>
+<li><strong>Non-functional requirement</strong>: how well it must do it (performance, security, availability).</li>
+<li><strong>User story</strong>: "As a role, I want X so that Y" — one line.</li>
+<li><strong>Acceptance Criteria (AC)</strong>: the conditions that mark "done".</li>
+<li><strong>INVEST</strong>: the six attributes of a good story.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — Vague</strong></p>
+<pre><code class="language-text">&quot;Build a search feature&quot;
+</code></pre>
+<p><strong>After — Measurable</strong></p>
+<pre><code class="language-text">A user (role) searches the product catalog (scope) by keyword (input)
+and gets results sorted by relevance (sort) within 500ms (performance).
+</code></pre>
+<p>One sentence sets the quality of the outcome.</p>
+<h2>Hands-on Step by Step</h2>
+<p><strong>Step 1 — Write a User Story</strong></p>
+<pre><code class="language-text"># 1_story.txt
+As a registered user, I want a password-reset link via email so that
+I can quickly recover account access.
+</code></pre>
+<p>Role - action - value.</p>
+<p><strong>Step 2 — Acceptance Criteria</strong></p>
+<pre><code class="language-text"># 2_ac.txt
+- Email arrives within 60 seconds for a registered address
+- Link expires after 30 minutes
+- Token is invalidated immediately after use
+- Identical response for unregistered emails (avoid leaking)
+</code></pre>
+<p>Phrased so they can be tested.</p>
+<p><strong>Step 3 — Non-functional Requirements</strong></p>
+<pre><code class="language-text"># 3_nfr.txt
+- Availability: 99.9% monthly
+- Security: single-use token
+- Observability: send/use counters streamed to SIEM
+</code></pre>
+<p>NFRs decide operational cost.</p>
+<p><strong>Step 4 — Ambiguity-Hunting Questions</strong></p>
+<pre><code class="language-text"># 4_questions.txt
+- Who uses this?
+- How often?
+- What happens on failure?
+- Where do we measure?
+- What is &quot;done&quot;?
+</code></pre>
+<p>Append 5W1H to expose vagueness.</p>
+<p><strong>Step 5 — Capture in the Wiki/Ticket</strong></p>
+<pre><code class="language-text"># 5_doc.md
+- Context
+- User story
+- Acceptance criteria
+- Non-functional requirements
+- Decision log (options and reason chosen)
+</code></pre>
+<p>A spoken agreement does not exist.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>"Verifiable" is the start of a good requirement.</li>
+<li>Acceptance criteria become PR-merge gates.</li>
+<li>Pinning NFRs early is always cheaper.</li>
+<li>A decision log shrinks future debugging time.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Designing the moment you hear the requirement.</strong> Vagueness hardens into code.</li>
+<li><strong>Accepting "something like X".</strong> Not measurable.</li>
+<li><strong>Ignoring NFRs.</strong> They explode in production.</li>
+<li><strong>Merging PRs without ACs.</strong> No definition of done.</li>
+<li><strong>No change history.</strong> "Why is it this way?" repeats forever.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>PM, designers, and engineers run a discovery meeting and capture requirements in an RFC or PRD. Jira/Linear tickets carry ACs as checkboxes that map directly into the PR description.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Cannot state the "why" in one line? Do not start.</li>
+<li>Pin NFRs before writing code.</li>
+<li>Automate ACs as tests.</li>
+<li>Capture decisions in RFCs/ADRs.</li>
+<li>Resolve ambiguity in conversation, not in code.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the story have role, action, and value?</li>
+<li>[ ] Are the acceptance criteria measurable?</li>
+<li>[ ] Are non-functional requirements stated?</li>
+<li>[ ] Is there a decision log?</li>
+<li>[ ] Does the PR description map to the ACs?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Rewrite one feature in your project as a user story.</li>
+<li>Pick a story without ACs and write five.</li>
+<li>Name two NFRs that would cause incidents if ignored.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good requirements are measurable. Next we look at the step before code — design vs implementation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What Is Software Engineering?</a></li>
+<li><strong>Understanding Requirements (current)</strong></li>
+<li>Design vs Implementation (upcoming)</li>
+<li>Code Review (upcoming)</li>
+<li>Testing Strategy (upcoming)</li>
+<li>Version Control and Release (upcoming)</li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mountaingoatsoftware.com/books/user-stories-applied">Mike Cohn — User Stories Applied</a></li>
+<li><a href="https://www.atlassian.com/agile/project-management/user-stories">Atlassian — INVEST in Good Stories</a></li>
+<li><a href="https://www.joelonsoftware.com/2000/10/02/painless-functional-specifications-part-1-why-bother/">Joel Spolsky — Painless Functional Specifications</a></li>
+<li><a href="https://www.iso.org/standard/72089.html">ISO/IEC/IEEE 29148 — Requirements Engineering</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Requirements, ProductManagement, UserStory, Process</p>
+</body>
+</html>

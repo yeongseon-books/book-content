@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Small Web App</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Small Web App</h1>
+<blockquote>
+<p>Web Development 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do the nine pieces from this series fit <em>into one app</em>?</p>
+<blockquote>
+<p>The smallest possible <em>Todo app</em> — HTML + Flask + SQLite + deployment in one continuous flow.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>See every concept from the series live <em>in one app</em></li>
+<li>A folder layout for a small full-stack project</li>
+<li>The full build-and-deploy flow end to end</li>
+<li>A map of what to learn next</li>
+<li>A retrospective on the whole series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowledge sets only when you <em>make something small</em>. One small full-stack app teaches more than five books. The Todo app you build here becomes the skeleton of <em>every project that follows</em>.</p>
+<blockquote>
+<p>Build <em>small</em> and go <em>all the way through</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; HTML[&quot;HTML form&quot;]
+    HTML --&gt; API[&quot;Flask /api/todos&quot;]
+    API --&gt; DB[(&quot;SQLite&quot;)]
+    DB --&gt; API
+    API --&gt; HTML
+    HTML --&gt; Render[&quot;Browser render&quot;]
+</code></pre>
+<p>Every stage from the series fits <em>in one picture</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Capstone</strong>: the <em>integration project</em> that closes a series.</li>
+<li><strong>Full-stack</strong>: FE + BE + DB + deployment.</li>
+<li><strong>MVP</strong>: the smallest <em>working</em> slice.</li>
+<li><strong>Folder layout</strong>: a layout you could share with a teammate.</li>
+<li><strong>Smoke test</strong>: a minimal check that the core flow <em>works</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (one-line script)</strong></p>
+<pre><code class="language-python">print(&quot;hello&quot;)
+</code></pre>
+<p><strong>After (one app)</strong></p>
+<pre><code class="language-text">todo-app/
+├── app.py
+├── templates/index.html
+├── static/style.css
+├── requirements.txt
+└── Dockerfile
+</code></pre>
+<p>From <code>hello</code> to a <em>shippable app</em>.</p>
+<h2>Hands-on: The Todo App in 5 Steps</h2>
+<p><strong>Step 1 — Project setup</strong></p>
+<pre><code class="language-bash">mkdir todo-app &amp;&amp; cd todo-app
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install flask gunicorn
+</code></pre>
+<p><strong>Step 2 — Backend (<code>app.py</code>)</strong></p>
+<pre><code class="language-python">from flask import Flask, request, jsonify, render_template
+import sqlite3, os
+
+DB = os.environ.get(&quot;DB_PATH&quot;, &quot;todo.db&quot;)
+app = Flask(__name__)
+
+def conn():
+    c = sqlite3.connect(DB)
+    c.row_factory = sqlite3.Row
+    return c
+
+with conn() as c:
+    c.execute(&quot;CREATE TABLE IF NOT EXISTS todos(id INTEGER PRIMARY KEY, text TEXT, done INTEGER DEFAULT 0)&quot;)
+
+@app.get(&quot;/&quot;)
+def home(): return render_template(&quot;index.html&quot;)
+
+@app.get(&quot;/api/todos&quot;)
+def list_todos():
+    rows = conn().execute(&quot;SELECT * FROM todos ORDER BY id DESC&quot;).fetchall()
+    return jsonify([dict(r) for r in rows])
+
+@app.post(&quot;/api/todos&quot;)
+def add_todo():
+    text = request.get_json()[&quot;text&quot;]
+    with conn() as c:
+        c.execute(&quot;INSERT INTO todos(text) VALUES (?)&quot;, (text,))
+    return jsonify(ok=True), 201
+
+@app.get(&quot;/health&quot;)
+def health(): return {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<p><strong>Step 3 — Frontend (<code>templates/index.html</code>)</strong></p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;Todo&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/style.css&quot;&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Todo&lt;/h1&gt;
+  &lt;form id=&quot;f&quot;&gt;&lt;input id=&quot;t&quot; placeholder=&quot;what to do&quot;&gt;&lt;button&gt;add&lt;/button&gt;&lt;/form&gt;
+  &lt;ul id=&quot;list&quot;&gt;&lt;/ul&gt;
+&lt;script&gt;
+async function load() {
+  const items = await (await fetch(&quot;/api/todos&quot;)).json();
+  document.getElementById(&quot;list&quot;).innerHTML = items.map(i =&gt; `&lt;li&gt;${i.text}&lt;/li&gt;`).join(&quot;&quot;);
+}
+document.getElementById(&quot;f&quot;).addEventListener(&quot;submit&quot;, async e =&gt; {
+  e.preventDefault();
+  await fetch(&quot;/api/todos&quot;, {method: &quot;POST&quot;, headers: {&quot;Content-Type&quot;: &quot;application/json&quot;},
+    body: JSON.stringify({text: document.getElementById(&quot;t&quot;).value})});
+  document.getElementById(&quot;t&quot;).value = &quot;&quot;;
+  load();
+});
+load();
+&lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+<p><strong>Step 4 — Smoke test</strong></p>
+<pre><code class="language-bash">flask --app app run
+# in another terminal
+curl -X POST -H &quot;Content-Type: application/json&quot; -d '{&quot;text&quot;:&quot;first todo&quot;}' http://localhost:5000/api/todos
+curl http://localhost:5000/api/todos
+</code></pre>
+<p><strong>Step 5 — Docker + deploy</strong></p>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+ENV DB_PATH=/data/todo.db
+CMD [&quot;gunicorn&quot;, &quot;-b&quot;, &quot;0.0.0.0:8000&quot;, &quot;app:app&quot;]
+</code></pre>
+<pre><code class="language-bash">docker build -t todo-app . &amp;&amp; docker run -p 8000:8000 -v $PWD/data:/data todo-app
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same <em>env var</em> (DB_PATH) drives both local and container runs.</li>
+<li><code>/health</code> is the <em>signal</em> a deployment system uses.</li>
+<li>All nine concepts of the series fit in roughly 100 lines.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hardcoding the DB path.</strong> Push it to env vars.</li>
+<li><strong>Inlining all JS in the first page.</strong> Even small apps benefit from separation.</li>
+<li><strong>Returning 200 on errors.</strong> Honor status codes.</li>
+<li><strong>Deploying with no test.</strong> At least a health check + curl.</li>
+<li><strong>Reaching for a <em>huge framework</em> too early.</strong> Start small.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>This little app can grow into a <em>blog, a budget tracker, a notebook, a chatbot</em>. Big SaaS products are <em>extensions of this very structure</em> — auth, cache, queue, batch, layered on top.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Ship a <em>vertical slice</em> end to end.</li>
+<li>Use env vars only for <em>what differs</em> between environments.</li>
+<li>Health check + logging + monitoring from day one.</li>
+<li>Redraw boundaries as features grow.</li>
+<li>As the product scales, <em>team agreements</em> (reviews, CI) matter more.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] FE, BE, and DB all live in one app.</li>
+<li>[ ] You have a health check endpoint.</li>
+<li>[ ] Configuration is moved to env vars.</li>
+<li>[ ] You have curled an endpoint.</li>
+<li>[ ] You have run it as a container.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add <em>toggle done</em> and <em>delete</em> to the Todo app (PUT/DELETE).</li>
+<li>Add session login so each user has their own todos.</li>
+<li>Add cache headers to static assets and run Lighthouse.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>That is <em>Web Development 101</em>. Next steps are depth — Frontend Development 101, Backend Development 101, and Database 101 take you one layer deeper. The best next book is the <em>next app you build</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Authentication and Sessions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/07-connecting-to-database.md">Connecting to a Database</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/08-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/09-performance-and-caching.md">Performance and Caching</a></li>
+<li><strong>Building a Small Web App (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://flask.palletsprojects.com/quickstart/">Flask quickstart</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html">SQLite (Python docs)</a></li>
+<li><a href="https://docs.docker.com/get-started/">Docker get started</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Capstone, Flask, FullStack, Project</p>
+</body>
+</html>

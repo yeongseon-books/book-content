@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Build a Container App</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Build a Container App</h1>
+<blockquote>
+<p>Containers 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When everything you have learned is wrapped into <em>one app</em>, <em>what flow</em> does it form?</p>
+<blockquote>
+<p><em>Dockerfile + Compose + healthcheck + secrets + logs</em> working from one <em>single command</em> is the <em>finish line</em> of the basics.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A <em>Dockerfile</em> for a <em>FastAPI</em> app</li>
+<li><em>Compose</em> with a <em>DB</em> connection</li>
+<li>Defining a <em>healthcheck</em></li>
+<li>Splitting <em>secrets</em></li>
+<li><em>Logs</em> and <em>restart policy</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Every concept above only sticks once you <em>integrate</em> it into <em>one running result</em>. That is the meaning of this <em>final post</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;app code&quot;] --&gt; Image[&quot;docker build&quot;]
+    Image --&gt; Compose[&quot;compose up&quot;]
+    Compose --&gt; App[&quot;app&quot;]
+    Compose --&gt; DB[&quot;db&quot;]
+    App --&gt; Log[&quot;logs&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Dockerfile</strong>: a <em>recipe</em> for building an image.</li>
+<li><strong>Compose</strong>: a tool that ties <em>multiple containers</em> together via <em>YAML</em>.</li>
+<li><strong>healthcheck</strong>: a <em>liveness signal</em>.</li>
+<li><strong>restart policy</strong>: an <em>auto-restart rule on failure</em>.</li>
+<li><strong>logs driver</strong>: a <em>log collection backend</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: many <em>manual docker run</em> lines that no one can reproduce.</p>
+<p><strong>After</strong>: <code>docker compose up</code> runs the <em>whole stack</em> in <em>one line</em>.</p>
+<h2>Hands-on: A FastAPI + Postgres Stack</h2>
+<p><strong>Step 1 — app/main.py</strong></p>
+<pre><code class="language-python">from fastapi import FastAPI
+import os, psycopg
+
+app = FastAPI()
+
+@app.get(&quot;/health&quot;)
+def health():
+    return {&quot;ok&quot;: True}
+
+@app.get(&quot;/users&quot;)
+def users():
+    with psycopg.connect(os.environ[&quot;DB_URL&quot;]) as conn:
+        with conn.cursor() as cur:
+            cur.execute(&quot;SELECT count(*) FROM users&quot;)
+            return {&quot;count&quot;: cur.fetchone()[0]}
+</code></pre>
+<p><strong>Step 2 — Dockerfile</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app
+USER 1000
+EXPOSE 8080
+HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
+CMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8080&quot;]
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — docker-compose.yml</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+services:
+  app:
+    build: .
+    ports: [&quot;8080:8080&quot;]
+    environment:
+      DB_URL: postgresql://app:secret@db:5432/app
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app
+    healthcheck:
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U app&quot;]
+      interval: 5s
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 4 — Automate startup</strong></p>
+<pre><code class="language-python">import subprocess
+
+def up():
+    subprocess.run([&quot;docker&quot;, &quot;compose&quot;, &quot;up&quot;, &quot;-d&quot;, &quot;--build&quot;], check=True)
+
+def logs():
+    subprocess.run([&quot;docker&quot;, &quot;compose&quot;, &quot;logs&quot;, &quot;--tail=100&quot;], check=False)
+</code></pre>
+<p><strong>Step 5 — Tear down</strong></p>
+<pre><code class="language-python">def down():
+    subprocess.run([&quot;docker&quot;, &quot;compose&quot;, &quot;down&quot;, &quot;-v&quot;], check=True)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>USER 1000</em> enforces <em>non-root</em>.</li>
+<li>The <em>healthcheck</em> drives <em>Compose</em> dependency ordering.</li>
+<li><em>depends_on + service_healthy</em> is a paired pattern.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Storing the <em>DB password</em> as plain text in <em>Compose</em> forever.</strong></li>
+<li><strong>Using <em>depends_on</em> without a <em>healthcheck</em>.</strong></li>
+<li><strong>Forgetting a <em>restart policy</em> and propagating failures.</strong></li>
+<li><strong>Missing <em>volumes</em> and losing data.</strong></li>
+<li><strong>Writing <em>logs</em> only inside the container.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Local development</em> runs on <em>Compose</em>; <em>production</em> runs on <em>Kubernetes</em>; the <em>same image</em> is operated by <em>different orchestrators</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A <em>one-line bring-up</em> defines <em>onboarding cost</em>.</li>
+<li>The <em>healthcheck</em> is the <em>signal for orchestration</em>.</li>
+<li><em>Env vars</em> should be the <em>only difference</em> across environments.</li>
+<li><em>Logs</em> go to <em>stdout</em>.</li>
+<li>Even <em>teardown</em> is automated.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Non-root</em> at runtime.</li>
+<li>[ ] <em>Healthcheck</em> defined.</li>
+<li>[ ] <em>Secrets</em> split out.</li>
+<li>[ ] <em>Teardown</em> command documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain in one line <em>why</em> the Dockerfile <em>USER</em> matters.</li>
+<li>Explain in one line why <em>depends_on alone</em> is insufficient.</li>
+<li>Name <em>one thing</em> Compose and Kubernetes share.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This is the <em>finale</em> of <em>Containers 101</em>. The next step is <em>Kubernetes 101</em>, where you enter the world of <em>orchestration</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/03-runtime.md">Runtime</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/04-dockerfile.md">Dockerfile</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/05-volume.md">Volume</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/06-network.md">Network</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/07-registry.md">Registry</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/08-container-security.md">Container Security</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/09-container-vs-vm.md">Containers vs VMs</a></li>
+<li><strong>Build a Container App (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/compose/">Docker Compose</a></li>
+<li><a href="https://fastapi.tiangolo.com/deployment/docker/">FastAPI in containers</a></li>
+<li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Dockerfile best practices</a></li>
+<li><a href="https://docs.docker.com/engine/reference/builder/#healthcheck">HEALTHCHECK reference</a></li>
+</ul>
+<p class="tags-line">Tags: Containers, Docker, Compose, FastAPI, DevOps</p>
+</body>
+</html>

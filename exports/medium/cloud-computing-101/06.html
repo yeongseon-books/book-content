@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Network</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Network</h1>
+<blockquote>
+<p>Cloud Computing 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do VPCs, subnets, and security groups all exist <em>separately</em>?</p>
+<blockquote>
+<p><em>Cloud networking works in four layers — isolate (VPC), place (subnets), allow (SG/NACL), distribute (LB).</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>VPCs vs subnets</li>
+<li>Security Groups vs NACLs</li>
+<li>Public and private subnet patterns</li>
+<li>Load balancer basics</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Network design is the hardest decision to undo later. The first hour shapes the next several years.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Internet[&quot;internet&quot;] --&gt; ALB[&quot;load balancer&quot;]
+    ALB --&gt; Public[&quot;public subnet&quot;]
+    Public --&gt; Private[&quot;private subnet&quot;]
+    Private --&gt; DB[&quot;database&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>VPC</strong>: a logically isolated virtual network.</li>
+<li><strong>Subnet</strong>: an IP range inside a VPC, scoped to an AZ.</li>
+<li><strong>Security Group</strong>: a stateful, instance-level firewall.</li>
+<li><strong>NACL</strong>: a stateless, subnet-level firewall.</li>
+<li><strong>Load Balancer</strong>: distributes traffic across targets.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every server has a public IP and the attack surface explodes.</p>
+<p><strong>After</strong>: apps live in private subnets, only the ALB faces the internet.</p>
+<h2>Hands-on: Create a Security Group</h2>
+<p><strong>Step 1 — Client</strong></p>
+<pre><code class="language-python">import boto3
+ec2 = boto3.client(&quot;ec2&quot;)
+</code></pre>
+<p><strong>Step 2 — Create SG</strong></p>
+<pre><code class="language-python">def create_sg(vpc_id, name):
+    res = ec2.create_security_group(
+        GroupName=name, Description=name, VpcId=vpc_id,
+    )
+    return res[&quot;GroupId&quot;]
+</code></pre>
+<p><strong>Step 3 — Allow inbound</strong></p>
+<pre><code class="language-python">def allow_https(sg_id):
+    ec2.authorize_security_group_ingress(
+        GroupId=sg_id,
+        IpPermissions=[{
+            &quot;IpProtocol&quot;: &quot;tcp&quot;, &quot;FromPort&quot;: 443, &quot;ToPort&quot;: 443,
+            &quot;IpRanges&quot;: [{&quot;CidrIp&quot;: &quot;0.0.0.0/0&quot;}],
+        }],
+    )
+</code></pre>
+<p><strong>Step 4 — DB SG references the app SG</strong></p>
+<pre><code class="language-python">def allow_db_from_app(db_sg, app_sg):
+    ec2.authorize_security_group_ingress(
+        GroupId=db_sg,
+        IpPermissions=[{
+            &quot;IpProtocol&quot;: &quot;tcp&quot;, &quot;FromPort&quot;: 5432, &quot;ToPort&quot;: 5432,
+            &quot;UserIdGroupPairs&quot;: [{&quot;GroupId&quot;: app_sg}],
+        }],
+    )
+</code></pre>
+<p><strong>Step 5 — Verify</strong></p>
+<pre><code class="language-python">def describe(sg_id):
+    return ec2.describe_security_groups(GroupIds=[sg_id])
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>DB SGs reference an SG, not a CIDR — that is the canonical pattern.</li>
+<li>0.0.0.0/0 is an explicit statement of public exposure.</li>
+<li>SGs are stateful; NACLs are stateless.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Opening SSH to 0.0.0.0/0.</strong></li>
+<li><strong>Putting databases in public subnets.</strong></li>
+<li><strong>Confusing NACLs and SG responsibilities.</strong></li>
+<li><strong>Ignoring cross-AZ traffic costs.</strong></li>
+<li><strong>Forgetting to review egress rules.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The ALB sits in public subnets. App servers live in private subnets. RDS sits in DB private subnets. A NAT Gateway handles outbound calls.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Private by default; public is the exception.</li>
+<li>Split SGs by role.</li>
+<li>Restrict egress just as explicitly as ingress.</li>
+<li>VPC Flow Logs are on by default.</li>
+<li>Plan CIDR ranges with future merges in mind.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] No databases in public subnets.</li>
+<li>[ ] SGs are split by role.</li>
+<li>[ ] Flow Logs are enabled.</li>
+<li>[ ] Egress rules are explicit.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List three differences between Security Groups and NACLs.</li>
+<li>Explain in one sentence why public/private subnet separation helps security.</li>
+<li>Give one major difference between ALB and NLB.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once the wires are in, the question becomes <em>who</em> may use them. The next post covers Identity and Security.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
+<li><strong>Network (current)</strong></li>
+<li>Identity and Security (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">AWS VPC user guide</a></li>
+<li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS Security Groups</a></li>
+<li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html">AWS Network ACL</a></li>
+<li><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html">AWS Elastic Load Balancing</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, Networking, VPC, Security, AWS</p>
+</body>
+</html>

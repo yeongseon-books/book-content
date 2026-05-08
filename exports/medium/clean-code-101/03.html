@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Small Functions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Small Functions</h1>
+<blockquote>
+<p>Clean Code 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How small is small enough?</p>
+<blockquote>
+<p>Small enough that "does one thing" is visible. The name carries that one thing.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Four effects of small functions</li>
+<li>The Extract Function procedure</li>
+<li>Patterns that remove side effects</li>
+<li>Command-Query Separation</li>
+<li>Parameter objects to simplify signatures</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A small function explains itself by name. A large function asks for comments, and comments turn into lies.</p>
+<blockquote>
+<p>When functions shrink, names do the work.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    B[&quot;Giant function&quot;] --&gt; E[&quot;Extract&quot;]
+    E --&gt; S[&quot;Does one thing&quot;]
+    S --&gt; N[&quot;Good name&quot;]
+    N --&gt; R[&quot;Reuse and test&quot;]
+</code></pre>
+<p>Extraction enables names; names enable reuse.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SRP (Single Responsibility)</strong>: One reason to change.</li>
+<li><strong>Extract Function</strong>: Pull a block out into a function.</li>
+<li><strong>Command-Query Separation</strong>: Functions either do or answer, not both.</li>
+<li><strong>Pure function</strong>: Same input -&gt; same output, no side effects.</li>
+<li><strong>Parameter Object</strong>: Group arguments into an object.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def checkout(cart, user, addr, coupon):
+    # 60 lines: validate + price + tax + ship + log + email + save
+    ...
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def checkout(cart, user, addr, coupon):
+    items = validate_cart(cart, user)
+    total = price_with_tax(items, addr)
+    order = save_order(user, items, total, coupon)
+    notify_user(user, order)
+    return order
+</code></pre>
+<p>The body becomes a table of contents.</p>
+<h2>Hands-on: Extract Safely</h2>
+<p><strong>Step 1 — Partial extraction</strong></p>
+<pre><code class="language-python"># 1_extract.py
+def total(items):
+    s = 0
+    for it in items:
+        s += it.price * it.qty
+    return s
+</code></pre>
+<p>Loops are good extraction candidates.</p>
+<p><strong>Step 2 — Intent name</strong></p>
+<pre><code class="language-python"># 2_intent.py
+def line_total(item): return item.price * item.qty
+def total(items): return sum(line_total(it) for it in items)
+</code></pre>
+<p>The name reduces the code.</p>
+<p><strong>Step 3 — Command/Query split</strong></p>
+<pre><code class="language-python"># 3_cqs.py
+class Account:
+    def withdraw(self, amount):  # command
+        self.balance -= amount
+    def is_overdrawn(self):      # query
+        return self.balance &lt; 0
+</code></pre>
+<p>Queries must not mutate.</p>
+<p><strong>Step 4 — Parameter object</strong></p>
+<pre><code class="language-python"># 4_param_obj.py
+from dataclasses import dataclass
+@dataclass
+class Range: lo: int; hi: int
+def in_range(value, r: Range): return r.lo &lt;= value &lt;= r.hi
+</code></pre>
+<p>More than three args is a candidate for an object.</p>
+<p><strong>Step 5 — Make it pure</strong></p>
+<pre><code class="language-python"># 5_pure.py
+def discount(price: int, rate: float) -&gt; int:
+    return int(price * (1 - rate))
+</code></pre>
+<p>Pure functions are one-line tests.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The body reads like a table of contents.</li>
+<li>Names replace comments.</li>
+<li>Command/Query split reduces debugging time.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Cleaning a giant function with variables only.</strong> No new names appear.</li>
+<li><strong>Argument explosion after extraction.</strong> Group into objects.</li>
+<li><strong>Queries that mutate.</strong> A leading source of bugs.</li>
+<li><strong>Extracting without tests.</strong> Regression risk.</li>
+<li><strong>Over-shredding.</strong> A hundred one-line functions kills readability.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams gate function length, arg count, and cyclomatic complexity via lint. Large functions get auto-flagged with extraction suggestions on PRs.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Make the body read like a table of contents.</li>
+<li>Names replace comments.</li>
+<li>Queries never mutate.</li>
+<li>More than three args is a smell.</li>
+<li>Pure functions are friends of tests.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the function do exactly one thing?</li>
+<li>[ ] Does the body read like a table of contents?</li>
+<li>[ ] Args ≤ 3?</li>
+<li>[ ] Are queries side-effect free?</li>
+<li>[ ] Are there tests around the extraction?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Rewrite one function so its body reads as a table of contents.</li>
+<li>Group a 4+ arg function into an object.</li>
+<li>Fix one CQS violation.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Small functions enable names and tests. Next, the chief reason for big functions — conditionals.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><strong>Small Functions (current)</strong></li>
+<li>Simplifying Conditionals (upcoming)</li>
+<li>Removing Duplication (upcoming)</li>
+<li>Error Handling (upcoming)</li>
+<li>Comments and Documentation (upcoming)</li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code (Ch. 3 Functions)</a></li>
+<li><a href="https://refactoring.com/catalog/extractFunction.html">Refactoring — Extract Function</a></li>
+<li><a href="https://martinfowler.com/bliki/CommandQuerySeparation.html">Martin Fowler — Command Query Separation</a></li>
+<li><a href="https://refactoring.com/catalog/introduceParameterObject.html">Refactoring — Introduce Parameter Object</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Functions, SRP, Refactoring, Readability</p>
+</body>
+</html>

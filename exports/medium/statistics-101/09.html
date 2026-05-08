@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding p-value</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding p-value</h1>
+<blockquote>
+<p>Statistics 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does <em>p &lt; 0.05</em> really mean? <em>Why</em> is it <em>misread so often</em>?</p>
+<blockquote>
+<p><em>A p-value is not the probability that a hypothesis is true. It is only how surprising the data is.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>precise definition</em> of a p-value</li>
+<li><em>Five common misreadings</em></li>
+<li><em>p-hacking</em> and <em>pre-registration</em></li>
+<li>A 5-step p-value exercise</li>
+<li>The core of the <em>ASA 2016 statement</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most papers and reports collapse a <em>conclusion</em> into one line: <em>p &lt; 0.05</em>. Yet <em>most readers misread that line</em>. <em>A misread p-value leads to wrong decisions</em>.</p>
+<blockquote>
+<p><em>A p-value is not an answer; it is the </em>start of a question<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    H0[&quot;H0 (null)&quot;] --&gt; Sample[&quot;Observed sample&quot;]
+    Sample --&gt; Stat[&quot;Test statistic&quot;]
+    Stat --&gt; P[&quot;p = P(stat &gt;= obs | H0)&quot;]
+    P --&gt; Decide[&quot;Compare with alpha&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>p-value</strong>: under the <em>assumption that H0 is true</em>, the probability of seeing a <em>result at least as extreme</em> as the observed one.</li>
+<li><strong>Significance level α</strong>: a pre-chosen <em>rejection threshold</em> (often 0.05).</li>
+<li><strong>Type I error</strong>: rejecting <em>H0 when it is true</em> (probability = α).</li>
+<li><strong>p-hacking</strong>: rerunning analyses <em>until the desired p</em> appears.</li>
+<li><strong>Pre-registration</strong>: publishing the hypothesis and procedure <em>before</em> analysis.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“p = 0.03, so H0 is true with </em>3%<em> probability.”</em> — <em>Wrong reading</em>.</p>
+<p><strong>After</strong>: <em>“If H0 is true, the chance of seeing data </em>as extreme as ours<em> is 3%.”</em></p>
+<h2>Hands-on: 5-step p-value</h2>
+<p><strong>Step 1 — Set the hypothesis</strong></p>
+<pre><code class="language-python"># H0: mean = 100, H1: mean != 100
+mu0 = 100
+</code></pre>
+<p><strong>Step 2 — Data</strong></p>
+<pre><code class="language-python">import numpy as np
+rng = np.random.default_rng(0)
+sample = rng.normal(102, 15, size=40)
+</code></pre>
+<p><strong>Step 3 — Run the test</strong></p>
+<pre><code class="language-python">from scipy import stats
+t, p = stats.ttest_1samp(sample, mu0)
+print(&quot;t:&quot;, t, &quot;p:&quot;, p)
+</code></pre>
+<p><strong>Step 4 — Effect size</strong></p>
+<pre><code class="language-python">import numpy as np
+effect = (sample.mean() - mu0) / sample.std(ddof=1)
+print(&quot;Cohen's d:&quot;, effect)
+</code></pre>
+<p><strong>Step 5 — Simulate p-hacking</strong></p>
+<pre><code class="language-python">import numpy as np
+from scipy import stats
+hits = 0
+for _ in range(20):
+    x = np.random.default_rng().normal(100, 15, size=40)
+    if stats.ttest_1samp(x, 100).pvalue &lt; 0.05:
+        hits += 1
+print(&quot;False alarms in 20 looks:&quot;, hits)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>p-value is a function of the data</em>; it is <em>not</em> the probability of a <em>hypothesis</em>.</li>
+<li><em>p</em> shrinks with sample size <em>even when the effect is small</em>.</li>
+<li>Re-analyzing the <em>same data many times</em> compounds <em>spurious significance</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><em>p = P(H0 is true)</em></strong> <em>(wrong)</em>.</li>
+<li><strong><em>p = effect size</em></strong> <em>(wrong)</em>.</li>
+<li><strong><em>p &gt; 0.05</em> means *no effect</strong><em> </em>(absence of evidence is not evidence of absence)*.</li>
+<li><strong>Running <em>many tests</em> with <em>no correction</em>.</strong></li>
+<li><strong>Reshaping a hypothesis <em>to fit the data after the fact</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A/B tests, clinical trials, quality control — production reports always pair <em>p-values</em> with <em>effect sizes</em> and <em>confidence intervals</em>. <em>Multiple-testing corrections</em> such as <em>Bonferroni</em> or <em>FDR</em> are standard.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always</em> reads <em>p</em> with the <em>effect size</em>.</li>
+<li>Knows <em>significant ≠ meaningful</em>.</li>
+<li>Uses <em>pre-registration</em> to block <em>p-hacking</em>.</li>
+<li>Knows the core of the <em>ASA statement</em>.</li>
+<li>Never decides on <em>p alone</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can define a <em>p-value</em> precisely.</li>
+<li>[ ] I separate <em>significance level</em> from <em>Type I error</em>.</li>
+<li>[ ] I recognize <em>p-hacking</em>.</li>
+<li>[ ] I report <em>effect size</em> alongside <em>p</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain the <em>practical difference</em> between <em>p = 0.04</em> and <em>p = 0.06</em>.</li>
+<li>Compute the <em>false-positive</em> probability of testing the <em>same data 5 times</em>.</li>
+<li>Describe what it <em>means</em> when the <em>effect size is tiny</em> but <em>p is small</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A p-value is <em>not proof</em>; it is a <em>measure of surprise</em>. The next episode wraps everything together as a <em>statistical mindset</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/07-hypothesis-testing.md">Hypothesis Testing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/08-correlation-and-regression.md">Correlation and Regression</a></li>
+<li><strong>Understanding p-value (current)</strong></li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf">ASA Statement on p-Values (2016)</a></li>
+<li><a href="https://www.nature.com/articles/d41586-019-00857-9">Nature — Scientists rise up against statistical significance</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html">scipy.stats — ttest_1samp</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Misuse_of_p-values">Wikipedia — Misuse of p-values</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, PValue, Inference, Misconceptions, Beginner</p>
+</body>
+</html>

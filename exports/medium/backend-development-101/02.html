@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building an HTTP Server</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building an HTTP Server</h1>
+<blockquote>
+<p>Backend Development 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does an HTTP server <em>actually do</em> under the hood?</p>
+<blockquote>
+<p>It reads text from a TCP socket, parses it as a request, and writes text back. An HTTP server is a <em>read-and-write</em> program.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The actual shape of an HTTP request and response</li>
+<li>How HTTP rides on top of TCP</li>
+<li>The meaning of status codes and headers</li>
+<li>How to build a real server with FastAPI</li>
+<li>How to run a raw-socket server and watch the traffic</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Once you have <em>seen</em> what frameworks hide, every future debugging session gets faster. Without it, you guess at why a status code looks wrong or why a header is missing.</p>
+<blockquote>
+<p>Frameworks are convenient, but seniors know what is <em>behind</em> the framework.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;Client&quot;] --&gt;|&quot;GET / HTTP/1.1&quot;| Sock[&quot;TCP socket&quot;]
+    Sock --&gt; Parser[&quot;Parser&quot;]
+    Parser --&gt; App[&quot;Handler&quot;]
+    App --&gt; Resp[&quot;Response builder&quot;]
+    Resp --&gt; Sock2[&quot;TCP socket&quot;]
+    Sock2 --&gt;|&quot;HTTP/1.1 200 OK&quot;| Client
+</code></pre>
+<p>Both request and response are just <em>blocks of text</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Request line</strong>: <code>GET /path HTTP/1.1</code> — method, path, version.</li>
+<li><strong>Status line</strong>: <code>HTTP/1.1 200 OK</code> — the first line of the response.</li>
+<li><strong>Header</strong>: <code>Key: Value</code> metadata.</li>
+<li><strong>Body</strong>: actual data (JSON, HTML, files).</li>
+<li><strong>Method</strong>: GET, POST, PUT, DELETE — kinds of action.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (the library hides everything)</strong></p>
+<pre><code class="language-python">import requests
+print(requests.get(&quot;https://example.com&quot;).status_code)
+</code></pre>
+<p><strong>After (you watch the bytes)</strong></p>
+<pre><code class="language-python">import socket
+s = socket.create_connection((&quot;example.com&quot;, 80))
+s.sendall(b&quot;GET / HTTP/1.1\r\nHost: example.com\r\n\r\n&quot;)
+print(s.recv(4096).decode()[:200])
+</code></pre>
+<p>Same effect, but the <em>protocol text</em> is now visible.</p>
+<h2>Hands-on: Five Steps to a Real Server</h2>
+<p><strong>Step 1 — Raw socket server</strong></p>
+<pre><code class="language-python"># 1_socket_server.py
+import socket
+srv = socket.socket()
+srv.bind((&quot;127.0.0.1&quot;, 9000))
+srv.listen()
+conn, _ = srv.accept()
+data = conn.recv(1024)
+print(data.decode())
+conn.sendall(b&quot;HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello&quot;)
+conn.close()
+</code></pre>
+<p>Open <code>http://127.0.0.1:9000/</code> in a browser to see <code>hello</code>.</p>
+<p><strong>Step 2 — Same thing with FastAPI</strong></p>
+<pre><code class="language-python"># 2_fastapi.py
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+def root():
+    return &quot;hello&quot;
+</code></pre>
+<pre><code class="language-bash">uvicorn 2_fastapi:app --port 9000
+</code></pre>
+<p><strong>Step 3 — Choose your status code</strong></p>
+<pre><code class="language-python"># 3_status.py
+from fastapi import FastAPI, HTTPException
+app = FastAPI()
+
+@app.get(&quot;/items/{i}&quot;)
+def get_item(i: int):
+    if i &lt; 0:
+        raise HTTPException(400, &quot;i must be &gt;= 0&quot;)
+    return {&quot;i&quot;: i}
+</code></pre>
+<p><strong>Step 4 — Custom headers</strong></p>
+<pre><code class="language-python"># 4_headers.py
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+def root():
+    return JSONResponse({&quot;ok&quot;: True}, headers={&quot;X-App&quot;: &quot;demo&quot;})
+</code></pre>
+<p><strong>Step 5 — Inspect with curl</strong></p>
+<pre><code class="language-bash">curl -i http://127.0.0.1:9000/
+</code></pre>
+<p><code>-i</code> shows the <em>headers and status line</em> alongside the body.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Without <code>Content-Length</code>, the client cannot know where the body ends.</li>
+<li>HTTP requires <code>\r\n</code> line endings — plain <code>\n</code> will break parsers.</li>
+<li>Same URL plus a different method means a <em>different action</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Returning 200 even on errors.</strong> Your monitoring breaks.</li>
+<li><strong>Forgetting <code>Content-Type</code>.</strong> Clients cannot decode JSON.</li>
+<li><strong>Never closing the body.</strong> Connections leak forever.</li>
+<li><strong>Sending a body with GET.</strong> Caches and proxies will drop it.</li>
+<li><strong>Using only 200 and 500.</strong> You lose the meaning of all the 4xx codes.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In production, FastAPI handles the socket plumbing for you. But when an outage hits — responses missing, connections truncated — you still have to drop down to sockets and headers. tcpdump, Wireshark, and curl are the basic backend debugger trio.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Status codes are a <em>contract</em>, not decoration.</li>
+<li>Headers communicate intent — set them on purpose.</li>
+<li>Timeouts and keep-alive are configured, not assumed.</li>
+<li>Responses have a maximum size.</li>
+<li>Reading raw HTTP regularly pays off when the real outage hits.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can read the first line of an HTTP request.</li>
+<li>[ ] You can tell 4xx from 5xx.</li>
+<li>[ ] You can use <code>curl -i</code> to see headers.</li>
+<li>[ ] You can set a status code in FastAPI.</li>
+<li>[ ] You have run a raw-socket server at least once.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Modify the raw-socket server to return JSON with a <code>Content-Type: application/json</code> header.</li>
+<li>In FastAPI, add a <code>/error</code> route that returns 503.</li>
+<li>Use <code>curl -v</code> against your server and capture the entire request and response text.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>An HTTP server is a <em>text-protocol program</em>. Next, we add the layer that decides <em>which function handles which path</em> — the router.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><strong>Building an HTTP Server (current)</strong></li>
+<li>Routing and Controllers (upcoming)</li>
+<li>The Service Layer (upcoming)</li>
+<li>The Database Layer (upcoming)</li>
+<li>Authentication and Authorization (upcoming)</li>
+<li>Logging and Error Handling (upcoming)</li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages">HTTP messages (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">HTTP status codes (MDN)</a></li>
+<li><a href="https://fastapi.tiangolo.com/advanced/response-directly/">FastAPI responses</a></li>
+<li><a href="https://curl.se/docs/manual.html">curl manual</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, HTTP, Python, FastAPI, Networking</p>
+</body>
+</html>

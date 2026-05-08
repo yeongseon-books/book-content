@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Leader Election</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Leader Election</h1>
+<blockquote>
+<p>Distributed Systems 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What happens when a leader you thought was dead comes back to life?</p>
+<blockquote>
+<p>Leader election is not just about deciding "who is the leader" — it is about safely cutting off the influence of the previous one.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why leader election is needed and what its safety conditions are</li>
+<li>The roles of lease and heartbeat</li>
+<li>How to use a fencing token to block an old leader</li>
+<li>Split-brain scenarios and how to prevent them</li>
+<li>Practical patterns for electing a leader with etcd or ZooKeeper</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Many distributed-system bugs happen the moment "there are two leaders." When two leaders write to the same resource at the same time, data breaks. A correct election guarantees that only one leader holds authority at any point in time.</p>
+<blockquote>
+<p>A good election is the promise that "there is no moment with two leaders."</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    C1[&quot;candidate 1&quot;] --&gt;|request lease| L[&quot;lock service (etcd)&quot;]
+    C2[&quot;candidate 2&quot;] --&gt;|request lease| L
+    L --&gt;|grant lease| C1
+    C1 --&gt;|heartbeat| L
+</code></pre>
+<p>Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Leader</strong>: The node that holds write authority at a point in time.</li>
+<li><strong>Lease</strong>: A temporary authority that expires automatically after a TTL.</li>
+<li><strong>Heartbeat</strong>: A periodic signal used to renew the lease.</li>
+<li><strong>Fencing token</strong>: A monotonically increasing ID used to reject old-leader requests.</li>
+<li><strong>Split-brain</strong>: A state where two nodes simultaneously believe they are leader.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — leader judgement by heartbeat alone</strong></p>
+<pre><code class="language-text">an old leader stalled by GC pause comes back and writes to the same resource
+</code></pre>
+<p><strong>After — lease + fencing token</strong></p>
+<pre><code class="language-text">the old leader's request is rejected by a smaller token; only the new leader passes
+</code></pre>
+<p>A single token line prevents split-brain.</p>
+<h2>Hands-on: Election and Fencing</h2>
+<p><strong>Step 1 — lease-based election (pseudocode)</strong></p>
+<pre><code class="language-python"># 1_lease.py
+import time
+class Lease:
+    def __init__(self, ttl): self.ttl, self.expires = ttl, 0
+    def acquire(self, now):
+        if now &gt;= self.expires:
+            self.expires = now + self.ttl
+            return True
+        return False
+</code></pre>
+<p>Only an expired lease can be acquired anew. TTL is the safety boundary.</p>
+<p><strong>Step 2 — renew with heartbeat</strong></p>
+<pre><code class="language-python"># 2_heartbeat.py
+def renew(lease, now):
+    lease.expires = now + lease.ttl
+</code></pre>
+<p>The leader renews every TTL/3. A safety margin lets one or two missed renewals slide.</p>
+<p><strong>Step 3 — fencing token</strong></p>
+<pre><code class="language-python"># 3_fence.py
+counter = 0
+def grant_leader():
+    global counter
+    counter += 1
+    return counter   # monotonically increasing token
+</code></pre>
+<p>Every time a new leader is elected the token grows. The resource server rejects requests with a smaller token.</p>
+<p><strong>Step 4 — resource server reject logic</strong></p>
+<pre><code class="language-python"># 4_resource.py
+last_token = 0
+def write(token, data):
+    global last_token
+    if token &lt; last_token:
+        return &quot;rejected (stale leader)&quot;
+    last_token = token
+    return &quot;ok&quot;
+</code></pre>
+<p>This single line stops an old leader from writing.</p>
+<p><strong>Step 5 — split-brain scenario</strong></p>
+<pre><code class="language-python"># 5_split.py (pseudocode)
+# old leader A: token=5, GC pause 30s
+# meanwhile new leader B: token=6 issued
+# A wakes up and tries to write with token=5 -&gt; resource server rejects
+# B's write with token=6 succeeds
+</code></pre>
+<p>In a design without tokens, A's write would land and corrupt the data.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A lease expires automatically — it handles network partitions naturally.</li>
+<li>Heartbeats are sent more often than the TTL — a margin is essential.</li>
+<li>Monotonic increase is the essence of a token.</li>
+<li>Rejection is the resource server's responsibility — never trust the client.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Believing heartbeats alone are enough.</strong> GC pauses and network delays are ignored.</li>
+<li><strong>Setting TTL too short.</strong> False failovers happen often.</li>
+<li><strong>Not putting token validation in the resource server.</strong> Old leaders succeed at writes.</li>
+<li><strong>Using random values for the token.</strong> Monotonic ordering breaks; comparison is meaningless.</li>
+<li><strong>Recovering from split-brain manually.</strong> Recovery should be automatic by design.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Kubernetes' <code>kube-controller-manager</code> and <code>kube-scheduler</code> use etcd leases for leader election. ZooKeeper's ephemeral znode is the same pattern. Kafka's controller, HDFS NameNode HA, and distributed cron are all lease + fencing variants.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>TTL is set comfortably above max(GC pause + network RTT).</li>
+<li>Election events are exposed as metrics — frequent elections are a bug signal.</li>
+<li>Fencing tokens are the first parameter of resource-server APIs.</li>
+<li>Behavior of in-flight requests during a leader change is documented in the spec.</li>
+<li>Split-brain is forced and reproduced as part of the test suite.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you explain the roles of lease and heartbeat in one line?</li>
+<li>[ ] Can you say why a fencing token must be monotonically increasing?</li>
+<li>[ ] Can you write a one-sentence split-brain scenario?</li>
+<li>[ ] Do you have a rule for choosing TTL?</li>
+<li>[ ] Can you imagine implementing election with etcd or ZooKeeper?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Analyze what happens in a system with a 5-second TTL when a single GC pause lasts 8 seconds.</li>
+<li>State in one line the conditions under which safe election is possible without a fencing token.</li>
+<li>Write pseudocode that implements distributed cron on top of etcd leases.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Leader election is the work of keeping the promise of "one leader at a time" with leases and fencing. In the next post we look at tools that distribute work without a leader at all — message queues and event sourcing.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/04-consistency-and-cap.md">Consistency and CAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/05-replication.md">Replication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/06-consensus-and-raft.md">Consensus and Raft</a></li>
+<li><strong>Leader Election (current)</strong></li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Leader_election">Leader election — Wikipedia</a></li>
+<li><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">How to do distributed locking — Martin Kleppmann</a></li>
+<li><a href="https://etcd.io/docs/v3.5/learning/lock/">etcd lease and leader election</a></li>
+<li><a href="https://pkg.go.dev/k8s.io/client-go/tools/leaderelection">Kubernetes leader election library</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, LeaderElection, Lease, Coordination, Liveness</p>
+</body>
+</html>

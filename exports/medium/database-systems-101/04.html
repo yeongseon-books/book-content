@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Indexes</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Indexes</h1>
+<blockquote>
+<p>Database Systems 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why is the index at the back of a book so fast, and why does the same intuition carry directly into database indexes?</p>
+<blockquote>
+<p>An index is a separate data structure that pre-sorts "value to row location." That is why a full scan is O(N) while an index lookup is O(log N). But indexes are not free. They cost writes and disk space. Good index design is less about "where to add one" and more about "where not to add one."</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The intuition and limits of B-tree indexes</li>
+<li>The difference between single, composite, and covering indexes</li>
+<li>That selectivity decides whether an index is useful at all</li>
+<li>The cost of indexes and the common anti-patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most performance problems come down to "missing index" or "wrong index." At the same time, too many indexes destroy write performance and waste disk. Once the intuition clicks, reading EXPLAIN starts to feel like reading a sentence: you can see why a query did or did not pick the index you expected.</p>
+<blockquote>
+<p>An index is exactly like the index at the back of a book. It makes one lookup fast, but it makes "read every page once" slower.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TB
+    A[&quot;B-tree root&quot;] --&gt; B[&quot;internal node&quot;]
+    A --&gt; C[&quot;internal node&quot;]
+    B --&gt; D[&quot;leaf: (value to row id)&quot;]
+    B --&gt; E[&quot;leaf&quot;]
+    C --&gt; F[&quot;leaf&quot;]
+    C --&gt; G[&quot;leaf&quot;]
+</code></pre>
+<p>Start at the root and narrow down one level at a time until a leaf gives you the row location. The depth is nearly constant, so even at 100 million rows you reach the answer in just a few steps.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>B-tree index</strong>: The most common kind. A balanced tree of sorted keys and pointers.</li>
+<li><strong>Selectivity</strong>: How many rows a single value points to. 1/1000 is great; 1/2 is essentially useless.</li>
+<li><strong>Composite index</strong>: An index on several columns. Column order matters.</li>
+<li><strong>Covering index</strong>: One that includes every column the query needs. The table itself is barely touched.</li>
+<li><strong>Index-only scan</strong>: The execution path made possible by a covering index.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — looking up 10k rows without an index</strong></p>
+<pre><code class="language-sql">SELECT * FROM orders WHERE user_id = 7;
+-- 100ms (full scan)
+</code></pre>
+<p><strong>After — one well-placed index</strong></p>
+<pre><code class="language-sql">CREATE INDEX idx_orders_user_id ON orders(user_id);
+SELECT * FROM orders WHERE user_id = 7;
+-- under 1ms (index lookup)
+</code></pre>
+<p>When selectivity is good, a 100x speedup is common.</p>
+<h2>Hands-on: See What an Index Does and Does Not Do</h2>
+<p><strong>Step 1 — Seed data</strong></p>
+<pre><code class="language-python"># seed.py
+import sqlite3, random
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        DROP TABLE IF EXISTS orders;
+        CREATE TABLE orders (
+            id      INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            status  TEXT    NOT NULL,
+            price   INTEGER NOT NULL
+        );
+    &quot;&quot;&quot;)
+    rows = [
+        (i, random.randint(1, 1000), random.choice([&quot;paid&quot;, &quot;pending&quot;]), random.randint(1, 1000))
+        for i in range(1, 100001)
+    ]
+    db.executemany(&quot;INSERT INTO orders VALUES (?, ?, ?, ?)&quot;, rows)
+</code></pre>
+<p><code>user_id</code> has 1000 distinct values (selectivity 1/1000); <code>status</code> has only two (selectivity 1/2).</p>
+<p><strong>Step 2 — A good index (high selectivity)</strong></p>
+<pre><code class="language-python">import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_user ON orders(user_id)&quot;)
+    db.execute(&quot;ANALYZE&quot;)
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 7&quot;).fetchall()
+    print(plan)
+</code></pre>
+<p>The optimizer happily picks <code>idx_user</code>.</p>
+<p><strong>Step 3 — A bad index (low selectivity)</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_status ON orders(status)&quot;)
+    db.execute(&quot;ANALYZE&quot;)
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE status = 'paid'&quot;).fetchall()
+    print(plan)
+</code></pre>
+<p>The optimizer is likely to pick a full scan. Pulling half the rows through an index one by one is slower than scanning the whole table.</p>
+<p><strong>Step 4 — Composite index and column order</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_user_status ON orders(user_id, status)&quot;)
+    db.execute(&quot;ANALYZE&quot;)
+
+    p1 = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id=7 AND status='paid'&quot;).fetchall()
+    p2 = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE status='paid'&quot;).fetchall()
+    print(p1)
+    print(p2)
+</code></pre>
+<p>The <code>(user_id, status)</code> index helps queries that start with <code>user_id</code>. Queries that start with <code>status</code> get almost no benefit. <strong>The leading column is everything.</strong></p>
+<p><strong>Step 5 — Covering index</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_cover ON orders(user_id, price)&quot;)
+    db.execute(&quot;ANALYZE&quot;)
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT user_id, price FROM orders WHERE user_id=7&quot;).fetchall()
+    print(plan)
+</code></pre>
+<p>When every column the query needs lives inside the index, the table heap is barely touched. This is the simplest form of an "index-only scan."</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>An index shines <strong>when selectivity is high</strong>. An index that points at half the table is something the optimizer will deliberately ignore.</li>
+<li>For a composite index, the <strong>leading column</strong> matters most.</li>
+<li>A covering index is the secret weapon of fast reads, but adding columns makes the index itself larger.</li>
+<li>Indexes get updated on every write. INSERT and UPDATE costs climb with every index you add.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Indexing every column.</strong> Write costs and disk usage explode, and the optimizer gets confused.</li>
+<li><strong>A single-column index on a low-selectivity column.</strong> Things like <code>is_active</code> or <code>gender</code> are nearly worthless on their own.</li>
+<li><strong>Wrong column order in a composite index.</strong> The column most often used in the first condition has to lead.</li>
+<li><strong>Creating an index without checking EXPLAIN.</strong> Creating an index does not guarantee the optimizer will use it.</li>
+<li><strong>Expecting <code>LIKE '%foo%'</code> to use a normal B-tree.</strong> Leading wildcards skip B-tree indexes; you need a full-text index instead.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Whenever a new query enters the system, the routine is the same. (1) Run EXPLAIN on the intended query. (2) Confirm the right index exists, add it if missing, and investigate if it exists but the optimizer skips it. When adding an index, leave a one-line comment that says which query it supports. A year later, you will be able to remove unused indexes safely.</p>
+<p>For write-heavy workloads, teams consciously cut indexes back. For read-heavy analytical systems, the answer is often not "more indexes" but columnar storage, materialized views, or summary tables.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Before adding an index, they ask "what is the selectivity of this column?"</li>
+<li>They validate in both directions: query patterns guide indexes, and existing indexes guide query patterns.</li>
+<li>When an index is not picked, they have a checklist: stale statistics, wrong column order, function calls in WHERE (<code>WHERE lower(email) = ...</code>).</li>
+<li>Every new index gets a comment naming the query that justifies it.</li>
+<li>Indexes that nobody uses get removed on a regular schedule.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do frequently used WHERE/JOIN columns have indexes?</li>
+<li>[ ] Is the column for any single-column index selective enough?</li>
+<li>[ ] Does the leading column of each composite index match real query patterns?</li>
+<li>[ ] Have you confirmed via EXPLAIN that each index is actually used?</li>
+<li>[ ] Can the workload absorb the extra write cost?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>You created a single-column index on <code>is_paid</code> (true/false). Explain in one sentence why the optimizer ignores it most of the time.</li>
+<li>With a composite index on <code>(country, city, age)</code>, say whether the index helps each of these queries: (a) <code>WHERE country='KR'</code>, (b) <code>WHERE city='Seoul'</code>, (c) <code>WHERE country='KR' AND city='Seoul'</code>.</li>
+<li>List three side effects of having too many indexes.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>An index is a sorted "value to row" structure that lets you answer a query in a couple of tree jumps. The biggest wins come from <strong>selectivity</strong> and <strong>leading columns</strong>. Good index design is less "where do I add one" and more "where do I refuse to add one." In the next post we look at the tool that lets multiple writers touch the same data safely: transactions and ACID.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
+<li><strong>Indexes (current)</strong></li>
+<li>Transactions and ACID (upcoming)</li>
+<li>Isolation Levels (upcoming)</li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://use-the-index-luke.com/">Use The Index, Luke!</a></li>
+<li><a href="https://www.postgresql.org/docs/current/indexes.html">PostgreSQL — Indexes</a></li>
+<li><a href="https://www.sqlite.org/queryplanner.html">SQLite — Query Planning</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html">MySQL — How MySQL Uses Indexes</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, Index, BTree, Selectivity, Performance</p>
+</body>
+</html>

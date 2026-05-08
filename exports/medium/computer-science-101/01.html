@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Computer Science?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Computer Science?</h1>
+<blockquote>
+<p>Computer Science 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: Is computer science the study of "how to use computers well"?</p>
+<blockquote>
+<p>Computer science studies <em>computation</em>, not computers. It asks which problems can be solved by computation, how efficiently they can be solved, and how we can design that process systematically. This article defines the field, lays out its core questions, and draws a map of how the major subjects connect.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of computer science and its central research questions</li>
+<li>Why abstraction is the field's most important tool</li>
+<li>How the major subjects relate to each other</li>
+<li>A roadmap for learning the rest of this series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Learning a programming language and learning computer science are not the same. Programming is the skill of using a tool. Computer science is the study of why those tools work. When you understand the principles, you pick up new tools quickly and you solve problems at the root.</p>
+<blockquote>
+<p>CS = the study of the principles, limits, and applications of computation.</p>
+</blockquote>
+<p>This series walks through the major subjects of a CS curriculum, one at a time, to draw the whole picture.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.</p>
+</blockquote>
+<pre><code class="language-text">         Computation theory
+        /                  \
+  Algorithms          Complexity
+       \                /
+       Data structures
+            |
+   ┌────────┼────────┐
+ Computer   OS    Networks
+ architecture        |
+   └────────┼────────┘
+            |
+       Software
+       engineering
+            |
+     AI / Data science
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Computation</strong><br>
+- Description: Producing output from input by following rules</p>
+<p><strong>Abstraction</strong><br>
+- Description: Hiding details so only the essential interface remains</p>
+<p><strong>Algorithm</strong><br>
+- Description: A step-by-step procedure for solving a problem</p>
+<p><strong>Complexity</strong><br>
+- Description: The time and space an algorithm consumes</p>
+<p><strong>Turing machine</strong><br>
+- Description: A theoretical model of what is computable</p>
+<h2>Before / After</h2>
+<p><strong>Before — without CS thinking:</strong></p>
+<pre><code class="language-python"># Compare every pair to find duplicates — O(n^2)
+def find_duplicates(items):
+    duplicates = []
+    for i in range(len(items)):
+        for j in range(i + 1, len(items)):
+            if items[i] == items[j] and items[i] not in duplicates:
+                duplicates.append(items[i])
+    return duplicates
+</code></pre>
+<p><strong>After — with CS thinking:</strong></p>
+<pre><code class="language-python"># Use a set for an O(n) solution
+def find_duplicates(items):
+    seen = set()
+    duplicates = set()
+    for item in items:
+        if item in seen:
+            duplicates.add(item)
+        seen.add(item)
+    return list(duplicates)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: What is computation?</strong></p>
+<pre><code class="language-python"># The simplest computation: input -&gt; process -&gt; output
+def is_even(n: int) -&gt; bool:
+    &quot;&quot;&quot;Return True if n is even.&quot;&quot;&quot;
+    return n % 2 == 0
+
+print(is_even(4))   # True
+print(is_even(7))   # False
+</code></pre>
+<p>The essence of computation is "take input, apply rules, produce output." Every program follows this shape.</p>
+<p><strong>Step 2: The power of abstraction</strong></p>
+<pre><code class="language-python"># Hide implementation details, expose only the interface
+class Stack:
+    &quot;&quot;&quot;An abstract stack — internals stay hidden.&quot;&quot;&quot;
+
+    def __init__(self) -&gt; None:
+        self._items: list[int] = []
+
+    def push(self, item: int) -&gt; None:
+        self._items.append(item)
+
+    def pop(self) -&gt; int:
+        return self._items.pop()
+
+    def is_empty(self) -&gt; bool:
+        return len(self._items) == 0
+
+# Users do not need to know there is a list inside
+stack = Stack()
+stack.push(1)
+stack.push(2)
+print(stack.pop())  # 2
+</code></pre>
+<p>Abstraction is the field's most important tool. Operating systems abstract hardware, programming languages abstract machine code, and functions abstract implementation details.</p>
+<p><strong>Step 3: Algorithms and efficiency</strong></p>
+<pre><code class="language-python">import time
+
+def linear_search(items: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Sequential search — O(n).&quot;&quot;&quot;
+    for i, item in enumerate(items):
+        if item == target:
+            return i
+    return -1
+
+def binary_search(items: list[int], target: int) -&gt; int:
+    &quot;&quot;&quot;Binary search — O(log n), requires sorted input.&quot;&quot;&quot;
+    low, high = 0, len(items) - 1
+    while low &lt;= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
+            return mid
+        elif items[mid] &lt; target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
+data = list(range(1_000_000))
+
+start = time.time()
+linear_search(data, 999_999)
+print(f&quot;Linear search: {time.time() - start:.4f}s&quot;)
+
+start = time.time()
+binary_search(data, 999_999)
+print(f&quot;Binary search: {time.time() - start:.6f}s&quot;)
+</code></pre>
+<p>The performance gap between two algorithms that solve the same problem widens dramatically as the input grows.</p>
+<p><strong>Step 4: CS as a layered structure</strong></p>
+<pre><code class="language-python"># Express the layered relationship of CS subjects as a dictionary
+cs_layers = {
+    &quot;Applications&quot;: [&quot;AI&quot;, &quot;Data science&quot;, &quot;Web&quot;, &quot;Mobile&quot;],
+    &quot;Software&quot;: [&quot;Software engineering&quot;, &quot;Programming languages&quot;],
+    &quot;Systems&quot;: [&quot;Operating systems&quot;, &quot;Networks&quot;, &quot;Databases&quot;],
+    &quot;Hardware&quot;: [&quot;Computer architecture&quot;, &quot;Digital logic&quot;],
+    &quot;Theory&quot;: [&quot;Algorithms&quot;, &quot;Complexity theory&quot;, &quot;Computation theory&quot;],
+}
+
+for layer, subjects in cs_layers.items():
+    print(f&quot;[{layer}] {', '.join(subjects)}&quot;)
+</code></pre>
+<p>CS stacks up as theory -&gt; hardware -&gt; systems -&gt; software -&gt; applications. Each layer rests on the one below it.</p>
+<p><strong>Step 5: This series at a glance</strong></p>
+<pre><code class="language-python">roadmap = [
+    (1, &quot;What Is Computer Science?&quot;, &quot;the whole picture&quot;),
+    (2, &quot;Computation and Programs&quot;, &quot;models of computation, paradigms&quot;),
+    (3, &quot;Data Representation&quot;, &quot;binary, encoding, types&quot;),
+    (4, &quot;Algorithms and Complexity&quot;, &quot;Big-O, sorting, searching&quot;),
+    (5, &quot;Computer Architecture&quot;, &quot;CPU, memory, instructions&quot;),
+    (6, &quot;Operating Systems&quot;, &quot;processes, memory, file systems&quot;),
+    (7, &quot;Networks&quot;, &quot;TCP/IP, HTTP, the internet&quot;),
+    (8, &quot;Databases&quot;, &quot;relational model, SQL, transactions&quot;),
+    (9, &quot;Software Engineering&quot;, &quot;design, testing, collaboration&quot;),
+    (10, &quot;From CS to AI and Data Science&quot;, &quot;ML, statistics, applications&quot;),
+]
+
+for num, title, keywords in roadmap:
+    print(f&quot;  {num:02d}. {title} — {keywords}&quot;)
+</code></pre>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>The essence of computation is the simple shape: input -&gt; process -&gt; output.</li>
+<li>Abstraction lets us split complex systems into manageable units.</li>
+<li>The choice of algorithm changes the performance of the same problem dramatically.</li>
+<li>Every subject in CS is connected through a layered structure.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Treating CS as "programming"</strong><br>
+- Problem: You confuse using a tool with understanding it<br>
+- Fix: CS studies the principles of computation</p>
+<p><strong>Skipping theory subjects</strong><br>
+- Problem: You hit walls in applied work<br>
+- Fix: Algorithms and data structures underpin every other subject</p>
+<p><strong>Drilling into one subject only</strong><br>
+- Problem: You miss the whole picture<br>
+- Fix: Survey the field first, then go deep where needed</p>
+<p><strong>Avoiding math entirely</strong><br>
+- Problem: Your theoretical understanding caps out<br>
+- Fix: Discrete math and probability are core CS tools</p>
+<p><strong>Studying theory without practice</strong><br>
+- Problem: Understanding stays superficial<br>
+- Fix: Implement concepts in code to confirm them</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>CS fundamentals are the core evaluation criteria in system-design interviews.</li>
+<li>Algorithm complexity analysis decides performance in large-scale data processing.</li>
+<li>Operating-system concepts underpin containers (Docker) and cloud infrastructure.</li>
+<li>Network knowledge is essential for distributed systems and microservice design.</li>
+<li>Database theory drives schema design and query optimization.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer is not rattled by new technology. The technology changes, but the underlying CS principles do not. Containers are an application of OS concepts, NoSQL is a variation of database theory, and serverless is a new abstraction over distributed systems.</p>
+<p>Engineers with strong CS foundations understand problems at the root and design solutions at the right level of abstraction. They can give a principled answer to "Why did you pick this technology?"</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can describe computer science in my own words</li>
+<li>[ ] I understand why abstraction matters in CS</li>
+<li>[ ] I can explain how the major CS subjects relate</li>
+<li>[ ] I see why algorithm efficiency matters in practice</li>
+<li>[ ] I have reviewed the full roadmap of this series</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Find three real-world examples of "algorithms" in daily life. Write down the input, the processing steps, and the output for each.</p>
+</li>
+<li>
+<p>List the CS fields that show up inside a single smartphone. (For example: operating system -&gt; iOS/Android.)</p>
+</li>
+<li>
+<p>Run <code>linear_search</code> and <code>binary_search</code> yourself, and measure the runtime gap as you grow the input by 10x each time.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Computer science is the study of the principles, limits, and applications of computation. Its central tool is abstraction, and its subjects connect in a layered structure from theory up to applications. Programming is a tool of CS, not CS itself.</p>
+<p>The next article digs into the most basic CS question — "What is computation?" — and traces the evolution of programming paradigms.</p>
+<ul>
+<li><strong>What Is Computer Science? (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/02-computation-and-programs.md">Computation and Programs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cs50.harvard.edu/">CS50 — Introduction to Computer Science (Harvard)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Computer_science">Wikipedia — Computer Science</a></li>
+<li><a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html">Structure and Interpretation of Computer Programs (MIT)</a></li>
+<li><a href="https://code.energy/computer-science-distilled/">Computer Science Distilled — Wladston Ferreira Filho</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CS Fundamentals, Abstraction, Computation Theory, Curriculum Overview, Learning Roadmap</p>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Systems Subjects</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Systems Subjects</h1>
+<blockquote>
+<p>Computer Science Major 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Do <em>systems</em> courses really explain <em>why</em> a single line of code <em>behaves</em> the way it does?</p>
+<blockquote>
+<p>Yes. <em>OS</em>, <em>architecture</em>, and <em>compilers</em> are the <em>stage</em> on which your code runs.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Meaning of the <em>operating system</em></li>
+<li><em>Computer architecture</em></li>
+<li>Role of the <em>compiler</em></li>
+<li><em>Systems programming</em></li>
+<li>Better debugging ability</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Performance</em> and <em>incident analysis</em> are only possible on top of <em>systems knowledge</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    H[Hardware] --&gt; A[Architecture]
+    A --&gt; O[OS]
+    O --&gt; C[Compiler]
+    C --&gt; P[Program]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>OS</strong>: <em>resource manager</em>.</li>
+<li><strong>process</strong>: unit of <em>execution</em>.</li>
+<li><strong>thread</strong>: <em>lightweight</em> execution.</li>
+<li><strong>register</strong>: <em>fastest</em> memory.</li>
+<li><strong>compiler</strong>: <em>translator</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Code <em>just</em> runs.</p>
+<p><strong>After</strong>: You see <em>CPU</em>, <em>memory</em>, and <em>OS</em> underneath.</p>
+<h2>Hands-on: Build Systems Sense</h2>
+<p><strong>Step 1 — Process ID</strong></p>
+<pre><code class="language-python">import os
+print(os.getpid())
+</code></pre>
+<p><strong>Step 2 — Environment variable</strong></p>
+<pre><code class="language-python">print(os.environ.get(&quot;PATH&quot;, &quot;&quot;))
+</code></pre>
+<p><strong>Step 3 — File descriptor</strong></p>
+<pre><code class="language-python">with open(&quot;/etc/hostname&quot;) as f:
+    print(f.fileno())
+</code></pre>
+<p><strong>Step 4 — Time measurement</strong></p>
+<pre><code class="language-python">import time
+t = time.perf_counter()
+sum(range(10_000_000))
+print(time.perf_counter() - t)
+</code></pre>
+<p><strong>Step 5 — Memory sense</strong></p>
+<pre><code class="language-python">import sys
+print(sys.getsizeof([0] * 1000))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Processes</em> have unique IDs.</li>
+<li><em>Environment</em> is per-process.</li>
+<li><em>Time</em> requires syscalls.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>memory addresses</em> as values.</strong></li>
+<li><strong>Confusing <em>process</em> and <em>thread</em>.</strong></li>
+<li><strong>Confusing <em>stack</em> and <em>heap</em>.</strong></li>
+<li><strong>Forgetting <em>buffering</em>.</strong></li>
+<li><strong>Ignoring <em>syscall</em> costs.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Root cause in incident reports is <em>usually</em> an <em>OS resource</em> limit.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Code runs on <em>machines</em>.</li>
+<li><em>Cost</em> is <em>CPU</em> and <em>memory</em>.</li>
+<li><em>Concurrency</em> is decided by the <em>OS</em>.</li>
+<li><em>Compiler</em> sets the shape.</li>
+<li><em>Syscalls</em> are <em>expensive</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Process/thread</em> clear.</li>
+<li>[ ] <em>Memory regions</em> understood.</li>
+<li>[ ] <em>Syscall</em> cost noted.</li>
+<li>[ ] <em>Timing</em> measurable.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>operating system</em> in one line.</li>
+<li>Define <em>compiler</em> in one line.</li>
+<li>State the meaning of <em>process</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Database and Network</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/03-data-structures-and-algorithms.md">Data Structures and Algorithms</a></li>
+<li><strong>Understanding Systems Subjects (current)</strong></li>
+<li>Database and Network (upcoming)</li>
+<li>AI and Data Science (upcoming)</li>
+<li>Project Subjects (upcoming)</li>
+<li>How to Study Computer Science (upcoming)</li>
+<li>Build Your Portfolio (upcoming)</li>
+<li>Skills to Have Before Graduation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">Operating Systems: Three Easy Pieces</a></li>
+<li><a href="https://csapp.cs.cmu.edu/">Computer Systems: A Programmer's Perspective</a></li>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters</a></li>
+<li><a href="https://man7.org/tlpi/">The Linux Programming Interface</a></li>
+</ul>
+<p class="tags-line">Tags: CS, Systems, OS, Architecture, Beginner</p>
+</body>
+</html>

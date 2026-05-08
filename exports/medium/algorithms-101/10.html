@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Algorithm Problem-Solving Strategies</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Algorithm Problem-Solving Strategies</h1>
+<blockquote>
+<p>Algorithms 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Does being good at algorithms mean memorising lots of solutions, or having a thinking procedure that decomposes new problems?</p>
+<blockquote>
+<p>Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox. When you meet a new problem, you narrow which tool fits by reading the input size, structure, and constraints. Senior engineers are not separated from others by the number of solutions they have memorised; they are separated by the consistency of their thinking procedure. This article makes that procedure explicit while wrapping up the series.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The standard thinking procedure to apply to any algorithm problem</li>
+<li>How to estimate an upper bound on time complexity from the input size</li>
+<li>Pattern recognition: which signals call for which tool</li>
+<li>What it really means to be good at algorithms in interviews and in production</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The point of studying algorithms is not memorising solutions but gaining the ability to decompose new problems. That matters in interviews and just as much in production system design. Two engineers with the same toolbox produce very different work depending on how they pick from it.</p>
+<blockquote>
+<p>A good solution is the product of a consistent procedure, not a memorised answer.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The standard procedure has five steps. (1) Restate the problem. (2) Write down inputs, outputs, and constraints. (3) Estimate the allowed complexity from input size. (4) Recognise the pattern and narrow the candidate tools. (5) Verify on a small example before writing code. The same procedure works in interviews.</p>
+</blockquote>
+<pre><code class="language-text">Input size -&gt; allowed complexity (rough upper bound)
+    n &lt;= 10            : backtracking, every subset (2^n)
+    n &lt;= 20            : bitmask DP (2^n)
+    n &lt;= 100..500      : up to O(n^3) (Floyd-Warshall, 3D DP)
+    n &lt;= 5,000         : O(n^2)
+    n &lt;= 10^5..10^6    : O(n log n)
+    n &gt;= 10^7          : O(n) or O(log n)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Restatement</strong><br>
+- Description: Re-write the problem in your own words</p>
+<p><strong>Allowed complexity</strong><br>
+- Description: Bound estimated from time limit and input size</p>
+<p><strong>Pattern recognition</strong><br>
+- Description: Recall a tool from input structure</p>
+<p><strong>Small-example verification</strong><br>
+- Description: Trace by hand before coding</p>
+<p><strong>Sanity test</strong><br>
+- Description: Edge, empty, and maximum-input checks</p>
+<h2>Before / After</h2>
+<p><strong>Before — coding the moment you see the problem:</strong></p>
+<pre><code class="language-text">&quot;Hmm, I think this is BFS.&quot;
+-&gt; code -&gt; works -&gt; some cases fail -&gt; debugging spiral
+</code></pre>
+<p><strong>After — the five-step procedure:</strong></p>
+<pre><code class="language-text">1) Restate the problem
+2) Write down inputs/outputs/constraints
+3) Estimate allowed complexity from n
+4) Use pattern recognition to narrow tool candidates
+5) Verify on a small example, then code
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Restate the problem in your own words</strong></p>
+<pre><code class="language-text">Original: &quot;Given an array, find the maximum sum of a contiguous subarray.&quot;
+
+Restated: Among all contiguous segments of an integer array, find the one with the largest sum.
+Edges: Is the answer for an empty array 0, or undefined?
+If all values are negative, is the answer the largest single value, or 0?
+</code></pre>
+<p>Re-writing the prompt in your own words removes half the bugs before you ever code.</p>
+<p><strong>Step 2: Estimate allowed complexity from input size</strong></p>
+<pre><code class="language-text">n = 10^6, time limit 1 second
+-&gt; O(n^2) is out; you need O(n log n) or O(n)
+-&gt; Strong hint: &quot;this problem wants a linear or near-linear algorithm&quot;
+</code></pre>
+<p>Input size is almost always the strongest cue for narrowing algorithm candidates.</p>
+<p><strong>Step 3: A pattern-recognition signal table</strong></p>
+<pre><code class="language-python">signals = {
+    &quot;search in a sorted array&quot;:          &quot;binary search&quot;,
+    &quot;nearest / largest / smallest&quot;:      &quot;sort or heap&quot;,
+    &quot;range sum / min / max&quot;:             &quot;prefix sum or segment tree&quot;,
+    &quot;contiguous subarray&quot;:               &quot;two pointers or sliding window&quot;,
+    &quot;overlapping subproblems&quot;:           &quot;DP&quot;,
+    &quot;shortest path, non-negative&quot;:       &quot;Dijkstra&quot;,
+    &quot;topological order / dependencies&quot;:  &quot;topological sort&quot;,
+    &quot;prefix matters&quot;:                    &quot;trie&quot;,
+    &quot;pattern matching, large text&quot;:      &quot;KMP / Aho-Corasick&quot;,
+    &quot;optimum + greedy plausible&quot;:        &quot;try an exchange argument&quot;,
+}
+for k, v in signals.items():
+    print(f&quot;- {k:36s} -&gt; {v}&quot;)
+</code></pre>
+<p>Memorising this mapping gives you an index that fires immediately when a new problem arrives.</p>
+<p><strong>Step 4: Verify on a small example by hand</strong></p>
+<pre><code class="language-text">Problem: maximum contiguous subarray sum (Kadane's algorithm)
+
+Hand trace
+arr = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+cur, best = 0, -inf
+i=0  cur = max(-2, -2)        = -2,  best = -2
+i=1  cur = max(1, -2+1)       = 1,   best = 1
+i=2  cur = max(-3, 1-3)       = -2,  best = 1
+i=3  cur = max(4, -2+4)       = 4,   best = 4
+i=4  cur = max(-1, 4-1)       = 3,   best = 4
+i=5  cur = max(2, 3+2)        = 5,   best = 5
+i=6  cur = max(1, 5+1)        = 6,   best = 6
+i=7  cur = max(-5, 6-5)       = 1,   best = 6
+i=8  cur = max(4, 1+4)        = 5,   best = 6
+Answer: 6
+</code></pre>
+<p>After tracing once by hand, coding becomes close to transcription.</p>
+<p><strong>Step 5: Translate to code and test the edges</strong></p>
+<pre><code class="language-python">def max_subarray(arr):
+    if not arr:
+        return 0
+    cur = best = arr[0]
+    for x in arr[1:]:
+        cur = max(x, cur + x)
+        best = max(best, cur)
+    return best
+
+assert max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6
+assert max_subarray([-1]) == -1
+assert max_subarray([1]) == 1
+assert max_subarray([]) == 0
+</code></pre>
+<p>Always check four edges beyond the core case: empty input, single element, all negative, all positive.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>The five-step procedure applies uniformly to every problem</li>
+<li>Estimating allowed complexity from n is the single strongest cue</li>
+<li>The pattern-recognition mapping acts as a mental index</li>
+<li>A solution traced once by hand is the most trustworthy</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Coding before reading fully</strong><br>
+- Problem: Wrong solution<br>
+- Fix: Restate in your own words</p>
+<p><strong>Skipping complexity estimation</strong><br>
+- Problem: Time limit exceeded<br>
+- Fix: Bound it from n first</p>
+<p><strong>Heuristics without pattern recognition</strong><br>
+- Problem: Wandering<br>
+- Fix: Use the signal-to-tool mapping</p>
+<p><strong>Ignoring edge cases</strong><br>
+- Problem: Sporadic failures<br>
+- Fix: Always check empty / single / extremes</p>
+<p><strong>Relying purely on memorised solutions</strong><br>
+- Problem: Weak on novel problems<br>
+- Fix: Decompose with the procedure</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>System design: input size narrows data-structure choice first</li>
+<li>Performance tuning: analyse bottlenecks through algorithmic complexity</li>
+<li>Code review: validate someone else's solution against the procedure</li>
+<li>Interviews: candidates are evaluated on procedural consistency</li>
+<li>Learning: decompose a new problem with the procedure to grow the toolbox</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer does not start typing on contact with a new problem. They read the size and structure, narrow tool candidates from the toolbox, verify on a small example, and only then touch the keyboard. The same procedure applies in production decisions, not just interviews.</p>
+<p>A senior engineer also does not measure themselves by the number of solutions they have memorised. The real definition of skill is the confidence that you can stably decompose a problem you have never seen — through the procedure. Growing the toolbox helps, but consistency of the procedure is what matters.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Have you memorised the five-step procedure?</li>
+<li>[ ] Do you estimate allowed complexity from input size?</li>
+<li>[ ] Do you carry the signal-to-tool mapping in your head?</li>
+<li>[ ] Do you check edge cases automatically?</li>
+<li>[ ] Can you decompose a new problem with the same procedure?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Build a single table summarising the algorithm tools from this series. For each tool list the average and worst complexity, the applicability signals, and the limits in one line. The table itself is a powerful learning artifact.</p>
+</li>
+<li>
+<p>Pick one external algorithm problem, write the five-step procedure as prose, then implement the solution. Note which step felt hardest.</p>
+</li>
+<li>
+<p>Spend five minutes explaining to a colleague (or to yourself) "what signals make me reach for graph algorithms?" If you can explain it, you own that tool.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>The essence of studying algorithms is not the volume of solutions but the consistency of the procedure. Estimating complexity from input size, narrowing tools from signals, verifying on small examples, and translating to code — that five-step loop works the same in interviews and in production.</p>
+<p>This concludes the Algorithms 101 series. Natural next steps include advanced data structures (tree/heap/hash variants), advanced graphs (flows, matching, SCC), or domain applications (search engines, recommender systems, compilers). The thinking procedure you built here transfers directly to all of them.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/06-dynamic-programming.md">Dynamic Programming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/07-greedy-algorithms.md">Greedy Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/08-graph-algorithms.md">Graph Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/09-string-algorithms.md">String Algorithm Basics</a></li>
+<li><strong>Algorithm Problem-Solving Strategies (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cses.fi/book/book.pdf">Competitive Programmer's Handbook (Antti Laaksonen)</a></li>
+<li><a href="https://leetcode.com/explore/">LeetCode — Patterns and study plans</a></li>
+<li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition">CLRS — Introduction to Algorithms</a></li>
+<li><a href="https://algs4.cs.princeton.edu/home/">Sedgewick &amp; Wayne — Algorithms 4ed</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Problem Solving, Pattern Recognition, Interviews, Practice</p>
+</body>
+</html>

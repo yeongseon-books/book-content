@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Greedy Algorithms</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Greedy Algorithms</h1>
+<blockquote>
+<p>Algorithms 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If we always pick what looks best right now, does that really lead to the global optimum? And why does it work on some problems and quietly fail on others?</p>
+<blockquote>
+<p>A greedy algorithm makes the locally best choice at every step and never reconsiders it. To be correct, two properties must hold: (1) the greedy-choice property and (2) optimal substructure. The standard tool for proving both is the exchange argument. Greedy is short and fast — but get the conditions wrong and it returns a subtly incorrect answer that is hard to spot. So intuition and proof have to travel together.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The two conditions a greedy algorithm needs to be correct</li>
+<li>How to justify a greedy choice with an exchange argument</li>
+<li>Classic greedy problems: activity selection, coin change, Huffman coding</li>
+<li>The trap of greedy-looking problems that actually need DP</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Greedy algorithms are among the simplest and fastest. When they apply they are easy to write and operate, often O(n log n) or better. The downside is that without a justification step you can ship wrong answers and not notice. Mastering greedy means knowing exactly when it applies.</p>
+<blockquote>
+<p>Greedy is the algorithm of simplicity, but it carries a heavier burden of correctness.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The greedy-choice property says "there exists an optimal solution that contains the local greedy choice." Optimal substructure says "after that choice, the rest is solved by the same greedy rule." Both must hold. The usual proof technique is the exchange argument.</p>
+</blockquote>
+<pre><code class="language-text">Conditions for greedy to be correct
+    1) Greedy-choice property : an optimal solution containing the greedy first choice exists
+    2) Optimal substructure   : the remaining subproblem is also solved greedily
+
+Exchange argument
+    Take any optimal OPT, swap its first choice for the greedy choice;
+    show the result is still optimal.
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Greedy choice</strong><br>
+- Description: The locally best choice at each step</p>
+<p><strong>Greedy-choice property</strong><br>
+- Description: An optimal solution containing the greedy choice exists</p>
+<p><strong>Optimal substructure</strong><br>
+- Description: The subproblem is also optimally solved by the same greedy rule</p>
+<p><strong>Exchange argument</strong><br>
+- Description: Replace one choice in OPT with the greedy choice and prove equivalence</p>
+<p><strong>Huffman code</strong><br>
+- Description: Frequency-based lossless compression — the canonical greedy example</p>
+<h2>Before / After</h2>
+<p><strong>Before — wrong greedy on coin change:</strong></p>
+<pre><code class="language-python"># Make change for 6 with coins [1, 3, 4]
+def greedy_change(coins, amount):
+    coins = sorted(coins, reverse=True)
+    n = 0
+    for c in coins:
+        n += amount // c
+        amount %= c
+    return n
+
+print(greedy_change([1, 3, 4], 6))   # 3 (4+1+1) — optimum is 2 (3+3)
+</code></pre>
+<p><strong>After — when greedy fails, fall back to DP:</strong></p>
+<pre><code class="language-python">def min_coins(coins, amount):
+    INF = float('inf')
+    dp = [0] + [INF] * amount
+    for a in range(1, amount + 1):
+        for c in coins:
+            if c &lt;= a and dp[a - c] + 1 &lt; dp[a]:
+                dp[a] = dp[a - c] + 1
+    return dp[amount] if dp[amount] != INF else -1
+
+print(min_coins([1, 3, 4], 6))   # 2
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Activity selection — pick the earliest finish time</strong></p>
+<pre><code class="language-python">def activity_selection(intervals):
+    &quot;&quot;&quot;[(start, end), ...] -&gt; the largest set of non-overlapping intervals&quot;&quot;&quot;
+    intervals = sorted(intervals, key=lambda x: x[1])
+    chosen, last_end = 0, -1
+    for s, e in intervals:
+        if s &gt;= last_end:
+            chosen += 1
+            last_end = e
+    return chosen
+
+print(activity_selection([(1, 4), (3, 5), (0, 6), (5, 7), (8, 9), (5, 9)]))   # 4
+</code></pre>
+<p>Always choosing the activity that finishes earliest is optimal. The exchange argument formalises why.</p>
+<p><strong>Step 2: Meeting rooms — sort by end time, not start time</strong></p>
+<pre><code class="language-python">meetings = [(1, 5), (2, 3), (3, 4), (4, 6), (6, 8)]
+print(activity_selection(meetings))   # 3 — e.g. (2,3), (3,4), (4,6)
+</code></pre>
+<p>The same algorithm covers meeting-room and classroom scheduling. A single line — the sort key — decides correctness.</p>
+<p><strong>Step 3: Coin change — when greedy actually works</strong></p>
+<pre><code class="language-python">def coin_change_greedy(coins, amount):
+    coins = sorted(coins, reverse=True)
+    used = []
+    for c in coins:
+        while amount &gt;= c:
+            amount -= c
+            used.append(c)
+    return used if amount == 0 else None
+
+# Korean and US coin systems are canonical, so greedy is optimal
+print(coin_change_greedy([500, 100, 50, 10], 1260))
+</code></pre>
+<p>If a coin system is "canonical," greedy is optimal. For arbitrary coin sets there is no guarantee, and DP is the safe choice.</p>
+<p><strong>Step 4: Huffman code — greedy on a priority queue</strong></p>
+<pre><code class="language-python">import heapq
+
+def huffman(freq):
+    h = [[w, c] for c, w in freq.items()]
+    heapq.heapify(h)
+    while len(h) &gt; 1:
+        a = heapq.heappop(h)
+        b = heapq.heappop(h)
+        heapq.heappush(h, [a[0] + b[0], (a, b)])
+    return h[0]
+
+print(huffman({&quot;a&quot;: 5, &quot;b&quot;: 9, &quot;c&quot;: 12, &quot;d&quot;: 13, &quot;e&quot;: 16, &quot;f&quot;: 45}))
+</code></pre>
+<p>Repeatedly merge the two least-frequent nodes. The result is an optimal prefix code for lossless compression.</p>
+<p><strong>Step 5: Fractional knapsack — fractional vs 0/1</strong></p>
+<pre><code class="language-python">def fractional_knapsack(weights, values, W):
+    items = sorted(zip(weights, values), key=lambda x: -x[1] / x[0])
+    total = 0.0
+    for w, v in items:
+        if W &gt;= w:
+            W -= w; total += v
+        else:
+            total += v * (W / w); break
+    return total
+
+print(fractional_knapsack([10, 20, 30], [60, 100, 120], 50))   # 240.0
+</code></pre>
+<p>Fractional knapsack is solved optimally by greedy, but 0/1 knapsack is not — that requires DP. Whether items are divisible decides whether greedy applies.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>A single sort key carries almost the entire correctness argument</li>
+<li>Divisibility separates fractional from 0/1 problems</li>
+<li>Priority queues are the workhorse data structure for greedy</li>
+<li>Don't trust intuition alone — reach for the exchange argument</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Greedy without a justification</strong><br>
+- Problem: Subtly wrong answers<br>
+- Fix: Verify with an exchange argument</p>
+<p><strong>Greedy-looking problem that is actually DP</strong><br>
+- Problem: Wrong answer<br>
+- Fix: Hand-craft a small counterexample</p>
+<p><strong>Wrong sort key</strong><br>
+- Problem: Off-by-one or close-to-optimal<br>
+- Fix: Compare candidates: start, end, ratio</p>
+<p><strong>Missing priority queue</strong><br>
+- Problem: O(n^2)<br>
+- Fix: Use a heap to get O(n log n)</p>
+<p><strong>Backtracking on a partial solution</strong><br>
+- Problem: Violates greedy itself<br>
+- Fix: Greedy never undoes — switch to DP if needed</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Job scheduling (CPU/GPU work queues)</li>
+<li>Fast heuristics for network routing</li>
+<li>Data compression (Huffman, LZ77 variants)</li>
+<li>Real-time decisions in ad-bidding systems</li>
+<li>Immediate action selection in game AI</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer writes the one-line "why this is correct" before writing the algorithm. If a clean exchange argument does not come naturally, they suspect DP. They also actively craft small counterexamples — a hand-drawn case is the fastest correctness check available.</p>
+<p>A senior engineer also documents the input conditions under which the greedy algorithm is valid. Writing "this only works when the coin system is canonical" protects future-you and your colleagues from quietly using it on the wrong inputs.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you check the greedy-choice property and optimal substructure?</li>
+<li>[ ] Can you state the exchange argument in one sentence?</li>
+<li>[ ] Do you understand how the sort key drives correctness?</li>
+<li>[ ] Can you spot DP problems that look greedy?</li>
+<li>[ ] Are you comfortable with priority queues?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Schedule as many meetings as possible in a single room. Then construct a counterexample showing why sorting by start time instead of end time breaks optimality.</p>
+</li>
+<li>
+<p>For jobs with positive weights, find a schedule that minimises mean completion time using a greedy strategy, and justify it with an exchange argument.</p>
+</li>
+<li>
+<p>With coins [1, 5, 6, 9] and target 11, print both the greedy and the DP answer, and explain why they differ.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Greedy is the algorithm of simplicity and speed, but it carries a heavier burden of correctness. Building the habit of checking the greedy-choice property and optimal substructure with an exchange argument prevents wrong answers slipping through.</p>
+<p>The next article covers graph algorithms: the difference between BFS and DFS, Dijkstra's shortest paths, and minimum spanning trees. Graphs are where greedy and DP meet most frequently.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/02-time-and-space-complexity.md">Time and Space Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/03-search-algorithms.md">Search Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/04-sorting-algorithms.md">Sorting Algorithms</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/05-recursion-and-divide-and-conquer.md">Recursion and Divide and Conquer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/06-dynamic-programming.md">Dynamic Programming</a></li>
+<li><strong>Greedy Algorithms (current)</strong></li>
+<li>Graph Algorithms (upcoming)</li>
+<li>String Algorithm Basics (upcoming)</li>
+<li>Algorithm Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition">CLRS — Introduction to Algorithms, Chapter 16</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Greedy_algorithm">Wikipedia — Greedy algorithm</a></li>
+<li><a href="https://docs.python.org/3/library/heapq.html">Python <code>heapq</code> documentation</a></li>
+<li><a href="https://cses.fi/book/book.pdf">Competitive Programmer's Handbook — Chapter 6</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Greedy, Exchange Argument, Optimisation, Activity Selection</p>
+</body>
+</html>

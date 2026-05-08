@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Propositions and Logic</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Propositions and Logic</h1>
+<blockquote>
+<p>Discrete Math 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How is <code>if x &gt; 0 and y &lt; 10</code> actually evaluated, and what is its mathematical foundation?</p>
+<blockquote>
+<p>Propositional logic deals with sentences that are unambiguously true or false (propositions) and the operators (AND, OR, NOT) that combine them. Every conditional in every programming language, every SQL <code>WHERE</code> clause, and every digital logic gate is a direct application. This article covers propositions, truth tables, equivalence transformations, and predicate logic.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The distinction between propositions and non-propositions</li>
+<li>The five basic logical connectives</li>
+<li>Building truth tables and proving logical equivalence</li>
+<li>Predicates and the quantifiers ∀ and ∃</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Every <code>if</code> statement is the evaluation of a proposition. Every database query asks whether a predicate is satisfied. Every digital circuit gate is a logical operation. Without propositional logic, you cannot simplify complex conditionals or debug them with confidence.</p>
+<blockquote>
+<p>Propositional logic = a symbolic system for precise reasoning.</p>
+</blockquote>
+<p>This article builds the logical foundation that the next chapter (set theory) extends.</p>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Propositions carry truth values, combined by connectives whose meaning is defined by truth tables.</p>
+</blockquote>
+<pre><code class="language-text">  Props P, Q  ──→  Operators  ──→  Compound prop.
+                 ┌──────────┐
+                 │ ¬ (NOT)  │
+                 │ ∧ (AND)  │
+                 │ ∨ (OR)   │
+                 │ → (impl) │
+                 │ ↔ (iff)  │
+                 └──────────┘
+                       ↓
+                  Truth tables
+                       ↓
+                Logical equivalence
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Negation</strong><br>
+- Symbol: ¬P<br>
+- Meaning: True iff P is false</p>
+<p><strong>Conjunction</strong><br>
+- Symbol: P ∧ Q<br>
+- Meaning: True iff both are true</p>
+<p><strong>Disjunction</strong><br>
+- Symbol: P ∨ Q<br>
+- Meaning: True iff at least one is true</p>
+<p><strong>Implication</strong><br>
+- Symbol: P → Q<br>
+- Meaning: False only when P true, Q false</p>
+<p><strong>Biconditional</strong><br>
+- Symbol: P ↔ Q<br>
+- Meaning: True iff truth values match</p>
+<h2>Before / After</h2>
+<p><strong>Before — without logic:</strong></p>
+<pre><code class="language-python"># Nested conditions, no simplification
+if not (x &gt; 0 and y &gt; 0):
+    if not (x &gt; 0):
+        handle_x()
+    if not (y &gt; 0):
+        handle_y()
+</code></pre>
+<p><strong>After — De Morgan's law applied:</strong></p>
+<pre><code class="language-python"># ¬(P ∧ Q) ≡ ¬P ∨ ¬Q
+if x &lt;= 0 or y &lt;= 0:
+    if x &lt;= 0:
+        handle_x()
+    if y &lt;= 0:
+        handle_y()
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Propositions and Truth Values</strong></p>
+<pre><code class="language-python"># A proposition is unambiguously true or false
+# A question is not a proposition
+
+propositions = {
+    &quot;2 is even&quot;: True,
+    &quot;Paris is the capital of the United States&quot;: False,
+    &quot;100 is prime&quot;: False,
+    &quot;1 + 1 = 2&quot;: True,
+}
+
+for statement, truth in propositions.items():
+    print(f&quot;{statement}: {truth}&quot;)
+</code></pre>
+<p><strong>Step 2: Basic Connectives</strong></p>
+<pre><code class="language-python">def NOT(p: bool) -&gt; bool:
+    return not p
+
+def AND(p: bool, q: bool) -&gt; bool:
+    return p and q
+
+def OR(p: bool, q: bool) -&gt; bool:
+    return p or q
+
+def IMPLIES(p: bool, q: bool) -&gt; bool:
+    &quot;&quot;&quot;P → Q: false only when P true and Q false&quot;&quot;&quot;
+    return (not p) or q
+
+def IFF(p: bool, q: bool) -&gt; bool:
+    &quot;&quot;&quot;P ↔ Q: true when both have the same value&quot;&quot;&quot;
+    return p == q
+
+print(IMPLIES(True, False))  # False
+print(IMPLIES(False, True))  # True (false premise → always true)
+print(IFF(True, True))       # True
+</code></pre>
+<p>The fact that P → Q is true whenever P is false often surprises beginners. "If it rains, I'll bring an umbrella" is not violated on dry days.</p>
+<p><strong>Step 3: Generate a Truth Table</strong></p>
+<pre><code class="language-python">from itertools import product
+
+def truth_table(variables: list[str], expr) -&gt; None:
+    &quot;&quot;&quot;Print the truth table for a given expression.&quot;&quot;&quot;
+    header = &quot; | &quot;.join(variables) + &quot; | result&quot;
+    print(header)
+    print(&quot;-&quot; * len(header))
+    for values in product([False, True], repeat=len(variables)):
+        env = dict(zip(variables, values))
+        result = expr(**env)
+        row = &quot; | &quot;.join(str(v)[0] for v in values) + f&quot; | {str(result)[0]}&quot;
+        print(row)
+
+# Truth table for (P ∧ Q) → P
+truth_table([&quot;P&quot;, &quot;Q&quot;], lambda P, Q: IMPLIES(AND(P, Q), P))
+</code></pre>
+<p>A truth table is the "execution" of propositional logic. Because it enumerates every input combination, you can always check equivalence.</p>
+<p><strong>Step 4: Verify De Morgan's Laws</strong></p>
+<pre><code class="language-python"># ¬(P ∧ Q) ≡ ¬P ∨ ¬Q
+# ¬(P ∨ Q) ≡ ¬P ∧ ¬Q
+
+def equivalent(expr1, expr2, variables: list[str]) -&gt; bool:
+    &quot;&quot;&quot;Two expressions are equivalent if they agree on every input.&quot;&quot;&quot;
+    for values in product([False, True], repeat=len(variables)):
+        env = dict(zip(variables, values))
+        if expr1(**env) != expr2(**env):
+            return False
+    return True
+
+lhs = lambda P, Q: NOT(AND(P, Q))
+rhs = lambda P, Q: OR(NOT(P), NOT(Q))
+
+print(f&quot;De Morgan holds: {equivalent(lhs, rhs, ['P', 'Q'])}&quot;)
+</code></pre>
+<p><strong>Step 5: Predicates and Quantifiers</strong></p>
+<pre><code class="language-python"># A predicate is a proposition-valued function over a variable
+def is_even(n: int) -&gt; bool:
+    return n % 2 == 0
+
+# Universal ∀: &quot;for all n&quot;
+def for_all(domain, predicate) -&gt; bool:
+    return all(predicate(x) for x in domain)
+
+# Existential ∃: &quot;there exists an n&quot;
+def there_exists(domain, predicate) -&gt; bool:
+    return any(predicate(x) for x in domain)
+
+numbers = [2, 4, 6, 8, 10]
+
+print(f&quot;∀x ∈ {numbers}: x is even = {for_all(numbers, is_even)}&quot;)
+print(f&quot;∃x ∈ [1,2,3]: x is even = {there_exists([1, 2, 3], is_even)}&quot;)
+</code></pre>
+<p>Quantifiers map directly onto SQL's <code>ALL</code> and <code>ANY</code>. <code>WHERE x &gt; ALL(SELECT ...)</code> is universal quantification.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Every connective is defined by its truth table</li>
+<li>P → Q is logically equivalent to ¬P ∨ Q</li>
+<li>De Morgan's laws control how negation distributes</li>
+<li>Quantifiers ∀ and ∃ turn predicates into propositions</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Misreading implication</strong><br>
+- Problem: "False premise → true" feels wrong<br>
+- Fix: Remember "from false, anything follows"</p>
+<p><strong>Confusing AND/OR precedence</strong><br>
+- Problem: Missing parens cause bugs<br>
+- Fix: Always parenthesize explicitly</p>
+<p><strong>Wrong distribution of negation</strong><br>
+- Problem: ¬(P ∧ Q) ≠ ¬P ∧ ¬Q<br>
+- Fix: Memorize De Morgan</p>
+<p><strong>Swapping ∀ and ∃ order</strong><br>
+- Problem: "For all x, some y" ≠ "Some y for all x"<br>
+- Fix: Preserve quantifier order</p>
+<p><strong>Treating predicates as propositions</strong><br>
+- Problem: P(x) with free x is not a proposition<br>
+- Fix: Bind it with a quantifier</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>SQL <code>WHERE</code> optimization uses logical equivalence transformations</li>
+<li>Code review simplifies complex conditionals via De Morgan</li>
+<li>Digital circuit design uses AND, OR, NOT, NAND, NOR gates</li>
+<li>Formal verification expresses system properties as propositions</li>
+<li>Search engines accept Boolean queries (<code>apple AND NOT pie</code>)</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When senior engineers see complex <code>if</code> statements, their first reaction is "can this be simplified?" They mentally sketch a truth table and often reduce conditions by half through equivalence transformations. They also reason with quantifiers — "is this always true, or only sometimes?" — which is how they avoid missing edge cases.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can sketch the truth table for all five connectives</li>
+<li>[ ] I can explain implication intuitively</li>
+<li>[ ] I can apply De Morgan to real code</li>
+<li>[ ] I can illustrate ∀ vs ∃ with a SQL example</li>
+<li>[ ] I can distinguish predicates from propositions</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Build the truth table for <code>(P → Q) ∧ (Q → R) → (P → R)</code> and confirm it is a tautology.</p>
+</li>
+<li>
+<p>Pick one nested <code>if</code> from your own code and simplify it using De Morgan's laws.</p>
+</li>
+<li>
+<p>Decide whether "∀x ∃y: x + y = 0" and "∃y ∀x: x + y = 0" are true or false over the integers, and justify each answer.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Propositional logic is the foundation of all computer reasoning. With five connectives, truth tables, and equivalence laws, you can manipulate complex conditions precisely. Quantifiers extend propositions into predicate logic for richer expression.</p>
+<p>Next, together with logic we cover the other foundation of discrete math — sets and functions.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><strong>Propositions and Logic (current)</strong></li>
+<li>Sets and Functions (upcoming)</li>
+<li>Relations and Equivalence (upcoming)</li>
+<li>Proof Techniques (upcoming)</li>
+<li>Sequences and Recurrence (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html">Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 1</a></li>
+<li><a href="https://plato.stanford.edu/entries/logic-propositional/">Stanford Encyclopedia of Philosophy — Propositional Logic</a></li>
+<li><a href="https://en.wikipedia.org/wiki/De_Morgan%27s_laws">Wikipedia — De Morgan's Laws</a></li>
+<li><a href="https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/">MIT OCW — Mathematics for Computer Science, Lectures 1-3</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Propositional Logic, Inference, Truth Tables, Predicates</p>
+</body>
+</html>

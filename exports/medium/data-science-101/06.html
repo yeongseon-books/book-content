@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Visualization</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Visualization</h1>
+<blockquote>
+<p>Data Science 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Which chart</em> fits <em>which message</em>, and how do you keep the picture <em>honest</em>?</p>
+<blockquote>
+<p><em>One good picture beats </em>three pages<em> of writing.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A mapping from <em>5 messages</em> to <em>5 charts</em></li>
+<li>Basic rules for <em>axis, color, labels</em></li>
+<li>Patterns that <em>mislead</em> the reader</li>
+<li>A 5-step visualization exercise</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Data is fastest to read as a <em>picture</em>. The wrong chart leads to the <em>wrong decision</em>. A clear <em>message-to-chart</em> mapping eliminates <em>half</em> of the misreadings.</p>
+<blockquote>
+<p><em>Visualization is the </em>last line<em> of an analysis.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Dist[&quot;Distribution&quot;] --&gt; Hist[&quot;Histogram / Box&quot;]
+    Comp[&quot;Comparison&quot;] --&gt; Bar[&quot;Bar Chart&quot;]
+    Trend[&quot;Trend&quot;] --&gt; Line[&quot;Line Chart&quot;]
+    Rel[&quot;Relation&quot;] --&gt; Scatter[&quot;Scatter&quot;]
+    Part[&quot;Part of Whole&quot;] --&gt; Stack[&quot;Stacked Bar&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Encoding</strong>: mapping data to <em>position, length, color</em>.</li>
+<li><strong>Scale</strong>: <em>linear, log</em> — the axis transform.</li>
+<li><strong>Faceting</strong>: <em>small multiples</em> for comparison.</li>
+<li><strong>Annotation</strong>: <em>notes and highlights</em> on the chart.</li>
+<li><strong>Colorblind-safe</strong>: a palette that works for color-vision deficiencies.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: a <em>3D pie chart</em> makes proportions <em>impossible to compare</em>.</p>
+<p><strong>After</strong>: a <em>horizontal bar chart</em> makes them <em>exactly comparable</em>.</p>
+<h2>Hands-on: 5-step Visualization</h2>
+<p><strong>Step 1 — Distribution (histogram)</strong></p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+df[&quot;amount&quot;].plot.hist(bins=30, title=&quot;amount distribution&quot;)
+plt.show()
+</code></pre>
+<p><strong>Step 2 — Comparison (bar)</strong></p>
+<pre><code class="language-python">(
+    df.groupby(&quot;country&quot;)[&quot;amount&quot;]
+      .sum()
+      .sort_values()
+      .plot.barh(title=&quot;revenue by country&quot;)
+)
+plt.show()
+</code></pre>
+<p><strong>Step 3 — Trend (line)</strong></p>
+<pre><code class="language-python">df.groupby(&quot;order_date&quot;)[&quot;amount&quot;].sum().plot(title=&quot;daily revenue&quot;)
+plt.show()
+</code></pre>
+<p><strong>Step 4 — Relation (scatter + facet)</strong></p>
+<pre><code class="language-python">import seaborn as sns
+sns.relplot(
+    data=df.sample(2000),
+    x=&quot;quantity&quot;,
+    y=&quot;amount&quot;,
+    col=&quot;country&quot;,
+    col_wrap=3,
+)
+</code></pre>
+<p><strong>Step 5 — Annotation and color</strong></p>
+<pre><code class="language-python">ax = df.groupby(&quot;order_date&quot;)[&quot;amount&quot;].sum().plot()
+ax.axvline(pd.Timestamp(&quot;2026-04-01&quot;), color=&quot;red&quot;, linestyle=&quot;--&quot;, label=&quot;campaign&quot;)
+ax.legend()
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>message-to-chart</em> mapping comes <em>first</em>.</li>
+<li>The <em>axis scale</em> changes the <em>reading</em>.</li>
+<li><em>Annotations</em> save the reader from a paragraph of explanation.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <em>3D charts</em>.</strong> Comparisons become <em>hard</em>.</li>
+<li><strong>Overusing <em>dual axes</em>.</strong> A common source of <em>misreading</em>.</li>
+<li><strong>Encoding categories <em>only by color</em>.</strong> Unfriendly to <em>colorblind</em> users.</li>
+<li><strong>Bar charts that don't start at <em>zero</em>.</strong> They <em>exaggerate</em> differences.</li>
+<li><strong>Charts without <em>labels</em>.</strong> Not reusable next week.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Analysts mix <em>Tableau / Looker</em> dashboards with <em>Python</em> charts. A <em>dashboard</em> is the standard <em>unit of a weekly report</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Write the <em>message first</em>, then pick the <em>chart</em>.</li>
+<li>Always fill in <em>axis and labels</em>.</li>
+<li>Default to a <em>colorblind-safe palette</em>.</li>
+<li>Use <em>annotations</em> to provide <em>context</em>.</li>
+<li>A dashboard should reach a <em>decision</em> within <em>3 screens</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the <em>5 message-to-chart</em> pairings.</li>
+<li>[ ] I value <em>axis and labels</em>.</li>
+<li>[ ] I know <em>colorblind-safe</em> palettes.</li>
+<li>[ ] I add <em>annotations</em> to aid interpretation.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Plot the <em>same data</em> with <em>3 different charts</em> and pick the clearest.</li>
+<li>Take a <em>misleading</em> chart and <em>fix</em> it.</li>
+<li>Sketch a <em>one-page dashboard</em> using <em>3 charts</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Visualization is the <em>bridge from analysis to decision</em>. Next we move into <em>modeling</em> — using data to <em>predict</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><strong>Visualization (current)</strong></li>
+<li>Modeling (upcoming)</li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://matplotlib.org/stable/tutorials/index.html">matplotlib — Tutorials</a></li>
+<li><a href="https://seaborn.pydata.org/tutorial.html">seaborn — Tutorial</a></li>
+<li><a href="https://www.storytellingwithdata.com/">Cole Knaflic — Storytelling with Data</a></li>
+<li><a href="https://www.tableau.com/learn/articles/data-visualization-tips">Tableau — Visual Best Practices</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, Visualization, Matplotlib, Seaborn, Beginner</p>
+</body>
+</html>

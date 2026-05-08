@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Modeling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Modeling</h1>
+<blockquote>
+<p>Data Science 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you build a <em>first model</em> — and why must you start with a <em>baseline</em>?</p>
+<blockquote>
+<p><em>A model without a baseline has </em>nothing to stand on<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The basic flow of <em>supervised learning</em></li>
+<li>The role of a <em>baseline</em> model</li>
+<li>The principle of <em>train/test splitting</em></li>
+<li>A 5-step modeling exercise</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>good baseline</em> is the real starting line — much more than a fancy model. Without a <em>reference</em>, you cannot prove a model adds value.</p>
+<blockquote>
+<p><em>Every model competes against a </em>baseline<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;Cleaned Data&quot;] --&gt; Split[&quot;Train / Test Split&quot;]
+    Split --&gt; Base[&quot;Baseline&quot;]
+    Split --&gt; Model[&quot;Model&quot;]
+    Base --&gt; Compare[&quot;Compare&quot;]
+    Model --&gt; Compare
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Baseline</strong>: the <em>simplest possible</em> prediction (e.g., always majority class).</li>
+<li><strong>Train/test split</strong>: separate data for <em>training</em> and <em>evaluation</em>.</li>
+<li><strong>Cross-validation</strong>: repeat evaluation across <em>folds</em>.</li>
+<li><strong>Overfitting</strong>: great on train, <em>poor</em> on test.</li>
+<li><strong>Pipeline</strong>: preprocessing + model wrapped in <em>one object</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: a complex model hits 95% accuracy. The baseline hits 96%. <em>Regression</em>, not progress.</p>
+<p><strong>After</strong>: record the <em>baseline 96%</em> first, then aim <em>above it</em>.</p>
+<h2>Hands-on: 5-step Modeling</h2>
+<p><strong>Step 1 — Prepare data</strong></p>
+<pre><code class="language-python">from sklearn.model_selection import train_test_split
+import pandas as pd
+
+df = pd.read_csv(&quot;churn.csv&quot;)
+X = df.drop(columns=[&quot;churn&quot;])
+y = df[&quot;churn&quot;]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+</code></pre>
+<p><strong>Step 2 — Baseline</strong></p>
+<pre><code class="language-python">from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score
+
+base = DummyClassifier(strategy=&quot;most_frequent&quot;).fit(X_train, y_train)
+print(&quot;baseline:&quot;, accuracy_score(y_test, base.predict(X_test)))
+</code></pre>
+<p><strong>Step 3 — Pipeline</strong></p>
+<pre><code class="language-python">from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+num = X.select_dtypes(&quot;number&quot;).columns.tolist()
+cat = X.select_dtypes(&quot;object&quot;).columns.tolist()
+
+pre = ColumnTransformer([
+    (&quot;num&quot;, StandardScaler(), num),
+    (&quot;cat&quot;, OneHotEncoder(handle_unknown=&quot;ignore&quot;), cat),
+])
+model = Pipeline([(&quot;pre&quot;, pre), (&quot;clf&quot;, LogisticRegression(max_iter=1000))])
+</code></pre>
+<p><strong>Step 4 — Train and evaluate</strong></p>
+<pre><code class="language-python">model.fit(X_train, y_train)
+print(&quot;model:&quot;, accuracy_score(y_test, model.predict(X_test)))
+</code></pre>
+<p><strong>Step 5 — Cross-validation</strong></p>
+<pre><code class="language-python">from sklearn.model_selection import cross_val_score
+scores = cross_val_score(model, X_train, y_train, cv=5, scoring=&quot;accuracy&quot;)
+print(scores.mean(), &quot;+/-&quot;, scores.std())
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Baseline first</em>, every time.</li>
+<li>A <em>Pipeline</em> prevents <em>data leakage</em>.</li>
+<li><em>Cross-validation</em> shows the <em>variance</em>, not just the mean.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping the <em>baseline</em>.</strong> You don't know if you improved anything.</li>
+<li><strong>Fitting <em>preprocessing on the test set</em>.</strong> That's <em>data leakage</em>.</li>
+<li><strong>Looking only at <em>accuracy</em>.</strong> Class <em>imbalance</em> fools you.</li>
+<li><strong>Forgetting <em>random_state</em>.</strong> <em>Reproducibility</em> breaks.</li>
+<li><strong>Deciding from a <em>single split</em>.</strong> You confuse <em>luck</em> with <em>skill</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Teams log experiments with <em>MLflow / Weights &amp; Biases</em>. The <em>baseline</em> is always experiment #1. Feature changes go <em>one at a time</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The <em>baseline</em> is the most valuable experiment.</li>
+<li>Always wrap in a <em>Pipeline</em>.</li>
+<li>Pin <em>random_state</em>.</li>
+<li>Always look at <em>CV variance</em>.</li>
+<li>One <em>change</em> per one <em>metric move</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can build a <em>baseline</em>.</li>
+<li>[ ] I understand a <em>Pipeline</em>.</li>
+<li>[ ] I know <em>why we split</em>.</li>
+<li>[ ] I look at <em>CV variance</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare <em>baseline + logistic regression</em> on Titanic.</li>
+<li>Document a case where a <em>missing Pipeline</em> caused <em>data leakage</em>.</li>
+<li>Vary the <em>number of CV folds</em> and observe the <em>variance</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Modeling is a <em>conversation with the baseline</em>. Next we step into the world of <em>evaluation metrics</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/01-what-is-data-science.md">What Is Data Science?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/02-problem-to-data-problem.md">Turning a Problem into a Data Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/03-data-collection.md">Data Collection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/04-data-cleaning.md">Data Cleaning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/05-exploratory-data-analysis.md">Exploratory Data Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-101/en/06-visualization.md">Visualization</a></li>
+<li><strong>Modeling (current)</strong></li>
+<li>Evaluation (upcoming)</li>
+<li>Result Interpretation (upcoming)</li>
+<li>End-to-End Data Project Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/user_guide.html">scikit-learn — User Guide</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google — Rules of Machine Learning</a></li>
+<li><a href="https://www.kaggle.com/learn/intro-to-machine-learning">Kaggle — Intro to Machine Learning</a></li>
+<li><a href="https://github.com/ageron/handson-ml3">Hands-On Machine Learning with Scikit-Learn</a></li>
+</ul>
+<p class="tags-line">Tags: DataScience, Modeling, ScikitLearn, MachineLearning, Beginner</p>
+</body>
+</html>

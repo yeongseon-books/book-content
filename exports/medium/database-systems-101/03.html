@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SQL and Query Processing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SQL and Query Processing</h1>
+<blockquote>
+<p>Database Systems 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you type <code>SELECT * FROM orders WHERE user_id = 7</code>, what actually happens inside the DBMS before rows come back?</p>
+<blockquote>
+<p>SQL only states <strong>what</strong> you want. The DBMS turns it into rows in four stages — <strong>parse → analyze → plan → execute</strong> — and the optimizer is allowed to find a cheaper way to compute the same answer. This episode walks those stages and the user-facing window into them: <code>EXPLAIN</code>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The consequences of SQL being declarative</li>
+<li>The four stages a query goes through</li>
+<li>How to read the simplest <code>EXPLAIN</code> output</li>
+<li>Why the same query can have many valid execution strategies</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most performance problems do not come from rewriting SQL. They come from <strong>not knowing what is actually being executed</strong>. Once you can read a plan, "why is this slow?" stops being a guessing game.</p>
+<blockquote>
+<p>Many SQL queries can produce the same answer, and many execution strategies can produce the same answer for one query. That is exactly why an optimizer exists.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;SQL text&quot;] --&gt; B[&quot;Parser&quot;]
+    B --&gt; C[&quot;Planner / Optimizer&quot;]
+    C --&gt; D[&quot;Plan tree&quot;]
+    D --&gt; E[&quot;Executor&quot;]
+    E --&gt; F[&quot;Rows&quot;]
+</code></pre>
+<p>SQL starts as text and becomes a tree (the plan). The executor walks the tree and emits rows.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DDL/DML</strong>: DDL defines schema (CREATE, ALTER); DML manipulates data (SELECT, INSERT, UPDATE, DELETE).</li>
+<li><strong>Plan</strong>: The tree of steps the optimizer chose to execute the query.</li>
+<li><strong>Cost</strong>: The optimizer's estimate it uses to compare plans — a simple I/O and CPU model.</li>
+<li><strong>Seq Scan vs Index Scan</strong>: Read the whole table, or follow an index.</li>
+<li><strong>Estimate vs Actual</strong>: The optimizer's expected row count vs what really happened. Big gaps usually mean stale statistics.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — guess at "why slow"</strong></p>
+<pre><code class="language-sql">SELECT * FROM orders WHERE user_id = 7;
+-- slow. Add another index. Still slow. Blame the cache…
+</code></pre>
+<p>Touching things you suspect, with no evidence.</p>
+<p><strong>After — read the plan</strong></p>
+<pre><code class="language-sql">EXPLAIN QUERY PLAN
+SELECT * FROM orders WHERE user_id = 7;
+-- SCAN orders         ← full scan
+-- or
+-- SEARCH orders USING INDEX idx_orders_user_id (user_id=?)
+</code></pre>
+<p>First you see a full scan; after creating an index, you see the index being used. One line of evidence kills or supports your hypothesis.</p>
+<h2>Hands-on: Follow a Single SELECT End to End</h2>
+<p><strong>Step 1 — Seed some data</strong></p>
+<pre><code class="language-python"># seed.py
+import sqlite3, random
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        DROP TABLE IF EXISTS orders;
+        CREATE TABLE orders (
+            id      INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            product TEXT    NOT NULL,
+            price   INTEGER NOT NULL
+        );
+    &quot;&quot;&quot;)
+    rows = [(i, random.randint(1, 1000), &quot;p&quot;, random.randint(1, 1000)) for i in range(1, 100001)]
+    db.executemany(&quot;INSERT INTO orders VALUES (?, ?, ?, ?)&quot;, rows)
+</code></pre>
+<p>100k rows is enough to see the difference between a scan and an index lookup.</p>
+<p><strong>Step 2 — Query without an index</strong></p>
+<pre><code class="language-python">import sqlite3, time
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 7&quot;).fetchall()
+    print(plan)
+
+    t = time.time()
+    rows = db.execute(&quot;SELECT * FROM orders WHERE user_id = 7&quot;).fetchall()
+    print(len(rows), &quot;rows in&quot;, round((time.time()-t)*1000, 1), &quot;ms&quot;)
+</code></pre>
+<p>You should see <code>SCAN orders</code> in the plan. With no index, the optimizer's only choice is to read everything.</p>
+<p><strong>Step 3 — Add an index, see the plan change</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id)&quot;)
+    db.execute(&quot;ANALYZE&quot;)  # refresh statistics
+
+    plan = db.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM orders WHERE user_id = 7&quot;).fetchall()
+    print(plan)
+</code></pre>
+<p>Now you see <code>SEARCH orders USING INDEX ...</code>. The SQL did not change; the optimizer's choice did. SQL still only says <strong>what</strong>; <strong>how</strong> is the optimizer's job.</p>
+<p><strong>Step 4 — Inspect a join's plan</strong></p>
+<pre><code class="language-python">with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT);
+        INSERT OR IGNORE INTO users (id, name) SELECT 7, 'Alice';
+    &quot;&quot;&quot;)
+    plan = db.execute(&quot;&quot;&quot;
+        EXPLAIN QUERY PLAN
+        SELECT u.name, o.product
+        FROM orders o JOIN users u ON u.id = o.user_id
+        WHERE u.id = 7
+    &quot;&quot;&quot;).fetchall()
+    for row in plan:
+        print(row)
+</code></pre>
+<p>You can see which side of the join is scanned first and how the other side is looked up.</p>
+<p><strong>Step 5 — Same answer, different SQL</strong></p>
+<pre><code class="language-sql">-- A
+SELECT * FROM orders WHERE user_id IN (SELECT id FROM users WHERE name = 'Alice');
+
+-- B
+SELECT o.* FROM orders o JOIN users u ON u.id = o.user_id WHERE u.name = 'Alice';
+</code></pre>
+<p>Both usually produce the same answer. The optimizer may or may not turn them into the same plan. Compare with <code>EXPLAIN</code>. This is where you start feeling SQL's freedom and the optimizer's limits at once.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same SQL can run with very different plans depending on <strong>data volume and statistics</strong>.</li>
+<li>Creating an index is not enough — the optimizer can still ignore it (small tables, stale stats). Sometimes you need <code>ANALYZE</code>.</li>
+<li><code>EXPLAIN</code> shows <strong>estimates</strong>. To see real runtimes, use measurement tools like PostgreSQL's <code>EXPLAIN ANALYZE</code>.</li>
+<li>The freedom to "compute the same answer differently" is what makes the optimizer worth its weight.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Calling a query "slow" without <code>EXPLAIN</code>.</strong> No evidence means luck-driven debugging.</li>
+<li><strong>Creating an index and being satisfied.</strong> If the optimizer does not pick it, it does nothing. Look at statistics and selectivity.</li>
+<li><strong>Selecting all 100 columns (<code>SELECT *</code>).</strong> Network and memory cost piles up invisibly. Production SELECTs name their columns.</li>
+<li><strong>Building N+1 queries.</strong> SQL inside an application loop means hundreds of round trips per page. Batch with JOIN or IN.</li>
+<li><strong>Mixing DDL and DML in one transaction.</strong> Behavior varies subtly by engine. Keep migrations separate.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Performance investigation almost always starts with <code>EXPLAIN</code>. On PostgreSQL it is <code>EXPLAIN (ANALYZE, BUFFERS)</code>, which shows estimates, actuals, and memory access. Some recurring shapes:</p>
+<ul>
+<li>"Seq Scan + huge row count" → missing index or wrong statistics</li>
+<li>"estimate 1, actual 1,000,000" → stale statistics (<code>ANALYZE</code>)</li>
+<li>"Nested Loop on two big sides" → join order or method poorly chosen</li>
+</ul>
+<p>Even one engineer on the team who reads plans confidently raises everyone's average SQL by a level.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They look at <code>EXPLAIN</code> first when they suspect something. Hypotheses come second.</li>
+<li>They treat indexes as "good when selective," not "always good."</li>
+<li>They catch N+1 in code review. SQL inside an application loop is a stop sign.</li>
+<li>They paginate. Nobody fetches "everything" at once.</li>
+<li>They trust the optimizer but verify it. Statistics must be alive.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Have you actually looked at <code>EXPLAIN</code> for the slow query?</li>
+<li>[ ] Are SELECTs naming their columns instead of <code>*</code>?</li>
+<li>[ ] Are there any SQL calls inside application loops?</li>
+<li>[ ] After big changes, did <code>ANALYZE</code> (or auto-stats) run?</li>
+<li>[ ] Are pagination and LIMIT in place?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Look at the <code>EXPLAIN QUERY PLAN</code> output from Step 2 and explain in one sentence why the optimizer chose a full scan.</li>
+<li>If two indexes can satisfy the same query, name two criteria the optimizer would use to choose between them.</li>
+<li>List three reasons not to use <code>SELECT *</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>You write <strong>what</strong>; the DBMS decides <strong>how</strong>. Between text and rows live a parser, an optimizer, and an executor — and <code>EXPLAIN</code> is your window. Next we cover the single most powerful lever the optimizer has: indexes.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><strong>SQL and Query Processing (current)</strong></li>
+<li>Indexes (upcoming)</li>
+<li>Transactions and ACID (upcoming)</li>
+<li>Isolation Levels (upcoming)</li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.sqlite.org/eqp.html">SQLite — EXPLAIN QUERY PLAN</a></li>
+<li><a href="https://www.postgresql.org/docs/current/using-explain.html">PostgreSQL — Using EXPLAIN</a></li>
+<li><a href="https://use-the-index-luke.com/">Use The Index, Luke!</a></li>
+<li><a href="https://www.db-book.com/">Database System Concepts (Silberschatz)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, SQL, Optimizer, Execution Plan, Queries</p>
+</body>
+</html>

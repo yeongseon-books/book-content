@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WHERE and Conditions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>WHERE and Conditions</h1>
+<blockquote>
+<p>SQL 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does <em>one condition</em> drop millions of rows, and where do the <em>NULLs we miss</em> sneak in?</p>
+<blockquote>
+<p><em>WHERE is the </em>front gate<em> for data. It must block precisely and pass precisely.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Comparison operators</em> and the precedence of <em>AND / OR</em></li>
+<li>The differences between <em>IN, BETWEEN, LIKE</em></li>
+<li>Why NULL comparisons are different</li>
+<li>How condition shape affects <em>performance</em></li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A single line in WHERE often decides <em>90% of the cost</em>. Whether an <em>index hits</em>, how many rows scan, how much memory the server uses — it all flows from WHERE. And <em>NULL</em> is the most common silent corruptor of results.</p>
+<blockquote>
+<p><em>Returning a </em>wrong answer fast<em> happens </em>more often than people think<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Rows[&quot;All rows&quot;] --&gt; Where[&quot;WHERE evaluation&quot;]
+    Where --&gt;|true| Pass[&quot;Next step&quot;]
+    Where --&gt;|false or NULL| Drop[&quot;Discarded&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Predicate</strong>: a <em>condition expression</em> deciding row passage.</li>
+<li><strong>Sargable</strong>: a condition shape that <em>can use an index</em>.</li>
+<li><strong>Three-valued logic</strong>: true / false / NULL.</li>
+<li><strong>Operator precedence</strong>: AND binds <em>before</em> OR.</li>
+<li><strong>Pattern matching</strong>: <code>LIKE</code> with <code>%</code> and <code>_</code>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>WHERE name LIKE '%kim%' OR age &gt; 30</code> — <em>intent is unclear</em>.</p>
+<p><strong>After</strong>: <code>WHERE (name LIKE '%kim%' OR age &gt; 30) AND active = TRUE</code> — parentheses make intent <em>explicit</em>.</p>
+<h2>Hands-on: Five Conditions</h2>
+<p><strong>Step 1 — Comparison</strong></p>
+<pre><code class="language-sql">SELECT * FROM users WHERE age &gt;= 18;
+</code></pre>
+<p><strong>Step 2 — Range</strong></p>
+<pre><code class="language-sql">SELECT * FROM orders WHERE total BETWEEN 100 AND 500;
+</code></pre>
+<p><strong>Step 3 — Membership</strong></p>
+<pre><code class="language-sql">SELECT * FROM users WHERE country IN ('KR', 'JP', 'US');
+</code></pre>
+<p><strong>Step 4 — Pattern</strong></p>
+<pre><code class="language-sql">SELECT * FROM users WHERE email LIKE '%@example.com';
+</code></pre>
+<p><strong>Step 5 — NULL-safe</strong></p>
+<pre><code class="language-sql">SELECT * FROM users WHERE deleted_at IS NULL;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>LIKE '%xxx'</code> <em>cannot use an index</em>. Trailing wildcards are <em>expensive</em>.</li>
+<li><code>IN</code> works for <em>small lists</em>. For larger ones, switch to a <em>join</em>.</li>
+<li>Only <code>IS NULL</code> matches NULL. <code>= NULL</code> is <em>always false</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Comparing with <code>= NULL</code>.</strong> The result is treated as false, so rows <em>vanish</em>.</li>
+<li><strong>Skipping AND/OR parentheses.</strong> AND binds first and <em>changes meaning</em>.</li>
+<li><strong>Wrapping the column in a function.</strong> <code>WHERE LOWER(email) = ...</code> <em>kills the index</em>.</li>
+<li><strong><code>LIKE '%kim%'</code></strong> scans <em>millions of rows</em>.</li>
+<li><strong>Type mismatch.</strong> <code>age = '18'</code> triggers an <em>implicit cast</em> that <em>defeats the index</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Dashboard filters, <em>search boxes</em>, and <em>permission checks</em> all funnel into WHERE. Search is usually offloaded to a <em>full-text index</em> or a <em>dedicated search engine</em>. NULL handling becomes a <em>team convention</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Never wrap the column in a function.</em></li>
+<li><em>Handle NULL </em>explicitly<em>.</em></li>
+<li><em>Look at the </em>selectivity<em> of each predicate.</em></li>
+<li><em>Always parenthesize AND/OR.</em></li>
+<li><em>Big OR lists belong in a </em>join or IN<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the difference between <code>IS NULL</code> and <code>= NULL</code>.</li>
+<li>[ ] I know AND/OR precedence.</li>
+<li>[ ] I know when <code>LIKE</code> is expensive.</li>
+<li>[ ] I can define <em>sargable</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Return only users where <code>deleted_at</code> is NULL.</li>
+<li>Filter rows where <code>signup_at</code> falls in <em>Q1 2026</em>.</li>
+<li>Rewrite <code>country IN ('KR','JP')</code> using <em>OR</em> and compare.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>WHERE is the <em>gatekeeper</em>. The next post is <em>JOIN</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/01-what-is-sql.md">What Is SQL?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sql-101/en/02-select-basics.md">SELECT Basics</a></li>
+<li><strong>WHERE and Conditions (current)</strong></li>
+<li>JOIN (upcoming)</li>
+<li>GROUP BY and Aggregates (upcoming)</li>
+<li>Subquery (upcoming)</li>
+<li>Window Function (upcoming)</li>
+<li>INSERT, UPDATE, DELETE (upcoming)</li>
+<li>Index and Query Plan (upcoming)</li>
+<li>Practical Analysis SQL (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-WHERE">PostgreSQL — WHERE clause</a></li>
+<li><a href="https://www.postgresql.org/docs/current/functions-matching.html">PostgreSQL — Pattern Matching</a></li>
+<li><a href="https://use-the-index-luke.com/sql/where-clause">Use The Index, Luke — Where Clause</a></li>
+<li><a href="https://mode.com/sql-tutorial/sql-where/">Mode — WHERE</a></li>
+</ul>
+<p class="tags-line">Tags: SQL, WHERE, Filter, Database, NULL</p>
+</body>
+</html>

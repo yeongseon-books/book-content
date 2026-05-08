@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Memory Management</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Memory Management</h1>
+<blockquote>
+<p>Programming Languages 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you write <code>del x</code>, does the object actually vanish on that line?</p>
+<blockquote>
+<p>Memory management is the rule that decides "when is this object alive, and when is it gone?" Languages answer differently — manual free, reference counting, garbage collection — but they all solve the same problem: keep what is alive, reclaim what is dead.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Stack vs heap in one sentence</li>
+<li>How Python's reference counting works</li>
+<li>How a garbage collector untangles cycles</li>
+<li>Why "memory leaks" still happen in GC languages</li>
+<li>The tradeoffs between manual free, RAII, and GC</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Long-running services often slowly creep up in memory. Finding the cause means being able to answer "why is this object still alive?" Memory models are the tools that produce that answer.</p>
+<blockquote>
+<p>Most leaks start with one forgotten reference.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;function call&quot;] --&gt; B[&quot;stack frame&quot;]
+    B --&gt; C[&quot;locals (auto freed)&quot;]
+    A --&gt; D[&quot;heap allocation&quot;]
+    D --&gt; E[&quot;refcount&quot;]
+    D --&gt; F[&quot;GC tracing&quot;]
+    E --&gt;|drops to 0| G[&quot;freed&quot;]
+    F --&gt;|cycle collected| G
+</code></pre>
+<p>The stack is reclaimed when the function returns. The heap needs someone to collect it.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Stack</strong>: Tied to function calls; appears and disappears automatically.</li>
+<li><strong>Heap</strong>: Allocated explicitly; reclaimed when no longer used.</li>
+<li><strong>Reference counting</strong>: Count references to an object; free immediately at zero.</li>
+<li><strong>Garbage collection</strong>: Trace which objects are reachable; reclaim the rest.</li>
+<li><strong>Cycle</strong>: A→B→A reference shape that simple counting cannot resolve.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — manual free in C-style pseudocode</strong></p>
+<pre><code class="language-python"># pseudocode: forget free, leak forever
+buf = malloc(1024)
+use(buf)
+# free(buf)  ← skip this and 1KB lives on
+</code></pre>
+<p><strong>After — Python: gone when the last reference goes</strong></p>
+<pre><code class="language-python">def work() -&gt; None:
+    buf = bytearray(1024)
+    use(buf)
+# when work() returns, buf has nowhere to live and is reclaimed
+</code></pre>
+<h2>Hands-on: Watch the Lifetime</h2>
+<p><strong>Step 1 — Peek at the refcount</strong></p>
+<pre><code class="language-python"># 1_refcount.py
+import sys
+
+class Tag:
+    def __del__(self) -&gt; None:
+        print(&quot;Tag deleted&quot;)
+
+t = Tag()
+print(sys.getrefcount(t))  # 2 (the variable t + getrefcount's argument)
+ref = t
+print(sys.getrefcount(t))  # 3
+del ref, t                  # all references gone → __del__ fires immediately
+</code></pre>
+<p><code>sys.getrefcount</code> is biased by +1; just remember that. CPython frees an object the instant the count hits zero.</p>
+<p><strong>Step 2 — Cycles and the GC</strong></p>
+<pre><code class="language-python"># 2_cycle.py
+import gc
+
+class Node:
+    def __init__(self) -&gt; None:
+        self.peer: &quot;Node | None&quot; = None
+    def __del__(self) -&gt; None:
+        print(&quot;Node deleted&quot;)
+
+a, b = Node(), Node()
+a.peer, b.peer = b, a   # they reference each other
+del a, b                 # counts never reach zero
+print(&quot;before collect&quot;)
+gc.collect()             # the tracing GC sweeps up the cycle
+print(&quot;after collect&quot;)
+</code></pre>
+<p>Cycles are unsolvable by counting alone. CPython runs an auxiliary tracing GC for exactly this case.</p>
+<p><strong>Step 3 — An object that "cannot die"</strong></p>
+<pre><code class="language-python"># 3_leak.py
+cache: dict[int, bytes] = {}
+
+def remember(i: int) -&gt; None:
+    cache[i] = b&quot;x&quot; * 1024  # cache only ever grows
+
+for i in range(1000):
+    remember(i)
+
+print(len(cache), &quot;items still alive&quot;)
+</code></pre>
+<p>GC or no GC, if something holds a reference, the object lives. <strong>A leak is a forgotten reference.</strong></p>
+<p><strong>Step 4 — Avoid strong references with <code>weakref</code></strong></p>
+<pre><code class="language-python"># 4_weakref.py
+import weakref
+
+class Big:
+    pass
+
+obj = Big()
+ref = weakref.ref(obj)
+print(ref())   # &lt;__main__.Big object ...&gt;
+del obj
+print(ref())   # None  — a weak reference does not extend lifetime
+</code></pre>
+<p>For caches and observer-style patterns, <code>weakref</code> is the standard tool to prevent leaks.</p>
+<p><strong>Step 5 — Make resource lifetime explicit with <code>with</code></strong></p>
+<pre><code class="language-python"># 5_with.py
+from contextlib import contextmanager
+
+@contextmanager
+def opened(name: str):
+    print(&quot;open&quot;, name)
+    try:
+        yield name
+    finally:
+        print(&quot;close&quot;, name)
+
+with opened(&quot;config.yml&quot;) as f:
+    print(&quot;use&quot;, f)
+# leaving the block guarantees close
+</code></pre>
+<p>Memory is not the only thing with lifetime. Files, sockets, and locks need it too — <code>with</code> is the standard pattern.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The instant the refcount drops to zero, the object is gone (CPython's promptness).</li>
+<li>Cycles need the tracing GC; counting alone is not enough.</li>
+<li>In a GC language, "if a reference exists, the object exists."</li>
+<li><code>weakref</code> and <code>with</code> are lifetime tools — not just memory tools.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Believing <code>del</code> immediately destroys the object.</strong> It only unbinds the name. Other references keep the object alive.</li>
+<li><strong>Unbounded global caches.</strong> The most common leak pattern. Always set a cap.</li>
+<li><strong>Ignoring cycles.</strong> When two domain objects reference each other, break one side with <code>weakref</code>.</li>
+<li><strong>Heavy work in <code>__del__</code>.</strong> Timing is not guaranteed; do real cleanup with <code>with</code> or an explicit close method.</li>
+<li><strong>Calling <code>gc.collect()</code> aggressively.</strong> Forcing collection in a hot loop just burns CPU.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Long-running servers watch memory graphs over time. When something looks off, <code>tracemalloc</code> or <code>objgraph</code> shows which type is growing. Caches always have an LRU or TTL bound. Observer/callback registries default to weak references or explicit teardown.</p>
+<p>C, C++, and Rust take different paths — Rust uses compile-time ownership instead of GC. The essence is the same across all of them: <strong>who owns this, and when do they let go?</strong></p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Asks "who owns this object?" first.</li>
+<li>Sees a cache and immediately asks about size limits and expiry.</li>
+<li>Looks at metrics first when leaks are suspected — never guess-debugs.</li>
+<li>Remembers that GC languages still leak resources.</li>
+<li>Writes <code>with</code>/<code>finally</code> so resource lifetime is visible in the code shape.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you answer stack vs heap in one sentence?</li>
+<li>[ ] Can you explain how Python's refcount and GC cooperate?</li>
+<li>[ ] Can you point to one leak risk in your most recent code?</li>
+<li>[ ] Can you name at least one place to use <code>weakref</code>?</li>
+<li>[ ] Is reaching for <code>with</code> to manage resource lifetime a habit?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Take the cycle from step 2 and weaken one side with <code>weakref</code>. Confirm cleanup happens without <code>gc.collect()</code>.</li>
+<li>Allocate and drop ten thousand objects while measuring with <code>tracemalloc</code>. Write a paragraph on what pattern you see.</li>
+<li>Pick one of your caches and convert it to LRU (<code>functools.lru_cache</code>). Note what changed in behavior with a bound in place.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The memory model answers "who holds it, when do they let go?" Next we look at the two roads that execute these objects — interpreters and compilers.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Objects and Prototypes</a></li>
+<li><strong>Memory Management (current)</strong></li>
+<li>Interpreters and Compilers (upcoming)</li>
+<li>Static vs Dynamic Languages (upcoming)</li>
+<li>What Makes a Good Language Design? (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/library/gc.html">Python — gc module</a></li>
+<li><a href="https://docs.python.org/3/library/weakref.html">Python — weakref module</a></li>
+<li><a href="https://docs.python.org/3/library/tracemalloc.html">Python — tracemalloc</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)">Garbage collection (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, MemoryManagement, GC, Stack, Heap</p>
+</body>
+</html>

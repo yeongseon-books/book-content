@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error Handling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Error Handling</h1>
+<blockquote>
+<p>Clean Code 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Should you raise an exception or return a value?</p>
+<blockquote>
+<p>Use values when the caller is expected to decide what to do; use exceptions when the caller cannot reasonably handle the situation.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>When to use exceptions vs return values</li>
+<li>The Fail Fast principle</li>
+<li>The "errors as values" pattern</li>
+<li>Retry with exponential backoff</li>
+<li>Try/except anti-patterns</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When error handling code outweighs business logic, the code stops being readable.</p>
+<blockquote>
+<p>Error handling is a first-class citizen, but never the lead role.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    I[&quot;Input&quot;] --&gt; V[&quot;Validate&quot;]
+    V --&gt;|&quot;Invalid&quot;| F[&quot;Fail fast&quot;]
+    V --&gt;|&quot;Valid&quot;| L[&quot;Logic&quot;]
+    L --&gt;|&quot;Expected&quot;| R[&quot;Value&quot;]
+    L --&gt;|&quot;Unexpected&quot;| E[&quot;Exception&quot;]
+</code></pre>
+<p>Validate up front; raise only when control is lost.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Fail Fast</strong>: Surface invalid state immediately.</li>
+<li><strong>Result/Either</strong>: Encode success/failure as a value.</li>
+<li><strong>Exception</strong>: Situation the caller cannot recover from locally.</li>
+<li><strong>Retry</strong>: Repeat a transient failure.</li>
+<li><strong>Backoff</strong>: Increase the delay between retries.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def fetch(url):
+    try:
+        ...
+    except Exception:
+        return None  # swallows everything
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class FetchError(Exception): ...
+
+def fetch(url):
+    try:
+        return _http_get(url)
+    except TimeoutError as e:
+        raise FetchError(f&quot;timeout: {url}&quot;) from e
+</code></pre>
+<p>Errors travel upward with meaning intact.</p>
+<h2>Hands-on: Five Steps to Robust Error Handling</h2>
+<p><strong>Step 1 — Fail fast</strong></p>
+<pre><code class="language-python"># 1_fail_fast.py
+def transfer(amount):
+    if amount &lt;= 0:
+        raise ValueError(&quot;amount must be positive&quot;)
+    ...
+</code></pre>
+<p>Reject bad input immediately.</p>
+<p><strong>Step 2 — Errors as values</strong></p>
+<pre><code class="language-python"># 2_result.py
+from dataclasses import dataclass
+@dataclass
+class Result:
+    ok: bool
+    value: object = None
+    error: str = &quot;&quot;
+
+def parse_int(s):
+    try: return Result(True, int(s))
+    except ValueError as e: return Result(False, error=str(e))
+</code></pre>
+<p>When the caller will branch, return a value.</p>
+<p><strong>Step 3 — Exception chaining</strong></p>
+<pre><code class="language-python"># 3_chain.py
+class ConfigError(Exception): ...
+
+def load_config(path):
+    try:
+        with open(path) as f: return f.read()
+    except FileNotFoundError as e:
+        raise ConfigError(f&quot;missing config: {path}&quot;) from e
+</code></pre>
+<p><code>from e</code> preserves the cause.</p>
+<p><strong>Step 4 — Retry + backoff</strong></p>
+<pre><code class="language-python"># 4_retry.py
+import time, random
+def with_retry(fn, attempts=3):
+    for i in range(attempts):
+        try: return fn()
+        except TimeoutError:
+            if i == attempts - 1: raise
+            time.sleep((2 ** i) + random.random())
+</code></pre>
+<p>Exponential backoff with jitter.</p>
+<p><strong>Step 5 — Catch only at boundaries</strong></p>
+<pre><code class="language-python"># 5_boundary.py
+def handle_request(req):
+    try:
+        return business_logic(req)
+    except ValueError as e:
+        return {&quot;status&quot;: 400, &quot;error&quot;: str(e)}
+    except Exception:
+        return {&quot;status&quot;: 500, &quot;error&quot;: &quot;internal&quot;}
+</code></pre>
+<p>Use broad catches only at outer boundaries.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Validation and handling are separated.</li>
+<li>Domain exception classes carry meaning.</li>
+<li>Retries are safe only when operations are idempotent.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Empty except blocks.</strong> All information is lost.</li>
+<li><strong>Catching <code>Exception</code> indiscriminately.</strong> Debugging becomes impossible.</li>
+<li><strong>Logging and continuing anyway.</strong> Bad state accumulates.</li>
+<li><strong>Infinite retry loops.</strong> They take systems down.</li>
+<li><strong>Using exceptions for control flow.</strong> Expensive and hard to read.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In an API server the handler is the boundary. Domain logic raises typed exceptions; the handler maps them to HTTP responses. Only idempotent operations are auto-retried.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Validates at the entry point and never again.</li>
+<li>Defines domain exception types.</li>
+<li>Distinguishes recoverable from unrecoverable.</li>
+<li>Pairs idempotency with retry.</li>
+<li>Restricts broad catches to boundaries.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is input validation at the top of the function?</li>
+<li>[ ] Are there domain exception types?</li>
+<li>[ ] Is the except clause narrow enough?</li>
+<li>[ ] Did you preserve the cause with <code>from e</code>?</li>
+<li>[ ] Is retry limited to idempotent operations?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Replace one empty except in your code with meaningful handling.</li>
+<li>Refactor one parse-style function to the Result pattern.</li>
+<li>Add backoff retry to one external call.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Treat errors as first-class but never as the lead role. Next: an often misused tool — comments and documentation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
+<li><strong>Error Handling (current)</strong></li>
+<li>Comments and Documentation (upcoming)</li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code (Ch. 7 Error Handling)</a></li>
+<li><a href="https://www.joelonsoftware.com/2003/10/13/13/">Joel Spolsky — Exceptions</a></li>
+<li><a href="https://sre.google/sre-book/handling-overload/">Google SRE — Handling Overload</a></li>
+<li><a href="https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/">AWS — Exponential Backoff and Jitter</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, ErrorHandling, Exceptions, Robustness, Reliability</p>
+</body>
+</html>

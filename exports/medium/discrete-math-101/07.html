@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Combinatorics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Combinatorics</h1>
+<blockquote>
+<p>Discrete Math 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why are hash collisions inevitable? How long does it take to brute-force every possible password?</p>
+<blockquote>
+<p>Combinatorics is the math of counting "how many cases are there?" Permutations, combinations, the binomial theorem, and the pigeonhole principle are the tools we use to size an algorithm's input space, a cipher's key space, or the probability of a hash collision. This article walks through the basic counting laws, the pigeonhole principle, and inclusion-exclusion, with code to verify each result.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The product rule and the sum rule</li>
+<li>The difference between permutations and combinations</li>
+<li>Binomial coefficients and Pascal's triangle</li>
+<li>The pigeonhole principle and inclusion-exclusion</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Cipher key-space size, brute-force attack time, the birthday paradox — all combinatorics. To analyze how an algorithm behaves over every possible input, you need to know how big the input space is, and that calculation is combinatorics.</p>
+<blockquote>
+<p>Combinatorics is the tool for measuring the exact size of possibility.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Two basic counting laws (product, sum) extend into permutations, combinations, the binomial theorem, the pigeonhole principle, and inclusion-exclusion.</p>
+</blockquote>
+<pre><code class="language-text">   basic laws
+  ┌─────────────┐
+  │ product rule │ — independent choices multiply
+  │ sum rule     │ — exclusive choices add
+  └──────┬───────┘
+         ↓
+  ┌──────┬──────────┐
+  ↓      ↓          ↓
+perm. P  comb. C   binomial thm
+  │      │          │
+  └──┬───┴──────────┘
+     ↓
+ pigeonhole / inclusion-exclusion
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Permutation</strong><br>
+- Notation: P(n, r) = n!/(n-r)!<br>
+- Description: Ordered selection of r from n</p>
+<p><strong>Combination</strong><br>
+- Notation: C(n, r) = n!/(r!(n-r)!)<br>
+- Description: Unordered selection of r from n</p>
+<p><strong>Binomial coefficient</strong><br>
+- Notation: (n choose r)<br>
+- Description: Same as C(n, r)</p>
+<p><strong>Pigeonhole principle</strong><br>
+- Notation: n+1 → n<br>
+- Description: At least one box holds two items</p>
+<p><strong>Inclusion-exclusion</strong><br>
+- Notation<br>
+- Description: A∪B</p>
+<h2>Before / After</h2>
+<p><strong>Before — brute force without counting:</strong></p>
+<pre><code class="language-python"># &quot;Just try everything&quot; — no idea how long it takes
+import itertools
+for password in itertools.product(&quot;abc&quot;, repeat=4):
+    pass  # 81 cases — looks small, but...
+</code></pre>
+<p><strong>After — analyzing the space size:</strong></p>
+<pre><code class="language-python"># 4-char lowercase: 26⁴ = 456,976
+# 8-char alphanumeric+symbols: 94⁸ ≈ 6.1 × 10¹⁵
+charset = 26
+length = 4
+print(f&quot;space size: {charset ** length:,}&quot;)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Product rule and sum rule</strong></p>
+<pre><code class="language-python"># Product rule: multiply when choices are independent
+# Example: 5 shirts, 3 pants → 5 × 3 = 15 outfits
+
+shirts = [&quot;white&quot;, &quot;black&quot;, &quot;gray&quot;, &quot;navy&quot;, &quot;beige&quot;]
+pants = [&quot;jeans&quot;, &quot;chinos&quot;, &quot;slacks&quot;]
+
+outfits = [(s, p) for s in shirts for p in pants]
+print(f&quot;outfits: {len(outfits)} = {len(shirts)} × {len(pants)}&quot;)
+
+# Sum rule: add when choices are exclusive
+# Example: lunch is either 4 Korean dishes or 3 Japanese → 4 + 3 = 7
+korean = 4; japanese = 3
+print(f&quot;lunch options: {korean + japanese}&quot;)
+</code></pre>
+<p><strong>Step 2: Permutations and combinations</strong></p>
+<pre><code class="language-python">from math import factorial
+
+def permutation(n: int, r: int) -&gt; int:
+    &quot;&quot;&quot;Ordered selection of r items from n.&quot;&quot;&quot;
+    return factorial(n) // factorial(n - r)
+
+def combination(n: int, r: int) -&gt; int:
+    &quot;&quot;&quot;Unordered selection of r items from n.&quot;&quot;&quot;
+    return factorial(n) // (factorial(r) * factorial(n - r))
+
+# Line up 3 people from 5 (order matters)
+print(f&quot;P(5, 3) = {permutation(5, 3)}&quot;)
+# Pick a 3-person committee from 5 (order does not matter)
+print(f&quot;C(5, 3) = {combination(5, 3)}&quot;)
+
+# Built-in
+from itertools import permutations, combinations
+print(f&quot;permutations: {len(list(permutations(range(5), 3)))}&quot;)
+print(f&quot;combinations: {len(list(combinations(range(5), 3)))}&quot;)
+</code></pre>
+<p>If order matters, use permutations; otherwise combinations. Passwords are permutations; poker hands are combinations.</p>
+<p><strong>Step 3: Binomial theorem and Pascal's triangle</strong></p>
+<pre><code class="language-python"># Binomial theorem: (x + y)ⁿ = Σ C(n, k) xⁿ⁻ᵏ yᵏ
+# The coefficients are exactly the combinations.
+
+def pascal_triangle(rows: int) -&gt; list[list[int]]:
+    triangle = [[1]]
+    for i in range(1, rows):
+        prev = triangle[-1]
+        new_row = [1] + [prev[j] + prev[j + 1] for j in range(len(prev) - 1)] + [1]
+        triangle.append(new_row)
+    return triangle
+
+for row in pascal_triangle(7):
+    print(&quot; &quot;.join(str(x).rjust(3) for x in row).center(40))
+
+# (x + y)⁴ expansion: coefficients 1, 4, 6, 4, 1
+n = 4
+print(f&quot;(x+y)^{n} coefficients: {[combination(n, k) for k in range(n + 1)]}&quot;)
+</code></pre>
+<p><strong>Step 4: The pigeonhole principle</strong></p>
+<pre><code class="language-python"># Pigeonhole: put n+1 items in n boxes → at least one box has 2
+# Application: hash collisions are inevitable when input &gt; output space
+
+def will_collide(input_space: int, hash_space: int) -&gt; bool:
+    return input_space &gt; hash_space
+
+# A 32-bit hash has 4 × 10⁹ outputs.
+# Hashing 10 billion IDs into 32 bits guarantees a collision.
+print(f&quot;10B → 32-bit collision? {will_collide(10 ** 10, 2 ** 32)}&quot;)
+
+# Birthday paradox: with just 23 people, two share a birthday with prob ~50%.
+def birthday_collision_prob(n: int, days: int = 365) -&gt; float:
+    no_collision = 1.0
+    for i in range(n):
+        no_collision *= (days - i) / days
+    return 1 - no_collision
+
+for n in [10, 23, 50, 100]:
+    print(f&quot;n={n}: collision probability = {birthday_collision_prob(n):.3f}&quot;)
+</code></pre>
+<p>The pigeonhole principle is simple but powerful. The fact that no lossless compression algorithm can shrink every possible input is a direct corollary.</p>
+<p><strong>Step 5: Inclusion-exclusion</strong></p>
+<pre><code class="language-python"># |A ∪ B| = |A| + |B| - |A ∩ B|
+# |A ∪ B ∪ C| = |A| + |B| + |C| - |A∩B| - |A∩C| - |B∩C| + |A∩B∩C|
+
+# Example: 100 students, 60 study English, 40 Japanese, 20 both
+def union_two(a: int, b: int, ab: int) -&gt; int:
+    return a + b - ab
+
+print(f&quot;studying at least one: {union_two(60, 40, 20)} students&quot;)
+
+# Multiples of 2 or 3 or 5 between 1 and 100
+def multiples_count(limit: int, n: int) -&gt; int:
+    return limit // n
+
+limit = 100
+m2, m3, m5 = multiples_count(limit, 2), multiples_count(limit, 3), multiples_count(limit, 5)
+m6, m10, m15 = multiples_count(limit, 6), multiples_count(limit, 10), multiples_count(limit, 15)
+m30 = multiples_count(limit, 30)
+
+answer = m2 + m3 + m5 - m6 - m10 - m15 + m30
+print(f&quot;multiples of 2, 3, or 5 in 1..100: {answer}&quot;)
+</code></pre>
+<p>Inclusion-exclusion is the right tool whenever you need to remove double counting precisely. Database query optimizers use it to estimate OR cardinality.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Combinatorics measures the exact size of an input space.</li>
+<li>Permutations care about order; combinations do not.</li>
+<li>The pigeonhole principle explains why collisions are unavoidable.</li>
+<li>Inclusion-exclusion is the standard tool for OR counts.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Mixing permutations and combinations</strong><br>
+- Problem: Wrong count<br>
+- Fix: Ask "does order matter?"</p>
+<p><strong>Mixing product and sum rules</strong><br>
+- Problem: Confusing independent vs exclusive<br>
+- Fix: Ask "both at once, or one of?"</p>
+<p><strong>Ignoring repetition</strong><br>
+- Problem: Same element re-picked<br>
+- Fix: With repetition, permutations are nʳ</p>
+<p><strong>Loose pigeonhole application</strong><br>
+- Problem: Applied without n+1 condition<br>
+- Fix: Verify the precise condition</p>
+<p><strong>Sign errors in inclusion-exclusion</strong><br>
+- Problem: Even-size intersections flipped<br>
+- Fix: Use the general signed formula</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Designing password policies (computing key-space size)</li>
+<li>Hash collision probability analysis (birthday paradox)</li>
+<li>Sample-size calculation for A/B tests</li>
+<li>Cardinality estimation in database query optimizers</li>
+<li>Avoiding ID collisions in distributed systems (UUID, Snowflake)</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer answers "is this design enough?" quantitatively. UUID v4 collision odds, the limits of a 32-bit hash, the strength of a password policy — all answered with combinatorics on the spot. They also reach for it when picking algorithms: "What is the worst-case number of inputs we have to handle?"</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you tell the product and sum rules apart?</li>
+<li>[ ] Can you safely choose between permutations and combinations?</li>
+<li>[ ] Can you explain hash-collision inevitability via the pigeonhole principle?</li>
+<li>[ ] Can you compute OR cardinality with inclusion-exclusion?</li>
+<li>[ ] Do you have intuition for the birthday paradox?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Compute the key-space size of an 8-character password (uppercase + lowercase + digits + 8 symbols), and estimate the average cracking time at 10⁹ guesses per second.</p>
+</li>
+<li>
+<p>Use inclusion-exclusion to count multiples of 7 or 11 or 13 between 1 and 1000.</p>
+</li>
+<li>
+<p>Estimate the UUID v4 collision probability via the birthday paradox. After generating one trillion UUIDs, what is the collision chance?</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Combinatorics is the math of measuring possibility. The product/sum rules, permutations and combinations, the binomial theorem, the pigeonhole principle, and inclusion-exclusion are the standard toolkit for security, hashing, and probability analysis.</p>
+<p>The next article enters another major area of discrete math: graph theory.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/04-relations-and-equivalence.md">Relations and Equivalence</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/05-proof-techniques.md">Proof Techniques</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/06-sequences-and-recurrence.md">Sequences and Recurrence</a></li>
+<li><strong>Combinatorics (current)</strong></li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html">Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 6</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Combinatorics">Wikipedia — Combinatorics</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Pigeonhole_principle">Wikipedia — Pigeonhole Principle</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Birthday_problem">Wikipedia — Birthday Problem</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Combinatorics, Permutations, Probability, Pigeonhole</p>
+</body>
+</html>

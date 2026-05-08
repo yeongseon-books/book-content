@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Refactoring Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Refactoring Basics</h1>
+<blockquote>
+<p>Clean Code 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When should you stop refactoring?</p>
+<blockquote>
+<p>When the next change is easier — not when the code looks cleaner.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What refactoring is and what it is not</li>
+<li>Core techniques from the Fowler catalog</li>
+<li>Characterization tests</li>
+<li>A safe step-by-step refactoring process</li>
+<li>Strategies for legacy code</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Refactoring is not rewriting. It improves internal structure while preserving external behavior.</p>
+<blockquote>
+<p>Refactoring is an investment that lowers the cost of the next change.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    T[&quot;Tests pass&quot;] --&gt; R[&quot;Tiny refactor&quot;]
+    R --&gt; T2[&quot;Tests pass&quot;]
+    T2 --&gt; R2[&quot;Next step&quot;]
+</code></pre>
+<p>Small steps between green and green.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Refactoring</strong>: Internal change that does not alter external behavior.</li>
+<li><strong>Characterization test</strong>: Locks in current behavior.</li>
+<li><strong>Code smell</strong>: Improvement signal (long function, large class, data clumps).</li>
+<li><strong>Two hats</strong>: Never add features and refactor in the same change.</li>
+<li><strong>Mikado method</strong>: Decompose a big change into a graph of small steps.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def order_total(o):
+    s = 0
+    for it in o.items:
+        s += it.price * it.qty
+    if o.coupon: s -= 10
+    if o.member: s = s * 0.9
+    return s
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def subtotal(items): return sum(i.price * i.qty for i in items)
+def with_coupon(s, coupon): return s - 10 if coupon else s
+def with_member(s, member): return s * 0.9 if member else s
+
+def order_total(o):
+    s = subtotal(o.items)
+    s = with_coupon(s, o.coupon)
+    s = with_member(s, o.member)
+    return s
+</code></pre>
+<p>Each step splits one piece of meaning.</p>
+<h2>Hands-on: Five Steps to Safe Refactoring</h2>
+<p><strong>Step 1 — Characterization tests as a safety net</strong></p>
+<pre><code class="language-python"># 1_characterize.py
+def test_legacy_total():
+    o = make_order(items=[(100, 2)], coupon=True, member=True)
+    assert order_total(o) == 171  # capture current behavior as is
+</code></pre>
+<p>Capture before you understand.</p>
+<p><strong>Step 2 — Extract Function</strong></p>
+<pre><code class="language-python"># 2_extract.py
+def subtotal(items): return sum(i.price * i.qty for i in items)
+</code></pre>
+<p>Cut into small units of meaning.</p>
+<p><strong>Step 3 — Rename</strong></p>
+<pre><code class="language-python"># 3_rename.py
+# Rename progressively so that names reveal intent.
+def items_subtotal(items): ...
+</code></pre>
+<p>Use IDE refactoring tools.</p>
+<p><strong>Step 4 — Inline and Move</strong></p>
+<pre><code class="language-python"># 4_move.py
+# Move a misplaced function to the right module/class.
+class OrderPricing:
+    def total(self, order): ...
+</code></pre>
+<p>Raise cohesion.</p>
+<p><strong>Step 5 — Keep two hats separate</strong></p>
+<pre><code class="language-python"># 5_two_hats.py
+# Never mix feature changes and refactoring in one PR.
+# PR-1: refactor (preserves behavior)
+# PR-2: add feature (new behavior)
+</code></pre>
+<p>Make the change reviewable.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Tests stay green after every step.</li>
+<li>Each change is small.</li>
+<li>Names reveal intent.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Starting without tests.</strong> Regressions become accidents.</li>
+<li><strong>One huge step.</strong> No way to roll back.</li>
+<li><strong>Mixing with features.</strong> Reviews are impossible.</li>
+<li><strong>Changing structure but keeping old names.</strong> Half the value lost.</li>
+<li><strong>Aesthetic refactoring.</strong> Does not make the next change easier.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Strong teams require a refactoring PR to be merged before each feature PR. Feature PRs shrink and reviews speed up.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Refactors only when the next change becomes easier.</li>
+<li>Takes small steps with fast tests.</li>
+<li>Keeps the two hats apart.</li>
+<li>Starts legacy work with characterization tests.</li>
+<li>Decomposes big changes via the Mikado graph.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Are tests green before starting?</li>
+<li>[ ] Are steps small enough?</li>
+<li>[ ] Are features kept out of the refactor?</li>
+<li>[ ] Do names now reveal intent?</li>
+<li>[ ] Has the next change become easier?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pin one 50+ line function with characterization tests and decompose it in three steps.</li>
+<li>Move one misplaced function to a more appropriate module.</li>
+<li>Open and merge one refactor-only PR.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Refactoring is an investment that lowers the next change's cost. The final episode wraps the series with good code review standards.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/04-simplifying-conditionals.md">Simplifying Conditionals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/05-removing-duplication.md">Removing Duplication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/06-error-handling.md">Error Handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/07-comments-and-docs.md">Comments and Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/08-testable-code.md">Testable Code</a></li>
+<li><strong>Refactoring Basics (current)</strong></li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/books/refactoring.html">Refactoring (Martin Fowler)</a></li>
+<li><a href="https://refactoring.com/catalog/">Refactoring Catalog</a></li>
+<li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code (M. Feathers)</a></li>
+<li><a href="https://mikadomethod.info/">The Mikado Method</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Refactoring, Patterns, LegacyCode, Quality</p>
+</body>
+</html>

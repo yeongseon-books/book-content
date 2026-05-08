@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Designing the MVP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Designing the MVP</h1>
+<blockquote>
+<p>Capstone Project 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> is an <em>MVP</em> a <em>learning tool</em> rather than a <em>small product</em>?</p>
+<blockquote>
+<p>Because it lets you <em>test</em> a <em>hypothesis</em> at <em>minimum cost</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>MVP</em> definition</li>
+<li>One <em>core flow</em></li>
+<li><em>Out-of-scope</em> decisions</li>
+<li>A <em>demo scenario</em></li>
+<li>Collecting <em>feedback</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>An <em>MVP</em> is where <em>learning</em> actually begins.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Problem] --&gt; H[Hypothesis]
+    H --&gt; M[MVP]
+    M --&gt; F[Feedback]
+    F --&gt; N[Next]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>MVP</strong>: <em>Minimum Viable Product</em>.</li>
+<li><strong>happy path</strong>: the <em>normal flow</em>.</li>
+<li><strong>out of scope</strong>: outside the <em>scope</em>.</li>
+<li><strong>demo</strong>: a <em>live walkthrough</em>.</li>
+<li><strong>feedback</strong>: structured <em>responses</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Build <em>every feature</em>.</p>
+<p><strong>After</strong>: <em>Finish one flow</em>.</p>
+<h2>Hands-on: MVP Table</h2>
+<p><strong>Step 1 — Pick the core flow</strong></p>
+<pre><code class="language-python">flow = &quot;register -&gt; upload -&gt; share&quot;
+</code></pre>
+<p><strong>Step 2 — Out of scope list</strong></p>
+<pre><code class="language-python">out = [&quot;payment&quot;, &quot;i18n&quot;, &quot;admin&quot;]
+</code></pre>
+<p><strong>Step 3 — Demo scenario</strong></p>
+<pre><code class="language-python">demo = [&quot;login_demo_user&quot;, &quot;upload_sample&quot;, &quot;show_share_link&quot;]
+</code></pre>
+<p><strong>Step 4 — Success criteria</strong></p>
+<pre><code class="language-python">success = {&quot;happy_path&quot;: &quot;&lt;= 60s&quot;, &quot;errors&quot;: 0}
+</code></pre>
+<p><strong>Step 5 — Feedback form</strong></p>
+<pre><code class="language-python">form = [&quot;clarity&quot;, &quot;speed&quot;, &quot;value&quot;]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>flow</em> is one <em>sentence</em>.</li>
+<li><em>Out of scope</em> is <em>explicit</em>.</li>
+<li><em>Criteria</em> are <em>numbers</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Measuring <em>progress</em> by <em>feature count</em>.</strong></li>
+<li><strong>Trying to handle <em>every</em> exception.</strong></li>
+<li><strong>No <em>demo scenario</em>.</strong></li>
+<li><strong>No <em>feedback</em> form.</strong></li>
+<li><strong>Adding <em>external dependencies</em> that grow risk.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startups also start with a <em>one-line happy path</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>An <em>MVP</em> is a <em>learning tool</em>.</li>
+<li>The <em>flow</em> is <em>single</em>.</li>
+<li><em>Cutting</em> scope is <em>bold</em>.</li>
+<li>The <em>demo</em> is <em>scripted</em>.</li>
+<li><em>Feedback</em> is <em>structured</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Core flow</em> defined.</li>
+<li>[ ] <em>Out-of-scope</em> list.</li>
+<li>[ ] <em>Demo</em> scenario.</li>
+<li>[ ] <em>Feedback</em> form.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State what <em>MVP</em> means in one line.</li>
+<li>Define <em>happy path</em> in one line.</li>
+<li>State the meaning of <em>out of scope</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Choosing the Tech Stack</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/03-defining-the-problem.md">Defining the Problem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/04-organizing-requirements.md">Organizing Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/05-splitting-team-roles.md">Splitting Team Roles</a></li>
+<li><strong>Designing the MVP (current)</strong></li>
+<li>Choosing the Tech Stack (upcoming)</li>
+<li>Schedule Management (upcoming)</li>
+<li>Building Presentation Materials (upcoming)</li>
+<li>Project Retrospective (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://theleanstartup.com/">The Lean Startup - Eric Ries</a></li>
+<li><a href="https://www.atlassian.com/agile/product-management/minimum-viable-product">MVP - Lean Methodology</a></li>
+<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired - Marty Cagan</a></li>
+<li><a href="https://www.producttalk.org/continuous-discovery/">Continuous Discovery Habits</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, MVP, Scope, Product, Beginner</p>
+</body>
+</html>

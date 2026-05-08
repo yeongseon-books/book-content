@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Registers and the ALU</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Registers and the ALU</h1>
+<blockquote>
+<p>Computer Architecture 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you run <code>x = 3</code>, where does that 3 actually live for a moment, and who carries out the addition?</p>
+<blockquote>
+<p>Inside a CPU, data shuttles constantly between memory and registers. Registers are the smallest and fastest storage, and the ALU (Arithmetic Logic Unit) is the circuit that actually performs operations. Every add, compare, and bit operation is one ALU cycle, and every variable's temporary home is a register. This article looks inside.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a register is and how it differs from memory</li>
+<li>General-purpose and special registers (PC, SP, FLAGS)</li>
+<li>The role of the ALU and its core operations</li>
+<li>An intuition for compiler register allocation</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The number of registers is the number of variables a CPU can hold at once. Too few and the code keeps bouncing through memory (slow). More allows the compiler more freedom. ALU throughput sets the upper bound on how many operations finish per cycle. Both shape the performance ceiling of code you write every day.</p>
+<blockquote>
+<p>"Is this variable in a register or in memory?" is the starting question for nearly every hot-path optimization.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A register is small storage inside a CPU core: typically a few dozen, each 64 bits wide, and accessible in less than a cycle. The ALU takes two register values as inputs and produces a result in one cycle. All arithmetic and logic happens here.</p>
+</blockquote>
+<pre><code class="language-text">   +----------------------- CPU Core ----------------------+
+   |                                                       |
+   |   +--------+    +-------+    +---------+              |
+   |   |  RAX   |---&gt;|       |    |         |              |
+   |   |  RBX   |---&gt;|  ALU  |---&gt;|  RAX    |              |
+   |   |  RCX   |    |       |    | (result)|              |
+   |   |  ...   |    +-------+    +---------+              |
+   |   +--------+                                          |
+   |                                                       |
+   |   PC | SP | FLAGS  &lt;- special registers               |
+   +-------------------------------------------------------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Register</strong><br>
+- Description: The fastest storage in a CPU core</p>
+<p><strong>General-purpose</strong><br>
+- Description: Holds arbitrary data (R0..R15, etc.)</p>
+<p><strong>PC</strong><br>
+- Description: Program counter, address of the next instruction</p>
+<p><strong>SP</strong><br>
+- Description: Stack pointer, used in function calls</p>
+<p><strong>FLAGS</strong><br>
+- Description: Comparison results (zero, sign, overflow, ...)</p>
+<p><strong>ALU</strong><br>
+- Description: Circuit that performs arithmetic and logic</p>
+<h2>Before / After</h2>
+<p><strong>Before — "a variable is just a variable":</strong></p>
+<pre><code class="language-python">def hot_loop():
+    s = 0
+    for i in range(1000):
+        s += i * 2 + 1
+    return s
+</code></pre>
+<p><strong>After — "a variable occupies a register":</strong></p>
+<pre><code class="language-text">On entry the compiler may assign:
+- s   -&gt; R0
+- i   -&gt; R1
+- temp (i*2+1) -&gt; R2
+
+One iteration:
+- R2 = R1 &lt;&lt; 1    # i * 2 via shift
+- R2 = R2 + 1
+- R0 = R0 + R2
+- R1 = R1 + 1
+- compare and branch
+</code></pre>
+<p>When the loop fits in registers, no memory access is needed.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Build a tiny ALU</strong></p>
+<pre><code class="language-python">class ALU:
+    &quot;&quot;&quot;A few basic arithmetic and logic operations.&quot;&quot;&quot;
+    def execute(self, op, a, b):
+        if op == &quot;ADD&quot;: return a + b
+        if op == &quot;SUB&quot;: return a - b
+        if op == &quot;AND&quot;: return a &amp; b
+        if op == &quot;OR&quot;:  return a | b
+        if op == &quot;XOR&quot;: return a ^ b
+        if op == &quot;SHL&quot;: return a &lt;&lt; b
+        if op == &quot;SHR&quot;: return a &gt;&gt; b
+        raise ValueError(op)
+
+alu = ALU()
+print(alu.execute(&quot;ADD&quot;, 3, 5))   # 8
+print(alu.execute(&quot;SHL&quot;, 1, 4))   # 16
+</code></pre>
+<p>The ALU is a set of simple two-input, one-output functions. Real circuits hew close to this abstraction.</p>
+<p><strong>Step 2: Build a tiny register file</strong></p>
+<pre><code class="language-python">class RegisterFile:
+    def __init__(self, n=8):
+        self.regs = [0] * n
+
+    def read(self, idx):
+        return self.regs[idx]
+
+    def write(self, idx, value):
+        self.regs[idx] = value
+
+    def __repr__(self):
+        return &quot; &quot;.join(f&quot;R{i}={v}&quot; for i, v in enumerate(self.regs))
+
+rf = RegisterFile()
+rf.write(0, 3)
+rf.write(1, 5)
+print(rf)   # R0=3 R1=5 R2=0 ...
+</code></pre>
+<p>A register file looks like a small array. In hardware it supports several simultaneous reads and writes per cycle through multiple ports.</p>
+<p><strong>Step 3: Combine ALU, registers, and instructions</strong></p>
+<pre><code class="language-python">def run(program, rf, alu):
+    for instr in program:
+        op, dst, src1, src2 = instr
+        a = rf.read(src1)
+        b = src2 if isinstance(src2, int) else rf.read(src2)
+        result = alu.execute(op, a, b)
+        rf.write(dst, result)
+
+rf, alu = RegisterFile(), ALU()
+rf.write(0, 7)
+rf.write(1, 3)
+
+# R2 = R0 + R1; R3 = R2 &lt;&lt; 1; R4 = R3 - R0
+run([
+    (&quot;ADD&quot;, 2, 0, 1),
+    (&quot;SHL&quot;, 3, 2, 1),     # immediate 1
+    (&quot;SUB&quot;, 4, 3, 0),
+], rf, alu)
+print(rf)   # R0=7 R1=3 R2=10 R3=20 R4=13
+</code></pre>
+<p>Register-to-register instructions dominate any ISA. Code that rarely touches memory is the fastest code.</p>
+<p><strong>Step 4: Use a FLAGS register for comparisons</strong></p>
+<pre><code class="language-python">class CPU:
+    def __init__(self):
+        self.rf = RegisterFile()
+        self.alu = ALU()
+        self.flags = {&quot;Z&quot;: 0, &quot;N&quot;: 0}   # zero, negative
+
+    def cmp(self, src1, src2):
+        diff = self.alu.execute(&quot;SUB&quot;, self.rf.read(src1), self.rf.read(src2))
+        self.flags[&quot;Z&quot;] = int(diff == 0)
+        self.flags[&quot;N&quot;] = int(diff &lt; 0)
+
+cpu = CPU()
+cpu.rf.write(0, 10); cpu.rf.write(1, 10)
+cpu.cmp(0, 1); print(cpu.flags)   # Z=1, N=0  (equal)
+cpu.rf.write(1, 11)
+cpu.cmp(0, 1); print(cpu.flags)   # Z=0, N=1  (less)
+</code></pre>
+<p>Conditions like <code>if a == b</code> and <code>if a &lt; b</code> are implemented as a SUB followed by a FLAGS check.</p>
+<p><strong>Step 5: Mimic compiler register allocation</strong></p>
+<pre><code class="language-python">def assign_registers(variables, num_regs=4):
+    &quot;&quot;&quot;Simplest first-fit allocator.&quot;&quot;&quot;
+    mapping = {}
+    free = list(range(num_regs))
+    for v in variables:
+        if not free:
+            mapping[v] = &quot;STACK&quot;   # spill
+        else:
+            mapping[v] = f&quot;R{free.pop(0)}&quot;
+    return mapping
+
+print(assign_registers([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]))
+print(assign_registers([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;, &quot;f&quot;]))
+</code></pre>
+<p>When registers run out, some variables spill to the stack (memory). Deep functions and large expressions therefore see more memory traffic.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The ALU is a simple two-input, one-output circuit</li>
+<li>Registers are few and fast (dozens, sub-cycle access)</li>
+<li>FLAGS is set by comparisons and consumed by branches</li>
+<li>Variables that do not fit in registers are spilled to the stack</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Variable explosion</strong><br>
+- Problem: Register pressure causes spills<br>
+- Fix: Reduce variables in hot functions</p>
+<p><strong>Inlining everything</strong><br>
+- Problem: Inlined code worsens register pressure<br>
+- Fix: Consider function splitting</p>
+<p><strong>Equating float and integer ALU</strong><br>
+- Problem: FPU and SIMD units are separate<br>
+- Fix: Measure float costs separately</p>
+<p><strong>Treating compares as expensive</strong><br>
+- Problem: They are one-cycle SUB+FLAG<br>
+- Fix: Branches, not compares, are costly</p>
+<p><strong>Treating registers as named variables</strong><br>
+- Problem: Register numbers != source names<br>
+- Fix: Keep them separate when reading assembly</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Embedded firmware: data type choices match register width</li>
+<li>ML inference: SIMD registers (AVX, NEON) for many values per instruction</li>
+<li>Graphics: GPU shaders use thousands of registers</li>
+<li>Compilers: graph-coloring register allocation to minimize spills</li>
+<li>Security: prevent FLAGS leakage in side-channel-resistant code</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer notices the local-variable count of hot functions. When live variables exceed the architectural registers (e.g., 16 on x86-64), the compiler starts using the stack and the per-iteration cost rises. Decisions to slim variables or split a large function come from that intuition.</p>
+<p>A senior also remembers that "FLAGS is an invisible byproduct." Branches that depend on a recent comparison can misbehave if other instructions land in between. They rarely write assembly by hand, but they can read it well enough to trust the compiler.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name the difference between a register and memory in one sentence</li>
+<li>[ ] You can list examples of general-purpose and special registers</li>
+<li>[ ] You can sketch what the ALU does in one cycle</li>
+<li>[ ] You know the role of FLAGS</li>
+<li>[ ] You can explain why register spills are expensive</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Use <code>RegisterFile</code> and <code>ALU</code> to compute the sum of 1..N using only registers — no memory access.</p>
+</li>
+<li>
+<p>Use FLAGS to implement <code>c = 1 if a &lt; b else 0</code> at the instruction level. Combine CMP, JL, and MOV.</p>
+</li>
+<li>
+<p>Compile a function you wrote on godbolt.org and count the registers used. Push variables past 16 and compare -O0 with -O2 output.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Registers are the fastest storage the CPU can hold at hand, and the ALU is where computation actually happens. Every variable passes through registers, and when they run out the surplus spills to memory. Watching the variable count of hot functions is the start of small wins.</p>
+<p>Next we zoom out to the larger landscape of memory: how RAM is addressed and how virtual memory builds on top of it.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
+<li><strong>Registers and the ALU (current)</strong></li>
+<li>Memory Organization (upcoming)</li>
+<li>Cache and Locality (upcoming)</li>
+<li>Pipelining (upcoming)</li>
+<li>I/O and Devices (upcoming)</li>
+<li>Parallelism and Multicore (upcoming)</li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1">Patterson &amp; Hennessy — Computer Organization and Design</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Arithmetic_logic_unit">Wikipedia — Arithmetic logic unit</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Processor_register">Wikipedia — Processor register</a></li>
+<li><a href="https://wiki.osdev.org/CPU_Registers_x86-64">Intel x86-64 Register Reference</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Registers, ALU, CPU, Computation</p>
+</body>
+</html>

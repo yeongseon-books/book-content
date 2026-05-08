@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Algorithms and Math</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Algorithms and Math</h1>
+<blockquote>
+<p>Math for CS 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does the <em>math</em> from this series come together in <em>algorithm design</em>?</p>
+<blockquote>
+<p><em>Math</em> shapes the <em>analysis</em>, <em>design</em>, and <em>limits</em> of every algorithm you write.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Complexity</em> and <em>combinatorics</em></li>
+<li><em>Graph algorithms</em></li>
+<li><em>Randomized algorithms</em></li>
+<li>Analysis of <em>gradient descent</em></li>
+<li><em>Information-theoretic</em> limits</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>This <em>capstone</em> synthesizes the series and shows that <em>seeing problems mathematically</em> changes <em>outcomes</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[Combinatorics] --&gt; X[Complexity]
+    B[Graphs] --&gt; Y[Algorithms]
+    C[Probability] --&gt; Z[Randomized]
+    D[Calculus] --&gt; W[Optimization]
+    E[Info Theory] --&gt; V[Lower Bound]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>complexity</strong>: <em>cost</em> vs <em>input size</em>.</li>
+<li><strong>shortest path</strong>: <em>minimum-distance</em> route.</li>
+<li><strong>randomized</strong>: branches on a <em>coin flip</em>.</li>
+<li><strong>optimization</strong>: search for <em>min/max</em>.</li>
+<li><strong>lower bound</strong>: a <em>line of impossibility</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: an algorithm is <em>just code</em>.</p>
+<p><strong>After</strong>: an algorithm is <em>analyzed</em> and bounded by <em>math</em>.</p>
+<h2>Hands-on: Mini Capstone Kit</h2>
+<p><strong>Step 1 — Combinatorial Complexity</strong></p>
+<pre><code class="language-python">def subsets(n):
+    return 2 ** n
+</code></pre>
+<p><strong>Step 2 — BFS Shortest Path</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def shortest(G, s, t):
+    q, seen = deque([(s, 0)]), {s}
+    while q:
+        v, d = q.popleft()
+        if v == t:
+            return d
+        for n in G[v]:
+            if n not in seen:
+                seen.add(n)
+                q.append((n, d + 1))
+    return -1
+</code></pre>
+<p><strong>Step 3 — Randomized Estimate</strong></p>
+<pre><code class="language-python">import random
+
+def estimate_pi(n=10000):
+    inside = sum(1 for _ in range(n) if random.random() ** 2 + random.random() ** 2 &lt; 1)
+    return 4 * inside / n
+</code></pre>
+<p><strong>Step 4 — Gradient Descent Min</strong></p>
+<pre><code class="language-python">def minimize(f, x, lr=0.1, steps=100, h=1e-5):
+    for _ in range(steps):
+        g = (f(x + h) - f(x - h)) / (2 * h)
+        x = x - lr * g
+    return x
+</code></pre>
+<p><strong>Step 5 — Entropy Lower Bound</strong></p>
+<pre><code class="language-python">import math
+
+def lower_bound_bits(probs):
+    return sum(-p * math.log2(p) for p in probs if p &gt; 0)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Combinatorics</em> explains <em>exponential blowup</em>.</li>
+<li><em>Graphs</em> are <em>models</em>.</li>
+<li><em>Randomness</em> enables <em>approximation</em>.</li>
+<li><em>Calculus</em> powers <em>optimization</em>.</li>
+<li><em>Entropy</em> sets the <em>compression floor</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Skipping <em>complexity</em> analysis.</strong></li>
+<li><strong>Failing to <em>model</em> the problem as a graph.</strong></li>
+<li><strong>Treating <em>randomized</em> output as <em>deterministic</em>.</strong></li>
+<li><strong>Ignoring <em>learning rate</em> tuning.</strong></li>
+<li><strong>Ignoring <em>theoretical limits</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Search indexing (graphs + info theory)</em>, <em>recommenders (linalg + probability)</em>, <em>training (calculus + probability)</em>, and <em>design reviews (complexity)</em> all combine these tools.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Math</em> is a <em>lens</em>.</li>
+<li><em>Complexity</em> is a <em>budget</em>.</li>
+<li><em>Probability</em> is <em>reality</em>.</li>
+<li><em>Information theory</em> sets <em>limits</em>.</li>
+<li><em>Modeling</em> comes <em>before code</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] State the <em>complexity</em>.</li>
+<li>[ ] State the <em>model</em>.</li>
+<li>[ ] Isolate <em>randomness</em>.</li>
+<li>[ ] Verify <em>convergence</em>.</li>
+<li>[ ] Acknowledge <em>theoretical limits</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the link between <em>complexity</em> and <em>combinatorics</em> in one line.</li>
+<li>State an advantage of <em>randomized</em> algorithms in one line.</li>
+<li>State a <em>limit</em> that <em>information theory</em> imposes in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This post wraps the <em>Math for CS 101</em> series. <em>Math</em> is the <em>map</em> that gives your <em>code</em> both <em>direction</em> and <em>boundaries</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/07-linear-algebra.md">Linear Algebra</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/08-calculus.md">Calculus</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/09-information-theory.md">Information Theory</a></li>
+<li><strong>Algorithms and Math (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms - CLRS</a></li>
+<li><a href="https://www.pearson.com/en-us/subject-catalog/p/algorithm-design/P200000003259">Algorithm Design - Kleinberg and Tardos</a></li>
+<li><a href="https://www.cambridge.org/9780521474658">Randomized Algorithms - Motwani and Raghavan</a></li>
+<li><a href="https://web.stanford.edu/~boyd/cvxbook/">Convex Optimization - Boyd and Vandenberghe</a></li>
+</ul>
+<p class="tags-line">Tags: Math, Algorithms, Complexity, Capstone, Beginner</p>
+</body>
+</html>

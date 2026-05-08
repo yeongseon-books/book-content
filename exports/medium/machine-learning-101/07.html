@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Clustering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Clustering</h1>
+<blockquote>
+<p>Machine Learning 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: With no labels to score against, how do you know the clusters are any good?</p>
+<blockquote>
+<p><em>Clustering reveals latent structure in data through similarity. Validation requires both metrics and judgment.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between KMeans and DBSCAN</li>
+<li>How to choose K with elbow and silhouette</li>
+<li>Why standardization is decisive</li>
+<li>The responsibility of interpreting clusters</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Data[&quot;X (no y)&quot;] --&gt; Std[&quot;standardize&quot;]
+    Std --&gt; KM[&quot;KMeans (K)&quot;]
+    Std --&gt; DB[&quot;DBSCAN (eps)&quot;]
+    KM --&gt; Out[&quot;clusters&quot;]
+    DB --&gt; Out
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>KMeans</strong>: K centroids minimizing within-cluster distance.</li>
+<li><strong>DBSCAN</strong>: density-based clustering with noise.</li>
+<li><strong>Inertia</strong>: sum of squared distances to centroids.</li>
+<li><strong>Silhouette</strong>: cohesion versus separation.</li>
+<li><strong>Elbow</strong>: the point where additional K stops helping much.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "K = 3, done." — without justification.</p>
+<p><strong>After</strong>: Combine elbow, silhouette, and domain knowledge to choose K.</p>
+<h2>Hands-on: 5 Steps of Clustering</h2>
+<p><strong>Step 1 — Data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+X = StandardScaler().fit_transform(load_iris().data)
+</code></pre>
+<p><strong>Step 2 — KMeans</strong></p>
+<pre><code class="language-python">from sklearn.cluster import KMeans
+km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
+print(&quot;inertia:&quot;, km.inertia_)
+</code></pre>
+<p><strong>Step 3 — Silhouette</strong></p>
+<pre><code class="language-python">from sklearn.metrics import silhouette_score
+print(&quot;sil:&quot;, silhouette_score(X, km.labels_))
+</code></pre>
+<p><strong>Step 4 — Elbow</strong></p>
+<pre><code class="language-python">ks = list(range(2, 8))
+scores = [KMeans(n_clusters=k, n_init=10, random_state=0).fit(X).inertia_ for k in ks]
+print(list(zip(ks, scores)))
+</code></pre>
+<p><strong>Step 5 — DBSCAN</strong></p>
+<pre><code class="language-python">from sklearn.cluster import DBSCAN
+db = DBSCAN(eps=0.5, min_samples=5).fit(X)
+print(&quot;labels:&quot;, set(db.labels_))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>KMeans needs <code>K</code>; DBSCAN needs <code>eps</code>.</li>
+<li>Standardization changes the entire result.</li>
+<li>A label of <code>-1</code> from DBSCAN means noise.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Using distance-based methods without standardizing first.</li>
+<li>Choosing K without visual confirmation.</li>
+<li>Forgetting that KMeans only fits convex clusters well.</li>
+<li>Treating cluster labels as ground truth.</li>
+<li>Fixing DBSCAN's <code>eps</code> without considering data scale.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Customer segmentation, color quantization, and anomaly detection all rely on clustering as the standard tool of unsupervised exploration.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Clusters are hypotheses, not answers.</li>
+<li>Validate downstream with measurable outcomes.</li>
+<li>Visualization carries the decision.</li>
+<li>Density methods handle outliers gracefully.</li>
+<li>Business meaning ultimately picks K.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I always standardize before distance-based methods.</li>
+<li>[ ] I look at elbow and silhouette together.</li>
+<li>[ ] I know the meaning of DBSCAN noise labels.</li>
+<li>[ ] I treat cluster output as a hypothesis.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Sweep K from 2 to 7 and compare silhouette scores.</li>
+<li>Compare KMeans with and without standardization.</li>
+<li>Try DBSCAN with <code>eps</code> values 0.3, 0.5, and 1.0 and count clusters.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Clustering exposes hidden structure. Next, we examine overfitting and regularization, the limits of model fitting.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/02-supervised-and-unsupervised.md">Supervised and Unsupervised Learning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/03-train-test-split.md">Train/Test Split</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/04-linear-regression.md">Linear Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/05-logistic-regression.md">Logistic Regression</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/06-decision-tree-and-random-forest.md">Decision Tree and Random Forest</a></li>
+<li><strong>Clustering (current)</strong></li>
+<li>Overfitting and Regularization (upcoming)</li>
+<li>Model Evaluation (upcoming)</li>
+<li>The ML Project Workflow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/clustering.html">scikit-learn — Clustering</a></li>
+<li><a href="https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html">scikit-learn — Silhouette analysis</a></li>
+<li><a href="https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf">DBSCAN — Ester et al. (1996)</a></li>
+<li><a href="https://www.youtube.com/watch?v=4b5d3muPQmA">StatQuest — KMeans</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, Clustering, KMeans, DBSCAN, UnsupervisedLearning</p>
+</body>
+</html>

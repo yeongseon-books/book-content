@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>An Operable DevOps Flow</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>An Operable DevOps Flow</h1>
+<blockquote>
+<p>DevOps 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Does <em>Code -&gt; CI -&gt; CD -&gt; Monitor -&gt; Incident -&gt; Postmortem</em> close as a <em>feedback loop</em>?</p>
+<blockquote>
+<p><em>DevOps</em> is <em>a flow</em>, not <em>a toolbox</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>whole flow</em> that ties this series together</li>
+<li>The <em>four DORA metrics</em> and how to measure them</li>
+<li><em>Team rituals</em> that keep the flow alive</li>
+<li>A <em>next-step learning path</em> (Observability / SRE / Kubernetes)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Adopting tools <em>one by one</em> creates <em>islands</em>. Only when they connect as a <em>flow</em> do you get <em>speed and stability</em> together.</p>
+<blockquote>
+<p>What is <em>not measured</em> is <em>not improved</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;code&quot;] --&gt; CI[&quot;CI&quot;]
+    CI --&gt; CD[&quot;CD&quot;]
+    CD --&gt; Monitor[&quot;monitor &amp; log&quot;]
+    Monitor --&gt; Incident[&quot;incident&quot;]
+    Incident --&gt; Postmortem[&quot;postmortem&quot;]
+    Postmortem --&gt; Code
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>DORA metrics</strong>: the <em>four metrics</em> from Google's research.</li>
+<li><strong>Deploy frequency</strong>: <em>how often</em> you deploy.</li>
+<li><strong>Lead time for changes</strong>: time from merge to production.</li>
+<li><strong>Change failure rate</strong>: percentage of deploys that <em>cause incidents</em>.</li>
+<li><strong>MTTR</strong>: mean time to <em>recover</em>.</li>
+<li><strong>Ritual</strong>: a recurring <em>team meeting</em> with a clear purpose.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: build, deploy, and monitoring run <em>separately</em> and no one looks at the <em>whole picture</em>.</p>
+<p><strong>After</strong>: a <em>single dashboard</em> shows the <em>four DORA metrics</em> and the team reviews it weekly.</p>
+<h2>Hands-on: Build the Flow in 5 Steps</h2>
+<p><strong>Step 1 — Draw the flow on one page</strong></p>
+<pre><code class="language-text">On a single sheet of paper:
+PR -&gt; CI -&gt; staging -&gt; prod -&gt; alert -&gt; on-call -&gt; postmortem
+For each step, write the *owner* and the *tool*.
+</code></pre>
+<p><strong>Step 2 — Start measuring DORA</strong></p>
+<pre><code class="language-python"># Simplest start: create a GitHub Release on every deploy.
+# Even hand-tracking these four numbers weekly is enough.
+metrics = {
+    &quot;deploy_frequency&quot;: &quot;5 per week&quot;,
+    &quot;lead_time&quot;: &quot;6 hours average&quot;,
+    &quot;change_failure_rate&quot;: &quot;8%&quot;,
+    &quot;mttr&quot;: &quot;22 minutes&quot;,
+}
+</code></pre>
+<p><strong>Step 3 — Weekly ritual: deploy review (30 min)</strong></p>
+<pre><code class="language-text">- Last week's deploy count
+- One incident summary from last week
+- This week's risky deploys
+</code></pre>
+<p><strong>Step 4 — Monthly ritual: postmortem reading (60 min)</strong></p>
+<pre><code class="language-text">- Read the month's postmortems together
+- Track the action-item completion rate
+- When patterns appear, change the *system*
+</code></pre>
+<p><strong>Step 5 — Quarterly: choose the next step</strong></p>
+<pre><code class="language-text">- Pick the next learning track
+- Add or remove tools
+- Propose org-structure changes
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Metrics can start by hand</em>. Automate them later.</li>
+<li><em>Rituals</em> are <em>short and recurring</em>.</li>
+<li>The team <em>learns</em> the moment the <em>feedback loop closes</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Adopting <em>tools first</em>.</strong> Without a flow, tools become <em>islands</em>.</li>
+<li><strong>Watching only <em>MTTR</em> of the four DORA metrics.</strong> Watch all four for <em>balance</em>.</li>
+<li><strong>Not <em>reading postmortems</em>.</strong> The same incidents <em>repeat</em>.</li>
+<li><strong>Long, ceremonial rituals.</strong> Keep them <em>short and data-driven</em>.</li>
+<li><strong>No owner for improvement.</strong> Decide <em>who owns the flow</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature organizations have a <em>platform team</em> that ships an <em>internal developer platform (IDP)</em> exposing the flow as <em>self-service</em>. Every new service inherits the <em>same flow</em> for free.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>The flow is the architecture</em>.</li>
+<li>Without metrics, debate is just <em>opinion</em>.</li>
+<li><em>Small rituals</em> drive <em>large change</em>.</li>
+<li><em>Platformization</em> is the next step.</li>
+<li><em>Learning never stops</em> — pick the next series.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] The <em>whole flow</em> is on <em>one diagram</em>.</li>
+<li>[ ] The team reviews the <em>four DORA metrics</em> weekly.</li>
+<li>[ ] <em>Weekly and monthly rituals</em> are scheduled.</li>
+<li>[ ] The <em>flow has an owner</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Draw your team's <em>Code -&gt; Postmortem</em> flow.</li>
+<li>Hand-measure the <em>four DORA metrics</em> for one week.</li>
+<li>Run one 30-minute <em>weekly deploy review</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>This concludes DevOps 101. Suggested learning paths next:</p>
+<ul>
+<li><strong>Observability 101</strong> — combining metrics, logs, and traces</li>
+<li><strong>SRE 101</strong> — operating reliability with SLO/SLI and error budgets</li>
+<li><strong>Kubernetes 101</strong> — a serious entry into container orchestration</li>
+</ul>
+<blockquote>
+<p><em>DevOps</em> is not a <em>collection of tools</em> but <em>the way a team learns</em>.</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">The CI Pipeline</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/03-cd-and-deployment.md">CD and Deployment Strategies</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/04-environments-and-config.md">Environments and Configuration</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/05-infrastructure-as-code.md">Infrastructure as Code</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/06-containers-and-build.md">Containers and Builds</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/07-monitoring-and-alerting.md">Monitoring and Alerting</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/08-logging-and-analysis.md">Logging and Analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/09-incident-and-oncall.md">Incident Response and On-Call</a></li>
+<li><strong>An Operable DevOps Flow (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://dora.dev/">DORA Research Program</a></li>
+<li><a href="https://sre.google/workbook/table-of-contents/">Google SRE Workbook</a></li>
+<li><a href="https://itrevolution.com/product/accelerate/">Accelerate (book)</a></li>
+<li><a href="https://teamtopologies.com/">Team Topologies</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, DORA, Strategy, Capstone, Engineering</p>
+</body>
+</html>

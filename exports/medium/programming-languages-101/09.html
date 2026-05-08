@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Static vs Dynamic Languages</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Static vs Dynamic Languages</h1>
+<blockquote>
+<p>Programming Languages 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is static typing really "safer" than dynamic typing — and what does that safety actually cover?</p>
+<blockquote>
+<p>Static and dynamic are not good and bad. They are a choice between <strong>checking at compile time or at run time</strong>. Both catch the same kinds of errors, but at different moments and at different costs. Neither stops every bug.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>A one-line definition of static vs dynamic</li>
+<li>The difference shown by the same function with and without hints</li>
+<li>What mypy/pyright catches and what it cannot</li>
+<li>What gradual typing makes possible</li>
+<li>The limits of the "static is safe, dynamic is fast" myth</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Every team debates "should we add more types?" Holding that conversation well requires a one-line answer for what static typing guarantees and what it does not.</p>
+<blockquote>
+<p>A type is a promise about the shape of data. Where that promise is checked is what static vs dynamic comes down to.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;source&quot;] --&gt; B{&quot;when is type checked?&quot;}
+    B --&gt;|compile time| C[&quot;static: errors blocked before run&quot;]
+    B --&gt;|run time| D[&quot;dynamic: only known when hit&quot;]
+    C --&gt; E[&quot;TypeError breaks the build&quot;]
+    D --&gt; F[&quot;TypeError fires in production&quot;]
+</code></pre>
+<p>The same kind of bug — caught by static at build time, by dynamic at run time.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Static typing</strong>: Variable and expression types are determined and checked at compile time.</li>
+<li><strong>Dynamic typing</strong>: Types are attached to values; checking happens at run time.</li>
+<li><strong>Strong vs weak</strong>: How much implicit conversion is allowed (think <code>1 + "1"</code>).</li>
+<li><strong>Gradual typing</strong>: Mixing static and dynamic regions in one codebase (Python, TypeScript).</li>
+<li><strong>Soundness</strong>: A guarantee that any code the type checker accepts behaves only according to its types.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — dynamic code with no hints</strong></p>
+<pre><code class="language-python">def total(items):
+    return sum(item.price for item in items)
+</code></pre>
+<p>The caller is responsible for <code>item</code> having <code>price</code>. A wrong input only blows up in production with <code>AttributeError</code>.</p>
+<p><strong>After — type hints make the contract explicit</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Item:
+    price: int
+
+def total(items: list[Item]) -&gt; int:
+    return sum(item.price for item in items)
+</code></pre>
+<p>Now mypy/pyright check callers too. Wrong inputs are blocked at build time.</p>
+<h2>Hands-on: Compare Both Models on the Same Code</h2>
+<p><strong>Step 1 — Errors mypy catches</strong></p>
+<pre><code class="language-python"># 1_mypy.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+print(add(1, 2))
+print(add(&quot;1&quot;, &quot;2&quot;))   # mypy: error — incompatible argument
+</code></pre>
+<p>Run <code>mypy 1_mypy.py</code> and the second call fails. A bug found without ever executing the code.</p>
+<p><strong>Step 2 — Errors that still only show up at run time</strong></p>
+<pre><code class="language-python"># 2_runtime_only.py
+import json
+
+data = json.loads('{&quot;price&quot;: &quot;10&quot;}')   # mypy sees dict[str, Any]
+def total(items):
+    return sum(i[&quot;price&quot;] for i in items)
+print(total([data]))                    # runtime TypeError
+</code></pre>
+<p>External inputs (JSON, DB, env vars) have no compile-time shape. Static typing's guarantee ends at "this code."</p>
+<p><strong>Step 3 — Gradual typing in action</strong></p>
+<pre><code class="language-python"># 3_gradual.py
+def parse(raw: str) -&gt; dict:        # only partly typed
+    return eval(raw)                # dynamic region (and risky)
+
+def use(d: dict[str, int]) -&gt; int:  # precisely typed
+    return sum(d.values())
+
+print(use(parse('{&quot;a&quot;: 1, &quot;b&quot;: 2}')))
+</code></pre>
+<p>Python is built so the two regions can coexist — receive dynamically at the edge, handle statically inside. TypeScript's <code>any</code> plays the same role.</p>
+<p><strong>Step 4 — Structural typing with <code>Protocol</code></strong></p>
+<pre><code class="language-python"># 4_protocol.py
+from typing import Protocol
+
+class Pricable(Protocol):
+    price: int
+
+def total(items: list[Pricable]) -&gt; int:
+    return sum(i.price for i in items)
+
+class Book:
+    def __init__(self, price: int) -&gt; None:
+        self.price = price
+
+print(total([Book(10), Book(20)]))   # OK — Book has the right shape
+</code></pre>
+<p>"Same shape passes" without inheritance is possible in static typing too. Think of it as static-checked duck typing.</p>
+<p><strong>Step 5 — Where dynamic languages shine</strong></p>
+<pre><code class="language-python"># 5_dynamic_strength.py
+def call_all(d: dict, *args):
+    for name, fn in d.items():
+        print(name, fn(*args))
+
+ops = {
+    &quot;add&quot;: lambda x, y: x + y,
+    &quot;mul&quot;: lambda x, y: x * y,
+}
+call_all(ops, 3, 4)
+</code></pre>
+<p>Metaprogramming and plugin patterns are possible in static typing too, but usually with more boilerplate. Dynamic expressiveness shows up here.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Static typing's guarantee ends where external input begins.</li>
+<li>Gradual typing is a pragmatic answer that blends both models.</li>
+<li><code>Protocol</code> and duck typing express "same shape" without inheritance.</li>
+<li>There are areas where dynamic genuinely wins (metaprogramming, short scripts).</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>The "static is safe, dynamic is risky" dichotomy.</strong> Both pay different costs.</li>
+<li><strong>Believing type hints stop bad external input.</strong> You still need boundary validation (e.g., <code>pydantic</code>).</li>
+<li><strong>Sprinkling <code>Any</code> everywhere.</strong> Gradual typing collapses back into dynamic typing.</li>
+<li><strong>Adding hints but never running the checker.</strong> Without mypy/pyright in CI, the hints are documentation at best.</li>
+<li><strong>Treating types and unit tests as substitutes.</strong> They catch different kinds of bugs.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large Python codebases now run mypy/pyright in CI almost universally. JavaScript has effectively standardized on TypeScript — separate from any JIT performance benefit, the maintenance value is large.</p>
+<p>A common design pattern is now "validate strongly at the boundary, type precisely inside" — <code>pydantic</code>, <code>attrs</code>, and <code>dataclass</code> + <code>Protocol</code> are the typical tools.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Asks "where does checking happen for this code?" first.</li>
+<li>Always validates external input at the boundary.</li>
+<li>Uses gradual typing but watches the cost of <code>Any</code>.</li>
+<li>Treats types and tests as complements, not substitutes.</li>
+<li>Knows when dynamic fits better (short scripts, notebooks) vs when static fits better (shared libraries, long-lived services).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the static–dynamic difference in one line?</li>
+<li>[ ] Do you run mypy/pyright in CI?</li>
+<li>[ ] Is there boundary validation where external input enters?</li>
+<li>[ ] Do you monitor your <code>Any</code> usage?</li>
+<li>[ ] Can you state what gradual typing means in one line?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add type hints to a recent function and run mypy. Summarize the kinds of errors it catches in a paragraph.</li>
+<li>Apply a <code>pydantic</code> model at one JSON-receiving endpoint. Compare the error messages before and after.</li>
+<li>Convert the <code>Protocol</code> in step 4 to ABC inheritance (<code>abc.ABC</code>) and write a paragraph on what changes.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Static and dynamic are not better and worse — they are tradeoffs. In the final episode we put all these choices together and ask what makes a good language design.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/01-what-is-a-programming-language.md">What Is a Programming Language?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/02-syntax-and-semantics.md">Syntax and Semantics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/03-type-system.md">Type Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/04-scope-and-binding.md">Scope and Binding</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/05-functions-and-closures.md">Functions and Closures</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/06-objects-and-prototypes.md">Objects and Prototypes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/07-memory-management.md">Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/programming-languages-101/en/08-interpreter-and-compiler.md">Interpreters and Compilers</a></li>
+<li><strong>Static vs Dynamic Languages (current)</strong></li>
+<li>What Makes a Good Language Design? (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
+<li><a href="https://mypy.readthedocs.io/">mypy documentation</a></li>
+<li><a href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html">TypeScript Handbook — Basic Types</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Gradual_typing">Gradual typing (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Programming Languages, StaticTyping, DynamicTyping, Tradeoffs, Safety</p>
+</body>
+</html>

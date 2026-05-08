@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is Cloud Computing?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What is Cloud Computing?</h1>
+<blockquote>
+<p>Cloud Computing 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why did we stop buying servers and start <em>renting computing power</em> over the internet?</p>
+<blockquote>
+<p><em>Cloud computing rents compute, storage, and network on demand and bills only for what you use.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The five essential characteristics of cloud</li>
+<li>On-premises vs cloud</li>
+<li>The three major providers</li>
+<li>The shared responsibility model</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>You can launch a global service with <em>zero up-front capital</em>. The trade-off is that you must understand <em>cost</em> and <em>responsibility boundaries</em> from day one.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;user&quot;] --&gt; Net[&quot;internet&quot;]
+    Net --&gt; CSP[&quot;cloud provider&quot;]
+    CSP --&gt; Compute[&quot;compute&quot;]
+    CSP --&gt; Storage[&quot;storage&quot;]
+    CSP --&gt; Network[&quot;network&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>CSP</strong>: Cloud Service Provider (AWS, Azure, GCP).</li>
+<li><strong>Elasticity</strong>: automatic scale-up and scale-down with demand.</li>
+<li><strong>On-demand</strong>: provision a resource the moment you need it.</li>
+<li><strong>Pay-as-you-go</strong>: billed by usage, not by purchase.</li>
+<li><strong>Shared responsibility</strong>: who secures what — provider vs customer.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: order servers, install them, wait six weeks.</p>
+<p><strong>After</strong>: click in the console, instance is ready in a minute.</p>
+<h2>Hands-on: Your First Cloud Resource — S3 with boto3</h2>
+<p><strong>Step 1 — Install</strong></p>
+<pre><code class="language-bash">pip install boto3
+</code></pre>
+<p><strong>Step 2 — Credentials</strong></p>
+<pre><code class="language-bash">export AWS_ACCESS_KEY_ID=&quot;...&quot;
+export AWS_SECRET_ACCESS_KEY=&quot;...&quot;
+export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
+</code></pre>
+<p><strong>Step 3 — Client</strong></p>
+<pre><code class="language-python">import boto3
+
+s3 = boto3.client(&quot;s3&quot;)
+</code></pre>
+<p><strong>Step 4 — Create a bucket</strong></p>
+<pre><code class="language-python">def create_bucket(name: str):
+    s3.create_bucket(Bucket=name)
+    return name
+</code></pre>
+<p><strong>Step 5 — Upload an object</strong></p>
+<pre><code class="language-python">def upload(bucket: str, key: str, data: bytes):
+    s3.put_object(Bucket=bucket, Key=key, Body=data)
+    return f&quot;s3://{bucket}/{key}&quot;
+
+print(upload(&quot;my-test-bucket-2026&quot;, &quot;hello.txt&quot;, b&quot;hi cloud&quot;))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Credentials live in environment variables, not source code.</li>
+<li>Clients are reusable — create once, call many times.</li>
+<li>Bucket names are globally unique across all of AWS.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Doing daily work as the root account.</strong></li>
+<li><strong>Skipping region — resources land somewhere unexpected.</strong></li>
+<li><strong>Public bucket misconfiguration leading to data leaks.</strong></li>
+<li><strong>No tags — billing becomes impossible to attribute.</strong></li>
+<li><strong>Forgetting cleanup — costs accumulate silently.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startups begin on AWS Free Tier, scale with Auto Scaling Groups when traffic grows, and put budget alarms in place before bills get scary.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>The cloud is for <em>fast experiments</em>.</li>
+<li>Document the responsibility boundary explicitly.</li>
+<li>Multi-region is a <em>result</em>, not a goal.</li>
+<li>Cost is an architectural metric.</li>
+<li>Apply least-privilege IAM from day one.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Root account is locked down.</li>
+<li>[ ] MFA is enabled.</li>
+<li>[ ] Budget alarms are configured.</li>
+<li>[ ] A resource-tagging policy exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a delete-bucket helper to the code above.</li>
+<li>In one sentence, explain why a closer region means lower latency.</li>
+<li>Name one workload that is still better on-premises.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Cloud is a <em>model</em>, not a technology. The next post draws the lines between IaaS, PaaS, and SaaS.</p>
+<ul>
+<li><strong>What is Cloud Computing? (current)</strong></li>
+<li>IaaS, PaaS, SaaS (upcoming)</li>
+<li>Region and Availability Zone (upcoming)</li>
+<li>Compute (upcoming)</li>
+<li>Storage (upcoming)</li>
+<li>Network (upcoming)</li>
+<li>Identity and Security (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://csrc.nist.gov/publications/detail/sp/800-145/final">NIST — definition of cloud computing</a></li>
+<li><a href="https://aws.amazon.com/architecture/well-architected/">AWS Well-Architected</a></li>
+<li><a href="https://cloud.google.com/docs/overview">Google Cloud — concepts</a></li>
+<li><a href="https://learn.microsoft.com/azure/cloud-adoption-framework/">Azure — what is cloud computing</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, AWS, Infrastructure, DevOps, Networking</p>
+</body>
+</html>

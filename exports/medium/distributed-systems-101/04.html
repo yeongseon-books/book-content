@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Consistency and CAP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Consistency and CAP</h1>
+<blockquote>
+<p>Distributed Systems 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The moment data lives in more than one place, why does "what is the latest value?" suddenly become hard?</p>
+<blockquote>
+<p>CAP says that during a partition you must give up either consistency or availability. The shape of that compromise is the consistency model you choose.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The many meanings of consistency (different from the C in transactions)</li>
+<li>The spectrum from linearizable to sequential to causal to eventual</li>
+<li>The CAP theorem and the misunderstandings around it</li>
+<li>What PACELC adds to CAP</li>
+<li>Where real databases sit on the spectrum</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A one-line difference like "this DB is strongly consistent" or "eventual" reshapes the whole design. The screens you can build, your retry policy, and the failure behavior all flow from this. Without CAP vocabulary you cannot read database docs.</p>
+<blockquote>
+<p>A consistency model is data's social contract.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;linearizable&quot;] --&gt; B[&quot;sequential&quot;]
+    B --&gt; C[&quot;causal&quot;]
+    C --&gt; D[&quot;eventual&quot;]
+    A -.-&gt;|stronger| D
+</code></pre>
+<p>Toward the left is intuitive but expensive. Toward the right is cheap and available but further from intuition.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Linearizability</strong>: Every node behaves as if there were a single timeline.</li>
+<li><strong>Sequential consistency</strong>: All nodes see the same order, but real-time order is not guaranteed.</li>
+<li><strong>Causal consistency</strong>: Only the ordering of causally related operations is preserved.</li>
+<li><strong>Eventual consistency</strong>: All replicas converge given enough time.</li>
+<li><strong>CAP</strong>: During a partition you must choose between C and A.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — "let the DB decide"</strong></p>
+<pre><code class="language-text">defaults silently chosen -&gt; races and stale reads in production
+</code></pre>
+<p><strong>After — explicit model selection</strong></p>
+<pre><code class="language-text">orders/payments -&gt; linearizable, feeds/recommendations -&gt; eventual
+</code></pre>
+<p>You distribute cost by screen.</p>
+<h2>Hands-on: See the Models in Code</h2>
+<p><strong>Step 1 — single node (the linearizable baseline)</strong></p>
+<pre><code class="language-python"># 1_single.py
+log = []
+def write(x): log.append(x)
+def read(): return log[-1] if log else None
+</code></pre>
+<p>On a single node every read sees the latest write. That intuition is the baseline.</p>
+<p><strong>Step 2 — async replica (eventual)</strong></p>
+<pre><code class="language-python"># 2_eventual.py
+import threading, time
+primary = []
+replica = []
+def write(x):
+    primary.append(x)
+    threading.Thread(target=lambda: (time.sleep(0.5), replica.append(x))).start()
+def read_primary(): return primary[-1] if primary else None
+def read_replica(): return replica[-1] if replica else None
+</code></pre>
+<p>A value just written is invisible on the replica for half a second. That is eventual in one snippet.</p>
+<p><strong>Step 3 — fake read-your-writes</strong></p>
+<pre><code class="language-python"># 3_ryw.py
+session_writes = {}
+def write(uid, x):
+    primary.append(x); session_writes[uid] = x
+def read(uid):
+    if uid in session_writes:
+        return session_writes[uid]   # users see their own writes immediately
+    return read_replica()
+</code></pre>
+<p>This is the common pattern of layering a stronger guarantee on top of a weaker model.</p>
+<p><strong>Step 4 — partition simulation (CAP choice)</strong></p>
+<pre><code class="language-python"># 4_partition.py (pseudocode)
+def write(x):
+    if not majority_alive():
+        # CP: refuse
+        raise Exception(&quot;no majority&quot;)
+        # AP: accept locally and merge later
+</code></pre>
+<p>Two lines of difference separate CP from AP.</p>
+<p><strong>Step 5 — fake causal (one-line vector clock)</strong></p>
+<pre><code class="language-python"># 5_vector.py
+clock = {&quot;A&quot;:0, &quot;B&quot;:0}
+def tick(node): clock[node] += 1
+def happens_before(a, b):
+    return all(a[k] &lt;= b[k] for k in a) and any(a[k] &lt; b[k] for k in a)
+</code></pre>
+<p>Causal models only need to preserve happens-before. Concurrent events are free to be in any order.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Consistency is a spectrum, not a binary.</li>
+<li>A single system can choose different models per screen.</li>
+<li>Read-your-writes is the trick that saves UX on weaker models.</li>
+<li>CP vs AP under partition is a policy decision, not automatic.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing CAP's C with the C of ACID transactions.</strong> Two different concepts.</li>
+<li><strong>Calling a system "CP" globally.</strong> Different calls in the same system can choose different models.</li>
+<li><strong>Reading "eventual" as "soon."</strong> There is no time bound in the guarantee.</li>
+<li><strong>Assuming read-your-writes is automatic.</strong> You must implement it.</li>
+<li><strong>Promising strong consistency while ignoring partitions.</strong> You will not deliver.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spanner, etcd, and ZooKeeper aim near linearizability (CP). DynamoDB, Cassandra, and Redis Cluster default close to eventual (AP). Even within one company, payment DBs go CP and recommendation caches go AP. PACELC adds the latency vs consistency view for the partition-free common case.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They map models to screens, not to the whole system.</li>
+<li>They implement read-your-writes explicitly (sticky sessions and so on).</li>
+<li>They treat partition policy as an operational responsibility.</li>
+<li>They measure "strong consistency is expensive" via SLOs.</li>
+<li>They distrust docs that do not name the model.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the difference between linearizable and eventual in one line?</li>
+<li>[ ] Can you say what CAP means when there is no partition?</li>
+<li>[ ] Can you map your system's screens to consistency models?</li>
+<li>[ ] Can you describe how to implement read-your-writes?</li>
+<li>[ ] Do you know what the ELC in PACELC means?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Map three of your service's main data sets to a model (linearizable / causal / eventual).</li>
+<li>Design how to guarantee read-your-writes in an eventual system.</li>
+<li>Write down whether you would pick CP or AP under partition and why.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The consistency model is the most important tradeoff axis once data is distributed. Next we look at the direct cause behind that choice — the kinds of replication and the sync vs async tradeoff.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/01-what-is-a-distributed-system.md">What Is a Distributed System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/02-failure-model.md">Failure Models</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/distributed-systems-101/en/03-rpc-and-message-passing.md">RPC and Message Passing</a></li>
+<li><strong>Consistency and CAP (current)</strong></li>
+<li>replication (upcoming)</li>
+<li>consensus and Raft (upcoming)</li>
+<li>leader election (upcoming)</li>
+<li>message queues and event sourcing (upcoming)</li>
+<li>distributed transactions (upcoming)</li>
+<li>patterns for operable distributed systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/CAP_theorem">CAP theorem (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Consistency_model">Consistency model (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/PACELC_theorem">PACELC theorem (Wikipedia)</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — chapter 9</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Distributed Systems, Consistency, CAP, Linearizability, Eventual Consistency</p>
+</body>
+</html>

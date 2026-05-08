@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is an API?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is an API?</h1>
+<blockquote>
+<p>API Design 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The word <em>API</em> is everywhere — what does it actually mean?</p>
+<blockquote>
+<p>A <em>call contract</em> between two systems. A good API makes that contract <em>easy to read</em> and <em>easy to change</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and kinds of APIs</li>
+<li>Five conditions for a "good API"</li>
+<li>Library API vs web API</li>
+<li>The contract between client and server</li>
+<li>A map of the whole series</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>An API is the <em>face</em> of a system. The internals can change freely as long as the API stays stable; if the API moves, every internal tweak becomes an external storm.</p>
+<blockquote>
+<p>An API should look more like a <em>promise that does not change</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;Client&quot;] --&gt;|&quot;request&quot;| API[&quot;API contract&quot;]
+    API --&gt; Server[&quot;Server (impl)&quot;]
+    Server --&gt;|&quot;response&quot;| API
+    API --&gt; Client
+</code></pre>
+<p>The client only needs to know the <em>contract</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>API (Application Programming Interface)</strong>: a contract between caller and provider.</li>
+<li><strong>Endpoint</strong>: the call target (URL + method).</li>
+<li><strong>Request/Response</strong>: the units of call and reply.</li>
+<li><strong>Contract</strong>: the shape and meaning of input/output.</li>
+<li><strong>Versioning</strong>: how the contract changes over time.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (no contract)</strong></p>
+<pre><code class="language-python"># the client has to know the server's internals
+data = open(&quot;/var/db/users.json&quot;).read()
+</code></pre>
+<p><strong>After (using an API)</strong></p>
+<pre><code class="language-python"># only the contract is required
+import requests
+data = requests.get(&quot;https://api.example.com/users&quot;).json()
+</code></pre>
+<p>Internals can change without touching the client.</p>
+<h2>Hands-on: Five Steps to Understand APIs</h2>
+<p><strong>Step 1 — Call a library API</strong></p>
+<pre><code class="language-python"># 1_lib_api.py
+import json
+data = json.dumps({&quot;a&quot;: 1})
+print(data)
+</code></pre>
+<p><code>json.dumps</code> is also an API — agreed input gives agreed output.</p>
+<p><strong>Step 2 — Call a web API</strong></p>
+<pre><code class="language-python"># 2_web_api.py
+import requests
+r = requests.get(&quot;https://api.github.com/repos/python/cpython&quot;)
+print(r.status_code, r.json()[&quot;full_name&quot;])
+</code></pre>
+<p>HTTP is the most common <em>transport</em>.</p>
+<p><strong>Step 3 — Look at the contract</strong></p>
+<pre><code class="language-python"># 3_contract.py
+# from https://docs.github.com/en/rest, GET /repos/{owner}/{repo}
+# - input: owner, repo (path)
+# - output: 200 OK + JSON (full_name, stargazers_count, ...)
+</code></pre>
+<p>The documentation <em>is</em> the contract.</p>
+<p><strong>Step 4 — A minimal server</strong></p>
+<pre><code class="language-python"># 4_min_server.py
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+@app.get(&quot;/health&quot;)
+def health(): return jsonify(status=&quot;ok&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    app.run(port=8000)
+</code></pre>
+<p>The smallest contract — <code>GET /health</code> → <code>{"status": "ok"}</code>.</p>
+<p><strong>Step 5 — Verify with a client</strong></p>
+<pre><code class="language-python"># 5_call.py
+import requests
+r = requests.get(&quot;http://localhost:8000/health&quot;)
+assert r.status_code == 200
+assert r.json() == {&quot;status&quot;: &quot;ok&quot;}
+</code></pre>
+<p>Tests <em>verify</em> the contract.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The client knows nothing about the server's <em>internals</em>.</li>
+<li>Implementation can change freely as long as the contract holds.</li>
+<li>Status code and body are the two axes of every response contract.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Starting without contract documentation.</strong> Clients have to guess.</li>
+<li><strong>Ignoring status codes.</strong> Returning 200 for everything.</li>
+<li><strong>Free-form error bodies.</strong> Clients cannot parse them.</li>
+<li><strong>Deploying without versioning.</strong> Every change becomes a storm.</li>
+<li><strong>Designing without a client in mind.</strong> The user perspective is missing.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>GitHub's REST API, Stripe's API, Google Maps API — all <em>documented contracts</em>. Internally, OpenAPI (Swagger) plays the same role. The better the company, the more <em>internal</em> APIs are treated like external ones.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Sketch the contract <em>first</em> (schema → code).</li>
+<li>Call it from the client's perspective.</li>
+<li>Specify both status codes and bodies.</li>
+<li>Errors deserve a <em>shape</em> too.</li>
+<li>Documentation grows with the code (auto-generated OpenAPI).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does this API have <em>public documentation</em>?</li>
+<li>[ ] Are input/output shapes explicit?</li>
+<li>[ ] Is the list of status codes explicit?</li>
+<li>[ ] Is the error body shape consistent?</li>
+<li>[ ] Does the client come with example calls?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick five <em>API functions</em> from your favorite library and tabulate input/output.</li>
+<li>Read a public web API doc and call one endpoint.</li>
+<li>Run your own small Flask server and define a <code>/health</code> contract.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>An API is a <em>contract</em>. The next post moves to its most common shape — REST basics.</p>
+<ul>
+<li><strong>What Is an API? (current)</strong></li>
+<li>REST Basics (upcoming)</li>
+<li>Resource Design (upcoming)</li>
+<li>HTTP Methods and Status Codes (upcoming)</li>
+<li>Request and Response Schemas (upcoming)</li>
+<li>Pagination and Filtering (upcoming)</li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/API">What is an API? (MDN)</a></li>
+<li><a href="https://docs.github.com/en/rest">GitHub REST API</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
+<li><a href="https://flask.palletsprojects.com/quickstart/">Flask Quickstart</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, REST, HTTP, Backend, WebDevelopment</p>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Severity Classification</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Severity Classification</h1>
+<blockquote>
+<p>Incident Response 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you say <em>how serious</em> it is in a <em>shared language</em>?</p>
+<blockquote>
+<p><em>Severity</em> is the agreed <em>language</em> that maps <em>impact</em> to <em>levels</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>severity</em></li>
+<li><em>SEV1/2/3</em> mapping</li>
+<li><em>Automated decisions</em></li>
+<li><em>Team-specific</em> differences</li>
+<li><em>Common pitfalls</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Using the <em>same word</em> with <em>different meanings</em> makes response <em>misfire</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Impact[&quot;impact&quot;] --&gt; Map[&quot;mapping&quot;]
+    Map --&gt; SEV[&quot;SEV1/2/3&quot;]
+    SEV --&gt; Roles[&quot;roles&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SEV1</strong>: <em>company-wide impact</em>.</li>
+<li><strong>SEV2</strong>: <em>major feature degradation</em>.</li>
+<li><strong>SEV3</strong>: <em>partial degradation</em>.</li>
+<li><strong>scope</strong>: the <em>range of impact</em>.</li>
+<li><strong>duration</strong>: how <em>long</em> it lasts.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: vague phrases like "this is <em>serious</em>".</p>
+<p><strong>After</strong>: an agreed <em>level</em> like "<em>SEV2</em>".</p>
+<h2>Hands-on: Severity Mapping</h2>
+<p><strong>Step 1 — Impact axes</strong></p>
+<pre><code class="language-python">def axes(users, region, money_loss):
+    return {&quot;users&quot;: users, &quot;region&quot;: region, &quot;money&quot;: money_loss}
+</code></pre>
+<p><strong>Step 2 — Mapping</strong></p>
+<pre><code class="language-python">def severity(a):
+    if a[&quot;users&quot;] &gt; 100000 or a[&quot;money&quot;] &gt; 100000:
+        return &quot;SEV1&quot;
+    if a[&quot;users&quot;] &gt; 1000:
+        return &quot;SEV2&quot;
+    return &quot;SEV3&quot;
+</code></pre>
+<p><strong>Step 3 — Page policy</strong></p>
+<pre><code class="language-python">def page_policy(sev):
+    return {&quot;SEV1&quot;: &quot;all&quot;, &quot;SEV2&quot;: &quot;primary&quot;, &quot;SEV3&quot;: &quot;next-day&quot;}[sev]
+</code></pre>
+<p><strong>Step 4 — Report cadence</strong></p>
+<pre><code class="language-python">def report_every_min(sev):
+    return {&quot;SEV1&quot;: 15, &quot;SEV2&quot;: 30, &quot;SEV3&quot;: 60}[sev]
+</code></pre>
+<p><strong>Step 5 — Auto routing</strong></p>
+<pre><code class="language-python">def route(a):
+    sev = severity(a)
+    return {&quot;sev&quot;: sev, &quot;page&quot;: page_policy(sev), &quot;every&quot;: report_every_min(sev)}
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Axes</em> break down the <em>impact</em>.</li>
+<li>Each <em>level</em> maps to <em>behavior</em>.</li>
+<li><em>Auto routing</em> reduces <em>errors</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong><em>Vague</em> level definitions.</strong></li>
+<li><strong>Forgetting <em>monetary impact</em>.</strong></li>
+<li><strong>Fuzzy line between <em>SEV2</em> and <em>SEV3</em>.</strong></li>
+<li><strong>Manual classification with no <em>automation</em>.</strong></li>
+<li><strong>Centering <em>internal impact</em> over <em>customer impact</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A <em>payment failure</em> defaults to <em>SEV1</em>; a <em>search result ordering bug</em> defaults to <em>SEV3</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A <em>level</em> is a <em>shorthand for behavior</em>.</li>
+<li>Keep the <em>axes</em> to a <em>minimum</em>.</li>
+<li>Settle the <em>boundaries</em> with <em>examples</em>.</li>
+<li><em>Automation</em> is the <em>default</em> for decisions.</li>
+<li><em>Differentiate</em> by product or region.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Level definitions</em>.</li>
+<li>[ ] <em>Mapping code</em>.</li>
+<li>[ ] <em>Behavior matrix</em>.</li>
+<li>[ ] <em>Example cases</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>SEV1</em> in one line.</li>
+<li>Define <em>scope</em> in one line.</li>
+<li>Define <em>duration</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>initial response</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><strong>Severity Classification (current)</strong></li>
+<li>Initial Response (upcoming)</li>
+<li>Communication (upcoming)</li>
+<li>Writing the Timeline (upcoming)</li>
+<li>Root Cause Analysis (upcoming)</li>
+<li>Mitigation and Resolution (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://response.pagerduty.com/before/severity_levels/">Severity Levels - PagerDuty</a></li>
+<li><a href="https://www.atlassian.com/incident-management/kpis/severity-levels">Severity Levels - Atlassian</a></li>
+<li><a href="https://www.datadoghq.com/blog/incident-management/">Incident Severity - Datadog</a></li>
+<li><a href="https://sre.google/workbook/incident-response/">Severity Classification - Google SRE Workbook</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Severity, Triage, Response, Operations</p>
+</body>
+</html>

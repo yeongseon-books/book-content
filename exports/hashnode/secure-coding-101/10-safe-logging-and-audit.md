@@ -1,0 +1,162 @@
+
+# Safe Logging and Audit
+
+> Secure Coding 101 series (10/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: When an incident hits, can we *reconstruct exactly what happened*? And does that record *avoid becoming the attacker's ladder*?
+
+> *Logs are *evidence and risk*. Real logging needs *masking* and *tamper evidence* together.*
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- The difference between *application log* and *audit log*
+- *Sensitive-field masking* policy
+- *Tamper evidence* and *retention*
+- The role of a *SIEM*
+- A five-step routine and five common mistakes
+
+## Why It Matters
+
+The first question in incident response is *when, who, what*. If you cannot answer, the *incident never ends*. Meanwhile, if passwords, tokens, or card numbers slip into logs, the *incident doubles*.
+
+> *Record everything precisely. Never record secrets.*
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    App["App"] -->|JSON log| Mask["Masking"]
+    Mask --> Storage["Immutable storage"]
+    Storage --> SIEM["SIEM / alerts"]
+    Audit["Auth / authz / payments"] --> Storage
+```
+
+## Key Terms
+
+- **Application log**: ordinary logs for *debugging and operations*.
+- **Audit log**: *legal evidence* of *who did what*.
+- **Tamper evidence**: ability to *detect modifications*.
+- **Retention**: *how long* the log is kept.
+- **SIEM**: a system that *collects, analyzes, alerts* on security logs.
+
+## Before/After
+
+**Before**: `print` lines containing the *raw password*. *No retention policy*. No way to tell *who deleted what*.
+
+**After**: Structured *JSON logs*, sensitive fields *masked*, *append-only* storage, explicit *retention*.
+
+## Hands-on: Safe Logging in Five Steps
+
+### Step 1 — Structured logs
+
+```python
+import json, time
+def log_event(event, **fields):
+    print(json.dumps({"ts": time.time(), "event": event, **fields}))
+```
+
+### Step 2 — Mask sensitive fields
+
+```python
+SENSITIVE = {"password", "token", "card_number", "ssn"}
+
+def mask(d):
+    return {k: ("***" if k in SENSITIVE else v) for k, v in d.items()}
+
+log_event("login", **mask({"user": "ana", "password": "x"}))
+```
+
+### Step 3 — Separate the audit log
+
+```python
+def audit(actor, action, target, result):
+    log_event(
+        "audit", actor=actor, action=action,
+        target=target, result=result,
+    )
+```
+
+### Step 4 — Append-only storage
+
+```bash
+# Object storage with Object Lock or immutability turned on
+aws s3api put-object-lock-configuration ...
+```
+
+### Step 5 — Retention policy
+
+```text
+- application log: 30 days
+- audit log: 1+ year (per regulation)
+- integrity check every quarter
+```
+
+## What to Notice in This Code
+
+- *Audit log* is *separate* from the application log.
+- Masking is the *default*; you opt out, not in.
+- Append-only storage *leaves traces* of any tampering.
+
+## Five Common Mistakes
+
+1. **Letting *passwords or tokens* flow into logs.** One line is enough.
+2. **Mixing *audit and application* logs.** Investigation becomes *impossible*.
+3. **Keeping logs only on *server disks*.** Attackers *delete them*.
+4. **Inconsistent timezones.** Local time instead of UTC.
+5. **Infinite retention.** Cost *explodes* and incidents *get worse*.
+
+## How This Shows Up in Production
+
+Most teams pipe *JSON logs* through a collector (*Fluent Bit*, *Vector*) into *central storage* (*Loki*, *Elasticsearch*, *S3*), and a *SIEM* (*Splunk*, *Datadog*, *Wazuh*) raises alerts on *audit patterns*.
+
+## How a Senior Engineer Thinks
+
+- *Logs are both *asset and risk*.*
+- *The audit log directly affects *business trust*.*
+- *Storage must be *immutable* to mean anything.*
+- *Masking is the *default*; opt-out only.*
+- *Retention is a *policy decision*, written down.*
+
+## Checklist
+
+- [ ] Sensitive fields are *masked*.
+- [ ] *Audit logs* are *separated*.
+- [ ] Storage is *append-only* or *immutable*.
+- [ ] *Retention* is documented.
+
+## Practice Problems
+
+1. List five *audit events* in your service.
+2. Implement a *masking* function that runs on a *Pydantic model*.
+3. Two scenarios where *append-only* could be broken.
+
+## Wrap-up and Next Steps
+
+That closes *Secure Coding 101*: validation → auth → authz → storage → secrets → DB → browser → dependencies → logging. Avoid the *most common pitfalls* at every step and your system gains *security that buys time*.
+
+- [What Is Secure Coding?](./01-what-is-secure-coding.md)
+- [Input Validation](./02-input-validation.md)
+- [Authentication and Session](./03-authentication-and-session.md)
+- [Authorization and Permissions](./04-authorization-and-permissions.md)
+- [Safe Data Storage](./05-safe-data-storage.md)
+- [Secret and Key Management](./06-secret-and-key-management.md)
+- [SQL Injection and Safe ORM Usage](./07-sql-injection-and-orm.md)
+- [XSS and CSRF Defense](./08-xss-and-csrf.md)
+- [Managing Dependency Vulnerabilities](./09-dependency-vulnerabilities.md)
+- **Safe Logging and Audit (current)**
+## References
+
+- [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
+- [NIST 800-92 — Log Management](https://csrc.nist.gov/publications/detail/sp/800-92/final)
+- [Google SRE — Logging](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [AWS S3 Object Lock](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html)
+
+Tags: Logging, AuditLog, SecureCoding, Compliance, SIEM
+
+---
+
+© 2026 YeongseonBooks. All rights reserved.

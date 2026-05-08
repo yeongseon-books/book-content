@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Volumes and Networks</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Volumes and Networks</h1>
+<blockquote>
+<p>Docker 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you keep <em>data alive across restarts</em> and let containers <em>talk to each other</em>?</p>
+<blockquote>
+<p><em>Volumes decide </em>data lifetime<em>; networks decide </em>paths between containers<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>volume / bind mount / tmpfs</em></li>
+<li><em>Bridge / host / none</em> network modes</li>
+<li>Communicating <em>by container name</em></li>
+<li>A <em>backup pattern</em> for volumes</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Data loss</em> and <em>broken communication</em> are the <em>most common incidents</em> in container ops. The right <em>volume/network model</em> prevents both.</p>
+<blockquote>
+<p><em>The moment </em>state leaks<em> into a stateless container, an incident begins.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Host[&quot;Host disk&quot;] --&gt;|bind mount| C1[&quot;Container A&quot;]
+    Vol[&quot;Docker volume&quot;] --&gt;|named| C2[&quot;Container B&quot;]
+    C1 --- Net[&quot;bridge network&quot;]
+    C2 --- Net
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Volume</strong>: a <em>persistent store</em> managed by Docker.</li>
+<li><strong>Bind mount</strong>: a <em>host path</em> mounted directly.</li>
+<li><strong>tmpfs</strong>: memory-backed <em>ephemeral</em> storage.</li>
+<li><strong>Bridge network</strong>: the default <em>virtual network</em> on one host.</li>
+<li><strong>Service discovery</strong>: <em>DNS resolution</em> by container name.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: DB data <em>disappears</em> on restart. Containers cannot reach each other on <code>localhost</code>.</p>
+<p><strong>After</strong>: <em>named volumes</em> persist data. <em>User-defined bridges</em> let containers talk <em>by name</em>.</p>
+<h2>Hands-on: Volumes and Networks in 5 Steps</h2>
+<p><strong>Step 1 — Named volume</strong></p>
+<pre><code class="language-bash">docker volume create app-data
+docker run -d --name api -v app-data:/var/lib/data myapp
+docker volume inspect app-data
+</code></pre>
+<p><strong>Step 2 — Bind mount (for dev)</strong></p>
+<pre><code class="language-bash">docker run --rm -v &quot;$PWD&quot;:/app -w /app python:3.12-slim python app.py
+</code></pre>
+<p><strong>Step 3 — User-defined bridge</strong></p>
+<pre><code class="language-bash">docker network create app-net
+docker run -d --network app-net --name db postgres:16
+docker run -d --network app-net --name api -e DB_HOST=db myapp
+# api can reach the host 'db'
+</code></pre>
+<p><strong>Step 4 — Verify communication</strong></p>
+<pre><code class="language-bash">docker exec api ping -c 1 db
+docker exec api curl http://db:5432
+</code></pre>
+<p><strong>Step 5 — Back up a volume</strong></p>
+<pre><code class="language-bash">docker run --rm \
+  -v app-data:/data \
+  -v &quot;$PWD&quot;:/backup \
+  alpine tar czf /backup/data.tgz -C /data .
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>named volume</em> lives <em>independent of containers</em>.</li>
+<li><em>User-defined bridges</em> provide <em>DNS</em> automatically.</li>
+<li><em>Bind mounts</em> often have <em>permission issues</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Saving directly to <em>paths inside</em> the container.</strong> Lost on restart.</li>
+<li><strong>Using the <em>default bridge</em>.</strong> <em>No name resolution</em>.</li>
+<li><strong>Bind mount owned by <em>root only</em>.</strong> Cannot edit from the host.</li>
+<li><strong>Volumes that are <em>never backed up</em>.</strong> Unrecoverable on incident.</li>
+<li><strong>Abusing <code>--network host</code>.</strong> Security and port-conflict risks.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Orchestrators (e.g., Kubernetes) extend the same ideas with <em>PersistentVolume</em> and <em>Service DNS</em>. Learning them here makes the transition natural.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>State is a volume; communication is a network</em>.</li>
+<li><em>User-defined bridges</em> are the <em>default</em>.</li>
+<li><em>A volume without a backup is one incident away</em>.</li>
+<li><em>Bind mounts</em> are for dev; production uses <em>named volumes</em>.</li>
+<li><em>Expose ports minimally</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Data persists in a <em>named volume</em>.</li>
+<li>[ ] Containers run on a <em>user-defined bridge</em>.</li>
+<li>[ ] They communicate <em>by name</em>.</li>
+<li>[ ] A <em>backup procedure</em> exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Persist PostgreSQL data with a <em>named volume</em>.</li>
+<li>Make two containers talk by <em>name</em> on a <em>user-defined bridge</em>.</li>
+<li>Back up a volume's contents with <em>tar</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Data and networking are the <em>pillars</em> of container ops. Next, <em>Docker Compose</em> runs many containers <em>at once</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/01-what-is-docker.md">What Is Docker?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/02-image-and-container.md">Images and Containers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/docker-101/en/03-dockerfile.md">Writing a Dockerfile</a></li>
+<li><strong>Volumes and Networks (current)</strong></li>
+<li>Docker Compose (upcoming)</li>
+<li>Environment Variables and Configuration (upcoming)</li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/storage/volumes/">Volumes</a></li>
+<li><a href="https://docs.docker.com/storage/bind-mounts/">Bind mounts</a></li>
+<li><a href="https://docs.docker.com/network/">Networking overview</a></li>
+<li><a href="https://docs.docker.com/network/bridge/">Use bridge networks</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Volume, Network, BindMount, Bridge</p>
+</body>
+</html>

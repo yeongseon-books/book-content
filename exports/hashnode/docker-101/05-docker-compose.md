@@ -1,0 +1,188 @@
+
+# Docker Compose
+
+> Docker 101 series (5/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: How do you start many containers *reproducibly* and *all at once*?
+
+> *Compose codifies a *multi-container environment* into *one YAML file*.*
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- Defining *services / networks / volumes*
+- *depends_on* and healthchecks
+- *profiles* for *selective execution*
+- *.env* files and variable interpolation
+- Five common pitfalls
+
+## Why It Matters
+
+New-hire setup finishes in *under five minutes*. The *README setup section* simply disappears.
+
+> *Compose is the shortest path to *environment-as-code*.*
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    Compose["compose.yaml"] --> Web["web service"]
+    Compose --> Db["db service"]
+    Compose --> Cache["cache service"]
+    Web --> Net["app-net"]
+    Db --> Net
+    Cache --> Net
+```
+
+## Key Terms
+
+- **Service**: a *group of containers* from one image.
+- **Project**: the *logical unit* Compose manages.
+- **Profile**: a *bundle of services* that runs only in a specific scenario.
+- **Healthcheck**: the criterion for *readiness*.
+- **depends_on**: start *order* and *waiting*.
+
+## Before/After
+
+**Before**: five `docker run` commands wrapped in a *shell script*. Options are *remembered, not written down*.
+
+**After**: `docker compose up`. Every option is *explicit in YAML*.
+
+## Hands-on: Compose in 5 Steps
+
+### Step 1 — `compose.yaml`
+
+```yaml
+services:
+  web:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: dev
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+volumes:
+  pgdata:
+```
+
+### Step 2 — Bring it up
+
+```bash
+docker compose up -d
+docker compose ps
+docker compose logs -f web
+```
+
+### Step 3 — Variables (`.env`)
+
+```bash
+# .env
+DB_PASSWORD=dev
+APP_PORT=8000
+```
+
+```yaml
+environment:
+  POSTGRES_PASSWORD: ${DB_PASSWORD}
+ports: ["${APP_PORT}:8000"]
+```
+
+### Step 4 — Profile
+
+```yaml
+services:
+  worker:
+    image: myapp:1.0
+    profiles: ["worker"]
+```
+
+```bash
+docker compose --profile worker up -d
+```
+
+### Step 5 — Tear down
+
+```bash
+docker compose down            # remove containers
+docker compose down -v         # also remove volumes
+```
+
+## What to Notice in This Code
+
+- *healthcheck + condition: service_healthy* waits for *real readiness*.
+- `depends_on` alone only ensures *start order*, not readiness.
+- *profiles* is the standard for *optional services*.
+
+## Five Common Mistakes
+
+1. **Trusting `depends_on` and *connecting before DB is ready*.** Healthcheck is required.
+2. **Always running `up`, *never* `down -v`.** Data sits *contaminated*.
+3. **Committing `.env`.** Secrets leak.
+4. **Running *all services always* without profiles.** Resource waste.
+5. **Multiple projects on the *same port*.** Conflicts.
+
+## How This Shows Up in Production
+
+Most companies' *local dev environments* run on Compose. CI also uses it for *integration test bootstrapping*.
+
+## How a Senior Engineer Thinks
+
+- *Setup must be *one command*.
+- `depends_on` without a healthcheck is *a lie*.
+- Keep `.env` and `.env.example` *separate*.
+- *Profiles* split *complexity*.
+- Use `down -v` only when you can *recover*.
+
+## Checklist
+
+- [ ] All services live in *one compose.yaml*.
+- [ ] Dependent services have a *healthcheck*.
+- [ ] *.env / .env.example* are split.
+- [ ] Optional services use *profiles*.
+
+## Practice Problems
+
+1. Bring up *web + db + redis* via Compose.
+2. Add a *healthcheck* on db so web starts *after readiness*.
+3. Move ports into *.env* and reference them.
+
+## Wrap-up and Next Steps
+
+Compose is your team's *first piece of infrastructure as code*. Next, the patterns of *environment variables and configuration*.
+
+- [What Is Docker?](./01-what-is-docker.md)
+- [Images and Containers](./02-image-and-container.md)
+- [Writing a Dockerfile](./03-dockerfile.md)
+- [Volumes and Networks](./04-volume-and-network.md)
+- **Docker Compose (current)**
+- Environment Variables and Configuration (upcoming)
+- Containerizing a Python App (upcoming)
+- Running with a Database (upcoming)
+- Image Optimization (upcoming)
+- Production-Ready Docker (upcoming)
+## References
+
+- [Compose specification](https://docs.docker.com/compose/compose-file/)
+- [Overview of Compose](https://docs.docker.com/compose/)
+- [Compose profiles](https://docs.docker.com/compose/profiles/)
+- [Healthcheck in Compose](https://docs.docker.com/compose/compose-file/05-services/#healthcheck)
+
+Tags: Docker, Compose, YAML, MultiContainer, Dev
+
+---
+
+© 2026 YeongseonBooks. All rights reserved.

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Version Control and Release</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Version Control and Release</h1>
+<blockquote>
+<p>Software Engineering 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you ship version 1.4.2, what exactly are you promising the user?</p>
+<blockquote>
+<p>Semantic versioning is the notation for that promise. Break it and trust collapses.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Branching strategies (Trunk-Based vs Git Flow)</li>
+<li>The meaning of Semantic Versioning (SemVer)</li>
+<li>How to generate changelogs automatically</li>
+<li>Safe releases via canary and rollback</li>
+<li>Writing release notes in the user's language</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A release is the only moment your code meets the user. If something fails here, every prior effort is forgotten.</p>
+<blockquote>
+<p>Safe releases build trust faster than fast releases.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F[&quot;feature branch&quot;] --&gt; M[&quot;main&quot;]
+    M --&gt; S[&quot;staging&quot;]
+    S --&gt; C[&quot;canary&quot;]
+    C --&gt; P[&quot;production&quot;]
+</code></pre>
+<p>Each stage shrinks the cost of recovery.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Trunk-Based</strong>: short branches, frequent merges.</li>
+<li><strong>Git Flow</strong>: develop/release/hotfix branching model.</li>
+<li><strong>SemVer</strong>: MAJOR.MINOR.PATCH (breaking/feature/fix).</li>
+<li><strong>Changelog</strong>: user-facing record of changes.</li>
+<li><strong>Canary</strong>: small slice of traffic exposed first.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — giant release</strong></p>
+<pre><code class="language-text">200 PRs every two weeks -&gt; impossible to localize a bug
+</code></pre>
+<p><strong>After — incremental release</strong></p>
+<pre><code class="language-text">multiple merges per day -&gt; 5% canary -&gt; monitor -&gt; 100%
+</code></pre>
+<p>Smaller and more frequent is safer.</p>
+<h2>Hands-on: A Small Release Pipeline</h2>
+<p><strong>Step 1 — Conventional Commits</strong></p>
+<pre><code class="language-text"># 1_commits.txt
+feat(auth): add refresh token rotation
+fix(billing): handle zero amount invoices
+chore(deps): bump fastapi to 0.110
+</code></pre>
+<p>Machine-readable messages are the start of automation.</p>
+<p><strong>Step 2 — Decide SemVer</strong></p>
+<pre><code class="language-text"># 2_semver.md
+feat -&gt; MINOR
+fix  -&gt; PATCH
+BREAKING CHANGE -&gt; MAJOR
+</code></pre>
+<p>Commits decide the version.</p>
+<p><strong>Step 3 — Auto changelog</strong></p>
+<pre><code class="language-yaml"># 3_release.yml
+- uses: googleapis/release-please-action@v4
+  with:
+    release-type: python
+</code></pre>
+<p>Merging PRs generates a release PR automatically.</p>
+<p><strong>Step 4 — Canary deployment</strong></p>
+<pre><code class="language-yaml"># 4_canary.yml
+strategy:
+  canary:
+    weight: 5
+    after: { metrics: error_rate &lt; 0.5%, duration: 10m }
+</code></pre>
+<p>Expose to a few first, expand only on healthy signals.</p>
+<p><strong>Step 5 — Instant rollback</strong></p>
+<pre><code class="language-bash"># 5_rollback.sh
+kubectl rollout undo deployment/api
+</code></pre>
+<p>Rollback should complete inside one minute.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Commit conventions feed automation.</li>
+<li>Canary is a recoverable decision.</li>
+<li>Rollback speed is a measure of safety.</li>
+<li>Changelogs must speak in user language.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Manual version numbers.</strong> Humans forget.</li>
+<li><strong>Untested rollback.</strong> Your first rehearsal is the incident.</li>
+<li><strong>Giant releases.</strong> Impossible to localize a defect.</li>
+<li><strong>No commit convention.</strong> Automation stops working.</li>
+<li><strong>Release notes in dev jargon.</strong> Trust leaks away.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams combine trunk-based + feature flags + auto SemVer + canary + instant rollback. Their MTTR (mean time to recovery) is measured in minutes.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A release must be recoverable in minutes.</li>
+<li>SemVer is a contract with users.</li>
+<li>Frequent shipping is safe shipping.</li>
+<li>Any human-touched step is an automation candidate.</li>
+<li>Design assuming incidents will happen.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the branching strategy written down?</li>
+<li>[ ] Is version selection automated?</li>
+<li>[ ] Is the changelog in user language?</li>
+<li>[ ] Is there a canary stage?</li>
+<li>[ ] Can you roll back in under a minute?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Convert ten of your own commit messages to conventional commits.</li>
+<li>Rewrite a recent release note in user language.</li>
+<li>Write a one-page rollback runbook.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Releases are the interface of trust. Next we capture that trust in writing — documentation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Testing Strategy</a></li>
+<li><strong>Version Control and Release (current)</strong></li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://semver.org/">Semantic Versioning 2.0.0</a></li>
+<li><a href="https://www.conventionalcommits.org/">Conventional Commits 1.0.0</a></li>
+<li><a href="https://trunkbaseddevelopment.com/">Trunk-Based Development</a></li>
+<li><a href="https://sre.google/sre-book/release-engineering/">Google SRE Book — Release Engineering</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Git, VersionControl, Release, SemVer</p>
+</body>
+</html>

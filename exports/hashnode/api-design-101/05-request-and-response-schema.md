@@ -1,0 +1,198 @@
+
+# Request and Response Schemas
+
+> API Design 101 series (5/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: How do you define the *shape of the data* an API exchanges so that it does not wobble?
+
+> Treat the schema as a *contract outside the code*, and validate at the *boundary*.
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- JSON and content types
+- Field naming conventions
+- Where and how to validate
+- Handling dates, time zones, and numbers
+- Stability principles for response schemas
+
+## Why It Matters
+
+If schemas wobble, *everything* on the client wobbles. Good schemas are *readable* and *evolvable*. Validating at the boundary keeps the inner code *clean*.
+
+> A schema is the *grammar* of your data.
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    Client["client"] -->|"JSON request"| Validate["validate"]
+    Validate -->|"typed object"| Handler["handler"]
+    Handler -->|"typed object"| Serialize["serialize"]
+    Serialize -->|"JSON response"| Client
+```
+
+Validate at the entrance; serialize at the exit.
+
+## Key Terms
+
+- **Schema**: the format and meaning of data.
+- **Content-Type**: the body's representation — `application/json` and friends.
+- **Validation**: checking incoming data against the schema.
+- **Serialization**: turning internal objects into an external representation.
+- **ISO 8601**: the *standard* notation for dates and times.
+
+## Before / After
+
+**Before (free form)**
+
+```json
+{"u": "Y", "ct": 1714800000, "act": "ok"}
+```
+
+**After (meaningful schema)**
+
+```json
+{
+  "username": "yeongseon",
+  "created_at": "2026-05-04T12:00:00Z",
+  "active": true
+}
+```
+
+You read it once and know what it is.
+
+## Hands-on: Five Steps Through Schemas
+
+### Step 1 — JSON body and headers
+
+```python
+# 1_json.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+@app.post("/echo")
+def echo():
+    if request.headers.get("Content-Type") != "application/json":
+        return jsonify(error="json required"), 415
+    return jsonify(request.get_json())
+```
+
+The *server* checks the content type.
+
+### Step 2 — Validation library
+
+```python
+# 2_validate.py
+from pydantic import BaseModel, Field
+class CreateUser(BaseModel):
+    username: str = Field(min_length=3, max_length=32)
+    email: str
+```
+
+Pydantic, marshmallow, and friends express schemas as *code*.
+
+### Step 3 — Separate response schema
+
+```python
+# 3_response.py
+from pydantic import BaseModel
+class UserOut(BaseModel):
+    id: int
+    username: str
+    created_at: str   # ISO 8601 string
+```
+
+Input and output are *different schemas* — common naming is `In` / `Out`.
+
+### Step 4 — Dates and time zones
+
+```python
+# 4_time.py
+from datetime import datetime, timezone
+now = datetime.now(timezone.utc).isoformat()
+print(now)   # "2026-05-04T12:00:00+00:00"
+```
+
+Store and transmit in *UTC + ISO 8601*.
+
+### Step 5 — Numbers and money
+
+```python
+# 5_money.py
+# Money: integer minor units — 1.99 USD = 199 cents
+amount = 199
+currency = "USD"
+```
+
+Never use floats for money.
+
+## What to Notice in This Code
+
+- Validation and the handler are *separated*.
+- Input and output schemas are distinct.
+- Time is UTC, money is integer.
+
+## Five Common Mistakes
+
+1. **Validation inside the handler.** The handler gets dirty and the same checks repeat.
+2. **Returning the internal model directly.** Internal change becomes external break.
+3. **Ignoring time zones.** Each client interprets time differently.
+4. **Floats for money.** A cent disappears to rounding.
+5. **Cryptic field names.** `u`, `ct`, `act` — unreadable in six months.
+
+## How This Shows Up in Production
+
+Large APIs converge on *snake_case*, ISO 8601, and integer minor-unit currency (Stripe). Frameworks like FastAPI and NestJS turn schemas into *decorators* — schema is documentation, validation, and type, all at once.
+
+## How a Senior Engineer Thinks
+
+- Put the schema at the *first line* of the boundary.
+- Make inputs strict; make outputs evolvable.
+- Use *standard* formats for time and money.
+- Add new fields; never reinterpret existing ones.
+- Design responses so clients can *ignore unknown fields*.
+
+## Checklist
+
+- [ ] Does every endpoint have an input schema?
+- [ ] Are response schemas separate from input?
+- [ ] Are timestamps in UTC + ISO 8601?
+- [ ] Is money in integer minor units?
+- [ ] Are field names spelled out enough to *read*?
+
+## Practice Problems
+
+1. Express your most-used response schema as a Pydantic model.
+2. Outline how to migrate data accidentally stored in KST back to UTC.
+3. Decide whether your input schema should *reject* or *ignore* unknown fields, and write down the trade-offs.
+
+## Wrap-up and Next Steps
+
+Schemas are the grammar of data. The next episode tackles a topic that no list endpoint can avoid — pagination and filtering.
+
+- [What Is an API?](./01-what-is-an-api.md)
+- [REST Basics](./02-rest-basics.md)
+- [Resource Design](./03-resource-design.md)
+- [HTTP Methods and Status Codes](./04-http-methods-and-status.md)
+- **Request and Response Schemas (current)**
+- Pagination and Filtering (upcoming)
+- Designing Error Responses (upcoming)
+- OpenAPI and Swagger (upcoming)
+- API Versioning (upcoming)
+- Writing Good API Documentation (upcoming)
+## References
+
+- [JSON Schema](https://json-schema.org/)
+- [pydantic Documentation](https://docs.pydantic.dev/)
+- [ISO 8601 Date and Time Format](https://en.wikipedia.org/wiki/ISO_8601)
+- [Stripe API: Working with Money](https://stripe.com/docs/currencies)
+
+Tags: Computer Science, APIDesign, JSON, Schema, Validation, Backend
+
+---
+
+© 2026 YeongseonBooks. All rights reserved.

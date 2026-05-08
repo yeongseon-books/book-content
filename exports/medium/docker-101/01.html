@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is Docker?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is Docker?</h1>
+<blockquote>
+<p>Docker 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does Docker do to <em>eliminate</em> "<em>it works on my machine</em>"?</p>
+<blockquote>
+<p><em>Docker bundles your </em>application + dependencies + runtime<em> into </em>one unit<em> so it runs </em>the same everywhere<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>containers</em> and <em>virtual machines</em></li>
+<li>The <em>environment-drift</em> problem Docker solves</li>
+<li>The big picture of <em>image / container / registry</em></li>
+<li>Run your first container</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Environment differences</em> are the most demoralizing thing for newcomers. <em>One Docker line</em> gives the <em>whole team the same environment</em>, cutting half of the debugging time.</p>
+<blockquote>
+<p><em>Environment problems are not a </em>skill issue<em>; they are a </em>design issue<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;my code&quot;] --&gt; Image[&quot;Docker image&quot;]
+    Image --&gt; Container[&quot;container run&quot;]
+    Container --&gt; Anywhere[&quot;local / CI / server&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Image</strong>: an <em>executable package</em> (code + libraries + OS layers).</li>
+<li><strong>Container</strong>: a <em>running instance</em> of an image.</li>
+<li><strong>Registry</strong>: an image storage backend (Docker Hub, GHCR).</li>
+<li><strong>Daemon</strong>: the background process that <em>creates and manages</em> containers.</li>
+<li><strong>Layer</strong>: the <em>unit of change</em> inside an image.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "It runs on my laptop." New-hire setup takes <em>half a day</em>.</p>
+<p><strong>After</strong>: <code>docker run myapp</code>. <em>Same environment in five minutes</em>.</p>
+<h2>Hands-on: Your First Container in 5 Steps</h2>
+<p><strong>Step 1 — Verify install</strong></p>
+<pre><code class="language-bash">docker --version
+# Docker version 25.x.x
+docker run hello-world
+</code></pre>
+<p><strong>Step 2 — Run an official image</strong></p>
+<pre><code class="language-bash">docker run -it --rm python:3.12-slim python -c &quot;print('hi')&quot;
+</code></pre>
+<p><strong>Step 3 — Run in the background</strong></p>
+<pre><code class="language-bash">docker run -d --name web -p 8080:80 nginx
+curl http://localhost:8080
+</code></pre>
+<p><strong>Step 4 — Inspect</strong></p>
+<pre><code class="language-bash">docker ps              # running
+docker logs web        # logs
+docker stop web &amp;&amp; docker rm web
+</code></pre>
+<p><strong>Step 5 — Search and pull images</strong></p>
+<pre><code class="language-bash">docker pull redis:7-alpine
+docker images
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>An <em>image</em> is a <em>snapshot just before run</em>; a <em>container</em> is a <em>live process</em>.</li>
+<li><em><code>-p 8080:80</code></em> maps <em>host:container</em> ports.</li>
+<li><em><code>--rm</code></em> cleans up after exit.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating Docker like a VM.</strong> Containers <em>share the host kernel</em>.</li>
+<li><strong>Using the <code>latest</code> tag in <em>production</em>.</strong> It will <em>break silently</em> one day.</li>
+<li><strong>Letting containers pile up without <code>docker rm</code>.</strong> Your disk <em>fills up</em>.</li>
+<li><strong>Forgetting <code>-p</code> and being puzzled it is "down".</strong> Port mapping is required.</li>
+<li><strong>Running as root, then promoting to <em>production</em>.</strong> A security incident waiting to happen.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most organizations operate on the assumption that <em>a service equals a container</em>. Local dev, CI, staging, and production all run the <em>same image</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Environments are code</em>, not wiki pages.</li>
+<li><em>Images are </em>immutable<em>; containers are </em>disposable*.</li>
+<li><em>latest</em> is for demos; production uses <em>pinned tags</em>.</li>
+<li><em>A container is a process</em>; mind PID 1.</li>
+<li><em>Sharing the host kernel</em> is where security starts.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>docker run hello-world</code> works.</li>
+<li>[ ] You can explain <em>image</em> vs <em>container</em>.</li>
+<li>[ ] You understand <em>port mapping</em>.</li>
+<li>[ ] You can <em>clean up</em> containers.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Run <code>nginx</code> and access it on <em>host port 8080</em>.</li>
+<li>Open an <em>interactive shell</em> with <code>python:3.12-slim</code>.</li>
+<li>Inspect a running container's <em>logs</em> and <em>status</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Docker is the fastest way to kill <em>environment drift</em>. Next we look deeper into <em>images and containers</em>.</p>
+<ul>
+<li><strong>What Is Docker? (current)</strong></li>
+<li>Images and Containers (upcoming)</li>
+<li>Writing a Dockerfile (upcoming)</li>
+<li>Volumes and Networks (upcoming)</li>
+<li>Docker Compose (upcoming)</li>
+<li>Environment Variables and Configuration (upcoming)</li>
+<li>Containerizing a Python App (upcoming)</li>
+<li>Running with a Database (upcoming)</li>
+<li>Image Optimization (upcoming)</li>
+<li>Production-Ready Docker (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/get-started/overview/">Docker overview</a></li>
+<li><a href="https://docs.docker.com/get-docker/">Get Docker</a></li>
+<li><a href="https://hub.docker.com/">Docker Hub</a></li>
+<li><a href="https://www.docker.com/resources/what-container/">What is a container?</a></li>
+</ul>
+<p class="tags-line">Tags: Docker, Container, DevOps, Linux, Virtualization</p>
+</body>
+</html>

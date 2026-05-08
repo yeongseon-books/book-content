@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Root Cause Analysis</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Root Cause Analysis</h1>
+<blockquote>
+<p>Incident Response 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What is the <em>real cause</em> of an <em>incident</em>, and <em>how</em> do you find it?</p>
+<blockquote>
+<p><em>RCA</em> uses <em>five whys</em> and <em>contributing factors</em> to find the <em>root cause</em>, not the <em>trigger</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>five whys</em> technique</li>
+<li><em>Fishbone diagrams</em></li>
+<li><em>Contributing factors</em></li>
+<li><em>Trigger vs root cause</em></li>
+<li><em>Systems thinking</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you only fix the <em>trigger</em>, the <em>same root cause</em> explodes <em>again</em> in the <em>next incident</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Trigger[&quot;trigger&quot;] --&gt; Why1[&quot;why?&quot;]
+    Why1 --&gt; Why2[&quot;why?&quot;]
+    Why2 --&gt; Why3[&quot;why?&quot;]
+    Why3 --&gt; Root[&quot;root cause&quot;]
+    Root --&gt; Action[&quot;action item&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>trigger</strong>: the <em>event</em> that <em>fired</em> directly.</li>
+<li><strong>root cause</strong>: the <em>condition</em> that made it possible.</li>
+<li><strong>contributing factor</strong>: a <em>contributing element</em>.</li>
+<li><strong>5 whys</strong>: ask <em>why</em> <em>five times</em>.</li>
+<li><strong>systems thinking</strong>: thinking in <em>systems</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: mistake the <em>trigger</em> for the <em>root cause</em>.</p>
+<p><strong>After</strong>: trace down to the <em>condition</em> with the <em>five whys</em>.</p>
+<h2>Hands-on: A Mini RCA Workbook</h2>
+<p><strong>Step 1 — Five whys</strong></p>
+<pre><code class="language-python">def five_whys(start):
+    chain = [start]
+    for _ in range(5):
+        chain.append(input(f&quot;why? {chain[-1]} -&gt; &quot;))
+    return chain
+</code></pre>
+<p><strong>Step 2 — Collect contributing factors</strong></p>
+<pre><code class="language-python">def factors():
+    return {&quot;people&quot;: [], &quot;process&quot;: [], &quot;tooling&quot;: [], &quot;system&quot;: []}
+</code></pre>
+<p><strong>Step 3 — Trigger vs root cause</strong></p>
+<pre><code class="language-python">def classify(item, evidence):
+    return &quot;root&quot; if evidence &gt;= 3 else &quot;trigger&quot;
+</code></pre>
+<p><strong>Step 4 — Map to actions</strong></p>
+<pre><code class="language-python">def actions(root):
+    return [{&quot;root&quot;: root, &quot;action&quot;: f&quot;fix {root}&quot;}]
+</code></pre>
+<p><strong>Step 5 — Verifiable?</strong></p>
+<pre><code class="language-python">def is_actionable(action):
+    return action[&quot;action&quot;].startswith((&quot;add &quot;, &quot;fix &quot;, &quot;remove &quot;, &quot;test &quot;))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A <em>chain</em> preserves <em>depth</em>.</li>
+<li><em>Contributing factors</em> sit on <em>four axes</em>.</li>
+<li><em>Actions</em> start with a <em>verb</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stopping at the <em>first answer</em>.</strong></li>
+<li><strong>Naming a <em>person</em> as the <em>root cause</em>.</strong></li>
+<li><strong>Fixing only the <em>trigger</em> and closing.</strong></li>
+<li><strong><em>Vague</em>, abstract actions.</strong></li>
+<li><strong>Actions that <em>cannot be verified</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <em>postmortem doc</em> embeds a <em>Five Whys</em> section and a <em>Contributing Factors</em> table as part of the <em>template</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Suspect the <em>system</em>.</li>
+<li>Do not blame <em>people</em>.</li>
+<li>The <em>root cause</em> is usually <em>process</em>.</li>
+<li><em>Actions</em> are <em>measurable</em>.</li>
+<li>The <em>five whys</em> is a <em>starting point</em>, not the <em>end</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Template section</em>.</li>
+<li>[ ] <em>Four-axis factor model</em>.</li>
+<li>[ ] <em>Verb-first action</em> rule.</li>
+<li>[ ] <em>Verification criteria</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Distinguish <em>trigger</em> and <em>root cause</em> in one line.</li>
+<li>Define the <em>five whys</em> in one line.</li>
+<li>Define <em>contributing factor</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>mitigation and resolution</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/03-initial-response.md">Initial Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/04-communication.md">Communication</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/05-timeline.md">Writing the Timeline</a></li>
+<li><strong>Root Cause Analysis (current)</strong></li>
+<li>Mitigation and Resolution (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/workbook/postmortem-culture/">Five Whys - Google SRE Workbook</a></li>
+<li><a href="https://response.pagerduty.com/after/root_cause_analysis/">Root Cause Analysis - PagerDuty</a></li>
+<li><a href="https://www.atlassian.com/incident-management/postmortem/templates">Incident RCA - Atlassian</a></li>
+<li><a href="https://increment.com/postmortems/beyond-root-cause/">Beyond Root Cause - Increment</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, RCA, Postmortem, Analysis, Operations</p>
+</body>
+</html>

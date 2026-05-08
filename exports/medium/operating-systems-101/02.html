@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Processes and Threads</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Processes and Threads</h1>
+<blockquote>
+<p>Operating Systems 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: "A running program" is too vague. From the OS's point of view, what exactly is it made of?</p>
+<blockquote>
+<p>A process is the OS's basic unit for handling an application. Memory, open files, permissions, and CPU state are bundled together, and each process is isolated from the others. A thread is a flow of execution that lives inside one process and shares its memory with sibling threads. This article walks through what is inside a process, how threads differ, and when to reach for one over the other.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four resources a process owns (memory, fds, permissions, CPU state)</li>
+<li>What threads share and what they keep private</li>
+<li>The process creation model — <code>fork</code> and <code>exec</code>, and Windows <code>CreateProcess</code></li>
+<li>Trade-offs between multi-process and multi-threaded designs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Processes and threads are the two basic building blocks of concurrency. Mixing them up leads to broken isolation, false thread-safety assumptions, and zombie children. "Why does the same data appear in one place but not the other?" almost always traces back to confusing these two models.</p>
+<blockquote>
+<p>The process is the unit of isolation; the thread is the unit of concurrency. If you use the same tool for both, something usually leaks or blocks.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.</p>
+</blockquote>
+<pre><code class="language-text">+-----------------------------------------+
+|  Process                                |
+|  +----------+ +-----------+ +--------+  |
+|  | Code     | | Heap      | | Globals|  |
+|  +----------+ +-----------+ +--------+  |
+|  +-------- File descriptor table -----+ |
+|  |  0:stdin  1:stdout  2:stderr  ...  | |
+|  +-----------------------------------+  |
+|                                         |
+|  +-- Thread A --+   +-- Thread B --+    |
+|  |  Stack       |   |  Stack       |    |
+|  |  Registers   |   |  Registers   |    |
+|  +--------------+   +--------------+    |
++-----------------------------------------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Address space</strong><br>
+- Description: The virtual memory a process sees (code, data, heap, stack)</p>
+<p><strong>File descriptor table</strong><br>
+- Description: The integer-indexed table of open files and sockets</p>
+<p><strong><code>fork</code></strong><br>
+- Description: Syscall that duplicates the calling process to create a child</p>
+<p><strong><code>exec</code></strong><br>
+- Description: Replaces the current process image with a new program</p>
+<p><strong>GIL</strong><br>
+- Description: CPython's global interpreter lock; only one thread runs Python bytecode at a time</p>
+<h2>Before / After</h2>
+<p><strong>Before — "threads and processes are both just concurrent stuff":</strong></p>
+<pre><code class="language-python"># I want these two tasks to run &quot;at the same time&quot;
+import threading, multiprocessing
+</code></pre>
+<p>This line does not tell you which to pick.</p>
+<p><strong>After — "they share different things":</strong></p>
+<pre><code class="language-text">multiprocessing.Process : separate memory, talk via queue/pipe/shared mem
+threading.Thread        : same memory, needs locks, GIL applies
+
+CPU-bound (large numpy matmul)  -&gt; multiprocessing usually wins
+I/O-bound (100 HTTP requests)   -&gt; threading or asyncio is enough
+</code></pre>
+<p>Both look like "concurrent execution" until you ask what is shared.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: PID and parent-child relationships</strong></p>
+<pre><code class="language-python">import os
+
+print(f&quot;Parent PID (this process): {os.getpid()}&quot;)
+
+pid = os.fork()
+if pid == 0:
+    print(f&quot;Child  PID: {os.getpid()}, parent: {os.getppid()}&quot;)
+else:
+    os.waitpid(pid, 0)
+    print(f&quot;Parent: child {pid} exited&quot;)
+</code></pre>
+<p><code>fork</code> is called once and returns twice. The parent gets the child's PID; the child gets <code>0</code>. The same source line splits into two execution streams.</p>
+<p><strong>Step 2: Memory isolation after <code>fork</code></strong></p>
+<pre><code class="language-python">import os
+
+x = [1, 2, 3]
+if os.fork() == 0:
+    x.append(99)
+    print(f&quot;Child x:  {x}&quot;)
+    os._exit(0)
+os.wait()
+print(f&quot;Parent x: {x}&quot;)
+</code></pre>
+<p>The child's mutation of <code>x</code> does not show up in the parent. The two processes do not see the same memory (under the hood it is copy-on-write).</p>
+<p><strong>Step 3: Threads share memory</strong></p>
+<pre><code class="language-python">import threading
+
+x = [1, 2, 3]
+def worker():
+    x.append(99)
+
+t = threading.Thread(target=worker)
+t.start(); t.join()
+print(f&quot;Main x: {x}&quot;)
+</code></pre>
+<p>The same <code>x</code> list is visible. Threads share an address space, which is exactly why synchronization becomes necessary.</p>
+<p><strong>Step 4: Thread vs process performance</strong></p>
+<pre><code class="language-python">import time, math
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+def cpu_heavy(n):
+    return sum(math.sqrt(i) for i in range(n))
+
+N = 5_000_000
+tasks = [N] * 4
+
+for Pool, label in [(ThreadPoolExecutor, &quot;Thread&quot;), (ProcessPoolExecutor, &quot;Process&quot;)]:
+    start = time.perf_counter()
+    with Pool(max_workers=4) as ex:
+        list(ex.map(cpu_heavy, tasks))
+    print(f&quot;{label}: {time.perf_counter() - start:.2f} s&quot;)
+</code></pre>
+<p>For CPU-bound work, processes typically win. CPython's GIL prevents two threads from running Python bytecode at the same time.</p>
+<p><strong>Step 5: <code>exec</code> to become a different program</strong></p>
+<pre><code class="language-python">import os
+
+if os.fork() == 0:
+    os.execvp(&quot;ls&quot;, [&quot;ls&quot;, &quot;-la&quot;])  # child becomes ls
+    # this line is never reached
+os.wait()
+</code></pre>
+<p><code>fork</code> then <code>exec</code> is the standard way a shell runs commands. The child's memory image is fully replaced by the new program.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>fork</code> is called once and returns twice</li>
+<li>Process memory is isolated; thread memory is shared</li>
+<li>CPython's GIL makes CPU-bound threading often slower than expected</li>
+<li><code>fork</code>+<code>exec</code> is the foundation of shells and container runtimes</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Using threads for everything</strong><br>
+- Problem: CPU-bound work is blocked by the GIL<br>
+- Fix: Processes for CPU-bound, threads or asyncio for I/O</p>
+<p><strong>Not reaping children</strong><br>
+- Problem: Zombie processes accumulate<br>
+- Fix: Call <code>os.wait</code>/<code>waitpid</code></p>
+<p><strong>No locks on shared thread state</strong><br>
+- Problem: Race conditions, mystery bugs<br>
+- Fix: Use <code>threading.Lock</code> or queues</p>
+<p><strong>Assuming <code>fork</code> is safe with anything</strong><br>
+- Problem: macOS-specific issues, library state corruption<br>
+- Fix: Consider <code>multiprocessing.set_start_method('spawn')</code></p>
+<p><strong>Treating processes as cheap</strong><br>
+- Problem: OOMs and resource exhaustion at scale<br>
+- Fix: Reuse via worker pools</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Web servers: gunicorn uses worker processes; uvicorn pairs with async; combinations are common</li>
+<li>Data processing: <code>multiprocessing.Pool</code> parallelizes CPU-bound ETL work</li>
+<li>Containers: container runtimes use <code>clone</code>+<code>exec</code> variants for isolated children</li>
+<li>Backend debugging: <code>ps -ef</code>, <code>pstree</code>, and <code>htop</code> show process/thread trees</li>
+<li>Data science: <code>joblib</code> picks a backend (threads vs processes) per workload</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer hearing "let's run this concurrently" first asks about the workload. Is it burning CPU? Waiting on I/O? How much state needs to be shared? Should a failure be contained? The answers usually pick the tool — process, thread, or async — almost automatically.</p>
+<p>A senior also resists the simple "processes are heavy, threads are cheap" comparison. Processes also bring isolation and crash-safety. A system whose worker can die without taking the others with it is often more valuable in production than one that is slightly faster on a microbenchmark.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name the four resources a process owns</li>
+<li>[ ] You know what threads share and what they keep separate</li>
+<li>[ ] You know which tool fits CPU-bound vs I/O-bound work</li>
+<li>[ ] You can explain why <code>fork</code> and <code>exec</code> are split into two calls</li>
+<li>[ ] You understand why children must be reaped</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Pick the heaviest function in a project and run it with (a) a single thread, (b) a 4-thread pool, (c) a 4-process pool. Compare the wall-clock times and write a paragraph explaining the result.</p>
+</li>
+<li>
+<p>Write a tiny script that uses <code>os.fork</code> and never reaps the child. Watch a zombie (state <code>Z</code>) appear in <code>ps -ef</code>. Then add <code>os.wait</code> and confirm it disappears.</p>
+</li>
+<li>
+<p>With <code>threading</code>, have two threads each increment the same counter 100 million times. Compare the result with and without a lock. Explain in one paragraph why the unlocked version produces a wrong answer.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A process is an isolated bundle of resources; a thread is a unit of execution flowing inside it. Mixing them up tends to make concurrent code subtly broken or surprisingly slow. Three axes — CPU vs I/O, isolation needs, and how much memory you must share — usually pick the right tool.</p>
+<p>The next article zooms into the OS function that decides which of these many processes and threads gets the CPU next: scheduling.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
+<li><strong>Processes and Threads (current)</strong></li>
+<li>Scheduling (upcoming)</li>
+<li>Concurrency and Race Conditions (upcoming)</li>
+<li>Locks, Mutexes, and Semaphores (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Virtual Memory (upcoming)</li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://man7.org/tlpi/">The Linux Programming Interface — Michael Kerrisk</a></li>
+<li><a href="https://docs.python.org/3/library/multiprocessing.html">Python multiprocessing documentation</a></li>
+<li><a href="https://docs.python.org/3/library/threading.html">Python threading documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Processes, Threads, Concurrency, Systems</p>
+</body>
+</html>

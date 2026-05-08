@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A Production-Ready Observability Stack</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>A Production-Ready Observability Stack</h1>
+<blockquote>
+<p>Observability 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does a <em>good-enough</em> observability stack look like that a <em>small team</em> can build <em>today</em>?</p>
+<blockquote>
+<p><em>OpenTelemetry to </em>unify collection<em>, Prometheus / Loki / Tempo for the </em>three signals<em>, Grafana for </em>one screen<em> — that is a small team's </em>realistic baseline<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The simple flow <em>collect → store → query</em></li>
+<li>An open-source <em>baseline stack</em></li>
+<li><em>Correlation</em> on one screen</li>
+<li>Five <em>operator SLOs</em></li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>There is no <em>perfect</em> stack for a small team. The best stack is <em>operable</em> and <em>replaceable</em>. Avoid lock-in and start <em>today</em>.</p>
+<blockquote>
+<p><em>The perfect stack </em>will not arrive tomorrow<em>. Build the operable one </em>today<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;app&quot;] --&gt; Otel[&quot;OpenTelemetry collector&quot;]
+    Otel --&gt; Prom[&quot;Prometheus (metric)&quot;]
+    Otel --&gt; Loki[&quot;Loki (log)&quot;]
+    Otel --&gt; Tempo[&quot;Tempo (trace)&quot;]
+    Prom --&gt; Grafana
+    Loki --&gt; Grafana
+    Tempo --&gt; Grafana
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Collector</strong>: a gateway that <em>receives and routes</em> signals.</li>
+<li><strong>Backend</strong>: storage (Prometheus / Loki / Tempo).</li>
+<li><strong>Correlation</strong>: linking the three signals via <em>trace_id</em>.</li>
+<li><strong>Datasource</strong>: a backend wired into Grafana.</li>
+<li><strong>Exemplar</strong>: a <em>representative trace_id</em> attached to a metric point.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: five tools, <em>not connected</em>; you juggle <em>five screens</em>.</p>
+<p><strong>After</strong>: <em>one Grafana</em>; click between <em>trace ↔ log ↔ metric</em>.</p>
+<h2>Hands-on: Baseline Stack in 5 Steps</h2>
+<p><strong>Step 1 — Collector</strong></p>
+<pre><code class="language-yaml">receivers:
+  otlp: { protocols: { grpc: {}, http: {} } }
+exporters:
+  prometheus:    { endpoint: &quot;:9464&quot; }
+  loki:          { endpoint: http://loki:3100/loki/api/v1/push }
+  otlp/tempo:    { endpoint: tempo:4317, tls: { insecure: true } }
+service:
+  pipelines:
+    metrics:  { receivers: [otlp], exporters: [prometheus] }
+    logs:     { receivers: [otlp], exporters: [loki] }
+    traces:   { receivers: [otlp], exporters: [otlp/tempo] }
+</code></pre>
+<p><strong>Step 2 — Docker Compose</strong></p>
+<pre><code class="language-yaml">services:
+  otel-collector: { image: otel/opentelemetry-collector }
+  prometheus:     { image: prom/prometheus }
+  loki:           { image: grafana/loki }
+  tempo:          { image: grafana/tempo }
+  grafana:        { image: grafana/grafana, ports: [&quot;3000:3000&quot;] }
+</code></pre>
+<p><strong>Step 3 — App emission</strong></p>
+<pre><code class="language-python">from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+# OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+</code></pre>
+<p><strong>Step 4 — Grafana correlation</strong></p>
+<pre><code class="language-text">Datasources: Prometheus, Loki, Tempo
+Tempo -&gt; Loki: derived field &quot;trace_id&quot; -&gt; log search
+Loki  -&gt; Tempo: log &quot;trace_id&quot; -&gt; trace view
+</code></pre>
+<p><strong>Step 5 — Five operator SLOs</strong></p>
+<pre><code class="language-text">1) /metrics scrape success &gt; 99.5%
+2) Loki ingest p95 &lt; 5s
+3) Tempo trace arrival &gt; 99%
+4) Grafana dashboard p95 &lt; 2s
+5) Alertmanager dispatch latency &lt; 30s
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Unified collector</em> gives <em>standard collection</em>.</li>
+<li><em>Trace_id correlation</em> turns debugging into one screen.</li>
+<li><em>Exemplars</em> let you jump from metric to trace.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>A different collector per signal.</strong> Ops burden <em>triples</em>.</li>
+<li><strong>No correlation set up.</strong> You bounce between screens.</li>
+<li><strong>No backup or retention policy.</strong> Cost is <em>unpredictable</em>.</li>
+<li><strong>Deep <em>vendor lock-in</em>.</strong> <em>Replacement impossible</em>.</li>
+<li><strong>No operator SLO.</strong> Observability itself is a <em>black box</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Small teams start with <em>OTel + LGTM (Loki/Grafana/Tempo/Mimir)</em>. As they scale, some move to <em>managed</em> (Grafana Cloud, Datadog, Honeycomb).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Collection is </em>OTel<em>, backends are </em>replaceable<em>.</em></li>
+<li><em>Without trace_id correlation, you have </em>half a stack<em>.</em></li>
+<li><em>Observability is also a </em>product<em> — it has SLOs.</em></li>
+<li><em>Start small and </em>measure as you grow<em>.</em></li>
+<li><em>Vendor lock-in is </em>cost + risk<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Collection is unified through one OTel collector.</li>
+<li>[ ] <em>All three signals</em> are visible in Grafana.</li>
+<li>[ ] Trace ↔ log jump works.</li>
+<li>[ ] Five operator SLOs are defined.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Bring up the baseline stack with Compose.</li>
+<li>Trace a single request through the <em>three signals</em>.</li>
+<li>Write the five operator SLOs in <em>PromQL</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A small team's first stack must be <em>replaceable</em>. From here: <em>incident response</em>, <em>capacity planning</em>, <em>cost FinOps</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/03-metric-collection.md">Collecting and Visualizing Metrics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/04-structured-logging.md">Structured Logging</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/05-distributed-tracing.md">Distributed Tracing Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/06-dashboard-design.md">Dashboard Design</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/07-alert-and-oncall.md">Alerts and On-Call</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/08-sli-and-slo.md">SLI and SLO Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/09-cost-and-cardinality.md">Cost and Cardinality</a></li>
+<li><strong>A Production-Ready Observability Stack (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opentelemetry.io/docs/collector/">OpenTelemetry Collector</a></li>
+<li><a href="https://grafana.com/oss/">Grafana LGTM stack</a></li>
+<li><a href="https://grafana.com/docs/tempo/latest/">Tempo docs</a></li>
+<li><a href="https://grafana.com/docs/loki/latest/">Loki docs</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, SRE, OpenTelemetry, Grafana, Prometheus</p>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROC and AUC</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>ROC and AUC</h1>
+<blockquote>
+<p>Model Evaluation 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Can you grade a model's ranking ability without picking a threshold?</p>
+<blockquote>
+<p><em>ROC plots TPR against FPR over all thresholds. AUC summarizes a model's ranking ability into a single number.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The axes and meaning of the ROC curve</li>
+<li>The probabilistic interpretation of AUC</li>
+<li>How PR and ROC curves disagree</li>
+<li>The AUC trap on imbalanced data</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>AUC is convenient because it avoids picking a threshold, but production decisions live at one specific threshold.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Score[&quot;score by model&quot;] --&gt; Sort[&quot;rank samples&quot;]
+    Sort --&gt; ROC[&quot;ROC: TPR vs FPR&quot;]
+    Sort --&gt; PR[&quot;PR: precision vs recall&quot;]
+    ROC --&gt; AUC[&quot;AUC = ranking ability&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>TPR</strong>: same as recall.</li>
+<li><strong>FPR</strong>: <code>FP/(FP+TN)</code>.</li>
+<li><strong>ROC</strong>: TPR vs FPR as the threshold sweeps.</li>
+<li><strong>AUC-ROC</strong>: probability that a random positive scores higher than a random negative.</li>
+<li><strong>AUC-PR</strong>: area under the precision-recall curve, more sensitive on imbalance.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "AUC 0.9, ship it."</p>
+<p><strong>After</strong>: "AUC 0.9, plus precision and recall at the operating threshold, plus PR-AUC for imbalance."</p>
+<h2>Hands-on: 5 Steps Through ROC and AUC</h2>
+<p><strong>Step 1 — Data and model</strong></p>
+<pre><code class="language-python">from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+X, y = make_classification(n_samples=2000, weights=[0.9, 0.1], random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(X, y, stratify=y, random_state=42)
+m = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+proba = m.predict_proba(Xte)[:, 1]
+</code></pre>
+<p><strong>Step 2 — ROC curve</strong></p>
+<pre><code class="language-python">from sklearn.metrics import roc_curve
+fpr, tpr, thr = roc_curve(yte, proba)
+print(&quot;first 3 thresholds:&quot;, thr[:3])
+</code></pre>
+<p><strong>Step 3 — AUC</strong></p>
+<pre><code class="language-python">from sklearn.metrics import roc_auc_score
+print(&quot;AUC-ROC:&quot;, roc_auc_score(yte, proba))
+</code></pre>
+<p><strong>Step 4 — Compare with PR-AUC</strong></p>
+<pre><code class="language-python">from sklearn.metrics import average_precision_score
+print(&quot;AUC-PR:&quot;, average_precision_score(yte, proba))
+</code></pre>
+<p><strong>Step 5 — Pick an operating threshold</strong></p>
+<pre><code class="language-python">import numpy as np
+target_fpr = 0.05
+idx = np.searchsorted(fpr, target_fpr)
+print(&quot;threshold for FPR&lt;=0.05:&quot;, thr[idx], &quot;TPR:&quot;, tpr[idx])
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>AUC measures ranking quality and is less sensitive to distribution.</li>
+<li>PR-AUC reacts strongly to imbalance, which is often what you want.</li>
+<li>Operating thresholds are usually fixed by an FPR or recall constraint.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Trusting AUC alone on heavy imbalance.</li>
+<li>Mixing ROC and PR comparisons across models.</li>
+<li>Shipping without nailing down the threshold.</li>
+<li>Tuning the threshold without calibrating probabilities.</li>
+<li>Assuming AUC 0.5 always means "random."</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Risk-scoring models choose between candidates by AUC. Alerting systems pin a maximum FPR and read TPR off the curve.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>AUC is a comparison summary, not a deployment decision.</li>
+<li>Add PR-AUC under imbalance.</li>
+<li>Fix the threshold from an FPR or recall budget.</li>
+<li>Watch AUC drift over time.</li>
+<li>Look at per-class AUC where it applies.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I report AUC-ROC.</li>
+<li>[ ] I report AUC-PR for imbalance.</li>
+<li>[ ] I document the operating threshold.</li>
+<li>[ ] I monitor AUC drift in production.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find the TPR achievable at FPR &lt;= 0.01.</li>
+<li>Show how AUC-ROC and AUC-PR diverge on heavily imbalanced data.</li>
+<li>Construct two models with the same AUC that make different operating decisions.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>ROC and AUC speak the language of ranking. Next, calibration asks whether the predicted probabilities themselves are trustworthy.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/01-why-evaluation-is-hard.md">Why Model Evaluation Is Hard</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/02-train-val-test.md">Train, Validation, and Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/03-limits-of-accuracy.md">The Limits of Accuracy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/04-precision-and-recall.md">Precision and Recall</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/model-evaluation-101/en/05-f1-score.md">F1 Score</a></li>
+<li><strong>ROC and AUC (current)</strong></li>
+<li>Calibration (upcoming)</li>
+<li>Cross Validation (upcoming)</li>
+<li>Error Analysis (upcoming)</li>
+<li>Building an Evaluation Report (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html">scikit-learn — roc_curve</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html">scikit-learn — roc_auc_score</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">Wikipedia — ROC curve</a></li>
+<li><a href="https://developers.google.com/machine-learning/crash-course/classification/roc-and-auc">Google — ROC and AUC</a></li>
+</ul>
+<p class="tags-line">Tags: ModelEvaluation, ROC, AUC, PRCurve, scikit-learn</p>
+</body>
+</html>

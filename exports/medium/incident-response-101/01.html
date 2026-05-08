@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is an Incident?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What is an Incident?</h1>
+<blockquote>
+<p>Incident Response 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Which</em> problems count as an <em>incident</em>?</p>
+<blockquote>
+<p>An <em>incident</em> is an <em>abnormal</em> condition with <em>customer impact</em> above a <em>threshold</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of an <em>incident</em></li>
+<li><em>Impact</em> measurement</li>
+<li>The difference from a <em>regular bug</em></li>
+<li>A starting point for <em>on-call</em></li>
+<li>The <em>cultural</em> dimension</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without a <em>threshold</em>, response is either <em>too slow</em> or <em>too aggressive</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Event[&quot;event&quot;] --&gt; Filter{&quot;impact?&quot;}
+    Filter --&gt;|yes| Inc[&quot;incident&quot;]
+    Filter --&gt;|no| Bug[&quot;bug ticket&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>incident</strong>: an <em>abnormal</em> event with <em>customer impact</em>.</li>
+<li><strong>alert</strong>: an <em>action-required</em> signal.</li>
+<li><strong>outage</strong>: a <em>service interruption</em>.</li>
+<li><strong>degradation</strong>: a <em>performance drop</em>.</li>
+<li><strong>on-call</strong>: a <em>standby duty rotation</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every <em>alert</em> is treated like an <em>incident</em>.</p>
+<p><strong>After</strong>: alerts are <em>classified by impact</em> before action.</p>
+<h2>Hands-on: Incident Decision</h2>
+<p><strong>Step 1 — Capture impact</strong></p>
+<pre><code class="language-python">def impact(users, minutes):
+    return {&quot;users&quot;: users, &quot;minutes&quot;: minutes}
+</code></pre>
+<p><strong>Step 2 — Threshold</strong></p>
+<pre><code class="language-python">def is_incident(i, user_th=100, min_th=5):
+    return i[&quot;users&quot;] &gt;= user_th or i[&quot;minutes&quot;] &gt;= min_th
+</code></pre>
+<p><strong>Step 3 — Classify</strong></p>
+<pre><code class="language-python">def classify(i):
+    return &quot;incident&quot; if is_incident(i) else &quot;bug&quot;
+</code></pre>
+<p><strong>Step 4 — Page or not</strong></p>
+<pre><code class="language-python">def page(i):
+    return classify(i) == &quot;incident&quot;
+</code></pre>
+<p><strong>Step 5 — Route the channel</strong></p>
+<pre><code class="language-python">def channel(kind):
+    return &quot;#inc&quot; if kind == &quot;incident&quot; else &quot;#bugs&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>threshold</em> is the result of an <em>agreement</em>.</li>
+<li>The <em>classification</em> picks the <em>path</em>.</li>
+<li><em>Code</em> removes <em>subjectivity</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing <em>alerts</em> with <em>incidents</em>.</strong></li>
+<li><strong>No agreed <em>threshold</em>.</strong></li>
+<li><strong>Estimating <em>impact</em> <em>subjectively</em>.</strong></li>
+<li><strong>Insufficient <em>on-call</em> <em>training</em> material.</strong></li>
+<li><strong>Returning to work <em>without records</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>PagerDuty's severity rules</em> automate the <em>classification</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Customer impact</em> is the <em>yardstick</em>.</li>
+<li><em>Alerts</em> are <em>raw material</em>; <em>judgment</em> is <em>human</em>.</li>
+<li><em>Over-response</em> is also a <em>cost</em>.</li>
+<li><em>Records</em> are the <em>fuel for learning</em>.</li>
+<li><em>On-call</em> matures through <em>training</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Threshold</em> agreed.</li>
+<li>[ ] <em>Classification</em> code.</li>
+<li>[ ] <em>Alert routing</em>.</li>
+<li>[ ] <em>Training</em> material.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>incident</em> in one line.</li>
+<li>Define <em>outage</em> in one line.</li>
+<li>Define <em>degradation</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>severity classification</em>.</p>
+<ul>
+<li><strong>What is an Incident? (current)</strong></li>
+<li>Severity Classification (upcoming)</li>
+<li>Initial Response (upcoming)</li>
+<li>Communication (upcoming)</li>
+<li>Writing the Timeline (upcoming)</li>
+<li>Root Cause Analysis (upcoming)</li>
+<li>Mitigation and Resolution (upcoming)</li>
+<li>Postmortem (upcoming)</li>
+<li>Prevention (upcoming)</li>
+<li>Building an Incident Runbook (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://response.pagerduty.com/">Incident Response - PagerDuty</a></li>
+<li><a href="https://sre.google/sre-book/managing-incidents/">Managing Incidents - Google SRE Book</a></li>
+<li><a href="https://www.atlassian.com/incident-management/handbook">Atlassian Incident Handbook</a></li>
+<li><a href="https://wiki.en.it-processmaps.com/index.php/Incident_Management">Incident Definition - ITIL</a></li>
+</ul>
+<p class="tags-line">Tags: Incident, Response, SRE, Operations, OnCall</p>
+</body>
+</html>

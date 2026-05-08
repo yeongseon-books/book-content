@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Testing Strategy</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Testing Strategy</h1>
+<blockquote>
+<p>Software Engineering 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Does more tests mean better software?</p>
+<blockquote>
+<p>No. The right tests at the right layer make better software.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The role of unit, integration, and E2E tests</li>
+<li>The test pyramid and its inverse, the ice cream cone</li>
+<li>When coverage lies</li>
+<li>How to keep tests fast in CI</li>
+<li>How to fix flaky tests instead of muting them</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests determine the cost of change. Good tests let you refactor without fear; bad tests make every PR a hesitation.</p>
+<blockquote>
+<p>Code without tests is, in practice, frozen code.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    U[&quot;Unit (many, fast)&quot;] --&gt; I[&quot;Integration (some)&quot;]
+    I --&gt; E[&quot;E2E (few, slow)&quot;]
+</code></pre>
+<p>The pyramid balances cost against speed.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Unit test</strong>: Function or class scope, no external dependency.</li>
+<li><strong>Integration test</strong>: Multiple components working together.</li>
+<li><strong>E2E test</strong>: Real user scenario, slowest layer.</li>
+<li><strong>Flaky test</strong>: Same code, sometimes red, sometimes green.</li>
+<li><strong>Coverage</strong>: Percentage of code executed by tests, not a quality metric.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — ice cream cone</strong></p>
+<pre><code class="language-text">E2E 80%, integration 15%, unit 5%
+-&gt; slow CI, flaky tests, debugging hell
+</code></pre>
+<p><strong>After — pyramid</strong></p>
+<pre><code class="language-text">unit 70%, integration 25%, E2E 5%
+-&gt; fast CI, clear failure location
+</code></pre>
+<p>Change the ratio and the team speeds up.</p>
+<h2>Hands-on: Build a Small Pyramid</h2>
+<p><strong>Step 1 — Unit test</strong></p>
+<pre><code class="language-python"># 1_unit.py
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+def test_add():
+    assert add(2, 3) == 5
+</code></pre>
+<p>Fastest layer, the most of them.</p>
+<p><strong>Step 2 — Integration with a fake</strong></p>
+<pre><code class="language-python"># 2_integration.py
+class FakeRepo:
+    def __init__(self): self.items = []
+    def save(self, x): self.items.append(x)
+
+def test_service_uses_repo():
+    repo = FakeRepo()
+    service = OrderService(repo)
+    service.create({&quot;id&quot;: 1})
+    assert repo.items == [{&quot;id&quot;: 1}]
+</code></pre>
+<p>Fakes break less than mocks.</p>
+<p><strong>Step 3 — E2E for scenarios only</strong></p>
+<pre><code class="language-python"># 3_e2e.py
+def test_checkout_flow(client):
+    client.post(&quot;/cart&quot;, json={&quot;sku&quot;: &quot;A&quot;})
+    r = client.post(&quot;/checkout&quot;)
+    assert r.status_code == 200
+</code></pre>
+<p>Critical user journeys only, kept few.</p>
+<p><strong>Step 4 — Split CI for speed</strong></p>
+<pre><code class="language-yaml"># 4_ci.yml
+jobs:
+  unit:
+    steps: [{ run: pytest tests/unit -q }]
+  integration:
+    steps: [{ run: pytest tests/integration -q }]
+  e2e:
+    if: github.ref == 'refs/heads/main'
+    steps: [{ run: pytest tests/e2e -q }]
+</code></pre>
+<p>Some teams gate E2E only on main.</p>
+<p><strong>Step 5 — Quarantine flaky tests</strong></p>
+<pre><code class="language-python"># 5_flaky.py
+import pytest
+@pytest.mark.flaky(reruns=2)
+def test_uses_external_clock(): ...
+</code></pre>
+<p>Quarantine, then fix next sprint. Do not mute.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Unit tests are most numerous and fastest.</li>
+<li>Fakes are more stable than mocks.</li>
+<li>E2E is scenario-driven and small in count.</li>
+<li>Splitting CI shortens feedback time.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Coverage as a goal.</strong> Coverage is an outcome, not a target.</li>
+<li><strong>Mocking everything.</strong> A leading cause of flaky tests.</li>
+<li><strong>Doing unit work via E2E.</strong> Slow and hard to debug.</li>
+<li><strong>Ignoring flakies.</strong> Trust collapses, everyone hits rerun.</li>
+<li><strong>Deleting tests to merge.</strong> Defects do not vanish, only the metric does.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Fast teams gate every PR on unit and integration tests, run E2E on main merge or nightly. They set an SLO for test runtime (for example PR &lt; 5 min) and split or parallelize when it slips.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Tests are both spec and safety net.</li>
+<li>Fast units mean fast change.</li>
+<li>Fakes teach you the code.</li>
+<li>A flaky test is fixed, not muted.</li>
+<li>Change safety beats coverage numbers.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Do you know your pyramid ratio?</li>
+<li>[ ] Is PR test time under 5 minutes?</li>
+<li>[ ] Is there a flaky-test tracking board?</li>
+<li>[ ] Do you prefer fakes over mocks?</li>
+<li>[ ] Can you measure change safety?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find a function whose external dependency can be replaced by a fake.</li>
+<li>Take your slowest E2E test and split it into unit and integration tests.</li>
+<li>Run a 5-Whys on the most recent flaky test.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Tests determine the cost of change. Next we look at how to ship tested code safely to users — version control and release.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
+<li><strong>Testing Strategy (current)</strong></li>
+<li>Version Control and Release (upcoming)</li>
+<li>Documentation (upcoming)</li>
+<li>Collaboration Process (upcoming)</li>
+<li>Maintenance and Tech Debt (upcoming)</li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/bliki/TestPyramid.html">Martin Fowler — Test Pyramid</a></li>
+<li><a href="https://testing.googleblog.com/2015/04/just-say-no-to-more-end-to-end-tests.html">Google Testing Blog — Just Say No to More End-to-End Tests</a></li>
+<li><a href="https://docs.pytest.org/">Pytest Docs</a></li>
+<li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code — Michael Feathers</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Testing, TestPyramid, CI, Quality</p>
+</body>
+</html>

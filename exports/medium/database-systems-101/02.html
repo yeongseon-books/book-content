@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Relational Model</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Relational Model</h1>
+<blockquote>
+<p>Database Systems 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Behind the simple picture of "rows in a table," what is the mathematical model that has lasted half a century?</p>
+<blockquote>
+<p>The relational model treats data as <strong>sets</strong>. A table is a set of rows; each row is a tuple of the same shape. Keys, foreign keys, normalization, and SQL itself all sit on top of that one promise. Once the model clicks, SQL stops looking like syntax and starts looking like algebra over relations.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What "relation," "tuple," and "attribute" actually point to in a table</li>
+<li>What primary keys and foreign keys guarantee</li>
+<li>The meaning of NULL and integrity constraints</li>
+<li>Why SQL looks the way it does, given the model</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you blur "table" and "relation," everything that comes later — normalization, indexes, transactions — feels slightly off. Get the model right once and SQL becomes "the language we use to operate on relations," not a list of incantations.</p>
+<blockquote>
+<p>SQL is not a procedural language. It is a set of operations defined over relations. That is why you describe <strong>what</strong> you want, not <strong>how</strong>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;Schema (table definition)&quot;] --&gt; B[&quot;Relation: rows of one shape&quot;]
+    B --&gt; C[&quot;Tuple (row)&quot;]
+    B --&gt; D[&quot;Attribute (column)&quot;]
+    B --&gt; E[&quot;Primary key&quot;]
+    B --&gt; F[&quot;Foreign key → other relation&quot;]
+</code></pre>
+<p>One table = one relation. A row in it is a tuple. A cell is an attribute value. A key is the attribute (or set of attributes) that uniquely identifies a row.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Relation</strong>: A set of tuples of the same shape. Everyday word: table.</li>
+<li><strong>Tuple</strong>: A single row, identified by attribute names rather than positions.</li>
+<li><strong>Attribute</strong>: A column, with a name and a domain (type).</li>
+<li><strong>Primary key</strong>: The minimal set of attributes that uniquely identifies a row. Cannot be NULL.</li>
+<li><strong>Foreign key</strong>: An attribute that points at another relation's primary key, enforcing referential integrity.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — cram everything into one table</strong></p>
+<pre><code class="language-sql">CREATE TABLE orders (
+    id        INTEGER PRIMARY KEY,
+    user_name TEXT,
+    user_email TEXT,
+    product   TEXT,
+    price     INTEGER
+);
+</code></pre>
+<p>The same user ordering twice means storing the email twice. Changing an email touches every order row. The promise "one fact in one place" is broken.</p>
+<p><strong>After — separate into relations</strong></p>
+<pre><code class="language-sql">CREATE TABLE users (
+    id    INTEGER PRIMARY KEY,
+    name  TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE orders (
+    id      INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    product TEXT    NOT NULL,
+    price   INTEGER NOT NULL CHECK (price &gt;= 0)
+);
+</code></pre>
+<p>Each user lives once in <code>users</code>. An order points to a user via foreign key. Changing the email updates exactly one row.</p>
+<h2>Hands-on: Build a Tiny Order System on the Relational Model</h2>
+<p><strong>Step 1 — Define two tables</strong></p>
+<pre><code class="language-python"># init.py
+import sqlite3
+
+DDL = &quot;&quot;&quot;
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS users (
+    id    INTEGER PRIMARY KEY,
+    name  TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id      INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    product TEXT    NOT NULL,
+    price   INTEGER NOT NULL CHECK (price &gt;= 0)
+);
+&quot;&quot;&quot;
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.executescript(DDL)
+</code></pre>
+<p>Do not forget <code>PRAGMA foreign_keys = ON</code>. SQLite leaves it off by default.</p>
+<p><strong>Step 2 — Watch keys reject bad data</strong></p>
+<pre><code class="language-python"># keys.py
+import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+    db.execute(&quot;INSERT INTO users (name, email) VALUES ('A', 'a@example.com')&quot;)
+    try:
+        db.execute(&quot;INSERT INTO users (name, email) VALUES ('B', 'a@example.com')&quot;)
+    except sqlite3.IntegrityError as e:
+        print(&quot;UNIQUE violation:&quot;, e)
+</code></pre>
+<p>The database refuses before the application code ever has to.</p>
+<p><strong>Step 3 — Watch foreign keys enforce referential integrity</strong></p>
+<pre><code class="language-python"># fk.py
+import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+    try:
+        db.execute(
+            &quot;INSERT INTO orders (user_id, product, price) VALUES (?, ?, ?)&quot;,
+            (999, &quot;milk&quot;, 3200),
+        )
+    except sqlite3.IntegrityError as e:
+        print(&quot;FK violation:&quot;, e)
+</code></pre>
+<p>An order pointing at a non-existent user simply cannot enter the table.</p>
+<p><strong>Step 4 — Combine two relations with a join</strong></p>
+<pre><code class="language-python">import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    rows = db.execute(&quot;&quot;&quot;
+        SELECT u.name, o.product, o.price
+        FROM orders o
+        JOIN users u ON u.id = o.user_id
+        ORDER BY o.id
+    &quot;&quot;&quot;).fetchall()
+    for r in rows:
+        print(r)
+</code></pre>
+<p>The application says "combine two relations on this key." Index choice and join algorithm are the optimizer's decision.</p>
+<p><strong>Step 5 — Try to break integrity</strong></p>
+<pre><code class="language-python">import sqlite3
+
+with sqlite3.connect(&quot;shop.db&quot;) as db:
+    db.execute(&quot;PRAGMA foreign_keys = ON&quot;)
+    try:
+        db.execute(&quot;DELETE FROM users WHERE email = 'a@example.com'&quot;)
+    except sqlite3.IntegrityError as e:
+        print(&quot;Refused — orders still reference this user:&quot;, e)
+</code></pre>
+<p>Referential integrity is the first line of defense against application bugs corrupting data.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The model's center is "one fact in one place." The user's email lives only in <code>users</code>.</li>
+<li>Keys and constraints reject invalid data faster and more uniformly than application checks.</li>
+<li>A join is an operation that combines two relations on a key into a new relation.</li>
+<li>The optimizer is free to choose <strong>how</strong> to compute the same answer faster. That is why you only specify <strong>what</strong>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Disabling foreign keys for convenience.</strong> A small win today; a 3 a.m. dangling-reference page in six months.</li>
+<li><strong>Allowing NULL on every column "just in case."</strong> Meaning blurs and queries get harder. NULL should be intentional.</li>
+<li><strong>Using natural keys as primary keys.</strong> Emails and phone numbers change. A surrogate key (e.g., integer id) is usually safer.</li>
+<li><strong>Duplicating display data across two tables.</strong> The day one side is updated, you have two competing truths.</li>
+<li><strong>Avoiding joins and merging in application code.</strong> You get N+1 queries and lose the optimizer.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most backend modeling lives in two artifacts: a human-readable ER diagram and DDL. New features start as relationships on the diagram and only then become migrations. If "one fact in one place" breaks at the model stage, both code and data start drifting.</p>
+<p>Sometimes you <strong>denormalize</strong> for performance. That is fine, but it always pairs with a question: how will the two copies stay in sync, and which one is the truth? Unintentional denormalization is just a future inconsistency bomb.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They draw the model before writing code. A wrong model cannot be cleaned up by clever code.</li>
+<li>They keep asking, "where does this fact live, and how many places see it?"</li>
+<li>They never disable foreign keys. The debugging bill for a corrupt graph is enormous.</li>
+<li>They check whether NULL is genuinely meaningful before allowing it.</li>
+<li>They denormalize only on purpose, with the sync responsibility written down.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does each fact live in exactly one table?</li>
+<li>[ ] Does every table have a meaningful primary key?</li>
+<li>[ ] Are foreign keys both declared and actively enforced?</li>
+<li>[ ] Is every NULL-allowed column intentional?</li>
+<li>[ ] If you denormalize, is the sync strategy documented?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>In the "Before" single-table model, list two concrete problems that arise when a user changes their email.</li>
+<li>To imitate the join from Step 4 in application code, how many SQL calls would you need? Describe in one line the N+1 problem that follows.</li>
+<li>A new feature: "an order can have a note." Compare adding a <code>note</code> column to <code>orders</code> versus a separate <code>order_notes</code> relation in one or two sentences each.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The relational model fits in three lines: a table is a set of like-shaped rows; rows are addressed by keys; relationships are represented by foreign keys. That simple promise shapes both SQL and what a DBMS can guarantee. Next we look at SQL itself — how a single SELECT actually gets processed.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><strong>The Relational Model (current)</strong></li>
+<li>SQL and Query Processing (upcoming)</li>
+<li>Indexes (upcoming)</li>
+<li>Transactions and ACID (upcoming)</li>
+<li>Isolation Levels (upcoming)</li>
+<li>Normalization and Modeling (upcoming)</li>
+<li>Query Optimization (upcoming)</li>
+<li>Replication and Backup (upcoming)</li>
+<li>OLTP and OLAP (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf">Codd 1970 — A Relational Model of Data for Large Shared Data Banks</a></li>
+<li><a href="https://www.postgresql.org/docs/current/ddl.html">PostgreSQL — Data Definition</a></li>
+<li><a href="https://www.sqlite.org/foreignkeys.html">SQLite — Foreign Key Support</a></li>
+<li><a href="https://www.db-book.com/">Database System Concepts (Silberschatz)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, Relational Model, SQL, Integrity, Keys</p>
+</body>
+</html>

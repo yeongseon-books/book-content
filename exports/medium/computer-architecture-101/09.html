@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Parallelism and Multicore</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Parallelism and Multicore</h1>
+<blockquote>
+<p>Computer Architecture 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: With eight cores, will a program run exactly 8x faster? If not, what sets the limit?</p>
+<blockquote>
+<p>Clock speed stopped climbing around 2005, and every gain in performance since has come from adding cores and exploiting parallelism. But adding cores does not automatically make code faster. Some work is inherently sequential, and communication between cores is never free. This article lays out the mental model for using multicore well: concurrency vs parallelism, the cost of synchronization, and Amdahl's law.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between concurrency and parallelism</li>
+<li>Multicore hardware models (SMP, NUMA, cache coherence)</li>
+<li>The cost of synchronization primitives (lock, atomic, barrier)</li>
+<li>Amdahl's law and the ceilings on scalability</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Every server, laptop, and phone is multicore today. Single-core clocks are no longer rising, so squeezing out performance means dividing work across cores. Done badly, this makes things slower. Lock contention, cache ping-pong, and false sharing wait at every corner.</p>
+<blockquote>
+<p>Parallelism is not free. Always start by asking "is this work worth parallelizing?"</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Concurrency is the structural ability to deal with many tasks. Parallelism is physically running tasks at the same time. Multicore enables parallelism, but data movement between cores has a cost. Cache coherence keeps data consistent automatically, but contention on the same line crashes performance. Amdahl's law says "if 5% is sequential, no number of cores breaks past 20x speedup."</p>
+</blockquote>
+<pre><code class="language-text">   concurrency                          parallelism
+   --------------------                 ---------------------
+   structural ability to                physical ability to
+   deal with many tasks                 run them simultaneously
+                                        (multicore required)
+
+   single-core OK                       multicore required
+   async/await, generators              threads, processes, SIMD
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Concurrency</strong><br>
+- Description: Structuring multiple tasks to interleave</p>
+<p><strong>Parallelism</strong><br>
+- Description: Physically running tasks at the same time</p>
+<p><strong>SMP</strong><br>
+- Description: Symmetric multi-processing, equal cores</p>
+<p><strong>NUMA</strong><br>
+- Description: Non-uniform memory access by core</p>
+<p><strong>Cache coherence</strong><br>
+- Description: Keeping per-core caches consistent</p>
+<p><strong>Amdahl's law</strong><br>
+- Description: Sequential fraction caps speedup</p>
+<h2>Before / After</h2>
+<p><strong>Before — use all cores without thinking:</strong></p>
+<pre><code class="language-python"># &quot;8 cores so it must be 8x faster&quot;
+from multiprocessing import Pool
+
+def task(x):
+    return x * 2
+
+with Pool(8) as p:
+    result = p.map(task, range(100))   # tasks too small, overhead dominates
+</code></pre>
+<p><strong>After — consider task size and communication cost:</strong></p>
+<pre><code class="language-python">from multiprocessing import Pool
+
+def heavy_task(n):
+    return sum(i * i for i in range(n))
+
+with Pool(8) as p:
+    result = p.map(heavy_task, [10_000_000] * 8)   # enough work per core
+</code></pre>
+<p>Same tool, opposite outcomes. When tasks are too small, inter-process communication costs more than the computation.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Check core count and trivial parallelism</strong></p>
+<pre><code class="language-python">import os, time
+from multiprocessing import Pool
+
+def work(n):
+    return sum(i * i for i in range(n))
+
+if __name__ == &quot;__main__&quot;:
+    print(f&quot;logical cores: {os.cpu_count()}&quot;)
+
+    N = 5_000_000
+    tasks = [N] * 8
+
+    start = time.time()
+    [work(n) for n in tasks]
+    print(f&quot;sequential: {time.time() - start:.2f}s&quot;)
+
+    with Pool(processes=os.cpu_count()) as p:
+        start = time.time()
+        p.map(work, tasks)
+        print(f&quot;parallel:   {time.time() - start:.2f}s&quot;)
+</code></pre>
+<p>Typical speedup is 4–6x. The reason 8 cores rarely give 8x is the topic of the next step.</p>
+<p><strong>Step 2: Compute Amdahl's law</strong></p>
+<pre><code class="language-python">def amdahl_speedup(p, n):
+    &quot;&quot;&quot;p: parallelizable fraction, n: cores&quot;&quot;&quot;
+    return 1 / ((1 - p) + p / n)
+
+for serial in [0.05, 0.10, 0.20, 0.50]:
+    p = 1 - serial
+    print(f&quot;serial {serial*100:.0f}%: cores 8 -&gt; {amdahl_speedup(p, 8):.2f}x,&quot;
+          f&quot;  cores inf -&gt; {1/serial:.1f}x&quot;)
+</code></pre>
+<p>Even 5% serial work caps speedup at 20x with infinite cores. That ceiling lives over every distributed system.</p>
+<p><strong>Step 3: Measure lock contention</strong></p>
+<pre><code class="language-python">import threading, time
+
+counter = 0
+lock = threading.Lock()
+
+def with_lock(iters):
+    global counter
+    for _ in range(iters):
+        with lock:
+            counter += 1
+
+ITERS = 1_000_000
+counter = 0
+threads = [threading.Thread(target=with_lock, args=(ITERS,)) for _ in range(4)]
+start = time.time()
+for t in threads: t.start()
+for t in threads: t.join()
+print(f&quot;with lock: {time.time()-start:.2f}s, counter={counter}&quot;)
+</code></pre>
+<p>Past a certain point, more threads do not speed things up — lock contention slows them down.</p>
+<p><strong>Step 4: See false sharing</strong></p>
+<pre><code class="language-python">import threading, time
+
+# Adjacent indices updated by different threads share a cache line
+shared = [0] * 4
+
+def bump(idx, iters):
+    for _ in range(iters):
+        shared[idx] += 1
+
+# Adjacent (false sharing)
+threads = [threading.Thread(target=bump, args=(i, 5_000_000)) for i in range(4)]
+start = time.time()
+for t in threads: t.start()
+for t in threads: t.join()
+print(f&quot;adjacent: {time.time()-start:.2f}s&quot;)
+
+# Spaced apart (false sharing reduced)
+shared = [0] * 256
+threads = [threading.Thread(target=bump, args=(i*64, 5_000_000)) for i in range(4)]
+start = time.time()
+for t in threads: t.start()
+for t in threads: t.join()
+print(f&quot;spaced:   {time.time()-start:.2f}s&quot;)
+</code></pre>
+<p>Same workload, different cache line layout, different time. Python's GIL hides much of the effect, but in C, Rust, or Go this is routinely 2–3x.</p>
+<p><strong>Step 5: Concurrency vs parallelism for I/O</strong></p>
+<pre><code class="language-python">import asyncio, time
+
+async def io_task(i):
+    await asyncio.sleep(0.1)
+    return i
+
+async def main():
+    start = time.time()
+    await asyncio.gather(*(io_task(i) for i in range(100)))
+    print(f&quot;asyncio (concurrency, 1 core): {time.time()-start:.2f}s&quot;)
+
+asyncio.run(main())
+</code></pre>
+<p>100 I/O tasks finish in roughly 0.1 seconds, not 10. A single core handles it through concurrency. Parallelism only helps when work is CPU-bound.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Adding cores alone has limits</li>
+<li>Amdahl's law shows the sequential fraction sets the ceiling</li>
+<li>Lock contention and false sharing are commonly missed performance traps</li>
+<li>For I/O-bound work, concurrency beats parallelism</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Parallelizing tiny tasks</strong><br>
+- Problem: Communication overhead dominates<br>
+- Fix: Make tasks bigger</p>
+<p><strong>Threading for CPU-bound work in Python</strong><br>
+- Problem: GIL keeps it single-core<br>
+- Fix: multiprocessing or C extension</p>
+<p><strong>Lock scope too wide</strong><br>
+- Problem: Effective serialization returns<br>
+- Fix: Minimize scope, split locks</p>
+<p><strong>Ignoring false sharing</strong><br>
+- Problem: Cache ping-pong tanks performance<br>
+- Fix: Pad and align data</p>
+<p><strong>Parallelizing everything</strong><br>
+- Problem: Some work is inherently sequential<br>
+- Fix: Use Amdahl to estimate first</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Data processing: SIMD in pandas/numpy, distributed parallelism in Spark</li>
+<li>Web servers: multi-process workers combined with async I/O</li>
+<li>Game engines: rendering, physics, audio pinned to separate cores</li>
+<li>ML training: GPUs use thousands of SIMD lanes</li>
+<li>Databases: parallel queries and partitioning</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer who hears "let's parallelize" asks two questions first. One: is this work actually CPU-bound? Two: what fraction is parallelizable? Most backend work is I/O-bound, and the answer there is concurrency, not parallelism.</p>
+<p>A senior also measures the cost of parallelism. Task distribution, result collection, synchronization, cache coherence traffic — if those costs exceed the parallel gain, you build systems that get slower as you add cores. The proven approach: measure small, scale cores incrementally, plot the curve.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain concurrency and parallelism to someone else</li>
+<li>[ ] You can estimate ceilings with Amdahl's law</li>
+<li>[ ] You can identify lock contention and false sharing</li>
+<li>[ ] You can tell CPU-bound from I/O-bound</li>
+<li>[ ] You can decide whether a task is large enough to parallelize</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Tabulate <code>amdahl_speedup</code> for serial fractions 1%, 5%, 10% across 16, 64, 256 cores. Find where diminishing returns start.</p>
+</li>
+<li>
+<p>With <code>multiprocessing.Pool</code>, vary task size (10k, 100k, 1M, 10M) and measure 4-core speedup. Find the threshold where parallelism is worth it.</p>
+</li>
+<li>
+<p>Compare <code>threading</code> and <code>asyncio</code> on 100 HTTP GET requests. Tabulate CPU usage, memory, and time.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Parallelism is the heart of the multicore era, but it is not automatic. Distinguish it from concurrency, estimate ceilings with Amdahl, and avoid the traps of lock contention and false sharing. A senior looks at the parallelizable fraction before the core count.</p>
+<p>Next is the final article in this series — measuring and analyzing performance. We pull together everything from CPU to memory to I/O to parallelism into a thinking tool that explains why a system is as fast or slow as it is.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/01-what-is-computer-architecture.md">What Is Computer Architecture?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/02-data-representation.md">Data Representation — Bit, Byte, Integer, Floating Point</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/03-cpu-and-instructions.md">CPU and Instructions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/04-registers-and-alu.md">Registers and the ALU</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/05-memory-organization.md">Memory Organization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/06-cache-and-locality.md">Cache and Locality</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/07-pipelining.md">Pipelining</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-architecture-101/en/08-io-and-devices.md">I/O and Devices</a></li>
+<li><strong>Parallelism and Multicore (current)</strong></li>
+<li>Understanding Performance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Wikipedia — Amdahl's law</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Cache_coherence">Wikipedia — Cache coherence</a></li>
+<li><a href="https://en.wikipedia.org/wiki/False_sharing">Wikipedia — False sharing</a></li>
+<li><a href="http://www.gotw.ca/publications/concurrency-ddj.htm">The Free Lunch Is Over (Herb Sutter, 2005)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computer Architecture, Parallelism, Multicore, Concurrency, Synchronization</p>
+</body>
+</html>

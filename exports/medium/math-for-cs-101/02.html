@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logic and Proofs</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Logic and Proofs</h1>
+<blockquote>
+<p>Math for CS 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>prove</em> a <em>program</em> is <em>correct</em>?</p>
+<blockquote>
+<p><em>Logic</em> gives us <em>propositions</em> and <em>implication</em>; <em>proof</em> uses <em>direct</em>, <em>contradiction</em>, and <em>induction</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Propositions</em> and <em>truth tables</em></li>
+<li><em>Implication</em> and <em>equivalence</em></li>
+<li><em>Direct proof</em></li>
+<li><em>Proof by contradiction</em></li>
+<li><em>Mathematical induction</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A <em>test</em> checks a <em>few</em> cases. A <em>proof</em> covers <em>all</em> of them.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Prop[&quot;proposition&quot;] --&gt; Truth[&quot;truth table&quot;]
+    Prop --&gt; Imply[&quot;implication&quot;]
+    Imply --&gt; Direct[&quot;direct proof&quot;]
+    Imply --&gt; Contra[&quot;contradiction&quot;]
+    Imply --&gt; Induct[&quot;induction&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>proposition</strong>: a <em>true/false</em> statement.</li>
+<li><strong>implication</strong>: <code>p → q</code>.</li>
+<li><strong>direct proof</strong>: from <em>premise</em> to <em>conclusion</em>.</li>
+<li><strong>contradiction</strong>: assume the <em>opposite</em>, derive a <em>contradiction</em>.</li>
+<li><strong>induction</strong>: <em>base case</em> plus <em>inductive step</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: conclude <em>correct</em> from <em>three examples</em>.</p>
+<p><strong>After</strong>: prove for <em>all n</em> by <em>mathematical induction</em>.</p>
+<h2>Hands-on: A Tiny Proof Kit</h2>
+<p><strong>Step 1 — Truth table</strong></p>
+<pre><code class="language-python">def truth_imply():
+    return [(p, q, (not p) or q) for p in (False, True) for q in (False, True)]
+</code></pre>
+<p><strong>Step 2 — Equivalence</strong></p>
+<pre><code class="language-python">def equiv(p, q):
+    return p == q
+</code></pre>
+<p><strong>Step 3 — Direct proof sketch</strong></p>
+<pre><code class="language-python">def even_sum(a, b):
+    assert a % 2 == 0 and b % 2 == 0
+    return (a + b) % 2 == 0
+</code></pre>
+<p><strong>Step 4 — Contradiction sketch</strong></p>
+<pre><code class="language-python">def assume_not(claim):
+    return f&quot;suppose not {claim}, derive contradiction&quot;
+</code></pre>
+<p><strong>Step 5 — Induction</strong></p>
+<pre><code class="language-python">def sum_to(n):
+    return n * (n + 1) // 2
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Implication</em> is <code>not p or q</code>.</li>
+<li>The <em>sum</em> of <em>even</em> numbers is <em>even</em>.</li>
+<li>The <em>sum</em> formula is a <em>closed form</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Replacing a <em>proof</em> with <em>examples</em>.</strong></li>
+<li><strong>Confusing <em>implication</em> with its <em>converse</em>.</strong></li>
+<li><strong>Skipping the <em>base case</em> in induction.</strong></li>
+<li><strong>One <em>counterexample</em> is <em>disproof</em>.</strong></li>
+<li><strong>Following <em>symbols</em> without grasping <em>meaning</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Compiler</em> type checkers and <em>distributed</em> consensus algorithms are validated via <em>formal proofs</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Proof</em> is <em>documentation</em>.</li>
+<li><em>Counterexamples</em> are <em>friends</em>.</li>
+<li><em>Induction</em> is the cousin of a <em>loop</em>.</li>
+<li><em>Equivalence</em> is a <em>refactoring</em> tool.</li>
+<li><em>Implication</em> is a <em>guard</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Build a <em>truth table</em>.</li>
+<li>[ ] Distinguish <em>implication</em>, <em>converse</em>, <em>contrapositive</em>.</li>
+<li>[ ] Verify the <em>base case</em>.</li>
+<li>[ ] Hunt for <em>counterexamples</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>implication</em> in one line.</li>
+<li>Define <em>contradiction</em> in one line.</li>
+<li>Define <em>induction</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next, we cover <em>sets and functions</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><strong>Logic and Proofs (current)</strong></li>
+<li>Sets and Functions (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Probability (upcoming)</li>
+<li>Linear Algebra (upcoming)</li>
+<li>Calculus (upcoming)</li>
+<li>Information Theory (upcoming)</li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Discrete_Mathematics_and_Its_Applications">Discrete Mathematics and Its Applications - Rosen</a></li>
+<li><a href="https://www.cambridge.org/core/books/how-to-prove-it/">How to Prove It - Velleman</a></li>
+<li><a href="https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:induction/v/proof-by-induction">Mathematical Induction - Khan Academy</a></li>
+<li><a href="https://www.cambridge.org/core/books/logic-in-computer-science/">Logic in Computer Science - Huth, Ryan</a></li>
+</ul>
+<p class="tags-line">Tags: Math, Logic, Proof, Boolean, Beginner</p>
+</body>
+</html>

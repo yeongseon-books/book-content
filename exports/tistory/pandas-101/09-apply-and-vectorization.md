@@ -1,0 +1,147 @@
+
+# apply와 vectorization
+
+> Pandas 101 시리즈 (9/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: *apply* 가 *for문보다 빠를까요*?
+
+> *apply는 *for문의 얇은 포장지* 일 뿐입니다. 진짜 속도는 *벡터화* 에서 나옵니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *벡터화* 의 의미
+- *apply / map / vectorize* 의 차이
+- *NumPy* 와의 *상호운용*
+- 5단계 성능 실습
+- 흔한 함정 5가지
+
+## 왜 중요한가
+
+분석 속도가 *수십~수백 배* 차이날 수 있습니다. *벡터화* 는 *Pandas의 본질* 이며, *apply 남용* 은 *가장 흔한 안티패턴* 입니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    Loop["for-loop"] -->|slow| Apply["apply"]
+    Apply -->|faster| Vec["vectorized (NumPy / Pandas ops)"]
+```
+
+## 핵심 용어 정리
+
+- **벡터화**: *반복문 없이* 배열 단위로 *한 번에 계산*.
+- **apply**: *함수* 를 *행/열에 적용* — 내부는 결국 Python 루프.
+- **map**: *Series 원소* 에 함수/dict 적용.
+- **np.where**: *조건부 벡터 연산*.
+- **eval / numexpr**: *큰 표현식* 의 *가속*.
+
+## Before/After
+
+**Before**: *“for i in range(len(df))”* — 100만 행에서 분 단위.
+
+**After**: *“df["c"] = df["a"] + df["b"]”* — 밀리초.
+
+## 실습: 5단계 성능
+
+### 1단계 — 기준 데이터
+
+```python
+import numpy as np, pandas as pd
+df = pd.DataFrame({"a": np.arange(1_000_000), "b": np.arange(1_000_000)})
+```
+
+### 2단계 — 느린 방식
+
+```python
+# %timeit df.apply(lambda r: r["a"] + r["b"], axis=1)
+# 매우 느림 — apply(axis=1)은 행 단위 Python 호출
+```
+
+### 3단계 — 벡터화
+
+```python
+df["c"] = df["a"] + df["b"]   # 가장 빠름
+```
+
+### 4단계 — np.where 조건부
+
+```python
+df["flag"] = np.where(df["a"] % 2 == 0, "even", "odd")
+```
+
+### 5단계 — map 으로 코드 매핑
+
+```python
+mapping = {0: "zero", 1: "one"}
+print(pd.Series([0, 1, 2]).map(mapping))
+```
+
+## 이 코드에서 주목할 점
+
+- *axis=1* apply 는 *가장 느림* — *행마다 Python 호출*.
+- *벡터 연산* 은 *C 레벨* 에서 실행됩니다.
+- *np.where* 는 *if-else* 의 벡터 버전.
+
+## 자주 하는 실수 5가지
+
+1. ***apply(axis=1) 남용*.**
+2. ***Python for문* 으로 *행 누적 합* 계산.**
+3. ***eval/numexpr* 을 *모르고* 거대한 표현식 직접 작성.**
+4. ***map* 의 *NaN 발생* 을 무시.**
+5. ***dtype 불일치* 로 *벡터화 실패* 후 object dtype.**
+
+## 실무에서는 이렇게 쓰입니다
+
+ETL 변환, 피처 엔지니어링, 대규모 리포트 — *벡터화* 는 *비용과 시간* 을 직접적으로 절감합니다. *클라우드 비용 절감* 의 가장 쉬운 레버.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *벡터화 가능성* 을 *항상 먼저* 확인.
+- *apply* 는 *벡터화 불가* 일 때만.
+- *axis=1* 은 *피한다*.
+- *dtype* 을 *맞춘다*.
+- *프로파일링* 으로 *실제 병목* 을 측정.
+
+## 체크리스트
+
+- [ ] *벡터화* 와 *apply* 를 구분한다.
+- [ ] *np.where* 를 쓴다.
+- [ ] *map* 으로 *코드 변환* 을 한다.
+- [ ] *axis=1 apply* 를 피한다.
+
+## 연습 문제
+
+1. *덧셈* 을 *벡터화 vs apply(axis=1)* 로 *시간 비교* 하세요.
+2. *np.where* 로 *3분기 조건* 을 표현하세요.
+3. *map* 으로 *국가 코드* 를 *국가명* 으로 변환하세요.
+
+## 정리 및 다음 단계
+
+벡터화는 *Pandas의 본질* 입니다. 다음 글에서는 *실전 데이터 분석* 을 다룹니다.
+
+- [Pandas란 무엇인가?](./01-what-is-pandas.md)
+- [Series와 DataFrame](./02-series-and-dataframe.md)
+- [CSV와 Excel 읽기](./03-read-csv-and-excel.md)
+- [filtering과 selection](./04-filtering-and-selection.md)
+- [missing value 처리](./05-missing-values.md)
+- [groupby](./06-groupby.md)
+- [merge와 join](./07-merge-and-join.md)
+- [time series](./08-time-series.md)
+- **apply와 vectorization (현재 글)**
+- 실전 데이터 분석 (예정)
+## 참고 자료
+
+- [pandas — Enhancing performance](https://pandas.pydata.org/docs/user_guide/enhancingperf.html)
+- [pandas — apply](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html)
+- [NumPy — Universal functions](https://numpy.org/doc/stable/reference/ufuncs.html)
+- [Real Python — Fast, Flexible, Easy and Intuitive Pandas](https://realpython.com/fast-flexible-pandas/)
+
+Tags: Pandas, Vectorization, Performance, Apply, Beginner
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Time and Space Complexity</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Time and Space Complexity</h1>
+<blockquote>
+<p>Algorithms 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How can we predict whether an algorithm will be fast enough before writing the code?</p>
+<blockquote>
+<p>Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Big-O is an upper bound, Big-Omega a lower bound, Big-Theta a tight bound. Most engineering work uses Big-O for the worst case. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of Big-O, Big-Omega, and Big-Theta</li>
+<li>How to estimate complexity from a code snippet</li>
+<li>The cost classes you must recognise immediately (constant, log, linear, n log n, quadratic, exponential)</li>
+<li>How input size narrows the algorithm choice</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Asymptotic analysis is the shared vocabulary engineers use to discuss performance. Without it, "is this fast enough" becomes guesswork. With it, you can compare two algorithms before running either, and you can estimate whether code will hold at 100x its current load.</p>
+<blockquote>
+<p>Big-O is the language in which performance arguments are made.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Complexity describes growth, not absolute time. An O(n) algorithm may be slower than an O(n log n) one for small inputs but always wins for large ones. The constant factors disappear in asymptotic notation, which is what allows fair comparison across machines and languages.</p>
+</blockquote>
+<pre><code class="language-text">Cost classes (low to high)
+    O(1)       constant
+    O(log n)   logarithmic
+    O(n)       linear
+    O(n log n) linearithmic
+    O(n^2)     quadratic
+    O(2^n)     exponential
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Big-O</strong><br>
+- Description: Asymptotic upper bound (worst case)</p>
+<p><strong>Big-Omega</strong><br>
+- Description: Asymptotic lower bound (best case)</p>
+<p><strong>Big-Theta</strong><br>
+- Description: Tight asymptotic bound</p>
+<p><strong>Worst case</strong><br>
+- Description: Maximum cost over all inputs of size n</p>
+<p><strong>Amortized</strong><br>
+- Description: Average over a long sequence of operations</p>
+<h2>Before / After</h2>
+<p><strong>Before — guessing if code is fast enough:</strong></p>
+<pre><code class="language-python"># &quot;It runs in a second on my laptop, ship it.&quot;
+# Production data is 1000x larger.
+</code></pre>
+<p><strong>After — estimating from input size:</strong></p>
+<pre><code class="language-text">n = 10^6, time budget = 1s
+→ O(n^2) = 10^12 ops, impossible
+→ O(n log n) ≈ 2 × 10^7 ops, feasible
+→ Pick an O(n log n) algorithm
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Recognise common patterns</strong></p>
+<pre><code class="language-python">def constant(arr):
+    return arr[0]                 # O(1)
+
+def linear(arr):
+    return sum(arr)               # O(n)
+
+def quadratic(arr):
+    out = 0
+    for x in arr:
+        for y in arr:             # nested loop over n
+            out += x * y
+    return out                    # O(n^2)
+</code></pre>
+<p>The shape of the loops, not the language, drives the cost class.</p>
+<p><strong>Step 2: Logarithmic patterns</strong></p>
+<pre><code class="language-python">def binary_search(arr, x):
+    lo, hi = 0, len(arr) - 1
+    while lo &lt;= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == x:
+            return mid
+        if arr[mid] &lt; x:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1                     # O(log n) — halves each step
+</code></pre>
+<p>Halving the search space each step yields O(log n). The same pattern appears in tree heights, exponentiation, and some divide-and-conquer recursions.</p>
+<p><strong>Step 3: Linearithmic patterns</strong></p>
+<pre><code class="language-python">def mergesort(arr):
+    if len(arr) &lt;= 1:
+        return arr
+    mid = len(arr) // 2
+    left = mergesort(arr[:mid])
+    right = mergesort(arr[mid:])
+    return merge(left, right)     # O(n log n)
+</code></pre>
+<p>Divide into halves (log n levels) and do O(n) work per level. The product is O(n log n) — the typical cost of efficient sorting.</p>
+<p><strong>Step 4: Estimate from input size</strong></p>
+<pre><code class="language-text">n = 10              → almost anything (even O(n!))
+n = 10^3            → O(n^2) okay
+n = 10^5            → O(n log n) required
+n = 10^7            → O(n) required
+n = 10^9            → O(log n) or streaming
+</code></pre>
+<p>Memorising this table is one of the highest-leverage things you can do. It instantly narrows the algorithm before any code.</p>
+<p><strong>Step 5: Worst case vs amortized</strong></p>
+<pre><code class="language-python">arr = []
+for i in range(10**6):
+    arr.append(i)                 # average O(1), worst O(n) on resize
+</code></pre>
+<p>Python's list <code>append</code> is amortized O(1) — most calls are O(1) but occasional resizes copy the whole array. Amortized analysis matters when worst-case spikes are tolerable.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>Big-O hides constants but constants matter for small n</li>
+<li>The worst case is usually what production sees over time</li>
+<li>Space complexity is independent of time complexity</li>
+<li>Logarithms ignore the base — O(log n) and O(log_2 n) are the same class</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Comparing algorithms by raw time on small inputs</strong><br>
+- Problem: Wrong winner at scale<br>
+- Fix: Look at the cost class, not the milliseconds</p>
+<p><strong>Counting only the outer loop</strong><br>
+- Problem: Missed nested cost<br>
+- Fix: Multiply nested loops</p>
+<p><strong>Ignoring constants completely</strong><br>
+- Problem: Tight code surprisingly slow<br>
+- Fix: Reduce both class and constant for hot paths</p>
+<p><strong>Confusing average with worst case</strong><br>
+- Problem: Production spikes<br>
+- Fix: Plan for worst case in latency-sensitive systems</p>
+<p><strong>Treating O(log n) as "essentially constant"</strong><br>
+- Problem: Underestimates large n<br>
+- Fix: log(10^9) ≈ 30 — small but not free</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Code reviews flag O(n^2) loops over potentially large inputs</li>
+<li>Database query plans are evaluated by the same asymptotic vocabulary</li>
+<li>Capacity planning estimates load growth against algorithm class</li>
+<li>Hot-path optimisation focuses on lowering both class and constants</li>
+<li>Algorithmic interviews are essentially asymptotic-analysis interviews</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer reads complexity from code at a glance. Nested loops over the same input scream O(n^2); divide-and-conquer with linear merge says O(n log n). This pattern recognition is built by exposure, not memorisation.</p>
+<p>A senior engineer also separates cost class from constant factors. For small inputs, a "worse" class with smaller constants can win. For large inputs, the class dominates. Knowing where your input lives on that curve is half of performance engineering.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you read the cost class of a function in 30 seconds?</li>
+<li>[ ] Do you estimate complexity before coding?</li>
+<li>[ ] Can you distinguish worst case, average, and amortized?</li>
+<li>[ ] Do you know the input-size table by heart?</li>
+<li>[ ] Can you explain why O(log n) is dramatically smaller than O(n)?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>For each of the following, give the time complexity in Big-O: triple nested loop, recursion T(n)=2T(n/2)+O(n), recursion T(n)=T(n/2)+O(1). Justify each in one sentence.</p>
+</li>
+<li>
+<p>Implement a function that finds the two indices in a sorted array whose values sum to a target. First write an O(n^2) brute-force version, then improve it to O(n) using two pointers, and explain the gain.</p>
+</li>
+<li>
+<p>Pick a real function from your code and write down its time and space complexity. Then identify a single change that would reduce one of them by at least one cost class.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Asymptotic analysis is the language we use to argue about performance. Big-O for upper bound, Omega for lower, Theta for tight. Recognise the common cost classes and combine them with input size to predict whether code will scale.</p>
+<p>The next article applies this vocabulary to search algorithms, where the difference between O(n) and O(log n) is the difference between scanning a million items and looking at twenty.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/algorithms-101/en/01-what-is-an-algorithm.md">What Is an Algorithm?</a></li>
+<li><strong>Time and Space Complexity (current)</strong></li>
+<li>Search Algorithms (upcoming)</li>
+<li>Sorting Algorithms (upcoming)</li>
+<li>Recursion and Divide and Conquer (upcoming)</li>
+<li>Dynamic Programming (upcoming)</li>
+<li>Greedy Algorithms (upcoming)</li>
+<li>Graph Algorithms (upcoming)</li>
+<li>String Algorithm Basics (upcoming)</li>
+<li>Algorithm Problem-Solving Strategies (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Big_O_notation">Wikipedia — Big O notation</a></li>
+<li><a href="https://mitpress.mit.edu/books/introduction-algorithms-third-edition">CLRS — Introduction to Algorithms, Chapter 3</a></li>
+<li><a href="https://opendatastructures.org/">Open Data Structures — Asymptotic Notation</a></li>
+<li><a href="https://www.bigocheatsheet.com/">Big-O Cheat Sheet</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Algorithms, Big-O, Complexity, Performance, Asymptotic Analysis</p>
+</body>
+</html>

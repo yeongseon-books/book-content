@@ -1,0 +1,203 @@
+
+# What Is Backend Development?
+
+> Backend Development 101 series (1/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: Users only see the screen. So what is the *backend* actually doing behind it?
+
+> It receives a request, applies rules, touches data, and returns a response. The backend is a *set of responsibilities*.
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- The role and the boundaries of a backend
+- The five layers that form a backend system
+- The path of one request through that system
+- A map of this whole series
+- Why each next chapter exists
+
+## Why It Matters
+
+Building only the frontend lets you ship *what the user sees*. Building the backend lets you ship *systems that survive*. Data, authentication, consistency, and operations all live behind the screen, and someone has to design them.
+
+> The backend is invisible, but it decides everything.
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    Client["Client"] --> HTTP["HTTP server"]
+    HTTP --> Route["Router"]
+    Route --> Service["Service"]
+    Service --> DB["Database"]
+    Service --> Ext["External API"]
+    DB --> Service
+    Service --> Route
+    Route --> HTTP
+    HTTP --> Client
+```
+
+Requests flow left to right; responses retrace the same path.
+
+## Key Terms
+
+- **HTTP server**: the front door for requests.
+- **Router**: chooses which function will produce the response.
+- **Service**: the layer that holds business rules.
+- **Repository**: the conversation with the database.
+- **Middleware**: behavior that runs on *every* request.
+
+## Before/After
+
+**Before (the frontend does everything)**
+
+```python
+# A password check inside the browser
+if password == "admin123":
+    show_dashboard()
+```
+
+**After (the backend owns the rule)**
+
+```python
+# server.py
+@app.post("/login")
+def login(body):
+    if not auth.verify(body["email"], body["password"]):
+        return 401, {"error": "invalid"}
+    return 200, {"token": auth.token(body["email"])}
+```
+
+Password verification belongs to the *server*; the client only consumes the result.
+
+## Hands-on: Your First Backend in Five Steps
+
+### Step 1 — The smallest server
+
+```python
+# 1_app.py
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+def hello():
+    return {"message": "hello"}
+```
+
+### Step 2 — Run it
+
+```bash
+uvicorn 1_app:app --reload
+```
+
+Open `http://127.0.0.1:8000/` and you will see JSON.
+
+### Step 3 — Add a route
+
+```python
+# 2_routes.py
+from fastapi import FastAPI
+app = FastAPI()
+
+USERS = [{"id": 1, "name": "Alice"}]
+
+@app.get("/users")
+def list_users():
+    return USERS
+```
+
+### Step 4 — Accept input
+
+```python
+# 3_input.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class UserIn(BaseModel):
+    name: str
+
+@app.post("/users")
+def create_user(payload: UserIn):
+    return {"id": 99, "name": payload.name}
+```
+
+### Step 5 — Call it
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"name":"Bob"}' http://127.0.0.1:8000/users
+```
+
+You get JSON back.
+
+## What to Notice in This Code
+
+- A server is a *path-to-function* mapping.
+- Input is *validated* before it reaches your function.
+- The response is *data* (JSON), not a screen.
+
+## Five Common Mistakes
+
+1. **Equating backend with database code.** It also covers routing, auth, validation, and logging.
+2. **Putting all logic inside route handlers.** One file becomes a thousand lines.
+3. **Trusting client-side validation.** The server must always validate again.
+4. **Returning 500 for every error.** Use meaningful codes like 400, 404, and 409.
+5. **Skipping logs.** You will never know what happened in production.
+
+## How This Shows Up in Production
+
+The shape of a backend is similar from a startup to a large company — Router, Service, Repository, and Middleware. Learn the *layer split* once and you can join almost any team without relearning structure. Skip it and every codebase feels foreign.
+
+## How a Senior Engineer Thinks
+
+- Business rules live in services, not routes.
+- Every input gets validated, every time.
+- Every dependency can be injected for testing.
+- Logs and metrics are designed alongside the code.
+- The bar is "operable", not "it works on my machine".
+
+## Checklist
+
+- [ ] You can name the five backend layers.
+- [ ] You can run the smallest FastAPI server.
+- [ ] You can tell GET from POST.
+- [ ] You can explain why input validation matters.
+- [ ] You know what the next chapter covers.
+
+## Practice Problems
+
+1. Add a `/health` route that returns `{"status": "ok"}`.
+2. Add `GET /users/{user_id}` and echo the path parameter.
+3. Make `POST /login` return `401` when the password is wrong.
+
+## Wrap-up and Next Steps
+
+The backend is a *set of responsibilities*. Next, we open up the lowest layer and build an *HTTP server* by hand to see how it really works.
+
+- **What Is Backend Development? (current)**
+- Building an HTTP Server (upcoming)
+- Routing and Controllers (upcoming)
+- The Service Layer (upcoming)
+- The Database Layer (upcoming)
+- Authentication and Authorization (upcoming)
+- Logging and Error Handling (upcoming)
+- Testing the Backend (upcoming)
+- Deploying the Backend (upcoming)
+- A Production-Ready Backend Structure (upcoming)
+## References
+
+- [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
+- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
+- [The Twelve-Factor App](https://12factor.net/)
+- [Backend roadmap](https://roadmap.sh/backend)
+
+Tags: Backend, WebDevelopment, HTTP, Architecture, Python
+
+---
+
+© 2026 YeongseonBooks. All rights reserved.

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>An Open Source Portfolio</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>An Open Source Portfolio</h1>
+<blockquote>
+<p>Open Source 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does open source contribution become a <em>portfolio</em>?</p>
+<blockquote>
+<p>Present context, evidence, and a narrative — together.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Profile</em> optimization</li>
+<li><em>Pinned</em> repositories</li>
+<li><em>PR</em> curation</li>
+<li>A <em>contribution</em> narrative</li>
+<li><em>Sustained</em> evidence</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A portfolio is the proof of your career.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    P[Profile] --&gt; R[Pinned]
+    R --&gt; C[Contribs]
+    C --&gt; N[Narrative]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>profile README</strong>: Self-introduction repo.</li>
+<li><strong>pinned</strong>: Highlighted repos.</li>
+<li><strong>contributions</strong>: Activity graph.</li>
+<li><strong>narrative</strong>: Your story.</li>
+<li><strong>proof of work</strong>: Evidence of effort.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "My GitHub is full of forks."</p>
+<p><strong>After</strong>: "Three notable PRs and one original project are pinned."</p>
+<h2>Hands-on: Portfolio Cleanup</h2>
+<p><strong>Step 1 — Profile README</strong></p>
+<pre><code class="language-bash">gh repo create &lt;username&gt; --public
+echo &quot;# Hi, I am ...&quot; &gt; README.md
+</code></pre>
+<p><strong>Step 2 — Choose Six Pinned Items</strong></p>
+<pre><code class="language-text">- 1 original project
+- 3 meaningful PRs
+- 1 learning notebook
+- 1 OSS you contribute to
+</code></pre>
+<p><strong>Step 3 — PR Index</strong></p>
+<pre><code class="language-markdown">## Notable PRs
+- pandas#123 — Fix x
+- requests#456 — Add y
+</code></pre>
+<p><strong>Step 4 — Contribution Narrative</strong></p>
+<pre><code class="language-markdown">## Story
+Started with docs, moved to bugs, now feature work.
+</code></pre>
+<p><strong>Step 5 — Evidence of Sustainment</strong></p>
+<pre><code class="language-text">At least 2 commits per week, three months straight
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Narrative provides context.</li>
+<li>Pinned items are your face.</li>
+<li>Sustainment builds trust.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stacking only forks.</strong></li>
+<li><strong>An empty profile README.</strong></li>
+<li><strong>Broken PR links.</strong></li>
+<li><strong>Sporadic activity.</strong></li>
+<li><strong>No descriptions.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Hiring teams check GitHub activity before technical interviews as a baseline reference.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Narrative beats raw data.</li>
+<li>Three is better than thirty.</li>
+<li>Persistence is talent.</li>
+<li>A PR link is evidence.</li>
+<li>Profile README is the door.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Profile README written.</li>
+<li>[ ] Six pinned items chosen.</li>
+<li>[ ] Notable PRs indexed.</li>
+<li>[ ] Three months of activity.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: difference between pinned and fork.</li>
+<li>One line: purpose of the profile README.</li>
+<li>One line: example of sustained evidence.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>My First Open Source Project</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Creating Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">A Good README</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/06-release-and-versioning.md">Release and Versioning</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/07-community-management.md">Community Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/08-maintainer-role.md">The Maintainer Role</a></li>
+<li><strong>An Open Source Portfolio (current)</strong></li>
+<li>My First Open Source Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile">GitHub Profile README</a></li>
+<li><a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile">Pinning items</a></li>
+<li><a href="https://opensource.guide/finding-users/">Open Source Guides — Finding Users</a></li>
+<li><a href="https://github.com/readme">Hiring with GitHub</a></li>
+</ul>
+<p class="tags-line">Tags: OpenSource, Portfolio, Career, GitHub, Beginner</p>
+</body>
+</html>

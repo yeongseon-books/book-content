@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Compute</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Compute</h1>
+<blockquote>
+<p>Cloud Computing 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Among VMs, containers, and Lambda, <em>when do you pick which</em>?</p>
+<blockquote>
+<p><em>Compute is anything that runs your code — VM vs container vs serverless trades control for automation.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four compute styles (VM / container / serverless / bare metal)</li>
+<li>What Auto Scaling actually does</li>
+<li>Reserved vs On-Demand vs Spot</li>
+<li>How to read instance type names</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Compute choice drives roughly 60% of your bill and most of your operational pain.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Bare[&quot;bare metal&quot;] --&gt; VM[&quot;vm&quot;]
+    VM --&gt; Container[&quot;container&quot;]
+    Container --&gt; Serverless[&quot;serverless&quot;]
+    Serverless --&gt; Code[&quot;code&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>EC2</strong>: AWS VM service.</li>
+<li><strong>AMI</strong>: a VM image.</li>
+<li><strong>Auto Scaling Group</strong>: demand-based instance management.</li>
+<li><strong>Spot</strong>: spare capacity at a discount.</li>
+<li><strong>Reserved</strong>: 1-3 year commitment for a discount.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: a permanently large server sized for the peak (waste).</p>
+<p><strong>After</strong>: an Auto Scaling group that grows and shrinks with demand.</p>
+<h2>Hands-on: EC2 with boto3</h2>
+<p><strong>Step 1 — Client</strong></p>
+<pre><code class="language-python">import boto3
+ec2 = boto3.client(&quot;ec2&quot;, region_name=&quot;us-east-1&quot;)
+</code></pre>
+<p><strong>Step 2 — Launch an instance (example)</strong></p>
+<pre><code class="language-python">def launch(ami: str, type_: str = &quot;t3.micro&quot;):
+    res = ec2.run_instances(
+        ImageId=ami, InstanceType=type_, MinCount=1, MaxCount=1,
+    )
+    return res[&quot;Instances&quot;][0][&quot;InstanceId&quot;]
+</code></pre>
+<p><strong>Step 3 — Status</strong></p>
+<pre><code class="language-python">def status(instance_id: str):
+    res = ec2.describe_instances(InstanceIds=[instance_id])
+    return res[&quot;Reservations&quot;][0][&quot;Instances&quot;][0][&quot;State&quot;][&quot;Name&quot;]
+</code></pre>
+<p><strong>Step 4 — Terminate</strong></p>
+<pre><code class="language-python">def terminate(instance_id: str):
+    ec2.terminate_instances(InstanceIds=[instance_id])
+</code></pre>
+<p><strong>Step 5 — Parse instance type</strong></p>
+<pre><code class="language-python">def parse_type(t: str) -&gt; dict:
+    family, size = t.split(&quot;.&quot;)
+    return {&quot;family&quot;: family, &quot;size&quot;: size}
+
+print(parse_type(&quot;t3.micro&quot;))
+print(parse_type(&quot;m5.large&quot;))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The AMI is the VM's birth photo.</li>
+<li><code>terminate</code> is irreversible.</li>
+<li>Instance type is <code>family.size</code>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using Spot for the database.</strong></li>
+<li><strong>No Auto Scaling — peaks take you offline.</strong></li>
+<li><strong>Buying Reserved without flexibility headroom.</strong></li>
+<li><strong>Believing "stopped instance = zero cost".</strong></li>
+<li><strong>Terminating instances without log shipping — evidence is gone.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Web tier runs On-Demand inside an ASG, batch jobs ride Spot, the database lives on Reserved, and unpredictable workloads land on Lambda.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Map workload to compute, not the other way around.</li>
+<li>Auto Scaling is the default.</li>
+<li>Spot belongs where retries are cheap.</li>
+<li>Reserve only your stable baseline.</li>
+<li>Serverless wins when human time costs more than compute.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Each workload mapped to a compute style.</li>
+<li>[ ] Auto Scaling evaluated for every tier.</li>
+<li>[ ] Reserved/Spot ratio is intentional.</li>
+<li>[ ] Termination policy is documented.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>What design constraints does Lambda's max execution time impose?</li>
+<li>How do you implement graceful shutdown for Spot interruptions?</li>
+<li>Compare <code>t3</code> vs <code>m5</code> from a workload-fit angle.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Compute moves data — and data has to live somewhere. The next post covers Storage.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><strong>Compute (current)</strong></li>
+<li>Storage (upcoming)</li>
+<li>Network (upcoming)</li>
+<li>Identity and Security (upcoming)</li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">AWS EC2 user guide</a></li>
+<li><a href="https://docs.aws.amazon.com/autoscaling/">AWS Auto Scaling</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html">AWS — Spot Instances</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lambda overview</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, Compute, EC2, AutoScaling, DevOps</p>
+</body>
+</html>

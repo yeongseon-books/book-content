@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Simplifying Conditionals</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Simplifying Conditionals</h1>
+<blockquote>
+<p>Clean Code 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why do nested if statements grow so fast?</p>
+<blockquote>
+<p>Because one function carries more than one responsibility. Splitting responsibilities reduces depth.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Guard clauses and early return</li>
+<li>Avoiding negative and double-negative conditions</li>
+<li>Removing if/else chains with polymorphism</li>
+<li>Separating branches with the Strategy pattern</li>
+<li>Table-driven branching</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Nested conditionals are the most common source of complexity. Reducing depth by one already doubles readability.</p>
+<blockquote>
+<p>Depth is cognitive load.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    N[&quot;Nested if&quot;] --&gt; G[&quot;Guard clause&quot;]
+    G --&gt; P[&quot;Polymorphism&quot;]
+    P --&gt; T[&quot;Table driven&quot;]
+    T --&gt; R[&quot;Flat flow&quot;]
+</code></pre>
+<p>More tools, fewer branches.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Guard Clause</strong>: Return early for exceptional cases at the top of a function.</li>
+<li><strong>Early Return</strong>: Exit early instead of nesting deeper.</li>
+<li><strong>Polymorphism</strong>: Move type-specific behavior into classes.</li>
+<li><strong>Strategy Pattern</strong>: Inject the algorithm from outside.</li>
+<li><strong>Table-driven</strong>: Express branches as data structures.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def price(user, item):
+    if user is not None:
+        if user.is_active:
+            if item is not None:
+                if item.in_stock:
+                    return item.price * (0.9 if user.is_member else 1.0)
+                else:
+                    return None
+            else:
+                return None
+        else:
+            return None
+    else:
+        return None
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">def price(user, item):
+    if user is None or not user.is_active: return None
+    if item is None or not item.in_stock: return None
+    rate = 0.9 if user.is_member else 1.0
+    return item.price * rate
+</code></pre>
+<p>Depth dropped from 4 to 1.</p>
+<h2>Hands-on: Five Steps to Reduce Branches</h2>
+<p><strong>Step 1 — Flatten with guard clauses</strong></p>
+<pre><code class="language-python"># 1_guard.py
+def total(items):
+    if not items:
+        return 0
+    return sum(it.price for it in items)
+</code></pre>
+<p>Empty input returns immediately.</p>
+<p><strong>Step 2 — Flip negative conditions</strong></p>
+<pre><code class="language-python"># 2_positive.py
+# Before: if not user.is_inactive: ...
+# After:
+def can_login(user):
+    if not user.is_active:
+        return False
+    return user.email_verified
+</code></pre>
+<p>Always avoid double negation.</p>
+<p><strong>Step 3 — Remove branches with polymorphism</strong></p>
+<pre><code class="language-python"># 3_poly.py
+class Shape:
+    def area(self): ...
+class Circle(Shape):
+    def __init__(self, r): self.r = r
+    def area(self): return 3.14 * self.r * self.r
+class Square(Shape):
+    def __init__(self, a): self.a = a
+    def area(self): return self.a * self.a
+
+def total_area(shapes): return sum(s.area() for s in shapes)
+</code></pre>
+<p>Type branches dissolve into classes.</p>
+<p><strong>Step 4 — Strategy pattern</strong></p>
+<pre><code class="language-python"># 4_strategy.py
+def percent_off(price, rate): return price * (1 - rate)
+def fixed_off(price, amount): return max(0, price - amount)
+
+DISCOUNTS = {&quot;member&quot;: lambda p: percent_off(p, 0.1),
+             &quot;coupon10&quot;: lambda p: fixed_off(p, 10)}
+
+def apply(price, kind): return DISCOUNTS[kind](price)
+</code></pre>
+<p>Dict lookup replaces branching.</p>
+<p><strong>Step 5 — Table-driven</strong></p>
+<pre><code class="language-python"># 5_table.py
+GRADES = [(90, &quot;A&quot;), (80, &quot;B&quot;), (70, &quot;C&quot;), (0, &quot;F&quot;)]
+def grade(score):
+    return next(g for s, g in GRADES if score &gt;= s)
+</code></pre>
+<p>The if/elif chain becomes data.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Guard clauses cut indentation.</li>
+<li>Polymorphism removes the if statement entirely.</li>
+<li>Tables express policy as data.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Nesting without guards.</strong> else blocks pile up.</li>
+<li><strong>Keeping negative conditions.</strong> Double negation creeps in.</li>
+<li><strong>Branching on types.</strong> isinstance everywhere.</li>
+<li><strong>Stateful strategies.</strong> Hard to test.</li>
+<li><strong>Order-dependent tables.</strong> Easy to break priorities.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Pricing, authorization, and routing — anywhere branches resemble data — are great candidates for tables and strategies. Policy changes no longer require code edits.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Depth above 3 is a design smell.</li>
+<li>More than five if/elif arms hint at polymorphism.</li>
+<li>Branches that change with external input belong in tables.</li>
+<li>Flip negative conditions to positive in one pass.</li>
+<li>Keep strategies stateless.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Function depth ≤ 3?</li>
+<li>[ ] Guard clauses placed first?</li>
+<li>[ ] Negative conditions flipped?</li>
+<li>[ ] Type branches considered for polymorphism?</li>
+<li>[ ] Policy branches considered for tables/strategies?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find a depth-4 branch in your code and flatten it.</li>
+<li>Convert an if/elif chain of 5+ arms into a table.</li>
+<li>Replace an isinstance branch with polymorphism.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Fewer conditions, clearer code. Next we tackle the second great enemy: duplication.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/01-what-is-clean-code.md">What Is Clean Code?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/02-naming.md">Naming</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/clean-code-101/en/03-small-functions.md">Small Functions</a></li>
+<li><strong>Simplifying Conditionals (current)</strong></li>
+<li>Removing Duplication (upcoming)</li>
+<li>Error Handling (upcoming)</li>
+<li>Comments and Documentation (upcoming)</li>
+<li>Testable Code (upcoming)</li>
+<li>Refactoring Basics (upcoming)</li>
+<li>Good Code Review Standards (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.com/catalog/replaceNestedConditionalWithGuardClauses.html">Refactoring — Replace Nested Conditional with Guard Clauses</a></li>
+<li><a href="https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html">Refactoring — Replace Conditional with Polymorphism</a></li>
+<li><a href="https://refactoring.guru/design-patterns/strategy">Strategy Pattern (Refactoring Guru)</a></li>
+<li><a href="https://www.oreilly.com/library/view/clean-code-a/9780136083238/">Clean Code (Ch. 3 Functions, Ch. 6 Objects)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, CleanCode, Conditionals, GuardClauses, Refactoring, Readability</p>
+</body>
+</html>

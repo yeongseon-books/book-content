@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TLS Basics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>TLS Basics</h1>
+<blockquote>
+<p>Computer Networks 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does the "S" in HTTPS stop eavesdropping, tampering, and impersonation all at once?</p>
+<blockquote>
+<p>TLS combines three techniques in one beat. Asymmetric crypto handles identity and key agreement, symmetric crypto handles fast bulk encryption, and AEAD handles integrity. Certificates and PKI prove "this key really belongs to this domain". With that picture in your head, expired certificates, self-signed servers, and MITM all fit on the same diagram.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The three TLS guarantees (confidentiality, integrity, identity)</li>
+<li>The handshake flow (client hello → server hello → key exchange → finished)</li>
+<li>Certificates, CAs, chains, and trust stores</li>
+<li>Differences between TLS 1.2 and TLS 1.3</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without TLS in your head, certificate-expiry incidents are paralyzing and dangerous code that "ignores self-signed" sneaks in. Modern infrastructure — mTLS, service mesh, zero-trust — all assumes TLS by default. If you cannot explain "why is it safe?" in your own words, security design drifts unconsciously.</p>
+<blockquote>
+<p>TLS is not "this channel is safe". It is the combination "this key really belongs to this domain, and only that key can decrypt".</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-text">Client                          Server
+  --- ClientHello (cipher list) --&gt;
+  &lt;-- ServerHello + Certificate ---
+  --- key share / Finished -------&gt;
+  &lt;-- Finished --------------------
+  ===== application data encrypted with the symmetric key =====
+</code></pre>
+<p>A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.</p>
+<h2>Key Terms</h2>
+<p><strong>Symmetric crypto</strong><br>
+- Meaning: Same key for encrypt and decrypt (e.g. AES)</p>
+<p><strong>Asymmetric crypto</strong><br>
+- Meaning: Public/private key pair (e.g. RSA, ECDSA)</p>
+<p><strong>AEAD</strong><br>
+- Meaning: Encryption + integrity together (e.g. AES-GCM, ChaCha20-Poly1305)</p>
+<p><strong>Certificate</strong><br>
+- Meaning: A document binding a public key to a domain plus a signature</p>
+<p><strong>CA</strong><br>
+- Meaning: A trusted authority that signs certificates</p>
+<p><strong>Chain</strong><br>
+- Meaning: Verification path from server cert → intermediate CA → root CA</p>
+<h2>Before / After</h2>
+<p><strong>Before — "https just means safe":</strong></p>
+<pre><code class="language-text">A padlock icon means safe — done.
+</code></pre>
+<p><strong>After — "TLS = key + identity + integrity":</strong></p>
+<pre><code class="language-text">- Whose key is it?            → certificate signed by a CA
+- Who can decrypt?            → symmetric session key
+- Was it tampered with?       → AEAD / MAC
+Safe as long as none of these break at the same time
+</code></pre>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: look at a certificate</strong></p>
+<pre><code class="language-bash">echo | openssl s_client -connect example.com:443 -servername example.com 2&gt;/dev/null \
+  | openssl x509 -noout -subject -issuer -dates
+# subject= /CN=*.example.com
+# issuer = /CN=DigiCert Global G2
+# notBefore=...  notAfter=...
+</code></pre>
+<p><strong>Step 2: verify the chain</strong></p>
+<pre><code class="language-bash">openssl s_client -showcerts -connect example.com:443 -servername example.com &lt;/dev/null
+# every certificate in the chain is printed
+</code></pre>
+<p>The browser walks this chain up to a root CA, verifying signatures along the way.</p>
+<p><strong>Step 3: a safe call from Python</strong></p>
+<pre><code class="language-python">import ssl, socket
+
+ctx = ssl.create_default_context()   # uses the OS trust store
+with socket.create_connection(('example.com', 443)) as s:
+    with ctx.wrap_socket(s, server_hostname='example.com') as ts:
+        print(ts.version())          # TLSv1.3
+        print(ts.getpeercert()['subject'])
+</code></pre>
+<p><strong>Step 4: create a self-signed certificate</strong></p>
+<pre><code class="language-bash">openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+  -subj &quot;/CN=localhost&quot; -keyout key.pem -out cert.pem
+</code></pre>
+<pre><code class="language-python"># Flask + TLS
+from flask import Flask
+app = Flask(__name__)
+
+@app.get('/')
+def home(): return 'hello'
+
+if __name__ == '__main__':
+    app.run(ssl_context=('cert.pem', 'key.pem'), port=8443)
+</code></pre>
+<pre><code class="language-bash">curl -k https://localhost:8443/    # -k allows self-signed (learning only)
+</code></pre>
+<p><strong>Step 5: see expiry and impersonation cases</strong></p>
+<pre><code class="language-bash">curl -v https://expired.badssl.com/        # expired
+curl -v https://wrong.host.badssl.com/     # name mismatch
+curl -v https://untrusted-root.badssl.com/ # untrusted root
+</code></pre>
+<p>Each case prints exactly which validation step failed.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The trust store is the list of root CAs the OS or browser ships with</li>
+<li>A certificate bundles "key + domain + expiry + signature"</li>
+<li>Self-signed is for learning only — production uses Let's Encrypt and friends</li>
+<li>TLS version and cipher choice are a large part of security</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Using <code>verify=False</code> or <code>-k</code> in production</strong><br>
+- Problem: MITM exposure<br>
+- Fix: Use trusted CA certificates</p>
+<p><strong>No certificate-expiry monitoring</strong><br>
+- Problem: Sudden outage<br>
+- Fix: Automate alerts 30 days before expiry</p>
+<p><strong>Missing intermediate certificate</strong><br>
+- Problem: Some clients fail to validate<br>
+- Fix: Deploy the full chain</p>
+<p><strong>Allowing weak ciphers or old TLS versions</strong><br>
+- Problem: Exposed to known attacks<br>
+- Fix: TLS 1.2+ with safe ciphers only</p>
+<p><strong>Domain not in SAN</strong><br>
+- Problem: Some browsers block<br>
+- Fix: Include all domains in SAN</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Web and mobile: Let's Encrypt with automated renewal</li>
+<li>Microservices: mTLS for service-to-service identity</li>
+<li>Message queues and DB clients: enable TLS options</li>
+<li>VPN and QUIC: TLS is a core component</li>
+<li>IoT: client certificates issued at factory provisioning</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer sees TLS as a key-management system, not a "safe = ON" switch. Renewal cadence, private-key protection, root-CA trust policy, mTLS policy — these operational pieces matter more than the algorithms themselves. The hour during which a certificate expires can decide a quarter's revenue.</p>
+<p>A senior is also wary of the simple conclusion "we encrypted it, so we are safe". They draw out which key exposes which metadata to whom, and what breaks if a key is leaked.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the three TLS guarantees</li>
+<li>[ ] I know certificates, CAs, chains, and trust stores</li>
+<li>[ ] I can sketch the major handshake steps</li>
+<li>[ ] I never use <code>verify=False</code> in production</li>
+<li>[ ] I monitor certificate expiry automatically</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Pull a favorite site's certificate with openssl and write down its issuer, expiry, and SAN list.</p>
+</li>
+<li>
+<p>Bring up a local HTTPS server with a self-signed cert and demonstrate both a passing and a failing call from Python's <code>ssl</code> module.</p>
+</li>
+<li>
+<p>Explain in one paragraph: "Why is mTLS important in zero-trust infrastructure?"</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>TLS combines asymmetric crypto for identity and key agreement, symmetric crypto for fast bulk encryption, and AEAD for integrity. Certificates and PKI prove "this key really belongs to this domain". With that picture, every HTTPS incident sits on the same shelf.</p>
+<p>Next we follow how the TLS-protected packet actually moves across the Internet — routing and NAT.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/01-what-is-a-network.md">What Is a Network?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/02-ip-and-subnet.md">IP and Subnet</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/03-tcp-and-udp.md">TCP and UDP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/04-dns.md">DNS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-networks-101/en/05-http-and-https.md">HTTP and HTTPS</a></li>
+<li><strong>TLS Basics (current)</strong></li>
+<li>Routing and NAT (upcoming)</li>
+<li>Load Balancer (upcoming)</li>
+<li>WebSocket and real-time (upcoming)</li>
+<li>Debugging network problems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.rfc-editor.org/rfc/rfc8446">RFC 8446 — TLS 1.3</a></li>
+<li><a href="https://ssl-config.mozilla.org/">Mozilla SSL Configuration Generator</a></li>
+<li><a href="https://letsencrypt.org/">Let's Encrypt</a></li>
+<li><a href="https://www.feistyduck.com/books/bulletproof-tls-and-pki/">Bulletproof TLS — Ivan Ristic</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Networking, TLS, Certificates, Encryption, PKI</p>
+</body>
+</html>

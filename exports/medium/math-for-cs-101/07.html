@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Linear Algebra</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Linear Algebra</h1>
+<blockquote>
+<p>Math for CS 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What <em>language</em> lets us handle <em>data</em> and <em>transforms</em> efficiently?</p>
+<blockquote>
+<p><em>Linear algebra</em> is the <em>common language</em> of data and transforms behind <em>ML</em>, <em>graphics</em>, and <em>simulation</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a <em>vector</em> means</li>
+<li>What a <em>matrix</em> means</li>
+<li><em>Dot product</em> and <em>angle</em></li>
+<li><em>Matrix multiplication</em> and <em>transpose</em></li>
+<li>Intuition for <em>basis</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Embeddings</em>, <em>PCA</em>, <em>recommenders</em>, and <em>3D transforms</em> all run on linear algebra.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    V[Vector] --&gt; D[Dot Product]
+    V --&gt; M[Matrix]
+    M --&gt; T[Transpose]
+    M --&gt; X[Matmul]
+    M --&gt; B[Basis]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>vector</strong>: <em>direction and magnitude</em>.</li>
+<li><strong>matrix</strong>: a <em>collection of vectors</em>.</li>
+<li><strong>dot product</strong>: a <em>similarity</em> score.</li>
+<li><strong>transpose</strong>: swap <em>rows and columns</em>.</li>
+<li><strong>basis</strong>: the <em>axes</em> of a space.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: element-wise <em>for loops</em>.</p>
+<p><strong>After</strong>: a single <em>vectorized</em> line.</p>
+<h2>Hands-on: Mini Linear Algebra Kit</h2>
+<p><strong>Step 1 — Vector Add</strong></p>
+<pre><code class="language-python">def vadd(a, b):
+    return [x + y for x, y in zip(a, b)]
+</code></pre>
+<p><strong>Step 2 — Dot Product</strong></p>
+<pre><code class="language-python">def dot(a, b):
+    return sum(x * y for x, y in zip(a, b))
+</code></pre>
+<p><strong>Step 3 — Matrix-Vector</strong></p>
+<pre><code class="language-python">def matvec(M, v):
+    return [dot(row, v) for row in M]
+</code></pre>
+<p><strong>Step 4 — Transpose</strong></p>
+<pre><code class="language-python">def transpose(M):
+    return [list(col) for col in zip(*M)]
+</code></pre>
+<p><strong>Step 5 — Matrix-Matrix</strong></p>
+<pre><code class="language-python">def matmul(A, B):
+    Bt = transpose(B)
+    return [[dot(row, col) for col in Bt] for row in A]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Dot product</em> is the core op.</li>
+<li><em>Transpose</em> is one <em>zip</em> call.</li>
+<li><em>Matmul</em> is a <em>grid of dot products</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Mismatching <em>row/column</em> dimensions.</strong></li>
+<li><strong>Assuming matrix multiplication is <em>commutative</em>.</strong></li>
+<li><strong>Confusing <em>dot</em> and <em>cross</em> products.</strong></li>
+<li><strong>Skipping <em>numpy</em> and losing performance.</strong></li>
+<li><strong>Thinking <em>transpose</em> mutates the original.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>Embedding search</em>, <em>ranking scores</em>, <em>camera transforms</em>, and <em>neural net forward passes</em> are all matrix ops.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Vectors</em> are <em>data</em>.</li>
+<li><em>Matrices</em> are <em>transforms</em>.</li>
+<li><em>Vectorization</em> is <em>performance</em>.</li>
+<li><em>Basis</em> is <em>interpretation</em>.</li>
+<li>Mind <em>numerical stability</em> too.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] State <em>dimensions</em>.</li>
+<li>[ ] <em>Vectorize</em> loops.</li>
+<li>[ ] Make <em>transpose</em> intent explicit.</li>
+<li>[ ] Inspect <em>numerical stability</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define the <em>dot product</em> in one line.</li>
+<li>Define <em>transpose</em> in one line.</li>
+<li>State the <em>condition</em> for matrix multiplication.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Calculus</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/03-sets-and-functions.md">Sets and Functions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/04-graphs.md">Graphs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/05-combinatorics.md">Combinatorics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/06-probability.md">Probability</a></li>
+<li><strong>Linear Algebra (current)</strong></li>
+<li>Calculus (upcoming)</li>
+<li>Information Theory (upcoming)</li>
+<li>Algorithms and Math (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/topics/linear-algebra">Linear Algebra - 3Blue1Brown</a></li>
+<li><a href="https://www.khanacademy.org/math/linear-algebra">Linear Algebra - Khan Academy</a></li>
+<li><a href="https://math.mit.edu/~gs/linearalgebra/">Introduction to Linear Algebra - Strang</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/routines.linalg.html">NumPy Linear Algebra Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Math, LinearAlgebra, Vectors, Matrices, Beginner</p>
+</body>
+</html>

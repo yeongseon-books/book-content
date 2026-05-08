@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Supervised and Unsupervised Learning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Supervised and Unsupervised Learning</h1>
+<blockquote>
+<p>Machine Learning 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When labels are present versus absent, do we reach for the same algorithms?</p>
+<blockquote>
+<p><em>Supervised learning fits a function to labeled examples; unsupervised learning discovers structure on its own.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The boundaries between supervised, unsupervised, semi-supervised, and reinforcement learning</li>
+<li>How to tell classification from regression</li>
+<li>The role of clustering versus dimensionality reduction</li>
+<li>A 5-step paradigm comparison</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Problem[&quot;problem&quot;] --&gt; Labeled{&quot;labels?&quot;}
+    Labeled --&gt;|yes| Sup[&quot;supervised (clf / reg)&quot;]
+    Labeled --&gt;|no| Unsup[&quot;unsupervised (cluster / DR)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Supervised learning</strong>: learn a function from <code>(X, y)</code> pairs.</li>
+<li><strong>Unsupervised learning</strong>: discover structure from <code>X</code> alone.</li>
+<li><strong>Classification</strong>: predict discrete labels.</li>
+<li><strong>Regression</strong>: predict continuous values.</li>
+<li><strong>Clustering</strong>: group similar points by distance or density.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "ML is one line of regression" — paradigm ignored.</p>
+<p><strong>After</strong>: Decide in order — labels available? then classification or regression? then choose the algorithm.</p>
+<h2>Hands-on: 5 Steps Comparing Paradigms</h2>
+<p><strong>Step 1 — Load data</strong></p>
+<pre><code class="language-python">from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+</code></pre>
+<p><strong>Step 2 — Supervised classification</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression(max_iter=1000).fit(X, y)
+print(&quot;clf acc:&quot;, clf.score(X, y))
+</code></pre>
+<p><strong>Step 3 — Regression dataset</strong></p>
+<pre><code class="language-python">from sklearn.datasets import fetch_california_housing
+Xr, yr = fetch_california_housing(return_X_y=True)
+</code></pre>
+<p><strong>Step 4 — Regression model</strong></p>
+<pre><code class="language-python">from sklearn.linear_model import LinearRegression
+reg = LinearRegression().fit(Xr, yr)
+print(&quot;R^2:&quot;, reg.score(Xr, yr))
+</code></pre>
+<p><strong>Step 5 — Unsupervised clustering</strong></p>
+<pre><code class="language-python">from sklearn.cluster import KMeans
+km = KMeans(n_clusters=3, n_init=10).fit(X)
+print(&quot;inertia:&quot;, km.inertia_)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>clf.score</code> returns accuracy, <code>reg.score</code> returns R-squared, <code>km.inertia_</code> measures cluster cohesion. Different metrics, different meaning.</li>
+<li><code>KMeans(n_init=...)</code> matters for reproducibility and stability.</li>
+<li>Unsupervised results are harder to interpret because there is no ground truth.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li>Solving a regression problem as classification (or the reverse).</li>
+<li>Throwing away partially labeled data instead of using semi-supervised methods.</li>
+<li>Treating cluster assignments as if they were ground truth.</li>
+<li>Fixing <code>K</code> for clustering without ever visualizing.</li>
+<li>Skipping standardization before distance-based algorithms.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spam and fraud rely on classification, pricing and demand forecasting on regression, customer segmentation on clustering. Real systems combine all three for ranking and recommendation.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Order matters: problem, then metric, then paradigm.</li>
+<li>Use unsupervised methods early for exploration.</li>
+<li>Semi-supervised setups are the common case in industry.</li>
+<li>Reinforcement learning is the last card to play.</li>
+<li>A labeling strategy beats algorithm choice.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can give an example of classification, regression, and clustering.</li>
+<li>[ ] I know the meaning behind each <code>.score()</code> value.</li>
+<li>[ ] I know <code>K</code> in KMeans is a hyperparameter.</li>
+<li>[ ] I know which algorithms require standardized inputs.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Cluster <code>iris</code> with KMeans and produce a cross-tab against the true <code>y</code>.</li>
+<li>List three problems best framed as regression and three as classification.</li>
+<li>Describe one situation where semi-supervised learning is the right answer.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Picking the paradigm sets the ceiling on model performance. Next, we measure generalization with train/test splits.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/machine-learning-101/en/01-what-is-machine-learning.md">What Is Machine Learning?</a></li>
+<li><strong>Supervised and Unsupervised Learning (current)</strong></li>
+<li>Train/Test Split (upcoming)</li>
+<li>Linear Regression (upcoming)</li>
+<li>Logistic Regression (upcoming)</li>
+<li>Decision Tree and Random Forest (upcoming)</li>
+<li>Clustering (upcoming)</li>
+<li>Overfitting and Regularization (upcoming)</li>
+<li>Model Evaluation (upcoming)</li>
+<li>The ML Project Workflow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/supervised_learning.html">scikit-learn — Supervised learning</a></li>
+<li><a href="https://scikit-learn.org/stable/unsupervised_learning.html">scikit-learn — Unsupervised learning</a></li>
+<li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/prml-book/">Pattern Recognition and Machine Learning — Bishop</a></li>
+<li><a href="https://developers.google.com/machine-learning/problem-framing">Google — ML Problem Framing</a></li>
+</ul>
+<p class="tags-line">Tags: MachineLearning, SupervisedLearning, UnsupervisedLearning, Classification, Clustering</p>
+</body>
+</html>

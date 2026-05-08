@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is SQL?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is SQL?</h1>
+<blockquote>
+<p>SQL 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why did the era of <em>moving rows by hand</em> end? How did we get a language where you only have to <em>describe what you want</em>?</p>
+<blockquote>
+<p><em>SQL is the language for stating </em>what you want<em>, not </em>how to get it<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>What <em>SQL</em> is and the heart of the <em>relational model</em></li>
+<li>What it means for a language to be <em>declarative</em></li>
+<li>The split between <em>DDL / DML / DCL</em></li>
+<li>Five steps to your first query</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Analysts, backend engineers, and data engineers <em>all share</em> SQL. The moment data outgrows a spreadsheet, <em>one SQL line saves a day</em>. And SQL has been <em>useful for over 40 years</em>, so the time you spend learning it <em>keeps paying off</em>.</p>
+<blockquote>
+<p><em>As data grows, SQL becomes the only </em>reasonable<em> tool.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Client[&quot;App / BI&quot;] --&gt; SQL[&quot;SQL query&quot;]
+    SQL --&gt; Engine[&quot;DB engine (planner)&quot;]
+    Engine --&gt; Storage[&quot;Tables / Indexes&quot;]
+    Storage --&gt; Engine
+    Engine --&gt; Result[&quot;Result set&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Table</strong>: the basic unit, made of <em>rows</em> and <em>columns</em>.</li>
+<li><strong>Row / Column</strong>: <em>one fact</em> and <em>one attribute</em>.</li>
+<li><strong>Schema</strong>: the <em>blueprint</em> of tables and their relations.</li>
+<li><strong>Query</strong>: a <em>sentence</em> asking the database something.</li>
+<li><strong>Result set</strong>: the <em>rows</em> a query returns.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You chain three <em>VLOOKUPs</em> across split spreadsheets to find an answer.</p>
+<p><strong>After</strong>: One SQL statement does the <em>join, aggregation, and filter</em> in one shot.</p>
+<h2>Hands-on: Your First Query in Five Steps</h2>
+<p><strong>Step 1 — Create a table</strong></p>
+<pre><code class="language-sql">CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL,
+    signup_at DATE NOT NULL
+);
+</code></pre>
+<p><strong>Step 2 — Insert data</strong></p>
+<pre><code class="language-sql">INSERT INTO users (id, name, signup_at) VALUES
+    (1, 'Ada', '2026-01-01'),
+    (2, 'Linus', '2026-02-15'),
+    (3, 'Grace', '2026-03-30');
+</code></pre>
+<p><strong>Step 3 — Read everything</strong></p>
+<pre><code class="language-sql">SELECT * FROM users;
+</code></pre>
+<p><strong>Step 4 — Filter</strong></p>
+<pre><code class="language-sql">SELECT name FROM users WHERE signup_at &gt;= '2026-02-01';
+</code></pre>
+<p><strong>Step 5 — Count</strong></p>
+<pre><code class="language-sql">SELECT COUNT(*) AS total FROM users;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>You never said <em>how</em> to fetch the data — only <em>what</em> you want.</li>
+<li>The engine decides <em>whether to use an index</em>, <em>how to sort</em>.</li>
+<li>The same result can be expressed in <em>many ways</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Using <code>SELECT *</code> <em>by reflex</em>.</strong> As columns grow, <em>network and memory</em> grow with them.</li>
+<li><strong>Storing everything as <em>strings</em>.</strong> Aggregations later become <em>misery</em>.</li>
+<li><strong>Treating NULL like <em>0</em>.</strong> NULL means <em>unknown</em> — a separate value.</li>
+<li><strong>Mixing <em>case styles</em> randomly.</strong> Pick a team convention to keep queries <em>readable</em>.</li>
+<li><strong>Eyeballing results.</strong> Verify with <em>COUNT, SUM</em> — actual numbers.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Dashboards, user metrics, A/B test results, revenue reports — <em>most analytics</em> starts as one or two SQL queries. Backends <em>read and tune SQL</em> even when an <em>ORM</em> is in front. Most <em>ETL</em> steps are SQL.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>SQL is the language </em>closest to the data<em>.</em></li>
+<li><em>Reading time is longer than writing time.</em></li>
+<li><em>If you don't read the </em>plan<em>, you are not tuning.</em></li>
+<li><em>Handle NULL </em>explicitly<em>.</em></li>
+<li><em>Break large queries into </em>CTEs<em> with named layers.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain <em>SELECT, FROM, WHERE</em> out loud.</li>
+<li>[ ] I know the difference between <em>table, row, column</em>.</li>
+<li>[ ] I know what <em>NULL</em> means.</li>
+<li>[ ] I can tell <em>DDL</em> from <em>DML</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Count the total rows in an <em>orders</em> table.</li>
+<li>List the <em>names</em> of users who signed up <em>after March 2026</em>.</li>
+<li>Explain to a teammate why <code>SELECT *</code> is <em>risky</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>SQL describes the <em>result</em>, not the steps. The next post takes a careful look at <em>SELECT</em>, the most-used statement.</p>
+<ul>
+<li><strong>What Is SQL? (current)</strong></li>
+<li>SELECT Basics (upcoming)</li>
+<li>WHERE and Conditions (upcoming)</li>
+<li>JOIN (upcoming)</li>
+<li>GROUP BY and Aggregates (upcoming)</li>
+<li>Subquery (upcoming)</li>
+<li>Window Function (upcoming)</li>
+<li>INSERT, UPDATE, DELETE (upcoming)</li>
+<li>Index and Query Plan (upcoming)</li>
+<li>Practical Analysis SQL (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.postgresql.org/docs/current/tutorial-sql.html">PostgreSQL Tutorial — SQL</a></li>
+<li><a href="https://sqlbolt.com/">SQLBolt — Interactive SQL Lessons</a></li>
+<li><a href="https://use-the-index-luke.com/">Use The Index, Luke</a></li>
+<li><a href="https://mode.com/sql-tutorial/">Mode — SQL Tutorial</a></li>
+</ul>
+<p class="tags-line">Tags: SQL, Database, RDBMS, Postgres, Analytics</p>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Test Strategy</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Test Strategy</h1>
+<blockquote>
+<p>Testing 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is <em>more tests</em> always <em>better</em>?</p>
+<blockquote>
+<p>A good strategy is <em>write less, catch more</em>. The real question is <em>where to invest</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning and distribution of the <em>test pyramid</em></li>
+<li><em>ROI</em> per layer and <em>investment priorities</em></li>
+<li>The <em>team rituals</em> that keep tests alive</li>
+<li><em>Contract tests</em> at system boundaries</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests are <em>not free</em>. They cost time to write, to run, and to fix. A strategy-less suite becomes a <em>slow, brittle net</em>.</p>
+<blockquote>
+<p>A good strategy <em>catches bugs while protecting development speed</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TB
+    E2E[&quot;E2E (tens)&quot;] --&gt; Int[&quot;Integration (hundreds)&quot;]
+    Int --&gt; Unit[&quot;Unit (thousands)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Test pyramid</strong>: a distribution model with <em>many unit / fewer integration / even fewer E2E</em> tests.</li>
+<li><strong>ROI</strong>: the <em>cost vs. bugs caught</em> per test.</li>
+<li><strong>Critical path</strong>: the <em>money-flow paths</em> (payment, login, etc.).</li>
+<li><strong>Contract test</strong>: validates <em>input/output shape</em> at <em>system boundaries</em>.</li>
+<li><strong>Flaky budget</strong>: the <em>acceptable instability ratio</em> (e.g., 0.5%).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (no strategy)</strong></p>
+<pre><code class="language-text">- *Unit tests* on every function
+- *E2E tests* on every scenario
+- 30-minute CI, team PR velocity stalls
+</code></pre>
+<p><strong>After (strategy applied)</strong></p>
+<pre><code class="language-text">- *2,000 unit tests* on the core domain
+- *200 integration tests* (DB and external APIs)
+- *20 E2E tests* on critical paths (payment, login, etc.)
+- CI under 5 minutes
+</code></pre>
+<h2>Hands-on: Five Steps to a Strategy</h2>
+<p><strong>Step 1 - Measure the current distribution</strong></p>
+<pre><code class="language-bash">pytest --collect-only -q | wc -l    # total test count
+ls tests/unit | wc -l
+ls tests/integration | wc -l
+ls tests/e2e | wc -l
+</code></pre>
+<p><strong>Step 2 - Define the critical paths</strong></p>
+<pre><code class="language-text">- Login
+- Payment
+- Sign-up
+- Password reset
+</code></pre>
+<p>These flows <em>must be protected by E2E</em>.</p>
+<p><strong>Step 3 - Add contract tests at the boundary</strong></p>
+<pre><code class="language-python"># tests/contracts/test_payment_api.py
+def test_payment_response_schema():
+    res = payment_client.charge(amount=100)
+    assert set(res.keys()) &gt;= {&quot;id&quot;, &quot;status&quot;, &quot;amount&quot;}
+</code></pre>
+<p><strong>Step 4 - Establish team rituals</strong></p>
+<pre><code class="language-text">- PR template: &quot;Did you add a regression test? [ ]&quot;
+- Weekly 30 minutes: review *flaky tests*
+- Monthly: check coverage *trend* (trend, not absolute)
+</code></pre>
+<p><strong>Step 5 - Quarterly pruning</strong></p>
+<pre><code class="language-bash"># E2E that has not failed for six months is a candidate for review
+# Tests that fail repeatedly in the same area are *a refactoring signal*
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A strategy survives as <em>rituals</em>, not as <em>documents</em>.</li>
+<li><em>Distribution</em> is unknowable without measurement.</li>
+<li>If <em>critical paths</em> are not defined, <em>everything</em> becomes critical.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>The same test intensity <em>for all code</em>.</strong> Invest in proportion to <em>risk</em>.</li>
+<li><strong>Treating E2E as the <em>primary tier</em>.</strong> It is slow and brittle and <em>kills team speed</em>.</li>
+<li><strong>Watching only the <em>coverage target</em>.</strong> What you <em>cover</em> matters more than the number.</li>
+<li><strong>No contract tests.</strong> External API changes get caught <em>in production</em>.</li>
+<li><strong>Setting the strategy <em>once and forgetting it</em>.</strong> Revisit <em>quarterly</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams record their <em>target distribution</em> and <em>flaky budget</em> in an <em>Engineering Excellence</em> document. Every new service follows that baseline, and <em>quarterly OKRs</em> include <em>CI duration</em> and <em>flaky ratio</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Test on a <em>risk basis</em>. Do not distribute evenly.</li>
+<li><em>Fast feedback</em> is the basis of <em>every decision</em>.</li>
+<li><em>Contract tests</em> at the boundary reduce <em>cross-team cost</em>.</li>
+<li>A <em>flaky test</em> is a <em>broken window</em>. Fix it immediately.</li>
+<li>A strategy is a <em>living document</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know your team's <em>test distribution</em>.</li>
+<li>[ ] <em>Critical paths</em> are <em>documented</em>.</li>
+<li>[ ] The <em>PR template</em> includes a regression test item.</li>
+<li>[ ] You <em>measure</em> the <em>flaky ratio</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Measure your project's <em>test distribution</em> and verify it forms a <em>pyramid</em>.</li>
+<li>Define three <em>critical paths</em> and confirm E2E covers them.</li>
+<li>Propose one <em>weekly ritual</em> to introduce to your team.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Test strategy is not <em>technique</em> but <em>decision-making</em>. With this we close out Testing 101 — next, in <em>DevOps 101</em> and <em>Observability 101</em>, we extend quality work into <em>post-deployment</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What is testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Doubles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Test Coverage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/08-regression-test.md">Regression Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/09-tests-in-ci.md">Running Tests in CI</a></li>
+<li><strong>Building a Test Strategy (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — The Practical Test Pyramid</a></li>
+<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
+<li><a href="https://itrevolution.com/product/accelerate/">Accelerate (Forsgren, Humble, Kim)</a></li>
+<li><a href="https://www.thoughtworks.com/insights/blog/testing-strategy">ThoughtWorks — Test Strategy</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Strategy, Quality, Capstone, Engineering</p>
+</body>
+</html>

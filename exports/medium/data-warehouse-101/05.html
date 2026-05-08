@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Partition and Clustering</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Partition and Clustering</h1>
+<blockquote>
+<p>Data Warehouse 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How can you pull <em>today's data</em> from a <em>fact with billions of rows</em> in seconds? How does the engine <em>decide what to skip</em>?</p>
+<blockquote>
+<p><em>Partitions split the file into chunks; clustering sorts inside each chunk.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and effect of <em>partitioning</em></li>
+<li>The definition and effect of <em>clustering</em></li>
+<li>How <em>pruning</em> works under the hood</li>
+<li>Five-step hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Warehouse facts often hold <em>billions of rows</em>. A daily partition alone lets the engine <em>skip 95%</em> of the data — and <em>cost drops directly</em>.</p>
+<blockquote>
+<p><em>You do not pay for data you do not read.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Query[&quot;WHERE date = '2026-05-04'&quot;] --&gt; Engine[&quot;Query Engine&quot;]
+    Engine --&gt; P1[&quot;partition: 2026-05-03 (skip)&quot;]
+    Engine --&gt; P2[&quot;partition: 2026-05-04 (scan)&quot;]
+    Engine --&gt; P3[&quot;partition: 2026-05-05 (skip)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Partition</strong>: A <em>physical chunk</em> of a table — usually keyed by <em>date</em>.</li>
+<li><strong>Clustering</strong>: Sorting <em>within a partition</em> by frequently queried columns.</li>
+<li><strong>Pruning</strong>: Picking only the <em>partitions to scan</em> based on the WHERE clause.</li>
+<li><strong>Partition key</strong>: The <em>column used to split</em> the table.</li>
+<li><strong>Cluster key</strong>: The <em>column used to sort</em> inside partitions.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <code>WHERE order_date = '2026-05-04'</code> still scans <em>the whole table</em>.</p>
+<p><strong>After</strong>: The same query reads <em>one daily partition</em>. <em>Cost drops 100x</em>.</p>
+<h2>Hands-on: Five Steps</h2>
+<p><strong>Step 1 — Define partitioning</strong></p>
+<pre><code class="language-sql">-- BigQuery example
+CREATE TABLE fact_orders (
+    order_id BIGINT,
+    user_key BIGINT,
+    amount NUMERIC(12, 2),
+    order_date DATE
+)
+PARTITION BY order_date;
+</code></pre>
+<p><strong>Step 2 — Add clustering</strong></p>
+<pre><code class="language-sql">CREATE TABLE fact_orders (
+    order_id BIGINT,
+    user_key BIGINT,
+    amount NUMERIC(12, 2),
+    order_date DATE
+)
+PARTITION BY order_date
+CLUSTER BY user_key;
+</code></pre>
+<p><strong>Step 3 — Query that prunes</strong></p>
+<pre><code class="language-sql">-- Reads only one daily partition
+SELECT SUM(amount)
+FROM fact_orders
+WHERE order_date = '2026-05-04';
+</code></pre>
+<p><strong>Step 4 — Query that defeats pruning</strong></p>
+<pre><code class="language-sql">-- Wrapping order_date in a function disables pruning
+SELECT SUM(amount)
+FROM fact_orders
+WHERE EXTRACT(YEAR FROM order_date) = 2026;
+</code></pre>
+<p><strong>Step 5 — Cluster-key benefit</strong></p>
+<pre><code class="language-sql">-- Add user_key and read even less
+SELECT SUM(amount)
+FROM fact_orders
+WHERE order_date BETWEEN '2026-05-01' AND '2026-05-31'
+  AND user_key = 100;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The condition must hit the <em>partition key directly</em> for pruning.</li>
+<li>Wrapping in a <em>function</em> breaks pruning.</li>
+<li>Clustering helps <em>inside</em> a partition.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Wrapping the partition key in a <em>function</em>.</strong> Falls back to <em>full scan</em>.</li>
+<li><strong>Splitting partitions <em>too small</em>.</strong> <em>Metadata cost</em> exceeds <em>read cost</em>.</li>
+<li><strong>Choosing <em>too many</em> cluster keys.</strong> <em>Sort cost</em> outweighs <em>read benefit</em>.</li>
+<li><strong>Trusting <em>indexes alone</em>.</strong> Warehouses are <em>not the world of indexes</em>.</li>
+<li><strong>Mutating <em>historical partitions</em>.</strong> Triggers an <em>avalanche of recomputes</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>BigQuery, Snowflake, and Redshift all expose <em>partition + clustering</em> as primary tools. <em>Date partition + user cluster</em> is the default combo.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Make the partition key the </em>first WHERE clause<em>.</em></li>
+<li><em>Document patterns that </em>break pruning<em>.</em></li>
+<li><em>Measure cost in </em>bytes scanned<em>.</em></li>
+<li><em>Use </em>few, frequently used<em> cluster keys.</em></li>
+<li><em>Prefer </em>append<em> over </em>update<em> of historical partitions.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish <em>partition</em> from <em>clustering</em>.</li>
+<li>[ ] You know patterns that <em>break pruning</em>.</li>
+<li>[ ] You know how <em>cost is measured</em>.</li>
+<li>[ ] You know how to choose a <em>partition key</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Choose a <em>partition key</em> and <em>cluster key</em> for <em>fact_payments</em>.</li>
+<li>List <em>three</em> queries that <em>break pruning</em>.</li>
+<li>Name <em>two</em> downsides of <em>over-splitting</em> partitions.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Partition and clustering improve <em>cost and speed</em> together. Next, we look at <em>ETL</em> and <em>ELT</em> — how data gets in.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/02-oltp-and-olap.md">OLTP and OLAP</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/03-fact-and-dimension.md">Fact and Dimension</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/04-star-schema.md">Star Schema</a></li>
+<li><strong>Partition and Clustering (current)</strong></li>
+<li>ETL and ELT (upcoming)</li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cloud.google.com/bigquery/docs/partitioned-tables">BigQuery — Partitioned Tables</a></li>
+<li><a href="https://cloud.google.com/bigquery/docs/clustered-tables">BigQuery — Clustered Tables</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/tables-clustering-keys">Snowflake — Clustering Keys</a></li>
+<li><a href="https://docs.aws.amazon.com/redshift/latest/dg/c_designing-tables-best-practices.html">Redshift — Distribution and Sort Keys</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, Partition, Clustering, Performance, Analytics</p>
+</body>
+</html>

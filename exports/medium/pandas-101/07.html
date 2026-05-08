@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Merge and Join</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Merge and Join</h1>
+<blockquote>
+<p>Pandas 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why are there <em>both merge and join</em>?</p>
+<blockquote>
+<p><em>merge keys on </em>columns<em>; join keys on </em>indexes<em>. They do the same thing, but </em>the key location differs<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>inner / left / right / outer / cross</em> joins</li>
+<li>The difference between <em>merge</em> and <em>join</em></li>
+<li>Options <em>suffixes / indicator / validate</em></li>
+<li>A 5-step join hands-on</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Real data is <em>spread across many tables</em>. <em>Joining ability</em> equals <em>analysis ability</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Left[&quot;Left DF&quot;] --&gt; M[&quot;merge / join&quot;]
+    Right[&quot;Right DF&quot;] --&gt; M
+    M --&gt; Result[&quot;combined DF&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>inner</strong>: keys <em>present in both</em>.</li>
+<li><strong>left</strong>: <em>all of left</em> + matched right.</li>
+<li><strong>right</strong>: the opposite.</li>
+<li><strong>outer</strong>: <em>union</em>.</li>
+<li><strong>cross</strong>: <em>cartesian product</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"One merge, rows exploded"</em> — <em>duplicate keys</em> cause a <em>cartesian blow-up</em>.</p>
+<p><strong>After</strong>: <em>"validate='one_to_one' or 'one_to_many'"</em> — <em>errors immediately</em> on bad assumptions.</p>
+<h2>Hands-on: Five Join Steps</h2>
+<p><strong>Step 1 — Prepare data</strong></p>
+<pre><code class="language-python">import pandas as pd
+users = pd.DataFrame({&quot;uid&quot;: [1, 2, 3], &quot;name&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]})
+orders = pd.DataFrame({&quot;uid&quot;: [1, 1, 2], &quot;amount&quot;: [100, 200, 50]})
+</code></pre>
+<p><strong>Step 2 — inner</strong></p>
+<pre><code class="language-python">print(users.merge(orders, on=&quot;uid&quot;))
+</code></pre>
+<p><strong>Step 3 — left and outer</strong></p>
+<pre><code class="language-python">print(users.merge(orders, on=&quot;uid&quot;, how=&quot;left&quot;))
+print(users.merge(orders, on=&quot;uid&quot;, how=&quot;outer&quot;, indicator=True))
+</code></pre>
+<p><strong>Step 4 — suffixes</strong></p>
+<pre><code class="language-python">df1 = pd.DataFrame({&quot;k&quot;: [1], &quot;v&quot;: [10]})
+df2 = pd.DataFrame({&quot;k&quot;: [1], &quot;v&quot;: [20]})
+print(df1.merge(df2, on=&quot;k&quot;, suffixes=(&quot;_a&quot;, &quot;_b&quot;)))
+</code></pre>
+<p><strong>Step 5 — validate</strong></p>
+<pre><code class="language-python">try:
+    users.merge(orders, on=&quot;uid&quot;, validate=&quot;one_to_one&quot;)
+except Exception as e:
+    print(&quot;expected:&quot;, type(e).__name__)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>indicator=True</em> tells you <em>the row's source</em>.</li>
+<li><em>suffixes</em> resolves <em>duplicate column names</em>.</li>
+<li><em>validate</em> makes <em>join assumptions</em> explicit <em>in code</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Row explosion from <em>duplicate keys</em>.</strong></li>
+<li><strong>Not knowing the default <em>how</em> is <em>inner</em>.</strong></li>
+<li><strong>Skipping <em>suffixes</em> and overwriting columns.</strong></li>
+<li><strong><em>Mismatched key dtypes</em> between left and right.</strong></li>
+<li><strong>Skipping <em>reset_index</em> and getting <em>index conflicts</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>CRM x orders, ads x conversions, users x events — <em>80% of analysis is joins</em>. <em>validate</em> expresses your <em>data contract</em> in code.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Always <em>track row counts</em>.</li>
+<li>Use <em>validate</em> to <em>make assumptions explicit</em>.</li>
+<li><em>Match key dtypes</em>.</li>
+<li>Decide whether to <em>deduplicate before joining</em>.</li>
+<li><em>Profile</em> the join result.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know the <em>5 how options</em>.</li>
+<li>[ ] I use <em>validate</em>.</li>
+<li>[ ] I check sources with <em>indicator</em>.</li>
+<li>[ ] I use <em>suffixes</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Print the <em>row count difference</em> between <em>left join</em> and <em>outer join</em>.</li>
+<li>Construct data where <em>validate='one_to_one'</em> fails and inspect the <em>exception message</em>.</li>
+<li>Use the <em>indicator column</em> to find <em>right-only rows</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Joining is <em>half of analysis</em>. Next we cover <em>time series</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/02-series-and-dataframe.md">Series and DataFrame</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">groupby</a></li>
+<li><strong>Merge and Join (current)</strong></li>
+<li>Time Series (upcoming)</li>
+<li>apply and Vectorization (upcoming)</li>
+<li>Real-world Data Analysis (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pandas.pydata.org/docs/user_guide/merging.html">pandas — Merge, join, concatenate and compare</a></li>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html">pandas — merge</a></li>
+<li><a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.join.html">pandas — join</a></li>
+<li><a href="https://mode.com/sql-tutorial/sql-joins/">SQL Joins Explained — Mode Analytics</a></li>
+</ul>
+<p class="tags-line">Tags: Pandas, Merge, Join, SQL, Beginner</p>
+</body>
+</html>

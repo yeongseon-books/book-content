@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Computation and Programs</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Computation and Programs</h1>
+<blockquote>
+<p>Computer Science 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Key question</strong>: What does it precisely mean that something is "computable," and how does a program express computation?</p>
+<blockquote>
+<p>In 1936 Alan Turing gave a mathematical definition of "what can be computed." The surprising conclusion: a simple machine that moves along a tape and reads or writes symbols can carry out <em>every</em> computation. That theoretical machine is the foundation of every modern computer. This article covers the definition of computation, problems that cannot be computed, the evolution of programming languages, and the major paradigms.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The Turing machine and the idea of computability</li>
+<li>Problems that cannot be computed (the halting problem)</li>
+<li>A short history of programming languages</li>
+<li>The differences between imperative, functional, and object-oriented paradigms</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The answer to "Can every problem be solved by a program?" is no. Computation theory marks the line between problems we can solve and problems we cannot. Programming paradigms then decide <em>how</em> we express the solvable ones. Both are foundations of software design.</p>
+<blockquote>
+<p>Computation theory = the constitution of CS. A paradigm = a philosophy of organizing code.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.</p>
+</blockquote>
+<pre><code class="language-text">Mathematical functions (theory)
+        │
+Turing machine (computation model)
+        │
+Machine code (hardware)
+        │
+Assembly (low level)
+        │
+High-level languages (Python, Java)
+        │
+Paradigms (imperative, functional, OOP)
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Turing machine</strong><br>
+- Description: A theoretical model that defines computability</p>
+<p><strong>Halting problem</strong><br>
+- Description: The classic uncomputable problem of deciding whether a program halts</p>
+<p><strong>Compiler</strong><br>
+- Description: A program that translates source code to machine code</p>
+<p><strong>Interpreter</strong><br>
+- Description: A program that executes source code line by line</p>
+<p><strong>Paradigm</strong><br>
+- Description: A way of thinking and a principle for organizing code</p>
+<h2>Before / After</h2>
+<p><strong>Before — without paradigm awareness:</strong></p>
+<pre><code class="language-python"># All logic crammed into one procedural function
+def process_orders(orders):
+    total = 0
+    for order in orders:
+        if order[&quot;status&quot;] == &quot;paid&quot;:
+            price = order[&quot;price&quot;] * order[&quot;quantity&quot;]
+            if order[&quot;discount&quot;]:
+                price = price * 0.9
+            total += price
+    return total
+</code></pre>
+<p><strong>After — with paradigm awareness:</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class Order:
+    price: int
+    quantity: int
+    status: str
+    discount: bool
+
+    def total_price(self) -&gt; int:
+        base = self.price * self.quantity
+        return int(base * 0.9) if self.discount else base
+
+def process_orders(orders: list[Order]) -&gt; int:
+    return sum(o.total_price() for o in orders if o.status == &quot;paid&quot;)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Computation as a state machine</strong></p>
+<pre><code class="language-python">def simple_state_machine(tape: list[str]) -&gt; list[str]:
+    &quot;&quot;&quot;A tiny state machine that flips 0 to 1 and 1 to 0.&quot;&quot;&quot;
+    state = &quot;flip&quot;
+    result = []
+    for symbol in tape:
+        if state == &quot;flip&quot;:
+            result.append(&quot;1&quot; if symbol == &quot;0&quot; else &quot;0&quot;)
+    return result
+
+tape = [&quot;1&quot;, &quot;0&quot;, &quot;1&quot;, &quot;1&quot;, &quot;0&quot;]
+print(simple_state_machine(tape))  # ['0', '1', '0', '0', '1']
+</code></pre>
+<p>This is the core idea of a Turing machine: look at the current state and the current symbol, then decide the next action.</p>
+<p><strong>Step 2: A problem that cannot be computed</strong></p>
+<pre><code class="language-python">def halts(program, input_data):
+    &quot;&quot;&quot;This function cannot be implemented.&quot;&quot;&quot;
+    # Decide whether `program` halts on `input_data`.
+    # Proof sketch: assuming this function exists leads to a contradiction.
+    raise NotImplementedError(&quot;The halting problem is undecidable&quot;)
+
+# A practical workaround: use a timeout
+import signal
+
+def run_with_timeout(func, timeout_sec: int = 5):
+    &quot;&quot;&quot;Abort if the function does not finish within the time limit.&quot;&quot;&quot;
+    signal.alarm(timeout_sec)
+    try:
+        return func()
+    except Exception:
+        return None
+</code></pre>
+<p>The halting problem is the most famous impossibility result in CS. It is why a perfect debugger or a perfect virus scanner cannot exist.</p>
+<p><strong>Step 3: Imperative programming</strong></p>
+<pre><code class="language-python"># Imperative: you tell the computer &quot;how&quot; step by step
+def sum_of_squares_imperative(n: int) -&gt; int:
+    total = 0
+    for i in range(1, n + 1):
+        total += i * i
+    return total
+
+print(sum_of_squares_imperative(5))  # 55
+</code></pre>
+<p>The imperative paradigm gives the computer step-by-step instructions. C, Go, and early Python code lean this way.</p>
+<p><strong>Step 4: Functional programming</strong></p>
+<pre><code class="language-python">from functools import reduce
+
+# Functional: you declare &quot;what&quot; to compute
+def sum_of_squares_functional(n: int) -&gt; int:
+    return reduce(lambda acc, x: acc + x * x, range(1, n + 1), 0)
+
+print(sum_of_squares_functional(5))  # 55
+</code></pre>
+<p>The functional paradigm expresses computation by composing functions instead of mutating state. Haskell, Scala, and Python's <code>map</code> / <code>filter</code> belong here.</p>
+<p><strong>Step 5: Compilation and interpretation</strong></p>
+<pre><code class="language-python"># Python is an interpreted language
+# Source code -&gt; bytecode -&gt; executed on a virtual machine
+
+import dis
+
+def add(a: int, b: int) -&gt; int:
+    return a + b
+
+# Inspect the Python bytecode
+dis.dis(add)
+# LOAD_FAST    0 (a)
+# LOAD_FAST    1 (b)
+# BINARY_ADD
+# RETURN_VALUE
+</code></pre>
+<p>A compiler translates the entire program ahead of time, while an interpreter runs it line by line. Python is a hybrid: it compiles to bytecode and then interprets that bytecode on a virtual machine.</p>
+<h2>Notable Points in This Code</h2>
+<ul>
+<li>A state machine is a simplified Turing machine and shows the essence of computation.</li>
+<li>The halting problem is theoretically unsolvable, but practical workarounds (timeouts) exist.</li>
+<li>The same computation can be expressed in either imperative or functional style.</li>
+<li>Python is a hybrid that uses both compilation and interpretation.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Assuming every problem is solvable by a program</strong><br>
+- Problem: Uncomputable problems exist<br>
+- Fix: Study the halting problem and computation theory</p>
+<p><strong>Sticking to one paradigm dogmatically</strong><br>
+- Problem: The code does not fit the situation<br>
+- Fix: Pick the paradigm that fits the problem</p>
+<p><strong>Confusing compilers and interpreters</strong><br>
+- Problem: You misunderstand language properties<br>
+- Fix: Distinguish the two execution models clearly</p>
+<p><strong>Using only high-level languages and ignoring the low level</strong><br>
+- Problem: You cannot reason about performance<br>
+- Fix: Learn machine code and memory at a basic level</p>
+<p><strong>Dismissing theory as irrelevant</strong><br>
+- Problem: You miss fundamental limits<br>
+- Fix: Notice how theory drives practical decisions</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Multi-paradigm languages (Python, Kotlin) let you pick the right style per situation.</li>
+<li>Understanding compile-time vs runtime errors lets you exploit the type system.</li>
+<li>Practical workarounds for the halting problem appear as timeouts and circuit breakers.</li>
+<li>Bytecode inspection helps locate Python performance bottlenecks.</li>
+<li>Functional patterns (map, filter, reduce) shape data pipelines.</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>Senior engineers are not dogmatic about paradigms. They write imperative code where it is clearest and functional code where it is more concise. What matters is not the paradigm but whether the code clearly conveys intent.</p>
+<p>Knowing the limits of computation theory matters in practice too. Once you accept that a "perfect static analyzer" or a "test suite that catches every bug" is impossible in principle, you can focus on building practical workarounds instead.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain what a Turing machine is</li>
+<li>[ ] I understand why the halting problem is unsolvable</li>
+<li>[ ] I can distinguish imperative, functional, and object-oriented styles</li>
+<li>[ ] I understand the difference between compilers and interpreters</li>
+<li>[ ] I can describe how Python runs (bytecode + VM)</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Implement a simple state machine that decides whether the parentheses in an input string are balanced.</p>
+</li>
+<li>
+<p>Write the same feature in two styles, imperative and functional: take a list, keep the even numbers, and sum their squares.</p>
+</li>
+<li>
+<p>Use <code>dis.dis()</code> to compare the bytecode of three small functions and analyze the operations performed.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Computation is the process of transforming input by rules, and the Turing machine is its theoretical model. Not every problem can be solved by computation (the halting problem). A programming language is how humans express computation, and a paradigm is the philosophy of organizing that code.</p>
+<p>The next article looks at how computers represent data — binary, character encodings, and types.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/01-what-is-computer-science.md">What Is Computer Science?</a></li>
+<li><strong>Computation and Programs (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/03-data-representation.md">Data Representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/04-algorithms-and-complexity.md">Algorithms and Complexity</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/05-computer-architecture.md">Computer Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/06-operating-systems.md">Operating Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/07-networks.md">Networks</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/08-databases.md">Databases</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/09-software-engineering.md">Software Engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-101/en/10-ai-and-data-science.md">From CS to AI and Data Science</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf">Alan Turing — On Computable Numbers (1936)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Halting_problem">Wikipedia — Halting Problem</a></li>
+<li><a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html">SICP — Structure and Interpretation of Computer Programs</a></li>
+<li><a href="https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf">Programming Paradigms for Dummies (Peter Van Roy)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Computation Models, Turing Machine, Programming Paradigms, Compilers, Interpreters</p>
+</body>
+</html>

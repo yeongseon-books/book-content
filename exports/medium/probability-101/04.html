@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bayes' Theorem</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Bayes' Theorem</h1>
+<blockquote>
+<p>Probability 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do our <em>beliefs update</em> when we <em>see new data</em>? One <em>equation</em> becomes the shared language of <em>AI, statistics, and decisions</em>.</p>
+<blockquote>
+<p><em>Posterior ∝ Likelihood × Prior.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>equation and intuition</em> of Bayes' theorem</li>
+<li>The <em>prior / likelihood / posterior</em> triangle</li>
+<li><em>Odds</em> and <em>Bayes factors</em></li>
+<li>A 5-step Bayes exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Bayes' theorem is the <em>only consistent rule for updating uncertainty</em>. <em>Spam filtering, medical diagnosis, A/B tests, RL</em> all use it.</p>
+<blockquote>
+<p><em>Bayes' theorem is the engine of inference.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Prior[&quot;Prior P(H)&quot;] --&gt; Update[&quot;Likelihood P(D|H)&quot;]
+    Update --&gt; Post[&quot;Posterior P(H|D)&quot;]
+    Post --&gt; NewPrior[&quot;Becomes new prior&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Prior P(H)</strong>: belief <em>before</em> seeing data.</li>
+<li><strong>Likelihood P(D|H)</strong>: probability of D <em>given</em> hypothesis H is true.</li>
+<li><strong>Posterior P(H|D)</strong>: belief <em>after</em> seeing data.</li>
+<li><strong>Evidence P(D)</strong>: <em>total probability of data</em> (normalization).</li>
+<li><strong>Bayes factor</strong>: P(D|H₁) / P(D|H₂).</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Positive test → disease.”</em></p>
+<p><strong>After</strong>: <em>P(disease|+) = P(+|disease)·P(disease) / P(+)</em> — a low base rate gives a low <em>PPV</em>.</p>
+<h2>Hands-on: 5-step Bayes</h2>
+<p><strong>Step 1 — Prior and likelihood</strong></p>
+<pre><code class="language-python">prior = 0.01           # P(disease)
+sens = 0.99            # P(+|disease)
+spec = 0.95            # P(-|no disease)
+</code></pre>
+<p><strong>Step 2 — Evidence P(+)</strong></p>
+<pre><code class="language-python">p_pos = sens * prior + (1 - spec) * (1 - prior)
+print(&quot;P(+):&quot;, p_pos)
+</code></pre>
+<p><strong>Step 3 — Posterior P(disease | +)</strong></p>
+<pre><code class="language-python">post = sens * prior / p_pos
+print(&quot;P(disease | +):&quot;, post)
+</code></pre>
+<p><strong>Step 4 — Update on a second positive</strong></p>
+<pre><code class="language-python">prior2 = post
+p_pos2 = sens * prior2 + (1 - spec) * (1 - prior2)
+post2 = sens * prior2 / p_pos2
+print(&quot;after 2 positives:&quot;, post2)
+</code></pre>
+<p><strong>Step 5 — Odds form</strong></p>
+<pre><code class="language-python">prior_odds = 0.01 / 0.99
+likelihood_ratio = sens / (1 - spec)
+post_odds = prior_odds * likelihood_ratio
+print(&quot;posterior odds:&quot;, post_odds, &quot;P:&quot;, post_odds / (1 + post_odds))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A small <em>base rate</em> keeps <em>PPV</em> low even with a <em>sensitive test</em>.</li>
+<li>The <em>posterior</em> becomes the next <em>prior</em> — <em>sequential updating</em>.</li>
+<li>The <em>odds form</em> simplifies the arithmetic.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Treating <em>P(D|H)</em> as <em>P(H|D)</em>.</strong></li>
+<li><strong>Ignoring the <em>base rate</em>.</strong></li>
+<li><strong>Pretending <em>no prior</em> exists.</strong></li>
+<li><strong>Confusing <em>likelihood</em> with <em>probability</em>.</strong></li>
+<li><strong>Skipping the <em>independence assumption</em> in sequential updates.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Spam filters (Naive Bayes), Bayesian A/B testing, medical diagnosis, RL <em>belief states</em> — <em>Bayesian inference</em> is the core of <em>probabilistic ML</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Names</em> the prior.</li>
+<li>Distinguishes <em>likelihood</em> from <em>probability</em>.</li>
+<li>Uses <em>odds</em> and <em>Bayes factors</em>.</li>
+<li>Validates <em>independence</em> in sequential updates.</li>
+<li>Runs <em>sensitivity analyses</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know Bayes' theorem as a <em>formula</em>.</li>
+<li>[ ] I separate <em>prior / likelihood / posterior</em>.</li>
+<li>[ ] I can compute <em>PPV</em>.</li>
+<li>[ ] I can do <em>sequential updating</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>With <em>base rate 0.001</em>, <em>sensitivity 0.99</em>, <em>specificity 0.99</em>, compute <em>PPV</em>.</li>
+<li>State the practical meaning of a <em>Bayes factor of 10</em>.</li>
+<li>Compare the posterior under a <em>strong</em> prior vs a <em>weak</em> prior.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Bayes' theorem is the <em>math of learning</em>. The next episode introduces <em>random variables</em> — handling <em>numeric outcomes</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/03-conditional-probability.md">Conditional Probability</a></li>
+<li><strong>Bayes' Theorem (current)</strong></li>
+<li>Random Variables (upcoming)</li>
+<li>Expectation and Variance (upcoming)</li>
+<li>Discrete Distributions (upcoming)</li>
+<li>Continuous Distributions (upcoming)</li>
+<li>Law of Large Numbers and CLT (upcoming)</li>
+<li>Probability in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/lessons/bayes-theorem">3Blue1Brown — Bayes' theorem</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Bayes%27_theorem">Wikipedia — Bayes' theorem</a></li>
+<li><a href="https://web.stanford.edu/class/cs109/">Stanford CS109 — Notes</a></li>
+<li><a href="https://probml.github.io/pml-book/book1.html">Kevin Murphy — Probabilistic ML</a></li>
+</ul>
+<p class="tags-line">Tags: Probability, Bayes, Inference, Posterior, Beginner</p>
+</body>
+</html>

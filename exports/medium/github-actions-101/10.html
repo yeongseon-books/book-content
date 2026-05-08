@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A Real-World CI/CD Pipeline</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>A Real-World CI/CD Pipeline</h1>
+<blockquote>
+<p>GitHub Actions 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you weave <em>triggers, tests, lint, artifacts, Docker, deploy, and secrets</em> into <em>one pipeline</em>?</p>
+<blockquote>
+<p><em>A good pipeline is a </em>sum of small steps<em>. Each step stays simple; the composition is explicit.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Responsibility split</em> across <em>PR, main, and tag</em></li>
+<li><em>Reusable workflows</em> (<code>workflow_call</code>) to <em>eliminate duplication</em></li>
+<li><em>Composite actions</em> for grouping steps</li>
+<li>The <em>team-template repo</em> pattern</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The parts you have learned only improve <em>DORA</em> (deploy frequency, lead time, change-failure rate, MTTR) when they sit <em>together</em> in one place.</p>
+<blockquote>
+<p><em>The pieces make you </em>fast<em>. The composition keeps you </em>fast<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    PR[&quot;PR open&quot;] --&gt; Lint[&quot;lint + test + typecheck&quot;]
+    Push[&quot;main push&quot;] --&gt; Build[&quot;build + docker + staging&quot;]
+    Tag[&quot;tag push&quot;] --&gt; Release[&quot;release + production (approval)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Reusable workflow</strong>: a <em>shared workflow</em> invoked via <code>workflow_call</code>.</li>
+<li><strong>Composite action</strong>: several steps wrapped as one <em>reusable step</em>.</li>
+<li><strong>Template repo</strong>: a repository teams use as a <em>starting point</em>.</li>
+<li><strong>DORA metrics</strong>: the four delivery performance metrics.</li>
+<li><strong>Promotion</strong>: moving from staging to production.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: every repo has a <em>similar but slightly different</em> workflow. Fix one and the <em>others drift</em>.</p>
+<p><strong>After</strong>: a single <em>shared reusable workflow</em>. Each repo holds only a <em>thin caller</em>. <em>One change rolls out org-wide</em>.</p>
+<h2>Hands-on: A Real Pipeline in 5 Steps</h2>
+<p><strong>Step 1 — Define a reusable workflow</strong></p>
+<pre><code class="language-yaml"># .github/workflows/_ci.yml in org/template-repo
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        default: &quot;3.12&quot;
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+      - run: pip install -e &quot;.[dev]&quot;
+      - run: ruff check . &amp;&amp; mypy . &amp;&amp; pytest -q
+</code></pre>
+<p><strong>Step 2 — PR stage (lint + test)</strong></p>
+<pre><code class="language-yaml"># .github/workflows/pr.yml
+on:
+  pull_request:
+jobs:
+  ci:
+    uses: org/template-repo/.github/workflows/_ci.yml@v1
+    with:
+      python-version: &quot;3.12&quot;
+</code></pre>
+<p><strong>Step 3 — main stage (build + docker + staging)</strong></p>
+<pre><code class="language-yaml">on:
+  push:
+    branches: [main]
+jobs:
+  ci:
+    uses: org/template-repo/.github/workflows/_ci.yml@v1
+  docker:
+    needs: ci
+    uses: org/template-repo/.github/workflows/_docker.yml@v1
+  deploy-staging:
+    needs: docker
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - run: kubectl apply -f k8s/staging/
+</code></pre>
+<p><strong>Step 4 — tag stage (release + production)</strong></p>
+<pre><code class="language-yaml">on:
+  push:
+    tags: [&quot;v*&quot;]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: softprops/action-gh-release@v2
+  deploy-prod:
+    needs: release
+    environment: production  # required reviewers ON
+    runs-on: ubuntu-latest
+    steps:
+      - run: kubectl apply -f k8s/production/
+</code></pre>
+<p><strong>Step 5 — Wrap steps with a composite action</strong></p>
+<pre><code class="language-yaml"># .github/actions/setup-app/action.yml
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with: { python-version: &quot;3.12&quot; }
+    - run: pip install -e &quot;.[dev]&quot;
+      shell: bash
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>PR</em> is for <em>feedback</em>, <em>main</em> is for <em>deployment</em>, <em>tag</em> is for <em>release</em>.</li>
+<li><em>Reusable workflows</em> are <em>version-pinned</em> (<code>@v1</code>) so upstream changes do not break you.</li>
+<li>The <em>production environment</em> is the <em>final gate</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running <em>full e2e</em> on every PR.</strong> Feedback now takes 30 minutes.</li>
+<li><strong>Deploying <em>straight to production</em> from main.</strong> Skipping canary and staging.</li>
+<li><strong>Calling reusable workflows with <code>@main</code>.</strong> One day it <em>breaks silently</em>.</li>
+<li><strong>Deploying to <em>production</em> without a tag.</strong> No way to trace what shipped.</li>
+<li><strong>Composite actions with <em>no input validation</em>.</strong> Bad values pass through quietly.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A platform team owns an <em>org-wide template repo</em> so every service shares the same <em>CI/CD skeleton</em>, while <em>DORA metrics</em> are collected automatically by <em>Sleuth/LinearB</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>The trigger decides the responsibility</em>.</li>
+<li><em>Common goes into reusable; differences stay in the caller</em>.</li>
+<li><em>Never give up the production gate</em>.</li>
+<li><em>Templates are code, not wiki pages</em>.</li>
+<li><em>Optimize for what makes DORA improve</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>PR, main, and tag</em> stages are separated.</li>
+<li>[ ] Common steps are extracted into <em>reusable workflows</em>.</li>
+<li>[ ] <em>production</em> has <em>required reviewers</em>.</li>
+<li>[ ] Reusable workflows are called with a <em>pinned version</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Write a <em>PR-stage</em> workflow that runs only <em>lint, test, typecheck</em>.</li>
+<li>Create a <em>reusable workflow</em> and call it from two repos with the same CI.</li>
+<li>Build a workflow where a <em>tag push</em> triggers <em>production deploy</em> behind an <em>approval gate</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>If you followed along, you can handle <em>95% of real-world CI/CD</em>. From here, deepen <em>runtime</em> and <em>operations</em> with <em>Docker 101</em>, <em>Kubernetes 101</em>, and <em>SRE 101</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/01-what-is-github-actions.md">What Is GitHub Actions?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/02-workflow-and-job.md">Workflows and Jobs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/03-triggers.md">Understanding Triggers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/04-python-test-automation.md">Python Test Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/05-lint-and-typecheck.md">Lint and Type Check</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/06-build-artifact.md">Build Artifacts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/07-docker-build.md">Docker Build</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/08-deploy-automation.md">Deployment Automation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/github-actions-101/en/09-secret-management.md">Secret Management</a></li>
+<li><strong>A Real-World CI/CD Pipeline (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.github.com/actions/using-workflows/reusing-workflows">Reusing workflows</a></li>
+<li><a href="https://docs.github.com/actions/creating-actions/creating-a-composite-action">Creating a composite action</a></li>
+<li><a href="https://dora.dev/">DORA - Accelerate State of DevOps</a></li>
+<li><a href="https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-template-repository">Creating a template repository</a></li>
+</ul>
+<p class="tags-line">Tags: GitHubActions, Pipeline, CICD, Capstone, ReusableWorkflow</p>
+</body>
+</html>

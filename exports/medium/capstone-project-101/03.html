@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Defining the Problem</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Defining the Problem</h1>
+<blockquote>
+<p>Capstone Project 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>Why</em> does an <em>unclear problem</em> make the <em>solution shake</em>?</p>
+<blockquote>
+<p>If the <em>problem</em> becomes a <em>moving target</em>, <em>progress</em> gets <em>redefined</em> too.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Writing a problem <em>statement</em></li>
+<li><em>User</em> hypothesis</li>
+<li><em>Value</em> specification</li>
+<li><em>Metric</em> baseline</li>
+<li>Problem <em>restatement</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Problem definition</em> decides <em>half</em> of <em>project quality</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    O[Observation] --&gt; S[Statement]
+    S --&gt; U[User]
+    U --&gt; V[Value]
+    V --&gt; M[Measure]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>statement</strong>: <em>problem</em> sentence.</li>
+<li><strong>persona</strong>: <em>user</em> profile.</li>
+<li><strong>value</strong>: <em>benefit</em> of solving.</li>
+<li><strong>assumption</strong>: a <em>premise</em>.</li>
+<li><strong>metric</strong>: <em>measurement</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A <em>feature</em> equals the <em>problem</em>.</p>
+<p><strong>After</strong>: The <em>problem</em> justifies the <em>feature</em>.</p>
+<h2>Hands-on: Problem Card</h2>
+<p><strong>Step 1 — Observation</strong></p>
+<pre><code class="language-python">obs = &quot;schedule conflicts during course registration&quot;
+</code></pre>
+<p><strong>Step 2 — User</strong></p>
+<pre><code class="language-python">user = &quot;freshmen plus double-major students&quot;
+</code></pre>
+<p><strong>Step 3 — Value</strong></p>
+<pre><code class="language-python">value = &quot;spot conflicts fast&quot;
+</code></pre>
+<p><strong>Step 4 — Assumption</strong></p>
+<pre><code class="language-python">assume = &quot;users can paste timetables as text&quot;
+</code></pre>
+<p><strong>Step 5 — Metric</strong></p>
+<pre><code class="language-python">metric = &quot;conflict found within 30s&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Observation</em> comes before <em>statement</em>.</li>
+<li><em>Assumptions</em> are <em>explicit</em>.</li>
+<li>The <em>metric</em> defines the <em>solution</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Writing the <em>solution</em> as the <em>problem</em>.</strong></li>
+<li><strong>Writing <em>everyone</em> as the <em>user</em>.</strong></li>
+<li><strong>Hiding <em>assumptions</em>.</strong></li>
+<li><strong>Vague <em>metrics</em>.</strong></li>
+<li><strong>Fearing <em>restatement</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <em>first section</em> of a PRD is the <em>problem statement</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Keep the <em>problem short</em>.</li>
+<li>Make <em>assumptions explicit</em>.</li>
+<li><em>Metrics</em> are <em>numbers</em>.</li>
+<li><em>Restatement</em> is <em>healthy</em>.</li>
+<li><em>Users</em> are <em>concrete</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Statement</em> in one paragraph.</li>
+<li>[ ] <em>User</em> named.</li>
+<li>[ ] <em>Assumption</em> table.</li>
+<li>[ ] <em>Metric</em> number.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>problem statement</em> in one line.</li>
+<li>Define <em>assumption</em> in one line.</li>
+<li>State the meaning of <em>metric</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: <em>Organizing Requirements</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
+<li><strong>Defining the Problem (current)</strong></li>
+<li>Organizing Requirements (upcoming)</li>
+<li>Splitting Team Roles (upcoming)</li>
+<li>Designing the MVP (upcoming)</li>
+<li>Choosing the Tech Stack (upcoming)</li>
+<li>Schedule Management (upcoming)</li>
+<li>Building Presentation Materials (upcoming)</li>
+<li>Project Retrospective (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="http://momtestbook.com/">The Mom Test</a></li>
+<li><a href="https://www.workingbackwards.com/">Working Backwards - Amazon</a></li>
+<li><a href="https://www.atlassian.com/agile/product-management/requirements">PRD Template - Atlassian</a></li>
+<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired - Marty Cagan</a></li>
+</ul>
+<p class="tags-line">Tags: Capstone, Problem, Definition, Scope, Beginner</p>
+</body>
+</html>

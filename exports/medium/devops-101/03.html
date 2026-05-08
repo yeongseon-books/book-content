@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CD and Deployment Strategies</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>CD and Deployment Strategies</h1>
+<blockquote>
+<p>DevOps 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is the <em>fear of deployment</em> really about <em>not being able to roll back</em>?</p>
+<blockquote>
+<p>A good deploy strategy turns a release into <em>small, reversible changes</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>CD</em> and its relationship with <em>CI</em></li>
+<li>A comparison of <em>Rolling, Blue-Green, and Canary</em> strategies</li>
+<li><em>Feature flags</em> to separate <em>code deploy</em> from <em>feature activation</em></li>
+<li><em>Rollback</em> strategies</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Deployment is <em>the most dangerous moment</em>. A good strategy <em>shrinks the blast radius</em> and <em>makes rollback easy</em>.</p>
+<blockquote>
+<p><em>Deployability</em> and <em>feature activation</em> must be <em>separated</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Build[&quot;build&quot;] --&gt; Stage[&quot;stage&quot;]
+    Stage --&gt; Canary[&quot;10% canary&quot;]
+    Canary --&gt; Full[&quot;100%&quot;]
+    Canary --&gt; Rollback[&quot;rollback&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>CD</strong>: <em>Continuous Delivery/Deployment</em>. <em>Automated deployment</em>.</li>
+<li><strong>Rolling</strong>: replace servers <em>one at a time</em> with the new version.</li>
+<li><strong>Blue-Green</strong>: keep <em>two environments</em> and <em>switch traffic</em> between them.</li>
+<li><strong>Canary</strong>: send <em>a slice of traffic</em> to the new version.</li>
+<li><strong>Feature flag</strong>: <em>deploy the code</em> but <em>toggle the feature</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (big-bang deploy)</strong></p>
+<pre><code class="language-text">- All servers move to the new version *at once*
+- A problem means *full outage*
+- Rollback takes *more than 30 minutes*
+</code></pre>
+<p><strong>After (Canary + flag)</strong></p>
+<pre><code class="language-text">- New version receives *10%* of traffic
+- After 5 minutes of monitoring, *50% then 100%*
+- On failure, *flag off* blocks it *immediately*
+</code></pre>
+<h2>Hands-on: Five Steps to a Safe Deploy</h2>
+<p><strong>Step 1 - Auto-deploy to staging</strong></p>
+<pre><code class="language-yaml">deploy-stage:
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  steps:
+    - run: ./deploy.sh stage
+</code></pre>
+<p><strong>Step 2 - Smoke test</strong></p>
+<pre><code class="language-bash">curl -f https://stage.example.com/health || exit 1
+pytest tests/smoke/ --base-url=https://stage.example.com
+</code></pre>
+<p><strong>Step 3 - Canary (10%)</strong></p>
+<pre><code class="language-bash">kubectl set image deploy/api api=myapp:v2 --record
+kubectl scale deploy/api-v2 --replicas=1   # 10%
+</code></pre>
+<p><strong>Step 4 - Monitor for 5 minutes</strong></p>
+<pre><code class="language-text">- error rate &lt; 0.1%
+- p95 latency &lt; 200ms
+- 5xx counts within normal range
+</code></pre>
+<p><strong>Step 5 - Promote or rollback</strong></p>
+<pre><code class="language-bash"># OK
+kubectl scale deploy/api-v2 --replicas=10
+
+# NG
+kubectl rollout undo deploy/api
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Staging</em> must mirror <em>production</em>.</li>
+<li>The <em>baseline metrics</em> for the canary are <em>defined in advance</em>.</li>
+<li><em>Rollback commands</em> live in the <em>runbook</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Automated CI but <em>manual CD</em>.</strong> Humans inject <em>mistakes</em>.</li>
+<li><strong>Staging differs from production.</strong> Bugs become <em>unreproducible</em>.</li>
+<li><strong>Promoting to 100% <em>without checking metrics</em> after canary.</strong> The canary loses its meaning.</li>
+<li><strong>Never cleaning up feature flags.</strong> After six months you <em>cannot tell which flags are alive</em>.</li>
+<li><strong>No rollback drill.</strong> A real incident becomes <em>the first practice</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Large services automate <em>Canary Analysis (CAA)</em> with tools that compare metrics for them. Spinnaker and Argo Rollouts are common examples.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Every deploy</em> must be <em>reversible</em>.</li>
+<li><em>Feature releases</em> go through <em>flags</em>. Decoupled from deployment.</li>
+<li><em>Canary metrics</em> are agreed by the <em>whole team</em>.</li>
+<li><em>DB migrations</em> must be <em>backward compatible</em>.</li>
+<li><em>Higher deploy frequency</em> makes things <em>safer</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Auto-deploy to staging</em> exists.</li>
+<li>[ ] <em>Smoke tests</em> are automated.</li>
+<li>[ ] <em>Rollback commands</em> are <em>documented</em>.</li>
+<li>[ ] A <em>feature flag</em> system exists.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li><em>Sketch</em> the deploy stages of your service.</li>
+<li>Add <em>rollback commands</em> to the <em>runbook</em>.</li>
+<li>Agree on <em>three canary metrics</em> with your team.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>CD is <em>a stream of small, reversible changes</em>. In the next post we cover <em>configuration management</em> across environments.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/01-what-is-devops.md">What Is DevOps?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/devops-101/en/02-ci-pipeline.md">CI Pipeline</a></li>
+<li><strong>CD and Deployment Strategies (current)</strong></li>
+<li>Environments and Configuration (upcoming)</li>
+<li>Infrastructure as Code (upcoming)</li>
+<li>Containers and Build (upcoming)</li>
+<li>Monitoring and Alerting (upcoming)</li>
+<li>Logging and Analysis (upcoming)</li>
+<li>Incident Response and On-Call (upcoming)</li>
+<li>An Operable DevOps Flow (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/bliki/ContinuousDelivery.html">Martin Fowler — Continuous Delivery</a></li>
+<li><a href="https://argoproj.github.io/rollouts/">Argo Rollouts</a></li>
+<li><a href="https://launchdarkly.com/blog/what-are-feature-flags/">LaunchDarkly — Feature Flags</a></li>
+<li><a href="https://spinnaker.io/">Spinnaker</a></li>
+</ul>
+<p class="tags-line">Tags: DevOps, CD, Deployment, BlueGreen, Canary</p>
+</body>
+</html>

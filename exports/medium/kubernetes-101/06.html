@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ConfigMap and Secret</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>ConfigMap and Secret</h1>
+<blockquote>
+<p>Kubernetes 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>inject</em> settings and <em>passwords</em> without <em>baking them into the image</em>?</p>
+<blockquote>
+<p><em>ConfigMap</em> delivers <em>non-secret config</em>; <em>Secret</em> delivers <em>sensitive values</em> — both safely into a <em>Pod</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Splitting <em>ConfigMap</em> and <em>Secret</em></li>
+<li><em>Env vars</em> vs <em>file mounts</em></li>
+<li>The <em>base64</em> fact and the <em>encryption gap</em></li>
+<li>Integrating an <em>external secret manager</em></li>
+<li><em>Restart on change</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Pulling <em>environment differences</em> out of the image is what makes things <em>reproducible</em>. <em>Secrets</em> must be tracked <em>separately</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    CM[&quot;configmap&quot;] --&gt; Pod[&quot;pod&quot;]
+    Sec[&quot;secret&quot;] --&gt; Pod
+    Pod --&gt; Env[&quot;env&quot;]
+    Pod --&gt; File[&quot;mounted file&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>ConfigMap</strong>: a bundle of <em>non-secret key/value</em>.</li>
+<li><strong>Secret</strong>: a bundle of <em>secret key/value</em> (base64).</li>
+<li><strong>envFrom</strong>: bulk-injects keys as <em>env vars</em>.</li>
+<li><strong>volume mount</strong>: mounts data as <em>files</em>.</li>
+<li><strong>External Secrets</strong>: syncs from an <em>external manager</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>baking the DB password</em> into the image.</p>
+<p><strong>After</strong>: <em>injecting via Secret</em>; the <em>image is environment-agnostic</em>.</p>
+<h2>Hands-on: Split Config and Secrets</h2>
+<p><strong>Step 1 — ConfigMap</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: app-config}
+data:
+  LOG_LEVEL: &quot;info&quot;
+  FEATURE_FLAG: &quot;true&quot;
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 2 — Secret</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+apiVersion: v1
+kind: Secret
+metadata: {name: app-secret}
+type: Opaque
+stringData:
+  DB_PASSWORD: &quot;s3cret&quot;
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 3 — Inject into a Pod</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+spec:
+  containers:
+  - name: app
+    image: myorg/app:1.0
+    envFrom:
+    - configMapRef: {name: app-config}
+    - secretRef: {name: app-secret}
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 4 — Mount as files</strong></p>
+<pre><code class="language-python">&quot;&quot;&quot;
+volumes:
+- name: cfg
+  configMap: {name: app-config}
+volumeMounts:
+- name: cfg
+  mountPath: /etc/app
+&quot;&quot;&quot;
+</code></pre>
+<p><strong>Step 5 — Restart after change</strong></p>
+<pre><code class="language-python">import subprocess
+
+def restart(dep):
+    subprocess.run(
+        [&quot;kubectl&quot;, &quot;rollout&quot;, &quot;restart&quot;, f&quot;deployment/{dep}&quot;],
+        check=True,
+    )
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>stringData</em> handles <em>base64 encoding for you</em>.</li>
+<li><em>envFrom</em> injects the <em>whole bundle</em>.</li>
+<li>A <em>change</em> requires an <em>explicit restart</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Equating <em>Secret</em> with <em>encryption</em>.</strong></li>
+<li><strong>Storing <em>Secret values</em> in <em>Git in the clear</em>.</strong></li>
+<li><strong>Expecting <em>ConfigMap</em> changes to <em>auto-reload</em>.</strong></li>
+<li><strong>Cramming <em>long config</em> into <em>env vars only</em>.</strong></li>
+<li><strong>Skipping <em>Secret RBAC</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <em>External Secrets Operator</em> keeps <em>Vault / AWS Secrets Manager</em> as the <em>source of truth</em> and <em>syncs cluster Secrets</em> automatically.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Secrets</em> are <em>base64</em>, not <em>encryption</em>.</li>
+<li>The <em>external manager</em> is the <em>source of truth</em>.</li>
+<li><em>RBAC</em> is the <em>last line of defense</em>.</li>
+<li><em>Change means restart</em>.</li>
+<li><em>Per-environment ConfigMap</em> gives <em>reproducibility</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] No <em>plain Secrets</em> in <em>Git</em>.</li>
+<li>[ ] <em>RBAC</em> applied.</li>
+<li>[ ] <em>rollout restart</em> after a change.</li>
+<li>[ ] <em>External manager</em> considered first.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the <em>difference</em> between ConfigMap and Secret in one line.</li>
+<li>Explain in one line <em>what</em> "Secret is not encryption" means.</li>
+<li>Name <em>one benefit</em> of External Secrets.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Config is solved. The next post covers persisting <em>state data</em> with <em>Volumes</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/01-what-is-kubernetes.md">What is Kubernetes?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/02-pod.md">Pod</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/03-deployment.md">Deployment</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/04-service.md">Service</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/kubernetes-101/en/05-ingress.md">Ingress</a></li>
+<li><strong>ConfigMap and Secret (current)</strong></li>
+<li>Volume (upcoming)</li>
+<li>HPA (upcoming)</li>
+<li>Helm (upcoming)</li>
+<li>Kubernetes in Operation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/concepts/configuration/configmap/">ConfigMap</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/configuration/secret/">Secret</a></li>
+<li><a href="https://external-secrets.io/">External Secrets Operator</a></li>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">RBAC</a></li>
+</ul>
+<p class="tags-line">Tags: Kubernetes, ConfigMap, Secret, Configuration, DevOps</p>
+</body>
+</html>

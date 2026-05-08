@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Test Double</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Test Double</h1>
+<blockquote>
+<p>Testing 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Can we <em>verify behavior</em> without <em>really calling</em> the DB or external API?</p>
+<blockquote>
+<p>Test doubles swap <em>real dependencies</em> for <em>stand-ins</em>. Each kind has <em>a different role</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of a <em>test double</em> and the five kinds</li>
+<li><em>When to use which</em> kind</li>
+<li>The difference between <em>Stub vs Mock vs Fake</em></li>
+<li>Problems caused by <em>overusing</em> doubles</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Tests must be <em>fast and deterministic</em>. Calling a real payment API is <em>slow and unstable</em>. Test doubles turn external dependencies into <em>controllable stand-ins</em>.</p>
+<blockquote>
+<p>Used well: <em>fast trust</em>. Used poorly: <em>false trust</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    SUT[&quot;System under test&quot;] --&gt; Double[&quot;Test Double&quot;]
+    Double -.-&gt;|replaces| Real[(&quot;Real dependency&quot;)]
+</code></pre>
+<h2>Key Terms (Meszaros' five)</h2>
+<ul>
+<li><strong>Dummy</strong>: a placeholder object that is <em>only passed around</em>.</li>
+<li><strong>Stub</strong>: a fake that <em>returns canned answers</em>.</li>
+<li><strong>Spy</strong>: a stub that also <em>records calls</em>.</li>
+<li><strong>Mock</strong>: a double with <em>pre-set expectations</em> that get verified.</li>
+<li><strong>Fake</strong>: a <em>simple real implementation</em> (for example, an in-memory DB).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (calling the dependency directly)</strong></p>
+<pre><code class="language-python">def test_send_welcome_email():
+    user = create_user(&quot;a@b.com&quot;)
+    send_welcome_email(user)   # *real SMTP* call
+</code></pre>
+<p><strong>After (replaced by a Stub)</strong></p>
+<pre><code class="language-python">class FakeMailer:
+    def __init__(self): self.sent = []
+    def send(self, to, body): self.sent.append((to, body))
+
+def test_send_welcome_email():
+    mailer = FakeMailer()
+    send_welcome_email(User(&quot;a@b.com&quot;), mailer=mailer)
+    assert mailer.sent == [(&quot;a@b.com&quot;, &quot;Welcome!&quot;)]
+</code></pre>
+<h2>Hands-on: Five Doubles in Five Steps</h2>
+<p><strong>Step 1 — Dummy</strong></p>
+<pre><code class="language-python">def test_dummy_passthrough():
+    user = User(email=&quot;a@b.com&quot;, logger=None)  # logger is *not used*
+    assert user.email == &quot;a@b.com&quot;
+</code></pre>
+<p><strong>Step 2 — Stub</strong></p>
+<pre><code class="language-python">class StubClock:
+    def now(self): return &quot;2026-05-04&quot;
+
+def test_uses_stub_clock():
+    assert greet(StubClock()) == &quot;Hello, today is 2026-05-04&quot;
+</code></pre>
+<p><strong>Step 3 — Spy</strong></p>
+<pre><code class="language-python">class SpyMailer:
+    def __init__(self): self.calls = []
+    def send(self, to, body): self.calls.append((to, body))
+
+def test_spy_records_calls():
+    m = SpyMailer(); send_welcome(&quot;a@b.com&quot;, m)
+    assert len(m.calls) == 1
+</code></pre>
+<p><strong>Step 4 — Mock (unittest.mock)</strong></p>
+<pre><code class="language-python">from unittest.mock import MagicMock
+
+def test_mock_with_expectation():
+    repo = MagicMock()
+    repo.find.return_value = User(email=&quot;a@b.com&quot;)
+    assert get_user(1, repo).email == &quot;a@b.com&quot;
+    repo.find.assert_called_once_with(1)
+</code></pre>
+<p><strong>Step 5 — Fake (in-memory)</strong></p>
+<pre><code class="language-python">class InMemoryUserRepo:
+    def __init__(self): self._db = {}
+    def add(self, u): self._db[u.id] = u
+    def find(self, id): return self._db.get(id)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Dummy</em> only fills <em>a slot</em>.</li>
+<li><em>Stub</em> adds <em>answers</em>; <em>Spy</em> adds <em>records</em>; <em>Mock</em> adds <em>expectations</em>.</li>
+<li><em>Fake</em> behaves <em>like the real thing</em> but stays <em>small and fast</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Reaching for a <em>Mock</em> everywhere.</strong> Tests become <em>brittle</em>.</li>
+<li><strong>Asserting on <em>implementation details</em>.</strong> Refactors become <em>impossible</em>.</li>
+<li><strong>A <em>Fake too far from the real thing</em> — bugs found in tests differ from production.</strong></li>
+<li><strong>Verifying only the <em>call count</em> of a Spy.</strong> Also check <em>the result</em>.</li>
+<li><strong>Building a Stub <em>where a Dummy</em> would do.</strong> <em>Wasted effort</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most unit tests get by with just <em>Stubs and Fakes</em>. <em>Mocks</em> are reserved for cases where <em>the interaction itself</em> is the thing being verified (sending email, calling payments, ...).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Defaults to <em>Fake/Stub</em>, uses Mock only when needed.</li>
+<li>Verifies <em>outcomes, not behavior</em>.</li>
+<li>Hides external dependencies behind a <em>thin interface</em>.</li>
+<li>Keeps a Fake <em>honoring the same contract</em> as the real thing.</li>
+<li>Can describe <em>what a test verifies</em> in one line.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can <em>distinguish</em> the five kinds.</li>
+<li>[ ] You wrote tests using <em>Stub and Fake</em>.</li>
+<li>[ ] You used Mock <em>only for interaction verification</em>.</li>
+<li>[ ] External deps are isolated by <em>an interface</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build <code>send_welcome</code> and test it with <em>both</em> a Stub and a Mock.</li>
+<li>Note <em>what kind of bug</em> each style catches.</li>
+<li>Build an <em>in-memory Repo Fake</em> and test the business logic on top of it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Test doubles <em>tame external dependencies</em>. The next post zooms into the two most common kinds — <em>Mock and Stub</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><strong>Test Double (current)</strong></li>
+<li>Mock and Stub (upcoming)</li>
+<li>Test Coverage (upcoming)</li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/bliki/TestDouble.html">Martin Fowler — Test Double</a></li>
+<li><a href="http://xunitpatterns.com/Test%20Double.html">Meszaros — xUnit Test Patterns</a></li>
+<li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock docs</a></li>
+<li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Martin Fowler — Mocks Aren't Stubs</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Test Double, Fake, Stub, Spy</p>
+</body>
+</html>

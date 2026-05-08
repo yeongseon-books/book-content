@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JIT vs AOT</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>JIT vs AOT</h1>
+<blockquote>
+<p>Compilers 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does the same JavaScript code feel slow at first and then suddenly speed up?</p>
+<blockquote>
+<p>JIT (just-in-time) compiles during execution and AOT (ahead-of-time) compiles before it. That single difference shapes startup time, peak performance, and even how you ship the program.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definitions and flow of AOT and JIT</li>
+<li>Why warmup happens and how to measure it</li>
+<li>The optimization opportunities each model unlocks</li>
+<li>How deployment models (binary vs runtime) differ</li>
+<li>How real systems blend the two</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The same algorithm can run ten times faster or slower depending on the execution mode (JIT, AOT, interpreted). The startup vs peak balance can make the same language a great fit for servers and a poor fit for desktops. We are no longer choosing a compiler; we are choosing a compiler mode.</p>
+<blockquote>
+<p>When you compile is what users feel as performance.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;source&quot;] --&gt; B{&quot;AOT?&quot;}
+    B -- yes --&gt; C[&quot;compile time -&gt; binary&quot;]
+    C --&gt; D[&quot;fast startup&quot;]
+    B -- no --&gt; E[&quot;interpret first&quot;]
+    E --&gt; F[&quot;JIT compile hot path&quot;]
+    F --&gt; G[&quot;fast peak&quot;]
+</code></pre>
+<p>AOT compiles once and starts fast every time. JIT starts slower but optimizes hot paths once it sees them.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>AOT (ahead-of-time)</strong>: Compile before deployment. The output is a binary.</li>
+<li><strong>JIT (just-in-time)</strong>: Compile during execution. The output lives in memory.</li>
+<li><strong>Warmup</strong>: The slow window before JIT discovers and optimizes hot paths.</li>
+<li><strong>Tiered compilation</strong>: A pipeline of interpreter -&gt; baseline JIT -&gt; optimizing JIT.</li>
+<li><strong>Profile-guided</strong>: Optimize more aggressively using observed runtime data.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — limits of a single mode</strong></p>
+<pre><code class="language-text">pure interpreter: fast startup, slow peak
+pure AOT       : fast startup, fast peak, but blind to dynamic info
+</code></pre>
+<p><strong>After — modern blended runtime</strong></p>
+<pre><code class="language-text">JVM, V8, .NET: interpreter or baseline first -&gt; optimizing JIT for hot code only
+</code></pre>
+<p>You get the best part of each stage.</p>
+<h2>Hands-on: Measure the JIT Effect</h2>
+<p><strong>Step 1 — A pure Python loop</strong></p>
+<pre><code class="language-python"># 1_naive.py
+def sum_to(n):
+    s = 0
+    for i in range(n):
+        s += i
+    return s
+
+import time
+t = time.perf_counter()
+sum_to(10**7)
+print(&quot;python:&quot;, time.perf_counter()-t)
+</code></pre>
+<p>CPython runs bytecode through an interpreter. There is no JIT, so each call is dispatched one op at a time.</p>
+<p><strong>Step 2 — JIT effect with PyPy or numba</strong></p>
+<pre><code class="language-python"># 2_jit.py
+# pip install numba
+from numba import njit
+import time
+
+@njit
+def sum_to(n):
+    s = 0
+    for i in range(n):
+        s += i
+    return s
+
+# First call compiles and runs
+t = time.perf_counter(); sum_to(10**7); print(&quot;first:&quot;, time.perf_counter()-t)
+# Second call reuses the compiled code
+t = time.perf_counter(); sum_to(10**7); print(&quot;warm :&quot;, time.perf_counter()-t)
+</code></pre>
+<p>The first call pays warmup cost. The second call runs at near-native speed.</p>
+<p><strong>Step 3 — AOT (for example, C)</strong></p>
+<pre><code class="language-c">// 3_aot.c
+#include &lt;stdio.h&gt;
+long sum_to(long n){ long s=0; for(long i=0;i&lt;n;i++) s+=i; return s; }
+int main(){ printf(&quot;%ld\n&quot;, sum_to(10000000)); return 0; }
+</code></pre>
+<pre><code class="language-bash">gcc -O2 3_aot.c -o sum &amp;&amp; ./sum
+</code></pre>
+<p>The binary already carries optimizations, so startup is fast and peak is fast. The downside is that it cannot adapt to dynamic types.</p>
+<p><strong>Step 4 — Tiered compilation intuition</strong></p>
+<pre><code class="language-python"># 4_tiered.py
+# pseudocode
+def execute(fn, args):
+    if call_count(fn) &lt; 10:    return interpret(fn, args)
+    if not has_baseline(fn):   compile_baseline(fn)
+    if call_count(fn) &gt; 1000:  compile_optimized(fn)
+    return run_compiled(fn, args)
+</code></pre>
+<p>JVM, V8, and .NET all look like this. Start with a fast-to-produce form, then upgrade hot functions to a slower-to-produce but faster-to-run form.</p>
+<p><strong>Step 5 — Profile-guided optimization</strong></p>
+<pre><code class="language-bash"># 5_pgo.sh
+gcc -fprofile-generate -O2 prog.c -o prog
+./prog                 # collect profile
+gcc -fprofile-use -O2 prog.c -o prog
+</code></pre>
+<p>Knowing real call frequencies and branch directions lets the compiler inline and reorder more aggressively. PGO is how AOT borrows a slice of JIT's dynamic information.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same source has different startup and peak depending on the mode.</li>
+<li>JIT's biggest weapon is the dynamic information it can collect.</li>
+<li>AOT's biggest strength is the simplicity of its deployment unit.</li>
+<li>Most real systems blend both modes.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Judging JIT from a single call.</strong> You must subtract the warmup window before comparing.</li>
+<li><strong>Assuming AOT always wins.</strong> With heavy dynamic dispatch, JIT often comes out ahead.</li>
+<li><strong>Ignoring JIT's memory cost.</strong> Compiled code and profiling data both consume RAM.</li>
+<li><strong>Ignoring AOT binary size.</strong> Inlining and multiple architectures grow the binary fast.</li>
+<li><strong>Treating PGO as free.</strong> The profile-collection run itself costs time and infrastructure.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>JVM, .NET, V8, and JavaScriptCore all use tiered JITs. Go, Rust, and C and C++ are pure AOT. Android's ART blends AOT with JIT. CPython is an interpreter, but PEP 744 is bringing in a copy-and-patch JIT. WebAssembly engines support both AOT and JIT.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They first measure the workload's startup vs peak ratio.</li>
+<li>They know short-lived processes (scripts) prefer AOT or an interpreter.</li>
+<li>They know long-running servers amortize JIT warmup well.</li>
+<li>They know memory-constrained environments (embedded) often rule out JIT.</li>
+<li>They never switch modes without measurements.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you compare AOT and JIT in one sentence?</li>
+<li>[ ] Can you explain why warmup happens?</li>
+<li>[ ] Can you give an example of an optimization enabled by dynamic info?</li>
+<li>[ ] Can you sketch the flow of tiered compilation?</li>
+<li>[ ] Can you say which AOT weakness PGO addresses?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Run the same function under CPython and numba. Compare the first and warm timings.</li>
+<li>For a short-lived CLI tool, decide in one minute whether AOT or JIT fits better and why.</li>
+<li>In one paragraph, explain how a JIT uses inline caches to shrink dynamic dispatch costs.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>JIT and AOT are two models born from one question: when do we compile? In the next post we assemble everything we have learned into a tiny interpreter that fits on one screen.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">what is a compiler</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">intermediate representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/07-optimization-basics.md">optimization basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/08-code-generation.md">code generation</a></li>
+<li><strong>JIT vs AOT (current)</strong></li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Just-in-time_compilation">Just-in-time compilation (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Ahead-of-time_compilation">Ahead-of-time compilation (Wikipedia)</a></li>
+<li><a href="https://v8.dev/blog/launching-ignition-and-turbofan">V8 — Ignition and TurboFan</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Profile-guided_optimization">Profile-guided optimization (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, JIT, AOT, Tradeoffs, Warmup</p>
+</body>
+</html>

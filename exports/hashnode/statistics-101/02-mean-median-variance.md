@@ -1,0 +1,155 @@
+
+# Mean, Median, and Variance
+
+> Statistics 101 series (2/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: When summarizing data with *one or two numbers*, when do we use the *mean* and when do we use the *median*? What does *variance* tell us?
+
+> *A summary statistic changes shape with the question you ask.*
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- Measures of *central tendency* — *mean / median / mode*
+- Measures of *spread* — *variance / standard deviation / IQR*
+- Why the *mean is dangerous* on *skewed distributions*
+- A 5-step summary statistics exercise
+- Five common mistakes
+
+## Why It Matters
+
+Data has *thousands of rows*, but humans decide with *one or two numbers*. *Which number you pick* determines the *quality of the decision*.
+
+> *One wrong mean writes one wrong decision.*
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    Data["Data"] --> Center["Center: mean/median/mode"]
+    Data --> Spread["Spread: variance/std/IQR"]
+    Center --> Story["Summary Story"]
+    Spread --> Story
+```
+
+## Key Terms
+
+- **Mean**: sum / count. *Sensitive to outliers*.
+- **Median**: middle value after sorting. *Robust to outliers*.
+- **Mode**: the *most frequent* value.
+- **Variance**: average of *squared distances* from the mean.
+- **Standard Deviation**: square root of variance. Same units as the data.
+- **IQR (Interquartile Range)**: *Q3 − Q1*. The width of the middle 50%.
+
+## Before / After
+
+**Before**: *“Our average user spend is $50.”* — But what if one user spent $5,000?
+
+**After**: *“Median $12, mean $50 (heavily skewed) — spend follows a long-tail distribution.”*
+
+## Hands-on: 5-step Summary Statistics
+
+### Step 1 — Prepare data
+
+```python
+import numpy as np
+x = np.array([10, 12, 11, 13, 12, 14, 11, 12, 5_000_000])
+```
+
+### Step 2 — Mean and median
+
+```python
+print("mean:", np.mean(x))
+print("median:", np.median(x))
+```
+
+### Step 3 — Variance and standard deviation
+
+```python
+print("var:", np.var(x))
+print("std:", np.std(x))
+```
+
+### Step 4 — IQR
+
+```python
+q1, q3 = np.percentile(x, [25, 75])
+print("IQR:", q3 - q1)
+```
+
+### Step 5 — Summary sentence
+
+```text
+Median 12, IQR 1.5 — most users sit near 12.
+Mean 555,557 (skewed by one outlier).
+Decision: report the median, not the mean.
+```
+
+## What to Notice in This Code
+
+- With outliers present, *mean ≠ median*.
+- Variance is in *squared units*; standard deviation is in *original units*.
+- IQR is a *spread* measure that is *robust to outliers*.
+
+## Five Common Mistakes
+
+1. **Deciding from the *mean alone*.** Missing the *shape* of the distribution.
+2. **Confusing *standard deviation* with *variance*.** Different units.
+3. **Reporting the *mean* on a *skewed* distribution.**
+4. **Trusting the *variance* of *N=10*.** The sample is too small.
+5. **Reporting *unitless numbers*.** Always include dollars, %, seconds.
+
+## How This Shows Up in Production
+
+Revenue, response time, ad cost — all of these tend to be *long-tail*, so *median / p95 / p99* are reported more often than *mean*. Dashboards usually show *three or four statistics* together.
+
+## How a Senior Engineer Thinks
+
+- *Plot the distribution* first.
+- Look at *median / p95* alongside the *mean*.
+- *Investigate the source* of outliers.
+- *Always* write the units.
+- Pick the *summary statistic that matches the question*.
+
+## Checklist
+
+- [ ] I know the difference between *mean* and *median*.
+- [ ] I know *variance / standard deviation / IQR*.
+- [ ] I use the *median* on *skewed* distributions.
+- [ ] I include units in my report.
+
+## Practice Problems
+
+1. Compute the mean and median of your *daily study time over the last 30 days*.
+2. Explain in one sentence why the *mean is dangerous* on a *long-tail* distribution.
+3. Compare *IQR* and *standard deviation* — how are they different?
+
+## Wrap-up and Next Steps
+
+Summary statistics is a tool for *briefly conveying the shape* of data. The next episode goes one level deeper into the *shape itself* — *distributions*.
+
+- [What Is Statistics?](./01-what-is-statistics.md)
+- **Mean, Median, and Variance (current)**
+- Distributions (upcoming)
+- Sample and Population (upcoming)
+- Estimation (upcoming)
+- Confidence Interval (upcoming)
+- Hypothesis Testing (upcoming)
+- Correlation and Regression (upcoming)
+- Understanding p-value (upcoming)
+- Statistical Thinking (upcoming)
+## References
+
+- [NIST/SEMATECH e-Handbook of Statistical Methods](https://www.itl.nist.gov/div898/handbook/)
+- [pandas — describe()](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html)
+- [Wikipedia — Robust Statistics](https://en.wikipedia.org/wiki/Robust_statistics)
+- [Khan Academy — Summary Statistics](https://www.khanacademy.org/math/statistics-probability/summarizing-quantitative-data)
+
+Tags: Statistics, DescriptiveStats, Mean, Variance, Beginner
+
+---
+
+© 2026 YeongseonBooks. All rights reserved.

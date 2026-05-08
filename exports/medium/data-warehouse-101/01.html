@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is a Data Warehouse?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is a Data Warehouse?</h1>
+<blockquote>
+<p>Data Warehouse 101 series (1/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does a <em>service database alone</em> fail at analytics, and what makes a <em>dedicated analytical store</em> different?</p>
+<blockquote>
+<p><em>A data warehouse is a store built to answer questions fast.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> and <em>purpose</em> of a data warehouse</li>
+<li>How it <em>differs</em> from a service DB</li>
+<li>Why analytics needs a <em>dedicated store</em></li>
+<li>Five-step first analytical query</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When a product grows, the database that handles <em>one order</em> and the one that answers <em>yesterday's revenue</em> have <em>very different needs</em>. Doing both on one engine <em>slows everything down</em>. <em>Separation</em> is the answer.</p>
+<blockquote>
+<p><em>Run analytics on its own road; keep operations on its own.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Service[&quot;Service DB (OLTP)&quot;] --&gt; ETL[&quot;ETL / ELT&quot;]
+    ETL --&gt; DW[&quot;Data Warehouse&quot;]
+    DW --&gt; BI[&quot;BI / Dashboard&quot;]
+    DW --&gt; ML[&quot;ML / Analytics&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>OLTP</strong>: <em>Online Transaction Processing</em>. Short transactions like orders and payments.</li>
+<li><strong>OLAP</strong>: <em>Online Analytical Processing</em>. Aggregations across <em>large ranges</em>.</li>
+<li><strong>Data Warehouse</strong>: A <em>central store</em> of analytics-ready data from many sources.</li>
+<li><strong>ETL / ELT</strong>: Pipelines that <em>extract, transform, and load</em> source data.</li>
+<li><strong>BI</strong>: <em>Business Intelligence</em>. Tools that turn data into <em>decisions</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You aggregate <em>six months</em> of revenue on the service DB and <em>production slows down</em>.</p>
+<p><strong>After</strong>: One load into the warehouse, and the same answer arrives in <em>seconds</em>.</p>
+<h2>Hands-on: First Analytical Query in Five Steps</h2>
+<p><strong>Step 1 — Create a fact table</strong></p>
+<pre><code class="language-sql">CREATE TABLE fact_orders (
+    order_id BIGINT,
+    user_id BIGINT,
+    amount NUMERIC(12, 2),
+    order_date DATE
+);
+</code></pre>
+<p><strong>Step 2 — Load data</strong></p>
+<pre><code class="language-sql">INSERT INTO fact_orders VALUES
+    (1, 100, 25000, '2026-01-15'),
+    (2, 100, 18000, '2026-02-03'),
+    (3, 200, 42000, '2026-02-10');
+</code></pre>
+<p><strong>Step 3 — Monthly revenue</strong></p>
+<pre><code class="language-sql">SELECT date_trunc('month', order_date) AS month,
+       SUM(amount) AS revenue
+FROM fact_orders
+GROUP BY 1
+ORDER BY 1;
+</code></pre>
+<p><strong>Step 4 — Per-user totals</strong></p>
+<pre><code class="language-sql">SELECT user_id, SUM(amount) AS total
+FROM fact_orders
+GROUP BY user_id;
+</code></pre>
+<p><strong>Step 5 — Top customers</strong></p>
+<pre><code class="language-sql">SELECT user_id, SUM(amount) AS total
+FROM fact_orders
+GROUP BY user_id
+ORDER BY total DESC
+LIMIT 10;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Aggregation</em> is the <em>base unit</em>. We never look at single rows.</li>
+<li><em>Dates</em> are the <em>axis</em> of analysis. Always have a <em>time column</em>.</li>
+<li>We analyze a <em>copy</em>, never the source.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running analytical queries <em>directly on the service DB</em>.</strong> A common cause of <em>production incidents</em>.</li>
+<li><strong>Copying tables <em>as-is</em>.</strong> A warehouse is <em>designed for analysis</em>, not mirroring.</li>
+<li><strong>Loading data <em>without a time column</em>.</strong> <em>Time-series analysis</em> becomes impossible later.</li>
+<li><strong>Forcing <em>all transformations before load</em>.</strong> <em>Preserve raw</em> and transform <em>inside</em> the warehouse.</li>
+<li><strong>Trying to make the warehouse <em>real-time</em>.</strong> <em>Minute-level</em> freshness is enough most of the time.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Startups often start with a <em>Postgres replica</em> as the warehouse. As scale grows, teams move to <em>BigQuery, Snowflake, or Redshift</em>. <em>Dashboards, reports, and ML feature extraction</em> all begin from the warehouse.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Separate analytical workloads from service workloads.</em></li>
+<li><em>Preserve the raw source.</em> Transformations must be <em>replayable</em>.</li>
+<li><em>Time and identity</em> are the <em>axes of every fact</em>.</li>
+<li><em>Pay schema-change cost early</em>, at load time.</li>
+<li><em>Warehouse cost</em> is shaped by <em>query patterns</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain <em>OLTP vs OLAP</em>.</li>
+<li>[ ] You can argue <em>why separation matters</em>.</li>
+<li>[ ] You can name the <em>steps of ETL/ELT</em>.</li>
+<li>[ ] You know what a <em>time axis</em> is in a warehouse.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Summarize the difference between a <em>service DB</em> and a <em>warehouse</em> in three sentences.</li>
+<li>Write a query for <em>yesterday's revenue</em>.</li>
+<li>List three pains a company <em>without a warehouse</em> will hit.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A warehouse is a <em>separate store for analysis</em>. Next, we look at <em>OLTP vs OLAP</em> in more depth.</p>
+<ul>
+<li><strong>What Is a Data Warehouse? (current)</strong></li>
+<li>OLTP and OLAP (upcoming)</li>
+<li>Fact and Dimension (upcoming)</li>
+<li>Star Schema (upcoming)</li>
+<li>Partition and Clustering (upcoming)</li>
+<li>ETL and ELT (upcoming)</li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/">Kimball Group — Data Warehouse Concepts</a></li>
+<li><a href="https://cloud.google.com/learn/what-is-a-data-warehouse">BigQuery — What Is a Data Warehouse?</a></li>
+<li><a href="https://www.snowflake.com/guides/what-data-warehouse/">Snowflake — Data Warehouse Guide</a></li>
+<li><a href="https://aws.amazon.com/data-warehouse/">AWS — Data Warehouse Concepts</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, Analytics, OLAP, Database, BI</p>
+</body>
+</html>

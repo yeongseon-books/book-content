@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sets and Functions</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Sets and Functions</h1>
+<blockquote>
+<p>Discrete Math 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Python's <code>set</code>, database tables, hash maps — what is the shared mathematical foundation behind these tools?</p>
+<blockquote>
+<p>A set is a collection of distinct elements, and a function is a well-defined correspondence from one set to another. Data structures (<code>set</code>, <code>dict</code>), database relational algebra, and the <code>map</code> of functional programming are all direct applications. This article covers set operations, Cartesian products, function classification, and composition with inverses.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Set notation and definitions</li>
+<li>Union, intersection, difference, and Cartesian product</li>
+<li>Function domain, codomain, and range</li>
+<li>Injective, surjective, and bijective functions</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A row in a database is an element of a Cartesian product, and JOIN evaluates a predicate over that product. A hash map is a partial function from keys to values. The functional <code>map</code> is function application across sets. Without sets and functions, you cannot understand the essence of these tools.</p>
+<blockquote>
+<p>A data structure is the efficient implementation of a set or a function.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>Sets are collections of elements; functions are correspondences between sets. Together they describe every data structure.</p>
+</blockquote>
+<pre><code class="language-text">   Set A           Function f: A → B           Set B
+  ┌─────┐                                    ┌─────┐
+  │ a₁  │ ─────────── f(a₁) ─────────────── │ b₁  │
+  │ a₂  │ ─────────── f(a₂) ─────────────── │ b₂  │
+  │ a₃  │ ─────────── f(a₃) ─────────────── │ b₃  │
+  └─────┘                                    └─────┘
+   domain                                    codomain
+                                              range
+                                              ⊆ codomain
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Element</strong><br>
+- Symbol: a ∈ A<br>
+- Meaning: a belongs to set A</p>
+<p><strong>Subset</strong><br>
+- Symbol: A ⊆ B<br>
+- Meaning: every element of A is in B</p>
+<p><strong>Cartesian product</strong><br>
+- Symbol: A × B<br>
+- Meaning: set of pairs (a, b)</p>
+<p><strong>Function</strong><br>
+- Symbol: f: A → B<br>
+- Meaning: maps each element of A to one in B</p>
+<p><strong>Injective</strong><br>
+- Symbol: one-to-one<br>
+- Meaning: distinct inputs → distinct outputs</p>
+<h2>Before / After</h2>
+<p><strong>Before — without set thinking:</strong></p>
+<pre><code class="language-python"># Manually deduplicate
+result = []
+for item in items:
+    if item not in result:
+        result.append(item)
+</code></pre>
+<p><strong>After — using sets:</strong></p>
+<pre><code class="language-python"># Leverage the set's intrinsic property
+result = list(set(items))
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Set Notation</strong></p>
+<pre><code class="language-python"># Roster notation: list elements
+A = {1, 2, 3, 4, 5}
+
+# Set-builder notation: state a condition
+B = {x for x in range(1, 11) if x % 2 == 0}
+
+# Power set: the set of all subsets
+from itertools import chain, combinations
+
+def power_set(s: set) -&gt; list[set]:
+    items = list(s)
+    return [
+        set(combo)
+        for r in range(len(items) + 1)
+        for combo in combinations(items, r)
+    ]
+
+print(f&quot;A = {A}&quot;)
+print(f&quot;B = {B}&quot;)
+print(f&quot;|A| = {len(A)}, |P(A)| = {2 ** len(A)}&quot;)
+print(f&quot;P({{1,2}}) = {power_set({1, 2})}&quot;)
+</code></pre>
+<p>If |A| = n, then |P(A)| = 2ⁿ. Subsets grow exponentially — this is one root cause of algorithmic complexity.</p>
+<p><strong>Step 2: Set Operations</strong></p>
+<pre><code class="language-python">A = {1, 2, 3, 4, 5}
+B = {4, 5, 6, 7, 8}
+U = set(range(1, 11))  # universal set
+
+print(f&quot;A ∪ B = {A | B}&quot;)        # union
+print(f&quot;A ∩ B = {A &amp; B}&quot;)        # intersection
+print(f&quot;A - B = {A - B}&quot;)        # difference
+print(f&quot;A △ B = {A ^ B}&quot;)        # symmetric difference
+print(f&quot;A^c (∈ U) = {U - A}&quot;)     # complement
+print(f&quot;|A ∪ B| = |A| + |B| - |A ∩ B| = {len(A) + len(B) - len(A &amp; B)}&quot;)
+</code></pre>
+<p>The last identity is the simplest case of inclusion–exclusion, expanded in Chapter 7.</p>
+<p><strong>Step 3: Cartesian Product and Relations</strong></p>
+<pre><code class="language-python">from itertools import product
+
+A = {1, 2, 3}
+B = {&quot;x&quot;, &quot;y&quot;}
+
+# A × B = {(a, b) | a ∈ A, b ∈ B}
+cartesian = set(product(A, B))
+print(f&quot;A × B = {cartesian}&quot;)
+print(f&quot;|A × B| = |A| × |B| = {len(cartesian)}&quot;)
+
+# A database row is an element of a Cartesian product
+users = {&quot;alice&quot;, &quot;bob&quot;}
+roles = {&quot;admin&quot;, &quot;user&quot;}
+permissions = set(product(users, roles))
+print(f&quot;Possible (user, role) pairs: {permissions}&quot;)
+</code></pre>
+<p>A database table schema is itself a Cartesian product. <code>CROSS JOIN</code> literally computes it.</p>
+<p><strong>Step 4: Kinds of Functions</strong></p>
+<pre><code class="language-python">def is_injective(f: dict) -&gt; bool:
+    &quot;&quot;&quot;Injective: distinct inputs map to distinct outputs&quot;&quot;&quot;
+    return len(set(f.values())) == len(f)
+
+def is_surjective(f: dict, codomain: set) -&gt; bool:
+    &quot;&quot;&quot;Surjective: every codomain element is hit&quot;&quot;&quot;
+    return set(f.values()) == codomain
+
+def is_bijective(f: dict, codomain: set) -&gt; bool:
+    &quot;&quot;&quot;Bijective: both injective and surjective&quot;&quot;&quot;
+    return is_injective(f) and is_surjective(f, codomain)
+
+f1 = {1: &quot;a&quot;, 2: &quot;b&quot;, 3: &quot;c&quot;}     # injective; surjectivity depends on codomain
+f2 = {1: &quot;a&quot;, 2: &quot;a&quot;, 3: &quot;b&quot;}     # not injective
+codomain = {&quot;a&quot;, &quot;b&quot;, &quot;c&quot;}
+
+print(f&quot;f1 injective: {is_injective(f1)}&quot;)
+print(f&quot;f1 surjective onto {codomain}: {is_surjective(f1, codomain)}&quot;)
+print(f&quot;f1 bijective: {is_bijective(f1, codomain)}&quot;)
+print(f&quot;f2 injective: {is_injective(f2)}&quot;)
+</code></pre>
+<p>A hash collision means the hash function failed injectivity. A good hash function is "almost" injective by design.</p>
+<p><strong>Step 5: Composition and Inverses</strong></p>
+<pre><code class="language-python">def compose(g, f):
+    &quot;&quot;&quot;(g ∘ f)(x) = g(f(x))&quot;&quot;&quot;
+    return lambda x: g(f(x))
+
+def inverse(f: dict) -&gt; dict:
+    &quot;&quot;&quot;Inverse exists only when f is injective&quot;&quot;&quot;
+    if not is_injective(f):
+        raise ValueError(&quot;non-injective functions have no inverse&quot;)
+    return {v: k for k, v in f.items()}
+
+f = lambda x: x + 1
+g = lambda x: x * 2
+
+h = compose(g, f)  # h(x) = 2(x + 1)
+print(f&quot;h(3) = {h(3)}&quot;)  # 8
+
+mapping = {1: &quot;a&quot;, 2: &quot;b&quot;, 3: &quot;c&quot;}
+inv = inverse(mapping)
+print(f&quot;Inverse: {inv}&quot;)
+</code></pre>
+<p>Function composition is at the heart of functional programming, and inverses are essential in cryptography and data transformations.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>A power set has size 2ⁿ — exhaustive subset search is exponential</li>
+<li>Cartesian products are the math behind database tables</li>
+<li>Injectivity and surjectivity drive hash and crypto design</li>
+<li>Composition and inverses are fundamental tools in transformation pipelines</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Confuse sets with lists</strong><br>
+- Problem: Order/duplication assumptions break<br>
+- Fix: Sets are unordered, no duplicates</p>
+<p><strong>Confuse codomain with range</strong><br>
+- Problem: Surjectivity check fails<br>
+- Fix: Codomain is declared; range is actual outputs</p>
+<p><strong>Mix partial and total functions</strong><br>
+- Problem: KeyError on missing inputs<br>
+- Fix: Handle <code>dict</code> access carefully</p>
+<p><strong>Reverse composition order</strong><br>
+- Problem: (g ∘ f)(x) ≠ (f ∘ g)(x)<br>
+- Fix: Apply right-to-left</p>
+<p><strong>Assume an inverse exists</strong><br>
+- Problem: Non-injective ⇒ no inverse<br>
+- Fix: Verify injectivity first</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Python <code>set</code>/<code>dict</code> are direct implementations of sets and functions</li>
+<li>SQL JOIN is filtering over a Cartesian product with a predicate</li>
+<li>Hash maps are partial functions from keys to values</li>
+<li>Data migrations are functions between schemas</li>
+<li>ORMs are functions from object domains to relational domains</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>When choosing a data structure, senior engineers ask "is this a set, a multiset, ordered, or what?" They check whether a function is injective and whether an inverse can be constructed. When designing a data pipeline, they verify that each step is well-defined as a function — same input always produces same output — which is the basis of idempotency.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain how sets differ from lists</li>
+<li>[ ] I know the formula |P(A)| = 2ⁿ</li>
+<li>[ ] I can distinguish injective, surjective, and bijective</li>
+<li>[ ] I understand the order of function composition</li>
+<li>[ ] I know when an inverse exists</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Enumerate the power set of {a, b, c} and confirm it has 2³ = 8 elements.</p>
+</li>
+<li>
+<p>Show that f(x) = x² is not injective on ℝ but is injective on [0, ∞).</p>
+</li>
+<li>
+<p>Pick a database table from a project of yours and describe which Cartesian product it is a subset of.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A set is a collection of data; a function is a well-defined correspondence between sets. Together they form the mathematical basis of data structures and databases. Power sets, Cartesian products, composition, and inverses describe every transformation we can perform.</p>
+<p>Next, we look at the most important structure built on top of sets — relations and equivalence.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/01-what-is-discrete-math.md">What Is Discrete Mathematics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/discrete-math-101/en/02-propositions-and-logic.md">Propositions and Logic</a></li>
+<li><strong>Sets and Functions (current)</strong></li>
+<li>Relations and Equivalence (upcoming)</li>
+<li>Proof Techniques (upcoming)</li>
+<li>Sequences and Recurrence (upcoming)</li>
+<li>Combinatorics (upcoming)</li>
+<li>Graph Theory Basics (upcoming)</li>
+<li>Trees and Graph Traversal (upcoming)</li>
+<li>Discrete Mathematics and Algorithms (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html">Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 2</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Set_theory">Wikipedia — Set Theory</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Function_(mathematics)">Wikipedia — Function (mathematics)</a></li>
+<li><a href="https://docs.python.org/3/tutorial/datastructures.html#sets">Python Documentation — set, dict</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Discrete Math, Set Theory, Functions, Databases, Data Structures</p>
+</body>
+</html>

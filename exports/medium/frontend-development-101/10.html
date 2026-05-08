@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Small Frontend App</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Small Frontend App</h1>
+<blockquote>
+<p>Frontend Development 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we tie all the <em>pieces</em> we have learned into <em>one living app</em>?</p>
+<blockquote>
+<p>Building one small app <em>from scratch to deployment</em> turns the concepts in a book into <em>tools in your hand</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to pick a <em>folder structure</em> for a small project</li>
+<li>How to <em>connect</em> the concepts from posts 1\~9</li>
+<li>The <em>full flow</em> of dev → build → deploy</li>
+<li>The next learning steps (testing, devops)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Knowledge becomes <em>yours</em> only when it is <em>bound into a project</em>. The nine posts gave you <em>bricks</em>. The final post builds the <em>house</em>.</p>
+<blockquote>
+<p>Polish does not have to be high. The experience of <em>shipping all the way to deployment</em> is <em>more powerful than any book</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; Page[&quot;Pages (routing)&quot;]
+    Page --&gt; Comp[&quot;Components + state&quot;]
+    Comp --&gt; API[&quot;API calls&quot;]
+    API --&gt; Backend[&quot;Backend / external API&quot;]
+    Comp --&gt; Style[&quot;Styles + design system&quot;]
+    Build[&quot;Build (Vite)&quot;] --&gt; Deploy[&quot;Deploy (Netlify/Vercel)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Project structure</strong>: a <em>folder layout split by role</em>.</li>
+<li><strong>Capstone</strong>: the <em>closing project that ties what you learned</em>.</li>
+<li><strong>Deployment</strong>: the act of putting build output <em>behind a public URL</em>.</li>
+<li><strong>Roadmap</strong>: a path showing <em>what to learn next</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (you only know the concepts)</strong></p>
+<pre><code class="language-text">&quot;I know routing, I know forms, I know APIs.&quot;
+&quot;But I have never combined them all to *build an app*.&quot;
+</code></pre>
+<p><strong>After (a small app is alive on the internet)</strong></p>
+<pre><code class="language-text">https://my-notes.netlify.app
+- A user can *add/edit/delete* notes.
+- The code is *on GitHub*.
+- The next learner studies *on top of this code*.
+</code></pre>
+<h2>Hands-on: A Small Notes App in Five Steps</h2>
+<p><strong>Step 1 — Project structure</strong></p>
+<pre><code class="language-text">my-notes/
+├── src/
+│   ├── components/   # NoteCard, NoteForm, ... (post 4)
+│   ├── pages/        # NotesPage, NotePage (post 5)
+│   ├── api/          # notes API client (post 6)
+│   ├── hooks/        # useNotes, useForm (posts 4, 7)
+│   ├── styles/       # tokens.css, layout.css (post 8)
+│   └── App.tsx
+├── vite.config.ts    # build config (post 9)
+├── .env.production
+└── package.json
+</code></pre>
+<p><strong>Step 2 — Routing and pages (review of post 5)</strong></p>
+<pre><code class="language-typescript">// src/App.tsx
+import { BrowserRouter, Routes, Route } from &quot;react-router-dom&quot;;
+import NotesPage from &quot;./pages/NotesPage&quot;;
+import NotePage from &quot;./pages/NotePage&quot;;
+
+export default function App() {
+  return (
+    &lt;BrowserRouter&gt;
+      &lt;Routes&gt;
+        &lt;Route path=&quot;/&quot; element={&lt;NotesPage /&gt;} /&gt;
+        &lt;Route path=&quot;/notes/:id&quot; element={&lt;NotePage /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/BrowserRouter&gt;
+  );
+}
+</code></pre>
+<p><strong>Step 3 — API client (review of post 6)</strong></p>
+<pre><code class="language-typescript">// src/api/notes.ts
+const BASE = import.meta.env.VITE_API_URL;
+
+export async function listNotes() {
+  const res = await fetch(`${BASE}/notes`);
+  if (!res.ok) throw new Error(&quot;Failed to list notes&quot;);
+  return res.json();
+}
+
+export async function createNote(body: { title: string }) {
+  const res = await fetch(`${BASE}/notes`, {
+    method: &quot;POST&quot;,
+    headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(&quot;Failed to create note&quot;);
+  return res.json();
+}
+</code></pre>
+<p><strong>Step 4 — Form + component (review of posts 4 and 7)</strong></p>
+<pre><code class="language-tsx">// src/components/NoteForm.tsx
+import { useState } from &quot;react&quot;;
+import { createNote } from &quot;../api/notes&quot;;
+
+export function NoteForm({ onCreated }: { onCreated: () =&gt; void }) {
+  const [title, setTitle] = useState(&quot;&quot;);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (title.trim().length &lt; 2) {
+      setError(&quot;Title must be at least 2 characters.&quot;);
+      return;
+    }
+    await createNote({ title });
+    setTitle(&quot;&quot;);
+    setError(null);
+    onCreated();
+  }
+
+  return (
+    &lt;form onSubmit={handleSubmit}&gt;
+      &lt;input value={title} onChange={(e) =&gt; setTitle(e.target.value)} /&gt;
+      {error &amp;&amp; &lt;p role=&quot;alert&quot;&gt;{error}&lt;/p&gt;}
+      &lt;button&gt;Add&lt;/button&gt;
+    &lt;/form&gt;
+  );
+}
+</code></pre>
+<p><strong>Step 5 — Build and deploy (post 9 + a new step)</strong></p>
+<pre><code class="language-bash">npm run build
+# Netlify CLI example
+npm install -g netlify-cli
+netlify deploy --dir=dist --prod
+</code></pre>
+<p>When the deploy finishes you have a <em>public URL</em>. Share that URL <em>with the next person</em>.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The folder layout is split <em>by role</em>, so you instantly know <em>where to edit</em>.</li>
+<li>The API client is <em>separated from components</em>, which makes <em>testing easy</em>.</li>
+<li>Environment variables split <em>dev and prod backends</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Putting all code into <code>App.tsx</code>.</strong> Past 100 lines it becomes <em>unreadable</em>.</li>
+<li><strong>Calling APIs <em>directly inside components</em>.</strong> Tests and reuse become <em>hard</em>.</li>
+<li><strong>Having <em>no README</em>.</strong> Future you <em>cannot run the project</em> a month later.</li>
+<li><strong>Looking only at <code>localhost</code> and <em>never deploying</em>.</strong> Deployment <em>always surfaces new issues</em>.</li>
+<li><strong>Waiting <em>for perfection</em>.</strong> A small app <em>deployed today</em> beats <em>a perfect undeployed one</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Production teams use <em>the same pattern</em>. Folder structures like <code>pages/</code>, <code>components/</code>, <code>api/</code>, <code>hooks/</code>, <code>styles/</code> are also the basic skeleton of <em>codebases shared by dozens of engineers</em>. The difference is only <em>scale and abstraction</em>; <em>the shape is the same</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Builds <em>small</em> and ships <em>often</em>.</li>
+<li>Lets folder structure <em>follow the business domain</em>.</li>
+<li>Always keeps a <em>README and .env.example</em>.</li>
+<li>Automates deployment <em>from day one</em>.</li>
+<li>Treats the first user as <em>themselves</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can sketch the folder structure.</li>
+<li>[ ] You moved API clients <em>outside components</em>.</li>
+<li>[ ] <code>npm run build</code> succeeds.</li>
+<li>[ ] Your app is live behind a <em>public URL</em>.</li>
+<li>[ ] Your README explains <em>how to run it</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a <em>notes app</em> with this structure and deploy it to Netlify or Vercel.</li>
+<li>In the README, document <em>how to run, environment variables, and the deploy URL</em>.</li>
+<li>Measure your build output size and <em>bring it under 200KB</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>If you made it here, <em>frontend onboarding is done</em>. Good companion series to read next:</p>
+<ul>
+<li><em>Testing 101</em>: how to <em>test</em> components and API calls.</li>
+<li><em>DevOps 101</em>: how to <em>automate deployment</em> and add monitoring.</li>
+<li><em>Secure Coding 101</em>: how to <em>block attacks</em> in forms and APIs.</li>
+</ul>
+<blockquote>
+<p>Do not try to learn everything at once. <em>Add one thing at a time</em> to the app you just built.</p>
+</blockquote>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/08-styling-and-design-system.md">Styling and Design Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/09-build-tools-and-bundling.md">Build Tools and Bundling</a></li>
+<li><strong>Building a Small Frontend App (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://vitejs.dev/">Vite docs</a></li>
+<li><a href="https://reactrouter.com/">React Router docs</a></li>
+<li><a href="https://docs.netlify.com/">Netlify docs</a></li>
+<li><a href="https://vercel.com/docs">Vercel docs</a></li>
+</ul>
+<p class="tags-line">Tags: Frontend, Project, Capstone, React, Web</p>
+</body>
+</html>

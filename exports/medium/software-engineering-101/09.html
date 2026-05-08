@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Maintenance and Tech Debt</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Maintenance and Tech Debt</h1>
+<blockquote>
+<p>Software Engineering 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Is tech debt always bad?</p>
+<blockquote>
+<p>No. Deliberate debt is a tool. Inadvertent debt is an incident waiting to happen.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The four types of tech debt (Martin Fowler's quadrant)</li>
+<li>How to prioritize debt repayment</li>
+<li>A safe refactoring procedure</li>
+<li>Phased deprecation</li>
+<li>Treating debt as a measurable signal</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>There is no codebase without debt. The question is whether you are aware of it, measuring it, and paying it down.</p>
+<blockquote>
+<p>Debt is not the problem. Unconscious debt is.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    R[&quot;Requirement change&quot;] --&gt; D[&quot;Debt accrual&quot;]
+    D --&gt; M[&quot;Measure&quot;]
+    M --&gt; P[&quot;Prioritize&quot;]
+    P --&gt; F[&quot;Pay down&quot;]
+    F --&gt; R
+</code></pre>
+<p>Debt is a cycle, not an event.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Deliberate-Prudent</strong>: Conscious decision with a plan to pay it off.</li>
+<li><strong>Deliberate-Reckless</strong>: Knowingly irresponsible.</li>
+<li><strong>Inadvertent-Prudent</strong>: Debt from inexperience, paid off by learning.</li>
+<li><strong>Inadvertent-Reckless</strong>: Unaware and irresponsible — the most dangerous.</li>
+<li><strong>Deprecation</strong>: Phased retirement of an interface.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — "all at once later"</strong></p>
+<pre><code class="language-text">big-bang refactor at month 12 -&gt; incidents + schedule blow-up
+</code></pre>
+<p><strong>After — 5% per quarter</strong></p>
+<pre><code class="language-text">5% of each sprint, measured, prioritized -&gt; incremental improvement
+</code></pre>
+<p>Small and frequent is safe.</p>
+<h2>Hands-on: Treat Debt as Code</h2>
+<p><strong>Step 1 — Debt label</strong></p>
+<pre><code class="language-python"># 1_label.py
+# DEBT(billing): tax computation leaks into PaymentService
+# Due: 2026 Q3, owner: @alice
+def charge(amount): ...
+</code></pre>
+<p>Debt needs a due date and an owner.</p>
+<p><strong>Step 2 — Debt index</strong></p>
+<pre><code class="language-markdown"># 2_index.md
+| ID | Area | Severity | Owner | Due |
+|----|------|----------|-------|-----|
+| D-12 | billing | high | alice | 2026 Q3 |
+| D-13 | auth | mid | bob | 2026 Q4 |
+</code></pre>
+<p>Only searchable debt is payable debt.</p>
+<p><strong>Step 3 — Strangler Fig pattern</strong></p>
+<pre><code class="language-python"># 3_strangler.py
+def charge(amount):
+    if feature(&quot;new_billing&quot;):
+        return new_billing.charge(amount)
+    return legacy.charge(amount)
+</code></pre>
+<p>Replace incrementally with a feature flag.</p>
+<p><strong>Step 4 — Deprecation phases</strong></p>
+<pre><code class="language-python"># 4_deprecate.py
+import warnings
+def old_api(*a, **kw):
+    warnings.warn(&quot;old_api is deprecated; use new_api&quot;, DeprecationWarning, stacklevel=2)
+    return new_api(*a, **kw)
+</code></pre>
+<p>Warn -&gt; trace callers -&gt; remove (one phase per quarter).</p>
+<p><strong>Step 5 — Debt metrics dashboard</strong></p>
+<pre><code class="language-text"># 5_metrics.md
+- Average cyclomatic complexity
+- Test coverage delta
+- Debt items closed per sprint
+- Mean time to recovery (MTTR) on incidents
+</code></pre>
+<p>What you do not measure, you do not pay.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Debt has a due date and an owner.</li>
+<li>The Strangler Fig pattern is recoverable replacement.</li>
+<li>Deprecation is phased and measurable.</li>
+<li>Without metrics, debt is forgotten.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Big-bang refactor.</strong> A leading cause of incidents.</li>
+<li><strong>No debt label.</strong> Unsearchable, unpayable.</li>
+<li><strong>Removing a deprecated API immediately.</strong> Callers break.</li>
+<li><strong>Blaming people for debt.</strong> Debt is a system outcome.</li>
+<li><strong>No debt metric.</strong> Unmeasured, unprioritized.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Mature teams allocate 10~20% of sprint capacity to debt repayment. Strangler Fig + feature flags enable zero-downtime replacement. The debt index is reviewed each quarter.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Debt is a cycle, not an event.</li>
+<li>Deliberate debt is a tool, unconscious debt is an incident.</li>
+<li>Debt without a due date becomes permanent.</li>
+<li>Incremental beats big-bang almost every time.</li>
+<li>Only what you measure gets paid.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is there a debt index?</li>
+<li>[ ] Does each debt item have an owner and a due date?</li>
+<li>[ ] Is sprint capacity allocated to debt?</li>
+<li>[ ] Are deprecation phases defined?</li>
+<li>[ ] Do debt metrics live on a dashboard?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Label five debt items in your repo.</li>
+<li>Decompose your most dangerous debt item using Strangler Fig.</li>
+<li>Define five debt-metric items for a dashboard.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Debt is a cycle. Be aware, measure, pay down each quarter. The final episode ties it all together — what makes good software.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/01-what-is-software-engineering.md">What is Software Engineering?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/02-understanding-requirements.md">Understanding Requirements</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/03-design-vs-implementation.md">Design vs Implementation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/04-code-review.md">Code Review</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/05-testing-strategy.md">Testing Strategy</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/06-version-control-and-release.md">Version Control and Release</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/07-documentation.md">Documentation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/software-engineering-101/en/08-collaboration-process.md">Collaboration Process</a></li>
+<li><strong>Maintenance and Tech Debt (current)</strong></li>
+<li>What Makes Good Software (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/bliki/TechnicalDebtQuadrant.html">Martin Fowler — Technical Debt Quadrant</a></li>
+<li><a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Martin Fowler — StranglerFigApplication</a></li>
+<li><a href="https://martinfowler.com/books/refactoring.html">Refactoring — Martin Fowler</a></li>
+<li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code — Michael Feathers</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, SoftwareEngineering, Maintenance, TechDebt, Refactoring, Legacy</p>
+</body>
+</html>

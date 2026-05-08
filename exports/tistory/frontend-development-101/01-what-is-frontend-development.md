@@ -1,0 +1,172 @@
+
+# 프론트엔드 개발이란 무엇인가?
+
+> Frontend Development 101 시리즈 (1/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: 사용자의 *눈* 에 보이는 모든 것은 어디서 만들어질까요?
+
+> 프론트엔드는 *브라우저 안에서 실행되는 작은 운영체제* 입니다. HTML, CSS, JavaScript가 그 OS의 *언어* 입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- 프론트엔드와 백엔드의 *명확한 경계*
+- 브라우저가 페이지를 *어떻게 그리는지*
+- HTML/CSS/JS의 *각자의 역할*
+- 현대 프론트엔드의 *주요 도구* 한눈에 보기
+- 학습 로드맵
+
+## 왜 중요한가
+
+사용자가 *느끼는 모든 것* 은 프론트엔드를 거칩니다. 백엔드가 아무리 완벽해도 프론트가 느리면 *제품이 느린 것* 으로 평가됩니다. 프론트엔드는 *제품의 첫인상이자 마지막 인상* 입니다.
+
+> 좋은 프론트엔드는 *보이지 않습니다.* 사용자가 의식하지 않고 *그냥 쓰게* 만듭니다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    User["User"] --> Browser["Browser"]
+    Browser --> HTML["HTML (structure)"]
+    Browser --> CSS["CSS (style)"]
+    Browser --> JS["JavaScript (behavior)"]
+    JS --> API["Backend API"]
+```
+
+브라우저가 세 언어를 *조합* 해 화면을 만듭니다.
+
+## 핵심 용어 정리
+
+- **DOM**: 브라우저가 HTML을 읽어 만든 *트리 구조*.
+- **Rendering**: HTML+CSS를 *픽셀로 변환* 하는 과정.
+- **Bundle**: 여러 JS 파일을 *하나로 합친* 결과.
+- **SPA (Single Page Application)**: 페이지 이동 없이 *JS로* 화면이 바뀌는 구조.
+- **Hydration**: 서버가 그린 HTML에 *JS 동작을 붙이는* 과정.
+
+## Before/After
+
+**Before (정적 웹사이트, 1995)**
+
+```html
+<!-- 모든 페이지가 별도 .html 파일 -->
+<a href="/about.html">About</a>
+```
+
+**After (현대 SPA, 2025)**
+
+```javascript
+// 한 페이지 안에서 라우터가 화면을 바꿈
+<Link to="/about">About</Link>
+```
+
+## 실습: 첫 페이지 5단계
+
+### 1단계 — index.html
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="utf-8"><title>Hi</title></head>
+<body>
+  <h1 id="t">안녕</h1>
+  <button id="b">눌러</button>
+  <script src="app.js"></script>
+</body>
+</html>
+```
+
+### 2단계 — style.css
+
+```css
+body { font-family: system-ui; padding: 2rem; }
+button { padding: .5rem 1rem; cursor: pointer; }
+```
+
+### 3단계 — app.js
+
+```javascript
+document.getElementById("b").addEventListener("click", () => {
+  document.getElementById("t").textContent = "안녕, 프론트엔드!";
+});
+```
+
+### 4단계 — 로컬 서버
+
+```bash
+python3 -m http.server 8000
+# 브라우저에서 http://localhost:8000
+```
+
+### 5단계 — DevTools 열기
+
+`F12` → Elements / Console / Network 탭을 열어 *브라우저가 무엇을 받았는지* 확인합니다.
+
+## 이 코드에서 주목할 점
+
+- HTML이 *구조*, CSS가 *모양*, JS가 *행동* 입니다.
+- 세 가지가 *분리* 되어 있어 각자 개선할 수 있습니다.
+- DevTools가 프론트엔드 개발의 *최강 무기* 입니다.
+
+## 자주 하는 실수 5가지
+
+1. **HTML에 스타일을 인라인으로 박는다.** 유지보수가 *기하급수적* 으로 어려워집니다.
+2. **JS 안에 비즈니스 로직과 DOM 조작을 섞는다.** 테스트가 불가능해집니다.
+3. **DevTools를 무시한다.** 절반의 디버깅을 *눈 감고* 하게 됩니다.
+4. **모든 곳에 framework를 도입한다.** *간단한 페이지에 React* 는 과합니다.
+5. **모바일을 *마지막에* 고려한다.** 모바일 사용자가 절반 이상입니다.
+
+## 실무에서는 이렇게 쓰입니다
+
+대부분의 회사는 *React/Vue/Svelte* 같은 framework + *TypeScript* + *Vite/Next.js* 같은 빌드 도구를 사용합니다. 처음부터 모든 도구를 배우려 하지 말고, *순수 HTML/CSS/JS* 로 한 페이지를 만들어본 뒤 framework로 옮겨가는 것이 *훨씬 빠른 길* 입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *기본기* 가 framework보다 *수명이 길다.*
+- 사용자 경험은 *밀리초* 단위로 측정한다.
+- HTML/CSS만으로 풀리는 문제에 JS를 *쓰지 않는다.*
+- 접근성(a11y)은 *처음부터* 고려해야 비용이 작다.
+- DevTools 안에 답이 *대부분* 있다.
+
+## 체크리스트
+
+- [ ] HTML/CSS/JS의 역할을 구분할 수 있다.
+- [ ] 로컬에서 정적 페이지를 띄울 수 있다.
+- [ ] DevTools의 Elements/Console/Network 탭을 연다.
+- [ ] DOM이라는 단어를 설명할 수 있다.
+- [ ] SPA가 무엇인지 한 줄로 말할 수 있다.
+
+## 연습 문제
+
+1. 자기소개 페이지를 HTML/CSS만으로 만드세요. JS는 쓰지 마세요.
+2. 위 페이지에 버튼 하나를 추가하고 클릭 시 텍스트가 바뀌게 만드세요.
+3. DevTools Network 탭에서 페이지 로딩에 *몇 개의 파일* 이 받아지는지 세어보세요.
+
+## 정리 및 다음 단계
+
+프론트엔드는 *브라우저 안에서 사용자와 만나는 layer* 입니다. 다음 글에서는 그 layer의 *기초인 HTML과 CSS* 를 본격적으로 다룹니다.
+
+- **프론트엔드 개발이란 무엇인가? (현재 글)**
+- HTML과 CSS 기본 (예정)
+- JavaScript 기본 (예정)
+- 컴포넌트와 상태 (예정)
+- 라우팅과 페이지 (예정)
+- API 호출과 비동기 (예정)
+- 폼과 유효성 검사 (예정)
+- 스타일링과 디자인 시스템 (예정)
+- 빌드 도구와 번들링 (예정)
+- 작은 프론트엔드 앱 만들기 (예정)
+## 참고 자료
+
+- [MDN Web Docs](https://developer.mozilla.org/)
+- [web.dev](https://web.dev/)
+- [Frontend Roadmap](https://roadmap.sh/frontend)
+- [HTML Living Standard](https://html.spec.whatwg.org/)
+
+Tags: Frontend, Web, JavaScript, HTML, Beginner
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

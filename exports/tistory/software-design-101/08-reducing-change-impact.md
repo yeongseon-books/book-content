@@ -1,0 +1,190 @@
+
+# 변경 영향 줄이기
+
+> Software Design 101 시리즈 (8/10)
+
+<!-- a-grade-intro:begin -->
+
+**핵심 질문**: 한 줄 바꿨는데 시스템이 흔들리지 않으려면 무엇이 필요한가요?
+
+> 변경의 폭발 반경을 좁히는 설계 — 개방 폐쇄 원칙, 확장-수축, 기능 플래그가 그 도구입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- 변경의 폭발 반경(blast radius) 개념
+- 개방-폐쇄 원칙(OCP)
+- 확장-수축(expand-contract) 패턴
+- 기능 플래그로 변경 분리
+- 변경 안전망을 만드는 신호
+
+## 왜 중요한가
+
+대부분의 시스템은 처음부터 잘 만들어지지 않습니다. 잘 *바뀌게* 만들어집니다. 변경 영향이 작을수록 자주, 안전하게 진화할 수 있습니다.
+
+> 변경에 강한 코드가 좋은 코드다.
+
+## 개념 한눈에 보기
+
+```mermaid
+flowchart LR
+    A["Add new path"] --> B["Run side by side"] --> C["Migrate readers"] --> D["Remove old path"]
+```
+
+확장하고 → 갈아타고 → 수축한다.
+
+## 핵심 용어 정리
+
+- **Blast radius**: 한 변경이 영향을 주는 범위.
+- **OCP**: 확장에 열려 있고 수정에는 닫혀 있다.
+- **Expand-contract**: 신/구 경로를 함께 두고 점진적으로 옮긴다.
+- **Feature flag**: 코드 배포와 기능 활성을 분리하는 스위치.
+- **Strangler fig**: 레거시를 점진적으로 감싸 대체하는 패턴.
+
+## Before/After
+
+**Before**
+
+```python
+def price(item, kind):
+    if kind == "book": return item.cost * 0.9
+    elif kind == "food": return item.cost * 0.95
+    elif kind == "lux": return item.cost * 1.1
+    # 새 카테고리 추가 = 이 함수 수정
+```
+
+**After**
+
+```python
+class PricingRule:
+    def apply(self, item) -> float: ...
+
+PRICING: dict[str, PricingRule] = {}
+
+def price(item, kind):
+    return PRICING[kind].apply(item)
+```
+
+새 카테고리는 PRICING에 등록만 하면 됩니다.
+
+## 실습: 변경 영향을 줄이는 5단계
+
+### 1단계 — 폭발 반경 측정
+
+```bash
+# 1_blast.sh
+git grep -n "kind ==" | wc -l
+# 한 변수의 비교가 시스템 전체에 흩어졌나?
+```
+
+먼저 현재 반경을 본다.
+
+### 2단계 — 확장 (Expand)
+
+```python
+# 2_expand.py
+# 신 경로를 추가만 한다, 옛 경로는 그대로.
+def price_v2(item, kind): ...
+```
+
+옛 사용자는 영향을 받지 않습니다.
+
+### 3단계 — 점진 이주 (Migrate)
+
+```python
+# 3_migrate.py
+def price(item, kind):
+    if FF.use_v2: return price_v2(item, kind)
+    return price_v1(item, kind)
+```
+
+기능 플래그로 사용자별 단계 전환.
+
+### 4단계 — 검증 (Compare)
+
+```python
+# 4_compare.py
+def price(item, kind):
+    a, b = price_v1(item, kind), price_v2(item, kind)
+    if a != b: log.warn("price drift", a, b)
+    return a if not FF.use_v2 else b
+```
+
+병렬 비교로 회귀 검증.
+
+### 5단계 — 수축 (Contract)
+
+```python
+# 5_contract.py
+# 모든 사용자가 v2로 옮긴 뒤 v1과 플래그를 제거한다.
+```
+
+마무리는 청소까지.
+
+## 이 코드에서 주목할 점
+
+- 새 경로 추가가 옛 경로를 건드리지 않습니다.
+- 변경이 데이터(설정/플래그)로 표현됩니다.
+- 회귀 검증이 자연스럽게 따라옵니다.
+
+## 자주 하는 실수 5가지
+
+1. **수정해서 끼워 넣기.** 분기가 무한 증식.
+2. **확장만 하고 수축 안 함.** 죽은 코드와 플래그가 누적.
+3. **플래그를 영원히 둠.** 운영 부담.
+4. **검증 없이 갈아탐.** 잠복 회귀.
+5. **모든 변경에 expand-contract 강요.** 한 줄 수정엔 과하다.
+
+## 실무에서는 이렇게 쓰입니다
+
+스키마 마이그레이션, API v1→v2 교체, 가격/할인 로직 개편, 외부 SaaS 교체 — 운영 중인 시스템을 안전하게 바꾸는 실전 도구입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 변경의 반경을 먼저 가늠한다.
+- 분기를 늘리는 대신 데이터로 옮긴다.
+- 신/구를 병렬로 돌려 검증한다.
+- 플래그에는 만료일을 단다.
+- 변경의 마지막 단계는 항상 청소다.
+
+## 체크리스트
+
+- [ ] 변경의 폭발 반경을 가늠했는가?
+- [ ] 새 경로를 옛 경로 옆에 둘 수 있는가?
+- [ ] 회귀 검증 수단이 있는가?
+- [ ] 플래그에 만료일이 있는가?
+- [ ] 마이그레이션 후 청소가 계획돼 있는가?
+
+## 연습 문제
+
+1. 본인 코드에서 분기 수가 가장 많은 함수를 찾아 데이터 기반으로 바꿔 보세요.
+2. 한 API에 v2를 추가하고 expand-contract로 옮길 계획을 적어 보세요.
+3. 살아 있는 기능 플래그 중 만료일을 정하지 않은 것을 정리해 보세요.
+
+## 정리 및 다음 단계
+
+좋은 설계는 변경을 두렵지 않게 만듭니다. 다음 글에서는 이런 생각을 압축한 — 설계 원칙 모음 — 을 봅니다.
+
+- [소프트웨어 설계란 무엇인가?](./01-what-is-software-design.md)
+- [관심사 분리](./02-separation-of-concerns.md)
+- [모듈과 경계](./03-modules-and-boundaries.md)
+- [의존성 방향](./04-dependency-direction.md)
+- [인터페이스와 추상화](./05-interfaces-and-abstraction.md)
+- [계층 아키텍처](./06-layered-architecture.md)
+- [데이터 흐름 설계](./07-data-flow-design.md)
+- **변경 영향 줄이기 (현재 글)**
+- 설계 원칙 모음 (예정)
+- 작은 프로젝트로 설계 연습 (예정)
+## 참고 자료
+
+- [Open/Closed Principle (Robert C. Martin)](https://web.archive.org/web/20060822033314/http://www.objectmentor.com/resources/articles/ocp.pdf)
+- [ParallelChange (Expand-Contract) — Danilo Sato](https://martinfowler.com/bliki/ParallelChange.html)
+- [Feature Toggles — Pete Hodgson](https://martinfowler.com/articles/feature-toggles.html)
+- [Strangler Fig Application — Martin Fowler](https://martinfowler.com/bliki/StranglerFigApplication.html)
+
+Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring
+
+---
+
+© 2026 영선북스. 이 글의 저작권은 저자에게 있습니다.

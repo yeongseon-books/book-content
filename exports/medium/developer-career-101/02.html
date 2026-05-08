@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Understanding Roles</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Understanding Roles</h1>
+<blockquote>
+<p>Developer Career 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you decide which developer <em>role</em> fits you?</p>
+<blockquote>
+<p>Compare responsibilities, tools, and metrics — three axes.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Six common roles</li>
+<li>Per-role <em>responsibilities</em></li>
+<li>Per-role <em>tools</em></li>
+<li>Per-role <em>metrics</em></li>
+<li>What to weigh when <em>switching</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A bad role fit shortens the path to burnout.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    F[Frontend] --&gt; B[Backend]
+    B --&gt; D[Data]
+    D --&gt; S[SRE]
+    S --&gt; M[ML]
+    M --&gt; Mo[Mobile]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>frontend</strong>: User experience.</li>
+<li><strong>backend</strong>: System logic.</li>
+<li><strong>SRE</strong>: Operational reliability.</li>
+<li><strong>data</strong>: Analytics and pipelines.</li>
+<li><strong>ML</strong>: Model-driven prediction.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "Roles look more or less alike."</p>
+<p><strong>After</strong>: "Responsibilities and tools differ completely."</p>
+<h2>Hands-on: Compare the Roles</h2>
+<p><strong>Step 1 — Frontend</strong></p>
+<pre><code class="language-text">responsibility: UX
+tools: React, CSS
+metrics: LCP, INP
+</code></pre>
+<p><strong>Step 2 — Backend</strong></p>
+<pre><code class="language-text">responsibility: data flow
+tools: Python, SQL
+metrics: p95, error rate
+</code></pre>
+<p><strong>Step 3 — Data</strong></p>
+<pre><code class="language-text">responsibility: pipelines
+tools: Airflow, dbt
+metrics: freshness, accuracy
+</code></pre>
+<p><strong>Step 4 — SRE</strong></p>
+<pre><code class="language-text">responsibility: operations
+tools: Prometheus, K8s
+metrics: SLO, MTTR
+</code></pre>
+<p><strong>Step 5 — ML</strong></p>
+<pre><code class="language-text">responsibility: model quality
+tools: PyTorch, MLflow
+metrics: AUC, latency
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Responsibility defines the role.</li>
+<li>Metrics define the culture.</li>
+<li>Tools are just tools.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Choosing role by tool.</strong></li>
+<li><strong>Not knowing the metrics.</strong></li>
+<li><strong>Crossing role boundaries impulsively.</strong></li>
+<li><strong>Switching on a whim.</strong></li>
+<li><strong>Ignoring the domain.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Companies recommend roughly six months of onboarding when switching roles.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>A role is a responsibility.</li>
+<li>Metrics are a language.</li>
+<li>Switch strategically.</li>
+<li>Domain is depth.</li>
+<li>Boundaries enable collaboration.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Three metrics for current role.</li>
+<li>[ ] Responsibilities of target role written.</li>
+<li>[ ] Learning plan for switch.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: define p95.</li>
+<li>One line: define SLO.</li>
+<li>One line: meaning of frontend LCP.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>Building a Learning Plan</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/developer-career-101/en/01-what-is-developer-career.md">What Is a Developer Career</a></li>
+<li><strong>Understanding Roles (current)</strong></li>
+<li>Building a Learning Plan (upcoming)</li>
+<li>Resume and Portfolio (upcoming)</li>
+<li>Preparing for Coding Interviews (upcoming)</li>
+<li>System Design Interviews (upcoming)</li>
+<li>Settling into the First Job (upcoming)</li>
+<li>Side Projects and Learning (upcoming)</li>
+<li>Mentoring and Networking (upcoming)</li>
+<li>The Path to Senior (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://web.dev/vitals/">Web Vitals</a></li>
+<li><a href="https://sre.google/books/">Google SRE Book</a></li>
+<li><a href="https://www.lakefs.io/blog/state-of-data-engineering-2024/">State of Data Engineering</a></li>
+<li><a href="https://ml-ops.org/">MLOps Maturity</a></li>
+</ul>
+<p class="tags-line">Tags: Career, Roles, Frontend, Backend, Beginner</p>
+</body>
+</html>

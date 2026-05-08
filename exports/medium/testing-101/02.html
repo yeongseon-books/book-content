@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unit Test</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Unit Test</h1>
+<blockquote>
+<p>Testing 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How small is the <em>smallest unit</em> of a test? One function? One class?</p>
+<blockquote>
+<p>A unit test verifies <em>one small piece of behavior</em> with <em>no external dependencies</em>. They are fast, plentiful, and run often.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and <em>scope</em> of a unit test</li>
+<li>The <em>AAA pattern</em> (Arrange/Act/Assert)</li>
+<li>pytest basics, fixtures, and parametrize</li>
+<li><em>Edge cases</em> and <em>exception cases</em></li>
+<li>The <em>five conditions</em> of a good unit test</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Unit tests are <em>the base of the pyramid</em>. Because they are fast, <em>thousands</em> of them run in <em>seconds</em>. Strong unit tests <em>let upper layers (integration/E2E) stay small</em>.</p>
+<blockquote>
+<p>Many fast unit tests are the <em>foundation of the whole strategy</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TB
+    Unit[&quot;Unit tests (thousands, fast)&quot;] --&gt; Integ[&quot;Integration tests (tens to hundreds)&quot;]
+    Integ --&gt; E2E[&quot;E2E tests (a few to dozens)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Unit</strong>: a <em>minimal piece</em> such as a single function, method, or class.</li>
+<li><strong>AAA pattern</strong>: <em>Arrange</em> → <em>Act</em> → <em>Assert</em>.</li>
+<li><strong>Fixture</strong>: <em>prepared data/objects</em> shared between tests.</li>
+<li><strong>Parametrize</strong>: collapsing tests <em>that differ only by input</em> into <em>one function</em>.</li>
+<li><strong>Edge case</strong>: <em>boundary values</em> (0, negative, empty string, None, ...).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (one big test)</strong></p>
+<pre><code class="language-python">def test_user_flow():
+    u = create_user(&quot;a&quot;)
+    u.activate()
+    u.upgrade()
+    assert u.plan == &quot;pro&quot;
+</code></pre>
+<p><strong>After (split into small units)</strong></p>
+<pre><code class="language-python">def test_create_user_starts_inactive(): ...
+def test_activate_sets_active(): ...
+def test_upgrade_sets_pro(): ...
+</code></pre>
+<h2>Hands-on: pytest in Five Steps</h2>
+<p><strong>Step 1 — The function under test</strong></p>
+<pre><code class="language-python"># src/discount.py
+def apply_discount(price: int, percent: int) -&gt; int:
+    if not 0 &lt;= percent &lt;= 100:
+        raise ValueError(&quot;percent must be 0..100&quot;)
+    return price - price * percent // 100
+</code></pre>
+<p><strong>Step 2 — Basic test (AAA)</strong></p>
+<pre><code class="language-python"># tests/test_discount.py
+from src.discount import apply_discount
+
+def test_apply_10_percent_discount():
+    # Arrange
+    price, percent = 1000, 10
+    # Act
+    result = apply_discount(price, percent)
+    # Assert
+    assert result == 900
+</code></pre>
+<p><strong>Step 3 — Group with parametrize</strong></p>
+<pre><code class="language-python">import pytest
+
+@pytest.mark.parametrize(&quot;price,percent,expected&quot;, [
+    (1000, 0, 1000),
+    (1000, 50, 500),
+    (1000, 100, 0),
+])
+def test_apply_discount_table(price, percent, expected):
+    assert apply_discount(price, percent) == expected
+</code></pre>
+<p><strong>Step 4 — Exception cases</strong></p>
+<pre><code class="language-python">def test_apply_discount_invalid_percent_raises():
+    with pytest.raises(ValueError):
+        apply_discount(1000, 150)
+</code></pre>
+<p><strong>Step 5 — Fixture</strong></p>
+<pre><code class="language-python">@pytest.fixture
+def base_price() -&gt; int:
+    return 10_000
+
+def test_with_fixture(base_price: int):
+    assert apply_discount(base_price, 10) == 9_000
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Each test asserts <em>one thing</em>.</li>
+<li>Same-shaped tests are <em>parametrized</em> to <em>cut duplication</em>.</li>
+<li>Exception cases live in <em>their own test</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Calling the <em>real</em> database.</strong> That is an <em>integration test</em>.</li>
+<li><strong>Tests depending on <em>each other's state</em>.</strong> Reordering <em>breaks</em> them.</li>
+<li><strong>Waiting via <code>time.sleep</code>.</strong> Unit tests <em>do not wait</em>.</li>
+<li><strong>Meaningless <code>assert True</code>.</strong> It only adds noise.</li>
+<li><strong>Test names like <em>test_1, test_2</em>.</strong> The name is <em>the documentation</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Core domain logic (pricing, authorization, state machines) is <em>always</em> covered by thick unit tests. The more incident-prone the code, the <em>higher the ROI of unit tests</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Grows <em>small, fast unit tests</em> first.</li>
+<li>Names tests with <em>one line of behavior</em>.</li>
+<li><em>Always</em> covers boundary values for the same function.</li>
+<li>Uses <em>parametrize</em> to express <em>repetition</em>.</li>
+<li>Keeps <em>all</em> unit tests under <em>five seconds</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You wrote <em>three or more</em> tests for one function.</li>
+<li>[ ] You covered <em>boundary</em> and <em>exception</em> cases.</li>
+<li>[ ] You followed AAA structure.</li>
+<li>[ ] You used parametrize <em>once</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build <code>is_palindrome(s)</code> and write a parametrized test with <em>five</em> inputs.</li>
+<li>Cover <em>boundary cases</em> like empty string, single char, and whitespace.</li>
+<li>Introduce a bug intentionally and note <em>which test catches it</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Unit tests are <em>small, fast, and free of external dependencies</em>. The next post climbs one step up to <em>integration tests</em>, which verify several modules together.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><strong>Unit Test (current)</strong></li>
+<li>Integration Test (upcoming)</li>
+<li>E2E Test (upcoming)</li>
+<li>Test Double (upcoming)</li>
+<li>Mock and Stub (upcoming)</li>
+<li>Test Coverage (upcoming)</li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html">pytest — parametrize</a></li>
+<li><a href="https://docs.pytest.org/en/stable/explanation/fixtures.html">pytest — fixtures</a></li>
+<li><a href="https://martinfowler.com/bliki/UnitTest.html">Martin Fowler — Unit Test</a></li>
+<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Unit Test, pytest, Python, Quality</p>
+</body>
+</html>

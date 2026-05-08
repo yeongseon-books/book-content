@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OLTP and OLAP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>OLTP and OLAP</h1>
+<blockquote>
+<p>Database Systems 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: It is the same data — so why do operational and analytical databases look so different?</p>
+<blockquote>
+<p>Short, narrow transactions are OLTP; long, wide aggregations are OLAP. The two workloads differ in data model, storage format, and indexing strategy. Once that distinction lands, "why is analytics a separate system" becomes obvious.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The fundamental difference between OLTP and OLAP workloads</li>
+<li>The trade-offs between row storage and column storage</li>
+<li>The role of a data warehouse and the place of ETL/ELT</li>
+<li>The problems of running operations and analytics on the same database</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Operational databases get crushed by analytical queries all the time. One big aggregation grabs locks, blows away the cache, and hurts everyone else. Knowing the OLTP/OLAP split lets you immediately decide "where does this query belong?"</p>
+<blockquote>
+<p>Putting operations and analytics in the same system is convenient short term, but the two workloads almost always sabotage each other.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;users&quot;] --&gt; B[&quot;OLTP DB (row store)&quot;]
+    B -- &quot;ETL/ELT&quot; --&gt; C[&quot;Warehouse (column store)&quot;]
+    D[&quot;analysts&quot;] --&gt; C
+</code></pre>
+<p>OLTP makes single-row queries fast; OLAP makes million-row aggregations fast. They naturally live in different systems.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>OLTP (Online Transaction Processing)</strong>: short, frequent reads and writes — placing orders, charging payments.</li>
+<li><strong>OLAP (Online Analytical Processing)</strong>: large-scale aggregation and filtering — daily revenue, cohort analysis.</li>
+<li><strong>Row-store vs Column-store</strong>: store by row vs by column. For OLAP, columnar wins by a wide margin.</li>
+<li><strong>Star Schema</strong>: an analytics model built from a fact table plus dimension tables.</li>
+<li><strong>ETL/ELT</strong>: pipelines that move and transform data from operational to analytical systems.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — analytics directly on the operational database</strong></p>
+<pre><code class="language-sql">SELECT date_trunc('day', created_at), sum(total)
+FROM orders
+GROUP BY 1
+ORDER BY 1;
+-- 60s, lock contention, hurts production
+</code></pre>
+<p><strong>After — columnar warehouse</strong></p>
+<pre><code class="language-sql">-- BigQuery, Snowflake, Redshift, etc.
+SELECT date_trunc('day', created_at), sum(total)
+FROM warehouse.orders
+GROUP BY 1
+ORDER BY 1;
+-- 2s, zero impact on the operational DB
+</code></pre>
+<p>The same query, in a different storage format and a different system, can be 30x faster.</p>
+<h2>Hands-on: See the Row vs Column Difference</h2>
+<p><strong>Step 1 — Seed data</strong></p>
+<pre><code class="language-python"># seed.py
+import sqlite3, random, time
+
+with sqlite3.connect(&quot;oltp.db&quot;) as db:
+    db.executescript(&quot;&quot;&quot;
+        DROP TABLE IF EXISTS orders;
+        CREATE TABLE orders (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER, status TEXT,
+            total INTEGER, country TEXT, created_at TEXT
+        );
+    &quot;&quot;&quot;)
+    rows = [
+        (i, random.randint(1, 1000),
+         random.choice([&quot;paid&quot;,&quot;pending&quot;,&quot;cancelled&quot;]),
+         random.randint(1, 1000),
+         random.choice([&quot;KR&quot;,&quot;US&quot;,&quot;JP&quot;]),
+         f&quot;2026-05-{random.randint(1,28):02d}&quot;)
+        for i in range(1, 1_000_001)
+    ]
+    db.executemany(&quot;INSERT INTO orders VALUES (?,?,?,?,?,?)&quot;, rows)
+</code></pre>
+<p>One million order rows in SQLite, a row store.</p>
+<p><strong>Step 2 — OLTP-style single-row lookup</strong></p>
+<pre><code class="language-python">import sqlite3, time
+with sqlite3.connect(&quot;oltp.db&quot;) as db:
+    db.execute(&quot;CREATE INDEX IF NOT EXISTS idx_user ON orders(user_id)&quot;)
+    t = time.time()
+    print(db.execute(&quot;SELECT * FROM orders WHERE user_id=7&quot;).fetchall()[:3])
+    print(&quot;OLTP query:&quot;, round((time.time()-t)*1000, 2), &quot;ms&quot;)
+</code></pre>
+<p>A single index jump and the answer comes back instantly. That is the strength of row storage.</p>
+<p><strong>Step 3 — OLAP-style aggregation</strong></p>
+<pre><code class="language-python">import sqlite3, time
+with sqlite3.connect(&quot;oltp.db&quot;) as db:
+    t = time.time()
+    rows = db.execute(&quot;&quot;&quot;
+        SELECT country, sum(total)
+        FROM orders
+        WHERE status='paid'
+        GROUP BY country
+    &quot;&quot;&quot;).fetchall()
+    print(rows)
+    print(&quot;OLAP query:&quot;, round((time.time()-t)*1000, 2), &quot;ms&quot;)
+</code></pre>
+<p>All million rows have to be scanned. With row storage you also pull every column you do not need. With columnar storage you would touch only <code>country</code>, <code>total</code>, and <code>status</code>.</p>
+<p><strong>Step 4 — Mimic columnar storage with Parquet</strong></p>
+<pre><code class="language-python">import pandas as pd
+df = pd.read_sql(&quot;SELECT * FROM orders&quot;, &quot;sqlite:///oltp.db&quot;)
+df.to_parquet(&quot;orders.parquet&quot;)
+
+import duckdb, time
+con = duckdb.connect()
+t = time.time()
+print(con.execute(&quot;&quot;&quot;
+    SELECT country, sum(total)
+    FROM 'orders.parquet'
+    WHERE status='paid'
+    GROUP BY country
+&quot;&quot;&quot;).fetchall())
+print(&quot;Parquet/DuckDB:&quot;, round((time.time()-t)*1000, 2), &quot;ms&quot;)
+</code></pre>
+<p>The same aggregation runs several times faster. DuckDB combines columnar storage with vectorized execution.</p>
+<p><strong>Step 5 — Sketch a Star Schema</strong></p>
+<pre><code class="language-sql">-- fact_orders + dim_user + dim_product + dim_date
+SELECT d.country, sum(f.total)
+FROM fact_orders f
+JOIN dim_user d ON d.user_id = f.user_id
+WHERE f.status='paid'
+GROUP BY d.country;
+</code></pre>
+<p>Analytics often deliberately denormalizes into a star schema. Fewer joins, faster aggregations.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>OLTP is <strong>one index jump</strong>; OLAP is <strong>a large scan</strong>.</li>
+<li>Columnar storage reads only the columns you need, which makes aggregations dramatically faster.</li>
+<li>A star schema is the opposite extreme of normalization — and it is the right call for analytics.</li>
+<li>Splitting operations from analytics makes both systems simpler.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running analytics on the operational database.</strong> Cache, locks, and resources all suffer.</li>
+<li><strong>Reusing the OLTP model in OLAP.</strong> Joins explode and aggregations crawl.</li>
+<li><strong>Believing columnar is universal.</strong> Single-row updates are far better in row storage.</li>
+<li><strong>Running ETL once a night.</strong> Analysts always look at yesterday's data, and decisions lag.</li>
+<li><strong>Ignoring warehouse cost.</strong> Many columnar warehouses bill by scan volume.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>OLTP defaults to row stores like PostgreSQL or MySQL. Analytics defaults to columnar systems like BigQuery, Snowflake, Redshift, or ClickHouse. ETL/ELT pipelines join the two.</p>
+<p>A more recent direction is the "data lakehouse." Columnar files like Parquet sit on object storage, and engines like DuckDB, Trino, Spark, and Snowflake query them. The boundary between operations and analytics is still clear; only the tooling has gotten richer.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>"Is this OLTP or OLAP?" is the first question for routing.</li>
+<li>Analytical queries belong in the analytics system, operational queries in the operational DB.</li>
+<li>They monitor ETL/ELT reliability. Data freshness and accuracy are the key indicators.</li>
+<li>They control columnar cost via scan-column choice and partitioning.</li>
+<li>Schema changes get planned across both worlds at once. Operational changes affect the analytics pipeline.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Are analytical queries kept off the operational DB?</li>
+<li>[ ] Is there a separate analytical model (star schema, etc.)?</li>
+<li>[ ] Are ETL/ELT freshness and failure rate monitored?</li>
+<li>[ ] Are scan volumes considered in the columnar warehouse?</li>
+<li>[ ] Are schema changes reviewed against the analytics pipeline?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Describe a scenario where the same SELECT is fast on the OLTP database and slow on the OLAP one.</li>
+<li>Explain in one sentence why columnar storage is bad at single-row UPDATEs.</li>
+<li>Describe how a star schema clashes with normalization, and why analytics still justifies it.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>OLTP and OLAP are two worlds handling the same data on different time scales and in different shapes. Row storage wins single-row lookups; columnar wins large aggregations. Splitting them and connecting them with ETL/ELT is the standard architecture. With this post we wrap up the Database Systems 101 series. The big map hidden behind the word "database" — model, transactions, indexes, replication, analytics — should now feel like familiar terrain.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/01-what-is-a-database.md">What Is a Database System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/02-relational-model.md">The Relational Model</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/03-sql-and-query-processing.md">SQL and Query Processing</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/04-indexes.md">Indexes</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/05-transactions-and-acid.md">Transactions and ACID</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/06-isolation-levels.md">Isolation Levels</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/07-normalization-and-modeling.md">Normalization and Modeling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/08-query-optimization.md">Query Optimization</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/database-systems-101/en/09-replication-and-backup.md">Replication and Backup</a></li>
+<li><strong>OLTP and OLAP (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Chapter 3</a></li>
+<li><a href="https://www.snowflake.com/guides/what-data-warehouse/">Snowflake — What Is a Data Warehouse?</a></li>
+<li><a href="https://duckdb.org/why_duckdb">DuckDB — Why DuckDB?</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Online_analytical_processing">Wikipedia — Online Analytical Processing</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Database, OLTP, OLAP, Columnar, Analytics</p>
+</body>
+</html>

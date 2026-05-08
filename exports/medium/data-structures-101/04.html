@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stacks and Queues</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Stacks and Queues</h1>
+<blockquote>
+<p>Data Structures 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What data structure underlies a function call? Why do message queues, work queues, and printer queues all share the word "queue"?</p>
+<blockquote>
+<p>A stack is last-in-first-out (LIFO); a queue is first-in-first-out (FIFO). The two ADTs are simple, but they sit at the heart of nearly every system: function calls, tree traversal, task scheduling, message passing. This article walks through both by implementing them and then shows how they appear in production software.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The ADT definitions of a stack and a queue and their core operations</li>
+<li>How to implement both using arrays and linked lists</li>
+<li>How a function call stack and a BFS traversal queue work</li>
+<li>Which Python data structure to reach for in each case</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Stacks and queues appear in language execution models, OS scheduling, and inter-service messaging in distributed systems. The ADTs are simple, but without a deep grasp you cannot reason about recursion, DFS, BFS, or event loops.</p>
+<blockquote>
+<p>Without stacks, you cannot debug recursion. Without queues, you cannot design async systems.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A stack is the "push on top, pop from top" model. A queue is the "join the back, leave from the front" model. Both ADTs only operate on the ends, so both can be O(1) with arrays or linked lists.</p>
+</blockquote>
+<pre><code class="language-text">Stack (LIFO)              Queue (FIFO)
+        push                  enqueue       dequeue
+          ↓                      ↓             ↑
+       ┌─────┐              ┌─────────────────┐
+       │  C  │ ← top         │ A → B → C → D │
+       │  B  │                └─────────────────┘
+       │  A  │              front           back
+       └─────┘
+          ↑
+         pop
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Stack</strong><br>
+- Meaning: Last-In-First-Out ADT</p>
+<p><strong>Queue</strong><br>
+- Meaning: First-In-First-Out ADT</p>
+<p><strong>push / pop</strong><br>
+- Meaning: Stack insert / remove</p>
+<p><strong>enqueue / dequeue</strong><br>
+- Meaning: Queue insert / remove</p>
+<p><strong>Deque</strong><br>
+- Meaning: A generalization that pushes and pops at both ends</p>
+<h2>Before / After</h2>
+<p><strong>Before — using a list as a queue directly:</strong></p>
+<pre><code class="language-python">queue = []
+queue.append(&quot;A&quot;)
+queue.append(&quot;B&quot;)
+front = queue.pop(0)   # O(n) — every element shifts one slot
+</code></pre>
+<p><strong>After — using deque as a queue:</strong></p>
+<pre><code class="language-python">from collections import deque
+
+queue = deque()
+queue.append(&quot;A&quot;)
+queue.append(&quot;B&quot;)
+front = queue.popleft()   # O(1)
+</code></pre>
+<p>The behavior is identical, but the gap widens dramatically as the queue grows.</p>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Implement a Stack Yourself</strong></p>
+<pre><code class="language-python">class Stack:
+    def __init__(self):
+        self._data = []
+
+    def push(self, value):
+        self._data.append(value)
+
+    def pop(self):
+        if not self._data:
+            raise IndexError(&quot;pop from empty stack&quot;)
+        return self._data.pop()
+
+    def peek(self):
+        if not self._data:
+            raise IndexError(&quot;peek from empty stack&quot;)
+        return self._data[-1]
+
+    def __len__(self):
+        return len(self._data)
+
+s = Stack()
+for v in [1, 2, 3]:
+    s.push(v)
+print(s.pop(), s.pop(), s.pop())   # 3 2 1
+</code></pre>
+<p>When you only operate on one end of an array, every operation is O(1), so a plain list is already a stack.</p>
+<p><strong>Step 2: Implement a Queue Yourself</strong></p>
+<pre><code class="language-python">from collections import deque
+
+class Queue:
+    def __init__(self):
+        self._data = deque()
+
+    def enqueue(self, value):
+        self._data.append(value)
+
+    def dequeue(self):
+        if not self._data:
+            raise IndexError(&quot;dequeue from empty queue&quot;)
+        return self._data.popleft()
+
+    def __len__(self):
+        return len(self._data)
+
+q = Queue()
+for v in [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]:
+    q.enqueue(v)
+print(q.dequeue(), q.dequeue(), q.dequeue())   # A B C
+</code></pre>
+<p>A deque is O(1) at both ends, which makes it the ideal queue backing.</p>
+<p><strong>Step 3: Bracket Balancing — A Classic Use of a Stack</strong></p>
+<pre><code class="language-python">def is_balanced(expr: str) -&gt; bool:
+    pairs = {&quot;)&quot;: &quot;(&quot;, &quot;]&quot;: &quot;[&quot;, &quot;}&quot;: &quot;{&quot;}
+    opens = set(&quot;([{&quot;)
+    stack = []
+
+    for ch in expr:
+        if ch in opens:
+            stack.append(ch)
+        elif ch in pairs:
+            if not stack or stack.pop() != pairs[ch]:
+                return False
+    return not stack
+
+print(is_balanced(&quot;({[]})&quot;))   # True
+print(is_balanced(&quot;({[})&quot;))    # False
+print(is_balanced(&quot;((&quot;))       # False
+</code></pre>
+<p>Push on opens, pop on closes, and check the match. Compiler parsing works on the same principle.</p>
+<p><strong>Step 4: BFS — A Classic Use of a Queue</strong></p>
+<pre><code class="language-python">from collections import deque
+
+def bfs(graph: dict, start: str) -&gt; list:
+    visited = {start}
+    queue = deque([start])
+    order = []
+
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+graph = {
+    &quot;A&quot;: [&quot;B&quot;, &quot;C&quot;],
+    &quot;B&quot;: [&quot;A&quot;, &quot;D&quot;],
+    &quot;C&quot;: [&quot;A&quot;, &quot;D&quot;],
+    &quot;D&quot;: [&quot;B&quot;, &quot;C&quot;, &quot;E&quot;],
+    &quot;E&quot;: [&quot;D&quot;],
+}
+
+print(bfs(graph, &quot;A&quot;))   # ['A', 'B', 'C', 'D', 'E']
+</code></pre>
+<p>The queue ensures you visit nearby nodes first. Swap the queue for a stack and the same code becomes DFS.</p>
+<p><strong>Step 5: A Deque Does Both</strong></p>
+<pre><code class="language-python">from collections import deque
+
+dq = deque()
+# As a stack
+dq.append(1); dq.append(2); dq.append(3)
+print(dq.pop())    # 3 (LIFO)
+
+# As a queue
+dq.append(1); dq.append(2); dq.append(3)
+print(dq.popleft()) # 1 (FIFO)
+</code></pre>
+<p>A deque is O(1) at both ends, so it is the generalized structure that can express both a stack and a queue.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>A list as a stack and a deque as a queue both stay O(1)</li>
+<li><code>list.pop(0)</code> for a queue is O(n) — never use it</li>
+<li>The only difference between a stack and a queue is "which end do you remove from"</li>
+<li>DFS and BFS are the same code with the data structure swapped</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Using <code>list.pop(0)</code> as a queue</strong><br>
+- Problem: O(n) per operation<br>
+- Fix: Use <code>collections.deque</code></p>
+<p><strong>Popping from an empty container</strong><br>
+- Problem: IndexError<br>
+- Fix: Guard with <code>if stack</code> or try/except</p>
+<p><strong>Ignoring recursion depth limits</strong><br>
+- Problem: RecursionError<br>
+- Fix: Convert to an explicit stack</p>
+<p><strong>Missing visited in BFS</strong><br>
+- Problem: Infinite traversal<br>
+- Fix: Mark visited at the moment of push</p>
+<p><strong>Treating a priority queue as a normal queue</strong><br>
+- Problem: Wrong order<br>
+- Fix: Use a heap separately</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Function calls run on a stack (the call stack, stack traces)</li>
+<li>A web browser's back button uses a stack; the forward button uses another stack</li>
+<li>Message queues like RabbitMQ and Kafka are the backbone of inter-service async communication</li>
+<li>OS schedulers compose multiple queues (FIFO, priority)</li>
+<li>In graph traversal, BFS uses a queue and DFS uses a stack (or recursion)</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer mentally draws the stack whenever they see a recursive function. They know deep recursion can be dangerous, so they always have a sense of the call-depth ceiling. When needed, they convert recursion into an explicit stack-based iteration.</p>
+<p>A senior engineer also names "work queues" carefully. A simple FIFO queue, a priority queue, a delay queue, and a queue with backpressure produce completely different system behavior. They never assume two queues behave the same just because the ADT name is the same.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the meaning of LIFO and FIFO</li>
+<li>[ ] I know why you must not use a list as a queue in Python</li>
+<li>[ ] I recognize problem patterns where a stack is natural (like bracket balancing)</li>
+<li>[ ] I understand that BFS vs DFS is a choice of data structure</li>
+<li>[ ] I know that a deque supports both stacks and queues</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Implement a queue using two stacks. <code>enqueue</code> pushes onto stack one; <code>dequeue</code> pops from stack two, refilling stack two from stack one when empty. What is the amortized cost?</p>
+</li>
+<li>
+<p>Implement a postfix calculator with a stack. Example: <code>"3 4 + 2 *"</code> → 14.</p>
+</li>
+<li>
+<p>Replace the deque in the BFS code above with a stack (a list). Confirm it becomes DFS. How does the visit order change?</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>Stacks and queues are the simplest ADTs and the ones you encounter most often. A stack is LIFO and powers function calls, parsing, and DFS. A queue is FIFO and powers BFS, scheduling, and messaging. In Python, a list is the standard stack and <code>collections.deque</code> is the standard queue. The only difference is "which end do you pop from," but that one choice changes how a system behaves.</p>
+<p>Next we look at the magic of finding a value by key instantly — the hash table. We see how average O(1) search works and how collisions are resolved.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
+<li><strong>Stacks and Queues (current)</strong></li>
+<li>Hash Tables (upcoming)</li>
+<li>Trees (upcoming)</li>
+<li>Binary Search Trees (upcoming)</li>
+<li>Heaps (upcoming)</li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/3_3_SEList_Space_Efficient_.html">Open Data Structures — Stacks and Queues</a></li>
+<li><a href="https://docs.python.org/3/library/collections.html#collections.deque">Python <code>collections.deque</code> docs</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Stack_(abstract_data_type)">Wikipedia — Stack (abstract data type)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Queue_(abstract_data_type)">Wikipedia — Queue (abstract data type)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Stack, Queue, LIFO, FIFO</p>
+</body>
+</html>

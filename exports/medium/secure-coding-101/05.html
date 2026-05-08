@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Safe Data Storage</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Safe Data Storage</h1>
+<blockquote>
+<p>Secure Coding 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: If somebody walks off with one of <em>our disks</em>, how much of the data inside is <em>readable</em>?</p>
+<blockquote>
+<p><em>Data must be protected </em>in motion<em> and </em>at rest<em>. If only one is safe, </em>everything is at risk<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>at-rest</em> and <em>in-transit</em></li>
+<li>Classifying <em>PII</em> and <em>sensitive data</em></li>
+<li><em>Symmetric</em> and <em>asymmetric</em> encryption basics</li>
+<li><em>Tokenization</em> and <em>pseudonymization</em></li>
+<li>Five storage steps and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Both legally (GDPR, regional privacy laws) and in incident cost, <em>sensitive data leakage</em> is the most expensive class of breach. Plaintext storage is a <em>time bomb</em>.</p>
+<blockquote>
+<p><em>Collect less, separate more, lock harder.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;App&quot;] --&gt;|TLS| DB[&quot;Database&quot;]
+    DB --&gt;|At-rest encryption| Disk[&quot;Disk&quot;]
+    App --&gt; KMS[&quot;KMS (key management)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>PII</strong>: information that <em>identifies</em> a person.</li>
+<li><strong>At-rest</strong>: data sitting in storage.</li>
+<li><strong>In-transit</strong>: data <em>moving</em> across the network.</li>
+<li><strong>KMS</strong>: a service that manages <em>keys themselves</em>.</li>
+<li><strong>Tokenization</strong>: store a <em>substitute token</em>, not the original.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: National ID and card numbers stored as <em>plaintext</em>. Logs hold them too.</p>
+<p><strong>After</strong>: National ID <em>hashed</em>, card number <em>tokenized</em>, storage encrypted with a <em>KMS-managed key</em>.</p>
+<h2>Hands-on: Safe Storage in Five Steps</h2>
+<p><strong>Step 1 — Classify the data</strong></p>
+<pre><code class="language-python">SENSITIVE = {&quot;ssn&quot;, &quot;card_number&quot;, &quot;password&quot;, &quot;address&quot;}
+def is_sensitive(field): return field in SENSITIVE
+</code></pre>
+<p><strong>Step 2 — Use TLS for transport</strong></p>
+<pre><code class="language-python"># Always TLS between client and DB; do not disable certificate verification.
+import psycopg
+conn = psycopg.connect(&quot;postgresql://...?sslmode=verify-full&quot;)
+</code></pre>
+<p><strong>Step 3 — Encrypt at rest with envelope encryption</strong></p>
+<pre><code class="language-python">from cryptography.fernet import Fernet
+data_key = Fernet(kms.get_data_key())
+ciphertext = data_key.encrypt(b&quot;card-number&quot;)
+</code></pre>
+<p><strong>Step 4 — Allow lookup with a <em>deterministic hash</em></strong></p>
+<pre><code class="language-python">import hmac, hashlib
+def lookup_hash(value, key):
+    return hmac.new(key, value.encode(), hashlib.sha256).hexdigest()
+</code></pre>
+<p><strong>Step 5 — Protect backups too</strong></p>
+<pre><code class="language-bash"># Encrypt the backup file itself; store the key elsewhere.
+gpg --symmetric --cipher-algo AES256 backup.sql
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Envelope encryption</em> separates the <em>data key</em> from the <em>KMS key</em>.</li>
+<li>A <em>deterministic hash</em> enables lookup, but the salt is <em>system-wide</em>, not per-row.</li>
+<li>Both transit and storage are protected.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Storing sensitive data as <em>plaintext</em>.</strong> One disk is enough.</li>
+<li><strong>Keeping keys <em>next to the code</em>.</strong> Then separation buys nothing.</li>
+<li><strong>Disabling <em>TLS certificate verification</em>.</strong> Opens the door to <em>MITM</em>.</li>
+<li><strong>Letting <em>sensitive data flow into logs</em>.</strong> Logs are also storage.</li>
+<li><strong>Plaintext <em>backups</em>.</strong> The largest blast radius in any incident.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams use a <em>KMS</em> (AWS KMS, GCP KMS, Vault), apply <em>envelope encryption</em> with periodic <em>key rotation</em>. Some sensitive fields (like card numbers) are <em>tokenized</em> so they <em>never enter our system</em> at all.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>The strongest defense is to </em>collect less<em>.</em></li>
+<li><em>Keep keys </em>physically separate<em> from data.</em></li>
+<li><em>Protect transit and storage </em>both<em>.</em></li>
+<li><em>If key rotation is impossible, the design is wrong.</em></li>
+<li><em>Backups are also </em>data<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] PII is <em>catalogued</em>.</li>
+<li>[ ] Storage is encrypted via <em>KMS</em>.</li>
+<li>[ ] Transit uses <em>TLS with certificate verification</em>.</li>
+<li>[ ] Backups are <em>encrypted</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List the <em>PII fields</em> in your service.</li>
+<li>Diagram the flow of <em>envelope encryption</em>.</li>
+<li>Write a function to <em>tokenize</em> card numbers.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Encrypted data is useless if the <em>keys leak</em>. Next we look at <em>secret and key management</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/03-authentication-and-session.md">Authentication and Session</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/04-authorization-and-permissions.md">Authorization and Permissions</a></li>
+<li><strong>Safe Data Storage (current)</strong></li>
+<li>Secret and Key Management (upcoming)</li>
+<li>SQL Injection and Safe ORM Usage (upcoming)</li>
+<li>XSS and CSRF Defense (upcoming)</li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html">OWASP Cryptographic Storage Cheat Sheet</a></li>
+<li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html">AWS KMS — Envelope Encryption</a></li>
+<li><a href="https://cloud.google.com/kms/docs">Google Cloud KMS</a></li>
+<li><a href="https://developer.hashicorp.com/vault/docs">HashiCorp Vault</a></li>
+</ul>
+<p class="tags-line">Tags: Encryption, DataProtection, PII, SecureCoding, Cryptography</p>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Collecting and Visualizing Metrics</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Collecting and Visualizing Metrics</h1>
+<blockquote>
+<p>Observability 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How are metrics <em>collected</em>, and how do they <em>become a graph</em>?</p>
+<blockquote>
+<p><em>Prometheus </em>pulls<em> exporters; Grafana </em>draws<em> what Prometheus stored.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Pull</em> vs <em>push</em> models</li>
+<li><em>Exporters</em> and the <code>/metrics</code> endpoint</li>
+<li>A one-line <em>Prometheus</em> config</li>
+<li>Your first <em>Grafana</em> dashboard</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A metric pipeline is the <em>starting line</em> of all observability. The moment the first byte flows, the system <em>starts talking</em>.</p>
+<blockquote>
+<p><em>What you do not measure </em>does not exist<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;app + /metrics&quot;] --&gt; Prom[&quot;Prometheus (pull)&quot;]
+    Prom --&gt; TSDB[&quot;time-series DB&quot;]
+    TSDB --&gt; Graf[&quot;Grafana&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Exporter</strong>: a component that <em>exposes metrics over HTTP</em>.</li>
+<li><strong>Scrape interval</strong>: <em>how often</em> to pull.</li>
+<li><strong>Time series</strong>: a sequence of <em>(label set, value, time)</em>.</li>
+<li><strong>PromQL</strong>: the Prometheus <em>query language</em>.</li>
+<li><strong>Dashboard panel</strong>: a single graph.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: You read logs and <em>guess the trend</em>.</p>
+<p><strong>After</strong>: A second-level graph shows the <em>trend immediately</em>.</p>
+<h2>Hands-on: Metric Pipeline in 5 Steps</h2>
+<p><strong>Step 1 — Python <code>/metrics</code></strong></p>
+<pre><code class="language-python">from prometheus_client import Counter, start_http_server
+
+reqs = Counter(&quot;http_requests_total&quot;, &quot;Total requests&quot;, [&quot;path&quot;])
+
+if __name__ == &quot;__main__&quot;:
+    start_http_server(8000)
+    while True:
+        reqs.labels(path=&quot;/health&quot;).inc()
+</code></pre>
+<p><strong>Step 2 — Prometheus config</strong></p>
+<pre><code class="language-yaml">scrape_configs:
+  - job_name: app
+    scrape_interval: 5s
+    static_configs:
+      - targets: [&quot;app:8000&quot;]
+</code></pre>
+<p><strong>Step 3 — Run Prometheus (Docker)</strong></p>
+<pre><code class="language-bash">docker run -d --name prom -p 9090:9090 \
+  -v $(pwd)/prom.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
+</code></pre>
+<p><strong>Step 4 — First PromQL queries</strong></p>
+<pre><code class="language-promql">rate(http_requests_total[1m])
+sum by (path) (rate(http_requests_total[5m]))
+</code></pre>
+<p><strong>Step 5 — Grafana panel</strong></p>
+<pre><code class="language-bash">docker run -d --name graf -p 3000:3000 grafana/grafana
+# Browser: http://localhost:3000
+# Datasource: Prometheus → http://prom:9090
+# Panel: rate(http_requests_total[1m])
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Prometheus <em>pulls</em>; the app <em>exposes</em>.</li>
+<li><code>/metrics</code> returns <em>plain text</em>.</li>
+<li><code>rate()</code> computes <em>per-second growth</em> (counter → rate).</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Graphing a counter <em>as is</em>.</strong> You need <code>rate()</code>.</li>
+<li><strong>Putting <em>unique IDs</em> in labels.</strong> Cardinality explodes.</li>
+<li><strong>Setting scrape interval to <em>1 second</em>.</strong> You crush the target.</li>
+<li><strong>Pull blocked by a <em>firewall</em>.</strong> Target reports <em>down</em>.</li>
+<li><strong>Stuffing <em>every panel</em> into Grafana.</strong> Meaningless <em>wallpaper</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most companies start with <em>Prometheus + Grafana</em> and grow into <em>Thanos / Mimir</em> for scale.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Measure what is measurable.</em></li>
+<li><em>Pull lives or dies by </em>target discovery<em>.</em></li>
+<li><em>Counters always go through </em>rate()<em>.</em></li>
+<li><em>A dashboard is a </em>question<em>, not a panel.</em></li>
+<li><em>Cardinality is the first cost variable.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You expose <code>/metrics</code> from your app.</li>
+<li>[ ] Prometheus shows the target as <em>up</em>.</li>
+<li>[ ] You write one <em>PromQL</em> query.</li>
+<li>[ ] You build the first Grafana panel.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Expose both a <code>Counter</code> and a <code>Gauge</code>.</li>
+<li>Explain the difference between <code>rate()</code> and <code>increase()</code>.</li>
+<li>Build a 5-minute average throughput dashboard.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once metrics flow, <em>the system speaks in graphs</em>. Next: <em>structured logging</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/01-what-is-observability.md">What Is Observability?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/observability-101/en/02-metric-log-trace.md">Metrics, Logs, and Traces</a></li>
+<li><strong>Collecting and Visualizing Metrics (current)</strong></li>
+<li>Structured Logging (upcoming)</li>
+<li>Distributed Tracing Basics (upcoming)</li>
+<li>Dashboard Design (upcoming)</li>
+<li>Alerts and On-Call (upcoming)</li>
+<li>SLI and SLO Basics (upcoming)</li>
+<li>Cost and Cardinality (upcoming)</li>
+<li>A Production-Ready Observability Stack (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://prometheus.io/docs/prometheus/latest/getting_started/">Prometheus getting started</a></li>
+<li><a href="https://github.com/prometheus/client_python">prometheus_client (Python)</a></li>
+<li><a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">PromQL basics</a></li>
+<li><a href="https://grafana.com/docs/grafana/latest/">Grafana docs</a></li>
+</ul>
+<p class="tags-line">Tags: Observability, Metrics, Prometheus, Grafana, Monitoring</p>
+</body>
+</html>

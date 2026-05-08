@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Tiny Interpreter</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Tiny Interpreter</h1>
+<blockquote>
+<p>Compilers 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What does it look like when the lexer, parser, and evaluator we have studied all live in one file?</p>
+<blockquote>
+<p>In this post we build a small arithmetic interpreter in a single file. We tokenize input, lift it into an AST, evaluate it to a value, and wrap the whole thing in a REPL you can run yourself.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>How to combine a lexer, parser, and evaluator into one file</li>
+<li>A minimal recursive descent parser</li>
+<li>How an interpreter walks an AST to produce values</li>
+<li>How a REPL closes one execution cycle</li>
+<li>Where to extend this code next</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Stages you learned separately only click once you wire them together. The single-file program in this post is enough to check, at a glance, which compiler stages you can already operate. It is also a launchpad for adding variables, functions, and types.</p>
+<blockquote>
+<p>Putting all stages in one file makes every interface obvious.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;source string&quot;] --&gt; B[&quot;Lexer&quot;]
+    B --&gt; C[&quot;tokens&quot;]
+    C --&gt; D[&quot;Parser&quot;]
+    D --&gt; E[&quot;AST&quot;]
+    E --&gt; F[&quot;Evaluator&quot;]
+    F --&gt; G[&quot;value&quot;]
+    G --&gt; H[&quot;REPL print&quot;]
+</code></pre>
+<p>Each arrow carries a clearly defined data type. The simplicity of those types is the whole point of this mini interpreter.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Token</strong>: The smallest unit produced by the lexer (<code>NUM</code>, <code>+</code>, <code>(</code>, etc.).</li>
+<li><strong>AST node</strong>: A tree node produced by the parser (<code>Num</code>, <code>BinOp</code>).</li>
+<li><strong>Recursive descent</strong>: A parser style where one function handles one grammar rule.</li>
+<li><strong>Evaluator</strong>: The stage that walks the AST and reduces it to a value.</li>
+<li><strong>REPL</strong>: Read-eval-print loop, the cycle of one input line, one result line.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — stages scattered across files</strong></p>
+<pre><code class="language-text">lexer.py, parser.py, evaluator.py  -&gt; the flow is hard to see at once
+</code></pre>
+<p><strong>After — one-file mini interpreter</strong></p>
+<pre><code class="language-text">mini.py: Lexer -&gt; Parser -&gt; Evaluator -&gt; REPL
+</code></pre>
+<p>The flow and the type transitions live on a single screen.</p>
+<h2>Hands-on: Build the Arithmetic Interpreter</h2>
+<p><strong>Step 1 — Lexer</strong></p>
+<pre><code class="language-python"># mini.py (1)
+import re
+
+TOKEN = re.compile(r&quot;\s*(?:(\d+(?:\.\d+)?)|(.))&quot;)
+
+def tokenize(src):
+    tokens = []
+    for num, op in TOKEN.findall(src):
+        if num:
+            tokens.append((&quot;NUM&quot;, float(num)))
+        elif op.strip():
+            tokens.append((op, op))
+    tokens.append((&quot;EOF&quot;, None))
+    return tokens
+</code></pre>
+<p><code>tokenize("1 + 2")</code> returns <code>[("NUM",1.0), ("+","+"), ("NUM",2.0), ("EOF",None)]</code>. A single regex carries the whole job.</p>
+<p><strong>Step 2 — Parser (recursive descent)</strong></p>
+<pre><code class="language-python"># mini.py (2)
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.pos = 0
+
+    def peek(self): return self.tokens[self.pos]
+    def eat(self, kind):
+        tok = self.tokens[self.pos]
+        if tok[0] != kind:
+            raise SyntaxError(f&quot;expected {kind}, got {tok[0]}&quot;)
+        self.pos += 1
+        return tok
+
+    def parse(self):
+        node = self.expr()
+        self.eat(&quot;EOF&quot;)
+        return node
+
+    def expr(self):
+        node = self.term()
+        while self.peek()[0] in (&quot;+&quot;, &quot;-&quot;):
+            op = self.eat(self.peek()[0])[0]
+            node = (&quot;BinOp&quot;, op, node, self.term())
+        return node
+
+    def term(self):
+        node = self.factor()
+        while self.peek()[0] in (&quot;*&quot;, &quot;/&quot;):
+            op = self.eat(self.peek()[0])[0]
+            node = (&quot;BinOp&quot;, op, node, self.factor())
+        return node
+
+    def factor(self):
+        tok = self.peek()
+        if tok[0] == &quot;NUM&quot;:
+            self.eat(&quot;NUM&quot;)
+            return (&quot;Num&quot;, tok[1])
+        if tok[0] == &quot;(&quot;:
+            self.eat(&quot;(&quot;)
+            node = self.expr()
+            self.eat(&quot;)&quot;)
+            return node
+        raise SyntaxError(f&quot;unexpected {tok}&quot;)
+</code></pre>
+<p><code>expr -&gt; term ((+|-) term)*</code> and <code>term -&gt; factor ((*|/) factor)*</code>. Operator precedence falls out of this pair of rules naturally.</p>
+<p><strong>Step 3 — Evaluator</strong></p>
+<pre><code class="language-python"># mini.py (3)
+def evaluate(node):
+    kind = node[0]
+    if kind == &quot;Num&quot;:
+        return node[1]
+    if kind == &quot;BinOp&quot;:
+        op, l, r = node[1], evaluate(node[2]), evaluate(node[3])
+        if op == &quot;+&quot;: return l + r
+        if op == &quot;-&quot;: return l - r
+        if op == &quot;*&quot;: return l * r
+        if op == &quot;/&quot;: return l / r
+    raise RuntimeError(f&quot;unknown node {node}&quot;)
+</code></pre>
+<p>Tuples alone, without a Visitor, are clean enough at this size.</p>
+<p><strong>Step 4 — REPL</strong></p>
+<pre><code class="language-python"># mini.py (4)
+def run(src):
+    return evaluate(Parser(tokenize(src)).parse())
+
+if __name__ == &quot;__main__&quot;:
+    while True:
+        try:
+            line = input(&quot;mini&gt; &quot;)
+        except (EOFError, KeyboardInterrupt):
+            break
+        if not line.strip():
+            continue
+        try:
+            print(run(line))
+        except Exception as e:
+            print(&quot;error:&quot;, e)
+</code></pre>
+<p><code>mini&gt; 1 + 2 * 3</code> prints <code>7.0</code>. One line in, one line out: the canonical read-eval-print loop.</p>
+<p><strong>Step 5 — Try it yourself</strong></p>
+<pre><code class="language-bash">python3 mini.py
+mini&gt; (1 + 2) * 3
+9.0
+mini&gt; 10 / 4
+2.5
+mini&gt; 1 +
+error: expected NUM, got EOF
+</code></pre>
+<p>You can see every stage cooperating to deliver a one-line result to the user.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Types are explicit: <code>str -&gt; list[token] -&gt; tuple AST -&gt; float</code>.</li>
+<li>Precedence is encoded in grammar functions (<code>expr</code> / <code>term</code> / <code>factor</code>).</li>
+<li>Errors are thrown close to their stage (lexer, parser, evaluator).</li>
+<li>Keeping the AST as tuples makes printing and debugging easy.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stuffing lex, parse, and eval into one function.</strong> Stage separation is what makes debugging tractable.</li>
+<li><strong>Handling precedence in a single function.</strong> Mixing additive and multiplicative ops gives the wrong answer.</li>
+<li><strong>Skipping the EOF token.</strong> The parser's terminator becomes ambiguous and you risk infinite loops.</li>
+<li><strong>Errors without source position.</strong> REPL users have no way to debug.</li>
+<li><strong>Not catching division by zero.</strong> The REPL crashes on the user.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Small DSLs (search queries, filter expressions, configuration expressions) almost always start from this exact layout. Expression evaluators in data tools, the WHERE-clause evaluator in SQL, and rule engines in game runtimes all share the same shape. Add variables and functions and you have a teaching toy language.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>They write down the data type for each stage before coding.</li>
+<li>They encode precedence in the grammar, not in the evaluator.</li>
+<li>They carry source position from day one for error messages.</li>
+<li>They keep the AST as the simplest data structure that works.</li>
+<li>They defer extensions like variables and functions to the next iteration.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the input/output type of the lexer, parser, and evaluator?</li>
+<li>[ ] Can you explain how recursive descent encodes precedence?</li>
+<li>[ ] Can you say why the EOF token is needed?</li>
+<li>[ ] Can you summarize the REPL cycle in one sentence?</li>
+<li>[ ] Have you picked one extension to add next?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Extend the parser and evaluator to handle unary minus (<code>-3</code>, <code>-(1+2)</code>).</li>
+<li>Add an environment dict so that <code>x = 1 + 2</code> followed by <code>x * 3</code> evaluates correctly.</li>
+<li>Add token positions (index or column) to the error messages.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>We built a tiny interpreter in one file and used it to verify every stage from this series. The next steps are to grow it into a toy language with variables, functions, and types, or to translate the same AST into backend code for a real compiler. The series ends here.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">what is a compiler</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/05-symbol-table-and-scope.md">symbol table and scope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/06-intermediate-representation.md">intermediate representation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/07-optimization-basics.md">optimization basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/08-code-generation.md">code generation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/09-jit-vs-aot.md">JIT vs AOT</a></li>
+<li><strong>building a tiny interpreter (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://craftinginterpreters.com/">Crafting Interpreters — Robert Nystrom</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">Recursive descent parser (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">Read–eval–print loop (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Compilers, Interpreter, Capstone, AST, REPL</p>
+</body>
+</html>

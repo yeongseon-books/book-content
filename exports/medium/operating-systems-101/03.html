@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scheduling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Scheduling</h1>
+<blockquote>
+<p>Operating Systems 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Hundreds of processes are alive on your machine. How does the OS decide who gets the next millisecond of CPU?</p>
+<blockquote>
+<p>The scheduler is one of the most frequently invoked parts of the OS. Every few milliseconds it picks "who runs next?" and that choice shapes responsiveness, throughput, fairness, and power. This article walks through why a scheduler exists, the policies it uses, and why context switch cost keeps showing up in performance discussions.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The scheduler's goals and the trade-offs between them</li>
+<li>Major policies (FCFS, RR, Priority, MLFQ, CFS)</li>
+<li>What a context switch is and what it costs</li>
+<li>Knobs you can turn — <code>nice</code>, priority, CPU affinity</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The scheduler is invisible until things slow down or jitter. Why does the system feel sluggish when CPU is idle? Why do identical runs take different times? Why did a container suddenly get sluggish after we set a CPU limit? The answers usually come back to the scheduler's decisions.</p>
+<blockquote>
+<p>Responsiveness, throughput, fairness, and power — the scheduler cannot maximize all four at once. Push one and another gives.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>The scheduler picks a runnable task from a queue and puts it on the CPU. It is invoked again whenever a task blocks on I/O, exhausts its time slice, or is preempted by a higher-priority task waking up.</p>
+</blockquote>
+<pre><code class="language-text">Runnable queue        Running              Blocked (waiting I/O)
++--------------+      +----------+         +-------------------+
+| T1, T3, T5   | ---&gt; |   T2     |         |  T4 (read)        |
++--------------+      +----------+         |  T6 (sleep)       |
+       ^                   |               +-------------------+
+       |                   v
+       +-- preempt /  time slice expires --+
+                           |
+                           +--&gt; back to runnable queue
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Context switch</strong><br>
+- Description: Saving one task's CPU state and restoring another's</p>
+<p><strong>Time slice</strong><br>
+- Description: The chunk of CPU a preemptive scheduler hands to one task at a time</p>
+<p><strong>Priority</strong><br>
+- Description: The weight that decides who runs first or more often</p>
+<p><strong><code>nice</code></strong><br>
+- Description: A user-tunable priority hint on Linux (lower is more aggressive)</p>
+<p><strong>CFS</strong><br>
+- Description: Linux's Completely Fair Scheduler, dividing virtual time fairly</p>
+<h2>Before / After</h2>
+<p><strong>Before — "the OS will share things fairly":</strong></p>
+<pre><code class="language-bash"># Run four heavy background tasks at once
+./heavy_task &amp; ./heavy_task &amp; ./heavy_task &amp; ./heavy_task &amp;
+</code></pre>
+<p>Will they finish at the same time? Will one starve another? How does this affect interactive responsiveness? Guessing will not tell you.</p>
+<p><strong>After — "you can track each task's state and time":</strong></p>
+<pre><code class="language-text">T1: ran 50ms -&gt; time slice expired -&gt; back to runnable
+T2: blocked on I/O -&gt; data arrived -&gt; runnable again
+T3: high priority -&gt; preempts T2 the moment it wakes up
+T4: nice +10 -&gt; gets less of the shared CPU
+</code></pre>
+<p>The scheduler makes thousands of decisions like this per second.</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: Count context switches</strong></p>
+<pre><code class="language-bash">/usr/bin/time -v python3 -c &quot;
+import threading
+def loop():
+    for _ in range(10**6): pass
+ts = [threading.Thread(target=loop) for _ in range(8)]
+for t in ts: t.start()
+for t in ts: t.join()
+&quot; 2&gt;&amp;1 | grep -E &quot;context switches&quot;
+</code></pre>
+<p>You will see voluntary (the task yielded) and involuntary (the scheduler preempted) counts. Their ratio hints at how loaded the system is.</p>
+<p><strong>Step 2: Adjust priority with <code>nice</code></strong></p>
+<pre><code class="language-bash"># Default priority
+nice -n 0  python3 -c &quot;x=0
+for _ in range(10**8): x+=1&quot; &amp;
+# Lower priority
+nice -n 19 python3 -c &quot;x=0
+for _ in range(10**8): x+=1&quot; &amp;
+wait
+</code></pre>
+<p>In <code>top</code> or <code>htop</code> you can compare CPU shares. The <code>nice 19</code> task only gets the slack the other one leaves.</p>
+<p><strong>Step 3: Pin to a specific core with affinity</strong></p>
+<pre><code class="language-bash"># Run only on CPU 0
+taskset -c 0 python3 my_workload.py
+# Inspect the affinity mask
+taskset -p $(pgrep -f my_workload.py)
+</code></pre>
+<p>CPU affinity is used to keep cache locality high or to protect a core from competing work.</p>
+<p><strong>Step 4: Watch per-thread state</strong></p>
+<pre><code class="language-bash"># All threads of a PID, refreshed once per second
+ps -L -p &lt;PID&gt; -o pid,tid,stat,wchan,comm
+</code></pre>
+<p><code>stat</code> shows <code>R</code> (runnable/running), <code>S</code> (sleeping), or <code>D</code> (uninterruptible disk wait). Looking at the distribution often points straight to a culprit.</p>
+<p><strong>Step 5: Switch to a real-time policy</strong></p>
+<pre><code class="language-bash"># Inspect current policy
+chrt -p $(pgrep -f my_workload.py)
+# Switch to round-robin real-time (root required)
+sudo chrt -r -p 50 $(pgrep -f my_workload.py)
+</code></pre>
+<p>Linux supports SCHED_FIFO and SCHED_RR alongside the default SCHED_OTHER (CFS). They are powerful but can ruin overall responsiveness; use them only when real-time guarantees are truly needed.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Context switches are not free, even when they look invisible (typically a few microseconds)</li>
+<li><code>nice</code> is a hint, not an absolute priority</li>
+<li>Distinguishing <code>S</code>, <code>D</code>, and <code>R</code> is decisive when debugging</li>
+<li>Real-time policies are powerful but can starve everything else</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Reading only CPU%</strong><br>
+- Problem: Misses context switches and wait time<br>
+- Fix: Combine <code>vmstat</code> and <code>pidstat</code></p>
+<p><strong>Assuming more threads is always faster</strong><br>
+- Problem: Excessive context switches make it slower<br>
+- Fix: Tune around core count and measure</p>
+<p><strong>Believing <code>nice -n -20</code> magically helps</strong><br>
+- Problem: Starves siblings, destabilizes system<br>
+- Fix: Use sparingly and measure</p>
+<p><strong>Ignoring container CPU limits</strong><br>
+- Problem: cgroup throttling tanks responsiveness<br>
+- Fix: Know <code>cpu.cfs_quota_us</code> etc.</p>
+<p><strong>Trying to <code>kill</code> <code>D</code>-state processes</strong><br>
+- Problem: Signal does not arrive; they linger<br>
+- Fix: Fix the underlying disk/network cause</p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Container ops: Kubernetes CPU request/limit maps to cgroup scheduler controls</li>
+<li>Database tuning: I/O wait vs CPU usage ratio identifies the bottleneck</li>
+<li>Games and audio: latency-sensitive threads run at real-time priorities</li>
+<li>Background jobs: ETL workers are <code>nice</code>'d down to protect interactive paths</li>
+<li>Laptop power: scheduler cooperates with frequency scaling for battery and speed</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer hearing "it is slow" does not ask only "is CPU 100%?" Worse than 100% CPU is 50% CPU with hundreds of thousands of context switches per second. Senior people reach for <code>vmstat</code>, <code>pidstat</code>, and <code>perf sched</code> and look at the system from the scheduler's point of view.</p>
+<p>A senior also treats the scheduler as a collaborator. Code that does small bursts and yields often makes the scheduler's life easy. Code that holds locks for a long time or blocks signals defeats it. Smooth latency comes as much from code patterns as from policy settings.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can name the four scheduler goals</li>
+<li>[ ] You know roughly how expensive a context switch is</li>
+<li>[ ] You can distinguish <code>nice</code>, priority, and affinity</li>
+<li>[ ] You can read <code>R</code>/<code>S</code>/<code>D</code> and act on them</li>
+<li>[ ] You have a sense of how container CPU limits map to the scheduler</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Run <code>vmstat 1</code> for 10 seconds and average the <code>cs</code> column. Then start a heavy build in the background and repeat. Compare the two averages.</p>
+</li>
+<li>
+<p>Run the same Python script as both <code>nice -n 0</code> and <code>nice -n 19</code> simultaneously. Watch CPU% in <code>top</code> for one minute. Note how the difference changes when the system goes from idle to busy.</p>
+</li>
+<li>
+<p>Write a script with 8 CPU-bound threads. Run it with <code>taskset -c 0</code> and again without affinity. Compare the times. If the result surprises you, explain why.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The scheduler picks the next CPU runner from the runnable queue. The decision balances responsiveness, throughput, fairness, and power, and context switches are the cost of executing it. Knobs like <code>nice</code> and affinity let you nudge it, but the scheduler also depends on well-behaved code.</p>
+<p>The next article looks at what happens when several flows touch the same data at once: race conditions. Knowing when the scheduler can interrupt a flow makes it obvious why these bugs are everywhere.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What Is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><strong>Scheduling (current)</strong></li>
+<li>Concurrency and Race Conditions (upcoming)</li>
+<li>Locks, Mutexes, and Semaphores (upcoming)</li>
+<li>Memory Management (upcoming)</li>
+<li>Virtual Memory (upcoming)</li>
+<li>File Systems (upcoming)</li>
+<li>System Calls (upcoming)</li>
+<li>Containers and the Operating System (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.pearson.com/store/p/modern-operating-systems/P100000869539">Tanenbaum &amp; Bos — Modern Operating Systems</a></li>
+<li><a href="https://www.kernel.org/doc/html/latest/scheduler/index.html">Linux Kernel Documentation — Scheduler</a></li>
+<li><a href="https://www.brendangregg.com/linuxperf.html">Brendan Gregg — Linux Performance</a></li>
+<li><a href="https://lwn.net/Articles/230501/">LWN — The CFS scheduler</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Scheduling, CPU, Systems, Performance</p>
+</body>
+</html>

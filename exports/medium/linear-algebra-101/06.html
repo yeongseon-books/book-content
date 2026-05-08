@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Basis and Dimension</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Basis and Dimension</h1>
+<blockquote>
+<p>Linear Algebra 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: What determines <em>how many vectors</em> you need to <em>describe a space</em>?</p>
+<blockquote>
+<p><em>A basis is a </em>set of axes<em>; the dimension is the </em>count of those axes<em>.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition of <em>linear independence</em></li>
+<li>The relationship between <em>basis</em> and <em>dimension</em></li>
+<li><em>Rank</em> and the <em>null space</em></li>
+<li>A 5-step hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Singular matrices</em>, <em>overfitting</em>, <em>PCA's principal axes</em> — all are explained by <em>basis and dimension</em>.</p>
+<blockquote>
+<p><em>Dimension is the count; basis is the choice of axes.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Vecs[&quot;Set of vectors&quot;] --&gt; Indep[&quot;Linearly independent?&quot;]
+    Indep --&gt; Basis[&quot;Basis&quot;]
+    Basis --&gt; Dim[&quot;Dimension&quot;]
+    Dim --&gt; Rank[&quot;Rank of matrix&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Linear combination</strong>: <code>c1 v1 + c2 v2 + ...</code></li>
+<li><strong>Linearly independent</strong>: no vector is a <em>linear combination of the others</em>.</li>
+<li><strong>Basis</strong>: a set of vectors that <em>spans</em> a space and is <em>linearly independent</em>.</li>
+<li><strong>Dimension</strong>: the <em>size of a basis</em>.</li>
+<li><strong>Rank</strong>: the <em>number of linearly independent columns (or rows)</em> of a matrix.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: <em>"A basis is the standard unit vectors."</em> — that is the only one you know.</p>
+<p><strong>After</strong>: <em>"A basis is a </em>choice<em> — the same space admits </em>many coordinate systems<em>."</em></p>
+<h2>Hands-on: Five Steps with Basis and Dimension</h2>
+<p><strong>Step 1 — Standard basis</strong></p>
+<pre><code class="language-python">import numpy as np
+e1 = np.array([1.0, 0.0])
+e2 = np.array([0.0, 1.0])
+print(&quot;e1, e2:&quot;, e1, e2)
+</code></pre>
+<p><strong>Step 2 — Linear combination</strong></p>
+<pre><code class="language-python">v = 3 * e1 + 4 * e2
+print(&quot;v:&quot;, v)
+</code></pre>
+<p><strong>Step 3 — Independence via rank</strong></p>
+<pre><code class="language-python">A = np.column_stack([e1, e2])
+print(&quot;rank:&quot;, np.linalg.matrix_rank(A))  # 2
+</code></pre>
+<p><strong>Step 4 — Dependent example</strong></p>
+<pre><code class="language-python">B = np.column_stack([np.array([1.0, 2.0]), np.array([2.0, 4.0])])
+print(&quot;rank:&quot;, np.linalg.matrix_rank(B))  # 1
+</code></pre>
+<p><strong>Step 5 — Coordinates in a different basis</strong></p>
+<pre><code class="language-python">b1 = np.array([1.0, 1.0])
+b2 = np.array([1.0, -1.0])
+B = np.column_stack([b1, b2])
+v = np.array([3.0, 4.0])
+coords = np.linalg.solve(B, v)
+print(&quot;coords in {b1,b2}:&quot;, coords)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Rank</em> tells you the <em>dimension</em>.</li>
+<li>A <em>basis is not unique</em>.</li>
+<li>If vectors are <em>linearly dependent</em>, they fail to <em>fill the space</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to <em>invert a rank-deficient</em> matrix.</strong></li>
+<li><strong>Believing the <em>basis is unique</em>.</strong></li>
+<li><strong>Floating-point errors causing <em>rank miscalculation</em>.</strong></li>
+<li><strong>Confusing <em>dimension</em> with <em>matrix size</em>.</strong></li>
+<li><strong>Judging <em>linear independence</em> purely by <em>visual intuition</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>PCA's <em>principal components</em> form a <em>new basis</em>. <em>Feature selection / dimensionality reduction</em> is a <em>basis change</em>. <em>Multicollinearity</em> equals <em>rank deficiency</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always check rank</em>.</li>
+<li>Uses the <em>condition number</em> to detect <em>near-dependence</em>.</li>
+<li>Uses <em>basis change</em> to <em>simplify problems</em>.</li>
+<li>Uses <em>PCA / SVD</em> to find an <em>optimal basis</em>.</li>
+<li><em>Resolves multicollinearity</em> explicitly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can test for <em>linear independence</em>.</li>
+<li>[ ] You can compute <em>rank</em>.</li>
+<li>[ ] You can express <em>coordinates in a different basis</em>.</li>
+<li>[ ] You know the difference between <em>dimension</em> and <em>rank</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Explain why <em>three 2D vectors</em> cannot be <em>linearly independent</em>.</li>
+<li>What is the <em>maximum rank</em> of a <em>2x3 matrix</em>?</li>
+<li>Use a <em>basis change</em> to express the vector <code>[3, 4]</code> in a new coordinate system.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A basis is a <em>choice of axes</em>; dimension is <em>their count</em>. The next post covers <em>eigenvalues and eigenvectors</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/01-what-is-linear-algebra.md">What Is Linear Algebra?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/02-vectors.md">Vectors</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/03-matrices.md">Matrices</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/04-inner-product-and-distance.md">Inner Product and Distance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linear-algebra-101/en/05-linear-transformation.md">Linear Transformations</a></li>
+<li><strong>Basis and Dimension (current)</strong></li>
+<li>Eigenvalues and Eigenvectors (upcoming)</li>
+<li>Matrix Decomposition (upcoming)</li>
+<li>PCA (upcoming)</li>
+<li>Linear Algebra in Machine Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.3blue1brown.com/lessons/span">3Blue1Brown — Basis vectors</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Basis_(linear_algebra)">Wikipedia — Basis (linear algebra)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Rank_(linear_algebra)">Wikipedia — Rank (linear algebra)</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html">NumPy — matrix_rank</a></li>
+</ul>
+<p class="tags-line">Tags: LinearAlgebra, Basis, Dimension, DataScience, Beginner</p>
+</body>
+</html>

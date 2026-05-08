@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Test Coverage</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Test Coverage</h1>
+<blockquote>
+<p>Testing 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: <em>How much</em> did you test? Is 100% <em>enough</em>?</p>
+<blockquote>
+<p>Coverage is a <em>measurement tool</em>. The moment it becomes <em>a target</em> it loses meaning.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>line/branch/function</em> coverage</li>
+<li>How to <em>measure</em> with <code>pytest-cov</code></li>
+<li>A workflow to find <em>uncovered code</em></li>
+<li><em>Why 100% coverage</em> can be dangerous</li>
+<li>How to set a sensible target</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If you do not know <em>where tests reach</em>, incidents happen in the <em>blind spots</em>. At the same time, tests written <em>just to raise the number</em> create <em>false safety</em>.</p>
+<blockquote>
+<p>Coverage is a <em>compass</em>, not a <em>map</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Code[&quot;Production code&quot;] --&gt; Cov[&quot;Coverage tool&quot;]
+    Cov --&gt; Report[&quot;Line/branch report&quot;]
+    Report --&gt; Action[&quot;Add tests for gaps&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Line coverage</strong>: ratio of <em>executed lines / total lines</em>.</li>
+<li><strong>Branch coverage</strong>: whether <em>both sides</em> of branches like if/else were executed.</li>
+<li><strong>Function coverage</strong>: ratio of <em>called functions</em>.</li>
+<li><strong>Uncovered</strong>: code that tests <em>never</em> executed.</li>
+<li><strong>Coverage gate</strong>: CI fails if coverage falls below <em>the minimum</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (no coverage)</strong></p>
+<pre><code class="language-text">- All you know is &quot;we have many tests&quot;
+- No idea which lines were *never executed*
+</code></pre>
+<p><strong>After (coverage report)</strong></p>
+<pre><code class="language-text">src/payment.py: 78% (line 42, 57 uncovered)
+src/auth.py: 92% (line 11 uncovered)
+TOTAL: 84%
+</code></pre>
+<h2>Hands-on: pytest-cov in Five Steps</h2>
+<p><strong>Step 1 — Install</strong></p>
+<pre><code class="language-bash">pip install pytest-cov
+</code></pre>
+<p><strong>Step 2 — Measure</strong></p>
+<pre><code class="language-bash">pytest --cov=src --cov-report=term-missing
+</code></pre>
+<pre><code class="language-text">src/calc.py    24    2    92%   18-19
+src/auth.py    50   10    80%   34, 41-49
+TOTAL         200   18    91%
+</code></pre>
+<p><strong>Step 3 — HTML report</strong></p>
+<pre><code class="language-bash">pytest --cov=src --cov-report=html
+open htmlcov/index.html
+</code></pre>
+<p>The red lines are <em>the untested ones</em>.</p>
+<p><strong>Step 4 — Branch coverage</strong></p>
+<pre><code class="language-bash">pytest --cov=src --cov-branch --cov-report=term-missing
+</code></pre>
+<p>This shows whether <em>both True and False</em> of <code>if x &gt; 0:</code> were covered.</p>
+<p><strong>Step 5 — Gate (enforce in CI)</strong></p>
+<pre><code class="language-toml"># pyproject.toml
+[tool.coverage.report]
+fail_under = 80
+</code></pre>
+<pre><code class="language-bash">pytest --cov=src
+# Coverage failure: total of 78 is less than fail_under=80
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Line coverage only looks at <em>execution</em> (value verification is separate).</li>
+<li><em>Branch coverage</em> is a more honest signal.</li>
+<li>The HTML report shows <em>the gaps</em> at a glance.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Setting <em>100%</em> as a KPI.</strong> It floods you with <em>meaningless tests</em>.</li>
+<li><strong>Inflating coverage with <em>no assertions</em>.</strong> Code is <em>executed</em> but not <em>verified</em>.</li>
+<li><strong>Including <em>generated/migration/experimental code</em> in measurement.</strong> Just noise.</li>
+<li><strong>Ignoring <em>branch coverage</em>.</strong> Testing only one side of an if-else still gives <em>100% line</em>.</li>
+<li><strong>Holding <em>new code and legacy code</em> to the <em>same gate</em>.</strong> Improvement becomes hard.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams aim for <em>70\~85% on production code</em>. Core domain stays <em>high</em>; adapters and UI sit <em>lower</em>. Many add a separate gate on <em>patch coverage</em> (coverage of changed lines).</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Treats coverage as <em>a diagnostic, not an outcome metric</em>.</li>
+<li>Looks at <em>the gaps</em> and asks <em>why</em> they are gaps.</li>
+<li>Keeps <em>new code coverage high</em> while <em>legacy improves gradually</em>.</li>
+<li><em>Prioritizes</em> branches and exception paths.</li>
+<li>Accepts that 100% can have <em>low ROI</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You looked at a <code>pytest --cov</code> report once.</li>
+<li>[ ] You inspected <em>red lines</em> in the HTML report.</li>
+<li>[ ] You enabled <em>branch coverage</em>.</li>
+<li>[ ] CI has a <em>minimum coverage</em> gate.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Find the <em>file with the lowest coverage</em> in your project.</li>
+<li>Write <em>why it is low</em> in one line and propose <em>three tests</em> to add.</li>
+<li>Compare the <em>numerical gap</em> between line and branch coverage.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Coverage is a <em>health signal</em>, not <em>health itself</em>. The next post covers <em>regression tests</em> — making sure the same bug <em>does not come back</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What Is Testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Double</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
+<li><strong>Test Coverage (current)</strong></li>
+<li>Regression Test (upcoming)</li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://pytest-cov.readthedocs.io/">pytest-cov docs</a></li>
+<li><a href="https://coverage.readthedocs.io/">coverage.py docs</a></li>
+<li><a href="https://martinfowler.com/bliki/TestCoverage.html">Martin Fowler — Test Coverage</a></li>
+<li><a href="https://testing.googleblog.com/2020/08/code-coverage-best-practices.html">Google Testing Blog — Code Coverage Best Practices</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Coverage, pytest-cov, Quality, Metrics</p>
+</body>
+</html>

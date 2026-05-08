@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authentication and Session</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Authentication and Session</h1>
+<blockquote>
+<p>Secure Coding 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When a request asks <em>who are you</em>, how should the <em>code answer</em> without leaking?</p>
+<blockquote>
+<p><em>Authentication confirms identity. The session remembers it. Both leak quietly when you are not looking.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between <em>authentication</em> and <em>authorization</em></li>
+<li>The principles of <em>password hashing</em></li>
+<li><em>Session cookies</em> vs <em>JWT</em> trade-offs</li>
+<li>The role of <em>MFA</em></li>
+<li>A five-step auth flow and five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>When auth leaks, <em>every permission leaks</em>. The most common incidents are <em>weak hashing</em>, <em>session fixation</em>, and <em>secret leakage</em>.</p>
+<blockquote>
+<p><em>Auth is the </em>door<em>. The session is the </em>hallway badge<em>.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Login[&quot;Login&quot;] --&gt; Verify[&quot;Verify password (hash)&quot;]
+    Verify --&gt; Issue[&quot;Issue session&quot;]
+    Issue --&gt; Cookie[&quot;Cookie (HttpOnly, Secure)&quot;]
+    Cookie --&gt; Request[&quot;Subsequent requests&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>AuthN</strong>: <em>who are you</em> (authentication).</li>
+<li><strong>AuthZ</strong>: <em>what may you do</em> (authorization).</li>
+<li><strong>Hash</strong>: turn the password into something <em>not reversible</em>.</li>
+<li><strong>Salt</strong>: makes the same password produce a <em>different hash</em>.</li>
+<li><strong>MFA</strong>: identity confirmed by <em>two or more factors</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: Passwords stored as <em>MD5</em>, session IDs <em>readable from JS</em>. One leak exposes <em>everything</em>.</p>
+<p><strong>After</strong>: Hashing with <em>bcrypt or argon2</em>, cookies marked <em>HttpOnly + Secure + SameSite</em>, login behind a <em>rate limit</em>.</p>
+<h2>Hands-on: A Safe Auth Flow in Five Steps</h2>
+<p><strong>Step 1 — Hash the password</strong></p>
+<pre><code class="language-python">from passlib.hash import argon2
+hashed = argon2.hash(&quot;user-password&quot;)
+ok = argon2.verify(&quot;user-password&quot;, hashed)
+</code></pre>
+<p><strong>Step 2 — Handle login</strong></p>
+<pre><code class="language-python">def login(username, password):
+    user = users.find(username)
+    if not user or not argon2.verify(password, user.hash):
+        raise PermissionError(&quot;invalid credentials&quot;)
+    return create_session(user)
+</code></pre>
+<p><strong>Step 3 — Issue a safe cookie</strong></p>
+<pre><code class="language-python">response.set_cookie(
+    &quot;session&quot;, session_id,
+    httponly=True, secure=True, samesite=&quot;Lax&quot;, max_age=3600,
+)
+</code></pre>
+<p><strong>Step 4 — Logout and revoke</strong></p>
+<pre><code class="language-python">def logout(session_id):
+    sessions.delete(session_id)  # truly revoked on the server
+</code></pre>
+<p><strong>Step 5 — Rate limit and lockout</strong></p>
+<pre><code class="language-python">def can_attempt(user_id):
+    n = redis.incr(f&quot;login:{user_id}&quot;)
+    redis.expire(f&quot;login:{user_id}&quot;, 60)
+    return n &lt;= 5
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A safe hash is <em>intentionally slow</em>.</li>
+<li>Cookie flags work as a <em>single set</em>, not one at a time.</li>
+<li>Sessions must be <em>server-revocable</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Hashing passwords with <em>MD5 or SHA1</em>.</strong> Both are broken.</li>
+<li><strong>Hashing without a <em>salt</em>.</strong> Rainbow tables apply directly.</li>
+<li><strong>Issuing <em>long-lived JWTs</em>.</strong> Revocation is <em>impossible</em>.</li>
+<li><strong>Cookies <em>without HttpOnly</em>.</strong> A single XSS steals the session.</li>
+<li><strong>Login errors that <em>reveal account existence</em>.</strong> Enables <em>enumeration</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams hash with <em>Argon2id</em> or <em>bcrypt</em>, combine <em>short-lived session cookies</em> with a <em>refresh</em> flow, and require <em>MFA</em> for sensitive actions.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>You should never </em>need<em> the password — only the hash.</em></li>
+<li><em>Sessions should be </em>short and revocable<em>.</em></li>
+<li><em>JWTs are convenient but </em>hard to revoke<em> — keep them short.</em></li>
+<li><em>MFA has the </em>best ROI<em> of any control.</em></li>
+<li><em>Every auth path has a </em>rate limit<em>.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Argon2 or bcrypt</em> in use.</li>
+<li>[ ] Cookies set <em>HttpOnly + Secure + SameSite</em>.</li>
+<li>[ ] <em>Logout</em> really invalidates the session.</li>
+<li>[ ] <em>Rate limiting</em> is on the login route.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Measure two different <em>bcrypt cost</em> values.</li>
+<li>Compare JWT vs session cookie in a single <em>trade-off table</em>.</li>
+<li>Write login error messages that prevent <em>account enumeration</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Auth answers <em>who</em>. Next we answer <em>what may they do</em> — <em>authorization and permissions</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/01-what-is-secure-coding.md">What Is Secure Coding?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/secure-coding-101/en/02-input-validation.md">Input Validation</a></li>
+<li><strong>Authentication and Session (current)</strong></li>
+<li>Authorization and Permissions (upcoming)</li>
+<li>Safe Data Storage (upcoming)</li>
+<li>Secret and Key Management (upcoming)</li>
+<li>SQL Injection and Safe ORM Usage (upcoming)</li>
+<li>XSS and CSRF Defense (upcoming)</li>
+<li>Managing Dependency Vulnerabilities (upcoming)</li>
+<li>Safe Logging and Audit (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP Authentication Cheat Sheet</a></li>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">OWASP Session Management Cheat Sheet</a></li>
+<li><a href="https://datatracker.ietf.org/doc/rfc9106/">Argon2 — RFC 9106</a></li>
+<li><a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST 800-63B — Digital Identity</a></li>
+</ul>
+<p class="tags-line">Tags: Authentication, Session, Cookie, JWT, SecureCoding</p>
+</body>
+</html>

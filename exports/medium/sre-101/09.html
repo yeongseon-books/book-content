@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Capacity Planning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Capacity Planning</h1>
+<blockquote>
+<p>SRE 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do you <em>prepare</em> for <em>next year's traffic</em>?</p>
+<blockquote>
+<p><em>Capacity planning</em> is the work of <em>aligning supply with demand</em> using <em>numbers</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>definition</em> of <em>capacity planning</em></li>
+<li><em>Demand forecasting</em></li>
+<li>Sizing <em>headroom</em></li>
+<li><em>Load testing</em></li>
+<li>The <em>cost</em> trade-off</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without a <em>forecast</em>, the next <em>traffic spike</em> takes the service <em>down</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Demand[&quot;forecast demand&quot;] --&gt; Sizing[&quot;sizing&quot;]
+    LoadTest[&quot;load test&quot;] --&gt; Sizing
+    Sizing --&gt; Buy[&quot;provision&quot;]
+    Buy --&gt; Monitor[&quot;monitor&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>demand forecast</strong>: predicted <em>future demand</em>.</li>
+<li><strong>headroom</strong>: <em>spare</em> capacity.</li>
+<li><strong>load test</strong>: a <em>load experiment</em>.</li>
+<li><strong>scaling unit</strong>: a unit of <em>expansion</em>.</li>
+<li><strong>lead time</strong>: how long <em>procurement</em> takes.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: scale up based on <em>last quarter's</em> traffic.</p>
+<p><strong>After</strong>: scale up using a <em>forecast</em> and a <em>load test</em>.</p>
+<h2>Hands-on: Modeling Capacity</h2>
+<p><strong>Step 1 — Trend line</strong></p>
+<pre><code class="language-python">def linear_forecast(history, weeks_ahead):
+    base = history[-1]
+    growth = (history[-1] - history[0]) / max(len(history) - 1, 1)
+    return base + growth * weeks_ahead
+</code></pre>
+<p><strong>Step 2 — Headroom</strong></p>
+<pre><code class="language-python">def headroom(target_util, current_util):
+    return max(0, target_util - current_util)
+</code></pre>
+<p><strong>Step 3 — Load-test result</strong></p>
+<pre><code class="language-python">def max_rps(samples):
+    return max(samples)
+</code></pre>
+<p><strong>Step 4 — Node count</strong></p>
+<pre><code class="language-python">def nodes(predicted_rps, rps_per_node):
+    return -(-predicted_rps // rps_per_node)
+</code></pre>
+<p><strong>Step 5 — Cost</strong></p>
+<pre><code class="language-python">def cost(nodes, monthly_per_node):
+    return nodes * monthly_per_node
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>forecast</em> is <em>data-driven</em>.</li>
+<li><em>Headroom</em> absorbs <em>variability</em>.</li>
+<li><em>Cost</em> is read <em>together</em> with capacity.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Replicating the <em>past</em> with no <em>forecast</em>.</strong></li>
+<li><strong>Zero <em>headroom</em> leaves you exposed.</strong></li>
+<li><strong>Skipping <em>load tests</em>.</strong></li>
+<li><strong>Ignoring <em>lead time</em>.</strong></li>
+<li><strong>Treating <em>cost</em> as a separate problem.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A peak event like <em>Black Friday</em> is <em>modeled</em> months ahead.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Forecasts</em> improve with <em>iteration</em>.</li>
+<li><em>Headroom</em> is <em>insurance</em>.</li>
+<li><em>Load tests</em> belong on a <em>schedule</em>.</li>
+<li><em>Lead time</em> shapes the <em>strategy</em>.</li>
+<li><em>Cost</em> is part of <em>capacity</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <em>Forecast model</em>.</li>
+<li>[ ] <em>Headroom policy</em>.</li>
+<li>[ ] <em>Load-test schedule</em>.</li>
+<li>[ ] <em>Cost analysis</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>headroom</em> in one line.</li>
+<li>Define <em>load test</em> in one line.</li>
+<li>Define <em>lead time</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The final episode is <em>Building Operable Systems</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/01-what-is-sre.md">What is SRE?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/02-reliability.md">Reliability</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/03-sli-slo-sla.md">SLI, SLO, SLA</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/04-error-budget.md">Error Budget</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/05-monitoring.md">Monitoring</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/06-incident-response.md">Incident Response</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/07-postmortem.md">Postmortem</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sre-101/en/08-reducing-toil.md">Reducing Toil</a></li>
+<li><strong>Capacity Planning (current)</strong></li>
+<li>Building Operable Systems (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sre.google/sre-book/software-engineering-in-sre/">Software Engineering in SRE - Google SRE Book</a></li>
+<li><a href="http://highscalability.com/blog/category/capacity-planning">Capacity Planning - High Scalability</a></li>
+<li><a href="https://www.oreilly.com/library/view/the-art-of/9780596518578/">The Art of Capacity Planning - O'Reilly</a></li>
+<li><a href="https://grafana.com/docs/k6/latest/">Load Testing - Grafana k6</a></li>
+</ul>
+<p class="tags-line">Tags: SRE, CapacityPlanning, Forecasting, Performance, Operations</p>
+</body>
+</html>

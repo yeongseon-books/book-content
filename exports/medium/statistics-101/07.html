@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hypothesis Testing</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Hypothesis Testing</h1>
+<blockquote>
+<p>Statistics 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we <em>prove with data</em> that <em>“there is a difference”</em>? How likely is it that the difference <em>appeared by chance</em>?</p>
+<blockquote>
+<p><em>Hypothesis testing turns chance into a number.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of <em>H0</em> and <em>H1</em></li>
+<li><em>t-test</em>, <em>chi-square</em>, <em>proportion</em> tests</li>
+<li><em>Type I / II errors</em> and <em>power</em></li>
+<li>A 5-step hypothesis testing exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>A/B testing, campaign effects, model comparisons</em> — <em>half</em> of all <em>decisions</em> run on hypothesis testing. Asking <em>correctly</em> avoids both <em>overclaiming</em> and <em>underclaiming</em>.</p>
+<blockquote>
+<p><em>Asking the right question matters more than the answer.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    H0[&quot;H0: no difference&quot;] --&gt; Test[&quot;Test Statistic&quot;]
+    H1[&quot;H1: difference&quot;] --&gt; Test
+    Test --&gt; Pvalue[&quot;p-value&quot;]
+    Pvalue --&gt; Decide[&quot;Reject or Not&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>H0 (Null Hypothesis)</strong>: <em>no difference</em>.</li>
+<li><strong>H1 (Alternative)</strong>: <em>there is a difference</em>.</li>
+<li><strong>Significance Level (α)</strong>: tolerated <em>Type I error</em> probability (usually 0.05).</li>
+<li><strong>Power (1-β)</strong>: probability of <em>catching a real effect</em>.</li>
+<li><strong>Type I Error</strong>: <em>rejecting</em> H0 when it is <em>true</em>.</li>
+<li><strong>Type II Error</strong>: <em>failing to reject</em> H0 when it is <em>false</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“Group B's mean is higher. The treatment works!”</em> — Could be chance.</p>
+<p><strong>After</strong>: <em>“B mean +0.4pp (t=3.2, p=0.001) — significant at α=0.05, the treatment shows an effect.”</em></p>
+<h2>Hands-on: 5-step Hypothesis Test</h2>
+<p><strong>Step 1 — State the hypotheses</strong></p>
+<pre><code class="language-text">H0: μ_A = μ_B
+H1: μ_A ≠ μ_B
+α = 0.05
+</code></pre>
+<p><strong>Step 2 — Sample</strong></p>
+<pre><code class="language-python">import numpy as np
+a = np.random.normal(3.2, 1, 1000)
+b = np.random.normal(3.6, 1, 1000)
+</code></pre>
+<p><strong>Step 3 — Test statistic</strong></p>
+<pre><code class="language-python">from scipy.stats import ttest_ind
+stat, p = ttest_ind(a, b, equal_var=False)
+print(&quot;t:&quot;, stat, &quot;p:&quot;, p)
+</code></pre>
+<p><strong>Step 4 — Decide</strong></p>
+<pre><code class="language-python">print(&quot;Reject H0&quot; if p &lt; 0.05 else &quot;Fail to reject H0&quot;)
+</code></pre>
+<p><strong>Step 5 — Effect size</strong></p>
+<pre><code class="language-python">diff = b.mean() - a.mean()
+pooled = np.sqrt((a.var(ddof=1) + b.var(ddof=1)) / 2)
+print(&quot;Cohen's d:&quot;, diff / pooled)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Never decide from the p-value alone</em>.</li>
+<li>Read <em>Cohen's d</em> alongside it for <em>effect size</em>.</li>
+<li><em>equal_var=False</em> selects <em>Welch's t-test</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Concluding <em>“there is an effect”</em> from <em>p &lt; 0.05</em> alone.</strong></li>
+<li><strong>Running multiple tests <em>without correcting for multiplicity</em>.</strong></li>
+<li><strong>Choosing sample size <em>without a power analysis</em>.</strong></li>
+<li><strong>Picking <em>one-sided / two-sided</em> without context.</strong></li>
+<li><strong>Changing H0 / H1 <em>after looking at results</em> (HARKing).</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>A/B test result pages, <em>model performance comparisons</em>, <em>clinical trials</em> — the standard procedure for any <em>comparison decision</em>. <em>Bonferroni</em> and <em>FDR</em> corrections are common companions.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Writes the <em>hypothesis</em> down <em>before</em> seeing the data.</li>
+<li>Reads <em>p-value</em> and <em>effect size</em> together.</li>
+<li>Computes <em>power</em> up front.</li>
+<li><em>Corrects</em> for multiple comparisons.</li>
+<li>Distinguishes <em>“fail to reject”</em> from <em>“H0 is true”</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I write <em>H0 / H1</em> clearly.</li>
+<li>[ ] I decide <em>α</em> and <em>power</em>.</li>
+<li>[ ] I report <em>effect size</em>.</li>
+<li>[ ] I know <em>multiple comparisons</em> corrections.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Simulate the <em>p-value</em> difference between <em>N=30</em> and <em>N=3000</em>.</li>
+<li>Explain <em>Type I</em> vs <em>Type II</em> error with an example.</li>
+<li>Write how you would <em>correct p &lt; 0.05</em> across <em>three campaigns</em> tested at once.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Hypothesis testing is the <em>standard language of decisions</em>. The next episode looks at the <em>relationship between variables</em> — <em>correlation and regression</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/05-estimation.md">Estimation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/06-confidence-interval.md">Confidence Interval</a></li>
+<li><strong>Hypothesis Testing (current)</strong></li>
+<li>Correlation and Regression (upcoming)</li>
+<li>Understanding p-value (upcoming)</li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">scipy.stats — Hypothesis Tests</a></li>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample">Khan Academy — Hypothesis Testing</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Multiple_comparisons_problem">Wikipedia — Multiple Comparisons Problem</a></li>
+<li><a href="https://www.statisticsdonewrong.com/">Statistics Done Wrong (Reinhart)</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, HypothesisTesting, Inference, ABTest, Beginner</p>
+</body>
+</html>

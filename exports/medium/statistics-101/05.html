@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Estimation</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Estimation</h1>
+<blockquote>
+<p>Statistics 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How <em>accurate</em> is it to estimate the <em>population mean</em> with the <em>sample mean</em>? How should we report the <em>error</em>?</p>
+<blockquote>
+<p><em>An estimate is a pair: value and error.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li><em>Point estimation</em> vs <em>interval estimation</em></li>
+<li>The meaning of <em>standard error (SE)</em></li>
+<li><em>Unbiased</em> and <em>consistent</em> estimators</li>
+<li>A 5-step estimation exercise</li>
+<li>Five common mistakes</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Reporting a mean is not the end. <em>How close it is</em> must be reported <em>together</em> so decision makers can read the <em>risk</em>.</p>
+<blockquote>
+<p><em>An estimate always carries error with it.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Sample[&quot;Sample x̄&quot;] --&gt; Estimate[&quot;Point Estimate&quot;]
+    Sample --&gt; SE[&quot;Standard Error&quot;]
+    Estimate --&gt; Interval[&quot;Interval Estimate&quot;]
+    SE --&gt; Interval
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Point Estimate</strong>: a <em>single value</em> estimate of a parameter (x̄).</li>
+<li><strong>Interval Estimate</strong>: a <em>range</em> expected to contain the parameter.</li>
+<li><strong>Standard Error (SE)</strong>: the <em>standard deviation of an estimator</em> — usually s/√n.</li>
+<li><strong>Unbiased Estimator</strong>: its <em>expected value</em> equals the <em>parameter</em>.</li>
+<li><strong>Consistent Estimator</strong>: as the sample grows, it <em>converges to the parameter</em>.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before</strong>: <em>“The sample mean is 100.”</em> — No clue how reliable it is.</p>
+<p><strong>After</strong>: <em>“x̄ = 100, SE = 2.5 (n=64). The 95% CI for the population mean is [95.1, 104.9].”</em></p>
+<h2>Hands-on: 5-step Estimation</h2>
+<p><strong>Step 1 — Prepare a sample</strong></p>
+<pre><code class="language-python">import numpy as np
+sample = np.random.normal(loc=100, scale=20, size=64)
+</code></pre>
+<p><strong>Step 2 — Point estimate</strong></p>
+<pre><code class="language-python">mean = sample.mean()
+print(&quot;x̄:&quot;, mean)
+</code></pre>
+<p><strong>Step 3 — Standard error</strong></p>
+<pre><code class="language-python">se = sample.std(ddof=1) / np.sqrt(len(sample))
+print(&quot;SE:&quot;, se)
+</code></pre>
+<p><strong>Step 4 — 95% interval</strong></p>
+<pre><code class="language-python">lower, upper = mean - 1.96 * se, mean + 1.96 * se
+print(f&quot;95% CI: [{lower:.1f}, {upper:.1f}]&quot;)
+</code></pre>
+<p><strong>Step 5 — Report</strong></p>
+<pre><code class="language-text">x̄ = 99.8 (n=64), SE = 2.4
+95% CI: [95.1, 104.5]
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>SE = s / √n</em> — it shrinks as the <em>sample grows</em>.</li>
+<li>A <em>95% CI</em> is <em>±1.96 × SE</em>.</li>
+<li>An estimate is always reported <em>with its SE</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Confusing <em>standard deviation</em> with <em>SE</em>.</strong></li>
+<li><strong>Believing more <em>N</em> drives error to <em>zero</em>.</strong></li>
+<li><strong>Reporting the <em>point estimate</em> alone.</strong></li>
+<li><strong>Assuming <em>normality</em> on a <em>small sample</em>.</strong> Use the <em>t-distribution</em>.</li>
+<li><strong>Building an <em>unbiased estimator</em> on a <em>biased sample</em>.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Conversion rate in A/B tests, monthly revenue averages, p95 latency — every <em>dashboard number</em> is an <em>estimate</em>. They are usually shown with <em>error bars</em> and <em>confidence intervals</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Always</em> attach <em>SE</em> next to an estimate.</li>
+<li>Set <em>N</em> with <em>statistical power analysis</em>.</li>
+<li>Use the <em>t-distribution</em> on <em>small samples</em>.</li>
+<li><em>Inspect bias</em> first.</li>
+<li><em>Never hide</em> error in a report.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I know <em>point</em> vs <em>interval</em> estimation.</li>
+<li>[ ] I can compute <em>SE</em>.</li>
+<li>[ ] I can build a <em>95% CI</em>.</li>
+<li>[ ] I understand the effect of <em>N</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Compare the <em>SE</em> at <em>N=10</em> and <em>N=1000</em>.</li>
+<li>Explain the meaning of <em>unbiased estimator</em> in one sentence.</li>
+<li>Write the <em>estimation procedure</em> you would use to judge whether <em>μ = 100</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Estimation is the act of <em>writing uncertainty as a number</em>. The next episode looks at the <em>true meaning</em> of a <em>95% CI</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/01-what-is-statistics.md">What Is Statistics?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/02-mean-median-variance.md">Mean, Median, and Variance</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/03-distributions.md">Distributions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/statistics-101/en/04-sample-and-population.md">Sample and Population</a></li>
+<li><strong>Estimation (current)</strong></li>
+<li>Confidence Interval (upcoming)</li>
+<li>Hypothesis Testing (upcoming)</li>
+<li>Correlation and Regression (upcoming)</li>
+<li>Understanding p-value (upcoming)</li>
+<li>Statistical Thinking (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/stats.html">scipy.stats — Statistical Functions</a></li>
+<li><a href="https://www.khanacademy.org/math/statistics-probability/confidence-intervals-one-sample">Khan Academy — Estimation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Standard_error">Wikipedia — Standard Error</a></li>
+<li><a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda35.htm">NIST — Estimation Methods</a></li>
+</ul>
+<p class="tags-line">Tags: Statistics, Estimation, Inference, PointEstimate, Beginner</p>
+</body>
+</html>

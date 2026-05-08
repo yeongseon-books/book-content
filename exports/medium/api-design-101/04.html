@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HTTP Methods and Status Codes</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>HTTP Methods and Status Codes</h1>
+<blockquote>
+<p>API Design 101 series (4/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Which method should you use, and which status code should you return — what is the <em>criterion</em> for those two decisions?</p>
+<blockquote>
+<p><em>Idempotency</em> and the <em>meaning of the result</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The meaning of GET / POST / PUT / PATCH / DELETE</li>
+<li>Safe vs idempotent operations</li>
+<li>The 2xx / 3xx / 4xx / 5xx families</li>
+<li>The twelve status codes you will use most</li>
+<li>A method × status mapping table</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Methods and status codes drive the <em>branching logic</em> on the client. Return the wrong code and the client cannot even tell whether retrying is safe. This pair determines how <em>predictable</em> your API is.</p>
+<blockquote>
+<p>A status code is not a <em>number</em>. It is a <em>contract</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Req[&quot;request&quot;] --&gt; M{&quot;method&quot;}
+    M --&gt;|&quot;GET&quot;| Read[&quot;read&quot;]
+    M --&gt;|&quot;POST&quot;| Create[&quot;create / action&quot;]
+    M --&gt;|&quot;PUT/PATCH&quot;| Update[&quot;update&quot;]
+    M --&gt;|&quot;DELETE&quot;| Remove[&quot;delete&quot;]
+    Read --&gt; S{&quot;status&quot;}
+    Create --&gt; S
+    Update --&gt; S
+    Remove --&gt; S
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Safe</strong>: a call that does not <em>mutate</em> the resource (GET, HEAD).</li>
+<li><strong>Idempotent</strong>: calling many times yields the <em>same result</em> (GET, PUT, DELETE).</li>
+<li><strong>2xx success</strong> / <strong>3xx redirect</strong> / <strong>4xx client error</strong> / <strong>5xx server error</strong>.</li>
+<li><strong>201 Created</strong>: creation + a <code>Location</code> header.</li>
+<li><strong>204 No Content</strong>: success but no body.</li>
+</ul>
+<h2>Before / After</h2>
+<p><strong>Before (intent unclear)</strong></p>
+<pre><code>POST /users/42/update   200 OK   {&quot;ok&quot;: true}
+POST /users/42/delete   200 OK   {&quot;ok&quot;: true}
+</code></pre>
+<p><strong>After (method × status)</strong></p>
+<pre><code>PATCH  /users/42   200 OK
+DELETE /users/42   204 No Content
+</code></pre>
+<p>The status alone tells you what happened.</p>
+<h2>Hands-on: Five Patterns You Will Reuse</h2>
+<p><strong>Step 1 — Read (GET)</strong></p>
+<pre><code class="language-python"># 1_get.py
+from flask import Flask, jsonify, abort
+app = Flask(__name__)
+USERS = {42: {&quot;id&quot;: 42, &quot;name&quot;: &quot;Y&quot;}}
+
+@app.get(&quot;/users/&lt;int:uid&gt;&quot;)
+def get_user(uid):
+    if uid not in USERS: abort(404)
+    return jsonify(USERS[uid])
+</code></pre>
+<p>200 on success, 404 when missing.</p>
+<p><strong>Step 2 — Create (POST)</strong></p>
+<pre><code class="language-python"># 2_post.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+NEXT = {&quot;id&quot;: 43}
+
+@app.post(&quot;/users&quot;)
+def create_user():
+    body = request.get_json()
+    uid = NEXT[&quot;id&quot;]; NEXT[&quot;id&quot;] += 1
+    return jsonify(id=uid, **body), 201, {&quot;Location&quot;: f&quot;/users/{uid}&quot;}
+</code></pre>
+<p>Creation returns <em>201 + Location</em>.</p>
+<p><strong>Step 3 — Partial update (PATCH)</strong></p>
+<pre><code class="language-python"># 3_patch.py
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+USERS = {42: {&quot;id&quot;: 42, &quot;name&quot;: &quot;Y&quot;}}
+
+@app.patch(&quot;/users/&lt;int:uid&gt;&quot;)
+def patch_user(uid):
+    USERS[uid].update(request.get_json())
+    return jsonify(USERS[uid])
+</code></pre>
+<p>PATCH is a partial change; PUT replaces the whole resource.</p>
+<p><strong>Step 4 — Delete</strong></p>
+<pre><code class="language-python"># 4_delete.py
+from flask import Flask
+app = Flask(__name__)
+USERS = {42: {}}
+
+@app.delete(&quot;/users/&lt;int:uid&gt;&quot;)
+def delete_user(uid):
+    USERS.pop(uid, None)
+    return (&quot;&quot;, 204)
+</code></pre>
+<p>Success without a body — 204.</p>
+<p><strong>Step 5 — Validation failure and conflict</strong></p>
+<pre><code class="language-python"># 5_errors.py
+from flask import Flask, request, jsonify, abort
+app = Flask(__name__)
+
+@app.post(&quot;/users&quot;)
+def create():
+    body = request.get_json() or {}
+    if &quot;name&quot; not in body: abort(400)        # validation
+    if body[&quot;name&quot;] == &quot;exists&quot;: abort(409)  # conflict
+    return jsonify(ok=True), 201
+</code></pre>
+<p>Validation failure is 400; resource conflict is 409.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The same action returns a different status when the <em>result</em> differs.</li>
+<li>Creation always carries a <code>Location</code> header.</li>
+<li>A successful empty response is 204, not 200.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>All-200 success.</strong> Creation, deletion, update — all 200, no information.</li>
+<li><strong>Validation failures returned as 500.</strong> Clients think a retry might fix it.</li>
+<li><strong>DELETE with a body.</strong> Breaks idempotency and cacheability.</li>
+<li><strong>Using PATCH to fully replace.</strong> Wrecks the meaning of PUT.</li>
+<li><strong>Confusing 404 with 401 / 403.</strong> Leaks security info or hides auth bugs.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Look at GitHub's responses — method × status reads almost like a textbook: 201 on create, 403 on missing scope, 429 on rate limit. Internally, memorizing the <em>twelve most common codes</em> covers ninety-five percent of situations.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Make <em>retryable</em> operations idempotent (PUT / DELETE / GET).</li>
+<li>Sketch the client's <em>branching</em> first, then map status codes onto it.</li>
+<li><code>4xx</code> = the <em>user</em> can fix it; <code>5xx</code> = the <em>server</em> must fix it.</li>
+<li>Pick from standard codes; resist inventing new ones.</li>
+<li>Put the <em>detailed reason</em> in the body, in a consistent shape.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does creation return 201 + Location?</li>
+<li>[ ] Does successful deletion return 204?</li>
+<li>[ ] Are validation failures 400 / 422?</li>
+<li>[ ] Is missing auth 401 and forbidden 403?</li>
+<li>[ ] Are PATCH and PUT used with their distinct meanings?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick one endpoint and list five plausible 4xx codes for it.</li>
+<li>Add a <em>duplicate username</em> check to Step 2 and return 409.</li>
+<li>Find three non-idempotent endpoints in your code and outline how to make them idempotent.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Methods and status codes are a pair. The next episode looks at the data flowing between them — request and response schemas.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/01-what-is-an-api.md">What Is an API?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/02-rest-basics.md">REST Basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/api-design-101/en/03-resource-design.md">Resource Design</a></li>
+<li><strong>HTTP Methods and Status Codes (current)</strong></li>
+<li>Request and Response Schemas (upcoming)</li>
+<li>Pagination and Filtering (upcoming)</li>
+<li>Designing Error Responses (upcoming)</li>
+<li>OpenAPI and Swagger (upcoming)</li>
+<li>API Versioning (upcoming)</li>
+<li>Writing Good API Documentation (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">HTTP Methods (MDN)</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">HTTP Status Codes (MDN)</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc7231">RFC 7231 — HTTP/1.1 Semantics</a></li>
+<li><a href="https://stripe.com/blog/idempotency">Idempotency in REST APIs (Stripe blog)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, APIDesign, HTTP, Methods, StatusCodes, Backend</p>
+</body>
+</html>

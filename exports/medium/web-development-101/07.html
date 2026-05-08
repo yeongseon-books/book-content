@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connecting to a Database</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Connecting to a Database</h1>
+<blockquote>
+<p>Web Development 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How does a web server hold onto data <em>forever</em>?</p>
+<blockquote>
+<p>One line of SQL plus a <em>connection</em> — and a <em>pool</em> that reuses those connections.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why we need a database in the first place</li>
+<li>The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)</li>
+<li>What an ORM is and when to use it</li>
+<li>Connections and connection pools</li>
+<li>The meaning of a transaction</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Almost all <em>state</em> in a web app lives in the database. Mishandle the connection and a server falls over with <em>dozens</em> of users. Learn it once and it pays back for years.</p>
+<blockquote>
+<p>The database is <em>the keeper of truth</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    App[&quot;Web app&quot;] --&gt;|&quot;SQL&quot;| Pool[&quot;Connection pool&quot;]
+    Pool --&gt; DB[(&quot;Database&quot;)]
+    DB --&gt; Pool
+    Pool --&gt; App
+</code></pre>
+<p>Connections are <em>expensive</em>, so a pool reuses them.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SQL</strong>: the language for talking to a relational DB.</li>
+<li><strong>Schema</strong>: the <em>shape</em> of a table (columns and types).</li>
+<li><strong>ORM</strong>: a tool that maps SQL to objects.</li>
+<li><strong>Connection</strong>: the channel between app and DB.</li>
+<li><strong>Transaction</strong>: a <em>single unit</em> that bundles multiple writes.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (write to a file)</strong></p>
+<pre><code class="language-python">open(&quot;users.txt&quot;, &quot;a&quot;).write(&quot;alice\n&quot;)  # races break it
+</code></pre>
+<p><strong>After (write to a DB)</strong></p>
+<pre><code class="language-python">import sqlite3
+con = sqlite3.connect(&quot;app.db&quot;)
+con.execute(&quot;INSERT INTO users(name) VALUES (?)&quot;, (&quot;alice&quot;,))
+con.commit()
+</code></pre>
+<p>The DB owns <em>concurrency</em> and <em>durability</em>.</p>
+<h2>Hands-on: Drive a Small DB in 5 Steps</h2>
+<p><strong>Step 1 — Create a table</strong></p>
+<pre><code class="language-python"># 1_init.py
+import sqlite3
+con = sqlite3.connect(&quot;app.db&quot;)
+con.execute(&quot;&quot;&quot;
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE
+)
+&quot;&quot;&quot;)
+con.commit()
+</code></pre>
+<p><strong>Step 2 — Insert and read</strong></p>
+<pre><code class="language-python"># 2_crud.py
+import sqlite3
+con = sqlite3.connect(&quot;app.db&quot;)
+con.execute(&quot;INSERT INTO users(name, email) VALUES (?, ?)&quot;, (&quot;alice&quot;, &quot;a@x.com&quot;))
+con.commit()
+for row in con.execute(&quot;SELECT id, name FROM users&quot;):
+    print(row)
+</code></pre>
+<p><strong>Step 3 — Parameter binding (block SQL injection)</strong></p>
+<pre><code class="language-python">name = &quot;alice'; DROP TABLE users; --&quot;  # attacker input
+con.execute(&quot;SELECT * FROM users WHERE name = ?&quot;, (name,))  # safe
+</code></pre>
+<p>Building SQL via f-strings is <em>fatal</em>.</p>
+<p><strong>Step 4 — ORM (SQLAlchemy)</strong></p>
+<pre><code class="language-python"># 4_orm.py
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+Base = declarative_base()
+class User(Base):
+    __tablename__ = &quot;users&quot;
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+
+engine = create_engine(&quot;sqlite:///app.db&quot;)
+Base.metadata.create_all(engine)
+S = sessionmaker(bind=engine)
+s = S()
+s.add(User(name=&quot;bob&quot;))
+s.commit()
+</code></pre>
+<p><strong>Step 5 — Transaction</strong></p>
+<pre><code class="language-python"># 5_tx.py
+import sqlite3
+con = sqlite3.connect(&quot;app.db&quot;)
+try:
+    con.execute(&quot;BEGIN&quot;)
+    con.execute(&quot;UPDATE users SET name='ALICE' WHERE id=1&quot;)
+    con.execute(&quot;INSERT INTO users(name) VALUES ('charlie')&quot;)
+    con.commit()
+except Exception:
+    con.rollback()
+    raise
+</code></pre>
+<p>Either <em>all</em> commits, or <em>all</em> roll back.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>SQL without parameter binding (<code>?</code>) <em>will</em> break someday.</li>
+<li>ORMs are convenient but you must occasionally read the <em>generated SQL</em>.</li>
+<li>Transactions wrap <em>business units</em>, not single statements.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stitching SQL with strings.</strong> SQL injection.</li>
+<li><strong>Opening a new connection per request.</strong> No pool.</li>
+<li><strong>Big SELECTs without indexes.</strong> Slow as molasses.</li>
+<li><strong>Two writes without a transaction.</strong> Half-applied disasters.</li>
+<li><strong>Swallowing errors.</strong> Data integrity slips.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most web backends pair PostgreSQL or MySQL with an ORM. Under traffic, <em>read replicas</em> and <em>Redis caches</em> show up. Every tool ultimately rests on <em>connection pools and transactions</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Sketch the <em>schema first</em>.</li>
+<li>Add indexes by <em>query pattern</em>.</li>
+<li>Make transaction boundaries <em>explicit</em>.</li>
+<li>Always suspect N+1 queries.</li>
+<li>Use a <em>migration tool</em> to track schema changes.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You know the four basic SQL operations.</li>
+<li>[ ] You always use parameter binding.</li>
+<li>[ ] You can explain what a connection pool is.</li>
+<li>[ ] You can read code that uses transactions.</li>
+<li>[ ] You can log the SQL an ORM generates.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Build a small <code>posts</code> table in SQLite with full CRUD.</li>
+<li>Rewrite the same queries with an ORM and log the actual SQL.</li>
+<li>Trigger an exception inside a transaction and confirm rollback.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The DB is <em>the keeper of truth</em>. Next, we ship our app to the world — deployment.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/01-how-the-web-works.md">How the Web Works</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/02-html-css-javascript.md">HTML, CSS, and JavaScript</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/03-browser-and-dom.md">The Browser and the DOM</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/04-http-and-api.md">HTTP and APIs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/05-frontend-and-backend.md">Frontend and Backend</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/web-development-101/en/06-auth-and-sessions.md">Authentication and Sessions</a></li>
+<li><strong>Connecting to a Database (current)</strong></li>
+<li>Deployment (upcoming)</li>
+<li>Performance and Caching (upcoming)</li>
+<li>Building a Small Web App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/SQL">SQL (MDN glossary)</a></li>
+<li><a href="https://docs.python.org/3/library/sqlite3.html">sqlite3 (Python docs)</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/orm/quickstart.html">SQLAlchemy ORM tutorial</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Connection_pool">Database connection pool (Wikipedia)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, WebDevelopment, Database, SQL, ORM, Backend</p>
+</body>
+</html>

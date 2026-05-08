@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Heaps</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Heaps</h1>
+<blockquote>
+<p>Data Structures 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When you constantly need to pull out the highest-priority task, which data structure should you reach for? Keeping the data sorted makes inserts slow; leaving it unordered makes pops slow.</p>
+<blockquote>
+<p>A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the <code>heapq</code> module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The heap invariant and its relationship to a complete binary tree</li>
+<li>How to represent a heap inside a flat array</li>
+<li>How insert (sift up) and delete (sift down) work</li>
+<li>How to use Python's <code>heapq</code> and where it falls short</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulation, and external sorting. They show up in every system that has to keep picking the next smallest (or largest) item to handle. If a BST is the general-purpose sorted tree, the heap is a specialised structure that handles only the two extremes.</p>
+<blockquote>
+<p>Heap = the de facto implementation of a priority queue.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.</p>
+</blockquote>
+<pre><code class="language-text">Min-heap
+        1            index: 0  1  2  3  4  5  6
+       / \           array: [1, 3, 2, 5, 4, 6, 7]
+      3   2
+     / \ / \         parent(i)      = (i - 1) // 2
+    5  4 6  7        left_child(i)  = 2*i + 1
+                     right_child(i) = 2*i + 2
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Min-heap</strong><br>
+- Meaning: Parent ≤ children</p>
+<p><strong>Max-heap</strong><br>
+- Meaning: Parent ≥ children</p>
+<p><strong>Complete binary tree</strong><br>
+- Meaning: A binary tree where every level except possibly the last is filled</p>
+<p><strong>Sift up</strong><br>
+- Meaning: Walk a new element upward, swapping with its parent until the invariant holds</p>
+<p><strong>Sift down</strong><br>
+- Meaning: Walk an element at the root downward, swapping with the smaller child until the invariant holds</p>
+<h2>Before / After</h2>
+<p><strong>Before — sort on every insert:</strong></p>
+<pre><code class="language-python">events = []
+def add(event):
+    events.append(event)
+    events.sort()
+
+def pop_next():
+    return events.pop(0)
+# Insert O(n log n), pop O(n)
+</code></pre>
+<p><strong>After — use a heap:</strong></p>
+<pre><code class="language-python">import heapq
+events = []
+def add(event):
+    heapq.heappush(events, event)
+
+def pop_next():
+    return heapq.heappop(events)
+# Insert and pop are both O(log n)
+</code></pre>
+<h2>Hands-On: Step by Step</h2>
+<p><strong>Step 1: Implement a heap by hand (sift up and down)</strong></p>
+<pre><code class="language-python">class MinHeap:
+    def __init__(self):
+        self._data = []
+
+    def push(self, value):
+        self._data.append(value)
+        self._sift_up(len(self._data) - 1)
+
+    def pop(self):
+        if not self._data:
+            raise IndexError(&quot;pop from empty heap&quot;)
+        top = self._data[0]
+        last = self._data.pop()
+        if self._data:
+            self._data[0] = last
+            self._sift_down(0)
+        return top
+
+    def _sift_up(self, i):
+        while i &gt; 0:
+            parent = (i - 1) // 2
+            if self._data[i] &lt; self._data[parent]:
+                self._data[i], self._data[parent] = self._data[parent], self._data[i]
+                i = parent
+            else:
+                break
+
+    def _sift_down(self, i):
+        n = len(self._data)
+        while True:
+            left, right = 2 * i + 1, 2 * i + 2
+            smallest = i
+            if left &lt; n and self._data[left] &lt; self._data[smallest]:
+                smallest = left
+            if right &lt; n and self._data[right] &lt; self._data[smallest]:
+                smallest = right
+            if smallest == i:
+                break
+            self._data[i], self._data[smallest] = self._data[smallest], self._data[i]
+            i = smallest
+
+h = MinHeap()
+for v in [5, 3, 8, 1, 9, 2]:
+    h.push(v)
+
+result = []
+while h._data:
+    result.append(h.pop())
+print(result)   # [1, 2, 3, 5, 8, 9]
+</code></pre>
+<p>Push appends to the end and sifts up. Pop moves the last element to the root and sifts down. Both walk only the height of the tree, so both are O(log n).</p>
+<p><strong>Step 2: Python's heapq module</strong></p>
+<pre><code class="language-python">import heapq
+
+heap = []
+for v in [5, 3, 8, 1, 9, 2]:
+    heapq.heappush(heap, v)
+
+print(heap)                      # internal array (the tree representation)
+print(heapq.heappop(heap))       # 1
+print(heapq.heappop(heap))       # 2
+
+# k smallest / largest
+import heapq
+data = [5, 3, 8, 1, 9, 2, 7]
+print(heapq.nsmallest(3, data))   # [1, 2, 3]
+print(heapq.nlargest(3, data))    # [9, 8, 7]
+</code></pre>
+<p><code>heapq</code> only ships a min-heap. If you need a max-heap, negate the values when you insert and again when you pop.</p>
+<p><strong>Step 3: Use it as a priority queue</strong></p>
+<pre><code class="language-python">import heapq
+
+# Store (priority, task) tuples
+tasks = []
+heapq.heappush(tasks, (3, &quot;report&quot;))
+heapq.heappush(tasks, (1, &quot;alert&quot;))
+heapq.heappush(tasks, (2, &quot;email&quot;))
+
+while tasks:
+    priority, task = heapq.heappop(tasks)
+    print(f&quot;[{priority}] {task}&quot;)
+
+# [1] alert
+# [2] email
+# [3] report
+</code></pre>
+<p>If you need to break ties at the same priority, switch to <code>(priority, counter, task)</code> so the comparison stays stable.</p>
+<p><strong>Step 4: heapify — turn an array into a heap in one pass</strong></p>
+<pre><code class="language-python">import heapq
+
+data = [5, 3, 8, 1, 9, 2, 7]
+heapq.heapify(data)   # O(n) — sift down from the leaves backward
+print(data)            # [1, 3, 2, 5, 9, 8, 7]
+</code></pre>
+<p>Pushing n items into an empty heap costs O(n log n), but heapifying once costs O(n). It is the better choice when you have a large batch of data to seed the heap.</p>
+<p><strong>Step 5: Heap sort</strong></p>
+<pre><code class="language-python">import heapq
+
+def heap_sort(data):
+    h = data[:]
+    heapq.heapify(h)
+    return [heapq.heappop(h) for _ in range(len(h))]
+
+print(heap_sort([5, 3, 8, 1, 9, 2, 7]))
+# [1, 2, 3, 5, 7, 8, 9]
+</code></pre>
+<p>Heap sort runs in O(n log n) overall. On average it is slower than quicksort, but it guarantees O(n log n) in the worst case.</p>
+<h2>Notable Points</h2>
+<ul>
+<li>A complete binary tree maps to a contiguous array with no gaps, which is great for memory</li>
+<li>A heap is not a "sorted data structure"; it only guarantees a partial order</li>
+<li>The fact that heapify runs in O(n) is one of the heap's most elegant properties</li>
+<li>Where a BST sorts every key, a heap manages only the two extremes</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>Treating a heap as a sorted structure</strong><br>
+- Problem: Indexing returns the wrong value<br>
+- Fix: Remember "only the smallest is fast"</p>
+<p><strong>Using <code>heapq</code> for a max-heap directly</strong><br>
+- Problem: <code>heapq</code> is a min-heap<br>
+- Fix: Negate values or wrap them</p>
+<p><strong>Forgetting to break ties</strong><br>
+- Problem: Comparison fails on incomparable objects<br>
+- Fix: Add a counter to the tuple</p>
+<p><strong>Using a heap as a BST replacement</strong><br>
+- Problem: Arbitrary search is O(n)<br>
+- Fix: Use a BST or dict if search dominates</p>
+<p><strong>Skipping heapify and pushing in a loop</strong><br>
+- Problem: O(n log n) instead of O(n)<br>
+- Fix: Call heapify once on the array</p>
+<h2>How This Is Used in Practice</h2>
+<ul>
+<li>Dijkstra's shortest-path algorithm is impractical without a priority queue</li>
+<li>OS schedulers and task queues use a priority heap to pick the next job</li>
+<li>Event-driven simulations process events in time order via a heap</li>
+<li>Some memory allocators manage free blocks with a heap keyed by size</li>
+<li>A* pathfinding, Huffman coding, and external merge sort all lean on heaps</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer reaches for a heap the moment the pattern is "the next smallest (or largest) thing to process". They do not pull the heavier tool of full sorting. They also check the subtle requirements up front: tie-breaking, stability, mutable priorities. If priorities can change, a stock heap is not enough; you need an indexed heap variant.</p>
+<p>A senior also asks: "Do we need k items or all of them?" If you only need the top 10 out of one million, <code>heapq.nsmallest</code> is dramatically faster than sorting the whole list. The difference comes from looking at the data structure and the algorithm together.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you state the heap invariant and what "complete binary tree" means</li>
+<li>[ ] Do you know the parent and child index formulas</li>
+<li>[ ] Do you understand sift up, sift down, and their complexities</li>
+<li>[ ] Do you know that <code>heapq</code> only provides a min-heap</li>
+<li>[ ] Can you tell when to pick a heap and when to pick a BST</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Generalise the <code>MinHeap</code> above so it accepts a comparison function. The same code should then implement both a min-heap and a max-heap.</p>
+</li>
+<li>
+<p>Use two heaps (a min-heap and a max-heap) to maintain the median of a stream in O(log n) per update.</p>
+</li>
+<li>
+<p>Find the 100 largest values in an array of one million integers using three approaches: (a) sort then slice, (b) <code>heapq.nlargest</code>, (c) maintain a min-heap of size 100 manually. Compare the timings.</p>
+</li>
+</ol>
+<h2>Wrap-Up and Next Steps</h2>
+<p>A heap is a complete binary tree specialised for handling the two extremes quickly, and it is the standard implementation of a priority queue. It packs into an array with no gaps, both insert and delete run in O(log n), and heapify runs in an elegant O(n). Arbitrary key search is O(n), so its purpose is clearly different from a BST or a dict. It powers task scheduling, Dijkstra's algorithm, event simulation, and any other system that has to decide "what's next" quickly.</p>
+<p>The next article moves on to graphs, the most general way to represent relationships in data. A tree is a special case of a graph, and you will study the standard ways to represent graphs together with the basic algorithms.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/01-what-are-data-structures.md">What Are Data Structures?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/02-arrays-and-dynamic-arrays.md">Arrays and Dynamic Arrays</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/03-linked-lists.md">Linked Lists</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/04-stacks-and-queues.md">Stacks and Queues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/05-hash-tables.md">Hash Tables</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/06-trees.md">Trees</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-structures-101/en/07-binary-search-trees.md">Binary Search Trees</a></li>
+<li><strong>Heaps (current)</strong></li>
+<li>Graphs (upcoming)</li>
+<li>Choosing Data Structures (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://opendatastructures.org/ods-python/10_Heaps.html">Open Data Structures — Heaps</a></li>
+<li><a href="https://docs.python.org/3/library/heapq.html">Python <code>heapq</code> documentation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Binary_heap">Wikipedia — Binary Heap</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Priority_queue">Wikipedia — Priority Queue</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Data Structures, Heap, Priority Queue, heapq, Sorting</p>
+</body>
+</html>

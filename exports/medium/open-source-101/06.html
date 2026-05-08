@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Release and Versioning</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Release and Versioning</h1>
+<blockquote>
+<p>Open Source 101 series (6/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When and how should you bump a version so users stay <em>safe</em>?</p>
+<blockquote>
+<p>Use <em>SemVer</em> together with a <em>changelog</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>three numbers</em> of SemVer</li>
+<li><em>Pre-release</em> tags</li>
+<li>Writing a <em>changelog</em></li>
+<li>Using <em>git tag</em></li>
+<li>An <em>automated release</em> workflow</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>A wobbling version number breaks the ecosystem around you.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    M[MAJOR] --&gt; A[breaking]
+    N[MINOR] --&gt; B[feature]
+    P[PATCH] --&gt; C[fix]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>SemVer</strong>: MAJOR.MINOR.PATCH.</li>
+<li><strong>breaking</strong>: A backward-incompatible change.</li>
+<li><strong>changelog</strong>: Record of changes.</li>
+<li><strong>tag</strong>: Immutable reference.</li>
+<li><strong>pre-release</strong>: Trial version.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: "I tag versions by date."</p>
+<p><strong>After</strong>: "I use SemVer to communicate scope of impact."</p>
+<h2>Hands-on: A Release Procedure</h2>
+<p><strong>Step 1 — Decide the Version</strong></p>
+<pre><code class="language-text">1.2.3 → 1.3.0 (new feature)
+1.2.3 → 2.0.0 (breaking change)
+1.2.3 → 1.2.4 (bug fix)
+</code></pre>
+<p><strong>Step 2 — Update the Changelog</strong></p>
+<pre><code class="language-markdown">## [1.3.0] - 2026-05-04
+### Added
+- new --json flag
+</code></pre>
+<p><strong>Step 3 — Create the Tag</strong></p>
+<pre><code class="language-bash">git tag -a v1.3.0 -m &quot;v1.3.0&quot;
+git push origin v1.3.0
+</code></pre>
+<p><strong>Step 4 — Publish Release Notes</strong></p>
+<pre><code class="language-bash">gh release create v1.3.0 --notes-file CHANGELOG.md
+</code></pre>
+<p><strong>Step 5 — Automate</strong></p>
+<pre><code class="language-yaml">on:
+  push:
+    tags: ['v*']
+jobs:
+  release:
+    runs-on: ubuntu-latest
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>MAJOR is a warning.</li>
+<li>MINOR is additive.</li>
+<li>PATCH is a fix.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Shipping a breaking change as MINOR.</strong></li>
+<li><strong>No changelog.</strong></li>
+<li><strong>Tag and version mismatched.</strong></li>
+<li><strong>Skipping pre-release labels.</strong></li>
+<li><strong>Empty release notes.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Internal libraries at companies also use SemVer to manage dependencies.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>SemVer is a contract.</li>
+<li>The changelog is memory.</li>
+<li>Tags make builds reproducible.</li>
+<li>MAJOR rarely.</li>
+<li>PATCH often.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Version chosen.</li>
+<li>[ ] Changelog updated.</li>
+<li>[ ] Tag pushed.</li>
+<li>[ ] Release published.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>One line: example of a breaking change.</li>
+<li>One line: example of a pre-release tag.</li>
+<li>One line: difference between a tag and a branch.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post covers <em>Community Management</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/03-reading-issues.md">Reading Issues</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/04-creating-pull-requests.md">Creating Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/05-good-readme.md">A Good README</a></li>
+<li><strong>Release and Versioning (current)</strong></li>
+<li>Community Management (upcoming)</li>
+<li>The Maintainer Role (upcoming)</li>
+<li>An Open Source Portfolio (upcoming)</li>
+<li>My First Open Source Project (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://semver.org/">Semantic Versioning</a></li>
+<li><a href="https://keepachangelog.com/">Keep a Changelog</a></li>
+<li><a href="https://docs.github.com/en/repositories/releasing-projects-on-github">GitHub Releases</a></li>
+<li><a href="https://git-scm.com/docs/git-tag">git tag docs</a></li>
+</ul>
+<p class="tags-line">Tags: OpenSource, SemVer, Release, Changelog, Beginner</p>
+</body>
+</html>

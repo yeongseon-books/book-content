@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Regression Test</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Regression Test</h1>
+<blockquote>
+<p>Testing 101 series (8/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does a bug you fixed <em>six months ago</em> keep coming back?</p>
+<blockquote>
+<p>Regression tests <em>freeze the fix into code</em>. If it ever breaks again, the alarm rings <em>immediately</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The definition and purpose of <em>regression tests</em></li>
+<li>The <em>bug -&gt; test -&gt; fix</em> workflow</li>
+<li><em>Repro tests</em> and <em>minimum reproduction cases</em></li>
+<li>How to manage the <em>maintenance cost</em> of regression tests</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Software has <em>no memory</em>. A bug fixed once can be <em>reintroduced by the next contributor</em>. Regression tests are <em>the team's memory</em>.</p>
+<blockquote>
+<p>A team without regression tests fixes <em>the same bug forever</em>.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Bug[&quot;Bug report&quot;] --&gt; Repro[&quot;Repro test (failing)&quot;]
+    Repro --&gt; Fix[&quot;Code fix&quot;]
+    Fix --&gt; Pass[&quot;Test passes&quot;]
+    Pass --&gt; CI[&quot;Locked into CI&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Regression</strong>: a <em>previously fixed behavior</em> that <em>breaks again</em>.</li>
+<li><strong>Repro test</strong>: the <em>minimum test</em> that <em>reproduces</em> the bug.</li>
+<li><strong>Bug ID</strong>: the <em>unique identifier</em> in your issue tracker (e.g., PROJ-1234).</li>
+<li><strong>Golden file</strong>: a file that <em>freezes the expected output</em> for comparison.</li>
+<li><strong>Snapshot test</strong>: a test that compares the <em>entire output snapshot</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (verbal promise)</strong></p>
+<pre><code class="language-text">- &quot;I fixed that bug&quot; -&gt; merged
+- Six months later the *same bug* shows up again
+</code></pre>
+<p><strong>After (regression test added)</strong></p>
+<pre><code class="language-python">def test_regression_PROJ_1234_negative_total():
+    cart = Cart(); cart.add(Item(price=-1))
+    with pytest.raises(ValueError):
+        cart.total()
+</code></pre>
+<h2>Hands-on: Five Steps to a Regression Test</h2>
+<p><strong>Step 1 - Reproduce the bug</strong></p>
+<pre><code class="language-python"># tests/test_regression.py
+def test_repro_negative_price_breaks_total():
+    cart = Cart(); cart.add(Item(price=-1))
+    assert cart.total() &gt;= 0   # currently *fails*
+</code></pre>
+<p><strong>Step 2 - See the red bar</strong></p>
+<pre><code class="language-bash">pytest tests/test_regression.py -v
+# FAILED ... assert -1 &gt;= 0
+</code></pre>
+<p><strong>Step 3 - Fix it</strong></p>
+<pre><code class="language-python">class Cart:
+    def add(self, item):
+        if item.price &lt; 0:
+            raise ValueError(&quot;price must be &gt;= 0&quot;)
+        self._items.append(item)
+</code></pre>
+<p><strong>Step 4 - Update the test (capture the intent)</strong></p>
+<pre><code class="language-python">def test_regression_PROJ_1234_negative_price_rejected():
+    &quot;&quot;&quot;Adding an item with a negative price raises ValueError. (PROJ-1234)&quot;&quot;&quot;
+    cart = Cart()
+    with pytest.raises(ValueError):
+        cart.add(Item(price=-1))
+</code></pre>
+<p><strong>Step 5 - Lock it into CI</strong></p>
+<pre><code class="language-bash">git add tests/test_regression.py src/cart.py
+git commit -m &quot;fix(cart): reject negative price (PROJ-1234)&quot;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The test <em>name</em> embeds the <em>bug ID</em> so it stays <em>traceable</em>.</li>
+<li>Regression tests are <em>small and clear</em>. Focus on <em>one reproduction</em> only.</li>
+<li>You add them <em>based on recurrence risk</em>, not as a blanket rule.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Fixing the bug but <em>not writing the test</em>.</strong> This is <em>how regressions begin</em>.</li>
+<li><strong>A repro test that is <em>too large</em>.</strong> Shrink it to the <em>minimum</em> case.</li>
+<li><strong>Regression tests that <em>only accumulate</em> and are never pruned.</strong> Maintenance cost explodes.</li>
+<li><strong>Refreshing snapshots <em>without thinking</em>.</strong> If you do not check <em>why it changed</em>, the snapshot is <em>meaningless paperwork</em>.</li>
+<li><strong>Pushing regression tests into <em>slow E2E suites</em>.</strong> Keep them at the <em>lowest layer</em> possible.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most teams enforce the <em>issue -&gt; repro test -&gt; fix</em> flow through their <em>default PR template</em>. When the <em>same module produces repeated regressions</em>, they treat it as a <em>signal of a design problem</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Every <em>bug-fix PR</em> must include a <em>regression test</em>.</li>
+<li>Keep regression tests as <em>unit tests</em> whenever possible.</li>
+<li><em>Repeated regressions</em> mean <em>refactoring is overdue</em>.</li>
+<li>Snapshots are refreshed <em>only after the reason is documented</em>.</li>
+<li>A <em>bug ID</em> is a <em>note left in the code</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] My recent bug fixes have <em>regression tests</em>.</li>
+<li>[ ] Test names include the <em>issue ID and reason</em>.</li>
+<li>[ ] Repro tests are <em>small and deterministic</em>.</li>
+<li>[ ] Regression tests live at the <em>lowest possible level</em>.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Pick <em>one bug</em> you fixed recently and add a regression test.</li>
+<li>Run that test against the <em>pre-fix code</em> and confirm it <em>fails</em>.</li>
+<li>If the same module has <em>three or more past regressions</em>, write down what <em>refactoring</em> it deserves.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Regression tests are <em>the team's memory</em>. In the next post we move all of these tests onto <em>CI that runs them automatically</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/01-what-is-testing.md">What is testing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/02-unit-test.md">Unit Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/03-integration-test.md">Integration Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/04-e2e-test.md">E2E Test</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/05-test-double.md">Test Doubles</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/06-mock-and-stub.md">Mock and Stub</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/testing-101/en/07-test-coverage.md">Test Coverage</a></li>
+<li><strong>Regression Test (current)</strong></li>
+<li>Running Tests in CI (upcoming)</li>
+<li>Building a Test Strategy (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — Regression Testing</a></li>
+<li><a href="https://docs.pytest.org/">pytest docs</a></li>
+<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
+<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer — Bug fixing chapter</a></li>
+</ul>
+<p class="tags-line">Tags: Testing, Regression, Bugfix, Quality, pytest</p>
+</body>
+</html>

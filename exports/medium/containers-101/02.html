@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Image and Layer</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Image and Layer</h1>
+<blockquote>
+<p>Containers 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why are images split into <em>layers</em> in the first place?</p>
+<blockquote>
+<p><em>Layered images give you reuse, caching, and small transfers all at once — they are the central design of containers.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The physical structure of an image</li>
+<li>The job of a layer</li>
+<li>How OverlayFS stacks them</li>
+<li>Layer caching for fast builds</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Base[&quot;base layer (os)&quot;] --&gt; Lib[&quot;lib layer&quot;]
+    Lib --&gt; Code[&quot;app code&quot;]
+    Code --&gt; Container[&quot;container (rw layer)&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Layer</strong>: a read-only bundle of changes.</li>
+<li><strong>Base image</strong>: the OS or runtime layer at the bottom.</li>
+<li><strong>OverlayFS</strong>: a filesystem that stacks layers visually.</li>
+<li><strong>Manifest</strong>: the index metadata of an image.</li>
+<li><strong>Digest</strong>: the content hash of an image.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: a single source change rebuilds the whole image.</p>
+<p><strong>After</strong>: only the upper layers rebuild — seconds, not minutes.</p>
+<h2>Hands-on: Look Inside an Image</h2>
+<p><strong>Step 1 — Pull and inspect</strong></p>
+<pre><code class="language-python">import subprocess, json
+
+def inspect(image):
+    res = subprocess.run(
+        [&quot;docker&quot;, &quot;image&quot;, &quot;inspect&quot;, image],
+        capture_output=True, text=True, check=True,
+    )
+    return json.loads(res.stdout)
+</code></pre>
+<p><strong>Step 2 — History</strong></p>
+<pre><code class="language-python">def history(image):
+    res = subprocess.run(
+        [&quot;docker&quot;, &quot;history&quot;, &quot;--no-trunc&quot;, image],
+        capture_output=True, text=True, check=True,
+    )
+    return res.stdout
+</code></pre>
+<p><strong>Step 3 — Layer hashes</strong></p>
+<pre><code class="language-python">def layer_sizes(image):
+    data = inspect(image)
+    return [layer for layer in data[0][&quot;RootFS&quot;][&quot;Layers&quot;]]
+</code></pre>
+<p><strong>Step 4 — Digest</strong></p>
+<pre><code class="language-python">def digest(image):
+    return inspect(image)[0][&quot;Id&quot;]
+</code></pre>
+<p><strong>Step 5 — Compare two builds</strong></p>
+<pre><code class="language-python">def diff(a, b):
+    return set(layer_sizes(a)) ^ set(layer_sizes(b))
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><code>RootFS.Layers</code> are the actual layer hashes.</li>
+<li><code>history</code> traces the command behind each layer.</li>
+<li>The digest guarantees content equality.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Splitting commands across many RUN statements — layer explosion.</strong></li>
+<li><strong><code>COPY .</code> pulling in junk you did not mean to ship.</strong></li>
+<li><strong>Splitting <code>apt update</code> from <code>apt install</code> — cache invalidates.</strong></li>
+<li><strong>Shipping huge build artifacts in the final image.</strong></li>
+<li><strong>Tagging <code>latest</code> and losing reproducibility.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Multi-stage builds split build tools from runtime. <code>.dockerignore</code> keeps the build context tiny. Digest pins guarantee reproducibility.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Stable instructions go on top, volatile ones at the bottom.</li>
+<li>Multi-stage is the default pattern.</li>
+<li><code>latest</code> is a landmine.</li>
+<li><code>.dockerignore</code> matters as much as the Dockerfile.</li>
+<li>Image size equals attack surface.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Multi-stage build in use.</li>
+<li>[ ] <code>.dockerignore</code> present.</li>
+<li>[ ] Digest pins in production.</li>
+<li>[ ] Image scanning enabled.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Name the most common reason layer caching breaks, in one line.</li>
+<li>Give one scenario where multi-stage builds clearly win.</li>
+<li>Explain the difference between an image digest and a tag in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>You can see how an image is built. Next, look at what runs it. The next post covers Runtime.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
+<li><strong>Image and Layer (current)</strong></li>
+<li>Runtime (upcoming)</li>
+<li>Dockerfile (upcoming)</li>
+<li>Volume (upcoming)</li>
+<li>Network (upcoming)</li>
+<li>Registry (upcoming)</li>
+<li>Container Security (upcoming)</li>
+<li>Containers vs VMs (upcoming)</li>
+<li>Build a Container App (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.docker.com/storage/storagedriver/">Docker — about storage drivers</a></li>
+<li><a href="https://docs.kernel.org/filesystems/overlayfs.html">OverlayFS</a></li>
+<li><a href="https://github.com/opencontainers/image-spec/blob/main/manifest.md">OCI Image Spec — manifest</a></li>
+<li><a href="https://docs.docker.com/build/building/multi-stage/">Multi-stage builds</a></li>
+</ul>
+<p class="tags-line">Tags: Containers, Docker, Image, Layer, DevOps</p>
+</body>
+</html>

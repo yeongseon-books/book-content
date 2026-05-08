@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Backpropagation Intuition</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Backpropagation Intuition</h1>
+<blockquote>
+<p>Calculus for ML 101 series (9/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do we compute gradients for <em>thousands of weights</em> <em>all at once</em>?</p>
+<blockquote>
+<p><em>Backpropagation</em> applies the <em>chain rule backward</em> and produces <em>every gradient efficiently</em>.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The <em>computation graph</em></li>
+<li>The <em>forward pass</em></li>
+<li>The <em>backward pass</em></li>
+<li><em>Gradient accumulation</em></li>
+<li>Intuition for <em>autograd</em></li>
+</ul>
+<h2>Why It Matters</h2>
+<p><em>Frameworks</em> compute gradients for you, so understanding the <em>principle</em> enables <em>debugging</em>.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    X[Inputs] --&gt; H[Hidden]
+    H --&gt; Y[Output]
+    Y --&gt; L[Loss]
+    L --&gt; H
+    H --&gt; X
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>graph</strong>: a <em>graph of computations</em>.</li>
+<li><strong>forward</strong>: <em>input -&gt; output</em>.</li>
+<li><strong>backward</strong>: <em>gradients flow back</em>.</li>
+<li><strong>autograd</strong>: <em>automatic differentiation</em>.</li>
+<li><strong>node</strong>: a <em>single op</em>.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: numerically differentiate <em>each weight</em>.</p>
+<p><strong>After</strong>: <em>one backward pass</em> covers all.</p>
+<h2>Hands-on: Mini Backprop Kit</h2>
+<p><strong>Step 1 — Node</strong></p>
+<pre><code class="language-python">class Node:
+    def __init__(self, val, parents=()):
+        self.val = val
+        self.parents = parents
+        self.grad = 0.0
+</code></pre>
+<p><strong>Step 2 — Add</strong></p>
+<pre><code class="language-python">def add(a, b):
+    n = Node(a.val + b.val, (a, b))
+    n.local = (1.0, 1.0)
+    return n
+</code></pre>
+<p><strong>Step 3 — Mul</strong></p>
+<pre><code class="language-python">def mul(a, b):
+    n = Node(a.val * b.val, (a, b))
+    n.local = (b.val, a.val)
+    return n
+</code></pre>
+<p><strong>Step 4 — Backward Pass</strong></p>
+<pre><code class="language-python">def backward(n):
+    n.grad = 1.0
+    stack = [n]
+    while stack:
+        x = stack.pop()
+        for p, lg in zip(x.parents, x.local):
+            p.grad += x.grad * lg
+            stack.append(p)
+</code></pre>
+<p><strong>Step 5 — Mini Example</strong></p>
+<pre><code class="language-python">a, b, c = Node(2.0), Node(3.0), Node(4.0)
+y = mul(add(a, b), c)
+backward(y)
+# a.grad == 4.0, b.grad == 4.0, c.grad == 5.0
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The <em>forward</em> pass produces <em>values</em>.</li>
+<li>The <em>backward</em> pass produces <em>gradients</em>.</li>
+<li>Each <em>node</em> carries <em>local</em> derivatives.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Forgetting to <em>zero</em> gradients (they accumulate).</strong></li>
+<li><strong>Mixing the <em>order</em> of forward and backward.</strong></li>
+<li><strong>Skipping accumulation at <em>shared nodes</em>.</strong></li>
+<li><strong>Skipping <em>value caching</em> and breaking memory tradeoffs.</strong></li>
+<li><strong>Forgetting <em>detach</em> and keeping graphs alive.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p><em>PyTorch</em>, <em>TensorFlow</em>, and <em>JAX</em> all run backprop <em>automatically</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Backprop is the <em>implementation</em> of the chain rule.</li>
+<li>Be <em>explicit</em> about <em>gradient accumulation</em>.</li>
+<li>Call <em>zero_grad</em> in every step.</li>
+<li>Use <em>numerical checks</em> to verify.</li>
+<li>The <em>graph</em> is <em>memory</em>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Call <em>zero_grad</em>.</li>
+<li>[ ] One <em>backward</em> pass.</li>
+<li>[ ] <em>Numerical verification</em>.</li>
+<li>[ ] <em>Detach</em> unused branches.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Define <em>backpropagation</em> in one line.</li>
+<li>State the meaning of <em>zero_grad</em> in one line.</li>
+<li>Define <em>autograd</em> in one line.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Next post: the <em>Calculus in Deep Learning</em> capstone.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/03-partial-derivatives.md">Partial Derivatives</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/04-gradient.md">Gradient</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/05-chain-rule.md">Chain Rule</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/06-loss-function.md">Loss Function</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/07-gradient-descent.md">Gradient Descent</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/08-optimization.md">Optimization</a></li>
+<li><strong>Backpropagation Intuition (current)</strong></li>
+<li>Calculus in Deep Learning (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cs231n.github.io/optimization-2/">Backpropagation - CS231n</a></li>
+<li><a href="https://colah.github.io/posts/2015-08-Backprop/">Calculus on Computational Graphs - Olah</a></li>
+<li><a href="https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html">PyTorch Autograd</a></li>
+<li><a href="https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html">JAX Autograd Cookbook</a></li>
+</ul>
+<p class="tags-line">Tags: Calculus, ML, Backprop, NeuralNetwork, Beginner</p>
+</body>
+</html>

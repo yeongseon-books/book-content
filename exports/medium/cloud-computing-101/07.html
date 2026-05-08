@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Identity and Security</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Identity and Security</h1>
+<blockquote>
+<p>Cloud Computing 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When and how do IAM <em>users</em> and <em>roles</em> differ in practice?</p>
+<blockquote>
+<p><em>Cloud security starts with least privilege, runs on role-based delegation, and protects data with encryption plus key management.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>IAM users, groups, roles, and policies</li>
+<li>The least privilege principle</li>
+<li>MFA and key rotation</li>
+<li>Encrypting data with KMS</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.</p>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;user&quot;] --&gt; Group[&quot;group&quot;]
+    Group --&gt; Policy[&quot;policy&quot;]
+    App[&quot;app/ec2&quot;] --&gt; Role[&quot;role&quot;]
+    Role --&gt; Policy
+    Policy --&gt; Resource[&quot;resource&quot;]
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>User</strong>: a person or long-lived credential.</li>
+<li><strong>Group</strong>: a bundle of users that receives policies.</li>
+<li><strong>Role</strong>: an identity that hands out <em>temporary</em> credentials.</li>
+<li><strong>Policy</strong>: an allow/deny rule, written as JSON.</li>
+<li><strong>KMS</strong>: a central service for managing encryption keys.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: access keys hardcoded in source — eventually leaked.</p>
+<p><strong>After</strong>: an EC2 role attached to the instance, with auto-refreshed temporary tokens.</p>
+<h2>Hands-on: Least-Privilege Policy</h2>
+<p><strong>Step 1 — Client</strong></p>
+<pre><code class="language-python">import boto3, json
+iam = boto3.client(&quot;iam&quot;)
+</code></pre>
+<p><strong>Step 2 — Policy document</strong></p>
+<pre><code class="language-python">policy = {
+    &quot;Version&quot;: &quot;2012-10-17&quot;,
+    &quot;Statement&quot;: [{
+        &quot;Effect&quot;: &quot;Allow&quot;,
+        &quot;Action&quot;: [&quot;s3:GetObject&quot;],
+        &quot;Resource&quot;: &quot;arn:aws:s3:::my-bucket/*&quot;,
+    }],
+}
+</code></pre>
+<p><strong>Step 3 — Create the policy</strong></p>
+<pre><code class="language-python">def create_policy(name, doc):
+    res = iam.create_policy(
+        PolicyName=name, PolicyDocument=json.dumps(doc),
+    )
+    return res[&quot;Policy&quot;][&quot;Arn&quot;]
+</code></pre>
+<p><strong>Step 4 — Create role and trust</strong></p>
+<pre><code class="language-python">trust = {
+    &quot;Version&quot;: &quot;2012-10-17&quot;,
+    &quot;Statement&quot;: [{
+        &quot;Effect&quot;: &quot;Allow&quot;,
+        &quot;Principal&quot;: {&quot;Service&quot;: &quot;ec2.amazonaws.com&quot;},
+        &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+    }],
+}
+
+def create_role(name):
+    res = iam.create_role(
+        RoleName=name, AssumeRolePolicyDocument=json.dumps(trust),
+    )
+    return res[&quot;Role&quot;][&quot;Arn&quot;]
+</code></pre>
+<p><strong>Step 5 — Attach</strong></p>
+<pre><code class="language-python">def attach(role_name, policy_arn):
+    iam.attach_role_policy(RoleName=role_name, PolicyArn=policy_arn)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A role needs both a <em>trust</em> policy and a <em>permissions</em> policy.</li>
+<li>Keep <code>Resource</code> as narrow as possible.</li>
+<li>Avoid wildcards in <code>Action</code>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Granting <code>Action: *</code>.</strong></li>
+<li><strong>Committing access keys to git.</strong></li>
+<li><strong>Doing daily work as the root account.</strong></li>
+<li><strong>Skipping MFA.</strong></li>
+<li><strong>Never rotating keys.</strong></li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>EC2 roles access S3. KMS encrypts data at rest. AWS SSO handles staff login. MFA is required for every user.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Least privilege is the default.</li>
+<li>Prefer roles; user keys are the exception.</li>
+<li>Every key has a rotation schedule.</li>
+<li>Audit logging is on by default.</li>
+<li>Separation — <code>prod</code> and <code>dev</code> live in <em>different</em> accounts.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Root account MFA enabled.</li>
+<li>[ ] Key rotation schedule in place.</li>
+<li>[ ] Roles preferred over user keys.</li>
+<li>[ ] CloudTrail enabled.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>State the fundamental difference between a User and a Role in one line.</li>
+<li>Write the <code>Resource</code> field of a least-privilege S3 policy in one line.</li>
+<li>Give one scenario where a customer-managed KMS key is preferable to an AWS-managed one.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Once permissions are right, the next question is <em>what is actually happening</em>. The next post covers Monitoring.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/01-what-is-cloud-computing.md">What is Cloud Computing?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/02-iaas-paas-saas.md">IaaS, PaaS, SaaS</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/03-region-and-availability-zone.md">Region and Availability Zone</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/04-compute.md">Compute</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/05-storage.md">Storage</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/cloud-computing-101/en/06-network.md">Network</a></li>
+<li><strong>Identity and Security (current)</strong></li>
+<li>Monitoring (upcoming)</li>
+<li>Cost Management (upcoming)</li>
+<li>Cloud Architecture Basics (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html">AWS IAM user guide</a></li>
+<li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html">IAM best practices</a></li>
+<li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/overview.html">AWS KMS</a></li>
+<li><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html">AWS CloudTrail</a></li>
+</ul>
+<p class="tags-line">Tags: Cloud, Security, IAM, AWS, Architecture</p>
+</body>
+</html>

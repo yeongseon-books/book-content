@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Containers and the Operating System</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Containers and the Operating System</h1>
+<blockquote>
+<p>Operating Systems 101 series (10/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: How do containers differ from virtual machines, and how do they make a shared kernel look like an isolated system?</p>
+<blockquote>
+<p>Containers are not magic. They are a combination of plain Linux features — namespaces, cgroups, and overlayfs. Every concept from this series — processes, memory, file systems, system calls — reappears inside a container. This article closes the series and bridges OS fundamentals to modern infrastructure.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The difference between containers and virtual machines</li>
+<li>Isolation built from namespaces — pid, net, mount, user, etc.</li>
+<li>Resource limits built from cgroups — CPU, memory, I/O</li>
+<li>Image layers and copy-on-write file systems via overlayfs</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In the container era, knowing the OS means knowing namespaces and cgroups. OOM-kills, CPU throttling, and network isolation problems inside containers all happen on top of OS primitives. If you only know "containers are lightweight VMs," you cannot diagnose the operational incidents that matter most.</p>
+<blockquote>
+<p>A container is not a new OS. It is a tool that slices the same OS more precisely.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<blockquote>
+<p>A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.</p>
+</blockquote>
+<pre><code class="language-text">[VM]                          [Container]
++-----------+                 +-----------+
+| Guest OS  |                 |   App     |
++-----------+                 +-----------+
+| Hypervisor|                 |  cgroup   |
++-----------+                 |  ns       |
+|  Host OS  |                 +-----------+
++-----------+                 |  Host OS  |
+|  HW       |                 +-----------+
++-----------+                 |  HW       |
+                              +-----------+
+</code></pre>
+<h2>Key Terms</h2>
+<p><strong>Namespace</strong><br>
+- Description: Isolates what a process sees (PID, network, mounts, etc.)</p>
+<p><strong>Cgroup</strong><br>
+- Description: Controls how much a group can use (CPU, memory, I/O)</p>
+<p><strong>Overlayfs</strong><br>
+- Description: File system that stacks a read-write layer on a read-only base</p>
+<p><strong>Capability</strong><br>
+- Description: A finer-grained slice of root privilege</p>
+<p><strong>OCI</strong><br>
+- Description: Standards for container images and runtimes</p>
+<h2>Before / After</h2>
+<p><strong>Before — "containers are lightweight VMs":</strong></p>
+<pre><code class="language-text">Misconception: same isolation level as a VM
+Result: surprised that &quot;container escape&quot; is even a thing
+</code></pre>
+<p><strong>After — "containers share the host kernel":</strong></p>
+<pre><code class="language-text">Truth: isolation is namespaces + cgroups + seccomp + capabilities together
+Result: security must be designed as layered defense
+</code></pre>
+<p>Knowing the difference, you accept the limits and add the right extra protection (seccomp, rootless, gVisor, etc.).</p>
+<h2>Hands-on: Step by Step</h2>
+<p><strong>Step 1: PIDs inside a container</strong></p>
+<pre><code class="language-bash">docker run --rm -it alpine sh -c &quot;ps -ef | head&quot;
+# Inside the container, PID 1 is sh, not init
+</code></pre>
+<p>Thanks to the PID namespace, processes inside a container have their own PID space.</p>
+<p><strong>Step 2: The same process from the host</strong></p>
+<pre><code class="language-bash"># On the host
+ps -ef | grep &lt;container PID command&gt;
+# The same process appears with a different PID
+</code></pre>
+<p>The host can see all container processes; the container cannot see the host. Isolation is asymmetric.</p>
+<p><strong>Step 3: cgroup memory limit</strong></p>
+<pre><code class="language-bash">docker run --rm -m 64m alpine sh -c &quot;
+  cat /sys/fs/cgroup/memory.max
+  yes 'data' | head -c 200m &gt; /tmp/big || echo 'OOM-killed'
+&quot;
+# memory.max = 67108864 (64MB), 200MB write → OOM
+</code></pre>
+<p>cgroups enforce the limit. Inside a container <code>free</code> may show the host total, which is a frequent source of confusion.</p>
+<p><strong>Step 4: See overlayfs layers</strong></p>
+<pre><code class="language-bash">docker pull alpine
+docker image inspect alpine | grep -i layer
+# Layered file system — sharing a base saves disk
+</code></pre>
+<p>Containers using the same base image share disk. That is why containers feel "light."</p>
+<p><strong>Step 5: Inspect capabilities and seccomp</strong></p>
+<pre><code class="language-bash">docker run --rm alpine sh -c &quot;
+  cat /proc/self/status | grep Cap
+&quot;
+# Even as root, the capability set is restricted
+</code></pre>
+<p>The "root" inside a default container is weaker than the host root. Capabilities and seccomp slice privilege finely.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>Isolation is the sum of namespaces, cgroups, seccomp, and capabilities</li>
+<li>PID 1 inside a container is the container's init; it is just another process on the host</li>
+<li>Container memory limits and <code>free</code> see different things, which is a common confusion</li>
+<li>Overlayfs lets containers using the same image share disk</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<p><strong>"Container == VM"</strong><br>
+- Problem: Overestimates isolation<br>
+- Fix: Layered defense (seccomp, rootless, etc.)</p>
+<p><strong>Reading memory with <code>free</code> inside</strong><br>
+- Problem: Sees the host total<br>
+- Fix: Use cgroup files or <code>docker stats</code></p>
+<p><strong>Abusing <code>--privileged</code></strong><br>
+- Problem: Effectively removes isolation<br>
+- Fix: Add only the capabilities you need</p>
+<p><strong>Huge single-layer image</strong><br>
+- Problem: Slow build/deploy, no caching<br>
+- Fix: Multi-stage build plus a small base</p>
+<p><strong>Using PID 1 directly without an init</strong><br>
+- Problem: Zombies are not reaped<br>
+- Fix: Use tini or <code>--init</code></p>
+<h2>How This Shows Up in Production</h2>
+<ul>
+<li>Microservices: one container per service to isolate dependencies</li>
+<li>CI/CD: pin the build environment as an image</li>
+<li>Multi-tenant: cgroup for resource guarantees + network namespace for isolation</li>
+<li>Serverless: extra isolation layers like gVisor or Firecracker</li>
+<li>Dev environments: docker compose / dev containers reproduce the environment</li>
+</ul>
+<h2>How a Senior Engineer Thinks</h2>
+<p>A senior engineer treats containers as "a convenient way to use the OS." Without understanding namespaces, cgroups, and overlayfs, they cannot act when something breaks in production. Every concept from this series — processes, memory, file systems, system calls — reappears inside a container.</p>
+<p>A senior also accepts the limits of isolation. Sharing a kernel is the start of the security model, not the end. They combine seccomp, rootless mode, gVisor, and trust-boundary separation as appropriate. Isolation is not "yes or no" but "how far."</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between a container and a VM</li>
+<li>[ ] I can describe what namespaces and cgroups do</li>
+<li>[ ] I know how to read memory limits from inside a container</li>
+<li>[ ] I know how overlayfs contributes to disk sharing</li>
+<li>[ ] I know the limits of isolation and the available extra protections</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>
+<p>Quantitatively measure overlayfs savings by comparing the disk usage sum of two containers sharing a base image versus the base image size alone.</p>
+</li>
+<li>
+<p>In a 64MB-limited container, decide a safe cache cap and compare it with the size that triggers OOM-kill.</p>
+</li>
+<li>
+<p>Use strace to confirm which syscalls are blocked when running with vs without the default seccomp profile.</p>
+</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A container is not a new OS but a tool that slices the same Linux OS precisely with namespaces, cgroups, and overlayfs. Every OS concept from this series gets reused above containers. To know containers is, finally, to know the OS.</p>
+<p>This series ends here. As a next step, follow the same OS concepts outward into networks and distributed systems (Computer Networks 101, Distributed Systems 101), or go deeper into container operations themselves (Docker 101, Kubernetes 101).</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/01-what-is-an-operating-system.md">What is an Operating System?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/02-processes-and-threads.md">Processes and Threads</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/03-scheduling.md">Scheduling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/04-concurrency-and-race-conditions.md">Concurrency and Race Conditions</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/05-locks-mutex-semaphore.md">Locks, Mutexes, and Semaphores</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/06-memory-management.md">Memory Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/07-virtual-memory.md">Virtual Memory</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/08-file-systems.md">File Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/operating-systems-101/en/09-system-calls.md">System Calls</a></li>
+<li><strong>Containers and the Operating System (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://man7.org/linux/man-pages/man7/namespaces.7.html">Linux namespaces(7)</a></li>
+<li><a href="https://man7.org/linux/man-pages/man7/cgroups.7.html">Linux cgroups(7)</a></li>
+<li><a href="https://opencontainers.org/">Open Container Initiative</a></li>
+<li><a href="https://docs.docker.com/get-started/overview/">Docker — Overview</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, Operating Systems, Containers, Namespace, Cgroup, Isolation</p>
+</body>
+</html>

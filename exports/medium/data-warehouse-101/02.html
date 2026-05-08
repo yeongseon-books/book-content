@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OLTP and OLAP</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>OLTP and OLAP</h1>
+<blockquote>
+<p>Data Warehouse 101 series (2/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: It is the <em>same SQL</em> — why do we need <em>different engines</em>? Why does <em>row vs column</em> storage make such a <em>big difference</em>?</p>
+<blockquote>
+<p><em>OLTP writes short and often; OLAP reads long and rarely.</em></p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The workload difference between <em>OLTP</em> and <em>OLAP</em></li>
+<li>The trade-offs of <em>row</em> vs <em>column</em> storage</li>
+<li>Why we <em>separate</em> the two systems</li>
+<li>Five-step comparison hands-on</li>
+<li>Five common pitfalls</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>OLTP processes <em>one record right now</em> fast. OLAP scans <em>all of history</em> in one shot. The <em>optimization directions are opposite</em>, so a single engine struggles to be great at both.</p>
+<blockquote>
+<p><em>Pick the right tool. Trying to do both with one makes both unhappy.</em></p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    User[&quot;User&quot;] --&gt; OLTP[&quot;OLTP DB (row store)&quot;]
+    OLTP --&gt; CDC[&quot;CDC / ETL&quot;]
+    CDC --&gt; OLAP[&quot;OLAP DB (column store)&quot;]
+    Analyst[&quot;Analyst&quot;] --&gt; OLAP
+</code></pre>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>OLTP</strong>: Short, <em>concurrent</em> read/write workloads.</li>
+<li><strong>OLAP</strong>: Large-range, <em>read-heavy</em> aggregations.</li>
+<li><strong>Row store</strong>: Stores <em>all columns of a row</em> together.</li>
+<li><strong>Column store</strong>: Stores <em>values of one column</em> contiguously.</li>
+<li><strong>CDC</strong>: <em>Change Data Capture</em> — streaming OLTP changes into OLAP.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong>: A single Postgres handles <em>payments</em> and <em>monthly analytics</em>; both <em>slow down</em>.</p>
+<p><strong>After</strong>: OLTP on <em>Postgres</em>, OLAP on <em>BigQuery</em> — each is <em>optimized for its job</em>.</p>
+<h2>Hands-on: Five-step Comparison</h2>
+<p><strong>Step 1 — OLTP pattern</strong></p>
+<pre><code class="language-sql">-- Update one user's balance
+UPDATE accounts SET balance = balance - 1000 WHERE id = 42;
+</code></pre>
+<p><strong>Step 2 — OLAP pattern</strong></p>
+<pre><code class="language-sql">-- Average balance across all users
+SELECT AVG(balance) FROM accounts;
+</code></pre>
+<p><strong>Step 3 — Row store cost</strong></p>
+<pre><code class="language-sql">-- Row store reads all columns even if you ask for one
+SELECT amount FROM fact_orders;
+</code></pre>
+<p><strong>Step 4 — Column store benefit</strong></p>
+<pre><code class="language-sql">-- Column store scans only the amount column
+SELECT SUM(amount) FROM fact_orders;
+</code></pre>
+<p><strong>Step 5 — Separated flow</strong></p>
+<pre><code class="language-sql">-- OLTP receives single-row INSERT
+INSERT INTO orders VALUES (...);
+-- OLAP analyzes accumulated facts
+SELECT date_trunc('day', created_at), COUNT(*) FROM fact_orders GROUP BY 1;
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li><em>Short queries</em> are fast on <em>row stores</em>.</li>
+<li><em>Big aggregations</em> are fast on <em>column stores</em>.</li>
+<li>The <em>concurrency shape</em> is <em>completely different</em>.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Running OLAP queries <em>on OLTP</em>.</strong> Lock waits pile up and <em>latency cascades</em>.</li>
+<li><strong>Sending <em>short transactions</em> to OLAP.</strong> <em>Cost goes up, value does not</em>.</li>
+<li><strong>Assuming <em>zero replication lag</em>.</strong> Always design for <em>minutes of lag</em>.</li>
+<li><strong>Copying the <em>index strategy</em>.</strong> Access patterns differ — <em>design indexes separately</em>.</li>
+<li><strong>Sharing a backup policy.</strong> OLTP wants <em>PITR</em>; OLAP wants <em>snapshots</em>.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Payments live on <em>Postgres / MySQL</em>. Revenue reports live on <em>Snowflake / BigQuery</em>. Between them, <em>Debezium</em>-style <em>CDC</em> moves changes with a <em>small lag</em>.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li><em>Start by analyzing the </em>shape of the workload<em>.</em></li>
+<li><em>Be skeptical of doing both with one engine.</em></li>
+<li><em>Cost is shaped by access patterns.</em></li>
+<li><em>Treat replication lag as a constant, not a bug.</em></li>
+<li><em>Design </em>post-separation consistency<em> from day one.</em></li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can compare OLTP and OLAP in <em>three lines</em>.</li>
+<li>[ ] You know the difference between <em>row and column store</em>.</li>
+<li>[ ] You can explain what <em>CDC</em> is.</li>
+<li>[ ] You can name the <em>backup difference</em> between the two.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>List <em>three</em> OLTP workloads.</li>
+<li>List <em>three</em> OLAP workloads.</li>
+<li>Explain which <em>queries favor row store</em>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>OLTP and OLAP optimize for opposite directions. Next we cover <em>facts and dimensions</em>, the core OLAP modeling unit.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-warehouse-101/en/01-what-is-data-warehouse.md">What Is a Data Warehouse?</a></li>
+<li><strong>OLTP and OLAP (current)</strong></li>
+<li>Fact and Dimension (upcoming)</li>
+<li>Star Schema (upcoming)</li>
+<li>Partition and Clustering (upcoming)</li>
+<li>ETL and ELT (upcoming)</li>
+<li>BI and Dashboard (upcoming)</li>
+<li>Data Mart (upcoming)</li>
+<li>Performance Optimization (upcoming)</li>
+<li>Warehouse Design Example (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Online_transaction_processing">Wikipedia — OLTP</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Online_analytical_processing">Wikipedia — OLAP</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/intro-key-concepts">Snowflake — Columnar Storage</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+</ul>
+<p class="tags-line">Tags: DataWarehouse, OLTP, OLAP, Database, Analytics</p>
+</body>
+</html>

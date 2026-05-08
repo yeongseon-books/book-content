@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logging and Error Handling</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Logging and Error Handling</h1>
+<blockquote>
+<p>Backend Development 101 series (7/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: At 3 a.m. when the pager fires, what does it take to find the <em>cause</em> in 30 minutes?</p>
+<blockquote>
+<p>Structured logs, meaningful status codes, and a global exception handler. With those three, the answer is in the logs — not in re-reading the code.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>Why we use a logger instead of <code>print</code></li>
+<li>The shape of a structured log</li>
+<li>How a global exception handler keeps responses consistent</li>
+<li>How a <code>request_id</code> lets you follow one request end to end</li>
+<li>How to choose the <em>right</em> log level</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Code is written once and <em>operated for years</em>. Ninety percent of operations is <em>reading</em>, and the reading tool is the log. Building structured logs from day one cuts incident response time by <em>orders of magnitude</em>.</p>
+<blockquote>
+<p>Good logs are read more often than the code itself.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Req[&quot;Request&quot;] --&gt; Mw[&quot;Middleware&quot;]
+    Mw --&gt;|&quot;add request_id&quot;| App[&quot;Handler&quot;]
+    App --&gt; Err{&quot;Error?&quot;}
+    Err --&gt;|&quot;yes&quot;| Handler[&quot;Global handler&quot;]
+    Err --&gt;|&quot;no&quot;| OK[&quot;200&quot;]
+    Handler --&gt; Log[&quot;Logger&quot;]
+    OK --&gt; Log
+</code></pre>
+<p>Every path leads to the <em>log</em>.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Logger</strong>: object that emits log records.</li>
+<li><strong>Log level</strong>: DEBUG / INFO / WARNING / ERROR / CRITICAL.</li>
+<li><strong>Structured log</strong>: a log line in a <em>machine-readable</em> format (often JSON).</li>
+<li><strong>request_id</strong>: identifier that follows a single request through every layer.</li>
+<li><strong>Global exception handler</strong>: the <em>one place</em> that turns exceptions into responses.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before (print debugging)</strong></p>
+<pre><code class="language-python">print(&quot;user=&quot;, user_id, &quot;error&quot;, e)
+</code></pre>
+<p><strong>After (structured log)</strong></p>
+<pre><code class="language-python">import logging, json
+log = logging.getLogger(&quot;app&quot;)
+
+log.error(json.dumps({
+    &quot;event&quot;: &quot;order_failed&quot;,
+    &quot;user_id&quot;: user_id,
+    &quot;error&quot;: str(e),
+}))
+</code></pre>
+<p>The <code>event</code> field alone makes the data <em>aggregable</em>.</p>
+<h2>Hands-on: Five Steps Through Logs and Errors</h2>
+<p><strong>Step 1 — Standard logger setup</strong></p>
+<pre><code class="language-python"># 1_setup.py
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s',
+)
+log = logging.getLogger(&quot;app&quot;)
+log.info(&quot;server started&quot;)
+</code></pre>
+<p><strong>Step 2 — JSON structured log</strong></p>
+<pre><code class="language-python"># 2_json_log.py
+import logging, json, sys
+class JsonFmt(logging.Formatter):
+    def format(self, r):
+        return json.dumps({&quot;level&quot;: r.levelname, &quot;msg&quot;: r.getMessage()})
+h = logging.StreamHandler(sys.stdout)
+h.setFormatter(JsonFmt())
+logging.basicConfig(handlers=[h], level=logging.INFO)
+logging.info(&quot;hello&quot;)
+</code></pre>
+<p><strong>Step 3 — request_id middleware</strong></p>
+<pre><code class="language-python"># 3_request_id.py
+from fastapi import FastAPI, Request
+import uuid, logging
+
+app = FastAPI()
+log = logging.getLogger(&quot;app&quot;)
+
+@app.middleware(&quot;http&quot;)
+async def add_request_id(request: Request, call_next):
+    rid = str(uuid.uuid4())
+    request.state.rid = rid
+    response = await call_next(request)
+    response.headers[&quot;X-Request-ID&quot;] = rid
+    log.info(f&quot;req rid={rid} path={request.url.path}&quot;)
+    return response
+</code></pre>
+<p><strong>Step 4 — Global exception handler</strong></p>
+<pre><code class="language-python"># 4_global_handler.py
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+class DomainError(Exception):
+    def __init__(self, code: str, message: str):
+        self.code, self.message = code, message
+
+@app.exception_handler(DomainError)
+async def handle_domain(_: Request, exc: DomainError):
+    return JSONResponse(
+        status_code=400,
+        content={&quot;code&quot;: exc.code, &quot;message&quot;: exc.message},
+    )
+</code></pre>
+<p><strong>Step 5 — Picking log levels</strong></p>
+<pre><code class="language-python"># 5_levels.py
+log.debug(&quot;trace data&quot;)
+log.info(&quot;user logged in&quot;)
+log.warning(&quot;retrying upstream call&quot;)
+log.error(&quot;payment failed&quot;)
+log.critical(&quot;database is down&quot;)
+</code></pre>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>A log line stays on <em>one line</em> so search works.</li>
+<li>Every log includes the request_id so traces are possible.</li>
+<li>Domain errors carry <em>business meaning</em> via stable codes.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Stopping at print debugging.</strong> Prints <em>disappear</em> in production.</li>
+<li><strong>Logging everything as ERROR.</strong> Alarms become noise and real incidents get missed.</li>
+<li><strong>Logging passwords or tokens.</strong> That is an immediate security incident.</li>
+<li><strong>Catching everything and ignoring it.</strong> Errors <em>vanish silently</em>.</li>
+<li><strong>Saving only the message and dropping the stack trace.</strong> Debugging becomes guesswork.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>In production logs flow into <em>collectors</em> (CloudWatch, Loki, Datadog). A field like <code>event=order_failed</code> becomes the basis of <em>dashboards and alerts</em>. Adopting structured logs early gets you monitoring almost for free.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>Logs are <em>aggregable data</em>.</li>
+<li>The request_id is <em>always</em> echoed in the response header.</li>
+<li>Domain errors and infra errors stay <em>separate</em>.</li>
+<li>Logs that page someone are <em>actionable</em>.</li>
+<li>"Why did this fail?" can be answered from the logs alone.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can configure the standard logger.</li>
+<li>[ ] You can emit JSON structured logs.</li>
+<li>[ ] You can write a request_id middleware.</li>
+<li>[ ] You can register a global exception handler.</li>
+<li>[ ] You can choose log levels with intent.</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add <code>request_id</code> to every JSON log line automatically.</li>
+<li>Define <code>DomainError</code> and <code>InfraError</code> and handle them separately.</li>
+<li>Inject a fake exception into a route and confirm the stack trace shows in the log.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Good logs and consistent error handling are the <em>eyes of operations</em>. Next, we make the code safe to change with <em>backend testing</em>.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/01-what-is-backend-development.md">What Is Backend Development?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/02-building-an-http-server.md">Building an HTTP Server</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/03-routing-and-controllers.md">Routing and Controllers</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/04-service-layer.md">The Service Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/05-database-layer.md">The Database Layer</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/backend-development-101/en/06-auth-and-authorization.md">Authentication and Authorization</a></li>
+<li><strong>Logging and Error Handling (current)</strong></li>
+<li>Testing the Backend (upcoming)</li>
+<li>Deploying the Backend (upcoming)</li>
+<li>A Production-Ready Backend Structure (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.python.org/3/howto/logging.html">Python logging HOWTO</a></li>
+<li><a href="https://fastapi.tiangolo.com/tutorial/handling-errors/">FastAPI exception handlers</a></li>
+<li><a href="https://12factor.net/logs">Twelve-Factor logs</a></li>
+<li><a href="https://www.structlog.org/en/stable/">structlog docs</a></li>
+</ul>
+<p class="tags-line">Tags: Backend, Logging, Observability, Python, ErrorHandling</p>
+</body>
+</html>

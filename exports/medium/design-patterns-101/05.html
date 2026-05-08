@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Strategy Pattern</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>The Strategy Pattern</h1>
+<blockquote>
+<p>Design Patterns 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: When the same job has <em>different ways</em> to be done, what should the code look like?</p>
+<blockquote>
+<p>Make each algorithm an object (or a function) and inject it into the context. That is Strategy.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<h2>What You Will Learn</h2>
+<ul>
+<li>The problem Strategy solves (branch explosion)</li>
+<li>Strategy and the Open/Closed Principle</li>
+<li>Class Strategy vs function Strategy</li>
+<li>Runtime swapping and testing</li>
+<li>When Strategy is overkill</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>Branching algorithms with if/elif means editing existing code every time a new option appears. Strategy turns those branches into <em>swappable objects</em> — open for extension, closed for modification (OCP).</p>
+<blockquote>
+<p>Strategy is OCP made visible in code.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    Ctx[&quot;Context&quot;] --&gt; Iface[&quot;Strategy interface&quot;]
+    Iface --&gt; A[&quot;StrategyA&quot;]
+    Iface --&gt; B[&quot;StrategyB&quot;]
+    Iface --&gt; C[&quot;StrategyC&quot;]
+</code></pre>
+<p>Context only knows the interface; concrete algorithms swap in.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Context</strong>: the object that uses a Strategy.</li>
+<li><strong>Strategy interface</strong>: the algorithm contract.</li>
+<li><strong>Concrete Strategy</strong>: an algorithm implementing the contract.</li>
+<li><strong>Injection point</strong>: where Strategy is supplied (constructor, method arg).</li>
+<li><strong>Default strategy</strong>: the sensible default behavior.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before</strong></p>
+<pre><code class="language-python">def price(kind, base):
+    if kind == &quot;vip&quot;:
+        return base * 0.7
+    elif kind == &quot;member&quot;:
+        return base * 0.9
+    elif kind == &quot;guest&quot;:
+        return base
+    raise ValueError(kind)
+</code></pre>
+<p><strong>After</strong></p>
+<pre><code class="language-python">class Pricing:
+    def apply(self, base): return base
+
+class Vip(Pricing):
+    def apply(self, base): return base * 0.7
+
+class Member(Pricing):
+    def apply(self, base): return base * 0.9
+</code></pre>
+<p><code>price</code> no longer knows the algorithm.</p>
+<h2>Hands-on: Five Steps to Practice Strategy</h2>
+<p><strong>Step 1 — Define the interface</strong></p>
+<pre><code class="language-python"># 1_iface.py
+from typing import Protocol
+
+class ShipCost(Protocol):
+    def for_weight(self, kg: float) -&gt; int: ...
+</code></pre>
+<p>Python often uses <code>Protocol</code> for <em>structural</em> interfaces instead of ABCs.</p>
+<p><strong>Step 2 — Concrete strategies</strong></p>
+<pre><code class="language-python"># 2_strategies.py
+class StandardShip:
+    def for_weight(self, kg): return int(3000 + 500 * kg)
+
+class ExpressShip:
+    def for_weight(self, kg): return int(6000 + 800 * kg)
+</code></pre>
+<p>Without inheritance, both satisfy the Protocol (duck typing).</p>
+<p><strong>Step 3 — Inject</strong></p>
+<pre><code class="language-python"># 3_inject.py
+class Order:
+    def __init__(self, ship: ShipCost): self.ship = ship
+    def total(self, items, kg):
+        return sum(items) + self.ship.for_weight(kg)
+</code></pre>
+<p>Constructor injection is the most common form.</p>
+<p><strong>Step 4 — Function Strategy</strong></p>
+<pre><code class="language-python"># 4_func.py
+def standard(kg): return int(3000 + 500 * kg)
+def express(kg):  return int(6000 + 800 * kg)
+
+class Order2:
+    def __init__(self, ship): self.ship = ship
+    def total(self, items, kg): return sum(items) + self.ship(kg)
+
+o = Order2(standard)
+</code></pre>
+<p>In Python, a function is the most natural Strategy.</p>
+<p><strong>Step 5 — Runtime swap and testing</strong></p>
+<pre><code class="language-python"># 5_runtime.py
+order = Order2(standard)
+print(order.total([10000], 2))
+order.ship = express
+print(order.total([10000], 2))
+</code></pre>
+<p>In tests, inject deterministic strategies to cut external dependencies.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The Context does not know Strategy <em>internals</em>.</li>
+<li>Adding a new algorithm is an <em>addition</em>, not a <em>modification</em>.</li>
+<li>Tests get easier — inject a fake Strategy and you're done.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Strategy for a trivial two-liner.</strong> Over-generalization.</li>
+<li><strong>Strategy mutating Context state directly.</strong> Leaky responsibility.</li>
+<li><strong>Class explosion.</strong> A function would have been enough.</li>
+<li><strong>Missing default Strategy.</strong> Callers must always decide.</li>
+<li><strong>Strategies coupling to each other's internals.</strong> Strategy-to-Strategy coupling.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The <code>key</code> argument of <code>sorted</code>, the <code>func</code> of <code>pandas.apply</code>, payment-gateway adapter selection, notification-channel selection (email/SMS/Slack) — all Strategy in shape.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>When you feel "another branch coming", suspect Strategy.</li>
+<li>Try a function first; reach for a class only if needed.</li>
+<li>Provide a default to keep simple callers simple.</li>
+<li>Strategy is best when it has <em>little state</em>.</li>
+<li>Name by <em>role</em>, not behavior — prefer <code>LoyaltyDiscount</code> over <code>Vip</code>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Does the Context stay ignorant of algorithm internals?</li>
+<li>[ ] Does adding an algorithm only add code?</li>
+<li>[ ] Does the Strategy avoid mutating Context state?</li>
+<li>[ ] Is the default Strategy reasonable?</li>
+<li>[ ] Did you avoid a class where a function would suffice?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Refactor a payment-method branch (card/transfer/points) into Strategy.</li>
+<li>Express a sort comparator as a function Strategy.</li>
+<li>Implement notification-channel selection with Strategy plus a default.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>Strategy is OCP made visible. The next post zooms in on the structural pattern for compatibility — Adapter.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/01-what-are-design-patterns.md">What Are Design Patterns?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/02-creational-patterns.md">Creational Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/03-structural-patterns.md">Structural Patterns</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/design-patterns-101/en/04-behavioral-patterns.md">Behavioral Patterns</a></li>
+<li><strong>The Strategy Pattern (current)</strong></li>
+<li>Adapter Pattern (upcoming)</li>
+<li>Observer Pattern (upcoming)</li>
+<li>Factory and Dependency Injection (upcoming)</li>
+<li>Avoiding Pattern Overuse (upcoming)</li>
+<li>Pythonic Patterns (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refactoring.guru/design-patterns/strategy">Strategy Pattern (refactoring.guru)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle">Open/Closed Principle (Wikipedia)</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
+<li><a href="https://docs.python.org/3/howto/sorting.html">sorted(key=...) (Python docs)</a></li>
+</ul>
+<p class="tags-line">Tags: Computer Science, DesignPatterns, Strategy, Polymorphism, Behavioral, OCP</p>
+</body>
+</html>
