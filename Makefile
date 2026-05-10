@@ -9,6 +9,7 @@ check-quality:
 check-content:
 	bash .sisyphus/style/check-ko.sh
 	python3 scripts/check_catalog.py
+	python3 scripts/check_nav_coverage.py
 	python3 scripts/check_frontmatter.py
 	python3 scripts/lint_captions.py
 	python3 scripts/check_article_structure.py
