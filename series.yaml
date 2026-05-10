@@ -91,6 +91,7 @@ series:
   - id: ai-web-dev-101
     relation: supersedes
     note: 이 시리즈가 ai-web-dev-101을 대체
+  tier: core
 - id: llm-api-production-101
   status: content-ready
   category: ai
@@ -168,6 +169,7 @@ series:
         status: publish-ready
   track: traffic
   stage: production
+  tier: core
 - id: vector-search-101
   status: content-ready
   category: ai
@@ -244,6 +246,7 @@ series:
         status: publish-ready
   track: traffic
   stage: search
+  tier: core
 - id: langchain-101
   status: content-ready
   category: ai
@@ -322,6 +325,7 @@ series:
         status: publish-ready
   track: authority
   stage: foundation
+  tier: core
 - id: ai-app-patterns-101
   status: content-ready
   category: ai
@@ -406,6 +410,7 @@ series:
   - id: ai-agent-101
     relation: next-step
     note: 패턴 → 에이전트 심화
+  tier: core
 - id: rag-deep-dive
   status: content-ready
   category: ai
@@ -482,6 +487,7 @@ series:
         status: publish-ready
   track: authority
   stage: internals
+  tier: core
 - id: rag-benchmark-101
   status: content-ready
   category: ai
@@ -559,6 +565,7 @@ series:
         status: publish-ready
   track: traffic
   stage: rag
+  tier: core
 - id: document-ingestion-101
   status: content-ready
   category: ai
@@ -635,6 +642,7 @@ series:
         status: publish-ready
   track: ebook
   stage: rag
+  tier: core
 - id: langgraph-101
   status: content-ready
   category: ai
@@ -711,6 +719,7 @@ series:
         status: publish-ready
   track: authority
   stage: patterns
+  tier: core
 - id: ai-agent-101
   status: content-ready
   category: ai
@@ -738,6 +747,7 @@ series:
   - id: ai-app-patterns-101
     relation: prerequisite
     note: 앱 패턴 선수
+  tier: core
 - id: harness-engineering-101
   status: content-ready
   category: ai
@@ -766,6 +776,7 @@ series:
   - id: llm-apps-ops-101
     relation: complementary
     note: harness는 에이전트 제어, ops는 운영
+  tier: core
 - id: ai-evaluation-101
   category: ai
   title:
@@ -793,6 +804,7 @@ series:
   - Testing
   - Quality
   path: content/ai-evaluation-101
+  tier: core
 - id: ai-safety-guardrails-101
   category: ai
   title:
@@ -820,6 +832,7 @@ series:
   - LLM Security
   - Compliance
   path: content/ai-safety-guardrails-101
+  tier: core
 - id: llm-apps-ops-101
   status: content-ready
   category: ai
@@ -900,6 +913,7 @@ series:
   - id: harness-engineering-101
     relation: complementary
     note: ops는 운영, harness는 에이전트 제어
+  tier: core
 - id: ai-data-preparation-101
   category: ai
   title:
@@ -927,6 +941,7 @@ series:
   - Data Quality
   - Pipelines
   path: content/ai-data-preparation-101
+  tier: core
 - id: llm-finetuning-101
   status: content-ready
   category: ai
@@ -1003,6 +1018,7 @@ series:
         status: publish-ready
   track: authority
   stage: education
+  tier: core
 - id: llm-from-scratch-101
   status: content-ready
   category: ai
@@ -1103,6 +1119,7 @@ series:
         status: publish-ready
   track: ebook
   stage: education
+  tier: core
 - id: multimodal-ai-101
   category: ai
   title:
@@ -1119,6 +1136,7 @@ series:
   - en
   status: content-ready
   path: content/multimodal-ai-101
+  tier: core
 - id: korean-ai-stack-101
   status: content-ready
   category: ai
@@ -1195,6 +1213,7 @@ series:
         status: publish-ready
   track: traffic
   stage: korean
+  tier: core
 - id: ai-web-dev-101
   status: needs-update
   category: ai
@@ -1248,6 +1267,7 @@ series:
         slug: 07-eval-improve
         title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
         status: needs-update
+  tier: archive
 - id: ax-practical-guide
   status: planned
   category: ai
@@ -1269,6 +1289,7 @@ series:
   level: 101
   lifecycle: active
   path: content/ax-practical-guide
+  tier: core
 - id: computer-science-101
   category: programming
   title:
@@ -1291,6 +1312,7 @@ series:
   level: 101
   lifecycle: active
   path: content/computer-science-101
+  tier: supported
 - id: python-101
   category: programming
   title:
@@ -1307,6 +1329,7 @@ series:
   - en
   status: draft
   path: content/python-101
+  tier: supported
 - id: git-github-101
   category: programming
   title:
@@ -1322,6 +1345,7 @@ series:
   - en
   status: content-ready
   path: content/git-github-101
+  tier: supported
 - id: linux-cli-101
   category: programming
   title:
@@ -1337,6 +1361,7 @@ series:
   - en
   status: content-ready
   path: content/linux-cli-101
+  tier: supported
 - id: python-package-101
   category: programming
   title:
@@ -1446,6 +1471,7 @@ series:
         slug: 10-package-template
         title: Production Package Template
         status: content-ready
+  tier: supported
 - id: pytest-101
   category: programming
   title:
@@ -1554,6 +1580,7 @@ series:
         slug: 10-testable-code
         title: Writing Testable Code
         status: content-ready
+  tier: supported
 - id: oop-101
   status: content-ready
   category: programming
@@ -1576,6 +1603,7 @@ series:
   level: 101
   lifecycle: active
   path: content/oop-101
+  tier: supported
 - id: functional-programming-101
   status: content-ready
   category: programming
@@ -1599,6 +1627,7 @@ series:
   level: 101
   lifecycle: active
   path: content/functional-programming-101
+  tier: supported
 - id: type-hints-python-101
   status: content-ready
   category: programming
@@ -1622,6 +1651,7 @@ series:
   level: 101
   lifecycle: active
   path: content/type-hints-python-101
+  tier: supported
 - id: data-structures-python-101
   status: content-ready
   category: programming
@@ -1648,6 +1678,7 @@ series:
   - id: data-structures-101
     relation: concept
     note: 자료구조 이론 입문
+  tier: supported
 - id: algorithms-python-101
   status: content-ready
   category: programming
@@ -1674,6 +1705,7 @@ series:
   - id: algorithms-101
     relation: concept
     note: 알고리즘 이론 입문
+  tier: supported
 - id: computer-science-major-101
   category: cs-core
   title:
@@ -1696,6 +1728,7 @@ series:
   level: 101
   lifecycle: active
   path: content/computer-science-major-101
+  tier: supported
 - id: discrete-math-101
   category: cs-core
   title:
@@ -1718,6 +1751,7 @@ series:
   level: 101
   lifecycle: active
   path: content/discrete-math-101
+  tier: supported
 - id: math-for-cs-101
   category: cs-core
   title:
@@ -1741,6 +1775,7 @@ series:
   level: 101
   lifecycle: active
   path: content/math-for-cs-101
+  tier: supported
 - id: calculus-for-ml-101
   category: cs-core
   title:
@@ -1764,6 +1799,7 @@ series:
   level: 101
   lifecycle: active
   path: content/calculus-for-ml-101
+  tier: supported
 - id: computer-architecture-101
   category: cs-core
   title:
@@ -1787,6 +1823,7 @@ series:
   level: 101
   lifecycle: active
   path: content/computer-architecture-101
+  tier: supported
 - id: data-structures-101
   category: cs-core
   title:
@@ -1813,6 +1850,7 @@ series:
   - id: data-structures-python-101
     relation: implementation
     note: Python 구현 실습
+  tier: supported
 - id: algorithms-101
   category: cs-core
   title:
@@ -1839,6 +1877,7 @@ series:
   - id: algorithms-python-101
     relation: implementation
     note: Python 구현 실습
+  tier: supported
 - id: programming-languages-101
   category: cs-core
   title:
@@ -1862,6 +1901,7 @@ series:
   level: 101
   lifecycle: active
   path: content/programming-languages-101
+  tier: supported
 - id: operating-systems-101
   category: cs-core
   title:
@@ -1886,6 +1926,7 @@ series:
   level: 101
   lifecycle: active
   path: content/operating-systems-101
+  tier: supported
 - id: computer-networks-101
   category: cs-core
   title:
@@ -1908,6 +1949,7 @@ series:
   level: 101
   lifecycle: active
   path: content/computer-networks-101
+  tier: supported
 - id: database-systems-101
   category: cs-core
   title:
@@ -1930,6 +1972,7 @@ series:
   level: 101
   lifecycle: active
   path: content/database-systems-101
+  tier: supported
 - id: distributed-systems-101
   category: cs-core
   title:
@@ -1953,6 +1996,7 @@ series:
   level: 101
   lifecycle: active
   path: content/distributed-systems-101
+  tier: supported
 - id: compilers-101
   category: cs-core
   title:
@@ -1976,6 +2020,7 @@ series:
   level: 101
   lifecycle: active
   path: content/compilers-101
+  tier: supported
 - id: information-security-101
   category: cs-core
   title:
@@ -1998,6 +2043,7 @@ series:
   level: 101
   lifecycle: active
   path: content/information-security-101
+  tier: supported
 - id: software-engineering-101
   category: software-engineering
   title:
@@ -2020,6 +2066,7 @@ series:
   level: 101
   lifecycle: active
   path: content/software-engineering-101
+  tier: supported
 - id: clean-code-101
   category: software-engineering
   title:
@@ -2042,6 +2089,7 @@ series:
   level: 101
   lifecycle: active
   path: content/clean-code-101
+  tier: supported
 - id: software-design-101
   category: software-engineering
   title:
@@ -2064,6 +2112,7 @@ series:
   level: 101
   lifecycle: active
   path: content/software-design-101
+  tier: supported
 - id: design-patterns-101
   category: software-engineering
   title:
@@ -2086,6 +2135,7 @@ series:
   level: 101
   lifecycle: active
   path: content/design-patterns-101
+  tier: supported
 - id: api-design-101
   category: software-engineering
   title:
@@ -2113,6 +2163,7 @@ series:
   - id: backend-development-101
     relation: parent-domain
     note: 백엔드 개발의 API 설계 부분
+  tier: supported
 - id: web-development-101
   category: software-engineering
   title:
@@ -2142,6 +2193,7 @@ series:
   - id: backend-development-101
     relation: specialization
     note: 백엔드 심화
+  tier: supported
 - id: frontend-development-101
   category: software-engineering
   title:
@@ -2168,6 +2220,7 @@ series:
   - id: web-development-101
     relation: overview
     note: 웹 개발 전체 그림
+  tier: supported
 - id: backend-development-101
   category: software-engineering
   title:
@@ -2197,6 +2250,7 @@ series:
   - id: api-design-101
     relation: specialization
     note: API 설계 심화
+  tier: supported
 - id: testing-101
   category: software-engineering
   title:
@@ -2220,6 +2274,7 @@ series:
   level: 101
   lifecycle: active
   path: content/testing-101
+  tier: supported
 - id: containers-101
   category: software-engineering
   title:
@@ -2246,6 +2301,7 @@ series:
   - id: docker-101
     relation: implementation
     note: Docker는 컨테이너의 대표적 구현체
+  tier: supported
 - id: docker-101
   category: software-engineering
   title:
@@ -2273,6 +2329,7 @@ series:
   - id: containers-101
     relation: concept
     note: 컨테이너 개념 입문
+  tier: supported
 - id: kubernetes-101
   category: software-engineering
   title:
@@ -2300,6 +2357,7 @@ series:
   - id: cloud-computing-101
     relation: parent-domain
     note: K8s는 클라우드 인프라의 일부
+  tier: supported
 - id: cloud-computing-101
   category: software-engineering
   title:
@@ -2326,6 +2384,7 @@ series:
   - id: kubernetes-101
     relation: specialization
     note: K8s는 클라우드 컨테이너 오케스트레이션
+  tier: supported
 - id: serverless-101
   category: software-engineering
   title:
@@ -2349,6 +2408,7 @@ series:
   level: 101
   lifecycle: active
   path: content/serverless-101
+  tier: supported
 - id: devops-101
   category: software-engineering
   title:
@@ -2375,6 +2435,7 @@ series:
   - id: sre-101
     relation: alternative-perspective
     note: DevOps는 개발-운영 통합, SRE는 신뢰성 중심
+  tier: supported
 - id: github-actions-101
   category: software-engineering
   title:
@@ -2398,6 +2459,7 @@ series:
   level: 101
   lifecycle: active
   path: content/github-actions-101
+  tier: supported
 - id: observability-101
   category: software-engineering
   title:
@@ -2420,6 +2482,7 @@ series:
   level: 101
   lifecycle: active
   path: content/observability-101
+  tier: supported
 - id: incident-response-101
   category: software-engineering
   title:
@@ -2442,6 +2505,7 @@ series:
   level: 101
   lifecycle: active
   path: content/incident-response-101
+  tier: supported
 - id: sre-101
   category: software-engineering
   title:
@@ -2468,6 +2532,7 @@ series:
   - id: devops-101
     relation: alternative-perspective
     note: SRE는 신뢰성 관점, DevOps는 배포/자동화 관점
+  tier: supported
 - id: secure-coding-101
   category: software-engineering
   title:
@@ -2492,6 +2557,7 @@ series:
   level: 101
   lifecycle: active
   path: content/secure-coding-101
+  tier: supported
 - id: open-source-101
   category: software-engineering
   title:
@@ -2514,6 +2580,7 @@ series:
   level: 101
   lifecycle: active
   path: content/open-source-101
+  tier: supported
 - id: developer-career-101
   category: software-engineering
   title:
@@ -2535,6 +2602,7 @@ series:
   level: 101
   lifecycle: active
   path: content/developer-career-101
+  tier: supported
 - id: data-science-career-101
   category: software-engineering
   title:
@@ -2556,6 +2624,7 @@ series:
   level: 101
   lifecycle: active
   path: content/data-science-career-101
+  tier: supported
 - id: portfolio-project-101
   category: software-engineering
   title:
@@ -2578,6 +2647,7 @@ series:
   level: 101
   lifecycle: active
   path: content/portfolio-project-101
+  tier: supported
 - id: capstone-project-101
   category: software-engineering
   title:
@@ -2600,6 +2670,7 @@ series:
   level: 101
   lifecycle: active
   path: content/capstone-project-101
+  tier: supported
 - id: technical-writing-101
   category: software-engineering
   title:
@@ -2622,6 +2693,7 @@ series:
   level: 101
   lifecycle: active
   path: content/technical-writing-101
+  tier: supported
 - id: technical-writing
   status: planned
   category: software-engineering
@@ -2643,6 +2715,7 @@ series:
   level: 101
   lifecycle: active
   path: content/technical-writing
+  tier: supported
 - id: statistics-101
   category: data
   title:
@@ -2665,6 +2738,7 @@ series:
   level: 101
   lifecycle: active
   path: content/statistics-101
+  tier: supported
 - id: probability-101
   category: data
   title:
@@ -2688,6 +2762,7 @@ series:
   level: 101
   lifecycle: active
   path: content/probability-101
+  tier: supported
 - id: linear-algebra-101
   category: data
   title:
@@ -2711,6 +2786,7 @@ series:
   level: 101
   lifecycle: active
   path: content/linear-algebra-101
+  tier: supported
 - id: data-science-101
   category: data
   title:
@@ -2733,6 +2809,7 @@ series:
   level: 101
   lifecycle: active
   path: content/data-science-101
+  tier: supported
 - id: sql-101
   category: data
   title:
@@ -2756,6 +2833,7 @@ series:
   level: 101
   lifecycle: active
   path: content/sql-101
+  tier: supported
 - id: pandas-101
   category: data
   title:
@@ -2779,6 +2857,7 @@ series:
   level: 101
   lifecycle: active
   path: content/pandas-101
+  tier: supported
 - id: machine-learning-101
   category: data
   title:
@@ -2801,6 +2880,7 @@ series:
   level: 101
   lifecycle: active
   path: content/machine-learning-101
+  tier: supported
 - id: model-evaluation-101
   category: data
   title:
@@ -2824,6 +2904,7 @@ series:
   level: 101
   lifecycle: active
   path: content/model-evaluation-101
+  tier: supported
 - id: mlops-101
   category: data
   title:
@@ -2846,6 +2927,7 @@ series:
   level: 101
   lifecycle: active
   path: content/mlops-101
+  tier: supported
 - id: data-warehouse-101
   category: data
   title:
@@ -2869,6 +2951,7 @@ series:
   level: 101
   lifecycle: active
   path: content/data-warehouse-101
+  tier: supported
 - id: python-dbapi-101
   category: data
   title:
@@ -2883,6 +2966,7 @@ series:
   - en
   status: content-ready
   path: content/python-dbapi-101
+  tier: supported
 - id: sqlalchemy-101
   category: data
   title:
@@ -2899,6 +2983,7 @@ series:
   - en
   status: content-ready
   path: content/sqlalchemy-101
+  tier: supported
 - id: alembic-101
   category: data
   title:
@@ -2915,6 +3000,7 @@ series:
   - en
   status: content-ready
   path: content/alembic-101
+  tier: supported
 - id: azure-app-service-101
   status: content-ready
   category: azure
@@ -2997,6 +3083,7 @@ series:
         slug: 07-scaling-101
         title: 'Scaling 101: When to Scale Up vs Scale Out?'
         status: publish-ready
+  tier: core
 - id: azure-app-service-deep-dive
   status: content-ready
   category: azure
@@ -3071,6 +3158,7 @@ series:
         slug: 06-cold-start-and-warmup
         title: Cold start and warmup — why the first request is expensive
         status: publish-ready
+  tier: core
 - id: azure-functions-101
   status: content-ready
   category: azure
@@ -3153,6 +3241,7 @@ series:
         slug: 07-monitoring-and-ops
         title: Monitoring and Operations Fundamentals
         status: publish-ready
+  tier: core
 - id: azure-functions-deep-dive
   status: content-ready
   category: azure
@@ -3229,6 +3318,7 @@ series:
         title: Cold Start and Placeholder Mode — What Happens When a New Instance
           Is Born
         status: publish-ready
+  tier: core
 - id: azure-aks-101
   status: content-ready
   category: azure
@@ -3312,6 +3402,7 @@ series:
         slug: 07-monitoring-and-ops
         title: Monitoring and ops — Container Insights, logs, alerts
         status: publish-ready
+  tier: core
 - id: azure-aks-deep-dive
   status: content-ready
   category: azure
@@ -3386,6 +3477,7 @@ series:
         slug: 06-keda-internals
         title: KEDA internals — how a ScaledObject builds an HPA
         status: publish-ready
+  tier: core
 - id: azure-aca-101
   status: content-ready
   category: azure
@@ -3468,6 +3560,7 @@ series:
         slug: 07-monitoring-and-ops
         title: Monitoring and ops — Log Analytics and Application Insights
         status: publish-ready
+  tier: core
 - id: azure-aca-deep-dive
   status: content-ready
   category: azure
@@ -3543,3 +3636,4 @@ series:
         slug: 06-envoy-ingress-path
         title: The Envoy ingress path — how the first request reaches your container
         status: publish-ready
+  tier: core
