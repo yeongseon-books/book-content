@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 한 요청이 *5개 서비스* 를 거칠 때, *어디서 느려졌는가* 를 어떻게 압니까?
-
-> *분산 트레이싱은 *한 요청의 모든 구간(span)* 을 *하나의 trace_id* 로 묶어 *흐름 그래프* 로 보여줍니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Span* 과 *Trace* 의 정의
-- *Context propagation* 의 의미
-- *Sampling* 전략
-- *OpenTelemetry* 로 첫 trace
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Microservice 환경에서 *느린 요청* 의 원인을 찾으려면, log 와 metric 만으로는 *불가능* 합니다. trace 가 *유일한 답* 입니다.
 
@@ -55,14 +40,6 @@ flowchart LR
     A --> C["service C (span)"]
     B --> D["DB span"]
 ```
-
-## 핵심 용어 정리
-
-- **Trace**: 한 요청의 *전체 흐름*.
-- **Span**: trace 안의 *한 구간*.
-- **Parent / Child**: span 간의 *호출 관계*.
-- **Context propagation**: 헤더로 *trace_id* 를 *전달*.
-- **Sampling**: 일부 trace 만 *기록*.
 
 ## Before/After
 
@@ -137,26 +114,12 @@ TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% 만
 
 OpenTelemetry → *Tempo / Jaeger / Honeycomb* 으로 흘려보내고, Grafana 에서 *trace ↔ log ↔ metric* 을 *한 화면* 에서 봅니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Trace 는 *지도*, log 는 *주석*.*
-- *Context 전파를 *프레임워크* 에 맡긴다.*
-- *Sampling 비율은 *데이터 양 × 가치*.*
-- *Span 이름은 *동사 + 명사* (`db_query`, `cache_get`).*
-- *모든 신호에 *trace_id* 를 넣는다.*
-
 ## 체크리스트
 
 - [ ] 첫 span 을 *콘솔* 에 본다.
 - [ ] *traceparent* 헤더 의미를 안다.
 - [ ] *Sampling* 비율을 정한다.
 - [ ] log 에 *trace_id* 를 넣는다.
-
-## 연습 문제
-
-1. 두 서비스 간 *trace* 를 propagation 으로 이어 보세요.
-2. *Sampling* 비율을 환경별로 다르게 두세요.
-3. 가장 *느린 span* 을 찾는 PromQL/TraceQL 을 작성해 보세요.
 
 ## 정리 및 다음 단계
 

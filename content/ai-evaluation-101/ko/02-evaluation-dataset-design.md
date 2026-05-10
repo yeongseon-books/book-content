@@ -28,15 +28,6 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 ![평가 데이터셋 설계하기](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
 
 *평가 데이터셋 설계하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-평가 데이터셋을 어떻게 설계해야 작더라도 의미 있는 신호를 줄까요?
-
-이 글은 그 질문에 답하기 위해 eval dataset 설계의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 좋은 평가 데이터셋이란 무엇인가요?
 
 ![좋은 평가 데이터셋이란 무엇인가요](../../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.ko.png)
@@ -206,14 +197,6 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **작게 시작해도 좋다** — 10건이라도 없는 것보다 훨씬 낫습니다.
-- **실패 모드로 분류** — happy path만으로는 회귀를 못 잡습니다.
-- **실제 트래픽에서 샘플** — 합성보다 production trace가 가치가 큽니다.
-- **groundtruth는 신중하게** — 라벨링 가이드를 처음에 표준화합니다.
-- **분포가 변하면 갱신** — eval set도 살아 있는 자산입니다.
-
 ## AI Evaluation 101 시리즈
 
 - [왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)

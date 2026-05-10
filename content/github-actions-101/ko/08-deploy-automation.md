@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *staging은 자동, production 은 승인 후* 같은 *세분화된 배포 정책* 을 어떻게 코드로 표현합니까?
-
-> *배포는 빈번하고 작게*, *위험은 게이트로* 통제합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *GitHub Environments* 와 *required reviewers*
-- *OIDC* 로 *AWS/GCP* 단기 자격증명
-- *staging → production* 승격 패턴
-- *rollback* 워크플로우
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *수동 배포* 는 *주말 출근* 의 원인입니다. 자동화는 *속도* 만이 아니라 *재현성* 을 줍니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Stg --> Approve["required reviewer"]
     Approve --> Prod["production deploy"]
 ```
-
-## 핵심 용어 정리
-
-- **Environment**: GitHub의 *배포 환경* (staging, production).
-- **Required reviewers**: 환경별 *승인자*.
-- **OIDC**: 클라우드와의 *단기 토큰* 신뢰.
-- **Promotion**: staging → production *승격*.
-- **Rollback**: *직전 배포로 복귀*.
 
 ## Before/After
 
@@ -152,26 +129,12 @@ jobs:
 
 성숙한 팀은 *PR 머지* → *카나리* → *블루/그린* → *전체 롤아웃* 을 *한 워크플로우* 로 묶고, *Datadog/Grafana* 메트릭을 *자동 검증* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *배포는 코드*, *수동 명령은 흔적이 없다*.
-- *production* 은 *항상 게이트*.
-- *단기 자격증명* 이 표준.
-- *rollback 도 워크플로우*.
-- *staging == production* 동일 매니페스트.
-
 ## 체크리스트
 
 - [ ] *Environments* 가 정의됐다.
 - [ ] *production* 에 *required reviewers* 가 있다.
 - [ ] *OIDC* 로 클라우드에 인증한다.
 - [ ] *rollback* 워크플로우가 있다.
-
-## 연습 문제
-
-1. *staging* 환경을 정의하고 *main push* 시 자동 배포되게 하세요.
-2. *production* 환경에 *승인 게이트* 를 추가하세요.
-3. *workflow_dispatch* 로 *rollback* 워크플로우를 만들어 보세요.
 
 ## 정리 및 다음 단계
 

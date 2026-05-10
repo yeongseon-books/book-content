@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *FastAPI 앱* 을 *프로덕션 수준* 으로 컨테이너화하려면 *무엇을 챙겨야* 합니까?
-
-> *Python 컨테이너화는 *PID 1, signal, healthcheck, non-root* 를 다루는 순간 *진짜 컨테이너* 가 됩니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *FastAPI + uvicorn* 컨테이너화
-- *PID 1 신호 처리* (SIGTERM)
-- *healthcheck* 추가
-- *non-root user* 와 권한
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *컨테이너 안의 Python* 은 종종 *SIGTERM 을 못 받아* *graceful shutdown* 에 실패합니다. 이는 *배포 사고* 의 흔한 원인입니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Run --> HC["healthcheck"]
     HC --> Sig["graceful SIGTERM"]
 ```
-
-## 핵심 용어 정리
-
-- **PID 1**: 컨테이너의 *최초 프로세스*.
-- **SIGTERM**: 종료 *부드러운 신호*.
-- **Graceful shutdown**: *진행 중 요청* 처리 후 종료.
-- **Healthcheck**: 컨테이너 *건강 상태* 보고.
-- **Tini**: 작은 *init 프로세스*.
 
 ## Before/After
 
@@ -156,26 +133,12 @@ docker logs api | tail
 
 운영에서는 *Gunicorn + Uvicorn worker*, *prometheus-fastapi-instrumentator* 로 메트릭, *opentelemetry* 로 trace 가 표준입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *PID 1 을 의식* 한다.
-- *graceful shutdown* 은 *사용자 신뢰* 다.
-- *healthcheck 는 가볍게*, 의존성 검사는 *다른 엔드포인트*.
-- *non-root* 는 *기본*.
-- *worker 수* 는 *부하 측정 후* 결정.
-
 ## 체크리스트
 
 - [ ] *tini* 또는 동등한 init 사용.
 - [ ] *healthcheck* 가 가볍고 정확하다.
 - [ ] *non-root user* 로 실행.
 - [ ] *graceful shutdown* 동작 확인.
-
-## 연습 문제
-
-1. FastAPI 앱을 *컨테이너화* 하고 `/healthz` 가 동작하는지 확인하세요.
-2. `docker stop` 시 *진행 중 요청* 이 *정상 응답* 후 종료되는지 확인하세요.
-3. `USER` 를 추가해 *non-root* 로 실행되게 하세요.
 
 ## 정리 및 다음 단계
 

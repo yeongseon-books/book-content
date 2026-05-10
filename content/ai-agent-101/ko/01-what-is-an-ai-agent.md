@@ -27,25 +27,7 @@ seo_description: Chatbot은 "질문에 답하는 사전"이라면, Agent는 "할
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## 핵심 질문
-
-- Chatbot과 Agent를 구분 짓는 본질적 차이는 무엇일까요?
-- Observe → Think → Act → Check 루프는 왜 필요할까요?
-- Agent라고 부르려면 최소한 어떤 조건을 충족해야 할까요?
-- 이 시리즈에서 다룰 Agent는 어디까지를 범위로 잡을까요?
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- ChatGPT 같은 chatbot과 AI Agent의 본질적인 차이
-- Agent의 핵심 루프 observe → think → act → check가 무엇이고 왜 필요한지
-- Agent를 써야 하는 상황과 chatbot으로 충분한 상황을 구분하는 기준
-- 첫 Agent를 직접 손으로 흉내 내는 작은 실습
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 LLM을 처음 만나면 대부분 "질문하면 답하는 모델"로 이해합니다. 그래서 ChatGPT의 채팅창이 곧 LLM의 전부라고 생각하기 쉽습니다. 하지만 실무에서 LLM을 production에 쓰는 순간 한계가 드러납니다.
 
@@ -187,29 +169,12 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 
 이 4개 중 2개 이상에 "yes"가 나오면 Agent를 진지하게 검토합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **정의를 좁혀라** — “에이전트”라는 단어 대신 LLM + tools + loop라는 구체적 구조로 합의합니다.
-- **자율성의 비용** — 자율성을 한 단계 올릴 때마다 디버깅·관측·비용이 비선형으로 증가합니다.
-- **툴 인터페이스 우선** — 모델보다 툴 인터페이스 설계가 결과 품질을 더 크게 좌우합니다.
-- **종료 조건 명시** — loop는 반드시 종료 조건과 step 상한을 둡니다.
-- **관측이 곧 신뢰** — trace 없이 운영되는 agent는 사실상 블랙박스라는 점을 인지합니다.
-
 ## 체크리스트
 
 - [ ] chatbot과 Agent의 차이를 한 문장으로 설명할 수 있다
 - [ ] observe → think → act → check 루프를 그릴 수 있다
 - [ ] 우리 use case가 Agent에 적합한지 4개 질문으로 판단할 수 있다
 - [ ] 무한 루프와 context bloat 위험을 알고 있다
-
-## 연습 문제
-
-1. 다음 작업 중 Agent가 필요한 것과 chatbot으로 충분한 것을 구분해보세요.
-   - "오늘 회의록을 요약해줘"
-   - "GitHub issue를 라벨에 따라 분류하고 담당자에게 할당해줘"
-   - "Python 코드 리뷰해줘"
-   - "Slack에서 오늘 멘션된 메시지에 모두 ack 답변을 달아줘"
-2. `get_weather`에 더해 `send_email`이라는 tool을 추가했을 때, Agent가 가능한 새 use case 하나를 생각해보세요.
 
 ## 정리
 
@@ -222,17 +187,6 @@ production에서 Agent 도입을 결정할 때는 다음 질문을 먼저 던집
 ## 다음 글
 
 다음 글에서는 Agent의 결정 품질을 좌우하는 **context engineering** - 무엇을 prompt에 넣고, 무엇을 빼야 할지를 다룹니다.
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] Chatbot과 Agent의 차이를 한 문장으로 설명할 수 있다.
-- [ ] Observe→Think→Act→Check 루프를 손으로 한 사이클 흉내 냈다.
-- [ ] Agent의 자율성 수준을 분류 기준으로 평가할 수 있다.
-- [ ] 이 시리즈가 다루는 범위와 다루지 않는 범위를 적었다.
-
-<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

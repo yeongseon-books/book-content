@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 좋은 dashboard 와 *벽지처럼 의미 없는* dashboard 는 무엇이 다릅니까?
-
-> *좋은 dashboard 는 *하나의 질문* 에 답합니다. *USE* 와 *RED* 같은 패턴을 따르면 panel 이 *의미 단위* 가 됩니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *USE* (Utilization, Saturation, Errors)
-- *RED* (Rate, Errors, Duration)
-- *Golden signals* 의 4가지
-- *질문 단위* dashboard 구성
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 대부분의 dashboard 는 *장식* 입니다. 장애 시 *어디를 봐야 할지* 모르면, panel 30개는 *0개* 와 같습니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Q --> USE["USE: util, saturation, error"]
     Q --> Golden["Golden: latency, traffic, error, saturation"]
 ```
-
-## 핵심 용어 정리
-
-- **USE**: 자원(*resource*) 관점.
-- **RED**: 요청(*request*) 관점.
-- **Golden signals**: 서비스 *건강* 4축.
-- **Heatmap**: 분포의 *시간 변화*.
-- **Annotation**: 배포 시점 등의 *마커*.
 
 ## Before/After
 
@@ -135,26 +112,12 @@ $service = api | worker | scheduler
 
 가장 자주 보는 *Service Overview* dashboard 가 *RED + USE* 6패널로 압축됩니다. 더 깊은 dashboard 는 *역할별로 분리*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Dashboard 는 *제목이 질문* 이다.*
-- *6패널 한 화면 — 그 이상은 *세부 dashboard* 로.*
-- *p95/p99 가 평균보다 *진실* 에 가깝다.*
-- *배포는 *annotation* 으로 마킹.*
-- *답하지 못하는 panel 은 *지운다*.*
-
 ## 체크리스트
 
 - [ ] *RED* 4쿼리 를 알고 있다.
 - [ ] *USE* 의 의미를 안다.
 - [ ] 첫 화면이 *건강 요약*.
 - [ ] 배포 *annotation* 이 보인다.
-
-## 연습 문제
-
-1. 한 서비스의 *RED* dashboard 를 만들어 보세요.
-2. *USE* 로 host 자원 dashboard 를 만들어 보세요.
-3. Annotation 으로 *배포 시점* 을 표시해 보세요.
 
 ## 정리 및 다음 단계
 

@@ -32,15 +32,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-호스트 부팅 과정을 이해하면 어떤 시작 시점의 사고를 더 정확히 진단할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 호스트 부팅 흐름의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - Functions Host는 정확히 어떤 프로세스이고, 어떤 순서로 부트스트랩되는가?
@@ -200,14 +191,6 @@ az functionapp config appsettings list -n my-func -g my-rg \
 
 az functionapp log tail -n my-func -g my-rg
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **WebJobsScriptHostService가 생애 주기 관리** — 호스트 시작·중지의 모든 신호가 이 지점에서 출발합니다.
-- **초기 설정이 런타임 행동을 결정** — host.json·환경 변수가 부팅 단계에서 굳어집니다.
-- **Extension bundle 로드가 무거운 단계** — 콜드 스타트 시간의 큰 비중을 차지합니다.
-- **부팅 실패는 invocation 실패로 위장** — 호스트 로그를 따로 보지 않으면 원인을 놓칩니다.
-- **재시작 사이클의 패턴을 본다** — 반복 재시작이 가장 빠른 위험 신호입니다.
 
 ## 운영 체크리스트
 

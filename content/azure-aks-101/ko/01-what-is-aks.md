@@ -28,15 +28,6 @@ AKS는 그 부담을 줄이기 위해 나온 Azure의 관리형 Kubernetes입니
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-AKS는 다른 컨테이너 옵션과 비교해 언제 선택해야 하고, 무엇을 책임져야 할까요?
-
-이 글은 그 질문에 답하기 위해 AKS의 위치와 책임 분담의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - AKS는 자체 관리(self-managed) Kubernetes와 비교해 무엇을 대신 해주고, 무엇은 여전히 사용자가 책임지는가?
@@ -213,14 +204,6 @@ az aks show \
   --resource-group $RG --name $CLUSTER \
   --query '{kubernetesVersion:kubernetesVersion, fqdn:fqdn, nodeResourceGroup:nodeResourceGroup}'
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **관리형이라도 책임은 공유된다** — control plane은 Azure가 보지만 노드·앱·네트워크는 사용자 책임입니다.
-- **쿠버네티스가 정말 필요한가를 먼저 묻는다** — ACA·App Service로 충분하다면 AKS의 운영 비용을 피할 수 있습니다.
-- **버전 업그레이드를 운영 캘린더에 둔다** — 지원 윈도가 짧으므로 업그레이드를 일상 작업으로 만듭니다.
-- **RBAC와 네임스페이스를 처음에 정한다** — 조직 경계를 코드로 표현해야 사고 후 정리가 가능합니다.
-- **관측·로그를 cluster 첫날에 켠다** — 사후 도입은 비용도 크고 사고 시 도움이 되지 않습니다.
 
 ## 운영 체크리스트
 

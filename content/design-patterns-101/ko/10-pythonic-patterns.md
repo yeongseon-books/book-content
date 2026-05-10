@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: GoF 패턴들을 *그대로* 옮기는 게 항상 옳은가요?
-
-> Python에서는 일급 함수, 모듈, Protocol, 데코레이터가 GoF의 많은 패턴을 *더 가볍게* 풀어 줍니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 모듈이 곧 Singleton인 이유
-- 함수로 표현하는 Strategy/Command
-- Protocol로 표현하는 인터페이스
-- `@dataclass`와 Value Object
-- 데코레이터로 표현하는 Decorator
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Python의 기본 도구 — 모듈, 함수, Protocol — 가 이미 많은 패턴의 *런타임 지원*입니다. 같은 문제를 *더 적은 코드*로 풀 수 있습니다.
 
@@ -60,14 +45,6 @@ flowchart LR
 ```
 
 같은 패턴, 더 가벼운 표현.
-
-## 핵심 용어 정리
-
-- **Module-as-singleton**: 모듈은 한 번만 로드되어 Singleton처럼 동작.
-- **First-class function**: 함수가 인자/반환값/저장 가능한 값.
-- **Protocol**: 구조적 타입(덕 타이핑의 정적 검증).
-- **Decorator (`@`)**: 함수/클래스를 감싸 책임을 추가.
-- **dataclass**: 동등성/표현/불변성을 제공하는 값 객체.
 
 ## Before/After
 
@@ -187,14 +164,6 @@ def work(): time.sleep(0.1)
 
 `logging` = 모듈 Singleton, `sorted(key=...)` = 함수 Strategy, `typing.Protocol` = 인터페이스, `@app.route(...)` = Decorator. 표준 라이브러리와 인기 프레임워크가 이미 Pythonic 패턴을 *살아 있는 예제* 로 보여 줍니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 먼저 *언어*가 주는 도구를 떠올린다.
-- ABC보다 Protocol을, Singleton 클래스보다 모듈을.
-- 함수로 충분하면 함수로.
-- 데코레이터는 `functools.wraps`와 함께.
-- 패턴은 결국 *가독성*에 봉사한다.
-
 ## 체크리스트
 
 - [ ] 모듈로 풀 수 있는 자리에 Singleton을 만들지 않았는가?
@@ -202,12 +171,6 @@ def work(): time.sleep(0.1)
 - [ ] Protocol로 충분한 자리에 ABC를 강요하지 않았는가?
 - [ ] 값 객체에 dataclass를 썼는가?
 - [ ] 데코레이터에 `functools.wraps`를 빠뜨리지 않았는가?
-
-## 연습 문제
-
-1. 자기 코드의 Singleton 클래스를 모듈로 접어 보세요.
-2. Strategy 클래스 한 곳을 함수로 단순화해 보세요.
-3. ABC 인터페이스를 Protocol로 바꾸고 mypy를 통과시켜 보세요.
 
 ## 정리 및 다음 단계
 

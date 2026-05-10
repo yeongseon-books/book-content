@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Frontend Development 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 서버에서 데이터를 받는 *그 짧은 순간* 동안 사용자에게 무엇을 보여줘야 할까요?
-
-> 비동기 코드를 잘 다루려면 *세 가지 상태* 를 항상 의식해야 합니다: *로딩 중, 성공, 실패*.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- `fetch` 와 `async/await` 의 *최소 사용법*
-- 로딩/에러 상태를 *명시적으로* 다루기
-- 취소(cancellation)와 race condition
-- 캐싱과 stale-while-revalidate
-- React Query / SWR이 *왜 표준이 되었는지*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 비동기는 *프론트엔드 버그의 절반* 입니다. 빠른 네트워크에서는 잘 보이지 않다가, 사용자의 *느린 3G* 에서 갑자기 깨집니다. 명시적인 상태 관리가 *유일한* 해법입니다.
 
@@ -55,14 +40,6 @@ flowchart LR
     Loading --> Error["error"]
     Error --> Loading
 ```
-
-## 핵심 용어 정리
-
-- **`fetch`**: 브라우저 내장 HTTP 클라이언트.
-- **Promise**: *미래에 도착할 값* 을 표현하는 객체.
-- **`async/await`**: Promise를 *동기처럼* 쓰는 문법.
-- **AbortController**: 요청을 *중간에 취소* 하는 도구.
-- **Stale-while-revalidate**: *오래된 캐시를 보여주며* 백그라운드에서 갱신.
 
 ## Before/After
 
@@ -169,14 +146,6 @@ function Users() {
 
 대부분의 React 앱은 *React Query (TanStack Query)* 또는 *SWR* 을 표준으로 사용합니다. Vue는 *Pinia + composables*, Svelte는 내장 *load 함수* 가 있습니다. 손으로 fetch 상태를 관리하는 코드는 *점점 사라지고* 있습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 비동기는 *상태 머신* 이다 — 4가지 상태를 모두 그린다.
-- 모든 fetch는 *취소 가능* 해야 한다.
-- 캐싱은 *기본값* 이고, 실시간 갱신이 예외다.
-- 사용자에게 보이는 에러 메시지는 *친절하고 행동 가능한* 것이어야 한다.
-- *네트워크 패널의 Slow 3G* 에서 한 번씩 테스트한다.
-
 ## 체크리스트
 
 - [ ] `async/await` 로 fetch를 작성할 수 있다.
@@ -184,12 +153,6 @@ function Users() {
 - [ ] AbortController를 한 번 써봤다.
 - [ ] React Query 또는 SWR을 시도해봤다.
 - [ ] Slow 3G 모드에서 앱을 테스트해봤다.
-
-## 연습 문제
-
-1. `https://jsonplaceholder.typicode.com/users` 를 호출해 사용자 목록을 표시하세요.
-2. 위 컴포넌트에 로딩과 에러 상태를 명시적으로 추가하세요.
-3. 검색창을 추가하고, 빠르게 입력해도 *마지막 입력의 결과* 만 표시되도록 하세요.
 
 ## 정리 및 다음 단계
 

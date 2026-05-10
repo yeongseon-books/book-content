@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *클러스터* 가 *돌고 있다* 는 것이 *운영 가능* 하다는 뜻일까요?
-
-> *probe, RBAC, 정책, 관측성, 런북* 이 모여야 *운영* 입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *liveness/readiness/startup* probe
-- *RBAC* 와 *네트워크 정책*
-- *metrics/logs/traces*
-- *용량 산정* 과 *GitOps*
-- *런북* 의 구조
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *기능* 이 *돌아가는 것* 과 *야간* 에도 *문제 없이 돌아가는 것* 은 다릅니다. *운영성* 이 *서비스 신뢰* 입니다.
 
@@ -53,14 +38,6 @@ flowchart LR
     Obs --> SRE["sre runbooks"]
     SRE --> GitOps["gitops"]
 ```
-
-## 핵심 용어 정리
-
-- **liveness probe**: *재시작* 판단.
-- **readiness probe**: *트래픽* 수신 판단.
-- **RBAC**: *역할 기반 권한*.
-- **NetworkPolicy**: *Pod 간 통신* 제한.
-- **GitOps**: *Git* 을 *원천* 으로 한 *선언적 운영*.
 
 ## Before/After
 
@@ -152,14 +129,6 @@ def runbook_step(name):
 
 *Argo CD* 같은 *GitOps* 도구가 *Git* 의 상태를 *클러스터* 에 *수렴* 시키며, *대시보드* 와 *런북* 으로 *야간* 에도 대응합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *probe* 는 *계약* 이다.
-- *권한* 은 *작게 시작* 한다.
-- *관측성* 은 *세 다리* (metrics, logs, traces).
-- *Git* 이 *원천* 이면 *드리프트* 가 사라진다.
-- *런북* 은 *훈련* 으로 갱신.
-
 ## 체크리스트
 
 - [ ] *probe* 3종 검토.
@@ -167,12 +136,6 @@ def runbook_step(name):
 - [ ] *NetworkPolicy 기본 deny*.
 - [ ] *대시보드 + 알람*.
 - [ ] *런북* 존재.
-
-## 연습 문제
-
-1. *liveness* 와 *readiness* 의 *차이* 한 줄로.
-2. *GitOps* 의 *핵심 이점* 한 줄로.
-3. *NetworkPolicy 기본 deny* 의 *효과* 한 줄로.
 
 ## 정리 및 다음 단계
 

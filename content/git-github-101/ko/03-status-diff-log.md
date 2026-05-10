@@ -24,23 +24,6 @@ seo_description: status·diff·log 세 명령은 각각 "지금 어디에 있나
 
 # 변경 사항 확인하기 - status, diff, log로 읽기
 
-## 이 글에서 배울 것
-
-- `git status`의 출력을 한 줄씩 정확히 읽는 방법
-- `git status -s`로 짧은 형식을 빠르게 훑는 방법
-- `git diff`, `git diff --cached`, `git diff HEAD`가 각각 어느 영역의 변경을 보여 주는지
-- 두 commit 사이의 변경을 `git diff <a> <b>`로 비교하는 방법
-- `git log`의 자주 쓰는 옵션(`--oneline`, `--graph`, `--stat`, `--patch`)을 한자리에서 익히는 방법
-
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-status·diff·log를 어떻게 읽어야 변경의 맥락을 정확히 파악할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 변경 사항 읽기의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - `git status` 출력의 각 줄은 어떤 영역(working/staging/HEAD)을 가리키는가?
@@ -49,7 +32,7 @@ status·diff·log를 어떻게 읽어야 변경의 맥락을 정확히 파악할
 - 두 commit 사이의 변경을 `git diff <a> <b>`로 비교하면 어느 방향의 diff가 나오는가?
 - `git log`의 `--oneline`, `--graph`, `--stat`, `--patch`는 각각 어떤 질문에 대답하는가?
 
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 지난 글에서 첫 commit까지 한 사이클을 돌려 봤습니다. 이제부터는 "변경이 어디에 있는지"뿐 아니라 "변경의 내용이 정확히 무엇인지"를 읽을 수 있어야 협업이 시작됩니다.
 
@@ -353,14 +336,6 @@ index 6e85ca6..b7f5a1e 100644
 - **alias로 손에 익히기**: `git config --global alias.lg "log --oneline --graph --decorate"` 같은 alias를 한두 개 등록하면 손가락이 기억합니다.
 - **출력 색**: 대부분의 환경에서 기본으로 색이 켜져 있지만, 꺼져 있다면 `git config --global color.ui auto`로 켭니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **status는 작업의 현재 위치** — staged·unstaged·untracked를 분리해 봅니다.
-- **diff는 의도를 검증하는 도구** — 커밋 전에 반드시 변경의 의미를 확인합니다.
-- **log는 시간을 거꾸로 읽는 능력** — --oneline·--graph로 흐름을 파악합니다.
-- **범위 지정이 강력한 디버깅** — diff·log 모두 두 시점을 비교할 수 있습니다.
-- **blame과 결합해 원인 추적** — 코드의 왜를 묻는 출발점입니다.
-
 ## 체크리스트
 
 - [ ] `git status` 긴 형식과 `-s` 짧은 형식의 출력을 둘 다 읽어 봤습니다.
@@ -369,14 +344,6 @@ index 6e85ca6..b7f5a1e 100644
 - [ ] `git log --oneline`, `--graph`, `--stat`, `-p`의 차이를 직접 출력으로 확인했습니다.
 - [ ] `git diff <a> <b>`에서 인자 순서가 어떤 의미인지 설명할 수 있습니다.
 - [ ] pager에서 `q`로 빠져나올 수 있다는 것을 손가락으로 기억하고 있습니다.
-
-## 연습 문제
-
-1. `README.md`의 한 줄을 수정하고 `git diff`와 `git diff --cached`의 출력을 각각 캡처해 비교해 보세요.
-2. `git add`로 staging한 뒤 `git diff`가 비어 있다는 사실을 직접 확인하고, `git diff HEAD`로는 여전히 보인다는 것도 확인하세요.
-3. 첫 commit과 두 번째 commit의 차이를 `git diff 4f1a2c0 9b8c3e2`(직접 만든 hash로 대체)로 출력해 보고, 같은 정보를 `git show 9b8c3e2`로도 확인해 보세요.
-4. `git log --oneline --graph --stat`을 한 번에 실행해 보고, 각 옵션이 어떤 줄을 담당하는지 한 줄씩 적어 보세요.
-5. 아무 파일이나 새로 만들고 `git status -s`의 `??` 표시를 본 다음, `git add` 후 표시가 어떻게 바뀌는지 비교해 보세요.
 
 ## 정리·다음 글
 

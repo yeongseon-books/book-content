@@ -24,23 +24,6 @@ seo_description: 첫 commit은 "working directory의 변경을 staging에 모아
 
 # 첫 commit 만들기 - init, status, add, commit
 
-## 이 글에서 배울 것
-
-- `git init`으로 빈 저장소를 만드는 방법
-- `git status`로 현재 상태를 읽는 방법
-- `git add`로 변경을 staging에 올리는 의미
-- `git commit -m`으로 첫 snapshot을 남기는 방법
-- 한 사이클(편집 → add → commit)을 한 번에 따라가 보기
-
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-첫 커밋을 만들 때 무엇을 의식적으로 실천해야 이후 협업이 편해질까요?
-
-이 글은 그 질문에 답하기 위해 첫 커밋 흐름의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - `git init`이 만든 빈 저장소 안에는 처음에 무엇이 들어 있는가?
@@ -49,7 +32,7 @@ seo_description: 첫 commit은 "working directory의 변경을 staging에 모아
 - `git commit -m`이 남기는 첫 snapshot은 어떤 정보를 함께 기록하는가?
 - 편집 → add → commit 한 사이클을 처음 돌릴 때 가장 자주 빠뜨리는 단계는 무엇인가?
 
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Git의 대부분의 명령은 "지금 변경이 어느 영역에 있는가"를 전제로 동작합니다. 그래서 처음 배울 때 어려운 부분은 명령 이름이 아니라 영역을 머릿속에 그리는 일입니다.
 
@@ -244,14 +227,6 @@ $ git log --oneline
 - **status를 자주 본다**: 작업 중간중간 `git status`를 부담 없이 칩니다. "지금 어디에 무엇이 있는지" 머릿속 그림과 실제 상태를 맞추는 일이 가장 큰 시간 절약입니다.
 - **commit 단위가 작을수록 협업이 쉽다**: 큰 변경을 한 번에 commit하면 PR 리뷰가 어렵고, 충돌도 크게 발생합니다. 작은 단위로 자주 commit하는 편이 안전합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **init·status·add·commit이 기본 사이클** — 이 네 단계의 의미를 정확히 분리해야 합니다.
-- **staging이 커밋의 의도를 표현** — 변경의 일부만 골라 담는 도구로 적극 활용합니다.
-- **의미 있는 단위로 commit** — 한 commit이 한 가지 일을 합니다.
-- **작성자 정보를 처음에 설정** — 협업에서 신원 추적이 깨지지 않도록 합니다.
-- **초기 .gitignore가 미래 사고 방지** — 민감 파일·생성물을 처음부터 제외합니다.
-
 ## 체크리스트
 
 - [ ] `git init`이 만든 `.git/` 폴더를 직접 확인했습니다.
@@ -260,14 +235,6 @@ $ git log --oneline
 - [ ] `git commit -m "..."`으로 commit을 만들고 `git log --oneline`으로 확인했습니다.
 - [ ] commit 후 status가 `working tree clean`으로 돌아오는 것을 봤습니다.
 - [ ] `root-commit`이 무엇을 뜻하는지 한 문장으로 설명할 수 있습니다.
-
-## 연습 문제
-
-1. 빈 디렉터리에서 `git init`을 실행한 뒤, `.git/` 폴더 안에 어떤 파일·디렉터리가 있는지 한 단계만 들여다보세요.
-2. README.md를 만들어 `Untracked` 상태에서 status를 확인하고, `add` 후 다시 한 번 status를 비교해 보세요.
-3. 첫 commit 이후 README.md를 한 줄 추가하고 commit하세요. `git log --oneline`이 두 줄로 보이는 것을 확인합니다.
-4. commit message를 빈 문자열로 시도해 보고(`git commit -m ""`), 어떤 메시지가 나오는지 적어 보세요.
-5. 새 파일을 두 개 만든 뒤 하나만 `git add`하고 commit하면, 나머지 파일은 어떤 상태로 남는지 status로 확인해 보세요.
 
 ## 정리·다음 글
 

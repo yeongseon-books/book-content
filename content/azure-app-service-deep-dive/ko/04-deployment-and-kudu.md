@@ -46,15 +46,6 @@ Linux code app에서는 빌드 단계에 **Oryx**가 강하게 연결됩니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Kudu·배포 파이프라인을 이해하면 어떤 배포 사고를 예방할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Kudu와 배포 파이프라인의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - Kudu는 어디서 실행되며, App Service의 ‘배포’는 정확히 어떤 단계로 흐르는가?
@@ -269,14 +260,6 @@ az webapp deployment slot swap -n my-app -g my-rg \
 az webapp config appsettings list -n my-app -g my-rg --slot staging \
   --query "[?starts_with(name, 'WEBSITE_SWAP')]" -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Kudu는 강력하지만 위험하다** — 운영 환경에서의 콘솔 접근 정책을 명확히 합니다.
-- **Run From Package가 안정적이다** — ZIP 배포 방식의 표준화가 사고를 줄입니다.
-- **배포 슬롯 스왑이 기본** — 수동 swap은 검증 후 자동화로 옮깁니다.
-- **빌드는 CI에서, 배포는 CD에서** — App Service에서 빌드하면 재현성을 잃습니다.
-- **배포 로그를 항상 보관** — 사고 시 원인을 좁히는 가장 빠른 길입니다.
 
 ## 운영 체크리스트
 

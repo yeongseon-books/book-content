@@ -39,15 +39,6 @@ KEDA는 크게 두 컴포넌트로 설치됩니다. **operator**는 `ScaledObjec
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-KEDA의 내부 구조를 이해하면 어떤 트리거 설계가 정확해질까요?
-
-이 글은 그 질문에 답하기 위해 KEDA 내부의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - KEDA는 HPA의 외부 메트릭을 어떻게 합성하고, 그 어댑터의 책임 경계는 어디인가?
@@ -128,14 +119,6 @@ kubectl describe scaledobject my-app -n my-ns | tail -40
 kubectl -n kube-system logs -l app=keda-operator --tail=80
 kubectl get hpa -n my-ns | grep keda
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **KEDA는 HPA의 메트릭 어댑터** — 외부 신호를 HPA가 이해하는 형태로 변환합니다.
-- **ScaledObject가 트리거 정의** — 선언적이므로 Git에서 변경 추적이 가능합니다.
-- **폴링 주기가 비용을 좌우** — 외부 시스템 부하와 균형을 잡습니다.
-- **Activation·Cooldown 분리** — 0→1 전환과 정상 스케일이 다른 정책으로 동작합니다.
-- **커스텀 스케일러는 신중하게** — 유지보수 책임이 따르므로 표준 트리거를 우선합니다.
 
 ## 운영 체크리스트
 

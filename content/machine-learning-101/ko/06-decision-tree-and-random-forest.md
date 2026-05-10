@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Machine Learning 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *if-else 의 거대한 묶음* 이 *왜 신경망보다 강력* 할 때가 있을까요?
-
-> *Decision Tree 는 *해석 가능한 비선형* 모델이고, *Random Forest 는 *수많은 트리* 의 *집단지성* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *결정 트리* 의 *분할 기준 (지니/엔트로피)*
-- *과적합* 과 *가지치기*
-- *Bagging* 과 *Random Forest*
-- *피처 중요도* 의 의미와 한계
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *표 데이터 (tabular)* 에서 *Random Forest / GBDT* 가 *여전히 최강*. *딥러닝 이전* 에 *반드시 시도*.
 
@@ -53,14 +38,6 @@ flowchart LR
     Many["many trees"] --> Forest["Random Forest"]
     Forest --> Stable["stable + accurate"]
 ```
-
-## 핵심 용어 정리
-
-- **분할**: *피처/임계값* 으로 *데이터 분리*.
-- **지니/엔트로피**: *불순도* 측정.
-- **가지치기**: *깊이/잎 크기* 제한.
-- **Bagging**: *부트스트랩* + 평균.
-- **피처 중요도**: *분할 기여도*.
 
 ## Before/After
 
@@ -126,26 +103,12 @@ print("top:", order)
 
 신용 평가, 클릭 예측, 추천 — *표 데이터* 의 *주력 모델*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *RF* 는 *베이스라인 + α*.
-- *GBDT* 가 *대개 더 강함*.
-- *Permutation Importance* 가 *더 신뢰* 가능.
-- *해석은 SHAP* 으로 *추가*.
-- *카테고리 피처* 는 *모델별 처리* 다름.
-
 ## 체크리스트
 
 - [ ] *max_depth* 를 *명시*.
 - [ ] *n_estimators* 를 *충분히* 늘림.
 - [ ] *피처 중요도* 의 *한계* 를 안다.
 - [ ] *GBDT* 와 *비교* 한다.
-
-## 연습 문제
-
-1. *max_depth* 를 1~20 으로 *바꿔* 점수 변화를 보세요.
-2. *RandomForest vs GradientBoosting* 점수를 비교하세요.
-3. *Permutation Importance* 와 *기본 importance* 를 비교하세요.
 
 ## 정리 및 다음 단계
 

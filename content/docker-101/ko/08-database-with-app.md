@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 컨테이너화한 *Python 앱* 과 *PostgreSQL* 을 *함께* 운용하려면 어떤 패턴을 써야 합니까?
-
-> *DB 컨테이너의 핵심은 *영속성, 준비 신호, 마이그레이션* 의 *세 박자* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *PostgreSQL Compose* 구성
-- *healthcheck* 와 *startup 순서*
-- *Alembic* 마이그레이션 자동화
-- *시드 데이터* 패턴
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 DB 가 *준비되지 않은 채* 앱이 시작하면 *cold start 사고* 가 납니다. 마이그레이션이 *자동* 이지 않으면 *배포가 수동* 이 됩니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Db -->|service_healthy| Mig["alembic upgrade head"]
     Mig --> Web["fastapi"]
 ```
-
-## 핵심 용어 정리
-
-- **Migration**: 스키마 *버전 관리*.
-- **Seed**: 초기 *기본 데이터*.
-- **Healthcheck**: DB *준비 신호*.
-- **Init container**: *마이그레이션 전용* 일회성 컨테이너.
-- **Volume**: DB 데이터 *영속화*.
 
 ## Before/After
 
@@ -163,26 +140,12 @@ docker compose exec db pg_dump -U postgres app > app.sql
 
 운영에서는 *RDS / Cloud SQL* 같은 *관리형 DB* 를 쓰지만, *로컬과 CI* 는 동일한 Compose 로 통일해 *환경 평등성* 을 유지합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *마이그레이션은 *자동, idempotent, 단일 실행* 이어야 한다*.
-- *healthcheck 가 정직해야 *startup 순서* 가 의미 있다*.
-- *DB 데이터는 *반드시 named volume* + 백업*.
-- *시드는 *멱등성* 이 핵심*.
-- *비밀번호는 *secret store*, 기본값 절대 금지*.
-
 ## 체크리스트
 
 - [ ] DB *healthcheck* 가 있다.
 - [ ] *migrate* 가 *일회성* 으로 분리됐다.
 - [ ] data volume 이 *named volume*.
 - [ ] *백업 명령* 이 문서화됐다.
-
-## 연습 문제
-
-1. *postgres + migrate + web* 을 Compose 로 띄워 *순서 기동* 을 확인하세요.
-2. Alembic 마이그레이션을 *자동 실행* 되게 하세요.
-3. *시드 데이터* 를 *멱등하게* 작성해 보세요.
 
 ## 정리 및 다음 단계
 

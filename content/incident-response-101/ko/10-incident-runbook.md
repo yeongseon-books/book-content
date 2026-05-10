@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Incident Response 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 지금까지 배운 *Severity*, *대응*, *공지*, *Timeline*, *RCA*, *Mitigation*, *Postmortem*, *예방* 을 *하나* 의 *Runbook* 으로 어떻게 묶을까요?
-
-> *Runbook* 은 *코드형 문서* 로, *SEV* 매핑부터 *Postmortem* 템플릿까지 *한 저장소* 에 둡니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *SEV* 매핑
-- *온콜* 일정
-- *커뮤니케이션* 템플릿
-- *코드형 런북*
-- *연습* 과 *유지 보수*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *문서* 가 *흩어져* 있으면 *새벽 3시* 에 *어디부터* 봐야 할지 모릅니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Steps --> PM["postmortem template"]
     PM --> Repo["runbook repo"]
 ```
-
-## 핵심 용어 정리
-
-- **runbook**: *대응 절차* 모음.
-- **on-call**: *호출 대기* 일정.
-- **sev map**: *SEV* 와 *대응* 의 매핑.
-- **template**: 재사용 가능한 *양식*.
-- **drill**: *연습* 훈련.
 
 ## Before/After
 
@@ -145,14 +122,6 @@ def run_incident(sev, schedule, now, summary):
 
 *runbook/* 디렉터리에 *Markdown* + *Python script* 를 두고, *PR 리뷰* 로 *변경* 을 *추적* 합니다. *분기* 마다 *Drill* 을 실행해 *현행화* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Runbook* 은 *코드*.
-- *연습* 이 없으면 *무용지물*.
-- *분기 Drill* 은 *문화*.
-- *변경* 은 *PR*.
-- *모든 SEV* 에 *동일* 절차는 위험.
-
 ## 체크리스트
 
 - [ ] *SEV 매핑*.
@@ -160,12 +129,6 @@ def run_incident(sev, schedule, now, summary):
 - [ ] *커뮤니케이션 템플릿*.
 - [ ] *Postmortem 템플릿*.
 - [ ] *분기 Drill*.
-
-## 연습 문제
-
-1. *runbook* 의 의미 한 줄로.
-2. *drill* 의 의미 한 줄로.
-3. *sev map* 의 의미 한 줄로.
 
 ## 정리 및 다음 단계
 

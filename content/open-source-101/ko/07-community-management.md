@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > 오픈소스 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *기여자* 가 *오래* *남도록* *하려면* *무엇* 이 *필요* 할까요?
-
-> *명확* 한 *행동 강령* 과 *친절* 한 *응답*.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Code of Conduct*
-- *CONTRIBUTING.md*
-- *Discussions* 활용
-- *응답 시간* 관리
-- *기여자* *온보딩*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *커뮤니티* 가 *살아 있어야* *프로젝트* 도 *살아남* 습니다.
 
@@ -52,14 +37,6 @@ flowchart LR
     G --> O[Onboarding]
     O --> R[Recognition]
 ```
-
-## 핵심 용어 정리
-
-- **CoC**: *Code of Conduct*.
-- **CONTRIBUTING**: *기여 가이드*.
-- **Discussions**: *대화* 공간.
-- **maintainer**: *관리자*.
-- **first-time contributor**: *신규* *기여자*.
 
 ## Before/After
 
@@ -128,26 +105,12 @@ labels: bug
 
 기업도 *DevRel* 팀이 *외부 커뮤니티* 와 *유사한* *방식* 으로 *내부 채널* 을 *운영* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *커뮤니티* 는 *자산*.
-- *친절* 이 *경쟁력*.
-- *답변 속도* 가 *신뢰*.
-- *명시적* *룰* 이 *안전*.
-- *인정* 이 *동기*.
-
 ## 체크리스트
 
 - [ ] *CoC* 채택.
 - [ ] *CONTRIBUTING* 작성.
 - [ ] *Issue* 템플릿.
 - [ ] *Discussions* 활성화.
-
-## 연습 문제
-
-1. *Contributor Covenant* 한 줄 설명.
-2. *good first issue* 와 *help wanted* 차이 한 줄.
-3. *DevRel* 의 *역할* 한 줄.
 
 ## 정리 및 다음 단계
 

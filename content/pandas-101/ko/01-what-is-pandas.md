@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Pandas 101 시리즈 (1/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *Pandas* 는 *엑셀의 대체품* 일까요, *데이터 분석의 공용어* 일까요?
-
-> *Pandas는 *표 형식 데이터* 를 다루는 *Python의 표준 라이브러리* 이며, 데이터 과학의 *입구* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Pandas* 의 *정의* 와 위치
-- *Series* 와 *DataFrame* 의 직관
-- 가장 기본적인 *읽기·보기·요약* 흐름
-- 5단계 첫 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 CSV, Excel, DB, API — *현실 데이터의 80%* 는 *표 형태* 입니다. *Pandas가 약하면* 데이터 분석은 *시작도 못 합니다*.
 
@@ -54,14 +39,6 @@ flowchart LR
     DF --> Ops["filter / group / join"]
     Ops --> Out["chart / report / model"]
 ```
-
-## 핵심 용어 정리
-
-- **Series**: *1차원* 의 *이름표 붙은 배열*.
-- **DataFrame**: *2차원* 의 *이름표 붙은 표* — 행과 열이 모두 라벨을 가짐.
-- **Index**: 행을 *식별하는 라벨*.
-- **dtype**: 각 *열의 타입* (int64, float64, object, datetime64).
-- **Vectorization**: *반복문 없이* 열 단위로 연산하는 *Pandas의 기본기*.
 
 ## Before/After
 
@@ -129,26 +106,12 @@ print(df[df["age"] > 40])
 
 데이터 정제, 리포트 생성, ML 전처리, 대시보드 데이터 가공 — *모든 데이터 파이프라인의 시작점* 이 Pandas입니다. *Jupyter + Pandas* 는 데이터 분석의 *기본 세트*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *shape, dtypes, head* 를 *항상 먼저* 본다.
-- *벡터화* 가 안 되면 그제서야 *apply* 를 본다.
-- *index* 를 *의미 있는 키* 로 둔다.
-- *복사인지 뷰인지* 의식한다.
-- *메모리* 가 한계면 *Polars/Dask* 로 옮긴다.
-
 ## 체크리스트
 
 - [ ] *DataFrame* 을 만들 수 있다.
 - [ ] *shape, dtypes, describe* 를 호출한다.
 - [ ] *불리언 인덱싱* 으로 필터링한다.
 - [ ] *Series 와 DataFrame* 의 차이를 안다.
-
-## 연습 문제
-
-1. *3행 4열* 의 DataFrame을 만들고 *컬럼별 평균* 을 출력하세요.
-2. *Series* 와 *Python 리스트* 의 차이를 *3가지* 로 정리하세요.
-3. *describe()* 에 *include="all"* 을 줄 때 어떤 정보가 추가되는지 확인하세요.
 
 ## 정리 및 다음 단계
 

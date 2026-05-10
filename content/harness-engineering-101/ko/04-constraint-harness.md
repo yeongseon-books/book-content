@@ -30,15 +30,6 @@ Agent에게 자유를 주면 창의적이지만 위험합니다. Constraint Harn
 ![Constraint Harness - 규칙, 경계, 금지 행동 정의하기](../../../assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.ko.png)
 
 *Constraint Harness - 규칙, 경계, 금지 행동 정의하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-규칙·경계·금지 행동을 어떻게 정의해야 Agent가 안전한 범위 안에서 동작할까요?
-
-이 글은 그 질문에 답하기 위해 Constraint Harness의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## Agent는 허용된 모든 것을 시도합니다
 
 Agent에게 도구와 권한을 주면 그것을 모두 시도합니다. "고객 데이터를 분석해 줘"라는 task에 데이터베이스 쓰기 권한이 있다면, 분석 도중에 데이터를 수정할 수도 있습니다. "이메일 초안을 작성해 줘"라고 했는데 발송 도구가 노출되어 있다면, 초안을 그대로 보낼 수도 있습니다.
@@ -335,16 +326,6 @@ Agent가 만든 SQL을 application에서 검사하는 것은 우회 가능합니
 - Resource constraint는 token, tool call, wall clock의 상한으로 비용 사고를 막습니다.
 - Scope constraint는 데이터 레이어에서 강제할 때 가장 강력합니다. application 레이어 검증은 우회 가능합니다.
 
----
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **제약은 프롬프트가 아닌 코드에** — system prompt만으로는 우회됩니다.
-- **화이트리스트 우선** — 허용 목록이 블랙리스트보다 안전합니다.
-- **리소스 한도를 명시적으로** — 토큰·시간·호출 횟수가 비용을 통제합니다.
-- **위반 시 처리 흐름 정의** — 에러·재시도·중단을 명확히 합니다.
-- **정책은 버전 관리** — 변경 이력 추적이 사고 분석의 단서입니다.
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -360,6 +341,8 @@ Agent가 만든 SQL을 application에서 검사하는 것은 우회 가능합니
 - Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 

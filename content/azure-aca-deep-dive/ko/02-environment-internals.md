@@ -53,15 +53,6 @@ Dapr component가 어디서 공유되는지 알려 줍니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-ACA Environment 내부에서 노드·네트워크·로깅이 어떻게 묶이고, 그것이 운영에 어떤 의미를 가질까요?
-
-이 글은 그 질문에 답하기 위해 Environment 내부 구조의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - managed environment는 내부적으로 어떤 노드 풀, 어떤 네임스페이스로 매핑되는가?
@@ -373,14 +364,6 @@ az containerapp env show -n my-env -g my-rg \
 
 az containerapp env workload-profile list -n my-env -g my-rg -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Environment는 노드 풀과 VNet의 묶음** — 여러 앱이 같은 인프라를 공유한다는 점을 항상 의식합니다.
-- **워크로드 프로파일이 비용·성능을 결정** — Consumption과 Dedicated의 차이를 워크로드 특성에 맞춰 선택합니다.
-- **VNet 통합은 사후 변경이 어렵다** — 초기 설계 단계에서 네트워크 경계를 확정합니다.
-- **로그 싱크는 환경 단위** — 환경을 합치면 로그 격리가 깨지므로 prod/non-prod는 분리합니다.
-- **Quota를 사전에 점검한다** — 지역별 코어·IP quota가 배포 실패의 흔한 원인입니다.
 
 ## 운영 체크리스트
 

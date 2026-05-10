@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Data Warehouse 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 큰 *Warehouse* 가 있는데 왜 *작은 Mart* 도 만들까요? *영업팀* 과 *재무팀* 이 *같은 뷰* 를 봐야 할 *이유* 가 있을까요?
-
-> *Mart 는 *팀의 언어로 정리한* 작은 분석 영역이다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Data Mart* 의 정의
-- *Warehouse* 와의 차이
-- 도메인별 *작은 영역* 을 두는 이유
-- 5단계 Mart 설계 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Warehouse 는 *전사 공통* 의 데이터를 모읍니다. 하지만 *영업, 재무, 운영* 은 *서로 다른 단어* 를 씁니다. Mart 는 *각 팀의 언어로* 데이터를 *재구성* 한 *얇은 layer* 입니다.
 
@@ -56,14 +41,6 @@ flowchart LR
     SalesMart --> SalesBI["Sales Dashboard"]
     FinanceMart --> FinanceBI["Finance Dashboard"]
 ```
-
-## 핵심 용어 정리
-
-- **Data Mart**: 특정 *도메인용 분석 영역*. Warehouse 의 *부분 집합*.
-- **Conformed Dimension**: 여러 Mart 가 *공유* 하는 dimension.
-- **Domain Modeling**: 팀의 *언어와 규칙* 으로 데이터를 *모델링*.
-- **Aggregated Mart**: *사전 집계* 된 빠른 mart.
-- **Self-service**: 분석가가 *직접 쓰는* 인터페이스.
 
 ## Before/After
 
@@ -143,26 +120,12 @@ GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
 
 dbt 의 *marts/* 폴더가 *도메인별* 로 나뉩니다. 영업, 재무, 제품, 마케팅이 *각자의 mart* 를 갖고, *공통 dim* 만 *Warehouse* 에서 가져옵니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Mart 는 *팀의 언어로 다시 쓴* Warehouse 다.*
-- *Conformed dim 은 *조직의 헌법*.*
-- *Mart 는 *작게 자주* 갱신한다.*
-- *권한* 은 *도메인 경계* 를 따라간다.
-- *Mart 의 *수명* 을 *지표로* 본다.
-
 ## 체크리스트
 
 - [ ] *Warehouse* 와 *Mart* 의 차이를 안다.
 - [ ] *Conformed dimension* 의 의미를 안다.
 - [ ] *권한 분리* 의 필요성을 안다.
 - [ ] *사전 집계* 의 trade-off 를 안다.
-
-## 연습 문제
-
-1. *재무 mart* 의 *fact 테이블 3개* 를 정해 보세요.
-2. Mart 가 *별도 dim 을 만들 때* 발생하는 *충돌 시나리오* 를 적어 보세요.
-3. *권한 분리 없는* mart 의 *위험* 을 *2가지* 적어 보세요.
 
 ## 정리 및 다음 단계
 

@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 시스템을 죽지 않게 만들 수 없다면, 어떻게 죽음을 견디게 만들 수 있을까요?
-
-> 운영 가능한 분산 시스템은 실패가 없는 시스템이 아니라, 실패가 일부에 머물고 빠르게 복구되는 시스템입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- bulkhead(격벽)로 실패를 격리하는 방법
-- circuit breaker로 연쇄 장애를 끊는 방법
-- backpressure로 부하를 안전하게 거절하는 방법
-- timeout / retry / jitter의 올바른 조합
-- 관측성(metric, log, trace)이 운영의 일부인 이유
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 지금까지 다룬 도구들 — replication, consensus, queue, transaction — 은 시스템을 만드는 재료였습니다. 운영 패턴은 그 재료를 "장애가 흔한 현실"에서도 유지하게 하는 운영자의 도구함입니다.
 
@@ -59,14 +44,6 @@ flowchart LR
 ```
 
 호출 경로마다 timeout, breaker, bulkhead, backpressure를 조합해 한 곳의 실패가 전체로 번지지 않게 합니다.
-
-## 핵심 용어 정리
-
-- **Bulkhead**: 자원(스레드, 커넥션 풀)을 분리해 한 곳의 폭발이 옆으로 번지지 않게 하는 격벽.
-- **Circuit breaker**: 연속 실패를 감지하면 잠시 호출 자체를 차단하는 회로.
-- **Backpressure**: 처리 한계를 넘는 요청을 큐 길이/거절로 알리는 메커니즘.
-- **Jitter**: 재시도 간격에 무작위성을 더해 thundering herd를 막는 기법.
-- **Observability**: 시스템 내부를 외부에서 추론할 수 있게 하는 신호의 합 (metric, log, trace).
 
 ## Before/After
 
@@ -179,14 +156,6 @@ def enqueue(msg):
 
 Netflix Hystrix(과거), resilience4j, Envoy/Istio의 retry/circuit breaker, AWS App Mesh, Kubernetes의 HPA + PDB, 큐 기반 백프레셔(SQS, Kafka의 lag) 등에서 같은 패턴이 반복됩니다. SRE 조직은 이 패턴들을 SLO와 묶어 자동화 알람으로 바꿉니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 모든 외부 호출에는 timeout과 retry budget을 명시합니다.
-- breaker / bulkhead의 임계값을 부하 테스트 결과로 정합니다.
-- 관측성(metric, log, trace) 없이는 패턴을 추가하지 않습니다.
-- chaos test로 평소에 실패를 흉내내 둡니다.
-- 사용자 대기 시간을 SLI로 두고 SLO 위반 시 자동 페이지를 보냅니다.
-
 ## 체크리스트
 
 - [ ] 모든 외부 호출에 timeout이 명시되어 있는가?
@@ -194,12 +163,6 @@ Netflix Hystrix(과거), resilience4j, Envoy/Istio의 retry/circuit breaker, AWS
 - [ ] 핵심 의존성에 breaker가 걸려 있는가?
 - [ ] 자원 풀이 도메인별로 분리되어 있는가?
 - [ ] metric / log / trace가 한 trace ID로 묶이는가?
-
-## 연습 문제
-
-1. timeout, retry, breaker가 함께 동작하는 한 호출의 의사코드를 적어 보세요.
-2. backpressure를 도입할지 판단하는 기준 두 가지를 적어 보세요.
-3. 평소에 chaos test로 검증할 시나리오 세 가지를 골라 보세요.
 
 ## 정리 및 다음 단계
 

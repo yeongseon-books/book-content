@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 같은 데이터를 여러 노드에 두는 가장 단순한 일이 왜 그렇게 많은 모드와 옵션을 만들까요?
-
-> replication은 durability와 availability를 위한 기본 도구입니다. 그러나 sync/async, leader 수, quorum 설정에 따라 직접 보이는 동작이 크게 달라집니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- replication의 동기, 종류, 트레이드오프
-- leader-follower, multi-leader, leaderless 모델
-- sync/async replication과 데이터 손실 위험
-- quorum 읽기/쓰기와 R+W>N 의미
-- replication lag을 측정하고 다루는 법
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 replication은 모든 분산 데이터 시스템의 가장 아래 층입니다. 이 층에서의 결정이 4편(consistency)과 6편(consensus)에서 보이는 동작을 만듭니다. "내 DB가 왜 이런 행동을 하지?"의 답은 보통 replication 설정에 있습니다.
 
@@ -66,14 +51,6 @@ flowchart LR
 ```
 
 세 가지 토폴로지가 90% 이상의 시스템을 설명합니다.
-
-## 핵심 용어 정리
-
-- **Leader/follower**: 쓰기는 leader 한 곳, 읽기는 여러 follower.
-- **Multi-leader**: 여러 leader가 쓰기를 받고 서로 동기화.
-- **Leaderless**: 모든 노드가 동등, quorum으로 결정.
-- **Sync replication**: leader가 follower 응답을 기다림.
-- **Quorum (R, W, N)**: N replica 중 R 읽고 W 쓸 때 R+W>N이면 latest 보장.
 
 ## Before/After
 
@@ -184,14 +161,6 @@ print("replication lag rows:", lag())
 
 PostgreSQL/MySQL은 leader-follower 모델이 기본입니다. Cassandra, DynamoDB는 leaderless quorum입니다. CRDTs를 쓰는 시스템은 multi-leader입니다. Cloud의 multi-AZ DB는 보통 sync to one AZ + async to another 하이브리드입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- replication 설정을 explicit하게 docs에 적습니다.
-- read-from-replica는 staleness 한계를 가진 별도 endpoint로 둡니다.
-- sync replica는 두 곳 이상 두어 단일 장애점을 피합니다.
-- LWW 대신 application-level merge를 설계합니다.
-- lag을 SLO로 본 후 alert를 답니다.
-
 ## 체크리스트
 
 - [ ] sync와 async replication의 차이를 한 줄로 말할 수 있는가?
@@ -199,12 +168,6 @@ PostgreSQL/MySQL은 leader-follower 모델이 기본입니다. Cassandra, Dynamo
 - [ ] multi-leader의 충돌 해결 방법을 두 가지 말할 수 있는가?
 - [ ] 우리 DB의 replication topology를 그릴 수 있는가?
 - [ ] replication lag을 어떻게 측정할지 아는가?
-
-## 연습 문제
-
-1. 우리 서비스의 read traffic 중 stale read가 안전한 화면을 두 개 골라 보세요.
-2. quorum (N=5, W=3, R=3) 설정의 가용성과 일관성을 평가해 보세요.
-3. multi-leader에서 같은 key에 동시 write가 들어왔을 때 application-level resolution을 설계해 보세요.
 
 ## 정리 및 다음 단계
 

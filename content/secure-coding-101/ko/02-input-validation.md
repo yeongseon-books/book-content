@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Secure Coding 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 사용자가 *무엇을 보내든* 우리 시스템이 *예측 가능하게 동작* 하려면 어떻게 해야 할까요?
-
-> *입력 검증은 *공격을 막는 첫 줄* 이자, *버그를 줄이는 첫 줄* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Allowlist* 와 *denylist* 의 차이
-- *Schema 기반* 검증의 힘
-- *입력 boundary* 의 의미
-- *type, range, format* 검증 5단계
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 OWASP Top 10 의 절반은 *입력을 믿어서* 생깁니다. SQL injection, XSS, path traversal, deserialization. 모두 *서버가 클라이언트를 너무 믿은* 결과입니다.
 
@@ -55,14 +40,6 @@ flowchart LR
     Schema --> Business["비즈니스 규칙 검증"]
     Business --> Storage["저장"]
 ```
-
-## 핵심 용어 정리
-
-- **Allowlist**: *허용된 것만* 통과시킨다.
-- **Denylist**: *금지된 것* 만 막는다 (불완전).
-- **Schema**: 데이터의 *모양 규약*.
-- **Sanitization**: 위험한 부분을 *지우거나 escape*.
-- **Canonicalization**: 입력을 *정규형* 으로 통일.
 
 ## Before/After
 
@@ -139,26 +116,12 @@ def handle_signup(payload: dict):
 
 대부분의 FastAPI / Flask 팀은 *Pydantic* 또는 *marshmallow* 로 입력을 *route 진입점* 에서 한 번에 검증합니다. 정상 입력은 *typed object* 로 흐르고, 비정상 입력은 *422* 로 떨어집니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Schema 가 곧 *contract* 다.*
-- *모든 boundary 에 *명시적 검증*.*
-- *Error 메시지는 *공격자도 읽는다*.*
-- *Default 는 *거부*, allow 가 *예외*.*
-- *입력은 *정규화* 한 뒤 검증한다.*
-
 ## 체크리스트
 
 - [ ] 모든 route 가 *schema* 를 통과한다.
 - [ ] *Allowlist* 가 기본이다.
 - [ ] *Error 메시지* 가 안전하다.
 - [ ] 길이, 범위, format 이 *명시* 되어 있다.
-
-## 연습 문제
-
-1. *Pydantic* 으로 *주소* 의 schema 를 작성해 보세요.
-2. *Path traversal* 을 막는 파일명 정규식을 적어 보세요.
-3. 같은 입력을 *두 가지 정규화* 로 처리하면 어떻게 다른가요?
 
 ## 정리 및 다음 단계
 

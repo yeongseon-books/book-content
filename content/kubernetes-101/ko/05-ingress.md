@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *서비스 여러 개* 를 *하나의 도메인* 에서 *경로별* 로 어떻게 *나눌까요*?
-
-> *Ingress* 는 *L7 HTTP* 라우팅과 *TLS 종료* 를 *한 진입점* 으로 정리해 줍니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Ingress* 와 *IngressController* 분리
-- *호스트/경로* 라우팅
-- *TLS 종료*
-- *외부 LoadBalancer* 와의 관계
-- *Gateway API* 한 줄 소개
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *LoadBalancer 서비스* 만 있으면 *서비스마다* *비용* 이 듭니다. *Ingress* 로 *한 진입점* 에 모읍니다.
 
@@ -53,14 +38,6 @@ flowchart LR
     IC --> S1["svc a"]
     IC --> S2["svc b"]
 ```
-
-## 핵심 용어 정리
-
-- **Ingress**: *L7 라우팅 규칙* 객체.
-- **IngressController**: *규칙을 실제로 푸는* 프록시 (nginx, Envoy).
-- **host**: *도메인 이름*.
-- **path**: *URL 경로*.
-- **TLS termination**: *Ingress* 에서 *암호 해독*.
 
 ## Before/After
 
@@ -152,26 +129,12 @@ def curl(host, path):
 
 *nginx-ingress* 또는 *AWS ALB Controller* 가 *Ingress 객체* 를 *외부 LB* 에 *반영* 하고, *cert-manager* 가 *TLS* 를 자동 발급합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Ingress* 는 *분기 규칙*.
-- *Controller* 의 *기능 차이* 가 크다.
-- *TLS* 는 *cert-manager* 위임.
-- *Gateway API* 가 *차세대 표준*.
-- *외부 진입점* 은 *최소화*.
-
 ## 체크리스트
 
 - [ ] *Controller* 설치 확인.
 - [ ] *pathType* 명시.
 - [ ] *TLS* 자동화.
 - [ ] *진입점* 통합.
-
-## 연습 문제
-
-1. *Ingress* 와 *IngressController* 의 *차이* 한 줄로.
-2. *TLS 종료* 가 *Ingress* 에서 좋은 *이유* 한 가지.
-3. *Gateway API* 가 *해결하는 한계* 한 줄로.
 
 ## 정리 및 다음 단계
 

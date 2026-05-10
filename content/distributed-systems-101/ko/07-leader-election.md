@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 죽은 줄 알았던 리더가 돌아오면 어떻게 되나요?
-
-> leader election은 단순히 "누가 리더인가"를 정하는 일이 아니라, 옛 리더의 영향력을 안전하게 끊는 일입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- leader election이 필요한 이유와 안전성 조건
-- lease와 heartbeat의 역할
-- fencing token으로 옛 리더를 막는 방법
-- split-brain 시나리오와 방지 설계
-- etcd, ZooKeeper로 리더를 뽑는 실무 패턴
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 분산 시스템의 많은 문제가 "리더가 둘"인 순간에 발생합니다. 두 리더가 같은 자원에 동시에 쓰면 데이터가 깨집니다. 옳은 election은 한 시점에 한 리더만 권한을 갖도록 보장합니다.
 
@@ -58,14 +43,6 @@ flowchart LR
 ```
 
 여러 candidate가 lock service에 lease를 요청합니다. 한 명만 받아 leader가 되고, heartbeat로 lease를 갱신합니다.
-
-## 핵심 용어 정리
-
-- **Leader**: 한 시점에 쓰기 권한을 가진 노드.
-- **Lease**: 시간이 지나면 자동 만료되는 임시 권한.
-- **Heartbeat**: lease를 갱신하기 위한 주기적 신호.
-- **Fencing token**: 단조 증가하는 ID로 옛 리더의 요청을 거부하는 장치.
-- **Split-brain**: 두 노드가 동시에 자기를 리더로 믿는 상태.
 
 ## Before/After
 
@@ -170,14 +147,6 @@ token이 없는 설계에서는 A의 쓰기가 그대로 들어가 데이터가 
 
 Kubernetes의 `kube-controller-manager`, `kube-scheduler`는 etcd lease로 leader election을 합니다. ZooKeeper의 ephemeral znode도 같은 패턴입니다. Kafka의 controller, HDFS NameNode HA, 분산 cron 모두 lease + fencing의 변형입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- TTL은 GC pause + 네트워크 RTT의 최댓값보다 충분히 큽니다.
-- election 이벤트를 metric으로 노출합니다 — 잦은 election은 버그 신호.
-- fencing token을 자원 서버 API의 첫 번째 인자로 둡니다.
-- 리더 변경 시 in-flight 요청의 처리 방식을 명세에 적습니다.
-- 테스트로 split-brain 시나리오를 강제 재현해 둡니다.
-
 ## 체크리스트
 
 - [ ] lease와 heartbeat의 역할을 한 줄로 설명할 수 있는가?
@@ -185,12 +154,6 @@ Kubernetes의 `kube-controller-manager`, `kube-scheduler`는 etcd lease로 leade
 - [ ] split-brain 시나리오를 한 문장으로 적을 수 있는가?
 - [ ] TTL을 정하는 기준을 가지고 있는가?
 - [ ] etcd/ZooKeeper로 election을 구현하는 방법을 떠올릴 수 있는가?
-
-## 연습 문제
-
-1. TTL이 5초, 한 번의 GC pause가 8초인 시스템에서 어떤 일이 벌어질지 분석해 보세요.
-2. fencing token 없이 안전한 election이 가능한 조건을 한 줄로 적어 보세요.
-3. 분산 cron을 etcd lease로 구현하는 의사코드를 적어 보세요.
 
 ## 정리 및 다음 단계
 

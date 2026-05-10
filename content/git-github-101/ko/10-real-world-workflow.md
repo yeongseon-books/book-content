@@ -24,22 +24,6 @@ seo_description: 실무 흐름은 "issue로 작업을 정의하고, branch에서
 
 # 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로
 
-## 이 글에서 배울 것
-
-- Episode 1~9에서 익힌 명령을 한 번의 실무 흐름으로 묶는 법을 익힙니다.
-- issue → branch → commit → PR → review → merge → tag → close까지 한 사이클을 직접 따라가 봅니다.
-- 흐름 중간에서 실수했을 때 어떤 명령으로 회복하는지 표로 정리합니다.
-- 팀 단위로 같은 흐름을 안정적으로 돌리려면 어떤 장치(branch protection, PR template, CI)를 둬야 하는지 살펴봅니다.
-
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-실전 Git 워크플로를 어떻게 설계해야 issue부터 release까지 한 흐름으로 이어질까요?
-
-이 글은 그 질문에 답하기 위해 실전 Git 워크플로의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - issue → branch → commit → PR → review → merge → tag → close 한 사이클은 어떤 명령들로 묶이는가?
@@ -48,7 +32,7 @@ seo_description: 실무 흐름은 "issue로 작업을 정의하고, branch에서
 - tag는 commit 흐름에서 어떤 시점에 어떤 의도로 찍는가?
 - 한 사이클이 평균보다 길어진다면 어느 단계의 신호로 의심해야 하는가?
 
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 지금까지 Episode 1~9에서 명령을 하나씩 익혔습니다. 명령을 아는 것과 흐름을 아는 것은 다릅니다. 같은 `git commit` 명령이라도 어떤 branch에서, 어떤 PR을 위해, 어떤 release를 향해 찍느냐에 따라 의미가 달라집니다. workflow는 사람과 사람 사이의 약속입니다. 같은 흐름을 따르면 새로 합류한 동료도 어디서 변경이 시작되고 어디서 끝나는지 첫 주에 파악합니다.
 
@@ -276,14 +260,6 @@ Closed • yeongseon opened about 1 hour ago
 
 squash merge를 기본으로 두면 history도 깔끔하게 유지됩니다. feature branch 내부의 작은 commit들은 PR 단위로 묶이므로, `main`에서 `git log --oneline`을 보면 한 줄당 한 PR이 보입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **워크플로의 핵심은 강제가 아닌 합의** — 팀이 동의해야 지속됩니다.
-- **trunk-based vs git-flow의 트레이드오프** — 릴리스 주기와 팀 크기에 따라 다릅니다.
-- **브랜치 보호 규칙으로 사고 예방** — main을 사람의 실수로부터 지킵니다.
-- **자동화된 release가 신뢰의 기반** — tag·changelog·배포가 한 흐름이어야 합니다.
-- **회고가 워크플로를 진화시킨다** — 정기적으로 마찰 지점을 점검합니다.
-
 ## 체크리스트
 
 - [ ] issue가 먼저 있고, 그 issue 번호가 PR 본문의 `Closes #N`에 들어가 있나요?
@@ -293,14 +269,6 @@ squash merge를 기본으로 두면 history도 깔끔하게 유지됩니다. fea
 - [ ] force push가 필요할 때 `--force-with-lease`를 사용했나요?
 - [ ] merge 방식이 squash merge로 통일돼 있고, merge 후 feature branch가 삭제됐나요?
 - [ ] release 시점이라면 annotated tag(`-a`)를 만들고 `--tags`로 push했나요?
-
-## 연습 문제
-
-1. 자신의 저장소에서 `feat/<slug>` 형식 branch를 하나 만들고 commit 두 개로 나눠 PR을 올려 봅니다. PR 본문에 `Closes #N`을 넣어 squash merge 후 issue가 닫히는지 확인합니다.
-2. `git push --force` 대신 `git push --force-with-lease`를 git config alias로 등록합니다. `git config --global alias.fpush "push --force-with-lease"`로 시작해 봅니다.
-3. 작은 PR 하나를 squash merge한 뒤 `git tag -a v0.0.1 -m "first tagged release"`로 tag를 만들고 `git push --tags`로 올려 GitHub의 Releases 탭에서 보이는지 확인합니다.
-4. 자신의 저장소에 `.github/pull_request_template.md`를 추가해 봅니다. "변경 요약 / 관련 issue / 테스트 방법 / release tag 여부" 네 항목으로 시작합니다.
-5. `main`에 실수로 commit이 들어갔다고 가정하고 `git revert <hash>`로 되돌리는 흐름을 따라가 봅니다. `git log --oneline`에 revert commit이 새로 쌓이는지 확인합니다.
 
 ## 정리
 

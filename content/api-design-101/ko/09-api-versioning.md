@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > API Design 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 약속을 *바꿔야 할 때*, 외부 클라이언트를 깨지 않으면서 어떻게 진행하나요?
-
-> *호환성 규칙* 을 먼저 정하고, *버전 채널* 로 변화를 격리합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- breaking vs non-breaking 변경 구분
-- URL versioning vs header versioning
-- 호환성 정책 (semver, calver)
-- deprecation 통지와 sunset
-- 다중 버전 운영의 비용
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 API는 *외부* 가 의존합니다. 한 번 깨지면 *수십·수백 클라이언트* 가 동시에 멈춥니다. 좋은 versioning 은 *변화의 자유* 를 줍니다 — 단, 규율과 함께.
 
@@ -55,14 +40,6 @@ flowchart LR
     V2["/v2/users"] --> H2["v2 handler"]
     H1 -.deprecated.-> Sunset["sunset 2027-01"]
 ```
-
-## 핵심 용어 정리
-
-- **Breaking change**: 클라이언트가 *수정해야* 작동.
-- **Non-breaking change**: 새 필드 추가, 새 endpoint 등.
-- **URL versioning**: `/v1/...`, `/v2/...`.
-- **Header versioning**: `X-API-Version: 2026-05-01` 또는 `Accept: application/vnd.api+json;version=2`.
-- **Sunset**: 한 버전을 *공식 종료* 하는 날짜.
 
 ## Before/After
 
@@ -164,14 +141,6 @@ def v1(uid):
 
 Stripe 는 *날짜 기반 버전* (calver) 을 헤더로 받습니다 (`Stripe-Version: 2024-04-10`). GitHub은 URL 버전 + `X-GitHub-Api-Version` 헤더의 혼합. AWS는 거의 *모든 서비스가* 명시적 버전 — 하위 호환성을 *수년* 유지합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 호환성 정책을 *문서로* 둔다 — *무엇이 breaking 인가* 의 정의.
-- 새 버전은 *드물게* — 대부분의 변경은 추가로 가능.
-- deprecation은 *표준 헤더 + 명시적 sunset* 으로.
-- 다중 버전의 *내부 비용* 을 정량화 (코드·테스트·문서).
-- 사용량이 0 이 된 후에 종료 — 데이터로 결정.
-
 ## 체크리스트
 
 - [ ] 호환성 정책이 문서화되어 있는가?
@@ -179,12 +148,6 @@ Stripe 는 *날짜 기반 버전* (calver) 을 헤더로 받습니다 (`Stripe-V
 - [ ] deprecation 헤더와 sunset 날짜가 있는가?
 - [ ] 사용량 모니터링이 *클라이언트 단위* 로 되는가?
 - [ ] 동시에 살아 있는 버전 수에 *상한* 이 있는가?
-
-## 연습 문제
-
-1. 자신의 API 에서 최근 변경 5개를 breaking / non-breaking 으로 분류해 보세요.
-2. 위 4단계에 v1 사용 시 *경고 로그* 를 남기는 코드를 추가하세요.
-3. URL versioning 과 header versioning 중 어느 것을 택할지 — 자신의 상황에서 비교해 결정하세요.
 
 ## 정리 및 다음 단계
 

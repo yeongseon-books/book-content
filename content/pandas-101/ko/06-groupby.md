@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Pandas 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *groupby* 는 *SQL의 GROUP BY* 와 *완전히 같은 것* 일까요?
-
-> *groupby는 *split-apply-combine* 패턴입니다. agg, transform, filter 세 얼굴을 가집니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *split-apply-combine* 모델
-- *agg / transform / filter* 의 차이
-- *멀티키 grouping*
-- 5단계 groupby 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *집계는 분석의 핵심 동작* 입니다. *groupby* 를 잘 쓰면 *수십 줄 for문* 이 *한 줄* 로 바뀝니다.
 
@@ -52,14 +37,6 @@ flowchart LR
     Split --> Apply["apply (agg / transform / filter)"]
     Apply --> Combine["combine into result"]
 ```
-
-## 핵심 용어 정리
-
-- **groupby**: *키별로 그룹* 을 *나눔*.
-- **agg**: *그룹별 단일 값* 으로 *축약*.
-- **transform**: *그룹별 계산* 을 *원본 shape* 으로 돌려줌.
-- **filter**: *그룹 조건* 으로 *행 필터링*.
-- **as_index**: *그룹 키* 를 *인덱스* 로 만들지 결정.
 
 ## Before/After
 
@@ -128,26 +105,12 @@ print(big)
 
 세그먼트 분석, 코호트 리텐션, KPI 집계 — *groupby* 는 *비즈니스 인텔리전스의 동력* 입니다. *transform* 은 *피처 엔지니어링* 의 핵심 도구.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *agg 우선*, *apply 최후*.
-- *named aggregation* 으로 *결과 가독성*.
-- *transform* 으로 *피처 만들기*.
-- *멀티키* 를 *튜플 인덱스* 로 본다.
-- *as_index* 를 *의식적으로* 선택.
-
 ## 체크리스트
 
 - [ ] *split-apply-combine* 을 설명할 수 있다.
 - [ ] *agg / transform / filter* 를 구분한다.
 - [ ] *named aggregation* 을 쓴다.
 - [ ] *멀티키* groupby 를 한다.
-
-## 연습 문제
-
-1. *카테고리별 평균과 표준편차* 를 *named agg* 로 출력하세요.
-2. *transform* 으로 *그룹 평균* 을 *원본에 붙이는* 코드를 작성하세요.
-3. *filter* 로 *합계가 임계 이상* 인 그룹만 남기세요.
 
 ## 정리 및 다음 단계
 

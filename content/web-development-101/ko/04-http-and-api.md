@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Web Development 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 클라이언트와 서버는 *무엇* 을 주고받나요?
-
-> 요청(method/url/header/body)과 응답(status/header/body) — 이게 *전부* 입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- HTTP 요청과 응답의 구조
-- method (GET/POST/PUT/DELETE)와 status code
-- 헤더의 역할
-- JSON API 호출과 파싱
-- API와 단순 페이지 요청의 차이
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 웹 개발의 절반은 *HTTP 메시지를 만들고 읽는 일* 입니다. 메시지의 모양을 모르면 디버깅이 추측 게임이 됩니다. 한 번만 정확히 익혀두면 어떤 프레임워크에서도 통합니다.
 
@@ -56,14 +41,6 @@ flowchart LR
 ```
 
 요청 한 줄, 응답 한 줄.
-
-## 핵심 용어 정리
-
-- **Method**: 무엇을 할지 (GET = 읽기, POST = 만들기 등).
-- **Status code**: 결과 (2xx 성공, 4xx 클라이언트 오류, 5xx 서버 오류).
-- **Header**: 메타정보 (Content-Type, Authorization 등).
-- **Body**: 실제 데이터 (JSON, HTML, 이미지 등).
-- **API**: 코드가 호출하는 *프로그래밍용 엔드포인트*.
 
 ## Before/After
 
@@ -157,14 +134,6 @@ curl -v https://httpbin.org/get
 
 대부분의 모바일/웹 앱은 *JSON over HTTP* 로 서버와 통신합니다. GraphQL, gRPC도 결국 HTTP 위에서 동작합니다. 새 서비스를 다룰 때 가장 먼저 보는 것이 *API 문서* 인 이유입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- method와 status code의 *의미* 를 정확히 쓴다.
-- 에러 본문을 *형식화* 한다.
-- 인증은 *헤더* 로, 토큰은 *짧은 수명* 으로.
-- 응답에 항상 *시간 예산* 을 둔다 (timeout).
-- API는 *문서가 코드와 함께 자란다*.
-
 ## 체크리스트
 
 - [ ] 4가지 method의 의미를 안다.
@@ -172,12 +141,6 @@ curl -v https://httpbin.org/get
 - [ ] `Content-Type` 헤더를 읽고 분기할 수 있다.
 - [ ] timeout과 retry를 설정할 수 있다.
 - [ ] curl로 raw 요청을 던질 수 있다.
-
-## 연습 문제
-
-1. `httpbin.org` 의 `/anything` 엔드포인트에 GET/POST/PUT/DELETE를 각각 보내고 응답을 비교하세요.
-2. 3xx 응답을 받았을 때 redirect를 따라가지 *않는* 코드를 작성하세요.
-3. 좋아하는 공개 API 한 개를 골라 *3개의 엔드포인트* 를 호출해 보세요.
 
 ## 정리 및 다음 단계
 

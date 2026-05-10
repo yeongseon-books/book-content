@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *트래픽* 이 *변할 때* *Pod 수* 를 *사람* 이 매번 바꿔야 할까요?
-
-> *HorizontalPodAutoscaler* 가 *지표* 를 보고 *Pod 수* 를 *자동* 으로 늘리고 줄입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *HPA* 의 위치
-- *metrics-server* 필요성
-- *CPU/메모리* 타깃
-- *커스텀 지표*
-- *VPA / Cluster Autoscaler* 와의 관계
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *수동 스케일* 은 *지연* 과 *과잉 프로비저닝* 의 원인입니다. *오토스케일* 이 *비용* 과 *가용성* 을 동시에 잡습니다.
 
@@ -52,14 +37,6 @@ flowchart LR
     HPA --> Dep["deployment"]
     Dep --> Pods["pods"]
 ```
-
-## 핵심 용어 정리
-
-- **HPA**: *Pod 수* 를 *자동* 조절.
-- **metrics-server**: *기본 지표* 수집기.
-- **target utilization**: *CPU/Mem 목표 비율*.
-- **custom metric**: *큐 길이* 같은 *외부 지표*.
-- **VPA**: *Pod 자체 자원* 을 조절.
 
 ## Before/After
 
@@ -155,26 +132,12 @@ def hpa_status(name):
 
 *HPA + Cluster Autoscaler* 조합으로 *Pod* 가 *늘 때* *노드* 도 *늘어나는* 두 단 자동화가 흔합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *requests* 가 *모든 자동화의 기반*.
-- *지표 신뢰도* 가 *오토스케일 신뢰도*.
-- *커스텀 지표* 는 *실측* 후.
-- *플랩* 은 *비용* 으로 돌아온다.
-- *노드 자동화* 와 *짝* 이다.
-
 ## 체크리스트
 
 - [ ] *requests* 설정.
 - [ ] *minReplicas ≥ 2*.
 - [ ] *Cluster Autoscaler* 도입 검토.
 - [ ] *플랩* 모니터링.
-
-## 연습 문제
-
-1. *HPA* 가 *requests* 없이 *왜* 안 도는지 한 줄로.
-2. *VPA* 와 *HPA* 의 *차이* 한 줄로.
-3. *Cluster Autoscaler* 의 *역할* 한 줄로.
 
 ## 정리 및 다음 단계
 

@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > SQL 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: GROUP BY 는 *행을 줄여서* 답을 만드는데, *행을 그대로 두면서* 그룹별 계산을 *더하는* 방법은 없을까요?
-
-> *Window function 은 *집계의 결과를 *옆에 붙여 주는* 도구다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *OVER (PARTITION BY ...)* 의 의미
-- *ROW_NUMBER, RANK, DENSE_RANK*
-- *LAG / LEAD* 와 *시간 비교*
-- *누적 합계 (running total)*
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 순위, 차이, 누적 — *행 단위 분석* 에 필수입니다. GROUP BY 만 쓰면 *세부를 잃습니다*. Window 는 *세부 + 집계* 를 *동시에* 보여줍니다. *cohort, funnel, retention* 의 핵심 도구입니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Win --> Func["ROW_NUMBER / SUM / LAG"]
     Func --> Out["행 + 계산 결과"]
 ```
-
-## 핵심 용어 정리
-
-- **Partition**: 같은 *그룹으로 묶일* 행들.
-- **Frame**: window 안에서 *어디까지 볼지*.
-- **Ranking function**: `ROW_NUMBER, RANK, DENSE_RANK`.
-- **Offset function**: `LAG, LEAD` — 이전/다음 행.
-- **Running total**: 누적 합.
 
 ## Before/After
 
@@ -132,26 +109,12 @@ FROM daily_revenue;
 
 *매출 7일 이동 평균*, *사용자별 N번째 주문*, *전월 대비 증가율* — 모두 window 한 줄입니다. *time series* 분석의 *핵심 도구* 입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Window 는 *세부를 잃지 않는* 집계.*
-- *frame 은 *항상 명시*.*
-- *RANK 는 *동률 정책* 에 따라 골라 쓴다.*
-- *LAG/LEAD 는 *시계열 비교* 의 기본.*
-- *복잡한 window 는 *CTE* 로 한 단계 빼낸다.*
-
 ## 체크리스트
 
 - [ ] PARTITION BY 의 의미를 안다.
 - [ ] ROW_NUMBER 와 RANK 의 차이를 안다.
 - [ ] LAG/LEAD 를 쓸 수 있다.
 - [ ] frame 의 기본값 위험을 안다.
-
-## 연습 문제
-
-1. *사용자별 첫 주문* 만 골라 보세요 (`ROW_NUMBER = 1`).
-2. *상품별 매출 상위 3* 위를 RANK 로 추출.
-3. *일별 매출* 의 *7일 이동 평균* 을 구해 보세요.
 
 ## 정리 및 다음 단계
 

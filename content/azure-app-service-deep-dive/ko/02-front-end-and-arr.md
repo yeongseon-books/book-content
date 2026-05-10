@@ -46,15 +46,6 @@ ARR Affinity를 언제 꺼야 하는지,
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Front End와 ARR의 동작을 이해하면 어떤 라우팅·가용성 사고를 예방할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Front End와 ARR의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - Front End 노드는 정확히 어떤 역할을 하고, ARR(Application Request Routing)은 그 안 어디에 있는가?
@@ -298,14 +289,6 @@ az webapp config show -n my-app -g my-rg \
 az webapp config hostname list -n my-app -g my-rg -o table
 az webapp config ssl list -g my-rg -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **ARR이 라우팅·sticky session을 결정** — session affinity의 의도와 비용을 정확히 평가합니다.
-- **ARR Affinity는 기본 끔이 안전** — 스케일과 무중단 배포에 유리합니다.
-- **타임아웃은 Front End에서도 적용** — ARR·앱·다운스트림 셋이 정렬되지 않으면 디버깅이 어렵습니다.
-- **503의 원인 다양성을 의식** — Worker 부재·재시작 등 여러 경로를 모두 점검합니다.
-- **로그는 Front End 단에서 분리** — 앱 로그만으로는 이 레이어 사고가 안 보입니다.
 
 ## 운영 체크리스트
 

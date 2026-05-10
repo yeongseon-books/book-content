@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: metric 은 *어떻게 모이고*, *어떻게 그래프* 가 됩니까?
-
-> *Prometheus 는 *pull 모델* 로 exporter 를 긁어옵니다. Grafana 는 그 데이터를 *그래프* 로 그립니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *pull* vs *push* 모델
-- *Exporter* 와 `/metrics` endpoint
-- *Prometheus* 설정 한 줄 이해
-- *Grafana* 첫 dashboard
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 metric 파이프라인은 *모든 observability 의 출발점* 입니다. 첫 줄이 흐르는 순간, 시스템이 *말하기 시작* 합니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Prom --> TSDB["시계열 DB"]
     TSDB --> Graf["Grafana"]
 ```
-
-## 핵심 용어 정리
-
-- **Exporter**: metric 을 *HTTP 로 내주는* 컴포넌트.
-- **Scrape interval**: *얼마나 자주* 긁을지.
-- **Time series**: (label set, 값, 시간) 의 *연속*.
-- **PromQL**: Prometheus *질의 언어*.
-- **Dashboard panel**: 한 그래프.
 
 ## Before/After
 
@@ -136,26 +113,12 @@ docker run -d --name graf -p 3000:3000 grafana/grafana
 
 대부분의 회사는 *Prometheus + Grafana* 로 시작해 *Thanos / Mimir* 로 확장합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *측정 가능한 것을 측정한다.*
-- *Pull 은 *target discovery* 가 핵심.*
-- *Counter 는 항상 *rate()* 를 거친다.*
-- *Dashboard 는 *질문 단위*, panel 단위가 아니다.*
-- *Cardinality 가 첫 번째 비용 변수.*
-
 ## 체크리스트
 
 - [ ] 앱에 `/metrics` 를 노출한다.
 - [ ] Prometheus 가 *target* 을 *up* 으로 본다.
 - [ ] *PromQL* 한 줄을 쓴다.
 - [ ] Grafana 에 첫 패널을 띄운다.
-
-## 연습 문제
-
-1. `Counter` 와 `Gauge` 를 각각 노출해 보세요.
-2. `rate()` 와 `increase()` 의 차이를 설명하세요.
-3. 5분 평균 처리량 dashboard 를 그려 보세요.
 
 ## 정리 및 다음 단계
 

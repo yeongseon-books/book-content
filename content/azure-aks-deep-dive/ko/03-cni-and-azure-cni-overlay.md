@@ -39,15 +39,6 @@ Pod IP는 네트워킹 모드에 따라 다른 주소 모델에서 옵니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-CNI 선택과 Azure CNI Overlay 동작을 이해하면 어떤 네트워크 사고를 예방할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 CNI와 Azure CNI Overlay의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - kubenet, Azure CNI, Azure CNI Overlay는 IP 사용량과 라우팅에서 어떻게 다른가?
@@ -125,14 +116,6 @@ az aks show -n my-cluster -g my-rg \
 kubectl get nodes -o wide
 kubectl get pods -A -o wide | head -20
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Overlay는 IP 고갈을 해결한다** — 대규모 클러스터의 가장 흔한 한계를 우회합니다.
-- **Pod 간 통신 경로를 정확히 안다** — MTU·NAT 동작이 디버깅의 단서입니다.
-- **ServiceCIDR과 PodCIDR 충돌을 피한다** — 사후 변경이 사실상 불가능합니다.
-- **NetworkPolicy 엔진을 결정해 둔다** — Calico·Cilium 선택이 운영 도구를 결정합니다.
-- **Egress 경로는 명시적으로 설계한다** — 암묵적 NAT는 보안·비용 사고를 부릅니다.
 
 ## 운영 체크리스트
 

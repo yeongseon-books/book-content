@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Backend Development 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: "비즈니스 로직"은 *어디에* 두어야 하나요?
-
-> Controller도 아니고 Repository도 아닌 *Service Layer* 입니다. 한 행동(register, transfer, refund)을 한 함수로 묶어 의미를 만듭니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Service Layer의 정의와 역할
-- Controller / Service / Repository의 책임 분리
-- 트랜잭션을 어디서 시작할지
-- Service에 의존성을 주입하는 패턴
-- 도메인 이벤트가 끼어드는 자리
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Controller에 비즈니스 로직을 넣으면 같은 규칙이 *세 군데* 에 흩어집니다 — REST, gRPC, 배치 작업. Service에 모으면 *어느 입구로 들어와도 같은 규칙* 이 적용됩니다. 이 한 가지 원칙이 서비스 수명을 결정합니다.
 
@@ -57,14 +42,6 @@ flowchart LR
 ```
 
 Service는 *오케스트레이터* — Repo, 외부 API, 이벤트 버스를 *조율* 합니다.
-
-## 핵심 용어 정리
-
-- **Service**: 한 비즈니스 행동(use case)을 담당하는 객체.
-- **Use case**: "주문 생성", "환불 처리" 같은 *시나리오*.
-- **Transaction boundary**: 한 단위로 commit/rollback 되는 범위.
-- **Domain event**: 비즈니스 행동이 끝났음을 알리는 메시지.
-- **DI(Dependency Injection)**: 의존 객체를 *생성자나 인자로* 받기.
 
 ## Before/After
 
@@ -189,14 +166,6 @@ class OrderService:
 
 큰 백엔드는 도메인 단위로 service 디렉터리를 둡니다(`services/orders/`, `services/payments/`). 한 use case는 *한 service의 한 메서드* — 이 단순한 규칙이 새 팀원도 30분 만에 적응하게 만듭니다. DDD를 본격적으로 도입하지 않더라도 이 정도 분리는 *모든* 백엔드에 도움이 됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 한 use case는 한 메서드 — 길어지면 *분리 신호* 다.
-- Service는 *입력 → 결과* 의 함수처럼 본다.
-- 트랜잭션 경계를 *명시적* 으로 만든다.
-- 외부 호출은 *재시도 정책* 을 service 안에서 결정한다.
-- Service만 보고 *비즈니스 규칙* 을 설명할 수 있어야 한다.
-
 ## 체크리스트
 
 - [ ] Controller / Service / Repository의 책임을 말할 수 있다.
@@ -204,12 +173,6 @@ class OrderService:
 - [ ] 트랜잭션을 Service에서 열 수 있다.
 - [ ] HTTP 예외와 도메인 예외를 구분한다.
 - [ ] 도메인 이벤트가 무엇인지 안다.
-
-## 연습 문제
-
-1. `RefundService.refund(order_id)` 를 만들고 잘못된 ID에 대해 `RefundError` 를 던지세요.
-2. `TransferService` 에 *잔액 부족* 검증을 추가하세요.
-3. 한 service의 메서드가 길어졌다면, 새 service로 분리하는 리팩터링을 시도하세요.
 
 ## 정리 및 다음 단계
 

@@ -26,15 +26,6 @@ seo_description: 2014~2020년 image generation의 default는 GAN이었습니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Diffusion으로 이미지를 생성할 때 품질과 비용을 어떻게 통제하나요?
-
-이 글은 그 질문에 답하기 위해 diffusion 기반 text-to-image의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 왜 Diffusion이 GAN을 밀어냈나
 
 2014~2020년 image generation의 default는 GAN이었습니다. StyleGAN은 인물 사진을 무섭게 잘 만들었지만 두 가지가 약했습니다. mode collapse(특정 패턴만 반복) 문제, 그리고 자유 텍스트로 제어하기 어렵다는 한계입니다.
@@ -237,14 +228,6 @@ pipe.enable_xformers_memory_efficient_attention()
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **샘플러와 step** — step 수와 샘플러 선택이 품질·시간을 직접 좌우합니다.
-- **프롬프트 구조화** — 주체·스타일·구도·negative를 정형화해 재현성을 확보합니다.
-- **저작권/라이선스** — 학습 데이터·모델 라이선스를 운영 정책으로 명문화합니다.
-- **안전 필터** — NSFW·인물 합성 등 위험을 입출력 양쪽에서 차단합니다.
-- **캐시 전략** — 프롬프트/시드 해시 기반 캐시로 GPU 비용을 줄입니다.
-
 ## Multimodal AI 101 시리즈
 
 - [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)

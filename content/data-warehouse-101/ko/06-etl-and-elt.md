@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Data Warehouse 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *변환* 을 *적재 전에* 할까요, *후에* 할까요? 답은 *Warehouse 의 힘* 이 *어떻게 변했는지* 에 달려 있습니다.
-
-> *예전엔 *전처리 후 적재* 였다. 지금은 *적재 후 SQL 변환* 이다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *ETL* 과 *ELT* 의 차이
-- 변환을 *어디서* 하는 게 좋은지
-- 현대 Warehouse 가 *ELT* 로 기우는 이유
-- 5단계 파이프라인 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Warehouse 의 *컴퓨팅 비용* 이 싸지면서 *원본을 그대로 적재* 하고 *SQL 로 변환* 하는 방식이 *기본* 이 됐습니다. 변환 코드가 *SQL* 로 *버전 관리* 되고, *재실행이 쉽고*, *디버깅* 이 *수월합니다*.
 
@@ -55,14 +40,6 @@ flowchart LR
     DW --> Transform["Transform (SQL)"]
     Transform --> Mart["Mart"]
 ```
-
-## 핵심 용어 정리
-
-- **ETL**: Extract → Transform → Load. 변환을 *적재 전* 에.
-- **ELT**: Extract → Load → Transform. 변환을 *적재 후* 에.
-- **Staging**: 원본을 *그대로 보존* 하는 *첫 레이어*.
-- **dbt**: SQL 기반 *변환 도구* — 모델을 *테스트와 함께* 관리.
-- **Idempotent**: 여러 번 실행해도 *결과가 같다*.
 
 ## Before/After
 
@@ -140,26 +117,12 @@ INSERT INTO marts.fact_orders SELECT ...;
 
 *Fivetran/Airbyte* 로 적재, *dbt* 로 변환, *Airflow/Dagster* 로 스케줄 — 이 조합이 *현재의 표준* 입니다. 변환은 *SQL 모델* 로 *Git* 에 올라갑니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *원본을 *법률 기록처럼* 보존한다.*
-- *변환은 *SQL 한 파일* 에 모은다.*
-- *모든 모델은 *테스트* 와 함께 산다.*
-- *Idempotency* 는 *재현 가능성* 의 다른 이름.
-- *Pipeline 도 *버전 관리* 한다.*
-
 ## 체크리스트
 
 - [ ] *ETL* 과 *ELT* 의 차이를 안다.
 - [ ] *Staging* 의 역할을 안다.
 - [ ] *Idempotent* 의 의미를 안다.
 - [ ] 변환에 *테스트* 를 붙일 수 있다.
-
-## 연습 문제
-
-1. *ETL* 이 *더 나은 경우* 를 적어 보세요.
-2. *Staging 없는* 파이프라인의 위험을 *3가지* 적어 보세요.
-3. *Idempotent* 하지 않은 변환 예시를 적어 보세요.
 
 ## 정리 및 다음 단계
 

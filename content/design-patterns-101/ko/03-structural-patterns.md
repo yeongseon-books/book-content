@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 객체들을 어떻게 묶어 더 큰 구조를 만들까요?
-
-> 합성과 위임으로 — 그 합성 방식의 이름이 Structural 패턴입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Structural 패턴이 푸는 문제
-- Adapter / Decorator / Facade
-- Proxy의 자리
-- Composite와 트리 구조
-- 합성 vs 상속의 기본 원칙
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 상속만으로는 구조가 빨리 굳습니다. 합성으로 책임을 조립하면 변경에 강해집니다.
 
@@ -59,14 +44,6 @@ flowchart LR
 ```
 
 다섯 가지 합성 방식.
-
-## 핵심 용어 정리
-
-- **Adapter**: 기존 인터페이스를 원하는 모양으로 변환.
-- **Decorator**: 객체에 책임을 동적으로 덧붙임.
-- **Facade**: 복잡한 서브시스템 앞에 간단한 입구.
-- **Proxy**: 진짜 객체를 대신해 접근/캐시/지연을 처리.
-- **Composite**: 단일 객체와 묶음을 같은 인터페이스로.
 
 ## Before/After
 
@@ -185,14 +162,6 @@ class Folder(Node):
 
 Flask middleware = Decorator 사슬, requests의 Session = Facade, ORM의 Lazy proxy = Proxy. 라이브러리 곳곳이 Structural의 무대입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 합성을 기본값으로.
-- Adapter는 외부 경계에만.
-- Decorator는 같은 인터페이스로 쌓는다.
-- Facade는 *단순화*이지 추가 기능이 아니다.
-- Composite는 진짜 트리 구조에서만.
-
 ## 체크리스트
 
 - [ ] Adapter가 외부 경계에 있는가?
@@ -200,12 +169,6 @@ Flask middleware = Decorator 사슬, requests의 Session = Facade, ORM의 Lazy p
 - [ ] Facade가 단순화 역할만 하는가?
 - [ ] Proxy 시그니처가 본체와 동일한가?
 - [ ] Composite가 자연스러운 트리에 적용되는가?
-
-## 연습 문제
-
-1. 외부 SaaS 호출을 도메인 인터페이스 + Adapter로 분리해 보세요.
-2. 기존 Notifier에 Logger Decorator를 입혀 보세요.
-3. 폴더/파일 구조를 Composite로 모델링해 보세요.
 
 ## 정리 및 다음 단계
 

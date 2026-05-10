@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > API Design 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 같은 API라도 *문서가 좋으면* 채택률이 다릅니다 — 좋은 문서의 *공식* 은 무엇일까요?
-
-> Getting Started 5분 + Examples + Reference + Changelog + SDK — 이 다섯 축입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 문서의 다섯 축
-- *5분 안에* 첫 호출 만들기
-- examples 의 무게
-- changelog 와 SDK 의 역할
-- 문서가 자라는 법
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 API 자체보다 *문서가 채택* 을 결정합니다. 같은 endpoint 라도 *5분에* 첫 호출이 되느냐, *반나절을* 헤매느냐는 문서의 차이입니다.
 
@@ -56,14 +41,6 @@ flowchart LR
     C --> D["Changelog"]
     D --> E["SDKs / CLIs"]
 ```
-
-## 핵심 용어 정리
-
-- **Getting Started**: 5분 안에 *첫 호출* 까지.
-- **Tutorial**: 한 가지 시나리오를 *처음부터 끝까지*.
-- **Reference**: endpoint·필드의 *사전*.
-- **Changelog**: 모든 버전 변경의 기록.
-- **SDK**: 언어별 클라이언트 라이브러리.
 
 ## Before/After
 
@@ -180,14 +157,6 @@ print(c.users.get(42))
 
 Stripe·Twilio 의 문서가 *황금 기준* 입니다 — Getting Started·Tutorial·Reference·Changelog·SDK 다섯 축이 일관됩니다. 사내 API 도 *공개 API 처럼* 다루면 채택률·문의 비율 모두 좋아집니다 — *이게 곧 DX*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 문서를 *코드와 같은 저장소* 에 둔다.
-- examples 를 *테스트* 한다 (실제로 돌려서).
-- changelog 를 *자동 생성* (PR 라벨 → release notes).
-- 5분 룰을 *측정* 한다 (실사용자 관찰).
-- 가장 많이 본 페이지를 *우선 개선*.
-
 ## 체크리스트
 
 - [ ] Getting Started 가 5분 안에 첫 호출까지 가는가?
@@ -195,12 +164,6 @@ Stripe·Twilio 의 문서가 *황금 기준* 입니다 — Getting Started·Tuto
 - [ ] Changelog 가 항상 최신인가?
 - [ ] 에러가 reference 에 *표* 로 정리되어 있는가?
 - [ ] SDK 또는 try-it 환경이 있는가?
-
-## 연습 문제
-
-1. 자신의 API 의 Getting Started 를 5분 룰에 맞게 다시 써 보세요.
-2. 가장 많이 쓰이는 endpoint 1개에 *3가지 시나리오* 의 examples 를 추가하세요.
-3. CI 에서 examples 코드를 *실행* 하는 단계를 추가하는 방법을 적어 보세요.
 
 ## 정리 및 시리즈 마무리
 

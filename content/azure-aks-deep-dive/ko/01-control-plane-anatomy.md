@@ -46,15 +46,6 @@ data plane은 어디서 시작되며,
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-AKS Control Plane을 더 깊이 이해하면 어떤 운영 결정을 더 정확히 내릴 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Control Plane 해부의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - AKS control plane은 정확히 어떤 컴포넌트로 구성되며, 누가 그것의 장애를 본다고 말할 수 있는가?
@@ -372,14 +363,6 @@ az aks show -n my-cluster -g my-rg \
 az monitor diagnostic-settings list \
   --resource $(az aks show -n my-cluster -g my-rg --query id -o tsv) -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **API Server가 모든 길의 출발점** — 성능·가용성 문제 해석의 기준입니다.
-- **etcd가 진실의 보존소** — 용량·백업·지연이 클러스터 안정성을 결정합니다.
-- **scheduler·controller-manager의 역할 분리** — 각자가 무엇을 보고 결정하는지 알아야 사고 분석이 가능합니다.
-- **관리형이라도 한계가 있다** — 대규모에서는 control plane 한계가 병목이 됩니다.
-- **버전 업그레이드는 control plane부터** — 노드보다 한 단계 먼저 올리는 게 원칙입니다.
 
 ## 운영 체크리스트
 

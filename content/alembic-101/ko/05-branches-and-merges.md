@@ -23,23 +23,6 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 
 # branch와 merge: 동시에 만든 revision을 합치는 법
 
-## 이 글에서 배울 것
-
-- alembic의 revision graph가 언제 branch로 갈라지는가
-- `branch_labels`와 `depends_on`의 정확한 용도
-- `alembic merge`로 두 head를 하나로 합치는 방법
-- multi-head 상태에서의 `upgrade`/`downgrade` 동작
-- 팀에서 branch 사고를 줄이는 운영 규칙
-
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-여러 브랜치에서 동시에 마이그레이션이 생길 때 충돌을 어떻게 해소해야 할까요?
-
-이 글은 그 질문에 답하기 위해 브랜치와 머지의 핵심 결정과 실무 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - alembic의 revision 그래프는 어떤 상황에서 branch로 갈라지는가?
@@ -48,7 +31,7 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 - multi-head 상태에서 `upgrade head`를 그냥 돌리면 왜 실패하는가?
 - 팀 단위로 branch 사고를 줄이는 PR/리뷰 규칙은 어떻게 설계하는가?
 
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 여러 사람이 동시에 PR을 만드는 팀에서는 alembic branch가 거의 매주 발생합니다. branch 자체는 정상 동작이지만, 처음 만나면 `Multiple head revisions are present` 에러로 배포가 멈추는 일이 흔합니다. 이 글은 그 상황을 두려워하지 않고 차분히 머지하기 위한 가이드입니다.
 
@@ -245,14 +228,6 @@ branch_labels = ("audit",)
 - **`depends_on`은 정말 필요할 때만.** 보통은 두 revision을 같은 PR에 묶어서 단일 brunch로 만드는 편이 단순합니다.
 - **`alembic history --verbose`로 graph 시각화.** 사고 났을 때 가장 빨리 상황 파악이 됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **브랜치는 짧게 유지한다** — 오래 갈수록 베이스 리비전이 멀어져 머지 비용이 폭증합니다.
-- **merge revision은 의식적으로 만든다** — alembic merge로 합류점을 명시해야 head가 하나로 정리됩니다.
-- **CI에서 multiple heads를 차단한다** — main에 head가 둘 이상이면 배포가 깨지므로 검사 단계가 필수입니다.
-- **rebase보다 merge revision을 선호한다** — 이미 적용된 환경이 있다면 히스토리 재작성이 위험합니다.
-- **팀 컨벤션으로 충돌을 예방한다** — 같은 테이블을 동시에 만지는 PR은 사전 조율로 줄입니다.
-
 ## 체크리스트
 
 - [ ] 머지 후 `alembic heads` 결과가 한 줄(head 1개)이다
@@ -261,12 +236,6 @@ branch_labels = ("audit",)
 - [ ] cross-branch 의존성이 있다면 `depends_on`이 명시되어 있다
 - [ ] `branch_labels`는 정말 분리된 도메인일 때만 사용한다
 - [ ] 머지 메시지가 `merge <X> and <Y>` 컨벤션을 따른다
-
-## 연습 문제
-
-1. 로컬 SQLite 환경에서 두 개의 head를 만든 뒤 `alembic merge`로 합쳐 보세요.
-2. 머지 revision의 `down_revision`이 튜플인지 직접 확인하세요.
-3. CI에 head 개수를 검사하는 스크립트를 추가해 multi-head PR이 차단되는지 확인하세요.
 
 ## 정리, 다음 글
 

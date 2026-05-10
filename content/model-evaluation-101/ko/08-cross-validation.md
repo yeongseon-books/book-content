@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Model Evaluation 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *test set 점수 한 줄* 만으로 *모델 비교* 를 끝내도 될까요?
-
-> *Cross Validation 은 *여러 분할* 의 *평균과 분산* 으로 *추정 신뢰도* 를 정량화합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *K-Fold* 의 의미와 *trade-off*
-- *Stratified* 가 *왜 기본* 인가
-- *GroupKFold* 와 *시계열 분할*
-- *분산* 을 보는 법
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *하나의 분할* 점수는 *우연* 의 영향을 받습니다. *분산* 을 *평균* 과 함께 보고해야 *비교* 가 의미 있습니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Val --> Score["k scores"]
     Score --> Stat["mean and std"]
 ```
-
-## 핵심 용어 정리
-
-- **K-Fold**: *k 등분* 후 *k 회 학습/검증*.
-- **Stratified**: *클래스 비율* 보존.
-- **GroupKFold**: *동일 그룹* 이 *분할 경계* 를 넘지 않음.
-- **TimeSeriesSplit**: *과거→미래* 순서 보존.
-- **Repeated K-Fold**: *여러 시드* 로 *k-fold 반복*.
 
 ## Before/After
 
@@ -135,26 +112,12 @@ print({k: v.mean() for k, v in out.items() if k.startswith("test_")})
 
 *하이퍼파라미터 튜닝* — *CV* 가 *내부 평가*. *최종 보고* 는 *별도 holdout*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *분산이 큰 점수* 는 *비교 불가* 일 수 있다.
-- *그룹/시간 누수* 를 *가장 먼저* 점검.
-- *Repeated CV* 로 *시드 의존* 을 줄인다.
-- *Nested CV* 로 *튜닝 + 평가* 를 분리.
-- *느린 모델* 은 *3-fold* 로 시작.
-
 ## 체크리스트
 
 - [ ] *Stratified* 또는 *Group/Time* 을 적용.
 - [ ] *평균 ± 표준편차* 를 보고.
 - [ ] *튜닝* 과 *평가* 가 분리됨.
 - [ ] *최종 holdout* 이 별도.
-
-## 연습 문제
-
-1. *K=2 vs K=10* 의 *분산* 을 비교하세요.
-2. *GroupKFold* 와 *KFold* 점수가 *얼마나 다른지* 측정하세요.
-3. *시계열* 데이터에 *KFold* 를 적용했을 때의 *낙관적 편향* 을 보이세요.
 
 ## 정리 및 다음 단계
 

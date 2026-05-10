@@ -38,15 +38,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Dispatcher와 Invocation 흐름을 이해하면 어떤 호출 경로 사고를 진단할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Dispatcher와 Invocation의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - Dispatcher는 한 번의 invocation을 어떤 단계로 분해하는가?
@@ -296,14 +287,6 @@ gRPC stream
 - worker `InvocationResponse` → worker-specific inbound channel → invocation ID lookup in `WorkerChannel` → `TaskCompletionSource<ScriptInvocationResult>` 완료
 
 ---
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **FunctionInvocationDispatcher가 라우팅 중심** — 트리거에서 워커까지의 경로가 여기서 결정됩니다.
-- **워커 풀 관리가 처리량을 결정** — 사용 가능한 워커 부족이 가장 흔한 지연 원인입니다.
-- **Invocation context가 격리의 단위** — 한 호출의 사고가 다른 호출로 번지지 않습니다.
-- **타임아웃은 dispatcher 단에서도 적용** — 함수 코드 타임아웃과 분리해 이해해야 합니다.
-- **재시도는 트리거 의미에 따라 다르다** — queue·HTTP·timer 각각의 보장 수준이 다릅니다.
 
 ## 운영 체크리스트
 

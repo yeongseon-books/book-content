@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: image 는 *하나* 인데 *환경마다 다른 설정* 을 어떻게 주입합니까?
-
-> *설정은 *코드 밖*, secret 은 *image 밖*. *12-factor* 의 가장 중요한 원칙입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *ENV / ARG* 의 차이
-- *환경변수 / 설정 파일 / secret* 분리
-- *Compose* 와 *외부 secret 도구* 연동
-- *기본값과 검증* 패턴
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *같은 image* 가 *dev / staging / prod* 에 그대로 흘러야 *재현성* 이 보장됩니다. 환경별 설정이 코드 안에 있으면 *그 신뢰가 깨집니다*.
 
@@ -54,14 +39,6 @@ flowchart LR
     Image --> Stg["staging env vars"]
     Image --> Prd["prod env vars"]
 ```
-
-## 핵심 용어 정리
-
-- **ENV**: Dockerfile 의 *기본 환경변수*.
-- **ARG**: *빌드 시점* 변수.
-- **`-e` / `--env-file`**: 런타임 주입.
-- **Config volume**: 설정 파일을 *마운트*.
-- **Secret store**: Vault / Doppler 등 *외부 secret*.
 
 ## Before/After
 
@@ -136,26 +113,12 @@ envconsul -secret secret/app -- docker compose up -d
 
 성숙한 팀은 *Vault / Doppler / 1Password* 가 *런타임 secret 제공자* 가 되고, 코드에는 *변수 이름만* 남습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *image 는 환경 무관*, *환경은 변수로*.
-- *secret 은 image 에 들어가면 끝*.
-- *시작 시 *변수 검증* 으로 빠른 실패*.
-- *기본값은 *안전한 쪽* 으로*.
-- *.env.example* 을 *반드시* 커밋한다.
-
 ## 체크리스트
 
 - [ ] image 는 *환경 무관* 하다.
 - [ ] secret 은 *외부 store* 에 있다.
 - [ ] *.env.example* 이 있다.
 - [ ] 시작 시 *변수 검증* 이 있다.
-
-## 연습 문제
-
-1. *동일 image* 를 *dev / staging* 두 환경에 띄워 보세요.
-2. `--env-file` 로 *환경별 설정* 을 분리하세요.
-3. 누락된 필수 변수 시 *시작 실패* 하는 코드를 추가해 보세요.
 
 ## 정리 및 다음 단계
 

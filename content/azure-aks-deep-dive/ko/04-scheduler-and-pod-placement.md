@@ -44,15 +44,6 @@ Binding을 기록합니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Scheduler 동작을 이해하면 어떤 배치 문제를 해결할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Scheduler와 Pod 배치의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 글에서 답할 질문
 
 - kube-scheduler는 한 Pod에 대해 어떤 단계로 노드를 줄여 나가는가?
@@ -117,14 +108,6 @@ kubectl describe pod my-pod -n my-ns | tail -30
 kubectl get events --sort-by=.lastTimestamp -n my-ns | tail -20
 kubectl get nodes -L topology.kubernetes.io/zone,agentpool
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **스케줄링은 필터+점수 두 단계** — 왜 Pod가 특정 노드에 갔는지 추론의 기초입니다.
-- **affinity·taint·toleration은 의도 표현** — 남용하면 디버깅이 어려워집니다.
-- **topology spread로 가용성을 확보** — AZ·zone 분산을 명시해 단일 장애를 줄입니다.
-- **PriorityClass를 의식적으로 사용** — 중요 워크로드를 보호하는 명시적 장치입니다.
-- **리소스 fragmentation을 본다** — 큰 Pod가 안 들어가는 사고는 fragmentation이 원인일 수 있습니다.
 
 ## 운영 체크리스트
 

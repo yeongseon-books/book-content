@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Secure Coding 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 같은 사용자의 *브라우저* 가 *우리 편* 인지 *공격자의 무기* 인지를 어떻게 구분할까요?
-
-> *XSS 는 *우리 페이지에서 공격자 코드 실행*. CSRF 는 *사용자 권한으로 의도치 않은 요청*.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *XSS* 의 세 가지 유형
-- *Output escaping* 과 *CSP* 의 역할
-- *CSRF* 의 원리
-- *SameSite cookie* 와 *CSRF token*
-- 방어 5단계와 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *XSS* 한 번이면 세션이 *탈취* 됩니다. *CSRF* 는 *사용자가 모르게* 송금/삭제를 일으킵니다.
 
@@ -55,14 +40,6 @@ flowchart LR
     Form["다른 사이트 폼"] -->|쿠키 자동전송| API["우리 API"]
     API --> Csrf["CSRF token / SameSite 검사"]
 ```
-
-## 핵심 용어 정리
-
-- **Reflected XSS**: URL 의 입력이 *그대로 출력*.
-- **Stored XSS**: DB 에 *저장된 입력* 이 출력.
-- **DOM XSS**: 클라이언트 JS 가 *innerHTML* 등으로 삽입.
-- **CSP**: 브라우저가 *허용된 출처의 코드만* 실행.
-- **CSRF token**: 요청에 *예측 불가 토큰* 을 묶는다.
 
 ## Before/After
 
@@ -131,26 +108,12 @@ element.textContent = userInput;    // 안전
 
 대부분의 팀은 템플릿 엔진의 *기본 escape* 를 켭니다. *CSP* 를 *report-only* 로 시작해 점진적으로 강화. 모든 변경 API 는 *CSRF token* 또는 *Origin* 검증.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *기본은 *escape*, raw 는 *예외* 처리.*
-- *CSP 는 *시간 들여 강화*.*
-- *SameSite + CSRF token* 은 *둘 다*.*
-- *DOM 에 *입력을 넣지 않는다*, textContent 만.*
-- *입력 sanitization 보다 *출력 escape* 가 안전.*
-
 ## 체크리스트
 
 - [ ] 템플릿 *기본 escape* 가 켜져 있다.
 - [ ] *CSP* 가 적용.
 - [ ] 쿠키가 *SameSite*.
 - [ ] 변경 요청에 *CSRF 검증*.
-
-## 연습 문제
-
-1. *Reflected* 와 *Stored* XSS 의 코드 예시를 각각 한 줄.
-2. *CSP nonce* 의 동작.
-3. *SameSite=Strict* 가 깰 수 있는 흐름.
 
 ## 정리 및 다음 단계
 

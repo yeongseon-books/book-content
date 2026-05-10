@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 같은 일을 *다른 방법*으로 처리해야 할 때, 코드는 어떻게 생겨야 할까요?
-
-> 알고리즘을 객체(혹은 함수)로 만들어 컨텍스트에 *주입*합니다. 그것이 Strategy입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Strategy가 푸는 문제 (분기 폭발)
-- OCP와 Strategy의 관계
-- 클래스 Strategy vs 함수 Strategy
-- 런타임 교체와 테스트
-- 언제 Strategy가 과한가
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 알고리즘을 if/elif로 분기하면 새 옵션이 생길 때마다 기존 코드를 건드려야 합니다. Strategy는 그 분기를 *교체 가능한 객체*로 바꿔, 추가에 열려 있고 변경에 닫힙니다 (OCP).
 
@@ -58,14 +43,6 @@ flowchart LR
 ```
 
 Context는 인터페이스만 알고, 구체 알고리즘은 갈아 끼웁니다.
-
-## 핵심 용어 정리
-
-- **Context**: Strategy를 사용하는 쪽.
-- **Strategy interface**: 알고리즘 약속.
-- **Concrete Strategy**: 약속을 구현한 알고리즘.
-- **Injection point**: Strategy를 주입하는 자리(생성자, 메서드 인자).
-- **Default strategy**: 가장 일반적인 동작의 기본값.
 
 ## Before/After
 
@@ -182,14 +159,6 @@ print(order.total([10000], 2))
 
 `sorted(key=...)`의 key, `pandas.apply(func)`의 func, 결제 시스템의 PG 어댑터 선택, 알림 채널(이메일/SMS/Slack) 선택 — 모두 Strategy의 모양입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- "또 분기를 늘리고 있다"는 신호가 오면 Strategy를 의심.
-- 우선 함수로 시도, 안 되면 클래스로.
-- Default를 두어 단순한 호출자의 부담을 낮춘다.
-- Strategy는 *상태가 적을수록* 좋다.
-- 이름은 동작이 아니라 *역할*로 — `Vip`보다는 `LoyaltyDiscount`.
-
 ## 체크리스트
 
 - [ ] Context가 알고리즘 내부를 모르는가?
@@ -197,12 +166,6 @@ print(order.total([10000], 2))
 - [ ] Strategy가 Context의 상태를 바꾸지 않는가?
 - [ ] Default strategy가 합리적인가?
 - [ ] 함수로 충분한 곳에 클래스를 쓰지 않았는가?
-
-## 연습 문제
-
-1. 결제 수단(카드/계좌이체/포인트) 분기를 Strategy로 정리.
-2. 정렬 비교자(comparator)를 함수 Strategy로 표현.
-3. 알림 채널 선택을 Strategy + Default로 구현.
 
 ## 정리 및 다음 단계
 

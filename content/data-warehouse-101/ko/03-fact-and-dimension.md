@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Data Warehouse 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *측정값* 과 *속성* 을 *왜 나눌까요*? 한 테이블에 *모두 두면* 무엇이 *무너질까요*?
-
-> *Fact 는 *얼마* 를, Dimension 은 *무엇/누구/언제* 를 담는다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Fact* 테이블의 정의
-- *Dimension* 테이블의 정의
-- 두 테이블의 *분리* 가 주는 이점
-- 5단계 모델링 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 분석 질문은 거의 항상 *얼마(measure)* 를 *어떤 단면(dimension)* 별로 보고 싶어합니다. *둘을 분리* 해 두면 *집계는 빠르게*, *속성 변경은 유연하게* 다룰 수 있습니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Fact --> DimProduct["dim_product"]
     Fact --> DimDate["dim_date"]
 ```
-
-## 핵심 용어 정리
-
-- **Fact**: *측정 가능한 사실*. 금액, 수량, 시간 같은 *수치*.
-- **Dimension**: *사실의 맥락*. 사용자, 상품, 날짜 같은 *속성*.
-- **Grain**: 한 행이 *무엇 한 건* 을 의미하는지 — 분석의 *최소 단위*.
-- **Surrogate key**: Dimension 에 부여하는 *내부 식별자*.
-- **Conformed dimension**: 여러 fact 가 *공유하는* dimension.
 
 ## Before/After
 
@@ -143,26 +120,12 @@ ORDER BY 1, 2;
 
 전자상거래는 *fact_orders, fact_payments, fact_refunds* 를 두고 *dim_user, dim_product, dim_date* 를 *공유* 합니다. 사용자 *국가가 바뀔 때* 도 dim_user 한 곳만 갱신합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Grain 을 *문장 한 줄* 로 적을 수 있어야 한다.*
-- *Conformed dimension* 을 *팀 자산* 으로 다룬다.
-- *Surrogate key* 로 *변화에 대비* 한다.
-- *Date dimension* 은 *모든 분석의 척추*.
-- *fact 는 좁고 길게, dimension 은 넓고 짧게*.
-
 ## 체크리스트
 
 - [ ] *Fact* 와 *Dimension* 의 차이를 안다.
 - [ ] *Grain* 을 한 줄로 적을 수 있다.
 - [ ] *Surrogate key* 의 필요성을 안다.
 - [ ] *Date dimension* 의 가치를 안다.
-
-## 연습 문제
-
-1. *fact_payments* 의 grain 을 한 줄로 적어 보세요.
-2. *dim_product* 에 들어갈 컬럼을 *5개* 적어 보세요.
-3. *Surrogate key 없는* 설계의 단점을 *3가지* 적어 보세요.
 
 ## 정리 및 다음 단계
 

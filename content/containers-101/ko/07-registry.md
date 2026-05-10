@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 빌드한 *이미지* 를 *어디* 에 두고 *어떻게* 다시 받을까요?
-
-> *Registry* 는 *이미지* 의 *원격 저장소* 이며 *push/pull* 로 배포 흐름의 *중심* 이 됩니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Registry* 의 역할
-- *push / pull* 흐름
-- *태그 전략*
-- *Docker Hub / ECR / GHCR*
-- *서명 검증* 한 줄 개요
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *이미지* 가 *재현 가능* 해도 *받을 곳* 이 없으면 의미가 없습니다. *배포* 는 *Registry* 에서 시작합니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Reg --> Pull["docker pull"]
     Pull --> Prod["prod"]
 ```
-
-## 핵심 용어 정리
-
-- **registry**: *이미지 저장소* 서버.
-- **repository**: *이미지 이름* 단위.
-- **tag**: *버전 라벨*.
-- **digest**: *불변* SHA 식별자.
-- **signed image**: *Cosign* 등으로 *서명* 된 이미지.
 
 ## Before/After
 
@@ -133,26 +110,12 @@ def verify_pull(remote_digest):
 
 *GitHub Actions* 가 *빌드 후 GHCR push*, *Argo CD* 가 *digest 변경* 을 감지해 *자동 배포*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *digest* 가 *진실*.
-- *태그* 는 *이름표* 일 뿐.
-- *Registry* 도 *백업* 대상.
-- *서명* 으로 *공급망* 보호.
-- *권한 분리* 가 *보안 시작*.
-
 ## 체크리스트
 
 - [ ] *프로덕션* 은 *digest* 로 핀.
 - [ ] *push* 권한은 *CI* 에만.
 - [ ] *서명* 정책 적용.
 - [ ] *retention* 규칙 설정.
-
-## 연습 문제
-
-1. *태그* 와 *digest* 의 *차이* 한 줄로.
-2. *GHCR* 의 *대표 장점* 한 가지.
-3. *서명 검증* 을 *왜* 하는지 한 줄로.
 
 ## 정리 및 다음 단계
 

@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Backend Development 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: "로그인했다"는 *서버* 입장에서 정확히 무슨 의미인가요?
-
-> 누구인지 *증명* 한 사용자가 — 이번 요청에서 *무엇을 할 수 있는지* 까지 결정되는 상태입니다. 인증과 권한은 *다른 문제* 입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 인증(Authentication)과 권한(Authorization)의 차이
-- 비밀번호 저장의 *최소 안전 기준*
-- 세션 vs JWT — 언제 어느 쪽인가?
-- FastAPI에서 보호된 endpoint 만들기
-- 권한을 *역할(role)* 로 모델링하기
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 인증 코드는 *유일하게* 잘못 짜면 회사가 망할 수 있는 영역입니다. 처음에 평문으로 비밀번호를 저장한 한 줄, 처음에 토큰을 검증하지 않은 한 줄이 *수년 후* 사고로 돌아옵니다.
 
@@ -59,14 +44,6 @@ flowchart LR
 ```
 
 인증은 *너 누구야?* 권한은 *그걸 해도 돼?*
-
-## 핵심 용어 정리
-
-- **Authentication**: 신원 확인.
-- **Authorization**: 행동 허가.
-- **Hash**: 비밀번호의 *되돌릴 수 없는* 변환.
-- **Session**: 서버 측 상태로 사용자 추적.
-- **JWT**: 서명된 토큰 — 서버 상태 없이 검증 가능.
 
 ## Before/After
 
@@ -177,14 +154,6 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 
 대부분의 SaaS는 *bcrypt + JWT + role-based access* 조합으로 시작합니다. 규모가 커지면 OAuth2(외부 로그인), MFA(다중 인증), permission matrix가 추가되지만 핵심은 동일합니다 — 인증과 권한을 *명확히 분리* 한 코드만 확장됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 인증 코드는 *작게, 표준 라이브러리로* 짠다.
-- 비밀은 *환경 변수* 와 *secret manager* 로만 관리한다.
-- 토큰 만료는 *짧게* , 갱신은 refresh token으로 분리한다.
-- 권한은 *role* 또는 *policy* 로 모델링한다.
-- 인증 실패 로그를 *모니터링* 한다 — 무차별 대입 공격 신호.
-
 ## 체크리스트
 
 - [ ] bcrypt로 해시하고 검증할 수 있다.
@@ -192,12 +161,6 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 - [ ] FastAPI에서 보호된 endpoint를 만들 수 있다.
 - [ ] 401과 403의 차이를 안다.
 - [ ] role 기반 권한 검사를 작성할 수 있다.
-
-## 연습 문제
-
-1. `/register`, `/login`, `/me` 세 endpoint를 가진 서비스를 만드세요.
-2. JWT 만료 시간을 1분으로 설정하고 만료 후 401이 떨어지는지 확인하세요.
-3. `admin` 만 접근 가능한 `/admin` 라우트를 추가하세요.
 
 ## 정리 및 다음 단계
 

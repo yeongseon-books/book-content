@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: image 를 *재현 가능하게* 만들려면 *어떤 명령* 을 *어떤 순서* 로 써야 합니까?
-
-> *Dockerfile 은 *빌드 레시피* 이자 *문서* 입니다. 명령의 순서가 *캐시 효율* 과 *디버깅 난이도* 를 좌우합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *FROM / RUN / COPY / CMD* 의 의미
-- *layer cache* 활용 *순서 전략*
-- *.dockerignore* 의 중요성
-- *non-root user* 로 실행
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *Dockerfile 한 줄의 순서* 가 *빌드 시간 5분 vs 30초* 를 만듭니다. 좋은 Dockerfile 은 팀 생산성을 *눈에 띄게* 바꿉니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Deps --> Code["COPY ."]
     Code --> Cmd["CMD"]
 ```
-
-## 핵심 용어 정리
-
-- **FROM**: *베이스 image* 지정.
-- **RUN**: 빌드 시 *명령 실행*.
-- **COPY**: 파일 복사.
-- **CMD**: container 시작 시 *기본 명령*.
-- **ENTRYPOINT**: 항상 실행되는 *고정 진입점*.
 
 ## Before/After
 
@@ -141,26 +118,12 @@ docker history myapp:1.0
 
 성숙한 팀은 *멀티스테이지 빌드* 와 *BuildKit cache mount* 로 *빌드 시간 1/10* 을 만듭니다 (9화에서 다룸).
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Dockerfile 은 *문서* 이기도 하다*.
-- *변경 빈도순으로 *위에서 아래*.
-- *.dockerignore 는 *보안* 이기도 하다*.
-- *CMD 와 ENTRYPOINT* 의 차이를 *의식* 한다.
-- *non-root* 는 *기본값*.
-
 ## 체크리스트
 
 - [ ] *layer 순서* 가 *변경 빈도* 를 따른다.
 - [ ] `.dockerignore` 가 있다.
 - [ ] *non-root user* 로 실행한다.
 - [ ] *deps 와 코드* 가 분리되어 있다.
-
-## 연습 문제
-
-1. `requirements.txt` 변경 없이 코드만 바꿔서 *캐시 적중* 을 확인하세요.
-2. `.dockerignore` 를 추가해 image 크기를 줄여 보세요.
-3. *non-root user* 로 실행되는 Dockerfile 을 만들어 보세요.
 
 ## 정리 및 다음 단계
 

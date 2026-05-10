@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 지금까지 배운 것을 *하나의 앱* 으로 묶으면 *어떤 흐름* 이 될까요?
-
-> *Dockerfile + Compose + healthcheck + 시크릿 + 로그* 가 한 줄의 *명령* 으로 동작하면 *기초 완성*입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *FastAPI* 앱의 *Dockerfile*
-- *Compose* 로 *DB 연결*
-- *healthcheck* 정의
-- *시크릿* 분리
-- *로그* 와 *재시작 정책*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 지금까지의 모든 개념을 *하나의 결과물* 로 *통합* 해야 *체득* 됩니다. *마지막 글* 의 의미가 여기 있습니다.
 
@@ -54,14 +39,6 @@ flowchart LR
     Compose --> DB["db"]
     App --> Log["logs"]
 ```
-
-## 핵심 용어 정리
-
-- **Dockerfile**: *이미지* 를 만드는 *레시피*.
-- **Compose**: *여러 컨테이너* 를 *YAML* 로 묶는 도구.
-- **healthcheck**: *살아있음* 신호.
-- **restart policy**: *죽으면* 자동 *재시작*.
-- **logs driver**: *로그 수집* 방식.
 
 ## Before/After
 
@@ -169,26 +146,12 @@ def down():
 
 *로컬 개발* 은 *Compose*, *프로덕션* 은 *Kubernetes* 로 동일한 *이미지* 를 *다른 오케스트레이터* 에서 운영합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *한 줄 기동* 이 *온보딩 비용* 을 결정.
-- *healthcheck* 가 *오케스트레이션 신호*.
-- *환경 변수* 가 *유일한 차이* 가 되도록.
-- *로그* 는 *표준 출력* 으로.
-- *teardown* 까지 *자동화* 한다.
-
 ## 체크리스트
 
 - [ ] *non-root* 실행.
 - [ ] *healthcheck* 정의.
 - [ ] *시크릿* 분리.
 - [ ] *teardown* 명령 문서화.
-
-## 연습 문제
-
-1. *Dockerfile* 의 *USER* 가 *왜* 중요한지 한 줄로.
-2. *depends_on* 만으로 *부족한 이유* 한 줄로.
-3. *Compose* 와 *Kubernetes* 의 *공통점* 한 가지.
 
 ## 정리 및 다음 단계
 

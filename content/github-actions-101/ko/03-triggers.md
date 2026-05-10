@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *주말 새벽* 에 자동으로 도는 *야간 빌드* 를 어떻게 만듭니까?
-
-> *언제 돌리느냐* 가 *왜 도느냐* 만큼 중요합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *push / pull_request* 트리거의 차이
-- *schedule(cron)* 으로 정기 실행
-- *workflow_dispatch* 로 수동 실행
-- *paths / branches* 필터로 *비용 절감*
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 트리거 설계가 *비용과 노이즈* 를 결정합니다. *모든 commit 마다 모든 워크플로우* 를 돌리면 *비용 폭발 + 알림 피로* 가 옵니다.
 
@@ -55,15 +40,6 @@ flowchart LR
     Cron["schedule"] --> WF
     Manual["workflow_dispatch"] --> WF
 ```
-
-## 핵심 용어 정리
-
-- **push**: 브랜치에 *commit이 올라올 때*.
-- **pull_request**: PR이 *열리거나 갱신될 때*.
-- **schedule**: *cron 표현식* 으로 정기 실행.
-- **workflow_dispatch**: *수동* 실행 버튼.
-- **paths/branches filter**: *경로/브랜치* 로 트리거 *제한*.
-- **concurrency**: *동시 실행* 을 *직렬화*.
 
 ## Before/After
 
@@ -142,26 +118,12 @@ concurrency:
 
 성숙한 팀은 *PR* = *빠른 검증*, *main push* = *full test + build*, *nightly cron* = *느린 e2e*, *workflow_dispatch* = *프로덕션 배포* 로 트리거를 *역할별* 로 나눕니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *트리거 = 비용 + 신뢰* 의 균형.
-- *cron* 은 *UTC 사고*.
-- *concurrency* 는 *기본 장착*.
-- *수동 트리거* 도 *입력 검증*.
-- *PR* 과 *main* 워크플로우를 분리.
-
 ## 체크리스트
 
 - [ ] *paths 필터* 로 불필요한 실행 제거됨.
 - [ ] *cron* 은 *UTC 로* 작성됨.
 - [ ] *concurrency* 가 설정돼 있다.
 - [ ] *workflow_dispatch* 가 문서화됐다.
-
-## 연습 문제
-
-1. *docs/* 변경에는 안 도는 워크플로우를 만드세요.
-2. *매일 새벽 KST 03:00* 에 도는 cron 을 작성해 보세요.
-3. *workflow_dispatch* 에 *환경 선택* 입력을 추가하세요.
 
 ## 정리 및 다음 단계
 

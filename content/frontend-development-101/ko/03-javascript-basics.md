@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Frontend Development 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 자바스크립트는 *어디서부터* 익히면 가장 효율적일까요?
-
-> 모든 기능을 다 외우지 마세요. *변수, 함수, 배열/객체, DOM, 이벤트* 다섯 가지가 자바스크립트의 *80%* 입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- `let`/`const` 와 *immutable 사고방식*
-- 함수, arrow function, 클로저의 *최소 이해*
-- 배열/객체 메서드 (`map`, `filter`, `reduce`)
-- DOM 조회와 수정
-- 이벤트 리스너의 *기본 패턴*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 JS는 framework가 *바뀌어도* 똑같이 쓰입니다. React 컴포넌트 안에서도, Vue 안에서도, Node.js 백엔드에서도 *같은 문법* 입니다. 여기에 시간을 쓰면 *모든 framework가 빨라집니다.*
 
@@ -55,14 +40,6 @@ flowchart LR
     Coll --> DOM["DOM"]
     DOM --> Evt["Events"]
 ```
-
-## 핵심 용어 정리
-
-- **`const`**: 재할당 불가. *기본값으로* 쓰세요.
-- **Arrow function**: `() => {}` 짧은 함수 표기.
-- **Closure**: 함수가 *자기가 만들어진 환경* 을 기억하는 것.
-- **`map/filter/reduce`**: *for문 없이* 컬렉션을 변환하는 표준 도구.
-- **Event delegation**: 부모 요소 *하나에* 리스너를 달아 자식 이벤트를 처리.
 
 ## Before/After
 
@@ -148,14 +125,6 @@ document.getElementById("list").addEventListener("click", (e) => {
 
 대부분의 회사는 *TypeScript* + *ESLint* + *Prettier* 조합을 표준으로 사용합니다. JS의 자유로움이 팀 규모에서는 *위험* 이 되기 때문에 타입과 lint로 *경계* 를 만듭니다. 그러나 그 모든 도구도 *순수 JS 위에서* 돕니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 함수는 *하나의 일* 만 한다.
-- 상태와 렌더링은 *분리* 한다.
-- `const` 가 기본, `let` 은 예외, `var` 는 금지.
-- 콜백 지옥이 보이면 `async/await` 로 평탄화한다.
-- 자바스크립트는 *읽는 시간이 더 길다.*
-
 ## 체크리스트
 
 - [ ] `let/const` 의 차이를 안다.
@@ -163,12 +132,6 @@ document.getElementById("list").addEventListener("click", (e) => {
 - [ ] `map/filter/reduce` 로 for문을 대체한다.
 - [ ] DOM을 조회/수정할 수 있다.
 - [ ] event delegation을 한 번 써봤다.
-
-## 연습 문제
-
-1. 위 todo 코드에 *완료 표시 (체크)* 기능을 추가하세요.
-2. `localStorage` 를 사용해 새로고침 후에도 todo가 유지되게 하세요.
-3. `map/filter/reduce` 만으로 평균 점수를 구하는 함수를 작성하세요.
 
 ## 정리 및 다음 단계
 

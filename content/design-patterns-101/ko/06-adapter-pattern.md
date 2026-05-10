@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 우리가 *바꿀 수 없는* 인터페이스를 우리가 *원하는* 모양으로 어떻게 쓰나요?
-
-> 그 사이에 얇은 변환 객체 — Adapter — 를 둡니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Adapter가 푸는 문제
-- 도메인 인터페이스 정의 → 외부 호출 감싸기
-- 객체 Adapter vs 클래스 Adapter
-- 테스트 더블과의 관계
-- Adapter가 변질되는 신호
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 도메인 코드 안에 외부 라이브러리 호출이 흩어져 있으면, 라이브러리 한 줄이 바뀔 때마다 도메인이 흔들립니다. Adapter는 그 흔들림을 *경계 한 줄*에 가둡니다.
 
@@ -57,14 +42,6 @@ flowchart LR
 ```
 
 도메인은 인터페이스만, Adapter가 외부 호출을 책임집니다.
-
-## 핵심 용어 정리
-
-- **Target**: 도메인이 원하는 인터페이스.
-- **Adaptee**: 우리가 가진 외부 인터페이스.
-- **Adapter**: Target을 구현하면서 Adaptee를 호출.
-- **Object Adapter**: 합성으로 Adaptee를 보유.
-- **Class Adapter**: 다중 상속으로 Adaptee를 흡수 (Python에서는 거의 안 씀).
 
 ## Before/After
 
@@ -178,14 +155,6 @@ class InMemoryFileStore:
 
 S3/GCS/Local을 같은 FileStore로, 결제 PG(스트라이프/토스/포트원)을 같은 PaymentGateway로, 메일 발송기(SES/SendGrid/SMTP)를 같은 Mailer로 — 모두 Adapter입니다. 운영 환경 전환의 자유는 여기서 옵니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 도메인 인터페이스를 *먼저* 그린다.
-- Adapter는 *얇게*, 변환과 호출만.
-- 외부 예외는 도메인 예외로 번역한다.
-- Fake/InMemory Adapter를 같이 만든다.
-- Adapter 하나가 두꺼워지면 책임이 잘못 들어온 것.
-
 ## 체크리스트
 
 - [ ] 도메인 코드가 외부 SDK를 import하지 않는가?
@@ -193,12 +162,6 @@ S3/GCS/Local을 같은 FileStore로, 결제 PG(스트라이프/토스/포트원)
 - [ ] 외부 타입이 경계 밖으로 새지 않는가?
 - [ ] 외부 예외가 도메인 예외로 번역되는가?
 - [ ] InMemory Adapter가 존재하는가?
-
-## 연습 문제
-
-1. 메일 발송 코드를 `Mailer` 인터페이스 + SMTP Adapter로 분리.
-2. 결제 PG 호출을 `PaymentGateway` 인터페이스 + 두 개 이상의 Adapter로 표현.
-3. 위 인터페이스들의 `InMemory` 버전을 작성해 단위 테스트 작성.
 
 ## 정리 및 다음 단계
 

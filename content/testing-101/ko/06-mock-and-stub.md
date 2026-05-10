@@ -24,23 +24,8 @@ last_reviewed: '2026-05-04'
 
 > Testing 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *Stub* 과 *Mock* 은 비슷해 보입니다. 정확히 *무엇이 다를까요*?
-
-> 같은 *가짜 객체* 라도, *결과를 검증* 하면 Stub, *호출 자체를 검증* 하면 Mock입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Stub과 Mock* 의 정확한 정의 차이
-- `unittest.mock` 의 핵심 API
-- *State 검증* vs *Interaction 검증*
-- Mock의 *남용을 피하는* 신호
-- 실전 패턴 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Mock과 Stub을 혼동하면 *과한 Mock* 으로 *깨지기 쉬운 테스트* 를 만들게 됩니다. 차이를 알면 *올바른 도구* 를 *올바른 자리* 에 둘 수 있습니다.
 
@@ -53,14 +38,6 @@ flowchart LR
     Stub["Stub: 미리 정한 답"] --> State["결과(state) 검증"]
     Mock["Mock: 미리 정한 기대"] --> Interact["호출(interaction) 검증"]
 ```
-
-## 핵심 용어 정리
-
-- **State verification**: SUT의 *최종 상태/반환값* 을 검증.
-- **Interaction verification**: SUT가 의존성을 *어떻게 호출했는지* 검증.
-- **MagicMock**: 임의의 속성/호출을 받아주는 *유연한 가짜*.
-- **patch**: 기존 객체를 *임시로 교체* 하는 데코레이터/컨텍스트.
-- **Side effect**: 호출마다 *다른 동작* 을 주는 설정.
 
 ## Before/After
 
@@ -154,26 +131,12 @@ def test_not_called_when_disabled():
 
 대부분의 새 테스트는 *Stub/Fake가 우선* 이고, *상호작용이 본질* 인 곳에만 Mock을 씁니다 (이메일/결제/푸시 알림 같이 *부수효과 자체* 가 검증 대상).
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *결과로 검증* 할 수 있으면 *항상 그렇게* 한다.
-- Mock을 쓸 때는 *기대를 최소화* 한다.
-- `patch` 의 범위는 *함수 단위* 로 좁게 잡는다.
-- *부수효과 자체* 가 시스템의 핵심이면 Mock으로 검증한다.
-- "Mock이 너무 많다"는 *설계 신호* 다.
-
 ## 체크리스트
 
 - [ ] Stub과 Mock의 *목적 차이* 를 한 줄로 설명할 수 있다.
 - [ ] `return_value`, `side_effect`, `assert_called_with` 를 모두 써 봤다.
 - [ ] `patch` 의 *범위* 를 좁게 유지했다.
 - [ ] *결과 검증* 을 우선했다.
-
-## 연습 문제
-
-1. 외부 API를 부르는 함수를 만들고 *Stub과 Mock 두 가지* 로 테스트하세요.
-2. `side_effect` 로 *3회 호출에 한 번 실패* 를 시뮬레이션하세요.
-3. 동일 시나리오를 *Fake* 로도 테스트하고 어떤 게 *읽기 쉬운지* 비교하세요.
 
 ## 정리 및 다음 단계
 

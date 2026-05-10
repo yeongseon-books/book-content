@@ -25,23 +25,8 @@ last_reviewed: '2026-05-04'
 
 > Information Security 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 입력은 어디서 코드가 되고, 어디서 데이터로 남나요?
-
-> 두 취약점 모두 같은 뿌리 — 입력을 코드로 해석시키면 안 됩니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- SQL Injection의 정확한 메커니즘
-- 파라미터 바인딩과 ORM의 안전 한계
-- XSS 세 종류 (Reflected, Stored, DOM-based)
-- Output encoding과 컨텍스트 인식
-- 입력 검증 vs 출력 인코딩의 우선순위
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 OWASP Top 10에 수년간 머무르는 두 취약점입니다. 원리를 정확히 이해하면 새 프레임워크/언어에서도 같은 방식으로 방어할 수 있습니다.
 
@@ -58,14 +43,6 @@ flowchart LR
 ```
 
 같은 입력, 다른 처리 — 결과는 정반대.
-
-## 핵심 용어 정리
-
-- **SQL Injection**: 사용자 입력이 SQL 구문으로 해석되는 취약점.
-- **Parameterized query**: 입력을 데이터로 분리해 바인딩.
-- **Reflected XSS**: 즉시 응답에 반사되는 입력.
-- **Stored XSS**: 저장소에 저장 후 다른 사용자에게 노출.
-- **Output encoding**: 출력 컨텍스트(HTML/JS/URL)에 맞춘 escape.
 
 ## Before/After
 
@@ -162,14 +139,6 @@ document.body.appendChild(node);
 
 대형 시스템은 ORM의 typed query만 허용하고 raw SQL은 코드 리뷰 필수. 프론트엔드는 React/Vue의 텍스트 보간을 신뢰하되 `dangerouslySetInnerHTML`은 별도 승인. WAF는 추가 방어선이지 주된 방어가 아닙니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 입력은 데이터로 받고, 출력은 컨텍스트로 인코딩 — 두 줄 원칙.
-- raw SQL을 lint로 차단합니다.
-- HTML sanitizer는 한 가지(잘 알려진 라이브러리)로 통일.
-- DOM XSS는 코드 리뷰 + 정적 분석으로.
-- 새 입력 경로가 생기면 위협 모델을 갱신.
-
 ## 체크리스트
 
 - [ ] 모든 SQL이 파라미터 바인딩을 쓰는가?
@@ -177,12 +146,6 @@ document.body.appendChild(node);
 - [ ] `innerHTML` 사용처를 점검했는가?
 - [ ] HTML sanitizer가 통일되어 있는가?
 - [ ] WAF에 의존하지 않는 코드 단 방어가 있는가?
-
-## 연습 문제
-
-1. `name=' OR '1'='1`을 막는 코드 한 줄을 적어 보세요.
-2. Reflected와 Stored XSS의 운영 영향 차이를 두 가지 적어 보세요.
-3. DOM XSS를 막는 React 패턴 한 가지를 설명해 보세요.
 
 ## 정리 및 다음 단계
 
