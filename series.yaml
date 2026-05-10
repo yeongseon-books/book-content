@@ -84,6 +84,13 @@ series:
         status: publish-ready
   track: traffic
   stage: foundation
+  related:
+  - id: ai-app-patterns-101
+    relation: next-step
+    note: 기초 → 설계 패턴
+  - id: ai-web-dev-101
+    relation: supersedes
+    note: 이 시리즈가 ai-web-dev-101을 대체
 - id: llm-api-production-101
   status: content-ready
   category: ai
@@ -392,6 +399,13 @@ series:
         status: publish-ready
   track: ebook
   stage: patterns
+  related:
+  - id: llm-app-foundations-101
+    relation: prerequisite
+    note: LLM API 기초 선수
+  - id: ai-agent-101
+    relation: next-step
+    note: 패턴 → 에이전트 심화
 - id: rag-deep-dive
   status: content-ready
   category: ai
@@ -720,6 +734,10 @@ series:
   level: 101
   lifecycle: active
   path: content/ai-agent-101
+  related:
+  - id: ai-app-patterns-101
+    relation: prerequisite
+    note: 앱 패턴 선수
 - id: harness-engineering-101
   status: content-ready
   category: ai
@@ -744,6 +762,10 @@ series:
   level: 101
   lifecycle: active
   path: content/harness-engineering-101
+  related:
+  - id: llm-apps-ops-101
+    relation: complementary
+    note: harness는 에이전트 제어, ops는 운영
 - id: ai-evaluation-101
   category: ai
   title:
@@ -874,6 +896,10 @@ series:
         status: publish-ready
   track: authority
   stage: ops
+  related:
+  - id: harness-engineering-101
+    relation: complementary
+    note: ops는 운영, harness는 에이전트 제어
 - id: ai-data-preparation-101
   category: ai
   title:
@@ -1618,6 +1644,10 @@ series:
   level: 101
   lifecycle: active
   path: content/data-structures-python-101
+  related:
+  - id: data-structures-101
+    relation: concept
+    note: 자료구조 이론 입문
 - id: algorithms-python-101
   status: content-ready
   category: programming
@@ -1640,6 +1670,10 @@ series:
   level: 101
   lifecycle: active
   path: content/algorithms-python-101
+  related:
+  - id: algorithms-101
+    relation: concept
+    note: 알고리즘 이론 입문
 - id: computer-science-major-101
   category: cs-core
   title:
@@ -1775,6 +1809,10 @@ series:
   level: 101
   lifecycle: active
   path: content/data-structures-101
+  related:
+  - id: data-structures-python-101
+    relation: implementation
+    note: Python 구현 실습
 - id: algorithms-101
   category: cs-core
   title:
@@ -1797,6 +1835,10 @@ series:
   level: 101
   lifecycle: active
   path: content/algorithms-101
+  related:
+  - id: algorithms-python-101
+    relation: implementation
+    note: Python 구현 실습
 - id: programming-languages-101
   category: cs-core
   title:
@@ -2067,6 +2109,10 @@ series:
   level: 101
   lifecycle: active
   path: content/api-design-101
+  related:
+  - id: backend-development-101
+    relation: parent-domain
+    note: 백엔드 개발의 API 설계 부분
 - id: web-development-101
   category: software-engineering
   title:
@@ -2089,6 +2135,13 @@ series:
   level: 101
   lifecycle: active
   path: content/web-development-101
+  related:
+  - id: frontend-development-101
+    relation: specialization
+    note: 프론트엔드 심화
+  - id: backend-development-101
+    relation: specialization
+    note: 백엔드 심화
 - id: frontend-development-101
   category: software-engineering
   title:
@@ -2111,6 +2164,10 @@ series:
   level: 101
   lifecycle: active
   path: content/frontend-development-101
+  related:
+  - id: web-development-101
+    relation: overview
+    note: 웹 개발 전체 그림
 - id: backend-development-101
   category: software-engineering
   title:
@@ -2133,6 +2190,13 @@ series:
   level: 101
   lifecycle: active
   path: content/backend-development-101
+  related:
+  - id: web-development-101
+    relation: overview
+    note: 웹 개발 전체 그림
+  - id: api-design-101
+    relation: specialization
+    note: API 설계 심화
 - id: testing-101
   category: software-engineering
   title:
@@ -2178,6 +2242,10 @@ series:
   level: 101
   lifecycle: active
   path: content/containers-101
+  related:
+  - id: docker-101
+    relation: implementation
+    note: Docker는 컨테이너의 대표적 구현체
 - id: docker-101
   category: software-engineering
   title:
@@ -2201,6 +2269,10 @@ series:
   level: 101
   lifecycle: active
   path: content/docker-101
+  related:
+  - id: containers-101
+    relation: concept
+    note: 컨테이너 개념 입문
 - id: kubernetes-101
   category: software-engineering
   title:
@@ -2224,6 +2296,10 @@ series:
   level: 101
   lifecycle: active
   path: content/kubernetes-101
+  related:
+  - id: cloud-computing-101
+    relation: parent-domain
+    note: K8s는 클라우드 인프라의 일부
 - id: cloud-computing-101
   category: software-engineering
   title:
@@ -2246,6 +2322,10 @@ series:
   level: 101
   lifecycle: active
   path: content/cloud-computing-101
+  related:
+  - id: kubernetes-101
+    relation: specialization
+    note: K8s는 클라우드 컨테이너 오케스트레이션
 - id: serverless-101
   category: software-engineering
   title:
@@ -2291,6 +2371,10 @@ series:
   level: 101
   lifecycle: active
   path: content/devops-101
+  related:
+  - id: sre-101
+    relation: alternative-perspective
+    note: DevOps는 개발-운영 통합, SRE는 신뢰성 중심
 - id: github-actions-101
   category: software-engineering
   title:
@@ -2380,6 +2464,10 @@ series:
   level: 101
   lifecycle: active
   path: content/sre-101
+  related:
+  - id: devops-101
+    relation: alternative-perspective
+    note: SRE는 신뢰성 관점, DevOps는 배포/자동화 관점
 - id: secure-coding-101
   category: software-engineering
   title:
