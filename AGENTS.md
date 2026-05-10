@@ -15,6 +15,7 @@
 2. `content/<series>/medium/`은 `.sisyphus/medium/to-medium.py`가 생성하는 산출물이므로 직접 수정하지 않는다.
 3. 경로는 hardcode하지 말고 `series.yaml`의 `path:` 필드를 기준으로 해석한다.
 4. 시리즈 카탈로그의 단일 출처는 [`series.yaml`](./series.yaml)이다. 인간이 읽는 요약은 [`SERIES.md`](./SERIES.md).
+5. 시리즈 순서는 카테고리별 학습 커리큘럼 순서를 따른다. 순서를 변경할 때는 `series.yaml`과 프로필 README(`yeongseon-books/.github/profile/README.md`) 두 곳을 반드시 함께 맞춘다. `SERIES.md`는 `scripts/build_series_index.py`가 `series.yaml` 순서대로 자동 생성한다.
 
 ## Before Editing Content
 
