@@ -1,26 +1,4 @@
 id: python-dbapi-101
-category: data
-title:
-  ko: Python DB-API 101
-  en: Python DB-API 101
-description:
-  ko: Python의 표준 데이터베이스 인터페이스 PEP 249(DB-API 2.0)를 SQLite 기준으로 다루는 입문 시리즈. connection/cursor lifecycle, transaction, parameter binding, error handling, async, production 패턴을 배웁니다.
-  en: A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite. Covers connection/cursor lifecycle, transactions, parameter binding, error handling, async, and production patterns.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - Python
-  - DB-API
-  - SQLite
-  - PEP 249
 articles:
 - idx: 1
   slug: 01-why-db-api-pep-249

@@ -1,72 +1,53 @@
 id: oop-101
-title:
-  ko: Object-Oriented Programming 101
-  en: Object-Oriented Programming 101
-description:
-  ko: 클래스, 캡슐화, 상속, 다형성, 추상화, SOLID 원칙까지 객체지향의 핵심을 다루는 시리즈.
-  en: A series covering the essentials of OOP from classes and encapsulation to inheritance, polymorphism, abstraction, and SOLID principles.
-status: content-ready
-category: programming-foundations
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
-
 episodes:
-  - number: 1
-    slug: what-is-oop
-    title:
-      ko: 객체지향이란 무엇인가?
-      en: What Is Object-Oriented Programming?
-  - number: 2
-    slug: classes-and-instances
-    title:
-      ko: 클래스와 인스턴스
-      en: Classes and Instances
-  - number: 3
-    slug: encapsulation
-    title:
-      ko: 캡슐화
-      en: Encapsulation
-  - number: 4
-    slug: inheritance
-    title:
-      ko: 상속
-      en: Inheritance
-  - number: 5
-    slug: polymorphism
-    title:
-      ko: 다형성
-      en: Polymorphism
-  - number: 6
-    slug: abstraction
-    title:
-      ko: 추상화
-      en: Abstraction
-  - number: 7
-    slug: composition-vs-inheritance
-    title:
-      ko: 합성과 상속
-      en: Composition vs Inheritance
-  - number: 8
-    slug: solid-principles
-    title:
-      ko: SOLID 원칙 기초
-      en: SOLID Principles Basics
-  - number: 9
-    slug: oop-design-example
-    title:
-      ko: 객체지향 설계 예제
-      en: OOP Design Example
-  - number: 10
-    slug: when-to-avoid-oop
-    title:
-      ko: 객체지향을 언제 피해야 할까?
-      en: When to Avoid OOP
+- number: 1
+  slug: what-is-oop
+  title:
+    ko: "\uAC1D\uCCB4\uC9C0\uD5A5\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Object-Oriented Programming?
+- number: 2
+  slug: classes-and-instances
+  title:
+    ko: "\uD074\uB798\uC2A4\uC640 \uC778\uC2A4\uD134\uC2A4"
+    en: Classes and Instances
+- number: 3
+  slug: encapsulation
+  title:
+    ko: "\uCEA1\uC290\uD654"
+    en: Encapsulation
+- number: 4
+  slug: inheritance
+  title:
+    ko: "\uC0C1\uC18D"
+    en: Inheritance
+- number: 5
+  slug: polymorphism
+  title:
+    ko: "\uB2E4\uD615\uC131"
+    en: Polymorphism
+- number: 6
+  slug: abstraction
+  title:
+    ko: "\uCD94\uC0C1\uD654"
+    en: Abstraction
+- number: 7
+  slug: composition-vs-inheritance
+  title:
+    ko: "\uD569\uC131\uACFC \uC0C1\uC18D"
+    en: Composition vs Inheritance
+- number: 8
+  slug: solid-principles
+  title:
+    ko: "SOLID \uC6D0\uCE59 \uAE30\uCD08"
+    en: SOLID Principles Basics
+- number: 9
+  slug: oop-design-example
+  title:
+    ko: "\uAC1D\uCCB4\uC9C0\uD5A5 \uC124\uACC4 \uC608\uC81C"
+    en: OOP Design Example
+- number: 10
+  slug: when-to-avoid-oop
+  title:
+    ko: "\uAC1D\uCCB4\uC9C0\uD5A5\uC744 \uC5B8\uC81C \uD53C\uD574\uC57C \uD560\uAE4C\
+      ?"
+    en: When to Avoid OOP

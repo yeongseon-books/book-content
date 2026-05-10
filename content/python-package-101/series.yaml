@@ -1,54 +1,32 @@
 id: python-package-101
-category: programming
-title:
-  ko: Python Package 101
-  en: Python Package 101
-description:
-  ko: Python 프로젝트 구조, pyproject.toml, 의존성 관리, 빌드, PyPI 배포, 버전 관리, CLI 패키지, 문서화까지 배우는 패키징 입문 시리즈.
-  en: A beginner series covering Python packaging from project structure and pyproject.toml to dependency management, building, PyPI publishing, versioning, CLI packages, and documentation.
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - Python
-  - Packaging
-  - PyPI
-  - pip
 articles:
-  - idx: 1
-    slug: 01-what-is-a-python-package
-    status: content-ready
-  - idx: 2
-    slug: 02-project-structure
-    status: content-ready
-  - idx: 3
-    slug: 03-dependency-management
-    status: content-ready
-  - idx: 4
-    slug: 04-building-packages
-    status: content-ready
-  - idx: 5
-    slug: 05-publishing-to-pypi
-    status: content-ready
-  - idx: 6
-    slug: 06-versioning-and-releases
-    status: content-ready
-  - idx: 7
-    slug: 07-cli-packages
-    status: content-ready
-  - idx: 8
-    slug: 08-type-hints-and-static-analysis
-    status: content-ready
-  - idx: 9
-    slug: 09-documentation
-    status: content-ready
-  - idx: 10
-    slug: 10-package-template
-    status: content-ready
+- idx: 1
+  slug: 01-what-is-a-python-package
+  status: content-ready
+- idx: 2
+  slug: 02-project-structure
+  status: content-ready
+- idx: 3
+  slug: 03-dependency-management
+  status: content-ready
+- idx: 4
+  slug: 04-building-packages
+  status: content-ready
+- idx: 5
+  slug: 05-publishing-to-pypi
+  status: content-ready
+- idx: 6
+  slug: 06-versioning-and-releases
+  status: content-ready
+- idx: 7
+  slug: 07-cli-packages
+  status: content-ready
+- idx: 8
+  slug: 08-type-hints-and-static-analysis
+  status: content-ready
+- idx: 9
+  slug: 09-documentation
+  status: content-ready
+- idx: 10
+  slug: 10-package-template
+  status: content-ready

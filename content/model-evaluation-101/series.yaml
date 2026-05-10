@@ -1,53 +1,42 @@
 id: model-evaluation-101
-title:
-  ko: Model Evaluation 101
-  en: Model Evaluation 101
-description:
-  ko: 모델을 제대로 평가하는 법 — train/val/test, precision/recall, ROC, calibration, error analysis까지
-  en: Properly evaluating ML models — train/val/test, precision and recall, ROC, calibration, and error analysis
-languages: [ko, en]
-status: content-ready
-level: junior
-lifecycle: blog-first
-path: content/model-evaluation-101
 episodes:
-  - slug: 01-why-evaluation-is-hard
-    title:
-      ko: 모델 평가는 왜 어려운가?
-      en: Why Model Evaluation Is Hard
-  - slug: 02-train-val-test
-    title:
-      ko: train/validation/test
-      en: Train, Validation, and Test
-  - slug: 03-limits-of-accuracy
-    title:
-      ko: Accuracy의 한계
-      en: The Limits of Accuracy
-  - slug: 04-precision-and-recall
-    title:
-      ko: Precision과 Recall
-      en: Precision and Recall
-  - slug: 05-f1-score
-    title:
-      ko: F1 Score
-      en: F1 Score
-  - slug: 06-roc-and-auc
-    title:
-      ko: ROC와 AUC
-      en: ROC and AUC
-  - slug: 07-calibration
-    title:
-      ko: Calibration
-      en: Calibration
-  - slug: 08-cross-validation
-    title:
-      ko: Cross Validation
-      en: Cross Validation
-  - slug: 09-error-analysis
-    title:
-      ko: Error Analysis
-      en: Error Analysis
-  - slug: 10-evaluation-report
-    title:
-      ko: 평가 리포트 만들기
-      en: Building an Evaluation Report
+- slug: 01-why-evaluation-is-hard
+  title:
+    ko: "\uBAA8\uB378 \uD3C9\uAC00\uB294 \uC65C \uC5B4\uB824\uC6B4\uAC00?"
+    en: Why Model Evaluation Is Hard
+- slug: 02-train-val-test
+  title:
+    ko: train/validation/test
+    en: Train, Validation, and Test
+- slug: 03-limits-of-accuracy
+  title:
+    ko: "Accuracy\uC758 \uD55C\uACC4"
+    en: The Limits of Accuracy
+- slug: 04-precision-and-recall
+  title:
+    ko: "Precision\uACFC Recall"
+    en: Precision and Recall
+- slug: 05-f1-score
+  title:
+    ko: F1 Score
+    en: F1 Score
+- slug: 06-roc-and-auc
+  title:
+    ko: "ROC\uC640 AUC"
+    en: ROC and AUC
+- slug: 07-calibration
+  title:
+    ko: Calibration
+    en: Calibration
+- slug: 08-cross-validation
+  title:
+    ko: Cross Validation
+    en: Cross Validation
+- slug: 09-error-analysis
+  title:
+    ko: Error Analysis
+    en: Error Analysis
+- slug: 10-evaluation-report
+  title:
+    ko: "\uD3C9\uAC00 \uB9AC\uD3EC\uD2B8 \uB9CC\uB4E4\uAE30"
+    en: Building an Evaluation Report

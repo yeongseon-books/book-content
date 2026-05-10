@@ -1,25 +1,4 @@
 id: azure-functions-101
-category: azure
-title:
-  ko: Azure Functions 101
-  en: Azure Functions 101
-description:
-  ko: Azure Functions 입문 7부작 — 트리거/바인딩부터 운영까지.
-  en: A 7-part beginner guide to Azure Functions.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - Azure
-  - Azure Functions
-  - Serverless
-  - Cloud
 articles:
 - idx: 1
   slug: 01-what-is-azure-functions

@@ -1,52 +1,42 @@
 id: sql-101
-title:
-  ko: SQL 101
-  en: SQL 101
-description:
-  ko: SELECT, JOIN, GROUP BY, subquery, window function, DML, index 기초까지 분석/개발에 바로 쓰는 SQL 입문 시리즈.
-  en: A practical SQL series covering SELECT, JOIN, GROUP BY, subqueries, window functions, DML, and index basics for analysts and junior developers.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: what-is-sql
-    title:
-      ko: SQL이란 무엇인가?
-      en: What Is SQL?
-  - slug: select-basics
-    title:
-      ko: SELECT 기본
-      en: SELECT Basics
-  - slug: where-and-conditions
-    title:
-      ko: WHERE와 조건
-      en: WHERE and Conditions
-  - slug: join
-    title:
-      ko: JOIN
-      en: JOIN
-  - slug: group-by-and-aggregate
-    title:
-      ko: GROUP BY와 aggregate
-      en: GROUP BY and Aggregates
-  - slug: subquery
-    title:
-      ko: Subquery
-      en: Subquery
-  - slug: window-function
-    title:
-      ko: Window Function
-      en: Window Function
-  - slug: insert-update-delete
-    title:
-      ko: INSERT, UPDATE, DELETE
-      en: INSERT, UPDATE, DELETE
-  - slug: index-and-query-plan
-    title:
-      ko: Index와 Query Plan
-      en: Index and Query Plan
-  - slug: practical-analysis-sql
-    title:
-      ko: 실전 분석 SQL
-      en: Practical Analysis SQL
+- slug: what-is-sql
+  title:
+    ko: "SQL\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is SQL?
+- slug: select-basics
+  title:
+    ko: "SELECT \uAE30\uBCF8"
+    en: SELECT Basics
+- slug: where-and-conditions
+  title:
+    ko: "WHERE\uC640 \uC870\uAC74"
+    en: WHERE and Conditions
+- slug: join
+  title:
+    ko: JOIN
+    en: JOIN
+- slug: group-by-and-aggregate
+  title:
+    ko: "GROUP BY\uC640 aggregate"
+    en: GROUP BY and Aggregates
+- slug: subquery
+  title:
+    ko: Subquery
+    en: Subquery
+- slug: window-function
+  title:
+    ko: Window Function
+    en: Window Function
+- slug: insert-update-delete
+  title:
+    ko: INSERT, UPDATE, DELETE
+    en: INSERT, UPDATE, DELETE
+- slug: index-and-query-plan
+  title:
+    ko: "Index\uC640 Query Plan"
+    en: Index and Query Plan
+- slug: practical-analysis-sql
+  title:
+    ko: "\uC2E4\uC804 \uBD84\uC11D SQL"
+    en: Practical Analysis SQL

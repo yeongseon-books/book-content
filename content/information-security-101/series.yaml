@@ -1,71 +1,52 @@
 id: information-security-101
-title:
-  ko: Information Security 101
-  en: Information Security 101
-description:
-  ko: 인증, 인가, 암호화, TLS, 웹 보안, secret 관리, 권한 최소화, 감사 로그까지 개발자가 알아야 할 보안 기본기.
-  en: Developer-level security basics - authentication, authorization, cryptography, TLS, web security, secrets, least privilege, and audit logs.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-information-security
-    title:
-      ko: 정보보안이란 무엇인가?
-      en: What Is Information Security?
-  - number: 2
-    slug: authentication-and-authorization
-    title:
-      ko: 인증과 인가
-      en: Authentication and Authorization
-  - number: 3
-    slug: cryptography-and-hash
-    title:
-      ko: 암호화와 해시
-      en: Cryptography and Hashing
-  - number: 4
-    slug: tls-and-certificates
-    title:
-      ko: TLS와 인증서
-      en: TLS and Certificates
-  - number: 5
-    slug: web-security-basics
-    title:
-      ko: Web 보안 기초
-      en: Web Security Basics
-  - number: 6
-    slug: sql-injection-and-xss
-    title:
-      ko: SQL Injection과 XSS
-      en: SQL Injection and XSS
-  - number: 7
-    slug: secret-management
-    title:
-      ko: secret 관리
-      en: Secret Management
-  - number: 8
-    slug: least-privilege
-    title:
-      ko: 권한 최소화
-      en: Least Privilege
-  - number: 9
-    slug: logging-and-audit
-    title:
-      ko: 로그와 감사
-      en: Logging and Audit
-  - number: 10
-    slug: incident-response
-    title:
-      ko: 보안 사고 대응
-      en: Security Incident Response
+- number: 1
+  slug: what-is-information-security
+  title:
+    ko: "\uC815\uBCF4\uBCF4\uC548\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Information Security?
+- number: 2
+  slug: authentication-and-authorization
+  title:
+    ko: "\uC778\uC99D\uACFC \uC778\uAC00"
+    en: Authentication and Authorization
+- number: 3
+  slug: cryptography-and-hash
+  title:
+    ko: "\uC554\uD638\uD654\uC640 \uD574\uC2DC"
+    en: Cryptography and Hashing
+- number: 4
+  slug: tls-and-certificates
+  title:
+    ko: "TLS\uC640 \uC778\uC99D\uC11C"
+    en: TLS and Certificates
+- number: 5
+  slug: web-security-basics
+  title:
+    ko: "Web \uBCF4\uC548 \uAE30\uCD08"
+    en: Web Security Basics
+- number: 6
+  slug: sql-injection-and-xss
+  title:
+    ko: "SQL Injection\uACFC XSS"
+    en: SQL Injection and XSS
+- number: 7
+  slug: secret-management
+  title:
+    ko: "secret \uAD00\uB9AC"
+    en: Secret Management
+- number: 8
+  slug: least-privilege
+  title:
+    ko: "\uAD8C\uD55C \uCD5C\uC18C\uD654"
+    en: Least Privilege
+- number: 9
+  slug: logging-and-audit
+  title:
+    ko: "\uB85C\uADF8\uC640 \uAC10\uC0AC"
+    en: Logging and Audit
+- number: 10
+  slug: incident-response
+  title:
+    ko: "\uBCF4\uC548 \uC0AC\uACE0 \uB300\uC751"
+    en: Security Incident Response

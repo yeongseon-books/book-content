@@ -1,60 +1,42 @@
 id: capstone-project-101
-title:
-  ko: 캡스톤 프로젝트 101
-  en: Capstone Project 101
-description:
-  ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 캡스톤 전체 흐름을 다룬 입문 시리즈.
-  en: An introductory series covering the full capstone flow — topic, problem, MVP, team roles, demo, and retrospective.
-status: content-ready
-level: 101
-lifecycle: active
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
 episodes:
-  - slug: 01-what-is-capstone
-    title:
-      ko: 캡스톤 프로젝트란 무엇인가
-      en: What is a Capstone Project
-  - slug: 02-choosing-a-topic
-    title:
-      ko: 주제 선정
-      en: Choosing a Topic
-  - slug: 03-defining-the-problem
-    title:
-      ko: 문제 정의
-      en: Defining the Problem
-  - slug: 04-organizing-requirements
-    title:
-      ko: 요구사항 정리
-      en: Organizing Requirements
-  - slug: 05-splitting-team-roles
-    title:
-      ko: 팀 역할 나누기
-      en: Splitting Team Roles
-  - slug: 06-designing-the-mvp
-    title:
-      ko: MVP 설계
-      en: Designing the MVP
-  - slug: 07-choosing-the-tech-stack
-    title:
-      ko: 기술 스택 선택
-      en: Choosing the Tech Stack
-  - slug: 08-schedule-management
-    title:
-      ko: 일정 관리
-      en: Schedule Management
-  - slug: 09-presentation-materials
-    title:
-      ko: 발표 자료 만들기
-      en: Building Presentation Materials
-  - slug: 10-project-retrospective
-    title:
-      ko: 프로젝트 회고
-      en: Project Retrospective
+- slug: 01-what-is-capstone
+  title:
+    ko: "\uCEA1\uC2A4\uD1A4 \uD504\uB85C\uC81D\uD2B8\uB780 \uBB34\uC5C7\uC778\uAC00"
+    en: What is a Capstone Project
+- slug: 02-choosing-a-topic
+  title:
+    ko: "\uC8FC\uC81C \uC120\uC815"
+    en: Choosing a Topic
+- slug: 03-defining-the-problem
+  title:
+    ko: "\uBB38\uC81C \uC815\uC758"
+    en: Defining the Problem
+- slug: 04-organizing-requirements
+  title:
+    ko: "\uC694\uAD6C\uC0AC\uD56D \uC815\uB9AC"
+    en: Organizing Requirements
+- slug: 05-splitting-team-roles
+  title:
+    ko: "\uD300 \uC5ED\uD560 \uB098\uB204\uAE30"
+    en: Splitting Team Roles
+- slug: 06-designing-the-mvp
+  title:
+    ko: "MVP \uC124\uACC4"
+    en: Designing the MVP
+- slug: 07-choosing-the-tech-stack
+  title:
+    ko: "\uAE30\uC220 \uC2A4\uD0DD \uC120\uD0DD"
+    en: Choosing the Tech Stack
+- slug: 08-schedule-management
+  title:
+    ko: "\uC77C\uC815 \uAD00\uB9AC"
+    en: Schedule Management
+- slug: 09-presentation-materials
+  title:
+    ko: "\uBC1C\uD45C \uC790\uB8CC \uB9CC\uB4E4\uAE30"
+    en: Building Presentation Materials
+- slug: 10-project-retrospective
+  title:
+    ko: "\uD504\uB85C\uC81D\uD2B8 \uD68C\uACE0"
+    en: Project Retrospective

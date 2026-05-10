@@ -1,25 +1,4 @@
 id: azure-functions-deep-dive
-category: azure
-title:
-  ko: Azure Functions Deep Dive
-  en: Azure Functions Deep Dive
-description:
-  ko: Azure Functions Host 소스 분석 시리즈 (commit-pinned).
-  en: Source-level dive into Azure Functions Host (commit-pinned).
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - Azure Functions
-  - Serverless
-  - Distributed Systems
-  - gRPC
 articles:
 - idx: 1
   slug: 01-host-bootstrap

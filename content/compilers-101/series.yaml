@@ -1,71 +1,52 @@
 id: compilers-101
-title:
-  ko: Compilers 101
-  en: Compilers 101
-description:
-  ko: lexer, parser, AST, semantic analysis, IR, optimization, code generation까지 컴파일러 파이프라인을 처음 배우는 시리즈.
-  en: A first walk through the compiler pipeline — lexer, parser, AST, semantic analysis, IR, optimization, and code generation.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-a-compiler
-    title:
-      ko: 컴파일러란 무엇인가?
-      en: What Is a Compiler?
-  - number: 2
-    slug: lexical-analysis
-    title:
-      ko: lexical analysis
-      en: Lexical Analysis
-  - number: 3
-    slug: parsing-and-ast
-    title:
-      ko: parsing과 AST
-      en: Parsing and the AST
-  - number: 4
-    slug: semantic-analysis
-    title:
-      ko: semantic analysis
-      en: Semantic Analysis
-  - number: 5
-    slug: symbol-table-and-scope
-    title:
-      ko: symbol table과 scope
-      en: Symbol Tables and Scope
-  - number: 6
-    slug: intermediate-representation
-    title:
-      ko: intermediate representation
-      en: Intermediate Representation
-  - number: 7
-    slug: optimization-basics
-    title:
-      ko: optimization 기초
-      en: Optimization Basics
-  - number: 8
-    slug: code-generation
-    title:
-      ko: code generation
-      en: Code Generation
-  - number: 9
-    slug: jit-vs-aot
-    title:
-      ko: JIT vs AOT
-      en: JIT vs AOT
-  - number: 10
-    slug: building-a-tiny-interpreter
-    title:
-      ko: 작은 인터프리터 만들어 보기
-      en: Build a Tiny Interpreter
+- number: 1
+  slug: what-is-a-compiler
+  title:
+    ko: "\uCEF4\uD30C\uC77C\uB7EC\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is a Compiler?
+- number: 2
+  slug: lexical-analysis
+  title:
+    ko: lexical analysis
+    en: Lexical Analysis
+- number: 3
+  slug: parsing-and-ast
+  title:
+    ko: "parsing\uACFC AST"
+    en: Parsing and the AST
+- number: 4
+  slug: semantic-analysis
+  title:
+    ko: semantic analysis
+    en: Semantic Analysis
+- number: 5
+  slug: symbol-table-and-scope
+  title:
+    ko: "symbol table\uACFC scope"
+    en: Symbol Tables and Scope
+- number: 6
+  slug: intermediate-representation
+  title:
+    ko: intermediate representation
+    en: Intermediate Representation
+- number: 7
+  slug: optimization-basics
+  title:
+    ko: "optimization \uAE30\uCD08"
+    en: Optimization Basics
+- number: 8
+  slug: code-generation
+  title:
+    ko: code generation
+    en: Code Generation
+- number: 9
+  slug: jit-vs-aot
+  title:
+    ko: JIT vs AOT
+    en: JIT vs AOT
+- number: 10
+  slug: building-a-tiny-interpreter
+  title:
+    ko: "\uC791\uC740 \uC778\uD130\uD504\uB9AC\uD130 \uB9CC\uB4E4\uC5B4 \uBCF4\uAE30"
+    en: Build a Tiny Interpreter

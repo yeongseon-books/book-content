@@ -1,22 +1,4 @@
 id: langgraph-101
-category: ai
-title:
-  ko: LangGraph 101
-  en: LangGraph 101
-description:
-  ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
-  en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-graph-basics

@@ -1,71 +1,53 @@
 id: software-engineering-101
-title:
-  ko: Software Engineering 101
-  en: Software Engineering 101
-description:
-  ko: 요구사항, 설계, 코드 리뷰, 테스트, 버전 관리, 문서화, 협업, 유지보수까지 소프트웨어 엔지니어링의 큰 그림을 다지는 시리즈.
-  en: The big picture of software engineering — requirements, design, code review, testing, version control, documentation, collaboration, and maintenance.
-status: content-ready
-category: software-engineering
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-software-engineering
-    title:
-      ko: 소프트웨어 엔지니어링이란 무엇인가?
-      en: What Is Software Engineering?
-  - number: 2
-    slug: understanding-requirements
-    title:
-      ko: 요구사항 이해하기
-      en: Understanding Requirements
-  - number: 3
-    slug: design-vs-implementation
-    title:
-      ko: 설계와 구현의 차이
-      en: Design vs Implementation
-  - number: 4
-    slug: code-review
-    title:
-      ko: 코드 리뷰
-      en: Code Review
-  - number: 5
-    slug: testing-strategy
-    title:
-      ko: 테스트 전략
-      en: Testing Strategy
-  - number: 6
-    slug: version-control-and-release
-    title:
-      ko: 버전 관리와 릴리스
-      en: Version Control and Release
-  - number: 7
-    slug: documentation
-    title:
-      ko: 문서화
-      en: Documentation
-  - number: 8
-    slug: collaboration-process
-    title:
-      ko: 협업 프로세스
-      en: Collaboration Process
-  - number: 9
-    slug: maintenance-and-tech-debt
-    title:
-      ko: 유지보수와 기술부채
-      en: Maintenance and Tech Debt
-  - number: 10
-    slug: what-makes-good-software
-    title:
-      ko: 좋은 소프트웨어의 기준
-      en: What Makes Good Software
+- number: 1
+  slug: what-is-software-engineering
+  title:
+    ko: "\uC18C\uD504\uD2B8\uC6E8\uC5B4 \uC5D4\uC9C0\uB2C8\uC5B4\uB9C1\uC774\uB780\
+      \ \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Software Engineering?
+- number: 2
+  slug: understanding-requirements
+  title:
+    ko: "\uC694\uAD6C\uC0AC\uD56D \uC774\uD574\uD558\uAE30"
+    en: Understanding Requirements
+- number: 3
+  slug: design-vs-implementation
+  title:
+    ko: "\uC124\uACC4\uC640 \uAD6C\uD604\uC758 \uCC28\uC774"
+    en: Design vs Implementation
+- number: 4
+  slug: code-review
+  title:
+    ko: "\uCF54\uB4DC \uB9AC\uBDF0"
+    en: Code Review
+- number: 5
+  slug: testing-strategy
+  title:
+    ko: "\uD14C\uC2A4\uD2B8 \uC804\uB7B5"
+    en: Testing Strategy
+- number: 6
+  slug: version-control-and-release
+  title:
+    ko: "\uBC84\uC804 \uAD00\uB9AC\uC640 \uB9B4\uB9AC\uC2A4"
+    en: Version Control and Release
+- number: 7
+  slug: documentation
+  title:
+    ko: "\uBB38\uC11C\uD654"
+    en: Documentation
+- number: 8
+  slug: collaboration-process
+  title:
+    ko: "\uD611\uC5C5 \uD504\uB85C\uC138\uC2A4"
+    en: Collaboration Process
+- number: 9
+  slug: maintenance-and-tech-debt
+  title:
+    ko: "\uC720\uC9C0\uBCF4\uC218\uC640 \uAE30\uC220\uBD80\uCC44"
+    en: Maintenance and Tech Debt
+- number: 10
+  slug: what-makes-good-software
+  title:
+    ko: "\uC88B\uC740 \uC18C\uD504\uD2B8\uC6E8\uC5B4\uC758 \uAE30\uC900"
+    en: What Makes Good Software

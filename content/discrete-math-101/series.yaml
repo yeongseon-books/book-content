@@ -1,71 +1,52 @@
 id: discrete-math-101
-title:
-  ko: Discrete Math 101
-  en: Discrete Math 101
-description:
-  ko: 명제, 집합, 함수, 증명, 조합, 그래프 등 컴퓨터공학에 직접 쓰이는 이산수학을 정리하는 시리즈.
-  en: An introductory series on discrete mathematics for computer science covering propositions, sets, functions, proofs, combinatorics, and graphs.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-discrete-math
-    title:
-      ko: 이산수학이란 무엇인가?
-      en: What Is Discrete Mathematics?
-  - number: 2
-    slug: propositions-and-logic
-    title:
-      ko: 명제와 논리
-      en: Propositions and Logic
-  - number: 3
-    slug: sets-and-functions
-    title:
-      ko: 집합과 함수
-      en: Sets and Functions
-  - number: 4
-    slug: relations-and-equivalence
-    title:
-      ko: 관계와 동치관계
-      en: Relations and Equivalence
-  - number: 5
-    slug: proof-techniques
-    title:
-      ko: 증명 방법
-      en: Proof Techniques
-  - number: 6
-    slug: sequences-and-recurrence
-    title:
-      ko: 수열과 점화식
-      en: Sequences and Recurrence
-  - number: 7
-    slug: combinatorics
-    title:
-      ko: 조합과 경우의 수
-      en: Combinatorics
-  - number: 8
-    slug: graph-theory-basics
-    title:
-      ko: 그래프 이론 기초
-      en: Graph Theory Basics
-  - number: 9
-    slug: trees-and-graph-traversal
-    title:
-      ko: 트리와 그래프 탐색
-      en: Trees and Graph Traversal
-  - number: 10
-    slug: discrete-math-and-algorithms
-    title:
-      ko: 알고리즘과 이산수학의 연결
-      en: Discrete Mathematics and Algorithms
+- number: 1
+  slug: what-is-discrete-math
+  title:
+    ko: "\uC774\uC0B0\uC218\uD559\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Discrete Mathematics?
+- number: 2
+  slug: propositions-and-logic
+  title:
+    ko: "\uBA85\uC81C\uC640 \uB17C\uB9AC"
+    en: Propositions and Logic
+- number: 3
+  slug: sets-and-functions
+  title:
+    ko: "\uC9D1\uD569\uACFC \uD568\uC218"
+    en: Sets and Functions
+- number: 4
+  slug: relations-and-equivalence
+  title:
+    ko: "\uAD00\uACC4\uC640 \uB3D9\uCE58\uAD00\uACC4"
+    en: Relations and Equivalence
+- number: 5
+  slug: proof-techniques
+  title:
+    ko: "\uC99D\uBA85 \uBC29\uBC95"
+    en: Proof Techniques
+- number: 6
+  slug: sequences-and-recurrence
+  title:
+    ko: "\uC218\uC5F4\uACFC \uC810\uD654\uC2DD"
+    en: Sequences and Recurrence
+- number: 7
+  slug: combinatorics
+  title:
+    ko: "\uC870\uD569\uACFC \uACBD\uC6B0\uC758 \uC218"
+    en: Combinatorics
+- number: 8
+  slug: graph-theory-basics
+  title:
+    ko: "\uADF8\uB798\uD504 \uC774\uB860 \uAE30\uCD08"
+    en: Graph Theory Basics
+- number: 9
+  slug: trees-and-graph-traversal
+  title:
+    ko: "\uD2B8\uB9AC\uC640 \uADF8\uB798\uD504 \uD0D0\uC0C9"
+    en: Trees and Graph Traversal
+- number: 10
+  slug: discrete-math-and-algorithms
+  title:
+    ko: "\uC54C\uACE0\uB9AC\uC998\uACFC \uC774\uC0B0\uC218\uD559\uC758 \uC5F0\uACB0"
+    en: Discrete Mathematics and Algorithms

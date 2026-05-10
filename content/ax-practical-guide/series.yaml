@@ -1,19 +1,1 @@
 id: ax-practical-guide
-category: ai
-title:
-  ko: AX 실전 가이드
-  en: AI Transformation Practical Guide
-description:
-  ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
-  en: Practical strategies for AI Transformation in real organizations.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: planned
-tags: []

@@ -1,53 +1,42 @@
 id: containers-101
-title:
-  ko: Containers 101
-  en: Containers 101
-description:
-  ko: Image, runtime, layer, Dockerfile부터 보안까지 컨테이너의 큰 그림을 입문자 관점에서 다룹니다.
-  en: A beginner-friendly tour of containers — images, runtimes, layers, Dockerfile, security, and how containers differ from VMs.
-status: in-progress
-level: beginner
-languages:
-  - ko
-  - en
 episodes:
-  - slug: 01-what-is-a-container
-    title:
-      ko: Container란 무엇인가?
-      en: What is a Container?
-  - slug: 02-image-and-layer
-    title:
-      ko: Image와 Layer
-      en: Image and Layer
-  - slug: 03-runtime
-    title:
-      ko: Runtime
-      en: Runtime
-  - slug: 04-dockerfile
-    title:
-      ko: Dockerfile
-      en: Dockerfile
-  - slug: 05-volume
-    title:
-      ko: Volume
-      en: Volume
-  - slug: 06-network
-    title:
-      ko: Network
-      en: Network
-  - slug: 07-registry
-    title:
-      ko: Registry
-      en: Registry
-  - slug: 08-container-security
-    title:
-      ko: Container Security
-      en: Container Security
-  - slug: 09-container-vs-vm
-    title:
-      ko: Container와 VM 차이
-      en: Containers vs VMs
-  - slug: 10-build-a-container-app
-    title:
-      ko: 실전 컨테이너 앱 만들기
-      en: Build a Container App
+- slug: 01-what-is-a-container
+  title:
+    ko: "Container\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What is a Container?
+- slug: 02-image-and-layer
+  title:
+    ko: "Image\uC640 Layer"
+    en: Image and Layer
+- slug: 03-runtime
+  title:
+    ko: Runtime
+    en: Runtime
+- slug: 04-dockerfile
+  title:
+    ko: Dockerfile
+    en: Dockerfile
+- slug: 05-volume
+  title:
+    ko: Volume
+    en: Volume
+- slug: 06-network
+  title:
+    ko: Network
+    en: Network
+- slug: 07-registry
+  title:
+    ko: Registry
+    en: Registry
+- slug: 08-container-security
+  title:
+    ko: Container Security
+    en: Container Security
+- slug: 09-container-vs-vm
+  title:
+    ko: "Container\uC640 VM \uCC28\uC774"
+    en: Containers vs VMs
+- slug: 10-build-a-container-app
+  title:
+    ko: "\uC2E4\uC804 \uCEE8\uD14C\uC774\uB108 \uC571 \uB9CC\uB4E4\uAE30"
+    en: Build a Container App

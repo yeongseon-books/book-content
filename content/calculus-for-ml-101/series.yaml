@@ -1,55 +1,42 @@
 id: calculus-for-ml-101
-title:
-  ko: ML을 위한 미분 101
-  en: Calculus for ML 101
-description:
-  ko: 함수, 기울기, 편미분, gradient, chain rule, loss, gradient descent, backprop 직관까지 ML에 필요한 미분을 다지는 입문 시리즈.
-  en: An entry series covering functions, slopes, partial derivatives, gradients, chain rule, loss, gradient descent, and backprop intuition for ML.
-languages:
-  - ko
-  - en
-status: content-ready
-level: 101
-lifecycle: active
-path: content/calculus-for-ml-101
 episodes:
-  - slug: 01-what-is-derivative
-    title:
-      ko: 미분이란 무엇인가
-      en: What Is a Derivative
-  - slug: 02-functions-and-slope
-    title:
-      ko: 함수와 기울기
-      en: Functions and Slope
-  - slug: 03-partial-derivatives
-    title:
-      ko: 편미분
-      en: Partial Derivatives
-  - slug: 04-gradient
-    title:
-      ko: Gradient
-      en: Gradient
-  - slug: 05-chain-rule
-    title:
-      ko: 연쇄 법칙
-      en: Chain Rule
-  - slug: 06-loss-function
-    title:
-      ko: 손실 함수
-      en: Loss Function
-  - slug: 07-gradient-descent
-    title:
-      ko: 경사하강법
-      en: Gradient Descent
-  - slug: 08-optimization
-    title:
-      ko: 최적화
-      en: Optimization
-  - slug: 09-backpropagation-intuition
-    title:
-      ko: 역전파 직관
-      en: Backpropagation Intuition
-  - slug: 10-calculus-in-deep-learning
-    title:
-      ko: 딥러닝에서의 미분
-      en: Calculus in Deep Learning
+- slug: 01-what-is-derivative
+  title:
+    ko: "\uBBF8\uBD84\uC774\uB780 \uBB34\uC5C7\uC778\uAC00"
+    en: What Is a Derivative
+- slug: 02-functions-and-slope
+  title:
+    ko: "\uD568\uC218\uC640 \uAE30\uC6B8\uAE30"
+    en: Functions and Slope
+- slug: 03-partial-derivatives
+  title:
+    ko: "\uD3B8\uBBF8\uBD84"
+    en: Partial Derivatives
+- slug: 04-gradient
+  title:
+    ko: Gradient
+    en: Gradient
+- slug: 05-chain-rule
+  title:
+    ko: "\uC5F0\uC1C4 \uBC95\uCE59"
+    en: Chain Rule
+- slug: 06-loss-function
+  title:
+    ko: "\uC190\uC2E4 \uD568\uC218"
+    en: Loss Function
+- slug: 07-gradient-descent
+  title:
+    ko: "\uACBD\uC0AC\uD558\uAC15\uBC95"
+    en: Gradient Descent
+- slug: 08-optimization
+  title:
+    ko: "\uCD5C\uC801\uD654"
+    en: Optimization
+- slug: 09-backpropagation-intuition
+  title:
+    ko: "\uC5ED\uC804\uD30C \uC9C1\uAD00"
+    en: Backpropagation Intuition
+- slug: 10-calculus-in-deep-learning
+  title:
+    ko: "\uB525\uB7EC\uB2DD\uC5D0\uC11C\uC758 \uBBF8\uBD84"
+    en: Calculus in Deep Learning

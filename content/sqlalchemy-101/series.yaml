@@ -1,26 +1,4 @@
 id: sqlalchemy-101
-category: data
-title:
-  ko: SQLAlchemy 101
-  en: SQLAlchemy 101
-description:
-  ko: SQLAlchemy 2.x를 SQLite 기준으로 다루는 입문 시리즈. Engine·Connection·Core·ORM·Session·Unit of Work·Relationship·Loading 전략·Async·Production 패턴을 배웁니다.
-  en: A beginner-friendly SQLAlchemy 2.x tour using SQLite. Covers Engine, Connection, Core, ORM, Session, Unit of Work, relationships, loading strategies, async, and production patterns.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - Python
-  - SQLAlchemy
-  - ORM
-  - SQLite
 articles:
 - idx: 1
   slug: 01-sqlalchemy-2x-engine-connection

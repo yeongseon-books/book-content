@@ -1,22 +1,4 @@
 id: llm-apps-ops-101
-category: ai
-title:
-  ko: LLM 앱 운영 101
-  en: LLM Apps Ops 101
-description:
-  ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
-  en: Observability, evaluation, cost, security, and deployment in 6 parts.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-monitoring-and-logging

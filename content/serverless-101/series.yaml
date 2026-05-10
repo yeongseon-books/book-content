@@ -1,51 +1,42 @@
 id: serverless-101
-title:
-  ko: Serverless 101
-  en: Serverless 101
-description:
-  ko: FaaS, trigger/event, cold start, scaling, state, queue, observability, cost까지 서버리스 입문 시리즈
-  en: An entry series covering FaaS, triggers/events, cold start, scaling, state, queues, observability, and cost
-status: content-ready
-level: beginner
-languages: [ko, en]
 episodes:
-  - slug: 01-what-is-serverless
-    title:
-      ko: Serverless란 무엇인가?
-      en: What is Serverless?
-  - slug: 02-function-as-a-service
-    title:
-      ko: Function as a Service
-      en: Function as a Service
-  - slug: 03-trigger-and-event
-    title:
-      ko: Trigger와 Event
-      en: Trigger and Event
-  - slug: 04-cold-start
-    title:
-      ko: Cold Start
-      en: Cold Start
-  - slug: 05-scaling
-    title:
-      ko: Scaling
-      en: Scaling
-  - slug: 06-state-management
-    title:
-      ko: State 관리
-      en: State Management
-  - slug: 07-queue-and-event-driven
-    title:
-      ko: Queue와 Event-driven Architecture
-      en: Queue and Event-driven Architecture
-  - slug: 08-observability
-    title:
-      ko: Observability
-      en: Observability
-  - slug: 09-cost
-    title:
-      ko: Cost
-      en: Cost
-  - slug: 10-serverless-app-design
-    title:
-      ko: Serverless 앱 설계
-      en: Designing a Serverless App
+- slug: 01-what-is-serverless
+  title:
+    ko: "Serverless\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What is Serverless?
+- slug: 02-function-as-a-service
+  title:
+    ko: Function as a Service
+    en: Function as a Service
+- slug: 03-trigger-and-event
+  title:
+    ko: "Trigger\uC640 Event"
+    en: Trigger and Event
+- slug: 04-cold-start
+  title:
+    ko: Cold Start
+    en: Cold Start
+- slug: 05-scaling
+  title:
+    ko: Scaling
+    en: Scaling
+- slug: 06-state-management
+  title:
+    ko: "State \uAD00\uB9AC"
+    en: State Management
+- slug: 07-queue-and-event-driven
+  title:
+    ko: "Queue\uC640 Event-driven Architecture"
+    en: Queue and Event-driven Architecture
+- slug: 08-observability
+  title:
+    ko: Observability
+    en: Observability
+- slug: 09-cost
+  title:
+    ko: Cost
+    en: Cost
+- slug: 10-serverless-app-design
+  title:
+    ko: "Serverless \uC571 \uC124\uACC4"
+    en: Designing a Serverless App

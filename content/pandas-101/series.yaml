@@ -1,52 +1,42 @@
 id: pandas-101
-title:
-  ko: Pandas 101
-  en: Pandas 101
-description:
-  ko: Series, DataFrame, 파일 입출력, filtering, missing value, groupby, merge, time series, vectorization까지 다루는 Pandas 입문 시리즈.
-  en: A Pandas series covering Series, DataFrame, file I/O, filtering, missing values, groupby, merge, time series, and vectorization.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: what-is-pandas
-    title:
-      ko: Pandas란 무엇인가?
-      en: What Is Pandas?
-  - slug: series-and-dataframe
-    title:
-      ko: Series와 DataFrame
-      en: Series and DataFrame
-  - slug: read-csv-and-excel
-    title:
-      ko: CSV와 Excel 읽기
-      en: Reading CSV and Excel
-  - slug: filtering-and-selection
-    title:
-      ko: filtering과 selection
-      en: Filtering and Selection
-  - slug: missing-values
-    title:
-      ko: missing value 처리
-      en: Handling Missing Values
-  - slug: groupby
-    title:
-      ko: groupby
-      en: groupby
-  - slug: merge-and-join
-    title:
-      ko: merge와 join
-      en: Merge and Join
-  - slug: time-series
-    title:
-      ko: time series
-      en: Time Series
-  - slug: apply-and-vectorization
-    title:
-      ko: apply와 vectorization
-      en: apply and Vectorization
-  - slug: real-world-data-analysis
-    title:
-      ko: 실전 데이터 분석
-      en: Real-world Data Analysis
+- slug: what-is-pandas
+  title:
+    ko: "Pandas\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Pandas?
+- slug: series-and-dataframe
+  title:
+    ko: "Series\uC640 DataFrame"
+    en: Series and DataFrame
+- slug: read-csv-and-excel
+  title:
+    ko: "CSV\uC640 Excel \uC77D\uAE30"
+    en: Reading CSV and Excel
+- slug: filtering-and-selection
+  title:
+    ko: "filtering\uACFC selection"
+    en: Filtering and Selection
+- slug: missing-values
+  title:
+    ko: "missing value \uCC98\uB9AC"
+    en: Handling Missing Values
+- slug: groupby
+  title:
+    ko: groupby
+    en: groupby
+- slug: merge-and-join
+  title:
+    ko: "merge\uC640 join"
+    en: Merge and Join
+- slug: time-series
+  title:
+    ko: time series
+    en: Time Series
+- slug: apply-and-vectorization
+  title:
+    ko: "apply\uC640 vectorization"
+    en: apply and Vectorization
+- slug: real-world-data-analysis
+  title:
+    ko: "\uC2E4\uC804 \uB370\uC774\uD130 \uBD84\uC11D"
+    en: Real-world Data Analysis

@@ -1,22 +1,20 @@
 id: llm-from-scratch-101
-category: ai
-title:
-  ko: LLM from Scratch 101
-  en: LLM from Scratch 101
-description:
-  ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
-  en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
-languages: [ko, en]
-targets: { tistory: true, medium: true, mkdocs: true, ebook: true }
-status: draft
-tags: [LLM, PyTorch, Transformer, Tutorial]
 articles:
-  - { idx: 1, slug: 01-tokenizer,         status: code-checked }
-  - { idx: 2, slug: 02-embedding,         status: code-checked }
-  - { idx: 3, slug: 03-attention,         status: code-checked }
-  - { idx: 4, slug: 04-transformer-block, status: code-checked }
-  - { idx: 5, slug: 05-gpt-model,         status: code-checked }
-  - { idx: 6, slug: 06-training-loop,     status: code-checked }
-  - { idx: 7, slug: 07-inference,         status: code-checked }
-  - { idx: 8, slug: 08-finetuning,        status: code-checked }
-  - { idx: 9, slug: 09-chatbot-wrapper,   status: code-checked }
+- idx: 1
+  slug: 01-tokenizer
+- idx: 2
+  slug: 02-embedding
+- idx: 3
+  slug: 03-attention
+- idx: 4
+  slug: 04-transformer-block
+- idx: 5
+  slug: 05-gpt-model
+- idx: 6
+  slug: 06-training-loop
+- idx: 7
+  slug: 07-inference
+- idx: 8
+  slug: 08-finetuning
+- idx: 9
+  slug: 09-chatbot-wrapper

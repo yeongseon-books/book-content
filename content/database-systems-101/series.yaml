@@ -1,71 +1,53 @@
 id: database-systems-101
-title:
-  ko: Database Systems 101
-  en: Database Systems 101
-description:
-  ko: 관계형 모델, SQL, 인덱스, 트랜잭션, isolation, 정규화, 쿼리 최적화, 복제까지 DBMS의 핵심을 다루는 시리즈.
-  en: A foundational series on relational databases — model, SQL, indexes, transactions, isolation, normalization, query optimization, and replication.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-a-database
-    title:
-      ko: 데이터베이스 시스템이란 무엇인가?
-      en: What Is a Database System?
-  - number: 2
-    slug: relational-model
-    title:
-      ko: 관계형 모델
-      en: The Relational Model
-  - number: 3
-    slug: sql-and-query-processing
-    title:
-      ko: SQL과 쿼리 처리
-      en: SQL and Query Processing
-  - number: 4
-    slug: indexes
-    title:
-      ko: 인덱스
-      en: Indexes
-  - number: 5
-    slug: transactions-and-acid
-    title:
-      ko: 트랜잭션과 ACID
-      en: Transactions and ACID
-  - number: 6
-    slug: isolation-levels
-    title:
-      ko: isolation level
-      en: Isolation Levels
-  - number: 7
-    slug: normalization-and-modeling
-    title:
-      ko: 정규화와 모델링
-      en: Normalization and Modeling
-  - number: 8
-    slug: query-optimization
-    title:
-      ko: 쿼리 최적화
-      en: Query Optimization
-  - number: 9
-    slug: replication-and-backup
-    title:
-      ko: 복제와 백업
-      en: Replication and Backup
-  - number: 10
-    slug: oltp-and-olap
-    title:
-      ko: OLTP와 OLAP
-      en: OLTP and OLAP
+- number: 1
+  slug: what-is-a-database
+  title:
+    ko: "\uB370\uC774\uD130\uBCA0\uC774\uC2A4 \uC2DC\uC2A4\uD15C\uC774\uB780 \uBB34\
+      \uC5C7\uC778\uAC00?"
+    en: What Is a Database System?
+- number: 2
+  slug: relational-model
+  title:
+    ko: "\uAD00\uACC4\uD615 \uBAA8\uB378"
+    en: The Relational Model
+- number: 3
+  slug: sql-and-query-processing
+  title:
+    ko: "SQL\uACFC \uCFFC\uB9AC \uCC98\uB9AC"
+    en: SQL and Query Processing
+- number: 4
+  slug: indexes
+  title:
+    ko: "\uC778\uB371\uC2A4"
+    en: Indexes
+- number: 5
+  slug: transactions-and-acid
+  title:
+    ko: "\uD2B8\uB79C\uC7AD\uC158\uACFC ACID"
+    en: Transactions and ACID
+- number: 6
+  slug: isolation-levels
+  title:
+    ko: isolation level
+    en: Isolation Levels
+- number: 7
+  slug: normalization-and-modeling
+  title:
+    ko: "\uC815\uADDC\uD654\uC640 \uBAA8\uB378\uB9C1"
+    en: Normalization and Modeling
+- number: 8
+  slug: query-optimization
+  title:
+    ko: "\uCFFC\uB9AC \uCD5C\uC801\uD654"
+    en: Query Optimization
+- number: 9
+  slug: replication-and-backup
+  title:
+    ko: "\uBCF5\uC81C\uC640 \uBC31\uC5C5"
+    en: Replication and Backup
+- number: 10
+  slug: oltp-and-olap
+  title:
+    ko: "OLTP\uC640 OLAP"
+    en: OLTP and OLAP

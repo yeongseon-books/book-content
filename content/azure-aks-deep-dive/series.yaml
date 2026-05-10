@@ -1,25 +1,4 @@
 id: azure-aks-deep-dive
-category: azure
-title:
-  ko: Azure Kubernetes Service Deep Dive
-  en: Azure Kubernetes Service Deep Dive
-description:
-  ko: AKS control plane / data plane 내부 동작.
-  en: AKS control plane / data plane internals.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - AKS
-  - Kubernetes
-  - Distributed Systems
-  - Containers
 articles:
 - idx: 1
   slug: 01-control-plane-anatomy

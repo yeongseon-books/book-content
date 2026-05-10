@@ -1,60 +1,42 @@
 id: open-source-101
-title:
-  ko: 오픈소스 101
-  en: Open Source 101
-description:
-  ko: 라이선스부터 첫 오픈소스 프로젝트까지, 오픈소스 기여의 기본을 다지는 시리즈입니다.
-  en: An entry series covering open source contribution from licenses to your first project.
-status: content-ready
-level: 101
-lifecycle: active
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
 episodes:
-  - slug: 01-what-is-open-source
-    title:
-      ko: 오픈소스란 무엇인가
-      en: What Is Open Source
-  - slug: 02-understanding-licenses
-    title:
-      ko: 라이선스 이해하기
-      en: Understanding Licenses
-  - slug: 03-reading-issues
-    title:
-      ko: Issue 읽기
-      en: Reading Issues
-  - slug: 04-creating-pull-requests
-    title:
-      ko: PR 만들기
-      en: Creating Pull Requests
-  - slug: 05-good-readme
-    title:
-      ko: 좋은 README
-      en: A Good README
-  - slug: 06-release-and-versioning
-    title:
-      ko: Release 와 Versioning
-      en: Release and Versioning
-  - slug: 07-community-management
-    title:
-      ko: Community 관리
-      en: Community Management
-  - slug: 08-maintainer-role
-    title:
-      ko: Maintainer 의 역할
-      en: The Maintainer Role
-  - slug: 09-open-source-portfolio
-    title:
-      ko: 오픈소스 포트폴리오
-      en: An Open Source Portfolio
-  - slug: 10-my-first-open-source-project
-    title:
-      ko: 내 첫 오픈소스 프로젝트
-      en: My First Open Source Project
+- slug: 01-what-is-open-source
+  title:
+    ko: "\uC624\uD508\uC18C\uC2A4\uB780 \uBB34\uC5C7\uC778\uAC00"
+    en: What Is Open Source
+- slug: 02-understanding-licenses
+  title:
+    ko: "\uB77C\uC774\uC120\uC2A4 \uC774\uD574\uD558\uAE30"
+    en: Understanding Licenses
+- slug: 03-reading-issues
+  title:
+    ko: "Issue \uC77D\uAE30"
+    en: Reading Issues
+- slug: 04-creating-pull-requests
+  title:
+    ko: "PR \uB9CC\uB4E4\uAE30"
+    en: Creating Pull Requests
+- slug: 05-good-readme
+  title:
+    ko: "\uC88B\uC740 README"
+    en: A Good README
+- slug: 06-release-and-versioning
+  title:
+    ko: "Release \uC640 Versioning"
+    en: Release and Versioning
+- slug: 07-community-management
+  title:
+    ko: "Community \uAD00\uB9AC"
+    en: Community Management
+- slug: 08-maintainer-role
+  title:
+    ko: "Maintainer \uC758 \uC5ED\uD560"
+    en: The Maintainer Role
+- slug: 09-open-source-portfolio
+  title:
+    ko: "\uC624\uD508\uC18C\uC2A4 \uD3EC\uD2B8\uD3F4\uB9AC\uC624"
+    en: An Open Source Portfolio
+- slug: 10-my-first-open-source-project
+  title:
+    ko: "\uB0B4 \uCCAB \uC624\uD508\uC18C\uC2A4 \uD504\uB85C\uC81D\uD2B8"
+    en: My First Open Source Project

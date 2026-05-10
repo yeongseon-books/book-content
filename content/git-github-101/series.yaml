@@ -1,70 +1,53 @@
 id: git-github-101
-category: programming
-title: Git & GitHub 101
-description: Git을 처음 쓰는 학생과 협업이 처음인 주니어 개발자를 위한 입문 시리즈. 설치와 첫 commit부터 branch, merge, GitHub Pull Request, issue, workflow까지 다룹니다.
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - Git
-  - GitHub
-  - version-control
-  - collaboration
 articles:
-  - episode: 1
-    slug: what-is-git
-    title:
-      ko: "Git이란 무엇인가? 버전 관리의 시작"
-      en: "What is Git? Version control fundamentals"
-  - episode: 2
-    slug: first-commit
-    title:
-      ko: "첫 commit 만들기: init, add, commit"
-      en: "Your first commit: init, add, commit"
-  - episode: 3
-    slug: status-diff-log
-    title:
-      ko: "변경 사항 확인하기: status, diff, log"
-      en: "Inspecting changes: status, diff, log"
-  - episode: 4
-    slug: branch-basics
-    title:
-      ko: "branch 이해하기: 분기와 전환"
-      en: "Understanding branches: diverging and switching"
-  - episode: 5
-    slug: merge-and-conflict
-    title:
-      ko: "merge와 conflict 해결"
-      en: "Merging branches and resolving conflicts"
-  - episode: 6
-    slug: github-repository
-    title:
-      ko: "GitHub repository 만들기와 remote, push, pull"
-      en: "Creating a GitHub repository: remote, push, pull"
-  - episode: 7
-    slug: pull-request
-    title:
-      ko: "Pull Request로 협업하기"
-      en: "Collaborating with Pull Requests"
-  - episode: 8
-    slug: issue-and-project
-    title:
-      ko: "issue와 project로 작업 관리하기"
-      en: "Tracking work with issues and projects"
-  - episode: 9
-    slug: good-commit-message
-    title:
-      ko: "좋은 commit message 쓰기"
-      en: "Writing good commit messages"
-  - episode: 10
-    slug: real-world-workflow
-    title:
-      ko: "실전 Git workflow 만들기"
-      en: "Building a real-world Git workflow"
+- episode: 1
+  slug: what-is-git
+  title:
+    ko: "Git\uC774\uB780 \uBB34\uC5C7\uC778\uAC00? \uBC84\uC804 \uAD00\uB9AC\uC758\
+      \ \uC2DC\uC791"
+    en: What is Git? Version control fundamentals
+- episode: 2
+  slug: first-commit
+  title:
+    ko: "\uCCAB commit \uB9CC\uB4E4\uAE30: init, add, commit"
+    en: 'Your first commit: init, add, commit'
+- episode: 3
+  slug: status-diff-log
+  title:
+    ko: "\uBCC0\uACBD \uC0AC\uD56D \uD655\uC778\uD558\uAE30: status, diff, log"
+    en: 'Inspecting changes: status, diff, log'
+- episode: 4
+  slug: branch-basics
+  title:
+    ko: "branch \uC774\uD574\uD558\uAE30: \uBD84\uAE30\uC640 \uC804\uD658"
+    en: 'Understanding branches: diverging and switching'
+- episode: 5
+  slug: merge-and-conflict
+  title:
+    ko: "merge\uC640 conflict \uD574\uACB0"
+    en: Merging branches and resolving conflicts
+- episode: 6
+  slug: github-repository
+  title:
+    ko: "GitHub repository \uB9CC\uB4E4\uAE30\uC640 remote, push, pull"
+    en: 'Creating a GitHub repository: remote, push, pull'
+- episode: 7
+  slug: pull-request
+  title:
+    ko: "Pull Request\uB85C \uD611\uC5C5\uD558\uAE30"
+    en: Collaborating with Pull Requests
+- episode: 8
+  slug: issue-and-project
+  title:
+    ko: "issue\uC640 project\uB85C \uC791\uC5C5 \uAD00\uB9AC\uD558\uAE30"
+    en: Tracking work with issues and projects
+- episode: 9
+  slug: good-commit-message
+  title:
+    ko: "\uC88B\uC740 commit message \uC4F0\uAE30"
+    en: Writing good commit messages
+- episode: 10
+  slug: real-world-workflow
+  title:
+    ko: "\uC2E4\uC804 Git workflow \uB9CC\uB4E4\uAE30"
+    en: Building a real-world Git workflow

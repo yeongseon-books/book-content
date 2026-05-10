@@ -1,71 +1,53 @@
 id: computer-science-101
-title:
-  ko: Computer Science 101
-  en: Computer Science 101
-description:
-  ko: 컴퓨터공학 전공에서 배우는 주요 과목들이 서로 어떻게 연결되는지 보여주는 입문 시리즈.
-  en: An introductory series showing how major computer science subjects connect to each other.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-computer-science
-    title:
-      ko: Computer Science란 무엇인가?
-      en: What Is Computer Science?
-  - number: 2
-    slug: computation-and-programs
-    title:
-      ko: 계산과 프로그램
-      en: Computation and Programs
-  - number: 3
-    slug: data-representation
-    title:
-      ko: 데이터 표현
-      en: Data Representation
-  - number: 4
-    slug: algorithms-and-complexity
-    title:
-      ko: 알고리즘과 복잡도
-      en: Algorithms and Complexity
-  - number: 5
-    slug: computer-architecture
-    title:
-      ko: 컴퓨터 구조
-      en: Computer Architecture
-  - number: 6
-    slug: operating-systems
-    title:
-      ko: 운영체제
-      en: Operating Systems
-  - number: 7
-    slug: networks
-    title:
-      ko: 네트워크
-      en: Networks
-  - number: 8
-    slug: databases
-    title:
-      ko: 데이터베이스
-      en: Databases
-  - number: 9
-    slug: software-engineering
-    title:
-      ko: 소프트웨어 엔지니어링
-      en: Software Engineering
-  - number: 10
-    slug: ai-and-data-science
-    title:
-      ko: AI와 데이터사이언스까지의 연결
-      en: From CS to AI and Data Science
+- number: 1
+  slug: what-is-computer-science
+  title:
+    ko: "Computer Science\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Computer Science?
+- number: 2
+  slug: computation-and-programs
+  title:
+    ko: "\uACC4\uC0B0\uACFC \uD504\uB85C\uADF8\uB7A8"
+    en: Computation and Programs
+- number: 3
+  slug: data-representation
+  title:
+    ko: "\uB370\uC774\uD130 \uD45C\uD604"
+    en: Data Representation
+- number: 4
+  slug: algorithms-and-complexity
+  title:
+    ko: "\uC54C\uACE0\uB9AC\uC998\uACFC \uBCF5\uC7A1\uB3C4"
+    en: Algorithms and Complexity
+- number: 5
+  slug: computer-architecture
+  title:
+    ko: "\uCEF4\uD4E8\uD130 \uAD6C\uC870"
+    en: Computer Architecture
+- number: 6
+  slug: operating-systems
+  title:
+    ko: "\uC6B4\uC601\uCCB4\uC81C"
+    en: Operating Systems
+- number: 7
+  slug: networks
+  title:
+    ko: "\uB124\uD2B8\uC6CC\uD06C"
+    en: Networks
+- number: 8
+  slug: databases
+  title:
+    ko: "\uB370\uC774\uD130\uBCA0\uC774\uC2A4"
+    en: Databases
+- number: 9
+  slug: software-engineering
+  title:
+    ko: "\uC18C\uD504\uD2B8\uC6E8\uC5B4 \uC5D4\uC9C0\uB2C8\uC5B4\uB9C1"
+    en: Software Engineering
+- number: 10
+  slug: ai-and-data-science
+  title:
+    ko: "AI\uC640 \uB370\uC774\uD130\uC0AC\uC774\uC5B8\uC2A4\uAE4C\uC9C0\uC758 \uC5F0\
+      \uACB0"
+    en: From CS to AI and Data Science

@@ -1,52 +1,43 @@
 id: frontend-development-101
-title:
-  ko: Frontend Development 101
-  en: Frontend Development 101
-description:
-  ko: HTML/CSS, JavaScript, 컴포넌트, 라우팅, API 호출, 빌드까지 현대 프론트엔드 개발 전체 흐름을 다루는 시리즈.
-  en: An end-to-end tour of modern frontend development — HTML/CSS, JavaScript, components, routing, API calls, and bundling.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: what-is-frontend-development
-    title:
-      ko: 프론트엔드 개발이란 무엇인가?
-      en: What Is Frontend Development?
-  - slug: html-and-css-basics
-    title:
-      ko: HTML과 CSS 기본
-      en: HTML and CSS Basics
-  - slug: javascript-basics
-    title:
-      ko: JavaScript 기본
-      en: JavaScript Basics
-  - slug: components-and-state
-    title:
-      ko: 컴포넌트와 상태
-      en: Components and State
-  - slug: routing-and-pages
-    title:
-      ko: 라우팅과 페이지
-      en: Routing and Pages
-  - slug: api-calls-and-async
-    title:
-      ko: API 호출과 비동기
-      en: API Calls and Async
-  - slug: forms-and-validation
-    title:
-      ko: 폼과 유효성 검사
-      en: Forms and Validation
-  - slug: styling-and-design-system
-    title:
-      ko: 스타일링과 디자인 시스템
-      en: Styling and Design Systems
-  - slug: build-tools-and-bundling
-    title:
-      ko: 빌드 도구와 번들링
-      en: Build Tools and Bundling
-  - slug: building-a-small-frontend-app
-    title:
-      ko: 작은 프론트엔드 앱 만들기
-      en: Building a Small Frontend App
+- slug: what-is-frontend-development
+  title:
+    ko: "\uD504\uB860\uD2B8\uC5D4\uB4DC \uAC1C\uBC1C\uC774\uB780 \uBB34\uC5C7\uC778\
+      \uAC00?"
+    en: What Is Frontend Development?
+- slug: html-and-css-basics
+  title:
+    ko: "HTML\uACFC CSS \uAE30\uBCF8"
+    en: HTML and CSS Basics
+- slug: javascript-basics
+  title:
+    ko: "JavaScript \uAE30\uBCF8"
+    en: JavaScript Basics
+- slug: components-and-state
+  title:
+    ko: "\uCEF4\uD3EC\uB10C\uD2B8\uC640 \uC0C1\uD0DC"
+    en: Components and State
+- slug: routing-and-pages
+  title:
+    ko: "\uB77C\uC6B0\uD305\uACFC \uD398\uC774\uC9C0"
+    en: Routing and Pages
+- slug: api-calls-and-async
+  title:
+    ko: "API \uD638\uCD9C\uACFC \uBE44\uB3D9\uAE30"
+    en: API Calls and Async
+- slug: forms-and-validation
+  title:
+    ko: "\uD3FC\uACFC \uC720\uD6A8\uC131 \uAC80\uC0AC"
+    en: Forms and Validation
+- slug: styling-and-design-system
+  title:
+    ko: "\uC2A4\uD0C0\uC77C\uB9C1\uACFC \uB514\uC790\uC778 \uC2DC\uC2A4\uD15C"
+    en: Styling and Design Systems
+- slug: build-tools-and-bundling
+  title:
+    ko: "\uBE4C\uB4DC \uB3C4\uAD6C\uC640 \uBC88\uB4E4\uB9C1"
+    en: Build Tools and Bundling
+- slug: building-a-small-frontend-app
+  title:
+    ko: "\uC791\uC740 \uD504\uB860\uD2B8\uC5D4\uB4DC \uC571 \uB9CC\uB4E4\uAE30"
+    en: Building a Small Frontend App

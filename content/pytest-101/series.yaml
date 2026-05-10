@@ -1,54 +1,32 @@
 id: pytest-101
-category: programming
-title:
-  ko: pytest 101
-  en: pytest 101
-description:
-  ko: pytest의 기본 문법, fixture, parametrization, mock, coverage, CI 연동까지 배우는 실전 테스트 입문 시리즈.
-  en: A beginner series on pytest covering assertions, fixtures, parametrization, mocking, coverage, and CI integration.
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - Python
-  - pytest
-  - Testing
-  - TDD
 articles:
-  - idx: 1
-    slug: 01-why-write-tests
-    status: content-ready
-  - idx: 2
-    slug: 02-first-pytest-test
-    status: content-ready
-  - idx: 3
-    slug: 03-assert-and-exceptions
-    status: content-ready
-  - idx: 4
-    slug: 04-fixtures
-    status: content-ready
-  - idx: 5
-    slug: 05-parametrization
-    status: content-ready
-  - idx: 6
-    slug: 06-mock-and-monkeypatch
-    status: content-ready
-  - idx: 7
-    slug: 07-testing-files-env-time
-    status: content-ready
-  - idx: 8
-    slug: 08-coverage
-    status: content-ready
-  - idx: 9
-    slug: 09-ci-with-github-actions
-    status: content-ready
-  - idx: 10
-    slug: 10-testable-code
-    status: content-ready
+- idx: 1
+  slug: 01-why-write-tests
+  status: content-ready
+- idx: 2
+  slug: 02-first-pytest-test
+  status: content-ready
+- idx: 3
+  slug: 03-assert-and-exceptions
+  status: content-ready
+- idx: 4
+  slug: 04-fixtures
+  status: content-ready
+- idx: 5
+  slug: 05-parametrization
+  status: content-ready
+- idx: 6
+  slug: 06-mock-and-monkeypatch
+  status: content-ready
+- idx: 7
+  slug: 07-testing-files-env-time
+  status: content-ready
+- idx: 8
+  slug: 08-coverage
+  status: content-ready
+- idx: 9
+  slug: 09-ci-with-github-actions
+  status: content-ready
+- idx: 10
+  slug: 10-testable-code
+  status: content-ready

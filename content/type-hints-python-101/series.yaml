@@ -1,71 +1,52 @@
 id: type-hints-python-101
-title:
-  ko: Type Hints in Python 101
-  en: Type Hints in Python 101
-description:
-  ko: Python type hint, Optional, Union, TypedDict, Protocol, Generic, mypy, Pydantic까지 타입 힌트 활용을 배우는 시리즈.
-  en: A beginner series on Python type hints covering basic annotations, Optional, Union, TypedDict, Protocol, Generic, mypy, and Pydantic.
-status: content-ready
-category: programming-foundations
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-type-hint
-    title:
-      ko: Python type hint란 무엇인가?
-      en: What Are Python Type Hints?
-  - number: 2
-    slug: basic-and-collection-types
-    title:
-      ko: 기본 타입과 collection 타입
-      en: Basic Types and Collection Types
-  - number: 3
-    slug: optional-and-union
-    title:
-      ko: Optional과 Union
-      en: Optional and Union
-  - number: 4
-    slug: function-type-hints
-    title:
-      ko: 함수 타입 힌트
-      en: Function Type Hints
-  - number: 5
-    slug: typeddict-and-dataclass
-    title:
-      ko: TypedDict와 dataclass
-      en: TypedDict and dataclass
-  - number: 6
-    slug: protocol-and-structural-typing
-    title:
-      ko: Protocol과 structural typing
-      en: Protocol and Structural Typing
-  - number: 7
-    slug: generic
-    title:
-      ko: Generic 이해하기
-      en: Understanding Generics
-  - number: 8
-    slug: mypy-and-pyright
-    title:
-      ko: mypy와 pyright 사용하기
-      en: Using mypy and pyright
-  - number: 9
-    slug: pydantic-and-type-hints
-    title:
-      ko: Pydantic과 타입 힌트
-      en: Pydantic and Type Hints
-  - number: 10
-    slug: type-hints-best-practices
-    title:
-      ko: 타입 힌트를 잘 쓰는 기준
-      en: Type Hint Best Practices
+- number: 1
+  slug: what-is-type-hint
+  title:
+    ko: "Python type hint\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Are Python Type Hints?
+- number: 2
+  slug: basic-and-collection-types
+  title:
+    ko: "\uAE30\uBCF8 \uD0C0\uC785\uACFC collection \uD0C0\uC785"
+    en: Basic Types and Collection Types
+- number: 3
+  slug: optional-and-union
+  title:
+    ko: "Optional\uACFC Union"
+    en: Optional and Union
+- number: 4
+  slug: function-type-hints
+  title:
+    ko: "\uD568\uC218 \uD0C0\uC785 \uD78C\uD2B8"
+    en: Function Type Hints
+- number: 5
+  slug: typeddict-and-dataclass
+  title:
+    ko: "TypedDict\uC640 dataclass"
+    en: TypedDict and dataclass
+- number: 6
+  slug: protocol-and-structural-typing
+  title:
+    ko: "Protocol\uACFC structural typing"
+    en: Protocol and Structural Typing
+- number: 7
+  slug: generic
+  title:
+    ko: "Generic \uC774\uD574\uD558\uAE30"
+    en: Understanding Generics
+- number: 8
+  slug: mypy-and-pyright
+  title:
+    ko: "mypy\uC640 pyright \uC0AC\uC6A9\uD558\uAE30"
+    en: Using mypy and pyright
+- number: 9
+  slug: pydantic-and-type-hints
+  title:
+    ko: "Pydantic\uACFC \uD0C0\uC785 \uD78C\uD2B8"
+    en: Pydantic and Type Hints
+- number: 10
+  slug: type-hints-best-practices
+  title:
+    ko: "\uD0C0\uC785 \uD78C\uD2B8\uB97C \uC798 \uC4F0\uB294 \uAE30\uC900"
+    en: Type Hint Best Practices

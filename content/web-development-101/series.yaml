@@ -1,52 +1,42 @@
 id: web-development-101
-title:
-  ko: Web Development 101
-  en: Web Development 101
-description:
-  ko: HTML/CSS/JS, 브라우저, HTTP, 프론트/백엔드, 인증, DB, 배포까지 웹 개발 전체 흐름을 한 번에 보는 시리즈.
-  en: A whole-picture tour of web development — HTML/CSS/JS, the browser, HTTP, frontend and backend, auth, databases, and deployment.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: how-the-web-works
-    title:
-      ko: 웹은 어떻게 동작하는가?
-      en: How the Web Works
-  - slug: html-css-javascript
-    title:
-      ko: HTML, CSS, JavaScript
-      en: HTML, CSS, and JavaScript
-  - slug: browser-and-dom
-    title:
-      ko: 브라우저와 DOM
-      en: The Browser and the DOM
-  - slug: http-and-api
-    title:
-      ko: HTTP와 API
-      en: HTTP and APIs
-  - slug: frontend-and-backend
-    title:
-      ko: Frontend와 Backend
-      en: Frontend and Backend
-  - slug: auth-and-sessions
-    title:
-      ko: 인증과 세션
-      en: Authentication and Sessions
-  - slug: connecting-to-database
-    title:
-      ko: 데이터베이스 연결
-      en: Connecting to a Database
-  - slug: deployment
-    title:
-      ko: 배포
-      en: Deployment
-  - slug: performance-and-caching
-    title:
-      ko: 성능과 캐싱
-      en: Performance and Caching
-  - slug: building-a-small-web-app
-    title:
-      ko: 작은 웹앱 만들기
-      en: Building a Small Web App
+- slug: how-the-web-works
+  title:
+    ko: "\uC6F9\uC740 \uC5B4\uB5BB\uAC8C \uB3D9\uC791\uD558\uB294\uAC00?"
+    en: How the Web Works
+- slug: html-css-javascript
+  title:
+    ko: HTML, CSS, JavaScript
+    en: HTML, CSS, and JavaScript
+- slug: browser-and-dom
+  title:
+    ko: "\uBE0C\uB77C\uC6B0\uC800\uC640 DOM"
+    en: The Browser and the DOM
+- slug: http-and-api
+  title:
+    ko: "HTTP\uC640 API"
+    en: HTTP and APIs
+- slug: frontend-and-backend
+  title:
+    ko: "Frontend\uC640 Backend"
+    en: Frontend and Backend
+- slug: auth-and-sessions
+  title:
+    ko: "\uC778\uC99D\uACFC \uC138\uC158"
+    en: Authentication and Sessions
+- slug: connecting-to-database
+  title:
+    ko: "\uB370\uC774\uD130\uBCA0\uC774\uC2A4 \uC5F0\uACB0"
+    en: Connecting to a Database
+- slug: deployment
+  title:
+    ko: "\uBC30\uD3EC"
+    en: Deployment
+- slug: performance-and-caching
+  title:
+    ko: "\uC131\uB2A5\uACFC \uCE90\uC2F1"
+    en: Performance and Caching
+- slug: building-a-small-web-app
+  title:
+    ko: "\uC791\uC740 \uC6F9\uC571 \uB9CC\uB4E4\uAE30"
+    en: Building a Small Web App

@@ -1,71 +1,52 @@
 id: computer-architecture-101
-title:
-  ko: Computer Architecture 101
-  en: Computer Architecture 101
-description:
-  ko: 데이터 표현, CPU와 명령어, 레지스터, 메모리 계층, 캐시, 파이프라인, 멀티코어까지 컴퓨터가 코드를 실행하는 방식을 처음 배우는 시리즈.
-  en: An introductory series on how computers execute code, covering data representation, CPU and instructions, registers, memory hierarchy, caches, pipelining, and multicore.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-computer-architecture
-    title:
-      ko: 컴퓨터 구조란 무엇인가?
-      en: What Is Computer Architecture?
-  - number: 2
-    slug: data-representation
-    title:
-      ko: 데이터 표현 — bit, byte, integer, floating point
-      en: Data Representation — Bits, Bytes, Integers, Floating Point
-  - number: 3
-    slug: cpu-and-instructions
-    title:
-      ko: CPU와 명령어
-      en: CPU and Instructions
-  - number: 4
-    slug: registers-and-alu
-    title:
-      ko: 레지스터와 ALU
-      en: Registers and the ALU
-  - number: 5
-    slug: memory-organization
-    title:
-      ko: 메모리 구조
-      en: Memory Organization
-  - number: 6
-    slug: cache-and-locality
-    title:
-      ko: 캐시와 지역성
-      en: Cache and Locality
-  - number: 7
-    slug: pipelining
-    title:
-      ko: 파이프라인
-      en: Pipelining
-  - number: 8
-    slug: io-and-devices
-    title:
-      ko: I/O와 장치
-      en: I/O and Devices
-  - number: 9
-    slug: parallelism-and-multicore
-    title:
-      ko: 병렬성과 멀티코어
-      en: Parallelism and Multicore
-  - number: 10
-    slug: understanding-performance
-    title:
-      ko: 성능을 이해하는 법
-      en: Understanding Performance
+- number: 1
+  slug: what-is-computer-architecture
+  title:
+    ko: "\uCEF4\uD4E8\uD130 \uAD6C\uC870\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Computer Architecture?
+- number: 2
+  slug: data-representation
+  title:
+    ko: "\uB370\uC774\uD130 \uD45C\uD604 \u2014 bit, byte, integer, floating point"
+    en: "Data Representation \u2014 Bits, Bytes, Integers, Floating Point"
+- number: 3
+  slug: cpu-and-instructions
+  title:
+    ko: "CPU\uC640 \uBA85\uB839\uC5B4"
+    en: CPU and Instructions
+- number: 4
+  slug: registers-and-alu
+  title:
+    ko: "\uB808\uC9C0\uC2A4\uD130\uC640 ALU"
+    en: Registers and the ALU
+- number: 5
+  slug: memory-organization
+  title:
+    ko: "\uBA54\uBAA8\uB9AC \uAD6C\uC870"
+    en: Memory Organization
+- number: 6
+  slug: cache-and-locality
+  title:
+    ko: "\uCE90\uC2DC\uC640 \uC9C0\uC5ED\uC131"
+    en: Cache and Locality
+- number: 7
+  slug: pipelining
+  title:
+    ko: "\uD30C\uC774\uD504\uB77C\uC778"
+    en: Pipelining
+- number: 8
+  slug: io-and-devices
+  title:
+    ko: "I/O\uC640 \uC7A5\uCE58"
+    en: I/O and Devices
+- number: 9
+  slug: parallelism-and-multicore
+  title:
+    ko: "\uBCD1\uB82C\uC131\uACFC \uBA40\uD2F0\uCF54\uC5B4"
+    en: Parallelism and Multicore
+- number: 10
+  slug: understanding-performance
+  title:
+    ko: "\uC131\uB2A5\uC744 \uC774\uD574\uD558\uB294 \uBC95"
+    en: Understanding Performance

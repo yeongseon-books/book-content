@@ -1,71 +1,52 @@
 id: distributed-systems-101
-title:
-  ko: Distributed Systems 101
-  en: Distributed Systems 101
-description:
-  ko: failure model, consistency, replication, consensus, message queue까지 분산 시스템의 핵심 개념을 처음 배우는 시리즈.
-  en: A first walk through distributed systems — failure models, consistency, replication, consensus, leader election, and messaging.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-a-distributed-system
-    title:
-      ko: 분산 시스템이란 무엇인가?
-      en: What Is a Distributed System?
-  - number: 2
-    slug: failure-model
-    title:
-      ko: failure model
-      en: Failure Models
-  - number: 3
-    slug: rpc-and-message-passing
-    title:
-      ko: RPC와 message passing
-      en: RPC and Message Passing
-  - number: 4
-    slug: consistency-and-cap
-    title:
-      ko: consistency와 CAP
-      en: Consistency and CAP
-  - number: 5
-    slug: replication
-    title:
-      ko: replication
-      en: Replication
-  - number: 6
-    slug: consensus-and-raft
-    title:
-      ko: consensus와 Raft
-      en: Consensus and Raft
-  - number: 7
-    slug: leader-election
-    title:
-      ko: leader election
-      en: Leader Election
-  - number: 8
-    slug: message-queue-and-event-sourcing
-    title:
-      ko: message queue와 event sourcing
-      en: Message Queues and Event Sourcing
-  - number: 9
-    slug: distributed-transaction
-    title:
-      ko: distributed transaction
-      en: Distributed Transactions
-  - number: 10
-    slug: operable-distributed-patterns
-    title:
-      ko: 운영 가능한 분산 시스템 패턴
-      en: Patterns for Operable Distributed Systems
+- number: 1
+  slug: what-is-a-distributed-system
+  title:
+    ko: "\uBD84\uC0B0 \uC2DC\uC2A4\uD15C\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is a Distributed System?
+- number: 2
+  slug: failure-model
+  title:
+    ko: failure model
+    en: Failure Models
+- number: 3
+  slug: rpc-and-message-passing
+  title:
+    ko: "RPC\uC640 message passing"
+    en: RPC and Message Passing
+- number: 4
+  slug: consistency-and-cap
+  title:
+    ko: "consistency\uC640 CAP"
+    en: Consistency and CAP
+- number: 5
+  slug: replication
+  title:
+    ko: replication
+    en: Replication
+- number: 6
+  slug: consensus-and-raft
+  title:
+    ko: "consensus\uC640 Raft"
+    en: Consensus and Raft
+- number: 7
+  slug: leader-election
+  title:
+    ko: leader election
+    en: Leader Election
+- number: 8
+  slug: message-queue-and-event-sourcing
+  title:
+    ko: "message queue\uC640 event sourcing"
+    en: Message Queues and Event Sourcing
+- number: 9
+  slug: distributed-transaction
+  title:
+    ko: distributed transaction
+    en: Distributed Transactions
+- number: 10
+  slug: operable-distributed-patterns
+  title:
+    ko: "\uC6B4\uC601 \uAC00\uB2A5\uD55C \uBD84\uC0B0 \uC2DC\uC2A4\uD15C \uD328\uD134"
+    en: Patterns for Operable Distributed Systems

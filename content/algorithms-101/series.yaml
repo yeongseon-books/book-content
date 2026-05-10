@@ -1,71 +1,52 @@
 id: algorithms-101
-title:
-  ko: Algorithms 101
-  en: Algorithms 101
-description:
-  ko: 복잡도, 탐색, 정렬, 분할 정복, DP, 그리디, 그래프 알고리즘까지 알고리즘 설계 패턴을 배우는 시리즈.
-  en: An introductory series on algorithm design covering complexity, search, sorting, divide and conquer, dynamic programming, greedy, and graph algorithms.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-an-algorithm
-    title:
-      ko: 알고리즘이란 무엇인가?
-      en: What Is an Algorithm?
-  - number: 2
-    slug: time-and-space-complexity
-    title:
-      ko: 시간 복잡도와 공간 복잡도
-      en: Time and Space Complexity
-  - number: 3
-    slug: search-algorithms
-    title:
-      ko: 탐색 알고리즘
-      en: Search Algorithms
-  - number: 4
-    slug: sorting-algorithms
-    title:
-      ko: 정렬 알고리즘
-      en: Sorting Algorithms
-  - number: 5
-    slug: recursion-and-divide-and-conquer
-    title:
-      ko: 재귀와 분할 정복
-      en: Recursion and Divide and Conquer
-  - number: 6
-    slug: dynamic-programming
-    title:
-      ko: 동적 계획법
-      en: Dynamic Programming
-  - number: 7
-    slug: greedy-algorithms
-    title:
-      ko: 그리디 알고리즘
-      en: Greedy Algorithms
-  - number: 8
-    slug: graph-algorithms
-    title:
-      ko: 그래프 알고리즘
-      en: Graph Algorithms
-  - number: 9
-    slug: string-algorithms
-    title:
-      ko: 문자열 알고리즘 기초
-      en: String Algorithm Basics
-  - number: 10
-    slug: problem-solving-strategies
-    title:
-      ko: 알고리즘 문제 풀이 전략
-      en: Algorithm Problem-Solving Strategies
+- number: 1
+  slug: what-is-an-algorithm
+  title:
+    ko: "\uC54C\uACE0\uB9AC\uC998\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is an Algorithm?
+- number: 2
+  slug: time-and-space-complexity
+  title:
+    ko: "\uC2DC\uAC04 \uBCF5\uC7A1\uB3C4\uC640 \uACF5\uAC04 \uBCF5\uC7A1\uB3C4"
+    en: Time and Space Complexity
+- number: 3
+  slug: search-algorithms
+  title:
+    ko: "\uD0D0\uC0C9 \uC54C\uACE0\uB9AC\uC998"
+    en: Search Algorithms
+- number: 4
+  slug: sorting-algorithms
+  title:
+    ko: "\uC815\uB82C \uC54C\uACE0\uB9AC\uC998"
+    en: Sorting Algorithms
+- number: 5
+  slug: recursion-and-divide-and-conquer
+  title:
+    ko: "\uC7AC\uADC0\uC640 \uBD84\uD560 \uC815\uBCF5"
+    en: Recursion and Divide and Conquer
+- number: 6
+  slug: dynamic-programming
+  title:
+    ko: "\uB3D9\uC801 \uACC4\uD68D\uBC95"
+    en: Dynamic Programming
+- number: 7
+  slug: greedy-algorithms
+  title:
+    ko: "\uADF8\uB9AC\uB514 \uC54C\uACE0\uB9AC\uC998"
+    en: Greedy Algorithms
+- number: 8
+  slug: graph-algorithms
+  title:
+    ko: "\uADF8\uB798\uD504 \uC54C\uACE0\uB9AC\uC998"
+    en: Graph Algorithms
+- number: 9
+  slug: string-algorithms
+  title:
+    ko: "\uBB38\uC790\uC5F4 \uC54C\uACE0\uB9AC\uC998 \uAE30\uCD08"
+    en: String Algorithm Basics
+- number: 10
+  slug: problem-solving-strategies
+  title:
+    ko: "\uC54C\uACE0\uB9AC\uC998 \uBB38\uC81C \uD480\uC774 \uC804\uB7B5"
+    en: Algorithm Problem-Solving Strategies

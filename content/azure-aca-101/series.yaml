@@ -1,25 +1,4 @@
 id: azure-aca-101
-category: azure
-title:
-  ko: Azure Container Apps 101
-  en: Azure Container Apps 101
-description:
-  ko: Container Apps 입문 시리즈.
-  en: Container Apps beginner guide.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - Azure
-  - Container Apps
-  - Serverless
-  - Containers
 articles:
 - idx: 1
   slug: 01-what-is-aca

@@ -1,25 +1,4 @@
 id: azure-aks-101
-category: azure
-title:
-  ko: Azure Kubernetes Service 101
-  en: Azure Kubernetes Service 101
-description:
-  ko: AKS 입문 시리즈.
-  en: AKS beginner guide.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - Azure
-  - AKS
-  - Kubernetes
-  - Cloud
 articles:
 - idx: 1
   slug: 01-what-is-aks

@@ -1,23 +1,4 @@
 id: rag-benchmark-101
-category: ai
-title:
-  ko: RAG 평가와 벤치마크 101
-  en: RAG Evaluation and Benchmarking 101
-description:
-  ko: RAG 품질 평가 6부작 — 평가 데이터셋, 임베딩/리트리버 비교, RAGAS, 의사결정 연결.
-  en: 6-part RAG evaluation guide — datasets, embedding/retriever comparison, RAGAS,
-    product decisions.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-evaluation-metrics

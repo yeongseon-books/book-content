@@ -1,23 +1,4 @@
 id: ai-app-patterns-101
-category: ai
-title:
-  ko: AI 앱 패턴 101
-  en: AI App Patterns 101
-description:
-  ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
-  en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns
-    in 6 parts.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-chatbot-pattern

@@ -1,25 +1,4 @@
 id: azure-app-service-101
-category: azure
-title:
-  ko: Azure App Service 101
-  en: Azure App Service 101
-description:
-  ko: Azure App Service 입문 7부작 — 호스팅, 설정, 로그, 스케일링.
-  en: A 7-part beginner guide to Azure App Service.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: draft
-tags:
-  - Azure
-  - App Service
-  - Cloud
-  - Web Apps
 articles:
 - idx: 1
   slug: 01-what-is-app-service

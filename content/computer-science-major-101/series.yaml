@@ -1,60 +1,43 @@
 id: computer-science-major-101
-title:
-  ko: 컴퓨터학과 전공 학습 가이드 101
-  en: Computer Science Major 101
-description:
-  ko: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 순서, 졸업 전 역량까지 정리한 입문 시리즈.
-  en: An introductory series on computer science major curriculum, core areas, study order, and graduation skills.
-status: content-ready
-level: 101
-lifecycle: active
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
 episodes:
-  - slug: 01-what-cs-majors-learn
-    title:
-      ko: 컴퓨터학과에서는 무엇을 배우는가
-      en: What Computer Science Majors Learn
-  - slug: 02-first-year-subjects
-    title:
-      ko: 1학년 과목 이해하기
-      en: Understanding First Year Subjects
-  - slug: 03-data-structures-and-algorithms
-    title:
-      ko: 자료구조와 알고리즘
-      en: Data Structures and Algorithms
-  - slug: 04-systems-subjects
-    title:
-      ko: 시스템 과목 이해하기
-      en: Understanding Systems Subjects
-  - slug: 05-database-and-network
-    title:
-      ko: 데이터베이스와 네트워크
-      en: Database and Network
-  - slug: 06-ai-and-data-science
-    title:
-      ko: AI와 데이터사이언스
-      en: AI and Data Science
-  - slug: 07-project-subjects
-    title:
-      ko: 프로젝트 과목
-      en: Project Subjects
-  - slug: 08-how-to-study-cs
-    title:
-      ko: 전공 공부 방법
-      en: How to Study Computer Science
-  - slug: 09-build-your-portfolio
-    title:
-      ko: 포트폴리오로 연결하기
-      en: Build Your Portfolio
-  - slug: 10-skills-before-graduation
-    title:
-      ko: 졸업 전 갖춰야 할 역량
-      en: Skills to Have Before Graduation
+- slug: 01-what-cs-majors-learn
+  title:
+    ko: "\uCEF4\uD4E8\uD130\uD559\uACFC\uC5D0\uC11C\uB294 \uBB34\uC5C7\uC744 \uBC30\
+      \uC6B0\uB294\uAC00"
+    en: What Computer Science Majors Learn
+- slug: 02-first-year-subjects
+  title:
+    ko: "1\uD559\uB144 \uACFC\uBAA9 \uC774\uD574\uD558\uAE30"
+    en: Understanding First Year Subjects
+- slug: 03-data-structures-and-algorithms
+  title:
+    ko: "\uC790\uB8CC\uAD6C\uC870\uC640 \uC54C\uACE0\uB9AC\uC998"
+    en: Data Structures and Algorithms
+- slug: 04-systems-subjects
+  title:
+    ko: "\uC2DC\uC2A4\uD15C \uACFC\uBAA9 \uC774\uD574\uD558\uAE30"
+    en: Understanding Systems Subjects
+- slug: 05-database-and-network
+  title:
+    ko: "\uB370\uC774\uD130\uBCA0\uC774\uC2A4\uC640 \uB124\uD2B8\uC6CC\uD06C"
+    en: Database and Network
+- slug: 06-ai-and-data-science
+  title:
+    ko: "AI\uC640 \uB370\uC774\uD130\uC0AC\uC774\uC5B8\uC2A4"
+    en: AI and Data Science
+- slug: 07-project-subjects
+  title:
+    ko: "\uD504\uB85C\uC81D\uD2B8 \uACFC\uBAA9"
+    en: Project Subjects
+- slug: 08-how-to-study-cs
+  title:
+    ko: "\uC804\uACF5 \uACF5\uBD80 \uBC29\uBC95"
+    en: How to Study Computer Science
+- slug: 09-build-your-portfolio
+  title:
+    ko: "\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uB85C \uC5F0\uACB0\uD558\uAE30"
+    en: Build Your Portfolio
+- slug: 10-skills-before-graduation
+  title:
+    ko: "\uC878\uC5C5 \uC804 \uAC16\uCDB0\uC57C \uD560 \uC5ED\uB7C9"
+    en: Skills to Have Before Graduation

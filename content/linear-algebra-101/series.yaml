@@ -1,52 +1,42 @@
 id: linear-algebra-101
-title:
-  ko: Linear Algebra 101
-  en: Linear Algebra 101
-description:
-  ko: 벡터, 행렬, 내적, 선형변환, 기저, 고유값, 행렬분해, PCA까지 ML 입문 직전 단계의 선형대수를 다지는 시리즈.
-  en: A Linear Algebra series covering vectors, matrices, inner products, linear transformations, basis, eigenvalues, decompositions, and PCA as the bridge to ML.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: what-is-linear-algebra
-    title:
-      ko: 선형대수란 무엇인가?
-      en: What Is Linear Algebra?
-  - slug: vectors
-    title:
-      ko: 벡터
-      en: Vectors
-  - slug: matrices
-    title:
-      ko: 행렬
-      en: Matrices
-  - slug: inner-product-and-distance
-    title:
-      ko: 내적과 거리
-      en: Inner Product and Distance
-  - slug: linear-transformation
-    title:
-      ko: 선형변환
-      en: Linear Transformations
-  - slug: basis-and-dimension
-    title:
-      ko: 기저와 차원
-      en: Basis and Dimension
-  - slug: eigenvalues-and-eigenvectors
-    title:
-      ko: 고유값과 고유벡터
-      en: Eigenvalues and Eigenvectors
-  - slug: matrix-decomposition
-    title:
-      ko: 행렬 분해
-      en: Matrix Decomposition
-  - slug: pca
-    title:
-      ko: PCA
-      en: PCA
-  - slug: linear-algebra-in-ml
-    title:
-      ko: 머신러닝에서의 선형대수
-      en: Linear Algebra in Machine Learning
+- slug: what-is-linear-algebra
+  title:
+    ko: "\uC120\uD615\uB300\uC218\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Linear Algebra?
+- slug: vectors
+  title:
+    ko: "\uBCA1\uD130"
+    en: Vectors
+- slug: matrices
+  title:
+    ko: "\uD589\uB82C"
+    en: Matrices
+- slug: inner-product-and-distance
+  title:
+    ko: "\uB0B4\uC801\uACFC \uAC70\uB9AC"
+    en: Inner Product and Distance
+- slug: linear-transformation
+  title:
+    ko: "\uC120\uD615\uBCC0\uD658"
+    en: Linear Transformations
+- slug: basis-and-dimension
+  title:
+    ko: "\uAE30\uC800\uC640 \uCC28\uC6D0"
+    en: Basis and Dimension
+- slug: eigenvalues-and-eigenvectors
+  title:
+    ko: "\uACE0\uC720\uAC12\uACFC \uACE0\uC720\uBCA1\uD130"
+    en: Eigenvalues and Eigenvectors
+- slug: matrix-decomposition
+  title:
+    ko: "\uD589\uB82C \uBD84\uD574"
+    en: Matrix Decomposition
+- slug: pca
+  title:
+    ko: PCA
+    en: PCA
+- slug: linear-algebra-in-ml
+  title:
+    ko: "\uBA38\uC2E0\uB7EC\uB2DD\uC5D0\uC11C\uC758 \uC120\uD615\uB300\uC218"
+    en: Linear Algebra in Machine Learning

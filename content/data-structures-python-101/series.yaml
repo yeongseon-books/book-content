@@ -1,62 +1,52 @@
 id: data-structures-python-101
-title:
-  ko: Data Structures with Python 101
-  en: Data Structures with Python 101
-description:
-  ko: Python으로 배열, 리스트, 스택, 큐, 해시 테이블, 트리, 그래프 등 핵심 자료구조를 다루는 입문 시리즈.
-  en: A beginner series on core data structures in Python including arrays, lists, stacks, queues, hash tables, trees, and graphs.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - idx: 1
-    slug: 01-what-are-data-structures
-    title:
-      ko: 자료구조란 무엇인가?
-      en: What Are Data Structures?
-  - idx: 2
-    slug: 02-arrays-and-lists
-    title:
-      ko: 배열과 리스트
-      en: Arrays and Lists
-  - idx: 3
-    slug: 03-stacks-and-queues
-    title:
-      ko: 스택과 큐
-      en: Stacks and Queues
-  - idx: 4
-    slug: 04-hash-tables-and-dict
-    title:
-      ko: 해시 테이블과 dict
-      en: Hash Tables and dict
-  - idx: 5
-    slug: 05-linked-lists
-    title:
-      ko: 연결 리스트
-      en: Linked Lists
-  - idx: 6
-    slug: 06-trees-and-binary-trees
-    title:
-      ko: 트리와 이진 트리
-      en: Trees and Binary Trees
-  - idx: 7
-    slug: 07-heaps-and-priority-queues
-    title:
-      ko: 힙과 우선순위 큐
-      en: Heaps and Priority Queues
-  - idx: 8
-    slug: 08-graph-representations
-    title:
-      ko: 그래프 표현
-      en: Graph Representations
-  - idx: 9
-    slug: 09-sets-and-set-operations
-    title:
-      ko: set과 집합 연산
-      en: Sets and Set Operations
-  - idx: 10
-    slug: 10-choosing-data-structures
-    title:
-      ko: 자료구조 선택 기준
-      en: Choosing the Right Data Structure
+- idx: 1
+  slug: 01-what-are-data-structures
+  title:
+    ko: "\uC790\uB8CC\uAD6C\uC870\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Are Data Structures?
+- idx: 2
+  slug: 02-arrays-and-lists
+  title:
+    ko: "\uBC30\uC5F4\uACFC \uB9AC\uC2A4\uD2B8"
+    en: Arrays and Lists
+- idx: 3
+  slug: 03-stacks-and-queues
+  title:
+    ko: "\uC2A4\uD0DD\uACFC \uD050"
+    en: Stacks and Queues
+- idx: 4
+  slug: 04-hash-tables-and-dict
+  title:
+    ko: "\uD574\uC2DC \uD14C\uC774\uBE14\uACFC dict"
+    en: Hash Tables and dict
+- idx: 5
+  slug: 05-linked-lists
+  title:
+    ko: "\uC5F0\uACB0 \uB9AC\uC2A4\uD2B8"
+    en: Linked Lists
+- idx: 6
+  slug: 06-trees-and-binary-trees
+  title:
+    ko: "\uD2B8\uB9AC\uC640 \uC774\uC9C4 \uD2B8\uB9AC"
+    en: Trees and Binary Trees
+- idx: 7
+  slug: 07-heaps-and-priority-queues
+  title:
+    ko: "\uD799\uACFC \uC6B0\uC120\uC21C\uC704 \uD050"
+    en: Heaps and Priority Queues
+- idx: 8
+  slug: 08-graph-representations
+  title:
+    ko: "\uADF8\uB798\uD504 \uD45C\uD604"
+    en: Graph Representations
+- idx: 9
+  slug: 09-sets-and-set-operations
+  title:
+    ko: "set\uACFC \uC9D1\uD569 \uC5F0\uC0B0"
+    en: Sets and Set Operations
+- idx: 10
+  slug: 10-choosing-data-structures
+  title:
+    ko: "\uC790\uB8CC\uAD6C\uC870 \uC120\uD0DD \uAE30\uC900"
+    en: Choosing the Right Data Structure

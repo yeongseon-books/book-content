@@ -1,22 +1,4 @@
 id: korean-ai-stack-101
-category: ai
-title:
-  ko: 한국어 AI 스택 101
-  en: Korean AI Stack 101
-description:
-  ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
-  en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-korean-embedding-models

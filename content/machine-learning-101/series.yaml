@@ -1,52 +1,42 @@
 id: machine-learning-101
-title:
-  ko: Machine Learning 101
-  en: Machine Learning 101
-description:
-  ko: 지도/비지도, train/test, 회귀, 분류, 트리, 군집, regularization, 평가까지 ML 전체 흐름을 다지는 시리즈.
-  en: A complete ML walkthrough — supervised/unsupervised, train/test, regression, classification, trees, clustering, regularization, and evaluation.
-status: content-ready
-languages:
-  - ko
-  - en
 episodes:
-  - slug: what-is-machine-learning
-    title:
-      ko: Machine Learning이란 무엇인가?
-      en: What Is Machine Learning?
-  - slug: supervised-and-unsupervised
-    title:
-      ko: 지도학습과 비지도학습
-      en: Supervised and Unsupervised Learning
-  - slug: train-test-split
-    title:
-      ko: Train/Test Split
-      en: Train/Test Split
-  - slug: linear-regression
-    title:
-      ko: Linear Regression
-      en: Linear Regression
-  - slug: logistic-regression
-    title:
-      ko: Logistic Regression
-      en: Logistic Regression
-  - slug: decision-tree-and-random-forest
-    title:
-      ko: Decision Tree와 Random Forest
-      en: Decision Tree and Random Forest
-  - slug: clustering
-    title:
-      ko: Clustering
-      en: Clustering
-  - slug: overfitting-and-regularization
-    title:
-      ko: Overfitting과 Regularization
-      en: Overfitting and Regularization
-  - slug: model-evaluation
-    title:
-      ko: Model Evaluation
-      en: Model Evaluation
-  - slug: ml-project-workflow
-    title:
-      ko: ML 프로젝트 전체 흐름
-      en: The ML Project Workflow
+- slug: what-is-machine-learning
+  title:
+    ko: "Machine Learning\uC774\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is Machine Learning?
+- slug: supervised-and-unsupervised
+  title:
+    ko: "\uC9C0\uB3C4\uD559\uC2B5\uACFC \uBE44\uC9C0\uB3C4\uD559\uC2B5"
+    en: Supervised and Unsupervised Learning
+- slug: train-test-split
+  title:
+    ko: Train/Test Split
+    en: Train/Test Split
+- slug: linear-regression
+  title:
+    ko: Linear Regression
+    en: Linear Regression
+- slug: logistic-regression
+  title:
+    ko: Logistic Regression
+    en: Logistic Regression
+- slug: decision-tree-and-random-forest
+  title:
+    ko: "Decision Tree\uC640 Random Forest"
+    en: Decision Tree and Random Forest
+- slug: clustering
+  title:
+    ko: Clustering
+    en: Clustering
+- slug: overfitting-and-regularization
+  title:
+    ko: "Overfitting\uACFC Regularization"
+    en: Overfitting and Regularization
+- slug: model-evaluation
+  title:
+    ko: Model Evaluation
+    en: Model Evaluation
+- slug: ml-project-workflow
+  title:
+    ko: "ML \uD504\uB85C\uC81D\uD2B8 \uC804\uCCB4 \uD750\uB984"
+    en: The ML Project Workflow

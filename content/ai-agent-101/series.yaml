@@ -1,26 +1,4 @@
 id: ai-agent-101
-category: ai
-title:
-  ko: AI Agent 101
-  en: AI Agent 101
-description:
-  ko: AI Agent의 개념부터 Context Engineering, Tool Use, Workflow, Multi-Agent, Evaluation, 운영까지 배우는 실전 입문 시리즈.
-  en: A practical beginner guide to AI agents, from context engineering and tool use to workflows, multi-agent systems, evaluation, and production operations.
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags:
-  - AI Agent
-  - LLM
-  - Automation
-  - Production
 articles:
 - idx: 1
   slug: 01-what-is-an-ai-agent

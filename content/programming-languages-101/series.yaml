@@ -1,71 +1,53 @@
 id: programming-languages-101
-title:
-  ko: Programming Languages 101
-  en: Programming Languages 101
-description:
-  ko: syntax, semantics, type system, scope, closure, memory model, interpreter/compiler 차이까지 PL 기초를 다지는 시리즈.
-  en: A foundational series on programming languages — syntax, semantics, type systems, scope, closures, memory model, and the interpreter vs compiler distinction.
-status: content-ready
-category: cs-core
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-level: 101
-lifecycle: active
 episodes:
-  - number: 1
-    slug: what-is-a-programming-language
-    title:
-      ko: 프로그래밍 언어란 무엇인가?
-      en: What Is a Programming Language?
-  - number: 2
-    slug: syntax-and-semantics
-    title:
-      ko: syntax와 semantics
-      en: Syntax and Semantics
-  - number: 3
-    slug: type-system
-    title:
-      ko: type system
-      en: Type Systems
-  - number: 4
-    slug: scope-and-binding
-    title:
-      ko: scope와 binding
-      en: Scope and Binding
-  - number: 5
-    slug: functions-and-closures
-    title:
-      ko: 함수와 closure
-      en: Functions and Closures
-  - number: 6
-    slug: objects-and-prototypes
-    title:
-      ko: 객체와 prototype
-      en: Objects and Prototypes
-  - number: 7
-    slug: memory-management
-    title:
-      ko: memory management
-      en: Memory Management
-  - number: 8
-    slug: interpreter-and-compiler
-    title:
-      ko: interpreter와 compiler
-      en: Interpreters and Compilers
-  - number: 9
-    slug: static-vs-dynamic
-    title:
-      ko: static vs dynamic language
-      en: Static vs Dynamic Languages
-  - number: 10
-    slug: what-makes-good-language-design
-    title:
-      ko: 좋은 언어 설계란 무엇인가?
-      en: What Makes a Good Language Design?
+- number: 1
+  slug: what-is-a-programming-language
+  title:
+    ko: "\uD504\uB85C\uADF8\uB798\uBC0D \uC5B8\uC5B4\uB780 \uBB34\uC5C7\uC778\uAC00\
+      ?"
+    en: What Is a Programming Language?
+- number: 2
+  slug: syntax-and-semantics
+  title:
+    ko: "syntax\uC640 semantics"
+    en: Syntax and Semantics
+- number: 3
+  slug: type-system
+  title:
+    ko: type system
+    en: Type Systems
+- number: 4
+  slug: scope-and-binding
+  title:
+    ko: "scope\uC640 binding"
+    en: Scope and Binding
+- number: 5
+  slug: functions-and-closures
+  title:
+    ko: "\uD568\uC218\uC640 closure"
+    en: Functions and Closures
+- number: 6
+  slug: objects-and-prototypes
+  title:
+    ko: "\uAC1D\uCCB4\uC640 prototype"
+    en: Objects and Prototypes
+- number: 7
+  slug: memory-management
+  title:
+    ko: memory management
+    en: Memory Management
+- number: 8
+  slug: interpreter-and-compiler
+  title:
+    ko: "interpreter\uC640 compiler"
+    en: Interpreters and Compilers
+- number: 9
+  slug: static-vs-dynamic
+  title:
+    ko: static vs dynamic language
+    en: Static vs Dynamic Languages
+- number: 10
+  slug: what-makes-good-language-design
+  title:
+    ko: "\uC88B\uC740 \uC5B8\uC5B4 \uC124\uACC4\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Makes a Good Language Design?

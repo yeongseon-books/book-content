@@ -1,52 +1,42 @@
 id: mlops-101
-title:
-  ko: MLOps 101
-  en: MLOps 101
-description:
-  ko: 운영 가능한 ML 시스템 만드는 법
-  en: How to build production-grade ML systems
-languages:
-  - ko
-  - en
-status: content-ready
 episodes:
-  - slug: 01-what-is-mlops
-    title:
-      ko: MLOps란 무엇인가?
-      en: What Is MLOps?
-  - slug: 02-experiment-tracking
-    title:
-      ko: 실험 관리
-      en: Experiment Tracking
-  - slug: 03-data-versioning
-    title:
-      ko: 데이터 버전 관리
-      en: Data Versioning
-  - slug: 04-training-pipeline
-    title:
-      ko: 모델 학습 파이프라인
-      en: Model Training Pipeline
-  - slug: 05-model-deployment
-    title:
-      ko: 모델 배포
-      en: Model Deployment
-  - slug: 06-model-monitoring
-    title:
-      ko: 모델 모니터링
-      en: Model Monitoring
-  - slug: 07-data-and-model-drift
-    title:
-      ko: Data Drift와 Model Drift
-      en: Data Drift and Model Drift
-  - slug: 08-retraining
-    title:
-      ko: 재학습
-      en: Retraining
-  - slug: 09-feature-store
-    title:
-      ko: Feature Store
-      en: Feature Store
-  - slug: 10-production-ml-system
-    title:
-      ko: 운영 가능한 ML 시스템
-      en: Building a Production ML System
+- slug: 01-what-is-mlops
+  title:
+    ko: "MLOps\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What Is MLOps?
+- slug: 02-experiment-tracking
+  title:
+    ko: "\uC2E4\uD5D8 \uAD00\uB9AC"
+    en: Experiment Tracking
+- slug: 03-data-versioning
+  title:
+    ko: "\uB370\uC774\uD130 \uBC84\uC804 \uAD00\uB9AC"
+    en: Data Versioning
+- slug: 04-training-pipeline
+  title:
+    ko: "\uBAA8\uB378 \uD559\uC2B5 \uD30C\uC774\uD504\uB77C\uC778"
+    en: Model Training Pipeline
+- slug: 05-model-deployment
+  title:
+    ko: "\uBAA8\uB378 \uBC30\uD3EC"
+    en: Model Deployment
+- slug: 06-model-monitoring
+  title:
+    ko: "\uBAA8\uB378 \uBAA8\uB2C8\uD130\uB9C1"
+    en: Model Monitoring
+- slug: 07-data-and-model-drift
+  title:
+    ko: "Data Drift\uC640 Model Drift"
+    en: Data Drift and Model Drift
+- slug: 08-retraining
+  title:
+    ko: "\uC7AC\uD559\uC2B5"
+    en: Retraining
+- slug: 09-feature-store
+  title:
+    ko: Feature Store
+    en: Feature Store
+- slug: 10-production-ml-system
+  title:
+    ko: "\uC6B4\uC601 \uAC00\uB2A5\uD55C ML \uC2DC\uC2A4\uD15C"
+    en: Building a Production ML System

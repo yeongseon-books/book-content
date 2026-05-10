@@ -1,22 +1,4 @@
 id: llm-finetuning-101
-category: ai
-title:
-  ko: LLM 파인튜닝 101
-  en: LLM Fine-tuning 101
-description:
-  ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
-  en: LoRA, datasets, and serving in 6 parts (optional).
-languages:
-- ko
-- en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
-status: content-ready
-tags: []
 articles:
 - idx: 1
   slug: 01-intro

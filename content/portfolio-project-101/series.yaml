@@ -1,60 +1,43 @@
 id: portfolio-project-101
-title:
-  ko: 포트폴리오 프로젝트 101
-  en: Portfolio Project 101
-description:
-  ko: 프로젝트 선정, README, 데모, 배포, 테스트, 의사결정 기록, 블로그, 면접 설명까지 다루는 입문 포트폴리오 시리즈.
-  en: An introductory portfolio series covering project selection, README, demo, deploy, tests, decisions, blog, and interviews.
-status: content-ready
-level: 101
-lifecycle: active
-languages:
-  - ko
-  - en
-targets:
-  tistory: true
-  hashnode: true
-  medium: true
-  mkdocs: true
-  ebook: true
 episodes:
-  - slug: 01-what-is-a-portfolio-project
-    title:
-      ko: 포트폴리오 프로젝트란 무엇인가
-      en: What is a Portfolio Project
-  - slug: 02-traits-of-a-good-project
-    title:
-      ko: 좋은 프로젝트의 조건
-      en: Traits of a Good Project
-  - slug: 03-writing-the-readme
-    title:
-      ko: README 작성
-      en: Writing the README
-  - slug: 04-building-the-demo
-    title:
-      ko: 데모 만들기
-      en: Building the Demo
-  - slug: 05-deploying-the-project
-    title:
-      ko: 배포하기
-      en: Deploying the Project
-  - slug: 06-tests-and-documentation
-    title:
-      ko: 테스트와 문서화
-      en: Tests and Documentation
-  - slug: 07-recording-tech-decisions
-    title:
-      ko: 기술적 의사결정 기록
-      en: Recording Tech Decisions
-  - slug: 08-summarizing-as-blog-posts
-    title:
-      ko: 블로그 글로 정리하기
-      en: Summarizing as Blog Posts
-  - slug: 09-explaining-in-interviews
-    title:
-      ko: 면접에서 설명하기
-      en: Explaining in Interviews
-  - slug: 10-portfolio-improvement-checklist
-    title:
-      ko: 포트폴리오 개선 체크리스트
-      en: Portfolio Improvement Checklist
+- slug: 01-what-is-a-portfolio-project
+  title:
+    ko: "\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uD504\uB85C\uC81D\uD2B8\uB780 \uBB34\uC5C7\
+      \uC778\uAC00"
+    en: What is a Portfolio Project
+- slug: 02-traits-of-a-good-project
+  title:
+    ko: "\uC88B\uC740 \uD504\uB85C\uC81D\uD2B8\uC758 \uC870\uAC74"
+    en: Traits of a Good Project
+- slug: 03-writing-the-readme
+  title:
+    ko: "README \uC791\uC131"
+    en: Writing the README
+- slug: 04-building-the-demo
+  title:
+    ko: "\uB370\uBAA8 \uB9CC\uB4E4\uAE30"
+    en: Building the Demo
+- slug: 05-deploying-the-project
+  title:
+    ko: "\uBC30\uD3EC\uD558\uAE30"
+    en: Deploying the Project
+- slug: 06-tests-and-documentation
+  title:
+    ko: "\uD14C\uC2A4\uD2B8\uC640 \uBB38\uC11C\uD654"
+    en: Tests and Documentation
+- slug: 07-recording-tech-decisions
+  title:
+    ko: "\uAE30\uC220\uC801 \uC758\uC0AC\uACB0\uC815 \uAE30\uB85D"
+    en: Recording Tech Decisions
+- slug: 08-summarizing-as-blog-posts
+  title:
+    ko: "\uBE14\uB85C\uADF8 \uAE00\uB85C \uC815\uB9AC\uD558\uAE30"
+    en: Summarizing as Blog Posts
+- slug: 09-explaining-in-interviews
+  title:
+    ko: "\uBA74\uC811\uC5D0\uC11C \uC124\uBA85\uD558\uAE30"
+    en: Explaining in Interviews
+- slug: 10-portfolio-improvement-checklist
+  title:
+    ko: "\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uAC1C\uC120 \uCCB4\uD06C\uB9AC\uC2A4\uD2B8"
+    en: Portfolio Improvement Checklist

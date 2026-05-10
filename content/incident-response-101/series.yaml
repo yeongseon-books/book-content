@@ -1,54 +1,42 @@
 id: incident-response-101
-title:
-  ko: Incident Response 101
-  en: Incident Response 101
-description:
-  ko: Severity 분류, 초기 대응, 커뮤니케이션, 타임라인, RCA, 완화, 포스트모템, 재발 방지, 런북 작성까지 다루는 입문 시리즈.
-  en: An entry series covering severity, initial response, communication, timelines, RCA, mitigation, postmortems, prevention, and runbooks.
-languages:
-  - ko
-  - en
-status: content-ready
-level: 101
-lifecycle: active
 episodes:
-  - slug: 01-what-is-incident
-    title:
-      ko: Incident란 무엇인가?
-      en: What is an Incident?
-  - slug: 02-severity
-    title:
-      ko: Severity 분류
-      en: Severity Classification
-  - slug: 03-initial-response
-    title:
-      ko: 초기 대응
-      en: Initial Response
-  - slug: 04-communication
-    title:
-      ko: Communication
-      en: Communication
-  - slug: 05-timeline
-    title:
-      ko: Timeline 작성
-      en: Writing the Timeline
-  - slug: 06-root-cause-analysis
-    title:
-      ko: Root Cause Analysis
-      en: Root Cause Analysis
-  - slug: 07-mitigation-and-resolution
-    title:
-      ko: Mitigation과 Resolution
-      en: Mitigation and Resolution
-  - slug: 08-postmortem
-    title:
-      ko: Postmortem
-      en: Postmortem
-  - slug: 09-prevention
-    title:
-      ko: 재발 방지
-      en: Prevention
-  - slug: 10-incident-runbook
-    title:
-      ko: Incident Runbook 만들기
-      en: Building an Incident Runbook
+- slug: 01-what-is-incident
+  title:
+    ko: "Incident\uB780 \uBB34\uC5C7\uC778\uAC00?"
+    en: What is an Incident?
+- slug: 02-severity
+  title:
+    ko: "Severity \uBD84\uB958"
+    en: Severity Classification
+- slug: 03-initial-response
+  title:
+    ko: "\uCD08\uAE30 \uB300\uC751"
+    en: Initial Response
+- slug: 04-communication
+  title:
+    ko: Communication
+    en: Communication
+- slug: 05-timeline
+  title:
+    ko: "Timeline \uC791\uC131"
+    en: Writing the Timeline
+- slug: 06-root-cause-analysis
+  title:
+    ko: Root Cause Analysis
+    en: Root Cause Analysis
+- slug: 07-mitigation-and-resolution
+  title:
+    ko: "Mitigation\uACFC Resolution"
+    en: Mitigation and Resolution
+- slug: 08-postmortem
+  title:
+    ko: Postmortem
+    en: Postmortem
+- slug: 09-prevention
+  title:
+    ko: "\uC7AC\uBC1C \uBC29\uC9C0"
+    en: Prevention
+- slug: 10-incident-runbook
+  title:
+    ko: "Incident Runbook \uB9CC\uB4E4\uAE30"
+    en: Building an Incident Runbook
