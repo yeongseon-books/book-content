@@ -29,15 +29,15 @@ series:
   level: 101
   lifecycle: active
   path: content/ai-agent-101
-- id: harness-engineering-101
+- id: ai-app-patterns-101
   status: content-ready
   category: ai
   title:
-    ko: Harness Engineering 101
-    en: Harness Engineering 101
+    ko: AI 앱 패턴 101
+    en: AI App Patterns 101
   description:
-    ko: AI Agent가 안정적으로 작업하도록 task, context, constraint, tool, test, feedback, approval, observability, production harness를 설계하는 입문 시리즈.
-    en: A beginner-friendly guide to designing task, context, constraint, tool, test, feedback, approval, observability, and production harnesses for reliable AI agents.
+    ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
+    en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
   languages:
   - ko
   - en
@@ -49,7 +49,87 @@ series:
     ebook: true
   level: 101
   lifecycle: active
-  path: content/harness-engineering-101
+  path: content/ai-app-patterns-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-chatbot-pattern
+        title: 챗봇 패턴 — 대화 이력 관리와 상태
+        status: publish-ready
+      - idx: 2
+        slug: 02-rag-qa-pattern
+        title: RAG Q&A 패턴 — 문서 기반 질의응답
+        status: publish-ready
+      - idx: 3
+        slug: 03-document-assistant
+        title: 문서 어시스턴트 — 요약, 추출, 분류
+        status: publish-ready
+      - idx: 4
+        slug: 04-agent-tool-pattern
+        title: Agent + Tool 패턴 — 자율 도구 선택
+        status: publish-ready
+      - idx: 5
+        slug: 05-workflow-automation
+        title: 워크플로 자동화 — 다단계 체인 설계
+        status: publish-ready
+      - idx: 6
+        slug: 06-human-in-the-loop
+        title: Human-in-the-loop — 사람 개입 설계 패턴
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-chatbot-pattern
+        title: Chatbot pattern — managing conversation history and state
+        status: publish-ready
+      - idx: 2
+        slug: 02-rag-qa-pattern
+        title: RAG Q&A pattern — document-based question answering
+        status: publish-ready
+      - idx: 3
+        slug: 03-document-assistant
+        title: Document assistant — summarization, extraction, classification
+        status: publish-ready
+      - idx: 4
+        slug: 04-agent-tool-pattern
+        title: Agent and tool pattern — autonomous tool selection
+        status: publish-ready
+      - idx: 5
+        slug: 05-workflow-automation
+        title: Workflow automation — designing multi-step chains
+        status: publish-ready
+      - idx: 6
+        slug: 06-human-in-the-loop
+        title: Human-in-the-loop — designing for human intervention
+        status: publish-ready
+  track: ebook
+  stage: patterns
+- id: ai-data-preparation-101
+  category: ai
+  title:
+    ko: AI Data Preparation 101
+    en: AI Data Preparation 101
+  description:
+    ko: AI 모델을 위한 데이터 준비 전 과정을 다루는 입문 시리즈. 수집, 정제, PII 익명화, 토큰화, 품질 필터링, 합성 데이터, 분할과 오염 통제, 프로덕션 파이프라인까지 배웁니다.
+    en: A beginner-friendly guide to end-to-end data preparation for AI models, covering collection, cleaning, PII anonymization, tokenization, quality filtering, synthetic data, splitting with contamination control, and production pipelines.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  tags:
+    - Data Preparation
+    - ML Foundations
+    - Data Quality
+    - Pipelines
+  path: content/ai-data-preparation-101
+
 - id: ai-evaluation-101
   category: ai
   title:
@@ -99,14 +179,68 @@ series:
     - Compliance
   path: content/ai-safety-guardrails-101
 
-- id: ai-data-preparation-101
+- id: ai-web-dev-101
+  status: needs-update
   category: ai
   title:
-    ko: AI Data Preparation 101
-    en: AI Data Preparation 101
+    ko: AI 웹 개발 입문
+    en: AI Web Development 101
   description:
-    ko: AI 모델을 위한 데이터 준비 전 과정을 다루는 입문 시리즈. 수집, 정제, PII 익명화, 토큰화, 품질 필터링, 합성 데이터, 분할과 오염 통제, 프로덕션 파이프라인까지 배웁니다.
-    en: A beginner-friendly guide to end-to-end data preparation for AI models, covering collection, cleaning, PII anonymization, tokenization, quality filtering, synthetic data, splitting with contamination control, and production pipelines.
+    ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
+    en: 7-part guide for junior developers — from AI API basics to deployment.
+  languages:
+  - ko
+  targets:
+    tistory: true
+    hashnode: false
+    medium: false
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: archived
+  note: Superseded by llm-app-foundations-101 and ai-app-patterns-101. Do not add new posts. Existing content will be absorbed
+    into the new series.
+  path: content/ai-web-dev-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-hello-ai-api
+        title: AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
+        status: needs-update
+      - idx: 2
+        slug: 02-prompt-engineering
+        title: 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술
+        status: needs-update
+      - idx: 3
+        slug: 03-ai-chatbot
+        title: AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
+        status: needs-update
+      - idx: 4
+        slug: 04-rag-intro
+        title: RAG 입문 — 내 데이터로 답하는 AI 만들기
+        status: needs-update
+      - idx: 5
+        slug: 05-ai-agent
+        title: AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
+        status: needs-update
+      - idx: 6
+        slug: 06-deploy
+        title: 'AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기'
+        status: needs-update
+      - idx: 7
+        slug: 07-eval-improve
+        title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
+        status: needs-update
+- id: document-ingestion-101
+  status: content-ready
+  category: ai
+  title:
+    ko: 문서 수집과 인덱싱 101
+    en: Document Ingestion 101
+  description:
+    ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
+    en: PDF parsing, metadata, and incremental indexing in 6 parts.
   languages:
   - ko
   - en
@@ -116,14 +250,717 @@ series:
     medium: true
     mkdocs: true
     ebook: true
+  level: 101
+  lifecycle: active
+  path: content/document-ingestion-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-pdf-parsing
+        title: PDF 파싱과 텍스트 추출
+        status: publish-ready
+      - idx: 2
+        slug: 02-chunking-strategies
+        title: 청킹 전략 — 문서 유형별 최적화
+        status: publish-ready
+      - idx: 3
+        slug: 03-metadata-filtering
+        title: 메타데이터 설계와 필터링
+        status: publish-ready
+      - idx: 4
+        slug: 04-incremental-indexing
+        title: 증분 인덱싱 — 변경된 문서만 업데이트
+        status: publish-ready
+      - idx: 5
+        slug: 05-multi-format-pipeline
+        title: 다중 포맷 문서 파이프라인
+        status: publish-ready
+      - idx: 6
+        slug: 06-pipeline-completion
+        title: 문서 수집 파이프라인 완성
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-pdf-parsing
+        title: PDF parsing and text extraction
+        status: publish-ready
+      - idx: 2
+        slug: 02-chunking-strategies
+        title: Chunking strategies — optimizing by document type
+        status: publish-ready
+      - idx: 3
+        slug: 03-metadata-filtering
+        title: Metadata design and filtering
+        status: publish-ready
+      - idx: 4
+        slug: 04-incremental-indexing
+        title: Incremental indexing — updating only changed documents
+        status: publish-ready
+      - idx: 5
+        slug: 05-multi-format-pipeline
+        title: Multi-format document pipeline
+        status: publish-ready
+      - idx: 6
+        slug: 06-pipeline-completion
+        title: Completing the document ingestion pipeline
+        status: publish-ready
+  track: ebook
+  stage: rag
+- id: harness-engineering-101
   status: content-ready
-  tags:
-    - Data Preparation
-    - ML Foundations
-    - Data Quality
-    - Pipelines
-  path: content/ai-data-preparation-101
-
+  category: ai
+  title:
+    ko: Harness Engineering 101
+    en: Harness Engineering 101
+  description:
+    ko: AI Agent가 안정적으로 작업하도록 task, context, constraint, tool, test, feedback, approval, observability, production harness를 설계하는 입문 시리즈.
+    en: A beginner-friendly guide to designing task, context, constraint, tool, test, feedback, approval, observability, and production harnesses for reliable AI agents.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/harness-engineering-101
+- id: korean-ai-stack-101
+  status: content-ready
+  category: ai
+  title:
+    ko: 한국어 AI 스택 101
+    en: Korean AI Stack 101
+  description:
+    ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
+    en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/korean-ai-stack-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-korean-embedding-models
+        title: 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar
+        status: publish-ready
+      - idx: 2
+        slug: 02-kosimcse-similarity
+        title: KoSimCSE로 문장 유사도 구현하기
+        status: publish-ready
+      - idx: 3
+        slug: 03-bge-m3-multilingual
+        title: BGE-M3 다국어 임베딩 실전
+        status: publish-ready
+      - idx: 4
+        slug: 04-clova-ocr
+        title: CLOVA OCR API로 문서 텍스트 추출
+        status: publish-ready
+      - idx: 5
+        slug: 05-hyperclova-solar-api
+        title: HyperCLOVA X와 Solar API 사용하기
+        status: publish-ready
+      - idx: 6
+        slug: 06-korean-rag-pipeline
+        title: 한국어 RAG 파이프라인 조합하기
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-korean-embedding-models
+        title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
+        status: publish-ready
+      - idx: 2
+        slug: 02-kosimcse-similarity
+        title: Building sentence similarity search with KoSimCSE
+        status: publish-ready
+      - idx: 3
+        slug: 03-bge-m3-multilingual
+        title: BGE-M3 multilingual embedding in practice
+        status: publish-ready
+      - idx: 4
+        slug: 04-clova-ocr
+        title: Document text extraction with CLOVA OCR API
+        status: publish-ready
+      - idx: 5
+        slug: 05-hyperclova-solar-api
+        title: Using HyperCLOVA X and Solar API
+        status: publish-ready
+      - idx: 6
+        slug: 06-korean-rag-pipeline
+        title: Assembling a Korean RAG pipeline
+        status: publish-ready
+  track: traffic
+  stage: korean
+- id: langchain-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LangChain 101
+    en: LangChain 101
+  description:
+    ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
+    en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/langchain-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-lcel-runnable-basics
+        title: LangChain 소개 — LCEL과 Runnable 기본
+        status: publish-ready
+      - idx: 2
+        slug: 02-prompt-llm-chain
+        title: Prompt와 LLM Chain — 체인 첫 번째 구성
+        status: publish-ready
+      - idx: 3
+        slug: 03-retriever
+        title: Retriever — 문서 검색과 컨텍스트 주입
+        status: publish-ready
+      - idx: 4
+        slug: 04-tool-calling
+        title: Tool Calling — 외부 도구 연결하기
+        status: publish-ready
+      - idx: 5
+        slug: 05-streaming
+        title: Streaming — 실시간 출력 처리
+        status: publish-ready
+      - idx: 6
+        slug: 06-putting-it-together
+        title: 실전 체인 조립 — 컴포넌트를 하나로 연결하기
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-lcel-runnable-basics
+        title: LangChain introduction — LCEL and the Runnable interface
+        status: publish-ready
+      - idx: 2
+        slug: 02-prompt-llm-chain
+        title: Prompt and LLM chain — assembling your first chain
+        status: publish-ready
+      - idx: 3
+        slug: 03-retriever
+        title: Retriever — document search and context injection
+        status: publish-ready
+      - idx: 4
+        slug: 04-tool-calling
+        title: Tool calling — connecting external tools
+        status: publish-ready
+      - idx: 5
+        slug: 05-streaming
+        title: Streaming — handling real-time output
+        status: publish-ready
+      - idx: 6
+        slug: 06-putting-it-together
+        title: Putting it together — a complete chain in one file
+        status: publish-ready
+  track: authority
+  stage: foundation
+- id: langgraph-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LangGraph 101
+    en: LangGraph 101
+  description:
+    ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
+    en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/langgraph-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-graph-basics
+        title: LangGraph 소개와 그래프 기초
+        status: publish-ready
+      - idx: 2
+        slug: 02-state-and-checkpoints
+        title: 상태 관리와 체크포인트
+        status: publish-ready
+      - idx: 3
+        slug: 03-conditional-edges
+        title: 조건부 엣지와 분기 흐름
+        status: publish-ready
+      - idx: 4
+        slug: 04-tool-calling-agent
+        title: 도구 호출 에이전트
+        status: publish-ready
+      - idx: 5
+        slug: 05-multi-agent
+        title: 멀티 에이전트 시스템
+        status: publish-ready
+      - idx: 6
+        slug: 06-langgraph-complete
+        title: LangGraph 완성
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-graph-basics
+        title: LangGraph introduction and graph basics
+        status: publish-ready
+      - idx: 2
+        slug: 02-state-and-checkpoints
+        title: State management and checkpoints
+        status: publish-ready
+      - idx: 3
+        slug: 03-conditional-edges
+        title: Conditional edges and branching
+        status: publish-ready
+      - idx: 4
+        slug: 04-tool-calling-agent
+        title: Tool-calling agents
+        status: publish-ready
+      - idx: 5
+        slug: 05-multi-agent
+        title: Multi-agent systems
+        status: publish-ready
+      - idx: 6
+        slug: 06-langgraph-complete
+        title: Completing LangGraph
+        status: publish-ready
+  track: authority
+  stage: patterns
+- id: llm-api-production-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LLM API 프로덕션 101
+    en: LLM API Production 101
+  description:
+    ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
+    en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 201
+  lifecycle: active
+  path: content/llm-api-production-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-structured-output
+        title: 구조화 출력 — JSON 모드와 응답 스키마
+        status: publish-ready
+      - idx: 2
+        slug: 02-tool-calling
+        title: 툴 호출 — 함수를 모델에 연결하기
+        status: publish-ready
+      - idx: 3
+        slug: 03-streaming-in-depth
+        title: 스트리밍 심화 — 청크 처리와 오류 복구
+        status: publish-ready
+      - idx: 4
+        slug: 04-caching-strategies
+        title: 캐싱 전략 — 비용과 지연 시간 줄이기
+        status: publish-ready
+      - idx: 5
+        slug: 05-retry-and-error-handling
+        title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
+        status: publish-ready
+      - idx: 6
+        slug: 06-rate-limit-management
+        title: 속도 제한 관리 — Rate Limit 대응 패턴
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-structured-output
+        title: Structured output — JSON mode and response schemas
+        status: publish-ready
+      - idx: 2
+        slug: 02-tool-calling
+        title: Tool calling — connecting functions to the model
+        status: publish-ready
+      - idx: 3
+        slug: 03-streaming-in-depth
+        title: Streaming in depth — chunk handling and error recovery
+        status: publish-ready
+      - idx: 4
+        slug: 04-caching-strategies
+        title: Caching strategies — reducing cost and latency
+        status: publish-ready
+      - idx: 5
+        slug: 05-retry-and-error-handling
+        title: Retry and error handling — making API calls reliable
+        status: publish-ready
+      - idx: 6
+        slug: 06-rate-limit-management
+        title: Rate limit management — patterns for staying within limits
+        status: publish-ready
+  track: traffic
+  stage: production
+- id: llm-app-foundations-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LLM 앱 기초
+    en: LLM App Foundations 101
+  description:
+    ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
+    en: LLM API basics, tokens, and prompt engineering in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/llm-app-foundations-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-llm-api-first-call
+        title: LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
+        status: publish-ready
+      - idx: 2
+        slug: 02-understanding-tokens
+        title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
+        status: publish-ready
+      - idx: 3
+        slug: 03-prompt-engineering-basics
+        title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
+        status: publish-ready
+      - idx: 4
+        slug: 04-few-shot-and-cot
+        title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
+        status: publish-ready
+      - idx: 5
+        slug: 05-conversation-state
+        title: 대화 상태 관리 — 멀티턴 챗봇 만들기
+        status: publish-ready
+      - idx: 6
+        slug: 06-streaming-responses
+        title: 스트리밍 응답 처리 — 실시간으로 출력 받기
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-llm-api-first-call
+        title: LLM API first call — sending your first request
+        status: publish-ready
+      - idx: 2
+        slug: 02-understanding-tokens
+        title: Understanding tokens — cost, limits, and context windows
+        status: publish-ready
+      - idx: 3
+        slug: 03-prompt-engineering-basics
+        title: Prompt engineering basics — system, user, and assistant roles
+        status: publish-ready
+      - idx: 4
+        slug: 04-few-shot-and-cot
+        title: Few-shot and chain-of-thought — steering better answers
+        status: publish-ready
+      - idx: 5
+        slug: 05-conversation-state
+        title: Managing conversation state — building a multi-turn chatbot
+        status: publish-ready
+      - idx: 6
+        slug: 06-streaming-responses
+        title: Handling streaming responses — real-time output
+        status: publish-ready
+  track: traffic
+  stage: foundation
+- id: llm-apps-ops-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LLM 앱 운영 101
+    en: LLM Apps Ops 101
+  description:
+    ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
+    en: Observability, evaluation, cost, security, and deployment in 6 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 201
+  lifecycle: active
+  path: content/llm-apps-ops-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-monitoring-and-logging
+        title: LLM 앱 모니터링과 로깅
+        status: publish-ready
+      - idx: 2
+        slug: 02-cost-tracking
+        title: LLM 비용 추적과 최적화
+        status: publish-ready
+      - idx: 3
+        slug: 03-evaluation
+        title: LLM 출력 품질 평가
+        status: publish-ready
+      - idx: 4
+        slug: 04-security
+        title: LLM 앱 보안
+        status: publish-ready
+      - idx: 5
+        slug: 05-deployment
+        title: LLM 앱 배포 전략
+        status: publish-ready
+      - idx: 6
+        slug: 06-ops-complete
+        title: LLM 앱 운영 완성
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-monitoring-and-logging
+        title: Monitoring and logging for LLM apps
+        status: publish-ready
+      - idx: 2
+        slug: 02-cost-tracking
+        title: LLM cost tracking and optimization
+        status: publish-ready
+      - idx: 3
+        slug: 03-evaluation
+        title: Evaluating LLM output quality
+        status: publish-ready
+      - idx: 4
+        slug: 04-security
+        title: LLM app security
+        status: publish-ready
+      - idx: 5
+        slug: 05-deployment
+        title: LLM app deployment strategies
+        status: publish-ready
+      - idx: 6
+        slug: 06-ops-complete
+        title: Completing the LLM ops pipeline
+        status: publish-ready
+  track: authority
+  stage: ops
+- id: llm-finetuning-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LLM 파인튜닝 101
+    en: LLM Fine-tuning 101
+  description:
+    ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
+    en: LoRA, datasets, and serving in 6 parts (optional).
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/llm-finetuning-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-intro
+        title: LLM 파인튜닝 입문
+        status: publish-ready
+      - idx: 2
+        slug: 02-dataset
+        title: 데이터셋 준비와 전처리
+        status: publish-ready
+      - idx: 3
+        slug: 03-lora
+        title: LoRA 어댑터 구성
+        status: publish-ready
+      - idx: 4
+        slug: 04-training
+        title: 학습 루프와 하이퍼파라미터
+        status: publish-ready
+      - idx: 5
+        slug: 05-evaluation
+        title: 모델 평가
+        status: publish-ready
+      - idx: 6
+        slug: 06-serving
+        title: 모델 서빙
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-intro
+        title: Introduction to LLM Fine-tuning
+        status: publish-ready
+      - idx: 2
+        slug: 02-dataset
+        title: Dataset preparation and preprocessing
+        status: publish-ready
+      - idx: 3
+        slug: 03-lora
+        title: Configuring the LoRA adapter
+        status: publish-ready
+      - idx: 4
+        slug: 04-training
+        title: Training loop and hyperparameters
+        status: publish-ready
+      - idx: 5
+        slug: 05-evaluation
+        title: Model evaluation
+        status: publish-ready
+      - idx: 6
+        slug: 06-serving
+        title: Model serving
+        status: publish-ready
+  track: authority
+  stage: education
+- id: llm-from-scratch-101
+  status: content-ready
+  category: ai
+  title:
+    ko: LLM from Scratch 101
+    en: LLM from Scratch 101
+  description:
+    ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
+    en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/llm-from-scratch-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-tokenizer
+        title: 글자를 숫자로 바꾸기
+        status: publish-ready
+      - idx: 2
+        slug: 02-embedding
+        title: 정수에서 벡터로, 그리고 위치
+        status: publish-ready
+      - idx: 3
+        slug: 03-attention
+        title: 어떤 토큰을 얼마나 볼지 스스로 정하기
+        status: publish-ready
+      - idx: 4
+        slug: 04-transformer-block
+        title: 블록 하나, 깊이의 단위
+        status: publish-ready
+      - idx: 5
+        slug: 05-gpt-model
+        title: '조립: GPT 모델 클래스 완성'
+        status: publish-ready
+      - idx: 6
+        slug: 06-training-loop
+        title: 기울기로 배우기
+        status: publish-ready
+      - idx: 7
+        slug: 07-inference
+        title: 샘플링 — 학습된 모델에서 글 뽑아내기
+        status: publish-ready
+      - idx: 8
+        slug: 08-finetuning
+        title: 베이스 모델을 우리 작업에 맞추기
+        status: publish-ready
+      - idx: 9
+        slug: 09-chatbot-wrapper
+        title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-tokenizer
+        title: Turning Text into Numbers
+        status: publish-ready
+      - idx: 2
+        slug: 02-embedding
+        title: From Integers to Vectors and Positions
+        status: publish-ready
+      - idx: 3
+        slug: 03-attention
+        title: Deciding Which Tokens to Focus On
+        status: publish-ready
+      - idx: 4
+        slug: 04-transformer-block
+        title: 'The Transformer Block: A Unit of Depth'
+        status: publish-ready
+      - idx: 5
+        slug: 05-gpt-model
+        title: 'Assembly: Completing the GPT Model Class'
+        status: publish-ready
+      - idx: 6
+        slug: 06-training-loop
+        title: Learning via Gradients
+        status: publish-ready
+      - idx: 7
+        slug: 07-inference
+        title: Sampling — Generating Text from a Trained Model
+        status: publish-ready
+      - idx: 8
+        slug: 08-finetuning
+        title: Adapting the Base Model to Specific Tasks
+        status: publish-ready
+      - idx: 9
+        slug: 09-chatbot-wrapper
+        title: Turning Your LLM into a Chatbot — FastAPI + Streaming
+        status: publish-ready
+  track: ebook
+  stage: education
 - id: multimodal-ai-101
   category: ai
   title:
@@ -138,70 +975,15 @@ series:
   status: content-ready
   path: content/multimodal-ai-101
 
-- id: python-dbapi-101
-  category: data
-  title:
-    ko: Python DB-API 101
-    en: Python DB-API 101
-  description:
-    ko: Python의 표준 데이터베이스 인터페이스 PEP 249(DB-API 2.0)를 SQLite 기준으로 다루는 입문 시리즈.
-    en: A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite, covering connection lifecycle, transactions, error handling, async, and production patterns.
-  languages:
-  - ko
-  - en
+- id: rag-benchmark-101
   status: content-ready
-  path: content/python-dbapi-101
-
-- id: sqlalchemy-101
-  category: data
+  category: ai
   title:
-    ko: SQLAlchemy 101
-    en: SQLAlchemy 101
+    ko: RAG 평가와 벤치마크 101
+    en: RAG Evaluation and Benchmarking 101
   description:
-    ko: SQLAlchemy 2.x를 SQLite 기준으로 다루는 입문 시리즈. Engine·Connection·Core·ORM·Session·Unit of Work·Relationship·Loading 전략·Async·Production 패턴을 배웁니다.
-    en: A beginner-friendly SQLAlchemy 2.x tour using SQLite. Covers Engine, Connection, Core, ORM, Session, Unit of Work, relationships, loading strategies, async, and production patterns.
-  languages:
-  - ko
-  - en
-  status: content-ready
-  path: content/sqlalchemy-101
-
-- id: alembic-101
-  category: data
-  title:
-    ko: Alembic 101
-    en: Alembic 101
-  description:
-    ko: Alembic으로 SQLAlchemy 마이그레이션을 운영하는 입문 시리즈. autogenerate, branch와 merge, 데이터 마이그레이션, downgrade 전략, 배포 순서를 SQLite 기준으로 다룹니다.
-    en: A beginner-friendly Alembic tour for SQLAlchemy migrations using SQLite. Covers autogenerate, branches and merges, data migrations, downgrade strategy, and deploy ordering.
-  languages:
-  - ko
-  - en
-  status: content-ready
-  path: content/alembic-101
-
-- id: python-101
-  category: programming
-  title:
-    ko: Python 101
-    en: Python 101
-  description:
-    ko: Python을 처음 시작하는 사람을 위한 입문 시리즈. 설치와 venv부터 변수, 자료구조, 제어 흐름, 함수, 모듈, 파일 I/O와 예외, 클래스, 표준 라이브러리까지 다룹니다.
-    en: A beginner-friendly Python tour from install and venv through variables, data structures, control flow, functions, modules, file I/O and exceptions, classes, and the standard library.
-  languages:
-  - ko
-  - en
-  status: draft
-  path: content/python-101
-
-- id: computer-science-101
-  category: programming
-  title:
-    ko: Computer Science 101
-    en: Computer Science 101
-  description:
-    ko: 컴퓨터공학 전공에서 배우는 주요 과목들이 서로 어떻게 연결되는지 보여주는 입문 시리즈.
-    en: An introductory series showing how major computer science subjects connect to each other.
+    ko: RAG 품질 평가 6부작 — 평가 데이터셋, 임베딩/리트리버 비교, RAGAS, 의사결정 연결.
+    en: 6-part RAG evaluation guide — datasets, embedding/retriever comparison, RAGAS, product decisions.
   languages:
   - ko
   - en
@@ -211,19 +993,73 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: content-ready
   level: 101
   lifecycle: active
-  path: content/computer-science-101
-
-- id: discrete-math-101
-  category: cs-core
+  path: content/rag-benchmark-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-evaluation-metrics
+        title: RAG 평가 지표 이해
+        status: publish-ready
+      - idx: 2
+        slug: 02-retrieval-benchmarking
+        title: 검색 성능 측정
+        status: publish-ready
+      - idx: 3
+        slug: 03-embedding-comparison
+        title: 임베딩 모델 비교
+        status: publish-ready
+      - idx: 4
+        slug: 04-vectordb-selection
+        title: VectorDB 선택 기준
+        status: publish-ready
+      - idx: 5
+        slug: 05-e2e-evaluation
+        title: 종단 간 RAG 파이프라인 평가
+        status: publish-ready
+      - idx: 6
+        slug: 06-benchmark-complete
+        title: RAG 벤치마크 완성
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-evaluation-metrics
+        title: Understanding RAG evaluation metrics
+        status: publish-ready
+      - idx: 2
+        slug: 02-retrieval-benchmarking
+        title: Measuring retrieval performance
+        status: publish-ready
+      - idx: 3
+        slug: 03-embedding-comparison
+        title: Comparing embedding models
+        status: publish-ready
+      - idx: 4
+        slug: 04-vectordb-selection
+        title: VectorDB selection criteria
+        status: publish-ready
+      - idx: 5
+        slug: 05-e2e-evaluation
+        title: End-to-end RAG pipeline evaluation
+        status: publish-ready
+      - idx: 6
+        slug: 06-benchmark-complete
+        title: Completing the RAG benchmark
+        status: publish-ready
+  track: traffic
+  stage: rag
+- id: rag-deep-dive
+  status: content-ready
+  category: ai
   title:
-    ko: Discrete Math 101
-    en: Discrete Math 101
+    ko: RAG Deep Dive
+    en: RAG Deep Dive
   description:
-    ko: 명제, 집합, 함수, 증명, 조합, 그래프 등 컴퓨터공학에 직접 쓰이는 이산수학을 정리하는 시리즈.
-    en: An introductory series on discrete mathematics for computer science covering propositions, sets, functions, proofs, combinatorics, and graphs.
+    ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
+    en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
   languages:
   - ko
   - en
@@ -233,19 +1069,73 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: content-ready
-  level: 101
+  level: 301
   lifecycle: active
-  path: content/discrete-math-101
-
-- id: data-structures-101
-  category: cs-core
+  path: content/rag-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-document-loading-and-chunking
+        title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
+        status: publish-ready
+      - idx: 2
+        slug: 02-embeddings-and-vector-index
+        title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
+        status: publish-ready
+      - idx: 3
+        slug: 03-retriever-design
+        title: Retriever 설계 — VectorStoreRetriever와 MMR
+        status: publish-ready
+      - idx: 4
+        slug: 04-prompt-construction-and-context-injection
+        title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
+        status: publish-ready
+      - idx: 5
+        slug: 05-rag-chain-assembly
+        title: RAG Chain 조립 — RetrievalQA vs LCEL
+        status: publish-ready
+      - idx: 6
+        slug: 06-evaluation-and-quality-gates
+        title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-document-loading-and-chunking
+        title: Document Loading and Chunking — Inside LangChain TextSplitter
+        status: publish-ready
+      - idx: 2
+        slug: 02-embeddings-and-vector-index
+        title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
+        status: publish-ready
+      - idx: 3
+        slug: 03-retriever-design
+        title: Retriever Design — VectorStoreRetriever and MMR
+        status: publish-ready
+      - idx: 4
+        slug: 04-prompt-construction-and-context-injection
+        title: Prompt Construction and Context Injection — Inside PromptTemplate
+        status: publish-ready
+      - idx: 5
+        slug: 05-rag-chain-assembly
+        title: Assembling the RAG Chain — RetrievalQA vs LCEL
+        status: publish-ready
+      - idx: 6
+        slug: 06-evaluation-and-quality-gates
+        title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
+        status: publish-ready
+  track: authority
+  stage: internals
+- id: vector-search-101
+  status: content-ready
+  category: ai
   title:
-    ko: Data Structures 101
-    en: Data Structures 101
+    ko: 벡터 검색 101
+    en: Vector Search 101
   description:
-    ko: 배열, 리스트, 스택, 큐, 해시, 트리, 힙, 그래프까지 자료구조의 큰 그림과 선택 기준을 다루는 시리즈.
-    en: An introductory series covering arrays, lists, stacks, queues, hash tables, trees, heaps, graphs, and how to choose the right data structure.
+    ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
+    en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
   languages:
   - ko
   - en
@@ -255,11 +1145,107 @@ series:
     medium: true
     mkdocs: true
     ebook: true
-  status: content-ready
   level: 101
   lifecycle: active
-  path: content/data-structures-101
+  path: content/vector-search-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-embedding
+        title: 01-what-is-embedding
+        status: publish-ready
+      - idx: 2
+        slug: 02-huggingface-embeddings
+        title: 02-huggingface-embeddings
+        status: publish-ready
+      - idx: 3
+        slug: 03-cosine-similarity
+        title: 03-cosine-similarity
+        status: publish-ready
+      - idx: 4
+        slug: 04-faiss-fundamentals
+        title: 04-faiss-fundamentals
+        status: publish-ready
+      - idx: 5
+        slug: 05-chunking-strategies
+        title: 05-chunking-strategies
+        status: publish-ready
+      - idx: 6
+        slug: 06-vector-search-pipeline
+        title: 06-vector-search-pipeline
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-embedding
+        title: 01-what-is-embedding
+        status: publish-ready
+      - idx: 2
+        slug: 02-huggingface-embeddings
+        title: 02-huggingface-embeddings
+        status: publish-ready
+      - idx: 3
+        slug: 03-cosine-similarity
+        title: 03-cosine-similarity
+        status: publish-ready
+      - idx: 4
+        slug: 04-faiss-fundamentals
+        title: 04-faiss-fundamentals
+        status: publish-ready
+      - idx: 5
+        slug: 05-chunking-strategies
+        title: 05-chunking-strategies
+        status: publish-ready
+      - idx: 6
+        slug: 06-vector-search-pipeline
+        title: 06-vector-search-pipeline
+        status: publish-ready
+  track: traffic
+  stage: search
+- id: algorithms-python-101
+  status: content-ready
+  category: python
+  title:
+    ko: Algorithms with Python 101
+    en: Algorithms with Python 101
+  description:
+    ko: Python 기반으로 시간 복잡도, 탐색, 정렬, DP, BFS/DFS, 그리디 등 알고리즘 기본기를 다지는 시리즈.
+    en: A beginner series on algorithm fundamentals in Python covering time complexity, searching, sorting, recursion, dynamic programming, and greedy algorithms.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/algorithms-python-101
 
+- id: data-structures-python-101
+  status: content-ready
+  category: python
+  title:
+    ko: Data Structures with Python 101
+    en: Data Structures with Python 101
+  description:
+    ko: Python으로 배우는 자료구조 입문. list, dict, set, deque, 트리, 힙, 그래프를 직접 구현합니다.
+    en: A hands-on introduction to data structures in Python covering list, dict, set, deque, trees, heaps, and graphs.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/data-structures-python-101
 
 - id: algorithms-101
   category: cs-core
@@ -284,6 +1270,50 @@ series:
   path: content/algorithms-101
 
 
+- id: calculus-for-ml-101
+  category: cs-core
+  title:
+    ko: Calculus for ML 101
+    en: Calculus for ML 101
+  description:
+    ko: 함수, 기울기, 편미분, gradient, chain rule, 손실, 경사하강, backprop 직관까지 ML에 필요한 미분을 다지는 입문 시리즈.
+    en: An entry series covering functions, slopes, partial derivatives, gradients, chain rule, loss, gradient descent, and backprop intuition for ML.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/calculus-for-ml-101
+
+- id: compilers-101
+  category: cs-core
+  title:
+    ko: Compilers 101
+    en: Compilers 101
+  description:
+    ko: lexer, parser, AST, semantic analysis, IR, optimization, code generation까지 컴파일러 파이프라인을 처음 배우는 시리즈.
+    en: A first walk through the compiler pipeline — lexer, parser, AST, semantic analysis, IR, optimization, and code generation.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/compilers-101
+
 - id: computer-architecture-101
   category: cs-core
   title:
@@ -305,29 +1335,6 @@ series:
   level: 101
   lifecycle: active
   path: content/computer-architecture-101
-
-
-- id: operating-systems-101
-  category: cs-core
-  title:
-    ko: Operating Systems 101
-    en: Operating Systems 101
-  description:
-    ko: 프로세스, 스레드, 스케줄링, 동시성, 메모리 관리, 가상 메모리, 파일 시스템, 시스템 콜, 컨테이너까지 운영체제의 기본 개념을 다지는 시리즈.
-    en: A foundational series on operating systems covering processes, threads, scheduling, concurrency, memory management, virtual memory, file systems, system calls, and containers.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/operating-systems-101
 
 
 - id: computer-networks-101
@@ -352,6 +1359,51 @@ series:
   lifecycle: active
   path: content/computer-networks-101
 
+- id: computer-science-major-101
+  category: cs-core
+  title:
+    ko: 컴퓨터학과 전공 학습 가이드 101
+    en: Computer Science Major 101
+  description:
+    ko: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 순서, 졸업 전 역량까지 정리한 입문 시리즈.
+    en: An introductory series on computer science major curriculum, core areas, study order, and graduation skills.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-science-major-101
+
+- id: data-structures-101
+  category: cs-core
+  title:
+    ko: Data Structures 101
+    en: Data Structures 101
+  description:
+    ko: 배열, 리스트, 스택, 큐, 해시, 트리, 힙, 그래프까지 자료구조의 큰 그림과 선택 기준을 다루는 시리즈.
+    en: An introductory series covering arrays, lists, stacks, queues, hash tables, trees, heaps, graphs, and how to choose the right data structure.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-structures-101
+
+
 - id: database-systems-101
   category: cs-core
   title:
@@ -374,14 +1426,14 @@ series:
   lifecycle: active
   path: content/database-systems-101
 
-- id: programming-languages-101
+- id: discrete-math-101
   category: cs-core
   title:
-    ko: Programming Languages 101
-    en: Programming Languages 101
+    ko: Discrete Math 101
+    en: Discrete Math 101
   description:
-    ko: syntax, semantics, type system, scope, closure, memory model, interpreter/compiler 차이까지 PL 기초를 다지는 시리즈.
-    en: A foundational series on programming languages — syntax, semantics, type systems, scope, closures, memory model, and the interpreter vs compiler distinction.
+    ko: 명제, 집합, 함수, 증명, 조합, 그래프 등 컴퓨터공학에 직접 쓰이는 이산수학을 정리하는 시리즈.
+    en: An introductory series on discrete mathematics for computer science covering propositions, sets, functions, proofs, combinatorics, and graphs.
   languages:
   - ko
   - en
@@ -394,29 +1446,7 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/programming-languages-101
-
-- id: compilers-101
-  category: cs-core
-  title:
-    ko: Compilers 101
-    en: Compilers 101
-  description:
-    ko: lexer, parser, AST, semantic analysis, IR, optimization, code generation까지 컴파일러 파이프라인을 처음 배우는 시리즈.
-    en: A first walk through the compiler pipeline — lexer, parser, AST, semantic analysis, IR, optimization, and code generation.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/compilers-101
+  path: content/discrete-math-101
 
 - id: distributed-systems-101
   category: cs-core
@@ -439,28 +1469,6 @@ series:
   level: 101
   lifecycle: active
   path: content/distributed-systems-101
-
-- id: incident-response-101
-  category: software-engineering
-  title:
-    ko: Incident Response 101
-    en: Incident Response 101
-  description:
-    ko: Severity 분류, 초기 대응, 커뮤니케이션, 타임라인, RCA, 완화, 포스트모템, 재발 방지, 런북 작성까지 다루는 입문 시리즈.
-    en: An entry series covering severity, initial response, communication, timelines, RCA, mitigation, postmortems, prevention, and runbooks.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/incident-response-101
 
 - id: information-security-101
   category: cs-core
@@ -506,14 +1514,14 @@ series:
   lifecycle: active
   path: content/math-for-cs-101
 
-- id: calculus-for-ml-101
+- id: operating-systems-101
   category: cs-core
   title:
-    ko: Calculus for ML 101
-    en: Calculus for ML 101
+    ko: Operating Systems 101
+    en: Operating Systems 101
   description:
-    ko: 함수, 기울기, 편미분, gradient, chain rule, 손실, 경사하강, backprop 직관까지 ML에 필요한 미분을 다지는 입문 시리즈.
-    en: An entry series covering functions, slopes, partial derivatives, gradients, chain rule, loss, gradient descent, and backprop intuition for ML.
+    ko: 프로세스, 스레드, 스케줄링, 동시성, 메모리 관리, 가상 메모리, 파일 시스템, 시스템 콜, 컨테이너까지 운영체제의 기본 개념을 다지는 시리즈.
+    en: A foundational series on operating systems covering processes, threads, scheduling, concurrency, memory management, virtual memory, file systems, system calls, and containers.
   languages:
   - ko
   - en
@@ -526,16 +1534,17 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/calculus-for-ml-101
+  path: content/operating-systems-101
 
-- id: computer-science-major-101
+
+- id: programming-languages-101
   category: cs-core
   title:
-    ko: 컴퓨터학과 전공 학습 가이드 101
-    en: Computer Science Major 101
+    ko: Programming Languages 101
+    en: Programming Languages 101
   description:
-    ko: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 순서, 졸업 전 역량까지 정리한 입문 시리즈.
-    en: An introductory series on computer science major curriculum, core areas, study order, and graduation skills.
+    ko: syntax, semantics, type system, scope, closure, memory model, interpreter/compiler 차이까지 PL 기초를 다지는 시리즈.
+    en: A foundational series on programming languages — syntax, semantics, type systems, scope, closures, memory model, and the interpreter vs compiler distinction.
   languages:
   - ko
   - en
@@ -548,202 +1557,7 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/computer-science-major-101
-
-- id: capstone-project-101
-  category: software-engineering
-  title:
-    ko: 측스톤 프로젝트 101
-    en: Capstone Project 101
-  description:
-    ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 측스톤 전체 흐름을 다룬 입문 시리즈.
-    en: An introductory series covering the full capstone flow — topic, problem, MVP, team roles, demo, and retrospective.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/capstone-project-101
-
-- id: portfolio-project-101
-  category: software-engineering
-  title:
-    ko: 포트폴리오 프로젝트 101
-    en: Portfolio Project 101
-  description:
-    ko: 프로젝트 선정, README, 데모, 배포, 테스트, 의사결정 기록, 블로그, 면접 설명까지 다루는 입문 포트폴리오 시리즈.
-    en: An introductory portfolio series covering project selection, README, demo, deploy, tests, decisions, blog, and interviews.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/portfolio-project-101
-
-- id: open-source-101
-  category: software-engineering
-  title:
-    ko: 오픈소스 101
-    en: Open Source 101
-  description:
-    ko: 라이선스부터 첫 오픈소스 프로젝트까지, 오픈소스 기여의 기본을 다지는 시리즈.
-    en: An entry series covering open source contribution from licenses to your first project.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/open-source-101
-- id: developer-career-101
-  category: software-engineering
-  title:
-    ko: Developer Career 101
-    en: Developer Career 101
-  description:
-    ko: 개발자 커리어를 설계하는 법.
-    en: How to design a developer career.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/developer-career-101
-- id: data-science-career-101
-  category: software-engineering
-  title:
-    ko: Data Science Career 101
-    en: Data Science Career 101
-  description:
-    ko: 데이터 직무 커리어를 설계하는 법.
-    en: How to design a data science career.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/data-science-career-101
-- id: software-engineering-101
-  category: software-engineering
-  title:
-    ko: Software Engineering 101
-    en: Software Engineering 101
-  description:
-    ko: 요구사항, 설계, 코드 리뷰, 테스트, 버전 관리, 문서화, 협업, 유지보수까지 소프트웨어 엔지니어링의 큰 그림을 다지는 시리즈.
-    en: The big picture of software engineering — requirements, design, code review, testing, version control, documentation, collaboration, and maintenance.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/software-engineering-101
-
-- id: clean-code-101
-  category: software-engineering
-  title:
-    ko: Clean Code 101
-    en: Clean Code 101
-  description:
-    ko: 이름 짓기, 함수 분리, 조건문 단순화, 중복 제거, 오류 처리부터 리팩토링 기초까지 읽기 쉬운 코드를 쓰는 법을 다지는 시리즈.
-    en: Naming, small functions, simplifying conditionals, removing duplication, error handling, and refactoring fundamentals — practical Clean Code in ten essays.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/clean-code-101
-
-- id: software-design-101
-  category: software-engineering
-  title:
-    ko: Software Design 101
-    en: Software Design 101
-  description:
-    ko: 관심사 분리, 모듈 경계, 의존성 방향, 인터페이스 설계, 계층 아키텍처를 통해 변경에 강한 코드를 설계하는 법을 다지는 시리즈.
-    en: Separation of concerns, module boundaries, dependency direction, interface design, and layered architecture — designing code that is easy to change.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/software-design-101
-
-- id: design-patterns-101
-  category: software-engineering
-  title:
-    ko: Design Patterns 101
-    en: Design Patterns 101
-  description:
-    ko: GoF 디자인 패턴을 Python 예시로 빠르게 훑고, 언제 쓰고 언제 피해야 할지 감을 잡는 시리즈.
-    en: A fast tour of the GoF design patterns in Python, with a clear sense of when to use them and when to avoid them.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/design-patterns-101
+  path: content/programming-languages-101
 
 - id: api-design-101
   category: software-engineering
@@ -768,29 +1582,6 @@ series:
   path: content/api-design-101
 
 
-- id: web-development-101
-  category: software-engineering
-  title:
-    ko: Web Development 101
-    en: Web Development 101
-  description:
-    ko: HTML/CSS/JS, 브라우저, HTTP, 프론트/백엔드, 인증, DB, 배포까지 웹 개발 전체 흐름을 한 번에 보는 시리즈.
-    en: A whole-picture tour of web development — HTML/CSS/JS, the browser, HTTP, frontend and backend, auth, databases, and deployment.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/web-development-101
-
-
 - id: backend-development-101
   category: software-engineering
   title:
@@ -813,14 +1604,14 @@ series:
   lifecycle: active
   path: content/backend-development-101
 
-- id: frontend-development-101
+- id: capstone-project-101
   category: software-engineering
   title:
-    ko: Frontend Development 101
-    en: Frontend Development 101
+    ko: 측스톤 프로젝트 101
+    en: Capstone Project 101
   description:
-    ko: HTML/CSS, JavaScript, 컴포넌트, 라우팅, API 호출, 빌드까지 현대 프론트엔드 개발 전체 흐름을 다루는 시리즈.
-    en: An end-to-end tour of modern frontend development — HTML/CSS, JavaScript, components, routing, API calls, and bundling.
+    ko: 주제 선정, 문제 정의, MVP, 팀 역할, 발표, 회고까지 측스톤 전체 흐름을 다룬 입문 시리즈.
+    en: An introductory series covering the full capstone flow — topic, problem, MVP, team roles, demo, and retrospective.
   languages:
   - ko
   - en
@@ -833,16 +1624,16 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/frontend-development-101
+  path: content/capstone-project-101
 
-- id: testing-101
+- id: clean-code-101
   category: software-engineering
   title:
-    ko: Testing 101
-    en: Testing 101
+    ko: Clean Code 101
+    en: Clean Code 101
   description:
-    ko: Unit, Integration, E2E, Test Double, Mock, Coverage, CI 연동까지 테스트 전략 전반을 다루는 시리즈.
-    en: A complete tour of testing strategy — unit, integration, E2E, test doubles, mocks, coverage, and CI.
+    ko: 이름 짓기, 함수 분리, 조건문 단순화, 중복 제거, 오류 처리부터 리팩토링 기초까지 읽기 쉬운 코드를 쓰는 법을 다지는 시리즈.
+    en: Naming, small functions, simplifying conditionals, removing duplication, error handling, and refactoring fundamentals — practical Clean Code in ten essays.
   languages:
   - ko
   - en
@@ -855,117 +1646,7 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/testing-101
-
-- id: devops-101
-  category: software-engineering
-  title:
-    ko: DevOps 101
-    en: DevOps 101
-  description:
-    ko: CI/CD, IaC, 환경 관리, 모니터링, 배포 전략, on-call까지 DevOps 입문 전반을 다루는 시리즈.
-    en: A DevOps starter — CI/CD, IaC, environment management, monitoring, deployment strategy, and on-call basics.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/devops-101
-
-- id: github-actions-101
-  category: software-engineering
-  title:
-    ko: GitHub Actions 101
-    en: GitHub Actions 101
-  description:
-    ko: Workflow, Job, Trigger, 테스트 자동화, 빌드 아티팩트, 배포, secret 관리까지 GitHub Actions 전반을 다루는 시리즈.
-    en: Workflows, jobs, triggers, test automation, build artifacts, deployment, and secrets — a complete GitHub Actions starter.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/github-actions-101
-
-- id: docker-101
-  category: software-engineering
-  title:
-    ko: Docker 101
-    en: Docker 101
-  description:
-    ko: Image, Container, Dockerfile, Volume, Network, Compose, 환경 설정, Python 앱 컨테이너화, 이미지 최적화, 배포 구성을 다루는 입문 시리즈.
-    en: Images, containers, Dockerfile, volumes, networks, Compose, configuration, Python apps, image optimization, and production-ready deploy.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/docker-101
-
-- id: observability-101
-  category: software-engineering
-  title:
-    ko: Observability 101
-    en: Observability 101
-  description:
-    ko: Metric, log, trace, dashboard, alert, SLO 기초까지 운영 시스템의 가시성을 만드는 입문 시리즈.
-    en: Metrics, logs, traces, dashboards, alerts, and SLO basics to make production systems observable.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/observability-101
-
-- id: secure-coding-101
-  category: software-engineering
-  title:
-    ko: Secure Coding 101
-    en: Secure Coding 101
-  description:
-    ko: 입력 검증, 인증, 인가, secret 관리, SQL Injection, XSS/CSRF, dependency 취약점, 안전한 로깅까지 시큐어 코딩 입문 시리즈.
-    en: A beginner guide to secure coding covering input validation, auth, authz, secret management, SQL Injection, XSS/CSRF, dependency vulnerabilities, and safe logging.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/secure-coding-101
+  path: content/clean-code-101
 
 - id: cloud-computing-101
   category: software-engineering
@@ -1011,6 +1692,180 @@ series:
   lifecycle: active
   path: content/containers-101
 
+- id: data-science-career-101
+  category: software-engineering
+  title:
+    ko: Data Science Career 101
+    en: Data Science Career 101
+  description:
+    ko: 데이터 직무 커리어를 설계하는 법.
+    en: How to design a data science career.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/data-science-career-101
+- id: design-patterns-101
+  category: software-engineering
+  title:
+    ko: Design Patterns 101
+    en: Design Patterns 101
+  description:
+    ko: GoF 디자인 패턴을 Python 예시로 빠르게 훑고, 언제 쓰고 언제 피해야 할지 감을 잡는 시리즈.
+    en: A fast tour of the GoF design patterns in Python, with a clear sense of when to use them and when to avoid them.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/design-patterns-101
+
+- id: developer-career-101
+  category: software-engineering
+  title:
+    ko: Developer Career 101
+    en: Developer Career 101
+  description:
+    ko: 개발자 커리어를 설계하는 법.
+    en: How to design a developer career.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/developer-career-101
+- id: devops-101
+  category: software-engineering
+  title:
+    ko: DevOps 101
+    en: DevOps 101
+  description:
+    ko: CI/CD, IaC, 환경 관리, 모니터링, 배포 전략, on-call까지 DevOps 입문 전반을 다루는 시리즈.
+    en: A DevOps starter — CI/CD, IaC, environment management, monitoring, deployment strategy, and on-call basics.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/devops-101
+
+- id: docker-101
+  category: software-engineering
+  title:
+    ko: Docker 101
+    en: Docker 101
+  description:
+    ko: Image, Container, Dockerfile, Volume, Network, Compose, 환경 설정, Python 앱 컨테이너화, 이미지 최적화, 배포 구성을 다루는 입문 시리즈.
+    en: Images, containers, Dockerfile, volumes, networks, Compose, configuration, Python apps, image optimization, and production-ready deploy.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/docker-101
+
+- id: frontend-development-101
+  category: software-engineering
+  title:
+    ko: Frontend Development 101
+    en: Frontend Development 101
+  description:
+    ko: HTML/CSS, JavaScript, 컴포넌트, 라우팅, API 호출, 빌드까지 현대 프론트엔드 개발 전체 흐름을 다루는 시리즈.
+    en: An end-to-end tour of modern frontend development — HTML/CSS, JavaScript, components, routing, API calls, and bundling.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/frontend-development-101
+
+- id: github-actions-101
+  category: software-engineering
+  title:
+    ko: GitHub Actions 101
+    en: GitHub Actions 101
+  description:
+    ko: Workflow, Job, Trigger, 테스트 자동화, 빌드 아티팩트, 배포, secret 관리까지 GitHub Actions 전반을 다루는 시리즈.
+    en: Workflows, jobs, triggers, test automation, build artifacts, deployment, and secrets — a complete GitHub Actions starter.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/github-actions-101
+
+- id: incident-response-101
+  category: software-engineering
+  title:
+    ko: Incident Response 101
+    en: Incident Response 101
+  description:
+    ko: Severity 분류, 초기 대응, 커뮤니케이션, 타임라인, RCA, 완화, 포스트모템, 재발 방지, 런북 작성까지 다루는 입문 시리즈.
+    en: An entry series covering severity, initial response, communication, timelines, RCA, mitigation, postmortems, prevention, and runbooks.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/incident-response-101
+
 - id: kubernetes-101
   category: software-engineering
   title:
@@ -1032,6 +1887,93 @@ series:
   level: 101
   lifecycle: active
   path: content/kubernetes-101
+
+- id: observability-101
+  category: software-engineering
+  title:
+    ko: Observability 101
+    en: Observability 101
+  description:
+    ko: Metric, log, trace, dashboard, alert, SLO 기초까지 운영 시스템의 가시성을 만드는 입문 시리즈.
+    en: Metrics, logs, traces, dashboards, alerts, and SLO basics to make production systems observable.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/observability-101
+
+- id: open-source-101
+  category: software-engineering
+  title:
+    ko: 오픈소스 101
+    en: Open Source 101
+  description:
+    ko: 라이선스부터 첫 오픈소스 프로젝트까지, 오픈소스 기여의 기본을 다지는 시리즈.
+    en: An entry series covering open source contribution from licenses to your first project.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/open-source-101
+- id: portfolio-project-101
+  category: software-engineering
+  title:
+    ko: 포트폴리오 프로젝트 101
+    en: Portfolio Project 101
+  description:
+    ko: 프로젝트 선정, README, 데모, 배포, 테스트, 의사결정 기록, 블로그, 면접 설명까지 다루는 입문 포트폴리오 시리즈.
+    en: An introductory portfolio series covering project selection, README, demo, deploy, tests, decisions, blog, and interviews.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/portfolio-project-101
+
+- id: secure-coding-101
+  category: software-engineering
+  title:
+    ko: Secure Coding 101
+    en: Secure Coding 101
+  description:
+    ko: 입력 검증, 인증, 인가, secret 관리, SQL Injection, XSS/CSRF, dependency 취약점, 안전한 로깅까지 시큐어 코딩 입문 시리즈.
+    en: A beginner guide to secure coding covering input validation, auth, authz, secret management, SQL Injection, XSS/CSRF, dependency vulnerabilities, and safe logging.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/secure-coding-101
 
 - id: serverless-101
   category: software-engineering
@@ -1055,6 +1997,50 @@ series:
   lifecycle: active
   path: content/serverless-101
 
+- id: software-design-101
+  category: software-engineering
+  title:
+    ko: Software Design 101
+    en: Software Design 101
+  description:
+    ko: 관심사 분리, 모듈 경계, 의존성 방향, 인터페이스 설계, 계층 아키텍처를 통해 변경에 강한 코드를 설계하는 법을 다지는 시리즈.
+    en: Separation of concerns, module boundaries, dependency direction, interface design, and layered architecture — designing code that is easy to change.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/software-design-101
+
+- id: software-engineering-101
+  category: software-engineering
+  title:
+    ko: Software Engineering 101
+    en: Software Engineering 101
+  description:
+    ko: 요구사항, 설계, 코드 리뷰, 테스트, 버전 관리, 문서화, 협업, 유지보수까지 소프트웨어 엔지니어링의 큰 그림을 다지는 시리즈.
+    en: The big picture of software engineering — requirements, design, code review, testing, version control, documentation, collaboration, and maintenance.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/software-engineering-101
+
 - id: sre-101
   category: software-engineering
   title:
@@ -1077,14 +2063,14 @@ series:
   lifecycle: active
   path: content/sre-101
 
-- id: sql-101
-  category: database-data
+- id: testing-101
+  category: software-engineering
   title:
-    ko: SQL 101
-    en: SQL 101
+    ko: Testing 101
+    en: Testing 101
   description:
-    ko: SELECT, JOIN, GROUP BY, subquery, window function, DML, index 기초까지 분석/개발에 바로 쓰는 SQL 입문 시리즈.
-    en: A practical SQL series covering SELECT, JOIN, GROUP BY, subqueries, window functions, DML, and index basics for analysts and junior developers.
+    ko: Unit, Integration, E2E, Test Double, Mock, Coverage, CI 연동까지 테스트 전략 전반을 다루는 시리즈.
+    en: A complete tour of testing strategy — unit, integration, E2E, test doubles, mocks, coverage, and CI.
   languages:
   - ko
   - en
@@ -1097,16 +2083,16 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/sql-101
+  path: content/testing-101
 
-- id: data-warehouse-101
-  category: database-data
+- id: web-development-101
+  category: software-engineering
   title:
-    ko: Data Warehouse 101
-    en: Data Warehouse 101
+    ko: Web Development 101
+    en: Web Development 101
   description:
-    ko: OLTP/OLAP, Fact와 Dimension, Star Schema, Partition, ETL/ELT, BI 연동까지 분석을 위한 데이터 저장소를 설계하는 시리즈.
-    en: A practical Data Warehouse series covering OLTP/OLAP, fact and dimension tables, star schema, partitioning, ETL/ELT, and BI integration.
+    ko: HTML/CSS/JS, 브라우저, HTTP, 프론트/백엔드, 인증, DB, 배포까지 웹 개발 전체 흐름을 한 번에 보는 시리즈.
+    en: A whole-picture tour of web development — HTML/CSS/JS, the browser, HTTP, frontend and backend, auth, databases, and deployment.
   languages:
   - ko
   - en
@@ -1119,7 +2105,50 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/data-warehouse-101
+  path: content/web-development-101
+
+
+- id: alembic-101
+  category: data
+  title:
+    ko: Alembic 101
+    en: Alembic 101
+  description:
+    ko: Alembic으로 SQLAlchemy 마이그레이션을 운영하는 입문 시리즈. autogenerate, branch와 merge, 데이터 마이그레이션, downgrade 전략, 배포 순서를 SQLite 기준으로 다룹니다.
+    en: A beginner-friendly Alembic tour for SQLAlchemy migrations using SQLite. Covers autogenerate, branches and merges, data migrations, downgrade strategy, and deploy ordering.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  path: content/alembic-101
+
+- id: python-dbapi-101
+  category: data
+  title:
+    ko: Python DB-API 101
+    en: Python DB-API 101
+  description:
+    ko: Python의 표준 데이터베이스 인터페이스 PEP 249(DB-API 2.0)를 SQLite 기준으로 다루는 입문 시리즈.
+    en: A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite, covering connection lifecycle, transactions, error handling, async, and production patterns.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  path: content/python-dbapi-101
+
+- id: sqlalchemy-101
+  category: data
+  title:
+    ko: SQLAlchemy 101
+    en: SQLAlchemy 101
+  description:
+    ko: SQLAlchemy 2.x를 SQLite 기준으로 다루는 입문 시리즈. Engine·Connection·Core·ORM·Session·Unit of Work·Relationship·Loading 전략·Async·Production 패턴을 배웁니다.
+    en: A beginner-friendly SQLAlchemy 2.x tour using SQLite. Covers Engine, Connection, Core, ORM, Session, Unit of Work, relationships, loading strategies, async, and production patterns.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  path: content/sqlalchemy-101
 
 - id: data-science-101
   category: database-data
@@ -1143,14 +2172,14 @@ series:
   lifecycle: active
   path: content/data-science-101
 
-- id: statistics-101
+- id: data-warehouse-101
   category: database-data
   title:
-    ko: Statistics 101
-    en: Statistics 101
+    ko: Data Warehouse 101
+    en: Data Warehouse 101
   description:
-    ko: 기술 통계, 분포, 추정, 신뢰구간, 가설검정, 회귀까지 데이터 분석에 필요한 통계의 큰 그림을 다지는 시리즈.
-    en: A Statistics series covering descriptive statistics, distributions, estimation, confidence intervals, hypothesis testing, and regression end to end.
+    ko: OLTP/OLAP, Fact와 Dimension, Star Schema, Partition, ETL/ELT, BI 연동까지 분석을 위한 데이터 저장소를 설계하는 시리즈.
+    en: A practical Data Warehouse series covering OLTP/OLAP, fact and dimension tables, star schema, partitioning, ETL/ELT, and BI integration.
   languages:
   - ko
   - en
@@ -1163,29 +2192,7 @@ series:
   status: content-ready
   level: 101
   lifecycle: active
-  path: content/statistics-101
-
-- id: probability-101
-  category: database-data
-  title:
-    ko: Probability 101
-    en: Probability 101
-  description:
-    ko: 사건, 조건부확률, 베이즈 정리, 확률변수, 분포, 중심극한정리까지 ML 기초로 이어지는 확률을 다지는 시리즈.
-    en: A Probability series covering events, conditional probability, Bayes' theorem, random variables, distributions, and the Central Limit Theorem as the bridge to ML.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/probability-101
+  path: content/data-warehouse-101
 
 - id: linear-algebra-101
   category: database-data
@@ -1208,6 +2215,28 @@ series:
   level: 101
   lifecycle: active
   path: content/linear-algebra-101
+
+- id: machine-learning-101
+  category: database-data
+  title:
+    ko: Machine Learning 101
+    en: Machine Learning 101
+  description:
+    ko: 지도/비지도, train/test, 회귀, 분류, 트리, 군집, regularization, 평가까지 ML 전체 흐름을 다지는 시리즈.
+    en: A complete ML walkthrough — supervised/unsupervised, train/test, regression, classification, trees, clustering, regularization, and evaluation.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/machine-learning-101
 
 - id: mlops-101
   category: database-data
@@ -1253,28 +2282,6 @@ series:
   lifecycle: active
   path: content/model-evaluation-101
 
-- id: machine-learning-101
-  category: database-data
-  title:
-    ko: Machine Learning 101
-    en: Machine Learning 101
-  description:
-    ko: 지도/비지도, train/test, 회귀, 분류, 트리, 군집, regularization, 평가까지 ML 전체 흐름을 다지는 시리즈.
-    en: A complete ML walkthrough — supervised/unsupervised, train/test, regression, classification, trees, clustering, regularization, and evaluation.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  status: content-ready
-  level: 101
-  lifecycle: active
-  path: content/machine-learning-101
-
 - id: pandas-101
   category: database-data
   title:
@@ -1296,6 +2303,94 @@ series:
   level: 101
   lifecycle: active
   path: content/pandas-101
+
+- id: probability-101
+  category: database-data
+  title:
+    ko: Probability 101
+    en: Probability 101
+  description:
+    ko: 사건, 조건부확률, 베이즈 정리, 확률변수, 분포, 중심극한정리까지 ML 기초로 이어지는 확률을 다지는 시리즈.
+    en: A Probability series covering events, conditional probability, Bayes' theorem, random variables, distributions, and the Central Limit Theorem as the bridge to ML.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/probability-101
+
+- id: sql-101
+  category: database-data
+  title:
+    ko: SQL 101
+    en: SQL 101
+  description:
+    ko: SELECT, JOIN, GROUP BY, subquery, window function, DML, index 기초까지 분석/개발에 바로 쓰는 SQL 입문 시리즈.
+    en: A practical SQL series covering SELECT, JOIN, GROUP BY, subqueries, window functions, DML, and index basics for analysts and junior developers.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/sql-101
+
+- id: statistics-101
+  category: database-data
+  title:
+    ko: Statistics 101
+    en: Statistics 101
+  description:
+    ko: 기술 통계, 분포, 추정, 신뢰구간, 가설검정, 회귀까지 데이터 분석에 필요한 통계의 큰 그림을 다지는 시리즈.
+    en: A Statistics series covering descriptive statistics, distributions, estimation, confidence intervals, hypothesis testing, and regression end to end.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/statistics-101
+
+- id: computer-science-101
+  category: programming
+  title:
+    ko: Computer Science 101
+    en: Computer Science 101
+  description:
+    ko: 컴퓨터공학 전공에서 배우는 주요 과목들이 서로 어떻게 연결되는지 보여주는 입문 시리즈.
+    en: An introductory series showing how major computer science subjects connect to each other.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  status: content-ready
+  level: 101
+  lifecycle: active
+  path: content/computer-science-101
 
 - id: git-github-101
   category: programming
@@ -1324,6 +2419,126 @@ series:
   - en
   status: content-ready
   path: content/linux-cli-101
+
+- id: pytest-101
+  category: programming
+  title:
+    ko: pytest 101
+    en: pytest 101
+  description:
+    ko: pytest의 기본 문법, fixture, parametrization, mock, coverage, CI 연동까지 배우는 실전 테스트 입문 시리즈.
+    en: A beginner series on pytest covering assertions, fixtures, parametrization, mocking, coverage, and CI integration.
+  languages:
+  - ko
+  - en
+  status: content-ready
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/pytest-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-why-write-tests
+        title: 왜 테스트를 작성해야 할까?
+        status: content-ready
+      - idx: 2
+        slug: 02-first-pytest-test
+        title: 첫 번째 pytest 테스트 작성하기
+        status: content-ready
+      - idx: 3
+        slug: 03-assert-and-exceptions
+        title: assert와 예외 테스트
+        status: content-ready
+      - idx: 4
+        slug: 04-fixtures
+        title: fixture 이해하기
+        status: content-ready
+      - idx: 5
+        slug: 05-parametrization
+        title: parametrization으로 테스트 케이스 늘리기
+        status: content-ready
+      - idx: 6
+        slug: 06-mock-and-monkeypatch
+        title: mock과 monkeypatch
+        status: content-ready
+      - idx: 7
+        slug: 07-testing-files-env-time
+        title: 파일, 환경변수, 시간 테스트하기
+        status: content-ready
+      - idx: 8
+        slug: 08-coverage
+        title: coverage와 테스트 품질 보기
+        status: content-ready
+      - idx: 9
+        slug: 09-ci-with-github-actions
+        title: GitHub Actions에서 테스트 자동화하기
+        status: content-ready
+      - idx: 10
+        slug: 10-testable-code
+        title: 테스트하기 쉬운 코드 구조 만들기
+        status: content-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-why-write-tests
+        title: Why Write Tests?
+        status: content-ready
+      - idx: 2
+        slug: 02-first-pytest-test
+        title: Writing Your First pytest Test
+        status: content-ready
+      - idx: 3
+        slug: 03-assert-and-exceptions
+        title: Assert and Exception Testing
+        status: content-ready
+      - idx: 4
+        slug: 04-fixtures
+        title: Understanding Fixtures
+        status: content-ready
+      - idx: 5
+        slug: 05-parametrization
+        title: Parametrization
+        status: content-ready
+      - idx: 6
+        slug: 06-mock-and-monkeypatch
+        title: Mock and Monkeypatch
+        status: content-ready
+      - idx: 7
+        slug: 07-testing-files-env-time
+        title: Testing Files, Environment Variables, and Time
+        status: content-ready
+      - idx: 8
+        slug: 08-coverage
+        title: Coverage and Test Quality
+        status: content-ready
+      - idx: 9
+        slug: 09-ci-with-github-actions
+        title: Test Automation with GitHub Actions
+        status: content-ready
+      - idx: 10
+        slug: 10-testable-code
+        title: Writing Testable Code
+        status: content-ready
+- id: python-101
+  category: programming
+  title:
+    ko: Python 101
+    en: Python 101
+  description:
+    ko: Python을 처음 시작하는 사람을 위한 입문 시리즈. 설치와 venv부터 변수, 자료구조, 제어 흐름, 함수, 모듈, 파일 I/O와 예외, 클래스, 표준 라이브러리까지 다룹니다.
+    en: A beginner-friendly Python tour from install and venv through variables, data structures, control flow, functions, modules, file I/O and exceptions, classes, and the standard library.
+  languages:
+  - ko
+  - en
+  status: draft
+  path: content/python-101
 
 - id: python-package-101
   category: programming
@@ -1431,18 +2646,18 @@ series:
         slug: 10-package-template
         title: Production Package Template
         status: content-ready
-- id: pytest-101
-  category: programming
+- id: functional-programming-101
+  status: content-ready
+  category: programming-foundations
   title:
-    ko: pytest 101
-    en: pytest 101
+    ko: Functional Programming 101
+    en: Functional Programming 101
   description:
-    ko: pytest의 기본 문법, fixture, parametrization, mock, coverage, CI 연동까지 배우는 실전 테스트 입문 시리즈.
-    en: A beginner series on pytest covering assertions, fixtures, parametrization, mocking, coverage, and CI integration.
+    ko: 순수 함수, 불변 데이터, 고차 함수, 클로저, 함수 합성까지 함수형 프로그래밍의 핵심을 Python으로 배우는 시리즈.
+    en: A beginner series on functional programming essentials in Python covering pure functions, immutability, higher-order functions, closures, and function composition.
   languages:
   - ko
   - en
-  status: content-ready
   targets:
     tistory: true
     hashnode: true
@@ -1451,92 +2666,363 @@ series:
     ebook: true
   level: 101
   lifecycle: active
-  path: content/pytest-101
+  path: content/functional-programming-101
+
+- id: oop-101
+  status: content-ready
+  category: programming-foundations
+  title:
+    ko: Object-Oriented Programming 101
+    en: Object-Oriented Programming 101
+  description:
+    ko: 클래스, 캡슐화, 상속, 다형성, 추상화, SOLID 원칙까지 객체지향의 핵심을 다루는 시리즈.
+    en: A series covering the essentials of OOP from classes and encapsulation to inheritance, polymorphism, abstraction, and SOLID principles.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/oop-101
+
+- id: type-hints-python-101
+  status: content-ready
+  category: programming-foundations
+  title:
+    ko: Type Hints in Python 101
+    en: Type Hints in Python 101
+  description:
+    ko: Python type hint, Optional, Union, TypedDict, Protocol, Generic, mypy, Pydantic까지 타입 힌트 활용을 배우는 시리즈.
+    en: A beginner series on Python type hints covering basic annotations, Optional, Union, TypedDict, Protocol, Generic, mypy, and Pydantic.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/type-hints-python-101
+- id: azure-aca-101
+  status: content-ready
+  category: azure
+  title:
+    ko: Azure Container Apps 101
+    en: Azure Container Apps 101
+  description:
+    ko: Container Apps 입문 시리즈.
+    en: Container Apps beginner guide.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/azure-aca-101
   per:
     ko:
       articles:
       - idx: 1
-        slug: 01-why-write-tests
-        title: 왜 테스트를 작성해야 할까?
-        status: content-ready
+        slug: 01-what-is-aca
+        title: Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
+        status: publish-ready
       - idx: 2
-        slug: 02-first-pytest-test
-        title: 첫 번째 pytest 테스트 작성하기
-        status: content-ready
+        slug: 02-environment-app-revision
+        title: Environment·Container App·Revision — 세 단어로 보는 ACA
+        status: publish-ready
       - idx: 3
-        slug: 03-assert-and-exceptions
-        title: assert와 예외 테스트
-        status: content-ready
+        slug: 03-first-deploy
+        title: 첫 앱 배포하기 — Python/FastAPI
+        status: publish-ready
       - idx: 4
-        slug: 04-fixtures
-        title: fixture 이해하기
-        status: content-ready
+        slug: 04-ingress-and-traffic-split
+        title: Ingress와 트래픽 분할 — Revision 기반 배포 전략
+        status: publish-ready
       - idx: 5
-        slug: 05-parametrization
-        title: parametrization으로 테스트 케이스 늘리기
-        status: content-ready
+        slug: 05-scaling-with-keda
+        title: 스케일링 — KEDA scaler와 0-to-N
+        status: publish-ready
       - idx: 6
-        slug: 06-mock-and-monkeypatch
-        title: mock과 monkeypatch
-        status: content-ready
+        slug: 06-dapr-integration
+        title: Dapr 통합 — 사이드카로 얻는 것
+        status: publish-ready
       - idx: 7
-        slug: 07-testing-files-env-time
-        title: 파일, 환경변수, 시간 테스트하기
-        status: content-ready
-      - idx: 8
-        slug: 08-coverage
-        title: coverage와 테스트 품질 보기
-        status: content-ready
-      - idx: 9
-        slug: 09-ci-with-github-actions
-        title: GitHub Actions에서 테스트 자동화하기
-        status: content-ready
-      - idx: 10
-        slug: 10-testable-code
-        title: 테스트하기 쉬운 코드 구조 만들기
-        status: content-ready
+        slug: 07-monitoring-and-ops
+        title: 모니터링과 운영 — Log Analytics와 Application Insights
+        status: publish-ready
     en:
       articles:
       - idx: 1
-        slug: 01-why-write-tests
-        title: Why Write Tests?
-        status: content-ready
+        slug: 01-what-is-aca
+        title: What is Azure Container Apps? — running containers without Kubernetes
+        status: publish-ready
       - idx: 2
-        slug: 02-first-pytest-test
-        title: Writing Your First pytest Test
-        status: content-ready
+        slug: 02-environment-app-revision
+        title: Environment, Container App, Revision — ACA in three words
+        status: publish-ready
       - idx: 3
-        slug: 03-assert-and-exceptions
-        title: Assert and Exception Testing
-        status: content-ready
+        slug: 03-first-deploy
+        title: Your first deploy — Python/FastAPI
+        status: publish-ready
       - idx: 4
-        slug: 04-fixtures
-        title: Understanding Fixtures
-        status: content-ready
+        slug: 04-ingress-and-traffic-split
+        title: Ingress and traffic splitting — revision-based deployment strategies
+        status: publish-ready
       - idx: 5
-        slug: 05-parametrization
-        title: Parametrization
-        status: content-ready
+        slug: 05-scaling-with-keda
+        title: Scaling — KEDA scalers and zero-to-N
+        status: publish-ready
       - idx: 6
-        slug: 06-mock-and-monkeypatch
-        title: Mock and Monkeypatch
-        status: content-ready
+        slug: 06-dapr-integration
+        title: Dapr integration — what you get from a sidecar
+        status: publish-ready
       - idx: 7
-        slug: 07-testing-files-env-time
-        title: Testing Files, Environment Variables, and Time
-        status: content-ready
-      - idx: 8
-        slug: 08-coverage
-        title: Coverage and Test Quality
-        status: content-ready
-      - idx: 9
-        slug: 09-ci-with-github-actions
-        title: Test Automation with GitHub Actions
-        status: content-ready
-      - idx: 10
-        slug: 10-testable-code
-        title: Writing Testable Code
-        status: content-ready
+        slug: 07-monitoring-and-ops
+        title: Monitoring and ops — Log Analytics and Application Insights
+        status: publish-ready
+- id: azure-aca-deep-dive
+  status: content-ready
+  category: azure
+  title:
+    ko: Azure Container Apps Deep Dive
+    en: Azure Container Apps Deep Dive
+  description:
+    ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
+    en: Inside ACA — KEDA, Dapr, Envoy.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  lifecycle: active
+  path: content/azure-aca-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-aca-architecture
+        title: ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
+        status: publish-ready
+      - idx: 2
+        slug: 02-environment-internals
+        title: Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
+        status: publish-ready
+      - idx: 3
+        slug: 03-revision-and-traffic-split
+        title: Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
+        status: publish-ready
+      - idx: 4
+        slug: 04-keda-in-aca
+        title: ACA 안의 KEDA — Scale Rule이 만드는 것
+        status: publish-ready
+      - idx: 5
+        slug: 05-dapr-sidecar-internals
+        title: Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
+        status: publish-ready
+      - idx: 6
+        slug: 06-envoy-ingress-path
+        title: Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-aca-architecture
+        title: ACA architecture — what Microsoft layered on a hidden Kubernetes
+        status: publish-ready
+      - idx: 2
+        slug: 02-environment-internals
+        title: Environment internals — the network, observability, and Dapr scope boundary
+        status: publish-ready
+      - idx: 3
+        slug: 03-revision-and-traffic-split
+        title: Revisions and traffic splitting — where Envoy weights come from
+        status: publish-ready
+      - idx: 4
+        slug: 04-keda-in-aca
+        title: KEDA inside ACA — what a scale rule actually creates
+        status: publish-ready
+      - idx: 5
+        slug: 05-dapr-sidecar-internals
+        title: Dapr sidecar internals — the Go process that lives next to your container
+        status: publish-ready
+      - idx: 6
+        slug: 06-envoy-ingress-path
+        title: The Envoy ingress path — how the first request reaches your container
+        status: publish-ready
+- id: azure-aks-101
+  status: content-ready
+  category: azure
+  title:
+    ko: Azure Kubernetes Service 101
+    en: Azure Kubernetes Service 101
+  description:
+    ko: AKS 입문 시리즈.
+    en: AKS beginner guide.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 101
+  lifecycle: active
+  path: content/azure-aks-101
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aks
+        title: Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
+        status: publish-ready
+      - idx: 2
+        slug: 02-cluster-architecture
+        title: 클러스터 아키텍처 — Control Plane과 Node Pool
+        status: publish-ready
+      - idx: 3
+        slug: 03-first-cluster-and-deploy
+        title: 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
+        status: publish-ready
+      - idx: 4
+        slug: 04-pod-deployment-service
+        title: Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식
+        status: publish-ready
+      - idx: 5
+        slug: 05-networking-and-ingress
+        title: 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
+        status: publish-ready
+      - idx: 6
+        slug: 06-scaling-hpa-ca-keda
+        title: 스케일링 — HPA, Cluster Autoscaler, KEDA
+        status: publish-ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: 모니터링과 운영 — Container Insights, 로그, 알람
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-what-is-aks
+        title: What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
+        status: publish-ready
+      - idx: 2
+        slug: 02-cluster-architecture
+        title: Cluster architecture — control plane and node pools
+        status: publish-ready
+      - idx: 3
+        slug: 03-first-cluster-and-deploy
+        title: Your first cluster, your first deploy — Python/FastAPI
+        status: publish-ready
+      - idx: 4
+        slug: 04-pod-deployment-service
+        title: Pod, Deployment, Service — the three ways you express a workload
+        status: publish-ready
+      - idx: 5
+        slug: 05-networking-and-ingress
+        title: Networking and Ingress — the path in and out of the cluster
+        status: publish-ready
+      - idx: 6
+        slug: 06-scaling-hpa-ca-keda
+        title: Scaling — HPA, Cluster Autoscaler, KEDA
+        status: publish-ready
+      - idx: 7
+        slug: 07-monitoring-and-ops
+        title: Monitoring and ops — Container Insights, logs, alerts
+        status: publish-ready
+- id: azure-aks-deep-dive
+  status: content-ready
+  category: azure
+  title:
+    ko: Azure Kubernetes Service Deep Dive
+    en: Azure Kubernetes Service Deep Dive
+  description:
+    ko: AKS control plane / data plane 내부 동작.
+    en: AKS control plane / data plane internals.
+  languages:
+  - ko
+  - en
+  targets:
+    tistory: true
+    hashnode: true
+    medium: true
+    mkdocs: true
+    ebook: true
+  level: 301
+  lifecycle: active
+  path: content/azure-aks-deep-dive
+  per:
+    ko:
+      articles:
+      - idx: 1
+        slug: 01-control-plane-anatomy
+        title: Control Plane 해부 — AKS가 사용자에게서 가린 것
+        status: publish-ready
+      - idx: 2
+        slug: 02-kubelet-and-containerd
+        title: kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
+        status: publish-ready
+      - idx: 3
+        slug: 03-cni-and-azure-cni-overlay
+        title: CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
+        status: publish-ready
+      - idx: 4
+        slug: 04-scheduler-and-pod-placement
+        title: Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
+        status: publish-ready
+      - idx: 5
+        slug: 05-hpa-and-cluster-autoscaler-internals
+        title: HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
+        status: publish-ready
+      - idx: 6
+        slug: 06-keda-internals
+        title: KEDA 내부 — ScaledObject가 HPA를 만드는 방식
+        status: publish-ready
+    en:
+      articles:
+      - idx: 1
+        slug: 01-control-plane-anatomy
+        title: Control plane anatomy — what AKS hides from you
+        status: publish-ready
+      - idx: 2
+        slug: 02-kubelet-and-containerd
+        title: kubelet and containerd — how a container actually starts on a node
+        status: publish-ready
+      - idx: 3
+        slug: 03-cni-and-azure-cni-overlay
+        title: CNI and Azure CNI Overlay — where Pod IPs come from
+        status: publish-ready
+      - idx: 4
+        slug: 04-scheduler-and-pod-placement
+        title: Scheduler and Pod placement — who decides which node
+        status: publish-ready
+      - idx: 5
+        slug: 05-hpa-and-cluster-autoscaler-internals
+        title: HPA and Cluster Autoscaler internals — two control loops
+        status: publish-ready
+      - idx: 6
+        slug: 06-keda-internals
+        title: KEDA internals — how a ScaledObject builds an HPA
+        status: publish-ready
 - id: azure-app-service-101
   status: content-ready
   category: azure
@@ -1849,1404 +3335,6 @@ series:
         slug: 06-cold-start-placeholder
         title: Cold Start and Placeholder Mode — What Happens When a New Instance Is Born
         status: publish-ready
-- id: azure-aks-101
-  status: content-ready
-  category: azure
-  title:
-    ko: Azure Kubernetes Service 101
-    en: Azure Kubernetes Service 101
-  description:
-    ko: AKS 입문 시리즈.
-    en: AKS beginner guide.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/azure-aks-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-what-is-aks
-        title: Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes
-        status: publish-ready
-      - idx: 2
-        slug: 02-cluster-architecture
-        title: 클러스터 아키텍처 — Control Plane과 Node Pool
-        status: publish-ready
-      - idx: 3
-        slug: 03-first-cluster-and-deploy
-        title: 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
-        status: publish-ready
-      - idx: 4
-        slug: 04-pod-deployment-service
-        title: Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식
-        status: publish-ready
-      - idx: 5
-        slug: 05-networking-and-ingress
-        title: 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길
-        status: publish-ready
-      - idx: 6
-        slug: 06-scaling-hpa-ca-keda
-        title: 스케일링 — HPA, Cluster Autoscaler, KEDA
-        status: publish-ready
-      - idx: 7
-        slug: 07-monitoring-and-ops
-        title: 모니터링과 운영 — Container Insights, 로그, 알람
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-what-is-aks
-        title: What is Azure Kubernetes Service? — what managed Kubernetes actually gives you
-        status: publish-ready
-      - idx: 2
-        slug: 02-cluster-architecture
-        title: Cluster architecture — control plane and node pools
-        status: publish-ready
-      - idx: 3
-        slug: 03-first-cluster-and-deploy
-        title: Your first cluster, your first deploy — Python/FastAPI
-        status: publish-ready
-      - idx: 4
-        slug: 04-pod-deployment-service
-        title: Pod, Deployment, Service — the three ways you express a workload
-        status: publish-ready
-      - idx: 5
-        slug: 05-networking-and-ingress
-        title: Networking and Ingress — the path in and out of the cluster
-        status: publish-ready
-      - idx: 6
-        slug: 06-scaling-hpa-ca-keda
-        title: Scaling — HPA, Cluster Autoscaler, KEDA
-        status: publish-ready
-      - idx: 7
-        slug: 07-monitoring-and-ops
-        title: Monitoring and ops — Container Insights, logs, alerts
-        status: publish-ready
-- id: azure-aks-deep-dive
-  status: content-ready
-  category: azure
-  title:
-    ko: Azure Kubernetes Service Deep Dive
-    en: Azure Kubernetes Service Deep Dive
-  description:
-    ko: AKS control plane / data plane 내부 동작.
-    en: AKS control plane / data plane internals.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 301
-  lifecycle: active
-  path: content/azure-aks-deep-dive
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-control-plane-anatomy
-        title: Control Plane 해부 — AKS가 사용자에게서 가린 것
-        status: publish-ready
-      - idx: 2
-        slug: 02-kubelet-and-containerd
-        title: kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
-        status: publish-ready
-      - idx: 3
-        slug: 03-cni-and-azure-cni-overlay
-        title: CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
-        status: publish-ready
-      - idx: 4
-        slug: 04-scheduler-and-pod-placement
-        title: Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
-        status: publish-ready
-      - idx: 5
-        slug: 05-hpa-and-cluster-autoscaler-internals
-        title: HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
-        status: publish-ready
-      - idx: 6
-        slug: 06-keda-internals
-        title: KEDA 내부 — ScaledObject가 HPA를 만드는 방식
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-control-plane-anatomy
-        title: Control plane anatomy — what AKS hides from you
-        status: publish-ready
-      - idx: 2
-        slug: 02-kubelet-and-containerd
-        title: kubelet and containerd — how a container actually starts on a node
-        status: publish-ready
-      - idx: 3
-        slug: 03-cni-and-azure-cni-overlay
-        title: CNI and Azure CNI Overlay — where Pod IPs come from
-        status: publish-ready
-      - idx: 4
-        slug: 04-scheduler-and-pod-placement
-        title: Scheduler and Pod placement — who decides which node
-        status: publish-ready
-      - idx: 5
-        slug: 05-hpa-and-cluster-autoscaler-internals
-        title: HPA and Cluster Autoscaler internals — two control loops
-        status: publish-ready
-      - idx: 6
-        slug: 06-keda-internals
-        title: KEDA internals — how a ScaledObject builds an HPA
-        status: publish-ready
-- id: azure-aca-101
-  status: content-ready
-  category: azure
-  title:
-    ko: Azure Container Apps 101
-    en: Azure Container Apps 101
-  description:
-    ko: Container Apps 입문 시리즈.
-    en: Container Apps beginner guide.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/azure-aca-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-what-is-aca
-        title: Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
-        status: publish-ready
-      - idx: 2
-        slug: 02-environment-app-revision
-        title: Environment·Container App·Revision — 세 단어로 보는 ACA
-        status: publish-ready
-      - idx: 3
-        slug: 03-first-deploy
-        title: 첫 앱 배포하기 — Python/FastAPI
-        status: publish-ready
-      - idx: 4
-        slug: 04-ingress-and-traffic-split
-        title: Ingress와 트래픽 분할 — Revision 기반 배포 전략
-        status: publish-ready
-      - idx: 5
-        slug: 05-scaling-with-keda
-        title: 스케일링 — KEDA scaler와 0-to-N
-        status: publish-ready
-      - idx: 6
-        slug: 06-dapr-integration
-        title: Dapr 통합 — 사이드카로 얻는 것
-        status: publish-ready
-      - idx: 7
-        slug: 07-monitoring-and-ops
-        title: 모니터링과 운영 — Log Analytics와 Application Insights
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-what-is-aca
-        title: What is Azure Container Apps? — running containers without Kubernetes
-        status: publish-ready
-      - idx: 2
-        slug: 02-environment-app-revision
-        title: Environment, Container App, Revision — ACA in three words
-        status: publish-ready
-      - idx: 3
-        slug: 03-first-deploy
-        title: Your first deploy — Python/FastAPI
-        status: publish-ready
-      - idx: 4
-        slug: 04-ingress-and-traffic-split
-        title: Ingress and traffic splitting — revision-based deployment strategies
-        status: publish-ready
-      - idx: 5
-        slug: 05-scaling-with-keda
-        title: Scaling — KEDA scalers and zero-to-N
-        status: publish-ready
-      - idx: 6
-        slug: 06-dapr-integration
-        title: Dapr integration — what you get from a sidecar
-        status: publish-ready
-      - idx: 7
-        slug: 07-monitoring-and-ops
-        title: Monitoring and ops — Log Analytics and Application Insights
-        status: publish-ready
-- id: azure-aca-deep-dive
-  status: content-ready
-  category: azure
-  title:
-    ko: Azure Container Apps Deep Dive
-    en: Azure Container Apps Deep Dive
-  description:
-    ko: ACA 위에 얹힌 KEDA·Dapr·Envoy 내부 동작.
-    en: Inside ACA — KEDA, Dapr, Envoy.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 301
-  lifecycle: active
-  path: content/azure-aca-deep-dive
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-aca-architecture
-        title: ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
-        status: publish-ready
-      - idx: 2
-        slug: 02-environment-internals
-        title: Environment 내부 — 네트워크·관측·Dapr 스코프의 경계
-        status: publish-ready
-      - idx: 3
-        slug: 03-revision-and-traffic-split
-        title: Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
-        status: publish-ready
-      - idx: 4
-        slug: 04-keda-in-aca
-        title: ACA 안의 KEDA — Scale Rule이 만드는 것
-        status: publish-ready
-      - idx: 5
-        slug: 05-dapr-sidecar-internals
-        title: Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
-        status: publish-ready
-      - idx: 6
-        slug: 06-envoy-ingress-path
-        title: Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-aca-architecture
-        title: ACA architecture — what Microsoft layered on a hidden Kubernetes
-        status: publish-ready
-      - idx: 2
-        slug: 02-environment-internals
-        title: Environment internals — the network, observability, and Dapr scope boundary
-        status: publish-ready
-      - idx: 3
-        slug: 03-revision-and-traffic-split
-        title: Revisions and traffic splitting — where Envoy weights come from
-        status: publish-ready
-      - idx: 4
-        slug: 04-keda-in-aca
-        title: KEDA inside ACA — what a scale rule actually creates
-        status: publish-ready
-      - idx: 5
-        slug: 05-dapr-sidecar-internals
-        title: Dapr sidecar internals — the Go process that lives next to your container
-        status: publish-ready
-      - idx: 6
-        slug: 06-envoy-ingress-path
-        title: The Envoy ingress path — how the first request reaches your container
-        status: publish-ready
-- id: ai-web-dev-101
-  status: needs-update
-  category: ai
-  title:
-    ko: AI 웹 개발 입문
-    en: AI Web Development 101
-  description:
-    ko: AI API 부터 배포까지, 초급 개발자를 위한 7부작.
-    en: 7-part guide for junior developers — from AI API basics to deployment.
-  languages:
-  - ko
-  targets:
-    tistory: true
-    hashnode: false
-    medium: false
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: archived
-  note: Superseded by llm-app-foundations-101 and ai-app-patterns-101. Do not add new posts. Existing content will be absorbed
-    into the new series.
-  path: content/ai-web-dev-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-hello-ai-api
-        title: AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
-        status: needs-update
-      - idx: 2
-        slug: 02-prompt-engineering
-        title: 프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술
-        status: needs-update
-      - idx: 3
-        slug: 03-ai-chatbot
-        title: AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
-        status: needs-update
-      - idx: 4
-        slug: 04-rag-intro
-        title: RAG 입문 — 내 데이터로 답하는 AI 만들기
-        status: needs-update
-      - idx: 5
-        slug: 05-ai-agent
-        title: AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
-        status: needs-update
-      - idx: 6
-        slug: 06-deploy
-        title: 'AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기'
-        status: needs-update
-      - idx: 7
-        slug: 07-eval-improve
-        title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
-        status: needs-update
-- id: llm-from-scratch-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LLM from Scratch 101
-    en: LLM from Scratch 101
-  description:
-    ko: PyTorch 2.x 로 토크나이저부터 챗봇까지, ~720 LOC 의 작은 GPT 9부작.
-    en: Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/llm-from-scratch-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-tokenizer
-        title: 글자를 숫자로 바꾸기
-        status: publish-ready
-      - idx: 2
-        slug: 02-embedding
-        title: 정수에서 벡터로, 그리고 위치
-        status: publish-ready
-      - idx: 3
-        slug: 03-attention
-        title: 어떤 토큰을 얼마나 볼지 스스로 정하기
-        status: publish-ready
-      - idx: 4
-        slug: 04-transformer-block
-        title: 블록 하나, 깊이의 단위
-        status: publish-ready
-      - idx: 5
-        slug: 05-gpt-model
-        title: '조립: GPT 모델 클래스 완성'
-        status: publish-ready
-      - idx: 6
-        slug: 06-training-loop
-        title: 기울기로 배우기
-        status: publish-ready
-      - idx: 7
-        slug: 07-inference
-        title: 샘플링 — 학습된 모델에서 글 뽑아내기
-        status: publish-ready
-      - idx: 8
-        slug: 08-finetuning
-        title: 베이스 모델을 우리 작업에 맞추기
-        status: publish-ready
-      - idx: 9
-        slug: 09-chatbot-wrapper
-        title: 직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-tokenizer
-        title: Turning Text into Numbers
-        status: publish-ready
-      - idx: 2
-        slug: 02-embedding
-        title: From Integers to Vectors and Positions
-        status: publish-ready
-      - idx: 3
-        slug: 03-attention
-        title: Deciding Which Tokens to Focus On
-        status: publish-ready
-      - idx: 4
-        slug: 04-transformer-block
-        title: 'The Transformer Block: A Unit of Depth'
-        status: publish-ready
-      - idx: 5
-        slug: 05-gpt-model
-        title: 'Assembly: Completing the GPT Model Class'
-        status: publish-ready
-      - idx: 6
-        slug: 06-training-loop
-        title: Learning via Gradients
-        status: publish-ready
-      - idx: 7
-        slug: 07-inference
-        title: Sampling — Generating Text from a Trained Model
-        status: publish-ready
-      - idx: 8
-        slug: 08-finetuning
-        title: Adapting the Base Model to Specific Tasks
-        status: publish-ready
-      - idx: 9
-        slug: 09-chatbot-wrapper
-        title: Turning Your LLM into a Chatbot — FastAPI + Streaming
-        status: publish-ready
-  track: ebook
-  stage: education
-- id: rag-deep-dive
-  status: content-ready
-  category: ai
-  title:
-    ko: RAG Deep Dive
-    en: RAG Deep Dive
-  description:
-    ko: LangChain · FAISS · RAGAS 소스로 따라가는 RAG 파이프라인 심층 분석 6부작.
-    en: A 6-part deep dive into RAG internals — LangChain, FAISS, and RAGAS source-pinned.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 301
-  lifecycle: active
-  path: content/rag-deep-dive
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-document-loading-and-chunking
-        title: 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
-        status: publish-ready
-      - idx: 2
-        slug: 02-embeddings-and-vector-index
-        title: 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
-        status: publish-ready
-      - idx: 3
-        slug: 03-retriever-design
-        title: Retriever 설계 — VectorStoreRetriever와 MMR
-        status: publish-ready
-      - idx: 4
-        slug: 04-prompt-construction-and-context-injection
-        title: 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
-        status: publish-ready
-      - idx: 5
-        slug: 05-rag-chain-assembly
-        title: RAG Chain 조립 — RetrievalQA vs LCEL
-        status: publish-ready
-      - idx: 6
-        slug: 06-evaluation-and-quality-gates
-        title: 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-document-loading-and-chunking
-        title: Document Loading and Chunking — Inside LangChain TextSplitter
-        status: publish-ready
-      - idx: 2
-        slug: 02-embeddings-and-vector-index
-        title: Embeddings and the Vector Index — Inside FAISS IndexFlatL2
-        status: publish-ready
-      - idx: 3
-        slug: 03-retriever-design
-        title: Retriever Design — VectorStoreRetriever and MMR
-        status: publish-ready
-      - idx: 4
-        slug: 04-prompt-construction-and-context-injection
-        title: Prompt Construction and Context Injection — Inside PromptTemplate
-        status: publish-ready
-      - idx: 5
-        slug: 05-rag-chain-assembly
-        title: Assembling the RAG Chain — RetrievalQA vs LCEL
-        status: publish-ready
-      - idx: 6
-        slug: 06-evaluation-and-quality-gates
-        title: Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
-        status: publish-ready
-  track: authority
-  stage: internals
-- id: llm-app-foundations-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LLM 앱 기초
-    en: LLM App Foundations 101
-  description:
-    ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
-    en: LLM API basics, tokens, and prompt engineering in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/llm-app-foundations-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-llm-api-first-call
-        title: LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
-        status: publish-ready
-      - idx: 2
-        slug: 02-understanding-tokens
-        title: 토큰 이해하기 — 비용, 한계, 컨텍스트 창
-        status: publish-ready
-      - idx: 3
-        slug: 03-prompt-engineering-basics
-        title: 프롬프트 엔지니어링 기초 — System·User·Assistant 역할
-        status: publish-ready
-      - idx: 4
-        slug: 04-few-shot-and-cot
-        title: Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기
-        status: publish-ready
-      - idx: 5
-        slug: 05-conversation-state
-        title: 대화 상태 관리 — 멀티턴 챗봇 만들기
-        status: publish-ready
-      - idx: 6
-        slug: 06-streaming-responses
-        title: 스트리밍 응답 처리 — 실시간으로 출력 받기
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-llm-api-first-call
-        title: LLM API first call — sending your first request
-        status: publish-ready
-      - idx: 2
-        slug: 02-understanding-tokens
-        title: Understanding tokens — cost, limits, and context windows
-        status: publish-ready
-      - idx: 3
-        slug: 03-prompt-engineering-basics
-        title: Prompt engineering basics — system, user, and assistant roles
-        status: publish-ready
-      - idx: 4
-        slug: 04-few-shot-and-cot
-        title: Few-shot and chain-of-thought — steering better answers
-        status: publish-ready
-      - idx: 5
-        slug: 05-conversation-state
-        title: Managing conversation state — building a multi-turn chatbot
-        status: publish-ready
-      - idx: 6
-        slug: 06-streaming-responses
-        title: Handling streaming responses — real-time output
-        status: publish-ready
-  track: traffic
-  stage: foundation
-- id: llm-api-production-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LLM API 프로덕션 101
-    en: LLM API Production 101
-  description:
-    ko: Structured Output, Tool Calling, Streaming, Caching, Retry, Rate Limit — 6부작.
-    en: Structured Output, Tool Calling, Streaming, Caching, Retry, and Rate Limit in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 201
-  lifecycle: active
-  path: content/llm-api-production-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-structured-output
-        title: 구조화 출력 — JSON 모드와 응답 스키마
-        status: publish-ready
-      - idx: 2
-        slug: 02-tool-calling
-        title: 툴 호출 — 함수를 모델에 연결하기
-        status: publish-ready
-      - idx: 3
-        slug: 03-streaming-in-depth
-        title: 스트리밍 심화 — 청크 처리와 오류 복구
-        status: publish-ready
-      - idx: 4
-        slug: 04-caching-strategies
-        title: 캐싱 전략 — 비용과 지연 시간 줄이기
-        status: publish-ready
-      - idx: 5
-        slug: 05-retry-and-error-handling
-        title: 재시도와 오류 처리 — 안정적인 API 호출 만들기
-        status: publish-ready
-      - idx: 6
-        slug: 06-rate-limit-management
-        title: 속도 제한 관리 — Rate Limit 대응 패턴
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-structured-output
-        title: Structured output — JSON mode and response schemas
-        status: publish-ready
-      - idx: 2
-        slug: 02-tool-calling
-        title: Tool calling — connecting functions to the model
-        status: publish-ready
-      - idx: 3
-        slug: 03-streaming-in-depth
-        title: Streaming in depth — chunk handling and error recovery
-        status: publish-ready
-      - idx: 4
-        slug: 04-caching-strategies
-        title: Caching strategies — reducing cost and latency
-        status: publish-ready
-      - idx: 5
-        slug: 05-retry-and-error-handling
-        title: Retry and error handling — making API calls reliable
-        status: publish-ready
-      - idx: 6
-        slug: 06-rate-limit-management
-        title: Rate limit management — patterns for staying within limits
-        status: publish-ready
-  track: traffic
-  stage: production
-- id: vector-search-101
-  status: content-ready
-  category: ai
-  title:
-    ko: 벡터 검색 101
-    en: Vector Search 101
-  description:
-    ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
-    en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/vector-search-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-what-is-embedding
-        title: 01-what-is-embedding
-        status: publish-ready
-      - idx: 2
-        slug: 02-huggingface-embeddings
-        title: 02-huggingface-embeddings
-        status: publish-ready
-      - idx: 3
-        slug: 03-cosine-similarity
-        title: 03-cosine-similarity
-        status: publish-ready
-      - idx: 4
-        slug: 04-faiss-fundamentals
-        title: 04-faiss-fundamentals
-        status: publish-ready
-      - idx: 5
-        slug: 05-chunking-strategies
-        title: 05-chunking-strategies
-        status: publish-ready
-      - idx: 6
-        slug: 06-vector-search-pipeline
-        title: 06-vector-search-pipeline
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-what-is-embedding
-        title: 01-what-is-embedding
-        status: publish-ready
-      - idx: 2
-        slug: 02-huggingface-embeddings
-        title: 02-huggingface-embeddings
-        status: publish-ready
-      - idx: 3
-        slug: 03-cosine-similarity
-        title: 03-cosine-similarity
-        status: publish-ready
-      - idx: 4
-        slug: 04-faiss-fundamentals
-        title: 04-faiss-fundamentals
-        status: publish-ready
-      - idx: 5
-        slug: 05-chunking-strategies
-        title: 05-chunking-strategies
-        status: publish-ready
-      - idx: 6
-        slug: 06-vector-search-pipeline
-        title: 06-vector-search-pipeline
-        status: publish-ready
-  track: traffic
-  stage: search
-- id: langchain-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LangChain 101
-    en: LangChain 101
-  description:
-    ko: LCEL, Runnable, Retriever, Tool Calling 기본, Streaming — LangChain API 사용법 6부작.
-    en: LCEL, Runnable, Retriever, Tool Calling, and Streaming — LangChain API in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/langchain-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-lcel-runnable-basics
-        title: LangChain 소개 — LCEL과 Runnable 기본
-        status: publish-ready
-      - idx: 2
-        slug: 02-prompt-llm-chain
-        title: Prompt와 LLM Chain — 체인 첫 번째 구성
-        status: publish-ready
-      - idx: 3
-        slug: 03-retriever
-        title: Retriever — 문서 검색과 컨텍스트 주입
-        status: publish-ready
-      - idx: 4
-        slug: 04-tool-calling
-        title: Tool Calling — 외부 도구 연결하기
-        status: publish-ready
-      - idx: 5
-        slug: 05-streaming
-        title: Streaming — 실시간 출력 처리
-        status: publish-ready
-      - idx: 6
-        slug: 06-putting-it-together
-        title: 실전 체인 조립 — 컴포넌트를 하나로 연결하기
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-lcel-runnable-basics
-        title: LangChain introduction — LCEL and the Runnable interface
-        status: publish-ready
-      - idx: 2
-        slug: 02-prompt-llm-chain
-        title: Prompt and LLM chain — assembling your first chain
-        status: publish-ready
-      - idx: 3
-        slug: 03-retriever
-        title: Retriever — document search and context injection
-        status: publish-ready
-      - idx: 4
-        slug: 04-tool-calling
-        title: Tool calling — connecting external tools
-        status: publish-ready
-      - idx: 5
-        slug: 05-streaming
-        title: Streaming — handling real-time output
-        status: publish-ready
-      - idx: 6
-        slug: 06-putting-it-together
-        title: Putting it together — a complete chain in one file
-        status: publish-ready
-  track: authority
-  stage: foundation
-- id: ai-app-patterns-101
-  status: content-ready
-  category: ai
-  title:
-    ko: AI 앱 패턴 101
-    en: AI App Patterns 101
-  description:
-    ko: 챗봇, RAG Q&A, 문서비서, Agent, Workflow, Human-in-the-loop — LLM 앱 설계 패턴 6부작.
-    en: Chatbot, RAG Q&A, Document Assistant, Agent, Workflow, and HITL design patterns in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/ai-app-patterns-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-chatbot-pattern
-        title: 챗봇 패턴 — 대화 이력 관리와 상태
-        status: publish-ready
-      - idx: 2
-        slug: 02-rag-qa-pattern
-        title: RAG Q&A 패턴 — 문서 기반 질의응답
-        status: publish-ready
-      - idx: 3
-        slug: 03-document-assistant
-        title: 문서 어시스턴트 — 요약, 추출, 분류
-        status: publish-ready
-      - idx: 4
-        slug: 04-agent-tool-pattern
-        title: Agent + Tool 패턴 — 자율 도구 선택
-        status: publish-ready
-      - idx: 5
-        slug: 05-workflow-automation
-        title: 워크플로 자동화 — 다단계 체인 설계
-        status: publish-ready
-      - idx: 6
-        slug: 06-human-in-the-loop
-        title: Human-in-the-loop — 사람 개입 설계 패턴
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-chatbot-pattern
-        title: Chatbot pattern — managing conversation history and state
-        status: publish-ready
-      - idx: 2
-        slug: 02-rag-qa-pattern
-        title: RAG Q&A pattern — document-based question answering
-        status: publish-ready
-      - idx: 3
-        slug: 03-document-assistant
-        title: Document assistant — summarization, extraction, classification
-        status: publish-ready
-      - idx: 4
-        slug: 04-agent-tool-pattern
-        title: Agent and tool pattern — autonomous tool selection
-        status: publish-ready
-      - idx: 5
-        slug: 05-workflow-automation
-        title: Workflow automation — designing multi-step chains
-        status: publish-ready
-      - idx: 6
-        slug: 06-human-in-the-loop
-        title: Human-in-the-loop — designing for human intervention
-        status: publish-ready
-  track: ebook
-  stage: patterns
-- id: korean-ai-stack-101
-  status: content-ready
-  category: ai
-  title:
-    ko: 한국어 AI 스택 101
-    en: Korean AI Stack 101
-  description:
-    ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
-    en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/korean-ai-stack-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-korean-embedding-models
-        title: 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar
-        status: publish-ready
-      - idx: 2
-        slug: 02-kosimcse-similarity
-        title: KoSimCSE로 문장 유사도 구현하기
-        status: publish-ready
-      - idx: 3
-        slug: 03-bge-m3-multilingual
-        title: BGE-M3 다국어 임베딩 실전
-        status: publish-ready
-      - idx: 4
-        slug: 04-clova-ocr
-        title: CLOVA OCR API로 문서 텍스트 추출
-        status: publish-ready
-      - idx: 5
-        slug: 05-hyperclova-solar-api
-        title: HyperCLOVA X와 Solar API 사용하기
-        status: publish-ready
-      - idx: 6
-        slug: 06-korean-rag-pipeline
-        title: 한국어 RAG 파이프라인 조합하기
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-korean-embedding-models
-        title: Korean embedding models compared — KoSimCSE, BGE-M3, Solar
-        status: publish-ready
-      - idx: 2
-        slug: 02-kosimcse-similarity
-        title: Building sentence similarity search with KoSimCSE
-        status: publish-ready
-      - idx: 3
-        slug: 03-bge-m3-multilingual
-        title: BGE-M3 multilingual embedding in practice
-        status: publish-ready
-      - idx: 4
-        slug: 04-clova-ocr
-        title: Document text extraction with CLOVA OCR API
-        status: publish-ready
-      - idx: 5
-        slug: 05-hyperclova-solar-api
-        title: Using HyperCLOVA X and Solar API
-        status: publish-ready
-      - idx: 6
-        slug: 06-korean-rag-pipeline
-        title: Assembling a Korean RAG pipeline
-        status: publish-ready
-  track: traffic
-  stage: korean
-- id: document-ingestion-101
-  status: content-ready
-  category: ai
-  title:
-    ko: 문서 수집과 인덱싱 101
-    en: Document Ingestion 101
-  description:
-    ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
-    en: PDF parsing, metadata, and incremental indexing in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/document-ingestion-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-pdf-parsing
-        title: PDF 파싱과 텍스트 추출
-        status: publish-ready
-      - idx: 2
-        slug: 02-chunking-strategies
-        title: 청킹 전략 — 문서 유형별 최적화
-        status: publish-ready
-      - idx: 3
-        slug: 03-metadata-filtering
-        title: 메타데이터 설계와 필터링
-        status: publish-ready
-      - idx: 4
-        slug: 04-incremental-indexing
-        title: 증분 인덱싱 — 변경된 문서만 업데이트
-        status: publish-ready
-      - idx: 5
-        slug: 05-multi-format-pipeline
-        title: 다중 포맷 문서 파이프라인
-        status: publish-ready
-      - idx: 6
-        slug: 06-pipeline-completion
-        title: 문서 수집 파이프라인 완성
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-pdf-parsing
-        title: PDF parsing and text extraction
-        status: publish-ready
-      - idx: 2
-        slug: 02-chunking-strategies
-        title: Chunking strategies — optimizing by document type
-        status: publish-ready
-      - idx: 3
-        slug: 03-metadata-filtering
-        title: Metadata design and filtering
-        status: publish-ready
-      - idx: 4
-        slug: 04-incremental-indexing
-        title: Incremental indexing — updating only changed documents
-        status: publish-ready
-      - idx: 5
-        slug: 05-multi-format-pipeline
-        title: Multi-format document pipeline
-        status: publish-ready
-      - idx: 6
-        slug: 06-pipeline-completion
-        title: Completing the document ingestion pipeline
-        status: publish-ready
-  track: ebook
-  stage: rag
-- id: llm-apps-ops-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LLM 앱 운영 101
-    en: LLM Apps Ops 101
-  description:
-    ko: 관측, 평가, 비용, 보안, 배포 — 6부작.
-    en: Observability, evaluation, cost, security, and deployment in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 201
-  lifecycle: active
-  path: content/llm-apps-ops-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-monitoring-and-logging
-        title: LLM 앱 모니터링과 로깅
-        status: publish-ready
-      - idx: 2
-        slug: 02-cost-tracking
-        title: LLM 비용 추적과 최적화
-        status: publish-ready
-      - idx: 3
-        slug: 03-evaluation
-        title: LLM 출력 품질 평가
-        status: publish-ready
-      - idx: 4
-        slug: 04-security
-        title: LLM 앱 보안
-        status: publish-ready
-      - idx: 5
-        slug: 05-deployment
-        title: LLM 앱 배포 전략
-        status: publish-ready
-      - idx: 6
-        slug: 06-ops-complete
-        title: LLM 앱 운영 완성
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-monitoring-and-logging
-        title: Monitoring and logging for LLM apps
-        status: publish-ready
-      - idx: 2
-        slug: 02-cost-tracking
-        title: LLM cost tracking and optimization
-        status: publish-ready
-      - idx: 3
-        slug: 03-evaluation
-        title: Evaluating LLM output quality
-        status: publish-ready
-      - idx: 4
-        slug: 04-security
-        title: LLM app security
-        status: publish-ready
-      - idx: 5
-        slug: 05-deployment
-        title: LLM app deployment strategies
-        status: publish-ready
-      - idx: 6
-        slug: 06-ops-complete
-        title: Completing the LLM ops pipeline
-        status: publish-ready
-  track: authority
-  stage: ops
-- id: rag-benchmark-101
-  status: content-ready
-  category: ai
-  title:
-    ko: RAG 평가와 벤치마크 101
-    en: RAG Evaluation and Benchmarking 101
-  description:
-    ko: RAG 품질 평가 6부작 — 평가 데이터셋, 임베딩/리트리버 비교, RAGAS, 의사결정 연결.
-    en: 6-part RAG evaluation guide — datasets, embedding/retriever comparison, RAGAS, product decisions.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/rag-benchmark-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-evaluation-metrics
-        title: RAG 평가 지표 이해
-        status: publish-ready
-      - idx: 2
-        slug: 02-retrieval-benchmarking
-        title: 검색 성능 측정
-        status: publish-ready
-      - idx: 3
-        slug: 03-embedding-comparison
-        title: 임베딩 모델 비교
-        status: publish-ready
-      - idx: 4
-        slug: 04-vectordb-selection
-        title: VectorDB 선택 기준
-        status: publish-ready
-      - idx: 5
-        slug: 05-e2e-evaluation
-        title: 종단 간 RAG 파이프라인 평가
-        status: publish-ready
-      - idx: 6
-        slug: 06-benchmark-complete
-        title: RAG 벤치마크 완성
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-evaluation-metrics
-        title: Understanding RAG evaluation metrics
-        status: publish-ready
-      - idx: 2
-        slug: 02-retrieval-benchmarking
-        title: Measuring retrieval performance
-        status: publish-ready
-      - idx: 3
-        slug: 03-embedding-comparison
-        title: Comparing embedding models
-        status: publish-ready
-      - idx: 4
-        slug: 04-vectordb-selection
-        title: VectorDB selection criteria
-        status: publish-ready
-      - idx: 5
-        slug: 05-e2e-evaluation
-        title: End-to-end RAG pipeline evaluation
-        status: publish-ready
-      - idx: 6
-        slug: 06-benchmark-complete
-        title: Completing the RAG benchmark
-        status: publish-ready
-  track: traffic
-  stage: rag
-- id: langgraph-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LangGraph 101
-    en: LangGraph 101
-  description:
-    ko: 그래프 에이전트, 체크포인트, 멀티에이전트 — 6부작.
-    en: Graph agents, checkpoints, and multi-agent systems in 6 parts.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/langgraph-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-graph-basics
-        title: LangGraph 소개와 그래프 기초
-        status: publish-ready
-      - idx: 2
-        slug: 02-state-and-checkpoints
-        title: 상태 관리와 체크포인트
-        status: publish-ready
-      - idx: 3
-        slug: 03-conditional-edges
-        title: 조건부 엣지와 분기 흐름
-        status: publish-ready
-      - idx: 4
-        slug: 04-tool-calling-agent
-        title: 도구 호출 에이전트
-        status: publish-ready
-      - idx: 5
-        slug: 05-multi-agent
-        title: 멀티 에이전트 시스템
-        status: publish-ready
-      - idx: 6
-        slug: 06-langgraph-complete
-        title: LangGraph 완성
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-graph-basics
-        title: LangGraph introduction and graph basics
-        status: publish-ready
-      - idx: 2
-        slug: 02-state-and-checkpoints
-        title: State management and checkpoints
-        status: publish-ready
-      - idx: 3
-        slug: 03-conditional-edges
-        title: Conditional edges and branching
-        status: publish-ready
-      - idx: 4
-        slug: 04-tool-calling-agent
-        title: Tool-calling agents
-        status: publish-ready
-      - idx: 5
-        slug: 05-multi-agent
-        title: Multi-agent systems
-        status: publish-ready
-      - idx: 6
-        slug: 06-langgraph-complete
-        title: Completing LangGraph
-        status: publish-ready
-  track: authority
-  stage: patterns
-- id: llm-finetuning-101
-  status: content-ready
-  category: ai
-  title:
-    ko: LLM 파인튜닝 101
-    en: LLM Fine-tuning 101
-  description:
-    ko: LoRA, 데이터셋, 서빙 — 6부작 (선택).
-    en: LoRA, datasets, and serving in 6 parts (optional).
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/llm-finetuning-101
-  per:
-    ko:
-      articles:
-      - idx: 1
-        slug: 01-intro
-        title: LLM 파인튜닝 입문
-        status: publish-ready
-      - idx: 2
-        slug: 02-dataset
-        title: 데이터셋 준비와 전처리
-        status: publish-ready
-      - idx: 3
-        slug: 03-lora
-        title: LoRA 어댑터 구성
-        status: publish-ready
-      - idx: 4
-        slug: 04-training
-        title: 학습 루프와 하이퍼파라미터
-        status: publish-ready
-      - idx: 5
-        slug: 05-evaluation
-        title: 모델 평가
-        status: publish-ready
-      - idx: 6
-        slug: 06-serving
-        title: 모델 서빙
-        status: publish-ready
-    en:
-      articles:
-      - idx: 1
-        slug: 01-intro
-        title: Introduction to LLM Fine-tuning
-        status: publish-ready
-      - idx: 2
-        slug: 02-dataset
-        title: Dataset preparation and preprocessing
-        status: publish-ready
-      - idx: 3
-        slug: 03-lora
-        title: Configuring the LoRA adapter
-        status: publish-ready
-      - idx: 4
-        slug: 04-training
-        title: Training loop and hyperparameters
-        status: publish-ready
-      - idx: 5
-        slug: 05-evaluation
-        title: Model evaluation
-        status: publish-ready
-      - idx: 6
-        slug: 06-serving
-        title: Model serving
-        status: publish-ready
-  track: authority
-  stage: education
-- id: ax-practical-guide
-  status: planned
-  category: ax
-  title:
-    ko: AX 실전 가이드
-    en: AI Transformation Practical Guide
-  description:
-    ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
-    en: Practical strategies for AI Transformation in real organizations.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/ax-practical-guide
 - id: technical-writing-101
   category: writing
   title:
@@ -3289,15 +3377,15 @@ series:
   level: 101
   lifecycle: active
   path: content/technical-writing
-- id: data-structures-python-101
-  status: content-ready
-  category: python
+- id: ax-practical-guide
+  status: planned
+  category: ax
   title:
-    ko: Data Structures with Python 101
-    en: Data Structures with Python 101
+    ko: AX 실전 가이드
+    en: AI Transformation Practical Guide
   description:
-    ko: Python으로 배우는 자료구조 입문. list, dict, set, deque, 트리, 힙, 그래프를 직접 구현합니다.
-    en: A hands-on introduction to data structures in Python covering list, dict, set, deque, trees, heaps, and graphs.
+    ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
+    en: Practical strategies for AI Transformation in real organizations.
   languages:
   - ko
   - en
@@ -3309,92 +3397,4 @@ series:
     ebook: true
   level: 101
   lifecycle: active
-  path: content/data-structures-python-101
-
-- id: algorithms-python-101
-  status: content-ready
-  category: python
-  title:
-    ko: Algorithms with Python 101
-    en: Algorithms with Python 101
-  description:
-    ko: Python 기반으로 시간 복잡도, 탐색, 정렬, DP, BFS/DFS, 그리디 등 알고리즘 기본기를 다지는 시리즈.
-    en: A beginner series on algorithm fundamentals in Python covering time complexity, searching, sorting, recursion, dynamic programming, and greedy algorithms.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/algorithms-python-101
-
-- id: oop-101
-  status: content-ready
-  category: programming-foundations
-  title:
-    ko: Object-Oriented Programming 101
-    en: Object-Oriented Programming 101
-  description:
-    ko: 클래스, 캡슐화, 상속, 다형성, 추상화, SOLID 원칙까지 객체지향의 핵심을 다루는 시리즈.
-    en: A series covering the essentials of OOP from classes and encapsulation to inheritance, polymorphism, abstraction, and SOLID principles.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/oop-101
-
-- id: functional-programming-101
-  status: content-ready
-  category: programming-foundations
-  title:
-    ko: Functional Programming 101
-    en: Functional Programming 101
-  description:
-    ko: 순수 함수, 불변 데이터, 고차 함수, 클로저, 함수 합성까지 함수형 프로그래밍의 핵심을 Python으로 배우는 시리즈.
-    en: A beginner series on functional programming essentials in Python covering pure functions, immutability, higher-order functions, closures, and function composition.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/functional-programming-101
-
-- id: type-hints-python-101
-  status: content-ready
-  category: programming-foundations
-  title:
-    ko: Type Hints in Python 101
-    en: Type Hints in Python 101
-  description:
-    ko: Python type hint, Optional, Union, TypedDict, Protocol, Generic, mypy, Pydantic까지 타입 힌트 활용을 배우는 시리즈.
-    en: A beginner series on Python type hints covering basic annotations, Optional, Union, TypedDict, Protocol, Generic, mypy, and Pydantic.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/type-hints-python-101
+  path: content/ax-practical-guide

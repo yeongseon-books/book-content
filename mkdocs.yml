@@ -38,7 +38,141 @@ nav:
   - Home: index.md
   - Korean:
       - ko/index.md
+      - AI:
+          - AI Agent 101:
+              - "AI Agent란 무엇인가?": ko/ai-agent-101/01-what-is-an-ai-agent.md
+              - "컨텍스트 엔지니어링": ko/ai-agent-101/02-context-engineering.md
+              - "Tool Use 기초": ko/ai-agent-101/03-tool-use-fundamentals.md
+              - "Agent Workflow 설계": ko/ai-agent-101/04-agent-workflow-design.md
+              - "Memory와 State": ko/ai-agent-101/05-memory-and-state.md
+              - "Multi-Agent 시스템": ko/ai-agent-101/06-multi-agent-systems.md
+              - "Agent 평가": ko/ai-agent-101/07-agent-evaluation.md
+              - "에러 처리와 안정성": ko/ai-agent-101/08-error-handling-reliability.md
+              - "운영": ko/ai-agent-101/09-production-operations.md
+              - "첫 Agent 만들기": ko/ai-agent-101/10-building-first-agent.md
+          - AI Data Preparation 101:
+              - "데이터 준비가 모델 품질을 결정하는 이유": ko/ai-data-preparation-101/01-why-data-preparation-matters.md
+              - "원본 데이터 수집과 카탈로깅": ko/ai-data-preparation-101/02-source-data-collection-cataloging.md
+              - "데이터 정제와 중복 제거": ko/ai-data-preparation-101/03-cleaning-deduplication.md
+              - "학습 데이터 PII 탐지와 익명화": ko/ai-data-preparation-101/04-pii-detection-anonymization.md
+              - "Tokenization과 Chunking 전략": ko/ai-data-preparation-101/05-tokenization-chunking.md
+              - "데이터 품질 필터링 — Heuristic과 Classifier": ko/ai-data-preparation-101/06-quality-filtering.md
+              - "합성 데이터 생성 — Self-Instruct부터 Distillation까지": ko/ai-data-preparation-101/07-synthetic-data-generation.md
+              - "데이터 증강 기법 — EDA부터 Back-Translation까지": ko/ai-data-preparation-101/08-data-augmentation.md
+              - "학습/평가/테스트 분할과 Contamination 통제": ko/ai-data-preparation-101/09-train-eval-test-splitting.md
+              - "프로덕션 데이터 파이프라인 구축": ko/ai-data-preparation-101/10-production-data-pipeline.md
+          - AI Evaluation 101:
+              - "왜 LLM 애플리케이션을 평가해야 하는가": ko/ai-evaluation-101/01-why-evaluate-llm-apps.md
+              - "평가 데이터셋 설계하기": ko/ai-evaluation-101/02-evaluation-dataset-design.md
+              - "결정적 지표 — Exact Match, BLEU, ROUGE": ko/ai-evaluation-101/03-deterministic-metrics.md
+              - "LLM-as-Judge — 모델로 모델을 평가하기": ko/ai-evaluation-101/04-llm-as-judge.md
+              - "Rubric 기반 채점 설계": ko/ai-evaluation-101/05-rubric-based-scoring.md
+              - "RAG 시스템 평가하기": ko/ai-evaluation-101/06-rag-evaluation.md
+              - "Agent 평가하기 — 단일 응답이 아닌 trajectory": ko/ai-evaluation-101/07-agent-evaluation.md
+              - "회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게": ko/ai-evaluation-101/08-regression-testing.md
+              - "LLM A/B 테스팅 — 어느 prompt가 더 나은가": ko/ai-evaluation-101/09-ab-testing-llms.md
+              - "운영 환경에서의 지속적 평가": ko/ai-evaluation-101/10-production-evaluation.md
+          - AI Safety & Guardrails 101:
+              - "AI Safety가 왜 중요한가": ko/ai-safety-guardrails-101/01-why-ai-safety-matters.md
+              - "Prompt Injection 방어": ko/ai-safety-guardrails-101/02-prompt-injection-defense.md
+              - "출력 필터링과 콘텐츠 모더레이션": ko/ai-safety-guardrails-101/03-output-filtering.md
+              - "PII 감지와 마스킹": ko/ai-safety-guardrails-101/04-pii-detection-redaction.md
+              - "Jailbreak 탐지": ko/ai-safety-guardrails-101/05-jailbreak-detection.md
+              - "독성과 편향 탐지": ko/ai-safety-guardrails-101/06-toxicity-bias-detection.md
+              - "Hallucination Guardrail — Grounding 검증": ko/ai-safety-guardrails-101/07-hallucination-guardrails.md
+              - "Rate Limiting과 남용 방지": ko/ai-safety-guardrails-101/08-rate-limiting-abuse-prevention.md
+              - "감사 로깅과 컴플라이언스": ko/ai-safety-guardrails-101/09-audit-logging-compliance.md
+              - "운영 가드레일 시스템 구축": ko/ai-safety-guardrails-101/10-production-guardrail-system.md
+          - AI 웹 개발 입문:
+              - "AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기": ko/ai-web-dev-101/01-hello-ai-api.md
+              - "프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술": ko/ai-web-dev-101/02-prompt-engineering.md
+              - "AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현": ko/ai-web-dev-101/03-ai-chatbot.md
+              - "RAG 입문 — 내 데이터로 답하는 AI 만들기": ko/ai-web-dev-101/04-rag-intro.md
+              - "AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기": ko/ai-web-dev-101/05-ai-agent.md
+              - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
+              - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
+          - Harness Engineering 101:
+              - "Harness Engineering이란 무엇인가?": ko/harness-engineering-101/01-what-is-harness-engineering.md
+              - "Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기": ko/harness-engineering-101/02-task-harness.md
+              - "Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기": ko/harness-engineering-101/03-context-harness.md
+              - "Constraint Harness — 규칙, 경계, 금지 행동 정의하기": ko/harness-engineering-101/04-constraint-harness.md
+              - "Tool Harness — Agent가 사용할 도구를 안전하게 설계하기": ko/harness-engineering-101/05-tool-harness.md
+              - "Test Harness — 완료 조건을 테스트로 고정하기": ko/harness-engineering-101/06-test-harness.md
+              - "Feedback Loop — 실패를 고치게 만드는 반복 구조": ko/harness-engineering-101/07-feedback-loop.md
+              - "Approval Gate — 사람 승인이 필요한 지점 설계하기": ko/harness-engineering-101/08-approval-gate.md
+              - "Observability — Agent 작업을 추적하고 재현하기": ko/harness-engineering-101/09-observability.md
+              - "Production Harness — 운영 가능한 Agent 작업 환경 만들기": ko/harness-engineering-101/10-production-harness.md
+          - LLM from Scratch 101:
+              - "글자를 숫자로 바꾸기": ko/llm-from-scratch-101/01-tokenizer.md
+              - "정수에서 벡터로, 그리고 위치": ko/llm-from-scratch-101/02-embedding.md
+              - "어떤 토큰을 얼마나 볼지 스스로 정하기": ko/llm-from-scratch-101/03-attention.md
+              - "블록 하나, 깊이의 단위": ko/llm-from-scratch-101/04-transformer-block.md
+              - "조립: GPT 모델 클래스 완성": ko/llm-from-scratch-101/05-gpt-model.md
+              - "기울기로 배우기": ko/llm-from-scratch-101/06-training-loop.md
+              - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
+              - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
+              - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
+          - RAG Deep Dive:
+              - "문서 로딩과 청크 전략 — LangChain TextSplitter 내부": ko/rag-deep-dive/01-document-loading-and-chunking.md
+              - "임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리": ko/rag-deep-dive/02-embeddings-and-vector-index.md
+              - "Retriever 설계 — VectorStoreRetriever와 MMR": ko/rag-deep-dive/03-retriever-design.md
+              - "프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부": ko/rag-deep-dive/04-prompt-construction-and-context-injection.md
+              - "RAG Chain 조립 — RetrievalQA vs LCEL": ko/rag-deep-dive/05-rag-chain-assembly.md
+              - "평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness": ko/rag-deep-dive/06-evaluation-and-quality-gates.md
+      - 프로그래밍 일반:
+          - pytest 101:
+              - "왜 테스트를 작성해야 할까?": ko/pytest-101/01-why-write-tests.md
+              - "첫 번째 pytest 테스트 작성하기": ko/pytest-101/02-first-pytest-test.md
+              - "assert와 예외 테스트": ko/pytest-101/03-assert-and-exceptions.md
+              - "fixture 이해하기": ko/pytest-101/04-fixtures.md
+              - "parametrization으로 테스트 케이스 늘리기": ko/pytest-101/05-parametrization.md
+              - "mock과 monkeypatch": ko/pytest-101/06-mock-and-monkeypatch.md
+              - "파일, 환경변수, 시간 테스트하기": ko/pytest-101/07-testing-files-env-time.md
+              - "coverage와 테스트 품질 보기": ko/pytest-101/08-coverage.md
+              - "GitHub Actions에서 테스트 자동화하기": ko/pytest-101/09-ci-with-github-actions.md
+              - "테스트하기 쉬운 코드 구조 만들기": ko/pytest-101/10-testable-code.md
+          - Python Package 101:
+              - "Python Package란 무엇인가?": ko/python-package-101/01-what-is-a-python-package.md
+              - "프로젝트 구조 잡기 — src layout과 pyproject.toml": ko/python-package-101/02-project-structure.md
+              - "의존성 관리 — venv, pip, uv, requirements": ko/python-package-101/03-dependency-management.md
+              - "패키지 빌드하기 — wheel과 sdist": ko/python-package-101/04-building-packages.md
+              - "PyPI에 배포하기 — TestPyPI부터 실제 배포까지": ko/python-package-101/05-publishing-to-pypi.md
+              - "버전 관리와 릴리스": ko/python-package-101/06-versioning-and-releases.md
+              - "CLI 패키지 만들기": ko/python-package-101/07-cli-packages.md
+              - "타입 힌트와 정적 검사": ko/python-package-101/08-type-hints-and-static-analysis.md
+              - "문서화 — README, MkDocs, API Reference": ko/python-package-101/09-documentation.md
+              - "실전 패키지 템플릿 만들기": ko/python-package-101/10-package-template.md
       - Azure:
+          - Azure Container Apps 101:
+              - "Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기": ko/azure-aca-101/01-what-is-aca.md
+              - "Environment·Container App·Revision — 세 단어로 보는 ACA": ko/azure-aca-101/02-environment-app-revision.md
+              - "첫 앱 배포하기 — Python/FastAPI": ko/azure-aca-101/03-first-deploy.md
+              - "Ingress와 트래픽 분할 — Revision 기반 배포 전략": ko/azure-aca-101/04-ingress-and-traffic-split.md
+              - "스케일링 — KEDA scaler와 0-to-N": ko/azure-aca-101/05-scaling-with-keda.md
+              - "Dapr 통합 — 사이드카로 얻는 것": ko/azure-aca-101/06-dapr-integration.md
+              - "모니터링과 운영 — Log Analytics와 Application Insights": ko/azure-aca-101/07-monitoring-and-ops.md
+          - Azure Container Apps Deep Dive:
+              - "ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것": ko/azure-aca-deep-dive/01-aca-architecture.md
+              - "Environment 내부 — 네트워크·관측·Dapr 스코프의 경계": ko/azure-aca-deep-dive/02-environment-internals.md
+              - "Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가": ko/azure-aca-deep-dive/03-revision-and-traffic-split.md
+              - "ACA 안의 KEDA — Scale Rule이 만드는 것": ko/azure-aca-deep-dive/04-keda-in-aca.md
+              - "Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스": ko/azure-aca-deep-dive/05-dapr-sidecar-internals.md
+              - "Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지": ko/azure-aca-deep-dive/06-envoy-ingress-path.md
+          - Azure Kubernetes Service 101:
+              - "Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes": ko/azure-aks-101/01-what-is-aks.md
+              - "클러스터 아키텍처 — Control Plane과 Node Pool": ko/azure-aks-101/02-cluster-architecture.md
+              - "첫 클러스터 만들고 앱 배포하기 — Python/FastAPI": ko/azure-aks-101/03-first-cluster-and-deploy.md
+              - "Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식": ko/azure-aks-101/04-pod-deployment-service.md
+              - "네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길": ko/azure-aks-101/05-networking-and-ingress.md
+              - "스케일링 — HPA, Cluster Autoscaler, KEDA": ko/azure-aks-101/06-scaling-hpa-ca-keda.md
+              - "모니터링과 운영 — Container Insights, 로그, 알람": ko/azure-aks-101/07-monitoring-and-ops.md
+          - Azure Kubernetes Service Deep Dive:
+              - "Control Plane 해부 — AKS가 사용자에게서 가린 것": ko/azure-aks-deep-dive/01-control-plane-anatomy.md
+              - "kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지": ko/azure-aks-deep-dive/02-kubelet-and-containerd.md
+              - "CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가": ko/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
+              - "Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가": ko/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
+              - "HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프": ko/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
+              - "KEDA 내부 — ScaledObject가 HPA를 만드는 방식": ko/azure-aks-deep-dive/06-keda-internals.md
           - Azure App Service 101:
               - "Azure App Service란? - 플랫폼 아키텍처 이해하기": ko/azure-app-service-101/01-what-is-app-service.md
               - "Request Lifecycle: 3am에 터진 502를 어디서부터 봐야 할까": ko/azure-app-service-101/02-request-lifecycle.md
@@ -69,65 +203,135 @@ nav:
               - "Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지": ko/azure-functions-deep-dive/04-dispatcher-and-invocation.md
               - "스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이": ko/azure-functions-deep-dive/05-scaling-internals.md
               - "콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때": ko/azure-functions-deep-dive/06-cold-start-placeholder.md
-          - Azure Kubernetes Service 101:
-              - "Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes": ko/azure-aks-101/01-what-is-aks.md
-              - "클러스터 아키텍처 — Control Plane과 Node Pool": ko/azure-aks-101/02-cluster-architecture.md
-              - "첫 클러스터 만들고 앱 배포하기 — Python/FastAPI": ko/azure-aks-101/03-first-cluster-and-deploy.md
-              - "Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식": ko/azure-aks-101/04-pod-deployment-service.md
-              - "네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길": ko/azure-aks-101/05-networking-and-ingress.md
-              - "스케일링 — HPA, Cluster Autoscaler, KEDA": ko/azure-aks-101/06-scaling-hpa-ca-keda.md
-              - "모니터링과 운영 — Container Insights, 로그, 알람": ko/azure-aks-101/07-monitoring-and-ops.md
-          - Azure Kubernetes Service Deep Dive:
-              - "Control Plane 해부 — AKS가 사용자에게서 가린 것": ko/azure-aks-deep-dive/01-control-plane-anatomy.md
-              - "kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지": ko/azure-aks-deep-dive/02-kubelet-and-containerd.md
-              - "CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가": ko/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
-              - "Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가": ko/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
-              - "HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프": ko/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
-              - "KEDA 내부 — ScaledObject가 HPA를 만드는 방식": ko/azure-aks-deep-dive/06-keda-internals.md
-          - Azure Container Apps 101:
-              - "Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기": ko/azure-aca-101/01-what-is-aca.md
-              - "Environment·Container App·Revision — 세 단어로 보는 ACA": ko/azure-aca-101/02-environment-app-revision.md
-              - "첫 앱 배포하기 — Python/FastAPI": ko/azure-aca-101/03-first-deploy.md
-              - "Ingress와 트래픽 분할 — Revision 기반 배포 전략": ko/azure-aca-101/04-ingress-and-traffic-split.md
-              - "스케일링 — KEDA scaler와 0-to-N": ko/azure-aca-101/05-scaling-with-keda.md
-              - "Dapr 통합 — 사이드카로 얻는 것": ko/azure-aca-101/06-dapr-integration.md
-              - "모니터링과 운영 — Log Analytics와 Application Insights": ko/azure-aca-101/07-monitoring-and-ops.md
-          - Azure Container Apps Deep Dive:
-              - "ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것": ko/azure-aca-deep-dive/01-aca-architecture.md
-              - "Environment 내부 — 네트워크·관측·Dapr 스코프의 경계": ko/azure-aca-deep-dive/02-environment-internals.md
-              - "Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가": ko/azure-aca-deep-dive/03-revision-and-traffic-split.md
-              - "ACA 안의 KEDA — Scale Rule이 만드는 것": ko/azure-aca-deep-dive/04-keda-in-aca.md
-              - "Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스": ko/azure-aca-deep-dive/05-dapr-sidecar-internals.md
-              - "Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지": ko/azure-aca-deep-dive/06-envoy-ingress-path.md
-      - AI:
-          - AI 웹 개발 입문:
-              - "AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기": ko/ai-web-dev-101/01-hello-ai-api.md
-              - "프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술": ko/ai-web-dev-101/02-prompt-engineering.md
-              - "AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현": ko/ai-web-dev-101/03-ai-chatbot.md
-              - "RAG 입문 — 내 데이터로 답하는 AI 만들기": ko/ai-web-dev-101/04-rag-intro.md
-              - "AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기": ko/ai-web-dev-101/05-ai-agent.md
-              - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
-              - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
-          - LLM from Scratch 101:
-              - "글자를 숫자로 바꾸기": ko/llm-from-scratch-101/01-tokenizer.md
-              - "정수에서 벡터로, 그리고 위치": ko/llm-from-scratch-101/02-embedding.md
-              - "어떤 토큰을 얼마나 볼지 스스로 정하기": ko/llm-from-scratch-101/03-attention.md
-              - "블록 하나, 깊이의 단위": ko/llm-from-scratch-101/04-transformer-block.md
-              - "조립: GPT 모델 클래스 완성": ko/llm-from-scratch-101/05-gpt-model.md
-              - "기울기로 배우기": ko/llm-from-scratch-101/06-training-loop.md
-              - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
-              - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
-              - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
-          - RAG Deep Dive:
-              - "문서 로딩과 청크 전략 — LangChain TextSplitter 내부": ko/rag-deep-dive/01-document-loading-and-chunking.md
-              - "임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리": ko/rag-deep-dive/02-embeddings-and-vector-index.md
-              - "Retriever 설계 — VectorStoreRetriever와 MMR": ko/rag-deep-dive/03-retriever-design.md
-              - "프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부": ko/rag-deep-dive/04-prompt-construction-and-context-injection.md
-              - "RAG Chain 조립 — RetrievalQA vs LCEL": ko/rag-deep-dive/05-rag-chain-assembly.md
-              - "평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness": ko/rag-deep-dive/06-evaluation-and-quality-gates.md
   - English:
       - en/index.md
+      - AI:
+          - AI Agent 101:
+              - "What Is an AI Agent?": en/ai-agent-101/01-what-is-an-ai-agent.md
+              - "Context Engineering": en/ai-agent-101/02-context-engineering.md
+              - "Tool Use Fundamentals": en/ai-agent-101/03-tool-use-fundamentals.md
+              - "Agent Workflow Design": en/ai-agent-101/04-agent-workflow-design.md
+              - "Memory and State": en/ai-agent-101/05-memory-and-state.md
+              - "Multi-Agent Systems": en/ai-agent-101/06-multi-agent-systems.md
+              - "Agent Evaluation": en/ai-agent-101/07-agent-evaluation.md
+              - "Error Handling and Reliability": en/ai-agent-101/08-error-handling-reliability.md
+              - "Production Operations": en/ai-agent-101/09-production-operations.md
+              - "Building Your First Agent": en/ai-agent-101/10-building-first-agent.md
+          - AI Data Preparation 101:
+              - "Why Data Preparation Determines Model Quality": en/ai-data-preparation-101/01-why-data-preparation-matters.md
+              - "Source Data Collection and Cataloging": en/ai-data-preparation-101/02-source-data-collection-cataloging.md
+              - "Cleaning and Deduplication": en/ai-data-preparation-101/03-cleaning-deduplication.md
+              - "PII Detection and Anonymization for Training Data": en/ai-data-preparation-101/04-pii-detection-anonymization.md
+              - "Tokenization and Chunking Strategies": en/ai-data-preparation-101/05-tokenization-chunking.md
+              - "Quality Filtering - Heuristics and Classifiers": en/ai-data-preparation-101/06-quality-filtering.md
+              - "Synthetic Data Generation - From Self-Instruct to Distillation": en/ai-data-preparation-101/07-synthetic-data-generation.md
+              - "Data Augmentation - From EDA to Back-Translation": en/ai-data-preparation-101/08-data-augmentation.md
+              - "Train/Eval/Test Splitting and Contamination Control": en/ai-data-preparation-101/09-train-eval-test-splitting.md
+              - "Building a Production Data Pipeline": en/ai-data-preparation-101/10-production-data-pipeline.md
+          - AI Evaluation 101:
+              - "Why Evaluate LLM Applications": en/ai-evaluation-101/01-why-evaluate-llm-apps.md
+              - "Designing Evaluation Datasets": en/ai-evaluation-101/02-evaluation-dataset-design.md
+              - "Deterministic Metrics — Exact Match, BLEU, ROUGE": en/ai-evaluation-101/03-deterministic-metrics.md
+              - "LLM-as-Judge — Evaluating Models with Models": en/ai-evaluation-101/04-llm-as-judge.md
+              - "Designing Rubric-Based Scoring": en/ai-evaluation-101/05-rubric-based-scoring.md
+              - "Evaluating RAG Systems": en/ai-evaluation-101/06-rag-evaluation.md
+              - "Evaluating Agents — Trajectories, Not Single Responses": en/ai-evaluation-101/07-agent-evaluation.md
+              - "Regression Testing — Don't Let Yesterday's Wins Break Today": en/ai-evaluation-101/08-regression-testing.md
+              - "A/B Testing LLMs — Which Prompt Is Better?": en/ai-evaluation-101/09-ab-testing-llms.md
+              - "Continuous Evaluation in Production": en/ai-evaluation-101/10-production-evaluation.md
+          - AI Safety & Guardrails 101:
+              - "Why AI Safety Matters": en/ai-safety-guardrails-101/01-why-ai-safety-matters.md
+              - "Prompt Injection Defense": en/ai-safety-guardrails-101/02-prompt-injection-defense.md
+              - "Output Filtering and Content Moderation": en/ai-safety-guardrails-101/03-output-filtering.md
+              - "PII Detection and Redaction": en/ai-safety-guardrails-101/04-pii-detection-redaction.md
+              - "Jailbreak Detection": en/ai-safety-guardrails-101/05-jailbreak-detection.md
+              - "Toxicity and Bias Detection": en/ai-safety-guardrails-101/06-toxicity-bias-detection.md
+              - "Hallucination Guardrails — Grounding Checks": en/ai-safety-guardrails-101/07-hallucination-guardrails.md
+              - "Rate Limiting and Abuse Prevention": en/ai-safety-guardrails-101/08-rate-limiting-abuse-prevention.md
+              - "Audit Logging and Compliance": en/ai-safety-guardrails-101/09-audit-logging-compliance.md
+              - "Building a Production Guardrail System": en/ai-safety-guardrails-101/10-production-guardrail-system.md
+          - Harness Engineering 101:
+              - "What Is Harness Engineering?": en/harness-engineering-101/01-what-is-harness-engineering.md
+              - "Task Harness — Turning Vague Work into Executable Tasks": en/harness-engineering-101/02-task-harness.md
+              - "Context Harness — Designing What the Agent Should Know and Not Know": en/harness-engineering-101/03-context-harness.md
+              - "Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions": en/harness-engineering-101/04-constraint-harness.md
+              - "Tool Harness — Designing Safe Tools for Agents": en/harness-engineering-101/05-tool-harness.md
+              - "Test Harness — Turning Completion Criteria into Tests": en/harness-engineering-101/06-test-harness.md
+              - "Feedback Loops — Building Structures That Let Agents Recover from Failure": en/harness-engineering-101/07-feedback-loop.md
+              - "Approval Gates — Designing Where Humans Must Approve": en/harness-engineering-101/08-approval-gate.md
+              - "Observability — Tracing and Replaying Agent Work": en/harness-engineering-101/09-observability.md
+              - "Production Harness — Building Operational Environments for Agents": en/harness-engineering-101/10-production-harness.md
+          - LLM from Scratch 101:
+              - "Turning Text into Numbers": en/llm-from-scratch-101/01-tokenizer.md
+              - "From Integers to Vectors and Positions": en/llm-from-scratch-101/02-embedding.md
+              - "Deciding Which Tokens to Focus On": en/llm-from-scratch-101/03-attention.md
+              - "The Transformer Block: A Unit of Depth": en/llm-from-scratch-101/04-transformer-block.md
+              - "Assembly: Completing the GPT Model Class": en/llm-from-scratch-101/05-gpt-model.md
+              - "Learning via Gradients": en/llm-from-scratch-101/06-training-loop.md
+              - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
+              - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
+              - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
+          - RAG Deep Dive:
+              - "Document Loading and Chunking — Inside LangChain TextSplitter": en/rag-deep-dive/01-document-loading-and-chunking.md
+              - "Embeddings and the Vector Index — Inside FAISS IndexFlatL2": en/rag-deep-dive/02-embeddings-and-vector-index.md
+              - "Retriever Design — VectorStoreRetriever and MMR": en/rag-deep-dive/03-retriever-design.md
+              - "Prompt Construction and Context Injection — Inside PromptTemplate": en/rag-deep-dive/04-prompt-construction-and-context-injection.md
+              - "Assembling the RAG Chain — RetrievalQA vs LCEL": en/rag-deep-dive/05-rag-chain-assembly.md
+              - "Evaluation and Quality Gates — RAGAS Metrics and Faithfulness": en/rag-deep-dive/06-evaluation-and-quality-gates.md
+      - 프로그래밍 일반:
+          - pytest 101:
+              - "Why Write Tests?": en/pytest-101/01-why-write-tests.md
+              - "Writing Your First pytest Test": en/pytest-101/02-first-pytest-test.md
+              - "Assert and Exception Testing": en/pytest-101/03-assert-and-exceptions.md
+              - "Understanding Fixtures": en/pytest-101/04-fixtures.md
+              - "Parametrization": en/pytest-101/05-parametrization.md
+              - "Mock and Monkeypatch": en/pytest-101/06-mock-and-monkeypatch.md
+              - "Testing Files, Environment Variables, and Time": en/pytest-101/07-testing-files-env-time.md
+              - "Coverage and Test Quality": en/pytest-101/08-coverage.md
+              - "Test Automation with GitHub Actions": en/pytest-101/09-ci-with-github-actions.md
+              - "Writing Testable Code": en/pytest-101/10-testable-code.md
+          - Python Package 101:
+              - "What Is a Python Package?": en/python-package-101/01-what-is-a-python-package.md
+              - "Project Structure — src layout and pyproject.toml": en/python-package-101/02-project-structure.md
+              - "Dependency Management — venv, pip, uv, requirements": en/python-package-101/03-dependency-management.md
+              - "Building Packages — wheel and sdist": en/python-package-101/04-building-packages.md
+              - "Publishing to PyPI — from TestPyPI to production": en/python-package-101/05-publishing-to-pypi.md
+              - "Versioning and Releases": en/python-package-101/06-versioning-and-releases.md
+              - "CLI Packages": en/python-package-101/07-cli-packages.md
+              - "Type Hints and Static Analysis": en/python-package-101/08-type-hints-and-static-analysis.md
+              - "Documentation — README, MkDocs, API Reference": en/python-package-101/09-documentation.md
+              - "Production Package Template": en/python-package-101/10-package-template.md
       - Azure:
+          - Azure Container Apps 101:
+              - "What is Azure Container Apps? — running containers without Kubernetes": en/azure-aca-101/01-what-is-aca.md
+              - "Environment, Container App, Revision — ACA in three words": en/azure-aca-101/02-environment-app-revision.md
+              - "Your first deploy — Python/FastAPI": en/azure-aca-101/03-first-deploy.md
+              - "Ingress and traffic splitting — revision-based deployment strategies": en/azure-aca-101/04-ingress-and-traffic-split.md
+              - "Scaling — KEDA scalers and zero-to-N": en/azure-aca-101/05-scaling-with-keda.md
+              - "Dapr integration — what you get from a sidecar": en/azure-aca-101/06-dapr-integration.md
+              - "Monitoring and ops — Log Analytics and Application Insights": en/azure-aca-101/07-monitoring-and-ops.md
+          - Azure Container Apps Deep Dive:
+              - "ACA architecture — what Microsoft layered on a hidden Kubernetes": en/azure-aca-deep-dive/01-aca-architecture.md
+              - "Environment internals — the network, observability, and Dapr scope boundary": en/azure-aca-deep-dive/02-environment-internals.md
+              - "Revisions and traffic splitting — where Envoy weights come from": en/azure-aca-deep-dive/03-revision-and-traffic-split.md
+              - "KEDA inside ACA — what a scale rule actually creates": en/azure-aca-deep-dive/04-keda-in-aca.md
+              - "Dapr sidecar internals — the Go process that lives next to your container": en/azure-aca-deep-dive/05-dapr-sidecar-internals.md
+              - "The Envoy ingress path — how the first request reaches your container": en/azure-aca-deep-dive/06-envoy-ingress-path.md
+          - Azure Kubernetes Service 101:
+              - "What is Azure Kubernetes Service? — what managed Kubernetes actually gives you": en/azure-aks-101/01-what-is-aks.md
+              - "Cluster architecture — control plane and node pools": en/azure-aks-101/02-cluster-architecture.md
+              - "Your first cluster, your first deploy — Python/FastAPI": en/azure-aks-101/03-first-cluster-and-deploy.md
+              - "Pod, Deployment, Service — the three ways you express a workload": en/azure-aks-101/04-pod-deployment-service.md
+              - "Networking and Ingress — the path in and out of the cluster": en/azure-aks-101/05-networking-and-ingress.md
+              - "Scaling — HPA, Cluster Autoscaler, KEDA": en/azure-aks-101/06-scaling-hpa-ca-keda.md
+              - "Monitoring and ops — Container Insights, logs, alerts": en/azure-aks-101/07-monitoring-and-ops.md
+          - Azure Kubernetes Service Deep Dive:
+              - "Control plane anatomy — what AKS hides from you": en/azure-aks-deep-dive/01-control-plane-anatomy.md
+              - "kubelet and containerd — how a container actually starts on a node": en/azure-aks-deep-dive/02-kubelet-and-containerd.md
+              - "CNI and Azure CNI Overlay — where Pod IPs come from": en/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
+              - "Scheduler and Pod placement — who decides which node": en/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
+              - "HPA and Cluster Autoscaler internals — two control loops": en/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
+              - "KEDA internals — how a ScaledObject builds an HPA": en/azure-aks-deep-dive/06-keda-internals.md
           - Azure App Service 101:
               - "What is Azure App Service? - Understanding the Platform Architecture": en/azure-app-service-101/01-what-is-app-service.md
               - "Request Lifecycle: How Requests Reach Your App": en/azure-app-service-101/02-request-lifecycle.md
@@ -158,52 +362,4 @@ nav:
               - "Dispatcher and Invocation — How a Function Call Reaches the Worker": en/azure-functions-deep-dive/04-dispatcher-and-invocation.md
               - "Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans": en/azure-functions-deep-dive/05-scaling-internals.md
               - "Cold Start and Placeholder Mode — What Happens When a New Instance Is Born": en/azure-functions-deep-dive/06-cold-start-placeholder.md
-          - Azure Kubernetes Service 101:
-              - "What is Azure Kubernetes Service? — what managed Kubernetes actually gives you": en/azure-aks-101/01-what-is-aks.md
-              - "Cluster architecture — control plane and node pools": en/azure-aks-101/02-cluster-architecture.md
-              - "Your first cluster, your first deploy — Python/FastAPI": en/azure-aks-101/03-first-cluster-and-deploy.md
-              - "Pod, Deployment, Service — the three ways you express a workload": en/azure-aks-101/04-pod-deployment-service.md
-              - "Networking and Ingress — the path in and out of the cluster": en/azure-aks-101/05-networking-and-ingress.md
-              - "Scaling — HPA, Cluster Autoscaler, KEDA": en/azure-aks-101/06-scaling-hpa-ca-keda.md
-              - "Monitoring and ops — Container Insights, logs, alerts": en/azure-aks-101/07-monitoring-and-ops.md
-          - Azure Kubernetes Service Deep Dive:
-              - "Control plane anatomy — what AKS hides from you": en/azure-aks-deep-dive/01-control-plane-anatomy.md
-              - "kubelet and containerd — how a container actually starts on a node": en/azure-aks-deep-dive/02-kubelet-and-containerd.md
-              - "CNI and Azure CNI Overlay — where Pod IPs come from": en/azure-aks-deep-dive/03-cni-and-azure-cni-overlay.md
-              - "Scheduler and Pod placement — who decides which node": en/azure-aks-deep-dive/04-scheduler-and-pod-placement.md
-              - "HPA and Cluster Autoscaler internals — two control loops": en/azure-aks-deep-dive/05-hpa-and-cluster-autoscaler-internals.md
-              - "KEDA internals — how a ScaledObject builds an HPA": en/azure-aks-deep-dive/06-keda-internals.md
-          - Azure Container Apps 101:
-              - "What is Azure Container Apps? — running containers without Kubernetes": en/azure-aca-101/01-what-is-aca.md
-              - "Environment, Container App, Revision — ACA in three words": en/azure-aca-101/02-environment-app-revision.md
-              - "Your first deploy — Python/FastAPI": en/azure-aca-101/03-first-deploy.md
-              - "Ingress and traffic splitting — revision-based deployment strategies": en/azure-aca-101/04-ingress-and-traffic-split.md
-              - "Scaling — KEDA scalers and zero-to-N": en/azure-aca-101/05-scaling-with-keda.md
-              - "Dapr integration — what you get from a sidecar": en/azure-aca-101/06-dapr-integration.md
-              - "Monitoring and ops — Log Analytics and Application Insights": en/azure-aca-101/07-monitoring-and-ops.md
-          - Azure Container Apps Deep Dive:
-              - "ACA architecture — what Microsoft layered on a hidden Kubernetes": en/azure-aca-deep-dive/01-aca-architecture.md
-              - "Environment internals — the network, observability, and Dapr scope boundary": en/azure-aca-deep-dive/02-environment-internals.md
-              - "Revisions and traffic splitting — where Envoy weights come from": en/azure-aca-deep-dive/03-revision-and-traffic-split.md
-              - "KEDA inside ACA — what a scale rule actually creates": en/azure-aca-deep-dive/04-keda-in-aca.md
-              - "Dapr sidecar internals — the Go process that lives next to your container": en/azure-aca-deep-dive/05-dapr-sidecar-internals.md
-              - "The Envoy ingress path — how the first request reaches your container": en/azure-aca-deep-dive/06-envoy-ingress-path.md
-      - AI:
-          - LLM from Scratch 101:
-              - "Turning Text into Numbers": en/llm-from-scratch-101/01-tokenizer.md
-              - "From Integers to Vectors and Positions": en/llm-from-scratch-101/02-embedding.md
-              - "Deciding Which Tokens to Focus On": en/llm-from-scratch-101/03-attention.md
-              - "The Transformer Block: A Unit of Depth": en/llm-from-scratch-101/04-transformer-block.md
-              - "Assembly: Completing the GPT Model Class": en/llm-from-scratch-101/05-gpt-model.md
-              - "Learning via Gradients": en/llm-from-scratch-101/06-training-loop.md
-              - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
-              - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
-              - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
-          - RAG Deep Dive:
-              - "Document Loading and Chunking — Inside LangChain TextSplitter": en/rag-deep-dive/01-document-loading-and-chunking.md
-              - "Embeddings and the Vector Index — Inside FAISS IndexFlatL2": en/rag-deep-dive/02-embeddings-and-vector-index.md
-              - "Retriever Design — VectorStoreRetriever and MMR": en/rag-deep-dive/03-retriever-design.md
-              - "Prompt Construction and Context Injection — Inside PromptTemplate": en/rag-deep-dive/04-prompt-construction-and-context-injection.md
-              - "Assembling the RAG Chain — RetrievalQA vs LCEL": en/rag-deep-dive/05-rag-chain-assembly.md
-              - "Evaluation and Quality Gates — RAGAS Metrics and Faithfulness": en/rag-deep-dive/06-evaluation-and-quality-gates.md
 # AUTOGEN-NAV-END

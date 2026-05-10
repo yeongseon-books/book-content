@@ -31,12 +31,17 @@ NAV_START = "# AUTOGEN-NAV-START"
 NAV_END = "# AUTOGEN-NAV-END"
 
 CATEGORY_LABELS = {
-    "azure": "Azure",
     "ai": "AI",
-    "ax": "AX (Planned)",
-    "developer-productivity": "Developer Productivity (Planned)",
-    "open-source": "Open Source (Planned)",
-    "technical-writing": "Technical Writing (Planned)",
+    "python": "Python",
+    "cs-core": "CS 핵심 과목",
+    "software-engineering": "소프트웨어 엔지니어링",
+    "database-data": "데이터베이스 · ORM",
+    "data": "데이터 사이언스 / ML 기초",
+    "programming": "프로그래밍 일반",
+    "programming-foundations": "프로그래밍 기초",
+    "azure": "Azure",
+    "writing": "기술 글쓰기",
+    "ax": "AX",
 }
 
 STATUS_LABELS = {
@@ -171,7 +176,7 @@ def render_series_md(catalog: list[dict]) -> str:
 
             series_path = REPO_ROOT / s["path"]
             for art in per["articles"]:
-                idx = art["idx"]
+                idx = art.get("idx") or art.get("episode", "?")
                 slug = art["slug"]
                 a_status = art.get("status", "draft")
                 lang_for_title = "ko" if has_ko else "en"
