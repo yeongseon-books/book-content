@@ -1,0 +1,19 @@
+id: technical-writing
+category: software-engineering
+title:
+  ko: 엔지니어를 위한 기술 글쓰기
+  en: Technical Writing for Engineers
+description:
+  ko: 시리즈를 설계하고, 한 편을 다듬는 법.
+  en: Designing a series and shipping a single article.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: planned
+tags: []

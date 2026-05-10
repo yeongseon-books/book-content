@@ -1,0 +1,38 @@
+id: vector-search-101
+category: ai
+title:
+  ko: 벡터 검색 101
+  en: Vector Search 101
+description:
+  ko: 임베딩, FAISS, 유사도, 청크 전략 — 6부작.
+  en: Embeddings, FAISS, similarity search, and chunking strategies in 6 parts.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: content-ready
+tags: []
+articles:
+- idx: 1
+  slug: 01-what-is-embedding
+  status: publish-ready
+- idx: 2
+  slug: 02-huggingface-embeddings
+  status: publish-ready
+- idx: 3
+  slug: 03-cosine-similarity
+  status: publish-ready
+- idx: 4
+  slug: 04-faiss-fundamentals
+  status: publish-ready
+- idx: 5
+  slug: 05-chunking-strategies
+  status: publish-ready
+- idx: 6
+  slug: 06-vector-search-pipeline
+  status: publish-ready

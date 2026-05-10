@@ -1,0 +1,38 @@
+id: korean-ai-stack-101
+category: ai
+title:
+  ko: 한국어 AI 스택 101
+  en: Korean AI Stack 101
+description:
+  ko: 한국어 임베딩, OCR, 국내 LLM API — 6부작.
+  en: Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: content-ready
+tags: []
+articles:
+- idx: 1
+  slug: 01-korean-embedding-models
+  status: publish-ready
+- idx: 2
+  slug: 02-kosimcse-similarity
+  status: publish-ready
+- idx: 3
+  slug: 03-bge-m3-multilingual
+  status: publish-ready
+- idx: 4
+  slug: 04-clova-ocr
+  status: publish-ready
+- idx: 5
+  slug: 05-hyperclova-solar-api
+  status: publish-ready
+- idx: 6
+  slug: 06-korean-rag-pipeline
+  status: publish-ready

@@ -1,0 +1,38 @@
+id: llm-app-foundations-101
+category: ai
+title:
+  ko: LLM 앱 기초
+  en: LLM App Foundations 101
+description:
+  ko: LLM API 기초, 토큰, 프롬프트 엔지니어링 — 6부작.
+  en: LLM API basics, tokens, and prompt engineering in 6 parts.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: content-ready
+tags: []
+articles:
+- idx: 1
+  slug: 01-llm-api-first-call
+  status: publish-ready
+- idx: 2
+  slug: 02-understanding-tokens
+  status: publish-ready
+- idx: 3
+  slug: 03-prompt-engineering-basics
+  status: publish-ready
+- idx: 4
+  slug: 04-few-shot-and-cot
+  status: publish-ready
+- idx: 5
+  slug: 05-conversation-state
+  status: publish-ready
+- idx: 6
+  slug: 06-streaming-responses
+  status: publish-ready

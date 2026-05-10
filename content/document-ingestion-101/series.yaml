@@ -1,0 +1,38 @@
+id: document-ingestion-101
+category: ai
+title:
+  ko: 문서 수집과 인덱싱 101
+  en: Document Ingestion 101
+description:
+  ko: PDF 파싱, 메타데이터, 증분 인덱싱 — 6부작.
+  en: PDF parsing, metadata, and incremental indexing in 6 parts.
+languages:
+- ko
+- en
+targets:
+  tistory: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  ebook: true
+status: content-ready
+tags: []
+articles:
+- idx: 1
+  slug: 01-pdf-parsing
+  status: publish-ready
+- idx: 2
+  slug: 02-chunking-strategies
+  status: publish-ready
+- idx: 3
+  slug: 03-metadata-filtering
+  status: publish-ready
+- idx: 4
+  slug: 04-incremental-indexing
+  status: publish-ready
+- idx: 5
+  slug: 05-multi-format-pipeline
+  status: publish-ready
+- idx: 6
+  slug: 06-pipeline-completion
+  status: publish-ready
