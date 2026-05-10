@@ -25,7 +25,7 @@ finalize:
 
 sync:
 	python3 scripts/sync_series_per.py
-	python3 scripts/gen_series_md.py
+	python3 scripts/build_series_index.py
 
 series: sync
 
