@@ -1,0 +1,9 @@
+flowchart TD
+    Hook["useChat()"] --> messages["messages\nChat history array"]
+    Hook --> input["input\nInput field state"]
+    Hook --> loading["isLoading\nLoading state"]
+    Hook --> submit["handleSubmit\nSubmit function"]
+    submit -->|Automatically| api["/api/chat call"]
+
+    style Hook fill:#fff3e0,stroke:#f57c00
+    style api fill:#e8f5e9,stroke:#388e3c

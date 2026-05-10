@@ -1,0 +1,8 @@
+flowchart LR
+    입력["테스트 질문"] --> 모델["AI 모델\n답변 생성"]
+    모델 --> 비교["기대 키워드와\n비교/채점"]
+    비교 --> 점수["품질 점수\n(0~100%)"]
+
+    style 입력 fill:#e3f2fd,stroke:#1976d2
+    style 모델 fill:#e8f5e9,stroke:#388e3c
+    style 점수 fill:#f3e5f5,stroke:#7b1fa2

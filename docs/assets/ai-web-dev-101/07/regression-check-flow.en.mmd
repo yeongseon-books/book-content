@@ -1,0 +1,11 @@
+flowchart TD
+    Fix["Prompt Fix"] --> NewTest["New Issue Test\n(Fixed part)"]
+    Fix --> OldTest["Existing Tests Rerun\n(Previously passing)"]
+    NewTest --> Pass{"All Pass?"}
+    OldTest --> Pass
+    Pass -->|Yes| Deploy["Deploy with Confidence"]
+    Pass -->|No| Refix["Fix Again"]
+
+    style Pass fill:#fff3e0,stroke:#f57c00
+    style Deploy fill:#e8f5e9,stroke:#388e3c
+    style Refix fill:#ffcdd2,stroke:#c62828

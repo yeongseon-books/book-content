@@ -1,0 +1,11 @@
+flowchart LR
+    A[Client request fails] --> B{Observed code?}
+    B -->|403| C[Frontend policy layer<br/>Access restriction / auth gate]
+    B -->|502| D[Frontend to worker/app path<br/>Backend connection or startup issue]
+    B -->|503| E[Healthy instance pool problem<br/>Workers unavailable or draining]
+    B -->|504| F[Long-running request path<br/>Timeout / slow dependency]
+
+    C --> C1[Check IP restrictions<br/>Host validation<br/>Auth configuration]
+    D --> D1[Check port binding<br/>Startup command<br/>Warm-up / health]
+    E --> E1[Check health check status<br/>Instance restarts<br/>Scale state]
+    F --> F1[Check DB/API latency<br/>Queue buildup<br/>Request design]

@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant 사용자
+    participant 서버 as Vercel/Azure
+    participant AI as OpenAI API
+
+    사용자->>서버: HTTPS 요청
+    서버->>서버: 환경 변수에서 API 키 로드
+    서버->>AI: API 호출 (키 포함)
+    AI-->>서버: AI 응답
+    서버-->>사용자: 결과 표시

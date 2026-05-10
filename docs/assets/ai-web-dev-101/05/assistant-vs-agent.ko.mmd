@@ -1,0 +1,14 @@
+flowchart TD
+    subgraph 일반 챗봇
+        질문1["사용자 질문"] --> 답변1["학습 데이터로\n텍스트 답변 생성"]
+    end
+    subgraph AI 에이전트
+        질문2["사용자 질문"] --> 판단["상황 판단\n어떤 도구가 필요?"]
+        판단 --> 도구["도구 실행\nAPI, DB, 계산기 등"]
+        도구 --> 결과["실행 결과 확인"]
+        결과 --> 최종["근거 있는 최종 답변"]
+    end
+
+    style 답변1 fill:#ffcdd2,stroke:#c62828
+    style 최종 fill:#e8f5e9,stroke:#388e3c
+    style 판단 fill:#fff3e0,stroke:#f57c00

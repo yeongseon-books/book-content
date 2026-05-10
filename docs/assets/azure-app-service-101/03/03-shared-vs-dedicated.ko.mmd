@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph LEFT[Shared Plan 전략]
+        direction TB
+        L0[하나의 Plan]
+        L1[App A\n낮은 트래픽]
+        L2[App B\n간헐적 CPU 사용]
+        L3[App C\n관리 포털]
+        L4[같은 인스턴스 풀 공유\n비용 효율적\nNoisy Neighbor 가능]
+        L0 --> L1
+        L0 --> L2
+        L0 --> L3
+        L1 --> L4
+        L2 --> L4
+        L3 --> L4
+    end
+
+    subgraph RIGHT[Dedicated Plan 전략]
+        direction TB
+        R1[Plan A + 핵심 API]
+        R2[Plan B + 내부 도구]
+        R3[Plan C + 배치/백오피스]
+        R4[리소스 격리\n독립 배포·독립 확장\n비용 증가]
+        R1 --> R4
+        R2 --> R4
+        R3 --> R4
+    end
+
+    LEFT --> M{결정 기준}
+    RIGHT --> M
+    M --> X[비용 최적화 우선\n→ Shared]
+    M --> Y[장애 격리·독립 확장 우선\n→ Dedicated]
+
+    style L0 fill:#e7f5ff,stroke:#1c7ed6,color:#111
+    style R1 fill:#fff3bf,stroke:#f59f00,color:#111
+    style R2 fill:#fff3bf,stroke:#f59f00,color:#111
+    style R3 fill:#fff3bf,stroke:#f59f00,color:#111
+    style M fill:#ffe8cc,stroke:#f76707,color:#111
+    style X fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style Y fill:#ffd8a8,stroke:#d9480f,color:#111

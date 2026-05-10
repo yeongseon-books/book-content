@@ -1,0 +1,10 @@
+flowchart TD
+    A[Incoming HTTPS request] --> B[TLS termination]
+    B --> C{SNI / Host valid?}
+    C -- No --> X[Reject request<br/>Wrong host or certificate path]
+    C -- Yes --> D{Access restrictions pass?}
+    D -- No --> E[Return 403]
+    D -- Yes --> F{Healthy worker available?}
+    F -- No --> G[Return 502 or 503]
+    F -- Yes --> H[Select worker instance]
+    H --> I[Forward request to worker]

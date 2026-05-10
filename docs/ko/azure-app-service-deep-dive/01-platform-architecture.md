@@ -1,0 +1,384 @@
+---
+title: App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
+series: azure-app-service-deep-dive
+episode: 1
+language: ko
+status: publish-ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- Azure
+- App Service
+- Distributed Systems
+- Platform Engineering
+last_reviewed: '2026-04-29'
+seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
+  않았습니다.
+---
+
+# App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
+
+## Source Version
+
+이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+
+- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
+- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+
+App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
+따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+
+> Azure App Service Deep Dive 시리즈 (1/6)
+
+App Service 101에서는 Management Plane, Runtime Plane, SCM Plane이라는 운영 관점을 먼저 잡았습니다.
+이번 심화 시리즈는 그중 Runtime Plane과 SCM Plane의 실제 바닥면을 더 가까이 봅니다.
+요청이 어디로 들어오고,
+어디에서 사용자 코드가 돌고,
+배포된 파일이 어디에 놓이며,
+스케일링과 워밍업이 어떤 경로로 연결되는지,
+박스를 나눠서 끝까지 따라갑니다.
+
+여기서 한 가지를 먼저 분명히 해둘 필요가 있습니다.
+**Azure Functions도 이 App Service 인프라 위에서 동작합니다.**
+Functions Deep Dive 시리즈가 함수 호스트 프로세스와 gRPC 채널을 확대했다면,
+이번 시리즈는 그 호스트가 올라타는 App Service 기판을 확대합니다.
+즉,
+Functions Deep Dive가 프로세스 안쪽을 봤다면,
+이번 글은 그 프로세스를 받치는 플랫폼 자체를 봅니다.
+
+---
+
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+App Service 플랫폼 아키텍처를 이해하면 어떤 운영 결정을 더 정확히 내릴 수 있을까요?
+
+이 글은 그 질문에 답하기 위해 App Service 플랫폼 아키텍처의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 답할 질문
+
+- App Service의 ‘플랫폼’은 정확히 어떤 레이어로 구성되어 있는가?
+- App Service Plan은 단순한 가격표인가, 아니면 격리 단위인가?
+- Front End 풀과 Worker 풀은 누가 소유하고, 우리 코드는 어디에서 도는가?
+- Linux 플랜과 Windows 플랜의 내부 차이는 우리 의사결정에 어떻게 영향을 주는가?
+- App Service Environment(ASE)는 멀티테넌트 모델과 무엇이 본질적으로 다른가?
+
+## 전체 그림 — App Service 한 인스턴스가 받는 요청
+
+이 그림이 이번 시리즈의 지도입니다.
+뒤의 다섯 편은 여기 있는 박스를 하나씩 확대하는 구조입니다.
+먼저 위치를 잡아 두면 세부 동작을 읽을 때 길을 잃지 않습니다.
+
+![요청 하나가 Front-End부터 warm-up까지 지나는 경로](../../assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.ko.png)
+
+*요청 하나가 Front-End부터 warm-up까지 지나는 경로*
+왼쪽의 외부 클라이언트와 글로벌 진입점은 101에서 다룬 요청 진입부입니다.
+가운데의 Front-End와 ARR은 2화에서,
+오른쪽의 Worker와 샌드박스는 3화에서,
+옆의 Kudu와 파일 배치 경로는 4화에서,
+Worker pool이 늘어나는 과정은 5화에서,
+첫 요청이 비싸지는 이유와 warm-up 신호는 6화에서 확대합니다.
+
+---
+
+## App Service를 박스 세 개로 보면 부족한 이유
+
+101에서의 3-Plane 모델은 운영 판단에 좋았습니다.
+하지만 플랫폼 내부를 보려면 조금 더 물리적인 그림이 필요합니다.
+
+이번 시리즈에서는 App Service를 다음 다섯 박스로 봅니다.
+
+1. Front-End
+2. ARR 기반 라우팅
+3. Worker 인스턴스
+4. 공유 파일 서버
+5. Kudu 배포 엔진
+
+이 다섯 박스를 함께 봐야 다음 질문이 한 줄로 이어집니다.
+
+- 왜 어떤 요청은 같은 워커로 계속 붙는가
+- 왜 여러 인스턴스가 `/home` 아래 같은 파일을 보는가
+- 왜 배포는 끝났는데 첫 요청은 느릴 수 있는가
+- 왜 Kudu에서 보이는 성공이 곧바로 앱 응답 성공과 같지 않은가
+
+---
+
+## 표준 아키텍처 — Front-End, Worker, shared storage
+
+Microsoft가 공개적으로 반복 설명하는 App Service의 표준 아키텍처는 비교적 단순합니다.
+
+- **Front-End machines**: HTTP/HTTPS 진입점입니다.
+- **Worker machines**: 실제 사용자 앱을 실행합니다.
+- **shared storage**: 모든 워커가 같은 앱 파일을 보게 합니다.
+
+특히 로컬 캐시와 Linux App Service 문서는,
+배포된 콘텐츠가 공유 스토리지에 놓이고 여러 인스턴스가 같은 기준점을 본다고 설명합니다.
+즉 Windows code app과 Linux code app에서는 보통 각 워커가 서로 다른 코드 복사본을 들고 있는 것이 아니라,
+공유된 앱 콘텐츠 경로를 함께 바라본다고 이해하는 편이 맞습니다.
+
+![Front-End, worker, shared storage의 연결 구조](../../assets/azure-app-service-deep-dive/01/01-02-canonical-public-architecture-front-end.ko.png)
+
+*Front-End, worker, shared storage의 연결 구조*
+여기서 중요한 건 속도가 아니라 성질입니다.
+기본 모델에서는 이 스토리지가 공유되고,
+재시작 뒤에도 남고,
+모든 워커가 같은 경로를 보게 됩니다.
+그래서 `/home/site/wwwroot`에 배포된 결과가 scale-out 뒤에도 워커마다 달라지지 않습니다.
+
+다만 Linux **custom container**는 예외가 있습니다.
+`WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`이면 `/home`이 공유 영속 스토리지로 마운트되지 않으므로,
+그 쓰기 경로는 컨테이너 로컬 계층에 더 가깝게 동작합니다.
+이 경우에는 `/home/site/wwwroot`를 “여러 인스턴스가 함께 보는 공유 기준점”으로 일반화하면 안 됩니다.
+이 storage 의미 차이는 3화에서 더 자세히 다시 다룹니다.
+
+---
+
+## Front-End는 단순한 네트워크 홉이 아닙니다
+
+App Service Front-End는 단순 TCP 전달기가 아닙니다.
+요청을 받아서 어느 앱으로 보낼지 정하고,
+어느 워커로 보낼지 고르고,
+필요하면 affinity 쿠키를 사용해 같은 사용자를 같은 워커에 오래 붙입니다.
+
+이 글에서는 세부 구현을 추측하지 않습니다.
+Microsoft가 공개한 범위에서만 정리하면 다음 정도가 확실합니다.
+
+- Front-End는 App Service의 공개 진입점입니다.
+- ARR이 여기서 동작합니다.
+- ARR Affinity 쿠키는 같은 세션의 요청을 같은 워커에 계속 붙이는 데 쓰입니다.
+
+이 특성 때문에 App Service는 기본적으로 stateless 앱에 더 잘 맞습니다.
+세션을 프로세스 메모리에 붙잡고 있으면,
+scale-in,
+worker 교체,
+affinity 해제,
+orchestrated restart 때 문제가 드러납니다.
+
+---
+
+## Worker는 “인스턴스 수”라는 숫자의 실체입니다
+
+포털에서 인스턴스를 3개로 늘린다는 말은,
+Worker pool 안에서 여러분 앱을 처리할 worker capacity가 세 개의 실행 단위로 확보된다는 뜻입니다.
+
+다만 worker를 이해할 때 자주 생기는 오해가 있습니다.
+“앱 하나 = VM 하나”가 아닙니다.
+
+실제로는 다음이 더 가깝습니다.
+
+- App Service Plan이 worker capacity를 가집니다.
+- 각 앱은 그 capacity 위에 배치됩니다.
+- scale-out은 앱의 실행 인스턴스를 여러 worker에 늘립니다.
+
+![인스턴스 수가 worker 수로 풀리는 구조](../../assets/azure-app-service-deep-dive/01/01-03-workers-are-what-instance-count-actually.ko.png)
+
+*인스턴스 수가 worker 수로 풀리는 구조*
+이때 사용자 코드가 실제로 돌고 있는 자리가 worker입니다.
+Windows 코드 앱이면 IIS 아래의 `w3wp.exe` 계열 프로세스가 그 핵심이고,
+Linux 앱이면 컨테이너가 그 핵심입니다.
+이 차이는 3화에서 자세히 봅니다.
+
+---
+
+## 파일 서버는 배포 결과의 공통 기반입니다
+
+App Service를 VM처럼 생각하면,
+배포가 각 서버 로컬 디스크에 복사된다고 상상하기 쉽습니다.
+하지만 App Service의 공용 문서는 오히려 반대 그림을 보여 줍니다.
+
+shared content store가 있고,
+여러 인스턴스가 그것을 봅니다.
+
+Linux 기준으로 독자가 가장 자주 보는 경로는 이렇습니다.
+
+- `/home/site/wwwroot` — 앱 코드 배치 위치
+- `/home/LogFiles` — 로그 위치
+- `/home/data` — 패키지와 부가 데이터가 놓일 수 있는 위치
+
+run-from-package를 켜면 여기서도 성질이 조금 달라집니다.
+ZIP이 풀려서 `wwwroot`에 복사되는 대신,
+패키지 자체가 mount된 읽기 전용 `wwwroot`가 됩니다.
+이 차이는 4화에서 다시 다룹니다.
+
+---
+
+## Kudu는 배포를 실행하는 buddy site입니다
+
+Kudu를 이해할 때 가장 중요한 표현은 “별도 출입구”보다 한 단계 더 구체적인 말입니다.
+Kudu는 앱의 **SCM buddy site** 입니다.
+
+Kudu 아키텍처 위키는 Kudu를 실사이트 옆에 붙은 single-tenant 서비스로 설명합니다.
+이 buddy site는 실제 사이트의 파일에 접근해 배포와 진단을 수행합니다.
+
+즉,
+Kudu는 단순한 로그 뷰어가 아닙니다.
+배포 엔진이고,
+ZipDeploy와 publish API의 실행 주체이며,
+Windows App Service 배포 자동화의 공개 소스 코드 창구입니다.
+
+![Kudu SCM 사이트와 실사이트의 배포 관계](../../assets/azure-app-service-deep-dive/01/01-01-kudu-is-the-deployment-buddy-site.ko.png)
+
+*Kudu SCM 사이트와 실사이트의 배포 관계*
+Kudu가 건드리는 건 결국 파일 배치와 앱 재기동 경로입니다.
+그래서 배포 문제를 읽을 때는 Kudu 로그를 보고,
+런타임 문제를 읽을 때는 앱 로그와 플랫폼 신호를 같이 봐야 합니다.
+
+---
+
+## Functions와 App Service의 경계선
+
+Functions Deep Dive를 이미 읽은 독자라면 이런 질문이 생깁니다.
+
+“그럼 Functions host는 이 그림에서 어디에 있나?”
+
+답은 worker 안입니다.
+
+- App Service substrate가 worker와 파일 시스템과 네트워크 진입점을 제공합니다.
+- 그 위에서 Functions host가 뜹니다.
+- 다시 그 host가 language worker와 gRPC 채널을 엽니다.
+
+![App Service worker 위에 Functions host가 놓인 구조](../../assets/azure-app-service-deep-dive/01/01-05-where-functions-fits-in-this-picture.ko.png)
+
+*App Service worker 위에 Functions host가 놓인 구조*
+그래서 두 시리즈는 경쟁 관계가 아닙니다.
+Functions 시리즈는 App Service 위에서 돌아가는 특정 런타임의 내부를 본 것이고,
+이번 시리즈는 그 런타임을 떠받치는 범용 웹 플랫폼을 보는 것입니다.
+
+---
+
+## 이 구조에서 운영 문제가 생기는 지점
+
+아키텍처를 박스로 나누면 장애도 박스별로 나눌 수 있습니다.
+
+### Front-End 쪽 냄새
+
+- 특정 사용자만 같은 인스턴스에 붙는 문제
+- affinity가 남아 부하가 고르게 안 퍼지는 문제
+- 워커가 준비되기 전 트래픽이 들어가는 문제
+
+### Worker 쪽 냄새
+
+- 앱 프로세스 시작 실패
+- 샌드박스 제약으로 특정 라이브러리 실패
+- 컨테이너 준비 지연
+
+### File Server 쪽 냄새
+
+- 배포는 성공했는데 기대 파일이 안 보이는 문제
+- 공유 경로를 로컬 디스크처럼 써서 생기는 잠금·성능 문제
+
+### Kudu 쪽 냄새
+
+- 배포 감지 성공 vs 런타임 실패 분리
+- Oryx 빌드는 성공했지만 startup contract는 실패하는 문제
+
+이렇게 잘라 두면 “App Service가 이상하다”는 추상적인 문장이,
+어느 박스부터 확인할지 정해진 체크리스트로 바뀝니다.
+
+---
+
+## 왜 이 심화 시리즈에서 closed-source를 추측하지 않는가
+
+App Service는 전부 오픈소스가 아닙니다.
+특히 Front-End와 worker allocation의 세부 구현은 공개 저장소로 전부 확인할 수 없습니다.
+
+그래서 이번 시리즈의 원칙은 단순합니다.
+
+- 공개된 Learn 문서로 확인되는 내용은 Learn으로 말합니다.
+- 공개 저장소가 있는 Kudu와 Oryx는 태그 고정 GitHub 링크로 말합니다.
+- 공개되지 않은 내부 스케줄러 세부 구현은 추측하지 않습니다.
+
+이 원칙이 중요한 이유는,
+심화 글이 디테일을 늘리는 순간 가장 쉽게 망가지는 부분이 바로 “그럴듯하지만 비공개인 내부 구현을 상상하는 것”이기 때문입니다.
+
+---
+
+## 이번 화 정리
+
+이번 1화의 핵심은 App Service를 한 장의 지도로 보는 것입니다.
+
+> 클라이언트 요청은 App Service Front-End로 들어오고, ARR이 적절한 worker로 보냅니다. worker는 사용자 코드를 실행하고, 여러 worker는 `/home` 아래의 공유 스토리지를 함께 봅니다. Kudu는 옆의 SCM buddy site로서 배포를 실행하고, 결과 파일을 그 공유 스토리지에 배치합니다. Azure Functions도 이 같은 substrate 위에서 동작하며, Functions Deep Dive는 그 위의 host 프로세스를 본 것이고 이번 시리즈는 그 아래의 App Service 자체를 봅니다.
+
+다음 2화에서는 이 그림의 왼쪽 가운데를 확대합니다.
+Front-End와 ARR이 어떻게 요청을 워커에 보내는지,
+그리고 왜 ARR Affinity를 끄는 것이 stateless 앱에 자주 권장되는지 이어서 다룹니다.
+
+---
+
+## 이 시리즈에서의 위치
+
+이 글은 App Service Deep Dive의 입구로서, 뒤의 다섯 편이 확대할 박스를 한 번에 배치합니다.
+2화는 Front-End와 ARR, 3화는 worker와 sandbox, 4화는 Kudu와 배포, 5화는 scale-out 경로, 6화는 cold start와 warm-up으로 이어집니다.
+
+---
+
+## Documented Behavior Summary
+
+- App Service의 공개 아키텍처는 Front-End, Worker, shared content store를 기준으로 설명됩니다.
+- Windows code app과 Linux code app은 기본적으로 공유된 앱 콘텐츠 경로를 여러 인스턴스가 함께 봅니다.
+- Linux custom container는 `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`일 때 `/home` 공유 영속 스토리지 마운트를 사용하지 않을 수 있습니다.
+- Kudu는 앱 옆의 SCM buddy site로서 배포와 진단 경로를 담당합니다.
+
+### 플랜 구성과 워커 가시성 점검
+
+```bash
+az appservice plan show -n my-plan -g my-rg \
+  --query "{sku:sku.name, tier:sku.tier, workers:numberOfWorkers, perSite:perSiteScaling, kind:kind, reserved:reserved}"
+
+az webapp list --plan my-plan -g my-rg \
+  --query "[].{name:name, state:state, hostNames:defaultHostName}" -o table
+```
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Front End·Worker 분리가 핵심 추상화** — 장애 격리와 스케일 단위가 여기서 갈립니다.
+- **App Service Plan이 자원 경계** — 여러 앱이 같은 Plan을 공유한다는 점을 의식합니다.
+- **스토리지·로깅이 공통 인프라** — 단일 장애가 여러 앱에 미칠 수 있습니다.
+- **Premium·Isolated의 격리 수준 차이** — 보안·성능 요구가 SKU 선택을 결정합니다.
+- **플랫폼 업그레이드는 불가피한 변수** — 주기적 변화를 운영 가정에 포함합니다.
+
+## 운영 체크리스트
+
+- [ ] App Service Plan을 ‘격리 단위’로서 의식적으로 분리했다
+- [ ] Linux/Windows 선택 근거를 ADR로 남겼다
+- [ ] ASE 도입의 비용/격리 trade-off를 매트릭스로 정리했다
+- [ ] 동일 플랜 위 앱들의 자원 경쟁(noisy neighbor) 시나리오를 검토했다
+- [ ] 플랫폼 업그레이드(OS, Runtime) 알림과 회귀 테스트 흐름을 정의했다
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- **App Service 플랫폼 아키텍처 — Front-End·Worker·File Server (현재 글)**
+- Front-End과 ARR — 요청은 어떻게 워커에 도달하는가 (예정)
+- Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가 (예정)
+- 배포와 Kudu — 빌드·동기화·릴리스의 안쪽 (예정)
+- 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로 (예정)
+- 콜드 스타트와 Warmup — 첫 요청이 비싼 이유 (예정)
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
+
+### 1차 출처
+- [Kudu architecture](https://github.com/projectkudu/kudu/wiki/Kudu-architecture/863125fba81e8b30950676bf495c7b7d74c00b92)
+- [PushDeploymentController.cs @ S62](https://github.com/projectkudu/kudu/blob/S62/Kudu.Services/Deployment/PushDeploymentController.cs)
+- [NinjectServices.cs @ S62](https://github.com/projectkudu/kudu/blob/S62/Kudu.Services.Web/App_Start/NinjectServices.cs)
+- [Oryx README @ 20240408.1](https://github.com/microsoft/Oryx/blob/20240408.1/README.md)
+- [Oryx BuildScriptGenerator directory @ 20240408.1](https://github.com/microsoft/Oryx/tree/20240408.1/src/BuildScriptGenerator)
+
+### 2차 출처
+- [Overview of Azure App Service](https://learn.microsoft.com/azure/app-service/overview)
+- [Local Cache in Azure App Service](https://learn.microsoft.com/azure/app-service/overview-local-cache)
+- [Run your app in Azure App Service directly from a ZIP package](https://learn.microsoft.com/azure/app-service/deploy-run-package)
+- [Kudu service overview](https://learn.microsoft.com/azure/app-service/resources-kudu)
+
+### 관련 시리즈
+- [Azure App Service 101](../azure-app-service-101/01-what-is-app-service.md)
+- [Azure Functions Deep Dive](../azure-functions-deep-dive/01-host-bootstrap.md)

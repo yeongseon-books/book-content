@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant 앱 as 내 앱
+    participant AI as GPT 모델
+    participant 도구 as 외부 도구
+
+    앱->>AI: 도구 목록 + 사용자 질문
+    AI->>AI: 어떤 도구가 필요한지 판단
+    AI-->>앱: "get_weather('서울') 실행해줘"
+    앱->>도구: get_weather('서울') 실행
+    도구-->>앱: 25도, 맑음
+    앱->>AI: 실행 결과 전달
+    AI-->>앱: "서울은 25도이고 맑습니다"

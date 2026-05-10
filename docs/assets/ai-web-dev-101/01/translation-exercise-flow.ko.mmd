@@ -1,0 +1,7 @@
+sequenceDiagram
+    participant 코드 as 내 코드
+    participant GPT as GPT 모델
+
+    Note over GPT: System: "전문 번역가"
+    코드->>GPT: "오늘 날씨가 좋네요" (번역 요청)
+    GPT-->>코드: "The weather is nice today" (번역 결과)

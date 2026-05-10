@@ -1,0 +1,218 @@
+---
+series: software-engineering-101
+episode: 4
+title: Code Review
+status: content-ready
+targets:
+  tistory: true
+  medium: true
+  hashnode: true
+  mkdocs: true
+  ebook: true
+language: en
+tags:
+  - Computer Science
+  - SoftwareEngineering
+  - CodeReview
+  - PullRequest
+  - Collaboration
+  - Quality
+seo_description: The real purpose of code review, how to write a reviewable PR, what reviewers actually look at, and the most common mistakes.
+last_reviewed: '2026-05-04'
+---
+
+# Code Review
+
+> Software Engineering 101 series (4/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: Is code review about catching defects, or about sharing knowledge?
+
+> Both. But run it badly and you do neither.
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- The real purpose of code review
+- How to write a Pull Request that is easy to review
+- What reviewers actually look at
+- Comment tone and decision signals
+- What automation can take off the reviewer's plate
+
+## Why It Matters
+
+Code review shapes both code quality and the distribution of knowledge in a team. The moment one person is the only one who understands a module, the organization is one resignation away from a freeze.
+
+> A review is a consensus, not a verdict.
+
+## Concept at a Glance
+
+```mermaid
+flowchart LR
+    A["Author: PR"] --> B["Automated checks"]
+    B --> C["Reviewer comments"]
+    C --> D["Revise or discuss"]
+    D --> E["Approve and merge"]
+```
+
+Automation first, humans focus on judgment.
+
+## Key Terms
+
+- **PR (Pull Request)**: The unit of change and the discussion space.
+- **Reviewer**: A peer who shares responsibility for the code.
+- **Nit**: A small suggestion, not a blocker.
+- **Blocking comment**: Must be resolved before merging.
+- **Approve with comments**: Trust-based approval.
+
+## Before/After
+
+**Before — one PR, 800 lines, "small fix included"**
+
+```text
+PR title: Refactor user module + bug fix + log cleanup
+-> impossible to review, intent is mixed
+```
+
+**After — split PRs, each under 200 lines**
+
+```text
+1) fix: null user crash
+2) refactor: extract notification port
+3) chore: prune verbose logs
+```
+
+Small PRs merge fast and cause fewer incidents.
+
+## Hands-on: Make a PR Reviewable
+
+### Step 1 — One-line intent
+
+```text
+# 1_pr_title.txt
+fix(auth): handle expired refresh token without 500
+```
+
+The title states the essence of the change.
+
+### Step 2 — Body template
+
+```text
+# 2_pr_body.md
+## What
+Return 401 for expired refresh tokens.
+
+## Why
+Today this throws 500 and floods our alerting.
+
+## How
+Map ExpiredTokenError to 401 in AuthService.refresh().
+
+## Test
+unit + manual cURL.
+```
+
+Reviewers enter through What/Why/How/Test fast.
+
+### Step 3 — Lift load with automation
+
+```yaml
+# 3_ci.yml
+jobs:
+  check:
+    steps:
+      - run: ruff check .
+      - run: mypy app
+      - run: pytest -q
+```
+
+Format, types, and tests are not human work.
+
+### Step 4 — Split into small units
+
+```text
+# 4_split.md
+- PR 1: data model change
+- PR 2: service logic
+- PR 3: handlers and routing
+```
+
+The smallest mergeable unit is the right unit.
+
+### Step 5 — Comment tone guide
+
+```text
+# 5_tone.md
+[nit] Naming user_id consistently would be nicer.
+[question] Could this branch trigger an N+1 query?
+[blocking] A secret key ends up in the log. Must fix before merge.
+```
+
+Tags accelerate decision making.
+
+## What to Notice in This Code
+
+- Automation clears the human's field of view.
+- A PR body template accelerates decisions.
+- Comment tags make the merge bar explicit.
+- Split PRs become recoverable decisions.
+
+## Five Common Mistakes
+
+1. **Giant PRs.** Review quality drops to zero.
+2. **Humans pointing out formatting.** Move it to automation.
+3. **Aggressive comment tone.** Talk about the code, not the person.
+4. **Rubber-stamp approvals.** Responsibility is shared.
+5. **Merging without tests.** Review is not a substitute for tests.
+
+## How This Shows Up in Production
+
+GitHub-based teams rely on CODEOWNERS for auto-assignment, 1~2 required reviews, protected branches, and a green CI gate. Larger changes go through an RFC step first.
+
+## How a Senior Engineer Thinks
+
+- A PR is a compression of intent.
+- Asking humans to do work a machine can do is disrespectful.
+- Comments are about code, not people.
+- Every approval is shared responsibility.
+- The skill of cutting work small is the mark of seniority.
+
+## Checklist
+
+- [ ] Does the PR title state intent in one line?
+- [ ] Does the PR body include What/Why/How/Test?
+- [ ] Does CI cover format, types, and tests?
+- [ ] Is the PR under 200~400 lines of change?
+- [ ] Are comments about the code, not the author?
+
+## Practice Problems
+
+1. Pick a recent PR and rewrite it using the template above.
+2. Find one CI item still being checked by humans and propose how to automate it.
+3. Draft a one-page comment guide with three tags for your team.
+
+## Wrap-up and Next Steps
+
+Code review does defect detection and knowledge distribution at the same time. Next, we move defect detection to where it belongs — testing strategy.
+
+<!-- toc:begin -->
+- [What is Software Engineering?](./01-what-is-software-engineering.md)
+- [Understanding Requirements](./02-understanding-requirements.md)
+- [Design vs Implementation](./03-design-vs-implementation.md)
+- **Code Review (current)**
+- Testing Strategy (upcoming)
+- Version Control and Release (upcoming)
+- Documentation (upcoming)
+- Collaboration Process (upcoming)
+- Maintenance and Tech Debt (upcoming)
+- What Makes Good Software (upcoming)
+<!-- toc:end -->
+
+## References
+
+- [Google Engineering Practices — Code Review Developer Guide](https://google.github.io/eng-practices/review/)
+- [Conventional Comments](https://conventionalcomments.org/)
+- [GitHub Docs — About protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
+- [Best Kept Secrets of Peer Code Review — Smart Bear](https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/)

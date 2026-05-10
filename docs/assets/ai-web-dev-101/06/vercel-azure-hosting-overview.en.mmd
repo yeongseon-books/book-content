@@ -1,0 +1,12 @@
+flowchart TD
+    subgraph Vercel
+        nextjs["Next.js App"] --> vercel_server["Vercel Server\nAuto build+deploy"]
+        vercel_server --> vercel_url["project.vercel.app"]
+    end
+    subgraph Azure
+        flask["Flask/FastAPI App"] --> azure_server["Azure App Service\nDeploy via CLI"]
+        azure_server --> azure_url["appname.azurewebsites.net"]
+    end
+
+    style vercel_server fill:#e8f5e9,stroke:#388e3c
+    style azure_server fill:#e3f2fd,stroke:#1976d2

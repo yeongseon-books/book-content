@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant D as DNS
+    participant L as Azure Load Balancer
+    participant F as App Service Frontend
+    participant W as Worker Instance
+    participant A as App Process
+
+    C->>D: Resolve host name
+    D-->>C: IP address / CNAME target
+    C->>L: HTTPS request
+    L->>F: Forward inbound traffic
+    F->>F: TLS termination + SNI/Host validation
+    F->>F: Access restriction evaluation
+    F->>W: Route to healthy instance
+    W->>A: Reverse proxy to app port
+    A-->>W: Generate response
+    W-->>F: Return upstream response
+    F-->>L: Add platform headers / egress
+    L-->>C: HTTP response

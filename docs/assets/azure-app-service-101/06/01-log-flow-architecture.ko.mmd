@@ -1,0 +1,10 @@
+flowchart LR
+    A[애플리케이션 로그 출력] --> B[stdout 또는 stderr]
+    B --> C[App Service 컨테이너 런타임]
+    C --> D[Docker 로그 파일<br/>home LogFiles docker]
+    C --> E[애플리케이션 파일 시스템 로그<br/>home LogFiles Application]
+    C --> F[Application Insights 또는 Azure Monitor Logs]
+
+    D -. 롤링 .-> G[빠른 장애 조사]
+    E -. 예시 보존 7일 100MB .-> H[단기 아카이브]
+    F -. 예시 기본 90일 이상 설정 가능 .-> I[장기 보관 추세 분석 알림]

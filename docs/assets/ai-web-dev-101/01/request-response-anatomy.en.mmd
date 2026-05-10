@@ -1,0 +1,11 @@
+flowchart TD
+    Request["Request"] --> model["model: gpt-3.5-turbo"]
+    Request --> messages["messages: conversation"]
+    
+    Response["Response"] --> choices["choices: AI answer"]
+    Response --> usage["usage: token count"]
+    choices --> content["content: actual response text"]
+    usage --> total["total_tokens: cost basis"]
+
+    style Request fill:#e3f2fd,stroke:#1976d2
+    style Response fill:#e8f5e9,stroke:#388e3c

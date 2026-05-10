@@ -1,0 +1,8 @@
+flowchart LR
+    요청["POST 요청\n(messages)"] --> 모델["모델 선택\n(gpt-4o)"]
+    모델 --> 스트림["streamText\n텍스트 생성"]
+    스트림 --> 응답["toDataStreamResponse\n스트리밍 응답 반환"]
+
+    style 요청 fill:#e3f2fd,stroke:#1976d2
+    style 모델 fill:#e8f5e9,stroke:#388e3c
+    style 응답 fill:#f3e5f5,stroke:#7b1fa2

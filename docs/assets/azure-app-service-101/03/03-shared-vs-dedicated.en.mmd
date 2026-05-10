@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph LEFT[Shared Plan Strategy]
+        direction TB
+        L0[Single Plan]
+        L1[App A\nLow Traffic]
+        L2[App B\nIntermittent CPU]
+        L3[App C\nAdmin Portal]
+        L4[Shared instance pool\nCost efficient\nPotential Noisy Neighbor]
+        L0 --> L1
+        L0 --> L2
+        L0 --> L3
+        L1 --> L4
+        L2 --> L4
+        L3 --> L4
+    end
+
+    subgraph RIGHT[Dedicated Plan Strategy]
+        direction TB
+        R1[Plan A + Core API]
+        R2[Plan B + Internal Tools]
+        R3[Plan C + Batch/Backoffice]
+        R4[Resource Isolation\nIndependent Scale/Deploy\nHigher Cost]
+        R1 --> R4
+        R2 --> R4
+        R3 --> R4
+    end
+
+    LEFT --> M{Decision Criteria}
+    RIGHT --> M
+    M --> X[Priority: Cost Optimization\n→ Shared]
+    M --> Y[Priority: Fault Isolation/Scale\n→ Dedicated]
+
+    style L0 fill:#e7f5ff,stroke:#1c7ed6,color:#111
+    style R1 fill:#fff3bf,stroke:#f59f00,color:#111
+    style R2 fill:#fff3bf,stroke:#f59f00,color:#111
+    style R3 fill:#fff3bf,stroke:#f59f00,color:#111
+    style M fill:#ffe8cc,stroke:#f76707,color:#111
+    style X fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style Y fill:#ffd8a8,stroke:#d9480f,color:#111

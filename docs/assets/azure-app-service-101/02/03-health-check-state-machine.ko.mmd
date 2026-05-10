@@ -1,0 +1,23 @@
+stateDiagram-v2
+    [*] --> Healthy
+    Healthy --> Unhealthy: 반복 프로브 실패
+    note right of Healthy
+      라우팅 풀에 포함
+      정상 트래픽 수신
+    end note
+
+    Unhealthy --> Recovering: 프로브 200-299 재반환
+    Unhealthy --> Replaced: 장기간 비정상 유지
+    note right of Unhealthy
+      로드 밸런서 풀에서 제거
+      새 요청 유입 중단
+    end note
+
+    Recovering --> Healthy: 연속 프로브 성공
+    Recovering --> Unhealthy: 프로브 재실패
+    note right of Recovering
+      점진적 신뢰 회복
+      트래픽 수신 재개 가능
+    end note
+
+    Replaced --> [*]

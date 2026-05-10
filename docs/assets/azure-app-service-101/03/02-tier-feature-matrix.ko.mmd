@@ -1,0 +1,32 @@
+flowchart TB
+    subgraph T1[티어별 기능 해금]
+        direction LR
+        F[Free / Shared\n실습·학습] --> B[Basic\n전용 리소스 시작]
+        B --> S[Standard\n운영 기능 시작]
+        S --> P[Premium\n성능·네트워킹 확장]
+    end
+
+    FD1[공유 컴퓨트\nCPU quota 중심]
+    BD1[전용 컴퓨트\n커스텀 도메인·TLS]
+    SD1[배포 슬롯\n자동 확장\n백업]
+    PD1[더 큰 CPU/메모리\n고급 네트워킹·보안\n더 큰 확장 여유]
+
+    F --> FD1
+    B --> BD1
+    S --> SD1
+    P --> PD1
+
+    U1[언제 올리나?\n'일단 배워보자']
+    U2[언제 올리나?\n'전용 리소스는 필요']
+    U3[언제 올리나?\n'운영 사고를 줄이고 싶다']
+    U4[언제 올리나?\n'네트워크·성능 요구가 커졌다']
+
+    F -.-> U1
+    B -.-> U2
+    S -.-> U3
+    P -.-> U4
+
+    style F fill:#f1f3f5,stroke:#868e96,color:#111
+    style B fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style S fill:#c5f6fa,stroke:#0b7285,color:#111
+    style P fill:#ffd8a8,stroke:#d9480f,color:#111

@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant User
+    participant Server as Vercel/Azure
+    participant AI as OpenAI API
+
+    User->>Server: HTTPS Request
+    Server->>Server: Load API key from env vars
+    Server->>AI: API call (with key)
+    AI-->>Server: AI Response
+    Server-->>User: Display result

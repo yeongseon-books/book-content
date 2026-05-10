@@ -1,0 +1,26 @@
+flowchart LR
+    subgraph SU[Scale Up / 수직 확장]
+        A1[현재 인스턴스<br/>S1] --> A2[더 큰 인스턴스<br/>P1v3]
+    end
+
+    subgraph SO[Scale Out / 수평 확장]
+        LB[Load Balancer]
+        B1[인스턴스 1<br/>S1] --> LB
+        B2[인스턴스 2<br/>S1] --> LB
+        B3[인스턴스 3<br/>S1] --> LB
+        B4[인스턴스 4<br/>S1] --> LB
+    end
+
+    C[주요 질문]
+    C --> C1[메모리 또는<br/>인스턴스당 CPU 부족]
+    C --> C2[동시 요청, 처리량,<br/>가용성 이슈]
+    C1 --> A2
+    C2 --> LB
+
+    style A1 fill:#dbeafe,stroke:#2563eb,color:#111
+    style A2 fill:#93c5fd,stroke:#1d4ed8,color:#111,stroke-width:3px
+    style B1 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B2 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B3 fill:#dcfce7,stroke:#16a34a,color:#111
+    style B4 fill:#dcfce7,stroke:#16a34a,color:#111
+    style LB fill:#fef3c7,stroke:#d97706,color:#111

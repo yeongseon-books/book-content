@@ -1,0 +1,8 @@
+flowchart TD
+    A[502 Bad Gateway 발생] --> B{Gunicorn이\nPORT에 바인딩했나?}
+    B -- 아니오 --> C[Startup Command 확인\n--bind=0.0.0.0:$PORT]
+    B -- 예 --> D{모듈 경로가\n맞나?}
+    D -- 아니오 --> E[src.app:app 같은\n정확한 경로로 수정]
+    D -- 예 --> F{의존성이\n설치됐나?}
+    F -- 아니오 --> G[requirements.txt 루트 확인\nSCM_DO_BUILD_DURING_DEPLOYMENT=true]
+    F -- 예 --> H[로그 스트림 / SSH로\n런타임 에러 확인]

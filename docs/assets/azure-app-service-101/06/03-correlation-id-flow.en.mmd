@@ -1,0 +1,6 @@
+flowchart LR
+    A[Client request enters] --> B[Middleware checks or generates Correlation ID]
+    B --> C[Tag all logs with correlationId during request processing]
+    C --> D[Return X-Correlation-ID response header]
+    D --> E[User/operator obtains ID]
+    E --> F[Query requests/traces/dependencies by correlationId in KQL]

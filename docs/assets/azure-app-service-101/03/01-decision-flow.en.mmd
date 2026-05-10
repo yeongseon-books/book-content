@@ -1,0 +1,36 @@
+flowchart TD
+    A[Create first App Service] --> B{Does app have Windows-only dependencies?}
+    B -->|Yes| C[Choose Windows]
+    B -->|No| D[Choose Linux]
+
+    C --> E{Need direct control over image/OS packages?}
+    D --> E
+
+    E -->|Yes| F[Container deployment]
+    E -->|No| G[Code deployment]
+
+    F --> H{Learning/experiment environment?}
+    G --> H
+
+    H -->|Yes| I[Free or Shared]
+    H -->|No| J{Is customer traffic or operational stability important?}
+
+    J -->|No| K[Basic]
+    J -->|Yes| L{Need deployment slots/autoscale/operational safeguards?}
+
+    L -->|Yes| M[Standard]
+    L -->|No| K
+
+    M --> N{Need advanced networking, more memory, stronger isolation?}
+    N -->|Yes| O[Consider Premium]
+    N -->|No| P[Keep Standard]
+
+    style C fill:#e8f0fe,stroke:#4c6ef5,color:#111
+    style D fill:#e8f0fe,stroke:#4c6ef5,color:#111
+    style F fill:#fff3bf,stroke:#f59f00,color:#111
+    style G fill:#fff3bf,stroke:#f59f00,color:#111
+    style I fill:#f1f3f5,stroke:#868e96,color:#111
+    style K fill:#d3f9d8,stroke:#2b8a3e,color:#111
+    style M fill:#c5f6fa,stroke:#0b7285,color:#111
+    style O fill:#ffd8a8,stroke:#d9480f,color:#111
+    style P fill:#c5f6fa,stroke:#0b7285,color:#111

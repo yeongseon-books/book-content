@@ -1,0 +1,9 @@
+flowchart LR
+    질문["내 질문\n(25 토큰)"] --> 합산["합산"]
+    답변["AI 답변\n(12 토큰)"] --> 합산
+    합산 --> 총량["총 37 토큰"]
+    총량 --> 비용["약 0.03원\n(커피 한 잔보다 훨씬 쌈)"]
+
+    style 질문 fill:#e3f2fd,stroke:#1976d2
+    style 답변 fill:#e8f5e9,stroke:#388e3c
+    style 비용 fill:#f3e5f5,stroke:#7b1fa2

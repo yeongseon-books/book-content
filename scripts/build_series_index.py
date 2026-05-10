@@ -18,6 +18,7 @@ from __future__ import annotations
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 import frontmatter
 import yaml
@@ -50,12 +51,12 @@ STATUS_LABELS = {
 }
 
 
-def load_root_catalog() -> list[dict]:
+def load_root_catalog() -> list[dict[str, Any]]:
     raw = yaml.safe_load(SERIES_YAML.read_text(encoding="utf-8"))
     return raw.get("series", [])
 
 
-def load_per_series(series: dict) -> dict | None:
+def load_per_series(series: dict[str, Any]) -> dict[str, Any] | None:
     p = REPO_ROOT / series["path"] / "series.yaml"
     if not p.is_file():
         return None
@@ -76,7 +77,72 @@ def article_title(series_path: Path, slug: str, lang: str, fallback: str) -> str
     return fallback
 
 
-def render_series_md(catalog: list[dict]) -> str:
+def get_articles(per: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not per:
+        return []
+
+    articles = per.get("articles")
+    if isinstance(articles, list):
+        normalized_articles: list[dict[str, Any]] = []
+        for i, article in enumerate(articles, start=1):
+            if not isinstance(article, dict):
+                continue
+            slug = article.get("slug")
+            if not isinstance(slug, str) or not slug.strip():
+                continue
+            slug = slug.strip()
+            idx = article.get("idx") or article.get("episode") or i
+            try:
+                idx_int = int(idx)
+            except (TypeError, ValueError):
+                idx_int = i
+            if not re.match(r"^\d{2}-", slug):
+                slug = f"{idx_int:02d}-{slug}"
+            normalized_articles.append(
+                {
+                    **article,
+                    "idx": idx_int,
+                    "slug": slug,
+                }
+            )
+        return normalized_articles
+
+    episodes = per.get("episodes")
+    if not isinstance(episodes, list):
+        return []
+
+    normalized: list[dict[str, Any]] = []
+    for i, episode in enumerate(episodes, start=1):
+        if not isinstance(episode, dict):
+            continue
+        slug = episode.get("slug")
+        if not isinstance(slug, str) or not slug.strip():
+            continue
+        slug = slug.strip()
+        if episode.get("number") is not None:
+            idx = episode.get("number")
+        elif episode.get("idx") is not None:
+            idx = episode.get("idx")
+        else:
+            m = re.match(r"^(\d+)-", slug)
+            idx = int(m.group(1)) if m else i
+        try:
+            idx_int = int(idx)
+        except (TypeError, ValueError):
+            idx_int = i
+        if not re.match(r"^\d+-", slug):
+            slug = f"{idx_int:02d}-{slug}"
+        normalized.append(
+            {
+                "idx": idx_int,
+                "slug": slug,
+                "status": episode.get("status", "draft"),
+            }
+        )
+    return normalized
+
+
+def render_series_md(catalog: list[dict[str, Any]]) -> str:
     out: list[str] = []
     out.append("# Series Index")
     out.append("")
@@ -105,7 +171,7 @@ def render_series_md(catalog: list[dict]) -> str:
     out.append("---")
     out.append("")
 
-    by_category: dict[str, list[dict]] = {}
+    by_category: dict[str, list[dict[str, Any]]] = {}
     category_order: list[str] = []
     for s in catalog:
         cat = s.get("category", "uncategorized")
@@ -126,6 +192,7 @@ def render_series_md(catalog: list[dict]) -> str:
             targets = s.get("targets", {})
             series_status = s.get("status", "planned")
             per = load_per_series(s)
+            articles = get_articles(per)
 
             heading = f"### {title_ko}"
             if title_en and title_en != title_ko:
@@ -136,18 +203,14 @@ def render_series_md(catalog: list[dict]) -> str:
             if desc_ko:
                 out.append(desc_ko)
                 out.append("")
-            out.append(
-                f"- 상태: **{STATUS_LABELS.get(series_status, series_status)}**"
-            )
+            out.append(f"- 상태: **{STATUS_LABELS.get(series_status, series_status)}**")
             out.append(f"- 언어: {', '.join(languages) if languages else '—'}")
             tgt_on = [k for k, v in targets.items() if v]
-            out.append(
-                f"- 발행 대상: {', '.join(tgt_on) if tgt_on else '—'}"
-            )
+            out.append(f"- 발행 대상: {', '.join(tgt_on) if tgt_on else '—'}")
             out.append(f"- 경로: [`{s['path']}/`](./{s['path']}/)")
             out.append("")
 
-            if per is None or not per.get("articles"):
+            if not articles:
                 out.append("_articles not yet enumerated._")
                 out.append("")
                 continue
@@ -168,7 +231,7 @@ def render_series_md(catalog: list[dict]) -> str:
             out.append("| " + " | ".join(["---"] * len(header)) + " |")
 
             series_path = REPO_ROOT / s["path"]
-            for art in per["articles"]:
+            for art in articles:
                 idx = art.get("idx") or art.get("episode", "?")
                 slug = art["slug"]
                 a_status = art.get("status", "draft")
@@ -177,14 +240,23 @@ def render_series_md(catalog: list[dict]) -> str:
                 row = [str(idx), title]
                 if has_ko:
                     ko_md = series_path / "ko" / f"{slug}.md"
-                    row.append(f"[ko](./{s['path']}/ko/{slug}.md)" if ko_md.is_file() else "—")
+                    row.append(
+                        f"[ko](./{s['path']}/ko/{slug}.md)" if ko_md.is_file() else "—"
+                    )
                 if has_en:
                     en_md = series_path / "en" / f"{slug}.md"
-                    row.append(f"[en](./{s['path']}/en/{slug}.md)" if en_md.is_file() else "—")
+                    row.append(
+                        f"[en](./{s['path']}/en/{slug}.md)" if en_md.is_file() else "—"
+                    )
                 if has_medium:
-                    med_md = series_path / "medium" / f"{idx:02d}.md"
-                    row.append(f"[medium](./{s['path']}/medium/{idx:02d}.md)" if med_md.is_file() else "—")
-                row.append(STATUS_LABELS.get(a_status, a_status))
+                    med_html = series_path / "medium" / f"{idx:02d}.html"
+                    row.append(
+                        f"[medium](./{s['path']}/medium/{idx:02d}.html)"
+                        if med_html.is_file()
+                        else "—"
+                    )
+                status_key = a_status or "draft"
+                row.append(STATUS_LABELS.get(status_key, status_key))
                 out.append("| " + " | ".join(row) + " |")
             out.append("")
         out.append("---")
@@ -196,22 +268,23 @@ def render_series_md(catalog: list[dict]) -> str:
     return "\n".join(out)
 
 
-def render_nav(catalog: list[dict]) -> list[str]:
+def render_nav(catalog: list[dict[str, Any]]) -> list[str]:
     lines = [NAV_START, "nav:", "  - Home: index.md"]
 
-    by_category: dict[str, list[dict]] = {}
+    by_category: dict[str, list[tuple[dict[str, Any], list[dict[str, Any]]]]] = {}
     category_order: list[str] = []
     for s in catalog:
         if not s.get("targets", {}).get("mkdocs"):
             continue
         per = load_per_series(s)
-        if per is None or not per.get("articles"):
+        articles = get_articles(per)
+        if not articles:
             continue
         cat = s.get("category", "uncategorized")
         if cat not in by_category:
             by_category[cat] = []
             category_order.append(cat)
-        by_category[cat].append((s, per))
+        by_category[cat].append((s, articles))
 
     for lang in ("ko", "en"):
         lang_label = "Korean" if lang == "ko" else "English"
@@ -219,22 +292,28 @@ def render_nav(catalog: list[dict]) -> list[str]:
         lines.append(f"      - {lang}/index.md")
         for cat in category_order:
             cat_label = CATEGORY_LABELS.get(cat, cat.title())
-            entries = [(s, per) for s, per in by_category[cat] if lang in s.get("languages", [])]
+            entries = [
+                (s, articles)
+                for s, articles in by_category[cat]
+                if lang in s.get("languages", [])
+            ]
             if not entries:
                 continue
             lines.append(f"      - {cat_label}:")
-            for s, per in entries:
+            for s, articles in entries:
                 title = s.get("title", {}).get(lang) or s["id"]
                 lines.append(f"          - {title}:")
                 series_path = REPO_ROOT / s["path"]
-                for art in per["articles"]:
+                for art in articles:
                     slug = art["slug"]
                     md = series_path / lang / f"{slug}.md"
                     if not md.is_file():
                         continue
                     a_title = article_title(series_path, slug, lang, slug)
                     safe_title = a_title.replace('"', '\\"')
-                    lines.append(f'              - "{safe_title}": {lang}/{s["id"]}/{slug}.md')
+                    lines.append(
+                        f'              - "{safe_title}": {lang}/{s["id"]}/{slug}.md'
+                    )
 
     lines.append(NAV_END)
     return lines
@@ -264,7 +343,9 @@ def patch_mkdocs_nav(nav_block: list[str]) -> bool:
 def main() -> int:
     catalog = load_root_catalog()
     md = render_series_md(catalog)
-    md_changed = SERIES_MD.read_text(encoding="utf-8") != md if SERIES_MD.exists() else True
+    md_changed = (
+        SERIES_MD.read_text(encoding="utf-8") != md if SERIES_MD.exists() else True
+    )
     if md_changed:
         SERIES_MD.write_text(md, encoding="utf-8")
     nav_lines = render_nav(catalog)

@@ -1,0 +1,6 @@
+flowchart LR
+    A[Local development\nWrite Flask app] --> B[Gunicorn local test\nsrc.app:app]
+    B --> C[Run az webapp up\nUpload code]
+    C --> D[Oryx build\nInstall requirements.txt]
+    D --> E[App Service startup\nRun Startup Command]
+    E --> F[App live\nazurewebsites.net responds]

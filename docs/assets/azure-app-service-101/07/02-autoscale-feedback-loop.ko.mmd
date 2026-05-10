@@ -1,0 +1,21 @@
+flowchart LR
+    A[메트릭 수집<br/>CPU / Queue / Response Time] --> B[규칙 평가]
+    B --> C{조건 충족?}
+    C -->|예| D[스케일 액션<br/>Scale Out 또는 In]
+    C -->|아니오| A
+    D --> E[인스턴스 변경 및 워밍업]
+    E --> F[쿨다운<br/>변화 반영 대기]
+    F --> G[다시 측정]
+    G --> A
+
+    H[주의점]
+    H --> H1[임계값이 너무 가까우면 요동 발생]
+    H --> H2[의존성이 병목이면 확장 효과 제한]
+
+    style A fill:#e0f2fe,stroke:#0284c7,color:#111
+    style B fill:#e0e7ff,stroke:#4f46e5,color:#111
+    style C fill:#fef3c7,stroke:#d97706,color:#111
+    style D fill:#dcfce7,stroke:#16a34a,color:#111
+    style E fill:#dcfce7,stroke:#16a34a,color:#111
+    style F fill:#fee2e2,stroke:#dc2626,color:#111
+    style G fill:#e0f2fe,stroke:#0284c7,color:#111

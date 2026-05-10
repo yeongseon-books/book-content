@@ -1,0 +1,5 @@
+flowchart LR
+    A[Level 0\nNo logs\n장애 시 감으로 대응] --> B[Level 1\nBasic stdout\n에러 메시지는 보임]
+    B --> C[Level 2\nStructured JSON\n필드 기준 검색 가능]
+    C --> D[Level 3\nCorrelation IDs\n요청 단위 추적 가능]
+    D --> E[Level 4\nApp Insights + KQL\n추세, 병목, 알림, RCA]

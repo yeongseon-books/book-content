@@ -1,0 +1,7 @@
+sequenceDiagram
+    participant 시스템 as 평가 시스템
+    participant 심사 as 심사 AI (GPT-4o)
+
+    시스템->>심사: 후보 답변 + 평가 기준(Rubric)
+    심사->>심사: 정확성, 친절함 등 채점
+    심사-->>시스템: 점수 + 이유 (JSON)

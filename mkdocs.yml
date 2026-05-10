@@ -208,8 +208,39 @@ nav:
               - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
               - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
       - 프로그래밍:
+          - Computer Science 101:
+              - "Computer Science란 무엇인가?": ko/computer-science-101/01-what-is-computer-science.md
+              - "계산과 프로그램": ko/computer-science-101/02-computation-and-programs.md
+              - "데이터 표현": ko/computer-science-101/03-data-representation.md
+              - "알고리즘과 복잡도": ko/computer-science-101/04-algorithms-and-complexity.md
+              - "컴퓨터 구조": ko/computer-science-101/05-computer-architecture.md
+              - "운영체제": ko/computer-science-101/06-operating-systems.md
+              - "네트워크": ko/computer-science-101/07-networks.md
+              - "데이터베이스": ko/computer-science-101/08-databases.md
+              - "소프트웨어 엔지니어링": ko/computer-science-101/09-software-engineering.md
+              - "AI와 데이터사이언스까지의 연결": ko/computer-science-101/10-ai-and-data-science.md
           - Python 101:
+              - "왜 Python인가, 그리고 설치와 venv": ko/python-101/01-why-python-and-install.md
+              - "변수, 타입, 연산자": ko/python-101/02-variables-types-operators.md
+              - "문자열과 포매팅": ko/python-101/03-strings-and-formatting.md
+              - "list, tuple, set, dict": ko/python-101/04-list-tuple-set-dict.md
+              - "제어 흐름: if, for, while, comprehension": ko/python-101/05-control-flow.md
+              - "함수와 인자: def, args, kwargs, default, lambda": ko/python-101/06-functions-and-arguments.md
+              - "모듈과 패키지: import, __init__, __name__": ko/python-101/07-modules-and-packages.md
+              - "파일 I/O와 예외 처리": ko/python-101/08-file-io-and-exceptions.md
+              - "클래스와 객체: 데이터와 동작을 함께 묶기": ko/python-101/09-classes-and-objects.md
+              - "표준 라이브러리 투어: datetime, pathlib, json, collections, itertools": ko/python-101/10-standard-library-tour.md
           - Git & GitHub 101:
+              - "Git이란 무엇인가? 버전 관리의 시작": ko/git-github-101/01-what-is-git.md
+              - "첫 commit 만들기 - init, status, add, commit": ko/git-github-101/02-first-commit.md
+              - "변경 사항 확인하기 - status, diff, log로 읽기": ko/git-github-101/03-status-diff-log.md
+              - "branch 기초 - 만들고 옮기고 비교하기": ko/git-github-101/04-branch-basics.md
+              - "merge와 conflict 해결하기 - 두 줄기를 다시 합치기": ko/git-github-101/05-merge-and-conflict.md
+              - "GitHub repository 만들기 - remote, push, pull 한 번에 익히기": ko/git-github-101/06-github-repository.md
+              - "Pull Request로 협업하기 - branch에서 review를 거쳐 main까지": ko/git-github-101/07-pull-request.md
+              - "Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법": ko/git-github-101/08-issue-and-project.md
+              - "좋은 commit message 쓰기: Conventional Commits와 좋은 본문": ko/git-github-101/09-good-commit-message.md
+              - "실전 Git workflow 만들기: issue부터 release까지 한 흐름으로": ko/git-github-101/10-real-world-workflow.md
           - Linux CLI 101:
               - "CLI와 Shell이란 무엇인가?": ko/linux-cli-101/01-what-is-cli-and-shell.md
               - "파일과 디렉터리 다루기": ko/linux-cli-101/02-files-and-directories.md
@@ -243,7 +274,614 @@ nav:
               - "coverage와 테스트 품질 보기": ko/pytest-101/08-coverage.md
               - "GitHub Actions에서 테스트 자동화하기": ko/pytest-101/09-ci-with-github-actions.md
               - "테스트하기 쉬운 코드 구조 만들기": ko/pytest-101/10-testable-code.md
+          - Object-Oriented Programming 101:
+              - "객체지향이란 무엇인가?": ko/oop-101/01-what-is-oop.md
+              - "클래스와 인스턴스": ko/oop-101/02-classes-and-instances.md
+              - "캡슐화": ko/oop-101/03-encapsulation.md
+              - "상속": ko/oop-101/04-inheritance.md
+              - "다형성": ko/oop-101/05-polymorphism.md
+              - "추상화": ko/oop-101/06-abstraction.md
+              - "합성과 상속": ko/oop-101/07-composition-vs-inheritance.md
+              - "SOLID 원칙 기초": ko/oop-101/08-solid-principles.md
+              - "객체지향 설계 예제": ko/oop-101/09-oop-design-example.md
+              - "객체지향을 언제 피해야 할까?": ko/oop-101/10-when-to-avoid-oop.md
+          - Functional Programming 101:
+              - "함수형 프로그래밍이란 무엇인가?": ko/functional-programming-101/01-what-is-fp.md
+              - "순수 함수와 부수효과": ko/functional-programming-101/02-pure-functions.md
+              - "immutable 데이터": ko/functional-programming-101/03-immutable-data.md
+              - "고차 함수": ko/functional-programming-101/04-higher-order-functions.md
+              - "map, filter, reduce": ko/functional-programming-101/05-map-filter-reduce.md
+              - "클로저와 partial": ko/functional-programming-101/06-closure-and-partial.md
+              - "재귀와 꼬리 호출": ko/functional-programming-101/07-recursion.md
+              - "지연 평가와 제너레이터": ko/functional-programming-101/08-lazy-evaluation.md
+              - "함수 합성과 파이프라인": ko/functional-programming-101/09-function-composition.md
+              - "객체지향과 함수형의 균형": ko/functional-programming-101/10-oop-and-fp-balance.md
+          - Type Hints in Python 101:
+              - "Python type hint란 무엇인가?": ko/type-hints-python-101/01-what-is-type-hint.md
+              - "기본 타입과 collection 타입": ko/type-hints-python-101/02-basic-and-collection-types.md
+              - "Optional과 Union": ko/type-hints-python-101/03-optional-and-union.md
+              - "함수 타입 힌트": ko/type-hints-python-101/04-function-type-hints.md
+              - "TypedDict와 dataclass": ko/type-hints-python-101/05-typeddict-and-dataclass.md
+              - "Protocol과 structural typing": ko/type-hints-python-101/06-protocol-and-structural-typing.md
+              - "Generic 이해하기": ko/type-hints-python-101/07-generic.md
+              - "mypy와 pyright 사용하기": ko/type-hints-python-101/08-mypy-and-pyright.md
+              - "Pydantic과 타입 힌트": ko/type-hints-python-101/09-pydantic-and-type-hints.md
+              - "타입 힌트를 잘 쓰는 기준": ko/type-hints-python-101/10-type-hints-best-practices.md
+          - Data Structures with Python 101:
+              - "자료구조란 무엇인가?": ko/data-structures-python-101/01-what-are-data-structures.md
+              - "배열과 리스트": ko/data-structures-python-101/02-arrays-and-lists.md
+              - "스택과 큐": ko/data-structures-python-101/03-stacks-and-queues.md
+              - "해시 테이블과 dict": ko/data-structures-python-101/04-hash-tables-and-dict.md
+              - "연결 리스트": ko/data-structures-python-101/05-linked-lists.md
+              - "트리와 이진 트리": ko/data-structures-python-101/06-trees-and-binary-trees.md
+              - "힙과 우선순위 큐": ko/data-structures-python-101/07-heaps-and-priority-queues.md
+              - "그래프 표현": ko/data-structures-python-101/08-graph-representations.md
+              - "set과 집합 연산": ko/data-structures-python-101/09-sets-and-set-operations.md
+              - "자료구조 선택 기준": ko/data-structures-python-101/10-choosing-data-structures.md
+          - Algorithms with Python 101:
+              - "알고리즘이란 무엇인가?": ko/algorithms-python-101/01-what-are-algorithms.md
+              - "시간 복잡도와 Big-O": ko/algorithms-python-101/02-time-complexity-and-big-o.md
+              - "선형 탐색과 이진 탐색": ko/algorithms-python-101/03-linear-and-binary-search.md
+              - "정렬 알고리즘": ko/algorithms-python-101/04-sorting-algorithms.md
+              - "재귀와 분할 정복": ko/algorithms-python-101/05-recursion-and-divide-and-conquer.md
+              - "동적 계획법 기초": ko/algorithms-python-101/06-dynamic-programming-basics.md
+              - "그래프 탐색 — BFS와 DFS": ko/algorithms-python-101/07-graph-traversal-bfs-dfs.md
+              - "최단 경로 기초": ko/algorithms-python-101/08-shortest-path-basics.md
+              - "그리디 알고리즘": ko/algorithms-python-101/09-greedy-algorithms.md
+              - "코딩 테스트 문제 접근법": ko/algorithms-python-101/10-coding-test-strategies.md
+      - CS 핵심 과목:
+          - 컴퓨터학과 전공 학습 가이드 101:
+              - "컴퓨터학과에서는 무엇을 배우는가": ko/computer-science-major-101/01-what-cs-majors-learn.md
+              - "1학년 과목 이해하기": ko/computer-science-major-101/02-first-year-subjects.md
+              - "자료구조와 알고리즘": ko/computer-science-major-101/03-data-structures-and-algorithms.md
+              - "시스템 과목 이해하기": ko/computer-science-major-101/04-systems-subjects.md
+              - "데이터베이스와 네트워크": ko/computer-science-major-101/05-database-and-network.md
+              - "AI와 데이터사이언스": ko/computer-science-major-101/06-ai-and-data-science.md
+              - "프로젝트 과목": ko/computer-science-major-101/07-project-subjects.md
+              - "전공 공부 방법": ko/computer-science-major-101/08-how-to-study-cs.md
+              - "포트폴리오로 연결하기": ko/computer-science-major-101/09-build-your-portfolio.md
+              - "졸업 전 갖춰야 할 역량": ko/computer-science-major-101/10-skills-before-graduation.md
+          - Discrete Math 101:
+              - "이산수학이란 무엇인가?": ko/discrete-math-101/01-what-is-discrete-math.md
+              - "명제와 논리": ko/discrete-math-101/02-propositions-and-logic.md
+              - "집합과 함수": ko/discrete-math-101/03-sets-and-functions.md
+              - "관계와 동치관계": ko/discrete-math-101/04-relations-and-equivalence.md
+              - "증명 방법": ko/discrete-math-101/05-proof-techniques.md
+              - "수열과 점화식": ko/discrete-math-101/06-sequences-and-recurrence.md
+              - "조합과 경우의 수": ko/discrete-math-101/07-combinatorics.md
+              - "그래프 이론 기초": ko/discrete-math-101/08-graph-theory-basics.md
+              - "트리와 그래프 탐색": ko/discrete-math-101/09-trees-and-graph-traversal.md
+              - "알고리즘과 이산수학의 연결": ko/discrete-math-101/10-discrete-math-and-algorithms.md
+          - Math for CS 101:
+              - "CS에 수학이 필요한 이유": ko/math-for-cs-101/01-why-math-for-cs.md
+              - "논리와 증명": ko/math-for-cs-101/02-logic-and-proofs.md
+              - "집합과 함수": ko/math-for-cs-101/03-sets-and-functions.md
+              - "그래프": ko/math-for-cs-101/04-graphs.md
+              - "조합": ko/math-for-cs-101/05-combinatorics.md
+              - "확률": ko/math-for-cs-101/06-probability.md
+              - "선형대수": ko/math-for-cs-101/07-linear-algebra.md
+              - "미분": ko/math-for-cs-101/08-calculus.md
+              - "정보이론": ko/math-for-cs-101/09-information-theory.md
+              - "알고리즘과 수학": ko/math-for-cs-101/10-algorithms-and-math.md
+          - Calculus for ML 101:
+              - "미분이란 무엇인가": ko/calculus-for-ml-101/01-what-is-derivative.md
+              - "함수와 기울기": ko/calculus-for-ml-101/02-functions-and-slope.md
+              - "편미분": ko/calculus-for-ml-101/03-partial-derivatives.md
+              - "Gradient": ko/calculus-for-ml-101/04-gradient.md
+              - "연쇄 법칙": ko/calculus-for-ml-101/05-chain-rule.md
+              - "손실 함수": ko/calculus-for-ml-101/06-loss-function.md
+              - "경사하강법": ko/calculus-for-ml-101/07-gradient-descent.md
+              - "최적화": ko/calculus-for-ml-101/08-optimization.md
+              - "역전파 직관": ko/calculus-for-ml-101/09-backpropagation-intuition.md
+              - "딥러닝에서의 미분": ko/calculus-for-ml-101/10-calculus-in-deep-learning.md
+          - Computer Architecture 101:
+              - "컴퓨터 구조란 무엇인가?": ko/computer-architecture-101/01-what-is-computer-architecture.md
+              - "데이터 표현 — bit, byte, integer, floating point": ko/computer-architecture-101/02-data-representation.md
+              - "CPU와 명령어": ko/computer-architecture-101/03-cpu-and-instructions.md
+              - "레지스터와 ALU": ko/computer-architecture-101/04-registers-and-alu.md
+              - "메모리 구조": ko/computer-architecture-101/05-memory-organization.md
+              - "캐시와 지역성": ko/computer-architecture-101/06-cache-and-locality.md
+              - "파이프라인": ko/computer-architecture-101/07-pipelining.md
+              - "I/O와 장치": ko/computer-architecture-101/08-io-and-devices.md
+              - "병렬성과 멀티코어": ko/computer-architecture-101/09-parallelism-and-multicore.md
+              - "성능을 이해하는 법": ko/computer-architecture-101/10-understanding-performance.md
+          - Data Structures 101:
+              - "자료구조란 무엇인가?": ko/data-structures-101/01-what-are-data-structures.md
+              - "배열과 동적 배열": ko/data-structures-101/02-arrays-and-dynamic-arrays.md
+              - "연결 리스트": ko/data-structures-101/03-linked-lists.md
+              - "스택과 큐": ko/data-structures-101/04-stacks-and-queues.md
+              - "해시 테이블": ko/data-structures-101/05-hash-tables.md
+              - "트리": ko/data-structures-101/06-trees.md
+              - "이진 탐색 트리": ko/data-structures-101/07-binary-search-trees.md
+              - "힙": ko/data-structures-101/08-heaps.md
+              - "그래프": ko/data-structures-101/09-graphs.md
+              - "자료구조 선택 기준": ko/data-structures-101/10-choosing-data-structures.md
+          - Algorithms 101:
+              - "알고리즘이란 무엇인가?": ko/algorithms-101/01-what-is-an-algorithm.md
+              - "시간 복잡도와 공간 복잡도": ko/algorithms-101/02-time-and-space-complexity.md
+              - "탐색 알고리즘": ko/algorithms-101/03-search-algorithms.md
+              - "정렬 알고리즘": ko/algorithms-101/04-sorting-algorithms.md
+              - "재귀와 분할 정복": ko/algorithms-101/05-recursion-and-divide-and-conquer.md
+              - "동적 계획법": ko/algorithms-101/06-dynamic-programming.md
+              - "그리디 알고리즘": ko/algorithms-101/07-greedy-algorithms.md
+              - "그래프 알고리즘": ko/algorithms-101/08-graph-algorithms.md
+              - "문자열 알고리즘 기초": ko/algorithms-101/09-string-algorithms.md
+              - "알고리즘 문제 풀이 전략": ko/algorithms-101/10-problem-solving-strategies.md
+          - Programming Languages 101:
+              - "프로그래밍 언어란 무엇인가?": ko/programming-languages-101/01-what-is-a-programming-language.md
+              - "syntax와 semantics": ko/programming-languages-101/02-syntax-and-semantics.md
+              - "type system": ko/programming-languages-101/03-type-system.md
+              - "scope와 binding": ko/programming-languages-101/04-scope-and-binding.md
+              - "함수와 closure": ko/programming-languages-101/05-functions-and-closures.md
+              - "객체와 prototype": ko/programming-languages-101/06-objects-and-prototypes.md
+              - "memory management": ko/programming-languages-101/07-memory-management.md
+              - "interpreter와 compiler": ko/programming-languages-101/08-interpreter-and-compiler.md
+              - "static vs dynamic language": ko/programming-languages-101/09-static-vs-dynamic.md
+              - "좋은 언어 설계란 무엇인가?": ko/programming-languages-101/10-what-makes-good-language-design.md
+          - Operating Systems 101:
+              - "운영체제란 무엇인가?": ko/operating-systems-101/01-what-is-an-operating-system.md
+              - "프로세스와 스레드": ko/operating-systems-101/02-processes-and-threads.md
+              - "스케줄링": ko/operating-systems-101/03-scheduling.md
+              - "동시성과 race condition": ko/operating-systems-101/04-concurrency-and-race-conditions.md
+              - "lock, mutex, semaphore": ko/operating-systems-101/05-locks-mutex-semaphore.md
+              - "메모리 관리": ko/operating-systems-101/06-memory-management.md
+              - "가상 메모리": ko/operating-systems-101/07-virtual-memory.md
+              - "파일 시스템": ko/operating-systems-101/08-file-systems.md
+              - "시스템 콜": ko/operating-systems-101/09-system-calls.md
+              - "컨테이너와 운영체제": ko/operating-systems-101/10-containers-and-the-os.md
+          - Computer Networks 101:
+              - "네트워크란 무엇인가?": ko/computer-networks-101/01-what-is-a-network.md
+              - "IP와 subnet": ko/computer-networks-101/02-ip-and-subnet.md
+              - "TCP와 UDP": ko/computer-networks-101/03-tcp-and-udp.md
+              - "DNS": ko/computer-networks-101/04-dns.md
+              - "HTTP와 HTTPS": ko/computer-networks-101/05-http-and-https.md
+              - "TLS 기초": ko/computer-networks-101/06-tls-basics.md
+              - "라우팅과 NAT": ko/computer-networks-101/07-routing-and-nat.md
+              - "Load Balancer": ko/computer-networks-101/08-load-balancer.md
+              - "WebSocket과 실시간 통신": ko/computer-networks-101/09-websocket-and-realtime.md
+              - "네트워크 문제 디버깅": ko/computer-networks-101/10-debugging-network-problems.md
+          - Database Systems 101:
+              - "데이터베이스 시스템이란 무엇인가?": ko/database-systems-101/01-what-is-a-database.md
+              - "관계형 모델": ko/database-systems-101/02-relational-model.md
+              - "SQL과 쿼리 처리": ko/database-systems-101/03-sql-and-query-processing.md
+              - "인덱스": ko/database-systems-101/04-indexes.md
+              - "트랜잭션과 ACID": ko/database-systems-101/05-transactions-and-acid.md
+              - "격리 수준": ko/database-systems-101/06-isolation-levels.md
+              - "정규화와 모델링": ko/database-systems-101/07-normalization-and-modeling.md
+              - "쿼리 최적화": ko/database-systems-101/08-query-optimization.md
+              - "복제와 백업": ko/database-systems-101/09-replication-and-backup.md
+              - "OLTP와 OLAP": ko/database-systems-101/10-oltp-and-olap.md
+          - Distributed Systems 101:
+              - "분산 시스템이란 무엇인가?": ko/distributed-systems-101/01-what-is-a-distributed-system.md
+              - "failure model": ko/distributed-systems-101/02-failure-model.md
+              - "RPC와 message passing": ko/distributed-systems-101/03-rpc-and-message-passing.md
+              - "consistency와 CAP": ko/distributed-systems-101/04-consistency-and-cap.md
+              - "replication": ko/distributed-systems-101/05-replication.md
+              - "consensus와 Raft": ko/distributed-systems-101/06-consensus-and-raft.md
+              - "leader election": ko/distributed-systems-101/07-leader-election.md
+              - "message queue와 event sourcing": ko/distributed-systems-101/08-message-queue-and-event-sourcing.md
+              - "distributed transaction": ko/distributed-systems-101/09-distributed-transaction.md
+              - "운영 가능한 분산 시스템 패턴": ko/distributed-systems-101/10-operable-distributed-patterns.md
+          - Compilers 101:
+              - "컴파일러란 무엇인가?": ko/compilers-101/01-what-is-a-compiler.md
+              - "lexical analysis": ko/compilers-101/02-lexical-analysis.md
+              - "parsing과 AST": ko/compilers-101/03-parsing-and-ast.md
+              - "semantic analysis": ko/compilers-101/04-semantic-analysis.md
+              - "symbol table과 scope": ko/compilers-101/05-symbol-table-and-scope.md
+              - "intermediate representation": ko/compilers-101/06-intermediate-representation.md
+              - "optimization 기초": ko/compilers-101/07-optimization-basics.md
+              - "code generation": ko/compilers-101/08-code-generation.md
+              - "JIT vs AOT": ko/compilers-101/09-jit-vs-aot.md
+              - "작은 인터프리터 만들어 보기": ko/compilers-101/10-building-a-tiny-interpreter.md
+          - Information Security 101:
+              - "정보보안이란 무엇인가?": ko/information-security-101/01-what-is-information-security.md
+              - "인증과 인가": ko/information-security-101/02-authentication-and-authorization.md
+              - "암호화와 해시": ko/information-security-101/03-cryptography-and-hash.md
+              - "TLS와 인증서": ko/information-security-101/04-tls-and-certificates.md
+              - "Web 보안 기초": ko/information-security-101/05-web-security-basics.md
+              - "SQL Injection과 XSS": ko/information-security-101/06-sql-injection-and-xss.md
+              - "secret 관리": ko/information-security-101/07-secret-management.md
+              - "권한 최소화": ko/information-security-101/08-least-privilege.md
+              - "로그와 감사": ko/information-security-101/09-logging-and-audit.md
+              - "보안 사고 대응": ko/information-security-101/10-incident-response.md
+      - 소프트웨어 엔지니어링:
+          - Software Engineering 101:
+              - "소프트웨어 엔지니어링이란 무엇인가?": ko/software-engineering-101/01-what-is-software-engineering.md
+              - "요구사항 이해하기": ko/software-engineering-101/02-understanding-requirements.md
+              - "설계와 구현의 차이": ko/software-engineering-101/03-design-vs-implementation.md
+              - "코드 리뷰": ko/software-engineering-101/04-code-review.md
+              - "테스트 전략": ko/software-engineering-101/05-testing-strategy.md
+              - "버전 관리와 릴리스": ko/software-engineering-101/06-version-control-and-release.md
+              - "문서화": ko/software-engineering-101/07-documentation.md
+              - "협업 프로세스": ko/software-engineering-101/08-collaboration-process.md
+              - "유지보수와 기술부채": ko/software-engineering-101/09-maintenance-and-tech-debt.md
+              - "좋은 소프트웨어의 기준": ko/software-engineering-101/10-what-makes-good-software.md
+          - Clean Code 101:
+              - "Clean Code란 무엇인가?": ko/clean-code-101/01-what-is-clean-code.md
+              - "이름 짓기": ko/clean-code-101/02-naming.md
+              - "함수 작게 만들기": ko/clean-code-101/03-small-functions.md
+              - "조건문 줄이기": ko/clean-code-101/04-simplifying-conditionals.md
+              - "중복 제거": ko/clean-code-101/05-removing-duplication.md
+              - "오류 처리": ko/clean-code-101/06-error-handling.md
+              - "주석과 문서화": ko/clean-code-101/07-comments-and-docs.md
+              - "테스트 가능한 코드": ko/clean-code-101/08-testable-code.md
+              - "리팩토링 기초": ko/clean-code-101/09-refactoring-basics.md
+              - "좋은 코드 리뷰 기준": ko/clean-code-101/10-good-code-review.md
+          - Software Design 101:
+              - "소프트웨어 설계란 무엇인가?": ko/software-design-101/01-what-is-software-design.md
+              - "관심사 분리": ko/software-design-101/02-separation-of-concerns.md
+              - "모듈과 경계": ko/software-design-101/03-modules-and-boundaries.md
+              - "의존성 방향": ko/software-design-101/04-dependency-direction.md
+              - "인터페이스와 추상화": ko/software-design-101/05-interfaces-and-abstraction.md
+              - "계층 아키텍처": ko/software-design-101/06-layered-architecture.md
+              - "데이터 흐름 설계": ko/software-design-101/07-data-flow-design.md
+              - "변경 영향 줄이기": ko/software-design-101/08-reducing-change-impact.md
+              - "설계 원칙 모음": ko/software-design-101/09-design-principles.md
+              - "작은 프로젝트로 설계 연습": ko/software-design-101/10-small-design-practice.md
+          - Design Patterns 101:
+              - "디자인 패턴이란 무엇인가?": ko/design-patterns-101/01-what-are-design-patterns.md
+              - "Creational 패턴": ko/design-patterns-101/02-creational-patterns.md
+              - "Structural 패턴": ko/design-patterns-101/03-structural-patterns.md
+              - "Behavioral 패턴": ko/design-patterns-101/04-behavioral-patterns.md
+              - "Strategy 패턴": ko/design-patterns-101/05-strategy-pattern.md
+              - "Adapter 패턴": ko/design-patterns-101/06-adapter-pattern.md
+              - "Observer 패턴": ko/design-patterns-101/07-observer-pattern.md
+              - "Factory와 의존성 주입": ko/design-patterns-101/08-factory-and-di.md
+              - "패턴을 남용하지 않는 법": ko/design-patterns-101/09-avoiding-pattern-overuse.md
+              - "Python에 어울리는 패턴": ko/design-patterns-101/10-pythonic-patterns.md
+          - API Design 101:
+              - "API란 무엇인가?": ko/api-design-101/01-what-is-an-api.md
+              - "REST 기본": ko/api-design-101/02-rest-basics.md
+              - "리소스 설계": ko/api-design-101/03-resource-design.md
+              - "HTTP method와 status code": ko/api-design-101/04-http-methods-and-status.md
+              - "Request와 response schema": ko/api-design-101/05-request-and-response-schema.md
+              - "Pagination과 filtering": ko/api-design-101/06-pagination-and-filtering.md
+              - "Error response 설계": ko/api-design-101/07-error-response-design.md
+              - "OpenAPI와 Swagger": ko/api-design-101/08-openapi-and-swagger.md
+              - "API versioning": ko/api-design-101/09-api-versioning.md
+              - "좋은 API 문서 만들기": ko/api-design-101/10-writing-good-api-docs.md
+          - Web Development 101:
+              - "웹은 어떻게 동작하는가?": ko/web-development-101/01-how-the-web-works.md
+              - "HTML, CSS, JavaScript": ko/web-development-101/02-html-css-javascript.md
+              - "브라우저와 DOM": ko/web-development-101/03-browser-and-dom.md
+              - "HTTP와 API": ko/web-development-101/04-http-and-api.md
+              - "Frontend과 Backend": ko/web-development-101/05-frontend-and-backend.md
+              - "인증과 세션": ko/web-development-101/06-auth-and-sessions.md
+              - "데이터베이스 연결": ko/web-development-101/07-connecting-to-database.md
+              - "배포": ko/web-development-101/08-deployment.md
+              - "성능과 캐싱": ko/web-development-101/09-performance-and-caching.md
+              - "작은 웹앱 만들기": ko/web-development-101/10-building-a-small-web-app.md
+          - Frontend Development 101:
+              - "프론트엔드 개발이란 무엇인가?": ko/frontend-development-101/01-what-is-frontend-development.md
+              - "HTML과 CSS 기본": ko/frontend-development-101/02-html-and-css-basics.md
+              - "JavaScript 기본": ko/frontend-development-101/03-javascript-basics.md
+              - "컴포넌트와 상태": ko/frontend-development-101/04-components-and-state.md
+              - "라우팅과 페이지": ko/frontend-development-101/05-routing-and-pages.md
+              - "API 호출과 비동기": ko/frontend-development-101/06-api-calls-and-async.md
+              - "폼과 유효성 검사": ko/frontend-development-101/07-forms-and-validation.md
+              - "스타일링과 디자인 시스템": ko/frontend-development-101/08-styling-and-design-system.md
+              - "빌드 도구와 번들링": ko/frontend-development-101/09-build-tools-and-bundling.md
+              - "작은 프론트엔드 앱 만들기": ko/frontend-development-101/10-building-a-small-frontend-app.md
+          - Backend Development 101:
+              - "백엔드 개발이란 무엇인가?": ko/backend-development-101/01-what-is-backend-development.md
+              - "HTTP 서버 만들기": ko/backend-development-101/02-building-an-http-server.md
+              - "Routing과 Controller": ko/backend-development-101/03-routing-and-controllers.md
+              - "Service Layer": ko/backend-development-101/04-service-layer.md
+              - "Database Layer": ko/backend-development-101/05-database-layer.md
+              - "인증과 권한": ko/backend-development-101/06-auth-and-authorization.md
+              - "Logging과 Error Handling": ko/backend-development-101/07-logging-and-error-handling.md
+              - "백엔드 테스트": ko/backend-development-101/08-testing-the-backend.md
+              - "백엔드 배포": ko/backend-development-101/09-deploying-the-backend.md
+              - "운영 가능한 백엔드 구조": ko/backend-development-101/10-production-ready-backend.md
+          - Testing 101:
+              - "테스트란 무엇인가?": ko/testing-101/01-what-is-testing.md
+              - "단위 테스트": ko/testing-101/02-unit-test.md
+              - "통합 테스트": ko/testing-101/03-integration-test.md
+              - "E2E 테스트": ko/testing-101/04-e2e-test.md
+              - "테스트 더블": ko/testing-101/05-test-double.md
+              - "Mock과 Stub": ko/testing-101/06-mock-and-stub.md
+              - "테스트 커버리지": ko/testing-101/07-test-coverage.md
+              - "회귀 테스트": ko/testing-101/08-regression-test.md
+              - "CI에서 테스트 실행하기": ko/testing-101/09-tests-in-ci.md
+              - "테스트 전략 세우기": ko/testing-101/10-test-strategy.md
+          - Containers 101:
+              - "Container란 무엇인가?": ko/containers-101/01-what-is-a-container.md
+              - "Image와 Layer": ko/containers-101/02-image-and-layer.md
+              - "Runtime": ko/containers-101/03-runtime.md
+              - "Dockerfile": ko/containers-101/04-dockerfile.md
+              - "Volume": ko/containers-101/05-volume.md
+              - "Network": ko/containers-101/06-network.md
+              - "Registry": ko/containers-101/07-registry.md
+              - "Container Security": ko/containers-101/08-container-security.md
+              - "Containers vs VMs": ko/containers-101/09-container-vs-vm.md
+              - "실전 컨테이너 앱 만들기": ko/containers-101/10-build-a-container-app.md
+          - Docker 101:
+              - "Docker란 무엇인가?": ko/docker-101/01-what-is-docker.md
+              - "Image와 Container": ko/docker-101/02-image-and-container.md
+              - "Dockerfile 작성하기": ko/docker-101/03-dockerfile.md
+              - "Volume과 Network": ko/docker-101/04-volume-and-network.md
+              - "Docker Compose": ko/docker-101/05-docker-compose.md
+              - "환경변수와 설정": ko/docker-101/06-env-and-config.md
+              - "Python 앱 컨테이너화": ko/docker-101/07-python-app-containerize.md
+              - "데이터베이스와 함께 실행하기": ko/docker-101/08-database-with-app.md
+              - "Image 최적화": ko/docker-101/09-image-optimization.md
+              - "배포용 Docker 구성": ko/docker-101/10-production-docker.md
+          - Kubernetes 101:
+              - "What is Kubernetes?": ko/kubernetes-101/01-what-is-kubernetes.md
+              - "Pod": ko/kubernetes-101/02-pod.md
+              - "Deployment": ko/kubernetes-101/03-deployment.md
+              - "Service": ko/kubernetes-101/04-service.md
+              - "Ingress": ko/kubernetes-101/05-ingress.md
+              - "ConfigMap과 Secret": ko/kubernetes-101/06-configmap-and-secret.md
+              - "Volume": ko/kubernetes-101/07-volume.md
+              - "HPA": ko/kubernetes-101/08-hpa.md
+              - "Helm": ko/kubernetes-101/09-helm.md
+              - "운영 관점의 Kubernetes": ko/kubernetes-101/10-kubernetes-in-operation.md
+          - Cloud Computing 101:
+              - "Cloud Computing이란 무엇인가?": ko/cloud-computing-101/01-what-is-cloud-computing.md
+              - "IaaS, PaaS, SaaS": ko/cloud-computing-101/02-iaas-paas-saas.md
+              - "Region과 Availability Zone": ko/cloud-computing-101/03-region-and-availability-zone.md
+              - "Compute": ko/cloud-computing-101/04-compute.md
+              - "Storage": ko/cloud-computing-101/05-storage.md
+              - "Network": ko/cloud-computing-101/06-network.md
+              - "Identity와 Security": ko/cloud-computing-101/07-identity-and-security.md
+              - "Monitoring": ko/cloud-computing-101/08-monitoring.md
+              - "Cost Management": ko/cloud-computing-101/09-cost-management.md
+              - "Cloud Architecture 기초": ko/cloud-computing-101/10-cloud-architecture-basics.md
+          - Serverless 101:
+              - "Serverless란 무엇인가?": ko/serverless-101/01-what-is-serverless.md
+              - "Function as a Service": ko/serverless-101/02-function-as-a-service.md
+              - "Trigger와 Event": ko/serverless-101/03-trigger-and-event.md
+              - "Cold Start": ko/serverless-101/04-cold-start.md
+              - "Scaling": ko/serverless-101/05-scaling.md
+              - "State 관리": ko/serverless-101/06-state-management.md
+              - "Queue와 Event-driven Architecture": ko/serverless-101/07-queue-and-event-driven.md
+              - "Observability": ko/serverless-101/08-observability.md
+              - "Cost": ko/serverless-101/09-cost.md
+              - "Serverless 앱 설계": ko/serverless-101/10-serverless-app-design.md
+          - DevOps 101:
+              - "DevOps란 무엇인가?": ko/devops-101/01-what-is-devops.md
+              - "CI 파이프라인": ko/devops-101/02-ci-pipeline.md
+              - "CD와 배포 전략": ko/devops-101/03-cd-and-deployment.md
+              - "환경 분리와 설정 관리": ko/devops-101/04-environments-and-config.md
+              - "Infrastructure as Code": ko/devops-101/05-infrastructure-as-code.md
+              - "컨테이너와 빌드": ko/devops-101/06-containers-and-build.md
+              - "모니터링과 알림": ko/devops-101/07-monitoring-and-alerting.md
+              - "로그 수집과 분석": ko/devops-101/08-logging-and-analysis.md
+              - "장애 대응과 on-call": ko/devops-101/09-incident-and-oncall.md
+              - "운영 가능한 DevOps 흐름": ko/devops-101/10-operable-devops-flow.md
+          - GitHub Actions 101:
+              - "GitHub Actions란 무엇인가?": ko/github-actions-101/01-what-is-github-actions.md
+              - "Workflow와 Job": ko/github-actions-101/02-workflow-and-job.md
+              - "Trigger 이해하기": ko/github-actions-101/03-triggers.md
+              - "Python 테스트 자동화": ko/github-actions-101/04-python-test-automation.md
+              - "Lint와 Type Check": ko/github-actions-101/05-lint-and-typecheck.md
+              - "빌드 아티팩트": ko/github-actions-101/06-build-artifact.md
+              - "Docker 빌드": ko/github-actions-101/07-docker-build.md
+              - "배포 자동화": ko/github-actions-101/08-deploy-automation.md
+              - "Secret 관리": ko/github-actions-101/09-secret-management.md
+              - "실전 CI/CD 파이프라인": ko/github-actions-101/10-real-world-cicd-pipeline.md
+          - Observability 101:
+              - "Observability란 무엇인가?": ko/observability-101/01-what-is-observability.md
+              - "Metric, Log, Trace": ko/observability-101/02-metric-log-trace.md
+              - "Metric 수집과 시각화": ko/observability-101/03-metric-collection.md
+              - "구조화된 로깅": ko/observability-101/04-structured-logging.md
+              - "분산 트레이싱 기초": ko/observability-101/05-distributed-tracing.md
+              - "Dashboard 설계": ko/observability-101/06-dashboard-design.md
+              - "Alert와 On-Call": ko/observability-101/07-alert-and-oncall.md
+              - "SLI와 SLO 기초": ko/observability-101/08-sli-and-slo.md
+              - "Cost와 Cardinality": ko/observability-101/09-cost-and-cardinality.md
+              - "운영 가능한 Observability 스택": ko/observability-101/10-production-observability-stack.md
+          - Incident Response 101:
+              - "Incident란 무엇인가?": ko/incident-response-101/01-what-is-incident.md
+              - "Severity 분류": ko/incident-response-101/02-severity.md
+              - "초기 대응": ko/incident-response-101/03-initial-response.md
+              - "Communication": ko/incident-response-101/04-communication.md
+              - "Timeline 작성": ko/incident-response-101/05-timeline.md
+              - "Root Cause Analysis": ko/incident-response-101/06-root-cause-analysis.md
+              - "Mitigation과 Resolution": ko/incident-response-101/07-mitigation-and-resolution.md
+              - "Postmortem": ko/incident-response-101/08-postmortem.md
+              - "재발 방지": ko/incident-response-101/09-prevention.md
+              - "Incident Runbook 만들기": ko/incident-response-101/10-incident-runbook.md
+          - SRE 101:
+              - "SRE란 무엇인가?": ko/sre-101/01-what-is-sre.md
+              - "Reliability": ko/sre-101/02-reliability.md
+              - "SLI, SLO, SLA": ko/sre-101/03-sli-slo-sla.md
+              - "Error Budget": ko/sre-101/04-error-budget.md
+              - "Monitoring": ko/sre-101/05-monitoring.md
+              - "Incident Response": ko/sre-101/06-incident-response.md
+              - "Postmortem": ko/sre-101/07-postmortem.md
+              - "Toil 줄이기": ko/sre-101/08-reducing-toil.md
+              - "Capacity Planning": ko/sre-101/09-capacity-planning.md
+              - "운영 가능한 시스템 만들기": ko/sre-101/10-building-operable-systems.md
+          - Secure Coding 101:
+              - "Secure Coding이란 무엇인가?": ko/secure-coding-101/01-what-is-secure-coding.md
+              - "입력값 검증": ko/secure-coding-101/02-input-validation.md
+              - "인증과 세션": ko/secure-coding-101/03-authentication-and-session.md
+              - "인가와 권한": ko/secure-coding-101/04-authorization-and-permissions.md
+              - "안전한 데이터 저장": ko/secure-coding-101/05-safe-data-storage.md
+              - "Secret과 키 관리": ko/secure-coding-101/06-secret-and-key-management.md
+              - "SQL Injection과 ORM 안전 사용": ko/secure-coding-101/07-sql-injection-and-orm.md
+              - "XSS와 CSRF 방어": ko/secure-coding-101/08-xss-and-csrf.md
+              - "Dependency 취약점 관리": ko/secure-coding-101/09-dependency-vulnerabilities.md
+              - "안전한 로깅과 감사": ko/secure-coding-101/10-safe-logging-and-audit.md
+          - 오픈소스 101:
+              - "오픈소스란 무엇인가": ko/open-source-101/01-what-is-open-source.md
+              - "라이선스 이해하기": ko/open-source-101/02-understanding-licenses.md
+              - "Issue 읽기": ko/open-source-101/03-reading-issues.md
+              - "PR 만들기": ko/open-source-101/04-creating-pull-requests.md
+              - "좋은 README": ko/open-source-101/05-good-readme.md
+              - "Release 와 Versioning": ko/open-source-101/06-release-and-versioning.md
+              - "Community 관리": ko/open-source-101/07-community-management.md
+              - "Maintainer 의 역할": ko/open-source-101/08-maintainer-role.md
+              - "오픈소스 포트폴리오": ko/open-source-101/09-open-source-portfolio.md
+              - "내 첫 오픈소스 프로젝트": ko/open-source-101/10-my-first-open-source-project.md
+          - Developer Career 101:
+              - "개발자 커리어란 무엇인가": ko/developer-career-101/01-what-is-developer-career.md
+              - "직무 이해하기": ko/developer-career-101/02-understanding-roles.md
+              - "학습 계획 세우기": ko/developer-career-101/03-learning-plan.md
+              - "이력서와 포트폴리오": ko/developer-career-101/04-resume-and-portfolio.md
+              - "코딩 인터뷰 준비": ko/developer-career-101/05-coding-interview.md
+              - "시스템 디자인 인터뷰": ko/developer-career-101/06-system-design-interview.md
+              - "첫 직장 적응": ko/developer-career-101/07-first-job.md
+              - "사이드 프로젝트와 학습": ko/developer-career-101/08-side-projects.md
+              - "멘토링과 네트워킹": ko/developer-career-101/09-mentoring-networking.md
+              - "시니어로 가는 길": ko/developer-career-101/10-path-to-senior.md
+          - Data Science Career 101:
+              - "데이터 직무란 무엇인가": ko/data-science-career-101/01-what-is-data-career.md
+              - "분석가 vs 사이언티스트 vs 엔지니어": ko/data-science-career-101/02-analyst-scientist-engineer.md
+              - "학습 경로 설계": ko/data-science-career-101/03-learning-path.md
+              - "데이터 포트폴리오": ko/data-science-career-101/04-data-portfolio.md
+              - "SQL과 분석 인터뷰": ko/data-science-career-101/05-sql-and-analytics-interview.md
+              - "ML 인터뷰": ko/data-science-career-101/06-ml-interview.md
+              - "케이스 인터뷰": ko/data-science-career-101/07-case-interview.md
+              - "첫 직장 적응": ko/data-science-career-101/08-first-job.md
+              - "도메인 전문성 쌓기": ko/data-science-career-101/09-domain-expertise.md
+              - "시니어 데이터 직무로 가는 길": ko/data-science-career-101/10-path-to-senior.md
+          - 포트폴리오 프로젝트 101:
+              - "포트폴리오 프로젝트란 무엇인가": ko/portfolio-project-101/01-what-is-a-portfolio-project.md
+              - "좋은 프로젝트의 조건": ko/portfolio-project-101/02-traits-of-a-good-project.md
+              - "README 작성": ko/portfolio-project-101/03-writing-the-readme.md
+              - "데모 만들기": ko/portfolio-project-101/04-building-the-demo.md
+              - "배포하기": ko/portfolio-project-101/05-deploying-the-project.md
+              - "테스트와 문서화": ko/portfolio-project-101/06-tests-and-documentation.md
+              - "기술적 의사결정 기록": ko/portfolio-project-101/07-recording-tech-decisions.md
+              - "블로그 글로 정리하기": ko/portfolio-project-101/08-summarizing-as-blog-posts.md
+              - "면접에서 설명하기": ko/portfolio-project-101/09-explaining-in-interviews.md
+              - "포트폴리오 개선 체크리스트": ko/portfolio-project-101/10-portfolio-improvement-checklist.md
+          - 측스톤 프로젝트 101:
+              - "캡스톤 프로젝트란 무엇인가": ko/capstone-project-101/01-what-is-capstone.md
+              - "주제 선정": ko/capstone-project-101/02-choosing-a-topic.md
+              - "문제 정의": ko/capstone-project-101/03-defining-the-problem.md
+              - "요구사항 정리": ko/capstone-project-101/04-organizing-requirements.md
+              - "팀 역할 나누기": ko/capstone-project-101/05-splitting-team-roles.md
+              - "MVP 설계": ko/capstone-project-101/06-designing-the-mvp.md
+              - "기술 스택 선택": ko/capstone-project-101/07-choosing-the-tech-stack.md
+              - "일정 관리": ko/capstone-project-101/08-schedule-management.md
+              - "발표 자료 만들기": ko/capstone-project-101/09-presentation-materials.md
+              - "프로젝트 회고": ko/capstone-project-101/10-project-retrospective.md
+          - 기술 글쓰기 101:
+              - "기술 글쓰기란 무엇인가": ko/technical-writing-101/01-what-is-technical-writing.md
+              - "독자 정의하기": ko/technical-writing-101/02-defining-the-reader.md
+              - "제목과 구조 잡기": ko/technical-writing-101/03-title-and-structure.md
+              - "개념 설명하기": ko/technical-writing-101/04-explaining-concepts.md
+              - "예제 코드 설명하기": ko/technical-writing-101/05-explaining-example-code.md
+              - "그림과 표 사용하기": ko/technical-writing-101/06-using-figures-and-tables.md
+              - "README 작성하기": ko/technical-writing-101/07-writing-the-readme.md
+              - "튜토리얼 작성하기": ko/technical-writing-101/08-writing-tutorials.md
+              - "블로그와 문서 차이": ko/technical-writing-101/09-blog-vs-docs.md
+              - "발행 전 체크리스트": ko/technical-writing-101/10-pre-publish-checklist.md
       - 데이터:
+          - Statistics 101:
+              - "통계란 무엇인가?": ko/statistics-101/01-what-is-statistics.md
+              - "평균, 중앙값, 분산": ko/statistics-101/02-mean-median-variance.md
+              - "분포": ko/statistics-101/03-distributions.md
+              - "표본과 모집단": ko/statistics-101/04-sample-and-population.md
+              - "추정": ko/statistics-101/05-estimation.md
+              - "신뢰구간": ko/statistics-101/06-confidence-interval.md
+              - "가설검정": ko/statistics-101/07-hypothesis-testing.md
+              - "상관과 회귀": ko/statistics-101/08-correlation-and-regression.md
+              - "p-value 이해하기": ko/statistics-101/09-understanding-p-value.md
+              - "통계적 사고방식": ko/statistics-101/10-statistical-thinking.md
+          - Probability 101:
+              - "확률이란 무엇인가?": ko/probability-101/01-what-is-probability.md
+              - "사건과 표본공간": ko/probability-101/02-events-and-sample-space.md
+              - "조건부확률": ko/probability-101/03-conditional-probability.md
+              - "베이즈 정리": ko/probability-101/04-bayes-theorem.md
+              - "확률변수": ko/probability-101/05-random-variables.md
+              - "기대값과 분산": ko/probability-101/06-expectation-and-variance.md
+              - "이산분포": ko/probability-101/07-discrete-distributions.md
+              - "연속분포": ko/probability-101/08-continuous-distributions.md
+              - "대수의 법칙과 중심극한정리": ko/probability-101/09-lln-and-clt.md
+              - "머신러닝에서의 확률": ko/probability-101/10-probability-in-ml.md
+          - Linear Algebra 101:
+              - "선형대수란 무엇인가?": ko/linear-algebra-101/01-what-is-linear-algebra.md
+              - "벡터": ko/linear-algebra-101/02-vectors.md
+              - "행렬": ko/linear-algebra-101/03-matrices.md
+              - "내적과 거리": ko/linear-algebra-101/04-inner-product-and-distance.md
+              - "선형변환": ko/linear-algebra-101/05-linear-transformation.md
+              - "기저와 차원": ko/linear-algebra-101/06-basis-and-dimension.md
+              - "고유값과 고유벡터": ko/linear-algebra-101/07-eigenvalues-and-eigenvectors.md
+              - "행렬 분해": ko/linear-algebra-101/08-matrix-decomposition.md
+              - "PCA": ko/linear-algebra-101/09-pca.md
+              - "머신러닝에서의 선형대수": ko/linear-algebra-101/10-linear-algebra-in-ml.md
+          - Data Science 101:
+              - "Data Science란 무엇인가?": ko/data-science-101/01-what-is-data-science.md
+              - "문제를 데이터 문제로 바꾸기": ko/data-science-101/02-problem-to-data-problem.md
+              - "데이터 수집": ko/data-science-101/03-data-collection.md
+              - "데이터 정제": ko/data-science-101/04-data-cleaning.md
+              - "탐색적 데이터 분석": ko/data-science-101/05-exploratory-data-analysis.md
+              - "시각화": ko/data-science-101/06-visualization.md
+              - "모델링": ko/data-science-101/07-modeling.md
+              - "평가": ko/data-science-101/08-evaluation.md
+              - "결과 해석": ko/data-science-101/09-result-interpretation.md
+              - "데이터 프로젝트 전체 흐름": ko/data-science-101/10-data-project-end-to-end.md
+          - SQL 101:
+              - "SQL이란 무엇인가?": ko/sql-101/01-what-is-sql.md
+              - "SELECT 기본": ko/sql-101/02-select-basics.md
+              - "WHERE와 조건": ko/sql-101/03-where-and-conditions.md
+              - "JOIN": ko/sql-101/04-join.md
+              - "GROUP BY와 aggregate": ko/sql-101/05-group-by-and-aggregate.md
+              - "Subquery": ko/sql-101/06-subquery.md
+              - "Window Function": ko/sql-101/07-window-function.md
+              - "INSERT, UPDATE, DELETE": ko/sql-101/08-insert-update-delete.md
+              - "Index와 Query Plan": ko/sql-101/09-index-and-query-plan.md
+              - "실전 분석 SQL": ko/sql-101/10-practical-analysis-sql.md
+          - Pandas 101:
+              - "Pandas란 무엇인가?": ko/pandas-101/01-what-is-pandas.md
+              - "Series와 DataFrame": ko/pandas-101/02-series-and-dataframe.md
+              - "CSV와 Excel 읽기": ko/pandas-101/03-read-csv-and-excel.md
+              - "filtering과 selection": ko/pandas-101/04-filtering-and-selection.md
+              - "missing value 처리": ko/pandas-101/05-missing-values.md
+              - "groupby": ko/pandas-101/06-groupby.md
+              - "merge와 join": ko/pandas-101/07-merge-and-join.md
+              - "time series": ko/pandas-101/08-time-series.md
+              - "apply와 vectorization": ko/pandas-101/09-apply-and-vectorization.md
+              - "실전 데이터 분석": ko/pandas-101/10-real-world-data-analysis.md
+          - Machine Learning 101:
+              - "Machine Learning이란 무엇인가?": ko/machine-learning-101/01-what-is-machine-learning.md
+              - "지도학습과 비지도학습": ko/machine-learning-101/02-supervised-and-unsupervised.md
+              - "Train/Test Split": ko/machine-learning-101/03-train-test-split.md
+              - "Linear Regression": ko/machine-learning-101/04-linear-regression.md
+              - "Logistic Regression": ko/machine-learning-101/05-logistic-regression.md
+              - "Decision Tree와 Random Forest": ko/machine-learning-101/06-decision-tree-and-random-forest.md
+              - "Clustering": ko/machine-learning-101/07-clustering.md
+              - "Overfitting과 Regularization": ko/machine-learning-101/08-overfitting-and-regularization.md
+              - "Model Evaluation": ko/machine-learning-101/09-model-evaluation.md
+              - "ML 프로젝트 전체 흐름": ko/machine-learning-101/10-ml-project-workflow.md
+          - Model Evaluation 101:
+              - "모델 평가는 왜 어려운가?": ko/model-evaluation-101/01-why-evaluation-is-hard.md
+              - "train/validation/test": ko/model-evaluation-101/02-train-val-test.md
+              - "Accuracy의 한계": ko/model-evaluation-101/03-limits-of-accuracy.md
+              - "Precision과 Recall": ko/model-evaluation-101/04-precision-and-recall.md
+              - "F1 Score": ko/model-evaluation-101/05-f1-score.md
+              - "ROC와 AUC": ko/model-evaluation-101/06-roc-and-auc.md
+              - "Calibration": ko/model-evaluation-101/07-calibration.md
+              - "Cross Validation": ko/model-evaluation-101/08-cross-validation.md
+              - "Error Analysis": ko/model-evaluation-101/09-error-analysis.md
+              - "평가 리포트 만들기": ko/model-evaluation-101/10-evaluation-report.md
+          - MLOps 101:
+              - "MLOps란 무엇인가?": ko/mlops-101/01-what-is-mlops.md
+              - "실험 관리": ko/mlops-101/02-experiment-tracking.md
+              - "데이터 버전 관리": ko/mlops-101/03-data-versioning.md
+              - "모델 학습 파이프라인": ko/mlops-101/04-training-pipeline.md
+              - "모델 배포": ko/mlops-101/05-model-deployment.md
+              - "모델 모니터링": ko/mlops-101/06-model-monitoring.md
+              - "Data Drift와 Model Drift": ko/mlops-101/07-data-and-model-drift.md
+              - "재학습": ko/mlops-101/08-retraining.md
+              - "Feature Store": ko/mlops-101/09-feature-store.md
+              - "운영 가능한 ML 시스템": ko/mlops-101/10-production-ml-system.md
+          - Data Warehouse 101:
+              - "Data Warehouse란 무엇인가?": ko/data-warehouse-101/01-what-is-data-warehouse.md
+              - "OLTP와 OLAP": ko/data-warehouse-101/02-oltp-and-olap.md
+              - "Fact와 Dimension": ko/data-warehouse-101/03-fact-and-dimension.md
+              - "Star Schema": ko/data-warehouse-101/04-star-schema.md
+              - "Partition과 Clustering": ko/data-warehouse-101/05-partition-and-clustering.md
+              - "ETL과 ELT": ko/data-warehouse-101/06-etl-and-elt.md
+              - "BI와 Dashboard": ko/data-warehouse-101/07-bi-and-dashboard.md
+              - "Data Mart": ko/data-warehouse-101/08-data-mart.md
+              - "성능 최적화": ko/data-warehouse-101/09-performance-optimization.md
+              - "Warehouse 설계 예제": ko/data-warehouse-101/10-warehouse-design-example.md
           - Python DB-API 101:
               - "왜 DB-API 2.0인가 - PEP 249가 푼 문제": ko/python-dbapi-101/01-why-db-api-pep-249.md
               - "Connection과 Cursor Lifecycle": ko/python-dbapi-101/02-connection-cursor-lifecycle.md
@@ -502,8 +1140,39 @@ nav:
               - "Using HyperCLOVA X and Solar API": en/korean-ai-stack-101/05-hyperclova-solar-api.md
               - "Assembling a Korean RAG pipeline": en/korean-ai-stack-101/06-korean-rag-pipeline.md
       - 프로그래밍:
+          - Computer Science 101:
+              - "What Is Computer Science?": en/computer-science-101/01-what-is-computer-science.md
+              - "Computation and Programs": en/computer-science-101/02-computation-and-programs.md
+              - "Data Representation": en/computer-science-101/03-data-representation.md
+              - "Algorithms and Complexity": en/computer-science-101/04-algorithms-and-complexity.md
+              - "Computer Architecture": en/computer-science-101/05-computer-architecture.md
+              - "Operating Systems": en/computer-science-101/06-operating-systems.md
+              - "Networks": en/computer-science-101/07-networks.md
+              - "Databases": en/computer-science-101/08-databases.md
+              - "Software Engineering": en/computer-science-101/09-software-engineering.md
+              - "From CS to AI and Data Science": en/computer-science-101/10-ai-and-data-science.md
           - Python 101:
+              - "Why Python, and how to install and use venv": en/python-101/01-why-python-and-install.md
+              - "Variables, types, and operators": en/python-101/02-variables-types-operators.md
+              - "Strings and formatting": en/python-101/03-strings-and-formatting.md
+              - "list, tuple, set, dict": en/python-101/04-list-tuple-set-dict.md
+              - "Control flow: if, for, while, comprehension": en/python-101/05-control-flow.md
+              - "Functions and arguments: def, args, kwargs, default, lambda": en/python-101/06-functions-and-arguments.md
+              - "Modules and packages: import, __init__, __name__": en/python-101/07-modules-and-packages.md
+              - "File I/O and exception handling": en/python-101/08-file-io-and-exceptions.md
+              - "Classes and objects: bundling data with behavior": en/python-101/09-classes-and-objects.md
+              - "Standard library tour: datetime, pathlib, json, collections, itertools": en/python-101/10-standard-library-tour.md
           - Git & GitHub 101:
+              - "What is Git? Version control fundamentals": en/git-github-101/01-what-is-git.md
+              - "Your first commit - init, status, add, commit": en/git-github-101/02-first-commit.md
+              - "Reading change history - status, diff, log": en/git-github-101/03-status-diff-log.md
+              - "Branch basics - create, switch, and compare": en/git-github-101/04-branch-basics.md
+              - "Merge and Conflict Resolution - Bringing Two Lines Back Together": en/git-github-101/05-merge-and-conflict.md
+              - "Creating a GitHub repository - remote, push, and pull in one go": en/git-github-101/06-github-repository.md
+              - "Collaborating with Pull Requests - From Branch to Review to Main": en/git-github-101/07-pull-request.md
+              - "Tracking Work with Issues and Projects - How GitHub Records What's Next": en/git-github-101/08-issue-and-project.md
+              - "Writing Good Commit Messages: Conventional Commits and Useful Bodies": en/git-github-101/09-good-commit-message.md
+              - "Building a real-world Git workflow: from issue to release in one cycle": en/git-github-101/10-real-world-workflow.md
           - Linux CLI 101:
               - "What Is the CLI and Shell?": en/linux-cli-101/01-what-is-cli-and-shell.md
               - "Files and Directories": en/linux-cli-101/02-files-and-directories.md
@@ -537,7 +1206,614 @@ nav:
               - "Coverage and Test Quality": en/pytest-101/08-coverage.md
               - "Test Automation with GitHub Actions": en/pytest-101/09-ci-with-github-actions.md
               - "Writing Testable Code": en/pytest-101/10-testable-code.md
+          - Object-Oriented Programming 101:
+              - "What Is Object-Oriented Programming?": en/oop-101/01-what-is-oop.md
+              - "Classes and Instances": en/oop-101/02-classes-and-instances.md
+              - "Encapsulation": en/oop-101/03-encapsulation.md
+              - "Inheritance": en/oop-101/04-inheritance.md
+              - "Polymorphism": en/oop-101/05-polymorphism.md
+              - "Abstraction": en/oop-101/06-abstraction.md
+              - "Composition vs Inheritance": en/oop-101/07-composition-vs-inheritance.md
+              - "SOLID Principles Basics": en/oop-101/08-solid-principles.md
+              - "OOP Design Example": en/oop-101/09-oop-design-example.md
+              - "When to Avoid OOP": en/oop-101/10-when-to-avoid-oop.md
+          - Functional Programming 101:
+              - "What Is Functional Programming?": en/functional-programming-101/01-what-is-fp.md
+              - "Pure Functions and Side Effects": en/functional-programming-101/02-pure-functions.md
+              - "Immutable Data": en/functional-programming-101/03-immutable-data.md
+              - "Higher-Order Functions": en/functional-programming-101/04-higher-order-functions.md
+              - "map, filter, reduce": en/functional-programming-101/05-map-filter-reduce.md
+              - "Closures and Partial Application": en/functional-programming-101/06-closure-and-partial.md
+              - "Recursion and Tail Calls": en/functional-programming-101/07-recursion.md
+              - "Lazy Evaluation and Generators": en/functional-programming-101/08-lazy-evaluation.md
+              - "Function Composition and Pipelines": en/functional-programming-101/09-function-composition.md
+              - "Balancing OOP and Functional Programming": en/functional-programming-101/10-oop-and-fp-balance.md
+          - Type Hints in Python 101:
+              - "What Are Python Type Hints?": en/type-hints-python-101/01-what-is-type-hint.md
+              - "Basic Types and Collection Types": en/type-hints-python-101/02-basic-and-collection-types.md
+              - "Optional and Union": en/type-hints-python-101/03-optional-and-union.md
+              - "Function Type Hints": en/type-hints-python-101/04-function-type-hints.md
+              - "TypedDict and dataclass": en/type-hints-python-101/05-typeddict-and-dataclass.md
+              - "Protocol and Structural Typing": en/type-hints-python-101/06-protocol-and-structural-typing.md
+              - "Understanding Generics": en/type-hints-python-101/07-generic.md
+              - "Using mypy and pyright": en/type-hints-python-101/08-mypy-and-pyright.md
+              - "Pydantic and Type Hints": en/type-hints-python-101/09-pydantic-and-type-hints.md
+              - "Type Hint Best Practices": en/type-hints-python-101/10-type-hints-best-practices.md
+          - Data Structures with Python 101:
+              - "What Are Data Structures?": en/data-structures-python-101/01-what-are-data-structures.md
+              - "Arrays and Lists": en/data-structures-python-101/02-arrays-and-lists.md
+              - "Stacks and Queues": en/data-structures-python-101/03-stacks-and-queues.md
+              - "Hash Tables and dict": en/data-structures-python-101/04-hash-tables-and-dict.md
+              - "Linked Lists": en/data-structures-python-101/05-linked-lists.md
+              - "Trees and Binary Trees": en/data-structures-python-101/06-trees-and-binary-trees.md
+              - "Heaps and Priority Queues": en/data-structures-python-101/07-heaps-and-priority-queues.md
+              - "Graph Representations": en/data-structures-python-101/08-graph-representations.md
+              - "Sets and Set Operations": en/data-structures-python-101/09-sets-and-set-operations.md
+              - "Choosing the Right Data Structure": en/data-structures-python-101/10-choosing-data-structures.md
+          - Algorithms with Python 101:
+              - "What Are Algorithms?": en/algorithms-python-101/01-what-are-algorithms.md
+              - "Time Complexity and Big-O": en/algorithms-python-101/02-time-complexity-and-big-o.md
+              - "Linear Search and Binary Search": en/algorithms-python-101/03-linear-and-binary-search.md
+              - "Sorting Algorithms": en/algorithms-python-101/04-sorting-algorithms.md
+              - "Recursion and Divide and Conquer": en/algorithms-python-101/05-recursion-and-divide-and-conquer.md
+              - "Dynamic Programming Basics": en/algorithms-python-101/06-dynamic-programming-basics.md
+              - "Graph Traversal — BFS and DFS": en/algorithms-python-101/07-graph-traversal-bfs-dfs.md
+              - "Shortest Path Basics": en/algorithms-python-101/08-shortest-path-basics.md
+              - "Greedy Algorithms": en/algorithms-python-101/09-greedy-algorithms.md
+              - "Coding Test Problem-Solving Strategies": en/algorithms-python-101/10-coding-test-strategies.md
+      - CS 핵심 과목:
+          - Computer Science Major 101:
+              - "What Computer Science Majors Learn": en/computer-science-major-101/01-what-cs-majors-learn.md
+              - "Understanding First Year Subjects": en/computer-science-major-101/02-first-year-subjects.md
+              - "Data Structures and Algorithms": en/computer-science-major-101/03-data-structures-and-algorithms.md
+              - "Understanding Systems Subjects": en/computer-science-major-101/04-systems-subjects.md
+              - "Database and Network": en/computer-science-major-101/05-database-and-network.md
+              - "AI and Data Science": en/computer-science-major-101/06-ai-and-data-science.md
+              - "Project Subjects": en/computer-science-major-101/07-project-subjects.md
+              - "How to Study Computer Science": en/computer-science-major-101/08-how-to-study-cs.md
+              - "Build Your Portfolio": en/computer-science-major-101/09-build-your-portfolio.md
+              - "Skills to Have Before Graduation": en/computer-science-major-101/10-skills-before-graduation.md
+          - Discrete Math 101:
+              - "What Is Discrete Mathematics?": en/discrete-math-101/01-what-is-discrete-math.md
+              - "Propositions and Logic": en/discrete-math-101/02-propositions-and-logic.md
+              - "Sets and Functions": en/discrete-math-101/03-sets-and-functions.md
+              - "Relations and Equivalence": en/discrete-math-101/04-relations-and-equivalence.md
+              - "Proof Techniques": en/discrete-math-101/05-proof-techniques.md
+              - "Sequences and Recurrence": en/discrete-math-101/06-sequences-and-recurrence.md
+              - "Combinatorics": en/discrete-math-101/07-combinatorics.md
+              - "Graph Theory Basics": en/discrete-math-101/08-graph-theory-basics.md
+              - "Trees and Graph Traversal": en/discrete-math-101/09-trees-and-graph-traversal.md
+              - "Discrete Mathematics and Algorithms": en/discrete-math-101/10-discrete-math-and-algorithms.md
+          - Math for CS 101:
+              - "Why Math for CS": en/math-for-cs-101/01-why-math-for-cs.md
+              - "Logic and Proofs": en/math-for-cs-101/02-logic-and-proofs.md
+              - "Sets and Functions": en/math-for-cs-101/03-sets-and-functions.md
+              - "Graphs": en/math-for-cs-101/04-graphs.md
+              - "Combinatorics": en/math-for-cs-101/05-combinatorics.md
+              - "Probability": en/math-for-cs-101/06-probability.md
+              - "Linear Algebra": en/math-for-cs-101/07-linear-algebra.md
+              - "Calculus": en/math-for-cs-101/08-calculus.md
+              - "Information Theory": en/math-for-cs-101/09-information-theory.md
+              - "Algorithms and Math": en/math-for-cs-101/10-algorithms-and-math.md
+          - Calculus for ML 101:
+              - "What Is a Derivative": en/calculus-for-ml-101/01-what-is-derivative.md
+              - "Functions and Slope": en/calculus-for-ml-101/02-functions-and-slope.md
+              - "Partial Derivatives": en/calculus-for-ml-101/03-partial-derivatives.md
+              - "Gradient": en/calculus-for-ml-101/04-gradient.md
+              - "Chain Rule": en/calculus-for-ml-101/05-chain-rule.md
+              - "Loss Function": en/calculus-for-ml-101/06-loss-function.md
+              - "Gradient Descent": en/calculus-for-ml-101/07-gradient-descent.md
+              - "Optimization": en/calculus-for-ml-101/08-optimization.md
+              - "Backpropagation Intuition": en/calculus-for-ml-101/09-backpropagation-intuition.md
+              - "Calculus in Deep Learning": en/calculus-for-ml-101/10-calculus-in-deep-learning.md
+          - Computer Architecture 101:
+              - "What Is Computer Architecture?": en/computer-architecture-101/01-what-is-computer-architecture.md
+              - "Data Representation — Bit, Byte, Integer, Floating Point": en/computer-architecture-101/02-data-representation.md
+              - "CPU and Instructions": en/computer-architecture-101/03-cpu-and-instructions.md
+              - "Registers and the ALU": en/computer-architecture-101/04-registers-and-alu.md
+              - "Memory Organization": en/computer-architecture-101/05-memory-organization.md
+              - "Cache and Locality": en/computer-architecture-101/06-cache-and-locality.md
+              - "Pipelining": en/computer-architecture-101/07-pipelining.md
+              - "I/O and Devices": en/computer-architecture-101/08-io-and-devices.md
+              - "Parallelism and Multicore": en/computer-architecture-101/09-parallelism-and-multicore.md
+              - "Understanding Performance": en/computer-architecture-101/10-understanding-performance.md
+          - Data Structures 101:
+              - "What Are Data Structures?": en/data-structures-101/01-what-are-data-structures.md
+              - "Arrays and Dynamic Arrays": en/data-structures-101/02-arrays-and-dynamic-arrays.md
+              - "Linked Lists": en/data-structures-101/03-linked-lists.md
+              - "Stacks and Queues": en/data-structures-101/04-stacks-and-queues.md
+              - "Hash Tables": en/data-structures-101/05-hash-tables.md
+              - "Trees": en/data-structures-101/06-trees.md
+              - "Binary Search Trees": en/data-structures-101/07-binary-search-trees.md
+              - "Heaps": en/data-structures-101/08-heaps.md
+              - "Graphs": en/data-structures-101/09-graphs.md
+              - "Choosing Data Structures": en/data-structures-101/10-choosing-data-structures.md
+          - Algorithms 101:
+              - "What Is an Algorithm?": en/algorithms-101/01-what-is-an-algorithm.md
+              - "Time and Space Complexity": en/algorithms-101/02-time-and-space-complexity.md
+              - "Search Algorithms": en/algorithms-101/03-search-algorithms.md
+              - "Sorting Algorithms": en/algorithms-101/04-sorting-algorithms.md
+              - "Recursion and Divide and Conquer": en/algorithms-101/05-recursion-and-divide-and-conquer.md
+              - "Dynamic Programming": en/algorithms-101/06-dynamic-programming.md
+              - "Greedy Algorithms": en/algorithms-101/07-greedy-algorithms.md
+              - "Graph Algorithms": en/algorithms-101/08-graph-algorithms.md
+              - "String Algorithm Basics": en/algorithms-101/09-string-algorithms.md
+              - "Algorithm Problem-Solving Strategies": en/algorithms-101/10-problem-solving-strategies.md
+          - Programming Languages 101:
+              - "What Is a Programming Language?": en/programming-languages-101/01-what-is-a-programming-language.md
+              - "Syntax and Semantics": en/programming-languages-101/02-syntax-and-semantics.md
+              - "Type Systems": en/programming-languages-101/03-type-system.md
+              - "Scope and Binding": en/programming-languages-101/04-scope-and-binding.md
+              - "Functions and Closures": en/programming-languages-101/05-functions-and-closures.md
+              - "Objects and Prototypes": en/programming-languages-101/06-objects-and-prototypes.md
+              - "Memory Management": en/programming-languages-101/07-memory-management.md
+              - "Interpreters and Compilers": en/programming-languages-101/08-interpreter-and-compiler.md
+              - "Static vs Dynamic Languages": en/programming-languages-101/09-static-vs-dynamic.md
+              - "What Makes a Good Language Design?": en/programming-languages-101/10-what-makes-good-language-design.md
+          - Operating Systems 101:
+              - "What Is an Operating System?": en/operating-systems-101/01-what-is-an-operating-system.md
+              - "Processes and Threads": en/operating-systems-101/02-processes-and-threads.md
+              - "Scheduling": en/operating-systems-101/03-scheduling.md
+              - "Concurrency and Race Conditions": en/operating-systems-101/04-concurrency-and-race-conditions.md
+              - "Locks, Mutexes, and Semaphores": en/operating-systems-101/05-locks-mutex-semaphore.md
+              - "Memory Management": en/operating-systems-101/06-memory-management.md
+              - "Virtual Memory": en/operating-systems-101/07-virtual-memory.md
+              - "File Systems": en/operating-systems-101/08-file-systems.md
+              - "System Calls": en/operating-systems-101/09-system-calls.md
+              - "Containers and the Operating System": en/operating-systems-101/10-containers-and-the-os.md
+          - Computer Networks 101:
+              - "What Is a Network?": en/computer-networks-101/01-what-is-a-network.md
+              - "IP and Subnet": en/computer-networks-101/02-ip-and-subnet.md
+              - "TCP and UDP": en/computer-networks-101/03-tcp-and-udp.md
+              - "DNS": en/computer-networks-101/04-dns.md
+              - "HTTP and HTTPS": en/computer-networks-101/05-http-and-https.md
+              - "TLS Basics": en/computer-networks-101/06-tls-basics.md
+              - "Routing and NAT": en/computer-networks-101/07-routing-and-nat.md
+              - "Load Balancer": en/computer-networks-101/08-load-balancer.md
+              - "WebSocket and Real-Time Communication": en/computer-networks-101/09-websocket-and-realtime.md
+              - "Debugging Network Problems": en/computer-networks-101/10-debugging-network-problems.md
+          - Database Systems 101:
+              - "What Is a Database System?": en/database-systems-101/01-what-is-a-database.md
+              - "The Relational Model": en/database-systems-101/02-relational-model.md
+              - "SQL and Query Processing": en/database-systems-101/03-sql-and-query-processing.md
+              - "Indexes": en/database-systems-101/04-indexes.md
+              - "Transactions and ACID": en/database-systems-101/05-transactions-and-acid.md
+              - "Isolation Levels": en/database-systems-101/06-isolation-levels.md
+              - "Normalization and Modeling": en/database-systems-101/07-normalization-and-modeling.md
+              - "Query Optimization": en/database-systems-101/08-query-optimization.md
+              - "Replication and Backup": en/database-systems-101/09-replication-and-backup.md
+              - "OLTP and OLAP": en/database-systems-101/10-oltp-and-olap.md
+          - Distributed Systems 101:
+              - "What Is a Distributed System?": en/distributed-systems-101/01-what-is-a-distributed-system.md
+              - "Failure Models": en/distributed-systems-101/02-failure-model.md
+              - "RPC and Message Passing": en/distributed-systems-101/03-rpc-and-message-passing.md
+              - "Consistency and CAP": en/distributed-systems-101/04-consistency-and-cap.md
+              - "Replication": en/distributed-systems-101/05-replication.md
+              - "Consensus and Raft": en/distributed-systems-101/06-consensus-and-raft.md
+              - "Leader Election": en/distributed-systems-101/07-leader-election.md
+              - "Message Queues and Event Sourcing": en/distributed-systems-101/08-message-queue-and-event-sourcing.md
+              - "Distributed Transactions": en/distributed-systems-101/09-distributed-transaction.md
+              - "Patterns for Operable Distributed Systems": en/distributed-systems-101/10-operable-distributed-patterns.md
+          - Compilers 101:
+              - "What Is a Compiler?": en/compilers-101/01-what-is-a-compiler.md
+              - "lexical analysis": en/compilers-101/02-lexical-analysis.md
+              - "parsing and AST": en/compilers-101/03-parsing-and-ast.md
+              - "semantic analysis": en/compilers-101/04-semantic-analysis.md
+              - "symbol table and scope": en/compilers-101/05-symbol-table-and-scope.md
+              - "intermediate representation": en/compilers-101/06-intermediate-representation.md
+              - "optimization basics": en/compilers-101/07-optimization-basics.md
+              - "code generation": en/compilers-101/08-code-generation.md
+              - "JIT vs AOT": en/compilers-101/09-jit-vs-aot.md
+              - "Building a Tiny Interpreter": en/compilers-101/10-building-a-tiny-interpreter.md
+          - Information Security 101:
+              - "What Is Information Security?": en/information-security-101/01-what-is-information-security.md
+              - "Authentication and Authorization": en/information-security-101/02-authentication-and-authorization.md
+              - "Cryptography and Hashing": en/information-security-101/03-cryptography-and-hash.md
+              - "TLS and Certificates": en/information-security-101/04-tls-and-certificates.md
+              - "Web Security Basics": en/information-security-101/05-web-security-basics.md
+              - "SQL Injection and XSS": en/information-security-101/06-sql-injection-and-xss.md
+              - "Secret Management": en/information-security-101/07-secret-management.md
+              - "Least Privilege": en/information-security-101/08-least-privilege.md
+              - "Logging and Audit": en/information-security-101/09-logging-and-audit.md
+              - "Incident Response": en/information-security-101/10-incident-response.md
+      - 소프트웨어 엔지니어링:
+          - Software Engineering 101:
+              - "What Is Software Engineering?": en/software-engineering-101/01-what-is-software-engineering.md
+              - "Understanding Requirements": en/software-engineering-101/02-understanding-requirements.md
+              - "Design vs Implementation": en/software-engineering-101/03-design-vs-implementation.md
+              - "Code Review": en/software-engineering-101/04-code-review.md
+              - "Testing Strategy": en/software-engineering-101/05-testing-strategy.md
+              - "Version Control and Release": en/software-engineering-101/06-version-control-and-release.md
+              - "Documentation": en/software-engineering-101/07-documentation.md
+              - "Collaboration Process": en/software-engineering-101/08-collaboration-process.md
+              - "Maintenance and Tech Debt": en/software-engineering-101/09-maintenance-and-tech-debt.md
+              - "What Makes Good Software": en/software-engineering-101/10-what-makes-good-software.md
+          - Clean Code 101:
+              - "What Is Clean Code?": en/clean-code-101/01-what-is-clean-code.md
+              - "Naming": en/clean-code-101/02-naming.md
+              - "Small Functions": en/clean-code-101/03-small-functions.md
+              - "Simplifying Conditionals": en/clean-code-101/04-simplifying-conditionals.md
+              - "Removing Duplication": en/clean-code-101/05-removing-duplication.md
+              - "Error Handling": en/clean-code-101/06-error-handling.md
+              - "Comments and Documentation": en/clean-code-101/07-comments-and-docs.md
+              - "Testable Code": en/clean-code-101/08-testable-code.md
+              - "Refactoring Basics": en/clean-code-101/09-refactoring-basics.md
+              - "Good Code Review Standards": en/clean-code-101/10-good-code-review.md
+          - Software Design 101:
+              - "What Is Software Design?": en/software-design-101/01-what-is-software-design.md
+              - "Separation of Concerns": en/software-design-101/02-separation-of-concerns.md
+              - "Modules and Boundaries": en/software-design-101/03-modules-and-boundaries.md
+              - "Dependency Direction": en/software-design-101/04-dependency-direction.md
+              - "Interfaces and Abstraction": en/software-design-101/05-interfaces-and-abstraction.md
+              - "Layered Architecture": en/software-design-101/06-layered-architecture.md
+              - "Data Flow Design": en/software-design-101/07-data-flow-design.md
+              - "Reducing Change Impact": en/software-design-101/08-reducing-change-impact.md
+              - "Design Principles": en/software-design-101/09-design-principles.md
+              - "Small Design Practice": en/software-design-101/10-small-design-practice.md
+          - Design Patterns 101:
+              - "What Are Design Patterns?": en/design-patterns-101/01-what-are-design-patterns.md
+              - "Creational Patterns": en/design-patterns-101/02-creational-patterns.md
+              - "Structural Patterns": en/design-patterns-101/03-structural-patterns.md
+              - "Behavioral Patterns": en/design-patterns-101/04-behavioral-patterns.md
+              - "The Strategy Pattern": en/design-patterns-101/05-strategy-pattern.md
+              - "The Adapter Pattern": en/design-patterns-101/06-adapter-pattern.md
+              - "The Observer Pattern": en/design-patterns-101/07-observer-pattern.md
+              - "Factory and Dependency Injection": en/design-patterns-101/08-factory-and-di.md
+              - "Avoiding Pattern Overuse": en/design-patterns-101/09-avoiding-pattern-overuse.md
+              - "Pythonic Patterns": en/design-patterns-101/10-pythonic-patterns.md
+          - API Design 101:
+              - "What Is an API?": en/api-design-101/01-what-is-an-api.md
+              - "REST Basics": en/api-design-101/02-rest-basics.md
+              - "Resource Design": en/api-design-101/03-resource-design.md
+              - "HTTP Methods and Status Codes": en/api-design-101/04-http-methods-and-status.md
+              - "Request and Response Schemas": en/api-design-101/05-request-and-response-schema.md
+              - "Pagination and Filtering": en/api-design-101/06-pagination-and-filtering.md
+              - "Designing Error Responses": en/api-design-101/07-error-response-design.md
+              - "OpenAPI and Swagger": en/api-design-101/08-openapi-and-swagger.md
+              - "API Versioning": en/api-design-101/09-api-versioning.md
+              - "Writing Good API Documentation": en/api-design-101/10-writing-good-api-docs.md
+          - Web Development 101:
+              - "How the Web Works": en/web-development-101/01-how-the-web-works.md
+              - "HTML, CSS, and JavaScript": en/web-development-101/02-html-css-javascript.md
+              - "The Browser and the DOM": en/web-development-101/03-browser-and-dom.md
+              - "HTTP and APIs": en/web-development-101/04-http-and-api.md
+              - "Frontend and Backend": en/web-development-101/05-frontend-and-backend.md
+              - "Authentication and Sessions": en/web-development-101/06-auth-and-sessions.md
+              - "Connecting to a Database": en/web-development-101/07-connecting-to-database.md
+              - "Deployment": en/web-development-101/08-deployment.md
+              - "Performance and Caching": en/web-development-101/09-performance-and-caching.md
+              - "Building a Small Web App": en/web-development-101/10-building-a-small-web-app.md
+          - Frontend Development 101:
+              - "What Is Frontend Development?": en/frontend-development-101/01-what-is-frontend-development.md
+              - "HTML and CSS Basics": en/frontend-development-101/02-html-and-css-basics.md
+              - "JavaScript Basics": en/frontend-development-101/03-javascript-basics.md
+              - "Components and State": en/frontend-development-101/04-components-and-state.md
+              - "Routing and Pages": en/frontend-development-101/05-routing-and-pages.md
+              - "API Calls and Async": en/frontend-development-101/06-api-calls-and-async.md
+              - "Forms and Validation": en/frontend-development-101/07-forms-and-validation.md
+              - "Styling and Design Systems": en/frontend-development-101/08-styling-and-design-system.md
+              - "Build Tools and Bundling": en/frontend-development-101/09-build-tools-and-bundling.md
+              - "Building a Small Frontend App": en/frontend-development-101/10-building-a-small-frontend-app.md
+          - Backend Development 101:
+              - "What Is Backend Development?": en/backend-development-101/01-what-is-backend-development.md
+              - "Building an HTTP Server": en/backend-development-101/02-building-an-http-server.md
+              - "Routing and Controllers": en/backend-development-101/03-routing-and-controllers.md
+              - "The Service Layer": en/backend-development-101/04-service-layer.md
+              - "The Database Layer": en/backend-development-101/05-database-layer.md
+              - "Authentication and Authorization": en/backend-development-101/06-auth-and-authorization.md
+              - "Logging and Error Handling": en/backend-development-101/07-logging-and-error-handling.md
+              - "Testing the Backend": en/backend-development-101/08-testing-the-backend.md
+              - "Deploying the Backend": en/backend-development-101/09-deploying-the-backend.md
+              - "A Production-Ready Backend Structure": en/backend-development-101/10-production-ready-backend.md
+          - Testing 101:
+              - "What Is Testing?": en/testing-101/01-what-is-testing.md
+              - "Unit Test": en/testing-101/02-unit-test.md
+              - "Integration Test": en/testing-101/03-integration-test.md
+              - "E2E Test": en/testing-101/04-e2e-test.md
+              - "Test Double": en/testing-101/05-test-double.md
+              - "Mock and Stub": en/testing-101/06-mock-and-stub.md
+              - "Test Coverage": en/testing-101/07-test-coverage.md
+              - "Regression Test": en/testing-101/08-regression-test.md
+              - "Running Tests in CI": en/testing-101/09-tests-in-ci.md
+              - "Building a Test Strategy": en/testing-101/10-test-strategy.md
+          - Containers 101:
+              - "What is a Container?": en/containers-101/01-what-is-a-container.md
+              - "Image and Layer": en/containers-101/02-image-and-layer.md
+              - "Runtime": en/containers-101/03-runtime.md
+              - "Dockerfile": en/containers-101/04-dockerfile.md
+              - "Volume": en/containers-101/05-volume.md
+              - "Network": en/containers-101/06-network.md
+              - "Registry": en/containers-101/07-registry.md
+              - "Container Security": en/containers-101/08-container-security.md
+              - "Containers vs VMs": en/containers-101/09-container-vs-vm.md
+              - "Build a Container App": en/containers-101/10-build-a-container-app.md
+          - Docker 101:
+              - "What Is Docker?": en/docker-101/01-what-is-docker.md
+              - "Images and Containers": en/docker-101/02-image-and-container.md
+              - "Writing a Dockerfile": en/docker-101/03-dockerfile.md
+              - "Volumes and Networks": en/docker-101/04-volume-and-network.md
+              - "Docker Compose": en/docker-101/05-docker-compose.md
+              - "Environment Variables and Configuration": en/docker-101/06-env-and-config.md
+              - "Containerizing a Python App": en/docker-101/07-python-app-containerize.md
+              - "Running with a Database": en/docker-101/08-database-with-app.md
+              - "Image Optimization": en/docker-101/09-image-optimization.md
+              - "Production-Ready Docker": en/docker-101/10-production-docker.md
+          - Kubernetes 101:
+              - "What is Kubernetes?": en/kubernetes-101/01-what-is-kubernetes.md
+              - "Pod": en/kubernetes-101/02-pod.md
+              - "Deployment": en/kubernetes-101/03-deployment.md
+              - "Service": en/kubernetes-101/04-service.md
+              - "Ingress": en/kubernetes-101/05-ingress.md
+              - "ConfigMap and Secret": en/kubernetes-101/06-configmap-and-secret.md
+              - "Volume": en/kubernetes-101/07-volume.md
+              - "HPA": en/kubernetes-101/08-hpa.md
+              - "Helm": en/kubernetes-101/09-helm.md
+              - "Kubernetes in Operation": en/kubernetes-101/10-kubernetes-in-operation.md
+          - Cloud Computing 101:
+              - "What is Cloud Computing?": en/cloud-computing-101/01-what-is-cloud-computing.md
+              - "IaaS, PaaS, SaaS": en/cloud-computing-101/02-iaas-paas-saas.md
+              - "Region and Availability Zone": en/cloud-computing-101/03-region-and-availability-zone.md
+              - "Compute": en/cloud-computing-101/04-compute.md
+              - "Storage": en/cloud-computing-101/05-storage.md
+              - "Network": en/cloud-computing-101/06-network.md
+              - "Identity and Security": en/cloud-computing-101/07-identity-and-security.md
+              - "Monitoring": en/cloud-computing-101/08-monitoring.md
+              - "Cost Management": en/cloud-computing-101/09-cost-management.md
+              - "Cloud Architecture Basics": en/cloud-computing-101/10-cloud-architecture-basics.md
+          - Serverless 101:
+              - "What is Serverless?": en/serverless-101/01-what-is-serverless.md
+              - "Function as a Service": en/serverless-101/02-function-as-a-service.md
+              - "Trigger and Event": en/serverless-101/03-trigger-and-event.md
+              - "Cold Start": en/serverless-101/04-cold-start.md
+              - "Scaling": en/serverless-101/05-scaling.md
+              - "State Management": en/serverless-101/06-state-management.md
+              - "Queue and Event-driven Architecture": en/serverless-101/07-queue-and-event-driven.md
+              - "Observability": en/serverless-101/08-observability.md
+              - "Cost": en/serverless-101/09-cost.md
+              - "Designing a Serverless App": en/serverless-101/10-serverless-app-design.md
+          - DevOps 101:
+              - "What Is DevOps?": en/devops-101/01-what-is-devops.md
+              - "CI Pipeline": en/devops-101/02-ci-pipeline.md
+              - "CD and Deployment Strategies": en/devops-101/03-cd-and-deployment.md
+              - "Environments and Configuration": en/devops-101/04-environments-and-config.md
+              - "Infrastructure as Code": en/devops-101/05-infrastructure-as-code.md
+              - "Containers and Build": en/devops-101/06-containers-and-build.md
+              - "Monitoring and Alerting": en/devops-101/07-monitoring-and-alerting.md
+              - "Logging and Analysis": en/devops-101/08-logging-and-analysis.md
+              - "Incident Response and On-Call": en/devops-101/09-incident-and-oncall.md
+              - "An Operable DevOps Flow": en/devops-101/10-operable-devops-flow.md
+          - GitHub Actions 101:
+              - "What Is GitHub Actions?": en/github-actions-101/01-what-is-github-actions.md
+              - "Workflows and Jobs": en/github-actions-101/02-workflow-and-job.md
+              - "Understanding Triggers": en/github-actions-101/03-triggers.md
+              - "Python Test Automation": en/github-actions-101/04-python-test-automation.md
+              - "Lint and Type Check": en/github-actions-101/05-lint-and-typecheck.md
+              - "Build Artifacts": en/github-actions-101/06-build-artifact.md
+              - "Docker Build": en/github-actions-101/07-docker-build.md
+              - "Deployment Automation": en/github-actions-101/08-deploy-automation.md
+              - "Secret Management": en/github-actions-101/09-secret-management.md
+              - "A Real-World CI/CD Pipeline": en/github-actions-101/10-real-world-cicd-pipeline.md
+          - Observability 101:
+              - "What Is Observability?": en/observability-101/01-what-is-observability.md
+              - "Metrics, Logs, and Traces": en/observability-101/02-metric-log-trace.md
+              - "Collecting and Visualizing Metrics": en/observability-101/03-metric-collection.md
+              - "Structured Logging": en/observability-101/04-structured-logging.md
+              - "Distributed Tracing Basics": en/observability-101/05-distributed-tracing.md
+              - "Dashboard Design": en/observability-101/06-dashboard-design.md
+              - "Alerts and On-Call": en/observability-101/07-alert-and-oncall.md
+              - "SLI and SLO Basics": en/observability-101/08-sli-and-slo.md
+              - "Cost and Cardinality": en/observability-101/09-cost-and-cardinality.md
+              - "A Production-Ready Observability Stack": en/observability-101/10-production-observability-stack.md
+          - Incident Response 101:
+              - "What is an Incident?": en/incident-response-101/01-what-is-incident.md
+              - "Severity Classification": en/incident-response-101/02-severity.md
+              - "Initial Response": en/incident-response-101/03-initial-response.md
+              - "Communication": en/incident-response-101/04-communication.md
+              - "Writing the Timeline": en/incident-response-101/05-timeline.md
+              - "Root Cause Analysis": en/incident-response-101/06-root-cause-analysis.md
+              - "Mitigation and Resolution": en/incident-response-101/07-mitigation-and-resolution.md
+              - "Postmortem": en/incident-response-101/08-postmortem.md
+              - "Prevention": en/incident-response-101/09-prevention.md
+              - "Building an Incident Runbook": en/incident-response-101/10-incident-runbook.md
+          - SRE 101:
+              - "What is SRE?": en/sre-101/01-what-is-sre.md
+              - "Reliability": en/sre-101/02-reliability.md
+              - "SLI, SLO, SLA": en/sre-101/03-sli-slo-sla.md
+              - "Error Budget": en/sre-101/04-error-budget.md
+              - "Monitoring": en/sre-101/05-monitoring.md
+              - "Incident Response": en/sre-101/06-incident-response.md
+              - "Postmortem": en/sre-101/07-postmortem.md
+              - "Reducing Toil": en/sre-101/08-reducing-toil.md
+              - "Capacity Planning": en/sre-101/09-capacity-planning.md
+              - "Building Operable Systems": en/sre-101/10-building-operable-systems.md
+          - Secure Coding 101:
+              - "What Is Secure Coding?": en/secure-coding-101/01-what-is-secure-coding.md
+              - "Input Validation": en/secure-coding-101/02-input-validation.md
+              - "Authentication and Session": en/secure-coding-101/03-authentication-and-session.md
+              - "Authorization and Permissions": en/secure-coding-101/04-authorization-and-permissions.md
+              - "Safe Data Storage": en/secure-coding-101/05-safe-data-storage.md
+              - "Secret and Key Management": en/secure-coding-101/06-secret-and-key-management.md
+              - "SQL Injection and Safe ORM Usage": en/secure-coding-101/07-sql-injection-and-orm.md
+              - "XSS and CSRF Defense": en/secure-coding-101/08-xss-and-csrf.md
+              - "Managing Dependency Vulnerabilities": en/secure-coding-101/09-dependency-vulnerabilities.md
+              - "Safe Logging and Audit": en/secure-coding-101/10-safe-logging-and-audit.md
+          - Open Source 101:
+              - "What Is Open Source": en/open-source-101/01-what-is-open-source.md
+              - "Understanding Licenses": en/open-source-101/02-understanding-licenses.md
+              - "Reading Issues": en/open-source-101/03-reading-issues.md
+              - "Creating Pull Requests": en/open-source-101/04-creating-pull-requests.md
+              - "A Good README": en/open-source-101/05-good-readme.md
+              - "Release and Versioning": en/open-source-101/06-release-and-versioning.md
+              - "Community Management": en/open-source-101/07-community-management.md
+              - "The Maintainer Role": en/open-source-101/08-maintainer-role.md
+              - "An Open Source Portfolio": en/open-source-101/09-open-source-portfolio.md
+              - "My First Open Source Project": en/open-source-101/10-my-first-open-source-project.md
+          - Developer Career 101:
+              - "What Is a Developer Career": en/developer-career-101/01-what-is-developer-career.md
+              - "Understanding Roles": en/developer-career-101/02-understanding-roles.md
+              - "Building a Learning Plan": en/developer-career-101/03-learning-plan.md
+              - "Resume and Portfolio": en/developer-career-101/04-resume-and-portfolio.md
+              - "Preparing for Coding Interviews": en/developer-career-101/05-coding-interview.md
+              - "System Design Interviews": en/developer-career-101/06-system-design-interview.md
+              - "Settling into the First Job": en/developer-career-101/07-first-job.md
+              - "Side Projects and Learning": en/developer-career-101/08-side-projects.md
+              - "Mentoring and Networking": en/developer-career-101/09-mentoring-networking.md
+              - "The Path to Senior": en/developer-career-101/10-path-to-senior.md
+          - Data Science Career 101:
+              - "What Is a Data Career": en/data-science-career-101/01-what-is-data-career.md
+              - "Analyst vs Scientist vs Engineer": en/data-science-career-101/02-analyst-scientist-engineer.md
+              - "Designing the Learning Path": en/data-science-career-101/03-learning-path.md
+              - "The Data Portfolio": en/data-science-career-101/04-data-portfolio.md
+              - "SQL and Analytics Interviews": en/data-science-career-101/05-sql-and-analytics-interview.md
+              - "The ML Interview": en/data-science-career-101/06-ml-interview.md
+              - "The Case Interview": en/data-science-career-101/07-case-interview.md
+              - "Settling into the First Data Job": en/data-science-career-101/08-first-job.md
+              - "Building Domain Expertise": en/data-science-career-101/09-domain-expertise.md
+              - "The Path to Senior in Data": en/data-science-career-101/10-path-to-senior.md
+          - Portfolio Project 101:
+              - "What is a Portfolio Project": en/portfolio-project-101/01-what-is-a-portfolio-project.md
+              - "Traits of a Good Project": en/portfolio-project-101/02-traits-of-a-good-project.md
+              - "Writing the README": en/portfolio-project-101/03-writing-the-readme.md
+              - "Building the Demo": en/portfolio-project-101/04-building-the-demo.md
+              - "Deploying the Project": en/portfolio-project-101/05-deploying-the-project.md
+              - "Tests and Documentation": en/portfolio-project-101/06-tests-and-documentation.md
+              - "Recording Tech Decisions": en/portfolio-project-101/07-recording-tech-decisions.md
+              - "Summarizing as Blog Posts": en/portfolio-project-101/08-summarizing-as-blog-posts.md
+              - "Explaining in Interviews": en/portfolio-project-101/09-explaining-in-interviews.md
+              - "Portfolio Improvement Checklist": en/portfolio-project-101/10-portfolio-improvement-checklist.md
+          - Capstone Project 101:
+              - "What is a Capstone Project": en/capstone-project-101/01-what-is-capstone.md
+              - "Choosing a Topic": en/capstone-project-101/02-choosing-a-topic.md
+              - "Defining the Problem": en/capstone-project-101/03-defining-the-problem.md
+              - "Organizing Requirements": en/capstone-project-101/04-organizing-requirements.md
+              - "Splitting Team Roles": en/capstone-project-101/05-splitting-team-roles.md
+              - "Designing the MVP": en/capstone-project-101/06-designing-the-mvp.md
+              - "Choosing the Tech Stack": en/capstone-project-101/07-choosing-the-tech-stack.md
+              - "Schedule Management": en/capstone-project-101/08-schedule-management.md
+              - "Building Presentation Materials": en/capstone-project-101/09-presentation-materials.md
+              - "Project Retrospective": en/capstone-project-101/10-project-retrospective.md
+          - Technical Writing 101:
+              - "What Is Technical Writing": en/technical-writing-101/01-what-is-technical-writing.md
+              - "Defining the Reader": en/technical-writing-101/02-defining-the-reader.md
+              - "Title and Structure": en/technical-writing-101/03-title-and-structure.md
+              - "Explaining Concepts": en/technical-writing-101/04-explaining-concepts.md
+              - "Explaining Example Code": en/technical-writing-101/05-explaining-example-code.md
+              - "Using Figures and Tables": en/technical-writing-101/06-using-figures-and-tables.md
+              - "Writing the README": en/technical-writing-101/07-writing-the-readme.md
+              - "Writing Tutorials": en/technical-writing-101/08-writing-tutorials.md
+              - "Blog vs Documentation": en/technical-writing-101/09-blog-vs-docs.md
+              - "Pre-publish Checklist": en/technical-writing-101/10-pre-publish-checklist.md
       - 데이터:
+          - Statistics 101:
+              - "What Is Statistics?": en/statistics-101/01-what-is-statistics.md
+              - "Mean, Median, and Variance": en/statistics-101/02-mean-median-variance.md
+              - "Distributions": en/statistics-101/03-distributions.md
+              - "Sample and Population": en/statistics-101/04-sample-and-population.md
+              - "Estimation": en/statistics-101/05-estimation.md
+              - "Confidence Interval": en/statistics-101/06-confidence-interval.md
+              - "Hypothesis Testing": en/statistics-101/07-hypothesis-testing.md
+              - "Correlation and Regression": en/statistics-101/08-correlation-and-regression.md
+              - "Understanding p-value": en/statistics-101/09-understanding-p-value.md
+              - "Statistical Thinking": en/statistics-101/10-statistical-thinking.md
+          - Probability 101:
+              - "What Is Probability?": en/probability-101/01-what-is-probability.md
+              - "Events and Sample Space": en/probability-101/02-events-and-sample-space.md
+              - "Conditional Probability": en/probability-101/03-conditional-probability.md
+              - "Bayes' Theorem": en/probability-101/04-bayes-theorem.md
+              - "Random Variables": en/probability-101/05-random-variables.md
+              - "Expectation and Variance": en/probability-101/06-expectation-and-variance.md
+              - "Discrete Distributions": en/probability-101/07-discrete-distributions.md
+              - "Continuous Distributions": en/probability-101/08-continuous-distributions.md
+              - "Law of Large Numbers and CLT": en/probability-101/09-lln-and-clt.md
+              - "Probability in Machine Learning": en/probability-101/10-probability-in-ml.md
+          - Linear Algebra 101:
+              - "What Is Linear Algebra?": en/linear-algebra-101/01-what-is-linear-algebra.md
+              - "Vectors": en/linear-algebra-101/02-vectors.md
+              - "Matrices": en/linear-algebra-101/03-matrices.md
+              - "Inner Product and Distance": en/linear-algebra-101/04-inner-product-and-distance.md
+              - "Linear Transformations": en/linear-algebra-101/05-linear-transformation.md
+              - "Basis and Dimension": en/linear-algebra-101/06-basis-and-dimension.md
+              - "Eigenvalues and Eigenvectors": en/linear-algebra-101/07-eigenvalues-and-eigenvectors.md
+              - "Matrix Decomposition": en/linear-algebra-101/08-matrix-decomposition.md
+              - "PCA": en/linear-algebra-101/09-pca.md
+              - "Linear Algebra in Machine Learning": en/linear-algebra-101/10-linear-algebra-in-ml.md
+          - Data Science 101:
+              - "What Is Data Science?": en/data-science-101/01-what-is-data-science.md
+              - "Turning a Problem into a Data Problem": en/data-science-101/02-problem-to-data-problem.md
+              - "Data Collection": en/data-science-101/03-data-collection.md
+              - "Data Cleaning": en/data-science-101/04-data-cleaning.md
+              - "Exploratory Data Analysis": en/data-science-101/05-exploratory-data-analysis.md
+              - "Visualization": en/data-science-101/06-visualization.md
+              - "Modeling": en/data-science-101/07-modeling.md
+              - "Evaluation": en/data-science-101/08-evaluation.md
+              - "Result Interpretation": en/data-science-101/09-result-interpretation.md
+              - "End-to-End Data Project Flow": en/data-science-101/10-data-project-end-to-end.md
+          - SQL 101:
+              - "What Is SQL?": en/sql-101/01-what-is-sql.md
+              - "SELECT Basics": en/sql-101/02-select-basics.md
+              - "WHERE and Conditions": en/sql-101/03-where-and-conditions.md
+              - "JOIN": en/sql-101/04-join.md
+              - "GROUP BY and Aggregates": en/sql-101/05-group-by-and-aggregate.md
+              - "Subquery": en/sql-101/06-subquery.md
+              - "Window Function": en/sql-101/07-window-function.md
+              - "INSERT, UPDATE, DELETE": en/sql-101/08-insert-update-delete.md
+              - "Index and Query Plan": en/sql-101/09-index-and-query-plan.md
+              - "Practical Analysis SQL": en/sql-101/10-practical-analysis-sql.md
+          - Pandas 101:
+              - "What Is Pandas?": en/pandas-101/01-what-is-pandas.md
+              - "Series and DataFrame": en/pandas-101/02-series-and-dataframe.md
+              - "Reading CSV and Excel": en/pandas-101/03-read-csv-and-excel.md
+              - "Filtering and Selection": en/pandas-101/04-filtering-and-selection.md
+              - "Handling Missing Values": en/pandas-101/05-missing-values.md
+              - "groupby": en/pandas-101/06-groupby.md
+              - "Merge and Join": en/pandas-101/07-merge-and-join.md
+              - "Time Series": en/pandas-101/08-time-series.md
+              - "apply and Vectorization": en/pandas-101/09-apply-and-vectorization.md
+              - "Real-world Data Analysis": en/pandas-101/10-real-world-data-analysis.md
+          - Machine Learning 101:
+              - "What Is Machine Learning?": en/machine-learning-101/01-what-is-machine-learning.md
+              - "Supervised and Unsupervised Learning": en/machine-learning-101/02-supervised-and-unsupervised.md
+              - "Train/Test Split": en/machine-learning-101/03-train-test-split.md
+              - "Linear Regression": en/machine-learning-101/04-linear-regression.md
+              - "Logistic Regression": en/machine-learning-101/05-logistic-regression.md
+              - "Decision Tree and Random Forest": en/machine-learning-101/06-decision-tree-and-random-forest.md
+              - "Clustering": en/machine-learning-101/07-clustering.md
+              - "Overfitting and Regularization": en/machine-learning-101/08-overfitting-and-regularization.md
+              - "Model Evaluation": en/machine-learning-101/09-model-evaluation.md
+              - "The ML Project Workflow": en/machine-learning-101/10-ml-project-workflow.md
+          - Model Evaluation 101:
+              - "Why Model Evaluation Is Hard": en/model-evaluation-101/01-why-evaluation-is-hard.md
+              - "Train, Validation, and Test": en/model-evaluation-101/02-train-val-test.md
+              - "The Limits of Accuracy": en/model-evaluation-101/03-limits-of-accuracy.md
+              - "Precision and Recall": en/model-evaluation-101/04-precision-and-recall.md
+              - "F1 Score": en/model-evaluation-101/05-f1-score.md
+              - "ROC and AUC": en/model-evaluation-101/06-roc-and-auc.md
+              - "Calibration": en/model-evaluation-101/07-calibration.md
+              - "Cross Validation": en/model-evaluation-101/08-cross-validation.md
+              - "Error Analysis": en/model-evaluation-101/09-error-analysis.md
+              - "Building an Evaluation Report": en/model-evaluation-101/10-evaluation-report.md
+          - MLOps 101:
+              - "What Is MLOps?": en/mlops-101/01-what-is-mlops.md
+              - "Experiment Tracking": en/mlops-101/02-experiment-tracking.md
+              - "Data Versioning": en/mlops-101/03-data-versioning.md
+              - "Model Training Pipeline": en/mlops-101/04-training-pipeline.md
+              - "Model Deployment": en/mlops-101/05-model-deployment.md
+              - "Model Monitoring": en/mlops-101/06-model-monitoring.md
+              - "Data Drift and Model Drift": en/mlops-101/07-data-and-model-drift.md
+              - "Retraining": en/mlops-101/08-retraining.md
+              - "Feature Store": en/mlops-101/09-feature-store.md
+              - "Building a Production ML System": en/mlops-101/10-production-ml-system.md
+          - Data Warehouse 101:
+              - "What Is a Data Warehouse?": en/data-warehouse-101/01-what-is-data-warehouse.md
+              - "OLTP and OLAP": en/data-warehouse-101/02-oltp-and-olap.md
+              - "Fact and Dimension": en/data-warehouse-101/03-fact-and-dimension.md
+              - "Star Schema": en/data-warehouse-101/04-star-schema.md
+              - "Partition and Clustering": en/data-warehouse-101/05-partition-and-clustering.md
+              - "ETL and ELT": en/data-warehouse-101/06-etl-and-elt.md
+              - "BI and Dashboard": en/data-warehouse-101/07-bi-and-dashboard.md
+              - "Data Mart": en/data-warehouse-101/08-data-mart.md
+              - "Performance Optimization": en/data-warehouse-101/09-performance-optimization.md
+              - "Warehouse Design Example": en/data-warehouse-101/10-warehouse-design-example.md
           - Python DB-API 101:
               - "Why DB-API 2.0 - The Problem PEP 249 Solved": en/python-dbapi-101/01-why-db-api-pep-249.md
               - "Connection and Cursor Lifecycle": en/python-dbapi-101/02-connection-cursor-lifecycle.md

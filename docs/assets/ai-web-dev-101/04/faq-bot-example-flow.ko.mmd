@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant 사용자
+    participant 앱 as FAQ 챗봇
+    participant DB as 벡터 DB
+    participant AI as GPT
+
+    사용자->>앱: "환불 어떻게 하나요?"
+    앱->>DB: 질문 임베딩으로 검색
+    DB-->>앱: "환불은 7일 이내..." (유사 문서)
+    앱->>AI: 질문 + 근거 문서 전달
+    AI-->>앱: 친절한 답변 생성
+    앱-->>사용자: "구매 후 7일 이내에..."

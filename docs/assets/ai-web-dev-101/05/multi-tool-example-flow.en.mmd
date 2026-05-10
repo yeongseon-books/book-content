@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant App as My App
+    participant AI as GPT
+    participant FX as Exchange Rate
+    participant Calc as Calculator
+
+    App->>AI: "Convert $100 to KRW, minus 10% fee"
+    AI-->>App: Request get_exchange_rate(USD, KRW)
+    App->>FX: Execute
+    FX-->>App: 1 USD = 1,350 KRW
+    App->>AI: Send rate result
+    AI-->>App: Request calculate(100*1350*0.9)
+    App->>Calc: Execute
+    Calc-->>App: 121,500
+    App->>AI: Send calc result
+    AI-->>App: "Final amount is 121,500 KRW"

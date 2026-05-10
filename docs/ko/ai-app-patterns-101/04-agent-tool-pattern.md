@@ -1,0 +1,319 @@
+---
+title: Agent + Tool 패턴 — 자율 도구 선택
+series: ai-app-patterns-101
+episode: 4
+language: ko
+status: publish-ready
+targets:
+  tistory: true
+  medium: true
+  mkdocs: true
+  ebook: true
+tags:
+- LLM
+- RAG
+- Agent
+- Python
+last_reviewed: '2026-05-01'
+seo_description: 에이전트는 단계를 직접 하드코딩하는 대신, 모델이 도구 호출 경로를 런타임에 고르게 만드는 제어기입니다.
+---
+
+# Agent + Tool 패턴 — 자율 도구 선택
+
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+LLM이 외부 도구를 안전하게 선택·호출하도록 설계하려면 어떤 루프와 인터페이스가 필요할까요?
+
+이 글은 에이전트 패턴의 도구 설계와 실행 루프, 권한 고려사항을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 답할 질문
+
+- 고정 체인 대신 AgentExecutor를 써야 하는 순간은 언제일까요?
+- LLM이 계산기와 검색 도구 중 무엇을 고를지 결정하게 하려면 도구 설명을 어떻게 써야 할까요?
+- 도구 선택형 에이전트를 디버깅할 때 어떤 실행 흔적을 확인해야 할까요?
+
+> 에이전트는 단계를 직접 하드코딩하는 대신, 모델이 도구 호출 경로를 런타임에 고르게 만드는 제어기입니다.
+
+![이 글에서 답할 질문](../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
+> AI 앱 패턴 101 시리즈 (4/6)
+
+예제 코드: [github.com/yeongseon-books/ai-app-patterns-101](https://github.com/yeongseon-books/ai-app-patterns-101/tree/main/ko/04-agent-tool-pattern)
+
+지금까지는 LLM이 고정된 체인 안에서만 동작했습니다. 입력이 들어오면 정해진 순서로 처리하고 결과를 반환했습니다. Agent 패턴은 다릅니다. LLM이 스스로 판단해서 어떤 도구를 쓸지, 도구 결과를 보고 다음에 무엇을 할지 결정합니다.
+
+이번 글에서는 Agent 패턴의 핵심 개념과 완전한 구현을 다룹니다.
+
+- Agent와 Chain의 차이
+- 도구(Tool) 정의와 등록
+- ReAct 방식 Agent 구현
+- 다중 도구 조합
+
+---
+
+## Agent vs Chain
+
+### 고정 체인과 동적 에이전트 비교 구조
+
+![고정 체인과 동적 에이전트 비교 구조](../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.ko.png)
+
+*고정 체인과 동적 에이전트 비교 구조*
+**Chain**: 입력 → 단계 A → 단계 B → 출력. 실행 경로가 고정됩니다.
+
+**Agent**: 입력 → LLM이 판단 → 도구 선택 → 도구 실행 → 결과 확인 → 필요하면 반복 → 최종 답변. 실행 경로가 동적입니다.
+
+Agent는 "생각(Thought) → 행동(Action) → 관찰(Observation)"을 반복하는 ReAct(Reason + Act) 루프로 동작합니다. LLM이 현재 상황을 추론하고, 도구를 선택해 실행하고, 그 결과를 보고 다음 행동을 결정합니다.
+
+---
+
+## 도구 정의
+
+### 도구 레지스트리와 선택 기준 구조
+
+![도구 레지스트리와 선택 기준 구조](../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.ko.png)
+
+*도구 레지스트리와 선택 기준 구조*
+LangChain에서 도구는 `@tool` 데코레이터로 만듭니다. 함수의 독스트링이 LLM이 도구를 선택할 때 참고하는 설명이 되므로, 정확하게 써야 합니다.
+
+```python
+import math
+import os
+from datetime import datetime
+
+from langchain_core.tools import tool
+
+@tool
+def calculate(expression: str) -> str:
+    """
+    수학 식을 계산합니다.
+    예: '2 + 3 * 4', 'sqrt(16)', 'pow(2, 10)'
+    파이썬 수식 문법을 사용합니다.
+    """
+    try:
+        # 안전한 수학 함수만 허용
+        allowed = {
+            "sqrt": math.sqrt,
+            "pow": math.pow,
+            "abs": abs,
+            "round": round,
+            "pi": math.pi,
+            "e": math.e,
+        }
+        result = eval(expression, {"__builtins__": {}}, allowed)
+        return str(result)
+    except Exception as exc:
+        return f"계산 오류: {exc}"
+
+@tool
+def get_current_time(timezone: str = "Asia/Seoul") -> str:
+    """
+    현재 날짜와 시간을 반환합니다.
+    timezone 파라미터로 시간대를 지정할 수 있습니다 (기본값: Asia/Seoul).
+    """
+    now = datetime.now()
+    return f"현재 시각: {now.strftime('%Y년 %m월 %d일 %H시 %M분')} ({timezone})"
+
+@tool
+def word_count(text: str) -> str:
+    """
+    텍스트의 단어 수와 글자 수를 반환합니다.
+    """
+    words = len(text.split())
+    chars = len(text)
+    chars_no_space = len(text.replace(" ", ""))
+    return f"단어 수: {words}, 글자 수: {chars} (공백 제외: {chars_no_space})"
+
+@tool
+def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
+    """
+    단위를 변환합니다.
+    지원 변환: km↔mile, kg↔lb, celsius↔fahrenheit, m↔ft
+    예: value=100, from_unit='km', to_unit='mile'
+    """
+    conversions = {
+        ("km", "mile"): lambda x: x * 0.621371,
+        ("mile", "km"): lambda x: x * 1.60934,
+        ("kg", "lb"): lambda x: x * 2.20462,
+        ("lb", "kg"): lambda x: x * 0.453592,
+        ("celsius", "fahrenheit"): lambda x: x * 9 / 5 + 32,
+        ("fahrenheit", "celsius"): lambda x: (x - 32) * 5 / 9,
+        ("m", "ft"): lambda x: x * 3.28084,
+        ("ft", "m"): lambda x: x * 0.3048,
+    }
+    key = (from_unit.lower(), to_unit.lower())
+    if key not in conversions:
+        return f"지원하지 않는 변환: {from_unit} → {to_unit}"
+    result = conversions[key](value)
+    return f"{value} {from_unit} = {result:.4f} {to_unit}"
+```
+
+---
+
+## ReAct Agent 구현
+
+### Thought Action Observation 반복 흐름
+
+![Thought Action Observation 반복 흐름](../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.ko.png)
+
+*Thought Action Observation 반복 흐름*
+```python
+import os
+
+from langchain_groq import ChatGroq
+from langchain.agents import create_react_agent, AgentExecutor
+from langchain_core.prompts import PromptTemplate
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
+tools = [calculate, get_current_time, word_count, unit_convert]
+
+# ReAct 프롬프트 — Thought/Action/Observation 루프 유도
+react_prompt = PromptTemplate.from_template("""
+당신은 주어진 도구를 사용해 질문에 답하는 AI 어시스턴트입니다.
+
+사용 가능한 도구:
+{tools}
+
+도구 이름 목록: {tool_names}
+
+다음 형식을 반드시 따르세요:
+
+Question: 답해야 할 질문
+Thought: 어떻게 접근할지 생각
+Action: 사용할 도구 이름 (도구 이름 목록 중 하나)
+Action Input: 도구에 전달할 입력
+Observation: 도구 실행 결과
+... (Thought/Action/Action Input/Observation 반복)
+Thought: 이제 최종 답변을 알고 있습니다
+Final Answer: 최종 답변
+
+시작!
+
+Question: {input}
+Thought: {agent_scratchpad}
+""")
+
+agent = create_react_agent(llm=llm, tools=tools, prompt=react_prompt)
+agent_executor = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+    max_iterations=5,
+    handle_parsing_errors=True,
+)
+
+# 테스트
+questions = [
+    "2의 10승은 얼마인가요?",
+    "지금 몇 시인가요?",
+    "100킬로미터는 몇 마일인가요?",
+    "다음 텍스트의 단어 수를 세고 2를 곱하세요: 'The quick brown fox jumps over the lazy dog'",
+]
+
+for question in questions:
+    print(f"\n{'='*60}")
+    print(f"질문: {question}")
+    result = agent_executor.invoke({"input": question})
+    print(f"최종 답변: {result['output']}")
+```
+
+---
+
+## 도구 사용 결과 관찰
+
+### 실행 흔적과 중단 조건 구조
+
+![실행 흔적과 중단 조건 구조](../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.ko.png)
+
+*실행 흔적과 중단 조건 구조*
+`verbose=True`로 실행하면 Agent의 사고 과정이 출력됩니다. Thought → Action → Observation → Thought 순서로 반복되는 것을 볼 수 있습니다. 복잡한 질문일수록 반복 횟수가 늘어납니다.
+
+`max_iterations`는 무한 루프 방지를 위해 항상 설정합니다. 일반적인 작업에는 5~10이 적당합니다.
+
+---
+
+## 도구 오류 처리
+
+### 도구 오류를 observation으로 되돌리는 경로
+
+![도구 오류를 observation으로 되돌리는 경로](../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.ko.png)
+
+*도구 오류를 observation으로 되돌리는 경로*
+도구가 예외를 던지면 Agent가 멈춥니다. 도구 함수 내부에서 예외를 잡아 문자열로 반환하면 Agent가 오류 메시지를 Observation으로 받아 다음 행동을 결정할 수 있습니다.
+
+```python
+@tool
+def safe_divide(a: float, b: float) -> str:
+    """두 수를 나눕니다. 0으로 나누기 오류를 안전하게 처리합니다."""
+    if b == 0:
+        return "오류: 0으로 나눌 수 없습니다."
+    return str(a / b)
+```
+
+---
+
+## 이 코드에서 봐야 할 것
+
+- `main.py`는 `AgentExecutor`를 계산용 실행기와 검색용 실행기로 나눠 가장 단순한 도구 선택 패턴을 보여 줍니다.
+- 각 도구는 `@tool(return_direct=True)`를 사용해 선택 결과를 바로 반환합니다.
+- 질문과 도구 설명을 짧게 유지해야 함수 호출 실패를 줄일 수 있습니다.
+
+---
+
+## 실무에서 헷갈리는 지점
+
+- 에이전트를 쓰면 무조건 더 똑똑해지는 것이 아닙니다. 경로 자유도가 늘어나는 대신 예측 가능성은 줄어듭니다.
+- 도구 품질이 낮으면 에이전트 품질도 같이 낮아집니다. LLM이 아니라 도구 인터페이스가 병목일 수 있습니다.
+- 검색 도구와 RAG는 비슷해 보여도 다릅니다. 전자는 도구 호출, 후자는 프롬프트 컨텍스트 주입이 중심입니다.
+
+---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **도구는 계약이다** — 이름·설명·입력 스키마·부작용이 명확해야 LLM이 올바른 도구를 선택합니다.
+- **실행 권한은 최소화한다** — 읽기·쓰기·외부 호출을 분리해 권한을 주고, 쓰기·결제·삭제는 승인 단계를 거칩니다.
+- **루프에 상한을 둔다** — 도구 호출 횟수·시간·비용을 제한해 무한 루프와 비용 폭주를 막습니다.
+- **관측 가능성을 먼저 심는다** — 어떤 도구가 언제 왜 호출되었는지 추적할 수 있어야 디버깅이 가능합니다.
+- **실패는 LLM에게 다시 알려준다** — 도구 에러를 그대로 종료하지 말고 모델이 재시도·우회를 결정하도록 컨텍스트로 돌려줍니다.
+
+## 체크리스트
+
+- [ ] 도구마다 명확한 설명과 입력 형태가 있다
+- [ ] AgentExecutor가 계산 도구를 한 번 호출한다
+- [ ] AgentExecutor가 검색 도구를 한 번 호출한다
+- [ ] 도구 결과가 최종 출력으로 바로 전달된다
+
+---
+
+## 마무리
+
+Agent 패턴은 LLM이 단순 체인을 넘어 동적으로 문제를 해결하도록 합니다. 도구의 독스트링이 LLM이 도구를 선택하는 유일한 단서이므로, 구체적이고 명확하게 작성해야 합니다. 모호한 독스트링은 잘못된 도구 선택으로 이어집니다.
+
+다음 글에서는 워크플로 자동화 패턴을 다룹니다. 여러 단계를 체계적으로 연결하는 다단계 체인 설계입니다.
+
+<!-- toc:begin -->
+## 시리즈 목차
+
+- [챗봇 패턴 — 대화 이력 관리와 상태](./01-chatbot-pattern.md)
+- [RAG Q&A 패턴 — 문서 기반 질의응답](./02-rag-qa-pattern.md)
+- [문서 어시스턴트 — 요약, 추출, 분류](./03-document-assistant.md)
+- **Agent + Tool 패턴 — 자율 도구 선택 (현재 글)**
+- 워크플로 자동화 — 다단계 체인 설계 (예정)
+- Human-in-the-loop — 사람 개입 설계 패턴 (예정)
+
+<!-- toc:end -->
+
+---
+
+## 참고 자료
+
+- [LangChain Agents 개요](https://python.langchain.com/docs/modules/agents/)
+- [ReAct 논문 (Yao et al., 2022)](https://arxiv.org/abs/2210.03629)
+- [LangChain Tool 정의](https://python.langchain.com/docs/modules/tools/)

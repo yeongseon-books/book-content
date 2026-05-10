@@ -1,0 +1,9 @@
+flowchart TD
+    훅["useChat()"] --> messages["messages\n대화 내역 배열"]
+    훅 --> input["input\n입력창 상태"]
+    훅 --> loading["isLoading\n로딩 상태"]
+    훅 --> submit["handleSubmit\n전송 함수"]
+    submit -->|자동으로| api["/api/chat 호출"]
+
+    style 훅 fill:#fff3e0,stroke:#f57c00
+    style api fill:#e8f5e9,stroke:#388e3c

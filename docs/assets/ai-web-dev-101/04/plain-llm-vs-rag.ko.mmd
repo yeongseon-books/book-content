@@ -1,0 +1,15 @@
+flowchart TD
+    subgraph 일반 LLM
+        질문1["사용자 질문"] --> LLM1["GPT 모델\n(학습 데이터만 활용)"]
+        LLM1 --> 답변1["일반적인 답변\n(최신 정보 부족)"]
+    end
+    subgraph RAG 방식
+        질문2["사용자 질문"] --> 검색["관련 문서 검색"]
+        검색 --> 결합["질문 + 문서 결합"]
+        결합 --> LLM2["GPT 모델\n(문서를 참고하며 답변)"]
+        LLM2 --> 답변2["근거 있는 정확한 답변"]
+    end
+
+    style 답변1 fill:#ffcdd2,stroke:#c62828
+    style 답변2 fill:#e8f5e9,stroke:#388e3c
+    style 검색 fill:#e3f2fd,stroke:#1976d2

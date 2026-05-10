@@ -1,0 +1,10 @@
+flowchart LR
+    Local["My Computer\n(localhost)"] -->|git push| GitHub["GitHub\nCode Repository"]
+    GitHub -->|Auto build| Server["Cloud Server\n(Vercel/Azure)"]
+    Server -->|URL issued| Domain["my-app.vercel.app"]
+    Domain -->|Global access| Users["Users"]
+
+    style Local fill:#e3f2fd,stroke:#1976d2
+    style GitHub fill:#fff3e0,stroke:#f57c00
+    style Server fill:#e8f5e9,stroke:#388e3c
+    style Users fill:#f3e5f5,stroke:#7b1fa2

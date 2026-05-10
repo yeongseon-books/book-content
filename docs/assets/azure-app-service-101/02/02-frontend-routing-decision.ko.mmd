@@ -1,0 +1,10 @@
+flowchart TD
+    A[수신 HTTPS 요청] --> B[TLS 종료]
+    B --> C{SNI/호스트 유효?}
+    C -- No --> X[요청 거부<br/>잘못된 호스트 또는 인증서 경로]
+    C -- Yes --> D{접근 제한 통과?}
+    D -- No --> E[403 반환]
+    D -- Yes --> F{정상 Worker 사용 가능?}
+    F -- No --> G[502 또는 503 반환]
+    F -- Yes --> H[Worker 인스턴스 선택]
+    H --> I[Worker로 요청 전달]

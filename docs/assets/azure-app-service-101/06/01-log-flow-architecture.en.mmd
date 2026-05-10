@@ -1,0 +1,10 @@
+flowchart LR
+    A[Application log output] --> B[stdout or stderr]
+    B --> C[App Service container runtime]
+    C --> D[Docker log files<br/>home LogFiles docker]
+    C --> E[Application filesystem logs<br/>home LogFiles Application]
+    C --> F[Application Insights or Azure Monitor Logs]
+
+    D -. Rolling .-> G[Quick incident investigation]
+    E -. "7 days / 100MB retention" .-> H[Short-term archive]
+    F -. "90+ days configurable" .-> I[Long-term storage trend analysis alerts]

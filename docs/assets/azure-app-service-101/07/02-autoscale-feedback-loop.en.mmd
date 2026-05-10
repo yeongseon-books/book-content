@@ -1,0 +1,21 @@
+flowchart LR
+    A[Collect metrics<br/>CPU / Queue / Response Time] --> B[Evaluate rules]
+    B --> C{Condition met?}
+    C -->|Yes| D[Scale action<br/>Scale Out or In]
+    C -->|No| A
+    D --> E[Instance change and warm-up]
+    E --> F[Cooldown<br/>Wait for changes to take effect]
+    F --> G[Measure again]
+    G --> A
+
+    H[Caution]
+    H --> H1[Oscillation if thresholds too close]
+    H --> H2[Scaling ineffective if dependency is bottleneck]
+
+    style A fill:#e0f2fe,stroke:#0284c7,color:#111
+    style B fill:#e0e7ff,stroke:#4f46e5,color:#111
+    style C fill:#fef3c7,stroke:#d97706,color:#111
+    style D fill:#dcfce7,stroke:#16a34a,color:#111
+    style E fill:#dcfce7,stroke:#16a34a,color:#111
+    style F fill:#fee2e2,stroke:#dc2626,color:#111
+    style G fill:#e0f2fe,stroke:#0284c7,color:#111

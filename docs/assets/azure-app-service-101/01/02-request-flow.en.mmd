@@ -1,0 +1,13 @@
+flowchart LR
+    Client[Client / Browser]
+    FE[App Service Frontend]
+    Worker[Healthy Worker Instance]
+    App[Application Process]
+    Resp[HTTP Response]
+
+    Client -->|HTTPS request| FE
+    FE -->|TLS termination\nhost validation\nrouting| Worker
+    Worker -->|forward request| App
+    App -->|business logic| Worker
+    Worker --> FE
+    FE --> Resp

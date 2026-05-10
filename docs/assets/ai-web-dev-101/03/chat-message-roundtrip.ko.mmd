@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant 사용자
+    participant UI as Next.js UI
+    participant 서버 as API Route
+    participant AI as OpenAI
+
+    사용자->>UI: 메시지 입력 + 전송
+    UI->>서버: POST /api/chat
+    서버->>AI: streamText 요청
+    AI-->>서버: 스트리밍 응답
+    서버-->>UI: 실시간 데이터 전달
+    UI-->>사용자: 화면에 표시

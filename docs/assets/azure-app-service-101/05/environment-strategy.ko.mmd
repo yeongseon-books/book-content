@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph L[로컬 개발]
+        L1[.env 파일]
+        L2[빠른 실행과 개발 편의]
+        L3[반드시 .gitignore]
+    end
+
+    subgraph S[스테이징]
+        S1[App Settings]
+        S2[운영과 유사한 런타임 검증]
+        S3[기능 플래그와 비민감 설정]
+    end
+
+    subgraph P[운영]
+        P1[Key Vault + App Settings]
+        P2[비밀 값 중앙 관리]
+        P3[Managed Identity와 RBAC]
+    end
+
+    L --> S --> P

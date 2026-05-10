@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant 앱 as 내 앱
+    participant AI as GPT
+    participant 환율 as 환율 조회
+    participant 계산기
+
+    앱->>AI: "100달러를 원화로, 수수료 10% 제외"
+    AI-->>앱: get_exchange_rate(USD, KRW) 요청
+    앱->>환율: 실행
+    환율-->>앱: 1달러 = 1,350원
+    앱->>AI: 환율 결과 전달
+    AI-->>앱: calculate(100*1350*0.9) 요청
+    앱->>계산기: 실행
+    계산기-->>앱: 121,500
+    앱->>AI: 계산 결과 전달
+    AI-->>앱: "최종 금액은 121,500원입니다"

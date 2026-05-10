@@ -1,0 +1,246 @@
+---
+series: programming-languages-101
+episode: 4
+title: Scope and Binding
+status: content-ready
+targets:
+  tistory: true
+  medium: true
+  hashnode: true
+  mkdocs: true
+  ebook: true
+language: en
+tags:
+  - Computer Science
+  - Programming Languages
+  - Scope
+  - Binding
+  - Lexical
+  - Dynamic
+seo_description: Where a name resolves to which value is one of the most foundational language design decisions. Compare lexical and dynamic scope.
+last_reviewed: '2026-05-04'
+---
+
+# Scope and Binding
+
+> Programming Languages 101 series (4/10)
+
+<!-- a-grade-intro:begin -->
+
+**Core question**: How does the same variable name end up referring to different values inside and outside a function, in a way that is consistent and predictable?
+
+> Every language has to decide, at every position in the source, **which value a name refers to**. The rule for that decision is called **scope**, and the act of attaching a value to a name is called **binding**. Almost every modern language picks lexical scope, but what that choice means and what it costs is easy to forget.
+
+<!-- a-grade-intro:end -->
+
+## What You Will Learn
+
+- Precise definitions of scope and binding
+- Lexical vs dynamic scope
+- The intent and danger of variable shadowing
+- Python's LEGB rule
+- The foundation needed for closures (next episode)
+
+## Why It Matters
+
+Without a grasp of scope, "why isn't this variable updating?" or "why am I suddenly getting NameError?" become mysteries. With it, you see that functions, modules, and closures are all variations of the same rule.
+
+> Binding ties a name to a value; scope is the region where that tie is visible.
+
+## Concept at a Glance
+
+```mermaid
+flowchart TB
+    A["Built-in (print, len)"] --> B["Global (module)"]
+    B --> C["Enclosing (outer function)"]
+    C --> D["Local (inner function)"]
+```
+
+Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.
+
+## Key Terms
+
+- **Binding**: Attaching a value to a name.
+- **Scope**: The region of code in which a binding is visible.
+- **Lexical scope**: Scope determined by where the code is written.
+- **Dynamic scope**: Scope determined by the call chain at runtime (rare in modern languages).
+- **Shadowing**: An inner scope hides an outer binding of the same name.
+
+## Before/After
+
+**Before — relying on a global**
+
+```python
+LIMIT = 10
+
+def is_ok(x):
+    return x < LIMIT
+
+def main():
+    LIMIT = 5      # a new local — has no effect on is_ok
+    print(is_ok(7))  # True
+```
+
+`main`'s `LIMIT` is not visible inside `is_ok`. That is lexical scope.
+
+**After — make the dependency explicit**
+
+```python
+def is_ok(x, limit=10):
+    return x < limit
+
+print(is_ok(7, limit=5))  # False
+```
+
+Pulling the hidden dependency into the parameter list makes the intent obvious.
+
+## Hands-on: Four Examples That Matter Most
+
+### Step 1 — Watch LEGB
+
+```python
+# 1_legb.py
+x = "global"
+def outer():
+    x = "enclosing"
+    def inner():
+        x = "local"
+        print(x)
+    inner()
+    print(x)
+
+outer()
+print(x)
+# local / enclosing / global
+```
+
+The same name resolves to the innermost binding first.
+
+### Step 2 — The real cause of UnboundLocalError
+
+```python
+# 2_unbound.py
+x = 1
+def f():
+    print(x)   # UnboundLocalError
+    x = 2
+
+f()
+```
+
+The moment Python sees `x = 2` inside the function, it treats `x` as local for the entire function. So `print(x)` references a local that has not yet been bound.
+
+### Step 3 — `nonlocal` to update the enclosing scope
+
+```python
+# 3_nonlocal.py
+def make_counter():
+    n = 0
+    def step():
+        nonlocal n
+        n += 1
+        return n
+    return step
+
+c = make_counter()
+print(c(), c(), c())  # 1 2 3
+```
+
+Without `nonlocal`, `n += 1` would try to create a new local and trigger the same error as above.
+
+### Step 4 — A lexical vs dynamic thought experiment
+
+```python
+# 4_lexical.py
+y = "outer"
+def show():
+    print(y)
+
+def caller():
+    y = "inner"
+    show()   # lexical scope → prints 'outer'
+
+caller()
+```
+
+Under dynamic scope, `show()` would see the caller's `y` and print `'inner'`. Modern languages chose lexical because **just reading the source tells you where a value comes from**.
+
+### Step 5 — The trap of shadowing
+
+```python
+# 5_shadow.py
+def total(items):
+    sum = 0   # shadowed the built-in sum
+    for x in items:
+        sum += x
+    return sum  # works, but you cannot call sum(...) in this function anymore
+```
+
+The shadow only causes pain when you suddenly need the original name back. Avoid unintentional shadowing even in short functions.
+
+## What to Notice in This Code
+
+- The same name does not always refer to the same value — scope decides.
+- A single assignment inside a function changes how that function treats the name everywhere.
+- `nonlocal`/`global` are not common needs; they mark intentional updates.
+- Lexical scope gives you "I can tell by reading" — dynamic does not.
+
+## Five Common Mistakes
+
+1. **Using globals to share state between functions.** The source of changes blurs and debugging gets harder.
+2. **Shadowing built-ins.** Naming a variable `list`, `dict`, `id`, or `sum` bites you much later.
+3. **Sprinkling `global` everywhere.** Cleaning up the module interface with explicit parameters and return values is almost always better.
+4. **Causing UnboundLocalError by reassigning a name partway through a function.** Step 2 above is the canonical case.
+5. **Assuming dynamic-scope behavior.** Almost always wrong in modern languages.
+
+## How This Shows Up in Production
+
+Scope is a frequent topic in code review. Code where "where does this name come from?" is obvious at a glance is good code. Splitting big functions, lifting dependencies into parameters, and concentrating mutation of module variables in one place all amplify the benefits of lexical scope.
+
+Testing follows the same pattern. A function that depends on global state is hard to unit test; the same function with dependencies as parameters is trivially testable.
+
+## How a Senior Engineer Thinks
+
+- Believes good code lets you answer "where was this name bound?" instantly.
+- Routinely refactors hidden dependencies into parameters.
+- Leaves a short comment when `nonlocal`/`global` is unavoidable.
+- Configures linters to catch built-in shadowing.
+- When meeting a new language, looks at scope rules first — function and closure behavior follows from them.
+
+## Checklist
+
+- [ ] Can you list the four levels of LEGB?
+- [ ] Can you explain UnboundLocalError in one line?
+- [ ] Do you know when to reach for `nonlocal` vs `global`?
+- [ ] Have you ever lifted a hidden dependency into an explicit parameter?
+- [ ] Can you state the readability advantage of lexical scope in one sentence?
+
+## Practice Problems
+
+1. Fix the shadowing of `sum` in step 5's `total` so that the function can still call the built-in `sum(...)` inside.
+2. Pick a function that depends on one module-level variable and rewrite it to take that variable as a parameter. Which version is easier to unit test?
+3. Write a small piece of imaginary code where the difference between lexical and dynamic scope changes the result.
+
+## Wrap-up and Next Steps
+
+Scope is the region a name is visible in; binding is the act of attaching a value to a name. Once you understand lexical scope deeply, the next episode — closures — falls out of it naturally, because closures are what lexical scope plus first-class functions allow.
+
+<!-- toc:begin -->
+- [What Is a Programming Language?](./01-what-is-a-programming-language.md)
+- [Syntax and Semantics](./02-syntax-and-semantics.md)
+- [Type Systems](./03-type-system.md)
+- **Scope and Binding (current)**
+- Functions and Closures (upcoming)
+- Objects and Prototypes (upcoming)
+- Memory Management (upcoming)
+- Interpreters and Compilers (upcoming)
+- Static vs Dynamic Languages (upcoming)
+- What Makes a Good Language Design? (upcoming)
+<!-- toc:end -->
+
+## References
+
+- [Python Language Reference — Naming and binding](https://docs.python.org/3/reference/executionmodel.html#naming-and-binding)
+- [Structure and Interpretation of Computer Programs — Chapter 3](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-21.html)
+- [Programming Language Pragmatics (Scott) — Chapter 3 Names, Scopes, and Bindings](https://www.elsevier.com/books/programming-language-pragmatics/scott/978-0-12-410409-9)
+- [MDN — Scope](https://developer.mozilla.org/en-US/docs/Glossary/Scope)

@@ -1,0 +1,14 @@
+flowchart TD
+    subgraph Regular Chatbot
+        Q1["User Question"] --> A1["Generate text answer\nfrom training data"]
+    end
+    subgraph AI Agent
+        Q2["User Question"] --> Decide["Decide\nWhich tool is needed?"]
+        Decide --> Tool["Execute Tool\nAPI, DB, Calculator"]
+        Tool --> Result["Check Result"]
+        Result --> Final["Grounded Final Answer"]
+    end
+
+    style A1 fill:#ffcdd2,stroke:#c62828
+    style Final fill:#e8f5e9,stroke:#388e3c
+    style Decide fill:#fff3e0,stroke:#f57c00
