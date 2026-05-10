@@ -12,7 +12,7 @@ Exit code: 0 on success, 1 on any validation error.
 
 status enum: `planned` is a series-level state (in series.yaml) only.
 Article-level front matter must be one of:
-  draft, content-ready, code-checked, publish-ready, ready, published, needs-update.
+  draft, content-ready, publish-ready, ready, published, needs-update.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ SERIES_YAML = REPO_ROOT / "series.yaml"
 
 REQUIRED_FIELDS = {"title", "series", "episode", "language", "status", "targets", "tags", "last_reviewed"}
 OPTIONAL_FIELDS = {"seo_title", "seo_description", "hashnode_title", "medium_title", "ebook_title", "published", "published_to", "code_required"}
-VALID_STATUS = {"draft", "content-ready", "code-checked", "publish-ready", "ready", "published", "needs-update"}
+VALID_STATUS = {"draft", "content-ready", "publish-ready", "ready", "published", "needs-update"}
 VALID_LANGUAGE = {"ko", "en"}
 TARGET_KEYS = {"tistory", "medium", "mkdocs", "ebook"}
 OPTIONAL_TARGET_KEYS = {"hashnode"}

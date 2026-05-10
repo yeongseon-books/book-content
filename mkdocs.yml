@@ -39,6 +39,41 @@ nav:
   - Korean:
       - ko/index.md
       - AI:
+          - LLM 앱 기초:
+              - "LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기": ko/llm-app-foundations-101/01-llm-api-first-call.md
+              - "토큰 이해하기 — 비용, 한계, 컨텍스트 창": ko/llm-app-foundations-101/02-understanding-tokens.md
+              - "프롬프트 엔지니어링 기초 — System·User·Assistant 역할": ko/llm-app-foundations-101/03-prompt-engineering-basics.md
+              - "Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기": ko/llm-app-foundations-101/04-few-shot-and-cot.md
+              - "대화 상태 관리 — 멀티턴 챗봇 만들기": ko/llm-app-foundations-101/05-conversation-state.md
+              - "스트리밍 응답 처리 — 실시간으로 출력 받기": ko/llm-app-foundations-101/06-streaming-responses.md
+          - LLM API 프로덕션 101:
+              - "구조화 출력 — JSON 모드와 응답 스키마": ko/llm-api-production-101/01-structured-output.md
+              - "툴 호출 — 함수를 모델에 연결하기": ko/llm-api-production-101/02-tool-calling.md
+              - "스트리밍 심화 — 청크 처리와 오류 복구": ko/llm-api-production-101/03-streaming-in-depth.md
+              - "캐싱 전략 — 비용과 지연 시간 줄이기": ko/llm-api-production-101/04-caching-strategies.md
+              - "재시도와 오류 처리 — 안정적인 API 호출 만들기": ko/llm-api-production-101/05-retry-and-error-handling.md
+              - "속도 제한 관리 — Rate Limit 대응 패턴": ko/llm-api-production-101/06-rate-limit-management.md
+          - 벡터 검색 101:
+              - "임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기": ko/vector-search-101/01-what-is-embedding.md
+              - "HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기": ko/vector-search-101/02-huggingface-embeddings.md
+              - "코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기": ko/vector-search-101/03-cosine-similarity.md
+              - "FAISS 입문 — 고속 근사 최근접 이웃 검색": ko/vector-search-101/04-faiss-fundamentals.md
+              - "청크 전략 — 긴 문서를 어떻게 나눌 것인가": ko/vector-search-101/05-chunking-strategies.md
+              - "벡터 검색 파이프라인 — 문서 수집부터 쿼리까지": ko/vector-search-101/06-vector-search-pipeline.md
+          - LangChain 101:
+              - "LangChain 소개 — LCEL과 Runnable 기본": ko/langchain-101/01-lcel-runnable-basics.md
+              - "Prompt와 LLM Chain — 체인 첫 번째 구성": ko/langchain-101/02-prompt-llm-chain.md
+              - "Retriever — 문서 검색과 컨텍스트 주입": ko/langchain-101/03-retriever.md
+              - "Tool Calling — 외부 도구 연결하기": ko/langchain-101/04-tool-calling.md
+              - "Streaming — 실시간 출력 처리": ko/langchain-101/05-streaming.md
+              - "실전 체인 조립 — 컴포넌트를 하나로 연결하기": ko/langchain-101/06-putting-it-together.md
+          - AI 앱 패턴 101:
+              - "챗봇 패턴 — 대화 이력 관리와 상태": ko/ai-app-patterns-101/01-chatbot-pattern.md
+              - "RAG Q&A 패턴 — 문서 기반 질의응답": ko/ai-app-patterns-101/02-rag-qa-pattern.md
+              - "문서 어시스턴트 — 요약, 추출, 분류": ko/ai-app-patterns-101/03-document-assistant.md
+              - "Agent + Tool 패턴 — 자율 도구 선택": ko/ai-app-patterns-101/04-agent-tool-pattern.md
+              - "워크플로 자동화 — 다단계 체인 설계": ko/ai-app-patterns-101/05-workflow-automation.md
+              - "Human-in-the-loop — 사람 개입 설계 패턴": ko/ai-app-patterns-101/06-human-in-the-loop.md
           - RAG Deep Dive:
               - "문서 로딩과 청크 전략 — LangChain TextSplitter 내부": ko/rag-deep-dive/01-document-loading-and-chunking.md
               - "임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리": ko/rag-deep-dive/02-embeddings-and-vector-index.md
@@ -46,6 +81,27 @@ nav:
               - "프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부": ko/rag-deep-dive/04-prompt-construction-and-context-injection.md
               - "RAG Chain 조립 — RetrievalQA vs LCEL": ko/rag-deep-dive/05-rag-chain-assembly.md
               - "평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness": ko/rag-deep-dive/06-evaluation-and-quality-gates.md
+          - RAG 평가와 벤치마크 101:
+              - "RAG 평가 지표 이해": ko/rag-benchmark-101/01-evaluation-metrics.md
+              - "검색 성능 측정": ko/rag-benchmark-101/02-retrieval-benchmarking.md
+              - "임베딩 모델 비교": ko/rag-benchmark-101/03-embedding-comparison.md
+              - "VectorDB 선택 기준": ko/rag-benchmark-101/04-vectordb-selection.md
+              - "종단 간 RAG 파이프라인 평가": ko/rag-benchmark-101/05-e2e-evaluation.md
+              - "RAG 벤치마크 완성": ko/rag-benchmark-101/06-benchmark-complete.md
+          - 문서 수집과 인덱싱 101:
+              - "PDF 파싱과 텍스트 추출": ko/document-ingestion-101/01-pdf-parsing.md
+              - "청킹 전략 — 문서 유형별 최적화": ko/document-ingestion-101/02-chunking-strategies.md
+              - "메타데이터 설계와 필터링": ko/document-ingestion-101/03-metadata-filtering.md
+              - "증분 인덱싱 — 변경된 문서만 업데이트": ko/document-ingestion-101/04-incremental-indexing.md
+              - "다중 포맷 문서 파이프라인": ko/document-ingestion-101/05-multi-format-pipeline.md
+              - "문서 수집 파이프라인 완성": ko/document-ingestion-101/06-pipeline-completion.md
+          - LangGraph 101:
+              - "LangGraph 소개와 그래프 기초": ko/langgraph-101/01-graph-basics.md
+              - "상태 관리와 체크포인트": ko/langgraph-101/02-state-and-checkpoints.md
+              - "조건부 엣지와 분기 흐름": ko/langgraph-101/03-conditional-edges.md
+              - "도구 호출 에이전트": ko/langgraph-101/04-tool-calling-agent.md
+              - "멀티 에이전트 시스템": ko/langgraph-101/05-multi-agent.md
+              - "LangGraph 완성": ko/langgraph-101/06-langgraph-complete.md
           - AI Agent 101:
               - "AI Agent란 무엇인가?": ko/ai-agent-101/01-what-is-an-ai-agent.md
               - "컨텍스트 엔지니어링": ko/ai-agent-101/02-context-engineering.md
@@ -90,6 +146,13 @@ nav:
               - "Rate Limiting과 남용 방지": ko/ai-safety-guardrails-101/08-rate-limiting-abuse-prevention.md
               - "감사 로깅과 컴플라이언스": ko/ai-safety-guardrails-101/09-audit-logging-compliance.md
               - "운영 가드레일 시스템 구축": ko/ai-safety-guardrails-101/10-production-guardrail-system.md
+          - LLM 앱 운영 101:
+              - "LLM 앱 모니터링과 로깅": ko/llm-apps-ops-101/01-monitoring-and-logging.md
+              - "LLM 비용 추적과 최적화": ko/llm-apps-ops-101/02-cost-tracking.md
+              - "LLM 출력 품질 평가": ko/llm-apps-ops-101/03-evaluation.md
+              - "LLM 앱 보안": ko/llm-apps-ops-101/04-security.md
+              - "LLM 앱 배포 전략": ko/llm-apps-ops-101/05-deployment.md
+              - "LLM 앱 운영 완성": ko/llm-apps-ops-101/06-ops-complete.md
           - AI Data Preparation 101:
               - "데이터 준비가 모델 품질을 결정하는 이유": ko/ai-data-preparation-101/01-why-data-preparation-matters.md
               - "원본 데이터 수집과 카탈로깅": ko/ai-data-preparation-101/02-source-data-collection-cataloging.md
@@ -101,6 +164,13 @@ nav:
               - "데이터 증강 기법 — EDA부터 Back-Translation까지": ko/ai-data-preparation-101/08-data-augmentation.md
               - "학습/평가/테스트 분할과 Contamination 통제": ko/ai-data-preparation-101/09-train-eval-test-splitting.md
               - "프로덕션 데이터 파이프라인 구축": ko/ai-data-preparation-101/10-production-data-pipeline.md
+          - LLM 파인튜닝 101:
+              - "LLM 파인튜닝 입문": ko/llm-finetuning-101/01-intro.md
+              - "데이터셋 준비와 전처리": ko/llm-finetuning-101/02-dataset.md
+              - "LoRA 어댑터 구성": ko/llm-finetuning-101/03-lora.md
+              - "학습 루프와 하이퍼파라미터": ko/llm-finetuning-101/04-training.md
+              - "모델 평가": ko/llm-finetuning-101/05-evaluation.md
+              - "모델 서빙": ko/llm-finetuning-101/06-serving.md
           - LLM from Scratch 101:
               - "글자를 숫자로 바꾸기": ko/llm-from-scratch-101/01-tokenizer.md
               - "정수에서 벡터로, 그리고 위치": ko/llm-from-scratch-101/02-embedding.md
@@ -111,6 +181,13 @@ nav:
               - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
               - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
               - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
+          - 한국어 AI 스택 101:
+              - "한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar": ko/korean-ai-stack-101/01-korean-embedding-models.md
+              - "KoSimCSE로 문장 유사도 구현하기": ko/korean-ai-stack-101/02-kosimcse-similarity.md
+              - "BGE-M3 다국어 임베딩 실전": ko/korean-ai-stack-101/03-bge-m3-multilingual.md
+              - "CLOVA OCR API로 문서 텍스트 추출": ko/korean-ai-stack-101/04-clova-ocr.md
+              - "HyperCLOVA X와 Solar API 사용하기": ko/korean-ai-stack-101/05-hyperclova-solar-api.md
+              - "한국어 RAG 파이프라인 조합하기": ko/korean-ai-stack-101/06-korean-rag-pipeline.md
           - AI 웹 개발 입문:
               - "AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기": ko/ai-web-dev-101/01-hello-ai-api.md
               - "프롬프트 엔지니어링 기초 — AI에게 원하는 답을 얻는 기술": ko/ai-web-dev-101/02-prompt-engineering.md
@@ -206,6 +283,41 @@ nav:
   - English:
       - en/index.md
       - AI:
+          - LLM App Foundations 101:
+              - "LLM API first call — sending your first request": en/llm-app-foundations-101/01-llm-api-first-call.md
+              - "Understanding tokens — cost, limits, and context windows": en/llm-app-foundations-101/02-understanding-tokens.md
+              - "Prompt engineering basics — system, user, and assistant roles": en/llm-app-foundations-101/03-prompt-engineering-basics.md
+              - "Few-shot and chain-of-thought — steering better answers": en/llm-app-foundations-101/04-few-shot-and-cot.md
+              - "Managing conversation state — building a multi-turn chatbot": en/llm-app-foundations-101/05-conversation-state.md
+              - "Handling streaming responses — real-time output": en/llm-app-foundations-101/06-streaming-responses.md
+          - LLM API Production 101:
+              - "Structured output — JSON mode and response schemas": en/llm-api-production-101/01-structured-output.md
+              - "Tool calling — connecting functions to the model": en/llm-api-production-101/02-tool-calling.md
+              - "Streaming in depth — chunk handling and error recovery": en/llm-api-production-101/03-streaming-in-depth.md
+              - "Caching strategies — reducing cost and latency": en/llm-api-production-101/04-caching-strategies.md
+              - "Retry and error handling — making API calls reliable": en/llm-api-production-101/05-retry-and-error-handling.md
+              - "Rate limit management — patterns for staying within limits": en/llm-api-production-101/06-rate-limit-management.md
+          - Vector Search 101:
+              - "What is an embedding — converting text into vectors": en/vector-search-101/01-what-is-embedding.md
+              - "HuggingFace embeddings in practice — creating your first vectors with sentence-transformers": en/vector-search-101/02-huggingface-embeddings.md
+              - "Cosine similarity and vector search — computing sentence distances": en/vector-search-101/03-cosine-similarity.md
+              - "FAISS fundamentals — fast approximate nearest-neighbor search": en/vector-search-101/04-faiss-fundamentals.md
+              - "Chunking strategies — how to split long documents": en/vector-search-101/05-chunking-strategies.md
+              - "Vector search pipeline — from document ingestion to query": en/vector-search-101/06-vector-search-pipeline.md
+          - LangChain 101:
+              - "LangChain introduction — LCEL and the Runnable interface": en/langchain-101/01-lcel-runnable-basics.md
+              - "Prompt and LLM chain — assembling your first chain": en/langchain-101/02-prompt-llm-chain.md
+              - "Retriever — document search and context injection": en/langchain-101/03-retriever.md
+              - "Tool calling — connecting external tools": en/langchain-101/04-tool-calling.md
+              - "Streaming — handling real-time output": en/langchain-101/05-streaming.md
+              - "Putting it together — a complete chain in one file": en/langchain-101/06-putting-it-together.md
+          - AI App Patterns 101:
+              - "Chatbot pattern — managing conversation history and state": en/ai-app-patterns-101/01-chatbot-pattern.md
+              - "RAG Q&A pattern — document-based question answering": en/ai-app-patterns-101/02-rag-qa-pattern.md
+              - "Document assistant — summarization, extraction, classification": en/ai-app-patterns-101/03-document-assistant.md
+              - "Agent and tool pattern — autonomous tool selection": en/ai-app-patterns-101/04-agent-tool-pattern.md
+              - "Workflow automation — designing multi-step chains": en/ai-app-patterns-101/05-workflow-automation.md
+              - "Human-in-the-loop — designing for human intervention": en/ai-app-patterns-101/06-human-in-the-loop.md
           - RAG Deep Dive:
               - "Document Loading and Chunking — Inside LangChain TextSplitter": en/rag-deep-dive/01-document-loading-and-chunking.md
               - "Embeddings and the Vector Index — Inside FAISS IndexFlatL2": en/rag-deep-dive/02-embeddings-and-vector-index.md
@@ -213,6 +325,27 @@ nav:
               - "Prompt Construction and Context Injection — Inside PromptTemplate": en/rag-deep-dive/04-prompt-construction-and-context-injection.md
               - "Assembling the RAG Chain — RetrievalQA vs LCEL": en/rag-deep-dive/05-rag-chain-assembly.md
               - "Evaluation and Quality Gates — RAGAS Metrics and Faithfulness": en/rag-deep-dive/06-evaluation-and-quality-gates.md
+          - RAG Evaluation and Benchmarking 101:
+              - "Understanding RAG evaluation metrics": en/rag-benchmark-101/01-evaluation-metrics.md
+              - "Measuring retrieval performance": en/rag-benchmark-101/02-retrieval-benchmarking.md
+              - "Comparing embedding models": en/rag-benchmark-101/03-embedding-comparison.md
+              - "VectorDB selection criteria": en/rag-benchmark-101/04-vectordb-selection.md
+              - "End-to-end RAG pipeline evaluation": en/rag-benchmark-101/05-e2e-evaluation.md
+              - "Completing the RAG Benchmark": en/rag-benchmark-101/06-benchmark-complete.md
+          - Document Ingestion 101:
+              - "PDF parsing and text extraction": en/document-ingestion-101/01-pdf-parsing.md
+              - "Chunking strategies — optimizing by document type": en/document-ingestion-101/02-chunking-strategies.md
+              - "Metadata design and filtering": en/document-ingestion-101/03-metadata-filtering.md
+              - "Incremental indexing — updating only changed documents": en/document-ingestion-101/04-incremental-indexing.md
+              - "Multi-format document pipeline": en/document-ingestion-101/05-multi-format-pipeline.md
+              - "Completing the document ingestion pipeline": en/document-ingestion-101/06-pipeline-completion.md
+          - LangGraph 101:
+              - "LangGraph introduction and graph basics": en/langgraph-101/01-graph-basics.md
+              - "State management and checkpoints": en/langgraph-101/02-state-and-checkpoints.md
+              - "Conditional edges and branching": en/langgraph-101/03-conditional-edges.md
+              - "Tool-calling agents": en/langgraph-101/04-tool-calling-agent.md
+              - "Multi-agent systems": en/langgraph-101/05-multi-agent.md
+              - "Completing LangGraph": en/langgraph-101/06-langgraph-complete.md
           - AI Agent 101:
               - "What Is an AI Agent?": en/ai-agent-101/01-what-is-an-ai-agent.md
               - "Context Engineering": en/ai-agent-101/02-context-engineering.md
@@ -257,6 +390,13 @@ nav:
               - "Rate Limiting and Abuse Prevention": en/ai-safety-guardrails-101/08-rate-limiting-abuse-prevention.md
               - "Audit Logging and Compliance": en/ai-safety-guardrails-101/09-audit-logging-compliance.md
               - "Building a Production Guardrail System": en/ai-safety-guardrails-101/10-production-guardrail-system.md
+          - LLM Apps Ops 101:
+              - "Monitoring and logging for LLM apps": en/llm-apps-ops-101/01-monitoring-and-logging.md
+              - "LLM cost tracking and optimization": en/llm-apps-ops-101/02-cost-tracking.md
+              - "Evaluating LLM output quality": en/llm-apps-ops-101/03-evaluation.md
+              - "LLM app security": en/llm-apps-ops-101/04-security.md
+              - "LLM app deployment strategies": en/llm-apps-ops-101/05-deployment.md
+              - "Completing the LLM ops pipeline": en/llm-apps-ops-101/06-ops-complete.md
           - AI Data Preparation 101:
               - "Why Data Preparation Determines Model Quality": en/ai-data-preparation-101/01-why-data-preparation-matters.md
               - "Source Data Collection and Cataloging": en/ai-data-preparation-101/02-source-data-collection-cataloging.md
@@ -268,6 +408,13 @@ nav:
               - "Data Augmentation - From EDA to Back-Translation": en/ai-data-preparation-101/08-data-augmentation.md
               - "Train/Eval/Test Splitting and Contamination Control": en/ai-data-preparation-101/09-train-eval-test-splitting.md
               - "Building a Production Data Pipeline": en/ai-data-preparation-101/10-production-data-pipeline.md
+          - LLM Fine-tuning 101:
+              - "LLM Fine-tuning Primer": en/llm-finetuning-101/01-intro.md
+              - "Dataset Preparation and Preprocessing": en/llm-finetuning-101/02-dataset.md
+              - "Configuring LoRA Adapters": en/llm-finetuning-101/03-lora.md
+              - "Training Loop and Hyperparameters": en/llm-finetuning-101/04-training.md
+              - "Model Evaluation": en/llm-finetuning-101/05-evaluation.md
+              - "Model Serving": en/llm-finetuning-101/06-serving.md
           - LLM from Scratch 101:
               - "Turning Text into Numbers": en/llm-from-scratch-101/01-tokenizer.md
               - "From Integers to Vectors and Positions": en/llm-from-scratch-101/02-embedding.md
@@ -278,6 +425,13 @@ nav:
               - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
               - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
               - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
+          - Korean AI Stack 101:
+              - "Korean embedding models compared — KoSimCSE, BGE-M3, Solar": en/korean-ai-stack-101/01-korean-embedding-models.md
+              - "Building sentence similarity search with KoSimCSE": en/korean-ai-stack-101/02-kosimcse-similarity.md
+              - "BGE-M3 multilingual embedding in practice": en/korean-ai-stack-101/03-bge-m3-multilingual.md
+              - "Document text extraction with CLOVA OCR API": en/korean-ai-stack-101/04-clova-ocr.md
+              - "Using HyperCLOVA X and Solar API": en/korean-ai-stack-101/05-hyperclova-solar-api.md
+              - "Assembling a Korean RAG pipeline": en/korean-ai-stack-101/06-korean-rag-pipeline.md
       - 프로그래밍:
           - Python Package 101:
               - "What Is a Python Package?": en/python-package-101/01-what-is-a-python-package.md

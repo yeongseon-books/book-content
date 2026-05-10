@@ -19,7 +19,6 @@ SERIES_MD = REPO_ROOT / "SERIES.md"
 STATUS_DISPLAY = {
     "draft": "Draft",
     "content-ready": "Content Ready",
-    "code-checked": "Code Checked",
     "publish-ready": "Publish Ready",
     "ready": "Ready",
     "published": "Published",
