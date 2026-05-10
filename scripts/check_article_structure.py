@@ -14,10 +14,16 @@ Advisory checks:
 Exit code: 0 when there are no blocking errors.
 Warnings are printed but do not fail the command.
 For 'published' articles, advisory checks are promoted to blocking errors.
+
+Flags:
+  --warn-all  Run advisory checks on all articles (not just publish-ready+).
+             Blocking checks still only apply to publish-ready+ articles.
+             Exit code is always 0 in warn-all mode.
 """
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -49,7 +55,7 @@ KO_REFS = re.compile(r"^## 참고 자료", re.MULTILINE)
 EN_REFS = re.compile(r"^## References", re.MULTILINE)
 
 
-def check_article(path: Path) -> tuple[list[str], list[str]]:
+def check_article(path: Path, *, warn_all: bool = False) -> tuple[list[str], list[str]]:
     """Return (errors, warnings). Errors block CI; warnings are informational."""
     errors: list[str] = []
     warnings: list[str] = []
@@ -61,25 +67,27 @@ def check_article(path: Path) -> tuple[list[str], list[str]]:
         return [], []  # front matter issues are caught by check_frontmatter.py
 
     status = post.metadata.get("status")
-    if status not in STRICT_STATUSES:
-        return [], []  # only strict-check for publish-ready+
+    is_strict = status in STRICT_STATUSES
+    if not is_strict and not warn_all:
+        return [], []  # skip non-strict articles unless warn-all
 
     lang = post.metadata.get("language", path.parent.name)
     body = post.content
 
-    # --- blocking checks ---
-    if not H1_RE.search(body):
-        errors.append("missing H1 title")
+    # --- blocking checks (only for strict statuses) ---
+    if is_strict:
+        if not H1_RE.search(body):
+            errors.append("missing H1 title")
 
-    refs_re = KO_REFS if lang == "ko" else EN_REFS
-    if not refs_re.search(body):
-        errors.append("missing references section")
+        refs_re = KO_REFS if lang == "ko" else EN_REFS
+        if not refs_re.search(body):
+            errors.append("missing references section")
 
-    # Tags line should be the last non-empty line
-    lines = text.rstrip().split("\n")
-    last_line = lines[-1] if lines else ""
-    if not TAGS_RE.match(last_line):
-        errors.append("missing or misplaced Tags line (must be last line)")
+        # Tags line should be the last non-empty line
+        lines = text.rstrip().split("\n")
+        last_line = lines[-1] if lines else ""
+        if not TAGS_RE.match(last_line):
+            errors.append("missing or misplaced Tags line (must be last line)")
 
     # --- advisory checks (warnings, promoted to errors for 'published') ---
     target = errors if status == "published" else warnings
@@ -102,6 +110,11 @@ def check_article(path: Path) -> tuple[list[str], list[str]]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Check article structure.")
+    parser.add_argument("--warn-all", action="store_true",
+                        help="Run advisory checks on all articles")
+    args = parser.parse_args()
+
     if not CONTENT_DIR.is_dir():
         print(f"no content/ directory at {CONTENT_DIR}", file=sys.stderr)
         return 1
@@ -111,15 +124,19 @@ def main() -> int:
     checked = 0
     skipped = 0
 
+    warn_all_count = 0
+
     for md in sorted(CONTENT_DIR.glob("*/*/*.md")):
         if md.parent.name not in ("ko", "en"):
             continue
-        errs, warns = check_article(md)
+        errs, warns = check_article(md, warn_all=args.warn_all)
         if not errs and not warns:
             try:
                 post = frontmatter.loads(md.read_text(encoding="utf-8"))
                 if post.metadata.get("status") in STRICT_STATUSES:
                     checked += 1
+                elif args.warn_all:
+                    warn_all_count += 1
                 else:
                     skipped += 1
             except Exception:
@@ -139,9 +156,10 @@ def main() -> int:
             for w in warns:
                 print(f"  - [warning] {w}")
 
-    print(
-        f"\nstrict-checked: {checked}, skipped: {skipped}, failures: {failures}, warnings: {warned}"
-    )
+    summary = f"\nstrict-checked: {checked}, skipped: {skipped}, failures: {failures}, warnings: {warned}"
+    if args.warn_all:
+        summary += f", warn-all-checked: {warn_all_count}"
+    print(summary)
     return 1 if failures else 0
 
 
