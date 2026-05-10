@@ -32,16 +32,11 @@ NAV_END = "# AUTOGEN-NAV-END"
 
 CATEGORY_LABELS = {
     "ai": "AI",
-    "python": "Python",
     "cs-core": "CS 핵심 과목",
     "software-engineering": "소프트웨어 엔지니어링",
-    "database-data": "데이터베이스 · ORM",
-    "data": "데이터 사이언스 / ML 기초",
-    "programming": "프로그래밍 일반",
-    "programming-foundations": "프로그래밍 기초",
+    "data": "데이터",
+    "programming": "프로그래밍",
     "azure": "Azure",
-    "writing": "기술 글쓰기",
-    "ax": "AX",
 }
 
 STATUS_LABELS = {

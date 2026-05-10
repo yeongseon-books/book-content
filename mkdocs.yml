@@ -119,7 +119,7 @@ nav:
               - "AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기": ko/ai-web-dev-101/05-ai-agent.md
               - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
               - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
-      - 프로그래밍 일반:
+      - 프로그래밍:
           - Python Package 101:
               - "Python Package란 무엇인가?": ko/python-package-101/01-what-is-a-python-package.md
               - "프로젝트 구조 잡기 — src layout과 pyproject.toml": ko/python-package-101/02-project-structure.md
@@ -278,7 +278,7 @@ nav:
               - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
               - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
               - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
-      - 프로그래밍 일반:
+      - 프로그래밍:
           - Python Package 101:
               - "What Is a Python Package?": en/python-package-101/01-what-is-a-python-package.md
               - "Project Structure — src layout and pyproject.toml": en/python-package-101/02-project-structure.md
