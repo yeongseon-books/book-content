@@ -38,6 +38,9 @@
 # 저장소 검증 (public asset 검증은 별도)
 make check
 
+# 콘텐츠 품질 경고 리포트 (warning-only)
+make check-quality
+
 # 발행 전 전체 검증 (public asset 포함)
 make publish-check
 
@@ -50,6 +53,7 @@ python3 scripts/check_frontmatter.py
 python3 scripts/lint_captions.py
 python3 scripts/check_links.py
 python3 scripts/check_article_structure.py            # article structure (A-grade) check
+python3 scripts/check_content_quality.py              # warning-only quality report
 ```
 
 medium 변형 재생성 시:
