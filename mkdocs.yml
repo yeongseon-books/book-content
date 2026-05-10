@@ -181,6 +181,17 @@ nav:
               - "샘플링 — 학습된 모델에서 글 뽑아내기": ko/llm-from-scratch-101/07-inference.md
               - "베이스 모델을 우리 작업에 맞추기": ko/llm-from-scratch-101/08-finetuning.md
               - "직접 만든 LLM을 챗봇으로 — FastAPI + 스트리밍": ko/llm-from-scratch-101/09-chatbot-wrapper.md
+          - Multimodal AI 101:
+              - "Multimodal AI가 중요한 이유": ko/multimodal-ai-101/01-why-multimodal-matters.md
+              - "Image Encoder: CLIP과 ViT": ko/multimodal-ai-101/02-image-encoders-clip-vit.md
+              - "Vision-Language Model 아키텍처": ko/multimodal-ai-101/03-vlm-architecture.md
+              - "Image Captioning과 OCR 파이프라인": ko/multimodal-ai-101/04-captioning-ocr-pipelines.md
+              - "Multimodal RAG: 이미지와 텍스트를 함께 검색하기": ko/multimodal-ai-101/05-multimodal-rag.md
+              - "오디오 처리와 Whisper STT": ko/multimodal-ai-101/06-audio-whisper.md
+              - "Diffusion으로 Text-to-Image 생성": ko/multimodal-ai-101/07-text-to-image-diffusion.md
+              - "Multimodal Embedding과 Cross-modal 검색": ko/multimodal-ai-101/08-multimodal-embeddings.md
+              - "Video 이해 - Frame Sampling에서 Video-LLaVA까지": ko/multimodal-ai-101/09-video-understanding.md
+              - "Production Multimodal Application 구축": ko/multimodal-ai-101/10-production-multimodal-app.md
           - 한국어 AI 스택 101:
               - "한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar": ko/korean-ai-stack-101/01-korean-embedding-models.md
               - "KoSimCSE로 문장 유사도 구현하기": ko/korean-ai-stack-101/02-kosimcse-similarity.md
@@ -197,6 +208,19 @@ nav:
               - "AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기": ko/ai-web-dev-101/06-deploy.md
               - "AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법": ko/ai-web-dev-101/07-eval-improve.md
       - 프로그래밍:
+          - Python 101:
+          - Git & GitHub 101:
+          - Linux CLI 101:
+              - "CLI와 Shell이란 무엇인가?": ko/linux-cli-101/01-what-is-cli-and-shell.md
+              - "파일과 디렉터리 다루기": ko/linux-cli-101/02-files-and-directories.md
+              - "권한과 소유자 이해하기": ko/linux-cli-101/03-permissions-and-ownership.md
+              - "cat, less, head, tail — 파일 내용 보기": ko/linux-cli-101/04-viewing-files.md
+              - "grep, find, xargs — 검색의 삼총사": ko/linux-cli-101/05-grep-find-xargs.md
+              - "pipe와 redirection": ko/linux-cli-101/06-pipe-and-redirection.md
+              - "프로세스 확인과 종료": ko/linux-cli-101/07-process-management.md
+              - "환경변수와 PATH": ko/linux-cli-101/08-environment-variables.md
+              - "간단한 shell script": ko/linux-cli-101/09-shell-script-basics.md
+              - "SSH와 원격 서버 접속": ko/linux-cli-101/10-ssh-and-remote.md
           - Python Package 101:
               - "Python Package란 무엇인가?": ko/python-package-101/01-what-is-a-python-package.md
               - "프로젝트 구조 잡기 — src layout과 pyproject.toml": ko/python-package-101/02-project-structure.md
@@ -219,6 +243,40 @@ nav:
               - "coverage와 테스트 품질 보기": ko/pytest-101/08-coverage.md
               - "GitHub Actions에서 테스트 자동화하기": ko/pytest-101/09-ci-with-github-actions.md
               - "테스트하기 쉬운 코드 구조 만들기": ko/pytest-101/10-testable-code.md
+      - 데이터:
+          - Python DB-API 101:
+              - "왜 DB-API 2.0인가 - PEP 249가 푼 문제": ko/python-dbapi-101/01-why-db-api-pep-249.md
+              - "Connection과 Cursor Lifecycle": ko/python-dbapi-101/02-connection-cursor-lifecycle.md
+              - "execute, executemany, fetch 패턴": ko/python-dbapi-101/03-execute-fetch-patterns.md
+              - "Parameter binding과 SQL injection 방어 (sqlite3, PEP 249)": ko/python-dbapi-101/04-parameter-binding-sql-injection.md
+              - "Transaction과 isolation level (sqlite3, PEP 249)": ko/python-dbapi-101/05-transactions-isolation.md
+              - "Row factory와 type adapter (sqlite3, PEP 249)": ko/python-dbapi-101/06-row-factories-adapters.md
+              - "PEP 249 예외 계층과 SQLite 에러 처리": ko/python-dbapi-101/07-error-handling-exception-hierarchy.md
+              - "SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링": ko/python-dbapi-101/08-connection-pooling.md
+              - "aiosqlite로 비동기 SQLite 다루기": ko/python-dbapi-101/09-async-aiosqlite.md
+              - "SQLite Production 패턴: retry, timeout, 관측성, 백업": ko/python-dbapi-101/10-production-patterns.md
+          - SQLAlchemy 101:
+              - "SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질": ko/sqlalchemy-101/01-sqlalchemy-2x-engine-connection.md
+              - "SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기": ko/sqlalchemy-101/02-core-metadata-table-types.md
+              - "SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기": ko/sqlalchemy-101/03-core-select-insert-update-delete.md
+              - "ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기": ko/sqlalchemy-101/04-orm-declarative-mapped-column.md
+              - "Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리": ko/sqlalchemy-101/05-session-unit-of-work-identity-map.md
+              - "ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기": ko/sqlalchemy-101/06-relationships-back-populates.md
+              - "로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가": ko/sqlalchemy-101/07-loading-strategies-n-plus-one.md
+              - "이벤트, hybrid_property, 그리고 커스텀 타입": ko/sqlalchemy-101/08-events-hybrid-types.md
+              - "비동기 SQLAlchemy: aiosqlite와 AsyncSession": ko/sqlalchemy-101/09-async-aiosqlite.md
+              - "production 패턴: 풀, 관측, 마이그레이션, 배포": ko/sqlalchemy-101/10-production-patterns.md
+          - Alembic 101:
+              - "왜 Alembic인가, 그리고 init까지": ko/alembic-101/01-why-alembic-and-init.md
+              - "env.py와 target_metadata: 모델과 마이그레이션 연결": ko/alembic-101/02-env-py-and-target-metadata.md
+              - "첫 revision: upgrade와 downgrade를 손으로 작성": ko/alembic-101/03-first-revision-upgrade-downgrade.md
+              - "autogenerate: 잡는 것과 못 잡는 것의 경계": ko/alembic-101/04-autogenerate-and-its-limits.md
+              - "branch와 merge: 동시에 만든 revision을 합치는 법": ko/alembic-101/05-branches-and-merges.md
+              - "데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기": ko/alembic-101/06-data-migrations.md
+              - "online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기": ko/alembic-101/07-online-vs-offline-and-batch.md
+              - "downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가": ko/alembic-101/08-downgrade-strategy.md
+              - "배포 순서와 blue/green: schema와 application code의 안전한 동기화": ko/alembic-101/09-deploy-ordering-and-blue-green.md
+              - "Production과 team workflow: PR, CI, 모니터링, 그리고 incident response": ko/alembic-101/10-production-and-team-workflow.md
       - Azure:
           - Azure App Service 101:
               - "Azure App Service란? - 플랫폼 아키텍처 이해하기": ko/azure-app-service-101/01-what-is-app-service.md
@@ -425,6 +483,17 @@ nav:
               - "Sampling — Generating Text from a Trained Model": en/llm-from-scratch-101/07-inference.md
               - "Adapting the Base Model to Specific Tasks": en/llm-from-scratch-101/08-finetuning.md
               - "Turning Your LLM into a Chatbot — FastAPI + Streaming": en/llm-from-scratch-101/09-chatbot-wrapper.md
+          - Multimodal AI 101:
+              - "Why Multimodal AI Matters": en/multimodal-ai-101/01-why-multimodal-matters.md
+              - "Image Encoders: CLIP and ViT": en/multimodal-ai-101/02-image-encoders-clip-vit.md
+              - "Vision-Language Model Architecture": en/multimodal-ai-101/03-vlm-architecture.md
+              - "Image Captioning and OCR Pipelines": en/multimodal-ai-101/04-captioning-ocr-pipelines.md
+              - "Multimodal RAG: Searching Images and Text Together": en/multimodal-ai-101/05-multimodal-rag.md
+              - "Audio Processing and Whisper STT": en/multimodal-ai-101/06-audio-whisper.md
+              - "Text-to-Image with Diffusion": en/multimodal-ai-101/07-text-to-image-diffusion.md
+              - "Multimodal Embeddings and Cross-modal Search": en/multimodal-ai-101/08-multimodal-embeddings.md
+              - "Video Understanding - From Frame Sampling to Video-LLaVA": en/multimodal-ai-101/09-video-understanding.md
+              - "Building a Production Multimodal Application": en/multimodal-ai-101/10-production-multimodal-app.md
           - Korean AI Stack 101:
               - "Korean embedding models compared — KoSimCSE, BGE-M3, Solar": en/korean-ai-stack-101/01-korean-embedding-models.md
               - "Building sentence similarity search with KoSimCSE": en/korean-ai-stack-101/02-kosimcse-similarity.md
@@ -433,6 +502,19 @@ nav:
               - "Using HyperCLOVA X and Solar API": en/korean-ai-stack-101/05-hyperclova-solar-api.md
               - "Assembling a Korean RAG pipeline": en/korean-ai-stack-101/06-korean-rag-pipeline.md
       - 프로그래밍:
+          - Python 101:
+          - Git & GitHub 101:
+          - Linux CLI 101:
+              - "What Is the CLI and Shell?": en/linux-cli-101/01-what-is-cli-and-shell.md
+              - "Files and Directories": en/linux-cli-101/02-files-and-directories.md
+              - "Permissions and Ownership": en/linux-cli-101/03-permissions-and-ownership.md
+              - "cat, less, head, tail — Viewing File Contents": en/linux-cli-101/04-viewing-files.md
+              - "grep, find, xargs — The Search Trio": en/linux-cli-101/05-grep-find-xargs.md
+              - "Pipes and Redirection": en/linux-cli-101/06-pipe-and-redirection.md
+              - "Process Management": en/linux-cli-101/07-process-management.md
+              - "Environment Variables and PATH": en/linux-cli-101/08-environment-variables.md
+              - "Shell Script Basics": en/linux-cli-101/09-shell-script-basics.md
+              - "SSH and Remote Access": en/linux-cli-101/10-ssh-and-remote.md
           - Python Package 101:
               - "What Is a Python Package?": en/python-package-101/01-what-is-a-python-package.md
               - "Project Structure — src layout and pyproject.toml": en/python-package-101/02-project-structure.md
@@ -455,6 +537,40 @@ nav:
               - "Coverage and Test Quality": en/pytest-101/08-coverage.md
               - "Test Automation with GitHub Actions": en/pytest-101/09-ci-with-github-actions.md
               - "Writing Testable Code": en/pytest-101/10-testable-code.md
+      - 데이터:
+          - Python DB-API 101:
+              - "Why DB-API 2.0 - The Problem PEP 249 Solved": en/python-dbapi-101/01-why-db-api-pep-249.md
+              - "Connection and Cursor Lifecycle": en/python-dbapi-101/02-connection-cursor-lifecycle.md
+              - "execute, executemany, and Fetch Patterns": en/python-dbapi-101/03-execute-fetch-patterns.md
+              - "Parameter binding and SQL injection defense (sqlite3, PEP 249)": en/python-dbapi-101/04-parameter-binding-sql-injection.md
+              - "Transactions and isolation levels (sqlite3, PEP 249)": en/python-dbapi-101/05-transactions-isolation.md
+              - "Row factories and type adapters (sqlite3, PEP 249)": en/python-dbapi-101/06-row-factories-adapters.md
+              - "PEP 249 Exception Hierarchy and SQLite Error Handling": en/python-dbapi-101/07-error-handling-exception-hierarchy.md
+              - "SQLite Connection Management: thread-safety, check_same_thread, and Pooling": en/python-dbapi-101/08-connection-pooling.md
+              - "Asynchronous SQLite with aiosqlite": en/python-dbapi-101/09-async-aiosqlite.md
+              - "SQLite Production Patterns: retry, timeout, observability, backup": en/python-dbapi-101/10-production-patterns.md
+          - SQLAlchemy 101:
+              - "Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified": en/sqlalchemy-101/01-sqlalchemy-2x-engine-connection.md
+              - "SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column": en/sqlalchemy-101/02-core-metadata-table-types.md
+              - "SQLAlchemy Core - select, insert, update, delete in 2.x Style": en/sqlalchemy-101/03-core-select-insert-update-delete.md
+              - "ORM Basics: Defining Models with DeclarativeBase and mapped_column": en/sqlalchemy-101/04-orm-declarative-mapped-column.md
+              - "Session in Depth: How Unit of Work and Identity Map Actually Work": en/sqlalchemy-101/05-session-unit-of-work-identity-map.md
+              - "ORM Relationships: Connecting Both Sides Safely with relationship and back_populates": en/sqlalchemy-101/06-relationships-back-populates.md
+              - "Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin": en/sqlalchemy-101/07-loading-strategies-n-plus-one.md
+              - "Events, hybrid_property, and custom types": en/sqlalchemy-101/08-events-hybrid-types.md
+              - "Async SQLAlchemy with aiosqlite and AsyncSession": en/sqlalchemy-101/09-async-aiosqlite.md
+              - "Production patterns: pools, observability, migrations, and deploys": en/sqlalchemy-101/10-production-patterns.md
+          - Alembic 101:
+              - "Why Alembic, and getting to alembic init": en/alembic-101/01-why-alembic-and-init.md
+              - "env.py and target_metadata: wiring models to migrations": en/alembic-101/02-env-py-and-target-metadata.md
+              - "Your first revision: writing upgrade and downgrade by hand": en/alembic-101/03-first-revision-upgrade-downgrade.md
+              - "autogenerate: the line between what it catches and what it misses": en/alembic-101/04-autogenerate-and-its-limits.md
+              - "branches and merges: combining revisions made in parallel": en/alembic-101/05-branches-and-merges.md
+              - "Data migrations: separating schema changes from data changes": en/alembic-101/06-data-migrations.md
+              - "Online and offline modes: previewing DDL with --sql and handling SQLite batch": en/alembic-101/07-online-vs-offline-and-batch.md
+              - "Downgrade strategy: when to write it for real and when to forbid it": en/alembic-101/08-downgrade-strategy.md
+              - "Deploy ordering and blue/green: synchronizing schema and application code safely": en/alembic-101/09-deploy-ordering-and-blue-green.md
+              - "Production and team workflow: PR, CI, monitoring, and incident response": en/alembic-101/10-production-and-team-workflow.md
       - Azure:
           - Azure App Service 101:
               - "What is Azure App Service? - Understanding the Platform Architecture": en/azure-app-service-101/01-what-is-app-service.md
