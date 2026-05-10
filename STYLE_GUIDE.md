@@ -179,7 +179,7 @@ assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png
 python3 .sisyphus/medium/mermaid-to-png.py <ko-file> <en-file>
 ```
 
-ko/en 본문은 로컬 상대 경로를, medium 본문은 commit-pinned `raw.githubusercontent.com/...` 절대 URL을 참조한다.
+ko/en 본문은 로컬 상대 경로를, 외부 발행 변형(medium, tistory, hashnode)은 `series.yaml`의 `meta.asset_base_url` 기준 공개 URL로 재작성된다.
 
 ---
 
