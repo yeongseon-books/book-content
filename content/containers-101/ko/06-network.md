@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 같은 호스트의 컨테이너가 *서로* 어떻게 *이름* 으로 연결될까요?
+
+> *컨테이너 네트워크 는 *bridge*, *host*, *overlay* 의 *모드 선택* 과 *DNS 기반 디스커버리* 로 작동합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *bridge / host / overlay / none* 모드
+- *컨테이너 간 DNS*
+- *publish (-p)* 와 *expose*
+- *user-defined network*
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *Compose* 와 *Kubernetes* 모두 *네트워크 추상화* 위에서 동작합니다. *기초* 가 *전부* 입니다.
 
@@ -38,6 +53,14 @@ flowchart LR
     Bridge --> C2["db"]
     C1 -. dns .-> C2
 ```
+
+## 핵심 용어 정리
+
+- **bridge**: *기본* 가상 *L2* 네트워크.
+- **host**: *호스트 네임스페이스* 공유.
+- **overlay**: *여러 호스트* 를 잇는 가상 네트워크.
+- **none**: *네트워크 없음*.
+- **expose**: *내부* 포트 *문서화* 만.
 
 ## Before/After
 
@@ -115,12 +138,26 @@ def cleanup(net):
 
 *Compose* 가 *서비스마다* *user-defined* 네트워크 자동 생성, *Kubernetes* 는 *CNI* 로 *Pod 간* *L3* 통신.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *DNS* 가 *연결의 기본*.
+- *외부 노출* 은 *명시적 결정*.
+- *모드 선택* 이 *보안 영향*.
+- *네트워크* 도 *상태* 다 (정리 필요).
+- *Compose/K8s* 가 *추상* 해도 *원리* 는 같다.
+
 ## 체크리스트
 
 - [ ] *user-defined* 네트워크 사용.
 - [ ] *DB* 는 *외부 비공개*.
 - [ ] *DNS 이름* 으로 통신.
 - [ ] *불필요 네트워크* 정리.
+
+## 연습 문제
+
+1. *기본 bridge* 의 *한계* 한 줄로.
+2. *overlay 네트워크* 의 *대표 용도* 한 가지.
+3. *expose* 와 *publish (-p)* 의 *차이* 한 줄로.
 
 ## 정리 및 다음 단계
 

@@ -25,8 +25,23 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 노드 다섯이 한 결정에 동의하려면 정확히 무엇이 필요한가요?
+
+> consensus는 분산 시스템의 가장 단단한 문제이고, Raft는 그 답을 사람이 읽을 수 있게 만든 알고리즘입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- consensus 문제의 정의와 안전성/생존성
+- Raft의 세 역할 (leader, follower, candidate)
+- term, log, index, commit의 의미
+- majority(quorum)가 왜 필요한가
+- Paxos와 Raft를 한 줄로 비교
+
+## 왜 중요한가
 
 etcd, ZooKeeper, Consul, CockroachDB의 핵심에는 모두 consensus 알고리즘이 있습니다. Kubernetes의 control plane도 etcd 위에 서 있습니다. consensus를 이해하면 "왜 이 시스템이 이렇게 동작하는가"의 절반은 풀립니다.
 
@@ -45,6 +60,14 @@ flowchart LR
 ```
 
 leader 한 명이 log를 받고 follower에게 복제합니다. 다수가 받은 entry만 commit으로 인정됩니다.
+
+## 핵심 용어 정리
+
+- **Consensus**: N개의 노드가 같은 값에 동의하는 문제.
+- **Term**: 단조 증가하는 epoch. 새 leader마다 새 term.
+- **Log**: 순차 entry. index로 식별.
+- **Commit**: 다수 노드가 받은 entry는 영구적으로 약속됨.
+- **Quorum**: 2f+1 중 f+1, 보통 majority.
 
 ## Before/After
 
@@ -155,6 +178,14 @@ majority가 없는 쪽은 의도적으로 멈춥니다. split-brain을 방지하
 
 etcd (Kubernetes의 데이터 저장소), Consul, ZooKeeper(ZAB, Paxos 변형), CockroachDB, TiKV가 모두 consensus 알고리즘 위에 서 있습니다. 데이터베이스의 leader election, 분산 락, configuration 저장이 전형적 use case입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- consensus는 자주 호출하지 않습니다 (비싸므로 metadata에만).
+- timeout은 측정에 기반해 randomize 합니다.
+- node 수는 홀수로 둡니다 (3, 5, 7).
+- leader change를 안전하게 다루는 client retry를 설계합니다.
+- read를 leader-only로 강제할지 lease로 풀지 의식합니다.
+
 ## 체크리스트
 
 - [ ] consensus의 정의를 한 줄로 말할 수 있는가?
@@ -162,6 +193,12 @@ etcd (Kubernetes의 데이터 저장소), Consul, ZooKeeper(ZAB, Paxos 변형), 
 - [ ] 5 노드 cluster에서 몇 개가 죽어도 동작하는지 답할 수 있는가?
 - [ ] split vote를 어떻게 막는지 아는가?
 - [ ] etcd가 consensus 위에 있다는 사실을 시스템 설계에 반영하는가?
+
+## 연습 문제
+
+1. 3 노드 / 5 노드 cluster의 fault tolerance를 비교해 보세요.
+2. Raft의 randomized election timeout이 어떻게 split vote를 줄이는지 설명해 보세요.
+3. 분산 락을 etcd로 구현하는 방법을 한 문단으로 적어 보세요.
 
 ## 정리 및 다음 단계
 

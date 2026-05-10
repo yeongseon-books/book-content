@@ -22,6 +22,22 @@ seo_description: 생성 API 호출은 4겹 계약으로 분해됩니다.
 
 # HyperCLOVA X와 Solar API 사용하기
 
+## 이 글에서 배울 것
+
+- HyperCLOVA X와 Solar API의 호출 방식과 응답 구조를 이해하고 Python으로 호출할 수 있습니다.
+- 두 API의 가격 모델, 토큰 제한, 한국어 성능 차이를 비교합니다.
+- OpenAI SDK 호환 인터페이스를 제공하는 모델의 장점과 제약을 파악합니다.
+- 한국어 LLM API를 RAG 파이프라인의 generation 단계에 연결하는 방법을 설계합니다.
+
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+HyperCLOVA X와 Solar API를 어떻게 골라야 한국어 워크로드에 맞을까요?
+
+이 글은 그 질문에 답하기 위해 HyperCLOVA·Solar API의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 - 한국어 생성 모델 API를 붙일 때 프롬프트보다 먼저 고정해야 할 호출 계약은 무엇일까요?
@@ -35,7 +51,7 @@ seo_description: 생성 API 호출은 4겹 계약으로 분해됩니다.
 
 예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/ko/05-hyperclova-solar-api)
 
-## 이 글에서 다룰 문제
+## 왜 중요한가
 
 이 글에서는 한국어 생성 LLM API를 안전하게 호출하는 패턴을 다룹니다. 앞 글들이 임베딩(KoSimCSE, BGE-M3)과 OCR(CLOVA)로 입력 데이터를 정리하는 단계였다면, 이번 글은 그 위에서 답을 만드는 단계입니다. HyperCLOVA X(NAVER)와 Solar(Upstage)는 한국어에 최적화돼 자연스러운 응답을 내놓지만, 운영 단계의 진짜 문제는 인증 방식, 응답 latency, 오류 코드, 토큰 한도, 프롬프트 캐시 같은 호출 계약 쪽에 있습니다.
 
@@ -271,6 +287,14 @@ API 선택에서 가장 중요한 것은 한국어 성능이 아니라 안정성
 
 vendor lock-in을 줄이려면 OpenAI SDK 호환 인터페이스를 제공하는 모델을 우선하는 것이 실용적입니다. Solar는 OpenAI SDK로 바로 호출할 수 있어 기존 코드를 거의 바꾸지 않고 교체할 수 있습니다. 프로덕션에서는 여러 모델을 fallback chain으로 엶는 패턴이 흔합니다. 메인 모델이 응답하지 않으면 대체 모델로 자동 전환하는 구조를 미리 마련해두는 것이 좋습니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **한국어 성능과 글로벌 모델을 비교** — 범용 GPT 대비 가치 제안을 측정합니다.
+- **API 안정성·SLA를 평가** — 신생 API는 운영 변수가 많습니다.
+- **비용 모델을 use case에 맞춘다** — 토큰 단가·기본 요금이 다릅니다.
+- **data residency가 결정적** — 국내 처리 요구가 있으면 선택지가 좁아집니다.
+- **multi-vendor 전략을 의식** — 단일 의존은 운영 위험입니다.
+
 ## 체크리스트
 
 - [ ] 시스템 메시지에 대상 독자·문체·언어를 명시한다.
@@ -279,6 +303,12 @@ vendor lock-in을 줄이려면 OpenAI SDK 호환 인터페이스를 제공하는
 - [ ] timeout과 retry를 짝으로 둔다.
 - [ ] 응답 검증과 마스킹을 generation 직후 한 번 거친다.
 - [ ] 공급자를 바꿀 때 인증·오류 처리·latency 차이를 점검한다.
+
+## 연습 문제
+
+1. 같은 system 메시지로 temperature 0.0, 0.3, 0.7 세 가지 호출을 5회씩 반복하고, 응답 길이와 핵심 단어 등장 빈도를 비교해 보세요.
+2. JSON 강제 호출에서 일부러 system 메시지의 스키마를 빼고 호출해 보세요. `response_format`만으로 얼마나 안정적인지 관찰하세요.
+3. Solar(또는 HyperCLOVA) 키가 있다면 같은 메시지를 보내고 latency·refusal rate·길이를 Groq 결과와 비교해 표로 정리하세요.
 
 ## 정리 · 다음 글
 

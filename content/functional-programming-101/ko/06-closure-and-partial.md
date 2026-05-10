@@ -24,8 +24,22 @@ last_reviewed: '2026-05-04'
 
 > Functional Programming 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 함수가 자신이 정의된 환경의 변수를 기억한다면, 어떤 패턴이 가능해질까요?
+
+> 클로저는 내부 함수가 외부 함수의 변수를 기억하는 메커니즘입니다. `functools.partial`은 기존 함수의 인자를 미리 고정하여 새 함수를 만듭니다. 이 글에서는 클로저의 동작 원리와 partial을 활용한 실용적 패턴을 다룹니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- 클로저의 정의와 동작 메커니즘
+- 자유 변수와 셀 객체의 관계
+- functools.partial로 함수 인자 고정하기
+- 클로저 vs partial의 선택 기준
+
+## 왜 중요한가
 
 클로저는 상태를 캡슐화하면서도 클래스를 사용하지 않는 경량 패턴입니다. 데코레이터, 팩토리 함수, 콜백 모두 클로저에 기반합니다.
 
@@ -274,6 +288,14 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 
 `functools.partial`은 과소평가된 도구입니다. `lambda x: f(x, fixed_arg)` 대신 `partial(f, fixed_arg)`를 사용하면 더 명확하고, `repr()`로 고정된 인자를 확인할 수 있어 디버깅도 쉬워집니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **캡처 명확화** — 캡처 변수는 명시적으로 documenting합니다.
+- **Late binding 함정** — 루프 안 람다의 late binding을 인지합니다.
+- **functools.partial** — 부분 적용으로 의도를 드러냅니다.
+- **불변 캡처** — 캡처 데이터는 불변으로 두면 디버깅이 쉽습니다.
+- **테스트** — 클로저 단위 테스트로 회귀를 고정합니다.
+
 ## 체크리스트
 
 - [ ] 클로저가 외부 변수를 기억하는 메커니즘을 설명할 수 있다
@@ -281,6 +303,12 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 - [ ] `functools.partial`로 함수의 인자를 고정할 수 있다
 - [ ] 클로저와 partial의 선택 기준을 알고 있다
 - [ ] 반복문에서 클로저 변수 공유 문제를 해결할 수 있다
+
+## 연습 문제
+
+1. 호출 횟수를 세는 `make_call_counter(func)` 클로저를 작성하세요.
+2. `partial`을 사용하여 `sorted`의 `key` 인자를 커스터마이징하는 유틸리티를 만드세요.
+3. 반복문에서 클로저 변수가 공유되는 문제를 재현하고 해결하세요.
 
 ## 정리 및 다음 글 안내
 

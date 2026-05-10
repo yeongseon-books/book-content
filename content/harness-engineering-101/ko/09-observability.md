@@ -30,6 +30,15 @@ Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다
 ![Observability - Agent 작업을 추적하고 재현하기](../../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.ko.png)
 
 *Observability - Agent 작업을 추적하고 재현하기*
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+Agent 작업을 어떻게 추적하고 재현해야 사고 진단이 가능할까요?
+
+이 글은 그 질문에 답하기 위해 Observability의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## Observability란 무엇인가요?
 
 Observability(관측성)는 에이전트가 무엇을, 왜, 어떻게 실행했는지를 외부에서 재구성할 수 있는 능력입니다. 단순히 로그를 남기는 것이 아니라, 사고가 났을 때 "그 시점의 의사결정"을 추적하고 재현할 수 있어야 합니다.
@@ -229,6 +238,16 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 
 다음 글은 Production Harness입니다. 지금까지 배운 9가지 harness를 묶어 실제 운영 환경에 배포하는 패턴을 다룹니다.
 
+---
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **trace가 추적의 기본 단위** — task·step·tool call의 트리 구조로 봅니다.
+- **입력·출력·결정을 모두 기록** — 사고 재현의 단일 출처가 됩니다.
+- **metric·log·trace를 함께** — 한 가지로는 진단이 부족합니다.
+- **샘플링 정책을 의식적으로** — 전수는 비용, 부족은 신호가 약해집니다.
+- **재현 가능성이 신뢰의 기반** — 기록만으로 사고를 다시 볼 수 있어야 합니다.
+
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -244,8 +263,6 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 - Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
-
----
 
 ## 참고 자료
 

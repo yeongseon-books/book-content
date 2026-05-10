@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *빌드 결과물* 을 *다음 Job* 또는 *외부 사용자* 에게 *어떻게 전달* 합니까?
+
+> *아티팩트* 는 *빌드와 배포 사이의 다리* 입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *upload-artifact / download-artifact* 의 사용
+- *Job 간 산출물* 전달 패턴
+- *retention-days* 로 *비용* 관리
+- *softprops/action-gh-release* 로 *Release* 발행
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *빌드한 결과를 그 자리에서 버리는* 워크플로우는 *재사용도 추적도* 안 됩니다. 아티팩트는 *증거이자 자산* 입니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     Store --> Down["download-artifact"]
     Down --> Deploy["deploy job"]
 ```
+
+## 핵심 용어 정리
+
+- **Artifact**: 워크플로우가 *생성한 파일* 묶음.
+- **upload-artifact**: 아티팩트 *업로드* 액션.
+- **download-artifact**: 다른 Job 에서 *다운로드*.
+- **retention-days**: 보관 *기간*.
+- **Release**: GitHub 의 *공식 산출물 페이지*.
 
 ## Before/After
 
@@ -124,12 +147,26 @@ deploy:
 
 성숙한 팀은 *모든 빌드* 가 *checksum + SBOM* 을 함께 만들고, *Release* 시 *서명 (sigstore)* 을 붙입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *추적 가능 빌드* 가 *공급망 보안* 의 시작.
+- *retention* 은 *비용 + 컴플라이언스*.
+- *Release* 는 *공식 외부 인터페이스*.
+- *아티팩트 이름* 은 *고유* 하게.
+- *체크섬/서명* 은 *문화*.
+
 ## 체크리스트
 
 - [ ] *upload-artifact@v4* 를 사용한다.
 - [ ] *retention-days* 가 명시됐다.
 - [ ] *Release* 가 *tag push* 로 자동 발행된다.
 - [ ] *체크섬* 또는 *서명* 이 첨부된다.
+
+## 연습 문제
+
+1. *pytest report + coverage* 를 *하나의 아티팩트* 로 업로드하세요.
+2. *deploy job* 이 *build job* 의 산출물을 다운로드하게 하세요.
+3. *tag push* 시 *Release* 가 자동 생성되도록 만드세요.
 
 ## 정리 및 다음 단계
 

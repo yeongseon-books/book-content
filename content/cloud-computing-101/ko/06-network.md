@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Cloud Computing 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *VPC* 와 *서브넷*, *보안 그룹* 은 *왜 모두 따로* 존재할까요?
+
+> *클라우드 네트워크 는 *격리(VPC)*, *배치(서브넷)*, *허용(SG/NACL)*, *분산(LB)* 의 *4단 구조* 로 작동합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *VPC* 와 *서브넷* 의 차이
+- *Security Group* 과 *NACL* 의 역할
+- *Public/Private* 서브넷 패턴
+- *Load Balancer* 기본
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *네트워크 설계* 는 *나중에 바꾸기 가장 어려운* 결정입니다. *처음 한 시간* 이 *수년* 을 좌우합니다.
 
@@ -38,6 +53,14 @@ flowchart LR
     Public --> Private["private subnet"]
     Private --> DB["database"]
 ```
+
+## 핵심 용어 정리
+
+- **VPC**: *논리적으로 격리* 된 *가상 네트워크*.
+- **Subnet**: *VPC 내부* 의 *IP 범위* (AZ 단위).
+- **Security Group**: *인스턴스* 단위 *상태 저장* 방화벽.
+- **NACL**: *서브넷* 단위 *무상태* 방화벽.
+- **Load Balancer**: *트래픽* 을 *여러 대상* 에 *분산*.
 
 ## Before/After
 
@@ -115,12 +138,26 @@ def describe(sg_id):
 
 *ALB* 는 *Public* 서브넷, *앱* 은 *Private* 서브넷, *RDS* 는 *DB Private* 서브넷, *NAT Gateway* 로 *외부 호출*.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Private 우선*. *Public* 은 *예외*.
+- *SG* 를 *역할별* 로 분리.
+- *Egress* 도 *명시적* 으로 제한.
+- *VPC Flow Log* 는 *기본 ON*.
+- *CIDR 계획* 은 *미래 통합* 까지 고려.
+
 ## 체크리스트
 
 - [ ] *Public 서브넷* 에 *DB* 가 없는가.
 - [ ] *SG* 가 *역할별* 로 분리되어 있는가.
 - [ ] *Flow Log* 가 활성인가.
 - [ ] *Egress* 가 *명시적* 인가.
+
+## 연습 문제
+
+1. *Security Group* 과 *NACL* 의 *3가지 차이* 를 적으세요.
+2. *Public/Private 서브넷* 분리가 *왜* 보안에 유리한지 한 줄로.
+3. *ALB* 와 *NLB* 의 *주요 차이* 한 가지를 들어 보세요.
 
 ## 정리 및 다음 단계
 

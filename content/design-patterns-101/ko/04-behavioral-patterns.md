@@ -25,8 +25,23 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (4/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 객체들이 어떻게 서로의 *행동*을 조정할까요?
+
+> 알고리즘을 갈아끼우거나, 통지를 흘려보내거나, 명령을 객체로 만드는 — 이름 붙은 방식들이 Behavioral 패턴입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- Behavioral 패턴이 푸는 문제
+- Strategy / Observer / Command
+- State와 Iterator
+- 흐름을 *데이터처럼* 다룬다는 사고
+- 패턴 선택의 기준
+
+## 왜 중요한가
 
 객체 사이의 협력은 if/elif 더미로 빠르게 굳습니다. Behavioral 패턴은 그 협력에 *이름*과 *모양*을 줍니다.
 
@@ -44,6 +59,14 @@ flowchart LR
 ```
 
 다섯 가지 협력 양식.
+
+## 핵심 용어 정리
+
+- **Strategy**: 알고리즘을 객체로 만들어 교체 가능하게.
+- **Observer**: 한 객체의 변경을 여러 구독자에게 통지.
+- **Command**: 요청 자체를 객체로 만들어 큐/실행취소를 가능하게.
+- **State**: 상태 객체로 행동을 분리.
+- **Iterator**: 컬렉션 내부 구조 없이 순회.
 
 ## Before/After
 
@@ -173,6 +196,14 @@ for x in Bag([1, 2, 3]):
 
 Django signals = Observer, Celery task = Command, FSM 라이브러리 = State, Python의 모든 컬렉션 = Iterator. 일상적인 도구의 기반에 Behavioral이 있습니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- Strategy의 첫 후보는 *함수*.
+- Observer는 통지 *방향*을 단방향으로.
+- Command는 단순 요청에는 과합니다.
+- State는 진짜 상태기계일 때만.
+- Iterator는 내부 자료 구조를 숨기는 약속.
+
 ## 체크리스트
 
 - [ ] Strategy가 함수보다 클래스가 나은 이유가 있는가?
@@ -180,6 +211,12 @@ Django signals = Observer, Celery task = Command, FSM 라이브러리 = State, P
 - [ ] Command가 *요청*만 담고 있는가?
 - [ ] State 전이가 한 곳에서 보이는가?
 - [ ] Iterator가 내부 구조를 숨기는가?
+
+## 연습 문제
+
+1. 현재 if/elif 분기를 Strategy로 정리해 보세요.
+2. 도메인 이벤트 발행을 Observer로 모델링해 보세요.
+3. 외부 API 호출 큐를 Command로 표현해 보세요.
 
 ## 정리 및 다음 단계
 

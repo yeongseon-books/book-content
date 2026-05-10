@@ -22,6 +22,22 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 # 학습 루프와 하이퍼파라미터
 
+## 이 글에서 배울 것
+
+- `TrainingArguments`의 필수 필드를 이해하고 1 step 학습을 실행할 수 있습니다.
+- `labels`와 data collator가 왜 필요한지 설명할 수 있습니다.
+- effective batch size 공식(`per_device × accum × devices`)을 이해합니다.
+- 학습 루프 디버깅 시 먼저 확인해야 할 출력값을 파악합니다.
+
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+학습 루프와 하이퍼파라미터를 어떻게 설정해야 안정적인 수렴과 일반화를 얻을까요?
+
+이 글은 그 질문에 답하기 위해 학습 루프와 하이퍼파라미터의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 이 글에서 답할 질문
 
 ![이 글에서 답할 질문](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.ko.png)
@@ -37,7 +53,7 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/ko/04-training)
 
-## 이 글에서 다룰 문제
+## 왜 중요한가
 
 4편은 파인튜닝 시리즈에서 처음으로 실제 가중치 업데이트가 발생하는 글입니다. 하지만 여전히 목표는 큰 성능이 아니라 **학습 루프가 살아 있는지 확인하는 것**입니다. 1 step만 끝까지 도는 것을 검증해 두면, 이후 학습이 안 될 때 "환경 문제인지, 데이터 문제인지, 하이퍼파라미터 문제인지"를 빠르게 분리할 수 있습니다.
 
@@ -202,6 +218,14 @@ args.max_steps = 1
 
 하이퍼파라미터 조정은 한 번에 하나만 바꾸는 원칙을 지켜야 합니다. learning rate와 batch size를 동시에 바꾸면 어느 변화가 결과에 영향을 줬는지 추적할 수 없기 때문입니다. GPU 메모리가 부족하다면 batch size를 줄이고 gradient accumulation으로 보상하는 것이 맞지, learning rate를 낮추는 것은 다른 문제입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **learning rate가 가장 중요** — 너무 크면 발산, 너무 작으면 정체됩니다.
+- **batch size·gradient accumulation 트레이드오프** — GPU 메모리와 안정성의 균형입니다.
+- **eval loss를 정기적으로** — train loss만 보면 과적합을 놓칩니다.
+- **checkpointing이 운영의 안전장치** — 장시간 학습이 멈춰도 손실을 줄입니다.
+- **재현성을 위한 seed·환경 기록** — 실험 비교의 전제입니다.
+
 ## 체크리스트
 
 - [ ] `TrainingArguments`의 필수 필드를 직접 읽고 수정할 수 있다.
@@ -210,6 +234,12 @@ args.max_steps = 1
 - [ ] loss가 NaN이 아닌 유한한 숫자였다.
 - [ ] effective batch size 공식 = `per_device × accum × devices`를 설명할 수 있다.
 - [ ] 다음 글에서 동일한 모델을 평가할 준비가 되었다.
+
+## 연습 문제
+
+1. `learning_rate`를 1e-5, 1e-4, 1e-3으로 바꿔 가며 5 step씩 돌리고 손실 변화를 비교해 보세요. 어느 값에서 NaN이 나오나요?
+2. `per_device_train_batch_size=1, gradient_accumulation_steps=4`와 `per_device_train_batch_size=4, gradient_accumulation_steps=1`을 같은 lr로 돌려 손실 곡선이 비슷한지 확인해 보세요. 다르다면 가능한 원인을 적어 보세요.
+3. prompt 부분을 -100으로 마스킹하는 collator를 만들어 학습해 보세요. 마스킹 전후 loss가 어떻게 달라지나요?
 
 ## 정리 · 다음 글
 

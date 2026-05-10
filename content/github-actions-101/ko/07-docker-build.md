@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (7/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *PR마다 Docker 이미지* 를 *빠르고 안전* 하게 빌드해 *레지스트리* 까지 올리려면 어떻게 합니까?
+
+> *Docker 빌드* 는 *캐시 설계* 가 전부입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *docker/setup-buildx-action* 으로 *Buildx* 활성화
+- *gha 캐시* 로 빌드 시간 단축
+- *GHCR* 로그인과 push
+- *멀티 플랫폼* (linux/amd64+arm64) 빌드
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 CI 의 *가장 느린 step* 은 보통 *Docker 빌드* 입니다. *캐시 + 멀티스테이지 + Buildx* 를 정확히 쓰면 *몇 분이 몇 초* 가 됩니다.
 
@@ -39,6 +54,14 @@ flowchart LR
     Buildx --> Cache["gha cache"]
     Buildx --> GHCR["ghcr.io"]
 ```
+
+## 핵심 용어 정리
+
+- **Buildx**: Docker 의 *고급 빌더*.
+- **gha cache**: GitHub Actions *캐시 백엔드*.
+- **GHCR**: *GitHub Container Registry*.
+- **Multi-platform**: *여러 CPU 아키텍처* 동시 빌드.
+- **OCI image**: 컨테이너 *표준 이미지 포맷*.
 
 ## Before/After
 
@@ -113,12 +136,26 @@ permissions:
 
 성숙한 팀은 *PR* 에서는 *amd64 + 캐시* 만, *main push* 에서는 *멀티 플랫폼 + 서명 (cosign)* 으로 *공식 이미지* 를 발행합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Docker 빌드 시간* = *팀의 인내심*.
+- *캐시 전략* 이 *Dockerfile 설계* 를 결정한다.
+- *latest* 는 *편의 태그*, *고정 태그* 가 *진실*.
+- *권한* 은 *최소 부여*.
+- *서명* 으로 *공급망 보안*.
+
 ## 체크리스트
 
 - [ ] *Buildx + gha cache* 가 켜져 있다.
 - [ ] *고정 태그* (sha) 와 *latest* 를 같이 푸시한다.
 - [ ] *permissions: packages: write* 가 있다.
 - [ ] *멀티 플랫폼* 은 *필요한 트리거에서만*.
+
+## 연습 문제
+
+1. *PR* 마다 *amd64* 만 빌드하는 워크플로우를 만드세요.
+2. *main push* 에서 *멀티 플랫폼 + latest* 를 푸시하세요.
+3. *Dockerfile* 을 *멀티스테이지* 로 줄여 이미지 크기를 *반* 으로 줄이세요.
 
 ## 정리 및 다음 단계
 

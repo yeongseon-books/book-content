@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (9/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *비밀번호, API 키, 인증서* 같은 *민감한 값* 을 워크플로우에서 *어떻게 안전하게* 다룹니까?
+
+> *Secret 은 코드가 아니라 *런타임 자원* 입니다. 저장, 노출, 회전을 분리해 설계하세요.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Repository / Environment / Organization* secret 의 차이
+- *GITHUB_TOKEN* 과 *최소 권한 (`permissions:`)* 원칙
+- *OIDC* 로 *장기 키 폐기* 하는 흐름
+- *`::add-mask::`* 로 동적 값 마스킹
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *Secret 유출* 은 *복구 불가능* 합니다. 한 번 공개 로그에 찍히면 *영원히* 인터넷에 남습니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     Env --> Job["Job runtime"]
     Job --> Mask["::add-mask::"]
 ```
+
+## 핵심 용어 정리
+
+- **Repository secret**: 한 *저장소* 전용.
+- **Environment secret**: *환경별* 분리 (staging, production).
+- **Organization secret**: 여러 저장소 *공유*.
+- **GITHUB_TOKEN**: 워크플로우 실행마다 *자동 발급* 되는 단기 토큰.
+- **OIDC**: 클라우드와 *키 없는 신뢰*.
 
 ## Before/After
 
@@ -115,12 +138,26 @@ Settings > Secrets > Dependabot
 
 성숙한 팀은 *HashiCorp Vault* 나 *Doppler*, *1Password Secrets Automation* 으로 secret 의 *단일 출처* 를 관리하고, GitHub Actions 는 *OIDC* 로 *짧게 빌려* 옵니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Secret 이 코드에 있으면 이미 유출된 것*.
+- *최소 권한* 이 기본값.
+- *장기 키는 부채*, *OIDC 가 자산*.
+- *회전은 캘린더가 아니라 자동화*.
+- *fork PR 에는 secret 을 *절대* 주지 않는다*.
+
 ## 체크리스트
 
 - [ ] *Repository / Environment / Organization* 구분이 명확하다.
 - [ ] *`permissions:`* 가 *최소 권한* 으로 설정됐다.
 - [ ] *OIDC* 로 클라우드에 인증한다.
 - [ ] *회전 일정* 이 캘린더에 있다.
+
+## 연습 문제
+
+1. *production* 환경에 *DB_PASSWORD* secret 을 추가하고 워크플로우에서 안전하게 사용하세요.
+2. 워크플로우의 *`permissions:`* 를 *deny-all* 에서 *필요한 권한만* 허용하도록 바꿔 보세요.
+3. *런타임 생성 토큰* 을 `::add-mask::` 로 마스킹하는 단계를 추가해 보세요.
 
 ## 정리 및 다음 단계
 

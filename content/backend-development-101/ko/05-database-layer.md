@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Backend Development 101 시리즈 (5/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: Service에서 SQL을 *직접* 쓰면 안 되는 이유는?
+
+> 데이터베이스가 바뀔 수도 있고, 같은 쿼리가 여러 곳에 흩어져 *유지보수 지옥* 이 되기 때문입니다. Repository가 그 사이를 막아 줍니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- Repository 패턴의 역할
+- ORM을 쓰는 이유와 *함정*
+- 트랜잭션 / commit / rollback의 흐름
+- migration이 무엇이고 왜 필요한지
+- N+1 쿼리 문제와 해결법
+
+## 왜 중요한가
 
 DB는 *가장 자주 바뀌는 것* 이자 *가장 바뀌면 안 되는 것* 입니다. 처음부터 layer를 분리하면 새 DB로 옮기거나, 캐시를 끼워넣거나, 테스트를 인메모리로 돌리는 일이 모두 *한 군데만 고치면 끝* 입니다.
 
@@ -42,6 +57,14 @@ flowchart LR
 ```
 
 Service는 SQL을 모릅니다 — Repository만 압니다.
+
+## 핵심 용어 정리
+
+- **Repository**: DB 접근을 *함수* 처럼 추상화한 객체.
+- **ORM**: 객체와 테이블을 매핑하는 도구.
+- **Migration**: 스키마 변경을 코드로 버전 관리하는 것.
+- **Transaction**: 여러 쿼리를 *한 단위* 로 묶는 범위.
+- **N+1**: 1개 쿼리 + N개의 자식 쿼리 — 가장 흔한 성능 함정.
 
 ## Before/After
 
@@ -161,6 +184,14 @@ orders = session.scalars(stmt).all()
 
 대부분의 백엔드는 *PostgreSQL + ORM + Alembic + Repository* 조합으로 시작합니다. 트래픽이 늘면 Read replica, 캐시(Redis), Elasticsearch가 추가되지만 Service는 그대로입니다 — Repository 안만 바뀝니다. 이 경계가 *시스템 진화* 를 가능하게 합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 모든 쿼리는 *index가 받쳐주는지* 확인한다.
+- migration은 *down* 도 작성한다.
+- Repository는 *도메인 언어* 로 메서드 이름을 짓는다 (`find_active_users`).
+- 트랜잭션 길이는 *짧을수록* 좋다.
+- 운영에서 슬로 쿼리 로그를 *항상* 켠다.
+
 ## 체크리스트
 
 - [ ] Repository에 SQL을 모을 수 있다.
@@ -168,6 +199,12 @@ orders = session.scalars(stmt).all()
 - [ ] Alembic으로 migration을 생성할 수 있다.
 - [ ] N+1을 식별하고 eager load로 고칠 수 있다.
 - [ ] DTO와 ORM 객체를 구분한다.
+
+## 연습 문제
+
+1. `OrderRepository.find_recent(limit=10)` 을 작성하고 인덱스를 검토하세요.
+2. Alembic으로 `users.email` 컬럼을 추가하는 migration을 만드세요.
+3. N+1이 발생하는 쿼리를 일부러 만들고 `selectinload` 로 고친 차이를 측정하세요.
 
 ## 정리 및 다음 단계
 

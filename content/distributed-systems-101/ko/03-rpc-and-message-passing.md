@@ -25,8 +25,23 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (3/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 함수처럼 부르는 RPC와 메시지를 보내는 queue, 두 방식은 같은 일을 하는데 왜 사용처가 갈릴까요?
+
+> RPC는 동기적 함수 호출의 직관, message passing은 비동기적 우편함의 직관을 따릅니다. 이 직관 차이가 latency, coupling, 회복력의 큰 차이를 만듭니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- RPC와 message passing의 정의와 차이
+- 동기 vs 비동기, request/response vs publish/subscribe
+- 각 모델의 장단점과 적합한 use case
+- "함수처럼 보이는" RPC가 숨기는 것들
+- 두 모델을 섞어 쓰는 패턴
+
+## 왜 중요한가
 
 서비스를 쪼개기로 결정하면, 다음 결정은 "어떻게 통신할까?"입니다. 이 결정이 latency 예산, 장애 격리, 운영 복잡도를 좌우합니다. 잘못 고르면 RPC 사슬이 길어져 한 노드가 죽으면 전 시스템이 멈추거나, 메시지가 어디 있는지 추적할 수 없는 시스템이 됩니다.
 
@@ -47,6 +62,14 @@ flowchart LR
 ```
 
 RPC는 양방향 약속, message passing은 중간 저장소를 두는 단방향 흐름입니다.
+
+## 핵심 용어 정리
+
+- **RPC (Remote Procedure Call)**: 원격 함수를 호출하듯 부르는 모델. gRPC, JSON-RPC.
+- **Message passing**: producer가 broker에 메시지를 두면 consumer가 가져가는 모델. Kafka, RabbitMQ.
+- **Synchronous**: 응답을 기다림.
+- **Asynchronous**: 응답을 기다리지 않음.
+- **At-least-once / exactly-once**: 메시지 전달 보장 수준.
 
 ## Before/After
 
@@ -168,6 +191,14 @@ def consume(msg):
 
 사용자 경로(즉시 응답 필요)는 RPC, 긴 작업(메일 발송, 영수증 처리, 분석)은 queue로 보냅니다. Microservices에서는 같은 회사 안에서도 모듈 사이를 RPC로, 도메인 경계 사이는 message로 나누는 패턴이 흔합니다. event sourcing/CQRS는 이 message 모델을 끝까지 밀어붙인 형태입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- "동기 응답이 정말 필요한가?"를 먼저 묻습니다.
+- chain의 깊이를 limit으로 둡니다 (예: 3단 이내).
+- idempotency key를 첫 줄부터 박습니다.
+- broker는 at-least-once라고 가정합니다.
+- DLQ와 retry policy를 운영 책임으로 봅니다.
+
 ## 체크리스트
 
 - [ ] RPC와 message passing의 차이를 한 줄로 설명할 수 있는가?
@@ -175,6 +206,12 @@ def consume(msg):
 - [ ] at-least-once와 exactly-once의 의미를 아는가?
 - [ ] idempotency key를 설계해 본 적 있는가?
 - [ ] DLQ가 무엇이고 언제 쓰는지 답할 수 있는가?
+
+## 연습 문제
+
+1. 우리 서비스에서 RPC를 message로 바꿀 만한 호출 한 가지를 찾아 보세요.
+2. idempotency key를 사용하는 결제 API의 동작을 한 문단으로 설명해 보세요.
+3. broker가 at-least-once일 때 consumer가 안전하게 동작하기 위한 조건 세 가지를 적어 보세요.
 
 ## 정리 및 다음 단계
 

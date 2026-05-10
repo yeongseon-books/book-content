@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (7/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 새벽 3시에 *깨어날 가치가 있는* alert 와 *그렇지 않은* alert 는 무엇이 다릅니까?
+
+> *좋은 alert 는 *조치 가능* 하고 *사용자 영향* 을 반영합니다. 그렇지 않은 alert 는 *피로* 만 남깁니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Alert* 의 3가지 조건
+- *Alert fatigue* 의 비용
+- *Symptom* vs *cause* alert
+- *On-call* 운영 기본
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 Alert 가 너무 많으면 *진짜 신호* 가 *묻힙니다*. On-call 은 *수면을 사고* 정신력을 *지불* 합니다. 설계가 곧 비용입니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     AM --> Page["pager"]
     AM --> Slack["chat"]
 ```
+
+## 핵심 용어 정리
+
+- **Alert rule**: 조건과 *지속 시간*.
+- **Severity**: *page* vs *ticket*.
+- **Routing**: 누가 받을지.
+- **Silence**: 일시 *억제*.
+- **Runbook**: alert 발생 시 *행동 매뉴얼*.
 
 ## Before/After
 
@@ -116,12 +139,26 @@ runbook 에는: 의미, 첫 행동 3가지, 에스컬레이션, 관련 dashboard
 
 대부분의 팀은 *symptom-based alert (SLO 위반)* 을 1순위로, *cause-based alert (CPU 95%)* 를 보조로 둡니다. PagerDuty / Opsgenie / Grafana OnCall 가 흔합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Alert 는 *조치 가능* 하지 않으면 지운다.*
+- *Symptom > cause. SLO 가 표준.*
+- *Page 의 비용은 *수면* 이다.*
+- *On-call 은 *근무*, 보상이 필요하다.*
+- *Runbook 없는 alert 는 *바로 해체*.*
+
 ## 체크리스트
 
 - [ ] 한 alert 에 *runbook 링크* 가 있다.
 - [ ] *severity* 가 *page/ticket* 으로 나뉜다.
 - [ ] `for` 가 설정되어 있다.
 - [ ] On-call *교대표* 가 있다.
+
+## 연습 문제
+
+1. 한 SLO 위반 alert 를 작성해 보세요.
+2. *Symptom* 과 *cause* alert 를 각 한 개씩 정리하세요.
+3. Runbook 한 페이지를 작성해 보세요.
 
 ## 정리 및 다음 단계
 

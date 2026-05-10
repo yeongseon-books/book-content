@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Model Evaluation 101 시리즈 (4/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *“정확한 예측”* 과 *“놓치지 않는 예측”* 중 *무엇이* 더 *중요* 할까요?
+
+> *Precision 은 *오탐* 을 줄이고, Recall 은 *놓침* 을 줄입니다. *문제마다 우선순위* 가 다릅니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Precision* 과 *Recall* 의 *수식* 과 *직관*
+- *혼동 행렬* 읽는 법
+- *임계값* 으로 *둘의 균형* 조정
+- *PR 커브* 와 *AP*
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *스팸 필터* 와 *암 진단* — *같은 모델* 이라도 *우선해야 할 지표* 가 다릅니다.
 
@@ -37,6 +52,14 @@ flowchart LR
     Actual["actual positive"] --> Rec["recall = TP/(TP+FN)"]
     Threshold["threshold"] --> Tradeoff["precision/recall trade-off"]
 ```
+
+## 핵심 용어 정리
+
+- **TP/FP/FN/TN**: *혼동 행렬* 의 4가지 셀.
+- **Precision**: *예측한 양성 중 진짜 양성*.
+- **Recall**: *실제 양성 중 잡아낸 비율*.
+- **Threshold**: *확률을 양성으로 바꾸는 경계*.
+- **Average Precision (AP)**: *PR 커브* 아래 면적.
 
 ## Before/After
 
@@ -108,12 +131,26 @@ print("AP:", average_precision_score(yte, proba))
 
 *사기 탐지* — *Recall* 우선. *광고 추천* — *Precision* 우선. *비용* 이 *임계값* 을 정합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *지표* 는 *비용 함수* 의 *근사*.
+- *임계값* 은 *모델* 보다 *비즈니스* 가 정한다.
+- *PR 커브* 가 *불균형* 평가의 *표준*.
+- *Precision/Recall* 은 *항상 함께* 본다.
+- *클래스별* 로 따로 본다.
+
 ## 체크리스트
 
 - [ ] *Precision* 과 *Recall* 을 *함께* 본다.
 - [ ] *임계값* 을 명시한다.
 - [ ] *PR 커브* 와 *AP* 를 본다.
 - [ ] *비즈니스 비용* 을 검토한다.
+
+## 연습 문제
+
+1. *임계값* 을 *0.1* 부터 *0.9* 까지 *Precision/Recall* 표를 만드세요.
+2. *AP* 가 *높은* 모델 vs *낮은* 모델의 *PR 커브* 를 비교하세요.
+3. *FP 1건* 의 비용이 *FN 10건* 과 같다면 *최적 임계값* 을 구하세요.
 
 ## 정리 및 다음 단계
 

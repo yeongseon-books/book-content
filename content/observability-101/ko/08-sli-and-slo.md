@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (8/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *얼마나 안정적이어야 하는가* 라는 질문에 *숫자* 로 답할 수 있습니까?
+
+> *SLI 는 *측정한 신뢰성*, SLO 는 *약속한 신뢰성*, error budget 은 *허용된 실패의 양* 입니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *SLI* 의 정의 ("좋은 / 전체")
+- *SLO* 가 만드는 *언어*
+- *Error budget* 의 의미
+- *Burn rate* alert
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 "안정적" 은 *주관* 입니다. 99.9% 는 *합의* 입니다. SLO 가 있으면 *기능 vs 안정* 의 갈등이 *데이터로* 풀립니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     SLO --> Budget["Error budget = 1 - SLO"]
     Budget --> Burn["burn rate alert"]
 ```
+
+## 핵심 용어 정리
+
+- **SLI**: *측정 가능한 비율* (예: success rate).
+- **SLO**: *목표 값* (예: 99.9%).
+- **SLA**: *계약*, 위반 시 *벌금*.
+- **Error budget**: 허용된 *실패의 양*.
+- **Burn rate**: 예산 *소진 속도*.
 
 ## Before/After
 
@@ -108,12 +131,26 @@ SLO: 30일 가용성 99.9%
 
 대부분의 회사는 *가용성 + 지연* 두 SLO 로 시작해, *제품 결정* (배포 / 기능 추가) 의 *기준* 으로 사용합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *100% 는 *불가능*. 99.9% 는 *선택*.*
+- *SLI 는 *사용자 시점*.*
+- *Budget 은 *예산*. 다 쓰면 *멈춤*.*
+- *Burn rate 는 *조기경보*.*
+- *SLO 가 없으면 *우선순위* 도 없다.*
+
 ## 체크리스트
 
 - [ ] SLI 한 개를 *정의* 한다.
 - [ ] SLO 한 개를 *합의* 한다.
 - [ ] Error budget 을 *계산* 한다.
 - [ ] Burn rate alert 한 개.
+
+## 연습 문제
+
+1. 한 서비스의 *Availability SLI* 를 PromQL 로.
+2. SLO 99.9% 의 *월간 budget* (분).
+3. Burn rate 빠른/느린 alert 두 개를 작성.
 
 ## 정리 및 다음 단계
 

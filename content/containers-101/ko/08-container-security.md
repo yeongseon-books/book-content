@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (8/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *컨테이너* 가 *격리* 되어 있다고 해서 *안전* 한 것일까요?
+
+> *컨테이너 보안* 은 *최소 권한*, *이미지 신뢰*, *런타임 정책* 의 *세 축* 으로 만듭니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *non-root* 의 의미
+- *capabilities* 와 *seccomp*
+- *이미지 스캔*
+- *시크릿* 처리
+- *서명 이미지* 강제
+
+## 왜 중요한가
 
 *기본 설정* 의 컨테이너는 *root* 로 동작하고 *과도한 권한* 을 갖기 쉽습니다. *보안 사고* 의 *시작점* 이 됩니다.
 
@@ -39,6 +54,14 @@ flowchart LR
     Run --> Caps["drop caps"]
     Caps --> Secrets["mount secrets"]
 ```
+
+## 핵심 용어 정리
+
+- **non-root**: *USER 1000* 처럼 *일반 사용자* 로 실행.
+- **capability**: *root 권한* 을 *조각* 낸 단위.
+- **seccomp**: *syscall 화이트리스트*.
+- **image scanning**: *CVE 검사*.
+- **secret**: *환경변수* 가 아닌 *전용 저장소*.
 
 ## Before/After
 
@@ -119,12 +142,26 @@ def run_with_secret(image, secret_path):
 
 *Kubernetes PodSecurity* 와 *admission controller* 가 *non-root, no privileged, signed only* 정책을 *런타임* 에서 강제합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *기본값* 은 *위험* 이다.
+- *capability* 는 *명시 추가* 만.
+- *시크릿* 은 *전용 시스템* 으로.
+- *스캔* 은 *CI 게이트* 에 포함.
+- *서명* 은 *공급망 신뢰* 의 시작.
+
 ## 체크리스트
 
 - [ ] *non-root* 사용자.
 - [ ] *cap-drop=ALL* 후 최소 추가.
 - [ ] *read-only* 파일시스템.
 - [ ] *시크릿* 은 볼륨/시크릿 매니저.
+
+## 연습 문제
+
+1. *capability* 가 *왜* 필요한지 한 줄로.
+2. *seccomp* 의 *역할* 한 줄로.
+3. *signed image* 가 *막아 주는 공격* 한 가지.
 
 ## 정리 및 다음 단계
 

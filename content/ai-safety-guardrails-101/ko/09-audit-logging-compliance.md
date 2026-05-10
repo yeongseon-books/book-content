@@ -23,6 +23,15 @@ seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 
 > AI Safety & Guardrails 101 시리즈 (9/10)
 
 ---
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+감사 로깅과 컴플라이언스를 어떻게 구축해야 사고 시 추적과 보고가 가능할까요?
+
+이 글은 그 질문에 답하기 위해 감사 로깅과 컴플라이언스의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## Section 1
 
 ## Audit log이 application log와 다른 이유
@@ -222,6 +231,14 @@ def monthly_report(year: int, month: int) -> dict:
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **입력·출력·결정을 모두 기록** — 사고 추적의 단일 출처가 됩니다.
+- **PII 마스킹은 로그에도 적용** — 로그가 새로운 PII 유출 채널이 될 수 있습니다.
+- **보존 기간을 의식적으로** — 법적 요구와 비용 사이의 균형입니다.
+- **불변 저장이 신뢰의 기반** — 사고 후 변조 가능성을 차단합니다.
+- **주기적 보고 리듬을 표준화** — 분기·연간 보고서가 컴플라이언스의 핵심입니다.
+
 ## AI Safety & Guardrails 101 시리즈
 
 - [Ep1 AI 안전이 왜 중요한가](./01-why-ai-safety-matters.md)

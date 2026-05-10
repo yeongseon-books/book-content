@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (1/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *push* 한 번으로 *테스트, 린트, 배포* 가 자동으로 도는 *기반* 을 어디서 시작합니까?
+
+> 자동화는 *손이 아니라 코드* 로 합니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *GitHub Actions* 의 정의와 위치
+- *Workflow / Job / Step* 의 관계
+- 첫 워크플로우 작성 과정
+- *왜 GitHub Actions 인가* (vs. Jenkins/CircleCI)
+- 흔한 오해 5가지
+
+## 왜 중요한가
 
 CI/CD 는 *팀의 속도와 품질* 을 결정합니다. *GitHub Actions* 는 *코드 옆* 에서 도는 *기본 자동화 엔진* 으로, 별도의 *서버를 운영* 하지 않고 시작할 수 있습니다.
 
@@ -40,6 +55,15 @@ flowchart LR
     Workflow --> Job["job: test"]
     Job --> Step["step: pytest"]
 ```
+
+## 핵심 용어 정리
+
+- **Workflow**: 자동화 *전체 단위*, `.github/workflows/*.yml` 한 파일.
+- **Event**: 워크플로우를 *시작시키는* 사건 (push, PR 등).
+- **Job**: 워크플로우 안의 *실행 단위*, 기본은 *병렬*.
+- **Step**: Job 안의 *명령 한 줄* 또는 *Action 호출*.
+- **Runner**: Job을 *실행하는 머신* (ubuntu-latest 등).
+- **Action**: 재사용 가능한 *Step 단위* (예: `actions/checkout`).
 
 ## Before/After
 
@@ -118,12 +142,26 @@ test 가 실패하면 머지가 막힙니다.
 
 성숙한 팀은 *test / lint / typecheck / build / deploy* 를 *각자의 워크플로우* 로 나누고, *재사용 가능한 workflow(reusable workflow)* 로 *조직 전체* 가 동일한 표준을 공유합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *CI 가 없으면 기능 추가도 없다*.
+- *YAML 도 코드*. 리뷰합니다.
+- *실행 시간* 은 *비용 + 피드백 속도*.
+- *secret* 은 *코드와 절대 섞지 않습니다*.
+- *워크플로우* 도 *작게 분해* 합니다.
+
 ## 체크리스트
 
 - [ ] `.github/workflows/` 디렉터리가 있다.
 - [ ] *push 와 PR* 양쪽에서 트리거된다.
 - [ ] *PR 체크* 에 결과가 표시된다.
 - [ ] *secret* 은 `secrets.*` 만 사용한다.
+
+## 연습 문제
+
+1. *Hello World* 만 출력하는 워크플로우를 만들어 보세요.
+2. *ubuntu / macOS* 두 OS에서 도는 *matrix* 를 추가하세요.
+3. *PR 체크* 에서 실패하도록 *고의로* 깨뜨리고 결과를 보세요.
 
 ## 정리 및 다음 단계
 

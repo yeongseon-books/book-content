@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (10/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 지금까지 배운 모든 것을 *프로덕션* 한 줄로 묶으려면 *무엇이 더* 필요합니까?
+
+> *프로덕션 컨테이너는 *image, 보안, 로깅, registry, tagging* 의 *다섯 가지* 가 동시에 정렬되어야 합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Image tag 정책* (semver + sha)
+- *Registry* 와 *signed image*
+- *runtime 보안* (read-only, capabilities)
+- *로깅 / 메트릭* 의 표준
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 지금까지의 모든 결정이 *프로덕션에서 한꺼번에 검증* 됩니다. 한 군데 약하면 *전체가 약합니다*.
 
@@ -40,6 +55,14 @@ flowchart LR
     Run --> Logs["json logs to stdout"]
     Run --> Metrics["prometheus metrics"]
 ```
+
+## 핵심 용어 정리
+
+- **Tag policy**: `semver` + `git sha` 이중 tagging.
+- **Cosign**: image *서명* 도구.
+- **Read-only rootfs**: 컨테이너 *FS 잠금*.
+- **Capabilities**: 리눅스 *권한 세분화*.
+- **Logging driver**: stdout 의 *수집/전달* 방식.
 
 ## Before/After
 
@@ -123,6 +146,14 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 대부분의 프로덕션은 *Kubernetes* 위에서 동작하지만, 위 5가지는 *그대로 K8s manifest* 의 옵션으로 옮겨집니다. *Docker 101* 의 학습이 *바로 K8s 자산* 이 됩니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *프로덕션은 *기본값을 거꾸로 뒤집는다*: deny-by-default*.
+- *image tag 는 *불변*, deploy 는 *디지스트 핀*.
+- *log 는 stdout, metric 은 endpoint, trace 는 OTel*.
+- *서명 없는 image 는 *모르는 사람의 코드*.
+- *복구 시간 (MTTR) 이 모든 결정의 기준*.
+
 ## 체크리스트
 
 - [ ] *semver + sha* 이중 tag.
@@ -130,6 +161,12 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 - [ ] *read-only / cap-drop / non-root*.
 - [ ] *log* 와 *metric* 표준 채널.
 - [ ] healthcheck + restart 정책.
+
+## 연습 문제
+
+1. 자신의 image 를 *semver + sha* 로 두 번 push 해 보세요.
+2. *cosign* 으로 서명/검증을 수행해 보세요.
+3. *read-only + cap-drop* 으로 컨테이너를 띄워 정상 동작을 확인하세요.
 
 ## 정리 및 다음 단계
 

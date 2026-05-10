@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (4/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: `x + "hello"`가 syntax는 맞는데 컴파일러가 거부하는 이유는 무엇입니까?
+
+> Semantic analysis는 syntax는 통과한 AST에 대해 "이게 의미상 말이 되는가?"를 묻는 단계입니다. 이름 해석, 타입 검사, 그리고 declare 전 사용 같은 의미적 오류를 잡습니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- 구문(syntactic) 정확성과 의미(semantic) 정확성의 차이
+- Name resolution: 이 이름이 어디를 가리키는가?
+- Type checking: 두 값이 같은 타입인가?
+- AST를 한 번 순회하면서 의미 정보를 붙이는 패턴
+- 의미 단계의 좋은 오류 메시지 형태
+
+## 왜 중요한가
 
 Parser는 "괄호가 맞나?"까지밖에 못 봅니다. `x = y + 1`의 `y`가 선언된 적이 없거나, `y`가 문자열인데 `1`을 더하려는 상황은 의미 단계에서 잡힙니다. 이 단계가 약하면 컴파일이 통과한 코드가 런타임에 죽습니다.
 
@@ -42,6 +57,14 @@ flowchart LR
 ```
 
 원래의 AST에 "이 이름은 여기 선언, 이 식의 타입은 int" 같은 메타데이터가 붙은 형태가 결과입니다.
+
+## 핵심 용어 정리
+
+- **Name resolution**: identifier가 어느 declaration을 가리키는지 결정.
+- **Type checking**: 표현식의 타입이 문맥에서 허용되는지 확인.
+- **Type inference**: 명시되지 않은 타입을 추론.
+- **Annotated AST**: 의미 정보가 붙은 AST.
+- **Coercion**: 다른 타입을 묵시적으로 맞춰 주는 변환 (`int → float`).
 
 ## Before/After
 
@@ -175,6 +198,14 @@ report({"line": 12, "text": 'x + "hello"'}, "int", "str")
 
 언어 서버(LSP)의 핵심이 여기 있습니다. "go to definition"은 name resolution, "type hint"는 type inference, "rename symbol"은 symbol table 갱신입니다. 컴파일러의 의미 단계가 곧 IDE의 핵심 기능입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 의미 오류의 메시지는 사용자가 가장 많이 읽는 문장임을 압니다.
+- 단일 환경(single source of truth)을 강하게 지킵니다.
+- 의미 정보는 AST에 붙이지, 옆에서 동행시키지 않습니다.
+- 오류 복구를 처음부터 설계합니다 (한 번에 여러 오류 보고).
+- 타입 시스템은 lattice 구조로 추상화해 두면 확장에 강합니다.
+
 ## 체크리스트
 
 - [ ] syntactic vs semantic의 차이를 한 줄로 설명할 수 있는가?
@@ -182,6 +213,12 @@ report({"line": 12, "text": 'x + "hello"'}, "int", "str")
 - [ ] AST에 타입을 붙이는 패턴을 한 번이라도 짠 적 있는가?
 - [ ] 의미 오류 메시지의 표준 형태를 정의해 본 적 있는가?
 - [ ] LSP의 기능이 의미 단계와 어떻게 연결되는지 답할 수 있는가?
+
+## 연습 문제
+
+1. 위 환경에 nested scope (함수 진입/탈출)를 추가해 보세요.
+2. `int + float`를 자동으로 `float`로 만드는 coercion을 추가해 보세요.
+3. 한 파일에서 의미 오류를 모두 모아 마지막에 한 번에 출력하는 구조를 설계해 보세요.
 
 ## 정리 및 다음 단계
 

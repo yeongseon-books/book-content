@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (4/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 컨테이너가 *재시작* 되어도 *데이터가 살아남고*, *서로 통신* 하게 하려면 무엇을 써야 합니까?
+
+> *Volume 은 데이터의 *수명* 을, network 는 컨테이너 간 *경로* 를 결정합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Volume / Bind mount / tmpfs* 의 차이
+- *Bridge / Host / None* 네트워크 모드
+- 컨테이너 *이름으로 통신*
+- *데이터 백업* 패턴
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *데이터 손실* 과 *통신 실패* 는 컨테이너 운영의 *가장 흔한 사고* 입니다. *volume / network 모델* 을 알면 사고가 *예방* 됩니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     C1 --- Net["bridge network"]
     C2 --- Net
 ```
+
+## 핵심 용어 정리
+
+- **Volume**: Docker 가 관리하는 *영속 저장소*.
+- **Bind mount**: *호스트 경로* 를 직접 마운트.
+- **tmpfs**: 메모리 기반 *휘발성* 저장소.
+- **Bridge network**: 같은 호스트 내 *기본 가상 네트워크*.
+- **Service discovery**: container 이름으로 *DNS 해석*.
 
 ## Before/After
 
@@ -106,12 +129,26 @@ docker run --rm \
 
 오케스트레이터 (Kubernetes 등) 에서는 *PersistentVolume* 과 *Service DNS* 가 같은 개념을 확장합니다. Docker 에서 익히면 *이전이 자연스럽다*.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *상태는 volume*, *통신은 network*.
+- *user-defined bridge* 는 *기본*.
+- *백업 없는 volume 은 사고 직전*.
+- *bind mount* 는 *개발용*, 운영은 *named volume*.
+- *포트 노출은 *최소* 로*.
+
 ## 체크리스트
 
 - [ ] *named volume* 으로 데이터를 영속화한다.
 - [ ] *user-defined bridge* 를 사용한다.
 - [ ] container 가 *이름* 으로 통신한다.
 - [ ] *백업 절차* 가 있다.
+
+## 연습 문제
+
+1. *named volume* 을 만들어 PostgreSQL 데이터를 영속화하세요.
+2. *user-defined bridge* 위에서 두 컨테이너를 *이름* 으로 통신시키세요.
+3. volume 의 내용을 *tar 로 백업* 해 보세요.
 
 ## 정리 및 다음 단계
 

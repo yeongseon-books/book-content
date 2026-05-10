@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Pandas 101 시리즈 (2/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *Series* 와 *DataFrame* 은 *서로 다른 것* 일까요, *같은 가족* 일까요?
+
+> *DataFrame은 *Series의 모음* 입니다. 둘은 *같은 라벨 시스템* 을 공유합니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Series* 의 *내부 구조*
+- *DataFrame* 의 *열 단위 사고*
+- *Index* 의 역할
+- 5단계 직접 만들어보기
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 Pandas의 *모든 동작* 은 결국 *Series 단위로 환원* 됩니다. *DataFrame* 의 한 열은 *Series* 입니다. 이 모델을 이해하면 *나머지가 쉬워집니다*.
 
@@ -38,6 +53,14 @@ flowchart LR
     Series3["Series C"] --> DF
     DF --> Index["shared Index"]
 ```
+
+## 핵심 용어 정리
+
+- **Series**: *값 + 인덱스* — *NumPy 배열* 위에 *라벨* 을 얹은 것.
+- **DataFrame**: *공통 인덱스* 를 가진 *Series들의 dict*.
+- **values**: 내부의 *NumPy 배열*.
+- **index**: 행 라벨.
+- **columns**: 열 라벨.
 
 ## Before/After
 
@@ -105,12 +128,26 @@ print(s1 + s2)
 
 A/B 테스트 결과 비교, 시계열 합산, *서로 다른 소스의 데이터* 를 *index 키* 로 자동 정렬 — *Pandas의 마법* 의 정체가 *index 정렬* 입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *index 의미* 를 *항상 의식* 한다.
+- *열 추출* 은 *Series 사고* 로 본다.
+- *정렬 실패의 NaN* 을 *디버깅 단서* 로 본다.
+- *df.values* 의존을 줄인다.
+- *name* 으로 시리즈를 식별한다.
+
 ## 체크리스트
 
 - [ ] *Series* 와 *DataFrame* 을 구분한다.
 - [ ] *index* 와 *columns* 를 안다.
 - [ ] *df["col"]* 의 타입이 *Series* 임을 안다.
 - [ ] *index 정렬* 이 *자동* 임을 안다.
+
+## 연습 문제
+
+1. *3개의 Series* 를 만들어 *DataFrame* 으로 묶고 *공통 인덱스* 를 확인하세요.
+2. *서로 다른 인덱스* 를 가진 두 Series를 *덧셈* 하여 *NaN 위치* 를 확인하세요.
+3. *df["x"]* 와 *df[["x"]]* 의 *타입 차이* 를 코드로 보이세요.
 
 ## 정리 및 다음 단계
 

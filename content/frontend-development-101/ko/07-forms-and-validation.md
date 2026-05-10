@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Frontend Development 101 시리즈 (7/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 사용자가 *잘못된 값* 을 입력했을 때 어떻게 *친절하게* 알려줄까요?
+
+> 좋은 폼은 *입력하는 동안* 도와주고, *제출 후에야* 야단치지 않습니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- controlled vs uncontrolled input
+- 유효성 검사의 *3단계* (형식, 비즈니스 규칙, 서버)
+- 에러 메시지의 *위치와 시점*
+- 접근성과 키보드 사용성
+- 폼 라이브러리 (React Hook Form, Zod)의 *역할*
+
+## 왜 중요한가
 
 폼은 *전환율* 의 핵심입니다. 가입, 결제, 검색이 모두 폼입니다. 폼이 *조금만 어색해도* 사용자는 떠납니다. 폼은 *프론트엔드 UX의 시험대* 입니다.
 
@@ -41,6 +56,14 @@ flowchart LR
     Submit --> Server["Server validation"]
     Server -->|error| Input
 ```
+
+## 핵심 용어 정리
+
+- **Controlled input**: 값이 *React state로* 관리되는 input.
+- **Uncontrolled input**: 값이 *DOM에* 직접 저장되는 input.
+- **Schema validation**: Zod/Yup 같은 *선언적* 유효성 검사.
+- **Inline error**: 입력 필드 *바로 옆* 에 표시되는 에러.
+- **`aria-invalid`**: 스크린리더에게 *해당 필드가 잘못됨* 을 알리는 속성.
 
 ## Before/After
 
@@ -126,6 +149,14 @@ if (!result.success) showErrors(result.error.format());
 
 대부분의 React 앱은 *React Hook Form + Zod* 조합을 사용합니다. 폼 상태 관리, 유효성 검사, 제출, 에러 표시를 *선언적으로* 묶을 수 있습니다. 직접 useState로 폼을 관리하는 코드는 *학습 단계 이후* 거의 사라집니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 폼은 *대화* 다 — 사용자가 한 단계 갈 때마다 *피드백* 한다.
+- 검증은 *프론트와 백엔드 모두* 에서 — 프론트는 UX, 백엔드는 보안.
+- 에러는 *친절하고 행동 가능* 해야 한다.
+- 키보드만으로 *전체 폼이 작동* 해야 한다.
+- 자동완성과 모바일 키보드 type은 *기본 옵션* 이다.
+
 ## 체크리스트
 
 - [ ] controlled input을 쓸 수 있다.
@@ -133,6 +164,12 @@ if (!result.success) showErrors(result.error.format());
 - [ ] `<label>` 과 `for` 를 모든 input에 단다.
 - [ ] `aria-invalid` 와 `aria-describedby` 를 안다.
 - [ ] Zod/Yup 같은 스키마 검증을 한 번 써봤다.
+
+## 연습 문제
+
+1. 이메일/비밀번호/비밀번호 확인이 있는 가입 폼을 만드세요.
+2. 모든 필드에 inline 검증과 친절한 에러 메시지를 붙이세요.
+3. 키보드만으로 폼을 완성하고 제출할 수 있는지 확인하세요.
 
 ## 정리 및 다음 단계
 

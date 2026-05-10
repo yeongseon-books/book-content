@@ -25,8 +25,23 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (2/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: `print("hello")`라는 한 줄에서 컴파일러는 정확히 몇 개의 "단어"를 봅니까?
+
+> Lexical analysis(또는 lexing)는 원시 문자열을 **토큰**이라는 의미 있는 조각으로 자르는 단계입니다. 이 단계가 잘 정의돼 있으면, 그 위의 모든 단계(parser, semantic analyzer)는 텍스트가 아니라 깔끔한 단위와 일합니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- 토큰의 정의와 lexer가 푸는 문제
+- 정규식 기반 lexer와 longest-match 규칙
+- 키워드와 identifier를 구분하는 표준 트릭
+- 위치 정보(line, column)를 유지하는 방법
+- Python 내장 `tokenize` 모듈로 실제 lexer를 살펴보기
+
+## 왜 중요한가
 
 `SyntaxError: unexpected token`이 어디서 오는지를 답할 수 있는 사람과 못하는 사람의 차이는 lexical analysis를 봤느냐 안 봤느냐입니다. 좋은 lexer는 좋은 오류 메시지의 출발점입니다.
 
@@ -44,6 +59,14 @@ flowchart LR
 ```
 
 핵심은 "가장 긴 매칭을 고른다"와 "위치를 끝까지 들고 다닌다" 두 가지입니다.
+
+## 핵심 용어 정리
+
+- **Token**: lexer가 만든 의미 단위. `(kind, text, position)`의 조합.
+- **Lexeme**: 토큰의 텍스트 부분.
+- **Longest match**: 같은 위치에서 여러 패턴이 매칭되면, 가장 긴 것을 고른다.
+- **Keyword vs identifier**: `if`는 키워드, `iff`는 identifier. 같은 패턴에서 시작하므로 후처리로 분리.
+- **Whitespace / comment**: lexer가 인식하되, 토큰 스트림에서는 보통 제거.
 
 ## Before/After
 
@@ -206,6 +229,14 @@ CPython의 lexer가 직접 보입니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COM
 
 대부분의 언어 도구는 정규식 기반 lexer 또는 그 변형(DFA)을 씁니다. PEG/parser combinator는 lexer와 parser를 합치기도 합니다 (scannerless parsing). LSP(language server)도 lexer를 가장 먼저 호출하고, syntax highlighting은 사실상 lexer 결과의 시각화입니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 새 언어를 만나면 토큰 종류 표를 먼저 그립니다.
+- 정규식 SPEC의 순서가 기능 명세의 일부입니다.
+- 위치 정보는 도구 품질의 핵심임을 압니다.
+- 사내 DSL을 짤 때 처음부터 직접 짜기보다 `re` + 테이블로 충분한지 먼저 확인합니다.
+- 에러 복구를 lexer에서부터 설계합니다.
+
 ## 체크리스트
 
 - [ ] 토큰을 한 줄로 정의할 수 있는가?
@@ -213,6 +244,12 @@ CPython의 lexer가 직접 보입니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COM
 - [ ] 키워드와 identifier를 분리하는 표준 패턴을 아는가?
 - [ ] lexer가 위치 정보를 들고 다녀야 하는 이유를 답할 수 있는가?
 - [ ] Python `tokenize` 모듈로 한 번이라도 출력을 본 적이 있는가?
+
+## 연습 문제
+
+1. 위 1단계의 lexer에 `<=`와 `>=`를 longest-match로 추가하고, 잘못된 순서일 때 어떻게 깨지는지 실험해 보세요.
+2. 같은 lexer가 한 번의 호출에서 여러 syntax error를 보고하도록 에러 복구를 추가해 보세요(가장 단순한 전략은 "한 글자 건너뛰고 계속").
+3. `tokenize` 모듈 출력을 받아 키워드 빈도를 세는 작은 도구를 만들어 보세요 (`if/while/return` 비율).
 
 ## 정리 및 다음 단계
 

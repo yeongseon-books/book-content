@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Cloud Computing 101 시리즈 (10/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 시리즈 전체를 *하나의 시스템* 으로 *어떻게 묶어야* 잘 만든 *클라우드 아키텍처* 가 될까요?
+
+> *Well-Architected 의 *5대 기둥* (운영, 보안, 신뢰성, 성능, 비용) 을 *기준* 으로 삼고, *다층 구조* 로 *느슨하게 결합* 하면 됩니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Well-Architected 5대 기둥*
+- *다층 웹 아키텍처* 패턴
+- *Stateless* 와 *Stateful* 분리
+- *IaC* 의 가치
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *동일한 기능* 도 *아키텍처* 에 따라 *비용*, *가용성*, *유지보수* 가 *10배* 차이가 납니다. *시리즈 마무리* 에서 *전체 그림* 을 잡습니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     App --> DB["rds (multi-az)"]
     App --> S3["s3"]
 ```
+
+## 핵심 용어 정리
+
+- **Well-Architected**: AWS *모범 설계* 프레임워크.
+- **Stateless**: *서버* 가 *상태 보관* 안 함.
+- **IaC**: *인프라를 코드* 로 관리 (Terraform, CloudFormation).
+- **Loose coupling**: *큐* 등으로 *분리*.
+- **Idempotent**: *같은 요청* 을 *반복해도 안전*.
 
 ## Before/After
 
@@ -100,12 +123,26 @@ def alb(): return {"listeners": [{"port": 443, "tls": True}], "target": "asg"}
 
 *CloudFront* + *ALB* + *ASG* + *RDS Multi-AZ* + *Redis* + *S3*, *Terraform* 으로 *환경* 별 *동일 구성*, *온콜* 은 *대시보드* 와 *Runbook* 으로 운영.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Well-Architected* 는 *체크리스트* 가 아니라 *대화 도구*.
+- *변경 안전성* 이 *최고 가치*.
+- *복원 훈련* 이 *백업* 보다 중요.
+- *작게 시작*, *모듈화* 로 성장.
+- *문서* 와 *Runbook* 은 *코드* 의 일부.
+
 ## 체크리스트
 
 - [ ] *Multi-AZ* 적용.
 - [ ] *IaC* 로 환경 재현.
 - [ ] *복원* 훈련 정기 실시.
 - [ ] *5대 기둥* 점검 분기 1회.
+
+## 연습 문제
+
+1. *Well-Architected 5대 기둥* 을 모두 적으세요.
+2. *Stateless* 를 만드는 *대표 기법* 한 가지를 들어 보세요.
+3. *IaC* 가 *수동 변경* 보다 *안전한 이유* 를 한 줄로.
 
 ## 정리 및 다음 단계
 

@@ -25,8 +25,23 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (10/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 지금까지 배운 lexer, parser, evaluator를 한 화면에 모으면 어떤 모양일까요?
+
+> 이 글에서는 산술식 인터프리터를 한 파일로 만듭니다. 입력을 받아 token으로 자르고, AST로 묶고, 값으로 줄이고, REPL로 묶어 사용자가 직접 실행해 봅니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- lexer + parser + evaluator를 한 파일에 모으는 법
+- recursive descent parser의 최소 구현
+- AST 위에서 동작하는 interpreter의 흐름
+- REPL이 한 번의 실행 사이클을 어떻게 돌리는가
+- 다음에 직접 확장해 볼 만한 지점
+
+## 왜 중요한가
 
 분리해서 배운 단계는 합쳐 봐야 진짜로 이해됩니다. 이 글의 코드 한 파일이면 "내가 컴파일러의 어느 단계까지 다뤘는가"를 한눈에 점검할 수 있습니다. 변수, 함수, 타입을 더 얹어 가는 출발점이기도 합니다.
 
@@ -46,6 +61,14 @@ flowchart LR
 ```
 
 각 화살표는 명확한 자료형을 주고받습니다. 이 자료형의 단순함이 이 미니 인터프리터의 핵심입니다.
+
+## 핵심 용어 정리
+
+- **Token**: lexer가 만든 최소 단위 (`NUM`, `+`, `(` 등).
+- **AST node**: parser가 만든 트리 노드 (`Num`, `BinOp`).
+- **Recursive descent**: 함수 하나가 문법 한 규칙을 처리하는 parser 구현 방식.
+- **Evaluator**: AST를 walk하며 값으로 줄이는 단계.
+- **REPL**: read-eval-print loop, 한 줄 입력에 한 줄 결과를 돌려주는 사이클.
 
 ## Before/After
 
@@ -212,6 +235,14 @@ error: expected NUM, got EOF
 
 작은 DSL(검색 쿼리, 필터 표현식, 설정 표현식)은 이 구조에서 거의 그대로 출발합니다. 데이터 도구의 expression evaluator, SQL의 WHERE 절 평가기, 게임 엔진의 룰 평가기 모두 동일한 layout입니다. 변수와 함수를 더하면 곧장 학습용 toy language가 됩니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 단계마다 자료형을 적어 두고 시작합니다.
+- 우선순위는 grammar에 박아 둡니다, evaluator에 넣지 않습니다.
+- error reporting은 처음부터 위치를 가지고 갑니다.
+- AST는 가능한 한 단순한 자료구조에서 시작합니다.
+- 변수, 함수 같은 확장은 다음 iteration의 일로 미룹니다.
+
 ## 체크리스트
 
 - [ ] lexer/parser/evaluator의 입출력 자료형을 말할 수 있는가?
@@ -219,6 +250,12 @@ error: expected NUM, got EOF
 - [ ] EOF token이 왜 필요한지 답할 수 있는가?
 - [ ] REPL의 사이클을 한 문장으로 정리할 수 있는가?
 - [ ] 다음 확장으로 무엇을 더할지 한 가지 정했는가?
+
+## 연습 문제
+
+1. 단항 마이너스(`-3`, `-(1+2)`)를 처리하도록 parser와 evaluator를 확장해 보세요.
+2. 변수 할당 `x = 1 + 2`를 받아 다음 줄에서 `x * 3`이 평가되도록 환경(dict)을 추가해 보세요.
+3. error 메시지에 token 위치(인덱스 또는 column)를 붙여 보세요.
 
 ## 정리 및 다음 단계
 

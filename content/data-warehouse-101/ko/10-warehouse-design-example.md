@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Data Warehouse 101 시리즈 (10/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *지금까지 배운* 것을 *모아* *하나의 warehouse* 를 *어떻게 설계* 할까요?
+
+> *설계는 *grain 한 줄* 에서 시작한다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *전자상거래* 예제로 *처음부터 끝까지* 설계
+- *grain → dimension → schema → partition → ETL → mart* 순서
+- *대시보드* 까지 *연결* 하는 흐름
+- 5단계 설계 실습
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 부분만 배우면 *조합* 이 어렵습니다. *하나의 도메인* 으로 *전 과정* 을 보면 *각 조각이 왜 그 자리에 있는지* 가 분명해집니다. *마지막 글* 은 *조립* 의 글입니다.
 
@@ -43,6 +58,14 @@ flowchart LR
     Dim --> Mart
     Mart --> BI["Dashboard"]
 ```
+
+## 핵심 용어 정리
+
+- **Grain**: fact 한 행이 *나타내는 단위*. 설계의 *출발점*.
+- **Conformed Dimension**: 여러 fact 가 *공유* 하는 dimension.
+- **Surrogate Key**: warehouse 가 *발급* 하는 *대체 키*.
+- **Slowly Changing Dimension (SCD)**: dimension 의 *변화* 를 *기록* 하는 방식.
+- **Mart**: 특정 팀/주제 전용으로 *제공* 되는 *최종 모델*.
 
 ## Before/After
 
@@ -126,12 +149,26 @@ GROUP BY d.year, d.month, p.category;
 
 데이터팀은 *한 페이지짜리 design doc* 으로 *grain, dimension, partition, owner* 를 적습니다. *리뷰* 후 PR 로 *DDL* 을 올리고, *ETL DAG* 를 추가합니다. *대시보드* 는 *mart 만* 봅니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Grain* 을 *제일 먼저* 정한다.
+- *Conformed dimension* 을 *팀 전체* 에서 *공유* 한다.
+- *Mart* 와 *fact/dim* 의 *경계* 를 분명히 둔다.
+- *Owner* 가 *없는 테이블* 은 만들지 않는다.
+- *문서* 가 *없는 설계* 는 *없는 설계* 와 같다.
+
 ## 체크리스트
 
 - [ ] Grain 을 *한 줄* 로 적을 수 있다.
 - [ ] *Conformed dimension* 의 의미를 안다.
 - [ ] *Star schema* DDL 을 작성할 수 있다.
 - [ ] *Mart* 와 *fact* 의 차이를 설명할 수 있다.
+
+## 연습 문제
+
+1. *블로그 댓글 시스템* 의 grain 과 dimension 을 적어 보세요.
+2. *광고 클릭 로그* 를 *fact_clicks* 로 설계해 보세요.
+3. *월간 매출 대시보드* 용 *mart 뷰* 한 개를 SQL 로 작성해 보세요.
 
 ## 정리 및 다음 단계
 

@@ -26,6 +26,15 @@ seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, 
 
 ---
 
+<!-- a-grade-intro:begin -->
+## 핵심 질문
+
+이미지를 포함한 문서를 RAG에서 어떻게 검색·답변에 활용하나요?
+
+이 글은 그 질문에 답하기 위해 multimodal RAG 설계의 핵심 결정과 운영 함정을 살펴봅니다.
+
+<!-- a-grade-intro:end -->
+
 ## 텍스트 RAG로는 풀리지 않는 질문
 
 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query embedding으로 nearest를 찾습니다. 그런데 사용자가 "이런 모양의 차트가 들어있는 슬라이드 찾아줘" 또는 "스크린샷에서 빨간 버튼 위치 알려줘" 같은 질문을 던지면 텍스트 chunk로는 답할 수 없습니다.
@@ -226,6 +235,14 @@ multimodal RAG는 텍스트 query뿐 아니라 image-by-image 검색, image+text
 ---
 
 <!-- toc:begin -->
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **이미지 색인 전략** — 원본 임베딩 vs 캡션 임베딩 vs 둘 다인지 검색 의도에 맞춰 결정합니다.
+- **청크 단위** — 페이지/블록/이미지 묶음 단위를 답변 정밀도와 함께 정합니다.
+- **랭킹 신호** — 텍스트와 이미지 점수를 가중 합산하는 단순 룰부터 시작합니다.
+- **증거 표시** — 이미지 출처와 좌표를 답변에 함께 노출해 신뢰를 만듭니다.
+- **평가 데이터** — 이미지가 결정적인 질의 셋을 따로 만들어 회귀 테스트로 묶습니다.
+
 ## Multimodal AI 101 시리즈
 
 - [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)

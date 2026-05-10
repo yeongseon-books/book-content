@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *설정* 과 *비밀번호* 를 *이미지* 에 *박지 않고* 어떻게 *주입* 할까요?
+
+> *ConfigMap* 은 *비기밀 설정*, *Secret* 은 *비밀 값* 을 *Pod* 에 안전하게 전달합니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *ConfigMap* 과 *Secret* 의 분리
+- *환경변수* vs *파일 마운트*
+- *Secret* 의 *base64* 와 *암호화 한계*
+- *외부 시크릿 매니저* 연동
+- *변경 시 재시작*
+
+## 왜 중요한가
 
 *환경별 차이* 를 *이미지 외부* 로 빼야 *재현 가능* 합니다. *비밀* 은 *별도 추적* 이 필수입니다.
 
@@ -38,6 +53,14 @@ flowchart LR
     Pod --> Env["env"]
     Pod --> File["mounted file"]
 ```
+
+## 핵심 용어 정리
+
+- **ConfigMap**: *비기밀 키-값* 묶음.
+- **Secret**: *비밀 키-값* 묶음 (base64).
+- **envFrom**: 키들을 *환경변수* 로 일괄 주입.
+- **volume mount**: *파일* 로 마운트.
+- **External Secrets**: *외부 매니저* 와 동기화.
 
 ## Before/After
 
@@ -130,12 +153,26 @@ def restart(dep):
 
 *External Secrets Operator* 가 *Vault / AWS Secrets Manager* 를 *진실 원천* 으로 두고, *클러스터 Secret* 을 *동기화* 합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *Secret* 은 *base64*, *암호화 아님*.
+- *외부 매니저* 가 *진실 원천*.
+- *RBAC* 가 *최후의 방어*.
+- *변경 = 재시작*.
+- *환경별 ConfigMap* 으로 *재현성* 확보.
+
 ## 체크리스트
 
 - [ ] *Secret* 평문 *Git 금지*.
 - [ ] *RBAC* 적용.
 - [ ] *변경* 후 *rollout restart*.
 - [ ] *외부 매니저* 우선 검토.
+
+## 연습 문제
+
+1. *ConfigMap* 과 *Secret* 의 *차이* 한 줄로.
+2. *Secret = 암호화 아님* 의 *의미* 한 줄로.
+3. *External Secrets* 의 *대표 효과* 한 가지.
 
 ## 정리 및 다음 단계
 

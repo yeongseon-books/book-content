@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (1/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 시스템이 *조용히 망가질 때*, 우리는 어떻게 *밖에서 안을 들여다볼 수 있을까요*?
+
+> *Observability 는 *외부 신호만으로 시스템 내부 상태를 이해하는 능력* 입니다. Monitoring 은 *알려진 문제를 본다*, Observability 는 *모르는 문제를 묻는다*.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Monitoring* 과 *Observability* 의 차이
+- *Metric, Log, Trace* 세 기둥
+- *Known unknowns* 대 *unknown unknowns*
+- 첫 신호 수집 5단계
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 운영 시스템은 *예측 불가능한 방식으로* 무너집니다. 미리 만든 dashboard 만으로는 *처음 보는 장애* 를 설명할 수 없습니다. *Observability* 는 *질문할 수 있는 시스템* 을 만듭니다.
 
@@ -42,6 +57,14 @@ flowchart LR
     Log --> Search["Log search"]
     Trace --> Flow["Request flow"]
 ```
+
+## 핵심 용어 정리
+
+- **Metric**: 시간에 따라 변하는 *숫자*. 예: 초당 요청 수.
+- **Log**: 사건을 기록한 *텍스트* 라인.
+- **Trace**: 한 요청이 여러 서비스를 거친 *경로*.
+- **Cardinality**: label 조합의 *고유 개수*.
+- **SLO**: 서비스가 지켜야 할 *수치 약속*.
 
 ## Before/After
 
@@ -121,12 +144,26 @@ grep '"trace_id": "abc-123"' app.log
 
 대부분의 SRE 팀은 *세 기둥* 을 *최소 신호* 로 본 뒤, *SLO* 를 기준으로 *경보* 를 설계합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *시스템은 *블랙박스* 가 아니라 *유리상자* 여야 한다.*
+- *Dashboard 는 *질문에 답하는 도구*, 장식이 아니다.*
+- *Cardinality 는 *비용* 이다.*
+- *모든 신호에 *trace_id* 를 흘려보낸다.*
+- *모르는 장애를 *물을 수 있는가* 가 진짜 척도.*
+
 ## 체크리스트
 
 - [ ] *Monitoring* 과 *Observability* 의 차이를 설명할 수 있다.
 - [ ] *세 기둥* 을 나열할 수 있다.
 - [ ] 구조화된 log 한 줄을 작성할 수 있다.
 - [ ] *trace_id* 의 역할을 안다.
+
+## 연습 문제
+
+1. 최근 장애 하나를 골라 *세 기둥* 으로 분해해 보세요.
+2. 비구조 log 한 줄을 *JSON* 으로 다시 써 보세요.
+3. *Known unknown* 과 *unknown unknown* 의 예시를 각각 두 개씩.
 
 ## 정리 및 다음 단계
 

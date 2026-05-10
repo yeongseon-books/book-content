@@ -30,6 +30,17 @@ Agent는 외부 도구를 호출하고, 네트워크를 거치고, 모델의 불
 
 ---
 
+<!-- a-grade-intro:begin -->
+
+## 핵심 질문
+
+- Agent에서 발생하는 에러는 어떤 유형으로 분류할 수 있을까요?
+- Retry, Fallback, Circuit Breaker는 각각 어떤 상황에 써야 할까요?
+- 도구 실행을 안전하게 격리하려면 어떤 장치가 필요할까요?
+- 사용자에게 보여줄 graceful degradation은 어떤 모양이어야 할까요?
+
+<!-- a-grade-intro:end -->
+
 ## Agent에서의 에러 유형
 
 Agent는 LLM, 도구, 외부 API, 사용자 입력 등 여러 컴포넌트가 얽혀 있어 에러 유형이 다양합니다.
@@ -434,6 +445,25 @@ return {
 - Circuit breaker는 반복 실패하는 외부 의존성으로부터 시스템을 보호합니다
 - 도구 실행에는 항상 타임아웃과 리소스 제한을 둡니다
 - 에러는 조용히 삼키지 말고 로그·메트릭으로 가시화합니다
+
+<!-- a-grade-example:begin -->
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Transient만 재시도** — 분류 후 transient 에러만 백오프 재시도합니다.
+- **Circuit breaker** — 외부 의존성에 회로 차단기를 둡니다.
+- **타임아웃 강제** — 모든 외부 호출에 명시적 타임아웃을 강제합니다.
+- **부분 성공** — 부분 성공·복구 경로를 1급으로 설계합니다.
+- **실패 학습** — 실패 사례를 회귀 셋에 환류합니다.
+
+## 체크리스트
+
+- [ ] Agent 에러를 transient / permanent / model-level로 분류했다.
+- [ ] Exponential backoff retry를 직접 구현해 transient 에러를 흡수했다.
+- [ ] Circuit breaker open/half-open/closed 상태 전이를 그려 봤다.
+- [ ] 도구 실행을 timeout + sandbox로 감싼 예제를 작성했다.
+
+<!-- a-grade-example:end -->
 
 <!-- toc:begin -->
 ## 시리즈 목차

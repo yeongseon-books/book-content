@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Incident Response 101 시리즈 (5/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *Incident* 가 *끝* 난 뒤, *무슨 일* 이 *언제* 일어났는지 어떻게 *재구성* 할까요?
+
+> *Timeline* 은 *대응 중* 에 *동시 기록* 하고, *사실* 만 시간 순으로 정렬합니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *동시 기록*
+- *채널 스크랩*
+- *시간 정렬*
+- *사실 vs 해석* 분리
+- *Postmortem* 입력
+
+## 왜 중요한가
 
 *기억* 은 *왜곡* 됩니다. *지금 적은 한 줄* 이 *내일의 RCA* 를 살립니다.
 
@@ -39,6 +54,14 @@ flowchart LR
     Scrape --> Sort["sort by time"]
     Sort --> Doc["timeline doc"]
 ```
+
+## 핵심 용어 정리
+
+- **timestamp**: *UTC* 표기 *시간 도장*.
+- **scrape**: 여러 *채널* 에서 *수집*.
+- **fact**: 관찰된 *사실*.
+- **interpretation**: *해석* 과 *추측*.
+- **anchor**: *Detection*, *Mitigation* 같은 *기준 시각*.
 
 ## Before/After
 
@@ -105,12 +128,26 @@ def mark(event):
 
 *Slack bot* 이 `!ts <text>` 명령으로 이벤트를 *수집* 하고 *Postmortem doc* 으로 *내보내기* 합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *동시 기록* 이 *원칙*.
+- *UTC* 로 통일.
+- *짧고 잦은* 줄.
+- *추측* 은 따로.
+- *anchor* 만 정확하면 OK.
+
 ## 체크리스트
 
 - [ ] *기록 책임자*.
 - [ ] *Bot 명령*.
 - [ ] *UTC 강제*.
 - [ ] *anchor 정의*.
+
+## 연습 문제
+
+1. *anchor* 의 의미 한 줄로.
+2. *fact* 와 *interpretation* 의 차이 한 줄로.
+3. *UTC* 통일이 필요한 이유 한 줄로.
 
 ## 정리 및 다음 단계
 

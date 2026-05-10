@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > 오픈소스 101 시리즈 (6/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *버전* 을 *언제* *어떻게* *올려야* *사용자* 가 *안전* 할까요?
+
+> *SemVer* 와 *changelog* 를 *함께* *씁니다*.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *SemVer* 의 *세 자리*
+- *Pre-release* 표기
+- *Changelog* 작성
+- *git tag* 활용
+- *자동 릴리스* 워크플로
+
+## 왜 중요한가
 
 *버전* 이 *흔들* 리면 *생태계* 가 *깨집니다*.
 
@@ -37,6 +52,14 @@ flowchart LR
     N[MINOR] --> B[feature]
     P[PATCH] --> C[fix]
 ```
+
+## 핵심 용어 정리
+
+- **SemVer**: *MAJOR.MINOR.PATCH*.
+- **breaking**: *호환성* *파괴*.
+- **changelog**: *변경* *기록*.
+- **tag**: *불변* *참조*.
+- **pre-release**: *시험* *버전*.
 
 ## Before/After
 
@@ -104,12 +127,26 @@ jobs:
 
 기업의 *내부 라이브러리* 도 *SemVer* 로 *의존성* 을 *관리* 합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *SemVer* 는 *계약* 이다.
+- *changelog* 는 *기억*.
+- *tag* 는 *재현* 가능.
+- *MAJOR* 는 *드물게*.
+- *PATCH* 는 *자주*.
+
 ## 체크리스트
 
 - [ ] *버전* 결정.
 - [ ] *Changelog* 갱신.
 - [ ] *Tag* 푸시.
 - [ ] *Release* 발행.
+
+## 연습 문제
+
+1. *breaking* 변경의 *예* 한 줄.
+2. *pre-release* 표기 *예* 한 줄.
+3. *tag* 와 *branch* 의 *차이* 한 줄.
 
 ## 정리 및 다음 단계
 

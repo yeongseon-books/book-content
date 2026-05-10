@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (5/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 함수 안의 `x`와 함수 밖의 `x`는 서로 다른 변수입니다. 컴파일러는 둘을 어떻게 구분합니까?
+
+> Symbol table은 "어느 이름이 어느 declaration을 가리키는가"를 기록하는 컴파일러의 메모리입니다. nested scope와 shadowing은 이 자료구조의 모양으로 직접 표현됩니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- symbol table이 무엇이고, 왜 컴파일러의 핵심 자료구조인가
+- scope를 stack 또는 chained dictionary로 표현하는 법
+- shadowing과 lookup이 자연스럽게 따라오는 구조
+- 함수, 블록, 모듈 단위 scope의 차이
+- symbol table을 활용한 IDE 기능 (rename, go-to-definition)
+
+## 왜 중요한가
 
 이전 글의 semantic analyzer는 환경(Env)을 dictionary 한 개로 표현했습니다. 실제 언어에는 함수, 블록, 클래스, 모듈 같은 여러 scope가 있습니다. symbol table을 어떻게 설계하느냐가 곧 언어의 가시성 규칙(visibility rule)입니다.
 
@@ -41,6 +56,14 @@ flowchart TB
 ```
 
 scope는 트리(또는 stack) 구조입니다. 안쪽에서 바깥쪽으로 lookup이 진행됩니다.
+
+## 핵심 용어 정리
+
+- **Symbol**: declaration entry. `(name, kind, type, location)`.
+- **Scope**: 같은 가시성을 공유하는 symbol들의 묶음.
+- **Shadowing**: 안쪽 scope의 같은 이름이 바깥쪽 이름을 가린다.
+- **Lookup**: 안에서 바깥으로 첫 매칭을 찾는다.
+- **Forward declaration**: 사용 시점보다 선언이 늦게 나오는 경우 (함수 내 함수 호출 등).
 
 ## Before/After
 
@@ -168,6 +191,14 @@ def goto(scope, name):
 
 LSP 서버의 핵심 자료구조가 바로 symbol table입니다. "Find all references"는 모든 scope를 거꾸로 훑는 것이고, "Rename symbol"은 같은 symbol을 가리키는 모든 사용처를 한 번에 바꾸는 것입니다. 이 모두가 symbol table 위에 얹힙니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 새 언어 기능을 보면 "어느 scope에 들어가는가?"를 먼저 묻습니다.
+- shadowing이 의도된 기능인지, 버그를 만드는지 언어 차원에서 결정합니다.
+- symbol에 위치, 가시성, 사용 횟수까지 같이 저장합니다.
+- 두 패스 분석(선언 수집 → 사용 분석)을 기본으로 둡니다.
+- symbol table은 곧 IDE의 데이터 모델임을 압니다.
+
 ## 체크리스트
 
 - [ ] Scope가 부모 포인터를 가진 dictionary임을 받아들였는가?
@@ -175,6 +206,12 @@ LSP 서버의 핵심 자료구조가 바로 symbol table입니다. "Find all ref
 - [ ] 함수와 블록 scope를 같은 자료구조로 표현할 수 있는가?
 - [ ] go-to-definition이 lookup임을 알겠는가?
 - [ ] symbol table을 두 패스로 채울 이유를 댈 수 있는가?
+
+## 연습 문제
+
+1. 위 Scope에 "이 scope에서 정의된 모든 symbol을 나열" 메서드를 추가해 보세요.
+2. shadowing이 일어날 때 경고를 띄우는 옵션을 추가해 보세요.
+3. forward declaration을 지원하기 위해 두 패스로 분리한 의사코드를 써 보세요.
 
 ## 정리 및 다음 단계
 

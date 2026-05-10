@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (5/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *PR 리뷰* 에서 *스타일과 타입 잡기* 에 시간을 *그만 쓰려면* 어떻게 합니까?
+
+> *기계가 잡을 것* 은 *기계에게* 맡깁니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Ruff* 로 *스타일 + 린트* 통합
+- *Mypy* 로 *정적 타입 체크*
+- *pre-commit* 으로 *로컬 + CI* 동시 검사
+- *PR diff* 만 *검사하는* 패턴
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *린트와 타입* 은 *리뷰어가 가장 먼저 잡는 것* 입니다. 자동화하면 *리뷰* 가 *설계 토론* 에 집중할 수 있습니다.
 
@@ -40,6 +55,14 @@ flowchart LR
     Ruff --> CI["CI gate"]
     Mypy --> CI
 ```
+
+## 핵심 용어 정리
+
+- **Linter**: *스타일/패턴 위반* 검사기 (ruff).
+- **Formatter**: *자동 포맷터* (ruff format).
+- **Type checker**: *정적 타입* 검사기 (mypy).
+- **pre-commit**: *commit 전* 자동 검사 훅.
+- **Quality gate**: 품질 미달 시 *머지 차단*.
 
 ## Before/After
 
@@ -116,12 +139,26 @@ repos:
 
 성숙한 팀은 *ruff + mypy + pre-commit* 을 *템플릿 저장소* 로 표준화하고, *pre-commit.ci* 또는 *GitHub Actions* 에서 동일하게 검증합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *린트는 토론을 줄인다*.
+- *타입은 문서다*.
+- *strict* 가 기본, 예외만 *문서화*.
+- *로컬 + CI* 가 *같은 명령* 을 돌린다.
+- *자동 수정* 은 *commit* 이 아니라 *피드백*.
+
 ## 체크리스트
 
 - [ ] *ruff check + format* 이 CI 에 있다.
 - [ ] *mypy strict* 가 켜져 있다.
 - [ ] *pre-commit* 이 *팀에 깔려* 있다.
 - [ ] 설정이 *pyproject.toml* 한곳에 있다.
+
+## 연습 문제
+
+1. *ruff + mypy* 워크플로우를 추가하세요.
+2. *pre-commit* 을 *3개 훅* 으로 시작해 보세요.
+3. *strict mypy* 적용 시 발생한 오류를 *유형별로* 분류해 보세요.
 
 ## 정리 및 다음 단계
 

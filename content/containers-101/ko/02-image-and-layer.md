@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (2/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *이미지* 는 *왜* *Layer* 로 쪼개져 있을까요?
+
+> *레이어 구조 는 *재사용*, *캐싱*, *전송 효율* 을 동시에 잡기 위한 *컨테이너의 핵심 설계* 입니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *Image* 의 *물리 구조*
+- *Layer* 의 *역할*
+- *OverlayFS* 의 *동작*
+- *Layer caching* 으로 *빌드 가속*
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *레이어* 를 *모르면* *Dockerfile 최적화* 도 *없습니다*. *빌드 1분 vs 30초* 가 여기서 갈립니다.
 
@@ -37,6 +52,14 @@ flowchart LR
     Lib --> Code["app code"]
     Code --> Container["container (rw layer)"]
 ```
+
+## 핵심 용어 정리
+
+- **Layer**: *읽기 전용* 변경 묶음.
+- **Base image**: *밑단* 의 *OS/런타임* 이미지.
+- **OverlayFS**: 여러 *레이어* 를 *겹쳐 보이는* 파일시스템.
+- **Manifest**: 이미지의 *목록 메타데이터*.
+- **Digest**: 이미지의 *콘텐츠 해시*.
 
 ## Before/After
 
@@ -110,12 +133,26 @@ def diff(a, b):
 
 *Multi-stage build* 로 *빌드 도구* 와 *런타임* 분리, *.dockerignore* 로 *전송 최소화*, *digest 핀* 으로 *재현성* 확보.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *변경 가능성* 이 낮은 *명령* 부터 위로.
+- *Multi-stage* 가 *기본 패턴*.
+- *latest* 는 *지뢰*.
+- *.dockerignore* 는 *Dockerfile* 만큼 중요.
+- *이미지 크기* 는 *공격 표면*.
+
 ## 체크리스트
 
 - [ ] *Multi-stage* 적용.
 - [ ] *.dockerignore* 존재.
 - [ ] *Digest 핀* 사용.
 - [ ] *이미지 스캔* 도입.
+
+## 연습 문제
+
+1. *Layer caching* 이 *깨지는 대표 원인* 을 한 줄로.
+2. *Multi-stage build* 가 *유리한 시나리오* 를 한 가지 들어 보세요.
+3. *Image digest* 와 *tag* 의 *차이* 를 한 줄로.
 
 ## 정리 및 다음 단계
 

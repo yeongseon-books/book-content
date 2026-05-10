@@ -25,8 +25,22 @@ last_reviewed: '2026-05-04'
 
 > Type Hints in Python 101 시리즈 (3/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: 함수가 None을 반환할 수 있다면 타입 힌트로 어떻게 표현할까요?
+
+> 실무 코드에서 값이 없을 수 있는 상황은 빈번합니다. `Optional`은 "값 또는 None"을, `Union`은 "여러 타입 중 하나"를 표현합니다. 이 글에서는 두 타입의 의미와 Python 3.10+ 문법, 안전한 None 처리 패턴을 다룹니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- `Optional[T]`의 의미와 사용법
+- `Union[T1, T2]`의 의미와 사용법
+- Python 3.10+ `X | Y` 문법
+- None 안전 처리 패턴
+
+## 왜 중요한가
 
 함수가 `None`을 반환할 수 있는데 타입 힌트에 표시하지 않으면, 호출자가 `None` 체크 없이 결과를 사용하다 `AttributeError`를 만납니다. `Optional`로 None 가능성을 명시하면 mypy가 체크 누락을 잡아줍니다.
 
@@ -263,6 +277,14 @@ print(create_user("Charlie", role="admin"))
 
 Python 3.10+를 사용한다면 `Optional[str]` 대신 `str | None`을, `Union[int, str]` 대신 `int | str`을 쓰는 것이 가독성과 현대적 스타일 모두에 좋습니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **Optional 의미** — Optional은 "기본값이 None"이 아니라 "None일 수 있음"입니다.
+- **X | Y 문법** — 현대 코드는 union 연산자를 우선합니다.
+- **Narrowing** — isinstance/None 검사로 타입을 좁힙니다.
+- **리턴 다중성** — Union 리턴은 호출자에게 부담이라는 점을 인지합니다.
+- **Result 패턴** — 복잡 분기는 Result/Maybe 패턴이 명료합니다.
+
 ## 체크리스트
 
 - [ ] `Optional[T]`와 `T | None`이 같은 의미임을 설명할 수 있다
@@ -270,6 +292,12 @@ Python 3.10+를 사용한다면 `Optional[str]` 대신 `str | None`을, `Union[i
 - [ ] isinstance로 Union 타입을 좁힐 수 있다
 - [ ] Optional 반환값을 안전하게 처리할 수 있다
 - [ ] Python 3.10+ `X | Y` 문법을 사용할 수 있다
+
+## 연습 문제
+
+1. 딕셔너리에서 키를 찾아 값을 반환하는 함수를 `Optional`로 작성하고, None 체크 패턴 3가지를 구현하세요.
+2. JSON 파싱 결과가 `dict | list | str | int | float | bool | None`일 수 있는 재귀 타입을 정의하세요.
+3. `Union[Success, Failure]` 결과 타입을 만들고 isinstance로 처리하는 패턴을 작성하세요.
 
 ## 정리 및 다음 글 안내
 

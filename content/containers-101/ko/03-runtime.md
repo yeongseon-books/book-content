@@ -24,8 +24,23 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (3/10)
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+**핵심 질문**: *Docker* 와 *containerd*, *runc* 는 *왜 따로* 존재할까요?
+
+> *컨테이너 런타임 은 *고수준 API (Docker)*, *데몬 (containerd)*, *저수준 실행기 (runc)* 의 *3계층* 으로 분리되어 있습니다.*
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- *고수준 vs 저수준 런타임*
+- *Docker → containerd → runc* 흐름
+- *CRI* 의 역할
+- *Kubernetes* 와의 관계
+- 흔한 함정 5가지
+
+## 왜 중요한가
 
 *Kubernetes 1.24* 부터 *dockershim* 이 제거되었습니다. *런타임 계층* 을 *모르면* *디버깅* 이 *불가능* 합니다.
 
@@ -38,6 +53,14 @@ flowchart LR
     Containerd --> Runc["runc"]
     Runc --> Process["container process"]
 ```
+
+## 핵심 용어 정리
+
+- **Docker**: *고수준 사용자 도구* + 데몬.
+- **containerd**: *컨테이너 라이프사이클* 관리 데몬.
+- **runc**: *OCI* 표준 *저수준 실행기*.
+- **CRI**: *Kubernetes* 가 *런타임* 과 통신하는 *인터페이스*.
+- **OCI**: *Open Container Initiative* 표준.
 
 ## Before/After
 
@@ -108,12 +131,26 @@ def ctr_kill(name):
 
 *K8s 노드* 는 *containerd*, *디버깅* 은 *crictl*, *로컬 개발* 은 *Docker Desktop*, *embedded* 환경은 *podman* 등 다양.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- *런타임 계층* 을 *알면* *장애 절반*.
+- *Docker = 사용자 도구*, *containerd = 운영 도구*.
+- *OCI* 가 *호환성* 의 핵심.
+- *rootless* 가 *가능* 하면 *기본*.
+- *런타임 변경* 은 *클러스터 영향*.
+
 ## 체크리스트
 
 - [ ] *containerd* 와 *runc* 차이 설명 가능.
 - [ ] *CRI* 의 역할 이해.
 - [ ] *crictl* 도구 인지.
 - [ ] *OCI 표준* 인지.
+
+## 연습 문제
+
+1. *runc* 와 *containerd* 의 *책임 차이* 한 줄로.
+2. *K8s* 가 *dockershim* 을 제거한 *이유* 한 가지.
+3. *crictl* 을 *언제* 사용하는지 한 줄로.
 
 ## 정리 및 다음 단계
 

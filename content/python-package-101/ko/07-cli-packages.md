@@ -27,8 +27,27 @@ seo_description: entry point와 click으로 pip install 후 바로 실행 가능
 
 ---
 
+<!-- a-grade-intro:begin -->
 
-## 이 글에서 다룰 문제
+## 핵심 질문
+
+- `pip install` 후 터미널에서 바로 실행되는 명령어는 어떻게 만들까요?
+- `[project.scripts]`의 entry point는 어떻게 동작할까요?
+- `argparse`와 `click`의 차이는 무엇일까요?
+- 서브커맨드(subcommand) 구조는 어떻게 만들까요?
+
+> Entry point는 `pip install` 후 터미널에서 바로 실행할 수 있는 명령어를 등록하는 것이고, click은 CLI 인터페이스를 선언적으로 만드는 라이브러리입니다.
+
+<!-- a-grade-intro:end -->
+
+## 이 글에서 배울 것
+
+- `[project.scripts]`로 CLI entry point를 등록하는 법
+- `argparse`로 기본 CLI를 만드는 법
+- `click`으로 선언적 CLI를 만드는 법
+- 서브커맨드 구조 구현
+
+## 왜 중요한가
 
 Python 스크립트를 `python my_script.py`로 실행하는 것보다 `mytool`로 바로 실행하는 것이 편합니다. 패키지에 entry point를 설정하면 `pip install` 후 바로 터미널 명령어로 쓸 수 있습니다.
 
@@ -251,6 +270,14 @@ CLI를 만들 때 가장 중요한 것은 **일관된 인터페이스**입니다
 
 `argparse`는 외부 의존성이 없어 가볍지만, `click`은 서브커맨드, 프롬프트, 색상 출력, 테스트 러너를 내장하여 실무에서 더 생산적입니다. 라이브러리라면 `argparse`, 독립 CLI 도구라면 `click`이 적합합니다.
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- **entry points** — console_scripts로 노출합니다.
+- **argparse vs click** — 복잡도에 따라 선택합니다.
+- **UX** — 도움말·에러 메시지에 시간을 투자합니다.
+- **종료 코드** — 성공/실패 종료 코드를 표준화합니다.
+- **테스트** — CLI 자체도 통합 테스트로 회귀를 막습니다.
+
 ## 체크리스트
 
 - [ ] `[project.scripts]`로 entry point를 등록할 수 있다
@@ -258,6 +285,12 @@ CLI를 만들 때 가장 중요한 것은 **일관된 인터페이스**입니다
 - [ ] `click`으로 데코레이터 기반 CLI를 만들 수 있다
 - [ ] 서브커맨드 구조를 `click.group`으로 구현할 수 있다
 - [ ] CLI의 종료 코드와 stderr 출력을 올바르게 처리할 수 있다
+
+## 연습 문제
+
+1. `argparse`로 두 숫자를 받아 사칙연산을 수행하는 CLI(`calc add 3 5`, `calc mul 2 4`)를 만들어보세요.
+2. 같은 CLI를 `click`으로 리팩터링하고, `--help` 출력을 비교해보세요.
+3. `click.testing.CliRunner`를 사용하여 CLI 출력을 테스트하는 pytest를 작성해보세요.
 
 ## 정리 · 다음 글
 
