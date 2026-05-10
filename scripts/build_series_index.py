@@ -93,7 +93,7 @@ def get_articles(per: dict[str, Any] | None) -> list[dict[str, Any]]:
             slug = slug.strip()
             idx = article.get("idx") or article.get("episode") or i
             try:
-                idx_int = int(idx)
+                idx_int = int(i if idx is None else idx)
             except (TypeError, ValueError):
                 idx_int = i
             if not re.match(r"^\d{2}-", slug):
@@ -127,10 +127,10 @@ def get_articles(per: dict[str, Any] | None) -> list[dict[str, Any]]:
             m = re.match(r"^(\d+)-", slug)
             idx = int(m.group(1)) if m else i
         try:
-            idx_int = int(idx)
+            idx_int = int(i if idx is None else idx)
         except (TypeError, ValueError):
             idx_int = i
-        if not re.match(r"^\d+-", slug):
+        if not re.match(r"^\d{2}-", slug):
             slug = f"{idx_int:02d}-{slug}"
         normalized.append(
             {
