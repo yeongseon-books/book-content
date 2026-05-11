@@ -28,12 +28,13 @@
 Every source post (`ko/*.md`, `en/*.md`) MUST have, top to bottom:
 
 1. **H1 title** (`# Title`) — front matter `title`과 일치
-2. **Body** (sections, code, images)
-3. **Series TOC block** (`<!-- toc:begin -->` / `<!-- toc:end -->`)
-4. **References section** (`## 참고 자료` for ko, `## References` for en)
-5. **Tag line** as the very last line: `Tags: A, B, C, D`
+2. **Series intro line** — H1 직후 도입 단락 안에 한 문장 (`이 글은 {시리즈 표시명} 시리즈의 {첫 번째 / N번째 / 마지막} 글입니다.`)
+3. **Body** (sections, code, images)
+4. **Series TOC block** (`<!-- toc:begin -->` / `<!-- toc:end -->`)
+5. **References section** (`## 참고 자료` for ko, `## References` for en)
+6. **Tag line** as the very last line: `Tags: A, B, C, D`
 
-상세 TOC rules, medium artifact rules, A-grade post structure는 아래 문서 참조.
+상세 TOC rules, medium artifact rules, A-grade post structure, series intro 표준 템플릿은 [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) §1 / §1.1 참조.
 
 ## Series TOC Rules
 

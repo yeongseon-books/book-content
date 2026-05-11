@@ -54,6 +54,13 @@ A_GRADE_MARKER = "<!-- a-grade-intro:begin -->"
 KO_REFS = re.compile(r"^## 참고 자료", re.MULTILINE)
 EN_REFS = re.compile(r"^## References", re.MULTILINE)
 
+# Series intro line (STYLE_GUIDE §1.1) — must appear in the intro paragraph
+# right after H1. We allow flexible phrasing (출발점/첫 번째/N번째/마지막/N화 등)
+# but require the "이 글은 ... 시리즈" / "this is ... series" anchor.
+KO_SERIES_INTRO = re.compile(r"이\s*글은[^.\n]{2,200}시리즈", re.MULTILINE)
+EN_SERIES_INTRO = re.compile(r"\b[Tt]his is\b[^.\n]{2,200}\bseries\b", re.MULTILINE)
+SERIES_INTRO_WINDOW_LINES = 25
+
 
 def check_article(path: Path, *, warn_all: bool = False) -> tuple[list[str], list[str]]:
     """Return (errors, warnings). Errors block CI; warnings are informational."""
@@ -106,13 +113,22 @@ def check_article(path: Path, *, warn_all: bool = False) -> tuple[list[str], lis
 
     if not CHECKBOX_RE.search(body):
         target.append("missing checklist")
+
+    intro_re = KO_SERIES_INTRO if lang == "ko" else EN_SERIES_INTRO
+    h1_match = H1_RE.search(body)
+    if h1_match:
+        after_h1 = body[h1_match.end() :].splitlines()
+        window = "\n".join(after_h1[:SERIES_INTRO_WINDOW_LINES])
+        if not intro_re.search(window):
+            target.append("missing series intro line near H1 (see STYLE_GUIDE §1.1)")
     return errors, warnings
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Check article structure.")
-    parser.add_argument("--warn-all", action="store_true",
-                        help="Run advisory checks on all articles")
+    parser.add_argument(
+        "--warn-all", action="store_true", help="Run advisory checks on all articles"
+    )
     args = parser.parse_args()
 
     if not CONTENT_DIR.is_dir():

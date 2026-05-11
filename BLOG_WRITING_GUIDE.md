@@ -32,26 +32,36 @@
 
 ```text
 1. H1 제목 (SEO 키워드 포함)
-2. 이 글에서 다룰 문제
-3. 한 문장 결론 / 멘탈 모델
-4. 배경 설명 (이 글 하나로 충분한 최소 맥락)
-5. 핵심 그림 (다이어그램)
-6. 본문 설명 (개념 → 예제 → 해석)
-7. 실무에서 헷갈리는 지점 / 체크리스트
-8. 시리즈 TOC block (<!-- toc:begin --> ... <!-- toc:end -->)
-9. 참고 자료 (## 참고 자료 / ## References)
-10. Tags: A, B, C, D (마지막 줄)
+2. Series intro line (H1 직후 도입 단락 안에 한 문장 — 표준 템플릿 STYLE_GUIDE §1.1)
+3. 이 글에서 다룰 문제
+4. 한 문장 결론 / 멘탈 모델
+5. 배경 설명 (이 글 하나로 충분한 최소 맥락)
+6. 핵심 그림 (다이어그램)
+7. 본문 설명 (개념 → 예제 → 해석)
+8. 실무에서 헷갈리는 지점 / 체크리스트
+9. 시리즈 TOC block (<!-- toc:begin --> ... <!-- toc:end -->)
+10. 참고 자료 (## 참고 자료 / ## References)
+11. Tags: A, B, C, D (마지막 줄)
+```
+
+### Series intro line (mandatory)
+
+H1 직후 도입 단락 안에 시리즈 안내를 한 문장으로 포함한다. raw prose 로 작성하며 `<!-- blog-only -->` 블록으로 감싸지 않는다 (eBook 빌드에서도 자연스럽게 읽혀야 한다). 표준 템플릿과 작성 원칙은 [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) §1.1 참조.
+
+```markdown
+# Azure Functions란? — 이벤트가 코드를 부르는 세계
+
+처음 Azure Functions 를 접하면 ... (도입 hook)
+
+이 글은 Azure Functions 101 시리즈의 두 번째 글입니다. 여기서는 Trigger 와 Binding 의 동작 모델을 정리합니다.
 ```
 
 ### blog-only 블록 사용
 
-앞 글 안 읽은 독자를 위한 브리지, 다음 글 링크처럼 블로그에서만 의미 있는 내용은 `blog-only` 블록으로 감싼다.
+다음 글 링크처럼 블로그에서만 의미 있는 보조 정보는 `blog-only` 블록으로 감싼다. 시리즈 인트로 한 문장은 blog-only 가 아니라 본문 도입의 일부로 둔다.
 
 ```markdown
 <!-- blog-only:start -->
-이 글은 Azure Functions 101 시리즈의 두 번째 글입니다.
-앞 글에서 Functions의 실행 모델을 다뤘고, 이 글에서는 Trigger와 Binding을 다룹니다.
-
 다음 글: [Host와 Worker 구조](./03-host-and-worker.md)
 <!-- blog-only:end -->
 ```

@@ -20,16 +20,17 @@
 모든 글은 다음 순서를 지킨다 ([`AGENTS.md`](./AGENTS.md) "Post structure" 와 동일).
 
 1. **H1 title** (`# Title`) — 첫 본문 라인
-2. **Body** (sections, code, images, ...)
-3. **Series TOC block** — `<!-- toc:begin --> ... <!-- toc:end -->`
-4. **References section** — `## 참고 자료` (ko) 또는 `## References` (en/medium)
-5. **Tag line** — 마지막 라인: `Tags: A, B, C, D`
+2. **Series intro line** — 도입 단락 안에 한 문장 (§1.1 참고)
+3. **Body** (sections, code, images, ...)
+4. **Series TOC block** — `<!-- toc:begin --> ... <!-- toc:end -->`
+5. **References section** — `## 참고 자료` (ko) 또는 `## References` (en/medium)
+6. **Tag line** — 마지막 라인: `Tags: A, B, C, D`
 
 권장 본문 구조 (위 mandatory order 와 일치):
 
 ```text
 1. Title (H1)
-2. Intro (왜 이 글이 필요한가)
+2. Intro (왜 이 글이 필요한가) — 시리즈 인트로 한 문장 포함
 3. Mental Model (개념 모델 / 그림)
 4. Main Explanation
 5. Practical Example (코드)
@@ -39,6 +40,37 @@
 9. References (`## 참고 자료` / `## References`)
 10. Tag line (`Tags: A, B, C, D`) — 마지막 줄
 ```
+
+### 1.1 Series intro line (mandatory)
+
+모든 시리즈 글은 H1 직후 도입 단락 안에 시리즈 안내 한 문장을 포함한다. blog-only 블록으로 감싸지 않고 raw prose로 작성한다 (eBook export 시에도 자연스럽게 읽혀야 한다).
+
+**표준 템플릿 (ko)** — `azure-aks-101` 스타일을 baseline으로 한다.
+
+| 위치 | 권장 문장 |
+| --- | --- |
+| 첫 글 (1편) | `이 글은 {시리즈 표시명} 시리즈의 첫 번째 글입니다.` |
+| 중간 글 (2 ~ N-1편) | `이 글은 {시리즈 표시명} 시리즈의 {N}번째 글입니다.` |
+| 마지막 글 (N편) | `이 글은 {시리즈 표시명} 시리즈의 마지막 글입니다.` |
+
+**표준 템플릿 (en)**
+
+| 위치 | 권장 문장 |
+| --- | --- |
+| 첫 글 | `This is the first post in the {Series Display Name} series.` |
+| 중간 글 | `This is post {N} in the {Series Display Name} series.` |
+| 마지막 글 | `This is the final post in the {Series Display Name} series.` |
+
+**작성 원칙**
+
+- `{시리즈 표시명}`은 `series.yaml` 의 `title` 필드를 그대로 사용한다 (예: `Azure App Service 101`, `Cloud Computing 101`).
+- 한 문장이 단독 문단으로 떠 있는 형태가 아니라, 도입 단락 안에서 자연스럽게 흐르도록 배치한다. 필요하면 뒤에 한 문장으로 이 글이 다룰 범위를 덧붙인다 (`여기서는 ... 를 다룹니다.`).
+- 표현은 위 표를 baseline으로 하되 글의 톤에 맞춰 자연스럽게 변형해도 된다 (`출발점입니다`, `마무리 글입니다`, `1화입니다` 등 기존 패턴 허용). 핵심은 독자가 "이 글이 어떤 시리즈의 어떤 위치인지"를 H1 직후에 즉시 알 수 있어야 한다는 것이다.
+- AI slop 표현 금지 (`이 글에서는 다음을 배웁니다:`, `By the end of this post, you will...`).
+
+**검증**
+
+`scripts/check_article_structure.py` 가 advisory(warning) 단계로 검사한다. 일괄 백필 완료 후 blocking 으로 승격할 예정이다.
 
 ---
 
