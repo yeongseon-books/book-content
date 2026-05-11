@@ -67,7 +67,7 @@ flowchart LR
 ### Step 1 — Clarify
 
 ```text
-"DAU dropped" = which segment, what period?
+"DAU가 떨어졌다" = 어느 세그먼트, 어느 기간인가?
 ```
 
 문제 명확화는 시간을 버는 단계가 아니라, 잘못된 문제를 푸는 일을 막는 단계입니다. 어느 지역인지, 어느 사용자군인지, 어느 기간인지, 제품 변경이 있었는지부터 물어야 같은 단어를 놓고도 서로 다른 상황을 상상하는 문제를 줄일 수 있습니다.
@@ -75,8 +75,8 @@ flowchart LR
 ### Step 2 — Metric
 
 ```text
-- north star metric
-- two supporting metrics
+- 북극성 지표
+- 보조 지표 두 개
 ```
 
 핵심 지표 하나와 보조 지표 둘 정도를 잡아 두면 답변의 중심이 생깁니다. 북극성 지표만 말하고 끝내면 원인 분해가 어렵고, 반대로 보조 지표만 나열하면 방향이 흐려집니다.
@@ -84,9 +84,9 @@ flowchart LR
 ### Step 3 — Hypothesis
 
 ```text
-- product change
-- external event
-- data pipeline
+- 제품 변경
+- 외부 이벤트
+- 데이터 파이프라인
 ```
 
 가설은 하나만 두면 위험합니다. 제품 변경, 외부 이벤트, 데이터 수집 이슈처럼 성격이 다른 가설을 함께 세워야 탐색 범위가 균형을 잡습니다. 특히 데이터 직군 면접에서는 파이프라인 문제를 가설에 넣는 습관이 좋은 신호가 됩니다.
@@ -94,8 +94,8 @@ flowchart LR
 ### Step 4 — Data
 
 ```text
-- which query, which comparison
-- A/B feasibility
+- 어떤 쿼리인지, 어떤 비교인지
+- A/B 가능성
 ```
 
 이 단계에서는 “데이터를 보겠습니다”라고만 말하면 약합니다. 어떤 세그먼트 비교를 할지, 어떤 기간 비교를 할지, 어떤 쿼리나 로그를 볼지, 추가 실험이 가능한지까지 이야기해야 실제 실행 계획처럼 들립니다.
@@ -103,9 +103,9 @@ flowchart LR
 ### Step 5 — Decision
 
 ```text
-- recommended action
-- risks
-- follow-up measurement
+- 권장 조치
+- 위험 요소
+- 후속 측정
 ```
 
 케이스 답변은 결론이 있어야 끝납니다. 추천 액션과 리스크, 그리고 후속 측정 계획까지 함께 말하면 단순 아이디어가 아니라 의사결정 제안으로 바뀝니다.

@@ -68,41 +68,41 @@ flowchart LR
 ### Step 1 — Purpose
 
 ```text
-Analyst: answer questions
-Scientist: validate hypotheses
-Engineer: guarantee data flow
+분석가: 질문에 답한다
+사이언티스트: 가설을 검증한다
+엔지니어: 데이터 흐름을 보장한다
 ```
 
 ### Step 2 — Deliverables
 
 ```text
-Analyst: dashboards, reports
-Scientist: experiments, models
-Engineer: pipelines, schemas
+분석가: 대시보드, 리포트
+사이언티스트: 실험, 모델
+엔지니어: 파이프라인, 스키마
 ```
 
 ### Step 3 — Primary Tools
 
 ```text
-Analyst: SQL, BI tool
-Scientist: Python, notebook, Spark
-Engineer: Airflow, dbt, Kafka
+분석가: SQL, BI 도구
+사이언티스트: Python, 노트북, Spark
+엔지니어: Airflow, dbt, Kafka
 ```
 
 ### Step 4 — Metrics
 
 ```text
-Analyst: decision adoption rate
-Scientist: experimental significance
-Engineer: SLA, data quality
+분석가: 의사결정 반영률
+사이언티스트: 실험적 유의성
+엔지니어: SLA, 데이터 품질
 ```
 
 ### Step 5 — Collaboration
 
 ```text
-Analyst <-> PM/marketing
-Scientist <-> PM/research
-Engineer <-> backend/platform
+분석가 <-> PM/마케팅
+사이언티스트 <-> PM/리서치
+엔지니어 <-> 백엔드/플랫폼
 ```
 
 ## 이 예시에서 봐야 할 점

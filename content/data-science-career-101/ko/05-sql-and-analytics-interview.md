@@ -116,7 +116,7 @@ SELECT SUM(s1), SUM(s2), SUM(s3) FROM steps;
 ### Step 5 — One-Sentence Interpretation
 
 ```text
-"Conversion fell from X to Y, hypothesis Z."
+"전환율이 X에서 Y로 떨어졌고, 가설은 Z입니다."
 ```
 
 이 마지막 한 문장이 의외로 가장 중요합니다. 결과가 나왔을 때 무엇이 바뀌었고, 어떤 가설이 가능한지, 다음에 무엇을 확인할지 말할 수 있어야 실제 분석 역량으로 이어집니다.

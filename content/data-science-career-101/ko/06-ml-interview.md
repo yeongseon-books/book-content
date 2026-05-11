@@ -66,7 +66,7 @@ flowchart LR
 ### Step 1 — Fundamentals
 
 ```text
-Explain bias-variance in one line.
+편향-분산 관계를 한 줄로 설명하기.
 ```
 
 기초 개념 질문은 짧지만 강합니다. 편향-분산을 한 줄로 설명할 수 있는지, 과적합을 예시와 함께 말할 수 있는지 같은 질문으로 기본기를 확인합니다.
@@ -74,8 +74,8 @@ Explain bias-variance in one line.
 ### Step 2 — Model Choice
 
 ```text
-- assumptions: linear vs tree vs neural
-- data size, interpretability
+- 가정: 선형 모델 vs 트리 vs 신경망
+- 데이터 크기, 해석 가능성
 ```
 
 모델 선택 문제에서는 무엇을 예측하려는지, 데이터 양이 어떤지, 해석 가능성이 중요한지, 특징 간 관계가 비선형인지 등을 함께 봐야 합니다. 모델 이름을 나열하는 것보다 선택 기준을 말하는 편이 훨씬 강한 답변입니다.
@@ -91,9 +91,9 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 ### Step 4 — Production Traps
 
 ```text
-- data leakage
-- class imbalance
-- time leakage
+- 데이터 누수
+- 클래스 불균형
+- 시간 누수
 ```
 
 이 함정들을 알고 있다는 사실 자체가 실무 경험 신호가 됩니다. 특히 time leakage처럼 시계열에서 자주 터지는 문제를 언급하면, 단순 모델 학습을 넘어 운영과 검증까지 생각하는 사람이라는 인상을 줍니다.
@@ -101,9 +101,9 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 ### Step 5 — System Design
 
 ```text
-- data -> train -> serve -> monitor
-- retraining cadence
-- drift detection
+- 데이터 -> 학습 -> 서빙 -> 모니터링
+- 재학습 주기
+- 드리프트 탐지
 ```
 
 모델 하나를 잘 만드는 것과 시스템을 운영하는 것은 다른 일입니다. 인터뷰 후반으로 갈수록 데이터 수집, 학습, 서빙, 모니터링, 재학습 주기를 하나의 흐름으로 설명할 수 있는지 보게 됩니다.

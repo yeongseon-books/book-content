@@ -68,44 +68,44 @@ flowchart LR
 ### Step 1 — Fundamentals (Weeks 1-4)
 
 ```text
-- Python syntax, pandas
-- SQL JOIN, GROUP BY
-- Statistics basics (mean, variance, p-value)
-- Visualization (matplotlib)
+- Python 문법, pandas
+- SQL의 JOIN, GROUP BY
+- 통계 기초 (평균, 분산, p-value)
+- 시각화 (matplotlib)
 ```
 
 ### Step 2 — Analytics (Weeks 5-8)
 
 ```text
-- Data cleaning
-- A/B test design
-- One dashboard
-- One case study
+- 데이터 정제
+- A/B 테스트 설계
+- 대시보드 하나
+- 케이스 스터디 하나
 ```
 
 ### Step 3 — Modeling (Weeks 9-12)
 
 ```text
-- One regression, one classification
-- scikit-learn pipeline
-- Model evaluation metrics
-- One mini project
+- 회귀 하나, 분류 하나
+- scikit-learn 파이프라인
+- 모델 평가 지표
+- 미니 프로젝트 하나
 ```
 
 ### Step 4 — Weekly Artifact
 
 ```markdown
 - README
-- Data source
-- Code
-- Result
-- Retro
+- 데이터 소스
+- 코드
+- 결과
+- 회고
 ```
 
 ### Step 5 — Retro Template
 
 ```text
-What went well / Improve / Next
+잘된 점 / 아쉬운 점 / 다음 단계
 ```
 
 ## 이 예시에서 봐야 할 점

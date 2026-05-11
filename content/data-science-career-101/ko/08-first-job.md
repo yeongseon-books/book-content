@@ -66,9 +66,9 @@ flowchart LR
 ### Step 1 — Days 0-30: Listen
 
 ```text
-- ten 1:1s
-- catalog the data
-- learn five key dashboards
+- 1:1 미팅 열 번
+- 데이터 목록 정리
+- 핵심 대시보드 다섯 개 익히기
 ```
 
 처음 한 달은 가능한 한 많이 듣는 편이 좋습니다. 1:1을 통해 팀의 기대를 듣고, 데이터 소스를 정리하고, 중요한 대시보드가 무엇인지 익혀 두면 이후 제안의 품질이 달라집니다.
@@ -76,8 +76,8 @@ flowchart LR
 ### Step 2 — Days 31-60: Quick Wins
 
 ```text
-- one analysis or model PoC
-- one SQL efficiency win
+- 분석 하나 또는 모델 PoC 하나
+- SQL 효율화 개선 하나
 ```
 
 두 번째 구간에서는 작은 승리가 필요합니다. 거창한 혁신보다, 반복 쿼리를 줄여 주거나 간단한 분석을 통해 팀이 바로 쓸 수 있는 결과를 만드는 편이 훨씬 효과적입니다.
@@ -85,8 +85,8 @@ flowchart LR
 ### Step 3 — Days 61-90: Propose
 
 ```text
-- one quarterly agenda item
-- include measurement plan
+- 분기 아젠다 항목 하나
+- 측정 계획 포함
 ```
 
 세 번째 구간이 되면 이제 제안을 할 차례입니다. 다만 아이디어만 말하지 말고, 무엇을 측정할지까지 붙여야 합니다. 이때부터는 단순 기여자가 아니라 문제를 정의하는 사람으로 보이기 시작합니다.
@@ -94,7 +94,7 @@ flowchart LR
 ### Step 4 — Data Map
 
 ```markdown
-| Source | Owner | Freshness | Use |
+| 데이터 소스 | 담당자 | 최신성 | 용도 |
 ```
 
 데이터 지도는 생각보다 강력한 문서입니다. 누가 소유자인지, 얼마나 자주 갱신되는지, 어디에 쓰이는지 정리해 두면 같은 질문이 반복될 때마다 팀 전체 시간을 줄일 수 있습니다.
@@ -102,7 +102,7 @@ flowchart LR
 ### Step 5 — Decision Log
 
 ```text
-- decision / alternatives / rationale / impact
+- 결정 / 대안 / 근거 / 영향
 ```
 
 결정 기록은 초반에 특히 도움이 됩니다. 왜 그런 판단을 했는지 남겨 두면 나중에 되돌아보기도 쉽고, 협업 상대와 인식 차이를 줄이는 데도 효과적입니다.

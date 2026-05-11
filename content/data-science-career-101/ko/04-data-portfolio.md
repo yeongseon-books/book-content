@@ -69,9 +69,9 @@ flowchart LR
 ### Step 1 — Three Projects
 
 ```text
-- one analytics (dashboard)
-- one model (classification or regression)
-- one data engineering (pipeline)
+- 분석 프로젝트 하나 (대시보드)
+- 모델 프로젝트 하나 (분류 또는 회귀)
+- 데이터 엔지니어링 프로젝트 하나 (파이프라인)
 ```
 
 이 세 종류는 서로 다른 역량을 보여 주기 좋습니다. 분석 프로젝트는 질문과 해석 능력을, 모델 프로젝트는 문제 정의와 평가 지표 감각을, 데이터 엔지니어링 프로젝트는 재현 가능한 데이터 흐름 설계 역량을 보여 줍니다.
@@ -79,12 +79,12 @@ flowchart LR
 ### Step 2 — README Template
 
 ```markdown
-# Title
-## Problem
-## Data
-## Approach
-## Results
-## How to Reproduce
+# 제목
+## 문제
+## 데이터
+## 접근
+## 결과
+## 재현 방법
 ```
 
 README는 저장소의 얼굴입니다. 무엇을 만들었는지보다 먼저 왜 만들었는지 설명해야 합니다. 특히 `How to Reproduce`가 있으면 읽는 사람이 “이 프로젝트는 정리된 작업이구나”라고 느끼기 쉽습니다.
@@ -102,9 +102,9 @@ make run
 ### Step 4 — Visualization
 
 ```text
-- one key chart
-- one comparison table
-- one one-line conclusion
+- 핵심 차트 하나
+- 비교 표 하나
+- 한 줄 결론 하나
 ```
 
 시각화는 많이 넣는다고 좋은 것이 아닙니다. 핵심 그래프 하나, 비교 표 하나, 결론 한 줄이 더 강할 때가 많습니다. 보는 사람이 무엇을 기억해야 하는지 선명해야 하기 때문입니다.
@@ -112,8 +112,8 @@ make run
 ### Step 5 — Documentation
 
 ```text
-- enough markdown cells in the notebook
-- decision notes
+- 노트북 안에 충분한 markdown 셀
+- 의사결정 메모
 ```
 
 노트북 안의 설명과 의사결정 메모는 생각보다 중요합니다. 결과만 보여 주는 사람보다, 왜 그런 선택을 했는지 남겨 두는 사람이 협업에 더 강한 신호를 줍니다.

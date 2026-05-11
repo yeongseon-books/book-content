@@ -66,8 +66,8 @@ flowchart LR
 ### Step 1 — Build a Glossary
 
 ```text
-- 30 words
-- definition + example
+- 용어 30개
+- 정의 + 예시
 ```
 
 도메인 학습의 시작은 어휘입니다. 회의에서 자주 나오는 단어 30개만 정리해도 이해도가 크게 달라집니다. 단순 정의만 적지 말고, 실제 예시까지 붙여 두면 훨씬 오래 남습니다.
@@ -75,9 +75,9 @@ flowchart LR
 ### Step 2 — Five Key Metrics
 
 ```text
-- definition
-- formula
-- consuming team
+- 정의
+- 수식
+- 사용하는 팀
 ```
 
 지표는 이름만 알면 부족합니다. 계산식이 무엇인지, 어느 팀이 주로 쓰는지, 어떤 의사결정에 연결되는지까지 같이 알아야 해석이 깊어집니다.
@@ -85,8 +85,8 @@ flowchart LR
 ### Step 3 — Field Shadowing
 
 ```text
-- spend a day with sales or operations
-- notes and questions
+- 영업 또는 운영과 하루 동행
+- 메모와 질문
 ```
 
 현장을 보는 경험은 숫자 뒤의 맥락을 이해하는 데 매우 중요합니다. 예를 들어 운영팀의 실제 업무 흐름을 한 번만 봐도, 같은 지표를 왜 그렇게 정의하는지 금방 납득되는 경우가 많습니다.
@@ -94,8 +94,8 @@ flowchart LR
 ### Step 4 — External Study
 
 ```text
-- one industry conference per quarter
-- industry news RSS
+- 분기마다 업계 컨퍼런스 하나
+- 업계 뉴스 RSS
 ```
 
 내부 데이터만 보면 조직 안 시야에 갇히기 쉽습니다. 분기마다 업계 컨퍼런스를 보거나 뉴스 흐름을 따라가면, 외부 변화가 내부 지표에 어떻게 반영되는지도 더 잘 읽힙니다.
@@ -103,8 +103,8 @@ flowchart LR
 ### Step 5 — Quarterly Retro
 
 ```text
-- ten new words
-- three new metrics
+- 새 용어 열 개
+- 새 지표 세 개
 ```
 
 도메인 전문성도 회고가 필요합니다. 새로 익힌 단어와 지표를 분기마다 점검하면, 지식이 흩어지지 않고 축적됩니다.

@@ -66,7 +66,7 @@ flowchart LR
 ### Step 1 — Define the Problem
 
 ```text
-Write the "problem", not the "symptom".
+"증상"이 아니라 "문제"를 적기.
 ```
 
 시니어는 증상과 문제를 구분합니다. “대시보드가 느리다”는 증상일 수 있고, 실제 문제는 데이터 모델이 과도하게 복잡하거나 쿼리 패턴이 잘못된 것일 수 있습니다. 문제를 잘못 정의하면 해결책도 늘 엇나갑니다.
@@ -74,9 +74,9 @@ Write the "problem", not the "symptom".
 ### Step 2 — Measure Impact
 
 ```markdown
-- hypothesis
-- measurement plan
-- result
+- 가설
+- 측정 계획
+- 결과
 ```
 
 좋은 제안은 실행 전에 이미 측정 계획이 붙어 있습니다. 무엇이 좋아질 것인지, 어떻게 확인할 것인지, 어느 시점에 평가할 것인지를 미리 말할 수 있어야 영향력이 설명됩니다.
@@ -84,8 +84,8 @@ Write the "problem", not the "symptom".
 ### Step 3 — Mentor
 
 ```text
-- monthly 1:1
-- mentee sets the agenda
+- 월간 1:1
+- 멘티가 아젠다를 정한다
 ```
 
 시니어는 자기 성과만 내는 사람이 아니라, 주변 사람의 성과도 키우는 사람입니다. 작은 코드 리뷰 습관, 월간 1:1, 문서 피드백만으로도 팀 전체 생산성이 달라질 수 있습니다.
@@ -93,7 +93,7 @@ Write the "problem", not the "symptom".
 ### Step 4 — Decision Records
 
 ```text
-- decision / alternatives / rationale / impact
+- 결정 / 대안 / 근거 / 영향
 ```
 
 의사결정 기록은 단순 메모가 아닙니다. 나중에 맥락을 복원하고, 팀이 왜 그런 방향을 택했는지 공유하는 장치입니다. 기록이 남으면 같은 논의를 반복하는 비용도 줄어듭니다.
@@ -101,7 +101,7 @@ Write the "problem", not the "symptom".
 ### Step 5 — Systems Thinking
 
 ```text
-- data -> model -> decision -> operation -> retro
+- 데이터 -> 모델 -> 결정 -> 운영 -> 회고
 ```
 
 시니어는 한 부분만 최적화하지 않습니다. 데이터 수집부터 모델, 의사결정, 운영, 회고까지 전체 흐름을 보고 어디가 병목인지 찾습니다. 그래서 기술적으로는 작은 수정이라도 조직적으로는 큰 효과를 내는 경우가 많습니다.

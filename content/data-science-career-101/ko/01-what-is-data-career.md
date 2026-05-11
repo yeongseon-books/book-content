@@ -68,31 +68,31 @@ flowchart LR
 ### Step 1 — Analyst
 
 ```text
-Drives decisions with SQL and dashboards.
+SQL과 대시보드로 의사결정을 돕는다.
 ```
 
 ### Step 2 — Scientist
 
 ```text
-Tests hypotheses with experiments and models.
+실험과 모델로 가설을 검증한다.
 ```
 
 ### Step 3 — Engineer
 
 ```text
-Builds pipelines and storage as data infrastructure.
+파이프라인과 저장소를 구축해 데이터 기반을 만든다.
 ```
 
 ### Step 4 — ML Engineer
 
 ```text
-Trains, deploys, and monitors models.
+모델을 학습시키고 배포하며 모니터링한다.
 ```
 
 ### Step 5 — Analytics Engineer
 
 ```text
-Builds reliable analytics models with dbt and friends.
+dbt 같은 도구로 신뢰할 수 있는 분석 기반을 만든다.
 ```
 
 ## 이 예시에서 봐야 할 점
