@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 증분 인덱싱은 벡터 DB 기술이라기보다 파일 상태를 기억하는 운영 자동화 문제입니다.
 ---
 

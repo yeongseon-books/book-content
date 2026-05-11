@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 다중 포맷 파이프라인의 본질은 다양한 입력을 하나의 Document 계약으로 수렴시키는 일입니다.
 ---
 

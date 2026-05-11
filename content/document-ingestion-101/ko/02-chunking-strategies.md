@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 청킹은 텍스트를 잘게 자르는 작업이 아니라 검색이 버틸 수 있는 문맥 단위를 설계하는 작업입니다.
 ---
 
