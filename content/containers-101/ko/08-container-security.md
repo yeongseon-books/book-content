@@ -17,7 +17,7 @@ tags:
   - Cosign
   - DevOps
 seo_description: 컨테이너 보안의 기초, non-root, capabilities, seccomp, 이미지 스캔과 시크릿 처리 원칙을 예제로 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Container Security
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*기본 설정* 의 컨테이너는 *root* 로 동작하고 *과도한 권한* 을 갖기 쉽습니다. *보안 사고* 의 *시작점* 이 됩니다.
+기본 설정의 컨테이너는 root로 동작하고 권한도 과하게 열려 있는 경우가 많습니다. 이런 상태가 보안 사고의 출발점이 됩니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *root + 모든 권한* 으로 실행.
+**Before**: root와 넓은 권한을 그대로 둔 채 실행합니다.
 
-**After**: *non-root + 최소 capability + seccomp* 로 *공격면 축소*.
+**After**: non-root, 최소 capability, seccomp 조합으로 공격면을 줄입니다.
 
 ## 안전한 컨테이너 실행
 
@@ -102,32 +102,32 @@ def run_with_secret(image, secret_path):
 
 ## 이 코드에서 주목할 점
 
-- *--user* 로 *root 회피*.
-- *--cap-drop=ALL* 후 *필요한 것만* 추가.
-- *시크릿* 은 *볼륨* 으로 마운트.
+- `--user`로 root 실행을 피합니다.
+- `--cap-drop=ALL`을 적용한 뒤 필요한 capability만 다시 추가합니다.
+- 시크릿은 환경 변수보다 볼륨 마운트 방식이 안전합니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***root* 로 실행 후 *내부* 만 신뢰.**
-2. ***시크릿* 을 *환경 변수* 로 노출.**
-3. ***이미지 스캔* 없이 *프로덕션* 배포.**
-4. ***privileged* 컨테이너 *남용*.**
-5. ***서명 검증* 미적용으로 *교체 공격*.**
+1. **root로 실행한 뒤 내부 네트워크만 믿고 안심합니다.**
+2. **시크릿을 환경 변수에 그대로 노출합니다.**
+3. **이미지 스캔 없이 프로덕션에 바로 배포합니다.**
+4. **privileged 컨테이너를 쉽게 남용합니다.**
+5. **서명 검증을 생략해서 이미지 교체 공격 여지를 남깁니다.**
 
 ## 실무에서는 이렇게 쓰입니다
 
-*Kubernetes PodSecurity* 와 *admission controller* 가 *non-root, no privileged, signed only* 정책을 *런타임* 에서 강제합니다.
+실무에서는 Kubernetes PodSecurity와 admission controller가 non-root, no privileged, signed only 같은 정책을 런타임에서 강제합니다.
 
 ## 체크리스트
 
-- [ ] *non-root* 사용자.
-- [ ] *cap-drop=ALL* 후 최소 추가.
-- [ ] *read-only* 파일시스템.
-- [ ] *시크릿* 은 볼륨/시크릿 매니저.
+- [ ] non-root 사용자를 적용했습니다.
+- [ ] `cap-drop=ALL` 뒤에 필요한 capability만 추가했습니다.
+- [ ] read-only 파일시스템을 검토했습니다.
+- [ ] 시크릿은 볼륨이나 시크릿 매니저로 분리했습니다.
 
 ## 정리 및 다음 단계
 
-보안 원칙이 잡혔으면 *컨테이너* 와 *VM* 의 *근본 차이* 를 정리할 차례입니다. 다음 글은 *Container와 VM 차이*.
+보안 원칙을 이해했다면 이제 컨테이너와 VM의 근본 차이를 정리할 차례입니다. 다음 글은 Container와 VM 차이입니다.
 
 <!-- toc:begin -->
 - [Container란 무엇인가?](./01-what-is-a-container.md)

@@ -17,7 +17,7 @@ tags:
   - FastAPI
   - DevOps
 seo_description: FastAPI 앱을 Dockerfile, Compose, healthcheck로 배포까지 끌고 가는 컨테이너 실전 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 실전 컨테이너 앱 만들기
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-지금까지의 모든 개념을 *하나의 결과물* 로 *통합* 해야 *체득* 됩니다. *마지막 글* 의 의미가 여기 있습니다.
+지금까지 본 개념은 하나의 결과물로 묶어 봐야 몸에 붙습니다. 마지막 글의 의미도 바로 여기에 있습니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *수동 docker run* 명령 *여러 줄* 로 환경 재현 어려움.
+**Before**: 수동 `docker run` 명령이 여러 줄이라 환경을 다시 띄우기 어렵습니다.
 
-**After**: `docker compose up` *한 줄* 로 *전체 스택* 기동.
+**After**: `docker compose up` 한 줄로 전체 스택을 기동합니다.
 
 ## FastAPI + Postgres 스택
 
@@ -129,32 +129,32 @@ def down():
 
 ## 이 코드에서 주목할 점
 
-- *USER 1000* 으로 *non-root*.
-- *healthcheck* 가 *Compose* 의 *의존성* 을 결정.
-- *depends_on + service_healthy* 조합.
+- `USER 1000`으로 non-root 실행을 강제합니다.
+- healthcheck가 Compose 서비스 의존성 판단에 영향을 줍니다.
+- `depends_on`과 `service_healthy`를 함께 써야 시작 순서를 더 안정적으로 맞출 수 있습니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***DB 비밀번호* 를 *Compose* 에 *평문* 으로 영구 보관.**
-2. ***healthcheck* 없이 *depends_on* 만 사용.**
-3. ***restart policy* 누락으로 *장애 전파*.**
-4. ***volumes* 누락으로 *데이터 손실*.**
-5. ***로그* 를 *컨테이너 내부* 에만 적재.**
+1. **DB 비밀번호를 Compose 파일에 평문으로 오래 남겨 둡니다.**
+2. **healthcheck 없이 `depends_on`만 사용합니다.**
+3. **restart policy를 빼먹어서 장애가 더 크게 번집니다.**
+4. **volumes를 설정하지 않아 데이터가 쉽게 사라집니다.**
+5. **로그를 컨테이너 내부에만 남겨 추적이 어려워집니다.**
 
 ## 실무에서는 이렇게 쓰입니다
 
-*로컬 개발* 은 *Compose*, *프로덕션* 은 *Kubernetes* 로 동일한 *이미지* 를 *다른 오케스트레이터* 에서 운영합니다.
+로컬 개발은 Compose로 빠르게 반복하고, 프로덕션은 Kubernetes에서 같은 이미지를 다른 오케스트레이터로 운영하는 흐름이 흔합니다.
 
 ## 체크리스트
 
-- [ ] *non-root* 실행.
-- [ ] *healthcheck* 정의.
-- [ ] *시크릿* 분리.
-- [ ] *teardown* 명령 문서화.
+- [ ] non-root 실행을 적용했습니다.
+- [ ] healthcheck를 정의했습니다.
+- [ ] 시크릿을 분리했습니다.
+- [ ] teardown 명령을 문서화했습니다.
 
 ## 정리 및 다음 단계
 
-여기까지가 *Containers 101* 의 *마지막* 입니다. 다음 단계는 *Kubernetes 101* 으로 *오케스트레이션* 의 세계로 들어가는 것입니다.
+여기까지가 Containers 101의 마지막입니다. 다음 단계는 Kubernetes 101으로 넘어가 오케스트레이션 관점까지 확장하는 것입니다.
 
 <!-- toc:begin -->
 - [Container란 무엇인가?](./01-what-is-a-container.md)

@@ -17,7 +17,7 @@ tags:
   - runc
   - DevOps
 seo_description: Docker, containerd, runc, CRI까지 컨테이너 런타임의 계층 구조를 ctr 예제와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Runtime
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*Kubernetes 1.24* 부터 *dockershim* 이 제거되었습니다. *런타임 계층* 을 *모르면* *디버깅* 이 *불가능* 합니다.
+Kubernetes 1.24부터 dockershim이 제거되었습니다. 런타임 계층을 이해해야 디버깅 포인트를 제대로 잡을 수 있습니다.
 
 ## 전체 흐름
 ```mermaid
@@ -40,9 +40,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *Docker* 만 있으면 된다고 생각.
+**Before**: Docker만 알면 충분하다고 생각합니다.
 
-**After**: *containerd*, *runc*, *CRI* 의 *역할* 을 구분.
+**After**: containerd, runc, CRI의 역할을 구분해서 봅니다.
 
 ## containerd 직접 다루기
 
@@ -91,32 +91,32 @@ def ctr_kill(name):
 
 ## 이 코드에서 주목할 점
 
-- *ctr* 는 *containerd* 의 *디버그용* CLI.
-- *task* 와 *container* 가 *분리* 됨.
-- *Kubernetes* 는 *crictl* 을 사용.
+- `ctr`는 containerd를 직접 들여다볼 때 쓰는 디버그용 CLI입니다.
+- `task`와 `container`는 분리된 개념입니다.
+- Kubernetes 환경에서는 `crictl`을 함께 이해해야 합니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***Docker* 만 익히고 *containerd* 무시.**
-2. ***K8s* 에서 *docker* CLI 로 디버깅 시도.**
-3. ***런타임 버전* 을 *호스트 OS* 와 일치시키지 않음.**
-4. ***rootless* 런타임 옵션 무시.**
-5. ***runc* 의 *seccomp* 기본값 무지.**
+1. **Docker만 익히고 containerd 계층을 무시합니다.**
+2. **Kubernetes 노드에서 docker CLI로만 디버깅하려고 합니다.**
+3. **런타임 버전과 호스트 OS의 조합을 점검하지 않습니다.**
+4. **rootless 런타임 옵션을 검토하지 않습니다.**
+5. **runc의 seccomp 기본값을 모르고 지나갑니다.**
 
 ## 실무에서는 이렇게 쓰입니다
 
-*K8s 노드* 는 *containerd*, *디버깅* 은 *crictl*, *로컬 개발* 은 *Docker Desktop*, *embedded* 환경은 *podman* 등 다양.
+Kubernetes 노드는 containerd를 많이 쓰고, 디버깅은 crictl로 하며, 로컬 개발은 Docker Desktop을 쓰는 식으로 환경마다 도구가 달라집니다.
 
 ## 체크리스트
 
-- [ ] *containerd* 와 *runc* 차이 설명 가능.
-- [ ] *CRI* 의 역할 이해.
-- [ ] *crictl* 도구 인지.
-- [ ] *OCI 표준* 인지.
+- [ ] containerd와 runc의 차이를 설명할 수 있습니다.
+- [ ] CRI의 역할을 이해했습니다.
+- [ ] crictl 도구의 용도를 알고 있습니다.
+- [ ] OCI 표준의 위치를 알고 있습니다.
 
 ## 정리 및 다음 단계
 
-런타임이 *이미지를 실행* 하려면 *이미지를 만들* 줄 알아야 합니다. 다음 글은 *Dockerfile*.
+런타임이 이미지를 실행하려면 먼저 이미지를 만드는 방법을 알아야 합니다. 다음 글은 Dockerfile입니다.
 
 <!-- toc:begin -->
 - [Container란 무엇인가?](./01-what-is-a-container.md)
