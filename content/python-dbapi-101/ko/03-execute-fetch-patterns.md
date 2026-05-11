@@ -29,20 +29,6 @@ seo_description: DB-API의 모든 query 실행은 결국 cursor의 execute(), ex
 
 DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`와 `fetchone()`, `fetchall()`, `fetchmany()` 다섯 메서드로 압축됩니다. 단순해 보이지만, 어떤 fetch 메서드를 언제 쓰느냐가 메모리 사용량, latency, 그리고 production에서 OOM이 터지는지 여부를 결정합니다. 이 글에서는 다섯 메서드의 동작과 실전 선택 기준을 정리합니다.
 
-<!-- a-grade-intro:begin -->
-
-![execute, executemany, fetch 패턴](../../../assets/python-dbapi-101/03/03-01-execute-executemany-and-fetch-patterns.ko.png)
-
-*execute, executemany, fetch 패턴*
-## 핵심 질문
-
-- execute, executemany, fetchone, fetchall, fetchmany는 각각 언제 써야 할까요?
-- 큰 결과 집합을 메모리 폭주 없이 처리하려면 어떻게 해야 할까요?
-- cursor.description은 어떤 메타데이터를 알려주나요?
-- streaming + transformation 파이프라인의 핵심 요소는 무엇일까요?
-
-<!-- a-grade-intro:end -->
-
 ## 1. execute - 한 번의 query
 
 ![execute - 한 번의 query](../../../assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.ko.png)
@@ -213,14 +199,6 @@ def export_notes(db_path, csv_path, chunk=500):
 다음 글에서는 parameter binding과 SQL injection 방어를 다룹니다.
 
 <!-- a-grade-example:begin -->
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **executemany 활용** — 대량 삽입은 executemany로 왕복을 줄입니다.
-- **fetch 전략** — fetchall은 메모리, fetchmany는 균형, fetchone은 스트리밍에 유리합니다.
-- **rowcount 신뢰도** — 드라이버마다 의미가 달라 맹신하지 않습니다.
-- **결과 소진** — Cursor 결과를 끝까지 소진하거나 닫아 자원 누수를 막습니다.
-- **배치 크기** — 메모리·latency 균형으로 배치 크기를 정합니다.
 
 ## 체크리스트
 

@@ -24,14 +24,6 @@ seo_description: LLM이 "사실이 아닌 내용을 자신 있게 말하는" 현
 > AI Safety & Guardrails 101 시리즈 (7/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Hallucination을 어떻게 가드레일로 막아야 grounding이 깨지지 않을까요?
-
-이 글은 그 질문에 답하기 위해 Hallucination Guardrail의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## Section 1
 
@@ -230,14 +222,6 @@ Hallucination 검증은 정확도와 비용 트레이드오프가 큽니다. 회
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **출력은 source에 grounded해야** — 검증 가능한 출처를 함께 요구합니다.
-- **citation 강제가 첫 단계** — 출처 없는 주장을 차단합니다.
-- **entailment 검증이 정밀 방어** — 출력과 source의 일치를 자동 판정합니다.
-- **retrieval 품질이 천장** — 근거 자체가 없으면 grounding 불가능합니다.
-- **불확실성 표현을 학습** — '모른다'를 말하는 능력이 안전의 핵심입니다.
-
 ## AI Safety & Guardrails 101 시리즈
 
 - [Ep1 AI 안전이 왜 중요한가](./01-why-ai-safety-matters.md)

@@ -27,27 +27,8 @@ seo_description: 환경변수는 프로세스에 붙은 이름표이고, PATH는
 
 ---
 
-<!-- a-grade-intro:begin -->
 
-## 핵심 질문
-
-- 환경변수란 무엇이고 왜 필요할까요?
-- `echo $PATH`의 출력은 무엇을 의미할까요?
-- `export`와 단순 변수 대입의 차이는 무엇일까요?
-- `.bashrc`, `.bash_profile`, `.profile`은 각각 언제 실행될까요?
-
-> 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 환경변수의 개념과 `echo`, `env`, `export`로 확인/설정하는 법
-- PATH가 명령어 검색에 작동하는 원리
-- `.bashrc`, `.bash_profile`에 영구 설정을 추가하는 법
-- `.env` 파일로 애플리케이션 설정을 관리하는 법
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 `python`을 입력하면 Shell이 Python 실행 파일을 찾아서 실행합니다. 어떻게 찾을까요? 모든 디렉터리를 뒤지는 것이 아니라, PATH에 등록된 디렉터리만 순서대로 확인합니다. PATH에 없으면 "command not found"입니다.
 
@@ -218,14 +199,6 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 
 반면 환경변수가 너무 많아지면 관리가 어려워집니다. 이때는 `.env` 파일을 환경별로 관리하거나, AWS Parameter Store, HashiCorp Vault 같은 시크릿 관리 도구로 넘어갑니다. 하지만 모든 것의 출발점은 `export`와 `$PATH`를 이해하는 것입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Secret 격리** — 환경변수에 비밀값은 두지 말고 secret manager로 갑니다.
-- **PATH 위험** — 현재 디렉터리(.)를 PATH에 두지 않습니다.
-- **export 범위** — 변수는 명시 export 시에만 자식 프로세스에 전달됩니다.
-- **Locale** — LC_ALL·LANG 차이가 정렬·정규식을 바꿉니다.
-- **스크립트 의존** — 스크립트 시작에 필요한 환경 변수의 존재를 검증합니다.
-
 ## 체크리스트
 
 - [ ] `echo $PATH`의 출력을 읽고 명령어 검색 순서를 설명할 수 있다
@@ -233,12 +206,6 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 - [ ] `.bashrc`에 PATH를 영구적으로 추가할 수 있다
 - [ ] `.env` 파일을 만들고 `source`로 로드할 수 있다
 - [ ] `.env` 파일을 `.gitignore`에 추가하는 이유를 안다
-
-## 연습 문제
-
-1. `echo $PATH | tr ':' '\n' | nl`로 PATH의 검색 순서를 번호와 함께 확인해보세요.
-2. `MY_SECRET=hello`와 `export MY_SECRET=hello` 후 각각 `bash -c 'echo $MY_SECRET'`를 실행하여 차이를 확인해보세요.
-3. `.bashrc`에 `alias ll='ls -la'`를 추가하고, `source ~/.bashrc` 후 `ll`이 동작하는지 확인해보세요.
 
 ## 정리 · 다음 글
 

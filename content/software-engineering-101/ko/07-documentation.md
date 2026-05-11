@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Software Engineering 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 코드만 잘 짜면 문서는 필요 없는 것 아닌가요?
-
-> 코드는 "어떻게"를 답합니다. 문서는 "왜"와 "언제"를 답합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- README의 최소 항목
-- ADR로 결정 남기기
-- docstring과 타입 힌트
-- runbook과 onboarding 문서
-- Diataxis 4분면(튜토리얼/가이드/레퍼런스/설명)
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 문서가 없으면 모든 질문이 사람을 거칩니다. 사람이 병목이 되는 순간 팀의 속도는 한 사람의 출근 시간에 종속됩니다.
 
 > 문서는 비동기 협업의 인프라다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     T["튜토리얼"] --> H["하우투(가이드)"]
@@ -57,14 +41,6 @@ flowchart LR
 ```
 
 Diataxis는 독자의 의도로 문서를 분리합니다.
-
-## 핵심 용어 정리
-
-- **README**: 첫인상이자 진입점.
-- **ADR**: 결정의 이유 기록.
-- **Docstring**: 함수/클래스의 사용 약속.
-- **Runbook**: 사고 시 따라하는 절차.
-- **Diataxis**: 4분면 문서 분류 모델.
 
 ## Before/After
 
@@ -82,7 +58,7 @@ docs/tutorials/  docs/how-to/  docs/reference/  docs/explanation/
 
 읽는 사람의 의도로 폴더가 나뉩니다.
 
-## 실습: 작은 문서 셋
+## 작은 문서 셋
 
 ### 1단계 — README 5블록
 
@@ -167,14 +143,6 @@ def compute_invoice(amount: int, tax_rate: float) -> int:
 
 규모 있는 팀은 docs-as-code(저장소에 마크다운으로 보관, PR로 변경, CI에서 빌드). 새 기능은 RFC -> 코드 -> docs 업데이트가 한 PR 안에.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 문서는 비동기 협업의 인프라다.
-- 코드는 "어떻게", 문서는 "왜"와 "언제"이다.
-- README가 부실한 저장소는 미래의 부채다.
-- 모든 문서에 owner와 last_reviewed가 있어야 한다.
-- 문서도 코드처럼 리뷰한다.
-
 ## 체크리스트
 
 - [ ] README 5블록이 있는가?
@@ -182,12 +150,6 @@ def compute_invoice(amount: int, tax_rate: float) -> int:
 - [ ] docstring이 사용 약속을 말하는가?
 - [ ] 운영 사고 runbook이 있는가?
 - [ ] 모든 문서에 owner가 있는가?
-
-## 연습 문제
-
-1. 본인 저장소 README를 5블록으로 다시 써 보세요.
-2. 최근 결정 한 가지를 ADR로 옮겨 보세요.
-3. 최근 incident에 대한 1페이지 runbook을 적어 보세요.
 
 ## 정리 및 다음 단계
 

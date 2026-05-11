@@ -51,23 +51,6 @@ Functions Deep Dive가 프로세스 안쪽을 봤다면,
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-App Service 플랫폼 아키텍처를 이해하면 어떤 운영 결정을 더 정확히 내릴 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 App Service 플랫폼 아키텍처의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- App Service의 ‘플랫폼’은 정확히 어떤 레이어로 구성되어 있는가?
-- App Service Plan은 단순한 가격표인가, 아니면 격리 단위인가?
-- Front End 풀과 Worker 풀은 누가 소유하고, 우리 코드는 어디에서 도는가?
-- Linux 플랜과 Windows 플랜의 내부 차이는 우리 의사결정에 어떻게 영향을 주는가?
-- App Service Environment(ASE)는 멀티테넌트 모델과 무엇이 본질적으로 다른가?
-
 ## 전체 그림 — App Service 한 인스턴스가 받는 요청
 
 이 그림이 이번 시리즈의 지도입니다.
@@ -333,14 +316,6 @@ az appservice plan show -n my-plan -g my-rg \
 az webapp list --plan my-plan -g my-rg \
   --query "[].{name:name, state:state, hostNames:defaultHostName}" -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Front End·Worker 분리가 핵심 추상화** — 장애 격리와 스케일 단위가 여기서 갈립니다.
-- **App Service Plan이 자원 경계** — 여러 앱이 같은 Plan을 공유한다는 점을 의식합니다.
-- **스토리지·로깅이 공통 인프라** — 단일 장애가 여러 앱에 미칠 수 있습니다.
-- **Premium·Isolated의 격리 수준 차이** — 보안·성능 요구가 SKU 선택을 결정합니다.
-- **플랫폼 업그레이드는 불가피한 변수** — 주기적 변화를 운영 가정에 포함합니다.
 
 ## 운영 체크리스트
 

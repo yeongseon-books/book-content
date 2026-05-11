@@ -30,23 +30,6 @@ seo_description: 처음 App Service를 만들 때 헷갈리는 이유는, 선택
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Code·Container·Static의 호스팅 모델은 어떻게 다르고 언제 어느 것을 골라야 할까요?
-
-이 글은 그 질문에 답하기 위해 App Service 호스팅 모델의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- 코드 배포, 컨테이너 배포, custom container는 같은 App Service 위에서 어떤 차이를 만드는가?
-- Linux App Service에서 Docker 이미지를 쓸 때 startup 명령은 어떻게 결정되는가?
-- Windows 컨테이너는 왜 별도 SKU에서만 동작하는가?
-- ZIP 배포와 컨테이너 배포의 롤백 전략은 어떻게 다른가?
-- 동일 앱을 여러 호스팅 모델로 운영하는 것이 가치 있을 때는 언제인가?
-
 ## 먼저 결론: 대부분의 첫 선택은 이 조합이다
 
 대부분의 팀에게 첫 App Service 조합은 아래에서 크게 벗어나지 않습니다.
@@ -496,14 +479,6 @@ az webapp create \
   --resource-group $RG --plan $PLAN --name $APP \
   --deployment-container-image-name $REGISTRY.azurecr.io/myapp:v1
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Code 호스팅이 가장 마찰이 적다** — 런타임 관리가 자동이라 시작이 빠릅니다.
-- **Container는 자유의 대가가 책임** — 이미지·런타임을 직접 관리해야 합니다.
-- **Static Web Apps는 다른 제품** — 동일한 이름으로 묶지 말고 용도를 분리합니다.
-- **스택 종속을 의식한다** — 지원 런타임 버전·EOL 정책이 운영 캘린더에 들어가야 합니다.
-- **로컬·CI 환경과 프로덕션을 맞춘다** — 동일 베이스 이미지·동일 런타임 버전이 사고를 줄입니다.
 
 ## 운영 체크리스트
 

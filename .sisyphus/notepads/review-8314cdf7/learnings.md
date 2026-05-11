@@ -1,0 +1,1 @@
+- 2026-05-11: Commit `8314cdf7` mostly applies the intended blog conversion pattern: eBook-only scaffolding is usually removed, `왜 중요한가` becomes `이 글에서 다룰 문제`, `개념 한눈에 보기` becomes `전체 흐름`, and core structure like TOC/references/tags stays intact in sampled files.

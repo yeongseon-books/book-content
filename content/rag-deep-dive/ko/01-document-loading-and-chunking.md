@@ -20,24 +20,6 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
 
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- 로더가 만든 문서 경계가 왜 검색 품질보다 먼저 중요할까요?
-- Character, Recursive, Token splitter는 같은 텍스트를 어떻게 다르게 자를까요?
-- `chunk_overlap`은 왜 설정한 숫자와 체감이 다를까요?
-- 토큰 기준 분할은 언제 문자 기준 분할보다 안전할까요?
-
-> 청킹은 문서를 잘게 자르는 작업이 아니라, 나중에 다시 찾을 의미 경계를 먼저 고정하는 작업입니다.
-
-![이 글에서 답할 질문](../../../assets/rag-deep-dive/01/01-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (1/6)
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/01-document-loading-and-chunking/main.py`
@@ -103,14 +85,6 @@ if __name__ == "__main__":
 - `chunk_overlap=10`이 항상 정확히 10문자 겹침을 뜻하지는 않습니다.
 - 재귀 분할은 구조 보존에 강하지만, 도메인별 경계를 자동으로 이해하는 것은 아닙니다.
 - 문자 기준으로 안전해 보여도 토큰 기준 컨텍스트 한도는 초과할 수 있습니다.
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **구조 우선** — 헤딩·문단을 살린 청크가 의미를 보존합니다.
-- **Overlap** — 약간의 겹침이 경계 손실을 줄입니다.
-- **메타 보존** — 출처·페이지·헤딩을 청크에 함께 저장합니다.
-- **측정** — 청크 변경은 회귀 셋으로 정량 비교합니다.
-- **도메인 적응** — 법률·코드 등 도메인은 전용 분할기가 필요합니다.
 
 ## 체크리스트
 

@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Secure Coding 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 우리 코드의 *대부분은 우리가 안 짰는데*, 그 코드의 *보안* 은 누가 책임지나요?
-
-> *Dependency 는 *우리 코드의 일부*. 모르는 결함은 *우리 결함이 된다*.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *SCA* (Software Composition Analysis) 의 의미
-- *SBOM* 의 역할
-- *Lockfile* 이 왜 필수인가
-- *Dependabot / Renovate* 자동화
-- 5단계와 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 Log4j, event-stream, ua-parser-js — *공급망 공격* 은 *우리 코드 0줄* 만으로 일어납니다. *모르고 쓰는* 라이브러리가 *문* 이 됩니다.
 
 > *Dependency 는 *언젠가 새는 자산*. 추적이 *방어의 시작*.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Manifest["pyproject.toml"] --> Lock["lockfile"]
@@ -56,21 +40,13 @@ flowchart LR
     Alerts --> Update["업데이트 PR"]
 ```
 
-## 핵심 용어 정리
-
-- **SCA**: dependency 의 *취약점 스캔*.
-- **SBOM**: 사용한 *모든 컴포넌트 목록*.
-- **Lockfile**: 정확한 *버전 + 해시* 고정.
-- **Pinning**: 직접 의존성 버전을 *명시*.
-- **Transitive dependency**: dependency 의 *dependency*.
-
 ## Before/After
 
 **Before**: `requirements.txt` 에 `requests` 만 적혀 있다. 빌드마다 *다른 버전*. 무엇이 들어왔는지 *모른다*.
 
 **After**: `uv.lock` / `poetry.lock` 으로 *해시 고정*. *주간 dependency PR* 자동 생성, CI 가 *SCA* 를 막는다.
 
-## 실습: Dependency 안전 5단계
+## Dependency 안전 5단계
 
 ### 1단계 — Lockfile 생성
 
@@ -127,26 +103,12 @@ pip install --require-hashes -r requirements.txt
 
 대부분의 팀은 *Renovate* 또는 *Dependabot* 으로 *주간* PR 을 받고, *CI* 에 *SCA gate* 를 둡니다. 큰 조직은 *SBOM* 을 *생산물* 처럼 발행합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Dependency 는 *우리 코드*. 책임도 우리 것.*
-- *Lockfile 없는 빌드는 *재현 불가*.*
-- *작은 업데이트가 *큰 사고를 막는다*.*
-- *SBOM 은 *사고 응대 도구*.*
-- *적게 의존하는 것 자체가 보안.*
-
 ## 체크리스트
 
 - [ ] *Lockfile* 이 commit 되어 있다.
 - [ ] *SCA* 가 CI 에서 돈다.
 - [ ] *자동 업데이트 PR* 이 매주 들어온다.
 - [ ] *SBOM* 이 발행된다.
-
-## 연습 문제
-
-1. *pip-audit* 결과 한 줄을 분석해 보세요.
-2. *Transitive dependency* 의 취약점 사례 한 가지.
-3. *Lockfile* 이 없는 빌드의 위험 세 가지.
 
 ## 정리 및 다음 단계
 

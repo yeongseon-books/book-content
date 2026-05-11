@@ -26,14 +26,6 @@ seo_description: 원본 corpus는 거의 항상 절반 이상이 쓰레기입니
 > AI Data Preparation 101 시리즈 (6/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Heuristic·Classifier 기반 품질 필터링을 어떻게 조합해야 신호 손실을 최소화할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 데이터 품질 필터링의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "수집했다고 다 학습데이터인가요?"
 
@@ -231,14 +223,6 @@ def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -> list[
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Heuristic이 첫 단계** — 길이·문자 비율 등 단순 규칙으로 노이즈를 빠르게 제거합니다.
-- **Classifier가 정밀 필터** — fastText·BERT 기반으로 정렬합니다.
-- **두 단계 분리가 비용·정확도 모두에 유리** — 한 번에 모든 걸 하면 비용이 폭증합니다.
-- **도메인 의존성을 의식** — 범용 필터가 도메인 데이터를 망칠 수 있습니다.
-- **필터된 샘플도 보관** — 오버 필터링 검증의 단서가 됩니다.
-
 ## AI Data Preparation 101 시리즈
 
 - [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)

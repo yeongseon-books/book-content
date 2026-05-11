@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Containers 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *같은 앱* 의 Dockerfile *5줄 차이* 가 *왜* *이미지 크기 10배* 와 *빌드 5배* 를 만들까요?
-
-> *Dockerfile 은 *명령 순서*, *캐시 친화*, *multi-stage* 의 *세 원칙* 으로 결과가 *완전히* 달라집니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *명령어* 의 *역할* 과 *순서*
-- *Layer caching* 친화 작성법
-- *Multi-stage build*
-- *보안* 기본
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *Dockerfile* 은 *팀 전체* 의 *생산성* 과 *보안* 을 *직접* 결정합니다. *제대로 한 번* 쓰면 *수년* 을 갑니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Dockerfile["dockerfile"] --> Builder["builder stage"]
@@ -53,21 +37,13 @@ flowchart LR
     Runtime --> Image["final image"]
 ```
 
-## 핵심 용어 정리
-
-- **FROM**: *베이스 이미지*.
-- **WORKDIR**: 작업 디렉터리.
-- **COPY/ADD**: 파일 복사.
-- **RUN**: 빌드 시 명령.
-- **CMD/ENTRYPOINT**: 실행 시 *기본 명령*.
-
 ## Before/After
 
 **Before**: *단일 단계* 빌드 → *900MB* 이미지.
 
 **After**: *multi-stage* + *slim* 베이스 → *80MB*.
 
-## 실습: Python 앱 Dockerfile (의사 텍스트)
+## Python 앱 Dockerfile (의사 텍스트)
 
 ### 1단계 — 베이스 선택
 
@@ -140,26 +116,12 @@ def finalize():
 
 *Multi-stage* 로 *빌드 도구* 분리, *.dockerignore* 로 *전송 최소화*, *digest 핀* 으로 *재현성*, *비루트* 사용자.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Dockerfile* 은 *코드 품질* 과 *동급*.
-- *캐시 친화 순서* 가 *생산성*.
-- *비밀* 은 *빌드 인자/시크릿* 으로.
-- *베이스* 는 *작고 검증된 것*.
-- *이미지 스캔* 은 *CI 의 일부*.
-
 ## 체크리스트
 
 - [ ] *Multi-stage* 적용.
 - [ ] *.dockerignore* 작성.
 - [ ] *비루트* 사용자.
 - [ ] *digest 핀* 사용.
-
-## 연습 문제
-
-1. *requirements 복사* 가 *코드 복사* 보다 *위* 에 와야 하는 *이유* 한 줄로.
-2. *Multi-stage* 의 *대표 효과* 한 가지.
-3. *Dockerfile* 에서 *비밀* 을 다루는 *권장 방법* 한 가지.
 
 ## 정리 및 다음 단계
 

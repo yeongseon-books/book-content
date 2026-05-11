@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *Pod* 가 *죽으면* *누가* *대신 살릴까요*?
-
-> *Deployment* 는 *원하는 수* 의 *Pod* 를 *유지* 하고 *무중단 배포* 와 *롤백* 을 책임집니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Deployment* 와 *ReplicaSet* 관계
-- *replicas* 의 의미
-- *RollingUpdate* 전략
-- *rollout* 명령
-- *롤백* 흐름
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *무중단 배포* 와 *자동 복구* 가 *Kubernetes* 도입의 *가장 큰 이유*. 그것을 *직접* 담당하는 객체가 *Deployment*.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Dep["deployment"] --> RS["replicaset"]
@@ -54,21 +38,13 @@ flowchart LR
     RS --> P3["pod"]
 ```
 
-## 핵심 용어 정리
-
-- **deployment**: *Pod 집합* 의 *희망 상태* 선언.
-- **replicaset**: *Pod* 수를 *유지* 하는 컨트롤러.
-- **replicas**: *원하는 Pod 수*.
-- **rollout**: *새 버전* 으로 *점진 교체*.
-- **rollback**: *이전 ReplicaSet* 으로 *되돌리기*.
-
 ## Before/After
 
 **Before**: *Pod 죽음* → *서비스 중단*.
 
 **After**: *Deployment* 가 *자동 재생성* + *무중단 교체*.
 
-## 실습: 무중단 배포 자동화
+## 무중단 배포 자동화
 
 ### 1단계 — Deployment manifest
 
@@ -147,26 +123,12 @@ def rollback(dep):
 
 *Argo CD / Flux* 가 *Git* 의 *Deployment YAML* 을 *진실 원천* 으로 두고, *클러스터* 를 *동기화* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Deployment* 가 *워크로드* 의 *기본*.
-- *RollingUpdate* 옵션이 *위험 통제 핵심*.
-- *readiness* 가 *진짜 무중단* 의 조건.
-- *롤백* 은 *훈련* 해야 작동.
-- *YAML* 은 *Git* 에 둔다.
-
 ## 체크리스트
 
 - [ ] *replicas ≥ 2*.
 - [ ] *readiness probe* 정의.
 - [ ] *RollingUpdate* 옵션 명시.
 - [ ] *롤백* 절차 *문서화*.
-
-## 연습 문제
-
-1. *Deployment* 와 *ReplicaSet* 의 *차이* 한 줄로.
-2. *readiness* 가 *왜* 무중단의 *핵심* 인지 한 줄로.
-3. *롤백* 이 *언제* 빠르게 동작하지 *않는지* 한 가지.
 
 ## 정리 및 다음 단계
 

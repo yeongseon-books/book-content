@@ -20,24 +20,6 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
 
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- `BaseRetriever`는 단순 helper가 아니라 어떤 호출 규약을 강제할까요?
-- `VectorStoreRetriever`는 어디에서 `similarity`, `mmr`, `threshold`로 갈라질까요?
-- `fetch_k`가 `k`보다 넓어야 하는 이유는 무엇일까요?
-- `lambda_mult`를 조절하면 결과 다양성은 어떻게 달라질까요?
-
-> retriever는 가장 가까운 벡터를 기계적으로 꺼내는 부품이 아니라, 후보 집합을 어떤 정책으로 줄일지 결정하는 선택기입니다.
-
-![이 글에서 답할 질문](../../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (3/6)
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/03-retriever-design/main.py`
@@ -104,14 +86,6 @@ if __name__ == "__main__":
 - `k`만 늘리면 다양성이 좋아질 것이라고 생각하기 쉽습니다.
 - `fetch_k == k` 상태에서는 MMR이 사실상 similarity search와 비슷해질 수 있습니다.
 - retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **MMR 활용** — 다양성 확보로 답변 품질이 오릅니다.
-- **Hybrid 검색** — BM25와 임베딩을 항상 함께 비교합니다.
-- **필터링** — 메타 필터는 정확도를 결정적으로 높입니다.
-- **재랭킹** — cross-encoder 재랭킹은 비용 대비 효과가 큽니다.
-- **회귀 셋** — 도메인 골든 셋을 retriever 단위로 만듭니다.
 
 ## 체크리스트
 

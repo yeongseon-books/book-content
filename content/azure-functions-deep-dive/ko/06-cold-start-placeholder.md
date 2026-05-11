@@ -36,23 +36,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Placeholder Mode를 이해하면 콜드 스타트를 어떻게 더 효과적으로 줄일 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 콜드 스타트와 Placeholder Mode의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Functions의 cold-start는 host bootstrap, worker start, JIT 중 어디가 가장 비싼가?
-- Placeholder 인스턴스는 정확히 무엇을 미리 만들어 두는가?
-- Premium plan의 always-ready instance와 placeholder는 어떻게 다른가?
-- cold-start를 줄이기 위한 코드 수준의 룰은 무엇인가?
-- cold-start metric을 SLO에 어떻게 명시할 것인가?
-
 ## 콜드 스타트가 왜 비싼가 — 부트스트랩 비용의 분해
 
 먼저 새 인스턴스 하나가 처음부터 함수를 실행할 준비가 될 때까지 어떤 단계들을 거치는지 정리하겠습니다.
@@ -425,14 +408,6 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 - `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
 
 ---
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Placeholder 인스턴스가 핵심 최적화** — 호스트가 미리 준비되어 specialization이 빨라집니다.
-- **Specialization이 사용자 체감 지연** — 준비된 placeholder를 특정 앱으로 변환하는 단계입니다.
-- **Premium의 pre-warmed와 다른 메커니즘** — 두 최적화의 결합이 콜드 스타트를 최소화합니다.
-- **초기화 비용을 줄이는 코드 설계** — DI·연결 풀 초기화가 specialization 시간을 결정합니다.
-- **배포 직후 메트릭을 모니터링** — 워밍업·specialization 효과를 사실로 확인합니다.
 
 ## 운영 체크리스트
 

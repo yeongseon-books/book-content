@@ -55,23 +55,6 @@ Pod에 주입됩니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Dapr 사이드카는 내부적으로 어떤 경로로 호출을 가로채고, 어떤 비용·지연을 추가할까요?
-
-이 글은 그 질문에 답하기 위해 Dapr 사이드카 내부의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Dapr sidecar는 ACA에서 어떤 lifecycle을 갖고, 앱 컨테이너와 어떻게 동기화되는가?
-- service invocation은 mTLS, retry, timeout을 ‘무료로’ 준다는데, 그 비용은 어디로 가는가?
-- state store와 pub/sub component 정의는 환경 단위인가, 앱 단위인가?
-- Dapr API를 직접 호출하는 코드와 SDK 호출 코드의 추적 가능성은 어떻게 다른가?
-- Dapr가 죽거나 느려질 때 앱 컨테이너의 readiness는 어떻게 신호되는가?
-
 ## 가장 짧고 정확한 문장
 
 ACA의 Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime입니다.
@@ -437,14 +420,6 @@ az containerapp env dapr-component set \
   -n my-env -g my-rg --dapr-component-name statestore \
   --yaml dapr/statestore.yaml
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **사이드카는 추가 hop을 만든다** — 지연·CPU 비용을 명확히 알고 도입 결정을 내려야 합니다.
-- **컴포넌트는 사이드카 시작 시 로드된다** — 잘못된 컴포넌트가 사이드카 자체를 죽일 수 있습니다.
-- **관측은 분산 trace로 통합한다** — 사이드카가 만든 hop은 trace 없이는 보이지 않습니다.
-- **재시도·서킷 브레이커가 자동으로 끼어든다** — 클라이언트 정책과 충돌하지 않도록 설정을 정렬합니다.
-- **불필요한 사이드카는 비용** — Dapr이 필요 없는 앱에 강제 적용하면 자원만 낭비됩니다.
 
 ## 운영 체크리스트
 

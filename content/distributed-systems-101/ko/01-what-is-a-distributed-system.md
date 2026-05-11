@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Distributed Systems 101 시리즈 (1/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 같은 코드를 한 대에서 돌리던 것과 백 대에서 돌리는 게 왜 그렇게 다를까요?
-
-> 분산 시스템은 단순히 "컴퓨터 여러 대"가 아닙니다. latency, failure, coordination이라는 세 가지 본질적 차이가 단일 머신 프로그래밍의 직관을 모두 바꿉니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 분산 시스템의 정의와 단일 머신과의 진짜 차이
-- latency, failure, coordination 세 축의 의미
-- "8 fallacies of distributed computing"이 주는 교훈
-- 일반적인 분산 시스템의 토폴로지
-- 이 시리즈가 다룰 큰 그림
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 요즘은 거의 모든 서비스가 사실상 분산 시스템입니다. 데이터베이스 한 대도 replica를 두면 분산 시스템이고, 마이크로서비스 두 개만 있어도 분산 시스템입니다. 단일 머신의 직관(즉시 응답, 항상 성공, 같은 시계)으로 짜면 production에서 반드시 깨집니다.
 
 > 단일 머신 프로그램의 가정이 깨지는 지점이 곧 분산 시스템의 본질입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     A["client"] --> B["service A"]
@@ -60,14 +44,6 @@ flowchart LR
 ```
 
 화살표 하나하나가 latency, failure, partial 응답의 가능성을 가집니다. 단일 함수 호출과 본질적으로 다릅니다.
-
-## 핵심 용어 정리
-
-- **분산 시스템**: 메시지 패싱으로 협력하는 독립적 노드들의 집합.
-- **Latency**: 메시지가 한쪽에서 다른 쪽에 도달하기까지의 시간.
-- **Failure**: 노드, 네트워크, 디스크가 부분적으로 또는 전체적으로 멈추는 상황.
-- **Coordination**: 여러 노드가 어떤 결정에 동의하는 과정.
-- **Partial failure**: 일부는 살아 있고 일부는 죽은 상태 (분산 시스템 특유).
 
 ## Before/After
 
@@ -85,7 +61,7 @@ flowchart LR
 
 이 단순한 차이가 retry, timeout, consensus 같은 이 시리즈의 모든 주제를 만들어 냅니다.
 
-## 실습: 단일 vs 분산의 체감 차이
+## 단일 vs 분산의 체감 차이
 
 ### 1단계 — 단일 프로세스 함수 호출
 
@@ -178,14 +154,6 @@ print("server time:", time.time())
 
 웹 서비스의 backend는 사실상 모두 분산 시스템입니다. RDBMS도 replica + failover가 있으면 분산이고, Redis cluster, Kafka, Cassandra는 명백히 분산입니다. Cloud의 AZ 단위 redundancy, multi-region 구성, CDN 모두 분산 시스템 설계입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 단일 머신 직관을 명시적으로 의심합니다.
-- timeout, retry, idempotency를 첫 줄부터 설계합니다.
-- "모름" 상태를 시스템 모델에 포함시킵니다.
-- 시계는 monotonic만 신뢰하고 wall clock은 표시용으로만 씁니다.
-- 분산이 필요 없는 경우(단일 머신으로 충분한 경우)를 알아봅니다.
-
 ## 체크리스트
 
 - [ ] 분산 시스템의 정의를 한 줄로 말할 수 있는가?
@@ -193,12 +161,6 @@ print("server time:", time.time())
 - [ ] partial failure가 단일 머신과 어떻게 다른지 답할 수 있는가?
 - [ ] timeout이 왜 의무인지 설명할 수 있는가?
 - [ ] wall clock과 monotonic clock의 차이를 아는가?
-
-## 연습 문제
-
-1. timeout 없이 외부 API를 호출하는 코드를 찾아 timeout을 붙여 보세요.
-2. retry가 안전한 동작과 안전하지 않은 동작의 예를 두 개씩 적어 보세요.
-3. 같은 메시지를 두 번 처리해도 결과가 같도록 하는 방법(idempotency key)을 설계해 보세요.
 
 ## 정리 및 다음 단계
 

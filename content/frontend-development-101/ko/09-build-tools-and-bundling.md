@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Frontend Development 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 우리가 쓴 *수백 개* 의 파일이 어떻게 *한 두 개* 의 파일로 바뀌어 브라우저로 갈까요?
-
-> 빌드 도구는 *모듈을 모으고, 압축하고, 분할* 합니다. 결과물의 크기가 *사용자 경험* 을 결정합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 번들러의 *역할* (모듈 그래프, 변환, 분할)
-- Vite와 esbuild가 *왜 빠른지*
-- tree shaking과 dead code elimination
-- 번들 분석으로 *큰 모듈 찾기*
-- 환경별 빌드와 최적화
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 번들 크기는 *직접* 사용자에게 갑니다. 1MB 번들은 *3G 사용자에게 8초의 흰 화면* 입니다. 빌드 도구를 이해하지 못하면 *제품이 무거워지는 이유* 를 모릅니다.
 
 > 좋은 번들은 *작고, 캐시 가능하고, 분할되어* 있습니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Src["src/*.{js,ts,jsx}"] --> Resolver["Module resolver"]
@@ -55,14 +39,6 @@ flowchart LR
     Trans --> Bundle["Bundler"]
     Bundle --> Out["dist/*.js + assets"]
 ```
-
-## 핵심 용어 정리
-
-- **Module bundler**: import 그래프를 따라 *파일을 합치는* 도구.
-- **Tree shaking**: 사용되지 않는 export를 *제거* 하는 최적화.
-- **Code splitting**: 한 번들을 *여러 chunk* 로 나누기.
-- **Source map**: 빌드된 코드를 *원본으로* 디버깅할 수 있게 해주는 매핑.
-- **HMR (Hot Module Replacement)**: 개발 중 *페이지 새로고침 없이* 변경 반영.
 
 ## Before/After
 
@@ -80,7 +56,7 @@ flowchart LR
 <script type="module" src="/dist/index-[hash].js"></script>
 ```
 
-## 실습: Vite 5단계
+## Vite 5단계
 
 ### 1단계 — 프로젝트 생성
 
@@ -149,14 +125,6 @@ const url = import.meta.env.VITE_API_URL;
 
 대부분의 신규 프로젝트는 *Vite + esbuild + SWC* 조합을 씁니다. 큰 모노레포는 *Turbopack/Rspack* 같은 차세대 번들러로 옮겨가는 중입니다. *Webpack* 은 여전히 많이 쓰이지만 새 프로젝트의 *기본 선택지에서* 점점 빠지고 있습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 번들 크기는 *예산* 으로 관리한다 (예: 메인 < 200KB).
-- *번들 분석은 매주* 한 번 본다.
-- 라이브러리 추가 전 *해당 라이브러리의 크기* 를 확인한다.
-- 이미지/폰트는 별도 *최적화 파이프라인* 을 거친다.
-- *느린 사용자가 기준* 이다.
-
 ## 체크리스트
 
 - [ ] Vite 프로젝트를 만들 수 있다.
@@ -164,12 +132,6 @@ const url = import.meta.env.VITE_API_URL;
 - [ ] `dist/` 안의 파일을 살펴봤다.
 - [ ] 번들 분석 도구를 한 번 돌렸다.
 - [ ] 환경 변수로 dev/prod를 분리할 수 있다.
-
-## 연습 문제
-
-1. Vite로 React 프로젝트를 만들고 `npm run build` 를 돌려 dist 폴더를 확인하세요.
-2. 번들 분석 도구로 어떤 모듈이 가장 큰지 적어보세요.
-3. lodash를 *전체 import* 와 *개별 import* 로 비교해 번들 크기 차이를 측정하세요.
 
 ## 정리 및 다음 단계
 

@@ -47,15 +47,6 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Few-shot과 Chain-of-Thought를 어떻게 결합해야 모델 답변 품질을 끌어올릴 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Few-shot과 CoT의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## few-shot prompting은 예시로 패턴을 가르치는 일입니다
 
 ![예시 쌍이 최종 답을 유도하는 흐름](../../../assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.ko.png)
@@ -610,14 +601,6 @@ few-shot은 예시로 행동 패턴을 보여 주는 기술이고, chain-of-thou
 다만 실전 감각은 언제나 같은 결론으로 돌아옵니다. 예시를 많이 넣는다고 무조건 좋아지지 않습니다. step by step 한 줄을 붙인다고 없는 지식이 생기지도 않습니다. 좋은 결과는 대개 짧고 선명한 예시, 분명한 출력 형식, 낮은 temperature, 그리고 토큰 예산 관리에서 나옵니다.
 
 다음 글에서는 멀티턴 대화에서 이력을 어떻게 관리할지 다룹니다. few-shot이 정적인 예시라면, 대화 상태 관리는 시간에 따라 바뀌는 동적 문맥 문제입니다. 그 지점부터 챗봇다운 설계가 본격적으로 시작됩니다.
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **예시가 가장 강한 지시** — instruction보다 example이 효과적입니다.
-- **CoT는 추론 task에서 차이를 만든다** — 수학·논리에서 정확도가 크게 오릅니다.
-- **zero-shot CoT도 강력** — '단계별로 생각해'만으로도 효과가 있습니다.
-- **예시는 다양성과 대표성** — 비슷한 예시만 주면 일반화가 안 됩니다.
-- **토큰 비용을 의식** — 긴 예시는 비용·지연 모두 키웁니다.
 
 ## 운영 체크리스트
 

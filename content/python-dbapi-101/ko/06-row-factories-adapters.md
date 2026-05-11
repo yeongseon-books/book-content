@@ -28,42 +28,8 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 ![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
 
-Row factory와 type adapter는 어떻게 활용해야 하나요?
-
-이 글은 그 질문에 답하기 위해 row factory와 type adapter의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받으려면 어떻게 하나요?
-- `sqlite3.Row`는 무엇이며 언제 충분한가요?
-- `detect_types`는 무엇을 감지하나요?
-- 사용자 정의 타입(`Decimal`, `datetime`, `Enum`, JSON)은 어떻게 안전하게 매핑하나요?
-- adapter/converter는 PEP 249 표준에 어떻게 들어맞나요?
-
-> Database가 돌려주는 raw tuple은 빠르지만 위험합니다. 컬럼 순서를 외워야 하고, 타입은 SQLite 5종(NULL, INTEGER, REAL, TEXT, BLOB)뿐입니다. row factory와 type adapter는 이 사이의 변환을 한 곳에 모아 줍니다.
-
-> Python DB-API 101 시리즈 (6/10)
-
----
-
-## 이 글에서 배울 것
-
-이 글에서는 sqlite3가 SQL과 Python 사이에서 데이터를 어떻게 옮기는지 두 축으로 나눠 다룹니다.
-
-1. **Row factory** — `cursor.fetch*()` 결과의 **shape**(tuple → Row → dict → dataclass → Pydantic).
-2. **Type adapter / converter** — 단일 **값의 타입** 변환(Python `Decimal` ↔ SQLite TEXT).
-3. **`detect_types`** — column declared type 또는 `[type-name]` 컬럼 별칭으로 자동 변환을 선택하는 메커니즘.
-4. **사용자 정의 타입 등록** — `register_adapter` / `register_converter`로 새 타입(`Decimal`, `Enum`, JSON dict)을 안전하게 추가.
-5. **타입 안전한 repository 레이어** — Pydantic 또는 dataclass를 결과 모델로 사용하는 패턴.
-
----
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 `row[3]`처럼 인덱스로 컬럼을 꺼내는 코드는 schema가 바뀌는 순간 침묵 속에 깨집니다. `row['name']`처럼 이름으로 꺼내거나, `row.name` 형태의 dataclass를 쓰면 schema 변경이 import error로 즉시 드러납니다.
 
@@ -404,14 +370,6 @@ GROUP BY u.id;
 
 ---
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **dict row 편의** — 딕셔너리 행은 가독성을 크게 높입니다.
-- **커스텀 타입** — 도메인 타입은 adapter로 양방향 변환을 강제합니다.
-- **성능 영향** — 변환 비용은 hot path에서 누적되므로 측정합니다.
-- **None 처리** — NULL과 None 변환 규칙을 명확히 합니다.
-- **테스트** — 변환 로직은 단위 테스트로 회귀를 막습니다.
-
 ## 체크리스트
 
 - [ ] connection 생성 시 `row_factory`를 명시적으로 설정한다.
@@ -421,16 +379,6 @@ GROUP BY u.id;
 - [ ] view/join 결과에는 `SELECT col AS "x [type]"` 별칭으로 converter를 강제한다.
 - [ ] `Enum`, `JSON`, `Decimal`, `datetime` 같은 도메인 타입은 한 번만 등록하고 모듈 import 시 자동 적용한다.
 - [ ] Repository 레이어가 외부에 SQLite storage class를 노출하지 않는다.
-
----
-
-## 연습 문제
-
-1. **factory 비교** — 같은 SELECT를 (a) 기본 tuple, (b) `sqlite3.Row`, (c) dict_factory, (d) Pydantic factory로 각각 받아 1만 row 처리 시간을 측정하세요.
-2. **`Decimal` 정밀도** — `REAL`로 저장한 값 `0.1 + 0.2`와 `Decimal` adapter로 저장한 같은 연산을 비교하세요.
-3. **`Enum` round-trip** — `Status.PAID`를 INSERT한 뒤 SELECT 결과의 타입이 `Status`인지 확인하세요. `PARSE_DECLTYPES`를 끄면 어떻게 되나요?
-4. **JSON 컬럼 검색** — `payload`에 JSON을 저장하고 SQLite의 `json_extract(payload, '$.k')`로 검색해 보세요.
-5. **자기만의 타입** — `IPv4Address`(`ipaddress.IPv4Address`)를 adapter/converter로 등록해 round-trip하세요.
 
 ---
 

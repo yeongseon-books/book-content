@@ -1,0 +1,1 @@
+- 2026-05-11: The transformation appears to over-match `a-grade-example` / intro-shaped blocks in some series, especially `rag-deep-dive`, causing removal of standalone examples, checklists, and one diagram that should remain in blog form.

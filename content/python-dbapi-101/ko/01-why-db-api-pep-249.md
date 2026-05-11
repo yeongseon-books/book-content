@@ -32,20 +32,6 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 이번 첫 글에서는 DB-API 2.0이 왜 필요했는지, 어떤 문제를 해결했는지, 시리즈 전반에서 SQLite로 실습하는 이유와 다른 driver(PostgreSQL, MySQL 등)에 그대로 옮기는 방법을 살펴봅니다.
 
-<!-- a-grade-intro:begin -->
-
-![DB-API 2.0과 PEP 249가 푼 문제](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.ko.png)
-
-*DB-API 2.0과 PEP 249가 푼 문제*
-## 핵심 질문
-
-- PEP 249가 등장하기 전에는 Python에서 DB를 어떻게 다뤘을까요?
-- DB-API 2.0이 표준화한 5가지 핵심은 무엇일까요?
-- paramstyle이 드라이버마다 다른 이유는 무엇이고, 코드를 어떻게 보호해야 할까요?
-- DB-API가 다루지 않는 영역은 어디까지일까요?
-
-<!-- a-grade-intro:end -->
-
 ## 1. DB-API 이전의 혼돈
 
 ![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
@@ -239,14 +225,6 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 다음 글에서는 connection과 cursor의 lifecycle을 더 깊이 들여다보고, context manager로 안전하게 다루는 패턴을 정리합니다.
 
 <!-- a-grade-example:begin -->
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **이식성** — 드라이버를 갈아끼워도 코드가 거의 그대로 동작하게 합니다.
-- **Connection/Cursor** — 두 추상이 트랜잭션·자원 관리의 단위가 됩니다.
-- **Threadsafety 등급** — 드라이버 등급을 보고 멀티스레드 정책을 정합니다.
-- **Paramstyle** — qmark/named 등 스타일이 SQL 작성 방식을 바꿉니다.
-- **표준의 한계** — 성능·고급 기능은 드라이버별로 갈리므로 문서를 항상 확인합니다.
 
 ## 체크리스트
 

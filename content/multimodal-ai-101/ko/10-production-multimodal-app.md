@@ -31,14 +31,6 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 
 이 글에서는 FastAPI 기반 multimodal API 설계, inference pipeline 단계별 최적화, caching 전략, cost control, 그리고 production rollout 함정을 다룹니다.
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Production multimodal 앱을 운영하려면 어떤 결정과 가드레일이 필요한가요?
-
-이 글은 그 질문에 답하기 위해 production multimodal 앱의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 1. End-to-End 시스템 전체 그림
 
@@ -260,14 +252,6 @@ multimodal API는 사용자가 의도하지 않게 개인정보를 보냅니다.
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **입력 검증** — MIME/크기/EXIF/안전 필터를 진입점에서 강제합니다.
-- **비용 가드** — 이미지 토큰 환산을 비용 메트릭에 포함시킵니다.
-- **Latency SLO** — preprocess/encode/inference 단계별 P50·P95를 분리 측정합니다.
-- **관측성** — modality·model·prompt 버전 태그로 trace를 묶습니다.
-- **회귀 평가** — 이미지·오디오 회귀 셋을 CI에 포함해 모델 교체 위험을 줄입니다.
-
 ## Multimodal AI 101 시리즈
 
 - [Multimodal AI가 중요한 이유](./01-why-multimodal-matters.md)

@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > GitHub Actions 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 지금까지 배운 *trigger, test, lint, artifact, docker, deploy, secret* 을 *하나의 파이프라인* 으로 어떻게 묶습니까?
-
-> *좋은 파이프라인은 *작은 단계의 합* 입니다. 각 단계는 단순하고, 합성은 명시적이어야 합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *PR / main / tag* 단계별 *책임 분리*
-- *reusable workflow* (`workflow_call`) 로 *중복 제거*
-- *composite action* 으로 단계 묶기
-- *팀 표준 템플릿* 저장소 패턴
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 지금까지 배운 부품을 *한 곳* 에 모아야 *DORA 4지표* (배포 빈도, 리드 타임, 변경 실패율, 복구 시간) 가 개선됩니다.
 
 > *조각으로는 빠르지만, 합쳐야 *지속적으로 빠릅니다*.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     PR["PR open"] --> Lint["lint + test + typecheck"]
@@ -55,21 +39,13 @@ flowchart LR
     Tag["tag push"] --> Release["release + production (approval)"]
 ```
 
-## 핵심 용어 정리
-
-- **Reusable workflow**: `workflow_call` 로 호출되는 *공유 워크플로우*.
-- **Composite action**: 여러 step 을 하나로 묶은 *재사용 단계*.
-- **Template repo**: 팀이 *시작점* 으로 쓰는 표준 저장소.
-- **DORA metrics**: 배포 성과 4지표.
-- **Promotion**: staging -> production 승격.
-
 ## Before/After
 
 **Before**: 저장소마다 *비슷하지만 다른* 워크플로우. 한 군데 고치면 *나머지가 표류*.
 
 **After**: *공통 reusable workflow* 1개. 저장소는 *얇은 호출자* 만 둔다. *수정 1회 -> 전사 반영*.
 
-## 실습: 실전 파이프라인 5단계
+## 실전 파이프라인 5단계
 
 ### 1단계 — Reusable workflow 정의
 
@@ -176,26 +152,12 @@ runs:
 
 플랫폼 팀은 *org-wide template repo* 를 만들어 모든 서비스가 *동일한 CI/CD 골격* 을 쓰게 하고, *DORA 메트릭* 은 *Sleuth/LinearB* 로 자동 수집합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *trigger 가 책임을 결정한다*.
-- *공통은 reusable, 차이는 caller*.
-- *production 게이트는 절대 양보하지 않는다*.
-- *템플릿은 *코드*, 위키가 아니다*.
-- *DORA* 가 좋아질 방향으로 설계한다.
-
 ## 체크리스트
 
 - [ ] *PR / main / tag* 단계가 분리됐다.
 - [ ] 공통 단계는 *reusable workflow* 로 추출됐다.
 - [ ] *production* 에 *required reviewers* 가 있다.
 - [ ] reusable workflow 가 *버전 핀* 으로 호출된다.
-
-## 연습 문제
-
-1. *PR 단계* 워크플로우를 작성해 *lint + test + typecheck* 만 돌리세요.
-2. *reusable workflow* 를 만들어 두 저장소에서 동일한 CI 를 쓰게 하세요.
-3. *tag push* 시 *production 배포* 에 *승인 게이트* 가 걸리는 워크플로우를 작성하세요.
 
 ## 정리 및 다음 단계
 

@@ -24,31 +24,13 @@ seo_description: Dapr를 두 개의 "수준"으로 보면 단순해집니다.
 
 > Azure Container Apps 101 시리즈 (6/7)
 
-## 이 글에서 배울 것
-
-- Dapr가 무엇이고 ACA의 어느 위치에 사이드카로 붙는지 이해합니다.
-- App 수준 설정과 Environment 수준 component의 분리를 구분할 수 있습니다.
-- Service invocation, Pub/Sub, State store, Secret store 네 가지 building block의 역할을 설명할 수 있습니다.
-- `--enable-dapr` 플래그와 component YAML로 실제 Dapr 통합을 구성할 수 있습니다.
-
-<!-- a-grade-intro:begin -->
 ## 핵심 질문
 
 Dapr 사이드카를 도입하면 무엇이 쉬워지고 무엇을 새로 책임져야 할까요?
 
 이 글은 그 질문에 답하기 위해 Dapr 통합의 핵심 결정과 운영 함정을 살펴봅니다.
 
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Dapr 사이드카는 ACA pod 안 어디에 붙고, 앱은 어떤 endpoint로 호출하는가?
-- App-level `--enable-dapr` 설정과 Environment-level component는 왜 분리되어 있는가?
-- Service invocation, Pub/Sub, State store, Secret store는 각각 어떤 문제를 해결하는가?
-- AKS에서 Dapr를 운영하는 것과 ACA에서 쓰는 것의 결정적 차이는 무엇인가?
-- Dapr를 "처음부터 켜는 것"이 왜 안티패턴으로 자주 지적되는가?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 마이크로서비스를 만들면 똑같은 문제가 반복됩니다.
 서비스 A가 서비스 B를 호출하려면 service discovery가 필요하고, 둘 사이에 메시지를 주고받으려면 메시지 브로커 SDK를 골라야 하고, 상태를 저장하려면 Redis나 Cosmos DB SDK를 직접 다뤄야 합니다.
@@ -230,14 +212,6 @@ Dapr component YAML은 ACA Environment 단위로 관리되므로, 여러 앱이 
 
 마이그레이션 관점에서 Dapr는 "점진적 도입"이 가능합니다. 모든 앱을 한꺿번에 Dapr로 전환할 필요 없이, 새로 추가하는 앱부터 Dapr를 켜고 기존 앱은 그대로 둘 수 있습니다. 다만 하이브리드 구성에서는 Dapr 앱과 비-Dapr 앱 간 통신 방식이 달라지므로, 호출 경로를 문서화해두지 않으면 혼란이 옵니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Dapr은 인터페이스 통일이 본질** — 메시징·상태·시크릿을 추상화해 벤더 종속을 줄입니다.
-- **컴포넌트 설정을 IaC로 관리한다** — 런타임 변경은 추적이 어려우므로 코드로 둡니다.
-- **관측은 분산 트레이싱 기본으로 연결한다** — 사이드카 추가로 호출 경로가 늘어나므로 trace가 필수입니다.
-- **재시도·타임아웃은 클라이언트와 일치시킨다** — Dapr이 자동 재시도를 추가하므로 의도치 않은 중복 호출을 막습니다.
-- **불필요한 곳에는 도입하지 않는다** — 단순 HTTP 호출만 있는 앱에 Dapr을 강제하면 복잡성만 늘어납니다.
-
 ## 체크리스트
 
 - [ ] `--enable-dapr true`와 `--dapr-app-id`, `--dapr-app-port`를 모두 설정했는가?
@@ -246,12 +220,6 @@ Dapr component YAML은 ACA Environment 단위로 관리되므로, 여러 앱이 
 - [ ] Secret이 inline value가 아니라 `secretRef` 또는 Key Vault로 관리되는가?
 - [ ] Service invocation과 Pub/Sub 호출 경로가 Application Insights에서 추적 가능한가?
 - [ ] 단일 앱 시나리오라면 Dapr가 정말 필요한지 재검토했는가?
-
-## 연습 문제
-
-1. 같은 Environment에 두 개의 앱(`api-app`, `worker-app`)이 있고, `api-app`만 Service Bus pubsub component를 사용해야 합니다. component YAML의 `scopes:`를 어떻게 작성하시겠습니까?
-2. Dapr service invocation과 직접 HTTP 호출(앱 FQDN으로 호출)의 차이점 세 가지를 나열하세요.
-3. State store backend를 Redis에서 Cosmos DB로 바꾸려고 합니다. 앱 코드는 얼마나 바뀌어야 하나요? 이유는?
 
 ## 정리·다음 글
 

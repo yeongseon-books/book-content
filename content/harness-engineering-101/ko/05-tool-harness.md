@@ -29,14 +29,6 @@ seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구
 ![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](../../../assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
 
 *Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Agent가 사용할 도구를 어떻게 설계해야 안전하고 사용하기 쉬울까요?
-
-이 글은 그 질문에 답하기 위해 Tool Harness의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 도구는 Agent의 손과 발입니다
 
@@ -321,16 +313,6 @@ shell 실행, 파일 쓰기, 무제한 HTTP 호출은 sandboxing 없이는 produ
 - 에러는 What/Why/How를 모두 포함하고 retryable 플래그로 Agent의 다음 행동을 안내합니다.
 - 코드 실행과 파일/네트워크 접근 같은 위험한 도구는 process, filesystem, network 격리를 모두 적용합니다.
 
----
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **도구 인터페이스는 모델 친화적으로** — 이름·파라미터가 자체 설명적이어야 합니다.
-- **최소 권한 원칙을 도구에** — 각 도구의 권한 경계를 좁힙니다.
-- **idempotency가 안전성의 기반** — 재시도 안전한 도구가 표준입니다.
-- **부작용은 명시적으로** — destructive operation은 확인을 요구합니다.
-- **관측·로깅이 모든 호출에** — 도구 호출이 사고 추적의 단위입니다.
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -346,6 +328,8 @@ shell 실행, 파일 쓰기, 무제한 HTTP 호출은 sandboxing 없이는 produ
 - Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 

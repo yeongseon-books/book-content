@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Secure Coding 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 25년이 지나도 *왜 SQL Injection 은 여전히 1위* 일까요?
-
-> *원인은 늘 같다 — *문자열로 SQL 을 만든다*. 해법도 늘 같다 — *parameter 를 쓴다*.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *SQL Injection* 의 원리
-- *Parameterized query* 의 중요성
-- ORM 이 *그래도 새는* 경우
-- *Raw SQL* 을 *안전하게* 쓰는 법
-- 방어 5단계와 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 SQLi 한 번이면 *DB 전체* 가 노출됩니다. 인증 우회, 데이터 유출, 데이터 조작이 *동시에* 가능합니다.
 
 > *문자열 연결로 SQL 을 만들면 *반드시* 새는 날이 온다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Input["사용자 입력"] -->|문자열 연결| Bad["SQL 문자열"]
@@ -56,21 +40,13 @@ flowchart LR
     Good --> Safe["안전"]
 ```
 
-## 핵심 용어 정리
-
-- **SQL Injection**: 입력으로 *SQL 의미* 를 바꾸는 공격.
-- **Parameterized query**: SQL 과 데이터를 *문법적으로 분리*.
-- **Prepared statement**: DB 가 *미리 컴파일* 한 SQL.
-- **ORM**: *객체 모델* 로 SQL 을 만드는 라이브러리.
-- **Stored procedure**: DB 안에 *저장된 함수*.
-
 ## Before/After
 
 **Before**: `f"SELECT * FROM users WHERE name='{name}'"` — *그대로 SQLi*.
 
 **After**: `cursor.execute("SELECT * FROM users WHERE name=%s", (name,))` — *parameter*.
 
-## 실습: SQLi 방어 5단계
+## SQLi 방어 5단계
 
 ### 1단계 — Parameter 사용
 
@@ -130,26 +106,12 @@ GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 
 대부분의 팀은 *ORM 기본*, *raw SQL* 은 *예외* 로 둡니다. 모든 raw SQL 은 *코드 리뷰* 에서 *parameter 여부* 를 본다. *애플리케이션 DB 계정* 은 *최소 권한*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *문자열 SQL 은 *없는 것* 으로 취급.*
-- *동적 식별자에는 *allowlist*.*
-- *DB 계정도 *least privilege*.*
-- *오류 메시지에 *SQL* 이 새지 않게.*
-- *ORM 은 안전 *습관* 일 뿐, 만능이 아니다.*
-
 ## 체크리스트
 
 - [ ] 모든 SQL 이 *parameter* 화.
 - [ ] 동적 컬럼/테이블이 *allowlist*.
 - [ ] DB 계정이 *역할 별 분리*.
 - [ ] 에러 메시지가 *안전*.
-
-## 연습 문제
-
-1. *Blind SQLi* 의 동작을 한 문단으로.
-2. ORM 에서 *raw text* 를 안전하게 쓰는 두 가지 패턴.
-3. *동적 정렬 컬럼* allowlist 함수.
 
 ## 정리 및 다음 단계
 

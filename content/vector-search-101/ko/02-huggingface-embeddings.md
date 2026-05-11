@@ -43,15 +43,6 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 이 장의 핵심: **HuggingFace 임베딩은 로컬에서 무료로 실행된다.** `sentence-transformers`가 모델을 내려받고 벡터를 반환한다.
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-sentence-transformers로 첫 임베딩 파이프라인을 어떻게 안전하게 만드나요?
-
-이 글은 그 질문에 답하기 위해 sentence-transformers 실습의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
 ## 이 장의 위치
 
 이 글은 시리즈 6편 중 2번째 장입니다.
@@ -60,14 +51,6 @@ sentence-transformers로 첫 임베딩 파이프라인을 어떻게 안전하게
 <!-- ebook-only:end -->
 
 ---
-
-## 이 글에서 답할 질문
-
-- Hugging Face `sentence-transformers`와 OpenAI Embeddings API는 어떤 트레이드오프가 있는가?
-- 로컬 임베딩 모델을 GPU 없이 돌릴 때 어떤 성능 함정이 있는가?
-- 다국어(multilingual) 모델과 영어 전용 모델은 한국어 검색 품질에서 어떻게 갈리는가?
-- 배치 임베딩 시 메모리, 배치 크기, 토큰 한도를 어떻게 같이 다뤄야 하는가?
-- 모델 버전이 올라가면 기존 인덱스를 어떻게 마이그레이션하는가?
 
 ## 설치
 
@@ -347,14 +330,6 @@ print(f"최대 오차: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 `HuggingFaceEmbeddings`로 벡터를 만들고, NumPy로 저장하고 불러오는 방법까지 익혔습니다. 배치 임베딩과 모델 재사용 패턴은 실제 앱에서도 그대로 쓸 수 있는 구조입니다.
 
 다음 글에서는 벡터 간 유사도를 제대로 계산하는 방법을 다룹니다. 코사인 유사도 외에 내적과 유클리드 거리가 언제 유리한지, 정규화가 왜 중요한지, 그리고 직접 최근접 이웃 검색을 만들어 보겠습니다.
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **모델 카드 확인** — 지원 언어·max_seq_length·정규화 여부를 먼저 확인합니다.
-- **배치 크기** — GPU/CPU 환경에 맞춰 배치를 조정해 throughput을 확보합니다.
-- **길이 잘림** — 긴 문장은 잘림이 발생하므로 청크 전략과 함께 설계합니다.
-- **캐시** — 동일 입력은 캐시해 비용·latency를 줄입니다.
-- **버전 고정** — 모델 가중치 버전을 고정해 결과 재현성을 확보합니다.
 
 ## 운영 체크리스트
 

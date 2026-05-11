@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Probability 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 지금까지 배운 *확률* 은 *머신러닝* 안에서 *어디에* 살아있을까요?
-
-> *ML 은 *확률을 푸는 기계* 이다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *손실함수* 와 *가능도*
-- *분류기 출력* 의 확률 의미
-- *베이즈 추론* 과 *MAP*
-- 5단계 ML 확률 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *Cross-entropy, MSE, NLL* 모두 *확률* 의 다른 모습입니다. *확률을 모르면 모델 출력을 해석할 수 없습니다*.
 
 > *Modern ML is applied probability.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Data["Data"] --> Model["Model p(y|x; theta)"]
@@ -57,21 +41,13 @@ flowchart LR
     Inf --> Eval["Calibration / AUC"]
 ```
 
-## 핵심 용어 정리
-
-- **가능도(likelihood)**: L(θ) = ∏ p(yᵢ | xᵢ; θ).
-- **MLE**: 가능도를 *최대화* 하는 θ.
-- **MAP**: 사전 곱한 사후를 *최대화*.
-- **Cross-entropy**: -Σ y log p̂.
-- **Calibration**: *예측확률* 이 *실제확률* 과 일치하는 정도.
-
 ## Before/After
 
 **Before**: *“모델 출력 0.8”* — *무엇* 을 의미?
 
 **After**: *p(y=1 | x) = 0.8* — *조건부확률* 의 추정. *Calibration* 으로 *진짜* 80% 인지 검증.
 
-## 실습: 5단계 ML 확률
+## 5단계 ML 확률
 
 ### 1단계 — Cross-entropy 손실
 
@@ -142,26 +118,12 @@ print("Brier:", brier)
 
 스팸 분류, 의료 진단, 추천 점수, 이상치 탐지 — *확률 출력* 이 *결정 규칙* 과 *비용* 을 만난다. *Calibration*, *Brier*, *Log-loss* 가 표준입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *손실 = 확률* 임을 안다.
-- *Calibration* 을 측정한다.
-- *임계값* 을 *비용 기반* 으로 설정한다.
-- *불확실성* 을 *예측에 포함* 한다.
-- *Bayesian* 과 *frequentist* 둘 다 다룬다.
-
 ## 체크리스트
 
 - [ ] *Cross-entropy = NLL* 임을 안다.
 - [ ] *Calibration* 을 측정한다.
 - [ ] *p(y|x)* 의 의미를 안다.
 - [ ] *Brier / Log-loss* 를 사용한다.
-
-## 연습 문제
-
-1. *불균형 90:10* 데이터에서 *임계 0.5* 의 문제를 적으세요.
-2. *Calibration plot* 을 그려야 하는 이유를 적으세요.
-3. *MAP* 와 *MLE* 의 차이를 한 줄로 적으세요.
 
 ## 정리 및 다음 단계
 

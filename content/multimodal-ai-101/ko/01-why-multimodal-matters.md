@@ -26,14 +26,6 @@ seo_description: ChatGPT가 등장한 2022년 말 이후, "LLM 하나면 거의 
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-텍스트 LLM만으로는 왜 부족하고, multimodal AI는 어떤 문제를 풀어주나요?
-
-이 글은 그 질문에 답하기 위해 multimodal AI의 필요성과 첫 호출의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "텍스트 LLM만으로는 왜 부족한가요?"
 
@@ -192,14 +184,6 @@ def prepare_for_vlm(path: str, max_side: int = 1024) -> Image.Image:
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **문제 정의를 먼저** — 이미지/오디오/비디오 중 어떤 modality가 필수인지 명확히 한 뒤 모델을 고릅니다.
-- **Fusion 전략 선택** — Early/late/hybrid fusion 중 데이터 특성과 latency 예산에 맞는 패턴을 정합니다.
-- **토큰 비용 주의** — 이미지 한 장이 수백~수천 토큰이라는 점을 비용 모델에 반영합니다.
-- **CLIP은 검색용** — CLIP은 분류/검색 임베딩이고 생성은 VLM이라는 역할 구분을 잊지 않습니다.
-- **함정 다섯 가지** — 해상도, 비용, latency, 환각, 라이선스 다섯 축으로 운영 위험을 점검합니다.
-
 ## Multimodal AI 101 시리즈
 
 - **Multimodal AI가 중요한 이유 (현재 글)**

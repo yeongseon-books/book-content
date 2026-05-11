@@ -24,32 +24,14 @@ seo_description: autogenerate는 현재 DB(ground truth)와 target_metadata(desi
 
 # autogenerate: 잡는 것과 못 잡는 것의 경계
 
-## 이 글에서 배울 것
-
-- `alembic revision --autogenerate`가 내부에서 무엇을 비교하는가
-- autogenerate가 잘 잡는 변경과 그렇지 못한 변경의 목록
-- `compare_type`, `compare_server_default`, `include_object`, `include_name` 옵션
-- table/column rename을 안전하게 처리하는 패턴
-- 자동 생성 결과를 사람 눈으로 다시 한 번 손봐야 하는 이유
-
-<!-- a-grade-intro:begin -->
 ## 핵심 질문
 
 autogenerate를 어디까지 믿을 수 있고, 어떤 변경은 사람이 직접 작성해야 할까요?
 
 이 글은 그 질문에 답하기 위해 autogenerate의 한계의 핵심 결정과 실무 함정을 살펴봅니다.
 
-<!-- a-grade-intro:end -->
 
-## 이 글에서 답할 질문
-
-- `alembic revision --autogenerate`는 내부적으로 무엇과 무엇을 비교하여 diff를 만드는가?
-- autogenerate가 잘 잡지 못하는 변경에는 어떤 것들이 있는가?
-- `compare_type`, `compare_server_default`, `include_object`, `include_name`은 각각 무엇을 제어하는가?
-- table 또는 column rename을 autogenerate에 맡기면 위험한 이유는 무엇인가?
-- 자동 생성된 revision을 사람이 다시 손볼 때 어떤 항목을 가장 먼저 검토해야 하는가?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 autogenerate는 alembic의 가장 강력한 기능이지만, "버튼 한 번 누르면 끝나는" 도구로 다루는 순간 production 사고가 납니다. 자동 생성된 파일을 그대로 commit하다가 column rename이 drop+create로 풀려 데이터가 사라지는 사례는 실제로 자주 발생합니다.
 
@@ -226,14 +208,6 @@ SQLite에서는 batch 모드가 필요합니다(3편 참고).
 - **schema-only 라이브러리 테이블 격리.** Celery, APScheduler 등 third-party 테이블은 `include_object`로 제외하거나 별도 metadata로 분리합니다.
 - **CI에서 `alembic check` 활용.** model과 migration이 어긋났는지 자동으로 검출합니다(alembic 1.9+).
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **autogenerate는 초안 생성기다** — 최종본이 아니라 초안이므로 모든 diff를 사람이 검토해야 합니다.
-- **이름 변경을 자동 감지하지 않는다** — drop+create로 보이므로 op.alter_column으로 직접 작성합니다.
-- **CHECK·인덱스 식·트리거는 누락된다** — DB 종속 객체는 수동 작성이 안전합니다.
-- **타입 미세 차이도 노이즈가 된다** — SQLAlchemy 타입과 DB 타입의 표현 차이는 비교 함수로 정리합니다.
-- **데이터 마이그레이션은 자동 감지 대상이 아니다** — 스키마와 데이터를 별도 리비전으로 명확히 분리합니다.
-
 ## 체크리스트
 
 - [ ] 자동 생성된 파일을 한 줄씩 읽고 의심스러운 부분을 손으로 교정했다
@@ -242,12 +216,6 @@ SQLite에서는 batch 모드가 필요합니다(3편 참고).
 - [ ] 외부 팀/라이브러리의 테이블은 `include_object`로 격리되어 있다
 - [ ] 큰 변경은 빈 revision으로 받고 손으로 작성하는 정책을 따랐다
 - [ ] CI에 `alembic check`이 들어 있다 (1.9+)
-
-## 연습 문제
-
-1. `User` model에 `bio` 컬럼을 추가하고 autogenerate로 revision을 만든 뒤, 그대로 commit해도 안전한지 검토하세요.
-2. `name` 컬럼을 `display_name`으로 rename하고, autogenerate가 만든 잘못된 revision을 손으로 교정하세요.
-3. `users.tier`의 default를 `"free"`에서 `"basic"`으로 바꾸고 `compare_server_default` 옵션을 끈/켠 두 경우의 결과 차이를 확인하세요.
 
 ## 정리, 다음 글
 

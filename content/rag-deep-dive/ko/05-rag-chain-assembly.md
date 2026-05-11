@@ -20,24 +20,6 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # RAG Chain 조립 — RetrievalQA vs LCEL
 
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- `RetrievalQA`는 어떤 단계를 내부에 숨기고 있을까요?
-- LCEL의 `|` 연산자는 RAG 그래프를 어떻게 드러낼까요?
-- `RunnablePassthrough()`는 왜 질문 원문 보존에 자주 쓰일까요?
-- 답변과 source documents를 함께 돌려주려면 어느 계층을 만져야 할까요?
-
-> RAG 체인은 질문에서 답변까지 이어지는 그래프이며, LCEL은 그 그래프의 각 경계를 바깥으로 끌어내는 조립 언어입니다.
-
-![이 글에서 답할 질문](../../../assets/rag-deep-dive/05/05-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (5/6)
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/05-rag-chain-assembly/main.py`
@@ -145,14 +127,6 @@ if __name__ == "__main__":
 - `RetrievalQA`가 반환하는 source documents는 최종 prompt 문자열과 동일한 artifact가 아닙니다.
 - LCEL의 dict literal은 평범한 dict가 아니라 내부적으로 병렬 runnable로 동작합니다.
 - 스트리밍과 중간 단계 관측이 필요해지는 순간 classic chain의 편의성이 빠르게 한계에 닿습니다.
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **LCEL 우선** — 신규 코드는 LCEL이 표준입니다.
-- **관측** — 각 단계 trace를 분리 가능하게 둡니다.
-- **재시도/타임아웃** — 각 노드에 정책을 명시합니다.
-- **Streaming** — 체감 latency는 streaming이 결정합니다.
-- **테스트** — 체인 단위·노드 단위 테스트를 분리합니다.
 
 ## 체크리스트
 

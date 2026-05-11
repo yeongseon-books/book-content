@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: AST를 그대로 두고 바로 기계어로 가지 않고, 왜 중간에 또 한 단계를 두는 걸까요?
-
-> Intermediate representation(IR)은 AST보다 단순하고 기계어보다 추상적인 중간 언어입니다. optimization과 다중 백엔드 지원이 모두 이 위에서 이뤄집니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- IR이 무엇이고 왜 필요한가
-- three-address code(3AC)의 형태
-- SSA(static single assignment)의 직관
-- 같은 IR에서 여러 architecture를 지원하는 구조
-- AST → IR 변환을 직접 짜기
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 AST는 사람을 위한 형태입니다. 기계어는 CPU를 위한 형태입니다. 그 사이를 잇는 IR이 없으면 optimization은 AST에 강하게 묶이고, 새 CPU를 지원하려면 모든 분석을 다시 짜야 합니다. IR은 컴파일러를 두 부분 — frontend와 backend — 으로 깔끔히 나눕니다.
 
 > "M개 언어 × N개 아키텍처"를 "M + N"으로 줄이는 다리, 그게 IR입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     A["AST (frontend)"] --> B["IR (3AC, SSA)"]
@@ -56,14 +40,6 @@ flowchart LR
 ```
 
 IR이 한 번 잘 정의되면, optimizer와 backend는 IR만 알면 됩니다.
-
-## 핵심 용어 정리
-
-- **IR (intermediate representation)**: 컴파일러 내부에서 다루는 중간 언어.
-- **Three-address code**: `t1 = a + b`처럼 한 줄에 최대 세 개 피연산자.
-- **Basic block**: 분기가 없는 연속된 명령어 묶음.
-- **CFG (control flow graph)**: basic block을 노드로 한 그래프.
-- **SSA**: 모든 변수에 정확히 한 번만 할당. optimization을 단순하게 만듭니다.
 
 ## Before/After
 
@@ -84,7 +60,7 @@ return t2
 
 명령어 단위로 분석하기가 훨씬 쉽습니다.
 
-## 실습: AST → IR 변환
+## AST → IR 변환
 
 ### 1단계 — IR 명령어 정의
 
@@ -188,14 +164,6 @@ entry.next = [body]; body.next = [body, exit_]   # loop
 
 LLVM의 LLVM IR이 대표적입니다. 수많은 언어(C/C++/Rust/Swift 등)가 같은 IR로 내려간 뒤, 같은 optimization을 거치고, 다양한 architecture로 코드 생성됩니다. CPython의 bytecode, Java의 bytecode도 일종의 IR입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 새 언어를 보면 "기존 IR로 lowering할 수 있는가?"를 먼저 묻습니다.
-- IR 설계는 "단순함 + 충분한 표현력" 사이의 균형 잡기입니다.
-- SSA를 분석의 기본 형태로 둡니다.
-- IR에 source-level 정보(line, column)를 끝까지 들고 다닙니다 (디버그 정보).
-- backend를 IR 위에서만 작성해 frontend와 분리합니다.
-
 ## 체크리스트
 
 - [ ] IR이 왜 필요한지 한 줄로 답할 수 있는가?
@@ -203,12 +171,6 @@ LLVM의 LLVM IR이 대표적입니다. 수많은 언어(C/C++/Rust/Swift 등)가
 - [ ] basic block의 정의가 무엇인지 답할 수 있는가?
 - [ ] SSA가 분석을 왜 단순하게 만드는지 직관이 있는가?
 - [ ] frontend와 backend의 분리 지점이 IR임을 받아들였는가?
-
-## 연습 문제
-
-1. 위 lower 함수에 비교 연산자 (`<`, `>`)를 추가해 보세요.
-2. `if (x < 10) { ... } else { ... }` 한 줄을 IR로 직접 손으로 변환해 보세요.
-3. 같은 변수에 두 번 대입하는 코드를 SSA 형태로 손으로 변환해 보세요.
 
 ## 정리 및 다음 단계
 

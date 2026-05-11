@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: IR에는 `t1, t2, t3...`처럼 무한히 많은 임시 변수가 있습니다. 진짜 CPU에는 register가 16개뿐인데, 어떻게 맞춥니까?
-
-> Code generation은 IR을 실제 명령어로 바꾸는 단계입니다. 두 핵심 작업은 instruction selection(어떤 명령어로?)과 register allocation(어디에 둘 것인가?)입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- code generation이 푸는 두 가지 핵심 문제
-- instruction selection의 패턴 매칭 직관
-- register allocation을 graph coloring으로 보는 시각
-- spill: register가 모자랄 때 메모리를 쓰는 결정
-- calling convention과 ABI의 등장 이유
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 여기까지 잘 와도 마지막에 잘못 내려가면 프로그램은 안 돕니다. 그리고 같은 IR이라도 backend 품질이 낮으면 실행 속도가 2-10배 차이가 납니다. code gen은 컴파일러의 평판을 결정합니다.
 
 > "이론은 IR에서 끝나고, 실력은 backend에서 드러난다."
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     A["IR"] --> B["instruction selection"]
@@ -57,14 +41,6 @@ flowchart LR
 ```
 
 세 단계가 거의 모든 backend의 뼈대입니다.
-
-## 핵심 용어 정리
-
-- **Instruction selection**: IR 노드를 어떤 CPU 명령어로 바꿀지 결정.
-- **Register allocation**: 가상 register(temporary)를 실제 physical register로 매핑.
-- **Spill**: register가 모자라 임시 변수를 메모리에 저장하는 동작.
-- **Calling convention**: 함수 호출 시 어느 register에 어느 값을 두는가에 대한 약속.
-- **ABI (application binary interface)**: 컴파일된 코드들이 서로 부르기 위한 약속.
 
 ## Before/After
 
@@ -87,7 +63,7 @@ ret
 
 가상 register가 `rax`로 줄어들고, LOAD/ADD가 한 명령어로 합쳐졌습니다.
 
-## 실습: 작은 코드 생성기
+## 작은 코드 생성기
 
 ### 1단계 — 직선적 instruction selection
 
@@ -208,14 +184,6 @@ print("\n".join(emit_call("printf", ["fmt", "x"])))
 
 LLVM의 backend는 SelectionDAG와 GlobalISel 두 갈래가 있고, 각각 instruction selection 전략이 다릅니다. register allocator는 LinearScan(빠름)과 Greedy(품질 좋음)를 옵션으로 제공합니다. ABI는 OS와 architecture별로 달라서, 같은 함수가 Linux x86-64와 macOS ARM64에서 다르게 호출됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- "이 backend는 어떤 ABI를 따르는가?"를 먼저 확인합니다.
-- 새 architecture를 보면 register 수와 calling convention부터 봅니다.
-- spill을 두려워하지 않습니다 — 정확성이 먼저, 성능은 다음.
-- liveness 분석을 모든 backend 작업의 시작점으로 둡니다.
-- flag/예외/atomic 같은 "implicit한 것"을 항상 의심합니다.
-
 ## 체크리스트
 
 - [ ] code generation이 푸는 두 가지 큰 문제를 답할 수 있는가?
@@ -223,12 +191,6 @@ LLVM의 backend는 SelectionDAG와 GlobalISel 두 갈래가 있고, 각각 instr
 - [ ] spill이 무엇이고 언제 일어나는지 답할 수 있는가?
 - [ ] calling convention과 ABI의 차이를 답할 수 있는가?
 - [ ] liveness 분석이 왜 필요한지 한 줄로 설명할 수 있는가?
-
-## 연습 문제
-
-1. 위 select에 비교 연산 (`<`)와 조건 분기 (`jl`)를 추가해 보세요.
-2. interference graph를 그림으로 그리고, k=2일 때 spill되는 노드를 찾아 보세요.
-3. 두 함수 호출이 같은 register를 다투는 상황을 가정하고, 호출 사이에 spill이 들어가야 하는지 따져 보세요.
 
 ## 정리 및 다음 단계
 

@@ -24,44 +24,20 @@ last_reviewed: '2026-05-04'
 
 > DevOps 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 100대 서버 중 *어디서 에러가 났는지* 한 번에 찾을 수 있나요?
-
-> 로그는 *수집되고 검색* 되어야 가치가 생깁니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *구조화 로그* 와 *비구조화 로그* 의 차이
-- *중앙 로그 수집* 의 필요성
-- *Loki / ELK* 비교
-- *상관관계 ID(correlation ID)* 활용
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 서버 *한 대* 에 *ssh* 해서 *grep* 하는 시대는 끝났습니다. 분산 시스템에서는 *수많은 인스턴스의 로그* 를 *한곳* 에서 봐야 합니다.
 
 > 로그는 *지금* 보다 *3주 후* 에 더 자주 봅니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     App["app stdout"] --> Agent["log agent (Promtail/Fluent Bit)"]
     Agent --> Store["Loki/Elasticsearch"]
     Store --> UI["Grafana/Kibana"]
 ```
-
-## 핵심 용어 정리
-
-- **Structured log**: *JSON* 등 *키-값* 형태의 로그.
-- **Log level**: DEBUG, INFO, WARN, ERROR, CRITICAL.
-- **Correlation ID**: 한 요청을 *추적* 하는 *고유 ID*.
-- **Log aggregator**: 분산 로그를 *중앙 수집*.
-- **Retention**: 로그 *보관 기간*.
 
 ## Before/After
 
@@ -81,7 +57,7 @@ log.info("user.login", user_id=user_id, request_id=req_id)
 # Grafana에서 {service="api"} |= "user.login" 으로 검색
 ```
 
-## 실습: 로깅 5단계
+## 로깅 5단계
 
 ### 1단계 — JSON 로그로 전환
 
@@ -144,26 +120,12 @@ scrape_configs:
 
 성숙한 팀은 *trace_id* 를 *로그 + 메트릭 + trace* 에 *공통 키* 로 둡니다. 한 ID로 *세 신호* 를 *교차 분석* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *로그는 비용*. 레벨과 retention을 의식한다.
-- *구조화 로그* 가 *검색의 근본*.
-- *민감 정보* 는 *코드에서* 마스킹.
-- *trace_id* 로 *3종 신호* 를 묶는다.
-- *INFO 이하* 는 샘플링도 고려.
-
 ## 체크리스트
 
 - [ ] 로그가 *JSON 구조* 다.
 - [ ] *Request ID* 가 모든 로그에 있다.
 - [ ] *PII 마스킹* 이 적용된다.
 - [ ] *Retention 정책* 이 정해져 있다.
-
-## 연습 문제
-
-1. 본인 앱을 *structlog* 로 전환하세요.
-2. *Request ID* 미들웨어를 추가하세요.
-3. *Loki* 또는 *Elasticsearch* 로 중앙 수집을 구성하세요.
 
 ## 정리 및 다음 단계
 

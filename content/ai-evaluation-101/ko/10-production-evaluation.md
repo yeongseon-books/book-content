@@ -28,14 +28,6 @@ Eval은 배포 전 한 번이 아니라 운영 중에도 계속 돌아야 합니
 ![운영 환경에서의 지속적 평가](../../../assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.ko.png)
 
 *운영 환경에서의 지속적 평가*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-운영 환경에서 지속적 평가를 어떻게 구축해야 사고를 빠르게 잡을 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 지속적 평가의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 배포 후가 진짜 시작입니다
 
@@ -332,14 +324,6 @@ def harvest_failures_to_regression_set(failed_traces: list[dict], regression_pat
 ---
 
 <!-- toc:begin -->
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **프로덕션 trace가 새로운 eval** — 사용자 입력의 분포를 가장 정확히 반영합니다.
-- **샘플링 정책을 의식적으로** — 전수는 비용, 부족은 신호가 약해집니다.
-- **실시간 지표와 오프라인 평가 결합** — 둘 다 필요합니다.
-- **사용자 피드백을 1급 신호로** — thumbs·implicit signal 모두 활용합니다.
-- **배포 마커를 메트릭에 둔다** — 회귀의 원인을 빠르게 좁힙니다.
-
 ## AI Evaluation 101 시리즈
 
 - [LLM 앱을 왜 평가해야 하는가](./01-why-evaluate-llm-apps.md)

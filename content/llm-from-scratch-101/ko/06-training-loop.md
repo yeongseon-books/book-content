@@ -32,17 +32,6 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## 핵심 질문
-
-- 학습 루프의 5줄 핵심은 어떤 동작들로 이루어질까요?
-- AdamW는 왜 transformer에서 SGD보다 잘 통할까요?
-- warmup + cosine 학습률은 학습 안정성에 어떤 영향을 줄까요?
-- gradient clipping 한 줄이 어떻게 폭발을 막을까요?
-
-<!-- a-grade-intro:end -->
-
 ## 학습 루프 5줄의 구조
 
 학습 루프의 중심은 정말 다섯 줄입니다. `zero_grad()`, `forward`, `backward()`, `clip_grad_norm_`, `step()`이 전부입니다. 나머지는 평가 주기, 로그, 학습률 계산 같은 운영 코드입니다.
@@ -204,14 +193,6 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 이제 가중치는 학습됐습니다. 다음 글에서는 `ckpt.pt`를 불러와 자기회귀 생성 루프를 붙이겠습니다. `ROMEO:` 같은 프롬프트 하나로 TinyShakespeare 모델이 다음 문자를 어떻게 뽑는지 직접 보게 됩니다.
 
 <!-- a-grade-example:begin -->
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **기울기 클리핑** — 발산 방지를 위해 grad clip을 기본으로 둡니다.
-- **LR 스케줄** — 워밍업 + 코사인이 사실상 표준입니다.
-- **로깅** — loss·grad norm·throughput을 항상 로깅합니다.
-- **Checkpoint** — 정기 체크포인트와 best-loss 저장을 분리합니다.
-- **재현성** — seed·데이터 셔플 시드를 함께 기록합니다.
 
 ## 체크리스트
 

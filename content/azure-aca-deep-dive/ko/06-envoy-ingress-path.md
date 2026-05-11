@@ -55,23 +55,6 @@ HTTPS 트래픽을 받습니다.
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-ACA Ingress의 Envoy 경로를 이해하면 어떤 디버깅과 튜닝이 가능할까요?
-
-이 글은 그 질문에 답하기 위해 Envoy ingress 경로의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- ACA의 ingress는 Envoy 한 겹인가, 그 위에 또 다른 프록시가 있는가?
-- external/internal ingress는 같은 이름의 hostname에서 어떻게 갈라지는가?
-- TLS 종단(termination)은 어디서 일어나고, 백엔드까지 mTLS는 어떻게 보장되는가?
-- header rewriting, sticky session, websocket은 각각 어디서 풀리고 어디서 막히는가?
-- ingress 단의 503/504는 무엇을 의미하고, 어떤 메트릭에서 가장 먼저 보이는가?
-
 ## 시작점은 앱이 아니라 전체 경로입니다
 
 Ingress 디버깅에서 가장 흔한 실수는 사용자 컨테이너부터 보는 것입니다.
@@ -379,14 +362,6 @@ az containerapp ingress show -n my-app -g my-rg \
 az containerapp ingress traffic show -n my-app -g my-rg -o table
 az containerapp hostname list -n my-app -g my-rg -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Envoy가 외부 트래픽의 진입점** — 헤더·타임아웃·재시도 동작은 Envoy 정책으로 결정됩니다.
-- **L7 처리이므로 헤더 변환을 의식한다** — 클라이언트 IP·proto·hostname 헤더가 어떻게 전달되는지 확인합니다.
-- **타임아웃은 ingress·앱·클라이언트가 일관되어야** — 값이 어긋나면 디버깅이 매우 어렵습니다.
-- **WebSocket·gRPC는 명시적으로 활성화한다** — 기본 HTTP로 동작이 막히는 케이스가 흔합니다.
-- **로그·trace를 Envoy 단에서 분리한다** — 앱 로그만으로는 ingress 단 문제를 진단할 수 없습니다.
 
 ## 운영 체크리스트
 

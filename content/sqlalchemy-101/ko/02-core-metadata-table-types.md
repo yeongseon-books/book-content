@@ -35,35 +35,13 @@ seo_description: MetaData는 schema의 카탈로그입니다. application이 알
 ![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](../../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
-## 이 글에서 배울 것
-
-- `MetaData` 객체가 무엇이고 왜 schema의 단일 출처(single source of truth)가 되는지
-- `Table`을 Python으로 선언하는 방법과 `Column`의 핵심 옵션(primary_key, nullable, unique, index, default, server_default)
-- SQLAlchemy의 generic type(`Integer`, `String`, `Text`, `Boolean`, `DateTime`, `Numeric`, `JSON`)이 SQLite에서 어떤 affinity로 매핑되는지
-- `metadata.create_all(engine)` / `drop_all(engine)`로 schema를 만들고 지우는 방법
-- `ForeignKey`와 `ForeignKeyConstraint`, 그리고 SQLite에서 ON DELETE CASCADE를 동작시키는 조건
-- Composite key, named constraint, `Index`를 Python으로 선언하는 방법
-- 기존 데이터베이스의 schema를 가져오는 reflection (`Table(..., autoload_with=engine)`)
-
-<!-- a-grade-intro:begin -->
 ## 핵심 질문
 
 Core의 MetaData·Table·Column을 왜 ORM 이전에 익혀야 할까요?
 
 이 글은 그 질문에 답하기 위해 Core 스키마 모델의 핵심 결정과 운영 함정을 살펴봅니다.
 
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- ORM 없이 Core만 써도 schema 정의가 의미가 있나?
-- `MetaData`는 application마다 하나만 있어야 하나, 여러 개도 가능한가?
-- `String`과 `Text`는 SQLite에서 어떻게 다른가?
-- `default`와 `server_default`의 차이는?
-- SQLite에서 `ON DELETE CASCADE`가 안 먹히는 이유는?
-- 이미 있는 테이블의 schema를 SQLAlchemy로 읽어들이려면?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 ![핵심 개념](../../../assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
 
@@ -458,14 +436,6 @@ app/
 
 Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic migration으로 schema를 관리하는 편이 안전합니다. 그러나 test fixture, 로컬 dev DB 초기화, demo 환경 등에서는 `create_all`이 여전히 가장 빠른 부트스트랩 방법입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Core가 모든 ORM의 기반** — MetaData가 schema의 단일 출처입니다.
-- **Table·Column이 1급 시민** — ORM 클래스 없이도 완전한 SQL을 표현합니다.
-- **Type system이 dialect 차이를 흡수** — DateTime·JSON 타입이 백엔드별로 매핑됩니다.
-- **제약·인덱스를 코드로 표현** — DB 스키마가 코드로 추적됩니다.
-- **reflect로 기존 DB와 연결** — 마이그레이션 없는 환경도 지원됩니다.
-
 ## 체크리스트
 
 - [ ] `MetaData`를 module-level 단일 instance로 두었다
@@ -476,13 +446,6 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 - [ ] SQLite에서 `ForeignKey(ondelete=...)`를 쓸 때 `PRAGMA foreign_keys = ON`을 함께 적용했다
 - [ ] 복합 제약은 `UniqueConstraint`/`Index`로 명시적으로 선언했다
 - [ ] 필요시 `autoload_with=engine`으로 reflection이 가능하다는 것을 안다
-
-## 연습 문제
-
-1. `MetaData`를 만들고 `users(id, name, email)`, `posts(id, user_id FK→users.id, title, body)` 두 테이블을 정의하세요. `metadata.create_all(engine)`로 SQLite 파일에 만든 뒤, `pragma_table_info`로 컬럼과 type을 출력하세요.
-2. 같은 schema에서 `posts.user_id`에 `ondelete="CASCADE"`를 적용하세요. PRAGMA를 켠 Engine과 끄지 않은 Engine 두 개로 부모 row를 DELETE하고, 자식 row가 어떻게 다르게 다뤄지는지 비교하세요.
-3. `naming_convention`을 적용한 `MetaData`와 적용하지 않은 `MetaData`로 같은 schema를 만들어, 자동 생성되는 INDEX와 UNIQUE 제약 이름이 어떻게 다른지 `sqlite_master` 테이블에서 확인하세요.
-4. 기존 SQLite 파일에 raw SQL로 `CREATE TABLE legacy(id INTEGER PRIMARY KEY, payload TEXT)`를 만들고, SQLAlchemy의 `Table("legacy", metadata, autoload_with=engine)`로 schema를 reflect하세요. reflect한 `Table` 객체를 사용해 row를 INSERT하고 SELECT하세요.
 
 ## 정리·다음 글
 

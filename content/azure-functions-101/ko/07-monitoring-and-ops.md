@@ -29,23 +29,6 @@ seo_description: 함수 앱을 배포한 뒤부터는 질문이 달라집니다.
 
 > 운영의 90%는 ‘무엇이 평소와 다른지’를 30초 안에 보는 능력이다.
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Functions의 관측을 어떻게 구축해야 사고를 빠르게 진단하고 회귀를 막을 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Functions 모니터링과 운영의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Application Insights와 Log Analytics는 Functions 운영에서 어떤 역할이 다른가?
-- 함수 단위 latency, 실패율, 의존성 호출은 어떤 쿼리로 가시화하는가?
-- Live Metrics와 stream logs는 언제 어느 쪽이 빨리 답을 주는가?
-- 비용 폭주를 미리 감지하기 위한 메트릭은 무엇인가?
-- 장애 대응 런북에 반드시 들어가야 할 항목은 무엇인가?
-
 ## 시작점은 Application Insights입니다
 
 Azure Functions 운영 데이터의 대부분은 Application Insights로 모입니다. 요청, 예외, 의존성 호출, 로그, 사용자 정의 메트릭을 한 자리에서 볼 수 있으니, Function App 생성 시점에 App Insights 연결을 빠뜨리지 않는 것이 가장 중요합니다.
@@ -219,14 +202,6 @@ Azure Functions 101 시리즈는 여기서 끝납니다. 이 시리즈 전체를
 내부 구현이 더 궁금하면 [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)과 [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)를 이어서 보면 좋습니다. 101 시리즈가 실무 감각을 잡는 데 초점을 맞췄다면, 심화편은 Host 코드와 논문을 바탕으로 내부 동작을 해부합니다.
 
 ---
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Application Insights는 출발점** — invocation·dependency·exception을 한 곳에서 봅니다.
-- **Live Metrics로 사고를 즉시 감지** — 오류 폭증 순간을 실시간으로 잡습니다.
-- **샘플링·보존 정책을 의식적으로** — 기본값은 비용 사고나 데이터 누락의 원인이 됩니다.
-- **KQL을 표준 도구로 익힌다** — 사고 진단 시간이 쿼리 능력으로 결정됩니다.
-- **배포 마커를 메트릭에 둔다** — 회귀 원인을 빠르게 좁히는 가장 단순한 단서입니다.
 
 ## 운영 체크리스트
 

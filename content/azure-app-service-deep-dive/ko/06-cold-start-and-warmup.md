@@ -45,23 +45,6 @@ worker가 아직 준비되지 않았거나,
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Cold start와 워밍업을 어떻게 설계해야 사용자 체감 지연을 줄일 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 Cold start와 워밍업의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- App Service에서 cold-start는 정확히 어떤 단계의 합인가?
-- Always On이 cold-start를 ‘얼마나’ 줄여 주는가, 어떤 경우 효과가 없는가?
-- warm-up ping은 무엇을 hit해야 의미 있고, 무엇을 hit하면 거짓 안전감을 주는가?
-- 런타임(예: .NET, Node, Python) 별로 cold-start의 우세한 요소는 어디에 있는가?
-- cold-start latency를 SLO에 어떻게 표현하는가, 평균인가 p99인가?
-
 ## 큰 그림 — cold path와 warm path
 
 ![첫 요청이 ready worker를 기다리는 경로](../../../assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
@@ -268,14 +251,6 @@ for i in $(seq 1 50); do
     https://my-app.azurewebsites.net/healthz
 done | sort -k2 -n | tail -10
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Always On을 의식적으로 선택** — 비용과 콜드 스타트의 트레이드오프입니다.
-- **워밍업 엔드포인트를 표준화** — 스왑 직후 첫 사용자를 망치지 않도록 합니다.
-- **초기화 비용을 측정한다** — DI·캐시·DB 풀 초기화가 시간을 결정합니다.
-- **Premium은 prewarmed 인스턴스가 핵심** — SKU 선택 이유가 여기에 있습니다.
-- **배포 직후 메트릭을 모니터링** — 워밍업 효과의 사실 여부를 확인합니다.
 
 ## 운영 체크리스트
 

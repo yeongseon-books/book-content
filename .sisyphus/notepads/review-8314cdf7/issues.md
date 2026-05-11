@@ -1,0 +1,1 @@
+- 2026-05-11: Review found regressions against `BLOG_WRITING_GUIDE.md §3`: 6 transformed posts lost code blocks (all `content/rag-deep-dive/ko/*.md`), 33 lost one image/diagram, 27 lost `## 체크리스트`, and `content/testing-101/ko/05-test-double.md` still contains `## 핵심 용어 정리 (Meszaros 5종)`.

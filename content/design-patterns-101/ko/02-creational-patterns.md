@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 왜 객체 *생성*에도 패턴이 필요할까요?
-
-> 누가, 언제, 어떤 모양으로 객체를 만드는지가 시스템의 결합도를 좌우하기 때문입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Creational 패턴이 푸는 문제
-- Factory Method와 Abstract Factory
-- Builder가 필요한 순간
-- Singleton의 위험
-- Prototype의 자리
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 `new SomeService()`가 코드 곳곳에 박혀 있다면 결합도는 이미 잠겨 있습니다. 생성을 한 곳에 모으면 교체가 쉬워집니다.
 
 > 무엇을 만드느냐보다, 어디서 만드느냐가 중요하다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     F["Factory"] --> P["Product A or B"]
@@ -58,14 +42,6 @@ flowchart LR
 ```
 
 생성의 책임을 분리하는 네 가지 방식.
-
-## 핵심 용어 정리
-
-- **Factory Method**: 어떤 구체 클래스를 만들지 서브클래스가 결정.
-- **Abstract Factory**: 관련된 객체 군을 한 묶음으로 생성.
-- **Builder**: 복잡한 객체를 단계적으로 조립.
-- **Singleton**: 한 인스턴스만 존재하도록 보장.
-- **Prototype**: 기존 객체를 복제해 새 객체를 만든다.
 
 ## Before/After
 
@@ -89,7 +65,7 @@ notifier = factory.create(kind)
 
 생성 책임이 한 자리에 모입니다.
 
-## 실습: Creational을 익히는 5단계
+## Creational을 익히는 5단계
 
 ### 1단계 — Factory Method
 
@@ -181,14 +157,6 @@ def new_report():
 
 DI 컨테이너, ORM 쿼리 빌더, UI 위젯 라이브러리 — Creational 패턴은 프레임워크 골격에 자주 등장합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 생성 책임을 한 곳에 모은다.
-- Singleton은 마지막 수단으로 둔다.
-- Builder는 인자가 6개 넘을 때 고려.
-- Abstract Factory는 가족이 2개 이상일 때.
-- Prototype의 복사 비용을 항상 잰다.
-
 ## 체크리스트
 
 - [ ] 호출자가 구체 클래스를 모르는가?
@@ -196,12 +164,6 @@ DI 컨테이너, ORM 쿼리 빌더, UI 위젯 라이브러리 — Creational 패
 - [ ] Singleton이 정말 필요한가?
 - [ ] Builder가 복잡도를 정말 낮추는가?
 - [ ] Prototype의 비용을 측정했는가?
-
-## 연습 문제
-
-1. 본인 코드에서 `new Xxx()`가 5곳 이상 박힌 클래스를 찾아 Factory로 모아 보세요.
-2. 인자 7개를 받는 생성자에 Builder를 적용해 보세요.
-3. Singleton을 모듈 수준 변수로 대체할 수 있는지 검토해 보세요.
 
 ## 정리 및 다음 단계
 

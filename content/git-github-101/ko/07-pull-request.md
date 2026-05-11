@@ -24,34 +24,14 @@ seo_description: Pull Request는 단순한 merge가 아니라 "내 branch의 변
 
 # Pull Request로 협업하기 - branch에서 review를 거쳐 main까지
 
-## 이 글에서 배울 것
-
-- Pull Request(이하 PR)가 정확히 무엇이고 단순한 `git merge`와 어떻게 다른지
-- feature branch에서 commit을 만들고 GitHub에 push해 PR을 여는 순서
-- 동료가 남긴 review comment에 추가 commit으로 답하는 방법
-- PR을 merge한 뒤 로컬 `main`을 업데이트하고 정리하는 과정
-- "PR이 너무 크다"라는 말을 듣지 않으려면 어떻게 잘라야 하는지
-
-이 글이 끝나면 `feature/release-notes` 같은 branch에서 시작해 GitHub PR을 열고 review와 merge를 마친 뒤 로컬을 정돈하는 한 사이클을 혼자 돌릴 수 있습니다.
-
-<!-- a-grade-intro:begin -->
 ## 핵심 질문
 
 Pull Request를 어떻게 운영해야 review가 의미 있고 main이 안전할까요?
 
 이 글은 그 질문에 답하기 위해 Pull Request 흐름의 핵심 결정과 운영 함정을 살펴봅니다.
 
-<!-- a-grade-intro:end -->
 
-## 이 글에서 답할 질문
-
-- Pull Request는 단순한 `git merge`와 동작·과정 측면에서 어떻게 다른가?
-- feature branch에서 PR을 여는 표준 순서는 어떤 명령들로 구성되는가?
-- review comment에 추가 commit으로 답한다는 것은 PR에서 어떻게 보이는가?
-- PR을 merge한 직후 로컬 `main`에서 해야 할 정리 작업은 무엇인가?
-- "PR이 너무 크다"라는 피드백을 피하려면 어떤 기준으로 변경을 잘라야 하는가?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 혼자 작업하면 `git merge feature/x`로 끝나는 일이, 둘 이상이 모이면 갑자기 어려워집니다. 누가 무엇을 바꿨는지, 그 변경이 왜 필요한지, 누가 동의했는지를 기록할 자리가 사라지기 때문입니다.
 
@@ -258,14 +238,6 @@ PR은 merge 도구라기보다 의사결정 기록 도구입니다. 실무에서
 - **연관 issue 링크하기**. 본문에 `Closes #42`라고 적으면 merge 시 issue가 자동으로 닫힙니다(다음 글의 주제입니다).
 - **revert가 필요할 때 PR 단위로 되돌리기**. GitHub은 PR 화면에서 "Revert" 버튼을 제공합니다. commit 하나하나를 따로 되돌리는 것보다 안전합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **PR은 변경의 의도를 설명하는 자리** — 코드만이 아니라 맥락을 함께 보냅니다.
-- **작은 PR이 좋은 review를 만든다** — 변경 크기가 review 품질을 결정합니다.
-- **self-review를 먼저 한다** — 올리기 전에 diff를 스스로 한 번 더 봅니다.
-- **CI 통과는 PR의 기본 자격** — review가 자동 검증 위에서 사람의 시간을 씁니다.
-- **merge 정책을 팀에서 합의** — squash·rebase·merge 중 표준을 정합니다.
-
 ## 체크리스트
 
 - [ ] `main`을 `git pull`로 최신화한 뒤에 새 branch를 만들었습니다
@@ -274,11 +246,6 @@ PR은 merge 도구라기보다 의사결정 기록 도구입니다. 실무에서
 - [ ] PR 본문에 변경 동기와 검증 방법을 적었습니다
 - [ ] review 의견은 새 branch가 아니라 같은 branch에 추가 commit으로 답했습니다
 - [ ] merge 후 로컬 `main`을 `git pull`하고 끝난 branch를 지웠습니다
-
-## 연습 문제
-
-1. 같은 `vacation-notes`에서 `feature/contact-section`이라는 branch를 만들고, `notes.md` 끝에 연락처 한 줄을 추가한 뒤 PR을 열어 보세요. 이번에는 본인 스스로에게 review를 부탁한다고 가정하고 한 번 읽어 본 뒤 merge합니다.
-2. PR을 만들고 일부러 본문을 비워 두세요. GitHub이 어떤 안내를 보여 주는지 확인하고, 본문을 채운 PR과 비교해 보세요. 6개월 뒤의 본인이 어느 쪽을 더 좋아할지 생각해 보면 PR 본문을 적는 습관의 가치가 보입니다.
 
 ## 정리와 다음 글
 

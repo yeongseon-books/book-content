@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Model Evaluation 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 모델이 *“80% 확신”* 이라고 말할 때, *정말로* *80%* 가 맞을까요?
-
-> *Calibration 은 *예측 확률* 과 *실제 빈도* 의 *일치* 를 본다. *임계값* 과는 *다른 차원* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *보정* 의 *정의* 와 *왜 필요* 한가
-- *신뢰도 곡선* 읽는 법
-- *Brier Score* 의 의미
-- *Platt* 와 *Isotonic* 보정
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *확률* 을 *비용* 에 곱해 *결정* 을 내리는 시스템에서는 *보정* 이 *AUC 보다* 중요합니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Raw["raw score"] --> Bin["bin by predicted probability"]
@@ -54,21 +38,13 @@ flowchart LR
     Raw --> Calib["Platt / Isotonic"]
 ```
 
-## 핵심 용어 정리
-
-- **Calibration**: *예측 확률 = 실제 빈도*.
-- **Reliability diagram**: *bin* 별 *예측 vs 실제* 그래프.
-- **Brier Score**: *(p - y)^2* 평균. 낮을수록 좋음.
-- **Platt scaling**: *시그모이드* 후처리.
-- **Isotonic regression**: *비모수* 단조 보정.
-
 ## Before/After
 
 **Before**: *“proba = 0.9 → 매우 확신”*.
 
 **After**: *보정 곡선 확인 → Brier 비교 → 필요시 isotonic*.
 
-## 실습: 5단계 보정
+## 5단계 보정
 
 ### 1단계 — 데이터와 모델
 
@@ -131,26 +107,12 @@ print("brier (isotonic):", brier_score_loss(yte, iso.predict_proba(Xte)[:, 1]))
 
 *기댓값 기반 입찰* (광고/보험) — *보정된 확률* 이 *돈* 과 *직결*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *AUC* 가 좋아도 *보정* 은 *별개*.
-- *보정용 데이터* 는 *분리*.
-- *Brier* 는 *AUC + 보정* 을 합친 단일 지표.
-- *보정 후* *재 임계값 튜닝*.
-- *드리프트* 시 *재보정* 필요.
-
 ## 체크리스트
 
 - [ ] *신뢰도 곡선* 을 본다.
 - [ ] *Brier Score* 를 비교한다.
 - [ ] *보정 데이터* 가 *분리* 되어 있다.
 - [ ] *재보정* 주기를 정한다.
-
-## 연습 문제
-
-1. *Logistic* 과 *Random Forest* 의 *보정 곡선* 을 비교하세요.
-2. *isotonic* vs *sigmoid* 의 *Brier* 를 비교하세요.
-3. *보정 전후* 의 *AUC* 가 어떻게 변하는지 확인하세요.
 
 ## 정리 및 다음 단계
 

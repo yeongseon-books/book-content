@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > DevOps 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *환경 변수* 가 *코드에 박혀* 있다면 *배포할 때마다 빌드* 가 필요하지 않을까요?
-
-> 좋은 설정 관리는 *코드 1개 / 환경 N개* 를 가능하게 합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *dev / stage / prod* 환경의 의미
-- *Twelve-Factor* 의 *Config* 원칙
-- *환경변수* 와 *시크릿* 의 차이
-- *.env*, *Vault*, *AWS Secrets Manager* 비교
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 환경별로 *DB 주소, 키, 도메인* 이 다릅니다. 이를 *코드와 분리* 해야 *같은 빌드물* 을 *모든 환경* 에 배포할 수 있습니다.
 
 > *Build once, run anywhere*.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Code["app code (1)"] --> Build["build artifact (1)"]
@@ -55,14 +39,6 @@ flowchart LR
     Build --> Stage["stage (config B)"]
     Build --> Prod["prod (config C)"]
 ```
-
-## 핵심 용어 정리
-
-- **Environment**: *dev/stage/prod* 등 *실행 컨텍스트*.
-- **Config**: 환경별 *값* (DB URL, 도메인 등).
-- **Secret**: *민감 정보* (API key, password).
-- **.env**: *로컬 개발용* 설정 파일.
-- **Secrets manager**: *Vault, AWS Secrets, Doppler* 등 *암호화 저장소*.
 
 ## Before/After
 
@@ -81,7 +57,7 @@ DB_URL = os.environ["DB_URL"]
 API_KEY = os.environ["API_KEY"]
 ```
 
-## 실습: 설정 관리 5단계
+## 설정 관리 5단계
 
 ### 1단계 — .env로 로컬 분리
 
@@ -151,26 +127,12 @@ spec:
 
 대규모 팀은 *Vault* 또는 *AWS Secrets Manager* 에 시크릿을 보관하고, *External Secrets Operator* 로 *Kubernetes* 에 자동 주입합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *코드 1개, 환경 N개*. Build once.
-- *시크릿 회전* 은 *자동* 이어야 한다.
-- *설정 변경* 도 *PR과 리뷰* 의 대상이다.
-- *환경 분기는 코드가 아니라 설정* 이다.
-- *시크릿 유출* 은 *시간 문제*. 조기 발견 체계 필요.
-
 ## 체크리스트
 
 - [ ] *.env* 가 *.gitignore* 에 있다.
 - [ ] *시크릿* 이 *별도 저장소* 에 있다.
 - [ ] *환경별 설정 파일* 이 분리되어 있다.
 - [ ] 앱이 *시작 시 설정 검증* 을 한다.
-
-## 연습 문제
-
-1. 본인 프로젝트의 *시크릿* 을 *git history* 에서 검색해보세요.
-2. *pydantic-settings* 로 설정 검증을 추가하세요.
-3. *환경별 YAML* 을 분리해보세요.
 
 ## 정리 및 다음 단계
 

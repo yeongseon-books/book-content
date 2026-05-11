@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Design Patterns 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: A가 바뀌었을 때 B, C, D가 자연스럽게 따라가게 하려면?
-
-> A는 "바뀌었다"고만 알리고, B/C/D가 *알아서* 듣습니다. Observer입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- Observer가 푸는 문제 (강한 결합)
-- Subject / Observer / 구독 / 통지
-- 동기 통지 vs 비동기 통지
-- 도메인 이벤트와의 관계
-- pub/sub로 확장될 때 주의점
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 A가 변할 때 B, C, D를 *직접 호출*하면 A는 셋을 모두 압니다. Observer는 그 호출을 *통지*로 바꿔, A는 누가 듣는지 알지 않아도 됩니다.
 
 > Observer는 결합을 *통지*로 풀어줍니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Subject["Subject"] --> Notify["notify(event)"]
@@ -58,14 +42,6 @@ flowchart LR
 ```
 
 Subject는 메시지를 흘리고, Observer는 자유롭게 듣습니다.
-
-## 핵심 용어 정리
-
-- **Subject**: 변경을 알리는 쪽.
-- **Observer**: 통지를 듣는 쪽.
-- **Subscribe/Unsubscribe**: 구독 등록/해지.
-- **Event**: 통지의 단위 데이터.
-- **Sync/Async**: 동기 호출 vs 큐를 거친 비동기 처리.
 
 ## Before/After
 
@@ -92,7 +68,7 @@ class Order:
 
 `Order`는 누가 듣는지 모릅니다.
 
-## 실습: Observer를 익히는 5단계
+## Observer를 익히는 5단계
 
 ### 1단계 — 단순 EventBus
 
@@ -176,14 +152,6 @@ def unsubscribe(bus, topic, fn):
 
 Django signals, Spring `ApplicationEventPublisher`, Kafka/Redis pub-sub, GitHub Webhooks — 모두 Observer의 큰 형제들입니다. *도메인 이벤트* 라는 이름으로도 자주 등장합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 통지의 *방향*을 단방향으로 강제한다.
-- 이벤트는 *과거형* 이름으로 — `order_submitted`.
-- 스키마는 명시적으로 — dict 자유 형식보다 dataclass.
-- 핸들러 실패는 별도 채널로 보고.
-- 비동기로 옮길 길을 열어둔다.
-
 ## 체크리스트
 
 - [ ] Subject가 구독자를 알지 않는가?
@@ -191,12 +159,6 @@ Django signals, Spring `ApplicationEventPublisher`, Kafka/Redis pub-sub, GitHub 
 - [ ] 이벤트 이름이 *발생한 일*을 가리키는가?
 - [ ] 핸들러 에러가 격리되는가?
 - [ ] 비동기 전환이 가능한 구조인가?
-
-## 연습 문제
-
-1. 결제 완료 시 메일/슬랙/창고예약을 모두 Observer로 분리.
-2. EventBus에 dataclass 기반 이벤트 스키마를 적용.
-3. 구독 해지(`unsubscribe`)와 단위 테스트를 작성.
 
 ## 정리 및 다음 단계
 

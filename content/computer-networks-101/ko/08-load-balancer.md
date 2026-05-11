@@ -25,29 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Computer Networks 101 시리즈 (8/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 한 도메인 뒤에 100개의 서버가 있을 때, 클라이언트는 어떻게 매번 "살아 있는 적당한" 서버에 닿을 수 있을까요?
-
-> Load Balancer는 한 가상 IP 뒤에 여러 백엔드를 숨기고, 트래픽을 분산하면서 죽은 서버를 빼냅니다. L4 LB는 IP/포트만 보고 분산하고, L7 LB는 HTTP를 이해해 경로/헤더 기반의 정교한 라우팅을 합니다. 둘 다 현대 서비스의 입구이자 신뢰성의 1선입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- L4 LB와 L7 LB의 차이
-- 분산 알고리즘(round-robin, least connections, hash)
-- 헬스체크와 graceful drain
-- sticky session과 그 비용
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 LB는 단순한 분배기가 아니라 시스템의 신뢰성과 배포 전략을 결정짓는 장치입니다. blue-green 배포, canary 출시, region failover, 자동 스케일이 모두 LB 위에서 이뤄집니다. 헬스체크 한 줄을 잘못 쓰면 죽은 서버에 트래픽이 가거나 살아 있는 서버가 통째로 빠집니다.
 
 > LB는 "최선의 서버"를 고르는 장치가 아니라 "충분히 좋은, 살아 있는" 서버를 빨리 고르는 장치입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```text
 client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
             ├─ healthcheck (HTTP/TCP)
@@ -56,16 +41,6 @@ client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
 ```
 
 L4 LB는 TCP 흐름만, L7 LB는 HTTP 요청 단위로 분산합니다.
-
-## 핵심 용어 정리
-
-| 용어 | 설명 |
-| --- | --- |
-| Virtual IP (VIP) | 클라이언트가 보는 LB 주소 |
-| 헬스체크 | 백엔드가 살아 있는지 주기적으로 확인 |
-| Round-robin | 순서대로 분산 |
-| Least connections | 현재 연결 수가 가장 적은 백엔드로 |
-| Sticky session | 같은 클라이언트는 같은 백엔드로 (쿠키/IP hash) |
 
 ## Before / After
 
@@ -83,7 +58,7 @@ client → LB → [app1, app2, app3]
 app1이 죽으면 헬스체크가 빼고, 나머지로 트래픽이 흐름
 ```
 
-## 실습: 단계별로 따라하기
+## 단계별로 따라하기
 
 ### 1단계: 백엔드 두 개 띄우기
 
@@ -194,12 +169,6 @@ upstream backend {
 - DB: pgbouncer, ProxySQL 같은 전용 LB
 - 글로벌 트래픽: anycast + DNS GeoLB
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-시니어 엔지니어는 LB를 단순한 분배기가 아니라 "서비스 안정성의 1선"으로 봅니다. 새 서비스 설계 시 가장 먼저 그리는 것이 LB의 헬스체크와 배포 시퀀스입니다. canary, blue-green, weighted routing 같은 패턴이 LB 설정 한 줄 차이로 가능 또는 불가능해지기 때문입니다.
-
-또한 시니어는 LB의 한계를 인지합니다. LB가 SPOF가 되지 않도록 LB 자체를 다중화(active-active 또는 active-standby)하고, DNS 라운드로빈, anycast 같은 상위 계층의 장치도 함께 설계합니다.
-
 ## 체크리스트
 
 - [ ] L4와 L7의 차이를 안다
@@ -207,14 +176,6 @@ upstream backend {
 - [ ] sticky session의 비용을 안다
 - [ ] graceful drain 절차를 안다
 - [ ] LB 자체의 다중화를 고려한다
-
-## 연습 문제
-
-1. 위 nginx 예제를 확장해 한쪽 백엔드를 죽이고, 헬스체크가 트래픽을 어떻게 옮기는지 관찰하세요.
-
-2. canary 배포 시나리오를 그려 보세요. 새 버전에 5%만 보내려면 LB 설정이 어떻게 달라져야 하는가?
-
-3. "왜 sticky session을 가급적 피해야 하는가?"를 한 문단으로 답하세요.
 
 ## 정리 및 다음 단계
 

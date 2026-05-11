@@ -1,0 +1,1 @@
+- 2026-05-11: Review verdict for commit `8314cdf7` is `NEEDS FIXES` because some transformations removed blog-required standalone/practical sections or technical example content, even though the majority of files were converted correctly.

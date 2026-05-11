@@ -30,14 +30,6 @@ Agent에게 모호한 지시를 던지면 모호한 결과가 돌아옵니다. T
 ![Task Harness - 모호한 일을 실행 가능한 작업으로 바꾸기](../../../assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.ko.png)
 
 *Task Harness - 모호한 일을 실행 가능한 작업으로 바꾸기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-모호한 일을 어떻게 실행 가능한 작업으로 변환해야 Agent가 안정적으로 수행할까요?
-
-이 글은 그 질문에 답하기 위해 Task Harness의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 모호한 일은 실행할 수 없습니다
 
@@ -299,16 +291,6 @@ def task_to_system_prompt(task: TaskSpec) -> str:
 - Completion criteria는 객관적이고 자동 검증 가능하며 측정 가능해야 합니다. 자연어 표현은 코드 표현으로 다시 씁니다.
 - TaskSpec 하나에서 시스템 프롬프트, 검증 함수, 평가 데이터셋이 모두 파생됩니다. Task가 단일 진실 공급원입니다.
 
----
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **작업 정의가 출력 품질을 결정** — 모호한 task는 모호한 결과로 이어집니다.
-- **성공 기준을 처음에 명시** — 측정 불가능한 목표는 자동화 불가능합니다.
-- **작은 단위로 분해** — 큰 task는 누적 오류를 키웁니다.
-- **입력·출력 형식을 표준화** — 구조적 인터페이스가 재사용성을 만듭니다.
-- **실패 모드를 사전에 정의** — 재시도·중단·승인 흐름이 명시되어야 합니다.
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -324,6 +306,8 @@ def task_to_system_prompt(task: TaskSpec) -> str:
 - Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 

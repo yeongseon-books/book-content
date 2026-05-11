@@ -24,32 +24,8 @@ seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 names
 
 # 모듈과 패키지: import, __init__, __name__
 
-<!-- a-grade-intro:begin -->
-**핵심 질문**: 코드를 언제 한 파일에서 다음 파일로, 다음 패키지로 나눠야 할까요?
 
-> 모듈은 한 번 실행되면 캐시되는 namespace이고, 패키지는 그런 모듈을 디렉터리로 묶은 것입니다. 이 두 정의를 잡아 두면 import의 거의 모든 동작이 같은 그림으로 설명되고, 분할의 기준도 "한 파일이 한 책임만 갖는가"로 단순해집니다.
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-이 글을 읽고 나면 다음을 할 수 있습니다.
-
-- 하나의 `.py` 파일을 모듈로 다루고 다른 파일에서 `import`로 불러올 수 있습니다.
-- 디렉터리에 `__init__.py`를 두어 패키지로 만들고, 안에서 모듈을 정리할 수 있습니다.
-- `import x`, `from x import y`, `import x as alias`의 차이를 설명할 수 있습니다.
-- `if __name__ == "__main__":` 가드가 어떤 시점에 어떤 일을 하는지 추적할 수 있습니다.
-- 같은 패키지 안에서 `from .sibling import ...`처럼 relative import를 쓸 수 있습니다.
-- `sys.path`와 `PYTHONPATH`가 import 경로 탐색에 어떻게 관여하는지 한 줄로 설명할 수 있습니다.
-
-## 이 글에서 답할 질문
-
-- `.py` 파일을 모듈로 다룬다는 것과 디렉터리를 패키지로 만드는 것은 무엇이 다른가?
-- `import x`, `from x import y`, `import x as alias` 세 형태는 각각 언제 자연스러운가?
-- `if __name__ == "__main__":` 가드는 어떤 시점에 어떤 차이를 만드는가?
-- 같은 패키지 안에서 `from .sibling import ...` 같은 relative import는 언제 쓸 수 없는가?
-- `sys.path`와 `PYTHONPATH`는 import 경로 탐색에 각각 어떻게 관여하는가?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 함수를 익히고 나면 코드가 길어집니다. 한 파일에 수백 줄이 쌓이면 다음 문제가 생깁니다.
 
@@ -376,14 +352,6 @@ def total(items):
 
 이 구조는 프로젝트가 커져도 큰 틀은 비슷하게 유지되는 편입니다. 처음에 `myapp/__init__.py` 한 줄로 시작해도, 필요해지면 하위 패키지를 늘리는 방식으로 확장할 수 있습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **import는 정의 시점에 한 번 실행되는 코드다** — 모듈 본문에 무거운 작업(네트워크, 파일 로드)을 두면 import 한 번에 그 비용이 듭니다. 함수 안으로 옮겨 "필요할 때만" 실행되게 합니다.
-- **순환 import는 책임 경계가 잘못 그려졌다는 신호다** — `a`가 `b`를 부르고 `b`가 다시 `a`를 부르면 공통 의존을 별도 모듈로 빼야 합니다. 함수 안 import는 임시방편일 뿐입니다.
-- **`from x import *`는 라이브러리 본문에서 금지다** — 어떤 이름이 들어왔는지 호출부에서 보이지 않아 충돌과 추적 모두 어려워집니다. REPL에서만 제한적으로 씁니다.
-- **`sys.path` 직접 조작은 마지막 수단이다** — `sys.path.insert(...)`이 본문에 흩어지면 import 경로가 어디서 결정되는지 추적이 어려워집니다. `pip install -e .`나 `PYTHONPATH`로 푸는 것이 안전합니다.
-- **공개 API는 `__init__.py`에서 명시적으로 re-export한다** — 사용자가 내부 모듈 경로를 알지 못하게 막으면 내부 구조를 자유롭게 리팩터링할 수 있습니다. 인터페이스와 구현의 분리입니다.
-
 ## 체크리스트
 
 - [ ] `.py` 파일 하나를 모듈로 만들고 다른 파일에서 import할 수 있습니다.
@@ -392,13 +360,6 @@ def total(items):
 - [ ] `if __name__ == "__main__":` 가드의 동작을 직접 실행과 import 두 경우로 나눠 설명할 수 있습니다.
 - [ ] 같은 패키지 안에서 `from .sibling import ...`로 relative import를 쓸 수 있습니다.
 - [ ] `sys.path`와 `PYTHONPATH`가 import 경로 탐색에 관여한다는 것을 한 줄로 설명할 수 있습니다.
-
-## 연습 문제
-
-1. `mathx.py`를 만들어 `square(x)`와 `cube(x)` 두 함수를 정의하고, REPL에서 `import mathx`로 가져와 사용해 보세요.
-2. `tools/` 디렉터리에 `__init__.py`, `text.py`, `numbers.py`를 두고, `text.py`의 함수가 `numbers.py`의 함수를 relative import로 부르도록 만들어 보세요.
-3. `tools/cli.py`를 추가해서 `python -m tools.cli` 형태로 실행되게 만들고, `__name__ == "__main__"` 가드를 사용해 보세요.
-4. `import` 한 번에 `print` 한 줄이 출력되는 모듈을 만든 뒤, 같은 REPL 세션에서 두 번 import해 보고 본문이 한 번만 실행되는지 확인해 보세요.
 
 ## 정리·다음 글
 

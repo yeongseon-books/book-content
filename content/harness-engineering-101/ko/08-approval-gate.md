@@ -29,14 +29,6 @@ seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다.
 ![Approval Gate - 사람 승인이 필요한 지점 설계하기](../../../assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.ko.png)
 
 *Approval Gate - 사람 승인이 필요한 지점 설계하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-사람 승인이 필요한 지점을 어떻게 설계해야 안전과 속도를 동시에 잡을까요?
-
-이 글은 그 질문에 답하기 위해 Approval Gate의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## Approval Gate란 무엇인가요?
 
@@ -206,16 +198,6 @@ class ApprovalLog:
 
 다음 글에서는 Observability를 다룹니다. 에이전트 실행을 어떻게 기록하고, 추적하고, 재현하는지 살펴봅니다.
 
----
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **위험·되돌릴 수 없는 작업에 게이트** — destructive·external·legal이 표준 후보입니다.
-- **승인 컨텍스트를 충분히 제공** — 사람이 빠르게 결정할 수 있어야 합니다.
-- **타임아웃·기본값을 명시** — 응답 없을 때의 동작이 결정되어야 합니다.
-- **승인 이력을 audit log에** — 누가·언제·왜 승인했는지 추적합니다.
-- **게이트를 너무 많이 두지 않는다** — 사람 병목이 자율성을 무력화합니다.
-
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -231,6 +213,8 @@ class ApprovalLog:
 - Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
+---
 
 ## 참고 자료
 

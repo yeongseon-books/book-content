@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Frontend Development 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 화면의 *뼈대* 와 *옷* 은 어떻게 분리해서 만들까요?
-
-> HTML은 *의미* 를 담고, CSS는 *모양* 을 담습니다. 이 분리를 지키면 6개월 뒤의 자신이 *고마워* 합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 시맨틱 HTML로 *의미 있는 구조* 만들기
-- CSS 박스 모델
-- Flexbox와 Grid의 *역할 차이*
-- 반응형 디자인의 *최소 패턴*
-- 접근성(a11y)의 *시작점*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 HTML/CSS는 *오래 살아남는 기술* 입니다. framework는 5년마다 바뀌어도 *시맨틱 태그와 박스 모델* 은 그대로입니다. 여기에 시간을 쓰는 것이 가장 *수익률 높은 학습* 입니다.
 
 > 시맨틱 HTML은 *검색엔진과 스크린리더가 함께 읽는* 코드입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     HTML["Semantic HTML"] --> Box["Box model"]
@@ -55,14 +39,6 @@ flowchart LR
     Layout --> Resp["Responsive"]
     Resp --> A11y["Accessibility"]
 ```
-
-## 핵심 용어 정리
-
-- **Semantic HTML**: `<header>`, `<nav>`, `<article>` 처럼 *의미를 가진* 태그.
-- **Box model**: 모든 요소가 *content + padding + border + margin* 으로 구성된다는 모델.
-- **Flexbox**: *한 방향* 축으로 정렬하는 레이아웃 시스템.
-- **Grid**: *두 방향* 축으로 영역을 나누는 레이아웃 시스템.
-- **Media query**: 화면 크기에 따라 *다른 스타일* 을 적용하는 문법.
 
 ## Before/After
 
@@ -83,7 +59,7 @@ flowchart LR
 <footer>...</footer>
 ```
 
-## 실습: 카드 레이아웃 5단계
+## 카드 레이아웃 5단계
 
 ### 1단계 — 시맨틱 구조
 
@@ -154,14 +130,6 @@ main {
 
 대부분의 회사는 *디자인 시스템* (예: Tailwind, Material UI, 자체 토큰)을 표준으로 정해두고 *재사용* 합니다. 그러나 디자인 시스템도 *내부적으로* 시맨틱 HTML과 Flexbox/Grid 위에서 돕니다. 기본기 없이 디자인 시스템만 익히면 *디버깅이 불가능* 해집니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *시맨틱 태그* 가 가장 저렴한 SEO/접근성 투자.
-- 레이아웃 문제는 *Flexbox vs Grid* 중 하나로 거의 다 풀린다.
-- 반응형은 *모바일을 먼저* 디자인한다(mobile-first).
-- 색이 정보를 *유일하게* 전달하면 안 된다.
-- "이걸 *왜* div로 했지?" 를 항상 자문한다.
-
 ## 체크리스트
 
 - [ ] `<header>`, `<main>`, `<footer>` 를 적절히 쓴다.
@@ -169,12 +137,6 @@ main {
 - [ ] Flexbox와 Grid의 차이를 한 줄로 말할 수 있다.
 - [ ] media query로 반응형을 만들 수 있다.
 - [ ] 모든 이미지에 의미 있는 alt를 단다.
-
-## 연습 문제
-
-1. 명함 카드를 시맨틱 HTML + CSS로 만드세요.
-2. 카드 3개를 Flexbox 한 번, Grid 한 번으로 정렬하세요. 차이를 적어보세요.
-3. 600px 이하에서 한 줄에 한 개씩 보이도록 media query를 추가하세요.
 
 ## 정리 및 다음 단계
 
