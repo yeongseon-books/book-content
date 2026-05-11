@@ -16,7 +16,7 @@ tags:
 - Flamingo
 - Vision Language
 - Modality Fusion
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: ChatGPT가 등장한 2022년 말 이후, "LLM 하나면 거의 모든 문제가 풀린다"는 인식이 잠깐 자리잡았습니다.
 ---
 
@@ -130,7 +130,7 @@ inputs = processor(text=queries, images=images,
 with torch.no_grad():
     out = model(**inputs)
 
-# image-text similarity matrix (queries x images)
+# 이미지-텍스트 유사도 행렬 (질의 x 이미지)
 logits = out.logits_per_text
 probs = logits.softmax(dim=-1)
 print(probs)

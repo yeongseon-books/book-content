@@ -16,7 +16,7 @@ tags:
 - DALL-E
 - Image Generation
 - ControlNet
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 2014~2020년 image generation의 default는 GAN이었습니다.
 ---
 

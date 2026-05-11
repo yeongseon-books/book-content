@@ -16,7 +16,7 @@ tags:
 - FAISS
 - LangChain
 - Vector Search
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query…
 ---
 

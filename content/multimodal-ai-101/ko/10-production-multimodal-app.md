@@ -16,7 +16,7 @@ tags:
 - Inference Pipeline
 - Cost Optimization
 - Caching
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, captioning, multimodal RAG,
   audio…
 ---

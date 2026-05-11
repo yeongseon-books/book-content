@@ -16,7 +16,7 @@ tags:
 - Audio Processing
 - OpenAI
 - faster-whisper
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: OpenAI Whisper가 2022년 9월 공개되기 전까지, production STT는 Google Speech,
   AWS…
 ---

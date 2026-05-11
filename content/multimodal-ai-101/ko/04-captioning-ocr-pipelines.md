@@ -16,7 +16,7 @@ tags:
 - Tesseract
 - PaddleOCR
 - Document AI
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: production multimodal 시스템에서 가장 자주 나오는 질문 두 가지가 있습니다.
 ---
 

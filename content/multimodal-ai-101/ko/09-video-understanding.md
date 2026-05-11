@@ -16,7 +16,7 @@ tags:
 - Temporal Modeling
 - VideoMAE
 - Action Recognition
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 이미지는 단일 frame이지만, video는 시간 축이 추가된 frame sequence입니다.
 ---
 
@@ -100,7 +100,7 @@ def extract_keyframes(path: str, threshold: float = 30.0) -> list[Image.Image]:
         if prev_hist is None:
             keyframes.append(frame.to_image())
         else:
-            # chi-square distance
+            # 카이제곱 거리
             diff = np.sum((hist - prev_hist) ** 2 / (hist + prev_hist + 1e-8))
             if diff > threshold:
                 keyframes.append(frame.to_image())

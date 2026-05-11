@@ -16,7 +16,7 @@ tags:
 - Q-Former
 - BLIP-2
 - Multimodal Fusion
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬하는 데까지 갔습니다.
 ---
 
@@ -67,7 +67,7 @@ class LLaVAProjector(nn.Module):
         )
 
     def forward(self, vision_features: torch.Tensor) -> torch.Tensor:
-        # vision_features: (B, num_patches, vision_dim)
+        # vision_features 형태: (B, num_patches, vision_dim)
         return self.proj(vision_features)  # (B, num_patches, llm_dim)
 ```
 
@@ -98,7 +98,7 @@ class QFormer(nn.Module):
         self.vision_proj = nn.Linear(vision_dim, hidden_dim)
 
     def forward(self, vision_features: torch.Tensor) -> torch.Tensor:
-        # vision_features: (B, num_patches, vision_dim)
+        # vision_features 형태: (B, num_patches, vision_dim)
         B = vision_features.size(0)
         q = self.queries.unsqueeze(0).expand(B, -1, -1)  # (B, 32, hidden)
         memory = self.vision_proj(vision_features)

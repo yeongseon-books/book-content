@@ -16,7 +16,7 @@ tags:
 - ImageBind
 - FAISS
 - Multimodal Index
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이번 글에서는 그 심장에 해당하는 multimodal embedding을
   더…
 ---
@@ -156,7 +156,7 @@ inputs = {
 with torch.no_grad():
     embeds = model(inputs)
 
-# normalize then cosine
+# 정규화한 뒤 cosine 계산
 for k, v in embeds.items():
     embeds[k] = v / v.norm(dim=-1, keepdim=True)
 

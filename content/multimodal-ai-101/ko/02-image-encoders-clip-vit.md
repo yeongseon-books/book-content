@@ -16,7 +16,7 @@ tags:
 - Contrastive Learning
 - OpenAI
 - Vision Transformer
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: multimodal 시스템의 품질은 결국 image encoder가 만들어내는 representation의 품질에서
   출발합니다.
 ---
@@ -150,7 +150,7 @@ vecs = embed_images(paths)
 index = faiss.IndexFlatIP(vecs.shape[1])  # cosine = inner product on normalized
 index.add(vecs)
 
-# query by text
+# 텍스트 질의
 query = proc(text=["a red sports car"], return_tensors="pt", padding=True)
 with torch.no_grad():
     qv = model.get_text_features(**query)
