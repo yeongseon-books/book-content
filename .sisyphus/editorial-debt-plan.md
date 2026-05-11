@@ -1,24 +1,42 @@
 # Editorial Debt Resolution Plan
 
-## Current State (as of 2026-05-10)
+## Current State (as of 2026-05-11, post-blog-transformation)
 
-**Total warnings from `check_article_structure.py --warn-all`: 106**
+**Warning counts depend on scope flag** — `check_article_structure.py` runs in two modes:
 
-### Warning Distribution by Series (6 series affected)
+| Mode | Command | Posts checked | Warnings | What it covers |
+| --- | --- | --- | --- | --- |
+| Strict (default) | `python3 scripts/check_article_structure.py` | 386 | **121** | Only `status: publish-ready` posts. This is what `make check` runs. |
+| Warn-all | `python3 scripts/check_article_structure.py --warn-all` | 1,673 (all) | **228** | All posts including `content-ready`, `needs-update`, `draft`. Used for backlog visibility. |
 
-1. **ai-data-preparation-101** (core tier)
-2. **ai-evaluation-101** (core tier)
-3. **ai-safety-guardrails-101** (core tier)
-4. **ai-web-dev-101** (core tier)
-5. **harness-engineering-101** (supported tier)
-6. **multimodal-ai-101** (supported tier)
+**Both numbers are correct and refer to the same underlying issue (missing questions / mental-model blocks). They differ only in scope.** The strict count (121) is the CI gate; the warn-all count (228) is the long-tail backlog including not-yet-publishable posts.
 
-### Warning Types
+### Warning Types (strict mode, 121 total)
 
 | Type | Count | Description |
 | --- | --- | --- |
-| Missing checklist | 105 | Article lacks production checklist section |
-| Missing question block | 49 | Article lacks common misconceptions / FAQ section |
+| Missing questions block | ~80 | Article lacks `## 자주 묻는 질문` / FAQ block |
+| Missing mental model blockquote | ~41 | Article lacks opening `> mental model` line |
+
+### Warning Distribution by Series (top contributors, strict mode)
+
+| Series | Warnings | Tier |
+| --- | --- | --- |
+| llm-from-scratch-101 | 9 | core |
+| ai-agent-101 | 9 | core |
+| azure-app-service-101 | 7 | supported |
+| vector-search-101 | 6 | core |
+| rag-deep-dive | 6 | core |
+| python-dbapi-101 | 6 | supported |
+| llm-finetuning-101 | 6 | core |
+| llm-apps-ops-101 | 6 | core |
+| llm-api-production-101 | 6 | core |
+| korean-ai-stack-101 | 6 | supported |
+| document-ingestion-101 | 6 | core |
+| ai-app-patterns-101 | 6 | core |
+| azure-* deep-dive (3) | 18 total | supported |
+
+> Note: 2026-05-10 baseline (106 warnings on 6 series) is superseded. Blog transformation (commit `57f24bd6` + `4725a968`) reset structure across all 840 ko posts; post-transformation re-baseline is **121 warnings (strict) / 228 warnings (--warn-all), missing questions+mental-model blocks** instead of checklists.
 
 ## Resolution Strategy
 
@@ -91,5 +109,5 @@ Track trend: warnings should decrease over time.
 
 ---
 
-*Last updated: 2026-05-10*
+*Last updated: 2026-05-11 (post-blog-transformation re-baseline)*
 *Created for issue #215*
