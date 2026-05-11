@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: ko
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 series: git-github-101
 status: publish-ready
 tags:
@@ -83,7 +83,7 @@ PR #5: Fix sidebar overflow
 - (\ubcf8\ubb38 \ube44\uc5b4 \uc788\uc74c)
 - merge \uC644\ub8CC
 
-# 3\uac1c\uc6d4 \ub4a4
+\uc11d \ub2ec \ub4a4
 $ git log --oneline | grep sidebar
 9d8e7f6 Fix sidebar overflow
 $ # \uc65c \uace0\uccd0\uc57c \ud588\ub294\uc9c0\ub294 \uc544\ubb34\ub3c4 \ubaa8\ub984

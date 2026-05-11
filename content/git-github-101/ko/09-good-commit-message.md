@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 series: git-github-101
 status: publish-ready
 tags:
@@ -170,10 +170,10 @@ pick a8b7c6d docs(readme): add closing thank-you note
 pick b9c8d7e fix
 pick c0d1e2f wip
 
-# Rebase ...
-# Commands:
-# p, pick   = use commit
-# r, reword = use commit, but edit the commit message
+# 리베이스 ...
+# 명령:
+# p, pick   = commit을 그대로 사용
+# r, reword = commit을 사용하되 message를 수정
 # ...
 ```
 

@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: ko
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 series: git-github-101
 status: publish-ready
 tags:
@@ -95,7 +95,7 @@ index 6e85ca6..b7f5a1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,4 @@
- # My First Repo
+ # 내 첫 저장소
 
  Some notes.
 +Author: me
@@ -166,7 +166,7 @@ index 6e85ca6..b7f5a1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,4 @@
- # My First Repo
+ # 내 첫 저장소
 
  Some notes.
 +Author: me
@@ -193,7 +193,7 @@ index 6e85ca6..b7f5a1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,4 @@
- # My First Repo
+ # 내 첫 저장소
 
  Some notes.
 +Author: me
@@ -229,7 +229,7 @@ index 6e85ca6..b7f5a1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,4 @@
- # My First Repo
+ # 내 첫 저장소
 
  Some notes.
 +Author: me
@@ -248,7 +248,7 @@ index a1b2c3d..6e85ca6 100644
 --- a/README.md
 +++ b/README.md
 @@ -1 +1,3 @@
- # My First Repo
+ # 내 첫 저장소
 +
 +Some notes.
 ```
@@ -310,7 +310,7 @@ index 6e85ca6..b7f5a1e 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,3 +1,4 @@
- # My First Repo
+ # 내 첫 저장소
 
  Some notes.
 +Author: me

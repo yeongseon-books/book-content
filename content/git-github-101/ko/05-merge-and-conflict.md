@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: ko
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 series: git-github-101
 status: publish-ready
 tags:
@@ -282,9 +282,9 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 ```text
 <<<<<<< HEAD
-# Awesome Project
+# 멋진 프로젝트
 =======
-## My Project
+## 내 프로젝트
 >>>>>>> feature/header-emoji
 ```
 
@@ -296,7 +296,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 원하는 형태로 직접 고치고 marker 세 줄을 모두 지웁니다. 예를 들어 main 쪽 이름을 유지하되 h2로 바꾸기로 결정했다면 파일을 다음과 같이 만듭니다.
 
 ```text
-## Awesome Project
+## 멋진 프로젝트
 ```
 
 resolve가 끝났음을 Git에 알리고 commit으로 마무리합니다.
