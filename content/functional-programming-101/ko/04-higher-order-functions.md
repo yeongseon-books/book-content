@@ -17,7 +17,7 @@ tags:
   - 콜백
   - 데코레이터
 seo_description: 함수를 인자로 받고 반환하는 고차 함수의 원리와 Python 활용법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 고차 함수
@@ -144,10 +144,10 @@ students = [
 by_score = sorted(students, key=lambda s: s.score, reverse=True)
 for s in by_score:
     print(f"{s.name}: {s.score}")
-# Diana: 95
-# Bob: 92
-# Alice: 85
-# Charlie: 78
+# 출력 예시: Diana: 95
+# 출력 예시: Bob: 92
+# 출력 예시: Alice: 85
+# 출력 예시: Charlie: 78
 
 # 학년순 → 점수순 다중 정렬
 by_grade_score = sorted(students, key=lambda s: (s.grade, -s.score))

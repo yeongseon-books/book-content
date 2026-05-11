@@ -17,7 +17,7 @@ tags:
   - 파이프라인
   - 데이터 변환
 seo_description: 작은 함수를 조합하여 복잡한 데이터 변환 파이프라인을 구성하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 함수 합성과 파이프라인
@@ -111,7 +111,7 @@ def pipe(*funcs: Callable) -> Callable:
     return piped
 
 
-# compose: f(g(h(x)))
+# compose 예시: f(g(h(x)))
 add_one = lambda x: x + 1
 double = lambda x: x * 2
 to_str = lambda x: f"Result: {x}"
@@ -162,10 +162,10 @@ slugify = pipe(
 )
 
 print(slugify("  Hello, World!  This is  a Test  "))
-# hello-world-this-is-a-test
+# 출력 예시: hello-world-this-is-a-test
 
 print(slugify("  Functional Programming — 함수 합성 가이드  "))
-# functional-programming--
+# 출력 예시: functional-programming--
 ```
 
 ### Step 3: 데이터 처리 파이프라인
@@ -235,10 +235,10 @@ raw_data = [
 print(process_students(raw_data))
 # 이름          점수   등급
 # ----------------------
-# Diana          95    A
-# Bob            92    A
-# Alice          85    B
-# Charlie        78    C
+# 출력 예시: Diana          95    A
+# 출력 예시: Bob            92    A
+# 출력 예시: Alice          85    B
+# 출력 예시: Charlie        78    C
 ```
 
 ### Step 4: 제너레이터 파이프라인

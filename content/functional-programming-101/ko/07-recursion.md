@@ -17,7 +17,7 @@ tags:
   - 꼬리 호출
   - 스택
 seo_description: 재귀 함수의 원리, 스택 오버플로우 방지, Python에서의 실용적 재귀 패턴을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 재귀와 꼬리 호출
@@ -98,7 +98,7 @@ def factorial(n: int) -> int:
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
-# 호출 과정 시각화
+# 호출 과정을 시각화합니다.
 def factorial_verbose(n: int, depth: int = 0) -> int:
     indent = "  " * depth
     print(f"{indent}factorial({n})")
@@ -110,14 +110,14 @@ def factorial_verbose(n: int, depth: int = 0) -> int:
     return result
 
 factorial_verbose(4)
-# factorial(4)
-#   factorial(3)
-#     factorial(2)
-#       factorial(1)
-#       → 1
-#     → 2
-#   → 6
-# → 24
+# 출력 예시: factorial(4)
+# 출력 예시:   factorial(3)
+# 출력 예시:     factorial(2)
+# 출력 예시:       factorial(1)
+# 출력 예시:       → 1
+# 출력 예시:     → 2
+# 출력 예시:   → 6
+# 출력 예시: → 24
 ```
 
 ### Step 2: 피보나치와 메모이제이션
@@ -144,7 +144,7 @@ def fib_memo(n: int) -> int:
 print(fib_naive(10))  # 55 (느림)
 print(fib_memo(100))  # 354224848179261915075 (빠름)
 
-# 캐시 정보 확인
+# 캐시 정보를 확인합니다.
 print(fib_memo.cache_info())
 # CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)
 ```
@@ -167,7 +167,7 @@ def factorial_tail(n: int, acc: int = 1) -> int:
     return factorial_tail(n - 1, n * acc)  # 마지막 연산이 재귀 호출
 
 
-# Python은 꼬리 호출 최적화(TCO)를 지원하지 않음
+# Python은 꼬리 호출 최적화(TCO)를 지원하지 않습니다.
 print(sys.getrecursionlimit())  # 기본 1000
 print(factorial_tail(900))  # 동작하지만...
 # factorial_tail(1500)  # RecursionError!
@@ -188,7 +188,7 @@ print(factorial_iterative(10000))  # 문제 없음
 from typing import Any
 
 
-# 중첩 딕셔너리(트리 구조) 탐색
+# 중첩 딕셔너리(트리 구조)를 탐색합니다.
 def flatten_dict(
     d: dict,
     parent_key: str = "",
@@ -220,11 +220,11 @@ config = {
 flat = flatten_dict(config)
 for k, v in flat.items():
     print(f"  {k}: {v}")
-# database.host: localhost
-# database.port: 5432
-# database.credentials.user: admin
-# database.credentials.password: secret
-# debug: True
+# 출력 예시: database.host: localhost
+# 출력 예시: database.port: 5432
+# 출력 예시: database.credentials.user: admin
+# 출력 예시: database.credentials.password: secret
+# 출력 예시: debug: True
 ```
 
 ### Step 5: 재귀를 반복으로 변환
