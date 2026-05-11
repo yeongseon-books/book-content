@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > parametrize = 하나의 테스트 함수 + 여러 데이터 세트 → N개의 독립 테스트
 
-```
+```text
 @pytest.mark.parametrize("input,expected", [
     ("hello", 5),      ← 테스트 1
     ("", 0),            ← 테스트 2

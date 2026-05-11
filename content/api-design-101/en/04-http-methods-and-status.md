@@ -74,14 +74,14 @@ flowchart LR
 
 **Before (intent unclear)**
 
-```
+```http
 POST /users/42/update   200 OK   {"ok": true}
 POST /users/42/delete   200 OK   {"ok": true}
 ```
 
 **After (method × status)**
 
-```
+```http
 PATCH  /users/42   200 OK
 DELETE /users/42   204 No Content
 ```

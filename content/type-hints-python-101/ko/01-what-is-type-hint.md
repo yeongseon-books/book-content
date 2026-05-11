@@ -38,7 +38,7 @@ Python 3.5에서 PEP 484로 도입된 이후, FastAPI, Pydantic, SQLAlchemy 2.0 
 
 > 동적 타입 vs 타입 힌트
 
-```
+```text
 동적 타입 (기본)              타입 힌트 적용
 ─────────────────           ─────────────────
 def greet(name):            def greet(name: str) -> str:

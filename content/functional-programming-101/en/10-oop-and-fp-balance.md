@@ -51,7 +51,7 @@ Python's standard library ships both `pathlib` (OOP) and `itertools` (FP). Using
 
 > OOP vs FP — strength comparison
 
-```
+```text
 OOP Fits Best                  FP Fits Best
 ─────────────────             ─────────────────
 State + behavior together     Stateless data transformation

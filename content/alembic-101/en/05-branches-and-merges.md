@@ -46,7 +46,7 @@ Borrowing from git: `alembic merge` is `git merge`. The difference is that the m
 
 ### When a branch appears
 
-```
+```text
 A → B → C  (head: C)
         ↑
       Alice generates D, Bob generates E concurrently

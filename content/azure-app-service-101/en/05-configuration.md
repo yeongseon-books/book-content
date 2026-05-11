@@ -54,7 +54,7 @@ App Service injects environment variables through **App Settings**:
 
 *Settings injected into app environment*
 
-```
+```text
 [Azure Portal/CLI] → App Settings → [Environment Variables] → [App Process]
 ```
 

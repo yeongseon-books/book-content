@@ -77,7 +77,7 @@ Finally, the `MetaData` becomes Alembic's `target_metadata`, the basis for autog
 
 > MetaData is your application's schema specification. A Table is a page in that spec, and a Column is one line on a page. Without an Engine, MetaData is just an in-memory document. Without MetaData, an Engine has nothing to build.
 
-```
+```text
                     MetaData (in-memory catalog)
                          │
         ┌────────────────┼────────────────┐

@@ -51,7 +51,7 @@ Protocol says "structurally matching is OK," while ABC says "you must explicitly
 
 > Abstract class structure
 
-```
+```text
 ABC (Abstract Base Class)
 ├── @abstractmethod read()     -> must implement
 ├── @abstractmethod write()    -> must implement

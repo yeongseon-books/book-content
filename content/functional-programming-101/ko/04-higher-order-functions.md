@@ -37,7 +37,7 @@ Python의 `sorted(key=...)`, `map(func, ...)`, 데코레이터 모두 고차 함
 
 > 고차 함수의 두 가지 형태
 
-```
+```text
 형태 1: 함수를 인자로 받음      형태 2: 함수를 반환
 ─────────────────────          ─────────────────
 sorted(data, key=func)         def make_adder(n):

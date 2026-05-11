@@ -51,7 +51,7 @@ Boundary values, empty inputs, and special characters need comprehensive coverag
 
 > parametrize = one test function + multiple data sets → N independent tests
 
-```
+```text
 @pytest.mark.parametrize("input,expected", [
     ("hello", 5),      ← test 1
     ("", 0),            ← test 2

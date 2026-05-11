@@ -51,7 +51,7 @@ Python's dunder methods let you integrate custom classes seamlessly with built-i
 
 > Anatomy of a class
 
-```
+```text
 Class
 ├── class variable
 ├── __init__()       → instance initialization

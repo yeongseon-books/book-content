@@ -38,7 +38,7 @@ Go의 인터페이스, TypeScript의 구조적 타입과 같은 개념입니다.
 
 > nominal typing vs structural typing
 
-```
+```text
 Nominal (ABC)                  Structural (Protocol)
 ─────────────────             ─────────────────
 class Dog(Animal):            class Dog:

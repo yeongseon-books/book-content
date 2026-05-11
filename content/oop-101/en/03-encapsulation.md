@@ -51,7 +51,7 @@ Python does not have `private` keywords like Java. Instead, it uses underscore (
 
 > Python access control conventions
 
-```
+```text
 Naming Pattern           Access Level
 ─────────────────────────────────────
 name                    public — accessible by anyone

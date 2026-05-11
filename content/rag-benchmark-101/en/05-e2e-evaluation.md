@@ -50,7 +50,7 @@ This post builds the second axis. The main tool is [RAGAS](https://docs.ragas.io
 
 The data flow of an end-to-end evaluation:
 
-```
+```text
 question  ──►  retriever  ──►  contexts (List[str])
                                     │
 question + contexts  ──►  LLM  ──►  answer
@@ -82,7 +82,7 @@ Faithfulness and Answer Relevancy work without ground truth, which makes them th
 
 **After**: Every PR runs RAGAS automatically against 50 questions and reports faithfulness / answer_relevancy.
 
-```
+```text
 metric              before  after
 faithfulness        0.78    0.91
 answer_relevancy    0.82    0.85

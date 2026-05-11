@@ -168,7 +168,7 @@ Video-LLaVA는 8 frame을 하나의 video token sequence로 압축합니다. 짧
 
 production action recognition pipeline은 이렇게 구성됩니다.
 
-```
+```text
 영상 입력 ──► frame sampler (8~16) ──► VideoMAE / X-CLIP ──► action label + score
                                                                  │
                                                                  ▼

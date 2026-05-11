@@ -51,7 +51,7 @@ A coding test is an exam where you write correct code within a time limit. A sys
 
 > Reverse-engineer the allowed time complexity from input size
 
-```
+```text
 Allowed time complexity by input size N (1-second limit):
 N ≤ 10        → O(N!)       — brute force / permutations
 N ≤ 20        → O(2^N)      — bitmask, backtracking

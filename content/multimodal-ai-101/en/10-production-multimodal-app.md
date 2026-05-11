@@ -41,7 +41,7 @@ We will assume a multimodal Q&A service:
 - Multimodal RAG fetches relevant documents
 - The final answer streams back
 
-```
+```text
 client ──► API gateway ──► FastAPI app
                                 │
                 ┌───────────────┼─────────────────┐

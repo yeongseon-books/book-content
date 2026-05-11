@@ -51,7 +51,7 @@ Exception handling is core to production code. Without testing that exceptions f
 
 > assertion introspection = pytest analyzes assert statements to provide detailed information on failure
 
-```
+```text
 assert result == expected
        │          │
        │          └─ Expected value: displayed

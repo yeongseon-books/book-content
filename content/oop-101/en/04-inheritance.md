@@ -51,7 +51,7 @@ That said, inheritance creates tight coupling. Changes to a parent class affect 
 
 > Inheritance hierarchy
 
-```
+```text
 Animal (parent class)
 ├── name, sound
 ├── speak()

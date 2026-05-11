@@ -134,7 +134,7 @@ func start
 
 If you see this near the bottom of the output, you're set:
 
-```
+```text
 Functions:
         hello: [GET,POST] http://localhost:7071/api/hello
 ```
@@ -232,7 +232,7 @@ Under the hood, the flow looks like this.
 *Local code deployment into Function App*
 You should see something like this at the end.
 
-```
+```text
 Functions in func-hello-xxxxx:
     hello - [httpTrigger]
         Invoke url: https://func-hello-xxxxx.azurewebsites.net/api/hello

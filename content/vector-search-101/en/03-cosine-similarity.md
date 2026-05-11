@@ -67,7 +67,7 @@ After this chapter, the next one moves on to **FAISS fundamentals — fast appro
 
 Cosine similarity measures the angle between two vectors, ignoring their magnitudes.
 
-```
+```text
 cos(θ) = (A · B) / (|A| × |B|)
 ```
 
@@ -84,7 +84,7 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 The dot product multiplies element-wise and sums the result.
 
-```
+```text
 A · B = Σ(Aᵢ × Bᵢ)
 ```
 
@@ -99,7 +99,7 @@ def dot_product(a: np.ndarray, b: np.ndarray) -> float:
 
 Euclidean distance is the straight-line distance between two points.
 
-```
+```text
 L2(A, B) = √Σ(Aᵢ - Bᵢ)²
 ```
 

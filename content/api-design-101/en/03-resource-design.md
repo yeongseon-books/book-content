@@ -70,13 +70,13 @@ Collection → item → sub-collection → sub-item.
 
 **Before (verbs, singular, flat)**
 
-```
+```http
 GET /getUserOrder?userId=42&orderId=9
 ```
 
 **After (nouns, plural, hierarchical)**
 
-```
+```http
 GET /users/42/orders/9
 ```
 

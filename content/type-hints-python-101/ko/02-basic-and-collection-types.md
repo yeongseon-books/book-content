@@ -38,7 +38,7 @@ Python 3.9부터 `list[int]`, `dict[str, int]`처럼 내장 타입을 직접 사
 
 > 스칼라 타입 vs 컬렉션 타입
 
-```
+```text
 스칼라 타입                    컬렉션 타입
 ─────────────────            ─────────────────
 int, str, float, bool        list[T], dict[K, V]

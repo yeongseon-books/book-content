@@ -47,7 +47,7 @@ Once the adapter wiring is verified in post 3, when training fails to converge i
 
 A LoRA adapter is summarized by:
 
-```
+```text
 Original forward:  y = W · x
 
 LoRA forward:      y = W · x + (alpha / r) · B · A · x

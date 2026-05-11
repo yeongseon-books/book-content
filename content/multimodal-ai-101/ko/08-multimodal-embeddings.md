@@ -38,7 +38,7 @@ Single-modal embedding은 동일한 modality 안에서 의미를 압축합니다
 
 Multimodal embedding은 contrastive learning으로 두 modality를 같은 공간으로 정렬합니다. 학습 시 (image, caption) 쌍을 가져와 같은 쌍은 가깝게, 다른 쌍은 멀게 학습시키면, 결과적으로 "강아지 사진"과 "a photo of a dog" 문장이 비슷한 벡터로 떨어집니다.
 
-```
+```text
 text "고양이가 잠자고 있다"  ──┐
                               ├──► shared space (예: 768-dim)
 image (잠자는 고양이 사진)     ──┘

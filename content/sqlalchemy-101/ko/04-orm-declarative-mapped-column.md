@@ -52,7 +52,7 @@ ORM은 마법이 아니라, Core 위에 얇은 레이어를 얹어 위 비용을
 
 다이어그램으로 보면 단순합니다.
 
-```
+```text
 DeclarativeBase
    └── metadata: MetaData       # Core의 schema catalog (Ep2)
          └── tables: dict[str, Table]

@@ -45,7 +45,7 @@ OCR deserves its own stage because half of Korean enterprise search begins with 
 
 The OCR pipeline has four stages.
 
-```
+```text
 [document image / PDF]
        |
        v

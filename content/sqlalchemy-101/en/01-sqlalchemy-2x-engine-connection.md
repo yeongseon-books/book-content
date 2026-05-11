@@ -75,7 +75,7 @@ The Engine in SQLAlchemy is "the ability to talk to a database, made into an obj
 
 Visually:
 
-```
+```text
 Application code
       │
       ▼

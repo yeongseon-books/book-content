@@ -45,7 +45,7 @@ Sentence similarity deserves its own stage because many Korean RAG systems colla
 
 Sentence similarity search decomposes into four steps.
 
-```
+```text
 [corpus]                         [query]
    |                                |
    v                                v

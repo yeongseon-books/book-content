@@ -68,7 +68,7 @@ flowchart LR
 
 **Before (silently broken)**
 
-```
+```text
 PATCH /users/42  → response date format changes one day
 ```
 
@@ -114,7 +114,7 @@ URLs stay clean, but *debugging and caching get harder*.
 
 ### Step 3 — Non-breaking additions
 
-```
+```text
 Add a new field to a response → non-breaking (if clients can ignore it)
 Add an *optional* field to a request → non-breaking
 ```

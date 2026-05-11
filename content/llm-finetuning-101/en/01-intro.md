@@ -48,7 +48,7 @@ Understanding numerically why LoRA is cheap and fast, how few parameters it real
 
 A fine-tuning experiment is a decision about how to slice three variables:
 
-```
+```text
                   ┌───────────────────────────────────────┐
                   │ ① What are we changing? (target params)│
                   ├───────────────────────────────────────┤

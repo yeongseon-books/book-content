@@ -38,7 +38,7 @@ A single-modal embedding compresses meaning within one modality. A text encoder 
 
 A multimodal embedding aligns two modalities into one space using contrastive learning. Training pulls (image, caption) pairs together and pushes mismatched pairs apart, so a "dog photo" and the sentence "a photo of a dog" end up at nearby vectors.
 
-```
+```text
 text "a sleeping cat"          ──┐
                                  ├──► shared space (e.g. 768-dim)
 image (sleeping cat photo)      ──┘

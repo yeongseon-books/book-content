@@ -38,7 +38,7 @@ last_reviewed: '2026-05-04'
 
 > TypedDict vs dataclass
 
-```
+```text
 TypedDict                      dataclass
 ─────────────────             ─────────────────
 딕셔너리 구조 유지              새로운 클래스 생성

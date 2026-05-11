@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > test discovery = pytest가 테스트 파일과 함수를 자동으로 찾는 메커니즘
 
-```
+```text
 project/
 ├── src/
 │   └── myapp/

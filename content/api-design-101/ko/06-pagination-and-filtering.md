@@ -46,13 +46,13 @@ cursor는 *다음 페이지의 시작점* 입니다.
 
 **Before (정렬·필터·페이지가 뒤엉킴)**
 
-```
+```http
 GET /orders?p=3&s=date&q=paid
 ```
 
 **After (이름·표준·메타)**
 
-```
+```http
 GET /orders?status=paid&sort=created_at:desc&limit=20&cursor=eyJpZCI6MTIzfQ
 ```
 
@@ -96,7 +96,7 @@ cursor는 *불투명* 하게 — 클라이언트가 해석하지 않습니다.
 
 ### 3단계 — 정렬
 
-```
+```http
 GET /items?sort=created_at:desc
 GET /items?sort=name:asc,id:desc
 ```
@@ -105,7 +105,7 @@ GET /items?sort=name:asc,id:desc
 
 ### 4단계 — 필터
 
-```
+```http
 GET /orders?status=paid&tier=pro
 GET /orders?created_at__gte=2026-01-01
 ```
@@ -114,7 +114,7 @@ GET /orders?created_at__gte=2026-01-01
 
 ### 5단계 — 검색
 
-```
+```http
 GET /articles?q=python+logging
 ```
 

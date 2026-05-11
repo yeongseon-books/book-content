@@ -52,7 +52,7 @@ The pipeline we build in this post is small, but it is the skeleton that support
 
 A finished benchmark is a single function:
 
-```
+```text
 run_benchmark(config) ──►  report
    │
    ├─ Phase 1: build retriever (corpus + embedding + index)
@@ -83,7 +83,7 @@ Splitting the report into aggregate and per-question pieces matters. With only t
 
 **After**: every PR runs `python3 run_benchmark.py --config configs/ci.yaml` automatically and posts a one-line comparison against baseline as a comment.
 
-```
+```text
                   baseline  this PR  delta
 hit_rate@3        0.94      0.96    +0.02 ✓
 MRR               0.78      0.81    +0.03 ✓

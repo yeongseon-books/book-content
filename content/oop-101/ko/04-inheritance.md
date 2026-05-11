@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > 상속 계층 구조
 
-```
+```text
 Animal (부모 클래스)
 ├── name, sound
 ├── speak()

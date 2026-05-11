@@ -38,7 +38,7 @@ last_reviewed: '2026-05-04'
 
 > Optional vs Union
 
-```
+```text
 Optional[str]            Union[str, int]
 ─────────────────       ─────────────────
 str | None              str | int

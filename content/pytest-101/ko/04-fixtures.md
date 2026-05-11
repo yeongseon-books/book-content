@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > fixture = 테스트 실행 전에 준비하고, 실행 후에 정리하는 재사용 가능한 컴포넌트
 
-```
+```text
 @pytest.fixture
 def user():          ← fixture 정의
     return User("Alice")

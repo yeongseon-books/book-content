@@ -47,7 +47,7 @@ A separate post is justified because many teams expect that swapping in a Korean
 
 Generation API calls factor into a 4-layer contract.
 
-```
+```text
 [call contract]    auth, endpoint, rate limit, timeout, retry
      |
      v

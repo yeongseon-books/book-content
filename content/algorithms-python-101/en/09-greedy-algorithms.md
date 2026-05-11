@@ -51,7 +51,7 @@ However, greedy does not always yield the optimal answer. Both the "greedy choic
 
 > Greedy choice property = the locally optimal choice is part of the globally optimal solution
 
-```
+```text
 Coin change (denominations: 500, 100, 50, 10):
 Make change for 1,260:
 → 500 × 2 = 1,000 (remaining: 260)

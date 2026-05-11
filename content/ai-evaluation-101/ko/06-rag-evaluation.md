@@ -36,7 +36,7 @@ RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다. 이 
 *RAG는 단일 모델이 아니라 파이프라인*
 RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 
-```
+```text
 질문 → [1. Retriever]  → 관련 문서 K개 → [2. Generator (LLM)] → 답변
         (vector DB)                       (context로 답변 생성)
 ```

@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > 스택 = LIFO(Last In, First Out), 큐 = FIFO(First In, First Out)
 
-```
+```text
 [스택 — LIFO]           [큐 — FIFO]
   push → │ C │          enqueue → │ A │ B │ C │ → dequeue
          │ B │                    ↑               ↑

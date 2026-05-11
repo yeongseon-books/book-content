@@ -39,7 +39,7 @@ seo_description: '"Traffic increased and the app is slow." "Want to reduce costs
 
 ## Two Directions of Scaling
 
-```
+```text
  ┌─────────────┐
  │ Larger │ ← Scale Up (Vertical)
  │ Instance │
@@ -180,7 +180,7 @@ az appservice plan update \
 
 ### Autoscale Flow
 
-```
+```text
 Collect Metrics → Evaluate Rules → Scale Action → Cooldown → Re-evaluate
 ```
 
@@ -253,7 +253,7 @@ az monitor autoscale show \
 
 ### 1. Separate Scale Out/In Thresholds
 
-```
+```text
 Scale Out: CPU > 70%
 Scale In: CPU < 35% ← Gap prevents oscillation
 ```
@@ -269,7 +269,7 @@ Scale In: CPU < 35% ← Gap prevents oscillation
 
 ### 3. Set Minimum/Maximum Instances
 
-```
+```text
 Minimum: 2 ← Ensures availability (Health Check needs this)
 Maximum: 10 ← Cost control
 ```
@@ -295,7 +295,7 @@ When instances increase, **load on external dependencies also increases**.
 
 *Instance growth cascading into dependency load*
 
-```
+```text
 2 instances → 20 DB connections
 10 instances → 100 DB connections (!)
 ```

@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > 클로저의 구조
 
-```
+```text
 outer_func(x)
   │
   ├─ 지역 변수 x (자유 변수가 됨)

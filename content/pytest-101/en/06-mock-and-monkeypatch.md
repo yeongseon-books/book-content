@@ -51,7 +51,7 @@ In production, mocks prevent test failures caused by external service outages.
 
 > mock = swap the real thing with a fake to isolate the test
 
-```
+```text
 [Production]                    [Test]
 function → DB query → result    function → Mock(DB) → fake result
 function → HTTP call → response function → Mock(HTTP) → fake response

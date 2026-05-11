@@ -51,7 +51,7 @@ Setting a team-wide coverage threshold prevents new code from merging without te
 
 > coverage = lines executed by tests / total lines of code
 
-```
+```text
 def process(x):        ← executed
     if x > 0:          ← executed
         return x * 2   ← executed

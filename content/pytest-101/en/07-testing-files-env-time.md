@@ -51,7 +51,7 @@ Master these three patterns and you can isolate most system dependencies.
 
 > system resource isolation = controlling files, env vars, and time within the test scope
 
-```
+```text
 [Before Isolation]                [After Isolation]
 files → real path collisions      tmp_path → auto-cleanup
 env vars → global pollution       monkeypatch → restored after test

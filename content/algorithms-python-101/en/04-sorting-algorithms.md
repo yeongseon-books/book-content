@@ -51,7 +51,7 @@ In practice, you use sorted() almost everywhere. But understanding the principle
 
 > Comparison-based sorting determines order by comparing pairs of elements
 
-```
+```text
 Bubble sort:    compare and swap adjacent elements → O(n^2)
 Selection sort: find the minimum and move it to front → O(n^2)
 Insertion sort: insert each element at its correct position → O(n^2), fast on nearly sorted data

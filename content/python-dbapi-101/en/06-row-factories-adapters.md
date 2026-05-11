@@ -68,7 +68,7 @@ This post unifies row factories and type adapters so your repository layer survi
 ![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
 
 *Mental model - two-step conversion*
-```
+```text
 Database row             Python value
 ─────────────             ────────────
                 converter

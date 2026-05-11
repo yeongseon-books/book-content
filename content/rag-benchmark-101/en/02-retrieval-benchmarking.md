@@ -47,7 +47,7 @@ The loop in this post is small but complete. Episodes 3 (embedding comparison) a
 
 A retrieval benchmark binds four things together:
 
-```
+```text
 QUERIES (question + gold ids)
    │
    ▼

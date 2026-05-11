@@ -116,7 +116,7 @@ The Runtime Plane is where actual user requests are handled.
 
 *Request flow through frontend and worker*
 
-```
+```text
 Client → App Service Frontend → Worker Instance → App Process
 ```
 

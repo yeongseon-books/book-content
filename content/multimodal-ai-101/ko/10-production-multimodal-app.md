@@ -41,7 +41,7 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 - multimodal RAG로 관련 문서를 함께 검색
 - 최종 응답을 streaming으로 반환
 
-```
+```text
 client ──► API gateway ──► FastAPI app
                                 │
                 ┌───────────────┼─────────────────┐

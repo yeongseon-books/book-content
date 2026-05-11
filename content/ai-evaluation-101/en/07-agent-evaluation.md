@@ -38,7 +38,7 @@ Through Ep1-Ep6 we evaluated **single responses**: one question paired with one 
 
 Agents are different. An agent goes through multiple steps to complete a task.
 
-```
+```text
 User: "Email me a summary of this week's schedule"
   ↓
 Step 1: read_calendar()  → [10 meetings]

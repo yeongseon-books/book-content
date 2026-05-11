@@ -70,13 +70,13 @@ A cursor marks the *start of the next page*.
 
 **Before (sort, filter, page mashed together)**
 
-```
+```http
 GET /orders?p=3&s=date&q=paid
 ```
 
 **After (named, standard, with metadata)**
 
-```
+```http
 GET /orders?status=paid&sort=created_at:desc&limit=20&cursor=eyJpZCI6MTIzfQ
 ```
 
@@ -120,7 +120,7 @@ Cursors are *opaque* — clients do not parse them.
 
 ### Step 3 — sorting
 
-```
+```http
 GET /items?sort=created_at:desc
 GET /items?sort=name:asc,id:desc
 ```
@@ -129,7 +129,7 @@ Standardize multi-key sort too.
 
 ### Step 4 — filtering
 
-```
+```http
 GET /orders?status=paid&tier=pro
 GET /orders?created_at__gte=2026-01-01
 ```
@@ -138,7 +138,7 @@ Use explicit operator suffixes like `__gte`, `__lt`.
 
 ### Step 5 — search
 
-```
+```http
 GET /articles?q=python+logging
 ```
 

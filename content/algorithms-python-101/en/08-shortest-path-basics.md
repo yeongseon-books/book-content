@@ -51,7 +51,7 @@ Dijkstra combines a greedy strategy with a priority queue to run in O((V+E) log 
 
 > Shortest path = the path from source to destination with the minimum total edge weight
 
-```
+```text
 Weighted graph:
 A --4-- B --3-- D
 |       |

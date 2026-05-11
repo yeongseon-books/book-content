@@ -61,7 +61,7 @@ The ORM is not magic; it is a thin layer above Core that absorbs these costs. De
 
 The picture is straightforward.
 
-```
+```text
 DeclarativeBase
    └── metadata: MetaData       # Core's schema catalog (Ep2)
          └── tables: dict[str, Table]

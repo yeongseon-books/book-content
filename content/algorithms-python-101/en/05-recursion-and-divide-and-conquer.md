@@ -51,7 +51,7 @@ Divide and conquer is the common pattern behind merge sort, quick sort, and bina
 
 > Recursion = a function that calls itself to perform repetitive work
 
-```
+```text
 factorial(4) call trace:
 factorial(4) → 4 × factorial(3)
                → 3 × factorial(2)

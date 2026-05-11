@@ -167,7 +167,7 @@ Video-LLaVA compresses 8 frames into a single video token sequence. That is enou
 
 A production action recognition pipeline looks like this:
 
-```
+```text
 input video ──► frame sampler (8-16) ──► VideoMAE / X-CLIP ──► action label + score
                                                                    │
                                                                    ▼

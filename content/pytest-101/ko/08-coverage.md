@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > coverage = 테스트가 실행한 코드 라인 수 / 전체 코드 라인 수
 
-```
+```text
 def process(x):        ← 실행됨 ✓
     if x > 0:          ← 실행됨 ✓
         return x * 2   ← 실행됨 ✓

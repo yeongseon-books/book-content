@@ -56,7 +56,7 @@ A second reason: `sqlite3` exception messages are English sentences, so it is te
 
 Reread the PEP 249 hierarchy with operations in mind:
 
-```
+```text
 Exception
 └── Warning             (warning - usually safe to ignore)
 └── Error               (root of all DB errors)

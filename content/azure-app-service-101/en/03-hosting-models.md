@@ -41,7 +41,7 @@ In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
 The flow for deciding your App Service hosting strategy:
 
-```
+```text
 1. Choose OS (Linux / Windows)
  ↓
 2. Choose Deployment Model (Code / Container)
@@ -72,7 +72,7 @@ An App Service Plan is the **compute resource pool** where your app runs.
 
 Deploying multiple apps to the same Plan means they **share compute resources**.
 
-```
+```text
 [App Service Plan: Standard S1]
 ├── Web App A
 ├── Web App B 
@@ -226,7 +226,7 @@ Separate Plan for each critical app:
 
 ### Recommended Approach
 
-```
+```text
 Business-critical apps → Dedicated Plan
 Internal tools, low traffic apps → Shared Plan
 ```

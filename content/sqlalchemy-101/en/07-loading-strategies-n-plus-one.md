@@ -58,7 +58,7 @@ These costs add up: disk IO, network round-trips, lock contention. A 5 ms query 
 *Mental model*
 > "Touching a relationship attribute for the first time fires one SELECT." That single sentence is all of lazy loading. N+1 happens when that sentence repeats N times. `joinedload` glues a LEFT JOIN onto the parent SELECT to fetch everything in one shot; `selectinload` fetches the parents first, then loads all children with a single `IN(...)` query.
 
-```
+```text
 lazy (default):    SELECT users         (1)
                    SELECT orders WHERE user_id = ?   ← user 1
                    SELECT orders WHERE user_id = ?   ← user 2

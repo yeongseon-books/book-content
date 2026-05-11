@@ -46,13 +46,13 @@ flowchart LR
 
 **Before (동사·단수·평탄)**
 
-```
+```http
 GET /getUserOrder?userId=42&orderId=9
 ```
 
 **After (명사·복수·계층)**
 
-```
+```http
 GET /users/42/orders/9
 ```
 

@@ -118,7 +118,7 @@ def user(uid: int) -> User: return User(id=uid, name="Y")
 
 ### 4단계 — Swagger UI / Redoc
 
-```
+```http
 GET /docs        # Swagger UI (시도해 보기)
 GET /redoc       # Redoc (읽기 좋음)
 GET /openapi.json

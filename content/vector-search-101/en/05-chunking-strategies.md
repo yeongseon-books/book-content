@@ -71,7 +71,7 @@ Two parameters control chunking: `chunk_size` and `chunk_overlap`.
 
 **chunk_overlap**: the number of characters shared between adjacent chunks. Without overlap, a sentence may land exactly on a chunk boundary and be split in half. With overlap, the same content appears in two consecutive chunks, so content near any boundary is still retrievable.
 
-```
+```text
 original: A B C D E F G H I J (each letter represents one word)
 
 chunk_size=4, chunk_overlap=1:

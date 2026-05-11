@@ -51,7 +51,7 @@ Data structure questions are a staple of coding interviews for good reason. Unde
 
 > Data Structure = a method for organizing data so it can be accessed and modified efficiently
 
-```
+```text
 [single variable]    →  stores 1 value
 [list]               →  stores N values in order
 [dict]               →  stores N key-value pairs (O(1) lookup)

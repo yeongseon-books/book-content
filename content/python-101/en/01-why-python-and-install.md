@@ -289,7 +289,7 @@ If you have multiple Python versions installed (3.10 and 3.12, say), `python3` i
 
 Start every project with the same shape so you have zero cognitive overhead when you open it months later:
 
-```
+```text
 hello-python/
 ├── .venv/              # not committed
 ├── .gitignore          # includes .venv/ and __pycache__/

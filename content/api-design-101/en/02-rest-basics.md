@@ -70,7 +70,7 @@ Resources are identified by URLs; actions are expressed as HTTP methods.
 
 **Before (RPC style)**
 
-```
+```http
 POST /getUser?id=42
 POST /createUser
 POST /deleteUser?id=42
@@ -80,7 +80,7 @@ Verbs leak into the URL.
 
 **After (REST style)**
 
-```
+```http
 GET    /users/42
 POST   /users
 DELETE /users/42

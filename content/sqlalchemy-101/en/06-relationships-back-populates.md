@@ -59,7 +59,7 @@ Relationships are the skeleton of your domain model. Setting them up cleanly the
 *Mental model*
 > `ForeignKey` is the SQL-level reference; `relationship()` is the object-level navigation channel. `back_populates` ties both ends of that channel together so a change made on one side is immediately reflected on the other.
 
-```
+```text
 User (parent)                           Order (child)
 ─────────────────                       ─────────────────
 id (PK)                                 id (PK)

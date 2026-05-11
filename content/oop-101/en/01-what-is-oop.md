@@ -51,7 +51,7 @@ Most modern languages — Python, Java, C++, C# — support OOP. Frameworks and 
 
 > Procedural vs Object-Oriented
 
-```
+```text
 Procedural                     Object-Oriented
 ┌────────────────────┐        ┌────────────────────┐
 │ Function A         │        │ Object A           │

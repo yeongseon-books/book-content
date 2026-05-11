@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > Python에서 다형성의 세 가지 방식
 
-```
+```text
 1. 상속 기반 다형성
    Animal → Dog.speak(), Cat.speak()
 

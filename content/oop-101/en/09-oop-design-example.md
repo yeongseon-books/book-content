@@ -51,7 +51,7 @@ Design is never completed in one pass. Start simple, then refactor when requirem
 
 > Online bookstore order system structure
 
-```
+```text
 OrderService
 ├── Cart          -> cart management
 ├── Discount      -> discount policy (strategy pattern)

@@ -51,7 +51,7 @@ When test structure is consistent across a team project, new members know where 
 
 > test discovery = the mechanism by which pytest automatically locates test files and functions
 
-```
+```text
 project/
 ├── src/
 │   └── myapp/

@@ -63,7 +63,7 @@ SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체
 
 > MetaData는 application의 schema 명세서다. Table은 그 명세서의 한 페이지이고, Column은 페이지 안의 한 줄이다. Engine이 없으면 MetaData는 그저 in-memory 명세서일 뿐이고, MetaData가 없으면 Engine은 무엇을 만들어야 할지 알지 못한다.
 
-```
+```text
                     MetaData (in-memory catalog)
                          │
         ┌────────────────┼────────────────┐

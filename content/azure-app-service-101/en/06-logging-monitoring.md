@@ -42,7 +42,7 @@ Understanding the log flow in App Service is the first step.
 
 *App logs flowing to files and monitoring*
 
-```
+```text
 Flask App (logger.info) → stdout/stderr → App Service Runtime
  ↓
  ┌─────────────────┴─────────────────┐
@@ -121,7 +121,7 @@ az webapp log tail \
 
 Send a request and logs appear immediately:
 
-```
+```text
 2025-04-07T10:30:15.123Z {"level": "info", "message": "Request processed", "userId": "user-123"}
 2025-04-07T10:30:15.456Z {"level": "error", "message": "Database connection failed", "error": "timeout"}
 ```
@@ -374,12 +374,12 @@ az monitor metrics alert create \
 
 ### Access via Kudu
 
-```
+```text
 https://<app-name>.scm.azurewebsites.net
 ```
 
 **Paths:**
-```
+```text
 /home/LogFiles/
 ├── <hostname>_docker.log ← Container stdout
 ├── Application/

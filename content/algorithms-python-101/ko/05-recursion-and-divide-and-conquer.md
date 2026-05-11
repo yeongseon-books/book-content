@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > 재귀 = 함수가 자기 자신을 호출하여 반복 작업을 수행하는 기법
 
-```
+```text
 factorial(4) 호출 과정:
 factorial(4) → 4 × factorial(3)
                → 3 × factorial(2)

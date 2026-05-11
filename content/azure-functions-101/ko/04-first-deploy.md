@@ -126,7 +126,7 @@ func start
 
 출력 마지막에 다음 줄이 보이면 성공입니다.
 
-```
+```text
 Functions:
         hello: [GET,POST] http://localhost:7071/api/hello
 ```
@@ -224,7 +224,7 @@ func azure functionapp publish $APP
 *로컬 코드가 함수 앱에 배포되는 흐름*
 마지막에 다음과 비슷한 출력이 나옵니다.
 
-```
+```text
 Functions in func-hello-xxxxx:
     hello - [httpTrigger]
         Invoke url: https://func-hello-xxxxx.azurewebsites.net/api/hello

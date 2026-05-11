@@ -60,7 +60,7 @@ Core SQL expression은 schema 객체와 Python 표현식을 조합해 SQL을 구
 
 > 2.x의 select은 immutable한 statement 객체다. 메서드를 호출할 때마다 원본은 변하지 않고 새로운 statement가 만들어진다. Result는 한 번만 순회 가능한 stream-like 객체이며, 무엇을 꺼낼지(`Row`, scalar, mapping)는 Result에서 결정한다.
 
-```
+```text
 select(users.c.id, users.c.name)        # statement 1
    .where(users.c.email == "a@x.com")   # statement 2
    .order_by(users.c.id)                 # statement 3

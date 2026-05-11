@@ -47,7 +47,7 @@ Episode 4 also breaks the habit of tuning many hyperparameters at once. If you c
 
 A single training step decomposes into six stages:
 
-```
+```text
 1. batch = data_collator([sample_i, sample_j, ...])
 2. outputs = model(input_ids=..., attention_mask=..., labels=...)
 3. loss = outputs.loss
@@ -81,7 +81,7 @@ Two more relationships worth memorizing:
 
 **After** — Following the 1-step pattern in this article produces this single line:
 
-```
+```text
 {'train_runtime': 1.42, 'train_samples_per_second': 1.41,
  'train_steps_per_second': 0.7, 'train_loss': 8.7421, 'epoch': 0.5}
 ```

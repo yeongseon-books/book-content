@@ -51,7 +51,7 @@ Python is a multi-paradigm language. Understanding functional style lets you pic
 
 > Imperative vs Functional — A Shift in Perspective
 
-```
+```text
 Imperative                       Functional
 ─────────────────                ─────────────────
 "How" to do it                   "What" to compute

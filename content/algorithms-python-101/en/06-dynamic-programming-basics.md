@@ -51,7 +51,7 @@ DP is the most frequently tested category in coding interviews. Learning the pat
 
 > DP applies when a problem has optimal substructure AND overlapping sub-problems
 
-```
+```text
 Fibonacci fib(5) — redundant computation in naive recursion:
 fib(5) → fib(4) + fib(3)
           fib(4) → fib(3) + fib(2)   ← fib(3) repeated

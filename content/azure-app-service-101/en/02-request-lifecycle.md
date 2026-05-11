@@ -41,7 +41,7 @@ To answer these questions, you need to understand the **complete journey of a re
 
 A user's HTTP request passes through these layers before reaching your app:
 
-```
+```text
 Client → DNS → Azure Load Balancer → App Service Frontend → Worker Instance → App Process
 ```
 
@@ -169,7 +169,7 @@ Finally, the request reaches your app code!
 
 Responses travel back in reverse order:
 
-```
+```text
 App → Worker → Frontend → Load Balancer → Client
 ```
 
@@ -225,7 +225,7 @@ Frontend distributes traffic across healthy instances by default.
 
 You can pin specific clients to the same instance:
 
-```
+```text
 Client A ─(Affinity Cookie)─→ Instance 2
 Client B ─(Affinity Cookie)─→ Instance 1
 ```

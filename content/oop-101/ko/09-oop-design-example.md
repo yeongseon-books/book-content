@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > 온라인 서점 주문 시스템 구조
 
-```
+```text
 OrderService
 ├── Cart          → 장바구니 관리
 ├── Discount      → 할인 정책 (전략 패턴)

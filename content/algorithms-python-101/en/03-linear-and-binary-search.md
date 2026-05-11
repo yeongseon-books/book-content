@@ -51,7 +51,7 @@ Beyond simple lookups, binary search extends to "find the first/last value satis
 
 > Search = the process of finding a target value in a collection of data
 
-```
+```text
 Linear search: [1, 3, 5, 7, 9, 11, 13] — find 9
 → 1, 3, 5, 7, 9 (5 comparisons)
 

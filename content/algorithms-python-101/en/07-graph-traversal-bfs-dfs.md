@@ -51,7 +51,7 @@ BFS is ideal for shortest-path problems on unweighted graphs. DFS is preferred f
 
 > A graph is a collection of nodes (vertices) and edges
 
-```
+```text
 Example graph:     BFS order:           DFS order:
   A—B               A (layer 0)         A → B → D → E → C → F
   |\ \              B, C (layer 1)

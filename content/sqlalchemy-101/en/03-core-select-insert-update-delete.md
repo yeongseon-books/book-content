@@ -75,7 +75,7 @@ In 2.x style, building SQL means stacking clauses through method chaining. You s
 
 > A 2.x `select` is an immutable statement object. Each method call returns a new statement; the original doesn't mutate. A `Result` is a one-shot stream; the shape you pull out of it (`Row`, scalar, or mapping) is decided at the Result level.
 
-```
+```text
 select(users.c.id, users.c.name)        # statement 1
    .where(users.c.email == "a@x.com")   # statement 2
    .order_by(users.c.id)                 # statement 3

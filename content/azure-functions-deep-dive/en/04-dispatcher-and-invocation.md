@@ -196,7 +196,7 @@ This post is host-centric, so I won't walk through the worker-side code. But eve
 
 Here's the path the worker's response takes:
 
-```
+```text
 gRPC stream
   → FunctionRpcService.EventStream (host-side handler)
   → write to the worker-specific inbound Channel<InboundGrpcEvent>

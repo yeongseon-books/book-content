@@ -44,7 +44,7 @@ flowchart LR
 
 **Before (조용히 깨뜨림)**
 
-```
+```text
 PATCH /users/42  → 응답에 created_at 형식이 어느날 바뀜
 ```
 
@@ -90,7 +90,7 @@ URL은 *깔끔* 하지만 디버깅·캐시는 *어려움*.
 
 ### 3단계 — non-breaking 추가
 
-```
+```text
 응답에 새 필드 추가 → non-breaking (클라이언트가 무시할 수 있다면)
 요청 본문에 *옵션* 필드 추가 → non-breaking
 ```

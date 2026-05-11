@@ -187,7 +187,7 @@ message RpcTraceContext {
 
 워커가 보낸 응답은 다음 경로를 거칩니다.
 
-```
+```text
 gRPC stream
   → FunctionRpcService.EventStream (호스트 측 핸들러)
   → workerId별 inbound Channel<InboundGrpcEvent>에 write

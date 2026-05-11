@@ -37,7 +37,7 @@ dict는 Python에서 두 번째로 많이 사용하는 자료구조입니다. JS
 
 > 해시 테이블 = 키를 해시 함수로 변환하여 배열 인덱스에 매핑하는 자료구조
 
-```
+```text
 키 "alice"  → hash("alice") → 인덱스 3
 키 "bob"    → hash("bob")   → 인덱스 7
 키 "charlie"→ hash("charlie")→ 인덱스 1

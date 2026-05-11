@@ -49,7 +49,7 @@ The benchmark in this post is small, but it produces numbers measured on your da
 
 Embedding comparison rests on the **one-variable-at-a-time** principle.
 
-```
+```text
 [fixed] corpus  +  [fixed] QUERIES  +  [fixed] k
                   │
                   ▼
@@ -82,7 +82,7 @@ Smaller models have lower dimensions (e.g. 384) and lower latency. Larger models
 
 **After**: Both models run on the same corpus and queries. The result is a one-line table:
 
-```
+```text
 model                    hit@3  MRR   avg_lat_ms  index_build_s
 all-MiniLM-L6-v2         1.00   0.83  6.2         3.1
 paraphrase-MiniLM-L3-v2  0.67   0.50  4.8         2.4

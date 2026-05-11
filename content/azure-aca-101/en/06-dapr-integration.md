@@ -70,7 +70,7 @@ Register one component on the Environment, and many apps in the same Environment
 `--enable-dapr true` makes ACA spin up a `daprd` sidecar next to your app container.
 Your code holds business logic; communication with external systems is delegated to the sidecar.
 
-```
+```text
 ┌─────────────────────────────────────┐
 │  Container App: api-app             │
 │  ┌──────────────┐  ┌─────────────┐  │

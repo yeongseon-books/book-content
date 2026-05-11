@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > assertion introspection = pytest가 assert 문을 분석하여 실패 시 상세 정보를 제공하는 기능
 
-```
+```text
 assert result == expected
        │          │
        │          └─ 기대값: 표시됨

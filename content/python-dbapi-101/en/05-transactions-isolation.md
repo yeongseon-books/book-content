@@ -71,7 +71,7 @@ This post compares the five modes through code and lock scenarios. Once you have
 ![Mental model - connection is the transaction scope](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
 
 *Mental model - connection is the transaction scope*
-```
+```text
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open

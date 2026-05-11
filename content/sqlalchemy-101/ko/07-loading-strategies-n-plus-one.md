@@ -49,7 +49,7 @@ ORM의 lazy 로딩은 코드 가독성을 높여 줍니다. `user.orders`라고 
 *Mental model*
 > "관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다. N+1은 이 한 문장이 N번 반복될 때 일어납니다. `joinedload`는 부모 SELECT에 LEFT JOIN을 붙여 한 번에 가져오는 전략, `selectinload`는 부모를 먼저 가져온 뒤 자식들을 IN(...) 한 방으로 가져오는 전략입니다.
 
-```
+```text
 lazy (default):    SELECT users         (1)
                    SELECT orders WHERE user_id = ?   ← 사용자 1번
                    SELECT orders WHERE user_id = ?   ← 사용자 2번

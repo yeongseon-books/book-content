@@ -51,7 +51,7 @@ Python's `range()`, `map()`, `filter()`, and file objects all use lazy evaluatio
 
 > Eager vs Lazy Evaluation
 
-```
+```text
 Eager Evaluation               Lazy Evaluation
 ─────────────────             ─────────────────
 [1, 4, 9, 16, 25]            (waiting to compute...)

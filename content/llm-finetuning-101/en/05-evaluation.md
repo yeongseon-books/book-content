@@ -48,7 +48,7 @@ The real goal of episode 5 is to make evaluation an **automatable pipeline**. Ey
 
 Evaluation works best when you separate "internal model signals" from "user-facing quality."
 
-```
+```text
 [Internal signals]              [User-facing quality]
 - perplexity                    - answer match rate
 - token-level accuracy          - format compliance
@@ -85,7 +85,7 @@ Two more facts to memorize:
 
 **After** — Adopting the evaluation loop in episode 5 condenses the result into one line:
 
-```
+```text
 {'before_ppl': 27431.84, 'after_ppl': 26890.17, 'delta_pct': -1.97}
 ```
 

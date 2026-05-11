@@ -51,7 +51,7 @@ Python's `sorted(key=...)`, `map(func, ...)`, and decorators are all higher-orde
 
 > Two Forms of Higher-Order Functions
 
-```
+```text
 Form 1: Accept a function          Form 2: Return a function
 ─────────────────────              ─────────────────
 sorted(data, key=func)             def make_adder(n):

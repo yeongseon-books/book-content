@@ -142,7 +142,7 @@ def user(uid: int) -> User: return User(id=uid, name="Y")
 
 ### Step 4 — Swagger UI / Redoc
 
-```
+```http
 GET /docs        # Swagger UI (try it)
 GET /redoc       # Redoc (read it)
 GET /openapi.json

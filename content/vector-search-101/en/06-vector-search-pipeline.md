@@ -71,13 +71,13 @@ A vector search pipeline has two phases.
 
 **Indexing** is an offline step: process documents once and produce a searchable index.
 
-```
+```text
 load documents → chunk → embed → save FAISS index
 ```
 
 **Retrieval** is an online step: accept a query, embed it, search the index, return results.
 
-```
+```text
 embed query → FAISS search → return ranked chunks
 ```
 

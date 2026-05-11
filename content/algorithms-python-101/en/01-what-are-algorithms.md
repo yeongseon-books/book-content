@@ -51,7 +51,7 @@ Algorithmic thinking is a core skill across coding interviews, performance optim
 
 > Algorithm = a finite procedure that transforms input into the desired output
 
-```
+```text
 [Problem] → [Algorithm] → [Solution]
 
 Example: Find the maximum value in a list

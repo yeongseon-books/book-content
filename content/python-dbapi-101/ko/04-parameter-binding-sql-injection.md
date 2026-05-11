@@ -43,7 +43,7 @@ PEP 249는 이를 driver 차원에서 막는 표준을 제시합니다. `cursor.
 ![Mental Model - query string과 값을 끝까지 분리](../../../assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.ko.png)
 
 *Mental Model - query string과 값을 끝까지 분리*
-```
+```text
 [ User input ] ─┐
                 │
                 ▼

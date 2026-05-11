@@ -37,7 +37,7 @@ Protocol은 "구조적으로 일치하면 OK"인 반면, ABC는 "명시적으로
 
 > 추상 클래스 구조
 
-```
+```text
 ABC (Abstract Base Class)
 ├── @abstractmethod read()     → 반드시 구현
 ├── @abstractmethod write()    → 반드시 구현

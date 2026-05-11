@@ -36,7 +36,7 @@ RAG requires evaluating both retrieval and generation stages. This post covers R
 *RAG is a Pipeline, not a single model*
 A RAG (Retrieval-Augmented Generation) system runs in two stages.
 
-```
+```text
 question → [1. Retriever]  → top-K documents → [2. Generator (LLM)] → answer
             (vector DB)                          (uses context)
 ```

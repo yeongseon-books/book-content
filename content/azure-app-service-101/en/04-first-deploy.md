@@ -65,7 +65,7 @@ az login
 
 ### Minimal Flask App Structure
 
-```
+```text
 my-flask-app/
 ├── src/
 │ └── app.py
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
 ### requirements.txt
 
-```
+```text
 Flask==3.1.3
 gunicorn==25.3.0
 ```
@@ -350,7 +350,7 @@ View deployment history and status.
 
 Advanced diagnostics and file browser:
 
-```
+```text
 https://<app-name>.scm.azurewebsites.net
 ```
 

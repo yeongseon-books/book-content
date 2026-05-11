@@ -51,7 +51,7 @@ Unnecessary classes make code harder to read and more expensive to maintain. Alw
 
 > OOP vs Alternatives — Decision Criteria
 
-```
+```text
 When classes make sense            When classes are overkill
 ─────────────────────              ─────────────────────
 State + behavior together          Stateless transformation functions

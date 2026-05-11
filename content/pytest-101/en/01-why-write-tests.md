@@ -51,7 +51,7 @@ In production environments, deploying without tests means incident root-cause an
 
 > Test = code that automatically verifies your code behaves as expected
 
-```
+```text
 [Manual Testing]           [Automated Testing]
   Human runs code            Code runs code
   Repetition cost ↑          Repetition cost ≈ 0

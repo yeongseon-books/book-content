@@ -46,7 +46,7 @@ flowchart LR
 
 **Before (RPC 스타일)**
 
-```
+```http
 POST /getUser?id=42
 POST /createUser
 POST /deleteUser?id=42
@@ -56,7 +56,7 @@ POST /deleteUser?id=42
 
 **After (REST 스타일)**
 
-```
+```http
 GET    /users/42
 POST   /users
 DELETE /users/42

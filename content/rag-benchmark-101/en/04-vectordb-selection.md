@@ -47,7 +47,7 @@ That is why you have to measure on your own corpus. The comparison in this post 
 
 The skeleton of a VectorDB comparison:
 
-```
+```text
 [fixed] embedding model + corpus embeddings (doc_vectors)
                   │
                   ▼
@@ -83,7 +83,7 @@ Recall is not the same as hit rate. **Hit rate** asks if the gold doc made it in
 
 **After**: same embedding vectors, two indexes side by side.
 
-```
+```text
 index               recall@5  search_ms  memory_mb
 IndexFlatIP         1.00      18.3       384
 IndexIVFFlat (n=1)  0.72       2.1       386

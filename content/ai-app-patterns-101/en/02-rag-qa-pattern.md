@@ -61,7 +61,7 @@ Topics:
 
 **Retrieval** (online): embed the query, find similar chunks, inject them into the prompt.
 
-```
+```text
 indexing:  documents → chunking → embedding → FAISS
 retrieval: query → embedding → FAISS search → prompt injection → LLM → answer
 ```

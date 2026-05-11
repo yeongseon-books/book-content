@@ -51,7 +51,7 @@ Defaulting to immutable data eliminates an entire class of state-related bugs an
 
 > Mutable vs Immutable Types in Python
 
-```
+```text
 Immutable                       Mutable
 ─────────────────               ─────────────────
 int, float, bool                list

@@ -37,7 +37,7 @@ Python의 특수 메서드(매직 메서드)를 활용하면 클래스를 Python
 
 > 클래스의 구성 요소
 
-```
+```text
 클래스 (Class)
 ├── 클래스 변수 (class variable)
 ├── __init__()       → 인스턴스 초기화

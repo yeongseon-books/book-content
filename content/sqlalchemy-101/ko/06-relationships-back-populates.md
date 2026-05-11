@@ -50,7 +50,7 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 *Mental model*
 > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
 
-```
+```text
 User (parent)                           Order (child)
 ─────────────────                       ─────────────────
 id (PK)                                 id (PK)

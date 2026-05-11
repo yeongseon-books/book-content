@@ -70,7 +70,7 @@ This post reproduces the attack with sqlite3 and contrasts it with the binding f
 ![Mental model - keep query string and values separate](../../../assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png)
 
 *Mental model - keep query string and values separate*
-```
+```text
 [ User input ] ─┐
                 │
                 ▼

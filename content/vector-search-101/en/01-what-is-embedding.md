@@ -85,7 +85,7 @@ Embeddings reframe the problem. Instead of asking "does this document contain th
 *Text entering vector space flow*
 An embedding model converts text into a fixed-length array of floating-point numbers. With `sentence-transformers/all-MiniLM-L6-v2`, every input — regardless of length — becomes a 384-dimensional vector. Models with 768 or 1536 dimensions are also common.
 
-```
+```text
 "Python async programming"       → [0.12, -0.34, 0.87, ..., 0.05]  (384 numbers)
 "handling concurrency in Python" → [0.14, -0.31, 0.85, ..., 0.07]  (384 numbers)
 "homemade dog treats recipe"     → [-0.63, 0.77, -0.12, ..., 0.44] (384 numbers)

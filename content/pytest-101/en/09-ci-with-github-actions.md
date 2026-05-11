@@ -51,7 +51,7 @@ No matter how well-written your tests are, they're useless if nobody runs them. 
 
 > CI = push/PR event → automatic test run → results displayed on PR
 
-```
+```text
 Developer pushes → GitHub Actions triggered
   → Install Python
   → Install dependencies

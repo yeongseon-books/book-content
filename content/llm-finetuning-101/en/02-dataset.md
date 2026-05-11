@@ -47,7 +47,7 @@ Nailing the format in post 2 means the same template flows untouched into the tr
 
 Treat the dataset as three layers:
 
-```
+```text
 ┌───────────────────────────────┐
 │ Layer 1: Raw samples (JSONL)  │  ← humans read and review here
 ├───────────────────────────────┤

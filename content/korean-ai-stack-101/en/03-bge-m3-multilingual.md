@@ -45,7 +45,7 @@ BGE-M3 deserves its own stage for two reasons. First, internal documentation sea
 
 Multilingual dense retrieval decomposes into four steps.
 
-```
+```text
 [multilingual corpus (ko+en)]      [Korean query]
         |                                |
         v                                v

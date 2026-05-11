@@ -47,7 +47,7 @@ sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이
 ![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
 
 *Mental Model - connection이 transaction 단위*
-```
+```text
 Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open

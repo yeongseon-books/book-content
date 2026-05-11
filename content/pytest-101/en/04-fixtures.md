@@ -51,7 +51,7 @@ Resources like database connections, API clients, and temporary files need fixtu
 
 > fixture = a reusable component that prepares state before a test and cleans up after
 
-```
+```text
 @pytest.fixture
 def user():            ← fixture definition
     return User("Alice")

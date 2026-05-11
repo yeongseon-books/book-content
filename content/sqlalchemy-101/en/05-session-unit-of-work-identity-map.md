@@ -62,7 +62,7 @@ Every one of these reduces to a single question: "What objects does the Session 
 
 Object state transitions look like this:
 
-```
+```text
 [transient]   → session.add()    → [pending]
 [pending]     → session.flush()  → [persistent]   (INSERT goes out)
 [persistent]  → session.delete() → [deleted]

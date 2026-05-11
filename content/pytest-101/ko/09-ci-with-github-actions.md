@@ -37,7 +37,7 @@ last_reviewed: '2026-05-04'
 
 > CI = push/PR 이벤트 → 자동으로 테스트 실행 → 결과를 PR에 표시
 
-```
+```text
 개발자 push → GitHub Actions 트리거
   → Python 설치
   → 의존성 설치

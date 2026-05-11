@@ -44,7 +44,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 ![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental Model - 두 단계 변환*
-```
+```text
 Database row             Python value
 ─────────────             ────────────
                 converter

@@ -51,7 +51,7 @@ Misused inheritance is a leading cause of increasing complexity during modificat
 
 > Inheritance vs Composition
 
-```
+```text
 Inheritance (is-a)                Composition (has-a)
 ┌─────────────┐               ┌─────────────┐
 │ Parent class │               │ Car         │
