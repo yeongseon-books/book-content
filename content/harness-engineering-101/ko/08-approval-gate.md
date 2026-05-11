@@ -14,7 +14,7 @@ tags:
 - Harness
 - Approval
 - Human-in-the-loop
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다. 결제, 배포, 삭제, 발송은 사람의 승인이 필요합니다.
 ---
 

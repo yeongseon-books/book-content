@@ -14,7 +14,7 @@ tags:
 - Harness
 - Tool Design
 - Sandboxing
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구는 데이터를 망가뜨리거나 비용을 폭발시킵니다.
 ---
 
@@ -220,7 +220,7 @@ def get_user(user_id: str) -> dict:
             how="Call list_users to find a valid user_id, or check the format.",
             retryable=False,
         )
-    # ... lookup logic
+    # ... 조회 로직
     raise ToolError(
         code=ErrorCode.NOT_FOUND,
         what=f"user not found: {user_id}",

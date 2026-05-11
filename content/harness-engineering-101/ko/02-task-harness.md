@@ -14,7 +14,7 @@ tags:
 - Harness
 - Reliability
 - Production
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Agent에게 모호한 지시를 던지면 모호한 결과가 돌아옵니다. Task Harness는 모호한 일을 명확한 입력, 출력,
   완료 조건이 있는…
 ---

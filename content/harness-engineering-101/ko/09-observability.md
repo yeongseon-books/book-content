@@ -14,7 +14,7 @@ tags:
 - Harness
 - Observability
 - Tracing
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다. Observability는 Agent의 모든 단계를
   추적, 기록, 재현…
 ---
