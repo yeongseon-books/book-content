@@ -14,7 +14,7 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
 ---
 

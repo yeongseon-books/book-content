@@ -14,7 +14,7 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
 ---
 
@@ -176,7 +176,7 @@ containerd가 OCI runtime 계층으로 내려가면서 `runc`를 사용합니다
 kubectl debug node/aks-nodepool1-12345 -it \
   --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- chroot /host
 
-# inside the node
+# 노드 내부에서 실행
 systemctl status kubelet
 journalctl -u kubelet --since '15 min ago' | tail -50
 crictl ps -a | head
