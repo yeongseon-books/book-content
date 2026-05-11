@@ -23,3 +23,8 @@ azure-functions-host/
 site/
 .playwright-mcp/
 medium-test.html
+
+# Local Sisyphus session state (not for commit)
+.sisyphus/*.local.md
+.sisyphus/**/*.local.md
+

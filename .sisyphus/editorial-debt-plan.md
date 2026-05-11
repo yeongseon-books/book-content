@@ -73,7 +73,8 @@ For each series:
 
 1. **Audit current state**
    ```bash
-   python3 scripts/check_article_structure.py --warn-all content/<series>/ko
+   # Script does not accept path arg; filter by series with grep.
+   python3 scripts/check_article_structure.py --warn-all | grep "content/<series>/ko"
    ```
 
 2. **Design section templates**
@@ -84,7 +85,7 @@ For each series:
 
 4. **Verify improvement**
    ```bash
-   python3 scripts/check_article_structure.py --warn-all content/<series>/ko
+   python3 scripts/check_article_structure.py --warn-all | grep "content/<series>/ko"
    # Expect reduced warning count
    ```
 
