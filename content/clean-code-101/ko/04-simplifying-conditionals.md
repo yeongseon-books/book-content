@@ -18,7 +18,7 @@ tags:
   - Refactoring
   - Readability
 seo_description: 가드 절, 조기 반환, 다형성과 전략 패턴으로 중첩 조건문을 줄이는 법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 조건문 줄이기
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-중첩된 조건문은 가장 흔한 복잡도의 원인입니다. 깊이가 1만 줄어도 가독성이 두 배가 됩니다.
+중첩된 조건문은 복잡도를 가장 빠르게 키우는 원인입니다. 깊이가 한 단계만 줄어도 읽는 부담이 크게 줄어듭니다.
 
 > 깊이는 곧 인지 부담이다.
 
@@ -41,7 +41,7 @@ flowchart LR
     T --> R["평탄한 흐름"]
 ```
 
-가드 → 다형성 → 테이블, 도구가 늘수록 분기는 줄어듭니다.
+가드 절, 다형성, 테이블 주도 설계를 순서대로 익히면 분기를 훨씬 단순하게 다룰 수 있습니다.
 
 ## Before/After
 
@@ -74,40 +74,40 @@ def price(user, item):
     return item.price * rate
 ```
 
-깊이가 4에서 1로 줄었습니다.
+중첩 깊이가 4단계에서 1단계로 줄어들었습니다.
 
 ## 분기를 줄이는 5단계
 
 ### 1단계 — 가드 절로 평탄화
 
 ```python
-# 1_guard.py
+# 예시 파일: 1_guard.py
 def total(items):
     if not items:
         return 0
     return sum(it.price for it in items)
 ```
 
-빈 입력은 즉시 반환합니다.
+비어 있는 입력은 바로 반환해 본문을 평평하게 유지합니다.
 
 ### 2단계 — 부정 조건 뒤집기
 
 ```python
-# 2_positive.py
-# Before: if not user.is_inactive: ...
-# After:
+# 예시 파일: 2_positive.py
+# 이전 형태: if not user.is_inactive: ...
+# 개선 후:
 def can_login(user):
     if not user.is_active:
         return False
     return user.email_verified
 ```
 
-이중 부정은 항상 피합니다.
+이중 부정은 한 번 더 해석해야 하므로 가능한 한 피하는 편이 좋습니다.
 
 ### 3단계 — 다형성으로 분기 제거
 
 ```python
-# 3_poly.py
+# 예시 파일: 3_poly.py
 class Shape:
     def area(self): ...
 class Circle(Shape):
@@ -120,12 +120,12 @@ class Square(Shape):
 def total_area(shapes): return sum(s.area() for s in shapes)
 ```
 
-타입 분기를 클래스가 흡수합니다.
+타입별 분기를 각 클래스가 맡으면 호출부는 훨씬 단순해집니다.
 
 ### 4단계 — 전략 패턴
 
 ```python
-# 4_strategy.py
+# 예시 파일: 4_strategy.py
 def percent_off(price, rate): return price * (1 - rate)
 def fixed_off(price, amount): return max(0, price - amount)
 
@@ -135,24 +135,24 @@ DISCOUNTS = {"member": lambda p: percent_off(p, 0.1),
 def apply(price, kind): return DISCOUNTS[kind](price)
 ```
 
-분기 대신 dict 조회.
+분기문 대신 딕셔너리 조회로 정책을 선택합니다.
 
 ### 5단계 — 테이블 주도
 
 ```python
-# 5_table.py
+# 예시 파일: 5_table.py
 GRADES = [(90, "A"), (80, "B"), (70, "C"), (0, "F")]
 def grade(score):
     return next(g for s, g in GRADES if score >= s)
 ```
 
-if/elif 사슬이 자료구조가 됩니다.
+길게 이어진 if/elif 사슬을 자료구조 하나로 바꿀 수 있습니다.
 
 ## 이 코드에서 주목할 점
 
-- 가드 절이 본문 들여쓰기를 깎습니다.
-- 다형성은 if문 자체를 없앱니다.
-- 테이블은 데이터로 정책을 표현합니다.
+- 가드 절은 본문 들여쓰기를 빠르게 줄여 줍니다.
+- 다형성은 타입 분기를 구조로 흡수합니다.
+- 테이블은 정책을 코드보다 데이터에 가깝게 표현합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -164,7 +164,7 @@ if/elif 사슬이 자료구조가 됩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-요금 계산, 권한 체크, 라우팅처럼 분기가 데이터에 가까운 영역은 모두 테이블/전략 후보입니다. 정책 변경이 코드 수정 없이 가능해집니다.
+요금 계산, 권한 체크, 라우팅처럼 정책이 자주 바뀌는 영역은 테이블이나 전략 패턴 후보입니다. 이런 구조를 잡아 두면 정책 변경이 훨씬 안전해집니다.
 
 ## 체크리스트
 
@@ -176,7 +176,7 @@ if/elif 사슬이 자료구조가 됩니다.
 
 ## 정리 및 다음 단계
 
-조건은 줄일수록 코드가 명확해집니다. 다음 글에서는 분기 다음으로 흔한 적인 중복을 다룹니다.
+조건문은 줄일수록 코드의 핵심 흐름이 또렷해집니다. 다음 글에서는 분기만큼 자주 문제를 만드는 중복을 다뤄 보겠습니다.
 
 <!-- toc:begin -->
 - [Clean Code란 무엇인가?](./01-what-is-clean-code.md)

@@ -14,7 +14,7 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
@@ -58,10 +58,10 @@ service FunctionRpc {
 
 ```protobuf
 message StreamingMessage {
-  // Used to identify message between host and worker
+  // 호스트와 워커 사이에서 메시지를 식별하는 데 사용
   string request_id = 1;
 
-  // Payload of the message
+  // 메시지 페이로드
   oneof content {
     StartStream start_stream = 20;
 
@@ -103,7 +103,7 @@ message StreamingMessage {
 }
 ```
 
-두 가지를 눈여겨봐야 합니다.
+두 가지를 먼저 잡고 가면 됩니다.
 
 1. `request_id` — 호스트와 워커가 메시지를 짝짓는 데 쓰는 ID. 비동기 응답을 짝지을 때 결정적입니다.
 2. `oneof content` — 한 번에 하나의 페이로드만 들어갑니다. 즉 같은 채널에 **수십 종의 메시지가 다중화**됩니다.
@@ -112,11 +112,11 @@ message StreamingMessage {
 
 | 그룹 | 메시지 | 누가 보내는가 |
 |---|---|---|
-| **수명주기** | StartStream, WorkerInitRequest/Response, WorkerTerminate | StartStream은 워커 → 호스트, WorkerInitRequest는 호스트 → 워커, WorkerInitResponse는 워커 → 호스트, WorkerTerminate는 호스트 → 워커 |
-| **상태 점검** | WorkerStatusRequest/Response | 호스트 → 워커 |
-| **함수 로드** | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | 호스트 ↔ 워커 |
-| **호출** | InvocationRequest/Response, InvocationCancel | 호스트 → 워커 (응답 역방향) |
-| **운영** | RpcLog, FileChangeEventRequest, FunctionEnvironmentReloadRequest/Response, WorkerWarmupRequest/Response | 다양 |
+| 수명주기 | StartStream, WorkerInitRequest/Response, WorkerTerminate | StartStream은 워커 → 호스트, WorkerInitRequest는 호스트 → 워커, WorkerInitResponse는 워커 → 호스트, WorkerTerminate는 호스트 → 워커 |
+| 상태 점검 | WorkerStatusRequest/Response | 호스트 → 워커 |
+| 함수 로드 | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | 호스트 ↔ 워커 |
+| 호출 | InvocationRequest/Response, InvocationCancel | 호스트 → 워커 (응답 역방향) |
+| 운영 | RpcLog, FileChangeEventRequest, FunctionEnvironmentReloadRequest/Response, WorkerWarmupRequest/Response | 다양 |
 
 이 표가 곧 Functions 프로토콜의 전체 그림입니다.
 
@@ -132,12 +132,12 @@ message StreamingMessage {
 
 ```protobuf
 message StartStream {
-  // id of the worker
+  // 워커 ID
   string worker_id = 2;
 }
 ```
 
-워커는 자신의 `worker_id`를 담아 `StartStream`을 호스트로 보냅니다. 이 ID는 2화에서 본 `RpcWorkerConfig` 생성 시 호스트가 워커에게 환경 변수나 명령행 인자로 전달한 것과 동일합니다. 즉 **호스트가 미리 알려준 ID를 워커가 그대로 되돌려주는** 인사입니다. 호스트는 이걸로 "방금 연결한 이 gRPC 클라이언트가 내가 띄운 그 워커"임을 확인합니다.
+워커는 자신의 `worker_id`를 담아 `StartStream`을 호스트로 보냅니다. 이 ID는 2화에서 본 `RpcWorkerConfig` 생성 시 호스트가 워커에게 환경 변수나 명령행 인자로 넘긴 값과 같습니다. 즉 **호스트가 미리 알려준 ID를 워커가 그대로 되돌려주는** 인사입니다. 호스트는 이걸로 "방금 연결한 이 gRPC 클라이언트가 내가 띄운 그 워커"임을 확인합니다.
 
 ### 2단계 — 호스트가 `WorkerInitRequest`를 보낸다
 
@@ -145,41 +145,41 @@ message StartStream {
 
 ```protobuf
 message WorkerInitRequest {
-  // version of the host sending init request
+  // 초기화 요청을 보내는 호스트의 버전
   string host_version = 1;
 
-  // A map of host supported features/capabilities
+  // 호스트가 지원하는 기능/capability 맵
   map<string, string> capabilities = 2;
 
-  // inform worker of supported categories and their levels
+  // 워커에 지원하는 로그 카테고리와 수준을 알림
   map<string, RpcLog.Level> log_categories = 3;
 
-  // Full path of worker.config.json location
+  // `worker.config.json` 위치의 전체 경로
   string worker_directory = 4;
 
-  // base directory for function app
+  // 함수 앱의 기준 디렉터리
   string function_app_directory = 5;
 }
 ```
 
-여기서 가장 중요한 필드는 `capabilities`입니다. **호스트가 자기가 지원하는 기능을 광고**합니다. (예: shared memory data transfer, RPC HTTP body, raw HTTP body bytes 등) 워커는 이걸 보고 "이 호스트랑은 이런 기능까지 쓸 수 있네"를 학습합니다.
+여기서 가장 중요한 필드는 `capabilities`입니다. **호스트가 자기가 지원하는 기능을 알립니다.** (예: shared memory data transfer, RPC HTTP body, raw HTTP body bytes 등) 워커는 이걸 보고 "이 호스트와는 여기까지 쓸 수 있겠구나"를 파악합니다.
 
 ### 3단계 — 워커가 `WorkerInitResponse`로 답한다
 
 ```protobuf
 message WorkerInitResponse {
-  // A map of worker supported features/capabilities
+  // 워커가 지원하는 기능/capability 맵
   map<string, string> capabilities = 2;
 
-  // Status of the response
+  // 응답 상태
   StatusResult result = 3;
 
-  // Worker metadata captured for telemetry purposes
+  // 텔레메트리 용도로 수집한 워커 메타데이터
   WorkerMetadata worker_metadata = 4;
 }
 ```
 
-이번엔 반대로 **워커가 자기 capabilities를 광고**합니다. 호스트는 `WorkerChannel.ApplyCapabilities()`로 기존 capability 상태를 갱신하며, 기본 전략은 merge입니다. 즉 “양쪽 capability의 단순 교집합을 한 번 계산한다”기보다, **호스트가 알고 있는 capability 집합을 업데이트하고 그 결과로 shared memory·HTTP proxying 같은 동작을 켜거나 끄는 모델**에 가깝습니다. 또한 `WorkerMetadata`로 런타임 종류, 버전, 비트성 같은 텔레메트리용 메타데이터가 함께 옵니다.
+이번에는 반대로 **워커가 자기 capabilities를 알립니다.** 호스트는 `WorkerChannel.ApplyCapabilities()`로 기존 capability 상태를 갱신하며, 기본 전략은 merge입니다. 즉 “양쪽 capability의 단순 교집합을 한 번 계산한다”기보다, **호스트가 알고 있는 capability 집합을 업데이트하고 그 결과로 shared memory·HTTP proxying 같은 동작을 켜거나 끄는 모델**에 가깝습니다. 또한 `WorkerMetadata`로 런타임 종류, 버전, 비트성 같은 텔레메트리용 메타데이터가 함께 옵니다.
 
 ### 4단계 — 호스트가 `FunctionLoadRequest`로 함수를 로드시킨다
 
@@ -193,7 +193,7 @@ message FunctionLoadRequest {
 }
 ```
 
-각 함수마다 하나씩 보내거나, 또는 `FunctionLoadRequestCollection`으로 한 번에 묶어서 보냅니다. 워커는 각각에 대해 `FunctionLoadResponse`로 "성공/실패"를 알려줍니다.
+각 함수마다 하나씩 보내거나 `FunctionLoadRequestCollection`으로 한 번에 묶어서 보냅니다. 워커는 각각에 대해 `FunctionLoadResponse`로 성공 여부를 알려줍니다.
 
 ### 한 화면으로
 

@@ -18,7 +18,7 @@ tags:
   - AST
   - REPL
 seo_description: lexer, parser, evaluator를 한 파일로 합쳐 산술식을 평가하는 작은 인터프리터와 REPL을 만듭니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 작은 인터프리터 만들어 보기
@@ -67,7 +67,7 @@ mini.py: Lexer → Parser → Evaluator → REPL
 ### 1단계 — Lexer
 
 ```python
-# mini.py (1)
+# 예제 파일: mini.py (1)
 import re
 
 TOKEN = re.compile(r"\s*(?:(\d+(?:\.\d+)?)|(.))")
@@ -88,7 +88,7 @@ def tokenize(src):
 ### 2단계 — Parser (recursive descent)
 
 ```python
-# mini.py (2)
+# 예제 파일: mini.py (2)
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -139,7 +139,7 @@ class Parser:
 ### 3단계 — Evaluator
 
 ```python
-# mini.py (3)
+# 예제 파일: mini.py (3)
 def evaluate(node):
     kind = node[0]
     if kind == "Num":
@@ -158,7 +158,7 @@ Visitor를 쓰지 않고 tuple만으로도 충분히 깔끔합니다.
 ### 4단계 — REPL
 
 ```python
-# mini.py (4)
+# 예제 파일: mini.py (4)
 def run(src):
     return evaluate(Parser(tokenize(src)).parse())
 

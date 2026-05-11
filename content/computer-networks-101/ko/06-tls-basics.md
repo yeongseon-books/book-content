@@ -18,7 +18,7 @@ tags:
   - 암호화
   - PKI
 seo_description: TLS handshake가 어떻게 기밀성·무결성·신원을 보장하는지, 인증서와 PKI의 역할을 한 번에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # TLS 기초
@@ -102,7 +102,7 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
 ```
 
 ```python
-# Flask + TLS
+# Flask + TLS 예제
 from flask import Flask
 app = Flask(__name__)
 

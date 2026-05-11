@@ -14,7 +14,7 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
@@ -26,18 +26,18 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
 
-지금까지 4화 동안 인스턴스 **하나** 안에서 호스트와 워커가 어떻게 함수를 실행하는지 봤습니다. 이번 화는 한 단계 위로 올라갑니다.
+지금까지 4화 동안 인스턴스 하나 안에서 호스트와 워커가 어떻게 함수를 실행하는지 봤습니다. 이번 화는 한 단계 위로 올라갑니다.
 
 > 인스턴스 자체는 **누가, 무엇을 보고, 언제 늘리고 줄이는가?**
 
-이게 우리가 흔히 말하는 "스케일아웃"입니다. 그리고 이 결정은 **호스트 프로세스 안에서 일어나지 않습니다.** 호스트는 결정의 **재료**를 제공할 뿐이고, 실제 결정은 호스트 바깥의 **Scale Controller**가 합니다 — 단, 플랜에 따라 다른 방식으로요.
+이게 우리가 흔히 말하는 "스케일아웃"입니다. 그리고 이 결정은 호스트 프로세스 안에서 일어나지 않습니다. 호스트는 결정에 필요한 재료를 제공할 뿐이고, 실제 결정은 호스트 바깥의 Scale Controller가 합니다. 다만 플랜에 따라 방식은 달라집니다.
 
 먼저 선을 분명히 긋겠습니다. **Scale Controller 자체 구현은 이 vendored `azure-functions-host` 저장소에 없습니다.** 이 글은 Azure 내부 컴포넌트의 세부 구현을 추측하지 않고, 호스트가 바깥으로 내보내는 scale signal과 플랜별 의미만 다룹니다.
 
 이 화의 목표는 세 가지입니다.
 
 1. Scale Controller, ScaleMonitor, ITargetScaler가 각각 무엇이고 어디에 사는지 정리
-2. 인스턴스 **수** 결정(스케일아웃)과 인스턴스 **내부** 워커 수 결정(워커 동시성)이 다른 메커니즘이라는 점 분리
+2. 인스턴스 수 결정(스케일아웃)과 인스턴스 내부 워커 수 결정(워커 동시성)이 서로 다른 메커니즘이라는 점 분리
 3. Consumption / Flex Consumption / Premium / Dedicated 네 플랜에서 같은 코드가 어떻게 다르게 동작하는지 비교
 
 > 모든 코드 인용은 [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
@@ -76,7 +76,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 - `TableStorageScaleMetricsRepository.cs`: ScaleMonitor가 보고한 메트릭을 Azure Table Storage에 저장
 - `TableEntityConverter.cs`: 그 직렬화 헬퍼
 
-즉 호스트의 역할은 **자기 부하를 보고**하고 **메트릭을 저장**하는 것뿐입니다. 결정은 외부 Scale Controller가 합니다. 이 그림이 잡히면 나머지가 쉬워집니다.
+즉 호스트의 역할은 자기 부하를 보고하고 메트릭을 저장하는 데 그칩니다. 결정은 외부 Scale Controller가 합니다. 이 그림이 잡히면 나머지가 쉬워집니다.
 
 ---
 
@@ -85,7 +85,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 Scale Controller가 인스턴스 하나를 보고 "이거 더 늘려야 하나?"를 판단할 때 쓰는 가장 직접적인 신호는 **HTTP health ping**입니다. 호스트가 그 ping에 응답하는 코드가 `HostPerformanceManager.TryHandleHealthPingAsync`입니다.
 
 ```csharp
-// src/WebJobs.Script/Scale/HostPerformanceManager.cs
+// 파일: src/WebJobs.Script/Scale/HostPerformanceManager.cs
 public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, ILogger logger)
 {
     var healthPingEnabled = _environment.GetEnvironmentVariableOrDefault(
@@ -101,7 +101,7 @@ public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, I
         (userAgent.IndexOf(ScriptConstants.HttpScaleUserAgent, StringComparison.OrdinalIgnoreCase) != -1 ||
          userAgent.IndexOf(ScriptConstants.ScaleControllerUserAgent, StringComparison.OrdinalIgnoreCase) != -1))
     {
-        // for these user agents, we default to true
+        // 이 User-Agent들에 대해서는 기본값을 true로 둡니다
         checkHealth = true;
     }
     // ...
@@ -146,8 +146,8 @@ public virtual async Task<bool> IsUnderHighLoadAsync(ILogger logger = null)
 var workerManager = _serviceProvider.GetScriptHostServiceOrNull<IScriptHostWorkerManager>();
 if (workerManager != null)
 {
-    // TEMP: This call pings all the OOP workers, to ensure we include any channel latency
-    // in the upstream ping result.
+    // 임시: 모든 OOP 워커를 ping해서 채널 지연 시간도
+    // 상위 ping 결과에 포함되도록 합니다.
     await workerManager.GetWorkerStatusesAsync();
 }
 
@@ -159,7 +159,7 @@ if (throttleManager != null)
 }
 ```
 
-즉 **외부 Scale Controller의 단일 HTTP 호출 하나에 호스트는 자기와 모든 워커의 상태를 종합해서 답합니다.** 이게 인스턴스가 자기 한계에 다다랐다는 신호를 외부로 내보내는 메커니즘입니다.
+즉 외부 Scale Controller의 HTTP 호출 하나에 대해 호스트는 자기 상태와 모든 워커 상태를 종합해서 답합니다. 이게 인스턴스가 한계에 가까워졌다는 신호를 외부로 내보내는 메커니즘입니다.
 
 ---
 
@@ -180,7 +180,7 @@ health ping이 호스트의 "지금 더 받을 수 있냐"라면, **ScaleMonitor
 
 ### Target-based scaling (`ITargetScaler`)
 
-2022년부터 도입돼 지금은 일부 트리거의 **기본값**입니다. 단순한 공식을 씁니다.
+2022년부터 도입됐고 지금은 일부 트리거에서 기본값으로 쓰입니다. 계산식은 단순합니다.
 
 > desired instances = event source length / target executions per instance
 
@@ -308,7 +308,7 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 
 - 스케일 결정은 **호스트 바깥**에서 일어난다. 호스트는 메트릭을 보고하고 health ping에 응답할 뿐입니다.
 - `IScaleMonitor`(점진)와 `ITargetScaler`(공식 기반)는 SDK·확장 측 인터페이스이고, 호스트는 그 메트릭을 Table Storage에 저장하는 역할만 합니다.
-- 인스턴스 **수** 결정과 인스턴스 **내부 워커 수** 결정은 다른 메커니즘입니다. 후자는 `WorkerConcurrencyManager`가 호스트 안에서 담당하지만, 새 워커를 **추가**하는 쪽만 다룹니다.
+- 인스턴스 수 결정과 인스턴스 내부 워커 수 결정은 다른 메커니즘입니다. 후자는 `WorkerConcurrencyManager`가 호스트 안에서 담당하지만, 새 워커를 추가하는 쪽만 다룹니다.
 - `FUNCTIONS_WORKER_PROCESS_COUNT`는 정적 워커 수 설정이고, `WorkerConcurrencyOptions`는 동적 추가 임계치입니다. 둘을 같은 설정으로 보면 흐름이 헷갈립니다.
 - 같은 호스트 코드가 Consumption / Flex / Premium / Dedicated에서 다르게 보이는 이유는 외부 결정자의 모델이 다르기 때문입니다. 호스트 자체는 그대로입니다.
 - Flex Consumption은 per-function scaling과 Always ready를 도입해 "어느 함수에 얼마나 인스턴스를 둘지"를 그룹 단위로 결정합니다.

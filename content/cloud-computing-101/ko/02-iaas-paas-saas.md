@@ -112,16 +112,16 @@ web: gunicorn app:app
 git init
 git add .
 git commit -m "init"
-# example: heroku create && git push heroku main
+# 예시: heroku create && git push heroku main
 ```
 
 ### 5단계 — IaaS 와 비교
 
 ```python
-# IaaS 라면 추가로:
+# IaaS라면 추가로 필요합니다.
 # - VM 프로비저닝
 # - OS 패키지 설치
-# - reverse proxy 설정
+# - 리버스 프록시 설정
 # - 로그 수집기 설치
 print("PaaS = git push, IaaS = 위 4단계 직접")
 ```

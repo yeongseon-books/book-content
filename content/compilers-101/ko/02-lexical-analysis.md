@@ -18,7 +18,7 @@ tags:
   - 정규식
   - 위치정보
 seo_description: 텍스트를 의미 있는 토큰으로 자르는 단계입니다. 정규식과 longest-match로 작은 lexer를 만들어 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # lexical analysis
@@ -77,7 +77,7 @@ SPEC = [("NUM", r"\d+"), ("OP", r"[+\-*/]"), ("WS", r"\s+")]
 ### 1단계 — 정규식 기반 lexer
 
 ```python
-# 1_regex_lex.py
+# 예제 파일: 1_regex_lex.py
 import re
 from dataclasses import dataclass
 
@@ -130,8 +130,8 @@ for t in lex('if x == 1\n  return "ok"\n'):
 ### 2단계 — longest-match가 왜 필요한가
 
 ```python
-# 2_longest.py
-# == 와 = 가 같이 있는 언어를 본다고 하자
+# 예제 파일: 2_longest.py
+# == 와 = 가 함께 있는 언어를 생각해 봅시다
 SPEC = [("EQ", r"=="), ("ASSIGN", r"=")]
 import re
 src = "=="
@@ -147,7 +147,7 @@ for kind, pat in SPEC:
 ### 3단계 — 키워드와 identifier 분리
 
 ```python
-# 3_keywords.py
+# 예제 파일: 3_keywords.py
 import re
 KEYWORDS = {"if", "else", "while"}
 src = "if iff while"
@@ -162,7 +162,7 @@ for m in re.finditer(r"[A-Za-z_]\w*", src):
 ### 4단계 — 위치 정보 유지
 
 ```python
-# 4_position.py
+# 예제 파일: 4_position.py
 # 1단계의 lex가 이미 line/col을 들고 다닌다.
 # 오류를 내야 할 때, 그 정보로 보기 좋은 메시지를 만들 수 있다
 def report(token, message):
@@ -176,7 +176,7 @@ def report(token, message):
 ### 5단계 — Python 내장 `tokenize`
 
 ```python
-# 5_python_tokenize.py
+# 예제 파일: 5_python_tokenize.py
 import tokenize, io
 
 src = "x = 1 + 2  # add\n"

@@ -18,7 +18,7 @@ tags:
   - 전송계층
   - 신뢰성
 seo_description: TCP와 UDP의 차이를 신뢰성·순서·연결·속도라는 네 축으로 비교하고, 어떤 상황에서 어느 쪽을 골라야 하는지 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # TCP와 UDP
@@ -64,7 +64,7 @@ QUIC (HTTP/3)      → UDP 위에 새로운 신뢰성 계층
 ### 1단계: TCP echo 서버
 
 ```python
-# tcp_server.py
+# tcp_server.py 예제
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('127.0.0.1', 5001)); s.listen()
@@ -75,7 +75,7 @@ while True:
 ```
 
 ```python
-# tcp_client.py
+# tcp_client.py 예제
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('127.0.0.1', 5001))
@@ -86,7 +86,7 @@ print(s.recv(1024))   # b'hello tcp'
 ### 2단계: UDP echo 서버
 
 ```python
-# udp_server.py
+# udp_server.py 예제
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('127.0.0.1', 5002))
@@ -96,7 +96,7 @@ while True:
 ```
 
 ```python
-# udp_client.py
+# udp_client.py 예제
 import socket
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.sendto(b'hello udp', ('127.0.0.1', 5002))

@@ -18,7 +18,7 @@ tags:
   - REST
   - 헤더
 seo_description: HTTP 요청과 응답의 구조, 메서드와 상태 코드, 헤더, 그리고 HTTPS가 더해 주는 보안 보장을 한 번에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # HTTP와 HTTPS
@@ -77,7 +77,7 @@ curl -v https://example.com/
 # < content-type: text/html; charset=UTF-8
 ```
 
-`-v`는 헤더와 TLS handshake까지 보여 줍니다.
+`-v`는 헤더와 TLS 핸드셰이크까지 보여 줍니다.
 
 ### 2단계: Python에서 클라이언트
 
@@ -95,7 +95,7 @@ print(r.json()['stargazers_count'])
 ### 3단계: 가장 작은 HTTP 서버
 
 ```python
-# server.py — Flask
+# server.py — Flask 예제
 from flask import Flask, jsonify, request
 app = Flask(__name__)
 

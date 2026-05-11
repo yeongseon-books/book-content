@@ -17,7 +17,7 @@ tags:
   - TypeChecking
   - NameResolution
 seo_description: semantic analysis는 AST가 의미상 맞는지 검사합니다. 이름 해석, 타입 검사, 좋은 오류 메시지 패턴을 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # semantic analysis
@@ -54,8 +54,8 @@ ast = Bin("+", Var("x"), Str("hello"))
 **After — semantic이 붙은 AST**
 
 ```python
-# x: int (declared at line 3)
-# Bin.+ requires int + int, got int + str → TypeError
+# x: int (3번째 줄에서 선언)
+# Bin.+는 int + int를 요구하지만 int + str이 들어와 TypeError가 납니다
 ```
 
 뒤 단계가 신뢰할 수 있는 형태가 됐습니다.
@@ -65,7 +65,7 @@ ast = Bin("+", Var("x"), Str("hello"))
 ### 1단계 — 단순 타입 환경
 
 ```python
-# 1_env.py
+# 예제 파일: 1_env.py
 class Env:
     def __init__(self, parent=None):
         self.parent, self.table = parent, {}
@@ -84,7 +84,7 @@ class Env:
 ### 2단계 — name resolution
 
 ```python
-# 2_resolve.py
+# 예제 파일: 2_resolve.py
 from dataclasses import dataclass
 @dataclass
 class Var: name: str
@@ -106,7 +106,7 @@ def resolve(node):
 ### 3단계 — 단순 타입 검사
 
 ```python
-# 3_typecheck.py
+# 예제 파일: 3_typecheck.py
 def type_of(node, env):
     kind = node[0]
     if kind == "NUM": return "int"
@@ -127,7 +127,7 @@ print(type_of(("BIN","+",("VAR","x"),("NUM",1)), env))  # int
 ### 4단계 — annotated AST
 
 ```python
-# 4_annotate.py
+# 예제 파일: 4_annotate.py
 def annotate(node, env):
     kind = node[0]
     if kind == "NUM": return ("NUM", node[1], "int")
@@ -144,7 +144,7 @@ def annotate(node, env):
 ### 5단계 — 좋은 오류 메시지
 
 ```python
-# 5_error.py
+# 예제 파일: 5_error.py
 def report(token, expected, got):
     print(f"  File \"<src>\", line {token['line']}")
     print(f"    {token['text']}")

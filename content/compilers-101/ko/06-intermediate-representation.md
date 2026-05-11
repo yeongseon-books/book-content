@@ -17,7 +17,7 @@ tags:
   - ThreeAddressCode
   - SSA
 seo_description: IR은 AST와 기계어 사이의 중간 언어입니다. three-address code와 SSA 같은 표현이 왜 필요한지 직접 만들어 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # intermediate representation
@@ -65,7 +65,7 @@ return t2
 ### 1단계 — IR 명령어 정의
 
 ```python
-# 1_ir.py
+# 예제 파일: 1_ir.py
 from dataclasses import dataclass
 @dataclass
 class Inst:
@@ -80,7 +80,7 @@ class Inst:
 ### 2단계 — temporary 이름 생성
 
 ```python
-# 2_temps.py
+# 예제 파일: 2_temps.py
 class TempGen:
     def __init__(self): self.n = 0
     def fresh(self):
@@ -95,7 +95,7 @@ print(g.fresh(), g.fresh(), g.fresh())  # t1 t2 t3
 ### 3단계 — 표현식 → 3AC
 
 ```python
-# 3_lower.py
+# 예제 파일: 3_lower.py
 def lower(node, code, g):
     kind = node[0]
     if kind == "NUM":
@@ -117,7 +117,7 @@ print("result:", result)
 ### 4단계 — basic block과 CFG
 
 ```python
-# 4_cfg.py
+# 예제 파일: 4_cfg.py
 class Block:
     def __init__(self, name):
         self.name, self.insts, self.next = name, [], []
@@ -131,7 +131,7 @@ entry.next = [body]; body.next = [body, exit_]   # loop
 ### 5단계 — SSA 맛보기
 
 ```python
-# 5_ssa.py
+# 예제 파일: 5_ssa.py
 # 같은 변수에 여러 번 대입한 코드
 # x = 1
 # x = x + 2

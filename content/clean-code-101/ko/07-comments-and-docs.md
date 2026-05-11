@@ -18,7 +18,7 @@ tags:
   - Docstring
   - Readability
 seo_description: 좋은 주석과 나쁜 주석, docstring 작성법, 의도 주석과 TODO 관리 원칙을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 주석과 문서화
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-주석은 거짓이 됩니다. 코드는 변하지만 주석은 따라오지 않기 때문입니다.
+주석은 쉽게 낡습니다. 코드는 바뀌는데 주석은 그대로 남는 경우가 많기 때문입니다.
 
 > 가장 좋은 주석은 필요 없는 주석이다.
 
@@ -41,7 +41,7 @@ flowchart LR
     Q -->|"공개 API"| D["Docstring"]
 ```
 
-설명이 필요하면 먼저 코드 자체를 고쳐 봅니다.
+설명이 필요하다고 느껴지면, 주석보다 먼저 코드 구조와 이름을 고칠 수 있는지 봐야 합니다.
 
 ## Before/After
 
@@ -61,36 +61,36 @@ def gu(): ...
 def get_active_users(): ...
 ```
 
-이름이 주석을 대체합니다.
+좋은 이름 하나가 평범한 설명 주석 여러 줄보다 낫습니다.
 
 ## 도움이 되는 문서화 5단계
 
 ### 1단계 — 의도 주석
 
 ```python
-# 1_intent.py
+# 예시 파일: 1_intent.py
 # 결제 게이트웨이가 가끔 200을 반환하면서 본문에 에러를 담는다.
 # 그래서 status 대신 body.status를 본다.
 def is_paid(resp):
     return resp.json().get("status") == "PAID"
 ```
 
-코드만 봐서는 알 수 없는 외부 사정을 적습니다.
+코드만 보고는 알 수 없는 외부 제약이나 배경을 적을 때 의도 주석이 가치가 있습니다.
 
 ### 2단계 — 경고 주석
 
 ```python
-# 2_warning.py
-# WARNING: 이 함수는 IO를 동반합니다. 트랜잭션 안에서 호출하지 마세요.
+# 예시 파일: 2_warning.py
+# 경고: 이 함수는 IO를 동반합니다. 트랜잭션 안에서 호출하지 마세요.
 def upload_invoice(path): ...
 ```
 
-호출자가 다칠 수 있는 지점에 둡니다.
+호출자가 실수하기 쉬운 경계에는 이런 경고 주석이 도움이 됩니다.
 
 ### 3단계 — Docstring
 
 ```python
-# 3_doc.py
+# 예시 파일: 3_doc.py
 def discount(price: int, rate: float) -> int:
     """할인 적용 후 가격을 반환합니다.
 
@@ -109,7 +109,7 @@ def discount(price: int, rate: float) -> int:
     return int(price * (1 - rate))
 ```
 
-공개 함수에는 docstring을 둡니다.
+공개 함수나 라이브러리 API에는 docstring으로 사용 계약을 남겨 두는 편이 좋습니다.
 
 ### 4단계 — README 헤더
 
@@ -124,23 +124,23 @@ def discount(price: int, rate: float) -> int:
 - Env vars: `GATEWAY_URL`, `SECRET_KEY`
 ```
 
-처음 보는 사람이 30초에 적응할 수 있게.
+처음 들어온 사람이 30초 안에 감을 잡을 수 있을 정도로 간결해야 합니다.
 
 ### 5단계 — TODO에 책임자
 
 ```python
-# 5_todo.py
-# TODO(yeongseon, 2026-06-01): retry 정책을 backoff로 교체.
+# 예시 파일: 5_todo.py
+# TODO(yeongseon, 2026-06-01): retry 정책을 backoff로 교체합니다.
 def retry_simple(): ...
 ```
 
-TODO에는 사람과 기한을 함께 둡니다.
+TODO에는 담당자와 기한을 함께 남겨야 추적이 가능합니다.
 
 ## 이 코드에서 주목할 점
 
-- 코드가 "무엇"을, 주석이 "왜"를 설명합니다.
-- Docstring은 사용 계약을 명시합니다.
-- TODO는 추적 가능합니다.
+- 코드는 "무엇을 하는가"를, 주석은 "왜 이렇게 했는가"를 설명해야 합니다.
+- Docstring은 함수나 클래스의 사용 계약을 분명하게 남깁니다.
+- TODO는 추적 가능한 작업 항목이어야 합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -152,7 +152,7 @@ TODO에는 사람과 기한을 함께 둡니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-좋은 팀은 공개 API에는 docstring을 강제하고 내부 함수에는 의도 주석만 허용합니다. 모든 TODO에는 이슈 링크가 달립니다.
+좋은 팀은 공개 API에는 docstring을 요구하고, 내부 구현에는 꼭 필요한 의도 주석만 남기도록 기준을 둡니다. 또한 모든 TODO에 이슈 링크나 담당자를 연결해 방치되지 않게 관리합니다.
 
 ## 체크리스트
 
@@ -164,7 +164,7 @@ TODO에는 사람과 기한을 함께 둡니다.
 
 ## 정리 및 다음 단계
 
-좋은 주석은 적고 정확합니다. 다음 글에서는 코드의 운명을 결정짓는 — 테스트 가능한 코드 — 를 다룹니다.
+좋은 주석은 많지 않아도 충분하고, 무엇보다 정확해야 합니다. 다음 글에서는 코드의 수명과 변경 속도를 크게 좌우하는 테스트 가능한 코드를 다뤄 보겠습니다.
 
 <!-- toc:begin -->
 - [Clean Code란 무엇인가?](./01-what-is-clean-code.md)

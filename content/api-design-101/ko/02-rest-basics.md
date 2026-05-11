@@ -18,7 +18,7 @@ tags:
   - Backend
   - WebDevelopment
 seo_description: REST의 6가지 제약과 자원 중심 사고를 정리합니다 — 백엔드 주니어를 위한 안내.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # REST 기본
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-REST는 가장 흔한 API 스타일입니다. 잘 따르면 *예측 가능* 하고, 잘못 따르면 *어디 한 번 본 적 있는데?* 가 됩니다. 핵심을 잡아두면 모든 후속 글이 쉬워집니다.
+REST는 가장 흔한 API 스타일입니다. 잘 따르면 예측 가능하고, 잘못 따르면 어디선가 본 것 같지만 일관되지 않은 API가 됩니다. 핵심을 잡아두면 모든 후속 글이 쉬워집니다.
 
-> 규칙을 외우기보다 *왜 그 규칙인지* 를 이해하세요.
+> 규칙을 외우기보다 왜 그 규칙인지 이해해야 합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -69,8 +69,8 @@ DELETE /users/42
 ### 1단계 — Client-Server 분리
 
 ```python
-# 1_client_server.py
-# 클라이언트는 UI, 서버는 데이터 — 서로 *교체 가능* 해야 한다
+# 예제 1: 클라이언트-서버 분리
+# 클라이언트는 UI, 서버는 데이터 — 서로 교체 가능해야 합니다
 import requests
 print(requests.get("https://api.github.com").status_code)
 ```
@@ -80,14 +80,14 @@ print(requests.get("https://api.github.com").status_code)
 ### 2단계 — Stateless 호출
 
 ```python
-# 2_stateless.py
+# 예제 2: 무상태 호출
 import requests
-# 매 호출이 *자기 완결적* — 토큰을 매번 보낸다
+# 매 호출이 자기 완결적이어야 하므로 토큰을 매번 보냅니다
 headers = {"Authorization": "token TEST"}
 requests.get("https://api.example.com/me", headers=headers)
 ```
 
-서버는 세션을 *기억* 하지 않습니다 — 호출이 모든 정보를 가져야 합니다.
+서버는 세션을 기억하지 않습니다. 호출이 모든 정보를 가져야 합니다.
 
 ### 3단계 — Cacheable 응답
 
@@ -103,47 +103,47 @@ def article():
     return resp
 ```
 
-응답이 캐시 가능한지 *명시* 합니다.
+응답이 캐시 가능한지 명시합니다.
 
 ### 4단계 — Uniform Interface
 
 ```python
-# 4_uniform.py
-# 같은 자원에 대해 method만 바꾼다
-# GET    /users/42  -> 조회
-# PUT    /users/42  -> 교체
-# DELETE /users/42  -> 삭제
+# 예제 4: 일관된 인터페이스
+# 같은 자원에 대해 method만 바꿉니다
+# 조회 요청
+# 교체 요청
+# 삭제 요청
 ```
 
-호출 규칙이 *일관* 되어야 학습 비용이 줄어듭니다.
+호출 규칙이 일관되어야 학습 비용이 줄어듭니다.
 
 ### 5단계 — Layered + Code on Demand
 
 ```python
-# 5_layered.py
+# 예제 5: 계층 구조
 # Client -> CDN -> LB -> App -> DB
-# 클라이언트는 *옆 계층* 만 압니다
+# 클라이언트는 옆 계층만 압니다
 ```
 
 중간에 캐시·게이트웨이가 들어가도 클라이언트 코드는 안 바뀝니다.
 
 ## 이 코드에서 주목할 점
 
-- 동사는 *method* 가, 명사는 *URL* 이 표현합니다.
-- 토큰은 매 호출에 — 세션을 *서버* 에 두지 않습니다.
-- `Cache-Control` 같은 *부가 약속* 도 API의 일부입니다.
+- 동사는 method가, 명사는 URL이 표현합니다.
+- 토큰은 매 호출에 보내고 세션은 서버에 두지 않습니다.
+- `Cache-Control` 같은 부가 약속도 API의 일부입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **URL에 동사 사용.** `/getUser` — RPC 신호.
-2. **POST로 모든 것.** method의 의미를 버림.
-3. **세션 의존.** 서버를 *수평 확장* 못 함.
-4. **에러를 200으로.** 클라이언트가 분기 못 함.
-5. **REST를 *URL 규칙* 으로만 이해.** 6제약을 잊음.
+1. **URL에 동사를 씁니다.** `/getUser`는 RPC 신호입니다.
+2. **POST로 모든 것을 처리합니다.** method의 의미를 버립니다.
+3. **세션에 의존합니다.** 서버를 수평 확장하지 못합니다.
+4. **에러를 200으로 돌려줍니다.** 클라이언트가 분기하지 못합니다.
+5. **REST를 URL 규칙으로만 이해합니다.** 6제약을 놓칩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-GitHub, Stripe, GitLab — 대부분의 공개 API는 *대체로 REST* 입니다. 완벽한 HATEOAS는 드물지만 *자원 중심 + uniform interface* 는 표준이 되었습니다. 사내에서도 REST를 기본으로 두고, 필요할 때만 GraphQL이나 gRPC로 *추가* 합니다.
+GitHub, Stripe, GitLab 등 대부분의 공개 API는 대체로 REST 스타일입니다. 완벽한 HATEOAS는 드물지만 자원 중심 설계와 uniform interface는 사실상 표준이 되었습니다. 사내에서도 REST를 기본으로 두고, 필요할 때만 GraphQL이나 gRPC를 추가합니다.
 
 ## 체크리스트
 
@@ -155,7 +155,7 @@ GitHub, Stripe, GitLab — 대부분의 공개 API는 *대체로 REST* 입니다
 
 ## 정리 및 다음 단계
 
-REST는 *6제약* 의 합입니다. 다음 글에서는 그 중심인 — 자원(resource) 설계 — 를 자세히 봅니다.
+REST는 6제약의 합입니다. 다음 글에서는 그 중심인 자원(resource) 설계를 자세히 봅니다.
 
 <!-- toc:begin -->
 - [API란 무엇인가?](./01-what-is-an-api.md)

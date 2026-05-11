@@ -18,7 +18,7 @@ tags:
   - AST
   - 바이트코드
 seo_description: 컴파일러는 한 언어에서 다른 언어로 옮기는 번역기입니다. 작은 식 한 줄을 따라 lexer부터 code generation까지 한눈에 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 컴파일러란 무엇인가?
@@ -67,7 +67,7 @@ flowchart LR
 ### 1단계 — 토큰화: 텍스트를 의미 있는 조각으로
 
 ```python
-# 1_lex.py
+# 예제 파일: 1_lex.py
 import re
 from dataclasses import dataclass
 
@@ -104,7 +104,7 @@ print(lex("2 + 3 * 4"))
 ### 2단계 — 파싱: 토큰에서 트리로
 
 ```python
-# 2_parse.py
+# 예제 파일: 2_parse.py
 from dataclasses import dataclass
 @dataclass
 class Num: value: int
@@ -131,7 +131,7 @@ def parse(tokens):
 ### 3단계 — 의미 분석: "이게 말이 되는가?"
 
 ```python
-# 3_check.py
+# 예제 파일: 3_check.py
 def check(node):
     if isinstance(node, Num):
         return "int"
@@ -146,7 +146,7 @@ def check(node):
 ### 4단계 — 평가(작은 인터프리터)
 
 ```python
-# 4_eval.py
+# 예제 파일: 4_eval.py
 def evaluate(node):
     if isinstance(node, Num):
         return node.value
@@ -159,7 +159,7 @@ def evaluate(node):
 ### 5단계 — 코드 생성(가짜 어셈블리)
 
 ```python
-# 5_codegen.py
+# 예제 파일: 5_codegen.py
 def emit(node, out=None):
     out = out if out is not None else []
     if hasattr(node, "value"):

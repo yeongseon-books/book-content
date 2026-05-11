@@ -18,7 +18,7 @@ tags:
   - CIDR
   - 라우팅
 seo_description: IP 주소가 무엇이고 subnet과 CIDR이 어떻게 네트워크를 분리하는지, 라우팅의 출발점이 되는 개념을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # IP와 subnet
@@ -77,8 +77,8 @@ ipconfig           # Windows
 
 ```bash
 ip route
-# default via 192.168.0.1 dev wlan0
-# 192.168.0.0/24 dev wlan0 proto kernel scope link src 192.168.0.42
+# 출력 예시: default via 192.168.0.1 dev wlan0
+# 출력 예시: 192.168.0.0/24 dev wlan0 proto kernel scope link src 192.168.0.42
 ```
 
 같은 `/24` 안의 목적지는 직접, 그 외는 모두 default gateway(192.168.0.1)로 보낸다는 뜻입니다.

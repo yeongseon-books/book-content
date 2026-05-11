@@ -17,7 +17,7 @@ tags:
   - Scope
   - Lookup
 seo_description: symbol table은 컴파일러의 메모리입니다. nested scope, shadowing, lookup의 핵심 패턴을 직접 짜며 익힙니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # symbol table과 scope
@@ -64,7 +64,7 @@ class Scope:
 ### 1단계 — 가장 단순한 Scope
 
 ```python
-# 1_scope.py
+# 예제 파일: 1_scope.py
 class Scope:
     def __init__(self, parent=None):
         self.parent, self.table = parent, {}
@@ -86,7 +86,7 @@ f = Scope(g); print(f.resolve("x"))  # int
 ### 2단계 — shadowing
 
 ```python
-# 2_shadow.py
+# 예제 파일: 2_shadow.py
 g = Scope(); g.define("x", "int(global)")
 f = Scope(g); f.define("x", "int(local)")
 print(f.resolve("x"))   # int(local) — 안쪽이 가린다
@@ -98,7 +98,7 @@ print(g.resolve("x"))   # int(global)
 ### 3단계 — scope stack 운영
 
 ```python
-# 3_stack.py
+# 예제 파일: 3_stack.py
 class Analyzer:
     def __init__(self):
         self.scopes = [Scope()]
@@ -119,7 +119,7 @@ a.exit()
 ### 4단계 — 함수 scope
 
 ```python
-# 4_function.py
+# 예제 파일: 4_function.py
 def visit_function(name, params, body, analyzer):
     analyzer.current().define(name, "fn")
     analyzer.enter()
@@ -135,7 +135,7 @@ def visit_function(name, params, body, analyzer):
 ### 5단계 — go-to-definition을 위한 위치 저장
 
 ```python
-# 5_goto.py
+# 예제 파일: 5_goto.py
 class Symbol:
     def __init__(self, name, kind, ty, line, col):
         self.name, self.kind, self.ty = name, kind, ty

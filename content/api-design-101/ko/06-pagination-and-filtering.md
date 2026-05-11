@@ -18,7 +18,7 @@ tags:
   - Performance
   - Backend
 seo_description: offset/limit과 cursor 페이지네이션, 정렬과 필터링의 표준 패턴을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Pagination과 filtering
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-페이지네이션이 잘못되면 *느린 쿼리* 와 *중복·누락* 이 동시에 옵니다. 그리고 한 번 외부에 나가면 쉽게 못 바꿉니다 — 처음부터 의도가 있어야 합니다.
+페이지네이션이 잘못되면 느린 쿼리와 중복, 누락이 동시에 생깁니다. 그리고 한 번 외부에 나가면 쉽게 못 바꾸므로 처음부터 의도를 담아 설계해야 합니다.
 
-> 큰 컬렉션은 *반드시* 조각으로.
+> 큰 컬렉션은 반드시 조각으로 나눠야 합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -40,7 +40,7 @@ flowchart LR
     A2 --> P2["page 2 + next_cursor"]
 ```
 
-cursor는 *다음 페이지의 시작점* 입니다.
+cursor는 다음 페이지의 시작점입니다.
 
 ## Before/After
 
@@ -73,7 +73,7 @@ def items():
     return jsonify(items=ITEMS[offset:offset+limit], total=len(ITEMS))
 ```
 
-`limit` 에는 *상한* 을 둡니다.
+`limit`에는 상한을 둡니다.
 
 ### 2단계 — cursor
 
@@ -92,7 +92,7 @@ def items():
     return jsonify(items=page, next_cursor=(nxt if nxt < len(ITEMS) else None))
 ```
 
-cursor는 *불투명* 하게 — 클라이언트가 해석하지 않습니다.
+cursor는 불투명하게 유지합니다. 클라이언트가 해석하지 않게 해야 합니다.
 
 ### 3단계 — 정렬
 
@@ -118,37 +118,37 @@ GET /orders?created_at__gte=2026-01-01
 GET /articles?q=python+logging
 ```
 
-검색은 *별도 파라미터* `q` 로 분리 — 필터와 섞지 않습니다.
+검색은 별도 파라미터 `q`로 분리합니다. 필터와 섞지 않습니다.
 
 ## 이 코드에서 주목할 점
 
-- `limit` 에 *상한* 이 있어야 합니다.
-- cursor는 *불투명한 토큰*.
-- 정렬·필터·검색은 *각각 다른 의미* — 같은 파라미터에 섞지 않음.
+- `limit`에는 상한이 있어야 합니다.
+- cursor는 불투명한 토큰이어야 합니다.
+- 정렬, 필터, 검색은 각각 다른 의미이므로 같은 파라미터에 섞지 않습니다.
 
 ## 자주 하는 실수 5가지
 
-1. **`limit` 상한 없음.** 클라이언트가 10만개를 한 번에 요청.
-2. **deep offset.** `offset=100000` 은 인덱스가 있어도 *느림*.
-3. **total count 항상 계산.** 큰 테이블에서 *주범*.
-4. **필터·정렬·검색 한 파라미터에.** 검증·문서화 모두 어려움.
-5. **cursor 의 *내용* 노출.** 클라이언트가 위조해 데이터를 빼냄.
+1. **`limit` 상한이 없습니다.** 클라이언트가 10만 개를 한 번에 요청할 수 있습니다.
+2. **deep offset을 남용합니다.** `offset=100000`은 인덱스가 있어도 느립니다.
+3. **total count를 항상 계산합니다.** 큰 테이블에서는 대표적인 병목이 됩니다.
+4. **필터, 정렬, 검색을 한 파라미터에 몰아넣습니다.** 검증과 문서화가 모두 어려워집니다.
+5. **cursor의 내용을 노출합니다.** 클라이언트가 위조해 데이터를 빼낼 수 있습니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-GitHub은 `Link` 헤더로 next/prev URL을 *돌려줍니다*. Twitter·Slack 같은 빠르게 변하는 데이터는 cursor 기반이 표준. Stripe는 `has_more` + `data[].id` 로 단순한 cursor를 노출합니다.
+GitHub은 `Link` 헤더로 next/prev URL을 돌려줍니다. Twitter·Slack처럼 빠르게 변하는 데이터는 cursor 기반이 표준입니다. Stripe는 `has_more`와 `data[].id`로 단순한 cursor를 노출합니다.
 
 ## 체크리스트
 
 - [ ] `limit` 에 상한이 있는가?
 - [ ] cursor가 불투명한가?
 - [ ] 정렬·필터·검색이 각자 다른 파라미터인가?
-- [ ] 응답에 *다음 페이지* 링크 또는 cursor가 있는가?
-- [ ] total count가 *비용 인식* 후 결정되었는가?
+- [ ] 응답에 다음 페이지 링크 또는 cursor가 있는가?
+- [ ] total count가 비용을 고려해 결정되었는가?
 
 ## 정리 및 다음 단계
 
-페이지네이션은 *성능과 정확성* 의 교차점입니다. 다음 글에서는 컬렉션이든 단일 자원이든 빠질 수 없는 — error response 설계 — 를 봅니다.
+페이지네이션은 성능과 정확성이 만나는 지점입니다. 다음 글에서는 컬렉션이든 단일 자원이든 빠질 수 없는 error response 설계를 봅니다.
 
 <!-- toc:begin -->
 - [API란 무엇인가?](./01-what-is-an-api.md)

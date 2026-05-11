@@ -18,7 +18,7 @@ tags:
   - DependencyInjection
   - Refactoring
 seo_description: 의존성 주입, 순수 함수, 테스트 이음새, 페이크로 테스트 가능한 코드를 만드는 법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 테스트 가능한 코드
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-테스트가 어렵다는 것은 코드 구조가 어렵다는 신호입니다. 테스트 가능성은 설계 품질의 척도입니다.
+테스트가 어렵다는 말은 대개 코드 구조가 이미 복잡하다는 뜻입니다. 그래서 테스트 가능성은 설계 품질을 보여 주는 좋은 척도입니다.
 
 > 테스트 가능성은 결과가 아니라 설계의 결과다.
 
@@ -41,7 +41,7 @@ flowchart LR
     S --> T2["통합 테스트"]
 ```
 
-순수 핵심 + 얇은 어댑터.
+핵심 로직은 순수하게 두고, 바깥 의존성은 얇은 어댑터로 밀어내는 것이 기본 전략입니다.
 
 ## Before/After
 
@@ -67,36 +67,36 @@ def fetch_user(uid, http):
     return http.get(f"/users/{uid}").json()
 ```
 
-시간과 HTTP가 바깥에서 들어옵니다.
+시간과 HTTP 호출을 함수 바깥에서 주입하면 테스트가 훨씬 쉬워집니다.
 
 ## 테스트 가능성 5단계
 
 ### 1단계 — 순수 추출
 
 ```python
-# 1_pure.py
+# 예시 파일: 1_pure.py
 def total(items):
     return sum(it.price * it.qty for it in items)
 ```
 
-IO 없는 계산은 항상 순수 함수로.
+입출력이 없는 계산은 가능한 한 순수 함수로 두는 편이 좋습니다.
 
 ### 2단계 — 시간 의존성 주입
 
 ```python
-# 2_clock.py
+# 예시 파일: 2_clock.py
 from datetime import datetime
 def is_overdue(due, now=None):
     now = now or datetime.now()
     return now > due
 ```
 
-테스트에서 `now`를 고정합니다.
+테스트에서는 `now`를 고정해 시간을 통제할 수 있습니다.
 
 ### 3단계 — Fake 객체
 
 ```python
-# 3_fake.py
+# 예시 파일: 3_fake.py
 class FakeRepo:
     def __init__(self): self.users = {}
     def save(self, u): self.users[u.id] = u
@@ -106,12 +106,12 @@ def register(repo, user):
     repo.save(user); return user
 ```
 
-DB 없이 도메인 로직을 테스트합니다.
+실제 DB 없이도 도메인 로직을 충분히 검증할 수 있습니다.
 
 ### 4단계 — 호출 기록(Spy)
 
 ```python
-# 4_spy.py
+# 예시 파일: 4_spy.py
 class EmailSpy:
     def __init__(self): self.sent = []
     def send(self, to, body): self.sent.append((to, body))
@@ -120,12 +120,12 @@ def notify(email, user):
     email.send(user.email, "welcome")
 ```
 
-테스트에서 호출 횟수와 인자를 검증.
+이런 Spy 객체로 호출 횟수와 인자를 검증할 수 있습니다.
 
 ### 5단계 — 외부 호출 격리
 
 ```python
-# 5_adapter.py
+# 예시 파일: 5_adapter.py
 class HttpClient:
     def get(self, path): ...
 
@@ -133,13 +133,13 @@ def fetch_user(uid, http: HttpClient):
     return http.get(f"/users/{uid}").json()
 ```
 
-외부 시스템 호출을 어댑터 한 클래스로 모읍니다.
+외부 시스템 호출은 어댑터 계층으로 모아 두는 편이 테스트와 변경 모두에 유리합니다.
 
 ## 이 코드에서 주목할 점
 
-- 핵심 로직은 IO를 모릅니다.
-- 시간/난수는 항상 주입됩니다.
-- 테스트는 가짜 구현으로 빠르게 돕니다.
+- 핵심 로직은 IO 세부사항을 알지 않아야 합니다.
+- 시간과 난수처럼 흔들리는 값은 주입해야 테스트가 안정적입니다.
+- 가짜 구현을 쓰면 테스트를 빠르고 독립적으로 돌릴 수 있습니다.
 
 ## 자주 하는 실수 5가지
 
@@ -151,7 +151,7 @@ def fetch_user(uid, http: HttpClient):
 
 ## 실무에서는 이렇게 쓰입니다
 
-좋은 팀은 헥사고날/포트-어댑터 구조로 도메인 핵심을 IO로부터 분리합니다. 단위 테스트가 수천 개 있어도 1초 안에 돕니다.
+좋은 팀은 포트-어댑터나 헥사고날 구조로 도메인 핵심을 IO에서 분리합니다. 그래서 단위 테스트 수가 많아도 짧은 시간 안에 반복 실행할 수 있습니다.
 
 ## 체크리스트
 
@@ -163,7 +163,7 @@ def fetch_user(uid, http: HttpClient):
 
 ## 정리 및 다음 단계
 
-테스트 가능성은 설계의 거울입니다. 다음 글에서는 안전하게 코드를 변경하는 기술 — 리팩토링 기초 — 를 다룹니다.
+테스트 가능성은 설계 상태를 비추는 거울과 같습니다. 다음 글에서는 이렇게 만든 안전망 위에서 코드를 바꾸는 방법, 즉 리팩토링 기초를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [Clean Code란 무엇인가?](./01-what-is-clean-code.md)

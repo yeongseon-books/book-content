@@ -14,7 +14,7 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
@@ -30,7 +30,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > 새 인스턴스가 추가될 때, 그 안에서는 정확히 무슨 일이 일어나는가? 그리고 왜 어떤 인스턴스는 1초 안에 첫 요청을 처리하고, 어떤 인스턴스는 5초 넘게 걸리는가?
 
-이 차이의 정체가 **Placeholder Mode**입니다. 이 화는 호스트가 placeholder로 시작해서 specialization으로 넘어가는 코드 경로를 따라갑니다. 그리고 입문 6화에서 다룬 콜드 스타트라는 사용자 관점의 문제를 호스트의 코드 레벨에서 다시 봅니다.
+이 차이를 만드는 핵심이 Placeholder Mode입니다. 이 화는 호스트가 placeholder로 시작해서 specialization으로 넘어가는 코드 경로를 따라갑니다. 그리고 입문 6화에서 다룬 콜드 스타트라는 사용자 관점의 문제를 호스트 코드 레벨에서 다시 봅니다.
 
 > 모든 코드 인용은 [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
 
@@ -47,7 +47,7 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
 
-> 1~5번까지를 **미리, 사용자와 무관하게** 만들어 둔다. 사용자가 도착하면 그 위에 6~9번만 입혀서 "특수화(specialization)"한다.
+> 1~5번까지를 미리, 사용자와 무관하게 만들어 둡니다. 사용자가 도착하면 그 위에 6~9번만 입혀서 "특수화(specialization)"합니다.
 
 이게 같은 호스트 바이너리로 콜드 스타트를 줄이는 방법입니다. 코드를 보면 그 동작이 분명해집니다.
 
@@ -58,7 +58,7 @@ Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
 Functions 플랫폼은 사용자가 없는 상태에서도 워밍된 인스턴스 풀을 미리 만들어 둡니다. 이 인스턴스들은 진짜 사용자 앱이 아니라 **placeholder 앱**으로 시작합니다. placeholder 상태에서 호스트가 무엇을 미리 해두는지는 [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L173-L190)와 그 뒤 warmup 요청을 처리하는 [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85)를 같이 봐야 보입니다.
 
 ```csharp
-// src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
+// 파일: src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
 public async Task InitializeAsync()
 {
     using (_metricsLogger.LatencyEvent(MetricEventNames.SpecializationStandbyManagerInitialize))
@@ -67,16 +67,16 @@ public async Task InitializeAsync()
         {
             try
             {
-                // Flag to indicate a function was initialized from placeholder mode
+                // 함수가 placeholder mode에서 초기화됐음을 나타내는 플래그
                 _environment.SetEnvironmentVariable(
                     EnvironmentSettingNames.InitializedFromPlaceholder, bool.TrueString);
 
                 await CreateStandbyWarmupFunctions();
 
-                // start a background timer to identify when specialization happens
-                // specialization usually happens via an http request (e.g. scale controller
-                // ping) but this timer is started as well to handle cases where we
-                // might not receive a request
+                // 특수화 시점을 식별하기 위한 백그라운드 타이머 시작
+                // 특수화는 보통 HTTP 요청(예: scale controller
+                // ping)으로 일어나지만, 요청이 오지 않는 경우도 있어
+                // 그때를 대비해 이 타이머도 함께 시작합니다
                 _specializationTimer = new Timer(
                     OnSpecializationTimerTick, null,
                     _specializationTimerInterval, _specializationTimerInterval);
@@ -90,7 +90,7 @@ public async Task InitializeAsync()
 }
 ```
 
-코드를 풀어 쓰면:
+코드를 풀어 쓰면 다음과 같습니다.
 
 1. `InitializedFromPlaceholder` 환경변수를 세팅 — 이 플래그는 나중에 진짜 앱이 시작됐을 때 "이 인스턴스는 placeholder에서 출발했다"는 표시로 쓰입니다.
 2. `CreateStandbyWarmupFunctions()` — placeholder 시점에서 쓸 `WarmUp` 함수 디렉토리와 파일을 만듭니다.
@@ -119,7 +119,7 @@ private async Task CreateStandbyWarmupFunctions()
 `WarmUpConstants`의 정의를 보면 이름이 정해져 있습니다.
 
 ```csharp
-// src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs
+// 파일: src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs
 public static class WarmUpConstants
 {
     public const string FunctionName = "WarmUp";
@@ -141,7 +141,7 @@ public static class WarmUpConstants
 Scale Controller가 placeholder 인스턴스 하나를 사용자 앱에 할당하기로 결정하면, 그 인스턴스에 사용자 앱의 환경변수·콘텐츠가 주입됩니다. 그러나 호스트 프로세스는 아직 placeholder 상태입니다. 그 전환을 일으키는 코드가 미들웨어 파이프라인의 첫 단계에 있습니다.
 
 ```csharp
-// src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs
+// 파일: src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs
 public class PlaceholderSpecializationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -160,8 +160,8 @@ public class PlaceholderSpecializationMiddleware
     {
         if (!_webHostEnvironment.InStandbyMode && _environment.IsContainerReady())
         {
-            // We don't want AsyncLocal context (like Activity.Current) to flow
-            // here as it will contain request details.
+            // 여기에는 AsyncLocal 컨텍스트(Activity.Current 같은 것)가
+            // 흘러들지 않게 해야 합니다. 요청 세부 정보가 들어 있기 때문입니다.
             Task specializeTask;
             using (System.Threading.ExecutionContext.SuppressFlow())
             {
@@ -182,12 +182,12 @@ public class PlaceholderSpecializationMiddleware
 
 [`PlaceholderSpecializationMiddleware.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs)
 
-코드의 의미가 단순하지만 미묘합니다.
+코드의 의도는 단순하지만 구현은 꽤 섬세합니다.
 
 1. 첫 요청이 들어오면 `InvokeSpecializationCheck`가 실행됩니다.
 2. 컨테이너가 준비되었고 더 이상 standby 모드가 아니라면 specialization을 트리거합니다.
-3. specialization이 한 번 완료되고 나면 `_invoke` 델리게이트를 `_next`로 교체합니다 — **두 번째 요청부터는 이 검사 자체를 건너뜁니다.** Hot path 비용 0.
-4. `ExecutionContext.SuppressFlow()`로 현재 요청의 AsyncLocal 컨텍스트가 호스트 specialization으로 흘러들어가지 않게 막습니다. 이 디테일이 흥미롭습니다 — 사용자 요청을 처리하는 도중에 호스트 자신을 다시 만들고 있는 셈이라 컨텍스트 오염을 막아야 합니다.
+3. specialization이 한 번 완료되고 나면 `_invoke` 델리게이트를 `_next`로 교체합니다. 두 번째 요청부터는 이 검사 자체를 건너뜁니다. 즉 hot path 비용이 0이 됩니다.
+4. `ExecutionContext.SuppressFlow()`로 현재 요청의 AsyncLocal 컨텍스트가 호스트 specialization으로 흘러들어가지 않게 막습니다. 사용자 요청을 처리하는 도중에 호스트 자신을 다시 만드는 셈이므로, 컨텍스트 오염을 막아야 합니다.
 
 이 미들웨어의 존재 의미는 분명합니다. **사용자 앱의 첫 요청이 specialization의 트리거**입니다. 5화에서 본 Scale Controller의 health ping과는 다른 경로지만 같은 결과로 수렴합니다.
 
@@ -216,14 +216,14 @@ specialization 트리거는 두 개입니다. **첫 HTTP 요청** 또는 **50ms 
 이제 specialization의 본체입니다. `StandbyManager.SpecializeHostCoreAsync`가 placeholder 상태의 호스트를 사용자 앱으로 변신시킵니다.
 
 ```csharp
-// src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
+// 파일: src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
 public async Task SpecializeHostCoreAsync()
 {
     Activity activity = Activity.Current;
     activity.SetColdStartTag();
 
-    // Go async immediately to ensure that any async context from
-    // the PlaceholderSpecializationMiddleware is properly suppressed.
+    // `PlaceholderSpecializationMiddleware`에서 넘어온 async 컨텍스트가
+    // 제대로 차단되도록 즉시 async로 전환합니다.
     await Task.Yield();
 
     using var initActivity = ActivityExtensions.StartSpecializationActivity();
@@ -232,21 +232,21 @@ public async Task SpecializeHostCoreAsync()
 
     _logger.LogInformation(Resources.HostSpecializationTrace);
 
-    // After specialization, we need to ensure that custom timezone
-    // settings configured by the user (WEBSITE_TIME_ZONE) are honored.
+    // 특수화 이후에는 사용자가 설정한 사용자 지정 타임존
+    // 설정(WEBSITE_TIME_ZONE)이 반영되도록 해야 합니다.
     TimeZoneInfo.ClearCachedData();
 
-    // Trigger a configuration reload to pick up all current settings
+    // 현재 설정을 모두 다시 읽도록 구성 리로드를 트리거합니다
     _configuration?.Reload();
 
     _hostNameProvider.Reset();
 
-    // Reset the shared load context to ensure we're reloading
-    // user dependencies
+    // 사용자 의존성을 다시 로드하도록 shared load context를
+    // 초기화합니다
     FunctionAssemblyLoadContext.ResetSharedContext();
 
-    // Signals change of JobHost options from placeholder mode
-    // (ex: ScriptPath is updated)
+    // placeholder mode 기준으로 JobHost 옵션이 바뀌었음을 알립니다
+    // (예: ScriptPath 업데이트)
     NotifyChange();
 
     using (_metricsLogger.LatencyEvent(MetricEventNames.SpecializationLanguageWorkerChannelManagerSpecialize))
@@ -268,7 +268,7 @@ public async Task SpecializeHostCoreAsync()
 
 [`StandbyManager.cs#L88-L137`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L88-L137)
 
-콜드 스타트의 동작은 사실상 이 메서드에 다 들어 있습니다. 단계별로 풀어 쓰겠습니다.
+콜드 스타트의 핵심 동작은 사실상 이 메서드에 다 들어 있습니다. 단계별로 보겠습니다.
 
 ### 1. Cold start tagging
 
@@ -276,7 +276,7 @@ public async Task SpecializeHostCoreAsync()
 activity.SetColdStartTag();
 ```
 
-호스트는 자기가 콜드 스타트 중이라는 것을 메트릭에 표시합니다. 이게 Application Insights에서 우리가 콜드 스타트를 식별할 수 있는 이유입니다.
+호스트는 자기가 콜드 스타트 중이라는 사실을 메트릭에 표시합니다. 그래서 Application Insights에서 콜드 스타트를 구분할 수 있습니다.
 
 ### 2. 환경 리셋
 
@@ -340,7 +340,7 @@ if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
 
 **한 번 specialization이 끝나면 `_invoke`를 다음 미들웨어로 직접 가리키게 바꿉니다.** 그래서 두 번째 요청부터는 specialization 검사 분기 자체가 없습니다 — 함수 포인터 한 번 비교 후 곧장 다음 미들웨어로 갑니다.
 
-이건 **콜드 스타트 비용이 첫 요청에 한 번만 발생**한다는 사실을 코드 레벨에서 보장합니다. 이후 모든 요청은 일반 요청과 동일한 hot path를 탑니다. 입문 6화에서 "콜드 스타트는 첫 요청에만 비싸다"라고 한 게 이 코드의 결과입니다.
+이건 콜드 스타트 비용이 첫 요청에 한 번만 발생한다는 사실을 코드 레벨에서 보장합니다. 이후 모든 요청은 일반 요청과 같은 hot path를 탑니다. 입문 6화에서 "콜드 스타트는 첫 요청에만 비싸다"라고 한 설명이 바로 이 코드에서 나옵니다.
 
 ---
 

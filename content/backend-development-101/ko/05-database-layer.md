@@ -17,7 +17,7 @@ tags:
   - SQLAlchemy
   - Python
 seo_description: Repository 패턴으로 DB 접근을 분리하는 법 — 트랜잭션/migration/N+1 문제까지 한 번에 정리.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Database Layer
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-DB는 *가장 자주 바뀌는 것* 이자 *가장 바뀌면 안 되는 것* 입니다. 처음부터 layer를 분리하면 새 DB로 옮기거나, 캐시를 끼워넣거나, 테스트를 인메모리로 돌리는 일이 모두 *한 군데만 고치면 끝* 입니다.
+DB는 자주 손대게 되지만 한 번 잘못 바꾸면 영향이 큰 영역입니다. 처음부터 레이어를 분리해 두면 새 DB로 옮기거나 캐시를 끼우거나 테스트를 인메모리로 바꾸는 작업을 한곳에서 정리할 수 있습니다.
 
-> Repository는 *DB와 service 사이의 통역사* 입니다.
+> Repository는 DB와 service 사이의 경계를 지키는 계층입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -40,7 +40,7 @@ flowchart LR
     Repo --> Cache[("Cache")]
 ```
 
-Service는 SQL을 모릅니다 — Repository만 압니다.
+Service는 SQL 세부 구현을 알 필요가 없고 Repository만 알면 됩니다.
 
 ## Before/After
 
@@ -55,7 +55,7 @@ def create_user(name):
 **After (Repository로 추상화)**
 
 ```python
-# repositories/user_repo.py
+# 파일: repositories/user_repo.py
 class UserRepository:
     def __init__(self, session):
         self.session = session
@@ -66,7 +66,7 @@ class UserRepository:
         return user
 ```
 
-쿼리 변경이 *한 파일* 안에서 끝납니다.
+쿼리 변경이 한 파일 안에서 끝납니다.
 
 ## Database Layer 5단계
 
@@ -129,7 +129,7 @@ alembic revision --autogenerate -m "add users"
 alembic upgrade head
 ```
 
-스키마 변경을 *코드처럼* 관리합니다.
+스키마 변경을 코드처럼 관리합니다.
 
 ### 5단계 — N+1 잡기
 
@@ -140,25 +140,25 @@ stmt = select(Order).options(selectinload(Order.items))
 orders = session.scalars(stmt).all()
 ```
 
-자식 컬렉션을 *한 번* 에 가져오면 N+1이 사라집니다.
+자식 컬렉션을 한 번에 가져오면 N+1 문제를 줄일 수 있습니다.
 
 ## 이 코드에서 주목할 점
 
-- Session은 *짧게* 유지합니다 — 요청 단위가 표준.
-- Repository는 *도메인 객체* 를 반환합니다 — dict가 아닙니다.
-- Migration은 *직접 ALTER TABLE* 보다 항상 안전합니다.
+- Session은 짧게 유지하는 편이 좋습니다. 보통 요청 단위가 표준입니다.
+- Repository는 dict보다 도메인 객체를 반환하는 편이 경계가 분명합니다.
+- Migration은 운영 DB에서 직접 `ALTER TABLE`을 치는 것보다 안전합니다.
 
 ## 자주 하는 실수 5가지
 
-1. **Service에서 ORM 객체를 그대로 응답한다.** Pydantic으로 *DTO* 를 만들어 분리합니다.
+1. **Service에서 ORM 객체를 그대로 응답한다.** Pydantic DTO를 두어 응답 모델과 분리하는 편이 안전합니다.
 2. **세션을 전역으로 재사용한다.** 동시성 문제를 일으킵니다.
 3. **migration 없이 운영 DB를 직접 수정한다.** 환경마다 스키마가 어긋납니다.
-4. **모든 관계를 lazy로 둔다.** N+1이 *조용히* 누적됩니다.
+4. **모든 관계를 lazy로 둔다.** N+1 문제가 조용히 누적됩니다.
 5. **테스트에서 진짜 DB를 쓴다.** 인메모리 SQLite나 mock으로 빠르게 갑니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 백엔드는 *PostgreSQL + ORM + Alembic + Repository* 조합으로 시작합니다. 트래픽이 늘면 Read replica, 캐시(Redis), Elasticsearch가 추가되지만 Service는 그대로입니다 — Repository 안만 바뀝니다. 이 경계가 *시스템 진화* 를 가능하게 합니다.
+대부분의 백엔드는 PostgreSQL, ORM, Alembic, Repository 조합으로 시작합니다. 트래픽이 늘면 Read replica, Redis 캐시, Elasticsearch가 추가될 수 있지만 Service 계층은 그대로 두고 Repository 안쪽만 바꾸면 됩니다. 이 경계가 시스템을 점진적으로 키우게 해줍니다.
 
 ## 체크리스트
 
@@ -170,7 +170,7 @@ orders = session.scalars(stmt).all()
 
 ## 정리 및 다음 단계
 
-Repository는 *DB 위에 얹은 통역사* 입니다. 다음 글에서는 데이터를 *누가 볼 수 있는지* 결정하는 인증과 권한을 봅니다.
+Repository는 DB 접근을 한곳에 모아 주는 계층입니다. 다음 글에서는 데이터를 누가 볼 수 있는지 결정하는 인증과 권한을 봅니다.
 
 <!-- toc:begin -->
 - [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)

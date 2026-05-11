@@ -18,7 +18,7 @@ tags:
   - 트러블슈팅
   - 진단
 seo_description: 네트워크 문제를 계층 순서대로 좁혀가는 방법, ping/dig/curl/ss/tcpdump의 역할과 해석을 한 번에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 네트워크 문제 디버깅

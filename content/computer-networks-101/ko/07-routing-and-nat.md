@@ -18,7 +18,7 @@ tags:
   - default gateway
   - 사설IP
 seo_description: 패킷이 인터넷을 가로질러 가는 라우팅 원리와, 사설 네트워크가 공인 인터넷으로 나가는 NAT를 한 번에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 라우팅과 NAT
@@ -62,9 +62,9 @@ NAT는 outbound는 자동, inbound는 명시적 포트 포워딩 필요
 
 ```bash
 ip route
-# default via 192.168.0.1 dev wlan0
-# 10.0.0.0/8 via 10.0.1.1 dev tun0
-# 192.168.0.0/24 dev wlan0 proto kernel scope link src 192.168.0.10
+# 출력 예시: default via 192.168.0.1 dev wlan0
+# 출력 예시: 10.0.0.0/8 via 10.0.1.1 dev tun0
+# 출력 예시: 192.168.0.0/24 dev wlan0 proto kernel scope link src 192.168.0.10
 ```
 
 가장 긴 prefix가 우선 — `192.168.0.0/24`가 default보다 우선 적용됩니다.
@@ -76,7 +76,7 @@ traceroute 1.1.1.1
 # 1  192.168.0.1   1 ms
 # 2  isp-gw        5 ms
 # 3  ...
-# N  one.one.one.one  12 ms
+# 출력 예시: N  one.one.one.one  12 ms
 ```
 
 각 줄이 다음 홉 라우터입니다.
@@ -94,8 +94,8 @@ curl -s ifconfig.me
 
 ```bash
 sudo iptables -t nat -L -n -v
-# Chain POSTROUTING (policy ACCEPT)
-# MASQUERADE  all  --  192.168.0.0/24  0.0.0.0/0
+# 출력 예시: Chain POSTROUTING (policy ACCEPT)
+# 출력 예시: MASQUERADE  all  --  192.168.0.0/24  0.0.0.0/0
 ```
 
 `MASQUERADE`가 source NAT 규칙입니다.

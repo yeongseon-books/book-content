@@ -18,7 +18,7 @@ tags:
   - L7
   - 헬스체크
 seo_description: Load Balancer가 트래픽을 분산하고 장애를 격리하는 원리, L4와 L7의 차이, 헬스체크와 sticky session까지 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Load Balancer
@@ -63,7 +63,7 @@ app1이 죽으면 헬스체크가 빼고, 나머지로 트래픽이 흐름
 ### 1단계: 백엔드 두 개 띄우기
 
 ```python
-# backend.py — Flask
+# backend.py — Flask 예제
 from flask import Flask
 import os, sys
 name = sys.argv[1] if len(sys.argv) > 1 else 'a'
@@ -84,7 +84,7 @@ PORT=9002 python backend.py app2 &
 ### 2단계: nginx로 L7 LB
 
 ```nginx
-# nginx.conf (snippet)
+# nginx.conf 설정 일부
 upstream backend {
     server 127.0.0.1:9001;
     server 127.0.0.1:9002;
@@ -101,10 +101,10 @@ server {
 ```bash
 nginx -c $(pwd)/nginx.conf
 for i in 1 2 3 4; do curl -s localhost:8080/; done
-# hello from app1
-# hello from app2
-# hello from app1
-# hello from app2
+# 출력 예시: hello from app1
+# 출력 예시: hello from app2
+# 출력 예시: hello from app1
+# 출력 예시: hello from app2
 ```
 
 기본은 round-robin입니다.

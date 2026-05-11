@@ -18,7 +18,7 @@ tags:
   - Validation
   - Backend
 seo_description: JSON 스키마, content-type, 필드 명명, 날짜·시간대 규칙을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Request와 response schema
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-스키마가 흔들리면 클라이언트가 *전부* 흔들립니다. 좋은 스키마는 *읽기 쉽고, 진화 가능* 합니다. 검증을 경계에서 하면 안쪽 코드는 *깨끗* 해집니다.
+스키마가 흔들리면 클라이언트가 전부 흔들립니다. 좋은 스키마는 읽기 쉽고 진화할 수 있습니다. 검증을 경계에서 하면 안쪽 코드는 더 깨끗해집니다.
 
-> 스키마는 데이터의 *문법* 입니다.
+> 스키마는 데이터의 문법입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,7 +41,7 @@ flowchart LR
     Serialize -->|"JSON response"| Client
 ```
 
-검증은 *입구* 에서, 직렬화는 *출구* 에서.
+검증은 입구에서, 직렬화는 출구에서 합니다.
 
 ## Before/After
 
@@ -61,7 +61,7 @@ flowchart LR
 }
 ```
 
-읽는 순간 *무엇* 인지 알 수 있습니다.
+읽는 순간 무엇인지 알 수 있습니다.
 
 ## 스키마 5단계
 
@@ -79,24 +79,24 @@ def echo():
     return jsonify(request.get_json())
 ```
 
-content-type은 *서버가* 확인합니다.
+content-type은 서버가 확인합니다.
 
 ### 2단계 — 검증 라이브러리
 
 ```python
-# 2_validate.py
+# 예제 2: 검증 모델
 from pydantic import BaseModel, Field
 class CreateUser(BaseModel):
     username: str = Field(min_length=3, max_length=32)
     email: str
 ```
 
-pydantic·marshmallow 등으로 스키마를 *코드* 로 표현합니다.
+pydantic·marshmallow 등으로 스키마를 코드로 표현합니다.
 
 ### 3단계 — 응답 스키마 분리
 
 ```python
-# 3_response.py
+# 예제 3: 응답 스키마
 from pydantic import BaseModel
 class UserOut(BaseModel):
     id: int
@@ -104,7 +104,7 @@ class UserOut(BaseModel):
     created_at: str   # ISO 8601 문자열
 ```
 
-입력과 출력은 *다른 스키마* — 보통 `In` / `Out` 네이밍.
+입력과 출력은 다른 스키마로 분리합니다. 보통 `In` / `Out` 네이밍을 씁니다.
 
 ### 4단계 — 날짜와 시간대
 
@@ -115,36 +115,36 @@ now = datetime.now(timezone.utc).isoformat()
 print(now)   # "2026-05-04T12:00:00+00:00"
 ```
 
-저장과 전송은 *UTC + ISO 8601*.
+저장과 전송은 UTC + ISO 8601을 기준으로 맞춥니다.
 
 ### 5단계 — 숫자와 통화
 
 ```python
 # 5_money.py
-# 통화는 정수 minor unit 으로 — 1.99 USD = 199 cents
+# 통화는 정수 최소 단위로 표현합니다 — 1.99 USD = 199 cents
 amount = 199
 currency = "USD"
 ```
 
-부동소수는 금액에 *쓰지 않습니다*.
+부동소수는 금액에 쓰지 않습니다.
 
 ## 이 코드에서 주목할 점
 
-- 검증과 핸들러가 *분리* 됩니다.
+- 검증과 핸들러가 분리됩니다.
 - 입력·출력 스키마가 따로 있습니다.
 - 시간은 UTC, 금액은 정수.
 
 ## 자주 하는 실수 5가지
 
-1. **검증을 핸들러 안에서.** 안쪽이 더러워지고, 같은 검사가 반복.
-2. **응답에 내부 모델 그대로 노출.** 내부 변경이 곧 외부 깨짐.
-3. **시간대 무시.** 클라이언트마다 *다른 시간* 으로 해석.
-4. **금액에 float.** 반올림 오차로 1원이 사라짐.
-5. **필드명을 줄임.** `u`, `ct`, `act` — 6개월 후 자기도 못 읽음.
+1. **검증을 핸들러 안에서 합니다.** 안쪽이 더러워지고 같은 검사가 반복됩니다.
+2. **응답에 내부 모델을 그대로 노출합니다.** 내부 변경이 곧 외부 깨짐으로 이어집니다.
+3. **시간대를 무시합니다.** 클라이언트마다 다른 시간으로 해석합니다.
+4. **금액에 float를 씁니다.** 반올림 오차로 1원이 사라집니다.
+5. **필드명을 지나치게 줄입니다.** `u`, `ct`, `act`는 6개월 뒤에 본인도 읽기 어렵습니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대형 API들은 거의 *snake_case*, ISO 8601, 정수 minor unit 통화를 씁니다 (Stripe). 검증은 FastAPI·NestJS 같은 프레임워크가 *데코레이터* 로 자동화합니다 — 스키마가 곧 문서이자 검증이자 타입.
+대형 API들은 거의 snake_case, ISO 8601, 정수 minor unit 통화를 씁니다. Stripe가 대표적인 예입니다. 검증은 FastAPI·NestJS 같은 프레임워크가 데코레이터로 자동화하므로, 스키마가 곧 문서이자 검증이자 타입이 됩니다.
 
 ## 체크리스트
 
@@ -152,7 +152,7 @@ currency = "USD"
 - [ ] 응답 스키마가 입력과 분리되어 있는가?
 - [ ] 시간이 UTC + ISO 8601 인가?
 - [ ] 통화가 정수 minor unit 인가?
-- [ ] 필드명이 *읽힐 만큼* 풀려 있는가?
+- [ ] 필드명이 읽힐 만큼 풀려 있는가?
 
 ## 정리 및 다음 단계
 

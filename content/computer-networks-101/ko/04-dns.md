@@ -18,7 +18,7 @@ tags:
   - 캐싱
   - TTL
 seo_description: 도메인 이름이 IP로 변환되는 과정과 DNS 계층 구조, TTL과 캐싱의 의미를 한 번에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # DNS
@@ -65,7 +65,7 @@ example.com → 어떻게? 모름.
 
 ```bash
 dig example.com +noall +answer
-# example.com.  86400  IN  A  93.184.216.34
+# 출력 예시: example.com.  86400  IN  A  93.184.216.34
 ```
 
 86400(초)은 TTL입니다. 24시간 동안 캐시될 수 있다는 뜻입니다.
@@ -74,9 +74,9 @@ dig example.com +noall +answer
 
 ```bash
 dig example.com +trace
-# .                ← root
-# com.             ← TLD
-# example.com.     ← authoritative
+# .                ← 루트 서버
+# com.             ← TLD 서버
+# example.com.     ← 권한(authoritative) 서버
 ```
 
 resolver가 실제로 거치는 경로를 그대로 봅니다.

@@ -18,7 +18,7 @@ tags:
   - Robustness
   - Reliability
 seo_description: 예외와 반환값의 선택, 빠른 실패, 값으로서의 오류, 재시도 패턴을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 오류 처리
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-오류 처리 코드가 비즈니스 로직보다 길어지면 코드는 더 이상 읽히지 않습니다.
+오류 처리 코드가 비즈니스 로직보다 더 눈에 띄기 시작하면, 그 코드는 이미 읽기 어려워졌다고 봐야 합니다.
 
 > 오류 처리는 일급 시민이지만, 주연이 되어서는 안 된다.
 
@@ -42,7 +42,7 @@ flowchart LR
     L -->|"예측 불가"| E["예외"]
 ```
 
-검증은 위에서, 예외는 통제 불가일 때만.
+입력 검증은 초반에 끝내고, 예외는 정말 예측할 수 없는 상황에만 남겨 두는 편이 좋습니다.
 
 ## Before/After
 
@@ -68,26 +68,26 @@ def fetch(url):
         raise FetchError(f"timeout: {url}") from e
 ```
 
-오류는 의미를 가진 채 위로 전달됩니다.
+오류를 삼키지 말고, 의미를 실어 위쪽 계층으로 전달해야 합니다.
 
 ## 견고한 오류 처리 5단계
 
 ### 1단계 — 빠른 실패
 
 ```python
-# 1_fail_fast.py
+# 예시 파일: 1_fail_fast.py
 def transfer(amount):
     if amount <= 0:
         raise ValueError("amount must be positive")
     ...
 ```
 
-잘못된 입력은 즉시 차단합니다.
+잘못된 입력은 가능한 한 빨리 차단해야 이후 로직이 단순해집니다.
 
 ### 2단계 — 값으로서의 오류
 
 ```python
-# 2_result.py
+# 예시 파일: 2_result.py
 from dataclasses import dataclass
 @dataclass
 class Result:
@@ -100,12 +100,12 @@ def parse_int(s):
     except ValueError as e: return Result(False, error=str(e))
 ```
 
-호출자가 분기할 수 있는 상황은 값으로.
+호출자가 자연스럽게 분기할 수 있는 오류라면 값으로 표현하는 편이 읽기 쉽습니다.
 
 ### 3단계 — 예외 체인
 
 ```python
-# 3_chain.py
+# 예시 파일: 3_chain.py
 class ConfigError(Exception): ...
 
 def load_config(path):
@@ -115,12 +115,12 @@ def load_config(path):
         raise ConfigError(f"missing config: {path}") from e
 ```
 
-`from e`로 원인을 보존합니다.
+`from e`를 사용하면 원래 예외 맥락을 잃지 않을 수 있습니다.
 
 ### 4단계 — 재시도 + 백오프
 
 ```python
-# 4_retry.py
+# 예시 파일: 4_retry.py
 import time, random
 def with_retry(fn, attempts=3):
     for i in range(attempts):
@@ -130,12 +130,12 @@ def with_retry(fn, attempts=3):
             time.sleep((2 ** i) + random.random())
 ```
 
-지수 백오프 + jitter.
+재시도에는 지수 백오프와 지터를 함께 두는 편이 안전합니다.
 
 ### 5단계 — 경계에서만 catch
 
 ```python
-# 5_boundary.py
+# 예시 파일: 5_boundary.py
 def handle_request(req):
     try:
         return business_logic(req)
@@ -145,13 +145,13 @@ def handle_request(req):
         return {"status": 500, "error": "internal"}
 ```
 
-핸들러 같은 외부 경계에서만 광범위 catch.
+광범위한 예외 처리는 핸들러 같은 외부 경계에서만 맡기는 것이 좋습니다.
 
 ## 이 코드에서 주목할 점
 
-- 검증과 처리가 분리되어 있습니다.
-- 도메인 예외 클래스로 의미를 부여합니다.
-- 재시도는 멱등할 때만 안전합니다.
+- 입력 검증과 핵심 처리를 분리하면 본문이 훨씬 읽기 쉬워집니다.
+- 도메인 예외 클래스를 두면 실패 원인을 더 분명하게 전달할 수 있습니다.
+- 재시도는 멱등성이 보장되는 작업에서만 안전합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -163,7 +163,7 @@ def handle_request(req):
 
 ## 실무에서는 이렇게 쓰입니다
 
-API 서버는 핸들러가 경계입니다. 도메인 로직은 예외를 던지고, 핸들러가 HTTP 응답으로 변환합니다. 멱등 작업만 자동 재시도합니다.
+실무에서는 API 핸들러가 대표적인 경계 역할을 합니다. 도메인 로직은 예외를 던지고, 핸들러는 그것을 HTTP 응답으로 변환합니다. 자동 재시도는 멱등 작업에만 제한하는 편이 안전합니다.
 
 ## 체크리스트
 
@@ -175,7 +175,7 @@ API 서버는 핸들러가 경계입니다. 도메인 로직은 예외를 던지
 
 ## 정리 및 다음 단계
 
-오류는 일급 시민으로 다루되 주연은 아닙니다. 다음 글에서는 오해받기 쉬운 도구 — 주석과 문서 — 를 다룹니다.
+오류 처리는 분명 중요하지만, 본문을 집어삼키게 두면 안 됩니다. 다음 글에서는 자주 과하거나 낡기 쉬운 주석과 문서를 어떻게 다뤄야 하는지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [Clean Code란 무엇인가?](./01-what-is-clean-code.md)

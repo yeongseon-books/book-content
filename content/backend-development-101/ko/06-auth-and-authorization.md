@@ -17,7 +17,7 @@ tags:
   - JWT
   - Python
 seo_description: 인증/권한/세션/JWT의 차이를 정리하고 FastAPI에서 안전한 로그인 흐름을 만드는 입문 가이드.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 인증과 권한
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-인증 코드는 *유일하게* 잘못 짜면 회사가 망할 수 있는 영역입니다. 처음에 평문으로 비밀번호를 저장한 한 줄, 처음에 토큰을 검증하지 않은 한 줄이 *수년 후* 사고로 돌아옵니다.
+인증 코드는 잘못 작성했을 때 피해가 가장 큰 영역 중 하나입니다. 평문 비밀번호를 저장한 한 줄, 토큰 검증을 빠뜨린 한 줄이 몇 년 뒤 큰 사고로 돌아올 수 있습니다.
 
-> 인증 코드는 *가장 적은 양으로, 가장 표준적으로* 작성해야 합니다.
+> 인증 코드는 가능하면 짧고, 검증된 표준 위에서 작성하는 편이 안전합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,7 +42,7 @@ flowchart LR
     Authz --> Handler["Handler"]
 ```
 
-인증은 *너 누구야?* 권한은 *그걸 해도 돼?*
+인증은 "너 누구야?"를 묻고, 권한은 "그 행동을 해도 되나?"를 판단합니다.
 
 ## Before/After
 
@@ -66,7 +66,7 @@ def verify(name, password):
     return row and bcrypt.verify(password, row["pw_hash"])
 ```
 
-DB가 유출돼도 비밀번호는 *원문으로 복원되지 않습니다*.
+DB가 유출돼도 비밀번호 원문이 바로 드러나지는 않습니다.
 
 ## 인증 흐름 5단계
 
@@ -137,21 +137,21 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 
 ## 이 코드에서 주목할 점
 
-- 비밀번호는 *절대* 평문으로 저장하지 않습니다.
-- JWT secret은 *절대* 코드에 박지 않습니다 — 환경 변수.
-- 401(미인증)과 403(권한 부족)은 *다른 의미* 입니다.
+- 비밀번호는 절대 평문으로 저장하지 않습니다.
+- JWT secret은 코드에 직접 넣지 말고 환경 변수나 비밀 저장소로 관리합니다.
+- 401(미인증)과 403(권한 부족)은 의미가 다릅니다.
 
 ## 자주 하는 실수 5가지
 
 1. **MD5 / SHA-1로 비밀번호를 해시한다.** bcrypt / argon2를 씁니다.
-2. **JWT의 `exp` 를 안 둔다.** 토큰이 *영원히* 유효해집니다.
-3. **JWT를 localStorage에 저장하고 끝낸다.** XSS에 노출됩니다 — httpOnly 쿠키도 검토합니다.
-4. **권한 체크를 프론트만 한다.** 서버에서 *항상* 다시 확인합니다.
-5. **모든 endpoint를 다 인증으로 막는다.** 공개 endpoint(`/healthz`, `/login`)를 *명시적* 으로 분리합니다.
+2. **JWT의 `exp`를 두지 않는다.** 토큰이 끝없이 유효해집니다.
+3. **JWT를 localStorage에만 저장하고 끝낸다.** XSS에 노출될 수 있으니 httpOnly 쿠키도 함께 검토해야 합니다.
+4. **권한 체크를 프론트에서만 한다.** 서버에서 항상 다시 확인해야 합니다.
+5. **모든 endpoint를 다 인증으로 막는다.** 공개 endpoint(`/healthz`, `/login`)는 명시적으로 분리해야 합니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 SaaS는 *bcrypt + JWT + role-based access* 조합으로 시작합니다. 규모가 커지면 OAuth2(외부 로그인), MFA(다중 인증), permission matrix가 추가되지만 핵심은 동일합니다 — 인증과 권한을 *명확히 분리* 한 코드만 확장됩니다.
+대부분의 SaaS는 bcrypt, JWT, role-based access 조합으로 시작합니다. 규모가 커지면 OAuth2, MFA, permission matrix가 추가되지만 핵심은 같습니다. 인증과 권한을 분리해 둔 코드만 무리 없이 확장됩니다.
 
 ## 체크리스트
 
@@ -163,7 +163,7 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 
 ## 정리 및 다음 단계
 
-인증은 *신원* , 권한은 *행동 허가* 입니다. 다음 글에서는 운영의 눈이 되는 *Logging과 Error Handling* 을 봅니다.
+인증은 신원을 확인하고, 권한은 허용된 행동 범위를 정합니다. 다음 글에서는 운영에서 문제를 읽어내는 Logging과 Error Handling을 봅니다.
 
 <!-- toc:begin -->
 - [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
