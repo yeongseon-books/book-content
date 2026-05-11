@@ -18,7 +18,7 @@ tags:
   - Coordination
   - Liveness
 seo_description: 분산 시스템에서 리더를 안전하게 뽑고 유지하는 방법을 lease, fencing, split-brain 관점으로 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # leader election
@@ -64,7 +64,7 @@ token 한 줄이 split-brain을 막아 줍니다.
 ### 1단계 — lease 기반 election (의사코드)
 
 ```python
-# 1_lease.py
+# 예제 파일: 1_lease.py
 import time
 class Lease:
     def __init__(self, ttl): self.ttl, self.expires = ttl, 0
@@ -80,7 +80,7 @@ class Lease:
 ### 2단계 — heartbeat로 갱신
 
 ```python
-# 2_heartbeat.py
+# 예제 파일: 2_heartbeat.py
 def renew(lease, now):
     lease.expires = now + lease.ttl
 ```
@@ -90,7 +90,7 @@ def renew(lease, now):
 ### 3단계 — fencing token
 
 ```python
-# 3_fence.py
+# 예제 파일: 3_fence.py
 counter = 0
 def grant_leader():
     global counter
@@ -103,7 +103,7 @@ def grant_leader():
 ### 4단계 — 자원 서버의 거부 로직
 
 ```python
-# 4_resource.py
+# 예제 파일: 4_resource.py
 last_token = 0
 def write(token, data):
     global last_token

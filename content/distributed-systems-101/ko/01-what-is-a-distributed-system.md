@@ -18,7 +18,7 @@ tags:
   - Failure
   - Coordination
 seo_description: 여러 컴퓨터가 하나처럼 동작하기 위해 필요한 latency, failure, coordination의 세 축을 처음부터 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 분산 시스템이란 무엇인가?
@@ -66,7 +66,7 @@ flowchart LR
 ### 1단계 — 단일 프로세스 함수 호출
 
 ```python
-# 1_local.py
+# 예제 파일: 1_local.py
 def add(a, b):
     return a + b
 
@@ -78,8 +78,8 @@ print(add(1, 2))  # 3, 즉시
 ### 2단계 — 같은 머신, 다른 프로세스 (HTTP)
 
 ```python
-# 2_local_http.py
-# pip install fastapi uvicorn requests
+# 예제 파일: 2_local_http.py
+# 필요 패키지 설치: pip install fastapi uvicorn requests
 # 서버
 from fastapi import FastAPI
 app = FastAPI()
@@ -89,7 +89,7 @@ def add(a: int, b: int): return {"r": a + b}
 ```
 
 ```python
-# 2_client.py
+# 예제 파일: 2_client.py
 import requests
 print(requests.get("http://127.0.0.1:8001/add", params={"a":1,"b":2}, timeout=1).json())
 ```
@@ -99,9 +99,9 @@ print(requests.get("http://127.0.0.1:8001/add", params={"a":1,"b":2}, timeout=1)
 ### 3단계 — 서버를 죽여 보기
 
 ```bash
-# 서버를 ctrl+c로 죽인 뒤
+# 서버를 ctrl+c로 종료한 뒤
 python3 2_client.py
-# requests.exceptions.ConnectionError
+# 발생 예외: requests.exceptions.ConnectionError
 ```
 
 호출자 코드는 서버 상태를 모릅니다. 단일 머신에서 본 적 없는 종류의 에러입니다.
@@ -118,7 +118,7 @@ def slow():
 
 ```python
 requests.get("http://127.0.0.1:8001/slow", timeout=1)
-# requests.exceptions.ReadTimeout
+# 발생 예외: requests.exceptions.ReadTimeout
 ```
 
 timeout 없이 호출하면 5초간 막힙니다. 분산에서는 timeout이 선택이 아니라 의무입니다.
@@ -126,7 +126,7 @@ timeout 없이 호출하면 5초간 막힙니다. 분산에서는 timeout이 선
 ### 5단계 — 두 노드 사이 시계 차이
 
 ```python
-# 5_clock.py
+# 예제 파일: 5_clock.py
 import time
 print("server time:", time.time())
 # 다른 머신에서도 같은 코드를 실행하면

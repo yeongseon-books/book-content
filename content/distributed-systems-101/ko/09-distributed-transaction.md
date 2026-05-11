@@ -18,7 +18,7 @@ tags:
   - Saga
   - Idempotency
 seo_description: 분산 트랜잭션의 어려움과 2PC, Saga, idempotent 연산이라는 현실적 해법을 짧은 코드로 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # distributed transaction
@@ -66,7 +66,7 @@ coordinator가 두 서비스에 prepare를 보내고, 모두 yes일 때만 commi
 ### 1단계 — 단일 DB 트랜잭션
 
 ```python
-# 1_single.py
+# 예제 파일: 1_single.py
 import sqlite3
 db = sqlite3.connect(":memory:")
 db.execute("CREATE TABLE acct(id TEXT, bal INT)")
@@ -118,10 +118,10 @@ saga()
 
 ```python
 # 4_outbox.py (의사코드)
-# 한 트랜잭션 안에서:
-#   INSERT INTO orders ...
-#   INSERT INTO outbox(event=...) VALUES (...)
-# 별도 worker가 outbox를 읽어 message broker에 발행
+# 한 트랜잭션 안에서 처리합니다:
+#   orders 테이블에 INSERT 합니다
+#   outbox(event=...)에도 INSERT 합니다
+# 별도 worker가 outbox를 읽어 message broker에 발행합니다
 ```
 
 DB 쓰기와 메시지 발행을 같은 트랜잭션에 묶어 dual-write 문제를 피합니다.

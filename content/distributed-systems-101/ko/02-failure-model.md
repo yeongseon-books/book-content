@@ -18,7 +18,7 @@ tags:
   - Byzantine
   - Reliability
 seo_description: 분산 시스템에서 노드와 네트워크가 깨지는 방식을 crash, omission, byzantine 모델로 분류해 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # failure model
@@ -65,7 +65,7 @@ byzantine 가정 → BFT (수십 배 비쌈)
 ### 1단계 — crash 모사
 
 ```python
-# 1_crash.py
+# 예제 파일: 1_crash.py
 import os, sys
 def handler():
     print("doing work")
@@ -78,7 +78,7 @@ handler()
 ### 2단계 — omission 모사
 
 ```python
-# 2_omission.py
+# 예제 파일: 2_omission.py
 import random
 def send(msg):
     if random.random() < 0.1:
@@ -104,7 +104,7 @@ def handle(req):
 ### 4단계 — byzantine 모사
 
 ```python
-# 4_byzantine.py
+# 예제 파일: 4_byzantine.py
 def vote(question):
     # 노드가 거짓말을 한다
     real_answer = compute(question)
@@ -116,7 +116,7 @@ def vote(question):
 ### 5단계 — network partition 모사
 
 ```bash
-# 5_partition.sh (linux)
+# 예제 파일: 5_partition.sh (linux)
 # 두 IP 사이 트래픽을 막아 partition을 만든다
 sudo iptables -A INPUT -s 10.0.0.5 -j DROP
 sudo iptables -A OUTPUT -d 10.0.0.5 -j DROP

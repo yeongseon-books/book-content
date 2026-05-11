@@ -18,7 +18,7 @@ tags:
   - Async
   - Idempotency
 seo_description: 노드 간 통신의 두 모델인 RPC와 message passing의 차이, 장단점, 사용 시점을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # RPC와 message passing
@@ -68,7 +68,7 @@ A는 메시지만 던지고 끝, 처리는 비동기로 D가 따라감
 ### 1단계 — RPC (FastAPI)
 
 ```python
-# 1_rpc_server.py
+# 예제 파일: 1_rpc_server.py
 from fastapi import FastAPI
 app = FastAPI()
 @app.post("/charge")
@@ -78,7 +78,7 @@ def charge(amount: int):
 ```
 
 ```python
-# 1_rpc_client.py
+# 예제 파일: 1_rpc_client.py
 import requests
 r = requests.post("http://127.0.0.1:8000/charge", json={"amount": 100}, timeout=2)
 print(r.json())
@@ -89,7 +89,7 @@ print(r.json())
 ### 2단계 — Message passing (간단한 in-memory queue)
 
 ```python
-# 2_queue.py
+# 예제 파일: 2_queue.py
 from queue import Queue
 import threading, time
 
@@ -137,7 +137,7 @@ def order():
 ### 5단계 — 전달 보장
 
 ```python
-# 5_dedup.py
+# 예제 파일: 5_dedup.py
 seen = set()
 def consume(msg):
     if msg["id"] in seen:

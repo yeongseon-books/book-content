@@ -18,7 +18,7 @@ tags:
   - Linearizability
   - Eventual Consistency
 seo_description: 분산 데이터의 consistency 모델과 CAP 정리, PACELC까지 읽는 법을 한 장에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # consistency와 CAP
@@ -64,7 +64,7 @@ flowchart LR
 ### 1단계 — single node (linearizable의 기준)
 
 ```python
-# 1_single.py
+# 예제 파일: 1_single.py
 from collections import deque
 log = []
 def write(x): log.append(x)
@@ -76,7 +76,7 @@ def read(): return log[-1] if log else None
 ### 2단계 — async replica (eventual)
 
 ```python
-# 2_eventual.py
+# 예제 파일: 2_eventual.py
 import threading, time
 primary = []
 replica = []
@@ -120,7 +120,7 @@ def write(x):
 ### 5단계 — causal 흉내 (vector clock 한 줄)
 
 ```python
-# 5_vector.py
+# 예제 파일: 5_vector.py
 clock = {"A":0, "B":0}
 def tick(node): clock[node] += 1
 def happens_before(a, b):

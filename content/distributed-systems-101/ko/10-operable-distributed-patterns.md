@@ -18,7 +18,7 @@ tags:
   - Backpressure
   - Observability
 seo_description: 분산 시스템을 운영 가능하게 만드는 핵심 패턴 - 격벽, 회로 차단기, 백프레셔, 관측성을 한 화면에 묶어 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 운영 가능한 분산 시스템 패턴
@@ -65,7 +65,7 @@ flowchart LR
 ### 1단계 — timeout
 
 ```python
-# 1_timeout.py
+# 예제 파일: 1_timeout.py
 import requests
 def call():
     return requests.get("https://api.example.com/x", timeout=2.0)
@@ -76,7 +76,7 @@ timeout 없는 호출은 운영 사고의 가장 흔한 원인입니다.
 ### 2단계 — exponential backoff + jitter
 
 ```python
-# 2_backoff.py
+# 예제 파일: 2_backoff.py
 import time, random
 def with_retry(fn, retries=4):
     for i in range(retries):
@@ -91,7 +91,7 @@ jitter가 없으면 모든 클라이언트가 같은 시점에 재시도해 upst
 ### 3단계 — circuit breaker (간단)
 
 ```python
-# 3_breaker.py
+# 예제 파일: 3_breaker.py
 import time
 class Breaker:
     def __init__(self, threshold=5, cool=10):
@@ -125,7 +125,7 @@ pool_search  = ConnectionPool(size=10)
 ### 5단계 — backpressure
 
 ```python
-# 5_backpressure.py
+# 예제 파일: 5_backpressure.py
 from collections import deque
 q, MAX = deque(), 100
 def enqueue(msg):

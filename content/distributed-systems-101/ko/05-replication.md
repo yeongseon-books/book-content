@@ -18,7 +18,7 @@ tags:
   - QuorumWrites
   - Durability
 seo_description: leader/follower, multi-leader, leaderless, sync, quorum 모델을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # replication
@@ -72,7 +72,7 @@ slower write, near-zero loss, linearizable read 가능
 ### 1단계 — async leader-follower
 
 ```python
-# 1_async.py
+# 예제 파일: 1_async.py
 import threading, time
 leader = []
 follower = []
@@ -97,7 +97,7 @@ write가 두 노드를 다 거쳐야 끝납니다. latency는 늘지만 손실�
 ### 3단계 — quorum write
 
 ```python
-# 3_quorum.py
+# 예제 파일: 3_quorum.py
 nodes = [[], [], []]   # N=3
 def write(x, w=2):
     acks = 0
