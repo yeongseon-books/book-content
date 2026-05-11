@@ -9,6 +9,7 @@ Checks:
 - Per-series schema: either articles or episodes list exists
 - Per-series articles/episodes structure is valid
 """
+
 from __future__ import annotations
 
 import sys
@@ -56,11 +57,13 @@ def main() -> int:
             errors.append(f"{sid}: path '{path_str}' does not exist (status={status})")
             continue
 
-        if series_path.is_dir():
+        if series_path.is_dir() and status != "planned":
             for lang in languages:
                 lang_dir = series_path / lang
                 if not lang_dir.is_dir():
-                    errors.append(f"{sid}: language '{lang}' listed but '{path_str}/{lang}/' missing")
+                    errors.append(
+                        f"{sid}: language '{lang}' listed but '{path_str}/{lang}/' missing"
+                    )
 
         if targets.get("medium") and "en" not in languages:
             errors.append(f"{sid}: targets.medium=true but 'en' not in languages")
@@ -70,13 +73,17 @@ def main() -> int:
             per_series_path = series_path / "series.yaml"
             if per_series_path.is_file():
                 try:
-                    per_series = yaml.safe_load(per_series_path.read_text(encoding="utf-8"))
+                    per_series = yaml.safe_load(
+                        per_series_path.read_text(encoding="utf-8")
+                    )
                     articles = per_series.get("articles")
                     episodes = per_series.get("episodes")
 
                     # Check that at least one exists
                     if not articles and not episodes:
-                        errors.append(f"{sid}: series.yaml missing both 'articles' and 'episodes' lists")
+                        errors.append(
+                            f"{sid}: series.yaml missing both 'articles' and 'episodes' lists"
+                        )
                     # If articles exists, validate it's a non-empty list with valid items
                     elif articles:
                         if not isinstance(articles, list):
@@ -86,10 +93,17 @@ def main() -> int:
                         else:
                             for i, article in enumerate(articles):
                                 if not isinstance(article, dict):
-                                    errors.append(f"{sid}: articles[{i}] must be a dict")
+                                    errors.append(
+                                        f"{sid}: articles[{i}] must be a dict"
+                                    )
                                     continue
-                                if "slug" not in article or not str(article.get("slug", "")).strip():
-                                    errors.append(f"{sid}: articles[{i}] missing or empty 'slug'")
+                                if (
+                                    "slug" not in article
+                                    or not str(article.get("slug", "")).strip()
+                                ):
+                                    errors.append(
+                                        f"{sid}: articles[{i}] missing or empty 'slug'"
+                                    )
                     # If episodes exists, validate it's a non-empty list with valid items
                     elif episodes:
                         if not isinstance(episodes, list):
@@ -99,10 +113,17 @@ def main() -> int:
                         else:
                             for i, episode in enumerate(episodes):
                                 if not isinstance(episode, dict):
-                                    errors.append(f"{sid}: episodes[{i}] must be a dict")
+                                    errors.append(
+                                        f"{sid}: episodes[{i}] must be a dict"
+                                    )
                                     continue
-                                if "slug" not in episode or not str(episode.get("slug", "")).strip():
-                                    errors.append(f"{sid}: episodes[{i}] missing or empty 'slug'")
+                                if (
+                                    "slug" not in episode
+                                    or not str(episode.get("slug", "")).strip()
+                                ):
+                                    errors.append(
+                                        f"{sid}: episodes[{i}] missing or empty 'slug'"
+                                    )
                 except yaml.YAMLError as e:
                     errors.append(f"{sid}: series.yaml YAML parse error: {e}")
             elif status != "planned":
@@ -113,7 +134,9 @@ def main() -> int:
             print(f"ERROR: {e}", file=sys.stderr)
         return 1
 
-    print(f"OK: {len(catalog['series'])} series validated (root meta + per-series schema)")
+    print(
+        f"OK: {len(catalog['series'])} series validated (root meta + per-series schema)"
+    )
     return 0
 
 
