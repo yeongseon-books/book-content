@@ -17,7 +17,7 @@ tags:
   - 인스턴스
   - 생성자
 seo_description: Python 클래스의 생성자, 인스턴스 메서드, 특수 메서드를 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 클래스와 인스턴스

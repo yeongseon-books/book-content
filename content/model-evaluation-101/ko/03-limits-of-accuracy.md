@@ -17,7 +17,7 @@ tags:
   - BaselineModel
   - scikit-learn
 seo_description: Accuracy가 불균형 데이터에서 무력해지는 이유와 베이스레이트·더미 모델·균형 정확도의 의미를 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Accuracy의 한계
@@ -89,14 +89,14 @@ print(classification_report(yte, pred))
 ## 이 코드에서 주목할 점
 
 - *Dummy 95%* 가 *베이스라인*.
-- *Balanced Accuracy* 가 *진실* 에 더 가깝다.
-- *클래스별* *recall* 이 *진짜 약점* 을 보여줌.
+- Balanced Accuracy가 실제 상황에 더 가깝습니다.
+- 클래스별 recall이 모델의 진짜 약점을 보여 줍니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***Dummy* 비교 없이 *우월* 주장.**
+1. **Dummy 비교 없이 우월하다고 주장합니다.**
 2. ***Top-1 Accuracy* 만 *멀티클래스* 에 사용.**
-3. ***Accuracy* 만 *불균형* 에 사용.**
+3. **Accuracy만 불균형 데이터에 사용합니다.**
 4. ***리샘플링* 후 *Accuracy* 비교.**
 5. ***리포트 표* 의 *작은 클래스* 무시.**
 
@@ -113,7 +113,7 @@ print(classification_report(yte, pred))
 
 ## 정리 및 다음 단계
 
-Accuracy 는 *전제* 가 깨지면 *무용지물* 입니다. 다음 글에서는 *Precision과 Recall* 로 *불균형 평가* 를 다룹니다.
+Accuracy는 전제가 깨지면 무용지물입니다. 다음 글에서는 Precision과 Recall로 불균형 평가를 다룹니다.
 
 <!-- toc:begin -->
 - [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)

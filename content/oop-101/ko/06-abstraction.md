@@ -17,7 +17,7 @@ tags:
   - ABC
   - 인터페이스
 seo_description: Python ABC를 활용한 추상 클래스 설계와 인터페이스 정의 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 추상화

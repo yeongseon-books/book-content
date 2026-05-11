@@ -17,7 +17,7 @@ tags:
   - Observability
   - DataScience
 seo_description: 운영 중인 ML 모델의 지연시간·에러율·예측 분포를 메트릭으로 관찰하는 패턴과 도구를 코드로 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 모델 모니터링
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*정확도* 만 보면 *늦습니다*. *지연시간* / *에러율* / *입력 분포* 가 먼저 흔들립니다.
+정확도만 보면 늦습니다. 지연시간, 에러율, 입력 분포가 먼저 흔들립니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,7 +42,7 @@ flowchart LR
 
 **Before**: *사용자 신고* 로 *사고 인지*.
 
-**After**: *알림* 이 *팀 채널* 로 자동.
+**After**: 알림이 팀 채널로 자동 전송됩니다.
 
 ## FastAPI에 Prometheus 메트릭 붙이기
 
@@ -104,8 +104,8 @@ groups:
 
 ## 이 코드에서 주목할 점
 
-- *`/metrics` 엔드포인트* 는 *Prometheus* 가 *주기적* 으로 긁어감.
-- *Histogram* 은 *분위수* 계산 가능.
+- `/metrics` 엔드포인트는 Prometheus가 주기적으로 수집합니다.
+- Histogram으로 분위수를 계산할 수 있습니다.
 - *Label* 로 *분류 분포* 추적.
 
 ## 자주 하는 실수 5가지
@@ -125,11 +125,11 @@ groups:
 - [ ] `/metrics` 엔드포인트.
 - [ ] *지연시간 + 에러율* 알림.
 - [ ] *예측 분포* 카운터.
-- [ ] *런북* 링크.
+- [ ] 런북 링크가 있다.
 
 ## 정리 및 다음 단계
 
-모니터링은 *Drift* 감지의 *전제* 입니다. 다음 글은 *Data Drift / Model Drift* 로 *예측 분포 변화* 를 다룹니다.
+모니터링은 Drift 감지의 전제입니다. 다음 글은 Data Drift / Model Drift로 예측 분포 변화를 다룹니다.
 
 <!-- toc:begin -->
 - [MLOps란 무엇인가?](./01-what-is-mlops.md)

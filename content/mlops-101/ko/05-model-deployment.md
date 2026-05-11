@@ -17,7 +17,7 @@ tags:
   - Docker
   - DataScience
 seo_description: 학습한 모델을 FastAPI와 Docker로 묶어 안전하게 배포하는 패턴과 주의점을 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 모델 배포
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*배포가 어렵다* 는 말은 *환경 차이* 와 *롤백 부재* 때문입니다. *컨테이너* 와 *점진적 전환* 이 그 답입니다.
+배포가 어려운 이유는 환경 차이와 롤백 부재에 있습니다. 컨테이너와 점진적 전환이 그 문제를 줄여 줍니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *노트북* 에서 *predict* 를 직접 호출.
+**Before**: 노트북에서 `predict`를 직접 호출합니다.
 
-**After**: *컨테이너* 가 *HTTP 엔드포인트* 를 노출.
+**After**: 컨테이너가 HTTP 엔드포인트를 노출합니다.
 
 ## FastAPI로 모델 서빙
 
@@ -108,7 +108,7 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x"
 
 - *모델 로드* 는 *시작 시 1회*.
 - *Pydantic* 으로 *입력 검증*.
-- *헬스체크* 가 *오케스트레이터* 와 통신.
+- 헬스체크가 오케스트레이터와 통신합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -120,18 +120,18 @@ curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x"
 
 ## 실무에서는 이렇게 쓰입니다
 
-*추천 모델* 은 *FastAPI + Docker + Kubernetes*. *주간 리포트* 는 *배치 잡*. *실시간 광고* 는 *스트리밍*.
+추천 모델은 FastAPI + Docker + Kubernetes 조합으로 운영합니다. 주간 리포트는 배치 잡으로 돌리고, 실시간 광고는 스트리밍으로 처리합니다.
 
 ## 체크리스트
 
 - [ ] *Dockerfile* 이 있다.
-- [ ] *헬스체크* 엔드포인트.
+- [ ] 헬스체크 엔드포인트가 있다.
 - [ ] *입력 스키마* 검증.
 - [ ] *롤백 계획* 문서.
 
 ## 정리 및 다음 단계
 
-배포는 *시작* 일 뿐, *모니터링* 이 *진짜 시작* 입니다. 다음 글은 *모델 모니터링* 으로 *운영 중 모델* 을 *관찰* 합니다.
+배포는 시작일 뿐이고, 모니터링이 진짜 운영의 출발점입니다. 다음 글은 모델 모니터링으로 운영 중 모델을 관찰합니다.
 
 <!-- toc:begin -->
 - [MLOps란 무엇인가?](./01-what-is-mlops.md)

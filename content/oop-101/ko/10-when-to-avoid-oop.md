@@ -17,7 +17,7 @@ tags:
   - dataclass
   - 설계 판단
 seo_description: 객체지향이 적합하지 않은 상황과 대안적 접근 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 객체지향을 언제 피해야 할까?

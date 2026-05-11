@@ -17,7 +17,7 @@ tags:
   - 메서드 오버라이딩
   - super
 seo_description: Python 상속의 기본 구조, 메서드 오버라이딩, super() 활용법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 상속

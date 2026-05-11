@@ -17,7 +17,7 @@ tags:
   - Reproducibility
   - DataScience
 seo_description: 실험 메타데이터·파라미터·메트릭·아티팩트를 기록해 재현 가능한 ML 실험 관리를 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 실험 관리
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*노트북 폴더* 가 *진실의 출처* 가 되면 *팀 협업* 이 *깨집니다*. *실험 추적기* 는 *공유 메모리* 입니다.
+노트북 폴더가 진실의 출처가 되면 팀 협업이 깨집니다. 실험 추적기는 팀의 공유 메모리 역할을 합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *파일명 “v3_final2.pkl”* 의 *카오스*.
+**Before**: 파일명 `v3_final2.pkl` 같은 식으로 버전이 뒤섞입니다.
 
 **After**: *runs 테이블* + *MLflow UI* 비교.
 
@@ -51,7 +51,7 @@ flowchart LR
 ### 1단계 — 설치 가정과 트래커 시작
 
 ```python
-# pip install mlflow
+# mlflow 설치
 import mlflow
 mlflow.set_tracking_uri("file:./mlruns")
 mlflow.set_experiment("demo")
@@ -107,13 +107,13 @@ for r in runs[:3]:
 
 - *with* 블록이 *Run 경계*.
 - *Param/Metric* 은 *키-값*.
-- *Artifact* 는 *파일* 그대로 저장.
+- Artifact는 파일 그대로 저장합니다.
 
 ## 자주 하는 실수 5가지
 
 1. ***성공한 Run* 만 기록.**
 2. ***데이터 버전* 누락.**
-3. ***Param/Metric* 키 이름 *불일치*.**
+3. **Param/Metric 키 이름이 제각각입니다.**
 4. ***로컬 mlruns* 만 사용 → *공유 불가*.**
 5. ***비교* 없이 *수동 결정*.**
 
@@ -126,7 +126,7 @@ for r in runs[:3]:
 - [ ] *모든 학습* 이 *Run* 으로 기록.
 - [ ] *데이터/코드 버전* 포함.
 - [ ] *공유 트래킹 서버* 사용.
-- [ ] *비교 화면* 으로 *결정*.
+- [ ] 비교 화면을 보고 결정합니다.
 
 ## 정리 및 다음 단계
 

@@ -17,7 +17,7 @@ tags:
   - 덕 타이핑
   - 프로토콜
 seo_description: Python에서 다형성을 구현하는 방법과 덕 타이핑, 프로토콜을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 다형성

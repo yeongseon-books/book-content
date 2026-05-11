@@ -17,7 +17,7 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: train/validation/test의 역할 분리, 데이터 누수와 누설 방지, 시계열 분할까지 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # train/validation/test
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*잘못된 분할* = *측정 무효*. *모든 모델 비교* 가 *오해* 가 됩니다.
+잘못된 분할은 측정을 무효로 만들고, 모든 모델 비교를 오해로 바꿉니다.
 
 ## 전체 흐름
 ```mermaid
@@ -60,8 +60,8 @@ print(Xtr.shape, Xva.shape, Xte.shape)
 
 ```python
 from sklearn.preprocessing import StandardScaler
-sc_bad = StandardScaler().fit(X)  # leak: full data
-sc_ok = StandardScaler().fit(Xtr)  # correct
+sc_bad = StandardScaler().fit(X)  # 누수: 전체 데이터 사용
+sc_ok = StandardScaler().fit(Xtr)  # 올바른 방식
 ```
 
 ### 3단계 — 시계열 분할
@@ -96,15 +96,15 @@ print("valid:", m.score(sc.transform(Xva), yva))
 ## 이 코드에서 주목할 점
 
 - *전체에 fit* 하면 *통계 누수*.
-- *시계열* 은 *시간 순서* 유지.
-- *그룹* 은 *동일 ID* 분리.
+- 시계열 데이터는 시간 순서를 유지해야 합니다.
+- 그룹 분할은 동일 ID를 분리합니다.
 
 ## 자주 하는 실수 5가지
 
 1. ***test 로 튜닝*.**
 2. ***시계열 무작위 분할*.**
 3. ***그룹 누수* 방치.**
-4. ***스케일러* 를 *전체* 에 fit.**
+4. **스케일러를 전체 데이터에 fit합니다.**
 5. ***valid 없이* *test 로* *반복 비교*.**
 
 ## 실무에서는 이렇게 쓰입니다
@@ -114,9 +114,9 @@ print("valid:", m.score(sc.transform(Xva), yva))
 ## 체크리스트
 
 - [ ] *세 분할* 을 사용한다.
-- [ ] *전처리* 는 *분할 후* fit.
-- [ ] *시계열* 은 *시간 분할*.
-- [ ] *그룹* 을 *명시*.
+- [ ] 전처리는 분할 후에 fit합니다.
+- [ ] 시계열 데이터는 시간 기준으로 분할합니다.
+- [ ] 그룹 정보를 명시합니다.
 
 ## 정리 및 다음 단계
 

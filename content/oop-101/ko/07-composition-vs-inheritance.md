@@ -17,7 +17,7 @@ tags:
   - 상속
   - 설계 패턴
 seo_description: 합성과 상속의 차이를 비교하고 실무에서의 올바른 선택 기준을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 합성과 상속

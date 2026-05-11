@@ -17,7 +17,7 @@ tags:
   - 리팩터링
   - 클래스 설계
 seo_description: OOP 원칙을 적용한 실전 설계 예제로 주문 처리 시스템을 구현합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 객체지향 설계 예제

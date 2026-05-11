@@ -17,7 +17,7 @@ tags:
   - Reproducibility
   - DataScience
 seo_description: DVC·git-LFS·해시 기반 스냅샷으로 ML 파이프라인의 데이터 버전 관리를 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 데이터 버전 관리
@@ -42,7 +42,7 @@ flowchart LR
 
 **Before**: *data_v3_final.csv* 가 *팀원 PC 에만* 존재.
 
-**After**: *git pull && dvc pull* 로 *어디서나* 동일한 데이터.
+**After**: `git pull && dvc pull`만으로 어디서나 같은 데이터를 받습니다.
 
 ## 5단계 DVC 흐름
 
@@ -57,11 +57,11 @@ df.to_csv("data.csv", index=False)
 ### 2단계 — DVC 초기화 (가정)
 
 ```bash
-# pip install dvc
-# git init && dvc init
-# dvc add data.csv
-# git add data.csv.dvc .gitignore
-# git commit -m "track data v1"
+# dvc 설치
+# git 저장소와 dvc 초기화
+# data.csv 추적 시작
+# 포인터 파일과 .gitignore 스테이징
+# 데이터 v1 추적 커밋
 ```
 
 ### 3단계 — 해시 포인터 흉내
@@ -106,7 +106,7 @@ print("changed:", new_h != h)
 1. ***대용량 데이터* 를 *git* 에 직접 commit.**
 2. ***Remote* 미설정 → *동료 재현 불가*.**
 3. ***데이터 변경* 을 *commit* 으로 기록 안 함.**
-4. ***DVC stage* 의 *입출력* 누락.**
+4. **DVC stage의 입출력을 빼먹습니다.**
 5. ***모델* 도 *DVC* 로 추적해야 함을 잊음.**
 
 ## 실무에서는 이렇게 쓰입니다
@@ -117,12 +117,12 @@ print("changed:", new_h != h)
 
 - [ ] *데이터 파일* 이 *DVC/LFS* 로 추적된다.
 - [ ] *Remote* 가 설정되어 있다.
-- [ ] *모델* 도 추적된다.
+- [ ] 모델도 추적됩니다.
 - [ ] *재현 명령* 이 문서화된다.
 
 ## 정리 및 다음 단계
 
-데이터 버전이 *재현* 의 *전제* 입니다. 다음 글은 *학습 파이프라인* 으로 *자동화* 를 다룹니다.
+데이터 버전은 재현의 전제입니다. 다음 글은 학습 파이프라인으로 자동화를 다룹니다.
 
 <!-- toc:begin -->
 - [MLOps란 무엇인가?](./01-what-is-mlops.md)

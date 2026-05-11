@@ -17,7 +17,7 @@ tags:
   - 설계 원칙
   - 클린 코드
 seo_description: SOLID 5가지 원칙을 Python 예제로 설명하고 실무 적용법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # SOLID 원칙 기초
@@ -204,7 +204,7 @@ from typing import Protocol
 
 
 # 위반: 모든 기능을 하나의 인터페이스에
-# class Worker(Protocol):
+# 예시: Worker 인터페이스를 하나로 몰아넣은 경우
 #     def code(self) -> str: ...
 #     def test(self) -> str: ...
 #     def design(self) -> str: ...  # 개발자에게 불필요

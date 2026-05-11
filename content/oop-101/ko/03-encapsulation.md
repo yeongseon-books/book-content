@@ -17,7 +17,7 @@ tags:
   - Property
   - 정보 은닉
 seo_description: Python에서 캡슐화를 구현하는 방법과 property를 활용한 접근 제어를 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 캡슐화

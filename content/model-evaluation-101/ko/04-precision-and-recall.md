@@ -17,7 +17,7 @@ tags:
   - ConfusionMatrix
   - scikit-learn
 seo_description: Precision과 Recall의 의미·트레이드오프와 혼동 행렬·임계값 조정·PR 커브를 코드와 함께 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Precision과 Recall
@@ -91,7 +91,7 @@ print("AP:", average_precision_score(yte, proba))
 
 ## 이 코드에서 주목할 점
 
-- *임계값* 은 *학습 후* 조정 가능한 *핵심 손잡이*.
+- 임계값은 학습 후에 조정할 수 있는 핵심 손잡이입니다.
 - *Precision* 과 *Recall* 은 *대개 반대 방향*.
 - *AP* 는 *임계값 무관* 한 *요약 지표*.
 
@@ -99,18 +99,18 @@ print("AP:", average_precision_score(yte, proba))
 
 1. ***Recall* 만 보고 *FP 폭증* 을 무시.**
 2. ***Precision* 만 보고 *놓친 양성* 을 무시.**
-3. ***임계값 0.5* 를 *고정* 으로 가정.**
+3. **임계값 0.5를 고정값으로 가정합니다.**
 4. ***불균형* 에서 *ROC* 만 보고 *PR* 무시.**
 5. ***비즈니스 비용* 무시한 *지표 최적화*.**
 
 ## 실무에서는 이렇게 쓰입니다
 
-*사기 탐지* — *Recall* 우선. *광고 추천* — *Precision* 우선. *비용* 이 *임계값* 을 정합니다.
+사기 탐지에서는 Recall을 우선하고, 광고 추천에서는 Precision을 우선합니다. 결국 비용이 임계값을 정합니다.
 
 ## 체크리스트
 
-- [ ] *Precision* 과 *Recall* 을 *함께* 본다.
-- [ ] *임계값* 을 명시한다.
+- [ ] Precision과 Recall을 함께 봅니다.
+- [ ] 임계값을 명시합니다.
 - [ ] *PR 커브* 와 *AP* 를 본다.
 - [ ] *비즈니스 비용* 을 검토한다.
 
