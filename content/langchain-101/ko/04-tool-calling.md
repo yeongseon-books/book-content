@@ -14,131 +14,418 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-06'
+last_reviewed: '2026-05-11'
 seo_description: LangChain Tool Calling으로 LLM이 함수를 호출하고 결과를 받아 답하는 방법을 정리합니다
 ---
 
 # Tool Calling — 외부 도구 연결하기
 
-> LangChain 101 시리즈 (4/6)
+LLM은 텍스트를 잘 만듭니다. 하지만 계산, 현재 시각 조회, 데이터베이스 질의, 외부 API 호출은 텍스트 생성만으로 끝나지 않습니다. 그래서 실제 애플리케이션에서는 모델이 모든 일을 "알아서" 하는 것이 아니라, **무엇을 물어봐야 할지 판단하는 역할**을 맡고, 실제 실행은 애플리케이션의 함수나 도구가 담당하게 됩니다.
+
+Tool Calling은 바로 그 경계를 명확히 해 줍니다. 모델은 Python 코드를 직접 실행하는 것이 아니라, 어떤 함수를 어떤 인자로 호출하고 싶은지 구조화된 요청을 내보냅니다. 그 요청을 실행하고 결과를 다시 대화에 넣는 것은 여전히 애플리케이션의 책임입니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
-*LLM* 만으로는 *계산*, *DB 조회*, *외부 API* 호출이 *어렵습니다*. *Tool Calling* 은 *모델* 의 *판단* 과 *결정적* *함수 실행* 을 *연결* 합니다.
+- Tool Calling은 일반 프롬프트 체인과 무엇이 다를까요?
+- `@tool`과 타입 힌트는 모델에게 어떤 실행 계약을 노출할까요?
+- `bind_tools()` 이후에도 애플리케이션이 직접 책임져야 할 루프는 무엇일까요?
+- 도구 사용 성공률을 운에 맡기지 않고 높이려면 무엇을 신경 써야 할까요?
+- 어디까지 자동화하고 어디서 멈춰야 안전할까요?
 
-## 전체 흐름
-```mermaid
-flowchart LR
-    Q[Question] --> L[LLM]
-    L --> T["AIMessage.tool_calls"]
-    T --> F[Function]
-    F --> M[ToolMessage]
-    M --> L2[LLM]
-    L2 --> A[Final Answer]
+> Tool Calling이 잘 작동하려면, 모델이 직접 일을 하는 척하는 대신 어떤 실제 함수를 호출해야 하는지 판단하도록 만들어야 합니다.
+
+![이 글에서 답할 질문](../../../assets/langchain-101/04/04-01-questions-this-post-answers.ko.png)
+
+*이 글에서 답할 질문*
+
+## 최소 실행 예제
+
+```python
+import os
+
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def add_numbers(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
+print(response.tool_calls)
 ```
 
-## Before/After
+<!-- injected-output:start -->
+**Output**
 
-**Before**: "*LLM* 답변 *문자열* 을 *정규식* 으로 *파싱* 해 *함수* 를 *호출* 합니다."
+    [{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '0r7b2zrqg', 'type': 'tool_call'}]
 
-**After**: "*모델* 이 *구조화* 된 *tool_calls* 를 *반환* 하고 *그대로* *실행* 합니다."
+<!-- injected-output:end -->
 
-## Tool Calling 5단계
+이 결과를 보면 핵심이 분명합니다. 모델은 `42`를 바로 출력한 것이 아니라, `add_numbers(a=13, b=29)`를 호출하겠다는 구조화된 요청을 보냈습니다. **도구 메타데이터를 보고 함수 호출 계획을 세운 것**이지, 함수를 실제로 실행한 것이 아닙니다.
 
-### 1단계 — Tool 두 개 정의
+## 이 코드에서 먼저 볼 점
+
+- 도구 이름, 설명, 입력 스키마는 함수 시그니처와 docstring에서 나옵니다.
+- `bind_tools()`는 도구를 모델에 노출할 뿐, 자동 실행해 주지 않습니다.
+- 응답에 `tool_calls`가 보이는 순간부터 애플리케이션 루프가 시작됩니다.
+- 개념적으로 보면 Tool Calling도 결국 메시지 왕복이 한 번 더 들어가는 구조입니다.
+
+## 엔지니어가 여기서 자주 헷갈리는 지점
+
+- 도구를 바인딩했다고 해서 함수가 자동으로 실행되지는 않습니다.
+- 약한 docstring과 애매한 타입 힌트는 도구 선택 품질을 떨어뜨립니다.
+- 간단한 산수 정도는 모델이 그냥 답하려 할 수 있으므로, 필요하면 도구 사용을 더 강하게 유도해야 합니다.
+
+## 체크리스트
+
+- [ ] `@tool` 함수가 어떤 스키마를 노출하는지 이해한다
+- [ ] `bind_tools()` 이후 애플리케이션 루프를 설명할 수 있다
+- [ ] `tool_calls`를 읽고 대응하는 Python 함수를 실행할 수 있다
+
+LangChain 101 (4/6)
+
+Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/04-tool-calling)
+
+## 이 글에서 다룰 문제
+
+- 도구를 정의하면 LangChain은 어떤 정보를 모델에 넘길까요?
+- `bind_tools()`를 호출하면 정확히 무엇이 달라질까요?
+- 도구 결과는 왜 `ToolMessage`로 다시 대화에 넣어야 할까요?
+- 안전하게 유지하려면 최소한 어디서 루프를 끊어야 할까요?
+
+> Tool Calling은 모델이 Python을 직접 실행하는 방식이 아닙니다. 모델이 구조화된 함수 호출 요청을 만들고, 애플리케이션이 그것을 실행한 뒤 결과를 다시 대화에 넣는 방식입니다.
+
+## 전체 흐름 한눈에 보기
+
+![전체 흐름 한눈에 보기](../../../assets/langchain-101/04/04-02-the-flow-at-a-glance.ko.png)
+
+*전체 흐름 한눈에 보기*
+
+LLM은 텍스트 생성기입니다. 계산, 날씨 조회, DB 질의, 외부 시스템 호출 같은 일은 외부 도구가 해야 합니다. Tool Calling은 모델이 "이 도구를 이런 인자로 호출해 달라"고 요청하고, 애플리케이션이 그 도구를 실행한 뒤 결과를 다시 대화에 붙여 최종 답변을 완성하는 패턴입니다.
+
+이 글에서는 다음 순서로 살펴보겠습니다.
+
+- `@tool`로 도구 정의하기
+- `bind_tools()`로 모델에 연결하기
+- 최소한의 tool-call loop 만들기
+- 여러 도구를 섞은 예제
+- 안전성과 품질을 위해 무엇을 봐야 하는지
+
+---
+
+## 도구 정의하기
+
+![함수 정의가 도구 메타데이터로 바뀌는 흐름](../../../assets/langchain-101/04/04-01-defining-tools.ko.png)
+
+*함수 정의가 도구 메타데이터로 바뀌는 흐름*
+
+`@tool` 데코레이터는 Python 함수를 LangChain 도구로 바꿉니다. 여기서 모델이 읽는 것은 주로 두 가지입니다. **docstring은 이 도구가 언제 필요한지 설명하고, type hint는 어떤 인자를 받아야 하는지 정의합니다.**
 
 ```python
 from langchain_core.tools import tool
 
 @tool
-def add(a: int, b: int) -> int:
-    """두 정수를 더합니다."""
+def add_numbers(a: float, b: float) -> float:
+    """Add two numbers. Use this when addition is needed."""
     return a + b
 
 @tool
-def multiply(a: int, b: int) -> int:
-    """두 정수를 곱합니다."""
-    return a * b
+def get_word_count(text: str) -> int:
+    """Return the word count of a text string."""
+    return len(text.split())
 
-tools = [add, multiply]
-tools_by_name = {t.name: t for t in tools}
+@tool
+def celsius_to_fahrenheit(celsius: float) -> float:
+    """Convert a temperature from Celsius to Fahrenheit."""
+    return celsius * 9 / 5 + 32
+
+print(f"name: {add_numbers.name}")
+print(f"description: {add_numbers.description}")
+print(f"schema: {add_numbers.args_schema.model_json_schema()}")
 ```
 
-### 2단계 — 모델에 바인딩
+운영 관점에서 여기서 가장 중요한 것은 설명 품질입니다. 도구 이름이 멋있느냐보다, **모델이 언제 이 도구를 써야 하는지 헷갈리지 않게 만드는 것**이 훨씬 중요합니다. 설명이 겹치면 잘못된 도구 선택이 늘고, 설명이 빈약하면 모델이 도구를 아예 쓰지 않기도 합니다.
+
+---
+
+## bind_tools()로 연결하기
+
+![도구 메타데이터를 모델에 바인딩하는 흐름](../../../assets/langchain-101/04/04-02-connecting-tools-with-bind-tools.ko.png)
+
+*도구 메타데이터를 모델에 바인딩하는 흐름*
+
+`bind_tools()`는 모델에게 현재 사용할 수 있는 도구 목록을 알려 줍니다. 즉, 어떤 함수 이름이 있고 어떤 인자를 받는지 모델이 알게 됩니다.
 
 ```python
 import os
+
+from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 
-os.environ.setdefault("GROQ_API_KEY", "your-key-here")
-llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
+@tool
+def add_numbers(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+@tool
+def multiply_numbers(a: float, b: float) -> float:
+    """Multiply two numbers."""
+    return a * b
+
+tools = [add_numbers, multiply_numbers]
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+
 llm_with_tools = llm.bind_tools(tools)
+
+response = llm_with_tools.invoke("What is 15 plus 27?")
+
+print(f"content: {response.content!r}")
+print(f"tool_calls: {response.tool_calls}")
 ```
 
-### 3단계 — 첫 호출 — tool_calls 받기
+<!-- injected-output:start -->
+**Output**
+
+    content: ''
+    tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'yc5j64vch', 'type': 'tool_call'}]
+
+<!-- injected-output:end -->
+
+여기서 `content`가 비어 있는 것은 이상한 일이 아닙니다. 아직 최종 답변을 한 것이 아니라, 먼저 도구를 호출해야 하기 때문입니다. Tool Calling에서는 **빈 텍스트와 도구 호출 요청이 정상적인 중간 상태**라는 점을 기억해야 합니다.
+
+---
+
+## 최소 tool-call loop
+
+![도구 요청 실행 후 다시 주입하는 루프](../../../assets/langchain-101/04/04-03-a-minimal-tool-call-loop.ko.png)
+
+*도구 요청 실행 후 다시 주입하는 루프*
+
+모델이 도구 호출을 요청하면, 애플리케이션은 해당 함수를 실행하고 결과를 `ToolMessage`로 돌려줘야 합니다. 이 재주입이 있어야 모델은 중간 결과를 보고 최종 답을 계속 생성할 수 있습니다.
 
 ```python
-from langchain_core.messages import HumanMessage
+import os
 
-messages = [HumanMessage(content="3과 4를 더한 뒤 그 결과에 5를 곱해 주세요.")]
-ai_msg = llm_with_tools.invoke(messages)
-print(ai_msg.tool_calls)
-messages.append(ai_msg)
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def add_numbers(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+@tool
+def multiply_numbers(a: float, b: float) -> float:
+    """Multiply two numbers."""
+    return a * b
+
+tools = [add_numbers, multiply_numbers]
+tool_map = {t.name: t for t in tools}
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+llm_with_tools = llm.bind_tools(tools)
+
+def run_with_tools(question: str) -> str:
+    """Simple tool-call loop."""
+    messages = [HumanMessage(content=question)]
+
+    while True:
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+
+        if not response.tool_calls:
+            return response.content
+
+        for tool_call in response.tool_calls:
+            tool_name = tool_call["name"]
+            tool_args = tool_call["args"]
+            tool_id = tool_call["id"]
+
+            if tool_name in tool_map:
+                result = tool_map[tool_name].invoke(tool_args)
+                messages.append(
+                    ToolMessage(
+                        content=str(result),
+                        tool_call_id=tool_id,
+                    )
+                )
+                print(f"  executed: {tool_name}({tool_args}) = {result}")
+
+questions = [
+    "What is 15 plus 27?",
+    "What is 7 times 8?",
+    "Add 5 and 3, then multiply the result by 4. What do you get?",
+]
+
+for q in questions:
+    print(f"\nquestion: {q}")
+    answer = run_with_tools(q)
+    print(f"answer: {answer}")
 ```
 
-### 4단계 — 도구 실행과 ToolMessage 추가
+<!-- injected-output:start -->
+**Output**
+
+    question: What is 15 plus 27?
+      executed: add_numbers({'a': 15, 'b': 27}) = 42.0
+    answer: The result of 15 plus 27 is 42.
+
+    question: What is 7 times 8?
+    answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
+
+    question: Add 5 and 3, then multiply the result by 4. What do you get?
+      executed: add_numbers({'a': 5, 'b': 3}) = 8.0
+      executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
+    answer: So, adding 5 and 3 gives 8, and multiplying 8 by 4 gives 32.
+
+<!-- injected-output:end -->
+
+이 루프를 보면 Tool Calling의 책임 분리가 또렷해집니다.
+
+- 모델: 어떤 도구를 어떤 인자로 호출할지 결정
+- 애플리케이션: 실제 함수 실행
+- `ToolMessage`: 실행 결과를 다시 대화 흐름에 연결
+
+운영 관점에서는 여기서 로깅이 매우 중요합니다. 어떤 질문에서 어떤 도구가 몇 번 호출됐는지 남겨 두지 않으면, 잘못된 도구 선택과 반복 루프를 나중에 추적하기 어렵습니다.
+
+---
+
+## 여러 도구를 섞는 예제
+
+실전 애플리케이션은 산수 도구 하나로 끝나지 않습니다. 조회, 계산, 시간 확인, 텍스트 처리처럼 성격이 다른 도구가 함께 들어갑니다.
 
 ```python
-from langchain_core.messages import ToolMessage
+import os
+from datetime import datetime
 
-for call in ai_msg.tool_calls:
-    fn = tools_by_name[call["name"]]
-    result = fn.invoke(call["args"])
-    messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
+from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+
+@tool
+def get_current_time() -> str:
+    """Return the current date and time."""
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+@tool
+def calculate_bmi(weight_kg: float, height_m: float) -> float:
+    """Calculate BMI from weight in kg and height in meters."""
+    return round(weight_kg / (height_m ** 2), 2)
+
+@tool
+def word_frequency(text: str, word: str) -> int:
+    """Count how many times a word appears in a text."""
+    return text.lower().split().count(word.lower())
+
+tools = [get_current_time, calculate_bmi, word_frequency]
+tool_map = {t.name: t for t in tools}
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+)
+llm_with_tools = llm.bind_tools(tools)
+
+def run_with_tools(question: str) -> str:
+    messages = [HumanMessage(content=question)]
+    while True:
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+        if not response.tool_calls:
+            return response.content
+        for tc in response.tool_calls:
+            result = tool_map[tc["name"]].invoke(tc["args"])
+            messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
+            print(f"  {tc['name']}({tc['args']}) = {result}")
+
+print(run_with_tools("What time is it now?"))
+print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 ```
 
-### 5단계 — 모델에 결과 돌려주고 최종 답 받기
+<!-- injected-output:start -->
+**Output**
+
+      get_current_time({}) = 2026-05-02 00:33:24
+      get_current_time({}) = 2026-05-02 00:33:24
+      get_current_time({}) = 2026-05-02 00:33:24
+    It seems that you can't get the current time because I do not have the get_current_time function.
+      calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
+    This is the calculated BMI for someone weighing 70 kg at 1.75 m.
+
+<!-- injected-output:end -->
+
+이 출력은 한 가지 중요한 교훈을 줍니다. Tool Calling이 있다고 해서 항상 완벽하게 흘러가지는 않습니다. 모델이 도구 결과를 다시 해석하는 단계에서 이상한 응답을 만들 수 있고, 설명 문구나 루프 제어가 부족하면 기대와 다른 결론을 낼 수 있습니다. 그래서 도구 바인딩만 해 놓고 "에이전트가 알아서 하겠지"라고 생각하면 곧 한계를 만납니다.
+
+---
+
+## 주의할 점
+
+![잘못된 도구 요청을 막는 가드레일](../../../assets/langchain-101/04/04-04-what-to-watch-out-for.ko.png)
+
+*잘못된 도구 요청을 막는 가드레일*
+
+**Docstring이 도구 선택을 좌우합니다.** 모델은 docstring을 읽고 어떤 도구를 언제 써야 하는지 판단합니다. 설명이 겹치거나 모호하면 틀린 도구를 고르기 쉽습니다.
+
+**도구 안에서 입력 검증이 필요합니다.** 타입 힌트는 스키마를 정의하지만, 런타임에 잘못된 값이 들어오는 것까지 막아 주지는 않습니다. 부작용이 있는 도구라면 더더욱 실제 실행 전에 검증해야 합니다.
+
+**무한 루프 방지가 필요합니다.** 종료 조건이 명확하지 않은 도구 루프는 최대 반복 수를 두는 것이 안전합니다.
 
 ```python
-final = llm_with_tools.invoke(messages)
-if final.tool_calls:
-    for call in final.tool_calls:
-        fn = tools_by_name[call["name"]]
-        result = fn.invoke(call["args"])
-        messages.append(final)
-        messages.append(ToolMessage(content=str(result), tool_call_id=call["id"]))
-    final = llm_with_tools.invoke(messages)
-print(final.content)
+MAX_ITERATIONS = 10
+
+def run_with_tools_safe(question: str) -> str:
+    messages = [HumanMessage(content=question)]
+    for _ in range(MAX_ITERATIONS):
+        response = llm_with_tools.invoke(messages)
+        messages.append(response)
+        if not response.tool_calls:
+            return response.content
+        for tc in response.tool_calls:
+            result = tool_map[tc["name"]].invoke(tc["args"])
+            messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
+    return "Max iterations reached."
 ```
+
+실무에서는 여기에 더해 권한 분리, allowlist, 타임아웃, 감사 로그를 붙입니다. 특히 외부 시스템을 변경하는 도구라면 "모델이 요청했다"는 이유만으로 실행해 버리면 안 됩니다.
+
+---
 
 ## 이 코드에서 주목할 점
 
-- *함수 docstring* 과 *타입 힌트* 가 *그대로* *모델* 에 *전달* 되는 *스키마* 입니다.
-- *모델* 은 *한 번* 에 *여러* *tool_calls* 를 *반환* 할 수 있습니다.
-- *루프* 가 *필요* 한 *이유* 는 *모델* 이 *중간 결과* 를 *보고* *추가* *호출* 을 *결정* 하기 때문입니다.
+- `@tool`의 docstring과 타입 힌트는 모델이 보는 설명과 인자 스키마가 됩니다.
+- `bind_tools()`는 에이전트를 만들어 주는 것이 아니라, 모델이 도구 호출 요청을 만들 수 있게 메타데이터를 붙입니다.
+- 응답에 `tool_calls`가 나타나면 애플리케이션이 함수를 실행하고, 그 결과를 `ToolMessage`로 다시 넣어야 reasoning loop가 이어집니다.
+- 여러 도구 예제가 중요한 이유는 요청 → 실행 → 재주입 루프를 더 분명하게 보여 주기 때문입니다.
 
-## 자주 하는 실수 5가지
+## 엔지니어가 자주 헷갈리는 지점
 
-1. ***eval/exec 직접 사용*** — *모델 출력* 을 *코드* 로 *실행* 하면 *치명적* *보안 사고* 가 *납니다*. *반드시* *허용 함수* 만 *등록* 하세요.
-2. ***docstring 누락*** — *모델* 이 *언제* 호출할지 *판단* 할 *근거* 가 *사라집니다*.
-3. ***tool_call_id 누락*** — *ToolMessage* 가 *어떤* *호출* 의 *결과* 인지 *추적* 이 *안* 됩니다.
-4. ***루프 종료 조건 부재*** — *tool_calls* 가 *비었을 때* 만 *종료* 하도록 *분기* 해야 합니다.
-5. ***병렬 호출 무시*** — *여러* *tool_calls* 를 *순서대로* 만 *처리* 하면 *지연* 이 *늘어납니다*.
-
-## 실무에서는 이렇게 쓰입니다
-
-*프로덕션* 에서는 *Tool Calling* 으로 *DB 조회*, *내부 API*, *검색* 등을 *모델* 이 *직접* *호출* 합니다. *루프* 는 *LangGraph* 의 *ToolNode* 와 *tools_condition* 으로 *대체* 하는 경우가 *많습니다*.
+- Tool Calling을 모델 측 실행으로 오해하기 쉽지만, 실제 함수 호출은 항상 애플리케이션이 담당합니다.
+- 애매한 도구 설명은 잘못된 도구 선택이나 malformed argument를 부릅니다.
+- 반복 상한은 선택 사항이 아닙니다. 잘못된 루프는 계속 잘못된 호출을 재생성할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] *함수* 마다 *docstring* 과 *타입 힌트* *작성*.
-- [ ] *bind_tools* 로 *모델* 에 *등록*.
-- [ ] *tool_call_id* *유지* 하며 *ToolMessage* *추가*.
-- [ ] *루프 상한* *설정*.
+- [ ] `@tool`, `bind_tools()`, `ToolMessage`의 역할을 설명할 수 있다
+- [ ] 모델이 도구를 요청한 뒤 어떤 순서가 이어지는지 말할 수 있다
+- [ ] tool loop에 명시적 종료 조건이 필요한 이유를 이해했다
 
-## 정리 및 다음 단계
+## 정리
 
-다음 글은 *Streaming — 실시간 출력 처리* 입니다.
+Tool Calling 루프는 세 부분으로 이루어집니다. `@tool`로 도구를 정의하고, `bind_tools()`로 모델에 연결하고, 실행 결과를 `ToolMessage`로 다시 대화에 넣는 것입니다. 루프는 모델이 더 이상 도구를 요청하지 않을 때까지 이어집니다.
+
+다음 글에서는 Streaming으로 넘어가, 같은 체인을 유지한 채 결과를 토큰 단위로 즉시 사용자에게 보여 주는 방식을 살펴보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -152,11 +439,12 @@ print(final.content)
 
 <!-- toc:end -->
 
+---
+
 ## 참고 자료
 
-- [Tool calling concept](https://python.langchain.com/docs/concepts/tool_calling/)
-- [How to use tools](https://python.langchain.com/docs/how_to/tool_calling/)
-- [@tool decorator](https://python.langchain.com/docs/how_to/custom_tools/)
-- [LangChain GitHub](https://github.com/langchain-ai/langchain)
+- [LangChain tool calling guide](https://python.langchain.com/docs/how_to/tool_calling/)
+- [Defining custom tools](https://python.langchain.com/docs/how_to/custom_tools/)
+- [Groq tool use](https://console.groq.com/docs/tool-use)
 
 Tags: LangChain, LCEL, Python, LLM
