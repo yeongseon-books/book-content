@@ -17,7 +17,7 @@ tags:
   - HighAvailability
   - Architecture
 seo_description: 클라우드 리전과 가용 영역(AZ)의 차이, Multi-AZ와 Multi-Region 설계 원칙을 코드와 그림으로 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Region과 Availability Zone
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*1개 AZ* 에 다 두면 *데이터센터 화재* 한 번에 *서비스 정지*. *분산* 이 *가용성* 의 *전제*.
+모든 자원을 1개 AZ에만 두면 데이터센터 화재 같은 사고 한 번에 서비스가 멈출 수 있습니다. 가용성을 확보하려면 분산 배치가 전제입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,9 +42,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *EC2 1대* 가 *az a* 에 있고 *RDS* 도 *az a*.
+**Before**: EC2 1대가 az a에 있고 RDS도 az a에 있습니다.
 
-**After**: *EC2* 는 *a/b/c*, *RDS* 는 *Multi-AZ*.
+**After**: EC2는 a/b/c에 분산하고 RDS는 Multi-AZ로 구성합니다.
 
 ## Python으로 가용 AZ 조회
 
@@ -94,32 +94,32 @@ print(placement(["a", "b", "c"], 5))
 
 ## 이 코드에서 주목할 점
 
-- *AZ 이름* 은 *계정마다 다름* (실제 매핑 다를 수 있음).
-- *RTT* 는 *물리 한계*.
-- *분산 배치* 는 *간단한 라운드로빈*.
+- AZ 이름은 계정마다 다를 수 있어서 실제 물리 매핑이 같다고 가정하면 안 됩니다.
+- RTT는 물리 한계를 벗어날 수 없습니다.
+- 예시의 분산 배치는 단순한 라운드로빈 방식입니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***단일 AZ* 만 사용.**
-2. ***Multi-Region* 으로 *지연만 늘림*.**
-3. ***DB Failover 테스트 미실시*.**
-4. ***리전 끼리 데이터 동기 무시*.**
-5. ***엣지 캐시* 미활용.**
+1. **단일 AZ만 사용합니다.**
+2. **Multi-Region을 적용하면서 지연 증가 비용을 고려하지 않습니다.**
+3. **DB Failover 테스트를 하지 않습니다.**
+4. **리전 간 데이터 동기화 문제를 무시합니다.**
+5. **엣지 캐시를 활용하지 않습니다.**
 
 ## 실무에서는 이렇게 쓰입니다
 
-*결제 서비스* 는 *Multi-AZ*, *전세계 CDN* 은 *Edge*, *재해 복구* 는 *Multi-Region*.
+결제 서비스는 Multi-AZ로 구성하고, 전 세계 CDN은 Edge를 활용하며, 재해 복구는 Multi-Region으로 설계합니다.
 
 ## 체크리스트
 
-- [ ] *AZ 분산* 적용.
-- [ ] *Failover* 자동.
-- [ ] *RTO/RPO* 정의.
-- [ ] *재해 훈련* 연 1회 이상.
+- [ ] AZ 분산을 적용했습니다.
+- [ ] Failover를 자동화했습니다.
+- [ ] RTO/RPO를 정의했습니다.
+- [ ] 재해 훈련을 연 1회 이상 실시합니다.
 
 ## 정리 및 다음 단계
 
-위치를 정했으니 *무엇을 돌릴지* 가 다음입니다. 다음 글은 *Compute*.
+위치를 정했으니 이제 그 위에서 무엇을 돌릴지 판단해야 합니다. 다음 글은 Compute를 다룹니다.
 
 <!-- toc:begin -->
 - [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
