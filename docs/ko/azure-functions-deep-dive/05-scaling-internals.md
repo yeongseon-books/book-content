@@ -44,23 +44,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Scale Controller·ScaleMonitor의 내부 동작을 이해하면 어떤 스케일 사고를 예방할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 스케일링 내부 동작의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Consumption, Premium, Dedicated 플랜의 스케일러는 같은 결정 트리를 쓰는가?
-- Scale Controller가 ‘인스턴스를 더 만든다’를 결정하는 신호는 무엇인가?
-- burst 트래픽에서 scale-out 지연은 어디에서 가장 크게 누적되는가?
-- concurrency throttle과 scale은 어떻게 함께 동작하며 어떻게 충돌하는가?
-- scale-in 시 진행 중 invocation은 어떻게 보호되는가?
-
 ## 큰 그림 — 스케일링은 어디에서 결정되는가
 
 코드를 보기 전에 한 장의 그림으로 정리하겠습니다.
@@ -341,14 +324,6 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 - `WorkerConcurrencyManager` timer loop → `WorkerStatus.LatencyHistory` 평가 → 필요 시 인스턴스 내부 worker 추가
 
 ---
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **ScaleMonitor가 트리거별 신호 생성** — queue 길이·이벤트 lag 등이 스케일 결정의 근거입니다.
-- **Scale Controller가 최종 결정** — 여러 모니터의 신호를 합쳐 인스턴스 수를 정합니다.
-- **플랜에 따라 스케일러가 다르다** — Consumption·Premium·Flex의 동작이 다릅니다.
-- **스케일 결정은 메트릭 윈도 기반** — 윈도가 짧으면 진동, 길면 지연이 됩니다.
-- **로그·메트릭으로 스케일을 가시화** — 왜 스케일했는지 모르면 튜닝이 불가능합니다.
 
 ## 운영 체크리스트
 

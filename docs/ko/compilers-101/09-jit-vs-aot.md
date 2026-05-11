@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Compilers 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 왜 같은 자바스크립트 코드가 처음에는 느리다가 잠시 뒤 빨라질까요?
-
-> JIT(just-in-time)는 실행 중에 컴파일하고, AOT(ahead-of-time)는 실행 전에 컴파일합니다. 이 한 차이가 startup, peak performance, 배포 형태까지 모두 결정합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- AOT와 JIT의 정의와 흐름
-- warmup이 왜 일어나고 어떻게 측정하는가
-- 두 방식의 optimization 기회 차이
-- 배포 모델 (binary vs runtime)의 영향
-- 실무에서 둘이 어떻게 섞여 쓰이는가
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 같은 알고리즘이라도 실행 환경(JIT/AOT/interpreted)에 따라 성능이 10배 차이가 납니다. 그리고 startup vs peak 균형에 따라 같은 언어가 서버에는 좋고 데스크톱에는 부적합할 수도 있습니다. 컴파일러를 고르는 게 아니라 컴파일러의 모드를 고르는 시대입니다.
 
 > "언제 컴파일하느냐"가 사용자가 체감하는 성능을 결정합니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     A["source"] --> B{"AOT?"}
@@ -60,14 +44,6 @@ flowchart LR
 ```
 
 AOT는 한 번 컴파일하고 매번 빠르게 시작합니다. JIT는 시작은 느리지만 hot path가 발견되면 그때 최적화합니다.
-
-## 핵심 용어 정리
-
-- **AOT (ahead-of-time)**: 배포 전에 컴파일. 결과는 binary.
-- **JIT (just-in-time)**: 실행 중 컴파일. 결과는 메모리 내 코드.
-- **Warmup**: JIT가 hot path를 찾아 최적화하기 전까지의 느린 구간.
-- **Tiered compilation**: interpreter → baseline JIT → optimizing JIT의 단계.
-- **Profile-guided**: 실제 실행 정보를 보고 더 공격적으로 최적화.
 
 ## Before/After
 
@@ -86,7 +62,7 @@ JVM, V8, .NET: 처음엔 인터프리터/baseline → hot path만 optimizing JIT
 
 각 단계의 장점만 골라 씁니다.
 
-## 실습: JIT 효과 측정해 보기
+## JIT 효과 측정해 보기
 
 ### 1단계 — 순수 Python 루프
 
@@ -188,14 +164,6 @@ gcc -fprofile-use -O2 prog.c -o prog
 
 JVM, .NET, V8, JavaScriptCore는 tiered JIT입니다. Go, Rust, C/C++은 순수 AOT. Android는 ART에서 AOT + JIT를 섞어 씁니다. CPython은 인터프리터지만 PEP 744로 JIT 도입을 진행 중입니다. WebAssembly는 AOT/JIT 둘 다 가능합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 워크로드의 startup vs peak 비중을 먼저 파악합니다.
-- 짧은 단명 프로세스(scripting)에는 AOT 또는 인터프리터가 유리함을 압니다.
-- 긴 수명 서버에는 JIT의 warmup 비용이 잘 분산됨을 압니다.
-- 메모리 제약 환경(임베디드)에서는 JIT가 부적합함을 압니다.
-- 측정 없이는 모드를 바꾸지 않습니다.
-
 ## 체크리스트
 
 - [ ] AOT와 JIT를 한 줄로 비교할 수 있는가?
@@ -203,12 +171,6 @@ JVM, .NET, V8, JavaScriptCore는 tiered JIT입니다. Go, Rust, C/C++은 순수 
 - [ ] 동적 정보로 가능한 최적화의 예를 들 수 있는가?
 - [ ] tiered compilation의 흐름을 그릴 수 있는가?
 - [ ] PGO가 AOT 진영의 어떤 약점을 보완하는지 답할 수 있는가?
-
-## 연습 문제
-
-1. 같은 함수를 CPython과 numba로 측정해 first/warm 시간을 비교해 보세요.
-2. 짧게 끝나는 CLI 도구라면 JIT와 AOT 중 무엇이 유리할지 1분 안에 정리해 보세요.
-3. JIT가 동적 dispatch를 inline cache로 어떻게 줄이는지 한 문단으로 설명해 보세요.
 
 ## 정리 및 다음 단계
 

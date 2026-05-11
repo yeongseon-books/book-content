@@ -25,14 +25,6 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 > AI Data Preparation 101 시리즈 (10/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-프로덕션 데이터 파이프라인을 어떻게 설계해야 재현성과 확장성을 동시에 확보할까요?
-
-이 글은 그 질문에 답하기 위해 프로덕션 데이터 파이프라인의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "지금까지 배운 걸 어떻게 한 pipeline으로 묶나요?"
 

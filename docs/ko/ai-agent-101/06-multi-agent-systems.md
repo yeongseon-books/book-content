@@ -31,17 +31,6 @@ Multi-Agent 시스템의 핵심은 조정(coordination)과 위임(delegation)입
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## 핵심 질문
-
-- 단일 Agent로 충분한 작업과 Multi-Agent가 필요한 작업은 어떻게 구분할까요?
-- Multi-Agent 패턴(Supervisor, Hierarchical, Swarm)은 각각 어떤 모양일까요?
-- Agent 간 통신 프로토콜에서 가장 흔한 실패는 무엇일까요?
-- 위임(delegation) 전략을 잘못 짜면 어떤 비용이 폭증할까요?
-
-<!-- a-grade-intro:end -->
-
 ## Multi-Agent 패턴
 
 복잡한 작업을 여러 Agent가 협력해서 처리하는 방식에는 여러 패턴이 있습니다.
@@ -1080,14 +1069,6 @@ except Exception as e:
 - Agent 간 명확한 통신 프로토콜과 책임 분담이 성공의 열쇠입니다.
 
 <!-- a-grade-example:begin -->
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **필요성 증명** — 단일 에이전트로 안 되는 이유가 명확할 때만 다중 에이전트로 갑니다.
-- **역할 분리** — 각 에이전트의 책임·인터페이스를 코드처럼 정의합니다.
-- **조정 비용** — 통신 오버헤드가 단일 모델보다 비싸질 수 있음을 인지합니다.
-- **교착 방지** — 라운드 상한·종료 조건을 둡니다.
-- **관측** — 에이전트 간 trace를 단일 timeline으로 묶습니다.
 
 ## 체크리스트
 

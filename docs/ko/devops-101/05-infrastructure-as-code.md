@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > DevOps 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *AWS 콘솔* 에서 *클릭으로 만든 서버* 가 *왜 다른 환경에는 없는지* 설명할 수 있나요?
-
-> IaC는 *인프라를 코드* 로 만들어 *재현 가능* 하게 합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *IaC* 의 정의와 효용
-- *Terraform* 의 기본 워크플로우
-- *State* 파일의 의미와 관리
-- *Module* 로 *재사용* 하기
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 콘솔로 만든 인프라는 *기억에만* 존재합니다. 다른 환경에 *복제* 하려면 다시 *클릭* 해야 하고, 그 사이 *드리프트* 가 생깁니다.
 
 > *코드만이 진실의 원천(SSOT)* 이다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Code["main.tf"] --> Plan["terraform plan"]
@@ -55,14 +39,6 @@ flowchart LR
     Apply --> Cloud["AWS/GCP/Azure"]
     Apply --> State["state file"]
 ```
-
-## 핵심 용어 정리
-
-- **IaC**: *Infrastructure as Code*. 인프라를 *코드로* 정의.
-- **Provider**: AWS, GCP 등 *클라우드 어댑터*.
-- **Resource**: 인스턴스, 버킷 등 *생성 단위*.
-- **State**: 현재 *실제 인프라* 의 *기록*.
-- **Module**: *재사용 가능한 인프라 묶음*.
 
 ## Before/After
 
@@ -84,7 +60,7 @@ resource "aws_s3_bucket" "logs" {
 }
 ```
 
-## 실습: Terraform 5단계
+## Terraform 5단계
 
 ### 1단계 — Provider 정의
 
@@ -148,26 +124,12 @@ module "vpc" {
 
 성숙한 팀은 *Terraform Cloud* 또는 *Atlantis* 로 *PR 기반 plan/apply* 를 자동화합니다. *변경 리뷰* 가 *코드 리뷰* 와 동일하게 됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *콘솔은 read-only*. 변경은 *코드로만*.
-- *State* 는 *백업과 잠금* 이 필수.
-- *Module* 로 *팀 표준* 을 강제한다.
-- *plan diff* 는 *PR 리뷰* 의 핵심 정보.
-- *Tag 정책* 으로 *비용/소유* 추적.
-
 ## 체크리스트
 
 - [ ] *모든 인프라* 가 코드로 정의되어 있다.
 - [ ] *State* 가 *원격 백엔드* 에 있다.
 - [ ] *Plan* 이 *PR* 에 자동 표시된다.
 - [ ] *Tag 정책* 이 강제된다.
-
-## 연습 문제
-
-1. *Terraform* 으로 *S3 버킷* 하나를 만들어보세요.
-2. 같은 코드를 *변수* 로 분리해 *dev/prod* 에 적용해보세요.
-3. *원격 state* 를 S3 + DynamoDB로 설정하세요.
 
 ## 정리 및 다음 단계
 

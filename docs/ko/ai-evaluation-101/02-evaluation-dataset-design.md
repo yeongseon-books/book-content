@@ -28,14 +28,6 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 ![평가 데이터셋 설계하기](../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
 
 *평가 데이터셋 설계하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-평가 데이터셋을 어떻게 설계해야 작더라도 의미 있는 신호를 줄까요?
-
-이 글은 그 질문에 답하기 위해 eval dataset 설계의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 좋은 평가 데이터셋이란 무엇인가요?
 

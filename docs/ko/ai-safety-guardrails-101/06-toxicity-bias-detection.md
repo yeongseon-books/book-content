@@ -23,14 +23,6 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 > AI Safety & Guardrails 101 시리즈 (6/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-독성·편향 탐지를 어떻게 운영해야 모델 공정성과 안전을 동시에 확보할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 독성·편향 탐지의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## Section 1
 

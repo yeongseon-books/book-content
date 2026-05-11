@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *수십 개* 의 *manifest* 를 *환경* 별로 *복붙* 해야 할까요?
-
-> *Helm* 이 *차트* 라는 *패키지 단위* 로 *템플릿* 과 *값* 을 분리합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Chart* 의 구성
-- *values.yaml* 사용법
-- *install / upgrade / rollback*
-- *Repo* 와 *dependency*
-- *helm template* 의 역할
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *환경별* *복붙* 은 *드리프트* 를 만듭니다. *Helm* 으로 *값* 만 바꿔서 *동일 템플릿* 을 재사용합니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Values["values.yaml"] --> Tmpl["templates/*.yaml"]
@@ -53,21 +37,13 @@ flowchart LR
     Render --> API["kubernetes api"]
 ```
 
-## 핵심 용어 정리
-
-- **Chart**: *Helm* 의 *패키지* 단위.
-- **values.yaml**: *기본값* 모음.
-- **release**: *차트* 의 *설치 인스턴스*.
-- **repository**: *차트* 의 *배포 채널*.
-- **dependency**: *서브차트* 의존성.
-
 ## Before/After
 
 **Before**: *dev/stage/prod* 별 *YAML 사본* 3 벌.
 
 **After**: 하나의 *Chart* + *환경별 values*.
 
-## 실습: 간단한 Chart
+## 간단한 Chart
 
 ### 1단계 — Chart 생성
 
@@ -140,26 +116,12 @@ def rollback(release, revision):
 
 *GitOps* 와 결합하여 *values* 변경만으로 *PR* 기반 배포가 이루어집니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Chart* 는 *공통 계약*.
-- *values* 는 *환경 차이* 만.
-- *--atomic* 은 *야간 배포의 안전벨트*.
-- *rollback* 은 *훈련* 이 필요.
-- *Secret* 은 *외부 매니저* 에 위임.
-
 ## 체크리스트
 
 - [ ] *Chart* 와 *values* 분리.
 - [ ] *버전 핀*.
 - [ ] *--atomic* 사용.
 - [ ] *Secret* 외부화.
-
-## 연습 문제
-
-1. *helm template* 의 *용도* 한 줄로.
-2. *values* 와 *Chart* 의 *책임 차이* 한 줄로.
-3. *--atomic* 이 *왜* 안전한지 한 줄로.
 
 ## 정리 및 다음 단계
 

@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *Pod IP* 가 *계속 바뀌는데* *어떻게 안정적* 으로 *부를까요*?
-
-> *Service* 는 *셀렉터로 묶인 Pod* 에 *안정 가상 IP* 와 *DNS 이름* 을 부여합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Service* 가 푸는 문제
-- *ClusterIP / NodePort / LoadBalancer*
-- *selector* 매칭
-- *클러스터 내부 DNS*
-- *Headless Service*
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *마이크로서비스* 가 서로를 *이름* 으로 호출하려면 *Service* 가 필수입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Client["client"] --> Svc["service (vip)"]
@@ -54,21 +38,13 @@ flowchart LR
     Svc --> P3["pod"]
 ```
 
-## 핵심 용어 정리
-
-- **ClusterIP**: *클러스터 내부* 가상 IP (기본).
-- **NodePort**: *각 노드의 포트* 노출.
-- **LoadBalancer**: *클라우드 LB* 자동 생성.
-- **selector**: *labels* 로 *Pod* 묶기.
-- **DNS name**: `svc.namespace.svc.cluster.local`.
-
 ## Before/After
 
 **Before**: *Pod IP* 직접 호출 → *재시작 시 연결 깨짐*.
 
 **After**: *Service 이름* 으로 *DNS* 통해 *안정 호출*.
 
-## 실습: 서비스 노출
+## 서비스 노출
 
 ### 1단계 — Service manifest
 
@@ -144,26 +120,12 @@ def delete(svc):
 
 *ClusterIP* 가 *내부* 통신, *LoadBalancer* 가 *외부 진입*, *Ingress* 가 *L7 라우팅* 을 담당합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Service 이름* 이 *API 계약*.
-- *내부* 는 *ClusterIP* 가 기본.
-- *외부* 는 *LoadBalancer + Ingress*.
-- *Headless* 는 *상태 ful* 에서.
-- *DNS TTL* 도 *변수* 다.
-
 ## 체크리스트
 
 - [ ] *selector* 일치 검증.
 - [ ] *type* 명시.
 - [ ] *DNS 이름* 으로 통신.
 - [ ] *외부 노출* 은 *Ingress* 우선.
-
-## 연습 문제
-
-1. *ClusterIP* 와 *LoadBalancer* 의 *차이* 한 줄로.
-2. *selector* 가 *왜* 핵심인지 한 줄로.
-3. *Headless Service* 의 *대표 용도* 한 가지.
 
 ## 정리 및 다음 단계
 

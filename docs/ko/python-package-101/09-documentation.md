@@ -27,27 +27,8 @@ seo_description: README는 패키지의 현관문이고, API Reference는 모든
 
 ---
 
-<!-- a-grade-intro:begin -->
 
-## 핵심 질문
-
-- 좋은 README에는 무엇이 포함되어야 할까요?
-- MkDocs와 Sphinx의 차이는 무엇일까요?
-- docstring에서 API Reference를 자동 생성하는 법은 무엇일까요?
-- GitHub Pages에 문서를 배포하는 법은 무엇일까요?
-
-> README는 패키지의 현관문이고, API Reference는 모든 함수의 사용 설명서입니다. 문서가 없는 패키지는 쓰이지 않습니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- 좋은 README의 구조와 필수 항목
-- MkDocs로 문서 사이트를 만드는 법
-- docstring에서 API Reference를 자동 생성하는 법
-- GitHub Pages에 문서를 배포하는 법
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 아무리 좋은 패키지도 사용법이 없으면 쓰이지 않습니다. PyPI에서 패키지를 발견한 사용자가 30초 안에 "이 패키지가 내 문제를 해결하는가?"를 판단할 수 있어야 합니다. README가 그 역할을 합니다.
 
@@ -259,14 +240,6 @@ API Reference는 "모든 함수의 목록"이지만, 사용자가 알고 싶은 
 
 MkDocs + Material 테마가 현재 Python 생태계의 사실상 표준입니다. Sphinx는 더 강력하지만 진입 장벽이 높습니다. 새 프로젝트라면 MkDocs부터 시작하세요.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Quickstart 우선** — 첫 5분 경험에 투자합니다.
-- **실행 가능한 예제** — 복붙으로 동작하는 예제를 만듭니다.
-- **MkDocs/Sphinx** — 도구는 정착된 것으로 통일합니다.
-- **API 자동** — docstring → API ref 자동화로 동기화합니다.
-- **버저닝** — 문서도 버전과 함께 보존합니다.
-
 ## 체크리스트
 
 - [ ] README에 설치 방법, 빠른 시작, 라이선스가 포함되어 있다
@@ -274,12 +247,6 @@ MkDocs + Material 테마가 현재 Python 생태계의 사실상 표준입니다
 - [ ] MkDocs로 문서 사이트를 생성할 수 있다
 - [ ] mkdocstrings으로 API Reference를 자동 생성할 수 있다
 - [ ] GitHub Pages에 문서를 배포할 수 있다
-
-## 연습 문제
-
-1. 이전 글에서 만든 패키지의 README.md를 작성하세요. 설치, 빠른 시작, 기능 목록, 개발 방법, 라이선스를 포함합니다.
-2. 모든 public 함수에 Google style docstring을 추가하고, `python -m doctest`로 예제가 동작하는지 확인해보세요.
-3. MkDocs를 설정하고 `mkdocs serve`로 로컬에서 문서를 미리보세요.
 
 ## 정리 · 다음 글
 

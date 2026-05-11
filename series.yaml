@@ -1269,28 +1269,6 @@ series:
         title: AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
         status: needs-update
   tier: archive
-- id: ax-practical-guide
-  status: planned
-  category: ai
-  title:
-    ko: AX 실전 가이드
-    en: AI Transformation Practical Guide
-  description:
-    ko: AX 도입 전략, 업무 자동화 사례, 조직 변화 관리.
-    en: Practical strategies for AI Transformation in real organizations.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/ax-practical-guide
-  tier: core
 - id: computer-science-101
   category: programming
   title:
@@ -2674,28 +2652,6 @@ series:
   level: 101
   lifecycle: active
   path: content/technical-writing-101
-  tier: supported
-- id: technical-writing
-  status: planned
-  category: software-engineering
-  title:
-    ko: 엔지니어를 위한 기술 글쓰기
-    en: Technical Writing for Engineers
-  description:
-    ko: 시리즈를 설계하고, 한 편을 다듬는 법.
-    en: Designing a series and shipping a single article.
-  languages:
-  - ko
-  - en
-  targets:
-    tistory: true
-    hashnode: true
-    medium: true
-    mkdocs: true
-    ebook: true
-  level: 101
-  lifecycle: active
-  path: content/technical-writing
   tier: supported
 - id: statistics-101
   category: data

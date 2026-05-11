@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > MLOps 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *학습 시 사용한 피처* 와 *서빙 시 만든 피처* 가 *왜 자꾸 달라질까* 요?
-
-> *Feature Store 는 *피처* 를 *중앙 정의* 하고 *학습/서빙* 에 *동일* 하게 제공해 *Train-Serve Skew* 를 없앱니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Train-Serve Skew* 의 정의
-- *Online vs Offline* 스토어
-- *Feast* 의 핵심 개념
-- *피처 재사용*
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *같은 피처 이름* 을 *두 곳에서 따로* 만들면 *반드시 어긋납니다*. *Feature Store* 가 *한 곳* 으로 통일.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Raw["raw data"] --> Reg["feature registry"]
@@ -55,21 +39,13 @@ flowchart LR
     On --> Serve["serving"]
 ```
 
-## 핵심 용어 정리
-
-- **Entity**: *피처가 결합되는 키* (예: user_id).
-- **Feature View**: *피처 정의* + *소스*.
-- **Online Store**: *낮은 지연* 키-값 (Redis 등).
-- **Offline Store**: *대용량 분석* (Parquet/BQ).
-- **Point-in-time join**: *시점 정확* 결합.
-
 ## Before/After
 
 **Before**: *학습 노트북* 과 *서빙 코드* 가 *피처를 따로 계산*.
 
 **After**: *Feature View* 한 번 정의, *양쪽* 에서 호출.
 
-## 실습: Feast 미니 워크플로우
+## Feast 미니 워크플로우
 
 ### 1단계 — 정의 파일
 
@@ -138,26 +114,12 @@ online = fs.get_online_features(
 
 *결제 모델* 은 *Feast* 로 *유저 행동 피처* 를 *학습/서빙* 모두에 제공, *팀 간 재사용*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *피처 = 자산*. 이름과 정의가 *카탈로그*.
-- *시점 정확성* 은 *정확도* 보다 *중요*.
-- *온라인/오프라인 동일 정의* 가 *최우선*.
-- *피처도 모니터링* (신선도, 결측).
-- *재사용* 이 *MLOps 의 최고 ROI*.
-
 ## 체크리스트
 
 - [ ] *Feature View* 정의 파일.
 - [ ] *PIT join* 사용.
 - [ ] *Online materialize* 스케줄.
 - [ ] *피처 신선도* 메트릭.
-
-## 연습 문제
-
-1. *유저별 최근 7일 매출* 피처를 *FeatureView* 로 정의하세요.
-2. *Point-in-time join* 이 없으면 어떤 *누수* 가 발생할까요?
-3. *Feast 외 대안* 두 가지를 들고 차이를 적으세요.
 
 ## 정리 및 다음 단계
 

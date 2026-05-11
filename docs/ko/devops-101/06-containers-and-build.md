@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > DevOps 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *내 노트북* 과 *서버* 가 *같은 결과* 를 내는 *유일한 방법* 은 무엇일까요?
-
-> 컨테이너는 *환경 자체* 를 *이미지* 로 박제합니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *컨테이너* 와 *VM* 의 차이
-- *Dockerfile* 의 핵심 명령어
-- *Multi-stage build* 로 이미지 크기 줄이기
-- *Layer 캐시* 활용
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 같은 빌드 산출물이 *모든 환경* 에서 *같이 동작* 해야 합니다. 컨테이너는 *OS 라이브러리, 의존성, 코드* 를 *한 덩어리* 로 만듭니다.
 
 > 컨테이너는 *Build once, run anywhere* 의 실현체입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Code["app code"] --> Build["docker build"]
@@ -55,14 +39,6 @@ flowchart LR
     Image --> Registry["registry push"]
     Registry --> Run["docker run / k8s"]
 ```
-
-## 핵심 용어 정리
-
-- **Image**: *불변의 실행 패키지*.
-- **Container**: 실행 중인 *image의 인스턴스*.
-- **Dockerfile**: 이미지 *빌드 레시피*.
-- **Layer**: 명령어마다 생기는 *읽기 전용 층*.
-- **Registry**: 이미지 저장소 (Docker Hub, ECR 등).
 
 ## Before/After
 
@@ -86,7 +62,7 @@ COPY . .
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
 ```
 
-## 실습: Dockerfile 5단계
+## Dockerfile 5단계
 
 ### 1단계 — 기본 빌드
 
@@ -148,26 +124,12 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
 성숙한 팀은 *distroless* + *SBOM 생성* + *이미지 서명(cosign)* + *취약점 스캔(Trivy)* 을 *CI 파이프라인* 에 연결합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Image는 immutable*. 변경 = *새 이미지*.
-- *작을수록 안전*. distroless 우선.
-- *.dockerignore* 가 *.gitignore* 만큼 중요.
-- *빌드 속도* 가 *개발 속도*. 캐시를 사수한다.
-- *이미지 서명* 으로 *공급망* 을 지킨다.
-
 ## 체크리스트
 
 - [ ] *Dockerfile* 이 *non-root* 로 끝난다.
 - [ ] *Multi-stage* 로 *최종 이미지* 가 작다.
 - [ ] *.dockerignore* 가 *.git, tests, docs* 를 제외한다.
 - [ ] *취약점 스캔* 이 CI에 있다.
-
-## 연습 문제
-
-1. 본인 앱의 *최종 이미지 크기* 를 *200MB 이하* 로 줄여보세요.
-2. *Multi-stage* 적용 전후 *빌드 시간* 을 비교하세요.
-3. *Trivy* 로 *HIGH/CRITICAL* 취약점을 점검하세요.
 
 ## 정리 및 다음 단계
 

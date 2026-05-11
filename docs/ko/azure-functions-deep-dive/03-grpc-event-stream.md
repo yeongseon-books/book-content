@@ -36,23 +36,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Host와 Worker의 gRPC 이벤트 스트림을 이해하면 어떤 통신 사고를 진단할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 gRPC 이벤트 스트림의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Host와 Worker 사이의 gRPC stream은 어떤 종류의 메시지를 어떻게 주고받는가?
-- 이 stream이 끊기면 호스트는 무엇을 가정하고, Worker는 무엇을 가정하는가?
-- 큰 payload는 stream 위에서 어떻게 흘러가는가, 한계는 어디인가?
-- gRPC 흐름의 backpressure는 어디에서 가시화되는가?
-- 이 채널은 디버깅 가능한 채널인가, 아니면 블랙박스인가?
-
 ## 큰 그림 — 단 하나의 스트림
 
 먼저 결론. Azure Functions의 호스트-워커 통신은 **gRPC 서비스 하나, RPC 하나**로 구성됩니다.
@@ -309,14 +292,6 @@ message FunctionLoadRequest {
 - `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
 
 ---
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **StreamingMessage가 통신의 단위** — 요청·응답·로그가 모두 같은 스트림을 탑니다.
-- **스트림 단절은 워커 사망 신호** — 재연결 패턴을 메트릭으로 추적합니다.
-- **InvocationRequest·Response가 핵심** — 함수 호출의 양방향이 명확히 구조화되어 있습니다.
-- **페이로드 크기 한계를 의식** — 대용량 입출력은 외부 스토리지를 경유해야 합니다.
-- **로그도 같은 채널로 흐른다** — 워커 로그 누락은 채널 단절의 단서입니다.
 
 ## 운영 체크리스트
 

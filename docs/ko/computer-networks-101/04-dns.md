@@ -25,29 +25,14 @@ last_reviewed: '2026-05-04'
 
 > Computer Networks 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 브라우저에 `example.com`을 쳤을 때, 그 글자가 어떻게 정확히 한 IP로 바뀌어 패킷이 출발할 수 있을까요?
-
-> DNS는 "이름 → 주소" 변환 시스템입니다. 단일 서버가 아니라 전 세계에 분산된 계층 — root, TLD, authoritative — 으로 구성되고, 그 사이에 resolver와 캐시가 끼어들어 매번 똑같은 질의를 반복하지 않게 합니다. 이 캐싱이 인터넷의 속도와 가장 자주 발생하는 사고의 출처입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- DNS의 계층 구조 (root → TLD → authoritative)
-- recursive resolver와 캐싱
-- A, AAAA, CNAME, MX, TXT 같은 레코드 타입
-- TTL의 의미와 운영상 함정
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 "인터넷 안 돼요"의 절반은 DNS 문제이고, 그중 상당수는 TTL과 캐시를 오해해서 생깁니다. DNS를 이해하지 못하면 배포 후 "아직 옛날 IP로 가요"가 미스터리로 남고, 서비스 이전이나 region failover가 오래 걸립니다. 또 모든 HTTP 요청은 DNS lookup으로 시작하기 때문에 성능 분석에서 빠질 수 없습니다.
 
 > "It's always DNS" — 인터넷 운영자의 농담이지만 절반 이상의 진실입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 > 클라이언트는 OS의 stub resolver에게 묻고, stub은 보통 ISP/회사의 recursive resolver에게 묻습니다. resolver는 root → TLD → authoritative 서버를 순서대로 물어 답을 찾고, 그 답을 TTL 동안 캐시합니다.
 
 ```text
@@ -58,16 +43,6 @@ browser
             ├─ TLD server       (".com")
             └─ authoritative    ("example.com.")
 ```
-
-## 핵심 용어 정리
-
-| 용어 | 설명 |
-| --- | --- |
-| A / AAAA | 도메인 → IPv4 / IPv6 주소 |
-| CNAME | 도메인 → 다른 도메인 (별칭) |
-| MX | 도메인 → 메일 서버 |
-| TXT | 임의의 텍스트(SPF, DKIM, 도메인 검증 등) |
-| TTL | 캐시 유효 시간(초) |
 
 ## Before / After
 
@@ -84,7 +59,7 @@ example.com → 어떻게? 모름.
 각 단계는 다른 서버이고, resolver가 위임을 따라가며 합친다
 ```
 
-## 실습: 단계별로 따라하기
+## 단계별로 따라하기
 
 ### 1단계: dig로 단일 조회
 
@@ -171,12 +146,6 @@ DNS는 기본 UDP 53번 포트, 응답이 크면 TCP로 넘어갑니다(DNSSEC, 
 - 메일: SPF, DKIM, DMARC 모두 TXT 레코드
 - 컨테이너: k8s 안의 DNS(coredns)가 service 이름을 ClusterIP로 변환
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-시니어 엔지니어는 IP를 바꾸기 전에 TTL을 본다는 단순한 습관을 가집니다. 그리고 DNS 변경은 "전파"가 아니라 "캐시 만료"라는 점을 늘 의식합니다. 즉 리얼타임이 아니라는 사실 — 이 단순한 사실을 잊은 변경이 가장 많은 장애를 만듭니다.
-
-또한 시니어는 단순히 `nslookup`을 신뢰하지 않습니다. 애플리케이션이 실제로 사용하는 resolver(컨테이너 안의 resolv.conf, 쿠버네티스의 coredns 정책, libc vs getaddrinfo 차이)를 확인합니다. 같은 도메인에 대한 답이 환경마다 다를 수 있다는 사실을 받아들입니다.
-
 ## 체크리스트
 
 - [ ] DNS 계층(root → TLD → authoritative)을 안다
@@ -184,14 +153,6 @@ DNS는 기본 UDP 53번 포트, 응답이 크면 TCP로 넘어갑니다(DNSSEC, 
 - [ ] dig으로 위임을 추적할 수 있다
 - [ ] TTL이 운영에 미치는 영향을 안다
 - [ ] DNS 변경 전 TTL을 먼저 줄인다
-
-## 연습 문제
-
-1. 자주 쓰는 사이트의 A, MX, TXT 레코드를 dig으로 모두 조회하고, 무엇이 보이는지 한 문단으로 설명하세요.
-
-2. TTL 60초로 임시 도메인을 운영한다고 가정하고, IP 변경 시 사용자 영향이 어떻게 달라지는지 단계별로 설명하세요.
-
-3. tcpdump로 DNS 질의/응답을 캡처한 뒤, 같은 도메인을 두 번 조회했을 때 두 번째가 더 빠른 이유를 설명하세요.
 
 ## 정리 및 다음 단계
 

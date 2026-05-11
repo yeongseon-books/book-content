@@ -28,14 +28,6 @@ RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다. 이 
 ![RAG 시스템 평가하기](../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.ko.png)
 
 *RAG 시스템 평가하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-RAG 시스템을 어떻게 평가해야 retrieval과 generation을 동시에 진단할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 RAG 평가의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## RAG는 단일 모델이 아니라 파이프라인입니다
 

@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Pandas 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *merge* 와 *join* 은 *왜 두 개* 일까요?
-
-> *merge는 *컬럼 키* 기반, join은 *인덱스 키* 기반입니다. 같은 일을 하지만 *키의 위치* 가 다릅니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *inner / left / right / outer / cross* 조인
-- *merge* 와 *join* 의 차이
-- *suffixes / indicator / validate* 옵션
-- 5단계 조인 실습
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 데이터는 *여러 테이블에 흩어져* 있습니다. *조인 능력* 이 곧 *분석 능력* 입니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Left["Left DF"] --> M["merge / join"]
@@ -53,21 +37,13 @@ flowchart LR
     M --> Result["combined DF"]
 ```
 
-## 핵심 용어 정리
-
-- **inner**: 양쪽 *모두 존재* 하는 키만.
-- **left**: *왼쪽 모두* + 매칭되는 *오른쪽*.
-- **right**: 그 반대.
-- **outer**: *합집합*.
-- **cross**: *카티시안 곱*.
-
 ## Before/After
 
 **Before**: *“merge 한 번 했더니 행이 폭증”* — *중복 키* 로 *카티시안 폭발*.
 
 **After**: *“validate='one_to_one' 또는 'one_to_many'”* — *의도와 다르면 즉시 에러*.
 
-## 실습: 5단계 조인
+## 5단계 조인
 
 ### 1단계 — 데이터 준비
 
@@ -125,26 +101,12 @@ except Exception as e:
 
 CRM × 주문, 광고 × 전환, 사용자 × 이벤트 — *데이터 분석의 80%* 는 *조인* 입니다. *validate* 는 *데이터 계약* 의 코드 표현.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *행 수 변화* 를 *항상 추적*.
-- *validate* 로 *가정 명시*.
-- *키 dtype* 을 *맞춘다*.
-- *조인 전 중복 제거* 여부를 결정.
-- *조인 결과* 를 *프로파일링* 한다.
-
 ## 체크리스트
 
 - [ ] *5가지 how* 를 안다.
 - [ ] *validate* 를 쓴다.
 - [ ] *indicator* 로 출처를 본다.
 - [ ] *suffixes* 를 쓴다.
-
-## 연습 문제
-
-1. *left 조인* 과 *outer 조인* 의 *행 수 차이* 를 출력하세요.
-2. *validate='one_to_one'* 이 *실패하는 데이터* 를 만들고 *예외 메시지* 를 확인하세요.
-3. *indicator* 컬럼으로 *오른쪽에만 있는 행* 을 찾으세요.
 
 ## 정리 및 다음 단계
 

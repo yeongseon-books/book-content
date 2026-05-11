@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Backend Development 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: HTTP 서버는 사실 *무슨 일* 을 하는 프로그램인가요?
-
-> TCP 소켓에서 텍스트를 읽어 요청을 해석하고, 같은 소켓으로 응답 텍스트를 돌려보내는 *읽고 쓰는 프로그램* 입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- HTTP 요청과 응답의 실제 모양
-- TCP 위에서 HTTP가 동작하는 원리
-- status code와 header의 의미
-- FastAPI로 *진짜* 서버를 만드는 흐름
-- 직접 raw socket 서버를 띄워 보기
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 프레임워크가 가려주는 부분을 한 번이라도 *눈으로 보면* 이후 모든 디버깅이 빨라집니다. status code가 왜 그렇게 나왔는지, header가 왜 안 붙었는지 — 본질을 모르면 항상 추측만 합니다.
 
 > 프레임워크는 편하지만, *프레임워크 너머* 를 알아야 시니어가 됩니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Client["Client"] -->|"GET / HTTP/1.1"| Sock["TCP socket"]
@@ -59,14 +43,6 @@ flowchart LR
 ```
 
 요청도 응답도 결국 *텍스트 한 덩어리* 입니다.
-
-## 핵심 용어 정리
-
-- **Request line**: `GET /path HTTP/1.1` — 메서드, 경로, 버전.
-- **Status line**: `HTTP/1.1 200 OK` — 응답의 첫 줄.
-- **Header**: `Key: Value` 형식의 메타정보.
-- **Body**: 실제 데이터(JSON, HTML, 파일 등).
-- **Method**: GET, POST, PUT, DELETE 등 행동의 종류.
 
 ## Before/After
 
@@ -88,7 +64,7 @@ print(s.recv(4096).decode()[:200])
 
 같은 일이지만, *프로토콜 텍스트* 가 직접 보입니다.
 
-## 실습: 서버 5단계
+## 서버 5단계
 
 ### 1단계 — raw socket 서버
 
@@ -176,14 +152,6 @@ curl -i http://127.0.0.1:9000/
 
 운영 환경에서는 FastAPI 같은 프레임워크가 raw socket을 *대신* 다뤄줍니다. 하지만 장애가 났을 때 — 응답이 안 온다거나 잘린다거나 — 결국 socket과 header 수준까지 내려가야 합니다. tcpdump, Wireshark, curl 셋이 백엔드 디버거의 기본입니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- status code는 *계약* 이다 — 잘 골라서 쓴다.
-- header에 의미를 *명시* 한다.
-- timeout과 keep-alive를 *항상* 설정한다.
-- 응답 크기에 상한을 둔다.
-- 평소에 raw 요청을 *읽어두면* 진짜 장애에서 차이가 난다.
-
 ## 체크리스트
 
 - [ ] HTTP 요청의 첫 줄을 읽을 수 있다.
@@ -191,12 +159,6 @@ curl -i http://127.0.0.1:9000/
 - [ ] curl `-i` 로 헤더를 볼 수 있다.
 - [ ] FastAPI에서 status code를 직접 지정할 수 있다.
 - [ ] raw socket 서버를 한 번이라도 띄워 봤다.
-
-## 연습 문제
-
-1. raw socket 서버를 수정해 `Content-Type: application/json` 헤더와 JSON body를 반환하세요.
-2. FastAPI에서 `/error` 라우트를 만들고 503을 반환하세요.
-3. `curl -v` 로 자기 서버를 호출하고 요청/응답 전체 텍스트를 캡처하세요.
 
 ## 정리 및 다음 단계
 

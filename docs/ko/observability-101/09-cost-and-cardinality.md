@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (9/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: observability 비용은 *왜* 갑자기 *10배* 가 됩니까?
-
-> *Cardinality 폭발, retention, sampling 부재 — 이 셋이 *비용 폭탄* 의 99% 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Cardinality* 가 비용을 만드는 법
-- *Retention* 정책의 단계화
-- *Sampling* 의 두 모델
-- 신호별 *비용 곡선*
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 신생 회사의 *AWS 비용 1위* 가 종종 *observability* 입니다. 모니터링이 *제품보다 비싸지면* 정치 문제가 됩니다.
 
 > *측정의 비용을 모르면 *측정이 적이 된다*.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Labels["label 조합"] --> Series["time series 수"]
@@ -56,21 +40,13 @@ flowchart LR
     Traces["trace 수"] --> Sample["sampling"]
 ```
 
-## 핵심 용어 정리
-
-- **Cardinality**: label 조합의 *고유 개수*.
-- **Retention tier**: hot / warm / cold *분리*.
-- **Head sampling**: 시작 시점에 결정.
-- **Tail sampling**: 끝난 후 결정 (느린 trace 우선).
-- **Aggregation**: 보존 전 *집계* 로 부피 축소.
-
 ## Before/After
 
 **Before**: `user_id` 가 label, *5천만 series*, 비용 *폭발*.
 
 **After**: `user_id` 는 *log* 로, label 은 *유한 차원*, 비용 *예측 가능*.
 
-## 실습: 비용 통제 5단계
+## 비용 통제 5단계
 
 ### 1단계 — Cardinality 측정
 
@@ -140,26 +116,12 @@ trace:   샘플링 후 ≤ Z 트레이스/분
 
 대부분의 회사는 *팀별 cardinality budget*, *retention tier*, *tail sampling* 을 조합해 *예측 가능한* observability 비용을 만듭니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Cardinality 는 *세금* 이다.*
-- *오래된 데이터는 *해상도를 낮춰* 보관.*
-- *Sampling 은 *부끄러운 일이 아니다*.*
-- *비용에 *오너* 가 있어야 한다.*
-- *측정 비용 자체를 *측정* 한다.*
-
 ## 체크리스트
 
 - [ ] *Cardinality* 상위 metric 을 안다.
 - [ ] *Retention tier* 가 단계화되어 있다.
 - [ ] Trace 에 *sampling* 이 있다.
 - [ ] 팀별 *비용 예산* 이 있다.
-
-## 연습 문제
-
-1. Cardinality 가 위험한 label 3개를 찾아보세요.
-2. Retention 3-tier 를 설계해 보세요.
-3. *Error / slow / random* tail sampling 정책을 작성해 보세요.
 
 ## 정리 및 다음 단계
 

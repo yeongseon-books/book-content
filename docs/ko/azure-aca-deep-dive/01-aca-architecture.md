@@ -56,23 +56,6 @@ Microsoft는 ACA가 Kubernetes 기반이라고 문서화하지만, 각 Environme
 
 ---
 
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-ACA의 내부 아키텍처를 이해하면 어떤 운영 결정을 더 정확히 내릴 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 ACA 내부 아키텍처의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- ACA는 결국 어떤 추상화 위에 어떤 추상화를 또 쌓은 플랫폼인가?
-- managed environment 안의 component(KEDA, Dapr, Envoy)는 누가 소유하고 누가 업그레이드하는가?
-- ACA가 AKS 위에서 돈다는 사실은 사용자에게 어떤 의무를 남기고 어떤 의무를 가져가는가?
-- control plane 장애가 나면 우리 앱은 어떻게 보이고 어떻게 회복되는가?
-- 한 environment 안에서 격리는 어디서 끊어지는가, 어디서 끊어지지 않는가?
-
 ## 전체 그림 — Azure Container Apps Environment
 
 이 그림이 이번 심화 시리즈 전체의 지도입니다.
@@ -379,14 +362,6 @@ az containerapp env workload-profile list \
   --name my-env --resource-group my-rg \
   -o table
 ```
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **ACA는 관리형 AKS 위에 있다** — 추상화 뒤의 실체를 알아야 한계와 SLA를 정확히 해석할 수 있습니다.
-- **Envoy·KEDA·Dapr이 핵심 구성 요소** — 각자가 무엇을 책임지는지 알면 장애 원인이 빨리 좁혀집니다.
-- **환경은 강한 격리 경계** — 리소스 공유 범위를 정확히 알아야 멀티테넌시 설계가 안전해집니다.
-- **Revision 모델은 불변 인프라의 적용** — 수정하지 말고 교체한다는 원칙이 곳곳에 녹아 있습니다.
-- **관리형이라도 책임은 공유된다** — 이미지·설정·코드 품질은 여전히 사용자 책임입니다.
 
 ## 운영 체크리스트
 

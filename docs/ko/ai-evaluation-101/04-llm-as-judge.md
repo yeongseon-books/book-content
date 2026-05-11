@@ -28,14 +28,6 @@ seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 
 ![LLM-as-Judge - 모델로 모델을 평가하기](../../assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
 
 *LLM-as-Judge - 모델로 모델을 평가하기*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-LLM-as-Judge를 어떻게 설계해야 사람 판정에 가까운 신뢰를 얻을까요?
-
-이 글은 그 질문에 답하기 위해 LLM-as-Judge의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## LLM-as-judge가 필요한 이유
 

@@ -26,14 +26,6 @@ seo_description: LLM에서 tokenization은 단순한 전처리가 아닙니다. 
 > AI Data Preparation 101 시리즈 (5/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Tokenization과 Chunking 전략이 왜 다운스트림 품질을 좌우할까요?
-
-이 글은 그 질문에 답하기 위해 Tokenization과 Chunking의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "Tokenizer가 모델 품질을 결정한다고요?"
 

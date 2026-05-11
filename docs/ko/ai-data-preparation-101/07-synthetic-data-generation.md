@@ -25,14 +25,6 @@ seo_description: production LLM fine-tuning에서 가장 흔한 병목은 labele
 > AI Data Preparation 101 시리즈 (7/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Self-Instruct·Distillation 등 합성 데이터를 어떻게 만들어야 모델이 망가지지 않을까요?
-
-이 글은 그 질문에 답하기 위해 합성 데이터 생성의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "데이터가 모자라면 만들어 쓰면 되지 않나요?"
 

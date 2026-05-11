@@ -25,14 +25,6 @@ seo_description: 지난 편의 synthetic data generation은 LLM을 호출해 새
 > AI Data Preparation 101 시리즈 (8/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-EDA·Back-Translation 같은 증강 기법을 어떻게 골라야 일반화에 도움이 될까요?
-
-이 글은 그 질문에 답하기 위해 데이터 증강의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "Synthetic generation과 Augmentation은 뭐가 다른가요?"
 

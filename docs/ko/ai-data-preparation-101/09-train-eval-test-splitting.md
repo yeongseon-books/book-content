@@ -26,14 +26,6 @@ seo_description: train_test_split(data, test_size=0.2)로 끝낸 모델이 produ
 > AI Data Preparation 101 시리즈 (9/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-학습·평가·테스트 분할에서 contamination을 어떻게 통제해야 할까요?
-
-이 글은 그 질문에 답하기 위해 분할과 contamination 통제의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "그냥 random_split 쓰면 되는 거 아닌가요?"
 

@@ -26,14 +26,6 @@ seo_description: 원본 corpus는 거의 항상 절반 이상이 쓰레기입니
 > AI Data Preparation 101 시리즈 (6/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Heuristic·Classifier 기반 품질 필터링을 어떻게 조합해야 신호 손실을 최소화할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 데이터 품질 필터링의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## "수집했다고 다 학습데이터인가요?"
 

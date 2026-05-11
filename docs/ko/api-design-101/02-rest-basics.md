@@ -25,30 +25,14 @@ last_reviewed: '2026-05-04'
 
 > API Design 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: REST는 단순한 *URL 규칙* 이 아닙니다 — 그 본질은 무엇인가요?
-
-> Roy Fielding이 정리한 *6가지 제약* 입니다. 그 중심에 *자원(resource)* 이 있습니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- REST의 정의와 역사
-- 6가지 아키텍처 제약
-- 자원 중심 사고
-- HTTP method 매핑의 직관
-- REST 같지만 REST 아닌 것 (RPC over HTTP)
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 REST는 가장 흔한 API 스타일입니다. 잘 따르면 *예측 가능* 하고, 잘못 따르면 *어디 한 번 본 적 있는데?* 가 됩니다. 핵심을 잡아두면 모든 후속 글이 쉬워집니다.
 
 > 규칙을 외우기보다 *왜 그 규칙인지* 를 이해하세요.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Client["Client"] -->|"GET /users/42"| Server["Server"]
@@ -57,14 +41,6 @@ flowchart LR
 ```
 
 자원은 URL로 식별되고, 동작은 HTTP method로 표현됩니다.
-
-## 핵심 용어 정리
-
-- **Resource**: API가 다루는 *명사* (users, orders, posts).
-- **Representation**: 자원의 표현 형태 (JSON, XML).
-- **Stateless**: 서버가 클라이언트 상태를 저장하지 않는다.
-- **Uniform Interface**: 일관된 호출 규칙.
-- **HATEOAS**: 응답 안에 *다음 행동* 링크를 포함.
 
 ## Before/After
 
@@ -88,7 +64,7 @@ DELETE /users/42
 
 자원은 URL, 동작은 method.
 
-## 실습: REST 6제약 따라가기
+## REST 6제약 따라가기
 
 ### 1단계 — Client-Server 분리
 
@@ -169,14 +145,6 @@ def article():
 
 GitHub, Stripe, GitLab — 대부분의 공개 API는 *대체로 REST* 입니다. 완벽한 HATEOAS는 드물지만 *자원 중심 + uniform interface* 는 표준이 되었습니다. 사내에서도 REST를 기본으로 두고, 필요할 때만 GraphQL이나 gRPC로 *추가* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- 자원의 *경계* 를 먼저 정한다.
-- method가 자원의 *상태 변화* 를 표현하게 한다.
-- 캐시·인증·에러도 *공식 약속* 으로 다룬다.
-- REST를 종교로 만들지 않는다 — 필요하면 RPC도 섞는다.
-- 클라이언트 입장에서 *예측 가능* 한지 본다.
-
 ## 체크리스트
 
 - [ ] URL에 동사가 없는가?
@@ -184,12 +152,6 @@ GitHub, Stripe, GitLab — 대부분의 공개 API는 *대체로 REST* 입니다
 - [ ] 응답에 적절한 cache 헤더가 있는가?
 - [ ] 인증이 매 호출에 자기 완결적인가?
 - [ ] 에러 상태 코드가 명확한가?
-
-## 연습 문제
-
-1. 손에 익은 라이브러리의 REST API 5개 endpoint를 골라 method/URL/의미 표를 만드세요.
-2. 위 4단계 Flask 예제에 `PUT /articles/1`을 추가해 보세요.
-3. *RPC over HTTP* 스타일과 REST 스타일을 같은 기능으로 두 가지 버전 작성해 비교하세요.
 
 ## 정리 및 다음 단계
 

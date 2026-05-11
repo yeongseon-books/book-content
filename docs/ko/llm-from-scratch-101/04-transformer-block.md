@@ -32,17 +32,6 @@ GPT 계열 모델을 읽다 보면 블록이 당연한 부품처럼 보이지만
 
 ---
 
-<!-- a-grade-intro:begin -->
-
-## 핵심 질문
-
-- FeedForward는 왜 단순한 2-layer MLP로 충분할까요?
-- residual connection이 학습을 어떻게 살릴까요?
-- pre-norm과 post-norm의 실전 차이는 무엇일까요?
-- 블록 하나의 파라미터는 어디에 가장 많이 모일까요?
-
-<!-- a-grade-intro:end -->
-
 ## FeedForward는 그냥 2-layer MLP
 
 어텐션만 여러 층 쌓으면 토큰끼리 참조는 많이 합니다. 그래도 표현력이 기대만큼 늘지 않습니다. 각 위치에서 비선형 변환이 부족하기 때문입니다. 그래서 블록마다 `Linear(C, 4C) → GELU → Linear(4C, C)` 형태의 MLP를 하나 더 둡니다.
@@ -129,14 +118,6 @@ for block in self.blocks:
 이제 블록이라는 벽돌은 준비됐습니다. 다음 글에서는 임베딩, `N`개 블록, 마지막 LayerNorm, LM head를 한 클래스에 묶어 `GPT(nn.Module)`를 완성하겠습니다. forward 한 번에 logits와 loss까지 나오도록 마무리할 차례입니다.
 
 <!-- a-grade-example:begin -->
-
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Pre-LN 권장** — Pre-LN이 깊은 네트워크에서 학습 안정성에 유리합니다.
-- **Residual 보존** — 잔차 경로를 깨지 않게 모듈을 배치합니다.
-- **FFN 폭** — 보통 4·d 폭이 합리적 시작점입니다.
-- **드롭아웃 위치** — 잔차 합산 직전 드롭아웃이 표준입니다.
-- **정합성 테스트** — 단일 블록 forward를 단위 테스트로 고정합니다.
 
 ## 체크리스트
 

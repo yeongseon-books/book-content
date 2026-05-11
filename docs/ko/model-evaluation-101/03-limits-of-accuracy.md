@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Model Evaluation 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *“정확도 95%”* 가 *항상 좋은 점수* 일까요?
-
-> *Accuracy 는 *클래스 균형* 가정에서만 *공정* 한 지표입니다. *불균형* 에서는 *베이스라인* 과 *균형 정확도* 가 필요합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Accuracy* 의 *수식과 의미*
-- *베이스레이트* 와 *더미 분류기*
-- *Balanced Accuracy* 의 직관
-- *멀티클래스* 에서의 한계
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *비교 기준* 이 *Accuracy 한 줄* 이면 — *팀 전체* 가 *모르고 잘못된 결정* 을 합니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Bal["balanced data"] --> AccOK["accuracy is fair"]
@@ -53,21 +37,13 @@ flowchart LR
     Imb --> BAcc["balanced accuracy"]
 ```
 
-## 핵심 용어 정리
-
-- **Accuracy**: *(TP+TN)/N*.
-- **Base rate**: *클래스 비율*.
-- **Dummy classifier**: *상수/무작위* 예측기.
-- **Balanced Accuracy**: *클래스별 재현율* 평균.
-- **Top-k Accuracy**: *상위 k* 안에 정답.
-
 ## Before/After
 
 **Before**: *“acc 95% 끝”*.
 
 **After**: *baseline → balanced acc → 클래스별 분석*.
 
-## 실습: 5단계 정확도 해부
+## 5단계 정확도 해부
 
 ### 1단계 — 불균형 데이터
 
@@ -128,26 +104,12 @@ print(classification_report(yte, pred))
 
 스팸/사기/희귀병 — *베이스레이트 < 5%* 인 곳에서 *Accuracy* 는 *언제나 함정*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *항상 Dummy 와 비교*.
-- *불균형* → *Balanced Accuracy + PR-AUC*.
-- *클래스별 분석* 이 *디버깅의 시작*.
-- *Top-k* 가 *추천 시스템* 에 적합.
-- *Accuracy* 는 *균형 데이터* 의 *마지막 보고용*.
-
 ## 체크리스트
 
 - [ ] *Dummy* 와 비교한다.
 - [ ] *Balanced Accuracy* 를 본다.
 - [ ] *클래스별 recall* 을 본다.
 - [ ] *Top-k* 가 적절한 문제에 사용.
-
-## 연습 문제
-
-1. *base rate 1%* 데이터에 *Dummy 와 모델* 정확도를 비교하세요.
-2. *Balanced Accuracy* 가 *Accuracy 와 가장 다르게* 나오는 데이터를 만드세요.
-3. *멀티클래스* 데이터에 *Top-3 Accuracy* 를 측정하세요.
 
 ## 정리 및 다음 단계
 

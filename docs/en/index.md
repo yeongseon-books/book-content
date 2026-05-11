@@ -68,17 +68,29 @@ LoRA, datasets, and serving in 6 parts (optional).
 
 Build a tiny GPT from tokenizer to chatbot in ~720 LOC, in 9 parts.
 
+## [Multimodal AI 101](multimodal-ai-101/)
+
+A beginner-friendly guide to multimodal AI covering text + image + audio + video. Learn CLIP, ViT, VLMs, Whisper, Diffusion, multimodal RAG, and video understanding from a production lens.
+
 ## [Korean AI Stack 101](korean-ai-stack-101/)
 
 Korean embeddings, OCR, and domestic LLM APIs in 6 parts.
 
-## [AI Transformation Practical Guide](ax-practical-guide/)
-
-Practical strategies for AI Transformation in real organizations.
-
 ## [Computer Science 101](computer-science-101/)
 
 An introductory series showing how major computer science subjects connect to each other.
+
+## [Python 101](python-101/)
+
+A beginner-friendly Python tour from install and venv through variables, data structures, control flow, functions, modules, file I/O and exceptions, classes, and the standard library.
+
+## [Git & GitHub 101](git-github-101/)
+
+A beginner guide to Git and GitHub covering commit, branch, merge, rebase, pull request, issue, and GitHub workflow for collaborative development.
+
+## [Linux CLI 101](linux-cli-101/)
+
+A beginner series covering essential Linux CLI skills for developers — file navigation, permissions, processes, grep, pipes, shell scripting, and SSH.
 
 ## [Python Package 101](python-package-101/)
 
@@ -268,10 +280,6 @@ An introductory series covering the full capstone flow — topic, problem, MVP, 
 
 An entry series covering technical writing from defining the reader to the pre-publish checklist.
 
-## [Technical Writing for Engineers](technical-writing/)
-
-Designing a series and shipping a single article.
-
 ## [Statistics 101](statistics-101/)
 
 A Statistics series covering descriptive statistics, distributions, estimation, confidence intervals, hypothesis testing, and regression end to end.
@@ -311,6 +319,18 @@ Production-grade ML systems — experiment tracking, deployment, monitoring, dri
 ## [Data Warehouse 101](data-warehouse-101/)
 
 A practical Data Warehouse series covering OLTP/OLAP, fact and dimension tables, star schema, partitioning, ETL/ELT, and BI integration.
+
+## [Python DB-API 101](python-dbapi-101/)
+
+A beginner-friendly tour of Python's PEP 249 (DB-API 2.0) using SQLite, covering connection lifecycle, transactions, error handling, async, and production patterns.
+
+## [SQLAlchemy 101](sqlalchemy-101/)
+
+A beginner-friendly SQLAlchemy 2.x tour using SQLite. Covers Engine, Connection, Core, ORM, Session, Unit of Work, relationships, loading strategies, async, and production patterns.
+
+## [Alembic 101](alembic-101/)
+
+A beginner-friendly Alembic tour for SQLAlchemy migrations using SQLite. Covers autogenerate, branches and merges, data migrations, downgrade strategy, and deploy ordering.
 
 ## [Azure App Service 101](azure-app-service-101/)
 

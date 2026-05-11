@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > MLOps 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *입력 분포가 바뀐 것* 과 *모델이 못 맞히는 것* 을 *어떻게 구분* 할까요?
-
-> *Data Drift 는 *입력 분포 변화*, *Model Drift* 는 *예측 품질 저하* 를 의미합니다. *통계 검정* 으로 감지합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Data Drift* vs *Concept Drift*
-- *KS 검정* 과 *PSI*
-- *기준 분포* 잡기
-- *알림 임계* 설정
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *세상은 변합니다*. *학습 시점* 의 분포가 *영원* 하지 않습니다. *Drift* 를 못 보면 *조용한 손실* 이 누적됩니다.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Train["train dist"] --> Base["baseline"]
@@ -54,21 +38,13 @@ flowchart LR
     Stat --> Alert["alert"]
 ```
 
-## 핵심 용어 정리
-
-- **Data Drift**: *입력 X* 의 *분포 변화*.
-- **Concept Drift**: *X → Y* *관계 변화*.
-- **PSI**: *Population Stability Index*. *0.1 미만* 안전.
-- **KS**: *Kolmogorov–Smirnov* 검정.
-- **Baseline**: *기준 분포* (학습 데이터).
-
 ## Before/After
 
 **Before**: *정확도* 가 *떨어진 뒤* 에야 알아챔.
 
 **After**: *입력 PSI > 0.2* 가 뜨면 *조사 시작*.
 
-## 실습: PSI로 Data Drift 감지
+## PSI로 Data Drift 감지
 
 ### 1단계 — 기준/현재 데이터
 
@@ -138,26 +114,12 @@ def status(p_value, psi_value):
 
 *리스크 모델* 은 *매일 PSI* 계산 후 *0.2 초과 시 재학습 큐* 에 *자동 등록*.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Data Drift* 는 *조기 경보*.
-- *Model Drift* 는 *지표* 로 확인.
-- *기준 분포* 는 *고정* 하고 *주기 갱신*.
-- *카테고리 변수* 는 *PSI*, *연속* 은 *KS*.
-- *드리프트 → 재학습* 은 *자동화*.
-
 ## 체크리스트
 
 - [ ] *기준 분포* 가 정의됨.
 - [ ] *PSI/KS* 가 *주기 계산*.
 - [ ] *임계* 가 문서화.
 - [ ] *재학습 트리거* 가 연결.
-
-## 연습 문제
-
-1. *카테고리 피처* 용 *PSI* 함수를 작성하세요.
-2. *Concept Drift* 를 라벨 지연 환경에서 어떻게 측정할까요?
-3. *PSI 0.18* 일 때 *알림 vs 무시* 결정 기준을 설명하세요.
 
 ## 정리 및 다음 단계
 

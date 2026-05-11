@@ -24,22 +24,8 @@ last_reviewed: '2026-05-04'
 
 > pytest 101 시리즈 (3/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: pytest의 `assert`는 Python 기본 `assert`와 무엇이 다른가요?
-
-> pytest는 `assert` 문을 내부적으로 재작성하여, 실패 시 좌변과 우변의 값을 상세하게 보여줍니다. 이 글에서는 assert의 다양한 패턴과 `pytest.raises`를 활용한 예외 테스트를 배웁니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- pytest의 assertion introspection 메커니즘
-- 컬렉션, 문자열, 부동소수점 비교 패턴
-- `pytest.raises`로 예외 타입과 메시지를 검증하는 방법
-- `pytest.approx`로 부동소수점을 안전하게 비교하는 방법
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 테스트가 실패했을 때 "왜 실패했는지"를 빠르게 파악하는 것이 중요합니다. pytest의 assertion introspection은 실패 원인을 즉시 보여주어 디버깅 시간을 크게 줄여줍니다.
 
@@ -246,14 +232,6 @@ def test_complex_assertion():
 
 예외 테스트를 작성할 때는 "이 함수가 이 입력에서 반드시 실패해야 한다"는 관점으로 접근합니다. 예외가 발생하지 않으면 테스트가 실패하므로, 에러 핸들링이 실수로 제거되는 것을 방지합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **pytest.raises** — 예외 메시지·타입까지 검증합니다.
-- **approx** — 부동소수 비교는 approx로 안정화합니다.
-- **커스텀 메시지** — assert 실패 메시지를 명확히 둡니다.
-- **예외 누락** — 예상하지 못한 예외도 명시적으로 잡습니다.
-- **경계** — 엣지 케이스를 별도 테스트로 분리합니다.
-
 ## 체크리스트
 
 - [ ] pytest의 assertion introspection 출력을 확인했다
@@ -261,12 +239,6 @@ def test_complex_assertion():
 - [ ] `pytest.raises`로 예외 타입을 검증했다
 - [ ] `match` 파라미터로 예외 메시지를 검증했다
 - [ ] `exc_info`로 예외 객체의 속성을 검사했다
-
-## 연습 문제
-
-1. 두 dict를 비교하여 실패하는 테스트를 작성하고, pytest의 diff 출력을 관찰하세요.
-2. `sqrt(n)` 함수에 음수를 입력하면 `ValueError`가 발생하는지 테스트하고, 에러 메시지도 검증하세요.
-3. `pytest.approx`의 `rel`과 `abs` 파라미터 차이를 실험하세요.
 
 ## 정리 및 다음 글 안내
 

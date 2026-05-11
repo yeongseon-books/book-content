@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (4/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 자유 텍스트 log 는 왜 *검색이 지옥* 이고, *구조화* 하면 무엇이 달라집니까?
-
-> *구조화된 log 는 *기계가 읽는 데이터* 입니다. 한 줄이 *JSON* 이면 *grep* 대신 *질의* 가 가능합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *비구조* vs *구조* log 의 차이
-- *Log level* 과 사용 기준
-- *Context* (request_id, user_id) 전파
-- Python `logging` 모듈로 *JSON* 출력
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 장애가 났을 때 *5분 안에* 원인 줄을 찾으려면, log 가 *질의 가능* 해야 합니다. `print` 의 시대는 끝났습니다.
 
 > *Log 는 *문장이 아니라 데이터* 다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Code["코드"] --> Logger["logger.info(event, **fields)"]
@@ -56,21 +40,13 @@ flowchart LR
     Sink --> Query["질의"]
 ```
 
-## 핵심 용어 정리
-
-- **Level**: DEBUG / INFO / WARNING / ERROR / CRITICAL.
-- **Structured fields**: key=value 한 쌍씩.
-- **Correlation ID**: 한 요청을 *묶는* ID.
-- **Sink**: log 가 흘러가는 *목적지*.
-- **Sampling**: 너무 많을 때 *일부만* 남기기.
-
 ## Before/After
 
 **Before**: `print(f"user {uid} failed: {e}")` — 정규식 *지옥*.
 
 **After**: `logger.error("login_failed", user_id=uid, reason=str(e))` — *질의 한 줄*.
 
-## 실습: 구조화된 로깅 5단계
+## 구조화된 로깅 5단계
 
 ### 1단계 — Python `logging` 기본
 
@@ -139,26 +115,12 @@ CRITICAL → 시스템 위험
 
 대부분의 회사는 *JSON log → Loki 또는 ELK → Grafana / Kibana* 로 흐름을 만듭니다. correlation ID 가 trace 와 *연결* 됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Log 는 *문장* 이 아니라 *이벤트*.*
-- *모든 요청은 *correlation ID* 를 가진다.*
-- *Level 은 *조치 가능성* 으로 나눈다.*
-- *PII 는 *마스킹* 또는 *해시*.*
-- *DEBUG 는 *프로덕션에서 끈다*, 끄는 *스위치* 를 둔다.*
-
 ## 체크리스트
 
 - [ ] 한 줄을 *JSON* 으로 출력한다.
 - [ ] *Level* 정책을 정한다.
 - [ ] *Correlation ID* 를 흘린다.
 - [ ] 민감 필드를 *마스킹* 한다.
-
-## 연습 문제
-
-1. `print` 한 줄을 *구조화된 log* 로 바꾸세요.
-2. *correlation ID* 를 미들웨어로 주입하세요.
-3. 한 사용자 ID 의 모든 ERROR 를 *질의* 해 보세요.
 
 ## 정리 및 다음 단계
 

@@ -28,14 +28,6 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 ![결정적 지표 - Exact Match, BLEU, ROUGE](../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
 
 *결정적 지표 - Exact Match, BLEU, ROUGE*
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Exact Match·BLEU·ROUGE는 어떤 상황에 적합하고, 어디서 한계를 드러낼까요?
-
-이 글은 그 질문에 답하기 위해 결정적 지표의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## 결정적 지표가 무엇인가요?
 

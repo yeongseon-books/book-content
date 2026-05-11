@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Secure Coding 101 시리즈 (6/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 우리는 비밀을 *어디에* 두어야, *언제든 회전* 할 수 있고 *실수로 새지* 않을까요?
-
-> *Secret 은 *코드와 분리*, *짧게 살고*, *언제든 회전 가능* 해야 한다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Secret* 의 정의와 종류
-- *Hard-coded* secret 이 위험한 이유
-- *Secret manager* 의 역할
-- *키 회전* 의 의미
-- 안전한 secret 5단계와 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 가장 흔한 사고가 *git 에 secret commit*. 한 번 push 되면 *영원히 추적 가능* 합니다. *History rewrite* 도 *완전한 해결* 이 아닙니다.
 
 > *모든 secret 은 *언제든 새는 전제* 로 설계한다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Code["코드"] -->|읽기| Env["환경 변수"]
@@ -55,21 +39,13 @@ flowchart LR
     Vault --> Rotate["주기적 회전"]
 ```
 
-## 핵심 용어 정리
-
-- **Secret**: API key, DB password, token 등 *알려지면 위험한 값*.
-- **Secret manager**: secret 을 *중앙* 에서 보관, 회전, 감사.
-- **Rotation**: secret 을 *주기적으로 교체*.
-- **Scope**: secret 이 닿을 수 있는 *범위*.
-- **Audit log**: 누가 언제 secret 을 *읽었는지*.
-
 ## Before/After
 
 **Before**: `config.py` 에 `API_KEY = "..."`. CI 로그에 *그대로 출력*.
 
 **After**: 환경 변수로 주입, secret manager 에서 *fetch*, 로그에는 *마스킹* 만.
 
-## 실습: 안전한 secret 5단계
+## 안전한 secret 5단계
 
 ### 1단계 — Secret 분리
 
@@ -125,26 +101,12 @@ print("API key:", mask(API_KEY))
 
 대부분의 팀은 *Vault*, *AWS Secrets Manager*, *Doppler*, *1Password Connect* 중 하나를 채택해 *환경별로 분리* 하고, *CI* 는 *short-lived token* 으로 fetch 합니다. *git push* 에는 *secret scan* 이 hook 으로 걸립니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Secret 은 *언제든 새는 전제* 로 산다.*
-- *회전이 *자동* 이어야 진짜 회전.*
-- *Scope 가 *좁을수록* 사고가 작다.*
-- *접근은 *감사* 가 기본.*
-- *로그는 *마스킹 기본값*.*
-
 ## 체크리스트
 
 - [ ] *git secret scan* 이 켜져 있다.
 - [ ] *환경별* secret 이 분리.
 - [ ] *회전* 이 자동.
 - [ ] *Audit log* 가 남는다.
-
-## 연습 문제
-
-1. *git history* 에서 secret 을 찾는 명령을 두 가지.
-2. *환경 변수* 와 *secret manager* 의 trade-off.
-3. *Short-lived token* 이 *long-lived* 보다 안전한 이유.
 
 ## 정리 및 다음 단계
 

@@ -27,31 +27,13 @@ seo_description: ACA는 "컨테이너용 App Service"입니다.
 
 ---
 
-## 이 글에서 배울 것
-
-- Azure Container Apps(ACA)가 다른 Azure 컨테이너 서비스(App Service, AKS, Functions)와 무엇이 다른지
-- ACA의 핵심 구성 요소 Environment, Container App, Revision의 역할
-- 어떤 워크로드가 ACA에 적합하고, 어떤 워크로드는 다른 서비스를 골라야 하는지
-- 이 시리즈 7편이 어떤 순서로 ACA의 각 부분을 확장해나갈지
-
-<!-- a-grade-intro:begin -->
 ## 핵심 질문
 
 ACA는 AKS·App Service와 비교해 언제 가장 잘 맞고, 무엇을 포기해야 할까요?
 
 이 글은 그 질문에 답하기 위해 Azure Container Apps의 위치의 핵심 결정과 운영 함정을 살펴봅니다.
 
-<!-- a-grade-intro:end -->
-
-## 이 글에서 답할 질문
-
-- Azure에는 이미 App Service, AKS, Functions가 있는데 왜 또 ACA가 필요한가?
-- ACA에서 Environment, Container App, Revision은 각각 어떤 단위인가?
-- ACA가 "Kubernetes 없이"라고 말할 때 실제로 사라지는 운영 책임은 무엇인가?
-- 어떤 워크로드는 ACA에 잘 맞고, 어떤 워크로드는 AKS나 Functions를 골라야 하는가?
-- 이 시리즈 7편은 어떤 순서로 ACA의 각 부분을 설명하는가?
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 컨테이너는 만들 수 있습니다. 로컬에서도 잘 뜹니다. 문제는 그 다음입니다.
 
@@ -229,29 +211,12 @@ production에서 ACA를 고를 때 던지는 질문은 보통 이렇습니다.
 - microservices 조합
 - Canary와 Blue-Green이 필요한 service
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **ACA는 서버리스 컨테이너의 기본값** — 쿠버네티스를 직접 운영하지 않으면서 컨테이너의 유연성을 얻을 수 있습니다.
-- **kubectl이 필요한 순간 ACA를 벗어난다** — 노드·CRD·세밀한 권한이 필요하면 AKS가 정답입니다.
-- **KEDA·Dapr이 1급 시민이다** — 이벤트 기반 스케일과 사이드카 패턴이 기본 제공이라 초기 설계가 단순해집니다.
-- **0으로 스케일된다는 점을 의식한다** — 콜드 스타트가 SLA에 영향을 주므로 최소 인스턴스 정책을 신중히 정합니다.
-- **VNet과 보안 경계는 처음에 결정한다** — 환경(Environment) 단위의 네트워크 경계라 사후 변경이 까다롭습니다.
-
 ## 체크리스트
 
 - [ ] ACA가 AKS, App Service, Functions와 어떻게 다른지 한 문단으로 설명할 수 있다
 - [ ] Environment, Container App, Revision의 관계를 그릴 수 있다
 - [ ] scale-to-zero를 켜는/끄는 기준을 안다
 - [ ] 우리 워크로드가 ACA에 적합한지 5개 질문으로 판단할 수 있다
-
-## 연습 문제
-
-1. 다음 워크로드 각각에 대해 AKS / ACA / App Service / Functions 중 무엇이 가장 적합한지 고르고 이유를 한 줄로 적어보세요.
-   - "GitHub webhook을 받아 Slack 알림을 보내는 함수"
-   - "FastAPI 기반 REST API, 일평균 100 req/s"
-   - "GPU로 모델을 학습하는 파이프라인"
-   - "30개 microservice가 service mesh로 묶인 시스템"
-2. 본문 Step 1-3을 따라 첫 ACA 환경을 만들고, hello-world URL에 접속해보세요. 첫 요청과 두 번째 요청의 latency를 비교해 cold start 영향을 체감해봅니다.
 
 ## 정리
 

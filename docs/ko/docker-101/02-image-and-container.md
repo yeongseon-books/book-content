@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (2/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *image* 는 *불변* 인데 *container* 는 *변한다* 는 말은 *실제로* 무엇을 뜻합니까?
-
-> *Image 는 *클래스*, container 는 *인스턴스* 입니다. 둘을 분리해 생각하면 디버깅이 쉬워집니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *Image / Container* 의 *라이프사이클*
-- *Layer* 와 *copy-on-write*
-- 자주 쓰는 *10가지 명령*
-- *컨테이너 안* 들여다보기
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *컨테이너의 동작* 을 이해하지 못하면 *디버깅이 운빨* 이 됩니다. layer 와 lifecycle 을 알면 *문제의 80%* 가 *예측 가능* 해집니다.
 
 > *재현되지 않는 버그의 절반은 *컨테이너 상태에 대한 오해* 에서 옵니다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Image["Image (불변)"] --> Run["docker run"]
@@ -56,21 +40,13 @@ flowchart LR
     Stop --> Rm["Removed"]
 ```
 
-## 핵심 용어 정리
-
-- **Layer**: image 를 구성하는 *읽기 전용 파일 시스템 조각*.
-- **Writable layer**: container 가 가진 *맨 위 쓰기 가능 layer*.
-- **Lifecycle**: created -> running -> stopped -> removed.
-- **Tag**: image 버전 라벨 (`nginx:1.27`).
-- **Digest**: image 의 *불변 SHA256* 식별자.
-
 ## Before/After
 
 **Before**: 컨테이너 안에서 `apt install` 한 뒤 *재시작 시 사라져* 당황.
 
 **After**: 변경은 *Dockerfile 에 코드화*, container 는 *언제든 버려도 됨*.
 
-## 실습: Image/Container 5단계
+## Image/Container 5단계
 
 ### 1단계 — Image 정보 보기
 
@@ -131,26 +107,12 @@ docker image rm nginx:1.27
 
 CI 시스템은 *digest 핀* 으로 빌드해 *재현성* 을 보장하고, 운영에서는 *image 별 변경 이력* 을 *Datadog/Grafana* 와 묶어 *변경 사고* 를 추적합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *Image 는 빌드, container 는 실행*.
-- *변경은 코드*, `commit` 은 *마지막 수단*.
-- *digest 핀* 이 *프로덕션 기본*.
-- *layer 캐시* 가 *빌드 속도* 를 결정.
-- *컨테이너는 *언제든 버려도 좋게* 설계*.
-
 ## 체크리스트
 
 - [ ] *image vs container* 를 설명할 수 있다.
 - [ ] container 의 *변경이 휘발* 임을 안다.
 - [ ] *layer / digest* 를 활용한다.
 - [ ] stopped 컨테이너를 *정리* 한다.
-
-## 연습 문제
-
-1. `nginx:1.27` 의 *layer 수* 를 확인해 보세요.
-2. 컨테이너 안에서 파일을 만든 뒤 *재시작* 후 사라짐을 확인하세요.
-3. `docker image prune` 으로 *불필요한 image* 를 정리해 보세요.
 
 ## 정리 및 다음 단계
 

@@ -24,28 +24,12 @@ last_reviewed: '2026-05-04'
 
 > Kubernetes 101 시리즈 (7/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *Pod* 가 *죽어도* *데이터* 를 *살아 있게* 하려면 무엇이 필요할까요?
-
-> *PersistentVolumeClaim* 이 *StorageClass* 를 통해 *동적* 으로 *영속 디스크* 를 *Pod* 에 붙입니다.
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *emptyDir* 과 *PV/PVC* 차이
-- *StorageClass* 의 역할
-- *동적 프로비저닝*
-- *접근 모드*
-- *데이터 백업* 관점
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 *컨테이너 파일시스템* 은 *Pod* 와 함께 *사라집니다*. *상태* 가 있는 워크로드에는 *Volume* 이 *필수*.
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Pod["pod"] --> PVC["pvc"]
@@ -53,21 +37,13 @@ flowchart LR
     SC --> PV["pv (disk)"]
 ```
 
-## 핵심 용어 정리
-
-- **Volume**: *Pod* 안에서 *공유/영속* 되는 저장소.
-- **PersistentVolume (PV)**: *클러스터 자원* 인 디스크.
-- **PersistentVolumeClaim (PVC)**: *Pod 가 요청* 하는 디스크.
-- **StorageClass**: *어떻게 만들지* 정의 (ssd, gp3 등).
-- **AccessMode**: *RWO / ROX / RWX*.
-
 ## Before/After
 
 **Before**: *DB* 데이터를 *Pod 내부* 에 → *재시작 시 손실*.
 
 **After**: *PVC + PV* 로 *외부 디스크* 보관.
 
-## 실습: PVC로 Pod에 디스크 연결
+## PVC로 Pod에 디스크 연결
 
 ### 1단계 — PVC
 
@@ -145,26 +121,12 @@ def delete(name):
 
 *StatefulSet* 이 *Pod 별 PVC* 를 자동 생성하고, *Velero* 같은 도구가 *볼륨 스냅샷* 을 정기 *백업* 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *상태* 는 *클러스터 외부* 가 안전.
-- *RWX* 는 *비용/성능* 을 본다.
-- *백업* 이 진짜 *복구 능력*.
-- *reclaimPolicy* 명시.
-- *StatefulSet* 은 *상태 패턴* 의 시작.
-
 ## 체크리스트
 
 - [ ] *상태* 는 *PVC* 또는 *managed DB*.
 - [ ] *백업* 정책 존재.
 - [ ] *AccessMode* 명시.
 - [ ] *reclaimPolicy* 명시.
-
-## 연습 문제
-
-1. *emptyDir* 과 *PVC* 의 *차이* 한 줄로.
-2. *RWO* 의 *제약* 한 가지.
-3. *백업* 이 *왜* PVC 만으로 *부족* 한지 한 줄로.
 
 ## 정리 및 다음 단계
 

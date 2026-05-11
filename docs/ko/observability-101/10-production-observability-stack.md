@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Observability 101 시리즈 (10/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: *작은 팀* 이 *오늘* 만들 수 있는 *충분히 좋은* observability 스택은 어떤 모습입니까?
-
-> *OpenTelemetry 로 *수집 통일*, Prometheus / Loki / Tempo 로 *세 신호*, Grafana 로 *한 화면* — 이것이 작은 팀의 *현실적 베이스라인* 입니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *수집 → 저장 → 조회* 의 단순한 흐름
-- 오픈소스 *베이스라인 스택*
-- *상관(correlation)* 으로 한 화면
-- 운영자에게 필요한 *5가지 SLO*
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 작은 팀에 *완벽한* 스택은 없습니다. *운영 가능* 하고 *교체 가능* 한 스택이 *최선* 입니다. 종속을 피하면서 *지금 바로* 시작합시다.
 
 > *완벽한 스택은 *내일도 안 온다*. 운영 가능한 스택을 *오늘* 만든다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     App["app"] --> Otel["OpenTelemetry collector"]
@@ -59,21 +43,13 @@ flowchart LR
     Tempo --> Grafana
 ```
 
-## 핵심 용어 정리
-
-- **Collector**: 신호를 *받아 라우팅* 하는 게이트웨이.
-- **Backend**: 저장소 (Prometheus / Loki / Tempo).
-- **Correlation**: trace_id 로 *세 신호 연결*.
-- **Datasource**: Grafana 에 연결된 저장소.
-- **Exemplar**: metric 한 점에 *대표 trace_id*.
-
 ## Before/After
 
 **Before**: 도구 5개, *서로 안 통한다*. 화면 *5개* 를 동시에.
 
 **After**: Grafana *한 곳*, 클릭으로 *trace ↔ log ↔ metric*.
 
-## 실습: 베이스라인 스택 5단계
+## 베이스라인 스택 5단계
 
 ### 1단계 — Collector
 
@@ -146,26 +122,12 @@ Loki → Tempo: log "trace_id" → trace view
 
 작은 팀은 *OTel + LGTM (Loki/Grafana/Tempo/Mimir)* 로 시작합니다. 규모가 커지면 *managed* (Grafana Cloud, Datadog, Honeycomb) 로 이동하기도 합니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *수집은 *OTel*, 백엔드는 *교체 가능*.*
-- *Trace_id 상관 없으면 *반쪽*.*
-- *Observability 도 *제품* 이다, SLO 가 있다.*
-- *작게 시작하고 *측정하며* 늘린다.*
-- *벤더 종속은 *비용 + 위험*.*
-
 ## 체크리스트
 
 - [ ] OTel collector 한 개로 수집 통일.
 - [ ] Grafana 에서 *세 신호* 가 보인다.
 - [ ] Trace ↔ log 점프가 동작한다.
 - [ ] 운영자 SLO 5개를 정의했다.
-
-## 연습 문제
-
-1. Compose 로 베이스라인 스택을 띄워 보세요.
-2. 한 요청을 *세 신호* 로 추적하세요.
-3. 운영자 SLO 5개를 *PromQL* 로 작성해 보세요.
 
 ## 정리 및 다음 단계
 

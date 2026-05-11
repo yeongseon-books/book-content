@@ -24,14 +24,6 @@ seo_description: LLM이 "사실이 아닌 내용을 자신 있게 말하는" 현
 > AI Safety & Guardrails 101 시리즈 (7/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-Hallucination을 어떻게 가드레일로 막아야 grounding이 깨지지 않을까요?
-
-이 글은 그 질문에 답하기 위해 Hallucination Guardrail의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## Section 1
 

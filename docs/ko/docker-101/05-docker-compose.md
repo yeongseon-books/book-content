@@ -24,30 +24,14 @@ last_reviewed: '2026-05-04'
 
 > Docker 101 시리즈 (5/10)
 
-<!-- a-grade-intro:begin -->
 
-**핵심 질문**: 여러 컨테이너를 *재현 가능* 하게 *한 번에* 띄우려면 어떻게 합니까?
-
-> *Compose 는 *멀티 컨테이너 환경* 을 *YAML 한 파일* 로 *코드화* 합니다.*
-
-<!-- a-grade-intro:end -->
-
-## 이 글에서 배울 것
-
-- *services / networks / volumes* 정의
-- *depends_on* 과 헬스체크
-- *profiles* 로 *선택 실행*
-- *.env* 와 변수 보간
-- 흔한 함정 5가지
-
-## 왜 중요한가
+## 이 글에서 다룰 문제
 
 신규 개발자 셋업이 *5분 안* 에 끝납니다. *README 의 셋업 섹션* 이 사라집니다.
 
 > *Compose 는 *환경 = 코드* 의 가장 짧은 길입니다.*
 
-## 개념 한눈에 보기
-
+## 전체 흐름
 ```mermaid
 flowchart LR
     Compose["compose.yaml"] --> Web["web service"]
@@ -58,21 +42,13 @@ flowchart LR
     Cache --> Net
 ```
 
-## 핵심 용어 정리
-
-- **Service**: 동일한 image 를 가진 *컨테이너 그룹*.
-- **Project**: Compose 가 관리하는 *논리 단위*.
-- **Profile**: 특정 환경에서만 실행되는 *서비스 묶음*.
-- **Healthcheck**: *준비 상태* 판단 기준.
-- **Depends_on**: 시작 *순서* 와 *대기*.
-
 ## Before/As
 
 **Before**: `docker run` 5번을 *셸 스크립트* 로 묶어 관리. 옵션은 *기억 의존*.
 
 **After**: `docker compose up` 한 줄. *모든 옵션* 이 yaml 에 *명시적*.
 
-## 실습: Compose 5단계
+## Compose 5단계
 
 ### 1단계 — `compose.yaml`
 
@@ -160,26 +136,12 @@ docker compose down -v         # volume 까지 제거
 
 대부분 회사의 *로컬 개발 환경* 은 Compose 입니다. CI 에서도 *통합 테스트 부트스트랩* 으로 자주 사용됩니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- *셋업은 *명령 하나* 로 끝나야 한다*.
-- *healthcheck* 없는 depends_on 은 *거짓말*.
-- *.env* 와 *.env.example* 을 분리한다.
-- *profiles* 로 *복잡도를 분할* 한다.
-- *down -v* 는 *복원 가능* 할 때만.
-
 ## 체크리스트
 
 - [ ] *compose.yaml* 한 파일에 모든 서비스가 있다.
 - [ ] 의존 서비스에 *healthcheck* 가 있다.
 - [ ] *.env / .env.example* 분리.
 - [ ] *profiles* 로 옵셔널 서비스 분리.
-
-## 연습 문제
-
-1. *web + db + redis* 3개를 *Compose* 로 띄워 보세요.
-2. db 의 *healthcheck* 를 추가하고 *준비 후* web 이 시작되게 하세요.
-3. *.env* 에 포트를 빼서 변수로 주입하세요.
 
 ## 정리 및 다음 단계
 

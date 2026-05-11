@@ -23,14 +23,6 @@ seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 
 > AI Safety & Guardrails 101 시리즈 (9/10)
 
 ---
-<!-- a-grade-intro:begin -->
-## 핵심 질문
-
-감사 로깅과 컴플라이언스를 어떻게 구축해야 사고 시 추적과 보고가 가능할까요?
-
-이 글은 그 질문에 답하기 위해 감사 로깅과 컴플라이언스의 핵심 결정과 운영 함정을 살펴봅니다.
-
-<!-- a-grade-intro:end -->
 
 ## Section 1
 
