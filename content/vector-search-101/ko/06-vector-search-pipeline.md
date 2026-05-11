@@ -51,6 +51,14 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 문서 수집(ingest), 임베딩(embedding), 인덱싱(indexing), 검색(search) 단계를 어떻게 깔끔하게 분리할 수 있을까요?
+- 자동 재인덱싱(reindex)을 트리거(trigger)해야 하는 이벤트는 무엇일까요?
+- 벡터만으로 부족할 때 BM25 같은 어휘 기반 검색(lexical search)과 벡터 검색을 어떻게 결합할까요?
+- 검색 결과를 LLM에 넘기기 전에 리랭커(reranker)를 추가해야 하는 시점은 언제일까요?
+- 운영 환경(production)에서 검색 품질 지표인 recall@k, MRR, nDCG는 어떻게 계산하고 추적할까요?
+
 ## 파이프라인 구조
 
 ![인덱싱 단계와 검색 단계의 전체 흐름](../../../assets/vector-search-101/06/06-01-pipeline-structure.ko.png)
@@ -63,13 +71,13 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 **인덱싱 단계**: 문서를 처리해서 검색 가능한 인덱스를 만드는 오프라인 작업입니다.
 
-```
+```text
 문서 로드 → 청킹 → 임베딩 → FAISS 인덱스 저장
 ```
 
 **검색 단계**: 사용자 쿼리를 받아 관련 청크를 반환하는 온라인 작업입니다.
 
-```
+```text
 쿼리 임베딩 → FAISS 검색 → 결과 반환
 ```
 

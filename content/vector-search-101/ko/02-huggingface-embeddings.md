@@ -52,6 +52,14 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ---
 
+## 이 글에서 다룰 문제
+
+- Hugging Face `sentence-transformers`와 OpenAI Embeddings API 사이에는 실제로 어떤 트레이드오프(trade-off)가 있을까요?
+- GPU 없이 로컬 임베딩 모델을 실행할 때 어떤 성능 함정이 생길까요?
+- 다국어 모델(multilingual model)과 영어 전용 모델(English-only model)은 한국어 검색 품질에서 어떻게 차이 날까요?
+- 배치 임베딩(batch embedding)에서는 메모리, 배치 크기(batch size), 토큰 한계를 어떻게 균형 있게 맞출까요?
+- 임베딩 모델 버전이 바뀌면 기존 인덱스(index)는 어떻게 마이그레이션(migration)해야 할까요?
+
 ## 설치
 
 필요한 패키지는 세 가지입니다.

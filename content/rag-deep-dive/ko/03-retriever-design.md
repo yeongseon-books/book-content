@@ -20,6 +20,15 @@ seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
 
+> Retriever는 단순한 최근접 이웃 조회기가 아닙니다. 후보 근거가 최종 컨텍스트가 되기까지의 정책을 결정하는 계층입니다.
+
+## 이 글에서 다룰 문제
+
+- `BaseRetriever`는 문서를 돌려주는 것 외에 어떤 호출 규약을 강제할까요?
+- `VectorStoreRetriever`는 어디에서 `similarity`, `mmr`, threshold 모드로 갈라질까요?
+- MMR이 의미 있으려면 `fetch_k`가 왜 `k`보다 더 넓어야 할까요?
+- `lambda_mult`는 중복과 커버리지를 어떻게 바꿀까요?
+
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

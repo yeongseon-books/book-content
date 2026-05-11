@@ -29,6 +29,14 @@ seo_description: 새벽 3시, 알람이 울립니다. 프로덕션 API가 갑자
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 요청이 앱에 도달하기 전에 Front End, ARR, Worker 같은 Azure 구성 요소를 어떤 순서로 거칠까요?
+- ARR Affinity 쿠키는 무엇을 위해 존재하고, 언제 끄는 편이 맞을까요?
+- Worker가 idle 상태에서 깨어날 때 warm-up 단계는 어느 정도 지연을 만들까요?
+- 어떤 신호가 Worker 종료나 재시작을 유발하고, 그 영향이 사용자 요청에 어떻게 나타날까요?
+- sticky routing은 수평 확장(horizontal scaling)과 어디에서 충돌할까요?
+
 ## 이 글에서 만들 멘탈 모델
 
 사용자 요청은 대략 아래 순서로 앱에 도착합니다.

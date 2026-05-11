@@ -28,6 +28,14 @@ seo_description: 앞선 글에서 App Service가 어떤 플랫폼인지, 어떤 
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 첫 번째 App Service 배포 전에 반드시 확정해 두어야 할 파라미터는 무엇일까요?
+- run-from-package 방식은 content deploy 방식과 무엇이 다를까요?
+- dev/stage/prod 환경에서 deployment slot 전략은 어디서부터 시작하는 것이 좋을까요?
+- 첫 배포 직후 health check가 자동으로 돌게 하려면 무엇을 켜 두어야 할까요?
+- 첫 배포에서 가장 자주 부딪히는 인증(auth)·권한(permission) 실패는 어떤 것들일까요?
+
 ## 이번 글에서 만들 결과
 
 이 글을 끝내면 다음을 직접 해보게 됩니다.

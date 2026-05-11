@@ -30,6 +30,14 @@ seo_description: 처음 App Service를 만들 때 헷갈리는 이유는, 선택
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 같은 App Service에서도 코드 배포, 기본 제공 컨테이너(built-in container), 커스텀 컨테이너(custom container)는 무엇이 다를까요?
+- Linux App Service에서 Docker 이미지를 실행할 때 startup command는 어떤 순서로 결정될까요?
+- Windows 컨테이너는 왜 특정 SKU에서만 실행될까요?
+- ZIP 배포와 컨테이너 배포는 롤백 전략이 어떻게 달라질까요?
+- 같은 앱을 여러 호스팅 모델로 함께 운영하는 것이 실제로 가치 있는 시점은 언제일까요?
+
 ## 먼저 결론: 대부분의 첫 선택은 이 조합이다
 
 대부분의 팀에게 첫 App Service 조합은 아래에서 크게 벗어나지 않습니다.

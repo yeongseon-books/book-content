@@ -51,6 +51,14 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 임베딩(embedding)은 수학적으로 무엇이며, 왜 텍스트를 굳이 숫자 벡터로 바꿔야 할까요?
+- 단어 임베딩(word embedding), 문장 임베딩(sentence embedding), 문서 임베딩(document embedding)은 실제로 어떻게 다를까요?
+- 임베딩 차원 수(dimensionality)가 커질수록 정확도와 비용은 어떻게 달라질까요?
+- 같은 텍스트라도 모델이 다르면 왜 다른 벡터가 나올까요?
+- 지금 만든 임베딩의 품질이 충분한지 어떻게 평가할 수 있을까요?
+
 ## 키워드 검색의 벽
 
 ![키워드 검색과 임베딩 검색의 차이](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.ko.png)
@@ -77,7 +85,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 *텍스트가 벡터 공간으로 들어가는 흐름*
 임베딩 모델은 텍스트를 고정 길이의 부동소수점 배열로 바꿉니다. `sentence-transformers/all-MiniLM-L6-v2`를 쓰면 모든 텍스트가 384차원 벡터가 됩니다. 768차원, 1536차원 모델도 흔합니다.
 
-```
+```text
 "파이썬 비동기"         → [0.12, -0.34, 0.87, ..., 0.05]  (384개 숫자)
 "파이썬으로 동시성 처리" → [0.14, -0.31, 0.85, ..., 0.07]  (384개 숫자)
 "강아지 간식 만들기"    → [-0.63, 0.77, -0.12, ..., 0.44] (384개 숫자)

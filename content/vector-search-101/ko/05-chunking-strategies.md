@@ -52,6 +52,14 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 긴 문서를 하나의 청크(chunk)로 통째로 임베딩하는 방식은 왜 좋지 않을까요?
+- 고정 크기 청킹(fixed-size chunking), 문장 기반 청킹(sentence-based chunking), 의미 기반 청킹(semantic chunking)은 각각 언제 잘 맞고 언제 한계가 드러날까요?
+- 청크 사이에 오버랩(overlap)을 두는 이유는 무엇이며, 그 비율은 어떻게 정할까요?
+- 코드, 표, Markdown 헤딩이 섞인 문서는 재현율(recall)을 잃지 않으면서 어떻게 청킹해야 할까요?
+- 각 청크에 메타데이터(metadata)로 섹션 제목이나 출처를 저장하면 실제로 어떤 이점이 있을까요?
+
 ## 청크 크기와 오버랩
 
 ![청크 크기와 오버랩의 구조](../../../assets/vector-search-101/05/05-01-chunk-size-and-overlap.ko.png)
@@ -63,7 +71,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 **chunk_overlap**: 인접한 청크 사이에 공유하는 길이입니다. 오버랩이 없으면 문장이 청크 경계에서 뚝 잘릴 수 있습니다. 오버랩을 주면 같은 내용이 두 청크에 걸쳐 나타나서 경계 근처 내용도 검색에 걸립니다.
 
-```
+```text
 원본 텍스트: A B C D E F G H I J (각 문자가 하나의 단어라고 가정)
 
 chunk_size=4, chunk_overlap=1 이면:

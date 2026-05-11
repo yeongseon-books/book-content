@@ -28,6 +28,14 @@ seo_description: 애플리케이션은 바로 다음 질문을 던집니다. 데
 
 ---
 
+## 이 글에서 다룰 문제
+
+- app setting, connection string, 환경 변수(env var)는 런타임(runtime)에서 어떤 방식으로 노출될까요?
+- slot-sticky 설정은 실제로 어떤 상황에서 도움이 될까요?
+- Key Vault reference는 일반 app setting과 무엇이 다르고, 권한(permission)은 어떤 흐름으로 연결될까요?
+- 어떤 설정 변경은 앱을 자동으로 재시작시키고, 어떤 변경은 그렇지 않을까요?
+- App Settings가 저장 시 암호화(encrypted at rest)되더라도, 왜 진짜 비밀 정보(secret)는 여기에 두면 안 될까요?
+
 ## 왜 설정이 배포보다 더 오래 문제를 만들까?
 
 처음 배포할 때는 앱이 뜨는지만 봅니다. 그런데 운영에서는 다음 문제가 더 자주 터집니다.

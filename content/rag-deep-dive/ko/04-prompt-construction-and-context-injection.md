@@ -20,6 +20,15 @@ seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 
+> 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽게 될 정확한 계약으로 바뀌는 지점입니다.
+
+## 이 글에서 다룰 문제
+
+- `PromptTemplate`는 문자열 치환 외에 무엇을 검증할까요?
+- `ChatPromptTemplate.from_messages()`는 입력 구조를 어떻게 유지할까요?
+- 검색된 `Document` 객체는 언제 `{context}` 문자열로 접힐까요?
+- `partial()`로 변수를 바인딩하면 무엇이 달라질까요?
+
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

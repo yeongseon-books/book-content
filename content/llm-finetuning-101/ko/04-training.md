@@ -28,6 +28,8 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 이 글은 그 질문에 답하기 위해 학습 루프와 하이퍼파라미터의 핵심 결정과 운영 함정을 살펴봅니다.
 
+> 학습 루프는 거대한 블랙박스가 아니라, 토큰화된 배치를 모델에 넣고 loss를 한 번 줄이는 동작의 반복입니다.
+
 ## 이 글에서 다룰 문제
 
 4편은 파인튜닝 시리즈에서 처음으로 실제 가중치 업데이트가 발생하는 글입니다. 하지만 여전히 목표는 큰 성능이 아니라 **학습 루프가 살아 있는지 확인하는 것**입니다. 1 step만 끝까지 도는 것을 검증해 두면, 이후 학습이 안 될 때 "환경 문제인지, 데이터 문제인지, 하이퍼파라미터 문제인지"를 빠르게 분리할 수 있습니다.
@@ -38,7 +40,7 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 학습 루프 한 step은 다음과 같이 분해됩니다.
 
-```
+```text
 1. batch = data_collator([sample_i, sample_j, ...])
 2. outputs = model(input_ids=..., attention_mask=..., labels=...)
 3. loss = outputs.loss
@@ -72,7 +74,7 @@ seo_description: 학습 루프 한 step은 다음과 같이 분해됩니다.
 
 **After** — 4편의 1-step 패턴을 따르면 다음 한 줄이 출력됩니다.
 
-```
+```text
 {'train_runtime': 1.42, 'train_samples_per_second': 1.41,
  'train_steps_per_second': 0.7, 'train_loss': 8.7421, 'epoch': 0.5}
 ```

@@ -22,6 +22,8 @@ seo_description: config에 모든 변수(임베딩 모델, top-k, LLM 모델, da
 
 # RAG 벤치마크 완성
 
+> 완성된 RAG 벤치마크는 **단일 숫자 하나가 아닙니다**. retrieval과 generation을 분리하고, 같은 고정 실험 조건에서 필요할 때마다 실행할 수 있는 재현 가능한 파이프라인입니다.
+
 ## 이 글에서 다룰 문제
 
 지금까지 만든 도구를 흩어진 채로 두면 의사결정에 도움이 되지 않습니다. 매번 사람이 손으로 돌리는 측정은 결국 안 돌리게 됩니다. 그러면 RAG 시스템의 품질은 다시 "최근 답변 인상"에 의존합니다.
@@ -39,7 +41,7 @@ seo_description: config에 모든 변수(임베딩 모델, top-k, LLM 모델, da
 
 완성된 벤치마크는 단일 함수입니다.
 
-```
+```text
 run_benchmark(config) ──►  report
    │
    ├─ Phase 1: build retriever (corpus + embedding + index)
@@ -70,7 +72,7 @@ run_benchmark(config) ──►  report
 
 **After**: 모든 PR이 `python3 run_benchmark.py --config configs/ci.yaml`을 자동 실행하고, baseline과 비교한 한 줄 리포트를 코멘트로 남깁니다.
 
-```
+```text
                   baseline  this PR  delta
 hit_rate@3        0.94      0.96    +0.02 ✓
 MRR               0.78      0.81    +0.03 ✓

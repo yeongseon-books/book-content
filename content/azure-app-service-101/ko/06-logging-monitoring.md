@@ -33,6 +33,14 @@ seo_description: “앱이 느려요.” “결제 페이지에서 가끔 멈춰
 
 ---
 
+## 이 글에서 다룰 문제
+
+- App Service 진단 로그(HTTP, 애플리케이션, 컨테이너)는 실제로 어디에 저장될까요?
+- Application Insights, Log Analytics, Diagnostic Settings는 역할을 어떻게 나눠 가질까요?
+- live tail이나 log streaming은 언제 도움이 되고, 어디서 한계에 부딪힐까요?
+- 메모리, HTTP 5xx, 응답 시간 알림은 어느 정도 임계값(threshold)부터 실용적일까요?
+- 디스크 quota 문제나 외부 의존성 장애를 가장 먼저 알려 주는 신호는 무엇일까요?
+
 ## 먼저 큰 그림: App Service에서 로그는 어디로 가는가?
 
 문제를 풀기 전에 로그의 목적지를 먼저 이해해야 합니다. 같은 `logger.info()`라도 **어디에 남느냐에 따라 쓸모가 완전히 달라지기 때문**입니다.

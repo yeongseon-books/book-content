@@ -20,6 +20,15 @@ seo_description: RetrievalQA의 한계와 LCEL 파이프라인이 같은 RAG 흐
 
 # RAG Chain 조립 — RetrievalQA vs LCEL
 
+> RAG chain은 질문에서 근거를 거쳐 프롬프트와 답변으로 이어지는 실행 그래프이며, LCEL은 그 이음새를 더 분명하게 드러냅니다.
+
+## 이 글에서 다룰 문제
+
+- `RetrievalQA`는 전통적인 인터페이스 뒤에 어떤 단계를 숨길까요?
+- LCEL은 RAG 그래프를 어떻게 더 직접적으로 드러낼까요?
+- 원래 질문을 유지할 때 `RunnablePassthrough()`는 왜 유용할까요?
+- 각 접근에서는 source 반환 로직을 어디에 붙일까요?
+
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 

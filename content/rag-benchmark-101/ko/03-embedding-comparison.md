@@ -22,6 +22,8 @@ seo_description: 임베딩 비교는 "하나만 바꾼다(one-variable-at-a-time
 
 # 임베딩 모델 비교
 
+> 임베딩 모델 비교는 어느 모델이 더 "똑똑한가"를 따지는 일이 아닙니다. 같은 retrieval pipeline 안에서 **관련 문서를 더 앞쪽에 배치하는 모델이 무엇인가**를 보는 일입니다.
+
 ## 이 글에서 다룰 문제
 
 임베딩 모델은 RAG 품질의 출발점입니다. 같은 chunk, 같은 retriever, 같은 LLM이라도 임베딩 모델이 바뀌면 답변 품질이 크게 흔들립니다. 그런데 모델 카드나 leaderboard 점수만 보고 결정하면 다음 두 가지 함정에 빠집니다.
@@ -36,7 +38,7 @@ seo_description: 임베딩 비교는 "하나만 바꾼다(one-variable-at-a-time
 
 임베딩 비교는 **"하나만 바꾼다(one-variable-at-a-time)"** 원칙 위에서 동작합니다.
 
-```
+```text
 [고정] corpus  +  [고정] QUERIES  +  [고정] k
                   │
                   ▼
@@ -69,7 +71,7 @@ corpus와 query를 고정하지 않으면, 점수 차이가 모델 때문인지 
 
 **After**: 같은 corpus와 query 위에서 두 모델을 돌립니다. 결과는 한 줄짜리 표:
 
-```
+```text
 model                    hit@3  MRR   avg_lat_ms  index_build_s
 all-MiniLM-L6-v2         1.00   0.83  6.2         3.1
 paraphrase-MiniLM-L3-v2  0.67   0.50  4.8         2.4

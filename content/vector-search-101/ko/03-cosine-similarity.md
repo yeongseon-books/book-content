@@ -50,6 +50,14 @@ seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않
 
 ---
 
+## 이 글에서 다룰 문제
+
+- 코사인 유사도(cosine similarity), 내적(dot product), 유클리드 거리(Euclidean distance)는 같은 순위를 만들까요, 아니면 다른 순위를 만들까요?
+- 벡터를 미리 정규화(pre-normalization)하면 왜 코사인 유사도와 내적이 사실상 같은 계산으로 수렴할까요?
+- 유사도 임계값(similarity threshold)을 정할 때는 어떤 데이터를 기준으로 봐야 할까요?
+- 유사도 점수가 높다고 해서 항상 같은 의미라는 뜻은 아닌데, 여기에는 어떤 함정이 있을까요?
+- 음수 유사도(negative similarity), 즉 반대 의미에 가까운 결과는 검색에서 어떻게 처리해야 할까요?
+
 ## 세 가지 거리 척도
 
 ![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
@@ -59,7 +67,7 @@ seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않
 
 코사인 유사도는 두 벡터가 이루는 각도의 코사인 값입니다. 벡터의 크기는 무시하고 방향만 비교합니다.
 
-```
+```text
 cos(θ) = (A · B) / (|A| × |B|)
 ```
 
@@ -76,7 +84,7 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 내적은 벡터를 구성 요소별로 곱해서 합산합니다.
 
-```
+```text
 A · B = Σ(Aᵢ × Bᵢ)
 ```
 
@@ -91,7 +99,7 @@ def dot_product(a: np.ndarray, b: np.ndarray) -> float:
 
 유클리드 거리는 두 점 사이의 직선 거리입니다.
 
-```
+```text
 L2(A, B) = √Σ(Aᵢ - Bᵢ)²
 ```
 
