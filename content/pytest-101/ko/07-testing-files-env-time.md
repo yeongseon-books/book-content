@@ -17,7 +17,7 @@ tags:
   - freezegun
   - 시스템 리소스 테스트
 seo_description: 파일, 환경변수, 시간 의존 코드를 pytest로 테스트하는 패턴을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 파일, 환경변수, 시간 테스트하기
@@ -59,7 +59,7 @@ last_reviewed: '2026-05-04'
 실제 파일 시스템을 사용하는 테스트와 tmp_path로 격리한 테스트를 비교합니다.
 
 ```python
-# before: 실제 경로 사용 — 테스트 간 충돌 위험
+# 이전 방식: 실제 경로 사용 — 테스트 간 충돌 위험이 있습니다
 import os
 
 def test_write_file():
@@ -71,12 +71,12 @@ def test_write_file():
 ```
 
 ```python
-# after: tmp_path 사용 — 자동 격리, 자동 정리
+# 개선 방식: tmp_path 사용 — 자동으로 격리하고 정리합니다
 def test_write_file(tmp_path):
     filepath = tmp_path / "test_output.txt"
     filepath.write_text("hello")
     assert filepath.read_text() == "hello"
-    # 정리 불필요 — pytest가 자동 처리
+    # 정리 코드는 불필요합니다 — pytest가 자동으로 처리합니다
 ```
 
 ## 단계별 실습
@@ -84,7 +84,7 @@ def test_write_file(tmp_path):
 ### Step 1: tmp_path로 파일 테스트
 
 ```python
-# file_processor.py
+# file_processor.py 파일
 from pathlib import Path
 import json
 
@@ -98,7 +98,7 @@ def load_config(filepath: Path) -> dict:
 ```
 
 ```python
-# test_file_processor.py
+# test_file_processor.py 파일
 import pytest
 from pathlib import Path
 from file_processor import save_config, load_config
@@ -128,7 +128,7 @@ def test_nested_directory(tmp_path):
 ### Step 2: 여러 파일 처리 테스트
 
 ```python
-# csv_processor.py
+# csv_processor.py 파일
 from pathlib import Path
 import csv
 
@@ -150,7 +150,7 @@ def merge_csv_files(input_dir: Path, output_file: Path) -> int:
 ```
 
 ```python
-# test_csv_processor.py
+# test_csv_processor.py 파일
 from csv_processor import merge_csv_files
 
 def test_merge_csv(tmp_path):
@@ -174,7 +174,7 @@ def test_merge_empty_dir(tmp_path):
 ### Step 3: 환경변수 테스트
 
 ```python
-# app_config.py
+# app_config.py 파일
 import os
 
 def get_config() -> dict:
@@ -186,7 +186,7 @@ def get_config() -> dict:
 ```
 
 ```python
-# test_app_config.py
+# test_app_config.py 파일
 from app_config import get_config
 
 def test_default_config(monkeypatch):
@@ -218,7 +218,7 @@ def test_debug_mode(monkeypatch):
 ### Step 4: 시간 고정 테스트
 
 ```python
-# billing.py
+# billing.py 파일
 from datetime import datetime
 
 def is_billing_day() -> bool:
@@ -233,7 +233,7 @@ def format_timestamp() -> str:
 ```
 
 ```python
-# test_billing.py
+# test_billing.py 파일
 from datetime import datetime
 from unittest.mock import patch
 from billing import is_billing_day, days_until_expiry, format_timestamp
@@ -273,7 +273,7 @@ pip install freezegun
 ```
 
 ```python
-# test_billing_freezegun.py
+# test_billing_freezegun.py 파일
 from freezegun import freeze_time
 from billing import is_billing_day, format_timestamp
 

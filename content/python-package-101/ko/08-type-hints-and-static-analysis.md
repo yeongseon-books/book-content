@@ -17,7 +17,7 @@ tags:
 - py.typed
 - Static Analysis
 - Typing
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하는 것이고, mypy는 코드를 실행하지 않고 타입 오류를 찾아주는 도구입니다.
 ---
 
@@ -89,7 +89,7 @@ result = process({"username": "alice"})  # mypy가 사전에 에러 감지
 ### Step 1. 기본 타입 힌트
 
 ```python
-# src/mylib/core.py
+# 예시 파일: src/mylib/core.py
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
@@ -106,7 +106,7 @@ def find_user(user_id: int) -> dict[str, str] | None:
 ```bash
 pip install mypy
 mypy src/
-# Success: no issues found in 2 source files
+# 검사 결과: 2개 소스 파일에서 문제를 찾지 못했습니다
 ```
 
 ```python
@@ -116,8 +116,8 @@ result: int = greet("Alice")  # str을 int에 할당
 
 ```bash
 mypy src/
-# error: Incompatible types in assignment
-#   (expression has type "str", variable has type "int")
+# 오류: 할당 시 타입이 호환되지 않습니다
+#   (표현식 타입은 "str"이고 변수 타입은 "int"입니다)
 ```
 
 ### Step 3. pyproject.toml에 mypy 설정
@@ -149,7 +149,7 @@ mylib = ["py.typed"]
 ### Step 5. 고급 타입 활용
 
 ```python
-# src/mylib/utils.py
+# 예시 파일: src/mylib/utils.py
 from typing import TypeVar, Callable
 
 T = TypeVar("T")

@@ -17,7 +17,7 @@ tags:
 - pool
 - Observability
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: production SQLAlchemy는 세 개의 손잡이로 조율합니다.
 ---
 

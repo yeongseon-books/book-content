@@ -17,7 +17,7 @@ tags:
 - uv
 - Dependencies
 - Virtual Environment
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간을 만드는 것이고, 의존성 관리는 어떤 패키지의 어떤 버전이 필요한지를 기록하는 것입니다.
 ---
 
@@ -88,10 +88,10 @@ pip install requests==2.31   # project-b 전용
 cd ~/practice/mylib-project
 python -m venv .venv
 source .venv/bin/activate    # macOS/Linux
-# .venv\Scripts\activate     # Windows
+# .venv\Scripts\activate     # Windows용
 
 which python
-# /home/user/practice/mylib-project/.venv/bin/python
+# 실행 중인 Python 경로: /home/user/practice/mylib-project/.venv/bin/python
 ```
 
 ### Step 2. 패키지 설치와 freeze
@@ -99,16 +99,16 @@ which python
 ```bash
 pip install requests flask
 pip list
-# requests  2.31.0
-# flask     3.0.0
+# 설치 예시: requests  2.31.0
+# 설치 예시: flask     3.0.0
 # ...
 
 pip freeze > requirements.txt
 cat requirements.txt
-# blinker==1.7.0
-# certifi==2024.2.2
-# flask==3.0.0
-# requests==2.31.0
+# freeze 결과: blinker==1.7.0
+# freeze 결과: certifi==2024.2.2
+# freeze 결과: flask==3.0.0
+# freeze 결과: requests==2.31.0
 # ...
 ```
 
@@ -126,7 +126,7 @@ pip list  # 동일한 패키지, 동일한 버전
 ### Step 4. pyproject.toml의 dependencies
 
 ```toml
-# pyproject.toml
+# 예시 파일: pyproject.toml
 [project]
 name = "mylib"
 version = "0.1.0"

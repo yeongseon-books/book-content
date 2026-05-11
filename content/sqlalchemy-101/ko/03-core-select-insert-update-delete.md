@@ -17,7 +17,7 @@ tags:
 - SQL Expression
 - Result
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다.
 ---
 
@@ -243,14 +243,14 @@ def safe_delete(conn, table, condition):
 JOIN은 두 가지 방식으로 적을 수 있습니다.
 
 ```python
-# A: select(...).join(...)
+# A 방식: select(...).join(...)
 stmt = (
     select(users.c.name, posts.c.title)
     .join(posts, posts.c.user_id == users.c.id)
     .order_by(posts.c.created_at.desc())
 )
 
-# B: select(...).select_from(a.join(b, ...))
+# B 방식: select(...).select_from(a.join(b, ...))
 joined = users.join(posts, posts.c.user_id == users.c.id)
 stmt = select(users.c.name, posts.c.title).select_from(joined)
 ```
@@ -439,7 +439,7 @@ stmt = select(users.c.name, cte.c.n).join(cte, cte.c.user_id == users.c.id)
 실무 코드에서 select은 보통 함수로 캡슐화해서 재사용합니다.
 
 ```python
-# repos/user_repo.py
+# repos/user_repo.py 파일 예시
 from sqlalchemy import select, insert, update
 from schema import users
 

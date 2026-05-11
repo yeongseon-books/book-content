@@ -17,7 +17,7 @@ tags:
 - README
 - API Reference
 - Sphinx
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: README는 패키지의 현관문이고, API Reference는 모든 함수의 사용 설명서입니다. 문서가 없는 패키지는 쓰이지 않습니다.
 ---
 
@@ -71,14 +71,14 @@ README.md:
 # mylib
 One-line description.
 
-## Installation
+## 설치
 pip install mylib
 
-## Quick Start
+## 빠른 시작
 from mylib import greet
 print(greet("World"))
 
-## Documentation
+## 문서
 https://yourname.github.io/mylib/
 ```
 
@@ -91,13 +91,13 @@ https://yourname.github.io/mylib/
 
 A simple greeting library for Python.
 
-## Installation
+## 설치
 
 ```bash
 pip install mylib
 ```
 
-## Quick Start
+## 빠른 시작
 
 ```python
 from mylib.core import greet
@@ -105,13 +105,13 @@ from mylib.core import greet
 print(greet("World"))  # Hello, World!
 ```
 
-## Features
+## 주요 기능
 
-- Simple and lightweight
-- Type-annotated
-- CLI support via `greet` command
+- 단순하고 가볍습니다
+- 타입 힌트를 포함합니다
+- `greet` 명령어 기반 CLI를 지원합니다
 
-## Development
+## 개발
 
 ```bash
 git clone https://github.com/yourname/mylib
@@ -120,7 +120,7 @@ pip install -e ".[dev]"
 pytest tests/
 ```
 
-## License
+## 라이선스
 
 MIT
 ```
@@ -128,7 +128,7 @@ MIT
 ### Step 2. docstring 추가
 
 ```python
-# src/mylib/core.py
+# 예시 파일: src/mylib/core.py
 def greet(name: str) -> str:
     """Return a greeting message.
 
@@ -177,7 +177,7 @@ echo "# Guide" > docs/guide.md
 
 ```markdown
 <!-- docs/api.md -->
-# API Reference
+# API Reference 문서
 
 ::: mylib.core
     options:
@@ -187,14 +187,14 @@ echo "# Guide" > docs/guide.md
 
 ```bash
 mkdocs serve
-# INFO - Serving on http://127.0.0.1:8000/
+# INFO - http://127.0.0.1:8000/ 에서 서빙 중
 ```
 
 ### Step 5. GitHub Pages 배포
 
 ```bash
 mkdocs gh-deploy
-# INFO - Deployed to https://yourname.github.io/mylib/
+# INFO - https://yourname.github.io/mylib/ 에 배포됨
 ```
 
 ## 이 코드에서 봐야 할 것

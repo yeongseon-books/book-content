@@ -16,7 +16,7 @@ tags:
 - Precision
 - Recall
 - MRR
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: retrieval 지표는 두 개의 집합을 비교하는 작업입니다.
 ---
 

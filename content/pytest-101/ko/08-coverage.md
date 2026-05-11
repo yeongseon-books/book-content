@@ -17,7 +17,7 @@ tags:
   - pytest-cov
   - 코드 커버리지
 seo_description: pytest-cov로 코드 커버리지를 측정하고 분석하는 방법을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # coverage와 테스트 품질 보기
@@ -62,15 +62,15 @@ test: process(5) → 라인 커버리지 60% (3/5)
 커버리지 없이 테스트하는 경우와 커버리지를 측정하는 경우를 비교합니다.
 
 ```bash
-# before: 커버리지 측정 없이 실행
+# 이전 방식: 커버리지를 측정하지 않고 실행합니다
 pytest
-# 결과: 4 passed — 하지만 어떤 코드가 테스트되지 않았는지 모름
+# 결과: 4 passed — 어떤 코드가 테스트되지 않았는지는 알 수 없습니다
 ```
 
 ```bash
-# after: 커버리지와 함께 실행
+# 개선 방식: 커버리지와 함께 실행합니다
 pytest --cov=src --cov-report=term-missing
-# 결과: 4 passed, coverage 78% — 누락 라인 번호까지 표시
+# 결과: 4 passed, coverage 78% — 누락 라인 번호까지 표시합니다
 ```
 
 ## 단계별 실습
@@ -84,7 +84,7 @@ pip install pytest-cov
 ### Step 2: 테스트 대상 코드 준비
 
 ```python
-# src/myapp/validator.py
+# src/myapp/validator.py 파일
 def validate_email(email: str) -> bool:
     if not email:
         return False
@@ -110,7 +110,7 @@ def validate_age(age: int) -> bool:
 ### Step 3: 부분 테스트 작성
 
 ```python
-# tests/test_validator.py
+# tests/test_validator.py 파일
 from myapp.validator import validate_email, validate_age
 
 def test_valid_email():
@@ -128,18 +128,18 @@ def test_valid_age():
 ```bash
 pytest --cov=src/myapp --cov-report=term-missing
 
-# 출력 예시:
-# Name                        Stmts   Miss  Cover   Missing
+# 출력 예시입니다:
+# 열 제목: Name                        Stmts   Miss  Cover   Missing
 # ---------------------------------------------------------
-# src/myapp/validator.py         16      6    63%   8-10, 20-22
+# 파일: src/myapp/validator.py         16      6    63%   8-10, 20-22
 # ---------------------------------------------------------
-# TOTAL                          16      6    63%
+# 합계: TOTAL                       16      6    63%
 ```
 
 ### Step 5: 누락 라인 보완
 
 ```python
-# tests/test_validator.py — 추가 테스트
+# tests/test_validator.py 파일 — 추가 테스트
 import pytest
 from myapp.validator import validate_email, validate_age
 
@@ -174,7 +174,7 @@ def test_age_type_error():
 
 ```bash
 pytest --cov=src/myapp --cov-report=term-missing
-# 결과: coverage 100%
+# 결과: coverage 100%입니다
 ```
 
 ## 이 코드에서 주목할 점

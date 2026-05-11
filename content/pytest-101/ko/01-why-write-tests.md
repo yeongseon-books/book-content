@@ -17,7 +17,7 @@ tags:
   - 소프트웨어 품질
   - 자동화 테스트
 seo_description: 테스트 작성이 개발 생산성과 코드 품질에 미치는 영향을 설명합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 왜 테스트를 작성해야 할까?
@@ -60,7 +60,7 @@ last_reviewed: '2026-05-04'
 테스트 없이 검증하는 방식과 pytest로 자동화하는 방식을 비교합니다.
 
 ```python
-# before: 수동으로 함수를 호출하여 눈으로 확인
+# 이전 방식: 수동으로 함수를 호출하여 눈으로 확인
 def add(a, b):
     return a + b
 
@@ -69,7 +69,7 @@ print(add(-1, 1))   # 0이 나오는지 눈으로 확인
 ```
 
 ```python
-# after: pytest로 자동 검증
+# 개선 방식: pytest로 자동 검증
 def add(a, b):
     return a + b
 
@@ -86,7 +86,7 @@ def test_add_negative():
 
 ```bash
 python3 --version
-# Python 3.10 이상이면 OK
+# Python 3.10 이상이면 됩니다
 ```
 
 ### Step 2: pytest 설치
@@ -101,7 +101,7 @@ pytest --version
 `calculator.py` 파일을 만듭니다.
 
 ```python
-# calculator.py
+# calculator.py 파일
 def add(a: int, b: int) -> int:
     return a + b
 
@@ -116,7 +116,7 @@ def divide(a: int, b: int) -> float:
 `test_calculator.py` 파일을 만듭니다.
 
 ```python
-# test_calculator.py
+# test_calculator.py 파일
 import pytest
 from calculator import add, divide
 

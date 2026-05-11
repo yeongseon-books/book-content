@@ -17,7 +17,7 @@ tags:
 - event
 - hybrid_property
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: SQLAlchemy 확장점은 세 층으로 나눠 생각합니다. 타입 층은 컬럼 값을 DB로 들고 날 때 변환하고, 속성 층은
   Python 객체와…
 ---

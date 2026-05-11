@@ -17,7 +17,7 @@ tags:
   - CI/CD
   - 테스트 자동화
 seo_description: GitHub Actions로 pytest를 자동 실행하는 CI 파이프라인을 구축합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # GitHub Actions에서 테스트 자동화하기
@@ -61,15 +61,15 @@ last_reviewed: '2026-05-04'
 수동 테스트와 CI 자동화를 비교합니다.
 
 ```bash
-# before: 수동 — 개발자가 직접 실행
+# 이전 방식: 수동 — 개발자가 직접 실행합니다
 git push origin feature-branch
 # PR 생성 후... 테스트를 깜빡하고 안 돌림
 # 리뷰어: "테스트 돌려봤어요?" → "아... 안 돌렸어요"
 ```
 
 ```yaml
-# after: 자동 — push하면 자동으로 실행
-# .github/workflows/test.yml
+# 개선 방식: 자동 — push하면 자동으로 실행합니다
+# .github/workflows/test.yml 파일
 name: Test
 on: [push, pull_request]
 jobs:
@@ -89,7 +89,7 @@ jobs:
 ### Step 1: 기본 워크플로우 작성
 
 ```yaml
-# .github/workflows/test.yml
+# .github/workflows/test.yml 파일
 name: Tests
 
 on:
@@ -103,30 +103,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 코드 체크아웃
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Python 설정
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: 의존성 설치
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[test]"
 
-      - name: Run tests
+      - name: 테스트 실행
         run: pytest -v --tb=short
 
-      - name: Run tests with coverage
+      - name: 커버리지 포함 테스트 실행
         run: pytest --cov=src --cov-report=term-missing --cov-fail-under=80
 ```
 
 ### Step 2: 매트릭스 빌드
 
 ```yaml
-# .github/workflows/test.yml
+# .github/workflows/test.yml 파일
 name: Tests
 
 on:
@@ -145,24 +145,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Python ${{ matrix.python-version }} 설정
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: 의존성 설치
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[test]"
 
-      - name: Run tests
+      - name: 테스트 실행
         run: pytest -v --cov=src --cov-report=term-missing
 ```
 
 ### Step 3: 의존성 캐싱
 
 ```yaml
-      - name: Cache pip packages
+      - name: pip 패키지 캐시
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
@@ -174,11 +174,11 @@ jobs:
 ### Step 4: 커버리지 아티팩트 업로드
 
 ```yaml
-      - name: Generate HTML coverage report
+      - name: HTML 커버리지 리포트 생성
         run: pytest --cov=src --cov-report=html
         if: matrix.python-version == '3.12'
 
-      - name: Upload coverage report
+      - name: 커버리지 리포트 업로드
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -189,7 +189,7 @@ jobs:
 ### Step 5: pyproject.toml에 test 의존성 설정
 
 ```toml
-# pyproject.toml
+# pyproject.toml 파일
 [project.optional-dependencies]
 test = [
     "pytest>=8.0",

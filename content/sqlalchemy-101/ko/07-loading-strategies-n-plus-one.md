@@ -17,7 +17,7 @@ tags:
 - N+1
 - selectinload
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: '"관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다.'
 ---
 

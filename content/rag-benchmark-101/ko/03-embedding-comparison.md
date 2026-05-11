@@ -16,7 +16,7 @@ tags:
 - Sentence-Transformers
 - MTEB
 - Latency
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 임베딩 비교는 "하나만 바꾼다(one-variable-at-a-time)" 원칙 위에서 동작합니다.
 ---
 

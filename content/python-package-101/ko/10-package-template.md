@@ -17,7 +17,7 @@ tags:
 - copier
 - GitHub Template
 - Best Practices
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: 패키지 템플릿은 프로젝트를 시작할 때 반복되는 설정 작업을 자동화하는 것이고, cookiecutter와 copier는 그 도구입니다.
 ---
 
@@ -81,7 +81,7 @@ mkdir myproject && cd myproject
 ```bash
 copier copy gh:yourname/python-template myproject
 # 프로젝트 이름? myproject
-# 설명? A useful tool
+# 설명 예시: A useful tool
 # → 30초 후 모든 설정 완료, 바로 코드 작성 시작
 ```
 
@@ -120,7 +120,7 @@ python-template/
 ### Step 2. copier 설정 파일 작성
 
 ```yaml
-# copier.yml
+# 예시 파일: copier.yml
 _subdirectory: "{{ project_slug }}"
 
 project_name:
@@ -200,7 +200,7 @@ select = ["E", "F", "I", "UP"]
 ### Step 4. CI/CD 워크플로 템플릿
 
 ```yaml
-# .github/workflows/ci.yml
+# 예시 파일: .github/workflows/ci.yml
 name: CI
 on: [push, pull_request]
 
@@ -227,13 +227,13 @@ jobs:
 pip install copier
 copier copy ./python-template my-new-project
 
-# ? project_name: My New Project
-# ? project_slug: my-new-project
-# ? module_name: my_new_project
-# ? description: A useful Python tool
-# ? author_name: Your Name
-# ? author_email: you@example.com
-# ? python_version: 3.11
+# ? project_name 값: My New Project
+# ? project_slug 값: my-new-project
+# ? module_name 값: my_new_project
+# ? description 값: A useful Python tool
+# ? author_name 값: Your Name
+# ? author_email 값: you@example.com
+# ? python_version 값: 3.11
 
 cd my-new-project
 python -m venv .venv && source .venv/bin/activate

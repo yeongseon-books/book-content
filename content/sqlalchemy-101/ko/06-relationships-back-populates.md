@@ -17,7 +17,7 @@ tags:
 - relationship
 - back_populates
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객체 레벨의 탐색 통로입니다.
 ---
 

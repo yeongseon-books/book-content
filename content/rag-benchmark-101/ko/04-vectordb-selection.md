@@ -16,7 +16,7 @@ tags:
 - IVF
 - Recall
 - ANN
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: VectorDB 비교의 골격은 다음과 같습니다.
 ---
 

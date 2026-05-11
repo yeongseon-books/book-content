@@ -17,7 +17,7 @@ tags:
 - click
 - argparse
 - Command Line
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: entry point와 click으로 pip install 후 바로 실행 가능한 CLI를 만드는 방법입니다.
 ---
 
@@ -81,7 +81,7 @@ greet --name Alice
 ### Step 1. argparse로 기본 CLI 만들기
 
 ```python
-# src/mylib/cli.py
+# 예시 파일: src/mylib/cli.py
 import argparse
 
 def main():
@@ -107,18 +107,18 @@ greet = "mylib.cli:main"
 ```bash
 pip install -e .
 greet Alice
-# [1] Hello, Alice!
+# 실행 결과: [1] Hello, Alice!
 
 greet Alice --count 3
-# [1] Hello, Alice!
-# [2] Hello, Alice!
-# [3] Hello, Alice!
+# 실행 결과: [1] Hello, Alice!
+# 실행 결과: [2] Hello, Alice!
+# 실행 결과: [3] Hello, Alice!
 ```
 
 ### Step 3. click으로 리팩터링
 
 ```python
-# src/mylib/cli.py
+# 예시 파일: src/mylib/cli.py
 import click
 
 @click.command()
@@ -143,17 +143,17 @@ dependencies = ["click>=8.0"]
 pip install -e .
 greet Alice --count 3
 greet --help
-# Usage: greet [OPTIONS] NAME
-#   Greet someone.
+# 사용법: greet [OPTIONS] NAME
+#   이름을 입력받아 인사합니다.
 # Options:
-#   --count INTEGER  Number of greetings
-#   --help           Show this message and exit.
+#   --count INTEGER  인사 횟수
+#   --help           도움말을 출력하고 종료합니다.
 ```
 
 ### Step 4. 서브커맨드 구조
 
 ```python
-# src/mylib/cli.py
+# 예시 파일: src/mylib/cli.py
 import click
 
 @click.group()

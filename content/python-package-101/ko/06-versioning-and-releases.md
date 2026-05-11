@@ -17,7 +17,7 @@ tags:
 - Release
 - CHANGELOG
 - Git Tag
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: SemVer는 버전 번호에 의미를 부여하는 규칙이고, Git 태그는 특정 커밋을 릴리스 시점으로 표시하는 것입니다.
 ---
 
@@ -74,9 +74,9 @@ MAJOR  (1.3.0 → 2.0.0): 기존 API 변경/삭제 (호환성 깨짐)
 ```text
 v1.2.3 ← git tag
   CHANGELOG.md:
-  ## 1.2.3 (2026-05-04)
-  ### Fixed
-  - Fixed timeout error in API client
+  ## 릴리스 1.2.3 (2026-05-04)
+  ### 수정됨
+  - API client의 timeout 오류 수정
 ```
 
 ## 단계별 실습
@@ -92,7 +92,7 @@ version = "0.1.0"
 ### Step 2. __version__ 동기화
 
 ```python
-# src/mylib/__init__.py
+# 예시 파일: src/mylib/__init__.py
 """mylib - A sample Python package."""
 __version__ = "0.1.0"
 ```
@@ -119,12 +119,12 @@ git tag
 ### Step 4. CHANGELOG 작성
 
 ```markdown
-# CHANGELOG.md
+# 예시 파일: CHANGELOG.md
 
-## 0.1.0 (2026-05-04)
+## 릴리스 0.1.0 (2026-05-04)
 
-### Added
-- Initial release
+### 추가됨
+- 첫 릴리스
 - `core.greet()` function
 - src layout project structure
 - pyproject.toml configuration
@@ -133,8 +133,8 @@ git tag
 ### Step 5. 버전 업 후 릴리스
 
 ```bash
-# pyproject.toml: version = "0.2.0"
-# src/mylib/__init__.py: __version__ = "0.2.0"
+# pyproject.toml의 version = "0.2.0"
+# src/mylib/__init__.py의 __version__ = "0.2.0"
 
 git add .
 git commit -m "Release v0.2.0: add string utilities"

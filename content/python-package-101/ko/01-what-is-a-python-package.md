@@ -17,7 +17,7 @@ tags:
 - Import
 - pip
 - Library
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른 사람과 공유하는 단위입니다. import로 불러오는 모든 것이 패키지입니다.
 ---
 
@@ -87,7 +87,7 @@ project-c/           # pip install mylib
 ### Step 1. 모듈 만들기
 
 ```python
-# ~/practice/python-pkg/calculator.py
+# 예시 파일: ~/practice/python-pkg/calculator.py
 def add(a: int, b: int) -> int:
     return a + b
 
@@ -96,7 +96,7 @@ def subtract(a: int, b: int) -> int:
 ```
 
 ```python
-# ~/practice/python-pkg/main.py
+# 예시 파일: ~/practice/python-pkg/main.py
 from calculator import add, subtract
 
 print(add(3, 5))        # 8
@@ -121,7 +121,7 @@ EOF
 ```
 
 ```python
-# ~/practice/python-pkg/main.py
+# 예시 파일: ~/practice/python-pkg/main.py
 from mymath import add, subtract
 
 print(add(3, 5))        # 8
@@ -134,9 +134,9 @@ import sys
 for path in sys.path:
     print(path)
 # '' (현재 디렉터리)
-# /usr/lib/python3.11
-# /usr/lib/python3.11/lib-dynload
-# /home/user/.local/lib/python3.11/site-packages
+# 경로 예시: /usr/lib/python3.11
+# 경로 예시: /usr/lib/python3.11/lib-dynload
+# 경로 예시: /home/user/.local/lib/python3.11/site-packages
 ```
 
 ### Step 4. pip으로 설치된 패키지 확인
@@ -145,17 +145,17 @@ for path in sys.path:
 pip list                          # 설치된 패키지 목록
 pip show requests                 # requests 패키지 정보
 pip show requests | grep Location # 설치 위치
-# Location: /home/user/.local/lib/python3.11/site-packages
+# 설치 위치: /home/user/.local/lib/python3.11/site-packages
 ```
 
 ### Step 5. 설치된 패키지의 실제 파일 확인
 
 ```bash
 python -c "import requests; print(requests.__file__)"
-# /home/user/.local/lib/python3.11/site-packages/requests/__init__.py
+# 설치 경로: /home/user/.local/lib/python3.11/site-packages/requests/__init__.py
 
 ls /home/user/.local/lib/python3.11/site-packages/requests/
-# __init__.py  api.py  models.py  sessions.py  ...
+# 포함 파일: __init__.py  api.py  models.py  sessions.py  ...
 ```
 
 ## 이 코드에서 봐야 할 것
@@ -183,8 +183,8 @@ import email  # 내 파일이 표준 라이브러리 대신 임포트됨
 ### 실수 3. 순환 임포트
 
 ```python
-# a.py: from b import func_b
-# b.py: from a import func_a
+# a.py에서 b의 func_b를 임포트
+# b.py에서 a의 func_a를 임포트
 # → ImportError
 ```
 

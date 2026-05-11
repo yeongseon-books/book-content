@@ -17,7 +17,7 @@ tags:
   - conftest
   - 테스트 데이터
 seo_description: pytest fixture의 scope, yield, conftest 활용법을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # fixture 이해하기
@@ -61,7 +61,7 @@ def test_greet(user):  ← 파라미터 이름으로 자동 주입
 setup/teardown 메서드와 fixture를 비교합니다.
 
 ```python
-# before: unittest 스타일 — setUp/tearDown
+# 이전 방식: unittest 스타일 — setUp/tearDown을 사용합니다
 import unittest
 import tempfile
 import os
@@ -83,7 +83,7 @@ class TestFileProcessor(unittest.TestCase):
 ```
 
 ```python
-# after: pytest fixture — 선언적이고 재사용 가능
+# 개선 방식: pytest fixture — 선언적이고 재사용할 수 있습니다
 import pytest
 import tempfile
 import os
@@ -96,7 +96,7 @@ def text_file(tmp_path):
 
 def test_read(text_file):
     assert text_file.read_text() == "hello"
-# teardown 불필요 — tmp_path가 자동 정리
+# 정리 코드는 불필요합니다 — tmp_path가 자동으로 정리합니다
 ```
 
 ## 단계별 실습
@@ -104,7 +104,7 @@ def test_read(text_file):
 ### Step 1: 기본 fixture 정의
 
 ```python
-# conftest.py
+# conftest.py 파일
 import pytest
 
 @pytest.fixture
@@ -123,7 +123,7 @@ def sample_users():
 ### Step 2: fixture 사용
 
 ```python
-# test_user.py
+# test_user.py 파일
 
 def test_user_name(sample_user):
     assert sample_user["name"] == "Alice"
@@ -139,7 +139,7 @@ def test_youngest_user(sample_users):
 ### Step 3: yield fixture로 리소스 관리
 
 ```python
-# conftest.py
+# conftest.py 파일
 import pytest
 import sqlite3
 
@@ -152,7 +152,7 @@ def db_connection():
     yield conn  # 테스트에 conn 제공
     conn.close()  # 테스트 완료 후 정리
 
-# test_db.py
+# test_db.py 파일
 def test_query_user(db_connection):
     cursor = db_connection.execute("SELECT name FROM users")
     row = cursor.fetchone()
@@ -162,7 +162,7 @@ def test_query_user(db_connection):
 ### Step 4: scope 활용
 
 ```python
-# conftest.py
+# conftest.py 파일
 import pytest
 
 @pytest.fixture(scope="module")
@@ -173,7 +173,7 @@ def expensive_resource():
     yield resource
     print("리소스 정리 (모듈 끝에 한 번)")
 
-# test_scope.py
+# test_scope.py 파일
 def test_first(expensive_resource):
     assert len(expensive_resource["data"]) == 10000
 
@@ -185,7 +185,7 @@ def test_second(expensive_resource):
 ### Step 5: fixture 합성
 
 ```python
-# conftest.py
+# conftest.py 파일
 import pytest
 
 @pytest.fixture
@@ -204,7 +204,7 @@ def api_client(base_url, auth_headers):
         "headers": auth_headers,
     }
 
-# test_api.py
+# test_api.py 파일
 def test_api_client_has_auth(api_client):
     assert "Authorization" in api_client["headers"]
 

@@ -17,7 +17,7 @@ tags:
 - DeclarativeBase
 - mapped_column
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: ORM 모델 클래스는 "파이썬 클래스 + Core Table"의 결합입니다.
 ---
 

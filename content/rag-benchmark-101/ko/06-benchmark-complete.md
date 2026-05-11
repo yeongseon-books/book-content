@@ -16,7 +16,7 @@ tags:
 - CI
 - Reproducibility
 - Reporting
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: config에 모든 변수(임베딩 모델, top-k, LLM 모델, dataset 경로)를 명시합니다.
 ---
 
@@ -88,7 +88,7 @@ faithfulness가 0.07 떨어졌으면 자동으로 차단됩니다. 사람이 잊
 ### 1단계 — Run config 정의
 
 ```python
-# configs/ci.yaml
+# CI 설정 파일 예시
 corpus_path: "data/corpus.jsonl"
 gold_set_path: "data/gold.jsonl"
 embedding_model: "sentence-transformers/all-MiniLM-L6-v2"

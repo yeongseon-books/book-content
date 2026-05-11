@@ -17,7 +17,7 @@ tags:
   - 테스트 케이스
   - 데이터 주도 테스트
 seo_description: pytest parametrize로 데이터 주도 테스트를 작성하는 방법을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # parametrization으로 테스트 케이스 늘리기
@@ -62,7 +62,7 @@ def test_length(input, expected):
 복사-붙여넣기 테스트와 parametrize를 비교합니다.
 
 ```python
-# before: 입력마다 함수를 복사
+# 이전 방식: 입력마다 함수를 복사합니다
 def test_is_palindrome_radar():
     assert is_palindrome("radar") is True
 
@@ -77,7 +77,7 @@ def test_is_palindrome_single():
 ```
 
 ```python
-# after: 데이터만 나열
+# 개선 방식: 데이터만 나열합니다
 import pytest
 
 @pytest.mark.parametrize("word,expected", [
@@ -95,7 +95,7 @@ def test_is_palindrome(word, expected):
 ### Step 1: 기본 parametrize
 
 ```python
-# test_math.py
+# test_math.py 파일
 import pytest
 
 def add(a, b):
@@ -115,7 +115,7 @@ def test_add(a, b, expected):
 ### Step 2: 문자열 파라미터
 
 ```python
-# test_string.py
+# test_string.py 파일
 import pytest
 
 def slugify(text: str) -> str:
@@ -135,7 +135,7 @@ def test_slugify(input_text, expected):
 ### Step 3: 예외 케이스 parametrize
 
 ```python
-# test_validation.py
+# test_validation.py 파일
 import pytest
 
 def parse_age(value: str) -> int:
@@ -161,7 +161,7 @@ def test_parse_age_invalid(value):
 ### Step 4: ID 커스터마이징
 
 ```python
-# test_with_ids.py
+# test_with_ids.py 파일
 import pytest
 
 @pytest.mark.parametrize("email,valid", [
@@ -182,7 +182,7 @@ def test_validate_email(email, valid):
 ### Step 5: 데카르트 곱 (중첩 parametrize)
 
 ```python
-# test_cartesian.py
+# test_cartesian.py 파일
 import pytest
 
 @pytest.mark.parametrize("method", ["GET", "POST", "PUT"])

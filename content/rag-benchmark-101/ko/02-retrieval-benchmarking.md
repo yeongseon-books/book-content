@@ -16,7 +16,7 @@ tags:
 - Hit-Rate
 - Latency
 - MRR
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 검색 벤치마크는 다음 네 가지 입력을 한 번에 묶어서 다룹니다.
 ---
 

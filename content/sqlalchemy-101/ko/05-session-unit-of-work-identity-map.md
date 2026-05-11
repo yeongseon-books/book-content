@@ -17,7 +17,7 @@ tags:
 - Session
 - Unit of Work
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Session은 작업 메모지(Unit of Work)와 캐시 노트(Identity Map)를 한 권의 노트로 묶어 둔
   것입니다.
 ---

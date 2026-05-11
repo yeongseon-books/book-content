@@ -17,7 +17,7 @@ tags:
 - Project Structure
 - Packaging
 - setuptools
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 잡는 방법을 설명합니다.
 ---
 
@@ -143,7 +143,7 @@ source .venv/bin/activate
 pip install -e .
 
 python -c "from mylib.core import greet; print(greet('World'))"
-# Hello, World!
+# 실행 결과: Hello, World!
 ```
 
 ### Step 4. 테스트 추가

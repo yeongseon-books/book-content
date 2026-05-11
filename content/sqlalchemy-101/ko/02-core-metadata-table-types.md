@@ -17,7 +17,7 @@ tags:
 - MetaData
 - Schema
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: MetaData는 schema의 카탈로그입니다. application이 알고 있는 모든 Table 정의를 담아 두는
   컨테이너이고, 그…
 ---

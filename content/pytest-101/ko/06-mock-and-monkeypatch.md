@@ -17,7 +17,7 @@ tags:
   - monkeypatch
   - 테스트 더블
 seo_description: mock과 monkeypatch로 외부 의존성을 격리하는 방법을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # mock과 monkeypatch
@@ -58,7 +58,7 @@ last_reviewed: '2026-05-04'
 실제 API를 호출하는 테스트와 mock으로 격리한 테스트를 비교합니다.
 
 ```python
-# before: 실제 HTTP 호출 — 느리고 외부 의존적
+# 이전 방식: 실제 HTTP 호출 — 느리고 외부 의존적입니다
 import requests
 
 def get_user_name(user_id):
@@ -66,13 +66,13 @@ def get_user_name(user_id):
     return response.json()["name"]
 
 def test_get_user_name():
-    # 실제 API 호출 — 네트워크 필요, 느림, 불안정
+    # 실제 API를 호출합니다 — 네트워크가 필요하고 느리며 불안정합니다
     name = get_user_name(1)
     assert name == "Alice"
 ```
 
 ```python
-# after: mock으로 HTTP 호출을 대체
+# 개선 방식: mock으로 HTTP 호출을 대체합니다
 from unittest.mock import patch, MagicMock
 
 def test_get_user_name():
@@ -89,7 +89,7 @@ def test_get_user_name():
 ### Step 1: 기본 mock 사용
 
 ```python
-# weather.py
+# weather.py 파일
 import requests
 
 def get_temperature(city: str) -> float:
@@ -101,7 +101,7 @@ def get_temperature(city: str) -> float:
 ```
 
 ```python
-# test_weather.py
+# test_weather.py 파일
 from unittest.mock import patch, MagicMock
 from weather import get_temperature
 
@@ -121,7 +121,7 @@ def test_get_temperature():
 ### Step 2: monkeypatch로 함수 교체
 
 ```python
-# notification.py
+# notification.py 파일
 import smtplib
 
 def send_email(to: str, subject: str, body: str) -> bool:
@@ -132,7 +132,7 @@ def send_email(to: str, subject: str, body: str) -> bool:
 ```
 
 ```python
-# test_notification.py
+# test_notification.py 파일
 from notification import send_email
 
 def test_send_email(monkeypatch):
@@ -160,7 +160,7 @@ def test_send_email(monkeypatch):
 ### Step 3: side_effect로 예외 시뮬레이션
 
 ```python
-# test_error_handling.py
+# test_error_handling.py 파일
 from unittest.mock import patch
 import requests
 from weather import get_temperature
@@ -175,7 +175,7 @@ def test_network_error():
 
 def test_invalid_json():
     mock_response = MagicMock()
-    mock_response.json.side_effect = ValueError("Invalid JSON")
+    mock_response.json.side_effect = ValueError("잘못된 JSON")
 
     with patch("weather.requests.get", return_value=mock_response):
         try:
@@ -188,7 +188,7 @@ def test_invalid_json():
 ### Step 4: monkeypatch로 환경변수 설정
 
 ```python
-# config.py
+# config.py 파일
 import os
 
 def get_database_url() -> str:
@@ -199,7 +199,7 @@ def get_database_url() -> str:
 ```
 
 ```python
-# test_config.py
+# test_config.py 파일
 import pytest
 from config import get_database_url
 
@@ -216,7 +216,7 @@ def test_missing_database_url(monkeypatch):
 ### Step 5: 호출 검증 패턴
 
 ```python
-# test_call_verification.py
+# test_call_verification.py 파일
 from unittest.mock import patch, call
 
 def process_items(items, handler):

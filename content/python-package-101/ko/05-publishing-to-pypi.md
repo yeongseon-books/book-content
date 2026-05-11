@@ -17,7 +17,7 @@ tags:
 - Publishing
 - TestPyPI
 - Distribution
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드된 패키지를 PyPI에 업로드하는 도구입니다.
 ---
 
@@ -99,19 +99,19 @@ pip install twine
 python -m build                 # 이전 글에서 빌드
 
 twine check dist/*
-# Checking dist/mylib-0.1.0-py3-none-any.whl: PASSED
-# Checking dist/mylib-0.1.0.tar.gz: PASSED
+# 검사 통과: dist/mylib-0.1.0-py3-none-any.whl
+# 검사 통과: dist/mylib-0.1.0.tar.gz
 ```
 
 ### Step 3. TestPyPI에 업로드
 
 ```bash
 twine upload --repository testpypi dist/*
-# Enter your API token: pypi-...
+# API 토큰 입력: pypi-...
 
-# Uploading mylib-0.1.0-py3-none-any.whl
-# Uploading mylib-0.1.0.tar.gz
-# View at: https://test.pypi.org/project/mylib/0.1.0/
+# 업로드 중: mylib-0.1.0-py3-none-any.whl
+# 업로드 중: mylib-0.1.0.tar.gz
+# 확인 주소: https://test.pypi.org/project/mylib/0.1.0/
 ```
 
 ### Step 4. TestPyPI에서 설치 테스트
@@ -125,18 +125,18 @@ pip install --index-url https://test.pypi.org/simple/ \
     mylib
 
 python -c "from mylib.core import greet; print(greet('PyPI'))"
-# Hello, PyPI!
+# 실행 결과: Hello, PyPI!
 deactivate
 ```
 
 ### Step 5. 실제 PyPI에 배포
 
 ```bash
-# PyPI 계정과 토큰은 별도 발급 (pypi.org)
+# PyPI 계정과 토큰은 별도로 발급합니다 (pypi.org)
 twine upload dist/*
-# Enter your API token: pypi-...
+# API 토큰 입력: pypi-...
 
-# View at: https://pypi.org/project/mylib/0.1.0/
+# 확인 주소: https://pypi.org/project/mylib/0.1.0/
 ```
 
 ## 이 코드에서 봐야 할 것

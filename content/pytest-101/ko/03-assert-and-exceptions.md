@@ -17,7 +17,7 @@ tags:
   - 예외 테스트
   - pytest.raises
 seo_description: pytest assert 재작성과 예외 테스트 패턴을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # assert와 예외 테스트
@@ -63,7 +63,7 @@ assert result == expected
 unittest 스타일과 pytest 스타일의 assert를 비교합니다.
 
 ```python
-# before: unittest 스타일 — 메서드 이름을 외워야 함
+# 이전 방식: unittest 스타일 — 메서드 이름을 외워야 합니다
 import unittest
 
 class TestMath(unittest.TestCase):
@@ -75,7 +75,7 @@ class TestMath(unittest.TestCase):
 ```
 
 ```python
-# after: pytest 스타일 — assert 하나로 통일
+# 개선 방식: pytest 스타일 — assert 하나로 통일합니다
 import pytest
 
 def test_add():
@@ -91,7 +91,7 @@ def test_add():
 ### Step 1: 기본 assert 패턴
 
 ```python
-# test_assert_patterns.py
+# test_assert_patterns.py 파일
 
 def test_equality():
     assert 1 + 1 == 2
@@ -116,7 +116,7 @@ def test_identity():
 ### Step 2: 컬렉션 비교
 
 ```python
-# test_collections.py
+# test_collections.py 파일
 
 def test_list_comparison():
     expected = [1, 2, 3, 4, 5]
@@ -137,7 +137,7 @@ def test_set_comparison():
 ### Step 3: 부동소수점 비교
 
 ```python
-# test_float.py
+# test_float.py 파일
 import pytest
 
 def test_float_naive():
@@ -159,7 +159,7 @@ def test_approx_list():
 ### Step 4: 예외 테스트
 
 ```python
-# test_exceptions.py
+# test_exceptions.py 파일
 import pytest
 
 def divide(a, b):
@@ -190,7 +190,7 @@ def test_raises_wrong_exception():
 ### Step 5: 커스텀 에러 메시지
 
 ```python
-# test_custom_message.py
+# test_custom_message.py 파일
 
 def test_with_message():
     value = compute_score()

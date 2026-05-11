@@ -17,7 +17,7 @@ tags:
   - test discovery
   - 프로젝트 구조
 seo_description: pytest 테스트 파일 구조와 실행 방법을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 첫 번째 pytest 테스트 작성하기
@@ -64,8 +64,8 @@ project/
 테스트 없는 프로젝트와 구조화된 테스트 프로젝트를 비교합니다.
 
 ```python
-# before: 프로덕션 코드와 테스트가 섞여 있음
-# main.py
+# 이전 방식: 프로덕션 코드와 테스트가 섞여 있습니다
+# main.py 파일
 def greet(name):
     return f"Hello, {name}"
 
@@ -74,14 +74,14 @@ if __name__ == "__main__":
 ```
 
 ```python
-# after: 분리된 구조
-# src/myapp/greeting.py
+# 개선 방식: 구조를 분리했습니다
+# src/myapp/greeting.py 파일
 def greet(name: str) -> str:
     if not name:
         raise ValueError("이름이 비어 있습니다")
     return f"Hello, {name}"
 
-# tests/test_greeting.py
+# tests/test_greeting.py 파일
 import pytest
 from myapp.greeting import greet
 
@@ -105,7 +105,7 @@ touch src/myapp/__init__.py
 ### Step 2: 프로덕션 코드 작성
 
 ```python
-# src/myapp/string_utils.py
+# src/myapp/string_utils.py 파일
 def reverse_string(s: str) -> str:
     """문자열을 뒤집습니다."""
     if not isinstance(s, str):
@@ -126,7 +126,7 @@ def truncate(s: str, max_length: int = 10) -> str:
 ### Step 3: 테스트 작성
 
 ```python
-# tests/test_string_utils.py
+# tests/test_string_utils.py 파일
 import pytest
 from myapp.string_utils import reverse_string, count_vowels, truncate
 
@@ -168,7 +168,7 @@ class TestTruncate:
 ### Step 4: pyproject.toml 설정
 
 ```toml
-# pyproject.toml
+# pyproject.toml 파일
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

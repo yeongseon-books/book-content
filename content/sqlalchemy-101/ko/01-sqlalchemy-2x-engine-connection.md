@@ -17,7 +17,7 @@ tags:
 - Connection
 - SQLite
 - DBAPI
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: SQLAlchemy의 Engine은 "데이터베이스와 통신할 수 있는 능력 그 자체를 객체화한 것"입니다.
 ---
 

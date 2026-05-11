@@ -17,7 +17,7 @@ tags:
 - aiosqlite
 - AsyncSession
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: async SQLAlchemy는 기존 ORM의 얇은 awaitable wrapper입니다.
 ---
 
@@ -85,7 +85,7 @@ async에서는 `obj.posts` 같은 lazy 접근이 동기 SQL을 호출하므로, 
 동기 코드를 async로 옮기는 1대1 매핑입니다.
 
 ```python
-# Before: sync
+# 이전: 동기 버전
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 
@@ -99,7 +99,7 @@ def list_users():
 ```
 
 ```python
-# After: async
+# 이후: 비동기 버전
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy import select
 
