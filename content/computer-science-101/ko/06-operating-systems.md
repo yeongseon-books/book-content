@@ -18,7 +18,7 @@ tags:
   - 가상 메모리
   - 동시성
 seo_description: 운영체제가 프로세스, 스레드, 메모리, 시스템 콜을 어떻게 관리하는지 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 운영체제
@@ -57,12 +57,12 @@ OS의 추상화를 모르면 디버깅은 마법이 됩니다.
 **Before — OS를 의식하지 않은 코드:**
 
 ```python
-# 100개 URL을 순차적으로 가져오기 — 대부분의 시간을 대기
+# URL 100개를 순차적으로 가져오므로 대부분의 시간을 기다립니다
 import urllib.request
 
 urls = [f"https://httpbin.org/delay/1?n={i}" for i in range(100)]
 results = [urllib.request.urlopen(u).read() for u in urls]
-# 약 100초 — CPU는 거의 놀고 I/O 대기만 합니다
+# 약 100초가 걸리며 CPU는 거의 쉬고 I/O만 기다립니다
 ```
 
 **After — OS의 비동기 I/O를 활용:**
@@ -112,7 +112,7 @@ p.join()
 ### 2단계: GIL과 멀티스레딩의 한계
 
 ```python
-# CPU 바운드 작업은 스레드로 빨라지지 않습니다 (CPython의 GIL)
+# CPU 바운드 작업은 스레드로 빨라지지 않습니다 (CPython의 GIL 영향)
 import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
@@ -145,7 +145,7 @@ print(f"프로세스 x4: {time.perf_counter() - start:.2f}s")  # 약 4배 빨라
 ### 3단계: 시스템 콜 들여다보기
 
 ```python
-# Python의 open()은 내부적으로 OS의 open(2) 시스템 콜을 호출합니다
+# 파이썬의 open()은 내부적으로 OS의 open(2) 시스템 콜을 호출합니다
 import os
 
 fd = os.open("/tmp/oscourse_demo.txt", os.O_CREAT | os.O_WRONLY, 0o644)
@@ -159,7 +159,7 @@ os.remove("/tmp/oscourse_demo.txt")
 ### 4단계: 가상 메모리 관찰하기
 
 ```python
-# 프로세스의 메모리 사용량 확인 (Linux/macOS)
+# 프로세스 메모리 사용량을 확인합니다 (Linux/macOS)
 import os
 import resource
 
@@ -172,8 +172,8 @@ print(f"page faults    : {usage.ru_minflt}")    # 페이지 부재 횟수
 ### 5단계: 동시성 vs 병렬성
 
 ```python
-# 동시성 = 여러 작업이 진행 중인 상태 (시간 분할 가능)
-# 병렬성 = 여러 작업이 같은 순간에 실행되는 상태 (다중 CPU 코어)
+# 동시성은 여러 작업이 진행 중인 상태입니다 (시간 분할 가능)
+# 병렬성은 여러 작업이 같은 순간에 실행되는 상태입니다 (다중 CPU 코어)
 
 import asyncio
 import time

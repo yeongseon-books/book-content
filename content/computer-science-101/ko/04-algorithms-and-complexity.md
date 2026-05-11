@@ -18,7 +18,7 @@ tags:
   - 자료구조
   - 성능
 seo_description: 알고리즘과 시간/공간 복잡도, Big-O 표기법을 입문자 눈높이로 설명하는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 알고리즘과 복잡도
@@ -126,10 +126,10 @@ print(f"binary : {time.perf_counter() - start:.6f}s")
 ### 3단계: 자료구조 선택이 복잡도를 바꾼다
 
 ```python
-# list: in 연산은 O(n)
+# 리스트에서는 in 연산이 O(n)입니다
 nums_list = list(range(1_000_000))
 
-# set: in 연산은 평균 O(1)
+# 집합에서는 in 연산이 평균 O(1)입니다
 nums_set = set(nums_list)
 
 start = time.perf_counter()

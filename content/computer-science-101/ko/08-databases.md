@@ -18,7 +18,7 @@ tags:
   - 트랜잭션
   - ACID
 seo_description: 데이터베이스가 데이터를 어떻게 저장·조회·보호하는지 인덱스와 트랜잭션 중심으로 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 데이터베이스
@@ -65,7 +65,7 @@ for (user_id,) in users:
 **After — JOIN과 인덱스 활용:**
 
 ```python
-# 한 번의 쿼리로 끝, user_id에 인덱스가 있으면 빠릅니다
+# 한 번의 쿼리로 끝나며 user_id 인덱스가 있으면 더 빠릅니다
 cursor.execute("""
     SELECT u.id, o.id, o.amount
     FROM users u
@@ -112,17 +112,17 @@ conn.commit()
 ### 2단계: 기본 쿼리
 
 ```python
-# SELECT
+# 전체 행을 조회합니다
 for row in cur.execute("SELECT id, email FROM users"):
     print(row)
 
-# WHERE + ORDER BY + LIMIT
+# 조건 필터링 후 정렬하고 일부만 가져옵니다
 for row in cur.execute(
     "SELECT name, email FROM users WHERE name LIKE 'A%' ORDER BY id LIMIT 10"
 ):
     print(row)
 
-# JOIN
+# 테이블을 조인해 함께 조회합니다
 for row in cur.execute("""
     SELECT u.name, SUM(o.amount) AS total
     FROM users u
@@ -166,7 +166,7 @@ print(f"인덱스 후: {time.perf_counter() - start:.6f}s")
 ```python
 for row in cur.execute("EXPLAIN QUERY PLAN SELECT * FROM big WHERE k = 12345"):
     print(row)
-# (… USING INDEX idx_big_k …) 같은 줄이 보이면 인덱스를 사용하는 것
+# (... USING INDEX idx_big_k ...) 같은 문구가 보이면 인덱스를 사용한 것입니다
 ```
 
 ### 5단계: 트랜잭션과 ACID

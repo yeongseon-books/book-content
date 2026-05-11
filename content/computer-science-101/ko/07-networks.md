@@ -18,7 +18,7 @@ tags:
   - DNS
   - 소켓
 seo_description: TCP/IP, HTTP, DNS가 어떻게 동작하는지 소켓 실습과 함께 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 네트워크
@@ -64,7 +64,7 @@ print(data[:80])
 import socket
 import ssl
 
-# HTTPS = TCP + TLS + HTTP
+# HTTPS는 TCP 위에 TLS와 HTTP가 올라간 구조입니다
 ctx = ssl.create_default_context()
 with socket.create_connection(("httpbin.org", 443)) as sock:
     with ctx.wrap_socket(sock, server_hostname="httpbin.org") as tls:
@@ -92,7 +92,7 @@ host = "www.python.org"
 ip = socket.gethostbyname(host)
 print(f"{host} → {ip}")
 
-# 모든 IP 알아보기 (IPv4, IPv6)
+# 연결 가능한 IP를 모두 확인합니다 (IPv4, IPv6)
 for info in socket.getaddrinfo(host, 443):
     family, _, _, _, sockaddr = info
     print(family.name, sockaddr)
@@ -101,7 +101,7 @@ for info in socket.getaddrinfo(host, 443):
 ### 2단계: TCP 에코 서버와 클라이언트
 
 ```python
-# server.py — 한 클라이언트만 받는 단순 에코 서버
+# server.py 파일 예시 — 클라이언트 하나만 받는 단순 에코 서버입니다
 import socket
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as srv:
@@ -116,7 +116,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as srv:
 ```
 
 ```python
-# client.py — 위 서버에 메시지를 보내고 응답을 출력합니다
+# client.py 파일 예시 — 위 서버에 메시지를 보내고 응답을 출력합니다
 import socket
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cli:
@@ -144,7 +144,7 @@ print("body bytes:", len(body))
 ### 4단계: TCP vs UDP 비교
 
 ```python
-# UDP는 연결 없이 보내고, 도착 여부를 보장하지 않습니다
+# UDP는 연결 없이 전송하며 도착 여부를 보장하지 않습니다
 import socket
 
 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:

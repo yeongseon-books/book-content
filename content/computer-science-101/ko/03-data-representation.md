@@ -18,7 +18,7 @@ tags:
   - 부동소수점
   - 자료형
 seo_description: 이진수, 문자 인코딩(ASCII, UTF-8), 정수와 부동소수점 표현 방식을 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 데이터 표현
@@ -99,12 +99,12 @@ print(to_binary(42))  # 101010
 ### 2단계: ASCII와 UTF-8
 
 ```python
-# ASCII: 영문 1바이트
+# ASCII에서는 영문이 1바이트입니다
 print(ord("A"))        # 65
 print(chr(65))         # A
 print(ord("a"))        # 97
 
-# UTF-8: 한글 3바이트
+# UTF-8에서는 한글이 3바이트입니다
 korean = "가"
 print(ord(korean))                # 44032
 print(korean.encode("utf-8"))     # b'\xea\xb0\x80' (3바이트)
@@ -120,11 +120,11 @@ print(len(emoji.encode("utf-8")))  # 4 (바이트 수)
 ### 3단계: 정수의 크기와 2의 보수
 
 ```python
-# Python의 정수는 크기 제한이 없습니다 (임의 정밀도)
+# 파이썬 정수는 크기 제한이 없습니다 (임의 정밀도)
 big_number = 2 ** 100
 print(big_number)  # 1267650600228229401496703205376
 
-# 하지만 C, Java 등에서는 고정 크기입니다
+# 하지만 C나 Java 등에서는 고정 크기입니다
 # 8비트 부호 있는 정수: -128 ~ 127
 # 32비트 부호 있는 정수: -2,147,483,648 ~ 2,147,483,647
 
@@ -149,7 +149,7 @@ import struct
 # 0.1의 실제 저장 값을 확인합니다
 print(f"{0.1:.20f}")  # 0.10000000000000000555
 
-# IEEE 754 double의 비트 표현
+# IEEE 754 배정밀도 부동소수점의 비트 표현입니다
 bits = struct.pack("d", 0.1)
 print(" ".join(f"{b:08b}" for b in bits))
 

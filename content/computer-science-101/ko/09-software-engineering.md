@@ -18,7 +18,7 @@ tags:
   - 코드 리뷰
   - 리팩터링
 seo_description: 코딩과 소프트웨어 엔지니어링의 차이를 테스트, 버전 관리, 리뷰, 리팩터링 중심으로 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 소프트웨어 엔지니어링
@@ -63,7 +63,7 @@ def calc_discount(price, user_type):
 **After — 테스트로 동작을 명세화한 함수:**
 
 ```python
-# discount.py
+# discount.py 파일 예시
 def calc_discount(price: float, user_type: str) -> float:
     if price < 0:
         raise ValueError("price must be non-negative")
@@ -71,7 +71,7 @@ def calc_discount(price: float, user_type: str) -> float:
     return price * rates.get(user_type, 1.0)
 
 
-# test_discount.py
+# test_discount.py 파일 예시
 import pytest
 from discount import calc_discount
 
@@ -126,13 +126,13 @@ git commit -m "feat: add VIP discount tier"
 
 # 원격에 올리고 PR 생성
 git push origin feature/discount-vip
-# GitHub/GitLab에서 Pull Request 열기
+# GitHub나 GitLab에서 풀 리퀘스트를 엽니다
 ```
 
 ### 4단계: 리팩터링 — 동작은 그대로, 구조만 개선
 
 ```python
-# Before: 조건이 늘어날 때마다 함수가 길어집니다
+# 이전 방식: 조건이 늘어날 때마다 함수가 길어집니다
 def calc_discount(price, user_type):
     if user_type == "vip":
         return price * 0.7
@@ -143,7 +143,7 @@ def calc_discount(price, user_type):
     return price
 
 
-# After: 데이터 테이블로 분리 — 새 등급은 한 줄 추가로 끝
+# 개선 방식: 데이터 테이블로 분리하면 새 등급도 한 줄로 추가됩니다
 DISCOUNT_RATES = {
     "vip":     0.70,
     "member":  0.90,
@@ -161,7 +161,7 @@ def calc_discount(price: float, user_type: str) -> float:
 ### 5단계: 간단한 CI 설정 (GitHub Actions)
 
 ```yaml
-# .github/workflows/ci.yml
+# .github/workflows/ci.yml 파일 예시
 name: CI
 on: [push, pull_request]
 jobs:

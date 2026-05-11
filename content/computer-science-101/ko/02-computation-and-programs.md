@@ -18,7 +18,7 @@ tags:
   - 컴파일러
   - 인터프리터
 seo_description: 계산의 정의, 튜링 기계, 프로그래밍 언어의 발전과 패러다임을 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 계산과 프로그램
@@ -114,7 +114,7 @@ print(simple_state_machine(tape))  # ['0', '1', '0', '0', '1']
 ```python
 def halts(program, input_data):
     """이 함수는 구현할 수 없습니다."""
-    # program이 input_data에 대해 멈추는지 판별
+    # program이 input_data에서 멈추는지 판별합니다
     # 증명: 이 함수가 존재한다고 가정하면 모순이 발생합니다
     raise NotImplementedError("정지 문제는 풀 수 없습니다")
 
@@ -168,8 +168,8 @@ print(sum_of_squares_functional(5))  # 55
 ### 5단계: 컴파일과 인터프리트
 
 ```python
-# Python은 인터프리터 언어입니다
-# 소스 코드 → 바이트코드 → 가상 머신에서 실행
+# 파이썬은 인터프리터 언어입니다
+# 소스 코드 → 바이트코드 → 가상 머신 실행 순서로 처리됩니다
 
 import dis
 
@@ -178,12 +178,12 @@ def add(a: int, b: int) -> int:
     return a + b
 
 
-# Python 바이트코드를 확인합니다
+# 파이썬 바이트코드를 확인합니다
 dis.dis(add)
-# LOAD_FAST    0 (a)
-# LOAD_FAST    1 (b)
-# BINARY_ADD
-# RETURN_VALUE
+# 지역 변수 a를 스택에 올립니다
+# 지역 변수 b를 스택에 올립니다
+# 두 값을 더합니다
+# 계산 결과를 반환합니다
 ```
 
 컴파일러는 전체 코드를 미리 번역하고, 인터프리터는 한 줄씩 실행합니다. Python은 바이트코드로 컴파일한 뒤 가상 머신에서 인터프리트합니다.

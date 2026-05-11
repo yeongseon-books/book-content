@@ -18,7 +18,7 @@ tags:
   - 계산 이론
   - 추상화
 seo_description: 컴퓨터과학이 무엇을 연구하는 학문인지, 전공 과목들이 어떻게 연결되는지 전체 그림을 그립니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Computer Science란 무엇인가?

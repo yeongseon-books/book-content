@@ -18,7 +18,7 @@ tags:
   - 통계
   - 진로
 seo_description: CS 기초가 AI·데이터사이언스로 어떻게 이어지는지, 다음 학습 경로를 정리하는 CS 입문 시리즈 마지막 글입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # AI와 데이터사이언스까지의 연결
@@ -63,7 +63,7 @@ print(classify_email("무료 쿠폰 당첨"))   # spam
 **After — 데이터로 학습한 분류:**
 
 ```python
-# scikit-learn 없이 개념만 — 실제로는 sklearn, transformers 등을 사용합니다
+# scikit-learn 없이 개념만 보여 주며 실제로는 sklearn, transformers 등을 사용합니다
 def train_naive_bayes(samples: list[tuple[str, str]]) -> dict:
     """단어별로 spam/ham 빈도를 세는 단순 학습."""
     counts = {"spam": {}, "ham": {}}
