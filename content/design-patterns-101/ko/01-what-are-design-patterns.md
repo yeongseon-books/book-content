@@ -18,7 +18,7 @@ tags:
   - Architecture
   - Foundations
 seo_description: 디자인 패턴의 정의, GoF의 23가지 분류, 그리고 패턴이 해결하는 진짜 문제를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 디자인 패턴이란 무엇인가?
@@ -67,7 +67,7 @@ processor.charge(...)
 ### 1단계 — 문제 인식
 
 ```python
-# 1_problem.py
+# 예시 파일: 1_problem.py
 # 같은 분기/같은 객체 생성/같은 알림 흐름이 반복?
 # 패턴이 등장할 무대.
 ```
@@ -86,7 +86,7 @@ processor.charge(...)
 ### 3단계 — 구조 그리기
 
 ```python
-# 3_structure.py
+# 예시 파일: 3_structure.py
 # 클래스 다이어그램으로 한 번 그려본 뒤 코드.
 ```
 
@@ -95,7 +95,7 @@ processor.charge(...)
 ### 4단계 — 작게 적용
 
 ```python
-# 4_small.py
+# 예시 파일: 4_small.py
 # 시스템 전체에 적용하지 말고 한 모듈에서.
 ```
 
@@ -104,7 +104,7 @@ processor.charge(...)
 ### 5단계 — 트레이드오프 적기
 
 ```python
-# 5_tradeoff.md
+# 예시 메모: 5_tradeoff.md
 # - 얻은 것: 분기 제거, 확장 용이
 # - 잃은 것: 클래스 수 증가
 ```
@@ -113,7 +113,7 @@ processor.charge(...)
 
 ## 이 코드에서 주목할 점
 
-- 패턴은 코드를 바꾸기 전 *대화*를 바꿉니다.
+- 패턴은 코드를 바꾸기 전 대화의 방식부터 바꿉니다.
 - 모든 패턴은 트레이드오프를 가집니다.
 - 적용 단위는 보통 작습니다.
 

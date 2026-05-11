@@ -18,7 +18,7 @@ tags:
   - Compatibility
   - Wrapper
 seo_description: 외부 인터페이스를 도메인이 원하는 모양으로 변환하는 Adapter 패턴 — 경계 보호와 테스트 용이성을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Adapter 패턴
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-도메인 코드 안에 외부 라이브러리 호출이 흩어져 있으면, 라이브러리 한 줄이 바뀔 때마다 도메인이 흔들립니다. Adapter는 그 흔들림을 *경계 한 줄*에 가둡니다.
+도메인 코드 안에 외부 라이브러리 호출이 흩어져 있으면, 라이브러리 한 줄이 바뀔 때마다 도메인이 흔들립니다. Adapter는 그 흔들림을 경계 한 줄에 가둡니다.
 
-> Adapter는 *경계의 얇은 외투*입니다.
+> Adapter는 경계의 얇은 외투입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -74,7 +74,7 @@ def save_report(store: FileStore, data):
 ### 1단계 — 도메인 인터페이스부터
 
 ```python
-# 1_iface.py
+# 예시 파일: 1_iface.py
 from typing import Protocol
 
 class FileStore(Protocol):
@@ -82,12 +82,12 @@ class FileStore(Protocol):
     def get(self, key: str) -> bytes: ...
 ```
 
-도메인이 *원하는* 모양을 먼저 정의합니다.
+도메인이 원하는 모양을 먼저 정의합니다.
 
 ### 2단계 — 외부 호출 감싸기
 
 ```python
-# 2_s3_adapter.py
+# 예시 파일: 2_s3_adapter.py
 class S3FileStore:
     def __init__(self, client, bucket):
         self.client, self.bucket = client, bucket
@@ -102,7 +102,7 @@ S3 호출은 이 한 클래스 안에만 존재합니다.
 ### 3단계 — 도메인 코드 사용
 
 ```python
-# 3_domain.py
+# 예시 파일: 3_domain.py
 def archive(store, key, data):
     store.put(key, data)
 ```
@@ -112,7 +112,7 @@ def archive(store, key, data):
 ### 4단계 — 다른 백엔드 추가
 
 ```python
-# 4_local_adapter.py
+# 예시 파일: 4_local_adapter.py
 import os, pathlib
 class LocalFileStore:
     def __init__(self, root): self.root = pathlib.Path(root)
@@ -138,7 +138,7 @@ class InMemoryFileStore:
 
 ## 이 코드에서 주목할 점
 
-- 외부 SDK 호출이 *오직* Adapter 안에만 존재합니다.
+- 외부 SDK 호출이 Adapter 안에만 존재합니다.
 - 도메인 코드는 Protocol에만 의존합니다.
 - 테스트 더블이 자연스럽게 같은 자리에 들어갑니다.
 
@@ -147,8 +147,8 @@ class InMemoryFileStore:
 1. **Adapter 안에 비즈니스 로직.** 변환과 정책이 섞임.
 2. **외부 타입을 그대로 노출.** 도메인이 외부 타입을 알게 됨.
 3. **Adapter가 다른 Adapter를 직접 호출.** 경계 침범.
-4. **에러를 외부 예외 그대로 던짐.** 도메인 예외로 *번역*해야 한다.
-5. **Adapter가 점점 두꺼워짐.** 책임이 *경계*만이 아니게 됨.
+4. **에러를 외부 예외 그대로 던짐.** 도메인 예외로 번역해야 합니다.
+5. **Adapter가 점점 두꺼워짐.** 책임이 경계 역할만이 아니게 됩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -164,7 +164,7 @@ S3/GCS/Local을 같은 FileStore로, 결제 PG(스트라이프/토스/포트원)
 
 ## 정리 및 다음 단계
 
-Adapter는 *경계의 외투*입니다. 다음 글은 객체 사이의 통지를 다루는 — Observer 패턴 — 을 깊게 봅니다.
+Adapter는 경계의 외투입니다. 다음 글은 객체 사이의 통지를 다루는 — Observer 패턴 — 을 깊게 봅니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)

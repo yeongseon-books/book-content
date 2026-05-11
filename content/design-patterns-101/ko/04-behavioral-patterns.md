@@ -18,7 +18,7 @@ tags:
   - Observer
   - Command
 seo_description: 객체 간 책임과 흐름을 다루는 Behavioral 패턴 — Strategy/Observer/Command/State/Iterator 정리.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Behavioral 패턴
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-객체 사이의 협력은 if/elif 더미로 빠르게 굳습니다. Behavioral 패턴은 그 협력에 *이름*과 *모양*을 줍니다.
+객체 사이의 협력은 if/elif 더미로 빠르게 굳습니다. Behavioral 패턴은 그 협력에 이름과 모양을 줍니다.
 
 > 흐름을 객체로 바꾸면 흐름도 테스트할 수 있습니다.
 
@@ -77,7 +77,7 @@ class Member(Discount):
 ### 1단계 — Strategy
 
 ```python
-# 1_strategy.py
+# 예시 파일: 1_strategy.py
 class Sorter:
     def __init__(self, strategy): self.strategy = strategy
     def sort(self, data): return self.strategy(data)
@@ -91,7 +91,7 @@ desc = Sorter(lambda d: sorted(d, reverse=True))
 ### 2단계 — Observer
 
 ```python
-# 2_observer.py
+# 예시 파일: 2_observer.py
 class Subject:
     def __init__(self): self._subs = []
     def subscribe(self, fn): self._subs.append(fn)
@@ -108,7 +108,7 @@ Subject는 구독자를 모르고도 통지를 보냅니다.
 ### 3단계 — Command
 
 ```python
-# 3_command.py
+# 예시 파일: 3_command.py
 class Command:
     def execute(self): ...
 
@@ -125,7 +125,7 @@ for c in queue: c.execute()
 ### 4단계 — State
 
 ```python
-# 4_state.py
+# 예시 파일: 4_state.py
 class Order:
     def __init__(self): self.state = Draft()
     def submit(self): self.state = self.state.submit()
@@ -134,7 +134,7 @@ class Draft:
     def submit(self): return Pending()
 
 class Pending:
-    def submit(self): return self  # idempotent
+    def submit(self): return self  # 이미 처리된 상태라 그대로 둡니다
 ```
 
 상태 분기를 if 더미가 아닌 객체 교체로 표현.
@@ -142,7 +142,7 @@ class Pending:
 ### 5단계 — Iterator
 
 ```python
-# 5_iterator.py
+# 예시 파일: 5_iterator.py
 class Bag:
     def __init__(self, items): self.items = items
     def __iter__(self):
@@ -156,7 +156,7 @@ for x in Bag([1, 2, 3]):
 
 ## 이 코드에서 주목할 점
 
-- 분기(if/elif)가 객체로 *압축*됩니다.
+- 분기(if/elif)가 객체로 정리됩니다.
 - 알고리즘과 컨텍스트가 분리됩니다.
 - 흐름이 데이터(객체)가 되어 큐/저장/리플레이가 가능합니다.
 
@@ -164,7 +164,7 @@ for x in Bag([1, 2, 3]):
 
 1. **Strategy를 위한 클래스 폭발.** 함수면 충분한 경우가 많다.
 2. **Observer 순환 통지.** A→B→A 무한 루프.
-3. **Command에 비즈니스 로직 산개.** Command는 *요청* 객체일 뿐.
+3. **Command에 비즈니스 로직 산개.** Command는 요청 객체일 뿐입니다.
 4. **State 객체가 서로를 강하게 안다.** 결합도 폭발.
 5. **Iterator 대신 인덱스 노출.** 클라이언트가 내부 구조를 안다.
 
@@ -176,7 +176,7 @@ Django signals = Observer, Celery task = Command, FSM 라이브러리 = State, P
 
 - [ ] Strategy가 함수보다 클래스가 나은 이유가 있는가?
 - [ ] Observer가 순환 통지를 만들지 않는가?
-- [ ] Command가 *요청*만 담고 있는가?
+- [ ] Command가 요청만 담고 있는가?
 - [ ] State 전이가 한 곳에서 보이는가?
 - [ ] Iterator가 내부 구조를 숨기는가?
 

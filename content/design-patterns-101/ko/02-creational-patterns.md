@@ -18,7 +18,7 @@ tags:
   - Singleton
   - Builder
 seo_description: 객체 생성 책임을 분리하는 Creational 패턴 — Factory, Builder, Singleton, Prototype을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Creational 패턴
@@ -70,7 +70,7 @@ notifier = factory.create(kind)
 ### 1단계 — Factory Method
 
 ```python
-# 1_factory.py
+# 예시 파일: 1_factory.py
 class Notifier:
     def send(self, msg): ...
 
@@ -86,7 +86,7 @@ class NotifierFactory:
 ### 2단계 — Abstract Factory
 
 ```python
-# 2_abstract_factory.py
+# 예시 파일: 2_abstract_factory.py
 class UIFactory:
     def button(self) -> "Button": ...
     def textbox(self) -> "TextBox": ...
@@ -100,7 +100,7 @@ class WinFactory(UIFactory): ...
 ### 3단계 — Builder
 
 ```python
-# 3_builder.py
+# 예시 파일: 3_builder.py
 class QueryBuilder:
     def __init__(self): self.parts = []
     def select(self, *cols): self.parts.append(("SELECT", cols)); return self
@@ -114,7 +114,7 @@ class QueryBuilder:
 ### 4단계 — Singleton (조심해서)
 
 ```python
-# 4_singleton.py
+# 예시 파일: 4_singleton.py
 # Python에서는 보통 모듈 자체가 싱글턴.
 # 굳이 클래스로 만들 필요 없는 경우가 많다.
 import logging
@@ -126,7 +126,7 @@ logger = logging.getLogger("app")
 ### 5단계 — Prototype
 
 ```python
-# 5_prototype.py
+# 예시 파일: 5_prototype.py
 import copy
 
 class ReportTemplate:

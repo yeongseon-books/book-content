@@ -18,7 +18,7 @@ tags:
   - Events
   - Behavioral
 seo_description: 한 객체의 변경을 여러 구독자에게 통지하는 Observer 패턴 — 도메인 이벤트와 pub/sub 사고를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Observer 패턴
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-A가 변할 때 B, C, D를 *직접 호출*하면 A는 셋을 모두 압니다. Observer는 그 호출을 *통지*로 바꿔, A는 누가 듣는지 알지 않아도 됩니다.
+A가 변할 때 B, C, D를 직접 호출하면 A는 셋을 모두 압니다. Observer는 그 호출을 통지로 바꿔, A는 누가 듣는지 알지 않아도 됩니다.
 
-> Observer는 결합을 *통지*로 풀어줍니다.
+> Observer는 결합을 통지로 풀어줍니다.
 
 ## 전체 흐름
 ```mermaid
@@ -87,7 +87,7 @@ class EventBus:
 ### 2단계 — 구독자 등록
 
 ```python
-# 2_subscribe.py
+# 예시 파일: 2_subscribe.py
 bus = EventBus()
 bus.subscribe("order_submitted", lambda e: print("EMAIL:", e["user"]))
 bus.subscribe("order_submitted", lambda e: print("SLACK:", e["user"]))
@@ -98,7 +98,7 @@ bus.subscribe("order_submitted", lambda e: print("SLACK:", e["user"]))
 ### 3단계 — Subject에서 발행
 
 ```python
-# 3_publish.py
+# 예시 파일: 3_publish.py
 bus.publish("order_submitted", {"user": "u1", "items": ["a", "b"]})
 ```
 
@@ -107,7 +107,7 @@ Subject는 "무슨 일이 일어났다"만 알립니다.
 ### 4단계 — 동기 vs 비동기
 
 ```python
-# 4_async.py
+# 예시 파일: 4_async.py
 import queue, threading
 q = queue.Queue()
 
@@ -127,7 +127,7 @@ def async_publish(topic, event): q.put((topic, event))
 ### 5단계 — 구독 해지
 
 ```python
-# 5_unsubscribe.py
+# 예시 파일: 5_unsubscribe.py
 def unsubscribe(bus, topic, fn):
     bus._subs.get(topic, []).remove(fn)
 ```
@@ -136,8 +136,8 @@ def unsubscribe(bus, topic, fn):
 
 ## 이 코드에서 주목할 점
 
-- Subject는 Observer의 *수*도 *종류*도 모릅니다.
-- 새 행동 추가가 *Subject 수정*이 아닙니다.
+- Subject는 Observer의 수와 종류를 모두 모릅니다.
+- 새 행동 추가가 Subject 수정으로 이어지지 않습니다.
 - 통지를 비동기로 옮기는 길이 열려 있습니다.
 
 ## 자주 하는 실수 5가지
@@ -150,19 +150,19 @@ def unsubscribe(bus, topic, fn):
 
 ## 실무에서는 이렇게 쓰입니다
 
-Django signals, Spring `ApplicationEventPublisher`, Kafka/Redis pub-sub, GitHub Webhooks — 모두 Observer의 큰 형제들입니다. *도메인 이벤트* 라는 이름으로도 자주 등장합니다.
+Django signals, Spring `ApplicationEventPublisher`, Kafka/Redis pub-sub, GitHub Webhooks — 모두 Observer의 큰 형제들입니다. 도메인 이벤트라는 이름으로도 자주 등장합니다.
 
 ## 체크리스트
 
 - [ ] Subject가 구독자를 알지 않는가?
 - [ ] 통지가 단방향인가?
-- [ ] 이벤트 이름이 *발생한 일*을 가리키는가?
+- [ ] 이벤트 이름이 발생한 일을 가리키는가?
 - [ ] 핸들러 에러가 격리되는가?
 - [ ] 비동기 전환이 가능한 구조인가?
 
 ## 정리 및 다음 단계
 
-Observer는 결합을 *통지*로 푸는 사고입니다. 다음 글은 객체 생성 책임을 다루는 — Factory와 의존성 주입 — 을 봅니다.
+Observer는 결합을 통지로 푸는 사고입니다. 다음 글은 객체 생성 책임을 다루는 — Factory와 의존성 주입 — 을 봅니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)

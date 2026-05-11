@@ -18,7 +18,7 @@ tags:
   - Behavioral
   - OCP
 seo_description: 알고리즘을 객체로 만들어 교체 가능하게 하는 Strategy 패턴 — Python에서의 자연스러운 모양과 함정을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Strategy 패턴
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-알고리즘을 if/elif로 분기하면 새 옵션이 생길 때마다 기존 코드를 건드려야 합니다. Strategy는 그 분기를 *교체 가능한 객체*로 바꿔, 추가에 열려 있고 변경에 닫힙니다 (OCP).
+알고리즘을 if/elif로 분기하면 새 옵션이 생길 때마다 기존 코드를 건드려야 합니다. Strategy는 그 분기를 교체 가능한 객체로 바꿔, 추가에 열려 있고 변경에 닫힙니다 (OCP).
 
 > Strategy는 OCP를 코드 모양으로 보여 줍니다.
 
@@ -78,19 +78,19 @@ class Member(Pricing):
 ### 1단계 — 인터페이스 정의
 
 ```python
-# 1_iface.py
+# 예시 파일: 1_iface.py
 from typing import Protocol
 
 class ShipCost(Protocol):
     def for_weight(self, kg: float) -> int: ...
 ```
 
-Python에서는 ABC 대신 `Protocol`로 *구조적* 인터페이스를 자주 씁니다.
+Python에서는 ABC 대신 `Protocol`로 구조적 인터페이스를 자주 씁니다.
 
 ### 2단계 — 구체 전략
 
 ```python
-# 2_strategies.py
+# 예시 파일: 2_strategies.py
 class StandardShip:
     def for_weight(self, kg): return int(3000 + 500 * kg)
 
@@ -103,7 +103,7 @@ class ExpressShip:
 ### 3단계 — 주입
 
 ```python
-# 3_inject.py
+# 예시 파일: 3_inject.py
 class Order:
     def __init__(self, ship: ShipCost): self.ship = ship
     def total(self, items, kg):
@@ -131,7 +131,7 @@ Python에서는 함수 그 자체가 가장 자연스러운 Strategy입니다.
 ### 5단계 — 런타임 교체와 테스트
 
 ```python
-# 5_runtime.py
+# 예시 파일: 5_runtime.py
 order = Order2(standard)
 print(order.total([10000], 2))
 order.ship = express
@@ -142,8 +142,8 @@ print(order.total([10000], 2))
 
 ## 이 코드에서 주목할 점
 
-- Context는 Strategy의 *내부*를 모릅니다.
-- 새 알고리즘 추가가 *수정*이 아닌 *추가*입니다.
+- Context는 Strategy의 내부 구현을 모릅니다.
+- 새 알고리즘 추가가 수정이 아니라 추가입니다.
 - 테스트가 쉬워집니다 — 가짜 Strategy를 주입하면 끝.
 
 ## 자주 하는 실수 5가지
@@ -161,7 +161,7 @@ print(order.total([10000], 2))
 ## 체크리스트
 
 - [ ] Context가 알고리즘 내부를 모르는가?
-- [ ] 새 알고리즘 추가가 *추가*만으로 끝나는가?
+- [ ] 새 알고리즘 추가가 추가만으로 끝나는가?
 - [ ] Strategy가 Context의 상태를 바꾸지 않는가?
 - [ ] Default strategy가 합리적인가?
 - [ ] 함수로 충분한 곳에 클래스를 쓰지 않았는가?

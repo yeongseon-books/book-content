@@ -18,7 +18,7 @@ tags:
   - Protocols
   - Decorators
 seo_description: 모듈, 일급 함수, Protocol, 데코레이터로 GoF 패턴을 다시 푸는 Pythonic 패턴 — Python다운 설계 사고를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Python에 어울리는 패턴
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-Python의 기본 도구 — 모듈, 함수, Protocol — 가 이미 많은 패턴의 *런타임 지원*입니다. 같은 문제를 *더 적은 코드*로 풀 수 있습니다.
+Python의 기본 도구 — 모듈, 함수, Protocol — 가 이미 많은 패턴을 런타임에서 뒷받침합니다. 같은 문제를 더 적은 코드로 풀 수 있습니다.
 
 > 언어가 주는 도구를 먼저 본 다음, 그래도 부족하면 패턴을 꺼낸다.
 
@@ -74,8 +74,8 @@ DB_URL = "postgres://..."
 ### 1단계 — 모듈 = Singleton
 
 ```python
-# 1_module_singleton.py
-# settings.py
+# 예시 파일: 1_module_singleton.py
+# 예시 설정 파일: settings.py
 import os
 ENV = os.getenv("ENV", "dev")
 SECRET = os.getenv("SECRET", "x")
@@ -86,7 +86,7 @@ import 하면 어디서나 같은 값.
 ### 2단계 — 함수 = Strategy / Command
 
 ```python
-# 2_function_strategy.py
+# 예시 파일: 2_function_strategy.py
 def asc(d): return sorted(d)
 def desc(d): return sorted(d, reverse=True)
 
@@ -99,7 +99,7 @@ print(run(desc, [3, 1, 2]))
 ### 3단계 — Protocol = 인터페이스
 
 ```python
-# 3_protocol.py
+# 예시 파일: 3_protocol.py
 from typing import Protocol
 
 class Mailer(Protocol):
@@ -114,7 +114,7 @@ class SmtpMailer:
 ### 4단계 — `@dataclass` = Value Object
 
 ```python
-# 4_dataclass.py
+# 예시 파일: 4_dataclass.py
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -128,7 +128,7 @@ class Money:
 ### 5단계 — 데코레이터 = Decorator 패턴
 
 ```python
-# 5_decorator.py
+# 예시 파일: 5_decorator.py
 import time, functools
 
 def timed(fn):
@@ -143,13 +143,13 @@ def timed(fn):
 def work(): time.sleep(0.1)
 ```
 
-`@`로 자연스럽게 책임을 *덧씌웁니다*.
+`@`로 책임을 자연스럽게 덧씌웁니다.
 
 ## 이 코드에서 주목할 점
 
 - 클래스 계층이 거의 없습니다.
-- 표준 도구만으로 패턴이 *드러납니다*.
-- 같은 의도를 더 *적은 줄* 로 표현.
+- 표준 도구만으로도 패턴이 자연스럽게 드러납니다.
+- 같은 의도를 더 적은 줄로 표현합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -161,7 +161,7 @@ def work(): time.sleep(0.1)
 
 ## 실무에서는 이렇게 쓰입니다
 
-`logging` = 모듈 Singleton, `sorted(key=...)` = 함수 Strategy, `typing.Protocol` = 인터페이스, `@app.route(...)` = Decorator. 표준 라이브러리와 인기 프레임워크가 이미 Pythonic 패턴을 *살아 있는 예제* 로 보여 줍니다.
+`logging` = 모듈 Singleton, `sorted(key=...)` = 함수 Strategy, `typing.Protocol` = 인터페이스, `@app.route(...)` = Decorator. 표준 라이브러리와 인기 프레임워크가 이미 Pythonic 패턴을 살아 있는 예제로 보여 줍니다.
 
 ## 체크리스트
 
@@ -173,7 +173,7 @@ def work(): time.sleep(0.1)
 
 ## 정리 및 다음 단계
 
-GoF는 *어휘집*이지 *교본*이 아닙니다. Python의 도구를 먼저 보고, 부족한 곳에서만 패턴 이름을 꺼내 쓰세요. 디자인 패턴 101 시리즈는 여기서 마칩니다 — 도구가 아니라 *생각의 단위*로 이 어휘들을 사용하시기 바랍니다.
+GoF는 어휘집이지 교본이 아닙니다. Python의 도구를 먼저 보고, 부족한 곳에서만 패턴 이름을 꺼내 쓰세요. 디자인 패턴 101 시리즈는 여기서 마칩니다 — 도구가 아니라 생각의 단위로 이 어휘들을 사용하시기 바랍니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)

@@ -18,7 +18,7 @@ tags:
   - Decorator
   - Facade
 seo_description: 객체 합성으로 구조를 만드는 Structural 패턴 — Adapter/Decorator/Facade/Proxy/Composite 정리.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Structural 패턴
@@ -73,7 +73,7 @@ class S3FileStore(FileStore):
 ### 1단계 — Adapter
 
 ```python
-# 1_adapter.py
+# 예시 파일: 1_adapter.py
 class LegacyPrinter:
     def write_line(self, s): ...
 
@@ -90,7 +90,7 @@ class PrinterAdapter(NewPrinter):
 ### 2단계 — Decorator
 
 ```python
-# 2_decorator.py
+# 예시 파일: 2_decorator.py
 class Logger:
     def __init__(self, inner): self.inner = inner
     def send(self, msg):
@@ -99,12 +99,12 @@ class Logger:
 notifier = Logger(EmailNotifier())
 ```
 
-기능을 *둘러서* 덧붙입니다.
+기능을 겉에서 감싸 덧붙입니다.
 
 ### 3단계 — Facade
 
 ```python
-# 3_facade.py
+# 예시 파일: 3_facade.py
 class CheckoutFacade:
     def buy(self, user, item):
         cart.add(user, item); pay.charge(user); ship.send(user, item)
@@ -115,7 +115,7 @@ class CheckoutFacade:
 ### 4단계 — Proxy
 
 ```python
-# 4_proxy.py
+# 예시 파일: 4_proxy.py
 class CachedRepo:
     def __init__(self, real): self.real = real; self.cache = {}
     def get(self, k):
@@ -128,7 +128,7 @@ class CachedRepo:
 ### 5단계 — Composite
 
 ```python
-# 5_composite.py
+# 예시 파일: 5_composite.py
 class Node:
     def total(self): ...
 
@@ -145,7 +145,7 @@ class Folder(Node):
 
 ## 이 코드에서 주목할 점
 
-- 모든 패턴이 *합성*을 도구로 씁니다.
+- 모든 패턴이 합성을 도구로 씁니다.
 - 인터페이스는 안정적, 구현은 갈아 끼울 수 있습니다.
 - 상속 트리 깊이가 거의 늘지 않습니다.
 
@@ -171,7 +171,7 @@ Flask middleware = Decorator 사슬, requests의 Session = Facade, ORM의 Lazy p
 
 ## 정리 및 다음 단계
 
-구조를 합성으로 짜면 변경이 쉬워집니다. 다음 글에서는 객체들의 *행동* 을 다스리는 — Behavioral 패턴 — 을 봅니다.
+구조를 합성으로 짜면 변경이 쉬워집니다. 다음 글에서는 객체들의 행동을 다스리는 — Behavioral 패턴 — 을 봅니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
