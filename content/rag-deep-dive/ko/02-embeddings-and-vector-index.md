@@ -81,7 +81,7 @@ if __name__ == "__main__":
 - [ ] FAISS가 반환하는 값이 거리인지 유사도인지 확인했다.
 - [ ] 벡터 row id를 원문과 다시 연결하는 매핑 계층을 이해했다.
 - [ ] exact baseline 없이 approximate index만 먼저 튜닝하지 않았다.
-<!-- a-grade-example:end -->
+
 
 ## 소스 버전
 

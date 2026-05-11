@@ -81,7 +81,7 @@ if __name__ == "__main__":
 - [ ] history는 메시지 리스트로, context는 문자열로 다루고 있다.
 - [ ] 프롬프트가 반환하는 타입이 string인지 prompt value인지 확인했다.
 - [ ] 최종 모델 입력 직전 컨텍스트 길이를 따로 점검할 계획이 있다.
-<!-- a-grade-example:end -->
+
 
 ## 소스 버전
 

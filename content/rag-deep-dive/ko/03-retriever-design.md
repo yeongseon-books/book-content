@@ -93,7 +93,7 @@ if __name__ == "__main__":
 - [ ] `fetch_k`를 `k`보다 충분히 크게 잡아 봤다.
 - [ ] `lambda_mult`를 조절하며 중복과 커버리지 trade-off를 확인했다.
 - [ ] 검색 품질 문제를 임베딩 문제와 retriever 정책 문제로 분리해서 봤다.
-<!-- a-grade-example:end -->
+
 
 ## 소스 버전
 

@@ -99,7 +99,7 @@ if __name__ == "__main__":
 - [ ] faithfulness와 answer relevancy를 서로 다른 실패 축으로 해석한다.
 - [ ] 점수 비교 전에 같은 샘플셋과 같은 모델 버전을 고정했다.
 - [ ] CI 게이트에 넣을 임계값을 로그와 함께 관리할 계획이 있다.
-<!-- a-grade-example:end -->
+
 
 ## 소스 버전
 

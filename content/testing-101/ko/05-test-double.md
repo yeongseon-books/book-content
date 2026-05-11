@@ -38,14 +38,6 @@ flowchart LR
     Double -.->|대체| Real[("실제 의존성")]
 ```
 
-## 핵심 용어 정리 (Meszaros 5종)
-
-- **Dummy**: *전달만 되는* 자리 채우기 객체.
-- **Stub**: *정해진 답* 만 돌려주는 가짜.
-- **Spy**: *호출 기록* 을 남기는 stub.
-- **Mock**: *기대된 호출* 을 사전에 정의하고 검증.
-- **Fake**: *간단한 진짜 구현* (예: in-memory DB).
-
 ## Before/After
 
 **Before (외부 의존 직접 호출)**
