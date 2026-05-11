@@ -17,7 +17,7 @@ tags:
   - 집합 연산
   - frozenset
 seo_description: Python set의 내부 구조와 집합 연산을 실습합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # set과 집합 연산
@@ -61,7 +61,7 @@ A = {1, 2, 3, 4}      B = {3, 4, 5, 6}
 리스트에서 중복을 제거하고 공통 원소를 찾는 비효율적 방법과 set을 사용한 효율적 방법을 비교합니다.
 
 ```python
-# before: list로 중복 제거와 교집합 — O(n²)
+# 개선 전: list로 중복 제거와 교집합 — O(n²)
 list_a = [1, 2, 3, 4, 2, 3]
 unique = []
 for x in list_a:
@@ -71,7 +71,7 @@ common = [x for x in list_a if x in [3, 4, 5, 6]]
 ```
 
 ```python
-# after: set으로 중복 제거와 교집합 — O(n)
+# 개선 후: set으로 중복 제거와 교집합 — O(n)
 set_a = {1, 2, 3, 4, 2, 3}   # 자동 중복 제거 → {1, 2, 3, 4}
 common = set_a & {3, 4, 5, 6}  # O(min(m, n))으로 교집합
 ```
@@ -167,15 +167,15 @@ articles = [
     {"title": "Flask API", "tags": {"python", "flask", "api"}},
 ]
 
-# python AND api 태그가 모두 있는 글
+# python 태그와 api 태그가 모두 있는 글
 required = {"python", "api"}
 matches = [a for a in articles if required <= a["tags"]]
 for m in matches:
     print(m["title"])
-# Django REST
-# Flask API
+# 결과: Django REST
+# 결과: Flask API
 
-# python OR javascript 태그가 있는 글
+# python 태그 또는 javascript 태그가 있는 글
 any_of = {"python", "javascript"}
 matches = [a for a in articles if a["tags"] & any_of]
 print([m["title"] for m in matches])

@@ -17,7 +17,7 @@ tags:
   - 해시 테이블
   - Hash Table
 seo_description: Python dict의 해시 테이블 구현 원리와 성능 특성을 설명합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 해시 테이블과 dict
@@ -61,7 +61,7 @@ dict는 Python에서 두 번째로 많이 사용하는 자료구조입니다. JS
 리스트에서 키-값을 선형 검색하는 방법과 dict로 즉시 조회하는 방법을 비교합니다.
 
 ```python
-# before: 리스트 순회로 검색 — O(n)
+# 개선 전: 리스트 순회로 검색 — O(n)
 users = [("alice", 95), ("bob", 82), ("charlie", 90)]
 for name, score in users:
     if name == "charlie":
@@ -70,7 +70,7 @@ for name, score in users:
 ```
 
 ```python
-# after: dict로 즉시 조회 — O(1)
+# 개선 후: dict로 즉시 조회 — O(1)
 users = {"alice": 95, "bob": 82, "charlie": 90}
 print(users["charlie"])  # 90
 ```
@@ -105,7 +105,7 @@ print("alice" in scores)    # True
 # 불변 객체는 해시 가능
 print(hash("hello"))    # 고정된 정수 (세션마다 다름)
 print(hash(42))         # 42
-print(hash((1, 2, 3)))  # tuple은 해시 가능
+print(hash((1, 2, 3)))  # tuple도 해시 가능
 
 # 가변 객체는 해시 불가
 try:
@@ -157,7 +157,7 @@ word_count = defaultdict(int)
 for word in "the cat sat on the mat".split():
     word_count[word] += 1
 print(dict(word_count))
-# {'the': 2, 'cat': 1, 'sat': 1, 'on': 1, 'mat': 1}
+# 결과: {'the': 2, 'cat': 1, 'sat': 1, 'on': 1, 'mat': 1}
 
 # Counter: 빈도 세기 전용
 counter = Counter("the cat sat on the mat".split())
@@ -169,14 +169,14 @@ print(counter.most_common(2))  # [('the', 2), ('cat', 1)]
 ```python
 scores = {"alice": 95, "bob": 82, "charlie": 90, "diana": 88}
 
-# dict comprehension
+# dict 컴프리헨션
 high_scores = {k: v for k, v in scores.items() if v >= 90}
 print(high_scores)  # {'alice': 95, 'charlie': 90}
 
 # 값 기준 정렬
 sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
 print(sorted_scores)
-# {'alice': 95, 'charlie': 90, 'diana': 88, 'bob': 82}
+# 결과: {'alice': 95, 'charlie': 90, 'diana': 88, 'bob': 82}
 ```
 
 ## 이 코드에서 주목할 점

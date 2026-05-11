@@ -17,7 +17,7 @@ tags:
   - 성능 최적화
   - 자료구조 비교
 seo_description: 상황별 최적의 자료구조를 선택하는 기준과 의사결정 흐름을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 자료구조 선택 기준
@@ -68,7 +68,7 @@ last_reviewed: '2026-05-04'
 자료구조를 무작정 선택하는 방식과 체계적으로 선택하는 방식을 비교합니다.
 
 ```python
-# before: 모든 곳에 list 사용 — 비효율적
+# 개선 전: 모든 곳에 list 사용 — 비효율적
 seen = []
 for item in data:
     if item not in seen:  # O(n) 검색
@@ -77,7 +77,7 @@ for item in data:
 ```
 
 ```python
-# after: 용도에 맞는 자료구조 선택 — 효율적
+# 개선 후: 용도에 맞는 자료구조 선택 — 효율적
 seen = set()
 for item in data:
     if item not in seen:  # O(1) 검색
@@ -131,7 +131,7 @@ def suggest_data_structure(
         return "list (동적 배열)"
     return "list (기본 선택)"
 
-# 사용 예
+# 사용 예시
 print(suggest_data_structure(
     need_order=False,
     need_key_value=False,
@@ -154,7 +154,7 @@ def benchmark(name, setup, operation, n=100_000):
     elapsed = time.perf_counter() - start
     print(f"{name:20s}: {elapsed:.4f}초")
 
-# 검색 벤치마크
+# 검색 성능 비교
 target = 99_999
 benchmark(
     "list 검색",
@@ -184,9 +184,9 @@ students = [("Alice", "A"), ("Bob", "B"), ("Charlie", "A"), ("Diana", "B")]
 for name, grade in students:
     students_by_grade[grade].append(name)
 print(dict(students_by_grade))
-# {'A': ['Alice', 'Charlie'], 'B': ['Bob', 'Diana']}
+# 결과: {'A': ['Alice', 'Charlie'], 'B': ['Bob', 'Diana']}
 
-# 패턴 2: dict + set — 고유 그룹핑
+# 패턴 2: dict + set — 중복 없는 그룹핑
 unique_tags = defaultdict(set)
 articles = [("글1", "python"), ("글2", "python"), ("글1", "flask")]
 for title, tag in articles:

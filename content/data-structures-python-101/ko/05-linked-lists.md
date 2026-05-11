@@ -17,7 +17,7 @@ tags:
   - 연결 리스트
   - 노드
 seo_description: Python으로 단일·이중 연결 리스트를 구현하고 배열과 비교합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 연결 리스트
@@ -60,14 +60,14 @@ last_reviewed: '2026-05-04'
 배열에서 중간 삭제와 연결 리스트에서 중간 삭제를 비교합니다.
 
 ```python
-# before: list 중간 삭제 — O(n), 뒤의 원소를 모두 이동
+# 개선 전: list 중간 삭제 — O(n), 뒤의 원소를 모두 이동
 data = [10, 20, 30, 40, 50]
 data.pop(2)  # 30 삭제 — 40, 50이 한 칸씩 앞으로 이동
 ```
 
 ```python
-# after: 연결 리스트 중간 삭제 — O(1), 포인터만 변경
-# node_b.next = node_b.next.next
+# 개선 후: 연결 리스트 중간 삭제 — O(1), 포인터만 변경
+# 예: node_b.next = node_b.next.next
 # 30 노드를 건너뛰고 20 → 40 연결
 ```
 

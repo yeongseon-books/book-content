@@ -17,7 +17,7 @@ tags:
   - Queue
   - deque
 seo_description: Python으로 스택과 큐를 구현하고 실무 활용 패턴을 설명합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 스택과 큐
@@ -61,18 +61,18 @@ last_reviewed: '2026-05-04'
 list로 큐를 구현한 비효율적 코드와 deque를 사용한 효율적 코드를 비교합니다.
 
 ```python
-# before: list로 큐 구현 — pop(0)이 O(n)
+# 개선 전: list로 큐 구현 — pop(0)이 O(n)
 queue = [1, 2, 3]
-queue.append(4)       # enqueue
-first = queue.pop(0)  # dequeue — O(n), 모든 원소 이동
+queue.append(4)       # 뒤에 넣기
+first = queue.pop(0)  # 앞에서 꺼내기 — O(n), 모든 원소 이동
 ```
 
 ```python
-# after: deque로 큐 구현 — popleft()가 O(1)
+# 개선 후: deque로 큐 구현 — popleft()가 O(1)
 from collections import deque
 queue = deque([1, 2, 3])
-queue.append(4)           # enqueue — O(1)
-first = queue.popleft()   # dequeue — O(1)
+queue.append(4)           # 뒤에 넣기 — O(1)
+first = queue.popleft()   # 앞에서 꺼내기 — O(1)
 ```
 
 ## 단계별 실습
@@ -203,14 +203,14 @@ from collections import deque
 
 n = 100_000
 
-# list.pop(0) — O(n) per operation
+# list.pop(0) — 한 번 호출할 때마다 O(n)
 data_list = list(range(n))
 start = time.perf_counter()
 while data_list:
     data_list.pop(0)
 list_time = time.perf_counter() - start
 
-# deque.popleft() — O(1) per operation
+# deque.popleft() — 한 번 호출할 때마다 O(1)
 data_deque = deque(range(n))
 start = time.perf_counter()
 while data_deque:

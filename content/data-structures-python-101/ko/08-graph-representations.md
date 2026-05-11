@@ -17,7 +17,7 @@ tags:
   - 그래프
   - BFS
 seo_description: Python으로 그래프를 인접 리스트와 인접 행렬로 표현하고 탐색합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 그래프 표현
@@ -60,14 +60,14 @@ last_reviewed: '2026-05-04'
 관계 데이터를 비구조적으로 관리하는 방법과 그래프로 구조화하는 방법을 비교합니다.
 
 ```python
-# before: 관계를 개별 변수로 관리 — 확장 어려움
+# 개선 전: 관계를 개별 변수로 관리 — 확장하기 어려움
 alice_friends = ["bob", "charlie"]
 bob_friends = ["alice", "charlie", "diana"]
 # 새 사용자 추가 시 코드 수정 필요
 ```
 
 ```python
-# after: 그래프(인접 리스트)로 구조화 — 확장 용이
+# 개선 후: 그래프(인접 리스트)로 구조화 — 확장하기 쉬움
 graph = {
     "alice": ["bob", "charlie"],
     "bob": ["alice", "charlie", "diana"],
@@ -168,8 +168,8 @@ g = Graph()
 for u, v in [("A","B"), ("A","C"), ("B","D"), ("C","D"), ("D","E")]:
     g.add_edge(u, v)
 
-print(f"BFS from A: {bfs(g, 'A')}")
-# BFS from A: ['A', 'B', 'C', 'D', 'E']
+print(f"A에서 시작한 BFS: {bfs(g, 'A')}")
+# A에서 시작한 BFS: ['A', 'B', 'C', 'D', 'E']
 ```
 
 ### Step 4: DFS 구현 (재귀 + 반복)
