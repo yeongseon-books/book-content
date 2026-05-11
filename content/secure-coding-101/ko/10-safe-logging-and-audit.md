@@ -17,7 +17,7 @@ tags:
   - Compliance
   - SIEM
 seo_description: 민감정보 마스킹, 감사 로그, 위변조 방지, 보존 정책 그리고 안전한 로깅 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 안전한 로깅과 감사
@@ -42,9 +42,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `print` 으로 *비밀번호도 그대로*. 보존 정책 *없음*. 누가 지웠는지도 *모름*.
+**Before**: `print` 로 비밀번호까지 그대로 남깁니다. 보존 정책도 없고, 누가 지웠는지도 알 수 없습니다.
 
-**After**: 구조화된 *JSON 로그*, 민감 필드는 *마스킹*, *append-only* 저장, *보존 기간* 명시.
+**After**: 구조화된 *JSON 로그* 를 쓰고, 민감 필드는 마스킹하고, *append-only* 저장과 보존 기간을 명시합니다.
 
 ## 안전한 로깅 5단계
 
@@ -94,21 +94,21 @@ aws s3api put-object-lock-configuration ...
 
 ## 이 코드에서 주목할 점
 
-- *Audit log* 는 *application log* 와 *분리*.
-- 마스킹은 *기본값* 으로, opt-out 으로 풀어준다.
+- *Audit log* 는 *application log* 와 분리합니다.
+- 마스킹은 기본값으로 두고, 필요할 때만 opt-out 으로 풉니다.
 - 저장은 *append-only* — 위변조 *흔적이 남는다*.
 
 ## 자주 하는 실수 5가지
 
 1. **로그에 *비밀번호 / 토큰* 흘러간다.** 한 줄이면 *전부 노출*.
-2. **Audit 와 application 로그 *섞기*.** 사고 응대 시 *추적 불가*.
-3. **로그가 *서버 디스크* 만에 있다.** 공격자가 *지운다*.
-4. **시간대 *불일치*.** UTC 가 아닌 *로컬* 만 기록.
-5. **보존 기간이 *무한*.** 비용 *폭발* + 사고 시 *피해 확대*.
+2. **Audit 와 application 로그를 섞는다.** 사고 응대 시 추적이 어려워집니다.
+3. **로그가 서버 디스크에만 있다.** 공격자가 지워 버릴 수 있습니다.
+4. **시간대가 일치하지 않는다.** UTC 가 아닌 로컬 시간만 기록합니다.
+5. **보존 기간이 무한이다.** 비용이 급증하고 사고 피해도 커집니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 팀은 *JSON 로그* 를 *수집기* (Fluent Bit, Vector) 로 모아 *중앙 저장소* (Loki, Elasticsearch, S3) 로 보냅니다. *SIEM* (Splunk, Datadog, Wazuh) 이 *audit 패턴* 에 *경보* 를 겁니다.
+대부분의 팀은 *JSON 로그* 를 수집기 (Fluent Bit, Vector) 로 모아 *중앙 저장소* (Loki, Elasticsearch, S3) 로 보냅니다. *SIEM* (Splunk, Datadog, Wazuh) 이 *audit 패턴* 에 경보를 겁니다.
 
 ## 체크리스트
 

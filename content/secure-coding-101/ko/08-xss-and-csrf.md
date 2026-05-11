@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - WebSecurity
 seo_description: Output escaping, CSP, SameSite cookie, CSRF token 그리고 브라우저 공격 방어 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # XSS와 CSRF 방어
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*XSS* 한 번이면 세션이 *탈취* 됩니다. *CSRF* 는 *사용자가 모르게* 송금/삭제를 일으킵니다.
+*XSS* 한 번이면 세션이 탈취됩니다. *CSRF* 는 사용자가 모르는 사이에 송금이나 삭제를 일으킵니다.
 
 > *기본 원칙은 *출력은 escape, 요청은 origin 확인*.*
 
@@ -85,23 +85,23 @@ def verify_csrf(form_token, session_token):
 ### 5단계 — 위험한 sink 금지
 
 ```javascript
-// element.innerHTML = userInput;  // 금지
-element.textContent = userInput;    // 안전
+// element.innerHTML = userInput;  // 사용 금지
+element.textContent = userInput;    // 안전한 출력
 ```
 
 ## 이 코드에서 주목할 점
 
 - 출력 escape 는 *컨텍스트 별* 로 (HTML, JS, attribute, URL).
 - CSP 는 *심층 방어* — escape 가 새도 *마지막 방어선*.
-- *SameSite* 와 *CSRF token* 은 *함께* 쓴다.
+- *SameSite* 와 *CSRF token* 은 함께 씁니다.
 
 ## 자주 하는 실수 5가지
 
 1. **Markdown 을 *그대로 HTML* 로 출력.** *script* 가 들어간다.
 2. **`innerHTML` 으로 *사용자 입력* 삽입.** 전형적 *DOM XSS*.
-3. **CSP 를 `unsafe-inline` 으로 둔다.** 의미가 *없다*.
-4. **CSRF token 을 *GET* 에 의존.** 캐시에 *남는다*.
-5. **API 가 *Origin/Referer* 를 안 본다.** CSRF 가 *통과*.
+3. **CSP 를 `unsafe-inline` 으로 둔다.** 의미가 없습니다.
+4. **CSRF token 을 *GET* 에 의존한다.** 캐시에 남습니다.
+5. **API 가 *Origin/Referer* 를 안 본다.** CSRF 가 통과합니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -116,7 +116,7 @@ element.textContent = userInput;    // 안전
 
 ## 정리 및 다음 단계
 
-브라우저 측 공격은 *기본기* 로 막습니다. 다음은 *우리가 안 짠 코드* — *dependency 취약점* 입니다.
+브라우저 측 공격은 기본기로 막습니다. 다음은 *우리가 안 짠 코드* 에서 오는 *dependency 취약점* 입니다.
 
 <!-- toc:begin -->
 - [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)

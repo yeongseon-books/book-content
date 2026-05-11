@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - OWASP
 seo_description: Parameterized query, ORM 안전 사용, raw SQL 위험성 그리고 SQLi 방어 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # SQL Injection과 ORM 안전 사용
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-SQLi 한 번이면 *DB 전체* 가 노출됩니다. 인증 우회, 데이터 유출, 데이터 조작이 *동시에* 가능합니다.
+SQLi 한 번이면 *DB 전체* 가 노출됩니다. 인증 우회, 데이터 유출, 데이터 조작이 한꺼번에 가능합니다.
 
-> *문자열 연결로 SQL 을 만들면 *반드시* 새는 날이 온다.*
+> 문자열 연결로 SQL 을 만들면 언젠가 새는 날이 옵니다.
 
 ## 전체 흐름
 ```mermaid
@@ -99,19 +99,19 @@ GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 1. **f-string 으로 SQL 작성.** 가장 흔한 *SQLi*.
 2. **ORM `.filter()` 안에서 *문자열 합성*.** 의미 없는 안전감.
 3. **검색 정렬 컬럼을 *입력 그대로*.** 동적 컬럼 *SQLi*.
-4. **DB 계정에 *DROP 권한* 까지 부여.** 사고 시 *치명적*.
+4. **DB 계정에 *DROP 권한* 까지 부여한다.** 사고 시 치명적입니다.
 5. **에러 메시지에 *SQL 을 그대로* 노출.** *blind SQLi* 의 단서.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 팀은 *ORM 기본*, *raw SQL* 은 *예외* 로 둡니다. 모든 raw SQL 은 *코드 리뷰* 에서 *parameter 여부* 를 본다. *애플리케이션 DB 계정* 은 *최소 권한*.
+대부분의 팀은 ORM 을 기본으로 쓰고, *raw SQL* 은 예외로 둡니다. 모든 raw SQL 은 *코드 리뷰* 에서 parameter 사용 여부를 봅니다. *애플리케이션 DB 계정* 은 *최소 권한* 입니다.
 
 ## 체크리스트
 
 - [ ] 모든 SQL 이 *parameter* 화.
 - [ ] 동적 컬럼/테이블이 *allowlist*.
 - [ ] DB 계정이 *역할 별 분리*.
-- [ ] 에러 메시지가 *안전*.
+- [ ] 에러 메시지가 안전하다.
 
 ## 정리 및 다음 단계
 

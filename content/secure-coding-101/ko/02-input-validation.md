@@ -17,7 +17,7 @@ tags:
   - OWASP
   - AppSec
 seo_description: Allowlist, schema 기반 검증, 경계 정책 그리고 안전한 입력 처리의 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 입력값 검증
@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 OWASP Top 10 의 절반은 *입력을 믿어서* 생깁니다. SQL injection, XSS, path traversal, deserialization. 모두 *서버가 클라이언트를 너무 믿은* 결과입니다.
 
-> *클라이언트는 *적대적*. 검증은 *서버에서 한 번 더*.*
+> 클라이언트는 적대적입니다. 검증은 서버에서 한 번 더 합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: route 마다 *if 문* 으로 검증한다. 빠뜨린 곳에서 *버그*.
+**Before**: route 마다 *if 문* 으로 검증한다. 빠뜨린 곳에서 버그가 납니다.
 
 **After**: *schema* 로 한 번에 검증, route 는 *비즈니스 규칙* 만 본다.
 
@@ -93,8 +93,8 @@ class CreateUser(BaseModel):
 
 ```python
 def handle_signup(payload: dict):
-    user = CreateUser(**payload)  # boundary
-    save_user(user)               # 이후는 신뢰 가능
+    user = CreateUser(**payload)  # 입력 경계
+    save_user(user)               # 이후에는 신뢰 가능
 ```
 
 ## 이 코드에서 주목할 점
@@ -105,11 +105,11 @@ def handle_signup(payload: dict):
 
 ## 자주 하는 실수 5가지
 
-1. **Denylist 만 쓴다.** 새로운 우회 패턴이 *계속* 등장.
-2. **Client 검증을 *서버에서 신뢰*.** 클라이언트는 *바뀐다*.
-3. **Schema 없이 *dict 그대로* 처리.** 어떤 키가 올지 *모른다*.
+1. **Denylist 만 쓴다.** 새로운 우회 패턴이 계속 등장합니다.
+2. **Client 검증을 서버에서 신뢰한다.** 클라이언트는 계속 바뀝니다.
+3. **Schema 없이 *dict 그대로* 처리.** 어떤 키가 올지 알 수 없습니다.
 4. **Error 메시지에 *입력 그대로* 출력.** XSS 통로가 된다.
-5. **국제화된 입력을 *byte 단위* 로 자른다.** 한글이 *깨진다*.
+5. **국제화된 입력을 *byte 단위* 로 자른다.** 한글이 깨집니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -120,7 +120,7 @@ def handle_signup(payload: dict):
 - [ ] 모든 route 가 *schema* 를 통과한다.
 - [ ] *Allowlist* 가 기본이다.
 - [ ] *Error 메시지* 가 안전하다.
-- [ ] 길이, 범위, format 이 *명시* 되어 있다.
+- [ ] 길이, 범위, format 이 명시되어 있다.
 
 ## 정리 및 다음 단계
 

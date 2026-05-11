@@ -17,7 +17,7 @@ tags:
   - LeastPrivilege
   - SecureCoding
 seo_description: RBAC, ABAC, IDOR 방어, least privilege, 그리고 안전한 인가 흐름의 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 인가와 권한
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-OWASP Top 10 의 1위는 종종 *Broken Access Control* 입니다. UI 가 버튼을 숨기는 것 만으로는 *방어가 아니다*. 모든 결정은 *서버에서* 이뤄져야 합니다.
+OWASP Top 10 의 1위는 종종 *Broken Access Control* 입니다. UI 가 버튼을 숨기는 것만으로는 방어가 되지 않습니다. 모든 결정은 서버에서 이뤄져야 합니다.
 
 > *인가는 *route 레벨* 이 아니라 *자원 레벨* 에서 검증한다.*
 
@@ -44,11 +44,11 @@ flowchart LR
 
 **Before**: route 에 `if user.role == 'admin'` 만 있다. 자원 *소유 여부* 는 안 본다.
 
-**After**: 모든 자원 호출에 `can(user, action, resource)` 를 *명시* 한다.
+**After**: 모든 자원 호출에 `can(user, action, resource)` 를 명시한다.
 
 ## 인가 흐름 5단계
 
-### 1단계 — 자원에 *소유자* 를 붙인다
+### 1단계 — 자원에 소유자를 붙인다
 
 ```python
 class Post:
@@ -73,7 +73,7 @@ def edit_post(user, post_id, new_text):
     post.content = new_text
 ```
 
-### 4단계 — 목록 조회에서도 *필터*
+### 4단계 — 목록 조회에서도 필터링
 
 ```python
 def my_posts(user):
@@ -86,7 +86,7 @@ def my_posts(user):
 def authorize(user, action, resource):
     handler = POLICIES.get(action)
     if not handler:
-        raise PermissionError("no policy")  # default deny
+        raise PermissionError("no policy")  # 기본 거부
     if not handler(user, resource):
         raise PermissionError("forbidden")
 ```
@@ -99,7 +99,7 @@ def authorize(user, action, resource):
 
 ## 자주 하는 실수 5가지
 
-1. **UI 숨김으로 *권한* 을 대체.** API 는 *그대로 호출*.
+1. **UI 숨김으로 권한을 대체한다.** API 는 그대로 호출됩니다.
 2. **`?id=` 만 보고 *소유 검증 생략*.** *IDOR* 의 전형.
 3. **Role 만 보고 *자원 소유* 무시.** admin 이 아닌 *editor 도* 모두 본다.
 4. **정책을 *route 에 흩어 놓는다*.** 한 곳을 빠뜨리면 *전부 위험*.
@@ -118,7 +118,7 @@ def authorize(user, action, resource):
 
 ## 정리 및 다음 단계
 
-권한이 *명시* 되면 사고가 *짧게 끝납니다*. 다음은 *자원 자체를 안전하게* — *데이터 저장* 입니다.
+권한이 명시되면 사고가 짧게 끝납니다. 다음은 자원 자체를 안전하게 다루는 *데이터 저장* 입니다.
 
 <!-- toc:begin -->
 - [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)

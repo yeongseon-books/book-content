@@ -17,7 +17,7 @@ tags:
   - DevSecOps
   - AppSec
 seo_description: Secure Coding의 정의, 위협 모델, OWASP Top 10, 그리고 안전한 개발 습관의 출발점
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Secure Coding이란 무엇인가?
@@ -43,7 +43,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: 기능을 먼저 만들고 보안은 *나중에* 본다. 사고가 나면 *전체를 다시 짠다*.
+**Before**: 기능을 먼저 만들고 보안은 나중에 본다. 사고가 나면 전체를 다시 짠다.
 
 **After**: 입력, 인증, 저장, 로그를 *처음부터 함께* 설계한다. 사고가 나도 *영향 범위가 좁다*.
 
@@ -94,7 +94,7 @@ def log_login(user):
 
 ## 이 코드에서 주목할 점
 
-- 검증은 *경계에서 한 번* 이 아니라 *경계마다* 한다.
+- 검증은 *경계에서 한 번* 이 아니라 각 경계마다 한다.
 - *Secret* 은 *환경 변수* 또는 *비밀 저장소* 에서 읽는다.
 - 권한은 *route 에서 한 번, 함수에서 다시*.
 
@@ -102,13 +102,13 @@ def log_login(user):
 
 1. **검증을 *클라이언트만* 에서 한다.** 서버는 *항상 다시* 검증한다.
 2. **Secret 을 *git 에 commit* 한다.** 한 번 새면 *영원히 샌다*.
-3. **Error 메시지에 *내부 구조* 를 노출.** 공격자에게 *지도* 를 준다.
+3. **Error 메시지에 *내부 구조* 를 노출.** 공격자에게 지도를 준다.
 4. **권한을 *UI* 만 숨긴다.** API 는 *그대로 호출* 가능.
 5. **Dependency 를 *영원히 안 올린다*.** *알려진 취약점* 이 쌓인다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 팀은 *threat model 워크숍* 으로 시작합니다. *데이터 흐름도* 를 그리고, *trust boundary* 마다 *위협* 을 적습니다. CI 에서 *secret scan*, *dependency scan*, *SAST* 를 *기본* 으로 돌립니다.
+대부분의 팀은 *threat model 워크숍* 으로 시작합니다. *데이터 흐름도* 를 그리고, *trust boundary* 마다 위협을 적습니다. CI 에서 *secret scan*, *dependency scan*, *SAST* 를 기본으로 돌립니다.
 
 ## 체크리스트
 
@@ -119,7 +119,7 @@ def log_login(user):
 
 ## 정리 및 다음 단계
 
-Secure coding 은 *습관* 입니다. 다음 글에서는 가장 많이 새는 곳, *입력값 검증* 을 깊이 봅니다.
+Secure coding 은 습관입니다. 다음 글에서는 가장 많이 새는 곳, *입력값 검증* 을 깊이 봅니다.
 
 <!-- toc:begin -->
 - **Secure Coding이란 무엇인가? (현재 글)**

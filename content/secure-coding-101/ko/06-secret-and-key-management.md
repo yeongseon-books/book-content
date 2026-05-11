@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - DevSecOps
 seo_description: 환경 변수, secret manager, 키 회전, secret scan 그리고 안전한 키 관리 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Secret과 키 관리
@@ -43,7 +43,7 @@ flowchart LR
 
 **Before**: `config.py` 에 `API_KEY = "..."`. CI 로그에 *그대로 출력*.
 
-**After**: 환경 변수로 주입, secret manager 에서 *fetch*, 로그에는 *마스킹* 만.
+**After**: 환경 변수로 주입하고, secret manager 에서 가져오고, 로그에는 마스킹만 적용합니다.
 
 ## 안전한 secret 5단계
 
@@ -87,13 +87,13 @@ print("API key:", mask(API_KEY))
 
 - *Secret manager* 는 *접근 감사* 가 기본.
 - 회전은 *애플리케이션을 멈추지 않고* 가능해야 한다.
-- 로그 마스킹은 *기본값* 으로.
+- 로그 마스킹은 기본값으로 둡니다.
 
 ## 자주 하는 실수 5가지
 
 1. **Secret 을 *git 에 commit*.** 한 번이면 *영원히 새었다*.
 2. **CI 로그에 *환경 변수 출력*.** *공개 빌드* 면 *공개 secret*.
-3. **Secret 회전을 *수동* 으로만.** 결국 *안 한다*.
+3. **Secret 회전을 수동으로만 한다.** 결국 하지 않게 됩니다.
 4. **모든 환경이 *같은 secret*.** 한 곳이 새면 *전부 새는*.
 5. **Secret 이 *프로세스 메모리* 에 *영원히 머문다*.** dump 한 번이면 끝.
 
@@ -104,8 +104,8 @@ print("API key:", mask(API_KEY))
 ## 체크리스트
 
 - [ ] *git secret scan* 이 켜져 있다.
-- [ ] *환경별* secret 이 분리.
-- [ ] *회전* 이 자동.
+- [ ] 환경별 secret 이 분리되어 있다.
+- [ ] 회전이 자동화되어 있다.
 - [ ] *Audit log* 가 남는다.
 
 ## 정리 및 다음 단계

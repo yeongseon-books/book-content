@@ -17,7 +17,7 @@ tags:
   - SupplyChain
   - SecureCoding
 seo_description: SCA, SBOM, lockfile, dependabot 그리고 안전한 dependency 관리 5단계
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Dependency 취약점 관리
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-Log4j, event-stream, ua-parser-js — *공급망 공격* 은 *우리 코드 0줄* 만으로 일어납니다. *모르고 쓰는* 라이브러리가 *문* 이 됩니다.
+Log4j, event-stream, ua-parser-js — *공급망 공격* 은 *우리 코드 0줄* 만으로 일어납니다. *모르고 쓰는* 라이브러리가 공격의 문이 됩니다.
 
 > *Dependency 는 *언젠가 새는 자산*. 추적이 *방어의 시작*.*
 
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `requirements.txt` 에 `requests` 만 적혀 있다. 빌드마다 *다른 버전*. 무엇이 들어왔는지 *모른다*.
+**Before**: `requirements.txt` 에 `requests` 만 적혀 있다. 빌드마다 버전이 달라지고, 무엇이 들어왔는지 알기 어렵습니다.
 
 **After**: `uv.lock` / `poetry.lock` 으로 *해시 고정*. *주간 dependency PR* 자동 생성, CI 가 *SCA* 를 막는다.
 
@@ -89,19 +89,19 @@ pip install --require-hashes -r requirements.txt
 
 - *Lockfile + 해시* 가 *재현 가능* 빌드의 핵심.
 - SBOM 은 *사고 발생 시 1초 내* 영향 범위 확인.
-- 업데이트는 *정기* 가 *비정기* 보다 안전.
+- 업데이트는 정기적으로 하는 편이 비정기 대응보다 안전합니다.
 
 ## 자주 하는 실수 5가지
 
 1. **Lockfile 없이 *latest* 사용.** *공급망 공격* 표적.
-2. **SCA 결과를 *무시* 한다.** 노이즈 속에 *진짜* 가 묻힌다.
+2. **SCA 결과를 무시한다.** 노이즈 속에 진짜 경고가 묻힙니다.
 3. **Transitive dependency 를 *안 본다*.** 대부분 취약점은 *transitive*.
 4. **포기한 라이브러리 *그대로 사용*.** 패치가 *영원히 안 옴*.
 5. **자동 업데이트 *PR 을 방치*.** 한 달이면 *수백 건* 누적.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 팀은 *Renovate* 또는 *Dependabot* 으로 *주간* PR 을 받고, *CI* 에 *SCA gate* 를 둡니다. 큰 조직은 *SBOM* 을 *생산물* 처럼 발행합니다.
+대부분의 팀은 *Renovate* 또는 *Dependabot* 으로 주간 PR 을 받고, *CI* 에 *SCA gate* 를 둡니다. 큰 조직은 *SBOM* 을 하나의 생산물처럼 발행합니다.
 
 ## 체크리스트
 
@@ -112,7 +112,7 @@ pip install --require-hashes -r requirements.txt
 
 ## 정리 및 다음 단계
 
-남이 쓴 코드도 *우리 코드* 입니다. 마지막은 사고 시 *증거* 가 되는 *안전한 로깅* 입니다.
+남이 쓴 코드도 *우리 코드* 입니다. 마지막은 사고 시 증거가 되는 *안전한 로깅* 입니다.
 
 <!-- toc:begin -->
 - [Secure Coding이란 무엇인가?](./01-what-is-secure-coding.md)

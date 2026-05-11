@@ -74,7 +74,7 @@ After에서는 운영 그 자체를 코드와 정책으로 다룹니다. 반복 
 ### 1단계 — 지표 선택
 
 ```python
-# Example: HTTP success ratio
+# 예시: HTTP 성공 비율
 indicator = "http_2xx / http_total"
 ```
 
