@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
+seo_description: How VectorStoreRetriever and MMR balance relevance and diversity, walked through LangChain internals.
 ---
 
 # Retriever Design — VectorStoreRetriever and MMR

@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: PyPDFLoader와 RecursiveCharacterTextSplitter가 문서를 청크로 나누는 내부 동작을 예제와 함께 분해합니다.
 ---
 
 # 문서 로딩과 청크 전략 — LangChain TextSplitter 내부

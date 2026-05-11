@@ -15,27 +15,10 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: HuggingFaceEmbeddings와 FAISS IndexFlatL2가 텍스트를 벡터로 바꾸고 검색하는 내부 동작을 코드와 함께 분해합니다.
 ---
 
 # 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
-
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- `embed_documents()`와 `embed_query()`를 왜 같은 함수처럼 다루면 안 될까요?
-- `IndexFlatL2`는 실제로 어떤 거리값을 계산할까요?
-- 벡터 검색 결과를 원문 문서로 다시 매핑하는 계층은 어디일까요?
-- exact flat search와 approximate IVF search는 언제 갈라질까요?
-
-> 임베딩 단계는 청크를 좌표로 바꾸고, 인덱스 단계는 그 좌표들 사이의 가까움을 순위로 바꿉니다.
-
-![이 글에서 답할 질문](../../assets/rag-deep-dive/02/02-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (2/6)
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -93,21 +76,13 @@ if __name__ == "__main__":
 - 정규화 여부를 모른 채 거리값만 비교하면 순위 의미를 잘못 해석하게 됩니다.
 - 인덱스는 저장소가 아니라 ranking rule이라는 점을 놓치기 쉽습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Flat 베이스라인** — 정확도 기준으로 Flat을 항상 둡니다.
-- **정규화 일관성** — 인덱싱·쿼리에서 동일 normalize를 강제합니다.
-- **차원이 비용** — 차원 증가는 저장·검색을 비싸게 만듭니다.
-- **재인덱싱 비용** — 모델 교체는 전수 재인덱싱이 필요합니다.
-- **관측** — 검색 latency·재현율을 분리 측정합니다.
-
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] 문서 임베딩과 질의 임베딩 호출 경로를 구분했다.
 - [ ] FAISS가 반환하는 값이 거리인지 유사도인지 확인했다.
 - [ ] 벡터 row id를 원문과 다시 연결하는 매핑 계층을 이해했다.
 - [ ] exact baseline 없이 approximate index만 먼저 튜닝하지 않았다.
-<!-- a-grade-example:end -->
 
 ## 소스 버전
 

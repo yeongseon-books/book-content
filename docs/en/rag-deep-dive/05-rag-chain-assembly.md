@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
+seo_description: Why RetrievalQA falls short and how LCEL pipelines express the same RAG flow more clearly.
 ---
 
 # Assembling the RAG Chain — RetrievalQA vs LCEL

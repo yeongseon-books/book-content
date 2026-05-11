@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
+seo_description: How RAGAS faithfulness and answer_relevancy metrics automate quality evaluation of RAG answers.
 ---
 
 # Evaluation and Quality Gates — RAGAS Metrics and Faithfulness

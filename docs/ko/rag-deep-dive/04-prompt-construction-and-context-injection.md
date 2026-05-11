@@ -15,27 +15,10 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
-
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- `PromptTemplate`는 단순 문자열 치환기보다 무엇을 더 검증할까요?
-- `ChatPromptTemplate.from_messages()`는 여러 입력을 어떻게 구조화할까요?
-- 검색 결과 `Document`는 언제 `{context}` 문자열로 접힐까요?
-- `partial()`과 `invoke()`는 변수 바인딩에 어떤 차이를 만들까요?
-
-> 프롬프트 계층은 문서를 예쁘게 붙이는 단계가 아니라, 구조화된 데이터를 모델이 실제로 읽는 계약으로 바꾸는 단계입니다.
-
-![이 글에서 답할 질문](../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (4/6)
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -93,21 +76,13 @@ if __name__ == "__main__":
 - `format()`과 `invoke()`는 비슷해 보여도 반환 타입과 LCEL 연결성이 다릅니다.
 - system 지시, history, context를 한 문자열로 평탄화하면 채팅 프롬프트의 구조 이점을 잃습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **우선순위 명시** — system → 정책 → 근거 → 질문 순서를 고정합니다.
-- **출처 표기** — 근거 출처를 답변 형식에 강제합니다.
-- **토큰 예산** — 근거가 컨텍스트를 잠식하지 않도록 설계합니다.
-- **템플릿 버전** — 프롬프트를 코드처럼 버전 관리합니다.
-- **회귀** — 프롬프트 변경 시 회귀 셋으로 검증합니다.
-
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] partial 변수와 호출 변수의 경계를 구분했다.
 - [ ] history는 메시지 리스트로, context는 문자열로 다루고 있다.
 - [ ] 프롬프트가 반환하는 타입이 string인지 prompt value인지 확인했다.
 - [ ] 최종 모델 입력 직전 컨텍스트 길이를 따로 점검할 계획이 있다.
-<!-- a-grade-example:end -->
 
 ## 소스 버전
 

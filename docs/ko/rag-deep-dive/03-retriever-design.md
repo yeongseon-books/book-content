@@ -15,27 +15,10 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻게 균형잡는지 LangChain 내부 구현으로 살펴봅니다.
 ---
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
-
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- `BaseRetriever`는 단순 helper가 아니라 어떤 호출 규약을 강제할까요?
-- `VectorStoreRetriever`는 어디에서 `similarity`, `mmr`, `threshold`로 갈라질까요?
-- `fetch_k`가 `k`보다 넓어야 하는 이유는 무엇일까요?
-- `lambda_mult`를 조절하면 결과 다양성은 어떻게 달라질까요?
-
-> retriever는 가장 가까운 벡터를 기계적으로 꺼내는 부품이 아니라, 후보 집합을 어떤 정책으로 줄일지 결정하는 선택기입니다.
-
-![이 글에서 답할 질문](../../assets/rag-deep-dive/03/03-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (3/6)
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -105,21 +88,13 @@ if __name__ == "__main__":
 - `fetch_k == k` 상태에서는 MMR이 사실상 similarity search와 비슷해질 수 있습니다.
 - retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **MMR 활용** — 다양성 확보로 답변 품질이 오릅니다.
-- **Hybrid 검색** — BM25와 임베딩을 항상 함께 비교합니다.
-- **필터링** — 메타 필터는 정확도를 결정적으로 높입니다.
-- **재랭킹** — cross-encoder 재랭킹은 비용 대비 효과가 큽니다.
-- **회귀 셋** — 도메인 골든 셋을 retriever 단위로 만듭니다.
-
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] similarity와 MMR을 같은 질의로 비교해 봤다.
 - [ ] `fetch_k`를 `k`보다 충분히 크게 잡아 봤다.
 - [ ] `lambda_mult`를 조절하며 중복과 커버리지 trade-off를 확인했다.
 - [ ] 검색 품질 문제를 임베딩 문제와 retriever 정책 문제로 분리해서 봤다.
-<!-- a-grade-example:end -->
 
 ## 소스 버전
 

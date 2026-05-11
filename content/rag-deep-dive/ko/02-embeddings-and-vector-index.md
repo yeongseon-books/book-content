@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: HuggingFaceEmbeddings와 FAISS IndexFlatL2가 텍스트를 벡터로 바꾸고 검색하는 내부 동작을 코드와 함께 분해합니다.
 ---
 
 # 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리

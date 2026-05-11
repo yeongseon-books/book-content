@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: RetrievalQA의 한계와 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 표현하는지 비교합니다.
 ---
 
 # RAG Chain 조립 — RetrievalQA vs LCEL

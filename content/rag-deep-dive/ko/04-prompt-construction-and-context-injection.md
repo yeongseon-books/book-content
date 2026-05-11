@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부

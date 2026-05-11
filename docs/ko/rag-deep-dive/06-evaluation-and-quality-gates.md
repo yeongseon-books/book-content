@@ -15,27 +15,10 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 
 # 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
-
-<!-- a-grade-intro:begin -->
-## 이 글에서 답할 질문
-
-- RAGAS는 왜 답변 문자열 하나만으로는 평가를 시작할 수 없을까요?
-- faithfulness는 답변을 어떤 단위로 쪼개서 검증할까요?
-- answer relevancy는 정확도가 아니라 무엇을 재려는 메트릭일까요?
-- 이 점수들을 CI 품질 게이트로 연결하려면 무엇을 고정해야 할까요?
-
-> 평가 단계는 RAG 답변을 다시 질문, 근거, 답변, 기준 답의 관계로 펼친 뒤, 그 관계를 점수로 바꾸는 단계입니다.
-
-![이 글에서 답할 질문](../../assets/rag-deep-dive/06/06-01-questions-this-post-answers.ko.png)
-
-*이 글에서 답할 질문*
-<!-- a-grade-intro:end -->
-
-> RAG Deep Dive 시리즈 (6/6)
 
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
@@ -111,21 +94,13 @@ if __name__ == "__main__":
 - answer relevancy는 사실 검증이 아니라 질문 초점도를 재는 축입니다.
 - 평가셋 스키마를 고정하지 않으면 지표 비교가 재현되지 않습니다.
 
-## 시니어 엔지니어는 이렇게 생각합니다
-
-- **Faithfulness 우선** — 정답성보다 근거 충실도를 먼저 봅니다.
-- **RAGAS** — 지표를 표준화해 비교 가능성을 확보합니다.
-- **CI 게이트** — 임계 미달 시 배포를 막습니다.
-- **골든 셋 환류** — 운영 실패를 골든 셋에 추가합니다.
-- **Cost·Latency** — 품질과 함께 비용·latency를 보드에 둡니다.
-
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] 평가셋에 질문, 근거, 답변, 기준 답을 모두 남겼다.
 - [ ] faithfulness와 answer relevancy를 서로 다른 실패 축으로 해석한다.
 - [ ] 점수 비교 전에 같은 샘플셋과 같은 모델 버전을 고정했다.
 - [ ] CI 게이트에 넣을 임계값을 로그와 함께 관리할 계획이 있다.
-<!-- a-grade-example:end -->
 
 ## 소스 버전
 

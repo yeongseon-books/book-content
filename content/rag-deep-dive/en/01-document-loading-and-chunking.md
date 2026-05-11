@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
+seo_description: How PyPDFLoader and RecursiveCharacterTextSplitter break documents into semantically meaningful chunks, walked through with runnable code.
 ---
 
 # Document Loading and Chunking — Inside LangChain TextSplitter

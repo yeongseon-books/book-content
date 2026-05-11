@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
+seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 
 # 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness

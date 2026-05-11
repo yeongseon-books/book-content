@@ -15,7 +15,7 @@ tags:
 - Vector Search
 - LLM
 last_reviewed: '2026-05-01'
-seo_description: '<!-- a-grade-intro:begin --> ## Questions this post answers'
+seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into vectors and search them, decomposed step by step.
 ---
 
 # Embeddings and the Vector Index — Inside FAISS IndexFlatL2
