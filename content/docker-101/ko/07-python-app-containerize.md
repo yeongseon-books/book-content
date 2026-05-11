@@ -17,7 +17,7 @@ tags:
   - Uvicorn
   - PID1
 seo_description: FastAPI 앱을 Dockerfile, healthcheck, non-root, PID1 신호까지 고려해 컨테이너화하는 실전 가이드
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Python 앱 컨테이너화
@@ -73,11 +73,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# deps layer
+# 의존성 레이어
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# app layer
+# 애플리케이션 레이어
 COPY . .
 
 RUN useradd -m -u 1000 appuser
@@ -122,7 +122,7 @@ docker logs api | tail
 
 ## 자주 하는 실수 5가지
 
-1. **`python app.py` 로 *직접 실행*.** SIGTERM *무시*.
+1. **`python app.py` 로 직접 실행합니다.** SIGTERM 을 무시합니다.
 2. **`workers` 를 *코어 수의 4배* 로.** *메모리 폭발*.
 3. **`pip install` 을 *코드 변경마다*.** 빌드 *분 단위 손해*.
 4. ***root* 로 실행.** 보안 사고.

@@ -17,7 +17,7 @@ tags:
   - Bind Mount
   - Bridge
 seo_description: 컨테이너의 데이터와 통신을 다루는 volume, bind mount, network 의 차이와 실전 사용
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Volume과 Network
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*데이터 손실* 과 *통신 실패* 는 컨테이너 운영의 *가장 흔한 사고* 입니다. *volume / network 모델* 을 알면 사고가 *예방* 됩니다.
+데이터 손실과 통신 실패는 컨테이너 운영에서 가장 흔한 사고입니다. volume / network 모델을 알면 이런 사고를 예방할 수 있습니다.
 
 > *상태 없는 컨테이너에 *상태가 새는 순간* 사고가 시작됩니다.*
 
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: container 재시작 시 *DB 데이터 사라짐*. `localhost` 로 다른 container 접근 *실패*.
+**Before**: container 를 재시작하면 DB 데이터가 사라지고, `localhost` 로는 다른 container 에 접근하지 못합니다.
 
 **After**: *named volume* 으로 데이터 영속. *user-defined bridge* 위에서 *이름 통신*.
 
@@ -95,7 +95,7 @@ docker run --rm \
 
 ## 자주 하는 실수 5가지
 
-1. **컨테이너 안 *경로 에 직접 저장*.** 재시작 시 *손실*.
+1. **컨테이너 안 경로에 직접 저장합니다.** 재시작 시 손실됩니다.
 2. ***default bridge* 사용.** *이름 해석* 안 됨.
 3. **bind mount 권한 *root 로 고정*.** 호스트에서 *수정 불가*.
 4. **volume 을 *백업하지 않음*.** 사고 시 *복구 불가*.
@@ -109,12 +109,12 @@ docker run --rm \
 
 - [ ] *named volume* 으로 데이터를 영속화한다.
 - [ ] *user-defined bridge* 를 사용한다.
-- [ ] container 가 *이름* 으로 통신한다.
+- [ ] container 가 이름으로 통신한다.
 - [ ] *백업 절차* 가 있다.
 
 ## 정리 및 다음 단계
 
-데이터와 통신은 컨테이너 운영의 *기둥* 입니다. 다음 글에서는 *Docker Compose* 로 여러 컨테이너를 *한 번에* 관리합니다.
+데이터와 통신은 컨테이너 운영의 기둥입니다. 다음 글에서는 Docker Compose 로 여러 컨테이너를 한 번에 관리합니다.
 
 <!-- toc:begin -->
 - [Docker란 무엇인가?](./01-what-is-docker.md)

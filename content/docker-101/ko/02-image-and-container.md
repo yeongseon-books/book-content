@@ -17,7 +17,7 @@ tags:
   - Layer
   - Lifecycle
 seo_description: Image 와 container 의 라이프사이클, layer 구조, 자주 쓰는 명령을 한 번에 정리
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Image와 Container
@@ -73,7 +73,7 @@ ls /etc/nginx
 exit
 ```
 
-### 4단계 — 변경은 *휘발*
+### 4단계 — 변경은 휘발됩니다
 
 ```bash
 docker exec web touch /tmp/hello
@@ -97,26 +97,26 @@ docker image rm nginx:1.27
 
 ## 자주 하는 실수 5가지
 
-1. **컨테이너 안에서 *파일 영구 저장*.** 재시작 시 *손실*.
+1. **컨테이너 안에 파일을 영구 저장합니다.** 재시작 시 손실됩니다.
 2. **`docker commit` 으로 image 만들기.** *재현 불가능*.
-3. **stopped 컨테이너 *방치*.** `docker ps -a` 가 *수백 줄*.
+3. **stopped 컨테이너를 방치합니다.** `docker ps -a` 가 수백 줄로 늘어납니다.
 4. **`latest` 만 사용.** 어느 날 *호환성 깨짐*.
-5. **layer 가 *너무 많은* image.** 빌드/풀이 *느려진다*.
+5. **layer 가 너무 많은 image 를 만듭니다.** 빌드와 풀이 느려집니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-CI 시스템은 *digest 핀* 으로 빌드해 *재현성* 을 보장하고, 운영에서는 *image 별 변경 이력* 을 *Datadog/Grafana* 와 묶어 *변경 사고* 를 추적합니다.
+CI 시스템은 digest 핀으로 빌드해 재현성을 보장하고, 운영에서는 image 별 변경 이력을 Datadog/Grafana 와 묶어 변경 사고를 추적합니다.
 
 ## 체크리스트
 
 - [ ] *image vs container* 를 설명할 수 있다.
 - [ ] container 의 *변경이 휘발* 임을 안다.
 - [ ] *layer / digest* 를 활용한다.
-- [ ] stopped 컨테이너를 *정리* 한다.
+- [ ] stopped 컨테이너를 정리한다.
 
 ## 정리 및 다음 단계
 
-Image 와 container 의 분리가 Docker 사용의 *기본기* 입니다. 다음 글에서는 *Dockerfile* 로 image 를 *직접* 만듭니다.
+Image 와 container 의 분리가 Docker 사용의 기본기입니다. 다음 글에서는 Dockerfile 로 image 를 직접 만듭니다.
 
 <!-- toc:begin -->
 - [Docker란 무엇인가?](./01-what-is-docker.md)

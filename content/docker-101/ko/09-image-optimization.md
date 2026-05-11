@@ -17,7 +17,7 @@ tags:
   - Alpine
   - Distroless
 seo_description: 멀티스테이지 빌드, BuildKit cache, slim/distroless 베이스로 image 크기와 빌드 시간을 절반으로
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Image 최적화
@@ -94,19 +94,19 @@ RUN apt-get update \
 
 ```bash
 docker history myapp:opt
-# 'dive' 도구로 layer 별 크기 분석
-# https://github.com/wagoodman/dive
+# 'dive' 도구로 layer 별 크기를 분석합니다
+# 저장소: https://github.com/wagoodman/dive
 ```
 
 ## 이 코드에서 주목할 점
 
 - *wheels 단계 분리* 로 *컴파일 결과물* 만 런타임에.
-- *cache mount* 로 pip 캐시 *재사용*.
+- *cache mount* 로 pip 캐시를 재사용합니다.
 - *distroless* 는 *셸이 없어 디버깅 어려움* (trade-off).
 
 ## 자주 하는 실수 5가지
 
-1. **alpine 으로 *무조건* 작게.** *musl* 비호환으로 *런타임 에러*.
+1. **alpine 으로 무조건 작게 만들려 합니다.** musl 비호환으로 런타임 에러가 납니다.
 2. **`--no-install-recommends` 빼먹음.** image 가 *수십 MB 부풀음*.
 3. **`apt-get install` 후 *cache 미정리*.** 마찬가지.
 4. **빌드 도구 (`gcc`) 가 *runtime* 에 남음.** 공격 표면 증가.
@@ -125,7 +125,7 @@ docker history myapp:opt
 
 ## 정리 및 다음 단계
 
-작은 image 는 *팀 속도* 와 *보안* 을 동시에 끌어올립니다. 다음 글에서는 *프로덕션 배포* 의 종합 구성을 다룹니다.
+작은 image 는 팀 속도와 보안을 동시에 끌어올립니다. 다음 글에서는 프로덕션 배포의 종합 구성을 다룹니다.
 
 <!-- toc:begin -->
 - [Docker란 무엇인가?](./01-what-is-docker.md)

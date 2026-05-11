@@ -17,7 +17,7 @@ tags:
   - Secret
   - 12Factor
 seo_description: 12-factor 의 config 원칙에 따른 환경변수, 설정 파일, secret 분리 방법
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 환경변수와 설정
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*같은 image* 가 *dev / staging / prod* 에 그대로 흘러야 *재현성* 이 보장됩니다. 환경별 설정이 코드 안에 있으면 *그 신뢰가 깨집니다*.
+같은 image 가 dev / staging / prod 에 그대로 흘러야 재현성이 보장됩니다. 환경별 설정이 코드 안에 있으면 그 신뢰가 깨집니다.
 
 > *Image 는 빌드 산출물, 환경은 *런타임 컨텍스트*.*
 
@@ -43,7 +43,7 @@ flowchart LR
 
 **Before**: prod 용 image 와 dev 용 image 가 *각각 별도 빌드*.
 
-**After**: image 는 *하나*. 환경변수만 *바꿔서 다르게 동작*.
+**After**: image 는 하나입니다. 환경변수만 바꿔서 다르게 동작합니다.
 
 ## 환경변수 5단계
 
@@ -67,7 +67,7 @@ docker run --rm \
 ### 3단계 — `--env-file`
 
 ```bash
-# .env.staging
+# .env.staging 파일
 LOG_LEVEL=INFO
 DB_URL=postgres://user:pass@stg-db:5432/app
 
@@ -96,9 +96,9 @@ envconsul -secret secret/app -- docker compose up -d
 
 ## 이 코드에서 주목할 점
 
-- *기본값* (`${VAR:-default}`) 으로 *누락 방어*.
+- 기본값 (`${VAR:-default}`) 으로 누락을 방어합니다.
 - *.env.dev*, *.env.staging* 분리로 *환경 명시*.
-- *secret* 은 *Compose 안* 에 두지 *않는다*.
+- secret 은 Compose 안에 두지 않습니다.
 
 ## 자주 하는 실수 5가지
 

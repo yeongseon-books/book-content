@@ -17,7 +17,7 @@ tags:
   - Linux
   - Virtualization
 seo_description: 컨테이너와 가상머신 차이, Docker 의 역할과 장점을 5분 만에 정리하는 입문
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Docker란 무엇인가?
@@ -41,7 +41,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: "내 노트북에선 돌아가요." 새 팀원 셋업에 *반나절*.
+**Before**: "내 노트북에선 돌아가요." 새 팀원 셋업에 반나절이 걸립니다.
 
 **After**: `docker run myapp` 한 줄. *5분이면 동일 환경*.
 
@@ -51,7 +51,7 @@ flowchart LR
 
 ```bash
 docker --version
-# Docker version 25.x.x
+# Docker 버전 25.x.x
 docker run hello-world
 ```
 
@@ -91,11 +91,11 @@ docker images
 
 ## 자주 하는 실수 5가지
 
-1. **Docker 와 가상머신을 *동일시*.** 컨테이너는 *호스트 커널 공유*.
-2. **`latest` tag 를 *프로덕션* 에 사용.** 어느 날 *조용히 깨짐*.
-3. **`docker rm` 없이 컨테이너 *방치*.** 디스크가 *가득 찬다*.
+1. **Docker 와 가상머신을 같다고 봅니다.** 컨테이너는 호스트 커널을 공유합니다.
+2. **`latest` tag 를 프로덕션에 사용합니다.** 어느 날 조용히 깨집니다.
+3. **`docker rm` 없이 컨테이너를 방치합니다.** 디스크가 가득 찹니다.
 4. **`-p` 없이 띄우고 *접속 안 됨* 으로 당황.** 포트 매핑이 필수.
-5. **root 로 컨테이너 실행 후 *프로덕션* 으로 진출.** 보안 사고.
+5. **root 로 컨테이너를 실행한 채 프로덕션으로 갑니다.** 보안 사고로 이어집니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -106,7 +106,7 @@ docker images
 - [ ] `docker run hello-world` 가 동작한다.
 - [ ] *image* 와 *container* 의 차이를 설명할 수 있다.
 - [ ] *포트 매핑* 의 의미를 안다.
-- [ ] 컨테이너를 *정리* 할 수 있다.
+- [ ] 컨테이너를 정리할 수 있다.
 
 ## 정리 및 다음 단계
 

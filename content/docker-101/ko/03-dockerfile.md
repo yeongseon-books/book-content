@@ -17,7 +17,7 @@ tags:
   - Layer
   - Cache
 seo_description: FROM, RUN, COPY, CMD 등 핵심 명령과 layer cache 를 활용한 효율적 Dockerfile 작성법
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Dockerfile 작성하기
@@ -41,7 +41,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `COPY .` 가 맨 위에 있어 *코드 한 줄 수정* 시 전체 *재빌드*.
+**Before**: `COPY .` 가 맨 위에 있어 코드 한 줄만 수정해도 전체를 다시 빌드합니다.
 
 **After**: *변경 빈도가 낮은 단계* 가 위, *높은 단계* 가 아래. *캐시 적중률 90%+*.
 
@@ -110,7 +110,7 @@ docker history myapp:1.0
 1. **`COPY .` 를 *맨 위* 에 둠.** 모든 변경에 *전체 재빌드*.
 2. **`apt update` 와 `install` 을 *다른 RUN* 으로 분리.** 캐시로 *오래된 패키지* 설치.
 3. **`pip install` 후 *캐시 정리 안 함*.** image 가 *두 배*.
-4. **`.dockerignore` 누락.** `.git`, `.env` 가 image 에 *포함*.
+4. **`.dockerignore` 를 빼먹습니다.** `.git`, `.env` 가 image 에 포함됩니다.
 5. ***root 로 실행*.** 보안 사고.
 
 ## 실무에서는 이렇게 쓰입니다

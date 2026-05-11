@@ -17,7 +17,7 @@ tags:
   - MultiContainer
   - Dev
 seo_description: 여러 컨테이너를 YAML 한 파일로 정의하고 한 번에 띄우는 Docker Compose 입문
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Docker Compose
@@ -46,7 +46,7 @@ flowchart LR
 
 **Before**: `docker run` 5번을 *셸 스크립트* 로 묶어 관리. 옵션은 *기억 의존*.
 
-**After**: `docker compose up` 한 줄. *모든 옵션* 이 yaml 에 *명시적*.
+**After**: `docker compose up` 한 줄이면 됩니다. 모든 옵션이 yaml 에 명시됩니다.
 
 ## Compose 5단계
 
@@ -87,7 +87,7 @@ docker compose logs -f web
 ### 3단계 — 변수 (`.env`)
 
 ```bash
-# .env
+# .env 파일
 DB_PASSWORD=dev
 APP_PORT=8000
 ```
@@ -121,14 +121,14 @@ docker compose down -v         # volume 까지 제거
 ## 이 코드에서 주목할 점
 
 - *healthcheck + condition: service_healthy* 로 *진짜 준비 상태* 대기.
-- *depends_on* 만 있으면 *기동만* 보장 (준비는 별도).
+- *depends_on* 만 있으면 기동만 보장됩니다. 준비 여부는 별도로 확인해야 합니다.
 - *profiles* 는 *옵셔널 서비스* 의 표준.
 
 ## 자주 하는 실수 5가지
 
 1. **`depends_on` 만 믿고 *DB 준비 전 접속*.** 헬스체크 필수.
 2. **`docker compose up` 만 쓰고 *down -v 안 함*.** 데이터가 *오염된 채 남음*.
-3. **`.env` 를 *커밋*.** secret 유출.
+3. **`.env` 를 커밋합니다.** secret 이 유출됩니다.
 4. **profile 없이 *모든 서비스 항상 기동*.** 자원 낭비.
 5. **여러 프로젝트가 *동일 포트* 사용.** 충돌.
 

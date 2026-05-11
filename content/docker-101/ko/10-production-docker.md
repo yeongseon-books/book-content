@@ -17,7 +17,7 @@ tags:
   - Logging
   - Capstone
 seo_description: 보안, 로깅, 헬스체크, registry, tagging 까지 프로덕션에 들어갈 Docker 구성의 종합 캡스톤
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 배포용 Docker 구성
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-지금까지의 모든 결정이 *프로덕션에서 한꺼번에 검증* 됩니다. 한 군데 약하면 *전체가 약합니다*.
+지금까지의 모든 결정이 프로덕션에서 한꺼번에 검증됩니다. 한 군데가 약하면 전체가 약해집니다.
 
-> *프로덕션은 *체크리스트가 아니라 시스템* 입니다. 모든 항목이 *동시에* 동작해야 합니다.*
+> **프로덕션은 체크리스트가 아니라 시스템입니다. 모든 항목이 함께 동작해야 합니다.**
 
 ## 전체 흐름
 ```mermaid
@@ -106,17 +106,17 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 ## 이 코드에서 주목할 점
 
-- *서명* 으로 *공급망 신뢰*.
+- 서명으로 공급망 신뢰를 확보합니다.
 - *read-only + cap-drop* 으로 *런타임 잠금*.
 - *log/metric* 은 *stdout / endpoint* 만으로 충분.
 
 ## 자주 하는 실수 5가지
 
 1. **`latest` 배포.** 어느 버전이 떠 있는지 *알 수 없음*.
-2. ***서명되지 않은* image*.** 공급망 공격 *무방비*.
+2. **서명되지 않은 image 를 사용합니다.** 공급망 공격에 무방비가 됩니다.
 3. **컨테이너 안 *log 파일* 에 기록.** 회전/수집 실패.
-4. **`--privileged` 사용.** 보안 *전소*.
-5. **healthcheck 없음 + restart 정책 없음.** 죽은 채로 *조용히* 머무름.
+4. **`--privileged` 를 사용합니다.** 보안이 무너집니다.
+5. **healthcheck 와 restart 정책이 없습니다.** 죽은 채로 조용히 머무릅니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -125,7 +125,7 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 ## 체크리스트
 
 - [ ] *semver + sha* 이중 tag.
-- [ ] image *서명* 과 *검증*.
+- [ ] image 서명과 검증.
 - [ ] *read-only / cap-drop / non-root*.
 - [ ] *log* 와 *metric* 표준 채널.
 - [ ] healthcheck + restart 정책.
