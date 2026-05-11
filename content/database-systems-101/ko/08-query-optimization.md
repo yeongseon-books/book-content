@@ -18,7 +18,7 @@ tags:
   - EXPLAIN
   - 튜닝
 seo_description: 옵티마이저가 통계와 비용 모델로 실행 계획을 고르는 방식과 EXPLAIN으로 튜닝하는 절차를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 쿼리 최적화
@@ -132,7 +132,7 @@ EXPLAIN ANALYZE SELECT * FROM users WHERE lower(email) = 'a@x.com';
 
 CREATE INDEX idx_users_email_lower ON users (lower(email));
 EXPLAIN ANALYZE SELECT * FROM users WHERE lower(email) = 'a@x.com';
--- Index Scan
+-- 인덱스 스캔
 ```
 
 WHERE의 컬럼에 함수를 씌우면 일반 인덱스는 안 탑니다. 함수형 인덱스나 가공된 컬럼이 필요합니다.

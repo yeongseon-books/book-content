@@ -18,7 +18,7 @@ tags:
   - 복구
   - 고가용성
 seo_description: 마스터-레플리카 복제, 동기와 비동기, PITR 백업까지 가용성과 복구 전략을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 복제와 백업
@@ -61,7 +61,7 @@ flowchart LR
 ### 1단계 — Primary 설정 (PostgreSQL)
 
 ```ini
-# postgresql.conf
+# postgresql.conf 설정
 wal_level = replica
 max_wal_senders = 10
 archive_mode = on
@@ -81,7 +81,7 @@ pg_basebackup -h primary.host -D /var/lib/pgsql/replica -U replicator -P -X stre
 ### 3단계 — 동기 복제 활성화
 
 ```ini
-# postgresql.conf
+# postgresql.conf 설정
 synchronous_commit = on
 synchronous_standby_names = 'replica1'
 ```
@@ -100,7 +100,7 @@ ls /var/lib/pgsql/wal_archive | tail
 ### 5단계 — 임의 시점으로 PITR
 
 ```ini
-# recovery.conf 또는 postgresql.auto.conf
+# recovery.conf 또는 postgresql.auto.conf 파일
 restore_command = 'cp /var/lib/pgsql/wal_archive/%f %p'
 recovery_target_time = '2026-05-04 03:00:00'
 ```
