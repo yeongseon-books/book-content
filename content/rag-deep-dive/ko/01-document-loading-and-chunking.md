@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # 문서 로딩과 청크 전략 — LangChain TextSplitter 내부
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/01-document-loading-and-chunking/main.py`
@@ -86,6 +87,7 @@ if __name__ == "__main__":
 - 재귀 분할은 구조 보존에 강하지만, 도메인별 경계를 자동으로 이해하는 것은 아닙니다.
 - 문자 기준으로 안전해 보여도 토큰 기준 컨텍스트 한도는 초과할 수 있습니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] 로더가 만든 기본 `Document` 경계를 먼저 확인했다.

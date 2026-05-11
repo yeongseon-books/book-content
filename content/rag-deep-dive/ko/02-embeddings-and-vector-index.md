@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # 임베딩과 벡터 인덱스 — FAISS IndexFlatL2 동작 원리
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/02-embeddings-and-vector-index/main.py`
@@ -75,6 +76,7 @@ if __name__ == "__main__":
 - 정규화 여부를 모른 채 거리값만 비교하면 순위 의미를 잘못 해석하게 됩니다.
 - 인덱스는 저장소가 아니라 ranking rule이라는 점을 놓치기 쉽습니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] 문서 임베딩과 질의 임베딩 호출 경로를 구분했다.

@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/04-prompt-construction-and-context-injection/main.py`
@@ -75,6 +76,7 @@ if __name__ == "__main__":
 - `format()`과 `invoke()`는 비슷해 보여도 반환 타입과 LCEL 연결성이 다릅니다.
 - system 지시, history, context를 한 문자열로 평탄화하면 채팅 프롬프트의 구조 이점을 잃습니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] partial 변수와 호출 변수의 경계를 구분했다.

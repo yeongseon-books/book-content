@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # 평가와 품질 게이트 — RAGAS 메트릭과 Faithfulness
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/06-evaluation-and-quality-gates/main.py`
@@ -93,6 +94,7 @@ if __name__ == "__main__":
 - answer relevancy는 사실 검증이 아니라 질문 초점도를 재는 축입니다.
 - 평가셋 스키마를 고정하지 않으면 지표 비교가 재현되지 않습니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] 평가셋에 질문, 근거, 답변, 기준 답을 모두 남겼다.

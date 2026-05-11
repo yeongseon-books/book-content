@@ -1,1 +1,2 @@
 - 2026-05-11: Commit `57f24bd6` fixes the Round 3 critical regression for code and checklist preservation: repo-wide scan found `code_drop=0` and `checklist_loss=0`, and `rag-deep-dive` files keep their runnable examples again.
+- 2026-05-11: Follow-up verification confirms `4725a968` removed all dangling `a-grade-example:end` markers from `content/rag-deep-dive/ko/` and removed the variant glossary heading from `content/testing-101/ko/05-test-double.md`; repo checks still show code/checklist preservation intact.

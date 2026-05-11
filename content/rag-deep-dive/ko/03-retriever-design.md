@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/03-retriever-design/main.py`
@@ -87,6 +88,7 @@ if __name__ == "__main__":
 - `fetch_k == k` 상태에서는 MMR이 사실상 similarity search와 비슷해질 수 있습니다.
 - retriever threshold와 vector store raw score threshold는 같은 계층이 아닙니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] similarity와 MMR을 같은 질의로 비교해 봤다.

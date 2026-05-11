@@ -20,6 +20,7 @@ seo_description: '<!-- a-grade-intro:begin --> ## 이 글에서 답할 질문'
 
 # RAG Chain 조립 — RetrievalQA vs LCEL
 
+<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `/root/Github/rag-deep-dive/ko/05-rag-chain-assembly/main.py`
@@ -128,6 +129,7 @@ if __name__ == "__main__":
 - LCEL의 dict literal은 평범한 dict가 아니라 내부적으로 병렬 runnable로 동작합니다.
 - 스트리밍과 중간 단계 관측이 필요해지는 순간 classic chain의 편의성이 빠르게 한계에 닿습니다.
 
+<!-- a-grade-example:end -->
 ## 체크리스트
 
 - [ ] classic `RetrievalQA`와 LCEL 체인을 같은 질의로 비교했다.
