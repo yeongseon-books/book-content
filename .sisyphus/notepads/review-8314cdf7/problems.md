@@ -1,1 +1,2 @@
 - 2026-05-11: The transformation appears to over-match `a-grade-example` / intro-shaped blocks in some series, especially `rag-deep-dive`, causing removal of standalone examples, checklists, and one diagram that should remain in blog form.
+- 2026-05-11 (Round 4): Even after the regex scope fix, `content/rag-deep-dive/ko/*.md` still has dangling `<!-- a-grade-example:end -->` markers and `content/testing-101/ko/05-test-double.md` still keeps `## 핵심 용어 정리 (Meszaros 5종)`.

@@ -93,7 +93,6 @@ if __name__ == "__main__":
 - [ ] overlap이 조각 단위로 실현된다는 점을 로그로 검증했다.
 - [ ] 프롬프트 직전 토큰 예산 점검이 따로 필요하다는 점을 이해했다.
 
-
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ v0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

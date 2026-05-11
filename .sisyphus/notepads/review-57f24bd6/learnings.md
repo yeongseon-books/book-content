@@ -1,0 +1,1 @@
+- 2026-05-11: Commit `57f24bd6` fixes the Round 3 critical regression for code and checklist preservation: repo-wide scan found `code_drop=0` and `checklist_loss=0`, and `rag-deep-dive` files keep their runnable examples again.

@@ -1,0 +1,1 @@
+- 2026-05-11: If strict score target is 100/100, remaining work is to restore or intentionally replace the removed intro/question images, make rag a-grade-example block boundaries consistent, and normalize opening structure in transformed files that still skip `## 이 글에서 다룰 문제` / mental-model style openings.

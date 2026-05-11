@@ -82,7 +82,6 @@ if __name__ == "__main__":
 - [ ] 벡터 row id를 원문과 다시 연결하는 매핑 계층을 이해했다.
 - [ ] exact baseline 없이 approximate index만 먼저 튜닝하지 않았다.
 
-
 ## 소스 버전
 
 이 글의 LangChain 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17), FAISS C++ 코드 인용은 [`facebookresearch/faiss @ c72ef8a`](https://github.com/facebookresearch/faiss/tree/c72ef8a) 기준입니다.

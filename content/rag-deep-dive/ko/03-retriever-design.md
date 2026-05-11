@@ -94,7 +94,6 @@ if __name__ == "__main__":
 - [ ] `lambda_mult`를 조절하며 중복과 커버리지 trade-off를 확인했다.
 - [ ] 검색 품질 문제를 임베딩 문제와 retriever 정책 문제로 분리해서 봤다.
 
-
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

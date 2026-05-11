@@ -1,0 +1,1 @@
+- 2026-05-11: Round 4 still has non-zero regressions: 33 transformed posts lose one image each, the six `content/rag-deep-dive/ko/*.md` files drop `<!-- a-grade-example:begin -->` while leaving dangling `<!-- a-grade-example:end -->`, and `content/testing-101/ko/05-test-double.md` still keeps `## 핵심 용어 정리 (Meszaros 5종)`.

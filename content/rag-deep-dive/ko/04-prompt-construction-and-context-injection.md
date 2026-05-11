@@ -82,7 +82,6 @@ if __name__ == "__main__":
 - [ ] 프롬프트가 반환하는 타입이 string인지 prompt value인지 확인했다.
 - [ ] 최종 모델 입력 직전 컨텍스트 길이를 따로 점검할 계획이 있다.
 
-
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

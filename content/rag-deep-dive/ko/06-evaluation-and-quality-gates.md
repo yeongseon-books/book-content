@@ -100,7 +100,6 @@ if __name__ == "__main__":
 - [ ] 점수 비교 전에 같은 샘플셋과 같은 모델 버전을 고정했다.
 - [ ] CI 게이트에 넣을 임계값을 로그와 함께 관리할 계획이 있다.
 
-
 ## 소스 버전
 
 이 글의 RAGAS 코드는 설치 가능한 [`ragas==0.1.22`](https://pypi.org/project/ragas/0.1.22/) 기준이고, LangChain 코드는 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다. 따라서 메트릭 구현 경로도 `ragas/metrics/_faithfulness.py`, `ragas/metrics/_answer_relevance.py`, `ragas/metrics/_context_precision.py`처럼 underscore-prefixed 파일명을 그대로 따릅니다.

@@ -135,7 +135,6 @@ if __name__ == "__main__":
 - [ ] source 반환 요구사항이 classic 옵션인지, LCEL 출력 설계 문제인지 구분했다.
 - [ ] 스트리밍이나 배치가 필요하면 LCEL이 기본 선택지라는 점을 이해했다.
 
-
 ## 소스 버전
 
 이 글의 모든 코드 인용은 [`langchain-ai/langchain @ langchain==0.2.17`](https://github.com/langchain-ai/langchain/tree/langchain==0.2.17) 기준입니다.

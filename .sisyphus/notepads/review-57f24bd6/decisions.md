@@ -1,0 +1,1 @@
+- 2026-05-11: Re-review verdict for commit `57f24bd6` is below merge-perfect because the catastrophic a-grade-example stripping bug is fixed, but exact preservation of rag block wrappers/images and strict `BLOG_WRITING_GUIDE.md §3` compliance are not fully met.
