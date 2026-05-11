@@ -14,7 +14,7 @@ tags:
 - PyTorch
 - Transformer
 - Tutorial
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: generate.py까지 오면 모델은 돌아가지만 아직은 개발자 도구에 가깝습니다.
 ---
 

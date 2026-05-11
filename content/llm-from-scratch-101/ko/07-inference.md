@@ -14,7 +14,7 @@ tags:
 - PyTorch
 - Transformer
 - Tutorial
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 지난 글에서 ckpt.pt를 저장하고 나면 바로 말을 시켜 보고 싶어집니다. 그런데 model.eval()만으로는 문장이
   나오지 않습니다.
 ---
@@ -60,7 +60,7 @@ top-p는 누적 확률 합이 `p`를 넘는 지점까지만 남깁니다.
 
 입력 길이는 `idx[:, -self.config.block_size:]`로 자르면 됩니다.
 
-## generate.py — 명령줄로 셰익스피어 흉내내기
+## 생성 스크립트 generate.py — 명령줄로 셰익스피어 흉내내기
 
 코드는 아래처럼 정리하면 됩니다.
 
@@ -87,7 +87,7 @@ def generate(self, idx, max_new_tokens, temperature=1.0, top_k=None, top_p=None)
 ```
 
 ```python
-# generate.py
+# 생성 스크립트 generate.py
 import argparse, torch
 from data import decode, encode
 from model import GPT, GPTConfig

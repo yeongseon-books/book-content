@@ -17,7 +17,7 @@ tags:
 - xargs
 - Search
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: grep은 파일 내용에서 텍스트를 찾는 탐정이고, find는 파일 이름과 속성으로 파일을 찾는 수색대입니다.
 ---
 
@@ -82,10 +82,10 @@ grep -rn "connection timeout" /var/log/app/
 cd ~/practice/linux-cli
 mkdir -p project/src project/tests project/docs
 echo 'def hello():
-    # TODO: add logging
+    # 할 일: 로깅 추가
     print("hello")' > project/src/app.py
 echo 'def test_hello():
-    # TODO: fix assertion
+    # 할 일: assertion 수정
     assert hello() is None' > project/tests/test_app.py
 echo '# Project README
 TODO: write documentation' > project/docs/README.md
@@ -95,26 +95,26 @@ TODO: write documentation' > project/docs/README.md
 
 ```bash
 grep "TODO" project/src/app.py           # 단일 파일
-# TODO: add logging
+# 할 일: 로깅 추가
 
 grep -rn "TODO" project/                  # 재귀 + 줄번호
 # project/src/app.py:2:    # TODO: add logging
 # project/tests/test_app.py:2:    # TODO: fix assertion
-# project/docs/README.md:2:TODO: write documentation
+# 문서 TODO: project/docs/README.md:2:TODO: write documentation
 
 grep -ri "todo" project/                  # 대소문자 무시
 grep -rl "TODO" project/                  # 파일 경로만 출력
-# project/src/app.py
-# project/tests/test_app.py
-# project/docs/README.md
+# 일치 파일: project/src/app.py
+# 일치 파일: project/tests/test_app.py
+# 일치 파일: project/docs/README.md
 ```
 
 ### Step 3. find로 파일 찾기
 
 ```bash
 find project/ -name "*.py"               # 이름으로 찾기
-# project/src/app.py
-# project/tests/test_app.py
+# 결과 파일: project/src/app.py
+# 결과 파일: project/tests/test_app.py
 
 find project/ -type d                     # 디렉터리만
 find project/ -name "*.py" -newer project/docs/README.md   # 특정 파일보다 새로운 파일
@@ -130,9 +130,9 @@ find project/ -name "*.py" | xargs wc -l
 #  6 total
 
 grep -rl "TODO" project/ | xargs -I {} echo "Fix needed: {}"
-# Fix needed: project/src/app.py
-# Fix needed: project/tests/test_app.py
-# Fix needed: project/docs/README.md
+# 수정 대상: project/src/app.py
+# 수정 대상: project/tests/test_app.py
+# 수정 대상: project/docs/README.md
 ```
 
 ### Step 5. 실전 조합
@@ -140,7 +140,7 @@ grep -rl "TODO" project/ | xargs -I {} echo "Fix needed: {}"
 ```bash
 # 모든 Python 파일에서 "print" 호출 찾기
 find project/ -name "*.py" | xargs grep -n "print"
-# project/src/app.py:3:    print("hello")
+# 검색 결과: project/src/app.py:3:    print("hello")
 
 # 30일 이상 된 로그 파일 삭제
 find /tmp -name "*.log" -mtime +30 -print | xargs rm -v

@@ -17,7 +17,7 @@ tags:
 - Directory
 - ls
 - cp
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: Linux 파일 시스템은 하나의 뿌리(/)에서 시작하는 거대한 나무입니다. 모든 파일과 디렉터리는 이 나무의 가지입니다.
 ---
 
@@ -119,7 +119,7 @@ cp hello.txt hello-backup.txt          # 파일 복사
 mv hello-backup.txt src/               # 파일 이동
 mv src/hello-backup.txt src/backup.txt # 이름 변경
 ls src/
-# backup.txt  utils/
+# backup.txt와 utils/가 보임
 ```
 
 ### Step 5. 삭제

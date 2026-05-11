@@ -17,7 +17,7 @@ tags:
 - bashrc
 - Shell
 - Configuration
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
 ---
 
@@ -64,7 +64,7 @@ Shell이 PATH를 순서대로 탐색:
 ```bash
 pip install httpie
 http GET https://api.example.com
-# bash: http: command not found
+# bash: http 명령을 찾지 못함
 # "왜 안 되지? 분명 설치했는데..."
 ```
 
@@ -73,7 +73,7 @@ http GET https://api.example.com
 ```bash
 pip install httpie
 which http || pip show httpie | grep Location
-# Location: /home/user/.local/lib/python3.11/site-packages
+# 설치 위치: /home/user/.local/lib/python3.11/site-packages
 # → ~/.local/bin이 PATH에 있는지 확인
 echo $PATH | tr ':' '\n' | grep local
 # /home/user/.local/bin이 없으면:

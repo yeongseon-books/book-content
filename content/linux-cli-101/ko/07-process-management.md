@@ -17,7 +17,7 @@ tags:
 - kill
 - Background
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: 프로세스는 실행 중인 프로그램의 인스턴스이며, 각각 고유한 PID를 가진 독립적인 작업자입니다.
 ---
 
@@ -101,7 +101,7 @@ sleep 300 &
 # [1] 12345
 
 ps aux | grep sleep
-# user  12345  ... sleep 300
+# 예시 출력: user  12345  ... sleep 300
 
 kill 12345                       # SIGTERM: 정상 종료 요청
 # 종료되지 않으면:

@@ -14,7 +14,7 @@ tags:
 - PyTorch
 - Transformer
 - Tutorial
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 문장을 읽을 때 사람도 전부를 같은 세기로 보지 않습니다. "그가 그것을 던졌다"라는 문장을 보면 그것이 무엇인지 찾으려고
   앞 단어를 다시…
 ---

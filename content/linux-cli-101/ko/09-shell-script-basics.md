@@ -17,7 +17,7 @@ tags:
 - Automation
 - Scripting
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: Shell script는 CLI 명령어를 레시피로 적어둔 파일입니다. 한 번 작성하면 반복 작업을 자동으로 실행합니다.
 ---
 
@@ -101,9 +101,9 @@ EOF
 
 chmod u+x hello.sh
 ./hello.sh
-# Hello, user!
-# Today is 2026-05-04
-# Current directory: /home/user/practice/linux-cli
+# 출력 예: Hello, user!
+# 오늘 날짜: 2026-05-04
+# 현재 디렉터리: /home/user/practice/linux-cli
 ```
 
 ### Step 2. 변수와 인자
@@ -176,8 +176,8 @@ EOF
 
 chmod u+x backup.sh
 ./backup.sh
-# Backed up: hello.sh
-# Backed up: greet.sh
+# 백업 완료: hello.sh
+# 백업 완료: greet.sh
 # ...
 ```
 

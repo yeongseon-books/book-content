@@ -14,7 +14,7 @@ tags:
 - PyTorch
 - Transformer
 - Tutorial
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 앞선 세 편에서 입력부와 어텐션을 만들었고, 지난 글에서는 블록 하나를 세웠습니다. 여기까지 오면 부품은 거의 다 모인
   셈입니다.
 ---

@@ -17,7 +17,7 @@ tags:
 - stdin
 - stdout
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: pipe는 명령어를 수도관으로 연결하는 것이고, redirection은 물줄기의 방향을 파일로 바꾸는 것입니다.
 ---
 
@@ -129,7 +129,7 @@ cat errors.txt
 ```bash
 ls /nonexistent 2> error.log            # 에러만 파일로
 cat error.log
-# ls: cannot access '/nonexistent': No such file or directory
+# 오류: ls가 '/nonexistent'에 접근할 수 없음
 
 ls /tmp /nonexistent > out.txt 2> err.txt  # 출력과 에러 분리
 ls /tmp /nonexistent > all.txt 2>&1        # 둘 다 같은 파일로

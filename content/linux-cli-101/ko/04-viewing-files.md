@@ -17,7 +17,7 @@ tags:
 - less
 - tail
 - Log
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 seo_description: cat은 파일을 통째로 쏟아내는 양동이이고, less는 한 페이지씩 넘기는 책입니다.
 ---
 
@@ -93,7 +93,7 @@ cat data.csv
 # name,age
 # Alice,30
 # Bob,25
-# Charlie,35
+# 마지막 행: Charlie,35
 
 cat -n data.csv          # 줄 번호 포함
 # 1  name,age
