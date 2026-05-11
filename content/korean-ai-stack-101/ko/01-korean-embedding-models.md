@@ -14,7 +14,7 @@ tags:
 - LLM
 - Embeddings
 - OCR
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 임베딩 모델 비교는 절대 점수 자랑이 아니라, 비슷한 문장과 무관한 문장을 얼마나 안정적으로 벌려 놓는지 보는 작업입니다.
 ---
 

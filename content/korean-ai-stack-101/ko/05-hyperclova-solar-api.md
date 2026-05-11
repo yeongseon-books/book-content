@@ -16,7 +16,7 @@ tags:
 - LLM API
 - Naver
 - Upstage
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 생성 API 호출은 4겹 계약으로 분해됩니다.
 ---
 

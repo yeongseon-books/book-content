@@ -18,7 +18,7 @@ tags:
   - KMS
   - Rotation
 seo_description: 환경 변수, vault, KMS, 회전 정책으로 secret을 안전하게 관리하는 법을 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # secret 관리
@@ -63,10 +63,10 @@ git에 실수로 커밋 -> 영구 유출 -> 모든 환경 회전 필요
 ### 1단계 — 환경 변수 (최소선)
 
 ```python
-# 1_env.py
+# 예시 파일: 1_env.py
 import os
 db_url = os.environ["DATABASE_URL"]
-# 코드에 하드코딩 금지: db_url = "postgres://user:pw@..."
+# 코드에 직접 넣지 않음: db_url = "postgres://user:pw@..."
 ```
 
 `.env` 파일은 절대 git에 커밋하지 않습니다.
@@ -74,7 +74,7 @@ db_url = os.environ["DATABASE_URL"]
 ### 2단계 — Vault에서 secret 가져오기
 
 ```python
-# 2_vault.py
+# 예시 파일: 2_vault.py
 import hvac
 client = hvac.Client(url="http://vault:8200", token=os.environ["VAULT_TOKEN"])
 data = client.secrets.kv.read_secret_version(path="myapp/db")
@@ -86,7 +86,7 @@ vault 토큰 자체도 단기여야 합니다 (예: AppRole, K8s SA).
 ### 3단계 — KMS로 데이터 키 암호화
 
 ```python
-# 3_kms.py
+# 예시 파일: 3_kms.py
 import boto3
 kms = boto3.client("kms")
 resp = kms.generate_data_key(KeyId="alias/app", KeySpec="AES_256")
@@ -99,8 +99,8 @@ ciphertext = resp["CiphertextBlob"] # DB에 저장
 ### 4단계 — secret 스캐너 (사전 방어)
 
 ```bash
-# 4_scan.sh
-# pre-commit hook: trufflehog 등으로 커밋 전 스캔
+# 예시 파일: 4_scan.sh
+# 커밋 전에 trufflehog 등으로 스캔
 trufflehog filesystem . --only-verified
 ```
 
@@ -109,7 +109,7 @@ git history를 항상 의심하고, 사전에 막습니다.
 ### 5단계 — 회전 의사코드
 
 ```python
-# 5_rotation.py
+# 예시 파일: 5_rotation.py
 def rotate_db_password():
     new_pw = generate_strong_password()
     db.execute(f"ALTER USER app WITH PASSWORD %s", (new_pw,))

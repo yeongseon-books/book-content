@@ -126,13 +126,13 @@ LangChain 입문에서 가장 중요한 것은 용어 정의보다 멘탈 모델
 LLM 애플리케이션 코드는 금방 비슷한 패턴으로 굳어집니다. 프롬프트 문자열을 만들고, 모델 API를 호출하고, 응답에서 텍스트를 꺼내고, 그 결과를 다음 단계 입력으로 다시 조립합니다. 한 번은 단순하지만 단계가 늘어나면 glue code가 빠르게 쌓입니다.
 
 ```python
-# typical accumulation of glue code
+# 반복해서 쌓이는 글루 코드
 prompt_text = f"Summarize this text: {user_input}"
 response = client.chat.completions.create(model="...", messages=[{"role": "user", "content": prompt_text}])
 raw_output = response.choices[0].message.content
 parsed = raw_output.strip()
 next_prompt = f"Translate this summary: {parsed}"
-# ...repeats
+# ...같은 패턴이 이어집니다
 ```
 
 운영 관점에서 더 중요한 문제는 코드 길이보다 **데이터 형식 관리**입니다. 어느 단계는 문자열을 받고, 어느 단계는 메시지 리스트를 받고, 어느 단계는 객체를 돌려줍니다. 이 형식 전환이 매번 수동으로 들어가면, 코드는 금방 읽기 어려워지고 디버깅 포인트도 늘어납니다.
@@ -266,19 +266,19 @@ llm = ChatGroq(
 
 parser = StrOutputParser()
 
-# step 1: render the prompt
+# 1단계: 프롬프트 렌더링
 messages = prompt.invoke({"topic": "embedding vectors"})
 print("=== step 1: messages ===")
 for m in messages.messages:
     print(f"  [{m.type}] {m.content}")
 
-# step 2: call the LLM
+# 2단계: LLM 호출
 ai_message = llm.invoke(messages)
 print(f"\n=== step 2: AIMessage ===")
 print(f"  type: {type(ai_message).__name__}")
 print(f"  content: {ai_message.content[:80]}...")
 
-# step 3: parse to string
+# 3단계: 문자열로 파싱
 text = parser.invoke(ai_message)
 print(f"\n=== step 3: string ===")
 print(f"  {text}")

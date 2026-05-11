@@ -18,7 +18,7 @@ tags:
   - InputValidation
   - OutputEncoding
 seo_description: SQL Injection과 XSS의 원인과 방어를 짧은 코드와 반례로 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # SQL Injection과 XSS
@@ -49,7 +49,7 @@ flowchart LR
 
 ```python
 cur.execute(f"SELECT * FROM users WHERE name='{name}'")
-# name = "' OR 1=1 --"  -> 모든 행 반환
+# name 값이 "' OR 1=1 --"이면 모든 행이 반환됨
 ```
 
 **After — 파라미터 바인딩**
@@ -65,7 +65,7 @@ cur.execute("SELECT * FROM users WHERE name=%s", (name,))
 ### 1단계 — 안전한 SQL
 
 ```python
-# 1_sql_safe.py
+# 예시 파일: 1_sql_safe.py
 import sqlite3
 con = sqlite3.connect(":memory:")
 con.execute("CREATE TABLE u (id int, name text)")
@@ -78,9 +78,9 @@ print(con.execute("SELECT * FROM u WHERE name=?", ("alice",)).fetchall())
 ### 2단계 — ORM도 만능이 아님
 
 ```python
-# 2_orm_dynamic.py
-# SQLAlchemy raw 영역은 여전히 위험
-# session.execute(text(f"SELECT * FROM u WHERE name='{name}'"))  # 금지
+# 예시 파일: 2_orm_dynamic.py
+# SQLAlchemy의 raw 영역은 여전히 위험함
+# session.execute(text(f"SELECT * FROM u WHERE name='{name}'"))  # 사용 금지
 ```
 
 ORM의 `raw` / `text` 영역은 다시 파라미터 바인딩이 필요합니다.
@@ -88,7 +88,7 @@ ORM의 `raw` / `text` 영역은 다시 파라미터 바인딩이 필요합니다
 ### 3단계 — Reflected XSS 방어
 
 ```python
-# 3_xss_reflect.py
+# 예시 파일: 3_xss_reflect.py
 from markupsafe import escape
 def search(q):
     return f"<p>검색어: {escape(q)}</p>"
@@ -99,7 +99,7 @@ def search(q):
 ### 4단계 — Stored XSS 방어
 
 ```python
-# 4_xss_stored.py
+# 예시 파일: 4_xss_stored.py
 def render_comment(html):
     # 입력은 그대로 저장하되, 출력 시 escape
     return f"<div>{escape(html)}</div>"
@@ -110,8 +110,8 @@ def render_comment(html):
 ### 5단계 — DOM-based XSS
 
 ```javascript
-// 5_dom_xss.js
-// document.body.innerHTML = location.hash;   // 위험
+// 예시 파일: 5_dom_xss.js
+// document.body.innerHTML = location.hash;   // 위험한 방식
 const text = decodeURIComponent(location.hash.slice(1));
 const node = document.createTextNode(text);   // 안전
 document.body.appendChild(node);

@@ -18,7 +18,7 @@ tags:
   - CSP
   - SameOrigin
 seo_description: same-origin, CORS, CSP, secure cookie를 짧은 코드로 정리한 web 보안 입문입니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Web 보안 기초
@@ -63,7 +63,7 @@ cross-site POST에 쿠키 미첨부 -> CSRF 차단
 ### 1단계 — Flask로 CORS 허용
 
 ```python
-# 1_cors.py
+# 예시 파일: 1_cors.py
 from flask import Flask, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
@@ -78,7 +78,7 @@ def me(): return jsonify(user="alice")
 ### 2단계 — CSP 헤더 추가
 
 ```python
-# 2_csp.py
+# 예시 파일: 2_csp.py
 @app.after_request
 def csp(resp):
     resp.headers["Content-Security-Policy"] = (
@@ -92,7 +92,7 @@ def csp(resp):
 ### 3단계 — 안전한 쿠키 설정
 
 ```python
-# 3_cookie.py
+# 예시 파일: 3_cookie.py
 @app.get("/login")
 def login():
     resp = app.make_response("ok")
@@ -105,7 +105,7 @@ def login():
 ### 4단계 — CSRF 토큰 검증 (의사코드)
 
 ```python
-# 4_csrf.py
+# 예시 파일: 4_csrf.py
 def verify_csrf(req):
     if req.method in ("POST", "PUT", "DELETE"):
         if req.headers.get("X-CSRF") != session["csrf"]:
@@ -117,7 +117,7 @@ double-submit 또는 synchronizer pattern을 선택합니다.
 ### 5단계 — XSS 방지: 자동 escape
 
 ```python
-# 5_xss.py
+# 예시 파일: 5_xss.py
 from markupsafe import escape
 def render(name):
     return f"<h1>Hello {escape(name)}</h1>"

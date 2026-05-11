@@ -18,7 +18,7 @@ tags:
   - Postmortem
   - Forensics
 seo_description: NIST IR 사이클, 런북, 무비난 회고로 보안 사고에 대응하는 법을 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 보안 사고 대응
@@ -66,7 +66,7 @@ NIST IR 사이클은 끊기지 않는 순환입니다.
 ### 1단계 — 사고 탐지 후 첫 행동
 
 ```text
-# 1_first_action.txt
+# 예시 파일: 1_first_action.txt
 1. 사고 사령관(IC) 지정
 2. 사고 채널 (#inc-YYYY-MM-DD-N) 생성
 3. 타임라인 기록 시작 (모든 행동을 시간과 함께)
@@ -79,7 +79,7 @@ NIST IR 사이클은 끊기지 않는 순환입니다.
 ### 2단계 — 격리 (의사코드)
 
 ```python
-# 2_contain.py
+# 예시 파일: 2_contain.py
 def contain_compromised_account(user_id):
     revoke_all_sessions(user_id)
     rotate_credentials(user_id)
@@ -92,7 +92,7 @@ def contain_compromised_account(user_id):
 ### 3단계 — 사고 등급 (severity)
 
 ```text
-# 3_severity.txt
+# 예시 파일: 3_severity.txt
 SEV1: 고객 데이터 노출, 서비스 전면 중단
 SEV2: 일부 기능 영향, 잠재적 데이터 위험
 SEV3: 단일 사용자 영향, 우회 가능
@@ -103,7 +103,7 @@ SEV3: 단일 사용자 영향, 우회 가능
 ### 4단계 — 무비난 회고 템플릿
 
 ```text
-# 4_postmortem.md
+# 예시 파일: 4_postmortem.md
 - 무엇이 일어났나 (타임라인)
 - 영향
 - 근본 원인 (5 Whys)
@@ -117,7 +117,7 @@ SEV3: 단일 사용자 영향, 우회 가능
 ### 5단계 — 게임데이 (사전 훈련)
 
 ```text
-# 5_gameday.txt
+# 예시 파일: 5_gameday.txt
 시나리오: "S3 버킷이 public으로 공개됨"
 목표: 탐지 -> 격리 -> 통신 -> 회복까지 1시간 내
 측정: MTTD, MTTR, 외부 통신 정확도

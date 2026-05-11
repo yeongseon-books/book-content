@@ -18,7 +18,7 @@ tags:
   - SIEM
   - Compliance
 seo_description: 무엇을 로그에 남기고 무엇을 남기면 안 되는지, 감사 로그와 SIEM의 역할을 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 로그와 감사
@@ -63,7 +63,7 @@ flowchart LR
 ### 1단계 — 구조화 로깅
 
 ```python
-# 1_struct_log.py
+# 예시 파일: 1_struct_log.py
 import json, time, sys
 def log(event, **fields):
     rec = {"ts": time.strftime("%FT%TZ"), "event": event, **fields}
@@ -77,10 +77,10 @@ free-form 문자열 대신 키-값으로 작성합니다.
 ### 2단계 — 절대 로그에 남기지 말 것
 
 ```python
-# 2_no_log.py
-# log("login", user=user, password=pw)        # 금지
-# log("token", token=jwt)                     # 금지
-# log("card", number="4111-...", cvv=cvv)     # 금지
+# 예시 파일: 2_no_log.py
+# log("login", user=user, password=pw)        # 사용 금지
+# log("token", token=jwt)                     # 사용 금지
+# log("card", number="4111-...", cvv=cvv)     # 사용 금지
 ```
 
 비밀번호, 토큰, PII는 마스킹하거나 아예 남기지 않습니다.
@@ -88,7 +88,7 @@ free-form 문자열 대신 키-값으로 작성합니다.
 ### 3단계 — 감사 로그 분리
 
 ```python
-# 3_audit.py
+# 예시 파일: 3_audit.py
 def audit(actor, action, resource, result):
     rec = {"actor": actor, "action": action, "resource": resource, "result": result}
     write_to_immutable_store(rec)   # WORM (write-once-read-many)
@@ -99,7 +99,7 @@ def audit(actor, action, resource, result):
 ### 4단계 — 로그 무결성 (HMAC chain)
 
 ```python
-# 4_chain.py
+# 예시 파일: 4_chain.py
 import hmac, hashlib, json
 def append(prev_mac, record, key):
     payload = json.dumps(record, sort_keys=True).encode()
@@ -111,7 +111,7 @@ def append(prev_mac, record, key):
 ### 5단계 — SIEM 룰 (의사코드)
 
 ```text
-# 5_rule.txt
+# 예시 파일: 5_rule.txt
 RULE "brute force":
   WHEN count(auth_login WHERE ok=false) > 10 BY user, ip IN 5min
   THEN alert(severity=high)

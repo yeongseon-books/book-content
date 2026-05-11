@@ -18,7 +18,7 @@ tags:
   - AccessControl
   - ZeroTrust
 seo_description: 최소 권한 원칙, IAM 정책, RBAC, zero trust를 짧은 코드로 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 권한 최소화
@@ -78,7 +78,7 @@ flowchart LR
 ### 2단계 — Kubernetes RBAC
 
 ```yaml
-# 2_role.yaml
+# 예시 파일: 2_role.yaml
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata: { namespace: app, name: pod-reader }
@@ -93,7 +93,7 @@ rules:
 ### 3단계 — 서비스 계정 분리
 
 ```yaml
-# 3_sa.yaml
+# 예시 파일: 3_sa.yaml
 kind: ServiceAccount
 apiVersion: v1
 metadata: { name: reports-reader, namespace: app }
@@ -104,9 +104,9 @@ metadata: { name: reports-reader, namespace: app }
 ### 4단계 — 임시 권한 (sudo 패턴)
 
 ```python
-# 4_temp_grant.py
+# 예시 파일: 4_temp_grant.py
 def assume_emergency_role():
-    # break-glass: 30분 만료, 알림 발송, 감사 로그
+    # 비상 권한: 30분 만료, 알림 발송, 감사 로그
     issue_short_lived_credential(role="incident-responder", ttl_min=30)
 ```
 
@@ -115,8 +115,8 @@ def assume_emergency_role():
 ### 5단계 — 정책 검증 (정적 분석)
 
 ```bash
-# 5_check.sh
-# IAM 정책에서 와일드카드 검출
+# 예시 파일: 5_check.sh
+# IAM 정책에서 와일드카드를 찾음
 grep -r '"\*"' iam/ && echo "WARNING: wildcard in IAM"
 ```
 

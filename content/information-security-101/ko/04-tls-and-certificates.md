@@ -18,7 +18,7 @@ tags:
   - PKI
   - mTLS
 seo_description: TLS 핸드셰이크, 인증서 체인, mTLS를 짧은 코드와 그림으로 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # TLS와 인증서
@@ -64,7 +64,7 @@ TLS 1.3은 1-RTT로 키 합의와 서버 인증을 끝냅니다.
 ### 1단계 — 인증서 정보 보기
 
 ```bash
-# 1_view_cert.sh
+# 예시 파일: 1_view_cert.sh
 openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null \
   | openssl x509 -noout -subject -issuer -dates
 ```
@@ -74,7 +74,7 @@ openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/
 ### 2단계 — Python으로 TLS 연결
 
 ```python
-# 2_tls_client.py
+# 예시 파일: 2_tls_client.py
 import ssl, socket
 ctx = ssl.create_default_context()
 with socket.create_connection(("example.com", 443)) as sock:
@@ -88,7 +88,7 @@ with socket.create_connection(("example.com", 443)) as sock:
 ### 3단계 — 자체 서명 인증서 만들기 (개발용)
 
 ```bash
-# 3_selfsigned.sh
+# 예시 파일: 3_selfsigned.sh
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
   -days 365 -nodes -subj "/CN=localhost"
 ```
@@ -98,7 +98,7 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
 ### 4단계 — 인증서 체인 검증
 
 ```bash
-# 4_verify_chain.sh
+# 예시 파일: 4_verify_chain.sh
 openssl verify -CAfile chain.pem server.pem
 ```
 
@@ -107,13 +107,13 @@ openssl verify -CAfile chain.pem server.pem
 ### 5단계 — mTLS 서버 (Python)
 
 ```python
-# 5_mtls.py
+# 예시 파일: 5_mtls.py
 import ssl
 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 ctx.verify_mode = ssl.CERT_REQUIRED
 ctx.load_cert_chain("server.pem", "server.key")
 ctx.load_verify_locations("client_ca.pem")
-# server.serve_forever() ...
+# 서버를 계속 실행하는 자리
 ```
 
 서비스 간 통신에서 클라이언트도 검증합니다.

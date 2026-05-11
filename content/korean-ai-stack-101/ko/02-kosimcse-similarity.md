@@ -16,7 +16,7 @@ tags:
 - SemanticSearch
 - Embeddings
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: 문장 유사도 검색은 4단계로 분해됩니다.
 ---
 

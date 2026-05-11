@@ -16,7 +16,7 @@ tags:
 - Retrieval
 - LLM
 - Python
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: '!핵심 흐름'
 ---
 

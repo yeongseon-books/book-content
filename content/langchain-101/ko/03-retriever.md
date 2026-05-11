@@ -193,7 +193,7 @@ for i, doc in enumerate(docs):
 - `"similarity_score_threshold"`: 임계치 이상인 문서만 반환
 
 ```python
-# MMR — prioritize diversity
+# MMR — 다양성을 우선합니다
 retriever_mmr = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 3, "fetch_k": 10, "lambda_mult": 0.5},
@@ -331,11 +331,11 @@ documents = [
 
 vectorstore = FAISS.from_texts(texts=documents, embedding=embedding_model)
 
-# save
+# 저장
 vectorstore.save_local("faiss_store")
 print("saved")
 
-# reload
+# 다시 불러오기
 loaded_store = FAISS.load_local(
     "faiss_store",
     embeddings=embedding_model,
@@ -343,7 +343,7 @@ loaded_store = FAISS.load_local(
 )
 print(f"reloaded: {loaded_store.index.ntotal} vectors")
 
-# verify
+# 검증
 results = loaded_store.similarity_search("vector search", k=1)
 print(f"\nresult: {results[0].page_content}")
 ```

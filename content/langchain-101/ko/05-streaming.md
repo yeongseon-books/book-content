@@ -131,7 +131,7 @@ llm = ChatGroq(
     api_key=os.environ["GROQ_API_KEY"],
 )
 
-# stream directly from the LLM
+# LLM에서 바로 스트리밍
 print("=== LLM direct streaming ===")
 for chunk in llm.stream("List five advantages of Python."):
     print(chunk.content, end="", flush=True)

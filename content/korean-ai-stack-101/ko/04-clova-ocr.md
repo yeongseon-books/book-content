@@ -16,7 +16,7 @@ tags:
 - NaverCloud
 - DocumentAI
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: OCR 파이프라인은 4단계로 분해됩니다.
 ---
 

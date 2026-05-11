@@ -17,7 +17,7 @@ tags:
   - DNS
   - DevOps
 seo_description: Kubernetes Service의 ClusterIP, NodePort, LoadBalancer 타입과 셀렉터, 클러스터 DNS를 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Service
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*마이크로서비스* 가 서로를 *이름* 으로 호출하려면 *Service* 가 필수입니다.
+마이크로서비스가 서로를 이름으로 호출하려면 Service가 필수입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -106,7 +106,7 @@ def delete(svc):
 
 - *selector* 가 *Deployment labels* 와 일치해야 함.
 - *targetPort* 는 *컨테이너 포트*.
-- *DNS 이름* 으로 *호출* 표준화.
+- DNS 이름으로 호출하는 방식을 표준으로 삼습니다.
 
 ## 자주 하는 실수 5가지
 
@@ -118,7 +118,7 @@ def delete(svc):
 
 ## 실무에서는 이렇게 쓰입니다
 
-*ClusterIP* 가 *내부* 통신, *LoadBalancer* 가 *외부 진입*, *Ingress* 가 *L7 라우팅* 을 담당합니다.
+ClusterIP는 내부 통신을 맡고, LoadBalancer는 외부 진입을 열며, Ingress는 L7 라우팅을 담당합니다.
 
 ## 체크리스트
 
@@ -129,7 +129,7 @@ def delete(svc):
 
 ## 정리 및 다음 단계
 
-내부 통신이 잡혔으면 *외부 HTTP* 트래픽을 *경로별* 로 나누는 *Ingress* 가 다음입니다.
+내부 통신이 잡혔다면, 다음은 외부 HTTP 트래픽을 경로별로 나누는 Ingress입니다.
 
 <!-- toc:begin -->
 - [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)

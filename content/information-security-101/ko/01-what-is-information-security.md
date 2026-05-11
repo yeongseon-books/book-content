@@ -18,7 +18,7 @@ tags:
   - RiskAssessment
   - InfoSec
 seo_description: 정보보안의 출발점 - 기밀성, 무결성, 가용성과 위협 모델, 위험 평가의 기본기를 한 화면에 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 정보보안이란 무엇인가?
@@ -90,7 +90,7 @@ flowchart LR
 ### 3단계 — 위험 우선순위 (간단)
 
 ```python
-# 3_risk.py
+# 예시 파일: 3_risk.py
 def risk_score(likelihood, impact):
     return likelihood * impact   # 1-5 척도
 print(risk_score(3, 5))   # 15

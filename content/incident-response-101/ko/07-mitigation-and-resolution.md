@@ -17,7 +17,7 @@ tags:
   - Rollback
   - Operations
 seo_description: Mitigation과 Resolution 차이, 롤백, 스케일 아웃, 스로틀, 킬 스위치 전략을 입문자 관점에서 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Mitigation과 Resolution
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*Mitigation* 을 *Resolution* 으로 착각하면 *같은 사건* 이 *밤에 다시* 터집니다.
+Mitigation을 Resolution로 착각하면 같은 사건이 밤에 다시 터질 수 있습니다.
 
 ## 전체 흐름
 ```mermaid
@@ -40,9 +40,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *완전히 고친 후* 공지.
+**Before**: 완전히 고친 뒤에만 공지합니다.
 
-**After**: *피해 차단* 즉시 공지, *원인 제거* 별도 공지.
+**After**: 피해를 막는 즉시 공지하고, 원인 제거는 별도로 공지합니다.
 
 ## 미니 Mitigation 키트
 
@@ -86,32 +86,32 @@ def verify(metrics):
 
 ## 이 코드에서 주목할 점
 
-- *Mitigation* 은 *작은* 동작.
-- *킬 스위치* 는 *플래그* 한 줄.
-- *검증* 은 *수치* 로.
+- Mitigation은 큰 개편보다 작은 동작으로 빨리 실행해야 합니다.
+- 킬 스위치는 플래그 한 줄로 바로 꺼질 정도로 단순해야 합니다.
+- 검증은 느낌이 아니라 수치로 확인해야 합니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***롤백* 없이 *전진* 만.**
-2. ***킬 스위치* 미준비.**
-3. ***Mitigation* 을 *Resolution* 으로 발표.**
-4. ***검증* 없이 *closed*.**
-5. ***스로틀* 해제 *잊음*.**
+1. 롤백 수단 없이 전진만 시도합니다.
+2. 킬 스위치를 미리 준비하지 않습니다.
+3. Mitigation을 곧바로 Resolution이라고 발표합니다.
+4. 검증 없이 closed 상태로 넘깁니다.
+5. 스로틀을 해제해야 한다는 사실을 잊습니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-*Feature flag* 시스템과 *autoscaler* 를 *runbook* 명령어 한 줄로 묶어 *2분* 안에 *Mitigation* 합니다.
+Feature flag 시스템과 autoscaler를 runbook 명령어 한 줄로 묶어 2분 안에 Mitigation할 수 있게 준비합니다.
 
 ## 체크리스트
 
-- [ ] *롤백 절차*.
-- [ ] *킬 스위치 목록*.
-- [ ] *스로틀 정책*.
-- [ ] *복구 검증 지표*.
+- [ ] 롤백 절차를 문서화했는지 확인합니다.
+- [ ] 킬 스위치 목록을 정리했는지 확인합니다.
+- [ ] 스로틀 정책을 준비했는지 확인합니다.
+- [ ] 복구 검증 지표를 정의했는지 확인합니다.
 
 ## 정리 및 다음 단계
 
-다음 글은 *Postmortem* 입니다.
+다음 글은 Postmortem입니다.
 
 <!-- toc:begin -->
 - [Incident란 무엇인가?](./01-what-is-incident.md)

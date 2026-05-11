@@ -17,7 +17,7 @@ tags:
   - PackageManager
   - DevOps
 seo_description: Kubernetes Helm의 차트 구조와 values, install/upgrade/rollback, 의존성 관리를 입문자 관점에서 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Helm
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*환경별* *복붙* 은 *드리프트* 를 만듭니다. *Helm* 으로 *값* 만 바꿔서 *동일 템플릿* 을 재사용합니다.
+환경별 복붙은 드리프트를 만듭니다. Helm에서는 값만 바꿔 같은 템플릿을 재사용합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -102,12 +102,12 @@ def rollback(release, revision):
 
 - *--atomic* 은 *실패 시 자동 롤백*.
 - *helm template* 으로 *렌더 결과* 를 *미리 검증*.
-- *values* 는 *환경별 분리*, *Chart* 는 *공유*.
+- `values`는 환경별로 분리하고, Chart는 공통으로 공유합니다.
 
 ## 자주 하는 실수 5가지
 
 1. ***values* 와 *Chart* 를 *같은 파일* 에 섞기.**
-2. ***민감 정보* 를 *values* 에 *평문* 으로.**
+2. **민감 정보를 `values`에 평문으로 넣습니다.**
 3. ***버전 핀* 없이 *latest* 사용.**
 4. ***rollback* 절차 미숙지.**
 5. ***dependency* 의 *update* 누락.**
