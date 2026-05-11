@@ -42,7 +42,7 @@ BLOCKQUOTE_RE = re.compile(r"^> .+", re.MULTILINE)
 TAGS_RE = re.compile(r"^Tags: .+$", re.MULTILINE)
 
 KO_QUESTIONS = re.compile(
-    r"^##\s+.*(질문|답할 질문|다룰 질문)",
+    r"^##\s+.*(질문|답할 질문|다룰 질문|다룰 문제)",
     re.MULTILINE,
 )
 EN_QUESTIONS = re.compile(
