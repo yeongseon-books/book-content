@@ -99,7 +99,7 @@ Could you spare 30 minutes to discuss Z?
 ### 4단계 — 컨퍼런스 후 기록 남기기
 
 ```bash
-# write one recap within 24 hours of the conference
+# 컨퍼런스 후 24시간 안에 회고 하나 작성
 ```
 
 컨퍼런스는 듣는 자리에서 끝내지 않는 편이 좋습니다. 하루 안에 느낀 점과 배운 내용을 정리하면 기억이 남고, 온라인 연결고리도 자연스럽게 생깁니다.

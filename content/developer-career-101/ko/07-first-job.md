@@ -92,7 +92,7 @@ flowchart LR
 
 ```bash
 git checkout -b first-fix
-# small, scoped change
+# 범위를 작게 잡은 변경
 ```
 
 첫 PR은 작을수록 좋습니다. 오탈자 수정, 로그 개선, 작은 버그 수정처럼 범위가 명확한 작업이 코드 리뷰 흐름과 배포 문화를 익히는 데 더 도움이 됩니다.

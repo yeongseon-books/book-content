@@ -111,7 +111,7 @@ Write the "problem", not the "symptom".
 ### 5단계 — 분기 학습 회고 하기
 
 ```bash
-# write a 30-minute retro every quarter
+# 분기마다 30분 회고 작성
 ```
 
 시니어가 된 뒤에도 학습은 끝나지 않습니다. 오히려 어떤 영역을 더 깊게 파고, 어떤 판단을 다시 돌아볼지 정리하는 회고가 더 중요해집니다.
