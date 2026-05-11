@@ -17,7 +17,7 @@ tags:
 - mutability
 - comprehensions
 - hashable
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 네 자료구조는 "가변성, 순서, 중복 허용, 해시 가능성"이라는 네 축의 조합으로 구분되며, 자료구조를 고른다는 것은
   이 네 축에서 어떤…
 ---

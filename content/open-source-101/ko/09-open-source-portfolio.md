@@ -96,7 +96,7 @@ echo "# Hi, I am ..." > README.md
 링크를 흩어 두지 말고 한곳에 묶어 두면 보는 사람이 훨씬 빠르게 판단할 수 있습니다. 내가 무엇을 고쳤는지 한 줄 요약도 함께 적는 편이 좋습니다.
 
 ```markdown
-## Notable PRs
+## 대표 PR
 - pandas#123 — Fix x
 - requests#456 — Add y
 ```
@@ -106,7 +106,7 @@ echo "# Hi, I am ..." > README.md
 활동의 순서와 성격을 설명하면 점수판처럼 보이던 기록이 성장 이야기로 바뀝니다. 문서에서 버그로, 버그에서 기능 작업으로 이동한 흐름은 좋은 사례입니다.
 
 ```markdown
-## Story
+## 활동 서사
 Started with docs, moved to bugs, now feature work.
 ```
 

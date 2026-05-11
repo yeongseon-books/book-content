@@ -17,7 +17,7 @@ tags:
 - floating-point
 - decimal
 - type-hints
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서
   일어나는 거의…
 ---

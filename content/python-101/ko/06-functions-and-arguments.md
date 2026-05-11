@@ -17,7 +17,7 @@ tags:
 - keyword-only
 - lambda
 - type-hints
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 함수 시그니처는 "호출자가 무엇을 줘야 하고, 함수가 무엇을 돌려주는가"의 계약이며, 다섯 인자 형태와 /·* 구분자는
   그 계약의 강도를…
 ---

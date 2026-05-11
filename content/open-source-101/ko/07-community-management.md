@@ -84,7 +84,7 @@ curl -O https://www.contributor-covenant.org/version/2/1/code_of_conduct.md
 기여자가 어디서 시작해야 하는지 모르면 메인테이너에게 바로 질문이 몰립니다. 최소 절차라도 분명하게 적어 두는 편이 좋습니다.
 
 ```markdown
-## How to contribute
+## 기여 방법
 
 1. Fork
 2. Branch

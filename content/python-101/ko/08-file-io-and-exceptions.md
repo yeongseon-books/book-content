@@ -17,7 +17,7 @@ tags:
 - exception-handling
 - try-except-finally
 - pathlib
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 파일은 "열고 → 쓰고/읽고 → 닫는다"는 세 단계의 자원이고, 예외는 "이 단계 중 어디에서 어떤 종류의 실패가 났는지"를
   분류하는…
 ---

@@ -17,7 +17,7 @@ tags:
 - dunder-methods
 - inheritance
 - dataclass
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는
   개별 객체입니다.
 ---

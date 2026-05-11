@@ -17,7 +17,7 @@ tags:
 - python-installation
 - package-management
 - developer-setup
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 각 프로젝트는 자기만의 Python을 하나씩 들고
   있어야 합니다.
 ---
@@ -122,7 +122,7 @@ Successfully installed requests-2.32.3
 ```bash
 brew install python@3.12
 python3.12 --version
-# Python 3.12.x
+# 예시 출력: Python 3.12.x
 ```
 
 **Windows** (python.org 설치 파일):
@@ -133,7 +133,7 @@ python3.12 --version
 
 ```powershell
 py -3.12 --version
-# Python 3.12.x
+# 예시 출력: Python 3.12.x
 ```
 
 **Linux** (Ubuntu/Debian):

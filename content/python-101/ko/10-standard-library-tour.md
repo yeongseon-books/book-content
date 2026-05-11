@@ -17,7 +17,7 @@ tags:
 - json-module
 - collections-module
 - itertools-module
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 않게 하는 도구함"이며, 각 모듈은 한 가지 도메인(시간·경로·직렬화·집계·반복)에
   한정해…
 ---

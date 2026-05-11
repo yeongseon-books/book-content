@@ -17,7 +17,7 @@ tags:
 - unicode
 - string-methods
 - bytes-and-str
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Python 3에서 str은 "Unicode 코드포인트의 불변 시퀀스"이고 bytes는 "바이트의 불변 시퀀스"라는
   두 층을 분리해 두면…
 ---

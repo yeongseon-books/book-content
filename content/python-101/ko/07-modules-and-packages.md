@@ -17,7 +17,7 @@ tags:
 - name-main-guard
 - relative-imports
 - namespace-packages
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Python에서 모듈은 "한 번 실행되면 캐시되는 namespace"이고, 패키지는 "__init__.py가 있는 디렉터리로
   묶인 모듈의…
 ---
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 같은 패키지 안에서 형제 모듈을 부를 때 `.`를 씁니다. 점 하나는 같은 패키지, 점 두 개는 부모 패키지를 가리킵니다.
 
 ```python
-# myapp/db/sqlite_store.py
+# 파일: myapp/db/sqlite_store.py
 from .migrations import latest_version       # 같은 db 패키지 안의 migrations
 from ..cli import parse_args                 # 한 단계 위 myapp 패키지의 cli
 ```
@@ -190,19 +190,19 @@ def insert_order(order):
 ```
 
 ```python
-# pay/tax.py
+# 파일: pay/tax.py
 def calc_tax(amount):
     return round(amount * 0.1, 2)
 ```
 
 ```python
-# pay/notify.py
+# 파일: pay/notify.py
 def send_receipt(email, amount):
     print(f"sending receipt to {email}: {amount}")
 ```
 
 ```python
-# pay/cli.py
+# 파일: pay/cli.py
 from .db import insert_order
 from .tax import calc_tax
 from .notify import send_receipt
@@ -277,7 +277,7 @@ shop/
 ```
 
 ```python
-# shop/catalog.py
+# 파일: shop/catalog.py
 PRICES = {"apple": 1000, "banana": 500}
 
 def price_of(item):
@@ -285,7 +285,7 @@ def price_of(item):
 ```
 
 ```python
-# shop/cart.py
+# 파일: shop/cart.py
 from .catalog import price_of
 
 def total(items):
