@@ -17,7 +17,7 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: 훈련·테스트 분할이 일반화 측정을 가능하게 하는 이유, 누수와 시드 고정, K-fold 교차검증까지 코드로 정리한 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Train/Test Split
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*일반화 측정* 이 없으면 *모델 선택* 도, *비교* 도 불가능. *훈련 점수* 는 *팔지 못하는 점수*.
+일반화 성능을 측정하지 못하면 모델을 고를 수도 없고 서로 비교할 수도 없습니다. 훈련 점수만 높은 모델은 실제 서비스에 바로 가져가기 어렵습니다.
 
 ## 전체 흐름
 ```mermaid
@@ -39,9 +39,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: *전체 데이터에 fit → 같은 데이터로 score* — *과대평가*.
+**Before**: 전체 데이터에 fit한 뒤 같은 데이터로 score를 계산합니다. 그래서 성능을 과대평가하기 쉽습니다.
 
-**After**: *train 으로 fit → test 로 score* — *현실적인 점수*.
+**After**: train으로 fit하고 test로 score를 재면, 훨씬 현실적인 점수를 볼 수 있습니다.
 
 ## 5단계 분할 평가
 
@@ -84,32 +84,32 @@ print(cross_val_score(model, X, y, cv=5).mean())
 
 ## 이 코드에서 주목할 점
 
-- *stratify=y* 가 *클래스 비율* 을 *유지*.
-- *random_state* 고정 → *재현 가능*.
-- *cross_val_score* 는 *훈련/평가* 를 *K번 반복*.
+- *stratify=y* 는 클래스 비율을 유지합니다.
+- *random_state* 를 고정하면 결과를 재현할 수 있습니다.
+- *cross_val_score* 는 훈련과 평가를 K번 반복합니다.
 
 ## 자주 하는 실수 5가지
 
-1. ***test 데이터로 튜닝* (=test 누수).**
-2. ***스케일러를 전체* 에 fit (=정보 누수).**
-3. ***시드 미고정* 으로 *결과* 가 흔들림.**
-4. ***불균형 데이터* 에 *stratify* 미사용.**
-5. ***시계열* 을 *무작위 분할*.**
+1. test 데이터로 튜닝해서 test 누수를 만듭니다.
+2. 스케일러를 전체 데이터에 먼저 fit해서 정보 누수를 일으킵니다.
+3. 시드를 고정하지 않아 결과가 흔들립니다.
+4. 불균형 데이터인데 *stratify* 를 쓰지 않습니다.
+5. 시계열 데이터를 시간 순서 없이 무작위로 나눕니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-A/B 실험, 모델 비교, MLOps 평가 게이트 — *분할 전략* 이 *조직의 의사결정* 까지 좌우.
+A/B 실험, 모델 비교, MLOps 평가 게이트까지, 분할 전략은 조직의 의사결정에 직접 영향을 줍니다.
 
 ## 체크리스트
 
-- [ ] *train/valid/test* 의 *역할* 을 안다.
+- [ ] *train/valid/test* 의 역할을 안다.
 - [ ] *stratify* 의 의미를 안다.
-- [ ] *random_state* 를 *항상 고정*.
+- [ ] *random_state* 를 항상 고정한다.
 - [ ] *cross_val_score* 를 쓸 수 있다.
 
 ## 정리 및 다음 단계
 
-*올바른 분할* 은 *모든 측정* 의 *전제* 입니다. 다음 글에서는 *Linear Regression* 으로 *지도학습* 의 *기본기* 를 다룹니다.
+올바른 분할은 모든 측정의 전제입니다. 다음 글에서는 *Linear Regression* 으로 지도학습의 기본기를 다룹니다.
 
 <!-- toc:begin -->
 - [Machine Learning이란 무엇인가?](./01-what-is-machine-learning.md)
