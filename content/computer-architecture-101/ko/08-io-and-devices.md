@@ -18,7 +18,7 @@ tags:
   - DMA
   - 장치
 seo_description: CPU와 장치 사이의 I/O 모델, 폴링과 인터럽트, DMA, 그리고 메모리 매핑 I/O를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # I/O와 장치

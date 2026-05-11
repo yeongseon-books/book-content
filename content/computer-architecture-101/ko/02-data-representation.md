@@ -18,7 +18,7 @@ tags:
   - 부동소수점
   - 비트 연산
 seo_description: 비트와 바이트, 정수의 2의 보수 표현, IEEE 754 부동소수점, 그리고 표현 한계가 만드는 버그를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 데이터 표현 — bit, byte, integer, floating point

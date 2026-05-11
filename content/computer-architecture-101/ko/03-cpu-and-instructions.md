@@ -18,7 +18,7 @@ tags:
   - ISA
   - 어셈블리
 seo_description: CPU의 fetch, decode, execute 사이클과 ISA, 어셈블리 명령어를 통해 컴퓨터의 실행 모델을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # CPU와 명령어
@@ -182,20 +182,21 @@ for cat, ops in INSTRUCTION_CATEGORIES.items():
 ```python
 # 다음 C 코드를 gcc -O2 -S 로 컴파일한 결과 (요약)
 #
-# int sum_to_n(int n) {
-#     int s = 0;
-#     for (int i = 1; i <= n; i++) s += i;
-#     return s;
+# 원본 C 함수:
+# 함수 선언: int sum_to_n(int n) {
+# 지역 변수 초기화: int s = 0;
+# 반복문 본문: for (int i = 1; i <= n; i++) s += i;
+# 반환문: return s;
 # }
 #
-# 컴파일러가 자동 최적화:
-#   sum_to_n(n) = n * (n + 1) / 2
+# 컴파일러가 자동으로 다음 식으로 바꿈:
+#   수식: sum_to_n(n) = n * (n + 1) / 2
 #
-# x86-64 어셈블리 (대략):
-#   lea     eax, [rdi + 1]
-#   imul    eax, edi
-#   sar     eax, 1
-#   ret
+# x86-64 어셈블리 핵심 부분:
+#   명령 1: lea     eax, [rdi + 1]
+#   명령 2: imul    eax, edi
+#   명령 3: sar     eax, 1
+#   명령 4: ret
 ```
 
 루프가 통째로 곱셈 한 줄로 변하기도 합니다. 컴파일러는 명령어 수를 줄이는 데 매우 능숙하며, 우리가 그 결과를 읽을 줄 알면 협력이 쉬워집니다.

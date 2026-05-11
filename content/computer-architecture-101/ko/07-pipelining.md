@@ -18,7 +18,7 @@ tags:
   - 성능
   - CPU
 seo_description: CPU 파이프라인의 단계와 해저드, 분기 예측을 통해 한 사이클에 한 명령어가 완료되는 원리를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 파이프라인

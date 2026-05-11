@@ -18,7 +18,7 @@ tags:
   - 동시성
   - 동기화
 seo_description: 멀티코어 시대의 병렬성 모델, 동시성과 병렬성의 차이, 동기화 비용, 그리고 Amdahl의 법칙을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 병렬성과 멀티코어

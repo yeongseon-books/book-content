@@ -18,7 +18,7 @@ tags:
   - CPU
   - 연산
 seo_description: CPU의 레지스터 파일과 ALU의 역할, 그리고 데이터가 명령어 실행 중 어디에 머무는지 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 레지스터와 ALU
@@ -142,7 +142,7 @@ rf, alu = RegisterFile(), ALU()
 rf.write(0, 7)
 rf.write(1, 3)
 
-# R2 = R0 + R1; R3 = R2 << 1; R4 = R3 - R0
+# 실행 순서: R2 = R0 + R1; R3 = R2 << 1; R4 = R3 - R0
 run([
     ("ADD", 2, 0, 1),
     ("SHL", 3, 2, 1),     # 즉시값 1

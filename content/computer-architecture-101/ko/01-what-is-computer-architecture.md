@@ -18,7 +18,7 @@ tags:
   - 시스템
   - 폰 노이만
 seo_description: 컴퓨터 구조의 정의와 폰 노이만 모델, 추상화 계층을 통해 컴퓨터가 코드를 실행하는 방식을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 컴퓨터 구조란 무엇인가?
@@ -104,11 +104,12 @@ dis.dis(add_one)
 
 ```python
 # C로 작성한 동일한 함수의 어셈블리 (gcc -S 결과 일부)
-# int add_one(int x) { return x + 1; }
+# 원본 C 함수: int add_one(int x) { return x + 1; }
 #
-#   add_one:
-#       lea     eax, [rdi + 1]
-#       ret
+# 어셈블리 핵심 부분:
+#   레이블: add_one:
+#   명령 1: lea     eax, [rdi + 1]
+#   명령 2: ret
 ```
 
 같은 의미라도 컴파일된 결과는 단 두 줄의 명령어입니다. 인터프리터의 비용이 어디서 오는지가 보입니다.

@@ -18,7 +18,7 @@ tags:
   - 성능
   - 메모리 계층
 seo_description: CPU 캐시의 동작 원리와 시간/공간 지역성, 캐시 친화적 코드 작성법을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 캐시와 지역성
