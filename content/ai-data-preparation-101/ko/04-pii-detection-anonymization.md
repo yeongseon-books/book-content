@@ -14,7 +14,7 @@ tags:
 - PII
 - Anonymization
 - Privacy
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번호를 그대로 출력해 버리는 사고는 이미 여러 사례로 보고됐습니다.
 ---
 
@@ -30,10 +30,10 @@ LLM이 학습 데이터에 있던 이메일 주소나 전화번호를 그대로 
 
 PII anonymization은 단순한 정규식 매칭이 아닙니다. 4단계 파이프라인이 필요합니다.
 
-1. **Detection**: 어떤 텍스트가 PII를 포함하는지 식별
-2. **Classification**: PII 종류 판별 (email, phone, SSN, 이름 등)
-3. **Anonymization**: 제거(redact) 또는 가명화(pseudonymize)
-4. **Audit**: 처리 결과를 기록하고 sampling으로 검증
+1. 탐지(Detection): 어떤 텍스트가 PII를 포함하는지 식별합니다.
+2. 분류(Classification): PII 종류를 판별합니다(email, phone, SSN, 이름 등).
+3. 익명화(Anonymization): 제거(redact)하거나 가명화(pseudonymize)합니다.
+4. 감사(Audit): 처리 결과를 기록하고 sampling으로 검증합니다.
 
 ## PII 종류 — 무엇을 잡아야 하는가
 
@@ -80,7 +80,7 @@ regex만으로는 이름이나 주소 같은 자연어 PII를 못 잡습니다. 
 `spaCy`나 Microsoft의 `Presidio`를 쓰면 이름, 조직, 위치를 잡을 수 있습니다.
 
 ```python
-# pip install presidio-analyzer presidio-anonymizer
+# 패키지 설치: pip install presidio-analyzer presidio-anonymizer
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 
@@ -154,10 +154,10 @@ def synthesize(text: str, hits: list[dict], faker) -> str:
 
 선택 기준:
 
-- **Redact**: training data 안전이 최우선일 때
-- **Mask**: 일부 식별자(예: card last 4 digits)를 보존해야 할 때
-- **Pseudonymize**: 같은 사용자의 행동 패턴을 추적해야 하지만 ID는 숨기고 싶을 때
-- **Synthesize**: 데이터 분포(이름의 길이, 이메일 형식)를 학습 데이터에 보존해야 할 때
+- Redact: 학습 데이터 안전이 최우선일 때 사용합니다.
+- Mask: 일부 식별자(예: card last 4 digits)를 보존해야 할 때 사용합니다.
+- Pseudonymize: 같은 사용자의 행동 패턴을 추적해야 하지만 ID는 숨기고 싶을 때 사용합니다.
+- Synthesize: 데이터 분포(이름의 길이, 이메일 형식)를 학습 데이터에 보존해야 할 때 사용합니다.
 
 ## Stage 4: Audit과 sampling 검증
 
@@ -195,24 +195,24 @@ def anonymize_with_audit(rows: list[dict], audit_path: str,
     return out
 ```
 
-**audit log는 PII 자체를 저장하지 않습니다.** count, type, char reduction만 기록합니다. review sample은 별도 access-controlled 위치에 보관합니다.
+audit log에는 PII 자체를 저장하지 않습니다. count, type, char reduction만 기록합니다. review sample은 별도 access-controlled 위치에 보관합니다.
 
 ## 한국어 텍스트의 추가 위험
 
 한국어 데이터는 영어와 다른 함정이 있습니다.
 
-- **주민등록번호 (RRN)**: 13자리 숫자 패턴(`900101-1234567`). regex로 잡힙니다.
-- **사업자등록번호**: 10자리(`123-45-67890`). 회사 정보지만 일부 자영업자에게는 PII입니다.
-- **자동차 번호판**: `12가3456` 같은 패턴.
-- **이름**: 한국어 이름은 2~4자가 대부분이라 일반 NER로 잡기 어려운 경우가 있어 별도 ko 모델이 필요합니다.
+- 주민등록번호(RRN): 13자리 숫자 패턴(`900101-1234567`)이라 regex로 잡힙니다.
+- 사업자등록번호: 10자리(`123-45-67890`)입니다. 회사 정보지만 일부 자영업자에게는 PII입니다.
+- 자동차 번호판: `12가3456` 같은 패턴입니다.
+- 이름: 한국어 이름은 2~4자가 대부분이라 일반 NER로 잡기 어려운 경우가 있어 별도 ko 모델이 필요합니다.
 
 ## 흔한 실수 5가지
 
-1. **Regex만 의존**: 이름, 주소 같은 자연어 PII를 놓칩니다. 반드시 NER stage를 추가합니다.
-2. **Pseudonymize에 동일 hash 사용**: pepper 없이 sha256만 쓰면 rainbow table 공격 가능. process-local secret을 추가합니다.
-3. **Audit log에 원문 PII 저장**: audit 자체가 leak source가 됩니다. count와 type만 기록합니다.
-4. **한국어 데이터에 영어 NER 모델 사용**: ko 이름은 거의 다 missed. spaCy ko 모델 또는 Korean NER 모델을 명시적으로 로드합니다.
-5. **Sample review 단계 생략**: 자동화만 믿으면 false negative를 영원히 못 잡습니다. 1% 정도라도 사람 검토를 유지합니다.
+1. Regex에만 의존합니다: 이름, 주소 같은 자연어 PII를 놓칩니다. 반드시 NER stage를 추가합니다.
+2. Pseudonymize에 동일 hash를 사용합니다: pepper 없이 sha256만 쓰면 rainbow table 공격이 가능합니다. process-local secret을 추가합니다.
+3. Audit log에 원문 PII를 저장합니다: audit 자체가 leak source가 됩니다. count와 type만 기록합니다.
+4. 한국어 데이터에 영어 NER 모델을 사용합니다: ko 이름은 거의 다 missed됩니다. spaCy ko 모델 또는 Korean NER 모델을 명시적으로 로드합니다.
+5. Sample review 단계를 생략합니다: 자동화만 믿으면 false negative를 영원히 못 잡습니다. 1% 정도라도 사람 검토를 유지합니다.
 
 ## 핵심 요약
 

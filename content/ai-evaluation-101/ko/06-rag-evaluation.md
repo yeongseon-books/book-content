@@ -14,7 +14,7 @@ tags:
 - RAG
 - Faithfulness
 - Retrieval
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다.
 ---
 
@@ -27,13 +27,13 @@ RAG는 retrieval과 generation 두 단계 모두를 평가해야 합니다. 이 
 ---
 ![RAG 시스템 평가하기](../../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.ko.png)
 
-*RAG 시스템 평가하기*
+RAG 시스템 평가하기
 
 ## RAG는 단일 모델이 아니라 파이프라인입니다
 
 ![RAG는 단일 모델이 아니라 파이프라인](../../../assets/ai-evaluation-101/06/06-02-rag-is-a-pipeline-not-a-single-model.ko.png)
 
-*RAG는 단일 모델이 아니라 파이프라인*
+RAG는 단일 모델이 아니라 파이프라인입니다
 RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 
 ```text
@@ -54,7 +54,7 @@ RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 
 ![RAG 4대 메트릭](../../../assets/ai-evaluation-101/06/06-03-the-four-core-rag-metrics.ko.png)
 
-*RAG 4대 메트릭*
+RAG 4대 메트릭
 업계 표준은 다음 4가지입니다 (RAGAS, TruLens 등이 채택).
 
 | 단계 | 메트릭 | 무엇을 묻는가 |
@@ -72,13 +72,12 @@ RAG(Retrieval-Augmented Generation)는 두 단계로 동작합니다.
 
 ![Retrieval 평가](../../../assets/ai-evaluation-101/06/06-04-evaluating-retrieval.ko.png)
 
-*Retrieval 평가*
+Retrieval 평가
 ### Context Recall — 필요한 정보가 검색됐는가
 
 정답을 만들 때 **반드시 알아야 하는 사실(claim)**들이 검색된 context에 모두 있는지 확인합니다.
 
 ```python
-# rag/context_recall.py
 from openai import OpenAI
 import json
 
@@ -126,7 +125,6 @@ def context_recall(question: str, reference: str, context: str) -> float:
 검색된 context 중 **실제로 관련 있는** 비율입니다. Top-K=10인데 그중 2개만 관련 있으면 precision=0.2입니다.
 
 ```python
-# rag/context_precision.py
 PRECISION_PROMPT = """다음 retrieved chunk가 질문에 답하는 데 필요한가요?
 
 질문: {question}
@@ -139,7 +137,7 @@ def context_precision(question: str, chunks: list[str]) -> float:
     relevant_count = 0
     for chunk in chunks:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # 단순 판정이라 cheaper model OK
+            model="gpt-4o-mini",  # 단순 판정이므로 더 저렴한 모델로 충분
             messages=[{"role": "user", "content": PRECISION_PROMPT.format(
                 question=question, chunk=chunk
             )}],
@@ -159,13 +157,12 @@ def context_precision(question: str, chunks: list[str]) -> float:
 
 ![Generation 평가](../../../assets/ai-evaluation-101/06/06-05-evaluating-generation.ko.png)
 
-*Generation 평가*
+Generation 평가
 ### Faithfulness — Hallucination 탐지
 
 답변의 모든 주장이 검색된 context로 **뒷받침되는지** 확인합니다. Context에 없는 사실을 말하면 hallucination입니다.
 
 ```python
-# rag/faithfulness.py
 FAITHFULNESS_PROMPT = """답변을 atomic claim으로 쪼개고, 각 claim이 context로 뒷받침되는지 확인하세요.
 
 질문: {question}
@@ -205,7 +202,6 @@ def faithfulness(question: str, context: str, answer: str) -> float:
 LLM은 가끔 질문과 무관한 내용을 답합니다. 답변에서 **역으로 질문을 생성**해 원 질문과의 유사도를 봅니다.
 
 ```python
-# rag/answer_relevance.py
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
@@ -224,7 +220,7 @@ def answer_relevance(question: str, answer: str) -> float:
     )
     generated_qs = response.choices[0].message.content.strip().split("\n")[:3]
 
-    # 원 질문과 생성된 질문들의 cosine similarity 평균
+    # 원 질문과 생성된 질문들의 코사인 유사도 평균
     emb_orig = model.encode([question])[0]
     embs_gen = model.encode(generated_qs)
     sims = [np.dot(emb_orig, eg) / (np.linalg.norm(emb_orig) * np.linalg.norm(eg))
@@ -257,7 +253,6 @@ def answer_relevance(question: str, answer: str) -> float:
 위 4개 metric을 직접 구현할 수도 있지만, [RAGAS](https://docs.ragas.io/) 라이브러리가 표준 구현을 제공합니다.
 
 ```python
-# rag/with_ragas.py
 from ragas import evaluate
 from ragas.metrics import (
     context_recall, context_precision,
@@ -277,7 +272,7 @@ result = evaluate(
     metrics=[context_recall, context_precision, faithfulness, answer_relevancy],
 )
 print(result)
-# {'context_recall': 0.85, 'context_precision': 0.72, 'faithfulness': 0.91, 'answer_relevancy': 0.88}
+# 예시 결과
 ```
 
 직접 구현할 시간이 없으면 RAGAS로 시작하세요. 단, 도메인 특화 평가가 필요하면 직접 구현이 더 정확합니다.

@@ -14,7 +14,7 @@ tags:
 - Memory
 - State Management
 - Context Window
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-11'
 seo_description: Agent가 여러 단계를 거쳐 작업을 수행하려면 이전 단계에서 무엇을 했는지 기억해야 합니다. 이것이 Memory입니다.
 ---
 
@@ -80,7 +80,7 @@ memory.add_user_message("오늘 날씨는?")
 memory.add_assistant_message("오늘 서울 날씨는 맑습니다.")
 
 memory.add_user_message("내일은?")
-# Agent는 이전 대화("오늘 날씨")를 기억하고 "내일"이 날씨를 묻는다는 것을 이해합니다.
+# Agent는 이전 대화("오늘 날씨")를 기억하고 "내일"이 날씨를 묻는 말이라는 점을 이해합니다.
 
 print(f"메시지 수: {len(memory.get_context())}")  # 4개 (system + user + assistant + user)
 ```
@@ -173,7 +173,7 @@ long_memory.add_memory(
 # 세션 2 (나중에 다시 접속): 이전 정보 검색
 preferences = long_memory.retrieve_memory(user_id="user123")
 print(f"사용자 선호도: {preferences}")
-# [{'key': 'language_preference', 'value': 'Korean', 'timestamp': '...'}, ...]
+# 예시 출력: [{'key': 'language_preference', 'value': 'Korean', 'timestamp': '...'}, ...]
 
 # 특정 키만 검색
 lang_pref = long_memory.retrieve_memory(user_id="user123", key="language_preference")
@@ -211,7 +211,7 @@ class HybridMemory:
         memories = self.long_term.retrieve_memory(self.user_id)
         
         if memories:
-            # 장기 메모리 내용을 system prompt에 추가
+            # 장기 메모리 내용을 시스템 프롬프트에 추가합니다
             context = "Previous user preferences:\n"
             for mem in memories:
                 context += f"- {mem['key']}: {mem['value']}\n"
@@ -254,7 +254,7 @@ memory.save_important_info("last_topic", "AI Agent")
 # 세션 종료
 memory.end_session()
 
-# 다음 세션에서는 "last_topic: AI Agent"가 자동으로 로드됩니다.
+# 다음 세션에서는 "last_topic: AI Agent" 항목이 자동으로 로드됩니다.
 ```
 
 **핵심 원리:**
@@ -279,7 +279,7 @@ class SlidingWindowMemory:
     
     def __init__(self, system_prompt: str, max_messages: int = 10):
         self.system_prompt = system_prompt
-        self.max_messages = max_messages  # system prompt 제외
+        self.max_messages = max_messages  # system prompt는 제외합니다
         self.messages: List[Dict[str, str]] = [
             {"role": "system", "content": system_prompt}
         ]
@@ -288,9 +288,9 @@ class SlidingWindowMemory:
         """메시지 추가"""
         self.messages.append({"role": role, "content": content})
         
-        # System prompt 제외하고 최근 N개만 유지
+        # system prompt를 제외하고 최근 N개만 유지합니다
         if len(self.messages) - 1 > self.max_messages:
-            # System prompt는 유지, 가장 오래된 메시지 2개 제거 (user + assistant 쌍)
+            # system prompt는 유지하고 가장 오래된 메시지 2개를 제거합니다(user + assistant 쌍)
             self.messages = [self.messages[0]] + self.messages[3:]
     
     def get_context(self) -> List[Dict[str, str]]:
@@ -362,7 +362,7 @@ class SummarizationMemory:
         
         # 메시지가 많아지면 요약 수행
         if len(self.messages) - 1 > self.max_messages:
-            # System prompt 제외하고 처음 절반 요약
+            # system prompt를 제외하고 앞쪽 절반을 요약합니다
             to_summarize = self.messages[1:self.max_messages//2 + 1]
             new_summary = self._summarize(to_summarize)
             
@@ -403,7 +403,7 @@ memory.add_message("user", "다른 질문: FastAPI 사용법은?")
 # 이 시점에서 웹 스크래핑 대화가 요약되고, 최근 대화만 유지됩니다.
 
 context = memory.get_context()
-print(f"요약: {memory.summary[:100]}...")  # "User asked about web scraping in Python..."
+print(f"요약: {memory.summary[:100]}...")  # "사용자가 Python 웹 스크래핑을 물었다..."
 ```
 
 **장점:**
@@ -435,7 +435,7 @@ class ImportanceBasedMemory:
         """메시지 중요도 계산 (간단한 휴리스틱)"""
         importance = 0.5  # 기본 점수
         
-        # Tool 호출 결과는 중요
+        # 도구 호출 결과는 중요합니다
         if "tool_calls" in content or "function_call" in content:
             importance += 0.3
         
@@ -460,7 +460,7 @@ class ImportanceBasedMemory:
         if len(self.messages) > self.max_messages:
             # 중요도 순으로 정렬
             self.messages.sort(key=lambda x: x[1], reverse=True)
-            # 상위 max_messages개만 유지
+            # 상위 max_messages개만 유지합니다
             self.messages = self.messages[:self.max_messages]
             # 시간 순으로 다시 정렬 (대화 흐름 유지)
             self.messages.sort(key=lambda x: self.messages.index(x))
@@ -563,7 +563,7 @@ class TokenAwareMemory:
     def _trim_messages(self):
         """오래된 메시지 제거 (system prompt는 유지)"""
         if len(self.messages) > 1:
-            # 가장 오래된 user-assistant 쌍 제거
+            # 가장 오래된 user-assistant 쌍을 제거합니다
             self.messages = [self.messages[0]] + self.messages[3:]
     
     def get_context(self) -> List[Dict[str, str]]:
@@ -753,7 +753,7 @@ print(f"프롬프트 토큰: {usage.prompt_tokens}")
 print(f"완성 토큰: {usage.completion_tokens}")
 print(f"Total tokens: {usage.total_tokens}")
 
-# 비용 계산 (GPT-4 기준: $0.03/1K prompt tokens, $0.06/1K completion tokens)
+# 비용 계산(GPT-4 기준: 입력 토큰 1K당 $0.03, 출력 토큰 1K당 $0.06)
 cost = (usage.prompt_tokens / 1000 * 0.03) + (usage.completion_tokens / 1000 * 0.06)
 print(f"Cost: ${cost:.4f}")
 ```
@@ -1068,14 +1068,14 @@ user_context = hybrid_system.initialize_user_context(
 print("User Context:")
 print(user_context)
 # 출력:
-# User Preferences:
-# - language: Korean
-# Recent Conversations:
+# 사용자 선호도:
+# - language: 한국어
+# 최근 대화:
 # - 사용자가 Python 웹 스크래핑에 대해 질문...
-# Relevant Past Discussions:
+# 관련 과거 대화:
 # - Python pandas를 사용한 데이터 분석...
 
-# 이 컨텍스트를 system prompt에 추가해 Agent에 전달합니다.
+# 이 컨텍스트를 시스템 프롬프트에 추가해 Agent에 전달합니다.
 ```
 
 **핵심 원리:**
@@ -1191,15 +1191,15 @@ class MemoryWithLimit:
 
 **나쁜 예:**
 ```python
-# System prompt도 함께 제거
+# 시스템 프롬프트까지 함께 제거합니다
 def trim_messages(messages):
-    return messages[-5:]  # System prompt가 사라질 수 있음
+    return messages[-5:]  # 시스템 프롬프트가 사라질 수 있습니다
 ```
 
 **좋은 예:**
 ```python
 def trim_messages(messages):
-    # System prompt는 항상 유지
+    # 시스템 프롬프트는 항상 유지합니다
     system_msg = messages[0]
     recent_msgs = messages[-5:]
     

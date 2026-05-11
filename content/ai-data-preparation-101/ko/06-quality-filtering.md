@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: ko
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 series: ai-data-preparation-101
 status: content-ready
 tags:
@@ -33,8 +33,8 @@ seo_description: 원본 corpus는 거의 항상 절반 이상이 쓰레기입니
 
 Quality filtering의 목표는 "이 sample이 학습에 도움이 되는가"를 판정하는 것입니다. 두 가지 접근이 있습니다.
 
-1. **Heuristic filtering**: 빠른 rule 기반 (ratio, length, repetition)
-2. **Model-based filtering**: classifier 또는 perplexity score
+1. Heuristic filtering: 빠른 rule 기반 필터링입니다(ratio, length, repetition).
+2. Model-based filtering: classifier 또는 perplexity score를 쓰는 방식입니다.
 
 production은 둘 다 씁니다. heuristic으로 명백한 쓰레기를 떨어내고, classifier로 borderline을 거릅니다.
 
@@ -66,7 +66,7 @@ def compute_signals(text: str) -> QualitySignals:
     symbol_ratio = sum(1 for c in text if not c.isalnum() and not c.isspace()) / max(n_chars, 1)
     digit_ratio = sum(1 for c in text if c.isdigit()) / max(n_chars, 1)
     upper_ratio = sum(1 for c in text if c.isupper()) / max(n_chars, 1)
-    # 5-gram repetition
+    # 5-gram 반복 비율
     grams = [" ".join(words[i:i+5]) for i in range(len(words)-4)]
     repetition_ratio = 1 - len(set(grams)) / max(len(grams), 1)
     return QualitySignals(n_chars, n_words, avg_word_len,
@@ -98,7 +98,7 @@ def passes_heuristic(text: str) -> tuple[bool, str]:
 multilingual scrape에서 원하는 언어만 남길 때.
 
 ```python
-# pip install fasttext-langdetect
+# 패키지 설치: pip install fasttext-langdetect
 from ftlangdetect import detect
 
 def keep_languages(text: str, allowed: set[str], min_conf: float = 0.7) -> bool:
@@ -117,7 +117,7 @@ fasttext가 빠르고 정확합니다. langdetect 같은 순수 python 라이브
 자연스러운 문장은 좋은 LM에서 perplexity가 낮습니다. 비정상적으로 높은 sample은 깨진 텍스트일 가능성이 큽니다.
 
 ```python
-# pip install kenlm
+# 패키지 설치: pip install kenlm
 import kenlm
 import math
 
@@ -146,11 +146,11 @@ CCNet 논문이 사용한 방식입니다. Wikipedia를 reference로 잡으면 "
 GPT-3는 reddit upvote를 positive label로 써서 fastText classifier를 학습했습니다. 같은 패턴을 쉽게 재현할 수 있습니다.
 
 ```python
-# pip install fasttext
+# 패키지 설치: pip install fasttext
 import fasttext
 
 # 1) 학습 데이터 준비: 위키/책은 positive, common-crawl 잡문은 negative
-# format: __label__pos text...
+# 형식: __label__pos text...
 # train.txt를 만들어둔 상태라고 가정
 model = fasttext.train_supervised(
     input="train.txt",
@@ -204,11 +204,11 @@ def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -> list[
 
 ## 흔한 실수 5가지
 
-1. **Threshold를 처음부터 hard-code**: 매 batch마다 분포가 달라집니다. histogram을 그려보고 percentile 기반으로 정합니다 (예: 하위 5% 제거).
-2. **Heuristic만으로 충분하다고 가정**: spam, scraped boilerplate는 heuristic을 통과합니다. classifier가 필요합니다.
-3. **Reference corpus가 작거나 편향됨**: KenLM을 1MB Wikipedia dump로 학습하면 perplexity가 의미 없는 숫자가 됩니다. 최소 수 GB 이상으로 학습합니다.
-4. **language detection을 전체 텍스트에 실행**: 1000자 sampling이면 충분합니다. 전체 실행은 cost만 늘립니다.
-5. **filtering 후 분포 변화를 측정 안 함**: filter가 한쪽 domain만 살려놓는 경우가 흔합니다. before/after distribution을 token count, language, source별로 비교합니다.
+1. Threshold를 처음부터 hard-code합니다: batch마다 분포가 달라집니다. histogram을 그려보고 percentile 기반으로 정합니다(예: 하위 5% 제거).
+2. Heuristic만으로 충분하다고 가정합니다: spam, scraped boilerplate는 heuristic을 통과합니다. classifier가 필요합니다.
+3. Reference corpus가 작거나 편향되어 있습니다: KenLM을 1MB Wikipedia dump로 학습하면 perplexity가 의미 없는 숫자가 됩니다. 최소 수 GB 이상으로 학습합니다.
+4. language detection을 전체 텍스트에 실행합니다: 1000자 sampling이면 충분합니다. 전체 실행은 cost만 늘립니다.
+5. filtering 후 분포 변화를 측정하지 않습니다: filter가 한쪽 domain만 살려놓는 경우가 흔합니다. before/after distribution을 token count, language, source별로 비교합니다.
 
 ## 핵심 요약
 

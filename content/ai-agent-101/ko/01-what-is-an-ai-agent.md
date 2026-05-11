@@ -17,7 +17,7 @@ tags:
 - Autonomy
 - ReAct
 - Automation
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-11'
 seo_description: Chatbot은 "질문에 답하는 사전"이라면, Agent는 "할 일을 받고 알아서 끝내고 오는 인턴"입니다.
 ---
 
@@ -103,7 +103,7 @@ framework 없이도 Agent의 동작을 이해할 수 있습니다. 작은 Python
 
 ```python
 def get_weather(city: str) -> dict:
-    # 실제로는 OpenWeather API 호출. 여기서는 mock.
+    # 실제로는 OpenWeather API를 호출합니다. 여기서는 모의 데이터를 사용합니다.
     fake = {"Tokyo": {"temp": 18, "condition": "rain"},
             "Seoul": {"temp": 22, "condition": "clear"}}
     return fake.get(city, {"error": "unknown city"})
@@ -116,20 +116,20 @@ LLM 없이 사람이 LLM 역할을 합니다.
 ```python
 goal = "도쿄 날씨를 확인하고 우산 필요 여부를 알려줘"
 
-# observe
+# 관찰
 context = {"goal": goal, "history": []}
 
-# think (사람이 결정)
+# 생각(사람이 결정)
 next_action = ("get_weather", {"city": "Tokyo"})
 
-# act
+# 실행
 result = get_weather(**next_action[1])
 context["history"].append((next_action, result))
 
-# check
+# 확인
 print(context)
-# {'goal': '...', 'history': [(('get_weather', {'city': 'Tokyo'}),
-#                              {'temp': 18, 'condition': 'rain'})]}
+# 예시 출력: {'goal': '...', 'history': [(('get_weather', {'city': 'Tokyo'}),
+#           예시 계속:                          {'temp': 18, 'condition': 'rain'})]}
 ```
 
 ### Step 3. LLM에게 think를 맡기기

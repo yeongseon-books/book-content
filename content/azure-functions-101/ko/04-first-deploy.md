@@ -14,7 +14,7 @@ tags:
 - Azure Functions
 - Serverless
 - Cloud
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-11'
 seo_description: 앞선 세 장은 개념을 정리하는 단계였습니다. 여기서는 로컬에서 함수를 만들고, Azure에 배포하고, 실제 호출 가능한
   URL을 받기까지의…
 ---
@@ -135,7 +135,7 @@ Functions:
 
 ```bash
 curl "http://localhost:7071/api/hello?name=Sisyphus"
-# Hello, Sisyphus!
+# 응답: Hello, Sisyphus!
 ```
 
 이 시점에서 `func start`는 **로컬에 Functions Host를 띄운 상태**입니다. 앞에서 본 Host와 Worker 구조가 실제로 올라오고, 둘 사이에 gRPC 채널이 연결됩니다. 운영과 같은 구조를 노트북에서 그대로 보는 셈입니다.
@@ -155,7 +155,7 @@ Azure에 함수를 올리려면 세 개의 리소스가 필요합니다.
 ![배포 전 필수 Azure 리소스 구성](../../../assets/azure-functions-101/04/04-02-4-create-azure-resources.ko.png)
 
 *배포 전 필수 Azure 리소스 구성*
-> Note: Storage Account는 Functions가 자기 동작을 유지하는 데 쓰는 인프라 저장소입니다. 트리거 락, 호출 메타데이터, Timer 스케줄 상태 같은 값이 여기에 들어갑니다. 비즈니스 데이터는 별도 저장소를 두는 편이 안전합니다.
+> 참고: Storage Account는 Functions가 자기 동작을 유지하는 데 쓰는 인프라 저장소입니다. 트리거 락, 호출 메타데이터, Timer 스케줄 상태 같은 값이 여기에 들어갑니다. 비즈니스 데이터는 별도 저장소를 두는 편이 안전합니다.
 
 이제 리소스를 만듭니다. 이름은 전역 고유해야 하므로 적절히 바꿔서 쓰면 됩니다.
 
@@ -165,15 +165,15 @@ LOC=koreacentral
 SA=sthello$RANDOM
 APP=func-hello-$RANDOM
 
-# 1) Resource Group
+# 1) 리소스 그룹
 az group create --name $RG --location $LOC
 
-# 2) Storage Account
+# 2) 스토리지 계정
 az storage account create \
     --name $SA --resource-group $RG \
     --location $LOC --sku Standard_LRS
 
-# 3) Function App (Flex Consumption, Python 3.11)
+# 3) Function App 생성(Flex Consumption, Python 3.11)
 az functionapp create \
     --name $APP --resource-group $RG \
     --storage-account $SA \
@@ -238,7 +238,7 @@ Functions in func-hello-xxxxx:
 
 ```bash
 curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
-# Hello, Sisyphus!
+# 응답: Hello, Sisyphus!
 ```
 
 여기까지가 로컬에서 클라우드까지 가는 가장 짧은 경로입니다. 같은 명령(`func azure functionapp publish $APP`)을 다시 실행하면 재배포됩니다.

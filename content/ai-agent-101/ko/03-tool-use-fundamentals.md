@@ -14,7 +14,7 @@ tags:
 - Tool Use
 - Function Calling
 - Integration
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-11'
 seo_description: Agent가 단순 대화 모델과 다른 이유는 도구를 사용할 수 있기 때문입니다.
 ---
 
@@ -55,7 +55,7 @@ def get_weather(location: str, unit: str = "celsius") -> dict:
     # API 호출 로직
     return {"temp": 25, "condition": "sunny", "humidity": 60}
 
-# 도구를 OpenAI function calling 형식으로 등록
+# 도구를 OpenAI function calling 형식으로 등록합니다
 tools = [
     {
         "type": "function",
@@ -102,7 +102,7 @@ response = client.chat.completions.create(
     tool_choice="auto"  # 모델이 자동으로 판단
 )
 
-# LLM의 응답 확인
+# LLM 응답을 확인합니다
 print(response.choices[0].message)
 ```
 
@@ -137,7 +137,7 @@ available_functions = {
     "get_weather": get_weather
 }
 
-# LLM 응답에서 tool_calls 추출
+# LLM 응답에서 tool_calls를 추출합니다
 tool_calls = response.choices[0].message.tool_calls
 
 # 각 도구 호출 처리
@@ -358,7 +358,7 @@ tools = [
     }
 ]
 
-# LLM에 도구 정보 전달
+# LLM에 도구 정보를 전달합니다
 response = openai.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
@@ -480,7 +480,7 @@ def agent_with_fallback(user_query: str) -> str:
     if cached_data:
         return f"최근 서울 날씨 (1시간 전): {cached_data}"
     
-    # 3차 시도: LLM 지식 기반 응답
+    # 3차 시도: LLM이 가진 일반 지식으로 응답
     return "죄송합니다. 현재 실시간 날씨 정보를 가져올 수 없습니다. 날씨 관련 일반적인 정보는 제공할 수 있습니다."
 ```
 
@@ -575,7 +575,7 @@ tools = [
     {"type": "function", "function": {...}},  # search_documents
 ]
 
-# 전략 1: 자동 선택 (LLM이 판단)
+# 전략 1: 자동 선택(LLM이 판단)
 response = openai.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "서울 날씨 알려줘"}],
@@ -652,7 +652,7 @@ def execute_with_priority(
 ) -> Dict[str, Any]:
     """우선순위 순서로 도구 실행"""
     
-    # 우선순위: 1. 캐시 조회 2. 실시간 API 3. LLM 지식
+    # 우선순위: 1. 캐시 조회 2. 실시간 API 3. LLM 일반 지식
     priority_order = ["check_cache", "api_call", "llm_knowledge"]
     
     for tool_name in priority_order:
@@ -683,7 +683,7 @@ def multi_tool_workflow(user_query: str) -> str:
     
     documents = search_result["data"]
     
-    # 2단계: 검색된 문서를 LLM에 전달하여 요약
+    # 2단계: 검색된 문서를 LLM에 전달해 요약
     summary_prompt = f"""
     다음 문서를 바탕으로 질문에 답하세요.
     
@@ -761,7 +761,7 @@ if "데이터베이스" in user_query:
         }
     })
 
-# 컨텍스트에 맞는 도구만 LLM에 전달
+# 컨텍스트에 맞는 도구만 LLM에 전달합니다
 tools = registry.get_tools(context="database")
 ```
 
@@ -849,7 +849,7 @@ def select_tool_by_cost(
 def execute_tool(tool_name: str, params: dict) -> dict:
     """도구 실행 (에러 처리 없음)"""
     if tool_name == "get_weather":
-        # API 호출이 실패하면 Exception 발생
+        # API 호출이 실패하면 예외가 발생합니다
         return requests.get(f"https://api.weather.com/{params['location']}").json()
 ```
 
@@ -915,10 +915,10 @@ def agent_loop(user_query: str) -> str:
         
         # 결과 확인
         if tool_result["success"]:
-            # 성공: 결과를 LLM에 전달하여 최종 답변 생성
+            # 성공: 결과를 LLM에 전달해 최종 답변을 생성합니다
             return llm.generate_answer(user_query, tool_result["data"])
         else:
-            # 실패: LLM에게 에러를 알리고 대체 전략 요청
+            # 실패: LLM에게 오류를 알리고 대체 전략을 요청합니다
             error_context = f"도구 실행 실패: {tool_result['error']}"
             return llm.decide_next_action(user_query, context=error_context)
 ```
@@ -930,13 +930,13 @@ def agent_loop(user_query: str) -> str:
 **나쁜 예**: 모든 가능한 도구를 한 번에 등록합니다.
 
 ```python
-# 50개의 도구를 한 번에 LLM에 전달
+# 50개의 도구를 한 번에 LLM에 전달합니다
 tools = [
     {"name": "get_weather", ...},
     {"name": "search_docs", ...},
     {"name": "send_email", ...},
     {"name": "query_database", ...},
-    # ... 46 more tools
+    # ... 나머지 도구 46개
 ]
 
 response = openai.chat.completions.create(
@@ -962,7 +962,7 @@ def get_relevant_tools(user_query: str, all_tools: list) -> list:
         # 기본 도구만 (최대 5개)
         return all_tools[:5]
 
-# 관련 도구만 LLM에 전달
+# 관련 도구만 LLM에 전달합니다
 relevant_tools = get_relevant_tools(user_query, all_tools)
 
 response = openai.chat.completions.create(

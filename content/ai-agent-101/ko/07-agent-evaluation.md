@@ -14,7 +14,7 @@ tags:
 - Evaluation
 - Testing
 - Metrics
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-11'
 seo_description: Agent를 만드는 것보다 어려운 것이 "이 Agent가 제대로 작동하는지" 평가하는 것입니다.
 ---
 
@@ -284,13 +284,13 @@ def evaluate_trajectory_efficiency(traj: Trajectory) -> dict:
             if traj.steps else 0
     }
 
-# 효율성 비교
+# 효율성을 비교합니다
 traj_a = recorder_a.finalize("답변 A", True)
 traj_b = recorder_b.finalize("답변 B", True)
 
 eff_a = evaluate_trajectory_efficiency(traj_a)
 eff_b = evaluate_trajectory_efficiency(traj_b)
-# 같은 답이라도 단계 수가 적은 쪽이 더 효율적
+# 같은 답이라도 단계 수가 적은 쪽이 더 효율적입니다
 ```
 
 Trajectory 평가의 핵심은 "같은 결과라면 더 적은 단계로 도달했는가"입니다.
@@ -342,7 +342,7 @@ expected = ToolCallExpectation(
 actual_tool = "get_weather"
 actual_args = {"city": "Seoul", "unit": "celsius"}
 print(evaluate_tool_call(actual_tool, actual_args, expected))
-# {'tool_correct': True, 'args_correct': True, ...}
+# 예시 출력: {'tool_correct': True, 'args_correct': True, ...}
 ```
 
 전체 테스트셋에서 도구 호출 정확도를 집계하면 Agent 약점을 찾을 수 있습니다.
