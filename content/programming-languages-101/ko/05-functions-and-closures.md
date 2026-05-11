@@ -18,7 +18,7 @@ tags:
   - 일급객체
   - 캡처
 seo_description: closure는 마법이 아니라 lexical scope와 일급 함수의 조합이 만드는 자연스러운 결과입니다. 그 메커니즘을 정확히 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 함수와 closure

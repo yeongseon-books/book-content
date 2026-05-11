@@ -18,7 +18,7 @@ tags:
   - 구조화 데이터
   - 타입 안전
 seo_description: TypedDict와 dataclass로 딕셔너리와 객체 구조에 타입 안전성을 부여하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # TypedDict와 dataclass
@@ -105,9 +105,9 @@ print(type(user))        # <class 'dict'>
 print(user["name"])      # Alice
 
 # mypy가 잡아주는 오류들:
-# user["age"] = "thirty"  # error: incompatible type
-# user["phone"] = "123"   # error: extra key
-# del user["name"]        # error: required key
+# user["age"] = "thirty"  # 오류: 타입이 맞지 않음
+# user["phone"] = "123"   # 오류: 허용되지 않은 추가 키
+# del user["name"]        # 오류: 필수 키 삭제
 
 
 # 선택적 키 — NotRequired (Python 3.11+)
@@ -166,7 +166,7 @@ price = Money(50000)
 print(price)  # Money(amount=50000, currency='KRW')
 
 # 불변 — 수정 시도하면 에러
-# price.amount = 60000  # FrozenInstanceError
+# price.amount = 60000  # 오류: FrozenInstanceError 발생
 
 # replace()로 새 인스턴스 생성
 discounted = replace(price, amount=45000)
@@ -207,7 +207,7 @@ print(f"언패킹: ({x}, {y})")
 color = RGB(255, 128, 0)
 print(f"RGB: {color}")
 print(f"hex: #{color.red:02x}{color.green:02x}{color.blue:02x}")
-# hex: #ff8000
+# 16진수 값: #ff8000
 ```
 
 ### Step 5: 선택 기준

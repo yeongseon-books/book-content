@@ -18,7 +18,7 @@ tags:
   - CI
   - Quality
 seo_description: 단위·통합·E2E 테스트의 역할, 테스트 피라미드, 커버리지 함정과 CI 통합을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 테스트 전략
@@ -64,7 +64,7 @@ E2E 80%, 통합 15%, 단위 5%
 ### 1단계 — 단위 테스트
 
 ```python
-# 1_unit.py
+# 파일: 1_unit.py
 def add(a: int, b: int) -> int:
     return a + b
 
@@ -77,7 +77,7 @@ def test_add():
 ### 2단계 — 가짜 의존(Fake)으로 통합
 
 ```python
-# 2_integration.py
+# 파일: 2_integration.py
 class FakeRepo:
     def __init__(self): self.items = []
     def save(self, x): self.items.append(x)
@@ -94,7 +94,7 @@ mock보다 fake가 깨지지 않습니다.
 ### 3단계 — E2E는 시나리오만
 
 ```python
-# 3_e2e.py
+# 파일: 3_e2e.py
 def test_checkout_flow(client):
     client.post("/cart", json={"sku": "A"})
     r = client.post("/checkout")
@@ -106,7 +106,7 @@ def test_checkout_flow(client):
 ### 4단계 — 빠른 CI 분할
 
 ```yaml
-# 4_ci.yml
+# 파일: 4_ci.yml
 jobs:
   unit:
     steps: [{ run: pytest tests/unit -q }]
@@ -122,7 +122,7 @@ E2E는 main에만 강제하기도 합니다.
 ### 5단계 — Flaky를 격리
 
 ```python
-# 5_flaky.py
+# 파일: 5_flaky.py
 import pytest
 @pytest.mark.flaky(reruns=2)
 def test_uses_external_clock(): ...

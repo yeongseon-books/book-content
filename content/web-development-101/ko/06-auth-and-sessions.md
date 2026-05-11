@@ -17,8 +17,8 @@ tags:
   - Sessions
   - Security
   - Backend
-seo_description: 쿠키/세션/JWT/OAuth — 사용자를 *기억* 하는 네 가지 방법.
-last_reviewed: '2026-05-04'
+seo_description: 쿠키/세션/JWT/OAuth — 사용자를 기억하는 네 가지 방법.
+last_reviewed: '2026-05-11'
 ---
 
 # 인증과 세션
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-로그인은 거의 모든 앱에 들어갑니다. 잘못 설계하면 *계정 탈취* 가 한 줄로 일어납니다. 도구의 이름과 책임을 정확히 알면 큰 사고는 거의 막을 수 있습니다.
+로그인은 거의 모든 앱에 들어갑니다. 잘못 설계하면 계정 탈취가 한 줄로 일어납니다. 도구의 이름과 책임을 정확히 알면 큰 사고는 거의 막을 수 있습니다.
 
-> 인증은 *기능* 이 아니라 *기반* 입니다.
+> 인증은 기능이 아니라 기반입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,7 +41,7 @@ flowchart LR
     Server -->|"data"| Browser
 ```
 
-서버가 *세션 ID* 를 발급하고, 브라우저가 매 요청에 동봉합니다.
+서버가 세션 ID를 발급하고, 브라우저가 매 요청에 동봉합니다.
 
 ## Before/After
 
@@ -59,7 +59,7 @@ s.post("/login", json={"id": "alice", "pw": "secret"})
 s.get("/api/me")  # 쿠키 자동 전송
 ```
 
-비밀번호는 *한 번* 만 흐릅니다.
+비밀번호는 한 번만 흐릅니다.
 
 ## 로그인 만들어 보기 5단계
 
@@ -107,7 +107,7 @@ def logout():
 ### 4단계 — JWT 발급 (대안)
 
 ```python
-# jwt_demo.py
+# 파일: jwt_demo.py
 import jwt, time
 SECRET = "dev"
 token = jwt.encode({"sub": "alice", "exp": time.time() + 3600}, SECRET, algorithm="HS256")
@@ -123,21 +123,21 @@ requests.get("/api/me", headers={"Authorization": f"Bearer {token}"})
 
 ## 이 코드에서 주목할 점
 
-- 세션은 *서버 메모리/DB* 가 필요하다.
-- JWT는 *서명* 만 검증하면 되어 분산 시스템에 어울린다.
-- 쿠키에는 `HttpOnly`, `Secure`, `SameSite` 를 *반드시* 설정한다.
+- 세션은 서버 메모리나 DB가 필요하다.
+- JWT는 서명만 검증하면 되어 분산 시스템에 어울린다.
+- 쿠키에는 `HttpOnly`, `Secure`, `SameSite` 를 반드시 설정한다.
 
 ## 자주 하는 실수 5가지
 
-1. **비밀번호를 평문 저장.** 반드시 *해시* (bcrypt/argon2).
-2. **JWT에 비밀 정보를 담는다.** JWT는 *암호화가 아니라 서명* 이다.
+1. **비밀번호를 평문 저장한다.** 반드시 해시(bcrypt/argon2)를 써야 한다.
+2. **JWT에 비밀 정보를 담는다.** JWT는 암호화가 아니라 서명이다.
 3. **쿠키 옵션을 비워둔다.** XSS/CSRF 위험.
 4. **만료 없는 토큰.** 한 번 새면 영원히 위험.
 5. **권한 검사를 한 번만 한다.** 모든 보호 endpoint에서 검사.
 
 ## 실무에서는 이렇게 쓰입니다
 
-웹앱은 *세션 쿠키* + CSRF 토큰, 모바일/SPA + 마이크로서비스는 *JWT* 가 흔합니다. 외부 서비스(Google, GitHub) 로그인은 *OAuth 2.0* 으로 위임합니다 — 비밀번호를 우리가 보지 않아도 됩니다.
+웹앱은 세션 쿠키 + CSRF 토큰 조합을, 모바일/SPA + 마이크로서비스는 JWT를 자주 씁니다. 외부 서비스(Google, GitHub) 로그인은 OAuth 2.0으로 위임합니다 — 비밀번호를 우리가 보지 않아도 됩니다.
 
 ## 체크리스트
 
@@ -149,7 +149,7 @@ requests.get("/api/me", headers={"Authorization": f"Bearer {token}"})
 
 ## 정리 및 다음 단계
 
-인증은 *기반* 입니다. 다음 글에서는 사용자가 만든 데이터를 *영원히 보관* 하는 데이터베이스 연결을 봅니다.
+인증은 기반입니다. 다음 글에서는 사용자가 만든 데이터를 오래 보관하는 데이터베이스 연결을 봅니다.
 
 <!-- toc:begin -->
 - [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)

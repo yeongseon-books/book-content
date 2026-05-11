@@ -17,7 +17,7 @@ tags:
   - Database
   - Query
 seo_description: INNER, LEFT, RIGHT, FULL, CROSS JOIN의 차이와 카디널리티 함정, 그리고 다중 JOIN 쿼리의 안전한 작성법
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # JOIN
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-실무 쿼리의 *대부분* 이 JOIN 을 포함합니다. 여기서 *카디널리티* 를 잘못 보면 *합계가 두 배* 가 됩니다. JOIN 을 정확히 다루는 것이 *분석가의 신뢰* 와 직결됩니다.
+실무 쿼리의 대부분이 JOIN 을 포함합니다. 여기서 *카디널리티* 를 잘못 보면 *합계가 두 배* 가 됩니다. JOIN 을 정확히 다루는 것이 *분석가의 신뢰* 와 직결됩니다.
 
 > *JOIN 은 *집합의 수학* 이지 *문자열 결합* 이 아니다.*
 
@@ -92,16 +92,16 @@ JOIN products p ON p.id = oi.product_id;
 
 ## 이 코드에서 주목할 점
 
-- LEFT JOIN 결과의 NULL 은 *짝이 없다* 는 *신호*.
-- Anti-join 은 *서브쿼리* 보다 *명시적* 이고 *튜닝 가능*.
+- LEFT JOIN 결과의 NULL 은 *짝이 없다* 는 신호.
+- Anti-join 은 서브쿼리보다 명시적이고 *튜닝 가능*.
 - 다중 JOIN 은 *기준 테이블* 을 *제일 작게* 두면 빠르다.
 
 ## 자주 하는 실수 5가지
 
-1. **카디널리티 *확인 없이* 합계.** 결과가 *부풀어* 오른다.
+1. **카디널리티 *확인 없이* 합계.** 결과가 부풀어 오른다.
 2. **WHERE 로 LEFT JOIN 을 *INNER 로 만들기*.** `WHERE o.x = ...` 가 *NULL 행을 제거*.
-3. **`USING` 과 `ON` *섞어 쓰기*.** 가독성이 *깨진다*.
-4. **CROSS JOIN 을 *실수로*.** *카르테시안 폭발*.
+3. **`USING` 과 `ON` *섞어 쓰기*.** 가독성이 깨진다.
+4. **CROSS JOIN 을 실수로.** *카르테시안 폭발*.
 5. **조인 키 *타입 불일치*.** *암시적 변환* 으로 *index 무력*.
 
 ## 실무에서는 이렇게 쓰입니다
@@ -117,7 +117,7 @@ JOIN products p ON p.id = oi.product_id;
 
 ## 정리 및 다음 단계
 
-JOIN 은 *집합* 의 언어입니다. 다음 글은 *GROUP BY 와 aggregate*.
+JOIN 은 집합의 언어입니다. 다음 글은 *GROUP BY 와 aggregate*.
 
 <!-- toc:begin -->
 - [SQL이란 무엇인가?](./01-what-is-sql.md)

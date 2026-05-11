@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 

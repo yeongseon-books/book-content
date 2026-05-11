@@ -76,14 +76,14 @@ flowchart LR
 ### 1단계 — 질문
 
 ```python
-# Does the new checkout button raise conversion?
+# 새 체크아웃 버튼이 전환율을 올리는가?
 question = "Does new button increase conversion?"
 ```
 
 ### 2단계 — 데이터와 분포
 
 ```python
-# A: 5,000 users, 250 conversions ; B: 5,000 users, 290 conversions
+# A: 사용자 5,000명, 전환 250건 / B: 사용자 5,000명, 전환 290건
 nA, kA = 5000, 250
 nB, kB = 5000, 290
 pA, pB = kA/nA, kB/nB
@@ -110,7 +110,7 @@ print("z:", z, "lift:", diff / pA)
 ### 5단계 — 의사결정
 
 ```python
-# Small effect with zero rollout cost ships; expensive change needs more data
+# 전개 비용이 거의 없으면 작은 효과도 배포하고, 비용이 크면 데이터를 더 본다.
 decision = "ship" if (diff > 0 and z > 1.96) else "hold"
 print(decision)
 ```

@@ -18,7 +18,7 @@ tags:
   - Encapsulation
   - PackageDesign
 seo_description: 모듈의 정의, 좋은 경계의 조건, 공개 API와 캡슐화 원칙을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 모듈과 경계
@@ -47,7 +47,7 @@ flowchart LR
 **Before**
 
 ```python
-# 얕은 모듈: 함수마다 외부에 노출
+# 얕은 모듈: 함수마다 외부에 그대로 드러난다
 def open_file(p): ...
 def read_chunk(f, n): ...
 def close_file(f): ...
@@ -56,7 +56,7 @@ def close_file(f): ...
 **After**
 
 ```python
-# 깊은 모듈: 표면 하나로 책임을 처리
+# 깊은 모듈: 표면 하나로 책임을 처리한다
 def read_file(path) -> bytes: ...
 ```
 
@@ -67,9 +67,9 @@ def read_file(path) -> bytes: ...
 ### 1단계 — 표면 줄이기
 
 ```python
-# 1_surface.py
-# public이 10개면 의존자도 10개에 노출.
-# 정말 필요한 것만 export.
+# 예시 파일: 1_surface.py
+# 공개 항목이 10개면 의존자도 10개를 알아야 한다.
+# 정말 필요한 것만 공개한다.
 __all__ = ["read_file"]
 ```
 
@@ -78,7 +78,7 @@ __all__ = ["read_file"]
 ### 2단계 — 내부 깊게 만들기
 
 ```python
-# 2_deep.py
+# 예시 파일: 2_deep.py
 def read_file(path):
     f = _open(path)
     try: return _read_all(f)
@@ -90,7 +90,7 @@ def read_file(path):
 ### 3단계 — 변경 가능성 격리
 
 ```python
-# 3_hide.py
+# 예시 파일: 3_hide.py
 class CacheBackend:  # 외부는 인터페이스만 안다
     def get(self, k): ...
     def set(self, k, v): ...
@@ -101,7 +101,7 @@ Redis냐 메모리냐는 내부 구현 결정.
 ### 4단계 — 데이터 객체 노출 제한
 
 ```python
-# 4_dto.py
+# 예시 파일: 4_dto.py
 # 내부 모델을 그대로 노출하지 말고 DTO로.
 def public_user(u): return {"id": u.id, "name": u.name}
 ```
@@ -111,7 +111,7 @@ def public_user(u): return {"id": u.id, "name": u.name}
 ### 5단계 — 의존 방향 단방향
 
 ```python
-# 5_one_way.py
+# 예시 파일: 5_one_way.py
 # domain은 infra를 몰라야 한다.
 # infra가 domain을 import한다.
 ```

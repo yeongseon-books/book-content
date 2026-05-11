@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: HuggingFaceEmbeddings와 FAISS IndexFlatL2가 텍스트를 벡터로 바꾸고 검색하는 내부 동작을 코드와 함께 분해합니다.
 ---
 
@@ -347,7 +347,7 @@ def main() -> None:
         str(target),
         embeddings,
         index_name="knowledge",
-        # trusted artifact only
+        # 신뢰 가능한 산출물만 허용
         allow_dangerous_deserialization=True,
     )
     result = restored.similarity_search("How often should secrets be rotated?", k=1)

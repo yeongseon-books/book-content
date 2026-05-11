@@ -17,7 +17,7 @@ tags:
   - Metrics
   - Sampling
 seo_description: cardinality 폭발과 retention 정책, sampling으로 observability 비용을 통제하는 법
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Cost와 Cardinality
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-신생 회사의 *AWS 비용 1위* 가 종종 *observability* 입니다. 모니터링이 *제품보다 비싸지면* 정치 문제가 됩니다.
+신생 회사에서 AWS 비용 1위가 observability 인 경우가 종종 있습니다. 모니터링 비용이 제품 자체보다 비싸지면 기술 문제가 아니라 조직 문제가 됩니다.
 
-> *측정의 비용을 모르면 *측정이 적이 된다*.*
+> 측정의 비용을 모르면, 측정 자체가 팀의 적이 될 수 있습니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,9 +42,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `user_id` 가 label, *5천만 series*, 비용 *폭발*.
+**Before**: `user_id` 를 label 로 넣어 series 가 5천만 개까지 늘고 비용이 폭발합니다.
 
-**After**: `user_id` 는 *log* 로, label 은 *유한 차원*, 비용 *예측 가능*.
+**After**: `user_id` 는 log 로 보내고 label 은 유한한 차원으로 제한해 비용을 예측 가능하게 만듭니다.
 
 ## 비용 통제 5단계
 
@@ -100,32 +100,32 @@ trace:   샘플링 후 ≤ Z 트레이스/분
 
 ## 이 코드에서 주목할 점
 
-- *Cardinality* 는 *label 곱셈* 으로 폭발.
-- *Resolution downsampling* 으로 *오래된 데이터* 부피 축소.
-- *Tail sampling* 은 *가치 있는 trace* 만 보관.
+- Cardinality 는 label 조합이 곱해지면서 빠르게 커집니다.
+- Resolution downsampling 으로 오래된 데이터의 부피를 줄일 수 있습니다.
+- Tail sampling 은 가치 있는 trace 만 남기는 데 유용합니다.
 
 ## 자주 하는 실수 5가지
 
-1. **`user_id`, `request_id` 를 *label* 로.** Cardinality 폭발.
-2. **모든 신호 *영원히 보관*.** 비용 *복리*.
-3. **Sampling 을 *나쁘게 본다*.** 부도 위험.
-4. **Log 에 *바이너리* 를 박는다.** 부피 폭발.
-5. **비용을 *팀 단위* 로 안 본다.** 책임이 *분산*.
+1. **`user_id`, `request_id` 를 label 로 둡니다.** Cardinality 가 폭발합니다.
+2. **모든 신호를 영원히 보관합니다.** 비용이 복리처럼 불어납니다.
+3. **Sampling 을 무조건 나쁘게 봅니다.** 예산 통제가 어려워집니다.
+4. **Log 에 바이너리를 그대로 넣습니다.** 저장 부피가 급격히 커집니다.
+5. **비용을 팀 단위로 보지 않습니다.** 책임이 분산됩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 회사는 *팀별 cardinality budget*, *retention tier*, *tail sampling* 을 조합해 *예측 가능한* observability 비용을 만듭니다.
+대부분의 회사는 팀별 cardinality budget, retention tier, tail sampling 을 조합해 예측 가능한 observability 비용 구조를 만듭니다.
 
 ## 체크리스트
 
-- [ ] *Cardinality* 상위 metric 을 안다.
-- [ ] *Retention tier* 가 단계화되어 있다.
-- [ ] Trace 에 *sampling* 이 있다.
-- [ ] 팀별 *비용 예산* 이 있다.
+- [ ] Cardinality 상위 metric 을 알고 있습니다.
+- [ ] Retention tier 가 단계화되어 있습니다.
+- [ ] Trace 에 sampling 이 적용되어 있습니다.
+- [ ] 팀별 비용 예산이 있습니다.
 
 ## 정리 및 다음 단계
 
-비용을 모르면 *observability 가 적* 이 됩니다. 다음 글은 *운영 가능한 스택* 입니다.
+비용을 모르면 observability 가 오히려 발목을 잡습니다. 다음 글은 운영 가능한 스택입니다.
 
 <!-- toc:begin -->
 - [Observability란 무엇인가?](./01-what-is-observability.md)

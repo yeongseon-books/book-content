@@ -18,7 +18,7 @@ tags:
   - CDN
   - Optimization
 seo_description: HTTP 캐시/CDN/지연 로딩/DB 인덱스 — 느린 웹앱을 빠르게 만드는 4가지 도구.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 성능과 캐싱
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-빠른 사이트는 *돈* 입니다 — 전환율, 검색 순위, 사용자 만족이 모두 속도에 비례합니다. 그리고 빠르게 만들기는 *추측이 아니라 측정* 의 일입니다.
+빠른 사이트는 곧 돈입니다 — 전환율, 검색 순위, 사용자 만족이 모두 속도에 비례합니다. 그리고 빠르게 만들기는 추측이 아니라 측정의 일입니다.
 
-> 성능은 *측정* 부터 시작합니다.
+> 성능은 측정부터 시작합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -41,7 +41,7 @@ flowchart LR
     AppCache --> DB[("Database")]
 ```
 
-가장 가까운 캐시에서 답이 나오면 *가장 빠릅니다*.
+가장 가까운 캐시에서 답이 나오면 가장 빠릅니다.
 
 ## Before/After
 
@@ -66,7 +66,7 @@ def popular():
     return _cache["data"]
 ```
 
-같은 결과 → DB 호출 *수십 배* 감소.
+같은 결과 → DB 호출이 수십 배 줄어듭니다.
 
 ## 빠르게 만들기 5단계
 
@@ -80,7 +80,7 @@ def popular():
 ### 2단계 — 정적 파일에 캐시 헤더
 
 ```python
-# Flask
+# Flask 예시
 @app.after_request
 def add_cache(resp):
     if resp.mimetype.startswith(("image/", "text/css")):
@@ -92,7 +92,7 @@ def add_cache(resp):
 
 ```text
 Cloudflare/Fastly/CloudFront 앞단에 두면
-정적 자산이 *지구 반대편* 에서도 가깝습니다.
+정적 자산이 지구 반대편에서도 가깝습니다.
 ```
 
 ### 4단계 — 지연 로딩
@@ -102,7 +102,7 @@ Cloudflare/Fastly/CloudFront 앞단에 두면
 ```
 
 ```js
-// JS 코드 스플리팅 (동적 import)
+// JS 코드 스플리팅 예시 (동적 import)
 button.onclick = async () => {
   const mod = await import("./editor.js");
   mod.open();
@@ -116,30 +116,30 @@ CREATE INDEX idx_posts_views ON posts(views DESC);
 ```
 
 ```python
-# N+1 (나쁨)
+# N+1 예시 (나쁨)
 for p in posts: print(p.author.name)  # 매번 SELECT
 
-# 한 번에 join (좋음)
+# 한 번에 join하는 예시 (좋음)
 posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_id")
 ```
 
 ## 이 코드에서 주목할 점
 
-- 캐시는 *수명* 과 *무효화* 가 같이 와야 한다.
-- CDN은 *정적* 자산에 가장 효과가 크다.
-- 인덱스는 *쿼리 패턴* 을 따라간다.
+- 캐시는 수명과 무효화가 같이 와야 한다.
+- CDN은 정적 자산에 가장 효과가 크다.
+- 인덱스는 쿼리 패턴을 따라간다.
 
 ## 자주 하는 실수 5가지
 
 1. **추측으로 최적화한다.** 실제로 느린 곳은 다른 곳이다.
 2. **모든 응답에 `no-cache`.** 캐시할 수 있는 것을 못 쓴다.
-3. **CDN을 *동적* 응답에 그대로 쓴다.** 사용자별 데이터가 섞일 위험.
+3. **CDN을 동적 응답에 그대로 쓴다.** 사용자별 데이터가 섞일 위험이 있다.
 4. **인덱스를 *모든 컬럼* 에 만든다.** 쓰기 성능이 죽는다.
 5. **N+1을 모니터링 없이 둔다.** 서비스가 조용히 느려진다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-브라우저 → CDN → 앱 캐시(Redis) → DB — 이 *4단 캐시* 가 거의 모든 큰 사이트의 구조입니다. 새 기능을 만들 때 *캐시 전략* 을 같이 그리는 습관이 시니어와 주니어를 가른다고들 합니다.
+브라우저 → CDN → 앱 캐시(Redis) → DB — 이 4단 캐시가 거의 모든 큰 사이트의 구조입니다. 새 기능을 만들 때 캐시 전략을 같이 그리는 습관이 시니어와 주니어를 가른다고들 합니다.
 
 ## 체크리스트
 
@@ -151,7 +151,7 @@ posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_
 
 ## 정리 및 다음 단계
 
-성능은 *측정* 부터입니다. 마지막 글에서는 지금까지 배운 모든 것을 묶어 *작은 웹앱* 을 만듭니다.
+성능은 측정부터입니다. 마지막 글에서는 지금까지 배운 모든 것을 묶어 작은 웹앱을 만듭니다.
 
 <!-- toc:begin -->
 - [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)

@@ -18,7 +18,7 @@ tags:
   - Release
   - SemVer
 seo_description: git 브랜치 전략, 시맨틱 버저닝, 체인지로그, 안전한 릴리스 절차를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 버전 관리와 릴리스
@@ -64,7 +64,7 @@ flowchart LR
 ### 1단계 — Conventional Commits
 
 ```text
-# 1_commits.txt
+# 파일: 1_commits.txt
 feat(auth): add refresh token rotation
 fix(billing): handle zero amount invoices
 chore(deps): bump fastapi to 0.110
@@ -75,7 +75,7 @@ chore(deps): bump fastapi to 0.110
 ### 2단계 — SemVer 결정
 
 ```text
-# 2_semver.md
+# 파일: 2_semver.md
 feat -> MINOR
 fix  -> PATCH
 BREAKING CHANGE -> MAJOR
@@ -86,7 +86,7 @@ BREAKING CHANGE -> MAJOR
 ### 3단계 — 자동 체인지로그
 
 ```yaml
-# 3_release.yml
+# 파일: 3_release.yml
 - uses: googleapis/release-please-action@v4
   with:
     release-type: python
@@ -97,7 +97,7 @@ PR 머지로 자동 릴리스 PR이 생성됩니다.
 ### 4단계 — 카나리 배포
 
 ```yaml
-# 4_canary.yml
+# 파일: 4_canary.yml
 strategy:
   canary:
     weight: 5
@@ -109,7 +109,7 @@ strategy:
 ### 5단계 — 즉시 롤백
 
 ```bash
-# 5_rollback.sh
+# 파일: 5_rollback.sh
 kubectl rollout undo deployment/api
 ```
 

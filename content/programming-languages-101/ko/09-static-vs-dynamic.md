@@ -18,7 +18,7 @@ tags:
   - 트레이드오프
   - 안전성
 seo_description: 정적과 동적은 우열의 문제가 아니라 검증을 어디에서 할지의 선택입니다. 같은 함수의 두 버전을 나란히 두고 트레이드오프를 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # static vs dynamic language

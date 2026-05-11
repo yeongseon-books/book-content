@@ -17,7 +17,7 @@ tags:
   - DataFrame
   - Beginner
 seo_description: Pandas의 정의와 Series·DataFrame의 직관, 그리고 데이터 분석에서 왜 표준 도구인지 코드와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Pandas란 무엇인가?
@@ -50,7 +50,7 @@ flowchart LR
 ### 1단계 — 설치와 import
 
 ```python
-# pip install pandas
+# Pandas 설치
 import pandas as pd
 print(pd.__version__)
 ```

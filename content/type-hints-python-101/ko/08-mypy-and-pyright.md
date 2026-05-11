@@ -18,7 +18,7 @@ tags:
   - 정적 분석
   - CI
 seo_description: mypy와 pyright를 설정하고 프로젝트에 점진적으로 도입하여 타입 오류를 자동 검출하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # mypy와 pyright 사용하기
@@ -65,7 +65,7 @@ print(name.upper())  # AttributeError: NoneType
 ```python
 def get_user_name(user_id: int) -> str:
     return None  # mypy: error: Incompatible return value type
-    # (got "None", expected "str")
+    # 반환값이 맞지 않습니다. (got "None", expected "str")
 ```
 
 ## 단계별로 따라하기
@@ -91,7 +91,7 @@ mypy는 파일 단위 또는 디렉터리 단위로 실행할 수 있습니다. 
 ### 2단계: pyproject.toml로 mypy 설정
 
 ```toml
-# pyproject.toml
+# pyproject.toml 설정 파일
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
@@ -162,7 +162,7 @@ ignore_errors = true
 ### 5단계: CI 파이프라인에 통합
 
 ```yaml
-# .github/workflows/type-check.yml
+# .github/workflows/type-check.yml 워크플로 파일
 name: Type Check
 
 on: [push, pull_request]

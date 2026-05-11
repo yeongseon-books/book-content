@@ -17,7 +17,7 @@ tags:
   - SRE
   - Microservices
 seo_description: Span, trace, context propagation 그리고 OpenTelemetry로 첫 trace 만들기
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 분산 트레이싱 기초
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-Microservice 환경에서 *느린 요청* 의 원인을 찾으려면, log 와 metric 만으로는 *불가능* 합니다. trace 가 *유일한 답* 입니다.
+Microservice 환경에서 느린 요청의 원인을 찾으려면, log 와 metric 만으로는 한계가 분명합니다. 이때 trace 가 가장 직접적인 답을 줍니다.
 
-> *Trace 없이 *분산 시스템* 을 디버깅하는 것은 *눈을 감고 미로 걷기*.*
+> Trace 없이 분산 시스템을 디버깅하는 일은 눈을 감고 미로를 걷는 것과 비슷합니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,9 +42,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: log 를 *grep* 하며 어느 서비스가 느렸는지 *추측*.
+**Before**: log 를 `grep` 하며 어느 서비스가 느렸는지 짐작합니다.
 
-**After**: trace UI 에서 *느린 span* 이 *바로* 보인다.
+**After**: trace UI 에서 느린 span 이 즉시 보입니다.
 
 ## 첫 Trace 5단계
 
@@ -97,32 +97,32 @@ TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% 만
 
 ## 이 코드에서 주목할 점
 
-- *한 trace = 여러 span* 의 트리.
-- 헤더 *traceparent* 가 표준 (W3C Trace Context).
-- *Sampling* 은 *비용 통제* 의 핵심.
+- 한 trace 는 여러 span 으로 이루어진 트리입니다.
+- 헤더 `traceparent` 가 표준입니다 (W3C Trace Context).
+- Sampling 은 비용 통제의 핵심입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 trace 를 100% 저장.** 비용 *폭발*.
-2. **Context 를 *전달하지 않음*.** trace 가 *끊긴다*.
-3. **Span 에 *너무 많은 attribute*.** cardinality 폭발.
-4. **Async 코드에서 *context 를 잃음*.** 부모 추적 실패.
-5. **Trace 만 보고 *metric 무시*.** 추세를 놓친다.
+1. **모든 trace 를 100% 저장합니다.** 비용이 급격히 커집니다.
+2. **Context 를 전달하지 않습니다.** trace 가 중간에서 끊깁니다.
+3. **Span 에 attribute 를 너무 많이 넣습니다.** cardinality 가 폭발합니다.
+4. **Async 코드에서 context 를 잃습니다.** 부모 추적이 실패합니다.
+5. **Trace 만 보고 metric 을 무시합니다.** 전체 추세를 놓칩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-OpenTelemetry → *Tempo / Jaeger / Honeycomb* 으로 흘려보내고, Grafana 에서 *trace ↔ log ↔ metric* 을 *한 화면* 에서 봅니다.
+실무에서는 OpenTelemetry 데이터를 Tempo / Jaeger / Honeycomb 으로 보내고, Grafana 에서 trace, log, metric 을 한 화면에서 함께 봅니다.
 
 ## 체크리스트
 
-- [ ] 첫 span 을 *콘솔* 에 본다.
-- [ ] *traceparent* 헤더 의미를 안다.
-- [ ] *Sampling* 비율을 정한다.
-- [ ] log 에 *trace_id* 를 넣는다.
+- [ ] 첫 span 을 콘솔에서 확인합니다.
+- [ ] `traceparent` 헤더의 의미를 이해합니다.
+- [ ] Sampling 비율을 정합니다.
+- [ ] log 에 `trace_id` 를 넣습니다.
 
 ## 정리 및 다음 단계
 
-Trace 가 흐르면 *흐름이 보입니다*. 다음 글은 *Dashboard 설계* 입니다.
+Trace 가 흐르면 요청의 전체 흐름이 보입니다. 다음 글은 Dashboard 설계입니다.
 
 <!-- toc:begin -->
 - [Observability란 무엇인가?](./01-what-is-observability.md)

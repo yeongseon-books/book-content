@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 

@@ -18,7 +18,7 @@ tags:
   - RFC
   - Async
 seo_description: RFC 작성, 비동기 협업, 의사결정 기록, 회의 시간을 줄이는 실용 패턴을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 협업 프로세스
@@ -64,14 +64,14 @@ RFC 비동기 3일 -> 30분 결정 회의 -> 결정 로그
 ### 1단계 — RFC 템플릿
 
 ```markdown
-# 1_rfc.md
-## Title
-## Problem
-## Proposal
-## Alternatives
-## Risks
-## Open questions
-## Reviewers
+# 파일: 1_rfc.md
+## 제목
+## 문제
+## 제안
+## 대안
+## 위험 요소
+## 열린 질문
+## 리뷰어
 ```
 
 문제 정의가 절반입니다.
@@ -79,7 +79,7 @@ RFC 비동기 3일 -> 30분 결정 회의 -> 결정 로그
 ### 2단계 — 비동기 코멘트
 
 ```markdown
-# 2_review.md
+# 파일: 2_review.md
 - @alice [blocking] 비용 추정에 인프라 비용 누락
 - @bob [question] 마이그레이션 다운타임은?
 - @carol [nit] 용어 통일 필요
@@ -90,7 +90,7 @@ RFC 비동기 3일 -> 30분 결정 회의 -> 결정 로그
 ### 3단계 — 짧은 결정 회의
 
 ```markdown
-# 3_meeting.md
+# 파일: 3_meeting.md
 30분, 5명 이하, 어젠다 RFC 링크 1개
 ```
 
@@ -99,7 +99,7 @@ RFC 비동기 3일 -> 30분 결정 회의 -> 결정 로그
 ### 4단계 — 결정 로그
 
 ```markdown
-# 4_decision_log.md
+# 파일: 4_decision_log.md
 | Date | Topic | Decision | Driver | Approver |
 |------|-------|----------|--------|----------|
 | 2026-05-04 | cache 도입 | Redis 채택 | A | B |
@@ -110,7 +110,7 @@ RFC 비동기 3일 -> 30분 결정 회의 -> 결정 로그
 ### 5단계 — 핸드오프 노트
 
 ```markdown
-# 5_handoff.md
+# 파일: 5_handoff.md
 ## 어제까지
 - API 스펙 합의됨
 ## 오늘 할 일

@@ -17,7 +17,7 @@ tags:
   - Database
   - Postgres
 seo_description: 데이터를 안전하게 넣고, 고치고, 지우는 법 — 트랜잭션, UPSERT, RETURNING, 그리고 WHERE를 절대 잊지 않는 습관
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # INSERT, UPDATE, DELETE
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-운영 DB 에서 *WHERE 한 줄* 을 빼먹으면 *전체 테이블* 이 사라집니다. *트랜잭션* 과 *명시적 WHERE*, *RETURNING* 은 *팀의 안전망* 입니다. 이 습관이 *사고를 줄입니다*.
+운영 DB 에서 *WHERE 한 줄* 을 빼먹으면 *전체 테이블* 이 사라집니다. 트랜잭션과 *명시적 WHERE*, *RETURNING* 은 *팀의 안전망* 입니다. 이 습관이 *사고를 줄입니다*.
 
 > *DML 은 *되돌릴 수 없는 작업* 이 *되돌릴 수 있는 작업으로* 바뀐 결과다.*
 
@@ -91,20 +91,20 @@ INSERT INTO users (id, name, signup_at) VALUES
 ## 이 코드에서 주목할 점
 
 - *모든 UPDATE/DELETE 에 WHERE* — 예외 없음.
-- *트랜잭션* 으로 묶고 *RETURNING* 으로 검증.
+- 트랜잭션으로 묶고 *RETURNING* 으로 검증.
 - UPSERT 의 `EXCLUDED` 는 *INSERT 시도하던 새 값* 을 가리킨다.
 
 ## 자주 하는 실수 5가지
 
 1. **WHERE 없는 UPDATE / DELETE.** *전체 테이블* 변경.
-2. **트랜잭션 *없이* 멀티 스텝.** 중간 실패 시 *반쪽 상태*.
-3. **`SELECT` 없이 *추정* 으로 변경.** *RETURNING* 으로 *반드시* 확인.
+2. **트랜잭션 없이 멀티 스텝.** 중간 실패 시 *반쪽 상태*.
+3. **`SELECT` 없이 추정으로 변경.** *RETURNING* 으로 반드시 확인.
 4. **UPSERT 의 *unique 제약* 누락.** ON CONFLICT 가 *동작하지 않음*.
 5. **Bulk INSERT 를 *한 행씩 N번*.** *느리고 비용 큼*.
 
 ## 실무에서는 이렇게 쓰입니다
 
-운영 DB 변경은 *PR 리뷰* 와 *마이그레이션 도구* 를 통합니다. 즉석 변경은 *항상 트랜잭션* 안에서, *RETURNING* 으로 결과를 *확인* 합니다. *백업과 PITR (Point-in-Time Recovery)* 가 *최후의 안전망*.
+운영 DB 변경은 *PR 리뷰* 와 *마이그레이션 도구* 를 통합니다. 즉석 변경은 *항상 트랜잭션* 안에서, *RETURNING* 으로 결과를 확인합니다. *백업과 PITR (Point-in-Time Recovery)* 가 *최후의 안전망*.
 
 ## 체크리스트
 

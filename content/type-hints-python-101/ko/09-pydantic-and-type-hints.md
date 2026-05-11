@@ -18,7 +18,7 @@ tags:
   - 데이터 검증
   - FastAPI
 seo_description: Pydantic BaseModel로 타입 힌트 기반의 런타임 데이터 검증과 직렬화를 구현하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Pydantic과 타입 힌트
@@ -120,9 +120,9 @@ product = Product(name="Python 입문서", price=25000)
 print(product.quantity)  # 0 (기본값)
 
 # 검증 실패
-# Product(name="", price=-100)
-# ValidationError: name must have at least 1 character,
-#                  price must be greater than 0
+# 잘못된 입력 예시: Product(name="", price=-100)
+# ValidationError: name은 최소 1자 이상이어야 하고,
+#                  price는 0보다 커야 합니다
 ```
 
 ### 3단계: field_validator로 커스텀 검증
@@ -172,7 +172,7 @@ class DateRange(BaseModel):
         return self
 
 
-# DateRange(start_date="2026-01-10", end_date="2026-01-01")
+# 잘못된 입력 예시: DateRange(start_date="2026-01-10", end_date="2026-01-01")
 # ValidationError: end_date는 start_date보다 뒤여야 합니다
 ```
 

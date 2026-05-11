@@ -18,7 +18,7 @@ tags:
   - FeatureFlags
   - Refactoring
 seo_description: 한 번의 변경이 시스템을 흔들지 않게 하는 설계 — 개방 폐쇄 원칙과 확장-수축 패턴을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 변경 영향 줄이기
@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-대부분의 시스템은 처음부터 잘 만들어지지 않습니다. 잘 *바뀌게* 만들어집니다. 변경 영향이 작을수록 자주, 안전하게 진화할 수 있습니다.
+대부분의 시스템은 처음부터 완벽하지 않습니다. 대신 잘 바뀔 수 있게 설계됩니다. 변경 영향이 작을수록 자주, 안전하게 진화할 수 있습니다.
 
 > 변경에 강한 코드가 좋은 코드다.
 
@@ -71,9 +71,9 @@ def price(item, kind):
 ### 1단계 — 폭발 반경 측정
 
 ```bash
-# 1_blast.sh
+# 예시 파일: 1_blast.sh
 git grep -n "kind ==" | wc -l
-# 한 변수의 비교가 시스템 전체에 흩어졌나?
+# 한 변수 비교가 시스템 전체에 흩어졌나?
 ```
 
 먼저 현재 반경을 본다.
@@ -81,7 +81,7 @@ git grep -n "kind ==" | wc -l
 ### 2단계 — 확장 (Expand)
 
 ```python
-# 2_expand.py
+# 예시 파일: 2_expand.py
 # 신 경로를 추가만 한다, 옛 경로는 그대로.
 def price_v2(item, kind): ...
 ```
@@ -91,7 +91,7 @@ def price_v2(item, kind): ...
 ### 3단계 — 점진 이주 (Migrate)
 
 ```python
-# 3_migrate.py
+# 예시 파일: 3_migrate.py
 def price(item, kind):
     if FF.use_v2: return price_v2(item, kind)
     return price_v1(item, kind)
@@ -102,7 +102,7 @@ def price(item, kind):
 ### 4단계 — 검증 (Compare)
 
 ```python
-# 4_compare.py
+# 예시 파일: 4_compare.py
 def price(item, kind):
     a, b = price_v1(item, kind), price_v2(item, kind)
     if a != b: log.warn("price drift", a, b)
@@ -114,7 +114,7 @@ def price(item, kind):
 ### 5단계 — 수축 (Contract)
 
 ```python
-# 5_contract.py
+# 예시 파일: 5_contract.py
 # 모든 사용자가 v2로 옮긴 뒤 v1과 플래그를 제거한다.
 ```
 

@@ -18,7 +18,7 @@ tags:
   - Grammar
   - 파싱
 seo_description: 같은 글자가 합법인 문법인지(syntax)와 그 의미가 무엇인지(semantics)는 다른 문제입니다. 두 축을 정확히 구별합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # syntax와 semantics

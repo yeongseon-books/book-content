@@ -18,7 +18,7 @@ tags:
   - Implementation
   - Tradeoff
 seo_description: 설계와 구현의 차이, ADR로 결정을 남기는 법, 좋은 설계의 신호를 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 설계와 구현의 차이
@@ -64,7 +64,7 @@ flowchart LR
 ### 1단계 — 인터페이스 먼저
 
 ```python
-# 1_iface.py
+# 파일: 1_iface.py
 from typing import Protocol
 
 class Notifier(Protocol):
@@ -76,7 +76,7 @@ class Notifier(Protocol):
 ### 2단계 — 두 가지 구현
 
 ```python
-# 2_impls.py
+# 파일: 2_impls.py
 class EmailNotifier:
     def send(self, user_id, body): ...
 class SMSNotifier:
@@ -88,7 +88,7 @@ class SMSNotifier:
 ### 3단계 — ADR 작성
 
 ```text
-# 3_adr.md
+# 파일: 3_adr.md
 # ADR 0007: 알림 채널 추상화
 - Context: 이메일/SMS/푸시 추가가 잦음
 - Decision: Notifier 프로토콜로 추상화
@@ -101,7 +101,7 @@ class SMSNotifier:
 ### 4단계 — YAGNI 적용 (제거)
 
 ```python
-# 4_remove.py
+# 파일: 4_remove.py
 # class NotifierFactory: ...        # 지금 1개 채널이면 불필요
 # class NotifierRegistry: ...       # 미래의 자유보다 현재의 단순함
 ```
@@ -111,7 +111,7 @@ class SMSNotifier:
 ### 5단계 — 관찰 가능성 (구현 단계)
 
 ```python
-# 5_obs.py
+# 파일: 5_obs.py
 import logging
 log = logging.getLogger(__name__)
 

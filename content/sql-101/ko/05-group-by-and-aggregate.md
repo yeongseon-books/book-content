@@ -17,7 +17,7 @@ tags:
   - Database
   - Analytics
 seo_description: GROUP BY의 동작 원리, 집계 함수, HAVING과 WHERE의 차이, 그리고 한 번에 여러 그룹을 보는 방법
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # GROUP BY와 aggregate
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-대시보드 숫자의 *대부분* 은 GROUP BY 결과입니다. *일별 매출, 사용자별 주문 수, 국가별 평균* — 모두 같은 모양입니다. 여기서 *NULL* 과 *조인 카디널리티* 를 못 보면 *숫자가 거짓말* 을 합니다.
+대시보드 숫자의 대부분은 GROUP BY 결과입니다. *일별 매출, 사용자별 주문 수, 국가별 평균* — 모두 같은 모양입니다. 여기서 *NULL* 과 *조인 카디널리티* 를 못 보면 *숫자가 거짓말* 을 합니다.
 
-> *집계는 *행을 한 줄로 압축* 한다. 무엇을 *버리는지* 안다는 뜻이다.*
+> *집계는 *행을 한 줄로 압축* 한다. 무엇을 버리는지 안다는 뜻이다.*
 
 ## 전체 흐름
 ```mermaid
@@ -43,7 +43,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `SELECT user_id, SUM(total) FROM orders;` — *오류*. user_id 는 *그룹화* 되어야 함.
+**Before**: `SELECT user_id, SUM(total) FROM orders;` — 오류. user_id 는 그룹화되어야 함.
 
 **After**: `SELECT user_id, SUM(total) FROM orders GROUP BY user_id;` — *올바른 집계*.
 
@@ -92,15 +92,15 @@ GROUP BY country;
 
 - WHERE 는 *집계 전*, HAVING 은 *집계 후*.
 - `COUNT(*)` 는 *NULL 포함*, `COUNT(col)` 은 *NULL 제외*.
-- `COUNT(DISTINCT)` 는 *비싸다*. 큰 테이블에서는 *근사 함수* 를 고려한다.
+- `COUNT(DISTINCT)` 는 비싸다. 큰 테이블에서는 *근사 함수* 를 고려한다.
 
 ## 자주 하는 실수 5가지
 
-1. **GROUP BY *컬럼 빠뜨림*.** SELECT 의 *비집계 컬럼* 은 *전부* 그룹에 들어가야 한다.
-2. **WHERE 자리에 *집계 조건*.** `WHERE COUNT(*) > 1` 은 *오류*. HAVING 으로.
-3. **`AVG(NULL)`** 을 0 처럼 가정. NULL 은 *제외* 된다.
-4. **조인 후 합계가 *부풀어* 오름.** *카디널리티* 가 1:N.
-5. **그룹화에 *너무 많은 컬럼*.** 그룹이 *모두 1행* 이라 의미가 *없음*.
+1. **GROUP BY *컬럼 빠뜨림*.** SELECT 의 *비집계 컬럼* 은 전부 그룹에 들어가야 한다.
+2. **WHERE 자리에 *집계 조건*.** `WHERE COUNT(*) > 1` 은 오류. HAVING 으로.
+3. **`AVG(NULL)`** 을 0 처럼 가정. NULL 은 제외된다.
+4. **조인 후 합계가 부풀어 오름.** *카디널리티* 가 1:N.
+5. **그룹화에 *너무 많은 컬럼*.** 그룹이 *모두 1행* 이라 의미가 없음.
 
 ## 실무에서는 이렇게 쓰입니다
 

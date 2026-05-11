@@ -18,7 +18,7 @@ tags:
   - 타입 매개변수
   - 제네릭 프로그래밍
 seo_description: TypeVar와 Generic으로 타입 안전한 재사용 코드를 작성하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Generic 이해하기

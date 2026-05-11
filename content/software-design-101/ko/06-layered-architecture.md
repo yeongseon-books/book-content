@@ -18,7 +18,7 @@ tags:
   - Layers
   - Architecture
 seo_description: 계층 아키텍처의 구성, 허용된 의존 방향, 부패 방지 계층을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 계층 아키텍처
@@ -60,12 +60,12 @@ def charge():
 **After**
 
 ```python
-# presentation
+# 표현 계층
 @app.route("/charge")
 def charge_view():
     return charge_use_case(request.json)
 
-# application
+# 애플리케이션 계층
 def charge_use_case(payload):
     cmd = ChargeCommand.from_payload(payload)
     return charge_service.run(cmd)
@@ -78,7 +78,7 @@ def charge_use_case(payload):
 ### 1단계 — 도메인 추출
 
 ```python
-# 1_domain.py
+# 예시 파일: 1_domain.py
 class Wallet:
     def debit(self, amount: int) -> None:
         if amount <= 0: raise ValueError
@@ -90,7 +90,7 @@ class Wallet:
 ### 2단계 — 유스케이스 묶기
 
 ```python
-# 2_usecase.py
+# 예시 파일: 2_usecase.py
 def charge(repo, user_id, amount):
     w = repo.get(user_id); w.debit(amount); repo.save(w)
 ```
@@ -100,7 +100,7 @@ def charge(repo, user_id, amount):
 ### 3단계 — 표현 계층 얇게
 
 ```python
-# 3_presentation.py
+# 예시 파일: 3_presentation.py
 @app.route("/charge")
 def view():
     return charge(repo, request.json["user"], request.json["amount"])
@@ -111,7 +111,7 @@ def view():
 ### 4단계 — 인프라 어댑터
 
 ```python
-# 4_infra.py
+# 예시 파일: 4_infra.py
 class SqlWalletRepo:
     def get(self, uid): ...
     def save(self, w): ...

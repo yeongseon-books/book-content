@@ -17,7 +17,7 @@ tags:
   - Database
   - Postgres
 seo_description: SELECT의 절(clause) 순서, 컬럼 선택, 별칭, ORDER BY와 LIMIT까지 실무에서 매일 쓰는 패턴
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # SELECT 기본
@@ -44,13 +44,13 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `SELECT * FROM orders ORDER BY id;` 로 *수십만 행* 을 *전부* 받아 본다.
+**Before**: `SELECT * FROM orders ORDER BY id;` 로 *수십만 행* 을 전부 받아 본다.
 
 **After**: 필요한 *3개 컬럼* 만 가져오고 `LIMIT 50` 으로 *화면에 맞춘다*.
 
 ## 자주 쓰는 5가지
 
-### 1단계 — 컬럼을 *명시* 한다
+### 1단계 — 컬럼을 명시한다
 
 ```sql
 SELECT id, name, signup_at FROM users;
@@ -88,8 +88,8 @@ SELECT DISTINCT country FROM users;
 
 ## 자주 하는 실수 5가지
 
-1. **`SELECT *` 로 *모든 컬럼* 가져오기.** 인덱스가 *덜 활용* 되고 네트워크가 *팽창* 한다.
-2. **`ORDER BY 1` 로 *컬럼 위치* 에 의존.** 컬럼 추가 시 *깨진다*.
+1. **`SELECT *` 로 *모든 컬럼* 가져오기.** 인덱스가 *덜 활용* 되고 네트워크가 팽창한다.
+2. **`ORDER BY 1` 로 *컬럼 위치* 에 의존.** 컬럼 추가 시 깨진다.
 3. **`LIMIT` 없이 *대용량 조회*.** UI 가 *얼어붙는다*.
 4. **`DISTINCT` 로 *중복을 숨긴다*.** 원인이 되는 *조인 카디널리티* 를 *못 본다*.
 5. **별칭에 *공백/한글* 을 넣고 quote 안 함.** *문법 오류*.

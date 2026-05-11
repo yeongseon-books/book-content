@@ -17,7 +17,7 @@ tags:
   - DataAnalysis
   - Beginner
 seo_description: split-apply-combine으로 보는 groupby의 본질과 agg·transform·filter 사용법을 코드와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # groupby
@@ -98,7 +98,7 @@ print(big)
 2. ***as_index=False* 미설정으로 *인덱스 의외성*.**
 3. ***reset_index* 누락으로 *후속 join* 어려움.**
 4. ***멀티키* 일 때 *대괄호 누락*.**
-5. ***apply 남용* 으로 *느려짐*.**
+5. **`apply`를 남용해서 속도가 느려짐.**
 
 ## 실무에서는 이렇게 쓰입니다
 
@@ -109,7 +109,7 @@ print(big)
 - [ ] *split-apply-combine* 을 설명할 수 있다.
 - [ ] *agg / transform / filter* 를 구분한다.
 - [ ] *named aggregation* 을 쓴다.
-- [ ] *멀티키* groupby 를 한다.
+- [ ] 멀티키 `groupby`를 한다.
 
 ## 정리 및 다음 단계
 

@@ -18,7 +18,7 @@ tags:
   - JIT
   - 바이트코드
 seo_description: 인터프리터와 컴파일러는 같은 일을 다른 시점에 합니다. dis로 바이트코드를 보고 JIT가 둘 사이를 잇는 법을 추적합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # interpreter와 compiler

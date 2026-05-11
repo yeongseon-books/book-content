@@ -18,7 +18,7 @@ tags:
   - 덕 타이핑
   - 인터페이스
 seo_description: Protocol로 상속 없이 인터페이스를 정의하고 structural typing을 활용하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Protocol과 structural typing

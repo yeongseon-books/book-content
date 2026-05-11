@@ -18,7 +18,7 @@ tags:
   - None
   - 타입 안전
 seo_description: Optional과 Union으로 None 가능성과 여러 타입을 안전하게 표현하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Optional과 Union
@@ -219,13 +219,13 @@ def create_user(
 
 # 다양한 조합으로 호출
 print(create_user("Alice"))
-# {'name': 'Alice', 'role': 'user'}
+# 반환 결과: {'name': 'Alice', 'role': 'user'}
 
 print(create_user("Bob", email="bob@example.com", age=30))
 # {'name': 'Bob', 'role': 'user', 'email': 'bob@example.com', 'age': 30}
 
 print(create_user("Charlie", role="admin"))
-# {'name': 'Charlie', 'role': 'admin'}
+# 반환 결과: {'name': 'Charlie', 'role': 'admin'}
 
 # 주의: Optional 매개변수 ≠ 기본값이 None인 매개변수
 # def f(x: Optional[int]) — x는 반드시 전달해야 하며, None도 가능

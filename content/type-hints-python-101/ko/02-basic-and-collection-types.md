@@ -18,7 +18,7 @@ tags:
   - dict
   - tuple
 seo_description: int, str부터 list, dict, tuple까지 Python 타입 힌트의 기본 타입과 컬렉션 타입을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 기본 타입과 collection 타입

@@ -18,7 +18,7 @@ tags:
   - LSP
   - Polymorphism
 seo_description: 좋은 인터페이스의 조건, 추상화 수준, 다형성과 LSP를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 인터페이스와 추상화
@@ -70,9 +70,9 @@ def notify(notifier: Notifier, user, msg):
 ### 1단계 — 사용자의 언어로 이름 짓기
 
 ```python
-# 1_naming.py
-# Bad: process_data()
-# Good: charge_user()
+# 예시 파일: 1_naming.py
+# 나쁨: process_data()
+# 좋음: charge_user()
 ```
 
 이름이 의도를 담아야 합니다.
@@ -80,9 +80,9 @@ def notify(notifier: Notifier, user, msg):
 ### 2단계 — 추상화 수준 맞추기
 
 ```python
-# 2_level.py
-# Bad: send_bytes_over_tcp(host, port, payload)
-# Good: notify(user, message)
+# 예시 파일: 2_level.py
+# 나쁨: send_bytes_over_tcp(host, port, payload)
+# 좋음: notify(user, message)
 ```
 
 호출자가 신경 쓰지 않을 것을 숨깁니다.
@@ -90,9 +90,9 @@ def notify(notifier: Notifier, user, msg):
 ### 3단계 — 인자는 적게, 의도는 분명하게
 
 ```python
-# 3_params.py
-# Bad: charge(u, a, c, r, m, x, y)
-# Good: charge(user, amount, *, reason)
+# 예시 파일: 3_params.py
+# 나쁨: charge(u, a, c, r, m, x, y)
+# 좋음: charge(user, amount, *, reason)
 ```
 
 위치 인자 4개를 넘기면 의심하세요.
@@ -100,7 +100,7 @@ def notify(notifier: Notifier, user, msg):
 ### 4단계 — LSP 검증
 
 ```python
-# 4_lsp.py
+# 예시 파일: 4_lsp.py
 class Bird:
     def fly(self): ...
 
@@ -114,7 +114,7 @@ class Penguin(Bird):
 ### 5단계 — 작은 인터페이스 여러 개
 
 ```python
-# 5_isp.py
+# 예시 파일: 5_isp.py
 class Reader:
     def read(self): ...
 

@@ -18,7 +18,7 @@ tags:
   - Cohesion
   - Coupling
 seo_description: 관심사 분리의 정의, 결합도와 응집도, 책임을 나누는 실전 절차를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 관심사 분리
@@ -71,7 +71,7 @@ def process_order(req):
 ### 1단계 — 변경 이유 나열
 
 ```python
-# 1_reasons.py
+# 예시 파일: 1_reasons.py
 # Order 모듈은 왜 바뀌나?
 # - 가격 정책 변경
 # - DB 스키마 변경
@@ -84,8 +84,8 @@ def process_order(req):
 ### 2단계 — 도메인/인프라 분리
 
 ```python
-# 2_domain_infra.py
-# 도메인은 IO를 모릅니다.
+# 예시 파일: 2_domain_infra.py
+# 도메인은 입출력을 모릅니다.
 def calculate_total(items, member): ...
 # 인프라는 도메인을 사용합니다.
 def save(order): db.execute(...)
@@ -96,7 +96,7 @@ def save(order): db.execute(...)
 ### 3단계 — 입력/처리/출력 분리
 
 ```python
-# 3_io.py
+# 예시 파일: 3_io.py
 def parse(req): ...    # 입력
 def handle(cmd): ...   # 처리
 def render(res): ...   # 출력
@@ -107,7 +107,7 @@ def render(res): ...   # 출력
 ### 4단계 — 횡단 관심사 추출
 
 ```python
-# 4_cross.py
+# 예시 파일: 4_cross.py
 def with_logging(fn):
     def w(*a, **k):
         # 로깅
@@ -120,7 +120,7 @@ def with_logging(fn):
 ### 5단계 — 통합 지점 점검
 
 ```python
-# 5_seam.py
+# 예시 파일: 5_seam.py
 # 분리된 관심사들이 어디서 만나는지(이음새)를 점검.
 def app(req):
     return render(handle(parse(req)))

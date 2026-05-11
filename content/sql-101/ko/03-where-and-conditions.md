@@ -17,7 +17,7 @@ tags:
   - Database
   - "NULL"
 seo_description: WHERE의 비교 연산자, AND/OR 우선순위, IN과 BETWEEN, LIKE, 그리고 NULL 안전 비교
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # WHERE와 조건
@@ -43,7 +43,7 @@ flowchart LR
 
 **Before**: `WHERE name LIKE '%kim%' OR age > 30` — *의도가 모호* 하다.
 
-**After**: `WHERE (name LIKE '%kim%' OR age > 30) AND active = TRUE` — *괄호로* 의도 명시.
+**After**: `WHERE (name LIKE '%kim%' OR age > 30) AND active = TRUE` — 괄호로 의도 명시.
 
 ## 조건 5단계
 
@@ -79,14 +79,14 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 
 ## 이 코드에서 주목할 점
 
-- `LIKE '%xxx'` 는 *index 를 못 탄다*. 후방 일치는 *비싸다*.
-- `IN` 은 *작은 목록* 에 좋다. 큰 목록은 *조인* 으로.
-- `IS NULL` 만 NULL 을 *정확히* 잡는다. `= NULL` 은 *항상 거짓*.
+- `LIKE '%xxx'` 는 *index 를 못 탄다*. 후방 일치는 비싸다.
+- `IN` 은 *작은 목록* 에 좋다. 큰 목록은 조인으로.
+- `IS NULL` 만 NULL 을 정확히 잡는다. `= NULL` 은 *항상 거짓*.
 
 ## 자주 하는 실수 5가지
 
-1. **`= NULL` 로 비교.** 결과는 *항상 NULL = 거짓 취급*. 행이 *사라진다*.
-2. **AND/OR 괄호 생략.** AND 가 *먼저* 결합돼 *원치 않는 결과*.
+1. **`= NULL` 로 비교.** 결과는 *항상 NULL = 거짓 취급*. 행이 사라진다.
+2. **AND/OR 괄호 생략.** AND 가 먼저 결합돼 *원치 않는 결과*.
 3. **컬럼에 함수 적용.** `WHERE LOWER(email) = ...` 는 *index 적중 실패*.
 4. **`LIKE '%kim%'`** *수백만 행 풀스캔*.
 5. **타입 불일치.** `age = '18'` 같은 *암시적 변환* 이 *index 무력화*.

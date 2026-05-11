@@ -18,7 +18,7 @@ tags:
   - Immutability
   - FunctionalDesign
 seo_description: 데이터가 흐르는 방향을 명확히 하고, 파이프라인과 불변 데이터로 설계를 단순하게 만드는 방법을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 데이터 흐름 설계
@@ -73,9 +73,9 @@ def signup(payload):
 ### 1단계 — 입출력 모양 적기
 
 ```python
-# 1_io.py
-# In: dict from HTTP
-# Out: User row id
+# 예시 파일: 1_io.py
+# 입력: HTTP에서 받은 dict
+# 출력: User 행 id
 # 그 사이에 무엇이 일어나는지 한 줄씩 적기.
 ```
 
@@ -84,7 +84,7 @@ def signup(payload):
 ### 2단계 — 단계 함수 분리
 
 ```python
-# 2_steps.py
+# 예시 파일: 2_steps.py
 def parse(payload) -> SignupCommand: ...
 def validate(cmd: SignupCommand) -> SignupCommand: ...
 def to_user(cmd: SignupCommand) -> User: ...
@@ -95,11 +95,11 @@ def to_user(cmd: SignupCommand) -> User: ...
 ### 3단계 — 부수효과 끝으로 미루기
 
 ```python
-# 3_side_effects.py
+# 예시 파일: 3_side_effects.py
 def signup(payload):
-    user = to_user(validate(parse(payload)))   # pure
-    repo.save(user)                            # effect
-    mailer.send(user.email)                    # effect
+    user = to_user(validate(parse(payload)))   # 순수 처리
+    repo.save(user)                            # 부수효과
+    mailer.send(user.email)                    # 부수효과
 ```
 
 검증과 변환은 순수, IO는 마지막.
@@ -107,7 +107,7 @@ def signup(payload):
 ### 4단계 — 불변 데이터 사용
 
 ```python
-# 4_immutable.py
+# 예시 파일: 4_immutable.py
 from dataclasses import dataclass
 @dataclass(frozen=True)
 class User:
@@ -120,9 +120,9 @@ class User:
 ### 5단계 — 한 방향으로만
 
 ```python
-# 5_one_way.py
-# UI -> command -> domain -> event
-# event가 다시 UI로 되돌아온다.
+# 예시 파일: 5_one_way.py
+# UI -> command -> domain -> event 흐름
+# event가 다시 UI로 되돌아오지 않는다.
 # 중간에서 임의로 데이터를 갱신하지 않는다.
 ```
 

@@ -17,7 +17,7 @@ tags:
   - Database
   - Query
 seo_description: ROW_NUMBER, RANK, LAG/LEAD, 누적 합계 — 행을 줄이지 않고 그룹별 계산을 더하는 SQL 도구
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Window Function
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-순위, 차이, 누적 — *행 단위 분석* 에 필수입니다. GROUP BY 만 쓰면 *세부를 잃습니다*. Window 는 *세부 + 집계* 를 *동시에* 보여줍니다. *cohort, funnel, retention* 의 핵심 도구입니다.
+순위, 차이, 누적 — *행 단위 분석* 에 필수입니다. GROUP BY 만 쓰면 *세부를 잃습니다*. Window 는 *세부 + 집계* 를 동시에 보여줍니다. *cohort, funnel, retention* 의 핵심 도구입니다.
 
 > *Window 는 SQL 을 *분석 언어로* 만든 결정적 도구다.*
 
@@ -94,15 +94,15 @@ FROM daily_revenue;
 
 - `OVER ()` 가 *비어 있으면* 전체가 한 partition.
 - ORDER BY 가 있어야 *순서 의존* 함수가 의미를 가진다.
-- frame 을 *명시* 하지 않으면 DB 별 *기본값* 이 다르다.
+- frame 을 명시하지 않으면 DB 별 기본값이 다르다.
 
 ## 자주 하는 실수 5가지
 
 1. **`RANK` 와 `ROW_NUMBER` 혼동.** 동률 처리 다름.
-2. **PARTITION 빠뜨림.** *전체* 가 한 그룹이 됨.
+2. **PARTITION 빠뜨림.** 전체가 한 그룹이 됨.
 3. **frame 미명시.** 기본 *RANGE UNBOUNDED PRECEDING* 가 *의도와 다름*.
 4. **`LAG` 의 *NULL* 무시.** 첫 행에 NULL 처리 필요.
-5. **window 와 GROUP BY 같이 쓰며 *충돌*.** 적용 시점 오해.
+5. **window 와 GROUP BY 같이 쓰며 충돌.** 적용 시점 오해.
 
 ## 실무에서는 이렇게 쓰입니다
 

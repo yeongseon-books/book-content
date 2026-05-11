@@ -18,7 +18,7 @@ tags:
   - Modularity
   - Architecture
 seo_description: URL 단축기 프로젝트로 시리즈의 모든 설계 도구를 한 자리에서 적용해 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 작은 프로젝트로 설계 연습
@@ -71,7 +71,7 @@ def shorten_view():
 ### 1단계 — 도메인부터
 
 ```python
-# 1_domain.py
+# 예시 파일: 1_domain.py
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -91,7 +91,7 @@ class ShortLink:
 ### 2단계 — 포트 정의
 
 ```python
-# 2_ports.py
+# 예시 파일: 2_ports.py
 from typing import Protocol
 
 class LinkRepo(Protocol):
@@ -107,7 +107,7 @@ class KeyGen(Protocol):
 ### 3단계 — 유스케이스
 
 ```python
-# 3_usecase.py
+# 예시 파일: 3_usecase.py
 def shorten_use_case(payload, repo: LinkRepo, key_gen: KeyGen):
     target = payload["url"]
     key = key_gen(target)
@@ -121,7 +121,7 @@ def shorten_use_case(payload, repo: LinkRepo, key_gen: KeyGen):
 ### 4단계 — 어댑터
 
 ```python
-# 4_adapter.py
+# 예시 파일: 4_adapter.py
 class InMemoryLinkRepo:
     def __init__(self): self._d = {}
     def save(self, link): self._d[link.key] = link
@@ -137,7 +137,7 @@ def md5_key(target: str) -> str:
 ### 5단계 — 조립과 표현
 
 ```python
-# 5_compose.py
+# 예시 파일: 5_compose.py
 from flask import Flask, request
 app = Flask(__name__)
 repo = InMemoryLinkRepo()

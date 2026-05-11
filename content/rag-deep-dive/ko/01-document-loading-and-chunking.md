@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: PyPDFLoader와 RecursiveCharacterTextSplitter가 문서를 청크로 나누는 내부 동작을 예제와 함께 분해합니다.
 ---
 

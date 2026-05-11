@@ -18,7 +18,7 @@ tags:
   - Collaboration
   - Quality
 seo_description: 코드 리뷰의 목적, PR 작성법, 리뷰어가 보는 항목, 자주 하는 실수를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 코드 리뷰
@@ -67,7 +67,7 @@ PR 제목: Refactor user module + bug fix + log cleanup
 ### 1단계 — 변경의 의도 한 줄
 
 ```text
-# 1_pr_title.txt
+# 파일: 1_pr_title.txt
 fix(auth): handle expired refresh token without 500
 ```
 
@@ -76,17 +76,17 @@ fix(auth): handle expired refresh token without 500
 ### 2단계 — 본문 템플릿
 
 ```text
-# 2_pr_body.md
-## What
+# 파일: 2_pr_body.md
+## 변경 내용
 만료된 refresh token에 대한 401 응답 추가.
 
-## Why
+## 이유
 현재 500이 발생해 모니터링 알람이 폭주.
 
-## How
+## 방법
 `AuthService.refresh()`에서 ExpiredTokenError를 401로 매핑.
 
-## Test
+## 테스트
 unit + 수동 cURL.
 ```
 
@@ -95,7 +95,7 @@ unit + 수동 cURL.
 ### 3단계 — 자동화로 사람 부담 줄이기
 
 ```yaml
-# 3_ci.yml
+# 파일: 3_ci.yml
 jobs:
   check:
     steps:
@@ -109,7 +109,7 @@ jobs:
 ### 4단계 — 작은 단위로 분리
 
 ```text
-# 4_split.md
+# 파일: 4_split.md
 - PR 1: 데이터 모델 변경
 - PR 2: 서비스 로직
 - PR 3: 핸들러와 라우팅
@@ -120,7 +120,7 @@ jobs:
 ### 5단계 — 코멘트 톤 가이드
 
 ```text
-# 5_tone.md
+# 파일: 5_tone.md
 [nit] 변수명 user_id가 일관적이면 좋겠습니다.
 [question] 이 분기에서 N+1 가능성이 있나요?
 [blocking] 비밀키가 로그에 남습니다. 머지 전 수정 필요.

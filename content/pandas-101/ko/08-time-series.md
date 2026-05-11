@@ -17,7 +17,7 @@ tags:
   - Datetime
   - Beginner
 seo_description: DatetimeIndex·resample·rolling·tz로 시계열을 다루는 Pandas의 표준 패턴을 코드와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # time series
@@ -83,7 +83,7 @@ print(ts2.head())
 
 - *문자열 슬라이싱* 은 *DatetimeIndex* 에서만 자연스럽습니다.
 - *resample* 은 *집계 함수* 와 함께 씁니다.
-- *시간대* 는 *명시적으로 부여* 한 후 *변환* 합니다.
+- 시간대는 명시적으로 부여한 뒤 변환합니다.
 
 ## 자주 하는 실수 5가지
 

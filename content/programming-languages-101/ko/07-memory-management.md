@@ -18,7 +18,7 @@ tags:
   - 스택
   - 힙
 seo_description: 스택과 힙, 참조 카운팅과 가비지 컬렉션을 한 줄의 코드와 함께 추적합니다. 객체가 언제 사라지는지 직접 관찰합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # memory management

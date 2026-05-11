@@ -18,7 +18,7 @@ tags:
   - 클래스
   - 상속
 seo_description: 클래스 기반과 프로토타입 기반은 같은 객체 아이디어의 두 가지 표현입니다. 메서드 탐색이 어떻게 일어나는지 추적해 봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 객체와 prototype

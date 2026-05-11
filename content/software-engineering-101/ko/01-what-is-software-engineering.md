@@ -18,7 +18,7 @@ tags:
   - Quality
   - Career
 seo_description: 코딩과 소프트웨어 엔지니어링의 차이, 그리고 엔지니어가 책임지는 영역을 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 소프트웨어 엔지니어링이란 무엇인가?
@@ -66,7 +66,7 @@ flowchart LR
 ### 1단계 — "한 번만 동작" 코드
 
 ```python
-# 1_quick.py
+# 파일: 1_quick.py
 import sys
 n = int(sys.argv[1])
 print(sum(range(n)))
@@ -77,7 +77,7 @@ print(sum(range(n)))
 ### 2단계 — "다른 사람도 쓸" 코드
 
 ```python
-# 2_reusable.py
+# 파일: 2_reusable.py
 def sum_to(n: int) -> int:
     """0..n-1 합."""
     if n < 0: raise ValueError("n must be >= 0")
@@ -89,7 +89,7 @@ def sum_to(n: int) -> int:
 ### 3단계 — "프로덕션" 코드
 
 ```python
-# 3_prod.py
+# 파일: 3_prod.py
 import logging
 log = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ def sum_to(n: int) -> int:
 ### 4단계 — 테스트 추가
 
 ```python
-# 4_test.py
+# 파일: 4_test.py
 import pytest
 from prod import sum_to
 
@@ -120,8 +120,8 @@ def test_sum_to_negative():
 ### 5단계 — 문서화
 
 ```text
-# 5_README.md
-## sum_to
+# 파일: 5_README.md
+## sum_to 함수
 - 입력: 음이 아닌 정수
 - 출력: 0..n-1 합
 - 복잡도: O(1)

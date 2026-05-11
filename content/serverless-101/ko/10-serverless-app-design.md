@@ -143,7 +143,7 @@ def notify(event):
 ### 5단계 — 실패 격리
 
 ```python
-# Queue policy (pseudo-config)
+# 큐 정책 예시 (의사 설정)
 queue_policy = {
     "VisibilityTimeout": 60,
     "MaxReceiveCount": 5,

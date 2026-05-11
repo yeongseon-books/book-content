@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-11'
 seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻게 균형잡는지 LangChain 내부 구현으로 살펴봅니다.
 ---
 

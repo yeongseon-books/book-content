@@ -18,7 +18,7 @@ tags:
   - REST
   - Networking
 seo_description: 요청/응답의 구조 — method/status/header/body와 JSON API 호출법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # HTTP와 API
@@ -28,9 +28,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-웹 개발의 절반은 *HTTP 메시지를 만들고 읽는 일* 입니다. 메시지의 모양을 모르면 디버깅이 추측 게임이 됩니다. 한 번만 정확히 익혀두면 어떤 프레임워크에서도 통합니다.
+웹 개발의 절반은 HTTP 메시지를 만들고 읽는 일입니다. 메시지의 모양을 모르면 디버깅이 추측 게임이 됩니다. 한 번만 정확히 익혀두면 어떤 프레임워크에서도 통합니다.
 
-> HTTP는 *문자로 된 약속* 입니다.
+> HTTP는 문자로 된 약속입니다.
 
 ## 전체 흐름
 ```mermaid
@@ -86,7 +86,7 @@ print(r.json()["json"])
 ### 3단계 — 헤더 살펴보기
 
 ```python
-# 3_headers.py
+# 파일: 3_headers.py
 import requests
 r = requests.get("https://httpbin.org/headers", headers={"X-Custom": "hi"})
 print(r.json()["headers"]["X-Custom"])
@@ -95,7 +95,7 @@ print(r.json()["headers"]["X-Custom"])
 ### 4단계 — Status code 분기
 
 ```python
-# 4_status.py
+# 파일: 4_status.py
 import requests
 for url in ["https://httpbin.org/status/200", "https://httpbin.org/status/404"]:
     r = requests.get(url)
@@ -109,21 +109,21 @@ for url in ["https://httpbin.org/status/200", "https://httpbin.org/status/404"]:
 
 ```bash
 curl -v https://httpbin.org/get
-# > GET /get HTTP/1.1
-# > Host: httpbin.org
-# < HTTP/1.1 200 OK
-# < Content-Type: application/json
+# 요청 예시 > GET /get HTTP/1.1
+# 요청 예시 > Host: httpbin.org
+# 응답 예시 < HTTP/1.1 200 OK
+# 응답 예시 < Content-Type: application/json
 ```
 
 ## 이 코드에서 주목할 점
 
-- `Content-Type` 이 `text/html` 인지 `application/json` 인지가 *전부* 를 가른다.
-- POST는 *서버 상태를 바꿀 수 있다* 는 약속이다.
+- `Content-Type` 이 `text/html` 인지 `application/json` 인지가 전부를 가른다.
+- POST는 서버 상태를 바꿀 수 있다는 약속이다.
 - 같은 URL이 method에 따라 다르게 동작한다.
 
 ## 자주 하는 실수 5가지
 
-1. **GET으로 데이터를 만든다.** GET은 *읽기 전용* 약속.
+1. **GET으로 데이터를 만든다.** GET은 읽기 전용 약속이다.
 2. **모든 응답을 200으로 보낸다.** 클라이언트가 오류를 못 걸러낸다.
 3. **`Content-Type` 을 안 본다.** JSON인 척 HTML을 파싱한다.
 4. **에러 본문이 자유 형식.** 클라이언트가 메시지를 못 꺼낸다.
@@ -131,7 +131,7 @@ curl -v https://httpbin.org/get
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 모바일/웹 앱은 *JSON over HTTP* 로 서버와 통신합니다. GraphQL, gRPC도 결국 HTTP 위에서 동작합니다. 새 서비스를 다룰 때 가장 먼저 보는 것이 *API 문서* 인 이유입니다.
+대부분의 모바일/웹 앱은 JSON over HTTP로 서버와 통신합니다. GraphQL, gRPC도 결국 HTTP 위에서 동작합니다. 새 서비스를 다룰 때 가장 먼저 보는 것이 API 문서인 이유입니다.
 
 ## 체크리스트
 
@@ -143,7 +143,7 @@ curl -v https://httpbin.org/get
 
 ## 정리 및 다음 단계
 
-HTTP는 *문자로 된 약속* 입니다. 다음 글에서는 그 약속의 양쪽 — Frontend와 Backend — 의 분리를 봅니다.
+HTTP는 문자로 된 약속입니다. 다음 글에서는 그 약속의 양쪽 — Frontend와 Backend — 의 분리를 봅니다.
 
 <!-- toc:begin -->
 - [웹은 어떻게 동작하는가?](./01-how-the-web-works.md)

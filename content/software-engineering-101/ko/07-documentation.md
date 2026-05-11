@@ -18,7 +18,7 @@ tags:
   - ADR
   - Knowledge
 seo_description: README, ADR, docstring, runbook의 역할과 Diataxis 4분면을 짧게 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 문서화
@@ -63,9 +63,9 @@ docs/tutorials/  docs/how-to/  docs/reference/  docs/explanation/
 ### 1단계 — README 5블록
 
 ```markdown
-# 1_readme.md
-## What — 한 문장 설명
-## Why — 왜 만들어졌나
+# 파일: 1_readme.md
+## 변경 내용 — 한 문장 설명
+## 이유 — 왜 만들어졌나
 ## Quick start — 60초 안에 동작
 ## Configuration — 환경 변수 표
 ## Links — 더 알아보기
@@ -76,10 +76,10 @@ docs/tutorials/  docs/how-to/  docs/reference/  docs/explanation/
 ### 2단계 — ADR 한 페이지
 
 ```markdown
-# 2_adr.md
+# 파일: 2_adr.md
 # ADR 0012: 캐시 도입
-- Context, Decision, Alternatives, Consequences
-- Date, Owners
+- 배경, 결정, 대안, 결과
+- 날짜, 담당자
 ```
 
 결정의 이유는 코드보다 오래 살아남습니다.
@@ -87,7 +87,7 @@ docs/tutorials/  docs/how-to/  docs/reference/  docs/explanation/
 ### 3단계 — docstring과 타입
 
 ```python
-# 3_docstring.py
+# 파일: 3_docstring.py
 def compute_invoice(amount: int, tax_rate: float) -> int:
     """Return cents amount including tax.
 
@@ -101,9 +101,9 @@ def compute_invoice(amount: int, tax_rate: float) -> int:
 ### 4단계 — runbook
 
 ```markdown
-# 4_runbook.md
+# 파일: 4_runbook.md
 ## 증상
-- 5xx error rate > 2% for 5 min
+- 5분 동안 5xx 오류율 > 2%
 ## 진단
 1. Grafana 대시보드 X 확인
 2. 최근 배포 로그 확인
@@ -116,7 +116,7 @@ def compute_invoice(amount: int, tax_rate: float) -> int:
 ### 5단계 — onboarding 체크리스트
 
 ```markdown
-# 5_onboarding.md
+# 파일: 5_onboarding.md
 - [ ] 저장소 clone + dev 환경 띄우기
 - [ ] 첫 PR 머지(타이포 수정)
 - [ ] 1주일 내 첫 incident shadow

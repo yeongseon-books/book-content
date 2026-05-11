@@ -18,7 +18,7 @@ tags:
   - Simplicity
   - Engineering
 seo_description: 좋은 소프트웨어의 품질 속성, SOLID, 단순성, 지속 가능성, 시니어가 보는 신호를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 좋은 소프트웨어의 기준
@@ -65,7 +65,7 @@ flowchart LR
 ### 1단계 — SRP 점검(SOLID의 S)
 
 ```python
-# 1_srp.py
+# 파일: 1_srp.py
 class Invoice:           # 책임 1: 데이터
     ...
 class InvoicePrinter:    # 책임 2: 출력
@@ -77,7 +77,7 @@ class InvoicePrinter:    # 책임 2: 출력
 ### 2단계 — DIP 점검(SOLID의 D)
 
 ```python
-# 2_dip.py
+# 파일: 2_dip.py
 class OrderService:
     def __init__(self, repo: "Repo"):  # 인터페이스에 의존
         self.repo = repo
@@ -88,7 +88,7 @@ class OrderService:
 ### 3단계 — 단순성 측정
 
 ```bash
-# 3_complexity.sh
+# 파일: 3_complexity.sh
 radon cc app/ -a -nb
 ```
 
@@ -97,7 +97,7 @@ radon cc app/ -a -nb
 ### 4단계 — 변경 리드 타임 측정
 
 ```bash
-# 4_lead_time.sh
+# 파일: 4_lead_time.sh
 git log --pretty='%H %as' -- app/ | head
 ```
 
@@ -106,7 +106,7 @@ git log --pretty='%H %as' -- app/ | head
 ### 5단계 — 외부 신호 4가지
 
 ```text
-# 5_signals.md
+# 파일: 5_signals.md
 - 새 입사자의 첫 PR까지 시간
 - 사고 평균 복구 시간
 - 기능 추가 평균 리드 타임

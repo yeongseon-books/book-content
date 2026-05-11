@@ -18,7 +18,7 @@ tags:
   - mypy
   - 코드 품질
 seo_description: Python 타입 힌트의 개념, 등장 배경, 기본 문법과 활용 이유를 살펴봅니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Python type hint란 무엇인가?
@@ -140,13 +140,13 @@ def process(name: str, count: int) -> list[str]:
 
 # 함수의 타입 힌트는 __annotations__에 저장됨
 print(process.__annotations__)
-# {'name': <class 'str'>, 'count': <class 'int'>, 'return': list[str]}
+# 타입 힌트 사전: {'name': <class 'str'>, 'count': <class 'int'>, 'return': list[str]}
 
 # 변수 타입 힌트도 확인 가능
 x: int = 10
 y: str = "hello"
 print(__annotations__)
-# {'x': <class 'int'>, 'y': <class 'str'>}
+# 변수 타입 사전: {'x': <class 'int'>, 'y': <class 'str'>}
 ```
 
 ### Step 5: None 반환 타입

@@ -17,7 +17,7 @@ tags:
   - SQL
   - Beginner
 seo_description: inner·left·right·outer·cross 조인의 의미와 merge·join의 차이를 코드와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # merge와 join
@@ -87,7 +87,7 @@ except Exception as e:
 
 - *indicator=True* 는 *행 출처* 를 알려줍니다.
 - *suffixes* 로 *동명 컬럼 충돌* 을 해결합니다.
-- *validate* 로 *조인 가정* 을 *코드로* 명시합니다.
+- `validate`로 조인 가정을 코드에 명시합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -99,7 +99,7 @@ except Exception as e:
 
 ## 실무에서는 이렇게 쓰입니다
 
-CRM × 주문, 광고 × 전환, 사용자 × 이벤트 — *데이터 분석의 80%* 는 *조인* 입니다. *validate* 는 *데이터 계약* 의 코드 표현.
+CRM × 주문, 광고 × 전환, 사용자 × 이벤트처럼 데이터 분석의 상당수는 조인입니다. `validate`는 데이터 계약을 코드로 표현하는 방법입니다.
 
 ## 체크리스트
 

@@ -18,7 +18,7 @@ tags:
   - 오버로드
   - 데코레이터
 seo_description: Callable, 콜백, 데코레이터, 오버로드까지 함수와 관련된 타입 힌트 심화 문법을 다룹니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 함수 타입 힌트

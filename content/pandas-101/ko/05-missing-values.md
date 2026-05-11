@@ -17,7 +17,7 @@ tags:
   - Python
   - Beginner
 seo_description: NaN의 의미와 isna·dropna·fillna·interpolate로 결측치를 다루는 표준 패턴을 코드와 함께 정리한 입문 글
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # missing value 처리
@@ -86,7 +86,7 @@ print(ts.interpolate())
 
 - *isna().sum()* 은 *결측 진단의 첫 단계*.
 - *fillna(평균)* 은 *분포를 왜곡* 할 수 있습니다.
-- *interpolate* 는 *시계열* 에서 자연스럽습니다.
+- `interpolate`는 시계열 데이터에서 자연스럽습니다.
 
 ## 자주 하는 실수 5가지
 
@@ -98,14 +98,14 @@ print(ts.interpolate())
 
 ## 실무에서는 이렇게 쓰입니다
 
-센서 데이터, 설문, 거래 로그 — *결측 패턴* 자체가 *시그널* 입니다. *MAR/MCAR/MNAR* 가설을 세우고 *처리 방식 의사결정 문서* 를 남깁니다.
+센서 데이터, 설문, 거래 로그에서는 결측 패턴 자체가 시그널입니다. `MAR/MCAR/MNAR` 가설을 세우고 처리 방식 의사결정 문서를 남깁니다.
 
 ## 체크리스트
 
-- [ ] *isna().sum()* 으로 *진단* 한다.
-- [ ] *dropna 영향도* 를 *측정* 한다.
-- [ ] *fillna 전략* 을 *명시* 한다.
-- [ ] *결측 비율* 을 *기록* 한다.
+- [ ] `isna().sum()`으로 진단한다.
+- [ ] `dropna` 영향도를 측정한다.
+- [ ] `fillna` 전략을 명시한다.
+- [ ] 결측 비율을 기록한다.
 
 ## 정리 및 다음 단계
 

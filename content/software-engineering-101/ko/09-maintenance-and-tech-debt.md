@@ -18,7 +18,7 @@ tags:
   - Refactoring
   - Legacy
 seo_description: 기술부채의 4가지 유형, 갚는 우선순위, 안전한 리팩터링과 deprecation 절차를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 유지보수와 기술부채
@@ -65,7 +65,7 @@ flowchart LR
 ### 1단계 — 부채 라벨
 
 ```python
-# 1_label.py
+# 파일: 1_label.py
 # DEBT(billing): tax 계산이 PaymentService에 새고 있음
 # 만기: 2026 Q3, 담당: @alice
 def charge(amount): ...
@@ -76,7 +76,7 @@ def charge(amount): ...
 ### 2단계 — 부채 인덱스
 
 ```markdown
-# 2_index.md
+# 파일: 2_index.md
 | ID | Area | Severity | Owner | Due |
 |----|------|----------|-------|-----|
 | D-12 | billing | high | alice | 2026 Q3 |
@@ -88,7 +88,7 @@ def charge(amount): ...
 ### 3단계 — Strangler Fig 패턴
 
 ```python
-# 3_strangler.py
+# 파일: 3_strangler.py
 def charge(amount):
     if feature("new_billing"):
         return new_billing.charge(amount)
@@ -100,7 +100,7 @@ def charge(amount):
 ### 4단계 — Deprecation 단계
 
 ```python
-# 4_deprecate.py
+# 파일: 4_deprecate.py
 import warnings
 def old_api(*a, **kw):
     warnings.warn("old_api is deprecated; use new_api", DeprecationWarning, stacklevel=2)
@@ -112,7 +112,7 @@ def old_api(*a, **kw):
 ### 5단계 — 부채 지표 대시보드
 
 ```text
-# 5_metrics.md
+# 파일: 5_metrics.md
 - 코드 복잡도(평균 cyclomatic)
 - 테스트 커버리지 변화율
 - 스프린트당 부채 처리 건수

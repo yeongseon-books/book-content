@@ -17,7 +17,7 @@ tags:
   - OnCall
   - Monitoring
 seo_description: 좋은 alert의 조건과 alert fatigue를 막는 설계, on-call 운영의 첫걸음
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Alert와 On-Call
@@ -27,9 +27,9 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-Alert 가 너무 많으면 *진짜 신호* 가 *묻힙니다*. On-call 은 *수면을 사고* 정신력을 *지불* 합니다. 설계가 곧 비용입니다.
+Alert 가 너무 많으면 진짜 신호가 묻힙니다. On-call 은 수면과 집중력을 비용으로 치르는 일입니다. 결국 설계가 곧 비용입니다.
 
-> *Alert 는 *깨우는 비용* 이 있다. 그 값을 모르면 *부도* 난다.*
+> Alert 는 사람을 깨우는 비용을 동반합니다. 그 값을 모르면 운영이 버티기 어려워집니다.
 
 ## 전체 흐름
 ```mermaid
@@ -42,9 +42,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: alert 50개/일, 모두 무시. 진짜 장애 *놓침*.
+**Before**: alert 가 하루 50개씩 와서 모두 무시되고, 진짜 장애도 놓칩니다.
 
-**After**: alert 3개/주, *모두 조치 필요*.
+**After**: alert 가 주 3개 수준으로 줄고, 모두 실제 조치가 필요한 신호만 남습니다.
 
 ## Alert 5단계
 
@@ -64,7 +64,7 @@ groups:
           runbook: "https://wiki/runbook/api-error"
 ```
 
-### 2단계 — `for` 절로 *flap* 방지
+### 2단계 — `for` 절로 flap 방지
 
 ```yaml
 for: 10m   # 짧으면 잡음 폭증
@@ -99,32 +99,32 @@ runbook 에는: 의미, 첫 행동 3가지, 에스컬레이션, 관련 dashboard
 
 ## 이 코드에서 주목할 점
 
-- `for: 10m` 으로 *지속 조건* 을 강제.
-- `severity` 라벨이 *행동* 을 결정.
-- *Runbook* 없는 alert 는 *반쪽*.
+- `for: 10m` 으로 지속 조건을 강제합니다.
+- `severity` 라벨이 대응 방식을 결정합니다.
+- Runbook 없는 alert 는 반쪽짜리에 가깝습니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 alert 가 *page*.** 새벽이 *지옥*.
-2. ***Cause* 에만 alert.** 사용자 영향과 *분리*.
-3. **`for` 없음.** *flapping* 으로 잡음 폭증.
-4. ***Runbook* 없음.** 받은 사람이 *멈춘다*.
-5. **Owner 없음.** 모두의 alert = *아무의 alert*.
+1. **모든 alert 를 page 로 보냅니다.** 새벽 대응이 감당하기 어려워집니다.
+2. **Cause 에만 alert 를 겁니다.** 사용자 영향과 분리됩니다.
+3. **`for` 절이 없습니다.** flapping 때문에 잡음이 폭증합니다.
+4. **Runbook 이 없습니다.** 받은 사람이 첫 행동에서 멈춥니다.
+5. **Owner 가 없습니다.** 모두의 alert 가 결국 아무의 alert 도 아니게 됩니다.
 
 ## 실무에서는 이렇게 쓰입니다
 
-대부분의 팀은 *symptom-based alert (SLO 위반)* 을 1순위로, *cause-based alert (CPU 95%)* 를 보조로 둡니다. PagerDuty / Opsgenie / Grafana OnCall 가 흔합니다.
+대부분의 팀은 symptom-based alert (SLO 위반) 을 1순위로 두고, cause-based alert (CPU 95%) 는 보조 수단으로 둡니다. PagerDuty, Opsgenie, Grafana OnCall 같은 도구를 많이 씁니다.
 
 ## 체크리스트
 
-- [ ] 한 alert 에 *runbook 링크* 가 있다.
-- [ ] *severity* 가 *page/ticket* 으로 나뉜다.
-- [ ] `for` 가 설정되어 있다.
-- [ ] On-call *교대표* 가 있다.
+- [ ] 각 alert 에 runbook 링크가 있습니다.
+- [ ] `severity` 가 `page` 와 `ticket` 으로 나뉩니다.
+- [ ] `for` 가 설정되어 있습니다.
+- [ ] On-call 교대표가 있습니다.
 
 ## 정리 및 다음 단계
 
-좋은 alert 는 *수면을 지킵니다*. 다음 글은 *SLI 와 SLO 기초* 입니다.
+좋은 alert 는 팀의 수면을 지켜 줍니다. 다음 글은 SLI 와 SLO 기초입니다.
 
 <!-- toc:begin -->
 - [Observability란 무엇인가?](./01-what-is-observability.md)

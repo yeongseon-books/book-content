@@ -18,7 +18,7 @@ tags:
   - 동적타입
   - 추론
 seo_description: 타입 시스템은 단순한 자료형 검사가 아니라 잘못된 프로그램을 미리 막아 주는 증명 도구입니다. 기본 개념을 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # type system

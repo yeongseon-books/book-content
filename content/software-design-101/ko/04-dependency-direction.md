@@ -18,7 +18,7 @@ tags:
   - Inversion
   - Architecture
 seo_description: 의존성의 방향을 통제해 변경 비용을 낮추는 방법, DIP와 포트/어댑터를 정리합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 의존성 방향
@@ -46,7 +46,7 @@ flowchart LR
 **Before**
 
 ```python
-# domain이 직접 DB를 안다
+# domain이 DB를 직접 안다
 import psycopg2
 
 def charge(user_id, amount):
@@ -72,7 +72,7 @@ DB 교체가 도메인을 흔들지 않는다.
 ### 1단계 — 화살표 그려 보기
 
 ```python
-# 1_arrows.py
+# 예시 파일: 1_arrows.py
 # 어떤 모듈이 어떤 모듈을 import하는지 종이에 그려 본다.
 # 핵심이 세부를 import하면 빨간 신호.
 ```
@@ -82,7 +82,7 @@ DB 교체가 도메인을 흔들지 않는다.
 ### 2단계 — 핵심에서 추상 정의
 
 ```python
-# 2_port.py
+# 예시 파일: 2_port.py
 from typing import Protocol
 
 class WalletRepo(Protocol):
@@ -94,7 +94,7 @@ class WalletRepo(Protocol):
 ### 3단계 — 어댑터에서 구현
 
 ```python
-# 3_adapter.py
+# 예시 파일: 3_adapter.py
 class PostgresWalletRepo:
     def debit(self, user_id, amount):
         # SQL 구체 구현
@@ -106,7 +106,7 @@ class PostgresWalletRepo:
 ### 4단계 — 조립은 가장자리에서
 
 ```python
-# 4_compose.py
+# 예시 파일: 4_compose.py
 def main():
     repo = PostgresWalletRepo()
     charge(repo, "u-1", 1000)
@@ -117,7 +117,7 @@ def main():
 ### 5단계 — 테스트는 가짜로
 
 ```python
-# 5_fake.py
+# 예시 파일: 5_fake.py
 class FakeRepo:
     def __init__(self): self.calls = []
     def debit(self, u, a): self.calls.append((u, a))

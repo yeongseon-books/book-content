@@ -18,7 +18,7 @@ tags:
   - Lexical
   - Dynamic
 seo_description: 같은 이름이 어디서 어떤 값을 가리키는가는 언어 설계의 가장 핵심 결정 중 하나입니다. lexical과 dynamic scope를 비교합니다.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # scope와 binding
@@ -87,7 +87,7 @@ def outer():
 
 outer()
 print(x)
-# local / enclosing / global
+# 지역 / 둘러싼 범위 / 전역
 ```
 
 같은 이름이 가장 안쪽 binding부터 우선 보입니다.
