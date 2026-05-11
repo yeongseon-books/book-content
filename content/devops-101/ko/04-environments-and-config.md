@@ -17,7 +17,7 @@ tags:
   - Environment
   - TwelveFactor
 seo_description: dev, stage, prod 환경 분리와 환경변수, 시크릿 관리의 안전한 패턴.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 환경 분리와 설정 관리
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-환경별로 *DB 주소, 키, 도메인* 이 다릅니다. 이를 *코드와 분리* 해야 *같은 빌드물* 을 *모든 환경* 에 배포할 수 있습니다.
+환경별로 *DB 주소, 키, 도메인*이 다릅니다. 이를 *코드와 분리*해야 *같은 빌드물*을 *모든 환경*에 배포할 수 있습니다.
 
 > *Build once, run anywhere*.
 
@@ -82,7 +82,7 @@ settings = Settings()   # 자동으로 env 읽음
 ### 3단계 — 환경별 분리
 
 ```yaml
-# k8s/values-prod.yaml
+# 프로덕션 k8s 값 파일
 db_url: postgres://prod-db.example.com/app
 api_key:
   valueFrom:
@@ -92,14 +92,14 @@ api_key:
 ### 4단계 — 시크릿은 별도 저장소
 
 ```bash
-# AWS Secrets Manager
+# AWS Secrets Manager에서 시크릿 조회
 aws secretsmanager get-secret-value --secret-id prod/api-key
 ```
 
 ### 5단계 — 시크릿 자동 주입
 
 ```yaml
-# Kubernetes External Secrets
+# Kubernetes External Secrets 설정
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 spec:
@@ -111,14 +111,14 @@ spec:
 
 ## 이 코드에서 주목할 점
 
-- *시크릿* 은 *코드 저장소* 에 절대 들어가지 않습니다.
+- 시크릿은 *코드 저장소*에 절대 들어가지 않습니다.
 - 설정 검증은 *시작 시* 합니다. 런타임 중 *모자란 값* 을 발견하면 늦습니다.
 - 환경별 *YAML 분리* 로 가시성을 확보합니다.
 
 ## 자주 하는 실수 5가지
 
 1. **시크릿을 *Git에 커밋*.** *영구 노출* 됩니다. *git filter-repo* 로도 100% 제거 어렵습니다.
-2. ***.env* 를 *프로덕션* 에서 사용.** Secrets manager로 옮기세요.
+2. ***.env*를 프로덕션에서 사용.** Secrets manager로 옮기세요.
 3. **모든 환경에 *같은 시크릿*.** 유출 시 *전체 환경* 영향.
 4. **설정을 *런타임에 변경* 후 재시작 안 함.** *불일치 상태* 가 발생.
 5. **환경별 *코드 분기*.** *if env == "prod"* 는 안티패턴.
@@ -130,7 +130,7 @@ spec:
 ## 체크리스트
 
 - [ ] *.env* 가 *.gitignore* 에 있다.
-- [ ] *시크릿* 이 *별도 저장소* 에 있다.
+- [ ] 시크릿이 *별도 저장소*에 있다.
 - [ ] *환경별 설정 파일* 이 분리되어 있다.
 - [ ] 앱이 *시작 시 설정 검증* 을 한다.
 

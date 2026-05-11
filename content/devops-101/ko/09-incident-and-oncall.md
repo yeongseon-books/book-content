@@ -110,20 +110,20 @@ rotation:
 런북은 "문제가 생기면 이것부터 보세요"를 문서로 만든 것입니다. 증상, 진단, 완화, 에스컬레이션 순서가 들어가면 새벽에도 따라가기 쉬워집니다. 길고 완벽한 문서보다 짧고 자주 열리는 문서가 훨씬 낫습니다. 실제로 좋은 런북은 위키 깊숙한 곳보다 코드 저장소나 알림 시스템 링크 옆에 붙어 있는 경우가 많습니다.
 
 ```markdown
-# Runbook: API 500 spike
+# 런북: API 500 급증
 
-## Symptoms
-- /api/* 5xx ratio above 5%
+## 증상
+- /api/* 5xx 비율 5% 초과
 
-## Diagnosis
-1. Open the Grafana "API Errors" dashboard
-2. Check recent logs: {service="api", level="error"}
+## 진단
+1. Grafana의 "API Errors" 대시보드를 엽니다.
+2. 최근 로그 `{service="api", level="error"}`를 확인합니다.
 
-## Mitigation
-- If a recent deploy is suspect: `kubectl rollout undo deploy/api`
+## 완화 조치
+- 최근 배포가 의심되면 `kubectl rollout undo deploy/api`를 실행합니다.
 
-## Escalation
-- If unresolved in 30 min, page IC in #incident channel
+## 에스컬레이션
+- 30분 안에 해결되지 않으면 #incident 채널에서 IC를 호출합니다.
 ```
 
 런북이 잘 쓰였는지 판단하는 가장 좋은 기준은 간단합니다. 처음 보는 사람이 그 문서를 읽고 5분 안에 첫 조치를 할 수 있는가입니다. 복잡한 배경 설명보다 바로 열어 볼 대시보드, 확인할 로그 쿼리, 의심 배포가 있을 때의 롤백 명령이 중요합니다.
@@ -135,10 +135,10 @@ rotation:
 incident commander는 직접 고치는 사람보다 흐름을 정리하는 사람에 가깝습니다. 누가 조사하는지, 누가 소통하는지, 어떤 가설을 먼저 검증할지, 외부 공지가 필요한지 결정합니다. 이 역할이 있으면 손이 빠른 사람은 복구에 집중하고, 전체 팀은 같은 정보를 공유할 수 있습니다.
 
 ```text
-IC = decision maker. Does NOT fix things directly.
-- Single source of communication
-- Assigns roles (investigator/comms/scribe)
-- Decides on external announcements
+IC = 의사결정 담당자입니다. 직접 복구 작업을 하지는 않습니다.
+- 커뮤니케이션 창구를 하나로 유지합니다.
+- 조사 담당, 커뮤니케이션 담당, 기록 담당을 지정합니다.
+- 외부 공지 여부를 결정합니다.
 ```
 
 작은 팀이라면 formal한 IC 체계까지는 부담스러울 수 있습니다. 그래도 "이번 장애에서는 누가 최종 조율을 맡는가"는 정해 두는 편이 좋습니다. 이름만 붙어도 혼선이 크게 줄어듭니다.
@@ -150,12 +150,12 @@ IC = decision maker. Does NOT fix things directly.
 좋은 포스트모템은 사건 기록, 영향 범위, 원인, 예방 항목이 짧고 명확하게 정리되어 있습니다. 그리고 반드시 담당자와 기한이 붙습니다. 문서만 쓰고 끝나면 학습이 아니라 기록으로 끝납니다.
 
 ```markdown
-# Postmortem: 2026-05-04 API outage
+# 포스트모템: 2026-05-04 API 장애
 
-- Impact: 12 minutes at 30% 5xx
-- Timeline: 03:11 alert -> 03:18 rollback -> 03:23 recovery
-- Root cause: typo in feature flag default
-- Prevention: add flag-validation checklist to PR template
+- 영향: 12분 동안 5xx 비율 30%
+- 타임라인: 03:11 알림 -> 03:18 롤백 -> 03:23 복구
+- 근본 원인: 기능 플래그 기본값 오타
+- 예방 조치: PR 템플릿에 플래그 검증 체크리스트 추가
 ```
 
 ## 이 코드에서 주목할 점

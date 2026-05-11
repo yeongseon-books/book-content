@@ -17,7 +17,7 @@ tags:
   - Build
   - Image
 seo_description: Dockerfile 작성, multi-stage build, 이미지 최적화로 가볍고 안전한 컨테이너 만들기.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 컨테이너와 빌드
@@ -108,15 +108,15 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
 ## 이 코드에서 주목할 점
 
-- *변경 빈도* 가 낮은 명령을 *위* 에 둡니다.
-- *Slim/distroless* 이미지로 *공격 표면* 을 줄입니다.
-- *Non-root* 는 *기본값* 입니다.
+- *변경 빈도*가 낮은 명령을 위에 둡니다.
+- *Slim/distroless* 이미지로 *공격 표면*을 줄입니다.
+- *Non-root*는 기본값입니다.
 
 ## 자주 하는 실수 5가지
 
 1. **`latest` 태그 사용.** *재현 불가능*. 항상 *버전 고정*.
-2. **`COPY . .` 를 *처음에*.** 캐시 무효화로 *빌드 매번 처음부터*.
-3. **시크릿을 *이미지에 빌드*.** `docker history` 로 *추출* 됩니다.
+2. **`COPY . .`를 처음에 두기.** 캐시 무효화로 *빌드 매번 처음부터* 시작합니다.
+3. **시크릿을 *이미지에 빌드*.** `docker history`로 추출됩니다.
 4. **루트로 실행.** 컨테이너 탈출 시 *호스트 위험*.
 5. **이미지가 *1GB+*.** *push/pull* 이 느려지고 *콜드 스타트* 가 길어집니다.
 
@@ -133,7 +133,7 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
 ## 정리 및 다음 단계
 
-컨테이너는 *환경의 박제* 입니다. 다음 글에서는 컨테이너를 *모니터링* 하는 법을 배웁니다.
+컨테이너는 *환경의 박제*입니다. 다음 글에서는 컨테이너를 모니터링하는 법을 배웁니다.
 
 <!-- toc:begin -->
 - [DevOps란 무엇인가?](./01-what-is-devops.md)
