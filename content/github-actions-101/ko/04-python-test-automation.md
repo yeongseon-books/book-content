@@ -17,7 +17,7 @@ tags:
   - Testing
   - CICD
 seo_description: pytest, coverage, matrix까지. Python 프로젝트의 테스트를 PR마다 자동으로 돌리는 법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Python 테스트 자동화
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-테스트는 *수동* 일 때 *반드시 잊습니다*. *자동화* 만이 *모든 PR* 에서 동일한 신뢰를 보장합니다.
+테스트를 수동으로 돌리면 반드시 빠뜨리게 됩니다. 자동화만이 모든 PR에서 동일한 신뢰를 보장합니다.
 
 > *느린 CI* 는 *건너뛰는 CI* 가 됩니다.
 
@@ -90,7 +90,7 @@ steps:
       python-version: ${{ matrix.python }}
 ```
 
-### 5단계 — 실패 시 *캡처*
+### 5단계 — 실패 시 로그 수집
 
 ```yaml
 - name: dump logs on failure
@@ -110,12 +110,12 @@ steps:
 1. **`pip install` 마다 *전체 재설치*.** 캐시 누락.
 2. **`pytest -v` 를 *프로덕션 CI에서* 사용.** 로그 폭발.
 3. ***외부 네트워크 의존* 테스트.** *Flaky* 의 원인.
-4. **`junitxml` 없음.** PR 에 결과 *세부* 가 안 보임.
+4. **`junitxml` 없음.** PR 에 결과 세부 정보가 안 보임.
 5. **커버리지를 *목표 없이* 측정.** 숫자만 늘림.
 
 ## 실무에서는 이렇게 쓰입니다
 
-성숙한 팀은 *pytest-xdist* 로 *병렬화*, *flaky test* 는 *re-run* 정책으로 처리하고 *coverage 임계치* 를 PR 차단 조건으로 둡니다.
+성숙한 팀은 *pytest-xdist* 로 병렬화하고, *flaky test* 는 re-run 정책으로 처리하며, coverage 임계치를 PR 차단 조건으로 둡니다.
 
 ## 체크리스트
 

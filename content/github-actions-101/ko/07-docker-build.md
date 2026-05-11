@@ -17,7 +17,7 @@ tags:
   - GHCR
   - CICD
 seo_description: Buildx, 캐시, 멀티 플랫폼, GHCR push까지. CI에서 Docker 이미지를 표준대로 빌드하기.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Docker 빌드
@@ -96,8 +96,8 @@ permissions:
 
 ## 이 코드에서 주목할 점
 
-- *cache-to: gha, mode=max* 가 *layer 캐시* 를 *최대로* 활용합니다.
-- *멀티 플랫폼* 은 *비용* 이 *2배 이상* 듭니다.
+- *cache-to: gha, mode=max* 가 layer 캐시를 최대한 활용합니다.
+- 멀티 플랫폼 빌드는 비용이 두 배 이상 들 수 있습니다.
 - *GITHUB_TOKEN* 의 *packages: write* 권한이 필수.
 
 ## 자주 하는 실수 5가지

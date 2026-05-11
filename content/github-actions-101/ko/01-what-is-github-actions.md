@@ -17,7 +17,7 @@ tags:
   - DevOps
   - Workflow
 seo_description: GitHub Actions의 핵심 개념과 첫 워크플로우. 자동화로 반복을 없애는 시작점.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # GitHub Actions란 무엇인가?
@@ -44,7 +44,7 @@ flowchart LR
 
 **Before**: PR마다 *로컬에서 직접* 테스트를 돌리고 결과를 *Slack에 복붙* 한다.
 
-**After**: PR을 열면 *자동으로* 테스트가 돌고 *체크 표시* 가 PR에 붙는다.
+**After**: PR을 열면 테스트가 자동으로 돌고 체크 표시가 PR에 붙는다.
 
 ## 첫 워크플로우 5단계
 
@@ -57,7 +57,7 @@ mkdir -p .github/workflows
 ### 2단계 — 워크플로우 파일 작성
 
 ```yaml
-# .github/workflows/ci.yml
+# 워크플로우 파일: .github/workflows/ci.yml
 name: ci
 on:
   push:
@@ -101,7 +101,7 @@ test 가 실패하면 머지가 막힙니다.
 
 ## 이 코드에서 주목할 점
 
-- *YAML 한 파일* 이 *전체 자동화* 를 정의합니다.
+- YAML 한 파일이 전체 자동화를 정의합니다.
 - *checkout* 은 거의 *모든 워크플로우* 의 첫 step입니다.
 - *runs-on* 으로 *실행 환경* 을 선택합니다.
 

@@ -17,7 +17,7 @@ tags:
   - OIDC
   - CICD
 seo_description: Environments, approval, OIDC까지. PR 머지로부터 staging과 production까지 안전하게 자동 배포.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 배포 자동화
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*수동 배포* 는 *주말 출근* 의 원인입니다. 자동화는 *속도* 만이 아니라 *재현성* 을 줍니다.
+수동 배포는 주말 출근의 원인입니다. 자동화는 속도만이 아니라 재현성도 줍니다.
 
 > *배포 절차서가 인간의 머릿속* 에만 있으면 *언젠가 사고* 가 납니다.
 
@@ -41,9 +41,9 @@ flowchart LR
 
 ## Before/After
 
-**Before**: 누군가 *로컬에서* `kubectl apply` 한다. 무엇이 배포됐는지 *기록 없음*.
+**Before**: 누군가 로컬에서 `kubectl apply` 한다. 무엇이 배포됐는지 기록이 없습니다.
 
-**After**: PR 머지 → *자동 staging 배포* → *승인* → *production* . 모두 *Actions 로그* 로 추적.
+**After**: PR 머지 → staging 자동 배포 → 승인 → production. 모두 Actions 로그로 추적합니다.
 
 ## 배포 자동화 5단계
 
@@ -120,13 +120,13 @@ jobs:
 
 1. **`production` 에 *required reviewers 없음*.** 누구나 배포.
 2. **장기 *AWS 키* 를 secret 에 보관.** 유출 위험.
-3. **rollback 절차가 *문서로만*.** 새벽엔 못 찾음.
+3. **rollback 절차가 문서에만 있음.** 새벽에는 못 찾습니다.
 4. **staging 과 production 이 *다른 매니페스트*.** 표류 발생.
 5. **배포 결과를 *Slack/Issue 에 안 알림*.** 기록 누락.
 
 ## 실무에서는 이렇게 쓰입니다
 
-성숙한 팀은 *PR 머지* → *카나리* → *블루/그린* → *전체 롤아웃* 을 *한 워크플로우* 로 묶고, *Datadog/Grafana* 메트릭을 *자동 검증* 합니다.
+성숙한 팀은 PR 머지 → 카나리 → 블루/그린 → 전체 롤아웃을 한 워크플로우로 묶고, *Datadog/Grafana* 메트릭을 자동 검증합니다.
 
 ## 체크리스트
 

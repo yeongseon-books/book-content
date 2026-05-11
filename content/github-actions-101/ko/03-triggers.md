@@ -17,7 +17,7 @@ tags:
   - Schedule
   - CICD
 seo_description: push, PR, schedule, workflow_dispatch까지. 워크플로우를 언제 돌릴지 정확히 통제하기.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Trigger 이해하기
@@ -101,7 +101,7 @@ concurrency:
 
 ## 이 코드에서 주목할 점
 
-- *paths-ignore* 보다 *paths* 가 *명시적* 입니다.
+- *paths-ignore* 보다 *paths* 가 더 명확합니다.
 - *cron* 은 *UTC* 입니다. KST 변환 주의.
 - *cancel-in-progress* 는 *PR 푸시 연타* 비용을 줄입니다.
 
@@ -115,7 +115,7 @@ concurrency:
 
 ## 실무에서는 이렇게 쓰입니다
 
-성숙한 팀은 *PR* = *빠른 검증*, *main push* = *full test + build*, *nightly cron* = *느린 e2e*, *workflow_dispatch* = *프로덕션 배포* 로 트리거를 *역할별* 로 나눕니다.
+성숙한 팀은 *PR* 은 빠른 검증, *main push* 는 full test + build, *nightly cron* 은 느린 e2e, *workflow_dispatch* 는 프로덕션 배포처럼 트리거를 역할에 따라 나눕니다.
 
 ## 체크리스트
 

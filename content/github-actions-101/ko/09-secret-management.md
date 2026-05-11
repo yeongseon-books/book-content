@@ -17,7 +17,7 @@ tags:
   - OIDC
   - CICD
 seo_description: Repository/Environment/Organization secret 와 OIDC, mask, 회전 정책으로 안전한 비밀 관리
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Secret 관리
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*Secret 유출* 은 *복구 불가능* 합니다. 한 번 공개 로그에 찍히면 *영원히* 인터넷에 남습니다.
+Secret 유출은 복구가 거의 불가능합니다. 한 번 공개 로그에 찍히면 영원히 인터넷에 남습니다.
 
 > *Secret 의 가장 큰 위험은 *해커가 아니라 우리* 입니다. 무심코 echo 하는 순간 끝납니다.*
 
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Before/After
 
-**Before**: `.env` 파일을 *커밋* 하거나 `AWS_KEY` 를 *Slack DM* 으로 공유한다. 회전은 *수동, 1년에 한 번*.
+**Before**: `.env` 파일을 커밋하거나 `AWS_KEY` 를 Slack DM으로 공유한다. 회전은 수동으로 1년에 한 번 한다.
 
 **After**: secret 은 *GitHub UI* 에서만 관리. *OIDC* 로 *장기 키 0개*. *분기마다 자동 회전 알림*.
 
@@ -51,7 +51,7 @@ flowchart LR
 ### 1단계 — Repository secret 등록
 
 ```bash
-# UI 대신 gh CLI 로 등록
+# UI 대신 gh CLI로 등록
 gh secret set NPM_TOKEN --body "npm_xxx"
 gh secret set --env production DB_PASSWORD --body "***"
 ```
@@ -75,7 +75,7 @@ jobs:
 permissions:
   contents: read
   pull-requests: write
-  # 나머지는 기본값 'none'
+  # 나머지 권한은 기본값 'none'을 사용
 ```
 
 ### 4단계 — 동적 값 마스킹

@@ -17,7 +17,7 @@ tags:
   - Capstone
   - ReusableWorkflow
 seo_description: 1-9화를 묶어 PR, main, tag 별 CI/CD 파이프라인을 reusable workflow 로 표준화하는 실전 캡스톤
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 실전 CI/CD 파이프라인
@@ -50,7 +50,7 @@ flowchart LR
 ### 1단계 — Reusable workflow 정의
 
 ```yaml
-# .github/workflows/_ci.yml (org/template-repo)
+# 재사용 워크플로 파일: .github/workflows/_ci.yml (org/template-repo)
 on:
   workflow_call:
     inputs:
@@ -72,7 +72,7 @@ jobs:
 ### 2단계 — PR 단계 (lint + test)
 
 ```yaml
-# .github/workflows/pr.yml
+# PR 워크플로 파일: .github/workflows/pr.yml
 on:
   pull_request:
 jobs:
@@ -124,7 +124,7 @@ jobs:
 ### 5단계 — Composite action 으로 단계 묶기
 
 ```yaml
-# .github/actions/setup-app/action.yml
+# Composite action 파일: .github/actions/setup-app/action.yml
 runs:
   using: composite
   steps:
@@ -136,7 +136,7 @@ runs:
 
 ## 이 코드에서 주목할 점
 
-- *PR* 은 *피드백*, *main* 은 *배포*, *tag* 는 *릴리스*.
+- *PR* 은 피드백, *main* 은 배포, *tag* 는 릴리스 역할을 맡습니다.
 - *reusable workflow* 의 *버전 핀* (`@v1`) 으로 *깨짐 방지*.
 - *production environment* 가 *마지막 게이트*.
 
@@ -144,7 +144,7 @@ runs:
 
 1. **PR 에서 *전체 e2e* 실행.** 피드백이 30분 밖.
 2. **main 에서 *production 직배포*.** 카나리/staging 생략.
-3. **reusable workflow 를 `@main` 으로 호출.** 어느 날 *깨짐*.
+3. **reusable workflow 를 `@main` 으로 호출.** 어느 날 갑자기 깨집니다.
 4. **tag 없이 *production* 에 배포.** 무엇이 배포됐는지 *추적 불가*.
 5. **composite action 의 *입력 검증 없음*.** 잘못된 값으로 *조용히 통과*.
 
@@ -161,7 +161,7 @@ runs:
 
 ## 정리 및 다음 단계
 
-여기까지 따라왔다면 *현업 CI/CD 의 95%* 를 다룰 수 있습니다. 다음은 *Docker 101*, *Kubernetes 101*, *SRE 101* 으로 *런타임* 과 *운영* 을 깊이 배우세요.
+여기까지 따라왔다면 현업 CI/CD 의 95%를 다룰 수 있습니다. 다음은 *Docker 101*, *Kubernetes 101*, *SRE 101* 으로 런타임과 운영을 더 깊이 배우세요.
 
 <!-- toc:begin -->
 - [GitHub Actions란 무엇인가?](./01-what-is-github-actions.md)

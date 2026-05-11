@@ -17,7 +17,7 @@ tags:
   - Release
   - CICD
 seo_description: upload-artifact, download-artifact, release까지. 빌드 결과물을 안전하게 보관하고 전달하는 법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # 빌드 아티팩트
@@ -116,7 +116,7 @@ deploy:
 1. **`upload-artifact@v3` 가 *deprecated*.** v4 로 업그레이드.
 2. ***모든 파일* 을 업로드.** *비용 폭발*.
 3. **`retention-days` 미설정.** *기본 90일* 로 누적.
-4. ***아티팩트 이름* 을 *덮어씀*.** 같은 이름 두 번이면 *오류*.
+4. **아티팩트 이름을 덮어씀.** 같은 이름을 두 번 쓰면 오류가 납니다.
 5. ***Release* 에 *체크섬 없음*.** 변조 검증 불가.
 
 ## 실무에서는 이렇게 쓰입니다
@@ -128,7 +128,7 @@ deploy:
 - [ ] *upload-artifact@v4* 를 사용한다.
 - [ ] *retention-days* 가 명시됐다.
 - [ ] *Release* 가 *tag push* 로 자동 발행된다.
-- [ ] *체크섬* 또는 *서명* 이 첨부된다.
+- [ ] 체크섬 또는 서명이 첨부된다.
 
 ## 정리 및 다음 단계
 

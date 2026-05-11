@@ -17,7 +17,7 @@ tags:
   - Mypy
   - QualityGate
 seo_description: ruff, mypy, pre-commit으로 PR 머지 전 코드 품질을 자동 검사하는 방법.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-11'
 ---
 
 # Lint와 Type Check
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 ## 이 글에서 다룰 문제
 
-*린트와 타입* 은 *리뷰어가 가장 먼저 잡는 것* 입니다. 자동화하면 *리뷰* 가 *설계 토론* 에 집중할 수 있습니다.
+린트와 타입 검사는 리뷰어가 가장 먼저 잡는 항목입니다. 자동화하면 리뷰가 설계 토론에 집중할 수 있습니다.
 
 > *형식 검사 자동화* 는 *리뷰 시간* 을 절반으로 줄입니다.
 
@@ -44,7 +44,7 @@ flowchart LR
 
 **Before**: 리뷰어가 *세미콜론, 줄 길이, 타입* 을 *한 줄 한 줄* 지적한다.
 
-**After**: PR 에 *Lint passed*, *Type-check passed* 가 자동으로 붙고 *리뷰* 는 *로직* 만 본다.
+**After**: PR 에 *Lint passed*, *Type-check passed* 가 자동으로 붙고 리뷰는 로직만 본다.
 
 ## 품질 게이트 5단계
 
@@ -82,7 +82,7 @@ strict = true
 ### 4단계 — pre-commit 통합
 
 ```yaml
-# .pre-commit-config.yaml
+# 설정 파일: .pre-commit-config.yaml
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.0
@@ -100,16 +100,16 @@ repos:
 ## 이 코드에서 주목할 점
 
 - *ruff* 한 도구가 *flake8 + isort + black* 을 대체합니다.
-- *strict* mypy 는 *처음부터* 켜는 게 *전환 비용* 이 작습니다.
+- *strict* mypy 는 처음부터 켜는 편이 전환 비용이 작습니다.
 - *pre-commit* 으로 *CI 가 잡기 전* 에 잡습니다.
 
 ## 자주 하는 실수 5가지
 
 1. **CI 만 두고 *로컬에 안 깖*.** 매번 *PR 에서* 깨짐.
 2. **rule 을 *너무 풀어서* 켬.** 의미가 없어짐.
-3. **`mypy` 를 *부분만* 적용.** 경계에서 *any* 가 흘러다님.
+3. **`mypy` 를 일부에만 적용.** 경계에서 *any* 가 흘러다님.
 4. **`ruff format` 을 *PR 마다 자동 commit* 시킴.** 머지 충돌.
-5. **`pyproject.toml` 설정 *분산*.** 어느 게 진짜인지 모름.
+5. **`pyproject.toml` 설정이 여러 곳에 흩어짐.** 어느 게 진짜인지 모름.
 
 ## 실무에서는 이렇게 쓰입니다
 
