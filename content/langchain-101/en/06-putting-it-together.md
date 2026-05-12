@@ -21,6 +21,10 @@ seo_description: The integrated chain is not a new abstraction; it is the same R
 
 # Putting it together — a complete chain in one file
 
+By the time you reach a real LangChain application, the challenge is no longer understanding each component in isolation. The real work is keeping indexing, retrieval, prompting, tool use, and output delivery separate enough that one integrated chain still stays debuggable.
+
+This is the final post in the LangChain 101 series. It assembles the earlier pieces into one executable RAG chain without losing the boundaries that make the system maintainable.
+
 ## Questions this post answers
 
 - How do the Runnables from the previous posts combine into one executable RAG chain

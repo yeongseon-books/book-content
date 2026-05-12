@@ -21,6 +21,10 @@ seo_description: Tool calling works when the model stops pretending to do the wo
 
 # Tool calling — connecting external tools
 
+As soon as an LLM needs current data, calculations, or side effects, prompt engineering stops being enough. Tool calling is the handoff point where the model chooses what should run and the application decides how safely to run it.
+
+This is the fourth post in the LangChain 101 series. It shows how tool metadata, execution loops, and result reinjection turn model output into real function calls.
+
 ## Questions this post answers
 
 - How is tool calling different from a normal prompt-only chain

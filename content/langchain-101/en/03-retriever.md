@@ -21,6 +21,10 @@ seo_description: A Retriever does not store knowledge by itself; it turns a ques
 
 # Retriever — document search and context injection
 
+RAG quality is often decided before the model writes a single token. If retrieval brings back the wrong chunks, prompt tuning rarely saves the answer, so the search boundary deserves attention first.
+
+This is the third post in the LangChain 101 series. It covers Retrievers, VectorStores, and the basic pattern for injecting retrieved context into an LLM prompt.
+
 ## Questions this post answers
 
 - Why does LangChain separate a Retriever from the underlying VectorStore

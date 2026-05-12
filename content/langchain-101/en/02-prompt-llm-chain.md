@@ -21,6 +21,10 @@ seo_description: A prompt chain is not string concatenation with extra steps; it
 
 # Prompt and LLM chain — assembling your first chain
 
+Once LCEL makes sense, the next question is where the real chain logic actually lives. In practice, that usually means prompt construction, output parsing, and the small input-shaping decisions that determine whether the rest of the pipeline stays readable.
+
+This is the second post in the LangChain 101 series. It shows how prompt templates, parsers, and passthrough steps turn LCEL basics into a practical first chain.
+
 ## Questions this post answers
 
 - How do `system` and `human` messages divide responsibility in `ChatPromptTemplate`

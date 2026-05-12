@@ -21,6 +21,10 @@ seo_description: In LangChain, most components become interchangeable once their
 
 # LangChain introduction — LCEL and the Runnable interface
 
+LangChain gets easier once you stop treating it as a pile of abstractions and start treating it as a pipeline library. Most real applications still do the same three things—shape input, call a model, and normalize output—and this post starts with the contract that makes those steps composable.
+
+This is the first post in the LangChain 101 series. It explains LCEL and the Runnable interface as the execution model behind a basic LangChain pipeline.
+
 ## Questions this post answers
 
 - Why does LCEL exist, and what glue code does it remove

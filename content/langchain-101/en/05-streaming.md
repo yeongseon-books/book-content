@@ -21,6 +21,10 @@ seo_description: Streaming is not a different chain design; it is a different wa
 
 # Streaming — handling real-time output
 
+Long model responses feel slow even when total latency is acceptable. Streaming changes that experience by letting the same chain surface useful output before the full response is finished.
+
+This is the fifth post in the LangChain 101 series. It covers `stream()`, `astream()`, and the practical patterns for delivering partial output to users.
+
 ## Questions this post answers
 
 - How does the return shape change when you switch from `invoke()` to `stream()`
