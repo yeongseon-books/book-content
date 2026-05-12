@@ -26,6 +26,8 @@ Scaling in AKS gets confusing because the word “scale” points at more than o
 
 They are related, but they are not the same. This post separates them by input signal, control target, and operating layer.
 
+This is the sixth post in the Azure Kubernetes Service 101 series. Here, we sort out how HPA, Cluster Autoscaler, and KEDA each react to demand and which layer of capacity each one changes.
+
 ---
 
 ## Questions this chapter answers

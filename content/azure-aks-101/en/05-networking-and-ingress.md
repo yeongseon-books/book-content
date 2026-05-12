@@ -26,6 +26,8 @@ Networking is where AKS often stops feeling simple. Pods can talk to each other,
 
 They get easier once you separate two layers: how pod IPs are assigned, and how external HTTP traffic gets from the edge into Services inside the cluster. This post is about keeping those layers straight.
 
+This is the fifth post in the Azure Kubernetes Service 101 series. Here, we connect the workload model to AKS networking by separating pod IP design from Ingress and external traffic flow.
+
 ---
 
 ## Questions this chapter answers

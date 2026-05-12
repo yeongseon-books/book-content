@@ -26,6 +26,8 @@ AKS is not done once deployment works. That is when operations starts. Why are p
 
 This final post is a 101-level operations map for AKS: what Container Insights gives you, where KQL fits, why kube-state-metrics matters, and where alerts should live.
 
+This is the final post in the Azure Kubernetes Service 101 series. Here, we tie the earlier cluster, traffic, and scaling model together from an observability and day-2 operations perspective.
+
 ---
 
 ## The operations view in one diagram

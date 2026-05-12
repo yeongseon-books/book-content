@@ -26,6 +26,8 @@ Kubernetes stays abstract for too long if you only study the nouns. The model ge
 
 This post creates a small AKS cluster, adds a user node pool, and deploys a minimal FastAPI application with a Deployment and a Service. The example stays intentionally small, but the shape matches the way real AKS environments are organized.
 
+This is the third post in the Azure Kubernetes Service 101 series. Here, we take the cluster model from the earlier posts and turn it into a working AKS deployment with a small FastAPI app.
+
 ---
 
 ## Questions this chapter answers

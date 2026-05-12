@@ -26,6 +26,8 @@ The first time you read Kubernetes manifests, the objects can feel unnecessarily
 
 This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling stay fuzzy too.
 
+This is the fourth post in the Azure Kubernetes Service 101 series. Here, we separate Pod, Deployment, and Service so the workload model behind the earlier FastAPI example becomes explicit.
+
 ---
 
 ## Questions this chapter answers

@@ -26,6 +26,8 @@ seo_description: 처음 Kubernetes YAML을 보면 비슷해 보이는 객체가 
 
 이번 글에서는 “컨테이너 하나 띄우기”라는 요구가 왜 세 객체로 나뉘는지 설명합니다. AKS를 쓰더라도 이 개념은 그대로 Kubernetes 자체의 언어이기 때문에, 여기서 헷갈리면 뒤의 Ingress와 HPA도 같이 흐려집니다.
 
+이 글은 Azure Kubernetes Service 101 시리즈의 4번째 글입니다. 여기서는 앞선 실습에서 사용한 Pod, Deployment, Service를 각각 어떤 문제를 푸는 객체인지 분리해서 설명합니다.
+
 ---
 
 ## 세 객체를 한 장으로 보면

@@ -26,6 +26,8 @@ The first structural split to get right in AKS is the split between the cluster'
 
 This post is about reading that boundary. We'll look at what the control plane does, why system and user node pools exist, and where Spot capacity fits into the picture.
 
+This is the second post in the Azure Kubernetes Service 101 series. Here, we turn the managed-Kubernetes boundary into a concrete cluster shape by looking at the control plane, node pools, and their operational roles.
+
 ---
 
 ## Questions this chapter answers

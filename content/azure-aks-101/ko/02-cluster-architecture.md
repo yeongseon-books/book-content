@@ -26,6 +26,8 @@ AKS를 이해할 때 가장 먼저 분리해야 하는 것은 “클러스터의
 
 이번 글은 그 경계를 읽는 연습입니다. Control Plane이 무엇을 맡고, System node pool과 User node pool이 왜 나뉘며, Spot과 일반 노드를 언제 써야 하는지까지 한 번에 묶어 보겠습니다.
 
+이 글은 Azure Kubernetes Service 101 시리즈의 2번째 글입니다. 여기서는 AKS의 관리 경계를 실제 클러스터 구조로 바꾸어 Control Plane과 Node Pool의 역할을 구체적으로 봅니다.
+
 ---
 
 ## 클러스터를 반으로 자르면 보이는 것
