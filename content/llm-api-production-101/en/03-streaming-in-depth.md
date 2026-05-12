@@ -30,6 +30,8 @@ That means a streamed response should not be treated like an ordinary completion
 
 This post focuses on the consumer side of the Groq streaming path. We will start with the normal chunk loop, then harden it by treating empty deltas as normal, enforcing read timeouts outside the blocking loop, and returning partial results alongside error states.
 
+This is the third post in the LLM API Production 101 series. Here we focus on chunk handling, timeout control, and recovery paths for incomplete streams.
+
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
 ![Streaming in depth: chunk handling and error recovery](../../../assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)

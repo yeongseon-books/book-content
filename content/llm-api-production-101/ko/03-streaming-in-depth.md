@@ -30,6 +30,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-1
 
 이번 글에서는 Groq Python SDK를 기준으로 청크 처리 루프를 강화합니다. `delta.content`가 없는 청크를 건너뛰는 기본기부터, 동기 루프 바깥에서 읽기 타임아웃을 거는 패턴, 네트워크 오류가 발생했을 때 부분 결과를 보존하는 복구 흐름까지 다룹니다. 목표는 멋진 실시간 출력이 아니라, **중간에 흔들려도 무슨 일이 일어났는지 설명 가능한 스트리밍 소비자**를 만드는 것입니다.
 
+이 글은 LLM API 프로덕션 101 시리즈의 세 번째 글입니다. 여기서는 스트리밍 응답에서 청크를 처리하고 오류 뒤에도 부분 결과를 복구하는 방법을 다룹니다.
+
 ![스트리밍 심화: 청크 처리와 오류 복구](../../../assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.ko.png)
 
 *스트리밍 심화: 청크 처리와 오류 복구*

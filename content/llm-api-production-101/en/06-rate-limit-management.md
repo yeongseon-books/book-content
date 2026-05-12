@@ -30,6 +30,8 @@ Systems usually fail here in one of two directions. The first is doing nothing a
 
 This post implements two simple local limiters for that job: a token bucket and a sliding-window limiter. The goal is not to model every provider policy in abstract detail. It is to build the smallest application-side control layer that can shape request flow before the provider has to reject it.
 
+This is the final post in the LLM API Production 101 series. Here we focus on token-bucket and sliding-window patterns that keep request flow inside rate limits.
+
 The main idea is simple: **rate-limit handling is not apologizing after a 429, it is controlling request flow before the 429 happens**.
 
 ![Rate limit management: patterns for staying within limits](../../../assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)

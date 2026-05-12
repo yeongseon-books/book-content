@@ -30,6 +30,8 @@ One of the most common mistakes is retrying everything. Teams catch a broad exce
 
 That is why retries work only when they begin with error classification. A retry policy is not “try again when something goes wrong.” It is “retry only the failures that are likely to be transient, with bounded backoff and explicit stop conditions.” In this post, we will use `tenacity` to build that policy around a Groq API call.
 
+This is the fifth post in the LLM API Production 101 series. Here we focus on error classification and bounded retry policies for reliable API calls.
+
 The main idea is simple: **a retry is not a friendly loop, it is a bounded recovery strategy built on top of error classification**.
 
 ![Retry and error handling: making API calls reliable](../../../assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)

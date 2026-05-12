@@ -30,6 +30,8 @@ That is what caching means in this context. The idea is familiar from web server
 
 This post builds the smallest useful cache for an LLM API path: an in-memory cache keyed by a request hash, with TTL-based expiration. The goal is not to jump immediately to Redis or distributed cache design. The goal is to make the core contract precise first: which inputs define sameness, how long a cached answer remains trustworthy, and which responses should never be cached at all.
 
+This is the fourth post in the LLM API Production 101 series. Here we focus on request-hash caching strategies that reduce both cost and latency.
+
 The main idea is simple: **an LLM cache is not a box for prompt outputs, it is a contract for when a request should not be recomputed**.
 
 ![Caching strategies: reducing cost and latency](../../../assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)

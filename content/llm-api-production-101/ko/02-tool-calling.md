@@ -30,6 +30,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-1
 
 이번 글에서는 Groq API의 `tools` 파라미터와 `tool_calls` 응답을 기준으로, 함수 실행 루프를 끝까지 만듭니다. 모델이 도구를 선택하면 애플리케이션은 인자를 파싱하고, 실제 Python 함수를 실행하고, 그 결과를 다시 대화에 넣어 한 번 더 모델을 부릅니다. 이 루프를 정확히 이해해야 나중에 검색, 데이터 조회, 외부 API 연동 같은 기능을 안정적으로 붙일 수 있습니다.
 
+이 글은 LLM API 프로덕션 101 시리즈의 두 번째 글입니다. 여기서는 모델 응답을 실제 함수 실행으로 연결하는 툴 호출 루프를 다룹니다.
+
 핵심은 간단합니다. **툴 호출은 모델 자율성이 아니라 애플리케이션이 설계한 실행 경계입니다.**
 
 ![툴 호출: 함수를 모델에 연결하기](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png)

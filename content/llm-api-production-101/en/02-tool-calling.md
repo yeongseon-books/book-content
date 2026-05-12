@@ -32,6 +32,8 @@ Tool calling is a cleaner contract. The application publishes an explicit toolbo
 
 In this post, we will build the full loop with Groq's `tools` parameter and the `tool_calls` response field. The model will decide when a tool is needed, the application will parse and execute the requested call, and the tool result will be fed back into the conversation so the model can produce a final answer.
 
+This is the second post in the LLM API Production 101 series. Here we focus on connecting model responses to application functions through a controlled tool-calling loop.
+
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
 ![Tool calling: connecting functions to the model](../../../assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)

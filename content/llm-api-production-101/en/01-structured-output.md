@@ -32,6 +32,8 @@ This article turns that loose boundary into an explicit interface. We will use G
 
 We will cover five things: why natural-language parsing breaks under production pressure, what JSON mode does and does not guarantee, how to request structured output with the Groq Python SDK, how to validate it with Pydantic, and how to think about logging and recovery when the contract fails.
 
+This is the first post in the LLM API Production 101 series. Here we focus on building a structured-output contract with JSON mode and response schemas.
+
 The main idea is simple: **structured output in production is a contract design problem, not a prompt trick**.
 
 ![Structured output: JSON mode and response schemas](../../../assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
