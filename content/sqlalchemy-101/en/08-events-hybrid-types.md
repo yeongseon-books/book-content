@@ -24,6 +24,10 @@ seo_description: Think of SQLAlchemy extension points as three layers. The type 
 
 # Events, hybrid_property, and custom types
 
+It helps to think about SQLAlchemy extension points as three layers: types, attributes, and events. This post uses that frame to connect events, `hybrid_property`, and custom types.
+
+This is the 8th article in the SQLAlchemy 101 series.
+
 ![Events, hybrid_property, and custom types](../../../assets/sqlalchemy-101/08/08-01-events-hybrid-property-and-custom-types.en.png)
 
 *Events, hybrid_property, and custom types*

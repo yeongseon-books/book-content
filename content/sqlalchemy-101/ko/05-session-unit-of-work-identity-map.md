@@ -26,6 +26,8 @@ seo_description: Session은 작업 메모지(Unit of Work)와 캐시 노트(Iden
 
 Ep4에서 정의한 ORM 모델은 그 자체만으로는 동작하지 않습니다. 모델 인스턴스를 데이터베이스에 반영하고, 데이터베이스에서 가져온 행을 객체로 다루려면 `Session`이 필요합니다. SQLAlchemy의 `Session`은 단순한 커넥션 래퍼가 아니라, "어떤 객체가 새로 생겼고, 어떤 객체가 변경되었으며, 어떤 객체가 삭제될 예정인지"를 추적하는 작업 단위(Unit of Work) 관리자입니다. 그리고 같은 `Session` 안에서 동일 PK의 행은 항상 동일한 파이썬 객체로 보장하는 Identity Map이 함께 동작합니다. 이번 글에서는 두 메커니즘이 실제로 어떻게 굴러가는지를 코드와 함께 살펴봅니다.
 
+이 글은 SQLAlchemy 101 시리즈의 다섯 번째 글입니다.
+
 ![Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리](../../../assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.ko.png)
 
 *Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리*

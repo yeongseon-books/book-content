@@ -25,6 +25,8 @@ seo_description: '"관계 속성에 처음 접근하면 SELECT가 한 번 발사
 
 ORM이 가장 많이 욕을 먹는 지점은 늘 같습니다. "왜 SELECT가 100번 나가나요?" 답은 보통 N+1 쿼리 패턴입니다. Ep6에서 다룬 `relationship`은 기본적으로 lazy 로딩으로 동작하기 때문에, 부모 컬렉션 안의 N개 객체에 대해 자식 속성을 접근하면 자식을 가져오는 SELECT가 N번 추가로 발사됩니다. 이번 글에서는 N+1이 실제로 어떻게 만들어지는지 echo 로그로 직접 확인하고, `joinedload`, `selectinload`, `raiseload` 같은 도구로 어떻게 막거나 노출시키는지 정리합니다.
 
+이 글은 SQLAlchemy 101 시리즈의 일곱 번째 글입니다.
+
 ![로딩 전략과 N+1 문제 - lazy/joined/selectin 선택 기준](../../../assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.ko.png)
 
 *로딩 전략과 N+1 문제 - lazy/joined/selectin 선택 기준*

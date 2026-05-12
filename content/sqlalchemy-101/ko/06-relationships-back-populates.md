@@ -25,6 +25,8 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 데이터베이스에서 가장 많이 다루는 작업 중 하나는 "관련된 행을 함께 가져오는 것"입니다. 사용자 한 명의 주문 목록, 게시글 한 건의 댓글, 태그가 여러 개 달린 글. SQL에서는 JOIN으로 처리하지만, ORM에서는 객체의 속성 접근(`user.orders`)으로 자연스럽게 표현됩니다. 그 다리를 놓는 도구가 `relationship()`이고, 양방향 탐색을 모순 없이 잇는 장치가 `back_populates`입니다. 이번 글에서는 일대다, 다대일, 다대다 관계를 차례로 정의하고, 양쪽이 같은 데이터를 가리키도록 안전하게 동기화하는 패턴을 정리합니다.
 
+이 글은 SQLAlchemy 101 시리즈의 여섯 번째 글입니다.
+
 ![ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
 
 *ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기*

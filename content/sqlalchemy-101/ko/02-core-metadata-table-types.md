@@ -24,6 +24,10 @@ seo_description: MetaData는 schema의 카탈로그입니다. application이 알
 
 # SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
 
+MetaData는 application이 알고 있는 모든 Table 정의를 모아 두는 schema 카탈로그입니다. 여기서는 그 구조가 SQLAlchemy Core의 출발점이 되는 이유를 정리합니다.
+
+이 글은 SQLAlchemy 101 시리즈의 두 번째 글입니다.
+
 > SQLAlchemy 101 시리즈 (2/10)
 
 ---

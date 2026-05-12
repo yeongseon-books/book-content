@@ -26,6 +26,8 @@ seo_description: A Session is a notebook that bundles a working scratch pad (Uni
 
 The ORM models from Ep4 do nothing on their own. To push instances back to the database and to read rows back as objects, you need a `Session`. SQLAlchemy's `Session` is more than a connection wrapper - it is a Unit of Work manager that tracks which objects are new, which were modified, and which are scheduled for deletion. It also maintains an Identity Map so that, within a single session, the same primary key always corresponds to the same Python object. This article walks through both mechanisms with real code.
 
+This is the 5th article in the SQLAlchemy 101 series.
+
 ![Session in Depth: how unit of work and identity map actually work](../../../assets/sqlalchemy-101/05/05-01-session-in-depth-how-unit-of-work-and-id.en.png)
 
 *Session in Depth: how unit of work and identity map actually work*

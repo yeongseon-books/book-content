@@ -26,6 +26,8 @@ seo_description: '"Touching a relationship attribute for the first time fires on
 
 The most common complaint about ORMs always lands in the same place: "Why am I seeing 100 SELECTs?" The answer is usually the N+1 query pattern. The `relationship()` we built in Ep6 defaults to lazy loading, so accessing a child attribute on each of N parent objects fires N additional SELECTs. This article shows how N+1 actually arises (with `echo=True` logs you can read line by line), and how to prevent or expose it with `joinedload`, `selectinload`, and `raiseload`.
 
+This is the 7th article in the SQLAlchemy 101 series.
+
 ![Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin](../../../assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.en.png)
 
 *Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin*
