@@ -14,55 +14,62 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때
 
-> Azure Functions Deep Dive 시리즈 (6/6)
+스케일아웃은 왜 새 인스턴스가 생겼는지를 설명해 줍니다. 하지만 사용자가 체감하는 문제는 그 다음에 남습니다. 어떤 인스턴스는 첫 요청을 거의 즉시 처리하는데, 어떤 인스턴스는 몇 초를 기다리게 만듭니다. 이 차이는 새 인스턴스가 **placeholder 상태에서 specialization 상태로 넘어가는 경로**에 숨어 있습니다.
 
-스케일아웃이 새 인스턴스의 탄생 이유를 설명해 준다면, 콜드 스타트는 그 인스턴스가 왜 어떤 날은 즉시 응답하고 어떤 날은 느리게 느껴지는지를 설명합니다. 그 차이는 placeholder에서 specialization으로 넘어가는 경로에 숨어 있습니다.
+콜드 스타트는 종종 “서버리스는 느리다”는 한 문장으로 소비되지만, 실제 비용은 하나가 아닙니다. VM 할당, 호스트 부팅, DI 컨테이너 준비, 코드 주입, 워커 재구성, `ScriptHost` 재시작이 서로 다른 단계로 쌓입니다. 따라서 정확한 운영 판단을 하려면 “콜드 스타트가 있다”가 아니라 “콜드 스타트 비용의 어느 부분이 공통이고 어느 부분이 사용자별인지”를 봐야 합니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 마지막 글입니다. 여기서는 placeholder 초기화부터 specialization, 호스트 재시작까지 콜드 스타트의 실제 코드 경로를 따라갑니다.
+이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 `StandbyManager`, `PlaceholderSpecializationMiddleware`, `HostWarmupMiddleware`를 따라 placeholder 초기화, warmup, specialization, host restart까지 이어지는 경로를 정리합니다. 시리즈 마지막 글로서 앞선 다섯 편의 설명이 모두 여기로 모입니다.
 
-## Source Version
+이 글은 Azure Functions Deep Dive 시리즈의 마지막 글입니다.
 
-이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+이제 사용자가 실제로 체감하는 cold start가 어떤 코드 경로의 합으로 만들어지는지 끝까지 따라가겠습니다.
 
-5화에서 Scale Controller가 인스턴스 수를 늘리기로 결정하는 과정을 봤습니다. 이번 화는 그 다음에 일어나는 일입니다.
+## 이 글에서 다룰 문제
 
-> 새 인스턴스가 추가될 때, 그 안에서는 정확히 무슨 일이 일어나는가? 그리고 왜 어떤 인스턴스는 1초 안에 첫 요청을 처리하고, 어떤 인스턴스는 5초 넘게 걸리는가?
+- 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?
+- Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?
+- Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?
+- cold start를 줄이기 위한 코드 수준의 레버는 무엇일까요?
+- SLO 문서 안에서 cold-start 지표를 어떻게 표현해야 할까요?
 
-이 차이를 만드는 핵심이 Placeholder Mode입니다. 이 화는 호스트가 placeholder로 시작해서 specialization으로 넘어가는 코드 경로를 따라갑니다. 그리고 입문 6화에서 다룬 콜드 스타트라는 사용자 관점의 문제를 호스트 코드 레벨에서 다시 봅니다.
+## 왜 이 글이 중요한가
 
-> 모든 코드 인용은 [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+콜드 스타트는 비용과 지연 시간을 동시에 흔드는 주제입니다. 잘못 이해하면 “함수가 느리다”는 감각적인 표현만 남고, 실제로는 플랫폼이 미리 해 둘 수 있는 일과 사용자 코드 때문에 뒤로 밀리는 일을 구분하지 못하게 됩니다. 이 구분이 없으면 Always Ready, Premium pre-warmed, 의존성 경량화, lazy initialization 같은 대안을 서로 다른 층의 해결책으로 비교하지 못합니다.
 
----
+또한 Placeholder Mode는 단순한 마케팅 용어가 아니라 호스트 코드에 실제로 드러나는 실행 전략입니다. 플랫폼은 사용자와 무관한 부트스트랩 단계를 미리 끝내 두고, 사용자가 배정된 뒤에만 specialization을 수행합니다. 즉 cold start 최적화는 “아무튼 빨리 한다”가 아니라 **공통 단계와 사용자별 단계를 분리하는 실행 모델**입니다.
 
-## 콜드 스타트가 왜 비싼가 — 부트스트랩 비용의 분해
+시리즈 전체 관점에서도 이 글은 중요합니다. 1화에서 본 host bootstrap, 2화의 worker process, 3~4화의 host-worker protocol과 invocation, 5화의 scale-out이 모두 마지막에 새 인스턴스 한 대의 생애 주기로 다시 합쳐집니다. 이 마지막 그림이 잡혀야 Functions 운영 모델이 하나의 구조로 닫힙니다.
 
-먼저 새 인스턴스 하나가 처음부터 함수를 실행할 준비가 될 때까지 어떤 단계들을 거치는지 정리하겠습니다.
+## 콜드 스타트를 이해하는 가장 좋은 방법: 사용자와 무관한 공통 부트스트랩을 placeholder가 미리 끝내고, 사용자별 나머지를 specialization 단계로 덧입힌다고 보는 것입니다
+
+콜드 스타트 비용은 하나의 거대한 지연이 아닙니다. VM 할당부터 DI 컨테이너 준비까지는 사용자 코드와 무관한 공통 비용이고, 코드 주입 이후는 사용자별 비용입니다. Placeholder Mode의 발상은 바로 이 선을 이용합니다. 플랫폼이 공통 비용을 미리 지불해 두고, 사용자가 실제로 배정되면 그 위에 specialization만 올리는 구조입니다.
+
+이 관점을 잡으면 cold start 감소 전략도 훨씬 명확해집니다. Always Ready나 Premium pre-warmed는 specialization 이전 상태를 어디까지 미리 끝내 두느냐의 문제이고, 의존성 경량화는 specialization 이후 `RestartHostAsync` 비용을 얼마나 줄이느냐의 문제입니다. 서로 다른 지연을 다른 레버로 줄이는 셈입니다.
+
+> 이번 글의 핵심은 cold start를 단일 현상이 아니라 “공통 placeholder 준비 + 사용자별 specialization + host restart”의 합으로 보는 것입니다.
+
+## 핵심 개념
+
+### 먼저 cold start 비용을 공통 단계와 사용자 단계로 나눠 봐야 합니다
+
+새 인스턴스가 처음부터 함수를 실행할 준비가 될 때까지 거치는 단계는 다음처럼 나눌 수 있습니다.
 
 ![공통 부트스트랩과 사용자 단계 분해](../../../assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
 
-*공통 부트스트랩과 사용자 단계 분해*
-1번부터 5번까지(VM 할당 ~ DI 컨테이너 빌드)는 **사용자 코드와 무관**합니다. 누구의 함수든 똑같이 거치는 단계입니다. 6번부터(코드 다운로드)부터 사용자별로 달라집니다.
+1번부터 5번까지, 즉 VM 할당부터 DI 컨테이너 빌드까지는 **사용자 코드와 무관한 공통 부트스트랩**입니다. 6번 이후 코드 주입, 실제 런타임 환경 반영, worker specialization, host restart는 사용자별 단계입니다. Placeholder Mode는 바로 이 분리를 이용해 1~5번을 미리 끝내 둡니다.
 
-Placeholder Mode의 아이디어는 정확히 이 분리를 이용합니다.
+### Placeholder는 `StandbyManager.InitializeAsync`에서 시작됩니다
 
-> 1~5번까지를 미리, 사용자와 무관하게 만들어 둡니다. 사용자가 도착하면 그 위에 6~9번만 입혀서 "특수화(specialization)"합니다.
-
-이게 같은 호스트 바이너리로 콜드 스타트를 줄이는 방법입니다. 코드를 보면 그 동작이 분명해집니다.
-
----
-
-## Placeholder가 이미 해둔 것 — `StandbyManager.InitializeAsync`
-
-Functions 플랫폼은 사용자가 없는 상태에서도 워밍된 인스턴스 풀을 미리 만들어 둡니다. 이 인스턴스들은 진짜 사용자 앱이 아니라 **placeholder 앱**으로 시작합니다. placeholder 상태에서 호스트가 무엇을 미리 해두는지는 [`StandbyManager.InitializeAsync`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L173-L190)와 그 뒤 warmup 요청을 처리하는 [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85)를 같이 봐야 보입니다.
+플랫폼은 사용자가 없어도 warmed instance pool을 유지합니다. 이 인스턴스는 곧바로 사용자 앱으로 뜨지 않고 placeholder app으로 시작합니다. placeholder 단계에서 호스트가 실제로 해 두는 일은 `StandbyManager.InitializeAsync`와 warmup 경로를 함께 봐야 드러납니다.
 
 ```csharp
-// 파일: src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
+// src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
 public async Task InitializeAsync()
 {
     using (_metricsLogger.LatencyEvent(MetricEventNames.SpecializationStandbyManagerInitialize))
@@ -71,16 +78,16 @@ public async Task InitializeAsync()
         {
             try
             {
-                // 함수가 placeholder mode에서 초기화됐음을 나타내는 플래그
+                // Flag to indicate a function was initialized from placeholder mode
                 _environment.SetEnvironmentVariable(
                     EnvironmentSettingNames.InitializedFromPlaceholder, bool.TrueString);
 
                 await CreateStandbyWarmupFunctions();
 
-                // 특수화 시점을 식별하기 위한 백그라운드 타이머 시작
-                // 특수화는 보통 HTTP 요청(예: scale controller
-                // ping)으로 일어나지만, 요청이 오지 않는 경우도 있어
-                // 그때를 대비해 이 타이머도 함께 시작합니다
+                // start a background timer to identify when specialization happens
+                // specialization usually happens via an http request (e.g. scale controller
+                // ping) but this timer is started as well to handle cases where we
+                // might not receive a request
                 _specializationTimer = new Timer(
                     OnSpecializationTimerTick, null,
                     _specializationTimerInterval, _specializationTimerInterval);
@@ -94,13 +101,11 @@ public async Task InitializeAsync()
 }
 ```
 
-코드를 풀어 쓰면 다음과 같습니다.
+이 코드는 세 가지를 합니다. `InitializedFromPlaceholder` 환경변수를 세팅하고, placeholder 전용 `WarmUp` 함수 파일을 만들고, specialization 감지를 위한 50ms 주기 타이머를 시작합니다. 즉 placeholder는 빈 껍데기가 아니라 **warmup 전용 준비 상태를 가진 호스트**입니다.
 
-1. `InitializedFromPlaceholder` 환경변수를 세팅 — 이 플래그는 나중에 진짜 앱이 시작됐을 때 "이 인스턴스는 placeholder에서 출발했다"는 표시로 쓰입니다.
-2. `CreateStandbyWarmupFunctions()` — placeholder 시점에서 쓸 `WarmUp` 함수 디렉토리와 파일을 만듭니다.
-3. 50ms 주기 타이머를 시작 — 요청이 안 와도 specialization을 감지하기 위한 폴백 신호입니다.
+### placeholder phase는 `WarmUp` 함수 파일과 JIT 준비 경로를 만듭니다
 
-가짜 함수가 무엇인지는 같은 파일의 `CreateStandbyWarmupFunctions`를 보면 분명해집니다.
+`CreateStandbyWarmupFunctions()`는 실제로 `WarmUp` 함수 디렉터리와 파일을 만듭니다.
 
 ```csharp
 private async Task CreateStandbyWarmupFunctions()
@@ -120,10 +125,10 @@ private async Task CreateStandbyWarmupFunctions()
 }
 ```
 
-`WarmUpConstants`의 정의를 보면 이름이 정해져 있습니다.
+관련 상수는 `WarmUpConstants`에 있습니다.
 
 ```csharp
-// 파일: src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs
+// src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs
 public static class WarmUpConstants
 {
     public const string FunctionName = "WarmUp";
@@ -134,18 +139,16 @@ public static class WarmUpConstants
 }
 ```
 
-여기서 중요한 건 **이 상수 파일이 JIT 트레이스 파일 이름을 정의할 뿐, 실행 주체는 아니라는 점**입니다. `StandbyManager.InitializeAsync`는 [`CreateStandbyWarmupFunctions`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L210-L242)로 `WarmUp` 함수 파일을 만들고 타이머를 시작한 뒤 끝납니다. JIT 준비는 warmup 요청 경로에서 [`HostWarmupMiddleware.WarmupInvoke`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L66-L85)가 맡고, 그 안에서 [`PreJitPrepare`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs#L136-L153)를 호출해 `WarmUpConstants.JitTraceFileName`을 읽습니다. Linux Consumption이면 같은 경로에서 `WarmUpConstants.LinuxJitTraceFileName`도 추가로 처리합니다.
+중요한 점은 JIT trace 파일 이름이 여기 정의되어 있지만, 실제 실행은 나중 warmup 요청 경로에서 일어난다는 사실입니다. `StandbyManager.InitializeAsync`는 파일과 타이머를 준비하고, 이후 `HostWarmupMiddleware.WarmupInvoke`가 `PreJitPrepare`를 호출해 `coldstart.jittrace`를 사용합니다. Linux Consumption에서는 `linux.coldstart.jittrace`도 같이 사용됩니다.
 
-즉 placeholder의 실체는 두 단계입니다. 먼저 `StandbyManager`가 `WarmUp` 함수와 타이머를 준비하고, 그다음 warmup invocation 경로에서 `HostWarmupMiddleware`가 `coldstart.jittrace`를 돌려 공통 메서드 경로를 PreJIT합니다. 외부에서 보면 그냥 "워밍된 인스턴스 풀"이지만, 내부에서는 **공통 부트스트랩을 끝낸 뒤 warmup 경로에서 JIT까지 앞당겨 놓은 호스트 프로세스**입니다.
+즉 placeholder는 “미리 떠 있는 인스턴스”라는 추상 설명보다 더 구체적입니다. **공통 bootstrap을 끝내고 warmup 함수와 JIT 준비 경로를 심어 둔 호스트**입니다.
 
----
+### specialization은 첫 요청 또는 50ms 타이머가 시작합니다
 
-## 사용자 요청이 도착했을 때 — `PlaceholderSpecializationMiddleware`
-
-Scale Controller가 placeholder 인스턴스 하나를 사용자 앱에 할당하기로 결정하면, 그 인스턴스에 사용자 앱의 환경변수·콘텐츠가 주입됩니다. 그러나 호스트 프로세스는 아직 placeholder 상태입니다. 그 전환을 일으키는 코드가 미들웨어 파이프라인의 첫 단계에 있습니다.
+사용자 앱이 placeholder 인스턴스에 배정되면, 환경변수와 앱 콘텐츠는 들어오지만 호스트는 아직 placeholder 상태입니다. 이 전환을 middleware 첫 구간에서 감지하는 것이 `PlaceholderSpecializationMiddleware`입니다.
 
 ```csharp
-// 파일: src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs
+// src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs
 public class PlaceholderSpecializationMiddleware
 {
     private readonly RequestDelegate _next;
@@ -164,8 +167,8 @@ public class PlaceholderSpecializationMiddleware
     {
         if (!_webHostEnvironment.InStandbyMode && _environment.IsContainerReady())
         {
-            // 여기에는 AsyncLocal 컨텍스트(Activity.Current 같은 것)가
-            // 흘러들지 않게 해야 합니다. 요청 세부 정보가 들어 있기 때문입니다.
+            // We don't want AsyncLocal context (like Activity.Current) to flow
+            // here as it will contain request details.
             Task specializeTask;
             using (System.Threading.ExecutionContext.SuppressFlow())
             {
@@ -184,21 +187,12 @@ public class PlaceholderSpecializationMiddleware
 }
 ```
 
-[`PlaceholderSpecializationMiddleware.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs)
+의도는 분명합니다. 첫 요청이 들어오면 specialization 체크를 하고, 컨테이너가 준비되었고 standby mode가 끝났다면 `SpecializeHostAsync()`를 호출합니다. `ExecutionContext.SuppressFlow()`는 현재 요청의 `AsyncLocal` 문맥이 specialization에 섞이지 않도록 막습니다. 이 세부 구현은 호스트가 **사용자 요청 한가운데서 자기 자신을 다시 구성**하는 코드라는 사실을 보여 줍니다.
 
-코드의 의도는 단순하지만 구현은 꽤 섬세합니다.
-
-1. 첫 요청이 들어오면 `InvokeSpecializationCheck`가 실행됩니다.
-2. 컨테이너가 준비되었고 더 이상 standby 모드가 아니라면 specialization을 트리거합니다.
-3. specialization이 한 번 완료되고 나면 `_invoke` 델리게이트를 `_next`로 교체합니다. 두 번째 요청부터는 이 검사 자체를 건너뜁니다. 즉 hot path 비용이 0이 됩니다.
-4. `ExecutionContext.SuppressFlow()`로 현재 요청의 AsyncLocal 컨텍스트가 호스트 specialization으로 흘러들어가지 않게 막습니다. 사용자 요청을 처리하는 도중에 호스트 자신을 다시 만드는 셈이므로, 컨텍스트 오염을 막아야 합니다.
-
-이 미들웨어의 존재 의미는 분명합니다. **사용자 앱의 첫 요청이 specialization의 트리거**입니다. 5화에서 본 Scale Controller의 health ping과는 다른 경로지만 같은 결과로 수렴합니다.
-
-`StandbyManager.cs`에서 봤던 50ms 타이머도 같은 일을 합니다. 사용자 요청이 첫 신호로 안 와도 컨테이너가 ready 상태가 되면 타이머가 specialization을 시작합니다.
+그리고 50ms 타이머도 같은 일을 합니다.
 
 ```csharp
-// 같은 파일, OnSpecializationTimerTick
+// same file, OnSpecializationTimerTick
 private async void OnSpecializationTimerTick(object state)
 {
     if (!_webHostEnvironment.InStandbyMode && _environment.IsContainerReady())
@@ -211,23 +205,21 @@ private async void OnSpecializationTimerTick(object state)
 }
 ```
 
-specialization 트리거는 두 개입니다. **첫 HTTP 요청** 또는 **50ms 타이머의 컨테이너 ready 감지**입니다. 어느 쪽이 먼저 오든 결과는 같습니다.
+즉 specialization 트리거는 두 가지입니다. **첫 HTTP 요청** 또는 **50ms 타이머의 container-ready 감지**입니다. 둘 중 무엇이 먼저 오든 결과는 같습니다.
 
----
+### specialization의 본체는 `SpecializeHostCoreAsync`입니다
 
-## Specialization이 실제로 하는 일 — `SpecializeHostCoreAsync`
-
-이제 specialization의 본체입니다. `StandbyManager.SpecializeHostCoreAsync`가 placeholder 상태의 호스트를 사용자 앱으로 변신시킵니다.
+placeholder 호스트를 실제 사용자 앱으로 바꾸는 본체는 `StandbyManager.SpecializeHostCoreAsync`입니다.
 
 ```csharp
-// 파일: src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
+// src/WebJobs.Script.WebHost/Standby/StandbyManager.cs
 public async Task SpecializeHostCoreAsync()
 {
     Activity activity = Activity.Current;
     activity.SetColdStartTag();
 
-    // `PlaceholderSpecializationMiddleware`에서 넘어온 async 컨텍스트가
-    // 제대로 차단되도록 즉시 async로 전환합니다.
+    // Go async immediately to ensure that any async context from
+    // the PlaceholderSpecializationMiddleware is properly suppressed.
     await Task.Yield();
 
     using var initActivity = ActivityExtensions.StartSpecializationActivity();
@@ -236,21 +228,21 @@ public async Task SpecializeHostCoreAsync()
 
     _logger.LogInformation(Resources.HostSpecializationTrace);
 
-    // 특수화 이후에는 사용자가 설정한 사용자 지정 타임존
-    // 설정(WEBSITE_TIME_ZONE)이 반영되도록 해야 합니다.
+    // After specialization, we need to ensure that custom timezone
+    // settings configured by the user (WEBSITE_TIME_ZONE) are honored.
     TimeZoneInfo.ClearCachedData();
 
-    // 현재 설정을 모두 다시 읽도록 구성 리로드를 트리거합니다
+    // Trigger a configuration reload to pick up all current settings
     _configuration?.Reload();
 
     _hostNameProvider.Reset();
 
-    // 사용자 의존성을 다시 로드하도록 shared load context를
-    // 초기화합니다
+    // Reset the shared load context to ensure we're reloading
+    // user dependencies
     FunctionAssemblyLoadContext.ResetSharedContext();
 
-    // placeholder mode 기준으로 JobHost 옵션이 바뀌었음을 알립니다
-    // (예: ScriptPath 업데이트)
+    // Signals change of JobHost options from placeholder mode
+    // (ex: ScriptPath is updated)
     NotifyChange();
 
     using (_metricsLogger.LatencyEvent(MetricEventNames.SpecializationLanguageWorkerChannelManagerSpecialize))
@@ -270,70 +262,30 @@ public async Task SpecializeHostCoreAsync()
 }
 ```
 
-[`StandbyManager.cs#L88-L137`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs#L88-L137)
+이 메서드 안에 cold start의 핵심이 있습니다.
 
-콜드 스타트의 핵심 동작은 사실상 이 메서드에 다 들어 있습니다. 단계별로 보겠습니다.
+첫째, `activity.SetColdStartTag()`로 cold start telemetry를 표시합니다. 둘째, timezone, configuration, hostname, assembly load context를 모두 reset해 placeholder 동안 캐시된 환경을 버립니다. 셋째, `_workerManager.SpecializeAsync()`로 worker specialization을 수행합니다. 넷째, `RestartHostAsync()`와 `DelayUntilHostReadyAsync()`로 specialized host가 실제 invocation을 받을 때까지 기다립니다.
 
-### 1. Cold start tagging
+사용자가 체감하는 cold start 비용의 대부분은 바로 이 specialization + host restart 구간에서 나옵니다. .NET CLR과 DI 컨테이너가 이미 따뜻하더라도, 사용자 환경으로 다시 구성하고 host를 재기동하는 비용은 사라지지 않습니다.
 
-```csharp
-activity.SetColdStartTag();
-```
+### placeholder channel 재사용은 조건부입니다
 
-호스트는 자기가 콜드 스타트 중이라는 사실을 메트릭에 표시합니다. 그래서 Application Insights에서 콜드 스타트를 구분할 수 있습니다.
+out-of-proc worker specialization은 “항상 placeholder worker를 버리고 새 워커를 띄운다”가 아닙니다. `StandbyManager`는 `_workerManager.SpecializeAsync()`만 호출하고, 실제 분기는 `WebHostRpcWorkerChannelManager.SpecializeAsync()` 안의 `UsePlaceholderChannel(...)`에 있습니다.
 
-### 2. 환경 리셋
+reuse가 허용되면 placeholder 채널을 유지한 채 `rpcWorkerChannel.SendFunctionEnvironmentReloadRequest()`를 보내 환경을 다시 로드합니다. reuse가 불가능하거나 reload가 실패하면 그때 placeholder 채널을 종료하고 새 경로로 갑니다.
 
-```csharp
-TimeZoneInfo.ClearCachedData();
-_configuration?.Reload();
-_hostNameProvider.Reset();
-FunctionAssemblyLoadContext.ResetSharedContext();
-```
+분기 조건은 꽤 구체적입니다.
 
-placeholder 시점에 캐시된 환경 정보(타임존·구성·호스트네임·로드 컨텍스트)를 모두 비웁니다. 같은 프로세스가 이제 다른 사용자의 컨텍스트로 바뀌어야 하기 때문입니다.
+- 공통 gate: custom `languageWorkers:<runtime>:arguments`가 있으면 재사용하지 않습니다.
+- `dotnet-isolated`: `UsePlaceholderDotNetIsolated()`가 켜져 있어야 하고, 64-bit이며, 사이트 런타임 버전이 placeholder worker와 맞아야 합니다.
+- `node` / `python` / `powershell`: 파일시스템이 read-only여야 하고, `~3` + v2 compatibility 경로가 아니어야 합니다.
+- 마지막 공통 gate: `_profileManager.IsCorrectProfileLoaded(workerRuntime)`가 true여야 합니다.
 
-### 3. 워커 specialization
+즉 재사용 여부는 막연한 “호환되면 재사용”이 아니라 런타임 종류, bitness, 버전, 파일시스템 모드, profile 적합성을 실제 코드로 확인한 뒤 결정됩니다.
 
-```csharp
-await _workerManager.SpecializeAsync();
-```
+### specialization 이후 middleware는 자기 자신을 핫패스에서 빼 버립니다
 
-OOP 워커(Python·Node·Java)의 경우 이 호출이 실제 specialization 분기를 시작합니다. 다만 이 경로를 “placeholder worker를 무조건 버리고 새 워커를 띄운다”로 이해하면 정확하지 않습니다. `StandbyManager`는 `_workerManager.SpecializeAsync()`까지만 알고, 실제 판단은 `WebHostRpcWorkerChannelManager.SpecializeAsync()` 안에서 이뤄집니다.
-
-이 메서드는 현재 runtime의 채널을 가져온 뒤 `UsePlaceholderChannel(rpcWorkerChannel)`을 평가합니다. 재사용 가능하면 기존 placeholder 채널을 유지한 채 `rpcWorkerChannel.SendFunctionEnvironmentReloadRequest()`를 호출해 `FunctionEnvironmentReloadRequest`를 워커 프로세스로 보냅니다. 반대로 재사용이 불가능하거나 reload가 실패하면, 그때 placeholder 채널을 종료하고 새 워커 경로로 넘어갑니다.
-
-즉 specialization의 실제 호출 경로는 다음처럼 읽는 편이 정확합니다.
-
-> `StandbyManager.SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel(...)` 판정 → `SendFunctionEnvironmentReloadRequest()` 또는 placeholder 채널 종료
-
-### 4. placeholder 채널을 언제 재사용할 수 있나
-
-`UsePlaceholderChannel(...)`의 분기 조건도 구체적입니다.
-
-- 공통 전제: custom `languageWorkers:<runtime>:arguments`가 지정돼 있으면 재사용하지 않습니다.
-- `dotnet-isolated`: `UsePlaceholderDotNetIsolated()`가 켜져 있어야 하고, 64비트 프로세스여야 하며, 사이트 runtime version과 placeholder worker runtime version이 일치해야 합니다.
-- `node` / `python` / `powershell`: 파일 시스템이 read-only여야 하고, `~3` 확장의 v2 compatibility 경로가 아니어야 합니다.
-- 마지막 공통 조건: `_profileManager.IsCorrectProfileLoaded(workerRuntime)`가 true여야 합니다.
-
-즉 분기 조건은 막연한 “호환되면 재사용”이 아니라, **runtime 종류·bitness·runtime version·read-only 여부·profile 일치**를 모두 확인하는 코드입니다.
-
-### 5. 호스트 재시작
-
-```csharp
-await _scriptHostManager.RestartHostAsync("Host specialization.");
-await _scriptHostManager.DelayUntilHostReadyAsync();
-```
-
-ScriptHost 자체를 재구성합니다 — 1화에서 본 부트스트랩 과정을 한 번 더 도는 셈인데, 이번에는 .NET CLR·DI 컨테이너·assembly load context는 이미 워밍된 상태에서 시작합니다. **이 재시작 비용이 콜드 스타트의 가시적인 부분의 대부분**입니다.
-
-`RestartHostAsync`는 specialization 이후의 설정과 환경으로 `ScriptHost`를 다시 올리고, `DelayUntilHostReadyAsync`는 그 결과 호스트가 invocation을 받을 수 있는 상태가 될 때까지 기다립니다. 이 시점의 핵심은 **placeholder 상태에서 specialized host 상태로 전환하는 재구성**이지, 별도의 파일 스캔 단계 하나로 specialization을 설명할 수 있다는 뜻은 아닙니다.
-
----
-
-## Specialization 후, 미들웨어는 무슨 일을 하는가
-
-`PlaceholderSpecializationMiddleware`로 다시 돌아가서 한 번 더 보면 흥미로운 디자인이 보입니다.
+`PlaceholderSpecializationMiddleware`를 한 번 더 보면 재미있는 설계가 보입니다.
 
 ```csharp
 if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
@@ -342,84 +294,68 @@ if (Interlocked.CompareExchange(ref _specialized, 1, 0) == 0)
 }
 ```
 
-**한 번 specialization이 끝나면 `_invoke`를 다음 미들웨어로 직접 가리키게 바꿉니다.** 그래서 두 번째 요청부터는 specialization 검사 분기 자체가 없습니다 — 함수 포인터 한 번 비교 후 곧장 다음 미들웨어로 갑니다.
+specialization이 끝나면 `_invoke`가 직접 `_next`를 가리키도록 바뀝니다. 즉 두 번째 요청부터는 specialization check branch 자체가 사라집니다. 이것이 “cold start 비용은 첫 요청에서만 크다”는 운영 감각의 코드 수준 근거입니다. 콜드 패스는 한 번만 타고, 이후에는 일반 핫패스만 남습니다.
 
-이건 콜드 스타트 비용이 첫 요청에 한 번만 발생한다는 사실을 코드 레벨에서 보장합니다. 이후 모든 요청은 일반 요청과 같은 hot path를 탑니다. 입문 6화에서 "콜드 스타트는 첫 요청에만 비싸다"라고 한 설명이 바로 이 코드에서 나옵니다.
+### 인스턴스 생애 주기를 한 장으로 보면 시리즈가 닫힙니다
 
----
+이제 전체 생애 주기를 한 장으로 보면 앞선 글들이 모두 여기서 합쳐집니다.
 
-## 전체 그림 — 한 인스턴스의 일생
+![Instance lifecycle from placeholder to execution](../../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
 
-지금까지 본 것을 한 장의 sequence diagram으로 정리하겠습니다.
+scale-out으로 인스턴스가 생기고, placeholder가 공통 bootstrap을 준비하고, specialization이 사용자 환경을 입히고, host가 다시 준비 완료가 되면 invocation 경로와 worker channel, gRPC transport가 실제 요청을 받기 시작합니다.
 
-![placeholder에서 실행까지 인스턴스 생애주기](../../../assets/azure-functions-deep-dive/06/06-02-the-whole-picture-the-life-of-an-instanc.ko.png)
+### 플랜에 따라 cold start가 다르게 느껴지는 이유도 같은 코드 위에서 설명됩니다
 
-*placeholder에서 실행까지 인스턴스 생애주기*
----
+같은 호스트 코드라도 플랜은 placeholder pool을 다르게 운용합니다.
 
-## 플랜별로 콜드 스타트가 다른 이유
-
-이 메커니즘이 분명해지면, 입문 5·6화에서 본 플랜별 콜드 스타트 차이가 코드 레벨에서 설명됩니다.
-
-| 플랜 | 콜드 스타트 빈도 | 메커니즘 |
+| Plan | Cold start frequency | Mechanism |
 |---|---|---|
-| Consumption | 자주 (스케일 0 → 1, 또는 새 인스턴스마다) | 매번 placeholder → specialization |
-| Flex Consumption (on-demand) | 자주 (스케일 0 → 1) | 매번 placeholder → specialization |
-| Flex Consumption (Always Ready) | 거의 없음 | 항상 specialized 인스턴스 유지 |
-| Premium (pre-warmed) | 거의 없음 (스케일아웃 시는 적음) | pre-warmed 인스턴스가 placeholder 풀과 유사한 역할 |
-| Dedicated | 인스턴스 부팅 시만 | App Service의 always-on, placeholder 무관 |
+| Consumption | Frequent (scale 0 → 1, or every new instance) | placeholder → specialization every time |
+| Flex Consumption (on-demand) | Frequent (scale 0 → 1) | placeholder → specialization every time |
+| Flex Consumption (Always Ready) | Almost none | Always-specialized instances kept around |
+| Premium (pre-warmed) | Almost none (small on scale-out) | Pre-warmed instances play a role similar to the placeholder pool |
+| Dedicated | Only at instance boot | App Service always-on, no placeholders involved |
 
-같은 호스트 코드지만 외부에서 **placeholder 풀을 어떻게 관리하느냐, always-ready 인스턴스를 몇 개 두느냐**에 따라 사용자가 체감하는 콜드 스타트가 달라집니다. 호스트가 직접 결정하는 게 아닙니다.
+Flex Consumption의 Always Ready는 사실상 **specialization까지 끝난 인스턴스를 유지하는 정책**이고, Premium의 pre-warmed도 비슷한 역할을 합니다. 반대로 Consumption은 placeholder → specialization 경로를 자주 타므로 사용자가 cold start를 더 자주 체감합니다. 즉 host code는 같아도, 사용자가 느끼는 cold start는 **외부 placeholder policy와 Always Ready 수량**이 결정합니다.
 
-Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specialization이 끝난 상태로 항상 켜져 있는 인스턴스"입니다. 그래서 그 인스턴스로 라우팅된 요청은 위 다이어그램의 specialization 단계 자체를 거치지 않습니다.
+### 코드 수준에서 cold start를 줄이는 레버도 분해해서 봐야 합니다
 
----
+host code를 따라가고 나면 어떤 레버가 어느 단계를 줄이는지 명확해집니다.
 
-## 코드 레벨에서 콜드 스타트를 줄이는 레버
-
-호스트 코드를 다 본 지금, 사용자가 콜드 스타트를 줄이기 위해 손댈 수 있는 지점들이 어디인지가 분명해집니다.
-
-| 레버 | 영향 단계 | 근거 |
+| Lever | Stage affected | Rationale |
 |---|---|---|
-| Always Ready 인스턴스 | specialization 자체를 회피 | Flex Consumption 문서 + 위 코드 흐름 |
-| Premium pre-warmed | specialization 풀을 직접 보유 | 같음 |
-| 가벼운 dependency | `RestartHostAsync` 시 사용자 코드 로딩 시간 | `FunctionAssemblyLoadContext.ResetSharedContext` |
-| 작은 deployment package | 콘텐츠 주입 시간 | 코드 외부, 플랫폼 영역 |
-| Functions runtime 최신 버전 | JIT 트레이스 개선 | `WarmUpConstants.JitTraceFileName` |
-| Application Initialization (Premium/Dedicated) | 호스트 ready 후 첫 요청까지 시간 | App Service 영역 |
+| Always Ready instances | Skips specialization entirely | Flex Consumption docs + the code flow above |
+| Premium pre-warmed | Owns a specialization pool directly | Same |
+| Lighter dependencies | User-code load time during `RestartHostAsync` | `FunctionAssemblyLoadContext.ResetSharedContext` |
+| Smaller deployment package | Content injection time | Outside this code; platform layer |
+| Latest Functions runtime | Improved JIT trace | `WarmUpConstants.JitTraceFileName` |
+| Application Initialization (Premium/Dedicated) | Time from host-ready to first request | App Service layer |
 
-특히 `FunctionAssemblyLoadContext.ResetSharedContext()` 호출이 specialization 단계에 들어 있다는 사실은 **사용자가 무거운 의존성을 가진 만큼 specialization이 길어진다**는 점을 코드 레벨에서 확인해 줍니다. 큰 .NET 패키지나 큰 Python venv는 콜드 스타트를 직접 가중시킵니다.
+특히 `FunctionAssemblyLoadContext.ResetSharedContext()`가 specialization 단계 안에 있다는 사실은, 사용자 의존성이 무거울수록 specialization 시간이 직접 늘어난다는 것을 코드 수준에서 보여 줍니다. 큰 Python venv, 큰 .NET 패키지 묶음은 cold start를 체감적으로 늘릴 수 있습니다.
 
----
+## 흔히 헷갈리는 지점
 
-## 정리 — 이 화에서 잡고 갈 모델
-
-- 콜드 스타트는 단일 비용이 아니라 **사용자 무관 부트스트랩 + 사용자별 specialization**의 합이다.
-- Functions 플랫폼은 placeholder 풀로 사용자 무관 부분을 미리 끝내 둔다. `StandbyManager.InitializeAsync`는 `WarmUp` 함수 파일과 타이머를 준비하고, `HostWarmupMiddleware.WarmupInvoke`가 warmup 경로에서 `coldstart.jittrace`를 실행한다.
-- 사용자 앱이 인스턴스에 할당되면 첫 HTTP 요청(`PlaceholderSpecializationMiddleware`) 또는 50ms 타이머가 specialization을 트리거한다.
-- specialization은 환경 리셋 + placeholder 채널 재사용 여부 판정 + 필요 시 `FunctionEnvironmentReloadRequest` 전송 + ScriptHost 재시작의 시퀀스다. 이 시간이 사용자가 체감하는 콜드 스타트다.
-- 한 번 specialization이 끝나면 미들웨어가 자기 자신을 우회하도록 만들어 hot path 비용을 0으로 만든다.
-- 같은 호스트 코드지만 placeholder 풀 관리 정책과 Always Ready 설정이 플랜마다 달라서, **사용자가 체감하는 콜드 스타트는 플랜에 의해 결정된다.**
-
-이 글로 Azure Functions Deep Dive 시리즈를 마무리합니다. 1화에서 호스트 부팅, 2화에서 워커 프로세스, 3·4화에서 gRPC와 dispatcher, 5화에서 스케일링을 다뤘고, 이번 6화에서는 같은 호스트 코드 위에 플랜이 어떻게 placeholder 정책을 다르게 얹어 콜드 스타트가 결정되는지를 따라갔습니다.
-
----
-
-## Call Path Summary
-
-- `StandbyManager.InitializeAsync()` → `CreateStandbyWarmupFunctions()` → specialization timer 시작
-- 첫 요청의 `PlaceholderSpecializationMiddleware.Invoke(...)` 또는 `OnSpecializationTimerTick(...)` → `StandbyManager.SpecializeHostAsync()` → `SpecializeHostCoreAsync()`
-- `SpecializeHostCoreAsync()` → `_workerManager.SpecializeAsync()` → `WebHostRpcWorkerChannelManager.SpecializeAsync()` → `UsePlaceholderChannel()` → `SendFunctionEnvironmentReloadRequest()` → `RestartHostAsync()`
-
----
+- **cold start는 단일 비용이 아닙니다.** 공통 placeholder 준비와 사용자별 specialization 비용이 합쳐진 결과입니다.
+- **placeholder는 빈 프로세스가 아닙니다.** `WarmUp` 함수 파일, specialization 타이머, JIT warmup 경로를 갖춘 준비 상태입니다.
+- **specialization은 첫 요청만이 유일한 트리거가 아닙니다.** 50ms 타이머의 container-ready 감지도 같은 경로를 시작할 수 있습니다.
+- **worker specialization은 항상 새 워커를 띄우는 방식이 아닙니다.** 조건이 맞으면 placeholder channel을 재사용하고 `FunctionEnvironmentReloadRequest`를 보냅니다.
+- **플랜별 cold start 차이는 host code 차이보다 placeholder policy 차이에서 더 많이 옵니다.** Always Ready, pre-warmed, App Service always-on 여부가 다르기 때문입니다.
 
 ## 운영 체크리스트
 
-- [ ] cold-start의 단계별 비용을 측정해 두었다
-- [ ] Premium always-ready instance 수를 워크로드에 맞춰 결정했다
-- [ ] 함수 초기화 코드(connection 등)의 lazy/eager 정책을 명시했다
-- [ ] cold-start latency를 SLO 문서에 명시했다
-- [ ] 스케일 아웃 시 cold-start 노출 시나리오를 부하 테스트했다
+- [ ] cold-start 비용을 단계별로 측정하고 기록했습니다.
+- [ ] 워크로드별 Premium 또는 Always Ready 인스턴스 수를 결정했습니다.
+- [ ] 연결 초기화 같은 작업의 lazy/eager 정책을 문서화했습니다.
+- [ ] SLO 문서에 cold-start latency 항목을 별도로 명시했습니다.
+- [ ] scale-out으로 사용자가 cold start를 직접 맞는 시나리오를 부하 테스트했습니다.
+
+## 정리
+
+이번 글은 cold start를 설명 가능한 코드 경로로 바꿨습니다. placeholder 인스턴스는 공통 bootstrap을 미리 끝내고 `WarmUp` 함수와 JIT warmup 경로를 준비합니다. 이후 첫 요청 또는 50ms 타이머가 specialization을 시작하고, 환경 재설정, worker specialization, `ScriptHost` 재시작, host-ready 대기까지가 사용자가 실제로 느끼는 cold-start 비용을 만듭니다.
+
+이 관점이 중요한 이유는 cold start 최적화가 더 이상 막연한 “성능 개선”이 아니게 되기 때문입니다. Always Ready와 pre-warmed는 specialization 자체를 건너뛰게 하는 전략이고, 의존성 경량화는 specialization 이후 host restart 구간을 줄이는 전략이며, 최신 런타임 사용은 JIT warmup 경로를 개선하는 전략입니다. 서로 다른 비용에 서로 다른 레버가 대응합니다.
+
+이 글로 Azure Functions Deep Dive 시리즈를 마칩니다. 1화의 host bootstrap, 2화의 worker process, 3~4화의 gRPC 채널과 invocation, 5화의 scale-out이 모두 마지막에 한 인스턴스의 생애 주기로 닫혔습니다. 이제 Functions 운영을 볼 때는 “서버리스라서 느릴 수 있다”가 아니라, 어느 단계의 bootstrap과 specialization이 지금 지연을 만들고 있는지 더 정확하게 질문할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -433,29 +369,23 @@ Flex Consumption의 **Always Ready 인스턴스**는 사실상 "이미 specializ
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처 (호스트 코드, commit `5e59423`)
-
+### 공식 문서
+- [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
 - [`src/WebJobs.Script.WebHost/Standby/IStandbyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/IStandbyManager.cs)
-- [`src/WebJobs.Script.WebHost/Standby/StandbyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs) — placeholder 초기화, specialization 본체
-- [`src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs) — JIT 트레이스 파일명
+- [`src/WebJobs.Script.WebHost/Standby/StandbyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyManager.cs)
+- [`src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/WarmUpConstants.cs)
 - [`src/WebJobs.Script.WebHost/Standby/StandbyChangeTokenSource.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyChangeTokenSource.cs)
 - [`src/WebJobs.Script.WebHost/Standby/StandbyInitializationService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Standby/StandbyInitializationService.cs)
 - [`src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/PlaceholderSpecializationMiddleware.cs)
 - [`src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Middleware/HostWarmupMiddleware.cs)
-
-### 2차 출처
-
 - [Azure Functions Flex Consumption — Always ready instances](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan#always-ready-instances)
 - [Azure Functions cold starts](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling#cold-start)
 
-### 시리즈 다른 화
-
-- [입문 6화 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
-- [심화 1화 — Host Bootstrap](./01-host-bootstrap.md)
-- [심화 5화 — 스케일링 내부 동작](./05-scaling-internals.md)
+### 관련 시리즈
+- [Azure Functions 101 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
+- [Azure Functions Deep Dive — 호스트 부팅](./01-host-bootstrap.md)
+- [Azure Functions Deep Dive — 스케일링 내부 동작](./05-scaling-internals.md)
 
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

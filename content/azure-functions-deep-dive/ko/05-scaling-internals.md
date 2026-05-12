@@ -14,82 +14,77 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이
 
-> Azure Functions Deep Dive 시리즈 (5/6)
+앞선 네 편에서는 인스턴스 하나 안에서 벌어지는 일을 따라왔습니다. 호스트가 부팅되고, 언어 워커가 떠서, gRPC 스트림이 연결되고, invocation이 워커까지 왕복하는 경로를 확인했습니다. 하지만 실제 운영에서 더 어려운 질문은 그 다음 단계에서 나옵니다. **인스턴스 하나로 부족해졌을 때 누가 더 늘릴지를 결정하는가**입니다.
 
-앞선 화들에서는 한 인스턴스 안에서 벌어지는 일을 따라왔습니다. 운영에서 더 어려운 질문은 그 다음입니다. 인스턴스 하나로 버티지 못할 때 누가 더 늘릴지를 결정하고, 그 판단에 어떤 신호가 쓰이며, 그중 어디까지가 호스트의 책임인가입니다.
+이 질문은 단순히 “자동 스케일이 된다”는 제품 설명으로는 답이 되지 않습니다. 호스트가 직접 인스턴스 수를 늘리는지, 외부 컴포넌트가 결정하는지, 같은 스케일링이라는 단어 아래에서 인스턴스 수와 인스턴스 내부 워커 수가 어떻게 구분되는지를 알아야 비용과 지연 시간을 함께 설계할 수 있습니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 5번째 글입니다. 여기서는 외부 Scale Controller의 스케일아웃 결정과 호스트 내부 워커 동시성 제어를 분리해서 봅니다.
+이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 호스트가 바깥으로 내보내는 scale signal만 다룹니다. 의도적으로 Azure 내부 Scale Controller의 비공개 구현을 추측하지 않고, host repo 안에 있는 것과 없는 것을 명확히 나눕니다.
 
-## Source Version
+이 글은 Azure Functions Deep Dive 시리즈의 다섯 번째 글입니다.
 
-이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+이제 외부 scale-out 결정과 인스턴스 내부 worker concurrency를 분리해서 보는 운영 모델을 고정하겠습니다.
 
-지금까지 4화 동안 인스턴스 하나 안에서 호스트와 워커가 어떻게 함수를 실행하는지 봤습니다. 이번 화는 한 단계 위로 올라갑니다.
+## 이 글에서 다룰 문제
 
-> 인스턴스 자체는 **누가, 무엇을 보고, 언제 늘리고 줄이는가?**
+- Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요?
+- Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요?
+- burst 트래픽에서 scale-out 지연은 어디에 가장 많이 쌓일까요?
+- 동시성 제어와 스케일링은 어떻게 협력하고, 어디서 충돌할까요?
+- scale-in 시점에 진행 중인 invocation은 어떻게 보호될까요?
 
-이게 우리가 흔히 말하는 "스케일아웃"입니다. 그리고 이 결정은 호스트 프로세스 안에서 일어나지 않습니다. 호스트는 결정에 필요한 재료를 제공할 뿐이고, 실제 결정은 호스트 바깥의 Scale Controller가 합니다. 다만 플랜에 따라 방식은 달라집니다.
+## 왜 이 글이 중요한가
 
-먼저 선을 분명히 긋겠습니다. **Scale Controller 자체 구현은 이 vendored `azure-functions-host` 저장소에 없습니다.** 이 글은 Azure 내부 컴포넌트의 세부 구현을 추측하지 않고, 호스트가 바깥으로 내보내는 scale signal과 플랜별 의미만 다룹니다.
+Functions를 운영하면서 가장 자주 만나는 오해 중 하나는 “호스트가 바쁘면 스스로 인스턴스를 더 띄운다”는 상상입니다. 실제로 호스트는 인스턴스 수를 직접 늘리지 않습니다. 호스트는 자신의 상태와 trigger 쪽 메트릭을 외부에 노출할 뿐이고, 실제 인스턴스 수 증감은 **호스트 바깥의 Scale Controller 또는 플랜별 외부 결정 계층**이 맡습니다. 이 선을 모르면 scale-out 문제를 host bug처럼 디버깅하게 됩니다.
 
-이 화의 목표는 세 가지입니다.
+또한 인스턴스 수 증가와 인스턴스 내부 워커 수 증가는 전혀 다른 문제입니다. 인스턴스를 더 만드는 것은 비용, 콜드 스타트, 네트워크 격리와 연결되고, 인스턴스 안에서 워커를 더 띄우는 것은 같은 VM 자원 안에서 처리량을 어떻게 끌어올릴지와 연결됩니다. 같은 “동시성”이나 “확장”이라는 단어를 써도 실제 조정 단위가 다릅니다.
 
-1. Scale Controller, ScaleMonitor, ITargetScaler가 각각 무엇이고 어디에 사는지 정리
-2. 인스턴스 수 결정(스케일아웃)과 인스턴스 내부 워커 수 결정(워커 동시성)이 서로 다른 메커니즘이라는 점 분리
-3. Consumption / Flex Consumption / Premium / Dedicated 네 플랜에서 같은 코드가 어떻게 다르게 동작하는지 비교
+마지막으로 플랜 차이는 제품 브로셔가 아니라 운영 감각의 차이입니다. Consumption, Flex Consumption, Premium, Dedicated는 같은 호스트 바이너리를 써도 바깥 결정 계층이 다르기 때문에 사용자가 체감하는 scale-out, cold start, 비용 구조가 달라집니다. 플랜별 차이를 host code 위에 올려서 이해해야 적절한 설계를 할 수 있습니다.
 
-> 모든 코드 인용은 [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+## 스케일링을 이해하는 가장 좋은 방법: 호스트가 인스턴스 수를 직접 결정하지 않고 health ping과 trigger 메트릭만 내보내며, 인스턴스 내부 worker concurrency는 별도 루프가 관리한다고 보는 것입니다
 
----
+스케일링 경계를 선명하게 보려면 먼저 결정 단위를 둘로 나눠야 합니다. 첫째는 **인스턴스 수**입니다. 이 결정은 호스트 바깥의 Scale Controller가 내립니다. 둘째는 **인스턴스 내부 워커 수**입니다. 이 결정은 호스트 내부 `WorkerConcurrencyManager`가 내립니다. 두 메커니즘은 신호도, 비용도, 장애 모드도 다릅니다.
 
-## 큰 그림 — 스케일링은 어디에서 결정되는가
+호스트는 외부 Scale Controller에 두 종류의 입력을 제공합니다. 하나는 `HostPerformanceManager`가 응답하는 health ping이고, 다른 하나는 trigger extension 쪽 `IScaleMonitor` / `ITargetScaler`가 수집한 메트릭을 저장해 두는 역할입니다. 그 이상은 하지 않습니다. 이 관점을 잡아야 scale signal과 scale decision을 헷갈리지 않게 됩니다.
 
-코드를 보기 전에 한 장의 그림으로 정리하겠습니다.
+> 이번 글의 핵심은 “Functions가 자동 스케일한다”는 설명을 “호스트는 신호를 내보내고, 외부 계층이 인스턴스 수를 결정하며, 호스트 내부는 별도로 워커 수만 조절한다”는 구조로 바꾸는 것입니다.
+
+## 핵심 개념
+
+### 큰 그림부터 보면 두 개의 다른 결정이 보입니다
+
+먼저 전체 구조를 한 장으로 보겠습니다.
 
 ![외부 스케일아웃과 내부 워커 확장 경계](../../../assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
 
-*외부 스케일아웃과 내부 워커 확장 경계*
-눈여겨볼 점은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 것입니다.
+핵심은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 점입니다.
 
-| 결정 | 결정자 | 신호 | 결과 |
+| Decision | Decided by | Signal | Result |
 |---|---|---|---|
-| **인스턴스 수**(스케일아웃) | Scale Controller (호스트 외부) | ScaleMonitor·TargetScaler 메트릭 + 호스트 health ping | 인스턴스를 N → N±k 로 |
-| **인스턴스 내부 워커 수** | `WorkerConcurrencyManager` (호스트 내부) | 워커 상태 응답의 지연 시간 기록 | 같은 인스턴스에서 워커 프로세스 추가 |
+| **Instance count** (scale-out) | Scale Controller (outside the host) | ScaleMonitor / TargetScaler metrics + host health ping | Move instances from N → N±k |
+| **Workers per instance** | `WorkerConcurrencyManager` (inside the host) | Latency history from worker status responses | Add worker processes on the same instance |
 
-이 둘을 섞어서 이해하면 "왜 Premium에서는 워커 수를 직접 못 늘리지?" 같은 질문에 답할 수 없습니다. 하나씩 보겠습니다.
+이 둘을 섞어 버리면 “왜 Premium에서 worker count만 올리면 안 되지?” 같은 질문에 답하기 어려워집니다. 인스턴스 수는 플랫폼 단위이고, 워커 수는 host runtime 단위이기 때문입니다.
 
----
+### host repo 안에 있는 것과 없는 것을 먼저 구분해야 합니다
 
-## 호스트 안에 있는 코드 — 그리고 없는 코드
+중요한 사실 하나를 먼저 고정하겠습니다. `IScaleMonitor`와 `ITargetScaler` 정의는 `azure-functions-host` 저장소에 없습니다. 이 인터페이스들은 [`Azure/azure-webjobs-sdk`](https://github.com/Azure/azure-webjobs-sdk) 쪽에 있고, Storage Queue, Service Bus, Event Hubs 같은 trigger extension이 그 SDK를 기준으로 자기 메트릭 수집기를 구현합니다.
 
-먼저 진실 하나를 짚고 가겠습니다. **`IScaleMonitor`와 `ITargetScaler`의 정의는 `azure-functions-host` 레포에 없습니다.** 이 인터페이스들은 [`Azure/azure-webjobs-sdk`](https://github.com/Azure/azure-webjobs-sdk) — WebJobs SDK 레포 — 에 있고, 각 트리거 확장(Storage Queue, Service Bus, Event Hubs 등)이 거기에 의존하면서 자기 트리거에 맞는 메트릭 수집기를 구현합니다.
+반면 host repo의 `src/WebJobs.Script/Scale/`에는 `ApplicationPerformanceCounters.cs`와 `HostPerformanceManager.cs`만 있습니다. 또 `src/WebJobs.Script.WebHost/Scale/`에는 `TableStorageScaleMetricsRepository.cs`와 `TableEntityConverter.cs`가 있습니다. 즉 호스트가 하는 일은 **자기 부하를 보고하고 메트릭을 저장하는 것**이지, 외부 Scale Controller 역할을 대체하는 것이 아닙니다.
 
-호스트 레포의 [`src/WebJobs.Script/Scale/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale) 디렉토리에는 단 두 파일만 있습니다.
+이 선이 잡히면 비공개 Azure 내부 알고리즘을 추측할 필요가 줄어듭니다. 운영에 필요한 것은 외부 결정기 내부를 상상하는 능력이 아니라, **호스트가 어떤 증거를 바깥에 내놓는지**를 정확히 아는 능력입니다.
 
-- `ApplicationPerformanceCounters.cs`: 샌드박스 카운터 DTO
-- `HostPerformanceManager.cs`: 호스트 부하 판단 + Scale Controller health ping 처리
+### 외부 Scale Controller는 health ping으로 호스트의 현재 수용 가능 상태를 봅니다
 
-그리고 [`src/WebJobs.Script.WebHost/Scale/`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale)에는 두 파일이 더 있습니다.
-
-- `TableStorageScaleMetricsRepository.cs`: ScaleMonitor가 보고한 메트릭을 Azure Table Storage에 저장
-- `TableEntityConverter.cs`: 그 직렬화 헬퍼
-
-즉 호스트의 역할은 자기 부하를 보고하고 메트릭을 저장하는 데 그칩니다. 결정은 외부 Scale Controller가 합니다. 이 그림이 잡히면 나머지가 쉬워집니다.
-
----
-
-## Scale Controller가 호스트와 대화하는 법 — health ping
-
-Scale Controller가 인스턴스 하나를 보고 "이거 더 늘려야 하나?"를 판단할 때 쓰는 가장 직접적인 신호는 **HTTP health ping**입니다. 호스트가 그 ping에 응답하는 코드가 `HostPerformanceManager.TryHandleHealthPingAsync`입니다.
+Scale Controller가 “이 인스턴스가 더 받아도 되는가”를 물을 때 가장 직접적으로 보는 신호는 HTTP health ping입니다. 호스트 쪽 응답 코드는 `HostPerformanceManager.TryHandleHealthPingAsync`입니다.
 
 ```csharp
-// 파일: src/WebJobs.Script/Scale/HostPerformanceManager.cs
+// src/WebJobs.Script/Scale/HostPerformanceManager.cs
 public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, ILogger logger)
 {
     var healthPingEnabled = _environment.GetEnvironmentVariableOrDefault(
@@ -105,7 +100,7 @@ public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, I
         (userAgent.IndexOf(ScriptConstants.HttpScaleUserAgent, StringComparison.OrdinalIgnoreCase) != -1 ||
          userAgent.IndexOf(ScriptConstants.ScaleControllerUserAgent, StringComparison.OrdinalIgnoreCase) != -1))
     {
-        // 이 User-Agent들에 대해서는 기본값을 true로 둡니다
+        // for these user agents, we default to true
         checkHealth = true;
     }
     // ...
@@ -122,16 +117,11 @@ public async Task<IActionResult> TryHandleHealthPingAsync(HttpRequest request, I
 }
 ```
 
-[`HostPerformanceManager.cs#L67-103`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/HostPerformanceManager.cs#L67-L103)
+여기서 호스트는 `User-Agent`를 보고 이 요청이 scale health check인지 판단하고, 현재 부하가 임계치를 넘지 않으면 `200 OK`, 넘으면 `429 Too Many Requests`를 돌려줍니다. 즉 외부 Scale Controller 입장에서는 호스트가 “지금 더 받아도 된다 / 이미 한계다”라는 현재 상태 신호를 내보내는 셈입니다.
 
-코드의 의미를 풀어 쓰면 이렇습니다.
+### `IsUnderHighLoadAsync`는 호스트와 워커 상태를 함께 봅니다
 
-1. Scale Controller(또는 HTTP scale 컴포넌트)가 호스트의 admin 엔드포인트로 ping을 보냅니다. **User-Agent로 자기 정체를 알립니다.**
-2. 호스트는 그 User-Agent를 보고 "이건 health 체크다"라고 판단합니다.
-3. 현재 부하를 측정해서 임계치 미만이면 **200 OK**, 초과면 **429 Too Many Requests**를 돌려줍니다.
-4. Scale Controller는 응답을 보고 이 인스턴스가 일을 더 받을 수 있는지 판단해 스케일 결정을 내립니다.
-
-`IsUnderHighLoadAsync`가 보는 부하는 두 종류입니다.
+health ping의 실제 판단은 다음 메서드에 있습니다.
 
 ```csharp
 public virtual async Task<bool> IsUnderHighLoadAsync(ILogger logger = null)
@@ -140,18 +130,15 @@ public virtual async Task<bool> IsUnderHighLoadAsync(ILogger logger = null)
 }
 ```
 
-- `PerformanceCountersExceeded`: 샌드박스 카운터(`ActiveConnections`, `Threads`, `NamedPipes`, …) 임계치 초과 여부
-- `ProcessThresholdsExceeded`: 호스트/워커 CPU·ThreadPool·gRPC 채널 헬스를 종합한 throttle 상태
-
-후자에서 호스트가 **자기 안에 있는 OOP 워커들에게 직접 ping을 돌리는** 코드가 보입니다.
+여기서 `PerformanceCountersExceeded`는 `ActiveConnections`, `Threads`, `NamedPipes` 같은 sandbox counter 임계치 초과 여부를 보고, `ProcessThresholdsExceeded`는 host/worker CPU, ThreadPool, gRPC channel health를 포괄하는 throttle 상태를 봅니다. 후자에서는 호스트가 자기가 가진 OOP worker 상태를 직접 묻는 코드도 나옵니다.
 
 ```csharp
-// 같은 파일, ProcessThresholdsExceeded 안
+// same file, inside ProcessThresholdsExceeded
 var workerManager = _serviceProvider.GetScriptHostServiceOrNull<IScriptHostWorkerManager>();
 if (workerManager != null)
 {
-    // 임시: 모든 OOP 워커를 ping해서 채널 지연 시간도
-    // 상위 ping 결과에 포함되도록 합니다.
+    // TEMP: This call pings all the OOP workers, to ensure we include any channel latency
+    // in the upstream ping result.
     await workerManager.GetWorkerStatusesAsync();
 }
 
@@ -163,39 +150,23 @@ if (throttleManager != null)
 }
 ```
 
-즉 외부 Scale Controller의 HTTP 호출 하나에 대해 호스트는 자기 상태와 모든 워커 상태를 종합해서 답합니다. 이게 인스턴스가 한계에 가까워졌다는 신호를 외부로 내보내는 메커니즘입니다.
+즉 외부에서 보면 HTTP 한 번이지만, 호스트 내부에서는 자기 자신과 모든 워커 상태를 합산한 결과를 바깥에 돌려주는 구조입니다. 이것이 인스턴스가 “여기까지가 내 현재 한계다”라고 바깥에 알리는 방식입니다.
 
----
+### `ScaleMonitor`와 `TargetScaler`는 trigger가 직접 측정한 적체 신호입니다
 
-## ScaleMonitor와 TargetScaler — 트리거가 직접 측정하는 신호
+health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변이라면, `ScaleMonitor`와 `TargetScaler`는 “일이 얼마나 쌓였나”에 대한 trigger 쪽 답변입니다.
 
-health ping이 호스트의 "지금 더 받을 수 있냐"라면, **ScaleMonitor / TargetScaler**는 트리거가 직접 측정하는 "지금 일이 얼마나 쌓였냐" 쪽입니다.
+![Trigger metrics flowing into scale decisions](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
 
-이 두 개념은 코드는 SDK에 있지만 호스트 입장에서 어떻게 흘러가는지는 명확합니다.
+두 모드는 성격이 다릅니다.
 
-![트리거 메트릭이 스케일 결정에 닿는 경로](../../../assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
+`IScaleMonitor`는 기존 증분형 모델입니다. 각 monitor가 자기 메트릭을 보고 `ScaleVote`를 던지며, 한 라운드에 최대 1개 인스턴스만 증감합니다. 모든 trigger가 지원합니다.
 
-*트리거 메트릭이 스케일 결정에 닿는 경로*
-두 가지 모드가 있고, 각각 다른 시기에 도입됐습니다.
+`ITargetScaler`는 2022년 도입된 target-based 모델입니다. 기본식은 “event source length / target executions per instance = desired instances”입니다. Microsoft 문서 기준으로 여러 trigger에서 기본값이 정해져 있고, 4.19.0+에서는 기본 활성화됩니다. 필요하면 `TARGET_BASED_SCALING_ENABLED=0`으로 증분형으로 되돌릴 수 있습니다.
 
-### Incremental scaling (`IScaleMonitor`)
+대표 trigger 기본값은 아래와 같습니다.
 
-원래 모델입니다. 각 ScaleMonitor가 자기 메트릭을 보고 `ScaleVote`(ScaleOut / ScaleIn / None)를 던집니다. 한 번에 **최대 1 인스턴스**만 추가/제거됩니다. 모든 트리거 타입이 지원합니다.
-
-### Target-based scaling (`ITargetScaler`)
-
-2022년부터 도입됐고 지금은 일부 트리거에서 기본값으로 쓰입니다. 계산식은 단순합니다.
-
-> desired instances = event source length / target executions per instance
-
-Microsoft의 공식 문서가 직접 인용하기에 이렇게 표현합니다.
-
-> "target-based scaling allows scale up of **four instances at a time**, and the scaling decision is based on a simple target-based equation"
-> — [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
-
-지원 트리거는 정해져 있습니다.
-
-| 트리거 | target executions per instance 설정 | 기본값 |
+| Trigger | Setting for target executions per instance | Default |
 |---|---|---|
 | Storage Queue | `extensions.queues.batchSize` | 16 |
 | Service Bus (single dispatch, v5+) | `extensions.serviceBus.maxConcurrentCalls` | 16 |
@@ -204,138 +175,90 @@ Microsoft의 공식 문서가 직접 인용하기에 이렇게 표현합니다.
 | Cosmos DB | `MaxItemsPerInvocation` (function attribute) | 100 |
 | Apache Kafka | `LagThreshold` (function attribute) | 1000 |
 
-target-based scaling은 **Functions runtime 4.19.0 이상**에서 기본 활성화되며, `TARGET_BASED_SCALING_ENABLED=0`으로 비활성화하고 incremental로 돌아갈 수 있습니다.
+호스트의 역할은 이 메트릭을 저장하는 repository입니다. 그 구현이 `TableStorageScaleMetricsRepository`이고, 외부 Scale Controller가 이 값을 읽어 판단합니다. 따라서 호스트는 메트릭 흐름의 중간 저장소이지 의사결정 주체가 아닙니다.
 
-> 출처: [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
+### 인스턴스 내부 동시성은 `WorkerConcurrencyManager`가 따로 관리합니다
 
-### 호스트는 무엇을 하는가
+외부 scale-out과 별개로, 같은 인스턴스 안에서 워커를 더 띄울지 결정하는 구성요소는 `WorkerConcurrencyManager`입니다. 이 경로는 겉보기보다 더 좁습니다. `StartAsync`는 Node, PowerShell, Python에 대해서만 동적 worker concurrency를 켜고, `HttpFunctionInvocationDispatcher` 경로는 제외하며, `FUNCTIONS_WORKER_PROCESS_COUNT`가 명시되면 아예 시작하지 않습니다.
 
-호스트는 이 두 모델 중 어느 쪽이든 **메트릭의 보관소** 역할만 합니다. `TableStorageScaleMetricsRepository`가 그 역할을 합니다 ([`src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs)). ScaleMonitor가 측정한 값을 저장하고, Scale Controller는 그 값을 읽어서 결정합니다.
+즉 `FUNCTIONS_WORKER_PROCESS_COUNT`는 인스턴스당 정적 워커 수 설정이고, `WorkerConcurrencyOptions`는 지연 시간 히스토리를 기준으로 **워커를 하나 더 추가할지** 판단하는 동적 루프입니다. 둘은 대체 관계가 아닙니다.
 
-즉 호스트는 결정에 **참여하지 않습니다.** 메트릭만 흘려보낼 뿐입니다.
+`IsOverloaded`는 queue depth를 보지 않습니다. `LatencyHistory`에서 최근 샘플을 보고, 임계치 이상 비율이 `NewWorkerThreshold`를 넘으면 과부하라고 봅니다. 그 다음 `NewWorkerIsRequired`가 최소 한 워커가 과부하이고 현재 워커 수가 `MaxWorkerCount` 미만일 때만 새 워커를 추가합니다. 중요한 점은 이 코드에 대칭적인 scale-in 경로가 없다는 것입니다. 이것은 **외부 scale-out의 축소판이 아니라, 인스턴스 내부 병렬성 확장 루프**입니다.
 
----
-
-## 인스턴스 내부 동시성 — `WorkerConcurrencyManager`
-
-위까지가 "인스턴스 수"를 결정하는 흐름이었습니다. 이번엔 다른 결정 — **같은 인스턴스 안에서 워커 프로세스를 몇 개 돌릴지** — 를 봅니다.
-
-OOP 워커(Python·Node·Java)에서 한 워커는 보통 단일 프로세스라 **같은 인스턴스 안에서 워커 프로세스를 여러 개 띄울 수 있습니다.** 이걸 결정하는 게 [`WorkerConcurrencyManager`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)입니다.
-
-이 로직은 생각보다 좁게 적용됩니다. `StartAsync`를 보면 동적 워커 동시성은 **Node / PowerShell / Python 런타임에서만** 켜집니다. `HttpFunctionInvocationDispatcher`를 쓰는 HTTP worker 경로에서는 건너뛰고, `FUNCTIONS_WORKER_PROCESS_COUNT`가 설정돼 있으면 아예 시작하지 않습니다. 이 환경 변수는 인스턴스당 워커 수를 **고정값으로 정하는 정적 설정**이기 때문입니다.
-
-반대로 `WorkerConcurrencyOptions`는 **동적 추가 로직의 임계치**입니다. 둘은 같은 것이 아닙니다. `FUNCTIONS_WORKER_PROCESS_COUNT`는 "처음부터 몇 개를 띄울까"이고, `WorkerConcurrencyOptions`는 "지금 지연 시간이 계속 높으니 하나 더 띄울까"를 결정하는 기준입니다.
-
-`IsOverloaded`는 큐 길이를 보지 않습니다. 워커 상태의 `LatencyHistory`가 `HistorySize` 이상 쌓였을 때, 그중 `LatencyThreshold` 이상인 샘플 비율을 구하고 그 비율이 `NewWorkerThreshold` 이상이면 overload로 판단합니다. 그리고 `NewWorkerIsRequired`는 overload인 워커가 하나 이상 있고 현재 워커 수가 `MaxWorkerCount`보다 작을 때만 새 워커를 추가합니다.
-
-여기에는 대칭적인 scale-in 경로가 없습니다. 이 코드는 바쁜 워커를 보고 **새 워커를 추가하는 쪽만** 담당합니다. 그래서 이건 **외부 Scale Controller와 무관한 인스턴스 내부 병렬도 확장**으로 이해하는 편이 정확합니다.
-
-이 둘을 한 표로 정리하면:
-
-| 항목 | 인스턴스 스케일아웃 | 워커 동시성 |
+| Aspect | Instance scale-out | Worker concurrency |
 |---|---|---|
-| 결정자 | Scale Controller (외부) | `WorkerConcurrencyManager` (호스트 내부) |
-| 단위 | VM 인스턴스 | 인스턴스 내 워커 프로세스 |
-| 신호 | ScaleMonitor 메트릭 + health ping | 워커 상태의 `LatencyHistory` 비율 |
-| 영향 | 청구액·시작 시간 | 인스턴스 내 처리량 |
-| 적용 범위 | 플랜마다 다름 | Node·PowerShell·Python에서만, HTTP worker 제외, 정적 process count 설정 시 비활성화 |
+| Decided by | Scale Controller (external) | `WorkerConcurrencyManager` (inside the host) |
+| Unit | VM instance | Worker process within an instance |
+| Signal | ScaleMonitor metrics + health ping | Proportion of overloaded samples in `LatencyHistory` |
+| Impact | Bill, cold-start time | Throughput within the instance |
+| Scope | Varies by plan | Node / PowerShell / Python only; excludes HTTP worker; disabled when static process count is set |
 
----
+### 같은 호스트 코드라도 플랜별 바깥 결정 계층이 다릅니다
 
-## 플랜별 차이 — 같은 코드, 다른 동작
+아래 그림은 같은 코드가 플랜마다 다른 운영 의미를 갖는 이유를 보여 줍니다.
 
-호스트 코드는 어디서 돌든 똑같습니다. 위에 본 `HostPerformanceManager.cs`도, `TableStorageScaleMetricsRepository.cs`도, `WorkerConcurrencyManager.cs`도 모두 한 코드베이스입니다. 다른 건 **누가 이 코드 바깥에서 결정을 내리느냐**입니다.
+![Plan-specific scaling decision differences](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
 
-![플랜별 결정 주체와 실행 차이](../../../assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
+#### Consumption
 
-*플랜별 결정 주체와 실행 차이*
-플랜별로 한 줄씩 정리하면:
+- 고전적인 Scale Controller가 결정합니다.
+- scale to zero를 지원합니다.
+- 최대 200 인스턴스입니다.
+- target-based scaling을 지원합니다.
 
-### Consumption
+#### Flex Consumption
 
-- 전통적인 Scale Controller가 결정.
-- 0으로 스케일 다운, 최대 200 인스턴스.
-- target-based scaling 지원(4.19.0+).
-- VNet 통합 없음.
+Flex Consumption은 사실상 Consumption의 후속 플랫폼입니다. 호스트 코드는 같지만 그 위의 결정 모델이 다릅니다.
 
-### Flex Consumption — 가장 새로운 모델
+- **per-function scaling**을 지원합니다. scale group은 `http`, `blob`, `durable`, `function:<NAMED_FUNCTION>`로 고정됩니다.
+- **Always Ready** 인스턴스를 둘 수 있어 cold start를 줄이는 주된 레버가 됩니다.
+- 기본 지역 할당량은 최대 1000 인스턴스 / 250 cores입니다.
+- 인스턴스 메모리를 512 / 2048 / 4096 MB에서 선택할 수 있습니다.
 
-Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입니다. 호스트 코드는 같지만 위에 얹힌 결정 모델이 다릅니다.
+#### Premium
 
-- **Per-function scaling**: 함수 단위 또는 함수 그룹 단위로 인스턴스를 다르게 스케일합니다. 그룹은 정해져 있습니다.
+- pre-warmed 인스턴스가 있어 사실상 초기 Always Ready 역할을 합니다.
+- VNet-bound trigger에서는 runtime scale monitoring을 켤 수 있어, 외부 Scale Controller가 VNet 밖에 있어도 host-side scale monitor 로직을 활용할 수 있습니다.
+- target-based scaling을 지원합니다.
 
-| 스케일 그룹 | 포함 트리거 |
-|---|---|
-| `http` | HTTP trigger, SignalR trigger |
-| `blob` | Blob storage trigger (Event Grid 기반) |
-| `durable` | Orchestration / Activity / Entity trigger |
-| `function:<NAMED_FUNCTION>` | 그 외 모든 함수 (개별) |
+#### Dedicated
 
-> 출처: [Flex Consumption per-function scaling](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan#per-function-scaling)
+- Functions 이벤트 기반 scaler가 돌지 않습니다.
+- App Service Auto-Scale 규칙이나 수동 확장을 사용합니다.
+- 같은 host code가 돌아도, 바깥에서 인스턴스 수를 event-driven으로 결정해 주는 계층이 없으므로 ScaleMonitor 메트릭의 의미가 달라집니다.
 
-- **Always ready 인스턴스**: 0이 아닌 최소치를 둘 수 있습니다. 그룹별/함수별로 따로 설정 가능. 콜드 스타트를 줄이는 핵심 레버입니다.
-- **최대 1000 인스턴스 / 250 cores per region 기본 쿼터**.
-- **인스턴스 메모리 선택 가능**: 512 / 2048 / 4096 MB. 큰 인스턴스일수록 같은 함수 그룹 안에서 더 높은 동시성을 흡수합니다.
-- VNet 통합·Azure Files 마운트 지원.
+전체를 한 표로 정리하면 아래와 같습니다.
 
-> 출처: [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
-
-### Premium (Elastic Premium)
-
-- Pre-warmed 인스턴스가 있어 Always Ready의 옛 형태처럼 동작.
-- VNet 트리거를 위해 **runtime scale monitoring**을 켤 수 있고, 켜면 ScaleMonitor 로직이 호스트 안에서 실행돼 외부 Scale Controller의 VNet 차단 문제를 우회합니다.
-- target-based scaling 지원 (4.19.0+, runtime scale monitoring 시 확장 패키지 최소 버전 요구).
-
-### Dedicated (App Service Plan)
-
-- Functions의 이벤트 기반 스케일러가 **동작하지 않습니다.** App Service의 일반 Auto-Scale 룰(CPU·메모리 기반) 또는 수동 스케일을 씁니다.
-- 호스트 코드는 같지만 외부에서 자기 인스턴스 수를 정해주지 않으니 ScaleMonitor가 보고하는 메트릭은 의미가 없어집니다.
-
-> 출처: [Target-based scaling considerations](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling#considerations) — "Event-driven scaling isn't supported when running on Dedicated (App Service) plans."
-
----
-
-## 한 표로 정리
-
-| 플랜 | 스케일 결정자 | 0으로 스케일 | 최대 인스턴스 | per-function | Always ready | VNet |
+| Plan | Scale decided by | Scale to zero | Max instances | Per-function | Always ready | VNet |
 |---|---|---|---|---|---|---|
-| Consumption | Scale Controller | 있음 | 200 | 없음 | 없음 | 없음 |
-| Flex Consumption | Scale Controller (신형) | 있음 | 1000 | 있음 | 있음 | 있음 |
-| Premium | Scale Controller(+옵션) | 없음 (최소 1) | SKU/리전별 상이 | 없음 | pre-warmed | 있음 |
-| Dedicated | App Service Auto-Scale | 없음 | 플랜 따라 다름 | 없음 | Always On으로 운영 가능 | 있음 |
+| Consumption | Scale Controller | Yes | 200 | No | No | No |
+| Flex Consumption | Scale Controller (new) | Yes | 1000 | Yes | Yes | Yes |
+| Premium | Scale Controller (+ option) | No (min 1) | Varies by SKU/region | No | pre-warmed | Yes |
+| Dedicated | App Service Auto-Scale | No | Depends on plan | No | Always On available | Yes |
 
-같은 호스트 바이너리 위에 얹힌 결정 레이어가 다를 뿐, 호스트가 일하는 방식은 같습니다.
+## 흔히 헷갈리는 지점
 
----
-
-## 정리 — 이 화에서 잡고 갈 모델
-
-- 스케일 결정은 **호스트 바깥**에서 일어난다. 호스트는 메트릭을 보고하고 health ping에 응답할 뿐입니다.
-- `IScaleMonitor`(점진)와 `ITargetScaler`(공식 기반)는 SDK·확장 측 인터페이스이고, 호스트는 그 메트릭을 Table Storage에 저장하는 역할만 합니다.
-- 인스턴스 수 결정과 인스턴스 내부 워커 수 결정은 다른 메커니즘입니다. 후자는 `WorkerConcurrencyManager`가 호스트 안에서 담당하지만, 새 워커를 추가하는 쪽만 다룹니다.
-- `FUNCTIONS_WORKER_PROCESS_COUNT`는 정적 워커 수 설정이고, `WorkerConcurrencyOptions`는 동적 추가 임계치입니다. 둘을 같은 설정으로 보면 흐름이 헷갈립니다.
-- 같은 호스트 코드가 Consumption / Flex / Premium / Dedicated에서 다르게 보이는 이유는 외부 결정자의 모델이 다르기 때문입니다. 호스트 자체는 그대로입니다.
-- Flex Consumption은 per-function scaling과 Always ready를 도입해 "어느 함수에 얼마나 인스턴스를 둘지"를 그룹 단위로 결정합니다.
-
-이번 화의 모델은 외부 결정자가 인스턴스 수를 판단하고, 호스트는 메트릭·health ping·워커 지연 시간 신호로 응답하는 경계에서 멈춥니다. 이 선을 분명히 그어야, 호스트 안의 근거와 Azure 관리 영역의 스케일 결정 로직을 섞지 않게 됩니다.
-
----
-
-## Call Path Summary
-
-- external scale component → `HostPerformanceManager.TryHandleHealthPingAsync(...)` → `IsUnderHighLoadAsync()` → host/worker 상태 기반 200 또는 429
-- trigger-side `IScaleMonitor` / `ITargetScaler` metrics → `TableStorageScaleMetricsRepository` → external Scale Controller consumes persisted metrics
-- `WorkerConcurrencyManager` timer loop → `WorkerStatus.LatencyHistory` 평가 → 필요 시 인스턴스 내부 worker 추가
-
----
+- **호스트가 인스턴스 수를 직접 결정하지는 않습니다.** 호스트는 health ping과 메트릭을 내보내고, 외부 계층이 인스턴스 수를 결정합니다.
+- **`IScaleMonitor`와 `ITargetScaler`는 host repo 안의 인터페이스가 아닙니다.** WebJobs SDK와 trigger extension 쪽 개념입니다.
+- **worker concurrency는 scale-out이 아닙니다.** 같은 인스턴스 안에 워커를 더 추가하는 병렬성 메커니즘입니다.
+- **`FUNCTIONS_WORKER_PROCESS_COUNT`와 `WorkerConcurrencyOptions`는 같은 축이 아닙니다.** 전자는 정적 워커 수, 후자는 지연 시간 기반 동적 추가입니다.
+- **같은 host code가 돌더라도 플랜별 운영 의미는 달라집니다.** 바깥 결정 계층과 placeholder 정책, App Service autoscale 여부가 다르기 때문입니다.
 
 ## 운영 체크리스트
 
-- [ ] 플랜 선택의 비용/지연 trade-off를 매트릭스로 정리했다
-- [ ] burst 시나리오에 대한 부하 테스트와 결과 기록이 있다
-- [ ] concurrency 설정과 다운스트림 quota를 함께 검증했다
-- [ ] scale-in 시 graceful shutdown 동작을 검증했다
-- [ ] Premium plan의 minimum instances와 cold-start 보호 전략을 결정했다
+- [ ] 플랜 선택 시 비용과 지연 시간 trade-off를 표로 정리했습니다.
+- [ ] burst 시나리오에 대한 부하 테스트와 결과 기록을 남겼습니다.
+- [ ] concurrency 설정이 downstream quota와 충돌하지 않는지 확인했습니다.
+- [ ] scale-in 시 graceful shutdown 동작을 검증했습니다.
+- [ ] Premium 또는 Flex Consumption의 cold-start 보호 전략을 문서화했습니다.
+
+## 정리
+
+이번 글의 핵심은 스케일링을 한 단어로 보지 않는 것입니다. 인스턴스 수를 결정하는 scale-out은 호스트 바깥의 Scale Controller 또는 플랜별 외부 계층이 맡고, 호스트는 health ping과 trigger 메트릭 저장소 역할만 합니다. 반면 인스턴스 내부 워커 수 증가는 `WorkerConcurrencyManager`가 맡는 별도 메커니즘입니다.
+
+이 구분을 잡아 두면 운영 질문이 훨씬 정확해집니다. “왜 인스턴스가 안 늘지?”는 외부 scale signal과 플랜 정책의 문제이고, “왜 같은 인스턴스 안에서 처리량이 낮지?”는 worker concurrency나 downstream bottleneck 문제일 가능성이 큽니다. 서로 다른 층의 문제를 같은 디버깅 경로로 섞지 않게 됩니다.
+
+다음 글에서는 새 인스턴스가 실제로 만들어진 뒤 어떤 일이 벌어지는지 봅니다. scale-out이 인스턴스 수 증가를 설명한다면, 콜드 스타트는 그 인스턴스가 왜 때로는 즉시 응답하고 때로는 느리게 준비되는지를 설명합니다. 마지막 편에서는 placeholder에서 specialization으로 넘어가는 코드 경로를 추적하겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -349,26 +272,22 @@ Flex Consumption은 Consumption의 후속이면서 사실상 다른 플랫폼입
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처 (호스트 코드, commit `5e59423`)
-
-- [`src/WebJobs.Script/Scale/HostPerformanceManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/HostPerformanceManager.cs) — Scale Controller health ping 처리, throttle 종합
-- [`src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs) — 샌드박스 카운터 DTO
-- [`src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs) — ScaleMonitor 메트릭 영속화
-- [`src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs) — 인스턴스 내부 워커 동시성
-
-### 2차 출처 (Microsoft Learn 공식 문서)
-
+### 공식 문서
+- [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
+- [`src/WebJobs.Script/Scale/HostPerformanceManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/HostPerformanceManager.cs)
+- [`src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script/Scale/ApplicationPerformanceCounters.cs)
+- [`src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.WebHost/Scale/TableStorageScaleMetricsRepository.cs)
+- [`src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/WorkerConcurrencyManager.cs)
 - [Azure Functions Flex Consumption plan hosting](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan)
 - [Target-based scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling)
 - [Event-driven scaling in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling)
 - [Azure Functions hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale)
 
 ### 관련 시리즈
-
-이 글은 Deep Dive 시리즈 5화입니다. 앞선 4화에서 한 번의 호출이 워커까지 도달하는 경로를 따라왔다면, 이번 화는 그런 호출이 많아졌을 때 바깥의 Scale Controller와 안쪽의 `WorkerConcurrencyManager`가 각각 무엇을 하는지 갈라서 보여 줍니다. 입문 시리즈 5·6화는 같은 주제를 운영자 관점에서 더 가볍게 정리한 버전입니다.
+- [Azure Functions 101 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
+- [Azure Functions 101 — Host와 Worker](../../azure-functions-101/ko/03-host-and-worker.md)
+- [Azure App Service Deep Dive — App Service 플랫폼 아키텍처](../../azure-app-service-deep-dive/ko/01-platform-architecture.md)
 
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

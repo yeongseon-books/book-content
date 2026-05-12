@@ -14,35 +14,51 @@ tags:
 - Serverless
 - Distributed Systems
 - gRPC
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @ 5e59423 기준입니다.
 ---
 
 # gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가
 
-> Azure Functions Deep Dive 시리즈 (3/6)
+워커 프로세스를 띄웠다고 해서 Functions가 곧바로 동작하는 것은 아닙니다. 실제 시스템 경계는 호스트와 워커가 생명주기 메시지, 함수 메타데이터, invocation, 로그, 상태 신호를 어떤 전송 경로로 주고받는지에서 드러납니다. 이 경로를 모르면 out-of-proc 모델은 “프로세스가 따로 있다”는 설명 이상으로 내려가지 못합니다.
 
-워커 프로세스를 띄웠다고 해서 시스템이 곧바로 움직이진 않습니다. 실제 경계는 호스트와 워커가 함수 메타데이터, 호출, 로그, 상태 신호를 어떤 전송 경로로 주고받는지에서 드러납니다.
+이 글의 범위는 하나입니다. `Process.Start()` 이후, 워커가 호스트와 처음 말을 트는 순간부터 시작해 실제 invocation이 오갈 준비가 될 때까지의 프로토콜 경계를 코드로 따라갑니다. 기준은 호스트 저장소 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)와 프로토콜 저장소 [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf)입니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 3번째 글입니다. 여기서는 Azure Functions의 호스트-워커 프로토콜이 실리는 양방향 gRPC 스트림을 코드 기준으로 추적합니다.
+특히 이번 글은 “gRPC를 쓴다”는 일반론이 아니라, 실제로 서비스가 하나이고 RPC도 하나이며 그 위에 dozens of message types가 `oneof`로 다중화된다는 사실을 구조적으로 정리합니다. 그리고 호스트 내부에서는 이 스트림이 일반 이벤트 버스보다 **워커별 채널 쌍 + gRPC 펌프**에 더 가깝게 구현되어 있다는 점을 보겠습니다.
 
-## Source Version
+이 글은 Azure Functions Deep Dive 시리즈의 세 번째 글입니다.
 
-이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
+이제 워커가 연결된 뒤 호스트와 워커 사이에 놓이는 실제 wire protocol 경계를 선명하게 보겠습니다.
 
-2화에서 워커 프로세스가 떠지는 것까지 봤습니다. `WorkerProcess.StartProcessAsync()`가 최종적으로 `Process.Start()`를 호출하면, Node/Python/Java 같은 외부 프로세스가 실행됩니다. 그러나 그것만으로는 아무 일도 일어나지 않습니다. **호스트와 워커가 서로 말을 걸 채널이 필요**합니다.
+## 이 글에서 다룰 문제
 
-그 채널은 단 하나의 **양방향 gRPC 스트림**입니다. 이 글에서는 그 스트림이 어떻게 생겼는지, 어떤 메시지가 오가는지, 그리고 호스트 측에서 그것을 어떻게 받고 라우팅하는지를 코드로 따라갑니다.
+- 호스트-워커 gRPC 스트림에는 어떤 메시지가 어떤 방식으로 실릴까요?
+- 스트림이 끊기면 호스트와 워커는 각각 무엇을 가정할까요?
+- 큰 페이로드는 이 스트림 위를 어떻게 지나가며, 어디에서 한계가 드러날까요?
+- gRPC 흐름의 backpressure는 어디에서 눈에 띄기 시작할까요?
+- 이 채널은 디버깅 가능한 구조일까요, 아니면 사실상 블랙박스일까요?
 
-> 이 글의 모든 코드 인용은 다음 두 저장소를 기준으로 합니다.
-> - 호스트: [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
-> - 프로토콜: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — 프로토콜은 호스트와 분리된 별도 저장소에 정의되어 있습니다.
+## 왜 이 글이 중요한가
 
----
+운영에서 “워커와 통신이 안 된다”는 말은 매우 자주 쓰이지만, 실제로는 여러 다른 층이 섞여 있습니다. 프로세스가 안 떴을 수도 있고, gRPC 클라이언트가 호스트에 붙지 못했을 수도 있고, 붙었지만 capability handshake가 끝나지 않았을 수도 있고, 함수 로드 메시지까지는 갔지만 invocation 경로가 준비되지 않았을 수도 있습니다. 프로토콜 경계를 알아야 이 문제들을 분리할 수 있습니다.
 
-## 큰 그림 — 단 하나의 스트림
+또한 Azure Functions의 out-of-proc 모델은 언어마다 구현체가 달라도 프로토콜은 동일하다는 점이 핵심입니다. Node, Python, Java 워커 코드가 달라도 `StartStream`, `WorkerInitRequest`, `FunctionLoadRequest`, `InvocationRequest`라는 공통 메시지 집합을 공유합니다. 이 사실을 이해하면 언어별 구현 차이와 플랫폼 공통 경계를 구분해서 볼 수 있습니다.
 
-먼저 결론. Azure Functions의 호스트-워커 통신은 **gRPC 서비스 하나, RPC 하나**로 구성됩니다.
+마지막으로, 이 글은 다음 화의 invocation 경로를 위한 전제 조건입니다. 한 번의 함수 호출이 워커에 도달하려면 먼저 워커별 채널과 응답 상관관계 구조가 이미 준비되어 있어야 합니다. 따라서 gRPC 스트림 구조를 이해하지 않고 dispatcher와 invocation을 보면 메시지 흐름이 지나치게 추상적으로 남습니다.
+
+## gRPC 이벤트 스트림을 이해하는 가장 좋은 방법: `StreamingMessage` 하나가 모든 메시지를 실어 나르는 단일 양방향 채널로 보는 것입니다
+
+Azure Functions 호스트-워커 통신은 서비스 하나와 RPC 하나로 압축됩니다. 중요한 것은 RPC가 많지 않다는 사실이 아니라, **하나의 양방향 스트림 위에 거의 모든 프로토콜 메시지가 `oneof`로 다중화되어 있다는 점**입니다. 생명주기, 함수 로드, invocation, 로그, 상태 점검이 모두 같은 운반체 위를 지나갑니다.
+
+호스트 내부 구현도 이 관점을 뒷받침합니다. 겉으로는 gRPC 서버와 클라이언트처럼 보이지만, 실제 소스에 가까이 붙어 보면 각 워커마다 inbound/outbound `Channel<T>`가 따로 있고, `FunctionRpcService`가 그 채널들과 실제 gRPC 스트림 사이를 연결하는 펌프 역할을 합니다. 즉 “generic event bus”보다는 “워커별 큐와 스트림 연결기”에 더 가깝습니다.
+
+> 이 글에서 잡아야 할 핵심은 단순히 gRPC를 쓴다는 사실이 아니라, 워커 하나가 워커별 채널 쌍과 하나의 `EventStream`에 매핑된다는 구체적인 통신 모델입니다.
+
+## 핵심 개념
+
+### 출발점은 정말로 RPC 하나뿐입니다
+
+호스트와 워커 사이의 통신 정의는 아래 한 줄로 요약됩니다.
 
 ```protobuf
 service FunctionRpc {
@@ -50,22 +66,18 @@ service FunctionRpc {
 }
 ```
 
-한 줄입니다. `EventStream` 하나. 양쪽 모두 stream. 즉 호스트와 워커는 **같은 채널을 통해 자유롭게 메시지를 주고받습니다**. 요청-응답 RPC가 아닙니다.
+`EventStream` 하나, 양방향 스트림 하나입니다. 요청-응답 RPC 여러 개가 있는 구조가 아닙니다. 따라서 이 채널 위에서 무엇이 오갈 수 있는지 이해하려면 `StreamingMessage`가 실을 수 있는 payload 집합을 보는 것이 핵심입니다.
 
-이 한 줄이 갖는 의미는 큽니다. **`StreamingMessage`에 들어갈 수 있는 모든 종류의 메시지**가 곧 Functions 프로토콜의 전부입니다.
+### `StreamingMessage`는 `oneof`로 다중화된 만능 메시지입니다
 
----
-
-## `StreamingMessage` — `oneof`로 다중화된 만능 메시지
-
-[`FunctionRpc.proto`의 `StreamingMessage`](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto)는 이렇게 생겼습니다.
+`FunctionRpc.proto`의 `StreamingMessage`는 아래처럼 정의되어 있습니다.
 
 ```protobuf
 message StreamingMessage {
-  // 호스트와 워커 사이에서 메시지를 식별하는 데 사용
+  // Used to identify message between host and worker
   string request_id = 1;
 
-  // 메시지 페이로드
+  // Payload of the message
   oneof content {
     StartStream start_stream = 20;
 
@@ -107,87 +119,76 @@ message StreamingMessage {
 }
 ```
 
-두 가지를 먼저 잡고 가면 됩니다.
+여기서 중요한 것은 두 가지입니다. `request_id`는 비동기 응답 상관관계에 쓰이고, `oneof content`는 한 번에 하나의 payload만 실을 수 있게 하면서도 수십 가지 메시지 타입을 같은 채널에 다중화합니다. 결국 Functions 프로토콜은 이 `oneof` 안에 들어가는 메시지 집합이라고 봐도 됩니다.
 
-1. `request_id` — 호스트와 워커가 메시지를 짝짓는 데 쓰는 ID. 비동기 응답을 짝지을 때 결정적입니다.
-2. `oneof content` — 한 번에 하나의 페이로드만 들어갑니다. 즉 같은 채널에 **수십 종의 메시지가 다중화**됩니다.
+### 메시지 집합은 다섯 부류로 나눠 보면 이해가 쉬워집니다
 
-이걸 분류해 보면 메시지는 크게 다섯 그룹으로 나뉩니다.
+프로토콜을 화면 하나에 올려놓으면 다음 다섯 부류로 볼 수 있습니다.
 
-| 그룹 | 메시지 | 누가 보내는가 |
+| 그룹 | 메시지 | 방향 |
 |---|---|---|
-| 수명주기 | StartStream, WorkerInitRequest/Response, WorkerTerminate | StartStream은 워커 → 호스트, WorkerInitRequest는 호스트 → 워커, WorkerInitResponse는 워커 → 호스트, WorkerTerminate는 호스트 → 워커 |
-| 상태 점검 | WorkerStatusRequest/Response | 호스트 → 워커 |
-| 함수 로드 | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | 호스트 ↔ 워커 |
-| 호출 | InvocationRequest/Response, InvocationCancel | 호스트 → 워커 (응답 역방향) |
-| 운영 | RpcLog, FileChangeEventRequest, FunctionEnvironmentReloadRequest/Response, WorkerWarmupRequest/Response | 다양 |
+| **Lifecycle** | StartStream, WorkerInitRequest/Response, WorkerTerminate | `StartStream` is worker → host, `WorkerInitRequest` is host → worker, `WorkerInitResponse` is worker → host, `WorkerTerminate` is host → worker |
+| **Health checks** | WorkerStatusRequest/Response | Host → Worker |
+| **Function loading** | FunctionLoadRequest/Response, FunctionsMetadataRequest, FunctionMetadataResponse | Host ↔ Worker |
+| **Invocation** | InvocationRequest/Response, InvocationCancel | Host → Worker (response goes the other way) |
+| **Operations** | RpcLog, FileChangeEventRequest, FunctionEnvironmentReloadRequest/Response, WorkerWarmupRequest/Response | Mixed |
 
-이 표가 곧 Functions 프로토콜의 전체 그림입니다.
+이 표를 머리에 넣으면 이후 세부 단계가 훨씬 단순해집니다. 같은 스트림을 쓰더라도 지금 오가는 메시지가 생명주기인지, 함수 로드인지, 호출인지 구분할 수 있기 때문입니다.
 
----
+### 첫 핸드셰이크를 이해하면 나머지가 따라옵니다
 
-## 핸드셰이크 — 워커가 떠서 호스트와 처음 말을 트는 순간
-
-이 모든 메시지가 다 중요하지만, **가장 처음 일어나는 핸드셰이크**를 이해하면 나머지는 자연스럽게 따라옵니다.
-
-### 1단계 — 워커가 `StartStream`을 보낸다
-
-워커 프로세스가 부팅을 마치면, 먼저 호스트에게 자기소개를 합니다.
+실제 시작 순서는 네 단계로 요약할 수 있습니다. 먼저 워커가 `StartStream`으로 자신을 소개합니다.
 
 ```protobuf
 message StartStream {
-  // 워커 ID
+  // id of the worker
   string worker_id = 2;
 }
 ```
 
-워커는 자신의 `worker_id`를 담아 `StartStream`을 호스트로 보냅니다. 이 ID는 2화에서 본 `RpcWorkerConfig` 생성 시 호스트가 워커에게 환경 변수나 명령행 인자로 넘긴 값과 같습니다. 즉 **호스트가 미리 알려준 ID를 워커가 그대로 되돌려주는** 인사입니다. 호스트는 이걸로 "방금 연결한 이 gRPC 클라이언트가 내가 띄운 그 워커"임을 확인합니다.
+이 `worker_id`는 호스트가 2화에서 워커를 띄울 때 환경변수나 명령줄 인자로 넘겨준 값입니다. 즉 워커는 호스트가 준 식별자를 다시 되돌려 주며, 호스트는 “방금 붙은 gRPC 클라이언트가 내가 띄운 그 워커가 맞다”고 확인합니다.
 
-### 2단계 — 호스트가 `WorkerInitRequest`를 보낸다
-
-워커의 신원이 확인되면, 호스트는 워커를 "초기화"합니다.
+그 다음 호스트는 `WorkerInitRequest`를 보냅니다.
 
 ```protobuf
 message WorkerInitRequest {
-  // 초기화 요청을 보내는 호스트의 버전
+  // version of the host sending init request
   string host_version = 1;
 
-  // 호스트가 지원하는 기능/capability 맵
+  // A map of host supported features/capabilities
   map<string, string> capabilities = 2;
 
-  // 워커에 지원하는 로그 카테고리와 수준을 알림
+  // inform worker of supported categories and their levels
   map<string, RpcLog.Level> log_categories = 3;
 
-  // `worker.config.json` 위치의 전체 경로
+  // Full path of worker.config.json location
   string worker_directory = 4;
 
-  // 함수 앱의 기준 디렉터리
+  // base directory for function app
   string function_app_directory = 5;
 }
 ```
 
-여기서 가장 중요한 필드는 `capabilities`입니다. **호스트가 자기가 지원하는 기능을 알립니다.** (예: shared memory data transfer, RPC HTTP body, raw HTTP body bytes 등) 워커는 이걸 보고 "이 호스트와는 여기까지 쓸 수 있겠구나"를 파악합니다.
+여기서 핵심은 `capabilities`입니다. 호스트가 자신이 지원하는 기능을 광고하고, 워커는 그 정보를 읽어 “이 호스트와는 shared memory data transfer를 쓸 수 있나, HTTP body를 어떤 방식으로 받을 수 있나”를 결정합니다.
 
-### 3단계 — 워커가 `WorkerInitResponse`로 답한다
+이어서 워커는 `WorkerInitResponse`로 자기 capability를 돌려줍니다.
 
 ```protobuf
 message WorkerInitResponse {
-  // 워커가 지원하는 기능/capability 맵
+  // A map of worker supported features/capabilities
   map<string, string> capabilities = 2;
 
-  // 응답 상태
+  // Status of the response
   StatusResult result = 3;
 
-  // 텔레메트리 용도로 수집한 워커 메타데이터
+  // Worker metadata captured for telemetry purposes
   WorkerMetadata worker_metadata = 4;
 }
 ```
 
-이번에는 반대로 **워커가 자기 capabilities를 알립니다.** 호스트는 `WorkerChannel.ApplyCapabilities()`로 기존 capability 상태를 갱신하며, 기본 전략은 merge입니다. 즉 “양쪽 capability의 단순 교집합을 한 번 계산한다”기보다, **호스트가 알고 있는 capability 집합을 업데이트하고 그 결과로 shared memory·HTTP proxying 같은 동작을 켜거나 끄는 모델**에 가깝습니다. 또한 `WorkerMetadata`로 런타임 종류, 버전, 비트성 같은 텔레메트리용 메타데이터가 함께 옵니다.
+호스트는 `WorkerChannel.ApplyCapabilities()`를 통해 이 값을 병합하고, 그 결과로 shared memory 전송이나 HTTP proxying 같은 기능을 활성화할지 판단합니다. `WorkerMetadata`에는 런타임 종류, 버전, bitness 같은 telemetry 정보도 함께 실립니다.
 
-### 4단계 — 호스트가 `FunctionLoadRequest`로 함수를 로드시킨다
-
-핸드셰이크가 끝나면 호스트는 본격적으로 함수를 워커에게 알려줍니다.
+마지막으로 호스트는 함수별 `FunctionLoadRequest` 또는 일괄 `FunctionLoadRequestCollection`을 보내 워커에게 실제 함수 목록을 알려 줍니다.
 
 ```protobuf
 message FunctionLoadRequest {
@@ -197,113 +198,58 @@ message FunctionLoadRequest {
 }
 ```
 
-각 함수마다 하나씩 보내거나 `FunctionLoadRequestCollection`으로 한 번에 묶어서 보냅니다. 워커는 각각에 대해 `FunctionLoadResponse`로 성공 여부를 알려줍니다.
+이 네 단계가 끝나야 워커는 invocation을 받을 준비를 갖춥니다.
 
-### 한 화면으로
+![Common worker protocol lifecycle flow](../../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
 
-![워커 생애주기의 공통 프로토콜 흐름](../../../assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
+### 호스트 쪽 gRPC 서버는 `FunctionRpcService`입니다
 
-*워커 생애주기의 공통 프로토콜 흐름*
-이 시퀀스가 **모든 워커의 일생**입니다. Node 워커도, Python 워커도, Java 워커도 똑같습니다. 언어별로 다른 건 워커 측의 구현 상세이고, **프로토콜은 단일**입니다.
+워커는 gRPC 클라이언트이고, 호스트는 서버입니다. 호스트 쪽 `EventStream` 구현은 `src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs`에 있습니다. 이 클래스는 `FunctionRpc.FunctionRpcBase`를 상속하고 `EventStream` 메서드를 override합니다.
 
----
+주변 파일도 함께 보면 구조가 더 분명해집니다. `AspNetCoreGrpcServer.cs`는 Kestrel + ASP.NET Core gRPC 서버를 호스트 내부에 띄우는 진입점이고, `AspNetCoreGrpcHostBuilder.cs`는 그 gRPC 서버용 `IHost`를 만들며, `Startup.cs`는 `endpoints.MapGrpcService<FunctionRpc.FunctionRpcBase>()`로 엔드포인트를 등록합니다. 즉 **Functions Host 내부에 localhost gRPC 서버가 하나 돌고 있고, 각 워커가 그 서버에 클라이언트로 붙는 구조**입니다.
 
-## 호스트 측 — `FunctionRpcService`가 EventStream을 받는다
+### 호스트 내부에서는 워커별 채널 쌍과 gRPC 펌프로 보는 편이 정확합니다
 
-워커는 클라이언트, 호스트는 서버입니다. 호스트 측에서 `EventStream` RPC를 구현하는 건 [`src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)입니다.
+이 부분은 소스에 가까이 붙어 읽는 것이 중요합니다. 실제 invocation 경로는 넓은 pub-sub 버스라기보다 워커별 inbound/outbound 채널 쌍으로 구현됩니다. `GrpcEventExtensions.AddGrpcChannels(workerId)`가 워커 ID별로 두 개의 채널을 만듭니다.
 
-이름에서 짐작되듯, `FunctionRpc.FunctionRpcBase`(protoc가 `service FunctionRpc`에서 자동 생성한 base 클래스)를 상속해 `EventStream` 메서드를 override합니다.
+- inbound: worker → host 방향의 `InboundGrpcEvent`
+- outbound: host → worker 방향의 `OutboundGrpcEvent`
 
-`Server/` 디렉토리에는 이 외에도 다음 파일이 있습니다.
+`FunctionRpcService.EventStream()`는 먼저 `StartStream`으로 워커 ID를 확인한 뒤 `TryGetGrpcChannels(workerId, out inbound, out outbound)`를 호출합니다. 그 다음은 기계적입니다. gRPC에서 읽은 `StreamingMessage`를 inbound 채널에 쓰고, outbound 채널에서 꺼낸 메시지를 다시 gRPC 응답 스트림으로 밀어 넣습니다.
 
-- [`AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs) — Kestrel + ASP.NET Core gRPC를 호스트 안에 서버로 띄우는 진입점
-- [`AspNetCoreGrpcHostBuilder.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcHostBuilder.cs) — gRPC 서버용 IHost를 빌드
-- [`Startup.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/Startup.cs) — `endpoints.MapGrpcService<FunctionRpc.FunctionRpcBase>()`로 gRPC 엔드포인트 매핑
+![Per-worker channel pairs and gRPC pump](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
 
-즉, **함수 호스트 안에서 ASP.NET Core gRPC 서버가 함께 떠 있고**, 워커 프로세스들은 그 서버에 gRPC 클라이언트로 접속해 `EventStream`을 부릅니다. localhost gRPC 통신입니다.
+따라서 `FunctionRpcService`는 실제 gRPC 스트림과 호스트 내부 워커별 큐 사이의 펌프입니다. `IScriptEventManager`가 있기는 하지만, 적어도 함수 호출 트래픽을 이해하는 데는 “워커별 큐 + gRPC 펌프”라는 멘탈 모델이 소스와 가장 잘 맞습니다.
 
-서버가 듣는 주소(엔드포인트와 포트)는 호스트가 결정하고, 2화에서 본 환경 변수/명령행 인자를 통해 워커에게 알려줍니다. 그래서 워커 측 코드를 보면 거의 모든 언어 워커가 첫 진입점에서 "호스트가 알려준 주소로 gRPC 클라이언트를 만든다"는 동일한 패턴을 보입니다.
+### 결국 한 invocation이 타는 통신 인프라는 이렇게 요약됩니다
 
----
+한 문장으로 압축하면 이렇습니다. `FunctionRpcService`가 워커에서 온 `StreamingMessage`를 읽어 그 워커의 inbound 채널에 넣고, outbound 채널의 메시지를 다시 gRPC 스트림으로 배출합니다. 그리고 `GrpcWorkerChannel`은 그 채널 쌍 위에 올라가 요청과 응답을 워커 단위로 맞춰 주는 호스트 측 제어 객체입니다.
 
-## `GrpcWorkerChannel` — 호스트가 워커를 다루는 손잡이
+이 그림이 잡히면 이후 dispatcher와 invocation 경로가 “generic event bus를 떠다니는 메시지”가 아니라, **워커 하나에 귀속된 실체적인 송수신 경로**로 보이기 시작합니다.
 
-서버가 받은 메시지는 결국 누군가가 **읽고 라우팅**해야 합니다. 그 "누군가"가 호스트 측의 워커 핸들 객체, **`GrpcWorkerChannel`**입니다.
+## 흔히 헷갈리는 지점
 
-[`src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)는 호스트가 **하나의 워커 프로세스 = 하나의 인스턴스** 비율로 갖고 있는 객체입니다. 같은 디렉토리의 다른 파일들을 곁에 두고 보면 역할이 분명해집니다.
-
-| 파일 | 역할 |
-|---|---|
-| `GrpcWorkerChannel.cs` | 워커 1대를 대표하는 손잡이. `StartWorkerProcessAsync()`, `SendWorkerInitRequest`, `SendInvocationRequest`, `StopWorkerProcess()` 같은 흐름이 여기와 베이스 `WorkerChannel`에 걸쳐 있습니다. |
-| [`WorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs) | gRPC 위에 있는 공통 베이스 |
-| [`GrpcWorkerChannelFactory.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannelFactory.cs) | `GrpcWorkerChannel`을 만드는 팩토리 |
-| [`GrpcCapabilities.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcCapabilities.cs) | capability 키 상수 모음 |
-| [`OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs) | 같은 `invocation_id`에 속한 메시지를 순서대로 처리 |
-
-이번 글에서 붙잡아 둘 핵심은 하나입니다. **이 객체가 EventStream을 양쪽 방향에서 다룬다**는 사실입니다.
-
----
-
-## 채널 구조 — 범용 이벤트 버스보다 워커별 `Channel<T>` 쌍에 가깝다
-
-이 부분은 그림을 과장 없이 보는 편이 좋습니다. 호출 메시지의 주 경로는 “광범위한 in-process 이벤트 버스”가 아니라, **워커 하나마다 만들어지는 inbound/outbound `Channel<T>` 쌍**입니다.
-
-`GrpcEventExtensions.AddGrpcChannels(workerId)`는 워커 ID별로 다음 두 채널을 만듭니다.
-
-- inbound: 워커 → 호스트로 들어오는 `InboundGrpcEvent`
-- outbound: 호스트 → 워커로 나가는 `OutboundGrpcEvent`
-
-`FunctionRpcService.EventStream()`은 `StartStream`으로 워커 ID를 확인한 뒤 `TryGetGrpcChannels(workerId, out inbound, out outbound)`를 호출합니다. 그 다음 동작은 단순합니다.
-
-- gRPC에서 읽은 `StreamingMessage`를 inbound 채널에 씁니다.
-- outbound 채널에서 읽은 메시지를 gRPC 응답 스트림으로 씁니다.
-
-즉 `FunctionRpcService`는 호스트 쪽 gRPC 서버이면서, 동시에 **워커별 채널과 실제 gRPC 스트림 사이를 펌프하는 중계기**입니다.
-
-![워커별 채널 쌍과 gRPC 펌프 구조](../../../assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
-
-*워커별 채널 쌍과 gRPC 펌프 구조*
-`IScriptEventManager`는 이 채널들을 워커 ID로 보관하고 찾는 상태 저장소로 쓰입니다. `InboundGrpcEvent`와 `OutboundGrpcEvent` 같은 래퍼 타입도 실제로 존재합니다. 다만 함수 호출 메시지의 핵심 경로를 설명할 때는, 그것들을 범용 pub-sub 버스라고 이해하기보다 **워커별 큐와 펌프 구조**로 보는 쪽이 코드와 더 가깝습니다.
-
----
-
-## 그래서 한 호출은 어떤 길을 가는가
-
-지금까지의 모든 걸 한 줄로 줄이면 다음과 같습니다.
-
-> 호스트 안의 `FunctionRpcService`는 워커가 보낸 `StreamingMessage`를 받아 해당 워커의 inbound 채널에 넣고, outbound 채널에서 꺼낸 메시지를 다시 gRPC 스트림으로 씁니다. `GrpcWorkerChannel`은 자기 워커에 연결된 그 채널 쌍을 통해 요청과 응답을 처리합니다.
-
-여기까지가 "통신 인프라"입니다. 워커별 채널 쌍과 gRPC 펌프 구조를 머릿속에 넣고 나면, 이후의 호출 경로도 범용 이벤트 버스가 아니라 구체적인 요청/응답 전송으로 읽히기 시작합니다.
-
----
-
-## 이 글이 고정해 주는 것
-
-여기까지 오면 프로토콜 경계가 선명해집니다. 워커 하나가 양방향 gRPC 스트림 하나로 호스트에 붙고, 호스트는 그 워커를 채널 쌍으로 매핑하며, `GrpcWorkerChannel`이 그 위에서 워커별 제어 객체 역할을 맡습니다.
-
----
-
-## 시리즈 안에서의 위치
-
-이 글은 Azure Functions Deep Dive 시리즈 3화입니다. 2화가 워커 프로세스를 띄우는 문제였다면, 이번 화는 그 워커가 호스트와 어떤 전송 경계로 붙는지 분해해 보여 줍니다.
-
----
-
-## Call Path Summary
-
-- Worker bootstrap → `StartStream(worker_id)` → `FunctionRpcService.EventStream(...)` → `TryGetGrpcChannels(workerId, out inbound, out outbound)`
-- `WorkerChannel.SendWorkerInitRequest()` → `WorkerInitResponse` → `ApplyCapabilities(...)`
-- `WorkerChannel.SendFunctionLoadRequest()` / `SendFunctionLoadRequestCollection()` → worker load ack → per-worker invocation path becomes ready
-
----
+- **호스트-워커 통신은 RPC 여러 개가 아니라 `EventStream` 하나입니다.** 수십 가지 메시지 타입이 `StreamingMessage.oneof`로 다중화됩니다.
+- **워커가 먼저 `StartStream`으로 자신을 소개합니다.** 호스트가 일방적으로 초기화만 하는 구조가 아닙니다.
+- **capability negotiation은 일회성 “공통집합 계산”으로 끝나지 않습니다.** 호스트는 워커 capability를 병합한 뒤 그 상태로 기능을 파생합니다.
+- **호스트 내부 경로는 generic event bus보다 워커별 채널 쌍에 가깝습니다.** invocation 트래픽은 worker-specific inbound/outbound 큐 위에서 움직입니다.
+- **프로토콜이 공통이라는 말은 언어별 구현이 같다는 뜻이 아닙니다.** 구현은 달라도 같은 메시지 집합과 같은 핸드셰이크 순서를 공유한다는 뜻입니다.
 
 ## 운영 체크리스트
 
-- [ ] 큰 payload 함수의 분할/스트리밍 정책을 정했다
-- [ ] Worker disconnect 알림과 자동 복구 동작을 검증했다
-- [ ] gRPC 채널 메트릭(latency, error)을 대시보드에 노출했다
-- [ ] stream 끊김 시 외부 의존성에 대한 idempotency 보장을 검토했다
-- [ ] 디버깅을 위한 trace correlation ID 전파 정책을 정했다
+- [ ] 큰 페이로드 함수에 대해 chunking 또는 shared-memory 전송 정책을 정했습니다.
+- [ ] worker disconnect와 자동 복구 알림을 대시보드에 올렸습니다.
+- [ ] gRPC 채널 지연과 오류 지표를 관측 가능한 형태로 정리했습니다.
+- [ ] 스트림 드롭 시 외부 의존성에 대한 idempotency 보장을 점검했습니다.
+- [ ] 추적 가능한 디버깅을 위해 correlation ID 전파 정책을 정의했습니다.
+
+## 정리
+
+이번 글은 Azure Functions out-of-proc 모델의 실제 프로토콜 경계를 고정했습니다. 워커는 하나의 양방향 `EventStream`으로 호스트와 대화하고, 그 위에서 생명주기·함수 로드·호출·로그·상태 메시지가 모두 `StreamingMessage` 형태로 다중화됩니다. 즉 gRPC는 단순 운반체가 아니라 전체 호스트-워커 계약의 표면입니다.
+
+동시에 호스트 내부 구현도 함께 분해했습니다. `FunctionRpcService`는 호스트 내부 localhost gRPC 서버의 핸들러이며, 실제 동작은 워커별 inbound/outbound 채널과 gRPC 스트림을 이어 주는 펌프에 가깝습니다. 이 구조를 이해하면 “통신이 안 된다”는 증상을 훨씬 더 구체적인 단계 문제로 쪼갤 수 있습니다.
+
+이제 다음 글에서는 이 스트림 위를 오가는 메시지 중 가장 중요한 `InvocationRequest`와 `InvocationResponse`에 집중합니다. 트리거가 발화했을 때 그 사건이 어떻게 워커 안의 사용자 함수 호출이 되고, 결과가 어떤 상관관계 경로를 따라 호스트로 되돌아오는지 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -317,14 +263,12 @@ message FunctionLoadRequest {
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-**프로토콜 (별도 저장소)**
-- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto) — `service FunctionRpc`, `StreamingMessage`, 모든 메시지 타입
-
-**호스트 코드 (commit `5e59423`)**
+### 공식 문서
+- [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
+- [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf)
+- [FunctionRpc.proto](https://github.com/Azure/azure-functions-language-worker-protobuf/blob/3757ce8/src/proto/FunctionRpc.proto)
 - [`Server/FunctionRpcService.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/FunctionRpcService.cs)
 - [`Server/AspNetCoreGrpcServer.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Server/AspNetCoreGrpcServer.cs)
 - [`Channel/GrpcWorkerChannel.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs)
@@ -332,7 +276,9 @@ message FunctionLoadRequest {
 - [`Eventing/GrpcEventExtensions.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Eventing/GrpcEventExtensions.cs)
 - [`Channel/OrderedInvocationMessageDispatcher.cs`](https://github.com/Azure/azure-functions-host/blob/5e59423ba45491041d18224c3e72c168a4a5b7f7/src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs)
 
-**관련 입문편**
-- [Host와 Worker — 함수는 누가 실행하는가 (입문편 3화)](../../azure-functions-101/ko/03-host-and-worker.md)
+### 관련 시리즈
+- [Azure Functions 101 — Host와 Worker](../../azure-functions-101/ko/03-host-and-worker.md)
+- [Azure Functions 101 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
+- [Azure App Service Deep Dive — App Service 플랫폼 아키텍처](../../azure-app-service-deep-dive/ko/01-platform-architecture.md)
 
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC
