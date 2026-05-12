@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 7
 title: 경사하강법
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,41 +16,59 @@ tags:
   - GradientDescent
   - Optimization
   - Beginner
-seo_description: 경사하강법, 학습률, 수렴, 발산, 확률적 경사하강 직관을 ML 입문자 관점에서 정리한 글
-last_reviewed: '2026-05-11'
+seo_description: 경사하강법, learning rate, 수렴, 발산, stochastic gradient descent 직관을 ML 입문자 관점에서 정리한 글
+last_reviewed: '2026-05-12'
 ---
 
 # 경사하강법
 
-경사하강법은 손실 gradient의 반대 방향으로 작은 걸음을 반복해 더 나은 가중치를 찾는 방법입니다.
+미분과 gradient를 안다고 해서 학습이 자동으로 진행되지는 않습니다. 이제 남은 질문은 그 gradient를 실제 움직임으로 어떻게 바꾸느냐입니다. 경사하강법은 현재 위치의 gradient를 읽고, 그 반대 방향으로 작은 스텝을 반복해 손실을 줄여 나가는 가장 기본적인 알고리즘입니다.
 
-이 글은 Calculus for ML 101 시리즈의 7번째 글입니다.
+중요한 것은 경사하강법이 단순한 수학 장난이 아니라, 현대 optimizer들의 공통 뼈대라는 점입니다. Adam, Momentum, RMSProp도 결국 기본 경사하강법을 더 안정적이고 빠르게 만들기 위한 변형입니다.
 
-> Calculus for ML 101 시리즈 (7/10)
+이 글은 Calculus for ML 101 시리즈의 일곱 번째 글입니다.
 
+이 글에서는 경사하강법의 기본 업데이트 식, learning rate의 역할, 수렴과 발산, SGD와 mini-batch 직관을 중심으로 설명하겠습니다. 목표는 “gradient가 있으니 이제 움직인다”를 단순한 문장이 아니라 반복 가능한 학습 절차로 이해하는 것입니다.
+
+끝까지 읽고 나면 optimizer 로그에서 loss curve를 볼 때 왜 learning rate가 가장 먼저 의심되는지 자연스럽게 설명할 수 있게 됩니다.
 
 ## 이 글에서 다룰 문제
 
-대부분의 ML 학습은 결국 손실을 줄이는 방향으로 조금씩 이동하는 과정이고, 그 기본 형태가 경사하강법입니다.
+- gradient의 반대 방향으로 이동하면 왜 손실이 줄어들까요?
+- learning rate는 단순한 배율 이상으로 어떤 역할을 할까요?
+- 경사하강법이 수렴하거나 발산하는 패턴은 어떻게 구분할 수 있을까요?
+- 전체 데이터 gradient와 SGD, mini-batch gradient는 어떤 차이를 만들까요?
+- 초기화와 gradient noise는 optimization 경로에 어떤 영향을 줄까요?
 
-## 전체 흐름
+## 왜 이 글이 중요한가
+
+대부분의 ML 학습은 경사하강법의 변형 위에서 돌아갑니다. 손실 함수가 목표를 정의하고 gradient가 방향을 제시한다면, 경사하강법은 그 둘을 실제 파라미터 업데이트로 연결하는 실행 절차입니다. 이 연결이 있어야 미분이 모델 학습으로 바뀝니다.
+
+실무에서 학습이 실패하는 가장 흔한 원인 중 하나는 learning rate 설정입니다. 너무 크면 발산하고, 너무 작으면 거의 움직이지 않으며, 데이터 스케일과 초기화, batch size에 따라 적절한 값이 달라집니다. 경사하강법의 동작 원리를 이해하지 못하면 이런 현상을 optimizer 이름 탓으로 돌리기 쉽습니다.
+
+또한 SGD가 가져오는 noise와 mini-batch가 만드는 trade-off를 이해해야 학습 곡선의 흔들림을 자연스럽게 읽을 수 있습니다. 이 감각은 다음 글의 고급 optimizer로 넘어갈 때도 그대로 이어집니다.
+
+## 경사하강법을 이해하는 가장 좋은 방법: gradient가 알려 준 반대 방향으로 반복적으로 미세 조정하는 루프로 보는 것입니다
+
+경사하강법은 사실상 매우 단순한 루프입니다. 현재 파라미터에서 gradient를 계산하고, 그 gradient를 learning rate만큼 스케일한 뒤 반대 방향으로 이동합니다. 이 루프를 반복하면서 손실을 낮춥니다.
+
+하지만 이 단순함 때문에 오히려 핵심이 잘 드러납니다. 방향은 gradient가 정하고, 스텝 크기는 learning rate가 정합니다. 따라서 학습이 이상하게 움직일 때는 대부분 “방향이 틀렸는가, 아니면 스텝 크기가 부적절한가”로 문제를 나눠 생각할 수 있습니다.
+
+> 경사하강법은 손실을 줄이는 마법이 아니라, gradient가 알려 준 반대 방향으로 얼마나 조심스럽게 걸을지 정하는 반복 절차입니다.
+
+## 핵심 개념
+
+경사하강법의 흐름은 다음과 같습니다.
+
 ```mermaid
 flowchart LR
-    W[Weights] --> G[Gradient]
-    G --> S[Step]
+    W[가중치] --> G[Gradient]
+    G --> S[스텝]
     S --> W
-    W --> L[Loss decrease]
+    W --> L[손실 감소]
 ```
 
-## Before/After
-
-**Before**: 가능한 조합을 전부 시도해야 할 것처럼 느낍니다.
-
-**After**: 기울기 방향을 따라 훨씬 효율적으로 이동합니다.
-
-## 미니 GD 키트
-
-### 1단계 — 손실과 기울기
+### 가장 단순한 손실과 gradient부터 봅시다
 
 ```python
 def loss(w):
@@ -60,14 +78,18 @@ def grad(w):
     return 2 * (w - 3)
 ```
 
-### 2단계 — GD 한 스텝
+이 손실은 $w=3$에서 최소가 됩니다. gradient는 현재 위치가 최소점보다 왼쪽인지 오른쪽인지, 그리고 얼마나 떨어져 있는지를 알려 줍니다. 경사하강법은 이 gradient를 반대로 사용해 최소점 쪽으로 이동합니다.
+
+### 한 번의 스텝은 매우 단순합니다
 
 ```python
 def step(w, lr=0.1):
     return w - lr * grad(w)
 ```
 
-### 3단계 — 학습 루프
+여기서 `lr`은 learning rate입니다. 방향은 `grad(w)`의 부호가 결정하고, 실제 이동 거리는 `lr`이 조절합니다. 같은 gradient라도 `lr`이 10배면 업데이트도 10배 커집니다. 그래서 learning rate는 optimizer에서 가장 먼저 손대는 하이퍼파라미터입니다.
+
+### 학습은 이 스텝의 반복입니다
 
 ```python
 def train(w0, lr=0.1, steps=100):
@@ -77,7 +99,9 @@ def train(w0, lr=0.1, steps=100):
     return w
 ```
 
-### 4단계 — SGD
+반복 횟수가 늘수록 파라미터는 최소점 근처로 이동합니다. 물론 실제 딥러닝은 다차원, 비볼록 손실, 노이즈가 있는 gradient를 다루므로 훨씬 복잡하지만, 기본 루프는 이와 같습니다.
+
+### SGD는 일부 데이터만 보고 업데이트합니다
 
 ```python
 import random
@@ -91,43 +115,48 @@ def sgd(data, w0, lr=0.01, epochs=10):
     return w
 ```
 
-### 5단계 — 학습률 영향
+Full-batch GD가 전체 데이터의 gradient를 쓴다면, SGD는 샘플 하나 또는 매우 작은 batch만 보고 업데이트합니다. 그래서 gradient가 noisy해지지만 계산은 싸고, 때로는 그 noise가 평평한 지역을 벗어나거나 일반화에 도움을 주기도 합니다.
+
+### learning rate는 학습 궤적을 바꿉니다
 
 ```python
 for lr in [0.001, 0.1, 1.5]:
     print(lr, train(0.0, lr, 50))
 ```
 
-## 이 코드에서 주목할 점
+작은 learning rate는 안정적이지만 느리고, 큰 learning rate는 빠를 수 있지만 최소점을 건너뛰며 진동하거나 발산할 수 있습니다. 그래서 loss curve를 볼 때는 값이 내려가느냐만 보지 말고, 요동치는지, plateau에 갇히는지, 특정 시점에 폭주하는지도 함께 봐야 합니다.
 
-- 경사하강법은 기울기의 반대 방향으로 한 걸음 움직이는 규칙입니다.
-- 학습률은 한 번에 얼마나 움직일지 정하므로 결과에 큰 영향을 줍니다.
-- SGD는 더 흔들리지만 계산량이 작고 빠르게 반응합니다.
+### 초기화와 noise도 경로를 바꿉니다
 
-## 자주 하는 실수 5가지
+같은 알고리즘이라도 초기 파라미터와 데이터 순서가 다르면 최적화 경로가 달라집니다. 특히 비볼록 딥러닝 손실에서는 이 차이가 더 큽니다. 따라서 재현성과 실험 비교를 위해 seed, initialization, batching 정책을 함께 기록하는 습관이 중요합니다.
 
-1. 학습률을 너무 크게 잡아 손실이 줄지 않고 튑니다.
-2. 스케일이 다른 파라미터에 같은 학습률을 그대로 적용합니다.
-3. 아직 수렴하지 않았는데 너무 일찍 학습을 멈춥니다.
-4. SGD의 노이즈를 오류로만 보고 장단점을 함께 보지 못합니다.
-5. 초기값의 영향을 무시하고 항상 같은 값으로만 시작합니다.
+## 흔히 헷갈리는 지점
 
-## 실무에서는 이렇게 쓰입니다
+- gradient가 맞아도 learning rate가 너무 크면 손실은 쉽게 발산할 수 있습니다.
+- loss가 천천히 줄어든다고 해서 모델 구조 문제라고 단정하면 안 됩니다. learning rate가 지나치게 작을 수 있습니다.
+- SGD의 흔들림을 실패 신호로만 보면 안 됩니다. 일부 noise는 정상적인 특성입니다.
+- 서로 다른 스케일의 파라미터에 동일한 learning rate를 적용할 때 문제가 생길 수 있습니다.
+- 모든 weight를 0으로 초기화하면 대칭성 문제로 학습이 막히는 구조가 있을 수 있습니다.
 
-Adam, Momentum, RMSProp 같은 최적화 기법도 뿌리는 모두 경사하강법입니다. 기본 원리를 이해해 두면 새로운 옵티마이저를 봐도 무엇이 달라졌는지 빠르게 파악할 수 있습니다.
+## 운영 체크리스트
 
-## 체크리스트
+- [ ] learning rate 후보를 최소 두세 개 이상 비교해 본다
+- [ ] loss curve에서 수렴, 진동, 발산 패턴을 구분해서 읽는다
+- [ ] SGD 또는 mini-batch가 만드는 noise를 정상 특성과 오류로 구분한다
+- [ ] 초기화와 seed를 기록해 실험 재현성을 확보한다
+- [ ] optimizer 문제를 의심하기 전에 기본 gradient와 learning rate 해석부터 확인한다
 
-- [ ] 학습률 후보를 비교해 봤습니다.
-- [ ] 손실이 실제로 수렴하는지 계속 확인했습니다.
-- [ ] 발산 징후가 보이면 바로 중단할 기준을 정했습니다.
-- [ ] 초기값을 바꿔도 비슷한 경향이 나오는지 확인했습니다.
+## 정리
 
-## 정리 및 다음 단계
+경사하강법은 gradient의 반대 방향으로 작은 스텝을 반복해 손실을 줄이는 가장 기본적인 학습 알고리즘입니다. 방향은 gradient가 정하고, 스텝 크기는 learning rate가 정합니다. 이 단순한 구조가 거의 모든 현대 optimizer의 출발점입니다.
 
-경사하강법은 손실 지형 위에서 가장 가파르게 내려가는 방향을 따라 이동하는 기본 전략입니다. 단순해 보여도 학습률, 초기화, 노이즈 해석처럼 실제 성능을 좌우하는 요소가 많습니다. 다음 글에서는 이런 기본 전략이 더 넓은 최적화 문제와 어떻게 연결되는지 보겠습니다.
+실무적으로 가장 중요한 감각은 learning rate 해석입니다. 발산, 느린 수렴, noisy curve 같은 현상은 대부분 경사하강법의 기본 요소로 설명할 수 있습니다. 따라서 optimizer를 바꾸기 전에 먼저 기본 GD 관점에서 현상을 읽어 보는 습관이 중요합니다.
+
+다음 글에서는 plain GD의 약점을 보완하는 momentum, RMSProp, Adam 같은 최적화 기법을 보겠습니다. 그러면 왜 현대 학습 루프가 그 변형들을 쓰는지 연결해서 이해할 수 있습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [미분이란 무엇인가](./01-what-is-derivative.md)
 - [함수와 기울기](./02-functions-and-slope.md)
 - [편미분](./03-partial-derivatives.md)
@@ -138,13 +167,19 @@ Adam, Momentum, RMSProp 같은 최적화 기법도 뿌리는 모두 경사하강
 - 최적화 (예정)
 - 역전파 직관 (예정)
 - 딥러닝에서의 미분 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+### 공식 문서
 - [Gradient Descent - CS231n](https://cs231n.github.io/optimization-1/)
 - [Adam Optimizer - Kingma and Ba](https://arxiv.org/abs/1412.6980)
 - [Deep Learning Book - Optimization](https://www.deeplearningbook.org/contents/optimization.html)
 - [PyTorch Optimizers](https://pytorch.org/docs/stable/optim.html)
+
+### 관련 시리즈
+- [Linear Algebra 101](../../linear-algebra-101/ko/)
+- [MLOps 101](../../mlops-101/ko/)
 
 Tags: Calculus, ML, GradientDescent, Optimization, Beginner

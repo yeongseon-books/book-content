@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 10
 title: 딥러닝에서의 미분
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,65 +16,59 @@ tags:
   - DeepLearning
   - Capstone
   - Beginner
-seo_description: 신경망, 손실, 옵티마이저, 역전파, 미분이 딥러닝 학습 루프에서 결합되는 방식을 정리한 글
-last_reviewed: '2026-05-11'
+seo_description: 네트워크, 손실, optimizer, backprop과 미분이 딥러닝 학습 루프에서 어떻게 합쳐지는지 정리한 글
+last_reviewed: '2026-05-12'
 ---
 
 # 딥러닝에서의 미분
 
-딥러닝 학습 루프는 순전파, 손실 계산, 역전파, 업데이트를 하나의 반복으로 묶고 그 중심에 미분을 둡니다.
+이 시리즈에서 지금까지 본 개념들은 각각 따로 존재하지 않습니다. 함수와 기울기, 편미분, gradient, chain rule, 손실 함수, 경사하강법, optimizer, 역전파는 모두 딥러닝 학습 루프 안에서 하나의 사이클로 묶여 움직입니다. 마지막 글의 목표는 그 조각들을 하나의 운영 모델로 합치는 것입니다.
 
-이 글은 Calculus for ML 101 시리즈의 10번째 글입니다.
+딥러닝 학습은 겉으로 보면 반복문 한 줄처럼 보일 수 있습니다. 하지만 그 안에서는 예측을 만들고, 오차를 수치화하고, chain rule로 gradient를 계산하고, optimizer가 파라미터를 조정하는 과정이 정밀하게 이어집니다. 이 전체 고리를 이해해야 프레임워크 사용법을 넘어서 학습 자체를 설명할 수 있습니다.
+
+이 글은 Calculus for ML 101 시리즈의 마지막 글입니다.
+
+이 글에서는 forward pass, loss computation, backward pass, optimizer update, 반복 학습을 하나의 training loop로 묶어 설명하겠습니다. 목표는 “딥러닝이 학습한다”는 문장을 추상적으로 두지 않고, 미분이 실제로 어디에서 어떤 역할을 하는지 단계별로 복원하는 것입니다.
+
+끝까지 읽고 나면 딥러닝 훈련 코드를 볼 때 각 줄이 어떤 수학적 의미를 갖는지, 그리고 왜 미분이 그 전체 루프의 중심인지 선명하게 보이게 됩니다.
 
 ## 이 글에서 다룰 문제
 
-- 지금까지 배운 미분 개념은 딥러닝 학습 루프에서 어떻게 합쳐질까요?
-- 순전파, 손실 계산, 역전파, 업데이트는 어떤 순서로 연결될까요?
-- 프레임워크를 블랙박스로만 보면 무엇을 놓치게 될까요?
-- 학습 루프의 핵심 뼈대를 직접 구현하면 무엇이 보일까요?
+- 딥러닝 학습 루프는 어떤 단계로 구성되고 각 단계에서 미분은 어디에 등장할까요?
+- forward pass와 loss computation은 backward를 위해 무엇을 준비할까요?
+- gradient 계산과 optimizer update는 어떻게 연결될까요?
+- `zero_grad`, eval/train mode, reproducibility 같은 실무 요소는 왜 이 루프 안에 들어올까요?
+- 이 시리즈의 모든 미분 개념은 최종적으로 어떤 하나의 그림으로 합쳐질까요?
 
-> 딥러닝 학습은 순전파로 예측을 만들고, 손실로 오차를 재고, 역전파로 gradient를 구한 뒤, optimizer로 파라미터를 갱신하는 반복입니다. 이 네 단계의 중심에 미분이 있습니다.
+## 왜 이 글이 중요한가
 
-> Calculus for ML 101 시리즈 (10/10)
+딥러닝 프레임워크는 training loop를 매우 간결하게 감춰 줍니다. 그래서 코드는 짧아지지만, 각 단계의 의미가 흐려지기 쉽습니다. forward가 무엇을 만들고, loss가 무엇을 수치화하고, backward가 무엇을 전파하며, optimizer가 무엇을 바꾸는지 이해해야 학습 버그를 제대로 읽을 수 있습니다.
 
-## 이 글에서 배울 것
+실무에서는 같은 모델 구조라도 data pipeline, loss reduction, gradient zeroing, optimizer scheduling, eval/train mode 관리에 따라 결과가 크게 달라집니다. 이 모두를 관통하는 공통 골격이 training loop입니다. 마지막 글에서 이 골격을 잡아 두면 이후 어떤 프레임워크를 보더라도 본질을 잃지 않게 됩니다.
 
-- 학습 루프의 5단계를 한 흐름으로 봅니다.
-- 순전파와 손실 계산의 역할을 정리합니다.
-- 역전파와 업데이트가 어디서 연결되는지 이해합니다.
-- 시리즈 전체 개념이 하나의 루프로 묶이는 모습을 봅니다.
+또한 이 글은 시리즈 전체의 요약이기도 합니다. 미분은 더 이상 별도의 수학 단원이 아니라, 예측을 오차로 바꾸고 그 오차를 다시 파라미터 변화로 환원하는 전 과정을 움직이는 중심 메커니즘으로 보이게 됩니다.
 
-## 왜 중요한가
+## 딥러닝에서의 미분을 이해하는 가장 좋은 방법: forward, loss, backward, update가 닫힌 순환을 이루는 것으로 보는 것입니다
 
-이 글은 시리즈의 마무리입니다. 개별 개념을 따로 이해하는 것도 중요하지만, 실제 딥러닝에서는 그 개념들이 한 루프 안에서 동시에 작동합니다. 이 골격을 이해해야 프레임워크가 숨기는 부분과 드러내는 부분을 구분할 수 있습니다.
+딥러닝 학습을 가장 실용적으로 이해하는 방법은 하나의 루프를 떠올리는 것입니다. 모델이 입력으로부터 예측을 만들고, 손실 함수가 오차를 계산하고, 역전파가 gradient를 만들고, optimizer가 파라미터를 갱신합니다. 그리고 이 과정이 반복됩니다.
 
-## 개념 한눈에 보기
+이 루프를 이해하면 미분은 코드 한 줄이 아니라 루프 전체를 관통하는 공통 언어가 됩니다. forward는 함수 합성이고, loss는 목적 함수이며, backward는 chain rule의 실행이고, optimizer step은 gradient를 이동으로 바꾸는 절차입니다.
+
+> 딥러닝에서 미분은 특정 레이어의 공식이 아니라, 예측 오차를 파라미터 업데이트로 변환하는 학습 루프 전체의 공통 인터페이스입니다.
+
+## 핵심 개념
+
+training loop의 핵심 흐름은 아래와 같습니다.
 
 ```mermaid
 flowchart LR
-    F[순전파] --> L[손실]
-    L --> B[역전파]
-    B --> U[업데이트]
+    F[Forward] --> L[Loss]
+    L --> B[Backward]
+    B --> U[Update]
     U --> F
 ```
 
-## 핵심 용어
-
-- **순전파**: 입력으로부터 예측을 계산하는 단계입니다.
-- **손실**: 예측과 정답의 차이를 재는 수치입니다.
-- **역전파**: 손실을 각 파라미터의 gradient로 분해하는 단계입니다.
-- **업데이트**: gradient를 사용해 가중치를 조정하는 단계입니다.
-- **epoch**: 전체 데이터를 한 번 모두 도는 주기입니다.
-
-## Before / After
-
-**Before**: 프레임워크가 알아서 학습한다고만 생각합니다.
-
-**After**: 각 단계가 왜 필요한지, 어디서 미분이 쓰이는지 설명할 수 있습니다.
-
-## 단계별 실습: 미니 학습 루프
-
-### Step 1 — 모델
+### 모델은 입력을 예측으로 바꾸는 함수입니다
 
 ```python
 import math
@@ -86,18 +80,18 @@ def sigmoid(z):
     return 1 / (1 + math.exp(-z))
 ```
 
-아주 작은 이진 분류 모델입니다. 입력 x와 파라미터 w, b로 예측 확률을 만듭니다.
+이 작은 모델은 선형 결합 뒤에 sigmoid를 붙인 가장 단순한 형태입니다. 하지만 여기에 이미 함수 합성과 비선형성이 모두 들어 있습니다. 복잡한 딥러닝 모델도 본질적으로는 이런 함수들의 긴 합성입니다.
 
-### Step 2 — 손실 (BCE)
+### 손실은 예측과 정답의 차이를 숫자로 만듭니다
 
 ```python
 def bce(y, p, eps=1e-7):
     return -(y * math.log(p + eps) + (1 - y) * math.log(1 - p + eps))
 ```
 
-예측이 정답과 얼마나 다른지 숫자로 측정합니다. 여기서부터 미분이 학습 신호를 만들기 시작합니다.
+forward만으로는 학습이 일어나지 않습니다. 예측이 얼마나 틀렸는지를 loss로 수치화해야 하고, 이 loss가 gradient의 출발점이 됩니다. 여기서 숫자 안정성을 위해 `eps`를 더하는 습관은 실제 training code에서도 매우 중요합니다.
 
-### Step 3 — 기울기 (해석)
+### gradient는 analytic form으로도 볼 수 있습니다
 
 ```python
 def grads(x, y, w, b):
@@ -106,9 +100,9 @@ def grads(x, y, w, b):
     return err * x, err
 ```
 
-손실을 w와 b에 대해 미분한 결과를 직접 씁니다. 실제 프레임워크는 이런 계산을 자동으로 처리합니다.
+이 함수는 BCE와 sigmoid 조합에서 나오는 단순화된 gradient 직관을 보여 줍니다. 핵심은 error가 각 파라미터의 책임으로 분해된다는 점입니다. 입력 쪽 weight는 `err * x`, bias는 `err` 형태로 영향을 받습니다. 즉 편미분과 chain rule이 실제 코드 결과로 나타난 것입니다.
 
-### Step 4 — 한 스텝 갱신
+### optimizer step은 gradient를 이동으로 바꿉니다
 
 ```python
 def step(x, y, w, b, lr=0.1):
@@ -116,9 +110,9 @@ def step(x, y, w, b, lr=0.1):
     return w - lr * dw, b - lr * db
 ```
 
-gradient의 반대 방향으로 가중치를 한 번 업데이트합니다.
+이 한 줄이 optimizer의 본질입니다. backward가 준 gradient를 learning rate만큼 스케일해 반대 방향으로 이동합니다. 대형 프레임워크에서는 Adam, momentum, weight decay 등이 추가되지만, 핵심 구조는 그대로입니다.
 
-### Step 5 — 학습 루프
+### 반복문이 곧 학습 루프입니다
 
 ```python
 def train(data, epochs=100, lr=0.1):
@@ -129,41 +123,39 @@ def train(data, epochs=100, lr=0.1):
     return w, b
 ```
 
-이 반복이 바로 학습입니다. 예측, 손실, gradient, 업데이트가 계속 이어집니다.
+학습은 거창한 것이 아니라 이 반복입니다. 데이터가 들어오고, 예측이 만들어지고, 손실이 계산되고, gradient가 업데이트로 바뀌며, 그 결과 새로운 파라미터가 다음 forward에 사용됩니다. 이 닫힌 고리가 학습의 전부라고 해도 과언이 아닙니다.
 
-## 이 코드에서 주목할 점
+### 실무에서는 루프 주변의 운영 규칙도 함께 봐야 합니다
 
-- 순전파는 예측을 만듭니다.
-- 손실은 얼마나 틀렸는지 측정합니다.
-- 역전파는 책임을 gradient로 나눕니다.
-- optimizer 업데이트가 실제 파라미터 변화를 만듭니다.
-- 반복 자체가 학습의 본체입니다.
+실제 코드에서는 `zero_grad`, `model.train()`, `model.eval()`, seed 고정, mixed precision, gradient clipping, scheduler step 같은 규칙이 이 루프 주변에 붙습니다. 하지만 이런 운영 요소들도 결국 forward-loss-backward-update 구조를 안정적으로 실행하기 위한 보조 장치입니다.
 
-## 자주 하는 실수 5가지
+## 흔히 헷갈리는 지점
 
-1. 학습률 조정을 뒤로 미뤄 전체 학습을 불안정하게 만듭니다.
-2. zero_grad 위치를 잘못 잡아 gradient를 누적시킵니다.
-3. 평가 단계에서도 gradient를 계산해 메모리를 낭비합니다.
-4. train/eval 모드를 섞어 Dropout, BatchNorm 동작을 틀리게 만듭니다.
-5. 재현성을 위한 시드와 로그를 남기지 않습니다.
+- loss를 계산했다고 해서 자동으로 업데이트가 되는 것은 아닙니다. backward와 optimizer step이 이어져야 합니다.
+- `zero_grad`를 빼먹으면 이전 step의 gradient가 누적될 수 있습니다.
+- evaluation 중에도 gradient를 계산하면 불필요한 메모리와 계산을 사용하게 됩니다.
+- train/eval mode를 혼동하면 Dropout, BatchNorm 동작이 달라져 결과 해석이 틀어질 수 있습니다.
+- reproducibility를 무시하면 실험 차이가 모델 구조 때문인지 학습 루프 설정 때문인지 구분하기 어려워집니다.
 
-## 실무에서는 이렇게 생각합니다
+## 운영 체크리스트
 
-이미지 분류, 언어 모델, 추천 시스템, 강화학습은 겉모습은 달라도 공통 학습 골격은 거의 같습니다. 달라지는 것은 모델 구조와 손실, optimizer 선택이지만, 그 중심에는 항상 미분과 gradient가 있습니다. 결국 프레임워크를 잘 쓰는 사람은 추상화 뒤의 루프를 머릿속에 그리고 있습니다.
+- [ ] forward, loss, backward, update의 순서를 팀 공통 학습 루프로 명확히 정리한다
+- [ ] `zero_grad`와 optimizer step의 위치를 코드 리뷰 기준에 포함한다
+- [ ] train/eval mode 전환 규칙을 실험 코드와 추론 코드에서 분리한다
+- [ ] learning rate, seed, scheduler, weight decay를 함께 기록해 재현성을 확보한다
+- [ ] 학습 문제를 볼 때 모델 구조뿐 아니라 training loop 전체를 한 번에 점검한다
 
-## 체크리스트
+## 정리
 
-- [ ] 순전파가 어떤 예측을 만드는지 설명할 수 있습니다.
-- [ ] 손실 함수가 문제 정의와 연결된다는 점을 이해했습니다.
-- [ ] backward가 gradient를 만든다는 흐름을 알고 있습니다.
-- [ ] optimizer step이 실제 업데이트라는 점을 확인했습니다.
-- [ ] 학습 루프 전체를 한 사이클로 설명할 수 있습니다.
+딥러닝에서 미분은 특정 수식의 일부가 아니라 학습 루프 전체를 움직이는 중심 메커니즘입니다. forward는 함수 합성으로 예측을 만들고, loss는 오차를 숫자로 바꾸고, backward는 chain rule로 gradient를 계산하고, optimizer는 그 gradient를 파라미터 업데이트로 바꿉니다.
 
-## 정리 및 마무리
+이 시리즈에서 본 미분, 편미분, gradient, 연쇄 법칙, 손실 함수, 경사하강법, 최적화, 역전파는 모두 이 하나의 루프 안에서 각자 자리를 갖습니다. 그래서 딥러닝을 이해한다는 것은 결국 이 루프의 각 단계가 어떤 수학적 역할을 맡는지 설명할 수 있다는 뜻입니다.
 
-이 시리즈에서 본 미분, 편미분, gradient, 손실, 경사하강법, 최적화, 역전파는 따로 떨어진 개념이 아닙니다. 모두 딥러닝 학습 루프 안에서 한 번에 작동합니다. 딥러닝이 학습한다는 말의 수학적 핵심은 결국 손실을 미분해 더 나은 방향으로 반복해서 이동한다는 뜻입니다.
+이 글로 Calculus for ML 101 시리즈를 마칩니다. 이제 이후 어떤 모델이나 프레임워크를 보더라도, 그 안에서 학습이 실제로 어떻게 일어나는지 미분의 언어로 다시 읽어 낼 수 있을 것입니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [미분이란 무엇인가](./01-what-is-derivative.md)
 - [함수와 기울기](./02-functions-and-slope.md)
 - [편미분](./03-partial-derivatives.md)
@@ -174,13 +166,19 @@ def train(data, epochs=100, lr=0.1):
 - [최적화](./08-optimization.md)
 - [역전파 직관](./09-backpropagation-intuition.md)
 - **딥러닝에서의 미분 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
 
+### 공식 문서
 - [Deep Learning Book - Goodfellow et al.](https://www.deeplearningbook.org/)
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 - [CS231n - Convolutional Neural Networks](https://cs231n.stanford.edu/)
 - [Reproducibility - PyTorch](https://pytorch.org/docs/stable/notes/randomness.html)
+
+### 관련 시리즈
+- [Linear Algebra 101](../../linear-algebra-101/ko/)
+- [MLOps 101](../../mlops-101/ko/)
 
 Tags: Calculus, ML, DeepLearning, Capstone, Beginner
