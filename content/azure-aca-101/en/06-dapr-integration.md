@@ -22,7 +22,9 @@ seo_description: 'Think of Dapr at two levels:'
 
 # Dapr integration — what you get from a sidecar
 
-> Azure Container Apps 101 series (6/7)
+Dapr removes a lot of repeated plumbing in microservices, but it does not erase architectural trade-offs. You need to keep App-level settings separate from Environment-level components to see where the platform ends and your design begins.
+
+This is post 6 in the Azure Container Apps 101 series. Here, we'll examine what the sidecar gives you on ACA and what it asks you to own.
 
 ## What you'll learn
 

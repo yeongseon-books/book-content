@@ -23,7 +23,9 @@ seo_description: Ingress는 ACA의 "건물 정문"이고, traffic weight는 "엘
 
 # Ingress와 트래픽 분할 — Revision 기반 배포 전략
 
-> Azure Container Apps 101 시리즈 (4/7)
+Ingress와 트래픽 분할은 ACA에서 가장 자주 만지는 운영 레버입니다. 설정 한두 줄 차이로 외부 노출 방식과 배포 안전성이 함께 달라지기 때문에 둘을 따로 보면 자주 놓칩니다.
+
+이 글은 Azure Container Apps 101 시리즈의 4번째 글입니다. 여기서는 Revision 기반 배포 전략까지 한 흐름으로 묶어 보겠습니다.
 
 ---
 

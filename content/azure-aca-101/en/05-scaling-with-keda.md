@@ -22,7 +22,9 @@ seo_description: 'Think of scaling as a three-stage declarative pipeline:'
 
 # Scaling — KEDA scalers and zero-to-N
 
-> Azure Container Apps 101 series (5/7)
+Scaling in ACA is not just about adding replicas. The moment you decide which signals matter and whether the platform can scale to zero, you are also setting your cost policy and your latency policy.
+
+This is post 5 in the Azure Container Apps 101 series. Here, we'll unpack KEDA scalers and the zero-to-N model from an operational angle.
 
 ## What you'll learn
 

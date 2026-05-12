@@ -24,7 +24,9 @@ seo_description: Ingress is ACA's "front door"; traffic weight is the "elevator 
 
 # Ingress and traffic splitting — revision-based deployment strategies
 
-> Azure Container Apps 101 series (4/7)
+Ingress and traffic splitting are two of the most important operational levers in ACA. A small configuration change can alter both exposure and rollout safety, so they make more sense together than apart.
+
+This is post 4 in the Azure Container Apps 101 series. Here, we'll connect ingress design to revision-based deployment strategy.
 
 ---
 

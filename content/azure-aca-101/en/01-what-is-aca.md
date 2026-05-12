@@ -23,7 +23,9 @@ seo_description: ACA is "App Service for containers."
 
 # What is Azure Container Apps? — running containers without Kubernetes
 
-> Azure Container Apps 101 series (1/7)
+At first glance, Azure Container Apps looks like the missing middle ground between App Service and AKS. To use it well, you need a clear mental model of what the platform abstracts away and what still belongs to you.
+
+This is the first post in the Azure Container Apps 101 series. Here, we'll place ACA on the Azure container map and define the workloads it fits best.
 
 ---
 

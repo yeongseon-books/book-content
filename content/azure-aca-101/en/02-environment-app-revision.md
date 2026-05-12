@@ -24,7 +24,9 @@ seo_description: Environment is "the building," Container App is "the office," R
 
 # Environment, Container App, Revision — ACA in three words
 
-> Azure Container Apps 101 series (2/7)
+Environment, Container App, and Revision show up everywhere in ACA. The names sound close, but they carry different lifetimes and responsibilities, and that distinction drives how you deploy and operate the platform.
+
+This is post 2 in the Azure Container Apps 101 series. Here, we'll separate those three terms from an operator's point of view.
 
 ---
 

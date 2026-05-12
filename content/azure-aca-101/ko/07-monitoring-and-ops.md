@@ -22,7 +22,9 @@ seo_description: ACA 관측성은 세 개의 독립된 계층으로 나뉩니다
 
 # 모니터링과 운영 — Log Analytics와 Application Insights
 
-> Azure Container Apps 101 시리즈 (7/7)
+운영 사고가 나면 로그가 있는지보다 먼저 어디서 답을 찾아야 하는지가 중요합니다. ACA는 플랫폼 로그, 애플리케이션 추적, 메트릭이 서로 다른 계층에 흩어져 있어서 경계를 모르면 진단 시간이 길어집니다.
+
+이 글은 Azure Container Apps 101 시리즈의 마지막 글입니다. 여기서는 Log Analytics와 Application Insights를 기준으로 운영 가시성의 경계를 정리합니다.
 
 ## 핵심 질문
 

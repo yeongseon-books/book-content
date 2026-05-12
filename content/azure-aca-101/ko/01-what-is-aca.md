@@ -23,7 +23,9 @@ seo_description: ACA는 "컨테이너용 App Service"입니다.
 
 # Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기
 
-> Azure Container Apps 101 시리즈 (1/7)
+Azure Container Apps를 처음 보면 App Service와 AKS 사이 어딘가에 있는 서비스처럼 보입니다. 컨테이너는 직접 가져가지만 클러스터 운영은 숨겨 주겠다는 약속이 실제로 무엇을 뜻하는지부터 먼저 잡아야 합니다.
+
+이 글은 Azure Container Apps 101 시리즈의 첫 번째 글입니다. 여기서는 ACA가 어떤 위치의 서비스인지, 어떤 워크로드에 잘 맞는지부터 정리합니다.
 
 ---
 

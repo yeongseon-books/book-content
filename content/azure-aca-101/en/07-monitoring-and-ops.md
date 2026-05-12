@@ -22,7 +22,9 @@ seo_description: 'ACA observability splits into three independent layers:'
 
 # Monitoring and ops — Log Analytics and Application Insights
 
-> Azure Container Apps 101 series (7/7)
+During an incident, the hard part is not whether data exists but knowing which layer holds the answer. ACA spreads logs, traces, and metrics across different systems, and that boundary determines how fast you can diagnose production problems.
+
+This is the final post in the Azure Container Apps 101 series. Here, we'll map those layers through Log Analytics and Application Insights.
 
 ## What you'll learn
 

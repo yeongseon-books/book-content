@@ -23,7 +23,9 @@ seo_description: Environment는 "건물", Container App은 "사무실", Revision
 
 # Environment·Container App·Revision — 세 단어로 보는 ACA
 
-> Azure Container Apps 101 시리즈 (2/7)
+ACA를 배우다 보면 Environment, Container App, Revision이라는 단어를 반복해서 만나게 됩니다. 이름은 비슷하지만 수명과 책임이 달라서 여기서 한 번 헷갈리면 배포와 운영이 계속 꼬입니다.
+
+이 글은 Azure Container Apps 101 시리즈의 2번째 글입니다. 여기서는 세 단어를 운영 관점에서 분리해 보겠습니다.
 
 ---
 

@@ -24,7 +24,9 @@ seo_description: A first deploy on ACA is like calling a taxi — you need an or
 
 # Your first deploy — Python/FastAPI
 
-> Azure Container Apps 101 series (3/7)
+A first deploy is where ACA stops being a diagram and starts becoming an operating model. You only really see the service boundaries after you push an image, wire the dependencies, and watch a Revision come alive.
+
+This is post 3 in the Azure Container Apps 101 series. Here, we'll walk a Python/FastAPI app through that full path.
 
 ---
 

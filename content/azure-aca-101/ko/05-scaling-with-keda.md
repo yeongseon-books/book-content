@@ -22,7 +22,9 @@ seo_description: 스케일링은 세 단계의 선언적 흐름으로 보면 단
 
 # 스케일링 — KEDA scaler와 0-to-N
 
-> Azure Container Apps 101 시리즈 (5/7)
+ACA의 스케일링은 단순히 replica 수를 늘리고 줄이는 기능이 아닙니다. 어떤 신호를 보고 언제 0까지 내릴지 결정하는 순간, 비용 정책과 응답 지연 정책이 함께 정해집니다.
+
+이 글은 Azure Container Apps 101 시리즈의 5번째 글입니다. 여기서는 KEDA scaler와 0-to-N 모델을 운영 관점에서 정리합니다.
 
 ## 핵심 질문
 
