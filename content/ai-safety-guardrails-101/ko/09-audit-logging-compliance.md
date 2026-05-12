@@ -3,7 +3,7 @@ title: 감사 로깅과 컴플라이언스
 series: ai-safety-guardrails-101
 episode: 9
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,39 +14,61 @@ tags:
 - Audit Logging
 - Compliance
 - GDPR
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 컴플라이언스, 사고 조사, 모델 개선의 기준 자료입니다.
 ---
 
 # 감사 로깅과 컴플라이언스
 
-> AI Safety & Guardrails 101 시리즈 (9/10)
+LLM 시스템의 audit log는 시끄러운 application log가 아닙니다. 나중에 “왜 이 답이 나왔는가”, “어떤 guardrail이 통과했고 무엇이 차단됐는가”, “삭제 요청은 언제 처리됐는가”를 재구성해야 하므로, 목적도 형식도 보존 정책도 모두 달라야 합니다.
 
-LLM 시스템의 audit log는 단순 디버그 로그가 아닙니다. 나중에 "왜 이런 결정을 내렸는가"를 재구성해야 하므로 보존 기간, 접근 권한, PII 처리 방식부터 별도로 설계해야 합니다.
+특히 AI 시스템에서는 결정 근거를 남기지 않으면 사고 대응이 거의 불가능합니다. 검색 기반 응답이었다면 어떤 chunk를 봤는지, 어떤 모델 설정이 적용됐는지, 어떤 정책 judge가 통과했는지까지 함께 남아야 합니다. 그래야 규제 대응과 재현, drift 탐지가 가능합니다.
 
-이 글은 AI Safety & Guardrails 101 시리즈의 9번째 글입니다. 여기서는 감사 로깅을 application log와 분리해야 하는 이유와 컴플라이언스 관점의 필수 필드를 정리합니다.
+그래서 audit log는 “개발자가 보기 편한 로그”가 아니라 “나중에 증거로 제출할 수 있는 기록”으로 설계해야 합니다. append-only, 구조화, 제한된 접근, PII 분리 저장이 핵심입니다.
 
----
+이 글은 AI Safety & Guardrails 101 시리즈의 9번째 글입니다.
 
-## Section 1
+이 글에서는 audit schema, PII 분리 저장, append-only 무결성, decision rationale, 보존 기간, 자동 보고를 함께 정리합니다.
 
-## Audit log이 application log와 다른 이유
+## 이 글에서 다룰 문제
 
-LLM 시스템에서 audit log는 단순 디버깅이 아니라 컴플라이언스, 사고 조사, 모델 개선의 기준 자료입니다. 일반 application log와 분리해 설계해야 합니다.
+- audit log와 application log는 왜 분리 저장해야 할까요?
+- 원문 프롬프트와 응답은 왜 hash만 audit에 남기고 별도 저장소에 보관해야 할까요?
+- append-only 무결성은 어떻게 보장할 수 있을까요?
+- “왜 이런 답이 나왔는가”를 재구성하려면 어떤 필드가 필요할까요?
+- 보존 기간과 삭제 기록은 왜 함께 관리해야 할까요?
 
-| 속성 | Application log | Audit log |
+## 왜 이 글이 중요한가
+
+감사 로깅이 잘 되어 있으면 규제 대응과 사고 조사가 훨씬 쉬워집니다. 어떤 요청이 어떤 모델을 거쳐 어떤 guardrail 결정을 받았는지 추적할 수 있고, 사용자 삭제 요청과 보존 만료도 체계적으로 관리할 수 있습니다. 이 기록은 보안뿐 아니라 운영 품질 개선에도 직접 연결됩니다.
+
+반대로 application log에 원문 프롬프트와 응답을 그대로 남기면 가장 먼저 PII가 새어 나갑니다. 로그 접근 권한이 넓을수록 누출 범위가 커지고, 나중에 삭제 요청이 오면 어떤 사본이 어디에 남았는지도 파악하기 어려워집니다. append-only라고 말만 하고 UPDATE 가능한 테이블에 저장하면 감사 무결성도 증명할 수 없습니다.
+
+결국 audit log의 핵심은 “기록을 많이 남기는가”가 아니라 “증거로 쓸 수 있는가”입니다. 이 관점으로 설계해야 저장소 구조와 접근 정책이 제대로 잡힙니다.
+
+## 감사 로깅을 이해하는 가장 좋은 방법: 디버그 편의성이 아니라 재현성과 무결성 중심으로 보는 것입니다
+
+application log는 빠른 디버깅을 위한 도구입니다. 반면 audit log는 나중에 재현과 소명에 쓰일 수 있어야 하므로 더 엄격해야 합니다. 자유 텍스트보다 구조화된 필드가 필요하고, 수정 가능성은 최소화해야 하며, 보관 기간도 훨씬 길어집니다.
+
+또한 audit와 원문 데이터는 같은 저장소에 두지 않는 편이 낫습니다. audit는 무결성과 추적성, 원문 저장소는 최소 보관과 암호화가 목적이기 때문입니다. 목적이 다른 데이터를 같은 곳에 두면 권한과 삭제 정책이 충돌합니다.
+
+> audit log의 가치는 로그를 남겼다는 사실이 아닙니다. 나중에 누가 봐도 변조되지 않았고, 결정 경로를 다시 설명할 수 있다는 점에 있습니다.
+
+## 핵심 개념
+
+### audit log는 application log와 목적이 다릅니다
+
+| Property | Application log | Audit log |
 | --- | --- | --- |
-| 보존 기간 | 7~30일 | 1~7년 (규제 의존) |
-| 변경 가능성 | 자유 수정 | append-only, immutable |
-| 접근 권한 | 개발자 일반 | 보안·컴플라이언스 한정 |
-| 포맷 | 자유 텍스트 | 정형 schema |
-| PII | 마스킹 권고 | 마스킹 필수, 키 분리 보관 |
+| Retention | 7 to 30 days | 1 to 7 years (regulation-dependent) |
+| Mutability | Freely editable | Append-only, immutable |
+| Access | Engineers in general | Security and compliance only |
+| Format | Free-form text | Structured schema |
+| PII | Masking recommended | Masking required, keys stored separately |
 
-application log는 "무엇이 일어났는가"를 빠르게 보기 위한 것이고, audit log는 "왜 그런 결정을 내렸는가"를 나중에 재구성하기 위한 것입니다.
+application log는 빨리 문제를 보는 데 적합하고, audit log는 나중에 이유를 재구성하는 데 적합합니다. 둘을 같은 목적으로 설계하면 어느 쪽도 만족하지 못합니다.
 
-## 무엇을 기록할 것인가
-
-LLM 요청 한 건당 audit record는 다음 필드를 포함합니다.
+### audit record에는 재현에 필요한 필드가 들어가야 합니다
 
 ```python
 from dataclasses import dataclass, asdict
@@ -58,7 +80,7 @@ import uuid
 class AuditRecord:
     request_id: str
     timestamp: str
-    user_id_hash: str          # PII는 해시로
+    user_id_hash: str          # PII becomes a hash
     api_key_id: str
     model: str
     input_token_count: int
@@ -67,7 +89,7 @@ class AuditRecord:
     guardrail_decisions: list  # ["pii_redacted", "moderation_passed", ...]
     blocked: bool
     block_reason: str | None
-    prompt_hash: str           # 원문은 별도 저장소
+    prompt_hash: str           # raw text lives in a separate store
     response_hash: str
     retrieved_chunk_ids: list[int]
     latency_ms: int
@@ -83,18 +105,16 @@ def make_record(user_id: str, prompt: str, response: str, **kw) -> AuditRecord:
     )
 ```
 
-원문 prompt와 response는 audit record에 포함하지 않고 별도 PII-aware 저장소(KMS 암호화)에 저장합니다. audit log에는 hash만 두어 무결성 검증과 사후 매칭에 사용합니다.
+원문 프롬프트와 응답은 audit 본문에 두지 않습니다. hash만 남기고, 필요한 경우에만 별도 저장소와 조인합니다.
 
-## PII 마스킹과 분리 저장
-
-GDPR, PIPA, HIPAA는 모두 "처리 목적이 다르면 저장소를 분리"하라고 요구합니다. Audit는 검증 목적, 원문 prompt는 모델 개선 목적이므로 두 저장소가 다릅니다.
+### 원문 데이터는 별도 PII 저장소로 분리합니다
 
 ```python
 def store_audit(record: AuditRecord, prompt: str, response: str):
-    # 1. Audit log: append-only, hash만
+    # 1. Audit log: append-only, hashes only
     audit_db.insert(asdict(record))
 
-    # 2. PII 저장소: KMS 암호화, 사용자 동의에 따라 보존 기간 짧게
+    # 2. PII store: KMS encrypted, short retention based on user consent
     if user_consent_to_train(record.user_id_hash):
         encrypted_prompt = kms.encrypt(prompt)
         encrypted_response = kms.encrypt(response)
@@ -105,15 +125,13 @@ def store_audit(record: AuditRecord, prompt: str, response: str):
         })
 ```
 
-사용자가 데이터 삭제를 요청하면 PII 저장소에서만 삭제하고, audit log의 hash는 무결성을 위해 유지합니다.
+이 구조면 사용자 삭제 요청이 왔을 때 PII 저장소는 지우고, audit hash는 무결성 목적상 남길 수 있습니다.
 
-## Append-only 저장소
+### append-only는 정책이 아니라 기술적으로 강제해야 합니다
 
-Audit log는 한 번 기록되면 누구도 수정할 수 없어야 합니다. 세 가지 구현 패턴이 있습니다.
-
-1. **WORM(Write Once Read Many) S3 버킷**: Object Lock with Compliance Mode. 보존 기간 안에는 root 계정도 삭제 못함.
-2. **Append-only DB**: ClickHouse, TimescaleDB. UPDATE/DELETE 권한을 application 사용자에게 주지 않음.
-3. **Hash chain**: 각 record가 이전 record의 hash를 포함. 중간 변조를 사후 검출 가능.
+1. **WORM (Write Once Read Many) S3 bucket**: Object Lock with Compliance Mode. Even root cannot delete within retention.
+2. **Append-only database**: ClickHouse or TimescaleDB. Do not grant UPDATE or DELETE to application users.
+3. **Hash chain**: each record contains the previous record's hash, so any tampering is detectable later.
 
 ```python
 from hashlib import sha256
@@ -129,17 +147,9 @@ def append_with_chain(record: dict):
     audit_db.insert(record)
 ```
 
-Hash chain은 비용이 거의 없으며 audit 검증을 자동화할 수 있습니다.
+hash chain은 비용이 거의 없으면서도 나중에 변조 여부를 자동 검증할 수 있게 해 줍니다.
 
-## Decision rationale 캡처
-
-규제 대응에서 가장 자주 요구되는 항목은 "왜 그렇게 답했는가"입니다. RAG 시스템은 다음을 캡처합니다.
-
-- 사용자 query (hash)
-- Retrieved chunk IDs와 점수
-- 적용된 guardrail decision
-- 모델, 온도, 시드
-- 최종 응답 (hash)
+### decision rationale이 있어야 규제 대응이 가능합니다
 
 ```python
 def log_decision(request_id: str, query: str, chunks: list[dict], answer: str, params: dict):
@@ -157,27 +167,23 @@ def log_decision(request_id: str, query: str, chunks: list[dict], answer: str, p
     })
 ```
 
-같은 query를 같은 모델·온도·seed로 재현했을 때 다른 답이 나오면 모델 drift 의심 신호로 사용합니다.
+이 정보가 있으면 같은 모델, 같은 seed, 같은 검색 결과에서 왜 다른 답이 나왔는지까지 살펴볼 수 있습니다.
 
-## 보존 기간과 자동 삭제
+### 보존 기간과 자동 삭제는 감사 대상입니다
 
-규제별 권장 보존 기간이 다릅니다.
-
-| 규제 | 권장 보존 기간 | 비고 |
+| Regulation | Suggested retention | Notes |
 | --- | --- | --- |
-| GDPR | 처리 목적 달성까지 | 사용자 삭제권 보장 |
-| HIPAA | 6년 | 의료 정보 |
-| SOC 2 | 1년 | 보안 audit |
-| PCI DSS | 1년, 최근 3개월 즉시 조회 | 결제 |
-| PIPA (KR) | 5년 | 개인정보 처리 기록 |
-
-자동 삭제 job을 매일 돌립니다.
+| GDPR | Until processing purpose ends | Right to erasure required |
+| HIPAA | 6 years | Health information |
+| SOC 2 | 1 year | Security audit |
+| PCI DSS | 1 year, last 3 months instantly searchable | Payments |
+| PIPA (KR) | 5 years | PII processing records |
 
 ```python
 from datetime import timedelta
 
 RETENTION = {
-    "audit_log": timedelta(days=365 * 7),     # 7년
+    "audit_log": timedelta(days=365 * 7),     # 7 years
     "pii_store": timedelta(days=90),
 }
 
@@ -186,11 +192,9 @@ def gc_pii_store():
     pii_store.delete_where(lambda r: r["created_at"] < cutoff)
 ```
 
-삭제 자체도 audit log에 기록합니다("PII record X was deleted at Y per retention policy").
+삭제 자체도 audit log에 다시 남겨야 무결성이 유지됩니다.
 
-## Compliance 보고서 자동 생성
-
-Audit log는 사람이 읽을 수 있어야 가치가 있습니다. 정기 보고서를 만듭니다.
+### 사람이 읽는 보고서로 변환해야 운영 가치가 생깁니다
 
 ```python
 def monthly_report(year: int, month: int) -> dict:
@@ -206,46 +210,58 @@ def monthly_report(year: int, month: int) -> dict:
     }
 ```
 
-이 보고서를 보안팀, 컴플라이언스팀, 임원에게 자동 발송하면 사고 발생 전에 이상 패턴이 보입니다.
+월간 보고는 보안팀, 준법팀, 리더십이 같은 사실 집합을 보게 만들어 줍니다.
 
-## Common Mistakes
+## 흔히 헷갈리는 지점
 
-1. **Application log에 prompt/response 그대로 기록**: PII가 7년치 로그에 남아 GDPR 위반 사유가 됩니다. hash만 audit에 두고 원문은 분리 저장합니다.
-2. **append-only를 이름만**: 권한 관리 없이 일반 DB에 두면 사고 시 변조 의심을 피할 수 없습니다. WORM, hash chain 같은 기술적 보호가 필요합니다.
-3. **Decision rationale 누락**: "왜 답했는가"가 없으면 사후 분석과 규제 대응이 불가능합니다. retrieval, params, guardrail 결정을 함께 기록합니다.
-4. **무한 보존**: "혹시 모르니" 영구 보존하면 GDPR 위반과 저장 비용 폭주가 동시에 발생합니다. 규제별 보존 기간과 자동 삭제 job을 둡니다.
-5. **삭제 자체를 기록 안 함**: 누가 언제 무엇을 지웠는지 audit이 없으면 audit log 자체의 무결성이 깨집니다. 삭제도 immutable record로 남깁니다.
+- application log를 잘 남기면 audit log도 충분하다고 생각하기 쉽습니다.
+- 원문 프롬프트를 같이 저장해야 나중에 편하다고 생각하기 쉽지만, 가장 큰 누출 표면이 됩니다.
+- append-only는 운영 규칙으로만 관리해도 된다고 보기 쉽습니다.
+- 삭제 정책은 원문 데이터에만 적용하면 된다고 생각하기 쉽습니다.
 
-## 핵심 요약
+## 운영 체크리스트
 
-- Audit log는 application log와 분리해 schema, 보존 기간, 권한, PII 정책을 모두 다르게 설계합니다.
-- 원문 prompt/response는 별도 KMS 암호화 저장소에, audit에는 hash만 둡니다.
-- WORM 저장소나 hash chain으로 append-only 무결성을 기술적으로 보장합니다.
-- Decision rationale(query, chunks, params, guardrail decision)을 함께 캡처해 사후 재현과 규제 대응이 가능하게 합니다.
-- 규제별 보존 기간을 자동 삭제 job으로 강제하고, 삭제 자체도 audit record로 남깁니다.
+- [ ] audit schema와 application log schema를 분리합니다.
+- [ ] 원문 프롬프트·응답은 KMS 기반 별도 저장소에 두고 audit에는 hash만 남깁니다.
+- [ ] WORM, 권한 통제, hash chain 중 최소 하나 이상으로 append-only를 기술적으로 강제합니다.
+- [ ] 검색 chunk, 모델 파라미터, guardrail 결정을 rationale 필드로 기록합니다.
+- [ ] 보존 기간 만료와 삭제 요청 처리 자체도 audit log에 남깁니다.
 
----
+## 정리
+
+감사 로깅은 나중에 보기 위한 로그가 아니라, 나중에 설명하기 위한 증거입니다. 이 차이를 이해하면 왜 별도 저장소, 별도 권한, 별도 보존 정책이 필요한지 자연스럽게 보입니다.
+
+실무에서는 원문 데이터와 audit 데이터를 분리하고, append-only 무결성을 기술적으로 강제하며, decision rationale을 구조화된 필드로 남기는 방식이 가장 안정적입니다. 여기에 보존과 삭제 기록까지 들어가야 컴플라이언스가 완성됩니다.
+
+핵심은 간단합니다. 로그를 남기는 것보다 중요한 일은, 그 로그가 나중에도 신뢰될 수 있게 만드는 것입니다.
 
 <!-- toc:begin -->
 ## AI Safety & Guardrails 101 시리즈
 
-- [Ep1 AI 안전이 왜 중요한가](./01-why-ai-safety-matters.md)
-- [Ep2 Prompt Injection 방어](./02-prompt-injection-defense.md)
-- [Ep3 출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
-- [Ep4 PII 탐지와 마스킹](./04-pii-detection-redaction.md)
-- [Ep5 Jailbreak 탐지](./05-jailbreak-detection.md)
-- [Ep6 Toxicity와 Bias 탐지](./06-toxicity-bias-detection.md)
-- [Ep7 Hallucination Guardrail - Grounding 검증](./07-hallucination-guardrails.md)
-- [Ep8 Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
-- **Ep9 Audit Logging과 컴플라이언스 (현재 글)**
-- Ep10 프로덕션 Guardrail 시스템 구축 (예정)
+- [AI Safety가 왜 중요한가](./01-why-ai-safety-matters.md)
+- [Prompt Injection 방어](./02-prompt-injection-defense.md)
+- [출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
+- [PII 감지와 마스킹](./04-pii-detection-redaction.md)
+- [Jailbreak 탐지](./05-jailbreak-detection.md)
+- [독성과 편향 탐지](./06-toxicity-bias-detection.md)
+- [Hallucination Guardrail — Grounding 검증](./07-hallucination-guardrails.md)
+- [Rate Limiting과 남용 방지](./08-rate-limiting-abuse-prevention.md)
+- **감사 로깅과 컴플라이언스 (현재 글)**
+- [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
 <!-- toc:end -->
 
 ## 참고 자료
+
+### 공식 문서
 
 - [GDPR - Article 30: Records of processing activities](https://gdpr-info.eu/art-30-gdpr/)
 - [HIPAA Security Rule - Audit controls](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
 - [SOC 2 - Trust Services Criteria](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
 - [AWS S3 Object Lock - Compliance mode](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html)
+
+### 관련 시리즈
+
+- [PII 감지와 마스킹](./04-pii-detection-redaction.md)
+- [LLM 앱 운영 101 — LLM 앱 모니터링과 로깅](../../llm-apps-ops-101/ko/01-monitoring-and-logging.md)
 
 Tags: AI Safety, Audit Logging, Compliance, GDPR
