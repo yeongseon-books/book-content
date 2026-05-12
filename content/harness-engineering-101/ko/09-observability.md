@@ -3,7 +3,7 @@ title: Observability — Agent 작업을 추적하고 재현하기
 series: harness-engineering-101
 episode: 9
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,24 +14,37 @@ tags:
 - Harness
 - Observability
 - Tracing
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다. Observability는 Agent의 모든 단계를
   추적, 기록, 재현…
 ---
-
 # Observability — Agent 작업을 추적하고 재현하기
-
-> Harness Engineering 101 시리즈 (9/10)
-
+에이전트가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다. 이 문장은 단순한 상식처럼 보이지만, 실제 운영에서는 여전히 많은 시스템이 결과 문자열만 남기고 그 뒤의 의사결정 과정을 잃어버립니다.
+문제는 에이전트 시스템이 전통적인 함수보다 훨씬 많은 중간 단계를 가진다는 점입니다. 모델 호출, retrieval, tool invocation, reflection, approval, retry가 모두 실행 경로에 들어가는데, 이 중 하나라도 기록이 끊기면 사고 재현이 거의 불가능해집니다.
+Observability는 로그를 많이 남기는 일이 아니라, 한 번의 실행을 외부에서 다시 구성할 수 있게 만드는 설계입니다. 무엇을 했는지, 왜 그렇게 했는지, 얼마나 걸리고 얼마나 들었는지를 같은 trace 안에서 읽을 수 있어야 합니다.
+이 글은 Harness Engineering 101 시리즈의 9번째 글입니다.
+운영 가능한 에이전트는 답변만 내는 시스템이 아니라, 답변이 만들어진 경로까지 설명할 수 있는 시스템입니다.
+## 이 글에서 다룰 문제
+- Observability에서 말하는 trace와 span은 에이전트 실행을 어떻게 표현할까요?
+- 결과뿐 아니라 어떤 입력과 의사결정 근거를 함께 남겨야 할까요?
+- replay 가능한 로그를 만들려면 무엇이 반드시 기록되어야 할까요?
+- 대시보드에는 왜 평균보다 p95 latency와 per-run cost가 중요할까요?
+- 언제 사람을 깨우고, 언제는 대시보드만 보면 되는지 어떻게 나눌까요?
+## 왜 이 글이 중요한가
+Observability가 중요한 첫 번째 이유는 재현성입니다. 사고가 났을 때 당시 모델이 어떤 prompt와 retrieved context를 봤는지 모르면 같은 문제를 다시 만들 수 없습니다.
+두 번째 이유는 비용과 성능입니다. 에이전트는 어느 단계에서 비용이 터지고 어느 단계에서 느려졌는지 모르면 최적화 대상도 찾기 어렵습니다. 모델만 비싼 것이 아니라 retrieval, judge, reflection도 모두 비용을 만듭니다.
+세 번째 이유는 책임 추적입니다. approval, retry, tool execution이 섞인 시스템에서 누가 무엇을 결정했는지 보이지 않으면 운영 개선은 추측에 머무릅니다.
+## Observability를 이해하는 가장 좋은 방법: 한 번의 실행을 나중에 다시 구성할 수 있게 만드는 추적 모델로 보는 것입니다
+좋은 observability는 단순 로그 목록이 아니라 구조화된 trace를 남깁니다. span은 작업 단위이고, trace는 한 실행의 전체 트리입니다. 이 구조가 있어야 어떤 단계가 느렸고 어떤 단계가 실패했는지 즉시 볼 수 있습니다.
+기록은 최소 세 층을 가져야 합니다. 무엇을 했는지, 왜 그렇게 했는지, 얼마나 걸리고 얼마나 들었는지입니다. 결과만 남기면 replay가 안 되고, 비용만 남기면 원인을 찾을 수 없습니다.
+또한 observability는 알림 설계까지 포함합니다. 모든 이상을 다 깨우면 alert fatigue가 오므로, baseline 대비 error rate, p95 latency, per-run cost 같은 소수의 신호만 paging 대상으로 올려야 합니다.
+> 결과만 남기는 로그는 설명이 아닙니다. Observability는 한 번의 실행을 외부에서 다시 구성할 수 있을 만큼 충분한 구조를 남기는 일입니다.
+## 핵심 개념
 Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다. Observability는 Agent의 모든 단계를 추적, 기록, 재현 가능하게 만드는 일입니다.
-
----
 
 ![Observability - Agent 작업을 추적하고 재현하기](../../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.ko.png)
 
-*Observability - Agent 작업을 추적하고 재현하기*
-
-## Observability란 무엇인가요?
+### Observability란 무엇인가요?
 
 Observability(관측성)는 에이전트가 무엇을, 왜, 어떻게 실행했는지를 외부에서 재구성할 수 있는 능력입니다. 단순히 로그를 남기는 것이 아니라, 사고가 났을 때 "그 시점의 의사결정"을 추적하고 재현할 수 있어야 합니다.
 
@@ -56,11 +69,10 @@ class Span:
 
 `Span`은 "에이전트의 한 가지 작업 단위"입니다. 도구 호출 1회, LLM 호출 1회, 사고(reflect) 1회가 각각 하나의 span이 됩니다. 같은 trace_id를 공유하는 span들이 모여 하나의 실행 흐름이 됩니다.
 
-## 무엇을 기록해야 할까요?
+### 무엇을 기록해야 할까요?
 
 ![무엇을 기록해야 할까요](../../../assets/harness-engineering-101/09/09-02-what-should-you-record.ko.png)
 
-*무엇을 기록해야 할까요*
 3가지 정보 계층을 모두 기록해야 추적이 가능합니다.
 
 1. **무엇을 했는가 (What)**: tool name, input, output
@@ -89,11 +101,10 @@ def record_llm_call(span: Span, prompt: str, model: str, response: str, usage: d
 
 prompt와 response를 attributes가 아니라 events로 기록하는 것에 주의하세요. attributes는 검색·필터링용 짧은 메타데이터고, events는 시간 순서가 있는 페이로드입니다.
 
-## Trace 모델 — 한 실행을 끝까지 따라가기
+### Trace 모델 — 한 실행을 끝까지 따라가기
 
 ![Trace 모델 - 한 실행을 끝까지 따라가기](../../../assets/harness-engineering-101/09/09-03-trace-model-following-one-run-end-to-end.ko.png)
 
-*Trace 모델 - 한 실행을 끝까지 따라가기*
 에이전트 한 번 실행은 다음과 같은 트리 구조의 trace를 만듭니다.
 
 ```python
@@ -125,20 +136,19 @@ class Tracer:
 
 ```text
 trace 7a3f...
-├── span: agent.run         (12.3s, $0.04)
-│   ├── span: llm.plan      (1.2s, $0.01)
-│   ├── span: tool.search   (0.8s)
-│   ├── span: llm.synthesize(2.1s, $0.02)
-│   └── span: tool.send_email(0.3s)
+├── span: agent.run           (12.3s, $0.04)
+│   ├── span: llm.plan        (1.2s, $0.01)
+│   ├── span: tool.search     (0.8s)
+│   ├── span: llm.synthesize  (2.1s, $0.02)
+│   └── span: tool.send_email (0.3s)
 ```
 
 이 트리만 있으면 "느린 단계는 어디였나", "비용이 어디서 터졌나", "어느 도구에서 실패했나"를 즉시 답할 수 있습니다.
 
-## Replay — 로그에서 실행을 재현하기
+### Replay — 로그에서 실행을 재현하기
 
 ![Replay - 로그에서 실행을 재현하기](../../../assets/harness-engineering-101/09/09-04-replay-reproducing-a-run-from-logs.ko.png)
 
-*Replay - 로그에서 실행을 재현하기*
 좋은 trace는 "재현 가능"합니다. 동일한 입력으로 같은 단계를 다시 실행해서 같은 결과가 나오는지 확인할 수 있어야 합니다.
 
 ```python
@@ -162,7 +172,7 @@ def replay_trace(trace_id: str, store) -> list[dict]:
 
 Replay가 가능하려면 모든 입력(prompt, retrieved context, tool input)이 span에 기록되어 있어야 합니다. "결과만 기록"하면 재현할 수 없습니다.
 
-## Cost와 Latency 대시보드
+### Cost와 Latency 대시보드
 
 운영 중인 에이전트는 비용과 응답 시간이 갑자기 튀는 일이 잦습니다. 대시보드는 다음 4개 지표를 실시간으로 보여줘야 합니다.
 
@@ -193,7 +203,7 @@ def aggregate(spans: list[Span]) -> AgentMetrics:
 
 p95 latency는 평균보다 훨씬 중요합니다. 평균은 정상이어도 5%의 사용자가 30초씩 기다리고 있을 수 있기 때문입니다.
 
-## Alerting — 언제 사람을 깨워야 하는가
+### Alerting — 언제 사람을 깨워야 하는가
 
 모든 이상을 알리면 알림 피로(alert fatigue)가 옵니다. 다음 3가지 조건만 깨우는 알림으로 둡니다.
 
@@ -211,27 +221,24 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 1. **에러율 급증**: baseline의 2배 이상 + 절대값 5% 이상
 2. **P95 latency 급증**: baseline의 3배 이상
 3. **건당 비용 급증**: baseline의 5배 이상
-
-## 흔한 실수 5가지
-
-1. **결과만 기록하고 입력은 안 기록**: replay가 불가능해지고, 사고 원인을 추적할 수 없습니다. prompt와 retrieved context를 반드시 기록하세요.
-2. **개인정보를 그대로 로깅**: span에 사용자 이메일, 카드 번호 등이 그대로 들어갑니다. 마스킹 또는 해싱 후 기록하세요.
-3. **trace_id 전파 실패**: 비동기 호출에서 context를 잃어버려 trace가 끊깁니다. async-aware tracer를 쓰거나 명시적으로 전달하세요.
-4. **평균만 보고 P95 무시**: 평균은 정상이어도 5%가 30초씩 걸릴 수 있습니다. 항상 percentile을 함께 보세요.
-5. **모든 이상에 알림**: 알림 피로로 진짜 알림을 놓치게 됩니다. baseline 대비 배수와 절대 임계치를 함께 쓰세요.
-
-## 핵심 요약
-
-- Observability는 사고 후 의사결정을 추적·재현할 수 있는 능력입니다.
-- Span은 작업 단위, Trace는 한 실행의 트리 구조입니다.
-- What(무엇), Why(왜), Cost(비용) 3계층을 모두 기록하세요.
-- Prompt와 retrieved context까지 기록해야 replay가 가능합니다.
-- 평균이 아닌 p95 latency를, baseline 대비 배수로 알림을 설계하세요.
-
-다음 글은 Production Harness입니다. 지금까지 배운 9가지 harness를 묶어 실제 운영 환경에 배포하는 패턴을 다룹니다.
-
+## 흔히 헷갈리는 지점
+- 출력만 저장해도 디버깅은 가능하다고 생각하기 쉽지만, prompt와 retrieved context가 없으면 replay가 불가능합니다.
+- PII는 나중에 마스킹하면 된다고 보기 쉽지만, raw span에 들어가는 순간 이미 새로운 위험이 됩니다.
+- trace_id 전파는 구현 세부라고 생각하기 쉽지만, 비동기 경계에서 trace가 끊기면 전체 실행을 읽을 수 없습니다.
+- 평균 latency만 보면 충분하다고 생각하기 쉽지만, 실제 체감 문제는 대개 p95에서 먼저 나타납니다.
+- 모든 이상에 paging을 걸면 더 안전할 것 같지만, alert fatigue는 결국 진짜 알림을 묻어 버립니다.
+## 운영 체크리스트
+- [ ] 모든 실행을 trace와 span 구조로 기록합니다.
+- [ ] What, Why, Cost 세 층의 메타데이터를 함께 저장합니다.
+- [ ] prompt, retrieved context, tool input처럼 replay에 필요한 입력을 남깁니다.
+- [ ] 대시보드에 error rate, p95 latency, avg cost per run을 기본 지표로 둡니다.
+- [ ] baseline 대비 급증 조건에만 paging을 걸고 나머지는 리포트성 알림으로 분리합니다.
+## 정리
+Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라, 왜 그런 결과가 나왔는지 나중에 다시 설명할 수 있게 만드는 운영 능력입니다. 이것이 있어야 디버깅, 비용 최적화, 사고 분석이 모두 가능해집니다.
+핵심은 구조입니다. span과 trace로 실행을 묶고, 결과뿐 아니라 입력과 근거와 비용을 함께 남겨야 replay가 가능합니다.
+다음 글에서는 마지막으로 Production Harness를 다룹니다. 지금까지 만든 모든 harness를 배포, 롤백, on-call까지 포함한 실제 운영 환경으로 묶는 단계입니다.
 <!-- toc:begin -->
-## 시리즈 목차
+## Harness Engineering 101 시리즈
 
 - [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
 - [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
@@ -242,17 +249,18 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 - [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
 - [Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
 - **Observability — Agent 작업을 추적하고 재현하기 (현재 글)**
-- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
+- [Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
 
 <!-- toc:end -->
-
----
-
 ## 참고 자료
+### 공식 문서
 
 - [OpenTelemetry — Tracing concepts](https://opentelemetry.io/docs/concepts/signals/traces/)
 - [Google SRE — Monitoring distributed systems](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [LangSmith — Tracing for LLM applications](https://docs.smith.langchain.com/observability)
 - [Honeycomb — Observability engineering](https://www.honeycomb.io/blog/what-is-observability)
+### 관련 시리즈
 
-Tags: AI Agent, Harness, Production, Reliability
+- [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
+- [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
+Tags: AI Agent, Harness, Observability, Tracing
