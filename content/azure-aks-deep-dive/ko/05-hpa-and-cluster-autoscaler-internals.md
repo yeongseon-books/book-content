@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프
 
+트래픽이 늘었는데 Pod가 늦게 붙는 상황을 한 문장으로 설명하려 하면 대개 "autoscaling이 느리다"로 뭉개집니다. 하지만 replica 수를 바꾸는 루프와 node 수를 바꾸는 루프는 서로 다른 입력과 시간축으로 움직이기 때문에, 둘을 분리해서 봐야 정상 지연과 이상 징후를 구분할 수 있습니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 5번째 글입니다. 여기서는 HPA와 Cluster Autoscaler가 어떤 순서로 반응하고, 두 control loop 사이에 어떤 race window가 생기는지 정리합니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

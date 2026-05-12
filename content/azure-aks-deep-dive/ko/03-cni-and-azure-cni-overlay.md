@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가
 
+AKS 네트워킹을 오래전 감각대로 "Azure CNI냐 아니냐" 정도로만 구분하면 지금 문서와 실제 설계 옵션이 자꾸 어긋납니다. Pod가 어떤 주소 공간에서 IP를 받고, 클러스터 밖으로 나갈 때 어떤 경로를 타는지 먼저 갈라서 봐야 IP 고갈과 라우팅 문제를 제대로 읽을 수 있습니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 3번째 글입니다. 여기서는 Azure CNI Pod Subnet, Node Subnet, Overlay를 나눠 보고, Pod IP가 실제로 어디서 오는지 정리합니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

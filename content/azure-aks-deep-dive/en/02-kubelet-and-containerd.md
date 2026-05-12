@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # kubelet and containerd — how a container actually starts on a node
 
+`kubectl apply` makes container startup look like one continuous action, but the execution path is more layered than that. After scheduling is finished, kubelet, the CRI boundary, containerd, and `runc` each take over a different part of the node-local path.
+
+This is the second post in the Azure Kubernetes Service Deep Dive series. Here, I follow the node-side startup path and separate kubelet's responsibility from the runtime stack below it.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

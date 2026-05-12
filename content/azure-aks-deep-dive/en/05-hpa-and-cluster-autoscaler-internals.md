@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # HPA and Cluster Autoscaler internals — two control loops
 
+“Autoscaling is slow” usually hides two different control loops under one complaint. One loop changes replica count, the other changes node count, and they react on different inputs and different timelines.
+
+This is the fifth post in the Azure Kubernetes Service Deep Dive series. Here, I separate HPA from Cluster Autoscaler and show where their race window comes from in real AKS behavior.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

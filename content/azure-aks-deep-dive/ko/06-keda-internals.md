@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식
 
+이벤트 기반 스케일링을 처음 보면 KEDA가 HPA를 완전히 대체하는 별도 시스템처럼 느껴질 수 있습니다. 하지만 내부를 보면 KEDA는 HPA 위에 새 계층을 하나 더 얹고, 특히 0에서 1로 올라가는 경계만 직접 다루는 방식에 가깝습니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 마지막 글입니다. 여기서는 ScaledObject가 generated HPA와 external metrics 경로로 어떻게 이어지고, scale-to-zero 경계에서 KEDA가 무엇을 직접 맡는지 봅니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

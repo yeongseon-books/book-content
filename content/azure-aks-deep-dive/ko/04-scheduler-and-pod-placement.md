@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가
 
+Pending Pod를 볼 때 가장 흔한 오해는 아직 컨테이너가 안 떴다는 결과만 보고 노드 문제부터 의심하는 것입니다. 실제로는 그보다 앞단에서 scheduler가 제약 조건을 계산하고 Binding을 남기는 단계가 먼저 통과해야 합니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 4번째 글입니다. 여기서는 kube-scheduler가 어떤 기준으로 후보 노드를 걸러내고 점수를 매겨 최종 배치를 결정하는지 봅니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

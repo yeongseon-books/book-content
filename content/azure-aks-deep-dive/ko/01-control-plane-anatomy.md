@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # Control Plane 해부 — AKS가 사용자에게서 가린 것
 
+AKS를 관리형 Kubernetes라고 부르는 순간 설명은 편해지지만, 운영 판단에 필요한 경계는 오히려 흐려집니다. 장애가 control plane 문제인지 node 문제인지, Microsoft가 대신 맡는 부분이 어디까지인지 구분하지 못하면 같은 증상도 계속 다른 이름으로 부르게 됩니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 첫 번째 글입니다. 여기서는 AKS의 control plane과 data plane 경계를 먼저 고정하고, 사용자가 실제로 마주하는 관리형 표면이 무엇인지 정리합니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

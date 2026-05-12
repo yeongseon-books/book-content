@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # KEDA internals — how a ScaledObject builds an HPA
 
+Event-driven autoscaling can make KEDA look like a full replacement for HPA. Internally, the model is more precise than that: KEDA layers on top of HPA, feeds the external-metrics path, and takes special responsibility at the scale-to-zero boundary.
+
+This is the final post in the Azure Kubernetes Service Deep Dive series. Here, I trace how a ScaledObject becomes a generated HPA, where the adapter fits, and why KEDA directly owns the 0-to-1 edge.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

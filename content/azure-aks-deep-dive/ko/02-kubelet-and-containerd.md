@@ -20,6 +20,10 @@ seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으
 
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지
 
+`kubectl apply` 뒤에 Pod가 떴다는 결과만 보면 실행 경로가 한 덩어리처럼 보입니다. 하지만 실제로는 scheduler의 결정이 끝난 뒤에도 노드 안에서 kubelet, CRI, containerd, `runc`가 각자 다른 책임을 나눠서 움직입니다.
+
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 2번째 글입니다. 여기서는 control plane 바깥에서 실제 컨테이너 실행이 어떻게 시작되는지, kubelet과 containerd의 호출 경계를 따라갑니다.
+
 ## Source Version
 
 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.

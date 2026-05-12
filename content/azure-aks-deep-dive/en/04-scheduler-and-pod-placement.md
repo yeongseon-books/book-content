@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # Scheduler and Pod placement — who decides which node
 
+When a Pod stays Pending, it is tempting to jump straight to node health or runtime logs. Very often the earlier decision point matters more: scheduler has to evaluate constraints, narrow the candidate set, and commit a Binding before node-side execution can even begin.
+
+This is the fourth post in the Azure Kubernetes Service Deep Dive series. Here, I walk through how kube-scheduler filters, scores, and finally records placement decisions.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

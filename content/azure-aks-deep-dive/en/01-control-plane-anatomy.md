@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # Control plane anatomy — what AKS hides from you
 
+The phrase “managed Kubernetes” is useful until you need it for real operational decisions. Once latency, rollout failures, or cluster-wide symptoms appear, you need a sharper boundary: what belongs to the control plane, what belongs to the nodes, and what Microsoft operates on your behalf.
+
+This is the first post in the Azure Kubernetes Service Deep Dive series. Here, I fix the control-plane versus data-plane map first and define the managed surfaces an AKS operator can actually observe.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:

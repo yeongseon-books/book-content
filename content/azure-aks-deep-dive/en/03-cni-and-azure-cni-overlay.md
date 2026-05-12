@@ -21,6 +21,10 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 
 # CNI and Azure CNI Overlay — where Pod IPs come from
 
+AKS networking gets confusing fast if every design is still called simply “Azure CNI.” The real operational questions are more specific: which address space gives the Pod its IP, what consumes scarce VNet space, and what path outbound traffic takes after the Pod comes up.
+
+This is the third post in the Azure Kubernetes Service Deep Dive series. Here, I separate Azure CNI Pod Subnet, Node Subnet, and Overlay so the source of Pod IPs becomes concrete.
+
 ## Source Version
 
 This post uses the following upstream versions as external reference points:
