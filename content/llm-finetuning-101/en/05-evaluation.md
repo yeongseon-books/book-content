@@ -23,6 +23,10 @@ seo_description: Evaluation works best when you separate "internal model signals
 
 # Model Evaluation
 
+Evaluation is where many fine-tuning demos become misleading. This article separates internal model signals from user-facing quality so you can measure improvement and catch regressions with a repeatable loop.
+
+This is the fifth post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/05/05-01-questions-this-post-answers.en.png)

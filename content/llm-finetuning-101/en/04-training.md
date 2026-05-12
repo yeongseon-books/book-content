@@ -22,6 +22,10 @@ seo_description: 'A single training step decomposes into six stages:'
 
 # Training Loop and Hyperparameters
 
+Training loops are easier to debug once you stop treating them like framework magic. This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles.
+
+This is the fourth post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png)

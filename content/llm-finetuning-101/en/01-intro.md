@@ -23,6 +23,10 @@ seo_description: 'A fine-tuning experiment is a decision about how to slice thre
 
 # LLM Fine-tuning Primer
 
+Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact. This article frames that decision around three variables so the rest of the series has a stable mental model.
+
+This is the first post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)

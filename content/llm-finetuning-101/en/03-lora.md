@@ -22,6 +22,10 @@ seo_description: 'A LoRA adapter is summarized by:'
 
 # Configuring LoRA Adapters
 
+A LoRA adapter does not replace the model; it adds a narrow correction path beside selected linear layers. This article uses that structure to explain how to choose rank, scaling, and target modules without guessing.
+
+This is the third post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)

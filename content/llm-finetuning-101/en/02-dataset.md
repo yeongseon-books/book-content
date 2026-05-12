@@ -22,6 +22,10 @@ seo_description: 'Treat the dataset as three layers:'
 
 # Dataset Preparation and Preprocessing
 
+Dataset work fails less often because of size than because of shape. This article breaks the problem into raw samples, templated text, and tokenized tensors so you can verify each layer before training starts.
+
+This is the second post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)

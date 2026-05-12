@@ -22,6 +22,10 @@ seo_description: A serving system decomposes into four layers.
 
 # Model Serving
 
+Serving forces a different set of trade-offs than training. This article breaks the system into four layers so you can see where the API boundary ends, where inference begins, and why adapters change deployment options.
+
+This is the final post in the LLM Fine-tuning 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/llm-finetuning-101/06/06-01-questions-this-post-answers.en.png)
