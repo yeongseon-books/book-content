@@ -17,7 +17,7 @@ tags:
 - SQLite
 - Database Driver
 - Standardization
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Python으로 데이터베이스를 다룬 적이 있다면 sqlite3, psycopg, pymysql, oracledb 같은
   패키지를 한 번쯤…
 ---
@@ -26,24 +26,37 @@ seo_description: Python으로 데이터베이스를 다룬 적이 있다면 sqli
 
 Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`, `pymysql`, `oracledb` 같은 패키지를 한 번쯤 써봤을 겁니다. 그리고 신기하게도 그 사용법이 묘하게 비슷합니다. `connect()`로 연결을 만들고 `cursor()`로 cursor를 받고 `execute()`로 쿼리를 던지고 `fetchone()`/`fetchall()`로 결과를 꺼냅니다. 이 통일성은 우연이 아니라 1996년에 합의된 표준, **PEP 249 — Python Database API Specification v2.0** (줄여서 DB-API 2.0) 덕분입니다.
 
-이번 첫 글에서는 DB-API 2.0이 왜 필요했는지, 어떤 문제를 해결했는지, 시리즈 전반에서 SQLite로 실습하는 이유와 다른 driver(PostgreSQL, MySQL 등)에 그대로 옮기는 방법을 살펴봅니다.
+이번 첫 글에서는 DB-API 2.0이 왜 필요했는지, 무엇을 표준화했는지, 그리고 왜 이 시리즈가 SQLite를 기준으로 출발하는지 정리합니다.
 
 이 글은 Python DB-API 101 시리즈의 첫 번째 글입니다.
 
+![Why DB-API 2.0 - the problem PEP 249 solved](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
+
+*Why DB-API 2.0 - the problem PEP 249 solved*
+
+## 이 글에서 다룰 문제
+
+- PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?
+- DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?
+- driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?
+- DB-API가 일부러 표준화하지 않은 영역은 어디까지일까요?
+
+> DB-API 2.0의 핵심은 "모든 driver를 똑같이 만드는 것"이 아니라, 애플리케이션 코드가 공통된 최소 계약 위에서 움직이게 만드는 것입니다.
+
 ## 1. DB-API 이전의 혼돈
 
-![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
+![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
 
 *DB-API 이전의 혼돈*
 표준이 없던 시절, 각 데이터베이스 라이브러리는 자기만의 API를 가졌습니다.
 
 ```python
-# 가상의 옛 oracle 모듈
+# Imagined old oracle module
 conn = oracle.open("dsn", "user", "pass")
 result = oracle.run_sql(conn, "SELECT * FROM users")
 rows = oracle.read_all(result)
 
-# 가상의 옛 mysql 모듈
+# Imagined old mysql module
 db = mysql.connect("server")
 db.send("SELECT * FROM users")
 data = db.receive_rows()
@@ -53,7 +66,7 @@ data = db.receive_rows()
 
 ## 2. PEP 249가 표준화한 5가지
 
-![PEP 249가 표준화한 5가지](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.ko.png)
+![PEP 249가 표준화한 5가지](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
 
 *PEP 249가 표준화한 5가지*
 DB-API 2.0은 모든 driver가 지켜야 할 최소 contract를 정의합니다.
@@ -73,13 +86,13 @@ DB-API 2.0은 모든 driver가 지켜야 할 최소 contract를 정의합니다.
 ```python
 import sqlite3
 
-# 1. 연결 생성 — 파일이 없으면 자동 생성
+# 1. Open a connection — the file is auto-created if missing
 conn = sqlite3.connect("notes.db")
 
-# 2. cursor 획득
+# 2. Acquire a cursor
 cur = conn.cursor()
 
-# 3. 스키마 준비
+# 3. Prepare schema
 cur.execute("""
     CREATE TABLE IF NOT EXISTS notes (
         id INTEGER PRIMARY KEY,
@@ -88,13 +101,13 @@ cur.execute("""
     )
 """)
 
-# 4. INSERT (parameter binding)
+# 4. INSERT with parameter binding
 cur.execute(
     "INSERT INTO notes (title, body) VALUES (?, ?)",
-    ("DB-API 시작", "PEP 249 첫 예제"),
+    ("Starting DB-API", "First PEP 249 example"),
 )
 
-# 5. transaction commit
+# 5. Commit the transaction
 conn.commit()
 
 # 6. SELECT
@@ -102,7 +115,7 @@ cur.execute("SELECT id, title FROM notes")
 for row in cur.fetchall():
     print(row)
 
-# 7. 정리
+# 7. Cleanup
 cur.close()
 conn.close()
 ```
@@ -111,7 +124,7 @@ conn.close()
 
 ## 4. paramstyle 한 가지가 다르다
 
-![paramstyle 한 가지가 다르다](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.ko.png)
+![paramstyle 한 가지가 다르다](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
 
 *paramstyle 한 가지가 다르다*
 PEP 249는 5가지 paramstyle을 허용합니다.
@@ -153,7 +166,7 @@ cur.execute("""
 
 cur.execute(
     "INSERT INTO notes (title, body) VALUES (%s, %s)",  # qmark -> format
-    ("DB-API 시작", "PEP 249 첫 예제"),
+    ("Starting DB-API", "First PEP 249 example"),
 )
 conn.commit()
 
@@ -202,7 +215,7 @@ for row in cur:  # streaming iteration
 ### 4. execute()를 string concatenation으로 만듦
 
 ```python
-# 절대 금지 — SQL injection
+# Never do this — SQL injection
 cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 ```
 
@@ -212,13 +225,13 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 
 `threadsafety=1`인 driver는 connection을 thread간 공유 불가입니다. sqlite3는 default가 `check_same_thread=True`라 다른 thread에서 쓰면 에러. multi-threaded app에서는 thread당 connection을 만들거나 connection pool을 씁니다.
 
-## 핵심 요약
+## 정리
 
-- DB-API 2.0(PEP 249)은 Python의 모든 DB driver가 따르는 최소 표준 contract입니다.
-- connect → cursor → execute → fetch → commit → close 7단계는 sqlite3/psycopg/pymysql 모두 동일합니다.
-- 가장 큰 driver 간 차이는 `paramstyle`이며, 그 외에는 application 코드가 거의 동일합니다.
-- DB-API는 connection pool, async, ORM, migration을 의도적으로 비워뒀고 상위 라이브러리가 채웁니다.
-- autocommit, cursor 정리, fetchall 메모리, SQL injection, thread safety는 첫 도입 시 자주 부딪히는 함정입니다.
+- DB-API 2.0(PEP 249)은 Python 데이터베이스 driver가 따르는 최소 공통 계약입니다.
+- `connect → cursor → execute → fetch → commit → close` 흐름은 sqlite3, psycopg, pymysql에서 거의 같습니다.
+- driver 간 가장 눈에 띄는 차이는 `paramstyle`이며, 나머지 애플리케이션 로직은 대부분 유지됩니다.
+- DB-API는 pooling, async, ORM, migration 같은 상위 문제를 일부러 비워 두었습니다.
+- autocommit, cursor 정리, `fetchall()` 메모리 사용, SQL injection, thread safety가 가장 먼저 부딪히는 함정입니다.
 
 다음 글에서는 connection과 cursor의 lifecycle을 더 깊이 들여다보고, context manager로 안전하게 다루는 패턴을 정리합니다.
 

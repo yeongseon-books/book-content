@@ -17,7 +17,7 @@ tags:
 - Type Adapter
 - Pydantic
 - PEP 249
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_title: Row factory와 type adapter
 seo_description: '[col1, col2, col3] row_factory │ ─────────────► {''id'': 1, ''name'':
   ''Alice''} ▼…'
@@ -29,7 +29,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 이 글은 Python DB-API 101 시리즈의 여섯 번째 글입니다.
 
-![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
+![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
@@ -45,22 +45,58 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## Mental Model — 두 단계 변환
 
-![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
+![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
 
 *Mental Model - 두 단계 변환*
-```text
-Database row             Python value
-─────────────             ────────────
-                converter
-SQLite TEXT  ─────────────►  Decimal('19.95')
-                 (값 단계)
-                 adapter
-SQLite TEXT  ◄─────────────  Decimal('19.95')
+```'
+---
 
-[col1, col2, col3]   row_factory
-        │       ─────────────►   {'id': 1, 'name': 'Alice'}
-        ▼                          또는 dataclass/Pydantic
-   tuple shape                    (행 단계)
+# Row factories and type adapters (sqlite3, PEP 249)
+
+Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.
+
+This is the 6th article in the Python DB-API 101 series.
+
+![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
+
+*Row factories and type adapters (sqlite3, PEP 249)*
+## Questions this post answers
+
+- How do you receive default tuple results as dict, dataclass, or Pydantic models?
+- What is `sqlite3.Row` and when is it enough?
+- What does `detect_types` actually detect?
+- How do you safely map custom types such as `Decimal`, `datetime`, `Enum`, or JSON?
+- How do adapters and converters fit into the PEP 249 model?
+
+> Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.
+
+## What you will learn
+
+This post separates how sqlite3 moves data between SQL and Python into two axes.
+
+1. **Row factory** — the **shape** of `cursor.fetch*()` results (tuple → Row → dict → dataclass → Pydantic).
+2. **Type adapter / converter** — the **type of a single value** (Python `Decimal` ↔ SQLite TEXT).
+3. **`detect_types`** — selects automatic conversion based on declared column type or `[type-name]` column aliases.
+4. **Registering custom types** — `register_adapter` / `register_converter` for `Decimal`, `Enum`, JSON dicts.
+5. **Type-safe repository layer** — using Pydantic or dataclass as the result model.
+
+---
+
+## Why this matters
+
+Code like `row[3]` shatters silently the moment the schema changes. `row['name']` (or `row.name` from a dataclass) turns schema changes into immediate import errors.
+
+The same applies to type conversion. Storing money as `REAL` (float) in SQLite leads to precision incidents like `0.1 + 0.2 = 0.30000000000000004`. Registering `Decimal` and storing as `TEXT` keeps full precision.
+
+This post unifies row factories and type adapters so your repository layer survives schema and type changes.
+
+---
+
+## Mental Model — two-step conversion
+
+![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+
+*Mental model - two-step conversion*
 ```
 
 - **adapter / converter** = **단일 값**의 타입 변환 (Python ↔ SQLite storage class).
@@ -72,17 +108,31 @@ SQLite TEXT  ◄─────────────  Decimal('19.95')
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
+![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
 
 *핵심 개념*
 ### `sqlite3.Row`
 
 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
 
-```python
-con.row_factory = sqlite3.Row
-row = con.execute('SELECT id, name FROM users WHERE id=?', (1,)).fetchone()
-print(row[0], row['name'], row.keys())
+```
+
+- **adapter / converter** = type conversion of a **single value** (Python ↔ SQLite storage class).
+- **row_factory** = shape conversion of an **entire row** (tuple → desired form).
+
+Separating these two concerns naturally separates where they live in code.
+
+---
+
+## Core concepts
+
+![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
+
+*Core concepts*
+### `sqlite3.Row`
+
+The lightest row factory. Accessible by index like a tuple AND by name like a dict.
+
 ```
 
 dict는 아니지만 80% 케이스에 충분합니다.
@@ -91,64 +141,46 @@ dict는 아니지만 80% 케이스에 충분합니다.
 
 진짜 dict가 필요하면:
 
-```python
-def dict_factory(cursor, row):
-    return {col[0]: value for col, value in zip(cursor.description, row)}
+```
 
-con.row_factory = dict_factory
+It is not a real dict, but it covers ~80% of cases.
+
+### dict factory
+
+For a true dict:
+
 ```
 
 ### dataclass factory
 
 타입 안전성과 IDE 자동완성을 원하면:
 
-```python
-from dataclasses import dataclass, fields
+```
 
-@dataclass
-class User:
-    id: int
-    name: str
-    email: str
+### dataclass factory
 
-def dataclass_factory(cls):
-    field_names = [f.name for f in fields(cls)]
-    def factory(cursor, row):
-        cols = [c[0] for c in cursor.description]
-        return cls(**{k: v for k, v in zip(cols, row) if k in field_names})
-    return factory
+For type safety and IDE autocomplete:
 
-con.row_factory = dataclass_factory(User)
 ```
 
 ### Pydantic factory
 
 검증과 직렬화가 함께 필요하면:
 
-```python
-from pydantic import BaseModel
+```
 
-class UserModel(BaseModel):
-    id: int
-    name: str
-    email: str
+### Pydantic factory
 
-def pydantic_factory(cls):
-    def factory(cursor, row):
-        cols = [c[0] for c in cursor.description]
-        return cls.model_validate({k: v for k, v in zip(cols, row)})
-    return factory
+For combined validation and serialisation:
 
-con.row_factory = pydantic_factory(UserModel)
 ```
 
 ### `detect_types`
 
-```python
-con = sqlite3.connect(
-    'app.db',
-    detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-)
+```
+
+### `detect_types`
+
 ```
 
 - `PARSE_DECLTYPES` — `CREATE TABLE`의 컬럼 declared type(예: `created_at TIMESTAMP`)을 보고 등록된 converter 호출.
@@ -160,42 +192,29 @@ con = sqlite3.connect(
 
 ### Before — raw tuple + 컬럼 인덱스
 
-```python
-con = sqlite3.connect('shop.db')
-row = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
-print(row[2] * 1.1)   # 가격에 부가세
+```
+
+- `PARSE_DECLTYPES` — looks at the column's declared type from `CREATE TABLE` (e.g., `created_at TIMESTAMP`) and dispatches the registered converter.
+- `PARSE_COLNAMES` — forces conversion via aliases like `SELECT created_at AS "ts [timestamp]"`.
+
+---
+
+## Before / After
+
+### Before — raw tuple + column index
+
 ```
 
 `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
 
 ### After — Pydantic + Decimal converter
 
-```python
-import sqlite3
-from decimal import Decimal
-from pydantic import BaseModel
+```
 
-sqlite3.register_adapter(Decimal, lambda d: str(d))
-sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
+If the SELECT column order changes, you suddenly multiply the name string.
 
-con = sqlite3.connect('shop.db', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('''CREATE TABLE IF NOT EXISTS products(
-    id INTEGER PRIMARY KEY, name TEXT, price decimal
-)''')
+### After — Pydantic + Decimal converter
 
-class Product(BaseModel):
-    id: int
-    name: str
-    price: Decimal
-
-def factory(cursor, row):
-    return Product.model_validate(
-        {c[0]: v for c, v in zip(cursor.description, row)}
-    )
-
-con.row_factory = factory
-p = con.execute('SELECT id, name, price FROM products WHERE id=1').fetchone()
-print(p.price * Decimal('1.1'))
 ```
 
 컬럼 순서가 바뀌어도 안전하고, 가격은 `Decimal`로 정확합니다.
@@ -204,112 +223,68 @@ print(p.price * Decimal('1.1'))
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
+![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
 
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`
 
-```python
-import sqlite3
+```
 
-con = sqlite3.connect(':memory:')
-con.row_factory = sqlite3.Row
-con.execute('CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT, email TEXT)')
-con.execute('INSERT INTO users(name, email) VALUES (?, ?)', ('Alice', 'a@x.io'))
+Order-independent and precise.
 
-row = con.execute('SELECT * FROM users WHERE id=1').fetchone()
-print(dict(row))   # {'id': 1, 'name': 'Alice', 'email': 'a@x.io'}
+---
+
+## Step-by-step walkthrough
+
+![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
+
+*Step-by-step walkthrough*
+### Step 1 — `sqlite3.Row`
+
 ```
 
 ### 단계 2 — `Decimal` adapter/converter
 
-```python
-from decimal import Decimal
+```
 
-def adapt_decimal(d: Decimal) -> str:
-    return str(d)
+### Step 2 — `Decimal` adapter / converter
 
-def convert_decimal(b: bytes) -> Decimal:
-    return Decimal(b.decode())
-
-sqlite3.register_adapter(Decimal, adapt_decimal)
-sqlite3.register_converter('decimal', convert_decimal)
-
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE prices(value decimal)')
-con.execute('INSERT INTO prices VALUES (?)', (Decimal('19.95'),))
-row = con.execute('SELECT value FROM prices').fetchone()
-print(row[0], type(row[0]))   # → 19.95 <class 'decimal.Decimal'>
 ```
 
 ### 단계 3 — `Enum` adapter
 
-```python
-from enum import Enum
+```
 
-class Status(str, Enum):
-    PENDING = 'pending'
-    PAID = 'paid'
-    CANCELLED = 'cancelled'
+### Step 3 — `Enum` adapter
 
-sqlite3.register_adapter(Status, lambda s: s.value)
-sqlite3.register_converter('order_status', lambda b: Status(b.decode()))
-
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE orders(id INTEGER, status order_status)')
-con.execute('INSERT INTO orders VALUES (?, ?)', (1, Status.PAID))
-row = con.execute('SELECT status FROM orders').fetchone()
-print(row[0])   # → Status.PAID
 ```
 
 ### 단계 4 — JSON adapter
 
-```python
-import json
+```
 
-sqlite3.register_adapter(dict, lambda d: json.dumps(d))
-sqlite3.register_converter('json', lambda b: json.loads(b.decode()))
+### Step 4 — JSON adapter
 
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES)
-con.execute('CREATE TABLE events(id INTEGER, payload json)')
-con.execute('INSERT INTO events VALUES (?, ?)', (1, {'k': 'v', 'n': 42}))
-row = con.execute('SELECT payload FROM events').fetchone()
-print(row[0])   # → {'k': 'v', 'n': 42}
 ```
 
 ### 단계 5 — `[type-name]` 컬럼 별칭
 
 declared type을 못 쓰는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
 
-```python
-con = sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_COLNAMES)
-sqlite3.register_converter('decimal', lambda b: Decimal(b.decode()))
+```
 
-con.execute('CREATE TABLE t(s TEXT)')
-con.execute('INSERT INTO t VALUES (?)', ('19.95',))
-row = con.execute('SELECT s AS "v [decimal]" FROM t').fetchone()
-print(row[0])   # → Decimal('19.95')
+### Step 5 — `[type-name]` column aliases
+
+For views or computed columns where declared type is unavailable, force conversion via aliases.
+
 ```
 
 ### 단계 6 — Pydantic + adapter 통합
 
-```python
-from datetime import datetime
-from pydantic import BaseModel
+```
 
-# datetime은 sqlite3가 기본 등록 (PARSE_DECLTYPES 시 'TIMESTAMP' 컬럼 자동 변환)
+### Step 6 — Pydantic + adapters together
 
-class Order(BaseModel):
-    id: int
-    status: Status
-    total: Decimal
-    created_at: datetime
-
-def order_factory(cursor, row):
-    cols = [c[0] for c in cursor.description]
-    return Order.model_validate(dict(zip(cols, row)))
-
-con.row_factory = order_factory
 ```
 
 이제 repository는 `Order` 객체만 다루며, SQLite의 storage class는 외부에 새지 않습니다.
@@ -333,21 +308,29 @@ con.row_factory = order_factory
 
 ### Repository 레이어 패턴
 
-```python
-class UserRepo:
-    def __init__(self, con: sqlite3.Connection):
-        con.row_factory = pydantic_factory(UserModel)
-        self.con = con
+```
 
-    def get(self, user_id: int) -> UserModel | None:
-        return self.con.execute(
-            'SELECT id, name, email FROM users WHERE id=?', (user_id,)
-        ).fetchone()
+The repository now deals only in `Order` objects; SQLite storage classes never leak outward.
 
-    def list_active(self) -> list[UserModel]:
-        return self.con.execute(
-            "SELECT id, name, email FROM users WHERE status='active'"
-        ).fetchall()
+---
+
+## Common mistakes
+
+1. **Direct column-index access.** `row[0]`, `row[2]` are fragile across schema changes. Start with at least `sqlite3.Row`.
+2. **Storing money as `REAL`.** Float precision incidents follow. Always use `Decimal` + `TEXT`, or `INTEGER` (cents).
+3. **Forgetting `detect_types`.** You register the adapter, but the converter never fires — and you wonder why bytes come back. Enable `PARSE_DECLTYPES`.
+4. **Converters always receive `bytes`, not `str`.** Do not forget `b.decode()`.
+5. **Adapter must return one of SQLite's five storage classes** — `int`, `float`, `str`, `bytes`, or `None`. Returning a custom object raises.
+6. **Timestamp clashes.** Python 3.12 deprecated the default timestamp converter. Be explicit with your own converter.
+7. **Assuming `dict_factory` is fast.** Each row builds a dict via comprehension. For million-row workloads, `sqlite3.Row` (C-implemented) is much faster.
+8. **Setting `row_factory` only on the cursor, not the connection.** Set it on the connection — every cursor inherits.
+
+---
+
+## Production application
+
+### Repository layer pattern
+
 ```
 
 호출자는 dict 키 오타나 컬럼 순서를 신경 쓸 필요가 없습니다.
@@ -360,10 +343,18 @@ class UserRepo:
 
 view나 join 결과는 declared type이 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
 
-```sql
-SELECT u.id, u.name, SUM(o.total) AS "total [decimal]"
-FROM users u JOIN orders o ON o.user_id = u.id
-GROUP BY u.id;
+```
+
+Callers no longer need to remember dict keys or column order.
+
+### Migration and types
+
+Adopting `Decimal` requires migrating `REAL` columns to `TEXT`. Wrap it in `BEGIN IMMEDIATE → ALTER TABLE → data conversion → COMMIT` together with the transaction patterns from the previous post.
+
+### Handling views with column aliases
+
+Views and join results lose declared types. The `[type-name]` alias pattern is widely used in production.
+
 ```
 
 ### 성능 vs 안전 균형
@@ -386,8 +377,7 @@ GROUP BY u.id;
 
 ---
 
-## 정리·다음 글
-
+## 정리
 row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축만 분리하면 sqlite3의 데이터 변환은 단순해집니다. Repository 레이어를 Pydantic 모델 위에 올려 두면 schema 변경이 import error로 잡히고, 도메인 타입(`Decimal`, `Enum`, JSON)이 안전하게 흐릅니다.
 
 다음 글에서는 **error handling과 exception hierarchy**를 다룹니다. PEP 249가 정의한 8개 예외 클래스, sqlite3의 매핑(IntegrityError, OperationalError, ProgrammingError 등), `BUSY`와 `LOCKED`의 차이, 그리고 retry 전략을 코드로 정리합니다.

@@ -17,7 +17,7 @@ tags:
 - Isolation
 - WAL
 - PEP 249
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_title: Transaction과 isolation level
 seo_description: sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이 동작을 모르면 위 두 사고가
   동시에 발생하기…
@@ -29,7 +29,7 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 
 이 글은 Python DB-API 101 시리즈의 다섯 번째 글입니다.
 
-![Transaction과 isolation level (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.ko.png)
+![Transaction과 isolation level (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 
 *Transaction과 isolation level (sqlite3, PEP 249)*
 
@@ -48,7 +48,7 @@ sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이
 
 ## Mental Model — connection이 transaction 단위
 
-![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
+![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
 
 *Mental Model - connection이 transaction 단위*
 ```text
@@ -56,17 +56,19 @@ Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open
     │
-    │  cur.execute('SELECT ...')   ← transaction 없음
-    │  cur.execute('INSERT ...')   ← driver가 implicit BEGIN
-    │  cur.execute('UPDATE ...')   ← 같은 transaction 안
+    │  cur.execute('SELECT ...')   ← no transaction
+    │  cur.execute('INSERT ...')   ← driver issues implicit BEGIN
+    │  cur.execute('UPDATE ...')   ← same transaction
     │
-    │  con.commit()                ← transaction 종료, durable
+    │  con.commit()                ← transaction ends, durable
     │
-    │  cur.execute('INSERT ...')   ← 새 implicit BEGIN
-    │  con.rollback()              ← 변경 폐기
+    │  cur.execute('INSERT ...')   ← new implicit BEGIN
+    │  con.rollback()              ← changes discarded
     │
   close
 ```
+
+> transaction은 `commit()`과 `rollback()`이라는 함수 이름이 아니라, "어디부터 어디까지를 한 덩어리로 묶을 것인가"를 정하는 경계입니다. sqlite3는 그 경계를 자동으로 잡아 주기 때문에, 자동 동작을 모르면 락과 데이터 손실을 함께 맞게 됩니다.
 
 핵심 두 가지:
 
@@ -77,7 +79,7 @@ Connection lifecycle (sqlite3 default)
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/python-dbapi-101/05/05-03-core-concepts.ko.png)
+![핵심 개념](../../../assets/python-dbapi-101/05/05-03-core-concepts.en.png)
 
 *핵심 개념*
 ### `isolation_level` 5가지 값
@@ -111,9 +113,9 @@ WAL(Write-Ahead Logging)은 writer가 별도 `.wal` 파일에 기록하므로 **
 ### Python 3.12 `autocommit` 매개변수
 
 ```python
-con = sqlite3.connect(path, autocommit=False)  # PEP 249 호환
-con = sqlite3.connect(path, autocommit=True)   # 매 statement immediate commit
-con = sqlite3.connect(path, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)  # 기존 isolation_level 동작
+con = sqlite3.connect(path, autocommit=False)  # PEP 249 compliant
+con = sqlite3.connect(path, autocommit=True)   # commit after every statement
+con = sqlite3.connect(path, autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)  # legacy isolation_level behaviour
 ```
 
 3.12 이후로는 `autocommit`이 명시적이고 권장 방법입니다. legacy 코드와의 호환을 위해 `LEGACY_TRANSACTION_CONTROL`이 default입니다.
@@ -130,13 +132,13 @@ import sqlite3
 con = sqlite3.connect('shop.db')
 con.execute('CREATE TABLE IF NOT EXISTS orders(id INTEGER PRIMARY KEY, total INTEGER)')
 con.execute('INSERT INTO orders(total) VALUES (10000)')
-# con.commit()  ← 누락
+# con.commit()  ← forgotten
 con.close()
 
-# 새 프로세스에서 확인
+# In a new process
 con2 = sqlite3.connect('shop.db')
 print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
-# → (0,)   ← INSERT가 사라짐
+# → (0,)   ← INSERT was discarded
 ```
 
 `con.close()`는 commit하지 않습니다. 실수로 commit을 빠뜨리면 데이터가 그대로 사라집니다.
@@ -146,7 +148,7 @@ print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
 ```python
 with sqlite3.connect('shop.db') as con:
     con.execute('INSERT INTO orders(total) VALUES (10000)')
-# 블록 정상 종료 시 commit, 예외 발생 시 rollback
+# Commit on normal exit, rollback on exception
 ```
 
 `with con:`은 connection 자체에 대한 컨텍스트 매니저로, **transaction을 종료**합니다. connection을 close하지는 않으므로 별도로 닫아 줘야 합니다.
@@ -155,7 +157,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.ko.png)
+![단계별 실습](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
 
 *단계별 실습*
 ### 단계 1 — 기본 동작 관찰
@@ -166,11 +168,11 @@ import sqlite3
 con = sqlite3.connect(':memory:')
 con.execute('CREATE TABLE t(v INTEGER)')
 
-# SELECT만 하면 transaction이 안 열림
+# SELECT alone does not open a transaction
 con.execute('SELECT * FROM t').fetchall()
 print(con.in_transaction)   # → False
 
-# DML 직전 implicit BEGIN
+# Implicit BEGIN before DML
 con.execute('INSERT INTO t(v) VALUES (1)')
 print(con.in_transaction)   # → True
 
@@ -184,7 +186,7 @@ print(con.in_transaction)   # → False
 con = sqlite3.connect(':memory:', isolation_level=None)
 con.execute('CREATE TABLE t(v INTEGER)')
 con.execute('INSERT INTO t(v) VALUES (1)')
-# 별도 commit 없이도 즉시 durable
+# Already durable, no commit needed
 print(con.in_transaction)   # → False
 ```
 
@@ -210,7 +212,7 @@ with con:
 ```python
 con = sqlite3.connect('shop.db')
 con.execute('PRAGMA journal_mode=WAL')
-con.execute('PRAGMA synchronous=NORMAL')   # WAL에서 안전 + 빠름
+con.execute('PRAGMA synchronous=NORMAL')   # safe + fast under WAL
 ```
 
 `journal_mode`는 데이터베이스 파일 단위로 영구 저장되므로, 한 번만 설정하면 됩니다.
@@ -237,7 +239,7 @@ OUTER transaction은 그대로 유지되고, savepoint 내부만 부분 rollback
 
 ```python
 import sqlite3
-assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT 안정 동작
+assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
 con.execute('BEGIN IMMEDIATE')
@@ -300,7 +302,7 @@ def tx():
     finally:
         con.close()
 
-# 사용
+# Usage
 with tx() as con:
     con.execute('INSERT INTO orders(total) VALUES (?)', (10000,))
 ```
@@ -339,8 +341,7 @@ with dst:
 
 ---
 
-## 정리·다음 글
-
+## 정리
 sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그 자동 동작을 모르면 운영에서 lock과 데이터 유실로 직결됩니다. `isolation_level` 5가지 값과 `BEGIN` 변종, WAL mode를 한 번 정리해 두면 대부분의 transaction 이슈가 진단 가능해집니다.
 
 다음 글에서는 **row factory와 type adapter**를 다룹니다. 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받는 방법, `detect_types`와 사용자 정의 adapter/converter, 그리고 새 타입(예: `Decimal`, `enum`)을 안전하게 매핑하는 법을 코드로 정리합니다.
