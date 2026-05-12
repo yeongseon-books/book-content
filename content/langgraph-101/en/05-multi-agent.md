@@ -21,6 +21,10 @@ seo_description: A multi-agent graph is not just “more LLM calls.” It is a d
 
 # Multi-agent systems
 
+If you push every task into one giant agent, prompts grow, roles blur, and behavior becomes harder to debug. A supervisor-worker graph fixes that by separating routing, execution, and final assembly into named nodes.
+
+This is the fifth post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - How do you express the supervisor-worker pattern in LangGraph?
@@ -30,8 +34,6 @@ seo_description: A multi-agent graph is not just “more LLM calls.” It is a d
 > A multi-agent graph is not just “more LLM calls.” It is a delegation structure where roles, handoffs, and state boundaries stay explicit.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
-
-If you push every task into one giant agent, prompts grow, roles blur, and behavior becomes harder to debug. A supervisor-worker graph fixes that by separating routing, execution, and final assembly into named nodes.
 
 ![Questions this post answers](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.en.png)
 

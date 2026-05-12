@@ -21,6 +21,10 @@ seo_description: A complete LangGraph agent is not one giant prompt. It is a sta
 
 # Completing LangGraph
 
+This final example pulls the series together. It classifies the incoming question, answers simple conceptual prompts directly, routes calculation-heavy prompts into a tool loop, and stores the whole conversation with `MemorySaver`. That is already enough structure for a serious prototype.
+
+This is the final post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - How do you combine checkpoints, routing, and tool calling in one graph?
@@ -30,8 +34,6 @@ seo_description: A complete LangGraph agent is not one giant prompt. It is a sta
 > A complete LangGraph agent is not one giant prompt. It is a state machine where supervisor logic, tool execution, and checkpointing cooperate through explicit transitions.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
-
-This final example pulls the series together. It classifies the incoming question, answers simple conceptual prompts directly, routes calculation-heavy prompts into a tool loop, and stores the whole conversation with `MemorySaver`. That is already enough structure for a serious prototype.
 
 ![Questions this post answers](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 

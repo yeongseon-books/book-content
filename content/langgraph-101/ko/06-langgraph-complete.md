@@ -20,6 +20,10 @@ seo_description: 체크포인트 분기 도구 호출을 한 그래프에 합쳐
 
 # LangGraph 완성
 
+이 마지막 예제는 시리즈 전체를 하나로 묶습니다. 들어온 질문을 분류하고, 간단한 개념 질문은 직접 답변 경로로 보내고, 계산이 필요한 질문은 도구 루프로 보내며, 전체 대화를 `MemorySaver`로 저장합니다. 진지한 프로토타입을 만들기에는 이 정도 구조만으로도 출발점이 충분합니다.
+
+이 글은 LangGraph 101 시리즈의 마지막 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - 체크포인트, 라우팅, 도구 호출을 하나의 그래프에 어떻게 합칠 수 있을까요?
@@ -29,8 +33,6 @@ seo_description: 체크포인트 분기 도구 호출을 한 그래프에 합쳐
 > 완성형 LangGraph 에이전트는 거대한 프롬프트 하나가 아닙니다. supervisor 로직, 도구 실행, 체크포인트가 명시적 전이로 협력하는 상태 머신입니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
-
-이 마지막 예제는 시리즈 전체를 하나로 묶습니다. 들어온 질문을 분류하고, 간단한 개념 질문은 직접 답변 경로로 보내고, 계산이 필요한 질문은 도구 루프로 보내며, 전체 대화를 `MemorySaver`로 저장합니다. 진지한 프로토타입을 만들기에는 이 정도 구조만으로도 출발점이 충분합니다.
 
 ![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
 

@@ -21,6 +21,10 @@ seo_description: A conditional edge inspects state and returns the name of the n
 
 # Conditional edges and branching
 
+Real agent workflows do not follow one path forever. Some requests should go to code generation, some to conceptual explanation, and others to debugging. LangGraph makes that branch visible with one routing node and one conditional edge definition.
+
+This is the third post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - When should you use `add_conditional_edges()`?
@@ -30,8 +34,6 @@ seo_description: A conditional edge inspects state and returns the name of the n
 > A conditional edge inspects state and returns the name of the next node, so routing becomes an explicit runtime decision instead of hidden control flow.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
-
-Real agent workflows do not follow one path forever. Some requests should go to code generation, some to conceptual explanation, and others to debugging. LangGraph makes that branch visible with one routing node and one conditional edge definition.
 
 ![Questions this post answers](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
 

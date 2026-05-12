@@ -20,6 +20,10 @@ seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임
 
 # 조건부 엣지와 분기 흐름
 
+실제 에이전트 워크플로는 한 경로만 계속 따라가지 않습니다. 어떤 요청은 코드 생성으로, 어떤 요청은 개념 설명으로, 어떤 요청은 디버깅으로 가야 합니다. LangGraph는 라우팅 노드 하나와 조건부 엣지 정의 하나로 그 분기를 그래프 위에 드러냅니다.
+
+이 글은 LangGraph 101 시리즈의 3번째 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - 언제 `add_conditional_edges()`를 써야 할까요?
@@ -29,8 +33,6 @@ seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임
 > 조건부 엣지는 상태를 보고 다음 노드 이름을 결정하는 장치입니다. 숨겨진 제어 흐름을 런타임의 명시적 분기로 끌어올린다고 생각하면 됩니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges)
-
-실제 에이전트 워크플로는 한 경로만 계속 따라가지 않습니다. 어떤 요청은 코드 생성으로, 어떤 요청은 개념 설명으로, 어떤 요청은 디버깅으로 가야 합니다. LangGraph는 라우팅 노드 하나와 조건부 엣지 정의 하나로 그 분기를 그래프 위에 드러냅니다.
 
 ![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.ko.png)
 

@@ -20,6 +20,10 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 # 멀티 에이전트 시스템
 
+복잡한 요청을 하나의 거대한 에이전트에 모두 밀어 넣으면 프롬프트가 비대해지고 역할 경계가 흐려집니다. supervisor-worker 그래프는 라우팅, 실제 작업, 최종 조립을 별도 노드로 나눠서 이 문제를 줄입니다.
+
+이 글은 LangGraph 101 시리즈의 5번째 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - LangGraph에서 supervisor-worker 패턴을 어떻게 표현할 수 있을까요?
@@ -29,8 +33,6 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 > 멀티 에이전트 그래프는 단순히 LLM 호출 수를 늘리는 구조가 아닙니다. 역할, 위임, 상태 경계를 명시적으로 드러내는 설계라고 봐야 합니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/05-multi-agent)
-
-복잡한 요청을 하나의 거대한 에이전트에 모두 밀어 넣으면 프롬프트가 비대해지고 역할 경계가 흐려집니다. supervisor-worker 그래프는 라우팅, 실제 작업, 최종 조립을 별도 노드로 나눠서 이 문제를 줄입니다.
 
 ![이 글에서 답할 질문](../../../assets/langgraph-101/05/05-01-questions-this-post-answers.ko.png)
 

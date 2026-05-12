@@ -20,6 +20,10 @@ seo_description: StateGraph로 노드와 엣지를 정의해 LLM 워크플로를
 
 # LangGraph 소개와 그래프 기초
 
+LangGraph를 처음 볼 때 가장 먼저 바꿔야 하는 관점은 이것입니다. LangGraph는 체인 몇 개를 이어 붙인 도구가 아니라, 상태가 이름 붙은 단계들을 따라 이동하는 그래프입니다. 이 글에서는 가장 작은 예제를 통해 노드 등록, 엣지 연결, `invoke()` 실행을 한 번에 살펴보겠습니다.
+
+이 글은 LangGraph 101 시리즈의 첫 번째 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - LangGraph에서 `StateGraph`는 정확히 무엇을 정의할까요?
@@ -29,8 +33,6 @@ seo_description: StateGraph로 노드와 엣지를 정의해 LLM 워크플로를
 > StateGraph는 노드 함수와 전이 규칙을 하나의 공유 상태 위에 올려서, 실행 가능한 워크플로로 바꿔 주는 설계도입니다.
 
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
-
-LangGraph를 처음 볼 때 가장 먼저 바꿔야 하는 관점은 이것입니다. LangGraph는 체인 몇 개를 이어 붙인 도구가 아니라, 상태가 이름 붙은 단계들을 따라 이동하는 그래프입니다. 이 글에서는 가장 작은 예제를 통해 노드 등록, 엣지 연결, `invoke()` 실행을 한 번에 살펴보겠습니다.
 
 ![이 글에서 답할 질문](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.ko.png)
 

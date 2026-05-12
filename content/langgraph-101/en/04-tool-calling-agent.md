@@ -21,6 +21,10 @@ seo_description: 'A tool-calling agent is a loop: the model decides whether it n
 
 # Tool-calling agents
 
+The key question is not whether the LLM can look clever. It is whether the tool path is explicit, inspectable, and easy to extend. In LangGraph 0.4.5, `ToolNode` plus `tools_condition` is the cleanest low-level pattern for that loop.
+
+This is the fourth post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - What responsibility does `ToolNode` take in a LangGraph agent?
@@ -30,8 +34,6 @@ seo_description: 'A tool-calling agent is a loop: the model decides whether it n
 > A tool-calling agent is a loop: the model decides whether it needs a tool, ToolNode executes the call, and the model reads the result before answering.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/04-tool-calling-agent)
-
-The key question is not whether the LLM can look clever. It is whether the tool path is explicit, inspectable, and easy to extend. In LangGraph 0.4.5, `ToolNode` plus `tools_condition` is the cleanest low-level pattern for that loop.
 
 ![Questions this post answers](../../../assets/langgraph-101/04/04-01-questions-this-post-answers.en.png)
 

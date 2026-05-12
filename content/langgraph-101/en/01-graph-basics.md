@@ -21,6 +21,10 @@ seo_description: StateGraph is a blueprint that turns node functions plus transi
 
 # LangGraph introduction and graph basics
 
+The most useful first mental shift is this: LangGraph is not a few chains glued together. It is a graph where state moves through named steps. This post builds the smallest possible graph so you can see node registration, edge wiring, and `invoke()` in one place.
+
+This is the first post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - What exactly does `StateGraph` define in LangGraph?
@@ -30,8 +34,6 @@ seo_description: StateGraph is a blueprint that turns node functions plus transi
 > StateGraph is a blueprint that turns node functions plus transition rules into an executable workflow over shared state.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/01-graph-basics)
-
-The most useful first mental shift is this: LangGraph is not “a few chains glued together.” It is a graph where state moves through named steps. This post builds the smallest possible graph so you can see node registration, edge wiring, and `invoke()` in one place.
 
 ![Questions this post answers](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
 

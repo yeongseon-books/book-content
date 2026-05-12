@@ -21,6 +21,10 @@ seo_description: A checkpointer snapshots graph state so the next invocation can
 
 # State management and checkpoints
 
+As soon as an agent becomes conversational, single-shot execution stops being enough. You need to save state between turns, reload it with the same session key, and verify what the graph actually kept. In LangGraph, that job belongs to the checkpointer.
+
+This is the second post in the LangGraph 101 series.
+
 ## Questions this post answers
 
 - What does a LangGraph checkpointer actually store?
@@ -30,8 +34,6 @@ seo_description: A checkpointer snapshots graph state so the next invocation can
 > A checkpointer snapshots graph state so the next invocation can continue from the same conversation timeline instead of starting from zero.
 
 Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints)
-
-As soon as an agent becomes conversational, single-shot execution stops being enough. You need to save state between turns, reload it with the same session key, and verify what the graph actually kept. In LangGraph, that job belongs to the checkpointer.
 
 ![Questions this post answers](../../../assets/langgraph-101/02/02-01-questions-this-post-answers.en.png)
 
