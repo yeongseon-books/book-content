@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Dynamic Programming
 
-> Algorithms 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why do we keep recomputing the same subproblems, and how can we recognise that pattern in the wild?
 
-> Dynamic programming (DP) applies when (1) the same subproblems repeat and (2) the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation. DP feels hard not because of the algorithm but because state design is a skill — one that grows by writing classic problems with your own hands.
+Dynamic programming (DP) applies when the same subproblems repeat and the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation.
 
-<!-- a-grade-intro:end -->
+This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
 
 ## What You Will Learn
 

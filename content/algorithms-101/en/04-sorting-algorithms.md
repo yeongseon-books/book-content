@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Sorting Algorithms
 
-> Algorithms 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why is Python's `sorted` so consistently fast, and what does it do that a textbook quicksort does not?
 
-> Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour. Python's standard library uses Timsort, which adapts to the partial order found in real data. Picking a sort means weighing data shape, memory, and external constraints together.
+Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour.
 
-<!-- a-grade-intro:end -->
+This is post 4 in the Algorithms 101 series. Here we cover the trade-offs among textbook sorting algorithms and why Timsort wins so often in production code.
 
 ## What You Will Learn
 

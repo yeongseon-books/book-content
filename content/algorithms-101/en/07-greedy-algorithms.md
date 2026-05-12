@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Greedy Algorithms
 
-> Algorithms 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: If we always pick what looks best right now, does that really lead to the global optimum? And why does it work on some problems and quietly fail on others?
 
-> A greedy algorithm makes the locally best choice at every step and never reconsiders it. To be correct, two properties must hold: (1) the greedy-choice property and (2) optimal substructure. The standard tool for proving both is the exchange argument. Greedy is short and fast — but get the conditions wrong and it returns a subtly incorrect answer that is hard to spot. So intuition and proof have to travel together.
+A greedy algorithm makes the locally best choice at every step and never reconsiders it. To be correct, two properties must hold: the greedy-choice property and optimal substructure. The standard tool for proving both is the exchange argument.
 
-<!-- a-grade-intro:end -->
+This is post 7 in the Algorithms 101 series. Here we cover when greedy algorithms are correct, how to justify them, and where greedy-looking problems quietly turn into DP.
 
 ## What You Will Learn
 

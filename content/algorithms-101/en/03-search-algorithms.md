@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Search Algorithms
 
-> Algorithms 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Given a million sorted integers, is there anything better than scanning from the start to find a target?
 
-> Search algorithms locate a value inside a collection. With unsorted data, linear scan at O(n) is the only option. With sorted data, binary search discards half the candidates each step, reaching the answer in O(log n). One precondition — sortedness — changes the algorithmic class. Python's `bisect` module provides a tested implementation, and the binary-search idea generalises to parametric search: searching the answer itself when it is monotone.
+Search algorithms locate a value inside a collection. With unsorted data, linear scan at O(n) is the only option. With sorted data, binary search discards half the candidates each step, reaching the answer in O(log n). One precondition — sortedness — changes the algorithmic class.
 
-<!-- a-grade-intro:end -->
+This is post 3 in the Algorithms 101 series. Here we cover linear search, binary search, Python's `bisect`, and the broader idea of parametric search.
 
 ## What You Will Learn
 

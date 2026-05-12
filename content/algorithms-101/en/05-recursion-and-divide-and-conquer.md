@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Recursion and Divide and Conquer
 
-> Algorithms 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does recursion feel hard, and why are divide-and-conquer algorithms like mergesort fast for the right reason?
 
-> Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine. Cost is analysed via recurrences. When the same subproblems repeat, we cache their results, which is exactly the door to dynamic programming.
+Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine.
 
-<!-- a-grade-intro:end -->
+This is post 5 in the Algorithms 101 series. Here we cover the call stack, recurrence-based cost analysis, and the mental model behind divide-and-conquer algorithms.
 
 ## What You Will Learn
 

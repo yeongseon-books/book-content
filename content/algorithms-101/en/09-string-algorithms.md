@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # String Algorithm Basics
 
-> Algorithms 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Finding a pattern inside text sounds simple — so why are there so many algorithms for it?
 
-> Almost every piece of software does string matching, but the naive comparison can be O(nm). KMP uses a failure function so it never re-examines the same character, getting O(n+m). Tries are the standard data structure for multi-pattern search and autocomplete. Regular expressions are expressive but their backtracking cost can explode. Working with strings means carrying both intuition and a cost model in your head at the same time.
+Almost every piece of software does string matching, but the naive comparison can be O(nm). KMP uses a failure function so it never re-examines the same character, getting O(n+m). Tries and regex engines introduce a different kind of trade-off: convenience vs cost awareness.
 
-<!-- a-grade-intro:end -->
+This is post 9 in the Algorithms 101 series. Here we cover naive matching, KMP, trie-based lookups, and the cost pitfalls that show up in production regex.
 
 ## What You Will Learn
 

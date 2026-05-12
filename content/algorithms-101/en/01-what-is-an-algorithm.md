@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # What Is an Algorithm?
 
-> Algorithms 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Why does a "good algorithm" matter so much when modern hardware is fast enough to run almost anything?
 
-> An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records. This article maps the vocabulary the entire series will use.
+An algorithm is a finite sequence of clear, unambiguous steps that takes a well-defined input and produces a correct output. Three properties separate an algorithm from "any code that happens to work": correctness on every valid input, finiteness in time and space, and efficiency that scales with input growth. Hardware does not save us from a quadratic algorithm running on millions of records.
 
-<!-- a-grade-intro:end -->
+This is the first post in the Algorithms 101 series. Here we define what an algorithm is, how it differs from a program, and which core terms the rest of the series will build on.
 
 ## What You Will Learn
 

@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Graph Algorithms
 
-> Algorithms 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Road networks, social networks, and dependency graphs all live in different domains — why can the same algorithms solve them?
 
-> A graph encodes relationships as nodes and edges, and almost every system can be reasoned about on top of one. The core algorithms are BFS (unweighted shortest paths and layered traversal), DFS (connectivity and topological sort), Dijkstra (weighted shortest paths), and MST (minimum-cost connecting trees). Their cost depends on the representation, so adjacency list vs adjacency matrix is part of the decision. Once you have these tools, recommendations, search, routing, and build systems all start sounding like dialects of the same language.
+A graph encodes relationships as nodes and edges, and almost every system can be reasoned about on top of one. The core algorithms are BFS, DFS, Dijkstra, and MST, and their cost depends on the graph representation you choose.
 
-<!-- a-grade-intro:end -->
+This is post 8 in the Algorithms 101 series. Here we cover graph representations, traversal patterns, shortest paths, and minimum spanning trees.
 
 ## What You Will Learn
 

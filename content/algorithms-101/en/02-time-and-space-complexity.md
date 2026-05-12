@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Time and Space Complexity
 
-> Algorithms 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: How can we predict whether an algorithm will be fast enough before writing the code?
 
-> Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Big-O is an upper bound, Big-Omega a lower bound, Big-Theta a tight bound. Most engineering work uses Big-O for the worst case. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.
+Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.
 
-<!-- a-grade-intro:end -->
+This is post 2 in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.
 
 ## What You Will Learn
 

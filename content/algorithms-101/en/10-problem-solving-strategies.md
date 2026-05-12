@@ -23,15 +23,11 @@ last_reviewed: '2026-05-04'
 
 # Algorithm Problem-Solving Strategies
 
-> Algorithms 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
 **Core question**: Does being good at algorithms mean memorising lots of solutions, or having a thinking procedure that decomposes new problems?
 
-> Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox. When you meet a new problem, you narrow which tool fits by reading the input size, structure, and constraints. Senior engineers are not separated from others by the number of solutions they have memorised; they are separated by the consistency of their thinking procedure. This article makes that procedure explicit while wrapping up the series.
+Solving algorithm problems is a game of pattern recognition and tool selection. The sorting, searching, recursion, DP, greedy, graph, and string topics in this series form a toolbox, but the real leverage comes from the procedure you use to choose among them.
 
-<!-- a-grade-intro:end -->
+This is the final post in the Algorithms 101 series. Here we wrap up the series with a practical thinking procedure for reading constraints, choosing tools, and verifying an approach before coding.
 
 ## What You Will Learn
 
