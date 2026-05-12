@@ -22,6 +22,10 @@ seo_description: Multilingual dense retrieval decomposes into four steps.
 
 # BGE-M3 multilingual embedding in practice
 
+Many Korean teams search across a corpus where the query is Korean but half the documents are English. That is the point where a Korean-only retrieval baseline starts to look clean in tests and brittle in production.
+
+This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to measure a dense multilingual baseline over mixed Korean-English corpora before adding more complex retrieval signals.
+
 ## Questions this post answers
 
 - Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?

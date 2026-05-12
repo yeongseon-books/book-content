@@ -21,6 +21,10 @@ seo_description: Comparing embedding models is less about headline scores and mo
 
 # Korean embedding models compared — KoSimCSE, BGE-M3, Solar
 
+Choosing a Korean embedding model is rarely about chasing the prettiest benchmark score. The practical question is which model stays more stable on your actual mix of Korean FAQs, Korean-English documents, and threshold-based retrieval decisions.
+
+This is the first post in the Korean AI Stack 101 series. Here, we build a reproducible comparison frame for Korean embedding models so later retrieval decisions have a clear baseline.
+
 ## Questions this post answers
 
 - Where do English-first embedding models usually fail on Korean-heavy data?

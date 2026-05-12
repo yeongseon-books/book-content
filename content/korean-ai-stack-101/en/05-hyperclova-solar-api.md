@@ -22,6 +22,10 @@ seo_description: Generation API calls factor into a 4-layer contract.
 
 # Using HyperCLOVA X and Solar API
 
+Once you introduce a Korean-first generation model, the hard part is not the model name. The hard part is locking down the call contract so authentication, prompting, output shape, and validation stay predictable in production.
+
+This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe calling patterns for Korean LLM APIs such as HyperCLOVA X and Solar.
+
 ## Questions this post answers
 
 - What API contract should you lock down before you start prompt tuning?

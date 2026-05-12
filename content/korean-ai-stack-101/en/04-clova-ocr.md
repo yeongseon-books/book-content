@@ -22,6 +22,10 @@ seo_description: The OCR pipeline has four stages.
 
 # Document text extraction with CLOVA OCR API
 
+Korean search and RAG pipelines often fail long before retrieval because the source material starts as scans, receipts, or photographed documents. If OCR breaks a meaningful line into the wrong pieces, every downstream embedding and ranking decision inherits that damage.
+
+This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA OCR responses into line-level text that can safely enter a retrieval corpus.
+
 ## Questions this post answers
 
 - When you add OCR, should you inspect text accuracy first, or response structure first?

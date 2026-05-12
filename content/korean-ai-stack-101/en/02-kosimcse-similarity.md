@@ -22,6 +22,10 @@ seo_description: Sentence similarity search decomposes into four steps.
 
 # Building sentence similarity search with KoSimCSE
 
+The first working retrieval loop should be small enough to inspect with your own eyes. In Korean FAQ search, a single bad choice around normalization or indexing is enough to make every later LLM step look smarter than it really is.
+
+This is the second post in the Korean AI Stack 101 series. Here, we build a minimal Korean sentence-similarity search flow with KoSimCSE and make the retrieval mechanics explicit.
+
 ## Questions this post answers
 
 - Where does KoSimCSE usually pay off first in Korean retrieval work?

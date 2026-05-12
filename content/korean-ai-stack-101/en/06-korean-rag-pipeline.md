@@ -22,6 +22,10 @@ seo_description: '!Core flow'
 
 # Assembling a Korean RAG pipeline
 
+RAG stops feeling mystical once you can see where each failure comes from. In Korean workflows, chunking, retrieval, and generation each introduce their own class of mistakes, so the only sane approach is to wire them together in a way you can inspect stage by stage.
+
+This is the final post in the Korean AI Stack 101 series. Here, we connect the earlier embedding, OCR, and generation pieces into one minimal Korean RAG pipeline.
+
 ## Questions this post answers
 
 - What stages are non-negotiable in a minimal Korean RAG pipeline?
