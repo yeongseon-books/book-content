@@ -3,7 +3,7 @@ title: 평가 데이터셋 설계하기
 series: ai-evaluation-101
 episode: 2
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,24 +14,53 @@ tags:
 - LLM
 - Dataset
 - Quality
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다.
 ---
 
 # 평가 데이터셋 설계하기
 
-> AI Evaluation 101 시리즈 (2/10)
+평가를 시작하겠다고 마음먹은 팀이 가장 먼저 부딪히는 벽은 지표보다 데이터입니다. 무엇을 점수화할지는 이야기할 수 있어도, 무엇을 입력으로 삼아야 할지는 금방 막히기 때문입니다.
 
-좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다.
+현업에서는 이 지점에서 자주 두 가지 실수가 나옵니다. 하나는 데모에 잘 맞는 예제만 모아 놓고 평가셋이라고 부르는 경우입니다. 다른 하나는 실제 트래픽을 넣고 싶지만 개인정보와 라벨링 부담 때문에 아예 시작을 미루는 경우입니다.
 
-이 글은 AI Evaluation 101 시리즈의 2번째 글입니다. 여기서는 50-200건 규모의 입문용 eval set을 설계하는 원칙과 데이터를 모으는 방법을 다룹니다.
+제가 본 강한 팀들은 평가 데이터셋을 정답 모음집으로 만들지 않았습니다. 대신 사용자 분포를 닮은 본류 사례와, 자주 오지는 않지만 깨지면 큰일 나는 실패 사례를 함께 관리했습니다. 이 균형이 없으면 평균 점수는 좋아도 서비스는 계속 흔들립니다.
 
----
+이 글은 AI Evaluation 101 시리즈의 2번째 글입니다.
+
+여기서는 50~200건 규모의 출발용 평가 데이터셋을 어떻게 설계하고, 어디서 수집하고, 어떤 방식으로 라벨을 붙여야 하는지 정리하겠습니다.
+
+## 이 글에서 다룰 문제
+
+- 좋은 평가 데이터셋은 실제 트래픽 분포와 엣지 케이스를 어떻게 함께 담아야 할까요?
+- 운영 로그, 실패 사례, 의도적 적대 사례는 각각 어떤 역할을 맡을까요?
+- Smoke test, 회귀 테스트, 모델 비교 실험에 필요한 데이터셋 크기는 왜 다를까요?
+- `expected` 필드는 언제 exact, keywords, rubric 중 무엇으로 채워야 할까요?
+- 평가 데이터셋을 JSONL과 git으로 버전 관리해야 하는 이유는 무엇일까요?
+
+## 왜 이 글이 중요한가
+
+데이터셋이 빈약하면 지표가 정교해도 결과를 믿기 어렵습니다. 프롬프트 작성자가 고른 보기 좋은 사례만 모아 두면 모델은 늘 좋아 보일 수밖에 없습니다. 운영 품질을 알고 싶다면 운영에 가까운 표본이 먼저 필요합니다.
+
+또 하나 중요한 점은 실패 사례의 축적입니다. 한 번 크게 깨진 입력을 평가셋에 넣지 않으면 팀은 같은 사고를 반복해서 다시 배웁니다. 실제로 좋은 평가셋은 성능 측정 도구이면서 동시에 사고 기록 저장소 역할도 합니다.
+
+그래서 데이터셋 설계는 단순한 준비 작업이 아닙니다. 무엇을 지키고 싶은지, 어떤 실패를 다시는 반복하지 않겠는지 팀이 합의하는 첫 운영 문서에 가깝습니다.
+
+## 평가 데이터셋을 이해하는 가장 좋은 방법: 모델 시험지가 아니라 운영 표본으로 봐야 합니다
+
+이 주제는 개별 기법을 외우기보다 먼저 어떤 운영 문제를 풀기 위한 장치인지 붙잡아 두는 편이 이해가 빠릅니다. 데이터셋이 빈약하면 지표가 정교해도 결과를 믿기 어렵습니다. 프롬프트 작성자가 고른 보기 좋은 사례만 모아 두면 모델은 늘 좋아 보일 수밖에 없습니다. 운영 품질을 알고 싶다면 운영에 가까운 표본이 먼저 필요합니다.
+
+> 좋은 평가 데이터셋은 멋진 예시 모음이 아닙니다. 실제 사용 분포를 닮되, 한 번 깨지면 큰 사고로 이어지는 모서리 사례를 일부러 섞어 둔 운영용 표본입니다.
+
+이 관점을 먼저 잡아 두면 뒤에 나오는 코드와 지표를 기능 설명이 아니라 운영 설계 관점에서 읽을 수 있습니다. 결국 중요한 것은 수치 이름보다, 그 수치가 어떤 의사결정을 가능하게 하느냐입니다.
+
+## 핵심 개념
+
 ![평가 데이터셋 설계하기](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
 
 *평가 데이터셋 설계하기*
 
-## 좋은 평가 데이터셋이란 무엇인가요?
+### 좋은 평가 데이터셋이란 무엇인가요?
 
 ![좋은 평가 데이터셋이란 무엇인가요](../../../assets/ai-evaluation-101/02/02-02-what-makes-a-good-evaluation-dataset.ko.png)
 
@@ -50,14 +79,14 @@ from dataclasses import dataclass
 class EvalExample:
     id: str
     input: dict
-    expected: dict | None       # 결정적 답이 있을 때만 채움
-    category: str               # "happy_path", "edge_case", "adversarial" 중 하나
+    expected: dict | None       # only filled when a deterministic answer exists
+    category: str               # one of "happy_path", "edge_case", "adversarial"
     notes: str = ""
 ```
 
 `category`를 명시적으로 붙이면 "edge case 점수만 따로 보기"가 가능해집니다. 평균만 보면 다수 케이스가 묻어 가립니다.
 
-## 어디서 데이터를 가져오나요?
+### 어디서 데이터를 가져오나요?
 
 ![어디서 데이터를 가져오나요](../../../assets/ai-evaluation-101/02/02-03-where-do-you-source-the-data.ko.png)
 
@@ -96,7 +125,7 @@ def add_failure_case(eval_set: list[dict], failed_input: dict, expected: dict, s
 
 도메인 지식을 가진 사람이 "이건 깨질 것 같다"고 손으로 만든 케이스입니다. Prompt injection, 모호한 질문, 답이 없는 질문 등이 여기 들어갑니다.
 
-## 몇 건이 필요한가요?
+### 몇 건이 필요한가요?
 
 ![몇 건이 필요한가요](../../../assets/ai-evaluation-101/02/02-04-how-many-cases-do-you-need.ko.png)
 
@@ -112,7 +141,7 @@ def add_failure_case(eval_set: list[dict], failed_input: dict, expected: dict, s
 
 처음에는 10-30건으로 시작하고, 매주 production trace에서 5-10건씩 추가하면 3개월 안에 200건에 도달합니다.
 
-## 라벨링 — `expected`를 어떻게 채우나요?
+### 라벨링 — `expected`를 어떻게 채우나요?
 
 ![라벨링 - expected 값 채우기](../../../assets/ai-evaluation-101/02/02-05-labeling-how-do-you-fill-expected.ko.png)
 
@@ -153,7 +182,7 @@ examples = [
 ]
 ```
 
-## Eval set을 어떻게 버전 관리하나요?
+### Eval set을 어떻게 버전 관리하나요?
 
 Eval set은 코드와 함께 버전 관리되어야 합니다. JSONL 파일로 저장하고 git에 커밋하세요.
 
@@ -179,7 +208,15 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 
 파일명에 버전을 박는 것도 좋은 습관입니다: `evals/customer-support/v3.jsonl`. 새 버전을 만들 때 옛 버전을 지우지 말고 이름을 늘리세요.
 
-## 흔한 실수 5가지
+## 이 코드에서 먼저 봐야 할 점
+
+- `EvalExample`에 `category`를 명시한 부분이 핵심입니다. 평균 점수만 보면 엣지 케이스가 묻히기 때문에, 카테고리별 분리가 먼저 필요합니다.
+- 세 가지 데이터 소스 가운데 운영 샘플과 실패 사례를 어떻게 섞는지 보시면 평가셋이 연구용 데이터가 아니라 운영 자산이라는 감각이 잡힙니다.
+- `save_eval_set` 예제는 평가셋이 코드 옆에서 버전 관리되어야 한다는 점을 보여 줍니다. 바뀐 모델은 기록하지 않으면서 바뀐 평가셋만 모호하게 두면 비교가 무의미해집니다.
+
+이 세 지점을 먼저 읽고 나면 세부 구현과 지표 해석이 훨씬 빨라집니다. 코드가 길어 보여도 운영 질문은 대개 여기로 다시 돌아옵니다.
+
+## 어디서 자주 헷갈릴까요?
 
 1. **Eval set을 prompt 작성자가 만듦**: 자기 prompt에 유리한 케이스만 모이고, "잘된다"는 잘못된 결론이 나옵니다. 다른 팀원이나 production에서 가져오세요.
 2. **Happy path만 모음**: edge case가 없으면 "평균 90%인데 1% 사용자가 망가지는" 상황을 못 잡습니다. category 비율을 의도적으로 관리하세요.
@@ -187,7 +224,25 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 4. **`expected`를 한 가지 방식으로만 채움**: 모든 케이스에 exact match를 강제하면 자유 형식 답이 모두 0점이 됩니다. 케이스별로 적절한 라벨 스타일을 고르세요.
 5. **Eval set을 한 번 만들고 안 갱신**: production 트래픽 분포가 바뀌면 옛 eval set은 의미가 없어집니다. 매주 5-10건씩 갱신하세요.
 
-## 핵심 요약
+현업에서 제가 가장 자주 보는 문제는 결과 숫자만 보고 원인 분해를 건너뛰는 습관입니다. 평가가 개선을 돕지 못하고 보고서용 숫자로만 남는 순간, 팀은 다시 감각에 의존하게 됩니다.
+
+## 첫 번째 운영 체크리스트
+
+- [ ] 운영 로그에서 매주 새 사례를 일정량 수집하는 흐름이 있는가
+- [ ] 실패 케이스를 별도 카테고리로 보존하고 있는가
+- [ ] 개인정보가 포함된 입력을 마스킹하거나 합성 데이터로 바꾸는 기준이 있는가
+- [ ] 정답 형식이 하나가 아닌 사례를 rubric으로 분리할 준비가 되어 있는가
+- [ ] 평가셋 파일 버전과 모델 버전을 함께 기록하고 있는가
+
+## 실무에서는 이렇게 생각한다
+
+실무에서는 '몇 건이면 충분한가'보다 '무엇이 빠져 있으면 위험한가'를 먼저 봅니다. 고객센터 봇이라면 상위 문의 유형과 과거 장애 사례가 빠진 데이터셋은 크기가 커도 약합니다.
+
+또한 평가셋 작성자를 분리하는 원칙이 중요합니다. 프롬프트를 만든 사람이 자기 평가셋까지 고르면 결과는 쉽게 낙관적으로 기울어집니다. 최소한 운영 로그나 다른 팀원의 리뷰를 끼워 넣는 편이 안전합니다.
+
+다음 글의 지표 논의도 결국 이 데이터셋 위에서만 의미가 있습니다. 잘못 뽑은 입력에 정교한 지표를 얹어 봐야 팀은 잘못된 확신만 더 크게 얻게 됩니다.
+
+## 정리: 좋은 평가셋은 평균을 재는 도구이면서 사고를 기억하는 저장소입니다
 
 - 좋은 eval set은 production 분포 + edge case를 함께 담습니다.
 - 출처는 production trace 샘플링, 실패 케이스, 의도적 adversarial 3가지를 조합하세요.
@@ -197,7 +252,15 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 
 다음 글에서는 결정적 지표 — Exact Match, F1, BLEU, ROUGE를 언제 써야 하고 언제 쓰면 안 되는지를 다룹니다.
 
----
+이제 데이터셋의 바탕이 잡혔다면, 다음 글에서는 여기에 어떤 결정적 지표를 얹을 수 있는지 봅니다. Exact Match, F1, BLEU, ROUGE가 어디까지 유효하고 어디서부터 위험해지는지가 다음 단계입니다.
+
+## 운영 체크리스트
+
+- [ ] 상위 사용 패턴과 과거 장애 사례를 모두 평가셋에 포함하기
+- [ ] 카테고리별 점수를 따로 볼 수 있도록 메타데이터 넣기
+- [ ] 정답 형식이 다른 사례를 한 가지 라벨 스타일로 강제하지 않기
+- [ ] 평가셋을 코드와 함께 버전 관리하기
+- [ ] 주간 단위로 새 운영 사례를 보충하는 습관 만들기
 
 <!-- toc:begin -->
 ## AI Evaluation 101 시리즈
@@ -205,20 +268,28 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 - [왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
 - **평가 데이터셋 설계하기 (현재 글)**
 - 결정적 지표 — Exact Match, BLEU, ROUGE (예정)
-- LLM-as-Judge (예정)
+- LLM-as-Judge — 모델로 모델을 평가하기 (예정)
 - Rubric 기반 채점 설계 (예정)
 - RAG 시스템 평가하기 (예정)
-- Agent 평가하기 (예정)
-- 회귀 테스트 (예정)
-- LLM A/B 테스팅 (예정)
+- 에이전트 평가하기 — 단일 응답이 아닌 trajectory (예정)
+- 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게 (예정)
+- LLM A/B 테스팅 — 어느 prompt가 더 나은가 (예정)
 - 운영 환경에서의 지속적 평가 (예정)
 <!-- toc:end -->
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Hamel Husain — Your AI product needs evals](https://hamel.dev/blog/posts/evals/)
 - [OpenAI — Evals framework](https://github.com/openai/evals)
 - [LangSmith — Dataset best practices](https://docs.smith.langchain.com/evaluation/concepts)
 - [Eugene Yan — Building eval datasets](https://eugeneyan.com/writing/evals/)
+
+### 관련 시리즈
+
+- [이전 글 — 왜 LLM 애플리케이션을 평가해야 하는가](./01-why-evaluate-llm-apps.md)
+- [다음 글 — 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
+- [시리즈 현재 위치 다시 보기](./02-evaluation-dataset-design.md)
 
 Tags: AI Evaluation, LLM, Dataset, Quality
