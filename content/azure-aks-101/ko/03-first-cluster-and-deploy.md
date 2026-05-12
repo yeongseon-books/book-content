@@ -14,45 +14,70 @@ tags:
 - AKS
 - Kubernetes
 - Cloud
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-12'
 seo_description: 개념을 오래 붙들고 있으면 Kubernetes는 필요 이상으로 추상적으로 느껴집니다.
 ---
 
 # 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI
 
-> Azure Kubernetes Service 101 시리즈 (3/7)
+Kubernetes는 개념만 오래 붙들고 있으면 필요 이상으로 추상적으로 느껴집니다. 실제로는 작은 앱 하나를 올려 보면 훨씬 빨리 감이 옵니다. 리소스를 만들고, 클러스터에 적용하고, Service로 접근하고, 상태를 확인하는 흐름을 한 번 직접 밟아 보면 뒤의 네트워킹과 스케일링도 갑자기 현실적인 문제로 바뀝니다.
 
-개념을 오래 붙들고 있으면 Kubernetes는 필요 이상으로 추상적으로 느껴집니다. 실제로는 작은 앱 하나를 올려 보면 훨씬 빨리 감이 옵니다. 리소스를 선언하고, 클러스터에 적용하고, Service를 통해 접근하는 흐름이 한 번 손에 들어오면 그 뒤의 네트워킹과 스케일링도 갑자기 현실적인 문제가 됩니다.
+특히 AKS 입문에서는 `az`와 `kubectl`의 경계가 몸으로 들어오는 경험이 중요합니다. Azure 리소스를 만드는 일과 Kubernetes API에 원하는 상태를 선언하는 일은 이어져 있지만 같은 작업이 아닙니다. 이 분리가 눈에 익으면 이후 운영 문맥도 훨씬 잘 잡힙니다.
 
-이번 글에서는 실습용 AKS 클러스터를 만들고, 아주 작은 FastAPI 앱을 컨테이너로 만든 뒤, Deployment와 Service로 배포합니다. 예시는 최대한 작게 두되, 운영 환경에서 왜 user node pool 분리가 중요한지도 같이 짚겠습니다.
+이 글은 Azure AKS 101 시리즈의 3번째 글입니다.
 
-이 글은 Azure Kubernetes Service 101 시리즈의 3번째 글입니다. 여기서는 앞에서 잡은 클러스터 구조를 실제 AKS 생성과 FastAPI 배포 흐름으로 연결합니다.
+여기서는 앞의 두 글에서 본 구조를 실제 배포 흐름으로 연결하겠습니다. **작은 AKS 클러스터를 만들고, user node pool을 추가하고, FastAPI 앱을 컨테이너로 빌드해 Deployment와 Service로 올리는 과정**을 통해 AKS의 기본 운영 언어를 손에 익히겠습니다.
 
----
+## 이 글에서 다룰 문제
 
-## 오늘 할 일의 순서
+- 실습용 AKS 클러스터를 만들 때 최소한 무엇을 결정해야 할까요?
+- 기본 system pool 외에 user node pool을 왜 별도로 추가하는 편이 좋을까요?
+- `az aks get-credentials` 이후 `kubectl`이 실제로 어떤 계층과 대화하게 될까요?
+- 첫 배포에서 가장 자주 막히는 지점은 이미지 pull, probe, Service 중 어디일까요?
+- 단순 실습이어도 왜 readiness/liveness/startup probe를 함께 봐야 할까요?
+
+## 왜 이 글이 중요한가
+
+AKS를 배울 때 가장 위험한 상태는 용어만 아는 상태입니다. Deployment가 무엇인지, Service가 무엇인지, node pool이 무엇인지는 설명할 수 있지만, 실제로는 어떤 순서로 만들고 어떤 명령으로 확인하며 어디에서 문제가 나는지 감이 없는 상태입니다. 플랫폼 운영은 대부분 그 감각 차이에서 갈립니다.
+
+또한 첫 배포는 이후의 모든 주제를 묶어 줍니다. Ingress는 결국 오늘 만든 Service 앞단에 붙는 것이고, HPA는 오늘 만든 Deployment의 복제본 수를 자동으로 바꾸는 장치이며, 운영과 관측은 결국 오늘 배포한 객체의 상태를 읽는 작업입니다. 작은 예제라도 한 번 전체 흐름을 보는 것이 중요합니다.
+
+무엇보다 이 글은 “AKS는 Azure 리소스이면서 동시에 Kubernetes 클러스터다”라는 사실을 가장 또렷하게 보여 줍니다. `az`와 `kubectl`이 각각 어느 세계를 다루는지 명확해지는 순간, AKS가 훨씬 덜 추상적으로 보이기 시작합니다.
+
+## 첫 배포를 이해하는 가장 좋은 방법: Azure 리소스 생성과 Kubernetes 상태 선언을 두 단계로 나눠 보는 것입니다
+
+AKS 첫 배포에서 가장 먼저 잡아야 할 기준은 도구 구분입니다. `az`는 Azure Resource Manager 쪽에서 클러스터와 노드 풀 같은 리소스를 만듭니다. 반면 `kubectl`은 그 클러스터 안의 Kubernetes API에 Deployment, Service 같은 원하는 상태를 선언합니다.
+
+이 둘을 한 흐름으로 묶어 보는 것은 맞지만, 같은 층으로 보는 것은 좋지 않습니다. 클러스터가 아직 없는데 `kubectl`은 아무 의미가 없고, 반대로 클러스터가 생긴 뒤 워크로드를 바꾸는 대부분의 일은 `az`보다 `kubectl`에서 일어납니다. 운영 문제도 종종 이 두 층의 경계에서 나뉩니다.
+
+따라서 이번 글은 명령어를 암기하는 글이 아니라, **Azure 리소스 생성 → kubeconfig 연결 → 워크로드 선언 → 외부 노출 → 상태 확인**이라는 기본 실행 루프를 몸에 익히는 글로 읽는 편이 좋습니다.
+
+> AKS 첫 배포의 핵심은 클러스터를 만드는 것보다, Azure 리소스 관리와 Kubernetes 상태 선언이 어떤 순서로 이어지는지 체감하는 데 있습니다.
+
+## 핵심 개념
+
+### 오늘의 흐름을 먼저 한 장으로 봅니다
+
+실습은 세부 명령보다 순서가 중요합니다.
 
 ![클러스터 생성부터 배포까지의 흐름](../../../assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
 
 *클러스터 생성부터 배포까지의 흐름*
-여기서 `az` 명령은 Azure 쪽 리소스를 만들고, `kubectl`은 Kubernetes API에 원하는 상태를 선언합니다. 이 분리를 체감하는 것이 오늘 실습의 절반입니다.
 
----
+이 그림이 보여 주는 핵심은 간단합니다. `az`는 Azure 쪽 리소스를 만들고, `kubectl`은 Kubernetes API에 원하는 상태를 선언합니다. 이 분리를 체감하는 것이 오늘 실습의 절반입니다.
 
-## 0. 준비물
+### 0. 준비물
 
 - Azure CLI
 - `kubectl`
 - Azure 구독
 - 컨테이너 이미지를 올릴 레지스트리
 
-실습에서는 AKS 예제 흐름을 설명하는 데 집중하므로, 이미지는 Azure Container Registry나 Docker Hub 어느 쪽을 써도 됩니다. Azure 환경에서 이어서 운영할 생각이라면 ACR이 자연스럽습니다.
+실습의 초점은 AKS 흐름이므로 레지스트리는 Azure Container Registry나 Docker Hub 어느 쪽이어도 됩니다. 다만 Azure 환경 안에서 이어서 운영할 생각이라면 ACR이 가장 자연스럽습니다.
 
----
+### 1. 리소스 그룹을 만듭니다
 
-## 1. 리소스 그룹 만들기
-
-먼저 리소스 그룹을 만듭니다.
+AKS도 결국 Azure Resource Manager 아래에 놓이는 Azure 리소스입니다. 그래서 출발점은 리소스 그룹입니다.
 
 ```bash
 export RESOURCE_GROUP="rg-aks-101"
@@ -63,13 +88,11 @@ export USER_POOL="userpool1"
 az group create --name $RESOURCE_GROUP --location $LOCATION
 ```
 
-이 단계는 Kubernetes와 직접 관련은 없지만, AKS가 Azure 리소스라는 사실을 보여 줍니다. 클러스터도 결국 Azure Resource Manager 아래에서 관리됩니다.
+이 단계는 Kubernetes 그 자체와 직접 관련되지는 않지만, AKS가 Azure 리소스라는 사실을 가장 단순하게 보여 줍니다.
 
----
+### 2. 작은 AKS 클러스터를 만듭니다
 
-## 2. 실습용 AKS 클러스터 만들기
-
-가장 단순한 생성 명령은 아래처럼 가져갈 수 있습니다.
+가장 단순한 시작 명령은 아래와 같습니다.
 
 ```bash
 az aks create \
@@ -79,20 +102,18 @@ az aks create \
   --generate-ssh-keys
 ```
 
-이 명령에서 먼저 볼 포인트는 네 가지입니다.
+여기서 먼저 볼 포인트는 네 가지입니다.
 
 - `az aks create`는 AKS 클러스터를 만듭니다.
-- 예제에서는 실습 비용을 줄이기 위해 `--node-count 1`을 명시했습니다.
-- 최신 Learn 빠른 시작 기준으로 기본 생성 흐름은 system-assigned managed identity를 사용합니다.
-- `--generate-ssh-keys`는 필요한 SSH 키가 없을 때 생성해 줍니다.
+- `--node-count 1`은 비용을 줄이기 위한 실습용 선택입니다.
+- 현재 Learn 빠른 시작 흐름에서는 system-assigned managed identity가 기본 경로입니다.
+- `--generate-ssh-keys`는 필요한 키가 없을 때 생성해 줍니다.
 
-운영 환경에서는 기본값을 그대로 믿기보다 VM 크기, 네트워킹 방식, 업그레이드 정책, 모니터링 설정까지 같이 설계해야 합니다. 하지만 입문 실습에서는 **먼저 클러스터 하나를 만들고, Kubernetes 객체를 올리는 감각**이 더 중요합니다.
+운영 환경이라면 VM 크기, 네트워킹 방식, 모니터링, 업그레이드 전략까지 먼저 설계해야 합니다. 하지만 첫 실습의 목적은 완벽한 설계가 아니라 **실제 클러스터 하나를 만들고 그 위에 Kubernetes 객체를 올리는 감각**을 얻는 데 있습니다.
 
----
+### 3. user node pool을 추가합니다
 
-## 3. user node pool 추가하기
-
-AKS 빠른 시작 문서도 애플리케이션은 user node pool에서 돌리도록 권장합니다. 실습이더라도 그 구조를 한 번은 밟아 보는 편이 좋습니다.
+AKS 실습에서도 애플리케이션 워크로드는 user node pool에서 돌린다는 기본 원칙을 한 번 밟아 보는 편이 좋습니다.
 
 ```bash
 az aks nodepool add \
@@ -103,9 +124,9 @@ az aks nodepool add \
   --mode User
 ```
 
-이제 클러스터에는 기본 system pool과 새 user pool이 같이 있게 됩니다.
+이제 클러스터에는 기본 system pool과 새 user pool이 함께 있게 됩니다. 2화에서 본 구조가 실제 리소스로 드러나는 순간입니다.
 
-확인은 이렇게 합니다.
+확인은 아래처럼 합니다.
 
 ```bash
 az aks nodepool list \
@@ -114,36 +135,27 @@ az aks nodepool list \
   --query "[].{Name:name, Mode:mode, Count:count}"
 ```
 
-여기서 `Mode`가 `System`, `User`로 나뉘는 것을 보면 2화에서 본 구조가 실제 리소스로 드러납니다.
+출력에서 `System`과 `User`가 나뉘는 것을 보면, Control Plane 아래의 실행 계층이 어떤 식으로 구분되는지 더 구체적으로 보입니다.
 
----
+### 4. `kubectl`이 클러스터를 보게 만듭니다
 
-## 4. kubectl이 클러스터를 보게 만들기
-
-Azure 리소스를 만드는 일과 Kubernetes API를 조작하는 일은 별개입니다. 이제 kubeconfig를 받아 와야 합니다.
+Azure 리소스를 만든 것과 로컬 Kubernetes 클라이언트를 연결한 것은 별개입니다. 이제 kubeconfig를 받아 와야 합니다.
 
 ```bash
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME
 ```
 
-그 다음 연결을 확인합니다.
+그다음 연결을 확인합니다.
 
 ```bash
 kubectl get nodes
 ```
 
-노드가 두 개 보이면 보통 다음 상황입니다.
+보통 노드가 두 개 보이면 system pool 1개, user pool 1개인 상황입니다. 이 시점부터 대부분의 작업은 Azure CLI보다 `kubectl`에서 이루어집니다.
 
-- 기본 system node pool의 노드 1개
-- user node pool의 노드 1개
+### 5. 작은 FastAPI 앱을 준비합니다
 
-이제부터는 대부분의 작업이 `kubectl` 영역으로 넘어갑니다.
-
----
-
-## 5. FastAPI 앱 준비하기
-
-앱 코드는 아주 작게 갑니다.
+애플리케이션 코드는 최대한 작게 두겠습니다.
 
 ```python
 from fastapi import FastAPI
@@ -159,7 +171,9 @@ def healthz():
     return {"status": "ok"}
 ```
 
-컨테이너를 위한 `Dockerfile`은 다음처럼 둘 수 있습니다.
+이 앱은 두 가지 목적을 가집니다. `/`는 실제 응답을 확인하는 데 쓰고, `/healthz`는 probe 경로로 사용합니다. 즉 예제는 작지만 운영 기본 문법은 그대로 담고 있습니다.
+
+컨테이너를 위한 `Dockerfile`은 다음처럼 둡니다.
 
 ```dockerfile
 FROM python:3.12-slim
@@ -181,13 +195,11 @@ fastapi==0.115.0
 uvicorn[standard]==0.30.6
 ```
 
-이미지를 빌드해서 레지스트리에 올린 뒤, 그 이미지를 Deployment에서 사용하면 됩니다.
+이미지를 빌드하고 레지스트리에 push한 뒤, Deployment에서 그 이미지를 참조하게 하면 됩니다.
 
----
+### 6. Deployment와 Service를 작성합니다
 
-## 6. Deployment와 Service 작성하기
-
-이번 글에서는 가장 작은 두 객체만 씁니다.
+이번 글에서는 가장 작은 두 객체만 사용합니다. 그래도 probe와 resource request는 넣어 두는 편이 좋습니다. 실습에서도 운영 감각을 너무 희석하지 않는 편이 낫기 때문입니다.
 
 ```yaml
 apiVersion: apps/v1
@@ -251,18 +263,16 @@ spec:
   type: LoadBalancer
 ```
 
-여기서 오늘 기억할 라인은 네 줄입니다.
+여기서 기억할 라인은 네 개면 충분합니다.
 
-- `replicas: 2` — 같은 앱 Pod를 두 개 원한다는 선언
-- `nodeSelector` — user node pool에 올리겠다는 의도 표현
-- `startupProbe` — 앱이 처음 뜨는 동안 liveness probe가 성급하게 재시작시키지 않게 하는 안전장치
-- `type: LoadBalancer` — Azure Load Balancer를 붙여 외부 진입점을 만들겠다는 선언
+- `replicas: 2`는 같은 앱 Pod를 두 개 원한다는 선언입니다.
+- `nodeSelector`는 user node pool에 올리겠다는 의도를 드러냅니다.
+- `startupProbe`는 느린 초기 기동 동안 과한 재시작을 막아 줍니다.
+- `type: LoadBalancer`는 Azure Load Balancer를 붙여 외부 진입점을 만들겠다는 선언입니다.
 
-실습 예제라고 해서 probe를 모두 같은 값으로 두면 운영 감각이 흐려집니다. readiness probe는 “이제 트래픽을 받아도 되는가”를 빠르게 판단하고, liveness probe는 시작 지연이나 초기 의존성 연결 때문에 컨테이너를 불필요하게 죽이지 않도록 더 느슨하게 두는 편이 안전합니다.
+특히 probe는 입문 단계부터 구분해서 보는 편이 좋습니다. readiness는 트래픽 수용 가능 여부를, liveness는 장기적으로 살아 있는지 여부를, startup은 초기 부팅 기간의 예외를 다룹니다. 셋을 한데 뭉개면 장애 해석이 어려워집니다.
 
----
-
-## 7. 클러스터에 적용하기
+### 7. 클러스터에 적용합니다
 
 매니페스트를 `fastapi-hello.yaml`로 저장했다면 적용은 한 줄입니다.
 
@@ -270,7 +280,7 @@ spec:
 kubectl apply -f fastapi-hello.yaml
 ```
 
-그 다음 상태를 확인합니다.
+그다음 상태를 확인합니다.
 
 ```bash
 kubectl get deployments
@@ -278,22 +288,21 @@ kubectl get pods -o wide
 kubectl get services
 ```
 
-`-o wide`를 붙이면 어느 노드에 올라갔는지가 보입니다. 여기서 user node pool 노드에 앱 Pod가 올라간다면 의도한 배치가 맞게 된 것입니다.
+`-o wide`를 붙이면 어느 노드에 올라갔는지까지 보입니다. user node pool 노드에 앱 Pod가 올라갔다면, placement 의도도 제대로 반영된 것입니다.
 
----
+### 8. 요청이 들어가고 응답이 나오는 경로를 확인합니다
 
-## 8. 요청이 들어가고 응답이 나오는 길
+배포가 끝나면 요청 경로를 한 번 그림으로 다시 보는 편이 좋습니다.
 
 ![외부 요청이 Service와 Pod로 흐르는 경로](../../../assets/azure-aks-101/03/03-02-8-the-request-path.ko.png)
 
 *외부 요청이 Service와 Pod로 흐르는 경로*
-이 그림은 5화의 Ingress 이야기 전 단계입니다. 지금은 Service가 외부 진입점까지 맡고 있습니다. 조금 더 복잡한 HTTP 라우팅이 필요해지면 여기 앞단에 Ingress를 추가하게 됩니다.
 
----
+지금 단계에서는 Service가 외부 진입점 역할까지 맡고 있습니다. 5화에서 Ingress를 붙이면 이 앞단에 HTTP 라우팅 계층이 하나 더 생기게 됩니다. 즉 오늘 실습은 이후 네트워킹의 바닥 구조이기도 합니다.
 
-## 9. 외부 IP 확인과 테스트
+### 9. 외부 IP를 확인하고 테스트합니다
 
-LoadBalancer 타입 Service는 Azure 쪽 퍼블릭 엔드포인트를 만드는 데 시간이 조금 걸릴 수 있습니다.
+LoadBalancer 타입 Service는 외부 IP가 붙는 데 시간이 조금 걸릴 수 있습니다.
 
 ```bash
 kubectl get service fastapi-hello
@@ -305,81 +314,74 @@ kubectl get service fastapi-hello
 curl http://<external-ip>/
 ```
 
-예상 응답은 대략 이렇습니다.
+예상 응답은 아래와 같습니다.
 
 ```json
 {"message":"hello from aks"}
 ```
 
-이 응답이 돌아오면 다음 세 가지가 한 번에 확인된 것입니다.
+이 응답이 돌아오면 세 가지가 동시에 확인된 것입니다.
 
-- 컨테이너가 정상 기동됨
-- Deployment가 원하는 수의 Pod를 유지함
-- Service가 외부 요청을 Pod로 연결함
+- 컨테이너가 정상 기동합니다.
+- Deployment가 원하는 수의 Pod를 유지합니다.
+- Service가 외부 요청을 올바른 Pod 집합으로 연결합니다.
 
----
+### 10. 초반에 자주 막히는 지점을 미리 봅니다
 
-## 10. 초반에 자주 막히는 지점
+#### 이미지 pull 실패
 
-### 이미지 pull 실패
-
-레지스트리 인증이나 이미지 이름 오타일 가능성이 큽니다.
+가장 흔한 원인은 레지스트리 인증 또는 이미지 이름 오타입니다.
 
 ```bash
 kubectl describe pod <pod-name>
 ```
 
-### Service 외부 IP가 오래 안 붙음
+#### Service 외부 IP가 오래 안 붙음
 
-Azure Load Balancer 프로비저닝이 진행 중일 수 있습니다. 이벤트를 함께 보세요.
+Azure Load Balancer 프로비저닝이 아직 진행 중일 수 있습니다.
 
 ```bash
 kubectl describe service fastapi-hello
 ```
 
-### Pod는 뜨는데 Ready가 안 됨
+#### Pod는 뜨는데 Ready가 안 됨
 
-`/healthz` 경로나 포트 번호가 맞는지 먼저 봅니다. readiness probe는 “프로세스가 떴는가”보다 “트래픽을 받아도 되는가”를 묻습니다.
+이 경우는 `/healthz` 경로나 포트, 또는 readiness probe 타이밍을 먼저 보는 편이 좋습니다. 프로세스가 살아 있는 것과 트래픽을 받을 준비가 된 것은 같은 말이 아닙니다.
 
----
+### 11. 실습이 끝난 뒤 남아야 하는 감각
 
-## 11. 실습이 끝나면 무엇이 남아야 하나
-
-이번 글의 목적은 YAML 문법 암기가 아닙니다. 아래 흐름을 몸으로 기억하는 데 있습니다.
+이번 글의 목적은 YAML 문법 암기가 아닙니다. 아래 순서를 몸으로 기억하는 데 있습니다.
 
 1. `az aks create`로 Azure 쪽 클러스터를 만든다.
 2. `az aks get-credentials`로 Kubernetes API에 붙는다.
 3. `kubectl apply -f`로 원하는 상태를 선언한다.
 4. Deployment와 Service가 그 상태를 실제 Pod와 엔드포인트로 만든다.
 
-이 순서만 분명하면 뒤에서 Deployment 전략을 바꾸거나, Ingress를 붙이거나, HPA를 켜는 작업도 같은 언어로 이어집니다.
+이 흐름만 분명하면 이후 Ingress를 붙이거나 HPA를 켜거나 관측 도구를 추가하는 일도 모두 같은 언어로 이어집니다.
 
----
+## 흔히 헷갈리는 지점
 
-## 정리
-
-오늘 만든 예시는 아주 작지만, AKS 운영의 주요 축이 이미 다 들어 있습니다.
-
-- Azure CLI로 클러스터와 node pool 생성
-- `kubectl`로 Kubernetes 객체 선언
-- user node pool에 워크로드 배치
-- Service로 외부 노출
-
-오늘 쓴 객체 셋 중에서도 Pod·Deployment·Service는 이후 모든 예제의 기본 문법이 됩니다.
-
----
-
-이 글은 Azure Kubernetes Service 101 시리즈의 3화입니다. 앞의 두 화에서 AKS와 클러스터 구조를 봤다면, 이번 화는 그 구조 위에 FastAPI 앱을 실제로 올리는 단계였습니다. 이제 남은 일은 오늘 매니페스트에 등장한 Pod, Deployment, Service를 각각 왜 따로 두는지 더 또렷하게 이해하는 것입니다.
-
----
+- `az aks create`만 끝나면 앱 배포까지 끝난 것처럼 느끼기 쉽지만, 그다음부터가 Kubernetes 객체 작업입니다.
+- system pool이 있으니 앱도 거기에 바로 올려도 된다고 생각하기 쉽지만, 기본 원칙은 user pool 분리입니다.
+- readiness와 liveness를 같은 체크로만 이해하기 쉽지만, 운영상 의미가 다릅니다.
+- Service를 만들면 곧바로 외부 IP가 즉시 생길 것이라 기대하기 쉽지만, 클라우드 리소스 프로비저닝 시간이 필요할 수 있습니다.
+- Pod가 Running이면 곧바로 정상 서비스라고 생각하기 쉽지만, Ready 여부와 실제 응답 확인이 따로 필요합니다.
 
 ## 운영 체크리스트
 
-- [ ] 리전, 노드 SKU, Kubernetes 버전을 사전에 결정했다
-- [ ] ACR와 AKS를 managed identity로 연결했다
-- [ ] `kubectl get nodes`로 클러스터 접속을 검증했다
-- [ ] 첫 Deployment의 readinessProbe와 livenessProbe를 정의했다
-- [ ] Service의 노출 방식(ClusterIP/LoadBalancer)을 의도에 맞게 선택했다
+- [ ] 리전, 노드 SKU, Kubernetes 버전 같은 최소 설계 값을 사전에 정했는가
+- [ ] system pool과 user pool을 분리하는 이유를 이해한 상태에서 클러스터를 만들었는가
+- [ ] `az aks get-credentials` 이후 `kubectl get nodes`로 실제 연결을 검증했는가
+- [ ] 첫 Deployment에도 startup/readiness/liveness probe를 구분해 정의했는가
+- [ ] Service 노출 방식을 `LoadBalancer`로 둘지, 이후 `ClusterIP + Ingress`로 바꿀지 의도를 가지고 선택했는가
+
+## 정리
+
+이번 글의 실습은 작지만 AKS 운영의 핵심 축이 이미 다 들어 있습니다. Azure CLI로 클러스터와 node pool을 만들고, `kubectl`로 Kubernetes 객체를 선언하고, user node pool에 워크로드를 배치하고, Service로 외부 노출을 만들었습니다. 즉 AKS의 두 세계인 Azure 리소스 관리와 Kubernetes 상태 선언이 한 번에 연결된 셈입니다.
+
+또한 오늘 등장한 Deployment와 Service는 이후 모든 글의 기본 문법이 됩니다. 4화에서는 이 두 객체와 Pod가 각각 어떤 문제를 푸는지 더 또렷하게 분리해서 보게 되고, 5화에서는 오늘 만든 Service 앞단에 Ingress가 추가됩니다.
+
+첫 배포에서 가장 중요하게 남아야 할 감각은 명령어가 아니라 흐름입니다. **클러스터를 만든다, 연결한다, 원하는 상태를 선언한다, 상태를 확인한다.** 이 반복 루프가 AKS 운영의 가장 기본적인 손동작입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -394,11 +396,10 @@ kubectl describe service fastapi-hello
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
 ### 공식 문서
+
 - [Deploy an Azure Kubernetes Service (AKS) Cluster Using Azure CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli)
 - [Create node pools in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/create-node-pools)
 - [Use system node pools in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/use-system-pools)
@@ -406,6 +407,7 @@ kubectl describe service fastapi-hello
 - [az aks get-credentials](https://learn.microsoft.com/en-us/cli/azure/aks#az-aks-get-credentials)
 
 ### 관련 시리즈
+
 - [Azure App Service 101](../../azure-app-service-101/ko/04-first-deploy.md) — 같은 FastAPI 앱을 더 높은 수준의 PaaS에 올리는 흐름과 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/) — 코드 배포 단위가 컨테이너와 어떻게 다른지 비교할 때
 
