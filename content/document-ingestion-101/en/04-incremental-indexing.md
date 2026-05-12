@@ -21,6 +21,10 @@ seo_description: Incremental indexing is less a vector-store trick and more an o
 
 # Incremental indexing — updating only changed documents
 
+Rebuilding an entire index is simple, but it stops scaling surprisingly quickly. Once the corpus grows, the real question becomes how to remember what changed and skip the rest safely.
+
+This is the fourth post in the Document Ingestion 101 series. Here, we use file hashes and a small state store to separate added, unchanged, and updated documents.
+
 ## Questions this post answers
 
 - What do you need to process only changed documents instead of rebuilding everything?

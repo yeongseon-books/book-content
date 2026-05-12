@@ -21,6 +21,10 @@ seo_description: Chunking is not just cutting text smaller; it is designing the 
 
 # Chunking strategies — optimizing by document type
 
+Chunking is where many retrieval systems quietly lose quality. A splitter that works well for an FAQ can easily damage the structure of a manual or a policy document.
+
+This is the second post in the Document Ingestion 101 series. Here, we compare chunking presets by document shape and look at the quick signals that tell you whether a split is trustworthy.
+
 ## Questions this post answers
 
 - Should FAQ pages, manuals, and policy documents use the same chunk size?

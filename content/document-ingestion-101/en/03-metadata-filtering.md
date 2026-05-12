@@ -21,6 +21,10 @@ seo_description: Metadata is not decoration around the text; it is the first ind
 
 # Metadata design and filtering
 
+Good retrieval is not only about semantic similarity. In production, engineers also need explicit ways to narrow results by scope, source, and time window before ranking becomes useful.
+
+This is the third post in the Document Ingestion 101 series. Here, we design a practical metadata shape and show how filtering changes retrieval behavior in a visible way.
+
 ## Questions this post answers
 
 - Which retrieval conditions cannot be solved by embedding similarity alone?

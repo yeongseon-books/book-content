@@ -21,6 +21,10 @@ seo_description: The first goal of PDF parsing is to turn a visual document into
 
 # PDF parsing and text extraction
 
+Most document ingestion pipelines fail earlier than people expect. If the very first extraction step is hard to reproduce or hard to inspect, every later chunking and indexing discussion rests on shaky ground.
+
+This is the first post in the Document Ingestion 101 series. Here, we start with a reproducible PDF sample and inspect what useful text and page-level metadata come out of it.
+
 ## Questions this post answers
 
 - How do you make a PDF extraction demo reproducible when no sample file exists?

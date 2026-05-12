@@ -21,6 +21,10 @@ seo_description: The essence of a multi-format pipeline is forcing varied inputs
 
 # Multi-format document pipeline
 
+Real ingestion work rarely stays inside one file format. Teams usually need to mix PDFs, plain text notes, and Markdown documents without forcing every later stage to care about those differences.
+
+This is the fifth post in the Document Ingestion 101 series. Here, we route multiple formats through separate loaders and normalize them into one shared `Document` contract.
+
 ## Questions this post answers
 
 - How do you combine PDF, TXT, and MD into one pipeline?

@@ -21,6 +21,10 @@ seo_description: A complete ingestion pipeline is not defined by how many stages
 
 # Completing the document ingestion pipeline
 
+The value of an ingestion pipeline appears only when the handoff between stages is real. It is not enough to understand loading, chunking, and indexing separately if they do not survive an end-to-end run together.
+
+This is the final post in the Document Ingestion 101 series. Here, we connect the earlier pieces into one reproducible flow and verify that the index can be saved, reloaded, and queried.
+
 ## Questions this post answers
 
 - How do you connect loading, chunking, embedding, and FAISS save-reload in one flow?
