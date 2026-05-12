@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Compute is anything that runs your code — VM vs container vs serverless trades control for automation.*
 
+This is post 4 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

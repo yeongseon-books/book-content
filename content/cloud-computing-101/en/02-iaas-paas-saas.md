@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud service models split work between you and the provider — IaaS, PaaS, SaaS — depending on how much of the OS, runtime, and app you manage yourself.*
 
+This is post 2 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

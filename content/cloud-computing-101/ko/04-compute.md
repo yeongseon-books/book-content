@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Compute
 
+VM·컨테이너·서버리스 등 클라우드 컴퓨트의 종류와 선택 기준을 boto3 EC2 예제와 함께 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 4번째 글입니다.
+
 > Cloud Computing 101 시리즈 (4/10)
 
 

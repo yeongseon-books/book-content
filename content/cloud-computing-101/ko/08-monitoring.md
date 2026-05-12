@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Monitoring
 
+CloudWatch 메트릭, 로그, 알람으로 시작하는 클라우드 모니터링의 기초를 boto3 예제와 함께 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 8번째 글입니다.
+
 > Cloud Computing 101 시리즈 (8/10)
 
 

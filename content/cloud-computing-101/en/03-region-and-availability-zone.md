@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *A region is a geographic location, an AZ is a physically isolated cluster of data centers — distributing across AZs is the foundation of high availability.*
 
+This is post 3 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

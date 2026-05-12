@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud storage splits into object, block, file, and archive based on access pattern and durability/cost tradeoffs.*
 
+This is post 5 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

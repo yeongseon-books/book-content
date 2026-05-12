@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud cost is tamed in four steps — visibility (tags), budgets (alerts), commitments (Savings), and optimization (rightsizing).*
 
+This is post 9 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

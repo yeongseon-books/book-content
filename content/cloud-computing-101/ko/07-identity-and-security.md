@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Identity와 Security
 
+IAM 사용자, 역할, 정책, MFA, KMS까지 클라우드 보안의 핵심을 boto3 예제와 최소 권한 원칙으로 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 7번째 글입니다.
+
 > Cloud Computing 101 시리즈 (7/10)
 
 

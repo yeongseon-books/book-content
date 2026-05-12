@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Cost Management
 
+태그, 예산, Savings Plans, 라이트사이징까지 클라우드 비용 관리의 기초를 boto3 예제와 함께 정리한 FinOps 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 9번째 글입니다.
+
 > Cloud Computing 101 시리즈 (9/10)
 
 

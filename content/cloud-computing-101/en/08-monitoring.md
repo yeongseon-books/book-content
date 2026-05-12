@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Monitoring makes a system observable through three axes — numbers (metrics), text (logs), and flow (traces).*
 
+This is post 8 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

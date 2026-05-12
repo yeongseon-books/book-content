@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Anchor on the five Well-Architected pillars (operations, security, reliability, performance, cost), then assemble a layered, loosely coupled design.*
 
+This is post 10 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

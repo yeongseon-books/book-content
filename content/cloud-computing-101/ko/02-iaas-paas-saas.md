@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # IaaS, PaaS, SaaS
 
+IaaS·PaaS·SaaS의 책임 경계와 선택 기준을 실제 예시 서비스와 함께 정리한 클라우드 모델 비교 글
+
+이 글은 Cloud Computing 101 시리즈의 2번째 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - EC2, Heroku, Notion처럼 모두 클라우드에 속하는 서비스가 왜 이렇게 다르게 느껴질까요?

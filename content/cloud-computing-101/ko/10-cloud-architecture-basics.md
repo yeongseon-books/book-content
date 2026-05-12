@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Cloud Architecture 기초
 
+AWS Well-Architected 5대 기둥과 다층 웹 아키텍처 패턴으로 정리한 클라우드 아키텍처 입문 마무리 글
+
+이 글은 Cloud Computing 101 시리즈의 10번째 글입니다.
+
 > Cloud Computing 101 시리즈 (10/10)
 
 

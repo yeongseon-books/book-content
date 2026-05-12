@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Storage
 
+객체·블록·파일·아카이브 등 클라우드 스토리지 종류와 선택 기준을 S3 boto3 예제와 함께 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 5번째 글입니다.
+
 > Cloud Computing 101 시리즈 (5/10)
 
 

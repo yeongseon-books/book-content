@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud networking works in four layers — isolate (VPC), place (subnets), allow (SG/NACL), distribute (LB).*
 
+This is post 6 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

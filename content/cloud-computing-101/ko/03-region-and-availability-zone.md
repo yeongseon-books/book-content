@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Region과 Availability Zone
 
+클라우드 리전과 가용 영역(AZ)의 차이, Multi-AZ와 Multi-Region 설계 원칙을 코드와 그림으로 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 3번째 글입니다.
+
 > Cloud Computing 101 시리즈 (3/10)
 
 

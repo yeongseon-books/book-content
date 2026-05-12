@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud security starts with least privilege, runs on role-based delegation, and protects data with encryption plus key management.*
 
+This is post 7 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

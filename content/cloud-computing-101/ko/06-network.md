@@ -22,6 +22,10 @@ last_reviewed: '2026-05-11'
 
 # Network
 
+VPC, 서브넷, 보안 그룹, 로드밸런서까지 클라우드 네트워킹의 핵심을 boto3 예제와 함께 정리한 입문 글
+
+이 글은 Cloud Computing 101 시리즈의 6번째 글입니다.
+
 > Cloud Computing 101 시리즈 (6/10)
 
 

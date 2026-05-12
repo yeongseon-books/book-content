@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Cloud computing rents compute, storage, and network on demand and bills only for what you use.*
 
+This is post 1 in the Cloud Computing 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn
