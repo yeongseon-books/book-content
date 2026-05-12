@@ -26,6 +26,8 @@ seo_description: A chatbot is a dictionary that gives you an answer. An Agent is
 
 > AI Agent 101 series (1/10)
 
+This is the first post in the AI Agent 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->

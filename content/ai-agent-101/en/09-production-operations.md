@@ -24,7 +24,7 @@ seo_description: When you deploy agents to production, new problems arise. You n
 
 > AI Agent 101 Series (9/10)
 
-When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.
+When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently. This is post 9 in the AI Agent 101 series.
 
 The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.
 

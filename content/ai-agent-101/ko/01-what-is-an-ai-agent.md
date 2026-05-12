@@ -25,6 +25,8 @@ seo_description: Chatbot은 "질문에 답하는 사전"이라면, Agent는 "할
 
 > AI Agent 101 시리즈 (1/10)
 
+이 글은 AI Agent 101 시리즈의 첫 번째 글입니다.
+
 ---
 
 ## 이 글에서 다룰 문제

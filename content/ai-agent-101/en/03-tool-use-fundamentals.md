@@ -24,7 +24,7 @@ seo_description: Agents differ from simple conversational models because they ca
 
 > AI Agent 101 Series (3/10)
 
-Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools.
+Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools. This is post 3 in the AI Agent 101 series.
 
 The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.
 
