@@ -14,301 +14,124 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-12'
 seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
   않았습니다.
 ---
 
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
 
-autoscale은 다이어그램에서는 즉시 반응하는 것처럼 보이지만, 실제 운영에서는 임계치 감지와 traffic-ready worker 사이에 분명한 시간차가 있습니다. 이 제어 루프를 이해해야 scale-out이 늦어 보이는 이유와 기대치를 함께 설명할 수 있습니다.
+autoscale은 다이어그램 안에서는 거의 즉시 반응하는 것처럼 보입니다. 하지만 실제 운영에서는 임계치가 한 번 넘었다고 곧바로 새 worker가 traffic을 받기 시작하지 않습니다. 메트릭이 쌓이고, autoscale rule이 평가되고, cooldown이 적용되고, App Service Plan의 desired count가 바뀌고, 새 worker가 startup과 readiness를 마쳐야 비로소 Front-End가 그 worker를 healthy pool에 넣습니다.
 
-이 글은 Azure App Service Deep Dive 시리즈의 5번째 글입니다.
+그래서 운영팀이 자주 묻는 질문도 비슷합니다. "autoscale은 켰는데 왜 첫 몇 분이 여전히 아프지?" 이 질문은 대개 설정 실수만을 뜻하지 않습니다. 제어 루프 자체가 주기적이고 보수적으로 설계되어 있기 때문에, threshold crossing과 traffic-ready worker 사이에는 원래 시간차가 존재합니다.
 
-## Source Version
+이 글은 Azure App Service Deep Dive 시리즈의 다섯 번째 글입니다.
 
-이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+이번 글에서는 scale-up과 scale-out의 차이, autoscale rule이 실제로 plan에 붙는 방식, Azure Monitor autoscale의 평가 루프, cooldown과 anti-flapping, 그리고 새 worker가 ready pool에 들어오는 마지막 순간까지를 공개 문서가 허용하는 범위 안에서 정리하겠습니다.
 
-- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
-- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+이제 "스케일링이 일어난다"는 문장을 control loop 관점으로 다시 풀어 보겠습니다.
 
-App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
-따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+## 이 글에서 다룰 문제
 
-> Azure App Service Deep Dive 시리즈 (5/6)
+- scale-up과 scale-out은 App Service에서 실제로 무엇을 바꿀까요?
+- autoscale rule은 앱이 아니라 왜 App Service Plan에 붙는다고 봐야 할까요?
+- Azure Monitor autoscale은 어떤 cadence와 observation window로 규칙을 평가할까요?
+- threshold가 넘은 뒤 새 worker가 traffic-eligible 상태가 되기까지 어떤 단계가 남아 있을까요?
+- scale-in은 왜 scale-out보다 더 보수적이고 더 위험한 동작으로 다뤄질까요?
 
-스케일링 101에서는 무엇을 언제 늘릴지 판단 기준을 다뤘습니다.
-이번 화는 그 다음 질문입니다.
+## 왜 이 글이 중요한가
 
-**Scale Out을 하기로 결정한 뒤,
-그 결정은 어떤 경로를 거쳐 실제 워커 증가가 되는가.**
+스케일링을 한 줄 버튼으로 이해하면 사용자 체감 지연을 설명할 수 없게 됩니다. CPU가 높아졌는데 왜 바로 capacity가 늘지 않았는지, metrics는 이미 올라갔는데 왜 요청 큐가 여전히 길었는지, 인스턴스 수가 늘었는데 왜 첫 요청 지연은 남았는지를 설명하려면 scale-out을 제어 루프로 읽어야 합니다.
 
-공개 문서 기준으로 안전하게 말할 수 있는 범위는 분명합니다.
+또한 App Service는 app 단위보다 plan 단위에서 scaling이 이루어진다는 점이 운영상 매우 중요합니다. 같은 plan에 여러 앱이 있으면 한 앱의 burst가 plan-level scale event를 일으키고, 추가된 worker capacity를 다른 앱도 함께 사용합니다. 이 구조를 놓치면 noisy-neighbour 현상을 앱 버그나 메트릭 설정 문제로 잘못 읽기 쉽습니다.
 
-- scale up은 App Service Plan SKU를 바꿉니다.
-- scale out은 인스턴스 수를 바꿉니다.
-- autoscale 규칙은 Azure Monitor autoscale이 평가합니다.
-- 대상은 app이 아니라 App Service Plan입니다.
+마지막으로 이 글은 6화와 직접 이어집니다. 5화가 desired instance count가 worker capacity로 바뀌는 control-plane 경로를 설명한다면, 6화는 그 새 worker가 실제 traffic-eligible 상태가 되기까지의 startup and warm-up window를 설명합니다. 둘을 나눠 이해해야 instance allocation과 traffic readiness를 같은 일로 뭉개지 않게 됩니다.
 
-이번 글은 여기서 한 단계 더 들어갑니다.
-비공개 배치 엔진을 추측하지 않고,
-**공개 문서가 보여 주는 확장 판단 루프의 관측 가능한 내부 동작**을 정리하는 것이 목표입니다.
+## 스케일링을 이해하는 가장 좋은 방법: autoscale 판단 루프와 worker readiness 루프를 분리해서 보는 것입니다
 
----
+이 주제를 이해할 때 가장 중요한 문장은 이것입니다. **App Service scale-out은 앱이 서버를 직접 띄우는 과정이 아니라, autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, 플랫폼이 그 desired state를 worker capacity로 반영한 뒤, 새 worker가 readiness를 통과해야 비로소 라우팅 대상이 되는 과정입니다.**
 
-## 큰 그림 — autoscale에서 worker 추가까지
+이렇게 보면 사용자 체감 지연이 어디서 생기는지도 자연스럽게 나뉩니다. 앞 절반은 제어 루프의 지연이고, 뒤 절반은 startup과 warm-up의 지연입니다. 같은 "확장이 늦다"는 불만도 실제로는 어느 단계가 병목인지 다를 수 있습니다.
+
+그리고 이 구분은 운영 대응에도 직접 도움이 됩니다. predictable spike라면 metrics가 쌓이기를 기다리는 것보다 pre-scaling이 더 안전할 수 있고, shared plan이라면 app-level 현상처럼 보이는 문제도 plan-level resource curve로 읽어야 할 수 있습니다.
+
+> scale-out의 진짜 끝은 포털의 숫자가 늘어나는 순간이 아니라, 새 worker가 healthy routing pool에 들어와 실제 사용자 요청을 받을 수 있게 되는 순간입니다.
+
+## 핵심 개념
+
+### autoscale에서 worker 추가까지의 큰 그림을 먼저 봐야 합니다
+
+scale-out을 한 장으로 보면 control-plane decision과 execution substrate가 분리되어 있다는 사실이 먼저 보입니다. 앱이 직접 VM을 만든다고 상상하는 대신, plan의 desired count가 바뀌고 App Service가 그만큼의 worker capacity를 반영한다고 이해하는 편이 맞습니다.
 
 ![autoscale 판단이 worker 추가로 이어지는 제어 경로](../../../assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.ko.png)
 
-*autoscale 판단이 worker 추가로 이어지는 제어 경로*
-이 그림에서 중요한 건 두 가지입니다.
+이 그림이 중요한 이유는 앱 관점의 요구와 플랫폼 관점의 실행을 분리해 주기 때문입니다. autoscale rule은 메트릭을 읽고 결정을 내리지만, 실제 사용자 경험은 그 결정 뒤에 따라오는 worker allocation과 readiness에 의해 마감됩니다.
 
-1. 판단 엔진과 실행 substrate를 분리해서 보는 것
-2. “app이 직접 VM을 띄운다”는 상상을 버리는 것
+### scale-up과 scale-out은 같은 "확장"이지만 바꾸는 대상이 다릅니다
 
-scale-out은 control plane이 App Service Plan의 원하는 인스턴스 수를 바꾸고,
-플랫폼이 그만큼의 워커 용량을 반영하는 과정으로 이해하는 편이 맞습니다.
-
----
-
-## scale up과 scale out은 무엇을 실제로 바꾸는가
+Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진 tier 또는 SKU로 이동하는 일이고, scale-out은 앱을 실행하는 VM instance count를 늘리는 일입니다. 이를 runtime 관점으로 바꾸면 scale-up은 worker 한 대의 체급을 키우는 일이고, scale-out은 앱이 더 많은 worker를 사용할 수 있게 하는 일입니다.
 
 ![scale up과 scale out이 바꾸는 대상 비교](../../../assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.ko.png)
 
-*scale up과 scale out이 바꾸는 대상 비교*
-Learn 문서는 이 차이를 명확히 설명합니다.
+이 구분은 느림의 원인을 읽을 때 특히 중요합니다. memory bottleneck과 concurrency bottleneck은 모두 "느리다"로 보일 수 있지만, 전자는 scale-up이 더 적절할 수 있고 후자는 scale-out이 더 적절할 수 있습니다. 확장 방향이 다르다는 뜻입니다.
 
-- **Scale up**: 더 큰 CPU, memory, features를 가진 tier/SKU로 이동
-- **Scale out**: 앱을 실행하는 VM instance count 증가
+### autoscale rule은 app이 아니라 plan에 붙습니다
 
-이 차이를 runtime 관점으로 번역하면 이렇습니다.
-
-- scale up은 worker 한 대의 체급을 바꿉니다.
-- scale out은 앱이 사용할 worker 수를 늘립니다.
-
-그래서 메모리 부족과 동시 요청 부족은 같은 “느림”으로 보이더라도 확장 방향이 달라집니다.
-
----
-
-## autoscale 규칙은 app이 아니라 plan에 붙는다
-
-이 부분은 현업에서 자주 헷갈립니다.
-App Service 앱 화면에서 autoscale을 설정하더라도,
-실제 타깃 리소스는 **App Service Plan** 입니다.
+이 부분은 현업에서 반복해서 헷갈립니다. 포털에서는 앱 중심으로 들어가 autoscale을 설정하는 것처럼 보일 수 있지만, 실제 대상 리소스는 App Service Plan입니다. 즉 scale event는 "내 앱만의 일"이 아니라 plan-level capacity 변화입니다.
 
 ![autoscale 규칙이 앱이 아닌 plan에 붙는 구조](../../../assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.ko.png)
 
-*autoscale 규칙이 앱이 아닌 plan에 붙는 구조*
-이 구조 때문에 같은 plan에 여러 앱이 있으면 서로 영향이 생깁니다.
-한 앱의 급격한 부하가 plan 전체 확장을 유도하고,
-그 capacity를 다른 앱도 함께 공유하게 됩니다.
+이 구조 때문에 같은 plan에 여러 앱이 있으면 서로 영향을 줍니다. 한 앱의 급격한 부하가 plan 전체 확장을 유도하고, 추가된 capacity는 같은 plan의 다른 앱도 공유합니다. 따라서 scaling behavior를 이해할 때는 앱의 메트릭뿐 아니라 plan의 resource curve를 같이 봐야 합니다.
 
-그래서 noisy-neighbor 문제를 피하려면,
-확장 패턴이 크게 다른 앱을 같은 plan에 얹지 않는 설계가 중요합니다.
+### Azure Monitor autoscale은 주기적 rule engine입니다
 
----
-
-## Azure Monitor autoscale이 하는 일
-
-Azure Monitor autoscale 문서는 역할을 명확히 말합니다.
-
-- 메트릭 또는 스케줄 기반으로 규칙 평가
-- 최소/기본/최대 instance count 유지
-- scale-out은 조건 중 하나만 만족해도 실행 가능
-- scale-in은 조건이 모두 만족해야 실행
+Azure Monitor autoscale 문서는 역할을 꽤 명확하게 설명합니다. 메트릭 또는 스케줄 기반으로 규칙을 평가하고, minimum, default, maximum instance count를 유지하며, scale-out은 조건 중 하나만 만족해도 실행될 수 있고, scale-in은 모든 scale-in rule이 만족되어야 합니다.
 
 ![메트릭 평가와 cooldown으로 움직이는 autoscale 루프](../../../assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.ko.png)
 
-*메트릭 평가와 cooldown으로 움직이는 autoscale 루프*
-이 로직은 운영적으로 아주 중요합니다.
-scale-out이 OR처럼,
-scale-in이 AND처럼 행동한다는 뜻이기 때문입니다.
-그래서 확장은 빠르고,
-축소는 더 보수적이어야 합니다.
+운영적으로 이 말은 매우 중요합니다. scale-out은 OR처럼, scale-in은 AND처럼 행동합니다. 그래서 확장은 상대적으로 빠르게, 축소는 더 보수적으로 설계됩니다. 여기에 autoscale job은 리소스 종류에 따라 대략 30~60초마다 실행되고, scale action 뒤에는 cooldown 동안 다시 같은 종류의 판단을 서두르지 않습니다.
 
-여기에 autoscale 문서가 하나를 더 붙입니다.
-autoscale job은 리소스 종류에 따라 대략 **30~60초마다** 실행되고,
-scale action이 발생한 뒤에는 cooldown 동안 다시 판단하지 않습니다.
-즉 이 시스템은 인터럽트가 아니라 주기적 control loop입니다.
+### observation window와 cooldown이 반응 속도를 결정합니다
 
----
+autoscale rule은 단순 threshold만 보지 않습니다. `timeGrain`, `timeWindow`, `statistic`, `timeAggregation`을 함께 읽어야 합니다. 즉 같은 CPU 80% rule이라도 1분 샘플을 10분 창으로 보느냐, 더 짧은 창으로 보느냐에 따라 반응 속도는 완전히 달라집니다.
 
-## autoscale 설정은 실제로 어떤 모양인가
+그리고 cooldown은 속도를 늦추기 위한 부작용이 아니라 안정성을 위한 장치입니다. worker를 하나 추가한 직후 metrics가 안정될 시간을 주고, 막 줄인 capacity를 다시 바로 늘리는 oscillation을 줄이며, App Service 특유의 startup and warm-up 지연을 고려하도록 만듭니다. 그래서 실제 scale latency는 threshold crossing 시점 하나가 아니라 `timeWindow + evaluation cadence + cooldown + worker readiness` 전체로 봐야 정확합니다.
 
-Azure Monitor 문서가 공개하는 `Microsoft.Insights/autoscaleSettings` 스키마를 보면,
-App Service scale-out을 읽는 시선도 더 선명해집니다.
+### 새 worker가 추가된다는 말은 desired count가 실제 capacity로 반영된다는 뜻입니다
 
-- `targetResourceUri` — 실제 확장 대상 리소스
-- `profiles` — 시간대별 또는 기본 확장 정책
-- `capacity.minimum/default/maximum` — 하한, fallback, 상한
-- `rules[].metricTrigger` — 어떤 메트릭을 어떤 창으로 볼지
-- `rules[].scaleAction` — 몇 대를 늘리거나 줄일지와 cooldown
-
-즉 autoscale은 “CPU 70%면 늘린다” 수준의 포털 토글이 아니라,
-메트릭 창과 행동 규칙을 가진 ARM 리소스입니다.
-
----
-
-## 메트릭 창이 반응 속도를 결정한다
-
-autoscale 규칙은 임계값만 보지 않습니다.
-문서는 `timeGrain`, `timeWindow`, `statistic`, `timeAggregation`을 함께 봐야 한다고 설명합니다.
-
-- `timeGrain` — 메트릭 샘플링 단위
-- `timeWindow` — 얼마 동안의 샘플을 볼지
-- `statistic` / `timeAggregation` — 평균, 합계, 최대값 등 어떤 방식으로 집계할지
-
-이 뜻은 단순합니다.
-같은 CPU 80% 규칙이라도,
-1분 평균을 10분 창으로 볼 때와 1분 창으로 볼 때의 반응 속도는 다릅니다.
-autoscale은 스파이크를 즉시 반영하는 장치가 아니라,
-메트릭 창을 통과한 신호에 반응하는 장치입니다.
-
----
-
-## cooldown은 확장 속도보다 안정성을 위해 존재한다
-
-autoscale 문서는 scale-out과 scale-in 모두에 cooldown이 적용된다고 명시합니다.
-예시 스키마의 기본값도 흔히 `PT5M`입니다.
-
-운영적으로 보면 cooldown의 의미는 분명합니다.
-
-- worker를 하나 추가한 직후 메트릭이 안정될 시간을 줍니다.
-- 막 줄인 capacity를 다시 바로 늘리는 출렁임을 줄입니다.
-- startup과 warm-up 지연이 있는 App Service에서 과잉 반응을 줄입니다.
-
-이 특성 때문에 scale-up이나 scale-out 판단은 “규칙을 만족한 시점”보다,
-`timeWindow + evaluation cadence + cooldown + startup readiness` 전체를 같이 봐야 정확합니다.
-
----
-
-## 새 worker가 추가된다는 말의 실제 의미
-
-공개 문서는 내부 배치 알고리즘을 세세하게 열어두지는 않습니다.
-하지만 멘탈 모델은 충분히 잡을 수 있습니다.
-
-1. autoscale 또는 수동 설정이 plan의 목표 인스턴스 수를 올립니다.
-2. App Service control plane이 그 목표 상태를 반영합니다.
-3. 해당 plan의 앱들은 늘어난 워커 용량만큼 더 많은 인스턴스를 확보할 수 있습니다.
-4. Front-End가 정상 상태에 들어온 새 워커로도 요청을 보내기 시작합니다.
+공개 문서는 내부 배치 알고리즘을 모두 드러내지 않지만, 운영에 필요한 멘탈 모델은 충분히 제공합니다. autoscale 또는 수동 설정이 plan의 desired instance count를 올리고, App Service control plane이 그 상태를 반영하며, 해당 plan은 더 많은 worker capacity를 얻게 되고, Front-End는 새 worker가 healthy 상태에 들어온 뒤에야 그쪽으로 요청을 보내기 시작합니다.
 
 ![목표 인스턴스 수가 새 worker로 반영되는 흐름](../../../assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.ko.png)
 
-*목표 인스턴스 수가 새 worker로 반영되는 흐름*
-이 정도가 공개 출처를 벗어나지 않으면서도 실전적으로 충분한 설명입니다.
+중요한 것은 포털 숫자와 traffic eligibility를 분리해서 보는 태도입니다. 인스턴스 수가 늘었다고 바로 사용자 요청이 그 worker로 들어가는 것은 아닙니다. startup과 health gate를 통과해야 비로소 routing 대상이 됩니다.
 
----
+### autoscale은 예측기가 아니라 feedback loop입니다
 
-## 왜 autoscale은 즉시성이 아니라 피드백 루프로 봐야 하는가
-
-101에서도 말했지만,
-autoscale은 예언이 아니라 반응입니다.
+autoscale은 예언이 아니라 반응입니다. metrics가 쌓이고, rules가 평가되고, cooldown이 비워지고, 새 worker가 준비되기까지 시간이 필요합니다. 따라서 predictable spike는 autoscale에만 맡기는 것보다 미리 scale-out하는 편이 더 안전할 수 있습니다.
 
 ![메트릭 지연과 cooldown이 끼는 확장 피드백 루프](../../../assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.ko.png)
 
-*메트릭 지연과 cooldown이 끼는 확장 피드백 루프*
-그래서 예측 가능한 이벤트에는 선제적 확장이 더 안전합니다.
-메트릭이 쌓이고,
-규칙이 평가되고,
-cooldown이 지나고,
-새 worker가 준비되기까지 시간차가 있기 때문입니다.
+이 사실을 무시하면 "autoscale은 켰는데도 첫 5분이 아프다"는 불만이 반복됩니다. autoscale은 트래픽 급등의 첫 순간을 막는 마법이 아니라, 이미 관측된 신호를 바탕으로 capacity를 조정하는 제어 루프입니다.
 
-이 시간차를 무시하면 “autoscale 켰는데도 첫 5분이 아프다”가 반복됩니다.
+### scale-out의 진짜 끝은 readiness입니다
 
----
-
-## Front-End와 health가 scale-out 완료 시점을 사실상 마감한다
-
-worker를 추가했다고 바로 요청을 받는 것은 아닙니다.
-Front-End 입장에서 그 worker가 받아도 되는 상태여야 합니다.
+새 worker를 하나 더 확보했다고 바로 요청을 보내면 안 됩니다. Front-End 입장에서는 그 worker가 실제로 받아도 되는 상태여야 합니다. 결국 scale-out의 마지막 마감선은 인스턴스 count 자체가 아니라 그 worker가 healthy routing pool에 들어오는 시점입니다.
 
 ![새 worker가 healthy pool에 들어가는 마지막 단계](../../../assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.ko.png)
 
-*새 worker가 healthy pool에 들어가는 마지막 단계*
-즉,
-scale-out의 끝은 instance count 숫자가 아니라,
-새 worker가 healthy pool에 들어오는 시점입니다.
+이 지점에서 5화와 6화가 연결됩니다. 공개 문서가 보여 주는 scale-out 설명은 여기까지이고, 그다음 사용자 체감 지연은 새 worker가 startup과 warm-up을 끝내 traffic-eligible 상태가 되는 readiness window에 남아 있습니다.
 
-즉 문서가 보여 주는 scale-out 설명은 여기까지입니다. 그 다음에 남는 지연은 새 워커가 실제 트래픽을 받을 준비를 마치는 startup·readiness 구간입니다.
+### scale-in은 scale-out의 반대말이 아니라 더 방어적인 경로입니다
 
----
+scale-out은 부족한 capacity를 더하는 일입니다. scale-in은 active capacity를 제거하는 일입니다. 그래서 scale-in은 항상 더 위험합니다. 아직 affinity로 pinned 된 사용자가 있을 수 있고, 긴 요청이 처리 중일 수 있으며, burst traffic이 충분히 식지 않았을 수 있습니다. autoscale best practice가 scale-in을 더 보수적으로 다루는 이유가 여기에 있습니다.
 
-## 여러 앱이 같은 plan을 공유할 때 생기는 일
+또한 autoscale engine은 flapping도 확인합니다. scale-in 결과가 곧바로 반대 scale-out rule을 다시 만족하게 만들 것 같으면, scale-in을 미루거나 덜 공격적으로 줄일 수 있습니다. 즉 scale-in은 단순히 scale-out의 반대 방향 계산이 아니라, 훨씬 방어적인 action path입니다.
 
-App Service Plan 단위 확장은 비용에는 유리할 수 있지만,
-확장 내부 동작을 읽을 때는 주의가 필요합니다.
+### 실제 근거는 autoscale 로그에 남습니다
 
-- autoscale 트리거는 plan 자원에 반응합니다.
-- worker는 plan 수준 capacity입니다.
-- 앱별 트래픽 패턴이 다르면 서로 간섭이 생깁니다.
+scale event를 추측하지 않아도 되는 이유는 진단 표면이 공개되어 있기 때문입니다. Microsoft는 autoscale 설정에 대해 `AutoscaleEvaluationsLog`와 `AutoscaleScaleActionsLog`라는 두 log category를 문서화합니다. 또한 activity log에는 scale-up과 scale-down initiated/completed 이벤트가 남습니다.
 
-이 구조는 한 앱의 scale event가 plan 전체 자원 곡선을 바꾼다는 뜻입니다.
-그래서 deep dive 관점에서는 “내 앱이 확장된다”보다 “내 plan이 확장되고 그 안에서 내 앱의 인스턴스가 늘어난다”가 더 정확한 문장입니다.
-
----
-
-## scale-in이 더 위험한 이유
-
-scale-out은 부족한 capacity를 더하는 작업입니다.
-scale-in은 사용 중인 capacity를 줄이는 작업입니다.
-
-그래서 scale-in은 항상 더 위험합니다.
-
-- 아직 붙어 있는 affinity 사용자
-- 긴 요청 처리 중인 worker
-- 아직 완전히 식지 않은 burst traffic
-
-공개 autoscale best practice 문서가 scale-in을 더 보수적으로 다루라고 하는 이유가 여기에 있습니다.
-
-autoscale 문서는 여기서 한 단계 더 나갑니다.
-축소 결과가 다시 곧바로 scale-out 조건을 만들면 flapping으로 간주할 수 있고,
-이 경우 autoscale은 축소를 미루거나 덜 줄이는 식으로 반응할 수 있습니다.
-즉 scale-in은 단순 역연산이 아니라,
-서비스 가용성을 우선하는 안정화 로직이 덧붙은 동작입니다.
-
----
-
-## 진짜로 무슨 판단이 있었는지는 로그에서 본다
-
-이 주제에서 가장 deep-dive다운 공개 정보는 Azure Monitor 진단 로그입니다.
-autoscale 진단 문서는 다음 두 로그 범주를 명시합니다.
-
-- `AutoscaleEvaluationsLog` — 어떤 규칙과 메트릭을 어떻게 평가했는지
-- `AutoscaleScaleActionsLog` — 실제 scale action을 언제 시작했고 결과가 어땠는지
-
-또 Activity Log에는 scale-up/scale-down initiated/completed 이벤트가 남습니다.
-
-즉 App Service scaling을 운영에서 추적할 때는 “늘어난 것 같다”가 아니라,
-**autoscale setting 리소스가 어떤 평가를 했고 어떤 action을 찍었는지**를 Log Analytics와 Activity Log에서 확인할 수 있습니다.
-
----
-
-## 5화 정리
-
-이번 화의 핵심을 한 문단으로 줄이면 다음과 같습니다.
-
-> App Service의 scale-out은 app 자체가 서버를 직접 추가하는 모델이 아니라, Azure Monitor autoscale 또는 수동 설정이 App Service Plan의 목표 인스턴스 수를 바꾸고, App Service control plane이 그 상태를 반영해 워커 용량을 늘리는 과정입니다. 그 뒤 새 워커가 앱 startup과 health 통과를 마쳐야 Front-End가 실제 트래픽을 보내기 시작합니다. scale up은 SKU 변경이고, scale out은 워커 수 변경이며, 둘 모두 plan 단위로 생각해야 정확합니다.
-
-이번 글의 경계는 여기까지입니다.
-외부 autoscale 결정으로 worker capacity가 늘어난 뒤에도,
-그 실행 단위가 실제 트래픽을 받기까지는 별도의 startup·readiness 구간이 남습니다.
-
----
-
-## 이 시리즈에서의 위치
-
-이번 글은 101의 스케일링 판단 기준을 내부 경로로 번역하는 편입니다. 여기서 얻는 가치는 scale-out 판단과 워커 준비 상태를 한 덩어리로 보지 않고, control plane과 실행 경계를 분리해 이해하게 된다는 점입니다.
-
----
-
-## Documented Behavior Summary
-
-- App Service autoscale의 실제 대상 리소스는 개별 앱이 아니라 App Service Plan입니다.
-- Azure Monitor autoscale은 30~60초 주기의 평가 job, time window, cooldown, flapping 방지 로직으로 동작합니다.
-- scale-out은 하나 이상의 확장 규칙이 충족되면 실행될 수 있지만, scale-in은 모든 축소 규칙이 충족되어야 합니다.
-- `AutoscaleEvaluationsLog`, `AutoscaleScaleActionsLog`, Activity Log를 통해 실제 평가와 실행 결과를 추적할 수 있습니다.
-
-### auto-scale 룰과 instance count 추적
+아래 명령은 autoscale 설정과 plan metrics를 빠르게 확인하는 기본 출발점입니다.
 
 ```bash
 az monitor autoscale show -g my-rg -n my-app-autoscale
@@ -318,13 +141,31 @@ az monitor metrics list \
   --metric "CpuPercentage,HttpQueueLength" --interval PT1M -o table
 ```
 
+이 표면을 통해 운영자는 왜 확장이 일어났는지, 어떤 rule이 평가됐는지, 어떤 action이 실제로 시작되고 끝났는지를 문서 기반으로 추적할 수 있습니다. deep dive에서 중요한 것은 보이지 않는 배치 엔진을 상상하는 일이 아니라, 보이는 decision trail을 정확히 읽는 일입니다.
+
+## 흔히 헷갈리는 지점
+
+- **autoscale은 앱이 아니라 plan을 확장합니다.** 앱 화면에서 시작했더라도 실제 타깃 리소스는 App Service Plan입니다.
+- **threshold를 넘었다고 바로 worker가 traffic을 받는 것은 아닙니다.** evaluation cadence, cooldown, startup, readiness가 뒤에 남아 있습니다.
+- **scale-up과 scale-out은 같은 느림에 대해 같은 답이 아닙니다.** 체급 부족과 worker 수 부족을 구분해야 합니다.
+- **scale-in은 scale-out의 단순 역연산이 아닙니다.** active capacity 제거이므로 더 보수적이고 anti-flapping도 고려됩니다.
+- **공유 plan에서는 "내 앱이 확장된다"보다 "내 plan이 확장되고 내 앱이 그 안에서 더 많은 capacity를 쓴다"가 더 정확한 설명입니다.**
+
 ## 운영 체크리스트
 
-- [ ] scale-out 메트릭과 임계치의 ‘정상 시’ baseline을 측정해 두었다
-- [ ] per-site scaling 사용 여부를 ADR로 남겼다
-- [ ] scale-in 동안 graceful drain을 위한 SIGTERM 핸들러를 점검했다
-- [ ] scale 이벤트 알림과 instance count 그래프를 대시보드에 두었다
-- [ ] scale-up(SKU 변경)과 scale-out 운영 절차를 분리했다
+- [ ] steady-state 기준선과 autoscale threshold를 실측 기반으로 정했습니다.
+- [ ] per-site scaling 사용 여부와 그 이유를 ADR에 남겼습니다.
+- [ ] scale event 알림과 instance-count 그래프를 운영 대시보드에 올렸습니다.
+- [ ] scale-in 시 graceful drain을 위한 종료 처리와 런북을 점검했습니다.
+- [ ] scale-up runbook과 scale-out runbook을 서로 다른 절차로 분리했습니다.
+
+## 정리
+
+5화의 핵심은 App Service scale-out을 앱이 서버를 직접 늘리는 장면으로 상상하지 않는 것입니다. Azure Monitor autoscale 또는 수동 조작이 App Service Plan의 desired instance count를 바꾸고, App Service control plane이 그 상태를 worker capacity로 반영하며, 새 worker가 startup과 readiness를 마친 뒤에야 Front-End가 실제 요청을 보내기 시작합니다. 이 선이 잡히면 확장 지연을 훨씬 정확하게 설명할 수 있습니다.
+
+운영적으로 가장 중요한 교훈은 plan scope와 feedback-loop 감각입니다. autoscale은 periodic evaluation, observation window, cooldown, anti-flapping을 가진 rule engine이며, shared plan에서는 여러 앱이 같은 resource curve를 공유합니다. 따라서 scale event를 읽을 때는 앱 메트릭 하나만이 아니라 plan-level capacity와 decision log를 함께 봐야 합니다.
+
+다음 글에서는 이 control-plane 이야기를 사용자 체감 이야기로 마무리하겠습니다. 새 worker가 실제로 warm 상태가 되어 첫 요청을 감당하기까지의 cold start와 warm-up 경로를 이어서 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -338,15 +179,11 @@ az monitor metrics list \
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처
+### 공식 문서
 - [Understand autoscale settings in Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-understanding-settings)
 - [Diagnostic settings in autoscale](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-diagnostics)
-
-### 2차 출처
 - [Scale up an app in Azure App Service](https://learn.microsoft.com/azure/app-service/manage-scale-up)
 - [Get started with autoscale in Azure](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-get-started)
 - [Autoscale in Azure Monitor](https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-overview)
@@ -356,6 +193,6 @@ az monitor metrics list \
 
 ### 관련 시리즈
 - [Azure App Service 101 — Scaling 101](../../azure-app-service-101/ko/07-scaling-101.md)
-- [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
+- [Azure Functions Deep Dive — Scaling internals](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

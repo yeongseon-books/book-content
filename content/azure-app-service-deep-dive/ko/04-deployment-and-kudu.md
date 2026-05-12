@@ -14,238 +14,112 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-12'
 seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
   않았습니다.
 ---
 
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
 
-App Service에서 “배포는 성공했다”는 말만으로는 아무것도 끝나지 않습니다. 아티팩트 업로드, 서버 쪽 빌드, 파일 배치, 런타임 준비 완료는 서로 다른 경계이기 때문에 어느 단계가 끝났는지를 구분해서 봐야 합니다.
+App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단계를 뭉뚱그린 표현입니다. artifact가 SCM 엔드포인트에 도착하는 것, 서버 쪽 build automation이 돌아가는 것, 결과물이 `wwwroot` 또는 mounted package 형태로 놓이는 것, 그리고 앱 프로세스가 실제로 새 코드를 들고 readiness를 통과하는 것은 서로 다른 경계입니다.
 
-이 글은 Azure App Service Deep Dive 시리즈의 4번째 글입니다.
+운영에서 시간이 길어지는 이유도 대개 여기 있습니다. Kudu deployment history에는 success가 찍혀 있는데 앱은 502를 내고, ZIP 업로드는 끝났는데 startup command가 어긋나며, slot swap은 끝났는데 production에서 첫 요청이 느립니다. 이 모든 경우에 "배포 실패"라는 한 문장만으로는 아무것도 설명되지 않습니다.
 
-## Source Version
+이 글은 Azure App Service Deep Dive 시리즈의 네 번째 글입니다.
 
-이 글의 인용과 판단은 다음 공개 출처를 기준으로 합니다.
+이번 글에서는 Kudu, Oryx, run-from-package, slot warm-up을 하나의 배포 경로로 묶어 보겠습니다. 배포를 upload, build, placement, startup readiness라는 네 단계로 나눠 보면 어디서 성공했고 어디서 실패했는지 훨씬 더 빠르게 읽을 수 있습니다.
 
-- Microsoft Learn — Azure App Service 문서 (https://learn.microsoft.com/azure/app-service)
-- Project Kudu (https://github.com/projectkudu/kudu) — 배포 엔진과 Windows 샌드박스 문맥에 한해
+이제 artifact가 worker가 보는 런타임 경로까지 도달하는 과정을 차례로 따라가 보겠습니다.
 
-App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지 않았습니다.
-따라서 이 시리즈에서는 Learn 문서가 1차 출처이고, Kudu 공개 자료는 보조 출처로만 사용합니다.
+## 이 글에서 다룰 문제
 
-> Azure App Service Deep Dive 시리즈 (4/6)
+- Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?
+- ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?
+- Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?
+- `SCM_DO_BUILD_DURING_DEPLOYMENT`와 run-from-package는 배포 의미를 어떻게 바꿀까요?
+- slot 배포와 warm-up은 왜 배포 성공과 런타임 성공을 분리해서 보게 만들까요?
 
-App Service에 코드를 올린다는 말은 너무 넓습니다.
-실제로는 누군가가 아티팩트를 받고,
-필요하면 빌드를 하고,
-결과를 배치하고,
-worker가 새 코드를 보게 만들어야 합니다.
+## 왜 이 글이 중요한가
 
-Windows App Service에서 그 중심에 있는 공개 엔진이 **Kudu**입니다.
-Linux code app에서는 빌드 단계에 **Oryx**가 강하게 연결됩니다.
+배포를 한 단계로 생각하면 실패 분석이 항상 늦어집니다. artifact upload가 실패했는지, server-side build가 실패했는지, 파일 placement는 끝났지만 runtime startup이 실패했는지를 구분하지 못하면 로그를 보는 순서도 흐려집니다. Kudu 로그와 앱 로그를 같은 문제의 같은 층으로 섞어 보는 실수도 여기서 나옵니다.
 
-이번 화는 그 배포 경로를 한 번에 봅니다.
+또한 Linux code app에서는 Oryx가 중간에 들어오면서 배포 경로가 더 복합해집니다. Kudu가 artifact를 받아도, Oryx가 detect-build-startup을 잘못 해석하거나 startup script가 런타임 계약과 어긋나면 결과는 여전히 startup failure입니다. 즉 Kudu success와 runtime success를 분리해서 보는 습관이 없으면 Linux App Service에서 특히 길을 잃기 쉽습니다.
 
----
+마지막으로 이 글은 5화와 6화의 전제이기도 합니다. deployment slot의 진짜 가치는 파일 copy 자체보다 production URL 바깥에서 warm-up을 끝낼 수 있다는 데 있습니다. 따라서 배포와 warm-up은 separate topic처럼 보여도 실제 운영에서는 하나의 연속된 경로로 봐야 합니다.
 
-## 큰 그림 — 배포 파이프라인
+## 배포 경로를 이해하는 가장 좋은 방법: artifact upload, build, placement, startup readiness를 서로 다른 단계로 나눠 보는 것입니다
+
+이 주제에서 가장 중요한 문장은 이것입니다. **App Service 배포는 파일을 올리는 행위가 아니라, artifact를 받는 단계와 build automation 단계, 런타임이 읽는 경로에 배치하는 단계, 그리고 새 코드가 실제로 traffic-eligible 상태가 되는 단계를 차례로 통과하는 과정입니다.** 이 네 단계를 분리해야 Kudu success와 app readiness를 혼동하지 않게 됩니다.
+
+이 분리가 실전적인 이유는 각 단계가 서로 다른 로그와 도구를 갖기 때문입니다. Kudu는 upload와 deployment orchestration의 중심이고, Oryx는 Linux code app에서 detect-build-startup 흐름을 맡을 수 있으며, run-from-package는 파일시스템 의미 자체를 바꾸고, slot warm-up은 production 사용자가 cold start 비용을 직접 맞지 않게 만듭니다.
+
+따라서 "배포가 성공했는데 앱이 안 뜬다"는 상황은 모순이 아닙니다. 배포 파이프라인의 앞단은 성공했지만, runtime readiness라는 마지막 경계가 아직 실패한 것일 수 있습니다.
+
+> App Service 배포를 잘 이해한다는 것은 Kudu 로그가 끝나는 자리와 앱 startup 책임이 시작되는 자리를 구분할 줄 안다는 뜻입니다.
+
+## 핵심 개념
+
+### 배포 파이프라인은 한 장의 그림으로 먼저 보는 편이 좋습니다
+
+배포 문제를 읽을 때 가장 실용적인 출발점은 네 단계 모델입니다. upload 실패, build 실패, file placement 실패, placement는 끝났지만 runtime startup 실패라는 네 경계로 나누면 진단 순서가 훨씬 분명해집니다.
 
 ![업로드부터 런타임 기동까지 이어지는 배포 경로](../../../assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
 
-*업로드부터 런타임 기동까지 이어지는 배포 경로*
-이 흐름을 기준으로 보면 배포 문제는 네 가지로 나뉩니다.
+이 모델이 좋은 이유는 "배포 실패"를 덩어리로 두지 않기 때문입니다. artifact를 받은 쪽이 실패했는지, build automation이 실패했는지, 최종 경로 배치가 실패했는지, 아니면 앱이 새 파일을 읽고도 startup contract를 지키지 못했는지 서로 다른 층으로 나뉩니다.
 
-1. 업로드 실패
-2. 빌드 실패
-3. 파일 배치 실패
-4. 배치는 됐지만 런타임 기동 실패
+### Kudu는 App Service의 구체적인 SCM API 표면입니다
 
-Kudu를 이해하는 이유는 이 네 단계를 서로 분리해서 읽기 위해서입니다.
+Kudu는 App Service의 SCM 사이트이며, 배포와 진단을 담당하는 companion service입니다. 공개 저장소를 보면 Kudu가 추상적인 개념이 아니라 실제 엔드포인트 집합이라는 점이 분명해집니다. `PushDeploymentController.cs`는 ZipDeploy와 publish 계열 요청의 진입점을 보여 주고, `NinjectServices.cs`는 `zipdeploy`, `publish`, `vfs`, `deployments` 같은 route registration을 노출합니다.
 
----
+즉 Kudu는 단순한 콘솔이 아닙니다. artifact를 받는 실제 SCM API이며, 배포 이력과 파일 접근, 진단 흐름이 이 표면에 연결됩니다. "배포는 성공했는데 어디서 성공한 거지"라는 질문에 답하려면 먼저 Kudu가 배포 파이프라인의 어느 자리인지 이해해야 합니다.
 
-## Kudu는 무엇을 공개하고 있는가
+### ZipDeploy는 "압축 해제 후 바로 실행"과 항상 같지 않습니다
 
-Kudu는 App Service의 SCM 사이트입니다.
-Learn 문서도 Kudu를 배포와 진단을 담당하는 companion service로 설명합니다.
-
-실제로 공개 코드에서 보이는 중요한 단서는 두 가지입니다.
-
-- `PushDeploymentController.cs` — ZipDeploy와 publish 계열 엔드포인트
-- `NinjectServices.cs` — 라우트 등록과 서비스 wiring
-
-특히 `NinjectServices.cs`에는 다음 라우트가 보입니다.
-
-- `zipdeploy`
-- `publish`
-- `vfs`
-- `deployments`
-
-즉 Kudu는 추상적 배포 개념이 아니라,
-실제로 요청을 받는 SCM API 집합입니다.
-
----
-
-## ZipDeploy가 의미하는 것
-
-Kudu 공개 코드에서 `ZipPushDeploy` 메서드 이름은 아주 직접적입니다.
-zip artifact를 받아 deployment info로 만들고,
-배포 흐름으로 넘깁니다.
+공개 Kudu 코드에 있는 `ZipPushDeploy`라는 이름은 꽤 설명적입니다. ZIP artifact를 받아 deployment metadata로 바꾸고, 그것을 배포 흐름으로 넘깁니다. 여기서 중요한 점은 ZipDeploy 자체가 곧장 "압축을 풀고 실행한다"는 뜻이 아니라는 사실입니다.
 
 ![ZipDeploy 요청이 배포 작업으로 바뀌는 흐름](../../../assets/azure-app-service-deep-dive/04/04-02-what-zipdeploy-actually-means.ko.png)
 
-*ZipDeploy 요청이 배포 작업으로 바뀌는 흐름*
-여기서 중요한 점은 ZipDeploy 자체가 항상 “압축 해제 후 바로 실행”과 같지 않다는 것입니다.
-앱 설정과 배포 모드에 따라 build automation 여부와 최종 배치 방식이 달라집니다.
+배포 설정에 따라 build automation이 추가될 수 있고, run-from-package가 켜져 있으면 `wwwroot`는 ZIP이 풀린 폴더가 아니라 mounted package로 바뀝니다. 즉 같은 zipdeploy 요청이라도 최종 파일 배치와 startup 의미는 다르게 나타날 수 있습니다.
 
----
+### Windows code app의 전통적 경로는 Kudu 중심으로 읽을 수 있습니다
 
-## Windows code app의 고전 경로
+Windows code app의 고전적인 경로는 비교적 직선적입니다. Git push 또는 zipdeploy 요청이 들어오고, Kudu가 사이트 유형과 설정을 확인한 뒤, 필요하면 deployment logic을 실행하고, 결과물을 `wwwroot`에 동기화하며, worker가 새 파일을 보게 됩니다. 이 경로에서 `deploy.cmd`나 `deploy.sh`가 자주 등장하는 이유도 자동 생성 또는 사용자 지정 deployment script가 실제로 이 흐름 한가운데 있기 때문입니다.
 
-전통적인 Kudu 경로에서는 대체로 이런 그림이 성립합니다.
+핵심은 배포 엔진이 artifact 수신과 파일 배치의 책임을 진다는 점입니다. 그러나 이 단계가 끝났다고 해서 곧바로 앱 프로세스가 healthy 상태라는 뜻은 아닙니다. Kudu가 새 파일을 올바른 경로에 놓는 일과, 런타임이 그 새 파일을 들고 정상 기동하는 일은 여전히 서로 다른 질문입니다.
 
-1. Git push 또는 zipdeploy 도착
-2. Kudu가 사이트 유형과 설정을 확인
-3. 필요하면 deployment script 실행
-4. 결과물을 `wwwroot`에 동기화
-5. worker가 새 파일을 보게 됨
+### Linux code app에서는 Oryx가 detect-build-startup 역할을 맡을 수 있습니다
 
-Kudu wiki와 Learn이 오래 설명해 온 모델이 바로 이것입니다.
-
-여기서 deploy script는 자동 생성될 수 있고,
-사용자 지정 스크립트일 수도 있습니다.
-이 계열이 `deploy.cmd`나 `deploy.sh`라는 이름으로 자주 등장하는 이유가 여기에 있습니다.
-
----
-
-## Linux code app에서 Oryx가 끼어드는 자리
-
-Oryx README는 자신을 source repo를 runnable artifact로 바꾸는 build system이라고 설명합니다.
-또한 코드베이스를 분석해 build script와 startup script를 생성한다고 분명히 적습니다.
-
-이 문장을 App Service 문맥으로 번역하면 이렇습니다.
-
-- Kudu 또는 App Service build service가 Oryx를 호출합니다.
-- Oryx가 언어와 파일을 감지합니다.
-- 의존성 설치와 빌드 스크립트를 생성합니다.
-- Python이면 WSGI server 계열 startup script까지 생성할 수 있습니다.
+Oryx의 공개 README는 자신을 source repo를 runnable artifact로 바꾸는 build system이라고 설명합니다. 또한 codebase를 분석해 build script와 startup script를 생성한다고 분명히 밝힙니다. 이 문장을 App Service 문맥으로 번역하면, Linux code app에서는 Kudu 또는 App Service build service가 Oryx를 호출하고, Oryx가 language와 repository shape를 감지해 dependency restore와 build, startup behavior를 만들어 낼 수 있다는 뜻입니다.
 
 ![Linux 코드 앱 배포 중 Oryx가 끼는 지점](../../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.ko.png)
 
-*Linux 코드 앱 배포 중 Oryx가 끼는 지점*
-그래서 Linux App Service에서 “배포는 성공했는데 startup command가 이상하다”는 문제는,
-순수 Kudu만의 문제가 아니라 Oryx가 만든 산출물과 runtime contract를 함께 봐야 풀립니다.
+그래서 Linux App Service에서 "배포는 성공했는데 startup command가 이상하다"는 문제는 순수 Kudu 문제라기보다 Kudu와 Oryx가 만나는 경계 문제일 수 있습니다. artifact는 정상 수신됐지만, detect-build-startup 결과가 런타임 계약과 어긋나면 배포 파이프라인의 앞 절반만 성공한 셈입니다.
 
----
+### `SCM_DO_BUILD_DURING_DEPLOYMENT`는 zipdeploy의 의미를 바꿉니다
 
-## `SCM_DO_BUILD_DURING_DEPLOYMENT`가 바꾸는 것
+Learn 문서는 zip deployment가 기본적으로 ready-to-run artifact를 전제로 한다고 설명합니다. 그리고 Git deployment와 같은 build automation을 원하면 `SCM_DO_BUILD_DURING_DEPLOYMENT=true`를 켜라고 말합니다. 이 설정 하나가 배포 경로의 성격을 완전히 바꿉니다.
 
-Learn 문서는 zip deployment가 기본적으로는 ready-to-run package를 전제로 한다고 설명합니다.
-그리고 Git deployment와 같은 build automation을 원하면 `SCM_DO_BUILD_DURING_DEPLOYMENT=true`를 켜라고 말합니다.
+끄면 플랫폼은 준비된 artifact를 주로 배치합니다. 켜면 server-side build와 dependency restore가 경로 안으로 들어옵니다. 즉 같은 zipdeploy 요청도 어떤 앱에서는 "파일 placement" 문제이고, 다른 앱에서는 "build automation" 문제일 수 있습니다.
 
-이 설정이 중요한 이유는 배포 실패의 성격을 바꾸기 때문입니다.
+### run-from-package는 `wwwroot`를 읽기 전용 mounted package로 바꿉니다
 
-- 끄면: “준비된 아티팩트를 그냥 배치”에 가깝습니다.
-- 켜면: “서버 쪽 빌드와 의존성 복원”이 추가됩니다.
-
-즉,
-같은 zipdeploy라도 build step이 있느냐 없느냐가 다릅니다.
-
----
-
-## run-from-package는 `wwwroot`를 읽기 전용 mount로 바꾼다
-
-run-from-package 문서는 가장 중요한 문장을 아주 분명하게 적습니다.
-
-**ZIP 내용이 `wwwroot`로 복사되는 것이 아니라,
-ZIP 패키지 자체가 읽기 전용 `wwwroot`로 mount됩니다.**
+run-from-package 문서가 강조하는 핵심은 아주 분명합니다. ZIP 내용이 `wwwroot`에 복사되는 것이 아니라, ZIP package 자체가 read-only `wwwroot`로 마운트됩니다. 이 변화는 단순한 배포 최적화가 아니라 런타임 파일시스템 의미의 변화입니다.
 
 ![ZIP 패키지가 읽기 전용 wwwroot로 마운트되는 구조](../../../assets/azure-app-service-deep-dive/04/04-02-run-from-package-turns-wwwroot-into-a-mo.ko.png)
 
-*ZIP 패키지가 읽기 전용 wwwroot로 마운트되는 구조*
-이 모드의 장점은 분명합니다.
+장점은 분명합니다. file-lock conflict가 줄고, deployment atomicity가 좋아지며, file-copy churn이 감소합니다. 대신 `wwwroot`를 writable working directory로 전제한 코드나 부가 구성은 다시 점검해야 합니다. runtime-generated content는 다른 위치를 써야 하고, path assumption은 운영 전에 명시적으로 검증해야 합니다.
 
-- 파일 잠금 충돌 감소
-- 배포 원자성 향상
-- 파일 복사 시간 감소
+### slot 배포는 file copy보다 routing sequence 때문에 안전하게 느껴집니다
 
-대신 의미가 달라집니다.
-
-- `wwwroot`를 수정 가능한 작업 디렉터리로 보면 안 됩니다.
-- 런타임 중 파일 생성 위치를 따로 생각해야 합니다.
-- WebJobs 같은 부가 구성은 경로 영향을 다시 확인해야 합니다.
-
----
-
-## slot 배포는 왜 안전한가
-
-slot을 쓰면 배포는 production URL 밖에서 먼저 끝납니다.
+slot의 핵심 가치는 production URL 바깥에서 새 버전을 먼저 올리고 warm-up을 끝낼 수 있다는 점입니다. 새 코드가 staging slot worker에서 이미 올라와 있고, 필요한 warm-up까지 끝난 뒤에 production traffic이 넘어가므로 사용자가 cold start 비용을 직접 맞을 확률이 낮아집니다.
 
 ![staging warm-up 뒤 production 라우팅이 바뀌는 흐름](../../../assets/azure-app-service-deep-dive/04/04-05-why-slot-deployment-feels-safer.ko.png)
 
-*staging warm-up 뒤 production 라우팅이 바뀌는 흐름*
-바뀌는 것은 코드 배치가 아니라 라우팅입니다.
-새 코드가 staging slot worker에서 이미 올라와 있고,
-필요한 warm-up까지 끝난 뒤 production 트래픽이 넘어가므로,
-사용자가 cold start를 덜 보게 됩니다.
+여기서 바뀌는 것은 단순한 파일 배치가 아니라 라우팅입니다. 그래서 slot swap을 이해할 때는 Kudu 배포와 worker warm-up을 같은 이야기로 읽어야 합니다. 파일이 올라갔다고 끝나는 것이 아니라, warm-up이 끝난 인스턴스로 Front-End routing rule이 바뀌어야 비로소 production 영향이 줄어듭니다.
 
-이 때문에 Kudu 배포와 worker warm-up을 하나의 이야기로 읽어야 합니다.
+### 배포 경로는 CLI로도 충분히 점검할 수 있습니다
 
----
-
-## Kudu 성공과 런타임 성공은 다르다
-
-실전에서 자주 나오는 함정이 이겁니다.
-
-“Kudu deployment history는 success인데,
-앱은 502가 난다.”
-
-이건 모순이 아닙니다.
-
-Kudu 성공은 보통 이런 뜻입니다.
-
-- artifact를 받았다
-- 빌드 또는 복사를 마쳤다
-- 대상 경로에 파일을 배치했다
-
-반면 런타임 성공은 별도 질문입니다.
-
-- 앱 프로세스가 제대로 떴는가
-- 올바른 포트에 바인딩했는가
-- warm-up 경로가 준비 완료를 반환하는가
-- dependency가 기동 시점에 정상인가
-
-그래서 배포와 런타임을 같은 로그에서 찾으려 하면 시간이 길어집니다.
-
----
-
-## 4화 정리
-
-이번 화의 핵심을 한 문단으로 줄이면 이렇습니다.
-
-> App Service 배포는 Kudu SCM 사이트가 artifact를 받고, 필요하면 build automation을 실행하고, 결과를 `wwwroot` 또는 mounted package 형태로 worker가 보는 경로에 배치하는 과정입니다. Linux code app에서는 Oryx가 detect-build-startup 단계를 담당할 수 있습니다. run-from-package를 켜면 `wwwroot`는 ZIP이 풀린 폴더가 아니라 읽기 전용 mount가 됩니다. Kudu success는 배포 success일 뿐, 앱 startup success와는 별개입니다.
-
-이번 글에서 붙잡아 둘 핵심은 배포 성공과 런타임 준비 완료가 서로 다른 경계라는 점입니다.
-Kudu가 artifact를 정상적으로 받아도,
-startup contract,
-mounted package 의미,
-worker recycle 이후 readiness가 실제 서비스 가능 여부를 다시 결정합니다.
-
----
-
-## 이 시리즈에서의 위치
-
-앞선 글들이 요청 경로와 worker 실행 경계를 설명했다면 이번 글은 코드가 그 worker에 도달하는 배포 경로를 설명합니다. 즉 라우팅 문제, 실행 경계 문제, 배포 경로 문제를 서로 다른 층위로 나눠 보게 해 주는 글입니다.
-
----
-
-## Call Path Summary
-
-Push (zip, git, publish profile, container image reference) → Kudu SCM endpoint → optional build automation (`SCM_DO_BUILD_DURING_DEPLOYMENT`, Oryx on Linux code apps) → content placement in `wwwroot` or mounted package path → app restart / worker process recycle → worker serves the new artifact
-
-### slot swap과 warm-up 흐름
+아래 명령은 slot 목록, slot swap, 그리고 staging slot의 swap 관련 app settings를 빠르게 확인할 때 유용합니다. 배포 경로를 실제 운영 표면과 연결하는 기본 도구입니다.
 
 ```bash
 az webapp deployment slot list -n my-app -g my-rg -o table
@@ -257,13 +131,31 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
   --query "[?starts_with(name, 'WEBSITE_SWAP')]" -o table
 ```
 
+이 명령은 slot 배포가 실제로 어떤 표면에서 제어되는지 보여 줍니다. production 이전에 어느 slot이 준비되는지, swap 관련 설정이 어떤 상태인지, 운영자가 어떤 조합을 의도했는지 빠르게 확인할 수 있습니다.
+
+## 흔히 헷갈리는 지점
+
+- **Kudu success는 runtime success가 아닙니다.** artifact 수신과 file placement는 성공했지만 앱 startup은 실패할 수 있습니다.
+- **ZipDeploy는 항상 "압축 해제 후 바로 실행"과 같지 않습니다.** build automation과 mounted package 여부에 따라 의미가 달라집니다.
+- **Linux code app의 startup 문제를 전부 Kudu 탓으로 돌리면 안 됩니다.** Oryx의 detect-build-startup 경계가 원인일 수 있습니다.
+- **run-from-package를 켠 상태에서 `wwwroot`를 writable 경로로 가정하면 안 됩니다.** read-only mounted package라는 전제가 먼저입니다.
+- **slot swap은 worker 집합을 통째로 갈아 끼우는 작업이 아닙니다.** warm-up이 끝난 slot으로 Front-End routing rule을 바꾸는 흐름입니다.
+
 ## 운영 체크리스트
 
-- [ ] deployment 방식을 한 가지로 통일하고 그 근거를 ADR로 남겼다
-- [ ] slot swap 전 warm-up 페이지가 main path를 모두 깨우는지 확인했다
-- [ ] rollback 절차를 자동화했고 RTO를 측정했다
-- [ ] Run From Package 사용 시 read-only 동작에 의존하는 코드가 없는지 점검했다
-- [ ] 배포 권한과 슬롯 권한을 분리했다
+- [ ] 팀에서 표준 배포 방식 하나를 정하고 선택 이유를 ADR에 기록했습니다.
+- [ ] `SCM_DO_BUILD_DURING_DEPLOYMENT` 사용 여부와 그에 따른 build 책임을 명확히 했습니다.
+- [ ] run-from-package 환경에서 `wwwroot` 쓰기 가정이 없는지 검토했습니다.
+- [ ] slot warm-up이 주요 요청 경로를 실제로 예열하는지 검증했습니다.
+- [ ] 배포 권한과 slot 운영 권한을 분리해 최소 권한으로 관리했습니다.
+
+## 정리
+
+4화의 핵심은 App Service 배포를 하나의 성공/실패 문장으로 보지 않는 것입니다. Kudu SCM 사이트가 artifact를 받고, 필요하면 build automation이 돌고, 결과가 `wwwroot` 또는 mounted package 경로에 놓이고, 그 뒤에야 worker가 새 artifact를 들고 startup readiness를 통과해야 합니다. 이 선을 분리해 두면 배포 문제를 훨씬 짧게 자를 수 있습니다.
+
+특히 Linux code app에서는 Oryx가 중간에 들어오므로 Kudu와 startup contract를 따로 보되, 서로 끊어진 주제로 보지는 말아야 합니다. 앞단의 artifact 수신과 중간의 build generation, 마지막의 runtime readiness가 하나의 체인으로 이어져 있기 때문입니다. run-from-package도 같은 이유로 단순한 속도 최적화가 아니라 파일시스템 semantics 변경으로 받아들여야 합니다.
+
+다음 글에서는 control plane 관점에서 scale-out이 어떻게 worker 증가로 이어지는지 보겠습니다. 배포가 끝나 새 코드가 준비되더라도, 실제 사용자 경험은 결국 새 worker가 언제 healthy routing pool에 들어오는가에 달려 있기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -277,25 +169,21 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처
+### 공식 문서
 - [PushDeploymentController.cs @ S62](https://github.com/projectkudu/kudu/blob/S62/Kudu.Services/Deployment/PushDeploymentController.cs)
 - [NinjectServices.cs @ S62](https://github.com/projectkudu/kudu/blob/S62/Kudu.Services.Web/App_Start/NinjectServices.cs)
 - [Oryx README @ 20240408.1](https://github.com/microsoft/Oryx/blob/20240408.1/README.md)
 - [Oryx BuildScriptGeneratorCli directory @ 20240408.1](https://github.com/microsoft/Oryx/tree/20240408.1/src/BuildScriptGeneratorCli)
 - [Oryx startupscriptgenerator directory @ 20240408.1](https://github.com/microsoft/Oryx/tree/20240408.1/src/startupscriptgenerator/src)
-
-### 2차 출처
 - [Kudu service overview](https://learn.microsoft.com/azure/app-service/resources-kudu)
 - [Deploy files to Azure App Service](https://learn.microsoft.com/azure/app-service/deploy-zip)
 - [Run your app directly from a ZIP package](https://learn.microsoft.com/azure/app-service/deploy-run-package)
 - [Deployment slots in Azure App Service](https://learn.microsoft.com/azure/app-service/deploy-staging-slots)
 
 ### 관련 시리즈
-- [Azure App Service 101 — 첫 번째 배포](../../azure-app-service-101/ko/04-first-deploy.md)
+- [Azure App Service 101 — First Deployment](../../azure-app-service-101/ko/04-first-deploy.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/03-grpc-event-stream.md)
 
 Tags: Azure, App Service, Distributed Systems, Platform Engineering
