@@ -14,62 +14,59 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-12'
 seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기
 
-> LLM 앱 기초 시리즈 (1/6)
+LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은 모델 성능이 아닙니다. 내 코드와 모델 서비스 사이에 어떤 계약이 있는지, 그 계약이 어디서 실패하는지, 응답에서 무엇을 읽어야 하는지가 더 먼저 헷갈립니다. 채팅 UI는 이 경계를 감추지만, 런타임에서는 결국 HTTP 요청 하나와 JSON 응답 하나가 전부입니다.
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/01-llm-api-first-call)
+이 구조를 초기에 정확히 잡아 두면 이후 주제들이 훨씬 또렷해집니다. 토큰 비용을 읽는 일도, 프롬프트 구조를 설계하는 일도, 스트리밍을 붙이는 일도 모두 첫 호출의 요청-응답 구조 위에 쌓입니다. 반대로 이 지점이 흐리면 이후의 기능은 전부 “뭔가 되긴 되는데 왜 그런지 모르겠다”는 상태로 남습니다.
 
-아래 다이어그램은 첫 호출에서 애플리케이션과 모델 API가 어떻게 왕복하는지 한눈에 보여 줍니다.
+특히 입문 단계에서는 프롬프트를 얼마나 영리하게 쓰느냐보다, 어떤 필드가 요청 본문에 들어가고 어떤 필드가 응답으로 돌아오는지부터 익히는 편이 좋습니다. 모델은 원격 서비스이고, 원격 서비스는 항상 명시적 계약과 실패 모드를 갖습니다. 이 감각이 있어야 이후 단계에서 문제를 추측이 아니라 로그와 구조로 설명할 수 있습니다.
 
-![LLM API 첫걸음: 모델에게 첫 번째 요청 보내기](../../../assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
+이 글은 LLM App Foundations 101 시리즈의 첫 번째 글입니다.
 
-*LLM API 첫걸음: 모델에게 첫 번째 요청 보내기*
-처음 LLM 앱을 붙일 때 가장 낯선 지점은 모델이 아니라 경계입니다. 브라우저에서 대화창을 열면 마치 똑똑한 프로그램 하나와 바로 연결된 듯 보이지만, 실제로 애플리케이션이 하는 일은 훨씬 단순합니다. HTTP 요청 하나를 보내고 JSON 응답 하나를 받습니다. 그 왕복이 전부입니다. 채팅 UI, 프롬프트 템플릿, 스트리밍, 메모리, RAG는 모두 그 위에 올라가는 두 번째 문제입니다.
+여기서는 Groq Python SDK로 가장 작은 성공 경로를 만들고, 첫 호출을 운영 가능한 멘탈 모델로 바꾸겠습니다.
 
-입문 단계에서는 이 단순함을 먼저 몸에 익히는 편이 좋습니다. 요청 본문에 무엇을 넣는지, 응답에서 무엇을 꺼내는지, 비용과 지연 시간을 어디서 읽는지 모르면 이후 단계가 계속 흐립니다. 반대로 첫 호출을 확실히 이해하면 나머지는 점진적으로 쌓을 수 있습니다. Python 코드 한 파일만으로도 “모델에게 문장을 보내고 답을 받는다”는 핵심 루프를 바로 확인할 수 있습니다.
+## 이 글에서 다룰 문제
 
-이 글은 LLM 앱 기초 시리즈의 첫 번째 글입니다. 여기서는 Groq 무료 API를 기준으로 첫 호출을 끝까지 만들어 봅니다. 독자는 `GROQ_API_KEY` 하나만 준비하면 됩니다. 모델은 `llama-3.1-8b-instant`, 패키지는 공식 Python SDK인 `groq`를 사용합니다. 범위는 다음 일곱 가지입니다.
+- LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 동작할까요?
+- API 키는 어디서 만들고, 왜 코드가 아니라 환경변수에 둬야 할까요?
+- `client.chat.completions.create()` 응답에서 최소한 무엇을 읽어야 할까요?
+- 동기 호출과 비동기 호출은 코드 구조와 쓰임새가 어떻게 다를까요?
+- 첫 호출이 실패했을 때 인증, 모델 ID, 메시지 형식 중 무엇부터 의심해야 할까요?
 
-- LLM API가 무엇인지
-- Groq 계정과 API 키를 어떻게 준비하는지
-- `pip install groq` 설치
-- `client.chat.completions.create()` 첫 호출
-- 응답 구조에서 본문, 사용량, 모델명을 읽는 법
-- 동기와 비동기 패턴 차이
-- 실제 실행 가능한 완성 예제
+## 왜 이 글이 중요한가
 
-포인트는 하나입니다. **LLM 앱의 시작점은 프롬프트 감각이 아니라 요청과 응답의 구조를 읽는 능력**입니다.
+첫 호출은 단순한 입문 예제가 아닙니다. 이후 모든 기능의 기준점입니다. 토큰 사용량을 읽는 위치, 응답 본문을 꺼내는 위치, 모델명을 기록하는 위치가 여기서 정해집니다. 이 단계에서 구조를 대충 넘기면 나중에 비용 분석과 장애 분석도 함께 흐려집니다.
 
----
+또한 LLM을 “똑똑한 객체 하나”로 보면 문제를 잘못 찾기 쉽습니다. 실제로는 네트워크 요청, 인증 헤더, JSON 직렬화, 모델 선택, 응답 파싱이 얽힌 원격 호출입니다. 따라서 첫 호출을 이해한다는 말은 모델 자체보다 서비스 경계를 먼저 이해한다는 뜻입니다.
 
-## LLM API는 무엇인가
+현업에서는 이 차이가 바로 드러납니다. `401`이면 프롬프트가 아니라 인증을 봐야 하고, `429`면 문장 표현보다 호출 빈도를 먼저 봐야 합니다. 첫 호출을 투명하게 보는 습관이 생기면, 이후의 LLM 개발은 훨씬 덜 신비롭고 훨씬 더 다루기 쉬워집니다.
 
-![JSON 요청과 응답이 오가는 흐름](../../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.ko.png)
+## 첫 호출을 이해하는 가장 좋은 방법: SDK 메서드가 아니라 JSON 요청과 JSON 응답의 왕복으로 보는 것입니다
 
-*JSON 요청과 응답이 오가는 흐름*
-LLM API는 이름만 거창할 뿐, 구조는 익숙한 웹 API와 다르지 않습니다. 클라이언트가 HTTP로 요청을 보내고 서버가 JSON으로 응답합니다. 차이가 있다면 엔드포인트의 목적이 데이터 조회가 아니라 텍스트 생성이라는 점뿐입니다.
+Groq SDK는 편리하지만, 실제 계약을 바꾸지는 않습니다. `client.chat.completions.create()`는 결국 JSON 요청을 만들고 JSON 응답을 Python 객체로 감싼 결과를 돌려줍니다. 그래서 첫 호출을 이해할 때는 “메서드를 어떻게 부르느냐”보다 “어떤 필드를 보내고 어떤 필드를 받느냐”를 먼저 보는 편이 정확합니다.
 
-REST 관점에서 보면 애플리케이션은 다음 정보를 서버에 보냅니다.
+이 관점이 중요한 이유는 SDK 문법은 바뀌어도 기본 계약은 쉽게 바뀌지 않기 때문입니다. 모델 ID를 보내고, 메시지 배열을 보내고, 응답에서 생성 텍스트와 사용량과 메타데이터를 읽는 구조는 이후 스트리밍과 툴 호출로 가도 그대로 이어집니다.
 
-- 어떤 모델을 쓸지
-- 어떤 메시지를 입력으로 줄지
-- 생성 길이, temperature 같은 옵션을 어떻게 줄지
+> LLM 첫 호출의 핵심은 모델을 부르는 문법이 아니라, 원격 서비스와 맺는 입력·출력 계약을 눈에 보이는 구조로 이해하는 데 있습니다.
 
-서버는 대개 다음 정보를 되돌려줍니다.
+## 핵심 개념
 
-- 생성된 답변 텍스트
-- 어떤 모델이 실제로 사용되었는지
-- 토큰 사용량이 얼마였는지
-- 요청 ID, 종료 이유 같은 메타데이터
+![첫 번째 LLM API 호출의 최소 왕복 구조](../../../assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
 
-SDK를 쓰면 이 HTTP/JSON 왕복이 감춰져서 메서드 호출처럼 보입니다. 그렇다고 구조가 사라지는 것은 아닙니다. `client.chat.completions.create()`는 내부적으로 JSON 요청을 만들고, Groq 서버가 돌려준 JSON 응답을 Python 객체로 감싼 결과를 반환합니다. 입문자에게 중요한 이유가 여기 있습니다. SDK 문법은 라이브러리마다 조금씩 바뀌지만, **JSON in / JSON out**이라는 기본 모델은 거의 바뀌지 않습니다.
+*첫 번째 LLM API 호출의 최소 왕복 구조*
 
-예를 들어 채팅 완료 요청은 개념적으로 아래와 비슷합니다.
+가장 먼저 기억할 문장은 단순합니다. LLM API도 결국 API입니다. 애플리케이션은 모델과 직접 대화하는 것이 아니라, 모델 서비스를 호출합니다. 따라서 요청에는 모델과 입력 메시지가 들어가고, 응답에는 생성 텍스트와 사용량 같은 메타데이터가 들어옵니다.
+
+![텍스트 입력과 JSON 응답으로 이어지는 흐름](../../../assets/llm-app-foundations-101/01/01-01-what-an-llm-api-is.ko.png)
+
+*텍스트 입력과 JSON 응답으로 이어지는 흐름*
+
+개념적으로 요청 본문은 아래처럼 생깁니다.
 
 ```json
 {
@@ -77,13 +74,13 @@ SDK를 쓰면 이 HTTP/JSON 왕복이 감춰져서 메서드 호출처럼 보입
   "messages": [
     {
       "role": "user",
-      "content": "Python에서 환경변수를 읽는 예제를 보여줘."
+      "content": "Show me a small Python example that reads an environment variable."
     }
   ]
 }
 ```
 
-응답도 같은 식입니다. 실제 필드는 더 많지만, 처음엔 아래 세 덩어리만 보면 충분합니다.
+응답에서 처음 봐야 할 세 블록은 `model`, `choices`, `usage`입니다.
 
 ```json
 {
@@ -104,35 +101,11 @@ SDK를 쓰면 이 HTTP/JSON 왕복이 감춰져서 메서드 호출처럼 보입
 }
 ```
 
-이 글에서는 SDK를 사용하더라도 계속 이 그림을 함께 떠올릴 것입니다. 그래야 나중에 스트리밍, 툴 호출, 구조화 출력으로 넘어갈 때도 길을 잃지 않습니다.
-
----
-
-## Groq 계정과 API 키 준비
-
-준비 과정은 길지 않습니다.
-
-1. 브라우저에서 <https://console.groq.com> 에 접속합니다.
-2. GitHub 계정이나 이메일로 가입합니다.
-3. 로그인 뒤 API Keys 메뉴로 이동합니다.
-4. 새 키를 생성하고 값을 복사합니다.
-5. 로컬 셸에 `GROQ_API_KEY` 환경변수로 넣습니다.
-
-macOS나 Linux 셸이라면 일단 아래처럼 넣고 시작하면 됩니다.
+실제 준비 단계는 길지 않습니다. 계정을 만들고, 키를 발급하고, 환경변수에 넣고, SDK를 설치하면 됩니다. 중요한 습관은 키를 코드에 박아 넣지 않는 것입니다.
 
 ```bash
-export GROQ_API_KEY="여기에-발급받은-키"
+export GROQ_API_KEY="your-issued-key"
 ```
-
-Windows PowerShell이라면 다음 형식입니다.
-
-```powershell
-$env:GROQ_API_KEY="여기에-발급받은-키"
-```
-
-영구 설정은 각자 쓰는 셸 프로필에 추가하면 됩니다. 다만 입문 단계에서 더 중요한 것은 보안 습관입니다. API 키를 코드에 직접 적지 마십시오. Git에 한 번 올라간 키는 곧바로 폐기 대상입니다. 예제 코드에서는 모두 `os.environ["GROQ_API_KEY"]`로 읽겠습니다. 키가 없으면 `KeyError`가 나므로, 환경 설정이 빠졌다는 사실도 즉시 드러납니다.
-
-간단한 확인 코드는 아래 정도면 충분합니다.
 
 ```python
 import os
@@ -141,45 +114,17 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    API key loaded: gsk_Z2...
-
-<!-- injected-output:end -->
-
-이 코드는 환경변수 연결만 확인하는 최소 예제입니다. 실제 앱에서는 키 전체를 출력하지 않는 편이 안전합니다. 개발 초반에는 앞 몇 글자만 확인해도 충분합니다.
-
----
-
-## SDK 설치와 실행 환경
-
-이 글의 예제는 Python 3.10 이상을 가정합니다. Groq 공식 SDK는 `groq` 패키지 하나면 시작할 수 있습니다.
-
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install groq
 ```
 
-이미 가상환경을 쓰고 있다면 `pip install groq`만 실행하면 됩니다. SDK는 내부적으로 HTTP 클라이언트를 사용해 Groq REST API와 통신합니다. 개발자가 직접 `requests.post()`를 쓰지 않아도 되는 이유가 여기 있습니다.
+![클라이언트 생성부터 첫 호출까지 이어지는 흐름](../../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.ko.png)
 
-설치 뒤에는 버전이 잘 잡혔는지 확인해 두면 좋습니다.
+*클라이언트 생성부터 첫 호출까지 이어지는 흐름*
 
-```bash
-python -c "import groq; print(groq.__version__)"
-```
-
-이제 준비물은 끝났습니다. 다음 단계부터 진짜 호출을 보겠습니다.
-
----
-
-## 첫 번째 호출 만들기
-
-![클라이언트 생성부터 첫 호출까지 흐름](../../../assets/llm-app-foundations-101/01/01-02-sending-your-first-request.ko.png)
-
-*클라이언트 생성부터 첫 호출까지 흐름*
-가장 작은 성공 경로부터 보겠습니다. 아래 코드는 동기 방식으로 한 번 요청을 보내고, 첫 번째 응답 텍스트만 출력합니다. 이 코드 블록은 독립 실행 가능합니다.
+가장 작은 성공 경로는 아래 코드입니다. 이 블록 하나로 “요청을 보냈고, 답이 돌아왔고, 본문을 읽었다”는 첫 번째 이정표를 확인할 수 있습니다.
 
 ```python
 import os
@@ -193,7 +138,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "Python에서 리스트 컴프리헨션을 한 문단으로 설명해 주세요.",
+            "content": "Explain Python list comprehensions in one paragraph.",
         }
     ],
 )
@@ -201,74 +146,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+이제 본문만 보지 말고 응답 객체 전체를 읽어야 합니다. 그래야 모델명, 토큰 사용량, 종료 이유까지 함께 추적할 수 있습니다.
 
-    **리스트 컴프리헨션**
+![응답 객체에서 본문과 메타데이터를 읽는 구조](../../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.ko.png)
 
-    리스트 컴프리헨션은 Python에서 데이터 목록을 만들기 위해 사용되는 표현식입니다. 리스트 컴프리헨션은 리스트에 요소를 추가할 때 for 루프를 사용하는 대신 간결한 코드로 할 수 있습니다.
-
-    **Syntax**
-
-    리스트 컴프리헨션의 기본 Syntax는 다음과 같습니다:
-
-    ```python
-    [expr for var in iterable]
-    ```
-
-    - `expr`: 컴프리헨션의 결과로 될 표현식
-    - `var`: 반복할 때 사용되는 변수
-    - `iterable`: 반복할 수 있는 iterable 객체 (리스트, 튜플, 집합 등)
-
-    **예시**
-
-    리스트 컴프리헨션의 예시는 다음과 같습니다:
-
-    ```python
-    # 단순한 컴프리헨션
-    numbers = [1, 2, 3, 4, 5]
-    double_numbers = [x * 2 for x in numbers]
-    print(double_numbers)  # [2, 4, 6, 8, 10]
-
-    # 조건에 따라 필터링하는 컴프리헨션
-    numbers = [1, 2, 3, 4, 5]
-    even_numbers = [x for x in numbers if x % 2 == 0]
-    print(even_numbers)  # [2, 4]
-
-    # 복합 컴프리헨션
-    students = [
-        {"name": "John", "age": 20},
-        {"name": "Jane", "age": 22},
-        {"name": "Bob", "age": 21}
-    ]
-    adult_students = [student["name"] for student in students if student["age"] >= 21]
-    print(adult_students)  # ["Bob"]
-    ```
-
-    리스트 컴프리헨션은 자료 집중을 위한 파이썬의 유연한 프로그래밍 방식의 하나로 반복문 없이 빠르게 여러 리스트에 데이터를 집어넣을 수 있습니다.
-
-<!-- injected-output:end -->
-
-여기서 눈여겨볼 줄은 세 군데입니다.
-
-첫째, `Groq(...)`는 API 서버와 통신할 클라이언트 객체를 만듭니다. 보통 애플리케이션 시작 시 한 번 만들고 재사용합니다.
-
-둘째, `model="llama-3.1-8b-instant"`는 어떤 모델에 보낼지 지정합니다. 모델명은 문자열일 뿐이지만, 이 값이 성능과 비용, 지연 시간의 성격을 결정합니다.
-
-셋째, `messages=[...]`는 채팅 입력입니다. 지금은 `user` 메시지 하나만 넣었지만, 실제로는 여러 턴의 대화 이력을 같은 배열에 담을 수 있습니다. 다음 글들에서 역할 분리와 멀티턴 상태 관리를 자세히 다룰 예정이니, 오늘은 “메시지 목록을 보낸다” 정도만 기억하면 충분합니다.
-
-실행 결과는 매번 조금씩 달라질 수 있습니다. 생성 모델이기 때문입니다. 중요한 것은 출력 내용의 정확한 문구가 아니라, 요청이 성공했고 `choices[0].message.content`에서 텍스트를 읽을 수 있다는 사실입니다.
-
----
-
-## 응답 구조를 해부해 보기
-
-![completion 객체 필드와 중첩 구조](../../../assets/llm-app-foundations-101/01/01-03-inspecting-the-response-object.ko.png)
-
-*completion 객체 필드와 중첩 구조*
-첫 호출이 성공하면 많은 입문자가 곧바로 본문 텍스트만 꺼내 쓰고 넘어갑니다. 하지만 실전에서는 응답 전체를 한 번은 눈으로 확인해 봐야 합니다. 모델명, 사용량, 종료 이유를 모르고 운영에 들어가면 나중에 비용과 지연 시간을 설명하기 어렵습니다.
-
-Groq Python SDK의 응답은 Pydantic 모델입니다. 따라서 `to_dict()`로 사전 형태를 볼 수 있습니다. 아래 코드는 응답 일부를 구조적으로 확인하는 예제입니다. 역시 독립 실행 가능합니다.
+*응답 객체에서 본문과 메타데이터를 읽는 구조*
 
 ```python
 import json
@@ -283,7 +165,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "HTTP API와 SDK의 차이를 세 문장으로 설명해 주세요.",
+            "content": "Explain the difference between an HTTP API and an SDK in three sentences.",
         }
     ],
 )
@@ -291,122 +173,19 @@ completion = client.chat.completions.create(
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+실전에서 최소한 기록할 값은 생성 텍스트, `usage`, 모델명, `finish_reason`입니다. 이 네 값만 있어도 비용과 잘림 문제를 설명할 재료가 생깁니다.
 
-    {
-      "id": "chatcmpl-0c023923-9150-4f42-a8c0-ebed55005429",
-      "choices": [
-        {
-          "finish_reason": "stop",
-          "index": 0,
-          "logprobs": null,
-          "message": {
-            "content": "HTTP API는 특정 URL이나 엔드포인트를 통해 HTTP 요청을 보내어 서비스의 기능을 호출하여 데이터를 얻는 방식으로, 다양한 언어와 플랫폼에서 사용할 수 있습니다. SDK (Software Development Kit)는 API를 더욱 편리하게 사용하기 위해 개발된 라이브러리 또는 프레임워크로, 특정 프로그래밍 언어나 플랫폼에 최적화되어 있기 때문에 보통 API의 기능 일부를 자동화하고, 사용 편의성을 향상시킵니다.\n\nSDK는 일반적으로 개발자가 API에 직접 접근할 필요없이, SDK 내장 API 함수를 호출하여 기능을 호출할 수 있습니다. 예를 들어, AWS SDK는 AWS 서비스에 접근하기 위해 개발자들이 AWS API에 직접 접근할 필요없이, AWS SDK를 통해 함수 호출로 AWS 서비스를 사용할 수 있습니다.",
-            "role": "assistant"
-          }
-        }
-      ],
-      "created": 1777648896,
-      "model": "llama-3.1-8b-instant",
-      "object": "chat.completion",
-      "service_tier": "on_demand",
-      "system_fingerprint": "fp_e2c608b1d6",
-      "usage": {
-        "completion_tokens": 187,
-        "prompt_tokens": 51,
-        "total_tokens": 238,
-        "completion_time": 0.446027073,
-        "prompt_time": 0.011731571,
-        "queue_time": 0.072881247,
-        "total_time": 0.457758644
-      },
-      "usage_breakdown": null,
-      "x_groq": {
-        "id": "req_01kqj231ydf158peewdn0r965d",
-        "seed": 1354672668
-      }
-    }
+![인증 오류, 속도 제한, 재시도 분기로 이어지는 HTTP 경계](../../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.ko.png)
 
-<!-- injected-output:end -->
+*인증 오류, 속도 제한, 재시도 분기로 이어지는 HTTP 경계*
 
-출력을 보면 필드가 여럿 보이겠지만, 처음에는 세 가지를 우선 읽으면 됩니다.
+SDK를 쓰더라도 네트워크 경계는 사라지지 않습니다. 느린 응답은 네트워크와 토큰 길이 문제일 수 있고, `401`은 인증 문제일 수 있으며, `429`는 속도 제한 문제일 수 있습니다. 그래서 첫 호출을 이해할 때는 프롬프트보다 경계 조건을 먼저 읽는 습관이 중요합니다.
 
-### `choices[0].message.content`
+![동기 대기와 비동기 병렬 실행의 차이](../../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.ko.png)
 
-가장 자주 쓰는 필드입니다. 모델이 생성한 실제 답변 본문이 들어 있습니다.
+*동기 대기와 비동기 병렬 실행의 차이*
 
-```python
-text = completion.choices[0].message.content
-print(text)
-```
-
-왜 `choices[0]`일까요. API 설계가 “후보 응답 목록”을 기본 구조로 두기 때문입니다. 지금은 첫 번째 후보 하나만 읽으면 충분합니다.
-
-### `usage`
-
-사용량 정보입니다. 보통 아래 세 값을 가장 먼저 봅니다.
-
-```python
-usage = completion.usage
-print(f"prompt_tokens={usage.prompt_tokens}")
-print(f"completion_tokens={usage.completion_tokens}")
-print(f"total_tokens={usage.total_tokens}")
-```
-
-이 숫자는 단순 통계가 아닙니다. 비용 추적, 길이 제한, 캐시 전략, 속도 분석의 시작점입니다. 다음 글에서 토큰을 별도로 다루는 이유도 여기에 있습니다. LLM 앱은 결국 토큰 예산 위에서 동작합니다.
-
-### `model`
-
-응답에 기록된 모델명입니다.
-
-```python
-print(completion.model)
-```
-
-요청에서 보낸 모델명과 같아 보일 수 있지만, 운영 환경에서는 로그에 이 값을 남기는 습관이 유용합니다. 어떤 모델이 실제 응답을 만들었는지 추적하기 쉬워지기 때문입니다.
-
-실제로는 두 가지 필드를 처음부터 로그에 남겨두면 나중에 디버깅이 편해집니다.
-
-```python
-print(completion.id)                              # 요청 고유 ID, 공급자 문의 시 필요
-print(completion.choices[0].finish_reason)        # "stop", "length", "tool_calls" 중 하나
-```
-
-`finish_reason`은 모델이 생성을 멈춘 이유를 알려줍니다. `"stop"`은 자연스러운 종료이고, `"length"`는 허용 토큰이 소진되어 잘린 것입니다. 이 두 값을 운영 로그에 남겨두면 응답 품질 이슈를 추적하기가 훨씬 쉬워집니다.
-
----
-
-## SDK 호출도 결국 HTTP 요청이라는 감각
-
-![인증과 재시도 판단 분기](../../../assets/llm-app-foundations-101/01/01-04-why-the-http-mental-model-still-matters.ko.png)
-
-*인증과 재시도 판단 분기*
-SDK가 편한 이유는 분명합니다. 인증 헤더, JSON 직렬화, 응답 파싱, 오류 객체를 라이브러리가 대신 처리해 줍니다. 그렇다고 네트워크 비용이 사라지는 것은 아닙니다. 요청은 여전히 원격 서버로 가고, 실패 가능성도 그대로 존재합니다.
-
-이 감각을 초반에 잡아 두면 실수가 줄어듭니다.
-
-- 응답이 느리면 Python 문법보다 네트워크 왕복 시간을 먼저 의심합니다.
-- `401`이 나면 프롬프트보다 API 키 설정부터 확인합니다.
-- `429`가 나면 모델 지능보다 호출 빈도를 먼저 봅니다.
-- 빈 문자열이나 예외가 나면 응답 객체 전체를 로그로 남깁니다.
-
-초급 예제에서는 한 줄 출력으로 끝나도 되지만, 실제 앱에서는 요청과 응답을 관찰 가능한 형태로 남겨야 합니다. 최소한 모델명, 토큰 수, 응답 길이 정도는 로그에 포함하는 편이 좋습니다.
-
----
-
-## 동기와 비동기 패턴은 무엇이 다른가
-
-![동기 대기와 비동기 병렬 호출 비교](../../../assets/llm-app-foundations-101/01/01-05-synchronous-and-asynchronous-patterns.ko.png)
-
-*동기 대기와 비동기 병렬 호출 비교*
-Python에서 LLM 호출은 동기와 비동기 두 방식으로 작성할 수 있습니다. 어느 쪽이 더 “좋다”기보다, 애플리케이션 구조에 맞는 방식을 고르면 됩니다.
-
-동기 코드는 읽기 쉽습니다. 스크립트, 배치, 실험용 노트북, 단일 요청 CLI 도구에서는 대개 이쪽이 더 단순합니다.
-
-비동기 코드는 다른 I/O 작업과 함께 돌릴 때 빛납니다. FastAPI 같은 비동기 웹 서버, 여러 LLM 요청을 동시에 날리는 작업, 외부 API 여러 개를 함께 기다리는 서비스라면 `asyncio` 패턴이 자연스럽습니다.
-
-먼저 동기 버전입니다. 이 코드는 앞에서 본 형태와 거의 같습니다.
+동기 호출은 입문용으로 가장 단순합니다.
 
 ```python
 import os
@@ -420,7 +199,7 @@ completion = client.chat.completions.create(
     messages=[
         {
             "role": "user",
-            "content": "비동기 프로그래밍을 한 문단으로 설명해 주세요.",
+            "content": "Explain asynchronous programming in one paragraph.",
         }
     ],
 )
@@ -428,14 +207,7 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    비동기 프로그래밍은 프로그램이 순서가 바뀌지 않으면서 여러 작업을 동시에 처리할 수 있게 해주는 프로그래밍 기법입니다. 이 기법을 사용하면 프로그램이 작업을 하나씩 순차적으로 처리하는 대신, 여러 작업을 동시에 처리할 수 있게 되어 프로그램의 성능이 improves하고 응답성이 향상될 수 있습니다. 비동기는 HTTP 요청이나 파일 처리 같은 연산을 수행하는 동안 다른 코드를 실행할 수 있게 해주며, 이러한 방법으로 웹 어플리케이션의 성능이 향상됩니다.
-
-<!-- injected-output:end -->
-
-다음은 비동기 버전입니다. 이 코드 블록도 독립 실행 가능합니다.
+애플리케이션이 이미 async 런타임 위에 있거나 여러 I/O 작업을 함께 다뤄야 하면 비동기 호출이 자연스럽습니다.
 
 ```python
 import asyncio
@@ -451,7 +223,7 @@ async def main() -> None:
         messages=[
             {
                 "role": "user",
-                "content": "asyncio가 필요한 상황을 두 가지로 설명해 주세요.",
+                "content": "Give me two situations where asyncio is useful.",
             }
         ],
     )
@@ -461,46 +233,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-차이는 두 가지뿐입니다. `Groq` 대신 `AsyncGroq`를 쓰고, API 호출 앞에 `await`를 붙입니다. 구조는 거의 같습니다. 그래서 입문 시점에는 “동기 코드로 개념을 익히고, 웹 앱으로 가져갈 때 비동기로 옮긴다”는 순서가 무난합니다.
-
-여러 요청을 동시에 보내는 장점도 비동기에서 분명해집니다. 아래 예시는 세 질문을 병렬로 호출합니다. 이 코드는 바로 실행할 수 있는 완전한 예제입니다.
-
-```python
-import asyncio
-import os
-
-from groq import AsyncGroq
-
-client = AsyncGroq(api_key=os.environ["GROQ_API_KEY"])
-
-async def ask(question: str) -> str:
-    completion = await client.chat.completions.create(
-        model="llama-3.1-8b-instant",
-        messages=[{"role": "user", "content": question}],
-    )
-    return completion.choices[0].message.content or ""
-
-async def main() -> None:
-    questions = [
-        "리스트와 튜플의 차이를 설명해 주세요.",
-        "파이썬 딕셔너리의 핵심 특징을 설명해 주세요.",
-        "예외 처리가 필요한 이유를 설명해 주세요.",
-    ]
-    answers = await asyncio.gather(*(ask(question) for question in questions))
-
-    for index, answer in enumerate(answers, start=1):
-        print(f"[{index}] {answer}\n")
-
-asyncio.run(main())
-```
-
-물론 동시에 많이 보낸다고 해서 항상 더 좋은 것은 아닙니다. API 제한, 재시도, 백오프, 타임아웃 같은 운영 문제는 곧바로 따라옵니다. 그 주제는 후속 시리즈에서 다루겠습니다. 지금은 비동기 패턴이 “문법 장난”이 아니라 동시성 제어 수단이라는 점만 잡고 가면 됩니다.
-
----
-
-## 실제 실행 가능한 완성 예제
-
-마지막으로, 오늘 내용을 한 파일에 모은 실행 예제를 보겠습니다. 이 코드는 환경변수를 읽고, 요청을 보내고, 응답 본문과 메타데이터를 함께 출력합니다. Post 01의 최소 완성본이라고 생각하면 됩니다.
+여러 요청을 동시에 다루는 구조는 이후 `asyncio.gather()` 같은 병렬 패턴으로 확장됩니다. 이 글에서는 첫 성공 경로와 구조 이해가 우선이므로, 마지막으로 기준점이 되는 완성 예제 하나만 남기겠습니다.
 
 ```python
 import os
@@ -520,8 +253,8 @@ def main() -> None:
             {
                 "role": "user",
                 "content": (
-                    "Python 초급자에게 함수와 메서드의 차이를 5문장 이내로 설명하고, "
-                    "짧은 예시 한 줄을 덧붙여 주세요."
+                    "Explain the difference between a Python function and a method "
+                    "in no more than five sentences, and add one short example line."
                 ),
             },
         ],
@@ -543,57 +276,31 @@ if __name__ == "__main__":
     main()
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+## 흔히 헷갈리는 지점
 
-    === answer ===
-    함수는 프로그램의 일부를 독립적으로 묶어두어 다른 프로그램 부분에서 호출할 수 있도록 만든 것임을 알려 드리겠습니다. 메서드 또한 함수의 일종으로 클래스 내에서 정의되는 함수입니다. 메서드는 클래스의 속성이지만 함수는 클래스 밖에 정의됩니다. 예를 들어 `print()` 함수를 호출할 수 있지만 `str` 클래스에서 `upper()` 메서드를 호출해 주목적인 `upper()`를 사용할 수 있습니다.
-
-    ```python
-    print("Hello, World!")  # 함수 호출
-    "Hello, World!".upper()  # 메서드 호출
-    ```
-
-    === metadata ===
-    model: llama-3.1-8b-instant
-    prompt_tokens: 81
-    completion_tokens: 136
-    total_tokens: 217
-
-<!-- injected-output:end -->
-
-저장 파일명을 `first_call.py`라고 가정하면 실행은 아래처럼 합니다.
-
-```bash
-python first_call.py
-```
-
-정상 동작 기준은 세 가지입니다.
-
-- 본문 텍스트가 출력된다.
-- `model`에 `llama-3.1-8b-instant`가 보인다.
-- `prompt_tokens`, `completion_tokens`, `total_tokens`가 숫자로 찍힌다.
-
-여기까지 왔다면 이미 LLM 앱의 첫 번째 관문은 통과한 셈입니다. 이후에 붙는 프롬프트 엔지니어링, 멀티턴 상태, 스트리밍, 캐싱은 모두 이 기본 호출을 변형한 것입니다.
-
----
-
-## 마무리
-
-오늘 만든 코드는 짧지만, 그 안에 LLM 앱의 핵심 구조가 그대로 들어 있습니다. 환경변수에서 키를 읽고, 클라이언트를 만들고, 메시지 배열과 모델명을 보내고, 응답에서 본문과 사용량을 꺼냅니다. 이 패턴은 공급자가 바뀌어도 거의 유지됩니다.
-
-다음 글에서는 응답 구조에서 잠깐만 보고 지나간 토큰을 본격적으로 다룹니다. 프롬프트가 길어질수록 비용이 어떻게 커지는지, 컨텍스트 창이 왜 중요한지, 왜 어떤 요청은 갑자기 잘리거나 비싸지는지를 수치로 이해해 보겠습니다.
+- SDK를 쓰면 HTTP 경계가 사라진다고 생각하기 쉽지만, 인증·속도 제한·네트워크 지연은 그대로 남습니다.
+- `choices[0].message.content`만 읽으면 충분하다고 느끼기 쉽지만, 실제 운영에서는 `usage`, `model`, `finish_reason`도 함께 봐야 합니다.
+- 비동기 호출은 더 고급 기능처럼 보이지만, 본질은 여러 I/O를 동시에 기다리는 구조 선택입니다. 품질 자체를 올려 주는 기능은 아닙니다.
+- 첫 호출 실패를 프롬프트 문제로 오해하기 쉽지만, 입문 단계에서는 인증 키 누락, 잘못된 모델 ID, 메시지 형식 오류가 더 흔합니다.
 
 ## 운영 체크리스트
 
-- [ ] `GROQ_API_KEY`가 환경변수로 설정되어 있고, 코드에는 키 문자열이 노출되어 있지 않다
-- [ ] `pip install groq`로 SDK를 설치했고 `import groq`가 에러 없이 동작한다
-- [ ] `client.chat.completions.create(model=..., messages=[...])` 호출이 200 응답을 반환한다
-- [ ] 응답에서 `choices[0].message.content`, `usage.total_tokens`, `model`을 모두 출력해 보았다
-- [ ] 동일한 호출을 동기·비동기 두 방식으로 각각 한 번씩 실행해 보았다
+- [ ] `GROQ_API_KEY`를 환경변수로 주입했고 소스코드에 키 문자열을 넣지 않았습니다.
+- [ ] `pip install groq` 이후 `import groq`가 정상 동작합니다.
+- [ ] `client.chat.completions.create(model=..., messages=[...])` 호출이 정상 응답을 반환합니다.
+- [ ] 응답에서 `choices[0].message.content`, `usage.total_tokens`, `model`을 함께 기록합니다.
+- [ ] 같은 호출을 동기와 비동기 방식으로 각각 한 번씩 실행해 차이를 확인했습니다.
+
+## 정리
+
+첫 번째 LLM API 호출은 작아 보여도 이미 핵심 구조를 다 담고 있습니다. 환경변수에서 키를 읽고, 클라이언트를 만들고, 모델과 메시지를 보내고, 응답에서 본문과 메타데이터를 읽습니다. 이후의 모든 기능은 이 루프를 더 정교하게 다루는 과정에 가깝습니다.
+
+이 글에서 꼭 가져가야 할 감각은 세 가지입니다. 첫째, SDK는 편의 계층일 뿐이고 기본 계약은 여전히 JSON 요청과 JSON 응답입니다. 둘째, 본문만 보지 말고 토큰 사용량과 모델명과 종료 이유까지 함께 읽어야 운영 감각이 생깁니다. 셋째, 동기와 비동기는 품질 문제가 아니라 애플리케이션 구조 문제입니다.
+
+다음 글에서는 같은 호출을 유지한 채 토큰을 중심에 놓고 보겠습니다. 길이 제한, 비용, 지연 시간은 결국 토큰 예산 문제로 수렴합니다. 첫 호출의 구조를 이해했다면, 이제 그 구조를 숫자로 읽을 차례입니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## 이 시리즈의 다른 글
 
 - **LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기 (현재 글)**
 - 토큰 이해하기 — 비용, 한계, 컨텍스트 창 (예정)
@@ -604,13 +311,19 @@ python first_call.py
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
+
+### 공식 문서
 
 - [Groq quickstart](https://console.groq.com/docs/quickstart)
 - [Groq Python SDK](https://github.com/groq/groq-python)
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Groq models](https://console.groq.com/docs/models)
+
+### 관련 시리즈
+
+- [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
+- [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
+- [구조화 출력 — JSON 모드와 응답 스키마](../../llm-api-production-101/ko/01-structured-output.md)
 
 Tags: LLM, OpenAI, Prompt Engineering, Python

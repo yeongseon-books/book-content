@@ -14,89 +14,77 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-12'
 seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
 # 대화 상태 관리 — 멀티턴 챗봇 만들기
 
-> LLM 앱 기초 시리즈 (5/6)
+챗봇을 처음 만들면 많은 입문자가 같은 장면을 봅니다. 첫 질문에는 잘 답했는데, 두 번째 질문에서 방금 한 말을 잊어버립니다. 사용자는 당연히 “대화 중”이라고 느끼지만, 모델은 마치 새 세션처럼 반응합니다. 이 장면은 버그처럼 보이지만 사실 API 계약에 더 가깝습니다.
 
-예제 코드: [github.com/yeongseon-books/llm-app-foundations-101](https://github.com/yeongseon-books/llm-app-foundations-101/tree/main/ko/05-conversation-state)
+LLM은 기본적으로 애플리케이션의 대화 상태를 무료로 보관해 주지 않습니다. 챗봇이 상태를 가진 것처럼 보이는 이유는 애플리케이션이 이전 맥락을 다시 모아 보내기 때문입니다. 즉, 기억은 모델 안의 숨은 능력이 아니라 애플리케이션이 소유하는 자료구조입니다.
 
-아래 다이어그램은 멀티턴 챗봇에서 메시지 이력이 누적되는 기본 흐름을 요약합니다.
+이 차이를 빨리 이해해야 멀티턴 설계가 쉬워집니다. 메모리를 모델의 신비한 능력으로 보면 디버깅도 어려워지고 정책도 흐려집니다. 반대로 메모리를 내가 직접 관리하는 상태라고 보면, 어떤 사실을 남기고 어떤 사실을 버릴지, 언제 요약할지, 어디서 비용을 줄일지 설계 포인트가 분명해집니다.
 
-![대화 상태 관리: 멀티턴 챗봇 만들기](../../../assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.ko.png)
+이 글은 LLM App Foundations 101 시리즈의 다섯 번째 글입니다.
 
-*대화 상태 관리: 멀티턴 챗봇 만들기*
-챗봇 UI를 처음 붙이면 많은 입문자가 같은 장면을 봅니다. 첫 질문에는 잘 답했는데, 두 번째 질문에서 방금 한 말을 잊어버립니다. 사용자는 대화를 이어 간다고 느끼는데 모델은 문맥이 끊긴 듯 반응합니다. 여기서 중요한 사실 하나를 먼저 분명히 해야 합니다. LLM은 기본적으로 상태를 들고 있지 않습니다. 우리가 매번 “대화처럼” 보이게 만들어 주기 때문에 대화가 되는 것입니다.
+여기서는 대화 메모리를 모델 기능이 아니라 애플리케이션 상태 관리 문제로 보고, 멀티턴 챗봇의 최소 구조를 정리하겠습니다.
 
-실무에서는 이 차이를 빨리 이해해야 합니다. 상태가 없는 모델 앞에 상태가 있는 애플리케이션을 세우는 순간, 누가 무엇을 기억하고 누가 무엇을 다시 보내는지 설계해야 하기 때문입니다. 메모리를 모델이 갖는다고 생각하면 디버깅이 어려워지고, 메모리를 애플리케이션이 관리한다고 이해하면 문제를 훨씬 명확하게 쪼갤 수 있습니다.
+## 이 글에서 다룰 문제
 
-이 글은 LLM 앱 기초 시리즈의 다섯 번째 글입니다. 여기서는 Groq의 `llama-3.1-8b-instant`를 기준으로 멀티턴 대화의 기본 구조를 정리하고, Python CLI 챗봇으로 끝까지 구현해 봅니다. 범위는 일곱 가지입니다.
+- LLM 호출이 stateless하다는 말은 멀티턴 설계에 어떤 제약을 줄까요?
+- 전체 이력 유지, 슬라이딩 윈도우, 요약 압축은 각각 언제 적합할까요?
+- 컨텍스트 초과는 실패 후가 아니라 어떻게 실패 전에 감지해야 할까요?
+- 요약 압축 프롬프트는 무엇을 보존하고 무엇을 버리게 설계해야 할까요?
+- 실용적인 CLI 챗봇을 만들려면 어떤 상태 조각이 최소한 필요할까요?
 
-- 왜 LLM이 본질적으로 stateless한지
-- `messages` 배열 누적으로 멀티턴 대화가 만들어지는 원리
-- 전체 이력을 유지하는 가장 단순한 메모리 패턴
-- 최근 N턴만 남기는 sliding window 패턴
-- 긴 대화에 대응하는 요약 기반 압축 패턴
-- 입력 루프와 이력 관리가 들어간 실용적인 CLI 챗봇 구현
-- 컨텍스트 창 초과를 미리 감지하고 줄이는 실전 대응
+## 왜 이 글이 중요한가
 
-포인트는 단순합니다. **멀티턴 챗봇의 기억은 모델 안이 아니라 애플리케이션 쪽 자료구조에 있습니다.**
+프롬프트 설계가 정적인 입력 구조를 다루는 문제였다면, 대화 상태 관리는 시간이 흐르면서 변하는 입력 구조를 다루는 문제입니다. 멀티턴 시스템은 매번 새로운 요청을 보내지만, 동시에 이전 결정과 사용자 선호, 아직 해결되지 않은 질문도 어느 정도 유지해야 합니다. 이 균형이 바로 챗봇 품질의 핵심입니다.
 
----
+또한 상태 관리는 곧 비용 관리이기도 합니다. 이력을 전부 보존하면 맥락은 강해지지만 토큰 비용이 계속 증가합니다. 너무 짧게 자르면 저렴하지만 중요한 사실을 잃습니다. 요약을 쓰면 오래 버틸 수 있지만, 잘못 요약하면 왜곡된 기억이 세션 전체를 오염시킵니다. 따라서 메모리 정책은 단순한 편의 기능이 아니라 시스템 설계 결정입니다.
 
-## LLM은 왜 상태가 없는가
+무엇보다 멀티턴 품질 문제는 대개 모델보다 상태 전략에서 먼저 해결됩니다. “왜 이 사실을 잊었지?”라는 질문은 모델 파라미터보다 메시지 재구성 로직을 먼저 봐야 답이 나옵니다. 그래서 대화 상태를 이해하는 순간부터 챗봇 개발은 프롬프트 실험이 아니라 애플리케이션 엔지니어링으로 성격이 바뀝니다.
 
-![이력 재전송 유무에 따른 상태 차이](../../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.ko.png)
+## 멀티턴 메모리를 이해하는 가장 좋은 방법: 모델의 숨은 기억이 아니라 매 요청마다 다시 조립되는 상태로 보는 것입니다
 
-*이력 재전송 유무에 따른 상태 차이*
-채팅 제품을 쓰다 보면 모델이 세션을 기억하는 것처럼 보이지만, API 경계에서는 그렇지 않습니다. `client.chat.completions.create()` 호출 하나는 그 요청 본문 안에 들어 있는 정보만 보고 답합니다. 서버가 이전 요청의 의미를 자동으로 이어 붙여 주지 않습니다.
+각 채팅 호출은 독립적입니다. 모델은 오직 현재 요청에 들어 있는 메시지 배열만 봅니다. 따라서 멀티턴 대화는 “기억하는 모델”의 결과가 아니라 “이전 문맥을 재전송하는 애플리케이션”의 결과입니다. 이 전제를 받아들이면 상태 관리 문제는 훨씬 평범해집니다. 어떤 데이터를 저장하고, 어떤 규칙으로 다시 조립하고, 언제 줄일지 결정하는 문제로 바뀌기 때문입니다.
 
-예를 들어 첫 번째 요청에서 아래 메시지를 보냈다고 하겠습니다.
+이 관점이 중요한 이유는 memory policy가 그대로 비용 정책과 품질 정책이 되기 때문입니다. 전체 이력을 유지하면 단순하지만 비싸고, 슬라이딩 윈도우는 예산이 예측 가능하지만 오래된 사실을 잃고, 요약 압축은 긴 세션에 유리하지만 정보 손실 위험을 동반합니다.
+
+> 멀티턴 챗봇의 기억은 모델 안에 숨어 있는 능력이 아니라, 애플리케이션이 매 요청마다 재구성하는 상태 계약입니다.
+
+## 핵심 개념
+
+![멀티턴 이력이 누적되는 전체 구조](../../../assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.ko.png)
+
+*멀티턴 이력이 누적되는 전체 구조*
+
+첫 원칙은 단순합니다. LLM 호출은 stateless합니다. 현재 요청에 실린 내용만 봅니다. 예를 들어 첫 요청에서 이름을 알려 주고, 두 번째 요청에서 그 이름을 다시 묻더라도 이전 턴을 재전송하지 않으면 모델은 답할 근거가 없습니다.
+
+![이력 재전송 유무가 상태를 가르는 차이](../../../assets/llm-app-foundations-101/05/05-01-why-llm-calls-are-stateless.ko.png)
+
+*이력 재전송 유무가 상태를 가르는 차이*
 
 ```python
 messages = [
-    {"role": "user", "content": "내 이름은 민준이야. 기억해 줘."}
+    {"role": "user", "content": "My name is Mina. Please remember that."}
 ]
 ```
-
-이때 모델은 “민준”이라는 정보를 사용해 답할 수 있습니다. 하지만 두 번째 요청에서 아래처럼 보내면 상황이 달라집니다.
 
 ```python
 messages = [
-    {"role": "user", "content": "내 이름이 뭐였지?"}
+    {"role": "user", "content": "What is my name?"}
 ]
 ```
 
-두 번째 요청 본문에는 `민준`이라는 문자열이 없습니다. 개발자가 첫 번째 턴을 다시 보내지 않았기 때문입니다. 모델 입장에서는 완전히 새로운 작업입니다. 이 점이 stateless의 의미입니다. 요청 A와 요청 B 사이의 연결을 모델이 암묵적으로 보존하지 않습니다.
+이 구조는 단점만 있는 것이 아닙니다. 요청 재현이 쉽고, 어떤 문맥이 실제로 모델에 들어갔는지 로그로 추적할 수 있으며, 보존 정책을 애플리케이션이 통제할 수 있습니다.
 
-이 구조가 꼭 단점만은 아닙니다. 오히려 운영 관점에서는 장점도 큽니다.
+멀티턴 대화는 결국 이력을 다시 보내는 루프입니다.
 
-- 요청 하나를 독립적으로 재현하기 쉽습니다.
-- 어떤 문맥이 모델에 들어갔는지 명시적으로 추적할 수 있습니다.
-- 메모리 정책을 애플리케이션에서 통제할 수 있습니다.
-- 개인정보 보존 범위를 코드 레벨에서 결정할 수 있습니다.
+![이전 턴들을 누적해 다음 요청을 만드는 루프](../../../assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.ko.png)
 
-결국 챗봇의 “기억”은 모델의 능력이 아니라 애플리케이션의 입력 재구성 능력입니다.
-
----
-
-## 멀티턴 대화는 messages 배열 누적으로 만듭니다
-
-![사용자 턴마다 이력이 누적되는 흐름](../../../assets/llm-app-foundations-101/05/05-02-multi-turn-chat-comes-from-replaying-his.ko.png)
-
-*사용자 턴마다 이력이 누적되는 흐름*
-멀티턴 대화의 원리는 의외로 단순합니다. 새 질문을 보낼 때 이전 턴들을 함께 다시 보냅니다. 모델은 그 배열을 읽고 “지금까지 이런 대화가 있었고, 이제 이 다음 답을 해야 한다”고 해석합니다.
-
-채팅 API에서 대화 이력은 보통 아래 세 역할로 표현합니다.
-
-- `system`: 전체 행동 규칙
-- `user`: 사용자의 입력
-- `assistant`: 모델이 앞서 답한 내용
-
-가장 작은 멀티턴 예제는 아래와 같습니다.
+*이전 턴들을 누적해 다음 요청을 만드는 루프*
 
 ```python
 import os
@@ -108,14 +96,14 @@ client = Groq(api_key=os.environ["GROQ_API_KEY"])
 messages = [
     {
         "role": "system",
-        "content": "당신은 짧고 정확하게 답하는 Python 튜터입니다.",
+        "content": "You are a concise Python tutor.",
     },
-    {"role": "user", "content": "리스트와 튜플의 차이를 설명해 줘."},
+    {"role": "user", "content": "Explain the difference between a list and a tuple."},
     {
         "role": "assistant",
-        "content": "리스트는 변경 가능하고, 튜플은 변경 불가능합니다.",
+        "content": "A list is mutable, while a tuple is immutable.",
     },
-    {"role": "user", "content": "그럼 둘 중 어느 쪽이 딕셔너리 키로 더 적합해?"},
+    {"role": "user", "content": "Which one is better as a dictionary key then?"},
 ]
 
 completion = client.chat.completions.create(
@@ -127,32 +115,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+가장 단순한 메모리 패턴은 전체 이력 유지입니다.
 
-    튜플이 더 적합합니다. 튜플은 변경 불가능하고, 딕셔너리 키는 변경 불가능해야 하기 때문입니다.
+![전체 이력을 계속 보낼 때의 장단점](../../../assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.ko.png)
 
-<!-- injected-output:end -->
-
-여기서 핵심은 마지막 질문 하나가 아니라 그 앞에 붙어 있는 이력입니다. 모델은 `그럼`과 `둘 중`이 무엇을 가리키는지 스스로 추론하는 것이 아니라, 앞선 메시지에서 그 대상을 읽습니다. 같은 질문을 이력 없이 보내면 훨씬 덜 안정적인 답이 나옵니다.
-
-이 패턴을 구현할 때 애플리케이션은 보통 다음 순서를 반복합니다.
-
-1. 사용자 입력을 이력 리스트에 추가합니다.
-2. 그 시점의 `messages` 전체를 모델에 보냅니다.
-3. 모델 응답을 받아 다시 이력 리스트에 추가합니다.
-4. 다음 사용자 입력을 기다립니다.
-
-바로 이 반복이 멀티턴 챗봇의 본체입니다.
-
----
-
-## 전체 이력 유지는 가장 단순한 시작점입니다
-
-![전체 이력 payload가 커지는 구조](../../../assets/llm-app-foundations-101/05/05-03-keeping-the-full-history-is-the-simplest.ko.png)
-
-*전체 이력 payload가 커지는 구조*
-가장 먼저 구현하기 쉬운 방식은 전체 이력을 계속 들고 가는 것입니다. 버그가 적고 이해도 쉽습니다. 대화가 짧거나 내부 운영 도구처럼 세션 길이가 제한된 경우에는 지금도 충분히 실용적입니다.
+*전체 이력을 계속 보낼 때의 장단점*
 
 ```python
 import os
@@ -164,7 +131,7 @@ client = Groq(api_key=os.environ["GROQ_API_KEY"])
 history = [
     {
         "role": "system",
-        "content": "당신은 간결한 기술 지원 도우미입니다.",
+        "content": "You are a concise technical support assistant.",
     }
 ]
 
@@ -181,36 +148,17 @@ def ask(user_text: str) -> str:
     history.append({"role": "assistant", "content": answer})
     return answer
 
-print(ask("내 서비스는 월 구독형 SaaS야. 기억해 줘."))
-print(ask("그럼 환불 정책 문구를 한 줄로 써 줘."))
+print(ask("My product is a monthly SaaS service. Please remember that."))
+print(ask("Now write a one-line refund policy statement."))
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
+이 방식은 이해와 디버깅이 가장 쉽지만, 턴이 늘수록 비용과 지연도 함께 증가합니다.
 
-    네, 월 구독형 SaaS 서비스입니다. 어떤 도움을 드릴까요?
-    "월 구독은 자동 연장되며, 30일 이내에 구독을 취소하시면 다음 월의 결제가 취소됩니다."
+다음 기본 패턴은 최근 N턴만 남기는 슬라이딩 윈도우입니다.
 
-<!-- injected-output:end -->
+![전체 이력, 윈도우, 요약 압축의 차이 비교](../../../assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.ko.png)
 
-이 방식의 장점은 분명합니다.
-
-- 구현이 가장 쉽습니다.
-- 문맥 보존력이 가장 좋습니다.
-- 응답 품질이 흔들릴 때 원인을 추적하기 쉽습니다.
-
-반면 약점도 뚜렷합니다. 대화가 길어질수록 프롬프트 토큰이 계속 늘어납니다. 응답이 느려지고, 비용이 늘고, 결국 컨텍스트 창 한계에 닿습니다. 사용자가 한 시간 동안 대화한 이력을 처음부터 끝까지 매번 다시 보내는 구조이기 때문입니다.
-
-그래서 전체 이력 유지는 입문 단계의 기준선으로는 좋지만, 길게 이어지는 세션의 기본 해법으로 두기에는 부담이 큽니다.
-
----
-
-## sliding window는 최근 N턴만 남깁니다
-
-![전체 이력과 window 요약 방식 비교](../../../assets/llm-app-foundations-101/05/05-04-sliding-windows-retain-only-the-last-n-t.ko.png)
-
-*전체 이력과 window 요약 방식 비교*
-대화 길이가 길어질수록 보통 중요한 정보는 최근 구간에 몰립니다. 이 점을 이용한 방식이 sliding window입니다. 시스템 프롬프트는 고정으로 유지하고, 최근 N개의 user/assistant 턴만 남깁니다.
+*전체 이력, 윈도우, 요약 압축의 차이 비교*
 
 ```python
 import os
@@ -222,9 +170,9 @@ client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 system_message = {
     "role": "system",
-    "content": "당신은 Python 학습을 돕는 챗봇입니다.",
+    "content": "You are a chatbot that helps users learn Python.",
 }
-recent_turns = deque(maxlen=6)  # 최근 3턴(user+assistant)
+recent_turns = deque(maxlen=6)  # last 3 user/assistant pairs
 
 def ask(user_text: str) -> str:
     recent_turns.append({"role": "user", "content": user_text})
@@ -241,29 +189,9 @@ def ask(user_text: str) -> str:
     return answer
 ```
 
-이 패턴은 토큰 사용량을 예측하기 쉽다는 장점이 있습니다. 메모리 크기가 고정되기 때문입니다. 다만 중요한 사실 하나를 놓치면 안 됩니다. 최근 대화만 남기므로 오래전 제약이나 사용자 선호가 사라질 수 있습니다. 예를 들어 처음에 “항상 한국어로 답해 줘”, “내 서비스 이름은 AcmeCloud야” 같은 정보가 나왔고 그것이 `system`으로 승격되지 않았다면, 윈도우 밖으로 밀려난 순간 모델도 잊습니다.
+이 방식은 예산을 통제하기 쉽지만, 창 밖으로 밀려난 사실은 모델도 함께 잃습니다. 오래 유지해야 할 사실은 `system`이나 별도 요약으로 승격해야 합니다.
 
-실무에서는 sliding window가 특히 잘 맞는 경우가 있습니다.
-
-- 고객 지원처럼 최근 맥락이 가장 중요한 대화
-- 길이가 짧고 회전이 빠른 Q&A 세션
-- 세션당 비용 상한을 명확히 잡아야 하는 서비스
-
-반대로 긴 작업형 대화에서는 이 방식만으로 부족할 수 있습니다. 그때 다음 패턴이 필요합니다.
-
----
-
-## 요약 기반 압축은 긴 대화를 짧게 접습니다
-
-오래된 이력을 다 버리기는 아깝고, 그대로 다 들고 가기에는 너무 길다면 중간 지점이 필요합니다. 가장 많이 쓰는 방법이 요약 기반 압축입니다. 오래된 대화를 한 덩어리 요약으로 바꾸고, 최근 몇 턴만 원문으로 유지합니다.
-
-구조는 보통 세 조각입니다.
-
-- 고정 `system` 메시지
-- 이전 대화의 핵심을 압축한 `summary`
-- 최근 raw turn 몇 개
-
-아래는 가장 기초적인 구현 예제입니다.
+긴 세션에서는 요약 압축이 필요합니다.
 
 ```python
 import os
@@ -274,7 +202,7 @@ client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 system_message = {
     "role": "system",
-    "content": "당신은 프로젝트 관리 챗봇입니다.",
+    "content": "You are a project-planning chatbot.",
 }
 summary_text = ""
 recent_turns = []
@@ -284,15 +212,15 @@ def summarize_history(history_chunk: list[dict[str, str]], current_summary: str)
         {
             "role": "system",
             "content": (
-                "다음 대화 이력을 짧게 압축하세요. "
-                "반드시 아래 항목을 유지하세요: 사용자 목표, 확정된 사실, 미해결 항목."
+                "Compress the conversation. Preserve user goals, confirmed facts, "
+                "preferences, and unresolved questions."
             ),
         },
         {
             "role": "user",
             "content": (
-                f"기존 요약:\n{current_summary or '(없음)'}\n\n"
-                f"새로 압축할 대화:\n{history_chunk}"
+                f"Current summary:\n{current_summary or '(none)'}\n\n"
+                f"New history chunk:\n{history_chunk}"
             ),
         },
     ]
@@ -310,7 +238,7 @@ def build_messages(user_text: str) -> list[dict[str, str]]:
         messages.append(
             {
                 "role": "system",
-                "content": f"이전 대화 요약:\n{summary_text}",
+                "content": f"Conversation summary:\n{summary_text}",
             }
         )
     messages.extend(recent_turns)
@@ -318,25 +246,13 @@ def build_messages(user_text: str) -> list[dict[str, str]]:
     return messages
 ```
 
-실전에서 중요한 점은 요약을 아무 정보나 뭉개는 용도로 쓰지 않는 것입니다. 요약이 잘못되면 그 뒤의 모든 응답이 잘못된 기억 위에서 이어집니다. 따라서 요약 프롬프트에는 보통 아래 항목을 넣습니다.
+요약은 본질적으로 손실 압축이므로 무엇을 보존할지 명확해야 합니다. 사용자 목표, 확정 사실, 선호, 미해결 질문 같은 지속 정보가 우선입니다.
 
-- 사용자의 장기 목표
-- 이미 합의한 사실
-- 선호 언어, 형식, 제약
-- 아직 해결되지 않은 질문
+긴 세션의 실패는 대부분 컨텍스트 예산 초과에서 시작합니다. 그래서 사전 감지가 중요합니다.
 
-요약은 토큰을 줄여 주지만, 손실 압축이라는 점을 잊으면 안 됩니다. 원문을 버리는 순간 세부 맥락 일부는 되돌릴 수 없습니다.
+![요청 실패 전에 예산을 점검하는 흐름](../../../assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.ko.png)
 
----
-
-## 컨텍스트 창 초과는 미리 감지하고 줄여야 합니다
-
-![컨텍스트 초과 전 예산 점검 분기](../../../assets/llm-app-foundations-101/05/05-05-detecting-context-overflow-before-the-re.ko.png)
-
-*컨텍스트 초과 전 예산 점검 분기*
-멀티턴 챗봇에서 흔한 장애는 모델 품질보다도 입력이 너무 길어지는 문제입니다. 대화가 계속 누적되면 어느 순간 provider가 요청을 거절하거나, 응답 길이를 줄이느라 품질이 흔들립니다. 이를 피하려면 보내기 전에 길이를 대략이라도 점검해야 합니다.
-
-토큰을 정확히 세는 전용 토크나이저가 가장 좋지만, 입문 단계에서는 거친 추정치만으로도 충분히 위험 신호를 잡을 수 있습니다. 아래 예제는 문자 수 기반으로 입력 길이를 대강 추정합니다.
+*요청 실패 전에 예산을 점검하는 흐름*
 
 ```python
 def rough_token_count(messages: list[dict[str, str]]) -> int:
@@ -352,195 +268,37 @@ def enforce_budget(messages: list[dict[str, str]], max_input_tokens: int = 6000)
     if rough_token_count(trimmed) <= max_input_tokens:
         return trimmed
 
-    raise ValueError("대화 이력이 너무 깁니다. 더 공격적인 요약이 필요합니다.")
+    raise ValueError("Conversation is too long. A more aggressive summary is required.")
 ```
 
-거친 추정이더라도 운영 가치는 있습니다. 너무 긴 요청을 보내기 전에 아래 같은 대응을 자동화할 수 있기 때문입니다.
+이제 이를 하나의 CLI 챗봇으로 합치면 상태 위치가 더 또렷해집니다. 핵심은 `system_message`, `recent_turns`, `summary_text`, `MAX_INPUT_TOKENS` 같은 값이 모두 애플리케이션 쪽 상태라는 점입니다. 실제 구현에서는 `/reset`, `/summary`, `/quit` 같은 명령을 제공하고, 요청 전 길이를 점검한 뒤 초과 시 오래된 턴을 요약으로 접는 흐름이 기본 골격이 됩니다. 프로덕션 환경이라면 이 상태를 메모리 변수 대신 Redis나 데이터베이스로 옮기고, 요약 성공 여부와 토큰 사용량을 함께 로깅하는 편이 안전합니다.
 
-- 오래된 raw turn을 요약으로 압축
-- sliding window 크기를 줄임
-- 응답 최대 길이를 낮춤
-- 사용자에게 세션을 새로 시작하도록 안내
+## 흔히 헷갈리는 지점
 
-한 가지 더 실용적인 팁을 덧붙이면, 응답 이후 `completion.usage`를 로그로 남기는 습관이 좋습니다. 그래야 어떤 사용자 세션이 비용을 밀어 올리는지, 어느 지점에서 프롬프트가 급격히 커지는지 잡아낼 수 있습니다.
-
----
-
-## 실용적인 CLI 챗봇을 완성해 봅시다
-
-이제 앞선 패턴을 한 파일로 모아 보겠습니다. 아래 예제는 네 가지를 함께 처리합니다.
-
-- 입력 루프
-- 전체 이력 저장
-- 길이 예산 초과 시 요약 압축
-- 최근 몇 턴만 raw 형태로 유지
-
-```python
-import os
-from typing import List, Dict
-
-from groq import Groq
-
-MODEL = "llama-3.1-8b-instant"
-MAX_INPUT_TOKENS = 6000
-RAW_TURN_LIMIT = 6  # 최근 3턴(user+assistant)
-
-client = Groq(api_key=os.environ["GROQ_API_KEY"])
-
-system_message = {
-    "role": "system",
-    "content": (
-        "당신은 실무형 Python 및 LLM 앱 도우미입니다. "
-        "모르면 모른다고 말하고, 답변은 짧고 정확하게 유지하세요."
-    ),
-}
-
-summary_text = ""
-recent_turns: List[Dict[str, str]] = []
-
-def rough_token_count(messages: List[Dict[str, str]]) -> int:
-    total_chars = sum(len(message["content"]) for message in messages)
-    overhead = len(messages) * 12
-    return (total_chars // 4) + overhead
-
-def summarize_old_turns(old_turns: List[Dict[str, str]], current_summary: str) -> str:
-    completion = client.chat.completions.create(
-        model=MODEL,
-        temperature=0.1,
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "대화 이력을 압축 요약하세요. "
-                    "반드시 사용자 목표, 확정된 사실, 선호, 미해결 질문을 남기세요."
-                ),
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"기존 요약:\n{current_summary or '(없음)'}\n\n"
-                    f"추가할 대화:\n{old_turns}"
-                ),
-            },
-        ],
-    )
-    return completion.choices[0].message.content or current_summary
-
-def build_messages(user_text: str) -> List[Dict[str, str]]:
-    messages: List[Dict[str, str]] = [system_message]
-
-    if summary_text:
-        messages.append(
-            {
-                "role": "system",
-                "content": f"이전 대화 요약:\n{summary_text}",
-            }
-        )
-
-    messages.extend(recent_turns)
-    messages.append({"role": "user", "content": user_text})
-    return messages
-
-def compress_if_needed(next_user_text: str) -> None:
-    global summary_text, recent_turns
-
-    candidate = build_messages(next_user_text)
-    if rough_token_count(candidate) <= MAX_INPUT_TOKENS:
-        return
-
-    if len(recent_turns) > RAW_TURN_LIMIT:
-        old_turns = recent_turns[:-RAW_TURN_LIMIT]
-        recent_turns = recent_turns[-RAW_TURN_LIMIT:]
-        summary_text = summarize_old_turns(old_turns, summary_text)
-
-    candidate = build_messages(next_user_text)
-    if rough_token_count(candidate) > MAX_INPUT_TOKENS:
-        raise ValueError("입력이 너무 깁니다. /reset으로 새 세션을 시작하세요.")
-
-def ask(user_text: str) -> str:
-    compress_if_needed(user_text)
-
-    messages = build_messages(user_text)
-    completion = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=0.3,
-    )
-
-    answer = completion.choices[0].message.content or ""
-    recent_turns.append({"role": "user", "content": user_text})
-    recent_turns.append({"role": "assistant", "content": answer})
-
-    usage = completion.usage
-    print(f"[tokens] prompt={usage.prompt_tokens} total={usage.total_tokens}")
-    return answer
-
-def main() -> None:
-    global summary_text, recent_turns
-
-    print("멀티턴 챗봇을 시작합니다. /reset, /summary, /quit 명령을 지원합니다.")
-
-    while True:
-        user_text = input("you> ").strip()
-
-        if not user_text:
-            continue
-        if user_text == "/quit":
-            break
-        if user_text == "/reset":
-            summary_text = ""
-            recent_turns = []
-            print("assistant> 세션을 초기화했습니다.")
-            continue
-        if user_text == "/summary":
-            print(f"assistant> 현재 요약:\n{summary_text or '(없음)'}")
-            continue
-
-        try:
-            answer = ask(user_text)
-            print(f"assistant> {answer}\n")
-        except ValueError as exc:
-            print(f"assistant> {exc}\n")
-
-if __name__ == "__main__":
-    main()
-```
-
-이 예제의 의도는 프레임워크를 보여 주는 데 있지 않습니다. 실제 상태 관리 책임이 어디 있는지 드러내는 데 있습니다. `summary_text`, `recent_turns`, `MAX_INPUT_TOKENS`가 모두 애플리케이션 계층에 있습니다. 모델은 그때그때 조립된 입력만 받습니다.
-
-운영 코드로 가져갈 때는 몇 가지를 더 붙이면 좋습니다.
-
-- 세션별 이력을 메모리 대신 DB나 Redis에 저장
-- 사용자별 요약을 별도 컬럼으로 분리
-- 토큰 사용량과 지연 시간을 구조화 로그로 기록
-- 실패한 요약 요청에 대한 재시도와 백오프 추가
-
----
-
-## 어떤 메모리 패턴을 언제 고를까
-
-세 패턴을 한 문장으로 정리하면 이렇습니다. 짧은 세션이면 전체 이력 유지, 예산이 빡빡하면 sliding window, 긴 작업형 대화면 요약 기반 압축입니다. 중요한 것은 한 가지 방식에 집착하지 않는 것입니다. 실전에서는 세 방식을 섞어 씁니다.
-
-예를 들어 시스템 규칙은 항상 유지하고, 최근 3턴은 raw로 보존하고, 그 이전은 요약으로 접는 혼합형이 가장 흔합니다. 오늘 만든 CLI도 바로 그 구조입니다. 이 구성이 널리 쓰이는 이유는 품질과 비용 사이의 균형이 괜찮기 때문입니다.
-
-멀티턴 챗봇을 설계할 때 마지막으로 점검할 질문은 세 가지입니다.
-
-- 오래 남겨야 하는 정보는 무엇인가
-- 버려도 되는 정보는 무엇인가
-- 요약이 틀렸을 때 어떻게 복구할 것인가
-
-이 질문에 답할 수 있으면, 메모리는 더 이상 막연한 감각 문제가 아니라 설계 가능한 컴포넌트가 됩니다.
+- 멀티턴 기억을 모델 기능으로 오해하기 쉽지만, 실제로는 `messages` 배열 재구성 로직입니다.
+- 전체 이력을 무조건 보존하면 좋다고 생각하기 쉽지만, 긴 세션에서는 비용과 지연이 빠르게 커집니다.
+- 슬라이딩 윈도우만 쓰면 충분하다고 보기 쉽지만, 세션 전체에 남아야 하는 사실은 별도 보존 전략이 필요합니다.
+- 요약은 압축이므로 반드시 정보 손실 위험이 있습니다. 요약 프롬프트가 무엇을 보존할지 분명해야 합니다.
+- 컨텍스트 초과를 실패 후에만 다루면 늦습니다. 길이 추정과 사전 압축이 먼저 있어야 합니다.
 
 ## 운영 체크리스트
 
-- [ ] 이전 턴의 `assistant` 응답을 다음 호출의 `messages`에 다시 넣고 있다
-- [ ] 최근 N턴만 유지하는 sliding window 모드와 전체 유지 모드를 둘 다 구현해 보았다
-- [ ] 요약 압축 시 system 메시지에 "요약 톤·길이·보존 규칙"이 명시되어 있다
-- [ ] 호출 전에 누적 토큰을 세서 컨텍스트 한계의 80% 임계값에서 경고를 띄운다
-- [ ] CLI 루프에 종료(`/exit`)와 이력 초기화(`/reset`) 명령이 있다
+- [ ] 각 턴의 `assistant` 답변을 다음 호출용 이력에 다시 추가합니다.
+- [ ] 전체 이력 모드와 최근 N턴 모드를 각각 비교해 장단점을 확인했습니다.
+- [ ] 요약 프롬프트에 사용자 목표, 확정 사실, 선호, 미해결 질문 보존 규칙을 적었습니다.
+- [ ] 요청 전 누적 입력 길이를 추정하고 한계에 가까워지면 경고 또는 압축을 실행합니다.
+- [ ] 세션 초기화와 상태 확인용 명령(`/reset`, `/summary`, `/quit`)을 제공합니다.
+
+## 정리
+
+멀티턴 챗봇의 핵심은 모델이 기억하는 척 보이게 만드는 데 있지 않습니다. 실제로는 애플리케이션이 무엇을 기억으로 간주할지 정의하고, 그것을 매 요청마다 다시 조립해 보내는 데 있습니다. 이 전제를 받아들이면 대화 상태 관리는 훨씬 더 명확한 엔지니어링 문제로 바뀝니다.
+
+실전에서는 세 가지 패턴을 함께 보게 됩니다. 짧은 세션은 전체 이력 유지로 충분하고, 예산 예측이 중요하면 슬라이딩 윈도우가 유리하며, 긴 세션은 요약 압축이 필요합니다. 대부분의 실제 시스템은 이 셋을 섞어 씁니다.
+
+다음 글에서는 마지막 기초 주제로 스트리밍 응답을 다룹니다. 이번 글이 “무엇을 기억할 것인가”의 문제였다면, 다음 글은 “생성 중인 답을 어떻게 즉시 보여 줄 것인가”의 문제입니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## 이 시리즈의 다른 글
 
 - [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
 - [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
@@ -551,13 +309,19 @@ if __name__ == "__main__":
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
+
+### 공식 문서
 
 - [Groq quickstart](https://console.groq.com/docs/quickstart)
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Groq models](https://console.groq.com/docs/models)
 - [OpenAI prompt engineering guide](https://platform.openai.com/docs/guides/prompt-engineering)
+
+### 관련 시리즈
+
+- [스트리밍 응답 처리 — 실시간으로 출력 받기](./06-streaming-responses.md)
+- [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
+- [챗봇 패턴 — 대화 이력 관리와 상태](../../ai-app-patterns-101/ko/01-chatbot-pattern.md)
 
 Tags: LLM, OpenAI, Prompt Engineering, Python
