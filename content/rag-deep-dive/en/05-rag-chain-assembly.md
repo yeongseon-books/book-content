@@ -20,6 +20,10 @@ seo_description: Why RetrievalQA falls short and how LCEL pipelines express the 
 
 # Assembling the RAG Chain — RetrievalQA vs LCEL
 
+RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.
+
+This is the 5th article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 

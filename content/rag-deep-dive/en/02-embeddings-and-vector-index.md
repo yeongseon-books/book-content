@@ -20,6 +20,10 @@ seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into 
 
 # Embeddings and the Vector Index — Inside FAISS IndexFlatL2
 
+HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.
+
+This is the 2nd article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 

@@ -20,6 +20,10 @@ seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved conte
 
 # Prompt Construction and Context Injection — Inside PromptTemplate
 
+PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.
+
+This is the 4th article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 

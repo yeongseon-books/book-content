@@ -20,6 +20,10 @@ seo_description: How VectorStoreRetriever and MMR balance relevance and diversit
 
 # Retriever Design — VectorStoreRetriever and MMR
 
+VectorStoreRetriever and MMR define how a retriever trades off relevance against coverage. This post walks that policy layer through LangChain internals.
+
+This is the 3rd article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 

@@ -20,7 +20,9 @@ seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트
 
 # 프롬프트 구성과 컨텍스트 주입 — PromptTemplate 내부
 
-> 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽게 될 정확한 계약으로 바뀌는 지점입니다.
+PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는 실제 입력 형식으로 바꿉니다. 여기서는 그 변환 경로를 코드로 추적합니다.
+
+이 글은 RAG Deep Dive 시리즈의 네 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

@@ -20,7 +20,9 @@ seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻
 
 # Retriever 설계 — VectorStoreRetriever와 MMR
 
-> Retriever는 단순한 최근접 이웃 조회기가 아닙니다. 후보 근거가 최종 컨텍스트가 되기까지의 정책을 결정하는 계층입니다.
+VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrieval 정책으로 구현합니다. 여기서는 LangChain 내부 구현을 기준으로 그 갈림길을 살펴봅니다.
+
+이 글은 RAG Deep Dive 시리즈의 세 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

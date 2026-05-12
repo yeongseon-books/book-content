@@ -20,6 +20,10 @@ seo_description: How PyPDFLoader and RecursiveCharacterTextSplitter break docume
 
 # Document Loading and Chunking — Inside LangChain TextSplitter
 
+PyPDFLoader and RecursiveCharacterTextSplitter decide where a document becomes retrievable context. This post breaks that path down with runnable examples.
+
+This is the first article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 

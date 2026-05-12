@@ -20,6 +20,10 @@ seo_description: How RAGAS faithfulness and answer_relevancy metrics automate qu
 
 # Evaluation and Quality Gates — RAGAS Metrics and Faithfulness
 
+RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer quality without rereading every output by hand. This post shows how to turn those signals into a quality gate.
+
+This is the final article in the RAG Deep Dive series.
+
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
 
