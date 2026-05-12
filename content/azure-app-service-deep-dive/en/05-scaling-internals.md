@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # Scaling internals — how Scale Out decisions become new workers
 
+Autoscale looks instantaneous in architecture diagrams, but production behavior is slower and more mechanical than that. There is a real control loop between a threshold crossing and a worker that is healthy enough to receive traffic.
+
+This is the fifth post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

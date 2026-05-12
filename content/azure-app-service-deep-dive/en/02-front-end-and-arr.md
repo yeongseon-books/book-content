@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # Front-End and ARR — how a request reaches a worker
 
+Many App Service incidents start before your code runs. If you cannot explain how the Front-End resolves a host name, keeps affinity, and picks a worker, partial outages keep looking random.
+
+This is the second post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

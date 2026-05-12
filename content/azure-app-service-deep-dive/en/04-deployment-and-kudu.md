@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # Deployment and Kudu — build, sync, release from the inside
 
+“Deployment succeeded” is one of the most misleading sentences in App Service operations. An artifact can upload cleanly, land in the right path, and still leave you with a process that never becomes ready.
+
+This is the fourth post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # Cold start and warmup — why the first request is expensive
 
+The first slow request is usually not “just latency.” It is the visible cost of turning an idle, recycled, or newly allocated execution path into something that can safely take real traffic.
+
+This is the final post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

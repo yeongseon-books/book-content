@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # App Service platform architecture — Front-End, Worker, File Server
 
+App Service gets hard to reason about when every runtime symptom is collapsed into “the platform.” Restarts, slow first requests, sticky routing, and deployment side effects start to make sense only after you separate the boxes underneath the service name.
+
+This is the first post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.

@@ -21,6 +21,10 @@ seo_description: Microsoft doesn't publicly document the full implementation det
 
 # Workers and the sandbox — where user code actually runs
 
+“Works locally, fails in App Service” is often not a mystery inside your framework. It is usually a boundary problem: Windows code runs under a sandbox, while Linux apps live inside a container contract with different limits and startup rules.
+
+This is the third post in the Azure App Service Deep Dive series.
+
 ## Source Version
 
 This post grounds its claims in the following public sources.
