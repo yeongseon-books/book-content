@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Sorting Algorithms
 
-> Algorithms with Python 101 Series (4/10)
+Sorting sits underneath far more problems than most beginners expect. Binary search, ranking, grouping, and deduplication all become easier once data is in order.
 
-<!-- a-grade-intro:begin -->
+Even if you use Python's built-in `sorted()` in practice, understanding the trade-offs behind classic sorting algorithms helps you reason about performance, stability, and data shape.
 
-**Key Question**: Why do different sorting algorithms have such different performance on the same data?
-
-> Sorting is a prerequisite for binary search, deduplication, ranking, and many other operations. This article implements O(n^2) sorts (bubble, selection, insertion) and O(n log n) sorts (merge, quick), then compares them with Python's built-in sorted().
-
-<!-- a-grade-intro:end -->
+This is post 4 in the Algorithms with Python 101 series. Here, we'll implement several classic sorting algorithms in Python and compare how their strategies affect performance.
 
 ## What You Will Learn
 

@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Time Complexity and Big-O
 
-> Algorithms with Python 101 Series (2/10)
+Wall-clock time on your laptop is not a reliable way to judge an algorithm. Hardware, runtime, and test data all change, but the growth pattern of the algorithm stays the same.
 
-<!-- a-grade-intro:begin -->
+Big-O gives you a practical language for comparing that growth before the code ever reaches production or an interview whiteboard.
 
-**Key Question**: How can you tell whether your code will be fast enough before running it on real data?
-
-> Time complexity describes how an algorithm's running time grows as the input size increases. Big-O notation gives us a language to express that growth rate objectively. This article teaches you to analyze and compare algorithms by their time complexity.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.
 
 ## What You Will Learn
 

@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Linear Search and Binary Search
 
-> Algorithms with Python 101 Series (3/10)
+Searching is one of the most common operations in programming. On a small list, a linear scan is fine. On a large sorted list, cutting the search space in half each step changes the problem completely.
 
-<!-- a-grade-intro:begin -->
+That is why binary search shows up far beyond textbook examples. The same pattern appears whenever you need the first value that satisfies a condition, not just an exact match.
 
-**Key Question**: How many comparisons does it take to find a value in a sorted list of one million items?
-
-> Linear search checks every element from start to finish — O(n). Binary search halves the search space each step — O(log n). This article implements both, introduces Python's bisect module, and compares their performance.
-
-<!-- a-grade-intro:end -->
+This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.
 
 ## What You Will Learn
 

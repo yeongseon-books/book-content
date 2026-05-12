@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Recursion and Divide and Conquer
 
-> Algorithms with Python 101 Series (5/10)
+Recursion is one of those ideas that looks simple on the surface and confusing in practice. Once it clicks, though, a lot of algorithm patterns start to feel much more consistent.
 
-<!-- a-grade-intro:begin -->
+Divide and conquer is one of the most important of those patterns. It shows up in binary search, merge sort, quick sort, and many problems that become manageable only after you split them into smaller parts.
 
-**Key Question**: Why does breaking a big problem into smaller pieces make it easier to solve?
-
-> Recursion is a technique where a function calls itself. Divide and conquer is a strategy that uses recursion to systematically split problems into smaller sub-problems. This article explains how recursion works and applies the divide-and-conquer pattern to real problems.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.
 
 ## What You Will Learn
 

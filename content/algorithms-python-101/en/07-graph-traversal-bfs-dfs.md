@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Graph Traversal — BFS and DFS
 
-> Algorithms with Python 101 Series (7/10)
+Networks, maps, dependency trees, and recommendation systems all reduce to relationships between nodes. That is why graph thinking shows up so often once you move past basic arrays and lists.
 
-<!-- a-grade-intro:begin -->
+BFS and DFS are the two foundational traversal strategies. If you can tell when to use each one, shortest paths, cycle checks, and connected-component problems become much easier to reason about.
 
-**Key Question**: How do you determine whether two points in a network are connected?
-
-> A graph is a data structure made of nodes (vertices) and edges. BFS and DFS are two strategies for systematically visiting every node. This article shows how to represent graphs in Python and implement both traversals.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the Algorithms with Python 101 series. Here, we'll represent graphs in Python and implement both BFS and DFS with practical use cases in mind.
 
 ## What You Will Learn
 

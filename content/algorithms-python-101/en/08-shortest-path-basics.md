@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Shortest Path Basics
 
-> Algorithms with Python 101 Series (8/10)
+Route planning, network latency, and logistics optimization all come down to the same question: what is the cheapest path from here to there?
 
-<!-- a-grade-intro:begin -->
+Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.
 
-**Key Question**: How do you find the shortest distance from one node to every other node in a weighted graph?
-
-> BFS guarantees shortest paths only on unweighted graphs. When edges have weights, you need Dijkstra's algorithm. This article implements Dijkstra's algorithm using Python's heapq module.
-
-<!-- a-grade-intro:end -->
+This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with `heapq`.
 
 ## What You Will Learn
 

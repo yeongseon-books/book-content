@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Dynamic Programming Basics
 
-> Algorithms with Python 101 Series (6/10)
+Some problems stay hopelessly slow if you solve the same subproblem again and again. Dynamic programming matters because it turns that waste into reusable work.
 
-<!-- a-grade-intro:begin -->
+This topic also shows up constantly in interviews and competitive programming, but the real value is learning to recognize overlapping subproblems and reusable state.
 
-**Key Question**: How can you find the optimal answer without repeating the same computation?
-
-> Dynamic programming (DP) breaks a problem into smaller sub-problems and stores each result to eliminate redundant computation. This article covers top-down (memoization) and bottom-up (tabulation) approaches with hands-on examples.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the Algorithms with Python 101 series. Here, we'll introduce dynamic programming through memoization, tabulation, and a set of classic Python examples.
 
 ## What You Will Learn
 

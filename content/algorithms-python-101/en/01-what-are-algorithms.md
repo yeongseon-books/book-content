@@ -22,15 +22,11 @@ last_reviewed: '2026-05-04'
 
 # What Are Algorithms?
 
-> Algorithms with Python 101 Series (1/10)
+Programming is ultimately about solving problems. Two pieces of code can produce the same answer and still behave very differently once the input gets large. That difference usually starts with the algorithm.
 
-<!-- a-grade-intro:begin -->
+Algorithms matter well beyond coding interviews. They shape performance tuning, data processing, and the way you reason about trade-offs in real systems.
 
-**Key Question**: Why does one piece of code finish in 1 second while another takes 10 minutes for the same problem?
-
-> An algorithm is a step-by-step procedure for solving a problem. A good algorithm is correct, efficient, and clear. This article covers the definition and properties of algorithms, how to represent them, and how to write your first algorithm in Python.
-
-<!-- a-grade-intro:end -->
+This is the first post in the Algorithms with Python 101 series. Here, we'll define what an algorithm is, look at its core properties, and write a simple Python example.
 
 ## What You Will Learn
 
