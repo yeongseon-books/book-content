@@ -21,6 +21,10 @@ seo_description: A deployable example is not defined by nice-looking server code
 
 # LLM app deployment strategies
 
+Operations-focused deployment advice only matters if the application can prove that it really starts. A believable example should bring up the server, pass health, and complete one representative request without manual glue.
+
+This is the fifth post in the LLM Apps Ops 101 series. Here, we will make a FastAPI-based LLM endpoint deployable and add a self-test that verifies the full startup path.
+
 ## Questions this post answers
 - How much should a health check prove for a FastAPI LLM endpoint?
 - How do you call the synchronous Groq client safely from an async endpoint?

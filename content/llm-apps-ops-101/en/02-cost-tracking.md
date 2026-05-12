@@ -21,6 +21,10 @@ seo_description: Cost tracking is not bookkeeping for its own sake. It is the fe
 
 # LLM cost tracking and optimization
 
+LLM costs often look harmless until repeated prompts, traffic growth, or background jobs make them visible all at once. If you do not measure cost per call early, optimization decisions stay qualitative much longer than they should.
+
+This is the second post in the LLM Apps Ops 101 series. Here, we will turn token usage into an explicit cost feedback loop that supports caching, prompt compression, and routing decisions.
+
 ## Questions this post answers
 - How should token usage accumulate across repeated calls?
 - How much abstraction is enough for a simple price-per-million model?

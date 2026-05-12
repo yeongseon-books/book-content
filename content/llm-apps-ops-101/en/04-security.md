@@ -21,6 +21,10 @@ seo_description: LLM security is about moving failure earlier. Block risky input
 
 # LLM app security
 
+LLM security gets expensive when unsafe input is allowed to spread through the stack before anyone notices. The practical goal is to fail earlier: before the model sees risky input and before the user sees risky output.
+
+This is the fourth post in the LLM Apps Ops 101 series. Here, we will set up a basic security layer with prompt scanning, masking, and output filtering.
+
 ## Questions this post answers
 - What should you scan first to catch basic prompt injection attempts?
 - How do you mask emails or secrets before the model sees them?

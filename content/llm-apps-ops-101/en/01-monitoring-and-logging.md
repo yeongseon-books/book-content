@@ -21,6 +21,10 @@ seo_description: Treat one log line as the operating contract for one LLM call, 
 
 # Monitoring and logging for LLM apps
 
+Once an LLM app moves beyond a demo, the first real operations problem is not the outage itself. It is the inability to reconstruct what happened for one request across latency, token usage, and debugging context.
+
+This is the first post in the LLM Apps Ops 101 series. Here, we will define the logging and monitoring baseline that makes each model call traceable after the fact.
+
 ## Questions this post answers
 - Which fields belong in every LLM request log?
 - How do you tie latency, token usage, and response preview into one record?

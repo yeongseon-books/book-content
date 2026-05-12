@@ -21,6 +21,10 @@ seo_description: The first useful evaluation layer is not a perfect semantic jud
 
 # Evaluating LLM output quality
 
+As traffic grows, nobody can read every model response by hand. Early in an ops pipeline, the pragmatic move is to catch obvious failures cheaply and consistently before reaching for heavier evaluation machinery.
+
+This is the third post in the LLM Apps Ops 101 series. Here, we will build a minimal quality gate around length, keyword coverage, and format checks.
+
 ## Questions this post answers
 - How do you automate max-length checks for model output?
 - When does keyword coverage become a useful quality gate?
