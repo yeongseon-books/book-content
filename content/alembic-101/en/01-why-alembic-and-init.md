@@ -23,6 +23,10 @@ seo_description: Alembic is git for your database schema. Each migration file is
 
 # Why Alembic, and getting to alembic init
 
+When a team first meets Alembic, the real question is not the command syntax but why raw SQL files stop scaling. Once schema history depends on memory instead of revision history, deploys and rollbacks turn into guesswork.
+
+This is the first post in the Alembic 101 series. Here we will frame why Alembic exists and what `alembic init` actually sets up.
+
 ## What you will learn
 
 - What problem a "migration tool" actually solves

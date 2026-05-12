@@ -25,6 +25,10 @@ seo_description: A migration always ships "before the code, and with broader com
 
 # Deploy ordering and blue/green: synchronizing schema and application code safely
 
+Many schema incidents begin with deploy ordering, not with the migration code itself. In blue/green or rolling setups, two app versions may share one database, so compatibility width has to be designed up front.
+
+This is post 9 in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
+
 ## What you will learn
 
 - The difference between migration-first and code-first deploy ordering

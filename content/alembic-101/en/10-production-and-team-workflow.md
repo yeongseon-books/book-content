@@ -24,6 +24,10 @@ seo_description: A migration is "the most irreversible kind of code change". Ord
 
 # Production and team workflow: PR, CI, monitoring, and incident response
 
+In production, a migration is more irreversible than ordinary application code. That is why Alembic safety has to live in team workflow, PR rules, and verification routines rather than in individual discipline alone.
+
+This is the final post in the Alembic 101 series. Here we will pull the series together into a practical operating model for PRs, CI, monitoring, and incident response.
+
 ## What you will learn
 
 - The one-revision-per-PR rule and why it matters

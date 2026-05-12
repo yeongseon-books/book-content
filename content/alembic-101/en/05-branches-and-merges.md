@@ -24,6 +24,10 @@ seo_description: An alembic revision graph is a directed acyclic graph (DAG), ju
 
 # branches and merges: combining revisions made in parallel
 
+When teammates generate revisions in parallel, the graph naturally forks into multiple heads. If you do not recognize that as a normal state, the first `Multiple head revisions are present` error feels much worse than it is.
+
+This is post 5 in the Alembic 101 series. Here we will cover why branches appear and how `alembic merge` brings the graph back to a single head.
+
 ## What you will learn
 
 - When the alembic revision graph forks into branches

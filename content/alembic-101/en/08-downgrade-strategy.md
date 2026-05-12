@@ -24,6 +24,10 @@ seo_description: 'Downgrade splits into two kinds. (1) Reversible changes: a pre
 
 # Downgrade strategy: when to write it for real and when to forbid it
 
+The existence of a `downgrade()` function does not make a change safe to reverse. Some revisions can be undone precisely, while others imply immediate data loss the moment you try.
+
+This is post 8 in the Alembic 101 series. Here we will separate reversible from irreversible changes and show how to encode that policy honestly.
+
 ## What you will learn
 
 - When a production downgrade is possible and when it is effectively impossible

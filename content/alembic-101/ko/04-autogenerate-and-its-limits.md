@@ -24,6 +24,10 @@ seo_description: autogenerate는 현재 DB(ground truth)와 target_metadata(desi
 
 # autogenerate: 잡는 것과 못 잡는 것의 경계
 
+autogenerate는 현재 DB와 `target_metadata`의 diff를 만들어 주지만, 의도까지 이해해 주지는 않습니다. 특히 rename 같은 변경은 사람이 직접 경계를 잡아야 안전합니다.
+
+이 글은 Alembic 101 시리즈의 4번째 글입니다. 여기서는 autogenerate가 잘하는 일과 사람이 직접 보강해야 하는 지점을 구분해 보겠습니다.
+
 ## 핵심 질문
 
 autogenerate를 어디까지 믿을 수 있고, 어떤 변경은 사람이 직접 작성해야 할까요?

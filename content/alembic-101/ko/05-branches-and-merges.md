@@ -23,6 +23,10 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 
 # branch와 merge: 동시에 만든 revision을 합치는 법
 
+팀에서 동시에 revision을 만들면 그래프는 자연스럽게 여러 head로 갈라집니다. 이 상태를 정상적으로 이해하지 못하면 첫 `Multiple head revisions are present`에서 배포가 멈춥니다.
+
+이 글은 Alembic 101 시리즈의 5번째 글입니다. 여기서는 branch가 생기는 이유와 `alembic merge`로 단일 head를 회복하는 흐름을 설명합니다.
+
 ## 핵심 질문
 
 여러 브랜치에서 동시에 마이그레이션이 생길 때 충돌을 어떻게 해소해야 할까요?

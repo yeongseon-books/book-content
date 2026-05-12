@@ -24,6 +24,10 @@ seo_description: env.py is a boot script Alembic runs on every command. For each
 
 # env.py and target_metadata: wiring models to migrations
 
+`env.py` is the boot script Alembic runs on every command. If this layer does not wire model metadata and connection settings cleanly, autogenerate becomes untrustworthy immediately.
+
+This is post 2 in the Alembic 101 series. Here we will pin down when `env.py` runs and what `target_metadata` must provide in practice.
+
 ## What you will learn
 
 - What `env.py` actually is and when it runs

@@ -24,6 +24,10 @@ seo_description: A data migration is a revision that leaves the schema alone and
 
 # Data migrations: separating schema changes from data changes
 
+Data migrations are often slower and more irreversible than the schema changes around them. How you isolate row transformation work inside revisions determines lock time, retry behavior, and recovery difficulty.
+
+This is post 6 in the Alembic 101 series. Here we will focus on why schema changes and data changes should be split, and what safe execution patterns look like.
+
 ## What you will learn
 
 - How a "data migration" is different from a schema migration

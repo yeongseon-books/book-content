@@ -23,6 +23,10 @@ seo_description: env.py는 alembic이 명령마다 실행하는 부트 스크립
 
 # env.py와 target_metadata: 모델과 마이그레이션 연결
 
+`env.py`는 Alembic 명령마다 실행되는 부트 스크립트입니다. 여기서 모델 metadata와 DB 연결 정보를 제대로 묶지 못하면 autogenerate는 바로 신뢰를 잃습니다.
+
+이 글은 Alembic 101 시리즈의 2번째 글입니다. 여기서는 `env.py`가 언제 실행되고 `target_metadata`가 어떤 역할을 하는지 실무 기준으로 정리합니다.
+
 ## 핵심 질문
 
 env.py와 target_metadata를 어떻게 설계해야 autogenerate가 정확하고 멀티 DB·멀티 스키마에 대응할 수 있을까요?
