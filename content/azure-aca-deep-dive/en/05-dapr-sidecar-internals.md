@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # Dapr sidecar internals — the Go process that lives next to your container
 
+When you first enable Dapr in Azure Container Apps, the feature looks deceptively light. You check a box or fill in a few fields, an app ID appears, and your service suddenly starts talking to localhost on port 3500 or 50001.
+
+But the surface is much smaller than the runtime change behind it. What actually happened is that the platform arranged for the upstream Dapr sidecar process, `daprd`, to run next to your user container with its own ports, args, probes, certificates, and component-loading behavior.
+
+This is post 5 in the Azure Container Apps Deep Dive series. Here, I follow that sidecar path from pod mutation to localhost API calls.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,24 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: enabling Dapr exposes localhost APIs and environment-scoped components in ACA.
 - **Inferred from upstream behavior**: sidecar injection details, port behavior, and mTLS/control-plane plumbing follow upstream Dapr patterns unless ACA documents otherwise.
 - **Out of bounds**: ACA-specific webhook internals, hidden cert distribution details, and private runtime arguments Microsoft does not publish.
-
-> Azure Container Apps Deep Dive series (5/6)
-
-When readers first enable Dapr in Azure Container Apps, the feature looks deceptively light.
-
-You check a box or set a few fields.
-An app ID appears.
-Suddenly your service can call localhost on port 3500 or 50001 and talk in terms of state stores, pub/sub, service invocation, or secrets.
-
-That surface is tiny.
-The runtime change is not.
-
-What actually happened is that the platform arranged for an upstream Dapr sidecar process, `daprd`, to run beside your user container.
-That process is written in Go.
-It is injected into the pod.
-It gets its own ports, args, probes, certificates, and component-loading behavior.
-
-This episode follows that path from pod mutation to localhost API calls.
 
 ---
 

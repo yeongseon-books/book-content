@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # ACA architecture — what Microsoft layered on a hidden Kubernetes
 
+The public story for Azure Container Apps is intentionally simple. You push a container, turn on ingress, Dapr, or scale rules, and Microsoft runs the platform.
+
+That simplicity is useful, but it also makes the internals easy to blur together. Container Apps is not a raw Kubernetes service, and it is not just AKS with nicer defaults either.
+
+This is the first post in the Azure Container Apps Deep Dive series. Here, I start with the full map of what Azure Container Apps adds on top of Microsoft-managed Kubernetes.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,25 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: ACA is Kubernetes-powered, environment-scoped, revision-based, and integrates ingress, Dapr, and autoscaling as product features.
 - **Inferred from upstream behavior**: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.
 - **Out of bounds**: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.
-
-> Azure Container Apps Deep Dive series (1/6)
-
-The public story for Azure Container Apps is intentionally simple.
-You push a container.
-You turn on ingress, Dapr, or scale rules.
-Microsoft runs the platform.
-
-That simplicity is useful.
-It is also exactly why the internals are easy to blur together.
-
-Container Apps is not a raw Kubernetes service.
-It is not "just AKS with nicer defaults" either.
-Microsoft documents ACA as Kubernetes-powered, but does not expose the exact substrate behind each environment.
-The safest description is that it is a serverless container platform built on Microsoft-managed Kubernetes infrastructure, with its own control surfaces for revisions, ingress, autoscaling, Dapr integration, logging, and environment scoping.
-
-This series is about that layering.
-Episode 1 draws the map.
-The later episodes zoom into each box.
 
 ---
 

@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # The Envoy ingress path — how the first request reaches your container
 
+The public story for ingress in Azure Container Apps is concise. Enable ingress, get an FQDN, receive HTTPS traffic, and optionally split traffic across revisions.
+
+That is enough to ship a service, but it is not enough to explain the first request path. To understand that path, you have to separate what ACA documents directly from what has to be inferred from Envoy and Kubernetes patterns.
+
+This is the final post in the Azure Container Apps Deep Dive series. Here, I trace how the first ingress request most likely moves through the Envoy layer before it reaches your container.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,24 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: FQDN, TLS termination, traffic splitting, session affinity, and ingress-facing readiness behavior.
 - **Inferred from upstream behavior**: Envoy-style routing and Kubernetes-style service hops from ingress state to ready revision replicas.
 - **Out of bounds**: the exact private 0 -> 1 request path, buffering behavior, and hidden ingress control-plane topology.
-
-> Azure Container Apps Deep Dive series (6/6)
-
-The public story for ingress in Azure Container Apps is concise.
-
-Enable ingress.
-Get an FQDN.
-Receive HTTPS traffic.
-Optionally split traffic across revisions.
-
-That is enough to ship a service.
-It is not enough to explain the first request path.
-
-This final episode follows that path at the right resolution for ACA operators, but with explicit evidence boundaries:
-
-- **[Documented]** external client -> ACA-managed ingress surface with FQDN, TLS termination, traffic splitting, and session affinity.
-- **[Inferred from Envoy upstream behavior]** ingress proxy route matching and weighted upstream selection.
-- **[Inferred from Kubernetes Service patterns]** a service-style hop from ingress routing state to ready revision replicas.
 
 ---
 

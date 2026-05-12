@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # Revisions and traffic splitting — where Envoy weights come from
 
+Azure Container Apps makes rollout mechanics look gentler than they are. You update an image, ACA creates a revision, you move some percentage of traffic, and the app keeps serving.
+
+That surface is clean because the product hides several lower-level steps. An immutable revision has to be created, it has to become active, and somewhere in the request path those weights have to become real routing behavior.
+
+This is post 3 in the Azure Container Apps Deep Dive series. Here, I trace how revision immutability and traffic splitting most likely meet at the Envoy routing layer.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,27 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: revisions are immutable deployment targets, can be activated together, and can receive weighted traffic.
 - **Inferred from upstream behavior**: those weights most plausibly become Envoy-style weighted upstream routing rules.
 - **Out of bounds**: the exact private config objects ACA generates to express revision routing internally.
-
-> Azure Container Apps Deep Dive series (3/6)
-
-Azure Container Apps makes rollout mechanics look gentler than they are.
-
-You update an image.
-ACA creates a revision.
-You move some percentage of traffic.
-The app keeps serving.
-
-That surface is clean because the product hides several lower-level steps.
-An immutable revision has to be created.
-That revision has to become active.
-Ingress has to know which revisions are eligible for traffic.
-And the final request path has to apply weights somewhere concrete.
-
-That final step is the reason for this episode.
-If traffic is split 80/20 in the portal or ARM template, where does that number actually matter?
-
-The short answer is: most likely at the Envoy routing layer, via weighted upstream selection.
-The long answer starts with revision immutability.
 
 ---
 

@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # KEDA inside ACA — what a scale rule actually creates
 
+At the product surface, scaling in Azure Container Apps is only a handful of fields. You set `minReplicas`, set `maxReplicas`, add an HTTP, TCP, or custom rule, and the platform handles the rest.
+
+That surface is intentionally terse, but the real question is what the platform has to create underneath for those rules to turn into replica counts. Microsoft's own documentation points straight at KEDA because that hidden translation layer matters.
+
+This is post 4 in the Azure Container Apps Deep Dive series. Here, I follow how an ACA scale rule most likely turns into a KEDA-style control loop.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,28 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: ACA scaling is KEDA-powered and exposes HTTP, TCP, and custom scale rules at the product surface.
 - **Inferred from upstream behavior**: those rules most likely materialize as KEDA/HPA-style control loops behind the service boundary.
 - **Out of bounds**: the exact managed KEDA deployment shape and private wiring Microsoft uses inside ACA.
-
-> Azure Container Apps Deep Dive series (4/6)
-
-At the product surface, scaling in Azure Container Apps is only a handful of fields.
-
-You set `minReplicas`.
-You set `maxReplicas`.
-You add an HTTP, TCP, or custom rule.
-The platform handles the rest.
-
-That surface is intentionally terse.
-The real question is what the platform has to create underneath in order for those rules to turn into replica counts.
-
-The answer is KEDA.
-
-Microsoft documents Container Apps scaling as KEDA-powered.
-That tells you two things immediately.
-
-1. The platform is using event-driven autoscaling concepts rather than inventing a wholly separate model.
-2. ACA scale rules should map onto the same broad control-loop shape as KEDA `ScaledObject`-driven scaling, even though ACA does not expose those Kubernetes objects directly.
-
-This episode follows that hidden mapping.
 
 ---
 

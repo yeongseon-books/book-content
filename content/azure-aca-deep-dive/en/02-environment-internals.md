@@ -21,6 +21,12 @@ seo_description: 'External references in this post are pinned to these upstream 
 
 # Environment internals — the network, observability, and Dapr scope boundary
 
+Episode 1 drew the stack. This episode narrows the focus to one resource that looks administrative from the outside and architectural from the inside: the Container Apps environment.
+
+If you keep one sentence from the Microsoft Learn documentation in your head, make it this one: the environment is the secure boundary around one or more container apps and jobs. That single idea explains network scope, logging scope, and where Dapr components are shared.
+
+This is post 2 in the Azure Container Apps Deep Dive series. Here, I read the Container Apps environment as the isolation boundary for networking, observability, and Dapr scope.
+
 ## Source Version
 
 External references in this post are pinned to these upstream baselines:
@@ -35,20 +41,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Documented by Microsoft**: environment scope for networking, logging, and shared Dapr components.
 - **Inferred from upstream behavior**: how those documented boundaries most likely map onto runtime isolation and sidecar scoping.
 - **Out of bounds**: the exact private cluster layout and non-public control-plane implementation inside an ACA environment.
-
-> Azure Container Apps Deep Dive series (2/6)
-
-Episode 1 drew the stack.
-This episode narrows the focus to one resource that looks administrative from the outside and architectural from the inside: the Container Apps environment.
-
-If you remember only one sentence from the Microsoft Learn documentation, make it this one in paraphrased form: the environment is the secure boundary around one or more container apps and jobs.
-
-That sentence explains more than people first assume.
-
-It tells you where network scope lives.
-It tells you where logs converge.
-It tells you where Dapr components are shared.
-It tells you why app placement into environments is a design decision, not a naming decision.
 
 ---
 
