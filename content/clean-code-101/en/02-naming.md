@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > A good name removes half of the comments. And it makes a single grep accurate.
 
+This is post 2 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

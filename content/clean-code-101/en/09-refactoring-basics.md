@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > When the next change is easier — not when the code looks cleaner.
 
+This is post 9 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

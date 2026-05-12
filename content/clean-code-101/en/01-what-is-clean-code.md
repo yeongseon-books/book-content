@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > Working is the minimum bar. Clean is consideration for the next person.
 
+This is post 1 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

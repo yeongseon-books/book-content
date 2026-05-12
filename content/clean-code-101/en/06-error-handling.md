@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > Use values when the caller is expected to decide what to do; use exceptions when the caller cannot reasonably handle the situation.
 
+This is post 6 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

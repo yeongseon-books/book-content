@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > Because one function carries more than one responsibility. Splitting responsibilities reduces depth.
 
+This is post 4 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

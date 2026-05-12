@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > Small enough that "does one thing" is visible. The name carries that one thing.
 
+This is post 3 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

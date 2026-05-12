@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > Everything this series taught — names, functions, branches, duplication, errors, tests, refactoring — checked at one moment.
 
+This is post 10 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

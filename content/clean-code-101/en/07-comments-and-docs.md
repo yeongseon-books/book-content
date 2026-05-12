@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > One that explains the "why" the code cannot. The "what" should be visible in the code itself.
 
+This is post 7 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

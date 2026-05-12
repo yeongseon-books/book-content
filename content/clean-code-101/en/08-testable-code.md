@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > The way side effects and dependencies are handled decides it. Separate them and tests fall out naturally.
 
+This is post 8 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

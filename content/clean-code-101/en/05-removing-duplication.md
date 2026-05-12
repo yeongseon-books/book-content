@@ -31,6 +31,8 @@ last_reviewed: '2026-05-04'
 
 > No. Code that looks the same but changes for different reasons is not the same code. Only remove duplication that changes for the same reason.
 
+This is post 5 in the Clean Code 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

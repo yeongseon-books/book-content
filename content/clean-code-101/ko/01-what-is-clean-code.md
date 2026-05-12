@@ -23,6 +23,10 @@ last_reviewed: '2026-05-11'
 
 # Clean Code란 무엇인가?
 
+Clean Code의 정의, 가독성과 의도, 변경 비용을 줄이는 작은 원칙을 정리합니다.
+
+이 글은 Clean Code 101 시리즈의 1번째 글입니다.
+
 > Clean Code 101 시리즈 (1/10)
 
 
