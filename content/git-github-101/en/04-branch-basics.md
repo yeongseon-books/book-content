@@ -24,6 +24,10 @@ seo_description: A branch is not a folder copy; it is a movable pointer to a spe
 
 # Branch basics - create, switch, and compare
 
+Git starts to feel powerful the moment you realize separate lines of work do not require separate folders. Branches give you room to experiment, pause, and compare without losing the safety of a shared main line.
+
+This is the fourth post in the Git & GitHub 101 series. Here, we focus on creating, switching, and comparing branches before we get to merging them.
+
 ## What you will learn
 
 - What a branch actually is (it is not a folder copy)

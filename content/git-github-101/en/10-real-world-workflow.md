@@ -24,6 +24,10 @@ seo_description: 'A realistic workflow is one repeating cycle: an issue defines 
 
 # Building a real-world Git workflow: from issue to release in one cycle
 
+Knowing isolated Git commands is not the same as knowing how a team actually ships work. The last step is to connect those commands into one repeatable loop that starts with an issue and ends with a merge, a tag, and a clean main branch.
+
+This is the final post in the Git & GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.
+
 ## What you will learn
 
 - How the commands from Episodes 1–9 fit together as one realistic workflow.

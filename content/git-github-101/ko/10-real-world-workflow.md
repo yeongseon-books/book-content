@@ -24,6 +24,10 @@ seo_description: 실무 흐름은 "issue로 작업을 정의하고, branch에서
 
 # 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로
 
+명령을 따로따로 아는 것만으로는 실무 흐름이 완성되지 않습니다. 실제 팀에서는 issue에서 시작한 일이 branch, PR, merge, tag를 지나 release까지 이어지므로, 각각의 명령을 하나의 반복 가능한 사이클로 묶어 이해해야 합니다.
+
+이 글은 Git & GitHub 101 시리즈의 마지막 글입니다. 여기서는 앞선 글의 내용을 묶어 issue부터 release까지 이어지는 실전 워크플로를 정리합니다.
+
 ## 핵심 질문
 
 실전 Git 워크플로를 어떻게 설계해야 issue부터 release까지 한 흐름으로 이어질까요?

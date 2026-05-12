@@ -24,6 +24,10 @@ seo_description: 'status, diff, and log are three read-only windows that answer 
 
 # Reading change history - status, diff, log
 
+Most Git mistakes get cheaper the moment you learn to read before you act. `status`, `diff`, and `log` are the three commands that let you inspect the current state, the exact content of a change, and the history behind it.
+
+This is the third post in the Git & GitHub 101 series. Here, we focus on reading change history accurately before branches and collaboration enter the picture.
+
 ## What you will learn
 
 - How to read each line of `git status` output with confidence

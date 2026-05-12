@@ -24,6 +24,10 @@ seo_description: A good commit message is a small document that lets you and you
 
 # Writing Good Commit Messages: Conventional Commits and Useful Bodies
 
+Every repository eventually reaches the point where the code alone is not enough to explain why a change happened. A good commit message turns the history itself into documentation that survives long after the context in chat and review threads fades away.
+
+This is the ninth post in the Git & GitHub 101 series. Here, we look at message structure, Conventional Commits, and the habits that keep `git log` useful.
+
 ## What you will learn
 
 - Why a good commit message is an asset that pays off as much as the code itself.

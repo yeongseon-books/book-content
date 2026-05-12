@@ -24,6 +24,10 @@ seo_description: A Pull Request is not a plain merge; it is a place to "propose 
 
 # Collaborating with Pull Requests - From Branch to Review to Main
 
+Once a second person is involved, a branch is no longer just your workspace. It becomes a proposal, and the Pull Request is the place where that proposal is explained, reviewed, and either accepted or sent back for another pass.
+
+This is the seventh post in the Git & GitHub 101 series. Here, we follow one change from feature branch to review to merge on `main`.
+
 ## What you will learn
 
 - What a Pull Request (PR) really is, and how it differs from a plain `git merge`

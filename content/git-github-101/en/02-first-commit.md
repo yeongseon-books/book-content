@@ -24,6 +24,10 @@ seo_description: A first commit is the act of "gathering changes from the workin
 
 # Your first commit - init, status, add, commit
 
+The first commit is where Git stops being abstract. Once you walk one change all the way from an empty folder to a saved snapshot, later commands start to feel predictable instead of arbitrary.
+
+This is the second post in the Git & GitHub 101 series. Here, we go through the full init -> add -> commit cycle by hand.
+
 ## What you will learn
 
 - How to create an empty repository with `git init`

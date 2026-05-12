@@ -24,6 +24,10 @@ seo_description: 첫 commit은 "working directory의 변경을 staging에 모아
 
 # 첫 commit 만들기 - init, status, add, commit
 
+첫 commit을 직접 만들어 보면 Git이 갑자기 추상적인 개념이 아니라 손에 잡히는 도구로 바뀝니다. 빈 폴더에서 시작해 변경을 staging에 올리고 snapshot으로 남기는 흐름을 한 번 끝까지 따라가면 이후 명령도 훨씬 자연스럽게 읽힙니다.
+
+이 글은 Git & GitHub 101 시리즈의 두 번째 글입니다. 여기서는 `git init`부터 첫 `git commit`까지의 전체 흐름을 손으로 따라가 봅니다.
+
 ## 핵심 질문
 
 첫 커밋을 만들 때 무엇을 의식적으로 실천해야 이후 협업이 편해질까요?

@@ -24,6 +24,10 @@ seo_description: Pull Request는 단순한 merge가 아니라 "내 branch의 변
 
 # Pull Request로 협업하기 - branch에서 review를 거쳐 main까지
 
+브랜치가 개인 작업 공간이라면 Pull Request는 그 작업을 팀에 설명하는 자리입니다. 변경을 곧바로 합치는 대신, 왜 필요한지 말하고 검토를 받고 합의한 뒤 main에 반영하는 흐름이 여기서 시작됩니다.
+
+이 글은 Git & GitHub 101 시리즈의 일곱 번째 글입니다. 여기서는 feature branch에서 시작해 review를 거쳐 `main`으로 돌아오는 PR 한 사이클을 따라갑니다.
+
 ## 핵심 질문
 
 Pull Request를 어떻게 운영해야 review가 의미 있고 main이 안전할까요?

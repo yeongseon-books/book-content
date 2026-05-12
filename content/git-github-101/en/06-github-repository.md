@@ -24,6 +24,10 @@ seo_description: A GitHub repository is just "another Git repository that lives 
 
 # Creating a GitHub repository - remote, push, and pull in one go
 
+Up to this point, every command has stayed on one machine. The real collaboration shift begins when your local repository gains a remote home that other people and other devices can reach.
+
+This is the sixth post in the Git & GitHub 101 series. Here, we connect a local repository to GitHub and walk through the first push, fetch, pull, and clone flow.
+
 ## What you'll learn
 
 - What a `remote` is, and why the first one is conventionally called `origin`

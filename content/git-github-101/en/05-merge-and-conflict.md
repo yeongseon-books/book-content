@@ -24,6 +24,10 @@ seo_description: A merge produces "a new commit that combines two commits." When
 
 # Merge and Conflict Resolution - Bringing Two Lines Back Together
 
+Creating branches is the easy part; bringing them back together cleanly is where Git starts to feel real. If you can predict when a merge will stay automatic and when it will stop for human judgment, collaboration gets much less stressful.
+
+This is the fifth post in the Git & GitHub 101 series. Here, we look at fast-forward merges, three-way merges, and the conflict resolution flow that sits between them.
+
 ## What You'll Learn
 
 - What `git merge` actually does, and how fast-forward differs from three-way merge

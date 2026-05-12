@@ -24,6 +24,10 @@ seo_description: 'Git''s core model is "a tool that keeps snapshots of your file
 
 # What is Git? Version control fundamentals
 
+If version control still feels like a tool you are supposed to learn before real work begins, this is the place to reset that picture. Git becomes much easier once you see it less as a command list and more as a way to preserve and recover changes over time.
+
+This is the first post in the Git & GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.
+
 ## What you will learn
 
 - The problem that a version control system (VCS) solves

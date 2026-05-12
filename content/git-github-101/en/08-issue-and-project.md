@@ -24,6 +24,10 @@ seo_description: Issues record "what is to be done", Pull Requests record "how i
 
 # Tracking Work with Issues and Projects - How GitHub Records What's Next
 
+Code history tells you what changed, but teams also need a place to record what should happen next. Issues and Projects give GitHub a planning layer, so decisions, ownership, and progress do not live only in someone's memory.
+
+This is the eighth post in the Git & GitHub 101 series. Here, we connect issues, pull requests, and project boards into one visible work-tracking flow.
+
 ## What you will learn
 
 - What a GitHub Issue is, and how it differs from a commit or a Pull Request
