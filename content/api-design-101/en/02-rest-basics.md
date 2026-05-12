@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # REST Basics
 
-> API Design 101 series (2/10)
+REST is easier to use well once you understand its six constraints and the resource-centric model behind them.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: REST is not just a *URL convention* — what is it really?
-
-> It is the set of *six architectural constraints* defined by Roy Fielding. At its center sits the *resource*.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the API Design 101 series.
 
 ## What You Will Learn
 

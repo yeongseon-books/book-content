@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # Error response 설계
 
-> API Design 101 시리즈 (7/10)
+API 에러 응답은 형식이 조금만 흔들려도 클라이언트 처리와 운영 디버깅이 함께 어려워집니다. RFC 7807 problem+json과 안정적인 error code 체계를 먼저 잡아 두면 좋습니다.
 
+이 글은 API Design 101 시리즈의 7번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # What Is an API?
 
-> API Design 101 series (1/10)
+If you want the rest of this series to make sense, start by getting clear on what an API is, what role it plays, and what makes one good.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: The word *API* is everywhere — what does it actually mean?
-
-> A *call contract* between two systems. A good API makes that contract *easy to read* and *easy to change*.
-
-<!-- a-grade-intro:end -->
+This is the first post in the API Design 101 series.
 
 ## What You Will Learn
 

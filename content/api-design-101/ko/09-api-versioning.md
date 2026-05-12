@@ -23,22 +23,16 @@ last_reviewed: '2026-05-11'
 
 # API versioning
 
+URL과 header 버전 전략, 호환성 정책, deprecation과 sunset 절차는 API를 오래 운영할수록 더 중요해집니다.
+
+이 글은 API Design 101 시리즈의 9번째 글입니다.
+
 ## 이 글에서 다룰 문제
 
 - 어떤 변경이 호환성을 깨는 breaking change인지 어떻게 구분할까요?
 - URL 버전과 헤더 버전은 각각 언제 더 잘 맞을까요?
 - 새 버전을 내놓은 뒤 deprecation과 sunset은 어떤 순서로 진행해야 할까요?
 - 동시에 여러 버전을 운영하면 팀 내부 비용은 어떻게 커질까요?
-
-> API Design 101 시리즈 (9/10)
-
-<!-- a-grade-intro:begin -->
-
-핵심 질문은 단순합니다. API 계약을 바꿔야 할 때, 외부 클라이언트를 깨뜨리지 않고 어떻게 변경을 밀어 넣을 것인가입니다.
-
-먼저 정해야 할 것은 버전 번호가 아니라 호환성 규칙입니다. 무엇을 breaking change로 볼지 정한 다음, URL이나 헤더 같은 버전 채널 뒤로 변화를 격리해야 합니다.
-
-<!-- a-grade-intro:end -->
 
 ## 이 글에서 배울 것
 

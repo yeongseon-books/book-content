@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Resource Design
 
-> API Design 101 series (3/10)
+Good REST URLs come from solid resource modeling, naming, hierarchies, and identifiers, not from path style alone.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it actually mean to *design good URLs* in a REST API?
-
-> It means modeling *resource boundaries* and *relationships* well. The URL is just the visible result.
-
-<!-- a-grade-intro:end -->
+This is post 3 in the API Design 101 series.
 
 ## What You Will Learn
 

@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Writing Good API Documentation
 
-> API Design 101 series (10/10)
+Good API docs are a system, not a reference dump. Getting Started, tutorials, reference, changelog, and SDK guidance all matter.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: For the same API, *good docs* drive higher adoption — is there a *formula* for good documentation?
-
-> Five minutes to first call, plus Examples, Reference, Changelog, and SDKs — these are the five axes.
-
-<!-- a-grade-intro:end -->
+This is the final post in the API Design 101 series.
 
 ## What You Will Learn
 

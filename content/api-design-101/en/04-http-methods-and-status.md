@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # HTTP Methods and Status Codes
 
-> API Design 101 series (4/10)
+Picking GET, POST, PUT, PATCH, DELETE and the right 2xx, 4xx, and 5xx response codes is what makes an API predictable to clients.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Which method should you use, and which status code should you return — what is the *criterion* for those two decisions?
-
-> *Idempotency* and the *meaning of the result*.
-
-<!-- a-grade-intro:end -->
+This is post 4 in the API Design 101 series.
 
 ## What You Will Learn
 

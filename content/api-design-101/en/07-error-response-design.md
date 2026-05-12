@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Designing Error Responses
 
-> API Design 101 series (7/10)
+Error responses work better when the envelope, machine-readable code, and validation details stay consistent across the API.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What should an error response *contain* so that clients can branch precisely and humans can read and understand it?
-
-> A *status code + a stable body shape + a stable error code*.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the API Design 101 series.
 
 ## What You Will Learn
 

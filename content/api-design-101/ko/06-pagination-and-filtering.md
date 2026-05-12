@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # Pagination과 filtering
 
-> API Design 101 시리즈 (6/10)
+offset/limit과 cursor 페이지네이션, 정렬과 필터링 패턴은 큰 컬렉션을 다룰 때 API 품질을 좌우합니다.
 
+이 글은 API Design 101 시리즈의 6번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

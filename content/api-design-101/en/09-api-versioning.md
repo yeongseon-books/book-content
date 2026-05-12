@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # API Versioning
 
-> API Design 101 series (9/10)
+Versioning gets easier once you separate compatibility policy from the version channel itself, whether that channel is a URL or a header.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you must *change* a contract, how do you do it without breaking external clients?
-
-> Define your *compatibility rules* first; isolate change behind *version channels*.
-
-<!-- a-grade-intro:end -->
+This is post 9 in the API Design 101 series.
 
 ## What You Will Learn
 

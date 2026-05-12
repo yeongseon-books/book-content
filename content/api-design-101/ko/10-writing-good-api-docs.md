@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # 좋은 API 문서 만들기
 
-> API Design 101 시리즈 (10/10)
+예제, getting started, reference, changelog, SDK 안내까지 갖춘 문서는 API 채택 속도를 크게 바꿉니다.
 
+이 글은 API Design 101 시리즈의 마지막 글입니다.
 
 ## 이 글에서 다룰 문제
 

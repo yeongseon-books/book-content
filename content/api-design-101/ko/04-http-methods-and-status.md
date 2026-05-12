@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # HTTP method와 status code
 
-> API Design 101 시리즈 (4/10)
+GET, POST, PUT, PATCH, DELETE의 의미와 2xx, 4xx, 5xx 상태 코드 매핑을 한 번 정리해 두면 API가 훨씬 예측 가능해집니다.
 
+이 글은 API Design 101 시리즈의 4번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

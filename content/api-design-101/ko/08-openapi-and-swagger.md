@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # OpenAPI와 Swagger
 
-> API Design 101 시리즈 (8/10)
+OpenAPI 3 스펙과 Swagger UI를 이해하면 문서, 검증, 코드 생성이 하나의 흐름으로 연결됩니다. code-first와 schema-first의 차이도 이 지점에서 함께 정리할 수 있습니다.
 
+이 글은 API Design 101 시리즈의 8번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

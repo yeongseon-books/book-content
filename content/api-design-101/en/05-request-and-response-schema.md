@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Request and Response Schemas
 
-> API Design 101 series (5/10)
+Schemas stay useful when you make naming, content types, validation, and date handling explicit instead of leaving them to convention.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you define the *shape of the data* an API exchanges so that it does not wobble?
-
-> Treat the schema as a *contract outside the code*, and validate at the *boundary*.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the API Design 101 series.
 
 ## What You Will Learn
 

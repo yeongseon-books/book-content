@@ -23,8 +23,9 @@ last_reviewed: '2026-05-11'
 
 # Request와 response schema
 
-> API Design 101 시리즈 (5/10)
+JSON 스키마와 content-type, 필드 명명, 날짜·시간대 규칙을 먼저 맞춰 두면 클라이언트와 서버가 함께 흔들리는 일을 줄일 수 있습니다.
 
+이 글은 API Design 101 시리즈의 5번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # OpenAPI and Swagger
 
-> API Design 101 series (8/10)
+OpenAPI 3 and Swagger UI turn one contract into docs, validation, and generated clients. The key design choice is where that contract lives.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If you could capture *every promise* of an API in a single file, what would happen?
-
-> Documentation, validation, client SDKs, and mock servers all *follow automatically*.
-
-<!-- a-grade-intro:end -->
+This is post 8 in the API Design 101 series.
 
 ## What You Will Learn
 

@@ -23,15 +23,9 @@ last_reviewed: '2026-05-04'
 
 # Pagination and Filtering
 
-> API Design 101 series (6/10)
+Pagination, sorting, and filtering shape both performance and correctness. The real trade-off starts with offset versus cursor.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you must return a large collection in *chunks*, what is the safe and fast way to do it?
-
-> The answer depends on how *fast the data changes* — offset for static data, cursor for fast-changing data.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the API Design 101 series.
 
 ## What You Will Learn
 
