@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (7/10)
 
 > AI Safety & Guardrails 101 Series (7/10)
 
+People use "hallucination" for any confident mistake, but production guardrails need a tighter target. In RAG systems, the practical question is whether the answer is actually grounded in the provided evidence.
+
+This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
+
 ---
 ## Section 1
 

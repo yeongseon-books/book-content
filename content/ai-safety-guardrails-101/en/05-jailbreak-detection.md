@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (5/10)
 
 > AI Safety & Guardrails 101 Series (5/10)
 
+A jailbreak does more than override a system instruction. It tries to peel back the model's safety alignment itself, and once a successful prompt escapes into the wild it gets copied at scale.
+
+This is post 5 in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
+
 ---
 ## Section 1
 

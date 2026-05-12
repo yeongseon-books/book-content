@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (1/10)
 
 > AI Safety & Guardrails 101 Series (1/10)
 
+The first version of an LLM app feels simple. Pass user input to the model and render the answer, and the demo works. Production exposes the rest of the problem: prompt injection, PII leaks, hallucinations, and abuse that a prompt alone cannot control.
+
+This is the first post in the AI Safety & Guardrails 101 series. It frames why guardrails are not optional polish around a prompt but part of the core operating model for an LLM application.
+
 ---
 ## Section 1
 

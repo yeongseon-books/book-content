@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (3/10)
 
 > AI Safety & Guardrails 101 Series (3/10)
 
+Model vendors ship safety training, but the output is still untrusted data. A subtle jailbreak, quoted profanity, or unsafe advice can slip through unless you moderate the response as a separate step.
+
+This is post 3 in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
+
 ---
 ## Section 1
 

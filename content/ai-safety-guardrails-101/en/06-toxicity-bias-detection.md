@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (6/10)
 
 > AI Safety & Guardrails 101 Series (6/10)
 
+Toxicity and bias often get grouped together, but they are not the same operational problem. Toxicity is an inline blocking decision; bias is a measurement and audit problem that shows up over many responses.
+
+This is post 6 in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
+
 ---
 ## Section 1
 

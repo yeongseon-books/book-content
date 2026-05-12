@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (9/10)
 
 > AI Safety & Guardrails 101 Series (9/10)
 
+In an LLM system, audit logs are not just verbose application logs. They are the record you rely on later for compliance, incident review, and decision traceability.
+
+This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
+
 ---
 ## Section 1
 

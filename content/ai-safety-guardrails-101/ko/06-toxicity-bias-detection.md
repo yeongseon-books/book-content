@@ -22,6 +22,10 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 
 > AI Safety & Guardrails 101 시리즈 (6/10)
 
+독성과 편향은 함께 언급되지만 운영에서는 다른 방식으로 다뤄야 합니다. 독성은 실시간 차단 대상이고, 편향은 데이터와 응답 패턴을 장기적으로 측정해야 드러납니다.
+
+이 글은 AI Safety & Guardrails 101 시리즈의 6번째 글입니다. 여기서는 toxicity와 bias를 왜 분리해 설계해야 하는지, 그리고 각각 어떤 평가 흐름이 필요한지 정리합니다.
+
 ---
 
 ## Section 1

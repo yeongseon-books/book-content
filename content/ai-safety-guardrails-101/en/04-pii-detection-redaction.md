@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (4/10)
 
 > AI Safety & Guardrails 101 Series (4/10)
 
+LLM applications handle personal data in both directions. Users send sensitive information into the model, and other people's data can leak back out through logs, context, or responses.
+
+This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
+
 ---
 ## Section 1
 

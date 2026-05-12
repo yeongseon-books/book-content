@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (8/10)
 
 > AI Safety & Guardrails 101 Series (8/10)
 
+Rate limiting for LLM APIs is not just about requests per second. Token volume, streaming output, and cost all move independently, so abuse control has to watch more than one meter.
+
+This is post 8 in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
+
 ---
 ## Section 1
 

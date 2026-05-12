@@ -23,6 +23,10 @@ seo_description: LLM이 "사실이 아닌 내용을 자신 있게 말하는" 현
 
 > AI Safety & Guardrails 101 시리즈 (7/10)
 
+Hallucination이라는 말은 넓게 쓰이지만 운영에서는 더 좁게 정의해야 합니다. 특히 RAG 시스템에서는 출력이 제공된 근거를 실제로 지지하는지 확인하는 grounding 검증이 핵심입니다.
+
+이 글은 AI Safety & Guardrails 101 시리즈의 7번째 글입니다. 여기서는 closed-domain hallucination을 기준으로 grounding 검증 레이어를 어떻게 설계할지 살펴봅니다.
+
 ---
 
 ## Section 1

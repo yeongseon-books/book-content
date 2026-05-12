@@ -22,6 +22,10 @@ seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 
 
 > AI Safety & Guardrails 101 시리즈 (9/10)
 
+LLM 시스템의 audit log는 단순 디버그 로그가 아닙니다. 나중에 "왜 이런 결정을 내렸는가"를 재구성해야 하므로 보존 기간, 접근 권한, PII 처리 방식부터 별도로 설계해야 합니다.
+
+이 글은 AI Safety & Guardrails 101 시리즈의 9번째 글입니다. 여기서는 감사 로깅을 application log와 분리해야 하는 이유와 컴플라이언스 관점의 필수 필드를 정리합니다.
+
 ---
 
 ## Section 1

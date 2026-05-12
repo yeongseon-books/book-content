@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (2/10)
 
 > AI Safety & Guardrails 101 Series (2/10)
 
+Prompt injection works because system and user messages end up in the same context window. If you treat user input as harmless text, an attacker can turn it into an instruction channel.
+
+This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
+
 ---
 ## Section 1
 

@@ -22,6 +22,10 @@ seo_description: AI Safety & Guardrails 101 Series (10/10)
 
 > AI Safety & Guardrails 101 Series (10/10)
 
+The guardrails in Episodes 1 through 9 are useful on their own, but production depends on how they fit together. You need one pipeline that makes ordering, fallback behavior, and auditability explicit.
+
+This is the final post in the AI Safety & Guardrails 101 series. It turns the earlier guardrails into a single production architecture you can reason about end to end.
+
 ---
 ## Section 1
 
