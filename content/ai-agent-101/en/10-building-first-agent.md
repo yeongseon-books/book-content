@@ -24,11 +24,11 @@ seo_description: Now let's synthesize what we've learned and build a real agent.
 
 > AI Agent 101 Series (10/10)
 
-Now let's synthesize what we've learned and build a real agent. This article implements a simple yet practical agent from start to finish. We'll cover the entire process: context setup, tool definition, workflow composition, error handling, and testing. This is the final post in the AI Agent 101 series.
+Now let's synthesize what we've learned and build a real agent. This article implements a simple yet practical agent from start to finish. We'll cover the entire process: context setup, tool definition, workflow composition, error handling, and testing.
 
 Recommended frameworks are LangGraph and Crew AI. Both simplify agent construction but have different approaches. LangGraph is strong in graph-based workflows, while Crew AI is strong in multi-agent collaboration.
 
-This article covers end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.
+This is the final post in the AI Agent 101 series. Here we cover end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.
 
 ---
 <!-- a-grade-intro:begin -->

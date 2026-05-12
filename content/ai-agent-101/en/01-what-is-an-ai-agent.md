@@ -26,7 +26,11 @@ seo_description: A chatbot is a dictionary that gives you an answer. An Agent is
 
 > AI Agent 101 series (1/10)
 
-This is the first post in the AI Agent 101 series.
+When most people first encounter LLMs, they frame them as systems that answer questions well. That mental model feels sufficient in a chat window, but it starts to break the moment you ask the model to finish real work on your behalf.
+
+Classifying customer tickets, creating follow-up tasks, and drafting replies all require more than polished text generation. The model has to interact with external systems, inspect results, and decide what to do next, which is exactly where the line between a chatbot and an Agent becomes useful.
+
+This is the first post in the AI Agent 101 series. Here we build the basic mental model for Agents by separating them from chatbots and walking through the observe → think → act → check loop.
 
 ---
 

@@ -24,11 +24,11 @@ seo_description: What's harder than building an agent is evaluating "whether thi
 
 > AI Agent 101 Series (7/10)
 
-What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc. This is post 7 in the AI Agent 101 series.
+What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.
 
 Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).
 
-This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
+This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
 ---
 <!-- a-grade-intro:begin -->

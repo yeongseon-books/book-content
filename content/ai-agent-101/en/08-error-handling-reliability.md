@@ -24,11 +24,11 @@ seo_description: Agents can fail because they call external tools, go through ne
 
 > AI Agent 101 Series (8/10)
 
-Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc. This is post 8 in the AI Agent 101 series.
+Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc.
 
 To build reliable agents, you must anticipate and respond to these failures. Retry strategies, fallback patterns, timeout handling, and graceful degradation are key.
 
-This article covers common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.
+This is post 8 in the AI Agent 101 series. Here we cover common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.
 
 ---
 <!-- a-grade-intro:begin -->

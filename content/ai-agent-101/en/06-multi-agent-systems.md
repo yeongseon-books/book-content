@@ -24,11 +24,11 @@ seo_description: Sometimes it's difficult to handle all tasks with a single agen
 
 > AI Agent 101 Series (6/10)
 
-Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system. This is post 6 in the AI Agent 101 series.
+Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.
 
 The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.
 
-This article covers multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
+This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
 
 ---
 <!-- a-grade-intro:begin -->

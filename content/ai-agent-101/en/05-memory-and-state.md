@@ -24,11 +24,11 @@ seo_description: For agents to perform multi-step tasks, they must remember what
 
 > AI Agent 101 Series (5/10)
 
-For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions. This is post 5 in the AI Agent 101 series.
+For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions.
 
 However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).
 
-This article covers the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
+This is post 5 in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
 
 ---
 

@@ -24,11 +24,11 @@ seo_description: Agent behavior is determined by context. System prompts, conver
 
 > AI Agent 101 Series (2/10)
 
-Agent behavior is determined by context. System prompts, conversation history, tool descriptions, and current state information all constitute context, and agents make decisions based on this context. Clear context leads to clear agent decisions, while ambiguous context leads to erratic behavior. This is post 2 in the AI Agent 101 series.
+Agent behavior is determined by context. System prompts, conversation history, tool descriptions, and current state information all constitute context, and agents make decisions based on this context. Clear context leads to clear agent decisions, while ambiguous context leads to erratic behavior.
 
 Context engineering is the process of clearly telling the agent "who you are, what you should do, how you should behave, and what you shouldn't do." It's not just about writing good prompts—it's about designing the entire environment in which the agent operates.
 
-This article covers context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
+This is post 2 in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
 
 ---
 

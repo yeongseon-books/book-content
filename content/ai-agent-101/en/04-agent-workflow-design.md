@@ -24,11 +24,11 @@ seo_description: To perform complex tasks, agents must break work into steps, ex
 
 > AI Agent 101 Series (4/10)
 
-To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal." This is post 4 in the AI Agent 101 series.
+To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."
 
 Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.
 
-This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
+This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
 ---
 
