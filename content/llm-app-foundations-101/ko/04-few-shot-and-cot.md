@@ -33,7 +33,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 
 실무에서 가장 먼저 꺼내는 손잡이 두 개가 few-shot prompting과 chain-of-thought prompting입니다. few-shot은 원하는 답변 패턴을 예시로 먼저 보여 주는 방식이고, chain-of-thought는 문제를 한 번에 찍게 두지 않고 단계적으로 풀도록 유도하는 방식입니다. 둘 다 새 모델을 학습시키는 기법이 아닙니다. 이미 있는 모델의 행동을 더 안정적으로 끌어내는 입력 설계 기법입니다.
 
-이번 글에서는 Groq의 `llama-3.1-8b-instant`를 기준으로 이 두 기법을 실제 코드로 다룹니다. 범위는 일곱 가지입니다.
+이 글은 LLM 앱 기초 시리즈의 네 번째 글입니다. 여기서는 Groq의 `llama-3.1-8b-instant`를 기준으로 이 두 기법을 실제 코드로 다룹니다. 범위는 일곱 가지입니다.
 
 - few-shot prompting이 무엇인지
 - zero-shot과 few-shot이 어떻게 다른지

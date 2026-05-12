@@ -33,7 +33,7 @@ Prompt engineering is often described as clever wording. In application work, th
 
 That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.
 
-In this post, we will use Groq's `llama-3.1-8b-instant` to build the core mental model for prompt design with chat completions. We will cover seven things:
+This is the third post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to build the core mental model for prompt design with chat completions. We will cover seven things:
 
 - what `system`, `user`, and `assistant` roles mean
 - how a system message changes overall behavior

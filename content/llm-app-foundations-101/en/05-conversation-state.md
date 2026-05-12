@@ -33,7 +33,7 @@ One of the first surprises in chatbot development is how quickly the illusion br
 
 An LLM does not carry your application's conversation state for free. A chat product feels stateful because the application keeps rebuilding context and resending it on every request. The memory is not hidden in the model. It is a data structure you own.
 
-This post uses Groq's `llama-3.1-8b-instant` to build that mental model and turn it into runnable Python. We will cover seven things:
+This is the fifth post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to build that mental model and turn it into runnable Python. We will cover seven things:
 
 - why LLM calls are fundamentally stateless
 - how multi-turn chat emerges from accumulated `messages`
