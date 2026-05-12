@@ -27,6 +27,8 @@ Free? Basic? Standard? Premium? And Windows vs Linux? Code vs Container?
 
 In this post, we'll cover the **key criteria for choosing your Hosting Model**.
 
+This is the third post in the Azure App Service 101 series. It turns the long list of App Service options into a practical decision framework for OS, deployment model, and pricing tier.
+
 ---
 
 ## Questions this chapter answers

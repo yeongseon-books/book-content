@@ -27,6 +27,8 @@ seo_description: 새벽 3시, 알람이 울립니다. 프로덕션 API가 갑자
 
 이번 글은 그 관문을 하나씩 따라가며, **“이 에러는 어느 레이어의 냄새인가?”**를 구분하는 감각을 만드는 글입니다. DNS, TLS/SNI, Frontend 라우팅, Worker reverse proxy, 앱 프로세스 실행, timeout, session affinity, health check, deployment slot까지 모두 **디버깅 여정**으로 엮어 보겠습니다.
 
+이 글은 Azure App Service 101 시리즈의 2번째 글입니다. 여기서는 요청이 앱에 도달하기까지 어떤 레이어를 거치고, 각 단계의 실패가 어떤 증상으로 드러나는지 운영자 관점에서 따라가 보겠습니다.
+
 ---
 
 ## 이 글에서 다룰 문제

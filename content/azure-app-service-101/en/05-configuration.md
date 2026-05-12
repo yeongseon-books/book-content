@@ -25,6 +25,8 @@ Your app is deployed. Now, **how do you manage environment-specific settings?**
 
 Different environments need different connection strings, API keys, and log levels. This post shows how to manage those settings without turning deployment into guesswork.
 
+This is the fifth post in the Azure App Service 101 series. Here, the goal is to make configuration changes predictable, secure, and safe across development, staging, and production.
+
 ---
 
 ## Questions this chapter answers

@@ -25,6 +25,8 @@ seo_description: '"Why is my app returning a 502 error?" "Response times suddenl
 
 To answer these questions, you need to understand the **complete journey of a request reaching your app**. In this post, we'll walk through the Azure App Service Request Lifecycle step by step.
 
+This is the second post in the Azure App Service 101 series. Here, the focus is on tracing where a request can stall, fail, or recover before it ever becomes an app-level bug.
+
 ---
 
 > The request lifecycle in App Service is a chain of stable hops; latency lives in the warm-up step in the middle.

@@ -25,6 +25,8 @@ When deploying a web application to Azure, **Azure App Service** is often the fi
 
 In this post, we'll explore how the platform works, focusing on the **3-Plane Architecture**.
 
+This is the first post in the Azure App Service 101 series. It sets up the platform mental model you need before deployment, configuration, and troubleshooting start to feel real.
+
 ---
 
 > App Service is one extra layer on top of PaaS that lets you operate per-app, not per-VM.

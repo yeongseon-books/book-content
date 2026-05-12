@@ -25,6 +25,8 @@ seo_description: '"Traffic increased and the app is slow." "Want to reduce costs
 
 **Scaling** is the key strategy for solving these problems. In this post, we'll cover the difference between Scale Up and Scale Out, when to choose each, and how to configure Autoscale.
 
+This is the final post in the Azure App Service 101 series. It ties the earlier platform, deployment, configuration, and monitoring topics into concrete scaling decisions.
+
 ---
 
 > Scale rules without cost ceilings are how a single bad release becomes a five-figure invoice.

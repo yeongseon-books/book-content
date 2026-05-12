@@ -24,6 +24,8 @@ seo_description: '"The app is slow." "There''s an error." "When did this start?"
 
 To answer these questions, **logging and monitoring** are essential. In this post, we'll explore how to collect and analyze logs in App Service.
 
+This is the sixth post in the Azure App Service 101 series. It shows how to turn App Service from a black box into a system you can observe, query, and debug under pressure.
+
 ---
 
 ## Questions this chapter answers

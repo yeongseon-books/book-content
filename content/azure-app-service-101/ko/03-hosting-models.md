@@ -28,6 +28,8 @@ seo_description: 처음 App Service를 만들 때 헷갈리는 이유는, 선택
 - 이번 배포는 **Code vs Container** 중 무엇으로 시작해야 하는가?
 - 내 예산과 운영 요구사항에 맞는 티어는 **Free/Basic/Standard/Premium 중 어디**인가?
 
+이 글은 Azure App Service 101 시리즈의 3번째 글입니다. 여기서는 운영 현실에 맞춰 OS, 배포 모델, 플랜 티어를 어떤 순서와 기준으로 고를지 정리합니다.
+
 ---
 
 ## 이 글에서 다룰 문제
