@@ -21,6 +21,10 @@ seo_description: A chatbot is not a model with memory; it is an application loop
 
 # Chatbot pattern — managing conversation history and state
 
+The first mistake in chatbot design is assuming the model remembers anything between calls. In practice, the application decides what context to replay, how long to keep it, and when that history becomes too expensive or too noisy.
+
+This is the first post in the AI App Patterns 101 series. Here we cover the smallest reliable chatbot pattern and the state-management decisions that make multi-turn behavior work.
+
 ## Questions this post answers
 
 - Why does a chatbot application need to carry conversation history itself?

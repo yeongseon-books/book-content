@@ -21,6 +21,10 @@ seo_description: Human-in-the-loop does not abandon automation; it inserts human
 
 # Human-in-the-loop — designing for human intervention
 
+Better automation does not remove the need for human review; it makes the review boundary more important. Once an AI system can draft, classify, or trigger actions at scale, the real engineering work is deciding which outcomes can flow through untouched and which ones must stop for approval.
+
+This is the final post in the AI App Patterns 101 series. Here we cover how to place human judgment inside an automated pipeline without turning the whole system back into manual work.
+
 ## Questions this post answers
 
 - What criteria should trigger a human approval step before an AI draft is sent?
