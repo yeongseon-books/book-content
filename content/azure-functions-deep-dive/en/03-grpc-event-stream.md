@@ -23,6 +23,10 @@ seo_description: All code citations in this post are based on Azure/azure-functi
 
 > Azure Functions Deep Dive series (3/6)
 
+Spawning a worker process is only the beginning. The real system boundary appears when the host and that worker need to exchange lifecycle messages, function metadata, invocations, logs, and health signals over one concrete transport.
+
+This is the third post in the Azure Functions Deep Dive series. Here, we trace the bidirectional gRPC stream that carries the Azure Functions host-worker protocol.
+
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

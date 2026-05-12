@@ -24,6 +24,10 @@ seo_description: All code citations in this post are based on Azure/azure-functi
 
 > Azure Functions Deep Dive series (5/6)
 
+Everything in the previous parts happened inside one instance. The harder operational question begins when that instance is no longer enough: who decides to add more instances, what signals feed that decision, and which parts of the story still belong to the host itself?
+
+This is the fifth post in the Azure Functions Deep Dive series. Here, we separate external scale-out decisions from in-instance worker concurrency and compare how that boundary changes across hosting plans.
+
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

@@ -23,6 +23,10 @@ seo_description: All code citations in this post are based on Azure/azure-functi
 
 > Azure Functions Deep Dive series (4/6)
 
+Once the gRPC channel is in place, the next question is the one operators and application developers both eventually ask. When a trigger fires, how does that event become one concrete function invocation inside a worker process, and how does the result find its way back?
+
+This is the fourth post in the Azure Functions Deep Dive series. Here, we follow a single invocation through the dispatcher, worker channel, and response-correlation path.
+
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (2/6)
 
+호스트 부팅의 윤곽을 잡고 나면 바로 다음 질문이 따라옵니다. .NET 호스트가 언어 선택 정보를 어떻게 실제 Node.js, Python, Java, PowerShell 프로세스로 바꾸고, 그 경계는 어느 시점부터 운영체제 수준의 프로세스 관리 문제가 되는가입니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 2번째 글입니다. 여기서는 `worker.config.json` 해석부터 최종 `Process.Start()` 호출 직전까지 워커 시작 경로를 따라갑니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

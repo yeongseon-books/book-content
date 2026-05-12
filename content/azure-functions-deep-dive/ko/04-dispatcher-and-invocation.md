@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (4/6)
 
+gRPC 채널이 준비된 뒤에 남는 질문은 결국 하나입니다. 트리거가 발화했을 때 그 사건이 어떻게 사용자 함수 한 번의 실행으로 바뀌고, 결과는 어떤 경로로 다시 호스트 쪽 호출자에게 돌아오는가입니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 4번째 글입니다. 여기서는 dispatcher, worker channel, 응답 상관관계 경로를 따라 한 번의 invocation을 끝까지 추적합니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

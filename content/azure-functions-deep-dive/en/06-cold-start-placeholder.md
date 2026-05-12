@@ -23,6 +23,10 @@ seo_description: This part closes out the Azure Functions Deep Dive series. Part
 
 > Azure Functions Deep Dive series (6/6)
 
+Scaling out explains why a new instance appears, but not why that instance sometimes feels instant and sometimes painfully slow. The answer lives in the placeholder-to-specialization path, where the platform decides how much startup work it can finish before your app is even assigned.
+
+This is the final post in the Azure Functions Deep Dive series. Here, we trace cold start from placeholder initialization to specialization and host restart.
+
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (3/6)
 
+워커 프로세스를 띄웠다고 해서 시스템이 곧바로 움직이진 않습니다. 실제 경계는 호스트와 워커가 함수 메타데이터, 호출, 로그, 상태 신호를 어떤 전송 경로로 주고받는지에서 드러납니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 3번째 글입니다. 여기서는 Azure Functions의 호스트-워커 프로토콜이 실리는 양방향 gRPC 스트림을 코드 기준으로 추적합니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

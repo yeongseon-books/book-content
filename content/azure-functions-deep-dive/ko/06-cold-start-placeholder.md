@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (6/6)
 
+스케일아웃이 새 인스턴스의 탄생 이유를 설명해 준다면, 콜드 스타트는 그 인스턴스가 왜 어떤 날은 즉시 응답하고 어떤 날은 느리게 느껴지는지를 설명합니다. 그 차이는 placeholder에서 specialization으로 넘어가는 경로에 숨어 있습니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 마지막 글입니다. 여기서는 placeholder 초기화부터 specialization, 호스트 재시작까지 콜드 스타트의 실제 코드 경로를 따라갑니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

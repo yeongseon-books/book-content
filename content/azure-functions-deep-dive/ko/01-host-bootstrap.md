@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (1/6)
 
+Azure Functions를 운영하다 보면 가장 먼저 부딪히는 질문은 의외로 단순합니다. 앱이 켜질 때 도대체 어디까지가 호스트 부팅이고, 어느 시점부터 함수 실행 준비가 끝났다고 봐야 하는가입니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 첫 번째 글입니다. 여기서는 `WebJobsScriptHostService`에서 시작해 `ScriptHost.InitializeAsync`와 메타데이터 인덱싱까지, 호스트 부팅의 바깥 경계를 먼저 고정합니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.

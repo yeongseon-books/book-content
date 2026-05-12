@@ -23,6 +23,10 @@ seo_description: All code citations in this post are based on Azure/azure-functi
 
 > Azure Functions Deep Dive series (2/6)
 
+At the end of host bootstrap, one practical question remains. How does a .NET host turn language selection into a real Node.js, Python, Java, or PowerShell process, and where does that boundary become an operating-system concern instead of a runtime abstraction?
+
+This is the second post in the Azure Functions Deep Dive series. Here, we follow the worker startup path from `worker.config.json` discovery to the final `Process.Start()` call.
+
 ## Source Version
 
 All code citations in this post are based on [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).

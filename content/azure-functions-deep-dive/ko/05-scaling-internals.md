@@ -22,6 +22,10 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 > Azure Functions Deep Dive 시리즈 (5/6)
 
+앞선 화들에서는 한 인스턴스 안에서 벌어지는 일을 따라왔습니다. 운영에서 더 어려운 질문은 그 다음입니다. 인스턴스 하나로 버티지 못할 때 누가 더 늘릴지를 결정하고, 그 판단에 어떤 신호가 쓰이며, 그중 어디까지가 호스트의 책임인가입니다.
+
+이 글은 Azure Functions Deep Dive 시리즈의 5번째 글입니다. 여기서는 외부 Scale Controller의 스케일아웃 결정과 호스트 내부 워커 동시성 제어를 분리해서 봅니다.
+
 ## Source Version
 
 이 글의 모든 코드 인용은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준입니다.
