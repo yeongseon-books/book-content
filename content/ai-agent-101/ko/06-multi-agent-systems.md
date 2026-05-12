@@ -14,45 +14,66 @@ tags:
 - Multi-Agent
 - Coordination
 - Delegation
-last_reviewed: '2026-05-11'
-seo_description: 하나의 Agent로 모든 작업을 처리하기 어려울 때가 있습니다. 작업이 여러 도메인에 걸쳐 있거나, 각 단계에서 다른
-  전문성이 필요하거나…
+last_reviewed: '2026-05-12'
+seo_description: multi-agent를 역할 분리와 위임 구조 관점에서 정리합니다.
 ---
 
 # Multi-Agent 시스템
 
-> AI Agent 101 시리즈 (6/10)
+하나의 agent에 검색, 작성, 검토, 계획, 최종 응답까지 모두 맡기면 처음에는 단순해 보입니다. 하지만 요청이 길어지고 역할이 늘어나면 곧 문제가 생깁니다. 누가 계획을 세우는지, 누가 검증하는지, 누가 최종 책임을 지는지가 흐려지기 때문입니다.
 
-하나의 Agent로 모든 작업을 처리하기 어려울 때가 있습니다. 작업이 여러 도메인에 걸쳐 있거나, 각 단계에서 다른 전문성이 필요하거나, 병렬 처리가 필요한 경우입니다. 이럴 때 여러 Agent를 협력시키는 것이 Multi-Agent 시스템입니다.
+이때 등장하는 해법이 multi-agent 시스템입니다. 다만 중요한 점은 agent 수를 늘리는 것 자체가 목적이 아니라는 사실입니다. 좋은 multi-agent는 역할을 나눠서 더 설명 가능하게 만들고, 나쁜 multi-agent는 역할을 나눠서 더 복잡하게 만듭니다.
 
-Multi-Agent 시스템의 핵심은 조정(coordination)과 위임(delegation)입니다. 한 Agent가 전체를 조율하는 Orchestrator 패턴, 여러 Agent가 대등하게 협력하는 Peer-to-Peer 패턴, 작업을 계층적으로 나누는 Hierarchical 패턴 등이 있습니다.
+실무에서 multi-agent를 잘못 도입하면 token 비용과 handoff 횟수만 늘고 품질은 오히려 떨어질 수 있습니다. 그래서 이 주제는 "여러 agent를 어떻게 띄울까"보다 "어떤 업무가 진짜로 위임 구조를 필요로 하는가"에서 출발해야 합니다.
 
-이 글은 AI Agent 101 시리즈의 6번째 글입니다. 여기서는 Multi-Agent 패턴, Agent 간 통신 프로토콜, 위임 전략, 그리고 Multi-Agent 시스템을 언제 사용해야 하는지 다룹니다.
+이 글은 AI Agent 101 시리즈의 여섯 번째 글입니다.
 
----
+이 글에서는 multi-agent를 모델 개수의 문제가 아니라 역할 분리와 위임 프로토콜의 문제로 정리하겠습니다.
 
-## Multi-Agent 패턴
+## 이 글에서 다룰 문제
 
-복잡한 작업을 여러 Agent가 협력해서 처리하는 방식에는 여러 패턴이 있습니다.
+- single-agent로 충분한 작업과 multi-agent가 필요한 작업은 어떻게 구분할까요?
+- orchestrator, peer-to-peer, hierarchical 패턴은 각각 어떤 trade-off를 가질까요?
+- agent 간 handoff에서 가장 자주 터지는 문제는 무엇일까요?
+- shared state를 어디까지 공유해야 하고 어디서 막아야 할까요?
+- multi-agent가 좋아 보이지만 실제로는 비용만 키우는 신호는 무엇일까요?
 
-### Orchestrator 패턴 (중앙 조율)
+## 왜 이 글이 중요한가
 
-하나의 Orchestrator Agent가 전체를 조율하고, 전문화된 Worker Agent들에게 작업을 위임합니다.
+multi-agent는 종종 성능 향상 도구로 소개되지만, 실제 현장에서는 구조화된 위임을 위한 도구에 더 가깝습니다. 어떤 agent가 어떤 종류의 결정을 하고 어떤 산출물만 남겨야 하는지 분리되면, 시스템이 커져도 읽기가 쉬워집니다.
+
+반대로 역할 분리 없이 agent만 여러 개 두면 문제가 더 커집니다. 서로에게 같은 질문을 넘기고, 동일한 정보를 중복 검색하고, 최종 답변 책임이 불명확해지고, 장애가 나도 어디서 틀어졌는지 추적하기 어려워집니다. 즉, multi-agent의 난점은 모델 수가 아니라 프로토콜 설계입니다.
+
+또한 이 주제는 운영과 평가에도 직결됩니다. route 정확도, handoff 수, agent별 latency, shared state 오염, 불필요한 delegation 비율 같은 지표는 multi-agent 구조가 있어야만 드러납니다. 그래서 역할 분리를 도입한다면 관측성도 함께 설계해야 합니다.
+
+## Multi-Agent를 이해하는 가장 좋은 방법: 협업이 아니라 위임 그래프로 보는 것입니다
+
+multi-agent를 "여러 agent가 함께 일한다"고만 설명하면 너무 추상적입니다. 더 실용적인 설명은 누가 어떤 하위 작업을 맡고 어떤 결과만 남기는지 정의된 위임 그래프라는 것입니다. 이 관점이 있어야 supervisor와 worker, reviewer와 writer, manager와 child agent의 차이가 선명해집니다.
+
+이 구조에서 중요한 것은 세 가지입니다. 첫째, 누가 route를 결정하는가. 둘째, 각 agent가 shared state의 어느 부분을 읽고 쓸 수 있는가. 셋째, 누가 최종 답을 사용자에게 돌려주는가. 이 세 가지가 모호하면 agent 수가 늘수록 시스템은 더 읽기 어려워집니다.
+
+실무에서는 multi-agent를 쓰는 이유가 똑똑해 보이기 위해서가 아니라, 책임을 좁히고 실패 범위를 줄이기 위해서여야 합니다. 그래야 비용이 늘어도 얻는 운영 이점이 분명합니다.
+
+> multi-agent 시스템의 핵심은 "agent가 여러 개다"가 아니라, "역할과 handoff 규칙이 코드와 상태에 명시되어 있다"는 데 있습니다.
+
+## 핵심 개념
+
+### Orchestrator 패턴은 중앙 조율에 강합니다
 
 ```python
 from typing import List, Dict
 from openai import OpenAI
 
 class WorkerAgent:
-    """전문화된 Worker Agent"""
-    
+    """A specialized worker agent."""
+
     def __init__(self, name: str, role: str, api_key: str):
         self.name = name
         self.role = role
         self.client = OpenAI(api_key=api_key)
-    
+
     def execute(self, task: str) -> str:
-        """작업 실행"""
+        """Execute a task."""
         response = self.client.chat.completions.create(
             model="gpt-4",
             messages=[
@@ -64,1023 +85,151 @@ class WorkerAgent:
         return response.choices[0].message.content
 
 class OrchestratorAgent:
-    """Orchestrator: 작업을 분석하고 Worker에게 위임"""
-    
+    """An orchestrator agent that coordinates workers."""
+
     def __init__(self, api_key: str):
         self.client = OpenAI(api_key=api_key)
         self.workers: Dict[str, WorkerAgent] = {}
-    
-    def register_worker(self, worker: WorkerAgent):
-        """Worker 등록"""
+
+    def register_worker(self, worker: WorkerAgent) -> None:
+        """Register a worker."""
         self.workers[worker.name] = worker
-    
-    def delegate(self, user_request: str) -> str:
-        """요청을 분석하고 적절한 Worker에게 위임"""
-        # 1. 작업 분석
-        analysis = self.client.chat.completions.create(
+
+    def plan(self, request: str) -> List[Dict]:
+        """Decompose the request into subtasks."""
+        worker_list = "
+".join([
+            f"- {name}: {w.role}"
+            for name, w in self.workers.items()
+        ])
+        prompt = f"""Break down the following request into subtasks and assign each to the appropriate worker.
+
+Available workers:
+{worker_list}
+
+Request: {request}
+
+Respond in JSON format:
+[
+  {{"worker": "worker_name", "task": "task description"}},
+  ...
+]
+"""
+        response = self.client.chat.completions.create(
             model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"""You are an orchestrator.
-Analyze the user request and decide which worker should handle it.
-Available workers: {', '.join(self.workers.keys())}"""},
-                {"role": "user", "content": user_request}
-            ],
-            temperature=0
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
         )
-        
-        worker_name = analysis.choices[0].message.content.strip()
-        
-        # 2. Worker에게 위임
-        if worker_name in self.workers:
-            result = self.workers[worker_name].execute(user_request)
-            return f"[{worker_name}] {result}"
-        else:
-            return f"No suitable worker found for: {user_request}"
+        import json
+        return json.loads(response.choices[0].message.content)
 
-# 사용 예시
-orchestrator = OrchestratorAgent(api_key="your-api-key")
-
-# Worker 등록
-code_agent = WorkerAgent(name="CodeAgent", role="Python expert", api_key="your-api-key")
-doc_agent = WorkerAgent(name="DocAgent", role="Documentation writer", api_key="your-api-key")
-
-orchestrator.register_worker(code_agent)
-orchestrator.register_worker(doc_agent)
-
-# 요청 처리
-result = orchestrator.delegate("Python으로 API 호출 예제 코드 작성해줘")
-print(result)  # [CodeAgent] ...
+    def handle(self, request: str) -> Dict:
+        """Handle the request."""
+        subtasks = self.plan(request)
+        results = {}
+        for subtask in subtasks:
+            worker_name = subtask["worker"]
+            task = subtask["task"]
+            if worker_name in self.workers:
+                results[worker_name] = self.workers[worker_name].execute(task)
+        return results
 ```
 
-**장점:**
-- 명확한 책임 분담 (조율 vs 실행)
-- Worker 추가/제거가 쉬움
-- 중앙에서 상태 추적 가능
+Orchestrator는 중앙에서 route와 fallback을 관리하기 좋습니다. 단계가 명확하고 승인 지점을 넣기 쉬우며, 로그를 한곳에서 모으기도 쉽습니다. 대신 단일 병목과 단일 실패 지점이 생긴다는 단점이 있습니다.
 
-**단점:**
-- Orchestrator가 병목이 될 수 있음
-- Orchestrator 장애 시 전체 시스템 중단
-
----
-
-### Peer-to-Peer 패턴 (대등한 협력)
-
-여러 Agent가 대등하게 협력하며, 서로 메시지를 주고받습니다.
+### Peer-to-Peer는 유연하지만 프로토콜이 약하면 금방 흐려집니다
 
 ```python
-from typing import List, Dict, Optional
+from typing import List, Optional
 
 class PeerAgent:
-    """Peer-to-Peer Agent"""
-    
+    """A peer agent."""
+
     def __init__(self, name: str, role: str, api_key: str):
         self.name = name
         self.role = role
         self.client = OpenAI(api_key=api_key)
-        self.peers: List['PeerAgent'] = []
-        self.conversation_history: List[Dict] = []
-    
-    def add_peer(self, peer: 'PeerAgent'):
-        """동료 Agent 추가"""
+        self.peers: List["PeerAgent"] = []
+        self.message_history: List[Dict] = []
+
+    def add_peer(self, peer: "PeerAgent") -> None:
+        """Add a peer."""
         if peer not in self.peers:
             self.peers.append(peer)
-    
-    def send_message(self, recipient_name: str, message: str):
-        """특정 Agent에게 메시지 전송"""
-        recipient = next((p for p in self.peers if p.name == recipient_name), None)
-        if recipient:
-            recipient.receive_message(self.name, message)
-    
-    def receive_message(self, sender_name: str, message: str):
-        """메시지 수신"""
-        self.conversation_history.append({
-            "from": sender_name,
+
+    def send_message(self, recipient: "PeerAgent", message: str) -> str:
+        """Send a message to a peer."""
+        msg = {
+            "from": self.name,
+            "to": recipient.name,
+            "content": message
+        }
+        self.message_history.append(msg)
+        return recipient.receive_message(self, message)
+
+    def receive_message(self, sender: "PeerAgent", message: str) -> str:
+        """Receive a message and respond."""
+        prompt = f"""You are {self.name}, a {self.role}.
+Message from {sender.name}: {message}
+
+Respond appropriately. If you need help from another peer, mention it."""
+
+        response = self.client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        reply = response.choices[0].message.content
+
+        self.message_history.append({
+            "from": sender.name,
             "to": self.name,
-            "message": message
+            "content": message,
+            "reply": reply
         })
-        
-        # 메시지에 대한 응답 생성
-        response = self.generate_response(sender_name, message)
-        
-        # 응답이 필요하면 답장
-        if response:
-            sender = next((p for p in self.peers if p.name == sender_name), None)
-            if sender:
-                sender.receive_message(self.name, response)
-    
-    def generate_response(self, sender_name: str, message: str) -> Optional[str]:
-        """메시지에 대한 응답 생성"""
-        context = f"You are {self.name}, a {self.role}.\n"
-        context += f"Message from {sender_name}: {message}\n"
-        context += "Generate a response or return 'DONE' if no response needed."
-        
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": context}
-            ],
-            temperature=0.7
-        )
-        
-        result = response.choices[0].message.content
-        return None if result.strip() == "DONE" else result
-
-# 사용 예시
-researcher = PeerAgent(name="Researcher", role="research specialist", api_key="your-api-key")
-writer = PeerAgent(name="Writer", role="content writer", api_key="your-api-key")
-reviewer = PeerAgent(name="Reviewer", role="content reviewer", api_key="your-api-key")
-
-# 서로를 동료로 등록
-researcher.add_peer(writer)
-writer.add_peer(researcher)
-writer.add_peer(reviewer)
-reviewer.add_peer(writer)
-
-# 협업 시작
-researcher.send_message("Writer", "AI Agent에 대한 글을 작성해줘. 내가 조사한 내용: ...")
-# Writer가 글을 작성하고 Reviewer에게 전달
-# Reviewer가 피드백을 주고 Writer가 수정
+        return reply
 ```
 
-**장점:**
-- 중앙 조율자 없이 유연한 협력
-- Agent 간 직접 통신으로 빠른 의사결정
+이 패턴은 창의적 협업이나 리뷰-피드백 흐름에는 자연스럽습니다. 하지만 누가 종료를 선언하는지, 어느 시점에 escalation하는지, 동일 요청을 다시 보내면 어떻게 막을지 같은 규칙이 없으면 곧 루프와 중복이 생깁니다.
 
-**단점:**
-- 통신 흐름이 복잡해질 수 있음
-- 무한 루프 위험 (A→B→A→B→...)
+### Hierarchical 패턴은 큰 조직 구조를 닮습니다
 
----
+부모 agent가 자식 agent에게 위임하고, 자식은 더 작은 하위 작업을 맡습니다. 규모가 큰 업무를 계층적으로 분해할 때 유용하지만, 깊이가 늘수록 context 손실과 보고 비용도 함께 커집니다. 따라서 child가 남기는 출력 계약을 매우 좁게 설계해야 합니다.
 
-### Hierarchical 패턴 (계층적 위임)
+### shared state는 최소 계약만 노출하는 편이 좋습니다
 
-Manager Agent가 여러 하위 Manager를 관리하고, 각 Manager가 자신의 Worker를 관리합니다.
+- route, current_owner, worker_result 같은 핵심 필드만 공유합니다.
+- 각 agent 전용 scratchpad를 전역 shared state로 노출하지 않습니다.
+- handoff마다 입력과 출력 스키마를 고정합니다.
+- 최종 조립 책임은 한 agent 또는 별도 finalizer에 둡니다.
+- delegation 사유를 로그에 남겨 route 품질을 평가할 수 있게 합니다.
 
-```python
-class HierarchicalAgent:
-    """계층적 Agent (Manager 또는 Worker)"""
-    
-    def __init__(self, name: str, role: str, api_key: str, is_manager: bool = False):
-        self.name = name
-        self.role = role
-        self.client = OpenAI(api_key=api_key)
-        self.is_manager = is_manager
-        self.subordinates: List['HierarchicalAgent'] = []
-    
-    def add_subordinate(self, agent: 'HierarchicalAgent'):
-        """하위 Agent 추가 (Manager만 가능)"""
-        if self.is_manager:
-            self.subordinates.append(agent)
-    
-    def execute(self, task: str) -> str:
-        """작업 실행 또는 위임"""
-        if self.is_manager and self.subordinates:
-            # Manager: 작업을 하위 Agent에게 위임
-            delegate_plan = self._plan_delegation(task)
-            results = []
-            
-            for subtask, agent_name in delegate_plan:
-                agent = next((a for a in self.subordinates if a.name == agent_name), None)
-                if agent:
-                    result = agent.execute(subtask)
-                    results.append(f"{agent_name}: {result}")
-            
-            # 결과 종합
-            return self._synthesize_results(results)
-        else:
-            # Worker: 직접 실행
-            return self._execute_task(task)
-    
-    def _plan_delegation(self, task: str) -> List[tuple]:
-        """작업을 하위 Agent들에게 어떻게 분배할지 계획"""
-        subordinate_info = ", ".join([f"{s.name} ({s.role})" for s in self.subordinates])
-        
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"""You are {self.name}, a manager.
-Your subordinates: {subordinate_info}
-Break down the task and assign subtasks to appropriate subordinates.
-Format: subtask|agent_name (one per line)"""},
-                {"role": "user", "content": task}
-            ],
-            temperature=0
-        )
-        
-        plan = []
-        for line in response.choices[0].message.content.split("\n"):
-            if "|" in line:
-                subtask, agent_name = line.split("|", 1)
-                plan.append((subtask.strip(), agent_name.strip()))
-        
-        return plan
-    
-    def _execute_task(self, task: str) -> str:
-        """Worker가 작업 직접 실행"""
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"You are {self.name}, a {self.role}."},
-                {"role": "user", "content": task}
-            ],
-            temperature=0.7
-        )
-        return response.choices[0].message.content
-    
-    def _synthesize_results(self, results: List[str]) -> str:
-        """하위 Agent 결과를 종합"""
-        combined = "\n".join(results)
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"You are {self.name}. Synthesize the following results."},
-                {"role": "user", "content": combined}
-            ],
-            temperature=0
-        )
-        return response.choices[0].message.content
+## 흔히 헷갈리는 지점
 
-# 사용 예시
-# 최상위 관리자
-cto = HierarchicalAgent(name="CTO", role="technical leader", api_key="your-api-key", is_manager=True)
+- agent를 여러 개 두면 자동으로 품질이 올라갈 것이라 기대하기 쉽지만, 실제로는 역할 경계가 먼저 필요합니다.
+- orchestrator가 모든 세부 작업까지 하도록 만들면 결국 single-agent와 다를 바가 없어집니다.
+- shared state를 넓게 열어 두면 유연할 것 같지만, 곧 결합도와 디버깅 난이도가 폭증합니다.
+- peer-to-peer는 자유로워 보여도 종료 규칙이 없으면 무한 handoff가 생기기 쉽습니다.
+- multi-agent는 전문성이 높아 보이지만, 실제로는 single-agent + better tools로 충분한 문제도 많습니다.
 
-# 중간 관리자
-dev_manager = HierarchicalAgent(name="DevManager", role="development manager", api_key="your-api-key", is_manager=True)
-qa_manager = HierarchicalAgent(name="QAManager", role="QA manager", api_key="your-api-key", is_manager=True)
+## 운영 체크리스트
 
-# 작업 담당 Agent
-backend_dev = HierarchicalAgent(name="BackendDev", role="backend developer", api_key="your-api-key")
-frontend_dev = HierarchicalAgent(name="FrontendDev", role="frontend developer", api_key="your-api-key")
-qa_tester = HierarchicalAgent(name="QATester", role="QA tester", api_key="your-api-key")
+- [ ] multi-agent가 정말 필요한지 single-agent 대안과 비교했는가
+- [ ] 누가 route를 결정하고 누가 최종 답을 책임지는지 명시했는가
+- [ ] handoff 입력/출력 스키마와 종료 조건이 정의되어 있는가
+- [ ] shared state를 최소 필드로 제한했는가
+- [ ] agent별 latency, route accuracy, handoff count를 측정하는가
 
-# 계층 구성
-cto.add_subordinate(dev_manager)
-cto.add_subordinate(qa_manager)
+## 정리
 
-dev_manager.add_subordinate(backend_dev)
-dev_manager.add_subordinate(frontend_dev)
+multi-agent 시스템은 여러 모델을 멋지게 묶는 기술이 아닙니다. 역할을 분리하고, 위임 경계를 명확히 하고, 최종 책임 위치를 고정해서 더 설명 가능한 자동화 구조를 만드는 방법입니다. 그래서 핵심은 agent 수보다 프로토콜 품질에 있습니다.
 
-qa_manager.add_subordinate(qa_tester)
+좋은 multi-agent 설계는 각 agent를 더 작게 만들고, shared state를 더 좁게 만들며, 최종 조립 지점을 더 선명하게 만듭니다. 반대로 나쁜 설계는 agent를 늘릴수록 누가 무엇을 했는지 알기 어려워집니다.
 
-# 작업 실행
-result = cto.execute("새로운 사용자 인증 기능 개발 및 테스트")
-print(result)
-```
-
-**장점:**
-- 대규모 조직 구조 모델링 가능
-- 명확한 책임 체인
-- 확장성이 높음
-
-**단점:**
-- 구조가 복잡함
-- 계층이 깊어지면 통신 지연 증가
-
----
-
-## Agent 간 통신 프로토콜
-
-Multi-Agent 시스템에서 Agent들이 어떻게 메시지를 주고받을지 정의해야 합니다.
-
-### 메시지 포맷 표준화
-
-모든 Agent가 이해할 수 있는 메시지 형식을 정의합니다.
-
-```python
-from typing import Dict, Any, Optional
-from dataclasses import dataclass
-from datetime import datetime
-import json
-
-@dataclass
-class AgentMessage:
-    """표준화된 Agent 메시지"""
-    sender: str          # 발신자 Agent 이름
-    receiver: str        # 수신자 Agent 이름
-    message_type: str    # "request", "response", "notification"
-    content: str         # 메시지 내용
-    metadata: Dict[str, Any]  # 추가 정보
-    timestamp: str       # 전송 시각
-    correlation_id: Optional[str] = None  # 요청-응답 연결용 ID
-    
-    def to_json(self) -> str:
-        """JSON으로 직렬화"""
-        return json.dumps({
-            "sender": self.sender,
-            "receiver": self.receiver,
-            "message_type": self.message_type,
-            "content": self.content,
-            "metadata": self.metadata,
-            "timestamp": self.timestamp,
-            "correlation_id": self.correlation_id
-        })
-    
-    @staticmethod
-    def from_json(json_str: str) -> 'AgentMessage':
-        """JSON에서 역직렬화"""
-        data = json.loads(json_str)
-        return AgentMessage(**data)
-
-# 사용 예시
-request = AgentMessage(
-    sender="OrchestratorAgent",
-    receiver="CodeAgent",
-    message_type="request",
-    content="Python으로 API 호출 예제 작성해줘",
-    metadata={"priority": "high", "language": "ko"},
-    timestamp=datetime.now().isoformat(),
-    correlation_id="req_001"
-)
-
-# JSON으로 직렬화합니다(네트워크 전송용)
-json_message = request.to_json()
-
-# 수신 측에서 역직렬화
-received = AgentMessage.from_json(json_message)
-print(f"From: {received.sender}, Content: {received.content}")
-```
-
-**핵심:**
-- 모든 메시지는 발신자, 수신자, 타입, 내용을 포함합니다.
-- `correlation_id`로 요청과 응답을 연결합니다.
-- JSON 직렬화로 네트워크 전송이나 저장이 가능합니다.
-
----
-
-### Message Broker 패턴
-
-중앙 Message Broker가 메시지 라우팅을 담당합니다.
-
-```python
-from typing import Dict, List, Callable
-from queue import Queue
-import threading
-
-class MessageBroker:
-    """중앙 메시지 브로커"""
-    
-    def __init__(self):
-        self.queues: Dict[str, Queue] = {}
-        self.handlers: Dict[str, Callable] = {}
-        self.running = False
-    
-    def register_agent(self, agent_name: str, handler: Callable):
-        """Agent 등록"""
-        self.queues[agent_name] = Queue()
-        self.handlers[agent_name] = handler
-    
-    def send_message(self, message: AgentMessage):
-        """메시지 전송"""
-        receiver_queue = self.queues.get(message.receiver)
-        if receiver_queue:
-            receiver_queue.put(message)
-        else:
-            print(f"Warning: Receiver {message.receiver} not found")
-    
-    def start(self):
-        """브로커 시작 (각 Agent별 메시지 처리 스레드 시작)"""
-        self.running = True
-        for agent_name in self.queues:
-            thread = threading.Thread(target=self._process_messages, args=(agent_name,))
-            thread.daemon = True
-            thread.start()
-    
-    def _process_messages(self, agent_name: str):
-        """Agent의 메시지 큐 처리"""
-        queue = self.queues[agent_name]
-        handler = self.handlers[agent_name]
-        
-        while self.running:
-            try:
-                message = queue.get(timeout=1)
-                handler(message)
-            except:
-                pass
-    
-    def stop(self):
-        """브로커 중지"""
-        self.running = False
-
-# 사용 예시
-broker = MessageBroker()
-
-def code_agent_handler(message: AgentMessage):
-    """CodeAgent의 메시지 처리 함수"""
-    print(f"[CodeAgent] Received: {message.content}")
-    # 작업 실행
-    result = f"Generated code for: {message.content}"
-    # 응답 전송
-    response = AgentMessage(
-        sender="CodeAgent",
-        receiver=message.sender,
-        message_type="response",
-        content=result,
-        metadata={},
-        timestamp=datetime.now().isoformat(),
-        correlation_id=message.correlation_id
-    )
-    broker.send_message(response)
-
-def orchestrator_handler(message: AgentMessage):
-    """Orchestrator의 메시지 처리 함수"""
-    print(f"[Orchestrator] 응답 수신: {message.content}")
-
-# Agent 등록
-broker.register_agent("CodeAgent", code_agent_handler)
-broker.register_agent("Orchestrator", orchestrator_handler)
-
-# 브로커 시작
-broker.start()
-
-# 메시지 전송
-request = AgentMessage(
-    sender="Orchestrator",
-    receiver="CodeAgent",
-    message_type="request",
-    content="Write Python API call example",
-    metadata={},
-    timestamp=datetime.now().isoformat(),
-    correlation_id="req_001"
-)
-broker.send_message(request)
-
-# 메시지 처리 대기
-import time
-time.sleep(2)
-
-broker.stop()
-```
-
-**장점:**
-- Agent 간 직접 의존성 제거 (decoupling)
-- 비동기 통신 지원
-- 메시지 큐잉으로 부하 조절
-
-**단점:**
-- Message Broker 자체가 단일 장애점
-- 추가 인프라 필요
-
----
-
-### Shared Memory 패턴
-
-공유 메모리(상태 저장소)를 통해 Agent들이 정보를 공유합니다.
-
-```python
-from typing import Dict, Any
-import json
-from datetime import datetime
-
-class SharedMemory:
-    """Agent들이 공유하는 메모리"""
-    
-    def __init__(self):
-        self.memory: Dict[str, Any] = {}
-        self.history: List[Dict] = []
-    
-    def set(self, key: str, value: Any, agent_name: str):
-        """값 설정"""
-        self.memory[key] = value
-        self.history.append({
-            "action": "set",
-            "key": key,
-            "value": value,
-            "agent": agent_name,
-            "timestamp": datetime.now().isoformat()
-        })
-    
-    def get(self, key: str, agent_name: str) -> Any:
-        """값 조회"""
-        value = self.memory.get(key)
-        self.history.append({
-            "action": "get",
-            "key": key,
-            "agent": agent_name,
-            "timestamp": datetime.now().isoformat()
-        })
-        return value
-    
-    def get_history(self) -> List[Dict]:
-        """메모리 접근 이력"""
-        return self.history
-
-class SharedMemoryAgent:
-    """Shared Memory를 사용하는 Agent"""
-    
-    def __init__(self, name: str, shared_memory: SharedMemory):
-        self.name = name
-        self.shared_memory = shared_memory
-    
-    def execute(self, task: str):
-        """작업 실행 및 결과를 공유 메모리에 저장"""
-        # 작업 수행
-        result = f"{self.name} completed: {task}"
-        
-        # 공유 메모리에 저장
-        self.shared_memory.set(f"result_{self.name}", result, self.name)
-        
-        print(f"[{self.name}] 작업 완료, 결과를 공유 메모리에 저장했습니다")
-    
-    def read_peer_result(self, peer_name: str):
-        """다른 Agent의 결과 읽기"""
-        result = self.shared_memory.get(f"result_{peer_name}", self.name)
-        print(f"[{self.name}] Read {peer_name}'s result: {result}")
-        return result
-
-# 사용 예시
-shared_mem = SharedMemory()
-
-agent_a = SharedMemoryAgent(name="AgentA", shared_memory=shared_mem)
-agent_b = SharedMemoryAgent(name="AgentB", shared_memory=shared_mem)
-
-# AgentA가 작업을 실행합니다
-agent_a.execute("Collect data from API")
-
-# AgentB가 AgentA의 결과를 읽고 작업을 이어서 수행합니다
-data = agent_b.read_peer_result("AgentA")
-agent_b.execute(f"Process data: {data}")
-
-# 메모리 접근 이력 확인
-print("\nShared Memory History:")
-for entry in shared_mem.get_history():
-    print(f"{entry['timestamp']} - {entry['agent']}: {entry['action']} {entry['key']}")
-```
-
-**장점:**
-- 복잡한 메시지 프로토콜 불필요
-- Agent 간 상태 공유가 명확함
-
-**단점:**
-- 동시 접근 시 경합(race condition) 발생 가능
-- 공유 메모리 크기 관리 필요
-
----
-
-## 위임 전략
-
-Orchestrator나 Manager Agent가 작업을 어떻게 분배할지 결정하는 전략입니다.
-
-### 역할 기반 위임 (Role-based)
-
-각 Agent의 역할(role)을 기준으로 작업을 할당합니다.
-
-```python
-class RoleBasedOrchestrator:
-    """역할 기반 위임 Orchestrator"""
-    
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
-        self.workers: Dict[str, WorkerAgent] = {}
-        self.role_mapping: Dict[str, str] = {}  # role -> worker_name
-    
-    def register_worker(self, worker: WorkerAgent, role: str):
-        """Worker 등록 (역할과 함께)"""
-        self.workers[worker.name] = worker
-        self.role_mapping[role] = worker.name
-    
-    def delegate_by_role(self, task: str) -> str:
-        """작업 분석 후 역할에 맞는 Worker에게 위임"""
-        # 작업에 필요한 역할 식별
-        required_role = self._identify_required_role(task)
-        
-        # 해당 역할에 맞는 Worker를 찾습니다
-        worker_name = self.role_mapping.get(required_role)
-        if worker_name and worker_name in self.workers:
-            return self.workers[worker_name].execute(task)
-        else:
-            return f"No worker found for role: {required_role}"
-    
-    def _identify_required_role(self, task: str) -> str:
-        """작업에 필요한 역할 식별"""
-        available_roles = ", ".join(self.role_mapping.keys())
-        
-        response = self.client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": f"""Identify which role is needed for this task.
-Available roles: {available_roles}
-Return only the role name."""},
-                {"role": "user", "content": task}
-            ],
-            temperature=0
-        )
-        
-        return response.choices[0].message.content.strip()
-
-# 사용 예시
-orchestrator = RoleBasedOrchestrator(api_key="your-api-key")
-
-code_agent = WorkerAgent(name="CodeExpert", role="Python expert", api_key="your-api-key")
-doc_agent = WorkerAgent(name="DocWriter", role="Documentation writer", api_key="your-api-key")
-
-orchestrator.register_worker(code_agent, role="coding")
-orchestrator.register_worker(doc_agent, role="documentation")
-
-result = orchestrator.delegate_by_role("FastAPI로 REST API 만드는 방법 문서화해줘")
-# "documentation" 역할로 식별되어 DocWriter에게 위임됩니다
-```
-
-**적용:**
-- 작업 유형이 명확히 구분될 때
-- 각 Agent가 특정 전문 분야를 담당할 때
-
----
-
-### 능력 기반 위임 (Capability-based)
-
-각 Agent의 능력(capability)을 점수화하고, 가장 적합한 Agent에게 할당합니다.
-
-```python
-class CapabilityBasedOrchestrator:
-    """능력 기반 위임 Orchestrator"""
-    
-    def __init__(self):
-        self.workers: Dict[str, WorkerAgent] = {}
-        self.capabilities: Dict[str, Dict[str, float]] = {}  # worker_name -> {skill: score}
-    
-    def register_worker(self, worker: WorkerAgent, capabilities: Dict[str, float]):
-        """Worker 등록 (능력 점수와 함께)"""
-        self.workers[worker.name] = worker
-        self.capabilities[worker.name] = capabilities
-    
-    def delegate_by_capability(self, task: str, required_skills: List[str]) -> str:
-        """필요한 스킬에 가장 적합한 Worker 선택"""
-        best_worker = None
-        best_score = 0.0
-        
-        for worker_name, skills in self.capabilities.items():
-            score = sum(skills.get(skill, 0) for skill in required_skills) / len(required_skills)
-            if score > best_score:
-                best_score = score
-                best_worker = worker_name
-        
-        if best_worker:
-            print(f"Selected {best_worker} (score: {best_score:.2f})")
-            return self.workers[best_worker].execute(task)
-        else:
-            return "No suitable worker found"
-
-# 사용 예시
-orchestrator = CapabilityBasedOrchestrator()
-
-agent_a = WorkerAgent(name="AgentA", role="generalist", api_key="your-api-key")
-agent_b = WorkerAgent(name="AgentB", role="specialist", api_key="your-api-key")
-
-orchestrator.register_worker(agent_a, capabilities={
-    "python": 0.7,
-    "javascript": 0.8,
-    "documentation": 0.6
-})
-
-orchestrator.register_worker(agent_b, capabilities={
-    "python": 0.95,
-    "machine_learning": 0.9,
-    "documentation": 0.5
-})
-
-result = orchestrator.delegate_by_capability(
-    task="Python으로 머신러닝 모델 학습 코드 작성",
-    required_skills=["python", "machine_learning"]
-)
-# AgentB가 선택됩니다(python: 0.95, machine_learning: 0.9)
-```
-
-**적용:**
-- 여러 Agent가 비슷한 역할을 하지만 숙련도가 다를 때
-- 작업 난이도에 따라 적절한 Agent 선택이 필요할 때
-
----
-
-### 부하 기반 위임 (Load-based)
-
-현재 부하가 가장 낮은 Agent에게 작업을 할당합니다.
-
-```python
-import time
-from collections import defaultdict
-
-class LoadBasedOrchestrator:
-    """부하 기반 위임 Orchestrator"""
-    
-    def __init__(self):
-        self.workers: Dict[str, WorkerAgent] = {}
-        self.load: Dict[str, int] = defaultdict(int)  # worker_name -> task count
-    
-    def register_worker(self, worker: WorkerAgent):
-        """Worker 등록"""
-        self.workers[worker.name] = worker
-        self.load[worker.name] = 0
-    
-    def delegate_with_load_balancing(self, task: str) -> str:
-        """부하가 가장 낮은 Worker에게 위임"""
-        # 부하가 가장 낮은 Worker를 선택합니다
-        worker_name = min(self.load, key=self.load.get)
-        
-        # 부하 증가
-        self.load[worker_name] += 1
-        
-        print(f"{worker_name}에게 위임 (현재 부하: {self.load[worker_name]})")
-        
-        # 작업 실행
-        result = self.workers[worker_name].execute(task)
-        
-        # 작업 완료 후 부하 감소
-        self.load[worker_name] -= 1
-        
-        return result
-
-# 사용 예시
-orchestrator = LoadBasedOrchestrator()
-
-for i in range(3):
-    worker = WorkerAgent(name=f"Worker{i}", role="general", api_key="your-api-key")
-    orchestrator.register_worker(worker)
-
-# 여러 작업 동시 처리
-import concurrent.futures
-
-tasks = [f"Task {i}" for i in range(10)]
-
-with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-    futures = [executor.submit(orchestrator.delegate_with_load_balancing, task) for task in tasks]
-    results = [f.result() for f in futures]
-
-print(f"\n최종 부하 분포: {dict(orchestrator.load)}")
-```
-
-**적용:**
-- 여러 Agent가 동일한 작업을 수행할 수 있을 때
-- 부하 분산이 중요할 때
-
----
-
-## Multi-Agent가 필요한 상황
-
-Multi-Agent 시스템을 도입하기 전에, 정말 필요한지 판단해야 합니다.
-
-### 단일 Agent로 충분한 경우
-
-```text
-- 작업이 단일 도메인에 속함
-- 순차 처리로 충분함
-- 작업 흐름이 단순함
-- 실시간성이 중요하지 않음
-```
-
-**예:** 문서 요약, 간단한 Q&A, 코드 생성
-
----
-
-### Multi-Agent가 필요한 경우
-
-#### 1. 다중 도메인 작업
-
-```python
-# 예: 프로젝트 기획서 작성
-# - 시장 조사(ResearchAgent)
-# - 기술 스택 추천(TechAgent)
-# - 비용 산정(FinanceAgent)
-# - 문서 작성(WriterAgent)
-```
-
-**단일 Agent 문제점:**
-- 모든 도메인 지식을 한 Agent에 포함하면 컨텍스트가 과부하됩니다.
-- 각 영역의 품질이 떨어질 수 있습니다.
-
-**Multi-Agent 해결:**
-- 각 도메인 전문 Agent가 담당합니다.
-- Orchestrator가 결과를 종합합니다.
-
----
-
-#### 2. 병렬 처리가 필요한 경우
-
-```python
-# 예: 여러 웹사이트 동시 크롤링
-# - Agent1: site1.com 크롤링
-# - Agent2: site2.com 크롤링
-# - Agent3: site3.com 크롤링
-# - Orchestrator: 결과를 병합합니다
-```
-
-**단일 Agent 문제점:**
-- 순차 처리로 시간이 오래 걸립니다.
-
-**Multi-Agent 해결:**
-- 여러 Agent가 병렬로 작업합니다.
-- 전체 실행 시간이 단축됩니다.
-
----
-
-#### 3. 반복 협력이 필요한 경우
-
-```python
-# 예: 콘텐츠 제작 파이프라인
-# 1. Writer: 초안 작성
-# 2. Reviewer: 피드백 제공
-# 3. Writer: 수정
-# 4. Editor: 최종 편집
-```
-
-**단일 Agent 문제점:**
-- Self-review가 제한적입니다 (자기 결과를 객관적으로 평가하기 어려움).
-
-**Multi-Agent 해결:**
-- 서로 다른 관점을 가진 Agent들이 협력합니다.
-- 품질이 향상됩니다.
-
----
-
-#### 4. 장기 실행 작업
-
-```python
-# 예: 지속적인 모니터링 시스템
-# - MonitorAgent: 24시간 시스템 상태를 감시합니다
-# - AlertAgent: 문제를 감지하면 알림을 보냅니다
-# - AnalysisAgent: 로그를 분석하고 리포트를 만듭니다
-```
-
-**단일 Agent 문제점:**
-- 하나의 Agent가 모든 역할을 하면 과부하됩니다.
-- 장애 시 전체 시스템 중단됩니다.
-
-**Multi-Agent 해결:**
-- 각 Agent가 독립적으로 실행됩니다.
-- 한 Agent 장애 시에도 다른 Agent는 동작합니다.
-
----
-
-### 의사결정 가이드
-
-```text
-Multi-Agent를 고려해야 하는 신호:
-✓ "이 작업은 A 전문가와 B 전문가가 모두 필요해"
-✓ "각 단계마다 다른 관점이 필요해"
-✓ "작업을 병렬로 처리하면 훨씬 빠를 것 같아"
-✓ "한 Agent가 모든 걸 하기엔 컨텍스트가 너무 커"
-
-단일 Agent로 충분한 신호:
-✓ "작업이 명확하고 단순해"
-✓ "순차 처리로도 충분히 빨라"
-✓ "하나의 역할만 있으면 돼"
-✓ "실시간 응답이 중요해"
-```
-
----
-
-## 흔한 실수 5가지
-
-### 실수 1: 불필요한 Multi-Agent 도입
-
-**나쁜 예:**
-```python
-# 간단한 문서 요약에 Agent 3개를 사용합니다
-orchestrator = OrchestratorAgent()
-reader = WorkerAgent(name="Reader", role="read document")
-summarizer = WorkerAgent(name="Summarizer", role="summarize")
-formatter = WorkerAgent(name="Formatter", role="format output")
-# 과한 설계입니다. 단일 Agent로 충분합니다
-```
-
-**좋은 예:**
-```python
-# 단일 Agent로 처리합니다
-client = OpenAI(api_key="your-api-key")
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": "Summarize the following document."},
-        {"role": "user", "content": document}
-    ]
-)
-```
-
-**교훈**: Multi-Agent는 복잡성을 증가시킵니다. 정말 필요한 경우에만 사용합니다.
-
----
-
-### 실수 2: Agent 간 통신 프로토콜 없음
-
-**나쁜 예:**
-```python
-# 각 Agent가 자유 형식으로 메시지를 전달합니다
-agent_a.send("여기 데이터야")
-agent_b.send("고마워! 근데 이거 뭐야?")  # 메시지 형식이 통일되지 않음
-```
-
-**좋은 예:**
-```python
-# 표준 메시지 포맷 사용
-message = AgentMessage(
-    sender="AgentA",
-    receiver="AgentB",
-    message_type="data_transfer",
-    content=json.dumps({"data": [1, 2, 3]}),
-    metadata={"format": "json"},
-    timestamp=datetime.now().isoformat()
-)
-broker.send_message(message)
-```
-
-**교훈**: 명확한 통신 프로토콜을 정의합니다.
-
----
-
-### 실수 3: 무한 루프 방지 장치 없음
-
-**나쁜 예:**
-```python
-# AgentA와 AgentB가 서로에게 계속 메시지를 보냅니다
-agent_a.send_to(agent_b, "help")
-# AgentB: "I need more info"라고 보내고 다시 AgentA를 호출합니다
-# AgentA: "What info?"라고 되묻고 다시 AgentB를 호출합니다
-# AgentB: "I don't know"라고 답하며 다시 AgentA를 호출합니다
-# 무한 루프가 발생합니다
-```
-
-**좋은 예:**
-```python
-class SafePeerAgent:
-    def __init__(self, name: str, max_exchanges: int = 5):
-        self.name = name
-        self.max_exchanges = max_exchanges
-        self.exchange_count: Dict[str, int] = defaultdict(int)
-    
-    def send_message(self, recipient: str, message: str):
-        # 같은 상대와의 교환 횟수 체크
-        if self.exchange_count[recipient] >= self.max_exchanges:
-            print(f"[{self.name}] {recipient}와의 최대 교환 횟수 도달")
-            return
-        
-        self.exchange_count[recipient] += 1
-        # 메시지 전송
-```
-
-**교훈**: Agent 간 교환 횟수를 제한합니다.
-
----
-
-### 실수 4: Orchestrator가 모든 세부사항 관리
-
-**나쁜 예:**
-```python
-# Orchestrator가 Worker의 내부 로직까지 관리합니다
-orchestrator.tell_worker("first, load data from DB, then clean it, then...")
-# Worker의 자율성이 사라집니다
-```
-
-**좋은 예:**
-```python
-# Orchestrator는 "무엇을" 할지만 지시합니다
-orchestrator.delegate("CodeAgent", "Python API 호출 예제 작성")
-# CodeAgent가 "어떻게" 할지 결정합니다
-```
-
-**교훈**: Orchestrator는 조율만 하고, 실행 세부사항은 Worker에게 맡깁니다.
-
----
-
-### 실수 5: Agent 실패 시 처리 없음
-
-**나쁜 예:**
-```python
-# Agent가 실패하면 전체 시스템이 중단됩니다
-result = worker.execute(task)  # 예외 발생 시 시스템 멈춤
-```
-
-**좋은 예:**
-```python
-try:
-    result = worker.execute(task)
-except Exception as e:
-    print(f"워커 실패: {e}")
-    # 대체 경로: 다른 Worker에게 다시 시도합니다
-    result = backup_worker.execute(task)
-```
-
-**교훈**: Agent 실패를 예상하고 fallback 전략을 준비합니다.
-
----
-
-## 핵심 요약
-
-- 복잡한 작업이나 다중 도메인 작업에는 Multi-Agent 시스템이 효과적입니다.
-- Orchestrator, Peer-to-Peer, Hierarchical 등 다양한 조정 패턴이 있습니다.
-- Agent 간 명확한 통신 프로토콜과 책임 분담이 성공의 열쇠입니다.
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] 단일 Agent로 풀 수 있는 일과 Multi-Agent가 필요한 일을 분류 기준으로 나눴다.
-- [ ] Supervisor 패턴 예제를 한 번 구현하거나 의사코드로 작성했다.
-- [ ] Agent 간 메시지 포맷을 명시적 schema로 정의했다.
-- [ ] Multi-Agent 호출 횟수를 추적해 비용 폭증을 한 번 재현/예방했다.
-
-<!-- a-grade-example:end -->
+다음 글에서는 이런 시스템을 어떻게 평가할지 다룹니다. route가 적절했는지, trajectory가 효율적이었는지, 최종 성공률이 유지되는지를 측정하지 않으면 multi-agent의 비용을 정당화할 수 없기 때문입니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## AI Agent 101 시리즈
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -1095,20 +244,18 @@ except Exception as e:
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-1. **AutoGPT Multi-Agent Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
-   여러 Agent가 협력하는 자율 시스템 구현 예시. Orchestrator와 Worker 패턴을 보여줍니다.
+### 공식 문서
 
-2. **LangGraph Multi-Agent Systems** - https://langchain-ai.github.io/langgraph/tutorials/multi_agent/  
-   LangGraph의 Multi-Agent 구현 튜토리얼. 메시지 라우팅과 상태 공유 방법을 다룹니다.
+- [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [LangGraph - Multi-agent workflows](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/)
+- [OpenAI Platform - Agents guide](https://platform.openai.com/docs/guides/agents)
+- [CrewAI Documentation](https://docs.crewai.com/)
 
-3. **CrewAI Documentation** - https://docs.crewai.com/  
-   Role-based Multi-Agent 프레임워크. Agent 간 협업 패턴과 위임 전략을 설명합니다.
+### 관련 시리즈
 
-4. **Microsoft Semantic Kernel: Agent Orchestration** - https://learn.microsoft.com/en-us/semantic-kernel/agents/  
-   Microsoft의 Agent Orchestration 가이드. 계층적 Agent 시스템 설계 방법을 제시합니다.
+- [LangGraph 101 - 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
+- [AI Evaluation 101 - 시스템 평가 관점](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 
-Tags: AI Agent, LLM, Tool Use, Python
+Tags: AI Agent, Multi-Agent, Coordination, Delegation

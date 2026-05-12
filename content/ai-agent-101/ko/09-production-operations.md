@@ -14,30 +14,51 @@ tags:
 - Operations
 - Monitoring
 - Observability
-last_reviewed: '2026-05-02'
-seo_description: Agent를 프로덕션에 배포하면 새로운 문제가 생깁니다. 비용이 얼마나 드는지, 응답 시간이 얼마나 걸리는지, 어디서
-  실패하는지, 어떤…
+last_reviewed: '2026-05-12'
+seo_description: production agent 운영에 필요한 observability와 비용 통제를 정리합니다.
 ---
 
 # 운영
 
-> AI Agent 101 시리즈 (9/10)
+agent를 로컬 데모에서 production으로 옮기는 순간 질문이 달라집니다. "잘 답하나?"보다 먼저 "얼마나 비싸나?", "어디서 느려지나?", "왜 실패했나?", "어떤 tool이 병목인가?" 같은 운영 질문이 앞에 나옵니다.
 
-Agent를 프로덕션에 배포하면 새로운 문제가 생깁니다. 비용이 얼마나 드는지, 응답 시간이 얼마나 걸리는지, 어디서 실패하는지, 어떤 도구가 가장 많이 호출되는지 모니터링해야 합니다.
+이 차이는 agent가 단순한 모델 호출이 아니라 여러 단계의 실행 시스템이기 때문에 생깁니다. 한 요청이 planning, tool call, retrieval, synthesis, memory write를 모두 거칠 수 있고, 각 단계가 서로 다른 latency와 failure mode를 가집니다.
 
-Agent 운영의 핵심은 Observability입니다. Agent의 모든 단계를 추적하고, 비용과 지연 시간을 측정하며, 이상 징후를 감지해야 합니다. 또한 스케일링 전략과 비용 최적화도 중요합니다.
+그래서 production agent의 핵심은 observability입니다. 로그, 메트릭, 트레이스가 없으면 문제를 발견해도 원인을 설명할 수 없고, 원인을 모르면 비용 최적화나 품질 개선도 우연에 의존하게 됩니다.
 
-이 글은 AI Agent 101 시리즈의 9번째 글입니다. 여기서는 Agent Observability, 비용 추적, 지연 시간 최적화, 스케일링 패턴, 그리고 프로덕션 체크리스트를 다룹니다.
+이 글은 AI Agent 101 시리즈의 아홉 번째 글입니다.
 
----
+이 글에서는 운영을 모델 배포가 아니라 관측 가능성과 예산 통제의 문제로 정리하겠습니다.
 
-## 관찰 가능성 (Observability)
+## 이 글에서 다룰 문제
 
-운영 환경의 Agent는 "왜 이렇게 답했는가"를 추적할 수 있어야 합니다. Logs, Metrics, Traces 세 축이 핵심입니다.
+- production agent에서 가장 먼저 심어야 할 관측 신호는 무엇일까요?
+- structured logging과 tracing은 각각 어떤 질문에 답해 줄까요?
+- 비용 상한과 사용자별 예산은 어떤 방식으로 강제할 수 있을까요?
+- agent를 scale할 때 병목은 LLM보다 tool 계층에서 더 자주 생길까요?
+- 안전한 배포와 롤백을 위해 무엇을 미리 준비해야 할까요?
 
-### 구조화 로깅
+## 왜 이 글이 중요한가
 
-평문 로그는 파싱과 검색이 어렵습니다. JSON 구조화 로그가 표준입니다.
+운영 체계가 없으면 agent는 금방 블랙박스가 됩니다. 잘될 때는 멋져 보이지만, 느려지거나 틀리거나 비싸질 때 왜 그런지 알 수 없습니다. production 시스템으로서는 매우 위험한 상태입니다.
+
+또한 LLM 비용은 일반적인 API 비용과 다르게 예측이 어렵습니다. 같은 기능도 프롬프트 길이, tool call 횟수, retry, 모델 선택에 따라 단가가 크게 달라집니다. 따라서 운영에서 비용 추적은 단순 회계가 아니라 아키텍처 피드백 루프입니다.
+
+observability는 reliability와 evaluation을 실제로 연결해 주는 층이기도 합니다. 어떤 경로가 비싸고, 어떤 tool이 느리고, 어느 단계에서 실패가 몰리는지 보이지 않으면 앞선 장들에서 설계한 원칙을 검증할 수 없습니다.
+
+## 운영을 이해하는 가장 좋은 방법: 품질 관리가 아니라 실행 시스템의 관측으로 보는 것입니다
+
+agent 운영은 모델 응답을 모니터링하는 일이 아닙니다. 요청 하나가 내부에서 어떤 단계들을 거쳤는지 추적하고, 그 단계별 비용과 시간을 읽는 일에 가깝습니다. 이 관점이 있어야 병목과 낭비를 분리할 수 있습니다.
+
+예를 들어 느린 요청이 모두 모델 때문이라고 가정하면 잘못된 대응을 하게 됩니다. 실제로는 외부 검색 API가 느릴 수도 있고, 같은 tool을 두 번씩 호출하는 workflow 때문일 수도 있고, serialization payload가 지나치게 커서 synthesis가 느릴 수도 있습니다. 운영 관측이 있어야 이 차이가 드러납니다.
+
+현업에서는 보통 로그, 메트릭, 트레이스를 함께 둡니다. 로그는 사건을 읽게 해주고, 메트릭은 추세를 보여 주며, 트레이스는 한 요청의 경로를 복원해 줍니다.
+
+> production agent 운영의 핵심은 "모델이 무엇을 답했는가"보다 "요청이 어떤 경로와 비용으로 처리되었는가"를 관측 가능하게 만드는 데 있습니다.
+
+## 핵심 개념
+
+### structured logging은 사건을 검색 가능한 형태로 남깁니다
 
 ```python
 import logging
@@ -46,7 +67,7 @@ from datetime import datetime
 from typing import Any
 
 class StructuredLogger:
-    """구조화 로깅."""
+    """Structured logger."""
 
     def __init__(self, name: str):
         self.logger = logging.getLogger(name)
@@ -69,24 +90,11 @@ class StructuredLogger:
 
     def error(self, event: str, **fields):
         self.log("ERROR", event, **fields)
-
-# 사용 예시
-logger = StructuredLogger("agent")
-logger.info(
-    "tool_call_completed",
-    request_id="req_123",
-    tool="get_weather",
-    args={"city": "Seoul"},
-    duration_ms=234,
-    success=True
-)
 ```
 
-구조화 로그는 ELK, Datadog, CloudWatch에서 그대로 쿼리할 수 있습니다.
+structured log는 어느 tool이 얼마나 오래 걸렸는지, 어느 request_id에서 어떤 fallback이 발생했는지 같은 질문에 답하게 해 줍니다. plaintext 로그로는 같은 작업을 반복하기 어렵습니다.
 
-### 분산 추적 (Tracing)
-
-Agent의 한 요청은 여러 LLM 호출, 도구 호출을 거칩니다. Trace로 전체 경로를 시각화합니다.
+### tracing은 한 요청의 내부 경로를 복원합니다
 
 ```python
 from contextlib import contextmanager
@@ -94,7 +102,7 @@ import uuid
 import time
 
 class TraceContext:
-    """간단한 분산 추적."""
+    """Simple distributed tracing."""
 
     def __init__(self):
         self.trace_id = str(uuid.uuid4())
@@ -129,33 +137,18 @@ class TraceContext:
                 "error": error,
                 "attributes": attributes
             })
-
-# 사용 예시
-trace = TraceContext()
-
-with trace.span("agent_request", user_id="u_456"):
-    with trace.span("llm_planning", model="gpt-4"):
-        plan = call_llm(user_input)
-
-    with trace.span("tool_execution", tool="search"):
-        result = search_tool(plan["query"])
-
-    with trace.span("llm_synthesis", model="gpt-4"):
-        answer = call_llm(result)
-
-# trace.spans 를 OpenTelemetry, Jaeger 등으로 전송
 ```
 
-OpenTelemetry 표준을 사용하면 LangSmith, Datadog APM과 호환됩니다.
+trace는 "왜 이 요청이 12초 걸렸는가" 같은 질문에 특히 강합니다. planning이 느렸는지, tool이 느렸는지, synthesis가 느렸는지 한 요청 단위로 복원할 수 있기 때문입니다.
 
-### 핵심 메트릭
+### 핵심 메트릭은 적지만 분명해야 합니다
 
 ```python
 from collections import defaultdict
 import threading
 
 class MetricsCollector:
-    """메트릭 수집기."""
+    """Metrics collector."""
 
     def __init__(self):
         self._counters = defaultdict(int)
@@ -171,406 +164,62 @@ class MetricsCollector:
         key = self._make_key(name, tags)
         with self._lock:
             self._timers[key].append(value_ms)
-
-    def _make_key(self, name: str, tags: dict) -> str:
-        if not tags:
-            return name
-        tag_str = ",".join(f"{k}={v}" for k, v in sorted(tags.items()))
-        return f"{name}[{tag_str}]"
-
-    def report(self) -> dict:
-        with self._lock:
-            return {
-                "counters": dict(self._counters),
-                "timers": {
-                    k: {
-                        "count": len(v),
-                        "avg_ms": sum(v) / len(v),
-                        "p95_ms": sorted(v)[int(len(v) * 0.95)] if v else 0
-                    }
-                    for k, v in self._timers.items()
-                }
-            }
-
-# 사용 예시 — 추적해야 할 핵심 메트릭
-metrics = MetricsCollector()
-metrics.increment("agent.requests", status="success")
-metrics.increment("agent.tool_calls", tool="search")
-metrics.increment("agent.errors", type="timeout")
-metrics.timing("agent.request.duration", 1234, model="gpt-4")
-metrics.timing("agent.tool.duration", 234, tool="search")
 ```
 
-핵심 메트릭: 요청 수, 성공/실패율, latency p50/p95/p99, 토큰 사용량, 비용.
+운영 초기에 꼭 보는 메트릭은 보통 다음과 같습니다.
 
-## 비용 추적과 제한
+- request count와 success/failure rate
+- end-to-end latency p50/p95/p99
+- tool별 호출 수와 latency
+- total tokens와 estimated cost
+- fallback 발생 횟수와 timeout 비율
 
-LLM 비용은 운영의 가장 큰 변수입니다. 사용자/조직별 한도를 설정해야 합니다.
+### 비용 상한은 시스템 차원에서 강제해야 합니다
 
 ```python
 from datetime import datetime, timedelta
 
 class BudgetEnforcer:
-    """예산 강제."""
+    """Budget enforcement."""
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
         "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
     }
-
-    def __init__(self):
-        # 사용자별 일일 사용량
-        self._usage = defaultdict(lambda: {"date": None, "spent_usd": 0.0})
-        self._limits = {}  # user_id -> daily_limit_usd
-
-    def set_limit(self, user_id: str, daily_limit_usd: float):
-        self._limits[user_id] = daily_limit_usd
-
-    def check_and_record(
-        self,
-        user_id: str,
-        model: str,
-        prompt_tokens: int,
-        completion_tokens: int
-    ) -> bool:
-        """예산 확인 후 사용량 기록. False면 차단."""
-        today = datetime.utcnow().date()
-        usage = self._usage[user_id]
-
-        # 날짜 바뀌면 리셋
-        if usage["date"] != today:
-            usage["date"] = today
-            usage["spent_usd"] = 0.0
-
-        # 예상 비용
-        cost = (
-            prompt_tokens * self.PRICING[model]["prompt"] +
-            completion_tokens * self.PRICING[model]["completion"]
-        )
-
-        limit = self._limits.get(user_id, float("inf"))
-        if usage["spent_usd"] + cost > limit:
-            return False
-
-        usage["spent_usd"] += cost
-        return True
-
-# 사용 예시
-budget = BudgetEnforcer()
-budget.set_limit("user_123", daily_limit_usd=5.0)
-
-if not budget.check_and_record("user_123", "gpt-4", 1500, 500):
-    raise RuntimeError("일일 예산 초과")
 ```
 
-비용 제한이 없으면 한 사용자가 전체 예산을 소진할 수 있습니다.
+모델 비용은 프롬프트 설계와 workflow 구조에 따라 흔들립니다. 그래서 사용자별 한도, 조직별 예산, 고비용 모델 사용 제한 같은 장치를 시스템 차원에서 걸어 두는 편이 안전합니다. 비용이 관측만 되고 제어되지 않으면 운영은 곧 불안정해집니다.
 
-## 스케일링 전략
+### 배포는 모델만이 아니라 프롬프트와 tool registry의 릴리스입니다
 
-Agent의 부하는 LLM API 호출이 대부분입니다. 따라서 LLM 호출을 효율화하는 것이 핵심입니다.
+agent 배포는 새 코드 배포이면서 동시에 새 프롬프트, 새 schema, 새 workflow 배포입니다. 따라서 canary, rollback, version pinning, replay eval이 함께 있어야 합니다. 특히 tool contract가 바뀌는 릴리스는 기능 코드 못지않게 조심해야 합니다.
 
-### 캐싱
+## 흔히 헷갈리는 지점
 
-같은 입력에 같은 출력은 캐싱할 수 있습니다.
+- 느린 응답의 원인을 모델 하나로 단정하기 쉽지만, 실제 병목은 tool 계층일 때가 많습니다.
+- 로그만 있으면 충분하다고 보기 쉽지만, 추세를 보려면 메트릭이 필요하고 경로를 보려면 트레이스가 필요합니다.
+- 비용 추적은 나중에 붙여도 된다고 생각하기 쉽지만, 초기에 안 넣으면 회귀 비교가 어려워집니다.
+- agent 배포를 모델 버전 변경 정도로만 보기 쉽지만, 프롬프트와 tool schema도 함께 버전 관리해야 합니다.
+- 운영 체크리스트를 만들지 않으면 품질 이슈가 인프라 이슈처럼, 인프라 이슈가 모델 이슈처럼 보이기 쉽습니다.
 
-```python
-import hashlib
-import json
-from typing import Optional
+## 운영 체크리스트
 
-class ResponseCache:
-    """LLM 응답 캐시."""
+- [ ] request_id 기준으로 로그, 메트릭, 트레이스를 연결할 수 있는가
+- [ ] request, tool, model 단위 비용과 latency를 측정하는가
+- [ ] 사용자 또는 조직별 예산 상한과 차단 정책이 있는가
+- [ ] 프롬프트, tool registry, workflow 버전을 함께 관리하는가
+- [ ] canary, rollback, replay eval이 배포 절차에 포함되어 있는가
 
-    def __init__(self, ttl_seconds: int = 3600):
-        self._cache = {}
-        self._ttl = ttl_seconds
+## 정리
 
-    def _key(self, model: str, messages: list, temperature: float) -> str:
-        payload = json.dumps({
-            "model": model,
-            "messages": messages,
-            "temperature": temperature
-        }, sort_keys=True)
-        return hashlib.sha256(payload.encode()).hexdigest()
+production agent 운영의 핵심은 observability입니다. 어떤 요청이 어떤 경로로 처리되었고 어디서 시간이 걸렸으며 얼마의 비용이 들었는지 보이지 않으면, 품질 개선도 비용 최적화도 모두 추측에 머무르게 됩니다.
 
-    def get(self, model: str, messages: list, temperature: float) -> Optional[str]:
-        # temperature > 0 이면 캐시 부적합
-        if temperature > 0:
-            return None
-        key = self._key(model, messages, temperature)
-        entry = self._cache.get(key)
-        if entry and time.time() - entry["timestamp"] < self._ttl:
-            return entry["response"]
-        return None
+좋은 운영 체계는 모델 자체보다 시스템 전체를 봅니다. 로그는 사건을 남기고, 메트릭은 추세를 보게 하고, 트레이스는 경로를 복원하게 합니다. 이 세 축이 있어야 앞선 장들에서 다룬 workflow, memory, reliability 설계가 실제로 검증됩니다.
 
-    def set(self, model: str, messages: list, temperature: float, response: str):
-        if temperature > 0:
-            return
-        key = self._key(model, messages, temperature)
-        self._cache[key] = {"response": response, "timestamp": time.time()}
-```
-
-`temperature=0` 호출만 캐싱하는 것이 안전합니다.
-
-### Rate Limiting과 큐잉
-
-LLM API 자체에 rate limit이 있으므로, Agent에서도 호출을 조절해야 합니다.
-
-```python
-from collections import deque
-
-class RateLimiter:
-    """슬라이딩 윈도우 rate limiter."""
-
-    def __init__(self, max_requests: int, window_seconds: int):
-        self.max_requests = max_requests
-        self.window = window_seconds
-        self.timestamps = deque()
-        self.lock = threading.Lock()
-
-    def acquire(self) -> bool:
-        with self.lock:
-            now = time.time()
-            # 윈도우 밖 타임스탬프 제거
-            while self.timestamps and self.timestamps[0] < now - self.window:
-                self.timestamps.popleft()
-
-            if len(self.timestamps) >= self.max_requests:
-                return False
-
-            self.timestamps.append(now)
-            return True
-
-    def wait_and_acquire(self):
-        while not self.acquire():
-            time.sleep(0.1)
-
-# 사용 예시
-limiter = RateLimiter(max_requests=60, window_seconds=60)  # 분당 60회
-limiter.wait_and_acquire()
-response = call_llm_api()
-```
-
-### 비동기 처리
-
-긴 작업은 큐에 넣고 비동기 처리합니다.
-
-```python
-import asyncio
-from asyncio import Queue
-
-class AgentTaskQueue:
-    """비동기 작업 큐."""
-
-    def __init__(self, num_workers: int = 5):
-        self.queue: Queue = Queue()
-        self.num_workers = num_workers
-        self.workers = []
-
-    async def submit(self, task: dict) -> str:
-        task_id = str(uuid.uuid4())
-        await self.queue.put({"id": task_id, **task})
-        return task_id
-
-    async def _worker(self, worker_id: int):
-        while True:
-            task = await self.queue.get()
-            try:
-                # 실제 Agent 실행
-                await process_task(task)
-            except Exception as e:
-                logger.error("task_failed", task_id=task["id"], error=str(e))
-            finally:
-                self.queue.task_done()
-
-    async def start(self):
-        for i in range(self.num_workers):
-            self.workers.append(asyncio.create_task(self._worker(i)))
-```
-
-## 배포와 롤백
-
-Agent는 LLM, 프롬프트, 도구 정의가 모두 결합된 시스템이라 변경 영향을 예측하기 어렵습니다.
-
-### 점진적 배포 (Canary)
-
-```python
-import random
-
-class CanaryRouter:
-    """일부 트래픽만 새 버전으로 라우팅."""
-
-    def __init__(self, canary_percentage: float = 0.05):
-        self.canary_percentage = canary_percentage
-        self.versions = {"stable": None, "canary": None}
-
-    def register(self, version: str, agent):
-        self.versions[version] = agent
-
-    def route(self, request) -> tuple:
-        if (self.versions["canary"] and
-            random.random() < self.canary_percentage):
-            return self.versions["canary"], "canary"
-        return self.versions["stable"], "stable"
-
-    def adjust_canary(self, percentage: float):
-        self.canary_percentage = max(0.0, min(1.0, percentage))
-
-# 사용 예시
-router = CanaryRouter(canary_percentage=0.05)  # 5%만 canary
-router.register("stable", agent_v1)
-router.register("canary", agent_v2)
-
-agent, version = router.route(user_request)
-result = agent.run(user_request)
-metrics.increment("agent.requests", version=version)
-```
-
-문제 감지 시 즉시 0%로 되돌릴 수 있어야 합니다.
-
-### Feature Flag
-
-```python
-class FeatureFlags:
-    """기능 플래그."""
-
-    def __init__(self):
-        self._flags = {}
-
-    def set(self, name: str, enabled: bool):
-        self._flags[name] = enabled
-
-    def is_enabled(self, name: str, user_id: Optional[str] = None) -> bool:
-        return self._flags.get(name, False)
-
-# 사용 예시
-flags = FeatureFlags()
-flags.set("use_new_planning", False)
-
-def plan_task(task):
-    if flags.is_enabled("use_new_planning"):
-        return new_planner(task)
-    return legacy_planner(task)
-```
-
-런타임에 동작을 켜고 끌 수 있어 문제 발생 시 즉시 대응 가능합니다.
-
-## 흔한 실수 5가지
-
-### 실수 1: 로그/메트릭 없이 배포
-
-문제 발생 시 원인을 추적할 방법이 없습니다.
-
-```python
-# 나쁜 예
-def handle_request(req):
-    return agent.run(req)  # 로깅 0, 메트릭 0
-
-# 좋은 예
-def handle_request(req):
-    req_id = str(uuid.uuid4())
-    logger.info("request_received", request_id=req_id, user=req["user"])
-    start = time.time()
-    try:
-        result = agent.run(req)
-        metrics.timing("agent.duration", (time.time() - start) * 1000)
-        metrics.increment("agent.success")
-        return result
-    except Exception as e:
-        logger.error("request_failed", request_id=req_id, error=str(e))
-        metrics.increment("agent.error")
-        raise
-```
-
-### 실수 2: 비용 모니터링 없음
-
-```python
-# 나쁜 예
-response = openai.ChatCompletion.create(...)  # 비용 추적 0
-return response
-
-# 좋은 예
-response = openai.ChatCompletion.create(...)
-budget.record(
-    user_id=current_user,
-    model=response.model,
-    prompt_tokens=response.usage.prompt_tokens,
-    completion_tokens=response.usage.completion_tokens
-)
-```
-
-월말에 청구서 보고 놀라지 않으려면 실시간 추적이 필수입니다.
-
-### 실수 3: 한 번에 100% 배포
-
-```python
-# 나쁜 예
-def deploy_v2():
-    global agent
-    agent = AgentV2()  # 모든 트래픽 즉시 전환
-
-# 좋은 예
-def deploy_v2():
-    router.register("canary", AgentV2())
-    router.adjust_canary(0.05)  # 5%부터
-    # 모니터링 후 점진적 증가
-```
-
-LLM 기반 시스템은 회귀가 흔하므로 canary 필수입니다.
-
-### 실수 4: Rate Limit 무시
-
-```python
-# 나쁜 예
-for item in items:  # 1만 건
-    response = openai.ChatCompletion.create(...)  # API 한도 초과
-
-# 좋은 예
-limiter = RateLimiter(60, 60)
-for item in items:
-    limiter.wait_and_acquire()
-    response = openai.ChatCompletion.create(...)
-```
-
-대량 처리는 항상 rate limit을 고려합니다.
-
-### 실수 5: PII 로깅
-
-```python
-# 나쁜 예
-logger.info("request", user_message=req.message)  # 개인정보 그대로
-
-# 좋은 예
-logger.info("request",
-    user_id=hash_user_id(req.user_id),  # 해시
-    message_length=len(req.message),    # 길이만
-    message_hash=hash(req.message)      # 내용 자체는 미저장
-)
-```
-
-GDPR/CCPA 위반과 보안 사고의 주요 원인입니다.
-
-## 핵심 요약
-
-- 운영 환경 Agent는 logs, metrics, traces로 관찰 가능해야 합니다
-- 사용자별 비용 한도와 실시간 추적이 필수입니다
-- 캐싱, rate limiting, 비동기 처리로 LLM 호출을 효율화합니다
-- Canary 배포와 feature flag로 안전하게 변경을 적용합니다
-- PII는 로깅하지 말고 해시/마스킹합니다
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] 관찰 지표를 latency / cost / quality / safety로 나눴다.
-- [ ] 한 Agent run 당 토큰·달러 비용을 자동 기록했다.
-- [ ] 동시 요청을 늘려 가며 병목이 LLM인지 도구인지 측정했다.
-- [ ] 카나리 배포·즉시 롤백 절차를 글로 정리했다.
-
-<!-- a-grade-example:end -->
+다음 글에서는 이 모든 요소를 모아 첫 agent를 끝까지 구현해 봅니다. 결국 운영 가능한 agent를 만드는 일은 개념을 아는 것에서 끝나지 않고, 작은 시스템으로 직접 묶어 보는 단계까지 가야 비로소 감이 잡히기 때문입니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## AI Agent 101 시리즈
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -587,16 +236,16 @@ GDPR/CCPA 위반과 보안 사고의 주요 원인입니다.
 
 ## 참고 자료
 
-1. **OpenTelemetry: LLM Observability** - https://opentelemetry.io/docs/specs/semconv/gen-ai/  
-   LLM/Agent 관찰 가능성을 위한 OpenTelemetry semantic conventions. 표준 trace 속성을 정의합니다.
+### 공식 문서
 
-2. **LangSmith Production Monitoring** - https://docs.smith.langchain.com/observability  
-   LangChain의 운영 모니터링 도구. Trace, metric, evaluation을 통합 제공합니다.
+- [OpenTelemetry documentation](https://opentelemetry.io/docs/)
+- [OpenAI Platform - Monitoring usage](https://platform.openai.com/docs/guides/monitor-usage)
+- [LangSmith documentation](https://docs.smith.langchain.com/)
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)
 
-3. **Google SRE Book: Monitoring Distributed Systems** - https://sre.google/sre-book/monitoring-distributed-systems/  
-   Google의 SRE 모니터링 원칙. Four Golden Signals를 Agent에도 적용할 수 있습니다.
+### 관련 시리즈
 
-4. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
-   OpenAI 공식 운영 가이드. Rate limit, 모니터링, 비용 관리 모범 사례를 제공합니다.
+- [AI Evaluation 101 - 운영 지표 읽기](../../ai-evaluation-101/ko/10-production-evaluation.md)
+- [Azure App Service 101 - 플랫폼 운영 감각](../../azure-app-service-101/ko/01-what-is-app-service.md)
 
-Tags: AI Agent, LLM, Tool Use, Python
+Tags: AI Agent, Operations, Monitoring, Observability

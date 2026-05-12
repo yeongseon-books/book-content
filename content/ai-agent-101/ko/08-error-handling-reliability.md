@@ -14,119 +14,113 @@ tags:
 - Error Handling
 - Reliability
 - Retry Logic
-last_reviewed: '2026-05-02'
-seo_description: Agent는 외부 도구를 호출하고, 네트워크를 거치고, 모델의 불확실한 판단에 의존하기 때문에 실패할 수 있습니다.
+last_reviewed: '2026-05-12'
+seo_description: retry, fallback, circuit breaker로 agent 신뢰성을 설계하는 법을 설명합니다.
 ---
 
 # 에러 처리와 안정성
 
-> AI Agent 101 시리즈 (8/10)
+agent는 실패하기 쉽습니다. LLM 응답이 형식을 어길 수 있고, 외부 API가 느리거나 죽을 수 있고, 사용자가 잘못된 입력을 줄 수 있고, workflow가 잘못된 판단을 반복할 수도 있습니다. 즉, agent는 여러 불확실성이 겹친 시스템입니다.
 
-Agent는 외부 도구를 호출하고, 네트워크를 거치고, 모델의 불확실한 판단에 의존하기 때문에 실패할 수 있습니다. API 타임아웃, 잘못된 도구 파라미터, 모델의 환각, 예상치 못한 응답 형식 등 다양한 실패 모드가 존재합니다.
+그래서 신뢰성은 나중에 덧붙이는 옵션이 아닙니다. 처음부터 어떤 에러가 retry 가능하고 어떤 에러는 즉시 중단해야 하는지, 언제 fallback하고 언제 사람에게 넘길지, 사용자에게는 어떤 형태로 실패를 드러낼지 설계해야 합니다.
 
-신뢰할 수 있는 Agent를 만들려면 이런 실패를 예측하고 대응해야 합니다. Retry 전략, Fallback 패턴, Timeout 처리, Graceful Degradation이 핵심입니다.
+많은 팀이 reliability를 model accuracy의 하위 문제처럼 다루지만 실제 운영에서는 정반대입니다. 정확도가 조금 낮아도 예측 가능하게 실패하는 시스템이, 정확도가 높지만 가끔 무너지는 시스템보다 훨씬 다루기 쉽습니다.
 
-이 글은 AI Agent 101 시리즈의 8번째 글입니다. 여기서는 Agent의 일반적인 실패 모드, Retry 전략, Fallback 패턴, Timeout 처리 방법, 그리고 Graceful Degradation을 다룹니다.
+이 글은 AI Agent 101 시리즈의 여덟 번째 글입니다.
 
----
+이 글에서는 reliability를 "에러를 없애는 일"이 아니라 "에러를 분류하고 제어하는 일"로 정리하겠습니다.
 
-## Agent에서의 에러 유형
+## 이 글에서 다룰 문제
 
-Agent는 LLM, 도구, 외부 API, 사용자 입력 등 여러 컴포넌트가 얽혀 있어 에러 유형이 다양합니다.
+- agent에서 자주 발생하는 에러를 어떤 축으로 분류하면 좋을까요?
+- retry와 fallback은 언제 서로를 대체하고 언제 함께 써야 할까요?
+- recoverable error와 non-recoverable error를 어떻게 나눌 수 있을까요?
+- circuit breaker와 timeout은 왜 tool use 계층에서 특히 중요할까요?
+- 사용자에게 좋은 graceful degradation은 어떤 모습이어야 할까요?
 
-### LLM 응답 에러
+## 왜 이 글이 중요한가
 
-LLM 자체의 비결정성, 형식 오류, 환각이 가장 흔한 에러원입니다.
+agent는 성공 경로만 설계해서는 배포할 수 없습니다. 외부 검색 API 하나만 붙어도 timeout, rate limit, malformed output, auth failure 같은 문제가 생기고, 여기에 LLM의 비결정성과 tool schema 오류까지 더해집니다. 에러를 기본값으로 받아들이지 않으면 운영 중 바로 흔들립니다.
+
+또한 reliability 설계는 비용 절감과도 연결됩니다. retry를 무분별하게 걸면 시스템 부하와 토큰 비용이 함께 오르고, fallback이 없으면 사소한 장애가 사용자 체감 장애로 번집니다. 따라서 신뢰성은 안정성뿐 아니라 단가 문제이기도 합니다.
+
+무엇보다 좋은 reliability 설계는 나중 평가와 관측성의 기초가 됩니다. 어떤 에러가 어디서 얼마나 발생했고, 어떤 fallback이 얼마나 자주 동작했고, 어떤 요청이 circuit breaker에 막혔는지 남겨야 개선이 가능합니다.
+
+## 신뢰성을 이해하는 가장 좋은 방법: 실패를 제거하는 것이 아니라 제어하는 것으로 보는 것입니다
+
+운영에서 중요한 것은 실패를 0으로 만드는 일이 아닙니다. 실제로는 불가능합니다. 더 중요한 것은 실패가 났을 때 시스템이 예측 가능한 형태로 멈추거나, 줄어든 기능으로라도 응답하거나, 안전하게 재시도하도록 만드는 것입니다.
+
+이 관점이 있으면 에러 처리도 더 단순해집니다. 모든 예외를 뭉뚱그려 잡는 대신, 파싱 실패인지, 네트워크 실패인지, 사용자 입력 오류인지, 권한 문제인지 분리해서 생각하게 됩니다. 그래야 retry 가능 여부도 구체적으로 판단할 수 있습니다.
+
+현업에서는 "실패했지만 왜 실패했는지 설명 가능하고, 다음 동작이 정의되어 있는가"가 reliability의 핵심 기준입니다.
+
+> reliable agent는 실패하지 않는 agent가 아니라, 실패를 분류하고 제한하며 사용자와 운영자 모두에게 예측 가능한 방식으로 드러내는 agent입니다.
+
+## 핵심 개념
+
+### LLM 응답 에러는 가장 흔한 입력 실패입니다
 
 ```python
 import json
 from typing import Optional
 
 class LLMResponseError(Exception):
-    """LLM 응답 관련 에러."""
+    """LLM response error."""
     pass
 
 def parse_llm_json(response_text: str) -> dict:
-    """LLM이 반환한 JSON을 안전하게 파싱."""
-    # 1. 마크다운 코드 블록 제거
+    """Safely parse JSON returned by an LLM."""
+    # 1. Strip markdown code fences
     cleaned = response_text.strip()
     if cleaned.startswith("```"):
-        # ```json ... ``` 또는 ``` ... ``` 제거
-        lines = cleaned.split("\n")
-        cleaned = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+        # Remove ```json ... ``` or ``` ... ```
+        lines = cleaned.split("
+")
+        cleaned = "
+".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
-    # 2. JSON 파싱 시도
+    # 2. Try to parse
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError as e:
-        raise LLMResponseError(f"JSON 파싱 실패: {e}\n원본: {response_text[:200]}")
-
-# 사용 예시
-response = '```json\n{"action": "search", "query": "Python"}\n```'
-try:
-    parsed = parse_llm_json(response)
-except LLMResponseError as e:
-    # 재시도 로직으로 분기
-    pass
+        raise LLMResponseError(f"JSON parse failed: {e}
+raw: {response_text[:200]}")
 ```
 
-LLM 응답을 항상 검증하고 파싱 실패에 대한 대응 경로를 마련해야 합니다.
+structured output를 요구하는 agent에서는 파싱 실패가 곧 workflow 실패로 이어질 수 있습니다. 따라서 이 구간은 단순 try/except가 아니라 retry 분기와 telemetry가 함께 있어야 합니다.
 
-### 도구 호출 에러
-
-도구 자체의 실패, 타임아웃, 외부 API 장애 등이 포함됩니다.
+### tool 에러는 recoverable 여부를 먼저 나눠야 합니다
 
 ```python
 import requests
 from typing import Any
 
 class ToolExecutionError(Exception):
-    """도구 실행 실패."""
+    """Tool execution failed."""
     def __init__(self, tool_name: str, reason: str, recoverable: bool = True):
         self.tool_name = tool_name
         self.reason = reason
         self.recoverable = recoverable
-        super().__init__(f"{tool_name} 실패: {reason}")
+        super().__init__(f"{tool_name} failed: {reason}")
 
 def execute_tool_safely(tool_name: str, tool_fn, **kwargs) -> Any:
-    """도구를 안전하게 실행."""
+    """Run a tool safely."""
     try:
         return tool_fn(**kwargs)
     except requests.Timeout:
-        raise ToolExecutionError(tool_name, "타임아웃", recoverable=True)
+        raise ToolExecutionError(tool_name, "timeout", recoverable=True)
     except requests.ConnectionError:
-        raise ToolExecutionError(tool_name, "네트워크 연결 실패", recoverable=True)
+        raise ToolExecutionError(tool_name, "network connection failed", recoverable=True)
     except ValueError as e:
-        # 잘못된 인자 — 같은 인자로 재시도해도 실패
-        raise ToolExecutionError(tool_name, f"잘못된 인자: {e}", recoverable=False)
+        # Bad arguments — same args won't succeed on retry
+        raise ToolExecutionError(tool_name, f"bad argument: {e}", recoverable=False)
     except Exception as e:
-        raise ToolExecutionError(tool_name, f"예상치 못한 에러: {e}", recoverable=False)
+        raise ToolExecutionError(tool_name, f"unexpected error: {e}", recoverable=False)
 ```
 
-`recoverable` 플래그로 재시도 가능 여부를 구분하면 상위에서 적절히 대응할 수 있습니다.
+recoverable 구분이 중요한 이유는 retry 정책을 분기하기 위해서입니다. 잘못된 인자를 세 번 더 보내는 것은 복구가 아니라 부하 증가입니다. 반대로 일시적 timeout을 한 번의 실패로 끝내는 것도 아깝습니다.
 
-### 사용자 입력 에러
-
-악의적 입력, 모호한 요청, 컨텍스트 윈도우 초과 등이 발생합니다.
-
-```python
-class UserInputError(Exception):
-    pass
-
-def validate_user_input(text: str, max_chars: int = 10000) -> str:
-    """사용자 입력 검증."""
-    if not text or not text.strip():
-        raise UserInputError("빈 입력")
-    if len(text) > max_chars:
-        raise UserInputError(f"입력이 너무 깁니다 ({len(text)}자, 최대 {max_chars}자)")
-    return text.strip()
-```
-
-검증되지 않은 입력은 LLM 비용 폭탄과 보안 사고로 이어집니다.
-
-## Retry 패턴
-
-가장 기본적인 안정성 메커니즘입니다. Exponential backoff가 표준입니다.
+### retry는 제한된 범위에서만 써야 합니다
 
 ```python
 import time
@@ -142,7 +136,7 @@ def retry_with_backoff(
     jitter: bool = True,
     retryable_exceptions: Tuple[Type[Exception], ...] = (Exception,)
 ):
-    """Exponential backoff로 재시도."""
+    """Retry with exponential backoff."""
     last_exception = None
 
     for attempt in range(max_attempts):
@@ -157,33 +151,19 @@ def retry_with_backoff(
             if jitter:
                 delay = delay * (0.5 + random.random())
 
-            print(f"시도 {attempt + 1} 실패: {e}. {delay:.1f}초 후 재시도")
+            print(f"attempt {attempt + 1} failed: {e}. retrying in {delay:.1f}s")
             time.sleep(delay)
 
     raise last_exception
-
-# 사용 예시
-def call_flaky_api():
-    response = requests.get("https://api.example.com/data", timeout=5)
-    response.raise_for_status()
-    return response.json()
-
-result = retry_with_backoff(
-    call_flaky_api,
-    max_attempts=5,
-    retryable_exceptions=(requests.Timeout, requests.ConnectionError)
-)
 ```
 
-주의: `recoverable=False` 에러까지 재시도하면 시스템 부하만 키우고 결과는 같습니다.
+retry는 가장 쉬운 안정성 장치지만 가장 남용되기 쉬운 장치이기도 합니다. recovery 가능성이 없는 에러에 retry를 걸면 단지 더 느리고 더 비싼 실패를 만들 뿐입니다.
 
-## Fallback과 Graceful Degradation
-
-주 경로가 실패해도 부분적으로 응답하는 능력이 사용자 경험을 크게 좌우합니다.
+### fallback과 graceful degradation은 사용자 경험을 지킵니다
 
 ```python
 class FallbackChain:
-    """순차적으로 fallback을 시도."""
+    """Try fallbacks sequentially."""
 
     def __init__(self):
         self.handlers = []
@@ -200,254 +180,51 @@ class FallbackChain:
                 return {"result": result, "source": name, "fallbacks_tried": errors}
             except Exception as e:
                 errors.append({"handler": name, "error": str(e)})
-        raise RuntimeError(f"모든 핸들러 실패: {errors}")
-
-# 사용 예시
-def primary_search(query):
-    return external_search_api(query)
-
-def cached_search(query):
-    return cache.get(f"search:{query}") or []
-
-def degraded_search(query):
-    return [{"text": f"'{query}' 검색은 일시적으로 사용할 수 없습니다.", "fallback": True}]
-
-chain = (FallbackChain()
-    .add(primary_search, "primary")
-    .add(cached_search, "cache")
-    .add(degraded_search, "degraded"))
-
-result = chain.execute("Python tutorial")
-# 1차 실패 시 캐시, 캐시도 실패 시 안내 메시지 반환
+        raise RuntimeError(f"all handlers failed: {errors}")
 ```
 
-Graceful degradation은 "나쁜 응답" 대신 "정직한 한정 응답"을 제공합니다.
+fallback은 항상 같은 품질을 보장하지는 않지만, 최소한 솔직한 부분 응답을 가능하게 합니다. 예를 들어 실시간 검색이 실패하면 캐시 결과를 주거나, 그것도 안 되면 제한된 안내 메시지를 줄 수 있습니다. 이 계층이 사용자 신뢰를 크게 좌우합니다.
 
-## Circuit Breaker 패턴
-
-특정 서비스가 계속 실패할 때 일시적으로 차단해 시스템 전체 부하를 막습니다.
+### 반복 장애에는 circuit breaker가 필요합니다
 
 ```python
 from enum import Enum
 import time
 
 class CircuitState(Enum):
-    CLOSED = "closed"      # 정상
-    OPEN = "open"          # 차단
-    HALF_OPEN = "half_open"  # 시험 호출
-
-class CircuitBreaker:
-    """Circuit Breaker."""
-
-    def __init__(
-        self,
-        failure_threshold: int = 5,
-        recovery_timeout: float = 60.0,
-        success_threshold: int = 2
-    ):
-        self.failure_threshold = failure_threshold
-        self.recovery_timeout = recovery_timeout
-        self.success_threshold = success_threshold
-
-        self.state = CircuitState.CLOSED
-        self.failure_count = 0
-        self.success_count = 0
-        self.last_failure_time = 0.0
-
-    def call(self, fn: Callable, *args, **kwargs):
-        if self.state == CircuitState.OPEN:
-            if time.time() - self.last_failure_time > self.recovery_timeout:
-                self.state = CircuitState.HALF_OPEN
-                self.success_count = 0
-            else:
-                raise RuntimeError("Circuit breaker OPEN")
-
-        try:
-            result = fn(*args, **kwargs)
-            self._on_success()
-            return result
-        except Exception:
-            self._on_failure()
-            raise
-
-    def _on_success(self):
-        if self.state == CircuitState.HALF_OPEN:
-            self.success_count += 1
-            if self.success_count >= self.success_threshold:
-                self.state = CircuitState.CLOSED
-                self.failure_count = 0
-        elif self.state == CircuitState.CLOSED:
-            self.failure_count = 0
-
-    def _on_failure(self):
-        self.failure_count += 1
-        self.last_failure_time = time.time()
-        if self.failure_count >= self.failure_threshold:
-            self.state = CircuitState.OPEN
-
-# 사용 예시
-breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=30)
-
-try:
-    result = breaker.call(external_api_call, "param")
-except RuntimeError as e:
-    # Circuit이 열렸으므로 fallback 사용
-    result = cached_value
+    CLOSED = "closed"      # normal
+    OPEN = "open"          # blocked
+    HALF_OPEN = "half_open"  # trial calls
 ```
 
-Circuit breaker는 외부 API 의존성이 많은 Agent에 필수적입니다.
+외부 서비스가 계속 실패할 때 계속 호출을 밀어 넣으면 전체 시스템이 함께 무너집니다. circuit breaker는 이 전염을 막는 장치입니다. 특히 search, browser, payment 같은 고비용 tool에는 거의 필수에 가깝습니다.
 
-## 안전한 도구 실행
+## 흔히 헷갈리는 지점
 
-도구 실행 시 시간/리소스 제한을 두지 않으면 한 번의 실패가 전체 시스템을 마비시킬 수 있습니다.
+- 모든 에러에 retry를 거는 것이 안전하다고 생각하기 쉽지만, non-recoverable 에러에는 해롭습니다.
+- fallback은 품질 저하라서 없어도 된다고 보기 쉽지만, production에서는 오히려 중요한 신뢰 장치입니다.
+- structured output을 요구하면 형식 오류가 사라질 것 같지만, 실제로는 파싱 실패 대비가 여전히 필요합니다.
+- timeout은 인프라 문제라고만 생각하기 쉽지만, agent 설계에서 stop condition의 일부입니다.
+- 에러 메시지를 숨기는 것이 UX라고 보기 쉽지만, 솔직한 제한 안내가 잘못된 확신보다 낫습니다.
 
-```python
-import signal
-from contextlib import contextmanager
+## 운영 체크리스트
 
-class TimeoutError(Exception):
-    pass
+- [ ] LLM 응답, tool 실행, 사용자 입력 에러를 별도 클래스로 분리했는가
+- [ ] retry 가능 여부를 에러 수준에서 구분하는가
+- [ ] fallback과 degraded response 경로가 정의되어 있는가
+- [ ] timeout, circuit breaker, max step 제한이 존재하는가
+- [ ] 실패 원인과 fallback 사용 여부를 로그와 메트릭으로 남기는가
 
-@contextmanager
-def time_limit(seconds: int):
-    """함수 실행 시간 제한."""
-    def signal_handler(signum, frame):
-        raise TimeoutError(f"실행이 {seconds}초를 초과")
+## 정리
 
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)
+agent reliability는 실패를 없애는 기술이 아니라 실패를 제어하는 기술입니다. 어떤 에러는 다시 시도하고, 어떤 에러는 즉시 멈추고, 어떤 에러는 우회 경로로 처리하며, 어떤 경우에는 사용자에게 제한된 응답을 솔직하게 돌려줘야 합니다.
 
-def run_tool_with_limits(tool_fn, *args, timeout: int = 30, **kwargs):
-    """타임아웃과 예외 처리를 포함한 도구 실행."""
-    try:
-        with time_limit(timeout):
-            return tool_fn(*args, **kwargs)
-    except TimeoutError as e:
-        raise ToolExecutionError("tool", str(e), recoverable=True)
-    except Exception as e:
-        raise ToolExecutionError("tool", str(e), recoverable=False)
-```
+좋은 reliability 설계는 모델과 도구의 불확실성을 시스템 차원에서 흡수합니다. 그래야 실패가 있더라도 전체 서비스는 예측 가능한 형태를 유지하고, 운영자는 원인을 추적할 수 있습니다.
 
-도구별로 적절한 타임아웃을 설정해야 합니다.
-
-## 흔한 실수 5가지
-
-### 실수 1: 모든 에러를 재시도
-
-```python
-# 나쁜 예
-for _ in range(5):
-    try:
-        return call_api(invalid_args)  # 잘못된 인자는 재시도해도 실패
-    except Exception:
-        time.sleep(1)
-
-# 좋은 예
-try:
-    return call_api(args)
-except (Timeout, ConnectionError):
-    return retry_with_backoff(lambda: call_api(args))
-except ValueError:
-    raise  # 재시도 불가
-```
-
-복구 불가능한 에러는 빠르게 실패시켜야 합니다.
-
-### 실수 2: 무한 재시도
-
-```python
-# 나쁜 예
-while True:
-    try:
-        return call_api()
-    except Exception:
-        time.sleep(1)  # 영원히 반복
-
-# 좋은 예
-return retry_with_backoff(call_api, max_attempts=5)
-```
-
-반드시 최대 시도 횟수와 시간 제한을 둡니다.
-
-### 실수 3: Fallback 없이 단일 경로 의존
-
-```python
-# 나쁜 예
-def search(query):
-    return external_api.search(query)  # API 죽으면 전체 다운
-
-# 좋은 예
-def search(query):
-    try:
-        return external_api.search(query)
-    except Exception:
-        return cache.get(query) or []  # 최소한 캐시라도
-```
-
-핵심 기능에는 항상 fallback을 제공합니다.
-
-### 실수 4: 에러를 조용히 삼키기
-
-```python
-# 나쁜 예
-try:
-    result = risky_operation()
-except Exception:
-    pass  # 무시 — 디버깅 불가능
-
-# 좋은 예
-try:
-    result = risky_operation()
-except Exception as e:
-    logger.error(f"risky_operation 실패: {e}", exc_info=True)
-    metrics.increment("risky_operation.failures")
-    raise
-```
-
-에러는 항상 로그와 메트릭에 기록합니다.
-
-### 실수 5: 사용자에게 raw 에러 노출
-
-```python
-# 나쁜 예
-return {"error": str(exception)}  # 내부 구조, 스택 트레이스 노출
-
-# 좋은 예
-return {
-    "error": "요청을 처리할 수 없습니다",
-    "request_id": req_id,  # 내부 추적용
-}
-# 상세 정보는 서버 로그에만
-```
-
-사용자에게는 친화적 메시지, 내부 추적 ID는 별도로 관리합니다.
-
-## 핵심 요약
-
-- Agent 에러는 LLM 응답, 도구 호출, 사용자 입력 등 여러 층에서 발생합니다
-- Retry는 exponential backoff와 jitter를 함께 사용하고, 복구 가능 여부를 구분합니다
-- Fallback과 graceful degradation으로 부분 응답이라도 제공합니다
-- Circuit breaker는 반복 실패하는 외부 의존성으로부터 시스템을 보호합니다
-- 도구 실행에는 항상 타임아웃과 리소스 제한을 둡니다
-- 에러는 조용히 삼키지 말고 로그·메트릭으로 가시화합니다
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] Agent 에러를 transient / permanent / model-level로 분류했다.
-- [ ] Exponential backoff retry를 직접 구현해 transient 에러를 흡수했다.
-- [ ] Circuit breaker open/half-open/closed 상태 전이를 그려 봤다.
-- [ ] 도구 실행을 timeout + sandbox로 감싼 예제를 작성했다.
-
-<!-- a-grade-example:end -->
+다음 글에서는 이렇게 설계한 agent를 실제 운영 환경에서 어떻게 관측하고 비용을 관리할지 다룹니다. 안정성 장치가 있어도 보이지 않으면 개선할 수 없기 때문입니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## AI Agent 101 시리즈
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -464,16 +241,16 @@ return {
 
 ## 참고 자료
 
-1. **Release It! Design and Deploy Production-Ready Software** - Michael Nygard - https://pragprog.com/titles/mnee2/release-it-second-edition/  
-   Circuit breaker, bulkhead, timeout 등 안정성 패턴의 고전. Agent 시스템에도 그대로 적용됩니다.
+### 공식 문서
 
-2. **AWS Builders' Library: Timeouts, retries, and backoff with jitter** - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/  
-   AWS의 재시도/백오프 모범 사례. Jitter의 필요성과 구체적인 알고리즘을 설명합니다.
+- [Google SRE Book - Handling Overload](https://sre.google/sre-book/handling-overload/)
+- [OpenAI Platform - Rate limits guide](https://platform.openai.com/docs/guides/rate-limits)
+- [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [Martin Fowler - Circuit Breaker](https://martinfowler.com/bliki/CircuitBreaker.html)
 
-3. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
-   OpenAI 공식 운영 가이드. Rate limit, 에러 코드, 재시도 정책을 다룹니다.
+### 관련 시리즈
 
-4. **Hystrix: Latency and Fault Tolerance** - https://github.com/Netflix/Hystrix/wiki  
-   Netflix의 circuit breaker 라이브러리 문서. 패턴의 핵심 개념과 운영 사례를 제공합니다.
+- [AI Evaluation 101 - 실패 분석과 회귀 검사](../../ai-evaluation-101/ko/08-regression-testing.md)
+- [LangGraph 101 - 상태와 재시도](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
-Tags: AI Agent, LLM, Tool Use, Python
+Tags: AI Agent, Error Handling, Reliability, Retry Logic

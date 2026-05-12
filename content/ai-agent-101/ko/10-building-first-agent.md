@@ -14,58 +14,51 @@ tags:
 - Tutorial
 - Python
 - Hands-on
-last_reviewed: '2026-05-02'
-seo_description: 이제 배운 내용을 종합해서 실제 Agent를 만들어 봅니다. 이번 글에서는 간단하면서도 실용적인 Agent를 처음부터
-  끝까지 구현합니다.
+last_reviewed: '2026-05-12'
+seo_description: 작은 research assistant agent를 직접 구현하며 핵심 구조를 연결합니다.
 ---
 
 # 첫 Agent 만들기
 
-> AI Agent 101 시리즈 (10/10)
+이제까지 이 시리즈에서는 agent를 이루는 부품을 하나씩 떼어 보았습니다. agent의 정의, 컨텍스트, tool use, workflow, memory, evaluation, operations를 각각 따로 설명했지만, 실제 개발에서는 이 요소들이 한 파일 안에서 동시에 만납니다.
 
-이제 배운 내용을 종합해서 실제 Agent를 만들어 봅니다. 이번 글에서는 간단하면서도 실용적인 Agent를 처음부터 끝까지 구현합니다. 컨텍스트 설정, 도구 정의, Workflow 구성, 에러 처리, 테스트까지 전 과정을 다룹니다.
+그래서 마지막 글에서는 작은 research assistant agent를 끝까지 묶어 봅니다. 중요한 목표는 기능을 많이 넣는 것이 아니라, 지금까지 다룬 설계 원칙이 실제 코드에서 어떻게 연결되는지 확인하는 것입니다. 작은 예제라도 구조가 분명하면 이후 LangGraph나 CrewAI 같은 프레임워크로 확장하기 쉽습니다.
 
-추천 프레임워크는 LangGraph와 Crew AI입니다. 두 프레임워크 모두 Agent 구축을 단순화하지만, 접근 방식이 다릅니다. LangGraph는 그래프 기반 Workflow에 강하고, Crew AI는 Multi-Agent 협업에 강합니다.
+또한 첫 구현은 학습용이면서 동시에 기준선 역할을 합니다. 어떤 부분이 직접 코드로 충분하고, 어느 시점부터 framework가 유용한지 판단하는 데도 도움이 됩니다. 즉, 이 글은 단순한 튜토리얼이 아니라 아키텍처 감각을 정리하는 마무리 단계입니다.
 
-이 글은 AI Agent 101 시리즈의 마지막 글입니다. 여기서는 엔드투엔드 구현 예제, LangGraph와 Crew AI 비교, 배포 방법, 그리고 다음 단계 학습 경로를 다룹니다.
+이 글은 AI Agent 101 시리즈의 마지막 글입니다.
 
----
+이 글에서는 작은 agent를 직접 구현하면서 개념을 코드 감각으로 바꾸는 데 집중하겠습니다.
 
-## 만들 Agent: Research Assistant
+## 이 글에서 다룰 문제
 
-이번 글에서는 간단한 리서치 어시스턴트 Agent를 처음부터 끝까지 만들어 봅니다. 이 Agent는 사용자가 질문을 던지면 다음 단계를 거칩니다.
+- 첫 agent의 책임 범위는 어디까지로 제한하는 편이 좋을까요?
+- tool, memory, loop를 어떤 순서로 구현하면 구조가 가장 잘 보일까요?
+- raw Python 구현과 framework 도입의 경계는 어디에서 갈릴까요?
+- 간단한 agent에도 reliability와 테스트가 왜 필요한가요?
+- 이 작은 구현을 이후 production 설계로 확장하려면 무엇을 먼저 바꿔야 할까요?
 
-1. 질문을 분석하고 필요한 정보를 파악합니다.
-2. 검색 도구를 사용해서 관련 자료를 수집합니다.
-3. 계산이 필요하면 계산 도구를 호출합니다.
-4. 수집한 정보를 종합해서 답변을 생성합니다.
-5. 대화 히스토리를 유지해서 후속 질문에 대응합니다.
+## 왜 이 글이 중요한가
 
-이 예제는 작지만 1편부터 9편까지 다룬 모든 개념을 한곳에 모읍니다. 컨텍스트 설정, 도구 정의, Workflow 설계, 메모리, 에러 처리, 평가, 운영까지 모두 포함합니다.
+개념을 이해했다고 해서 곧 구현 감각이 생기지는 않습니다. 실제로는 tool schema를 어디에 두는지, memory를 어떤 형식으로 저장하는지, tool result를 어떻게 다시 모델로 넣는지 같은 세부 구조에서 감각 차이가 크게 납니다. 마지막으로 한 번 직접 묶어 보는 이유가 여기에 있습니다.
 
----
+또한 첫 구현은 과한 프레임워크 추상화에 가려 본질을 놓치지 않게 해 줍니다. 직접 loop를 돌려 보면 agent가 결국 메시지 배열, tool registry, validation, stop condition 위에 세워진다는 사실이 선명해집니다. 그 다음에 framework를 봐야 추상화가 왜 필요한지 제대로 이해할 수 있습니다.
 
-## 사전 준비
+현업에서도 작은 기준 구현은 중요합니다. 나중에 LangGraph나 multi-agent 구조로 커지더라도, 가장 작은 end-to-end 경로가 있어야 regression test와 architecture review의 기준점이 생깁니다.
 
-필요한 패키지를 설치합니다.
+## 첫 Agent 만들기를 이해하는 가장 좋은 방법: 기능 구현이 아니라 지금까지의 설계 원칙을 하나로 묶는 연습으로 보는 것입니다
 
-```bash
-pip install openai pydantic python-dotenv
-```
+이 글의 목표는 가장 화려한 agent를 만드는 것이 아닙니다. 오히려 작지만 읽기 쉬운 구조로 agent의 핵심 계층을 한 번에 연결하는 것이 중요합니다. tool 정의, memory, loop, error handling이 각각 어디에 들어가는지 보이게 만들어야 합니다.
 
-`.env` 파일에 API 키를 저장합니다.
+이 관점이 있으면 구현 순서도 자연스럽습니다. 먼저 책임이 작은 tool을 만들고, 그 tool을 노출할 schema와 registry를 정의하고, 현재 대화를 담을 memory를 만들고, 마지막으로 LLM-tool loop를 연결합니다. 이렇게 쌓아야 디버깅도 쉽습니다.
 
-```bash
-OPENAI_API_KEY=sk-...
-```
+실무에서는 프레임워크보다 먼저 이 구조를 이해하는 팀이 훨씬 빨리 안정화합니다. framework가 숨겨 주는 부분을 알아야 문제가 생겼을 때 벗겨 볼 수 있기 때문입니다.
 
-전체 코드는 단일 파일 `agent.py`로 작성합니다. 학습 목적이므로 외부 프레임워크 없이 표준 라이브러리와 OpenAI SDK만 사용합니다. 프레임워크 도입은 마지막 섹션에서 다룹니다.
+> 첫 agent 구현의 핵심은 많은 기능이 아니라, tool·memory·loop·검증이 어떤 경계로 연결되는지 코드에서 선명하게 드러내는 것입니다.
 
----
+## 핵심 개념
 
-## Step 1: 도구 정의
-
-도구는 Agent가 호출할 수 있는 외부 함수입니다. 각 도구는 명확한 입력 스키마와 결정적인 동작이 있어야 합니다.
+### 먼저 작은 도구 집합을 정의합니다
 
 ```python
 from typing import Any
@@ -73,49 +66,51 @@ from pydantic import BaseModel, Field
 import json
 
 class SearchInput(BaseModel):
-    """검색 도구 입력 스키마."""
-    query: str = Field(..., description="검색어")
-    top_k: int = Field(3, description="반환할 결과 수")
+    """Input schema for the search tool."""
+    query: str = Field(..., description="Search query")
+    top_k: int = Field(3, description="Number of results to return")
 
 class CalculatorInput(BaseModel):
-    """계산 도구 입력 스키마."""
-    expression: str = Field(..., description="Python 산술식")
+    """Input schema for the calculator tool."""
+    expression: str = Field(..., description="Python arithmetic expression")
 
 def tool_search(query: str, top_k: int = 3) -> list[dict[str, str]]:
-    """가짜 검색 도구. 실제로는 외부 API를 호출합니다."""
+    """Fake search tool. In production this would call an external API."""
     fake_db = [
-        {"title": "FastAPI 공식 문서", "snippet": "FastAPI는 현대적이고 빠른 Python 웹 프레임워크입니다."},
-        {"title": "FastAPI 성능 벤치마크", "snippet": "FastAPI는 Node.js와 Go에 견줄 만한 성능을 제공합니다."},
-        {"title": "FastAPI vs Flask", "snippet": "FastAPI는 비동기 지원과 자동 문서화에서 Flask보다 우위입니다."},
+        {"title": "FastAPI Official Docs", "snippet": "FastAPI is a modern, fast Python web framework."},
+        {"title": "FastAPI Performance Benchmarks", "snippet": "FastAPI delivers performance comparable to Node.js and Go."},
+        {"title": "FastAPI vs Flask", "snippet": "FastAPI beats Flask in async support and automatic documentation."},
     ]
     return fake_db[:top_k]
 
 def tool_calculator(expression: str) -> float:
-    """안전한 산술 계산. eval은 위험하므로 제한된 환경을 사용합니다."""
+    """Safe arithmetic. Plain eval is dangerous, so we use a restricted environment."""
     allowed = set("0123456789+-*/(). ")
     if not set(expression) <= allowed:
-        raise ValueError(f"허용되지 않은 문자가 포함되어 있습니다: {expression}")
+        raise ValueError(f"Disallowed characters in expression: {expression}")
     return eval(expression, {"__builtins__": {}}, {})
 ```
 
-도구 등록 테이블을 만듭니다. Agent는 이 테이블을 보고 어떤 도구를 호출할지 결정합니다.
+첫 구현에서 tool은 적을수록 좋습니다. 검색과 계산처럼 역할이 분명한 두 개 정도면 충분합니다. 중요한 것은 tool 자체보다 입력 스키마와 실패 조건을 함께 설계하는 습관입니다.
+
+### tool registry는 모델과 코드 사이의 계약입니다
 
 ```python
 TOOLS = {
     "search": {
         "function": tool_search,
         "schema": SearchInput,
-        "description": "키워드로 자료를 검색합니다.",
+        "description": "Search for material by keyword.",
     },
     "calculator": {
         "function": tool_calculator,
         "schema": CalculatorInput,
-        "description": "산술식을 계산합니다.",
+        "description": "Evaluate an arithmetic expression.",
     },
 }
 
 def tools_to_openai_format() -> list[dict[str, Any]]:
-    """OpenAI Function Calling 형식으로 변환합니다."""
+    """Convert the registry to OpenAI Function Calling format."""
     result = []
     for name, info in TOOLS.items():
         result.append({
@@ -129,15 +124,13 @@ def tools_to_openai_format() -> list[dict[str, Any]]:
     return result
 ```
 
----
+registry를 분리해 두면 나중에 tool을 추가하거나 교체할 때 영향 범위를 줄일 수 있습니다. 또한 evaluation에서 어떤 tool이 등록되어 있었는지 버전 기준을 맞추기 쉽습니다.
 
-## Step 2: 메모리 구현
-
-대화 히스토리를 저장하는 단순한 메모리 클래스입니다. 5편에서 다룬 슬라이딩 윈도우 패턴을 적용합니다.
+### memory는 단순하게 시작하되 길이 제한을 둡니다
 
 ```python
 class ConversationMemory:
-    """슬라이딩 윈도우 대화 메모리."""
+    """Sliding window conversation memory."""
 
     def __init__(self, system_prompt: str, max_messages: int = 20):
         self.system_prompt = system_prompt
@@ -145,24 +138,20 @@ class ConversationMemory:
         self.messages: list[dict[str, Any]] = []
 
     def add(self, role: str, content: str, **extra: Any) -> None:
-        """메시지를 추가합니다."""
+        """Append a message."""
         msg = {"role": role, "content": content, **extra}
         self.messages.append(msg)
         if len(self.messages) > self.max_messages:
             self.messages = self.messages[-self.max_messages:]
 
     def to_openai(self) -> list[dict[str, Any]]:
-        """OpenAI Chat Completions 형식으로 반환합니다."""
+        """Return messages in OpenAI Chat Completions format."""
         return [{"role": "system", "content": self.system_prompt}] + self.messages
 ```
 
-`max_messages`로 컨텍스트 길이를 제한합니다. 토큰 기반 압축은 5편을 참고하세요.
+첫 구현에서는 long-term memory보다 short-term memory를 안정적으로 만드는 것이 먼저입니다. history가 끝없이 커지지 않도록 상한을 두고, 메시지 형식을 LLM API가 바로 소비할 수 있게 맞추는 편이 좋습니다.
 
----
-
-## Step 3: Agent 루프
-
-Agent의 핵심은 LLM과 도구 사이의 루프입니다. LLM이 도구를 호출하면 결과를 다시 LLM에 전달하고, 더 이상 호출이 없으면 최종 답변을 반환합니다.
+### agent loop가 모든 개념을 연결합니다
 
 ```python
 from openai import OpenAI
@@ -172,13 +161,13 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-SYSTEM_PROMPT = """당신은 리서치 어시스턴트입니다.
-사용자 질문에 답하기 위해 search와 calculator 도구를 사용할 수 있습니다.
-도구 결과를 종합해서 정확하고 간결한 답변을 제공하세요.
-모르는 것은 모른다고 답하세요."""
+SYSTEM_PROMPT = """You are a research assistant.
+Use the search and calculator tools to answer user questions.
+Synthesize tool results into accurate, concise answers.
+Say you do not know when you do not."""
 
 class ResearchAgent:
-    """리서치 어시스턴트 Agent."""
+    """Research assistant agent."""
 
     def __init__(self, model: str = "gpt-4o-mini", max_iterations: int = 5):
         self.model = model
@@ -186,7 +175,7 @@ class ResearchAgent:
         self.memory = ConversationMemory(SYSTEM_PROMPT)
 
     def run(self, user_input: str) -> str:
-        """사용자 질문을 처리하고 답변을 반환합니다."""
+        """Process a user question and return an answer."""
         self.memory.add("user", user_input)
 
         for iteration in range(self.max_iterations):
@@ -216,16 +205,16 @@ class ResearchAgent:
                     tool_call_id=tool_call.id,
                 )
 
-        return "최대 반복 횟수에 도달했습니다. 답변을 생성하지 못했습니다."
+        return "Max iterations reached without producing an answer."
 
     def _execute_tool(self, tool_call: Any) -> Any:
-        """도구를 안전하게 실행합니다."""
+        """Execute a tool safely."""
         name = tool_call.function.name
         try:
             args = json.loads(tool_call.function.arguments)
             tool = TOOLS.get(name)
             if not tool:
-                return {"error": f"알 수 없는 도구: {name}"}
+                return {"error": f"Unknown tool: {name}"}
             validated = tool["schema"](**args)
             result = tool["function"](**validated.model_dump())
             return {"result": result}
@@ -233,291 +222,44 @@ class ResearchAgent:
             return {"error": str(exc)}
 ```
 
-핵심 포인트는 다음과 같습니다.
+이 루프 안에 지금까지의 개념이 거의 모두 들어 있습니다. context는 `SYSTEM_PROMPT`와 memory에, tool use는 registry와 `_execute_tool`에, reliability는 validation과 max_iterations에, 운영 포인트는 iteration 수와 에러 반환 형태에 들어 있습니다.
 
-- `max_iterations`로 무한 루프를 방지합니다.
-- 도구 실행은 `_execute_tool`로 격리해서 예외를 잡습니다.
-- 입력 스키마는 Pydantic으로 검증합니다.
-- 도구 응답도 메시지 히스토리에 추가합니다.
+### 작은 테스트와 운영 습관까지 같이 시작합니다
 
----
+첫 구현이라도 아래 항목은 같이 확인하는 편이 좋습니다.
 
-## Step 4: 실행과 테스트
+- 정상 질문, 계산 질문, tool error 질문을 각각 한 번씩 돌려 봅니다.
+- tool result가 memory에 어떤 형태로 저장되는지 확인합니다.
+- iteration이 과하게 늘어나는 요청을 일부러 넣어 봅니다.
+- unknown tool과 bad argument가 사용자에게 어떻게 보이는지 봅니다.
+- request당 token과 latency를 대략이라도 기록합니다.
 
-간단한 CLI로 Agent를 실행해 봅니다.
+## 흔히 헷갈리는 지점
 
-```python
-if __name__ == "__main__":
-    agent = ResearchAgent()
-    print("Research Assistant. 종료하려면 'quit'를 입력하세요.")
-    while True:
-        user_input = input("\n질문: ").strip()
-        if user_input.lower() in {"quit", "exit"}:
-            break
-        if not user_input:
-            continue
-        try:
-            answer = agent.run(user_input)
-            print(f"\n답변: {answer}")
-        except Exception as exc:
-            print(f"\n[에러] {exc}")
-```
+- 첫 agent부터 framework를 반드시 써야 한다고 생각하기 쉽지만, 작은 기준 구현은 raw code가 더 교육적입니다.
+- tool이 많을수록 agent가 좋아질 것 같지만, 초반에는 오히려 라우팅 난이도만 올라갑니다.
+- memory를 길게 유지하면 더 똑똑해질 것 같지만, 작은 구현에서는 상한을 두는 편이 안전합니다.
+- error handling은 나중에 붙여도 된다고 보기 쉽지만, unknown tool과 invalid args 처리는 첫날부터 필요합니다.
+- 데모가 한 번 잘 되면 구현이 끝났다고 생각하기 쉽지만, 반복 수 제한과 기본 테스트가 없으면 쉽게 무너집니다.
 
-실행 예시입니다.
+## 운영 체크리스트
 
-```text
-질문: FastAPI 성능은 어떤가요?
-답변: FastAPI는 Node.js와 Go에 견줄 만한 성능을 제공하는 현대적인 Python 웹 프레임워크입니다.
-검색 결과에 따르면 비동기 지원과 자동 문서화에서 Flask보다 우위에 있습니다.
+- [ ] tool schema와 registry가 분리되어 있는가
+- [ ] memory 길이 제한과 max iteration 제한이 있는가
+- [ ] tool 실행 전에 입력 검증을 수행하는가
+- [ ] unknown tool과 execution error를 구조화된 형태로 반환하는가
+- [ ] 최소한의 정상/실패 테스트와 비용 기록 경로가 있는가
 
-질문: 요청 1000개를 0.5초씩 처리하면 총 몇 초인가요?
-답변: 1000 * 0.5 = 500초 입니다.
-```
+## 정리
 
-후속 질문에서 컨텍스트가 유지되는지도 확인해 봅니다.
+첫 agent 만들기의 핵심은 많은 기능을 한 번에 넣는 것이 아닙니다. 작은 구조 안에서 tool, memory, loop, reliability를 어떻게 연결하는지 눈으로 확인하는 데 있습니다. 이 감각이 있어야 이후의 프레임워크와 고급 패턴이 제대로 보입니다.
 
-```text
-질문: 그럼 동시에 100개씩 처리하면요?
-답변: 1000개를 동시에 100개씩 처리하면 10배 빠릅니다. 즉 50초가 걸립니다.
-```
+좋은 기준 구현은 작지만 설명 가능합니다. 어떤 도구가 있고, 어떤 입력을 받고, 어떻게 validation하고, 언제 멈추고, 실패하면 어떤 형태로 돌아오는지 한 번에 읽혀야 합니다. 이 선명함이 나중 확장의 기반이 됩니다.
 
----
-
-## Step 5: 자동화 평가
-
-7편에서 다룬 평가 프레임워크를 적용합니다. 작은 골드 데이터셋을 만들고 회귀를 감지합니다.
-
-```python
-GOLD_CASES = [
-    {
-        "input": "FastAPI는 어떤 프레임워크인가요?",
-        "must_contain": ["Python", "웹"],
-    },
-    {
-        "input": "100 더하기 200은?",
-        "must_contain": ["300"],
-    },
-]
-
-def run_eval() -> dict[str, Any]:
-    """골드 데이터셋으로 평가를 실행합니다."""
-    passed = 0
-    failures = []
-    for case in GOLD_CASES:
-        agent = ResearchAgent()
-        answer = agent.run(case["input"])
-        if all(kw in answer for kw in case["must_contain"]):
-            passed += 1
-        else:
-            failures.append({"input": case["input"], "answer": answer})
-    return {
-        "total": len(GOLD_CASES),
-        "passed": passed,
-        "pass_rate": passed / len(GOLD_CASES),
-        "failures": failures,
-    }
-
-if __name__ == "__main__" and os.getenv("RUN_EVAL"):
-    result = run_eval()
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-```
-
-`RUN_EVAL=1 python agent.py`로 실행하면 평가 결과를 확인할 수 있습니다. 키워드 매칭은 단순하지만 회귀 감지에 충분합니다. LLM-as-Judge 평가는 7편을 참고하세요.
-
----
-
-## 프레임워크 비교: 직접 구현 vs LangGraph vs CrewAI
-
-위 예제는 직접 구현한 버전입니다. 실제 프로덕션에서는 검증된 프레임워크를 쓰는 것이 좋습니다. 대표적으로 LangGraph와 CrewAI가 있습니다.
-
-| 항목 | 직접 구현 | LangGraph | CrewAI |
-| --- | --- | --- | --- |
-| 학습 곡선 | 낮음 | 중간 | 낮음 |
-| 유연성 | 매우 높음 | 매우 높음 | 중간 |
-| Multi-Agent | 직접 작성 | 직접 설계 | 빌트인 |
-| 그래프 시각화 | 없음 | 있음 | 제한적 |
-| Streaming | 직접 구현 | 빌트인 | 빌트인 |
-| 체크포인트 | 직접 구현 | 빌트인 | 제한적 |
-| 적합 사례 | 학습, 단순 Agent | 복잡한 Workflow | Role 기반 협업 |
-
-LangGraph 예시는 다음과 같습니다.
-
-```python
-from langgraph.graph import StateGraph, END
-from typing import TypedDict
-
-class AgentState(TypedDict):
-    messages: list[dict[str, Any]]
-    iterations: int
-
-def call_model(state: AgentState) -> AgentState:
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=state["messages"],
-        tools=tools_to_openai_format(),
-    )
-    msg = response.choices[0].message
-    state["messages"].append(msg.model_dump())
-    state["iterations"] += 1
-    return state
-
-def should_continue(state: AgentState) -> str:
-    last = state["messages"][-1]
-    if not last.get("tool_calls") or state["iterations"] >= 5:
-        return END
-    return "tools"
-
-graph = StateGraph(AgentState)
-graph.add_node("agent", call_model)
-graph.add_node("tools", execute_tools_node)
-graph.set_entry_point("agent")
-graph.add_conditional_edges("agent", should_continue)
-graph.add_edge("tools", "agent")
-app = graph.compile()
-```
-
-LangGraph는 노드와 엣지로 Workflow를 표현합니다. 복잡한 분기와 루프를 명시적으로 다룰 수 있습니다.
-
-CrewAI 예시는 다음과 같습니다.
-
-```python
-from crewai import Agent, Task, Crew
-
-researcher = Agent(
-    role="Researcher",
-    goal="주제에 대한 자료를 수집한다",
-    backstory="당신은 꼼꼼한 리서처입니다.",
-    tools=[search_tool],
-)
-
-writer = Agent(
-    role="Writer",
-    goal="수집한 자료로 답변을 작성한다",
-    backstory="당신은 명확하게 쓰는 작가입니다.",
-)
-
-task1 = Task(description="FastAPI에 대해 조사한다", agent=researcher)
-task2 = Task(description="조사 내용을 요약한다", agent=writer)
-
-crew = Crew(agents=[researcher, writer], tasks=[task1, task2])
-result = crew.kickoff()
-```
-
-CrewAI는 Role 기반 Multi-Agent 협업에 강합니다. Agent마다 역할과 목표를 부여하고 Task를 할당합니다.
-
-선택 가이드입니다.
-
-- 간단한 단일 Agent 학습 단계: 직접 구현
-- 복잡한 Workflow와 분기, 체크포인트가 필요: LangGraph
-- 여러 Agent가 역할을 나눠 협업하는 시나리오: CrewAI
-
----
-
-## 배포 준비
-
-학습용 코드를 프로덕션으로 옮기려면 몇 가지가 더 필요합니다.
-
-### FastAPI 래퍼
-
-CLI 대신 HTTP 엔드포인트로 노출합니다.
-
-```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
-
-SESSIONS: dict[str, ResearchAgent] = {}
-
-@app.post("/chat")
-def chat(req: ChatRequest) -> dict[str, str]:
-    agent = SESSIONS.setdefault(req.session_id, ResearchAgent())
-    try:
-        answer = agent.run(req.message)
-        return {"answer": answer}
-    except Exception as exc:
-        raise HTTPException(500, detail=str(exc))
-```
-
-세션별로 Agent 인스턴스를 분리해서 대화를 격리합니다. 실제 서비스에서는 Redis나 DB로 메모리를 외부화합니다.
-
-### 환경 변수와 시크릿
-
-API 키는 코드에 절대 하드코딩하지 않습니다. `.env` 파일은 `.gitignore`에 포함하고, 운영에서는 Secret Manager(Vault, AWS Secrets Manager 등)를 사용합니다.
-
-### 컨테이너 이미지
-
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-이미지 크기를 줄이려면 multi-stage build를 사용합니다. 9편의 운영 체크리스트도 함께 적용합니다.
-
----
-
-## 흔한 실수
-
-**1. 무한 루프 방지를 잊는다.**
-LLM이 같은 도구를 반복 호출하는 사례가 있습니다. `max_iterations`는 반드시 설정합니다.
-
-**2. 도구 실행에서 예외를 잡지 않는다.**
-도구 하나가 실패하면 전체 Agent가 죽습니다. 모든 도구 실행은 `try/except`로 감쌉니다.
-
-**3. 시스템 프롬프트를 매 호출마다 새로 만든다.**
-시스템 프롬프트는 한 번만 정의하고 메모리에서 관리합니다. 매 호출마다 다시 작성하면 일관성이 깨집니다.
-
-**4. 평가 없이 프롬프트를 수정한다.**
-프롬프트를 바꾸면 회귀가 생길 수 있습니다. 작은 골드 데이터셋이라도 만들고 평가를 자동화하세요.
-
-**5. 프레임워크부터 도입한다.**
-LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직접 구현해서 동작 원리를 이해한 다음 프레임워크로 옮기는 것이 좋습니다.
-
----
-
-## 다음 단계
-
-이번 시리즈를 마쳤다면 다음 학습 경로를 추천합니다.
-
-1. **RAG 통합**: 사내 문서를 검색하는 RAG Agent를 만들어 봅니다. `vector-search-101`과 `rag-deep-dive` 시리즈를 참고하세요.
-2. **함수 호출 고도화**: OpenAI 외에 Anthropic, Gemini 등 멀티 모델 지원을 추가합니다.
-3. **장기 메모리**: 대화를 요약해서 벡터 DB에 저장하고 후속 세션에서 검색합니다.
-4. **Multi-Agent 시스템**: 6편에서 다룬 Coordinator-Worker 패턴으로 확장합니다.
-5. **프로덕션 운영**: 9편의 Observability와 비용 추적을 실제로 적용합니다.
-
-이 시리즈는 Agent 개발의 출발점입니다. 작은 Agent부터 시작해서 점진적으로 복잡도를 높여 나가세요. 모든 Agent는 결국 같은 패턴을 따릅니다. 도구를 정의하고, 컨텍스트를 관리하고, 루프를 안정화하고, 평가를 자동화하는 일입니다.
-
----
-
-## 핵심 요약
-
-- 직접 Agent를 만들면 LLM-도구 루프, 메모리, 에러 처리의 동작 원리를 깊이 이해할 수 있습니다.
-- `max_iterations`와 `try/except`는 모든 Agent 루프의 필수 안전장치입니다.
-- 도구는 Pydantic 스키마로 입력을 검증하고 결정적으로 동작해야 합니다.
-- 평가 자동화는 작은 골드 데이터셋만으로도 충분히 시작할 수 있습니다.
-- 직접 구현으로 원리를 익힌 다음 LangGraph나 CrewAI 같은 프레임워크로 확장하세요.
-
-<!-- a-grade-example:begin -->
-
-## 체크리스트
-
-- [ ] Research Assistant의 입력·출력·범위를 한 단락으로 적었다.
-- [ ] 도구 → 메모리 → 루프 순서로 직접 코드를 짜 보았다.
-- [ ] 직접 구현 vs LangGraph vs CrewAI 비교 표를 만들었다.
-- [ ] Step 5의 자동 평가 루프를 1회 이상 실행해 결과를 봤다.
-
-<!-- a-grade-example:end -->
+이 시리즈는 여기서 마무리되지만 실제 작업은 여기서 시작됩니다. 다음 단계에서는 이 작은 agent를 LangGraph 같은 workflow 프레임워크로 옮겨 보거나, 더 정교한 evaluation과 observability를 붙이며 production-grade 구조로 확장해 보면 좋습니다.
 
 <!-- toc:begin -->
-## 시리즈 목차
+## AI Agent 101 시리즈
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -532,13 +274,18 @@ LangGraph나 CrewAI는 강력하지만 학습 비용이 있습니다. 먼저 직
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-- [OpenAI Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
-- [LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
-- [CrewAI Documentation](https://docs.crewai.com/)
-- [Building Effective Agents — Anthropic](https://www.anthropic.com/research/building-effective-agents)
+### 공식 문서
 
-Tags: AI Agent, LLM, Tool Use, Python
+- [OpenAI Platform - Function calling guide](https://platform.openai.com/docs/guides/function-calling)
+- [Pydantic documentation](https://docs.pydantic.dev/)
+- [LangGraph documentation](https://langchain-ai.github.io/langgraph/)
+- [CrewAI documentation](https://docs.crewai.com/)
+
+### 관련 시리즈
+
+- [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md)
+- [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
+
+Tags: AI Agent, Tutorial, Python, Hands-on
