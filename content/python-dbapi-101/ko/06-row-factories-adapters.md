@@ -25,6 +25,10 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 # Row factory와 type adapter (sqlite3, PEP 249)
 
+`row[3]` 같은 코드는 스키마가 바뀌는 순간 조용히 깨집니다. 이 글에서는 row factory와 type adapter를 함께 다뤄 결과 shape와 값 변환을 한 곳에서 통제하는 방법을 설명합니다.
+
+이 글은 Python DB-API 101 시리즈의 여섯 번째 글입니다.
+
 ![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*

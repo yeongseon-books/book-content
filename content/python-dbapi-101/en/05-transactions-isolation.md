@@ -23,6 +23,10 @@ seo_description: 'Two operational data incidents dominate in production:'
 
 # Transactions and isolation levels (sqlite3, PEP 249)
 
+sqlite3 starts transactions for you, which is convenient until an implicit `BEGIN` quietly holds a lock or a missing `commit()` drops data on exit. This post maps that behavior to PEP 249 so isolation levels and autocommit stop feeling magical.
+
+This is the 5th article in the Python DB-API 101 series.
+
 ![Transactions and isolation levels (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 
 *Transactions and isolation levels (sqlite3, PEP 249)*
@@ -35,10 +39,6 @@ seo_description: 'Two operational data incidents dominate in production:'
 - How does Python 3.12's new `autocommit` parameter differ from the legacy `isolation_level`?
 
 > A transaction is not "calling commit/rollback" — it is "deciding what runs as one unit." Because sqlite3 picks that unit for you automatically, you must understand the auto-behaviour to avoid surprise locks and data loss.
-
-> Python DB-API 101 (5/10)
-
----
 
 ## What you will learn
 

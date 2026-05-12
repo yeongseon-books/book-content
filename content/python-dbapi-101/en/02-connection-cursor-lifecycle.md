@@ -24,11 +24,9 @@ seo_description: The two core DB-API objects are connection and cursor. Their na
 
 # Connection and Cursor Lifecycle
 
-> Python DB-API 101 series (2/10)
-
----
-
 The two core DB-API objects are connection and cursor. Their names are plain, but mishandling their lifecycle leads to connection leaks, locks, and race conditions. This episode covers how each is created, used, and closed; the context-manager patterns that keep them safe; and the lifecycle pitfalls that bite most often.
+
+This is the 2nd article in the Python DB-API 101 series.
 
 <!-- a-grade-intro:begin -->
 

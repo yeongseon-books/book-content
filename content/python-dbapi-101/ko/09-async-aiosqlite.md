@@ -28,6 +28,8 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 
 `aiosqlite`는 이 문제를 해결합니다. 다만 "해결"의 의미를 정확히 알아야 합니다. 이 라이브러리는 SQLite를 진짜 비동기로 만들지 않고, **별도 스레드에서 sqlite3 호출을 실행하고 결과를 future로 돌려주는 어댑터**입니다. 그래서 이벤트 루프는 안 막히지만, SQLite 엔진 자체의 단일 writer 제약은 그대로 남습니다.
 
+이 글은 Python DB-API 101 시리즈의 아홉 번째 글입니다.
+
 ![aiosqlite로 비동기 SQLite 다루기](../../../assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.ko.png)
 
 *aiosqlite로 비동기 SQLite 다루기*

@@ -24,13 +24,11 @@ seo_description: If you have used Python with a database, you have probably touc
 
 # Why DB-API 2.0 - The Problem PEP 249 Solved
 
-> Python DB-API 101 series (1/10)
-
----
-
 If you have used Python with a database, you have probably touched `sqlite3`, `psycopg`, `pymysql`, or `oracledb`. Their APIs feel oddly similar: `connect()` to open a connection, `cursor()` to get a cursor, `execute()` to run a query, `fetchone()` / `fetchall()` to read results. That uniformity is not a coincidence. It comes from a 1996 standard called **PEP 249 — Python Database API Specification v2.0** (DB-API 2.0 for short).
 
 This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.
+
+This is the first article in the Python DB-API 101 series.
 
 <!-- a-grade-intro:begin -->
 

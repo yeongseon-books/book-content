@@ -24,6 +24,10 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 # Row factories and type adapters (sqlite3, PEP 249)
 
+Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.
+
+This is the 6th article in the Python DB-API 101 series.
+
 ![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 
 *Row factories and type adapters (sqlite3, PEP 249)*
@@ -36,10 +40,6 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 - How do adapters and converters fit into the PEP 249 model?
 
 > Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.
-
-> Python DB-API 101 (6/10)
-
----
 
 ## What you will learn
 

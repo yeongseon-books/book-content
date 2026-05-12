@@ -23,11 +23,9 @@ seo_description: DB-API의 두 핵심 객체는 connection과 cursor입니다.
 
 # Connection과 Cursor Lifecycle
 
-> Python DB-API 101 시리즈 (2/10)
-
----
-
 DB-API의 두 핵심 객체는 connection과 cursor입니다. 이름은 평범하지만, 둘의 lifecycle을 잘못 다루면 connection leak, lock, race condition이 줄줄이 생깁니다. 이 글에서는 두 객체가 어떻게 만들어지고 살고 닫히는지, context manager로 안전하게 관리하는 패턴, 그리고 자주 빠지는 lifecycle 함정을 정리합니다.
+
+이 글은 Python DB-API 101 시리즈의 두 번째 글입니다.
 
 ## 1. Connection이란
 

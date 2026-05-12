@@ -24,13 +24,11 @@ seo_description: Python으로 데이터베이스를 다룬 적이 있다면 sqli
 
 # 왜 DB-API 2.0인가 - PEP 249가 푼 문제
 
-> Python DB-API 101 시리즈 (1/10)
-
----
-
 Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`, `pymysql`, `oracledb` 같은 패키지를 한 번쯤 써봤을 겁니다. 그리고 신기하게도 그 사용법이 묘하게 비슷합니다. `connect()`로 연결을 만들고 `cursor()`로 cursor를 받고 `execute()`로 쿼리를 던지고 `fetchone()`/`fetchall()`로 결과를 꺼냅니다. 이 통일성은 우연이 아니라 1996년에 합의된 표준, **PEP 249 — Python Database API Specification v2.0** (줄여서 DB-API 2.0) 덕분입니다.
 
 이번 첫 글에서는 DB-API 2.0이 왜 필요했는지, 어떤 문제를 해결했는지, 시리즈 전반에서 SQLite로 실습하는 이유와 다른 driver(PostgreSQL, MySQL 등)에 그대로 옮기는 방법을 살펴봅니다.
+
+이 글은 Python DB-API 101 시리즈의 첫 번째 글입니다.
 
 ## 1. DB-API 이전의 혼돈
 

@@ -24,11 +24,9 @@ seo_description: 'Every query in DB-API ultimately reduces to five cursor method
 
 # execute, executemany, and Fetch Patterns
 
-> Python DB-API 101 series (3/10)
-
----
-
 Every query in DB-API ultimately reduces to five cursor methods: `execute()`, `executemany()`, and `fetchone()`/`fetchall()`/`fetchmany()`. The API surface is tiny, but choosing the wrong fetch method decides whether your service streams gracefully or OOMs at 3 AM. This article walks through each method and the rules for picking one.
+
+This is the 3rd article in the Python DB-API 101 series.
 
 <!-- a-grade-intro:begin -->
 

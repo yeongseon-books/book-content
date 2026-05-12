@@ -23,11 +23,9 @@ seo_description: DB-API의 모든 query 실행은 결국 cursor의 execute(), ex
 
 # execute, executemany, fetch 패턴
 
-> Python DB-API 101 시리즈 (3/10)
-
----
-
 DB-API의 모든 query 실행은 결국 cursor의 `execute()`, `executemany()`와 `fetchone()`, `fetchall()`, `fetchmany()` 다섯 메서드로 압축됩니다. 단순해 보이지만, 어떤 fetch 메서드를 언제 쓰느냐가 메모리 사용량, latency, 그리고 production에서 OOM이 터지는지 여부를 결정합니다. 이 글에서는 다섯 메서드의 동작과 실전 선택 기준을 정리합니다.
+
+이 글은 Python DB-API 101 시리즈의 세 번째 글입니다.
 
 ## 1. execute - 한 번의 query
 
