@@ -3,7 +3,7 @@ title: 'Multimodal RAG: 이미지와 텍스트를 함께 검색하기'
 series: multimodal-ai-101
 episode: 5
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,24 +16,59 @@ tags:
 - FAISS
 - LangChain
 - Vector Search
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query…
 ---
 
 # Multimodal RAG: 이미지와 텍스트를 함께 검색하기
 
-> Multimodal AI 101 시리즈 (5/10)
+텍스트 RAG는 많은 문제를 해결했지만, 이미지와 문서 레이아웃이 중요한 순간부터 한계가 또렷해집니다. 사용자가 “표 오른쪽 아래 수치가 무엇인가요?”, “이 제품 사진과 가장 비슷한 항목을 찾아 주세요”, “스크린샷 속 경고 아이콘이 의미하는 바가 뭔가요?”라고 묻는 순간 텍스트 청크만으로는 답이 흔들립니다.
 
----
+이때 필요한 것이 multimodal RAG입니다. 핵심은 단순합니다. 검색 대상을 텍스트에서 이미지·caption·OCR·메타데이터까지 넓히고, 최종 생성 단계에서 VLM이 그 결과를 함께 읽게 만드는 것입니다. 하지만 구현은 텍스트 RAG보다 훨씬 까다롭습니다. 어떤 representation을 인덱싱할지부터, 어떤 modality를 어떤 비용으로 프롬프트에 넣을지까지 선택지가 많기 때문입니다.
 
+실무에서는 특히 인덱싱 전략이 성패를 좌우합니다. 원본 이미지를 직접 검색할지, caption과 OCR을 함께 넣을지, dual index를 둘지에 따라 정확도와 지연 시간이 크게 바뀝니다. 메타데이터 필터와 평가셋 설계도 텍스트 RAG보다 더 중요합니다.
 
-## 텍스트 RAG로는 풀리지 않는 질문
+이 글에서는 multimodal RAG를 “이미지까지 검색하는 RAG”가 아니라, 검색 표현과 생성 입력을 함께 다시 설계하는 확장형 retrieval 시스템으로 정리합니다.
+
+이 글은 Multimodal AI 101 시리즈의 5번째 글입니다.
+
+검색 대상이 넓어질수록 인덱싱과 평가 전략을 먼저 고정하는 편이 훨씬 안전합니다.
+
+## 이 글에서 다룰 문제
+
+- 텍스트 RAG는 왜 이미지, 표, 레이아웃 정보가 중요한 질문에서 곧바로 성능 한계를 드러낼까요?
+- 멀티모달 검색을 위해 원본 이미지, caption/OCR, dual index를 쓰는 세 가지 전략은 어떻게 다를까요?
+- 검색 결과를 최종 답변 단계에서 VLM에 넘길 때 어떤 입력 조합이 가장 실용적일까요?
+- retrieval과 generation 품질을 멀티모달 환경에서는 어떤 지표와 데이터셋으로 봐야 할까요?
+- 인덱스 혼합, base64 전달, lazy captioning, 메타데이터 누락 같은 실수는 왜 자주 반복될까요?
+
+## 왜 이 글이 중요한가
+
+멀티모달 RAG는 실제 제품에서 바로 쓰일 가능성이 높은 패턴입니다. 전자상거래 검색, 문서 비서, 디자인 QA, 화면 기반 지원, 의료·산업 이미지 검색처럼 텍스트와 시각 정보가 섞인 데이터가 이미 많기 때문입니다.
+
+또한 이 패턴은 기존 RAG 자산을 버리지 않고 확장할 수 있다는 장점이 있습니다. caption, OCR, image embedding을 추가하면 텍스트 중심 인프라를 상당 부분 재사용하면서도 검색 표현을 넓힐 수 있습니다.
+
+반대로 성급하게 붙이면 비용과 복잡도가 빠르게 증가합니다. 어떤 representation을 저장하고, 어떤 것을 프롬프트에 직접 넣을지에 대한 원칙이 없으면 멀티모달 RAG는 금세 느리고 비싼 시스템이 됩니다.
+
+## Multimodal RAG를 이해하는 가장 좋은 방법: 새로운 모델 문제가 아니라 검색 표현을 다시 설계하는 문제로 보는 것입니다
+
+많은 팀이 multimodal RAG를 “VLM을 붙인 RAG”라고만 생각합니다. 하지만 실제 병목은 대개 generation보다 retrieval에서 먼저 생깁니다. 텍스트만 검색하면 이미지 의미를 놓치고, 원본 이미지만 검색하면 정밀 텍스트를 잃기 때문입니다.
+
+따라서 먼저 정해야 할 것은 어떤 표현을 인덱싱할지입니다. CLIP embedding, OCR 텍스트, caption, 메타데이터를 어떤 조합으로 저장할지에 따라 시스템 성격이 거의 결정됩니다. 생성 단계는 그 위에서 최종 컨텍스트를 조립하는 층에 가깝습니다.
+
+이 관점으로 접근하면 평가도 달라집니다. 정답 생성만 보지 말고, 어떤 질의에서 어떤 modality의 증거가 실제로 회수되었는지를 retrieval 단계부터 분리해서 확인해야 합니다.
+
+> 멀티모달 RAG의 난점은 VLM 호출 자체보다, 무엇을 검색 가능한 표현으로 만들고 무엇을 최종 컨텍스트에 넣을지 결정하는 데 있습니다.
+
+## 핵심 개념
+
+### 텍스트 RAG로는 풀리지 않는 질문
 
 전형적인 RAG 시스템은 documents를 chunk로 나누고, embedding을 vector DB에 넣고, query embedding으로 nearest를 찾습니다. 그런데 사용자가 "이런 모양의 차트가 들어있는 슬라이드 찾아줘" 또는 "스크린샷에서 빨간 버튼 위치 알려줘" 같은 질문을 던지면 텍스트 chunk로는 답할 수 없습니다.
 
 multimodal RAG는 이런 질문을 image와 text를 같은 vector space에서 검색해 풀어냅니다. 2편의 CLIP, 4편의 OCR/captioning이 이번 편에서 한 파이프라인으로 합쳐집니다.
 
-## 세 가지 인덱싱 전략
+### 세 가지 인덱싱 전략
 
 ### 전략 1: image embedding 단독 인덱스
 
@@ -93,7 +128,7 @@ def index_text(items: list[dict]):
     index.add(vecs)
     return index, items
 
-# 가정: 각 image에 대해 caption / ocr_text를 미리 추출
+# Assumes caption / ocr_text are precomputed per image
 items = [
     {"path": "slides/01.png",
      "caption": "bar chart of revenue",
@@ -140,7 +175,7 @@ class HybridIndex:
 
 `alpha`를 query intent로 동적으로 정합니다. 시각적 query면 0.7, 사실/숫자 query면 0.2 같은 식입니다.
 
-## 답변 생성 단계: 검색 결과를 VLM에 넘기기
+### 답변 생성 단계: 검색 결과를 VLM에 넘기기
 
 검색만으로 끝나는 RAG는 거의 없습니다. retrieved image를 VLM이 읽고 답을 만들어야 합니다.
 
@@ -169,13 +204,11 @@ def answer(question: str, top_paths: list[str]) -> str:
 
 검색 -> top-K image -> VLM에 inline -> 답변. 텍스트 RAG와 구조는 같지만 context에 image가 들어간다는 점이 다릅니다.
 
-## 평가: multimodal RAG는 어떻게 측정하나
+### 평가: multimodal RAG는 어떻게 측정하나
 
 retrieval 정확도와 generation 품질을 분리해서 측정합니다.
 
 ```python
-from typing import Iterable
-
 def hit_at_k(predictions: list[list[str]],
              gold: list[str], k: int = 5) -> float:
     hits = sum(1 for pred, g in zip(predictions, gold) if g in pred[:k])
@@ -194,37 +227,29 @@ def mrr(predictions: list[list[str]], gold: list[str]) -> float:
 
 ai-evaluation-101 시리즈에서 이 평가 프레임워크를 자세히 다뤘습니다.
 
-## 흔히 놓치는 함정 다섯 가지
+## 흔히 헷갈리는 지점
 
-### 1. CLIP과 텍스트 embedding을 같은 인덱스에 섞기
+- **CLIP과 텍스트 embedding을 같은 인덱스에 섞기** CLIP은 자체 latent space, BGE/OpenAI embedding은 다른 latent space입니다. 두 vector를 한 인덱스에 넣으면 거리가 의미를 잃습니다. 인덱스를 따로 두고 score를 가중평균합니다.
+- **고해상도 이미지 모두 base64 inline** VLM에 inline하는 이미지는 base64 한 장당 수십 KB~수백 KB입니다. retrieval top-10을 모두 inline하면 token 비용과 latency 모두 폭증합니다. top-3로 제한하거나 URL 참조 방식을 씁니다.
+- **caption/OCR을 미리 안 만들고 query 시점에 생성** 매 query마다 caption을 새로 뽑으면 latency가 초 단위로 느려집니다. ingestion 단계에서 caption/OCR을 함께 저장합니다.
+- **metadata filter 없이 검색** production index는 보통 1000만 장 이상으로 커집니다. user_id, document_type, date_range 같은 metadata filter 없이 ANN 검색하면 권한 누수와 성능 저하가 동시에 옵니다.
+- **evaluation set이 텍스트 query만** multimodal RAG는 텍스트 query뿐 아니라 image-by-image 검색, image+text 혼합 query도 평가해야 합니다. 평가 셋 설계 단계부터 multimodal query를 포함합니다.
 
-CLIP은 자체 latent space, BGE/OpenAI embedding은 다른 latent space입니다. 두 vector를 한 인덱스에 넣으면 거리가 의미를 잃습니다. 인덱스를 따로 두고 score를 가중평균합니다.
+## 운영 체크리스트
 
-### 2. 고해상도 이미지 모두 base64 inline
+- [ ] 원본 이미지·OCR 텍스트·caption 중 어떤 표현을 인덱싱할지 명시적으로 구분했는가
+- [ ] CLIP류 이미지 인덱스와 텍스트 인덱스의 점수 결합 방식을 정의했는가
+- [ ] 대용량 이미지를 무분별하게 inline하지 않고 썸네일·URL·선별 업로드 전략을 두었는가
+- [ ] 메타데이터 필터와 권한 필터를 retrieval 단계에 포함했는가
+- [ ] 텍스트 질의뿐 아니라 이미지 질의·복합 질의를 포함한 평가셋을 갖췄는가
 
-VLM에 inline하는 이미지는 base64 한 장당 수십 KB~수백 KB입니다. retrieval top-10을 모두 inline하면 token 비용과 latency 모두 폭증합니다. top-3로 제한하거나 URL 참조 방식을 씁니다.
+## 정리
 
-### 3. caption/OCR을 미리 안 만들고 query 시점에 생성
+멀티모달 RAG는 단순히 이미지까지 넣는 RAG가 아닙니다. 어떤 표현을 검색 가능한 증거로 저장할지, 그리고 어떤 증거를 최종 생성 입력으로 조합할지를 다시 설계하는 패턴입니다.
 
-매 query마다 caption을 새로 뽑으면 latency가 초 단위로 느려집니다. ingestion 단계에서 caption/OCR을 함께 저장합니다.
+성공하는 시스템은 retrieval 표현을 분리해서 생각합니다. CLIP embedding, OCR, caption, 메타데이터는 각각 다른 종류의 질문을 잘 처리하며, 어느 하나만으로는 충분하지 않은 경우가 많습니다.
 
-### 4. metadata filter 없이 검색
-
-production index는 보통 1000만 장 이상으로 커집니다. user_id, document_type, date_range 같은 metadata filter 없이 ANN 검색하면 권한 누수와 성능 저하가 동시에 옵니다.
-
-### 5. evaluation set이 텍스트 query만
-
-multimodal RAG는 텍스트 query뿐 아니라 image-by-image 검색, image+text 혼합 query도 평가해야 합니다. 평가 셋 설계 단계부터 multimodal query를 포함합니다.
-
-## 핵심 요약
-
-- multimodal RAG는 image embedding 인덱스, caption+OCR 텍스트 인덱스, hybrid 셋 중 하나를 선택합니다.
-- 가장 자주 쓰이는 패턴은 hybrid: 두 벡터를 따로 인덱싱하고 query별로 가중치 alpha를 조정합니다.
-- 검색 후 VLM에 inline image를 넘겨 답변을 생성합니다. top-K는 3 정도가 cost/quality 균형점입니다.
-- 평가는 retrieval(Recall@k, MRR)과 generation(faithfulness, relevancy)을 분리해 측정합니다.
-- 인덱스 분리, base64 inline 제한, ingestion 단계 caption/OCR 저장, metadata filter, multimodal query evaluation은 production 도입 전에 점검합니다.
-
----
+다음 주제들로 넘어가더라도 오늘의 기준은 계속 유효합니다. 멀티모달 시스템의 품질은 결국 좋은 표현을 인덱싱하고, 그 표현을 비용 안에서 적절히 조합하는 능력에 달려 있습니다.
 
 <!-- toc:begin -->
 ## Multimodal AI 101 시리즈
@@ -234,18 +259,26 @@ multimodal RAG는 텍스트 query뿐 아니라 image-by-image 검색, image+text
 - [Vision-Language Model 아키텍처](./03-vlm-architecture.md)
 - [Image Captioning과 OCR 파이프라인](./04-captioning-ocr-pipelines.md)
 - **Multimodal RAG: 이미지와 텍스트를 함께 검색하기 (현재 글)**
-- 오디오 처리와 Whisper STT (예정)
-- Diffusion으로 텍스트에서 이미지 생성 (예정)
-- Multimodal Embedding과 cross-modal 검색 (예정)
-- Video 이해 (Frame Sampling에서 Video-LLaVA까지) (예정)
-- Production Multimodal Application 구축 (예정)
+- [오디오 처리와 Whisper STT](./06-audio-whisper.md)
+- [Diffusion으로 Text-to-Image 생성](./07-text-to-image-diffusion.md)
+- [Multimodal Embedding과 Cross-modal 검색](./08-multimodal-embeddings.md)
+- [Video 이해 - Frame Sampling에서 Video-LLaVA까지](./09-video-understanding.md)
+- [Production Multimodal Application 구축](./10-production-multimodal-app.md)
 <!-- toc:end -->
 
 ## 참고 자료
+
+### 공식 문서
 
 - [LangChain - Multi-Modal RAG](https://python.langchain.com/docs/use_cases/question_answering/multi_modal_rag/)
 - [FAISS Documentation](https://github.com/facebookresearch/faiss/wiki)
 - [Sentence-Transformers Documentation](https://www.sbert.net/)
 - [BAAI BGE Embedding Model Card](https://huggingface.co/BAAI/bge-base-en-v1.5)
+
+### 관련 시리즈
+
+- [Vector Search 101 - 벡터 검색 파이프라인](../../vector-search-101/ko/06-vector-search-pipeline.md)
+- [RAG Deep Dive - Retriever 설계](../../rag-deep-dive/ko/03-retriever-design.md)
+- [RAG 평가와 벤치마크 101 - 종단 간 RAG 파이프라인 평가](../../rag-benchmark-101/ko/05-e2e-evaluation.md)
 
 Tags: Multimodal RAG, CLIP Embeddings, Cross-modal Retrieval, FAISS, LangChain, Vector Search
