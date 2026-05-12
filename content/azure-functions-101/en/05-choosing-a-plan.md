@@ -27,6 +27,8 @@ That does not make Consumption irrelevant. You still need to understand all four
 
 The goal is simple: **understand what each plan gives you, what it constrains, and which one fits your workload**.
 
+This is the fifth post in the Azure Functions 101 series. Here, we compare the hosting plans in terms of real workload trade-offs instead of product labels.
+
 ---
 
 ## Questions this chapter answers

@@ -25,6 +25,8 @@ Serverless is usually sold with one sentence: it scales automatically, and you o
 
 This chapter revisits the hosting-plan decision from an operations angle. When traffic jumps abruptly, how do Consumption, Flex Consumption, Premium, and Dedicated react? Where does cold-start time actually go? And what should you change first if the first request is too slow?
 
+This is the sixth post in the Azure Functions 101 series. Here, we turn scaling and cold starts into concrete operational trade-offs.
+
 ---
 
 ## Questions this chapter answers

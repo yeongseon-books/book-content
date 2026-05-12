@@ -25,6 +25,8 @@ The opening mental model established two key ideas: every function is wired to e
 
 This chapter draws that line clearly. We’ll cover the main trigger types, the difference between input and output bindings, and what bindings really are once you strip away the “magic.” By the end, picking a trigger for a new function should feel mechanical.
 
+This is the second post in the Azure Functions 101 series. Here, we make the boundary between triggers and bindings concrete so function I/O stops feeling magical.
+
 ---
 
 ## Questions this chapter answers

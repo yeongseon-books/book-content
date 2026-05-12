@@ -34,6 +34,8 @@ The sample uses the Python v2 programming model. The overall flow is nearly iden
 
 One framing note before we start: this walkthrough uses **Flex Consumption as the primary path**. That matches current Azure guidance for new serverless apps. Classic Consumption still matters for legacy estates and the simplest throwaway demos, but it should no longer be the default mental model for a first production-shaped deployment.
 
+This is the fourth post in the Azure Functions 101 series. Here, we take a function from local development to a real Azure endpoint you can call.
+
 ---
 
 ## Questions this chapter answers

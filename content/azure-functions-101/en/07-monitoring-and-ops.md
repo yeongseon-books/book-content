@@ -25,6 +25,8 @@ Once the app is deployed, the questions change. You stop asking whether the func
 
 The scope is practical: the baseline observability view, a small KQL toolkit for incident response, the right signals for instance count and cost, and the first alerts worth wiring up.
 
+This is the final post in the Azure Functions 101 series. Here, we focus on the observability and incident-response baseline that keeps a function app operable in production.
+
 ---
 
 > 90% of operations is the ability to see 'what is different from baseline' inside 30 seconds.

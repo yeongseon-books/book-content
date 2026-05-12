@@ -31,6 +31,8 @@ Here’s the one-line answer up front:
 
 Let’s unpack that line with diagrams.
 
+This is the third post in the Azure Functions 101 series. Here, we trace how the Host and Worker split turns your code into a real execution model.
+
 ---
 
 ## Questions this chapter answers

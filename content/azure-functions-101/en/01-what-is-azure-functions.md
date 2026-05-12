@@ -26,6 +26,8 @@ When developers first hear the word "serverless," the reaction is usually one of
 
 This series is an introductory guide for developers who are picking up Azure Functions for the first time. It starts with the most basic question: **what exactly is Azure Functions, and why does this model matter?** Once you have the right mental model, the later discussions about triggers, bindings, scaling, and deployment land much more easily.
 
+This is the first post in the Azure Functions 101 series. Here, we build the core mental model that makes the rest of the platform easier to reason about.
+
 ---
 
 ## Questions this chapter answers
