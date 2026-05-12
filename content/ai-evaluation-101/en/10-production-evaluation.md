@@ -23,7 +23,9 @@ seo_description: Evaluation is not a one-shot pre-deploy check; it must run cont
 
 > AI Evaluation 101 Series (10/10)
 
-Evaluation is not a one-shot pre-deploy check; it must run continuously in production. This post covers sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.
+Evaluation is not a one-shot pre-deploy check; it must run continuously in production.
+
+This is the final post in the AI Evaluation 101 series. Here we cover sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.
 
 ---
 ![Continuous evaluation in production](../../../assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)

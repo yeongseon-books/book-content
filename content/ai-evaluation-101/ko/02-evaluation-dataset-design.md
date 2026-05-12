@@ -22,7 +22,9 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 
 > AI Evaluation 101 시리즈 (2/10)
 
-좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다. 이 글은 50-200건 규모의 입문용 eval set을 설계하는 원칙과 데이터를 모으는 방법을 다룹니다.
+좋은 평가 데이터셋은 production 트래픽의 분포를 닮으면서도 edge case를 충분히 포함해야 합니다.
+
+이 글은 AI Evaluation 101 시리즈의 2번째 글입니다. 여기서는 50-200건 규모의 입문용 eval set을 설계하는 원칙과 데이터를 모으는 방법을 다룹니다.
 
 ---
 ![평가 데이터셋 설계하기](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)

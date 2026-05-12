@@ -22,7 +22,9 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 
 > AI Evaluation 101 시리즈 (3/10)
 
-결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다. 이 글은 Exact Match, F1, BLEU, ROUGE를 언제 써야 하고 언제 쓰면 안 되는지를 다룹니다.
+결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다.
+
+이 글은 AI Evaluation 101 시리즈의 3번째 글입니다. 여기서는 Exact Match, F1, BLEU, ROUGE를 언제 써야 하고 언제 쓰면 안 되는지를 다룹니다.
 
 ---
 ![결정적 지표 - Exact Match, BLEU, ROUGE](../../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)

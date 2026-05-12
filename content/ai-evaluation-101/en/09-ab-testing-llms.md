@@ -23,7 +23,9 @@ seo_description: How do you decide which of two prompts is better? This post cov
 
 > AI Evaluation 101 Series (9/10)
 
-How do you decide which of two prompts is better? This post covers paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
+How do you decide which of two prompts is better?
+
+This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
 
 ---
 ![A/B testing LLMs - which prompt is Better](../../../assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)

@@ -23,7 +23,9 @@ seo_description: Changing one line of a prompt can break other cases. This post 
 
 > AI Evaluation 101 Series (8/10)
 
-Changing one line of a prompt can break other cases. This post covers a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
+Changing one line of a prompt can break other cases.
+
+This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
 
 ---
 ![Regression testing - Don't let Yesterday's wins break today](../../../assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)

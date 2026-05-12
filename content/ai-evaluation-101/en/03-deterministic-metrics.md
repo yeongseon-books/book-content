@@ -23,7 +23,9 @@ seo_description: Deterministic metrics are fast and reproducible, but they penal
 
 > AI Evaluation 101 Series (3/10)
 
-Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches. This post covers when to use Exact Match, F1, BLEU, and ROUGE — and when not to.
+Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches.
+
+This is post 3 in the AI Evaluation 101 series. Here we cover when to use Exact Match, F1, BLEU, and ROUGE — and when not to.
 
 ---
 ![Deterministic metrics - exact Match, BLEU, ROUGE](../../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)

@@ -23,7 +23,9 @@ seo_description: LLMs return different answers for the same input. Without evalu
 
 > AI Evaluation 101 Series (1/10)
 
-LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today. This post covers why LLM evaluation differs from regular software testing and what to measure.
+LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today.
+
+This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.
 
 ---
 ![Why evaluate LLM applications](../../../assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)

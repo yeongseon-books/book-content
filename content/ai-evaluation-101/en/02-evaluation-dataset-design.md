@@ -23,7 +23,9 @@ seo_description: A good evaluation dataset mirrors production traffic distributi
 
 > AI Evaluation 101 Series (2/10)
 
-A good evaluation dataset mirrors production traffic distribution while including enough edge cases. This post covers the principles for designing a starter eval set of 50-200 examples and how to collect the data.
+A good evaluation dataset mirrors production traffic distribution while including enough edge cases.
+
+This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.
 
 ---
 ![Designing evaluation datasets](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)

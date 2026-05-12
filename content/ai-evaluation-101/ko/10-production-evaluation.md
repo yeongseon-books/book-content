@@ -22,7 +22,9 @@ seo_description: Eval은 배포 전 한 번이 아니라 운영 중에도 계속
 
 > AI Evaluation 101 시리즈 (10/10)
 
-Eval은 배포 전 한 번이 아니라 운영 중에도 계속 돌아야 합니다. 이 글은 production trace에서 평가 샘플을 추출하고, online metrics를 모니터링하고, drift를 감지하는 패턴을 다룹니다.
+Eval은 배포 전 한 번이 아니라 운영 중에도 계속 돌아야 합니다.
+
+이 글은 AI Evaluation 101 시리즈의 마지막 글입니다. 여기서는 production trace에서 평가 샘플을 추출하고, online metrics를 모니터링하고, drift를 감지하는 패턴을 다룹니다.
 
 ---
 ![운영 환경에서의 지속적 평가](../../../assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.ko.png)
