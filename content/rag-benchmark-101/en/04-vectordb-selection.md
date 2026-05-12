@@ -22,6 +22,10 @@ seo_description: 'The skeleton of a VectorDB comparison:'
 
 # VectorDB selection criteria
 
+VectorDB comparison is really a comparison of index behavior under the same vectors and the same queries. Hold that frame steady and the trade-offs across accuracy, latency, and memory become hard to ignore.
+
+This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/04/04-01-questions-this-post-answers.en.png)

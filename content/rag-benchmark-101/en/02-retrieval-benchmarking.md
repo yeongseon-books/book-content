@@ -22,6 +22,10 @@ seo_description: 'A retrieval benchmark binds four things together:'
 
 # Measuring retrieval performance
 
+A retrieval benchmark works only when questions, gold documents, ranked results, and metrics stay in the same loop. Fix those inputs and you can tell whether a retriever change improved the system or just changed the feel of a few examples.
+
+This is the 2nd article in the RAG Evaluation and Benchmarking 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png)

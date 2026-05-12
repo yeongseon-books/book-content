@@ -22,6 +22,10 @@ seo_description: Embedding comparison rests on the one-variable-at-a-time princi
 
 # Comparing embedding models
 
+Embedding comparison is only credible when you change one variable at a time. Keep the corpus, queries, and top-k fixed, and the score gap starts to reflect the embedding model instead of the test setup.
+
+This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/03/03-01-questions-this-post-answers.en.png)

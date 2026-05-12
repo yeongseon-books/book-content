@@ -22,6 +22,10 @@ seo_description: 'A finished benchmark is a single function:'
 
 # Completing the RAG Benchmark
 
+A finished benchmark has to encode its experimental knobs in configuration and reproduce the same result from the same inputs. That is what turns scattered evaluation code into something you can use for regression checks, candidate comparison, and operational tracking.
+
+This is the final article in the RAG Evaluation and Benchmarking 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/06/06-01-questions-this-post-answers.en.png)

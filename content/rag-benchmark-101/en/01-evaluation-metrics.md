@@ -24,6 +24,10 @@ seo_description: 'Retrieval metrics compare two sets:'
 
 > RAG Benchmark 101 series (1/6)
 
+Retrieval metrics compare a gold document set with a ranked result list. Once you separate those two objects, it becomes much easier to see what Precision@k, Recall@k, and MRR each reveal.
+
+This is the first article in the RAG Evaluation and Benchmarking 101 series.
+
 ## What you'll learn
 
 - Compute Precision@k, Recall@k, and MRR — the three most common retrieval metrics — by hand.

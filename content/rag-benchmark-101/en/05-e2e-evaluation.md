@@ -22,6 +22,10 @@ seo_description: 'The data flow of an end-to-end evaluation:'
 
 # End-to-end RAG pipeline evaluation
 
+End-to-end evaluation only becomes useful when question, context, and answer are observed as one flow. Measure retrieval and generation on that shared path, and you can tell which layer is actually responsible for quality loss.
+
+This is the 5th article in the RAG Evaluation and Benchmarking 101 series.
+
 ## Questions this post answers
 
 ![Questions this post answers](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
