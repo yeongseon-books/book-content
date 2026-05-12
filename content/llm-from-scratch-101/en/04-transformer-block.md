@@ -31,6 +31,8 @@ In GPT models, these blocks often seem like standard components. Writing them by
 
 The mental model for today is simple: **Attention mixes information across tokens, FeedForward transforms it within each token, and Residual connections wrap them both for stability.**
 
+This is the 4th article in the LLM from Scratch 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->

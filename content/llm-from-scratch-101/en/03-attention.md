@@ -31,6 +31,8 @@ Today, we're adding `CausalSelfAttention` to `model.py`. We'll skip shortcuts li
 
 Today's mental model is this: **Each token asks a question with its Query, provides a score with its Key, and pulls the information it needs from the Value.**
 
+This is the 3rd article in the LLM from Scratch 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->

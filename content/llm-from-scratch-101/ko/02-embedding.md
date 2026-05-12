@@ -30,6 +30,8 @@ seo_description: 토크나이저까지 만들고 나면 잠깐 멍해집니다. 
 
 오늘 멘탈 모델은 이 문장 하나면 충분합니다. **토큰 입력 벡터는 token embedding과 positional embedding의 합입니다.**
 
+이 글은 LLM from Scratch 101 시리즈의 두 번째 글입니다.
+
 ---
 
 ## nn.Embedding은 사실 그냥 룩업 테이블

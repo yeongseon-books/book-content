@@ -31,6 +31,8 @@ In this post, we'll implement `train.py`. We'll include AdamW, warmup, cosine de
 
 Today's mental model is this: **Training is about repeatedly showing the model quality batches, flowing gradients back based on its errors, and adjusting weights slightly in the direction of those gradients.**
 
+This is the 6th article in the LLM from Scratch 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->

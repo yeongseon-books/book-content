@@ -29,6 +29,8 @@ The model we've built is a char-level GPT with 1.2 million parameters. It's smal
 
 Today's mental model is this: **A chatbot isn't just a model. It's a small system that integrates conversation history, streaming I/O, and a user interface.**
 
+This is the final article in the LLM from Scratch 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->

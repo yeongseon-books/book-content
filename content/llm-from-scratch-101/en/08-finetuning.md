@@ -29,6 +29,8 @@ The primary effect of Supervised Fine-Tuning (SFT) is a change in format rather 
 
 Today's mental model is this: **Fine-tuning isn't about discarding the base model. It's about painting over its output habits using a small, specialized dataset.**
 
+This is the 8th article in the LLM from Scratch 101 series.
+
 ---
 
 <!-- a-grade-intro:begin -->
