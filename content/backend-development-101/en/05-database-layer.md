@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Because the database might change, the same query gets duplicated everywhere, and maintenance turns into hell. The repository sits between them.
 
+This is post 5 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

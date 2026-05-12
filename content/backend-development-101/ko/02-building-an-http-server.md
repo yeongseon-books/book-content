@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (2/10)
 
+HTTP 서버를 직접 만들면서 요청과 응답의 구조, status code, header 감각을 손에 익히는 입문 가이드입니다.
+
+이 글은 Backend Development 101 시리즈의 2번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

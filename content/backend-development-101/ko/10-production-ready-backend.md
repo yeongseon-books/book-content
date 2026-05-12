@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (10/10)
 
+아홉 개 layer를 하나의 프로젝트 구조로 묶어 운영 가능한 백엔드의 디렉터리, 설정, 관측, 성장 로드맵을 정리합니다.
+
+이 글은 Backend Development 101 시리즈의 10번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

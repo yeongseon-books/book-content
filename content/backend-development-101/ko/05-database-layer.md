@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (5/10)
 
+Repository 패턴으로 DB 접근을 분리하고 트랜잭션, migration, N+1 문제까지 한 번에 정리하는 글입니다.
+
+이 글은 Backend Development 101 시리즈의 5번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

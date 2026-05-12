@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (6/10)
 
+인증, 권한, 세션, JWT 차이를 정리하고 FastAPI에서 안전한 로그인 흐름을 만드는 방법을 다룹니다.
+
+이 글은 Backend Development 101 시리즈의 6번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

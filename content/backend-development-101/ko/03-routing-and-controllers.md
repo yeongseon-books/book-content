@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (3/10)
 
+Routing과 Controller를 분리해 요청을 깔끔하게 받고, path·query·body 파라미터를 한 번에 정리하는 글입니다.
+
+이 글은 Backend Development 101 시리즈의 3번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

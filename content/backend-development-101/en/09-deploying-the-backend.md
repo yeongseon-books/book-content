@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Production has different OS, dependencies, secrets, and networks. Deployment is the work of *freezing* those differences in code.
 
+This is post 9 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

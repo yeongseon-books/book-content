@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A user has *proven who they are* and the server now knows *what they can do* on this request. Authentication and authorization are *two different problems*.
 
+This is post 6 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

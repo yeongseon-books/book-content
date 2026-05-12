@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > It reads text from a TCP socket, parses it as a request, and writes text back. An HTTP server is a *read-and-write* program.
 
+This is post 2 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

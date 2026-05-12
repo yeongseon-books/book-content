@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (4/10)
 
+Service Layer에 비즈니스 규칙을 모아 트랜잭션, 검증, 이벤트 처리를 한곳에서 다루는 방법을 살펴봅니다.
+
+이 글은 Backend Development 101 시리즈의 4번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Structured logs, meaningful status codes, and a global exception handler. With those three, the answer is in the logs — not in re-reading the code.
 
+This is post 7 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

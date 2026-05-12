@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (8/10)
 
+단위, 통합, E2E 테스트를 나눠 보고 pytest와 TestClient로 안전한 변경 환경을 만드는 방법을 다룹니다.
+
+이 글은 Backend Development 101 시리즈의 8번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

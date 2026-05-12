@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > It receives a request, applies rules, touches data, and returns a response. The backend is a *set of responsibilities*.
 
+This is post 1 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

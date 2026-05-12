@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Writing code that works and writing a backend that *runs in production* are different jobs. Production-readiness starts with structure.
 
+This is post 10 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

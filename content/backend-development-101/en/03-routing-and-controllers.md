@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > The router decides *the address*; the controller *receives input and delegates to the next layer*. Splitting these two responsibilities lets the code organize itself.
 
+This is post 3 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

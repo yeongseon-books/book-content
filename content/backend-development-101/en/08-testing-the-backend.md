@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Without tests, every change is a *bet*. A single unit test prevents *hours* of debugging later.
 
+This is post 8 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

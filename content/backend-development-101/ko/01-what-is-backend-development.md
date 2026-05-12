@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (1/10)
 
+백엔드의 역할과 구성 요소를 HTTP, 라우팅, 서비스, DB, 인증, 배포까지 한눈에 정리하는 글입니다.
+
+이 글은 Backend Development 101 시리즈의 1번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

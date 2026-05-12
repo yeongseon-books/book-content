@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Not in the controller. Not in the repository. In the *service layer*. One business action — register, transfer, refund — becomes one function with a meaningful name.
 
+This is post 4 in the Backend Development 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

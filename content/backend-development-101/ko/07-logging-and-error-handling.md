@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (7/10)
 
+구조화 로그와 글로벌 예외 처리로 운영 장애를 빠르게 진단하는 logging 기본기를 정리합니다.
+
+이 글은 Backend Development 101 시리즈의 7번째 글입니다.
 
 ## 이 글에서 다룰 문제
 

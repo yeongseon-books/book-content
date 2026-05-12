@@ -24,6 +24,9 @@ last_reviewed: '2026-05-11'
 
 > Backend Development 101 시리즈 (9/10)
 
+Docker, 환경 변수, healthcheck, zero-downtime 배포를 바탕으로 백엔드를 운영 환경에 안전하게 올리는 흐름을 정리합니다.
+
+이 글은 Backend Development 101 시리즈의 9번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
