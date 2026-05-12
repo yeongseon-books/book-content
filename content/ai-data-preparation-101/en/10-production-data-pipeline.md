@@ -25,6 +25,10 @@ seo_description: Episodes 1-9 covered cleaning, dedup, PII redaction, tokenizati
 
 > AI Data Preparation 101 series (10/10)
 
+Cleaning, deduplication, PII handling, tokenization, filtering, and splitting all matter on their own, but production requires them to run as one repeatable system. The hard part is not knowing each step in isolation, but wiring them into a pipeline you can rerun and trust.
+
+This is the final post in the AI Data Preparation 101 series. Here we cover how to turn the earlier stages into a production data pipeline with reproducibility and observability built in.
+
 ---
 ## "How do I tie everything we learned into one pipeline?"
 

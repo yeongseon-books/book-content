@@ -25,6 +25,10 @@ seo_description: A raw corpus is almost always more than half garbage. Ads, auto
 
 > AI Data Preparation 101 series (6/10)
 
+Collected data is rarely clean enough to become training data as-is. The real question is how quickly you can separate usable samples from ads, spam, encoding breakage, and boilerplate before they distort learning.
+
+This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.
+
 ---
 ## "Collected does not mean trainable."
 

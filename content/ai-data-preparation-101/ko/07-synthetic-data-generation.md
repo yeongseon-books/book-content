@@ -24,6 +24,10 @@ seo_description: production LLM fine-tuning에서 가장 흔한 병목은 labele
 
 > AI Data Preparation 101 시리즈 (7/10)
 
+production LLM fine-tuning에서 가장 자주 막히는 지점은 모델보다 labeled data 수급입니다. 사람 손으로만 데이터를 늘리기 어렵다면, 더 강한 모델을 활용해 합성 데이터를 만드는 전략이 현실적인 대안이 됩니다.
+
+이 글은 AI Data Preparation 101 시리즈의 7번째 글입니다. 여기서는 Self-Instruct부터 distillation까지 대표적인 synthetic data generation 패턴을 다룹니다.
+
 ---
 
 ## "데이터가 모자라면 만들어 쓰면 되지 않나요?"

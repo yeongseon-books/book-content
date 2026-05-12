@@ -24,6 +24,10 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 
 > AI Data Preparation 101 시리즈 (10/10)
 
+앞선 단계에서 배운 cleaning, dedup, PII 처리, tokenization, filtering은 각자 중요하지만 따로 돌려서는 운영 체계가 되지 않습니다. 결국 프로덕션에서는 이 과정을 재현 가능하고 관측 가능하게 묶는 파이프라인 설계가 필요합니다.
+
+이 글은 AI Data Preparation 101 시리즈의 마지막 글입니다. 여기서는 지금까지 다룬 단계를 하나의 production data pipeline으로 연결하는 방법을 다룹니다.
+
 ---
 
 ## "지금까지 배운 걸 어떻게 한 pipeline으로 묶나요?"

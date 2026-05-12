@@ -25,6 +25,10 @@ seo_description: LLM에서 tokenization은 단순한 전처리가 아닙니다. 
 
 > AI Data Preparation 101 시리즈 (5/10)
 
+LLM에서 tokenizer는 단순한 전처리 도구가 아니라 모델이 텍스트를 보는 단위를 결정하는 기준입니다. 여기에 chunking 전략까지 어긋나면 context window를 낭비하고 검색 품질도 함께 떨어집니다.
+
+이 글은 AI Data Preparation 101 시리즈의 5번째 글입니다. 여기서는 tokenization이 품질과 비용에 미치는 영향, 그리고 긴 문서를 안정적으로 나누는 chunking 전략을 다룹니다.
+
 ---
 
 ## "Tokenizer가 모델 품질을 결정한다고요?"

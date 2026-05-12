@@ -25,6 +25,10 @@ seo_description: Entities and references cut at chunk boundaries lose informatio
 
 > AI Data Preparation 101 series (5/10)
 
+In LLM systems, the tokenizer is not a minor preprocessing detail. It defines the units the model sees, and poor chunking decisions waste context window budget while hurting retrieval and answer quality.
+
+This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.
+
 ---
 ## "The tokenizer decides model quality?"
 

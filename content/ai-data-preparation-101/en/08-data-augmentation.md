@@ -25,6 +25,10 @@ seo_description: The previous episode generated samples "from scratch" by callin
 
 > AI Data Preparation 101 series (8/10)
 
+Generating brand-new samples and transforming existing ones solve different problems. When you need broader coverage without paying the full cost of new annotation, augmentation is often the more controlled lever.
+
+This is post 8 in the AI Data Preparation 101 series. Here we cover when to use augmentation techniques such as EDA, back-translation, and paraphrasing.
+
 ---
 ## "How is augmentation different from synthetic generation?"
 

@@ -23,6 +23,10 @@ seo_description: This is the question every ML beginner asks. You download a Kag
 
 > AI Data Preparation 101 series (1/10)
 
+It is easy to think the job ends once you download a dataset, run `pandas.read_csv()`, and feed it into a model. In production, though, model failures usually trace back to data preparation decisions long before they trace back to architecture choices.
+
+This is the first post in the AI Data Preparation 101 series. Here we cover why data preparation has outsized impact on model quality and which early mistakes tend to compound later.
+
 ---
 ## "Can't I Just Grab Some Data and Train?"
 

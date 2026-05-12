@@ -25,6 +25,10 @@ seo_description: The most common bottleneck in production LLM fine-tuning is a s
 
 > AI Data Preparation 101 series (7/10)
 
+In production LLM fine-tuning, the bottleneck is often labeled data rather than model capacity. When annotation is too slow or too expensive, synthetic generation becomes the practical way to expand supervision.
+
+This is post 7 in the AI Data Preparation 101 series. Here we cover common synthetic data generation patterns, from Self-Instruct to distillation.
+
 ---
 ## "If we run out of data, can't we just generate more?"
 

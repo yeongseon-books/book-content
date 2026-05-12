@@ -23,6 +23,10 @@ seo_description: 'Anyone who has worked on The Pile, C4, or RedPajama will tell 
 
 > AI Data Preparation 101 series (3/10)
 
+Teams that have processed large corpora tend to agree on one point: deduplication is one of the highest-leverage quality steps in the pipeline. You can change nothing about the model and still see better results by cleaning and removing repeated data correctly.
+
+This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cleaning transforms for raw text and the deduplication methods that keep training quality honest.
+
 ---
 ## "Is Deduplication Really That Important?"
 

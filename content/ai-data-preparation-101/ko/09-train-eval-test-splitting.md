@@ -25,6 +25,10 @@ seo_description: train_test_split(data, test_size=0.2)로 끝낸 모델이 produ
 
 > AI Data Preparation 101 시리즈 (9/10)
 
+`train_test_split(..., test_size=0.2)` 한 줄로 끝낸 실험이 production에서 무너지는 일은 드물지 않습니다. 분할 전략이 데이터의 시간축과 사용자 단위를 무시하면 검증 점수는 좋아 보여도 실제 성능은 쉽게 흔들립니다.
+
+이 글은 AI Data Preparation 101 시리즈의 9번째 글입니다. 여기서는 train/eval/test 분할 전략과 contamination을 통제하는 실무 기준을 다룹니다.
+
 ---
 
 ## "그냥 random_split 쓰면 되는 거 아닌가요?"

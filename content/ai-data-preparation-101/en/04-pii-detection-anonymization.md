@@ -23,6 +23,10 @@ seo_description: LLMs leaking email addresses or phone numbers that came from tr
 
 > AI Data Preparation 101 series (4/10)
 
+Training-data leaks are no longer theoretical once email addresses, phone numbers, or names make it into the corpus. The later you try to handle PII, the more expensive cleanup becomes across the rest of the pipeline.
+
+This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.
+
 ---
 ## "We Can't Have PII in Training Data, Right?"
 

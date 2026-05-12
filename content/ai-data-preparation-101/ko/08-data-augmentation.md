@@ -24,6 +24,10 @@ seo_description: 지난 편의 synthetic data generation은 LLM을 호출해 새
 
 > AI Data Preparation 101 시리즈 (8/10)
 
+새 샘플을 처음부터 만드는 synthetic generation과, 기존 샘플을 변형하는 augmentation은 목적과 비용 구조가 다릅니다. 특히 데이터가 적지만 분포를 조금씩 넓혀야 할 때 augmentation이 더 실용적인 선택이 됩니다.
+
+이 글은 AI Data Preparation 101 시리즈의 8번째 글입니다. 여기서는 EDA, back-translation, paraphrase 같은 증강 기법을 어떤 상황에서 써야 하는지 다룹니다.
+
 ---
 
 ## "Synthetic generation과 Augmentation은 뭐가 다른가요?"

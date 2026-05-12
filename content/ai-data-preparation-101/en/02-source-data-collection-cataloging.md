@@ -23,6 +23,10 @@ seo_description: 'A request lands: re-train the model from three months ago. You
 
 > AI Data Preparation 101 series (2/10)
 
+The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.
+
+This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.
+
 ---
 ## "I Don't Remember Where This Data Came From"
 
