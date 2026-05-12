@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Learning cost* and *ops burden* eat into your *schedule*.
 
+This is post 7 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

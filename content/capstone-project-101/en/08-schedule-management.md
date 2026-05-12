@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Reality* is *slower* and *more uncertain* than *estimates*.
 
+This is post 8 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Because it lets you *test* a *hypothesis* at *minimum cost*.
 
+This is post 6 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

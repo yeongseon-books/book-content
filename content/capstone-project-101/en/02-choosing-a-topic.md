@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A topic that is *small*, *measurable*, and *within your team's reach* is a *good topic*.
 
+This is post 2 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

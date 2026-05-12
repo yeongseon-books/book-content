@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Students *own* the *whole flow* — from *problem definition* to *demo*.
 
+This is post 1 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > They lack the *problem solution result* *narrative*.
 
+This is post 9 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

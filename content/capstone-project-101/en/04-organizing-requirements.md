@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > Without *non-functional* needs and *priorities*, *decisions* will *shake*.
 
+This is post 4 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > When *responsibility* is *diffused*, *decisions* are *delayed*.
 
+This is post 5 in the Capstone Project 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn
