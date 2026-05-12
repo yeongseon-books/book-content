@@ -24,6 +24,10 @@ seo_description: The standard library is a toolbox of routines so you do not wri
 
 # Standard library tour: datetime, pathlib, json, collections, itertools
 
+The standard library is the toolbox that keeps you from rewriting common routines. Each module stays focused on one domain, which is why `datetime`, `pathlib`, `json`, `collections`, and `itertools` fit so naturally into day-to-day code.
+
+This post is the final article in the Python 101 series. This is the final stop in the series, where you tie the core language to the tools Python already ships with.
+
 ## What you will learn
 
 - How to handle dates and times with `datetime`

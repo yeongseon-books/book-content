@@ -24,6 +24,10 @@ seo_description: One computer can host many Pythons at once, and every project g
 
 # Why Python, and how to install and use venv
 
+One computer can host many Pythons at once, and every project gets its own. If you miss that model early, environment problems pile up faster than syntax problems.
+
+This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.
+
 ## What you will learn
 
 - Why "just installing Python" is risky, and why you must separate system Python from project Python

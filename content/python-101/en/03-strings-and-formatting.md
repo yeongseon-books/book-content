@@ -24,6 +24,10 @@ seo_description: In Python 3, str is an immutable sequence of Unicode code point
 
 # Strings and formatting
 
+In Python 3, `str` is an immutable sequence of Unicode code points, while `bytes` is an immutable sequence of raw bytes. Keeping those two layers separate makes encoding and formatting issues much easier to reason about.
+
+This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.
+
 ## What you will learn
 
 By the end of this chapter you will be able to explain and code the following:

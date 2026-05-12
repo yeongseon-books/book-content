@@ -24,6 +24,10 @@ seo_description: 'A file is a three-step resource: open, read or write, close. E
 
 # File I/O and exception handling
 
+A file is a three-step resource: open it, read or write it, then close it. Exceptions are the labels that tell you which step failed and what kind of failure you hit.
+
+This post is the 8th article in the Python 101 series. This is the point in the series where resource handling and failure paths become part of normal coding.
+
 ## What you will learn
 
 By the end of this chapter you can do the following.

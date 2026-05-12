@@ -24,6 +24,10 @@ seo_description: In Python, a variable is not a box that holds a value but a nam
 
 # Variables, types, and operators
 
+In Python, a variable is not a box that holds a value but a name attached to an object. That one model clears up most beginner confusion around assignment, comparison, and copying.
+
+This post is the 2nd article in the Python 101 series. This is the point in the series where Python's name-and-object model starts to matter.
+
 ## What you'll learn
 
 By the end of this chapter you will be able to explain and code the following yourself.
