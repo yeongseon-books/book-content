@@ -14,388 +14,195 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-12'
 seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
 ---
 
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
 
-독자가 Azure Container Apps에서 Dapr를 처음 켜 보면 기능이 놀랄 만큼 가볍게 보입니다. 체크박스 몇 개를 누르거나 필드 몇 개를 채우면 App ID가 생기고, 서비스는 곧바로 localhost 3500 또는 50001을 통해 state store나 pub/sub 같은 API를 쓰기 시작합니다.
+Azure Container Apps에서 Dapr를 처음 켜면 기능이 아주 가볍게 보입니다. 앱 ID 몇 개를 적고, 포트를 지정하면 서비스가 갑자기 localhost 3500이나 50001로 Dapr API를 부르기 시작합니다. 겉으로는 체크박스 하나를 켠 것 같지만, 런타임에서는 훨씬 큰 변화가 일어납니다.
 
-하지만 표면이 작다고 런타임 변화까지 작은 것은 아닙니다. 실제로는 upstream Dapr sidecar 프로세스인 `daprd`가 사용자 컨테이너 옆에 붙고, 자기 포트와 인자, probe, 인증서, component 로딩 경로를 가진 별도 프로세스로 동작합니다.
+실제로는 upstream Dapr sidecar runtime인 `daprd` 계열 프로세스가 사용자 컨테이너 옆에 붙습니다. 그 프로세스는 자체 포트, 인자, health probe, component loading, 인증 재료를 갖고 움직입니다. 즉 Dapr enablement는 앱에 메타데이터를 하나 더 붙이는 일이 아니라, Pod의 런타임 형태 자체를 바꾸는 일입니다.
 
-이 글은 Azure Container Apps Deep Dive 시리즈의 5번째 글입니다. 여기서는 Dapr를 켰을 때 사용자 컨테이너 옆에 붙는 sidecar 런타임의 구조와 호출 경로를 따라갑니다.
+이 글은 Azure Container Apps Deep Dive 시리즈의 다섯 번째 글입니다. 여기서는 Dapr enablement가 어떻게 sidecar lifecycle, localhost API, component scope, sidecar 로그라는 운영 현실로 바뀌는지 정리하겠습니다.
 
-## Source Version
+이 관점을 잡으면 Dapr 장애를 “앱 코드가 틀렸다”로만 보지 않게 됩니다. 이제는 sidecar 부팅, component scope, environment dependency, sidecar-to-backing-service 경로도 같은 수준으로 봐야 하기 때문입니다.
 
-이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:
-- Dapr: v1.13.x (https://github.com/dapr/dapr)
-- KEDA: v2.14.x (https://github.com/kedacore/keda)
-- Envoy: v1.30.x (https://github.com/envoyproxy/envoy)
+이제 Dapr를 기능 목록이 아니라 컨테이너 옆에 붙는 실제 런타임으로 읽어 보겠습니다.
 
-ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
+## 이 글에서 다룰 문제
 
-## Evidence Model
+- ACA에서 Dapr를 켠다는 것은 런타임에 정확히 무엇이 추가된다는 뜻일까요?
+- sidecar injection은 어떤 upstream 모델로 이해하는 편이 가장 정확할까요?
+- localhost 포트 3500, 50001은 왜 중요한 운영 계약일까요?
+- Dapr component는 Environment와 app scope 사이에서 어떻게 연결될까요?
+- sidecar 로그와 readiness를 왜 애플리케이션 로그만큼 중요하게 봐야 할까요?
 
-- **Microsoft가 문서로 직접 밝힌 범위**: ACA에서 Dapr를 켜면 localhost API와 Environment 범위 component 모델이 노출된다는 점.
-- **업스트림 동작을 바탕으로 한 추론**: sidecar injection 세부, 포트 동작, mTLS/control-plane plumbing은 ACA 문서가 없는 한 upstream Dapr 패턴을 기준으로 읽습니다.
-- **이 글이 넘지 않는 선**: ACA 전용 webhook 내부, 숨겨진 인증서 배포 세부, 비공개 runtime argument.
+## 왜 이 글이 중요한가
 
----
+Dapr는 자주 “개발 편의 API”처럼 소개되지만, 운영 현실에서는 별도 런타임입니다. sidecar가 정상적으로 뜨지 않으면 앱 코드가 멀쩡해도 서비스 invocation, state access, pub/sub가 모두 실패할 수 있습니다. 즉 Dapr를 켠 순간부터는 애플리케이션 하나가 아니라 두 개의 협력 프로세스를 운영하게 됩니다.
 
-## 가장 짧고 정확한 문장
+또한 Dapr는 2편에서 본 Environment 경계를 다시 끌어옵니다. enablement는 앱 수준에서 켜지만, component availability와 sharing은 Environment 수준에서 결정되기 때문입니다. 그래서 app 설정만 보고는 설명되지 않는 장애가 생깁니다. 앱은 Dapr를 켰는데 필요한 component가 scope에 안 걸렸거나, Environment에 component 정의가 없으면 런타임 행동이 달라집니다.
 
-ACA의 Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime입니다.
+마지막으로 Dapr를 실제 sidecar runtime으로 이해해야 incident timeline도 바로잡힙니다. localhost 호출 성공은 바깥 의존성 경로 성공과 같은 뜻이 아니고, sidecar readiness는 앱 readiness와 얽혀 있으며, sidecar 로그는 앱 로그와 별개의 증거입니다. 이 차이를 모르고 운영하면 진단이 계속 빗나갑니다.
 
-이 문장이 중요한 이유는 두 가지 잘못된 모델을 바로 지우기 때문입니다.
+## Dapr를 이해하는 가장 좋은 방법: 앱 옆에 붙는 실제 사이드카 프로세스로 보는 것입니다
 
-첫째, ACA가 제어면에서 Dapr 비슷한 API만 흉내 내는 것은 아닙니다.
-둘째, Dapr를 켠다는 것이 앱 metadata 몇 개 추가하는 일로 끝나지 않습니다.
+ACA의 Dapr를 가장 정확하게 설명하는 문장은 이것입니다. **ACA Dapr는 Container Apps 제품 표면에 통합된 upstream Dapr runtime이며, 런타임에서는 사용자 컨테이너 옆에 실제 sidecar 프로세스가 붙습니다.** 저는 이 문장이 Dapr 편 전체를 설명한다고 생각합니다.
 
-Pod 모양 자체가 바뀝니다.
+이 문장은 두 가지 나쁜 mental model을 동시에 제거합니다. 첫째, ACA가 control plane에서 Dapr 비슷한 API를 흉내 낸다는 오해입니다. 둘째, Dapr enablement가 앱 리소스에 메타데이터만 몇 개 추가하는 일이라는 오해입니다. 실제로는 Pod shape가 바뀌고, sidecar lifecycle이 추가됩니다.
 
-![앱 로컬 호출과 sidecar 외부 호출 구조](../../../assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.ko.png)
+또한 이 관점은 디버깅 방식도 바꿉니다. 이제는 앱 컨테이너가 sidecar에 어떻게 붙는지, sidecar가 component를 어디서 읽는지, sidecar 로그가 무엇을 말하는지, 인증 재료와 mTLS가 어디서 들어오는지를 함께 봐야 합니다. 즉 애플리케이션과 인접 런타임을 한 묶음으로 운영해야 합니다.
 
-*앱 로컬 호출과 sidecar 외부 호출 구조*
-앱은 로컬에 붙습니다.
-사이드카는 바깥과 통신합니다.
-이게 기본 계약입니다.
+> ACA에서 Dapr를 켠다는 것은 앱에 API 이름을 붙이는 일이 아니라, 컨테이너 옆에 실제 `daprd` 계열 런타임을 하나 더 띄우는 일입니다.
 
-### Dapr on Kubernetes (documented)
+## 핵심 개념
 
-Upstream Dapr on Kubernetes는 mutating admission webhook으로 `daprd`를 주입하는 control plane을 문서화합니다.
-그 upstream 문서와 소스에는 public HTTP port 3501, Sentry, trust anchor, mTLS 관련 sidecar 설정도 함께 나타납니다.
+### 앱은 localhost로 말하고, sidecar는 바깥으로 말합니다
 
-### Likely ACA wiring (inferred)
+Dapr sidecar 패턴의 핵심 계약은 단순합니다. 앱은 localhost로 sidecar에 요청하고, sidecar는 그 요청을 component와 네트워크 경로를 따라 바깥으로 전달합니다. 이 분리가 Dapr가 주는 추상화의 핵심입니다.
 
-ACA는 앱 표면에서 Dapr를 켰을 때(`dapr.enabled=true`) 런타임 표면이 생긴다고 문서화하지만, admission webhook·control plane·certificate plumbing 내부는 공개하지 않습니다.
-따라서 가장 안전한 모델은, ACA가 upstream Dapr 패턴을 제품화한 변형을 내부에서 사용하되 정확한 구현은 감춘다는 설명입니다.
+![Local app calls and outward sidecar calls](../../../assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.ko.png)
 
----
+*Local app calls and outward sidecar calls*
 
-## 출발점은 upstream pod mutation 모델입니다
+앱은 service invocation, state save, pub/sub publish 같은 의도만 표현합니다. sidecar는 어떤 component를 써야 하는지, 어디로 보내야 하는지, 어떻게 인증하고 직렬화할지를 맡습니다. 그래서 앱은 단순해지고 Pod는 더 복잡해집니다.
 
-Upstream Dapr on Kubernetes는 mutating admission webhook으로 sidecar를 주입합니다.
-Pinned Dapr source의 injector service 코드와 pod patch 경로가 그 사실을 보여 줍니다.
+### 출발점은 upstream pod mutation 모델입니다
 
-Injector는 admission review를 받고, pod annotation과 환경 상태에서 sidecar config를 만들고, Dapr sidecar container를 추가하는 patch operation을 생성합니다.
+Upstream Dapr on Kubernetes는 mutating admission webhook을 통해 sidecar를 주입합니다. injector는 admission review를 받고, pod annotation과 환경 상태를 바탕으로 sidecar config를 만들고, Dapr sidecar container를 추가하는 patch operation을 생성합니다.
 
-![Pod mutation 기반 sidecar 주입 흐름](../../../assets/azure-aca-deep-dive/05/05-02-start-with-the-pod-mutation-model.ko.png)
+![Sidecar injection through pod mutation](../../../assets/azure-aca-deep-dive/05/05-02-start-with-the-pod-mutation-model.ko.png)
 
-*Pod mutation 기반 sidecar 주입 흐름*
-ACA는 raw Kubernetes admission mechanics를 직접 보여 주지 않습니다.
-따라서 여기서 말하는 webhook 주입은 ACA 공개 구현이 아니라 upstream Dapr 문서입니다.
-그래도 실제로 붙는 sidecar의 런타임 모양을 설명하는 기준으로는 upstream injector 모델이 가장 적절합니다.
+*Sidecar injection through pod mutation*
 
----
+ACA는 raw Kubernetes admission mechanics를 노출하지 않습니다. 그래서 이 설명은 ACA 공개 구현이 아니라 upstream Dapr documented model입니다. 하지만 ACA가 만들어 내는 sidecar shape를 이해하는 가장 좋은 reference model이기도 합니다.
 
-## Injector의 일은 "컨테이너 하나 추가"보다 훨씬 큽니다
+### injector의 일은 “컨테이너 하나 붙이기”보다 큽니다
 
-Pinned upstream Dapr source를 보면 pod patch 코드는 단순히 `daprd`를 붙이라고 말하는 수준이 아닙니다.
+Pinned upstream source를 보면 injector는 단순히 `daprd`를 append하지 않습니다. sidecar image, trust anchors, cert material, control plane address, mode, namespace, app ID, protocol, health setting, port, volume mount, env var까지 계산합니다.
 
-다음 값을 계산합니다.
+즉 sidecar는 generic helper container가 아니라, 꽤 많은 구성을 가진 runtime process입니다. 이걸 이해해야 Dapr enablement가 운영 복잡도를 왜 늘리는지도 자연스럽게 받아들일 수 있습니다.
 
-- sidecar image
-- trust anchor와 certificate material
-- control plane address
-- mode와 namespace 값
-- app ID와 app protocol
-- health와 readiness 설정
-- port number
-- volume mount와 environment variable
+### sidecar container는 문자 그대로 `daprd`입니다
 
-그래서 sidecar는 generic helper container가 아니라, 구성된 runtime process로 봐야 합니다.
+Upstream `sidecar_container.go`는 이 사실을 아주 직접적으로 보여 줍니다. 주입되는 컨테이너는 `/daprd` 실행 파일을 command로 쓰고, sidecar config에서 조립된 CLI arg를 받으며, explicit port와 probe를 가집니다.
 
----
+![Injected daprd process and container shape](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.ko.png)
 
-## Sidecar container의 실체는 `daprd`입니다
+*Injected daprd process and container shape*
 
-Upstream `sidecar_container.go` 파일은 주입되는 컨테이너의 실체를 잘 보여 줍니다.
-이 코드는 command가 `/daprd`인 컨테이너를 만들고, sidecar config에서 조합한 CLI flag를 붙입니다.
+이 지점이 중요합니다. Dapr는 passive library가 아닙니다. 실행 중인 별도 프로세스입니다. ACA는 제품 표면에서 스위치를 제공할 뿐이고, 런타임은 실제 Go 프로그램을 하나 더 띄웁니다.
 
-이 파일 하나만 봐도 핵심이 드러납니다.
+### Go 프로세스라는 말은 사소한 표현이 아닙니다
 
-- 실제 실행 파일입니다.
-- 명시적인 CLI flag를 받습니다.
-- 명시적인 port를 엽니다.
-- readiness / liveness probe를 가집니다.
+“사이드카”라는 표현만 들으면 막연한 보조 채널처럼 느껴질 수 있습니다. 하지만 `daprd`를 Go 프로세스라고 명시하면 운영자가 봐야 할 것이 분명해집니다. startup path, crash mode, own logs, health probe, network listener, configuration load path가 따로 존재한다는 뜻이기 때문입니다.
 
-![주입된 daprd 프로세스와 컨테이너 구조](../../../assets/azure-aca-deep-dive/05/05-01-the-sidecar-container-is-literally-daprd.ko.png)
+즉 Dapr가 느리거나 죽어 있으면, 이제는 사용자 앱만 디버깅하는 것이 아닙니다. 앱이 의존하는 인접 런타임을 함께 디버깅하는 상황입니다.
 
-*주입된 daprd 프로세스와 컨테이너 구조*
-즉 제품 표면에서 Dapr를 켠다는 짧은 설정은, 런타임에서는 이렇게 구성된 두 번째 프로세스를 Pod 안에 띄우는 일입니다.
+### bootstrap path는 실제 런타임 프로그램의 부팅 절차를 보여 줍니다
 
----
+Pinned upstream 코드에서 `cmd/daprd/main.go`는 작고, 실제 부팅은 `app.Run()`과 runtime creation 경로를 따라갑니다. logging, security, runtime option 조립을 거쳐 최종적으로 Dapr runtime object를 만들고 실행합니다.
 
-## 이것을 Go 프로세스라고 부르는 이유
+![Bootstrap path from main.go to runtime](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.ko.png)
 
-독자는 sidecar라는 말을 듣고 막연한 보조 통로를 떠올리기 쉽습니다.
-여기서 `daprd`를 Go 프로세스라고 부르는 편이 유용한 이유는, 실제 런타임 단위를 중심에 놓기 때문입니다.
+*Bootstrap path from main.go to runtime*
 
-이 프로세스는 다음을 모두 가집니다.
+여기서 모든 bootstrap detail을 외울 필요는 없습니다. 중요한 것은 Dapr enablement가 complete runtime program을 띄운다는 사실입니다. 정상적인 프로세스 lifecycle과 구성 파이프라인이 있다는 뜻입니다.
 
-- 자체 부팅 경로
-- 자체 장애 형태
-- 자체 로그
-- 자체 health probe
-- 자체 listener
-- 자체 설정 로딩 경로
+### sidecar 포트는 구체적이고 운영적으로 중요합니다
 
-ACA에서 Dapr가 이상하다면, 더 이상 여러분 앱만 디버깅하는 것이 아닙니다.
-옆에서 같이 도는 런타임 프로세스를 함께 디버깅해야 합니다.
+Upstream runtime config default와 ACA Dapr 문서는 sidecar의 핵심 포트를 설명합니다. HTTP API는 3500, gRPC API는 50001입니다. Upstream Dapr는 public HTTP port 3501도 문서화하지만, ACA는 그 포트의 내부 wiring을 공개하지 않습니다.
 
----
+![Dapr HTTP and gRPC ports](../../../assets/azure-aca-deep-dive/05/05-05-the-sidecar-ports-are-concrete-and-impor.ko.png)
 
-## 부팅 경로: `main.go`에서 `app.Run()`을 거쳐 runtime 생성까지
+*Dapr HTTP and gRPC ports*
 
-Pinned upstream Dapr code는 이 부팅 경로를 깔끔하게 보여 줍니다.
+이 포트는 이론이 아니라 앱과 sidecar 사이의 local contract입니다. ACA 앱이 Dapr service invocation이나 state API를 쓸 때, 대개는 이 local listener 중 하나와 통신하고 있습니다.
 
-`cmd/daprd/main.go`는 매우 짧습니다.
-`app.Run()`을 호출합니다.
-그 뒤 bootstrap 경로가 runtime option, logging, security, 최종 Dapr runtime object를 만든 뒤 `Run`을 호출합니다.
+### localhost가 중요한 이유
 
-![main.go에서 runtime까지 부팅 경로](../../../assets/azure-aca-deep-dive/05/05-04-boot-path-main-go-to-app-run-to-runtime.ko.png)
+sidecar 패턴이 강한 이유는 앱이 최종 네트워크 경로를 몰라도 되기 때문입니다. 앱은 “service X를 호출하라”, “key Y를 저장하라”, “topic Z에 publish하라”는 의도만 표현합니다. sidecar가 어떤 component가 backing store인지, 어디로 라우팅해야 하는지, 어떻게 인증할지를 압니다.
 
-*main.go에서 runtime까지 부팅 경로*
-ACA 독자에게 중요한 것은 부팅 세부사항 전부가 아닙니다.
-Dapr를 켜면 실제로 완전한 런타임 프로그램이 하나 더 떠서, 정상적인 프로세스 생명주기와 설정 파이프라인을 돈다는 사실입니다.
+![Localhost API boundary between app and sidecar](../../../assets/azure-aca-deep-dive/05/05-06-why-localhost-matters-so-much.ko.png)
 
----
+*Localhost API boundary between app and sidecar*
 
-## Sidecar 포트는 구체적이며 중요합니다
+그래서 앱은 더 이식 가능해지고, 반대로 Pod shape는 더 복잡해집니다. localhost 성공이 외부 의존성 성공을 보장하지 않는 이유도 여기 있습니다.
 
-Upstream runtime config 기본값은 Dapr HTTP와 gRPC API 포트를 명시합니다.
+### component loading에서 Environment 경계가 다시 등장합니다
 
-- HTTP API: 3500
-- Public HTTP port: 3501
-- gRPC API: 50001
+2편에서 본 것처럼 ACA의 Dapr component는 Environment-level resource입니다. 이 글에서는 그 사실이 왜 런타임적으로 중요한지 드러납니다. sidecar는 Dapr app ID와 scope를 기준으로 component 정의를 로드합니다.
 
-Microsoft의 ACA Dapr overview도 sidecar가 HTTP 3500, gRPC 50001을 노출한다고 설명합니다.
-반면 public HTTP port 3501은 upstream Dapr 문서에 있는 정보이며, ACA 전용 wiring은 공개되지 않았습니다.
+![Environment components and sidecar loading scope](../../../assets/azure-aca-deep-dive/05/05-07-component-loading-is-where-aca-s-environ.ko.png)
 
-![Dapr HTTP·gRPC 포트와 로컬 계약](../../../assets/azure-aca-deep-dive/05/05-05-the-sidecar-ports-are-concrete-and-impor.ko.png)
+*Environment components and sidecar loading scope*
 
-*Dapr HTTP·gRPC 포트와 로컬 계약*
-이 포트는 추상적 개념이 아닙니다.
-여러분 코드와 sidecar 사이의 로컬 계약입니다.
+즉 Environment가 component registry boundary를 소유하고, sidecar가 최종적으로 어떤 scoped component를 활성화할지 결정합니다. app-level enablement와 environment-level dependency가 항상 함께 움직이는 이유가 바로 여기 있습니다.
 
-ACA 앱이 Dapr service invocation이나 state operation을 쓸 때는, 대부분 이 로컬 listener 중 하나에 붙고 있는 셈입니다.
+### Dapr enablement는 app-level switch지만 environment dependency를 가집니다
 
----
+사용자는 앱에서 Dapr를 켭니다. 하지만 런타임 성공 여부는 Environment에 있는 component와 구성 상태에 의존할 수 있습니다. 이 미묘한 분리가 운영에서 매우 중요합니다.
 
-## 왜 localhost가 그렇게 중요한가
+![App-level enablement with environment dependencies](../../../assets/azure-aca-deep-dive/05/05-08-enabling-dapr-in-aca-is-an-app-level-swi.ko.png)
 
-Sidecar 패턴의 핵심은 앱이 외부 의존성의 최종 네트워크 경로를 몰라도 된다는 점입니다.
-localhost API 계약만 알면 됩니다.
+*App-level enablement with environment dependencies*
 
-이 구조가 portability와 decoupling을 줍니다.
+앱 설정은 맞아 보이는데 동작이 실패할 때, 누락된 조각은 종종 app scope가 아니라 environment scope에 있습니다. Dapr는 항상 두 범위를 가로지릅니다.
 
-앱은 말합니다.
+### injector flag는 ACA 사용자가 보는 현상과 직접 맞닿아 있습니다
 
-- 서비스 X를 호출해 달라
-- key Y를 저장해 달라
-- topic Z에 publish해 달라
+Upstream sidecar builder에는 `--dapr-http-port`, `--dapr-grpc-port`, `--app-id`, `--app-port`, `--app-protocol`, `--control-plane-address`, `--sentry-address`, `--enable-mtls` 같은 flag가 등장합니다. ACA 사용자가 모두 직접 설정하는 것은 아니지만, 런타임은 결국 이런 정보를 필요로 합니다.
 
-Sidecar는 말합니다.
+이 사실은 managed sidecar integration의 의미를 잘 보여 줍니다. 제품이 세부 plumbing을 감췄을 뿐, sidecar가 요구하는 실제 runtime input은 사라지지 않습니다.
 
-- 어떤 component가 그 요청을 담당하는지 안다
-- 어디로 라우팅할지 안다
-- 어떻게 인증하고 직렬화할지 안다
+### Dapr는 building-block API뿐 아니라 operational API도 가집니다
 
-![앱과 sidecar의 localhost API 경계](../../../assets/azure-aca-deep-dive/05/05-06-why-localhost-matters-so-much.ko.png)
+ACA 문서가 Dapr overview에서 building-block API와 operational API를 구분하는 이유도 여기 있습니다. sidecar는 state, pub/sub, invocation뿐 아니라 health, metadata 같은 운영 표면도 노출합니다.
 
-*앱과 sidecar의 localhost API 경계*
-그래서 Dapr는 앱은 단순하게 만들고, Pod 모양은 더 복잡하게 만듭니다.
+![Building-block and operational Dapr APIs](../../../assets/azure-aca-deep-dive/05/05-09-dapr-is-not-only-the-building-block-apis.ko.png)
 
----
+*Building-block and operational Dapr APIs*
 
-## Component 로딩에서 다시 등장하는 Environment 경계
+즉 sidecar는 원격 호출 편의 래퍼가 아니라, Pod 안에서 주소 가능한 운영 endpoint이기도 합니다.
 
-2화에서 Dapr component가 ACA에서 environment-level resource라고 했습니다.
-이번 화는 그 말이 런타임에서 왜 중요한지 보여 줍니다.
+### app-to-sidecar와 sidecar-to-app은 다른 채널입니다
 
-Sidecar runtime은 Dapr app ID와 scope에 따라 component 정의를 로드합니다.
-Microsoft의 components 문서도 scope가 Container App 이름이 아니라 Dapr app ID에 대응한다고 분명히 적습니다.
+로컬 관계는 사실 두 방향입니다. 앱이 localhost로 sidecar를 호출하는 경로가 있고, sidecar가 service invocation delivery나 pub/sub handler 같은 패턴에서 앱으로 다시 들어오는 경로가 있습니다.
 
-![Environment component와 sidecar 로딩 범위](../../../assets/azure-aca-deep-dive/05/05-07-component-loading-is-where-aca-s-environ.ko.png)
+![App calls and sidecar callbacks as dual channels](../../../assets/azure-aca-deep-dive/05/05-10-app-to-sidecar-and-sidecar-to-app-are-se.ko.png)
 
-*Environment component와 sidecar 로딩 범위*
-즉 Environment는 component registry 경계를 소유합니다.
-실제 어떤 scoped component가 살아나는지는 sidecar가 최종 런타임 판단을 합니다.
+*App calls and sidecar callbacks as dual channels*
 
----
+그래서 app port와 app protocol은 장식이 아닙니다. sidecar가 사용자 코드에 어떻게 접근할지 알려 주는 실제 계약입니다.
 
-## ACA에서 Dapr enablement는 app-level 스위치이면서 environment-level 의존성을 가집니다
+### sidecar 로그는 incident timeline의 1급 증거입니다
 
-이 분리는 미묘하지만 중요합니다.
+Environment 문서는 Dapr sidecar 로그가 shared logging destination에 포함된다고 설명합니다. 이것이 중요한 이유는 실패 원인을 sidecar가 더 잘 알고 있을 수 있기 때문입니다. component load failure, auth issue, service invocation resolution issue, backing service timeout, sidecar startup failure는 앱 로그보다 sidecar 로그에 더 선명하게 남습니다.
 
-여러분은 app에서 Dapr를 켭니다.
-하지만 sidecar는 environment-level component와 configuration 상태에 의존할 수 있습니다.
+![Sidecar logs in the incident timeline](../../../assets/azure-aca-deep-dive/05/05-11-why-sidecar-logs-belong-in-your-incident.ko.png)
 
-즉 ACA의 Dapr 동작은 최소 두 스코프를 항상 가로지릅니다.
+*Sidecar logs in the incident timeline*
 
-- enablement와 sidecar attachment를 위한 app scope
-- component availability와 sharing을 위한 environment scope
+따라서 sidecar 로그를 noisy adjunct data로 보면 안 됩니다. 앱 컨테이너 로그와 같은 급의 운영 증거로 다뤄야 합니다.
 
-![App enablement와 environment 의존성 관계](../../../assets/azure-aca-deep-dive/05/05-08-enabling-dapr-in-aca-is-an-app-level-swi.ko.png)
+### mTLS와 trust material도 실제 런타임이라는 증거입니다
 
-*App enablement와 environment 의존성 관계*
-App 설정은 멀쩡해 보이는데 런타임 동작이 실패한다면, 빠진 조각은 app scope가 아니라 environment scope에 있을 수 있습니다.
+Upstream injector 코드에 trust anchors, certificate material, Sentry address, identity-related config가 포함된다는 사실은 중요합니다. 이것은 cosmetic metadata가 아니라, security-aware distributed runtime이 실제로 동작하는 데 필요한 구성입니다.
 
----
+ACA는 trust, Sentry, mTLS wiring의 정확한 내부 값을 공개하지 않지만, broad runtime shape는 upstream Dapr와 닮아 있다고 보는 편이 가장 안전합니다. 관리 표면이 추상화될 뿐, 런타임 복잡도 자체는 남아 있습니다.
 
-## Injector 코드는 ACA 사용자에게도 꽤 많은 힌트를 줍니다
+### sidecar lifecycle을 한눈에 보는 그림
 
-Upstream sidecar container builder에는 ACA 사용자가 실제로 체감하는 flag가 많이 보입니다.
+![Full lifecycle of the Dapr sidecar](../../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.ko.png)
 
-대표적으로 다음과 같습니다.
+*Full lifecycle of the Dapr sidecar*
 
-- `--dapr-http-port`
-- `--dapr-grpc-port`
-- `--app-id`
-- `--app-port`
-- `--app-protocol`
-- `--control-plane-address`
-- `--sentry-address`
-- `--enable-mtls`
+이 그림이 보여 주는 것은 단순합니다. ACA의 Dapr 체크박스 하나가 결국 두 번째 프로세스, 두 번째 로그 흐름, 두 번째 health surface, 그리고 Environment 수준 dependency를 만든다는 사실입니다.
 
-ACA에서 여러분이 이 값을 전부 직접 주지는 않습니다.
-중요한 것은 upstream 런타임 프로세스가 이 값들을 실제로 필요로 한다는 점입니다.
-Sentry, mTLS, control-plane address 같은 이름은 upstream Dapr 문서에 근거한 것이고, ACA 내부 값과 배선은 공개되지 않았습니다.
+### 운영자가 바로 써 볼 수 있는 명령
 
-이것이 관리형 sidecar 통합이란 무엇인지 보여 주는 또 하나의 단서입니다.
-
----
-
-## Dapr는 building block API만이 아니라 health / metadata API이기도 합니다
-
-Microsoft의 ACA용 Dapr overview는 building block API와 operational API를 구분합니다.
-이 구분은 중요합니다.
-Sidecar는 기능 API만 제공하는 것이 아니라, 관측 가능한 runtime이기도 하기 때문입니다.
-
-State, pub/sub, invocation, bindings 외에도 sidecar는 다음 같은 operational surface를 가집니다.
-
-- health
-- metadata
-
-![Building block과 운영 API의 이중 표면](../../../assets/azure-aca-deep-dive/05/05-09-dapr-is-not-only-the-building-block-apis.ko.png)
-
-*Building block과 운영 API의 이중 표면*
-즉 sidecar는 원격 호출 편의 래퍼에 그치지 않습니다.
-Pod 안에서 직접 접근 가능한 운영 endpoint이기도 합니다.
-
----
-
-## App -> sidecar와 sidecar -> app는 다른 채널입니다
-
-기억해야 할 로컬 관계는 사실 두 개입니다.
-
-1. 앱이 localhost로 sidecar를 호출합니다.
-2. 특정 패턴에서는 sidecar도 앱을 호출합니다.
-
-예를 들어 service invocation delivery나 pub/sub handler 호출이 그렇습니다.
-
-![App 호출과 sidecar 콜백의 양방향 채널](../../../assets/azure-aca-deep-dive/05/05-10-app-to-sidecar-and-sidecar-to-app-are-se.ko.png)
-
-*App 호출과 sidecar 콜백의 양방향 채널*
-그래서 app port와 app protocol 설정은 장식이 아닙니다.
-Sidecar가 여러분 코드를 어떤 방식으로 호출해야 하는지 알려 주는 값입니다.
-
----
-
-## Incident timeline에 sidecar 로그를 반드시 넣어야 하는 이유
-
-Microsoft의 environment 문서도 Dapr sidecar log가 공용 logging destination에 포함된다고 설명합니다.
-사고 분석에서는 이 점이 매우 중요합니다.
-
-요청이 실패했을 때, 사용자 컨테이너보다 sidecar가 더 많은 사실을 알고 있을 수 있습니다.
-
-- component load failure
-- auth issue
-- service invocation resolution issue
-- backing service timeout
-- sidecar startup failure
-
-![Sidecar 로그와 장애 타임라인 연결](../../../assets/azure-aca-deep-dive/05/05-11-why-sidecar-logs-belong-in-your-incident.ko.png)
-
-*Sidecar 로그와 장애 타임라인 연결*
-Sidecar 로그를 부수 데이터로 보지 말고, 1급 증거로 다루는 편이 맞습니다.
-
----
-
-## mTLS와 trust material도 이게 진짜 런타임이라는 증거입니다
-
-Upstream injector 코드는 trust anchor, certificate material, Sentry address, identity 관련 설정을 다룹니다.
-이건 장식용 metadata가 아닙니다.
-
-보안 인지형 분산 런타임이 실제로 동작하기 위해 필요한 구성입니다.
-
-이 점이 중요한 이유는, Dapr service invocation이 단순한 친절한 client library 경험만은 아니기 때문입니다.
-Upstream Dapr on Kubernetes에는 실제 sidecar-to-sidecar 인프라와 identity plumbing이 있습니다.
-ACA도 큰 런타임 모양은 비슷하다고 보는 편이 맞지만, trust·Sentry·mTLS 배선의 정확한 구현은 Microsoft가 공개하지 않습니다.
-
-ACA가 관리 세부사항을 감추더라도, 런타임 복잡도 자체는 남아 있습니다.
-
----
-
-## Sidecar 전체 생명주기를 한 장으로
-
-![Dapr sidecar의 전체 생명주기](../../../assets/azure-aca-deep-dive/05/05-12-putting-the-whole-sidecar-lifecycle-in-o.ko.png)
-
-*Dapr sidecar의 전체 생명주기*
-이 그림이 체크박스 하나가 Pod 안의 두 번째 런타임 프로세스로 이어지는 전체 압축본입니다.
-
----
-
-## ACA 운영자에게 이 구조가 뜻하는 것
-
-실무적으로는 세 가지를 가져가면 됩니다.
-
-첫째, Dapr 문제는 "내 앱 코드가 틀렸다"로 끝나지 않습니다.
-Sidecar bootstrap, component scope, environment config, sidecar-to-backing-service 경로 문제일 수 있습니다.
-
-둘째, Dapr에서 Environment 설계는 component scope가 거기 살기 때문에 특히 중요합니다.
-
-셋째, localhost 호출이 성공했다는 사실은 외부 의존성 경로 전체가 건강하다는 뜻이 아닙니다.
-앱이 sidecar까지 도달했다는 뜻일 뿐입니다.
-
-Timeout 분석에서는 이 마지막 구분이 특히 중요합니다.
-
----
-
-## 5화 정리
-
-압축 모델은 다음과 같습니다.
-
-> Azure Container Apps에서 Dapr를 켜면, upstream `daprd` 계열의 sidecar 프로세스가 사용자 컨테이너 옆에 나타납니다. ACA가 직접 문서화한 것은 localhost HTTP / gRPC API와 Environment 수준 component 모델이고, webhook 주입·3501 포트·Sentry·mTLS 배선은 upstream Dapr에서 가져온 추론입니다.
-
-런타임에서 "Dapr enabled"가 뜻하는 것은 바로 이것입니다.
-
----
-
-## 시리즈 안에서의 위치
-
-앞선 4화가 ACA가 Revision을 어떻게 스케일하는지 설명했다면, 이번 5화는 Dapr를 켰을 때 그 Revision의 Pod 모양이 어떻게 바뀌는지 설명한 글입니다. 여기서 얻는 핵심은 스케일 상태와 사이드카 상태를 하나의 "앱 런타임"으로 뭉개지 않고, 같은 Revision 위에 겹쳐진 서로 다른 계층으로 읽는 감각입니다.
-
----
-
-## Evidence Boundaries
-
-이 장은 ACA의 공개 Dapr 표면과 upstream Dapr-on-Kubernetes 구현 세부를 분리해서 다룹니다.
-
-**Documented (Microsoft Learn / 1차 출처):**
-- ACA는 Dapr를 localhost HTTP / gRPC API를 가진 실제 sidecar 기반 런타임 표면으로 노출합니다.
-- Dapr component는 environment-level resource이며, scope는 Dapr app ID에 대응합니다.
-- Dapr sidecar 로그는 공용 logging destination에 포함됩니다.
-
-**Inferred from upstream behavior:**
-- Mutating admission webhook 주입, public HTTP port 3501, Sentry, trust anchor, mTLS wiring은 upstream Dapr-on-Kubernetes 문서와 소스에서 온 내용입니다.
-- ACA는 그 upstream sidecar 모델을 제품화한 변형으로 이해하는 편이 가장 안전합니다.
-
-**Speculation (ACA-internal, not exposed):**
-- ACA 내부에서 실제로 어떤 admission pipeline, certificate flow, control-plane address가 쓰이는지는 공개되지 않았습니다.
-
-### Dapr 활성화와 component 바인딩
+아래 예시는 앱에 Dapr를 켜고, Environment에 component를 연결하는 가장 기본적인 명령입니다.
 
 ```bash
 az containerapp update -n my-app -g my-rg \
@@ -409,13 +216,31 @@ az containerapp env dapr-component set \
   --yaml dapr/statestore.yaml
 ```
 
+첫 번째 명령은 app-level enablement를, 두 번째 명령은 environment-level dependency를 만듭니다. Dapr가 왜 항상 두 범위를 가로지르는지 이 두 줄만 봐도 이해할 수 있습니다.
+
+## 흔히 헷갈리는 지점
+
+- **Dapr enablement는 메타데이터 추가가 아닙니다.** 실제 sidecar 프로세스가 붙습니다.
+- **localhost 호출 성공은 외부 dependency 경로 성공과 다릅니다.** 앱이 sidecar까지 도달했음을 뜻할 뿐입니다.
+- **component는 앱 리소스가 아니라 Environment 리소스입니다.** sidecar가 scope에 따라 로드합니다.
+- **sidecar 로그는 부가 로그가 아닙니다.** incident 분석의 핵심 증거가 될 수 있습니다.
+- **Dapr 문제를 앱 코드 문제로만 보면 안 됩니다.** sidecar bootstrap, component scope, auth, backing service 경로를 함께 봐야 합니다.
+
 ## 운영 체크리스트
 
-- [ ] Dapr sidecar의 readiness가 앱 readiness에 반영되는지 확인했다
-- [ ] service invocation의 retry/timeout 정책을 명시적으로 설정했다
-- [ ] 환경 단위 component를 어떤 앱이 쓰는지 ownership 매트릭스를 만들었다
-- [ ] Dapr trace를 Application Insights에 연결했다
-- [ ] Dapr 장애 시 fallback 경로(직접 호출, 큐 우회)를 정의했다
+- [ ] Dapr sidecar readiness가 앱 readiness에 어떻게 반영되는지 확인했습니다.
+- [ ] service invocation용 retry와 timeout 정책을 명시적으로 설정했습니다.
+- [ ] 어떤 앱이 어떤 environment-scoped component를 쓰는지 ownership matrix를 만들었습니다.
+- [ ] Dapr trace를 Application Insights에 연결했습니다.
+- [ ] Dapr 장애 시 fallback path(직접 호출, queue bypass)를 정의했습니다.
+
+## 정리
+
+ACA의 Dapr는 API 문법이 아니라 런타임 구조의 변화입니다. 앱에 Dapr를 켜는 순간, 사용자 컨테이너 옆에 실제 `daprd` 계열 sidecar가 붙고, localhost 포트와 component scope, sidecar 로그, health surface가 새로 생깁니다.
+
+또한 이 sidecar는 app-level enablement와 environment-level dependency를 동시에 가집니다. 그래서 Dapr 장애는 앱 코드, sidecar bootstrap, Environment component scope, backing service 경로가 모두 얽힌 문제일 수 있습니다. 이 복합성을 인정해야 제대로 디버깅할 수 있습니다.
+
+다음 글에서는 이 모든 런타임 위로 실제 요청이 어떻게 들어오는지 보겠습니다. FQDN, TLS termination, forwarded header, weighted routing이 Envoy 기반 ingress 경로에서 어떻게 이어지는지 정리하겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -429,19 +254,9 @@ az containerapp env dapr-component set \
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처
-- [`dapr/dapr` tree at `v1.13.0`](https://github.com/dapr/dapr/tree/v1.13.0)
-- [`daprd` 진입점](https://github.com/dapr/dapr/blob/v1.13.0/cmd/daprd/main.go)
-- [`daprd` 부팅 코드](https://github.com/dapr/dapr/blob/v1.13.0/cmd/daprd/app/app.go)
-- [Dapr runtime 기본 포트와 설정](https://github.com/dapr/dapr/blob/v1.13.0/pkg/runtime/config.go)
-- [Dapr injector의 pod patch 로직](https://github.com/dapr/dapr/blob/v1.13.0/pkg/injector/service/pod_patch.go)
-- [Dapr sidecar container 구성 코드](https://github.com/dapr/dapr/blob/v1.13.0/pkg/injector/patcher/sidecar_container.go)
-
-### 2차 출처
+### 공식 문서
 - [Microservice APIs Powered by Dapr](https://learn.microsoft.com/en-us/azure/container-apps/dapr-overview)
 - [Dapr Components in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/dapr-components)
 - [Azure Container Apps environments](https://learn.microsoft.com/en-us/azure/container-apps/environment)

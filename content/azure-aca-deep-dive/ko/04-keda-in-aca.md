@@ -14,342 +14,197 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-12'
 seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
 ---
 
 # ACA 안의 KEDA — Scale Rule이 만드는 것
 
-Azure Container Apps의 제품 표면에서 스케일링은 몇 개 필드로 끝납니다. `minReplicas`와 `maxReplicas`를 적고, HTTP·TCP·custom rule을 추가하면 나머지는 플랫폼이 처리하는 식입니다.
+Azure Container Apps의 스케일링 표면은 놀랄 만큼 짧습니다. `minReplicas`, `maxReplicas`, 그리고 HTTP·TCP·custom rule 몇 개만 설정하면 플랫폼이 나머지를 처리합니다. 사용 경험은 단순하지만, 실제 질문은 그다음부터 시작합니다. 이 설정이 어떻게 실제 replica 수로 바뀌는가입니다.
 
-표면이 짧은 이유는 의도적이지만, 진짜 질문은 이 규칙이 replica 수로 바뀌려면 플랫폼이 아래에서 무엇을 만들어야 하느냐입니다. Microsoft가 ACA 스케일링이 KEDA 기반이라고 밝히는 이유도 바로 그 숨은 번역 계층을 설명하기 위해서입니다.
+Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여기에 있습니다. 사용자가 직접 `ScaledObject`나 HPA를 만들지는 않지만, 하위 제어 루프를 설명할 때는 KEDA가 가장 정확한 기준점이 되기 때문입니다. 제품 표면만 보고 있으면 스케일링이 “그냥 자동으로 되는 일”처럼 보이지만, 운영은 그렇게 단순하지 않습니다.
 
-이 글은 Azure Container Apps Deep Dive 시리즈의 4번째 글입니다. 여기서는 ACA scale rule이 KEDA 기반 control loop로 어떻게 번역되는지 봅니다.
+이 글은 Azure Container Apps Deep Dive 시리즈의 네 번째 글입니다. 여기서는 ACA의 scale rule이 보이지 않는 KEDA형 control loop로 어떻게 읽히는지, 그리고 왜 scale과 traffic을 서로 다른 mental bucket에 넣어야 하는지 설명하겠습니다.
 
-## Source Version
+이 글을 읽고 나면 HTTP concurrency, custom rule, scale-to-zero, cooldown 같은 용어가 각각 어디에 걸리는지 감이 생깁니다. 그리고 Replica 수 변화가 제품 마법이 아니라 KEDA형 번역과 제어 루프의 결과라는 점도 명확해집니다.
 
-이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다:
-- Dapr: v1.13.x (https://github.com/dapr/dapr)
-- KEDA: v2.14.x (https://github.com/kedacore/keda)
-- Envoy: v1.30.x (https://github.com/envoyproxy/envoy)
+이제 ACA의 friendly Scale blade 뒤에 있는 KEDA형 구조를 보겠습니다.
 
-ACA 내부 구현은 Microsoft가 공개하지 않으므로, 위 버전은 비교 기준으로만 사용합니다.
+## 이 글에서 다룰 문제
 
-## Evidence Model
+- ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?
+- 왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?
+- `minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?
+- HTTP/TCP/custom rule은 어디까지 같고, 어디서부터 다를까요?
+- 여러 scale rule이 동시에 있을 때 활성화는 어떤 식으로 이해해야 할까요?
 
-- **Microsoft가 문서로 직접 밝힌 범위**: ACA scaling이 KEDA 기반이며, 제품 표면에는 HTTP, TCP, custom scale rule이 노출된다는 점.
-- **업스트림 동작을 바탕으로 한 추론**: 이 규칙들은 서비스 경계 뒤에서 KEDA/HPA류 control loop로 물질화될 가능성이 높습니다.
-- **이 글이 넘지 않는 선**: ACA 내부의 정확한 managed KEDA 배치 형태와 private wiring.
+## 왜 이 글이 중요한가
 
----
+ACA 운영에서 트래픽 분할과 스케일링은 자주 같은 이야기처럼 섞입니다. 둘 다 Revision 주변에서 일어나기 때문입니다. 하지만 실제로는 완전히 다른 제어 루프입니다. 트래픽은 Ingress가 어디로 보낼지를 결정하고, 스케일은 선택된 Revision 뒤에 몇 개 replica를 둘지를 결정합니다. 이 둘을 섞는 순간 rollout과 capacity planning이 동시에 흐려집니다.
 
-## 짧게 말하면: Scale rule은 scaler 자체가 아닙니다
+또한 scale rule은 성능 조절 기능이면서 비용 제어 기능입니다. `minReplicas`, `maxReplicas`, polling interval, cooldown, concurrency threshold를 어떻게 잡느냐에 따라 첫 요청 지연, burst 대응, downstream 부하, 운영 비용이 함께 달라집니다. 즉 스케일링은 “자동”이 아니라 “제약을 둔 자동”이어야 합니다.
 
-ACA에서 여러분이 적는 scale rule은 제품 설정입니다.
-런타임 scaler object 자체가 아닙니다.
+마지막으로 KEDA 모델을 이해하면 ACA의 닫힌 구현을 과장하지 않아도 됩니다. Microsoft가 공개한 제품 사실은 그대로 두고, 보이지 않는 하위 제어 루프는 pinned upstream KEDA 동작으로 제한적으로 설명할 수 있기 때문입니다. 이것이 가장 정확하고 실무적인 접근입니다.
 
-플랫폼은 이 rule을 KEDA가 reconcile할 수 있는 형태로 바꿔야 합니다.
+## ACA 스케일링을 이해하는 가장 좋은 방법: 제품 설정이 KEDA형 제어 루프로 번역된다고 보는 것입니다
 
-가장 맞는 그림은 이것입니다.
+ACA의 스케일링을 한 문장으로 요약하면 이렇습니다. **scale rule은 scaler 그 자체가 아니라, 플랫폼이 KEDA형 autoscaling 동작으로 번역해야 하는 제품 설정**입니다. 사용자는 의도를 적고, 플랫폼이 그 의도를 숨은 control loop로 바꿉니다.
 
-![ACA rule과 hidden scaler 오브젝트 관계](../../../assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.ko.png)
+이 관점이 중요한 이유는 관찰 가능한 현상이 모두 번역 이후에 나타나기 때문입니다. 스케일링이 늦다, 0에서 깨어나는 첫 요청이 느리다, 여러 rule 중 하나만 충족해도 scale이 시작된다, 외부 지표 기반 scale이 밀리초 단위로 즉시 반응하지 않는다는 현상은 모두 KEDA형 polling·cooldown·activation 모델로 읽을 때 가장 자연스럽습니다.
 
-*ACA rule과 hidden scaler 오브젝트 관계*
-숨은 오브젝트를 직접 보지는 못합니다.
-그래도 알아야 하는 이유는, 여러분이 관찰하는 동작이 이 번역 단계의 downstream이기 때문입니다.
+그리고 이 설명은 ACA의 closed-source 성격과도 잘 맞습니다. 실제 `ScaledObject`나 HPA를 볼 수는 없지만, KEDA가 upstream에서 어떤 계약으로 동작하는지 알면 하위 루프의 모양을 과장 없이 설명할 수 있습니다.
 
----
+> ACA의 scale rule은 사용자가 작성한 제품 설정이고, 실제 replica 수는 그 설정이 KEDA형 control loop로 해석된 뒤에야 결정됩니다.
 
-## 왜 KEDA가 정확한 고정점인가
+## 핵심 개념
 
-Upstream KEDA는 구조가 매우 분명합니다.
+### scale rule은 scaler가 아니라 제품 설정입니다
 
-- `ScaledObject`가 target과 trigger를 기술합니다.
-- KEDA operator가 이를 reconcile합니다.
-- KEDA가 HPA를 만들고 갱신합니다.
-- metrics adapter가 HPA의 external metric 질의에 응답합니다.
+ACA에서 사용자가 작성하는 rule은 runtime scaler object가 아닙니다. 플랫폼이 그 rule을 KEDA가 reconcile할 수 있는 형태의 숨은 구성으로 바꿔야 합니다. 보이지 않는다는 사실이 중요하지 않다는 뜻은 아닙니다. 오히려 보이지 않기 때문에 더 잘 이해해야 합니다.
 
-Upstream KEDA source는 이 구조를 그대로 보여 줍니다.
-`ScaledObject` 타입은 trigger metadata, cooldown, min/max replica, target reference를 담습니다.
-Controller는 이를 reconcile하고 HPA spec을 만듭니다.
+![ACA rule to hidden scaler object mapping](../../../assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.ko.png)
 
-그래서 ACA 심화 시리즈에서 pinned KEDA source를 반드시 보라는 품질 게이트가 붙어 있는 것입니다.
-ACA 자체는 closed-source여도, 숨은 autoscaling loop의 모양은 KEDA가 설명해 줍니다.
+*ACA rule to hidden scaler object mapping*
 
----
+직접 object를 보지는 못해도, 관찰되는 스케일 결과는 이 번역의 downstream입니다. 따라서 scale 이슈를 이해할 때는 rule 문법보다 “이 rule이 어떤 제어 루프를 만들었을까”를 먼저 생각해야 합니다.
 
-## ACA가 노출하는 것과 KEDA가 필요로 하는 것
+### KEDA가 기준점인 이유는 계약이 명확하기 때문입니다
 
-나란히 놓으면 대응이 쉬워집니다.
+Upstream KEDA는 구조가 분명합니다. `ScaledObject`가 target과 trigger를 설명하고, operator가 이를 reconcile하며, HPA를 만들고, metrics adapter가 external metric 질의에 답합니다. ACA는 이 object를 드러내지 않지만, scaling이 KEDA-powered라는 문장은 이 구조를 기준점으로 삼아도 된다는 뜻입니다.
 
-![ACA scale fields와 KEDA 입력 대응](../../../assets/azure-aca-deep-dive/04/04-02-what-aca-exposes-versus-what-keda-needs.ko.png)
+즉 ACA가 closed-source여도 스케일링 이야기를 허공에서 추측할 필요는 없습니다. pinned KEDA source가 control-loop의 형태를 설명하는 데 충분한 기준을 제공합니다.
 
-*ACA scale fields와 KEDA 입력 대응*
-KEDA는 scale target, metric 또는 trigger 정의, 그리고 limit 정보를 원합니다.
-ACA의 revision template는 이미 그 개념들을 갖고 있습니다.
+### ACA가 노출하는 것과 KEDA가 필요한 것은 거의 대응됩니다
 
-그래서 ACA scale rule에서 숨은 KEDA 오브젝트로의 개념 점프는 작습니다.
-제품이 실제 object를 private하게 감췄을 뿐입니다.
+KEDA에는 scale target, trigger definition, limits가 필요합니다. ACA는 Revision template 안에 이미 그 개념을 갖고 있습니다. `minReplicas`, `maxReplicas`, HTTP/TCP/custom rule metadata, auth field가 그것입니다.
 
----
+![ACA scale fields and KEDA inputs](../../../assets/azure-aca-deep-dive/04/04-02-what-aca-exposes-versus-what-keda-needs.ko.png)
 
-## 첫 번째 핵심 동작: 스케일링은 Revision 단위입니다
+*ACA scale fields and KEDA inputs*
 
-ACA의 traffic은 app-facing입니다.
-스케일링은 revision-facing입니다.
+그래서 사용자가 느끼는 scale rule과 보이지 않는 KEDA object 사이의 conceptual jump는 크지 않습니다. 제품은 object model을 감추지만, 의도는 거의 직접 대응됩니다.
 
-그래서 scale rule을 바꾸면 revision-scope 변경이 되고, 새 Revision이 생성됩니다.
-Microsoft의 revisions 문서도 이 사실을 분명히 적습니다.
+### 스케일링은 App이 아니라 Revision 단위입니다
 
-즉 스케일 엔진은 mutable한 배포 정체성이 아니라, 불변 Revision 스냅샷에 붙습니다.
+ACA에서 트래픽은 app-facing이지만, 스케일은 revision-facing입니다. scale rule을 바꾸면 새 Revision이 만들어지는 이유도 여기에 있습니다. scale은 metadata가 아니라 runtime behavior이기 때문입니다.
 
-![Revision별 독립 스케일 제어 구조](../../../assets/azure-aca-deep-dive/04/04-03-the-first-key-behavior-scaling-is-per-re.ko.png)
+![Per-revision independent scaling behavior](../../../assets/azure-aca-deep-dive/04/04-03-the-first-key-behavior-scaling-is-per-re.ko.png)
 
-*Revision별 독립 스케일 제어 구조*
-두 Revision이 동시에 active 상태라면, 같은 app-level ingress 표면을 공유하면서도 각자 별도의 scale behavior를 가질 수 있습니다.
+*Per-revision independent scaling behavior*
 
-그래서 rollout 수학과 scaling 수학을 같은 개념으로 합치면 안 됩니다.
+여러 Revision이 동시에 active라면 각 Revision은 서로 다른 scaling behavior를 가질 수 있습니다. 이 때문에 rollout math와 scaling math를 절대 같은 개념으로 합쳐서는 안 됩니다.
 
----
+### KEDA는 HPA를 대체하는 것이 아니라 HPA 동작을 관리합니다
 
-## `ScaledObject`는 HPA를 대체하는 것이 아니라 HPA를 만들어 냅니다
+이 부분은 자주 오해됩니다. KEDA는 HPA와 완전히 별개인 마법 시스템이 아닙니다. upstream KEDA는 `ScaledObject`를 reconcile하고 HPA spec을 만들고 업데이트합니다. 즉 HPA-style decision loop를 관리하고 feeding하는 쪽에 가깝습니다.
 
-이 부분은 KEDA에서 가장 흔한 오해입니다.
-KEDA는 HPA를 마법처럼 대체하는 전혀 다른 시스템이 아닙니다.
-HPA 동작을 관리하고 먹이는 계층입니다.
+![ScaledObject and HPA control relationship](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.ko.png)
 
-Upstream KEDA source를 보면 이 사실이 분명합니다.
-Controller는 `ScaledObject`를 reconcile하고 HPA spec을 생성합니다.
-HPA 생성 로직은 min/max replica, metric target, scale target reference를 채웁니다.
+*ScaledObject and HPA control relationship*
 
-![ScaledObject와 HPA 제어 관계](../../../assets/azure-aca-deep-dive/04/04-04-a-scaledobject-creates-hpa-behavior-not.ko.png)
+ACA에서도 같은 큰 그림을 가정하는 편이 정확합니다. 제품 표면은 KEDA가 Revision에 대한 HPA류 결정을 만들 수 있을 만큼 충분한 정보를 제공합니다.
 
-*ScaledObject와 HPA 제어 관계*
-ACA에서도 이 큰 역할 분담은 그대로라고 보는 편이 맞습니다.
-제품 표면이 KEDA에게 Revision에 대한 HPA류 결정을 만들 정보만 전달하는 구조입니다.
+### `minReplicas: 0`은 scale-to-zero의 문을 엽니다
 
----
+ACA가 `minReplicas: 0`을 허용한다는 사실은 중요한 의미를 가집니다. 이제 스케일링은 단순한 비율 조정이 아니라, event-driven activation까지 포함하는 모델이 됩니다. 전통적인 HPA-only mental model보다 KEDA mental model이 더 적합한 이유가 바로 여기 있습니다.
 
-## `minReplicas`가 0일 수 있다는 점이 모든 것을 바꿉니다
+![minReplicas zero and scale-to-zero activation path](../../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.ko.png)
 
-ACA는 `minReplicas: 0`을 명시적으로 허용합니다.
-이것이 scale-to-zero 이야기입니다.
+*minReplicas zero and scale-to-zero activation path*
 
-여기서 event-driven 모델이 plain HPA 사고방식보다 중요해집니다.
-전통적인 HPA만으로는 event signal에 의해 0에서 깨어나는 activation을 자연스럽게 설명하기 어렵습니다.
-KEDA는 그 부분을 설명합니다.
+문서가 cooldown이 마지막 replica를 0으로 내릴 때 특히 중요하다고 설명하는 것도 같은 맥락입니다. 1에서 0으로 가는 마지막 단계는 event-driven activation 모델에서 특별한 운영 의미를 가집니다.
 
-![minReplicas 0과 scale-to-zero 활성화 경로](../../../assets/azure-aca-deep-dive/04/04-05-minreplicas-can-be-zero-and-that-changes.ko.png)
+### custom rule은 가장 KEDA다운 부분입니다
 
-*minReplicas 0과 scale-to-zero 활성화 경로*
-Microsoft의 scaling 문서도 마지막 replica에서 0으로 내려갈 때 cooldown이 특히 중요하다고 설명합니다.
-이건 바로 KEDA식 event-driven lifecycle이 잘 드러나는 지점입니다.
+custom rule은 KEDA scaler와의 대응이 가장 선명한 영역입니다. ACA 문서도 KEDA scaler metadata와 authentication 개념을 ACA field로 옮기는 방법을 설명합니다. 사실상 “여기는 KEDA식으로 생각하라”는 힌트에 가깝습니다.
 
----
+![Custom rule to replica control loop](../../../assets/azure-aca-deep-dive/04/04-06-the-control-loop-how-a-custom-rule-becom.ko.png)
 
-## Custom rule이 replica가 되기까지의 control loop
+*Custom rule to replica control loop*
 
-Custom rule은 흐름이 가장 선명합니다.
+외부 event source를 보고 activation을 판단하고, polling과 cooldown을 거쳐 replica 수를 늘리거나 줄이는 흐름은 보이지 않는 Kubernetes object를 몰라도 충분히 설명 가능합니다.
 
-![Custom rule에서 replica까지 제어 루프](../../../assets/azure-aca-deep-dive/04/04-06-the-control-loop-how-a-custom-rule-becom.ko.png)
+### HTTP scaling은 built-in이지만 KEDA형 사고와 닮아 있습니다
 
-*Custom rule에서 replica까지 제어 루프*
-실제 Kubernetes object를 직접 볼 수 없더라도, 이 흐름이 가장 맞는 추상화입니다.
+ACA는 HTTP concurrency 기반 built-in scaling을 제공합니다. 문서는 concurrent requests와 15초 측정 창을 설명합니다. 여기서 중요한 것은 정확한 선 긋기입니다. ACA HTTP scaling이 upstream `kedacore/http-add-on`과 동일하다고 말하면 과장입니다. 하지만 event-driven autoscaling 사고방식과 trigger input이 request concurrency라는 점은 분명합니다.
 
----
+![HTTP concurrency in a KEDA-shaped loop](../../../assets/azure-aca-deep-dive/04/04-07-http-scaling-is-built-in-but-the-shape-s.ko.png)
 
-## HTTP scaling은 built-in 기능이지만, 모양은 여전히 KEDA 계열입니다
+*HTTP concurrency in a KEDA-shaped loop*
 
-ACA는 request concurrency 기반 built-in HTTP scaler를 제공합니다.
-Microsoft 문서는 concurrent requests와 15초 측정 창 기준으로 이 규칙을 설명합니다.
+정확한 표현은 이렇습니다. ACA는 HTTP scaling을 built-in product feature로 제공하고, 그 scaling model은 KEDA형 제어 루프와 개념적으로 정렬되어 있습니다.
 
-여기서 조심할 구분이 있습니다.
+### TCP scaling도 같은 큰 패턴을 따릅니다
 
-ACA HTTP scaling이 upstream `kedacore/http-add-on`과 완전히 같은 구현이라고 말하면 안 됩니다.
-그 주장은 소스가 보장하지 않습니다.
+TCP scaling 역시 동시 연결 수 기준을 정하고, 측정 창에서 수요를 보고, 임계값을 넘으면 replica를 늘린다는 큰 구조를 가집니다. 플랫폼 구현은 제품이 소유하지만, trigger state를 replica 변화로 바꾸는 패턴은 여전히 KEDA형 autoscaling loop로 읽는 편이 맞습니다.
 
-대신 이렇게 말하면 정확합니다.
+### 인증도 번역 경계입니다
 
-- ACA는 HTTP scaling을 built-in product feature로 노출합니다.
-- 그 스케일링 모델은 KEDA의 event-driven autoscaling 사고방식과 개념적으로 맞닿아 있습니다.
-- Trigger 입력은 request concurrency입니다.
+Upstream KEDA는 `TriggerAuthentication`이나 identity 구성을 자주 씁니다. ACA는 그 raw object를 노출하지 않고, secrets와 managed identity 같은 제품 표면으로 같은 의도를 표현하게 합니다. 즉 auth도 또 하나의 translation boundary입니다.
 
-![HTTP concurrency와 KEDA형 스케일 모델](../../../assets/azure-aca-deep-dive/04/04-07-http-scaling-is-built-in-but-the-shape-s.ko.png)
+![Scale rule auth and product translation boundary](../../../assets/azure-aca-deep-dive/04/04-09-authentication-for-scale-rules-is-anothe.ko.png)
 
-*HTTP concurrency와 KEDA형 스케일 모델*
-이렇게 써야 정확성을 지키면서도 실제 동작을 설명할 수 있습니다.
+*Scale rule auth and product translation boundary*
 
----
+모양은 recognizable하지만 resource model은 productized되어 있습니다. 이것이 ACA가 KEDA를 감추는 방식입니다.
 
-## TCP scaling도 큰 모양은 같습니다
+### metrics adapter를 몰라도 그 결과는 계속 보게 됩니다
 
-ACA는 TCP concurrency scaling도 제공합니다.
-제품 표면은 HTTP와 거의 평행합니다.
+Upstream KEDA는 HPA가 external metric 질의에 답을 받을 수 있도록 metrics adapter를 둡니다. ACA에서는 사용자가 adapter를 직접 설정하지 않지만, 외부 이벤트나 concurrency가 replica 수를 바꾸는 모든 순간 이 숨은 고리가 작동하고 있다고 봐야 합니다.
 
-- 동시 연결 수 임계치 정의
-- 측정 창에서 수요 관측
-- 임계치 초과 시 replica 증가
+![HPA queries and metrics adapter path](../../../assets/azure-aca-deep-dive/04/04-10-why-the-metrics-adapter-matters-even-whe.ko.png)
 
-깊은 내부 설명도 동일합니다.
-구체 구현은 플랫폼이 책임집니다.
-그래도 전체 모양은 KEDA류 autoscaling loop로 보는 편이 맞습니다.
+*HPA queries and metrics adapter path*
 
----
+그래서 metric이 사라지거나 activation이 기대와 다르게 느릴 때는 제품 표면만 보지 말고, “metric answer path에서 어떤 신호가 비었는가”라는 질문도 함께 해야 합니다.
 
-## Custom rule은 ACA 안에서 가장 KEDA 냄새가 진한 부분입니다
+### 기본 polling·cooldown 값이 운영 체감을 만듭니다
 
-Microsoft scaling 가이드는 custom ACA rule이 KEDA scaler에서 어떻게 옮겨지는지 꽤 직접적으로 설명합니다.
-KEDA scaler metadata와 authentication을 ACA rule field로 번역하는 과정까지 안내합니다.
+문서가 custom rule의 default polling, cooldown 값을 따로 언급하는 이유가 있습니다. scale 변화는 밀리초 단위 연속 곡선이 아닙니다. 특히 1에서 0으로 내려갈 때는 cooldown의 존재감이 훨씬 강하게 드러납니다. 또 0에서 깨어나는 activation은 이미 떠 있는 Revision의 steady-state scaling과 체감이 다릅니다.
 
-이건 사실상 "여기는 KEDA 식으로 생각해도 된다"는 신호에 가깝습니다.
+이런 차이는 제품 quirks가 아니라 event-driven autoscaling loop의 자연스러운 결과입니다. 운영에서 보이는 scale 지연, scale-in 보수성, 0→1 특수성은 대부분 여기서 설명됩니다.
 
-![Custom rule과 KEDA scaler 번역 구조](../../../assets/azure-aca-deep-dive/04/04-08-custom-rules-are-the-clearest-keda-shape.ko.png)
+### 여러 rule은 평균이 아니라 여러 활성화 경로입니다
 
-*Custom rule과 KEDA scaler 번역 구조*
-즉 제품은 완전히 새로운 autoscaling 언어를 만든 것이 아니라, 선별된 KEDA 표면을 제품화해서 내놓은 셈입니다.
+ACA 문서는 여러 scale rule이 있을 때 첫 번째 조건을 만족한 rule부터 스케일이 시작될 수 있다고 설명합니다. 즉 여러 rule을 거대한 단일 평균 임계값으로 합치는 식으로 이해하면 안 됩니다.
 
----
+![Multiple scale rules with separate activation paths](../../../assets/azure-aca-deep-dive/04/04-11-one-rule-can-wake-the-revision-up.ko.png)
 
-## Scale rule 인증도 번역 경계입니다
+*Multiple scale rules with separate activation paths*
 
-Upstream KEDA는 `TriggerAuthentication` 리소스나 identity 구성을 자주 사용합니다.
-ACA는 그런 raw object를 직접 노출하지 않습니다.
+깊이 들어가면, 여러 trigger는 하나의 scaling target을 깨울 수 있는 여러 activation path입니다. 이 관점을 알아야 rule stack을 설계할 때 우선순위와 downstream 영향도를 함께 볼 수 있습니다.
 
-대신 같은 의도를 제품 표면으로 바꿔 제공합니다.
+### scale rule이 revision template에 붙는 이유
 
-- Scale rule auth field에 연결되는 secret
-- 지원되는 Azure trigger용 managed identity 설정
+ACA가 scale rule을 revision-scope로 둔 것은 우연이 아닙니다. canary Revision은 stable Revision과 다른 concurrency threshold나 max replica를 필요로 할 수 있고, 새 버전은 요청 처리 효율이 달라서 같은 임계값이 맞지 않을 수 있습니다.
 
-![Scale rule auth와 제품 번역 경계](../../../assets/azure-aca-deep-dive/04/04-09-authentication-for-scale-rules-is-anothe.ko.png)
+![Scale rules attached to revision templates](../../../assets/azure-aca-deep-dive/04/04-12-scale-rules-belong-to-the-revision-templ.ko.png)
 
-*Scale rule auth와 제품 번역 경계*
-모양은 여전히 알아볼 수 있습니다.
-리소스 모델만 제품화되었을 뿐입니다.
+*Scale rules attached to revision templates*
 
----
+scale이 runtime behavior라는 점을 생각하면, revision template에 붙는 것이 가장 자연스럽습니다. 그래야 rollout 실험과 scaling 실험을 함께 하지만 서로 섞지 않을 수 있습니다.
 
-## 이름을 몰라도 metrics adapter는 중요합니다
+### 여러 scaler를 쌓을수록 downstream 보호가 더 중요해집니다
 
-Upstream KEDA에 metrics adapter가 있는 이유는 HPA가 metric 답변을 받아야 하기 때문입니다.
-KEDA의 HPA 생성 코드는 external metric selector를 붙여, adapter가 올바른 scaled object의 metric 질의에 응답할 수 있게 만듭니다.
+scale rule을 추가하는 일은 처리량을 늘리는 일처럼 보이지만, 동시에 downstream pressure를 증폭시키는 일입니다. queue scaler, HTTP concurrency scaler, 외부 metric scaler가 같은 Revision을 깨울 수 있다면, 앱 뒤의 DB connection pool, rate-limited API, 메시지 브로커가 버틸 수 있는지까지 함께 계산해야 합니다.
 
-이 연결 고리는 숨겨져 있지만 중요합니다.
+이 점이 중요한 이유는 ACA가 “잘” 확장될수록 뒤 시스템에는 더 빨리 부담을 줄 수 있기 때문입니다. KEDA형 autoscaling loop는 애플리케이션 앞단의 demand를 읽는 데는 능숙하지만, downstream이 같은 속도로 커진다고 가정하지는 않습니다. 따라서 max replica와 concurrency threshold는 성능 knob이면서 동시에 보호 장치입니다.
 
-![HPA와 metrics adapter 연결 경로](../../../assets/azure-aca-deep-dive/04/04-10-why-the-metrics-adapter-matters-even-whe.ko.png)
+### scale 변화가 즉시 연속적이지 않은 이유
 
-*HPA와 metrics adapter 연결 경로*
-ACA에서는 adapter를 직접 건드리지 않습니다.
-그래도 외부 이벤트나 concurrency 규칙이 replica 수를 바꾸는 순간마다, 그 효과를 간접적으로 보고 있는 셈입니다.
+운영에서 자주 듣는 질문이 있습니다. “왜 요청이 늘었는데 바로바로 replica가 늘지 않죠?” 이때는 제품이 둔한 것이 아니라, control loop가 polling과 cooldown을 가진다는 사실을 먼저 떠올리는 편이 맞습니다. event-driven autoscaling은 본질적으로 measurement window, threshold, polling cadence 위에서 움직입니다.
 
----
+즉 scale change는 매 밀리초마다 끊김 없이 따라붙는 연속 함수가 아닙니다. 이 특성을 이해하고 나면 burst 대응 전략도 현실적으로 바뀝니다. 아주 짧고 급한 스파이크는 warm baseline이나 higher min replica가 더 맞을 수 있고, 길고 명확한 이벤트 증가는 aggressive scaler가 더 맞을 수 있습니다.
 
-## KEDA 기본값은 ACA에서 나중에 눈에 띄는 동작을 설명합니다
+### 관찰 포인트를 KEDA형 모델에 맞춰 잡아야 합니다
 
-Microsoft scaling 문서는 custom rule의 기본 polling interval과 cooldown 값도 짚습니다.
-이 숫자들은 KEDA control loop의 감각과 잘 맞습니다.
+ACA에서 보이지 않는 object를 직접 볼 수는 없지만, 관찰 포인트는 분명히 잡을 수 있습니다. 첫째, trigger input이 실제로 들어오고 있는가를 봐야 합니다. 둘째, activation 이후 replica count가 기대 방향으로 움직이는가를 봐야 합니다. 셋째, 움직인 replica가 downstream 오류율과 latency에 어떤 영향을 주는지 봐야 합니다.
 
-운영 중 자주 보이는 현상도 여기서 설명됩니다.
+이 세 단계를 나누면 scale 문제를 훨씬 덜 추상적으로 다룰 수 있습니다. “스케일이 이상하다”는 막연한 말 대신, 입력 신호 문제인지, control loop 반응 문제인지, downstream 용량 문제인지를 각각 따로 검토할 수 있기 때문입니다.
 
-- 스케일 변화가 밀리초 단위로 연속 발생하지는 않음
-- 1에서 0으로 내려갈 때 cooldown 성격이 눈에 띔
-- 0에서 깨어나는 activation과, 0이 아닌 구간의 steady-state scaling이 체감상 다름
+### 운영자가 바로 적용해 볼 명령
 
-이건 임의의 제품 quirks가 아닙니다.
-Polling과 cooldown을 가진 event-driven autoscaling loop의 자연스러운 결과입니다.
-
----
-
-## 여러 rule 중 하나만 활성화돼도 Revision은 깨어날 수 있습니다
-
-ACA 문서도 여러 scale rule이 있으면 첫 번째 조건을 만족한 rule 하나만으로 scale이 시작될 수 있다고 설명합니다.
-
-Activation logic은 이렇게 보는 편이 맞습니다.
-
-![여러 scale rule의 개별 활성화 경로](../../../assets/azure-aca-deep-dive/04/04-11-one-rule-can-wake-the-revision-up.ko.png)
-
-*여러 scale rule의 개별 활성화 경로*
-즉 여러 rule이 하나의 거대한 평균 임계치로 합쳐지는 것이 아닙니다.
-같은 scale target으로 들어가는 여러 activation path입니다.
-
----
-
-## Scale rule이 revision template에 붙는 이유
-
-왜 ACA는 scale rule을 revision-scope로 두었을까요.
-
-스케일링이 metadata가 아니라 runtime behavior이기 때문입니다.
-
-Canary Revision은 stable Revision과 다른 limit나 threshold를 원할 수 있습니다.
-새 버전이 요청 처리 효율을 바꾸면 concurrency threshold도 달라질 수 있습니다.
-
-Scale rule이 app-scope만 가졌다면, rollout 실험에서 가장 중요한 제어 노브 하나를 잃게 됩니다.
-
-![Revision template에 붙는 scale rule 구조](../../../assets/azure-aca-deep-dive/04/04-12-scale-rules-belong-to-the-revision-templ.ko.png)
-
-*Revision template에 붙는 scale rule 구조*
-Revision-scope scaling이기 때문에 이런 분리가 가능합니다.
-
----
-
-## 무엇을 주장하면 안 되는가
-
-여기서 꼭 지워야 할 오해가 두 가지 있습니다.
-
-첫째, ACA HTTP scaling이 upstream KEDA HTTP add-on과 같은 것이라고 단정하면 안 됩니다.
-개념적 친척 관계는 맞습니다.
-구현이 1:1이라는 주장은 소스가 보장하지 않습니다.
-
-둘째, KEDA가 HPA를 대체한다고 말하면 안 됩니다.
-Upstream KEDA source는 KEDA가 HPA 동작을 관리하고 먹인다는 점을 분명히 보여 줍니다.
-ACA도 이 모양을 개념적으로 상속합니다.
-
-이 두 교정만 해도 설명의 정확도가 크게 올라갑니다.
-
----
-
-## autoscaling 전체 그림을 한 장으로
-
-![ACA autoscaling 전체 제어 흐름](../../../assets/azure-aca-deep-dive/04/04-13-the-whole-autoscaling-picture-in-one-dia.ko.png)
-
-*ACA autoscaling 전체 제어 흐름*
-이 그림만 기억해도 ACA autoscaling 내부는 충분히 올바른 해상도로 머릿속에 남습니다.
-
----
-
-## 4화 정리
-
-압축하면 다음과 같습니다.
-
-> Azure Container Apps에서 scale rule은 플랫폼이 KEDA 기반 autoscaling 동작으로 번역하는 제품 설정입니다. 그 결과 KEDA는 한 Revision에 대해 HPA류 control loop를 만들고, trigger 상태·concurrency·external metric을 replica 수로 바꿉니다. `minReplicas`가 0이면 scale-to-zero도 그 루프 안에 포함됩니다.
-
-Scale 블레이드 뒤에 숨어 있는 기계가 바로 이것입니다.
-
----
-
-## 시리즈 안에서의 위치
-
-3화가 Revision이 어떻게 traffic을 받는지 설명했다면, 이번 4화는 같은 Revision이 아래에서 replica를 어떻게 늘리고 줄이는지 설명한 글입니다. 여기서 얻는 핵심은 routing policy와 scaling policy를 같은 타깃 위의 다른 제어 루프로 분리해 보는 감각입니다.
-
----
-
-## Evidence Boundaries
-
-이 장은 Microsoft가 문서화한 KEDA 기반 스케일링 계약 위에, upstream KEDA로 숨은 control loop 모양을 설명합니다.
-
-**Documented (Microsoft Learn / 1차 출처):**
-- ACA 스케일링은 KEDA 기반입니다.
-- Scale rule은 revision template에 붙고, `minReplicas`는 0이 될 수 있습니다.
-- ACA는 built-in HTTP/TCP scaling과 custom rule 번역 개념을 문서화합니다.
-
-**Inferred from upstream behavior:**
-- 숨은 ACA scale rule은 upstream KEDA의 `ScaledObject`, HPA, metrics adapter, polling, cooldown 동작으로 이해하는 편이 맞습니다.
-- Activation path와 per-revision autoscaling loop 설명은 ACA 내부 오브젝트가 아니라 upstream KEDA controller 설계에 기대고 있습니다.
-
-**Speculation (ACA-internal, not exposed):**
-- ACA가 각 scale rule마다 실제로 어떤 hidden Kubernetes object나 private controller를 만드는지는 공개되지 않았습니다.
-- ACA HTTP scaling을 upstream KEDA HTTP add-on의 1:1 배포라고 단정하면 안 됩니다.
-
-### scale 규칙 정의 (queue 기반)
+아래 예시는 queue-based scale rule을 정의하는 가장 직접적인 ACA 표면입니다.
 
 ```bash
 az containerapp update -n my-app -g my-rg \
@@ -360,13 +215,31 @@ az containerapp update -n my-app -g my-rg \
   --scale-rule-auth connection=queue-conn
 ```
 
+보이는 것은 몇 개 필드뿐이지만, 이 명령은 결국 trigger metadata, activation path, auth, replica limit가 숨은 KEDA형 control loop로 번역되도록 요청하는 것입니다.
+
+## 흔히 헷갈리는 지점
+
+- **scale rule은 scaler object 자체가 아닙니다.** 제품 설정이며, 플랫폼이 하위 루프로 번역합니다.
+- **KEDA는 HPA를 대체하는 완전히 별도 시스템이 아닙니다.** HPA-style behavior를 관리하고 feeding합니다.
+- **HTTP scaling을 upstream KEDA HTTP add-on과 1:1로 단정하면 안 됩니다.** 개념적으로 닮았을 뿐입니다.
+- **traffic 비율과 replica 비율은 같은 수치가 아닙니다.** 하나는 ingress policy, 하나는 autoscaling 결과입니다.
+- **여러 rule은 평균 임계값이 아닙니다.** 여러 activation path로 이해하는 편이 맞습니다.
+
 ## 운영 체크리스트
 
-- [ ] scale-to-zero 허용 여부를 SLA 관점에서 결정했다
-- [ ] polling interval과 cooldown을 워크로드 spike 형태에 맞게 설정했다
-- [ ] max replicas가 다운스트림(DB connection, API quota)을 부수지 않는지 확인했다
-- [ ] 복수 scaler를 쓸 때 우선순위와 합산 방식을 문서화했다
-- [ ] KEDA 메트릭과 실제 replica 수의 정합성을 모니터링한다
+- [ ] SLA 기준으로 scale-to-zero 허용 여부를 명시적으로 결정했습니다.
+- [ ] 워크로드 스파이크 형태에 맞춰 polling interval과 cooldown을 조정했습니다.
+- [ ] max replicas가 downstream(DB 연결 수, API quota)를 깨지 않는지 확인했습니다.
+- [ ] 여러 scaler를 겹칠 때 우선순위와 aggregation 방식을 문서화했습니다.
+- [ ] KEDA형 metric 변화와 실제 replica 수가 일치하는지 모니터링 체계를 만들었습니다.
+
+## 정리
+
+ACA의 스케일링은 단순한 제품 편의 기능이 아닙니다. 사용자가 적은 scale rule을 플랫폼이 KEDA형 autoscaling behavior로 번역하고, 그 결과가 Revision 단위 replica 수로 나타나는 구조입니다. 따라서 scale 이슈를 읽을 때는 rule 문법보다 control loop를 먼저 생각해야 합니다.
+
+또한 scale은 Revision 범위의 런타임 행동입니다. 그래서 트래픽 분할과 같은 app-scope 정책과 분리해서 봐야 하며, canary나 blue-green 운영에서도 별도 조절 레버로 취급해야 합니다. `minReplicas: 0`, polling, cooldown, multi-rule activation은 모두 이 분리 위에서 의미를 가집니다.
+
+다음 글에서는 replica 옆에 실제로 붙는 또 다른 런타임, Dapr sidecar를 보겠습니다. Dapr enablement가 단순 메타데이터가 아니라 어떻게 실제 `daprd` 프로세스를 붙이는지 따라가 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -380,17 +253,9 @@ az containerapp update -n my-app -g my-rg \
 
 <!-- toc:end -->
 
----
-
 ## 참고 자료
 
-### 1차 출처
-- [`kedacore/keda` tree at `v2.14.0`](https://github.com/kedacore/keda/tree/v2.14.0)
-- [KEDA의 `ScaledObject` 타입](https://github.com/kedacore/keda/blob/v2.14.0/apis/keda/v1alpha1/scaledobject_types.go)
-- [KEDA의 `ScaledObjectReconciler`](https://github.com/kedacore/keda/blob/v2.14.0/controllers/keda/scaledobject_controller.go)
-- [KEDA의 HPA 생성 코드](https://github.com/kedacore/keda/blob/v2.14.0/controllers/keda/hpa.go)
-
-### 2차 출처
+### 공식 문서
 - [Scaling in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/scale-app)
 - [Update and deploy changes in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/revisions)
 
