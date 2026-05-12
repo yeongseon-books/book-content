@@ -24,6 +24,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/01-what-is-embedding)
 
+이 글은 벡터 검색 101 시리즈의 첫 번째 글입니다.
+
 검색 엔진은 오랫동안 키워드를 비교했습니다. 사용자가 "파이썬 비동기"를 입력하면 엔진은 그 단어가 문서에 얼마나 많이, 어떤 위치에 등장하는지를 봤습니다. 이 방식은 단어가 정확히 일치할 때 잘 작동하지만, "파이썬으로 동시성 처리하기"처럼 의미는 같아도 표현이 다른 경우에는 약합니다.
 
 임베딩(embedding)은 이 문제를 다르게 풉니다. 텍스트를 숫자 벡터로 바꿔서, 의미가 비슷한 문장은 벡터 공간에서도 가깝게 놓습니다. "파이썬 비동기"와 "파이썬으로 동시성 처리하기"는 단어 수준에서는 다르지만, 잘 만든 임베딩 공간에서는 서로 가까운 위치에 놓입니다. 이 성질 덕분에 키워드 없이도 의미 기반 검색이 가능해집니다.

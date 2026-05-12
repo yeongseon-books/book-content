@@ -24,6 +24,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/04-faiss-fundamentals)
 
+이 글은 벡터 검색 101 시리즈의 네 번째 글입니다.
+
 문서가 수천, 수만 건이 되면 NumPy 브루트 포스 검색은 느려집니다. 차원이 384인 벡터 10만 개를 쿼리 한 번에 비교하려면 3,840만 번의 곱셈이 필요합니다. 검색 지연이 수백 밀리초에서 수 초로 늘어나면 실제 서비스에 쓰기 어렵습니다.
 
 FAISS(Facebook AI Similarity Search)는 이 문제를 푼 라이브러리입니다. 정확도를 조금 희생해서 속도를 크게 높이는 근사 최근접 이웃(ANN) 검색을 지원합니다. 10억 개 규모 벡터도 처리할 수 있고, C++로 작성되어 있어서 CPU와 GPU 모두에서 빠릅니다.

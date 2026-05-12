@@ -24,6 +24,8 @@ seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/05-chunking-strategies)
 
+This is the 5th article in the Vector Search 101 series.
+
 Embedding models have a hard token limit. `all-MiniLM-L6-v2` processes at most 256 subword tokens. A single page of a PDF often exceeds that. Feeding a long document as one input either truncates it — losing content at the boundary — or compresses too much information into one vector, which dilutes retrieval precision.
 
 Chunking is the process of splitting a long document into embedding-sized pieces. How you split directly affects retrieval quality. Chunks that are too small lose context; chunks that are too large mix unrelated content.

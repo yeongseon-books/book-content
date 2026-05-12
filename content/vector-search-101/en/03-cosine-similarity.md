@@ -24,6 +24,8 @@ seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
+This is the 3rd article in the Vector Search 101 series.
+
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
 
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.

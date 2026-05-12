@@ -24,6 +24,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/05-chunking-strategies)
 
+이 글은 벡터 검색 101 시리즈의 다섯 번째 글입니다.
+
 임베딩 모델은 처리할 수 있는 토큰 수에 한계가 있습니다. `all-MiniLM-L6-v2`는 최대 256 서브워드 토큰입니다. PDF 한 페이지만 해도 이 한계를 금방 넘습니다. 긴 문서를 통째로 임베딩하면 잘려서 중요한 내용이 날아가거나, 너무 많은 정보가 한 벡터에 압축되어 검색 정확도가 떨어집니다.
 
 청크(chunk)는 긴 문서를 임베딩 가능한 크기의 단위로 나눈 것입니다. 어떻게 나누느냐가 검색 품질에 직접 영향을 줍니다. 청크가 너무 작으면 문맥이 끊기고, 너무 크면 관련 없는 내용이 섞입니다.

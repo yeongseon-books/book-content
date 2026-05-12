@@ -24,6 +24,8 @@ seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
+This is the 2nd article in the Vector Search 101 series.
+
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 
 `HuggingFaceEmbeddings` from `langchain-community` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.

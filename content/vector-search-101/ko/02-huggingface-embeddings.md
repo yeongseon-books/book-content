@@ -24,6 +24,8 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/02-huggingface-embeddings)
 
+이 글은 벡터 검색 101 시리즈의 두 번째 글입니다.
+
 지난 글에서 임베딩의 개념을 잡았다면, 이번 글은 실제로 벡터를 만들고 다루는 방법에 집중합니다. 이론을 코드로 옮기는 과정에서 자주 막히는 부분이 있습니다. 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장했다가 재사용하는 방법은 무엇인지 같은 실용적인 질문들입니다.
 
 `langchain-community`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스로 감싼 클래스입니다. LangChain 생태계와 연동하지 않더라도, 임베딩 래퍼 패턴 자체가 실제 앱에서 어떻게 쓰이는지 이해하는 데 좋은 출발점이 됩니다.

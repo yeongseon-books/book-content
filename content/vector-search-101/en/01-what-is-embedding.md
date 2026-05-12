@@ -24,6 +24,8 @@ seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
 
 Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
 
+This is the first article in the Vector Search 101 series.
+
 Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.
 
 Embeddings approach the problem differently. They convert text into numeric vectors so that semantically similar sentences end up geometrically close in a high-dimensional space. The distance between those vectors becomes a proxy for meaning. That property makes keyword-free, meaning-based retrieval possible.
