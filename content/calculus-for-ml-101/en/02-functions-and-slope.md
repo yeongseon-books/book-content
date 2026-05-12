@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A *function* is a *contract* from input to output, and a *slope* is the *direction and speed* of change.
 
+This is post 2 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

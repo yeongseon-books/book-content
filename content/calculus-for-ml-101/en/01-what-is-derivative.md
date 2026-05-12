@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A *derivative* is a *rate of change*, and *training* uses derivatives of *loss* to pick a *direction*.
 
+This is post 1 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

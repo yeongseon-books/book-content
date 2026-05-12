@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > The *chain rule* is *outer derivative times inner derivative*, and it is the *math foundation of backprop*.
 
+This is post 5 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

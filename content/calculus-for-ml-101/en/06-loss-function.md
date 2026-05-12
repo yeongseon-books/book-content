@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A *loss function* turns the *gap* between *prediction* and *truth* into a *number*, and its *gradient* drives training.
 
+This is post 6 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

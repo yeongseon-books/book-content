@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A *gradient* is the *vector* pointing in the direction of *steepest loss increase*.
 
+This is post 4 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

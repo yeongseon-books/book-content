@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Gradient descent* repeatedly takes a *small step* in the *opposite* direction of the gradient.
 
+This is post 7 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

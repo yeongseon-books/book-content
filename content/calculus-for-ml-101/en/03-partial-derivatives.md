@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > A *partial derivative* is the agreement to *hold the others fixed* and vary *only one*.
 
+This is post 3 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

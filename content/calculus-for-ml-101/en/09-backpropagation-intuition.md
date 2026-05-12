@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Backpropagation* applies the *chain rule backward* and produces *every gradient efficiently*.
 
+This is post 9 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn

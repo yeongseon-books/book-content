@@ -30,6 +30,8 @@ last_reviewed: '2026-05-04'
 
 > *Networks*, *losses*, *backprop*, and *optimizers* all run on calculus inside *one cycle*.
 
+This is post 10 in the Calculus for ML 101 series.
+
 <!-- a-grade-intro:end -->
 
 ## What You Will Learn
