@@ -1,14 +1,24 @@
 ---
 title: 프로덕션 데이터 파이프라인 구축
+
 series: ai-data-preparation-101
+
 episode: 10
+
 language: ko
-status: content-ready
+
+status: publish-ready
+
 targets:
+
   tistory: true
+
   medium: true
+
   mkdocs: true
+
   ebook: true
+
 tags:
 - Data Pipelines
 - Production
@@ -16,48 +26,79 @@ tags:
 - Airflow
 - pandera
 - MLOps
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+
 seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunking, quality…
 ---
 
 # 프로덕션 데이터 파이프라인 구축
 
-> AI Data Preparation 101 시리즈 (10/10)
+정제, 중복 제거, PII 처리, 토큰화, 품질 필터링, 분할을 각각 이해하는 것과 그것들을 프로덕션에서 매일 반복 가능한 시스템으로 묶는 것은 전혀 다른 문제입니다. 운영의 어려움은 개별 기법을 모르는 데서보다, 그 기법들을 다시 돌려도 같은 결과를 내는 파이프라인으로 만드는 데서 더 자주 나타납니다.
 
-앞선 단계에서 배운 cleaning, dedup, PII 처리, tokenization, filtering은 각자 중요하지만 따로 돌려서는 운영 체계가 되지 않습니다. 결국 프로덕션에서는 이 과정을 재현 가능하고 관측 가능하게 묶는 파이프라인 설계가 필요합니다.
+이 단계에서 요구되는 것은 알고리즘이 아니라 시스템 속성입니다. 같은 입력이면 같은 출력이 나와야 하고, 어느 단계에서 몇 행이 떨어졌는지 관측 가능해야 하며, 중간 산출물과 데이터 버전이 코드 커밋과 연결돼야 합니다.
 
-이 글은 AI Data Preparation 101 시리즈의 마지막 글입니다. 여기서는 지금까지 다룬 단계를 하나의 production data pipeline으로 연결하는 방법을 다룹니다.
+프로덕션 데이터 파이프라인은 결국 데이터셋을 코드처럼 다루는 문제입니다. 버전, 캐시, lineage, schema validation, scheduler, retry가 모두 필요합니다. 한 단계라도 임시 스크립트로 남겨 두면 파이프라인 전체의 신뢰도가 떨어집니다.
 
----
+좋은 팀은 모델 학습보다 먼저 데이터 파이프라인의 재실행 가능성과 관측성을 검증합니다. 모델은 바뀌어도 파이프라인은 계속 남기 때문입니다.
 
-## "지금까지 배운 걸 어떻게 한 pipeline으로 묶나요?"
+이 글은 AI Data Preparation 101 시리즈의 마지막 글입니다.
 
-Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunking, quality filtering, synthesis, augmentation, splitting을 다뤘습니다. production에서 이 단계들을 매주 또는 매일 자동으로 돌려야 합니다. 마지막 편은 모든 단계를 통합한 pipeline 설계입니다.
+여기서는 앞선 아홉 편의 단계를 하나의 프로덕션 데이터 파이프라인으로 묶기 위해 필요한 버전 관리, 캐싱, 오케스트레이션, 관측성, 스키마 검증을 정리하겠습니다.
 
-production data pipeline의 4가지 요구사항:
+## 이 글에서 다룰 문제
 
-1. Reproducibility — 같은 input은 항상 같은 output을 만들어야 합니다.
-2. Versioning — dataset의 version을 git처럼 추적해야 합니다.
-3. Observability — stage별 통계, drift, failure를 측정해야 합니다.
-4. Idempotency — 같은 stage를 두 번 돌려도 결과가 변하지 않아야 합니다.
+- 여러 데이터 준비 단계를 실제 운영 가능한 하나의 파이프라인으로 묶으려면 어떤 시스템 속성이 필요할까요?
+- DVC와 stage fingerprint는 데이터 버전 관리와 idempotency를 어떻게 함께 해결할까요?
+- Airflow 같은 오케스트레이터는 단순 스케줄링 외에 어떤 운영 가치를 줄까요?
+- drop_rate, duration, schema validation을 stage별로 남기면 어떤 drift를 빨리 찾을 수 있을까요?
+- PII redaction, splitting, chunking 같은 단계는 파이프라인에서 어떤 순서로 들어가야 안전할까요?
 
-## 아키텍처 — 6 stage pipeline
+## 왜 이 글이 중요한가
 
-![아키텍처 - 6 stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
+프로덕션 파이프라인을 잘 만들면 데이터셋 재생성, 버그 재현, drift 분석, 비용 절감이 모두 쉬워집니다. 특히 모델이 여러 개로 늘어날수록 재사용 가능한 데이터 파이프라인은 조직의 핵심 자산이 됩니다.
 
-아키텍처 - 6 stage pipeline
-각 stage는 input parquet과 output parquet, manifest를 가집니다. manifest에는 input fingerprint, code version, parameters가 모두 기록됩니다.
+반대로 매번 수동 스크립트를 이어 붙이는 방식은 같은 입력에서도 결과가 달라지고, 어느 단계가 원인인지 추적하기 어려우며, PII나 schema 변화 같은 사고를 조기에 잡지 못합니다. 배포 직전에만 보이는 문제들이 늘어납니다.
 
-## DVC로 dataset versioning
+이 글은 데이터 준비를 마무리하는 마지막 편으로서, 개별 기법을 운영 가능한 시스템으로 승격시키는 기준을 제시합니다. 결국 데이터 품질은 파이프라인 품질과 분리할 수 없습니다.
 
-dataset을 git처럼 version 관리합니다. 코드 commit과 data version이 1:1로 묶입니다.
+## 프로덕션 파이프라인을 이해하는 가장 좋은 방법: 각 단계를 자동화하는 것이 아니라 재실행 가능한 계약으로 묶는 것입니다
+
+프로덕션 파이프라인의 핵심은 단계가 많다는 사실이 아닙니다. 각 단계가 입력, 출력, 파라미터, 코드 버전, fingerprint를 명시적으로 갖고, 다시 실행해도 같은 결과를 내는 계약을 가진다는 점이 중요합니다.
+
+이 계약이 있으면 캐시를 안전하게 쓸 수 있고, stage 단위 재실행과 롤백이 가능해집니다. 반대로 계약이 없으면 캐시도 믿기 어렵고, “다시 돌려 보자”가 사실상 다른 결과를 만드는 행위가 됩니다.
+
+운영에서 pipeline orchestration, stats logging, schema validation은 부가 기능이 아닙니다. reproducibility와 observability를 시스템 차원에서 보장하는 핵심 장치입니다.
+
+> 프로덕션 데이터 파이프라인은 스크립트 모음이 아니라, 각 단계가 입력·출력·버전·통계를 가진 재실행 가능한 계약들의 연결입니다.
+
+## 핵심 개념
+
+### 프로덕션 데이터 파이프라인의 네 가지 요구사항
+
+마지막 편에서는 앞선 단계를 하나의 시스템으로 묶습니다. 핵심 요구사항은 네 가지입니다.
+
+1. **Reproducibility**: 같은 입력은 항상 같은 출력이 나와야 합니다.
+
+2. **Versioning**: 데이터셋 버전이 코드 커밋과 연결돼야 합니다.
+
+3. **Observability**: stage별 통계와 실패 원인을 볼 수 있어야 합니다.
+
+4. **Idempotency**: 같은 stage를 다시 실행해도 결과가 바뀌지 않아야 합니다.
+
+### 아키텍처는 여섯 단계 파이프라인으로 정리할 수 있습니다
+
+![Architecture - a 6-stage pipeline](../../../assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
+
+각 stage는 input/output parquet와 manifest를 갖습니다. manifest에 fingerprint, 코드 버전, 파라미터를 남겨 두면 데이터셋을 파일이 아니라 재현 가능한 산출물로 다룰 수 있습니다.
+
+### DVC와 fingerprint caching으로 버전과 재실행을 묶습니다
 
 ```bash
-# 패키지 설치: pip install dvc
+# pip install dvc
 dvc init
 dvc remote add -d s3 s3://my-bucket/datasets
 
-# Stage별 산출물 추적
+# Track per-stage outputs
 dvc add data/02_clean.parquet
 dvc add data/05_chunked.parquet
 git add data/02_clean.parquet.dvc data/05_chunked.parquet.dvc
@@ -93,33 +134,33 @@ class Stage:
         if self.is_cached():
             print(f"[skip] {self.name} cached")
             return
-        self.execute()  # subclass에서 구현
+        self.execute()  # implemented by subclass
         self.write_manifest()
 ```
 
-`fingerprint`가 같으면 stage를 재실행하지 않습니다. idempotency와 caching이 동시에 해결됩니다.
+`fingerprint`가 같으면 stage를 건너뛰는 방식은 캐시와 idempotency를 동시에 해결합니다. 중요한 점은 입력 파일, stage 이름, 파라미터를 모두 fingerprint에 넣는 것입니다.
 
-## Stage별 구현 예 — 통합 pipeline
+### Stage 구현은 이전 편의 개념을 그대로 연결합니다
 
 ```python
 import pandas as pd
 from datetime import datetime
 
-# Stage 1: 수집
+# Stage 1: Ingest
 def stage_ingest(sources: list[str]) -> pd.DataFrame:
     dfs = [pd.read_json(s, lines=True) for s in sources]
     df = pd.concat(dfs, ignore_index=True)
     df["ingested_at"] = datetime.utcnow()
     return df
 
-# Stage 2: 정제 + 중복 제거 (Ep3)
+# Stage 2: Clean + Dedup (Ep3)
 def stage_clean(df: pd.DataFrame) -> pd.DataFrame:
     df["text"] = df["text"].str.strip().str.replace(r"\s+", " ", regex=True)
     df = df[df["text"].str.len() >= 50]
     df = df.drop_duplicates(subset=["text"])
     return df
 
-# Stage 3: PII 처리 (Ep4)
+# Stage 3: PII (Ep4)
 from presidio_analyzer import AnalyzerEngine
 from presidio_anonymizer import AnonymizerEngine
 
@@ -133,25 +174,24 @@ def stage_pii(df: pd.DataFrame) -> pd.DataFrame:
     df["text"] = df["text"].map(redact)
     return df
 
-# Stage 4: 품질 필터링 (Ep6)
+# Stage 4: Quality (Ep6)
 def stage_quality(df: pd.DataFrame) -> pd.DataFrame:
-    from typing import Callable
     def passes(t: str) -> bool:
         words = t.split()
         return 50 <= len(words) <= 100_000
     return df[df["text"].map(passes)]
 
-# Stage 5: 토큰화/청킹 (Ep5)
+# Stage 5: Tokenize/Chunk (Ep5)
 def stage_chunk(df: pd.DataFrame, max_tokens: int = 500) -> pd.DataFrame:
     rows = []
     for _, r in df.iterrows():
-        # Ep5의 recursive_chunk 사용
+        # recursive_chunk from Ep5
         chunks = [r["text"][i:i+2000] for i in range(0, len(r["text"]), 1800)]
         for i, c in enumerate(chunks):
             rows.append({**r.to_dict(), "chunk_id": i, "text": c})
     return pd.DataFrame(rows)
 
-# Stage 6: 분할 + 버전 관리 (Ep9)
+# Stage 6: Split + Version (Ep9)
 def stage_split(df: pd.DataFrame, time_col: str = "ingested_at") -> dict:
     df = df.sort_values(time_col)
     n = len(df)
@@ -162,12 +202,12 @@ def stage_split(df: pd.DataFrame, time_col: str = "ingested_at") -> dict:
     }
 ```
 
-## Pipeline orchestration — Airflow 예
+여기서 보이는 ingest -> clean/dedup -> PII -> quality -> tokenize/chunk -> split 순서는 임의가 아닙니다. PII를 늦게 처리하면 raw 민감정보가 더 많은 산출물에 퍼지고, split을 너무 일찍 하면 이후 변환 단계에서 분할 무결성을 다시 관리해야 합니다.
 
-production은 Airflow, Prefect, Dagster 중 하나를 씁니다. Airflow가 가장 보편적입니다.
+### 오케스트레이션은 Airflow 같은 도구에 맡깁니다
 
 ```python
-# dags/data_prep.py 파일
+# dags/data_prep.py
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
@@ -185,9 +225,9 @@ with DAG("data_prep", default_args=default,
     t1 >> t2 >> t3 >> t4 >> t5 >> t6
 ```
 
-Airflow는 retry, scheduling, lineage UI를 제공합니다. failed stage만 재실행할 수 있어 cost를 아낍니다.
+Airflow의 가치는 단순 cron 대체가 아닙니다. retry, scheduling, lineage UI, stage별 재실행이 가능하다는 점이 큽니다. 어느 단계가 실패했는지 보이고, 실패한 단계만 다시 돌릴 수 있어야 운영 비용이 줄어듭니다.
 
-## Observability — stage 통계 수집
+### observability는 stage 통계로 시작합니다
 
 ```python
 import json, time
@@ -214,14 +254,12 @@ def with_stats(stage_fn):
 stage_clean = with_stats(stage_clean)
 ```
 
-stage별 drop_rate를 시계열로 plot하면 source distribution drift를 즉시 감지할 수 있습니다. 평소 0.1이던 quality drop_rate가 0.5로 뛰면 source가 깨졌다는 신호입니다.
+`drop_rate`, `duration_s`, `rows_in/out`만 꾸준히 남겨도 source drift를 빨리 감지할 수 있습니다. 예를 들어 평소 0.1이던 quality drop rate가 갑자기 0.5가 되면 upstream source가 깨졌을 가능성이 높습니다.
 
-## Schema validation — Great Expectations / pandera
-
-input/output schema가 변하면 pipeline은 silent하게 깨집니다. schema check가 마지막 안전망입니다.
+### schema validation은 마지막 안전망입니다
 
 ```python
-# 패키지 설치: pip install pandera
+# pip install pandera
 import pandera as pa
 from pandera.typing import Series
 
@@ -231,35 +269,37 @@ class TextSchema(pa.DataFrameModel):
     source: Series[str]
     ingested_at: Series["datetime64[ns]"]
 
-# 모든 stage 입력에서 검증
+# Validate at every stage entry
 TextSchema.validate(df)
 ```
 
-schema가 깨지면 stage가 fail합니다. silently 잘못된 dataset을 만드는 것보다 나은 선택입니다.
+스키마 체크가 없으면 source format 변경이 조용히 파이프라인을 통과합니다. stage가 loud하게 실패하는 편이 훨씬 낫습니다. 데이터 파이프라인에서 조용한 실패는 대개 가장 비싼 실패입니다.
 
-## 흔한 실수 5가지
+## 흔히 헷갈리는 지점
 
-1. Caching 없이 매번 전체 파이프라인을 재실행합니다: cost와 시간이 폭발합니다. fingerprint 기반 stage caching이 필수입니다.
-2. Schema validation을 생략합니다: source format이 바뀌어도 pipeline이 silent하게 통과해 잘못된 dataset이 production에 배포됩니다.
-3. Dataset version과 code commit을 분리합니다: 버그가 발생했을 때 어떤 dataset version으로 학습했는지 추적할 수 없습니다. DVC + git tag 조합이 표준입니다.
-4. stage 통계를 수집하지 않습니다: drift 감지가 늦어지고 model 품질 저하의 원인 분석이 어려워집니다.
-5. PII redaction을 마지막에 둡니다: 한 번이라도 PII가 raw로 disk에 떨어지면 compliance 위반입니다. ingest 직후 또는 clean 직후에 해야 합니다.
+- **단계를 순서대로 실행만 하면 파이프라인입니다**: 입출력 계약, 버전, 캐시, 통계가 없으면 단지 스크립트 묶음일 뿐입니다.
+- **캐시는 나중에 속도 문제가 생기면 붙이면 됩니다**: fingerprint 기반 캐시는 idempotency와 재현성 설계와 연결돼 있어 초기에 함께 들어가야 합니다.
+- **스케줄러는 cron이면 충분합니다**: retry, lineage, stage별 재실행, 상태 가시성이 없으면 운영 비용이 크게 늘어납니다.
+- **schema validation이 없어도 테스트 데이터 몇 건이면 충분합니다**: 실제 source format drift는 조용히 들어오므로 자동 검증이 마지막 안전망입니다.
 
-## 핵심 요약
+## 운영 체크리스트
 
-- Production data pipeline은 ingest -> clean/dedup -> PII -> quality -> tokenize/chunk -> split의 6 stage입니다.
-- DVC로 dataset versioning을 git commit과 1:1 매핑합니다.
-- Stage 단위 fingerprint caching으로 idempotency와 cost를 동시에 잡습니다.
-- Airflow / Prefect / Dagster로 schedule, retry, lineage를 관리합니다.
-- 모든 stage에서 drop_rate, duration, schema 통계를 수집해 drift를 모니터링합니다.
-- PII redaction은 ingest 직후 단계에 배치합니다.
+- [ ] 모든 stage가 입력, 출력, 파라미터, fingerprint, manifest를 가진다
+- [ ] DVC 또는 동급 도구로 데이터 버전을 코드 커밋과 1:1로 연결했다
+- [ ] stage별 rows_in/out, drop_rate, duration, timestamp를 자동 수집한다
+- [ ] PII redaction을 ingest 직후 초반 단계에 배치했다
+- [ ] schema validation과 stage 단위 재실행을 오케스트레이터 수준에서 지원한다
 
-이 시리즈는 여기까지입니다. Ep1의 GIGO에서 시작해 production pipeline까지 왔습니다. 다음 시리즈는 multimodal data 준비, 또는 model evaluation으로 이어집니다.
+## 정리
 
----
+프로덕션 데이터 파이프라인의 핵심은 여러 단계를 모아 두는 것이 아니라, 각 단계가 버전·캐시·통계를 가진 재실행 가능한 계약이 되게 만드는 것입니다. 그래야 데이터셋을 코드처럼 다룰 수 있습니다.
+
+DVC, fingerprint caching, Airflow, stats logging, pandera 같은 도구는 개별 기능이 아니라 reproducibility와 observability를 붙잡기 위한 수단입니다. 이 장치들이 있어야 정제, PII 처리, 토큰화, 분할이 운영에서 계속 살아남습니다.
+
+이로써 시리즈는 raw 데이터에서 시작해 프로덕션 파이프라인까지 닫혔습니다. 이후 실제 모델 학습과 평가 시리즈를 볼 때도, 기반 데이터 파이프라인을 어떻게 설계했는지가 결과 해석의 출발점이라는 사실은 그대로 유지됩니다.
 
 <!-- toc:begin -->
-## AI Data Preparation 101 시리즈
+## 시리즈 목차
 
 - [데이터 준비가 모델 품질을 결정하는 이유](./01-why-data-preparation-matters.md)
 - [원본 데이터 수집과 카탈로깅](./02-source-data-collection-cataloging.md)
@@ -275,9 +315,14 @@ schema가 깨지면 stage가 fail합니다. silently 잘못된 dataset을 만드
 
 ## 참고 자료
 
+### 공식 문서
 - [DVC - Data Version Control](https://dvc.org/doc)
 - [Apache Airflow Documentation](https://airflow.apache.org/docs/)
 - [pandera - Statistical Data Testing](https://pandera.readthedocs.io/)
 - [Great Expectations - Data Quality Pipeline](https://docs.greatexpectations.io/)
+
+### 관련 시리즈
+- [LLM API 프로덕션 101 — 캐싱 전략 — 비용과 지연 시간 줄이기](../../llm-api-production-101/ko/04-caching-strategies.md)
+- [AI Evaluation 101 — LLM-as-Judge — 모델로 모델을 평가하기](../../ai-evaluation-101/ko/04-llm-as-judge.md)
 
 Tags: Data Pipelines, Production, DVC, Airflow, pandera, MLOps
