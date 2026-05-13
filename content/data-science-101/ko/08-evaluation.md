@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 8
 title: 평가
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,11 +16,17 @@ tags:
   - Metrics
   - ScikitLearn
   - Beginner
-seo_description: 정확도만 봐서는 안 되는 이유와 정밀도, 재현율, F1, ROC AUC, RMSE 까지 모델 평가 지표 한눈에 정리
-last_reviewed: '2026-05-11'
+seo_description: 정확도가 왜 위험할 수 있는지와 평가 지표를 고르는 기준을 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
 # 평가
+
+이 글은 Data Science 101 시리즈의 여덟 번째 글입니다.
+
+모델링이 끝나면 많은 입문자가 가장 먼저 정확도를 봅니다. 물론 정확도는 유용한 지표일 수 있습니다. 하지만 언제나 좋은 지표는 아닙니다. 특히 클래스 불균형이 큰 문제에서는 정확도가 매우 높아도 실제로 중요한 대상을 거의 잡지 못할 수 있습니다. 사기 탐지, 장애 탐지, 이탈 예측처럼 놓치는 비용이 큰 문제에서는 더 그렇습니다.
+
+그래서 평가는 단순히 점수를 보는 단계가 아니라, 우리가 어떤 문제를 풀고 있는지 다시 확인하는 단계에 가깝습니다. 어떤 지표를 선택하느냐가 곧 어떤 실패를 더 크게 볼지 정하는 일이기 때문입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -30,19 +36,25 @@ last_reviewed: '2026-05-11'
 - 임계값 하나만 보고 판단하면 왜 위험할까요?
 - 비즈니스 비용을 지표에 반영하지 않으면 어떤 문제가 생길까요?
 
-> Data Science 101 시리즈 (8/10)
+> 어떤 지표를 고를지 정하는 일은 사실상 문제를 다시 정의하는 일과 같습니다.
 
-모델링이 끝나면 많은 입문자가 가장 먼저 정확도를 봅니다. 물론 정확도는 유용한 지표일 수 있습니다. 하지만 언제나 좋은 지표는 아닙니다. 특히 클래스 불균형이 큰 문제에서는 정확도가 매우 높아도 실제로 중요한 대상을 거의 잡지 못할 수 있습니다. 사기 탐지, 장애 탐지, 이탈 예측처럼 놓치는 비용이 큰 문제에서는 더 그렇습니다.
+## 이 글에서 배우는 내용
 
-그래서 평가는 단순히 점수를 보는 단계가 아니라, 우리가 어떤 문제를 풀고 있는지 다시 확인하는 단계에 가깝습니다. 어떤 지표를 선택하느냐가 곧 어떤 실패를 더 크게 볼지 정하는 일이기 때문입니다.
+- accuracy가 쉽게 오해를 만드는 이유
+- 분류 문제에서 precision, recall, F1, ROC AUC를 읽는 법
+- 회귀 문제에서 MAE, RMSE, R²를 비교하는 법
+- 5단계 평가 실습 흐름
+- 평가 단계에서 흔한 함정 다섯 가지
 
 ## 왜 중요한가
 
 지표가 문제와 어긋나면 모델은 잘못된 방향으로 최적화됩니다. 예를 들어 실제로는 놓치는 비용이 큰 문제인데 accuracy만 올리면, 팀은 좋은 모델이라고 믿지만 현업에서는 계속 불만이 나올 수 있습니다.
 
+평가 지표는 단순한 표시판이 아니라 최적화의 방향키입니다. 그래서 문제를 푸는 방식과 비용 구조를 지표 안에 반영해야 합니다.
+
 > 지표는 우리가 최적화하는 대상이므로 매우 신중하게 골라야 합니다.
 
-## 평가 지표 한눈에 보기
+## 핵심 개념 한눈에 보기
 
 ```mermaid
 flowchart LR
@@ -55,8 +67,6 @@ flowchart LR
     Reg --> R2["R-squared"]
 ```
 
-분류와 회귀는 보는 지표 자체가 다릅니다. 그리고 같은 분류 문제 안에서도 어떤 실패가 더 비싼지에 따라 중심 지표가 달라집니다.
-
 ## 핵심 용어
 
 - **Confusion matrix**: TP, FP, FN, TN으로 예측 결과를 정리한 표입니다.
@@ -65,15 +75,13 @@ flowchart LR
 - **F1**: precision과 recall의 조화평균입니다.
 - **ROC AUC**: 임계값에 덜 의존적으로 모델의 구분 능력을 보여 주는 지표입니다.
 
-이 용어들을 그냥 외우기보다, 어떤 비용을 반영하는지와 연결해 이해하는 편이 좋습니다. 예를 들어 recall은 놓치지 않는 능력과 더 가깝습니다.
-
 ## Before / After
 
 **Before**: 사기 탐지 모델이 accuracy 99%를 찍습니다. 숫자만 보면 대단해 보이지만 recall이 5%라면 대부분의 사기를 놓치고 있다는 뜻입니다.
 
 **After**: recall을 주요 지표로 두고, F1과 비용 기반 지표를 보조 지표로 둡니다. 그제야 문제와 지표가 맞기 시작합니다.
 
-## 5단계 평가
+## 실습: 5단계 평가
 
 ### 1단계 — confusion matrix 보기
 
@@ -122,28 +130,28 @@ print("R^2 :", r2_score(y_test, y_pred))
 ### 5단계 — 비즈니스 비용 직접 계산
 
 ```python
-# 거짓 음성 비용이 거짓 양성보다 5배 큼
+# A false negative costs 5x a false positive
 cost = 5 * cm[1, 0] + 1 * cm[0, 1]
 print("expected cost:", cost)
 ```
 
 실무에서는 이 단계가 특히 중요합니다. false negative가 false positive보다 훨씬 비싼 문제라면 그 비용을 직접 숫자로 계산해 지표로 삼아야 합니다. 그래야 모델 점수와 실제 의사결정이 같은 방향을 봅니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - confusion matrix는 분류 지표의 뿌리입니다.
 - ROC AUC 같은 확률 기반 지표는 임계값 하나에 덜 묶입니다.
 - 비즈니스 비용도 직접 계산해서 하나의 지표로 다뤄야 합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **accuracy만 봅니다.** 불균형 데이터에서는 특히 오해를 부릅니다.
-2. **임계값 하나만 보고 판단합니다.** ROC나 threshold trade-off를 함께 봐야 합니다.
-3. **RMSE만 봅니다.** 이상치에 지나치게 민감할 수 있습니다.
-4. **테스트셋에서 임계값을 조정합니다.** 평가 데이터에 맞춰 버리는 데이터 누수입니다.
-5. **비즈니스 비용을 무시합니다.** 점수는 좋아 보여도 현업 만족도는 낮아질 수 있습니다.
+1. **accuracy만 보는 실수**: 불균형 데이터에서는 특히 오해를 부릅니다.
+2. **임계값 하나만 보고 판단하는 실수**: ROC나 threshold trade-off를 함께 봐야 합니다.
+3. **RMSE만 보는 실수**: 이상치에 지나치게 민감할 수 있습니다.
+4. **테스트셋에서 임계값을 조정하는 실수**: 평가 데이터에 맞춰 버리는 데이터 누수입니다.
+5. **비즈니스 비용을 무시하는 실수**: 점수는 좋아 보여도 현업 만족도는 낮아질 수 있습니다.
 
-## 실무에서는 이렇게 드러납니다
+## 실무에서는 이렇게 나타납니다
 
 실무 팀은 하나의 주 지표와 여러 가드레일 지표를 함께 둡니다. 예를 들어 recall을 최우선으로 보되, precision이 0.7 아래로 내려가면 배포하지 않는 식입니다. 이렇게 해야 한쪽 지표만 좋아지고 다른 쪽이 무너지는 상황을 막을 수 있습니다.
 
@@ -189,7 +197,7 @@ print("expected cost:", cost)
 
 - [scikit-learn — Model Evaluation](https://scikit-learn.org/stable/modules/model_evaluation.html)
 - [Google — Classification Metrics](https://developers.google.com/machine-learning/crash-course/classification)
-- [Wikipedia — ROC AUC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
+- [Wikipedia — Receiver Operating Characteristic](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
 - [Aurelien Geron — Hands-On ML](https://github.com/ageron/handson-ml3)
 
 Tags: DataScience, Evaluation, Metrics, ScikitLearn, Beginner
