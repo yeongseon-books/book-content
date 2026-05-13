@@ -2,7 +2,7 @@
 series: computer-architecture-101
 episode: 7
 title: 파이프라인
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,32 +17,54 @@ tags:
   - 분기 예측
   - 성능
   - CPU
-seo_description: CPU 파이프라인의 단계와 해저드, 분기 예측을 통해 한 사이클에 한 명령어가 완료되는 원리를 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: 파이프라인과 분기 예측이 CPU 처리량을 어떻게 끌어올리는지 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 파이프라인
 
-> Computer Architecture 101 시리즈 (7/10)
+명령어 하나를 처리하는 데 다섯 단계가 필요하다면, 왜 CPU는 평균적으로 한 사이클에 한 명령어를 끝내는 것처럼 보일까요? 이 글은 Computer Architecture 101 시리즈의 일곱 번째 글입니다. 여기서는 파이프라인이라는 겹쳐 처리하기 기법과, 그 흐름을 자주 깨뜨리는 분기·의존성·메모리 지연을 보겠습니다.
 
+파이프라인은 평균을 빠르게 만듭니다. 하지만 그 평균은 분기 예측 한 번이 틀리는 순간 무너질 수 있습니다. 그래서 핫 루프의 분기 패턴을 이해하는 습관이 생각보다 큰 성능 차이를 만듭니다.
 
 ## 이 글에서 다룰 문제
 
-현대 CPU는 14단계 이상의 깊은 파이프라인을 갖고 있고, 이론적으로 한 사이클에 여러 명령어를 동시에 끝낼 수 있습니다(슈퍼스칼라). 그러나 분기 예측이 한 번 틀리면 파이프라인을 비우고 다시 채워야 하므로 10~20 사이클이 날아갑니다. 핫 루프의 분기를 줄이거나 예측 가능하게 만드는 것은 작지만 누적되면 큰 최적화입니다.
+- 파이프라인은 어떻게 처리량을 높일까요?
+- 데이터 해저드와 제어 해저드는 무엇이 다를까요?
+- 분기 예측은 어떤 가정을 바탕으로 동작할까요?
+- 분기 없는 코드가 왜 때때로 더 빠를까요?
 
-> 파이프라인은 평균을 빠르게 만들지만, 잘못된 예측 한 번이 그 평균을 깨뜨립니다.
+> 파이프라인은 명령어 단계를 겹쳐 처리량을 높이지만, 분기와 의존성이 그 흐름을 자주 깨뜨립니다.
 
-## 전체 흐름
-> 5단계 파이프라인(Fetch, Decode, Execute, Memory, Writeback)에서 한 사이클마다 다섯 명령어가 동시에 진행됩니다. 한 명령어 자체는 5 사이클이 걸리지만, 처리량은 사이클당 1 명령어가 됩니다. 분기가 발생하면 잘못 fetch된 명령어들을 모두 버리고 다시 시작해야 합니다.
+## 왜 중요한가
+
+현대 CPU는 깊은 파이프라인과 슈퍼스칼라 설계를 사용합니다. 그러나 분기 예측이 한 번 틀리면 이미 가져온 명령어를 버리고 다시 채워야 해서 10~20사이클 비용이 날 수 있습니다.
+
+그래서 파이프라인 친화적인 코드, 예측 가능한 분기, 적절한 데이터 배치는 작은 차이처럼 보여도 누적되면 크게 작동합니다.
+
+## 한눈에 보는 개념
+
+5단계 파이프라인에서는 서로 다른 명령어가 동시에 Fetch, Decode, Execute, Memory, Writeback 단계를 점유합니다. 한 명령어는 끝까지 5사이클이 걸리지만, 처리량은 사이클당 1개에 가까워집니다.
 
 ```text
-사이클:        1    2    3    4    5    6    7
-명령어 1:      F    D    E    M    W
-명령어 2:           F    D    E    M    W
-명령어 3:                F    D    E    M    W
-명령어 4:                     F    D    E    M
-명령어 5:                          F    D    E
+cycle:        1    2    3    4    5    6    7
+instr 1:      F    D    E    M    W
+instr 2:           F    D    E    M    W
+instr 3:                F    D    E    M    W
+instr 4:                     F    D    E    M
+instr 5:                          F    D    E
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Pipeline | 명령어 단계를 겹쳐 처리하는 구조 |
+| Hazard | 파이프라인을 멈추거나 깨뜨리는 조건 |
+| Data hazard | 앞선 결과를 다음 명령어가 기다리는 상황 |
+| Control hazard | 분기 때문에 다음 명령어를 확신할 수 없는 상황 |
+| Branch prediction | 분기 방향을 미리 추측하는 기법 |
+| Stall | 유효한 작업 없이 파이프라인이 쉬는 사이클 |
 
 ## Before / After
 
@@ -52,7 +74,7 @@ last_reviewed: '2026-05-11'
 def count_positive(arr):
     count = 0
     for x in arr:
-        if x > 0:           # 무작위 데이터면 예측 실패율 ~50%
+        if x > 0:           # ~50% mispredict on random data
             count += 1
     return count
 ```
@@ -61,17 +83,17 @@ def count_positive(arr):
 
 ```python
 def count_positive_branchless(arr):
-    return sum((x > 0) for x in arr)   # bool→int, 분기 없음
+    return sum((x > 0) for x in arr)   # bool->int, no branch
 ```
 
-산술 연산은 항상 같은 명령어 흐름을 갖기 때문에 파이프라인이 멈추지 않습니다. CPU 관점에서 가장 좋은 분기는 없는 분기, 그 다음이 예측 가능한 분기입니다.
+CPU 입장에서는 가장 좋은 분기는 없는 분기이고, 그다음은 예측하기 쉬운 분기입니다.
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
-### 1단계: 정렬된 vs 무작위 데이터의 분기 비용
+### 1단계: 정렬된 데이터와 무작위 데이터 비교
 
 ```python
-import time, random, numpy as np
+import time, numpy as np
 
 N = 10_000_000
 sorted_data = np.sort(np.random.randint(-100, 100, N))
@@ -85,19 +107,19 @@ def count_positive(arr):
     return c
 
 start = time.perf_counter(); count_positive(sorted_data)
-print(f"정렬:    {time.perf_counter() - start:.2f} s")
+print(f"sorted:   {time.perf_counter() - start:.2f} s")
 
 start = time.perf_counter(); count_positive(random_data)
-print(f"무작위:  {time.perf_counter() - start:.2f} s")
+print(f"random:   {time.perf_counter() - start:.2f} s")
 ```
 
-같은 함수, 같은 크기. 정렬된 데이터는 분기 예측이 거의 모두 적중하지만, 무작위 데이터는 절반쯤 빗나가 파이프라인이 자주 비워집니다. C나 Rust에서는 차이가 더 극적입니다.
+같은 코드라도 정렬된 데이터는 예측기가 잘 맞히고, 무작위 데이터는 자주 틀립니다.
 
 ### 2단계: 파이프라인 시뮬레이터
 
 ```python
 def pipeline(instructions, stages=("F", "D", "E", "M", "W")):
-    """각 명령어가 단계별로 한 사이클씩 진행되는 파이프라인을 시뮬레이션"""
+    """Each instruction advances one stage per cycle."""
     n_inst = len(instructions)
     total_cycles = n_inst + len(stages) - 1
     grid = [[" " for _ in range(total_cycles)] for _ in range(n_inst)]
@@ -110,34 +132,32 @@ for row in pipeline(["I1", "I2", "I3", "I4"]):
     print("".join(row))
 ```
 
-출력은 명령어가 한 사이클씩 어긋나며 같은 단계에 머무는 구조를 보여 줍니다. 처리량은 사이클당 1 명령어이지만, 분기 한 번이 이 흐름을 깹니다.
+출력은 명령어가 한 단계씩 어긋나며 동시에 흐르는 구조를 보여 줍니다.
 
 ### 3단계: 데이터 해저드 모델링
 
 ```python
 class HazardCheck:
-    """ADD R3, R1, R2 다음에 ADD R4, R3, R5가 오면 R3 결과를 기다려야 함"""
+    """ADD R3, R1, R2 followed by ADD R4, R3, R5 must wait for R3."""
     @staticmethod
     def has_data_hazard(prev, curr):
-        prev_dst = prev["dst"]
-        curr_src = curr["src"]
-        return prev_dst in curr_src
+        return prev["dst"] in curr["src"]
 
 a = {"dst": "R3", "src": ("R1", "R2")}
-b = {"dst": "R4", "src": ("R3", "R5")}   # R3 의존
+b = {"dst": "R4", "src": ("R3", "R5")}   # depends on R3
 c = {"dst": "R6", "src": ("R7", "R8")}
 
 print(HazardCheck.has_data_hazard(a, b))   # True
 print(HazardCheck.has_data_hazard(a, c))   # False
 ```
 
-데이터 해저드는 forwarding(결과를 EX 단계에서 바로 전달)으로 보통 해소되지만, 메모리 로드 직후의 의존은 여전히 1 사이클 stall을 유발합니다.
+forwarding이 많은 의존성을 완화하지만, 메모리 로드 직후 의존은 여전히 stall을 만들 수 있습니다.
 
-### 4단계: 분기 예측 시뮬레이터
+### 4단계: 분기 예측기 시뮬레이션
 
 ```python
 class BranchPredictor:
-    """간단한 2비트 saturating counter 예측기"""
+    """Simple 2-bit saturating counter."""
     def __init__(self):
         self.state = 2   # 0:strong NT, 1:weak NT, 2:weak T, 3:strong T
 
@@ -155,12 +175,12 @@ for actual in sequence:
     pred = bp.predict()
     hits += (pred == actual)
     bp.update(actual)
-print(f"적중률: {hits}/{len(sequence)}")
+print(f"hit rate: {hits}/{len(sequence)}")
 ```
 
-2비트 예측기는 단순하지만 거의 늘 같은 방향으로 가는 분기에 대해 95%+의 적중률을 보입니다. 무작위 분기에서는 50% 근처로 떨어집니다.
+단순한 2비트 예측기조차 패턴이 있는 분기에는 매우 강합니다.
 
-### 5단계: 분기 없는(branchless) 패턴
+### 5단계: branchless 패턴 보기
 
 ```python
 def abs_with_branch(x):
@@ -169,54 +189,67 @@ def abs_with_branch(x):
     return x
 
 def abs_branchless(x):
-    # 비트 연산으로 부호 비트 추출
-    mask = x >> 31    # 음수면 -1(=...111), 양수면 0
+    mask = x >> 31    # -1 if negative, 0 if positive
     return (x ^ mask) - mask
 
 print(abs_with_branch(-7), abs_branchless(-7))
 print(abs_with_branch(5), abs_branchless(5))
 ```
 
-같은 결과를 분기 없이 만들어 내는 패턴은 핫 루프의 예측 실패 비용을 0으로 만듭니다. 가독성과 트레이드오프가 있어, 측정으로 가치를 검증한 뒤에만 도입합니다.
+같은 결과를 분기 없이 만들면 예측 실패 비용은 사라지지만, 가독성은 나빠질 수 있습니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 파이프라인은 단계가 깊을수록 처리량이 좋지만 분기 실패 비용도 큽니다
-- 분기 예측은 패턴이 있는 분기에 매우 강하고, 무작위 분기에 약합니다
-- 데이터 의존은 forwarding으로 대부분 해소되지만 메모리 로드는 stall이 남습니다
-- 분기 없는 코드는 빠르지만 가독성을 희생합니다
+- 파이프라인이 깊을수록 처리량은 좋아지지만 예측 실패 비용도 커집니다.
+- 분기 예측은 패턴이 있는 분기에 강하고 무작위 분기에 약합니다.
+- forwarding이 많은 데이터 의존을 가려 주지만 load-use stall은 남습니다.
+- branchless 코드는 빠를 수 있지만 항상 좋은 선택은 아닙니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| 핫 루프에 무작위 분기 | 예측 실패 폭증 | 가능하면 산술/마스크로 |
-| 데이터 정렬 무시 | 분기 패턴 불규칙 | 정렬 후 처리 검토 |
-| 깊은 함수 호출 체인 | 분기·간접 호출 누적 | 인라인 또는 평탄화 |
-| `if x` vs `if x > 0` 혼동 | 의도와 다른 비교 | 명시적 비교 사용 |
-| 측정 없는 branchless 도입 | 가독성만 깎고 효과 없음 | 항상 before/after 측정 |
+| 핫 루프에 무작위 분기 두기 | 예측 실패 폭증 | 산술/마스크 대체 검토 |
+| 데이터 정렬 무시 | 분기 패턴이 불규칙해짐 | 미리 정렬하거나 묶기 |
+| 깊은 호출과 간접 분기 남발 | 파이프라인 흐름 악화 | 평탄화나 인라인 검토 |
+| `if x`와 `if x > 0` 혼동 | 의도와 다른 조건 | 명시적 비교 사용 |
+| 측정 없이 branchless 도입 | 가독성만 손상 | 반드시 전후 측정 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-- 정렬 알고리즘: 분기 없는 비교(branchless compare)로 가속
-- 그래픽스/SIMD: 마스크 기반 처리로 분기 제거
-- JIT 컴파일러: 핫 트레이스에서 자주 가지 않는 분기를 가드로 처리
-- 데이터베이스 옵티마이저: predicate를 일괄 처리해 분기 줄임
-- 보안: 일정 시간(constant-time) 비교로 타이밍 공격 방지
+- 정렬 알고리즘은 branchless compare를 활용합니다.
+- 그래픽스와 SIMD 코드는 마스크 기반 처리로 분기를 줄입니다.
+- JIT는 드문 분기를 deopt guard로 빼기도 합니다.
+- 데이터베이스는 predicate를 배치 처리해 분기 비용을 줄입니다.
+- 보안 코드는 일정 시간 비교로 타이밍 공격을 막습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어는 핫 루프를 볼 때 분기를 하나씩 셉니다. 거의 늘 같은 방향으로 가는 분기는 거의 공짜에 가깝지만, 랜덤한 분기는 10~20사이클씩 새어 나갈 수 있다는 것을 압니다. 그래서 데이터를 패턴 있게 정렬하거나, 때로는 산술 연산으로 바꾸는 선택을 합니다.
+
+동시에 branchless가 만능이 아니라는 점도 압니다. 예측기가 잘 맞는 경우라면 오히려 일반 분기가 더 나을 수 있고, 컴파일러가 `cmov` 같은 형태로 자동 변환해 줄 수도 있습니다. 그래서 측정 없는 미세 최적화는 경계합니다.
 
 ## 체크리스트
 
-- [ ] 파이프라인의 5단계를 그릴 수 있는가
+- [ ] 파이프라인 5단계를 그릴 수 있는가
 - [ ] 데이터 해저드와 제어 해저드를 구분할 수 있는가
-- [ ] 분기 예측의 적중률이 코드 패턴에 따라 다름을 안다
-- [ ] 정렬된 데이터가 분기 예측에 유리한 이유를 설명할 수 있는가
-- [ ] branchless 패턴의 장단점을 한 문단으로 말할 수 있는가
+- [ ] 분기 예측 적중률이 코드 패턴에 달린다는 점을 아는가
+- [ ] 정렬된 데이터가 예측기에 유리한 이유를 설명할 수 있는가
+- [ ] branchless의 장단점을 요약할 수 있는가
 
-## 정리 및 다음 단계
+## 연습 문제
 
-파이프라인은 CPU의 처리량을 단계 수만큼 끌어올리는 핵심 장치이며, 분기 예측은 그 이득을 분기 위에서도 유지하기 위한 발명입니다. 핫 코드의 분기 패턴을 의식하는 것은 작지만 누적되면 큰 차이를 만듭니다. 다만 모든 최적화가 그렇듯 측정이 가설보다 먼저입니다.
+1. `count_positive`를 정렬 데이터와 무작위 데이터에 각각 실행해 차이를 측정해 보세요.
 
-다음 글에서는 CPU 바깥 세계, 즉 I/O와 장치를 살펴봅니다. 디스크, 네트워크, 키보드 같은 느린 장치들이 어떻게 빠른 CPU와 연결되는지를 다룹니다.
+2. `BranchPredictor`에 50/50 분기와 80/20 분기를 넣어 적중률 차이를 확인해 보세요.
+
+3. `abs`, `min`, `max`의 분기 버전과 branchless 버전을 만들어 각각 더 빠른 경우를 비교해 보세요.
+
+## 정리 및 다음 글
+
+파이프라인은 명령어 단계들을 겹쳐 CPU 처리량을 끌어올리는 핵심 장치입니다. 분기 예측은 그 이득을 분기 위에서도 유지하려는 장치이고, 의존성과 메모리 지연은 그 흐름을 자주 방해합니다. 결국 파이프라인 친화적 사고는 핫 코드의 분기와 데이터 흐름을 읽는 감각으로 이어집니다.
+
+다음 글에서는 CPU 바깥의 느린 세계, 즉 I/O와 장치를 봅니다. 디스크, 네트워크, 키보드 같은 장치가 어떻게 CPU와 연결되고, 왜 비동기 모델이 필요한지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
