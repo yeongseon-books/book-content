@@ -2,7 +2,7 @@
 series: data-structures-python-101
 episode: 5
 title: 연결 리스트
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,64 +16,74 @@ tags:
   - Linked List
   - 연결 리스트
   - 노드
-seo_description: Python으로 단일·이중 연결 리스트를 구현하고 배열과 비교합니다.
-last_reviewed: '2026-05-11'
+seo_description: 연결 리스트의 구조와 배열 대비 장단점을 Python 코드로 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 연결 리스트
 
-> Data Structures with Python 101 시리즈 (5/10)
-
+이 글은 Data Structures with Python 101 시리즈의 다섯 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-연결 리스트는 자료구조의 기본 중 기본입니다. 트리, 그래프, 해시 테이블의 체이닝 등 고급 자료구조의 빌딩 블록이 됩니다. 연결 리스트를 직접 구현하면 포인터(참조) 개념을 확실히 익힐 수 있습니다.
+- Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?
+- 단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?
+- 연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?
+- 뒤집기와 순환 감지 같은 대표 문제는 어떤 사고방식으로 풀어야 할까요?
 
-> 연결 리스트는 각 노드가 데이터와 다음 노드에 대한 참조를 가지는 자료구조입니다.
+> 멘탈 모델: 연결 리스트는 값을 “연속된 칸”에 저장하지 않고, 노드가 다음 노드를 가리키는 방식으로 이어 붙입니다. 그래서 위치 기반 접근보다 포인터 변경이 핵심 연산이 됩니다.
 
-코딩 면접에서 연결 리스트 문제는 가장 자주 출제되는 유형 중 하나입니다. 뒤집기, 순환 감지, 병합 등 다양한 변형 문제가 있습니다.
+## 왜 이 글이 중요한가
 
-## 핵심 개념 잡기
+연결 리스트는 자료구조에서 가장 기본적인 빌딩 블록 중 하나입니다. 트리, 그래프, 해시 테이블의 체이닝, LRU 캐시 같은 구조를 제대로 이해하려면 결국 노드와 참조를 다루는 감각이 필요합니다. 연결 리스트는 그 감각을 가장 직접적으로 훈련시키는 구조입니다.
 
-> 연결 리스트 = 노드들이 포인터로 연결된 선형 자료구조
+> 연결 리스트는 각 노드가 데이터와 다음 노드에 대한 참조를 저장하는 선형 자료구조입니다.
 
-```text
-[단일 연결 리스트]
-  head → [A|→] → [B|→] → [C|→] → None
+코딩 면접에서 연결 리스트 문제가 자주 나오는 이유도 같습니다. 뒤집기, 순환 감지, 병합, 중간 노드 찾기처럼 포인터 조작과 경계 조건 처리를 한꺼번에 볼 수 있기 때문입니다. 즉, 연결 리스트를 잘 다루는 사람은 단순 문법보다 데이터 흐름을 더 잘 이해하는 경우가 많습니다.
 
-[이중 연결 리스트]
-  None ← [←|A|→] ⇄ [←|B|→] ⇄ [←|C|→] → None
+## 핵심 개념 한눈에 보기
+
+> 연결 리스트 = 노드들이 참조로 연결된 선형 구조
+
+```
+[Singly Linked List]
+  head -> [A|->] -> [B|->] -> [C|->] -> None
+
+[Doubly Linked List]
+  None <- [<-|A|->] <-> [<-|B|->] <-> [<-|C|->] -> None
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 노드(Node) | 데이터와 다음 노드에 대한 참조를 가지는 단위입니다 |
-| head | 연결 리스트의 첫 번째 노드를 가리킵니다 |
-| tail | 연결 리스트의 마지막 노드를 가리킵니다 |
-| 단일 연결 리스트 | 각 노드가 다음 노드만 참조하는 구조입니다 |
-| 이중 연결 리스트 | 각 노드가 이전과 다음 노드를 모두 참조하는 구조입니다 |
+| 노드(Node) | 데이터와 다음 노드 참조를 담는 기본 단위입니다 |
+| head | 연결 리스트의 첫 번째 노드를 가리키는 참조입니다 |
+| tail | 마지막 노드를 가리키는 참조입니다 |
+| 단일 연결 리스트 | 각 노드가 다음 노드만 가리키는 구조입니다 |
+| 이중 연결 리스트 | 각 노드가 이전 노드와 다음 노드를 모두 가리키는 구조입니다 |
 
 ## Before / After
 
-배열에서 중간 삭제와 연결 리스트에서 중간 삭제를 비교합니다.
+배열 기반 구조와 연결 리스트 기반 구조가 중간 삭제를 어떻게 다르게 처리하는지 보겠습니다.
 
 ```python
-# 개선 전: list 중간 삭제 — O(n), 뒤의 원소를 모두 이동
+# before: delete from middle of list — O(n), shifts all subsequent elements
 data = [10, 20, 30, 40, 50]
-data.pop(2)  # 30 삭제 — 40, 50이 한 칸씩 앞으로 이동
+data.pop(2)  # removes 30 — 40 and 50 shift left
 ```
 
 ```python
-# 개선 후: 연결 리스트 중간 삭제 — O(1), 포인터만 변경
-# 예: node_b.next = node_b.next.next
-# 30 노드를 건너뛰고 20 → 40 연결
+# after: delete from middle of linked list — O(1), change pointers only
+# node_b.next = node_b.next.next
+# skip node 30 and connect 20 -> 40
 ```
+
+여기서 연결 리스트의 장단점이 동시에 드러납니다. 삭제 자체는 포인터 변경만으로 끝나지만, 삭제할 노드를 찾기까지는 보통 순차 탐색이 필요합니다. 그래서 “무엇을 빨리 하려는 구조인가”를 분리해서 봐야 합니다.
 
 ## 단계별 실습
 
-### Step 1: Node 클래스 정의
+### Step 1: Define the Node class
 
 ```python
 class Node:
@@ -85,7 +95,7 @@ class Node:
         return f"Node({self.data})"
 ```
 
-### Step 2: 단일 연결 리스트 구현
+### Step 2: Implement a singly linked list
 
 ```python
 class SinglyLinkedList:
@@ -134,21 +144,21 @@ class SinglyLinkedList:
         while current:
             parts.append(str(current.data))
             current = current.next
-        return " → ".join(parts)
+        return " -> ".join(parts)
 
 sll = SinglyLinkedList()
 sll.append("A")
 sll.append("B")
 sll.append("C")
-print(sll)          # A → B → C
+print(sll)          # A -> B -> C
 sll.prepend("Z")
-print(sll)          # Z → A → B → C
+print(sll)          # Z -> A -> B -> C
 sll.delete("B")
-print(sll)          # Z → A → C
+print(sll)          # Z -> A -> C
 print(len(sll))     # 3
 ```
 
-### Step 3: 연결 리스트 뒤집기
+### Step 3: Reverse a linked list
 
 ```python
 def reverse_linked_list(head: Node) -> Node:
@@ -164,12 +174,12 @@ def reverse_linked_list(head: Node) -> Node:
 sll = SinglyLinkedList()
 for item in ["A", "B", "C", "D"]:
     sll.append(item)
-print(f"원본: {sll}")  # A → B → C → D
+print(f"original: {sll}")  # A -> B -> C -> D
 sll.head = reverse_linked_list(sll.head)
-print(f"뒤집기: {sll}")  # D → C → B → A
+print(f"reversed: {sll}")  # D -> C -> B -> A
 ```
 
-### Step 4: 이중 연결 리스트 구현
+### Step 4: Implement a doubly linked list
 
 ```python
 class DNode:
@@ -210,17 +220,17 @@ class DoublyLinkedList:
         while current:
             parts.append(str(current.data))
             current = current.next
-        return " ⇄ ".join(parts)
+        return " <-> ".join(parts)
 
 dll = DoublyLinkedList()
 dll.append("A")
 dll.append("B")
 dll.append("C")
 dll.prepend("Z")
-print(dll)  # Z ⇄ A ⇄ B ⇄ C
+print(dll)  # Z <-> A <-> B <-> C
 ```
 
-### Step 5: 순환 감지 (Floyd's algorithm)
+### Step 5: Cycle detection (Floyd's algorithm)
 
 ```python
 def has_cycle(head: Node) -> bool:
@@ -232,46 +242,48 @@ def has_cycle(head: Node) -> bool:
             return True
     return False
 
-# 순환 없는 리스트
+# no cycle
 a, b, c = Node("A"), Node("B"), Node("C")
 a.next, b.next = b, c
 print(has_cycle(a))  # False
 
-# 순환 있는 리스트
-c.next = a  # C → A 순환
+# cycle present
+c.next = a  # C -> A creates a cycle
 print(has_cycle(a))  # True
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 연결 리스트의 prepend는 O(1)이지만 list의 insert(0, x)는 O(n)입니다
-- 연결 리스트는 인덱스 접근이 O(n)이라 랜덤 접근에는 부적합합니다
-- 뒤집기, 순환 감지 등은 코딩 면접 단골 문제입니다
-- Python의 collections.deque는 내부적으로 이중 연결 리스트입니다
+- 연결 리스트의 `prepend`는 O(1)이지만 `list.insert(0, x)`는 O(n)입니다.
+- 인덱스 접근은 O(n)이므로 랜덤 접근이 많으면 연결 리스트는 불리합니다.
+- 뒤집기와 순환 감지는 연결 리스트 사고방식을 가장 잘 드러내는 대표 문제입니다.
+- Python의 `collections.deque`를 이해할 때도 이중 연결 구조에 대한 감각이 도움이 됩니다.
+
+연결 리스트는 “무조건 빠른 구조”가 아닙니다. 배열보다 느린 점도 많습니다. 대신 참조를 바꿔 구조를 재배열하는 문제에서는 매우 강력합니다. 결국 핵심은 메모리 배치가 아니라 연결 관계를 조작하는 능력입니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| next 포인터 업데이트 순서 오류 | 노드가 유실되어 리스트가 끊깁니다 | 다음 노드를 임시 변수에 저장한 뒤 포인터를 수정합니다 |
-| head가 None인 경우 미처리 | NoneType 에러가 발생합니다 | head가 None인 경우를 먼저 처리합니다 |
-| 삭제 후 size 미갱신 | len()이 잘못된 값을 반환합니다 | 삭제 성공 시 _size -= 1을 빠뜨리지 않습니다 |
-| 이중 연결 리스트에서 prev 미설정 | 역방향 순회가 불가능합니다 | 삽입·삭제 시 prev와 next를 모두 업데이트합니다 |
-| 순환 참조로 무한 루프 발생 | while current가 끝나지 않습니다 | Floyd 알고리즘으로 순환을 감지합니다 |
+| `next` 업데이트 순서 실수 | 노드가 유실되어 리스트가 끊어질 수 있습니다 | 포인터를 바꾸기 전 다음 노드를 임시 변수에 저장합니다 |
+| `head is None` 케이스 누락 | `NoneType` 관련 오류가 발생합니다 | 빈 리스트 조건을 항상 먼저 처리합니다 |
+| 삭제 후 `_size` 미갱신 | `len()` 결과가 실제와 달라집니다 | 성공적으로 삭제했을 때 반드시 감소시킵니다 |
+| 이중 연결 리스트에서 `prev` 누락 | 역방향 순회와 삭제가 꼬입니다 | 삽입·삭제 때 `prev`와 `next`를 모두 맞춥니다 |
+| 순환 리스트를 일반 순회로 처리 | 무한 루프에 빠집니다 | Floyd 알고리즘 같은 감지 로직을 사용합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- LRU 캐시를 이중 연결 리스트 + dict로 구현합니다
-- 텍스트 에디터의 실행 취소를 연결 리스트로 관리합니다
-- 메모리 할당자가 빈 블록을 연결 리스트로 관리합니다
-- 해시 테이블의 체이닝 방식이 연결 리스트를 사용합니다
-- 브라우저 히스토리를 이중 연결 리스트로 구현합니다
+- LRU 캐시는 이중 연결 리스트와 dict를 조합해 구현합니다.
+- 텍스트 에디터의 undo 이력은 연결 구조로 관리하기 좋습니다.
+- 메모리 할당자는 빈 블록 목록을 연결 리스트로 관리하기도 합니다.
+- 해시 테이블 체이닝은 충돌 버킷을 연결 리스트로 연결할 수 있습니다.
+- 브라우저 히스토리는 이전/다음 이동 때문에 이중 연결 구조와 잘 맞습니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 실무에서는 이렇게 생각합니다
 
-Python에서는 연결 리스트를 직접 구현할 일이 거의 없습니다. list와 deque가 대부분의 상황을 커버하기 때문입니다. 하지만 연결 리스트의 개념을 이해하면 deque, LRU 캐시, 그래프 등의 동작 원리를 파악할 수 있습니다.
+Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다. list와 deque가 대부분의 요구를 해결하기 때문입니다. 그래도 연결 리스트를 이해하는 이유는 구현 자체보다, 참조 기반 구조가 어떻게 움직이는지 감각을 익히기 위해서입니다.
 
-면접 준비에서 연결 리스트는 필수입니다. 포인터 조작, 경계 조건 처리, 재귀적 사고를 연습하기에 최적의 자료구조입니다.
+면접 관점에서도 연결 리스트는 필수입니다. 포인터 조작, 경계 조건 처리, 재귀와 반복 전환 능력을 모두 보여 줄 수 있기 때문입니다. 즉, 연결 리스트 문제를 잘 푼다는 것은 다른 자료구조 문제에도 강하다는 신호가 됩니다.
 
 ## 체크리스트
 
@@ -281,9 +293,15 @@ Python에서는 연결 리스트를 직접 구현할 일이 거의 없습니다.
 - [ ] Floyd의 순환 감지 알고리즘을 설명할 수 있다
 - [ ] 배열과 연결 리스트의 성능 차이를 비교할 수 있다
 
+## 연습 문제
+
+1. 단일 연결 리스트에서 한 번의 순회로 가운데 노드를 찾는 함수를 작성해 보세요. 힌트: slow/fast 포인터를 사용합니다.
+2. 정렬된 연결 리스트 두 개를 받아 하나의 정렬된 연결 리스트로 합치는 함수를 작성해 보세요.
+3. 연결 리스트의 뒤에서 N번째 노드를 삭제하는 함수를 작성해 보세요.
+
 ## 정리 및 다음 글 안내
 
-연결 리스트는 노드를 포인터로 연결하여 삽입·삭제에 O(1)을 달성합니다. 배열과 달리 연속된 메모리가 필요 없지만, 인덱스 접근이 O(n)입니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 다룹니다.
+연결 리스트는 노드를 참조로 연결해 삽입과 삭제를 유연하게 처리하는 구조입니다. 배열처럼 연속 메모리를 요구하지 않지만, 인덱스 기반 임의 접근은 느립니다. 즉, 연결 리스트는 “위치로 찾는 구조”보다 “연결을 바꾸는 구조”에 가깝습니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [자료구조란 무엇인가?](./01-what-are-data-structures.md)

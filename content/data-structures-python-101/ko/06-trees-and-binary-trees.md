@@ -2,7 +2,7 @@
 series: data-structures-python-101
 episode: 6
 title: 트리와 이진 트리
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,35 +16,43 @@ tags:
   - Tree
   - Binary Tree
   - BST
-seo_description: Python으로 이진 트리와 이진 탐색 트리를 구현하고 순회합니다.
-last_reviewed: '2026-05-04'
+seo_description: 트리와 BST의 구조, 순회, 탐색 원리를 Python으로 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 트리와 이진 트리
 
-> Data Structures with Python 101 시리즈 (6/10)
-
+이 글은 Data Structures with Python 101 시리즈의 여섯 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-트리는 컴퓨터 과학에서 가장 중요한 자료구조 중 하나입니다. 파일 시스템, HTML DOM, 데이터베이스 인덱스(B-Tree), JSON 파싱 트리 등 어디에나 트리가 있습니다.
+- 파일 시스템, DOM, 조직도는 왜 트리 구조로 모델링될까요?
+- 트리의 루트, 리프, 깊이, 높이는 각각 무엇을 뜻할까요?
+- 이진 트리 순회는 왜 재귀와 잘 맞을까요?
+- BST는 어떻게 정렬된 데이터를 O(log n)에 탐색할 수 있을까요?
 
-> 트리를 이해하면 재귀적 사고 능력이 크게 향상됩니다. 대부분의 트리 알고리즘은 재귀로 자연스럽게 표현됩니다.
+> 멘탈 모델: 트리는 “위에서 아래로 갈라지는 계층 구조”입니다. 그리고 BST는 그 계층 구조에 정렬 규칙까지 얹어, 탐색 범위를 매 단계 절반씩 줄여 가는 구조입니다.
 
-이진 탐색 트리는 정렬된 데이터를 유지하면서 삽입, 삭제, 검색을 O(log n)에 수행합니다. 이는 list의 선형 검색 O(n)보다 월등히 빠릅니다.
+## 왜 이 글이 중요한가
 
-## 핵심 개념 잡기
+트리는 컴퓨터 과학에서 가장 널리 쓰이는 구조 중 하나입니다. 파일 시스템, HTML DOM, 데이터베이스 인덱스, AST까지 계층 관계를 표현해야 하는 곳에는 거의 항상 트리가 등장합니다. 그래서 트리를 이해하는 것은 특정 알고리즘 하나를 배우는 문제가 아니라, 복잡한 시스템을 구조적으로 읽는 연습에 가깝습니다.
 
-> 트리 = 루트에서 시작하여 자식 노드로 뻗어나가는 계층 구조
+> 트리를 이해하면 재귀 사고가 자연스러워집니다. 대부분의 트리 알고리즘은 재귀로 가장 잘 표현됩니다.
+
+특히 이진 탐색 트리(BST)는 트리 위에 정렬 규칙을 얹은 구조입니다. 이 규칙 덕분에 선형 검색 O(n) 대신 O(log n)에 가까운 탐색이 가능해집니다. 물론 균형이 무너질 수 있다는 한계도 함께 배워야 합니다.
+
+## 핵심 개념 한눈에 보기
+
+> 트리 = 루트에서 시작해 자식 노드로 분기하는 계층 구조
 
 ```
-        [루트]
+        [root]
        /      \
-    [자식]   [자식]
+    [child]  [child]
     /   \       \
- [잎]  [잎]    [잎]
+ [leaf] [leaf]  [leaf]
 
-이진 탐색 트리 (BST):
+Binary Search Tree (BST):
         [8]
        /   \
      [3]   [10]
@@ -56,18 +64,18 @@ last_reviewed: '2026-05-04'
 
 | 용어 | 설명 |
 |------|------|
-| 루트(root) | 트리의 최상위 노드입니다 |
-| 잎(leaf) | 자식이 없는 노드입니다 |
-| 깊이(depth) | 루트에서 해당 노드까지의 거리입니다 |
-| 높이(height) | 해당 노드에서 가장 먼 잎까지의 거리입니다 |
-| 이진 탐색 트리(BST) | 왼쪽 자식 < 부모 < 오른쪽 자식 규칙을 따르는 트리입니다 |
+| 루트(root) | 트리의 가장 위에 있는 시작 노드입니다 |
+| 리프(leaf) | 자식이 없는 말단 노드입니다 |
+| 깊이(depth) | 루트에서 특정 노드까지 내려가는 거리입니다 |
+| 높이(height) | 특정 노드에서 가장 먼 리프까지의 거리입니다 |
+| 이진 탐색 트리(BST) | 왼쪽 자식 < 부모 < 오른쪽 자식 규칙을 만족하는 트리입니다 |
 
 ## Before / After
 
-정렬된 리스트에서 검색하는 방법과 BST에서 검색하는 방법을 비교합니다.
+정렬된 데이터를 list로 순차 탐색하는 경우와 BST로 탐색하는 경우를 비교해 보겠습니다.
 
 ```python
-# before: 정렬된 리스트에서 선형 검색 — O(n)
+# before: linear search in a sorted list — O(n)
 data = [1, 3, 6, 8, 10, 14]
 for item in data:
     if item == 10:
@@ -76,8 +84,8 @@ for item in data:
 ```
 
 ```python
-# after: BST에서 검색 — O(log n)
-# BST: 8 → 10 → found (2단계)
+# after: BST search — O(log n)
+# BST: 8 → 10 → found (2 steps)
 def search_bst(node, target):
     if node is None:
         return False
@@ -89,9 +97,11 @@ def search_bst(node, target):
         return search_bst(node.right, target)
 ```
 
+BST의 장점은 매 단계에서 볼 필요 없는 절반을 버릴 수 있다는 점입니다. 그래서 정렬 규칙은 단순한 예쁜 성질이 아니라, 탐색 비용을 줄이는 핵심 계약입니다.
+
 ## 단계별 실습
 
-### Step 1: 이진 트리 노드 정의
+### Step 1: Define a binary tree node
 
 ```python
 class TreeNode:
@@ -104,50 +114,50 @@ class TreeNode:
         return f"TreeNode({self.data})"
 ```
 
-### Step 2: 트리 순회 구현
+### Step 2: Implement tree traversals
 
 ```python
 def inorder(node):
-    """중위 순회: 왼쪽 → 루트 → 오른쪽"""
+    """Inorder traversal: left → root → right"""
     if node is None:
         return []
     return inorder(node.left) + [node.data] + inorder(node.right)
 
 def preorder(node):
-    """전위 순회: 루트 → 왼쪽 → 오른쪽"""
+    """Preorder traversal: root → left → right"""
     if node is None:
         return []
     return [node.data] + preorder(node.left) + preorder(node.right)
 
 def postorder(node):
-    """후위 순회: 왼쪽 → 오른쪽 → 루트"""
+    """Postorder traversal: left → right → root"""
     if node is None:
         return []
     return postorder(node.left) + postorder(node.right) + [node.data]
 
-# 트리 구성:     1
-#              /   \
-#             2     3
-#            / \
-#           4   5
+# Build tree:        1
+#                  /   \
+#                 2     3
+#                / \
+#               4   5
 root = TreeNode(1)
 root.left = TreeNode(2)
 root.right = TreeNode(3)
 root.left.left = TreeNode(4)
 root.left.right = TreeNode(5)
 
-print(f"중위: {inorder(root)}")    # [4, 2, 5, 1, 3]
-print(f"전위: {preorder(root)}")   # [1, 2, 4, 5, 3]
-print(f"후위: {postorder(root)}")  # [4, 5, 2, 3, 1]
+print(f"inorder:   {inorder(root)}")    # [4, 2, 5, 1, 3]
+print(f"preorder:  {preorder(root)}")   # [1, 2, 4, 5, 3]
+print(f"postorder: {postorder(root)}")  # [4, 5, 2, 3, 1]
 ```
 
-### Step 3: 레벨 순회 (BFS)
+### Step 3: Level-order traversal (BFS)
 
 ```python
 from collections import deque
 
 def level_order(root):
-    """레벨 순회: 같은 깊이의 노드를 왼쪽에서 오른쪽으로"""
+    """Level-order traversal: nodes at the same depth, left to right"""
     if root is None:
         return []
     result = []
@@ -161,10 +171,10 @@ def level_order(root):
             queue.append(node.right)
     return result
 
-print(f"레벨: {level_order(root)}")  # [1, 2, 3, 4, 5]
+print(f"level-order: {level_order(root)}")  # [1, 2, 3, 4, 5]
 ```
 
-### Step 4: 이진 탐색 트리 구현
+### Step 4: Implement a binary search tree
 
 ```python
 class BST:
@@ -203,12 +213,12 @@ bst = BST()
 for val in [8, 3, 10, 1, 6, 14]:
     bst.insert(val)
 
-print(bst.inorder())       # [1, 3, 6, 8, 10, 14] — 정렬 결과
+print(bst.inorder())       # [1, 3, 6, 8, 10, 14] — sorted result
 print(bst.search(6))       # True
 print(bst.search(7))       # False
 ```
 
-### Step 5: 트리 높이와 노드 수 계산
+### Step 5: Compute tree height and node count
 
 ```python
 def tree_height(node):
@@ -221,52 +231,60 @@ def count_nodes(node):
         return 0
     return 1 + count_nodes(node.left) + count_nodes(node.right)
 
-print(f"높이: {tree_height(bst.root)}")    # 2
-print(f"노드 수: {count_nodes(bst.root)}") # 6
+print(f"height: {tree_height(bst.root)}")      # 2
+print(f"node count: {count_nodes(bst.root)}")   # 6
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 트리 알고리즘은 재귀로 자연스럽게 표현됩니다 — base case는 node is None
-- BST의 중위 순회는 정렬된 결과를 반환합니다
-- 레벨 순회는 큐(deque)를 사용합니다 — BFS 패턴
-- BST의 검색은 매 단계에서 반을 버리므로 O(log n)입니다
+- 트리 알고리즘은 `node is None`이라는 base case를 중심으로 재귀가 전개됩니다.
+- BST의 inorder 순회 결과가 정렬되는 이유는 왼쪽 < 부모 < 오른쪽 규칙 때문입니다.
+- level-order 순회는 큐를 사용하며, 트리에서 BFS 패턴을 가장 명확하게 보여 줍니다.
+- BST 탐색은 매 단계에서 절반을 버릴 수 있을 때 O(log n)에 가까워집니다.
+
+트리는 구현 세부사항보다 사고방식이 중요합니다. “현재 노드를 처리하고, 왼쪽과 오른쪽 서브트리에 같은 규칙을 적용한다”라는 반복 패턴을 익히면 순회, 높이 계산, 탐색, 검증 문제들이 하나의 패밀리처럼 보이기 시작합니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 재귀 base case 누락 | 무한 재귀로 RecursionError 발생합니다 | node is None 체크를 항상 먼저 합니다 |
-| BST에 중복 값 삽입 미처리 | 예상과 다른 트리 구조가 됩니다 | 중복 정책을 명확히 정합니다 (무시 또는 카운트) |
-| 편향 트리 미인식 | BST가 O(n)으로 퇴화합니다 | 균형 트리(AVL, Red-Black)를 고려합니다 |
-| 순회 순서 혼동 | 잘못된 결과가 나옵니다 | 전위(NLR), 중위(LNR), 후위(LRN)를 외웁니다 |
-| 삭제 연산의 복잡성 과소평가 | 자식이 2개인 노드 삭제가 까다롭습니다 | 후계자(in-order successor) 패턴을 학습합니다 |
+| 재귀 base case 누락 | 무한 재귀와 `RecursionError`로 이어집니다 | 항상 `node is None`을 먼저 처리합니다 |
+| BST 중복 정책 미정의 | 예상과 다른 트리 구조가 생깁니다 | 중복을 무시할지, 개수를 셀지 정책을 정합니다 |
+| 편향 트리를 BST로 착각 | 한쪽으로만 치우치면 O(n)으로 퇴화합니다 | 균형 트리 필요 여부를 구분합니다 |
+| 순회 순서 혼동 | 알고리즘 결과가 달라집니다 | preorder(NLR), inorder(LNR), postorder(LRN)를 분명히 구분합니다 |
+| 삭제 연산을 단순하게 봄 | 자식이 둘인 노드 처리가 특히 까다롭습니다 | 후계자(in-order successor) 패턴을 따로 연습합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 데이터베이스 인덱스가 B-Tree/B+Tree로 구현됩니다
-- 파일 시스템의 디렉터리 구조가 트리입니다
-- HTML/XML DOM이 트리 구조입니다
-- 표현식 파서가 AST(추상 구문 트리)를 생성합니다
-- 자동 완성 기능이 Trie(접두사 트리)로 구현됩니다
+- 데이터베이스 인덱스는 B-Tree/B+Tree 계열을 사용합니다.
+- 파일 시스템 디렉터리 구조는 전형적인 트리입니다.
+- HTML/XML DOM은 문서 구조를 트리로 표현합니다.
+- 파서와 컴파일러는 AST를 만들어 식과 문장을 처리합니다.
+- 자동 완성은 Trie 같은 특화 트리 구조를 사용합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 실무에서는 이렇게 생각합니다
 
-실무에서 BST를 직접 구현할 일은 드뭅니다. Python의 `sorted()`, `bisect` 모듈, 또는 데이터베이스의 인덱스가 대부분의 정렬·검색 요구를 처리합니다. 하지만 트리의 원리를 이해하면 이런 도구가 어떻게 동작하는지 파악할 수 있습니다.
+실무에서 BST를 처음부터 직접 구현할 일은 많지 않습니다. 대신 `sorted()`, `bisect`, 데이터베이스 인덱스, 라이브러리 내부 구조가 이미 그런 역할을 대신합니다. 그래도 트리를 이해해야 이런 도구가 어떤 가정 위에서 빠르게 동작하는지 설명할 수 있습니다.
 
-재귀적 사고를 연습하기에 트리만한 자료구조가 없습니다. 트리 문제를 많이 풀수록 재귀를 자연스럽게 사용하게 됩니다.
+또 하나 중요한 점은 트리가 재귀 사고를 훈련하는 최고의 재료라는 사실입니다. 트리 문제를 반복해서 풀다 보면, 복잡한 문제를 “현재 노드와 하위 문제”로 분해하는 감각이 자연스럽게 생깁니다.
 
 ## 체크리스트
 
-- [ ] 트리의 루트, 잎, 깊이, 높이를 설명할 수 있다
-- [ ] 전위, 중위, 후위, 레벨 순회를 구현할 수 있다
-- [ ] BST에서 삽입과 검색을 구현할 수 있다
-- [ ] BST의 중위 순회가 정렬된 결과를 반환하는 이유를 설명할 수 있다
-- [ ] 트리의 높이와 노드 수를 재귀로 계산할 수 있다
+- [ ] 트리의 루트, 리프, 깊이, 높이를 설명할 수 있다
+- [ ] preorder, inorder, postorder, level-order 순회를 구현할 수 있다
+- [ ] BST에서 삽입과 탐색을 구현할 수 있다
+- [ ] BST의 inorder 순회가 왜 정렬 결과를 반환하는지 설명할 수 있다
+- [ ] 트리 높이와 노드 수를 재귀로 계산할 수 있다
+
+## 연습 문제
+
+1. 주어진 이진 트리가 BST인지 검증하는 함수를 작성해 보세요. 힌트: inorder 결과가 정렬되어야 합니다.
+2. 두 이진 트리가 구조적으로 같은지 확인하는 함수를 작성해 보세요.
+3. BST에서 값을 삭제하는 함수를 구현해 보세요. 자식 수가 0, 1, 2인 경우를 모두 처리해야 합니다.
 
 ## 정리 및 다음 글 안내
 
-트리는 계층 구조를 표현하는 자료구조이고, BST는 정렬된 데이터를 O(log n)에 검색합니다. 트리 순회는 재귀로 자연스럽게 구현됩니다. 다음 글에서는 트리의 특수한 형태인 힙과 우선순위 큐를 다룹니다.
+트리는 계층 관계를 표현하는 가장 중요한 자료구조 중 하나이고, BST는 그 위에 정렬 규칙을 얹어 탐색 효율을 높인 구조입니다. 순회와 높이 계산처럼 많은 트리 연산은 재귀로 자연스럽게 풀립니다. 다음 글에서는 트리의 특수한 형태이면서 우선순위 처리에 강한 힙과 우선순위 큐를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [자료구조란 무엇인가?](./01-what-are-data-structures.md)

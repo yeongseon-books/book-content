@@ -2,7 +2,7 @@
 series: data-structures-python-101
 episode: 8
 title: 그래프 표현
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,70 +16,80 @@ tags:
   - Graph
   - 그래프
   - BFS
-seo_description: Python으로 그래프를 인접 리스트와 인접 행렬로 표현하고 탐색합니다.
-last_reviewed: '2026-05-11'
+seo_description: 그래프를 인접 리스트와 행렬로 표현하고 BFS/DFS를 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 그래프 표현
 
-> Data Structures with Python 101 시리즈 (8/10)
-
+이 글은 Data Structures with Python 101 시리즈의 여덟 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-현실 세계의 관계는 대부분 그래프로 모델링됩니다. 소셜 네트워크의 친구 관계, 웹 페이지 링크, 도로망, 패키지 의존성 등이 모두 그래프입니다. 그래프를 표현하고 탐색하는 능력은 복잡한 문제를 해결하는 핵심 역량입니다.
+- 소셜 네트워크, 지도, 의존성 관계는 코드에서 어떻게 표현할 수 있을까요?
+- 인접 리스트와 인접 행렬은 각각 언제 유리할까요?
+- BFS와 DFS는 무엇이 다르고 어디에 쓰일까요?
+- 가중치 그래프와 최단 경로 문제는 어떤 구조 위에서 풀릴까요?
 
-> 그래프는 트리의 일반화입니다. 트리는 순환이 없는 연결 그래프의 특수한 경우입니다.
+> 멘탈 모델: 그래프는 “노드들의 모음”이 아니라 “관계 자체를 데이터로 다루는 구조”입니다. 그래서 핵심은 값 하나보다, 누가 누구와 어떻게 연결되는가입니다.
 
-코딩 면접에서 그래프 문제는 중상급 난이도로 자주 출제됩니다. BFS, DFS를 자유자재로 구현할 수 있어야 합니다.
+## 왜 이 글이 중요한가
 
-## 핵심 개념 잡기
+현실 세계의 대부분의 복잡한 관계는 그래프로 모델링할 수 있습니다. 친구 관계, 웹 링크, 도로망, 패키지 의존성, CI/CD 작업 흐름 모두 그래프 문제입니다. 그래서 그래프를 표현하고 순회하는 능력은 특정 문제 하나를 푸는 기술이 아니라, 관계형 시스템을 해석하는 기본 역량입니다.
 
-> 그래프 = 노드(정점)들과 그것들을 연결하는 간선의 집합
+> 그래프는 트리의 일반화입니다. 트리는 순환이 없는 연결 그래프라는 특수한 경우일 뿐입니다.
+
+면접에서도 그래프는 중상급 난이도의 단골 주제입니다. 하지만 실제로 더 중요한 것은 “이 문제가 그래프 문제인가?”를 알아보는 능력입니다. 그래프로 모델링하는 순간 해결 전략이 BFS, DFS, 최단 경로, 위상 정렬 쪽으로 빠르게 정리되기 때문입니다.
+
+## 핵심 개념 한눈에 보기
+
+> 그래프 = 정점과 간선으로 관계를 표현하는 구조
 
 ```
-[무방향 그래프]        [인접 리스트]
-  A --- B              A: [B, C]
-  |   / |              B: [A, C, D]
-  |  /  |              C: [A, B]
-  C --- D              D: [B]
+[Undirected Graph]        [Adjacency List]
+  A --- B                  A: [B, C]
+  |   / |                  B: [A, C, D]
+  |  /  |                  C: [A, B]
+  C --- D                  D: [B]
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 정점(vertex) | 그래프의 노드입니다 |
-| 간선(edge) | 두 정점을 연결하는 선입니다 |
+| 정점(vertex) | 그래프를 구성하는 노드입니다 |
+| 간선(edge) | 두 정점 사이의 연결입니다 |
 | 방향 그래프 | 간선에 방향이 있는 그래프입니다 |
-| 가중치 그래프 | 간선에 비용(가중치)이 있는 그래프입니다 |
-| 인접 리스트 | 각 정점의 이웃을 리스트로 저장하는 표현 방식입니다 |
+| 가중치 그래프 | 간선마다 비용이나 거리 같은 값을 갖는 그래프입니다 |
+| 인접 리스트 | 각 정점이 연결된 이웃 정점을 list로 저장하는 방식입니다 |
 
 ## Before / After
 
-관계 데이터를 비구조적으로 관리하는 방법과 그래프로 구조화하는 방법을 비교합니다.
+관계를 흩어진 변수로 관리하는 방식과 그래프로 구조화하는 방식을 비교해 보겠습니다.
 
 ```python
-# 개선 전: 관계를 개별 변수로 관리 — 확장하기 어려움
+# before: relationships in individual variables — hard to extend
 alice_friends = ["bob", "charlie"]
 bob_friends = ["alice", "charlie", "diana"]
-# 새 사용자 추가 시 코드 수정 필요
+# adding a new user requires code changes
 ```
 
 ```python
-# 개선 후: 그래프(인접 리스트)로 구조화 — 확장하기 쉬움
+# after: structured as a graph (adjacency list) — easy to extend
 graph = {
     "alice": ["bob", "charlie"],
     "bob": ["alice", "charlie", "diana"],
     "charlie": ["alice", "bob"],
     "diana": ["bob"],
 }
-# 새 사용자: graph["eve"] = ["alice"]
+# new user: graph["eve"] = ["alice"]
 ```
+
+이 차이는 단순한 코드 정리 이상의 의미가 있습니다. 그래프로 표현하는 순간, 탐색과 분석을 일반화할 수 있고 새로운 노드나 관계도 데이터만 바꿔 확장할 수 있습니다.
 
 ## 단계별 실습
 
-### Step 1: 인접 리스트로 그래프 구현
+### Step 1: Implement a graph with an adjacency list
 
 ```python
 from collections import defaultdict
@@ -115,7 +125,7 @@ print(g)
 # D: ['B']
 ```
 
-### Step 2: 인접 행렬로 그래프 구현
+### Step 2: Implement a graph with an adjacency matrix
 
 ```python
 class GraphMatrix:
@@ -128,7 +138,7 @@ class GraphMatrix:
     def add_edge(self, u, v, weight=1):
         i, j = self.index[u], self.index[v]
         self.matrix[i][j] = weight
-        self.matrix[j][i] = weight  # 무방향
+        self.matrix[j][i] = weight  # undirected
 
     def has_edge(self, u, v):
         i, j = self.index[u], self.index[v]
@@ -146,7 +156,7 @@ gm.add_edge("B", "D")
 gm.print_matrix()
 ```
 
-### Step 3: BFS 구현
+### Step 3: Implement BFS
 
 ```python
 from collections import deque
@@ -168,11 +178,11 @@ g = Graph()
 for u, v in [("A","B"), ("A","C"), ("B","D"), ("C","D"), ("D","E")]:
     g.add_edge(u, v)
 
-print(f"A에서 시작한 BFS: {bfs(g, 'A')}")
-# A에서 시작한 BFS: ['A', 'B', 'C', 'D', 'E']
+print(f"BFS from A: {bfs(g, 'A')}")
+# BFS from A: ['A', 'B', 'C', 'D', 'E']
 ```
 
-### Step 4: DFS 구현 (재귀 + 반복)
+### Step 4: Implement DFS (recursive and iterative)
 
 ```python
 def dfs_recursive(graph, node, visited=None):
@@ -199,11 +209,11 @@ def dfs_iterative(graph, start):
                 stack.append(neighbor)
     return visited
 
-print(f"DFS 재귀: {dfs_recursive(g, 'A')}")
-print(f"DFS 반복: {dfs_iterative(g, 'A')}")
+print(f"DFS recursive: {dfs_recursive(g, 'A')}")
+print(f"DFS iterative: {dfs_iterative(g, 'A')}")
 ```
 
-### Step 5: 가중치 그래프와 최단 경로
+### Step 5: Weighted graph and shortest path
 
 ```python
 import heapq
@@ -242,48 +252,56 @@ distances = dijkstra(wg, "A")
 print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 인접 리스트는 희소 그래프에 적합하고, 인접 행렬은 밀집 그래프에 적합합니다
-- BFS는 큐(deque)를, DFS는 스택(list 또는 재귀)을 사용합니다
-- BFS는 가중치 없는 그래프에서 최단 경로를 보장합니다
-- Dijkstra는 가중치 그래프에서 최단 경로를 구하며 힙을 사용합니다
+- 인접 리스트는 희소 그래프에, 인접 행렬은 밀집 그래프에 더 잘 맞습니다.
+- BFS는 큐를 쓰고 DFS는 스택이나 재귀를 씁니다. 구현 도구가 곧 탐색 전략입니다.
+- BFS는 가중치 없는 그래프에서 최단 경로를 보장합니다.
+- Dijkstra는 가중치 그래프에서 힙을 사용해 최단 경로를 계산합니다.
+
+그래프 문제를 잘 풀려면 구현보다 먼저 관계를 구조로 보는 눈이 필요합니다. 값 하나를 처리하는 대신, 연결을 따라 움직이는 사고방식으로 전환해야 BFS·DFS·최단 경로가 한 흐름으로 이어집니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 방문 체크 없이 탐색 | 순환 그래프에서 무한 루프에 빠집니다 | seen/visited 집합으로 방문을 체크합니다 |
-| 무방향 그래프에서 한쪽만 간선 추가 | 탐색 시 일부 경로가 누락됩니다 | add_edge에서 양방향을 모두 추가합니다 |
-| 인접 행렬을 희소 그래프에 사용 | 메모리가 O(V²)로 낭비됩니다 | 인접 리스트를 사용합니다 |
-| DFS에서 스택 대신 큐 사용 | DFS가 아닌 BFS가 됩니다 | DFS는 스택(pop), BFS는 큐(popleft)입니다 |
-| Dijkstra에 음수 가중치 사용 | 정확한 결과를 보장하지 않습니다 | 음수 가중치에는 Bellman-Ford를 사용합니다 |
+| 방문 체크 없이 순회 | 순환이 있는 그래프에서 무한 루프가 날 수 있습니다 | `seen`/`visited` 집합을 둡니다 |
+| 무방향 그래프에서 한 방향만 간선 추가 | 일부 경로를 절대 방문하지 못합니다 | `add_edge`에서 양방향을 모두 추가합니다 |
+| 희소 그래프에 인접 행렬 사용 | O(V²) 메모리를 낭비합니다 | 기본 선택은 인접 리스트로 시작합니다 |
+| DFS에 큐 사용 | 의도와 다르게 BFS가 됩니다 | DFS는 stack, BFS는 queue를 사용합니다 |
+| Dijkstra에 음수 가중치 사용 | 결과가 보장되지 않습니다 | 음수 가중치가 있으면 Bellman-Ford를 검토합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 소셜 네트워크에서 친구 추천을 BFS로 구현합니다 (2촌 탐색)
-- 패키지 매니저가 의존성 그래프를 위상 정렬합니다
-- 네비게이션 앱이 Dijkstra로 최단 경로를 계산합니다
-- 웹 크롤러가 BFS로 페이지를 방문합니다
-- CI/CD 파이프라인이 작업 의존성을 DAG(방향 비순환 그래프)로 관리합니다
+- 소셜 네트워크는 BFS 기반 친구 추천을 구현합니다.
+- 패키지 매니저는 의존성 그래프를 정렬합니다.
+- 내비게이션은 최단 경로 계산에 가중치 그래프를 사용합니다.
+- 웹 크롤러는 BFS 방식으로 페이지를 넓게 방문할 수 있습니다.
+- CI/CD 파이프라인은 작업 의존성을 DAG로 표현합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 실무에서는 이렇게 생각합니다
 
-실무에서 그래프를 직접 구현하는 경우는 드뭅니다. NetworkX 같은 라이브러리를 사용하거나, 그래프 데이터베이스(Neo4j)를 활용합니다. 하지만 BFS, DFS, 최단 경로의 원리를 이해하면 라이브러리를 더 효과적으로 사용할 수 있습니다.
+실무에서 그래프를 처음부터 구현하는 일은 드물고, NetworkX 같은 라이브러리나 Neo4j 같은 그래프 데이터베이스를 쓰는 일이 더 흔합니다. 그래도 BFS, DFS, 최단 경로의 내부 원리를 알아야 도구를 제대로 선택하고 병목을 설명할 수 있습니다.
 
-문제를 그래프로 모델링하는 능력이 핵심입니다. "이 문제가 그래프 문제인가?"를 판단하는 것이 풀이보다 어려운 경우가 많습니다.
+결국 그래프 실력의 핵심은 구현보다 모델링입니다. “이 관계를 그래프로 볼 수 있는가?”를 먼저 알아차리면, 해결 전략은 그다음부터 훨씬 빠르게 정리됩니다.
 
 ## 체크리스트
 
 - [ ] 인접 리스트와 인접 행렬의 차이를 설명할 수 있다
 - [ ] BFS와 DFS를 구현할 수 있다
 - [ ] 방향 그래프와 무방향 그래프를 구분할 수 있다
-- [ ] 가중치 그래프에서 Dijkstra를 적용할 수 있다
-- [ ] 그래프 표현 방식을 상황에 맞게 선택할 수 있다
+- [ ] 가중치 그래프에 Dijkstra를 적용할 수 있다
+- [ ] 상황에 맞는 그래프 표현 방식을 선택할 수 있다
+
+## 연습 문제
+
+1. BFS를 사용해 두 노드 사이의 최단 경로(간선 수 기준)를 구하는 함수를 작성해 보세요.
+2. DFS를 사용해 그래프의 연결 요소를 모두 찾는 함수를 작성해 보세요.
+3. 방향 그래프에 사이클이 있는지 감지하는 함수를 작성해 보세요.
 
 ## 정리 및 다음 글 안내
 
-그래프는 관계를 표현하는 범용 자료구조입니다. 인접 리스트와 인접 행렬로 표현하고, BFS와 DFS로 탐색합니다. 다음 글에서는 집합 연산을 효율적으로 수행하는 set을 다룹니다.
+그래프는 관계를 표현하는 범용 자료구조입니다. 인접 리스트와 인접 행렬로 표현할 수 있고, BFS와 DFS로 순회할 수 있으며, 가중치가 붙으면 최단 경로 문제로 확장됩니다. 다음 글에서는 중복 제거와 집합 연산에 강한 set을 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [자료구조란 무엇인가?](./01-what-are-data-structures.md)

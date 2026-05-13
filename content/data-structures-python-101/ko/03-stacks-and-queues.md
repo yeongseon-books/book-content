@@ -2,7 +2,7 @@
 series: data-structures-python-101
 episode: 3
 title: 스택과 큐
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,34 +16,42 @@ tags:
   - Stack
   - Queue
   - deque
-seo_description: Python으로 스택과 큐를 구현하고 실무 활용 패턴을 설명합니다.
-last_reviewed: '2026-05-11'
+seo_description: Python에서 스택과 큐를 효율적으로 구현하는 기준을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 스택과 큐
 
-> Data Structures with Python 101 시리즈 (3/10)
-
+이 글은 Data Structures with Python 101 시리즈의 세 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-스택과 큐는 가장 기본적인 추상 자료형입니다. 함수 호출 스택, 브라우저 뒤로 가기, 작업 큐, BFS 탐색 등 컴퓨터 과학 전반에서 사용됩니다. 이 두 가지를 이해하면 복잡한 알고리즘의 기반을 갖추게 됩니다.
+- 스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?
+- Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?
+- `list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?
+- BFS, undo, 작업 처리 같은 문제에 스택과 큐를 어떻게 연결할 수 있을까요?
 
-> 스택은 "마지막에 넣은 것을 먼저 꺼내는" 구조이고, 큐는 "먼저 넣은 것을 먼저 꺼내는" 구조입니다.
+> 멘탈 모델: 스택과 큐의 핵심은 저장 방식이 아니라 “꺼내는 순서”입니다. LIFO와 FIFO를 구분하는 순간, 어떤 구조를 써야 할지도 거의 자동으로 결정됩니다.
 
-웹 서버의 요청 처리, 메시지 브로커, 실행 취소(undo) 기능 등 실무의 핵심 패턴이 스택과 큐에 기반합니다.
+## 왜 이 글이 중요한가
 
-## 핵심 개념 잡기
+스택과 큐는 가장 기본적인 추상 자료형입니다. 함수 호출 스택, 브라우저 뒤로 가기, 작업 큐, BFS 탐색처럼 운영 코드와 알고리즘 코드의 양쪽에서 모두 반복해서 등장합니다. 이 둘을 정확히 이해하면 더 복잡한 흐름 제어 구조를 훨씬 쉽게 읽을 수 있습니다.
 
-> 스택 = LIFO(Last In, First Out), 큐 = FIFO(First In, First Out)
+> 스택은 마지막에 넣은 값을 먼저 꺼내고, 큐는 먼저 넣은 값을 먼저 꺼냅니다.
 
-```text
-[스택 — LIFO]           [큐 — FIFO]
-  push → │ C │          enqueue → │ A │ B │ C │ → dequeue
-         │ B │                    ↑               ↑
-         │ A │                  뒤(rear)       앞(front)
-         └───┘
-  pop  ← │ C │ (마지막)  dequeue ← │ A │ (처음)
+이 차이는 단순해 보이지만, 실제 코드의 동작 순서를 완전히 바꿉니다. 그래서 구현보다 먼저 순서를 머릿속에 고정하는 것이 중요합니다. 웹 서버의 요청 처리, 메시지 브로커의 작업 소비, undo/redo 기능도 결국 이 원리 위에 올라갑니다.
+
+## 핵심 개념 한눈에 보기
+
+> Stack = LIFO, Queue = FIFO
+
+```
+[Stack — LIFO]            [Queue — FIFO]
+  push -> | C |           enqueue -> | A | B | C | -> dequeue
+          | B |                     ^               ^
+          | A |                   rear            front
+          +---+
+  pop  <- | C | (last)    dequeue <- | A | (first)
 ```
 
 ## 핵심 개념
@@ -52,32 +60,34 @@ last_reviewed: '2026-05-11'
 |------|------|
 | 스택(Stack) | LIFO 원칙으로 동작하는 자료구조입니다 |
 | 큐(Queue) | FIFO 원칙으로 동작하는 자료구조입니다 |
-| push/pop | 스택에 원소를 넣고 꺼내는 연산입니다 |
-| enqueue/dequeue | 큐에 원소를 넣고 꺼내는 연산입니다 |
-| deque | 양쪽 끝에서 O(1) 삽입·삭제가 가능한 자료구조입니다 |
+| push / pop | 스택에 데이터를 넣고 꺼내는 연산입니다 |
+| enqueue / dequeue | 큐에 데이터를 넣고 꺼내는 연산입니다 |
+| deque | 양쪽 끝 삽입·삭제를 O(1)에 제공하는 구조입니다 |
 
 ## Before / After
 
-list로 큐를 구현한 비효율적 코드와 deque를 사용한 효율적 코드를 비교합니다.
+큐처럼 보이는 코드를 list로 구현할 때 생기는 문제를 먼저 보겠습니다.
 
 ```python
-# 개선 전: list로 큐 구현 — pop(0)이 O(n)
+# before: queue with list — pop(0) is O(n)
 queue = [1, 2, 3]
-queue.append(4)       # 뒤에 넣기
-first = queue.pop(0)  # 앞에서 꺼내기 — O(n), 모든 원소 이동
+queue.append(4)       # enqueue
+first = queue.pop(0)  # dequeue — O(n), shifts all elements
 ```
 
 ```python
-# 개선 후: deque로 큐 구현 — popleft()가 O(1)
+# after: queue with deque — popleft() is O(1)
 from collections import deque
 queue = deque([1, 2, 3])
-queue.append(4)           # 뒤에 넣기 — O(1)
-first = queue.popleft()   # 앞에서 꺼내기 — O(1)
+queue.append(4)           # enqueue — O(1)
+first = queue.popleft()   # dequeue — O(1)
 ```
+
+겉보기 기능은 같아도 자료구조가 다르면 비용이 전혀 다릅니다. 큐를 list로 구현하는 실수는 초반에는 티가 안 나지만, 요청량이나 데이터 크기가 커지는 순간 병목으로 드러납니다.
 
 ## 단계별 실습
 
-### Step 1: list로 스택 구현
+### Step 1: Implement a stack with list
 
 ```python
 class Stack:
@@ -89,12 +99,12 @@ class Stack:
 
     def pop(self):
         if self.is_empty():
-            raise IndexError("빈 스택에서 pop 할 수 없습니다")
+            raise IndexError("cannot pop from an empty stack")
         return self._data.pop()
 
     def peek(self):
         if self.is_empty():
-            raise IndexError("빈 스택에서 peek 할 수 없습니다")
+            raise IndexError("cannot peek an empty stack")
         return self._data[-1]
 
     def is_empty(self):
@@ -112,7 +122,7 @@ print(stack.peek())  # "b"
 print(len(stack))    # 2
 ```
 
-### Step 2: deque로 큐 구현
+### Step 2: Implement a queue with deque
 
 ```python
 from collections import deque
@@ -126,12 +136,12 @@ class Queue:
 
     def dequeue(self):
         if self.is_empty():
-            raise IndexError("빈 큐에서 dequeue 할 수 없습니다")
+            raise IndexError("cannot dequeue from an empty queue")
         return self._data.popleft()
 
     def peek(self):
         if self.is_empty():
-            raise IndexError("빈 큐에서 peek 할 수 없습니다")
+            raise IndexError("cannot peek an empty queue")
         return self._data[0]
 
     def is_empty(self):
@@ -148,7 +158,7 @@ print(queue.dequeue())  # "task1"
 print(queue.peek())     # "task2"
 ```
 
-### Step 3: 괄호 짝 검사 — 스택 활용
+### Step 3: Balanced parentheses check — stack in action
 
 ```python
 def is_balanced(text: str) -> bool:
@@ -167,7 +177,7 @@ print(is_balanced("({[})"))    # False
 print(is_balanced("((()"))     # False
 ```
 
-### Step 4: BFS에서 큐 활용
+### Step 4: BFS with a queue
 
 ```python
 from collections import deque
@@ -195,7 +205,7 @@ graph = {
 print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E']
 ```
 
-### Step 5: 성능 비교 — list.pop(0) vs deque.popleft()
+### Step 5: Performance comparison — list.pop(0) vs deque.popleft()
 
 ```python
 import time
@@ -203,67 +213,75 @@ from collections import deque
 
 n = 100_000
 
-# list.pop(0) — 한 번 호출할 때마다 O(n)
+# list.pop(0) — O(n) per operation
 data_list = list(range(n))
 start = time.perf_counter()
 while data_list:
     data_list.pop(0)
 list_time = time.perf_counter() - start
 
-# deque.popleft() — 한 번 호출할 때마다 O(1)
+# deque.popleft() — O(1) per operation
 data_deque = deque(range(n))
 start = time.perf_counter()
 while data_deque:
     data_deque.popleft()
 deque_time = time.perf_counter() - start
 
-print(f"list.pop(0):      {list_time:.4f}초")
-print(f"deque.popleft():  {deque_time:.4f}초")
-print(f"deque가 {list_time / deque_time:.0f}배 빠릅니다")
+print(f"list.pop(0):      {list_time:.4f}s")
+print(f"deque.popleft():  {deque_time:.4f}s")
+print(f"deque is {list_time / deque_time:.0f}x faster")
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- list의 append/pop은 O(1)이므로 스택 구현에 적합합니다
-- deque의 appendleft/popleft도 O(1)이므로 큐 구현에 적합합니다
-- 빈 스택/큐에서 pop하면 에러가 발생하므로 방어 코드가 필요합니다
-- BFS는 큐, DFS는 스택(또는 재귀)을 사용하는 것이 정석입니다
+- stack은 끝 append/pop만 필요하므로 list와 자연스럽게 맞습니다.
+- queue는 앞에서 꺼내는 연산이 핵심이므로 `popleft()`가 O(1)인 deque가 맞습니다.
+- 빈 스택이나 빈 큐에서 값을 꺼내면 예외가 발생하므로 방어 코드가 필요합니다.
+- BFS는 큐, DFS는 스택 또는 재귀라는 연결 고리를 기억해 두면 탐색 알고리즘이 훨씬 잘 읽힙니다.
+
+스택과 큐를 배우는 목적은 클래스를 직접 만드는 데 있지 않습니다. “이 흐름이 역순 처리인가, 순차 처리인가”를 구분하고 그에 맞는 기본 구조를 바로 떠올리는 데 있습니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| list.pop(0)으로 큐 구현 | O(n)이라 대규모 데이터에서 느립니다 | deque.popleft()를 사용합니다 |
-| 빈 스택/큐에서 pop 호출 | IndexError가 발생합니다 | is_empty() 검사 후 pop합니다 |
-| 스택과 큐를 혼동 | 잘못된 순서로 데이터를 처리합니다 | LIFO/FIFO 원칙을 명확히 구분합니다 |
-| deque에 인덱스 접근 남용 | 중간 인덱스 접근은 O(n)입니다 | 양쪽 끝 연산만 사용하고, 중간 접근이 필요하면 list를 사용합니다 |
-| maxlen 설정 없이 무한 큐 사용 | 메모리가 계속 증가합니다 | deque(maxlen=N)으로 크기를 제한합니다 |
+| `list.pop(0)`으로 큐 구현 | 호출마다 O(n)이라 데이터가 커지면 매우 느립니다 | `deque.popleft()`를 사용합니다 |
+| 빈 스택/큐에서 pop 호출 | `IndexError`가 발생합니다 | `is_empty()` 검사나 예외 처리를 추가합니다 |
+| 스택과 큐를 혼동 | 처리 순서가 바뀌어 버그가 생깁니다 | LIFO와 FIFO를 먼저 분리해 생각합니다 |
+| deque에 중간 인덱스 접근 남용 | 중간 접근은 O(n)이라 장점이 사라집니다 | 양끝 연산 중심으로 사용합니다 |
+| 무한히 커지는 큐 사용 | 메모리가 계속 증가합니다 | 필요하면 `deque(maxlen=N)`으로 상한을 둡니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 웹 브라우저의 뒤로/앞으로 기능을 스택 두 개로 구현합니다
-- 실행 취소(undo) 기능을 스택으로 구현합니다
-- 작업 큐(task queue)에서 요청을 FIFO로 처리합니다
-- BFS 탐색에서 방문할 노드를 큐로 관리합니다
-- rate limiter에서 최근 N개 요청을 deque(maxlen=N)으로 추적합니다
+- 브라우저의 뒤로/앞으로 기능은 보통 두 개의 스택으로 모델링합니다.
+- undo 기능은 최근 작업을 스택으로 보관합니다.
+- 작업 큐와 배치 처리기는 FIFO 순서로 요청을 소비합니다.
+- BFS는 방문할 노드를 큐에 넣고 꺼내며 진행합니다.
+- 최근 N개 이벤트만 유지하는 로직은 `deque(maxlen=N)`으로 간결하게 구현합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 실무에서는 이렇게 생각합니다
 
-직접 Stack, Queue 클래스를 만들기보다 list와 deque를 직접 사용하는 경우가 많습니다. 팀 내에서 "이 변수는 스택으로 사용합니다"라는 주석이나 타입 힌트로 의도를 전달합니다.
+현업에서는 Stack, Queue 클래스를 직접 정의하는 경우보다 list와 deque를 바로 사용하는 경우가 많습니다. 대신 변수 이름, 주석, 타입 힌트로 “이 구조를 스택처럼 쓴다”는 의도를 드러냅니다.
 
-대규모 시스템에서는 in-memory 큐 대신 Redis, RabbitMQ, Kafka 같은 메시지 큐를 사용합니다. 하지만 기본 원리는 동일합니다. deque로 큐의 동작을 이해하면 메시지 큐 시스템도 쉽게 파악할 수 있습니다.
+규모가 커지면 in-memory 큐 대신 Redis, RabbitMQ, Kafka 같은 외부 시스템으로 넘어갑니다. 그래도 기본 원리는 바뀌지 않습니다. deque로 FIFO를 이해해 두면 메시지 큐 시스템도 같은 눈으로 읽을 수 있습니다.
 
 ## 체크리스트
 
 - [ ] 스택(LIFO)과 큐(FIFO)의 차이를 설명할 수 있다
 - [ ] list로 스택을 구현할 수 있다
 - [ ] deque로 큐를 구현할 수 있다
-- [ ] 괄호 짝 검사를 스택으로 풀 수 있다
-- [ ] list.pop(0)이 deque.popleft()보다 느린 이유를 설명할 수 있다
+- [ ] 괄호 짝 검사 문제를 스택으로 풀 수 있다
+- [ ] `list.pop(0)`이 `deque.popleft()`보다 느린 이유를 설명할 수 있다
+
+## 연습 문제
+
+1. 두 개의 스택으로 큐를 구현해 보세요. `enqueue`, `dequeue`, `peek`를 모두 포함해야 합니다.
+2. 스택을 사용해 문자열을 뒤집는 함수를 작성해 보세요.
+3. `deque(maxlen=5)`를 만들고 10개의 값을 넣어 본 뒤 어떤 값이 남는지 확인해 보세요.
 
 ## 정리 및 다음 글 안내
 
-스택은 LIFO, 큐는 FIFO 원칙으로 동작합니다. Python에서 스택은 list, 큐는 deque로 구현하는 것이 표준입니다. 다음 글에서는 O(1) 검색을 가능하게 하는 해시 테이블과 dict를 다룹니다.
+스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [자료구조란 무엇인가?](./01-what-are-data-structures.md)
