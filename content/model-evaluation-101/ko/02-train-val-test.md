@@ -1,8 +1,8 @@
 ---
 series: model-evaluation-101
 episode: 2
-title: train/validation/test
-status: content-ready
+title: 훈련·검증·테스트 데이터 나누기
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,20 +16,38 @@ tags:
   - DataLeakage
   - CrossValidation
   - scikit-learn
-seo_description: train/validation/test의 역할 분리, 데이터 누수와 누설 방지, 시계열 분할까지 코드와 함께 정리한 글
-last_reviewed: '2026-05-11'
+seo_description: 데이터 분할과 누수 방지 원칙을 실습 코드와 함께 정리합니다
+last_reviewed: '2026-05-12'
 ---
 
-# train/validation/test
+# 훈련·검증·테스트 데이터 나누기
 
-> Model Evaluation 101 시리즈 (2/10)
+모델 성능은 지표를 계산하는 순간보다 데이터를 나누는 순간에 이미 상당 부분 결정됩니다. 분할이 잘못되면 이후에 나오는 모든 점수는 그럴듯해 보여도 신뢰할 수 없습니다. 특히 전처리를 먼저 해 버리거나, 시계열 데이터를 무작위로 섞거나, 같은 사용자가 여러 세트에 동시에 들어가면 성능은 쉽게 부풀려집니다.
 
+그래서 train, validation, test의 역할 분리는 단순한 교과서 규칙이 아닙니다. 어떤 데이터로 학습하고, 어떤 데이터로 고르고, 어떤 데이터로 최종 확인할지 구분하는 훈련이 평가의 바닥을 만듭니다.
+
+이 글은 Model Evaluation 101 시리즈의 2번째 글입니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
-잘못된 분할은 측정을 무효로 만들고, 모든 모델 비교를 오해로 바꿉니다.
+- train, validation, test는 각각 무엇을 맡아야 할까요?
+- 왜 validation과 test를 같은 용도로 쓰면 안 될까요?
+- 데이터 누수는 어떤 경로로 가장 자주 들어올까요?
+- 시계열 데이터는 왜 무작위 분할이 위험할까요?
+- 같은 사용자나 문서가 여러 세트에 섞이는 문제는 어떻게 막을까요?
 
-## 전체 흐름
+> 훈련은 맞추기 위한 단계이고, 검증은 고르기 위한 단계이며, 테스트는 마지막으로 한 번만 진실을 확인하는 단계입니다. 이 세 역할이 섞이는 순간 평가는 무너집니다.
+
+## 왜 이 글이 중요한가
+
+분할 전략이 잘못되면 비교 자체가 불가능해집니다. 두 모델 중 하나가 더 좋아 보이더라도, 그 차이가 모델의 힘인지 누수의 부산물인지 알 수 없기 때문입니다. 평가가 아니라 착시가 되는 셈입니다.
+
+실무에서는 특히 세 가지 누수가 자주 나옵니다. 전체 데이터에 스케일러를 먼저 맞추는 전처리 누수, 미래 정보를 과거 학습에 흘려보내는 시계열 누수, 같은 사용자나 문서가 서로 다른 분할에 등장하는 그룹 누수입니다. 이 셋을 막는 것만으로도 평가의 질이 크게 올라갑니다.
+
+## 한눈에 보는 멘탈 모델
+
 ```mermaid
 flowchart LR
     All["all data"] --> Tr["train (fit)"]
@@ -37,13 +55,23 @@ flowchart LR
     All --> Te["test (final)"]
 ```
 
-## Before/After
+먼저 나누고, 그다음 학습해야 합니다. 전처리 역시 같은 원칙을 따릅니다. 나누기 전에 전체를 들여다보며 통계를 맞추는 순간, 답이 조금씩 새어 들어갑니다.
 
-**Before**: *“전체에 fit, 일부 score”*.
+## 핵심 용어
 
-**After**: *세 분할* + *분할 후 전처리*.
+- **훈련 세트(train)**: 모델 파라미터를 학습하는 데이터입니다.
+- **검증 세트(validation)**: 하이퍼파라미터를 조정하고 모델을 고르는 데이터입니다.
+- **테스트 세트(test)**: 최종 성능을 마지막으로 확인하는 데이터입니다.
+- **누수(leakage)**: 정답이나 미래 정보가 부적절하게 학습 과정으로 스며드는 현상입니다.
+- **그룹 분할(group split)**: 같은 개체가 서로 다른 분할에 동시에 나오지 않도록 막는 방식입니다.
 
-## 5단계 분할 패턴
+## 분할을 잘못 볼 때와 제대로 볼 때
+
+잘못된 방식은 전체 데이터를 다 본 뒤 일부를 떼어 점수를 확인하는 흐름입니다. 이 방법은 빠르지만, 실제로는 평가 기준을 스스로 흐리게 만듭니다. 반대로 제대로 된 방식은 train, validation, test를 분리하고, 전처리와 학습도 분할 이후에만 수행하는 것입니다.
+
+이 차이는 점수 한두 자리보다 더 중요합니다. 분할 원칙이 지켜져야 이후의 정확도, F1, AUC도 해석할 수 있습니다.
+
+## 다섯 가지 분할 패턴 실습
 
 ### 1단계 — 기본 분할
 
@@ -60,8 +88,8 @@ print(Xtr.shape, Xva.shape, Xte.shape)
 
 ```python
 from sklearn.preprocessing import StandardScaler
-sc_bad = StandardScaler().fit(X)  # 누수: 전체 데이터 사용
-sc_ok = StandardScaler().fit(Xtr)  # 올바른 방식
+sc_bad = StandardScaler().fit(X)
+sc_ok = StandardScaler().fit(Xtr)
 ```
 
 ### 3단계 — 시계열 분할
@@ -93,45 +121,45 @@ m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
 print("valid:", m.score(sc.transform(Xva), yva))
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- *전체에 fit* 하면 *통계 누수*.
-- 시계열 데이터는 시간 순서를 유지해야 합니다.
-- 그룹 분할은 동일 ID를 분리합니다.
+두 번째 코드가 이 글의 핵심입니다. 전체 데이터에 `StandardScaler`를 맞추면 훈련 전에 이미 검증과 테스트의 통계를 본 셈이 됩니다. 아주 작은 정보 누수처럼 보여도 비교가 반복될수록 성능은 부풀려집니다.
 
-## 자주 하는 실수 5가지
+세 번째와 네 번째 코드는 분할 방식이 데이터 성격에 따라 달라져야 한다는 점을 보여 줍니다. 시간 순서가 중요한 데이터는 과거에서 미래로 가야 하고, 같은 사용자가 여러 샘플로 나뉜 데이터는 그룹 단위로 묶어야 합니다.
 
-1. ***test 로 튜닝*.**
-2. ***시계열 무작위 분할*.**
-3. ***그룹 누수* 방치.**
-4. **스케일러를 전체 데이터에 fit합니다.**
-5. ***valid 없이* *test 로* *반복 비교*.**
+## 자주 헷갈리는 지점
 
-## 실무에서는 이렇게 쓰입니다
+많이 나오는 오해는 탐색적 데이터 분석도 금지라고 생각하는 것입니다. 분할 전에 데이터를 이해하는 일은 괜찮습니다. 문제는 전처리의 `fit`이나 기준선 결정이 분할 전 전체 데이터를 먹는 순간입니다.
 
-추천(시간 기반), 의료(환자 그룹), 금융(고객 그룹) — *분할 전략* 이 *실서비스 성능* 의 80%.
+또 다른 오해는 테스트 세트를 자주 봐도 괜찮다는 생각입니다. 하지만 테스트를 반복해서 확인하는 순간 그 세트는 더 이상 최종 검증 세트가 아닙니다. 검증 세트와 같은 역할로 전락합니다.
 
-## 체크리스트
+## 실무에서는 이렇게 생각한다
 
-- [ ] *세 분할* 을 사용한다.
-- [ ] 전처리는 분할 후에 fit합니다.
-- [ ] 시계열 데이터는 시간 기준으로 분할합니다.
-- [ ] 그룹 정보를 명시합니다.
+강한 팀은 분할 전략을 모델보다 먼저 리뷰합니다. 추천 시스템이면 사용자나 세션 누수를 먼저 의심하고, 금융 데이터면 시간 순서를 먼저 확인합니다. 모델 구조를 바꾸는 것보다 분할 원칙을 바로잡는 편이 더 큰 차이를 내는 경우도 많습니다.
 
-## 정리 및 다음 단계
+또한 각 세트의 역할을 문서로 남깁니다. 무엇이 튜닝용이고 무엇이 최종 보고용인지 분명하지 않으면, 시간이 지난 뒤 누구나 테스트 점수를 다시 쓰고 싶어집니다. 평가의 엄격함은 기억이 아니라 규칙에서 나옵니다.
 
-분할 전략은 *모든 측정의 전제* 입니다. 다음 글에서는 *Accuracy 의 한계* 를 다룹니다.
+## 점검 목록
+
+- [ ] train, validation, test를 분리해 사용합니다.
+- [ ] 전처리 `fit`은 분할 이후에만 수행합니다.
+- [ ] 시계열 데이터는 시간 순서를 지켜 분할합니다.
+- [ ] 그룹 정보가 있으면 명시적으로 분리합니다.
+
+## 정리
+
+데이터 분할은 평가의 준비 단계가 아니라 평가 그 자체의 일부입니다. train은 학습, validation은 선택, test는 최종 확인이라는 역할을 끝까지 지켜야 점수가 의미를 가집니다. 다음 글에서는 이렇게 준비된 평가 위에서 정확도라는 지표가 어디까지 유효한지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [모델 평가는 왜 어려운가?](./01-why-evaluation-is-hard.md)
-- **train/validation/test (현재 글)**
-- Accuracy의 한계 (예정)
-- Precision과 Recall (예정)
-- F1 Score (예정)
-- ROC와 AUC (예정)
-- Calibration (예정)
-- Cross Validation (예정)
-- Error Analysis (예정)
+- **훈련·검증·테스트 데이터 나누기 (현재 글)**
+- 정확도의 한계 (예정)
+- 정밀도와 재현율 (예정)
+- F1 점수 (예정)
+- ROC와 AUC 이해하기 (예정)
+- 확률 보정 이해하기 (예정)
+- 교차 검증 이해하기 (예정)
+- 오류 분석으로 약점 찾기 (예정)
 - 평가 리포트 만들기 (예정)
 <!-- toc:end -->
 
@@ -140,6 +168,6 @@ print("valid:", m.score(sc.transform(Xva), yva))
 - [scikit-learn — Cross-validation](https://scikit-learn.org/stable/modules/cross_validation.html)
 - [scikit-learn — TimeSeriesSplit](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)
 - [Forecasting: Principles and Practice — Hyndman](https://otexts.com/fpp3/)
-- [Google — Data leakage](https://developers.google.com/machine-learning/guides/rules-of-ml)
+- [Google — Rules of ML](https://developers.google.com/machine-learning/guides/rules-of-ml)
 
 Tags: ModelEvaluation, TrainValTest, DataLeakage, CrossValidation, scikit-learn
