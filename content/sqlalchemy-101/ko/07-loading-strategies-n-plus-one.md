@@ -17,21 +17,31 @@ tags:
 - N+1
 - selectinload
 - SQLite
-last_reviewed: '2026-05-11'
-seo_description: '"관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다.'
+last_reviewed: '2026-05-12'
+seo_description: lazy, joinedload, selectinload와 N+1 문제를 언제 어떻게 다루는지 설명합니다
 ---
 
 # 로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가
 
-ORM이 가장 많이 욕을 먹는 지점은 늘 같습니다. "왜 SELECT가 100번 나가나요?" 답은 보통 N+1 쿼리 패턴입니다. Ep6에서 다룬 `relationship`은 기본적으로 lazy 로딩으로 동작하기 때문에, 부모 컬렉션 안의 N개 객체에 대해 자식 속성을 접근하면 자식을 가져오는 SELECT가 N번 추가로 발사됩니다. 이번 글에서는 N+1이 실제로 어떻게 만들어지는지 echo 로그로 직접 확인하고, `joinedload`, `selectinload`, `raiseload` 같은 도구로 어떻게 막거나 노출시키는지 정리합니다.
+ORM이 가장 자주 비판받는 이유는 대개 쿼리 횟수가 눈에 보이지 않는다는 점입니다. 코드 한 줄은 단순해 보이는데 실제로는 SELECT가 수십 번 더 나가는 경우가 많고, 그 대표적인 패턴이 N+1입니다.
 
-이 글은 SQLAlchemy 101 시리즈의 일곱 번째 글입니다.
+이 글은 SQLAlchemy 101 시리즈의 일곱 번째 글입니다. 여기서는 lazy 로딩이 N+1을 어떻게 만들고, `joinedload`, `selectinload`, `raiseload`를 어떤 기준으로 선택해야 하는지 설명합니다.
+
+6편에서 관계를 정의했다면 이제 그 관계를 어떤 SQL 패턴으로 읽을지 결정해야 합니다. 관계 정의가 객체 그래프의 뼈대라면, 로딩 전략은 그 그래프를 얼마나 비싸게 읽을지 결정하는 실행 계획에 가깝습니다.
 
 ![로딩 전략과 N+1 문제 - lazy/joined/selectin 선택 기준](../../../assets/sqlalchemy-101/07/07-01-loading-strategies-and-the-n-1-problem-w.ko.png)
 
 *로딩 전략과 N+1 문제 - lazy/joined/selectin 선택 기준*
 
 ## 이 글에서 다룰 문제
+
+- 기본 lazy 로딩은 어떤 상황에서 N+1을 만들까요?
+- `joinedload`와 `selectinload`는 각각 어떤 쿼리를 추가로 만들까요?
+- 컬렉션 관계에서는 왜 `selectinload`가 더 자주 권장될까요?
+- `raiseload`는 개발 단계에서 어떤 회귀를 빨리 드러낼까요?
+- 응답 직전의 lazy 로딩이 왜 운영 장애로 이어지기 쉬울까요?
+
+## 왜 중요한가
 
 ![핵심 개념](../../../assets/sqlalchemy-101/07/07-02-why-it-matters.ko.png)
 
@@ -42,13 +52,13 @@ ORM의 lazy 로딩은 코드 가독성을 높여 줍니다. `user.orders`라고 
 - 게시글 목록 50건과 각 게시글의 태그를 보여 주는 응답: 1 + 50 = 51 SELECT.
 - 운영 모니터링 도구가 "이 엔드포인트는 평균 80개 쿼리를 사용합니다"라고 경고를 보내는 시점이 N+1을 알아차리는 가장 흔한 순간입니다.
 
-이 패턴은 디스크 IO나 네트워크 round-trip 비용이 누적되어, 단일 쿼리로 처리하면 5ms일 작업이 800ms로 늘어나는 식의 회귀를 만듭니다. 그리고 SQLite처럼 단일 파일 기반 엔진에서도 락 경합과 트랜잭션 크기에 영향을 주기 때문에 지역 개발 환경에서도 무시할 수 없는 문제입니다.
+이 패턴은 디스크 IO나 네트워크 왕복 비용이 누적되어, 단일 쿼리로 처리하면 5ms일 작업이 800ms로 늘어나는 식의 회귀를 만듭니다. 그리고 SQLite처럼 단일 파일 기반 엔진에서도 락 경합과 트랜잭션 크기에 영향을 주기 때문에 지역 개발 환경에서도 영향이 큽니다.
 
-## Mental Model
+## 멘탈 모델
 
 ![Mental model](../../../assets/sqlalchemy-101/07/07-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 > "관계 속성에 처음 접근하면 SELECT가 한 번 발사된다." 이 한 문장이 lazy 로딩의 전부입니다. N+1은 이 한 문장이 N번 반복될 때 일어납니다. `joinedload`는 부모 SELECT에 LEFT JOIN을 붙여 한 번에 가져오는 전략, `selectinload`는 부모를 먼저 가져온 뒤 자식들을 IN(...) 한 방으로 가져오는 전략입니다.
 
 ```text
@@ -146,9 +156,9 @@ for u in users:
 
 또는 모델 정의 단계에서 `relationship(..., lazy="raise")`로 설정해 두면 해당 관계에 한해 항상 eager 로딩을 강제할 수 있습니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: lazy 로딩으로 N+1 발생
+### 이전: lazy 로딩으로 N+1 발생
 
 ```python
 with Session(engine) as session:
@@ -160,7 +170,7 @@ with Session(engine) as session:
 # echo 결과: SELECT users 1번 + SELECT orders WHERE user_id = ? 50번 = 51 SELECT
 ```
 
-### After: selectinload 한 줄 추가
+### 개선 후: selectinload 한 줄 추가
 
 ```python
 with Session(engine) as session:

@@ -1,5 +1,5 @@
 ---
-title: 'ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기'
+title: 'ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기'
 series: sqlalchemy-101
 episode: 6
 language: ko
@@ -17,21 +17,31 @@ tags:
 - relationship
 - back_populates
 - SQLite
-last_reviewed: '2026-05-11'
-seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객체 레벨의 탐색 통로입니다.
+last_reviewed: '2026-05-12'
+seo_description: relationship과 back_populates로 양방향 ORM 관계를 안전하게 모델링하는 방법을 설명합니다
 ---
 
-# ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기
+# ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기
 
-데이터베이스에서 가장 많이 다루는 작업 중 하나는 "관련된 행을 함께 가져오는 것"입니다. 사용자 한 명의 주문 목록, 게시글 한 건의 댓글, 태그가 여러 개 달린 글. SQL에서는 JOIN으로 처리하지만, ORM에서는 객체의 속성 접근(`user.orders`)으로 자연스럽게 표현됩니다. 그 다리를 놓는 도구가 `relationship()`이고, 양방향 탐색을 모순 없이 잇는 장치가 `back_populates`입니다. 이번 글에서는 일대다, 다대일, 다대다 관계를 차례로 정의하고, 양쪽이 같은 데이터를 가리키도록 안전하게 동기화하는 패턴을 정리합니다.
+관계형 데이터베이스를 다룬다면 결국 "연결된 행을 함께 읽고 함께 수정하는 문제"를 피할 수 없습니다. SQL에서는 JOIN으로 풀지만, ORM에서는 객체 그래프를 어떻게 안전하게 표현하느냐가 더 중요한 질문이 됩니다.
 
-이 글은 SQLAlchemy 101 시리즈의 여섯 번째 글입니다.
+이 글은 SQLAlchemy 101 시리즈의 여섯 번째 글입니다. 여기서는 `relationship()`과 `back_populates`를 이용해 일대다, 다대일, 다대다 관계를 어떻게 정의하는지 정리합니다.
 
-![ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
+중요한 점은 외래키와 관계 속성이 같은 역할이 아니라는 사실입니다. `ForeignKey`는 SQL 레벨의 참조를, `relationship()`은 Python 객체 레벨의 탐색을 맡습니다. 둘이 어떻게 맞물리는지 이해해야 이후 로딩 전략과 cascade 정책도 덜 헷갈립니다.
 
-*ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기*
+![ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기](../../../assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.ko.png)
+
+*ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기*
 
 ## 이 글에서 다룰 문제
+
+- `ForeignKey`와 `relationship()`은 왜 항상 한 쌍처럼 이해해야 할까요?
+- `back_populates`와 `backref`는 어떤 기준으로 선택할까요?
+- 컬렉션 조작, flush, SQL 실행 시점은 어떻게 연결될까요?
+- 다대다에서는 association table과 association object 중 언제 갈릴까요?
+- cascade 설정이 빠지면 어떤 고아 데이터 문제가 생길까요?
+
+## 왜 중요한가
 
 ![핵심 개념](../../../assets/sqlalchemy-101/06/06-02-why-it-matters.ko.png)
 
@@ -45,11 +55,11 @@ seo_description: ForeignKey는 SQL 레벨의 참조이고, relationship()은 객
 
 관계는 도메인 모델의 골격입니다. 처음에 깔끔하게 잡아 두면 이후 SELECT 패턴 최적화(Ep7), 마이그레이션, 테스트 fixture까지 모두 단순해집니다.
 
-## Mental Model
+## 멘탈 모델
 
 ![Mental model](../../../assets/sqlalchemy-101/06/06-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 > `ForeignKey`는 SQL 레벨의 참조이고, `relationship()`은 객체 레벨의 탐색 통로입니다. `back_populates`는 양방향 통로의 두 끝을 연결해 "한쪽에서 바뀐 컬렉션이 다른 쪽에서도 즉시 반영"되게 만드는 장치입니다.
 
 ```text
@@ -190,9 +200,9 @@ class User(Base):
 
 가장 흔한 실수는 부모-자식 모델에서 cascade를 빼두는 것입니다. 부모를 삭제했는데 자식이 살아남아 외래키 무결성 오류로 SQL이 실패하는 경우가 잦습니다. SQLite에서는 별도로 `PRAGMA foreign_keys=ON`을 켜야 외래키 제약 자체가 동작한다는 점도 함께 기억해 두십시오 (Ep2).
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: ForeignKey만 두고 객체 탐색을 손으로 처리
+### 이전: ForeignKey만 두고 객체 탐색을 손으로 처리
 
 ```python
 def get_user_orders(session, user_id):
@@ -203,7 +213,7 @@ def get_user_orders(session, user_id):
 
 매번 새 SELECT를 작성해야 하고, 부모-자식 관계가 코드에 드러나지 않습니다.
 
-### After: relationship으로 객체 그래프 표현
+### 개선 후: relationship으로 객체 그래프 표현
 
 ```python
 def get_user_orders(session, user_id):

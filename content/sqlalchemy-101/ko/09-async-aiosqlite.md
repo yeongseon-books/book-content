@@ -17,26 +17,30 @@ tags:
 - aiosqlite
 - AsyncSession
 - SQLite
-last_reviewed: '2026-05-11'
-seo_description: async SQLAlchemy는 기존 ORM의 얇은 awaitable wrapper입니다.
+last_reviewed: '2026-05-12'
+seo_description: AsyncSession과 aiosqlite를 써서 비동기 SQLAlchemy를 안전하게 다루는 방법을 설명합니다
 ---
 
 # 비동기 SQLAlchemy: aiosqlite와 AsyncSession
 
-async SQLAlchemy는 기존 ORM 위에 얇은 awaitable wrapper를 올린 구조입니다. 여기서는 AsyncSession과 aiosqlite를 쓸 때 동기 코드와 무엇이 같고 무엇이 달라지는지 짚습니다.
+비동기 웹 애플리케이션으로 넘어가면 같은 ORM 코드라도 더 엄격한 규칙이 생깁니다. 동기 코드에서 "그냥 속성 접근"처럼 보이던 lazy 로딩이 비동기 컨텍스트에서는 곧바로 오류가 되기 때문입니다.
 
-이 글은 SQLAlchemy 101 시리즈의 아홉 번째 글입니다.
+이 글은 SQLAlchemy 101 시리즈의 아홉 번째 글입니다. 여기서는 `AsyncSession`, `async_sessionmaker`, `aiosqlite`를 기준으로 비동기 SQLAlchemy의 사용 패턴을 정리합니다.
+
+중요한 점은 동기 ORM과 완전히 다른 제품을 배우는 것이 아니라, 거의 같은 API를 더 명시적인 IO 규칙 위에서 다시 읽는 일이라는 사실입니다. 어디에서 `await`가 필요하고, 왜 eager loading이 더 중요해지는지를 이번 글에서 정리합니다.
 
 ![비동기 SQLAlchemy: aiosqlite와 AsyncSession](../../../assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.ko.png)
 
 *비동기 SQLAlchemy: aiosqlite와 AsyncSession*
-## 핵심 질문
-
-비동기 SQLAlchemy와 AsyncSession을 어떻게 써야 동시성 사고를 피할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 비동기 SQLAlchemy의 핵심 결정과 운영 함정을 살펴봅니다.
-
 ## 이 글에서 다룰 문제
+
+- `create_async_engine`과 `AsyncSession`은 동기 버전과 무엇이 같고 무엇이 다를까요?
+- URL에 `sqlite+aiosqlite` 같은 비동기 드라이버 표기는 왜 중요할까요?
+- async 환경에서는 왜 암묵적 IO를 피해야 할까요?
+- lazy 로딩이 `MissingGreenlet` 같은 오류로 이어지는 이유는 무엇일까요?
+- FastAPI 같은 프레임워크와 붙일 때 세션 수명은 어떻게 잡아야 할까요?
+
+## 왜 중요한가
 
 ![핵심 개념](../../../assets/sqlalchemy-101/09/09-02-why-this-matters.ko.png)
 
@@ -45,14 +49,14 @@ FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy
 
 다만 async가 동기와 달리 신경 써야 할 지점이 몇 군데 있습니다. 특히 lazy loading은 동기에서는 추가 SELECT 한 번이지만 async에서는 "동기 IO를 비동기 컨텍스트에서 호출"하는 형태가 돼 즉시 예외가 됩니다. 이 글에서 그 차이를 확실히 짚습니다.
 
-## Mental Model
+## 멘탈 모델
 
 ![Mental model](../../../assets/sqlalchemy-101/09/09-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 > async SQLAlchemy는 **기존 ORM의 얇은 awaitable wrapper**입니다. 내부적으로 동기 ORM을 thread pool 위에서 돌리지 않고, greenlet 기반 어댑터로 동기 호출을 비동기 경계에 노출합니다. 그래서 API는 거의 같지만, "암묵적 IO"가 일어날 자리는 모두 명시적 `await`이 필요합니다.
 
-핵심은 두 가지입니다.
+여기서 먼저 볼 점은 두 가지입니다.
 
 - **명시적 IO**: `select`, `insert`, `update`, `delete`는 모두 `await session.execute(...)` 또는 `await session.scalars(...)`로 호출합니다.
 - **암묵적 IO 차단**: lazy load 같은 "내가 모르는 사이 일어나는 SQL"은 async에서는 거의 다 에러로 바뀝니다. 그래서 eager loading 전략이 더 강하게 요구됩니다.
@@ -84,7 +88,7 @@ FastAPI, Starlette, aiohttp 같은 async 프레임워크에서 동기 SQLAlchemy
 
 async에서는 `obj.posts` 같은 lazy 접근이 동기 SQL을 호출하므로, SQLAlchemy가 `MissingGreenlet` 류 에러를 던집니다. async에서는 7편의 `selectinload`/`joinedload`가 "선택"이 아니라 "기본 전략"이 됩니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
 동기 코드를 async로 옮기는 1대1 매핑입니다.
 

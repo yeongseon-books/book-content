@@ -17,35 +17,30 @@ tags:
 - MetaData
 - Schema
 - SQLite
-last_reviewed: '2026-05-11'
-seo_description: MetaData는 schema의 카탈로그입니다. application이 알고 있는 모든 Table 정의를 담아 두는
-  컨테이너이고, 그…
+last_reviewed: '2026-05-12'
+seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모델링하는 방법을 설명합니다
 ---
 
 # SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기
 
-MetaData는 application이 알고 있는 모든 Table 정의를 모아 두는 schema 카탈로그입니다. 여기서는 그 구조가 SQLAlchemy Core의 출발점이 되는 이유를 정리합니다.
+테이블 설계를 문자열 SQL로만 관리하면 애플리케이션 코드와 실제 스키마가 언제 어긋났는지 늦게 알아차리기 쉽습니다. 컬럼 이름 하나를 바꿨는데 런타임에서야 `no such column`이 터지는 식입니다.
 
-이 글은 SQLAlchemy 101 시리즈의 두 번째 글입니다.
+이 글은 SQLAlchemy 101 시리즈의 두 번째 글입니다. 여기서는 `MetaData`, `Table`, `Column`, 타입 시스템을 통해 스키마를 Python 객체로 다루는 방법을 정리합니다.
 
-> SQLAlchemy 101 시리즈 (2/10)
-
----
-
-1편에서 우리는 Engine과 Connection이 무엇인지, 그리고 raw SQL을 `text()`로 어떻게 실행하는지 보았습니다. 그런데 raw SQL만 쓸 거라면 SQLAlchemy를 쓰는 의미가 절반쯤 사라집니다. SQLAlchemy의 진짜 매력은 schema 자체를 Python 객체로 표현하고, 그 객체로 SQL을 빌드하고, 동일한 schema 정의로 여러 데이터베이스를 지원하는 데 있습니다.
-
-이 글은 SQLAlchemy Core의 핵심인 `MetaData`, `Table`, `Column`, 그리고 type system을 다룹니다. 여기서 만들어 둔 schema 객체는 3편의 select/insert/update/delete의 재료가 되고, 4편 이후 ORM의 `mapped_column`으로 자연스럽게 이어집니다. ORM만 쓸 사람이라도 이 layer를 이해해야 migration이나 reflection 같은 도구를 다룰 수 있습니다.
+1편에서 `Engine`과 `Connection`이 실행 경로를 맡는다는 점을 봤다면, 이번에는 그 위에 올릴 스키마 명세를 다룹니다. 이 객체들은 3편의 `select`와 `insert`의 재료가 되고, 4편 이후 ORM 모델이 어떤 Core 구조 위에 올라가는지도 자연스럽게 이어 줍니다.
 
 ![SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기](../../../assets/sqlalchemy-101/02/02-01-sqlalchemy-core-modeling-schema-as-pytho.ko.png)
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
-## 핵심 질문
-
-Core의 MetaData·Table·Column을 왜 ORM 이전에 익혀야 할까요?
-
-이 글은 그 질문에 답하기 위해 Core 스키마 모델의 핵심 결정과 운영 함정을 살펴봅니다.
-
 ## 이 글에서 다룰 문제
+
+- `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
+- `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
+- SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
+- `create_all`, `drop_all`, reflection은 언제 유용할까요?
+- `ForeignKey`, 제약 조건, 인덱스를 Core에서 어떻게 선언해야 할까요?
+
+## 왜 중요한가
 
 ![핵심 개념](../../../assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
 
@@ -58,11 +53,11 @@ SQLAlchemy Core는 schema를 Python 객체로 들고 있기 때문에 그 객체
 
 마지막으로 `MetaData`는 Alembic의 `target_metadata`로 그대로 들어가서 migration 자동 생성의 기준이 됩니다. 이 글의 schema 정의가 alembic-101 시리즈의 출발점이 됩니다.
 
-## Mental Model
+## 멘탈 모델
 
 ![Mental model](../../../assets/sqlalchemy-101/02/02-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 `MetaData`는 schema의 **카탈로그**입니다. application이 알고 있는 모든 `Table` 정의를 담아 두는 컨테이너이고, 그 컨테이너를 통째로 Engine에 던지면 schema가 만들어지거나 비교됩니다.
 
 > MetaData는 application의 schema 명세서다. Table은 그 명세서의 한 페이지이고, Column은 페이지 안의 한 줄이다. Engine이 없으면 MetaData는 그저 in-memory 명세서일 뿐이고, MetaData가 없으면 Engine은 무엇을 만들어야 할지 알지 못한다.
@@ -254,9 +249,9 @@ print([c.name for c in users.columns])
 
 전체 schema를 한 번에 reflect하려면 `metadata.reflect(bind=engine)`을 씁니다. legacy 데이터베이스를 점진적으로 SQLAlchemy로 옮길 때 유용합니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: 문자열 SQL로 schema 관리
+### 이전: 문자열 SQL로 스키마 관리
 
 ```python
 DDL = """
@@ -277,7 +272,7 @@ conn.execute(text("INSERT INTO users(name, emai, created_at) VALUES (:n, :e, :c)
 # typo (emai)는 런타임에 OperationalError로 발견된다.
 ```
 
-### After: MetaData + Table
+### 개선 후: MetaData + Table
 
 ```python
 from sqlalchemy import MetaData, Table, Column, Integer, String, DateTime, insert
@@ -445,13 +440,13 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 - [ ] `MetaData`를 module-level 단일 instance로 두었다
 - [ ] `naming_convention`을 첫 단계부터 적용했다
 - [ ] 모든 `Column`에 `nullable` 의도를 명시했다
-- [ ] `String(n)` vs `Text` 선택 기준을 가지고 있다 (길이 제한 의도 vs 무제한)
+- [ ] `String(n)` vs `Text` 선택 기준이 분명하다 (길이 제한 의도 vs 무제한)
 - [ ] `default`와 `server_default` 중 하나만 사용한다
 - [ ] SQLite에서 `ForeignKey(ondelete=...)`를 쓸 때 `PRAGMA foreign_keys = ON`을 함께 적용했다
 - [ ] 복합 제약은 `UniqueConstraint`/`Index`로 명시적으로 선언했다
 - [ ] 필요시 `autoload_with=engine`으로 reflection이 가능하다는 것을 안다
 
-## 정리·다음 글
+## 정리와 다음 글
 
 이 글에서 우리는 SQLAlchemy Core의 schema layer를 만났습니다. `MetaData`는 application 전체 schema의 카탈로그이고, `Table`/`Column`은 그 카탈로그의 항목이며, generic type system은 SQLite의 affinity 모델 위에서 동작합니다. `create_all`/`drop_all`로 빠르게 schema를 부트스트랩할 수 있고, reflection으로 기존 데이터베이스를 SQLAlchemy 세계로 끌어올 수 있습니다.
 

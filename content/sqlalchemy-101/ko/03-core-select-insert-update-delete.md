@@ -17,34 +17,30 @@ tags:
 - SQL Expression
 - Result
 - SQLite
-last_reviewed: '2026-05-11'
-seo_description: 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다.
+last_reviewed: '2026-05-12'
+seo_description: select, insert, update, delete를 SQLAlchemy 2.x Core 스타일로 설명합니다
 ---
 
 # SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기
 
-2.x style의 SQL은 절(clause)을 메서드 chaining으로 쌓아 올리는 방식으로 읽는 편이 가장 정확합니다. 여기서는 그 조립 규칙이 select·insert·update·delete에 어떻게 이어지는지 봅니다.
+SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL을 붙여 넣는 순간이 아니라, 스키마 객체를 바탕으로 쿼리를 조립하기 시작하는 순간입니다. 이 단계부터 컬럼 이름, 조건식, 결과 처리 방식이 더 예측 가능해집니다.
 
-이 글은 SQLAlchemy 101 시리즈의 세 번째 글입니다.
+이 글은 SQLAlchemy 101 시리즈의 세 번째 글입니다. 여기서는 `select()`, `insert()`, `update()`, `delete()`와 `Result` 객체를 2.x 스타일 기준으로 정리합니다.
 
-> SQLAlchemy 101 시리즈 (3/10)
-
----
-
-2편에서 우리는 `MetaData`와 `Table`로 schema를 Python 객체로 만들었습니다. 이제 그 객체로 실제 SQL을 빌드할 차례입니다. raw `text()`만으로도 SQL을 실행할 수는 있지만, Core SQL expression의 진가는 Python으로 SQL을 조립하면서 컴파일 단계에서 typo와 type 오류를 잡고, dialect 차이에 흔들리지 않게 만드는 데 있습니다.
-
-이 글은 SQLAlchemy 2.x style의 `select()`, `insert()`, `update()`, `delete()`와 결과를 다루는 `Result`/`Row` 객체를 정리합니다. 1편의 Engine, 2편의 schema가 여기서 합쳐져 한 권의 작은 작업 매뉴얼이 됩니다.
+2편에서 만든 `MetaData`와 `Table`이 이번 글부터 실제로 움직이기 시작합니다. 이후 ORM을 쓰더라도 복잡한 조회나 서브쿼리를 다룰 때는 결국 같은 Core 표현식으로 내려오기 때문에, 이 감각을 지금 잡아 두는 편이 좋습니다.
 
 ![SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](../../../assets/sqlalchemy-101/03/03-01-sqlalchemy-core-select-insert-update-del.ko.png)
 
 *SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기*
-## 핵심 질문
-
-Core의 select·insert·update·delete를 2.x style로 어떻게 다뤄야 안전할까요?
-
-이 글은 그 질문에 답하기 위해 Core CRUD 2.x style의 핵심 결정과 운영 함정을 살펴봅니다.
-
 ## 이 글에서 다룰 문제
+
+- `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
+- `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
+- `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
+- 문자열 SQL 대신 표현식 기반 쿼리를 쓰면 무엇이 달라질까요?
+- ORM으로 넘어가도 왜 Core 쿼리 감각이 계속 필요할까요?
+
+## 왜 중요한가
 
 ![핵심 개념](../../../assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
 
@@ -55,11 +51,11 @@ Core SQL expression은 schema 객체와 Python 표현식을 조합해 SQL을 구
 
 또한 ORM이 본격적으로 등장하는 4편 이후에도 Core SQL expression은 사라지지 않습니다. ORM의 `select()`는 Core의 `select()`와 같은 객체이고, 복잡한 쿼리에서는 결국 Core 표현식으로 내려와야 합니다. 이 글이 그 토대를 만듭니다.
 
-## Mental Model
+## 멘탈 모델
 
 ![Mental model](../../../assets/sqlalchemy-101/03/03-03-mental-model.ko.png)
 
-*Mental model*
+*멘탈 모델*
 2.x style의 SQL은 "절(clause)을 메서드 chaining으로 쌓는 식"입니다. `select(...)`로 시작해서 `where`, `order_by`, `limit` 같은 메서드를 호출하면 새로운 statement 객체가 반환되고, 마지막에 Connection이 그것을 실행해 `Result`를 돌려줍니다.
 
 > 2.x의 select은 immutable한 statement 객체다. 메서드를 호출할 때마다 원본은 변하지 않고 새로운 statement가 만들어진다. Result는 한 번만 순회 가능한 stream-like 객체이며, 무엇을 꺼낼지(`Row`, scalar, mapping)는 Result에서 결정한다.
@@ -297,9 +293,9 @@ stmt = select(users.c.id, func.count(posts.c.id).label("post_count")).join(posts
 
 `label()`로 alias를 주면 `row.post_count`로 접근할 수 있습니다.
 
-## Before-After
+## 이전 방식과 개선 방식
 
-### Before: text 기반 동적 쿼리
+### 이전: text 기반 동적 쿼리
 
 ```python
 def find_users(active=None, email_like=None, limit=10):
@@ -316,7 +312,7 @@ def find_users(active=None, email_like=None, limit=10):
 
 문제: 문자열 조립이 깨지기 쉽고, `LIMIT`처럼 binding되지 않는 부분에서 type 오류·SQL injection 위험이 생깁니다.
 
-### After: select 기반 동적 쿼리
+### 개선 후: select 기반 동적 쿼리
 
 ```python
 from sqlalchemy import select
@@ -461,7 +457,7 @@ def deactivate_user(conn, user_id: int) -> int:
     ).rowcount
 ```
 
-이 패턴의 핵심은 함수가 `Connection`을 인자로 받는다는 점입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
+이 패턴에서 중요한 점은 함수가 `Connection`을 인자로 받는다는 점입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
 
 읽기 함수가 list를 반환할 때는 `.all()`이 아닌 `.scalars().all()`이나 `.mappings().all()`이 더 다루기 쉬울 때가 많습니다. JSON 응답으로 그대로 직렬화하려면 `.mappings().all()`이 가장 자연스럽습니다.
 
