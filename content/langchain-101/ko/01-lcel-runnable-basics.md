@@ -14,17 +14,17 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: LCEL과 Runnable 인터페이스로 LLM 파이프라인을 한 줄로 잇는 방법을 정리합니다
 ---
 
 # LangChain 소개 — LCEL과 Runnable 기본
 
+이 글은 LangChain 101 시리즈의 첫 번째 글입니다.
+
 LangChain을 처음 보면 용어가 먼저 몰려옵니다. LCEL, Runnable, Chain, Pipe 같은 단어가 연달아 나오는데, 정작 손에 잡히는 것은 "프롬프트 만들고 모델 호출하고 결과 파싱하는 코드"입니다. 그래서 입문 단계에서는 개념을 외우기보다, **반복되는 글루 코드를 LangChain이 어떤 공통 계약으로 정리했는지**부터 보는 편이 훨씬 빠릅니다.
 
 이렇게 생각하면 됩니다. LangChain은 새로운 마법을 만든 라이브러리가 아닙니다. 이미 여러분이 애플리케이션에서 하던 일을, 서로 교체 가능한 부품으로 나눈 뒤 같은 실행 인터페이스로 묶어 놓은 도구입니다. 그 인터페이스가 *Runnable*이고, 그 부품들을 `|`로 잇는 문법이 *LCEL*입니다.
-
-이 글은 LangChain 101 시리즈의 첫 번째 글입니다. 여기서는 LCEL과 Runnable 인터페이스를 중심으로 LangChain 체인의 가장 기본적인 실행 모델을 정리합니다.
 
 ---
 
@@ -38,7 +38,7 @@ LangChain을 처음 보면 용어가 먼저 몰려옵니다. LCEL, Runnable, Cha
 
 > LangChain에서는 입력과 출력 모양만 맞으면, 많은 컴포넌트를 서로 바꿔 끼울 수 있습니다.
 
-![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.en.png)
 
 *이 글에서 답할 질문*
 
@@ -101,7 +101,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## 전체 흐름 한눈에 보기
 
-![전체 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
+![전체 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
 
 *전체 흐름 한눈에 보기*
 
@@ -353,7 +353,7 @@ print(result)
 
 ## 여러 입력을 한 번에 처리하는 `batch()`
 
-![여러 입력을 펼쳐 처리한 뒤 모으는 흐름](../../../assets/langchain-101/01/01-04-batch.ko.png)
+![여러 입력을 펼쳐 처리한 뒤 모으는 흐름](../../../assets/langchain-101/01/01-04-batch-for-multiple-inputs.en.png)
 
 *여러 입력을 펼쳐 처리한 뒤 모으는 흐름*
 
