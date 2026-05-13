@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 4
 title: Service
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,20 +16,36 @@ tags:
   - Networking
   - DNS
   - DevOps
-seo_description: Kubernetes Service의 ClusterIP, NodePort, LoadBalancer 타입과 셀렉터, 클러스터 DNS를 정리한 글
-last_reviewed: '2026-05-11'
+seo_description: Service가 Pod 집합에 안정적인 주소와 이름을 주는 방식을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # Service
 
-> Kubernetes 101 시리즈 (4/10)
+Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다. Pod IP가 계속 바뀌는데, 다른 서비스나 사용자는 그 파드를 어떻게 안정적으로 찾아야 할까 하는 문제입니다. 파드가 재시작되거나 새로 생성될 때마다 주소가 달라지면 애플리케이션끼리 서로를 부르기가 금방 불안정해집니다.
 
+이 글은 Kubernetes 101 시리즈의 4번째 글입니다.
+
+여기서는 Service를 단순한 포트 노출 기능이 아니라, 라벨로 선택된 파드 집합에 안정적인 가상 IP와 DNS 이름을 부여하는 네트워킹 기본 객체라는 관점에서 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
-마이크로서비스가 서로를 이름으로 호출하려면 Service가 필수입니다.
+> Service는 변하는 Pod IP 대신, 라벨로 묶인 파드 집합에 안정적인 가상 주소와 이름을 붙여 주는 Kubernetes의 기본 네트워킹 계약입니다.
 
-## 전체 흐름
+- Service는 정확히 어떤 문제를 해결할까요?
+- ClusterIP, NodePort, LoadBalancer는 언제 갈라질까요?
+- selector와 labels는 왜 정확히 맞아야 할까요?
+- 클러스터 DNS는 서비스 호출을 어떻게 단순하게 만들까요?
+- Headless Service는 일반 Service와 무엇이 다를까요?
+
+## 왜 중요한가
+
+마이크로서비스 구조에서는 애플리케이션이 다른 애플리케이션을 이름으로 호출해야 합니다. 그런데 Pod IP를 직접 쓰는 방식은 재시작 한 번으로 바로 깨집니다. Kubernetes에서 내부 통신이 안정적으로 보이려면 중간에서 변하는 파드 집합을 고정된 이름으로 가려 주는 계층이 필요합니다.
+
+그 역할을 Service가 맡습니다. 많은 입문자가 Service를 단순히 외부 노출용으로만 이해하지만, 실제로는 내부 통신에서 더 자주 중요합니다. Service를 이해하지 못하면 Ingress도, 서비스 디스커버리도, DNS 기반 호출도 모두 흐릿하게 남습니다.
+
+## 한눈에 보는 구조
+
 ```mermaid
 flowchart LR
     Client["client"] --> Svc["service (vip)"]
@@ -38,15 +54,25 @@ flowchart LR
     Svc --> P3["pod"]
 ```
 
-## Before/After
+Service는 특정 파드를 직접 고정해 가리키지 않습니다. 라벨로 선택된 파드 집합을 뒤에 두고, 앞단에는 안정적인 가상 IP와 이름을 제공합니다. 클라이언트는 뒤에서 어떤 파드가 바뀌는지 신경 쓰지 않고 Service 이름만 알면 됩니다.
 
-**Before**: *Pod IP* 직접 호출 → *재시작 시 연결 깨짐*.
+## 핵심 용어
 
-**After**: *Service 이름* 으로 *DNS* 통해 *안정 호출*.
+- ClusterIP: 클러스터 내부에서만 쓰는 기본 가상 IP입니다.
+- NodePort: 모든 노드의 특정 포트를 통해 접근하게 하는 방식입니다.
+- LoadBalancer: 클라우드 로드 밸런서를 연결해 외부 진입점을 여는 방식입니다.
+- selector: 라벨로 파드 집합을 고르는 조건입니다.
+- DNS 이름: `svc.namespace.svc.cluster.local` 형태의 서비스 이름입니다.
 
-## 서비스 노출
+## 도입 전과 후
 
-### 1단계 — Service manifest
+Service가 없으면 클라이언트가 Pod IP를 직접 호출해야 합니다. 이 방식은 파드 재시작이나 재배치가 일어나는 순간 바로 깨집니다.
+
+Service를 두면 클라이언트는 DNS 이름으로 Service를 호출하고, Service가 뒤의 파드 집합으로 트래픽을 보냅니다. 파드가 바뀌어도 호출 방식은 바뀌지 않습니다. 이것이 내부 통신 안정성의 출발점입니다.
+
+## 단계별로 Service 노출해 보기
+
+### 1단계 — Service 매니페스트 작성
 
 ```python
 """
@@ -61,7 +87,9 @@ spec:
 """
 ```
 
-### 2단계 — apply + 조회
+이 설정은 `app: web` 라벨을 가진 파드 집합을 `web`이라는 이름의 Service 뒤에 묶습니다. 여기서 가장 중요한 값은 `selector`입니다.
+
+### 2단계 — 적용 후 조회
 
 ```python
 import subprocess
@@ -74,6 +102,8 @@ def apply_and_get(path):
     ).stdout
 ```
 
+적용 후 바로 상태를 보는 습관이 중요합니다. Service 자체는 생성됐더라도 뒤에 연결된 파드가 없으면 실제 라우팅은 되지 않기 때문입니다.
+
 ### 3단계 — DNS 확인
 
 ```python
@@ -85,6 +115,8 @@ def dns_check(target):
     return res.stdout
 ```
 
+Service를 이해할 때는 DNS 관점이 중요합니다. 내부 서비스 간 통신을 IP가 아니라 이름으로 바꾸는 핵심 고리가 바로 여기입니다.
+
 ### 4단계 — NodePort로 변경
 
 ```python
@@ -95,6 +127,8 @@ def to_nodeport(svc):
     ], check=True)
 ```
 
+Service 타입을 바꾸면 접근 경로가 달라집니다. 다만 NodePort는 외부 접근 실험에는 편해도, 보통 운영의 최종 외부 진입점으로 삼는 경우는 드뭅니다.
+
 ### 5단계 — 정리
 
 ```python
@@ -102,34 +136,48 @@ def delete(svc):
     subprocess.run(["kubectl", "delete", "svc", svc], check=True)
 ```
 
-## 이 코드에서 주목할 점
+리소스를 지울 때는 Service 삭제 자체보다, 이 Service를 바라보는 다른 애플리케이션이 있는지 먼저 보는 편이 중요합니다. 이름 기반 호출 구조에서는 이름 하나가 계약이 되기 때문입니다.
 
-- *selector* 가 *Deployment labels* 와 일치해야 함.
-- *targetPort* 는 *컨테이너 포트*.
-- DNS 이름으로 호출하는 방식을 표준으로 삼습니다.
+## 이 코드에서 먼저 봐야 할 점
 
-## 자주 하는 실수 5가지
+- `selector`는 Deployment가 붙인 라벨과 정확히 맞아야 합니다.
+- `targetPort`는 컨테이너가 실제로 듣는 포트입니다.
+- DNS 이름이 서비스 호출의 표준 경로가 됩니다.
 
-1. ***selector* 와 *labels* 불일치로 *연결 실패*.**
-2. ***NodePort* 를 *프로덕션 외부 진입점* 으로 사용.**
-3. ***Pod IP* 직접 호출.**
-4. ***Headless Service* 를 *일반 케이스* 에 사용.**
-5. ***네임스페이스* 빼먹은 *DNS 이름*.**
+이 셋이 연결되면 Service를 단순 프록시가 아니라 네트워크 계약으로 볼 수 있습니다. 호출하는 쪽은 이름만 알고, 실제 파드 교체는 뒤에서 계속 일어나도 괜찮아집니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 자주 하는 실수 다섯 가지
 
-ClusterIP는 내부 통신을 맡고, LoadBalancer는 외부 진입을 열며, Ingress는 L7 라우팅을 담당합니다.
+1. selector와 labels가 어긋나는데도 Service가 동작할 것이라 기대합니다.
+2. NodePort를 운영 환경의 최종 외부 진입점으로 씁니다.
+3. Pod IP를 직접 호출합니다.
+4. 일반적인 경우에도 Headless Service부터 꺼내 듭니다.
+5. DNS 이름에서 네임스페이스 개념을 무시합니다.
+
+## 실무에서는 이렇게 봅니다
+
+실무에서는 ClusterIP가 내부 통신의 기본값이고, 외부 진입은 LoadBalancer와 Ingress가 나눠 맡는 구성이 흔합니다. Service는 그 사이에서 안정적인 서비스 이름과 백엔드 파드 집합을 연결하는 핵심 고리입니다.
+
+시니어 엔지니어는 Service 이름을 사실상 API 계약처럼 봅니다. 파드가 어떻게 바뀌든, 내부 호출자가 기대하는 이름과 포트는 오래 유지되기 때문입니다. 그래서 라벨 설계와 네이밍이 운영 품질에 직접 영향을 줍니다.
 
 ## 체크리스트
 
-- [ ] *selector* 일치 검증.
-- [ ] *type* 명시.
-- [ ] *DNS 이름* 으로 통신.
-- [ ] *외부 노출* 은 *Ingress* 우선.
+- [ ] selector가 실제 파드 라벨과 맞는가
+- [ ] Service 타입을 명시했는가
+- [ ] 내부 호출이 DNS 이름 기준으로 이뤄지는가
+- [ ] 외부 노출은 Ingress 중심으로 검토했는가
 
-## 정리 및 다음 단계
+## 연습 문제
 
-내부 통신이 잡혔다면, 다음은 외부 HTTP 트래픽을 경로별로 나누는 Ingress입니다.
+1. ClusterIP와 LoadBalancer의 차이를 한 줄로 설명해 보세요.
+2. selector가 왜 중요한지 한 줄로 적어 보세요.
+3. Headless Service의 대표적인 사용 예를 하나 떠올려 보세요.
+
+## 마무리와 다음 글
+
+이 글에서는 Service를 변하는 파드 집합 앞에 안정적인 주소와 이름을 붙여 주는 객체로 정리했습니다. Kubernetes 네트워킹이 복잡해 보일 때도, 먼저 Service가 어떤 파드 집합을 어떤 이름으로 대표하는지부터 보면 흐름이 빠르게 정리됩니다.
+
+다음 글에서는 내부 통신을 넘어서, 외부에서 들어오는 HTTP 요청을 도메인과 경로 기준으로 어떻게 나누는지 Ingress를 보겠습니다.
 
 <!-- toc:begin -->
 - [Kubernetes란 무엇인가?](./01-what-is-kubernetes.md)
