@@ -1,8 +1,8 @@
 ---
 series: programming-languages-101
 episode: 7
-title: memory management
-status: content-ready
+title: 메모리 관리
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -13,62 +13,85 @@ language: ko
 tags:
   - Computer Science
   - Programming Languages
-  - 메모리관리
+  - MemoryManagement
   - GC
-  - 스택
-  - 힙
-seo_description: 스택과 힙, 참조 카운팅과 가비지 컬렉션을 한 줄의 코드와 함께 추적합니다. 객체가 언제 사라지는지 직접 관찰합니다.
-last_reviewed: '2026-05-11'
+  - Stack
+  - Heap
+seo_description: 객체가 언제 살아 있고 언제 사라지는지 메모리 관리 관점에서 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# memory management
+# 메모리 관리
 
-> Programming Languages 101 시리즈 (7/10)
+`del x`를 썼다고 해서 그 줄에서 객체가 바로 사라지는 것은 아닙니다. 이름과 객체, 참조와 수명은 서로 다른 층위에 있고, 언어는 그 관계를 각자 다른 방식으로 관리합니다.
 
+이 글은 Programming Languages 101 시리즈의 일곱 번째 글입니다.
+
+이 글에서는 메모리 관리를 “이 객체는 언제 살아 있고 언제 죽는가”를 정하는 규칙으로 보겠습니다. 스택과 힙, 참조 카운팅, 가비지 컬렉션, 약한 참조를 차례로 보면서 GC가 있어도 누수가 생기는 이유까지 함께 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
-서비스가 며칠째 돌고 나면 메모리 사용량이 슬금슬금 오르는 일이 흔합니다. 원인을 찾으려면 "이 객체가 왜 아직 살아 있나"를 답할 수 있어야 합니다. 그 답을 만드는 도구가 메모리 모델입니다.
+- 스택과 힙은 어떻게 다를까요?
+- Python의 참조 카운팅은 언제 객체를 즉시 해제할까요?
+- 순환 참조는 왜 가비지 컬렉터가 따로 필요할까요?
+- GC 언어에서도 메모리 누수가 생기는 이유는 무엇일까요?
 
-> 메모리 누수는 보통 "잊혀진 참조" 한 줄에서 시작됩니다.
+> 메모리 관리는 결국 “누가 이 객체를 붙잡고 있나, 언제 손을 놓나”를 정하는 규칙입니다. 살아 있는 것은 남기고, 더 이상 도달할 수 없는 것은 거두는 일이 핵심입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+오래 실행되는 서비스는 메모리가 조금씩 올라가는 문제를 자주 겪습니다. 그때 필요한 질문은 “왜 이 객체가 아직 살아 있지?”입니다. 메모리 모델을 모르면 이 질문에 답할 수 없고, 누수 원인을 찾는 일도 막연해집니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
-    A["함수 호출"] --> B["스택 프레임"]
-    B --> C["지역 변수 (자동 해제)"]
-    A --> D["힙 할당"]
-    D --> E["참조 카운트"]
-    D --> F["GC 추적"]
-    E -->|0이 되면 즉시| G["해제"]
-    F -->|순환 회수| G
+    A["function call"] --> B["stack frame"]
+    B --> C["locals (auto freed)"]
+    A --> D["heap allocation"]
+    D --> E["refcount"]
+    D --> F["GC tracing"]
+    E -->|drops to 0| G["freed"]
+    F -->|cycle collected| G
 ```
 
-스택은 함수가 끝나면 통째로 사라집니다. 힙은 누군가가 관리해 줘야 회수됩니다.
+함수 호출이 끝나면 스택 프레임은 자동으로 사라집니다. 반면 힙에 있는 객체는 누가 더 참조하는지 따로 추적해야 합니다. CPython은 참조 카운팅과 순환 수집기를 함께 사용해 이 문제를 풉니다.
 
-## Before/After
+## 먼저 알아둘 용어
 
-**Before — 직접 해제하는 C 스타일 의사코드**
+- 스택: 함수 호출과 함께 생기고 사라지는 메모리 영역입니다.
+- 힙: 객체를 할당해 두는 영역으로, 별도 회수가 필요합니다.
+- 참조 카운팅: 객체를 가리키는 참조 수를 세다가 0이 되면 해제합니다.
+- 가비지 컬렉션: 도달 가능한 객체를 따라가며 살아 있는 것만 남깁니다.
+- 순환 참조: A가 B를, B가 다시 A를 가리키는 구조입니다.
+
+## 먼저 보는 예시
+
+### 수동 해제 방식의 감각
 
 ```python
-# 의사코드: 사용자가 free를 잊으면 누수
+# pseudocode: forget free, leak forever
 buf = malloc(1024)
 use(buf)
-# free(buf)  ← 빠뜨리면 1KB가 살아 있다
+# free(buf)  ← skip this and 1KB lives on
 ```
 
-**After — Python: 참조가 사라지면 자동 회수**
+수동 해제 모델에서는 마지막 `free`를 잊는 순간 누수가 시작됩니다.
+
+### 이름이 사라질 때 객체 수명 보기
 
 ```python
 def work() -> None:
     buf = bytearray(1024)
     use(buf)
-# work()이 끝나면 buf는 갈 곳이 없으니 자동 회수
+# when work() returns, buf has nowhere to live and is reclaimed
 ```
 
-## 객체의 일생을 직접 관찰하기
+이름이 사라지고 다른 참조도 없다면 객체는 수명을 다합니다. 다만 “이름이 사라진다”와 “객체가 즉시 해제된다”를 같은 말로 보면 자꾸 헷갈립니다.
 
-### 1단계 — 참조 카운트 들여다보기
+## 객체 수명을 직접 따라가 보기
+
+### 1단계 — 참조 카운트 보기
 
 ```python
 # 1_refcount.py
@@ -76,18 +99,18 @@ import sys
 
 class Tag:
     def __del__(self) -> None:
-        print("태그 삭제됨")
+        print("Tag deleted")
 
 t = Tag()
-print(sys.getrefcount(t))  # 2 (변수 t + getrefcount의 임시 인자)
+print(sys.getrefcount(t))  # 2 (the variable t + getrefcount's argument)
 ref = t
 print(sys.getrefcount(t))  # 3
-del ref, t                  # 모든 참조 제거 → 즉시 __del__ 호출
+del ref, t                  # all references gone → __del__ fires immediately
 ```
 
-`sys.getrefcount`는 +1 편향이 있다는 점만 기억하세요. CPython은 카운트가 0이 되는 순간 객체를 해제합니다.
+CPython에서는 참조 수가 0이 되는 순간 객체가 곧바로 정리되는 경우가 많습니다. `sys.getrefcount`가 호출 인자로 인해 1 더 크게 보인다는 점만 기억하면 됩니다.
 
-### 2단계 — 순환 참조와 GC
+### 2단계 — 순환 참조와 가비지 컬렉터
 
 ```python
 # 2_cycle.py
@@ -97,26 +120,26 @@ class Node:
     def __init__(self) -> None:
         self.peer: "Node | None" = None
     def __del__(self) -> None:
-        print("노드 삭제됨")
+        print("Node deleted")
 
 a, b = Node(), Node()
-a.peer, b.peer = b, a   # 서로를 참조 (순환)
-del a, b                 # 카운트는 0이 안 된다
+a.peer, b.peer = b, a   # they reference each other
+del a, b                 # counts never reach zero
 print("before collect")
-gc.collect()             # 추적식 GC가 순환을 회수
+gc.collect()             # the tracing GC sweeps up the cycle
 print("after collect")
 ```
 
-순환은 카운팅만으로는 못 풉니다. CPython은 보조 GC(추적식)를 같이 돌려 이 문제를 해결합니다.
+서로만 참조하는 객체는 참조 수만으로는 정리되지 않습니다. 그래서 CPython은 보조적인 추적 기반 수집기를 함께 둡니다.
 
-### 3단계 — "죽지 못하는" 객체
+### 3단계 — 죽지 않는 객체 만들기
 
 ```python
 # 3_leak.py
 cache: dict[int, bytes] = {}
 
 def remember(i: int) -> None:
-    cache[i] = b"x" * 1024  # 캐시에 계속 쌓이기만 한다
+    cache[i] = b"x" * 1024  # cache only ever grows
 
 for i in range(1000):
     remember(i)
@@ -124,9 +147,9 @@ for i in range(1000):
 print(len(cache), "items still alive")
 ```
 
-GC가 있어도 누군가가 참조를 들고 있으면 회수되지 않습니다. **누수 = 잊혀진 참조**입니다.
+GC가 있든 없든 참조가 남아 있으면 객체는 계속 살아 있습니다. 누수의 본질은 잊힌 해제가 아니라 잊히지 않은 참조인 경우가 많습니다.
 
-### 4단계 — `weakref`로 강한 참조를 피하기
+### 4단계 — 약한 참조 사용하기
 
 ```python
 # 4_weakref.py
@@ -139,12 +162,12 @@ obj = Big()
 ref = weakref.ref(obj)
 print(ref())   # <__main__.Big object ...>
 del obj
-print(ref())   # None  — 약한 참조는 객체 수명을 늘리지 않는다
+print(ref())   # None  — a weak reference does not extend lifetime
 ```
 
-캐시나 옵저버 패턴에서 `weakref`는 누수를 막는 표준 도구입니다.
+캐시나 옵저버 목록처럼 수명을 늘리고 싶지 않은 참조에는 `weakref`가 표준 도구입니다.
 
-### 5단계 — `with`로 자원의 수명을 명확히 하기
+### 5단계 — 블록으로 자원 수명 드러내기
 
 ```python
 # 5_with.py
@@ -160,54 +183,60 @@ def opened(name: str):
 
 with opened("config.yml") as f:
     print("use", f)
-# 블록을 벗어나는 순간 close가 보장된다
+# leaving the block guarantees close
 ```
 
-메모리뿐 아니라 파일·소켓·잠금 같은 자원도 수명 관리가 필요하고, `with`가 그 표준 패턴입니다.
+메모리만 수명을 가지는 것은 아닙니다. 파일, 소켓, 락도 모두 수명 관리가 필요합니다. `with`는 그 의도를 코드 모양으로 드러내는 가장 좋은 패턴입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- 참조 카운트가 0인 순간 객체는 사라집니다 (CPython의 즉시성).
-- 순환은 카운팅만으로는 못 풀고, 추적식 GC가 보충합니다.
-- GC 언어에서도 "참조가 살아 있으면" 객체는 살아 있습니다.
-- `weakref`와 `with`는 수명을 다루는 도구입니다 — 메모리만의 이야기가 아닙니다.
+- 참조 수가 0이 되면 객체가 즉시 정리될 수 있다는 점이 CPython의 중요한 특징입니다.
+- 순환 참조는 참조 카운팅만으로 풀 수 없기 때문에 추적 기반 GC가 필요합니다.
+- GC 언어에서도 참조가 남아 있으면 객체는 살아 있습니다.
+- `weakref`와 `with`는 메모리뿐 아니라 자원 수명 전반을 다루는 도구입니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수
 
-1. **`del`이면 즉시 사라진다고 믿는다.** `del`은 이름 바인딩만 끊을 뿐, 다른 참조가 있으면 객체는 살아 있습니다.
-2. **전역 캐시에 무한히 쌓는다.** 가장 흔한 누수 패턴입니다. 항상 상한을 정하세요.
-3. **순환 참조를 무시한다.** 서로 참조하는 도메인 모델은 `weakref`로 한쪽을 풀어 줍니다.
-4. **`__del__`에 무거운 일을 넣는다.** 호출 시점이 보장되지 않으니, 실제 정리 작업은 `with`나 명시적 close 메서드에 맡기세요.
-5. **GC를 강제로 자주 부른다.** `gc.collect()`를 루프에서 부르면 CPU가 더 든다는 사실만 남습니다.
+1. `del`이 객체를 즉시 파괴한다고 믿습니다. 실제로는 이름 바인딩을 끊을 뿐입니다.
+2. 크기 제한 없는 전역 캐시를 둡니다. 아주 흔한 누수 패턴입니다.
+3. 순환 참조를 무시합니다. 도메인 객체가 서로를 오래 붙잡는 구조가 흔합니다.
+4. `__del__`에 무거운 정리 로직을 넣습니다. 진짜 정리는 `with`나 명시적 `close`가 더 안전합니다.
+5. 뜨거운 경로에서 `gc.collect()`를 남발합니다. CPU만 태우는 경우가 많습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 본다
 
-긴 시간 도는 서버는 메모리 그래프를 정기적으로 본다. 의심스러우면 `tracemalloc`이나 `objgraph`로 어떤 타입이 늘어나는지 추적합니다. 캐시는 항상 LRU나 TTL을 두고, 옵저버/콜백 등록은 약한 참조나 명시적 해제를 표준으로 둡니다.
+오래 실행되는 서버는 메모리 그래프를 지속적으로 봅니다. 이상 징후가 보이면 `tracemalloc`이나 `objgraph`로 어떤 객체가 늘어나는지 확인합니다. 캐시에는 항상 크기 제한이나 TTL을 넣고, 콜백이나 옵저버 목록에는 약한 참조나 명시적 해제를 기본값으로 둡니다.
 
-C/C++/Rust 같은 언어는 다른 접근을 씁니다 — Rust는 컴파일 타임 소유권으로 GC 없이 안전을 보장합니다. 어떤 모델이든 본질은 같습니다: **소유자가 누구이고, 언제 놓아주는가**.
+C, C++, Rust는 또 다른 길을 갑니다. Rust는 GC 대신 소유권을 컴파일 시점에 검사합니다. 구현은 달라도 질문은 같습니다. “이 객체를 누가 소유하고, 언제 놓는가?” 이 질문에 답할 수 있어야 메모리 문제를 제대로 다룰 수 있습니다.
 
 ## 체크리스트
 
-- [ ] 스택과 힙의 차이를 한 줄로 답할 수 있는가?
+- [ ] 스택과 힙의 차이를 한 문장으로 말할 수 있는가?
 - [ ] Python의 참조 카운팅과 GC가 어떻게 협력하는지 설명할 수 있는가?
-- [ ] 가장 최근에 짠 코드에서 누수 가능 지점을 한 군데라도 짚을 수 있는가?
-- [ ] `weakref`를 어디에 쓰는지 한 가지 이상 말할 수 있는가?
-- [ ] `with`로 자원의 수명을 다루는 것이 습관인가?
+- [ ] 최근 코드에서 잠재적 누수 지점을 하나 짚을 수 있는가?
+- [ ] `weakref`를 써야 할 대표 상황을 하나 이상 말할 수 있는가?
+- [ ] 자원 수명 관리에 `with`를 자연스럽게 쓰는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-메모리 모델은 "누가 들고 있고, 언제 놓는가"의 답을 만드는 도구입니다. 다음 글에서는 그 객체들을 실행하는 두 길 — 인터프리터와 컴파일러 — 을 살펴봅니다.
+1. 순환 참조 예제에서 한쪽을 `weakref`로 바꿔 `gc.collect()` 없이도 정리되는지 확인해 보세요.
+2. `tracemalloc`으로 객체를 많이 만들고 지우는 실험을 한 뒤, 관찰한 패턴을 한 단락으로 적어 보세요.
+3. 최근에 만든 캐시 하나를 골라 크기 제한이 있는 형태로 바꿔 보세요.
+
+## 정리
+
+메모리 모델은 결국 “누가 붙잡고 있고, 언제 손을 놓는가”를 설명하는 규칙입니다. 다음 글에서는 이 객체와 코드를 실제로 실행하는 두 가지 큰 전략인 인터프리터와 컴파일러를 보겠습니다.
 
 <!-- toc:begin -->
 - [프로그래밍 언어란 무엇인가?](./01-what-is-a-programming-language.md)
-- [syntax와 semantics](./02-syntax-and-semantics.md)
-- [type system](./03-type-system.md)
-- [scope와 binding](./04-scope-and-binding.md)
-- [함수와 closure](./05-functions-and-closures.md)
-- [객체와 prototype](./06-objects-and-prototypes.md)
-- **memory management (현재 글)**
-- interpreter와 compiler (예정)
-- static vs dynamic language (예정)
+- [구문과 의미](./02-syntax-and-semantics.md)
+- [타입 시스템](./03-type-system.md)
+- [스코프와 바인딩](./04-scope-and-binding.md)
+- [함수와 클로저](./05-functions-and-closures.md)
+- [객체와 프로토타입](./06-objects-and-prototypes.md)
+- **메모리 관리 (현재 글)**
+- 인터프리터와 컴파일러 (예정)
+- 정적 언어와 동적 언어 (예정)
 - 좋은 언어 설계란 무엇인가? (예정)
 <!-- toc:end -->
 
@@ -218,4 +247,4 @@ C/C++/Rust 같은 언어는 다른 접근을 씁니다 — Rust는 컴파일 타
 - [Python — tracemalloc](https://docs.python.org/3/library/tracemalloc.html)
 - [Garbage collection (Wikipedia)](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science))
 
-Tags: Computer Science, Programming Languages, 메모리관리, GC, 스택, 힙
+Tags: Computer Science, Programming Languages, MemoryManagement, GC, Stack, Heap
