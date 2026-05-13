@@ -16,92 +16,93 @@ tags:
 - SQLAlchemy
 - Migration
 - SQLite
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: Alembic은 DB 스키마를 위한 git입니다. 각 마이그레이션 파일은 commit이고, alembic_version
   테이블은 현재…
 ---
 
 # 왜 Alembic인가, 그리고 init까지
 
-Alembic을 처음 접하면 "왜 SQL 파일 몇 개로 안 되나"부터 막히기 쉽습니다. 스키마 변경 이력을 코드처럼 다루지 못하면 배포와 롤백이 금방 사람 기억에 의존하게 됩니다.
+이 글은 Alembic 101 시리즈의 첫 번째 글입니다. 여기서는 raw SQL 파일만으로는 왜 스키마 변경 이력이 금방 통제 불가능해지는지, 그리고 `alembic init`이 실제로 무엇을 준비하는지 정리합니다.
 
-이 글은 Alembic 101 시리즈의 첫 번째 글입니다. 여기서는 Alembic이 왜 필요한지와 `alembic init`으로 무엇을 준비하는지부터 잡겠습니다.
-
-## 핵심 질문
-
-왜 SQL 스크립트 대신 Alembic을 도입해야 하고, 초기화는 어떻게 해야 협업과 운영이 편할까요?
-
-이 글은 그 질문에 답하기 위해 Alembic 도입과 초기화의 핵심 결정과 실무 함정을 살펴봅니다.
-
+Alembic을 처음 접하면 명령어보다 먼저 이런 의문이 생깁니다. “SQL 파일 몇 개 잘 관리하면 되지 않을까?” 문제는 스키마 변경 이력이 revision history가 아니라 사람 기억에 기대는 순간 시작됩니다. 그때부터 배포와 롤백은 재현 가능한 절차가 아니라 추측이 됩니다.
 
 ## 이 글에서 다룰 문제
 
-스키마 변경은 모든 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서, "DB 스키마는 누가 어떤 SQL을 언제 돌렸는가"를 손으로 관리하는 팀이 의외로 많습니다. 그 결과 staging은 프로덕션과 미묘하게 달라지고, 롤백할 때는 누구도 자신 있게 "스키마를 어디까지 되돌려야 하는지" 답하지 못합니다.
+- 마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?
+- 왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?
+- revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?
+- `alembic init`은 프로젝트에 어떤 파일과 책임을 추가할까요?
+- SQLite 기반 Alembic 시작점에서 자주 부딪히는 함정은 무엇일까요?
 
-Alembic은 SQLAlchemy 저자가 만든 마이그레이션 도구로, 이 문제를 git처럼 다룹니다. 각 변경은 revision이고, head는 최신 상태이며, 모든 환경은 같은 history를 따라 올라가거나 내려옵니다. 이 글은 그 첫 단추인 "왜 필요한가"와 "어떻게 시작하는가"를 정리합니다.
+## 왜 중요한가
+
+스키마 변경은 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서도 “누가 어떤 SQL을 어느 환경에 실행했는가”만 수작업으로 남기는 팀이 의외로 많습니다. 그러면 staging은 조용히 production과 어긋나고, 문제가 생겼을 때도 스키마를 어디까지 되돌려야 하는지 누구도 자신 있게 말하지 못합니다.
+
+Alembic은 SQLAlchemy 작성자가 만든 마이그레이션 도구이고, 이 문제를 git이 코드 변경을 다루는 방식으로 풀어냅니다. 각 변경은 revision이고, head는 최신 상태이며, 모든 환경은 같은 이력을 따라 올라가거나 내려옵니다. 이 글에서는 그 출발점인 “왜 필요한가”와 “어떻게 시작하는가”를 잡겠습니다.
 
 ## 멘탈 모델
 
-> Alembic은 DB 스키마를 위한 git입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD를 가리키며, `upgrade head`는 fast-forward이고, `downgrade -1`은 reset 한 칸입니다.
+> Alembic은 **DB 스키마를 위한 git**입니다. 각 마이그레이션 파일은 commit이고, `alembic_version` 테이블은 현재 HEAD 포인터이며, `upgrade head`는 fast-forward이고, `downgrade -1`은 한 단계 reset에 가깝습니다.
 
-이 비유가 한 번 자리잡으면 거의 모든 명령이 자연스러워집니다. `revision`은 새 commit을 만드는 것이고, `merge`는 두 head를 합치는 것이며, `stamp`는 working tree는 그대로 두고 HEAD만 바꾸는 `git reset` 같은 동작입니다.
+이 비유를 받아들이면 거의 모든 명령이 자연스럽게 읽힙니다. `revision`은 새 commit을 만드는 일이고, `merge`는 두 head를 화해시키는 일이며, `stamp`는 working tree를 건드리지 않고 HEAD만 옮기는 `git reset`과 비슷합니다.
 
 ## 핵심 개념
 
-### Revision과 Head
+### Revision과 head
 
-각 마이그레이션 파일은 `revision`이라는 고유 ID와 `down_revision`이라는 부모 ID를 가집니다. revision들은 단방향 그래프를 이루고, 그래프의 마지막 노드(자식 없는 노드)가 `head`입니다. 일반적으로 head는 하나지만, branch가 생기면 둘 이상이 될 수 있습니다.
+각 마이그레이션 파일은 고유한 `revision` ID와 부모를 가리키는 `down_revision`을 가집니다. revision들은 방향성이 있는 그래프를 이루고, 자식이 없는 leaf node가 `head`입니다. 보통은 head가 하나지만, branch가 생기면 둘 이상이 될 수 있습니다.
 
 ### `alembic_version` 테이블
 
-DB에는 `alembic_version`이라는 한 줄짜리 메타 테이블이 생깁니다. 이 테이블의 값은 "이 DB가 현재 어느 revision까지 적용됐는가"입니다. Alembic의 모든 명령은 이 값을 읽고 그래프와 비교해 결정합니다.
+Alembic은 DB 안에 `alembic_version`이라는 한 줄짜리 메타 테이블을 만듭니다. 이 값은 “이 데이터베이스가 현재 어느 revision 위에 있는가”를 뜻합니다. Alembic의 모든 명령은 이 값을 읽고 revision graph와 비교해 다음 행동을 결정합니다.
 
 ### `create_all`과의 차이
 
 | 항목 | `Base.metadata.create_all` | Alembic |
 | --- | --- | --- |
-| 용도 | 테스트, 초기 prototyping | production 운영 |
-| 변경 추적 | 없음 | revision 그래프 |
-| 컬럼 변경/삭제 | 못 함 | 자유롭게 |
-| 환경 간 동기화 | 안 됨 | 동일 history |
-| 롤백 | 없음 | downgrade 명령 |
+| 용도 | 테스트, 초기 프로토타입 | 운영 환경 관리 |
+| 변경 추적 | 없음 | revision graph |
+| 컬럼 변경/삭제 | 불가 | 가능 |
+| 환경 간 동기화 | 없음 | 같은 history |
+| 롤백 | 없음 | `downgrade` 명령 |
 
-`create_all`은 "테이블이 없으면 만든다"가 전부입니다. 컬럼 하나 추가하면 `create_all`로는 절대 production에 반영이 안 됩니다.
+`create_all`은 “없는 테이블을 만든다”가 전부입니다. 컬럼 하나가 추가돼도 production에 그 변경을 전달해 주지 않습니다.
 
 ### `alembic init`이 만드는 것
 
 ```text
 project/
-├── alembic.ini           # 전역 설정 (DB URL, 로깅, 파일명 템플릿)
+├── alembic.ini           # global config (DB URL, logging, file template)
 └── alembic/
-    ├── env.py            # 마이그레이션 실행 컨텍스트
-    ├── script.py.mako    # revision 파일 템플릿
-    └── versions/         # 실제 마이그레이션 파일들
+    ├── env.py            # migration runtime context
+    ├── script.py.mako    # revision file template
+    └── versions/         # the actual migration files
 ```
 
-가장 자주 만지는 파일은 `env.py`(다음 글)와 `versions/*.py`(매 변경마다)입니다.
+실제로 자주 만지는 파일은 `env.py`(다음 글)와 `versions/` 아래의 revision 파일들입니다.
 
 ## 변경 전후
 
 ```bash
-# 변경 전: 프로덕션 DB에 손으로 SQL 실행
+# Before: hand-running SQL on production
 psql -h prod -U app -d main -c "ALTER TABLE users ADD COLUMN tier VARCHAR(16) NOT NULL DEFAULT 'free';"
-# 누가 언제 어떤 환경에 실행했는지 사후 추적이 어렵다
+# Nobody can reconstruct who, when, on which environment, after the fact
 ```
 
 ```bash
-# 변경 후: revision 파일이 곧 변경 기록
+# After: the revision file IS the change log
 alembic revision -m "add users.tier"
-# 생성된 리비전 파일
-# 코드 리뷰, 환경 간 동기화, 롤백이 가능
+# alembic/versions/3f9c..._add_users_tier.py is created
+# Code review, environment sync, rollback all become possible
 alembic upgrade head
 ```
 
-After 버전은 git diff에 잡히고, PR 리뷰 대상이 되며, staging과 production이 같은 명령으로 같은 상태가 됩니다.
+After 쪽은 `git diff`에 잡히고, PR 리뷰 대상이 되며, staging과 production이 같은 명령으로 같은 상태에 도달하게 만듭니다.
 
 ## 단계별 실습
 
-### 1단계: 환경 준비
+### 1단계: 설치
 
 ```bash
 mkdir alembic-demo && cd alembic-demo
@@ -112,7 +113,7 @@ pip install "sqlalchemy>=2.0" "alembic>=1.13"
 ### 2단계: 모델 정의
 
 ```python
-# 모델 파일 예시
+# app/models.py
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 class Base(DeclarativeBase):
@@ -131,7 +132,7 @@ class User(Base):
 alembic init alembic
 ```
 
-다음 구조가 생성됩니다.
+그러면 다음 구조가 생깁니다.
 
 ```text
 alembic-demo/
@@ -142,64 +143,70 @@ alembic-demo/
     └── versions/
 ```
 
-### 4단계: SQLite URL 설정
+### 4단계: SQLite URL 연결
 
-`alembic.ini`에서 다음 줄을 찾아 SQLite 경로로 바꿉니다.
+`alembic.ini`에서 다음 줄을 찾습니다.
 
 ```ini
 sqlalchemy.url = sqlite:///./app.db
 ```
 
-다음 글에서 다루지만 미리 환경 변수로 받아 쓰는 형태가 더 안전합니다(`os.environ["DATABASE_URL"]`).
+다음 글에서는 `os.environ["DATABASE_URL"]`로 읽는 더 안전한 패턴을 다루지만, 여기서는 이 정도 설정으로 충분합니다.
 
-### 5단계: 첫 빈 revision
+### 5단계: 첫 빈 revision 생성
 
 ```bash
 alembic revision -m "init"
 ```
 
-`alembic/versions/<hash>_init.py`가 생성되고, 안에는 `upgrade()`와 `downgrade()` 두 함수가 비어 있습니다. 이 파일이 첫 commit입니다.
+그러면 `alembic/versions/<hash>_init.py`가 생성되고, 안에는 비어 있는 `upgrade()`와 `downgrade()`가 들어 있습니다. 이것이 첫 commit입니다.
 
-### 6단계: upgrade와 version 테이블 확인
+### 6단계: upgrade 후 version 테이블 확인
 
 ```bash
 alembic upgrade head
 sqlite3 app.db "SELECT * FROM alembic_version;"
-# 결과 예시: <hash>
+# result: <hash>
 ```
 
-`alembic_version`에 한 줄이 생긴 것을 보면 모든 게 명확해집니다. 이 테이블이 모든 마이그레이션 명령의 기준점입니다.
+`alembic_version`에 한 줄이 보이는 순간 모델이 한 번에 잡힙니다. 이 테이블이 모든 마이그레이션 명령의 기준점입니다.
 
 ## 자주 하는 실수
 
-- `create_all`로 production을 시작하기. 한 번 시작하면 alembic을 도입할 때 "현재 스키마를 첫 revision으로 stamping"하는 추가 단계가 필요합니다. 가능하면 처음부터 alembic만 씁니다.
-- `alembic.ini`에 production credential을 그대로 넣기. 환경 변수로 받아 쓰도록 `env.py`에서 override합니다(다음 글).
-- `alembic_version`을 손으로 수정하기. 가능은 하지만 거의 항상 사고로 이어집니다. `alembic stamp` 명령으로만 바꿉니다.
-- revision 파일을 push한 뒤 수정하기. revision ID는 history의 일부입니다. 이미 다른 환경에 적용됐다면 새 revision으로 고치는 편이 안전합니다.
-- 여러 사람이 동시에 `revision -m`을 실행하기. branch가 생깁니다. 5편에서 다루는 `merge` 명령으로 합칠 수 있지만, 가능하면 PR 머지 직전에 정리하는 편이 낫습니다.
+- **`create_all`로 production을 시작하기.** 나중에 Alembic을 도입하려면 현재 스키마를 baseline revision으로 찍어 두는 stamping 단계가 추가됩니다. 가능하면 첫날부터 Alembic을 씁니다.
+- **`alembic.ini`에 production credential을 하드코딩하기.** 다음 글의 환경 변수 override 패턴을 표준처럼 생각하는 편이 안전합니다.
+- **`alembic_version`을 손으로 수정하기.** 가능은 하지만 거의 항상 사고로 이어집니다. `alembic stamp`를 사용하세요.
+- **push한 revision 파일을 다시 수정하기.** revision ID는 이력의 일부입니다. 이미 다른 환경에 적용됐다면 기존 파일을 바꾸지 말고 새 revision으로 고칩니다.
+- **여러 사람이 동시에 `revision -m`을 실행하기.** branch가 생깁니다. 5편에서 `merge`로 정리하지만, 가장 좋은 방법은 PR 머지 직전에 정리하는 것입니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- revision 파일은 코드와 같은 PR에 둡니다. "기능 코드 + 마이그레이션 + 테스트"가 한 PR에 모이는 구조가 좋습니다.
-- CI에서 `alembic upgrade head --sql`로 DDL을 출력해 리뷰합니다. 자동 생성된 SQL을 사람 눈으로 한 번 보면 의외로 많은 사고를 막을 수 있습니다.
-- `alembic.ini`의 파일명 템플릿을 의미 있게 바꿉니다. 기본은 hash만 들어가지만, `file_template = %%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(slug)s`처럼 설정하면 정렬이 시간순이 됩니다.
-- branch는 가능한 한 만들지 않습니다. 큰 팀이 아니면 head 하나로 충분합니다.
-- 첫 revision은 "현재 상태 baseline"으로 잡습니다. 기존 DB에 도입할 때는 `alembic revision --autogenerate -m "baseline"` 후 `alembic stamp head`로 바로 HEAD에 표시합니다.
+- **revision 파일은 코드와 같은 PR에 넣습니다.** 기능 코드, 마이그레이션, 테스트가 함께 움직여야 합니다.
+- **CI에서 `alembic upgrade head --sql`을 출력합니다.** 사람이 DDL을 한 번만 읽어도 의외로 많은 사고를 막습니다.
+- **파일명 템플릿을 의미 있게 바꿉니다.** `file_template = %%(year)d%%(month).2d%%(day).2d_%%(hour).2d%%(minute).2d_%%(slug)s`처럼 두면 파일이 시간순으로 정렬됩니다.
+- **가능하면 single head를 유지합니다.** 대부분 팀에는 branch보다 head 하나가 더 단순합니다.
+- **첫 revision은 baseline입니다.** 기존 DB에 Alembic을 도입한다면 `alembic revision --autogenerate -m "baseline"` 후 `alembic stamp head`로 현재 상태를 맞춥니다.
 
 ## 체크리스트
 
-- [ ] `alembic init` 후 `alembic.ini` / `env.py` / `versions/` 구조를 확인했다
-- [ ] `sqlalchemy.url`이 적절한 DB(여기서는 SQLite) URL로 설정돼 있다
-- [ ] 첫 빈 revision을 만들고 `upgrade head`로 `alembic_version` 테이블 생성을 확인했다
-- [ ] `create_all`은 테스트에서만 사용하고 production에는 쓰지 않는다는 결정이 명확하다
-- [ ] revision 파일이 git에 포함되고 PR 리뷰 대상이 된다
-- [ ] credential은 `alembic.ini` 평문이 아니라 환경 변수로 받는다(다음 글에서 구현)
+- [ ] `alembic init` 뒤에 `alembic.ini`, `env.py`, `versions/`를 구분할 수 있다
+- [ ] `sqlalchemy.url`이 올바른 데이터베이스를 가리킨다 (이 시리즈에서는 SQLite)
+- [ ] 첫 빈 revision을 만들고 `upgrade head` 후 `alembic_version`이 생기는 것을 확인했다
+- [ ] `create_all`은 테스트용이고, 운영 환경은 Alembic으로만 관리한다는 원칙이 분명하다
+- [ ] revision 파일을 git에 커밋하고 PR에서 리뷰한다
+- [ ] credential은 `alembic.ini` 평문이 아니라 환경 변수에서 읽는다 (다음 글에서 구현)
+
+## 연습 문제
+
+1. 위 단계를 SQLite와 `alembic init`으로 그대로 따라 하고, `alembic_version` 테이블이 생기는지 확인해 보세요.
+2. `alembic history`와 `alembic current`를 실행해 출력 차이를 비교해 보세요.
+3. `alembic downgrade base`를 실행한 뒤 `alembic_version` 테이블이 어떻게 바뀌는지 확인해 보세요.
 
 ## 정리, 다음 글
 
-Alembic은 "DB 스키마를 위한 git"이라는 비유 한 줄로 거의 다 설명됩니다. revision, head, version 테이블 셋만 잡으면 나머지는 명령어 외우기에 가깝습니다.
+Alembic은 결국 “DB 스키마를 위한 git”이라는 한 줄로 요약됩니다. revision, head, version table만 머릿속에 자리 잡으면 나머지는 명령을 익히는 문제에 가깝습니다.
 
-다음 글에서는 `env.py`를 직접 들여다봅니다. 어떻게 모델 metadata와 연결하는지, 환경 변수로 DB URL을 어떻게 안전하게 받는지, online/offline 모드는 무엇인지 정리합니다.
+다음 글에서는 `env.py`를 열어 봅니다. 모델 metadata를 어떻게 연결하는지, DB URL을 환경 변수에서 어떻게 안전하게 읽는지, online과 offline 모드는 실제로 무엇을 뜻하는지 정리합니다.
 
 <!-- toc:begin -->
 <!-- toc:end -->

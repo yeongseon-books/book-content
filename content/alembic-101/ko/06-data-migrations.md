@@ -17,47 +17,48 @@ tags:
 - op.execute
 - batch
 - SQLite
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row를 변환하는 revision"입니다.
 ---
 
 # 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기
 
-데이터 마이그레이션은 스키마 변경보다 더 느리고 더 비가역적일 수 있습니다. row 변환을 revision 안에 어떻게 분리하느냐가 lock 시간과 복구 난이도를 좌우합니다.
+이 글은 Alembic 101 시리즈의 여섯 번째 글입니다. 여기서는 data migration이 schema migration과 어떻게 다른지, 그리고 row 변환 작업을 왜 별도 revision으로 분리해야 하는지 실무 패턴 중심으로 설명합니다.
 
-이 글은 Alembic 101 시리즈의 6번째 글입니다. 여기서는 schema 변경과 데이터 변경을 왜 분리해야 하는지, 그리고 안전한 실행 패턴이 무엇인지 다룹니다.
-
-## 핵심 질문
-
-스키마와 함께 데이터를 옮겨야 할 때 안전하게 수행하려면 어떻게 분리해야 할까요?
-
-이 글은 그 질문에 답하기 위해 데이터 마이그레이션의 핵심 결정과 실무 함정을 살펴봅니다.
-
+데이터 마이그레이션은 주변의 schema 변경보다 더 느리고, 더 비가역적이며, 실패했을 때 복구가 더 어렵습니다. 그래서 row 변환을 revision 안에 어떻게 격리하느냐가 lock 시간과 재실행 안정성을 좌우합니다.
 
 ## 이 글에서 다룰 문제
 
-`ALTER TABLE`만 마이그레이션이 아닙니다. column rename, enum 값 변경, JSON 구조 변환 같은 작업은 schema와 함께 데이터도 변경해야 합니다. 데이터 마이그레이션을 schema와 같은 revision에 섞으면 큰 데이터셋에서 lock 문제와 timeout이 발생하고, downgrade가 사실상 불가능해집니다.
+- data migration은 schema migration과 무엇이 다를까요?
+- `op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?
+- 큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?
+- 왜 schema-only revision과 data-only revision을 분리해야 할까요?
+- idempotency와 안전한 재실행은 어떻게 확보할까요?
+
+## 왜 중요한가
+
+`ALTER TABLE`만 migration은 아닙니다. column rename, enum 값 변경, JSON 구조 변환처럼 schema와 함께 데이터도 바뀌는 작업이 많습니다. 문제는 이런 data migration을 schema revision 안에 그대로 섞으면 큰 데이터셋에서 lock과 timeout이 폭발하고, `downgrade`는 사실상 불가능해진다는 점입니다.
 
 ## 멘탈 모델
 
-> 데이터 마이그레이션은 "schema는 그대로 두고 row를 변환하는 revision"입니다. schema-only revision과 분리하면 (1) 큰 트랜잭션을 작은 batch로 쪼갤 수 있고, (2) 실패 시 schema 부분은 살리고 데이터 부분만 재실행할 수 있고, (3) 리뷰어가 의도를 분명하게 읽을 수 있습니다.
+> data migration은 **schema는 그대로 두고 row를 변환하는 revision**입니다. 이를 schema-only revision과 분리하면 (1) 거대한 트랜잭션을 작은 batch로 쪼갤 수 있고, (2) 실패 시 schema는 유지한 채 data 단계만 다시 실행할 수 있으며, (3) 리뷰어가 의도를 더 정확히 읽을 수 있습니다.
 
-git에 비유하면 schema 변경은 코드 리팩터링, 데이터 변경은 데이터베이스 마이그레이션 스크립트입니다. 한 commit에 섞으면 history가 흐려집니다.
+git 비유로 보면 schema 변경은 코드 refactor이고, data migration은 데이터 변환 스크립트입니다. 둘을 한 commit에 섞으면 history가 흐려집니다.
 
 ## 핵심 개념
 
-### `op.execute` 두 가지 스타일
+### `op.execute`의 두 가지 스타일
 
-raw SQL 방식
+**Raw SQL**
 
 ```python
 def upgrade() -> None:
     op.execute("UPDATE users SET tier = 'free' WHERE tier IS NULL")
 ```
 
-빠르고 단순하지만 dialect 의존이 있고 IDE의 도움을 받기 어렵습니다.
+빠르고 단순하지만 dialect에 묶이고 IDE 도움도 적습니다.
 
-SQLAlchemy core 방식
+**SQLAlchemy core**
 
 ```python
 from sqlalchemy import table, column, String
@@ -71,11 +72,11 @@ def upgrade() -> None:
     )
 ```
 
-조금 길지만 dialect-agnostic이고, 변환 로직이 복잡할 때 안전합니다. 주의할 점은 마이그레이션에서 `Base.metadata`의 모델을 import하지 않는다는 것입니다. 모델이 미래에 바뀌면 과거 마이그레이션이 깨지기 때문입니다. 위처럼 `table()`/`column()`로 inline schema를 만들어 그 시점의 schema만 표현합니다.
+조금 길지만 dialect-agnostic하고, 변환 로직이 복잡할수록 더 안전합니다. 중요한 점은 migration 안에서 live 모델을 import하지 않는다는 것입니다. 미래에 모델이 바뀌면 과거 migration이 깨질 수 있으므로 `table()`과 `column()`으로 그 시점의 schema만 inline으로 표현해야 합니다.
 
-### 배치 단위 처리
+### batch 처리
 
-수백만 row를 한 번에 UPDATE하면 lock과 트랜잭션 로그가 폭발합니다. SQLite에서는 동시성 문제가, PostgreSQL/MySQL에서는 다른 트랜잭션 차단이 발생합니다.
+수백만 row에 대한 단일 `UPDATE`는 lock과 transaction log를 크게 키웁니다. SQLite에서는 concurrency 이슈가, PostgreSQL과 MySQL에서는 다른 transaction 차단이 발생합니다.
 
 ```python
 def upgrade() -> None:
@@ -90,36 +91,36 @@ def upgrade() -> None:
             break
 ```
 
-루프 안에서 commit을 명시적으로 끊어 주면 더 안전합니다. SQLite는 단일 writer이므로 큰 트랜잭션이 다른 작업을 막는 시간이 줄어듭니다.
+루프 안에서 명시적으로 commit을 끊어 주면 더 안전해집니다. SQLite는 single-writer이기 때문에 긴 transaction이 다른 작업을 막는 시간을 줄이는 것이 특히 중요합니다.
 
-### schema/data revision 분리
+### schema revision과 data revision 분리
 
-세 단계로 나누는 것이 정석입니다.
+표준 패턴은 세 단계입니다.
 
-1. schema add: `nullable=True`로 새 컬럼/테이블 추가 (빠름).
-2. data backfill: 기존 row를 채우는 데이터 마이그레이션 (느림, batch).
-3. schema tighten: `nullable=False`, default 제거 등 제약 강화 (빠름).
+1. **schema add**: 새 컬럼이나 테이블을 `nullable=True`로 추가합니다. 빠릅니다.
+2. **data backfill**: 기존 row를 채우는 data migration을 수행합니다. 느리고 batch가 필요합니다.
+3. **schema tighten**: `nullable=False`를 강제하거나 default를 제거합니다. 다시 빠른 단계입니다.
 
-이 세 단계를 각자 별도 revision으로 만들어 deploy 시점도 분리합니다. 9편의 expand-contract 패턴이 이를 정식화합니다.
+각 단계는 별도 revision이어야 하고, deploy 시점도 분리하는 편이 맞습니다. 9편의 expand-contract가 이 패턴을 운영 정책으로 정리합니다.
 
 ## 변경 전후
 
 ```python
-# 변경 전: schema와 데이터를 한 revision에 함께 넣어 timeout 발생
+# Before: schema and data bundled into one revision and timing out
 def upgrade() -> None:
     op.add_column("users", sa.Column("tier", sa.String(16), nullable=False, server_default="free"))
-    # 1억 건 갱신 — lock과 트랜잭션 로그 폭증
+    # 100M-row UPDATE — lock + transaction log explosion
     op.execute("UPDATE users SET tier = 'paid' WHERE last_payment_at IS NOT NULL")
     op.alter_column("users", "tier", server_default=None)
 ```
 
 ```python
-# 변경 후: 세 revision으로 분리
-# 리비전 1: 컬럼만 추가
+# After: split into three revisions
+# revision 1: schema add (nullable=True)
 def upgrade() -> None:
     op.add_column("users", sa.Column("tier", sa.String(16), nullable=True))
 
-# 리비전 2: 데이터 채우기
+# revision 2: data backfill (batch loop)
 def upgrade() -> None:
     bind = op.get_bind()
     while True:
@@ -131,17 +132,17 @@ def upgrade() -> None:
         if result.rowcount == 0:
             break
 
-# 리비전 3: 제약 강화
+# revision 3: schema tighten
 def upgrade() -> None:
     with op.batch_alter_table("users") as batch:
         batch.alter_column("tier", existing_type=sa.String(16), nullable=False)
 ```
 
-After 버전은 각 단계를 빠르게 마치고 다음으로 넘어갑니다. revision 2가 길어져도 다른 단계는 영향받지 않습니다.
+After 패턴은 각 단계의 책임을 분리합니다. revision 2가 오래 걸리더라도 schema add와 schema tighten은 여전히 짧고 명확합니다.
 
 ## 단계별 실습
 
-### 1단계: schema 추가
+### 1단계: schema 추가 revision
 
 ```bash
 alembic revision -m "add users.tier (nullable)"
@@ -155,7 +156,7 @@ def downgrade() -> None:
     op.drop_column("users", "tier")
 ```
 
-### 2단계: 데이터 backfill revision
+### 2단계: data backfill revision
 
 ```bash
 alembic revision -m "backfill users.tier"
@@ -176,10 +177,10 @@ def upgrade() -> None:
             break
 
 def downgrade() -> None:
-    pass  # 데이터 마이그레이션은 보통 되돌리지 않음 (raise NotImplementedError도 가능)
+    pass  # data migrations usually do not roll back (raise NotImplementedError is also fine)
 ```
 
-### 3단계: schema 강화
+### 3단계: schema tighten revision
 
 ```bash
 alembic revision -m "tighten users.tier NOT NULL"
@@ -195,60 +196,66 @@ def downgrade() -> None:
         batch.alter_column("tier", existing_type=sa.String(16), nullable=True)
 ```
 
-### 4단계: 멱등성 확보
+### 4단계: idempotency 확보
 
-마이그레이션이 중간에 실패해 다시 실행돼도 이상이 없도록 작성합니다.
+재실행돼도 깨지지 않도록 작성해야 합니다.
 
 ```python
-op.execute("UPDATE users SET tier = 'free' WHERE tier IS NULL")  # 멱등
-op.execute("UPDATE users SET counter = counter + 1")              # 비멱등 (위험)
+op.execute("UPDATE users SET tier = 'free' WHERE tier IS NULL")  # idempotent
+op.execute("UPDATE users SET counter = counter + 1")              # non-idempotent (dangerous)
 ```
 
-`WHERE`로 이미 처리된 row를 제외해 멱등하게 만듭니다.
+이미 처리한 row를 제외하는 `WHERE` 절이 핵심입니다.
 
-### 5단계: 검증 쿼리
+### 5단계: 검증 쿼리 추가
 
 ```python
 def upgrade() -> None:
     bind = op.get_bind()
-    # ... 데이터 채우기 작업 ...
+    # ... backfill work ...
     remaining = bind.execute(text("SELECT COUNT(*) FROM users WHERE tier IS NULL")).scalar()
     assert remaining == 0, f"backfill incomplete: {remaining} rows remain"
 ```
 
-assertion으로 backfill 완성도를 검증합니다. 실패하면 transaction이 rollback되어 schema 강화 단계로 넘어가지 않습니다.
+assertion은 backfill이 끝났는지 검증합니다. 실패하면 transaction이 롤백되고 schema tighten 단계는 진행되지 않습니다.
 
 ## 자주 하는 실수
 
-- schema와 데이터를 한 revision에 묶기. 큰 데이터셋에서 timeout과 lock 사고를 부르는 대표 원인입니다.
-- 모델을 import해서 사용하기. 미래에 모델이 바뀌면 과거 revision이 깨집니다. inline `table()`/`column()`으로 대체하는 편이 안전합니다.
-- batch 없이 전체 UPDATE를 실행하기. 수백만 row에서 트랜잭션이 폭발합니다.
-- 멱등성을 무시하기. 재실행 시 같은 row를 두 번 처리하는 비멱등 코드는 위험합니다.
-- 데이터 마이그레이션의 downgrade를 억지로 작성하기. 일반적으로 데이터는 한 방향만 가는 commit으로 보는 편이 낫습니다. `pass` 또는 `raise NotImplementedError`가 더 정직합니다.
+- **schema와 data를 한 revision에 섞기.** 큰 데이터셋에서 timeout과 lock 사고의 가장 흔한 원인입니다.
+- **migration 안에서 모델을 import하기.** 미래의 모델 변경이 과거 revision을 깨뜨립니다. inline `table()` / `column()`을 쓰세요.
+- **전체 테이블을 한 번에 UPDATE하기.** row 수가 커질수록 transaction이 감당되지 않습니다.
+- **idempotency를 무시하기.** 재실행 시 같은 row를 두 번 처리하면 위험합니다.
+- **data migration에 진지한 `downgrade`를 쓰려고 하기.** 보통 데이터는 one-way commit입니다. `pass`나 `NotImplementedError`가 더 정직합니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- schema/data/tighten 3단계로 나눕니다. 표준 expand-contract 패턴입니다(9편).
-- `op.get_bind()`로 connection을 얻고 SQLAlchemy core를 사용합니다. portability가 높습니다.
-- inline schema(`table`/`column`)로 시점을 고정합니다. 모델 의존을 끊는 효과가 있습니다.
-- batch loop와 명시적 commit을 함께 사용합니다. SQLite/PostgreSQL/MySQL 모두에서 안전합니다.
-- 검증 쿼리로 마무리합니다. assertion 한 줄이 운영 사고를 막아 주는 경우가 많습니다.
-- CI에서 데이터 마이그레이션 dry-run을 확인합니다. 작은 dataset으로 batch 루프가 정상 종료하는지 보는 습관이 좋습니다.
+- **schema / data / tighten의 3단계 분리**를 기본형으로 가져갑니다.
+- **`op.get_bind()`와 SQLAlchemy Core를 사용합니다.** 이식성과 가독성의 균형이 좋습니다.
+- **inline schema로 시점을 고정합니다.** live 모델 의존성을 끊을 수 있습니다.
+- **batch loop와 explicit commit을 검토합니다.** SQLite, PostgreSQL, MySQL 모두에서 안전성이 올라갑니다.
+- **마지막에 verification query를 넣습니다.** 단일 assertion 하나가 production 사고를 막습니다.
+- **CI에서 소규모 dry-run을 돌립니다.** batch loop가 종료되는지, 재실행이 안전한지 확인합니다.
 
 ## 체크리스트
 
-- [ ] schema와 데이터 마이그레이션이 별도 revision으로 분리되어 있다
-- [ ] 모델 import 없이 inline `table()`/`column()`을 사용했다
-- [ ] 큰 UPDATE는 batch loop로 처리한다
-- [ ] WHERE 조건으로 멱등성을 확보했다
-- [ ] backfill 완성도를 검증하는 assertion이 있다
-- [ ] 데이터 마이그레이션 downgrade는 의도적으로 비웠거나 `NotImplementedError`다
+- [ ] schema migration과 data migration을 별도 revision으로 분리했다
+- [ ] 모델 import 없이 inline `table()` / `column()`을 사용했다
+- [ ] 큰 `UPDATE`는 batch loop로 나눴다
+- [ ] `WHERE` 절로 idempotency를 확보했다
+- [ ] verification assertion으로 backfill 완료를 확인했다
+- [ ] data migration의 `downgrade`는 의도적으로 비우거나 `NotImplementedError`를 사용했다
+
+## 연습 문제
+
+1. `users`에 `display_name` 컬럼을 추가하고 `name`에서 backfill한 뒤, 별도 revision에서 `name`을 제거하는 3단계 migration을 만들어 보세요.
+2. 100만 개의 fake row를 넣고 batch loop가 얼마나 걸리는지 측정해 보세요.
+3. backfill assertion이 실패하도록 만들어 transaction이 롤백되는지 확인해 보세요.
 
 ## 정리, 다음 글
 
-데이터 마이그레이션은 schema 마이그레이션과 분리해 별도 revision으로 작성하는 것이 정석입니다. batch loop, 멱등성, 검증 assertion이 핵심 도구입니다.
+data migration의 기본형은 schema 변경과 분리된 별도 revision입니다. batch loop, idempotency, verification assertion이 핵심 도구입니다.
 
-다음 글은 `--sql` 옵션과 SQLite 전용 batch 모드를 깊게 다루는 online vs offline DDL 이야기입니다.
+다음 글에서는 `--sql` 기반의 offline DDL 미리 보기와 SQLite 전용 batch mode를 함께 다루며, online과 offline의 역할 분담을 정리합니다.
 
 <!-- toc:begin -->
 <!-- toc:end -->

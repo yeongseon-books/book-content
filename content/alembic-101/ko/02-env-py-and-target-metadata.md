@@ -17,45 +17,46 @@ tags:
 - target_metadata
 - Configuration
 - SQLite
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: env.py는 alembic이 명령마다 실행하는 부트 스크립트입니다.
 ---
 
 # env.py와 target_metadata: 모델과 마이그레이션 연결
 
-`env.py`는 Alembic 명령마다 실행되는 부트 스크립트입니다. 여기서 모델 metadata와 DB 연결 정보를 제대로 묶지 못하면 autogenerate는 바로 신뢰를 잃습니다.
+이 글은 Alembic 101 시리즈의 두 번째 글입니다. 여기서는 `env.py`가 Alembic 실행 흐름에서 정확히 어떤 위치를 차지하는지, 그리고 `target_metadata`가 autogenerate의 근거로서 무엇을 제공해야 하는지 실무 관점에서 정리합니다.
 
-이 글은 Alembic 101 시리즈의 2번째 글입니다. 여기서는 `env.py`가 언제 실행되고 `target_metadata`가 어떤 역할을 하는지 실무 기준으로 정리합니다.
-
-## 핵심 질문
-
-env.py와 target_metadata를 어떻게 설계해야 autogenerate가 정확하고 멀티 DB·멀티 스키마에 대응할 수 있을까요?
-
-이 글은 그 질문에 답하기 위해 env.py와 target_metadata 설계의 핵심 결정과 실무 함정을 살펴봅니다.
-
+1편에서 `alembic init`까지 마쳤더라도 그 상태의 Alembic은 여러분 모델을 모릅니다. 이 연결을 `env.py`에서 제대로 하지 못하면 `alembic revision --autogenerate`는 즉시 신뢰를 잃습니다.
 
 ## 이 글에서 다룰 문제
 
-1편의 `alembic init`은 모든 파일을 만들어 줬지만, 그 상태로는 모델을 모릅니다. `alembic revision --autogenerate`를 돌려도 빈 파일만 나옵니다. `env.py`에서 모델 metadata를 알려 주는 한 줄을 빠뜨리면 alembic은 "DB와 모델 차이"를 계산할 근거 자체가 없기 때문입니다.
+- `env.py`는 정확히 무엇이고 언제 실행될까요?
+- 왜 `target_metadata`는 선택 사항이 아니라 필수일까요?
+- DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?
+- online과 offline 모드는 무엇이 다르고 언제 중요할까요?
+- SQLite와 Alembic을 함께 쓸 때 거의 항상 필요한 옵션은 무엇일까요?
 
-또한 `alembic.ini`에 DB URL을 평문으로 두면 staging/production credential이 git에 들어갑니다. 이 글은 `env.py`를 직접 들여다보면서 그 두 가지 — metadata 연결과 URL 처리 — 를 정리합니다.
+## 왜 중요한가
+
+1편의 scaffold 상태에서 Alembic은 아직 모델 metadata의 위치를 모릅니다. 그래서 `alembic revision --autogenerate`를 실행해도 빈 파일이 나옵니다. `env.py`에 모델 metadata를 알려 주는 한 줄이 없으면, Alembic은 live DB schema와 무엇을 비교해야 하는지조차 알 수 없습니다.
+
+또 하나의 문제는 URL입니다. `alembic.ini`에 staging이나 production용 DB URL을 평문으로 두면 credential이 그대로 git에 남습니다. 이 글에서는 `env.py`를 열어 보고, metadata 연결과 URL 처리라는 두 문제를 함께 해결하겠습니다.
 
 ## 멘탈 모델
 
-> `env.py`는 alembic이 명령마다 실행하는 부트 스크립트입니다. 매 명령(`upgrade`, `revision --autogenerate` 등)에서 alembic은 (1) `alembic.ini`를 읽고 → (2) `env.py`를 실행해 connection과 metadata를 얻은 뒤 → (3) versions 디렉터리의 revision을 적용합니다.
+> `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
 
-핵심은 "매번 실행된다"입니다. 그래서 환경 변수도 매 실행 시점에 새로 읽히고, 모델 import도 매번 다시 됩니다. 이 흐름을 잡으면 `env.py`에서 무엇을 해야 하는지 명확해집니다.
+핵심은 매번 실행된다는 점입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`가 해야 할 일은 훨씬 분명해집니다.
 
 ## 핵심 개념
 
-### `env.py`의 두 함수
+### `env.py` 안의 두 함수
 
-기본 `env.py`는 두 함수를 정의합니다.
+기본 `env.py`는 보통 두 함수를 정의합니다.
 
-- `run_migrations_online()`: 실제 DB connection을 열고 마이그레이션을 실행
-- `run_migrations_offline()`: connection 없이 SQL 스크립트만 출력
+- `run_migrations_online()` — 실제 DB 연결을 열고 마이그레이션을 적용합니다
+- `run_migrations_offline()` — 연결 없이 SQL만 출력합니다
 
-마지막에 `if context.is_offline_mode(): run_migrations_offline() else: run_migrations_online()` 분기로 둘 중 하나가 호출됩니다.
+파일 맨 아래에서는 `if context.is_offline_mode(): ... else: ...` 분기로 둘 중 하나를 호출합니다.
 
 ### `target_metadata`
 
@@ -64,28 +65,28 @@ from app.models import Base
 target_metadata = Base.metadata
 ```
 
-이 한 줄이 autogenerate의 근거입니다. alembic은 connection 너머의 실제 DB 스키마를 introspection으로 읽고, `target_metadata`와 비교해 차이를 revision 파일로 출력합니다. `target_metadata = None`이면 autogenerate는 빈 파일만 만듭니다.
+이 한 줄이 autogenerate의 근거입니다. Alembic은 connection을 통해 live DB를 introspect하고, 그 결과를 `target_metadata`와 비교해 diff를 revision 파일에 씁니다. `target_metadata = None`이면 autogenerate는 조용히 아무 일도 하지 않습니다.
 
-### Online과 Offline
+### online과 offline
 
 | 모드 | 명령 | 쓰임 |
 | --- | --- | --- |
-| Online | `alembic upgrade head` | 실제 DB에 직접 적용 |
-| Offline | `alembic upgrade head --sql > out.sql` | SQL만 출력해 DBA가 수동 적용 |
+| Online | `alembic upgrade head` | DB에 직접 적용 |
+| Offline | `alembic upgrade head --sql > out.sql` | SQL만 출력하고 DBA가 수동 적용 |
 
-Offline 모드는 production DB 접근이 제한된 환경(별도 변경관리 프로세스, 망 분리 등)에서 자주 씁니다.
+offline 모드는 production DB 직접 접근이 제한된 환경에서 자주 씁니다.
 
 ### URL 우선순위
 
-alembic은 일반적으로 `alembic.ini`의 `sqlalchemy.url`을 읽지만, `env.py`에서 `config.set_main_option("sqlalchemy.url", ...)`로 override할 수 있습니다. 환경 변수 패턴은 이 override를 활용합니다.
+Alembic은 기본적으로 `alembic.ini`의 `sqlalchemy.url`을 읽지만, `env.py`에서 `config.set_main_option("sqlalchemy.url", ...)`로 덮어쓸 수 있습니다. 환경 변수 패턴은 바로 이 override를 이용합니다.
 
 ## 변경 전후
 
 ```python
-# 변경 전: 기본 생성 상태 그대로 사용
+# Before: scaffolded defaults (autogenerate produces empty files)
 from alembic import context
 config = context.config
-target_metadata = None  # ← 비워 두면 autogenerate가 무력화됨
+target_metadata = None  # ← leaving this empty disables autogenerate
 
 def run_migrations_online():
     connectable = engine_from_config(config.get_section(config.config_ini_section), ...)
@@ -96,20 +97,20 @@ def run_migrations_online():
 ```
 
 ```python
-# 변경 후: 모델과 URL 연결
+# After: model wired in, URL from environment
 import os
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-from app.models import Base   # ← 모델 가져오기
+from app.models import Base   # ← import the model
 
 config = context.config
 
-# 환경 변수가 있으면 설정값을 덮어쓴다
+# Override alembic.ini if DATABASE_URL is set in the environment
 db_url = os.environ.get("DATABASE_URL")
 if db_url:
     config.set_main_option("sqlalchemy.url", db_url)
 
-target_metadata = Base.metadata   # ← autogenerate 기준
+target_metadata = Base.metadata   # ← basis for autogenerate
 
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
@@ -117,7 +118,7 @@ def run_migrations_offline():
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        render_as_batch=url.startswith("sqlite"),  # SQLite 전용 batch 모드
+        render_as_batch=url.startswith("sqlite"),  # SQLite-only batch mode
     )
     with context.begin_transaction():
         context.run_migrations()
@@ -143,13 +144,13 @@ else:
     run_migrations_online()
 ```
 
-After 버전은 (1) 모델을 안다 → autogenerate가 동작, (2) production credential은 환경 변수로만 받는다 → git 안전, (3) SQLite에서는 batch 모드를 자동으로 켠다 → ALTER 제약을 우회.
+After 버전은 (1) 모델을 알기 때문에 autogenerate가 동작하고, (2) production credential을 환경 변수에서 읽어 git을 안전하게 유지하며, (3) SQLite의 ALTER 제약을 우회하기 위해 batch mode를 자동으로 켭니다.
 
 ## 단계별 실습
 
-### 1단계: 모델 import 경로 확보
+### 1단계: 모델 import가 실제로 되는지 확인
 
-`env.py`는 alembic 명령어 실행 위치에서 import됩니다. 보통 프로젝트 루트에서 `alembic` 명령을 실행하므로, `from app.models import Base`가 바로 import되도록 패키지 구조를 잡거나 `sys.path`에 명시적으로 루트를 추가합니다.
+`env.py`는 보통 project root에서 `alembic` 명령을 실행할 때 import됩니다. 따라서 `from app.models import Base`가 바로 동작하도록 패키지 구조를 잡거나, 필요하면 project root를 `sys.path`에 직접 넣습니다.
 
 ```python
 import sys, pathlib
@@ -163,7 +164,7 @@ from app.models import Base
 target_metadata = Base.metadata
 ```
 
-여러 `Base`가 있다면 `MetaData`를 합쳐 전달합니다.
+`Base`가 여러 개라면 각 `MetaData`를 합쳐야 합니다.
 
 ```python
 from sqlalchemy import MetaData
@@ -183,64 +184,70 @@ if db_url:
     config.set_main_option("sqlalchemy.url", db_url)
 ```
 
-`alembic.ini`의 평문 URL은 로컬 SQLite 같은 안전한 기본값만 두고, staging/production은 환경 변수로 주입합니다.
+`alembic.ini`에는 local SQLite 같은 안전한 기본값만 두고, staging과 production은 환경 변수로 주입하는 편이 좋습니다.
 
-### 4단계: SQLite를 위한 `render_as_batch`
+### 4단계: SQLite용 `render_as_batch`
 
-SQLite는 `ALTER TABLE`로 컬럼 drop, type change 등을 거의 지원하지 않습니다. alembic의 batch 모드는 (1) 임시 테이블 생성 → (2) 데이터 복사 → (3) 원본 drop → (4) 임시 테이블 rename으로 우회합니다. SQLite를 쓴다면 거의 항상 켭니다.
+SQLite는 컬럼 삭제, 타입 변경, nullable 변경 같은 `ALTER TABLE` 지원이 매우 약합니다. Alembic의 batch mode는 임시 테이블을 만들고, 데이터를 복사하고, 원본을 바꾸는 방식으로 이를 우회합니다. SQLite를 쓴다면 거의 항상 켜 두는 편이 맞습니다.
 
-### 5단계: autogenerate 동작 확인
+### 5단계: autogenerate 검증
 
 ```bash
-# 모델에 컬럼 하나 추가
-# User 모델
+# Add a column to the model
+# class User(Base):
 #     ...
-#     tier 컬럼 추가
+#     tier: Mapped[str] = mapped_column(default="free")
 
 alembic revision --autogenerate -m "add users.tier"
 ```
 
-`versions/<hash>_add_users_tier.py`가 생성되고 `upgrade()`에 `op.add_column(...)`이 들어 있으면 metadata 연결이 성공한 것입니다.
+`versions/<hash>_add_users_tier.py` 안에 `op.add_column(...)`이 생성됐다면 metadata 연결은 성공한 것입니다.
 
-### 6단계: offline 모드로 SQL 미리 보기
+### 6단계: offline SQL 미리 보기
 
 ```bash
 alembic upgrade head --sql
 ```
 
-connection 없이 DDL을 출력합니다. CI에 이 명령을 넣고 PR 본문에 출력 결과를 붙이는 팀이 많습니다. 사람 눈으로 SQL을 보는 습관 자체가 큰 안전 장치입니다.
+이 명령은 connection 없이 DDL을 출력합니다. 많은 팀이 이 출력을 CI 산출물로 남기고 PR 본문에 붙입니다. SQL을 사람 눈으로 읽는 과정 자체가 꽤 강한 안전 장치입니다.
 
 ## 자주 하는 실수
 
-- `target_metadata = None`을 그대로 두기. autogenerate가 빈 파일만 만듭니다. 가장 먼저 확인할 지점입니다.
-- 모델을 import했는데도 빈 결과가 나오기. 모델 모듈이 로딩되지 않으면 `Base.metadata`가 비어 있습니다. `__init__.py`에서 모든 모델을 명시적으로 import하거나 `env.py`에서 직접 import합니다.
-- SQLite에서 `render_as_batch` 없이 컬럼 drop을 시도하기. "ALTER TABLE drop column not supported" 에러가 납니다.
-- `alembic.ini`에 production URL을 그대로 commit하기. 환경 변수 override 패턴이 사실상 표준입니다.
-- pool을 기본값으로 두기. alembic은 보통 단발성 명령이므로 `poolclass=pool.NullPool`이 더 적절합니다.
+- **`target_metadata = None`을 그대로 두기.** autogenerate가 빈 파일만 만듭니다. 가장 먼저 확인해야 할 지점입니다.
+- **모델 import는 했는데 결과가 비어 있기.** 모델 모듈이 실제로 로드되지 않으면 `Base.metadata`는 비어 있습니다. `__init__.py`에서 모든 모델을 명시적으로 import하거나 `env.py`에서 직접 import하세요.
+- **SQLite에서 `render_as_batch` 없이 컬럼 drop을 시도하기.** 지원되지 않는 ALTER 에러를 만나게 됩니다.
+- **`alembic.ini`에 production URL을 그대로 커밋하기.** 환경 변수 override 패턴을 사실상 표준으로 보세요.
+- **기본 pool 설정을 그대로 두기.** Alembic 명령은 보통 one-shot이므로 `poolclass=pool.NullPool`이 더 적절합니다.
 
-## 실무에서 쓰는 패턴
+## 실무 패턴
 
-- `env.py`는 한 번 잘 짜 두면 거의 건드릴 일이 없습니다. 모델 import, 환경 변수 URL, batch 모드(SQLite/MySQL) 정도가 핵심입니다.
-- 여러 environment(local/staging/prod)에서 같은 `env.py`를 씁니다. 차이는 환경 변수로만 흡수하는 편이 단순합니다.
-- `compare_type=True`, `compare_server_default=True`를 켭니다. autogenerate가 컬럼 타입 변경과 default 변경까지 잡게 하려는 설정입니다(다음 글에서 자세히 다룹니다).
-- `include_object` hook으로 특정 테이블을 제외합니다. 외부 시스템이 관리하는 테이블이 있을 때 유용합니다.
-- sync와 async를 구분합니다. async SQLAlchemy를 쓰더라도 alembic은 `env.py`에서 sync engine으로 동작하는 경우가 일반적입니다. async가 꼭 필요하면 `connectable.run_sync(...)` 패턴을 씁니다.
+- **`env.py`는 한 번 제대로 만들면 오래 갑니다.** 보통 필요한 것은 모델 import, env-var URL, batch mode 정도입니다.
+- **모든 환경에서 같은 `env.py`를 씁니다.** 차이는 코드가 아니라 환경 변수에서 흡수하는 편이 단순합니다.
+- **`compare_type=True`, `compare_server_default=True`를 켭니다.** 다음 글의 autogenerate에서 타입과 default 변경까지 잡기 위해서입니다.
+- **`include_object` hook으로 특정 테이블을 제외합니다.** 외부 시스템이 관리하는 테이블이 있을 때 유용합니다.
+- **async 앱이어도 Alembic은 sync engine으로 돌리는 경우가 많습니다.** 정말 async가 필요할 때만 `connectable.run_sync(...)` 패턴을 검토하세요.
 
 ## 체크리스트
 
-- [ ] `from app.models import Base` 같은 import가 `env.py` 상단에 있고 실제로 동작한다
+- [ ] `from app.models import Base` 또는 동등한 import가 `env.py` 상단에서 실제로 동작한다
 - [ ] `target_metadata = Base.metadata`가 명시돼 있다
 - [ ] `DATABASE_URL` 환경 변수로 URL을 override할 수 있다
 - [ ] SQLite를 쓴다면 `render_as_batch=True`가 `context.configure(...)`에 들어 있다
-- [ ] `alembic.ini`에는 안전한 기본값(local SQLite)만 들어 있다
-- [ ] `alembic revision --autogenerate`가 빈 파일이 아니라 실제 차이를 출력한다
-- [ ] `alembic upgrade head --sql`로 offline DDL 출력이 가능하다
+- [ ] `alembic.ini`에는 안전한 기본값(local SQLite)만 있다
+- [ ] `alembic revision --autogenerate`가 빈 파일이 아니라 실제 diff를 만든다
+- [ ] `alembic upgrade head --sql`로 offline DDL을 출력할 수 있다
+
+## 연습 문제
+
+1. `target_metadata = None`으로 둔 채 `alembic revision --autogenerate`를 실행해 보고, 결과 파일이 비는지 확인해 보세요.
+2. `DATABASE_URL`을 두 개의 서로 다른 SQLite 파일로 번갈아 지정해 같은 migration을 둘 다에 적용해 보세요.
+3. `render_as_batch`를 끈 상태에서 SQLite 컬럼 삭제 migration을 시도해 오류를 재현해 보세요.
 
 ## 정리, 다음 글
 
-`env.py`는 alembic의 부트 스크립트이고, 그 안에서 핵심은 두 가지입니다. `target_metadata` 연결과 환경 변수 URL만 제대로 잡으면 나머지는 거의 손댈 일이 없습니다. SQLite를 쓴다면 `render_as_batch`를 추가합니다.
+`env.py`는 Alembic의 부트 스크립트이고, 실제로 핵심은 두 가지입니다. `target_metadata`를 올바르게 연결하는 일과 URL을 환경 변수에서 안전하게 읽는 일입니다. SQLite를 쓴다면 여기에 `render_as_batch`까지 더하면 됩니다.
 
-다음 글에서는 첫 의미 있는 revision을 직접 작성합니다. `op.create_table`, `op.add_column`, `op.execute`의 세 도구로 손으로 작성하는 마이그레이션과 자동 생성된 마이그레이션을 비교하고, `upgrade`/`downgrade`가 대칭이 되도록 짜는 법을 정리합니다.
+다음 글에서는 첫 의미 있는 revision을 손으로 작성해 봅니다. `op.create_table`, `op.add_column`, `op.execute`를 중심으로 수동 작성과 autogenerate 결과를 비교하고, `upgrade`와 `downgrade`를 대칭으로 유지하는 법을 다룹니다.
 
 <!-- toc:begin -->
 <!-- toc:end -->
