@@ -2,7 +2,7 @@
 series: algorithms-101
 episode: 3
 title: 탐색 알고리즘
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,34 +17,50 @@ tags:
   - 이진 탐색
   - 선형 탐색
   - bisect
-seo_description: 선형 탐색과 이진 탐색의 차이, 정렬된 데이터의 위력, 그리고 파이썬 bisect 모듈을 통한 실전 사용법을 정리합니다.
-last_reviewed: '2026-05-04'
+seo_description: 선형 탐색과 이진 탐색의 차이, 정렬된 데이터의 위력, 그리고 Python bisect의 실전 사용법을 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 탐색 알고리즘
 
-탐색은 거의 모든 시스템이 매일 반복하는 기본 연산입니다. 데이터가 정렬되어 있는지 여부 하나만으로도 같은 조회 문제가 전혀 다른 비용을 갖습니다.
-
-이 글은 Algorithms 101 시리즈의 3번째 글입니다. 여기서는 선형 탐색과 이진 탐색의 차이, 정렬된 데이터의 위력, 그리고 파이썬 `bisect` 모듈의 실전 사용법을 정리합니다.
+정렬된 정수 백만 개가 있을 때, 원하는 값을 찾으려면 처음부터 끝까지 다 봐야 할까요? 이 글은 Algorithms 101 시리즈의 세 번째 글입니다. 여기서는 선형 탐색, 이진 탐색, Python의 `bisect`, 그리고 답 자체를 이진 탐색하는 parametric search까지 다룹니다.
 
 ## 이 글에서 다룰 문제
 
-탐색은 거의 모든 시스템의 기본 연산입니다. 잘못된 탐색 알고리즘은 시스템의 응답 시간을 통째로 망칩니다. 한편 이진 탐색의 사고는 단순한 검색을 넘어 "답이 단조롭다면 매개 변수 자체를 이진 탐색"하는 패턴(parametric search)으로도 확장됩니다.
+- 선형 탐색과 이진 탐색의 비용 차이는 얼마나 클까요?
+- 정렬 여부 하나가 왜 알고리즘 계층을 바꿀까요?
+- lower bound와 upper bound는 각각 어디에 쓰일까요?
+- `bisect` 모듈은 어떻게 안전하게 활용할 수 있을까요?
 
-> 이진 탐색을 모르면 알고리즘의 절반을 못 본 것과 같습니다.
+## 왜 중요한가
 
-## 전체 흐름
-> 선형 탐색은 처음부터 끝까지 비교하므로 O(n)입니다. 이진 탐색은 정렬된 배열에서 매 단계 절반을 버리므로 O(log n)입니다. 100만 개에서 선형은 100만 번, 이진은 약 20번이면 충분합니다.
+탐색은 거의 모든 시스템의 기본 연산입니다. 데이터베이스 조회, 로그 검색, 추천 후보 탐색, 게임 매칭은 모두 탐색 문제로 환원됩니다. 잘못된 선택 하나가 시스템 전체 응답 시간을 끌어내릴 수 있습니다. 또한 이진 탐색은 단순 조회를 넘어 parametric search라는 더 큰 패턴으로 확장됩니다.
+
+> 이진 탐색을 모르면 알고리즘 책의 절반을 놓친 셈입니다.
+
+## 한눈에 보는 개념
+
+> 선형 탐색은 첫 원소부터 차례로 비교하므로 O(n)입니다. 이진 탐색은 정렬된 순서를 이용해 매 단계 후보의 절반을 버리므로 O(log n)입니다. 백만 개 원소에서는 선형 탐색이 백만 번 가까이 비교할 수 있지만, 이진 탐색은 대략 20번이면 충분합니다. 이 차이는 오직 입력이 정렬되어 있다는 전제에서 나옵니다.
 
 ```text
-선형 탐색  [3, 1, 4, 1, 5, 9, 2, 6]   target=9
-              비교 8번 → O(n)
+Linear  [3, 1, 4, 1, 5, 9, 2, 6]   target=9
+            8 comparisons → O(n)
 
-이진 탐색  [1, 1, 2, 3, 4, 5, 6, 9]   target=5
-              4 < 5 < 6 → 우측 절반
-              5 == 5 → 발견
-              비교 ≈ log(8)=3번 → O(log n)
+Binary  [1, 1, 2, 3, 4, 5, 6, 9]   target=5
+            4 < 5 < 6 → right half
+            5 == 5 → found
+            ≈ log(8) = 3 comparisons → O(log n)
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| 선형 탐색 | 첫 원소부터 차례로 비교하는 탐색 |
+| 이진 탐색 | 정렬된 데이터에서 후보를 절반씩 줄이는 탐색 |
+| lower bound | target 이상이 처음 나타나는 위치 |
+| upper bound | target 초과가 처음 나타나는 위치 |
+| parametric search | 답 자체를 이진 탐색하는 기법 |
 
 ## Before / After
 
@@ -56,10 +72,10 @@ def contains(sorted_arr, x):
         if v == x:
             return True
     return False
-# O(n) — 정렬을 활용 못 함
+# O(n) — wastes the sortedness
 ```
 
-**After — 이진 탐색 사용:**
+**After — `bisect` 기반 이진 탐색:**
 
 ```python
 import bisect
@@ -69,9 +85,9 @@ def contains(sorted_arr, x):
 # O(log n)
 ```
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
-### 1단계: 선형 탐색 직접 구현
+### 1단계: 선형 탐색 구현
 
 ```python
 def linear_search(arr, target):
@@ -84,9 +100,9 @@ print(linear_search([3, 1, 4, 1, 5, 9, 2, 6], 5))   # 4
 print(linear_search([3, 1, 4, 1, 5, 9, 2, 6], 7))   # -1
 ```
 
-데이터의 정렬 여부와 무관하게 동작하지만 비용은 O(n)입니다.
+정렬 여부와 무관하게 동작하지만 비용은 언제나 O(n)을 냅니다.
 
-### 2단계: 이진 탐색 직접 구현
+### 2단계: 이진 탐색 구현
 
 ```python
 def binary_search(arr, target):
@@ -102,17 +118,15 @@ def binary_search(arr, target):
     return -1
 
 arr = sorted([3, 1, 4, 1, 5, 9, 2, 6])
-print(binary_search(arr, 5))   # 5의 위치
-print(binary_search(arr, 7))   # -1
+print(binary_search(arr, 5))
 ```
 
-핵심은 `mid = (lo + hi) // 2`와 절반 버리기. 종료 조건 `lo <= hi`와 `lo = mid + 1`, `hi = mid - 1`을 정확히 적어야 무한 루프를 피합니다.
+핵심은 `mid = (lo + hi) // 2`입니다. 종료 조건 `lo <= hi`와 `lo`, `hi` 갱신이 한 글자만 어긋나도 무한 루프로 이어질 수 있습니다.
 
-### 3단계: 이진 탐색의 변형 — 좌측/우측 경계
+### 3단계: lower bound와 upper bound
 
 ```python
 def lower_bound(arr, target):
-    """target 이상이 처음 나오는 위치"""
     lo, hi = 0, len(arr)
     while lo < hi:
         mid = (lo + hi) // 2
@@ -123,7 +137,6 @@ def lower_bound(arr, target):
     return lo
 
 def upper_bound(arr, target):
-    """target 초과가 처음 나오는 위치"""
     lo, hi = 0, len(arr)
     while lo < hi:
         mid = (lo + hi) // 2
@@ -134,14 +147,14 @@ def upper_bound(arr, target):
     return lo
 
 arr = [1, 2, 2, 2, 3, 4, 5]
-print(lower_bound(arr, 2))   # 1
-print(upper_bound(arr, 2))   # 4
-print(upper_bound(arr, 2) - lower_bound(arr, 2))   # 3 (2의 개수)
+print(lower_bound(arr, 2))                                  # 1
+print(upper_bound(arr, 2))                                  # 4
+print(upper_bound(arr, 2) - lower_bound(arr, 2))            # 3
 ```
 
-좌측·우측 경계만 알면 "범위 안의 개수", "삽입 위치", "첫 등장 위치"를 모두 풀 수 있습니다.
+이 두 변형만 익혀도 개수 세기, 삽입 위치 찾기, 첫 등장 위치 찾기 같은 문제를 한 도구로 처리할 수 있습니다.
 
-### 4단계: 파이썬 bisect 모듈
+### 4단계: `bisect` 사용
 
 ```python
 import bisect
@@ -149,19 +162,17 @@ import bisect
 arr = [1, 2, 4, 4, 4, 6, 8]
 print(bisect.bisect_left(arr, 4))    # 2
 print(bisect.bisect_right(arr, 4))   # 5
-print(bisect.bisect(arr, 4))         # 5 (= bisect_right)
 
-# 정렬 유지하며 삽입
 bisect.insort(arr, 5)
-print(arr)   # [1, 2, 4, 4, 4, 5, 6, 8]
+print(arr)
 ```
 
-표준 라이브러리에 이미 검증된 구현이 있습니다. 직접 구현하는 것보다 안전합니다.
+표준 라이브러리는 이미 검증된 구현을 제공합니다. 연습 목적이 아니라면 직접 구현보다 `bisect`를 우선하는 편이 안전합니다.
 
-### 5단계: Parametric Search — 답을 이진 탐색
+### 5단계: Parametric search
 
 ```python
-# 문제: 길이가 정해진 통나무 n개에서 m개를 같은 길이로 자를 때 최대 길이
+# Cut n logs into m equal pieces. Find the maximum length per piece.
 def can_make(logs, length, m):
     return sum(log // length for log in logs) >= m
 
@@ -178,46 +189,60 @@ def max_cut_length(logs, m):
 print(max_cut_length([802, 743, 457, 539], 11))   # 200
 ```
 
-답이 단조 함수(길이가 짧으면 가능, 길면 불가능)이면 답 자체를 이진 탐색합니다. 알고리즘 대회에서 흔한 패턴입니다.
+답의 가능 여부가 단조롭다면, 즉 짧으면 가능하고 길면 불가능한 구조라면 답 자체를 이진 탐색할 수 있습니다. 많은 최적화 문제가 이 패턴으로 단순화됩니다.
 
-## 이 코드에서 주목할 점
+## 이 글에서 먼저 가져갈 점
 
-- 정렬된 데이터에서 선형 탐색을 사용하면 알고리즘적 손실
-- 이진 탐색의 종료 조건과 mid 갱신은 한 글자 차이로 무한 루프
-- 좌측·우측 경계 변형으로 다양한 문제를 풀 수 있음
-- `bisect`는 직접 구현보다 안전하고 빠름
+- 정렬된 데이터에 선형 탐색을 쓰는 것은 기회를 버리는 일입니다.
+- 이진 탐색의 버그는 주로 `mid` 갱신과 종료 조건에 숨어 있습니다.
+- lower/upper bound 변형이 실전 문제 대부분을 덮습니다.
+- `bisect`는 임시 구현보다 빠르고 안전합니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| 정렬 안 된 배열에 이진 탐색 | 잘못된 결과 | 정렬 보장을 코드 주석으로 명시 |
-| `(lo + hi) / 2` 정수 오버플로우 | 큰 인덱스에서 음수 | Python은 안전, C++ 등에서는 `lo + (hi-lo)//2` |
-| 경계 처리 오류 | 무한 루프 또는 off-by-one | 좌측/우측 경계 변형 외워두기 |
-| bisect를 잊고 직접 구현 | 버그 | 표준 라이브러리 우선 |
-| 비교 가능한 객체 가정 누락 | TypeError | 키 함수 분리 |
+| 정렬되지 않은 데이터에 이진 탐색 적용 | 잘못된 결과 | 정렬 전제를 문서와 코드에 명시합니다 |
+| `(lo + hi) / 2` 오버플로우 패턴 무시 | C/C++에서 음수 인덱스 가능 | Python은 안전하지만 일반식은 `lo + (hi - lo) // 2`를 기억합니다 |
+| 경계 갱신을 잘못 씀 | 무한 루프 | lower/upper bound 템플릿을 익힙니다 |
+| `bisect` 대신 매번 직접 구현 | 미묘한 버그 | 표준 라이브러리를 먼저 사용합니다 |
+| 모든 원소가 비교 가능하다고 가정 | TypeError | 필요하면 key 기준을 별도로 둡니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
-- 데이터베이스 인덱스 조회: B-Tree 위에서 이진 탐색의 일반화
-- 시계열 데이터: 시간으로 정렬된 로그에서 특정 시각 찾기
-- 게임 매칭: 점수 기반 매칭에서 적정 상대를 이진 탐색
-- 머신러닝 추론: 정렬된 임베딩에서 근접 이웃을 이진 탐색
-- 운영체제: 빈 메모리 블록 탐색에 변형 이진 탐색 사용
+- 데이터베이스 인덱스 조회는 이진 탐색의 일반화입니다.
+- 시계열 조회는 정렬된 로그에서 시간값을 이진 탐색합니다.
+- 게임 매칭은 정렬된 점수대에서 비슷한 상대를 찾습니다.
+- 메모리 할당기 내부에도 이진 탐색 변형이 등장합니다.
+- 반복 조회가 많다면 "한 번 정렬 + 여러 번 이진 탐색"이 선형 탐색 반복보다 훨씬 낫습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 "정렬됨"이라는 단어를 보는 순간 이진 탐색 가능성을 떠올립니다. 또한 한 번 정렬해 두고 여러 번 이진 탐색하는 비용과, 그때그때 선형 탐색하는 비용을 함께 비교합니다. 반복 조회가 있는 문제에서는 전처리 비용이 거의 항상 이깁니다.
+
+또한 "가장 큰 X such that ..." 같은 문장을 보면 답의 단조성을 먼저 확인합니다. 가능 여부가 한 방향으로만 바뀐다면, 그것은 parametric search를 적용하라는 강한 신호입니다.
 
 ## 체크리스트
 
-- [ ] 선형 탐색과 이진 탐색의 비용 차이를 직관적으로 갖고 있는가
+- [ ] 선형 탐색과 이진 탐색의 비용 차이를 직관적으로 느끼는가
 - [ ] 이진 탐색의 종료 조건을 정확히 쓸 수 있는가
-- [ ] 좌측·우측 경계의 의미를 이해했는가
-- [ ] `bisect` 모듈을 자유롭게 사용하는가
-- [ ] Parametric search 패턴을 인식할 수 있는가
+- [ ] lower bound와 upper bound의 차이를 이해하는가
+- [ ] `bisect` 사용이 익숙한가
+- [ ] 언제 parametric search를 써야 하는지 감을 잡았는가
+
+## 연습 문제
+
+1. 정렬된 배열에서 target의 첫 위치와 마지막 위치를 반환하는 함수를 작성해 보세요. `lower_bound`와 `upper_bound`를 활용해 보세요.
+
+2. `[4,5,6,7,0,1,2]`처럼 회전된 정렬 배열에서 O(log n)으로 값을 찾는 함수를 구현해 보세요. 이진 탐색의 변형 문제입니다.
+
+3. 크기 n, m인 두 정렬 배열의 합집합에서 k번째 작은 원소를 O(log(n+m))에 찾는 방법을 설계해 보세요. 고전적인 이진 탐색 응용입니다.
 
 ## 정리 및 다음 단계
 
-탐색 알고리즘은 데이터에 사전 조건이 있는지에 따라 비용이 한 차원 달라집니다. 정렬된 데이터에서는 이진 탐색이 표준이며, 좌측·우측 경계 변형만 익히면 다양한 문제를 풀 수 있습니다. 답이 단조롭다면 답 자체를 이진 탐색하는 parametric search 패턴까지 확장됩니다.
+탐색 비용은 데이터에 구조가 있는지에 따라 크게 달라집니다. 정렬이 있으면 O(n)을 O(log n)으로 줄일 수 있고, 같은 발상은 parametric search로 확장됩니다. lower/upper bound 템플릿을 몸에 익히고, 일상적인 작업에는 `bisect`를 적극적으로 활용하는 것이 좋습니다.
 
-다음 글에서는 정렬 알고리즘을 살펴봅니다. 비교 기반 정렬의 한계, mergesort/quicksort/heapsort의 트레이드오프, 그리고 파이썬 sorted의 알고리즘인 Timsort까지 다룹니다.
+다음 글에서는 정렬 알고리즘을 다룹니다. mergesort, quicksort, heapsort의 트레이드오프와 Python의 `sorted`가 왜 Timsort를 쓰는지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [알고리즘이란 무엇인가?](./01-what-is-an-algorithm.md)

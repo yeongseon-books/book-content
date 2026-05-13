@@ -2,7 +2,7 @@
 series: algorithms-101
 episode: 1
 title: 알고리즘이란 무엇인가?
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -13,210 +13,193 @@ language: ko
 tags:
   - Computer Science
   - 알고리즘
-  - 문제 해결
   - 기초
-  - 설계
-  - 사고법
-seo_description: 알고리즘의 정의와 좋은 알고리즘의 조건, 그리고 자료구조와의 관계를 통해 알고리즘적 사고의 출발점을 정리합니다.
-last_reviewed: '2026-05-04'
+  - 문제 해결
+  - 의사코드
+  - 정확성
+seo_description: 알고리즘이 무엇인지, 프로그램과 어떻게 다른지, 그리고 정확성·유한성·효율성이 왜 핵심 조건인지 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 알고리즘이란 무엇인가?
 
-알고리즘을 처음 배울 때 가장 먼저 헷갈리는 지점은 코드와 알고리즘을 같은 것으로 보는 일입니다. 하지만 같은 기능을 구현해도 문제를 푸는 절차를 어떻게 설계하느냐에 따라 성능과 확장성이 크게 달라집니다.
-
-이 글은 Algorithms 101 시리즈의 첫 번째 글입니다. 여기서는 알고리즘의 정의와 좋은 알고리즘의 조건, 그리고 자료구조와의 관계를 함께 정리합니다.
+현대 하드웨어가 충분히 빠른데도 왜 여전히 좋은 알고리즘이 중요할까요? 이 글은 Algorithms 101 시리즈의 첫 번째 글입니다. 여기서는 알고리즘이 무엇인지, 프로그램과 어떻게 다른지, 그리고 이후 시리즈 전체를 떠받치는 핵심 용어를 정리합니다.
 
 ## 이 글에서 다룰 문제
 
-같은 문제도 알고리즘 선택에 따라 성능 차이가 100배, 10000배가 됩니다. 인프라 확장으로 만회하기 어렵고, 한번 잘못 고르면 시스템의 상한선이 됩니다. 알고리즘적 사고는 코드를 짧게 만드는 기술이 아니라, 문제를 분해하고 해법의 비용을 미리 예측하는 기술입니다.
+- 알고리즘이 반드시 만족해야 하는 세 가지 조건은 무엇일까요?
+- 알고리즘과 프로그램은 어떻게 다를까요?
+- 왜 알고리즘 설계에서는 의사코드가 중요한 작업 언어가 될까요?
+- 남은 아홉 편은 어떤 주제로 이어질까요?
 
-> 좋은 코드 ≠ 좋은 알고리즘. 알고리즘은 코드 이전의 결정입니다.
+## 왜 중요한가
 
-## 전체 흐름
-> 알고리즘은 입력을 받아서 출력을 만들기 위한 일련의 단계입니다. 같은 문제를 풀더라도 단계의 구성에 따라 비용이 달라집니다. 자료구조가 "데이터를 어떻게 보관할지"를 결정한다면, 알고리즘은 "데이터로 무엇을 할지"를 결정합니다.
+운영에서 "시스템이 느리다"로 보이는 문제의 상당수는 사실 "알고리즘이 입력 크기에 맞게 확장되지 않는다"는 문제입니다. 테스트 데이터에서는 괜찮았던 선형 탐색 하나가, 실제로 수천만 건을 만나는 순간 병목이 되곤 합니다. 알고리즘의 언어를 익히는 것은 시스템이 현실적인 부하를 견딜지 미리 예측하는 첫걸음입니다.
+
+> 알고리즘은 문제와 해법 사이의 계약입니다.
+
+## 한눈에 보는 개념
+
+> 알고리즘은 세 가지 의무를 집니다. 모든 유효한 입력에 대해 올바른 출력을 내야 하고(정확성), 유한한 시간과 메모리 안에서 끝나야 하며(유한성), 입력이 커져도 감당 가능한 비용으로 동작해야 합니다(효율성). 프로그램은 여기에 구체적인 문법, 실행 환경, 부작용이 더해진 형태이고, 알고리즘은 그 뒤에 있는 추상적 절차입니다.
 
 ```text
-입력 → [알고리즘: 단계의 나열] → 출력
-        │
-        ├─ 단계 수가 적으면 빠름
-        ├─ 메모리를 적게 쓰면 가벼움
-        └─ 잘못된 단계가 있으면 정답이 아님
+Problem  →  Algorithm  →  Program  →  Execution
+                  (correctness, finiteness, efficiency)
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| 알고리즘 | 입력을 출력으로 바꾸는 유한하고 모호하지 않은 단계의 집합 |
+| 정확성 | 모든 유효한 입력에 대해 올바른 출력을 만드는 성질 |
+| 유한성 | 유한한 시간과 메모리 안에서 종료되는 성질 |
+| 의사코드 | 특정 언어에 묶이지 않는 알고리즘 설계 표기법 |
+| 효율성 | 입력 크기에 따라 비용이 어떻게 증가하는지 |
 
 ## Before / After
 
-**Before — 단순 반복으로 평균 구하기:**
+**Before — "내 컴퓨터에서는 된다" 수준의 코드:**
 
 ```python
-def average(nums):
-    total = 0
-    for n in nums:
-        total += n
-    return total / len(nums) if nums else 0
+def find(arr, x):
+    for v in arr:
+        if v == x:
+            return True
+    return False
+# Fine on 100 items, terrible on 10^8
 ```
 
-**After — 동일한 문제를 라이브러리로:**
+**After — 입력 크기에 맞는 알고리즘 선택:**
 
 ```python
-from statistics import fmean
-average = lambda nums: fmean(nums) if nums else 0
+def find(sorted_arr, x):
+    import bisect
+    i = bisect.bisect_left(sorted_arr, x)
+    return i < len(sorted_arr) and sorted_arr[i] == x
+# O(log n) once the array is sorted
 ```
 
-같은 문제를 푸는 알고리즘이지만, "어떻게 푸는가"가 다릅니다. 알고리즘 설계는 늘 "더 나은 방법은 없는가"를 묻습니다.
+같은 문제라도 어떤 알고리즘을 선택하느냐에 따라 비용 계층이 완전히 달라집니다.
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
-### 1단계: 알고리즘의 다섯 조건 점검
+### 1단계: 유한성 확인
 
 ```python
-def find_max(nums):
-    """최댓값 찾기 - 다섯 조건 모두 만족"""
-    if not nums:
-        return None              # 명확성: 빈 입력 처리 정의
-    current_max = nums[0]        # 입력으로부터 시작
-    for n in nums[1:]:           # 유한 단계
-        if n > current_max:      # 명확한 비교
-            current_max = n
-    return current_max           # 출력 정의
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
 
-print(find_max([3, 1, 4, 1, 5, 9, 2, 6]))   # 9
+print(gcd(48, 36))   # 12
 ```
 
-입력, 출력, 유한성, 명확성, 효율성 — 다섯 조건을 모두 만족해야 알고리즘입니다.
+유클리드 알고리즘은 매 단계마다 `b`가 엄격하게 줄어들기 때문에 반드시 종료합니다. 유한성은 우연이 아니라 한 문장으로 설명할 수 있어야 하는 성질입니다.
 
-### 2단계: 같은 문제, 다른 알고리즘
+### 2단계: 경계 입력에서 정확성 확인
 
 ```python
-# 방법 1: 정렬 후 마지막 원소
-def max_by_sort(nums):
-    return sorted(nums)[-1]
-
-# 방법 2: 한 번 순회
-def max_by_scan(nums):
-    m = nums[0]
-    for n in nums[1:]:
-        if n > m:
-            m = n
-    return m
-
-# 방법 3: 재귀 분할 정복
-def max_by_divide(nums):
-    if len(nums) == 1:
-        return nums[0]
-    mid = len(nums) // 2
-    left = max_by_divide(nums[:mid])
-    right = max_by_divide(nums[mid:])
-    return left if left > right else right
-
-data = [3, 1, 4, 1, 5, 9, 2, 6]
-print(max_by_sort(data), max_by_scan(data), max_by_divide(data))
+assert gcd(0, 5) == 5
+assert gcd(5, 0) == 5
+assert gcd(7, 7) == 7
 ```
 
-세 알고리즘 모두 정답을 반환하지만 비용이 다릅니다. 정렬은 O(n log n), 순회는 O(n), 분할 정복은 O(n)이지만 호출 비용이 더 큽니다.
+정확성은 빈값, 같은 값, 극단값처럼 대표적인 입력 부류를 놓고 확인해야 합니다. 테스트가 통과했다는 말은, 올바른 입력 부류를 테스트했을 때만 의미가 있습니다.
 
-### 3단계: 정확성 검증
+### 3단계: 코딩 전에 효율성 추정
 
-```python
-import random
-
-def reference(nums):
-    return max(nums)
-
-for _ in range(1000):
-    data = [random.randint(-1000, 1000) for _ in range(random.randint(1, 100))]
-    assert max_by_sort(data) == reference(data)
-    assert max_by_scan(data) == reference(data)
-    assert max_by_divide(data) == reference(data)
-
-print("모든 알고리즘이 reference와 일치")
+```text
+n = 10^6, time budget = 1 second
+→ O(n^2) is impossible
+→ O(n log n) or O(n) is required
 ```
 
-알고리즘이 빠르더라도 틀리면 의미가 없습니다. 정확성 검증은 효율성 분석보다 먼저입니다.
+입력 크기만 봐도 후보 알고리즘이 크게 좁혀집니다. 이 습관 하나가 대부분의 성능 사고를 미리 막아 줍니다.
 
-### 4단계: 비용 측정
+### 4단계: 먼저 의사코드 작성
+
+```text
+Algorithm: find smallest in array
+1. min ← arr[0]
+2. for i in 1..len(arr)-1:
+3.     if arr[i] < min: min ← arr[i]
+4. return min
+```
+
+의사코드는 논리에 집중하게 해 줍니다. 단계가 명확해지면 Python으로 옮기는 일은 기계적 변환에 가까워집니다.
+
+### 5단계: 같은 문제를 두 알고리즘으로 비교
 
 ```python
 import time
+n = 1_000_000
+arr = list(range(n))
 
-def measure(fn, data, label):
-    start = time.perf_counter()
-    fn(data)
-    print(f"{label:20s}: {(time.perf_counter() - start) * 1000:.2f} ms")
+t = time.perf_counter()
+arr.index(n - 1)                                # O(n)
+print(f"linear : {time.perf_counter() - t:.4f}s")
 
-big = [random.randint(-10**6, 10**6) for _ in range(100_000)]
-measure(max_by_sort, big, "sort")
-measure(max_by_scan, big, "scan")
-measure(max, big, "builtin max")
+import bisect
+t = time.perf_counter()
+bisect.bisect_left(arr, n - 1)                  # O(log n)
+print(f"binary : {time.perf_counter() - t:.4f}s")
 ```
 
-빅오뿐 아니라 실제 측정으로 알고리즘의 비용을 확인합니다. 표준 내장 함수가 거의 항상 가장 빠릅니다.
+중요한 것은 절대 시간이 아니라 차수의 차이입니다. 같은 하드웨어에서도 알고리즘에 따라 비용 차이가 크게 벌어집니다.
 
-### 5단계: 알고리즘적 사고 적용
+## 이 글에서 먼저 가져갈 점
 
-```python
-# 문제: 정수 배열에서 두 수의 합이 target이 되는 인덱스 쌍
-# 첫 번째 시도: 이중 루프 O(n^2)
-def two_sum_naive(nums, target):
-    for i, x in enumerate(nums):
-        for j in range(i + 1, len(nums)):
-            if x + nums[j] == target:
-                return (i, j)
-    return None
-
-# 더 나은 방법: 해시 테이블 O(n)
-def two_sum_hash(nums, target):
-    seen = {}
-    for i, x in enumerate(nums):
-        complement = target - x
-        if complement in seen:
-            return (seen[complement], i)
-        seen[x] = i
-    return None
-
-print(two_sum_hash([2, 7, 11, 15], 9))   # (0, 1)
-```
-
-같은 문제에서 자료구조를 도입하면 시간 복잡도가 한 차원 떨어집니다. 알고리즘 설계와 자료구조 선택은 분리할 수 없습니다.
-
-## 이 코드에서 주목할 점
-
-- 알고리즘은 "무엇을"이 아니라 "어떻게"를 결정합니다
-- 같은 문제도 여러 알고리즘이 존재하며 비용이 다릅니다
-- 정확성 검증이 효율성 분석보다 먼저입니다
-- 자료구조의 도움으로 알고리즘이 한 단계 빨라질 수 있습니다
+- 같은 문제에도 비용이 전혀 다른 여러 알고리즘이 존재합니다.
+- 의사코드는 "무엇을 할지"와 "어떻게 구현할지"를 분리해 줍니다.
+- 정확성은 테스트 몇 개가 아니라 논증의 대상입니다.
+- 유한성도 당연하게 가정하지 말고 검증해야 합니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| "동작하면 끝" | 비효율로 시스템 한계 | 비용 분석 후 채택 |
-| 빅오만 본다 | 상수 무시, 캐시 무시 | 측정으로 검증 |
-| 자료구조 무시 | 같은 알고리즘이 한 차원 느림 | 자료구조와 같이 설계 |
-| 라이브러리 무시 | 검증 안 된 직접 구현 | 표준 함수 우선 |
-| 종료 조건 빠뜨림 | 무한 루프 | 유한성 직접 확인 |
+| 비용을 추정하지 않고 바로 코딩 | 운영에서 시간 초과 | 입력 크기부터 보고 복잡도를 추정합니다 |
+| 경계 입력 없이 "테스트는 통과함"이라고 판단 | 드문 입력에서 실패 | 빈 입력, 단일 입력, 극단값, 중복값을 포함합니다 |
+| 빠른 언어가 나쁜 알고리즘을 덮어 줄 것이라 기대 | O(n²)는 결국 무너짐 | 언어보다 알고리즘 선택을 먼저 봅니다 |
+| 코드를 복사해 놓고 알고리즘은 읽지 않음 | 숨은 가정 누락 | 먼저 의사코드로 절차를 이해합니다 |
+| 한 입력에서 성공한 것을 정확성으로 착각 | 잠복 버그 | 대표 입력 부류 전체로 검증합니다 |
 
 ## 실무에서는 이렇게 쓰입니다
 
-- 검색 엔진 랭킹: 정렬·집합 연산·그래프 알고리즘의 결합
-- 결제 시스템: 거래 매칭·중복 제거·우선순위 큐 알고리즘
-- 추천 시스템: 행렬 분해·근접 이웃 탐색 알고리즘
-- 라우팅: 다익스트라·A*·Bellman-Ford
-- 컴파일러: 토큰화·파싱·최적화 알고리즘
+- API 성능 리뷰는 언어보다 알고리즘부터 봅니다.
+- 데이터베이스의 sort, hash join, index scan도 결국 알고리즘입니다.
+- 컴파일러 최적화는 한 알고리즘을 더 빠른 동등 알고리즘으로 바꾸는 일입니다.
+- 머신러닝 학습 비용도 바닥에 있는 알고리즘 비용이 지배합니다.
+- 느린 시스템을 디버깅하는 일은 종종 알고리즘 교체로 이어집니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 "버그가 무엇인가"보다 먼저 "여기서 쓰는 알고리즘이 무엇인가"를 묻습니다. 시스템이 느릴 때도 구현 미세 조정보다 입력 크기에 맞는 접근인지부터 확인합니다.
+
+또한 어려운 로직일수록 코드보다 먼저 의사코드를 적습니다. 몇 분 동안 절차를 분명히 하는 일이, 나중에 한 시간짜리 디버깅을 없애 주기 때문입니다. 코드는 비교적 싼 작업이고, 진짜 설계는 알고리즘 단계에서 일어납니다.
 
 ## 체크리스트
 
-- [ ] 알고리즘의 다섯 조건을 말할 수 있는가
-- [ ] 같은 문제에 여러 알고리즘이 있을 수 있음을 이해했는가
-- [ ] 자료구조와 알고리즘이 함께 비용을 결정함을 알고 있는가
-- [ ] 정확성 검증이 효율성 분석보다 먼저임을 동의하는가
-- [ ] 표준 라이브러리부터 시작하는 습관을 갖고 있는가
+- [ ] 이 알고리즘의 정확성 조건을 한 문장으로 말할 수 있는가
+- [ ] 유한성을 한 문장으로 설명할 수 있는가
+- [ ] 코딩 전에 복잡도를 추정했는가
+- [ ] 같은 문제의 두 알고리즘을 같은 입력에서 비교할 수 있는가
+- [ ] 특정 언어에 기대지 않고 의사코드를 쓸 수 있는가
+
+## 연습 문제
+
+1. 유클리드 알고리즘을 의사코드로 작성하고, 왜 반드시 종료하는지 한 문장으로 설명해 보세요. 그다음 Python으로 옮겨 세 가지 경계 입력으로 검증해 보세요.
+
+2. 배열의 최댓값을 찾는 두 알고리즘, 즉 선형 탐색과 분할 정복 재귀를 각각 구현해 보세요. 입력 크기 10^4, 10^5, 10^6에서 측정하고, 둘 다 O(n)인데도 시간이 왜 달라지는지 설명해 보세요.
+
+3. 최근에 작성한 작은 작업 하나를 골라 특정 언어 문법 없이 의사코드로 다시 써 보세요. 그 과정에서 어떤 가정을 명시적으로 드러내야 했는지 적어 보세요.
 
 ## 정리 및 다음 단계
 
-알고리즘은 입력을 출력으로 바꾸는 명확한 절차이며, 자료구조 위에서 동작합니다. 같은 문제도 여러 알고리즘이 존재하고 그 비용이 다르므로, "동작하는가"가 아니라 "어떤 비용으로 동작하는가"를 함께 묻는 사고가 알고리즘 설계의 핵심입니다.
+알고리즘은 정확성, 유한성, 효율성으로 정의됩니다. 알고리즘은 모든 프로그램 뒤에 있는 추상적 절차이며, 시스템이 부하를 견딜 수 있는지를 결정하는 핵심입니다. 의사코드는 설계 언어이고, 구체적인 코드는 구현 세부사항입니다.
 
-다음 글에서는 알고리즘의 비용을 정량적으로 분석하는 도구인 시간 복잡도와 공간 복잡도를 살펴봅니다. 빅오 표기법, 평균·최악·분할 상환의 차이, 그리고 이론과 측정을 함께 보는 법을 다룹니다.
+다음 글에서는 시간 복잡도와 공간 복잡도를 다룹니다. Big-O, Big-Omega, Big-Theta라는 공통 언어를 익히면 이후 시리즈 전체를 같은 기준으로 비교할 수 있습니다.
 
 <!-- toc:begin -->
 - **알고리즘이란 무엇인가? (현재 글)**
@@ -234,8 +217,8 @@ print(two_sum_hash([2, 7, 11, 15], 9))   # (0, 1)
 ## 참고 자료
 
 - [Wikipedia — Algorithm](https://en.wikipedia.org/wiki/Algorithm)
-- [CLRS — Introduction to Algorithms (3rd ed.)](https://mitpress.mit.edu/9780262033848/introduction-to-algorithms/)
+- [Donald Knuth — The Art of Computer Programming](https://www-cs-faculty.stanford.edu/~knuth/taocp.html)
+- [CLRS — Introduction to Algorithms](https://mitpress.mit.edu/books/introduction-algorithms-third-edition)
 - [Sedgewick & Wayne — Algorithms 4ed](https://algs4.cs.princeton.edu/home/)
-- [Open Data Structures](https://opendatastructures.org/)
 
-Tags: Computer Science, 알고리즘, 문제 해결, 기초, 설계, 사고법
+Tags: Computer Science, 알고리즘, 기초, 문제 해결, 의사코드, 정확성
