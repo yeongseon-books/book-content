@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 10
 title: Python에 어울리는 패턴
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,37 +17,59 @@ tags:
   - Idioms
   - Protocols
   - Decorators
-seo_description: 모듈, 일급 함수, Protocol, 데코레이터로 GoF 패턴을 다시 푸는 Pythonic 패턴 — Python다운 설계 사고를 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: Python다운 도구로 GoF 패턴을 더 가볍게 푸는 법을 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
 # Python에 어울리는 패턴
 
-> Design Patterns 101 시리즈 (10/10)
+GoF 패턴을 처음 배우면 언어가 달라도 같은 구조를 그대로 옮기고 싶어집니다. 하지만 Python에서는 모듈, 일급 함수, Protocol, 데코레이터 같은 기본 도구만으로도 상당수 패턴을 더 짧고 읽기 쉬운 형태로 풀 수 있습니다.
 
+이 글은 Design Patterns 101 시리즈의 마지막 글입니다.
+
+이번 글에서는 GoF 패턴을 Python에 그대로 이식하는 대신, Python 언어 자체가 이미 제공하는 도구로 더 가볍게 표현하는 방법을 정리하겠습니다. 핵심은 패턴 이름보다 언어의 기본기를 먼저 믿는 것입니다.
 
 ## 이 글에서 다룰 문제
 
-Python의 기본 도구 — 모듈, 함수, Protocol — 가 이미 많은 패턴을 런타임에서 뒷받침합니다. 같은 문제를 더 적은 코드로 풀 수 있습니다.
+- 왜 Python에서는 모듈이 이미 Singleton 역할을 할까요?
+- Strategy와 Command를 함수로 표현하면 무엇이 좋아질까요?
+- 인터페이스를 Protocol로 표현하는 이유는 무엇일까요?
+- `@dataclass`는 왜 값 객체에 잘 맞을까요?
+- 데코레이터 문법은 Decorator 패턴을 어떻게 자연스럽게 녹여 낼까요?
 
-> 언어가 주는 도구를 먼저 본 다음, 그래도 부족하면 패턴을 꺼낸다.
+> 멘탈 모델: Python다운 패턴은 GoF 패턴을 버리는 것이 아니라, 같은 의도를 더 적은 코드로 표현하는 일입니다. 언어가 이미 주는 도구를 먼저 쓰고, 그래도 부족할 때만 더 무거운 패턴 형태로 올라갑니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+Python은 모듈 로딩, 함수 전달, 구조적 타이핑, 데코레이터 문법처럼 많은 패턴을 언어 수준에서 지원합니다. 같은 문제를 Java식 클래스 계층으로 그대로 옮기면, Python 코드가 불필요하게 무거워지고 읽는 사람도 언어의 장점을 잃게 됩니다.
+
+실무에서는 “패턴을 얼마나 충실히 재현했는가”보다 “언어에 맞게 얼마나 읽히게 풀었는가”가 더 중요합니다. Pythonic 설계는 패턴을 무시하는 태도가 아니라, 패턴의 의도를 Python다운 문법으로 번역하는 태도입니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
-    GoF["GoF 형식"] --> Trans["Pythonic 변환"]
-    Trans --> Mod["모듈 = Singleton"]
-    Trans --> Fn["함수 = Strategy / Command"]
-    Trans --> Proto["Protocol = 인터페이스"]
+    GoF["GoF form"] --> Trans["Pythonic translation"]
+    Trans --> Mod["module = Singleton"]
+    Trans --> Fn["function = Strategy / Command"]
+    Trans --> Proto["Protocol = interface"]
     Trans --> Deco["@decorator = Decorator"]
     Trans --> DC["@dataclass = Value Object"]
 ```
 
-같은 패턴, 더 가벼운 표현.
+같은 의도라도 Python에서는 더 가벼운 표현이 가능합니다. 패턴의 이름은 같아도 구현 무게는 훨씬 달라질 수 있습니다.
 
-## Before/After
+## 핵심 용어
 
-**Before (GoF 그대로)**
+- **Module-as-singleton**: 모듈은 한 번 로드되어 Singleton처럼 동작합니다.
+- **First-class function**: 전달, 반환, 저장이 가능한 함수입니다.
+- **Protocol**: 정적 검사까지 가능한 구조적 타이핑입니다.
+- **Decorator (`@`)**: 함수나 클래스에 동작을 감싸 추가하는 문법입니다.
+- **dataclass**: 값 객체에 필요한 동등성, repr, 불변성 표현을 쉽게 제공합니다.
+
+## Before / After
+
+**Before (GoF as-is)**
 
 ```python
 class SingletonConfig:
@@ -64,29 +86,29 @@ class SingletonConfig:
 # config.py
 DEBUG = True
 DB_URL = "postgres://..."
-# 어디서든 from config import DEBUG, DB_URL
+# elsewhere: from config import DEBUG, DB_URL
 ```
 
-모듈이 이미 Singleton입니다.
+Python에서는 모듈이 이미 한 번만 로드됩니다. 굳이 Singleton 클래스를 재구현하는 순간 오히려 불필요한 복잡성이 생깁니다.
 
-## Pythonic 패턴 5단계
+## Pythonic 패턴을 익히는 5단계
 
-### 1단계 — 모듈 = Singleton
+### 1단계 — 모듈을 Singleton처럼 씁니다
 
 ```python
-# 예시 파일: 1_module_singleton.py
-# 예시 설정 파일: settings.py
+# 1_module_singleton.py
+# settings.py
 import os
 ENV = os.getenv("ENV", "dev")
 SECRET = os.getenv("SECRET", "x")
 ```
 
-import 하면 어디서나 같은 값.
+어디서 import하든 같은 값을 공유합니다. Python에서는 이것만으로도 많은 Singleton 요구를 충분히 충족합니다.
 
-### 2단계 — 함수 = Strategy / Command
+### 2단계 — Strategy와 Command를 함수로 표현합니다
 
 ```python
-# 예시 파일: 2_function_strategy.py
+# 2_function_strategy.py
 def asc(d): return sorted(d)
 def desc(d): return sorted(d, reverse=True)
 
@@ -94,27 +116,27 @@ def run(strategy, data): return strategy(data)
 print(run(desc, [3, 1, 2]))
 ```
 
-클래스 없이도 충분히 명료합니다.
+명확성이 유지된다면 함수가 가장 자연스러운 Strategy입니다. 클래스를 만들지 않아도 역할과 교체 가능성이 충분히 살아납니다.
 
-### 3단계 — Protocol = 인터페이스
+### 3단계 — 인터페이스는 Protocol로 표현합니다
 
 ```python
-# 예시 파일: 3_protocol.py
+# 3_protocol.py
 from typing import Protocol
 
 class Mailer(Protocol):
     def send(self, to: str, body: str) -> None: ...
 
 class SmtpMailer:
-    def send(self, to, body): ...   # ABC 상속 없이 만족
+    def send(self, to, body): ...   # satisfies without inheritance
 ```
 
-덕 타이핑 + 정적 검사의 균형.
+상속 계층을 만들지 않고도 계약을 표현할 수 있다는 점이 중요합니다. 덕 타이핑의 유연성과 정적 검사의 안정성을 함께 가져갈 수 있습니다.
 
-### 4단계 — `@dataclass` = Value Object
+### 4단계 — 값 객체는 `@dataclass`로 간단히 만듭니다
 
 ```python
-# 예시 파일: 4_dataclass.py
+# 4_dataclass.py
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -123,12 +145,12 @@ class Money:
     currency: str
 ```
 
-동등성, 표현, 불변성이 한 줄로.
+값 객체에 필요한 비교, 표현, 불변성 설정을 짧은 문법으로 얻을 수 있습니다. Python에서 값 객체를 손으로 장황하게 만들 이유가 많이 줄어듭니다.
 
-### 5단계 — 데코레이터 = Decorator 패턴
+### 5단계 — Decorator 패턴은 `@` 문법으로 녹여 냅니다
 
 ```python
-# 예시 파일: 5_decorator.py
+# 5_decorator.py
 import time, functools
 
 def timed(fn):
@@ -143,37 +165,51 @@ def timed(fn):
 def work(): time.sleep(0.1)
 ```
 
-`@`로 책임을 자연스럽게 덧씌웁니다.
+책에 나오는 Decorator 클래스를 그대로 옮기지 않아도 됩니다. Python은 이미 감싸기 구조를 언어 문법으로 제공하고 있습니다.
 
 ## 이 코드에서 주목할 점
 
-- 클래스 계층이 거의 없습니다.
-- 표준 도구만으로도 패턴이 자연스럽게 드러납니다.
-- 같은 의도를 더 적은 줄로 표현합니다.
+- 클래스 계층이 거의 자라지 않습니다.
+- 패턴의 의도가 언어 기본 도구 위에서 자연스럽게 드러납니다.
+- 같은 목적을 더 적은 줄 수로 표현합니다.
 
 ## 자주 하는 실수 5가지
 
-1. **자바식 GoF를 그대로 이식.** Python에 어울리지 않는 무게.
-2. **모듈 대신 Singleton 클래스.** 두 번째 인스턴스가 가능해 위험.
-3. **ABC 강요.** Protocol이면 충분한 경우가 많다.
-4. **데코레이터 남용으로 호출 흐름 불명확.** `functools.wraps` 누락도 흔함.
-5. **dataclass 대신 손-말이 클래스.** `__eq__`/`__repr__` 빠진 채 사용.
+1. **Java식 GoF 구조를 그대로 옮기는 경우**: Python에 필요 없는 무게를 추가합니다.
+2. **모듈이면 될 것을 Singleton 클래스로 만드는 경우**: 두 번째 인스턴스 가능성까지 열어 둡니다.
+3. **Protocol로 충분한데 ABC를 강제하는 경우**: 불필요한 상속 구조가 생깁니다.
+4. **데코레이터를 과하게 겹치고 `functools.wraps`를 빼먹는 경우**: 호출 흐름과 메타데이터가 흐려집니다.
+5. **값 객체를 손코딩하는 경우**: `__eq__`, `__repr__` 같은 기본 기능을 놓치기 쉽습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-`logging` = 모듈 Singleton, `sorted(key=...)` = 함수 Strategy, `typing.Protocol` = 인터페이스, `@app.route(...)` = Decorator. 표준 라이브러리와 인기 프레임워크가 이미 Pythonic 패턴을 살아 있는 예제로 보여 줍니다.
+`logging` 모듈은 모듈 Singleton처럼 읽히고, `sorted(key=...)`는 함수 Strategy이며, `typing.Protocol`은 인터페이스 역할을 하고, `@app.route(...)`는 Decorator의 일상적인 예입니다. Python 표준 라이브러리와 주요 프레임워크 자체가 Pythonic 패턴의 살아 있는 예시입니다.
+
+## 시니어 엔지니어는 이렇게 판단합니다
+
+- 패턴보다 언어 도구를 먼저 봅니다.
+- Singleton 클래스보다 모듈, ABC보다 Protocol을 먼저 떠올립니다.
+- 함수로 충분하면 클래스를 만들지 않습니다.
+- 데코레이터에는 항상 `functools.wraps`를 붙입니다.
+- 결국 패턴은 가독성을 위해 존재한다고 봅니다.
 
 ## 체크리스트
 
-- [ ] 모듈로 풀 수 있는 자리에 Singleton을 만들지 않았는가?
-- [ ] 함수로 풀 수 있는 자리에 Strategy 클래스를 만들지 않았는가?
-- [ ] Protocol로 충분한 자리에 ABC를 강요하지 않았는가?
-- [ ] 값 객체에 dataclass를 썼는가?
-- [ ] 데코레이터에 `functools.wraps`를 빠뜨리지 않았는가?
+- [ ] 모듈이면 충분한데 Singleton 클래스를 만들지 않았는가?
+- [ ] 함수로 충분한데 Strategy 클래스를 만들지 않았는가?
+- [ ] Protocol로 충분한데 ABC를 강제하지 않았는가?
+- [ ] 값 객체에 `dataclass`를 활용했는가?
+- [ ] 데코레이터에 `functools.wraps`를 사용했는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-GoF는 어휘집이지 교본이 아닙니다. Python의 도구를 먼저 보고, 부족한 곳에서만 패턴 이름을 꺼내 쓰세요. 디자인 패턴 101 시리즈는 여기서 마칩니다 — 도구가 아니라 생각의 단위로 이 어휘들을 사용하시기 바랍니다.
+1. Singleton 클래스를 하나 골라 모듈 기반 구성으로 접어 봅니다.
+2. Strategy 클래스를 하나 함수 기반으로 단순화해 봅니다.
+3. ABC 기반 인터페이스 하나를 Protocol로 바꾸고 정적 타입 검사까지 통과시켜 봅니다.
+
+## 정리 및 다음 글
+
+GoF 패턴은 어휘이지 매뉴얼이 아닙니다. Python에서는 언어가 이미 많은 패턴을 더 가볍게 표현할 수 있게 도와줍니다. Design Patterns 101 시리즈는 여기서 마무리하겠습니다. 앞으로는 패턴 이름을 구현 강박이 아니라 사고 단위로 사용해 보시기 바랍니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)

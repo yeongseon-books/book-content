@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 5
 title: Strategy 패턴
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,22 +17,36 @@ tags:
   - Polymorphism
   - Behavioral
   - OCP
-seo_description: 알고리즘을 객체로 만들어 교체 가능하게 하는 Strategy 패턴 — Python에서의 자연스러운 모양과 함정을 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: Strategy 패턴의 핵심과 Python에서의 자연스러운 구현을 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
 # Strategy 패턴
 
-> Design Patterns 101 시리즈 (5/10)
+같은 일을 하는 방법이 여러 개일 때 코드는 쉽게 분기문으로 기울어집니다. 처음에는 `if kind == ...` 한두 줄로 시작하지만, 옵션이 늘고 정책이 갈라지기 시작하면 수정 포인트가 한곳에 몰리고 새 요구사항이 들어올 때마다 기존 코드를 열어야 합니다.
 
+이 글은 Design Patterns 101 시리즈의 5번째 글입니다.
+
+이번 글에서는 Strategy 패턴을 “알고리즘을 교체 가능한 단위로 분리하는 방법”으로 보겠습니다. 핵심은 분기를 계속 늘리는 대신, 알고리즘을 객체나 함수로 바꾸고 그것을 컨텍스트에 주입하는 것입니다.
 
 ## 이 글에서 다룰 문제
 
-알고리즘을 if/elif로 분기하면 새 옵션이 생길 때마다 기존 코드를 건드려야 합니다. Strategy는 그 분기를 교체 가능한 객체로 바꿔, 추가에 열려 있고 변경에 닫힙니다 (OCP).
+- Strategy 패턴은 어떤 종류의 분기 폭발을 줄여 줄까요?
+- Open/Closed Principle과 Strategy는 어떻게 이어질까요?
+- Python에서는 클래스 Strategy와 함수 Strategy를 어떻게 구분할까요?
+- 런타임 교체와 테스트에서 Strategy는 어떤 이점을 줄까요?
+- 언제는 Strategy가 과한 추상화가 될까요?
 
-> Strategy는 OCP를 코드 모양으로 보여 줍니다.
+> 멘탈 모델: Strategy는 알고리즘을 사용하는 코드와 알고리즘 자체를 분리하는 패턴입니다. 컨텍스트는 계약만 알고, 실제 계산 방식은 바깥에서 갈아 끼웁니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+분기 기반 알고리즘은 옵션이 늘 때마다 기존 코드를 계속 수정하게 만듭니다. 이는 기능 추가가 곧 기존 로직 편집으로 이어진다는 뜻이고, 테스트 범위도 그만큼 넓어집니다.
+
+Strategy는 이 분기를 교체 가능한 단위로 바꿉니다. 새 알고리즘을 넣을 때 기존 컨텍스트를 뜯지 않고 새 구현을 추가하는 방향으로 움직이므로, OCP(Open/Closed Principle)를 코드 모양으로 드러내는 대표적인 예가 됩니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Ctx["Context"] --> Iface["Strategy interface"]
@@ -41,9 +55,17 @@ flowchart LR
     Iface --> C["StrategyC"]
 ```
 
-Context는 인터페이스만 알고, 구체 알고리즘은 갈아 끼웁니다.
+컨텍스트는 인터페이스만 알고, 실제 알고리즘은 상황에 따라 바뀝니다. 설계 포인트는 “누가 계산하느냐”가 아니라 “누가 선택하느냐”입니다.
 
-## Before/After
+## 핵심 용어
+
+- **Context**: Strategy를 사용해 실제 작업을 수행하는 객체입니다.
+- **Strategy interface**: 알고리즘이 따라야 하는 계약입니다.
+- **Concrete Strategy**: 실제 알고리즘 구현입니다.
+- **Injection point**: Strategy를 주입하는 지점입니다.
+- **Default strategy**: 별도 선택이 없을 때 쓰는 기본 동작입니다.
+
+## Before / After
 
 **Before**
 
@@ -71,26 +93,26 @@ class Member(Pricing):
     def apply(self, base): return base * 0.9
 ```
 
-`price`는 더는 알고리즘을 알지 않습니다.
+이후 `price` 함수는 더 이상 구체 알고리즘을 알 필요가 없습니다. 알고리즘을 추가하는 일이 기존 분기문을 늘리는 일이 아니라, 새 전략을 하나 더 만드는 일이 됩니다.
 
-## Strategy를 익히는 5단계
+## Strategy 패턴을 익히는 5단계
 
-### 1단계 — 인터페이스 정의
+### 1단계 — 인터페이스를 먼저 정의합니다
 
 ```python
-# 예시 파일: 1_iface.py
+# 1_iface.py
 from typing import Protocol
 
 class ShipCost(Protocol):
     def for_weight(self, kg: float) -> int: ...
 ```
 
-Python에서는 ABC 대신 `Protocol`로 구조적 인터페이스를 자주 씁니다.
+Python에서는 ABC보다 `Protocol`이 더 자연스러운 경우가 많습니다. 상속보다 구조적 타이핑으로 계약을 표현할 수 있기 때문입니다.
 
-### 2단계 — 구체 전략
+### 2단계 — 구체 전략을 나눕니다
 
 ```python
-# 예시 파일: 2_strategies.py
+# 2_strategies.py
 class StandardShip:
     def for_weight(self, kg): return int(3000 + 500 * kg)
 
@@ -98,21 +120,21 @@ class ExpressShip:
     def for_weight(self, kg): return int(6000 + 800 * kg)
 ```
 
-상속 없이도 Protocol 약속을 만족합니다 (덕 타이핑).
+두 클래스는 상속 없이도 같은 Protocol을 만족합니다. 중요한 것은 같은 계약 아래 서로 다른 알고리즘을 표현한다는 점입니다.
 
-### 3단계 — 주입
+### 3단계 — 컨텍스트에 주입합니다
 
 ```python
-# 예시 파일: 3_inject.py
+# 3_inject.py
 class Order:
     def __init__(self, ship: ShipCost): self.ship = ship
     def total(self, items, kg):
         return sum(items) + self.ship.for_weight(kg)
 ```
 
-생성자 주입이 가장 흔한 형태입니다.
+생성자 주입은 가장 흔하고 읽기 쉬운 방식입니다. `Order`는 운송비 계산을 쓰기만 할 뿐, 어떤 계산식인지 직접 고르지 않습니다.
 
-### 4단계 — 함수 Strategy
+### 4단계 — 함수 Strategy도 적극적으로 씁니다
 
 ```python
 # 4_func.py
@@ -126,49 +148,63 @@ class Order2:
 o = Order2(standard)
 ```
 
-Python에서는 함수 그 자체가 가장 자연스러운 Strategy입니다.
+Python에서는 함수 하나가 가장 자연스러운 Strategy인 경우가 많습니다. 클래스가 아니어도 역할이 충분히 드러난다면 그 편이 더 Python답습니다.
 
-### 5단계 — 런타임 교체와 테스트
+### 5단계 — 런타임 교체와 테스트를 단순화합니다
 
 ```python
-# 예시 파일: 5_runtime.py
+# 5_runtime.py
 order = Order2(standard)
 print(order.total([10000], 2))
 order.ship = express
 print(order.total([10000], 2))
 ```
 
-테스트에서는 결정론적 Strategy를 주입해 외부 의존을 끊습니다.
+테스트에서는 결정적인(fake) Strategy를 넣어 외부 의존성을 잘라낼 수 있습니다. 런타임 교체가 쉬워진다는 점도 운영상 큰 장점입니다.
 
 ## 이 코드에서 주목할 점
 
-- Context는 Strategy의 내부 구현을 모릅니다.
-- 새 알고리즘 추가가 수정이 아니라 추가입니다.
-- 테스트가 쉬워집니다 — 가짜 Strategy를 주입하면 끝.
+- 컨텍스트는 알고리즘 내부를 모릅니다.
+- 새 알고리즘 추가는 기존 코드 수정이 아니라 코드 추가로 끝나기 쉽습니다.
+- 테스트가 쉬워집니다. 가짜 Strategy 하나 주입하면 됩니다.
 
 ## 자주 하는 실수 5가지
 
-1. **간단한 두 줄짜리에 Strategy.** 과한 일반화.
-2. **Strategy 안에 Context 상태 직접 변경.** 책임 누수.
-3. **클래스 Strategy 폭발.** 함수면 충분한 경우가 많다.
-4. **Default strategy 누락.** 호출자가 매번 결정해야 함.
-5. **Strategy가 서로의 내부를 알게 됨.** Strategy 끼리 결합.
+1. **두 줄짜리 로직에도 Strategy를 쓰는 경우**: 과잉 일반화입니다.
+2. **Strategy가 Context 상태를 직접 바꾸는 경우**: 책임 경계가 샙니다.
+3. **클래스가 불필요하게 늘어나는 경우**: 함수로 충분한데 구조만 무거워집니다.
+4. **기본 Strategy를 두지 않는 경우**: 단순한 호출자도 매번 선택을 떠안게 됩니다.
+5. **전략끼리 서로 내부를 아는 경우**: Strategy 간 결합이 생깁니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-`sorted(key=...)`의 key, `pandas.apply(func)`의 func, 결제 시스템의 PG 어댑터 선택, 알림 채널(이메일/SMS/Slack) 선택 — 모두 Strategy의 모양입니다.
+`sorted(key=...)`의 `key`, `pandas.apply`에 넘기는 함수, 결제 수단별 처리기 선택, 알림 채널별 전송기 선택은 모두 Strategy 모양으로 읽을 수 있습니다. 이름만 다를 뿐, 실무에서는 생각보다 자주 만나는 구조입니다.
+
+## 시니어 엔지니어는 이렇게 판단합니다
+
+- “분기가 하나 더 오겠다”는 감이 들면 Strategy 후보로 봅니다.
+- 클래스보다 함수가 먼저인지부터 따집니다.
+- 기본 Strategy를 둬서 단순한 호출자를 더 단순하게 유지합니다.
+- 상태가 거의 없는 Strategy를 선호합니다.
+- 이름은 동작보다 역할 중심으로 붙입니다.
 
 ## 체크리스트
 
-- [ ] Context가 알고리즘 내부를 모르는가?
-- [ ] 새 알고리즘 추가가 추가만으로 끝나는가?
-- [ ] Strategy가 Context의 상태를 바꾸지 않는가?
-- [ ] Default strategy가 합리적인가?
-- [ ] 함수로 충분한 곳에 클래스를 쓰지 않았는가?
+- [ ] 컨텍스트가 알고리즘 내부를 모르고 있는가?
+- [ ] 새 알고리즘 추가가 코드 추가로 끝나는가?
+- [ ] Strategy가 Context 상태를 직접 바꾸지 않는가?
+- [ ] 기본 Strategy가 합리적인가?
+- [ ] 함수로 충분한데 클래스를 만들지는 않았는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Strategy는 OCP를 코드 모양으로 만든 패턴입니다. 다음 글은 외부 인터페이스 호환을 다루는 — Adapter 패턴 — 을 깊게 봅니다.
+1. 카드/계좌이체/포인트 결제 분기를 Strategy로 바꿔 봅니다.
+2. 정렬 기준 하나를 함수 Strategy로 표현해 봅니다.
+3. 기본 구현을 포함한 알림 채널 선택기를 Strategy로 설계해 봅니다.
+
+## 정리 및 다음 글
+
+Strategy는 OCP를 눈에 보이게 만드는 패턴입니다. 다음 글에서는 외부 인터페이스를 도메인이 원하는 계약으로 바꾸는 Structural 패턴, Adapter를 자세히 보겠습니다.
 
 <!-- toc:begin -->
 - [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
