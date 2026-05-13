@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 3
 title: 데이터 표현
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,16 +17,36 @@ tags:
   - UTF-8
   - 부동소수점
   - 자료형
-seo_description: 이진수, 문자 인코딩(ASCII, UTF-8), 정수와 부동소수점 표현 방식을 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-11'
+seo_description: 이진수, UTF-8, 2의 보수, 부동소수점의 한계를 함께 이해합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 데이터 표현
 
-> Computer Science 101 시리즈 (3/10)
+컴퓨터는 결국 0과 1만 다룬다는 말을 자주 듣지만, 이 문장을 실제 디버깅으로 연결하는 사람은 많지 않습니다. 글자가 깨지고, 금액 계산이 틀어지고, 다른 언어로 옮기자 정수가 넘치는 순간 비로소 데이터 표현이 운영 문제로 보이기 시작합니다.
 
+이 글은 Computer Science 101 시리즈의 3번째 글입니다.
+
+여기서는 비트와 바이트, 문자 인코딩, 정수와 부동소수점 표현을 따라가며 데이터가 어떻게 의미를 얻는지 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
+
+- 컴퓨터는 0과 1만으로 숫자, 문자, 이미지를 어떻게 저장할까요?
+- ASCII와 UTF-8은 무엇이 다르고 왜 바이트 수가 달라질까요?
+- 음수는 왜 2의 보수 방식으로 표현할까요?
+- `0.1 + 0.2 != 0.3` 같은 부동소수점 오차는 왜 생길까요?
+- 문자 길이와 바이트 길이를 혼동하면 어떤 버그가 생길까요?
+
+> 데이터 표현은 디지털 세계의 물리 법칙에 가깝습니다. 비트에 어떤 규칙을 부여했는지 알아야 버그의 원인도 설명할 수 있습니다.
+
+## 이 글에서 배울 것
+
+- 이진수와 십진수 변환 원리
+- ASCII와 UTF-8 인코딩의 차이
+- 부호 있는 정수와 2의 보수 표현
+- 부동소수점이 근사값이라는 사실과 그 영향
+
+## 왜 중요한가
 
 문자 깨짐, 부동소수점 오차, 정수 오버플로우는 모두 데이터 표현을 모르면 해결할 수 없는 문제입니다. `0.1 + 0.2 != 0.3`이 되는 이유를 알아야 금융 시스템에서 올바른 설계를 할 수 있습니다.
 
@@ -34,26 +54,37 @@ last_reviewed: '2026-05-11'
 
 비트 수준의 이해가 디버깅과 성능 최적화의 기초입니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 모든 데이터는 비트(0/1)로 표현됩니다. 인코딩 규칙이 비트열에 의미를 부여합니다.
 
 ```text
-비트열: 01000001
+Bits: 01000001
    │
-   ├── 정수로 해석 → 65
-   ├── ASCII로 해석 → 'A'
-   └── 컬러값으로 해석 → 매우 어두운 파란색
+   ├── Read as integer  -> 65
+   ├── Read as ASCII    -> 'A'
+   └── Read as a color  -> very dark blue
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Bit | 0 또는 1 하나를 담는 최소 저장 단위 |
+| Byte | 8개의 비트로 이루어진 단위 |
+| ASCII | 영문자를 위한 7비트 문자 인코딩 표준 |
+| UTF-8 | 전 세계 문자를 1~4바이트로 표현하는 가변 길이 인코딩 |
+| Floating point | IEEE 754 규칙에 따라 실수를 근사 표현하는 방식 |
 
 ## Before / After
 
 **Before — 데이터 표현을 모를 때:**
 
 ```python
-# 왜 0.1 + 0.2가 0.3이 아닐까?
+# Why isn't 0.1 + 0.2 equal to 0.3?
 result = 0.1 + 0.2
 print(result)          # 0.30000000000000004
-print(result == 0.3)   # False — 이유를 모릅니다
+print(result == 0.3)   # False — and you do not know why
 ```
 
 **After — 데이터 표현을 알 때:**
@@ -61,7 +92,7 @@ print(result == 0.3)   # False — 이유를 모릅니다
 ```python
 from decimal import Decimal
 
-# 부동소수점은 이진 근사이므로 정확한 계산에는 Decimal을 사용합니다
+# Floating point is a binary approximation; use Decimal for exact arithmetic.
 result = Decimal("0.1") + Decimal("0.2")
 print(result)              # 0.3
 print(result == Decimal("0.3"))  # True
@@ -72,18 +103,17 @@ print(result == Decimal("0.3"))  # True
 ### 1단계: 이진수와 십진수 변환
 
 ```python
-# 십진수 → 이진수
+# Decimal -> binary
 print(bin(42))      # 0b101010
 print(bin(255))     # 0b11111111
 
-# 이진수 → 십진수
+# Binary -> decimal
 print(int("101010", 2))   # 42
 print(int("11111111", 2)) # 255
 
-
-# 변환 원리를 코드로 확인합니다
+# Verify the conversion principle in code
 def to_binary(n: int) -> str:
-    """십진수를 이진수 문자열로 변환합니다."""
+    """Convert a decimal integer to a binary string."""
     if n == 0:
         return "0"
     bits = []
@@ -92,49 +122,47 @@ def to_binary(n: int) -> str:
         n //= 2
     return "".join(reversed(bits))
 
-
 print(to_binary(42))  # 101010
 ```
 
 ### 2단계: ASCII와 UTF-8
 
 ```python
-# ASCII에서는 영문이 1바이트입니다
+# ASCII: one byte per English character
 print(ord("A"))        # 65
 print(chr(65))         # A
 print(ord("a"))        # 97
 
-# UTF-8에서는 한글이 3바이트입니다
+# UTF-8: a Korean character takes three bytes
 korean = "가"
-print(ord(korean))                # 44032
-print(korean.encode("utf-8"))     # b'\xea\xb0\x80' (3바이트)
-print(len(korean))                # 1 (문자 수)
-print(len(korean.encode("utf-8")))  # 3 (바이트 수)
+print(ord(korean))                  # 44032
+print(korean.encode("utf-8"))       # b'\xea\xb0\x80' (3 bytes)
+print(len(korean))                  # 1 (character count)
+print(len(korean.encode("utf-8")))  # 3 (byte count)
 
-# 이모지: 4바이트
+# Emoji: four bytes
 emoji = "🐍"
-print(len(emoji))                  # 1 (문자 수)
-print(len(emoji.encode("utf-8")))  # 4 (바이트 수)
+print(len(emoji))                   # 1 (character count)
+print(len(emoji.encode("utf-8")))   # 4 (byte count)
 ```
 
 ### 3단계: 정수의 크기와 2의 보수
 
 ```python
-# 파이썬 정수는 크기 제한이 없습니다 (임의 정밀도)
+# Python integers have no size limit (arbitrary precision)
 big_number = 2 ** 100
 print(big_number)  # 1267650600228229401496703205376
 
-# 하지만 C나 Java 등에서는 고정 크기입니다
-# 8비트 부호 있는 정수: -128 ~ 127
-# 32비트 부호 있는 정수: -2,147,483,648 ~ 2,147,483,647
+# But C, Java, and others use fixed sizes
+# 8-bit signed: -128 to 127
+# 32-bit signed: -2,147,483,648 to 2,147,483,647
 
-# 2의 보수로 음수를 표현합니다
+# Two's complement represents negatives
 def twos_complement(n: int, bits: int = 8) -> str:
-    """n의 2의 보수 표현을 반환합니다."""
+    """Return the two's-complement representation of n."""
     if n >= 0:
         return format(n, f"0{bits}b")
     return format((1 << bits) + n, f"0{bits}b")
-
 
 print(twos_complement(5))    # 00000101
 print(twos_complement(-5))   # 11111011
@@ -146,19 +174,19 @@ print(twos_complement(-1))   # 11111111
 ```python
 import struct
 
-# 0.1의 실제 저장 값을 확인합니다
+# Inspect the actual stored value of 0.1
 print(f"{0.1:.20f}")  # 0.10000000000000000555
 
-# IEEE 754 배정밀도 부동소수점의 비트 표현입니다
+# IEEE 754 double-precision bit pattern
 bits = struct.pack("d", 0.1)
 print(" ".join(f"{b:08b}" for b in bits))
 
-# 비교할 때는 오차 범위를 사용합니다
+# Compare with a tolerance
 import math
 print(math.isclose(0.1 + 0.2, 0.3))  # True
 
-# 금융 계산에는 Decimal 또는 정수(센트 단위)를 사용합니다
-price_cents = 1099  # $10.99를 센트로 저장
+# For money, use Decimal or integer cents
+price_cents = 1099  # $10.99 stored as cents
 tax_cents = int(price_cents * 0.1)
 total_cents = price_cents + tax_cents
 print(f"${total_cents / 100:.2f}")  # $12.09
@@ -170,20 +198,20 @@ print(f"${total_cents / 100:.2f}")  # $12.09
 data_sizes = {
     "1 bit": 1,
     "1 byte": 8,
-    "ASCII 문자 1개": 8,
-    "UTF-8 한글 1자": 24,
-    "32비트 정수": 32,
-    "64비트 double": 64,
+    "1 ASCII character": 8,
+    "1 UTF-8 Korean char": 24,
+    "32-bit int": 32,
+    "64-bit double": 64,
     "1 KB": 8 * 1024,
     "1 MB": 8 * 1024 ** 2,
     "1 GB": 8 * 1024 ** 3,
 }
 
 for name, bits in data_sizes.items():
-    print(f"{name:20s} = {bits:>15,} bits")
+    print(f"{name:22s} = {bits:>15,} bits")
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 같은 비트열도 해석 방식에 따라 숫자, 문자, 색상이 됩니다
 - UTF-8은 문자마다 바이트 수가 다르므로 `len(문자열) != len(바이트열)`입니다
@@ -208,6 +236,12 @@ for name, bits in data_sizes.items():
 - 파일 처리 시 BOM(Byte Order Mark)과 인코딩 감지
 - 네트워크 프로토콜에서 바이트 순서(엔디안) 처리
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 저장 크기보다 데이터의 의미와 제약을 먼저 봅니다. 금액은 부동소수점이 아니라 정수 센트나 Decimal로, 식별자는 숫자처럼 보여도 UUID나 문자열 규약으로 다룹니다.
+
+문자 인코딩도 초기에 표준을 못 박습니다. 프로젝트 전역에서 UTF-8을 기본으로 삼고, 파일·HTTP 헤더·DB 연결마다 그 사실을 명시하는 습관이 수많은 깨짐 문제를 예방합니다.
+
 ## 체크리스트
 
 - [ ] 이진수와 십진수를 상호 변환할 수 있는가
@@ -215,6 +249,12 @@ for name, bits in data_sizes.items():
 - [ ] 부동소수점 오차의 원인을 이해했는가
 - [ ] 문자열 길이와 바이트 길이의 차이를 구분하는가
 - [ ] 금융 데이터에 float을 사용하면 안 되는 이유를 아는가
+
+## 연습 문제
+
+1. 0부터 255까지의 정수를 이진수와 16진수로 함께 출력하는 함수를 작성해 보세요.
+2. 영문, 한글, 일본어, 이모지를 골라 UTF-8 바이트 길이를 비교하는 표를 만들어 보세요.
+3. `float`와 `Decimal`로 `0.1`을 100번씩 더한 결과를 비교해 차이를 기록해 보세요.
 
 ## 정리 및 다음 단계
 

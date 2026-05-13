@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 4
 title: 알고리즘과 복잡도
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,16 +17,36 @@ tags:
   - Big-O
   - 자료구조
   - 성능
-seo_description: 알고리즘과 시간/공간 복잡도, Big-O 표기법을 입문자 눈높이로 설명하는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-11'
+seo_description: 알고리즘, Big-O, 자료구조 선택이 성능을 어떻게 바꾸는지 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 알고리즘과 복잡도
 
-> Computer Science 101 시리즈 (4/10)
+작은 입력에서는 멀쩡하던 코드가 운영에서 갑자기 느려지는 이유는 대개 하드웨어보다 알고리즘 차수에서 먼저 설명됩니다. 같은 문제를 풀어도 어떤 코드는 선형으로 늘고, 어떤 코드는 제곱으로 무너집니다.
 
+이 글은 Computer Science 101 시리즈의 4번째 글입니다.
+
+여기서는 알고리즘의 정의, 시간·공간 복잡도, Big-O 표기법, 그리고 자료구조 선택이 왜 성능을 바꾸는지 입문자 관점에서 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
+
+- 같은 문제를 푸는 두 코드 중 무엇이 더 빠를지 어떻게 판단할까요?
+- 시간 복잡도와 공간 복잡도는 무엇을 각각 뜻할까요?
+- Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?
+- `list`, `set`, `dict` 선택이 왜 전체 차수를 바꿀 수 있을까요?
+- 작은 입력에서 괜찮아 보이는 코드가 큰 입력에서 무너지는 이유는 무엇일까요?
+
+> 알고리즘은 절차이고, 복잡도는 그 절차의 비용입니다. 시니어 엔지니어는 코드를 읽으면서 이미 입력 크기 변화에 따른 비용 곡선을 함께 봅니다.
+
+## 이 글에서 배울 것
+
+- 좋은 알고리즘을 판단하는 기준
+- 시간 복잡도와 공간 복잡도의 의미
+- Big-O로 성능 증가율을 읽는 방법
+- 자료구조 선택이 복잡도를 바꾸는 방식
+
+## 왜 중요한가
 
 코드가 100개 데이터에서 잘 돌아가도 100만 개에서는 멈출 수 있습니다. 데이터 크기에 따른 성능 변화를 예측하지 못하면 출시 후에 장애로 이어집니다. Big-O는 코드를 실행해 보지 않고도 성능 한계를 미리 판단하게 해 줍니다.
 
@@ -34,44 +54,55 @@ last_reviewed: '2026-05-11'
 
 복잡도를 읽을 줄 아는 것이 시니어와 주니어를 가르는 가장 명확한 기준 중 하나입니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 같은 결과를 내는 두 알고리즘도 입력이 커지면 차이가 수천 배로 벌어집니다.
 
 ```text
-입력 크기 n            n=10    n=1,000   n=1,000,000
+Input size n          n=10    n=1,000     n=1,000,000
 ─────────────────────────────────────────────────────
-O(1)    상수            1        1            1
-O(log n) 로그            3       10           20
-O(n)    선형           10     1,000    1,000,000
-O(n log n) 선형로그     33    10,000   20,000,000
-O(n²)   제곱           100  1,000,000   10¹²(불가능)
+O(1)    constant       1        1              1
+O(log n) log            3       10             20
+O(n)    linear         10     1,000      1,000,000
+O(n log n) linearithmic 33    10,000     20,000,000
+O(n^2)  quadratic     100  1,000,000   10^12 (impossible)
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Algorithm | 입력을 원하는 출력으로 바꾸는 유한하고 명확한 절차 |
+| Time complexity | 입력 크기가 커질 때 연산 수가 증가하는 비율 |
+| Space complexity | 입력 크기에 따라 추가 메모리가 늘어나는 비율 |
+| Big-O | 입력이 무한히 커질 때의 상한 증가율 표기 |
+| Data structure | 데이터를 저장하고 접근하는 방식 |
 
 ## Before / After
 
 **Before — 복잡도를 모를 때:**
 
 ```python
-# 두 리스트의 공통 원소 찾기 — O(n²)
+# Find common elements between two lists — O(n^2)
 def common_slow(a: list[int], b: list[int]) -> list[int]:
     result = []
     for x in a:
-        if x in b:        # b에 대한 in 연산은 O(n)
+        if x in b:        # `in` on a list is O(n)
             result.append(x)
     return result
 
-# n=10,000일 때 약 1억 번의 비교 — 수 초 소요
+# At n=10,000 that is roughly 100 million comparisons — several seconds
 ```
 
 **After — 복잡도를 알 때:**
 
 ```python
-# 같은 문제 — O(n)
+# Same problem — O(n)
 def common_fast(a: list[int], b: list[int]) -> list[int]:
-    b_set = set(b)        # 한 번에 O(n)
-    return [x for x in a if x in b_set]   # in은 O(1)
+    b_set = set(b)        # one-time O(n)
+    return [x for x in a if x in b_set]   # `in` on a set is O(1)
 
-# n=10,000일 때 약 2만 번의 비교 — 수 밀리초
+# At n=10,000 that is roughly 20,000 comparisons — milliseconds
 ```
 
 ## 단계별로 따라하기
@@ -80,15 +111,14 @@ def common_fast(a: list[int], b: list[int]) -> list[int]:
 
 ```python
 def linear_search(arr: list[int], target: int) -> int:
-    """정렬되지 않은 리스트에서 target을 찾습니다 — O(n)."""
+    """Search an unsorted list for target — O(n)."""
     for i, value in enumerate(arr):
         if value == target:
             return i
     return -1
 
-
 def binary_search(arr: list[int], target: int) -> int:
-    """정렬된 리스트에서 target을 찾습니다 — O(log n)."""
+    """Search a sorted list for target — O(log n)."""
     lo, hi = 0, len(arr) - 1
     while lo <= hi:
         mid = (lo + hi) // 2
@@ -100,10 +130,9 @@ def binary_search(arr: list[int], target: int) -> int:
             hi = mid - 1
     return -1
 
-
 data = sorted(range(1_000_000))
-print(linear_search(data, 999_999))   # 999999 — 100만 번 비교
-print(binary_search(data, 999_999))   # 999999 — 약 20번 비교
+print(linear_search(data, 999_999))   # 999999 — about 1,000,000 comparisons
+print(binary_search(data, 999_999))   # 999999 — about 20 comparisons
 ```
 
 ### 2단계: 두 알고리즘의 실제 시간 비교
@@ -126,10 +155,10 @@ print(f"binary : {time.perf_counter() - start:.6f}s")
 ### 3단계: 자료구조 선택이 복잡도를 바꾼다
 
 ```python
-# 리스트에서는 in 연산이 O(n)입니다
+# list: `in` is O(n)
 nums_list = list(range(1_000_000))
 
-# 집합에서는 in 연산이 평균 O(1)입니다
+# set: `in` is O(1) on average
 nums_set = set(nums_list)
 
 start = time.perf_counter()
@@ -147,7 +176,7 @@ print(f"set    : {time.perf_counter() - start:.6f}s")
 import random
 
 def bubble_sort(arr: list[int]) -> list[int]:
-    """O(n²) — 교육용. 실무에서는 사용하지 않습니다."""
+    """O(n^2) — educational only. Do not use this in real code."""
     arr = arr[:]
     n = len(arr)
     for i in range(n):
@@ -156,7 +185,6 @@ def bubble_sort(arr: list[int]) -> list[int]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
 
-
 small = [random.randint(0, 100) for _ in range(2000)]
 
 start = time.perf_counter()
@@ -164,7 +192,7 @@ bubble_sort(small)
 print(f"bubble (n=2000)  : {time.perf_counter() - start:.4f}s")
 
 start = time.perf_counter()
-sorted(small)             # Python의 sorted는 Timsort — O(n log n)
+sorted(small)             # Python's sorted is Timsort — O(n log n)
 print(f"sorted (n=2000)  : {time.perf_counter() - start:.6f}s")
 ```
 
@@ -172,17 +200,16 @@ print(f"sorted (n=2000)  : {time.perf_counter() - start:.6f}s")
 
 ```python
 def complexity_table(sizes: list[int]) -> None:
-    print(f"{'n':>10} {'O(log n)':>12} {'O(n)':>12} {'O(n log n)':>14} {'O(n²)':>16}")
+    print(f"{'n':>10} {'O(log n)':>12} {'O(n)':>12} {'O(n log n)':>14} {'O(n^2)':>16}")
     for n in sizes:
         import math
         log_n = math.log2(n)
         print(f"{n:>10} {log_n:>12.1f} {n:>12} {n * log_n:>14.0f} {n * n:>16,}")
 
-
 complexity_table([10, 100, 1_000, 10_000, 100_000])
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 같은 문제를 푸는 알고리즘도 자료구조 선택에 따라 복잡도가 달라집니다
 - `list`의 `in`은 O(n), `set`과 `dict`의 `in`은 평균 O(1)입니다
@@ -207,6 +234,12 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 - 대용량 로그 처리에서 스트리밍 알고리즘으로 공간 복잡도 절감
 - 검색·추천 시스템에서 인덱스 자료구조(B-Tree, Trie, HNSW)의 복잡도 트레이드오프
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 중첩 루프를 보면 먼저 n이 커질 때 무슨 일이 생기는지 계산합니다. 작은 입력에서는 체감이 안 나도, 운영 규모에서는 낮은 차수가 거의 항상 이깁니다.
+
+동시에 이론적인 Big-O와 실제 벽시계 시간이 다를 수 있다는 사실도 압니다. 그래서 차수를 낮춘 뒤에는 반드시 측정합니다. 측정하지 않은 최적화는 추측에 가깝기 때문입니다.
+
 ## 체크리스트
 
 - [ ] Big-O 표기법으로 알고리즘의 차수를 말할 수 있는가
@@ -214,6 +247,12 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 - [ ] 선형 탐색과 이진 탐색의 적용 조건을 구분하는가
 - [ ] 정렬에 표준 라이브러리를 사용하는 이유를 설명할 수 있는가
 - [ ] 작은 데이터의 결과만 보고 성능을 판단하지 않는가
+
+## 연습 문제
+
+1. 리스트의 중복 원소를 찾는 O(n^2) 버전과 O(n) 버전을 각각 구현하고 실행 시간을 비교해 보세요.
+2. 정렬된 두 리스트를 O(n) 시간에 하나로 합치는 함수를 작성해 보세요.
+3. 1..n 범위에서 빠진 정수 하나를 O(n) 시간, O(1) 추가 공간으로 찾는 방법을 구현해 보세요.
 
 ## 정리 및 다음 단계
 

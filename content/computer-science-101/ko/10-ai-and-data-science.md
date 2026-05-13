@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 10
 title: AI와 데이터사이언스까지의 연결
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,16 +17,36 @@ tags:
   - 머신러닝
   - 통계
   - 진로
-seo_description: CS 기초가 AI·데이터사이언스로 어떻게 이어지는지, 다음 학습 경로를 정리하는 CS 입문 시리즈 마지막 글입니다.
-last_reviewed: '2026-05-11'
+seo_description: CS 기초가 AI와 데이터사이언스에 어떻게 이어지는지와 다음 학습 경로를 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # AI와 데이터사이언스까지의 연결
 
-> Computer Science 101 시리즈 (10/10)
+AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가 아닙니다. 데이터 표현, 알고리즘 비용, 메모리 계층, 데이터베이스, 엔지니어링 습관 위에 통계와 도메인 지식을 더한 결과에 가깝습니다.
 
+이 글은 Computer Science 101 시리즈의 마지막 글입니다.
+
+여기서는 머신러닝의 기본 구조를 훑고, 앞선 아홉 편이 AI/DS 실무와 어떻게 이어지는지 연결한 뒤, 다음에 무엇을 공부하면 좋을지 로드맵을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
+
+- 지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?
+- 규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?
+- 학습, 추론, 데이터 품질 검증은 왜 결국 계산과 시스템 문제일까요?
+- AI 시스템에도 테스트, 모니터링, 비용 관리가 왜 똑같이 중요할까요?
+- 이 시리즈 다음에는 어떤 순서로 공부를 이어 가면 좋을까요?
+
+> AI/DS는 CS 위에 통계와 도메인 지식을 쌓은 층입니다. 모델이 달라져도 데이터 표현, 복잡도, 시스템 설계라는 바닥은 그대로 남습니다.
+
+## 이 글에서 배울 것
+
+- 머신러닝의 기본 구성요소와 흐름
+- 규칙 기반 시스템과 ML 기반 시스템의 차이
+- 앞선 아홉 편이 AI/DS와 연결되는 방식
+- 다음 학습 로드맵을 설계하는 기준
+
+## 왜 중요한가
 
 AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행렬 연산이며, 그 모든 것은 결국 CPU·메모리·디스크 위에서 돌아갑니다. CS 기초가 단단할수록 AI 코드를 디버깅하고, 비용을 추정하고, 문제를 정의하는 능력이 빠르게 성장합니다.
 
@@ -34,15 +54,27 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 
 도구는 빨리 변해도 기초는 오래 유효합니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 규칙 기반은 사람이 규칙을 적고, 머신러닝은 데이터로부터 규칙을 추론합니다.
 
 ```text
-규칙 기반                              머신러닝
-입력 ──┐                              입력 ──┐
-       ├─ 사람이 만든 규칙 ─→ 출력          ├─ 학습된 모델 ─→ 출력
-규칙 ──┘                              모델 ←── 학습 데이터로 추정
+Rule-based                              Machine learning
+input ──┐                               input ──┐
+        ├─ human-written rules ─→ out          ├─ learned model ─→ out
+rules ──┘                               model ←── estimated from training data
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Machine learning | 데이터에서 패턴을 학습해 새 입력의 출력을 예측하는 기법 |
+| Training | 데이터로부터 모델 파라미터를 추정하는 과정 |
+| Inference | 학습된 모델로 새 입력의 출력을 계산하는 과정 |
+| Feature | 모델이 다룰 수 있도록 숫자로 표현한 입력 정보 |
+| Model | 입력에서 출력을 계산하는 파라미터 묶음 |
+| Dataset | 학습·검증·평가에 사용하는 입력과 라벨의 집합 |
 
 ## Before / After
 
@@ -50,22 +82,21 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 
 ```python
 def classify_email(text: str) -> str:
-    """사람이 직접 규칙을 만든 스팸 분류기."""
-    spam_words = {"무료", "당첨", "지금 클릭", "할인"}
+    """A spam classifier with hand-written rules."""
+    spam_words = {"free", "winner", "click now", "discount"}
     score = sum(word in text for word in spam_words)
     return "spam" if score >= 2 else "ham"
 
-
-print(classify_email("무료 쿠폰 당첨"))   # spam
-# 새 표현이 나올 때마다 사람이 규칙을 갱신해야 합니다
+print(classify_email("free coupon, you are the winner"))   # spam
+# Every new phrasing forces a human to update the rules
 ```
 
 **After — 데이터로 학습한 분류:**
 
 ```python
-# scikit-learn 없이 개념만 보여 주며 실제로는 sklearn, transformers 등을 사용합니다
+# Just the concept (no scikit-learn) — in practice, use sklearn, transformers, etc.
 def train_naive_bayes(samples: list[tuple[str, str]]) -> dict:
-    """단어별로 spam/ham 빈도를 세는 단순 학습."""
+    """Naive count-based learner: tally words per class."""
     counts = {"spam": {}, "ham": {}}
     totals = {"spam": 0, "ham": 0}
     for text, label in samples:
@@ -74,20 +105,18 @@ def train_naive_bayes(samples: list[tuple[str, str]]) -> dict:
             totals[label] += 1
     return {"counts": counts, "totals": totals}
 
-
 def predict(model: dict, text: str) -> str:
     spam_score = sum(model["counts"]["spam"].get(w, 0) for w in text.split())
     ham_score  = sum(model["counts"]["ham"].get(w, 0)  for w in text.split())
     return "spam" if spam_score > ham_score else "ham"
 
-
 model = train_naive_bayes([
-    ("무료 쿠폰 당첨", "spam"),
-    ("회의 자료 첨부", "ham"),
-    ("지금 클릭 할인", "spam"),
-    ("점심 같이 드실래요", "ham"),
+    ("free coupon winner", "spam"),
+    ("meeting notes attached", "ham"),
+    ("click now discount", "spam"),
+    ("lunch together?", "ham"),
 ])
-print(predict(model, "무료 점심 쿠폰"))   # 데이터 기반으로 결정
+print(predict(model, "free lunch coupon"))   # decided from data
 ```
 
 ## 단계별로 따라하기
@@ -95,9 +124,9 @@ print(predict(model, "무료 점심 쿠폰"))   # 데이터 기반으로 결정
 ### 1단계: 데이터로부터 직선 학습 (선형 회귀)
 
 ```python
-# y ≈ a*x + b 의 a, b를 데이터로부터 추정합니다 — 외부 라이브러리 없이
+# Estimate a, b in y ≈ a*x + b from data — no external libraries
 xs = [1, 2, 3, 4, 5]
-ys = [2.1, 3.9, 6.1, 8.0, 10.2]   # 대략 y = 2x
+ys = [2.1, 3.9, 6.1, 8.0, 10.2]   # roughly y = 2x
 
 n = len(xs)
 mean_x = sum(xs) / n
@@ -115,12 +144,11 @@ print(f"y ≈ {a:.2f}x + {b:.2f}")    # y ≈ 2.03x + -0.05
 import random
 
 def train_test_split(data: list, ratio: float = 0.8) -> tuple[list, list]:
-    """데이터를 학습용과 평가용으로 나눕니다."""
+    """Split data into training and evaluation sets."""
     data = list(data)
     random.shuffle(data)
     cut = int(len(data) * ratio)
     return data[:cut], data[cut:]
-
 
 train, test = train_test_split(list(zip(xs, ys)))
 print("train:", train)
@@ -138,8 +166,8 @@ def predict_y(x: float, a: float, b: float) -> float:
 start = time.perf_counter()
 for x in range(1_000_000):
     predict_y(x, a, b)
-print(f"100만 추론: {time.perf_counter() - start:.3f}s")
-# 모델이 단순할수록 추론이 빠릅니다 — 실시간 서비스에서 중요한 지표
+print(f"1M inferences: {time.perf_counter() - start:.3f}s")
+# Simpler models infer faster — a key metric for real-time services
 ```
 
 ### 4단계: 데이터 품질 확인
@@ -152,26 +180,25 @@ def basic_stats(values: list[float]) -> dict:
     return {"n": n, "mean": mean, "std": var ** 0.5,
             "min": min(values), "max": max(values)}
 
-
 print(basic_stats(ys))
-# 학습 전 데이터의 분포·결측·이상치를 보는 습관이 ML의 절반입니다
+# Looking at distribution, missing values, and outliers before training is half the job in ML
 ```
 
 ### 5단계: ML 워크플로우 한 줄 요약
 
 ```python
-# ① 문제 정의 → ② 데이터 수집 → ③ 전처리 → ④ 모델 학습
-# → ⑤ 평가 → ⑥ 배포 → ⑦ 모니터링 → ① 로 돌아가기
+# 1) frame the problem -> 2) collect data -> 3) preprocess -> 4) train model
+# -> 5) evaluate -> 6) deploy -> 7) monitor -> back to 1)
 
 steps = [
-    "문제 정의", "데이터 수집", "전처리", "모델 학습",
-    "평가", "배포", "모니터링",
+    "frame problem", "collect data", "preprocess", "train model",
+    "evaluate", "deploy", "monitor",
 ]
 for i, step in enumerate(steps, 1):
     print(f"{i}. {step}")
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 단순한 모델일수록 디버깅과 운영이 쉽습니다 — 항상 기준선(baseline)부터 시작합니다
 - 데이터를 학습/검증/평가로 분리하지 않으면 성능을 과대 평가하게 됩니다
@@ -196,6 +223,12 @@ for i, step in enumerate(steps, 1):
 - MLOps — 데이터셋 버전 관리, 실험 추적, 자동 재학습
 - AI 비용 관리 — 모델 크기·토큰·GPU 시간의 단가 추적
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 AI를 만능 해법이 아니라 하나의 도구로 다룹니다. 규칙으로 충분한 문제는 규칙으로 풀고, 데이터에서 패턴을 끌어내야 할 때만 ML을 씁니다. 그리고 ML 시스템도 결국 소프트웨어이므로 테스트, 모니터링, 롤백 계획이 필요하다는 점을 잊지 않습니다.
+
+오히려 AI 시대일수록 기초가 더 중요합니다. 모델은 매년 바뀌지만 데이터 표현, 연산 비용, 시스템 설계 원리는 오래 남습니다. 그래서 CS 기초가 탄탄한 사람이 새로운 AI 도구도 가장 빨리 받아들입니다.
+
 ## 시리즈에서 배운 것이 어떻게 이어지는가
 
 | 이 시리즈에서 | AI/DS에서 |
@@ -215,6 +248,12 @@ for i, step in enumerate(steps, 1):
 - [ ] 모델 추론도 결국 CPU/메모리 위의 연산임을 의식하는가
 - [ ] AI 시스템에 테스트와 모니터링이 똑같이 필요함을 이해했는가
 - [ ] 다음에 무엇을 공부할지 자기 학습 경로를 그려 봤는가
+
+## 연습 문제
+
+1. 작은 데이터셋을 직접 만들어 선형 회귀 코드로 직선을 학습시키고 새 입력의 출력을 예측해 보세요.
+2. 같은 데이터셋을 학습용과 평가용으로 나눈 뒤 MAE 같은 간단한 지표를 계산해 보세요.
+3. 이 시리즈에서 가장 약하다고 느낀 주제 하나를 골라, 그 주제만 100줄 분량으로 다시 설명하는 학습 글을 써 보세요.
 
 ## 정리 및 다음 단계
 

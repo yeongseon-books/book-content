@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 6
 title: 운영체제
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,16 +17,36 @@ tags:
   - 스레드
   - 가상 메모리
   - 동시성
-seo_description: 운영체제가 프로세스, 스레드, 메모리, 시스템 콜을 어떻게 관리하는지 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-11'
+seo_description: 운영체제가 프로세스, 스레드, 메모리, 시스템 콜을 어떻게 관리하는지 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 운영체제
 
-> Computer Science 101 시리즈 (6/10)
+한 대의 컴퓨터에서 수십 개 프로그램이 동시에 도는 것처럼 보이는 순간, 우리는 이미 운영체제의 추상화 위에서 일하고 있습니다. 웹 서버가 멈추는 이유도, 메모리 누수가 보이는 방식도, 스레드가 기대만큼 빨라지지 않는 이유도 결국 OS 관점으로 돌아옵니다.
 
+이 글은 Computer Science 101 시리즈의 6번째 글입니다.
+
+여기서는 프로세스와 스레드, 가상 메모리, 시스템 콜, 동시성과 병렬성의 차이를 실전 감각으로 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
+
+- 하나의 머신에서 많은 프로그램이 동시에 실행되는 것처럼 보이는 이유는 무엇일까요?
+- 프로세스와 스레드는 메모리와 격리 측면에서 어떻게 다를까요?
+- 가상 메모리는 왜 필요한 추상화일까요?
+- 시스템 콜은 사용자 코드와 커널 사이에서 어떤 비용을 만들까요?
+- CPU 바운드 작업과 I/O 바운드 작업에서 동시성 전략은 왜 달라질까요?
+
+> 운영체제는 자원 관리자이자 추상화 계층입니다. 프로세스, 메모리, 파일, 네트워크를 균일한 인터페이스로 보이게 만들지만, 병목과 버그는 그 추상화의 경계에서 드러납니다.
+
+## 이 글에서 배울 것
+
+- 프로세스와 스레드의 차이
+- 가상 메모리와 주소 공간의 기본 개념
+- 시스템 콜과 user/kernel mode 경계
+- 동시성·병렬성·GIL의 실무적 의미
+
+## 왜 중요한가
 
 웹 서버가 멈추는 이유, 메모리 누수가 OS에 어떻게 보이는지, 멀티스레딩이 항상 빠르지 않은 이유는 모두 운영체제를 이해해야 답할 수 있습니다.
 
@@ -34,51 +54,62 @@ last_reviewed: '2026-05-11'
 
 OS의 추상화를 모르면 디버깅은 마법이 됩니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 프로세스는 격리된 실행 단위, 스레드는 같은 프로세스 안에서 메모리를 공유하는 실행 흐름입니다.
 
 ```text
-프로세스 A                       프로세스 B
+Process A                       Process B
 ┌───────────────────┐           ┌───────────────────┐
-│ 가상 주소 공간     │           │ 가상 주소 공간     │
+│ Virtual address   │           │ Virtual address   │
 │  ┌─────────────┐  │           │  ┌─────────────┐  │
-│  │ 스레드 1     │  │           │  │ 스레드 1     │  │
-│  │ 스레드 2     │  │           │  │             │  │
+│  │ Thread 1    │  │           │  │ Thread 1    │  │
+│  │ Thread 2    │  │           │  │             │  │
 │  └─────────────┘  │           │  └─────────────┘  │
 └─────────┬─────────┘           └─────────┬─────────┘
           │                               │
-          └────── 운영체제 (커널) ────────┘
+          └───── Operating system ────────┘
                        │
-                  하드웨어 (CPU, RAM, 디스크)
+                  Hardware (CPU, RAM, disk)
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Process | 자기만의 메모리 공간을 가진 실행 단위 |
+| Thread | 같은 프로세스 안에서 메모리를 공유하는 실행 흐름 |
+| Context switch | OS가 CPU에서 실행할 프로세스나 스레드를 바꾸는 일 |
+| Virtual memory | 각 프로세스에 독립적인 연속 주소 공간을 주는 추상화 |
+| System call | 사용자 프로그램이 커널 서비스에 요청을 보내는 인터페이스 |
+| Scheduler | 누가 CPU를 받을지 결정하는 OS 구성 요소 |
 
 ## Before / After
 
 **Before — OS를 의식하지 않은 코드:**
 
 ```python
-# URL 100개를 순차적으로 가져오므로 대부분의 시간을 기다립니다
+# Fetch 100 URLs sequentially — most of the time is spent waiting
 import urllib.request
 
 urls = [f"https://httpbin.org/delay/1?n={i}" for i in range(100)]
 results = [urllib.request.urlopen(u).read() for u in urls]
-# 약 100초가 걸리며 CPU는 거의 쉬고 I/O만 기다립니다
+# About 100 seconds — the CPU is idle, just waiting on I/O
 ```
 
 **After — OS의 비동기 I/O를 활용:**
 
 ```python
-# 같은 작업, 동시에 처리 — I/O 대기 시간을 겹치게 합니다
+# Same work, done concurrently — overlap the I/O wait
 from concurrent.futures import ThreadPoolExecutor
 import urllib.request
 
 def fetch(url: str) -> bytes:
     return urllib.request.urlopen(url).read()
 
-
 with ThreadPoolExecutor(max_workers=20) as pool:
     results = list(pool.map(fetch, urls))
-# 약 5~10초 — I/O 대기 동안 다른 요청이 진행됩니다
+# About 5-10 seconds — other requests progress while one waits
 ```
 
 ## 단계별로 따라하기
@@ -90,20 +121,18 @@ import os
 import threading
 import multiprocessing
 
-
 def show_id(label: str) -> None:
     print(f"{label}: pid={os.getpid()}, tid={threading.get_ident()}")
 
-
-print("[메인]")
+print("[main]")
 show_id("main")
 
-print("\n[스레드]")
+print("\n[thread]")
 t = threading.Thread(target=show_id, args=("thread",))
 t.start()
 t.join()
 
-print("\n[프로세스]")
+print("\n[process]")
 p = multiprocessing.Process(target=show_id, args=("process",))
 p.start()
 p.join()
@@ -112,10 +141,9 @@ p.join()
 ### 2단계: GIL과 멀티스레딩의 한계
 
 ```python
-# CPU 바운드 작업은 스레드로 빨라지지 않습니다 (CPython의 GIL 영향)
+# CPU-bound work does not get faster with threads (CPython GIL)
 import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-
 
 def cpu_heavy(n: int) -> int:
     total = 0
@@ -123,29 +151,28 @@ def cpu_heavy(n: int) -> int:
         total += i * i
     return total
 
-
 N = 10_000_000
 work = [N] * 4
 
 start = time.perf_counter()
 [cpu_heavy(n) for n in work]
-print(f"순차       : {time.perf_counter() - start:.2f}s")
+print(f"sequential : {time.perf_counter() - start:.2f}s")
 
 start = time.perf_counter()
 with ThreadPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
-print(f"스레드 x4 : {time.perf_counter() - start:.2f}s")  # 거의 비슷합니다
+print(f"threads x4 : {time.perf_counter() - start:.2f}s")  # roughly the same
 
 start = time.perf_counter()
 with ProcessPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
-print(f"프로세스 x4: {time.perf_counter() - start:.2f}s")  # 약 4배 빨라집니다
+print(f"processes x4: {time.perf_counter() - start:.2f}s")  # about 4x faster
 ```
 
 ### 3단계: 시스템 콜 들여다보기
 
 ```python
-# 파이썬의 open()은 내부적으로 OS의 open(2) 시스템 콜을 호출합니다
+# Python's open() ultimately calls the OS open(2) system call
 import os
 
 fd = os.open("/tmp/oscourse_demo.txt", os.O_CREAT | os.O_WRONLY, 0o644)
@@ -159,42 +186,39 @@ os.remove("/tmp/oscourse_demo.txt")
 ### 4단계: 가상 메모리 관찰하기
 
 ```python
-# 프로세스 메모리 사용량을 확인합니다 (Linux/macOS)
+# Inspect process memory usage (Linux/macOS)
 import os
 import resource
 
 print(f"PID            : {os.getpid()}")
 usage = resource.getrusage(resource.RUSAGE_SELF)
-print(f"max RSS (KB)   : {usage.ru_maxrss}")    # 사용한 최대 물리 메모리
-print(f"page faults    : {usage.ru_minflt}")    # 페이지 부재 횟수
+print(f"max RSS (KB)   : {usage.ru_maxrss}")    # peak resident set size
+print(f"page faults    : {usage.ru_minflt}")    # page-fault count
 ```
 
 ### 5단계: 동시성 vs 병렬성
 
 ```python
-# 동시성은 여러 작업이 진행 중인 상태입니다 (시간 분할 가능)
-# 병렬성은 여러 작업이 같은 순간에 실행되는 상태입니다 (다중 CPU 코어)
+# Concurrency = multiple tasks in progress (time-sliced)
+# Parallelism = multiple tasks running at the same instant (multi-core)
 
 import asyncio
 import time
 
-
 async def task(name: str, sec: float) -> None:
-    print(f"{name} 시작")
-    await asyncio.sleep(sec)        # I/O 대기 시뮬레이션
-    print(f"{name} 종료")
-
+    print(f"{name} starting")
+    await asyncio.sleep(sec)        # simulate I/O wait
+    print(f"{name} done")
 
 async def main() -> None:
     start = time.perf_counter()
     await asyncio.gather(task("A", 1), task("B", 1), task("C", 1))
-    print(f"총 소요: {time.perf_counter() - start:.2f}s")  # 약 1초
-
+    print(f"total elapsed: {time.perf_counter() - start:.2f}s")  # about 1s
 
 asyncio.run(main())
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 프로세스는 메모리를 공유하지 않고, 스레드는 공유합니다
 - CPython의 GIL 때문에 CPU 바운드 작업은 스레드보다 프로세스가 유리합니다
@@ -219,6 +243,12 @@ asyncio.run(main())
 - 디버깅 도구(`strace`, `dtruss`, `perf`)로 시스템 콜·스케줄링 분석
 - 서비스 메모리 누수 분석에서 RSS, swap, page fault 추세 모니터링
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 먼저 병목이 CPU인지 I/O인지부터 묻습니다. CPU 바운드라면 알고리즘과 병렬성을, I/O 바운드라면 async·스레드·큐잉을 먼저 생각합니다.
+
+또한 운영체제 추상화가 완전하지 않다는 사실을 압니다. 가상 메모리는 무한해 보이지만 실제 RAM과 swap에는 한계가 있고, 파일 시스템은 단순한 폴더 트리처럼 보여도 inode와 mount 경계가 있습니다. 운영 버그는 늘 그 가장자리에서 커집니다.
+
 ## 체크리스트
 
 - [ ] 프로세스와 스레드의 차이를 메모리 관점에서 설명할 수 있는가
@@ -226,6 +256,12 @@ asyncio.run(main())
 - [ ] 가상 메모리, 페이지, 스왑의 의미를 이해했는가
 - [ ] 시스템 콜이 비용이 있다는 점을 의식하는가
 - [ ] 동시성과 병렬성을 구분해서 사용할 수 있는가
+
+## 연습 문제
+
+1. CPU 바운드 함수와 I/O 바운드 함수를 각각 스레드 4개, 프로세스 4개로 실행해 시간을 비교해 보세요.
+2. `multiprocessing.Process`로 부모와 자식 프로세스가 같은 변수를 어떻게 다르게 보게 되는지 확인해 보세요.
+3. `threading.Lock` 유무에 따라 여러 스레드가 카운터를 증가시킬 때 결과가 어떻게 달라지는지 관찰해 보세요.
 
 ## 정리 및 다음 단계
 

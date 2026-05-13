@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 8
 title: 데이터베이스
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,16 +17,36 @@ tags:
   - 인덱스
   - 트랜잭션
   - ACID
-seo_description: 데이터베이스가 데이터를 어떻게 저장·조회·보호하는지 인덱스와 트랜잭션 중심으로 다루는 CS 입문 시리즈입니다.
-last_reviewed: '2026-05-11'
+seo_description: SQL, 인덱스, 트랜잭션이 데이터베이스 성능과 무결성을 어떻게 좌우하는지 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 데이터베이스
 
-> Computer Science 101 시리즈 (8/10)
+수억 행 중 한 행을 1ms 안에 찾는 일은 SQL 문장 자체보다 그 뒤에 숨어 있는 자료구조와 실행 계획의 힘에 가깝습니다. 서비스 장애가 데이터베이스에서 시작되는 이유도, 짧은 쿼리 뒤에 깊은 비용이 숨어 있기 때문입니다.
 
+이 글은 Computer Science 101 시리즈의 8번째 글입니다.
+
+여기서는 관계형 데이터베이스의 기본 개념, SQL 조회와 수정, 인덱스, 트랜잭션과 ACID를 실무 중심으로 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
+
+- 데이터베이스는 많은 데이터를 어떻게 영구 저장하고 동시에 안전하게 읽고 쓸까요?
+- 인덱스는 왜 조회 속도를 급격하게 바꿀까요?
+- SQL 한 줄과 실제 실행 계획 사이에는 어떤 차이가 있을까요?
+- 트랜잭션과 ACID는 어떤 실패를 막아 줄까요?
+- N+1 쿼리나 장시간 트랜잭션은 왜 운영 사고로 이어질까요?
+
+> 데이터베이스는 단순 저장소가 아니라 동시성과 일관성을 책임지는 시스템입니다. 짧은 SQL 뒤에서도 자료구조, 락, 실행 계획이 함께 움직입니다.
+
+## 이 글에서 배울 것
+
+- 관계형 데이터베이스의 기본 개념
+- SQL로 데이터를 조회하고 수정하는 방법
+- 인덱스가 조회를 빠르게 만드는 원리
+- 트랜잭션과 ACID의 의미
+
+## 왜 중요한가
 
 대부분의 서비스 장애는 데이터베이스에서 일어납니다. 느린 쿼리 하나가 전체 시스템을 마비시키고, 트랜잭션 한 줄을 놓치면 데이터가 깨집니다. SQL과 인덱스, 트랜잭션을 이해하지 못하면 백엔드 엔지니어로 성장할 수 없습니다.
 
@@ -34,27 +54,39 @@ last_reviewed: '2026-05-11'
 
 쿼리는 짧지만 그 뒤에는 깊은 알고리즘이 있습니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 > 인덱스는 책의 색인과 같습니다. 본문 전체를 뒤지지 않고 색인을 따라 곧장 페이지를 펼칩니다.
 
 ```text
-인덱스 없이 SELECT * FROM users WHERE email = 'a@b.com'
-  → 모든 행을 스캔 (Full Table Scan)  — O(n)
+Without an index:  SELECT * FROM users WHERE email = 'a@b.com'
+  -> scan every row (Full Table Scan)  -- O(n)
 
-인덱스 있을 때 (B-Tree)
-  → 트리에서 이진 탐색       — O(log n)
+With a B-Tree index
+  -> binary search through the tree    -- O(log n)
 
-100만 행 기준
-  - 풀 스캔  : 약 1,000,000번 비교
-  - B-Tree   : 약 20번 비교
+For 1,000,000 rows
+  - full scan : about 1,000,000 comparisons
+  - B-Tree    : about 20 comparisons
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Table | 행과 열로 구성된 관계형 데이터의 기본 단위 |
+| Primary key | 한 행을 유일하게 식별하는 열 |
+| Index | 특정 열 기준으로 행을 빠르게 찾게 해 주는 자료구조 |
+| Transaction | 여러 SQL 문을 하나의 논리 작업으로 묶는 단위 |
+| ACID | 원자성·일관성·격리성·지속성 네 가지 속성 |
+| Query planner | SQL을 어떤 방식으로 실행할지 결정하는 DB 구성 요소 |
 
 ## Before / After
 
 **Before — 인덱스 없이 N+1 쿼리:**
 
 ```python
-# 사용자 100명의 주문을 가져오기 — 101번의 쿼리
+# Fetch orders for 100 users — 101 queries
 users = cursor.execute("SELECT id FROM users").fetchall()
 orders = []
 for (user_id,) in users:
@@ -65,7 +97,7 @@ for (user_id,) in users:
 **After — JOIN과 인덱스 활용:**
 
 ```python
-# 한 번의 쿼리로 끝나며 user_id 인덱스가 있으면 더 빠릅니다
+# A single query, fast when user_id is indexed
 cursor.execute("""
     SELECT u.id, o.id, o.amount
     FROM users u
@@ -112,17 +144,17 @@ conn.commit()
 ### 2단계: 기본 쿼리
 
 ```python
-# 전체 행을 조회합니다
+# SELECT
 for row in cur.execute("SELECT id, email FROM users"):
     print(row)
 
-# 조건 필터링 후 정렬하고 일부만 가져옵니다
+# WHERE + ORDER BY + LIMIT
 for row in cur.execute(
     "SELECT name, email FROM users WHERE name LIKE 'A%' ORDER BY id LIMIT 10"
 ):
     print(row)
 
-# 테이블을 조인해 함께 조회합니다
+# JOIN
 for row in cur.execute("""
     SELECT u.name, SUM(o.amount) AS total
     FROM users u
@@ -152,13 +184,13 @@ target = 12345
 
 start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
-print(f"인덱스 전: {time.perf_counter() - start:.4f}s")
+print(f"before index: {time.perf_counter() - start:.4f}s")
 
 cur.execute("CREATE INDEX idx_big_k ON big(k)")
 
 start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
-print(f"인덱스 후: {time.perf_counter() - start:.6f}s")
+print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```
 
 ### 4단계: EXPLAIN QUERY PLAN으로 들여다보기
@@ -166,7 +198,7 @@ print(f"인덱스 후: {time.perf_counter() - start:.6f}s")
 ```python
 for row in cur.execute("EXPLAIN QUERY PLAN SELECT * FROM big WHERE k = 12345"):
     print(row)
-# (... USING INDEX idx_big_k ...) 같은 문구가 보이면 인덱스를 사용한 것입니다
+# A line like (… USING INDEX idx_big_k …) confirms the index is used
 ```
 
 ### 5단계: 트랜잭션과 ACID
@@ -181,9 +213,8 @@ cur.executemany(
 )
 conn.commit()
 
-
 def transfer(src: int, dst: int, amount: int) -> None:
-    """원자적으로 두 계좌 간 이체 — 둘 다 성공하거나 둘 다 실패."""
+    """Atomic transfer between two accounts — both succeed or both fail."""
     try:
         cur.execute("BEGIN")
         cur.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, src))
@@ -193,12 +224,11 @@ def transfer(src: int, dst: int, amount: int) -> None:
         conn.rollback()
         raise
 
-
 transfer(1, 2, 300)
 print(cur.execute("SELECT * FROM accounts").fetchall())
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
 - 인덱스 하나로 같은 쿼리가 수백 배 빨라질 수 있습니다
 - N+1 쿼리는 거의 항상 JOIN 또는 IN 절로 한 번에 해결할 수 있습니다
@@ -223,6 +253,12 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - 트랜잭션 격리 수준 선택 — Read Committed, Repeatable Read, Serializable
 - 마이그레이션 전략 — Zero-downtime schema change, online DDL
 
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 SQL을 쓰면서 동시에 실행 계획을 머릿속에 그립니다. 화면에 보이는 SQL과 DB가 실제로 밟는 단계는 다르기 때문에, `EXPLAIN`으로 인덱스 사용과 예상 row 수를 먼저 확인합니다.
+
+또한 데이터베이스는 시스템에서 가장 위험한 상태 저장 구성 요소라는 사실을 압니다. 코드 배포는 롤백할 수 있어도 잘못된 마이그레이션은 되돌리기 어렵습니다. 그래서 스키마 변경은 항상 호환 가능하게, 트랜잭션은 짧게, 운영 SQL은 실행 전 `EXPLAIN`으로 검증합니다.
+
 ## 체크리스트
 
 - [ ] 기본 키와 인덱스의 차이를 설명할 수 있는가
@@ -230,6 +266,12 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - [ ] 트랜잭션 안과 밖에서 무엇을 해야 하는지 구분하는가
 - [ ] N+1 쿼리 문제를 알아차리고 고칠 수 있는가
 - [ ] 운영 환경에 SQL을 쏘기 전에 `EXPLAIN`을 확인하는가
+
+## 연습 문제
+
+1. 200만 행짜리 테이블을 만들고 인덱스 추가 전후의 `SELECT` 시간을 측정해 보세요.
+2. 사용자별 주문 총액을 (a) N+1 쿼리와 (b) JOIN + GROUP BY 한 번으로 각각 구해 시간을 비교해 보세요.
+3. 중간에 예외를 발생시키는 계좌 이체 함수를 만들어 트랜잭션이 일관성을 지키는지 확인해 보세요.
 
 ## 정리 및 다음 단계
 
