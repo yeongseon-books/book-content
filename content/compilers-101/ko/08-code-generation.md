@@ -1,8 +1,8 @@
 ---
 series: compilers-101
 episode: 8
-title: code generation
-status: content-ready
+title: 코드 생성
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,22 +16,32 @@ tags:
   - CodeGen
   - RegisterAllocation
   - Assembly
-seo_description: code generation은 IR을 실제 명령어로 바꿉니다. 명령어 선택과 register 할당의 핵심을 봅니다.
-last_reviewed: '2026-05-11'
+seo_description: IR을 실제 명령어로 내리는 코드 생성의 핵심 원리를 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
-# code generation
+# 코드 생성
 
-> Compilers 101 시리즈 (8/10)
-
+이 글은 Compilers 101 시리즈의 여덟 번째 글입니다. IR에는 `t1`, `t2`, `t3`처럼 임시 값이 무한히 있는 것처럼 보이지만 실제 CPU에는 레지스터가 몇 개 없다는 사실을 이해하면, 코드 생성이 왜 컴파일러 백엔드의 핵심 기술인지 바로 체감하게 됩니다.
 
 ## 이 글에서 다룰 문제
 
-여기까지 잘 와도 마지막에 잘못 내려가면 프로그램은 안 돕니다. 그리고 같은 IR이라도 backend 품질이 낮으면 실행 속도가 2-10배 차이가 납니다. code gen은 컴파일러의 평판을 결정합니다.
+- 코드 생성이 해결해야 하는 두 핵심 문제는 무엇일까요?
+- instruction selection은 어떤 직관으로 동작할까요?
+- register allocation은 왜 그래프 색칠 문제로 보일까요?
+- spill은 언제 왜 필요할까요?
+- calling convention과 ABI는 왜 꼭 필요할까요?
 
-> "이론은 IR에서 끝나고, 실력은 backend에서 드러난다."
+> 코드 생성은 IR을 실제 명령어로 바꾸는 단계이며, 핵심 일은 어떤 명령어를 고를지와 값을 어디에 둘지를 결정하는 것입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+앞 단계가 모두 잘 되어 있어도 마지막에 잘못 내리면 프로그램은 실행되지 않습니다. 같은 IR이라도 백엔드 품질이 낮으면 실행 속도가 몇 배씩 차이 날 수 있습니다. 그래서 코드 생성은 컴파일러의 최종 평판을 좌우합니다.
+
+> 이론은 IR에서 끝나지만, 실력은 백엔드에서 드러납니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
     A["IR"] --> B["instruction selection"]
@@ -40,11 +50,19 @@ flowchart LR
     D --> E["assembly / machine code"]
 ```
 
-세 단계가 거의 모든 backend의 뼈대입니다.
+이 세 단계가 거의 모든 백엔드의 뼈대입니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — 무한 가상 register IR**
+- **instruction selection**: IR 노드마다 어떤 CPU 명령어를 쓸지 고르는 과정입니다.
+- **register allocation**: 가상 레지스터를 실제 물리 레지스터에 매핑하는 과정입니다.
+- **spill**: 레지스터가 모자라 임시 값을 메모리에 저장하는 일입니다.
+- **calling convention**: 함수 호출 시 어떤 레지스터에 어떤 값을 넣을지에 대한 약속입니다.
+- **ABI**: 서로 다른 컴파일 결과물이 함께 호출되고 연결될 수 있게 하는 이진 인터페이스 규약입니다.
+
+## Before / After
+
+**Before — 무한 가상 레지스터를 가진 IR**
 
 ```text
 t1 = LOAD a
@@ -61,15 +79,15 @@ add rax, [b]
 ret
 ```
 
-가상 register가 `rax`로 줄어들고, LOAD/ADD가 한 명령어로 합쳐졌습니다.
+가상 레지스터들이 실제 레지스터에 접혀 들어가고, LOAD와 ADD가 결합되기도 합니다.
 
-## 작은 코드 생성기
+## 실습: 작은 코드 생성기 만들기
 
-### 1단계 — 직선적 instruction selection
+### 1단계 — 직선형 instruction selection
 
 ```python
-# 예제 파일: 1_select.py
-# 매우 단순한 1:1 매칭
+# 1_select.py
+# very simple 1:1 matching
 def select(inst):
     op, dst, a, b = inst
     if op == "LOAD":  return [f"mov {dst}, {a}"]
@@ -83,14 +101,14 @@ for inst in [("LOAD","t1",2,None),("LOAD","t2",3,None),
     print("\n".join(select(inst)))
 ```
 
-먼저 매우 단순한 1:1 매칭으로 시작합니다. 더 좋은 backend는 트리 패턴 매칭을 합니다.
+처음에는 가장 단순한 1:1 매칭으로 시작하면 됩니다. 더 정교한 백엔드는 트리 패턴 매칭으로 발전합니다.
 
-### 2단계 — interference graph
+### 2단계 — 간섭 그래프
 
 ```python
-# 예제 파일: 2_interference.py
-# 같은 시점에 살아 있는 두 temporary는 같은 register를 못 쓴다
-# → 그래프의 간선
+# 2_interference.py
+# two temporaries alive at the same time cannot share a register
+# → an edge in the graph
 def interferences(code):
     live = set(); edges = set()
     for op, dst, a, b in reversed(code):
@@ -106,13 +124,13 @@ def interferences(code):
     return edges
 ```
 
-뒤에서 앞으로 라이브니스를 추적하면, "동시에 살아 있는 변수들"의 간선이 모입니다.
+동시에 살아 있는 값끼리는 같은 레지스터를 공유할 수 없습니다. 그 관계를 그래프로 만들면 register allocation 문제를 더 명확히 볼 수 있습니다.
 
-### 3단계 — graph coloring 직관
+### 3단계 — 그래프 색칠 직관
 
 ```python
-# 예제 파일: 3_color.py
-# 사용 가능한 색(register)이 K개일 때, 인접한 노드끼리 같은 색이 안 되게 칠한다
+# 3_color.py
+# given K colors (registers), color so adjacent nodes differ
 def greedy_color(nodes, edges, k):
     color = {}
     for n in nodes:
@@ -125,13 +143,13 @@ def greedy_color(nodes, edges, k):
     return color
 ```
 
-K개 색으로 안 칠해지는 노드는 spill 후보입니다. 실제 알고리즘은 chordal graph의 특성 등을 활용해 더 정교합니다.
+K개의 색으로 칠할 수 없으면 spill 후보가 됩니다. 실제 알고리즘은 더 정교하지만 핵심 직관은 같습니다.
 
-### 4단계 — spill: 메모리에 임시 저장
+### 4단계 — spill: 메모리에 임시 보관하기
 
 ```python
-# 예제 파일: 4_spill.py
-# register가 모자라면 stack에 일시 저장 후 다시 로드
+# 4_spill.py
+# when registers run out, save to stack and reload
 def spill(code, var):
     new = []
     for op, dst, a, b in code:
@@ -144,14 +162,14 @@ def spill(code, var):
     return new
 ```
 
-성능은 떨어지지만 정확성은 보장됩니다. 잘 만든 backend는 spill을 최소화합니다.
+spill은 느리지만 올바릅니다. 좋은 백엔드는 spill을 최소화하지만, spill 자체를 실패로 보지는 않습니다.
 
 ### 5단계 — calling convention
 
 ```python
-# 예제 파일: 5_call.py
-# x86-64 System V: 첫 6개 정수 인자는 rdi, rsi, rdx, rcx, r8, r9
-# 반환값은 rax
+# 5_call.py
+# x86-64 System V: first 6 integer args go in rdi, rsi, rdx, rcx, r8, r9
+# return value in rax
 def emit_call(name, args):
     regs = ["rdi","rsi","rdx","rcx","r8","r9"]
     out = []
@@ -163,50 +181,64 @@ def emit_call(name, args):
 print("\n".join(emit_call("printf", ["fmt", "x"])))
 ```
 
-내가 만든 함수와 라이브러리가 같은 약속을 따라야 호출이 동작합니다. 이게 ABI입니다.
+여러분의 함수와 외부 라이브러리가 같은 약속을 따라야 호출이 성립합니다. 그것이 ABI의 핵심입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- instruction selection은 패턴 매칭의 일종입니다.
-- register allocation의 본질은 graph coloring이지만, 실용은 더 정교합니다.
-- spill은 "패배"가 아니라 정상적인 도구입니다.
-- calling convention 위반은 무조건 segfault.
+- instruction selection은 패턴 매칭의 한 형태입니다.
+- register allocation의 본질은 그래프 색칠입니다.
+- spill은 패배가 아니라 정상적인 도구입니다.
+- calling convention을 어기면 프로그램은 쉽게 비정상 종료합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **liveness 분석 없이 register를 배정한다.** 이미 쓰이고 있는 register를 덮어 씁니다.
-2. **spill을 두려워해 코드 폭발을 만든다.** 적절한 spill은 필요합니다.
-3. **calling convention을 임의로 바꾼다.** 외부 라이브러리와 영원히 못 만납니다.
-4. **flag register(EFLAGS) 같은 implicit register를 잊는다.** 비교 후 점프 사이에 낀 명령어가 깨뜨립니다.
-5. **instruction selection을 너무 일찍 최적화한다.** 먼저 정확한 1:1 매칭으로 동작하는 것을 먼저.
+1. **liveness 분석 없이 레지스터를 배정하는 것**입니다. 아직 살아 있는 값을 덮어쓸 수 있습니다.
+2. **spill을 지나치게 두려워하는 것**입니다. 일부 spill은 불가피합니다.
+3. **자체 calling convention을 발명하는 것**입니다. 외부 라이브러리와 상호 운용할 수 없습니다.
+4. **EFLAGS 같은 암묵 레지스터를 잊는 것**입니다. compare와 jump 사이에 다른 명령을 끼우면 깨질 수 있습니다.
+5. **너무 이르게 고급 instruction selection 최적화에 집착하는 것**입니다. 먼저 정확한 1:1 변환부터 동작시켜야 합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-LLVM의 backend는 SelectionDAG와 GlobalISel 두 갈래가 있고, 각각 instruction selection 전략이 다릅니다. register allocator는 LinearScan(빠름)과 Greedy(품질 좋음)를 옵션으로 제공합니다. ABI는 OS와 architecture별로 달라서, 같은 함수가 Linux x86-64와 macOS ARM64에서 다르게 호출됩니다.
+LLVM 백엔드는 SelectionDAG와 GlobalISel처럼 서로 다른 선택 전략을 제공합니다. register allocator도 LinearScan, Greedy 같은 여러 방식을 선택할 수 있습니다. ABI는 운영체제와 아키텍처마다 달라서, 같은 함수라도 Linux x86-64와 macOS ARM64에서 호출 방식이 달라집니다.
+
+## 숙련된 엔지니어는 이렇게 봅니다
+
+- 가장 먼저 “이 백엔드는 어떤 ABI를 따르는가?”를 확인합니다.
+- 새 아키텍처에서는 레지스터 개수와 calling convention부터 봅니다.
+- spill을 두려워하지 않고, 정확성을 우선합니다.
+- 백엔드 작업의 출발점을 liveness 분석으로 잡습니다.
+- flags, 예외, 원자성 같은 암묵 요소를 항상 의심합니다.
 
 ## 체크리스트
 
-- [ ] code generation이 푸는 두 가지 큰 문제를 답할 수 있는가?
-- [ ] register allocation이 graph coloring 문제임을 이해했는가?
-- [ ] spill이 무엇이고 언제 일어나는지 답할 수 있는가?
-- [ ] calling convention과 ABI의 차이를 답할 수 있는가?
-- [ ] liveness 분석이 왜 필요한지 한 줄로 설명할 수 있는가?
+- [ ] 코드 생성이 해결하는 두 핵심 문제를 말할 수 있습니까?
+- [ ] register allocation을 그래프 색칠로 이해하고 있습니까?
+- [ ] spill이 무엇이며 언제 생기는지 설명할 수 있습니까?
+- [ ] calling convention과 ABI의 차이를 설명할 수 있습니까?
+- [ ] liveness 분석이 왜 필요한지 한 문장으로 말할 수 있습니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Code generation은 IR과 진짜 CPU 사이의 마지막 다리입니다. 다음 글에서는 이 모든 단계를 언제(컴파일 시점) 또는 언제(실행 중) 하는지를 결정하는 — JIT vs AOT — 의 비교를 살펴봅니다.
+1. 위 `select` 함수에 비교(`<`)와 조건 분기(`jl`)를 추가해 보세요.
+2. 간섭 그래프를 직접 그리고 `k=2`일 때 어떤 노드가 spill되는지 찾아보세요.
+3. 같은 레지스터를 두 함수 호출이 동시에 원할 때 spill이 어디에 들어가야 하는지 추론해 보세요.
+
+## 정리 및 다음 글
+
+코드 생성은 IR과 실제 CPU 사이의 마지막 다리입니다. 다음 글에서는 이 전체 파이프라인이 언제 실행되는지를 비교하는 주제, JIT vs AOT를 다룹니다.
 
 <!-- toc:begin -->
 - [컴파일러란 무엇인가?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing과 AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table과 scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization 기초](./07-optimization-basics.md)
-- **code generation (현재 글)**
+- [렉시컬 분석](./02-lexical-analysis.md)
+- [파싱과 AST](./03-parsing-and-ast.md)
+- [시맨틱 분석](./04-semantic-analysis.md)
+- [심볼 테이블과 스코프](./05-symbol-table-and-scope.md)
+- [중간 표현](./06-intermediate-representation.md)
+- [최적화 기초](./07-optimization-basics.md)
+- **코드 생성 (현재 글)**
 - JIT vs AOT (예정)
-- 작은 인터프리터 만들어 보기 (예정)
+- 작은 인터프리터 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료

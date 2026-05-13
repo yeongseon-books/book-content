@@ -1,8 +1,8 @@
 ---
 series: compilers-101
 episode: 2
-title: lexical analysis
-status: content-ready
+title: 렉시컬 분석
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -14,42 +14,60 @@ tags:
   - Computer Science
   - Compilers
   - Lexer
-  - 토큰
-  - 정규식
-  - 위치정보
-seo_description: 텍스트를 의미 있는 토큰으로 자르는 단계입니다. 정규식과 longest-match로 작은 lexer를 만들어 봅니다.
-last_reviewed: '2026-05-11'
+  - Tokens
+  - Regex
+  - Position
+seo_description: 렉서가 토큰과 위치 정보를 어떻게 만드는지 핵심 원리를 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
-# lexical analysis
+# 렉시컬 분석
 
-> Compilers 101 시리즈 (2/10)
-
+이 글은 Compilers 101 시리즈의 두 번째 글입니다. `print("hello")` 같은 한 줄을 컴파일러가 실제로 어떻게 잘게 나누는지 이해하면, `SyntaxError`가 왜 그 자리에서 생겼는지 훨씬 선명하게 보이기 시작합니다.
 
 ## 이 글에서 다룰 문제
 
-`SyntaxError: unexpected token`이 어디서 오는지를 답할 수 있는 사람과 못하는 사람의 차이는 lexical analysis를 봤느냐 안 봤느냐입니다. 좋은 lexer는 좋은 오류 메시지의 출발점입니다.
+- 토큰은 정확히 무엇이고, 렉서는 어떤 문제를 해결할까요?
+- 정규식 기반 렉서는 어떻게 동작할까요?
+- longest-match 규칙은 왜 중요할까요?
+- 키워드와 식별자는 왜 같은 패턴에서 시작할까요?
+- line/column 같은 위치 정보는 왜 끝까지 유지해야 할까요?
 
-> 토큰을 잘못 자르면, 그다음 모든 단계가 같은 잘못 위에 쌓입니다.
+> 렉시컬 분석은 원문 문자열을 토큰이라는 의미 단위로 자르는 단계이며, 이 분리가 잘못되면 위의 모든 단계가 같은 잘못을 물려받습니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+`SyntaxError: unexpected token`이 어디에서 오는지 정확히 답할 수 있는 사람과 그렇지 못한 사람의 차이는 대개 lexical analysis를 실제로 들여다봤는지에 달려 있습니다. 좋은 렉서는 단지 토큰을 자르는 도구가 아니라, 좋은 오류 메시지의 시작점이기도 합니다.
+
+> 토큰을 잘못 자르면, 그다음 모든 단계가 같은 잘못된 분할 위에 세워집니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
-    A["raw text"] --> B["scanner: 한 글자씩"]
-    B --> C["pattern match: 정규식"]
-    C --> D["longest match 선택"]
-    D --> E["키워드 vs identifier 분리"]
-    E --> F["토큰 + (line, col)"]
+    A["raw text"] --> B["scanner: char by char"]
+    B --> C["pattern match: regex"]
+    C --> D["pick longest match"]
+    D --> E["split keyword vs identifier"]
+    E --> F["token + (line, col)"]
 ```
 
-핵심은 "가장 긴 매칭을 고른다"와 "위치를 끝까지 들고 다닌다" 두 가지입니다.
+이 단계의 핵심은 두 가지입니다. **가장 긴 매치를 고르는 것**과 **위치 정보를 끝까지 들고 가는 것**입니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — 한 글자씩 분기 처리**
+- 토큰: 렉서가 만들어 내는 의미 있는 단위입니다. 보통 `(kind, text, position)`의 조합으로 생각합니다.
+- **렉심(lexeme)**: 토큰 안의 실제 텍스트 부분입니다.
+- **longest match**: 같은 위치에서 여러 패턴이 맞을 수 있을 때 가장 긴 매치를 고르는 규칙입니다.
+- **키워드 vs 식별자**: `if`는 키워드이고 `iff`는 식별자입니다. 둘 다 같은 패턴에서 시작하므로 후처리로 분리합니다.
+- **공백 / 주석**: 렉서는 인식하지만 토큰 스트림에서는 보통 제거합니다.
+
+## Before / After
+
+**Before — 문자 하나씩 분기하는 코드**
 
 ```python
-# if/else로 글자별 처리 → 코드가 폭발한다
+# if/else per character makes the code explode
 def lex_naive(s):
     out, i = [], 0
     while i < len(s):
@@ -70,14 +88,14 @@ def lex_naive(s):
 SPEC = [("NUM", r"\d+"), ("OP", r"[+\-*/]"), ("WS", r"\s+")]
 ```
 
-테이블만 늘리면 새 토큰이 추가됩니다. 유지보수성과 가독성이 훨씬 좋습니다.
+새 토큰을 추가할 때 한 행만 더 넣으면 됩니다. 유지보수성과 가독성이 훨씬 좋아집니다.
 
-## 작은 lexer를 단계별로
+## 실습: 작은 렉서를 단계별로 만들기
 
-### 1단계 — 정규식 기반 lexer
+### 1단계 — 정규식 기반 렉서
 
 ```python
-# 예제 파일: 1_regex_lex.py
+# 1_regex_lex.py
 import re
 from dataclasses import dataclass
 
@@ -125,13 +143,13 @@ for t in lex('if x == 1\n  return "ok"\n'):
     print(t)
 ```
 
-표 한 개로 모든 토큰 종류를 표현했습니다. 위치 정보는 매 단계 갱신됩니다.
+하나의 테이블이 모든 토큰 종류를 표현합니다. 위치 정보도 매 단계에서 함께 갱신됩니다.
 
-### 2단계 — longest-match가 왜 필요한가
+### 2단계 — longest-match가 왜 중요한가
 
 ```python
-# 예제 파일: 2_longest.py
-# == 와 = 가 함께 있는 언어를 생각해 봅시다
+# 2_longest.py
+# imagine a language that has both == and =
 SPEC = [("EQ", r"=="), ("ASSIGN", r"=")]
 import re
 src = "=="
@@ -142,12 +160,12 @@ for kind, pat in SPEC:
         break
 ```
 
-순서를 거꾸로 두면 `=`가 먼저 매칭되어 `==`가 두 토큰으로 잘립니다. SPEC 순서로 longest-match를 흉내 내거나, 정규식 alternation을 길이 순으로 정렬해야 합니다.
+순서를 뒤집으면 `=`가 먼저 잡혀서 `==`가 두 토큰으로 잘립니다. 그래서 SPEC 순서로 longest-match를 흉내 내거나, 정규식 대안을 길이 순으로 정렬해야 합니다.
 
-### 3단계 — 키워드와 identifier 분리
+### 3단계 — 키워드와 식별자 분리하기
 
 ```python
-# 예제 파일: 3_keywords.py
+# 3_keywords.py
 import re
 KEYWORDS = {"if", "else", "while"}
 src = "if iff while"
@@ -157,26 +175,26 @@ for m in re.finditer(r"[A-Za-z_]\w*", src):
     print(kind, text)
 ```
 
-같은 정규식으로 잡고, 후처리로 키워드 집합과 비교하는 게 표준입니다. 정규식 안에 키워드를 박아 두면 추가/변경이 어려워집니다.
+표준 패턴은 같습니다. 같은 정규식으로 먼저 잡고, 후처리 단계에서 키워드 집합과 비교합니다. 키워드를 정규식 안에 직접 박아 넣으면 변경이 불편해집니다.
 
-### 4단계 — 위치 정보 유지
+### 4단계 — 위치 정보 유지하기
 
 ```python
-# 예제 파일: 4_position.py
-# 1단계의 lex가 이미 line/col을 들고 다닌다.
-# 오류를 내야 할 때, 그 정보로 보기 좋은 메시지를 만들 수 있다
+# 4_position.py
+# the lex from step 1 already carries line/col.
+# When we need to report an error, that info builds a nice message.
 def report(token, message):
     print(f"  File \"<src>\", line {token.line}, col {token.col}")
     print(f"    {token.text}")
     print(f"  SyntaxError: {message}")
 ```
 
-좋은 컴파일러 오류 메시지의 출발점은 lexer가 위치를 잃지 않는 것입니다.
+좋은 컴파일러 오류 메시지는 위치를 절대 잃지 않는 렉서에서 시작합니다.
 
-### 5단계 — Python 내장 `tokenize`
+### 5단계 — Python 내장 `tokenize` 살펴보기
 
 ```python
-# 예제 파일: 5_python_tokenize.py
+# 5_python_tokenize.py
 import tokenize, io
 
 src = "x = 1 + 2  # add\n"
@@ -184,50 +202,64 @@ for tok in tokenize.generate_tokens(io.StringIO(src).readline):
     print(tok)
 ```
 
-CPython의 lexer가 직접 보입니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COMMENT` 같은 토큰들이 line/column 정보와 함께 나옵니다.
+CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLINE`, `COMMENT` 같은 토큰이 line/column 정보와 함께 나옵니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 테이블 기반 lexer는 추가/변경이 데이터 변경으로 끝납니다.
-- longest-match는 SPEC 순서나 명시적 비교로 보장합니다.
-- 키워드는 lexer가 직접 인식하지 않고, 후처리로 분리합니다.
-- 위치 정보는 토큰의 1등 시민입니다.
+- 테이블 기반 렉서는 토큰 추가와 변경을 **데이터 수정**으로 바꿉니다.
+- longest-match는 SPEC 순서나 명시적 길이 비교로 보장합니다.
+- 키워드는 렉서의 정규식 자체가 아니라 후처리로 분리합니다.
+- 위치 정보는 토큰의 부가 정보가 아니라 핵심 정보입니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **`==`와 `=`처럼 prefix가 겹치는 토큰의 longest-match를 보장하지 않는다.** 가장 흔한 lexer 버그.
-2. **키워드를 정규식에 박는다.** 키워드 추가가 정규식 수정이 됩니다.
-3. **위치 정보를 안 들고 다닌다.** 오류 메시지가 "어딘가에서 syntax error" 수준이 됩니다.
-4. **공백/주석을 너무 일찍 버린다.** code formatter나 linter에서는 그 정보가 필요합니다.
-5. **에러 복구를 안 만든다.** 첫 syntax error 한 번에 lexer가 죽으면 사용자 경험이 나쁩니다.
+1. **`==`와 `=`처럼 접두사가 겹치는 토큰에서 longest-match를 보장하지 않는 것**입니다.
+2. **키워드를 정규식 안에 하드코딩하는 것**입니다.
+3. **위치 정보를 들고 가지 않는 것**입니다. 오류 메시지가 “어딘가에서 syntax error” 수준으로 떨어집니다.
+4. **공백이나 주석을 너무 일찍 버리는 것**입니다. 포매터와 린터는 그 정보가 필요합니다.
+5. **에러 복구 전략이 전혀 없는 것**입니다. 첫 오류에서 바로 종료되면 사용자 경험이 나빠집니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-대부분의 언어 도구는 정규식 기반 lexer 또는 그 변형(DFA)을 씁니다. PEG/parser combinator는 lexer와 parser를 합치기도 합니다 (scannerless parsing). LSP(language server)도 lexer를 가장 먼저 호출하고, syntax highlighting은 사실상 lexer 결과의 시각화입니다.
+대부분의 언어 도구는 정규식 기반 렉서나 DFA 계열 변형을 사용합니다. PEG나 parser combinator는 렉서와 파서를 합쳐 scannerless parsing 형태를 쓰기도 합니다. LSP 서버도 가장 먼저 렉서를 호출하고, syntax highlighting은 사실상 렉서 출력의 시각화라고 볼 수 있습니다.
+
+## 숙련된 엔지니어는 이렇게 봅니다
+
+- 새 언어를 만나면 먼저 토큰 종류 표를 그립니다.
+- 정규식 SPEC의 순서 자체를 언어 규칙의 일부로 봅니다.
+- 위치 정보가 도구 품질의 핵심이라는 점을 알고 있습니다.
+- 사내 DSL이라면 먼저 `re`와 표 하나로 충분한지 검토합니다.
+- 오류 복구 전략을 렉서 단계부터 설계합니다.
 
 ## 체크리스트
 
-- [ ] 토큰을 한 줄로 정의할 수 있는가?
-- [ ] longest-match를 한 줄로 설명할 수 있는가?
-- [ ] 키워드와 identifier를 분리하는 표준 패턴을 아는가?
-- [ ] lexer가 위치 정보를 들고 다녀야 하는 이유를 답할 수 있는가?
-- [ ] Python `tokenize` 모듈로 한 번이라도 출력을 본 적이 있는가?
+- [ ] 토큰을 한 문장으로 정의할 수 있습니까?
+- [ ] longest-match를 한 문장으로 설명할 수 있습니까?
+- [ ] 키워드와 식별자를 분리하는 표준 패턴을 알고 있습니까?
+- [ ] 렉서가 왜 위치 정보를 반드시 들고 가야 하는지 설명할 수 있습니까?
+- [ ] Python `tokenize` 모듈의 출력을 직접 본 적이 있습니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Lexer는 텍스트를 의미 단위로 바꾸는 첫 변환입니다. 다음 글에서는 그 토큰 스트림으로 트리(AST)를 만드는 단계 — parsing — 를 살펴봅니다.
+1. 1단계 렉서에 `<=`, `>=`를 추가하고, 순서를 잘못 두면 무엇이 깨지는지 실험해 보세요.
+2. 같은 렉서에 가장 단순한 에러 복구를 넣어 한 번에 여러 문법 오류를 보고하게 만들어 보세요.
+3. `tokenize` 출력으로 키워드 빈도를 세는 작은 도구를 만들어 보세요.
+
+## 정리 및 다음 글
+
+렉서는 텍스트를 의미 단위로 바꾸는 첫 번째 변환입니다. 다음 글에서는 이 토큰 스트림을 트리(AST)로 바꾸는 단계인 parsing을 다룹니다.
 
 <!-- toc:begin -->
 - [컴파일러란 무엇인가?](./01-what-is-a-compiler.md)
-- **lexical analysis (현재 글)**
-- parsing과 AST (예정)
-- semantic analysis (예정)
-- symbol table과 scope (예정)
-- intermediate representation (예정)
-- optimization 기초 (예정)
-- code generation (예정)
+- **렉시컬 분석 (현재 글)**
+- 파싱과 AST (예정)
+- 시맨틱 분석 (예정)
+- 심볼 테이블과 스코프 (예정)
+- 중간 표현 (예정)
+- 최적화 기초 (예정)
+- 코드 생성 (예정)
 - JIT vs AOT (예정)
-- 작은 인터프리터 만들어 보기 (예정)
+- 작은 인터프리터 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료
@@ -237,4 +269,4 @@ Lexer는 텍스트를 의미 단위로 바꾸는 첫 변환입니다. 다음 글
 - [Lex (Wikipedia)](https://en.wikipedia.org/wiki/Lex_(software))
 - [Regular language (Wikipedia)](https://en.wikipedia.org/wiki/Regular_language)
 
-Tags: Computer Science, Compilers, Lexer, 토큰, 정규식, 위치정보
+Tags: Computer Science, Compilers, Lexer, Tokens, Regex, Position

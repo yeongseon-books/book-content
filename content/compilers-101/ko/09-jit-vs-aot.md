@@ -2,7 +2,7 @@
 series: compilers-101
 episode: 9
 title: JIT vs AOT
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,57 +17,75 @@ tags:
   - AOT
   - Tradeoffs
   - Warmup
-seo_description: JIT는 실행 중에, AOT는 실행 전에 컴파일합니다. warmup, optimization 기회, 배포 모델의 차이를 비교합니다.
-last_reviewed: '2026-05-11'
+seo_description: JIT와 AOT가 시작 시간과 최고 성능을 어떻게 바꾸는지 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
 # JIT vs AOT
 
-> Compilers 101 시리즈 (9/10)
-
+이 글은 Compilers 101 시리즈의 아홉 번째 글입니다. 같은 JavaScript 코드가 처음에는 느리다가 어느 순간 빨라지는 이유를 이해하면, 컴파일러 선택이 아니라 **컴파일 시점 선택**이 성능 경험을 바꾼다는 사실이 보이기 시작합니다.
 
 ## 이 글에서 다룰 문제
 
-같은 알고리즘이라도 실행 환경(JIT/AOT/interpreted)에 따라 성능이 10배 차이가 납니다. 그리고 startup vs peak 균형에 따라 같은 언어가 서버에는 좋고 데스크톱에는 부적합할 수도 있습니다. 컴파일러를 고르는 게 아니라 컴파일러의 모드를 고르는 시대입니다.
+- AOT와 JIT는 각각 어떻게 정의할 수 있을까요?
+- warmup은 왜 생기고 어떻게 측정해야 할까요?
+- 각 실행 모델은 어떤 최적화 기회를 열어 줄까요?
+- 배포 모델은 바이너리 중심과 런타임 중심으로 어떻게 달라질까요?
+- 실제 시스템은 왜 두 방식을 섞어 사용할까요?
 
-> "언제 컴파일하느냐"가 사용자가 체감하는 성능을 결정합니다.
+> JIT는 실행 중에 컴파일하고, AOT는 실행 전에 컴파일합니다. 이 한 가지 차이가 시작 시간, 최고 성능, 배포 방식까지 바꿉니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+같은 알고리즘이라도 실행 모드가 인터프리터인지, JIT인지, AOT인지에 따라 체감 성능이 크게 달라질 수 있습니다. 짧게 끝나는 CLI에는 AOT나 인터프리터가 유리할 수 있고, 오래 도는 서버에는 JIT가 유리할 수 있습니다. 즉, 우리는 이제 언어만이 아니라 컴파일 방식까지 선택하고 있습니다.
+
+> 언제 컴파일하느냐가 사용자가 체감하는 성능이 됩니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
     A["source"] --> B{"AOT?"}
-    B -- yes --> C["compile time → binary"]
+    B -- yes --> C["compile time -> binary"]
     C --> D["fast startup"]
     B -- no --> E["interpret first"]
     E --> F["JIT compile hot path"]
     F --> G["fast peak"]
 ```
 
-AOT는 한 번 컴파일하고 매번 빠르게 시작합니다. JIT는 시작은 느리지만 hot path가 발견되면 그때 최적화합니다.
+AOT는 한 번 컴파일하고 매번 빠르게 시작합니다. JIT는 처음에는 느릴 수 있지만 hot path를 본 뒤 더 공격적으로 최적화할 수 있습니다.
 
-## Before/After
+## 핵심 용어
+
+- **AOT**: 배포 전에 미리 컴파일하는 방식입니다. 결과물은 보통 바이너리입니다.
+- **JIT**: 실행 중에 컴파일하는 방식입니다. 결과 코드는 메모리에 머뭅니다.
+- **warmup**: JIT가 hot path를 찾아 최적화하기 전까지의 느린 구간입니다.
+- **tiered compilation**: 인터프리터 → baseline JIT → optimizing JIT처럼 여러 단계를 거치는 구조입니다.
+- **profile-guided**: 실제 실행 데이터를 바탕으로 더 공격적으로 최적화하는 접근입니다.
+
+## Before / After
 
 **Before — 단일 모드의 한계**
 
 ```text
-순수 interpreter: 시작 빠름, peak 느림
-순수 AOT       : 시작 빠름, peak 빠름, 그러나 동적 정보 못 씀
+pure interpreter: fast startup, slow peak
+pure AOT       : fast startup, fast peak, but blind to dynamic info
 ```
 
-**After — 섞은 현대 런타임**
+**After — 현대 런타임의 혼합 모델**
 
 ```text
-JVM, V8, .NET: 처음엔 인터프리터/baseline → hot path만 optimizing JIT
+JVM, V8, .NET: interpreter or baseline first -> optimizing JIT for hot code only
 ```
 
-각 단계의 장점만 골라 씁니다.
+여러 단계를 섞으면 각 방식의 장점을 더 잘 가져갈 수 있습니다.
 
-## JIT 효과 측정해 보기
+## 실습: JIT 효과 직접 보기
 
 ### 1단계 — 순수 Python 루프
 
 ```python
-# 예제 파일: 1_naive.py
+# 1_naive.py
 def sum_to(n):
     s = 0
     for i in range(n):
@@ -80,13 +98,13 @@ sum_to(10**7)
 print("python:", time.perf_counter()-t)
 ```
 
-CPython은 bytecode 인터프리터입니다. JIT 없이 한 호출 한 호출 실행됩니다.
+CPython은 바이트코드를 인터프리터로 실행합니다. JIT가 없기 때문에 매 호출이 한 단계씩 해석됩니다.
 
-### 2단계 — PyPy 또는 numba로 JIT 효과
+### 2단계 — PyPy나 numba로 JIT 효과 보기
 
 ```python
-# 예제 파일: 2_jit.py
-# 먼저 numba를 설치합니다: pip install numba
+# 2_jit.py
+# pip install numba
 from numba import njit
 import time
 
@@ -97,18 +115,18 @@ def sum_to(n):
         s += i
     return s
 
-# 첫 호출은 컴파일 + 실행
+# First call compiles and runs
 t = time.perf_counter(); sum_to(10**7); print("first:", time.perf_counter()-t)
-# 두 번째는 컴파일된 코드만
+# Second call reuses the compiled code
 t = time.perf_counter(); sum_to(10**7); print("warm :", time.perf_counter()-t)
 ```
 
-첫 호출은 warmup 비용이 들고, 두 번째 호출부터는 native에 가까운 속도가 나옵니다.
+첫 호출은 warmup 비용을 내고, 두 번째 호출은 이미 만들어 둔 기계 코드를 재사용합니다.
 
-### 3단계 — AOT (예: C 컴파일)
+### 3단계 — AOT 예시(C)
 
 ```c
-// 예제 파일: 3_aot.c
+// 3_aot.c
 #include <stdio.h>
 long sum_to(long n){ long s=0; for(long i=0;i<n;i++) s+=i; return s; }
 int main(){ printf("%ld\n", sum_to(10000000)); return 0; }
@@ -118,13 +136,13 @@ int main(){ printf("%ld\n", sum_to(10000000)); return 0; }
 gcc -O2 3_aot.c -o sum && ./sum
 ```
 
-binary에 이미 최적화가 박혀 있어 시작도 빠르고 peak도 빠릅니다. 단, 동적 타입에는 못 적응합니다.
+AOT 바이너리는 이미 최적화된 형태로 배포되므로 시작도 빠르고 최고 성능도 빠릅니다. 대신 런타임의 동적 정보는 직접 볼 수 없습니다.
 
 ### 4단계 — tiered compilation 직관
 
 ```python
-# 예제 파일: 4_tiered.py
-# 의사코드
+# 4_tiered.py
+# pseudocode
 def execute(fn, args):
     if call_count(fn) < 10:    return interpret(fn, args)
     if not has_baseline(fn):   compile_baseline(fn)
@@ -132,61 +150,75 @@ def execute(fn, args):
     return run_compiled(fn, args)
 ```
 
-JVM, V8, .NET 모두 비슷한 모양입니다. 처음엔 빨리 실행 가능한 형태로, 자주 호출되면 더 비싸지만 빠른 형태로.
+JVM, V8, .NET은 대체로 이런 흐름을 따릅니다. 빨리 만들 수 있는 형태로 먼저 실행하고, 자주 호출되는 함수만 더 느리게 만들지만 더 빠르게 도는 형태로 승격합니다.
 
-### 5단계 — profile-guided optimization
+### 5단계 — PGO
 
 ```bash
-# 예제 파일: 5_pgo.sh
+# 5_pgo.sh
 gcc -fprofile-generate -O2 prog.c -o prog
-./prog                 # 프로파일 수집
+./prog                 # collect profile
 gcc -fprofile-use -O2 prog.c -o prog
 ```
 
-실제 호출 빈도, 분기 방향을 알면 더 공격적으로 inline/branch 최적화를 할 수 있습니다. AOT가 JIT의 동적 정보를 일부 빌리는 방법입니다.
+실제 호출 빈도와 분기 방향을 알면 AOT도 더 공격적인 인라이닝과 재배치를 할 수 있습니다. PGO는 AOT가 JIT의 장점을 일부 빌려오는 대표적 방식입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 같은 코드가 컴파일러 모드에 따라 startup과 peak이 다릅니다.
-- JIT는 동적 정보를 활용할 수 있는 게 가장 큰 무기입니다.
-- AOT는 배포 형태가 단순하다는 게 가장 큰 장점입니다.
-- 실무 시스템 대부분은 둘을 섞어 씁니다.
+- 같은 소스라도 실행 모드에 따라 시작 시간과 최고 성능이 달라집니다.
+- JIT의 가장 강한 무기는 런타임에서 수집한 동적 정보입니다.
+- AOT의 가장 큰 장점은 배포 단위가 단순하다는 점입니다.
+- 실제 시스템은 대개 두 방식을 섞습니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **단일 호출의 시간만 보고 JIT가 느리다고 결론짓는다.** warmup을 빼고 측정해야 합니다.
-2. **AOT는 무조건 빠르다고 가정한다.** 동적 dispatch가 많으면 JIT가 이깁니다.
-3. **JIT의 메모리 사용을 무시한다.** 컴파일된 코드와 분석 데이터로 RAM이 늘어납니다.
-4. **AOT binary의 코드 크기를 무시한다.** inline + 다중 architecture로 binary가 커집니다.
-5. **PGO 비용을 0으로 본다.** 프로파일 수집 단계 자체에 시간이 듭니다.
+1. **JIT를 단 한 번의 호출만 보고 평가하는 것**입니다. warmup을 빼고 봐야 합니다.
+2. **AOT가 항상 이긴다고 가정하는 것**입니다. 동적 디스패치가 많으면 JIT가 더 유리할 수 있습니다.
+3. **JIT의 메모리 비용을 무시하는 것**입니다. 생성된 코드와 프로파일 데이터가 RAM을 사용합니다.
+4. **AOT 바이너리 크기를 과소평가하는 것**입니다. 인라이닝과 다중 아키텍처 지원이 크기를 키울 수 있습니다.
+5. **PGO를 공짜라고 생각하는 것**입니다. 프로파일 수집 실행 자체가 시간과 인프라를 요구합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-JVM, .NET, V8, JavaScriptCore는 tiered JIT입니다. Go, Rust, C/C++은 순수 AOT. Android는 ART에서 AOT + JIT를 섞어 씁니다. CPython은 인터프리터지만 PEP 744로 JIT 도입을 진행 중입니다. WebAssembly는 AOT/JIT 둘 다 가능합니다.
+JVM, .NET, V8, JavaScriptCore는 모두 계층형 JIT를 사용합니다. Go, Rust, C, C++는 대표적인 AOT 계열입니다. Android ART는 AOT와 JIT를 혼합하고, WebAssembly 엔진도 AOT와 JIT를 모두 지원합니다. CPython은 인터프리터 중심이지만 JIT 도입 논의도 계속 진행되고 있습니다.
+
+## 숙련된 엔지니어는 이렇게 봅니다
+
+- 워크로드의 시작 시간 대비 최고 성능 비율을 먼저 측정합니다.
+- 짧게 끝나는 프로세스는 AOT나 인터프리터가 유리하다는 점을 압니다.
+- 오래 도는 서버는 warmup 비용을 상쇄하고 JIT 이득을 얻기 쉽다는 점을 압니다.
+- 메모리 제약 환경에서는 JIT가 배제될 수 있다는 점을 압니다.
+- 측정 없이 실행 모드를 바꾸지 않습니다.
 
 ## 체크리스트
 
-- [ ] AOT와 JIT를 한 줄로 비교할 수 있는가?
-- [ ] warmup이 왜 일어나는지 답할 수 있는가?
-- [ ] 동적 정보로 가능한 최적화의 예를 들 수 있는가?
-- [ ] tiered compilation의 흐름을 그릴 수 있는가?
-- [ ] PGO가 AOT 진영의 어떤 약점을 보완하는지 답할 수 있는가?
+- [ ] AOT와 JIT를 한 문장으로 비교할 수 있습니까?
+- [ ] warmup이 왜 생기는지 설명할 수 있습니까?
+- [ ] 동적 정보가 열어 주는 최적화 예를 하나 들 수 있습니까?
+- [ ] tiered compilation 흐름을 그릴 수 있습니까?
+- [ ] PGO가 AOT의 어떤 약점을 보완하는지 말할 수 있습니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-JIT와 AOT는 "언제 컴파일하느냐"의 차이가 만든 두 모델입니다. 다음 글에서는 이 시리즈에서 배운 모든 단계를 모아, 한 화면에 들어가는 작은 인터프리터를 직접 만듭니다.
+1. 같은 함수를 CPython과 numba에서 실행해 첫 호출과 warm 호출 시간을 비교해 보세요.
+2. 짧게 끝나는 CLI 도구 하나를 가정하고 AOT와 JIT 중 어느 쪽이 더 맞는지 1분 안에 판단해 보세요.
+3. JIT가 inline cache를 이용해 동적 디스패치 비용을 줄이는 방식을 한 단락으로 설명해 보세요.
+
+## 정리 및 다음 글
+
+JIT와 AOT는 결국 “언제 컴파일할 것인가?”라는 한 질문에서 갈라진 두 모델입니다. 다음 글에서는 지금까지 배운 렉서, 파서, 평가기를 한 파일로 합쳐 작은 인터프리터를 직접 만들어 봅니다.
 
 <!-- toc:begin -->
 - [컴파일러란 무엇인가?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing과 AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table과 scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- [optimization 기초](./07-optimization-basics.md)
-- [code generation](./08-code-generation.md)
+- [렉시컬 분석](./02-lexical-analysis.md)
+- [파싱과 AST](./03-parsing-and-ast.md)
+- [시맨틱 분석](./04-semantic-analysis.md)
+- [심볼 테이블과 스코프](./05-symbol-table-and-scope.md)
+- [중간 표현](./06-intermediate-representation.md)
+- [최적화 기초](./07-optimization-basics.md)
+- [코드 생성](./08-code-generation.md)
 - **JIT vs AOT (현재 글)**
-- 작은 인터프리터 만들어 보기 (예정)
+- 작은 인터프리터 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료

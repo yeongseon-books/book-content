@@ -1,8 +1,8 @@
 ---
 series: compilers-101
 episode: 7
-title: optimization 기초
-status: content-ready
+title: 최적화 기초
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,22 +16,32 @@ tags:
   - Optimization
   - ConstantFolding
   - DeadCode
-seo_description: optimizer는 의미를 보존하며 코드를 더 빠르게 만듭니다. fold와 dce를 짠니다.
-last_reviewed: '2026-05-11'
+seo_description: 의미를 보존하면서 IR을 개선하는 기본 최적화 패턴을 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
-# optimization 기초
+# 최적화 기초
 
-> Compilers 101 시리즈 (7/10)
-
+이 글은 Compilers 101 시리즈의 일곱 번째 글입니다. 컴파일러가 `2 + 3 * 4`를 실행할 때마다 계산하지 않고 미리 `14`로 바꿔 둘 수 있다는 사실을 이해하면, 최적화가 “더 빠르게”만이 아니라 “의미를 절대 바꾸지 않으면서” 수행되는 정교한 변환이라는 점이 드러납니다.
 
 ## 이 글에서 다룰 문제
 
-같은 알고리즘이라도 컴파일러가 잘 줄여 주면 10배 빠르거나 1/10 크기가 됩니다. 동시에 잘못된 optimization은 프로그램의 의미를 바꿔 버립니다 — 가장 무서운 버그입니다. 그래서 optimizer를 보면 컴파일러의 신뢰성이 어디서 오는지가 보입니다.
+- 최적화에서 가장 절대적인 규칙은 무엇일까요?
+- constant folding은 어떤 식으로 동작할까요?
+- dead code elimination은 어떤 정보를 기반으로 할까요?
+- CSE는 왜 같은 계산을 줄이는 데 유용할까요?
+- 최적화는 왜 여러 패스를 조합한 파이프라인으로 실행될까요?
 
-> "더 빠르게 + 의미는 그대로." 이 두 줄을 동시에 지키는 게 optimizer입니다.
+> 최적화기는 IR을 입력으로 받아 IR을 내보내는 변환기이며, 더 빠르고 더 작은 코드를 만들되 프로그램 의미는 그대로 보존해야 합니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+같은 알고리즘이라도 최적화가 잘 되면 10배 빠르게 돌거나 크기가 10분의 1로 줄 수 있습니다. 반대로 잘못된 최적화는 프로그램 의미 자체를 바꿔 버립니다. 그래서 최적화기는 성능 도구이면서 동시에 신뢰성 시험대이기도 합니다.
+
+> “더 빠르게, 그러나 의미는 그대로.” 이 두 조건을 동시에 지키는 것이 최적화기의 일입니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
     A["IR"] --> B["constant folding"]
@@ -40,9 +50,17 @@ flowchart LR
     D --> E["optimized IR"]
 ```
 
-각 단계는 IR을 입력으로 받아 IR을 내놓습니다. 모든 pass는 의미를 보존해야 합니다.
+각 패스는 IR을 받아 IR을 내보냅니다. 그래서 작은 변환을 여러 개 합성할 수 있습니다.
 
-## Before/After
+## 핵심 용어
+
+- **패스(pass)**: IR을 한 번 순회하며 수행하는 변환입니다.
+- **constant folding**: 상수끼리의 계산을 컴파일 시점에 미리 수행하는 최적화입니다.
+- **dead code elimination**: 결과가 전혀 사용되지 않는 코드를 제거하는 최적화입니다.
+- **common subexpression elimination**: 동일한 표현식의 중복 계산을 제거하는 최적화입니다.
+- **strength reduction**: `x * 2`를 `x + x`나 `x << 1`로 바꾸는 식의 저비용 연산 대체입니다.
+
+## Before / After
 
 **Before — 순진한 IR**
 
@@ -53,21 +71,21 @@ t3 = t2
 return t3
 ```
 
-**After — 최적화 후**
+**After — 최적화된 IR**
 
 ```text
 return 7
 ```
 
-같은 결과지만, 명령어 수가 4 → 1.
+결과는 같지만 명령어 수는 4개에서 1개로 줄어듭니다.
 
-## 작은 optimizer
+## 실습: 작은 최적화기 만들기
 
-### 1단계 — IR 인스트럭션 표현
+### 1단계 — IR 명령어 표현
 
 ```python
-# 예제 파일: 1_inst.py
-# (op, dst, src1, src2) 튜플로 다룬다
+# 1_inst.py
+# work on tuples of (op, dst, src1, src2)
 code = [
     ("LOAD", "t1", 2, None),
     ("LOAD", "t2", 3, None),
@@ -78,12 +96,12 @@ code = [
 ]
 ```
 
-평탄한 리스트 위에서 모든 변환을 합니다.
+대부분의 변환은 결국 이런 평평한 리스트를 대상으로 동작합니다.
 
 ### 2단계 — constant folding
 
 ```python
-# 예제 파일: 2_fold.py
+# 2_fold.py
 def fold(code):
     consts = {}
     out = []
@@ -100,15 +118,15 @@ def fold(code):
     return out
 ```
 
-상수 환경(`consts`)을 들고 다니면서, 양쪽 피연산자가 상수인 산술을 즉시 계산합니다.
+상수 환경을 유지하면서 양쪽 피연산자가 모두 상수면 그 자리에서 계산해 버립니다.
 
 ### 3단계 — dead code elimination
 
 ```python
-# 예제 파일: 3_dce.py
+# 3_dce.py
 def dce(code):
     used = set()
-    # 마지막부터 거꾸로 used를 모은다
+    # gather use info from the bottom up
     for op, dst, a, b in reversed(code):
         if op == "RET":
             used.add(a)
@@ -116,17 +134,17 @@ def dce(code):
             if dst in used:
                 if isinstance(a, str): used.add(a)
                 if isinstance(b, str): used.add(b)
-    # 한 번 더 순회해 살아 있는 것만 남긴다
+    # one more pass keeps only live instructions
     return [(op, dst, a, b) for op, dst, a, b in code
             if op == "RET" or dst in used]
 ```
 
-뒤에서 앞으로 use 정보를 모은 뒤, 안 쓰이는 dst의 명령어를 버립니다.
+아래에서 위로 사용 정보를 모은 뒤, 결과가 쓰이지 않는 명령어를 버립니다.
 
-### 4단계 — pass 묶기
+### 4단계 — 패스 조합하기
 
 ```python
-# 예제 파일: 4_pipeline.py
+# 4_pipeline.py
 def optimize(code):
     code = fold(code)
     code = dce(code)
@@ -135,62 +153,76 @@ def optimize(code):
 for inst in optimize(code): print(inst)
 ```
 
-pass를 함수 합성으로 묶습니다. 같은 pass를 두 번 돌리면 더 줄어들 수도 있습니다 (fixed point).
+패스는 함수처럼 조합할 수 있습니다. 같은 패스를 두 번 이상 돌리면 더 줄어드는 경우도 많습니다.
 
-### 5단계 — common subexpression 직관
+### 5단계 — CSE의 직관
 
 ```python
-# 예제 파일: 5_cse.py
-# 같은 우항이 두 번 나오면 한 번만 계산
+# 5_cse.py
+# the same right-hand side appearing twice
 # t1 = a + b
-# t2 = a + b   <- 같은 식
-# 의 두 번째 줄을 t2 = t1 로 바꾼다
+# t2 = a + b   <- same expression
+# replace the second line with t2 = t1
 ```
 
-해시 테이블 `(op, src1, src2) → dst`을 들고 다니면 매우 단순합니다. SSA에서 특히 깔끔합니다.
+`(op, src1, src2) → dst` 형태의 해시 테이블만 있어도 기본 아이디어는 구현됩니다. SSA 형태에서는 특히 더 단순해집니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 모든 pass는 IR → IR 변환입니다.
-- 각 pass는 작고 단순합니다 (몇십 줄).
-- pass의 순서가 결과 품질에 영향을 줍니다.
-- pass를 fixed point까지 돌리는 패턴이 흔합니다.
+- 모든 패스는 IR → IR 변환입니다.
+- 각 패스는 작고 단순해야 합니다.
+- 패스 순서는 결과 품질에 영향을 줍니다.
+- “고정점까지 반복 실행” 패턴이 매우 흔합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **side effect를 무시한 dead code elimination을 한다.** I/O 호출은 결과를 안 써도 살려야 합니다.
-2. **부동소수점에서 마음대로 fold한다.** 결합법칙이 깨지는 경우가 있어 결과가 달라집니다.
-3. **분기를 무시한 CSE를 한다.** 다른 basic block에서는 같은 식이 다른 값일 수 있습니다.
-4. **pass 순서를 의식하지 않는다.** fold 다음 dce 순서가 보통 잘 동작.
-5. **한 번 도는 데서 멈춘다.** fold가 더 많은 dead code를 만들고, dce가 더 많은 fold 기회를 만듭니다.
+1. **부작용을 무시한 DCE를 하는 것**입니다. I/O 호출은 결과가 안 쓰여도 살아 있어야 합니다.
+2. **부동소수점 계산을 무심코 folding하는 것**입니다. 결합법칙이 깨질 수 있습니다.
+3. **분기 구조를 무시한 CSE를 하는 것**입니다. 같은 식이라도 basic block이 다르면 값이 다를 수 있습니다.
+4. **패스 순서를 고민하지 않는 것**입니다. 보통 `fold → dce` 순서가 안전한 출발점입니다.
+5. **한 번만 실행하고 끝내는 것**입니다. folding이 새 dead code를 만들고, DCE가 새 folding 기회를 만들 수 있습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-LLVM은 수십 개의 pass를 가지고 있고, 컴파일 옵션(`-O2`, `-O3`)이 곧 어떤 pass를 어떤 순서로 도는가입니다. JIT 컴파일러는 hot path만 골라 더 공격적인 optimization을 적용합니다. profile-guided optimization(PGO)은 실제 실행 정보를 기반으로 pass를 적용합니다.
+LLVM에는 수십 개의 패스가 있으며, `-O2`, `-O3` 같은 플래그는 어떤 패스를 어떤 순서로 돌릴지 묶어 둔 설정입니다. JIT 컴파일러는 hot path에 더 공격적인 최적화를 적용하고, PGO는 실제 실행 데이터를 바탕으로 패스 선택을 더 정교하게 합니다.
+
+## 숙련된 엔지니어는 이렇게 봅니다
+
+- 새 패스를 추가하기 전에 먼저 의미 보존을 검증합니다.
+- 패스를 작고 단일 책임으로 유지합니다.
+- 고정점 반복이 흔한 패턴이라는 점을 압니다.
+- 추측보다 프로파일 기반 판단을 신뢰합니다.
+- “이 변환이 어떤 아키텍처에서 실제 이득을 내는가?”를 항상 묻습니다.
 
 ## 체크리스트
 
-- [ ] 의미 보존이 optimizer의 절대 규칙임을 받아들였는가?
-- [ ] constant folding을 한 페이지 안에 짤 수 있는가?
-- [ ] dead code elimination이 use 분석에서 나온다는 사실을 답할 수 있는가?
-- [ ] pass의 순서가 결과에 영향을 주는 이유를 설명할 수 있는가?
-- [ ] CSE가 SSA에서 왜 더 단순한지 직관이 있는가?
+- [ ] 의미 보존이 최적화의 절대 규칙이라는 점을 받아들였습니까?
+- [ ] constant folding을 한 페이지 안에 직접 쓸 수 있습니까?
+- [ ] DCE가 사용 정보 분석에서 나온다는 점을 설명할 수 있습니까?
+- [ ] 패스 순서가 왜 결과에 영향을 주는지 설명할 수 있습니까?
+- [ ] SSA에서 CSE가 더 쉬워지는 직관을 갖고 있습니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Optimization은 IR 위에서 일어나는 의미 보존 변환의 연속입니다. 다음 글에서는 마침내 이 IR을 진짜 기계어로 바꾸는 — code generation — 단계를 살펴봅니다.
+1. 위 `fold`에 strength reduction(`x * 2 → x + x`)을 추가해 보세요.
+2. `fold + dce`를 더 이상 줄어들지 않을 때까지 반복하는 고정점 루프를 작성해 보세요.
+3. `PRINT`, `STORE` 같은 부작용 명령어를 추가하고 DCE가 지우지 않도록 만들어 보세요.
+
+## 정리 및 다음 글
+
+최적화는 IR 위에서 돌아가는 의미 보존 변환들의 연속입니다. 다음 글에서는 이 최적화된 IR을 실제 CPU 명령어로 바꾸는 마지막 단계, code generation을 다룹니다.
 
 <!-- toc:begin -->
 - [컴파일러란 무엇인가?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing과 AST](./03-parsing-and-ast.md)
-- [semantic analysis](./04-semantic-analysis.md)
-- [symbol table과 scope](./05-symbol-table-and-scope.md)
-- [intermediate representation](./06-intermediate-representation.md)
-- **optimization 기초 (현재 글)**
-- code generation (예정)
+- [렉시컬 분석](./02-lexical-analysis.md)
+- [파싱과 AST](./03-parsing-and-ast.md)
+- [시맨틱 분석](./04-semantic-analysis.md)
+- [심볼 테이블과 스코프](./05-symbol-table-and-scope.md)
+- [중간 표현](./06-intermediate-representation.md)
+- **최적화 기초 (현재 글)**
+- 코드 생성 (예정)
 - JIT vs AOT (예정)
-- 작은 인터프리터 만들어 보기 (예정)
+- 작은 인터프리터 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료

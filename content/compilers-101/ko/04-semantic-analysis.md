@@ -1,8 +1,8 @@
 ---
 series: compilers-101
 episode: 4
-title: semantic analysis
-status: content-ready
+title: 시맨틱 분석
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,56 +16,74 @@ tags:
   - SemanticAnalysis
   - TypeChecking
   - NameResolution
-seo_description: semantic analysis는 AST가 의미상 맞는지 검사합니다. 이름 해석, 타입 검사, 좋은 오류 메시지 패턴을 봅니다.
-last_reviewed: '2026-05-11'
+seo_description: AST가 의미상 타당한지 검사하는 시맨틱 분석의 핵심을 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
-# semantic analysis
+# 시맨틱 분석
 
-> Compilers 101 시리즈 (4/10)
-
+이 글은 Compilers 101 시리즈의 네 번째 글입니다. 문법은 맞지만 의미가 틀린 코드가 왜 거부되는지 이해하는 순간, 컴파일러가 단순한 문장 검사기가 아니라 프로그램 의미를 판정하는 도구라는 점이 분명해집니다.
 
 ## 이 글에서 다룰 문제
 
-Parser는 "괄호가 맞나?"까지밖에 못 봅니다. `x = y + 1`의 `y`가 선언된 적이 없거나, `y`가 문자열인데 `1`을 더하려는 상황은 의미 단계에서 잡힙니다. 이 단계가 약하면 컴파일이 통과한 코드가 런타임에 죽습니다.
+- 문법적으로 맞다는 것과 의미적으로 맞다는 것은 어떻게 다를까요?
+- 이름 해석은 무엇이며, 식별자는 어디를 가리킬까요?
+- 타입 검사는 어떤 규칙으로 동작할까요?
+- AST를 한 번 순회하며 의미를 붙이는 패턴은 어떻게 생겼을까요?
+- 시맨틱 단계의 좋은 오류 메시지는 어떤 모양일까요?
 
-> 컴파일러가 신뢰받는 이유는 syntax가 아니라 semantics 때문입니다.
+> 시맨틱 분석은 문법 검사를 통과한 AST를 대상으로 “이 코드가 정말 말이 되는가?”를 묻는 단계입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+파서는 괄호가 맞는지, 문장 구조가 규칙에 맞는지까지만 판단할 수 있습니다. 하지만 `x = y + 1`에서 `y`가 선언된 적이 없는지, 혹은 `y`가 문자열인데 `1`을 더하려는지 같은 문제는 시맨틱 단계에서만 잡을 수 있습니다. 이 단계가 약하면 컴파일은 통과했는데 런타임에서 터지는 코드가 늘어납니다.
+
+> 컴파일러가 신뢰를 얻는 이유는 문법보다 시맨틱에 있습니다.
+
+## 핵심 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
     A["AST"] --> B["name resolution"]
     B --> C["type inference / check"]
     C --> D["annotated AST"]
-    D --> E["다음 단계로"]
+    D --> E["next stage"]
 ```
 
-원래의 AST에 "이 이름은 여기 선언, 이 식의 타입은 int" 같은 메타데이터가 붙은 형태가 결과입니다.
+결과는 원래의 AST에 “이 이름은 이 선언을 가리킨다”, “이 식의 타입은 int다” 같은 메타데이터가 붙은 형태입니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — parser만 끝낸 AST**
+- **이름 해석**: 식별자가 어떤 선언을 가리키는지 결정하는 과정입니다.
+- **타입 검사**: 식이 놓인 문맥에서 허용된 타입인지 확인하는 과정입니다.
+- **타입 추론**: 코드에 명시되지 않은 타입을 추론해 내는 과정입니다.
+- **annotated AST**: 시맨틱 정보가 붙은 AST입니다.
+- **강제 변환(coercion)**: `int → float`처럼 호환 가능한 타입 사이의 암묵 변환입니다.
+
+## Before / After
+
+**Before — 파서가 남긴 AST**
 
 ```python
 ast = Bin("+", Var("x"), Str("hello"))
-# x가 무엇인지, 두 쪽 타입이 맞는지 아무도 모른다
+# nobody knows what x is, or whether the two sides match
 ```
 
-**After — semantic이 붙은 AST**
+**After — 의미 정보가 붙은 AST**
 
 ```python
-# x: int (3번째 줄에서 선언)
-# Bin.+는 int + int를 요구하지만 int + str이 들어와 TypeError가 납니다
+# x: int (declared at line 3)
+# Bin.+ requires int + int, got int + str → TypeError
 ```
 
-뒤 단계가 신뢰할 수 있는 형태가 됐습니다.
+이제 뒤 단계는 이 AST를 신뢰하고 다음 작업을 진행할 수 있습니다.
 
-## 작은 의미 분석기
+## 실습: 작은 시맨틱 분석기 만들기
 
-### 1단계 — 단순 타입 환경
+### 1단계 — 단순한 타입 환경
 
 ```python
-# 예제 파일: 1_env.py
+# 1_env.py
 class Env:
     def __init__(self, parent=None):
         self.parent, self.table = parent, {}
@@ -79,12 +97,12 @@ class Env:
         raise NameError(f"undeclared: {name}")
 ```
 
-이름 해석은 결국 dictionary lookup입니다. parent를 두면 nested scope를 자연스럽게 표현할 수 있습니다.
+이름 해석은 결국 딕셔너리 조회입니다. 부모 포인터 하나만 있으면 중첩 스코프도 자연스럽게 표현됩니다.
 
-### 2단계 — name resolution
+### 2단계 — 이름 해석
 
 ```python
-# 예제 파일: 2_resolve.py
+# 2_resolve.py
 from dataclasses import dataclass
 @dataclass
 class Var: name: str
@@ -101,12 +119,12 @@ def resolve(node):
         env[node.name] = node.ty
 ```
 
-선언과 사용을 같은 자료구조로 다루는 것이 핵심입니다. AST를 한 번 순회하면서 환경을 갱신하고 조회합니다.
+선언과 사용을 같은 환경 자료구조로 다뤄야 합니다. AST를 순회하면서 환경을 갱신하고 동시에 조회하는 패턴이 기본입니다.
 
 ### 3단계 — 단순 타입 검사
 
 ```python
-# 예제 파일: 3_typecheck.py
+# 3_typecheck.py
 def type_of(node, env):
     kind = node[0]
     if kind == "NUM": return "int"
@@ -122,12 +140,12 @@ env = {"x": "int"}
 print(type_of(("BIN","+",("VAR","x"),("NUM",1)), env))  # int
 ```
 
-타입은 트리를 따라 위로 올라옵니다. 두 자식의 타입이 맞지 않으면 그 자리에서 오류를 냅니다.
+타입은 트리를 따라 아래에서 위로 올라옵니다. 자식 둘이 맞지 않으면 바로 그 지점에서 오류를 냅니다.
 
-### 4단계 — annotated AST
+### 4단계 — annotated AST 만들기
 
 ```python
-# 예제 파일: 4_annotate.py
+# 4_annotate.py
 def annotate(node, env):
     kind = node[0]
     if kind == "NUM": return ("NUM", node[1], "int")
@@ -139,12 +157,12 @@ def annotate(node, env):
         return ("BIN", node[1], l, r, l[-1])
 ```
 
-원래 AST에 마지막 슬롯으로 타입을 붙여 둡니다. 다음 단계는 트리 한 번 더 보면서 타입에 맞는 코드를 낼 수 있습니다.
+원래 AST 끝에 타입 정보를 붙여 annotated AST를 만듭니다. 다음 단계는 이 트리를 다시 한 번 걷기만 하면 됩니다.
 
-### 5단계 — 좋은 오류 메시지
+### 5단계 — 좋은 오류 메시지 만들기
 
 ```python
-# 예제 파일: 5_error.py
+# 5_error.py
 def report(token, expected, got):
     print(f"  File \"<src>\", line {token['line']}")
     print(f"    {token['text']}")
@@ -153,50 +171,64 @@ def report(token, expected, got):
 report({"line": 12, "text": 'x + "hello"'}, "int", "str")
 ```
 
-의미 오류는 위치 + 무엇이 기대됐는가 + 무엇이 왔는가 세 줄로 충분합니다.
+시맨틱 오류 메시지는 보통 세 줄이면 충분합니다. 위치, 기대한 것, 실제로 들어온 것입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 환경(Env)은 chained dictionary로 자연스럽게 nested scope를 표현합니다.
-- 타입은 AST의 추가 정보로 다루지, 별도 자료구조가 아닙니다.
-- 오류는 가능한 한 가까운 위치에서 보고합니다.
-- 한 번의 순회로 끝낼 수도, 여러 패스로 나눌 수도 있습니다.
+- 환경(Env)은 부모 포인터를 가진 연결 딕셔너리로 자연스럽게 중첩 스코프를 표현합니다.
+- 타입은 별도 자료구조가 아니라 AST에 붙는 추가 정보입니다.
+- 오류는 가능한 한 그 위치에 가깝게 보고해야 합니다.
+- 한 번의 순회로도 가능하지만, 필요하면 여러 패스로 쪼갤 수 있습니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **Name과 Symbol을 같은 것으로 본다.** Name은 텍스트, Symbol은 declaration entry입니다.
-2. **타입 오류를 모아서 한 번에 보고하지 않는다.** 첫 오류 한 번에 멈추면 사용자 경험이 나쁩니다.
-3. **`==` 비교만으로 타입 호환성을 판단한다.** subtype, generics, coercion이 있으면 깨집니다.
-4. **선언/사용을 별도 자료구조로 만들어 환경이 둘이 된다.** 진리의 출처는 하나여야 합니다.
-5. **scope 진입/탈출을 부모로의 포인터 없이 구현한다.** 변수 가림(shadowing)이 깨집니다.
+1. **이름(Name)과 심볼(Symbol)을 같은 것으로 보는 것**입니다. 이름은 텍스트이고, 심볼은 선언 엔트리입니다.
+2. **첫 번째 타입 오류에서 바로 멈추는 것**입니다. 사용자 경험은 여러 오류를 한 번에 보여 줄 때 좋아집니다.
+3. **타입 호환성을 `==`로만 판단하는 것**입니다. 하위 타입, 제네릭, coercion이 들어오면 무너집니다.
+4. **선언용 환경과 사용용 환경을 따로 만드는 것**입니다. 진실의 원천은 하나여야 합니다.
+5. **스코프 진입/탈출을 부모 포인터 없이 처리하려는 것**입니다. 변수 가리기(shadowing)가 깨집니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-언어 서버(LSP)의 핵심이 여기 있습니다. "go to definition"은 name resolution, "type hint"는 type inference, "rename symbol"은 symbol table 갱신입니다. 컴파일러의 의미 단계가 곧 IDE의 핵심 기능입니다.
+언어 서버(LSP)의 핵심 기능 상당수가 여기서 나옵니다. “정의로 이동”은 이름 해석이고, “타입 힌트”는 타입 추론이며, “심볼 이름 바꾸기”는 시맨틱 정보와 심볼 테이블 갱신입니다. 즉, 시맨틱 단계는 IDE 핵심 기능의 기반이기도 합니다.
+
+## 숙련된 엔지니어는 이렇게 봅니다
+
+- 사용자가 가장 많이 읽는 문장은 시맨틱 오류 메시지라는 사실을 압니다.
+- 단일 환경을 진실의 원천으로 강하게 유지합니다.
+- 시맨틱 정보를 옆으로 흘리지 않고 AST에 직접 붙입니다.
+- 한 패스에서 여러 오류를 보고할 수 있게 복구 전략을 설계합니다.
+- 확장을 위해 타입 시스템을 lattice처럼 추상화해 생각합니다.
 
 ## 체크리스트
 
-- [ ] syntactic vs semantic의 차이를 한 줄로 설명할 수 있는가?
-- [ ] name resolution이 dictionary lookup이라는 사실을 받아들였는가?
-- [ ] AST에 타입을 붙이는 패턴을 한 번이라도 짠 적 있는가?
-- [ ] 의미 오류 메시지의 표준 형태를 정의해 본 적 있는가?
-- [ ] LSP의 기능이 의미 단계와 어떻게 연결되는지 답할 수 있는가?
+- [ ] 문법 오류와 시맨틱 오류의 차이를 한 문장으로 설명할 수 있습니까?
+- [ ] 이름 해석이 결국 딕셔너리 조회라는 점을 받아들였습니까?
+- [ ] AST에 타입을 붙이는 패턴을 직접 작성해 본 적이 있습니까?
+- [ ] 시맨틱 오류 메시지의 표준 형태를 정의해 두었습니까?
+- [ ] LSP 기능이 시맨틱 단계와 어떻게 연결되는지 설명할 수 있습니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Semantic analysis는 syntax가 답해 주지 못하는 "이게 의미상 맞는가?"를 답합니다. 다음 글에서는 그 핵심 도구인 symbol table과 scope를 더 자세히 살펴봅니다.
+1. 위 환경에 함수 진입/탈출을 추가해 중첩 스코프를 처리해 보세요.
+2. `int + float`를 `float`로 승격하는 coercion 규칙을 추가해 보세요.
+3. 파일 전체의 시맨틱 오류를 모아 마지막에 한 번에 출력하는 구조를 설계해 보세요.
+
+## 정리 및 다음 글
+
+시맨틱 분석은 문법만으로는 답할 수 없는 “이 코드가 정말 의미가 맞는가?”라는 질문에 답하는 단계입니다. 다음 글에서는 이 단계의 핵심 도구인 symbol table과 scope를 더 집중해서 살펴봅니다.
 
 <!-- toc:begin -->
 - [컴파일러란 무엇인가?](./01-what-is-a-compiler.md)
-- [lexical analysis](./02-lexical-analysis.md)
-- [parsing과 AST](./03-parsing-and-ast.md)
-- **semantic analysis (현재 글)**
-- symbol table과 scope (예정)
-- intermediate representation (예정)
-- optimization 기초 (예정)
-- code generation (예정)
+- [렉시컬 분석](./02-lexical-analysis.md)
+- [파싱과 AST](./03-parsing-and-ast.md)
+- **시맨틱 분석 (현재 글)**
+- 심볼 테이블과 스코프 (예정)
+- 중간 표현 (예정)
+- 최적화 기초 (예정)
+- 코드 생성 (예정)
 - JIT vs AOT (예정)
-- 작은 인터프리터 만들어 보기 (예정)
+- 작은 인터프리터 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료
