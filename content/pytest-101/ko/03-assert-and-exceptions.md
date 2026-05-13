@@ -2,7 +2,7 @@
 series: pytest-101
 episode: 3
 title: assert와 예외 테스트
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,34 +16,44 @@ tags:
   - assert
   - 예외 테스트
   - pytest.raises
-seo_description: pytest assert 재작성과 예외 테스트 패턴을 실습합니다.
-last_reviewed: '2026-05-11'
+seo_description: pytest의 assert 재작성, 예외 검증, 부동소수점 비교 패턴을 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # assert와 예외 테스트
 
-> pytest 101 시리즈 (3/10)
+이 글은 pytest 101 시리즈의 세 번째 글입니다. pytest의 `assert`는 Python 내장 `assert`와 겉모습은 비슷하지만, 실패했을 때 훨씬 많은 정보를 보여 주도록 내부적으로 재작성됩니다. 이 글에서는 assertion introspection, `pytest.raises`, `pytest.approx`를 중심으로 실패 원인을 빨리 읽는 테스트를 만드는 방법을 설명합니다.
 
+테스트는 실패했을 때 가치가 드러납니다. 왜 실패했는지 바로 읽히지 않는 테스트는 디버깅 시간을 늘리고, 예외 처리 검증이 빠진 테스트는 실제 운영에서 에러 핸들링이 깨져도 놓치기 쉽습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
-테스트가 실패했을 때 "왜 실패했는지"를 빠르게 파악하는 것이 중요합니다. pytest의 assertion introspection은 실패 원인을 즉시 보여주어 디버깅 시간을 크게 줄여줍니다.
+- pytest의 `assert`는 왜 더 읽기 좋은 실패 메시지를 제공할까요?
+- 컬렉션, 문자열, 부동소수점은 어떤 방식으로 검증해야 할까요?
+- `pytest.raises`로 예외 타입과 메시지를 어떻게 확인할 수 있을까요?
+- `pytest.approx`는 언제 써야 할까요?
 
-> unittest의 `self.assertEqual(a, b)`보다 `assert a == b`가 읽기 쉽고, 실패 메시지는 오히려 더 상세합니다.
+## 왜 이 글이 중요한가
 
-예외 처리는 프로덕션 코드의 핵심입니다. 예외가 올바르게 발생하는지 검증하지 않으면, 에러 핸들링이 깨져도 발견하지 못합니다.
+테스트가 실패했는데 원인을 한눈에 읽을 수 없다면, 테스트가 디버깅을 돕는 것이 아니라 오히려 방해하게 됩니다. pytest는 이 지점에서 강합니다. `assert result == expected`처럼 단순한 표현만 써도, 실패 시 양쪽 값을 자세히 보여 주기 때문입니다.
+
+> unittest의 `self.assertEqual(a, b)`보다 `assert a == b`가 읽기 쉽고, pytest의 실패 메시지는 오히려 더 상세합니다.
+
+또한 예외는 프로덕션 코드의 핵심 계약입니다. 잘못된 입력에서 반드시 실패해야 하는 함수가 조용히 통과해 버리면, 실제 장애는 테스트를 모두 통과한 뒤에야 드러납니다.
 
 ## 핵심 개념 잡기
 
-> assertion introspection = pytest가 assert 문을 분석하여 실패 시 상세 정보를 제공하는 기능
+> assertion introspection = pytest가 assert 문을 분석해 실패 원인을 자세히 보여 주는 기능
 
 ```text
 assert result == expected
        │          │
-       │          └─ 기대값: 표시됨
-       └─ 실제값: 표시됨
+       │          └─ Expected value: displayed
+       └─ Actual value: displayed
 
-실패 시 출력:
+On failure:
   AssertionError: assert 3 == 5
     where 3 = add(1, 2)
 ```
@@ -52,18 +62,18 @@ assert result == expected
 
 | 용어 | 설명 |
 |------|------|
-| assertion rewriting | pytest가 AST 수준에서 assert를 변환하여 상세 메시지를 생성합니다 |
+| assertion rewriting | pytest가 AST 수준에서 `assert`를 변환해 자세한 메시지를 만듭니다 |
 | pytest.raises | 특정 예외가 발생하는지 검증하는 컨텍스트 매니저입니다 |
-| pytest.approx | 부동소수점 비교 시 오차 범위를 허용합니다 |
+| pytest.approx | 부동소수점 비교에서 허용 오차를 다룹니다 |
 | match 파라미터 | 예외 메시지를 정규식으로 검증합니다 |
-| ExceptionInfo | pytest.raises가 반환하는 예외 정보 객체입니다 |
+| ExceptionInfo | `pytest.raises`가 반환하는 예외 정보 객체입니다 |
 
 ## Before / After
 
-unittest 스타일과 pytest 스타일의 assert를 비교합니다.
+unittest 스타일과 pytest 스타일을 비교해 보겠습니다.
 
 ```python
-# 이전 방식: unittest 스타일 — 메서드 이름을 외워야 합니다
+# before: unittest style — must memorize method names
 import unittest
 
 class TestMath(unittest.TestCase):
@@ -75,7 +85,7 @@ class TestMath(unittest.TestCase):
 ```
 
 ```python
-# 개선 방식: pytest 스타일 — assert 하나로 통일합니다
+# after: pytest style — unified with assert
 import pytest
 
 def test_add():
@@ -88,10 +98,10 @@ def test_add():
 
 ## 단계별 실습
 
-### Step 1: 기본 assert 패턴
+### Step 1: Basic Assert Patterns
 
 ```python
-# test_assert_patterns.py 파일
+# test_assert_patterns.py
 
 def test_equality():
     assert 1 + 1 == 2
@@ -100,8 +110,8 @@ def test_inequality():
     assert 1 + 1 != 3
 
 def test_truthiness():
-    assert [1, 2, 3]    # 비어 있지 않은 리스트는 True
-    assert not []        # 빈 리스트는 False
+    assert [1, 2, 3]    # non-empty list is truthy
+    assert not []        # empty list is falsy
 
 def test_membership():
     fruits = ["apple", "banana", "cherry"]
@@ -113,10 +123,10 @@ def test_identity():
     assert a is None
 ```
 
-### Step 2: 컬렉션 비교
+### Step 2: Collection Comparison
 
 ```python
-# test_collections.py 파일
+# test_collections.py
 
 def test_list_comparison():
     expected = [1, 2, 3, 4, 5]
@@ -126,25 +136,25 @@ def test_list_comparison():
 def test_dict_comparison():
     expected = {"name": "Alice", "age": 30}
     result = {"name": "Alice", "age": 25}
-    assert result == expected  # 실패 시 다른 키-값 표시
+    assert result == expected  # shows differing key-values on failure
 
 def test_set_comparison():
     expected = {1, 2, 3}
     result = {1, 2, 4}
-    assert result == expected  # 실패 시 차집합 표시
+    assert result == expected  # shows set difference on failure
 ```
 
-### Step 3: 부동소수점 비교
+### Step 3: Floating-Point Comparison
 
 ```python
-# test_float.py 파일
+# test_float.py
 import pytest
 
 def test_float_naive():
-    # 이 테스트는 실패합니다
+    # This test would fail:
     # assert 0.1 + 0.2 == 0.3
 
-    # pytest.approx로 안전하게 비교
+    # Safe comparison with pytest.approx
     assert 0.1 + 0.2 == pytest.approx(0.3)
 
 def test_approx_with_tolerance():
@@ -156,15 +166,15 @@ def test_approx_list():
     assert result == pytest.approx([0.3, 0.5])
 ```
 
-### Step 4: 예외 테스트
+### Step 4: Exception Testing
 
 ```python
-# test_exceptions.py 파일
+# test_exceptions.py
 import pytest
 
 def divide(a, b):
     if b == 0:
-        raise ValueError(f"{a}을(를) 0으로 나눌 수 없습니다")
+        raise ValueError(f"Cannot divide {a} by zero")
     return a / b
 
 def test_raises_basic():
@@ -172,65 +182,65 @@ def test_raises_basic():
         divide(10, 0)
 
 def test_raises_with_match():
-    with pytest.raises(ValueError, match="0으로 나눌 수 없습니다"):
+    with pytest.raises(ValueError, match="by zero"):
         divide(10, 0)
 
 def test_raises_inspect_exception():
     with pytest.raises(ValueError) as exc_info:
         divide(10, 0)
-    assert "0으로 나눌 수 없습니다" in str(exc_info.value)
+    assert "by zero" in str(exc_info.value)
     assert exc_info.type is ValueError
 
 def test_raises_wrong_exception():
-    # TypeError가 아니라 ValueError가 발생하므로 이 테스트는 실패합니다
+    # This test fails because ValueError is raised, not TypeError
     with pytest.raises(TypeError):
         divide(10, 0)
 ```
 
-### Step 5: 커스텀 에러 메시지
+### Step 5: Custom Error Messages
 
 ```python
-# test_custom_message.py 파일
+# test_custom_message.py
 
 def test_with_message():
     value = compute_score()
-    assert value >= 0, f"점수는 음수일 수 없습니다. 실제값: {value}"
+    assert value >= 0, f"Score cannot be negative. Got: {value}"
 
 def test_complex_assertion():
     users = fetch_active_users()
-    assert len(users) > 0, "활성 사용자가 한 명도 없습니다"
+    assert len(users) > 0, "No active users found"
 ```
 
 ## 이 코드에서 주목할 점
 
-- dict 비교 실패 시 다른 키와 값을 정확히 보여줍니다
-- `pytest.approx`는 리스트, dict 값에도 적용됩니다
-- `match` 파라미터는 정규식을 지원하여 유연한 메시지 검증이 가능합니다
-- `exc_info.value`로 예외 객체에 직접 접근하여 속성을 검증합니다
+- dict 비교가 실패하면 어떤 키와 값이 다른지 바로 보여 줍니다.
+- `pytest.approx`는 리스트 같은 컬렉션에도 적용할 수 있습니다.
+- `match`는 정규식을 지원하므로 예외 메시지를 유연하게 검증할 수 있습니다.
+- `exc_info.value`를 통해 예외 객체 자체의 속성을 검사할 수 있습니다.
 
-## 흔한 실수 5가지
+## 흔한 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| `assert 0.1 + 0.2 == 0.3` | 부동소수점 오차로 항상 실패합니다 | `pytest.approx(0.3)`를 사용합니다 |
-| `pytest.raises` 블록 안에서 assert | 예외 발생 후 코드가 실행되지 않습니다 | `exc_info`를 블록 밖에서 검사합니다 |
-| 너무 넓은 예외 타입으로 검증 | `Exception`으로 검증하면 다른 버그를 숨깁니다 | 정확한 예외 타입을 명시합니다 |
-| `match`에 특수문자 이스케이프 누락 | 정규식으로 해석되어 의도와 다른 매칭이 됩니다 | `re.escape()`를 사용합니다 |
-| assert 없이 함수만 호출 | 에러가 발생하지 않는 것만 확인됩니다 | 반환값도 반드시 assert로 검증합니다 |
+| `assert 0.1 + 0.2 == 0.3` | 부동소수점 오차 때문에 실패합니다 | `pytest.approx(0.3)`를 사용합니다 |
+| `pytest.raises` 블록 안에서 추가 assert를 함 | 예외 발생 뒤 코드는 실행되지 않습니다 | `exc_info` 검사는 블록 밖에서 합니다 |
+| 너무 넓은 예외 타입을 사용함 | 다른 버그까지 숨길 수 있습니다 | 정확한 예외 타입을 명시합니다 |
+| `match`의 특수문자를 고려하지 않음 | 정규식으로 해석돼 의도와 다를 수 있습니다 | 필요하면 `re.escape()`를 사용합니다 |
+| 함수 호출만 하고 assert를 하지 않음 | 결과 계약은 검증하지 못합니다 | 반환값이나 상태를 반드시 assert 합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- API 응답의 상태 코드와 본문을 assert로 동시에 검증합니다
-- 금융 계산 로직에서 `pytest.approx`로 소수점 오차를 허용합니다
-- 입력 유효성 검사 코드에 대해 `pytest.raises`로 에러 케이스를 빠짐없이 테스트합니다
-- 커스텀 예외 클래스의 속성(error_code, detail)을 `exc_info.value`로 검증합니다
-- 실패 메시지에 컨텍스트를 추가하여 CI 로그에서 원인을 빠르게 파악합니다
+- API 응답의 상태 코드와 본문 내용을 함께 검증합니다.
+- 금융 계산처럼 오차 허용이 필요한 로직에 `pytest.approx`를 사용합니다.
+- 입력 검증 실패 경로를 `pytest.raises`로 빠짐없이 테스트합니다.
+- 커스텀 예외 객체의 속성도 `exc_info.value`로 확인합니다.
+- CI 로그에서 바로 원인을 읽을 수 있도록 실패 메시지에 맥락을 남깁니다.
 
 ## 현업 개발자는 이렇게 생각합니다
 
-좋은 테스트는 실패 메시지만 보고도 원인을 파악할 수 있어야 합니다. `assert result == expected`가 실패하면, pytest가 양쪽 값을 보여주기 때문에 별도의 print 디버깅이 필요 없습니다.
+좋은 테스트는 실패 메시지만 보고도 원인을 짐작할 수 있어야 합니다. pytest의 `assert`는 이 목표에 매우 잘 맞습니다. 별도의 `print()` 디버깅 없이도 실제값과 기대값을 바로 보여 주기 때문입니다.
 
-예외 테스트를 작성할 때는 "이 함수가 이 입력에서 반드시 실패해야 한다"는 관점으로 접근합니다. 예외가 발생하지 않으면 테스트가 실패하므로, 에러 핸들링이 실수로 제거되는 것을 방지합니다.
+예외 테스트도 같은 관점으로 보면 됩니다. “이 함수는 이 입력에서 반드시 실패해야 한다”는 계약을 명시하는 일입니다. 예외가 사라지면 테스트가 바로 실패하므로, 에러 핸들링 회귀를 빨리 잡을 수 있습니다.
 
 ## 체크리스트
 
@@ -238,11 +248,17 @@ def test_complex_assertion():
 - [ ] `pytest.approx`로 부동소수점을 비교했다
 - [ ] `pytest.raises`로 예외 타입을 검증했다
 - [ ] `match` 파라미터로 예외 메시지를 검증했다
-- [ ] `exc_info`로 예외 객체의 속성을 검사했다
+- [ ] `exc_info`로 예외 객체를 확인했다
+
+## 연습 문제
+
+1. 두 dict가 다르게 생긴 테스트를 직접 작성하고, pytest의 diff 출력을 확인해 보세요.
+2. 음수 입력에서 `ValueError`를 발생시키는 `sqrt(n)` 함수를 만들고 메시지까지 검증해 보세요.
+3. `pytest.approx`의 `rel`, `abs` 옵션 차이를 직접 비교해 보세요.
 
 ## 정리 및 다음 글 안내
 
-pytest의 assert는 읽기 쉽고, 실패 시 상세한 정보를 제공합니다. `pytest.raises`와 `pytest.approx`는 예외와 부동소수점 테스트의 필수 도구입니다. 다음 글에서는 테스트 데이터를 관리하는 fixture를 배웁니다.
+pytest의 `assert`는 읽기 쉽고, 실패했을 때도 유용합니다. `pytest.raises`와 `pytest.approx`까지 익히면 예외와 부동소수점처럼 자주 헷갈리는 영역도 안정적으로 검증할 수 있습니다. 다음 글에서는 테스트 데이터와 상태 준비를 반복 없이 관리하는 fixture를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [왜 테스트를 작성해야 할까?](./01-why-write-tests.md)

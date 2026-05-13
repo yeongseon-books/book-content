@@ -2,7 +2,7 @@
 series: pytest-101
 episode: 4
 title: fixture 이해하기
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,33 +16,43 @@ tags:
   - fixture
   - conftest
   - 테스트 데이터
-seo_description: pytest fixture의 scope, yield, conftest 활용법을 실습합니다.
-last_reviewed: '2026-05-11'
+seo_description: pytest fixture의 기본 개념, scope, yield, conftest 패턴을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # fixture 이해하기
 
-> pytest 101 시리즈 (4/10)
+이 글은 pytest 101 시리즈의 네 번째 글입니다. fixture는 테스트에 필요한 데이터와 상태 준비를 함수로 분리해 재사용하게 해 주는 pytest의 핵심 메커니즘입니다. 이 글에서는 fixture 정의, 자동 주입, scope, yield 기반 정리, `conftest.py` 공유 패턴까지 차례로 살펴봅니다.
 
+테스트마다 같은 객체 생성 코드가 반복되기 시작하면, 테스트 본문이 무엇을 검증하는지보다 무엇을 준비하는지가 더 눈에 띄게 됩니다. fixture는 이 준비 코드를 밖으로 빼내어 테스트를 더 짧고 명확하게 만들어 줍니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
-테스트마다 동일한 객체를 생성하는 코드가 반복되면, 테스트 코드가 비대해지고 유지보수가 어려워집니다. fixture는 이 반복을 제거하고, 테스트가 "무엇을 검증하는지"에 집중하게 합니다.
+- fixture는 일반 함수와 무엇이 다를까요?
+- fixture를 테스트 함수에 어떻게 자동으로 주입할까요?
+- `function`, `module`, `session` scope는 언제 선택해야 할까요?
+- `yield` fixture는 setup과 teardown을 어떻게 나눌까요?
 
-> fixture는 테스트의 "Given" 단계입니다. Given-When-Then에서 Given을 fixture로 분리하면, 테스트 본문은 When과 Then만 남습니다.
+## 왜 이 글이 중요한가
 
-데이터베이스 연결, API 클라이언트, 임시 파일 같은 리소스는 fixture로 관리해야 안전하게 생성하고 정리할 수 있습니다.
+테스트 코드가 커질수록 반복되는 준비 로직이 유지보수 비용을 키웁니다. fixture를 쓰면 테스트는 “무엇을 검증하는가”에 집중하고, 준비와 정리는 재사용 가능한 단위로 분리할 수 있습니다.
+
+> fixture는 Given-When-Then에서 Given을 밖으로 빼내는 도구입니다. Given이 fixture로 빠지면 테스트 본문은 When과 Then에 집중하게 됩니다.
+
+데이터베이스 연결, API 클라이언트, 임시 파일 같은 자원은 생성보다 정리가 더 중요할 때가 많습니다. fixture는 이 생명주기를 통제하기 위한 가장 자연스러운 장치입니다.
 
 ## 핵심 개념 잡기
 
-> fixture = 테스트 실행 전에 준비하고, 실행 후에 정리하는 재사용 가능한 컴포넌트
+> fixture = 테스트 전에 상태를 준비하고, 필요하면 테스트 후 정리까지 맡는 재사용 가능한 구성요소
 
 ```text
 @pytest.fixture
-def user():          ← fixture 정의
+def user():            ← fixture definition
     return User("Alice")
 
-def test_greet(user):  ← 파라미터 이름으로 자동 주입
+def test_greet(user):  ← auto-injected by parameter name
     assert user.name == "Alice"
 ```
 
@@ -51,17 +61,17 @@ def test_greet(user):  ← 파라미터 이름으로 자동 주입
 | 용어 | 설명 |
 |------|------|
 | fixture | 테스트에 필요한 데이터나 상태를 제공하는 함수입니다 |
-| scope | fixture의 생명주기를 결정합니다 (function, class, module, session) |
-| yield fixture | yield 이전이 setup, 이후가 teardown입니다 |
-| conftest.py | fixture를 여러 테스트 파일에서 공유하는 설정 파일입니다 |
-| autouse | 명시적 요청 없이 자동으로 적용되는 fixture입니다 |
+| scope | fixture 생명주기를 결정합니다 |
+| yield fixture | `yield` 앞은 setup, 뒤는 teardown입니다 |
+| conftest.py | 여러 테스트 파일에 fixture를 공유하는 설정 파일입니다 |
+| autouse | 명시적으로 요청하지 않아도 자동 적용되는 fixture입니다 |
 
 ## Before / After
 
-setup/teardown 메서드와 fixture를 비교합니다.
+unittest 스타일과 pytest fixture 스타일을 비교해 보겠습니다.
 
 ```python
-# 이전 방식: unittest 스타일 — setUp/tearDown을 사용합니다
+# before: unittest style — setUp/tearDown methods
 import unittest
 import tempfile
 import os
@@ -83,10 +93,8 @@ class TestFileProcessor(unittest.TestCase):
 ```
 
 ```python
-# 개선 방식: pytest fixture — 선언적이고 재사용할 수 있습니다
+# after: pytest fixture — declarative and reusable
 import pytest
-import tempfile
-import os
 
 @pytest.fixture
 def text_file(tmp_path):
@@ -96,15 +104,15 @@ def text_file(tmp_path):
 
 def test_read(text_file):
     assert text_file.read_text() == "hello"
-# 정리 코드는 불필요합니다 — tmp_path가 자동으로 정리합니다
+# no teardown needed — tmp_path auto-cleans
 ```
 
 ## 단계별 실습
 
-### Step 1: 기본 fixture 정의
+### Step 1: Define Basic Fixtures
 
 ```python
-# conftest.py 파일
+# conftest.py
 import pytest
 
 @pytest.fixture
@@ -120,10 +128,10 @@ def sample_users():
     ]
 ```
 
-### Step 2: fixture 사용
+### Step 2: Use Fixtures
 
 ```python
-# test_user.py 파일
+# test_user.py
 
 def test_user_name(sample_user):
     assert sample_user["name"] == "Alice"
@@ -136,10 +144,10 @@ def test_youngest_user(sample_users):
     assert youngest["name"] == "Bob"
 ```
 
-### Step 3: yield fixture로 리소스 관리
+### Step 3: Yield Fixtures for Resource Management
 
 ```python
-# conftest.py 파일
+# conftest.py
 import pytest
 import sqlite3
 
@@ -149,43 +157,43 @@ def db_connection():
     conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
     conn.execute("INSERT INTO users (name) VALUES ('Alice')")
     conn.commit()
-    yield conn  # 테스트에 conn 제공
-    conn.close()  # 테스트 완료 후 정리
+    yield conn  # provide conn to the test
+    conn.close()  # cleanup after test
 
-# test_db.py 파일
+# test_db.py
 def test_query_user(db_connection):
     cursor = db_connection.execute("SELECT name FROM users")
     row = cursor.fetchone()
     assert row[0] == "Alice"
 ```
 
-### Step 4: scope 활용
+### Step 4: Fixture Scopes
 
 ```python
-# conftest.py 파일
+# conftest.py
 import pytest
 
 @pytest.fixture(scope="module")
 def expensive_resource():
-    """모듈 내 모든 테스트가 공유합니다."""
-    print("리소스 생성 (한 번만 실행)")
+    """Shared across all tests in the module."""
+    print("Creating resource (runs once)")
     resource = {"data": list(range(10000))}
     yield resource
-    print("리소스 정리 (모듈 끝에 한 번)")
+    print("Cleaning up resource (runs once at module end)")
 
-# test_scope.py 파일
+# test_scope.py
 def test_first(expensive_resource):
     assert len(expensive_resource["data"]) == 10000
 
 def test_second(expensive_resource):
-    # 같은 리소스를 재사용합니다
+    # reuses the same resource
     assert expensive_resource["data"][0] == 0
 ```
 
-### Step 5: fixture 합성
+### Step 5: Fixture Composition
 
 ```python
-# conftest.py 파일
+# conftest.py
 import pytest
 
 @pytest.fixture
@@ -198,13 +206,13 @@ def auth_headers():
 
 @pytest.fixture
 def api_client(base_url, auth_headers):
-    """다른 fixture를 조합합니다."""
+    """Composes other fixtures."""
     return {
         "base_url": base_url,
         "headers": auth_headers,
     }
 
-# test_api.py 파일
+# test_api.py
 def test_api_client_has_auth(api_client):
     assert "Authorization" in api_client["headers"]
 
@@ -214,46 +222,52 @@ def test_api_client_url(api_client):
 
 ## 이 코드에서 주목할 점
 
-- fixture 이름이 곧 파라미터 이름입니다 — 명시적 호출 없이 자동 주입됩니다
-- `yield` 이전 코드가 setup, 이후 코드가 teardown입니다
-- `scope="module"`로 비용이 큰 리소스의 생성 횟수를 줄입니다
-- fixture를 다른 fixture의 파라미터로 사용하여 합성합니다
+- fixture 이름 자체가 주입 이름이므로 별도 호출 코드가 필요 없습니다.
+- `yield` 앞은 준비, 뒤는 정리이므로 리소스 생명주기를 읽기 쉽게 나눌 수 있습니다.
+- `scope="module"`은 비용 큰 자원의 생성 횟수를 줄여 줍니다.
+- fixture도 다른 fixture를 의존성으로 받아 합성할 수 있습니다.
 
-## 흔한 실수 5가지
+## 흔한 실수
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| fixture에서 직접 assert를 사용 | fixture는 데이터를 제공하는 역할이지 검증 역할이 아닙니다 | assert는 테스트 함수에서만 사용합니다 |
-| function scope fixture를 module scope에서 사용 | scope 불일치로 에러가 발생합니다 | 의존하는 fixture의 scope를 맞춥니다 |
-| yield 없이 리소스를 열기만 함 | 파일이나 연결이 닫히지 않습니다 | yield를 사용하여 정리 코드를 추가합니다 |
-| conftest.py를 import하려 함 | pytest가 자동으로 로드하므로 import가 불필요합니다 | import 없이 fixture 이름만 사용합니다 |
-| autouse를 남용 | 모든 테스트에 불필요한 fixture가 적용됩니다 | autouse는 로깅, 타이밍 같은 공통 관심사에만 사용합니다 |
+| fixture 안에서 assert를 함 | fixture는 준비 역할이지 검증 역할이 아닙니다 | 검증은 테스트 함수에서만 합니다 |
+| scope가 맞지 않는 fixture를 조합함 | 생명주기 충돌로 오류가 납니다 | 의존 fixture의 scope를 맞춥니다 |
+| 리소스를 열어 놓고 정리하지 않음 | 파일과 연결이 누수될 수 있습니다 | `yield` 뒤에 cleanup 코드를 둡니다 |
+| conftest.py를 import하려고 함 | pytest가 자동 로드합니다 | fixture 이름만 바로 사용합니다 |
+| autouse를 남용함 | 보이지 않는 준비 코드가 늘어 테스트 이해가 어려워집니다 | 정말 공통적인 관심사에만 씁니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 데이터베이스 연결을 session scope fixture로 관리하여 테스트 속도를 높입니다
-- `tmp_path` 내장 fixture로 임시 파일을 생성하고 자동 정리합니다
-- API 테스트에서 인증 토큰을 fixture로 제공합니다
-- 여러 conftest.py를 디렉터리별로 배치하여 테스트 계층에 맞는 fixture를 제공합니다
-- factory fixture 패턴으로 다양한 변형의 테스트 데이터를 생성합니다
+- 데이터베이스 연결을 session scope fixture로 관리해 테스트 전체 속도를 개선합니다.
+- `tmp_path` 같은 내장 fixture로 임시 파일을 자동 정리합니다.
+- 인증 토큰, API 클라이언트, 샘플 사용자 데이터를 fixture로 표준화합니다.
+- 디렉터리 단위 `conftest.py`를 통해 계층적으로 fixture를 배치합니다.
+- factory fixture로 테스트 데이터 변형을 유연하게 만듭니다.
 
 ## 현업 개발자는 이렇게 생각합니다
 
-fixture는 테스트의 가독성과 유지보수성을 결정하는 핵심 요소입니다. 잘 설계된 fixture는 테스트 코드를 "시나리오 설명"처럼 읽을 수 있게 만듭니다.
+fixture 설계는 테스트의 가독성과 유지보수성을 좌우합니다. fixture가 잘 설계되면 테스트 본문은 거의 시나리오 문장처럼 읽히고, 변경이 생겨도 준비 코드만 한곳에서 수정하면 됩니다.
 
-scope 선택은 "이 데이터가 테스트 간에 공유되어도 안전한가?"를 기준으로 판단합니다. 불변 데이터는 module이나 session scope를, 변경 가능한 데이터는 function scope를 사용합니다.
+scope 선택 기준도 단순합니다. “이 데이터나 자원을 테스트끼리 공유해도 안전한가?”를 먼저 묻는 것입니다. 안전하지 않다면 function scope가 기본값이고, 불변 자원이라면 module이나 session scope를 검토할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] `@pytest.fixture`로 fixture를 정의하고 테스트에 주입했다
-- [ ] yield fixture로 setup/teardown을 분리했다
-- [ ] scope의 차이를 이해하고 적절히 선택했다
-- [ ] conftest.py에 공통 fixture를 배치했다
-- [ ] fixture 합성으로 복잡한 테스트 데이터를 구성했다
+- [ ] `@pytest.fixture`로 fixture를 정의하고 주입했다
+- [ ] `yield` fixture로 setup과 teardown을 분리했다
+- [ ] scope 차이를 이해하고 적절히 선택했다
+- [ ] 공통 fixture를 `conftest.py`에 배치했다
+- [ ] 여러 fixture를 조합해 테스트 데이터를 구성했다
+
+## 연습 문제
+
+1. SQLite 메모리 DB를 제공하는 fixture를 만들고, INSERT/SELECT를 검증해 보세요.
+2. `tmp_path` 내장 fixture로 임시 JSON 파일을 만들고 읽는 테스트를 작성해 보세요.
+3. `scope="session"`과 `scope="function"` fixture의 실행 횟수를 `-s` 옵션으로 비교해 보세요.
 
 ## 정리 및 다음 글 안내
 
-fixture는 테스트 데이터를 관리하는 pytest의 핵심 메커니즘입니다. scope와 yield를 이해하면 리소스를 안전하고 효율적으로 관리할 수 있습니다. 다음 글에서는 parametrization으로 하나의 테스트 함수에서 여러 입력을 검증하는 방법을 배웁니다.
+fixture는 pytest에서 테스트 데이터를 다루는 중심 도구입니다. scope와 yield를 이해하면 반복 준비 코드를 줄이고, 리소스도 더 안전하게 관리할 수 있습니다. 다음 글에서는 하나의 테스트 함수에 여러 입력 세트를 연결하는 parametrization을 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [왜 테스트를 작성해야 할까?](./01-why-write-tests.md)
