@@ -17,39 +17,65 @@ tags:
   - Automation
   - Quality
 seo_description: GitHub Actions로 테스트를 자동화하고 매트릭스, 캐시, 병렬화로 빠르게 만드는 법.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 ---
 
 # CI에서 테스트 실행하기
 
-> Testing 101 시리즈 (9/10)
+노트북에서는 통과했는데 동료 환경이나 머지 뒤 파이프라인에서는 깨지는 일은 흔합니다. 파이썬 버전이 다르거나, 의존 패키지 캐시 상태가 다르거나, 로컬에만 있는 파일 하나가 원인일 수도 있습니다. 로컬 통과만으로는 팀 전체 기준을 만들기 어렵습니다.
 
+그래서 테스트는 개인 습관에만 맡기지 않고 공통 환경에서 자동으로 돌려야 합니다. 그 역할을 맡는 것이 CI입니다.
+
+이 글은 Testing 101 시리즈의 아홉 번째 글입니다. 여기서는 CI의 목적, GitHub Actions 워크플로의 기본 구조, 매트릭스와 캐시로 속도를 줄이는 방법, 그리고 테스트 결과를 팀 공통 신호로 운영하는 감각을 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
-로컬 환경은 사람마다 다릅니다. CI는 동일한 컨테이너 환경에서 모든 PR을 검증합니다. 깨진 코드를 메인에 들여보내지 않는 마지막 문이라고 보면 됩니다.
+- CI는 왜 필요한 공통 검증 장치일까요?
+- GitHub Actions 워크플로는 어떤 구조로 작성할까요?
+- 파이썬 버전 매트릭스와 캐시는 언제 도움이 될까요?
+- 병렬 실행과 결과 아티팩트는 어떻게 활용할까요?
+- CI에서 자주 생기는 함정은 무엇일까요?
 
-> CI 없는 테스트는 우연히 통과한 테스트일 뿐입니다.
+> CI는 모든 커밋에 같은 기준을 적용하는 자동 검증 장치입니다. 개인 환경의 우연한 통과를 팀 기준의 통과로 바꾸는 역할을 합니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+로컬 환경은 사람마다 다릅니다. 어떤 사람은 파이썬 3.11을 쓰고, 어떤 사람은 3.12를 쓰며, 어떤 사람은 캐시 덕분에 우연히 통과할 수도 있습니다. CI는 같은 컨테이너 또는 같은 런너 환경에서 모든 PR을 검증해 이런 편차를 줄입니다.
+
+또한 CI는 팀 규율을 강제합니다. 테스트가 실패하면 머지를 막고, 그 압력 덕분에 팀은 작은 PR과 빠른 피드백을 선호하게 됩니다. 테스트 문화는 도구 없이 잘 유지되지 않습니다.
+
+## 한눈에 보는 구조
+
 ```mermaid
 flowchart LR
-    Push["git push"] --> Trigger["GitHub Actions 트리거"]
-    Trigger --> Setup["Python/캐시 셋업"]
-    Setup --> Run["pytest 실행"]
-    Run --> Report["결과/커버리지 업로드"]
+    Push["git push"] --> Trigger["GitHub Actions trigger"]
+    Trigger --> Setup["Python and cache setup"]
+    Setup --> Run["Run pytest"]
+    Run --> Report["Upload results and coverage"]
 ```
 
-## Before/After
+커밋이나 PR이 올라오면 워크플로가 실행되고, 파이썬과 의존을 준비한 뒤, 테스트를 돌리고, 결과나 커버리지 보고서를 남깁니다. 흐름은 단순하지만 팀 전체 품질 게이트 역할을 합니다.
 
-**Before (수동 테스트)**
+## 핵심 용어
+
+- **CI**: Continuous Integration의 약자로, 커밋마다 자동 검증을 수행하는 흐름입니다.
+- **워크플로(workflow)**: GitHub Actions에서 실행 규칙을 정의한 YAML 파일입니다.
+- **매트릭스(matrix)**: 여러 파이썬 버전이나 운영체제 조합을 병렬 실행하는 설정입니다.
+- **캐시(cache)**: 의존 설치 결과를 재사용해 시간을 줄이는 방식입니다.
+- **아티팩트(artifact)**: 커버리지 보고서나 로그처럼 CI가 남기는 파일입니다.
+
+## 바꾸기 전과 후
+
+**바꾸기 전 — 수동 실행 중심**
 
 ```text
-- 개발자가 자기 노트북에서만 pytest 실행
-- 깜빡하면 실패한 채로 머지
+- 개발자가 자기 노트북에서만 pytest를 돌린다
+- 한 번 빼먹으면 실패한 코드가 그대로 머지된다
 ```
 
-**After (CI 자동화)**
+**바꾼 뒤 — CI 자동화 적용**
 
 ```yaml
 on: [push, pull_request]
@@ -64,16 +90,18 @@ jobs:
       - run: pytest -v
 ```
 
-## CI 구축 5단계
+이 차이는 습관이 아니라 시스템 차이입니다. CI가 붙는 순간 테스트 실행이 선택이 아니라 기본 경로가 됩니다.
 
-### 1단계 — 워크플로우 파일 만들기
+## 다섯 단계로 CI 구성하기
+
+### 1단계 — 워크플로 파일 만들기
 
 ```bash
 mkdir -p .github/workflows
 touch .github/workflows/test.yml
 ```
 
-### 2단계 — 매트릭스로 다중 버전 테스트
+### 2단계 — 매트릭스로 여러 버전 확인하기
 
 ```yaml
 strategy:
@@ -84,24 +112,24 @@ steps:
     with: { python-version: ${{ matrix.python-version }} }
 ```
 
-### 3단계 — 의존성 캐싱
+### 3단계 — 의존 캐시 켜기
 
 ```yaml
 - uses: actions/setup-python@v5
   with:
     python-version: ${{ matrix.python-version }}
-    cache: 'pip'           # requirements.txt 자동 감지
+    cache: 'pip'           # requirements.txt를 자동 감지
 - run: pip install -r requirements.txt
 ```
 
-### 4단계 — 병렬 실행으로 속도 올리기
+### 4단계 — 병렬 실행으로 시간 줄이기
 
 ```bash
 pip install pytest-xdist
-pytest -n auto             # CPU 수만큼 병렬
+pytest -n auto             # CPU 코어 기준 병렬 실행
 ```
 
-### 5단계 — 커버리지 아티팩트 업로드
+### 5단계 — 커버리지 결과 업로드하기
 
 ```yaml
 - run: pytest --cov=src --cov-report=html
@@ -111,34 +139,44 @@ pytest -n auto             # CPU 수만큼 병렬
     path: htmlcov/
 ```
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- trigger는 보통 `push`와 `pull_request` 둘 다 둡니다.
-- 캐시 키는 requirements 해시로 자동 관리됩니다.
-- 매트릭스는 조합 폭발에 주의해야 합니다. 보통 2\~3개 버전이면 충분합니다.
+- 트리거는 보통 `push`와 `pull_request`를 함께 포함합니다.
+- `setup-python`의 캐시는 요구사항 파일 해시를 기준으로 관리됩니다.
+- 매트릭스는 유용하지만 조합이 많아지면 시간이 급격히 늘 수 있습니다.
 
-## 자주 하는 실수 5가지
+CI 설정에서 가장 중요한 숫자 중 하나는 총 실행 시간입니다. 테스트가 아무리 좋아도 PR 하나 확인하는 데 20분이 걸리면 팀은 우회로를 찾기 시작합니다. 속도는 품질과 별개가 아니라 품질을 지속시키는 조건입니다.
 
-1. **CI에서만 플레이키한 테스트가 나온다.** 보통 순서 의존이나 외부 자원 문제가 원인입니다.
-2. **모든 PR마다 전체 E2E를 실행한다.** `unit -> integration -> E2E` 단계로 나누세요.
-3. **캐시를 키 없이 써서 낡은 의존성으로 통과한다.** 항상 해시 기반 키를 사용해야 합니다.
-4. **시크릿을 로그에 출력한다.** 절대 `echo $SECRET` 를 쓰면 안 됩니다.
-5. **빌드 시간이 10분을 넘는데 방치한다.** 병렬화와 캐싱으로 5분 이내를 목표로 두세요.
+## 어디서 자주 헷갈릴까요?
 
-## 실무에서는 이렇게 쓰입니다
+첫 번째 문제는 CI에서만 플래키하게 깨지는 테스트입니다. 대개 실행 순서 의존, 외부 자원 의존, 고정되지 않은 시간 대기 같은 문제가 원인입니다.
 
-대규모 팀은 unit job(1\~2분), integration job(5분), E2E job(15분, nightly)으로 분리합니다. PR에는 unit과 integration만 강제하고 E2E는 머지 후 야간에 돌립니다.
+둘째, 모든 E2E 테스트를 모든 PR마다 돌리는 구성입니다. 계층을 나누지 않으면 피드백 시간이 너무 길어집니다. 단위 테스트와 통합 테스트는 PR에서, 더 무거운 E2E는 야간이나 머지 뒤에 돌리는 구성이 현실적일 때가 많습니다.
+
+셋째, 로그에 비밀 값을 찍는 실수입니다. 테스트 자동화가 늘어날수록 비밀 관리도 더 엄격해야 합니다.
+
+## 실무에서는 이렇게 생각합니다
+
+큰 팀일수록 테스트 계층을 잡 단위로 나눕니다. 예를 들어 단위 테스트는 1~2분, 통합 테스트는 5분 안팎, E2E는 15분 정도로 별도 운영하는 식입니다. PR에는 빠른 계층만 필수로 걸고, 무거운 계층은 야간이나 머지 뒤 검증으로 옮깁니다.
+
+경험 많은 엔지니어는 빨간 PR이 머지되는 일을 시스템 실패로 봅니다. 개인 실수로 넘기지 않습니다. 머지 규칙, 브랜치 보호, 캐시 전략, 플래키 테스트 격리까지 모두 운영 설계의 일부로 다룹니다.
 
 ## 체크리스트
 
-- [ ] `.github/workflows/test.yml` 이 존재한다.
-- [ ] 매트릭스로 최소 2개 Python 버전을 돌린다.
-- [ ] 의존성 캐시가 켜져 있다.
-- [ ] PR이 빨간 상태로 머지되지 않는다.
+- [ ] `.github/workflows/test.yml`이 존재합니다.
+- [ ] 최소 두 개 파이썬 버전을 매트릭스로 확인합니다.
+- [ ] 의존 캐시를 켰습니다.
+- [ ] 실패한 PR은 머지되지 않도록 운영합니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-CI는 팀 전체의 안전망입니다. 다음 글에서는 지금까지 배운 모든 테스트를 묶어 전략을 세웁니다.
+1. 프로젝트에 `test.yml` 워크플로를 추가하고 첫 초록색 빌드를 만들어 보세요.
+2. Python 3.11과 3.12를 매트릭스에 추가해 보세요.
+3. `pytest-xdist`를 도입하고 실행 시간을 비교해 보세요.
+
+## 정리
+
+CI는 테스트를 팀 공통 기준으로 바꾸는 장치입니다. 노트북에서 우연히 통과한 결과를, 누구에게나 같은 방식으로 검증된 결과로 바꿔 줍니다. 다음 글에서는 지금까지 본 모든 계층을 묶어 팀에 맞는 테스트 전략을 세우는 방법을 정리하겠습니다.
 
 <!-- toc:begin -->
 - [테스트란 무엇인가?](./01-what-is-testing.md)
@@ -155,7 +193,7 @@ CI는 팀 전체의 안전망입니다. 다음 글에서는 지금까지 배운 
 
 ## 참고 자료
 
-- [GitHub Actions 공식 문서](https://docs.github.com/en/actions)
+- [GitHub Actions docs](https://docs.github.com/en/actions)
 - [pytest-xdist](https://pytest-xdist.readthedocs.io/)
 - [Martin Fowler — Continuous Integration](https://martinfowler.com/articles/continuousIntegration.html)
 - [Google Testing Blog — Flaky Tests](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html)
