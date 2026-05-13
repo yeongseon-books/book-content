@@ -3,7 +3,7 @@ title: PyPI에 배포하기 — TestPyPI부터 실제 배포까지
 series: python-package-101
 episode: 5
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,39 +17,50 @@ tags:
 - Publishing
 - TestPyPI
 - Distribution
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드된 패키지를 PyPI에 업로드하는 도구입니다.
 ---
 
 # PyPI에 배포하기 — TestPyPI부터 실제 배포까지
 
-> Python Package 101 시리즈 (5/10)
-
----
-
+패키지를 빌드했다면 이제 다른 사람이 실제로 설치할 수 있는 저장소에 올려야 합니다. 이 단계부터는 단순한 로컬 연습을 넘어 배포 안정성, 인증 정보 관리, 버전 고정 같은 운영 감각이 중요해집니다. 이 글은 Python Package 101 시리즈의 5번째 글입니다. 여기서는 TestPyPI와 PyPI의 역할 차이, `twine` 업로드 흐름, 그리고 배포 실패를 피하기 위한 기본 원칙을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
-패키지를 만들고 빌드했으면 배포해야 다른 사람이 `pip install`로 설치할 수 있습니다. PyPI에 올리면 전 세계 누구나 설치할 수 있고, 사내 저장소에 올리면 팀 내에서 공유됩니다.
+- PyPI와 TestPyPI는 무엇이 다를까요?
+- `twine`은 정확히 어떤 역할을 할까요?
+- API 토큰은 어떻게 만들고 관리할까요?
+- 한 번 업로드한 버전은 수정할 수 있을까요?
 
-> 팀에서 공통 유틸리티 라이브러리를 Git에서 직접 설치합니다: `pip install git+https://...`. 브랜치가 바뀌면 동작이 달라지고, 설치 시간도 깁니다.
+## 이 글에서 배우는 내용
 
-PyPI에 배포하면 버전으로 고정되어 안정적입니다.
+- PyPI/TestPyPI 계정을 만들고 API 토큰을 발급하는 방법
+- `twine`으로 패키지를 업로드하는 방법
+- TestPyPI에서 먼저 검증한 뒤 PyPI에 배포하는 흐름
+- 업로드 실패를 다루는 기본 원칙
 
-## Mental Model
+## 왜 중요한가
 
-> PyPI는 앱스토어이고, twine은 앱을 제출하는 도구입니다. TestPyPI는 스테이징 환경이고, PyPI가 프로덕션입니다. 스테이징에서 먼저 테스트하고 프로덕션에 배포합니다.
+패키지를 만들고 빌드해도, 다른 사람이 `pip install`로 설치할 수 없으면 사실상 배포한 것이 아닙니다. PyPI에 올리면 전 세계 어디서든 설치할 수 있고, 사내 저장소에 올리면 팀 내부 패키지 배포 체계를 만들 수 있습니다.
+
+> 팀에서 공통 유틸리티 라이브러리를 Git URL로 직접 설치한다고 가정해 보겠습니다. `pip install git+https://...`는 브랜치가 바뀌면 동작도 함께 바뀌고, 설치 속도도 느리며, 정확한 버전 고정도 어렵습니다.
+
+PyPI 배포는 이 문제를 버전 중심의 설치 흐름으로 바꿔 줍니다.
+
+## 멘탈 모델
+
+PyPI는 앱스토어이고, `twine`은 앱스토어에 제출하는 업로드 도구입니다. TestPyPI는 스테이징 환경이고, 실제 PyPI는 프로덕션입니다. 따라서 먼저 스테이징에서 검증한 뒤 프로덕션에 올리는 흐름이 자연스럽습니다.
 
 ```text
 python -m build → dist/*.whl, dist/*.tar.gz
                      ↓
-              twine check dist/*       (유효성 검사)
+              twine check dist/*       (validate)
                      ↓
-          twine upload --repository testpypi dist/*  (스테이징)
+          twine upload --repository testpypi dist/*  (staging)
                      ↓
-              pip install --index-url https://test.pypi.org/simple/ mylib  (테스트)
+              pip install --index-url https://test.pypi.org/simple/ mylib  (test)
                      ↓
-          twine upload dist/*          (프로덕션)
+          twine upload dist/*          (production)
 ```
 
 ## 핵심 개념
@@ -64,54 +75,54 @@ python -m build → dist/*.whl, dist/*.tar.gz
 
 ## Before / After
 
-**Before (Git에서 직접 설치)**
+**Before (install directly from Git)**
 
 ```bash
 pip install git+https://github.com/team/mylib.git@main
-# → 브랜치가 바뀌면 동작 변경
-# → 설치 시간이 김 (clone + build)
-# → 버전 고정이 어려움
+# → behavior changes when the branch changes
+# → slow install (clone + build)
+# → hard to pin versions
 ```
 
-**After (PyPI에서 설치)**
+**After (install from PyPI)**
 
 ```bash
 pip install mylib==0.1.0
-# → 버전으로 고정
-# → wheel이 있으면 즉시 설치
-# → 어디서든 동일한 결과
+# → pinned to a version
+# → instant install if wheel exists
+# → identical result everywhere
 ```
 
 ## 단계별 실습
 
-### Step 1. TestPyPI 계정과 토큰 발급
+### Step 1. TestPyPI 계정과 토큰 만들기
 
 ```text
-1. https://test.pypi.org/account/register/ 에서 계정 생성
-2. https://test.pypi.org/manage/account/ 에서 API token 생성
-3. 토큰을 안전한 곳에 저장 (pypi-으로 시작하는 문자열)
+1. Register at https://test.pypi.org/account/register/
+2. Generate an API token at https://test.pypi.org/manage/account/
+3. Save the token securely (a string starting with pypi-)
 ```
 
-### Step 2. twine 설치와 빌드 검증
+### Step 2. `twine` 설치와 빌드 검증
 
 ```bash
 pip install twine
-python -m build                 # 이전 글에서 빌드
+python -m build                 # build from previous post
 
 twine check dist/*
-# 검사 통과: dist/mylib-0.1.0-py3-none-any.whl
-# 검사 통과: dist/mylib-0.1.0.tar.gz
+# Checking dist/mylib-0.1.0-py3-none-any.whl: PASSED
+# Checking dist/mylib-0.1.0.tar.gz: PASSED
 ```
 
 ### Step 3. TestPyPI에 업로드
 
 ```bash
 twine upload --repository testpypi dist/*
-# API 토큰 입력: pypi-...
+# Enter your API token: pypi-...
 
-# 업로드 중: mylib-0.1.0-py3-none-any.whl
-# 업로드 중: mylib-0.1.0.tar.gz
-# 확인 주소: https://test.pypi.org/project/mylib/0.1.0/
+# Uploading mylib-0.1.0-py3-none-any.whl
+# Uploading mylib-0.1.0.tar.gz
+# View at: https://test.pypi.org/project/mylib/0.1.0/
 ```
 
 ### Step 4. TestPyPI에서 설치 테스트
@@ -125,88 +136,94 @@ pip install --index-url https://test.pypi.org/simple/ \
     mylib
 
 python -c "from mylib.core import greet; print(greet('PyPI'))"
-# 실행 결과: Hello, PyPI!
+# Hello, PyPI!
 deactivate
 ```
 
 ### Step 5. 실제 PyPI에 배포
 
 ```bash
-# PyPI 계정과 토큰은 별도로 발급합니다 (pypi.org)
+# PyPI account and token are separate (pypi.org)
 twine upload dist/*
-# API 토큰 입력: pypi-...
+# Enter your API token: pypi-...
 
-# 확인 주소: https://pypi.org/project/mylib/0.1.0/
+# View at: https://pypi.org/project/mylib/0.1.0/
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 눈여겨볼 점
 
-- `twine check`는 메타데이터 오류를 사전에 잡아줍니다
-- TestPyPI에서 `--extra-index-url`을 추가하는 이유는 의존성 패키지가 TestPyPI에 없을 수 있기 때문입니다
-- API 토큰은 `__token__`을 사용자명으로, 토큰 문자열을 비밀번호로 입력합니다
-- 한 번 업로드한 버전은 수정할 수 없습니다. 버전을 올려서 다시 배포해야 합니다
+- `twine check`는 업로드 전에 메타데이터 오류를 먼저 잡아 줍니다.
+- TestPyPI에서는 의존성 패키지가 모두 존재하지 않을 수 있으므로 `--extra-index-url`이 필요합니다.
+- API 토큰을 사용할 때 사용자명은 `__token__`, 비밀번호는 토큰 문자열입니다.
+- 한 번 업로드한 버전은 수정할 수 없으므로, 문제가 있으면 버전을 올려 다시 배포해야 합니다.
 
 ## 자주 하는 실수
 
 ### 실수 1. 같은 버전을 다시 업로드하려 한다
 
-PyPI는 동일 버전 덮어쓰기를 허용하지 않습니다. 수정 사항이 있으면 반드시 버전을 올려야 합니다.
+PyPI는 이미 존재하는 버전을 덮어쓰지 못하게 막습니다. 작은 수정이라도 새 버전으로 다시 배포해야 합니다.
 
-### 실수 2. API 토큰을 코드에 하드코딩한다
+### 실수 2. API 토큰을 코드나 명령 기록에 하드코딩한다
 
 ```bash
-# 잘못: 토큰이 Git 히스토리에 남음
+# Wrong: token ends up in Git history
 twine upload --password pypi-abc123 dist/*
 
-# 올바름: 환경변수 또는 .pypirc 사용
+# Correct: use environment variables or .pypirc
 export TWINE_PASSWORD=pypi-abc123
 ```
 
-### 실수 3. TestPyPI를 건너뛰고 바로 PyPI에 올린다
+### 실수 3. TestPyPI를 건너뛰고 곧바로 PyPI에 올린다
 
-TestPyPI에서 먼저 테스트하세요. PyPI에 올린 후에는 삭제할 수 없습니다(72시간 이내 프로젝트 삭제만 가능).
+실수 한 번이 곧바로 공개 배포 사고로 이어질 수 있습니다. TestPyPI에서 설치와 README 렌더링, 의존성 동작을 먼저 확인하는 편이 안전합니다.
 
-### 실수 4. 패키지 이름이 이미 있는지 확인하지 않는다
+### 실수 4. 패키지 이름 선점을 확인하지 않는다
 
-PyPI에서 이름이 먼저 등록되면 사용할 수 없습니다. `pip index versions mylib`이나 pypi.org 검색으로 미리 확인하세요.
+PyPI 이름은 선착순입니다. 이미 등록된 이름은 사용할 수 없으므로 배포 전 `pip index versions mylib`나 pypi.org 검색으로 먼저 확인해야 합니다.
 
-### 실수 5. dist/에 이전 버전 파일이 남아있는 채로 업로드한다
+### 실수 5. `dist/`에 오래된 파일이 남아 있는 상태로 업로드한다
 
 ```bash
 rm -rf dist/
 python -m build
-twine upload dist/*    # 현재 버전만 업로드
+twine upload dist/*    # upload only the current version
 ```
 
 ## 실무 적용
 
-- **CI/CD 자동 배포**: GitHub Actions에서 태그 push 시 자동으로 PyPI에 배포합니다
-- **Trusted Publisher**: OIDC 기반으로 API 토큰 없이 GitHub Actions에서 직접 배포합니다
-- **사내 저장소**: Artifactory, Nexus, devpi에 사내 패키지를 배포합니다
-- **pre-release**: `0.1.0rc1` 같은 pre-release 버전으로 베타 테스트합니다
-- **README 렌더링**: PyPI 페이지에 표시되는 README는 `[project.readme]`로 지정합니다
+- **CI/CD 자동 배포**: GitHub Actions에서 태그 push를 감지해 자동 배포할 수 있습니다.
+- **Trusted Publisher**: OIDC 기반으로 API 토큰 없이 배포를 자동화할 수 있습니다.
+- **사내 저장소**: Artifactory, Nexus, devpi에 내부 패키지를 배포할 수 있습니다.
+- **사전 릴리스**: `0.1.0rc1` 같은 버전으로 베타 테스트를 운영할 수 있습니다.
+- **README 렌더링**: PyPI 페이지에 보일 README는 `[project.readme]` 설정으로 제어합니다.
 
-## 실무에서는 이렇게 생각한다
+## 실무에서는 이렇게 생각합니다
 
-수동 배포는 실수를 유발합니다. "빌드 → 테스트 → 업로드"를 CI/CD로 자동화하는 것이 표준입니다. GitHub Actions + Trusted Publisher를 쓰면 토큰 관리도 필요 없습니다.
+수동 배포는 실수를 부르기 쉽습니다. 빌드, 검증, 업로드를 CI/CD로 자동화하는 것이 지금은 기본 패턴에 가깝습니다. 특히 GitHub Actions와 Trusted Publisher를 조합하면 토큰 관리 부담까지 크게 줄일 수 있습니다.
 
-패키지 이름은 한번 정하면 바꾸기 어렵습니다. 이름이 직관적이고, 기존 패키지와 충돌하지 않으며, 검색하기 쉬운 이름을 고르세요. PyPI에서 검색해보고, `pip index versions`로 확인한 뒤 배포하세요.
+패키지 이름도 초기에 신중하게 고르는 편이 좋습니다. 한 번 공개 배포를 시작하면 이름을 바꾸기 어렵기 때문입니다. 직관적이고, 기존 패키지와 충돌하지 않으며, 검색하기 쉬운 이름을 우선적으로 검토해야 합니다.
 
 ## 체크리스트
 
 - [ ] TestPyPI 계정을 만들고 API 토큰을 발급할 수 있다
-- [ ] `twine check`로 빌드 결과물의 유효성을 검증할 수 있다
+- [ ] `twine check`로 빌드 결과물을 검증할 수 있다
 - [ ] TestPyPI에 업로드하고 설치 테스트할 수 있다
 - [ ] 실제 PyPI에 배포할 수 있다
 - [ ] API 토큰을 환경변수로 안전하게 관리할 수 있다
 
+## 연습 문제
+
+1. TestPyPI 계정을 만들고 이전 글에서 빌드한 패키지를 업로드해 보세요.
+2. 새 가상환경에서 TestPyPI로부터 패키지를 설치하고 import가 동작하는지 확인해 보세요.
+3. `~/.pypirc`를 작성해 `twine upload --repository testpypi dist/*`가 토큰을 자동으로 사용하도록 구성해 보세요.
+
 ## 정리 · 다음 글
 
-- PyPI는 Python 패키지의 공식 저장소이고, TestPyPI는 테스트 환경입니다.
-- `twine check`로 유효성을 검증하고, `twine upload`로 업로드합니다.
-- TestPyPI에서 먼저 테스트한 뒤 실제 PyPI에 배포합니다.
-- 한 번 업로드한 버전은 수정할 수 없으므로 버전을 올려야 합니다.
-- API 토큰은 코드에 넣지 않고 환경변수나 `.pypirc`로 관리합니다.
+- PyPI는 공식 패키지 저장소이고, TestPyPI는 그 테스트 환경입니다.
+- `twine check`는 검증하고, `twine upload`는 업로드합니다.
+- 실제 PyPI 배포 전에는 반드시 TestPyPI에서 먼저 검증하는 편이 안전합니다.
+- 한 번 업로드한 버전은 수정할 수 없으므로 버전을 올려 다시 배포해야 합니다.
+- API 토큰은 코드에 넣지 말고 환경변수나 `.pypirc`로 관리해야 합니다.
 
 다음 글에서는 **버전 관리와 릴리스** — SemVer, Git 태그, CHANGELOG를 다룹니다.
 

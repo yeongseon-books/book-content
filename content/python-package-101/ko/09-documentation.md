@@ -3,7 +3,7 @@ title: 문서화 — README, MkDocs, API Reference
 series: python-package-101
 episode: 9
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,31 +17,42 @@ tags:
 - README
 - API Reference
 - Sphinx
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: README는 패키지의 현관문이고, API Reference는 모든 함수의 사용 설명서입니다. 문서가 없는 패키지는 쓰이지 않습니다.
 ---
 
 # 문서화 — README, MkDocs, API Reference
 
-> Python Package 101 시리즈 (9/10)
-
----
-
+패키지가 아무리 잘 만들어져 있어도, 사용자가 30초 안에 “이걸 어떻게 설치하고 어디서 시작해야 하는지” 파악할 수 없다면 실제 채택으로 이어지기 어렵습니다. 문서는 코드의 부록이 아니라 패키지 자체의 일부입니다. 이 글은 Python Package 101 시리즈의 9번째 글입니다. 여기서는 좋은 README의 구조, MkDocs 기반 문서 사이트, docstring에서 API Reference를 생성하는 흐름을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
-아무리 좋은 패키지도 사용법이 없으면 쓰이지 않습니다. PyPI에서 패키지를 발견한 사용자가 30초 안에 "이 패키지가 내 문제를 해결하는가?"를 판단할 수 있어야 합니다. README가 그 역할을 합니다.
+- 좋은 README에는 무엇이 들어가야 할까요?
+- MkDocs와 Sphinx는 무엇이 다를까요?
+- docstring에서 API Reference를 자동 생성하려면 어떻게 해야 할까요?
+- 문서 사이트는 GitHub Pages에 어떻게 배포할까요?
 
-> 유용한 패키지를 발견했지만 README에 설치 방법과 예제가 없습니다. 소스 코드를 읽어봐야 사용법을 알 수 있습니다. 결국 비슷한 기능의 다른 패키지를 선택합니다.
+## 이 글에서 배우는 내용
 
-## Mental Model
+- 좋은 README에 꼭 필요한 섹션
+- MkDocs로 문서 사이트를 만드는 방법
+- docstring에서 API Reference를 자동 생성하는 방법
+- GitHub Pages에 문서를 배포하는 방법
 
-> 문서는 3층 구조입니다. 1층(README)은 "무엇이고 어떻게 시작하는가", 2층(가이드)은 "어떻게 쓰는가", 3층(API Reference)은 "모든 함수의 상세 스펙"입니다. 사용자는 1층에서 시작해서 필요한 만큼 깊이 들어갑니다.
+## 왜 중요한가
+
+아무리 좋은 패키지라도 사용법이 없으면 실제로는 쓰이지 않습니다. 사용자가 PyPI나 GitHub에서 패키지를 발견했을 때 가장 먼저 묻는 질문은 “내 문제를 이 패키지가 해결하나?”입니다. README는 그 질문에 30초 안에 답해야 합니다.
+
+> 기능은 좋아 보이지만 README에 설치 방법도, 예제도 없는 패키지를 찾았다고 가정해 보겠습니다. 사용법을 알려면 소스 코드를 직접 읽어야 합니다. 대부분의 사용자는 그 시점에서 비슷한 기능을 제공하는 다른 패키지로 이동합니다.
+
+## 멘탈 모델
+
+문서는 세 층으로 나누어 생각하면 편합니다. 1층 README는 “무엇이고 어떻게 시작하는가”를 설명하고, 2층 가이드는 “실제로 어떻게 쓰는가”를 보여 주며, 3층 API Reference는 “각 함수와 클래스가 정확히 무엇을 하는가”를 기록합니다.
 
 ```text
-README.md          →  30초 판단: 설치, 빠른 시작
-docs/guide.md      →  5분 튜토리얼: 주요 기능 사용법
-docs/api.md        →  상세 참조: 모든 함수/클래스의 스펙
+README.md          →  30-second decision: install, quick start
+docs/guide.md      →  5-minute tutorial: main features
+docs/api.md        →  detailed reference: specs for every function/class
 ```
 
 ## 핵심 개념
@@ -49,14 +60,14 @@ docs/api.md        →  상세 참조: 모든 함수/클래스의 스펙
 | 용어 | 설명 | 파일 |
 |---|---|---|
 | README | 프로젝트 소개, 설치, 빠른 시작 | `README.md` |
-| docstring | 함수/클래스에 달린 문서 문자열 | `"""..."""` |
+| docstring | 함수·클래스에 붙는 문서 문자열 | `"""..."""` |
 | MkDocs | Markdown 기반 문서 사이트 생성기 | `mkdocs.yml` |
-| mkdocstrings | docstring에서 API 문서 자동 생성 | MkDocs 플러그인 |
-| GitHub Pages | 무료 정적 사이트 호스팅 | `gh-pages` 브랜치 |
+| mkdocstrings | docstring에서 API 문서를 자동 생성하는 MkDocs 플러그인 | MkDocs plugin |
+| GitHub Pages | 무료 정적 사이트 호스팅 | `gh-pages` branch |
 
 ## Before / After
 
-**Before (문서 없음)**
+**Before (no documentation)**
 
 ```text
 README.md:
@@ -64,21 +75,21 @@ README.md:
 A Python library.
 ```
 
-**After (구조화된 문서)**
+**After (structured documentation)**
 
 ```text
 README.md:
 # mylib
 One-line description.
 
-## 설치
+## Installation
 pip install mylib
 
-## 빠른 시작
+## Quick Start
 from mylib import greet
 print(greet("World"))
 
-## 문서
+## Documentation
 https://yourname.github.io/mylib/
 ```
 
@@ -86,18 +97,18 @@ https://yourname.github.io/mylib/
 
 ### Step 1. README 작성
 
-```markdown
+````markdown
 # mylib
 
 A simple greeting library for Python.
 
-## 설치
+## Installation
 
 ```bash
 pip install mylib
 ```
 
-## 빠른 시작
+## Quick Start
 
 ```python
 from mylib.core import greet
@@ -105,13 +116,13 @@ from mylib.core import greet
 print(greet("World"))  # Hello, World!
 ```
 
-## 주요 기능
+## Features
 
-- 단순하고 가볍습니다
-- 타입 힌트를 포함합니다
-- `greet` 명령어 기반 CLI를 지원합니다
+- Simple and lightweight
+- Type-annotated
+- CLI support via `greet` command
 
-## 개발
+## Development
 
 ```bash
 git clone https://github.com/yourname/mylib
@@ -120,15 +131,15 @@ pip install -e ".[dev]"
 pytest tests/
 ```
 
-## 라이선스
+## License
 
 MIT
-```
+````
 
 ### Step 2. docstring 추가
 
 ```python
-# 예시 파일: src/mylib/core.py
+# src/mylib/core.py
 def greet(name: str) -> str:
     """Return a greeting message.
 
@@ -177,7 +188,7 @@ echo "# Guide" > docs/guide.md
 
 ```markdown
 <!-- docs/api.md -->
-# API Reference 문서
+# API Reference
 
 ::: mylib.core
     options:
@@ -187,74 +198,80 @@ echo "# Guide" > docs/guide.md
 
 ```bash
 mkdocs serve
-# INFO - http://127.0.0.1:8000/ 에서 서빙 중
+# INFO - Serving on http://127.0.0.1:8000/
 ```
 
 ### Step 5. GitHub Pages 배포
 
 ```bash
 mkdocs gh-deploy
-# INFO - https://yourname.github.io/mylib/ 에 배포됨
+# INFO - Deployed to https://yourname.github.io/mylib/
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 눈여겨볼 점
 
-- Google style docstring(`Args:`, `Returns:`)이 가장 널리 쓰이는 형식입니다
-- `mkdocstrings`의 `::: mylib.core`가 해당 모듈의 docstring을 자동으로 렌더링합니다
-- `mkdocs serve`로 로컬에서 문서를 미리보고, `mkdocs gh-deploy`로 배포합니다
-- `Examples:` 섹션의 `>>>` 코드는 `doctest`로 자동 테스트할 수 있습니다
+- Google style docstring(`Args:`, `Returns:`)은 Python 생태계에서 가장 널리 쓰이는 형식입니다.
+- `mkdocstrings`는 `::: mylib.core` 구문으로 해당 모듈의 docstring을 자동 렌더링합니다.
+- `mkdocs serve`는 로컬 미리보기이고, `mkdocs gh-deploy`는 실제 배포입니다.
+- `Examples:` 섹션의 `>>>` 예제는 `doctest`로 자동 검증할 수 있습니다.
 
 ## 자주 하는 실수
 
 ### 실수 1. README에 설치 방법을 빼먹는다
 
-사용자의 첫 행동은 "어떻게 설치하지?"입니다. `pip install mylib`을 반드시 포함하세요.
+사용자가 가장 먼저 시도하는 것은 설치입니다. `pip install mylib` 같은 최소 설치 방법은 반드시 README에 들어가야 합니다.
 
-### 실수 2. docstring이 코드와 다르다
+### 실수 2. docstring이 코드와 어긋난다
 
-코드를 수정한 후 docstring을 갱신하지 않으면 문서가 거짓말을 합니다. CI에서 `doctest`를 실행하여 예제가 동작하는지 확인하세요.
+코드는 바뀌었는데 docstring을 갱신하지 않으면 문서가 사실과 달라집니다. 예제가 계속 유효한지 `doctest`로 확인하는 습관이 중요합니다.
 
-### 실수 3. 문서 사이트만 있고 README가 없다
+### 실수 3. 문서 사이트만 있고 README가 약하다
 
-PyPI와 GitHub에서 사용자가 가장 먼저 보는 것은 README입니다. 문서 사이트 링크는 README에 넣되, README 자체도 독립적으로 유용해야 합니다.
+사용자가 PyPI와 GitHub에서 가장 먼저 보는 것은 README입니다. 문서 사이트 링크를 README에 걸어 두되, README 자체만 읽어도 시작할 수 있어야 합니다.
 
 ### 실수 4. API Reference만 있고 가이드가 없다
 
-API Reference는 "모든 함수의 목록"이지만, 사용자가 알고 싶은 것은 "어떤 순서로 어떤 함수를 써야 하는가"입니다. 가이드가 그 역할을 합니다.
+API Reference는 함수 목록을 알려 주지만, 사용자가 정말 알고 싶은 것은 “어떤 순서로 무엇을 써야 하는가”입니다. 이 간격을 메우는 것이 가이드 문서입니다.
 
 ### 실수 5. 문서를 배포하지 않는다
 
-로컬에서 `mkdocs serve`만 하고 배포하지 않으면 사용자가 접근할 수 없습니다. `mkdocs gh-deploy`나 CI에서 자동 배포하세요.
+로컬에서 `mkdocs serve`만 해 보고 끝내면 사용자에게는 아무것도 전달되지 않습니다. `mkdocs gh-deploy`나 CI 자동 배포를 반드시 연결하는 편이 좋습니다.
 
 ## 실무 적용
 
-- **PyPI README**: `[project.readme]`로 PyPI 페이지에 README를 렌더링합니다
-- **CI 문서 빌드**: PR마다 문서 빌드를 확인하여 깨진 링크나 렌더링 오류를 방지합니다
-- **버전별 문서**: `mike`(MkDocs 플러그인)로 버전별 문서를 호스팅합니다
-- **Jupyter 연동**: 노트북에서 `?` 또는 `help()`로 docstring을 바로 확인합니다
-- **자동 CHANGELOG**: `towncrier`로 PR 단위 변경 로그를 자동 취합합니다
+- **PyPI README**: `[project.readme]`로 PyPI 페이지에 README를 렌더링합니다.
+- **CI 문서 빌드**: 모든 PR에서 문서 빌드를 검증해 깨진 링크를 빨리 찾습니다.
+- **버전별 문서**: `mike` 플러그인으로 여러 버전의 문서를 함께 운영할 수 있습니다.
+- **Jupyter 연동**: 노트북에서 `?` 또는 `help()`로 docstring을 바로 확인할 수 있습니다.
+- **자동 CHANGELOG**: `towncrier`로 PR 단위 변경 사항을 자동 취합할 수 있습니다.
 
-## 실무에서는 이렇게 생각한다
+## 실무에서는 이렇게 생각합니다
 
-문서는 코드의 일부입니다. PR에 코드 변경이 있으면 문서 변경도 함께 리뷰합니다. "코드는 바뀌었는데 문서는 그대로"는 기술 부채입니다.
+문서는 코드와 분리된 부속물이 아니라 코드의 일부입니다. PR에서 코드가 바뀌었는데 문서가 그대로라면, 그 자체가 기술 부채로 누적됩니다.
 
-MkDocs + Material 테마가 현재 Python 생태계의 사실상 표준입니다. Sphinx는 더 강력하지만 진입 장벽이 높습니다. 새 프로젝트라면 MkDocs부터 시작하세요.
+현재 Python 생태계에서는 MkDocs + Material 조합이 사실상 기본 선택지에 가깝습니다. Sphinx는 더 강력하지만 진입 장벽이 높습니다. 새 프로젝트라면 일단 MkDocs로 시작하고, 이후 필요에 따라 확장하는 편이 보통 더 효율적입니다.
 
 ## 체크리스트
 
-- [ ] README에 설치 방법, 빠른 시작, 라이선스가 포함되어 있다
+- [ ] README에 설치, 빠른 시작, 라이선스가 포함되어 있다
 - [ ] 모든 public 함수에 docstring이 있다
 - [ ] MkDocs로 문서 사이트를 생성할 수 있다
-- [ ] mkdocstrings으로 API Reference를 자동 생성할 수 있다
+- [ ] `mkdocstrings`로 API Reference를 자동 생성할 수 있다
 - [ ] GitHub Pages에 문서를 배포할 수 있다
+
+## 연습 문제
+
+1. 이전 글의 패키지를 기준으로 README.md를 직접 작성해 보세요. 설치, 빠른 시작, 기능, 개발 환경, 라이선스를 포함해야 합니다.
+2. 모든 public 함수에 Google style docstring을 추가하고 `python -m doctest`로 예제가 동작하는지 확인해 보세요.
+3. MkDocs를 설정하고 `mkdocs serve`로 로컬 미리보기를 확인해 보세요.
 
 ## 정리 · 다음 글
 
-- README는 패키지의 현관문으로, 설치 · 빠른 시작 · 기능 소개가 필수입니다.
-- docstring은 Google style로 작성하고, 예제는 doctest로 검증합니다.
-- MkDocs + mkdocstrings로 docstring에서 API Reference를 자동 생성합니다.
-- `mkdocs gh-deploy`로 GitHub Pages에 무료로 문서를 호스팅합니다.
-- 문서는 코드의 일부이며, PR에 코드 변경이 있으면 문서도 함께 갱신합니다.
+- README는 패키지의 현관문이며, 설치·빠른 시작·기능 소개가 핵심입니다.
+- docstring은 Google style로 쓰고 `doctest`로 예제를 검증할 수 있습니다.
+- MkDocs + `mkdocstrings`로 API Reference를 자동 생성할 수 있습니다.
+- `mkdocs gh-deploy`로 GitHub Pages에 문서를 무료로 배포할 수 있습니다.
+- 문서는 코드의 일부이므로 코드 변경과 함께 항상 갱신해야 합니다.
 
 다음 글에서는 **실전 패키지 템플릿 만들기** — cookiecutter, copier, GitHub Template을 다룹니다.
 
