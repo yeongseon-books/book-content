@@ -2,7 +2,7 @@
 series: discrete-math-101
 episode: 7
 title: 조합과 경우의 수
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,80 +17,101 @@ tags:
   - 순열
   - 비둘기집 원리
   - 확률
-seo_description: 순열, 조합, 이항정리, 비둘기집 원리, 포함-배제 원리를 통해 경우의 수와 확률 분석의 기초를 배웁니다.
-last_reviewed: '2026-05-11'
+seo_description: 순열, 조합, 비둘기집 원리, 포함-배제로 경우의 수와 충돌 확률을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 조합과 경우의 수
 
-> Discrete Math 101 시리즈 (7/10)
-
+이 글은 Discrete Math 101 시리즈의 7번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-암호의 키 공간 크기, 무차별 대입 공격 시간, 생일 역설은 모두 조합론의 문제입니다. 알고리즘이 가능한 모든 입력에서 어떻게 동작할지 분석하려면 입력 공간의 크기를 알아야 하고, 그 크기를 세는 도구가 바로 조합론입니다.
+- 곱의 법칙과 합의 법칙은 어떻게 구분할까요?
+- 순열과 조합은 언제 달라질까요?
+- 이항계수와 파스칼 삼각형은 왜 중요한가요?
+- 비둘기집 원리와 포함-배제는 어떤 실무 문제를 설명할까요?
 
-> 조합론 = 가능성의 크기를 정확히 세는 도구
+> 조합론은 “가능한 경우가 몇 개인가”를 세는 수학입니다. 순열, 조합, 이항정리, 비둘기집 원리, 포함-배제는 알고리즘 입력 공간의 크기, 암호 키 공간, 해시 충돌 확률, 확률 계산을 다루는 기본 도구입니다. 이 글에서는 셈의 기본 법칙부터 충돌 필연성까지 코드와 함께 정리합니다.
 
-## 전체 흐름
-> 셈의 두 법칙(곱·합)에서 출발하여 순열·조합·이항정리·비둘기집·포함-배제로 확장됩니다.
+## 왜 중요한가
+
+암호 키 공간의 크기, 무차별 대입 공격 시간, 생일 역설은 모두 조합론 문제입니다. 어떤 알고리즘이 가능한 모든 입력에서 어떻게 행동할지 평가하려면 먼저 입력 공간의 크기를 알아야 하고, 그 계산을 맡는 것이 조합론입니다.
+
+> 조합론은 가능성의 크기를 정확히 재는 도구입니다.
+
+## 한눈에 보는 개념
+
+> 곱의 법칙과 합의 법칙이라는 두 기본 규칙이 순열, 조합, 이항정리, 비둘기집 원리, 포함-배제로 확장됩니다.
 
 ```text
-   기본 법칙
-  ┌─────────┐
-  │ 곱의 법칙 │ — 독립 선택의 곱
-  │ 합의 법칙 │ — 배타적 선택의 합
-  └─────┬─────┘
-        ↓
-  ┌─────────┬─────────┐
-  ↓         ↓         ↓
- 순열 P    조합 C    이항정리
-   │         │         │
-   └────┬────┴─────────┘
-        ↓
-  비둘기집 / 포함-배제
+   basic laws
+  ┌─────────────┐
+  │ product rule │ — independent choices multiply
+  │ sum rule     │ — exclusive choices add
+  └──────┬───────┘
+         ↓
+  ┌──────┬──────────┐
+  ↓      ↓          ↓
+perm. P  comb. C   binomial thm
+  │      │          │
+  └──┬───┴──────────┘
+     ↓
+ pigeonhole / inclusion-exclusion
 ```
+
+## 핵심 용어
+
+| 용어 | 표기 | 설명 |
+| --- | --- | --- |
+| Permutation | P(n, r) = n!/(n-r)! | n개 중 r개를 순서를 고려해 선택 |
+| Combination | C(n, r) = n!/(r!(n-r)!) | n개 중 r개를 순서 없이 선택 |
+| Binomial coefficient | (n choose r) | 조합 `C(n, r)`와 동일 |
+| Pigeonhole principle | n+1 → n | 적어도 한 칸에는 두 개 이상 들어감 |
+| Inclusion-exclusion | \|A∪B\| = \|A\| + \|B\| - \|A∩B\| | 중복 집계를 제거 |
 
 ## Before / After
 
-**Before — 셈 없이 무차별 시도:**
+**Before — brute force without counting:**
 
 ```python
-# "모든 경우를 시도해보자" — 얼마나 걸릴지 모름
+# "Just try everything" — no idea how long it takes
 import itertools
 for password in itertools.product("abc", repeat=4):
-    pass  # 81가지 — 작아 보이지만...
+    pass  # 81 cases — looks small, but...
 ```
 
-**After — 공간 크기 분석:**
+**After — analyzing the space size:**
 
 ```python
-# 4자리 영소문자: 26⁴ = 456,976
-# 8자리 영숫자대소문자+특수: 94⁸ ≈ 6.1 × 10¹⁵
+# 4-char lowercase: 26⁴ = 456,976
+# 8-char alphanumeric+symbols: 94⁸ ≈ 6.1 × 10¹⁵
 charset = 26
 length = 4
-print(f"공간 크기: {charset ** length:,}")
+print(f"space size: {charset ** length:,}")
 ```
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
 ### 1단계: 곱의 법칙과 합의 법칙
 
 ```python
-# 곱의 법칙: 독립적 선택의 경우는 곱한다
-# 예: 셔츠 5종, 바지 3종 → 코디 5 × 3 = 15
+# Product rule: multiply when choices are independent
+# Example: 5 shirts, 3 pants → 5 × 3 = 15 outfits
 
-shirts = ["흰", "검정", "회색", "남색", "베이지"]
-pants = ["청", "면", "정장"]
+shirts = ["white", "black", "gray", "navy", "beige"]
+pants = ["jeans", "chinos", "slacks"]
 
 outfits = [(s, p) for s in shirts for p in pants]
-print(f"코디 가짓수: {len(outfits)} = {len(shirts)} × {len(pants)}")
+print(f"outfits: {len(outfits)} = {len(shirts)} × {len(pants)}")
 
-# 합의 법칙: 배타적 선택은 더한다
-# 예: 점심으로 한식 4가지 또는 일식 3가지 → 4 + 3 = 7
+# Sum rule: add when choices are exclusive
+# Example: lunch is either 4 Korean dishes or 3 Japanese → 4 + 3 = 7
 korean = 4; japanese = 3
-print(f"점심 메뉴 가짓수: {korean + japanese}")
+print(f"lunch options: {korean + japanese}")
 ```
+
+둘을 섞지 않는 감각이 중요합니다. 동시에 일어나는 독립 선택은 곱하고, 서로 배타적인 선택지는 더합니다.
 
 ### 2단계: 순열과 조합
 
@@ -99,33 +120,33 @@ from math import factorial
 
 
 def permutation(n: int, r: int) -> int:
-    """순서를 고려한 r개 선택"""
+    """Ordered selection of r items from n."""
     return factorial(n) // factorial(n - r)
 
 
 def combination(n: int, r: int) -> int:
-    """순서를 고려하지 않는 r개 선택"""
+    """Unordered selection of r items from n."""
     return factorial(n) // (factorial(r) * factorial(n - r))
 
 
-# 5명 중 3명 줄세우기 (순서 중요)
+# Line up 3 people from 5 (order matters)
 print(f"P(5, 3) = {permutation(5, 3)}")
-# 5명 중 3명 위원회 (순서 무관)
+# Pick a 3-person committee from 5 (order does not matter)
 print(f"C(5, 3) = {combination(5, 3)}")
 
-# Python 내장
+# Built-in
 from itertools import permutations, combinations
-print(f"순열 수: {len(list(permutations(range(5), 3)))}")
-print(f"조합 수: {len(list(combinations(range(5), 3)))}")
+print(f"permutations: {len(list(permutations(range(5), 3)))}")
+print(f"combinations: {len(list(combinations(range(5), 3)))}")
 ```
 
-순서가 중요하면 순열이고, 순서가 중요하지 않으면 조합입니다. 비밀번호는 순열로 보고, 카드 패는 조합으로 봅니다.
+비밀번호는 순열 문제이고, 포커 핸드는 조합 문제입니다. “순서가 의미 있는가”를 먼저 묻는 습관이 실수를 크게 줄입니다.
 
 ### 3단계: 이항정리와 파스칼 삼각형
 
 ```python
-# 이항정리: (x + y)ⁿ = Σ C(n, k) xⁿ⁻ᵏ yᵏ
-# 계수가 곧 조합의 수
+# Binomial theorem: (x + y)ⁿ = Σ C(n, k) xⁿ⁻ᵏ yᵏ
+# The coefficients are exactly the combinations.
 
 def pascal_triangle(rows: int) -> list[list[int]]:
     triangle = [[1]]
@@ -140,27 +161,29 @@ for row in pascal_triangle(7):
     print(" ".join(str(x).rjust(3) for x in row).center(40))
 
 
-# (x + y)⁴ 전개: 계수는 1, 4, 6, 4, 1
+# (x + y)⁴ expansion: coefficients 1, 4, 6, 4, 1
 n = 4
-print(f"(x+y)^{n} 계수: {[combination(n, k) for k in range(n + 1)]}")
+print(f"(x+y)^{n} coefficients: {[combination(n, k) for k in range(n + 1)]}")
 ```
+
+이항정리의 계수가 곧 조합이라는 사실은 대수와 경우의 수가 따로 노는 주제가 아니라는 점을 잘 보여 줍니다.
 
 ### 4단계: 비둘기집 원리
 
 ```python
-# 비둘기집 원리: n+1개를 n칸에 넣으면 적어도 한 칸에 2개
-# 응용: 해시 충돌은 입력 공간이 출력 공간보다 크면 필연
+# Pigeonhole: put n+1 items in n boxes → at least one box has 2
+# Application: hash collisions are inevitable when input > output space
 
 def will_collide(input_space: int, hash_space: int) -> bool:
     return input_space > hash_space
 
 
-# 32비트 해시는 출력 4 × 10⁹
-# 100억 개의 ID를 32비트로 해시하면 충돌 보장
-print(f"100억 → 32bit 충돌? {will_collide(10 ** 10, 2 ** 32)}")
+# A 32-bit hash has 4 × 10⁹ outputs.
+# Hashing 10 billion IDs into 32 bits guarantees a collision.
+print(f"10B → 32-bit collision? {will_collide(10 ** 10, 2 ** 32)}")
 
 
-# 생일 역설: 23명만 모여도 같은 생일 쌍이 50% 확률로 존재
+# Birthday paradox: with just 23 people, two share a birthday with prob ~50%.
 def birthday_collision_prob(n: int, days: int = 365) -> float:
     no_collision = 1.0
     for i in range(n):
@@ -169,26 +192,26 @@ def birthday_collision_prob(n: int, days: int = 365) -> float:
 
 
 for n in [10, 23, 50, 100]:
-    print(f"n={n}: 충돌 확률 = {birthday_collision_prob(n):.3f}")
+    print(f"n={n}: collision probability = {birthday_collision_prob(n):.3f}")
 ```
 
-비둘기집 원리는 단순하지만 매우 강력합니다. 무손실 압축 알고리즘이 모든 입력을 줄일 수 없다는 사실도 이 원리에서 바로 따라옵니다.
+비둘기집 원리는 단순하지만 놀랄 만큼 강력합니다. 모든 입력을 더 짧게 압축하는 무손실 압축기는 존재할 수 없다는 사실도 이 원리의 직접적인 귀결입니다.
 
-### 5단계: 포함-배제 원리
+### 5단계: 포함-배제
 
 ```python
 # |A ∪ B| = |A| + |B| - |A ∩ B|
 # |A ∪ B ∪ C| = |A| + |B| + |C| - |A∩B| - |A∩C| - |B∩C| + |A∩B∩C|
 
 
-# 예: 100명 중 영어 학습자 60, 일어 40, 둘 다 20
+# Example: 100 students, 60 study English, 40 Japanese, 20 both
 def union_two(a: int, b: int, ab: int) -> int:
     return a + b - ab
 
 
-print(f"적어도 하나 학습: {union_two(60, 40, 20)}명")
+print(f"studying at least one: {union_two(60, 40, 20)} students")
 
-# 1~100 중 2 또는 3 또는 5의 배수 개수
+# Multiples of 2 or 3 or 5 between 1 and 100
 def multiples_count(limit: int, n: int) -> int:
     return limit // n
 
@@ -199,49 +222,61 @@ m6, m10, m15 = multiples_count(limit, 6), multiples_count(limit, 10), multiples_
 m30 = multiples_count(limit, 30)
 
 answer = m2 + m3 + m5 - m6 - m10 - m15 + m30
-print(f"1~100 중 2,3,5의 배수: {answer}개")
+print(f"multiples of 2, 3, or 5 in 1..100: {answer}")
 ```
 
-포함-배제는 중복을 정확히 제거하는 도구입니다. 데이터베이스의 OR 쿼리 카디널리티 추정에도 쓰입니다.
+포함-배제는 OR 조건이 붙는 순간 거의 자동으로 떠올라야 하는 도구입니다. 데이터베이스 쿼리 옵티마이저가 OR 카디널리티를 추정할 때도 같은 원리를 씁니다.
 
-## 이 코드에서 주목할 점
+## 주목할 점
 
-- 조합론은 입력 공간의 크기를 정확히 계산하는 도구
-- 순열 = 순서 O, 조합 = 순서 X
-- 비둘기집 원리는 충돌의 필연성을 설명
-- 포함-배제는 OR 셈의 표준 기법
+- 조합론은 입력 공간의 정확한 크기를 계산합니다.
+- 순열은 순서를 따지고, 조합은 따지지 않습니다.
+- 비둘기집 원리는 충돌이 피할 수 없는 이유를 설명합니다.
+- 포함-배제는 OR 조건의 개수를 세는 표준 도구입니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| 순열·조합 혼동 | 잘못된 경우의 수 | "순서가 의미 있나?" 질문 |
-| 곱·합의 법칙 혼동 | 독립/배타 구분 실패 | "동시 발생인가, 둘 중 하나인가" |
-| 중복 허용 여부 무시 | 같은 원소 재선택 가능성 | 중복 순열은 nʳ |
-| 비둘기집 원리 약식 적용 | n+1이 아닌 경우 적용 | 정확한 조건 확인 |
-| 포함-배제 부호 오류 | 짝수개 교집합 부호 +/- | 일반화된 공식 참조 |
+| 순열과 조합을 섞는다 | 경우의 수를 틀리게 센다 | 순서가 중요한지 먼저 묻는다 |
+| 곱의 법칙과 합의 법칙을 섞는다 | 독립 선택과 배타 선택을 혼동한다 | 동시에 일어나는지, 둘 중 하나인지 구분한다 |
+| 중복 허용을 놓친다 | 같은 원소 재선택을 빼먹는다 | 반복 허용 여부를 먼저 확인한다 |
+| 비둘기집 원리를 느슨하게 적용한다 | `n+1 → n` 조건이 빠진다 | 정확한 조건을 써 본다 |
+| 포함-배제 부호를 틀린다 | 교집합 항의 더하기·빼기가 뒤집힌다 | 일반 부호 패턴을 유지한다 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 사용합니다
 
-- 비밀번호 정책 설계 (키 공간 크기 계산)
-- 해시 함수 충돌 확률 분석 (생일 역설)
-- A/B 테스트 표본 크기 산정
-- 데이터베이스 쿼리 옵티마이저의 카디널리티 추정
-- 분산 시스템의 ID 충돌 회피 (UUID, Snowflake)
+- 비밀번호 정책의 키 공간 크기를 계산합니다.
+- 해시 충돌 확률을 생일 역설로 추정합니다.
+- A/B 테스트 표본 크기 계산에 씁니다.
+- 데이터베이스 OR 쿼리의 카디널리티를 추정합니다.
+- UUID, Snowflake 같은 ID 설계에서 충돌 확률을 판단합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 “이 설계면 충분한가”를 감으로 넘기지 않고 숫자로 답합니다. UUID v4의 충돌 가능성, 32비트 해시의 한계, 비밀번호 정책의 강도는 모두 조합론으로 즉시 계산합니다. 알고리즘을 고를 때도 “가능한 입력 수가 얼마나 큰가”를 먼저 묻습니다.
 
 ## 체크리스트
 
-- [ ] 곱·합의 법칙을 구분할 수 있는가
-- [ ] 순열과 조합의 차이를 안전하게 판단할 수 있는가
-- [ ] 비둘기집 원리로 해시 충돌의 필연성을 설명할 수 있는가
-- [ ] 포함-배제 원리로 OR 카디널리티를 계산할 수 있는가
-- [ ] 생일 역설을 직관적으로 이해했는가
+- [ ] 곱의 법칙과 합의 법칙을 구분할 수 있다
+- [ ] 순열과 조합 중 무엇을 써야 할지 판단할 수 있다
+- [ ] 비둘기집 원리로 해시 충돌의 필연성을 설명할 수 있다
+- [ ] 포함-배제로 OR 카디널리티를 계산할 수 있다
+- [ ] 생일 역설에 대한 직관이 있다
+
+## 연습 문제
+
+1. 대문자, 소문자, 숫자, 특수문자 8개를 사용하는 8자리 비밀번호의 키 공간을 계산하고 초당 `10⁹`회 추측 시 평균 크랙 시간을 추정해 보세요.
+
+2. 포함-배제로 1부터 1000까지에서 7 또는 11 또는 13의 배수 개수를 구해 보세요.
+
+3. UUID v4 충돌 확률을 생일 역설로 근사해 보세요. 1조 개를 생성했을 때 충돌 가능성은 어느 정도인가요?
 
 ## 정리 및 다음 단계
 
-조합론은 "가능성의 크기"를 정확히 세는 수학입니다. 곱·합의 법칙, 순열·조합, 이항정리, 비둘기집·포함-배제 원리는 보안·해시·확률 분석의 표준 도구입니다.
+조합론은 가능성의 크기를 재는 수학입니다. 곱과 합의 법칙, 순열과 조합, 이항정리, 비둘기집 원리, 포함-배제는 보안, 해시, 확률, 완전 탐색 분석에서 반복적으로 등장합니다.
 
-다음 글에서는 이산수학의 또 다른 큰 영역 — 그래프 이론의 기초 — 를 살펴봅니다.
+다음 글에서는 이산수학의 또 다른 핵심 분야인 그래프 이론으로 넘어가겠습니다.
 
 <!-- toc:begin -->
 - [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)

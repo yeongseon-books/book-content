@@ -2,7 +2,7 @@
 series: discrete-math-101
 episode: 2
 title: 명제와 논리
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,47 +17,66 @@ tags:
   - 추론
   - 진리표
   - 술어 논리
-seo_description: 명제, 진리값, 논리 연산자, 진리표, 술어와 양화사를 통해 모든 컴퓨터 추론의 기초를 배웁니다.
-last_reviewed: '2026-05-11'
+seo_description: 명제, 진리값, 논리 연산자, 진리표, 술어와 양화사로 컴퓨터 추론의 기초를 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 명제와 논리
 
-> Discrete Math 101 시리즈 (2/10)
-
+이 글은 Discrete Math 101 시리즈의 2번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-코드의 모든 if 문은 명제의 평가입니다. 데이터베이스의 모든 쿼리는 술어의 충족 여부를 묻습니다. 회로 설계의 모든 게이트는 논리 연산입니다. 명제 논리를 모르면 복잡한 조건문을 단순화할 수도, 정확히 디버깅할 수도 없습니다.
+- 명제와 비명제는 어떻게 구분할까요?
+- 다섯 가지 기본 논리 연산자는 어떻게 동작할까요?
+- 진리표로 논리적 동치를 어떻게 확인할까요?
+- 술어와 양화사 ∀, ∃는 명제 논리를 어떻게 확장할까요?
 
-> 명제 논리 = 정확한 사고를 위한 기호 체계
+> 명제 논리는 참과 거짓이 분명한 문장, 그리고 그것들을 결합하는 연산자의 체계입니다. 모든 프로그래밍 언어의 조건문, 모든 SQL `WHERE` 절, 모든 디지털 회로의 논리 게이트는 이 구조를 그대로 사용합니다. 이 글에서는 명제, 진리표, 동치 변형, 술어 논리까지 한 흐름으로 정리합니다.
 
-이 글에서는 논리의 기초를 차근차근 정리하고, 다음 글의 집합 이론으로 자연스럽게 이어 가겠습니다.
+## 왜 중요한가
 
-## 전체 흐름
-> 명제는 진리값(참/거짓)을 가지며, 논리 연산자로 결합됩니다. 모든 결합은 진리표로 정의됩니다.
+모든 `if` 문은 명제의 평가입니다. 모든 데이터베이스 질의는 어떤 술어가 만족되는지 묻습니다. 모든 디지털 회로 게이트는 논리 연산입니다. 명제 논리를 이해하지 못하면 복잡한 조건문을 줄이거나, 조건의 의미를 엄밀하게 검증하거나, 엣지 케이스를 자신 있게 다룰 수 없습니다.
+
+> 명제 논리는 정확한 추론을 위한 기호 체계입니다.
+
+이 글에서 세운 논리의 기초는 다음 글의 집합 이론으로 자연스럽게 이어집니다.
+
+## 한눈에 보는 개념
+
+> 명제는 진리값을 가지고, 논리 연산자는 그 진리값을 결합합니다. 연산의 의미는 모두 진리표로 정의됩니다.
 
 ```text
-  명제 P, Q  ──→  연산자  ──→  복합 명제
+  Props P, Q  ──→  Operators  ──→  Compound prop.
                  ┌──────────┐
                  │ ¬ (NOT)  │
                  │ ∧ (AND)  │
                  │ ∨ (OR)   │
-                 │ → (함의) │
-                 │ ↔ (동치) │
+                 │ → (impl) │
+                 │ ↔ (iff)  │
                  └──────────┘
                        ↓
-                    진리표
+                  Truth tables
                        ↓
-                  논리적 동치
+                Logical equivalence
 ```
+
+## 핵심 용어
+
+| 용어 | 기호 | 의미 |
+| --- | --- | --- |
+| Negation | ¬P | P가 거짓일 때 참 |
+| Conjunction | P ∧ Q | 둘 다 참일 때만 참 |
+| Disjunction | P ∨ Q | 하나 이상 참이면 참 |
+| Implication | P → Q | P 참, Q 거짓일 때만 거짓 |
+| Biconditional | P ↔ Q | 두 진리값이 같을 때 참 |
 
 ## Before / After
 
-**Before — 논리를 모를 때:**
+**Before — without logic:**
 
 ```python
-# 중첩된 조건문, 단순화 불가
+# Nested conditions, no simplification
 if not (x > 0 and y > 0):
     if not (x > 0):
         handle_x()
@@ -65,7 +84,7 @@ if not (x > 0 and y > 0):
         handle_y()
 ```
 
-**After — 드모르간 법칙으로 단순화:**
+**After — De Morgan's law applied:**
 
 ```python
 # ¬(P ∧ Q) ≡ ¬P ∨ ¬Q
@@ -76,18 +95,18 @@ if x <= 0 or y <= 0:
         handle_y()
 ```
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
 ### 1단계: 명제와 진리값
 
 ```python
-# 명제: 참 또는 거짓이 명확한 문장
-# 비명제: "오늘 날씨 어때?"는 의문문이라 명제가 아님
+# A proposition is unambiguously true or false
+# A question is not a proposition
 
 propositions = {
-    "2는 짝수이다": True,
-    "파리는 미국의 수도이다": False,
-    "100은 소수이다": False,
+    "2 is even": True,
+    "Paris is the capital of the United States": False,
+    "100 is prime": False,
     "1 + 1 = 2": True,
 }
 
@@ -95,7 +114,9 @@ for statement, truth in propositions.items():
     print(f"{statement}: {truth}")
 ```
 
-### 2단계: 기본 논리 연산자
+명제는 참이나 거짓이 분명해야 합니다. 질문, 명령, 감탄처럼 진리값이 정해지지 않는 문장은 명제가 아닙니다. 이 구분이 흐려지면 이후의 모든 논리식도 애매해집니다.
+
+### 2단계: 기본 연산자
 
 ```python
 def NOT(p: bool) -> bool:
@@ -111,30 +132,30 @@ def OR(p: bool, q: bool) -> bool:
 
 
 def IMPLIES(p: bool, q: bool) -> bool:
-    """P → Q: P가 참이고 Q가 거짓일 때만 거짓"""
+    """P → Q: false only when P true and Q false"""
     return (not p) or q
 
 
 def IFF(p: bool, q: bool) -> bool:
-    """P ↔ Q: 진리값이 같을 때만 참"""
+    """P ↔ Q: true when both have the same value"""
     return p == q
 
 
 print(IMPLIES(True, False))  # False
-print(IMPLIES(False, True))  # True (전제가 거짓이면 항상 참)
+print(IMPLIES(False, True))  # True (false premise → always true)
 print(IFF(True, True))       # True
 ```
 
-함의 P → Q에서 "P가 거짓이면 항상 참"이라는 점은 처음에는 직관에 어긋나 보일 수 있습니다. "비가 오면 우산을 챙긴다"는 약속은 비가 오지 않은 날에는 깨지지 않는다고 보면 이해가 쉽습니다.
+초보자가 가장 많이 놀라는 부분은 함의입니다. `P → Q`는 P가 거짓이면 참이 됩니다. “비가 오면 우산을 챙긴다”는 약속은 비가 오지 않은 날 위반되지 않는다고 생각하면 직관이 맞춰집니다.
 
-### 3단계: 진리표 자동 생성
+### 3단계: 진리표 생성
 
 ```python
 from itertools import product
 
 
 def truth_table(variables: list[str], expr) -> None:
-    """주어진 변수와 표현식의 진리표를 출력합니다."""
+    """Print the truth table for a given expression."""
     header = " | ".join(variables) + " | result"
     print(header)
     print("-" * len(header))
@@ -145,11 +166,11 @@ def truth_table(variables: list[str], expr) -> None:
         print(row)
 
 
-# (P ∧ Q) → P 의 진리표
+# Truth table for (P ∧ Q) → P
 truth_table(["P", "Q"], lambda P, Q: IMPLIES(AND(P, Q), P))
 ```
 
-진리표는 명제 논리를 실제로 펼쳐 보는 도구입니다. 모든 변수 조합에 대한 결과를 빠짐없이 나열하므로 동치 여부를 확실하게 확인할 수 있습니다.
+진리표는 명제 논리의 실행 표와 같습니다. 입력 조합을 모두 열거하기 때문에 동치 여부를 가장 확실하게 확인할 수 있습니다.
 
 ### 4단계: 드모르간 법칙 검증
 
@@ -158,7 +179,7 @@ truth_table(["P", "Q"], lambda P, Q: IMPLIES(AND(P, Q), P))
 # ¬(P ∨ Q) ≡ ¬P ∧ ¬Q
 
 def equivalent(expr1, expr2, variables: list[str]) -> bool:
-    """두 표현식이 모든 입력에서 같은 결과를 내는지 확인합니다."""
+    """Two expressions are equivalent if they agree on every input."""
     for values in product([False, True], repeat=len(variables)):
         env = dict(zip(variables, values))
         if expr1(**env) != expr2(**env):
@@ -169,73 +190,87 @@ def equivalent(expr1, expr2, variables: list[str]) -> bool:
 lhs = lambda P, Q: NOT(AND(P, Q))
 rhs = lambda P, Q: OR(NOT(P), NOT(Q))
 
-print(f"드모르간 법칙 성립: {equivalent(lhs, rhs, ['P', 'Q'])}")
+print(f"De Morgan holds: {equivalent(lhs, rhs, ['P', 'Q'])}")
 ```
+
+코드 리뷰에서 자주 쓰는 조건문 단순화는 대부분 이런 동치 변형입니다. 논리식이 짧아질수록 버그 표면적도 함께 줄어듭니다.
 
 ### 5단계: 술어와 양화사
 
 ```python
-# 술어(predicate): 변수에 따라 진리값이 결정되는 명제 함수
+# A predicate is a proposition-valued function over a variable
 def is_even(n: int) -> bool:
     return n % 2 == 0
 
 
-# 전칭 양화 ∀: "모든 n에 대해"
+# Universal ∀: "for all n"
 def for_all(domain, predicate) -> bool:
     return all(predicate(x) for x in domain)
 
 
-# 존재 양화 ∃: "어떤 n이 존재하여"
+# Existential ∃: "there exists an n"
 def there_exists(domain, predicate) -> bool:
     return any(predicate(x) for x in domain)
 
 
 numbers = [2, 4, 6, 8, 10]
 
-print(f"∀x ∈ {numbers}: x는 짝수 = {for_all(numbers, is_even)}")
-print(f"∃x ∈ [1,2,3]: x는 짝수 = {there_exists([1, 2, 3], is_even)}")
+print(f"∀x ∈ {numbers}: x is even = {for_all(numbers, is_even)}")
+print(f"∃x ∈ [1,2,3]: x is even = {there_exists([1, 2, 3], is_even)}")
 ```
 
-양화사는 SQL의 ALL, ANY와 동일한 개념입니다. `WHERE x > ALL(SELECT ...)`은 전칭 양화입니다.
+양화사는 술어를 실제 명제로 닫아 주는 도구입니다. SQL의 `ALL`, `ANY`와 직접 이어진다고 보면 훨씬 실용적으로 이해할 수 있습니다.
 
-## 이 코드에서 주목할 점
+## 주목할 점
 
-- 모든 논리 연산자는 진리표로 정의됩니다
-- 함의 P → Q는 ¬P ∨ Q와 동치입니다
-- 드모르간 법칙은 부정의 분배를 제어합니다
-- 양화사 ∀, ∃는 술어를 명제로 변환합니다
+- 모든 논리 연산자는 진리표로 정의됩니다.
+- `P → Q`는 `¬P ∨ Q`와 논리적으로 같습니다.
+- 드모르간 법칙은 부정이 분배되는 방식을 통제합니다.
+- 양화사 ∀, ∃는 술어를 명제로 바꿉니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| 함의의 진리값 오해 | "전제가 거짓이면 참" 직관에 반함 | "거짓에서 무엇이든 도출"을 기억 |
-| AND/OR 우선순위 혼동 | 괄호 누락으로 버그 | 항상 명시적으로 괄호 사용 |
-| 부정의 잘못된 분배 | ¬(P ∧ Q) = ¬P ∧ ¬Q로 오인 | 드모르간 법칙 암기 |
-| ∀와 ∃ 순서 바꿈 | "모든 x에 어떤 y" vs "어떤 y가 모든 x에" 다름 | 양화사 순서 엄격히 유지 |
-| 술어와 명제 혼동 | 변수가 있는 P(x)는 명제가 아님 | 양화사로 닫아야 명제가 됨 |
+| 함의를 직관적으로만 읽는다 | “거짓 전제면 참”이 계속 낯설다 | 정의를 진리표 기준으로 익힌다 |
+| AND/OR 우선순위를 대충 처리한다 | 괄호가 빠져 버그가 생긴다 | 복합식은 항상 괄호를 명시한다 |
+| 부정을 잘못 분배한다 | `¬(P ∧ Q)`를 잘못 바꾼다 | 드모르간 법칙을 확실히 익힌다 |
+| ∀와 ∃의 순서를 바꾼다 | 전혀 다른 명제가 된다 | 양화사 순서를 그대로 유지한다 |
+| 술어를 명제로 착각한다 | 자유변수가 남아 의미가 흐려진다 | 양화사로 닫아 준다 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 사용합니다
 
-- SQL `WHERE` 절 최적화 시 논리적 동치 변환
-- 코드 리뷰에서 복잡한 조건문을 드모르간 법칙으로 단순화
-- 회로 설계의 논리 게이트(AND, OR, NOT, NAND, NOR)
-- 정형 검증(formal verification)에서 시스템 속성을 명제로 표현
-- 검색 엔진의 불리언 쿼리(`apple AND NOT pie`)
+- SQL `WHERE` 최적화는 논리적 동치 변형을 활용합니다.
+- 코드 리뷰에서는 복잡한 조건문을 드모르간 법칙으로 정리합니다.
+- 디지털 회로 설계는 AND, OR, NOT, NAND, NOR 게이트 위에 서 있습니다.
+- 형식 검증은 시스템 속성을 명제로 표현합니다.
+- 검색 엔진의 불리언 질의는 그대로 명제 논리입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 복잡한 `if` 문을 보면 먼저 “이걸 더 단순하게 만들 수 있는가”를 묻습니다. 머릿속에서 진리표를 그리거나 동치 변형을 적용해 조건을 절반 이하로 줄이는 경우가 흔합니다. 또한 “이 조건은 항상 성립하는가, 가끔만 성립하는가”라는 양화사의 감각으로 엣지 케이스를 점검합니다.
 
 ## 체크리스트
 
-- [ ] 다섯 가지 논리 연산자의 진리표를 그릴 수 있는가
-- [ ] 함의 P → Q의 의미를 직관적으로 설명할 수 있는가
-- [ ] 드모르간 법칙을 코드에 적용할 수 있는가
-- [ ] ∀와 ∃의 차이를 SQL 예시로 설명할 수 있는가
-- [ ] 술어와 명제의 차이를 이해했는가
+- [ ] 다섯 가지 기본 연산자의 진리표를 그릴 수 있다
+- [ ] 함의의 의미를 직관적으로 설명할 수 있다
+- [ ] 드모르간 법칙을 실제 코드에 적용할 수 있다
+- [ ] ∀와 ∃를 SQL 예시로 설명할 수 있다
+- [ ] 술어와 명제의 차이를 구분할 수 있다
+
+## 연습 문제
+
+1. `(P → Q) ∧ (Q → R) → (P → R)`의 진리표를 만들어 항진명제인지 확인해 보세요.
+
+2. 자신이 작성한 중첩 `if` 문 하나를 골라 드모르간 법칙으로 단순화해 보세요.
+
+3. 정수 전체에서 `∀x ∃y: x + y = 0`과 `∃y ∀x: x + y = 0`의 참·거짓을 각각 판단하고 이유를 설명해 보세요.
 
 ## 정리 및 다음 단계
 
-명제 논리는 모든 컴퓨터 추론의 기초입니다. 다섯 가지 연산자, 진리표, 동치 법칙을 도구로 사용하면 복잡한 조건문도 정확히 다룰 수 있습니다. 양화사를 통해 명제는 술어로 확장되고, 더 풍부한 표현이 가능해집니다.
+명제 논리는 모든 컴퓨터 추론의 기초입니다. 다섯 가지 논리 연산자, 진리표, 동치 법칙을 이해하면 복잡한 조건도 정밀하게 조작할 수 있습니다. 여기에 양화사가 더해지면 표현력은 술어 논리로 확장됩니다.
 
-다음 글에서는 명제 논리와 함께 이산수학의 양대 기초인 "집합과 함수"를 살펴봅니다.
+다음 글에서는 논리와 함께 이산수학의 또 다른 기초인 집합과 함수를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)

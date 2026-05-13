@@ -2,7 +2,7 @@
 series: discrete-math-101
 episode: 9
 title: 트리와 그래프 탐색
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,39 +17,58 @@ tags:
   - BFS
   - DFS
   - 신장 트리
-seo_description: 트리의 정의, BFS와 DFS 탐색, 신장 트리와 최소 신장 트리(MST)의 개념을 코드와 함께 정리합니다.
-last_reviewed: '2026-05-04'
+seo_description: 트리, BFS, DFS, 신장 트리와 MST를 그래프 탐색의 기본 도구로 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 트리와 그래프 탐색
 
-> Discrete Math 101 시리즈 (9/10)
-
+이 글은 Discrete Math 101 시리즈의 9번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-파일 시스템, DOM, 컴파일러 AST, 데이터베이스 인덱스 — 거의 모든 시스템에 트리가 숨어 있습니다. BFS와 DFS는 그래프 알고리즘의 출발점이며, 최단 경로·사이클 검사·위상 정렬·MST 등 수많은 문제의 기반입니다.
+- 트리의 정의와 성질은 무엇일까요?
+- BFS는 왜 최단 경로와 연결될까요?
+- DFS는 어떤 문제에서 강할까요?
+- 신장 트리와 최소 신장 트리(MST)는 무엇이 다를까요?
 
-> 트리 = 가장 단순한 비자명 그래프. 탐색 = 그래프 알고리즘의 기본 동작.
+> 트리는 연결되어 있으면서 사이클이 없는 그래프입니다. 그래프 알고리즘에서 가장 자주 만나는 부분구조이며, BFS와 DFS는 그래프 위를 움직이는 두 가지 기본 탐색입니다. 이 글에서는 트리의 핵심 성질, BFS와 DFS, 신장 트리, 최소 신장 트리까지 실전 코드와 함께 정리합니다.
 
-## 전체 흐름
-> 트리: 사이클 없는 연결 무방향 그래프. n개 정점이면 정확히 n-1개의 간선. 임의의 두 정점 사이에 경로가 정확히 하나.
+## 왜 중요한가
+
+파일 시스템, DOM, 컴파일러 AST, 데이터베이스 인덱스처럼 많은 시스템 내부에는 트리가 숨어 있습니다. BFS와 DFS는 최단 경로, 사이클 검출, 위상 정렬, MST의 출발점입니다.
+
+> 트리는 가장 단순한 비자명 그래프이고, 탐색은 그래프 알고리즘의 기본 동작입니다.
+
+## 한눈에 보는 개념
+
+> 트리는 연결된 무사이클 무방향 그래프입니다. 정점이 n개면 간선은 정확히 n-1개이고, 임의의 두 정점 사이 경로는 정확히 하나입니다.
 
 ```text
-     트리                    BFS 순서             DFS 순서
-       1                    1 → 2 → 3            1 → 2 → 4
-      / \                   → 4 → 5 → 6          → 5 → 3 → 6
-     2   3                  (레벨 단위)          (한 가지 끝까지)
-    / \   \
-   4   5   6
+       tree                    BFS order            DFS order
+        1                    1 → 2 → 3            1 → 2 → 4
+       / \                   → 4 → 5 → 6          → 5 → 3 → 6
+      2   3                  (level by level)     (one branch first)
+     / \   \
+    4   5   6
 ```
+
+## 핵심 용어
+
+| 용어 | 설명 |
+| --- | --- |
+| Tree | 연결된 사이클 없는 그래프 |
+| Root | 선택된 시작 정점 |
+| Leaf | 차수 1의 정점 |
+| Spanning tree | 모든 정점을 포함하는 부분 트리 |
+| MST | 총 가중치가 최소인 신장 트리 |
 
 ## Before / After
 
-**Before — 모든 노드를 개별적으로 확인:**
+**Before — checking every node by hand:**
 
 ```python
-# 친구의 친구를 손으로 검색 — 깊이마다 중복 코드
+# Friends-of-friends, written manually — duplicate code per depth
 def friends_of_friends(person):
     result = set()
     for f in friends_of(person):
@@ -58,14 +77,14 @@ def friends_of_friends(person):
     return result
 ```
 
-**After — BFS로 임의 거리 탐색:**
+**After — BFS for arbitrary distance:**
 
 ```python
 from collections import deque
 
 
 def reachable_within(graph, start, max_distance):
-    """start로부터 거리 max_distance 이내의 모든 정점."""
+    """All vertices within distance max_distance from start."""
     visited = {start: 0}
     queue = deque([start])
     while queue:
@@ -79,16 +98,16 @@ def reachable_within(graph, start, max_distance):
     return visited
 ```
 
-## 단계별로 따라하기
+## 단계별로 따라가기
 
-### 1단계: 트리의 정의와 검증
+### 1단계: 트리 정의와 검증
 
 ```python
 from collections import defaultdict
 
 
 def is_tree(edges: list, n_nodes: int) -> bool:
-    """무방향 그래프가 트리인지 검사 — 간선 수와 연결성 확인."""
+    """Test whether an undirected graph is a tree — check edge count and connectivity."""
     if len(edges) != n_nodes - 1:
         return False
     adj = defaultdict(set)
@@ -106,16 +125,16 @@ def is_tree(edges: list, n_nodes: int) -> bool:
 
 
 tree_edges = [(1, 2), (1, 3), (2, 4), (2, 5), (3, 6)]
-print(f"트리인가: {is_tree(tree_edges, 6)}")
+print(f"is tree: {is_tree(tree_edges, 6)}")
 ```
 
-트리의 핵심 성질: n개 정점이면 정확히 n-1개의 간선이며, 임의의 간선을 제거하면 연결이 끊어집니다.
+트리를 판정할 때 가장 실용적인 감각은 `V - 1 = E`와 연결성입니다. 이 두 조건이 함께 맞아떨어지면 트리라는 판단이 매우 쉬워집니다.
 
 ### 2단계: BFS — 너비 우선 탐색
 
 ```python
 def bfs(graph: dict, start) -> dict:
-    """start로부터 모든 정점까지의 최소 간선 수 (가중치 1 가정)."""
+    """Minimum number of edges from start to every vertex (assuming weight 1)."""
     distances = {start: 0}
     queue = deque([start])
     while queue:
@@ -128,16 +147,16 @@ def bfs(graph: dict, start) -> dict:
 
 
 graph = {1: [2, 3], 2: [1, 4, 5], 3: [1, 6], 4: [2], 5: [2], 6: [3]}
-print(f"1로부터 거리: {bfs(graph, 1)}")
+print(f"distances from 1: {bfs(graph, 1)}")
 ```
 
-BFS는 큐를 사용해 가까운 정점부터 방문합니다. 가중치가 모두 같다면 BFS가 최단 경로를 찾습니다.
+BFS는 큐를 사용해 가까운 정점부터 탐색합니다. 모든 간선 가중치가 같다면 BFS가 최단 경로를 준다는 사실이 실무적으로 특히 중요합니다.
 
 ### 3단계: DFS — 깊이 우선 탐색
 
 ```python
 def dfs_recursive(graph: dict, start, visited=None) -> list:
-    """재귀 DFS — 방문 순서를 반환."""
+    """Recursive DFS — returns visit order."""
     if visited is None:
         visited = set()
     if start in visited:
@@ -150,7 +169,7 @@ def dfs_recursive(graph: dict, start, visited=None) -> list:
 
 
 def dfs_iterative(graph: dict, start) -> list:
-    """스택 기반 DFS — 깊이가 매우 큰 경우 안전."""
+    """Stack-based DFS — safe when depth is large."""
     visited, order, stack = set(), [], [start]
     while stack:
         v = stack.pop()
@@ -161,17 +180,17 @@ def dfs_iterative(graph: dict, start) -> list:
     return order
 
 
-print(f"DFS 재귀: {dfs_recursive(graph, 1)}")
-print(f"DFS 반복: {dfs_iterative(graph, 1)}")
+print(f"DFS recursive: {dfs_recursive(graph, 1)}")
+print(f"DFS iterative: {dfs_iterative(graph, 1)}")
 ```
 
-DFS는 한 경로를 끝까지 탐색한 뒤 백트래킹합니다. 사이클 검사, 위상 정렬, 강한 연결 요소 검출 등에 사용됩니다.
+DFS는 한 갈래를 끝까지 따라간 뒤 되돌아옵니다. 그래서 사이클 검출, 위상 정렬, 강한 연결 요소처럼 구조를 깊게 파악하는 문제에 잘 맞습니다.
 
-### 4단계: 신장 트리와 BFS/DFS의 관계
+### 4단계: BFS/DFS가 만드는 신장 트리
 
 ```python
 def spanning_tree_bfs(graph: dict, start) -> list:
-    """BFS로 신장 트리 추출."""
+    """Extract a spanning tree via BFS."""
     visited = {start}
     tree = []
     queue = deque([start])
@@ -185,16 +204,16 @@ def spanning_tree_bfs(graph: dict, start) -> list:
     return tree
 
 
-print(f"신장 트리(BFS): {spanning_tree_bfs(graph, 1)}")
+print(f"spanning tree (BFS): {spanning_tree_bfs(graph, 1)}")
 ```
 
-BFS와 DFS는 모두 그래프의 신장 트리를 구성합니다. 신장 트리는 정점을 모두 포함하면서 사이클이 없는 부분 그래프입니다.
+BFS와 DFS는 모두 그래프 전체를 덮는 신장 트리를 만들 수 있습니다. 즉, 탐색 과정 자체가 그래프의 뼈대를 하나 뽑아내는 작업이기도 합니다.
 
 ### 5단계: 최소 신장 트리(MST) — Kruskal
 
 ```python
 def kruskal_mst(n_nodes: int, weighted_edges: list) -> list:
-    """가중치 합이 최소인 신장 트리 — Union-Find 사용."""
+    """Spanning tree of minimum total weight — uses Union-Find."""
     parent = list(range(n_nodes))
 
     def find(x):
@@ -223,46 +242,58 @@ edges = [(1, 0, 1), (4, 0, 2), (2, 1, 2), (3, 1, 3), (5, 2, 3)]
 print(f"MST: {kruskal_mst(4, edges)}")
 ```
 
-Kruskal은 간선을 가중치 순으로 정렬하고, 사이클을 만들지 않는 간선만 선택합니다. 통신망 설계, 클러스터링, 회로 배선 등에 사용됩니다.
+Kruskal은 간선을 가중치 순으로 보되 사이클을 만드는 간선은 건너뜁니다. 통신망 설계, 배선, 클러스터링에서 자주 쓰이는 이유가 바로 이 단순함과 강력함에 있습니다.
 
-## 이 코드에서 주목할 점
+## 주목할 점
 
-- BFS와 DFS는 데이터 구조(큐 vs 스택)만 다를 뿐 골격은 같음
-- 트리는 V-1개의 간선이라는 단순한 성질로 검증 가능
-- BFS의 신장 트리는 최단 경로 트리(가중치 동일 시)
-- MST는 그리디 알고리즘이 정답을 보장하는 드문 경우
+- BFS와 DFS는 골격은 같고 사용 자료구조만 다릅니다.
+- 트리는 `V - 1 = E` 성질과 연결성으로 검증할 수 있습니다.
+- BFS 신장 트리는 가중치가 동일할 때 최단 경로 트리이기도 합니다.
+- MST는 그리디 알고리즘이 최적해를 보장하는 대표 사례입니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| 방문 표시 누락 | 무한 루프 | 재귀 진입 즉시 visited에 추가 |
-| 큐와 스택 혼동 | BFS인데 DFS처럼 동작 | deque의 popleft vs pop 확인 |
-| 재귀 깊이 초과 | RecursionError | 큰 그래프는 반복 DFS |
-| 가중치 무시한 BFS | 최단 경로 오답 | 가중치 있으면 Dijkstra |
-| MST에 사이클 미검사 | 결과가 트리가 아님 | Union-Find로 사이클 차단 |
+| 방문 표시를 늦게 한다 | 무한 루프가 생긴다 | 진입 즉시 visited에 넣는다 |
+| 큐와 스택을 헷갈린다 | BFS와 DFS가 뒤바뀐다 | `popleft`와 `pop`을 명확히 구분한다 |
+| 재귀 DFS만 고집한다 | 깊은 그래프에서 스택 오버플로가 난다 | 큰 입력은 반복 DFS를 쓴다 |
+| 가중치 그래프에도 BFS를 쓴다 | 최단 경로가 틀린다 | 가중치가 있으면 Dijkstra를 고려한다 |
+| MST에서 사이클 검사를 뺀다 | 결과가 트리가 아니게 된다 | Union-Find로 차단한다 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 사용합니다
 
-- 웹 크롤러의 페이지 탐색 (BFS, 깊이 제한)
-- 컴파일러의 AST 순회 (DFS, post-order)
-- 게임 AI의 상태 공간 탐색 (BFS·DFS·A*)
-- 통신망의 최소 비용 설계 (MST)
-- React의 가상 DOM diff (트리 비교)
+- 웹 크롤러는 깊이 제한 BFS를 사용합니다.
+- 컴파일러는 AST를 DFS 순회합니다.
+- 게임 AI는 상태 공간을 BFS, DFS, A*로 탐색합니다.
+- 최소 비용 네트워크 설계는 MST 문제입니다.
+- React의 가상 DOM 비교도 트리 비교 문제로 볼 수 있습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 그래프 문제를 보면 가장 먼저 “BFS인가, DFS인가”를 결정합니다. 레벨별 탐색이나 무가중치 최단 경로는 BFS, 경로 구조 분석이나 사이클 검출은 DFS가 기본입니다. 또한 입력 크기가 크면 재귀 DFS 대신 명시적 스택을 사용하는 식으로 메모리 한계까지 함께 고려합니다.
 
 ## 체크리스트
 
-- [ ] 트리의 정의와 V-1 = E 성질을 안다
-- [ ] BFS와 DFS의 차이를 데이터 구조로 설명할 수 있다
-- [ ] BFS가 최단 경로를 찾는 조건을 안다
-- [ ] 신장 트리와 MST의 차이를 이해했다
+- [ ] 트리의 정의와 `V-1 = E` 성질을 안다
+- [ ] BFS와 DFS의 차이를 자료구조 기준으로 설명할 수 있다
+- [ ] BFS가 최단 경로를 보장하는 조건을 안다
+- [ ] 신장 트리와 MST의 차이를 이해한다
 - [ ] Kruskal에서 Union-Find의 역할을 안다
+
+## 연습 문제
+
+1. 정점 5개인 트리에서 간선 수와 최소 리프 수를 구해 보세요.
+
+2. 2차원 미로에서 시작점부터 목표점까지 최단 경로를 찾는 BFS를 작성해 보세요.
+
+3. 도시 6개와 임의의 가중치를 두고 Kruskal로 MST를 손으로 계산해 보세요.
 
 ## 정리 및 다음 단계
 
-트리는 사이클 없는 연결 그래프이며, BFS와 DFS는 그래프 위의 가장 기본적인 탐색 알고리즘입니다. MST는 가중치를 가진 그래프에서 최소 비용으로 모두 연결하는 부분 트리입니다.
+트리는 연결된 무사이클 그래프이며, BFS와 DFS는 그래프 위를 움직이는 가장 기본적인 탐색입니다. MST는 가중 그래프를 최소 비용으로 연결하는 부분 트리입니다.
 
-다음 글에서는 지금까지 배운 이산수학의 모든 주제가 알고리즘 분석과 실무에서 어떻게 연결되는지 살펴봅니다.
+다음 글에서는 지금까지 배운 이산수학의 모든 주제가 알고리즘 분석과 실무 의사결정에 어떻게 연결되는지 묶어 보겠습니다.
 
 <!-- toc:begin -->
 - [이산수학이란 무엇인가?](./01-what-is-discrete-math.md)
