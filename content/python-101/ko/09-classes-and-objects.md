@@ -17,7 +17,7 @@ tags:
 - dunder-methods
 - inheritance
 - dataclass
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는
   개별 객체입니다.
 ---
@@ -38,7 +38,7 @@ seo_description: 클래스는 "데이터를 담는 형틀"이 아니라 "같은 
 
 이 글에서는 그 묶음을 만드는 가장 단순한 도구인 `class` 문과 dunder 메서드를 살펴봅니다.
 
-## Mental Model
+## 멘탈 모델
 
 > 클래스는 "데이터를 담는 형틀"이 아니라 "같은 종류의 객체가 공유하는 행동의 정의"이며, 인스턴스는 그 정의를 따르는 개별 객체입니다. 이 한 줄이 잡혀 있으면 `self`, 클래스 속성, dunder 메서드의 자리가 자연스럽게 정해집니다.
 다음 그림은 클래스 정의에서 인스턴스 호출까지의 흐름을 보여줍니다.
@@ -77,10 +77,10 @@ class User:
 
 ```python
 class User:
-    role = "member"  # 클래스 속성
+    role = "member"  # class attribute
 
     def __init__(self, name):
-        self.name = name  # 인스턴스 속성
+        self.name = name  # instance attribute
 ```
 
 - `User.role`은 인스턴스들이 공유하는 값입니다.
@@ -158,7 +158,7 @@ class User:
 
 이 한 블록은 필드 기반의 `__init__`, `__eq__`, 그리고 기본 `__repr__`를 자동으로 만듭니다. 다만 기본 `__repr__` 형식은 `User(name='Ada', email='a@x')`처럼 필드 이름을 포함하므로, 앞의 손작성 예시와 완전히 같지는 않습니다.
 
-## Before-After
+## 전후 비교
 
 다음은 사용자 정보를 다루는 코드입니다.
 
@@ -324,7 +324,7 @@ True
 - **dict처럼 쓸 클래스를 손으로 작성** — 단순 데이터 묶음이면 `@dataclass`로 줄일 수 있습니다.
 - **`is`와 `==`을 혼동** — `is`는 같은 객체인지, `==`은 동등한 값인지 묻습니다. `__eq__`를 정의하지 않으면 둘이 같은 결과를 내지만, 정의한 뒤로는 갈라집니다.
 
-## 실무
+## 실무에서는 이렇게 생각합니다
 
 실제 프로젝트에서 클래스가 등장하는 자리는 주로 다음과 같습니다.
 
@@ -357,6 +357,16 @@ True
 다음 글에서는 표준 라이브러리 투어를 다룹니다. 지금까지 배운 함수, 모듈, 클래스 위에서 Python이 기본으로 제공하는 도구들을 빠르게 훑어봅니다.
 
 <!-- toc:begin -->
+- [왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- [변수, 타입, 연산자](./02-variables-types-operators.md)
+- [문자열과 포매팅](./03-strings-and-formatting.md)
+- [list, tuple, set, dict](./04-list-tuple-set-dict.md)
+- [제어 흐름: if, for, while, comprehension](./05-control-flow.md)
+- [함수와 인자: def, args, kwargs, default, lambda](./06-functions-and-arguments.md)
+- [모듈과 패키지: import, __init__, __name__](./07-modules-and-packages.md)
+- [파일 I/O와 예외 처리](./08-file-io-and-exceptions.md)
+- **클래스와 객체 (현재 글)**
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
 <!-- toc:end -->
 
 ## 참고 자료

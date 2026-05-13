@@ -17,7 +17,7 @@ tags:
 - floating-point
 - decimal
 - type-hints
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 seo_description: Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서
   일어나는 거의…
 ---
@@ -39,7 +39,7 @@ Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름
 
 이 문제들의 공통 뿌리는 "변수가 무엇을 가리키는지", "타입이 무엇을 보장하는지"를 정확히 모르는 데 있습니다. 한 번만 제대로 잡고 가면 이후의 자료구조·함수·클래스 단원이 훨씬 가볍습니다.
 
-## Mental Model
+## 멘탈 모델
 
 > Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름표라는 한 가지 모델만 머릿속에 두면, 할당·비교·복사에서 일어나는 거의 모든 함정이 같은 그림으로 설명됩니다.
 Python에서 변수는 값을 담는 상자가 아닙니다. **객체에 붙는 이름표**입니다. 같은 객체에 여러 이름표가 붙을 수도 있고, 이름표를 다른 객체로 옮길 수도 있습니다.
@@ -48,14 +48,6 @@ Python에서 변수는 값을 담는 상자가 아닙니다. **객체에 붙는 
 
 *Mental Model*
 위 그림에서 `a = 42; b = a`를 실행하면 `a`와 `b`는 모두 같은 정수 객체 `42`를 가리킵니다. 그리고 `a = "hi"`를 실행하면 `a`만 새 문자열 객체로 옮겨가고, `b`는 여전히 `42`를 가리킵니다.
-
-```mermaid
-flowchart LR
-    a["이름표 a"] --> obj1["int 객체 42"]
-    b["이름표 b"] --> obj1
-    a2["a = 'hi' 후의 a"] --> obj2["str 객체 'hi'"]
-    b2["b (그대로)"] --> obj1
-```
 
 왼쪽이 `b = a` 직후의 모습이고, 오른쪽이 `a = "hi"`로 이름표만 옮긴 뒤의 모습입니다. 객체 자체는 변하지 않습니다. 변하는 것은 어떤 이름표가 어떤 객체를 가리키는가뿐입니다.
 
@@ -71,8 +63,8 @@ flowchart LR
 Python은 변수 자체에 타입을 묶지 않습니다. 타입은 변수가 가리키는 객체에 붙어 있습니다.
 
 ```python
-x = 1          # 지금은 int 객체를 가리킵니다
-x = "hello"    # 같은 이름이 str 객체를 가리키도록 옮겼습니다
+x = 1          # the name now points at an int object
+x = "hello"    # the same name now points at a str object
 ```
 
 이 자유 덕분에 빠르게 짤 수 있지만, 큰 코드베이스에서는 "이 함수가 무엇을 받고 무엇을 돌려주는지"가 흐려집니다. 그래서 PEP 484 이후 Python은 **type hint**를 표준으로 채택했습니다.
@@ -101,10 +93,10 @@ def total_price(quantity: int, unit_price: float) -> float:
 산술은 익숙한 그대로지만, 정수 나눗셈과 거듭제곱은 처음 보면 헷갈립니다.
 
 ```python
-7 / 2     # 3.5 (항상 float)
-7 // 2    # 3   (정수 몫)
-7 % 2     # 1   (나머지)
-2 ** 10   # 1024 (거듭제곱)
+7 / 2     # 3.5 (always returns a float)
+7 // 2    # 3   (floor division)
+7 % 2     # 1   (remainder)
+2 ** 10   # 1024 (exponentiation)
 ```
 
 비교 연산자는 chain이 가능합니다. `0 <= x < 10`은 `x >= 0 and x < 10`과 같습니다. 이 표현은 가독성이 좋아서 적극적으로 사용해도 됩니다.
@@ -112,11 +104,11 @@ def total_price(quantity: int, unit_price: float) -> float:
 논리 연산자는 short-circuit 평가를 합니다. `a and b`에서 `a`가 falsy면 `b`는 평가하지 않습니다. 그래서 다음 패턴이 자주 쓰입니다.
 
 ```python
-name = user.name or "guest"          # user.name이 빈 문자열이면 "guest"
+name = user.name or "guest"          # if user.name is empty, fall back to "guest"
 config = override_config or default_config
 ```
 
-## Before-After
+## 전후 비교
 
 타입 힌트와 명시적인 변수가 코드 가독성을 어떻게 바꾸는지 짧게 비교해 봅니다.
 
@@ -147,12 +139,12 @@ REPL을 열고 한 줄씩 따라 입력해 보세요. 결과가 책과 다르면
 ```python
 >>> a = [1, 2]
 >>> b = [1, 2]
->>> a == b      # 값 비교: True
+>>> a == b      # value comparison: True
 True
->>> a is b      # 정체성 비교: False (서로 다른 list 객체입니다)
+>>> a is b      # identity comparison: False (two distinct list objects)
 False
 >>> c = a
->>> c is a      # True — 같은 list 객체에 이름표 두 개
+>>> c is a      # True — two name tags on the same list object
 True
 ```
 
@@ -221,7 +213,7 @@ def append_id(item, items=None):
 **6. 큰 숫자를 가독성 없이 적기**
 `10000000`보다 `10_000_000`이 읽기 쉽습니다. Python은 정수 리터럴 안의 밑줄을 무시하므로 자릿수 구분에 자유롭게 쓰세요.
 
-## 실무 패턴
+## 실무에서는 이렇게 생각합니다
 
 **1. mypy로 타입 힌트 검증**
 타입 힌트는 적어 두기만 해서는 안전을 주지 않습니다. CI에서 `mypy src/`를 돌려야 의미가 있습니다. `pyproject.toml`에 다음을 넣어 두면 strict 모드로 검증합니다.
@@ -289,6 +281,16 @@ class Order:
 다음 글에서는 문자열을 깊이 있게 다룹니다. f-string과 format spec, str·bytes 차이, 정규표현식의 첫 만남까지 짚어 봅니다.
 
 <!-- toc:begin -->
+- [왜 Python인가, 그리고 설치와 venv](./01-why-python-and-install.md)
+- **변수, 타입, 연산자 (현재 글)**
+- 문자열과 포매팅 (예정)
+- list, tuple, set, dict (예정)
+- 제어 흐름: if, for, while, comprehension (예정)
+- 함수와 인자: def, args, kwargs, default, lambda (예정)
+- 모듈과 패키지: import, __init__, __name__ (예정)
+- 파일 I/O와 예외 처리 (예정)
+- 클래스와 객체 (예정)
+- 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools (예정)
 <!-- toc:end -->
 
 ## 참고 자료
