@@ -16,89 +16,100 @@ tags:
 - Adapter
 - Transformers
 - Python
-last_reviewed: '2026-05-01'
-seo_description: LoRA 어댑터는 다음 그림으로 요약됩니다.
+last_reviewed: '2026-05-12'
+seo_description: LoRA 어댑터는 특정 선형 변환 옆에 붙는 작은 보정 경로입니다.
 ---
 
 # LoRA 어댑터 구성
 
-LoRA 어댑터는 모델 전체를 다시 학습하는 장치가 아니라, 기존 선형 변환 옆에 작은 보정 경로를 붙이는 방식입니다. 이 글에서는 그 구조를 기준으로 rank, alpha, target_modules를 어떻게 결정해야 하는지 설명합니다.
+LoRA 어댑터는 모델 전체를 갈아엎는 장치가 아니라, 선택한 선형 레이어 옆에 좁은 보정 경로를 덧붙이는 방식입니다. 이 글은 LLM Finetuning 101 시리즈의 세 번째 글입니다. 여기서는 그 구조를 기준으로 랭크, 스케일, 대상 모듈을 어떻게 정해야 하는지 감이 아니라 확인 가능한 기준으로 정리하겠습니다.
 
-이 글은 LLM 파인튜닝 101 시리즈의 세 번째 글입니다.
-
-## 핵심 질문
-
-LoRA 어댑터 구성을 어떻게 결정해야 효율과 성능을 동시에 잡을까요?
-
-이 글은 그 질문에 답하기 위해 LoRA 어댑터의 핵심 결정과 운영 함정을 살펴봅니다.
-
-> LoRA 어댑터는 모델 전체를 다시 쓰는 장치가 아니라, 특정 선형 변환 옆에 덧붙는 작은 보정 패치입니다.
+3편부터는 실제 모델 객체를 만집니다. 다만 목표는 성능 경쟁이 아니라 **연결이 올바른지 검증하는 것**입니다. `target_modules`에 오타가 하나만 있어도 `print_trainable_parameters()`는 0을 출력하고, 학습은 돌아가지만 손실은 움직이지 않는 가장 난감한 실패가 시작됩니다.
 
 ## 이 글에서 다룰 문제
 
-3편부터는 실제 모델 객체를 만집니다. GPU 없는 환경을 전제로 하므로 `sshleifer/tiny-gpt2` 같은 초소형 모델을 사용하지만, 이 단계의 목표는 성능이 아니라 **구성이 올바른지**를 확인하는 것입니다. `target_modules`가 한 글자라도 틀리면 `print_trainable_parameters()`가 0을 출력하면서도 에러는 나지 않습니다. 학습은 돌아가는데 손실이 미동도 하지 않는, 가장 진단이 어려운 실패 양상이 여기서 시작됩니다.
+![이 글에서 다룰 문제](../../../assets/llm-finetuning-101/03/03-01-questions-this-post-answers.en.png)
 
-3편에서 어댑터 부착을 확실히 검증해 두면 4편에서 학습이 안 될 때 "데이터 문제인지 어댑터 문제인지"를 즉시 가를 수 있습니다. 또 1편에서 손으로 계산한 1.5% 비율이 실제 PEFT 출력과 일치하는지를 코드 수준에서 확인하므로, 그 뒤에 어떤 베이스 모델을 골라도 비율을 추정할 수 있게 됩니다.
+*이 글에서 다룰 문제*
 
-## Mental Model
+- `LoraConfig`에서 실제로 이해해야 할 필드는 무엇일까요?
+- `target_modules`를 잘못 지정하면 어떤 문제가 생길까요?
+- 작은 GPT-2 계열 모델에서는 학습 가능한 파라미터 비율이 얼마나 낮아질까요?
+- `lora_alpha / r` 비율은 학습률과 어떻게 상호작용할까요?
 
-LoRA 어댑터는 다음 그림으로 요약됩니다.
+> LoRA 어댑터는 모델 전체를 다시 쓰는 장치가 아니라, 특정 선형 변환 옆에 붙는 작은 보정 패치입니다.
+
+예제 코드: [github.com/yeongseon-books/llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101/tree/main/en/03-lora)
+
+## 왜 이 글이 중요한가
+
+3편부터는 실제 모델에 어댑터를 붙입니다. GPU가 없는 환경을 전제로 `sshleifer/tiny-gpt2` 같은 작은 모델을 쓰지만, 이 단계의 목표는 성능이 아니라 **배선 검증**입니다. 학습이 수렴하지 않을 때 데이터 문제인지 어댑터 문제인지 바로 가르려면, 먼저 어댑터가 정말 의도한 위치에 붙었는지 확인해 두어야 합니다.
+
+또 1편에서 손으로 계산한 1.5% 안팎의 감각이 실제 PEFT 출력과 어느 정도 맞는지도 여기서 확인합니다. 이 연결이 맞아야 뒤에서 어떤 베이스 모델을 보더라도 학습 가능 파라미터 비율을 빠르게 추정할 수 있습니다.
+
+## 멘탈 모델
+
+LoRA 어댑터는 아래 구조로 요약할 수 있습니다.
 
 ```text
-원래 forward:   y = W · x
+Original forward:  y = W · x
 
-LoRA forward:   y = W · x + (alpha / r) · B · A · x
-                       │           │   │
-                       │           │   └ rank r 짜리 저랭크 분해
-                       │           └ scale 계수
-                       └ 베이스 가중치 (frozen)
+LoRA forward:      y = W · x + (alpha / r) · B · A · x
+                          │           │   │
+                          │           │   └ rank-r low-rank decomposition
+                          │           └ scale factor
+                          └ base weight (frozen)
 ```
 
-- `W`는 freeze. 그라디언트가 흐르지 않습니다.
-- `A: (in, r)`은 보통 가우시안 초기화, `B: (r, out)`은 0으로 초기화됩니다. 그래서 학습 시작 시점에 `B·A = 0`이고, 모델 출력은 베이스와 동일합니다.
-- 학습이 진행되면서 `B`가 0에서 벗어나며 보정이 시작됩니다.
-- `alpha / r`이 보정의 크기를 결정합니다. 보통 `alpha = 2 * r`로 두는 것이 관례입니다.
+- `W`는 고정됩니다. 이 경로로는 그라디언트가 흐르지 않습니다.
+- `A: (in, r)`은 보통 가우시안 초기화, `B: (r, out)`은 0 초기화를 사용합니다. 그래서 학습 0단계에서는 `B·A = 0`이고 모델은 베이스와 똑같이 동작합니다.
+- 학습이 진행되면서 `B`가 0에서 벗어나고, 그때부터 보정 경로가 실제로 작동합니다.
+- `alpha / r`은 보정의 크기를 조절합니다. `alpha = 2 * r`은 무난한 기본값으로 자주 쓰입니다.
 
-이 구조 덕분에 어댑터를 끼우는 순간에는 모델 동작이 바뀌지 않고, 학습이 진행된 만큼만 점진적으로 변화합니다.
+즉 어댑터를 붙이는 순간 모델 동작이 바뀌는 것이 아니라, 학습이 진행된 만큼만 점진적으로 달라집니다.
 
 ## 핵심 개념
 
 | 필드 | 의미 |
 | --- | --- |
-| `r` | LoRA의 rank. 작을수록 가볍고, 클수록 표현력 ↑ |
-| `lora_alpha` | 스케일 계수. 실제 영향력은 `alpha / r` |
-| `lora_dropout` | 어댑터 경로에만 적용되는 dropout (베이스에는 영향 없음) |
-| `target_modules` | LoRA를 부착할 선형 레이어 이름 목록 |
-| `bias` | bias 학습 정책 (`"none"`, `"all"`, `"lora_only"`) |
-| `task_type` | `CAUSAL_LM`, `SEQ_CLS` 등. PEFT가 head를 정확히 인식하게 함 |
+| `r` | LoRA 랭크입니다. 작을수록 가볍고, 클수록 표현력은 높아집니다. |
+| `lora_alpha` | 스케일 계수입니다. 실제 영향력은 `alpha / r`로 나타납니다. |
+| `lora_dropout` | 어댑터 경로에만 적용되는 드롭아웃입니다. 베이스 경로는 건드리지 않습니다. |
+| `target_modules` | LoRA를 부착할 선형 레이어 이름 목록입니다. |
+| `bias` | bias 학습 정책입니다. `"none"`, `"all"`, `"lora_only"` 중에서 고릅니다. |
+| `task_type` | `CAUSAL_LM`, `SEQ_CLS` 같은 태스크 유형입니다. PEFT가 헤드를 올바르게 해석하게 합니다. |
 
 ## Before vs. After
 
-**Before** — `LoraConfig(r=8, target_modules=["q_proj", "v_proj"])`을 GPT-2에 그대로 적용했더니 `print_trainable_parameters()`가 `trainable params: 0`을 출력합니다. 학습은 돌지만 loss는 변동이 없습니다.
+**Before**
 
-**After** — GPT-2의 attention 모듈 이름이 `c_attn`(QKV 합쳐짐), `c_proj`임을 확인하고 다음과 같이 바꿉니다.
+`LoraConfig(r=8, target_modules=["q_proj", "v_proj"])`를 GPT-2에 그대로 적용했더니 `print_trainable_parameters()`가 `trainable params: 0`을 출력합니다. 학습은 돌아가지만 손실 곡선은 평평합니다.
+
+**After**
+
+GPT-2의 실제 모듈 이름이 `c_attn`, `c_proj`라는 것을 확인하고 다음처럼 바꿉니다.
 
 ```
 trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 ```
 
-이 한 줄이 출력되면 어댑터가 제대로 부착됐음을 확인한 것입니다. 1편에서 손계산한 1.5%와 거의 일치합니다.
+이 한 줄은 어댑터가 실제로 붙었다는 가장 직접적인 증거입니다. 동시에 1편에서 계산한 감각이 코드 수준에서도 크게 어긋나지 않음을 보여 줍니다.
 
-## 설정에서 의미가 큰 필드
+## 먼저 고쳐야 할 설정 포인트
 
-![저랭크 분해와 스케일 적용 구조](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.ko.png)
+![저랭크 분해와 스케일 구조](../../../assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
 
-*저랭크 분해와 스케일 적용 구조*
+*저랭크 분해와 스케일 구조*
 
-`r`은 저랭크 차원, `lora_alpha`는 스케일, `lora_dropout`은 어댑터 경로에만 적용되는 드롭아웃입니다. 그리고 실무에서 가장 사고가 많이 나는 항목이 `target_modules`입니다. 이 목록이 틀리면 어댑터가 전혀 붙지 않거나, 원하지 않는 레이어에 붙습니다.
+`r`은 저랭크 차원이고, `lora_alpha`는 보정 크기이며, `lora_dropout`은 어댑터 경로에만 적용되는 드롭아웃입니다. 실전에서 가장 사고가 잦은 필드는 `target_modules`입니다. 이 값이 틀리면 아무 데도 붙지 않거나, 의도하지 않은 레이어에 붙습니다.
 
-![설정에서 의미가 큰 필드](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.ko.png)
+![운영 영향이 큰 필드](../../../assets/llm-finetuning-101/03/03-01-the-fields-with-real-operational-impact.en.png)
 
-*설정에서 의미가 큰 필드*
+*운영 영향이 큰 필드*
 
-## 단계별 실습
+## 단계별 설명
 
-### 1단계 — 베이스 모델 로드
+### 1단계 — 베이스 모델을 로드합니다
 
 ```python
 from transformers import AutoModelForCausalLM
@@ -107,7 +118,7 @@ model = AutoModelForCausalLM.from_pretrained("sshleifer/tiny-gpt2")
 print(sum(p.numel() for p in model.parameters()))
 ```
 
-### 2단계 — 모듈 이름 확인
+### 2단계 — 모듈 이름을 직접 확인합니다
 
 ```python
 for name, module in model.named_modules():
@@ -115,9 +126,9 @@ for name, module in model.named_modules():
         print(name, tuple(module.weight.shape))
 ```
 
-GPT-2는 `transformer.h.0.attn.c_attn`, `c_proj` 같은 이름을 사용합니다. Llama-3는 `q_proj`, `k_proj`, `v_proj`, `o_proj`, Qwen은 또 다른 명명을 씁니다. **항상 직접 확인합니다.**
+GPT-2는 `transformer.h.0.attn.c_attn`, `c_proj` 같은 이름을 씁니다. Llama-3는 `q_proj`, `k_proj`, `v_proj`, `o_proj`를 쓰고, Qwen은 또 다릅니다. 모델별 명명 규칙을 추측하지 말고 **항상 직접 확인하는 습관**이 중요합니다.
 
-### 3단계 — `LoraConfig` 정의
+### 3단계 — `LoraConfig`를 정의합니다
 
 ```python
 from peft import LoraConfig, TaskType
@@ -132,7 +143,7 @@ config = LoraConfig(
 )
 ```
 
-### 4단계 — 어댑터 부착
+### 4단계 — 어댑터를 부착합니다
 
 ```python
 from peft import get_peft_model
@@ -141,9 +152,9 @@ peft_model = get_peft_model(model, config)
 peft_model.print_trainable_parameters()
 ```
 
-`trainable%`가 0이 아니라 1~3% 사이로 나오면 부착이 성공한 것입니다. 0이면 `target_modules` 이름을 다시 확인해야 합니다.
+`trainable%`가 1~3% 사이로 나오면 보통 부착이 제대로 된 것입니다. 0이면 가장 먼저 `target_modules` 이름부터 다시 확인해야 합니다.
 
-### 5단계 — 부착된 어댑터 위치 검사
+### 5단계 — 어댑터 위치를 확인합니다
 
 ```python
 for name, param in peft_model.named_parameters():
@@ -151,58 +162,58 @@ for name, param in peft_model.named_parameters():
         print(name, tuple(param.shape))
 ```
 
-`lora_A`, `lora_B`로 끝나는 파라미터만 학습 대상이 되어야 합니다. 다른 이름이 섞여 있으면 의도와 다른 모듈이 학습되고 있다는 신호입니다.
+학습 대상은 `lora_A`, `lora_B`로 끝나는 파라미터여야 합니다. 다른 이름이 보인다면 의도하지 않은 모듈이 학습에 들어왔을 가능성이 큽니다.
 
 ## 이 코드에서 봐야 할 것
 
-![GPT 계열 target module 선택 구조](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.ko.png)
+![GPT 계열에서 대상 모듈 고르기](../../../assets/llm-finetuning-101/03/03-03-what-to-notice-in-this-code.en.png)
 
-*GPT 계열 target module 선택 구조*
+*GPT 계열에서 대상 모듈 고르기*
 
-- GPT-2 계열은 attention과 projection 모듈 이름이 `c_attn`, `c_proj` 형태라서 target module을 문자열로 정확히 맞춰야 합니다.
-- 실행 시 `fan_in_fan_out` 경고가 보일 수 있는데, GPT-2의 `Conv1D` 래퍼에 맞게 PEFT가 내부적으로 보정하는 정상 동작입니다.
-- 이 글의 예제는 설정 확인용입니다. 실제 학습은 4편에서 `Trainer`와 연결합니다.
-- `c_attn`은 Q, K, V가 한 행렬에 합쳐져 있어, 이름 하나만으로 세 projection에 동시에 LoRA가 붙습니다.
+- GPT-2 계열은 어텐션과 projection 모듈 이름이 `c_attn`, `c_proj`라서 `target_modules` 문자열이 정확히 일치해야 합니다.
+- 실행 중 `fan_in_fan_out` 경고가 보일 수 있는데, 이것은 GPT-2의 `Conv1D` 래퍼를 PEFT가 올바르게 처리하고 있다는 뜻이지 오류가 아닙니다.
+- 이 글의 예제는 배선 검증용입니다. 실제 학습은 4편에서 `Trainer`와 연결합니다.
+- `c_attn`은 Q, K, V를 하나의 행렬에 묶어 두기 때문에, 이름 하나만으로 세 projection에 동시에 LoRA가 붙습니다.
 
 ## 자주 하는 실수
 
-![풀 파인튜닝과 LoRA 파라미터 규모 비교](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.ko.png)
+![풀 파인튜닝과 LoRA 규모 비교](../../../assets/llm-finetuning-101/03/03-04-where-engineers-get-confused.en.png)
 
-*풀 파인튜닝과 LoRA 파라미터 규모 비교*
+*풀 파인튜닝과 LoRA 규모 비교*
 
-- **target_modules 오타** — 가장 흔합니다. `trainable params: 0`이 나오는데 에러는 없습니다. 항상 `print_trainable_parameters()`로 확인합니다.
-- **r과 alpha를 무관하게 키움** — `r=64, alpha=16`처럼 두면 보정 크기가 너무 작아 학습이 거의 일어나지 않습니다. `alpha = 2 * r` 관례를 우선 따르세요.
-- **`bias="all"` 무분별하게** — bias까지 학습시키면 어댑터 크기가 커지고, 베이스 모델로 되돌리기도 어려워집니다. `"none"`이 기본값인 데에는 이유가 있습니다.
-- **모든 선형 레이어에 LoRA** — attention QKV에만 붙여도 충분한 경우가 대부분입니다. MLP까지 포함하면 학습 파라미터가 두세 배로 뜁니다.
-- **Conv1D를 Linear로 착각** — GPT-2는 `nn.Linear`가 아닌 `transformers.pytorch_utils.Conv1D`를 씁니다. fan_in/fan_out이 반대라 직접 LoRA 구현을 만들면 행렬이 어긋납니다. PEFT가 알아서 처리해 주는 것을 신뢰하세요.
+- **`target_modules` 오타**: 가장 흔한 실패입니다. 에러는 안 나고 `trainable params: 0`만 출력됩니다. 항상 `print_trainable_parameters()`로 확인해야 합니다.
+- **`r`과 `alpha`를 따로 놀게 두는 실수**: `r=64, alpha=16`처럼 두면 보정이 너무 약해져 학습이 거의 일어나지 않을 수 있습니다. 기본값으로는 `alpha = 2 * r`가 무난합니다.
+- **`bias="all"`을 가볍게 켜는 실수**: 어댑터가 커지고, 베이스 상태로 되돌리기도 어려워집니다. `"none"`이 기본인 이유가 있습니다.
+- **모든 선형 레이어에 LoRA를 붙이는 실수**: 어텐션 QKV만으로 충분한 경우가 많습니다. MLP까지 포함하면 학습 파라미터가 두세 배 늘어납니다.
+- **Conv1D와 Linear를 같은 것으로 보는 실수**: GPT-2는 `nn.Linear`가 아니라 `transformers.pytorch_utils.Conv1D`를 사용합니다. 직접 구현하면 fan_in/fan_out이 쉽게 어긋납니다. 이 부분은 PEFT가 처리하게 두는 편이 안전합니다.
 
-## 실무 적용
+## 실무 메모
 
-- **모델별 target_modules 표 만들기**: GPT-2 → `["c_attn", "c_proj"]`, Llama → `["q_proj", "v_proj"]`(보수적) 또는 `["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"]`(공격적). 팀 위키에 박아 두면 실수가 줄어듭니다.
-- **`r=8` → `r=16` 비교 실험**: 동일 데이터로 두 번 돌려 손실 곡선과 평가 지표를 비교합니다. 큰 차이가 없다면 r=8로 머무릅니다.
-- **어댑터를 베이스에 합치기(`merge_and_unload`)**: 추론 지연이 중요한 환경에서는 학습 후 어댑터를 베이스에 합쳐 한 모델로 배포합니다. 합친 모델은 LoRA가 아니라 일반 모델로 동작합니다.
-- **어댑터만 저장**: `peft_model.save_pretrained("adapter/")`로 수 MB짜리 가중치만 저장합니다. 베이스 모델은 별도 캐시에서 가져옵니다.
-
-## 실무에서는 이렇게 생각한다
-
-LoRA는 파라미터 효율성이 돋보이지만, 실무에서는 "어느 레이어에 붙일 것인가"가 훨씬 더 중요한 결정입니다. attention QKV에만 붙여도 충분한 경우가 대부분이고, MLP까지 포함하면 학습 파라미터가 두세 배로 뛰어 실험 속도가 느려집니다. 또 rank를 키우는 것과 데이터를 늘리는 것 중 어느 쪽이 비용 대비 효과가 더 큰지는 데이터셋 크기에 따라 달라집니다.
-
-팀에서 LoRA를 도입할 때 가장 먼저 할 일은 모델별 `target_modules` 매핑 표를 위키에 박아 두는 것입니다. 이것만으로도 신규 팀원이 `trainable params: 0` 실수를 반복하는 일을 방지할 수 있습니다. 어댑터를 base에 합칠지(`merge_and_unload`) 분리해서 배포할지는 서빙 환경의 latency 요구와 multi-tenancy 필요성에 따라 결정합니다.
+- **모델별 `target_modules` 표를 유지합니다**: GPT-2는 `["c_attn", "c_proj"]`, Llama는 보수적으로 `["q_proj", "v_proj"]`, 공격적으로는 더 넓은 목록을 씁니다. 이 매핑 표만 있어도 실수가 크게 줄어듭니다.
+- **`r=8`과 `r=16`을 같은 데이터로 비교합니다**: 손실 곡선과 평가 지표 차이가 작다면 더 가벼운 설정에 머무르는 편이 좋습니다.
+- **필요하면 베이스에 병합합니다**: 추론 지연이 중요하면 `merge_and_unload()`로 어댑터를 베이스에 합친 뒤 단일 모델처럼 배포할 수 있습니다.
+- **어댑터만 따로 저장합니다**: `peft_model.save_pretrained("adapter/")`는 작은 산출물을 만들기 때문에 배포와 버전 관리가 쉽습니다.
 
 ## 체크리스트
 
-- [ ] `LoraConfig`의 핵심 필드 의미를 설명할 수 있다.
-- [ ] `target_modules`가 왜 모델별로 달라지는지 이해했다.
-- [ ] `python main.py`로 실제 어댑터 부착과 파라미터 비율 출력을 확인했다.
-- [ ] `trainable%`가 1~3% 범위에 들어왔다.
-- [ ] `lora_A`, `lora_B`만 `requires_grad=True`인지 확인했다.
-- [ ] 다음 글에서 이 모델을 1 step이라도 학습시킬 준비가 되었다.
+- [ ] `LoraConfig` 핵심 필드의 의미를 설명할 수 있습니다.
+- [ ] `target_modules`가 모델마다 달라지는 이유를 이해했습니다.
+- [ ] `python main.py`를 실행해 어댑터가 실제로 붙고 비율이 0이 아님을 확인했습니다.
+- [ ] `trainable%`가 1~3% 범위에 들어오는지 확인했습니다.
+- [ ] `requires_grad=True`인 파라미터가 `lora_A`, `lora_B`뿐인지 확인했습니다.
+- [ ] 다음 글에서 이 모델에 최소 한 번의 학습 스텝을 밀어 넣을 준비가 되어 있습니다.
+
+## 연습 문제
+
+1. `r`를 {4, 8, 16, 32}로 바꿔 `trainable%`가 어떻게 달라지는지 출력해 보세요. 1편의 손계산과 대체로 맞나요?
+2. `target_modules`를 `["c_attn"]`만 남기면 비율이 얼마나 줄어드나요? 평가 결과는 어떻게 달라질지 가설을 세워 보세요.
+3. `peft_model.merge_and_unload()`를 호출한 뒤 파라미터 수를 다시 확인해 보세요. 이 병합된 모델을 다시 LoRA 어댑터로 분리할 수 있을까요?
 
 ## 정리 · 다음 글
 
-LoRA 구성 단계의 핵심은 성능 튜닝이 아니라 **연결 검증**입니다. 어댑터가 어디에 붙는지, 몇 개의 파라미터가 학습 대상이 되는지만 정확히 봐도 절반은 끝난 셈입니다.
+LoRA 구성 단계의 핵심은 성능 튜닝이 아니라 **연결 검증**입니다. 어댑터가 어디에 붙는지, 얼마나 많은 파라미터가 학습 대상이 되는지만 확인해도 절반은 끝난 셈입니다.
 
-다음 글(4편)에서는 학습 루프를 다룹니다. 이 어댑터에 실제로 그라디언트를 흘려 보내고, learning rate / batch / gradient accumulation이 손실 곡선에 어떻게 영향을 주는지 직접 확인합니다.
+다음 글인 4편에서는 학습 루프를 다룹니다. 이제 이 어댑터에 실제로 그라디언트를 흘리고, 학습률, 배치 크기, 그래디언트 누적이 손실 곡선에 어떤 차이를 만드는지 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
