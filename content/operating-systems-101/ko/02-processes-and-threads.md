@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 2
 title: 프로세스와 스레드
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,22 +17,28 @@ tags:
   - 스레드
   - 동시성
   - 시스템
-seo_description: 프로세스의 구성, 스레드와의 차이, fork/exec 모델, 그리고 실무에서의 선택 기준을 정리합니다.
-last_reviewed: '2026-05-04'
+seo_description: 프로세스의 구성, 스레드와의 차이, fork/exec 모델, 선택 기준을 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 프로세스와 스레드
 
-> Operating Systems 101 시리즈 (2/10)
+"실행 중인 프로그램"이라는 표현은 익숙하지만, 운영체제 관점에서는 너무 뭉뚱그린 말입니다. 메모리, 열린 파일, 권한, CPU 상태까지 묶인 단위가 무엇인지 분리해서 봐야 동시성 설계가 선명해집니다.
 
+특히 프로세스와 스레드를 섞어 이해하면 공유 범위와 격리 경계를 계속 헷갈리게 됩니다. 그래서 이 글에서는 두 단위를 운영체제가 실제로 다루는 기준으로 다시 정리합니다.
+
+이 글은 Operating Systems 101 시리즈의 2번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-프로세스와 스레드는 동시성을 구현하는 두 가지 기본 빌딩 블록입니다. 둘을 혼동하면 메모리 격리가 깨지거나, 스레드 안전성을 잘못 가정하거나, 자식 프로세스를 좀비로 남기는 식의 문제가 생깁니다. "왜 같은 데이터인데 한쪽에서는 보이고 다른 쪽에서는 안 보이지?"라는 질문 대부분은 프로세스/스레드 모델로 풀립니다.
+- 프로세스는 어떤 자원을 자기 것으로 가지고 있을까요?
+- 스레드는 무엇을 공유하고 무엇은 따로 가질까요?
+- `fork`와 `exec`는 왜 두 단계로 나뉘어 있을까요?
+- CPU 작업과 I/O 작업에서는 언제 프로세스를, 언제 스레드를 골라야 할까요?
 
-> 프로세스는 격리의 단위, 스레드는 동시성의 단위입니다. 둘을 같은 도구로 쓰면 거의 항상 한쪽이 새거나 한쪽이 막힙니다.
+> 프로세스는 격리의 단위이고, 스레드는 실행 흐름의 단위입니다. 둘 다 동시성을 만드는 도구처럼 보이지만, 메모리와 실패 범위를 어디까지 공유할지라는 질문에 전혀 다른 답을 줍니다.
 
-## 전체 흐름
+## 기본 모델
 > 한 프로세스는 자기만의 가상 주소 공간, 파일 디스크립터 테이블, 신호 처리기, 권한을 가집니다. 그 안에 한 개 이상의 스레드가 있고, 스레드는 메모리와 fd는 공유하지만 자신만의 스택과 레지스터 상태를 갖습니다.
 
 ```text
@@ -52,49 +58,49 @@ last_reviewed: '2026-05-04'
 +-----------------------------------------+
 ```
 
-## Before / After
+## 같은 코드를 다르게 읽는 법
 
-**Before — "스레드와 프로세스는 그냥 다 동시 실행":**
+**이전 관점 — "스레드와 프로세스는 그냥 둘 다 동시 실행 도구":**
 
 ```python
-# 두 작업을 "동시에" 돌리고 싶다
+# I want these two tasks to run "at the same time"
 import threading, multiprocessing
 ```
 
 이 한 줄은 둘 중 어느 것을 골라야 하는지 알려 주지 않습니다.
 
-**After — "공유 모델이 다르다"는 모델:**
+**바꿔서 보면 — "공유하는 것이 다르다"는 모델:**
 
 ```text
-multiprocessing.Process : 메모리 따로, 통신은 큐/파이프/공유 메모리
-threading.Thread        : 메모리 같이, 락이 필요하고 GIL이 있음
+multiprocessing.Process : separate memory, talk via queue/pipe/shared mem
+threading.Thread        : same memory, needs locks, GIL applies
 
-CPU 바운드(numpy로 큰 행렬 곱) → 멀티프로세스가 보통 빠름
-I/O 바운드(HTTP 요청 100건)    → 멀티스레드 또는 asyncio가 보통 충분
+CPU-bound (large numpy matmul)  -> multiprocessing usually wins
+I/O-bound (100 HTTP requests)   -> threading or asyncio is enough
 ```
 
 같은 "동시 실행"이라도 무엇을 공유하느냐로 도구가 갈립니다.
 
-## 단계별로 따라하기
+## 단계별로 확인하기
 
-### 1단계: PID와 부모-자식 관계 보기
+### 1단계: 프로세스 식별자와 부모-자식 관계 보기
 
 ```python
 import os
 
-print(f"부모 PID(이 프로세스): {os.getpid()}")
+print(f"Parent PID (this process): {os.getpid()}")
 
 pid = os.fork()
 if pid == 0:
-    print(f"자식  PID: {os.getpid()}, 부모: {os.getppid()}")
+    print(f"Child  PID: {os.getpid()}, parent: {os.getppid()}")
 else:
     os.waitpid(pid, 0)
-    print(f"부모: 자식 {pid} 종료 확인")
+    print(f"Parent: child {pid} exited")
 ```
 
 `fork`는 한 번 호출되어 두 번 리턴합니다. 부모에는 자식 PID가, 자식에는 0이 돌아옵니다. 같은 코드인데 두 줄기로 갈라지는 경험이 핵심입니다.
 
-### 2단계: `fork` 이후의 메모리 격리 확인
+### 2단계: 자식 분기 이후의 메모리 격리 확인
 
 ```python
 import os
@@ -102,10 +108,10 @@ import os
 x = [1, 2, 3]
 if os.fork() == 0:
     x.append(99)
-    print(f"자식의 x: {x}")
+    print(f"Child x:  {x}")
     os._exit(0)
 os.wait()
-print(f"부모의 x: {x}")
+print(f"Parent x: {x}")
 ```
 
 자식이 `x`를 바꿔도 부모의 `x`는 그대로입니다. 두 프로세스는 같은 메모리를 보지 못합니다(겉보기는 같지만 내부적으로는 copy-on-write).
@@ -121,12 +127,12 @@ def worker():
 
 t = threading.Thread(target=worker)
 t.start(); t.join()
-print(f"메인의 x: {x}")
+print(f"Main x: {x}")
 ```
 
 같은 `x` 리스트가 보입니다. 스레드는 같은 주소 공간을 공유하기 때문에 동기화가 필요해집니다.
 
-### 4단계: 스레드 vs 프로세스 성능 직관
+### 4단계: 스레드와 프로세스의 성능 감각 보기
 
 ```python
 import time, math
@@ -147,20 +153,20 @@ for Pool, label in [(ThreadPoolExecutor, "Thread"), (ProcessPoolExecutor, "Proce
 
 CPU 바운드 작업에서는 보통 프로세스 풀이 빠릅니다. CPython의 GIL 때문에 스레드는 같은 시점에 하나만 파이썬 코드를 실행할 수 있습니다.
 
-### 5단계: `exec`로 다른 프로그램 되기
+### 5단계: 다른 프로그램으로 실행 이미지 바꾸기
 
 ```python
 import os
 
 if os.fork() == 0:
-    os.execvp("ls", ["ls", "-la"])  # 자식이 ls로 변신
-    # 여기는 도달하지 않음
+    os.execvp("ls", ["ls", "-la"])  # child becomes ls
+    # this line is never reached
 os.wait()
 ```
 
 `fork`로 자식을 만들고 곧바로 `exec`로 다른 프로그램이 되는 패턴이 셸이 명령을 실행하는 표준 방식입니다. 자식 프로세스의 메모리는 새 프로그램의 이미지로 통째로 교체됩니다.
 
-## 이 코드에서 주목할 점
+## 여기서 먼저 볼 점
 
 - `fork`는 한 번 호출되고 두 번 리턴합니다
 - 프로세스 간 메모리는 격리되어 있고, 스레드 간 메모리는 공유됩니다
@@ -177,7 +183,7 @@ os.wait()
 | `fork` 직후 큰 라이브러리 임포트 가정 | macOS에서 동작 차이, 안전성 문제 | `multiprocessing.set_start_method('spawn')` 고려 |
 | 프로세스를 가볍다고 가정 | 수천 개 프로세스 생성으로 OS 자원 고갈 | 워커 풀 패턴으로 재사용 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 본다
 
 - 웹 서버: gunicorn은 워커 프로세스, uvicorn은 비동기, 둘을 조합
 - 데이터 처리: `multiprocessing.Pool`로 CPU 바운드 ETL 분산
@@ -193,7 +199,7 @@ os.wait()
 - [ ] `fork`와 `exec`의 역할 분리를 설명할 수 있는가
 - [ ] 자식 프로세스 회수의 필요성을 안다
 
-## 정리 및 다음 단계
+## 마무리와 다음 글
 
 프로세스는 격리된 자원 묶음이고, 스레드는 그 안에서 흐르는 동시 실행 단위입니다. 둘을 헷갈리면 동시성 코드가 미묘하게 깨지거나 성능이 기대만큼 나오지 않습니다. CPU 바운드와 I/O 바운드, 격리의 필요성, 메모리 공유 정도라는 세 가지 축으로 도구를 고를 수 있습니다.
 
@@ -203,8 +209,8 @@ os.wait()
 - [운영체제란 무엇인가?](./01-what-is-an-operating-system.md)
 - **프로세스와 스레드 (현재 글)**
 - 스케줄링 (예정)
-- 동시성과 race condition (예정)
-- lock, mutex, semaphore (예정)
+- 동시성과 경쟁 상태 (예정)
+- 락, 뮤텍스, 세마포어 (예정)
 - 메모리 관리 (예정)
 - 가상 메모리 (예정)
 - 파일 시스템 (예정)
