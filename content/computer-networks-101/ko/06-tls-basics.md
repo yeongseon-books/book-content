@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 6
 title: TLS 기초
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,53 +17,72 @@ tags:
   - 인증서
   - 암호화
   - PKI
-seo_description: TLS handshake가 어떻게 기밀성·무결성·신원을 보장하는지, 인증서와 PKI의 역할을 한 번에 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: TLS와 인증서, PKI가 HTTPS를 안전하게 만드는 구조를 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # TLS 기초
 
-> Computer Networks 101 시리즈 (6/10)
-
+이 글은 Computer Networks 101 시리즈의 6번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-TLS를 모르면 인증서 만료 사고에 손을 대지 못하고, 자기서명을 그냥 무시하는 위험한 코드가 들어갑니다. 또 mTLS·서비스 메시·zero-trust 같은 현대 인프라는 TLS가 기본 가정입니다. "왜 안전한가?"를 자기 언어로 설명하지 못하면 보안 설계는 의식 없이 흐르게 됩니다.
+- TLS가 보장하는 세 가지는 무엇일까요?
+- 핸드셰이크는 어떤 순서로 진행될까요?
+- 인증서, CA, 체인, trust store는 어떤 관계일까요?
+- TLS 1.2와 TLS 1.3은 무엇이 달라졌을까요?
 
-> TLS는 "이 채널이 안전하다"가 아니라 "이 키가 진짜 이 도메인 것이고, 그 키로만 풀 수 있다"의 조합입니다.
+> TLS는 한 번에 세 가지 기술을 엮습니다. 비대칭 암호는 신원 확인과 키 합의를 맡고, 대칭 암호는 빠른 데이터 암호화를 맡고, AEAD는 무결성을 보장합니다. 여기에 인증서와 PKI가 붙어 "이 공개 키가 정말 이 도메인의 것"임을 증명합니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+TLS를 머릿속에 그리지 못하면 인증서 만료 사고가 생겼을 때 손을 대기 어렵고, self-signed 인증서를 그냥 무시하는 위험한 코드도 쉽게 들어갑니다. mTLS, 서비스 메시, zero-trust 같은 현대 인프라는 TLS를 기본 전제로 삼습니다. "왜 안전한가"를 자기 언어로 설명하지 못하면 보안 설계는 금세 관성에 휩쓸립니다.
+
+> TLS는 "이 채널이 안전하다"는 막연한 말이 아니라, "이 키가 정말 이 도메인 것이고 그 키로만 풀 수 있다"는 조합입니다.
+
+## 핵심 그림
+
 ```text
 Client                          Server
-  --- ClientHello (지원 cipher) -->
+  --- ClientHello (cipher list) -->
   <-- ServerHello + Certificate ---
   --- key share / Finished ------->
   <-- Finished --------------------
-  ===== 대칭 키로 암호화된 application data =====
+  ===== application data encrypted with the symmetric key =====
 ```
 
-비대칭 키로 합의된 비밀에서 대칭 세션 키를 만들고, 이후 데이터는 그 키로 빠르게 암호화합니다.
+비대칭 합의로 대칭 세션 키를 만들고, 그 뒤부터는 그 키로 빠르게 데이터를 암호화합니다.
+
+## 핵심 용어
+
+| 용어 | 의미 |
+| --- | --- |
+| 대칭 암호 | 같은 키로 암호화와 복호화를 하는 방식 |
+| 비대칭 암호 | 공개 키와 개인 키 쌍을 쓰는 방식 |
+| AEAD | 암호화와 무결성 검증을 함께 제공하는 방식 |
+| 인증서 | 공개 키와 도메인을 묶고 서명을 붙인 문서 |
+| CA | 인증서에 서명하는 신뢰 기관 |
+| 체인 | 서버 인증서에서 중간 CA, 루트 CA로 이어지는 검증 경로 |
 
 ## Before / After
 
-**Before — "https는 그냥 안전":**
+**Before — "https면 그냥 안전하다"**
 
 ```text
-자물쇠 아이콘이 있으면 안전 — 끝.
+브라우저 자물쇠가 보이면 끝.
 ```
 
-**After — "TLS는 키 + 신원 + 무결성":**
+**After — "TLS는 키, 신원, 무결성을 함께 묶는다"**
 
 ```text
-- 누구의 키인가? → CA가 보증한 인증서
-- 누구만 풀 수 있는가? → 대칭 세션 키
-- 변조되지 않았나? → AEAD/MAC
-이 셋이 동시에 깨지지 않는 한 안전
+- 누구의 키인가?            → certificate signed by a CA
+- 누가 복호화할 수 있는가? → symmetric session key
+- 중간에 변조되지 않았는가? → AEAD / MAC
 ```
 
 ## 단계별로 따라하기
 
-### 1단계: 인증서 보기
+### 1단계: 인증서 들여다보기
 
 ```bash
 echo | openssl s_client -connect example.com:443 -servername example.com 2>/dev/null \
@@ -73,28 +92,28 @@ echo | openssl s_client -connect example.com:443 -servername example.com 2>/dev/
 # notBefore=...  notAfter=...
 ```
 
-### 2단계: 체인 검증
+### 2단계: 인증서 체인 확인하기
 
 ```bash
 openssl s_client -showcerts -connect example.com:443 -servername example.com </dev/null
-# 체인의 모든 인증서가 출력됨
+# every certificate in the chain is printed
 ```
 
-브라우저는 이 체인을 root CA까지 따라가며 서명을 검증합니다.
+브라우저는 이 체인을 루트 CA까지 따라 올라가며 서명을 검증합니다.
 
-### 3단계: Python에서 안전한 호출
+### 3단계: Python에서 안전하게 호출하기
 
 ```python
 import ssl, socket
 
-ctx = ssl.create_default_context()   # OS의 신뢰 저장소 사용
+ctx = ssl.create_default_context()   # uses the OS trust store
 with socket.create_connection(('example.com', 443)) as s:
     with ctx.wrap_socket(s, server_hostname='example.com') as ts:
         print(ts.version())          # TLSv1.3
         print(ts.getpeercert()['subject'])
 ```
 
-### 4단계: 자기서명 인증서 만들기
+### 4단계: self-signed 인증서 만들기
 
 ```bash
 openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
@@ -102,7 +121,7 @@ openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
 ```
 
 ```python
-# Flask + TLS 예제
+# Flask + TLS
 from flask import Flask
 app = Flask(__name__)
 
@@ -114,57 +133,69 @@ if __name__ == '__main__':
 ```
 
 ```bash
-curl -k https://localhost:8443/    # -k는 자기서명 허용 (학습용)
+curl -k https://localhost:8443/    # -k allows self-signed (learning only)
 ```
 
-### 5단계: 만료/위장 사례 보기
+### 5단계: 만료와 위장 사례 보기
 
 ```bash
-curl -v https://expired.badssl.com/        # 만료
-curl -v https://wrong.host.badssl.com/     # 도메인 불일치
-curl -v https://untrusted-root.badssl.com/ # 신뢰 안 되는 root
+curl -v https://expired.badssl.com/        # expired
+curl -v https://wrong.host.badssl.com/     # name mismatch
+curl -v https://untrusted-root.badssl.com/ # untrusted root
 ```
 
-각 사례에서 정확히 무엇이 검증에 실패했는지 메시지로 보입니다.
+어느 검증 단계가 실패했는지 메시지로 바로 확인할 수 있습니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- 신뢰 저장소(trust store)는 OS/브라우저가 가진 root CA 목록
-- 인증서는 "키 + 도메인 + 만료 + 서명"의 묶음
-- 자기서명은 학습용으로만, 운영에서는 Let's Encrypt 등을 사용
-- TLS 버전과 cipher 선택이 보안의 큰 부분
+- trust store는 운영 체제나 브라우저가 신뢰하는 루트 CA 목록입니다.
+- 인증서는 키, 도메인, 만료일, 서명을 함께 담는 문서입니다.
+- self-signed 인증서는 학습용일 뿐이고, 운영에서는 공인 CA를 사용합니다.
+- TLS 버전과 cipher 선택은 보안 수준에 직접 영향을 줍니다.
 
 ## 자주 하는 실수 5가지
 
 | 실수 | 문제 | 해결 |
 | --- | --- | --- |
-| `verify=False`/`-k` 운영 사용 | MITM 사고 노출 | 신뢰된 CA 인증서 사용 |
-| 인증서 만료 모니터링 없음 | 갑작스러운 장애 | 만료 30일 전 알림 자동화 |
-| 중간 인증서 누락 | 일부 클라이언트가 검증 실패 | full chain 배포 |
-| 약한 cipher/구버전 TLS 허용 | 알려진 공격 노출 | TLS 1.2+ + 안전한 cipher만 |
-| 도메인과 SAN 불일치 | 일부 브라우저에서 차단 | SAN에 모든 도메인 포함 |
+| `verify=False`나 `-k`를 운영에서 사용 | MITM 공격에 노출 | 신뢰할 수 있는 CA 인증서를 사용한다 |
+| 인증서 만료 모니터링이 없음 | 갑작스러운 장애 | 만료 30일 전 알림을 자동화한다 |
+| 중간 인증서 누락 | 일부 클라이언트 검증 실패 | full chain을 배포한다 |
+| 약한 cipher나 오래된 TLS 허용 | 알려진 공격에 노출 | TLS 1.2+와 안전한 cipher만 사용한다 |
+| SAN에 필요한 도메인이 없음 | 일부 브라우저가 차단 | 필요한 도메인을 SAN에 모두 넣는다 |
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 보입니다
 
-- 웹/모바일: Let's Encrypt + 자동 갱신
-- 마이크로서비스: mTLS로 서비스 간 신원 검증
-- 메시지 큐/DB 클라이언트: TLS 옵션 활성화
-- VPN/QUIC: TLS가 핵심 구성 요소
-- IoT: 공장 출하 시 클라이언트 인증서 발급
+- 웹과 모바일은 Let's Encrypt와 자동 갱신을 널리 사용합니다.
+- 마이크로서비스는 mTLS로 서비스 간 신원을 검증합니다.
+- 메시지 큐와 DB 클라이언트도 TLS 옵션을 켜는 것이 기본입니다.
+- VPN과 QUIC에서도 TLS는 핵심 구성 요소입니다.
+- IoT는 제조 단계에서 클라이언트 인증서를 발급하기도 합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+시니어 엔지니어는 TLS를 단순한 암호화 스위치가 아니라 키 관리 시스템으로 봅니다. 인증서 갱신 주기, 개인 키 보호, 어떤 루트 CA를 신뢰할지, mTLS 정책을 어떻게 배포할지 같은 운영 문제가 알고리즘 선택만큼 중요하다는 것을 잘 압니다.
+
+또한 "암호화했으니 안전하다"는 단순한 결론을 경계합니다. 어떤 키가 유출되면 누가 무엇을 볼 수 있는지, 메타데이터는 어디까지 노출되는지까지 함께 그려 봅니다.
 
 ## 체크리스트
 
-- [ ] TLS 3가지 보장(기밀성/무결성/신원)을 안다
-- [ ] 인증서, CA, 체인, 신뢰 저장소를 안다
-- [ ] handshake의 큰 단계를 그릴 수 있다
-- [ ] 운영에서 `verify=False`를 절대 쓰지 않는다
+- [ ] TLS의 세 가지 보장을 설명할 수 있다
+- [ ] 인증서, CA, 체인, trust store의 관계를 안다
+- [ ] 핸드셰이크의 큰 흐름을 그릴 수 있다
+- [ ] 운영에서 `verify=False`를 쓰지 않는다
 - [ ] 인증서 만료를 자동 모니터링한다
 
-## 정리 및 다음 단계
+## 연습 문제
 
-TLS는 비대칭 키로 신원과 키 합의를, 대칭 키로 빠른 암호화를, AEAD로 무결성을 보장하는 조합입니다. 인증서와 PKI는 "이 키가 진짜 이 도메인 것"임을 보증합니다. 이 그림이 잡히면 모든 HTTPS 사고가 같은 책장 위에서 보입니다.
+1. 좋아하는 사이트의 인증서를 `openssl`로 확인하고 issuer, 만료일, SAN 목록을 적어 보세요.
+2. self-signed 인증서로 로컬 HTTPS 서버를 띄운 뒤, Python `ssl` 모듈로 성공하는 호출과 실패하는 호출을 각각 만들어 보세요.
+3. "zero-trust 인프라에서 mTLS가 왜 중요한가"를 한 단락으로 설명해 보세요.
 
-다음 글에서는 TLS가 보호한 패킷이 인터넷을 어떻게 흘러가는지 — 라우팅과 NAT로 넘어갑니다.
+## 정리와 다음 글
+
+TLS는 비대칭 암호로 신원 확인과 키 합의를 하고, 대칭 암호로 빠른 데이터 암호화를 하며, AEAD로 무결성을 보장합니다. 인증서와 PKI는 그 키가 정말 해당 도메인의 것임을 증명합니다. 이 그림이 잡히면 HTTPS 관련 사고가 한 자리에서 정리되기 시작합니다.
+
+다음 글에서는 이 TLS로 보호된 패킷이 인터넷에서 어떻게 이동하는지, 라우팅과 NAT를 다룹니다.
 
 <!-- toc:begin -->
 - [네트워크란 무엇인가?](./01-what-is-a-network.md)
