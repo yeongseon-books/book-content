@@ -1,15 +1,15 @@
 ---
+title: Error response 설계
 series: api-design-101
 episode: 7
-title: Error response 설계
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Computer Science
   - APIDesign
@@ -17,23 +17,30 @@ tags:
   - RFC7807
   - Validation
   - Backend
-seo_description: API 에러 응답의 표준 형식 — RFC 7807 problem+json, error code, validation error를 정리합니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 일관된 error response를 만드는 envelope, code, validation 규칙을 정리합니다.
 ---
 
 # Error response 설계
 
-API 에러 응답은 형식이 조금만 흔들려도 클라이언트 처리와 운영 디버깅이 함께 어려워집니다. RFC 7807 problem+json과 안정적인 error code 체계를 먼저 잡아 두면 좋습니다.
-
-이 글은 API Design 101 시리즈의 7번째 글입니다.
+이 글은 API Design 101 시리즈의 일곱 번째 글입니다. 에러 응답은 성공 응답보다 더 많은 경로를 다룹니다. 그래서 envelope, machine-readable code, validation detail이 일관되게 유지되어야 클라이언트와 운영팀 모두 덜 고생합니다.
 
 ## 이 글에서 다룰 문제
 
-성공 응답은 한 가지지만 에러는 수백 가지입니다. 형식이 들쭉날쭉하면 클라이언트는 모든 케이스를 따로 다뤄야 하고, 사용자에게는 알 수 없는 오류만 보입니다.
+- 좋은 error response는 어떤 요소로 이루어질까요?
+- RFC 7807 `application/problem+json`은 왜 유용할까요?
+- validation error는 어떤 모양으로 표현해야 할까요?
+- 사람이 읽는 메시지와 기계가 읽는 코드는 어떻게 나눠야 할까요?
+- 보안과 디버깅 편의성은 어디서 균형을 잡아야 할까요?
 
-> 좋은 에러 응답은 디버깅 시간을 줄여 줍니다.
+## 왜 중요한가
 
-## 전체 흐름
+성공 경로는 하나지만 에러 경로는 수십, 수백 개입니다. 에러 모양이 제각각이면 클라이언트는 케이스별로 모두 따로 처리해야 하고, 사용자에게는 결국 “알 수 없는 오류”만 남게 됩니다.
+
+> 좋은 error response는 디버깅 시간을 줄여 줍니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     R["request"] --> H["handler"]
@@ -42,7 +49,15 @@ flowchart LR
     H -->|"internal"| S["500 + problem+json"]
 ```
 
-## Before/After
+## 핵심 용어
+
+- **Status code**: 에러의 큰 범주입니다. `4xx`는 사용자 측, `5xx`는 서버 측입니다.
+- **Error code**: 안정적으로 유지되는 문자열 식별자입니다. 예를 들면 `user.not_found`입니다.
+- **Title**: 사람이 빠르게 읽는 짧은 제목입니다.
+- **Detail**: 더 긴 설명입니다.
+- **Errors[]**: validation 실패 항목을 필드 단위로 담는 배열입니다.
+
+## Before / After
 
 **Before (자유 형식)**
 
@@ -50,7 +65,7 @@ flowchart LR
 {"error": "something went wrong"}
 ```
 
-**After (RFC 7807 + 코드)**
+**After (RFC 7807 + code)**
 
 ```json
 {
@@ -62,17 +77,19 @@ flowchart LR
 }
 ```
 
-## 에러 응답 5단계
+모양이 안정적이면 클라이언트도 일관되게 다룰 수 있습니다.
 
-### 1단계 — 표준 envelope
+## 실습: error response를 만드는 다섯 단계
+
+### Step 1 — Standard envelope
 
 ```python
-# 예제 1: 표준 envelope
+# 1_envelope.py
 from flask import Flask, jsonify
 app = Flask(__name__)
 
 def problem(status, code, title, detail):
-    body = {"type": f"about:blank", "title": title,
+    body = {"type": "about:blank", "title": title,
             "status": status, "code": code, "detail": detail}
     return jsonify(body), status, {"Content-Type": "application/problem+json"}
 
@@ -81,10 +98,12 @@ def user(uid):
     return problem(404, "user.not_found", "User not found", f"User {uid} does not exist.")
 ```
 
-### 2단계 — 검증 에러
+모든 에러가 같은 envelope를 공유하면 처리와 문서화가 쉬워집니다.
+
+### Step 2 — Validation errors
 
 ```python
-# 예제 2: 검증 에러
+# 2_validation.py
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
@@ -100,29 +119,29 @@ def create():
     return jsonify(ok=True), 201
 ```
 
-`errors[]`로 필드별 실패를 묶습니다.
+validation 실패는 `errors[]` 안에 필드별로 쪼개 담아야 클라이언트가 정확히 표시할 수 있습니다.
 
-### 3단계 — 에러 코드 안정성
+### Step 3 — Stable error codes
 
 ```
-user.not_found          # 200, 의미 명확
+user.not_found
 order.payment_required
 order.already_paid
 ```
 
-코드는 문자열이며 상태 코드보다 안정적입니다.
+status code보다 더 안정적으로 분기되는 값이 문자열 error code입니다.
 
-### 4단계 — 보안 정보 누출 방지
+### Step 4 — Avoid leaking secrets
 
 ```python
 # 4_safe.py
-# 나쁨: 사용자 존재 여부가 드러나는 상세 메시지
-# 좋음: 인증 실패처럼 범용적인 상세 메시지
+# Bad : detail="No password match for user 'yeongseon'"
+# Good: detail="Invalid credentials."
 ```
 
-존재 여부 자체를 노출하지 않습니다.
+인증과 권한 관련 에러는 계정 존재 여부 같은 정보를 과하게 드러내지 않아야 합니다.
 
-### 5단계 — trace id
+### Step 5 — trace id
 
 ```python
 # 5_trace.py
@@ -139,37 +158,51 @@ def server_error(e):
     return jsonify(title="Internal", status=500, trace_id=g.trace_id), 500
 ```
 
-trace_id가 지원 요청 시간을 크게 줄여 줍니다.
+trace id가 있으면 지원 요청이 막연한 추적 작업이 아니라 빠른 조회 작업으로 바뀝니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 봐야 할 점
 
-- 본문이 항상 같은 모양입니다.
-- 사람용(`title`/`detail`) 과 기계용(`code`) 이 분리됩니다.
-- trace_id 가 응답에 포함됩니다.
+- 에러 본문이 항상 같은 형태를 가집니다.
+- 사람용 메시지와 기계용 코드가 분리되어 있습니다.
+- trace id가 응답과 함께 따라갑니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **에러 본문이 문자열입니다.** 클라이언트가 파싱하지 못합니다.
-2. **error code 없이 title만 둡니다.** 다국어 번역 후 분기가 깨집니다.
-3. **검증 실패에 단일 메시지만 둡니다.** 어느 필드인지 알기 어렵습니다.
-4. **스택 트레이스를 노출합니다.** 보안 사고로 이어질 수 있습니다.
-5. **trace_id가 없습니다.** 사용자 문의가 수사극이 됩니다.
+1. **에러 본문이 문자열 하나뿐입니다.** 클라이언트가 파싱할 수 없습니다.
+2. **`title`만 있고 error code가 없습니다.** 번역이나 문구 수정 이후 분기가 깨집니다.
+3. **validation 에러를 한 문장으로만 반환합니다.** 어느 필드가 틀렸는지 알 수 없습니다.
+4. **stack trace를 본문에 넣습니다.** 보안 사고로 이어질 수 있습니다.
+5. **trace id가 없습니다.** 모든 지원 요청이 탐정 소설이 됩니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-Stripe의 에러 객체(`type`, `code`, `param`, `message`)는 사실상 표준 사례가 되었습니다. 큰 사내 API들은 거의 RFC 7807 또는 그 변형을 씁니다. 핵심은 형식의 안정성입니다.
+Stripe의 error object는 `type`, `code`, `param`, `message` 조합으로 사실상 업계 기준처럼 읽힙니다. 대규모 내부 API도 RFC 7807 자체를 쓰거나 거의 같은 변형을 사용합니다. 중요한 것은 포맷 이름보다 모양의 안정성입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- error envelope를 공용 모듈로 구현합니다.
+- 새 에러는 새 code를 추가해서 표현합니다.
+- 4xx에도 trace id를 함께 돌려줍니다.
+- 사용자 메시지는 보안과 UX 관점에서 따로 검토합니다.
+- 자주 발생하는 에러는 문서 상단에서 먼저 보여 줍니다.
 
 ## 체크리스트
 
-- [ ] 모든 에러가 동일한 envelope인가?
+- [ ] 모든 에러가 같은 envelope를 공유하는가?
 - [ ] error code가 안정적인 문자열인가?
-- [ ] 검증 실패가 필드별로 나뉘는가?
-- [ ] 보안 정보가 detail에 새지 않는가?
-- [ ] trace_id 가 모든 응답에 있는가?
+- [ ] validation 실패가 필드 단위로 분해되는가?
+- [ ] `detail`이 민감한 정보를 노출하지 않는가?
+- [ ] 모든 응답에 trace id가 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-에러 응답은 API의 두 번째 얼굴입니다. 다음 글에서는 이 모든 약속을 한곳에 모은 OpenAPI와 Swagger를 봅니다.
+1. 현재 API에서 자주 나오는 4xx 응답 다섯 개에 안정적인 code 이름을 붙여 보세요.
+2. Step 2 예제에 최소 길이 검사를 추가해 보세요.
+3. 자유 형식 에러를 RFC 7807 envelope로 옮기는 마이그레이션 절차를 적어 보세요.
+
+## 정리와 다음 글
+
+error response는 API의 두 번째 얼굴입니다. 다음 글에서는 이 모든 계약을 한곳에 모아 주는 OpenAPI와 Swagger를 다룹니다.
 
 <!-- toc:begin -->
 - [API란 무엇인가?](./01-what-is-an-api.md)

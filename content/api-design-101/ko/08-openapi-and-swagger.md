@@ -1,15 +1,15 @@
 ---
+title: OpenAPI와 Swagger
 series: api-design-101
 episode: 8
-title: OpenAPI와 Swagger
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Computer Science
   - APIDesign
@@ -17,34 +17,49 @@ tags:
   - Swagger
   - Documentation
   - Backend
-seo_description: OpenAPI 3 스펙과 Swagger UI, code-first/schema-first 접근의 차이를 정리합니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연결하는 방법을 설명합니다.
 ---
 
 # OpenAPI와 Swagger
 
-OpenAPI 3 스펙과 Swagger UI를 이해하면 문서, 검증, 코드 생성이 하나의 흐름으로 연결됩니다. code-first와 schema-first의 차이도 이 지점에서 함께 정리할 수 있습니다.
-
-이 글은 API Design 101 시리즈의 8번째 글입니다.
+이 글은 API Design 101 시리즈의 여덟 번째 글입니다. OpenAPI 3와 Swagger UI는 하나의 계약을 문서, validation, client SDK 생성까지 확장해 줍니다. 핵심은 그 계약을 어디에 두고 어떻게 단일 진실 원본으로 유지하느냐입니다.
 
 ## 이 글에서 다룰 문제
 
-스펙 파일 하나가 문서, 검증, 코드 생성, 목 서버를 모두 만들어 줍니다. 손으로 쓴 문서는 항상 코드와 어긋나므로 자동화가 답입니다.
+- OpenAPI 3 문서는 어떤 구조로 이루어질까요?
+- Swagger UI와 Redoc은 각각 어떤 역할을 할까요?
+- code-first와 schema-first는 어떤 차이가 있을까요?
+- client SDK는 어떻게 생성할 수 있을까요?
+- spec drift를 막으려면 어떤 운영 습관이 필요할까요?
 
-> 단일 진실 원본(single source of truth)을 가져야 합니다.
+## 왜 중요한가
 
-## 전체 흐름
+잘 관리된 spec 파일 하나만 있으면 문서, validation, client code, mock server까지 한 번에 연결할 수 있습니다. 반대로 사람이 손으로 쓰는 문서는 코드와 반드시 어긋납니다. 자동화가 필요한 이유가 여기에 있습니다.
+
+> 하나의 단일 진실 원본을 유지해야 합니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Spec["openapi.yaml"] --> Docs["Swagger UI / Redoc"]
     Spec --> Validate["request validation"]
-    Spec --> Client["client SDK 생성"]
+    Spec --> Client["client SDK generation"]
     Spec --> Mock["mock server"]
 ```
 
-## Before/After
+## 핵심 용어
 
-**Before (수기 문서)**
+- **OpenAPI**: API 명세를 위한 표준입니다. 예전 Swagger spec의 후속 이름입니다.
+- **Swagger UI**: spec을 클릭 가능한 문서로 렌더링합니다.
+- **Redoc**: 더 읽기 편한 문서 중심 렌더러입니다.
+- **Code-first**: 코드나 decorator에서 spec을 생성하는 방식입니다.
+- **Schema-first**: spec을 먼저 작성하고 코드나 SDK를 생성하는 방식입니다.
+
+## Before / After
+
+**Before (손으로 쓴 문서)**
 
 ```
 README.md "GET /users/{id} returns user. id is integer."
@@ -69,12 +84,12 @@ paths:
               schema: {$ref: '#/components/schemas/User'}
 ```
 
-## OpenAPI 5단계
+## 실습: OpenAPI를 쓰는 다섯 단계
 
-### 1단계 — 최소 spec
+### Step 1 — Minimal spec
 
 ```yaml
-# 최소 OpenAPI 명세
+# openapi.yaml
 openapi: 3.0.0
 info: {title: Demo API, version: '1.0'}
 paths:
@@ -84,9 +99,9 @@ paths:
         '200': {description: OK}
 ```
 
-브라우저에서 Swagger UI로 띄우면 호출 버튼까지 생깁니다.
+Swagger UI에 열기만 해도 바로 호출해 볼 수 있는 문서가 생깁니다.
 
-### 2단계 — components/schemas
+### Step 2 — components / schemas
 
 ```yaml
 components:
@@ -99,12 +114,12 @@ components:
         name: {type: string}
 ```
 
-스키마는 재사용합니다. `$ref`로 참조합니다.
+반복되는 schema는 `$ref`로 재사용해야 유지보수가 쉬워집니다.
 
-### 3단계 — code-first (FastAPI)
+### Step 3 — Code-first (FastAPI)
 
 ```python
-# 예제 3: 코드 우선 방식
+# 3_codefirst.py
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -114,20 +129,22 @@ class User(BaseModel):
 app = FastAPI()
 @app.get("/users/{uid}")
 def user(uid: int) -> User: return User(id=uid, name="Y")
-# 문서 엔드포인트가 자동 생성됩니다
+# /docs and /openapi.json are generated automatically
 ```
 
-### 4단계 — Swagger UI / Redoc
+FastAPI처럼 code-first를 잘 지원하는 프레임워크에서는 spec drift를 줄이기 쉽습니다.
+
+### Step 4 — Swagger UI / Redoc
 
 ```http
-GET /docs        # Swagger UI (시도해 보기)
-GET /redoc       # Redoc (읽기 좋음)
+GET /docs        # Swagger UI (try it)
+GET /redoc       # Redoc (read it)
 GET /openapi.json
 ```
 
-같은 spec을 두 가지 방식으로 보여 주는 셈입니다.
+세 endpoint는 하나의 spec을 서로 다른 얼굴로 보여 줍니다.
 
-### 5단계 — 클라이언트 생성
+### Step 5 — Generate clients
 
 ```bash
 # 5_gen.sh
@@ -135,37 +152,51 @@ openapi-generator-cli generate \
   -i openapi.json -g python -o ./client
 ```
 
-수십 개 SDK를 명령 한 줄로 생성할 수 있습니다.
+하나의 spec에서 여러 언어 SDK를 생성할 수 있습니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 봐야 할 점
 
 - spec이 코드와 함께 자랍니다.
-- 같은 스키마가 검증, 문서, SDK에 동시에 쓰입니다.
-- 손으로 쓰는 문서가 사라집니다.
+- 같은 schema가 validation, 문서, SDK 생성에 동시에 쓰입니다.
+- 사람이 손으로 관리하는 중복 문서가 줄어듭니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **spec과 코드가 따로 놉니다.** 시간이 지나면 반드시 어긋납니다.
-2. **examples가 없습니다.** 클라이언트 입장에서 호출 방법이 보이지 않습니다.
-3. **에러 응답이 빠져 있습니다.** 200만 정의하고 4xx/5xx는 숨겨 둡니다.
-4. **버전을 적지 않습니다.** spec 자체에 version이 없으면 변경 추적이 어렵습니다.
-5. **public spec에 내부 정보를 넣습니다.** 내부 endpoint와 필드가 그대로 노출됩니다.
+1. **spec과 코드가 따로 놉니다.** 결국 반드시 어긋납니다.
+2. **예제가 없습니다.** 사용자가 무엇을 보내야 할지 감을 못 잡습니다.
+3. **에러 응답이 빠져 있습니다.** 200만 문서화되고 4xx, 5xx는 비밀이 됩니다.
+4. **spec 버전 관리가 없습니다.** 변경 이력을 추적하기 어렵습니다.
+5. **공개 spec에 내부 정보가 섞입니다.** 내부 endpoint나 필드가 그대로 노출됩니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-GitHub도 OpenAPI spec을 공개합니다(`api.github.com/openapi`). 사내에서도 PR마다 spec이 바뀌는지 CI가 검사하면 drift를 줄일 수 있습니다. FastAPI와 NestJS 같은 프레임워크는 기본으로 spec을 내보냅니다.
+GitHub는 `api.github.com/openapi`로 OpenAPI spec을 공개합니다. 내부 시스템에서는 CI에서 코드 변경과 함께 spec 변경도 검증하면 drift가 크게 줄어듭니다. FastAPI와 NestJS는 spec export를 기본적으로 잘 지원하는 편입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- code-first와 schema-first 중 하나만 분명히 선택합니다.
+- spec 파일을 git에 커밋하고 PR diff로 리뷰합니다.
+- 예제를 반드시 채웁니다. 사용자는 예제부터 복사합니다.
+- 200만이 아니라 4xx, 5xx도 spec에 넣습니다.
+- 공개용 spec과 내부용 spec을 분리합니다.
 
 ## 체크리스트
 
-- [ ] spec 이 코드와 동기화되는가 (CI 가 검사)?
-- [ ] 모든 endpoint에 examples 가 있는가?
-- [ ] 4xx/5xx 가 spec 에 정의되어 있는가?
-- [ ] components/schemas가 재사용되는가?
-- [ ] public/internal spec 이 분리되어 있는가?
+- [ ] spec이 코드와 동기화되는가? CI에서 확인하는가?
+- [ ] 모든 endpoint에 예제가 있는가?
+- [ ] 4xx와 5xx가 spec에 정의되어 있는가?
+- [ ] `components/schemas`를 `$ref`로 재사용하는가?
+- [ ] 공개 spec과 내부 spec이 분리되어 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-OpenAPI는 API의 프로토콜이자 문서이자 코드입니다. 다음 글에서는 약속이 바뀔 때의 규율인 versioning을 봅니다.
+1. 가장 복잡한 endpoint 하나를 OpenAPI로 표현해 보세요.
+2. Step 3 FastAPI 예제에 `POST /users`를 추가해 보세요.
+3. spec 변경이 PR 리뷰 일부가 되도록 워크플로를 설계해 보세요.
+
+## 정리와 다음 글
+
+OpenAPI는 API의 프로토콜이자 문서이자 코드 생성 입력입니다. 다음 글에서는 이 계약을 안전하게 바꾸는 기술, versioning을 다룹니다.
 
 <!-- toc:begin -->
 - [API란 무엇인가?](./01-what-is-an-api.md)

@@ -1,15 +1,15 @@
 ---
+title: Pagination과 filtering
 series: api-design-101
 episode: 6
-title: Pagination과 filtering
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Computer Science
   - APIDesign
@@ -17,23 +17,30 @@ tags:
   - Filtering
   - Performance
   - Backend
-seo_description: offset/limit과 cursor 페이지네이션, 정렬과 필터링의 표준 패턴을 정리합니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 trade-off를 정리합니다.
 ---
 
 # Pagination과 filtering
 
-offset/limit과 cursor 페이지네이션, 정렬과 필터링 패턴은 큰 컬렉션을 다룰 때 API 품질을 좌우합니다.
-
-이 글은 API Design 101 시리즈의 6번째 글입니다.
+이 글은 API Design 101 시리즈의 여섯 번째 글입니다. 목록 API에서는 pagination, sorting, filtering이 단순한 편의 기능이 아니라 성능과 정확성을 동시에 좌우합니다. 특히 offset과 cursor 중 무엇을 선택하느냐가 전체 경험을 크게 바꿉니다.
 
 ## 이 글에서 다룰 문제
 
-페이지네이션이 잘못되면 느린 쿼리와 중복, 누락이 동시에 생깁니다. 그리고 한 번 외부에 나가면 쉽게 못 바꾸므로 처음부터 의도를 담아 설계해야 합니다.
+- offset / limit 방식은 어디까지 단순하고 어디서부터 한계가 드러날까요?
+- cursor 기반 pagination은 어떤 문제를 해결할까요?
+- sorting, filtering, searching은 어떤 규칙으로 분리해야 할까요?
+- 응답 메타데이터와 link header는 어떻게 설계하는 편이 좋을까요?
+- 큰 결과 집합에서 자주 터지는 성능 함정은 무엇일까요?
 
-> 큰 컬렉션은 반드시 조각으로 나눠야 합니다.
+## 왜 중요한가
 
-## 전체 흐름
+나쁜 pagination은 느린 쿼리만 만드는 것이 아닙니다. 중복과 누락까지 동시에 만들 수 있습니다. 한 번 공개된 뒤에는 바꾸기 어렵기 때문에 처음부터 의도를 가지고 설계해야 합니다.
+
+> 큰 컬렉션은 항상 작은 조각으로 나눠 이동해야 합니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     A["?limit=20"] --> P1["page 1 + next_cursor"]
@@ -41,25 +48,35 @@ flowchart LR
     A2 --> P2["page 2 + next_cursor"]
 ```
 
-cursor는 다음 페이지의 시작점입니다.
+cursor는 다음 페이지가 어디서 시작되는지를 가리키는 토큰입니다.
 
-## Before/After
+## 핵심 용어
 
-**Before (정렬·필터·페이지가 뒤엉킴)**
+- **Offset / Limit**: `?offset=40&limit=20` 형태입니다. 단순하지만 offset이 커질수록 느려집니다.
+- **Cursor**: 마지막 항목의 정렬 키를 바탕으로 만든 불투명 토큰입니다.
+- **Total count**: 전체 행 수입니다. 큰 테이블에서는 계산 비용이 큽니다.
+- **Sort**: `?sort=created_at:desc`처럼 정렬 기준을 전달합니다.
+- **Filter**: `?status=active&tier=pro`처럼 조건을 전달합니다.
+
+## Before / After
+
+**Before (정렬, 필터, 페이지가 뒤섞임)**
 
 ```http
 GET /orders?p=3&s=date&q=paid
 ```
 
-**After (이름·표준·메타)**
+**After (이름과 의미가 분명함)**
 
 ```http
 GET /orders?status=paid&sort=created_at:desc&limit=20&cursor=eyJpZCI6MTIzfQ
 ```
 
-## Pagination 5단계
+파라미터는 짧은 것보다 의미가 분명한 편이 낫습니다.
 
-### 1단계 — offset/limit
+## 실습: pagination을 설계하는 다섯 단계
+
+### Step 1 — offset / limit
 
 ```python
 # 1_offset.py
@@ -74,9 +91,9 @@ def items():
     return jsonify(items=ITEMS[offset:offset+limit], total=len(ITEMS))
 ```
 
-`limit`에는 상한을 둡니다.
+`limit`에는 항상 상한을 둬야 합니다.
 
-### 2단계 — cursor
+### Step 2 — cursor
 
 ```python
 # 2_cursor.py
@@ -93,63 +110,77 @@ def items():
     return jsonify(items=page, next_cursor=(nxt if nxt < len(ITEMS) else None))
 ```
 
-cursor는 불투명하게 유지합니다. 클라이언트가 해석하지 않게 해야 합니다.
+실제 서비스에서는 cursor를 클라이언트가 해석하지 못하는 불투명 토큰으로 만드는 편이 안전합니다.
 
-### 3단계 — 정렬
+### Step 3 — sorting
 
 ```http
 GET /items?sort=created_at:desc
 GET /items?sort=name:asc,id:desc
 ```
 
-여러 키 조합도 표준화합니다.
+다중 정렬도 같은 문법 안에서 일관되게 표현해야 합니다.
 
-### 4단계 — 필터
+### Step 4 — filtering
 
 ```http
 GET /orders?status=paid&tier=pro
 GET /orders?created_at__gte=2026-01-01
 ```
 
-연산자는 `__gte`, `__lt` 같은 명시적 접미사로.
+`__gte`, `__lt` 같은 명시적 연산자 suffix를 두면 문서화와 검증이 쉬워집니다.
 
-### 5단계 — 검색
+### Step 5 — search
 
 ```http
 GET /articles?q=python+logging
 ```
 
-검색은 별도 파라미터 `q`로 분리합니다. 필터와 섞지 않습니다.
+검색은 `q`처럼 별도 parameter로 두고 filter와 섞지 않는 편이 좋습니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 봐야 할 점
 
-- `limit`에는 상한이 있어야 합니다.
-- cursor는 불투명한 토큰이어야 합니다.
-- 정렬, 필터, 검색은 각각 다른 의미이므로 같은 파라미터에 섞지 않습니다.
+- `limit`에는 상한이 있습니다.
+- cursor는 불투명 토큰이어야 합니다.
+- sort, filter, search는 각자 다른 의미를 가지므로 parameter도 분리해야 합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **`limit` 상한이 없습니다.** 클라이언트가 10만 개를 한 번에 요청할 수 있습니다.
-2. **deep offset을 남용합니다.** `offset=100000`은 인덱스가 있어도 느립니다.
-3. **total count를 항상 계산합니다.** 큰 테이블에서는 대표적인 병목이 됩니다.
-4. **필터, 정렬, 검색을 한 파라미터에 몰아넣습니다.** 검증과 문서화가 모두 어려워집니다.
-5. **cursor의 내용을 노출합니다.** 클라이언트가 위조해 데이터를 빼낼 수 있습니다.
+1. **`limit` 상한이 없습니다.** 한 번에 수십만 건을 요청하게 됩니다.
+2. **깊은 offset을 허용합니다.** `offset=100000`은 인덱스가 있어도 느릴 수 있습니다.
+3. **항상 total을 계산합니다.** 큰 테이블에서는 치명적인 비용이 됩니다.
+4. **filter, sort, search를 한 parameter에 몰아넣습니다.** 검증과 문서화가 어려워집니다.
+5. **cursor 내부 구조를 노출합니다.** 클라이언트가 위조하거나 데이터 유출의 단서가 될 수 있습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-GitHub은 `Link` 헤더로 next/prev URL을 돌려줍니다. Twitter·Slack처럼 빠르게 변하는 데이터는 cursor 기반이 표준입니다. Stripe는 `has_more`와 `data[].id`로 단순한 cursor를 노출합니다.
+GitHub는 `Link` header로 다음과 이전 페이지 URL을 전달합니다. 데이터가 빠르게 바뀌는 시스템인 Twitter나 Slack은 cursor 기반 방식을 기본으로 둡니다. Stripe도 `has_more`와 `data[].id`를 활용한 단순한 cursor 모델을 사용합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 새 컬렉션은 기본적으로 cursor를 먼저 고려합니다.
+- 기본 `limit`와 최대 `limit`를 반드시 문서화합니다.
+- total count는 비용이 크면 선택적으로 제공합니다.
+- filter 값은 enum으로 문서화합니다.
+- 검색은 별도 endpoint로 빼는 편이 나은지도 함께 검토합니다.
 
 ## 체크리스트
 
-- [ ] `limit` 에 상한이 있는가?
+- [ ] `limit`에 상한이 있는가?
 - [ ] cursor가 불투명한가?
-- [ ] 정렬·필터·검색이 각자 다른 파라미터인가?
-- [ ] 응답에 다음 페이지 링크 또는 cursor가 있는가?
-- [ ] total count가 비용을 고려해 결정되었는가?
+- [ ] sort, filter, search가 서로 다른 parameter를 쓰는가?
+- [ ] 응답에 다음 페이지 cursor나 link가 포함되는가?
+- [ ] total count를 비용을 고려해 선택했는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-페이지네이션은 성능과 정확성이 만나는 지점입니다. 다음 글에서는 컬렉션이든 단일 자원이든 빠질 수 없는 error response 설계를 봅니다.
+1. 현재 목록 endpoint 하나를 cursor 기반으로 다시 설계해 보세요.
+2. Step 1 예제의 `limit`에 100 상한을 추가해 보세요.
+3. 검색을 별도 endpoint로 둘지 `?q=`로 둘지 정하고 trade-off를 정리해 보세요.
+
+## 정리와 다음 글
+
+pagination은 성능과 정확성이 만나는 지점입니다. 다음 글에서는 모든 API가 결국 마주치는 또 하나의 주제, error response 설계를 다룹니다.
 
 <!-- toc:begin -->
 - [API란 무엇인가?](./01-what-is-an-api.md)
