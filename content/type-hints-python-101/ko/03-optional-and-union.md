@@ -18,262 +18,228 @@ tags:
   - None
   - 타입 안전
 seo_description: Optional과 Union으로 None 가능성과 여러 타입을 안전하게 표현하는 방법을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 ---
 
 # Optional과 Union
 
-> Type Hints in Python 101 시리즈 (3/10)
+실무 Python 코드에서는 값이 항상 존재하지 않습니다. 조회 결과가 없으면 `None`이 나오고, 유연한 입력을 받으려다 보면 하나의 매개변수가 문자열일 수도 정수일 수도 있습니다. 이런 상황을 타입에 적지 않으면 가장 흔한 버그가 조용히 숨어 듭니다.
 
+이 글은 Type Hints (Python) 101 시리즈의 3번째 글입니다. 여기서는 `Optional`과 `Union`으로 값의 가능 범위를 어떻게 표현하는지, 그리고 호출자가 그 가능성을 어떻게 안전하게 처리해야 하는지 살펴봅니다.
 
 ## 이 글에서 다룰 문제
 
-함수가 `None`을 반환할 수 있는데 타입 힌트에 표시하지 않으면, 호출자가 `None` 체크 없이 결과를 사용하다 `AttributeError`를 만납니다. `Optional`로 None 가능성을 명시하면 mypy가 체크 누락을 잡아줍니다.
+- 반환값이 `None`일 수 있다는 사실을 타입에 어떻게 드러낼까요?
+- 하나의 값이 여러 타입 중 하나일 수 있을 때 어떤 문법을 써야 할까요?
+- Python 3.10+의 `X | Y` 문법은 언제 유용할까요?
+- `is None`, `isinstance` 검사로 타입을 어떻게 좁힐까요?
 
-> Optional = "이 값은 None일 수 있다"는 경고
+> Optional은 "없을 수도 있음"을, Union은 "여러 타입 중 하나일 수 있음"을 계약으로 드러내는 문법입니다.
 
-`Union`은 API 응답이 성공(dict) 또는 오류(str)일 수 있는 경우처럼 여러 타입을 하나의 힌트로 표현합니다.
+## 왜 이 주제가 중요한가
 
-## 핵심 개념 잡기
+Python 런타임 오류 중에는 `None` 관련 예외가 매우 많습니다. 함수가 찾지 못한 값을 `None`으로 반환했는데 호출자는 항상 객체가 온다고 가정하고 메서드를 호출해 버리는 식입니다. 이런 문제는 원인이 생긴 지점과 폭발하는 지점이 멀리 떨어져 있어서 디버깅 비용도 큽니다.
 
-> Optional vs Union
+`Union`도 마찬가지입니다. 하나의 매개변수가 문자열 ID와 숫자 ID를 모두 받는다면, 코드와 타입은 그 사실을 숨기지 말아야 합니다. 입력이 여러 타입을 받을 수 있다는 사실을 명시해야 분기 처리, 자동완성, 코드 리뷰 모두가 쉬워집니다.
+
+## 한눈에 보는 개념
 
 ```text
-Optional[str]            Union[str, int]
-─────────────────       ─────────────────
-str | None              str | int
-값이 있거나 None         str이거나 int
-검색 결과 없음 표현      여러 타입 허용
+Optional[str]  =  str | None
+                    │
+            if value is not None:
+                    │
+            value: str 로 좁혀짐
+
+Union[int, str]  =  int | str
+                      │
+            if isinstance(value, int):
+                      │
+            value: int 로 좁혀짐
 ```
 
-## 핵심 개념
+## 핵심 용어
 
 | 용어 | 설명 |
-|------|------|
-| Optional[T] | `T | None`과 같으며, 값이 없을 수 있음을 나타냅니다 |
-| Union[T1, T2] | T1 또는 T2 중 하나의 타입임을 나타냅니다 |
-| `X \| Y` | Python 3.10+에서 Union의 축약 문법입니다 |
-| 타입 가드(type guard) | 조건문으로 타입을 좁히는 패턴입니다 |
-| 타입 좁히기(narrowing) | mypy가 분기를 분석하여 타입을 확정하는 기능입니다 |
+| --- | --- |
+| Optional[T] | `T | None`과 같은 뜻입니다 |
+| Union[T1, T2] | 값이 나열된 타입 중 하나라는 뜻입니다 |
+| 파이프 문법 | Python 3.10+에서 `Union[int, str]` 대신 `int | str`로 적는 방식입니다 |
+| 타입 좁히기 | 분기 조건을 통해 분석기가 구체 타입을 확정하는 과정입니다 |
+| 타입 가드 | 특정 검사가 타입을 좁혀 준다는 사실을 표현하는 방식입니다 |
 
-## Before / After
-
-None 가능성이 숨겨진 코드를 Optional로 명시합니다.
+## 바꾸기 전과 후
 
 ```python
-# before: None 반환이 숨겨져 있음
-def find_user(user_id):
-    users = {"1": "Alice", "2": "Bob"}
-    return users.get(user_id)
+def find_user(user_id: int) -> dict:
+    if user_id == 0:
+        return None  # 타입은 dict라고 적었지만 실제로는 None 반환
+    return {"id": user_id, "name": "Alice"}
+
+
+user = find_user(0)
+print(user["name"])  # 런타임 오류
 ```
 
 ```python
-# after: None 가능성이 명시됨
-def find_user(user_id: str) -> str | None:
-    users = {"1": "Alice", "2": "Bob"}
-    return users.get(user_id)
+def find_user(user_id: int) -> dict[str, str | int] | None:
+    if user_id == 0:
+        return None
+    return {"id": user_id, "name": "Alice"}
+
+
+user = find_user(0)
+if user is not None:
+    print(user["name"])  # 안전함
 ```
 
-## 단계별 실습
+여기서 중요한 점은 `None` 가능성을 숨기지 않는다는 사실입니다.
 
-### Step 1: Optional 기본
+## 단계별로 익히기
+
+### 1단계: Optional로 nullable 반환값 표현하기
 
 ```python
 from typing import Optional
 
 
-# Optional[str] == str | None
-def find_user(user_id: str) -> Optional[str]:
-    """사용자를 찾습니다. 없으면 None을 반환합니다."""
-    users = {"1": "Alice", "2": "Bob", "3": "Charlie"}
-    return users.get(user_id)
+def find_by_name(name: str) -> Optional[str]:
+    """찾으면 이메일을, 없으면 None을 반환합니다."""
+    users = {"Alice": "alice@example.com", "Bob": "bob@example.com"}
+    return users.get(name)
 
 
-result = find_user("1")
-print(result)  # Alice
-
-result = find_user("999")
-print(result)  # None
-
-# Python 3.10+ 문법
-def find_email(name: str) -> str | None:
-    emails = {"Alice": "alice@example.com"}
-    return emails.get(name)
+email = find_by_name("Alice")
+# email: Optional[str] — 사용 전에 확인 필요
+if email is not None:
+    print(email.upper())  # 안전함
 ```
 
-### Step 2: None 안전 처리
+`Optional[str]`는 정확히 `str | None`입니다. 선택적 매개변수라는 말이 아니라, 값 자체가 비어 있을 수도 있다는 설명에 가깝습니다.
+
+### 2단계: Python 3.10+ 파이프 문법 쓰기
 
 ```python
-def find_user(user_id: str) -> str | None:
-    users = {"1": "Alice", "2": "Bob"}
-    return users.get(user_id)
+# Python 3.10+: Union/Optional 대신 | 문법을 사용합니다.
+def find_by_name(name: str) -> str | None:
+    users = {"Alice": "alice@example.com"}
+    return users.get(name)
 
 
-# 방법 1: if 체크
-user = find_user("1")
-if user is not None:
-    print(user.upper())  # mypy OK — user는 str로 좁혀짐
-else:
-    print("사용자 없음")
-
-# 방법 2: 기본값 제공
-user = find_user("999") or "Unknown"
-print(user.upper())  # UNKNOWN
-
-# 방법 3: 조기 반환
-def process_user(user_id: str) -> str:
-    user = find_user(user_id)
-    if user is None:
-        return "사용자를 찾을 수 없습니다"
-    # 여기서 user는 str로 확정됨
-    return f"처리 완료: {user.upper()}"
-
-
-print(process_user("1"))    # 처리 완료: ALICE
-print(process_user("999"))  # 사용자를 찾을 수 없습니다
+def process(value: int | str) -> str:
+    return str(value)
 ```
 
-### Step 3: Union 기본
+이 문법은 더 짧고, `typing` 임포트를 줄여 줍니다.
+
+### 3단계: Union으로 여러 타입 받기
 
 ```python
-from typing import Union
-
-
-# Union[int, float] — 정수 또는 실수
-def absolute(value: Union[int, float]) -> float:
-    return abs(float(value))
-
-
-print(absolute(-5))    # 5.0
-print(absolute(-3.14)) # 3.14
-
-# Python 3.10+ 문법
-def parse_value(raw: str) -> int | float | str:
-    """문자열을 숫자로 변환합니다. 변환 불가하면 그대로 반환합니다."""
-    try:
-        return int(raw)
-    except ValueError:
-        pass
-    try:
-        return float(raw)
-    except ValueError:
-        return raw
-
-
-print(parse_value("42"))     # 42 (int)
-print(parse_value("3.14"))   # 3.14 (float)
-print(parse_value("hello"))  # hello (str)
-```
-
-### Step 4: 타입 가드와 isinstance
-
-```python
-def format_value(value: int | str | list[int]) -> str:
-    """다양한 타입의 값을 문자열로 변환합니다."""
+def format_id(value: int | str) -> str:
+    """정수 ID와 문자열 UUID를 모두 받습니다."""
     if isinstance(value, int):
-        return f"정수: {value:,}"
-    if isinstance(value, str):
-        return f"문자열: '{value}'"
-    if isinstance(value, list):
-        return f"리스트: [{', '.join(str(v) for v in value)}]"
-    # mypy: 여기에 도달하면 안 됨 (exhaustive check)
-    raise TypeError(f"지원하지 않는 타입: {type(value)}")
+        return f"ID-{value:06d}"
+    return f"UUID-{value}"
 
 
-print(format_value(1000))           # 정수: 1,000
-print(format_value("hello"))        # 문자열: 'hello'
-print(format_value([1, 2, 3]))      # 리스트: [1, 2, 3]
-
-
-# 복합 Union 처리
-def process_response(data: dict[str, str] | str | None) -> str:
-    if data is None:
-        return "응답 없음"
-    if isinstance(data, str):
-        return f"오류: {data}"
-    return f"성공: {data.get('result', 'N/A')}"
-
-
-print(process_response({"result": "OK"}))  # 성공: OK
-print(process_response("timeout"))          # 오류: timeout
-print(process_response(None))               # 응답 없음
+print(format_id(42))          # ID-000042
+print(format_id("abc-123"))   # UUID-abc-123
 ```
 
-### Step 5: Optional 매개변수와 기본값
+`isinstance` 분기 안에서는 분석기가 `value`를 `int`로 좁혀서 봅니다.
+
+### 4단계: 타입 좁히기 패턴 익히기
 
 ```python
-def create_user(
-    name: str,
-    email: str | None = None,
-    age: int | None = None,
-    role: str = "user",
-) -> dict[str, str | int | None]:
-    """사용자를 생성합니다. email과 age는 선택입니다."""
-    user: dict[str, str | int | None] = {"name": name, "role": role}
-    if email is not None:
-        user["email"] = email
-    if age is not None:
-        user["age"] = age
-    return user
+def process(value: str | int | None) -> str:
+    # 패턴 1: None 확인
+    if value is None:
+        return "default"
+
+    # 패턴 2: isinstance 확인
+    if isinstance(value, int):
+        return str(value)
+
+    # 다른 경우를 제거했으므로 여기서는 str만 남습니다.
+    return value.upper()
 
 
-# 다양한 조합으로 호출
-print(create_user("Alice"))
-# 반환 결과: {'name': 'Alice', 'role': 'user'}
-
-print(create_user("Bob", email="bob@example.com", age=30))
-# {'name': 'Bob', 'role': 'user', 'email': 'bob@example.com', 'age': 30}
-
-print(create_user("Charlie", role="admin"))
-# 반환 결과: {'name': 'Charlie', 'role': 'admin'}
-
-# 주의: Optional 매개변수 ≠ 기본값이 None인 매개변수
-# def f(x: Optional[int]) — x는 반드시 전달해야 하며, None도 가능
-# def f(x: int | None = None) — x를 전달하지 않으면 None
+def safe_len(text: str | None) -> int:
+    # 패턴 3: 조기 반환
+    if text is None:
+        return 0
+    return len(text)
 ```
 
-## 이 코드에서 주목할 점
+이런 분기 구조가 있어야 mypy와 pyright가 모든 경우를 안전하게 처리했다고 판단합니다.
 
-- `Optional[T]`는 `T | None`의 별칭이며, None 가능성을 명시합니다
-- `isinstance` 체크 후 mypy가 타입을 자동으로 좁힙니다
-- Python 3.10+에서는 `X | Y` 문법이 `Union[X, Y]`보다 간결합니다
-- Optional 매개변수의 기본값은 `None`이 일반적입니다
+### 5단계: 기본값이 `None`인 매개변수 적기
 
-## 흔한 실수 5가지
+```python
+def greet(name: str, title: str | None = None) -> str:
+    """title은 기본값이 None인 선택적 값입니다."""
+    if title is not None:
+        return f"Hello, {title} {name}!"
+    return f"Hello, {name}!"
 
-| 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| Optional을 쓰고 None 체크 누락 | AttributeError 발생합니다 | if/assert로 None을 먼저 처리합니다 |
-| `Optional[int] = 0` 혼동 | 기본값이 0이면 Optional이 아닙니다 | 기본값이 None일 때만 Optional을 씁니다 |
-| Union 타입에 isinstance 미사용 | 잘못된 속성 접근이 발생합니다 | isinstance로 타입을 좁힙니다 |
-| `Optional[Optional[int]]` | 중첩 Optional은 무의미합니다 | `Optional[int]`로 충분합니다 |
-| `Union[int, str, float]`에서 int 포함 | int는 float의 하위 타입입니다 | `Union[float, str]`로 단순화합니다 |
 
-## 실무에서 이렇게 쓰입니다
+print(greet("Alice"))              # Hello, Alice!
+print(greet("Alice", "Dr."))      # Hello, Dr. Alice!
+```
 
-- 데이터베이스 조회 결과가 없을 때 `Optional[Model]`을 반환합니다
-- API 응답이 성공(dict) 또는 오류(str)일 때 `Union`으로 표현합니다
-- 설정 값이 존재하지 않을 수 있는 경우 `Optional`로 표시합니다
-- FastAPI 쿼리 파라미터에 `None` 기본값과 함께 `Optional`을 사용합니다
-- 에러 처리에서 `Result = Success | Failure` 패턴을 구현합니다
+매개변수 기본값이 `None`이면 대개 `T | None` 형태로 적는 편이 가장 분명합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 여기서 먼저 봐야 할 점
 
-`Optional`은 "이 값은 None일 수 있다"는 명시적 경고입니다. 타입 힌트 없이는 코드를 읽거나 런타임에서야 None 가능성을 알게 됩니다. mypy와 함께 사용하면 None 체크 누락을 컴파일 타임에 잡을 수 있습니다.
+- `Optional[T]`와 `T | None`은 의미가 같습니다.
+- `Optional` 값을 쓰기 전에는 `None` 확인이 필요합니다.
+- `Union`을 받는 코드는 분기 안에서 타입을 좁혀야 안전합니다.
+- Python 3.10+에서는 `|` 문법이 가장 읽기 좋습니다.
 
-Python 3.10+를 사용한다면 `Optional[str]` 대신 `str | None`을, `Union[int, str]` 대신 `int | str`을 쓰는 것이 가독성과 현대적 스타일 모두에 좋습니다.
+## 자주 헷갈리는 지점
+
+| 실수 | 왜 문제인가 | 권장 방식 |
+| --- | --- | --- |
+| Optional 값을 확인 없이 사용함 | `NoneType` 관련 런타임 오류가 납니다 | `is not None` 확인 후 사용합니다 |
+| Optional을 "매개변수를 안 넘겨도 된다"로 이해함 | nullable과 optional argument를 혼동합니다 | `Optional`은 값이 `None`일 수 있다는 뜻으로 읽습니다 |
+| `Union[int, str, float, bool, list]`처럼 너무 넓게 잡음 | 호출자와 구현 모두 복잡해집니다 | 2~3개 수준으로 유지하거나 API를 나눕니다 |
+| 분기에서 타입 좁히기를 하지 않음 | 분석기가 여전히 여러 타입 가능성을 봅니다 | `isinstance`, `is None` 패턴을 씁니다 |
+| `Optional[Optional[str]]`를 중첩함 | 의미가 늘지 않습니다 | `str | None` 하나면 충분합니다 |
+
+## 실무에서는 이렇게 연결됩니다
+
+- 데이터베이스 조회 함수는 찾지 못한 경우 `Model | None`을 반환합니다.
+- 설정 조회는 `str | None`으로 받고 호출부에서 기본값을 정합니다.
+- API 클라이언트는 성공 응답과 오류 응답을 `Union`으로 모델링할 수 있습니다.
+- 폼 입력은 `str | int`처럼 여러 형태를 받되 내부에서 빨리 정규화합니다.
+
+## 실무 판단 기준
+
+숙련된 개발자는 "없음"을 숫자 `-1`이나 빈 문자열 같은 센티널 값으로 감추기보다 `None`과 `Optional`로 드러내는 쪽을 선호합니다. 그래야 호출자가 빠뜨릴 수 없고, 분석기도 그 분기를 강제할 수 있습니다.
+
+또한 `Union`이 계속 넓어지면 타입 문제가 아니라 설계 문제로 봅니다. 하나의 함수가 너무 많은 입력 형태를 받기 시작했다는 뜻일 수 있기 때문입니다. 이때는 타입을 더 복잡하게 적는 것보다 인터페이스를 쪼개는 편이 낫습니다.
 
 ## 체크리스트
 
-- [ ] `Optional[T]`와 `T | None`이 같은 의미임을 설명할 수 있다
-- [ ] `Union[T1, T2]`로 여러 타입을 표현할 수 있다
-- [ ] isinstance로 Union 타입을 좁힐 수 있다
-- [ ] Optional 반환값을 안전하게 처리할 수 있다
-- [ ] Python 3.10+ `X | Y` 문법을 사용할 수 있다
+- [ ] nullable 값에는 `Optional[T]` 또는 `T | None`을 사용했습니다
+- [ ] Optional 값을 쓰기 전에 `None` 확인을 했습니다
+- [ ] Union 분기에서 `isinstance`나 `is None`으로 타입을 좁혔습니다
+- [ ] Union 타입 개수를 과도하게 늘리지 않았습니다
+- [ ] Python 3.10+ 환경에서는 `|` 문법을 고려했습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-`Optional`은 None 가능성을, `Union`은 여러 타입의 가능성을 명시합니다. isinstance와 조건문을 통해 mypy가 타입을 좁히는 원리를 이해했습니다. 다음 글에서는 콜백, 데코레이터, 오버로드 등 **함수 타입 힌트**를 심화합니다.
+1. `safe_divide(a: float, b: float) -> float | None` 함수를 작성해 0으로 나누려 할 때 `None`을 반환하게 해 보세요.
+
+2. `format_value(value: int | float | str) -> str` 함수를 만들고, 각 타입마다 다른 포맷을 적용해 보세요.
+
+3. 지금은 빈 문자열 `""`로 "없음"을 표현하는 함수를 하나 골라 `Optional[str]` 기반으로 바꿔 보세요.
+
+## 정리와 다음 글
+
+`Optional[T]`는 값이 `None`일 수 있음을, `Union[T1, T2]`는 여러 타입 중 하나가 올 수 있음을 적는 방법입니다. 중요한 점은 타입을 적는 데서 끝나지 않고, 분기 안에서 그 가능성을 실제로 처리하는 것입니다. `isinstance`와 `is None`은 그 계약을 코드로 드러내는 가장 기본적인 패턴입니다.
+
+다음 글에서는 함수 자체를 값처럼 다룰 때 필요한 `Callable`, `*args`, `**kwargs`, `@overload`를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [Python type hint란 무엇인가?](./01-what-is-type-hint.md)
@@ -290,9 +256,9 @@ Python 3.10+를 사용한다면 `Optional[str]` 대신 `str | None`을, `Union[i
 
 ## 참고 자료
 
-- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
+- [Python 공식 문서 — typing.Optional](https://docs.python.org/3/library/typing.html#typing.Optional)
+- [Python 공식 문서 — typing.Union](https://docs.python.org/3/library/typing.html#typing.Union)
 - [PEP 604 — Allow writing union types as X | Y](https://peps.python.org/pep-0604/)
-- [mypy 공식 문서 — Optional types](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#optional-types-and-the-none-type)
-- [Real Python — Union and Optional](https://realpython.com/python-type-checking/#union-types)
+- [mypy 문서 — Optional types and None](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#optional-types-and-the-none-type)
 
 Tags: Python, Type Hints, Optional, Union, None, 타입 안전

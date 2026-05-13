@@ -18,222 +18,206 @@ tags:
   - dict
   - tuple
 seo_description: int, str부터 list, dict, tuple까지 Python 타입 힌트의 기본 타입과 컬렉션 타입을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 ---
 
 # 기본 타입과 collection 타입
 
-> Type Hints in Python 101 시리즈 (2/10)
+타입 힌트를 처음 붙일 때 가장 많이 나오는 질문은 단순합니다. `name: str`은 알겠는데, 리스트와 딕셔너리 안에 무엇이 들어가는지는 어떻게 적어야 할까요? 바로 이 지점부터 타입 힌트가 문서 수준을 넘어 실제 오류 방지 도구로 바뀝니다.
 
+이 글은 Type Hints (Python) 101 시리즈의 2번째 글입니다. 여기서는 기본 스칼라 타입과 컬렉션 타입을 어떻게 표현하는지, 그리고 컨테이너 안쪽 타입까지 적어야 하는 이유를 정리합니다.
 
 ## 이 글에서 다룰 문제
 
-`items: list`라고만 쓰면 리스트 안에 무엇이 들어있는지 알 수 없습니다. `items: list[str]`로 원소 타입을 명시하면 IDE와 mypy가 잘못된 원소 삽입을 바로 잡아줍니다.
+- `int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?
+- `list`, `dict`, `tuple`, `set`은 왜 원소 타입까지 붙여야 할까요?
+- 고정 길이 튜플과 가변 길이 튜플은 어떻게 다를까요?
+- 중첩된 자료구조는 어떤 방식으로 읽기 좋게 표현할까요?
 
-> 컬렉션 타입 힌트 = 원소 타입까지 명시
+> 컬렉션 타입 힌트의 핵심은 컨테이너의 종류가 아니라, 그 안에 무엇이 들어가는지를 명시하는 데 있습니다.
 
-Python 3.9부터 `list[int]`, `dict[str, int]`처럼 내장 타입을 직접 사용할 수 있어 `typing.List`, `typing.Dict` 임포트가 불필요합니다.
+## 왜 이 주제가 중요한가
 
-## 핵심 개념 잡기
+실무 Python 코드는 대부분 컬렉션과 함께 움직입니다. API 응답은 딕셔너리와 리스트로 오고, 설정은 중첩 딕셔너리로 들어오며, 쿼리 결과는 튜플 목록으로 다뤄집니다. 이때 `list`나 `dict`만 적어 두면 분석기는 안쪽 원소를 `object`에 가깝게 취급하고, 엉뚱한 메서드 호출이나 잘못된 값 삽입을 충분히 잡아내지 못합니다.
 
-> 스칼라 타입 vs 컬렉션 타입
+예를 들어 `list[int]`와 `list[str]`는 전혀 다른 계약입니다. 전자에는 합계를 구할 수 있지만 후자에는 `sum()`을 쓰기 어렵습니다. 이 차이를 타입 힌트에 적지 않으면, 도구는 호출자가 어떤 연산을 해도 미리 경고할 근거를 얻지 못합니다.
+
+## 한눈에 보는 개념
 
 ```text
-스칼라 타입                    컬렉션 타입
-─────────────────            ─────────────────
-int, str, float, bool        list[T], dict[K, V]
-단일 값                       여러 값의 모음
-age: int = 30                scores: list[int] = [85, 92]
+스칼라 타입:  int    str    float    bool    None
+                  \    |      /         |
+컬렉션 타입:   list[int]  dict[str, float]  tuple[str, int]
+                  \            |                /
+중첩 타입:     dict[str, list[int]]
 ```
 
-## 핵심 개념
+## 핵심 용어
 
 | 용어 | 설명 |
-|------|------|
-| 스칼라 타입 | 단일 값을 표현하는 타입입니다 (`int`, `str`, `float`, `bool`) |
-| 제네릭 표기 | 컬렉션의 원소 타입을 `[]`로 명시하는 방식입니다 |
-| `list[T]` | 원소가 모두 T 타입인 리스트입니다 |
-| `dict[K, V]` | 키가 K, 값이 V 타입인 딕셔너리입니다 |
-| `tuple[T, ...]` | 가변 길이 튜플(모든 원소 T)입니다 |
+| --- | --- |
+| 스칼라 타입 | `int`, `str`, `float`, `bool`처럼 단일 값을 나타내는 타입입니다 |
+| 매개화된 타입 | `list[int]`처럼 타입 인자를 가진 제네릭 타입입니다 |
+| 동종 튜플 | 길이는 가변이고 원소 타입은 같은 튜플입니다. 예: `tuple[int, ...]` |
+| 이종 튜플 | 길이와 위치별 타입이 정해진 튜플입니다. 예: `tuple[str, int]` |
+| 타입 별칭 | 복잡한 타입에 이름을 붙여 가독성을 높이는 방식입니다 |
 
-## Before / After
-
-타입 정보 없는 컬렉션을 제네릭 표기로 개선합니다.
+## 바꾸기 전과 후
 
 ```python
-# before: 원소 타입을 알 수 없음
-def get_names(users):
-    return [u["name"] for u in users]
+def get_prices(items: list) -> dict:
+    result = {}
+    for item in items:
+        result[item.name] = item.price  # 타입 검사기: 속성을 알 수 없음
+    return result
 ```
 
 ```python
-# after: 입력과 출력의 타입이 명확
-def get_names(users: list[dict[str, str]]) -> list[str]:
-    return [u["name"] for u in users]
+def get_prices(items: list[Product]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for item in items:
+        result[item.name] = item.price  # 타입 검사기: OK
+    return result
 ```
 
-## 단계별 실습
+컨테이너의 내부 타입을 적는 순간, 분석기는 `item.name`, `item.price`, `result`의 키와 값까지 추적할 수 있습니다.
 
-### Step 1: 기본 스칼라 타입
+## 단계별로 익히기
+
+### 1단계: 기본 스칼라 타입
 
 ```python
-# 기본 타입 — Python 내장 타입 그대로 사용
 name: str = "Alice"
 age: int = 30
-height: float = 165.5
+height: float = 5.7
 is_active: bool = True
-
-# bytes와 None
 data: bytes = b"hello"
 nothing: None = None
-
-print(f"이름: {name} ({type(name).__name__})")
-print(f"나이: {age} ({type(age).__name__})")
-print(f"키: {height} ({type(height).__name__})")
-print(f"활성: {is_active} ({type(is_active).__name__})")
 ```
 
-### Step 2: list, set, frozenset
+복잡한 타입도 결국은 이런 기본 타입을 조합해서 표현합니다.
+
+### 2단계: list와 set
 
 ```python
-# list — 순서 있는 가변 컬렉션
-scores: list[int] = [85, 92, 78, 95]
 names: list[str] = ["Alice", "Bob", "Charlie"]
+unique_ids: set[int] = {1, 2, 3}
 
-# set — 순서 없는 고유 원소 컬렉션
-tags: set[str] = {"python", "typing", "hints"}
-
-# frozenset — 불변 set
-permissions: frozenset[str] = frozenset({"read", "write"})
-
-print(f"점수 평균: {sum(scores) / len(scores):.1f}")
-print(f"태그: {tags}")
-print(f"권한: {permissions}")
-
-
-# 빈 컬렉션에도 타입 명시
-empty_list: list[int] = []
-empty_set: set[str] = set()
-```
-
-### Step 3: dict
-
-```python
-# dict — 키-값 쌍
-user_ages: dict[str, int] = {
-    "Alice": 30,
-    "Bob": 25,
-    "Charlie": 35,
-}
-
-# 중첩 dict
-config: dict[str, dict[str, int]] = {
-    "database": {"port": 5432, "pool_size": 10},
-    "cache": {"port": 6379, "ttl": 300},
-}
-
-for name, age in user_ages.items():
-    print(f"  {name}: {age}세")
-
-# dict의 키는 hashable 타입만 가능
-# dict[list, str]은 불가 (list는 unhashable)
-```
-
-### Step 4: tuple
-
-```python
-# 고정 길이 튜플 — 각 위치의 타입을 명시
-point: tuple[float, float] = (3.5, 7.2)
-rgb: tuple[int, int, int] = (255, 128, 0)
-record: tuple[str, int, bool] = ("Alice", 30, True)
-
-print(f"좌표: {point}")
-print(f"RGB: {rgb}")
-print(f"레코드: {record}")
-
-
-# 가변 길이 튜플 — Ellipsis 사용
-values: tuple[int, ...] = (1, 2, 3, 4, 5)
-empty_tuple: tuple[()] = ()
-
-print(f"값: {values}")
-print(f"빈 튜플: {empty_tuple}")
-
-# 고정 길이 vs 가변 길이
-# tuple[int, str]     → 정확히 2개 (int, str)
-# tuple[int, ...]     → 0개 이상의 int
-```
-
-### Step 5: 중첩 컬렉션과 타입 별칭
-
-```python
-# 중첩 컬렉션
+# 중첩 리스트
 matrix: list[list[int]] = [
     [1, 2, 3],
     [4, 5, 6],
-    [7, 8, 9],
 ]
 
-user_scores: dict[str, list[int]] = {
-    "Alice": [85, 92, 78],
-    "Bob": [90, 88, 95],
-}
 
-# 타입 별칭으로 가독성 향상
-type Row = list[int]
-type Matrix = list[Row]
-type UserScores = dict[str, list[int]]
-
-grades: Matrix = [[1, 2], [3, 4]]
-scores: UserScores = {"Alice": [85, 92]}
-
-for name, s in user_scores.items():
-    avg = sum(s) / len(s)
-    print(f"  {name}: 평균 {avg:.1f}")
+def get_active_users(users: list[str]) -> set[str]:
+    return set(users)
 ```
 
-## 이 코드에서 주목할 점
+`list[str]`는 모든 원소가 문자열이어야 한다는 뜻입니다. 따라서 `names.append(42)` 같은 코드는 타입 검사기에서 바로 걸립니다.
 
-- Python 3.9+에서 `list[int]`, `dict[str, int]`를 직접 사용합니다
-- 컬렉션의 원소 타입까지 명시해야 정적 분석의 효과가 있습니다
-- `tuple[int, str]`은 고정 길이, `tuple[int, ...]`은 가변 길이입니다
-- 타입 별칭(`type`)으로 복잡한 타입을 읽기 쉽게 만듭니다
+### 3단계: dict
 
-## 흔한 실수 5가지
+```python
+scores: dict[str, int] = {"Alice": 95, "Bob": 87}
+config: dict[str, str | int | bool] = {
+    "host": "localhost",
+    "port": 8080,
+    "debug": True,
+}
 
-| 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| `list` 대신 `List` 임포트 (3.9+) | 불필요한 임포트입니다 | 내장 `list[T]`를 사용합니다 |
-| 원소 타입 생략 (`list` only) | 어떤 원소인지 알 수 없습니다 | `list[int]`처럼 원소 타입을 명시합니다 |
-| `tuple[int]`로 가변 길이 의도 | 정확히 1개 원소 튜플입니다 | `tuple[int, ...]`을 사용합니다 |
-| `dict[str, any]` 사용 | `any`는 변수명입니다 | `dict[str, Any]`로 typing에서 임포트합니다 |
-| 빈 컬렉션에 타입 생략 | 추론이 불가능합니다 | `empty: list[int] = []`로 명시합니다 |
 
-## 실무에서 이렇게 쓰입니다
+def get_headers() -> dict[str, str]:
+    return {"Content-Type": "application/json"}
+```
 
-- API 응답을 `dict[str, Any]`로 타입 지정합니다
-- 데이터베이스 쿼리 결과를 `list[dict[str, Any]]`로 표현합니다
-- 설정 파일 구조를 `dict[str, dict[str, int]]`로 정의합니다
-- 좌표, RGB 등 고정 구조를 `tuple`로 표현합니다
-- 타입 별칭으로 도메인 용어를 코드에 반영합니다
+`dict[str, int]`는 키는 문자열, 값은 정수라는 뜻입니다. 값 타입이 섞여 있다면 `Union` 또는 `|` 문법을 함께 써야 합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+### 4단계: tuple — 고정 구조와 가변 구조
 
-컬렉션 타입 힌트의 핵심은 "원소 타입까지 명시"하는 것입니다. `list`만 쓰면 타입 힌트의 절반만 활용하는 셈입니다. Python 3.9+ 프로젝트에서는 `typing` 모듈의 `List`, `Dict`를 사용할 이유가 없습니다.
+```python
+# 이종 튜플: 길이 고정, 위치별 타입 고정
+coordinate: tuple[float, float] = (37.5, 127.0)
+record: tuple[str, int, bool] = ("Alice", 30, True)
 
-복잡한 중첩 타입은 타입 별칭을 적극 활용합니다. `dict[str, list[tuple[int, str]]]`보다 `type UserRecord = tuple[int, str]`으로 분리하면 코드와 타입 힌트 모두 읽기 쉬워집니다.
+# 동종 튜플: 길이 가변, 모든 원소 타입 동일
+numbers: tuple[int, ...] = (1, 2, 3, 4, 5)
+empty: tuple[()] = ()
+```
+
+`tuple[int, ...]`의 `...`는 정수 원소가 0개 이상 이어질 수 있다는 뜻입니다. 반대로 `tuple[str, int]`는 정확히 두 칸짜리 구조입니다.
+
+### 5단계: 복잡한 타입은 별칭으로 정리하기
+
+```python
+# 가독성을 위한 타입 별칭
+UserScores = dict[str, list[int]]
+Config = dict[str, str | int | bool | list[str]]
+
+
+def aggregate_scores(data: UserScores) -> dict[str, float]:
+    return {name: sum(scores) / len(scores) for name, scores in data.items()}
+
+
+scores: UserScores = {
+    "Alice": [95, 87, 92],
+    "Bob": [78, 85, 90],
+}
+```
+
+중첩 구조가 길어지면 타입 별칭이 가독성에 큰 도움을 줍니다. Python 3.12 이상에서는 `type UserScores = dict[str, list[int]]` 문법도 사용할 수 있습니다.
+
+## 여기서 먼저 봐야 할 점
+
+- 컬렉션 타입은 원소 타입까지 적어야 정적 분석에 의미가 생깁니다.
+- 튜플은 `tuple[int, int]`와 `tuple[int, ...]`가 전혀 다른 구조입니다.
+- `dict[str, list[int]]` 같은 중첩 타입도 충분히 실용적으로 사용할 수 있습니다.
+- 타입 별칭은 중첩 구조가 길어질수록 가치가 커집니다.
+
+## 자주 헷갈리는 지점
+
+| 실수 | 왜 문제인가 | 권장 방식 |
+| --- | --- | --- |
+| `list`, `dict`만 적음 | 원소 타입을 추적할 수 없습니다 | `list[int]`, `dict[str, str]`처럼 매개화합니다 |
+| `tuple[int, int]`와 `tuple[int, ...]`를 혼동함 | 하나는 고정 길이, 하나는 가변 길이입니다 | 의도한 구조를 정확히 구분합니다 |
+| Python 3.9+에서 `typing.List`를 계속 씀 | 불필요한 임포트가 늘어납니다 | 내장 컬렉션 타입을 직접 사용합니다 |
+| `dict[str, Any]`를 너무 넓게 씀 | 값 타입 안전성이 사라집니다 | 가능한 한 구체 타입이나 TypedDict를 씁니다 |
+| 불변 집합인데 `set`을 사용함 | 가변성 계약이 어긋납니다 | 불변이 필요하면 `frozenset[T]`를 검토합니다 |
+
+## 실무에서는 이렇게 연결됩니다
+
+- JSON 구조는 `dict[str, list[dict[str, str]]]`처럼 중첩 타입으로 표현합니다.
+- 데이터베이스 결과는 `list[tuple[int, str, float]]`처럼 행 구조를 타입으로 적을 수 있습니다.
+- 설정 로더는 `dict[str, str | int | bool]` 형태로 혼합 값을 관리합니다.
+- 캐시나 저장소 래퍼는 이후 Generic과 결합해 `dict[str, T]` 형태로 확장됩니다.
+
+## 실무 판단 기준
+
+경험 많은 개발자는 컬렉션 타입을 절대 맨몸으로 두지 않습니다. `list`라고만 적는 순간 가장 중요한 정보인 원소 타입을 버리기 때문입니다. `list[int]`를 적는 데 몇 초 더 걸리더라도, 잘못된 타입이 세 단계 아래 호출 체인으로 흘러가는 문제를 미리 막는 효과가 훨씬 큽니다.
+
+또한 타입을 넓게 잡는 것보다 정확하게 잡는 편을 선호합니다. `dict[str, Any]`는 편해 보이지만 곧 분석기를 무력화합니다. 데이터의 모양을 알고 있다면 더 구체적인 컬렉션 타입이나 `TypedDict`로 이동하는 편이 좋습니다.
 
 ## 체크리스트
 
-- [ ] 기본 스칼라 타입 힌트를 작성할 수 있다
-- [ ] `list[T]`, `dict[K, V]`, `set[T]`를 작성할 수 있다
-- [ ] 고정 길이 튜플과 가변 길이 튜플의 차이를 설명할 수 있다
-- [ ] 중첩 컬렉션 타입을 작성할 수 있다
-- [ ] 타입 별칭을 사용하여 복잡한 타입을 단순화할 수 있다
+- [ ] 컬렉션 타입에 원소 타입을 함께 적었습니다
+- [ ] 고정 구조 데이터에는 이종 튜플을 사용했습니다
+- [ ] 복잡한 중첩 타입에는 타입 별칭을 고려했습니다
+- [ ] `list`, `dict`, `tuple`을 타입 인자 없이 두지 않았습니다
+- [ ] Python 3.9+ 스타일의 내장 타입 문법을 사용했습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-기본 타입과 컬렉션 타입의 힌트 작성법을 살펴보았습니다. 컬렉션은 원소 타입까지 명시해야 정적 분석의 효과를 온전히 얻을 수 있습니다. 다음 글에서는 값이 없을 수 있는 경우를 표현하는 **Optional과 Union**을 다룹니다.
+1. `flatten(matrix: list[list[int]]) -> list[int]` 함수를 작성하고 mypy로 검사해 보세요.
+
+2. `StudentRecord = tuple[str, int, list[float]]` 타입 별칭을 만들고, 학생 목록에서 평균 점수를 계산하는 함수를 작성해 보세요.
+
+3. `dict[str, dict[str, str | int | list[str]]]` 형태의 설정 구조를 타입으로 적고, 특정 값을 꺼내는 함수를 만들어 보세요.
+
+## 정리와 다음 글
+
+기본 타입과 컬렉션 타입은 Python 타입 힌트의 가장 넓은 바닥을 이룹니다. `int`, `str`, `float`, `bool` 같은 스칼라 타입 위에 `list[T]`, `dict[K, V]`, `tuple[...]`, `set[T]` 같은 컨테이너가 쌓입니다. 여기서 중요한 습관은 컬렉션 안쪽 타입을 생략하지 않는 것입니다.
+
+다음 글에서는 값이 없을 수도 있거나 여러 타입 중 하나일 수 있는 상황을 표현하는 `Optional`과 `Union`을 다룹니다.
 
 <!-- toc:begin -->
 - [Python type hint란 무엇인가?](./01-what-is-type-hint.md)
@@ -250,9 +234,9 @@ for name, s in user_scores.items():
 
 ## 참고 자료
 
-- [PEP 585 — Type Hinting Generics In Standard Collections](https://peps.python.org/pep-0585/)
 - [Python 공식 문서 — typing 모듈](https://docs.python.org/3/library/typing.html)
-- [PEP 613 — Explicit Type Aliases](https://peps.python.org/pep-0613/)
-- [mypy 공식 문서 — Built-in types](https://mypy.readthedocs.io/en/stable/builtin_types.html)
+- [PEP 585 — Type Hinting Generics In Standard Collections](https://peps.python.org/pep-0585/)
+- [mypy 문서 — Built-in types](https://mypy.readthedocs.io/en/stable/builtin_types.html)
+- [Real Python — Python Type Checking](https://realpython.com/python-type-checking/)
 
 Tags: Python, Type Hints, 컬렉션 타입, list, dict, tuple

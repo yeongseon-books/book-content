@@ -18,279 +18,244 @@ tags:
   - 오버로드
   - 데코레이터
 seo_description: Callable, 콜백, 데코레이터, 오버로드까지 함수와 관련된 타입 힌트 심화 문법을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
 ---
 
 # 함수 타입 힌트
 
-> Type Hints in Python 101 시리즈 (4/10)
+Python에서 함수는 값입니다. 함수에 함수를 넘기고, 함수를 반환하고, 데코레이터로 감쌀 수 있습니다. 이 유연성은 강력하지만, 타입 힌트 없이 쓰면 가장 먼저 흐려지는 것도 함수 계약입니다.
 
+이 글은 Type Hints (Python) 101 시리즈의 4번째 글입니다. 여기서는 `Callable`, `*args`, `**kwargs`, `@overload`, `ParamSpec`으로 함수 수준 계약을 어떻게 적는지 살펴봅니다.
 
 ## 이 글에서 다룰 문제
 
-`map()`, `filter()`, `sorted()`의 `key` 인자처럼 함수를 전달하는 패턴은 Python에서 흔합니다. 이런 함수의 타입을 명시하지 않으면, 잘못된 시그니처의 함수를 전달해도 에러를 잡을 수 없습니다.
+- 함수 자체를 인자로 받는 매개변수는 어떻게 타입을 붙일까요?
+- `*args`, `**kwargs`는 무엇에 타입을 붙이는 걸까요?
+- 입력 타입에 따라 반환 타입이 달라지는 함수는 어떻게 표현할까요?
+- 데코레이터가 원본 함수 시그니처를 잃지 않게 하려면 무엇이 필요할까요?
 
-> Callable = 함수 타입의 청사진
+> 함수 타입 힌트의 핵심은 값을 다루는 것처럼 함수 시그니처도 타입으로 모델링하는 데 있습니다.
 
-`@overload`는 입력 타입에 따라 반환 타입이 달라지는 함수를 정확하게 표현하여, 호출 시점에 올바른 타입 추론을 가능하게 합니다.
+## 왜 이 주제가 중요한가
 
-## 핵심 개념 잡기
+콜백, 전략 패턴, 이벤트 핸들러, 데코레이터는 Python 실무에서 흔합니다. 그런데 함수 타입을 적지 않으면 잘못된 시그니처를 가진 콜백을 넘겨도 리뷰 단계까지 숨어 있을 수 있습니다. 데코레이터를 잘못 타입 지정하면 감싼 함수들의 타입 정보가 연쇄적으로 `Any`로 무너질 수도 있습니다.
 
-> Callable의 구조
+특히 FastAPI나 Flask 같은 프레임워크를 많이 쓰는 팀이라면 데코레이터 타입 안정성이 중요합니다. 한 번 어긋난 데코레이터는 그 아래 함수들의 자동완성과 오류 검출 품질을 함께 떨어뜨립니다.
+
+## 한눈에 보는 개념
 
 ```text
-Callable[[인자1, 인자2], 반환타입]
+Callable[[int, str], bool]
+    │       │   │      │
+    │    인자 타입들   반환 타입
+    │
+    "(int, str)을 받아 bool을 반환하는 함수"
 
-예시:
-  Callable[[str], int]          → str을 받아 int 반환
-  Callable[[int, int], float]   → int 2개를 받아 float 반환
-  Callable[[], None]            → 인자 없이 None 반환
+@overload
+def parse(raw: str) -> dict: ...
+def parse(raw: bytes) -> dict: ...
 ```
 
-## 핵심 개념
+## 핵심 용어
 
 | 용어 | 설명 |
-|------|------|
-| Callable | 함수 타입을 표현하는 제네릭 타입입니다 |
-| 콜백(callback) | 다른 함수에 인자로 전달되는 함수입니다 |
-| @overload | 입력에 따라 다른 반환 타입을 명시하는 데코레이터입니다 |
-| ParamSpec | 데코레이터에서 원본 함수의 시그니처를 보존합니다 |
-| TypeVar | 제네릭 함수에서 타입 매개변수를 정의합니다 |
+| --- | --- |
+| Callable | 함수 타입 값을 적는 문법입니다. `Callable[[Args], Return]` 형태를 씁니다 |
+| @overload | 하나의 구현에 여러 호출 시그니처를 제공하는 장치입니다 |
+| ParamSpec | 함수의 전체 매개변수 목록을 타입 변수처럼 보존합니다 |
+| Concatenate | 데코레이터 래퍼에서 매개변수를 앞에 붙일 때 사용합니다 |
+| TypeGuard | 불리언 함수가 타입을 좁힌다는 사실을 분석기에 알려 주는 반환 타입입니다 |
 
-## Before / After
-
-타입 없는 콜백을 Callable로 명시합니다.
+## 바꾸기 전과 후
 
 ```python
-# before: callback이 어떤 함수인지 알 수 없음
-def apply(items, callback):
-    return [callback(item) for item in items]
+def retry(func, attempts):
+    for i in range(attempts):
+        try:
+            return func()
+        except Exception:
+            if i == attempts - 1:
+                raise
 ```
 
 ```python
-# after: callback의 시그니처가 명확
-from typing import Callable
+from collections.abc import Callable
+from typing import TypeVar
 
-def apply(items: list[str], callback: Callable[[str], str]) -> list[str]:
-    return [callback(item) for item in items]
+T = TypeVar("T")
+
+
+def retry(func: Callable[[], T], attempts: int) -> T:
+    for i in range(attempts):
+        try:
+            return func()
+        except Exception:
+            if i == attempts - 1:
+                raise
+    raise RuntimeError("unreachable")
 ```
 
-## 단계별 실습
+이제 분석기는 `func`가 인자 없이 호출 가능해야 하고, 반환값 타입이 그대로 바깥으로 이어진다는 사실을 압니다.
 
-### Step 1: Callable 기본
+## 단계별로 익히기
+
+### 1단계: `Callable`로 함수 매개변수 적기
 
 ```python
-from typing import Callable
+from collections.abc import Callable
 
 
-# 함수를 인자로 받는 함수
-def apply_operation(
-    x: int,
-    y: int,
-    operation: Callable[[int, int], int],
-) -> int:
-    return operation(x, y)
+def apply_operation(values: list[int], op: Callable[[int], int]) -> list[int]:
+    return [op(v) for v in values]
 
 
-def add(a: int, b: int) -> int:
-    return a + b
-
-def multiply(a: int, b: int) -> int:
-    return a * b
+def double(x: int) -> int:
+    return x * 2
 
 
-print(apply_operation(3, 5, add))       # 8
-print(apply_operation(3, 5, multiply))   # 15
-
-# lambda도 Callable로 전달 가능
-print(apply_operation(3, 5, lambda a, b: a - b))  # -2
+result = apply_operation([1, 2, 3], double)  # [2, 4, 6]
+result = apply_operation([1, 2, 3], lambda x: x + 1)  # [2, 3, 4]
 ```
 
-### Step 2: 콜백 패턴
+`Callable[[int], int]`는 정수 하나를 받아 정수를 돌려주는 함수라는 뜻입니다.
+
+### 2단계: `*args`와 `**kwargs` 적기
 
 ```python
-from typing import Callable
+def log_call(*args: str, **kwargs: int) -> None:
+    for arg in args:
+        print(arg)        # arg: str
+    for key, value in kwargs.items():
+        print(f"{key}={value}")  # value: int
 
 
-# 이벤트 핸들러 등록
-EventHandler = Callable[[str, dict], None]
-
-class EventEmitter:
-    def __init__(self) -> None:
-        self._handlers: dict[str, list[EventHandler]] = {}
-
-    def on(self, event: str, handler: EventHandler) -> None:
-        self._handlers.setdefault(event, []).append(handler)
-
-    def emit(self, event: str, data: dict) -> None:
-        for handler in self._handlers.get(event, []):
-            handler(event, data)
-
-
-def log_handler(event: str, data: dict) -> None:
-    print(f"[LOG] {event}: {data}")
-
-def alert_handler(event: str, data: dict) -> None:
-    print(f"[ALERT] {event} 발생!")
-
-
-emitter = EventEmitter()
-emitter.on("error", log_handler)
-emitter.on("error", alert_handler)
-emitter.emit("error", {"code": 500, "message": "서버 오류"})
-# [LOG] error: {'code': 500, 'message': '서버 오류'}
-# [ALERT] error 발생!
+log_call("hello", "world", retries=3, timeout=30)
 ```
 
-### Step 3: 반환값이 함수인 경우
+여기서 `*args: str`은 `args` 전체가 `tuple[str, ...]`라는 뜻이 아니라, 각 개별 인자가 `str`이라는 뜻입니다.
 
-```python
-from typing import Callable
-
-
-def make_multiplier(factor: int) -> Callable[[int], int]:
-    """팩터를 곱하는 함수를 반환합니다."""
-    def multiplier(x: int) -> int:
-        return x * factor
-    return multiplier
-
-
-double = make_multiplier(2)
-triple = make_multiplier(3)
-
-print(double(5))   # 10
-print(triple(5))   # 15
-
-
-# 검증 함수 팩토리
-def make_validator(
-    min_val: int,
-    max_val: int,
-) -> Callable[[int], bool]:
-    def validate(value: int) -> bool:
-        return min_val <= value <= max_val
-    return validate
-
-
-is_valid_age = make_validator(0, 150)
-is_valid_score = make_validator(0, 100)
-
-print(is_valid_age(25))     # True
-print(is_valid_score(150))  # False
-```
-
-### Step 4: 데코레이터 타입 힌트
-
-```python
-from typing import Callable, ParamSpec, TypeVar
-from functools import wraps
-import time
-
-P = ParamSpec("P")
-R = TypeVar("R")
-
-
-def timer(func: Callable[P, R]) -> Callable[P, R]:
-    """실행 시간을 측정하는 데코레이터입니다."""
-    @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        elapsed = time.perf_counter() - start
-        print(f"{func.__name__}: {elapsed:.4f}초")
-        return result
-    return wrapper
-
-
-@timer
-def slow_function(n: int) -> int:
-    """느린 계산을 시뮬레이션합니다."""
-    total = sum(range(n))
-    return total
-
-
-result = slow_function(1_000_000)
-# slow_function: 0.0312초
-print(f"결과: {result:,}")
-# 결과: 499,999,500,000
-```
-
-### Step 5: @overload
+### 3단계: `@overload`로 여러 시그니처 제공하기
 
 ```python
 from typing import overload
 
 
 @overload
-def process(value: int) -> str: ...
+def parse_value(raw: str) -> dict[str, str]: ...
+
+
 @overload
-def process(value: str) -> int: ...
-@overload
-def process(value: list[int]) -> int: ...
-
-def process(value: int | str | list[int]) -> str | int:
-    """입력 타입에 따라 다른 변환을 수행합니다."""
-    if isinstance(value, int):
-        return str(value)
-    if isinstance(value, str):
-        return len(value)
-    if isinstance(value, list):
-        return sum(value)
-    raise TypeError(f"지원하지 않는 타입: {type(value)}")
+def parse_value(raw: bytes) -> dict[str, bytes]: ...
 
 
-# mypy가 각 호출에 대해 정확한 반환 타입을 추론
-result_str = process(42)        # mypy: str
-result_int = process("hello")   # mypy: int
-result_sum = process([1, 2, 3]) # mypy: int
+def parse_value(raw: str | bytes) -> dict[str, str] | dict[str, bytes]:
+    if isinstance(raw, str):
+        return {"data": raw}
+    return {b"data": raw}
 
-print(f"process(42) = '{result_str}'")        # process(42) = '42'
-print(f"process('hello') = {result_int}")     # process('hello') = 5
-print(f"process([1,2,3]) = {result_sum}")     # process([1,2,3]) = 6
+
+text_result = parse_value("hello")    # dict[str, str]
+bytes_result = parse_value(b"hello")  # dict[str, bytes]
 ```
 
-## 이 코드에서 주목할 점
+호출자는 오버로드 선언만 보게 되고, 실제 구현은 모든 경우를 한 번에 처리합니다.
 
-- `Callable[[ArgTypes], ReturnType]`으로 함수 타입을 정확히 표현합니다
-- `ParamSpec`은 데코레이터에서 원본 함수의 시그니처를 보존합니다
-- `@overload`는 입력에 따라 다른 반환 타입을 명시하여 호출 시점 추론을 가능하게 합니다
-- 타입 별칭(`EventHandler`)으로 복잡한 Callable을 읽기 쉽게 만듭니다
+### 4단계: 데코레이터에 `ParamSpec` 쓰기
 
-## 흔한 실수 5가지
+```python
+from collections.abc import Callable
+from functools import wraps
+from typing import ParamSpec, TypeVar
 
-| 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| `Callable` 인자 타입 생략 | 시그니처 검증이 불가능합니다 | `Callable[[int], str]`로 완전히 명시합니다 |
-| 데코레이터에서 ParamSpec 미사용 | 원본 함수의 시그니처가 손실됩니다 | `ParamSpec`과 `TypeVar`를 사용합니다 |
-| @overload 실제 구현에 타입 누락 | 구현체 시그니처가 모든 오버로드를 포함해야 합니다 | Union으로 모든 경우를 커버합니다 |
-| Callable에 키워드 인자 표현 | Callable은 위치 인자만 표현합니다 | `Protocol`로 정확한 시그니처를 정의합니다 |
-| lambda에 타입 힌트 시도 | lambda는 타입 힌트 문법을 지원하지 않습니다 | 일반 함수를 정의합니다 |
+P = ParamSpec("P")
+T = TypeVar("T")
 
-## 실무에서 이렇게 쓰입니다
 
-- FastAPI의 의존성 주입에서 Callable 타입으로 팩토리를 전달합니다
-- pytest의 fixture가 반환하는 팩토리 함수에 Callable을 사용합니다
-- 이벤트 드리븐 아키텍처에서 핸들러 타입을 Callable로 정의합니다
-- 미들웨어 체인에서 `Callable[[Request], Response]`를 사용합니다
-- `@overload`로 `json.loads` 같은 다형 함수를 정확히 타입 지정합니다
+def log_calls(func: Callable[P, T]) -> Callable[P, T]:
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
 
-## 현업 개발자는 이렇게 생각합니다
 
-`Callable`은 함수형 프로그래밍과 타입 시스템의 교차점입니다. 콜백, 팩토리, 데코레이터 패턴에서 함수의 시그니처를 명시하면 잘못된 함수 전달을 사전에 방지할 수 있습니다.
+@log_calls
+def add(a: int, b: int) -> int:
+    return a + b
 
-`ParamSpec`은 Python 3.10에서 추가된 강력한 도구입니다. 데코레이터를 작성할 때 원본 함수의 시그니처를 그대로 보존하므로, IDE 자동완성과 mypy 검증이 데코레이터를 투과해서 동작합니다.
+
+result = add(1, 2)  # 타입 검사기는 여전히 (int, int) -> int로 압니다
+```
+
+`ParamSpec`이 없으면 데코레이터가 원본 함수의 매개변수 구조를 잃어버리기 쉽습니다.
+
+### 5단계: 인자가 없거나 제한하지 않을 때
+
+```python
+from collections.abc import Callable
+from typing import Any
+
+
+# 인자가 없고 str을 반환
+factory: Callable[[], str] = lambda: "hello"
+
+# 어떤 인자든 허용함 (가능하면 제한적으로 사용)
+handler: Callable[..., None] = lambda *args, **kwargs: None
+```
+
+`Callable[..., None]`는 편하지만 인자 검사를 사실상 포기하므로, 정말 필요한 경우에만 쓰는 편이 좋습니다.
+
+## 여기서 먼저 봐야 할 점
+
+- `Callable`은 인자 타입 목록과 반환 타입을 함께 적습니다.
+- `@overload`는 여러 선언 뒤에 하나의 실제 구현이 따라와야 합니다.
+- `ParamSpec`은 데코레이터가 원본 함수 시그니처를 지키게 해 줍니다.
+- `*args`, `**kwargs` 주석은 각각의 원소 타입에 붙는다는 점이 중요합니다.
+
+## 자주 헷갈리는 지점
+
+| 실수 | 왜 문제인가 | 권장 방식 |
+| --- | --- | --- |
+| `Callable[..., int]`를 남발함 | 매개변수 타입 안전성이 사라집니다 | 인자 타입을 알면 구체적으로 적습니다 |
+| `@overload` 선언만 적고 구현을 빠뜨림 | 실제 함수가 없어 분석기와 런타임 모두 어색해집니다 | 마지막에 구현 함수를 둡니다 |
+| 데코레이터 반환 타입을 `Any`로 둠 | 감싼 함수 타입 정보가 사라집니다 | `ParamSpec`과 `TypeVar`를 씁니다 |
+| `*args: tuple[str, ...]`처럼 적음 | 의미가 어긋납니다 | `*args: str`처럼 개별 인자 타입을 적습니다 |
+| 같은 시그니처를 중복 오버로드함 | 읽기만 복잡해집니다 | 입력 관계가 분명히 다를 때만 씁니다 |
+
+## 실무에서는 이렇게 연결됩니다
+
+- 이벤트 시스템은 `Callable[[Event], None]` 형태의 콜백 계약을 둡니다.
+- 재시도 데코레이터는 `Callable[P, T]`로 원래 함수 계약을 보존합니다.
+- 전략 패턴은 `Callable[[Data], Result]`를 받아 교체 가능한 알고리즘을 구성합니다.
+- 프레임워크 데코레이터는 `ParamSpec` 없이는 타입 정보가 쉽게 무너집니다.
+
+## 실무 판단 기준
+
+경험 많은 개발자는 특히 데코레이터 타입을 대충 두지 않습니다. 데코레이터는 한 번 쓰고 끝나는 코드가 아니라 여러 함수에 반복 적용되기 때문에, 여기서 타입 정보가 무너지면 영향 범위가 넓기 때문입니다. `ParamSpec`은 선택 기능이라기보다 typed codebase의 기본 장치에 가깝습니다.
+
+또한 `@overload`는 강력하지만 남용하지 않습니다. 입력 타입에 따라 반환 타입이 실제로 달라질 때만 쓰고, 오버로드가 너무 많아지면 함수 설계를 다시 봅니다.
 
 ## 체크리스트
 
-- [ ] `Callable[[ArgTypes], ReturnType]`을 작성할 수 있다
-- [ ] 콜백 패턴에 적절한 Callable 타입을 정의할 수 있다
-- [ ] `ParamSpec`으로 데코레이터 타입을 정확히 표현할 수 있다
-- [ ] `@overload`로 조건부 반환 타입을 명시할 수 있다
-- [ ] Callable 타입 별칭을 활용하여 가독성을 높일 수 있다
+- [ ] 함수 값을 받는 매개변수에 `Callable[[...], ...]`를 사용했습니다
+- [ ] `*args`, `**kwargs`에 개별 원소 타입을 붙였습니다
+- [ ] 입력-출력 관계가 달라지는 함수에 `@overload`를 검토했습니다
+- [ ] 데코레이터에서 `ParamSpec`으로 시그니처를 보존했습니다
+- [ ] 불필요한 `Callable[..., T]` 사용을 줄였습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-`Callable`로 함수 타입을, `ParamSpec`으로 데코레이터의 시그니처 보존을, `@overload`로 조건부 반환 타입을 표현했습니다. 다음 글에서는 딕셔너리 구조를 타입으로 정의하는 **TypedDict와 dataclass**를 다룹니다.
+1. `map_values(data: dict[str, int], transform: Callable[[int], float]) -> dict[str, float]` 함수를 작성해 보세요.
+
+2. `ParamSpec`을 사용해 실행 시간을 출력하는 데코레이터를 만들고, 감싼 함수 시그니처가 유지되는지 확인해 보세요.
+
+3. `serialize(data: dict) -> str`, `serialize(data: list) -> str` 두 경우를 가진 오버로드 함수를 작성해 보세요.
+
+## 정리와 다음 글
+
+함수 타입 힌트는 "함수도 값"이라는 Python 특성을 타입 시스템 안으로 끌어옵니다. `Callable`은 함수 모양을, `@overload`는 여러 합법적 호출 계약을, `ParamSpec`은 데코레이터를 거친 뒤에도 시그니처가 살아남게 해 줍니다. 콜백과 데코레이터를 많이 쓰는 코드일수록 이 도구들의 가치가 빨리 드러납니다.
+
+다음 글에서는 키와 필드 이름이 있는 구조화 데이터를 타입으로 다루는 `TypedDict`와 `dataclass`를 보겠습니다.
 
 <!-- toc:begin -->
 - [Python type hint란 무엇인가?](./01-what-is-type-hint.md)
@@ -307,9 +272,9 @@ print(f"process([1,2,3]) = {result_sum}")     # process([1,2,3]) = 6
 
 ## 참고 자료
 
-- [Python 공식 문서 — typing.Callable](https://docs.python.org/3/library/typing.html#callable)
+- [Python 공식 문서 — typing.Callable](https://docs.python.org/3/library/typing.html#typing.Callable)
+- [Python 공식 문서 — typing.overload](https://docs.python.org/3/library/typing.html#typing.overload)
 - [PEP 612 — Parameter Specification Variables](https://peps.python.org/pep-0612/)
-- [PEP 484 — @overload](https://peps.python.org/pep-0484/#function-method-overloading)
-- [mypy 공식 문서 — Callable types](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#callable-types-and-lambdas)
+- [mypy 문서 — Callable types](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#callable-types-and-lambdas)
 
 Tags: Python, Type Hints, Callable, 함수 시그니처, 오버로드, 데코레이터
