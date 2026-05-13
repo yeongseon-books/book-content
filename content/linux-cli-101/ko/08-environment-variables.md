@@ -3,7 +3,7 @@ title: 환경변수와 PATH
 series: linux-cli-101
 episode: 8
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,24 +17,26 @@ tags:
 - bashrc
 - Shell
 - Configuration
-last_reviewed: '2026-05-11'
-seo_description: 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
+last_reviewed: '2026-05-12'
+seo_description: 환경변수와 PATH가 명령 실행과 설정 전달에 쓰이는 방식을 정리합니다.
 ---
 
 # 환경변수와 PATH
 
-> Linux CLI 101 시리즈 (8/10)
+`python`을 입력하면 Shell이 Python 실행 파일을 찾아서 실행합니다. 어떻게 찾을까요? 모든 디렉터리를 뒤지는 것이 아니라, PATH에 등록된 디렉터리만 순서대로 확인합니다. PATH에 없으면 "command not found"입니다.
 
----
-
+이 글은 Linux CLI 101 시리즈의 8번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-`python`을 입력하면 Shell이 Python 실행 파일을 찾아서 실행합니다. 어떻게 찾을까요? 모든 디렉터리를 뒤지는 것이 아니라, PATH에 등록된 디렉터리만 순서대로 확인합니다. PATH에 없으면 "command not found"입니다.
+- 환경변수는 어떤 방식으로 프로세스에 전달될까요?
+- `export`와 로컬 Shell 변수는 무엇이 다를까요?
+- `PATH`는 명령 실행에서 어떤 검색 순서를 만들까요?
+- 도구를 설치했는데 command not found가 뜨면 무엇부터 봐야 할까요?
 
-> `pip install`로 패키지를 설치했는데 `mycommand`를 입력하면 "command not found"가 뜹니다. 패키지는 설치되었는데 왜 실행이 안 될까요? 설치 경로가 PATH에 없기 때문입니다.
+> 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
 
-## Mental Model
+## 머릿속에 먼저 그릴 그림
 
 > 환경변수는 프로세스에 붙은 이름표이고, PATH는 Shell이 명령어를 찾아다니는 지도입니다.
 
@@ -42,9 +44,9 @@ seo_description: 환경변수는 프로세스에 붙은 이름표이고, PATH는
 
 ```text
 $ python
-Shell이 PATH를 순서대로 탐색:
-  /usr/local/bin/python  → 없음
-  /usr/bin/python         → 있음! → 실행
+Shell searches PATH in order:
+  /usr/local/bin/python  -> not found
+  /usr/bin/python         -> found! -> execute
 ```
 
 ## 핵심 개념
@@ -57,15 +59,15 @@ Shell이 PATH를 순서대로 탐색:
 | .bashrc | 대화형 bash shell 시작 시 실행 | `~/.bashrc` |
 | .bash_profile | 로그인 shell 시작 시 실행 | `~/.bash_profile` |
 
-## Before / After
+## 전과 후
 
 **Before (PATH를 모를 때)**
 
 ```bash
 pip install httpie
 http GET https://api.example.com
-# bash: http 명령을 찾지 못함
-# "왜 안 되지? 분명 설치했는데..."
+# bash: http: command not found
+# "Why doesn't it work? I just installed it..."
 ```
 
 **After (PATH를 이해할 때)**
@@ -73,67 +75,67 @@ http GET https://api.example.com
 ```bash
 pip install httpie
 which http || pip show httpie | grep Location
-# 설치 위치: /home/user/.local/lib/python3.11/site-packages
-# → ~/.local/bin이 PATH에 있는지 확인
+# Location: /home/user/.local/lib/python3.11/site-packages
+# -> check if ~/.local/bin is in PATH
 echo $PATH | tr ':' '\n' | grep local
-# /home/user/.local/bin이 없으면:
+# If /home/user/.local/bin is missing:
 export PATH="$HOME/.local/bin:$PATH"
-http GET https://api.example.com   # 정상 실행
+http GET https://api.example.com   # Works
 ```
 
 ## 단계별 실습
 
-### Step 1. 환경변수 확인
+### 1단계. 환경변수 확인
 
 ```bash
-echo $HOME                    # 홈 디렉터리
-echo $USER                    # 현재 사용자
-echo $SHELL                   # 사용 중인 Shell
-echo $PATH                    # 명령어 검색 경로
+echo $HOME                    # Home directory
+echo $USER                    # Current user
+echo $SHELL                   # Current shell
+echo $PATH                    # Command search paths
 
-env                           # 모든 환경변수 출력
-env | grep -i python          # python 관련 변수만
+env                           # Print all environment variables
+env | grep -i python          # Python-related variables only
 ```
 
-### Step 2. 변수 설정과 export
+### 2단계. 변수 설정과 내보내기
 
 ```bash
-MY_VAR="hello"                # Shell 변수 (자식에게 안 전달됨)
+MY_VAR="hello"                # Shell variable (not passed to children)
 echo $MY_VAR                  # hello
 
-bash -c 'echo $MY_VAR'       # (빈 출력) — 자식 프로세스에 없음
+bash -c 'echo $MY_VAR'       # (empty) — not available in child process
 
-export MY_VAR                 # export하면 자식에게 전달
+export MY_VAR                 # export passes it to children
 bash -c 'echo $MY_VAR'       # hello
 
-export DB_HOST="localhost"    # 선언과 export 동시에
+export DB_HOST="localhost"    # Declare and export at once
 ```
 
-### Step 3. PATH 수정
+### 3단계. 실행 경로 수정
 
 ```bash
-echo $PATH | tr ':' '\n'     # PATH를 줄 단위로 보기
+echo $PATH | tr ':' '\n'     # View PATH one entry per line
 
-# 임시 추가 (현재 세션만)
+# Temporary addition (current session only)
 export PATH="$HOME/mytools:$PATH"
 
-# which로 명령어 위치 확인
+# Check command location
 which python
 which ls
 ```
 
-### Step 4. .bashrc에 영구 설정
+### 4단계. 셸 시작 파일에 영구 설정
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 echo 'export EDITOR=vim' >> ~/.bashrc
 
-source ~/.bashrc             # 즉시 적용 (또는 새 터미널 열기)
+source ~/.bashrc             # Apply immediately (or open a new terminal)
 echo $EDITOR
 # vim
 ```
 
-### Step 5. .env 파일 패턴
+### 5단계. 환경 파일 패턴
 
 ```bash
 cat > ~/practice/linux-cli/.env << 'EOF'
@@ -143,8 +145,8 @@ DB_NAME=myapp
 API_KEY=secret-key-123
 EOF
 
-# Shell에서 .env 파일 로드
-set -a                        # 이후 변수를 자동 export
+# Load .env file in Shell
+set -a                        # Auto-export subsequent variables
 source ~/practice/linux-cli/.env
 set +a
 echo $DB_HOST                 # localhost
@@ -159,29 +161,29 @@ echo $DB_HOST                 # localhost
 
 ## 자주 하는 실수
 
-### 실수 1. PATH를 덮어쓴다
+### 실수 1. 실행 경로를 덮어쓴다
 
 ```bash
-export PATH="/my/new/path"              # 기존 PATH가 전부 사라짐!
-export PATH="/my/new/path:$PATH"        # 기존 PATH 뒤에 추가 — 안전
+export PATH="/my/new/path"              # Entire existing PATH is gone!
+export PATH="/my/new/path:$PATH"        # Appends to existing PATH — safe
 ```
 
-### 실수 2. .bashrc와 .bash_profile을 혼동한다
+### 실수 2. 시작 파일 역할을 혼동한다
 
 로그인 셸(SSH 접속)은 `.bash_profile`을 읽고, 비로그인 대화형 셸(터미널 앱)은 `.bashrc`를 읽습니다. 보통 `.bash_profile`에서 `.bashrc`를 source하여 통일합니다.
 
 ### 실수 3. 변수 참조 시 중괄호를 생략한다
 
 ```bash
-echo "$HOME_backup"           # HOME_backup이라는 변수를 참조
-echo "${HOME}_backup"         # HOME 변수 + "_backup" 문자열
+echo "$HOME_backup"           # Looks for a variable named HOME_backup
+echo "${HOME}_backup"         # HOME variable + "_backup" string
 ```
 
-### 실수 4. .env 파일을 Git에 커밋한다
+### 실수 4. 환경 파일을 저장소에 커밋한다
 
 API 키, 비밀번호가 포함된 `.env`가 공개 저장소에 올라가면 보안 사고입니다. `.gitignore`에 반드시 `.env`를 추가하세요.
 
-### 실수 5. export를 빼먹고 "변수가 안 먹힌다"고 한다
+### 실수 5. 내보내기를 빼먹고 변수 전달이 안 된다고 생각한다
 
 Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `export`로 내보내야 합니다. `MY_VAR=hello`만으로는 자식 프로세스인 Python이 볼 수 없습니다.
 
@@ -191,7 +193,7 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 - **가상환경 활성화**: `source venv/bin/activate`는 PATH 앞에 venv의 bin/을 추가합니다
 - **CI/CD 변수**: GitHub Actions의 `env:`는 환경변수를 설정하는 것입니다
 - **Docker**: `docker run -e DB_HOST=db`로 컨테이너에 환경변수를 전달합니다
-- **디버깅**: `env | sort`로 현재 환경을 덤프하여 문제를 진단합니다
+- 디버깅: `env | sort`로 현재 환경을 덤프하여 문제를 진단합니다
 
 ## 실무에서는 이렇게 생각한다
 
@@ -207,7 +209,13 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 - [ ] `.env` 파일을 만들고 `source`로 로드할 수 있다
 - [ ] `.env` 파일을 `.gitignore`에 추가하는 이유를 안다
 
-## 정리 · 다음 글
+## 연습 문제
+
+1. `MY_NAME=linux-cli`와 `export MY_NAME=linux-cli`를 각각 실행한 뒤 하위 Shell에서 보이는 차이를 확인해 보세요.
+2. `echo $PATH` 결과를 줄마다 나눠 보고, 자주 쓰는 명령이 어느 디렉터리에서 오는지 `which`로 확인해 보세요.
+3. 가상의 `.env` 파일을 하나 만들고 Shell에서 읽어 오는 흐름을 직접 연습해 보세요.
+
+## 정리와 다음 글
 
 - 환경변수는 프로세스에 전달되는 key=value 설정이며 `export`로 자식에게 상속됩니다.
 - PATH는 Shell이 명령어를 찾는 디렉터리 목록이며 `:` 구분, 왼쪽 우선입니다.
@@ -223,8 +231,8 @@ Python 스크립트에서 `os.environ["MY_VAR"]`를 읽으려면, Shell에서 `e
 - [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
 - [파일과 디렉터리 다루기](./02-files-and-directories.md)
 - [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- [grep, find, xargs](./05-grep-find-xargs.md)
+- [cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
+- [grep, find, xargs — 검색의 삼총사](./05-grep-find-xargs.md)
 - [pipe와 redirection](./06-pipe-and-redirection.md)
 - [프로세스 확인과 종료](./07-process-management.md)
 - **환경변수와 PATH (현재 글)**

@@ -3,7 +3,7 @@ title: "grep, find, xargs — 검색의 삼총사"
 series: linux-cli-101
 episode: 5
 language: ko
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,33 +17,33 @@ tags:
 - xargs
 - Search
 - CLI
-last_reviewed: '2026-05-11'
-seo_description: grep은 파일 내용에서 텍스트를 찾는 탐정이고, find는 파일 이름과 속성으로 파일을 찾는 수색대입니다.
+last_reviewed: '2026-05-12'
+seo_description: grep, find, xargs를 함께 써서 검색 작업을 이어 붙이는 법을 정리합니다.
 ---
 
 # grep, find, xargs — 검색의 삼총사
 
-> Linux CLI 101 시리즈 (5/10)
+프로젝트가 커지면 파일이 수백 개를 넘깁니다. "이 함수를 어디에서 호출하지?", "어제 수정된 파일이 뭐지?", "ERROR가 포함된 로그 줄만 보고 싶다" — 이 모든 질문에 답하는 것이 `grep`과 `find`입니다.
 
----
-
+이 글은 Linux CLI 101 시리즈의 5번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-프로젝트가 커지면 파일이 수백 개를 넘깁니다. "이 함수를 어디에서 호출하지?", "어제 수정된 파일이 뭐지?", "ERROR가 포함된 로그 줄만 보고 싶다" — 이 모든 질문에 답하는 것이 `grep`과 `find`입니다.
+- 파일 내용 검색과 파일 위치 검색은 왜 다른 문제일까요?
+- `grep`, `find`, `xargs`는 어떤 순서로 연결하면 좋을까요?
+- 검색 결과를 다음 명령으로 넘길 때 어떤 위험을 먼저 생각해야 할까요?
+- 대규모 코드베이스에서 왜 이 세 명령이 계속 함께 등장할까요?
 
-> 프로덕션 서버에서 "database connection timeout" 에러가 발생했습니다. 로그 파일이 30개이고 각각 수만 줄입니다. 어느 파일, 몇 번째 줄에서 발생하는지 찾아야 합니다.
+> `grep`은 도서관에서 책 내용을 검색하는 전문 사서이고, `find`는 책꽂이에서 제목이나 크기로 책을 찾는 수색대입니다. `xargs`는 찾은 책 목록을 다른 사람에게 넘겨주는 전달자입니다.
 
-에디터로 파일을 하나씩 여는 대신, `grep -rn "connection timeout" /var/log/app/`이면 전체 결과가 1초 안에 나옵니다.
-
-## Mental Model
+## 머릿속에 먼저 그릴 그림
 
 > `grep`은 도서관에서 책 내용을 검색하는 전문 사서이고, `find`는 책꽂이에서 제목이나 크기로 책을 찾는 수색대입니다. `xargs`는 찾은 책 목록을 다른 사람에게 넘겨주는 전달자입니다.
 
 ```text
-grep: "이 단어가 적힌 페이지를 찾아줘"  → 내용 검색
-find: "빨간 표지의 200페이지짜리 책을 찾아줘" → 파일 검색
-xargs: "찾은 책을 모아서 복사기에 넣어줘" → 결과 → 명령어
+grep: "Find pages containing this word"     -> content search
+find: "Find the red 200-page book"          -> file search
+xargs: "Take the found books to the copier" -> results -> command
 ```
 
 ## 핵심 개념
@@ -54,15 +54,15 @@ xargs: "찾은 책을 모아서 복사기에 넣어줘" → 결과 → 명령어
 | `find` | 파일/디렉터리(메타데이터) | `-name`, `-type`, `-mtime`, `-size` | `find . -name "*.py"` |
 | `xargs` | stdin을 인자로 변환 | `-I {}`, `-P` | `find . -name "*.log" \| xargs rm` |
 
-## Before / After
+## 전과 후
 
 **Before (수동 검색)**
 
 ```text
-1. 에디터로 파일을 하나씩 열기
-2. Ctrl+F로 검색
-3. 다음 파일 열기
-4. 30개 파일 반복 → 20분 소요
+1. Open files one by one in an editor
+2. Ctrl+F to search
+3. Open next file
+4. Repeat for 30 files -> 20 minutes
 ```
 
 **After (grep 한 줄)**
@@ -71,57 +71,57 @@ xargs: "찾은 책을 모아서 복사기에 넣어줘" → 결과 → 명령어
 grep -rn "connection timeout" /var/log/app/
 # /var/log/app/web.log:1523: 2026-05-04 ERROR database connection timeout
 # /var/log/app/worker.log:89: 2026-05-04 ERROR database connection timeout
-# 1초 만에 모든 위치 확인
+# All locations found in 1 second
 ```
 
 ## 단계별 실습
 
-### Step 1. 실습 환경 준비
+### 1단계. 실습 환경 준비
 
 ```bash
 cd ~/practice/linux-cli
 mkdir -p project/src project/tests project/docs
 echo 'def hello():
-    # 할 일: 로깅 추가
+    # TODO: add logging
     print("hello")' > project/src/app.py
 echo 'def test_hello():
-    # 할 일: assertion 수정
+    # TODO: fix assertion
     assert hello() is None' > project/tests/test_app.py
 echo '# Project README
 TODO: write documentation' > project/docs/README.md
 ```
 
-### Step 2. grep으로 내용 검색
+### 2단계. 내용 검색
 
 ```bash
-grep "TODO" project/src/app.py           # 단일 파일
-# 할 일: 로깅 추가
+grep "TODO" project/src/app.py           # Single file
+# TODO: add logging
 
-grep -rn "TODO" project/                  # 재귀 + 줄번호
+grep -rn "TODO" project/                  # Recursive + line numbers
 # project/src/app.py:2:    # TODO: add logging
 # project/tests/test_app.py:2:    # TODO: fix assertion
-# 문서 TODO: project/docs/README.md:2:TODO: write documentation
+# project/docs/README.md:2:TODO: write documentation
 
-grep -ri "todo" project/                  # 대소문자 무시
-grep -rl "TODO" project/                  # 파일 경로만 출력
-# 일치 파일: project/src/app.py
-# 일치 파일: project/tests/test_app.py
-# 일치 파일: project/docs/README.md
+grep -ri "todo" project/                  # Case insensitive
+grep -rl "TODO" project/                  # File paths only
+# project/src/app.py
+# project/tests/test_app.py
+# project/docs/README.md
 ```
 
-### Step 3. find로 파일 찾기
+### 3단계. 파일 찾기
 
 ```bash
-find project/ -name "*.py"               # 이름으로 찾기
-# 결과 파일: project/src/app.py
-# 결과 파일: project/tests/test_app.py
+find project/ -name "*.py"               # Find by name
+# project/src/app.py
+# project/tests/test_app.py
 
-find project/ -type d                     # 디렉터리만
-find project/ -name "*.py" -newer project/docs/README.md   # 특정 파일보다 새로운 파일
-find /tmp -size +1M -mtime -7            # 1MB 이상, 7일 이내
+find project/ -type d                     # Directories only
+find project/ -name "*.py" -newer project/docs/README.md   # Newer than a specific file
+find /tmp -size +1M -mtime -7            # Over 1MB, modified within 7 days
 ```
 
-### Step 4. xargs로 결과를 명령어에 전달
+### 4단계. 검색 결과를 다음 명령에 넘기기
 
 ```bash
 find project/ -name "*.py" | xargs wc -l
@@ -130,19 +130,19 @@ find project/ -name "*.py" | xargs wc -l
 #  6 total
 
 grep -rl "TODO" project/ | xargs -I {} echo "Fix needed: {}"
-# 수정 대상: project/src/app.py
-# 수정 대상: project/tests/test_app.py
-# 수정 대상: project/docs/README.md
+# Fix needed: project/src/app.py
+# Fix needed: project/tests/test_app.py
+# Fix needed: project/docs/README.md
 ```
 
-### Step 5. 실전 조합
+### 5단계. 실전 조합
 
 ```bash
-# 모든 Python 파일에서 "print" 호출 찾기
+# Find "print" calls in all Python files
 find project/ -name "*.py" | xargs grep -n "print"
-# 검색 결과: project/src/app.py:3:    print("hello")
+# project/src/app.py:3:    print("hello")
 
-# 30일 이상 된 로그 파일 삭제
+# Delete log files older than 30 days
 find /tmp -name "*.log" -mtime +30 -print | xargs rm -v
 ```
 
@@ -155,37 +155,37 @@ find /tmp -name "*.log" -mtime +30 -print | xargs rm -v
 
 ## 자주 하는 실수
 
-### 실수 1. find 패턴에 따옴표를 빼먹는다
+### 실수 1. 검색 패턴에 따옴표를 빼먹는다
 
 ```bash
-find . -name *.py          # Shell이 먼저 *.py를 확장 → 예상과 다른 결과
-find . -name "*.py"        # 정상: find가 패턴을 직접 처리
+find . -name *.py          # Shell expands *.py first -> unexpected results
+find . -name "*.py"        # Correct: find processes the pattern directly
 ```
 
-### 실수 2. grep에서 정규표현식을 모르고 쓴다
+### 실수 2. 정규표현식을 모르고 검색한다
 
 `grep "error.log"`에서 `.`은 "아무 문자"입니다. `error.log`뿐 아니라 `errorXlog`도 매칭됩니다. 문자 그대로 찾으려면 `grep -F "error.log"` 또는 `grep "error\.log"`를 씁니다.
 
-### 실수 3. xargs에 공백이 있는 파일 이름을 넘긴다
+### 실수 3. 공백이 있는 파일 이름을 안전하게 넘기지 못한다
 
 ```bash
-find . -name "*.txt" | xargs rm          # "My File.txt" → "My"와 "File.txt"로 분리
-find . -name "*.txt" -print0 | xargs -0 rm  # null 구분자로 안전하게 처리
+find . -name "*.txt" | xargs rm          # "My File.txt" splits into "My" and "File.txt"
+find . -name "*.txt" -print0 | xargs -0 rm  # Null delimiter handles spaces safely
 ```
 
-### 실수 4. find 결과를 for 루프로 처리한다
+### 실수 4. 검색 결과를 비효율적으로 반복 처리한다
 
 ```bash
-# 느리고 위험한 방법
+# Slow and unsafe
 for f in $(find . -name "*.log"); do rm "$f"; done
 
-# 빠르고 안전한 방법
+# Fast and safe
 find . -name "*.log" -exec rm {} \;
-# 또는
+# or
 find . -name "*.log" -print0 | xargs -0 rm
 ```
 
-### 실수 5. grep으로 바이너리 파일을 검색한다
+### 실수 5. 텍스트가 아닌 파일까지 같은 방식으로 검색한다
 
 이미지, 실행 파일 등 바이너리 파일에 grep을 돌리면 깨진 문자가 출력됩니다. `grep --include="*.py" -r "pattern" .`으로 파일 유형을 제한하세요.
 
@@ -211,7 +211,13 @@ find . -name "*.log" -print0 | xargs -0 rm
 - [ ] 공백이 있는 파일 이름을 `-print0`과 `-0`으로 안전하게 처리할 수 있다
 - [ ] `grep`의 `-i`, `-l`, `-c`, `-F` 옵션을 설명할 수 있다
 
-## 정리 · 다음 글
+## 연습 문제
+
+1. 연습용 디렉터리를 만든 뒤 `TODO` 문자열이 들어 있는 파일만 `grep -R`로 찾아 보세요.
+2. `find`로 `.py` 파일만 골라 `xargs`로 `wc -l`을 실행해 보고, 각 명령의 역할을 한 줄씩 적어 보세요.
+3. 공백이 있는 파일 이름이 있을 때 `xargs`가 위험해지는 이유와 `-print0` / `-0` 조합의 의미를 설명해 보세요.
+
+## 정리와 다음 글
 
 - `grep`은 파일 내용에서 문자열을 검색하며, `-r`로 재귀, `-n`으로 줄번호를 표시합니다.
 - `find`는 파일 이름, 유형, 크기, 수정 시간 등 메타데이터로 파일을 찾습니다.
@@ -227,8 +233,8 @@ find . -name "*.log" -print0 | xargs -0 rm
 - [CLI와 Shell이란 무엇인가?](./01-what-is-cli-and-shell.md)
 - [파일과 디렉터리 다루기](./02-files-and-directories.md)
 - [권한과 소유자 이해하기](./03-permissions-and-ownership.md)
-- [cat, less, head, tail](./04-viewing-files.md)
-- **grep, find, xargs (현재 글)**
+- [cat, less, head, tail — 파일 내용 보기](./04-viewing-files.md)
+- **grep, find, xargs — 검색의 삼총사 (현재 글)**
 - pipe와 redirection (예정)
 - 프로세스 확인과 종료 (예정)
 - 환경변수와 PATH (예정)
