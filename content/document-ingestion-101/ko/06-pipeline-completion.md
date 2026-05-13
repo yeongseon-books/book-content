@@ -14,37 +14,49 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-11'
-seo_description: 완성된 수집 파이프라인은 각 단계를 더 많이 붙이는 구조가 아니라 각 단계의 입출력이 이어지는 구조입니다.
+last_reviewed: '2026-05-12'
+seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간 handoff가 깨지지 않는지로 판단해야 합니다.
 ---
 
 # 문서 수집 파이프라인 완성
 
-문서 수집 파이프라인의 가치는 각 단계를 따로 이해하는 데서 끝나지 않습니다. 로딩, 청킹, 임베딩, 저장이 한 번의 흐름으로 이어지고 다시 검색까지 돌아와야 비로소 설계가 검증됩니다.
+수집 파이프라인의 가치는 각 단계를 따로 아는 데서 나오지 않습니다. 로딩, 청킹, 인덱싱을 각각 이해해도, 그것들이 엔드투엔드 실행에서 함께 버티지 못하면 실제 파이프라인이라고 부르기 어렵습니다.
 
-이 글은 문서 수집과 인덱싱 101 시리즈의 마지막 글입니다. 여기서는 앞선 단계를 하나로 연결하고, 저장한 인덱스를 다시 불러와 검색까지 되는지 확인합니다.
-
-> 완성된 수집 파이프라인은 단계 수가 많아서가 아니라 각 단계가 다음 단계로 깔끔하게 넘겨질 때 비로소 완성됩니다.
+이 글은 Document Ingestion 101 시리즈의 마지막 글입니다. 여기서는 앞선 조각들을 하나의 재현 가능한 흐름으로 연결하고, 인덱스를 저장한 뒤 다시 불러와 검색까지 되는지 확인합니다.
 
 ## 이 글에서 다룰 문제
 
 - 로딩, 청킹, 임베딩, FAISS 저장·재로드를 하나의 흐름으로 어떻게 연결할 수 있을까요?
-- 전체 파이프라인이 실제로 동작했다는 최소한의 증거는 어떤 출력일까요?
+- 전체 파이프라인이 실제로 동작했다는 최소 증거는 무엇일까요?
 - 검색 흐름을 오프라인에서도 재현 가능하게 유지하려면 어떻게 해야 할까요?
+
+> 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
+
+예제 코드: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
+
+![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
+
+마지막 글은 앞에서 따로 보았던 예제들을 하나의 실제 흐름으로 조립합니다. 이제 중요한 질문은 각 단계 경계가 여전히 맞물리는가입니다.
+
+이 예제는 세 가지 형식을 로드하고, 청킹하고, FAISS에 임베딩을 저장한 뒤, 저장한 인덱스를 다시 읽어 검색합니다. 이 정도면 ingestion MVP가 끝에서 끝까지 동작한다는 최소 증거로 충분합니다.
 
 ## 엔드투엔드 수집 파이프라인
 
-![전체 수집 단계가 이어지는 파이프라인 흐름](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
+![End-to-end ingestion pipeline flow](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
 
-*전체 수집 단계가 이어지는 파이프라인 흐름*
-마지막 글의 핵심은 각 단계의 세부 구현보다도 앞 단계 출력이 다음 단계 입력으로 자연스럽게 이어지는지 확인하는 데 있습니다.
+*End-to-end ingestion pipeline flow*
+
+마지막 글의 핵심은 개별 함수의 깊은 로직보다 단계 사이 handoff가 깨지지 않는지 확인하는 데 있습니다.
 
 ## 단계별 검증 체크포인트
 
-![단계별 검증 지표가 남는 체크포인트 흐름](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.ko.png)
+![Stage verification checkpoint flow](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
 
-*단계별 검증 지표가 남는 체크포인트 흐름*
-체크포인트를 적게 두더라도 단계 경계마다 숫자와 경로를 하나씩 남기면 원인 추적 속도가 크게 빨라집니다.
+*Stage verification checkpoint flow*
+
+단계별 체크포인트 몇 개만 잘 두어도 파이프라인이 어디서 깨졌는지 빠르게 좁힐 수 있습니다.
 
 ## 실행 예제
 
@@ -99,20 +111,15 @@ def seed_files() -> list[Path]:
     txt_path = DATA_DIR / 'ops.txt'
     md_path = DATA_DIR / 'faq.md'
     create_pdf(pdf_path)
-    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.
-', encoding='utf-8')
-    md_path.write_text('# FAQ
-
-MD source: metadata filters reduce the candidate set before answer generation.
-', encoding='utf-8')
+    txt_path.write_text('TXT source: nightly ingestion runs at 02:00 and retries failed files first.\n', encoding='utf-8')
+    md_path.write_text('# FAQ\n\nMD source: metadata filters reduce the candidate set before answer generation.\n', encoding='utf-8')
     return [pdf_path, txt_path, md_path]
 
 def load_file(path: Path) -> list[Document]:
     suffix = path.suffix.lower()
     if suffix == '.pdf':
         reader = PdfReader(str(path))
-        text = '
-'.join((page.extract_text() or '').strip() for page in reader.pages)
+        text = '\n'.join((page.extract_text() or '').strip() for page in reader.pages)
         return [Document(page_content=text, metadata={'source': path.name, 'format': 'pdf'})]
     if suffix == '.txt':
         return [Document(page_content=path.read_text(encoding='utf-8'), metadata={'source': path.name, 'format': 'txt'})]
@@ -124,10 +131,7 @@ def chunk_documents(documents: list[Document]) -> list[Document]:
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=90,
         chunk_overlap=20,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_documents(documents)
     for index, chunk in enumerate(chunks):
@@ -153,8 +157,7 @@ def main() -> None:
     print(f'chunks: {len(chunks)}')
     print(f'faiss_saved: {INDEX_DIR}')
     for doc in results:
-        preview = doc.page_content.replace('
-', ' ')[:90]
+        preview = doc.page_content.replace('\n', ' ')[:90]
         print(f"result={doc.metadata['source']} chunk_id={doc.metadata['chunk_id']} preview={preview}")
 
 if __name__ == '__main__':
@@ -172,43 +175,51 @@ python main.py
 ```text
 loaded_documents: 3
 chunks: 4
-faiss_saved: /root/Github/document-ingestion-101/ko/06-pipeline-completion/faiss_store
+faiss_saved: /root/Github/document-ingestion-101/en/06-pipeline-completion/faiss_store
 result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retention rules.
 result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-### 모니터링과 장애 복구 흐름
+### 모니터링과 복구 경로
 
-![모니터링과 장애 복구가 이어지는 흐름](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.ko.png)
+![Monitoring and recovery flow](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
 
-*모니터링과 장애 복구가 이어지는 흐름*
-운영용 ingestion은 성공 경로만 그리면 부족하고 어느 단계에서 멈췄는지 되짚을 복구 경로도 함께 있어야 합니다.
+*Monitoring and recovery flow*
 
-- `load_file()`가 포맷 차이를 흡수하고, `chunk_documents()`가 공통 청크 계약을 만듭니다.
-- `SimpleHashEmbeddings` 덕분에 외부 모델 다운로드 없이도 FAISS 저장·재로딩 흐름을 끝까지 검증할 수 있습니다.
-- 검증 포인트를 `loaded_documents`, `chunks`, `faiss_saved`, `result` 네 줄로 남겨서 실패 지점을 빠르게 좁힐 수 있습니다.
+운영용 수집 파이프라인에는 성공 경로만이 아니라, 실패 후 어디서 다시 시작할지 보이는 복구 경로도 필요합니다.
 
-## 실무에서 헷갈리는 지점
+- `load_file()`는 파일 형식 차이를 흡수하고, `chunk_documents()`는 공통 청크 계약을 만듭니다.
+- `SimpleHashEmbeddings`는 외부 모델 다운로드 없이도 FAISS 저장·재로드 동작을 검증하게 해 줍니다.
+- 로그는 `loaded_documents`, `chunks`, `faiss_saved`, `result`라는 네 개의 짧은 체크포인트를 남깁니다.
 
-### 재시도와 재처리 제어 구조
+## 실무에서 자주 헷갈리는 지점
 
-![재시도와 재처리를 나누는 제어 구조](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.ko.png)
+### 재시도와 재실행 제어
 
-*재시도와 재처리를 나누는 제어 구조*
-재시도와 재처리를 같은 버튼으로 취급하면 중복 비용이 커지므로 둘을 다른 제어 경로로 나눠 두는 편이 좋습니다.
+![Retry and replay control flow](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
 
-- 엔드투엔드 데모라고 해서 LLM 호출까지 꼭 넣을 필요는 없습니다. 먼저 인덱스가 정상 저장·재로딩되는지 확인하는 편이 중요합니다.
-- 임베딩 품질과 파이프라인 동작 검증은 다른 문제입니다. 데모 단계에서는 재현성이 더 중요합니다.
-- FAISS 저장 후 다시 읽는 절차를 빼면 운영 배포 시 경로, 권한, 직렬화 문제를 놓치기 쉽습니다.
+*Retry and replay control flow*
+
+재시도와 재실행은 다른 제어 경로입니다. 둘을 하나의 동작으로 뭉개면 시간과 계산 비용을 쉽게 낭비합니다.
+
+- 엔드투엔드 데모라고 해서 첫날부터 LLM 호출까지 넣을 필요는 없습니다. 우선 인덱스 저장과 재로드를 검증하는 편이 더 중요합니다.
+- 임베딩 품질과 파이프라인의 정합성은 다른 문제입니다. 데모 단계에서는 재현성이 우선입니다.
+- 재로드 단계를 건너뛰면 배포 시점의 경로 문제와 직렬화 문제가 나중까지 숨어 버립니다.
 
 ## 체크리스트
 
-- [ ] 세 포맷을 모두 로드했다.
-- [ ] 청크 수가 기대 범위인지 확인했다.
-- [ ] FAISS 인덱스를 저장한 뒤 다시 로드했다.
-- [ ] 재로딩된 인덱스에서 검색 결과를 확인했다.
+- [ ] 세 가지 형식을 모두 로드했습니다.
+- [ ] 청크 수가 납득 가능한지 확인했습니다.
+- [ ] FAISS 인덱스를 저장하고 다시 불러왔습니다.
+- [ ] 재로드한 인덱스로 검색까지 검증했습니다.
+
+## 정리
+
+완성된 파이프라인은 기능 목록이 많아서가 아니라, 각 단계의 출력이 다음 단계의 입력으로 자연스럽게 이어질 때 비로소 완성됩니다. 그래서 마지막 검증은 개별 기술보다 handoff가 끊기지 않는지를 보는 데 초점이 있어야 합니다.
+
+이 시리즈에서 다룬 PDF 추출, 청킹, 메타데이터, 증분 인덱싱, 다중 포맷 수집은 따로 존재하는 팁이 아닙니다. 하나의 흐름으로 묶였을 때 비로소 문서 수집 시스템의 최소 형태가 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

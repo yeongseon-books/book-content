@@ -14,37 +14,49 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-11'
-seo_description: 메타데이터는 본문을 설명하는 부가 정보라기보다 검색 후보군을 줄이는 첫 번째 인덱스입니다.
+last_reviewed: '2026-05-12'
+seo_description: 메타데이터는 장식이 아니라 검색 후보군을 먼저 줄이는 첫 번째 인덱스입니다.
 ---
 
 # 메타데이터 설계와 필터링
 
-좋은 검색은 임베딩 유사도만으로 완성되지 않습니다. 운영 단계로 가면 범위, 출처, 시점처럼 의미 유사도 바깥에서 먼저 걸러야 할 조건이 분명해집니다.
+좋은 검색은 의미 유사도만으로 완성되지 않습니다. 운영 환경에서는 범위, 출처, 시간 구간처럼 랭킹 전에 먼저 좁혀야 하는 조건이 분명히 생깁니다.
 
-이 글은 문서 수집과 인덱싱 101 시리즈의 세 번째 글입니다. 여기서는 실무에 맞는 메타데이터 모양을 잡고, 필터가 검색 결과를 어떻게 바꾸는지 눈에 보이게 확인합니다.
-
-> 메타데이터는 본문 옆에 붙는 장식이 아니라 검색 후보군을 줄이는 첫 번째 인덱스입니다.
+이 글은 Document Ingestion 101 시리즈의 3번째 글입니다. 여기서는 실무에서 바로 쓸 수 있는 메타데이터 형태를 설계하고, 필터가 검색 동작을 어떻게 바꾸는지 눈에 보이게 확인합니다.
 
 ## 이 글에서 다룰 문제
 
 - 어떤 검색 조건은 임베딩 유사도만으로 해결할 수 없을까요?
-- 나중에 필터링하기 쉽게 LangChain `Document` 메타데이터는 어떻게 설계해야 할까요?
+- 나중에 필터링하기 쉽도록 LangChain `Document` 메타데이터를 어떻게 설계해야 할까요?
 - FAISS 검색 흐름에서 `filter` 파라미터는 어떤 모양으로 들어갈까요?
+
+> 메타데이터는 본문 옆의 장식이 아니라 검색 후보군을 줄이는 첫 번째 인덱스입니다.
+
+예제 코드: `/root/Github/document-ingestion-101/en/03-metadata-filtering/main.py`
+
+![Questions this post answers](../../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
+
+RAG에서 가장 흔한 실수 중 하나는 "의미가 비슷하다"와 "허용된 범위 안이다"를 섞어 생각하는 것입니다. 분기, 출처, 카테고리 같은 조건은 대개 벡터 유사도만으로 처리되지 않고, 구조화된 필터가 필요합니다.
+
+이 예제는 작은 문서 세 개를 FAISS에 넣고 `category`와 `quarter` 기준으로 `filter`를 바꿔 보면서 검색 동작이 어떻게 달라지는지 분명하게 보여 줍니다.
 
 ## 메타데이터 스키마 설계
 
-![검색용 메타데이터 필드가 모이는 스키마](../../../assets/document-ingestion-101/03/03-01-metadata-schema-design.ko.png)
+![Retrieval metadata schema flow](../../../assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
 
-*검색용 메타데이터 필드가 모이는 스키마*
-검색 스키마는 필드 수를 늘리는 일이 아니라 실제로 후보군을 줄일 키를 좁혀 가는 일에 가깝습니다.
+*Retrieval metadata schema flow*
 
-## 필터가 후보군을 줄이는 흐름
+좋은 스키마는 필드를 많이 모으는 데 있지 않습니다. 실제로 후보군을 줄이는 몇 개의 키를 남기는 데 있습니다.
 
-![필터가 후보군을 줄이는 검색 흐름](../../../assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.ko.png)
+## 필터가 후보군을 좁히는 방식
 
-*필터가 후보군을 줄이는 검색 흐름*
-의미상 비슷한 청크가 많아도 필터가 먼저 범위를 좁혀 주면 검색 결과가 훨씬 덜 흔들립니다.
+![Filtered retrieval candidate flow](../../../assets/document-ingestion-101/03/03-02-how-filters-narrow-the-candidate-set.en.png)
+
+*Filtered retrieval candidate flow*
+
+여러 청크가 의미상 비슷해도, 필터는 랭킹 전에 범위를 먼저 줄여서 검색 결과를 안정시킵니다.
 
 ## 실행 예제
 
@@ -127,8 +139,7 @@ def main() -> None:
     for doc in vectorstore.similarity_search(query, k=3, filter={'category': 'marketing'}):
         print(doc.metadata['title'], doc.metadata['quarter'], '-', doc.page_content)
 
-    print('
-[filter=quarter:2024Q4]')
+    print('\n[filter=quarter:2024Q4]')
     for doc in vectorstore.similarity_search(query, k=3, filter={'quarter': '2024Q4'}):
         print(doc.metadata['title'], doc.metadata['category'], '-', doc.page_content)
 
@@ -154,38 +165,46 @@ Q4 marketing budget marketing - ...
 Q4 infrastructure cost engineering - ...
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-### 하이브리드 검색 결합 순서
+### 유사도와 필터가 결합되는 순서
 
-![유사도와 필터가 결합되는 처리 흐름](../../../assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.ko.png)
+![Similarity and filter processing flow](../../../assets/document-ingestion-101/03/03-01-how-similarity-and-filters-combine.en.png)
 
-*유사도와 필터가 결합되는 처리 흐름*
-유사도와 필터는 경쟁 관계가 아니라 순서를 가진 협력 관계로 봐야 결과 해석이 쉬워집니다.
+*Similarity and filter processing flow*
 
-- `ChunkSpec`이 본문과 메타데이터를 함께 정의하므로 검색 스키마를 코드에서 한눈에 볼 수 있습니다.
-- `SimpleHashEmbeddings`를 써서 네트워크 없이도 `filter` 동작 자체를 재현할 수 있습니다.
-- 같은 질의라도 필터 조건을 바꾸면 결과 집합이 달라진다는 점이 핵심입니다.
+유사도와 필터는 하나의 불투명한 검색 단계가 아니라, 순서가 보이는 별도 단계로 다룰 때 해석이 쉬워집니다.
 
-## 실무에서 헷갈리는 지점
+- `ChunkSpec`은 본문과 메타데이터를 함께 두어 검색 스키마를 한곳에서 보이게 합니다.
+- `SimpleHashEmbeddings`는 네트워크 없이도 실제 `filter` 경로를 그대로 재현하게 해 줍니다.
+- 핵심은 같은 질의라도 필터가 바뀌면 결과 집합이 달라진다는 점입니다.
 
-### 출처 추적과 감사 경로
+## 실무에서 자주 헷갈리는 지점
 
-![출처와 분기를 따라가는 추적 경로](../../../assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.ko.png)
+### 출처 추적이 감사를 돕는 방식
 
-*출처와 분기를 따라가는 추적 경로*
-운영에서 잘못된 답을 추적할 때는 본문보다 source와 분기 정보가 먼저 단서를 주는 경우가 많습니다.
+![Source tracking and audit path](../../../assets/document-ingestion-101/03/03-02-how-source-tracking-supports-audits.en.png)
 
-- 메타데이터는 많이 붙일수록 좋은 것이 아닙니다. 실제 필터에 쓰는 필드만 남겨야 유지비가 낮습니다.
-- 벡터 검색 결과가 부정확해 보여도 필터 문제일 수 있습니다. 먼저 후보군이 올바르게 제한됐는지 봐야 합니다.
-- FAISS 자체는 관계형 DB가 아니므로 복잡한 다중 조건은 애플리케이션 레이어 설계가 함께 필요합니다.
+*Source tracking and audit path*
+
+응답이 이상해 보일 때는 청크 본문만 들여다보는 것보다, source와 scope 메타데이터가 실패 원인을 더 빨리 설명하는 경우가 많습니다.
+
+- 메타데이터가 많다고 항상 좋은 것은 아닙니다. 실제로 필터링할 필드만 남겨야 합니다.
+- 검색 결과가 이상하면 임베딩 모델보다 후보군 설계가 먼저 문제일 수 있습니다.
+- FAISS는 관계형 데이터베이스가 아니므로, 더 복잡한 조건은 애플리케이션 레벨 설계가 함께 필요합니다.
 
 ## 체크리스트
 
-- [ ] chunk 메타데이터에 최소한 category, quarter, source를 넣었다.
-- [ ] 같은 질의에 대해 서로 다른 filter 결과를 비교했다.
-- [ ] 필터 필드 이름이 문서 생성 코드와 검색 코드에서 일관된다.
-- [ ] 운영에서 필요한 필드만 남기도록 스키마를 정리했다.
+- [ ] 청크 메타데이터에 최소한 `category`, `quarter`, `source`가 들어 있습니다.
+- [ ] 같은 질의에 대해 서로 다른 필터 결과를 비교했습니다.
+- [ ] 필드 이름이 문서 생성과 검색 단계에서 일관됩니다.
+- [ ] 운영상 유용한 필드만 남기도록 스키마를 다듬었습니다.
+
+## 정리
+
+메타데이터는 본문을 설명하는 부가 정보가 아니라, 검색 전에 후보군을 줄이는 첫 번째 인덱스입니다. 그래서 어떤 필드를 저장할지보다, 어떤 필드가 실제로 검색 범위를 줄이는지부터 따져야 합니다.
+
+이 글에서 본 `category`, `quarter`, `source` 같은 키는 단순하지만 강력합니다. 다음 글에서는 이런 메타데이터 계약을 유지한 채, 변경된 문서만 다시 처리하는 증분 인덱싱 흐름으로 넘어가겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -14,37 +14,49 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-11'
-seo_description: PDF 파싱의 첫 목표는 “보이는 문서”를 “검증 가능한 문자열 목록”으로 바꾸는 것입니다.
+last_reviewed: '2026-05-12'
+seo_description: PDF 파싱의 첫 목표는 시각 문서를 검증 가능한 문자열 목록으로 바꾸는 일입니다.
 ---
 
 # PDF 파싱과 텍스트 추출
 
-문서 수집 파이프라인은 생각보다 앞단에서 자주 흔들립니다. 첫 추출 단계가 재현되지 않거나 눈으로 검증되지 않으면 뒤의 청킹과 인덱싱 논의도 금방 공중에 뜹니다.
+문서 수집 파이프라인은 생각보다 훨씬 앞단에서 흔들립니다. 첫 추출 단계가 재현되지 않거나, 추출 결과를 눈으로 확인하기 어렵다면 뒤에서 청킹과 인덱싱을 아무리 정교하게 붙여도 기반이 약합니다.
 
-이 글은 문서 수집과 인덱싱 101 시리즈의 첫 번째 글입니다. 여기서는 재현 가능한 PDF 샘플을 직접 만들고, 그 안에서 어떤 텍스트와 페이지 메타데이터를 뽑아낼 수 있는지 확인합니다.
-
-> PDF 파싱의 첫 목표는 눈에 보이는 문서를 검증 가능한 문자열 목록으로 바꾸는 일입니다.
+이 글은 Document Ingestion 101 시리즈의 첫 번째 글입니다. 여기서는 재현 가능한 PDF 샘플을 직접 만들고, 그 PDF에서 어떤 텍스트와 페이지 단위 메타데이터가 나오는지 검증 가능한 형태로 확인합니다.
 
 ## 이 글에서 다룰 문제
 
-- 예제용 PDF 파일이 없을 때도 PDF 추출 데모를 재현 가능하게 만들려면 어떻게 해야 할까요?
-- `pypdf`로 페이지 단위 텍스트와 문자 수를 어떻게 확인할 수 있을까요?
+- 샘플 파일이 없어도 PDF 추출 데모를 어떻게 재현 가능하게 만들 수 있을까요?
+- `pypdf`로 페이지별 텍스트와 문자 수를 어떻게 확인할 수 있을까요?
 - 문서 수집의 첫 단계에서 어떤 메타데이터를 남겨 두는 편이 좋을까요?
+
+> PDF 파싱의 첫 목표는 시각 문서를 검증 가능한 문자열 목록으로 바꾸는 일입니다.
+
+예제 코드: `/root/Github/document-ingestion-101/en/01-pdf-parsing/main.py`
+
+![Questions this post answers](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png)
+
+*Questions this post answers*
+
+PDF 파싱 튜토리얼에서 가장 먼저 부딪히는 실무 문제는 종종 샘플 파일입니다. 독자가 예제를 처음부터 그대로 재현할 수 없다면, 파이프라인 이야기는 시작부터 마찰을 안고 갑니다.
+
+이 예제는 `reportlab`으로 PDF를 직접 만든 뒤, 그 파일을 `pypdf`로 다시 읽고 페이지별 텍스트 요약을 출력합니다. 문서 수집의 첫 단계는 바로 이런 모양이어야 합니다. 입력도 통제되고, 출력도 사람이 검증할 수 있어야 합니다.
 
 ## PDF 파싱 흐름
 
-![PDF 생성과 추출이 이어지는 수집 흐름](../../../assets/document-ingestion-101/01/01-01-pdf-parsing-flow.ko.png)
+![PDF generation and extraction flow](../../../assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
 
-*PDF 생성과 추출이 이어지는 수집 흐름*
-입문 예제에서는 생성과 추출을 한 스크립트에 넣어 두면 입력 재현성과 출력 검증이 동시에 잡힙니다.
+*PDF generation and extraction flow*
+
+생성과 추출을 한 스크립트에 묶어 두면 예제를 다시 돌리기 쉽고, 출력 검증도 간단해집니다.
 
 ## 페이지 구조와 추출 포인트
 
-![페이지 구조와 표 감지 분기 구조](../../../assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.ko.png)
+![Page structure and table detection path](../../../assets/document-ingestion-101/01/01-02-page-structure-and-extraction-points.en.png)
 
-*페이지 구조와 표 감지 분기 구조*
-같은 PDF라도 텍스트, 표, 이미지가 섞여 있으므로 추출 전략을 한 가지로 고정하면 품질 차이를 놓치기 쉽습니다.
+*Page structure and table detection path*
+
+실제 PDF는 순수 텍스트만 담지 않는 경우가 많습니다. 텍스트, 표, 이미지가 섞여 있기 때문에 각 요소가 어떤 경로로 처리되는지에 따라 추출 품질이 달라집니다.
 
 ## 실행 예제
 
@@ -109,8 +121,7 @@ def extract_pages(pdf_path: Path) -> list[PageSummary]:
             {
                 'page': index,
                 'chars': len(text),
-                'preview': text.replace('
-', ' ')[:100],
+                'preview': text.replace('\n', ' ')[:100],
             }
         )
     return pages
@@ -145,38 +156,46 @@ page=1 chars=190 preview=Page 1 Document ingestion notes ...
 page=2 chars=173 preview=Page 2 Operational checks ...
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-### 페이지 메타데이터가 이어지는 방식
+### 페이지 메타데이터가 다음 단계로 이어지는 방식
 
-![페이지별 메타데이터가 쌓이는 스키마](../../../assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.ko.png)
+![Page metadata fields per document](../../../assets/document-ingestion-101/01/01-01-how-page-metadata-carries-forward.en.png)
 
-*페이지별 메타데이터가 쌓이는 스키마*
-페이지 번호와 문자 수를 같이 남기면 추출 품질 문제를 나중에 청킹 단계까지 끌고 가지 않고 앞단에서 잡을 수 있습니다.
+*Page metadata fields per document*
 
-- `create_sample_pdf()`가 입력 데이터를 직접 만들기 때문에 외부 의존 파일이 없습니다.
-- `extract_pages()`가 페이지 번호, 문자 수, 미리보기를 함께 반환해서 이후 메타데이터 설계로 자연스럽게 이어집니다.
-- 출력은 사람이 바로 읽을 수 있는 형태라서 파싱이 깨졌을 때 눈으로 검증하기 쉽습니다.
+페이지 번호와 문자 수를 함께 보존해 두면, 이후 청킹과 디버깅 단계에서도 맥락을 훨씬 쉽게 추적할 수 있습니다.
 
-## 실무에서 헷갈리는 지점
+- `create_sample_pdf()`가 입력 데이터를 직접 만들기 때문에 숨겨진 파일 의존성이 없습니다.
+- `extract_pages()`는 페이지 번호, 문자 수, 미리보기를 함께 반환하므로 다음 메타데이터 설계 단계와 자연스럽게 연결됩니다.
+- 출력이 사람이 읽기 쉬운 형태라서 레이아웃이 깨졌을 때 육안으로 바로 확인할 수 있습니다.
 
-### 텍스트 레이어와 OCR 대체 기준
+## 실무에서 자주 헷갈리는 지점
 
-![텍스트 레이어와 OCR 대체 판단 흐름](../../../assets/document-ingestion-101/01/01-02-when-ocr-becomes-the-fallback.ko.png)
+### OCR이 대체 경로가 되는 시점
 
-*텍스트 레이어와 OCR 대체 판단 흐름*
-OCR은 첫 선택지가 아니라 텍스트 레이어가 없거나 품질이 너무 낮을 때 들어가는 우회 경로로 보는 편이 안전합니다.
+![Text-layer check and OCR fallback flow](../../../assets/document-ingestion-101/01/01-02-when-ocr-becomes-the-fallback.en.png)
 
-- PDF 파싱은 OCR과 다릅니다. 텍스트 레이어가 이미 있는 PDF라면 먼저 텍스트 추출부터 확인해야 합니다.
-- 문자 수가 많이 나온다고 품질이 좋은 것은 아닙니다. 줄바꿈, 순서, 머리글 반복도 같이 봐야 합니다.
-- 복잡한 레이아웃 문서는 라이브러리 비교가 필요하지만, 입문 단계에서는 재현 가능한 단순 샘플부터 검증하는 편이 낫습니다.
+*Text-layer check and OCR fallback flow*
+
+OCR은 모든 PDF의 기본 경로가 아니라, 텍스트 레이어를 확인한 뒤 필요할 때만 쓰는 우회 경로로 두는 편이 안전합니다.
+
+- PDF 파싱과 OCR은 같은 작업이 아닙니다. PDF에 이미 텍스트 레이어가 있다면 먼저 일반 추출 품질부터 확인해야 합니다.
+- 문자 수가 많다고 해서 자동으로 품질이 좋은 것은 아닙니다. 읽기 순서와 반복 머리글 문제도 함께 봐야 합니다.
+- 복잡한 레이아웃에서는 라이브러리 비교가 필요하지만, 첫 튜토리얼은 재현 가능한 단순 샘플에서 시작하는 편이 좋습니다.
 
 ## 체크리스트
 
-- [ ] 스크립트가 PDF를 직접 생성한다.
-- [ ] 페이지 수와 문자 수를 함께 출력한다.
-- [ ] 페이지 미리보기로 추출 순서를 눈으로 확인했다.
-- [ ] 다음 단계에서 쓸 메타데이터 후보를 정리했다.
+- [ ] 스크립트가 PDF를 직접 생성합니다.
+- [ ] 페이지 수와 문자 수를 함께 출력합니다.
+- [ ] 페이지 미리보기만으로도 추출 순서를 눈으로 검증할 수 있습니다.
+- [ ] 다음 단계로 넘길 메타데이터를 정했습니다.
+
+## 정리
+
+이 글의 핵심은 PDF 파싱을 복잡한 라이브러리 비교 문제로 시작하지 않는 데 있습니다. 먼저 재현 가능한 입력을 만들고, 페이지별 텍스트와 문자 수를 확인하고, 사람이 읽을 수 있는 로그를 남겨야 합니다.
+
+여기까지 정리하면 다음 단계로 넘길 최소 계약도 분명해집니다. 페이지 텍스트, 페이지 번호, 문자 수 같은 기본 메타데이터가 확보되어야 이후 청킹과 인덱싱이 흔들리지 않습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

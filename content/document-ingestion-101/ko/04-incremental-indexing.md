@@ -14,37 +14,49 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-11'
-seo_description: 증분 인덱싱은 벡터 DB 기술이라기보다 파일 상태를 기억하는 운영 자동화 문제입니다.
+last_reviewed: '2026-05-12'
+seo_description: 증분 인덱싱은 벡터 저장소 기법이라기보다 무엇이 바뀌었는지 기억하는 운영 문제입니다.
 ---
 
 # 증분 인덱싱 — 변경된 문서만 업데이트
 
-문서 수가 적을 때는 전체 재색인도 버틸 만합니다. 하지만 코퍼스가 커지기 시작하면 무엇이 바뀌었는지를 기억하고 나머지는 건너뛰는 운영 감각이 더 중요해집니다.
+전체 인덱스를 다시 만드는 방식은 단순합니다. 하지만 코퍼스가 커지면 생각보다 빨리 한계가 옵니다. 그 시점부터 중요한 질문은 무엇이 바뀌었는지 기억하고, 나머지는 안전하게 건너뛰는 방법입니다.
 
-이 글은 문서 수집과 인덱싱 101 시리즈의 네 번째 글입니다. 여기서는 파일 해시와 작은 상태 저장소만으로 added, unchanged, updated를 구분하는 방법을 다룹니다.
-
-> 증분 인덱싱은 벡터 저장소 기술이라기보다 운영에서 무엇을 기억할지에 관한 문제에 더 가깝습니다.
+이 글은 Document Ingestion 101 시리즈의 4번째 글입니다. 여기서는 파일 해시와 작은 상태 저장소를 이용해 추가된 문서, 변경 없는 문서, 수정된 문서를 구분합니다.
 
 ## 이 글에서 다룰 문제
 
-- 전체를 다시 빌드하지 않고 변경된 문서만 처리하려면 무엇이 필요할까요?
-- 해시 기반 상태 저장소는 가장 단순하게 어떤 모양이면 충분할까요?
+- 전체를 다시 만들지 않고 변경된 문서만 처리하려면 무엇이 필요할까요?
+- 해시 기반 상태 저장소의 가장 단순한 형태는 무엇일까요?
 - 실행 로그에서 변경 없음, 수정됨, 신규 파일을 어떻게 구분할 수 있을까요?
 
-## 증분 스캔과 변경 감지 흐름
+> 증분 인덱싱은 벡터 저장소 트릭이라기보다 무엇을 기억할지 정하는 운영 문제에 더 가깝습니다.
 
-![증분 스캔과 변경 감지가 이어지는 흐름](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.ko.png)
+예제 코드: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
 
-*증분 스캔과 변경 감지가 이어지는 흐름*
-증분 인덱싱의 핵심은 파일을 읽는 비용보다 먼저 어떤 파일이 다시 처리 대상인지 좁히는 데 있습니다.
+![Questions this post answers](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
 
-## 상태 저장소와 해시 비교 구조
+*Questions this post answers*
 
-![상태 저장소와 해시 비교가 맞물리는 구조](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.ko.png)
+파일 수가 수십 개일 때는 전체 재색인도 감당할 수 있습니다. 하지만 수천 개로 커지면 전체 재실행은 금방 낭비가 됩니다.
 
-*상태 저장소와 해시 비교가 맞물리는 구조*
-mtime만 보는 방식보다 해시 비교를 같이 넣으면 운영에서 오탐과 누락을 줄이기 쉽습니다.
+이 예제는 파일 해시와 JSON 상태 파일만으로 `added`, `unchanged`, `updated`를 구분합니다. 이 단순한 분류기가 이후 모든 벡터 저장소 업데이트 흐름의 기초가 됩니다.
+
+## 증분 스캔과 변경 감지
+
+![Incremental scan and change detection flow](../../../assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+
+*Incremental scan and change detection flow*
+
+증분 인덱싱의 첫 이득은 비싼 후속 처리를 시작하기 전에 작업 집합을 먼저 줄이는 데 있습니다.
+
+## 상태 저장소와 해시 비교
+
+![State store and hash comparison flow](../../../assets/document-ingestion-101/04/04-02-state-store-and-hash-comparison.en.png)
+
+*State store and hash comparison flow*
+
+타임스탬프 옆에 내용 해시까지 두면, 변경 감지기는 mtime만 보는 방식보다 훨씬 믿을 만해집니다.
 
 ## 실행 예제
 
@@ -97,10 +109,8 @@ def reset_demo_state() -> None:
 
 def seed_files() -> list[Path]:
     files = {
-        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.
-',
-        'beta.txt': 'This is the second document. We will revise it later.
-',
+        'alpha.txt': 'This is the first document. It acts as the baseline for incremental indexing.\n',
+        'beta.txt': 'This is the second document. We will revise it later.\n',
     }
     paths = []
     for name, content in files.items():
@@ -125,8 +135,7 @@ def main() -> None:
     store = IndexStateStore(STATE_FILE)
     scan(store, files, 'first run')
     scan(store, files, 'second run without changes')
-    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.
-', encoding='utf-8')
+    files[1].write_text('This is the second document. Its contents changed, so it must be reprocessed.\n', encoding='utf-8')
     scan(store, files, 'third run after beta update')
 
 if __name__ == '__main__':
@@ -153,38 +162,46 @@ python main.py
   beta.txt: updated
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-### 추가 업데이트 삭제 분기
+### 추가 수정 삭제 경로
 
-![추가 업데이트 삭제를 가르는 처리 분기](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.ko.png)
+![Added updated and deleted decision flow](../../../assets/document-ingestion-101/04/04-01-added-updated-and-deleted-paths.en.png)
 
-*추가 업데이트 삭제를 가르는 처리 분기*
-삭제 처리까지 모델에 넣어 두면 나중에 전체 재색인 없이도 index 청소 경로를 자연스럽게 확장할 수 있습니다.
+*Added updated and deleted decision flow*
 
-- `IndexStateStore`가 해시, mtime, indexed_at을 함께 저장해 디버깅 포인트를 남깁니다.
-- 동일한 스크립트를 세 번 연속 실행하면서 added → unchanged → updated 흐름을 재현합니다.
-- 상태 저장소가 JSON이어서 로직을 먼저 이해하고 나중에 DB로 옮기기 쉽습니다.
+삭제를 별도 경로로 모델링해 두면, 인덱스 정리 역시 같은 상태 기계의 확장으로 다룰 수 있습니다.
 
-## 실무에서 헷갈리는 지점
+- `IndexStateStore`는 해시, mtime, indexed_at을 함께 저장해 디버깅을 쉽게 만듭니다.
+- 스크립트는 의도적으로 세 번 실행되어 `added → unchanged → updated` 수명 주기를 다시 보여 줍니다.
+- 처음에는 JSON을 써서 로직을 투명하게 만들고, 같은 패턴을 나중에 데이터베이스로 옮기면 됩니다.
 
-### 인덱스 버전과 실행 기록 흐름
+## 실무에서 자주 헷갈리는 지점
 
-![인덱스 버전과 실행 기록이 남는 흐름](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.ko.png)
+### 인덱스 버전과 실행 이력
 
-*인덱스 버전과 실행 기록이 남는 흐름*
-운영 자동화에서는 변경 감지 자체보다도 어떤 실행이 어떤 인덱스 버전을 만들었는지 남기는 일이 더 중요해지는 시점이 옵니다.
+![Index version and run history flow](../../../assets/document-ingestion-101/04/04-02-index-version-and-run-history-flow.en.png)
 
-- mtime만 비교하면 빠르지만 오탐이 생길 수 있습니다. 내용 해시를 같이 보는 이유가 여기에 있습니다.
-- 증분 인덱싱은 “변경 감지”와 “변경 반영” 두 단계입니다. 둘을 섞어 생각하면 구현이 꼬입니다.
-- 삭제 처리까지 넣으려면 현재 파일 목록과 이전 상태 목록을 비교하는 루프가 추가로 필요합니다.
+*Index version and run history flow*
+
+규모가 커지면 무엇이 바뀌었는지 아는 것만큼, 어떤 실행이 어떤 인덱스 버전을 만들었는지 아는 일도 중요해집니다.
+
+- mtime만 보는 체크는 빠르지만 변경을 과하게 잡을 수 있습니다. 그래서 내용 해시가 여전히 중요합니다.
+- 증분 인덱싱에는 변경을 감지하는 단계와 변경을 반영하는 단계, 두 가지 관심사가 있습니다.
+- 삭제 처리는 현재 파일 목록과 저장된 상태를 비교하는 추가 패스를 필요로 합니다.
 
 ## 체크리스트
 
-- [ ] 상태 저장소에 해시와 시각을 함께 기록한다.
-- [ ] 변경 없는 두 번째 실행이 unchanged로 떨어진다.
-- [ ] 파일 수정 후 세 번째 실행이 updated로 바뀐다.
-- [ ] 삭제 처리 확장 포인트를 설계했다.
+- [ ] 상태 저장소에 해시와 타임스탬프를 함께 기록합니다.
+- [ ] 수정 없는 두 번째 실행이 `unchanged`로 떨어집니다.
+- [ ] 나중의 파일 수정이 `updated`로 분류됩니다.
+- [ ] 삭제 처리를 어디에 끼워 넣을지 정했습니다.
+
+## 정리
+
+증분 인덱싱의 본질은 벡터 저장소보다 먼저 상태 기억에 있습니다. 무엇이 새 파일인지, 무엇이 바뀌지 않았는지, 무엇이 다시 처리되어야 하는지를 안정적으로 구분해야 뒤의 임베딩 비용을 아낄 수 있습니다.
+
+해시와 작은 상태 저장소만으로도 그 출발점은 충분히 만들 수 있습니다. 다음 글에서는 이렇게 구분된 문서를 여러 파일 형식에서 공통 `Document` 계약으로 모으는 다중 포맷 파이프라인을 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

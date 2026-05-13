@@ -14,37 +14,49 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-11'
-seo_description: 청킹은 텍스트를 잘게 자르는 작업이 아니라 검색이 버틸 수 있는 문맥 단위를 설계하는 작업입니다.
+last_reviewed: '2026-05-12'
+seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 신뢰할 최소 문맥 단위를 설계하는 일입니다.
 ---
 
 # 청킹 전략 — 문서 유형별 최적화
 
-청킹은 검색 품질이 조용히 무너지는 지점이기도 합니다. FAQ에서 잘 맞던 분할 기준이 매뉴얼이나 정책 문서에서는 문맥을 쉽게 끊어 버리기 때문입니다.
+청킹은 많은 검색 시스템이 조용히 품질을 잃는 지점입니다. FAQ에 잘 맞는 분할기가 매뉴얼이나 정책 문서의 구조를 그대로 망가뜨리는 일은 흔합니다.
 
-이 글은 문서 수집과 인덱싱 101 시리즈의 두 번째 글입니다. 여기서는 문서 유형별 청킹 프리셋을 비교하고, 분할 결과를 빠르게 점검하는 기준을 정리합니다.
-
-> 청킹은 텍스트를 잘게 자르는 일이 아니라 검색이 여전히 신뢰할 수 있는 가장 작은 문맥 단위를 설계하는 일입니다.
+이 글은 Document Ingestion 101 시리즈의 2번째 글입니다. 여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
 
 ## 이 글에서 다룰 문제
 
-- FAQ, 매뉴얼, 정책 문서는 같은 청크 크기를 써도 괜찮을까요?
-- `RecursiveCharacterTextSplitter`는 어디에서 자를지 어떻게 결정할까요?
+- FAQ 페이지, 매뉴얼, 정책 문서에 같은 청크 크기를 써도 될까요?
+- `RecursiveCharacterTextSplitter`는 어디에서 잘라야 할지 어떻게 결정할까요?
 - 청크를 임베딩하기 전에 어떤 빠른 통계를 먼저 확인해야 할까요?
 
-## 문서 유형별 청킹 전략 흐름
+> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
 
-![문서 유형별 청킹 전략 선택 흐름](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
+예제 코드: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
 
-*문서 유형별 청킹 전략 선택 흐름*
-같은 분할기를 쓰더라도 문서 유형마다 경계와 겹침의 기본값을 다르게 잡아야 검색 잡음을 줄일 수 있습니다.
+![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
 
-## 재귀 분할기 구분자 후퇴 순서
+*Questions this post answers*
 
-![재귀 분할기의 구분자 후퇴 흐름](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.ko.png)
+나쁜 청킹 선택은 뒤의 모든 단계에 흔적을 남깁니다. 너무 작으면 문맥이 끊기고, 너무 크면 검색 잡음이 커집니다.
 
-*재귀 분할기의 구분자 후퇴 흐름*
-재귀 분할기의 장점은 의미 있는 큰 경계를 먼저 살려 보고, 안 되면 더 작은 경계로 천천히 내려간다는 점입니다.
+이 예제는 FAQ, 매뉴얼, 정책 문서처럼 보이는 텍스트를 같은 분할기에 넣고, 왜 문서별 프리셋이 필요한지 숫자로 보여 줍니다.
+
+## 문서 유형별 청킹 흐름
+
+![Chunking strategy selection flow](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
+
+*Chunking strategy selection flow*
+
+분할기가 하나여도, 시작하는 `chunk_size`와 `chunk_overlap`은 문서 형태에 맞춰 달라져야 합니다.
+
+## 재귀 분할기의 후퇴 순서
+
+![Recursive separator fallback flow](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.en.png)
+
+*Recursive separator fallback flow*
+
+재귀 분할의 강점은 더 큰 의미 경계를 먼저 지키고, 정말 필요할 때만 더 작은 경계로 내려간다는 점입니다.
 
 ## 실행 예제
 
@@ -58,13 +70,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 SAMPLES = {
     'faq': 'Question: what is the upload limit? Answer: the default limit is 20MB and can be tuned. '
     'Question: how do we reprocess failed files? Answer: rerun only the failed documents in the incremental job. ' * 4,
-    'manual': '# Deployment guide
-
-1. Review the config file.
-2. Validate sample documents before rollout.
-3. Check logs and chunk counts after deployment.
-
-'
+    'manual': '# Deployment guide\n\n1. Review the config file.\n2. Validate sample documents before rollout.\n3. Check logs and chunk counts after deployment.\n\n'
     'When the structure is explicit, larger chunks can stay readable. ' * 4,
     'policy': 'Policy documents use long paragraphs and repeated definitions. They describe access control, retention, and deletion '
     'rules together, so context breaks if the overlap is too small. ' * 5,
@@ -80,10 +86,7 @@ def summarize(name: str, text: str, chunk_size: int, chunk_overlap: int) -> None
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
-        separators=['
-
-', '
-', '. ', ' '],
+        separators=['\n\n', '\n', '. ', ' '],
     )
     chunks = splitter.split_text(text)
     sizes = [len(chunk) for chunk in chunks]
@@ -112,38 +115,46 @@ python main.py
 [policy] chunks=4 avg=224.8 min=118 max=297
 ```
 
-## 이 코드에서 봐야 할 것
+## 이 코드에서 먼저 봐야 할 점
 
-### 청크 경계와 overlap 구조
+### 청크 겹침이 문맥을 이어 주는 방식
 
-![청크 경계와 겹침이 이어지는 구조](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.ko.png)
+![Chunk boundaries with overlap flow](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.en.png)
 
-*청크 경계와 겹침이 이어지는 구조*
-겹침은 중복 저장이 아니라 앞 청크의 문맥 실마리를 다음 청크로 이어 주는 안전장치입니다.
+*Chunk boundaries with overlap flow*
 
-- 예제는 `chunk_size`, `chunk_overlap`, `separators`만 바꿔도 결과가 크게 달라진다는 점을 보여줍니다.
-- 평균 길이뿐 아니라 최소/최대 길이도 함께 출력해서 불균형한 청크를 바로 찾을 수 있습니다.
-- 첫 번째 청크 미리보기를 같이 찍으면 헤더나 번호 목록이 예상대로 보존되는지 확인할 수 있습니다.
+겹침은 단순 중복이 아니라, 인접한 청크 사이에 앞선 문맥 일부를 이어 주는 handoff 장치입니다.
 
-## 실무에서 헷갈리는 지점
+- 이 예제는 `chunk_size`, `chunk_overlap`, `separators`를 조금만 바꿔도 결과가 크게 달라진다는 점을 바로 보여 줍니다.
+- 평균 길이뿐 아니라 최소와 최대 길이도 함께 출력해서 불균형한 청크를 바로 찾게 해 줍니다.
+- 첫 번째 청크 미리보기는 제목과 번호 목록이 살아남았는지 확인하는 가장 싼 검증 방법입니다.
 
-### 청크 품질 점검 흐름
+## 실무에서 자주 헷갈리는 지점
 
-![청크 품질 지표를 확인하는 점검 흐름](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.ko.png)
+### 청크 품질을 검토하는 방법
 
-*청크 품질 지표를 확인하는 점검 흐름*
-청크 수만 보는 것으로는 부족하고 길이 분포와 첫 청크 미리보기까지 같이 봐야 경계 품질을 빠르게 판단할 수 있습니다.
+![Chunk quality review flow](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.en.png)
 
-- 좋은 청킹은 무조건 작은 청킹이 아닙니다. 검색 품질은 경계와 겹침이 함께 결정합니다.
-- 문서 유형별 프리셋은 고정 규칙이 아니라 출발점입니다. 실제 운영에서는 검색 로그로 다시 조정해야 합니다.
-- 문장 기준 분할이 항상 최고는 아닙니다. 매뉴얼처럼 구조가 뚜렷한 문서는 헤더 보존이 더 중요할 수 있습니다.
+*Chunk quality review flow*
+
+청크 개수만으로는 부족합니다. 길이 분포와 미리보기까지 같이 봐야 분할이 구조를 존중했는지 판단할 수 있습니다.
+
+- 더 좋은 청킹이 항상 더 작은 청크를 뜻하는 것은 아닙니다. 품질은 경계 선택과 겹침이 함께 결정합니다.
+- 문서 유형별 프리셋은 시작점일 뿐입니다. 나중에는 검색 로그를 보고 다시 조정해야 합니다.
+- 문장 경계가 항상 최선은 아닙니다. 매뉴얼에서는 구조 보존이 더 중요할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] 문서 유형별 프리셋을 최소 세 가지로 나눴다.
-- [ ] 청크 수와 길이 분포를 숫자로 확인했다.
-- [ ] 첫 번째 청크 미리보기로 구조 보존 여부를 확인했다.
-- [ ] 임베딩 전에 너무 긴 청크와 너무 짧은 청크를 걸러낼 기준을 정했다.
+- [ ] 최소 세 가지 문서 유형으로 프리셋을 나눴습니다.
+- [ ] 청크 수와 길이 분포를 숫자로 확인했습니다.
+- [ ] 첫 번째 청크 미리보기로 구조 보존 여부를 검증했습니다.
+- [ ] 임베딩 전에 너무 길거나 너무 짧은 청크의 기준을 정했습니다.
+
+## 정리
+
+청킹은 텍스트를 잘게 쪼개는 기계적 단계가 아닙니다. 검색이 다시 회수해야 할 최소 문맥 단위를 어디에 둘지 정하는 설계 단계입니다.
+
+그래서 문서 유형별 기본값을 다르게 잡고, 청크 수만이 아니라 길이 분포와 미리보기를 함께 점검해야 합니다. 다음 단계에서는 이렇게 만든 청크에 어떤 메타데이터를 붙여야 검색 후보군을 더 안정적으로 줄일 수 있는지 보겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
