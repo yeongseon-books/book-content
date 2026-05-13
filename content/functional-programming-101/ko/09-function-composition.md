@@ -2,7 +2,7 @@
 series: functional-programming-101
 episode: 9
 title: 함수 합성과 파이프라인
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,51 +16,61 @@ tags:
   - 함수 합성
   - 파이프라인
   - 데이터 변환
-seo_description: 작은 함수를 조합하여 복잡한 데이터 변환 파이프라인을 구성하는 방법을 다룹니다.
-last_reviewed: '2026-05-11'
+seo_description: compose와 pipe로 작은 함수를 데이터 파이프라인으로 조합하는 방법입니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 함수 합성과 파이프라인
 
-> Functional Programming 101 시리즈 (9/10)
+이 글은 Functional Programming 101 시리즈의 아홉 번째 글입니다.
 
+작은 함수는 이해하기 쉽습니다. 문제는 그런 함수가 많아졌을 때입니다. 함수가 많아질수록 오히려 흩어지고 읽기 어려워질 수도 있습니다. 함수 합성과 파이프라인은 그 작은 조각들을 의미 있는 흐름으로 다시 묶는 방법입니다.
+
+현업에서 이 패턴이 중요한 이유는 테스트성과 변경 용이성 때문입니다. 거대한 함수 하나에 모든 로직을 넣는 대신, 각 단계가 하나의 변환만 맡게 만들면 수정 범위가 작아지고 파이프라인 전체를 안전하게 재구성할 수 있습니다.
 
 ## 이 글에서 다룰 문제
 
-복잡한 데이터 처리 로직을 하나의 거대한 함수로 작성하면 테스트와 재사용이 어렵습니다. 작은 단위 함수를 조합하면 각 단계를 독립적으로 테스트하고 재조합할 수 있습니다.
+- 함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?
+- `compose`와 `pipe`는 무엇이 다르고, 왜 `pipe`가 더 읽기 쉬운 경우가 많을까요?
+- 데이터 처리와 텍스트 처리에서 파이프라인은 어떤 장점을 줄까요?
+- generator 기반 파이프라인과 조건부 파이프라인은 어떻게 설계할 수 있을까요?
 
-> 함수 합성 = 작은 부품으로 큰 시스템 구축
+> 멘탈 모델: 함수 합성은 "작은 변환을 이어 붙여 더 큰 변환을 만드는 일"입니다. 각 함수는 한 단계만 책임지고, 파이프라인은 그 단계를 실행 순서대로 드러내는 설계라고 보면 됩니다.
 
-UNIX의 파이프(`cat file | grep error | sort | uniq`)와 같은 철학입니다. 각 도구는 한 가지 일을 잘 하고, 조합으로 복잡한 작업을 수행합니다.
+## 왜 중요한가
 
-## 핵심 개념 잡기
+복잡한 데이터 처리 로직을 하나의 거대한 함수에 넣으면 테스트하기 어렵고 재사용도 힘들어집니다. 반대로 단일 목적 함수들을 조합하면 각 단계를 독립적으로 검증할 수 있고, 다른 파이프라인에서도 같은 함수를 다시 쓸 수 있습니다.
 
-> compose vs pipe — 방향의 차이
+이것은 UNIX 철학과도 닿아 있습니다. `cat file | grep error | sort | uniq`처럼 각 도구가 한 가지 일만 잘하고, 조합으로 복잡한 작업을 처리합니다. 함수형 파이프라인은 이 철학을 코드 수준으로 가져오는 방법입니다.
 
-```text
-compose(f, g, h)(x)  =  f(g(h(x)))     ← 오른쪽에서 왼쪽
-pipe(h, g, f)(x)     =  f(g(h(x)))     ← 왼쪽에서 오른쪽
+## 개념 개요
 
-파이프라인 시각화:
-  x → [h] → [g] → [f] → result
+> `compose`와 `pipe`의 차이는 방향입니다. 계산 자체는 같아도 읽는 순서가 달라집니다.
+
+```
+compose(f, g, h)(x)  =  f(g(h(x)))     <- right to left
+pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right
+
+Pipeline visualization:
+  x -> [h] -> [g] -> [f] -> result
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 함수 합성(composition) | 두 함수 f, g를 결합하여 f(g(x))를 만드는 연산입니다 |
-| 파이프라인(pipeline) | 데이터가 함수 체인을 순차적으로 통과하는 패턴입니다 |
+| 함수 합성(function composition) | 두 함수 `f`, `g`를 `f(g(x))`로 결합하는 연산입니다 |
+| 파이프라인(pipeline) | 데이터가 여러 함수를 순차적으로 통과하는 패턴입니다 |
 | compose | 함수를 오른쪽에서 왼쪽으로 합성합니다 |
 | pipe | 함수를 왼쪽에서 오른쪽으로 합성합니다 |
-| 포인트프리 스타일(point-free) | 인자를 명시하지 않고 함수 조합만으로 표현하는 스타일입니다 |
+| point-free style | 인자 이름을 드러내지 않고 함수 조합만으로 로직을 표현하는 스타일입니다 |
 
 ## Before / After
 
-중첩 함수 호출을 파이프라인으로 전환합니다.
+중첩 호출은 안쪽부터 해석해야 해서 읽기가 어렵습니다. 파이프라인은 실행 순서를 코드 순서와 맞춰 줍니다.
 
 ```python
-# before: 중첩 호출 — 안에서 바깥으로 읽어야 함
+# before: nested calls — read from inside out
 result = format_output(
     sort_by_score(
         filter_passing(
@@ -73,7 +83,7 @@ result = format_output(
 ```
 
 ```python
-# after: 파이프라인 — 위에서 아래로 읽기
+# after: pipeline — read top to bottom
 result = pipe(
     load_data,
     calculate_totals,
@@ -85,7 +95,7 @@ result = pipe(
 
 ## 단계별 실습
 
-### Step 1: 기본 compose와 pipe
+### Step 1: compose와 pipe의 기본
 
 ```python
 from typing import Callable, Any
@@ -93,7 +103,7 @@ from functools import reduce
 
 
 def compose(*funcs: Callable) -> Callable:
-    """오른쪽에서 왼쪽으로 함수를 합성합니다."""
+    """Composes functions from right to left."""
     def composed(x: Any) -> Any:
         result = x
         for f in reversed(funcs):
@@ -102,7 +112,7 @@ def compose(*funcs: Callable) -> Callable:
     return composed
 
 def pipe(*funcs: Callable) -> Callable:
-    """왼쪽에서 오른쪽으로 함수를 합성합니다."""
+    """Composes functions from left to right."""
     def piped(x: Any) -> Any:
         result = x
         for f in funcs:
@@ -111,7 +121,7 @@ def pipe(*funcs: Callable) -> Callable:
     return piped
 
 
-# compose 예시: f(g(h(x)))
+# compose: f(g(h(x)))
 add_one = lambda x: x + 1
 double = lambda x: x * 2
 to_str = lambda x: f"Result: {x}"
@@ -119,12 +129,14 @@ to_str = lambda x: f"Result: {x}"
 transform_c = compose(to_str, double, add_one)
 print(transform_c(5))  # Result: 12  — (5+1)*2 = 12
 
-# pipe: 읽기 순서와 실행 순서가 같음
+# pipe: read order matches execution order
 transform_p = pipe(add_one, double, to_str)
 print(transform_p(5))  # Result: 12
 ```
 
-### Step 2: 실전 문자열 처리 파이프라인
+실무에서는 `pipe`가 더 자주 읽기 좋습니다. 코드 순서와 실행 순서가 같아서 디버깅과 리뷰가 수월하기 때문입니다.
+
+### Step 2: 문자열 처리 파이프라인
 
 ```python
 import re
@@ -151,7 +163,7 @@ def truncate(max_len: int):
     return _truncate
 
 
-# 슬러그 생성 파이프라인
+# slug generation pipeline
 slugify = pipe(
     strip_whitespace,
     normalize_spaces,
@@ -162,11 +174,13 @@ slugify = pipe(
 )
 
 print(slugify("  Hello, World!  This is  a Test  "))
-# 출력 예시: hello-world-this-is-a-test
+# hello-world-this-is-a-test
 
-print(slugify("  Functional Programming — 함수 합성 가이드  "))
-# 출력 예시: functional-programming--
+print(slugify("  Functional Programming — A Composition Guide  "))
+# functional-programming--a-composition-guide
 ```
+
+문자열 정규화는 파이프라인의 장점을 가장 직관적으로 보여 줍니다. 단계마다 역할이 뚜렷해서 수정 포인트를 찾기도 쉽습니다.
 
 ### Step 3: 데이터 처리 파이프라인
 
@@ -175,7 +189,7 @@ from typing import Callable
 
 
 def pipe_data(*funcs: Callable) -> Callable:
-    """데이터 처리 파이프라인입니다."""
+    """Data processing pipeline."""
     def process(data):
         result = data
         for func in funcs:
@@ -184,7 +198,7 @@ def pipe_data(*funcs: Callable) -> Callable:
     return process
 
 
-# 각 단계를 독립 함수로 정의
+# define each stage as an independent function
 def parse_records(raw: list[str]) -> list[dict]:
     records = []
     for line in raw:
@@ -207,14 +221,14 @@ def sort_by_score(records: list[dict]) -> list[dict]:
     return sorted(records, key=lambda r: r["score"], reverse=True)
 
 def format_table(records: list[dict]) -> str:
-    lines = [f"{'이름':<10} {'점수':>5} {'등급':>4}"]
+    lines = [f"{'Name':<10} {'Score':>5} {'Grade':>5}"]
     lines.append("-" * 22)
     for r in records:
-        lines.append(f"{r['name']:<10} {r['score']:>5} {r['grade']:>4}")
+        lines.append(f"{r['name']:<10} {r['score']:>5} {r['grade']:>5}")
     return "\n".join(lines)
 
 
-# 파이프라인 조립
+# assemble the pipeline
 process_students = pipe_data(
     parse_records,
     add_grade,
@@ -223,7 +237,7 @@ process_students = pipe_data(
     format_table,
 )
 
-# 실행
+# execute
 raw_data = [
     "Alice, 85",
     "Bob, 92",
@@ -233,13 +247,15 @@ raw_data = [
 ]
 
 print(process_students(raw_data))
-# 이름          점수   등급
+# Name        Score Grade
 # ----------------------
-# 출력 예시: Diana          95    A
-# 출력 예시: Bob            92    A
-# 출력 예시: Alice          85    B
-# 출력 예시: Charlie        78    C
+# Diana          95     A
+# Bob            92     A
+# Alice          85     B
+# Charlie        78     C
 ```
+
+좋은 파이프라인은 각 단계가 순수 함수이기 때문에 독립 테스트가 가능합니다. 어느 단계에서 데이터가 잘못됐는지도 빠르게 찾을 수 있습니다.
 
 ### Step 4: 제너레이터 파이프라인
 
@@ -248,7 +264,7 @@ from typing import Iterator, Callable
 
 
 def gen_pipe(*funcs: Callable) -> Callable:
-    """제너레이터 기반 지연 파이프라인입니다."""
+    """Generator-based lazy pipeline."""
     def process(data):
         result = data
         for func in funcs:
@@ -280,7 +296,7 @@ def to_upper(it: Iterator[str]) -> Iterator[str]:
         yield line.upper()
 
 
-# 지연 파이프라인 조립
+# assemble the lazy pipeline
 clean_text = gen_pipe(
     strip_lines,
     skip_empty,
@@ -289,12 +305,12 @@ clean_text = gen_pipe(
 )
 
 text = """
-  # 설정 파일
+  # config file
   host = localhost
 
   port = 8080
 
-  # 디버그 모드
+  # debug mode
   debug = true
 """
 
@@ -304,6 +320,8 @@ for line in clean_text(lines(text)):
 # PORT = 8080
 # DEBUG = TRUE
 ```
+
+파이프라인은 eager 데이터에만 쓰는 패턴이 아닙니다. generator와 결합하면 큰 입력도 메모리 효율적으로 처리할 수 있습니다.
 
 ### Step 5: 조건부 파이프라인
 
@@ -316,7 +334,7 @@ def conditional(
     if_true: Callable,
     if_false: Callable | None = None,
 ) -> Callable:
-    """조건에 따라 다른 함수를 적용합니다."""
+    """Applies different functions based on a condition."""
     def apply(value: Any) -> Any:
         if predicate(value):
             return if_true(value)
@@ -324,11 +342,11 @@ def conditional(
     return apply
 
 def when(predicate: Callable[[Any], bool], func: Callable) -> Callable:
-    """조건이 참일 때만 함수를 적용합니다."""
+    """Applies a function only when the condition is true."""
     return conditional(predicate, func)
 
 
-# 조건부 단계가 포함된 파이프라인
+# pipeline with conditional steps
 process = pipe(
     lambda x: x.strip(),
     when(lambda x: x.startswith("http"), lambda x: x.replace("http://", "https://")),
@@ -342,48 +360,56 @@ print(process("  Short URL  "))
 # short url
 ```
 
+조건부 단계까지 조합할 수 있으면 파이프라인은 단순 직선 구조를 넘어서도 충분히 실용적이 됩니다.
+
 ## 이 코드에서 주목할 점
 
-- `pipe`는 실행 순서와 코드 순서가 일치하여 가독성이 높습니다
-- 각 단계 함수가 독립적이므로 개별 테스트가 가능합니다
-- 제너레이터 파이프라인은 대용량 데이터를 메모리 효율적으로 처리합니다
-- 조건부 파이프라인으로 분기 로직을 선언적으로 표현할 수 있습니다
+- `pipe`는 코드 순서와 실행 순서를 맞춰 읽기 쉽게 만듭니다.
+- 각 단계 함수는 독립적이어서 개별 테스트가 쉽습니다.
+- generator 파이프라인은 큰 데이터를 메모리 효율적으로 처리합니다.
+- 조건부 파이프라인은 분기 로직도 선언형으로 표현하게 해 줍니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 함수 시그니처 불일치 | 앞 함수의 출력이 뒤 함수의 입력과 맞지 않습니다 | 타입 힌트로 호환성을 확인합니다 |
-| 파이프라인이 너무 길어짐 | 디버깅이 어려워집니다 | 중간 변수나 로깅 단계를 추가합니다 |
-| 부수효과를 파이프라인 중간에 배치 | 테스트와 재사용이 어렵습니다 | 부수효과는 파이프라인의 끝에 배치합니다 |
-| 에러 처리 누락 | 중간 단계 실패 시 전체가 멈춥니다 | 에러 처리 단계를 파이프라인에 포함합니다 |
-| compose와 pipe 혼용 | 실행 방향이 혼란스럽습니다 | 프로젝트 내에서 하나를 통일합니다 |
+| 함수 시그니처가 맞지 않음 | 앞 단계 출력이 다음 단계 입력과 안 맞습니다 | 타입 힌트로 연결 가능성을 확인합니다 |
+| 파이프라인이 너무 길어짐 | 디버깅이 어려워집니다 | 중간 변수나 로깅 단계를 둡니다 |
+| 파이프라인 중간에 부수효과를 넣음 | 테스트와 재사용이 어려워집니다 | 부수효과는 마지막 단계로 밀어냅니다 |
+| 오류 처리 단계가 없음 | 한 단계 실패가 전체를 멈춥니다 | 에러 처리용 단계를 명시적으로 둡니다 |
+| `compose`와 `pipe`를 섞어 씀 | 실행 방향이 헷갈립니다 | 프로젝트 안에서 한 가지 기준을 정합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- ETL 파이프라인(Extract → Transform → Load)을 함수 합성으로 구성합니다
-- 데이터 검증을 여러 검증 함수의 파이프라인으로 구현합니다
-- 텍스트 전처리(정규화, 토큰화, 필터링)를 파이프라인으로 구성합니다
-- API 미들웨어 체인을 함수 합성으로 구현합니다
-- CI/CD 파이프라인의 각 단계를 독립 함수로 정의합니다
+- ETL 파이프라인을 함수 합성으로 구성합니다.
+- 검증 함수를 여러 단계로 조합해 데이터 검증 파이프라인을 만듭니다.
+- 텍스트 전처리를 정규화, 토큰화, 필터링 단계로 분리합니다.
+- API 미들웨어 체인을 함수 조합으로 표현합니다.
+- CI/CD 각 단계를 독립 함수처럼 설계하는 데 같은 사고방식을 적용합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 판단합니다
 
-함수 합성의 핵심 가치는 "관심사의 분리"입니다. 각 함수가 한 가지 변환만 담당하면 테스트가 쉽고 재조합이 자유롭습니다. UNIX 철학 "한 가지 일을 잘 하라"를 코드 수준에서 실천하는 것입니다.
+함수 합성의 핵심 가치는 관심사 분리입니다. 각 함수가 정확히 하나의 변환만 담당하면 테스트가 쉬워지고 조합 비용이 낮아집니다. 결국 중요한 것은 `pipe()`라는 도구 자체가 아니라, 작은 함수를 조립 가능한 단위로 설계하는 사고방식입니다.
 
-Python에는 Haskell의 `.` 연산자 같은 내장 합성 문법이 없지만, `pipe()` 유틸리티 하나면 충분합니다. 핵심은 도구가 아니라 "작은 함수를 조합하는 사고방식"입니다.
+Python에는 Haskell의 `.` 같은 내장 합성 연산자가 없지만, 그건 본질이 아닙니다. 프로젝트 안에서 읽기 좋은 방향으로 `pipe` 또는 `compose` 하나만 정해 두고 일관되게 쓰는 편이 훨씬 중요합니다.
 
 ## 체크리스트
 
-- [ ] compose와 pipe의 차이를 설명할 수 있다
-- [ ] 작은 함수를 조합하여 데이터 파이프라인을 구성할 수 있다
-- [ ] 제너레이터 파이프라인으로 지연 평가를 구현할 수 있다
+- [ ] `compose`와 `pipe`의 차이를 설명할 수 있다
+- [ ] 작은 함수를 조합해 데이터 파이프라인을 만들 수 있다
+- [ ] generator 기반 지연 파이프라인을 구현할 수 있다
 - [ ] 조건부 파이프라인을 작성할 수 있다
-- [ ] 파이프라인의 각 단계를 독립적으로 테스트할 수 있다
+- [ ] 각 단계를 독립적으로 테스트할 수 있다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-함수 합성은 작은 함수를 결합하여 복잡한 변환을 만드는 기법입니다. `pipe`는 실행 순서와 코드 순서를 일치시켜 가독성을 높입니다. 다음 글에서는 시리즈의 마무리로 **객체지향과 함수형의 균형**을 다룹니다.
+1. `compose`와 `pipe`를 둘 다 구현하고 같은 결과를 내는지 검증해 보세요.
+2. JSON 데이터를 읽어 필터링, 변환, 정렬, 포맷팅까지 하는 4단계 파이프라인을 설계해 보세요.
+3. `Result` 타입을 가정하고 오류 처리가 포함된 파이프라인을 구현해 보세요.
+
+## 정리와 다음 글
+
+함수 합성은 작은 함수를 결합해 큰 변환을 만드는 방법입니다. 특히 `pipe`는 코드 순서와 실행 순서를 맞춰 주기 때문에 Python에서 읽기 좋은 파이프라인을 만들기 좋습니다. 다음 글에서는 시리즈를 마무리하며 **객체지향과 함수형의 균형**을 다룹니다.
 
 <!-- toc:begin -->
 - [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)

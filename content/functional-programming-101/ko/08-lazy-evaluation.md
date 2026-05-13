@@ -2,7 +2,7 @@
 series: functional-programming-101
 episode: 8
 title: 지연 평가와 제너레이터
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,32 +16,42 @@ tags:
   - 제너레이터
   - 지연 평가
   - itertools
-seo_description: 제너레이터와 지연 평가로 메모리 효율적인 데이터 처리를 구현하는 방법을 다룹니다.
-last_reviewed: '2026-05-04'
+seo_description: 제너레이터와 itertools로 메모리 효율적인 지연 파이프라인을 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 지연 평가와 제너레이터
 
-> Functional Programming 101 시리즈 (8/10)
+이 글은 Functional Programming 101 시리즈의 여덟 번째 글입니다.
 
+작은 데이터만 다룰 때는 리스트를 한 번에 만들어도 문제가 없습니다. 하지만 입력이 커지는 순간 이야기가 달라집니다. 로그 파일, 이벤트 스트림, 대용량 CSV처럼 전부 메모리에 올릴 수 없는 데이터를 다루기 시작하면 계산 시점을 늦추는 설계가 필요합니다.
+
+지연 평가는 "값이 정말 필요해질 때까지 계산하지 않는다"는 전략입니다. Python에서는 제너레이터와 iterator 프로토콜이 이 전략의 핵심 도구입니다. 이 글을 이해하면 `range`, `map`, `filter`, 파일 객체가 왜 메모리 효율적인지까지 함께 연결됩니다.
 
 ## 이 글에서 다룰 문제
 
-10GB 로그 파일을 분석할 때 전체를 메모리에 올릴 수 없습니다. 지연 평가는 데이터를 한 줄씩 처리하여 메모리 사용을 일정하게 유지합니다.
+- eager evaluation과 lazy evaluation은 무엇이 다를까요?
+- 제너레이터 함수와 제너레이터 표현식은 어떤 상황에서 유용할까요?
+- 무한 시퀀스와 큰 데이터를 Python에서는 어떻게 안전하게 다룰 수 있을까요?
+- `itertools`는 지연 파이프라인을 어떻게 더 강력하게 만들어 줄까요?
 
-> 지연 평가 = 필요한 만큼만 계산
+> 멘탈 모델: 지연 평가는 "전체 결과를 미리 만드는 것"이 아니라 "소비자가 다음 값을 요청할 때마다 한 단계만 계산하는 것"입니다. 데이터가 흐르는 속도를 소비자가 결정한다고 생각하면 이해가 쉽습니다.
 
-Python의 `range()`, `map()`, `filter()`, 파일 객체 모두 지연 평가를 사용합니다. 제너레이터를 이해하면 이 모든 도구의 원리를 파악할 수 있습니다.
+## 왜 중요한가
 
-## 핵심 개념 잡기
+10GB 로그 파일을 분석한다고 가정해 보겠습니다. 전체를 리스트로 올리는 접근은 바로 한계에 부딪힙니다. 반대로 한 줄씩 읽고, 필요한 줄만 통과시키고, 마지막 소비 단계에서만 처리하면 입력 크기와 무관하게 메모리를 안정적으로 유지할 수 있습니다.
 
-> 즉시 평가 vs 지연 평가
+이 사고방식은 대용량 데이터 처리에서만 중요한 것이 아닙니다. 파이프라인 각 단계를 독립적으로 조합하고, 계산 시점을 늦추고, 필요 이상으로 일을 하지 않게 만드는 점에서 함수형 프로그래밍과도 아주 잘 맞습니다.
+
+## 개념 개요
+
+> eager는 값을 즉시 만들고, lazy는 필요해질 때까지 미룹니다.
 
 ```text
-즉시 평가 (Eager)              지연 평가 (Lazy)
+Eager Evaluation               Lazy Evaluation
 ─────────────────             ─────────────────
-[1, 4, 9, 16, 25]            (계산 대기 중...)
-메모리에 전부 저장              요청 시 하나씩 생성
+[1, 4, 9, 16, 25]            (waiting to compute...)
+Everything in memory          Produces one value at a time
 list()                        generator / iterator
 ```
 
@@ -49,95 +59,99 @@ list()                        generator / iterator
 
 | 용어 | 설명 |
 |------|------|
-| 지연 평가(lazy evaluation) | 값이 필요한 시점에 계산하는 전략입니다 |
-| 제너레이터(generator) | `yield`로 값을 하나씩 생성하는 함수입니다 |
-| 이터레이터(iterator) | `__next__()`로 값을 순차 반환하는 객체입니다 |
-| 제너레이터 표현식 | `(expr for x in iterable)` 형태의 지연 평가 표현식입니다 |
-| itertools | 효율적인 이터레이터 조합을 제공하는 표준 라이브러리입니다 |
+| 지연 평가(lazy evaluation) | 값이 필요할 때만 계산하는 전략입니다 |
+| 제너레이터(generator) | `yield`를 사용해 값을 하나씩 만들어 내는 함수입니다 |
+| iterator | `__next__()`를 통해 순차적으로 값을 반환하는 객체입니다 |
+| 제너레이터 표현식 | `(expr for x in iterable)` 형태의 지연 표현식입니다 |
+| itertools | 효율적인 iterator 조합 도구를 제공하는 표준 라이브러리입니다 |
 
 ## Before / After
 
-전체 리스트 생성을 제너레이터로 교체합니다.
+리스트 전체를 만드는 코드와 값을 하나씩 내보내는 코드는 겉보기엔 비슷하지만, 메모리 사용량은 완전히 다릅니다.
 
 ```python
-# before: 전체 리스트를 메모리에 생성
+# before: build the entire list in memory
 def get_squares(n: int) -> list[int]:
     return [i ** 2 for i in range(n)]
 
-squares = get_squares(1_000_000)  # 수백만 개를 한번에 저장
+squares = get_squares(1_000_000)  # millions of items stored at once
 ```
 
 ```python
-# after: 제너레이터로 하나씩 생성
+# after: yield one value at a time
 def get_squares(n: int):
     for i in range(n):
         yield i ** 2
 
-squares = get_squares(1_000_000)  # 메모리 거의 사용하지 않음
+squares = get_squares(1_000_000)  # almost no memory used
 ```
 
 ## 단계별 실습
 
-### Step 1: 제너레이터 함수 기초
+### Step 1: 제너레이터 함수의 기본
 
 ```python
 def countdown(n: int):
-    """n부터 1까지 카운트다운합니다."""
+    """Counts down from n to 1."""
     while n > 0:
         yield n
         n -= 1
 
 
-# 제너레이터 객체 생성
+# create a generator object
 gen = countdown(5)
 print(type(gen))  # <class 'generator'>
 
-# next()로 하나씩 가져오기
+# pull values one at a time with next()
 print(next(gen))  # 5
 print(next(gen))  # 4
 
-# for 루프로 나머지 순회
+# iterate over the rest with a for loop
 for n in gen:
     print(n, end=" ")
 # 3 2 1
 
-# 이미 소진된 제너레이터
+# the generator is now exhausted
 # next(gen)  # StopIteration
 ```
+
+제너레이터는 함수처럼 보이지만, 실제로는 "다음 값을 요청받을 때마다 이어서 실행되는 상태 기계"에 가깝습니다. 이 관점을 잡으면 동작이 훨씬 명확해집니다.
 
 ### Step 2: 제너레이터 표현식
 
 ```python
-# 리스트 컴프리헨션 — 즉시 평가
+# list comprehension — eager evaluation
 squares_list = [x ** 2 for x in range(10)]
 print(type(squares_list))  # <class 'list'>
 
-# 제너레이터 표현식 — 지연 평가
+# generator expression — lazy evaluation
 squares_gen = (x ** 2 for x in range(10))
 print(type(squares_gen))  # <class 'generator'>
 
 
-# 메모리 비교
+# memory comparison
 import sys
 
 big_list = [x ** 2 for x in range(1_000_000)]
 big_gen = (x ** 2 for x in range(1_000_000))
 
-print(f"리스트: {sys.getsizeof(big_list):,} bytes")  # ~8,000,000 bytes
-print(f"제너레이터: {sys.getsizeof(big_gen):,} bytes")  # ~200 bytes
+print(f"List: {sys.getsizeof(big_list):,} bytes")       # ~8,000,000 bytes
+print(f"Generator: {sys.getsizeof(big_gen):,} bytes")    # ~200 bytes
 
-# 합계 계산 — 제너레이터를 sum()에 직접 전달
+# pass a generator expression directly to sum()
 total = sum(x ** 2 for x in range(1_000_000))
-print(f"합계: {total:,}")
+print(f"Total: {total:,}")
 ```
 
-### Step 3: 무한 시퀀스
+제너레이터 표현식은 문법 비용이 거의 없으면서 지연 평가의 장점을 바로 가져옵니다. 집계 함수에 직접 넘길 수 있다는 점도 실용적입니다.
+
+### Step 3: 무한 시퀀스 다루기
 
 ```python
 from itertools import count, islice
 
 
-# 무한 제너레이터
+# infinite generator
 def fibonacci():
     a, b = 0, 1
     while True:
@@ -145,19 +159,19 @@ def fibonacci():
         a, b = b, a + b
 
 
-# islice로 필요한 만큼만 가져오기
+# take only what you need with islice
 fib_10 = list(islice(fibonacci(), 10))
 print(fib_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 
-# 무한 카운터
+# infinite counter
 def natural_numbers():
     n = 1
     while True:
         yield n
         n += 1
 
-# 처음 5개의 제곱수
+# first 5 perfect squares
 squares = list(islice(
     (n ** 2 for n in natural_numbers()),
     5,
@@ -165,28 +179,30 @@ squares = list(islice(
 print(squares)  # [1, 4, 9, 16, 25]
 ```
 
-### Step 4: itertools 활용
+지연 평가의 진짜 힘은 여기서 드러납니다. 끝이 없는 데이터도 "필요한 만큼만" 가져오면 안전하게 다룰 수 있습니다.
+
+### Step 4: itertools 활용하기
 
 ```python
 from itertools import chain, takewhile, dropwhile, accumulate, groupby
 
 
-# chain: 여러 이터러블을 연결
+# chain: concatenate multiple iterables
 combined = list(chain([1, 2], [3, 4], [5, 6]))
 print(combined)  # [1, 2, 3, 4, 5, 6]
 
-# takewhile / dropwhile: 조건 기반 선택
+# takewhile / dropwhile: condition-based selection
 numbers = [2, 4, 6, 1, 3, 5, 8]
 taken = list(takewhile(lambda x: x % 2 == 0, numbers))
 dropped = list(dropwhile(lambda x: x % 2 == 0, numbers))
 print(taken)    # [2, 4, 6]
 print(dropped)  # [1, 3, 5, 8]
 
-# accumulate: 누적 합계
+# accumulate: running totals
 running_total = list(accumulate([1, 2, 3, 4, 5]))
 print(running_total)  # [1, 3, 6, 10, 15]
 
-# groupby: 연속된 동일 키로 그룹화
+# groupby: group consecutive elements by key
 data = sorted(["a", "b", "a", "c", "b", "a"])
 for key, group in groupby(data):
     print(f"  {key}: {list(group)}")
@@ -195,37 +211,39 @@ for key, group in groupby(data):
 # c: ['c']
 ```
 
-### Step 5: 지연 파이프라인 구성
+`itertools`는 표준 라이브러리 안에 들어 있는 함수형 도구상자에 가깝습니다. 직접 루프를 짜기 전에 여기서 이미 해결되는지 먼저 보는 습관이 좋습니다.
+
+### Step 5: 지연 파이프라인 만들기
 
 ```python
 from typing import Iterator
 
 
 def read_lines(text: str) -> Iterator[str]:
-    """텍스트를 줄 단위로 생성합니다."""
+    """Yields lines from a text block."""
     for line in text.strip().split("\n"):
         yield line.strip()
 
 def parse_csv(lines: Iterator[str]) -> Iterator[dict]:
-    """CSV 줄을 딕셔너리로 변환합니다."""
+    """Converts CSV lines into dictionaries."""
     headers = next(lines).split(",")
     for line in lines:
         values = line.split(",")
         yield dict(zip(headers, values))
 
 def filter_by_score(records: Iterator[dict], min_score: int) -> Iterator[dict]:
-    """최소 점수 이상인 레코드만 선택합니다."""
+    """Yields only records above the minimum score."""
     for record in records:
         if int(record["score"]) >= min_score:
             yield record
 
 def format_output(records: Iterator[dict]) -> Iterator[str]:
-    """출력 형식으로 변환합니다."""
+    """Formats records for display."""
     for r in records:
-        yield f"{r['name']}: {r['score']}점"
+        yield f"{r['name']}: {r['score']} points"
 
 
-# 파이프라인 실행 — 모든 단계가 지연 평가
+# run the pipeline — every stage is lazy
 csv_text = """name,score
 Alice,85
 Bob,92
@@ -240,56 +258,64 @@ pipeline = format_output(
     )
 )
 
-# 결과를 하나씩 소비
+# consume results one at a time
 for line in pipeline:
     print(line)
-# Alice: 85점
-# Bob: 92점
-# Diana: 95점
+# Alice: 85 points
+# Bob: 92 points
+# Diana: 95 points
 ```
+
+좋은 지연 파이프라인은 각 단계가 입력 iterator를 받아 출력 iterator를 돌려주는 형태를 유지합니다. 그 덕분에 단계별 테스트와 재조합이 쉬워집니다.
 
 ## 이 코드에서 주목할 점
 
-- 제너레이터는 값을 하나씩 생성하여 메모리를 절약합니다
-- 제너레이터 표현식은 `sum()`, `max()`, `min()`에 직접 전달할 수 있습니다
-- 무한 시퀀스는 `islice()`나 `takewhile()`로 유한하게 자릅니다
-- 지연 파이프라인은 각 단계가 제너레이터이므로 데이터가 한 줄씩 흐릅니다
+- 제너레이터는 값을 한 번에 하나씩 만들어 메모리를 절약합니다.
+- 제너레이터 표현식은 `sum()`, `max()`, `min()`에 직접 전달할 수 있습니다.
+- 무한 시퀀스는 `islice()`나 `takewhile()`로 안전하게 유한화해야 합니다.
+- 지연 파이프라인에서는 각 단계가 generator이므로 데이터가 레코드 단위로 흐릅니다.
 
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
-| 제너레이터를 여러 번 순회 | 한 번 소진되면 끝입니다 | `list()`로 변환하거나 다시 생성합니다 |
-| 무한 제너레이터에 `list()` 호출 | 메모리 부족으로 멈춥니다 | `islice()`로 제한합니다 |
-| 제너레이터에 `len()` 호출 | TypeError가 발생합니다 | 길이가 필요하면 리스트로 변환합니다 |
-| 제너레이터 안에서 예외 무시 | 데이터 손실이 발생합니다 | 예외를 적절히 처리하거나 전파합니다 |
-| 불필요한 `list()` 변환 | 지연 평가의 이점을 잃습니다 | 최종 소비 시점까지 제너레이터를 유지합니다 |
+| 같은 제너레이터를 두 번 순회함 | 한 번 소진되면 더 이상 값이 나오지 않습니다 | `list()`로 저장하거나 다시 생성합니다 |
+| 무한 제너레이터에 `list()`를 호출함 | 메모리가 고갈됩니다 | `islice()`로 개수를 제한합니다 |
+| 제너레이터에 `len()`을 호출함 | `TypeError`가 발생합니다 | 길이가 필요하면 리스트로 변환합니다 |
+| 제너레이터 내부 예외를 무시함 | 데이터 손실이 조용히 발생할 수 있습니다 | 예외를 처리하거나 상위로 전파합니다 |
+| 너무 일찍 `list()`로 변환함 | 지연 평가의 이점을 잃습니다 | 최종 소비 직전까지 generator를 유지합니다 |
 
 ## 실무에서 이렇게 쓰입니다
 
-- 대용량 로그 파일을 줄 단위로 처리합니다
-- API 페이지네이션 결과를 제너레이터로 추상화합니다
-- ETL 파이프라인을 제너레이터 체이닝으로 구성합니다
-- 스트리밍 데이터를 실시간으로 변환합니다
-- `itertools`로 조합, 순열, 그룹화를 효율적으로 처리합니다
+- 큰 로그 파일을 한 줄씩 처리합니다.
+- API pagination 결과를 generator로 감쌉니다.
+- ETL 파이프라인을 여러 generator 단계로 조합합니다.
+- 스트리밍 데이터를 실시간으로 변환합니다.
+- `itertools`로 조합, 순열, 그룹화를 효율적으로 처리합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 판단합니다
 
-Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 실용적으로 구현한 도구입니다. "이 데이터를 전부 메모리에 올려야 하는가?"라는 질문에 "아니오"라면 제너레이터를 사용합니다.
+Python의 제너레이터는 함수형 프로그래밍의 지연 평가를 아주 실용적으로 구현한 도구입니다. "이 데이터를 정말 전부 메모리에 올려야 하나?"라는 질문이 떠오르는 순간 제너레이터를 검토하면 됩니다.
 
-실무에서는 파이프라인의 각 단계를 제너레이터로 구성하고, 최종 소비자(for 루프, `sum()`, 파일 쓰기)에서만 실제 계산이 발생하게 하는 패턴이 효과적입니다. 이는 UNIX의 파이프(`|`) 철학과 동일합니다.
+운영 코드에서는 각 파이프라인 단계를 generator로 만들고, 마지막 소비자만 실제 계산을 밀어붙이게 하는 패턴이 가장 강합니다. `for` 루프, `sum()`, 파일 쓰기 같은 최종 소비자가 파이프 전체를 구동하는 구조는 UNIX 파이프와도 같은 철학을 가집니다.
 
 ## 체크리스트
 
-- [ ] 제너레이터 함수와 일반 함수의 차이를 설명할 수 있다
+- [ ] 일반 함수와 제너레이터 함수의 차이를 설명할 수 있다
 - [ ] 제너레이터 표현식을 작성할 수 있다
-- [ ] `itertools`의 주요 함수를 활용할 수 있다
+- [ ] `itertools`의 핵심 함수를 활용할 수 있다
 - [ ] 무한 시퀀스를 안전하게 다룰 수 있다
-- [ ] 지연 파이프라인을 구성하여 대용량 데이터를 처리할 수 있다
+- [ ] 큰 데이터를 위한 지연 파이프라인을 설계할 수 있다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-지연 평가는 필요한 시점에 계산하여 메모리를 절약합니다. Python의 제너레이터와 `itertools`는 지연 파이프라인을 구성하는 핵심 도구입니다. 다음 글에서는 작은 함수를 조합하여 복잡한 변환을 만드는 **함수 합성과 파이프라인**을 다룹니다.
+1. 소수를 무한히 생성하는 제너레이터를 만들고 `islice`로 앞 20개를 출력해 보세요.
+2. 큰 CSV 파일을 한 줄씩 읽어 특정 컬럼 평균을 계산하는 지연 파이프라인을 설계해 보세요.
+3. 여러 로그 파일의 항목을 `itertools.chain`과 `groupby`로 날짜별 묶음으로 만들어 보세요.
+
+## 정리와 다음 글
+
+지연 평가는 값이 정말 필요해지는 순간까지 계산을 미뤄 메모리 사용량을 안정적으로 유지하는 전략입니다. Python에서는 제너레이터와 `itertools`가 그 중심 도구입니다. 다음 글에서는 작은 함수를 큰 변환으로 연결하는 **함수 합성과 파이프라인**을 다룹니다.
 
 <!-- toc:begin -->
 - [함수형 프로그래밍이란 무엇인가?](./01-what-is-fp.md)
