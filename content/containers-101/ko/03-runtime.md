@@ -2,7 +2,7 @@
 series: containers-101
 episode: 3
 title: Runtime
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,20 +16,32 @@ tags:
   - containerd
   - runc
   - DevOps
-seo_description: Docker, containerd, runc, CRI까지 컨테이너 런타임의 계층 구조를 ctr 예제와 함께 정리한 입문 글
-last_reviewed: '2026-05-11'
+seo_description: Docker, containerd, runc, CRI의 역할 차이를 계층 구조로 설명합니다
+last_reviewed: '2026-05-12'
 ---
 
 # Runtime
 
-> Containers 101 시리즈 (3/10)
-
+이 글은 Containers 101 시리즈의 세 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-Kubernetes 1.24부터 dockershim이 제거되었습니다. 런타임 계층을 이해해야 디버깅 포인트를 제대로 잡을 수 있습니다.
+- Docker, containerd, runc는 왜 따로 존재할까요?
+- 고수준 런타임과 저수준 런타임은 무엇이 다를까요?
+- Docker → containerd → runc 흐름은 어떻게 이어질까요?
+- Kubernetes는 런타임과 어떤 인터페이스로 연결될까요?
+- 노드 디버깅에서 가장 흔한 오해는 무엇일까요?
 
-## 전체 흐름
+> 컨테이너 런타임은 하나의 프로그램이 아니라 계층입니다. 사용자 경험을 맡는 Docker, 생명주기를 관리하는 containerd, 실제 실행을 맡는 runc가 분리되어 있다는 점을 이해해야 운영 문제가 풀립니다.
+
+## 왜 중요한가
+
+Kubernetes 1.24에서 `dockershim`이 제거된 뒤로는 런타임 계층을 모르면 노드 디버깅이 매우 어려워졌습니다. 예전처럼 “컨테이너 문제니까 docker CLI를 보면 되겠지”라는 접근이 항상 통하지 않기 때문입니다.
+
+실무에서 장애를 만났을 때는 누가 이미지를 내려받고, 누가 컨테이너 메타데이터를 관리하며, 누가 최종 프로세스를 띄우는지 구분할 수 있어야 합니다. 이 구분이 없으면 문제를 잘못된 계층에서 찾게 됩니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     User["user/k8s"] --> CRI["cri"]
@@ -38,15 +50,29 @@ flowchart LR
     Runc --> Process["container process"]
 ```
 
-## Before/After
+사용자나 Kubernetes는 직접 프로세스를 실행하지 않습니다. 요청은 인터페이스와 데몬을 거쳐 최종 실행기까지 단계적으로 내려갑니다.
 
-**Before**: Docker만 알면 충분하다고 생각합니다.
+## 핵심 용어
 
-**After**: containerd, runc, CRI의 역할을 구분해서 봅니다.
+- **Docker**: 사용자가 가장 자주 만나는 고수준 CLI와 데몬 조합입니다.
+- **containerd**: 컨테이너 생명주기를 관리하는 데몬입니다.
+- **runc**: OCI 표준에 맞춰 컨테이너를 실제로 실행하는 저수준 실행기입니다.
+- **CRI**: Kubernetes가 런타임과 통신할 때 사용하는 인터페이스입니다.
+- **OCI**: 컨테이너 이미지와 런타임 호환성의 기반이 되는 표준입니다.
 
-## containerd 직접 다루기
+특히 Docker와 containerd의 관계를 모르면 노드 운영에서 자주 막힙니다. Docker는 편한 사용자 도구이고, containerd는 운영 계층에서 더 직접적으로 다뤄지는 런타임 데몬입니다.
 
-### 1단계 — 클라이언트 (의사 코드)
+## Before / After
+
+**Before**: Docker가 컨테이너의 전부라고 생각합니다.
+
+**After**: containerd, runc, CRI의 책임을 분리해서 이해합니다.
+
+이 전환이 중요합니다. 그래야 Kubernetes 환경에서 어떤 도구를 써야 하는지 판단할 수 있습니다.
+
+## 실습: containerd 직접 보기
+
+### Step 1 — Client (illustrative)
 
 ```python
 import subprocess
@@ -56,14 +82,18 @@ def ctr_version():
     return res.stdout
 ```
 
-### 2단계 — 이미지 pull
+`ctr`는 containerd를 직접 들여다볼 때 쓰는 디버깅용 CLI입니다. 일상적인 개발 도구라기보다 운영 도구에 가깝습니다.
+
+### Step 2 — Pull
 
 ```python
 def ctr_pull(image):
     subprocess.run(["ctr", "image", "pull", image], check=True)
 ```
 
-### 3단계 — 컨테이너 만들기
+이미지를 직접 내려받아 보면 Docker가 없어도 런타임 계층이 독립적으로 동작한다는 점을 실감할 수 있습니다.
+
+### Step 3 — Run
 
 ```python
 def ctr_run(image, name):
@@ -73,7 +103,9 @@ def ctr_run(image, name):
     )
 ```
 
-### 4단계 — 목록
+컨테이너 실행도 별도 계층에서 이뤄집니다. Docker가 편한 UX를 제공할 뿐, 실행의 본질이 Docker 하나 안에 갇혀 있는 것은 아닙니다.
+
+### Step 4 — List
 
 ```python
 def ctr_list():
@@ -81,7 +113,9 @@ def ctr_list():
     return res.stdout
 ```
 
-### 5단계 — 정리
+컨테이너 메타데이터를 확인합니다. 운영에서는 이 목록을 통해 실제 관리 대상이 무엇인지 구분하게 됩니다.
+
+### Step 5 — Cleanup
 
 ```python
 def ctr_kill(name):
@@ -89,34 +123,60 @@ def ctr_kill(name):
     subprocess.run(["ctr", "container", "rm", name])
 ```
 
-## 이 코드에서 주목할 점
+`task`와 `container`를 분리해서 다룬다는 점이 여기서 드러납니다. 메타데이터와 실행 중인 작업은 같은 개념이 아닙니다.
 
-- `ctr`는 containerd를 직접 들여다볼 때 쓰는 디버그용 CLI입니다.
-- `task`와 `container`는 분리된 개념입니다.
-- Kubernetes 환경에서는 `crictl`을 함께 이해해야 합니다.
+## 이 코드에서 먼저 봐야 할 점
+
+- `ctr`는 containerd 디버깅용 CLI입니다.
+- `task`와 `container`는 서로 다른 개념입니다.
+- Kubernetes 노드에서는 보통 `docker`가 아니라 `crictl`을 사용합니다.
+
+이 차이를 이해하면 노드 문제를 디버깅할 때 도구 선택이 훨씬 정확해집니다. 잘못된 CLI를 붙잡고 한참 헤매는 일이 줄어듭니다.
 
 ## 자주 하는 실수 5가지
 
-1. **Docker만 익히고 containerd 계층을 무시합니다.**
-2. **Kubernetes 노드에서 docker CLI로만 디버깅하려고 합니다.**
-3. **런타임 버전과 호스트 OS의 조합을 점검하지 않습니다.**
+1. **Docker만 배우고 containerd를 완전히 건너뜁니다.**
+2. **Kubernetes 노드를 `docker` CLI로 디버깅하려고 합니다.**
+3. **호스트마다 런타임 버전 차이를 방치합니다.**
 4. **rootless 런타임 옵션을 검토하지 않습니다.**
-5. **runc의 seccomp 기본값을 모르고 지나갑니다.**
+5. **`runc`의 기본 seccomp 프로필 영향을 무시합니다.**
 
-## 실무에서는 이렇게 쓰입니다
+이 실수들은 모두 컨테이너 실행 계층을 하나로 뭉뚱그려 볼 때 생깁니다. 실제 운영에서는 계층 분리가 곧 문제 해결 속도입니다.
 
-Kubernetes 노드는 containerd를 많이 쓰고, 디버깅은 crictl로 하며, 로컬 개발은 Docker Desktop을 쓰는 식으로 환경마다 도구가 달라집니다.
+## 운영에서는 이렇게 나타납니다
+
+Kubernetes 노드는 주로 containerd를 사용하고, 운영자는 `crictl` 같은 도구로 상태를 확인합니다. 반면 로컬 개발은 여전히 Docker Desktop을 많이 사용합니다. 또 일부 임베디드나 서버리스 환경에서는 `podman`이나 다른 런타임 구성이 등장하기도 합니다.
+
+즉, 같은 컨테이너라도 환경에 따라 앞단 도구는 달라질 수 있습니다. 그러나 OCI와 런타임 계층 구조는 계속 공통 기반으로 남습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 런타임 계층을 이해하면 절반의 장애는 더 빨리 풀립니다.
+- Docker는 사용자 도구이고, containerd는 운영 도구에 더 가깝습니다.
+- OCI 표준이 호환성의 핵심입니다.
+- 가능하면 rootless 옵션을 먼저 검토합니다.
+- 런타임 업그레이드는 클러스터 전체 동작에 영향을 준다고 봅니다.
+
+시니어 엔지니어는 “무슨 CLI를 쓰는가”보다 “지금 어느 계층을 보고 있는가”를 먼저 묻습니다. 그 질문이 정확해야 로그와 증상도 올바르게 해석할 수 있기 때문입니다.
 
 ## 체크리스트
 
 - [ ] containerd와 runc의 차이를 설명할 수 있습니다.
-- [ ] CRI의 역할을 이해했습니다.
-- [ ] crictl 도구의 용도를 알고 있습니다.
-- [ ] OCI 표준의 위치를 알고 있습니다.
+- [ ] CRI의 역할을 이해합니다.
+- [ ] 디버깅 시 `crictl`이 필요한 상황을 알고 있습니다.
+- [ ] OCI 표준의 의미를 이해합니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-런타임이 이미지를 실행하려면 먼저 이미지를 만드는 방법을 알아야 합니다. 다음 글은 Dockerfile입니다.
+1. runc와 containerd의 책임 차이를 한 줄로 설명해 보세요.
+2. Kubernetes가 `dockershim`을 제거한 이유를 하나 들어 보세요.
+3. `crictl`을 언제 써야 하는지 한 줄로 적어 보세요.
+
+## 정리와 다음 글
+
+컨테이너 실행은 Docker 하나가 모두 맡는 단일 구조가 아닙니다. 사용자 경험, 생명주기 관리, 저수준 실행이 계층으로 나뉘어 있고, Kubernetes는 그 위에 CRI를 통해 올라탑니다. 이 구조를 이해해야 컨테이너 운영이 비로소 선명해집니다.
+
+다음 글에서는 이렇게 실행할 이미지를 실제로 어떻게 작성하는지, 즉 Dockerfile을 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [Container란 무엇인가?](./01-what-is-a-container.md)
