@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 8
 title: 백엔드 테스트
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,44 +16,59 @@ tags:
   - Pytest
   - Python
   - QualityAssurance
-seo_description: 백엔드를 단위/통합/E2E로 나눠 테스트하는 법 — pytest와 TestClient로 안전한 변경 환경 만들기.
-last_reviewed: '2026-05-11'
+seo_description: pytest와 TestClient로 안전한 백엔드 변경 환경을 만드는 방법입니다
+last_reviewed: '2026-05-12'
 ---
 
 # 백엔드 테스트
 
-> Backend Development 101 시리즈 (8/10)
-
-단위, 통합, E2E 테스트를 나눠 보고 pytest와 TestClient로 안전한 변경 환경을 만드는 방법을 다룹니다.
-
-이 글은 Backend Development 101 시리즈의 8번째 글입니다.
+이 글은 Backend Development 101 시리즈의 여덟 번째 글입니다. 테스트 없이 코드를 바꾸는 일은 매번 도박에 가깝습니다. 여기서는 unit, integration, E2E 테스트를 어떻게 나눠 생각해야 하는지, 그리고 pytest와 FastAPI TestClient로 변경에 안전한 백엔드를 만드는 방법을 살펴보겠습니다.
 
 ## 이 글에서 다룰 문제
 
-테스트 없는 코드는 읽을 수는 있어도 자신 있게 바꾸기 어렵습니다. 좋은 백엔드는 얼마나 안전하게 변경할 수 있는지가 중요하고, 그 안전을 만들어 주는 것이 자동화된 테스트입니다.
+- unit, integration, E2E 테스트는 각각 무엇을 검증할까요?
+- pytest로 service를 어떻게 테스트할 수 있을까요?
+- FastAPI `TestClient`는 endpoint를 어떻게 검증하게 해 줄까요?
+- 실제 데이터베이스를 띄우지 않고도 어떤 부분까지 테스트할 수 있을까요?
+- fixture와 mock은 언제 쓰고 언제 과하게 쓰게 될까요?
 
-> 테스트는 평소에는 조용하지만 문제가 생겼을 때 차이를 만드는 안전장치입니다.
+## 왜 중요한가
 
-## 전체 흐름
+테스트가 없는 코드는 읽을 수는 있어도 안전하게 바꾸기 어렵습니다. 좋은 백엔드의 핵심은 처음부터 완벽하게 짜는 것이 아니라, 나중에 바꿔도 무너지지 않게 만드는 데 있습니다. 그 안전망이 자동화된 테스트입니다.
+
+테스트는 평소에는 눈에 잘 띄지 않지만, 장애가 났을 때와 기능을 빠르게 추가해야 할 때 가장 큰 차이를 만듭니다. 새 기능마다 손으로 브라우저를 클릭해 확인하는 팀은 결국 변경 속도가 급격히 떨어집니다.
+
+> 테스트는 코드를 읽기 좋게 만드는 장치가 아니라, 바꾸기 안전하게 만드는 안전망입니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Unit["Unit"] --> Int["Integration"]
     Int --> E2E["E2E"]
-    Unit -->|"빠르고 많다"| Pyramid
-    E2E -->|"느리고 적다"| Pyramid
+    Unit -->|"fast and many"| Pyramid
+    E2E -->|"slow and few"| Pyramid
 ```
 
-테스트 피라미드는 아래를 두껍게, 위를 얇게 가져가는 구조입니다.
+테스트 피라미드의 핵심은 아래쪽에 빠르고 많은 테스트를 두고, 위쪽에 느리고 적은 테스트를 두는 것입니다. 이 비율이 깨지면 팀의 개발 속도도 함께 무너집니다.
+
+## 핵심 용어
+
+- **Unit test**: 함수나 클래스 하나 같은 작은 단위를 검증합니다.
+- **Integration test**: 여러 모듈이 함께 제대로 동작하는지 검증합니다.
+- **E2E test**: 실제 사용자처럼 전체 시스템을 끝까지 검증합니다.
+- **Fixture**: 반복되는 준비 코드를 재사용 가능하게 만든 장치입니다.
+- **Mock**: 외부 의존성을 대신하는 가짜 객체입니다.
 
 ## Before/After
 
-**Before (수동 확인)**
+**Before (manual checks)**
 
 ```python
-# 매번 브라우저에서 직접 눌러 확인한다
+# Click around in the browser every time
 ```
 
-**After (자동 검증)**
+**After (automatic verification)**
 
 ```python
 def test_create_user(client):
@@ -62,14 +77,14 @@ def test_create_user(client):
     assert r.json()["name"] == "Alice"
 ```
 
-배포 전에 주요 케이스를 자동으로 검증할 수 있습니다.
+자동 검증이 생기면 배포 전마다 같은 시나리오를 다시 눌러 볼 필요가 줄어듭니다. 결국 테스트의 목적은 코드를 읽기 좋게 만드는 것이 아니라, 바꾸기 안전하게 만드는 것입니다.
 
-## 테스트 5단계
+## 실습: 다섯 단계로 보는 테스트
 
-### 1단계 — pytest 첫 테스트
+### Step 1 — First pytest test
 
 ```python
-# 파일: tests/test_basic.py
+# tests/test_basic.py
 def add(a, b): return a + b
 
 def test_add():
@@ -80,10 +95,12 @@ def test_add():
 pytest -q
 ```
 
-### 2단계 — Service 단위 테스트 (mock 사용)
+가장 작은 테스트부터 시작하면 자동 검증의 감각을 빠르게 익힐 수 있습니다. 핵심은 “호출했다”가 아니라 “기대값을 assert했다”입니다.
+
+### Step 2 — Unit test a service with mocks
 
 ```python
-# 파일: tests/test_user_service.py
+# tests/test_user_service.py
 from unittest.mock import MagicMock
 from services.user_service import UserService
 
@@ -96,10 +113,12 @@ def test_register():
     assert result["id"] == 1
 ```
 
-### 3단계 — FastAPI TestClient
+unit test에서는 외부 의존성을 잘라내고 service의 판단만 검증합니다. mock은 그 경계를 빠르게 세워 주는 도구입니다.
+
+### Step 3 — FastAPI TestClient
 
 ```python
-# 파일: tests/test_api.py
+# tests/test_api.py
 from fastapi.testclient import TestClient
 from main import app
 
@@ -109,10 +128,12 @@ def test_health():
     assert client.get("/health").status_code == 200
 ```
 
-### 4단계 — Fixture로 인메모리 DB
+TestClient를 쓰면 실제 서버 프로세스를 띄우지 않고도 endpoint를 호출할 수 있습니다. 라우팅과 응답 형식 검증에 매우 유용합니다.
+
+### Step 4 — Fixture for in-memory DB
 
 ```python
-# 파일: tests/conftest.py
+# tests/conftest.py
 import pytest
 from sqlalchemy import create_engine
 from db import Base
@@ -124,47 +145,67 @@ def engine():
     return e
 ```
 
-### 5단계 — 의존성 오버라이드
+fixture를 쓰면 반복되는 설정 코드를 한곳에 모을 수 있습니다. 테스트가 많아질수록 이 재사용성이 큰 차이를 만듭니다.
+
+### Step 5 — Dependency override
 
 ```python
-# 파일: tests/test_with_db.py
+# tests/test_with_db.py
 def test_create_user(client, engine):
     app.dependency_overrides[get_engine] = lambda: engine
     r = client.post("/users", json={"name": "Bob"})
     assert r.status_code == 200
 ```
 
-FastAPI는 `dependency_overrides`로 실제 DB 없이 테스트할 수 있습니다.
+FastAPI의 `dependency_overrides`를 쓰면 실제 운영용 데이터베이스 없이도 꽤 많은 경로를 검증할 수 있습니다. 빠른 테스트를 만드는 핵심 포인트 중 하나입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- 단위 테스트는 외부 의존성을 mock으로 끊습니다.
-- 통합 테스트는 실제 session을 엮어 흐름을 확인합니다.
-- 픽스처는 같은 준비 코드를 반복하지 않게 도와줍니다.
+- unit test는 mock으로 외부 의존성을 끊습니다.
+- integration test는 실제 session 같은 연결을 확인합니다.
+- fixture는 같은 설정을 반복해서 쓰지 않게 해 줍니다.
+
+이 구조가 중요한 이유는, 모든 테스트를 E2E로만 하려 들면 너무 느려져서 결국 아무도 자주 실행하지 않게 되기 때문입니다. 빠른 하단 테스트가 많아야 개발 속도도 유지됩니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 테스트를 E2E로 한다.** 너무 느려져서 아무도 자주 돌리지 않게 됩니다.
-2. **테스트 안에서 `time.sleep` 으로 기다린다.** 불안정해집니다 — 폴링이나 mock으로 대체합니다.
-3. **DB를 공유 상태로 둔다.** 테스트가 서로 간섭하므로 항상 격리해야 합니다.
-4. **mock으로 너무 많은 것을 가짜로 만든다.** 실제 동작을 검증하지 못하게 됩니다.
-5. **assert 없이 호출만 한다.** 그것은 실행일 뿐 검증이 아닙니다.
+1. **E2E만 작성하는 실수**입니다. 너무 느려서 결국 자주 돌리지 않게 됩니다.
+2. **테스트 안에서 `time.sleep`으로 기다리는 실수**입니다. flaky test의 지름길입니다.
+3. **테스트끼리 데이터베이스 상태를 공유하는 실수**입니다. 테스트 간 간섭이 생깁니다.
+4. **너무 많이 mock하는 실수**입니다. 실제 동작을 검증하지 못하게 됩니다.
+5. **호출만 하고 assert를 하지 않는 실수**입니다. 실행은 테스트가 아닙니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 운영에서는 이렇게 드러납니다
 
-CI(GitHub Actions 등)는 PR마다 `pytest`를 자동 실행합니다. 단위 테스트는 수초, 통합 테스트는 수십 초, E2E는 수분 안쪽에 들어오도록 관리하는 경우가 많습니다. 이 시간 분포가 무너지면 개발 속도도 함께 느려집니다. 시니어는 테스트 피라미드 비율을 의식하면서 범위를 조정합니다.
+CI에서는 보통 모든 PR마다 `pytest`가 실행됩니다. unit test는 수 초, integration test는 수십 초, E2E는 수 분 정도로 분포하는 것이 자연스럽습니다. 이 피라미드 형태가 무너지면 개발 속도도 함께 무거워집니다.
+
+시니어 엔지니어는 커버리지 숫자만 보지 않고 위험한 지점이 제대로 보호되고 있는지를 봅니다. 결제, 인증, 데이터 변경처럼 실패 비용이 큰 부분에는 더 촘촘한 테스트가 필요합니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 새 기능은 테스트와 함께 배포되어야 합니다.
+- 버그는 고치기 전에 테스트로 먼저 재현합니다.
+- 테스트 이름은 문장처럼 읽혀야 합니다.
+- mock은 내부가 아니라 외부 경계에서 사용합니다.
+- 커버리지 숫자보다 위험 구간 보호가 더 중요합니다.
 
 ## 체크리스트
 
-- [ ] pytest로 첫 테스트를 실행할 수 있다.
-- [ ] mock을 써서 service를 단위 테스트할 수 있다.
-- [ ] TestClient로 endpoint를 호출할 수 있다.
-- [ ] in-memory DB 픽스처를 만들 수 있다.
-- [ ] dependency_overrides를 활용할 수 있다.
+- [ ] 첫 pytest 테스트를 실행할 수 있습니다.
+- [ ] mock으로 service unit test를 작성할 수 있습니다.
+- [ ] TestClient로 endpoint를 호출할 수 있습니다.
+- [ ] 인메모리 DB fixture를 만들 수 있습니다.
+- [ ] `dependency_overrides`를 사용할 수 있습니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-테스트는 변경의 안전망입니다. 다음 글에서는 그 코드를 실제 사용자에게 전달하는 백엔드 배포를 봅니다.
+1. mock repository를 사용해 `OrderService.create` unit test를 작성해 보세요.
+2. 잘못된 비밀번호로 `POST /login`을 호출했을 때 `401`이 나는지 검증해 보세요.
+3. 같은 endpoint에 대해 인메모리 DB 기반 integration test를 추가해 보세요.
+
+## 정리와 다음 글
+
+테스트는 변경을 위한 안전망입니다. 다음 글에서는 작성한 코드를 실제 사용자에게 전달하는 과정, 즉 백엔드 배포를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)

@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 3
 title: Routing과 Controller
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,25 +16,32 @@ tags:
   - Architecture
   - REST
   - Python
-seo_description: Routing과 Controller를 분리해 요청을 깔끔하게 받는 법 — path/query/body 파라미터를 한 번에 정리.
-last_reviewed: '2026-05-11'
+seo_description: 라우팅과 컨트롤러를 분리해 엔드포인트를 깔끔하게 설계하는 방법입니다
+last_reviewed: '2026-05-12'
 ---
 
 # Routing과 Controller
 
-> Backend Development 101 시리즈 (3/10)
-
-Routing과 Controller를 분리해 요청을 깔끔하게 받고, path·query·body 파라미터를 한 번에 정리하는 글입니다.
-
-이 글은 Backend Development 101 시리즈의 3번째 글입니다.
+이 글은 Backend Development 101 시리즈의 세 번째 글입니다. 엔드포인트가 몇 개 안 될 때는 한 파일에 몰아넣어도 돌아가지만, 기능이 늘어나는 순간 코드가 급격히 읽기 어려워집니다. 여기서는 router와 controller를 분리해 요청을 정리하는 기본 구조를 잡아 보겠습니다.
 
 ## 이 글에서 다룰 문제
 
-작은 프로젝트에서는 한 파일에 모두 넣어도 동작합니다. 하지만 endpoint가 늘어나면 파일 하나가 금방 감당하기 어려워집니다. 처음부터 레이어를 나눠 두면 새 기능을 추가할 때마다 어디에 둘지 바로 판단할 수 있습니다.
+- router와 controller는 각각 무엇을 책임져야 할까요?
+- path, query, body parameter는 언제 어떻게 나눠 써야 할까요?
+- REST 스타일 엔드포인트는 어떤 기준으로 설계해야 할까요?
+- FastAPI의 `APIRouter`로 기능별 경계를 어떻게 만들 수 있을까요?
+- controller는 어디까지 처리하고, 어디서 service로 넘겨야 할까요?
 
-> 좋은 구조는 코드를 어디에 둘지 두고 매번 고민하지 않게 해줍니다.
+## 왜 중요한가
 
-## 전체 흐름
+작은 프로젝트에서는 한 파일도 충분해 보입니다. 하지만 엔드포인트 수가 늘어나면 그 한 파일이 곧 지옥이 됩니다. 새 기능이 들어올 때마다 “이 코드를 어디에 두지?”라는 질문이 생기면, 이미 구조가 약한 것입니다.
+
+좋은 구조는 매번 위치를 고민하지 않게 해 줍니다. router는 경로의 지도 역할을 하고, controller는 입력을 받고 다음 레이어로 넘기는 접수창구 역할을 합니다. 이 둘을 분리하면 기능이 커져도 코드가 스스로 정리되기 시작합니다.
+
+> router는 주소를 고르고, controller는 입력을 받아 다음 레이어로 넘깁니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Req["Request"] --> Router["Router"]
@@ -43,11 +50,19 @@ flowchart LR
     Service --> Repo["Repository"]
 ```
 
-Router는 지도, Controller는 접수창구, Service는 실제 규칙을 다루는 계층이라고 생각하면 이해하기 쉽습니다.
+router는 지도를, controller는 접수창구를, service는 실제 규칙을 처리하는 전문가를 떠올리면 이해하기 쉽습니다. 이 비유가 중요한 이유는, 요청이 복잡해져도 각 층이 맡아야 할 일이 달라지지 않기 때문입니다.
+
+## 핵심 용어
+
+- **Router**: URL 패턴을 핸들러에 연결하는 계층입니다.
+- **Controller**: 요청을 받고 검증한 뒤 service를 호출하는 계층입니다.
+- **Path parameter**: `/users/{id}`의 `{id}`처럼 자원을 식별하는 값입니다.
+- **Query parameter**: `/users?active=true`의 `active`처럼 필터 조건입니다.
+- **Body**: POST나 PUT 요청에서 전달하는 JSON payload입니다.
 
 ## Before/After
 
-**Before (한 파일에 다 넣기)**
+**Before (everything in one file)**
 
 ```python
 # main.py
@@ -64,10 +79,10 @@ def list_orders(): ...
 def list_products(): ...
 ```
 
-**After (모듈별 router)**
+**After (one router per module)**
 
 ```python
-# 파일: routers/users.py
+# routers/users.py
 from fastapi import APIRouter
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -83,11 +98,11 @@ app.include_router(users.router)
 app.include_router(orders.router)
 ```
 
-기능별로 파일이 나뉘면 어디를 고쳐야 할지 바로 보입니다.
+기능마다 파일을 나누면 수정 위치가 분명해집니다. 어떤 경로가 어디에 있는지 찾는 시간이 줄어드는 것만으로도 코드베이스 수명이 크게 늘어납니다.
 
-## 5단계로 라우팅 정돈하기
+## 실습: 다섯 단계로 정리하는 라우팅
 
-### 1단계 — Path 파라미터
+### Step 1 — Path parameters
 
 ```python
 # 1_path.py
@@ -99,7 +114,9 @@ def get_user(user_id: int):
     return {"id": user_id}
 ```
 
-### 2단계 — Query 파라미터
+path parameter는 대개 자원의 정체성을 나타냅니다. `/users/10`에서 `10`은 필터가 아니라 특정 사용자를 가리키는 식별자입니다.
+
+### Step 2 — Query parameters
 
 ```python
 # 2_query.py
@@ -111,7 +128,9 @@ def list_users(active: bool = True, limit: int = 10):
     return {"active": active, "limit": limit}
 ```
 
-### 3단계 — Body로 JSON 받기
+query parameter는 목록을 좁히거나 정렬 방식을 조정할 때 자연스럽습니다. identity가 아니라 filtering에 가깝다는 점이 핵심입니다.
+
+### Step 3 — JSON body
 
 ```python
 # 3_body.py
@@ -129,10 +148,12 @@ def create_user(payload: UserIn):
     return {"id": 1, **payload.model_dump()}
 ```
 
-### 4단계 — Router 분리
+body는 새 자원을 만들거나 기존 자원을 변경할 때 의미를 가집니다. 입력 모델을 명시하면 서버는 유효하지 않은 payload를 자동으로 거절할 수 있습니다.
+
+### Step 4 — Split the router
 
 ```python
-# 파일: routers/products.py
+# routers/products.py
 from fastapi import APIRouter
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -145,10 +166,12 @@ def get_product(pid: int):
     return {"id": pid}
 ```
 
-### 5단계 — Controller에서 service 호출
+도메인별로 router를 분리하면 products, orders, users처럼 관심사가 파일 구조에 그대로 드러납니다. 기능이 늘수록 이런 물리적 분리가 큰 힘을 발휘합니다.
+
+### Step 5 — Controller calls the service
 
 ```python
-# 파일: controllers/user_controller.py
+# controllers/user_controller.py
 from services.user_service import UserService
 
 class UserController:
@@ -159,37 +182,55 @@ class UserController:
         return self.svc.register(payload.name, payload.age)
 ```
 
-Controller는 최대한 얇게 유지합니다. 입력을 받고 검증한 뒤 service에 위임하는 데 집중합니다.
+controller는 얇게 유지해야 합니다. 입력을 받고 필요한 검증을 거친 뒤, 실제 비즈니스 규칙은 service에 넘기는 것이 핵심입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 볼 점
 
-- Path는 식별에, query는 필터에 씁니다.
-- Body는 POST, PUT, PATCH에서 주로 의미를 가집니다.
-- `tags`는 OpenAPI 문서를 그룹화할 때 씁니다.
+- path는 주로 identity, query는 주로 filtering에 씁니다.
+- body는 POST, PUT, PATCH에서 의미가 큽니다.
+- `tags`는 OpenAPI 문서에서 엔드포인트를 그룹화합니다.
+
+이 구분이 중요한 이유는 API가 커질수록 URL 설계가 곧 유지보수성으로 이어지기 때문입니다. 파라미터의 역할이 명확할수록 문서도 읽기 쉬워지고, 클라이언트와의 계약도 더 안정적이 됩니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 데이터를 query string에 넣는다.** 검색 조건은 query, 새 자원은 body가 맞습니다.
-2. **Controller에 비즈니스 로직을 쓴다.** Service로 옮겨야 재사용·테스트가 쉽습니다.
-3. **`/getUsers`, `/createUser`처럼 동사 path를 쓴다.** REST는 명사와 HTTP method 조합으로 표현하는 편이 자연스럽습니다.
-4. **검증 없이 받은 값을 DB에 직접 넣는다.** Pydantic으로 항상 모델링한 뒤 다뤄야 합니다.
-5. **상태 변경을 GET으로 한다.** GET은 안전(safe)한 조회에만 써야 합니다.
+1. **모든 입력을 query string에 몰아넣는 실수**입니다. 필터는 query, 새 자원은 body가 자연스럽습니다.
+2. **비즈니스 로직을 controller에 넣는 실수**입니다. 재사용성과 테스트성이 모두 떨어집니다.
+3. **`/getUsers` 같은 동사형 URL을 쓰는 실수**입니다. REST는 명사와 HTTP 메서드 조합을 선호합니다.
+4. **검증되지 않은 입력을 바로 DB로 보내는 실수**입니다. Pydantic 모델로 항상 경계를 세워야 합니다.
+5. **GET으로 상태를 바꾸는 실수**입니다. GET은 안전해야 합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 운영에서는 이렇게 드러납니다
 
-큰 백엔드는 도메인별로 router 디렉터리(`routers/orders.py`, `routers/payments.py`)를 둡니다. 새 기능이 들어오면 어떤 router에 어떤 path를 추가할지만 정하면 됩니다. 이런 단순한 규칙이 코드베이스를 오래 버티게 합니다.
+큰 백엔드에서는 보통 `routers/orders.py`, `routers/payments.py`처럼 도메인별 router 디렉터리를 둡니다. 새 기능이 들어오면 먼저 “어느 router에 어떤 path를 추가할 것인가”부터 정합니다. 이 단순한 규칙 하나가 코드베이스의 수명을 몇 년씩 늘려 줍니다.
+
+controller를 얇게 유지하면 인증, 로깅, 테스트 전략도 함께 단순해집니다. 요청 입구를 읽는 데 걸리는 시간이 줄어들기 때문입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- URL은 명사이고, 동작은 HTTP 메서드가 표현합니다.
+- controller는 한 화면 안에 들어올 정도로 얇아야 합니다.
+- 입력은 항상 Pydantic으로 모델링합니다.
+- 인증과 로깅 middleware는 router 수준에서 붙입니다.
+- 새 엔드포인트를 만들기 전에 기존 엔드포인트를 확장할 수 있는지 먼저 봅니다.
 
 ## 체크리스트
 
-- [ ] Path / query / body 파라미터를 구분할 수 있다.
-- [ ] APIRouter로 router를 분리할 수 있다.
-- [ ] REST 명사 path를 설계할 수 있다.
-- [ ] Controller에서 service를 호출하는 흐름을 안다.
-- [ ] OpenAPI 문서(`/docs`)를 열어 봤다.
+- [ ] path, query, body parameter를 구분할 수 있습니다.
+- [ ] `APIRouter`로 라우트를 분리할 수 있습니다.
+- [ ] 명사 기반 REST URL을 설계할 수 있습니다.
+- [ ] controller에서 service로 흐르는 구조를 설명할 수 있습니다.
+- [ ] `/docs`의 OpenAPI 문서를 열어 보았습니다.
 
-## 정리 및 다음 단계
+## 연습 문제
 
-Router는 요청 경로를 나누고, Controller는 그 요청을 받아 다음 계층으로 넘깁니다. 다음 글에서는 안쪽에서 비즈니스 규칙을 다루는 Service Layer를 봅니다.
+1. `/orders` router를 만들고 `GET /orders`, `GET /orders/{id}`, `POST /orders`를 추가해 보세요.
+2. `GET /users`에 `?role=admin` 필터를 추가해 보세요.
+3. Pydantic `OrderIn` 모델을 만들고 잘못된 payload에 `422`가 나오는지 확인해 보세요.
+
+## 정리와 다음 글
+
+router는 지도이고 controller는 접수창구입니다. 다음 글에서는 그 뒤편으로 들어가, 실제 비즈니스 규칙이 머무는 Service Layer를 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [백엔드 개발이란 무엇인가?](./01-what-is-backend-development.md)
