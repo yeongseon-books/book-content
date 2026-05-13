@@ -2,7 +2,7 @@
 series: frontend-development-101
 episode: 10
 title: 작은 프론트엔드 앱 만들기
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,72 +16,97 @@ tags:
   - Capstone
   - React
   - Web
-seo_description: 9개 글에서 배운 라우팅, 컴포넌트, API, 폼, 스타일을 모아 작은 노트 앱을 설계하고 배포합니다.
-last_reviewed: '2026-05-11'
+seo_description: 앞선 아홉 글의 개념을 모아 작은 노트 앱으로 완성합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 작은 프론트엔드 앱 만들기
 
-> Frontend Development 101 시리즈 (10/10)
+이 글은 Frontend Development 101 시리즈의 마지막 글입니다.
 
+개념을 따로따로 이해하는 것과 실제 앱으로 끝까지 묶는 것은 완전히 다른 경험입니다. 라우팅도 알고, 폼도 알고, API 호출도 이해했는데 막상 하나의 프로젝트로 합치려면 어디서부터 파일을 나누고 어떤 순서로 조립해야 할지 막막해지는 경우가 많습니다.
+
+이 글에서는 지금까지 배운 내용을 작은 노트 앱으로 모아 보겠습니다. 한 가지 관점이 중요합니다. 완벽한 앱을 만드는 것이 목표가 아니라, 기초 개념을 하나의 살아 있는 제품 흐름으로 연결해 배포까지 끝내 보는 경험이 목표라는 점입니다.
 
 ## 이 글에서 다룰 문제
 
-지식은 프로젝트로 묶일 때 비로소 자기 것이 됩니다. 앞선 9개 글에서 배운 내용이 벽돌이라면, 마지막 글에서는 그 벽돌로 집을 짓습니다.
+- 작은 프로젝트에서는 어떤 폴더 구조가 가장 읽기 쉬울까요?
+- 앞선 1~9화 개념은 실제 앱 안에서 어떻게 이어질까요?
+- 개발, 빌드, 배포 흐름은 어떤 순서로 정리되는 편이 좋을까요?
+- API, 라우팅, 폼, 스타일을 어디까지 분리해야 유지보수가 쉬울까요?
+- 이 시리즈를 마친 뒤 다음에 무엇을 학습하는 편이 좋을까요?
 
-> 완성도가 조금 부족해도 괜찮습니다. 끝까지 배포해 보는 경험이 책 한 권보다 훨씬 오래 남습니다.
+> 작은 앱 하나를 처음부터 배포까지 끝내 보는 경험은 많은 개념 설명보다 강합니다. 책 속 개념이 손 안의 도구로 바뀌는 순간이 바로 여기입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+지식은 프로젝트로 묶일 때 비로소 자기 것이 됩니다. 앞선 아홉 개 글이 벽돌이었다면, 마지막 글은 그 벽돌로 실제 집을 짓는 단계입니다. 화면만 그리는 것도 아니고, API 호출만 하는 것도 아니고, 배포만 하는 것도 아닌 전체 흐름이 한 번에 연결됩니다.
+
+완성도가 아주 높지 않아도 괜찮습니다. 작은 앱을 실제 URL 뒤에 올려 보는 경험은 입문 단계에서 가장 강력한 학습 장치입니다.
+
+## 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
-    User["사용자"] --> Page["페이지 (라우팅)"]
-    Page --> Comp["컴포넌트 + 상태"]
-    Comp --> API["API 호출"]
-    API --> Backend["백엔드 / 외부 API"]
-    Comp --> Style["스타일 + 디자인 시스템"]
-    Build["빌드 (Vite)"] --> Deploy["배포 (Netlify/Vercel)"]
+    User["User"] --> Page["Pages (routing)"]
+    Page --> Comp["Components + state"]
+    Comp --> API["API calls"]
+    API --> Backend["Backend / external API"]
+    Comp --> Style["Styles + design system"]
+    Build["Build (Vite)"] --> Deploy["Deploy (Netlify/Vercel)"]
 ```
+
+이 흐름은 시리즈 전체를 압축한 그림입니다. 사용자는 페이지를 보고, 페이지는 컴포넌트와 상태로 구성되고, 컴포넌트는 API와 스타일 계층을 사용하며, 마지막에는 빌드와 배포를 거쳐 외부에 공개됩니다.
+
+## 핵심 용어
+
+- **프로젝트 구조**: 역할별로 나눈 폴더 레이아웃입니다.
+- **Capstone**: 앞에서 배운 내용을 하나로 묶는 마무리 프로젝트입니다.
+- **배포(Deployment)**: 빌드 산출물을 공개 URL 뒤에 올리는 작업입니다.
+- 로드맵: 다음에 무엇을 배울지 보여 주는 학습 경로입니다.
 
 ## Before/After
 
-**Before (개념만 안다)**
+**Before (you only know the concepts)**
 
 ```text
-"라우팅도 알고, 폼도 알고, API도 알아."
-"근데 한 번도 다 합쳐서 앱을 만들어 본 적은 없다."
+"I know routing, I know forms, I know APIs."
+"But I have never combined them all to *build an app*."
 ```
 
-**After (작은 앱이 인터넷에 살아있다)**
+**After (a small app is alive on the internet)**
 
 ```text
 https://my-notes.netlify.app
-- 사용자가 노트를 추가/수정/삭제할 수 있다.
-- 코드가 GitHub에 있다.
-- 다음 사람이 이 코드 위에서 배울 수 있다.
+- A user can *add/edit/delete* notes.
+- The code is *on GitHub*.
+- The next learner studies *on top of this code*.
 ```
 
-## 작은 노트 앱 5단계
+이 차이는 매우 큽니다. 개념만 아는 상태에서는 머릿속 연결이 약하지만, 한 번 앱을 배포하고 나면 라우팅과 폼과 API와 빌드가 하나의 흐름으로 묶입니다.
 
-### 1단계 — 프로젝트 구조
+## 실습: 작은 노트 앱을 5단계로 만들기
+
+### 1단계 — Project structure
 
 ```text
 my-notes/
 ├── src/
-│   ├── components/   # NoteCard, NoteForm 등 (4화)
-│   ├── pages/        # NotesPage, NotePage (5화)
-│   ├── api/          # notes API client (6화)
-│   ├── hooks/        # useNotes, useForm (4·7화)
-│   ├── styles/       # tokens.css, layout.css (8화)
+│   ├── components/   # NoteCard, NoteForm, ... (post 4)
+│   ├── pages/        # NotesPage, NotePage (post 5)
+│   ├── api/          # notes API client (post 6)
+│   ├── hooks/        # useNotes, useForm (posts 4, 7)
+│   ├── styles/       # tokens.css, layout.css (post 8)
 │   └── App.tsx
-├── vite.config.ts    # 빌드 설정 (9화)
+├── vite.config.ts    # build config (post 9)
 ├── .env.production
 └── package.json
 ```
 
-### 2단계 — 라우팅과 페이지 (5화 복습)
+### 2단계 — Routing and pages (review of post 5)
 
 ```typescript
-// src/App.tsx 파일
+// src/App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotesPage from "./pages/NotesPage";
 import NotePage from "./pages/NotePage";
@@ -98,10 +123,10 @@ export default function App() {
 }
 ```
 
-### 3단계 — API 클라이언트 (6화 복습)
+### 3단계 — API client (review of post 6)
 
 ```typescript
-// src/api/notes.ts 파일
+// src/api/notes.ts
 const BASE = import.meta.env.VITE_API_URL;
 
 export async function listNotes() {
@@ -121,10 +146,10 @@ export async function createNote(body: { title: string }) {
 }
 ```
 
-### 4단계 — 폼 + 컴포넌트 (4·7화 복습)
+### 4단계 — Form + component (review of posts 4 and 7)
 
 ```tsx
-// src/components/NoteForm.tsx 파일
+// src/components/NoteForm.tsx
 import { useState } from "react";
 import { createNote } from "../api/notes";
 
@@ -135,7 +160,7 @@ export function NoteForm({ onCreated }: { onCreated: () => void }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (title.trim().length < 2) {
-      setError("제목은 2자 이상이어야 합니다.");
+      setError("Title must be at least 2 characters.");
       return;
     }
     await createNote({ title });
@@ -148,58 +173,72 @@ export function NoteForm({ onCreated }: { onCreated: () => void }) {
     <form onSubmit={handleSubmit}>
       <input value={title} onChange={(e) => setTitle(e.target.value)} />
       {error && <p role="alert">{error}</p>}
-      <button>추가</button>
+      <button>Add</button>
     </form>
   );
 }
 ```
 
-### 5단계 — 빌드와 배포 (9화 + 새로운 단계)
+### 5단계 — Build and deploy (post 9 + a new step)
 
 ```bash
 npm run build
-# Netlify CLI 예시
+# Netlify CLI example
 npm install -g netlify-cli
 netlify deploy --dir=dist --prod
 ```
 
-배포가 끝나면 공개 URL이 생깁니다. 이 URL을 다음 사람과 공유해 보세요.
+배포가 끝나면 공개 URL이 생깁니다. 이 URL을 다른 사람에게 공유하는 순간, 연습 프로젝트는 실제 제품 경험으로 한 단계 올라갑니다.
 
 ## 이 코드에서 주목할 점
 
-- 폴더가 역할별로 나뉘어 있어 어디를 고쳐야 할지 바로 알 수 있습니다.
-- API 클라이언트가 컴포넌트와 분리되어 테스트하기 쉬워집니다.
+- 폴더 구조가 역할별로 나뉘어 있어 어디를 수정해야 할지 즉시 보입니다.
+- API 클라이언트를 컴포넌트 밖으로 분리해 테스트와 재사용이 쉬워집니다.
 - 환경 변수로 개발 백엔드와 프로덕션 백엔드를 분리합니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 코드를 `App.tsx` 에 넣는다.** 100줄을 넘기면 읽기가 급격히 어려워집니다.
-2. **API 호출을 컴포넌트 안에서 직접 한다.** 테스트와 재사용이 어려워집니다.
-3. **README가 없다.** 한 달 뒤의 자신도 프로젝트를 다시 돌리기 어렵습니다.
-4. **`localhost` 만 보고 배포는 안 한다.** 배포 단계에서는 늘 새로운 문제가 드러납니다.
-5. **완벽을 기다린다.** 작은 앱이라도 오늘 배포하는 편이 미뤄 둔 완벽한 앱보다 낫습니다.
+1. **모든 코드를 `App.tsx`에 넣습니다.** 100줄을 넘기면 읽기가 급격히 어려워집니다.
+2. **컴포넌트 안에서 API를 직접 호출합니다.** 테스트와 재사용이 모두 어려워집니다.
+3. **README를 남기지 않습니다.** 한 달 뒤의 자신도 프로젝트를 다시 실행하기 어려워집니다.
+4. **`localhost`에서만 확인하고 배포하지 않습니다.** 실제 배포는 언제나 새로운 문제를 드러냅니다.
+5. **완벽해질 때까지 공개를 미룹니다.** 오늘 배포한 작은 앱이 배포하지 않은 완벽한 앱보다 훨씬 큰 학습을 줍니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 보입니다
 
-실무 팀도 같은 패턴을 씁니다. `pages/`, `components/`, `api/`, `hooks/`, `styles/` 같은 폴더 구조는 수십 명이 함께 일하는 코드베이스의 기본 골격이기도 합니다. 달라지는 것은 규모와 추상화 수준이지, 기본 모양 자체는 크게 다르지 않습니다.
+실무 팀도 본질적으로 같은 패턴을 씁니다. `pages/`, `components/`, `api/`, `hooks/`, `styles/` 같은 구조는 수십 명이 함께 일하는 코드베이스에서도 기본 골격으로 자주 등장합니다. 달라지는 것은 규모와 추상화 수준이지, 형태 자체는 크게 다르지 않습니다.
+
+그래서 입문 단계에서 작은 프로젝트를 제대로 나눠 보는 경험은 생각보다 오래갑니다. 나중에 큰 코드베이스를 만났을 때도 어디를 봐야 할지 훨씬 빨리 감이 옵니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 작게 만들고 자주 배포합니다.
+- 폴더 구조는 비즈니스 도메인을 따라가게 둡니다.
+- 항상 README와 `.env.example`를 함께 유지합니다.
+- 배포 자동화는 가능한 한 초반부터 붙입니다.
+- 첫 번째 사용자를 자기 자신으로 생각합니다.
 
 ## 체크리스트
 
-- [ ] 폴더 구조를 그릴 수 있다.
-- [ ] API 클라이언트를 컴포넌트 밖으로 분리했다.
-- [ ] `npm run build` 가 성공한다.
-- [ ] 공개 URL로 앱을 띄웠다.
-- [ ] README에 실행 방법을 적었다.
+- [ ] 폴더 구조를 설명할 수 있습니다.
+- [ ] API 클라이언트를 컴포넌트 밖으로 분리했습니다.
+- [ ] `npm run build`가 성공합니다.
+- [ ] 앱이 공개 URL 뒤에서 동작합니다.
+- [ ] README에 실행 방법을 적어 두었습니다.
+
+## 연습 문제
+
+1. 이 구조를 참고해 노트 앱을 만들고 Netlify나 Vercel에 배포해 보세요.
+2. README에 실행 방법, 환경 변수, 배포 URL을 문서화해 보세요.
+3. 빌드 산출물 크기를 측정하고 200KB 이하로 줄이는 연습을 해 보세요.
 
 ## 정리 및 다음 단계
 
-여기까지 왔다면 프론트엔드 입문 과정은 잘 마무리한 셈입니다. 다음으로 함께 보면 좋은 시리즈는 다음과 같습니다.
+여기까지 왔다면 프론트엔드 입문 과정은 한 번 완주한 셈입니다. 이제 개별 개념이 아니라 하나의 앱을 운영 가능한 형태로 묶는 감각이 생겼을 것입니다.
 
-- *Testing 101*: 컴포넌트와 API 호출을 테스트하는 법
-- *DevOps 101*: 배포를 자동화하고 모니터링하는 법
-- *Secure Coding 101*: 폼과 API에서 공격을 막는 법
+다음에 함께 보면 좋은 주제는 테스트, DevOps, 보안 코딩입니다. 컴포넌트와 API 호출을 어떻게 검증할지, 배포와 모니터링을 어떻게 자동화할지, 폼과 API를 어떤 식으로 방어할지 이어서 확장해 보세요.
 
-> 한 번에 다 배우려 하지 말고, 지금 만든 앱에 한 가지씩 더해 보세요.
+> 한 번에 모든 것을 배우려 하지 말고, 지금 만든 앱에 한 가지씩 더해 가는 방식으로 확장해 보세요.
 
 <!-- toc:begin -->
 - [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)

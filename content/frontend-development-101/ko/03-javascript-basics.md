@@ -2,7 +2,7 @@
 series: frontend-development-101
 episode: 3
 title: JavaScript 기본
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,22 +16,36 @@ tags:
   - DOM
   - Web
   - Beginner
-seo_description: 변수, 함수, DOM 조작, 이벤트 — 모던 자바스크립트의 핵심 12개를 한 글에 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: 변수, 함수, DOM, 이벤트 중심으로 JavaScript 핵심을 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # JavaScript 기본
 
-> Frontend Development 101 시리즈 (3/10)
+이 글은 Frontend Development 101 시리즈의 세 번째 글입니다.
 
+JavaScript를 처음 배우면 문법이 끝없이 많아 보입니다. 배열 메서드도 많고, 함수 표현식도 여러 가지고, DOM API도 처음엔 낯섭니다. 그래서 많은 입문자가 모든 기능을 순서대로 외우려다 오히려 속도를 잃습니다.
+
+이 글에서는 JavaScript를 완전한 언어 사전처럼 다루지 않겠습니다. 프론트엔드에서 가장 자주 쓰는 작은 조각들을 먼저 묶어 설명하겠습니다. 한 가지 관점이 중요합니다. 변수, 함수, 컬렉션 처리, DOM, 이벤트만 제대로 잡아도 실무 JavaScript의 큰 부분이 열립니다.
 
 ## 이 글에서 다룰 문제
 
-JS는 프레임워크가 바뀌어도 그대로 쓰입니다. React 컴포넌트 안에서도, Vue 안에서도, Node.js 백엔드에서도 문법은 같습니다. 여기에 시간을 쓰면 어떤 프레임워크를 배우든 속도가 빨라집니다.
+- `let`과 `const`를 어떻게 구분해 쓰는 편이 좋을까요?
+- 함수와 화살표 함수는 어떤 기준으로 읽고 작성하면 될까요?
+- `map`, `filter`, `reduce`는 왜 for문보다 자주 권장될까요?
+- DOM을 읽고 수정하는 흐름은 어떤 최소 패턴으로 잡아야 할까요?
+- 이벤트 리스너를 많이 달아야 할 때 event delegation은 왜 중요할까요?
 
-> 좋은 자바스크립트는 작고 분리된 함수가 쌓여 만들어집니다.
+> JavaScript를 배울 때 모든 기능을 외우려 하지 마세요. 변수, 함수, 배열과 객체, DOM, 이벤트 다섯 축만 먼저 잡아도 실제 프론트엔드 작업의 대부분을 설명할 수 있습니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+JavaScript는 프레임워크를 바꿔도 그대로 따라옵니다. React 컴포넌트 안에서도 JavaScript를 쓰고, Vue 안에서도 JavaScript를 쓰고, Node.js에서도 같은 문법을 씁니다. 결국 이 언어에 투자한 시간은 특정 도구가 아니라 전체 생태계로 회수됩니다.
+
+좋은 JavaScript는 거대한 함수 하나에서 나오지 않습니다. 작고 분리된 함수가 상태와 화면 변경을 예측 가능하게 연결할 때 비로소 읽기 쉬운 코드가 됩니다.
+
+## 개념 한눈에 보기
+
 ```mermaid
 flowchart LR
     Var["let/const"] --> Fn["Functions"]
@@ -40,9 +54,19 @@ flowchart LR
     DOM --> Evt["Events"]
 ```
 
+프론트엔드의 JavaScript는 대개 이 흐름으로 전개됩니다. 값을 만들고, 함수를 정의하고, 컬렉션을 변환하고, DOM에 반영하고, 이벤트로 다시 상태를 바꿉니다.
+
+## 핵심 용어
+
+- **`const`**: 재할당할 수 없는 변수입니다. 기본 선택으로 두는 편이 좋습니다.
+- **화살표 함수**: `() => {}` 형태의 간결한 함수 문법입니다.
+- 클로저: 함수가 자신이 만들어질 당시의 환경을 기억하는 성질입니다.
+- **`map/filter/reduce`**: 반복문 대신 컬렉션을 변환할 때 쓰는 표준 도구입니다.
+- **이벤트 위임(event delegation)**: 자식마다 리스너를 붙이지 않고 부모에 한 번만 리스너를 두는 방식입니다.
+
 ## Before/After
 
-**Before (var와 for문)**
+**Before (var and for)**
 
 ```javascript
 var arr = [1,2,3];
@@ -57,23 +81,25 @@ const arr = [1, 2, 3];
 const doubled = arr.map(n => n * 2);
 ```
 
-## 할 일 목록 5단계
+현대 JavaScript는 반복과 상태 변경을 더 짧고 명확하게 표현하는 방향으로 이동했습니다. 특히 배열 메서드를 익히면 코드 길이보다 의도가 훨씬 빠르게 읽힙니다.
 
-### 1단계 — HTML 골격
+## 실습: 할 일 목록을 5단계로 만들기
+
+### 1단계 — HTML skeleton
 
 ```html
 <input id="todo">
-<button id="add">추가</button>
+<button id="add">Add</button>
 <ul id="list"></ul>
 ```
 
-### 2단계 — 상태 변수
+### 2단계 — State variable
 
 ```javascript
 const todos = [];
 ```
 
-### 3단계 — 함수로 분리
+### 3단계 — A render function
 
 ```javascript
 function render() {
@@ -82,7 +108,7 @@ function render() {
 }
 ```
 
-### 4단계 — 이벤트
+### 4단계 — Events
 
 ```javascript
 document.getElementById("add").addEventListener("click", () => {
@@ -94,7 +120,7 @@ document.getElementById("add").addEventListener("click", () => {
 });
 ```
 
-### 5단계 — Event delegation으로 삭제
+### 5단계 — Delete via event delegation
 
 ```javascript
 document.getElementById("list").addEventListener("click", (e) => {
@@ -106,35 +132,55 @@ document.getElementById("list").addEventListener("click", (e) => {
 });
 ```
 
+이 예제는 프레임워크 없이도 중요한 프론트엔드 사고방식을 보여 줍니다. 상태인 `todos`가 있고, 상태를 화면으로 바꾸는 `render()`가 있고, 이벤트가 상태를 바꾸면 다시 렌더링합니다. 나중에 React를 배우면 이 흐름이 왜 익숙하게 느껴지는지 바로 이해하게 됩니다.
+
 ## 이 코드에서 주목할 점
 
 - 상태(`todos`)와 렌더링(`render`)이 분리되어 있습니다.
-- 모든 변경은 상태 → 렌더링 순서로 흐릅니다. React 사고방식의 기본 흐름을 미리 보여 주는 예시입니다.
-- 이벤트 리스너는 부모에 하나만 달아도 충분한 경우가 많습니다.
+- 모든 변경이 상태에서 시작해 렌더링으로 흘러갑니다.
+- 자식마다 리스너를 붙이기보다 부모에 하나 두는 방식이 더 효율적일 때가 많습니다.
 
 ## 자주 하는 실수 5가지
 
-1. **`var` 를 사용한다.** 함수 스코프 특성 때문에 버그가 생기기 쉽습니다. `const/let` 만 쓰세요.
-2. **`==` 를 쓴다.** 타입 변환이 끼어들어 결과를 예측하기 어려워집니다. `===` 만 쓰세요.
-3. **상태와 DOM을 동시에 갱신한다.** 무엇이 실제 상태인지 금방 헷갈립니다.
-4. **모든 요소에 리스너를 단다.** 메모리와 성능을 낭비합니다.
-5. **`async` 안에서 에러를 처리하지 않는다.** 조용히 실패하는 버그가 생깁니다.
+1. **`var`를 계속 사용합니다.** 함수 스코프 특성 때문에 버그를 만들기 쉽습니다.
+2. **`==`를 사용합니다.** 느슨한 형변환이 예상하지 못한 결과를 만들 수 있으니 `===`를 기본값으로 두는 편이 안전합니다.
+3. **상태와 DOM을 동시에 이곳저곳에서 수정합니다.** 진실의 출처가 사라져 디버깅이 어려워집니다.
+4. **모든 요소에 리스너를 개별로 붙입니다.** 메모리와 CPU를 불필요하게 더 쓰게 됩니다.
+5. **`async` 내부 에러를 처리하지 않습니다.** 실패가 조용히 묻히는 버그가 생깁니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 보입니다
 
-대부분의 회사는 TypeScript + ESLint + Prettier 조합을 표준으로 사용합니다. JS의 자유로움은 팀 규모가 커질수록 위험이 되기 때문에, 타입과 lint로 경계를 세웁니다. 다만 그 모든 도구도 결국 순수 JS 위에서 동작합니다.
+대부분의 팀은 TypeScript, ESLint, Prettier를 함께 사용합니다. JavaScript의 자유로움이 팀 단위에서는 오히려 위험이 되기 때문에 타입과 규칙으로 경계를 세웁니다. 하지만 그 모든 도구도 결국 순수 JavaScript 위에서 동작합니다.
+
+그래서 실무에서는 화려한 문법보다 읽기 쉬운 함수 분리, 상태와 UI 책임 분리, 일관된 배열 메서드 사용이 더 중요하게 평가됩니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 함수는 한 가지 일을 하게 만듭니다.
+- 상태와 렌더링을 분리합니다.
+- 기본은 `const`, 예외적으로 `let`, `var`는 쓰지 않습니다.
+- 콜백 지옥은 `async/await`로 평탄화합니다.
+- JavaScript는 쓰는 시간보다 읽는 시간이 더 길다는 전제로 설계합니다.
 
 ## 체크리스트
 
-- [ ] `let/const` 의 차이를 안다.
-- [ ] arrow function을 쓸 수 있다.
-- [ ] `map/filter/reduce` 로 for문을 대체한다.
-- [ ] DOM을 조회/수정할 수 있다.
-- [ ] event delegation을 한 번 써봤다.
+- [ ] `let`과 `const`의 차이를 설명할 수 있습니다.
+- [ ] 화살표 함수를 작성할 수 있습니다.
+- [ ] `map/filter/reduce`로 반복 로직을 표현할 수 있습니다.
+- [ ] DOM을 읽고 수정할 수 있습니다.
+- [ ] event delegation을 한 번 직접 사용해 봤습니다.
+
+## 연습 문제
+
+1. 위 todo 예제에 완료 표시 기능을 추가해 보세요.
+2. `localStorage`를 사용해 새로고침 후에도 todo가 남도록 만들어 보세요.
+3. `map/filter/reduce`만 사용해 평균 점수를 계산하는 코드를 작성해 보세요.
 
 ## 정리 및 다음 단계
 
-순수 JS만으로도 작은 앱은 충분히 만들 수 있습니다. 하지만 화면이 커지면 상태와 렌더링을 자동으로 묶어 주는 도구가 필요해집니다. 다음 글에서 컴포넌트와 상태라는 개념을 다룹니다.
+순수 JavaScript만으로도 작은 애플리케이션을 만들 수 있습니다. 다만 화면이 커질수록 상태와 렌더링을 더 체계적으로 연결해 주는 도구가 필요해집니다.
+
+다음 글에서는 그 연결을 담당하는 컴포넌트와 상태 모델을 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
