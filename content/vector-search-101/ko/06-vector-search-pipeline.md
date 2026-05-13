@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: ko
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-12'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,79 +20,77 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 # 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
 
-> 벡터 검색 101 시리즈 (6/6)
+이 글은 Vector Search 101 시리즈의 마지막 글입니다. 앞선 다섯 편에서는 임베딩, 유사도 척도, FAISS, 청킹을 각각 따로 봤습니다. 이번 글에서는 그 부품들을 하나의 실행 가능한 파이프라인으로 조립합니다. 문서를 불러오고, 청크로 나누고, 임베딩하고, FAISS 인덱스에 저장한 뒤, 자연어 쿼리로 결과를 검색하는 전체 흐름입니다.
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/06-vector-search-pipeline)
+마지막에는 벡터 검색과 키워드 검색을 결합하는 하이브리드 검색의 기초도 정리합니다.
 
-이 글은 벡터 검색 101 시리즈의 마지막 글입니다.
+이 글에서 다루는 주제는 다음과 같습니다.
 
-지금까지 임베딩, 유사도 계산, FAISS, 청킹을 각각 따로 다뤘습니다. 이번 글에서는 이 부품들을 하나의 실행 가능한 파이프라인으로 조립합니다. 문서 파일을 불러오고, 청크로 나누고, 임베딩하고, FAISS 인덱스에 저장하고, 자연어 쿼리로 검색하는 전체 흐름입니다.
+- 텍스트에서 문서 불러오기
+- 청킹 → 임베딩 → FAISS로 이어지는 전체 인덱싱 흐름
+- 인덱스 저장과 다시 불러오기
+- 쿼리 실행과 결과 출력
+- 하이브리드 검색 개념과 최소 구현
 
-마지막에는 키워드 검색과 벡터 검색을 결합한 하이브리드 검색의 기본 개념도 살펴봅니다.
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
 
-다룰 내용은 다음과 같습니다.
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 
-- 텍스트 파일에서 문서 불러오기
-- 청킹 → 임베딩 → FAISS 인덱스 구축 전체 흐름
-- 인덱스 저장과 불러오기
-- 자연어 쿼리로 검색하고 결과 출력하기
-- 하이브리드 검색 개념과 기본 구현
-
-![인덱싱 단계와 검색 단계의 전체 흐름](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.ko.png)
-
-*인덱싱 단계와 검색 단계의 전체 흐름*
+*엔드 투 엔드 인덱싱 및 검색 흐름*
 <!-- ebook-only:start -->
 
-이 장의 핵심: **벡터 검색 파이프라인은 embed → index → query → retrieve 네 단계다.** 각 단계를 독립적으로 교체할 수 있어야 한다.
+**핵심 아이디어**: 벡터 검색 파이프라인은 embed, index, query, retrieve의 네 단계입니다. 각 단계는 독립적으로 교체 가능해야 합니다.
 
 ## 이 장의 위치
 
-이 글은 시리즈 6편 중 6번째 장입니다.
-앞 장에서는 **청크 전략 — 긴 문서를 어떻게 나눌 것인가**을 다뤘습니다.
+이 글은 시리즈 6편 중 6편입니다.
+이전 글에서는 **청크 전략 — 긴 문서를 어떻게 나눌 것인가**를 다뤘습니다.
 <!-- ebook-only:end -->
 
 ---
 
+> 벡터 검색 파이프라인은 거대한 한 덩어리 기능이 아니라, 인덱싱 단계와 검색 단계를 분리해 각각 교체 가능하게 만드는 구조입니다.
+
 ## 이 글에서 다룰 문제
 
-- 문서 수집(ingest), 임베딩(embedding), 인덱싱(indexing), 검색(search) 단계를 어떻게 깔끔하게 분리할 수 있을까요?
-- 자동 재인덱싱(reindex)을 트리거(trigger)해야 하는 이벤트는 무엇일까요?
-- 벡터만으로 부족할 때 BM25 같은 어휘 기반 검색(lexical search)과 벡터 검색을 어떻게 결합할까요?
-- 검색 결과를 LLM에 넘기기 전에 리랭커(reranker)를 추가해야 하는 시점은 언제일까요?
-- 운영 환경(production)에서 검색 품질 지표인 recall@k, MRR, nDCG는 어떻게 계산하고 추적할까요?
+- 문서 수집, 임베딩, 인덱싱, 검색 단계를 어떻게 깔끔하게 분리할 수 있을까요?
+- 어떤 이벤트를 자동 재인덱싱의 트리거로 삼아야 할까요?
+- 벡터만으로 부족할 때 BM25 같은 어휘 기반 검색과 벡터 검색을 어떻게 결합할까요?
+- 검색 결과를 LLM에 넘기기 전에 리랭커를 붙여야 하는 시점은 언제일까요?
+- 운영 환경에서 recall@k, MRR, nDCG 같은 검색 품질 지표를 어떻게 계산하고 추적할까요?
 
 ## 파이프라인 구조
 
-![인덱싱 단계와 검색 단계의 전체 흐름](../../../assets/vector-search-101/06/06-01-pipeline-structure.ko.png)
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
 
-*인덱싱 단계와 검색 단계의 전체 흐름*
-![파이프라인 구성 요소 연결 구조](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.ko.png)
+*엔드 투 엔드 인덱싱 및 검색 흐름*
+![Pipeline component connection structure](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
 
 *파이프라인 구성 요소 연결 구조*
-벡터 검색 파이프라인은 크게 두 단계입니다.
+벡터 검색 파이프라인은 크게 두 단계로 나뉩니다.
 
-**인덱싱 단계**: 문서를 처리해서 검색 가능한 인덱스를 만드는 오프라인 작업입니다.
-
-```text
-문서 로드 → 청킹 → 임베딩 → FAISS 인덱스 저장
-```
-
-**검색 단계**: 사용자 쿼리를 받아 관련 청크를 반환하는 온라인 작업입니다.
+인덱싱은 오프라인 단계입니다. 문서를 한 번 처리해서 검색 가능한 인덱스를 만듭니다.
 
 ```text
-쿼리 임베딩 → FAISS 검색 → 결과 반환
+load documents → chunk → embed → save FAISS index
 ```
 
-두 단계를 분리하면 인덱스를 한 번 만들어 두고 여러 번 쿼리할 수 있습니다.
+검색은 온라인 단계입니다. 쿼리를 받아 임베딩하고 인덱스를 조회해 결과를 반환합니다.
+
+```text
+embed query → FAISS search → return ranked chunks
+```
+
+이 두 단계를 분리하면 인덱스는 한 번 만들고, 쿼리는 여러 번 처리할 수 있습니다.
 
 ---
 
-## 완전한 파이프라인 구현
+## 완전한 파이프라인
 
-![인덱스 구축 저장 로드 검색 실행 경로](../../../assets/vector-search-101/06/06-03-complete-pipeline.ko.png)
+![Build save load search execution path](../../../assets/vector-search-101/06/06-03-complete-pipeline.en.png)
 
-*인덱스 구축 저장 로드 검색 실행 경로*
-이 예제는 독립 실행 가능한 하나의 파일로 구성됩니다.
+*구축, 저장, 로드, 검색 실행 경로*
+하나의 파일로 바로 실행 가능한 예제를 보겠습니다.
 
 ```python
 import json
@@ -103,72 +101,66 @@ import numpy as np
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# ── 설정 ──────────────────────────────────────────────────────────────────
+# ── config ────────────────────────────────────────────────────────────────
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 CHUNK_SIZE = 300
 CHUNK_OVERLAP = 30
 INDEX_PATH = "faiss.index"
 DOCS_PATH = "chunks.json"
 
-# ── 임베딩 모델 ────────────────────────────────────────────────────────────
+# ── embedding model ────────────────────────────────────────────────────────
 embedding_model = HuggingFaceEmbeddings(
     model_name=EMBED_MODEL,
     model_kwargs={"device": "cpu"},
     encode_kwargs={"normalize_embeddings": True},
 )
 
-# ── 텍스트 분할기 ──────────────────────────────────────────────────────────
+# ── text splitter ──────────────────────────────────────────────────────────
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=CHUNK_SIZE,
     chunk_overlap=CHUNK_OVERLAP,
     separators=["\n\n", "\n", ". ", " ", ""],
 )
 
-# ── 인덱싱 ────────────────────────────────────────────────────────────────
+# ── indexing ───────────────────────────────────────────────────────────────
 def build_index(documents: list[str]) -> tuple[faiss.Index, list[str]]:
-    """문서 목록을 받아 FAISS 인덱스와 청크 목록을 반환합니다."""
-    # 청킹
+    """Chunk, embed, and index a list of document strings."""
     all_chunks: list[str] = []
     for doc in documents:
         all_chunks.extend(splitter.split_text(doc))
-    print(f"총 청크 수: {len(all_chunks)}")
+    print(f"total chunks: {len(all_chunks)}")
 
-    # 임베딩
     vectors = np.array(
         embedding_model.embed_documents(all_chunks), dtype=np.float32
     )
     dimension = vectors.shape[1]
-    print(f"벡터 크기: {vectors.shape}")
+    print(f"vector shape: {vectors.shape}")
 
-    # FAISS 인덱스
     index = faiss.IndexFlatIP(dimension)
     index.add(vectors)
 
     return index, all_chunks
 
 def save_index(index: faiss.Index, chunks: list[str]) -> None:
-    """인덱스와 청크를 디스크에 저장합니다."""
     faiss.write_index(index, INDEX_PATH)
-    with open(DOCS_PATH, "w", encoding="utf-8") as f:
-        json.dump(chunks, f, ensure_ascii=False, indent=2)
-    print(f"저장 완료: {INDEX_PATH}, {DOCS_PATH}")
+    with open(DOCS_PATH, "w") as f:
+        json.dump(chunks, f, indent=2)
+    print(f"saved: {INDEX_PATH}, {DOCS_PATH}")
 
 def load_index() -> tuple[faiss.Index, list[str]]:
-    """저장된 인덱스와 청크를 불러옵니다."""
     index = faiss.read_index(INDEX_PATH)
-    with open(DOCS_PATH, encoding="utf-8") as f:
+    with open(DOCS_PATH) as f:
         chunks = json.load(f)
-    print(f"불러오기 완료: {index.ntotal}개 벡터")
+    print(f"loaded: {index.ntotal} vectors")
     return index, chunks
 
-# ── 검색 ─────────────────────────────────────────────────────────────────
+# ── retrieval ──────────────────────────────────────────────────────────────
 def search(
     query: str,
     index: faiss.Index,
     chunks: list[str],
     top_k: int = 3,
 ) -> list[tuple[float, str]]:
-    """쿼리를 임베딩해서 FAISS에서 가장 유사한 청크를 반환합니다."""
     q_vec = np.array([embedding_model.embed_query(query)], dtype=np.float32)
     scores, indices = index.search(q_vec, top_k)
     return [
@@ -177,46 +169,44 @@ def search(
         if indices[0][i] != -1
     ]
 
-# ── 실행 ─────────────────────────────────────────────────────────────────
+# ── run ────────────────────────────────────────────────────────────────────
 documents = [
     """
-벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-키워드 검색과 달리 표현이 달라도 의미가 같으면 검색 결과에 포함됩니다.
-임베딩 모델은 유사한 의미의 텍스트를 벡터 공간에서 가깝게 배치합니다.
+Vector search converts text into numeric vectors for meaning-based retrieval.
+Unlike keyword search, it matches content even when phrasing differs.
+Embedding models place semantically similar text close together in vector space.
 """,
     """
-FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.
-정확 검색과 근사 검색 모두 지원하며, 수십억 개의 벡터도 처리할 수 있습니다.
-IndexFlatIP는 내적 기반 정확 검색 인덱스로, 정규화된 벡터에서 코사인 검색과 동일합니다.
+FAISS is a high-speed vector search library developed at Facebook AI Research.
+It supports both exact and approximate search and can handle billions of vectors.
+IndexFlatIP is an exact inner-product index equivalent to cosine search on normalized vectors.
 """,
     """
-청크 전략은 긴 문서를 임베딩 모델이 처리할 수 있는 단위로 나누는 방법입니다.
-chunk_size와 chunk_overlap을 적절히 설정해야 검색 품질이 좋아집니다.
-RecursiveCharacterTextSplitter는 문단, 문장, 단어 순서로 자연스러운 경계에서 나눕니다.
+Chunking strategies split long documents into units the embedding model can process.
+chunk_size and chunk_overlap must be tuned to achieve good retrieval quality.
+RecursiveCharacterTextSplitter tries paragraph, sentence, and word boundaries in order.
 """,
     """
-RAG(Retrieval-Augmented Generation)는 검색된 문서를 LLM 프롬프트와 결합하는 패턴입니다.
-사용자 질문에 관련 문서를 먼저 검색하고, 그 내용을 컨텍스트로 제공해 LLM이 더 정확한 답을 생성합니다.
-벡터 검색은 RAG 파이프라인의 핵심 검색 컴포넌트로 자주 사용됩니다.
+RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt.
+The system retrieves relevant chunks for the user's question and provides them as context.
+Vector search is the retrieval component in most RAG pipelines.
 """,
 ]
 
-# 인덱스 구축
 index, chunks = build_index(documents)
 save_index(index, chunks)
 
-# 불러와서 쿼리
 index, chunks = load_index()
 
-test_queries = [
-    "벡터 검색이 키워드 검색과 다른 점",
-    "FAISS 인덱스 종류",
-    "청크 크기를 어떻게 정해야 하나",
-    "RAG에서 검색의 역할",
+queries = [
+    "how vector search differs from keyword search",
+    "FAISS index types",
+    "choosing chunk size",
+    "role of retrieval in RAG",
 ]
 
-for query in test_queries:
-    print(f"\n쿼리: '{query}'")
+for query in queries:
+    print(f"\nquery: '{query}'")
     results = search(query, index, chunks, top_k=2)
     for rank, (score, text) in enumerate(results, start=1):
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
@@ -225,47 +215,56 @@ for query in test_queries:
 <!-- injected-output:start -->
 **출력 결과**
 
-    총 청크 수: 4
-    벡터 크기: (4, 384)
-    저장 완료: faiss.index, chunks.json
-    불러오기 완료: 4개 벡터
+    total chunks: 4
+    vector shape: (4, 384)
+    saved: faiss.index, chunks.json
+    loaded: 4 vectors
 
-    쿼리: '벡터 검색이 키워드 검색과 다른 점'
-      [1] 0.6463 — 벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-    키워드 검색과 달리 표현이 달라도 의미가 같으면 ...
-      [2] 0.4941 — FAISS는 Facebook AI Research에서 개발한 고속 벡터 검색 라이브러리입니다.
-    정확 검색과 근사 검색 모두 지...
+    query: 'how vector search differs from keyword search'
+      [1] 0.7285 — Vector search converts text into numeric vectors for meaning-based ret...
+      [2] 0.4562 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
 
-    쿼리: 'FAISS 인덱스 종류'
-      [1] 0.2851 — RAG(Retrieval-Augmented Generation)는 검색된 문서를 LLM 프롬프트와 결합하는 패턴입니다.
-    사용자...
-      [2] 0.2830 — 벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-    키워드 검색과 달리 표현이 달라도 의미가 같으면 ...
+    query: 'FAISS index types'
+      [1] 0.5547 — FAISS is a high-speed vector search library developed at Facebook AI R...
+      [2] 0.1110 — Vector search converts text into numeric vectors for meaning-based ret...
 
-    쿼리: '청크 크기를 어떻게 정해야 하나'
-      [1] 0.4475 — 청크 전략은 긴 문서를 임베딩 모델이 처리할 수 있는 단위로 나누는 방법입니다.
-    chunk_size와 chunk_overlap...
-      [2] 0.3571 — 벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-    키워드 검색과 달리 표현이 달라도 의미가 같으면 ...
+    query: 'choosing chunk size'
+      [1] 0.4771 — Chunking strategies split long documents into units the embedding mode...
+      [2] 0.1839 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
 
-    쿼리: 'RAG에서 검색의 역할'
-      [1] 0.6477 — RAG(Retrieval-Augmented Generation)는 검색된 문서를 LLM 프롬프트와 결합하는 패턴입니다.
-    사용자...
-      [2] 0.4154 — 벡터 검색은 텍스트를 수치 벡터로 변환해 의미 기반으로 검색하는 방법입니다.
-    키워드 검색과 달리 표현이 달라도 의미가 같으면 ...
+    query: 'role of retrieval in RAG'
+      [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
+      [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
 
 <!-- injected-output:end -->
 
+Expected output:
+
+```
+total chunks: 8
+vector shape: (8, 384)
+saved: faiss.index, chunks.json
+loaded: 8 vectors
+
+query: 'how vector search differs from keyword search'
+  [1] 0.8123 — Vector search converts text into numeric vectors for meaning-based...
+  [2] 0.7234 — Unlike keyword search, it matches content even when phrasing differs.
+
+query: 'FAISS index types'
+  [1] 0.8412 — IndexFlatIP is an exact inner-product index equivalent to cosine...
+  [2] 0.7891 — FAISS is a high-speed vector search library developed at Facebook...
+```
+
 ---
 
-## 하이브리드 검색 개념
+## 하이브리드 검색
 
-![벡터 점수와 BM25 점수 결합 구조](../../../assets/vector-search-101/06/06-04-hybrid-search.ko.png)
+![Combining vector scores with BM25 scores](../../../assets/vector-search-101/06/06-04-hybrid-search.en.png)
 
 *벡터 점수와 BM25 점수 결합 구조*
-벡터 검색만으로는 정확한 키워드가 중요한 경우에 약합니다. 특정 오류 코드, 제품 ID, 고유명사처럼 정확히 일치해야 하는 검색은 키워드 검색이 더 정확합니다.
+벡터 검색만으로는 정확한 용어가 중요한 상황에 약합니다. 오류 코드, 제품 ID, 고유명사처럼 정확 일치가 중요한 경우에는 키워드 검색이 더 강합니다. 하이브리드 검색은 두 방식을 결합합니다.
 
-하이브리드 검색은 두 방식을 결합합니다. 각 방식의 점수를 정규화한 뒤 가중치를 줘서 합산합니다.
+가장 표준적인 접근은 각 점수를 [0, 1] 범위로 정규화한 뒤 가중합을 계산하는 방식입니다.
 
 ```python
 from rank_bm25 import BM25Okapi
@@ -277,62 +276,65 @@ def hybrid_search(
     top_k: int = 3,
     alpha: float = 0.5,
 ) -> list[tuple[float, str]]:
-    """벡터 검색 + BM25 키워드 검색을 결합한 하이브리드 검색.
-    alpha: 벡터 검색 가중치 (0 = 키워드만, 1 = 벡터만)
+    """Combine vector search and BM25 keyword search.
+    alpha: weight of vector score (0 = keyword only, 1 = vector only)
     """
-    # 벡터 검색 점수 (0~1)
+    # vector scores (already 0–1 with normalized vectors)
     q_vec = np.array([embedding_model.embed_query(query)], dtype=np.float32)
     vec_scores, vec_indices = index.search(q_vec, len(chunks))
-    vec_score_map = {int(idx): float(score) for idx, score in zip(vec_indices[0], vec_scores[0]) if idx != -1}
+    vec_score_map = {
+        int(idx): float(score)
+        for idx, score in zip(vec_indices[0], vec_scores[0])
+        if idx != -1
+    }
 
-    # BM25 키워드 검색 점수 (정규화 필요)
+    # BM25 scores normalized to 0–1
     tokenized = [chunk.split() for chunk in chunks]
     bm25 = BM25Okapi(tokenized)
     bm25_scores = bm25.get_scores(query.split())
     max_bm25 = max(bm25_scores) if max(bm25_scores) > 0 else 1.0
-    bm25_norm = bm25_scores / max_bm25  # 0~1로 정규화
+    bm25_norm = bm25_scores / max_bm25
 
-    # 가중 합산
-    combined = {}
-    for i in range(len(chunks)):
-        vec_s = vec_score_map.get(i, 0.0)
-        bm25_s = float(bm25_norm[i])
-        combined[i] = alpha * vec_s + (1 - alpha) * bm25_s
+    # weighted combination
+    combined = {
+        i: alpha * vec_score_map.get(i, 0.0) + (1 - alpha) * float(bm25_norm[i])
+        for i in range(len(chunks))
+    }
 
-    sorted_indices = sorted(combined, key=combined.get, reverse=True)[:top_k]
-    return [(combined[i], chunks[i]) for i in sorted_indices]
+    top_indices = sorted(combined, key=combined.__getitem__, reverse=True)[:top_k]
+    return [(combined[i], chunks[i]) for i in top_indices]
 ```
 
-`alpha=0.5`는 두 방식에 동일한 가중치를 줍니다. 의미 검색이 더 중요하면 `alpha=0.7`, 키워드가 더 중요하면 `alpha=0.3`으로 조정합니다.
+`alpha=0.5`는 두 방식에 같은 가중치를 둡니다. 의미 기반 가중치를 더 높이고 싶다면 1.0 쪽으로 올리고, 키워드 일치를 더 중시하고 싶다면 0.0 쪽으로 낮추면 됩니다.
 
 ---
 
-## 파이프라인 운영 시 고려사항
+## 운영 관점에서 볼 점
 
-![인덱스 갱신과 삭제 제약 경로](../../../assets/vector-search-101/06/06-05-operational-considerations.ko.png)
+![Index update and deletion constraint path](../../../assets/vector-search-101/06/06-05-operational-considerations.en.png)
 
 *인덱스 갱신과 삭제 제약 경로*
-**인덱스 업데이트.** 문서가 추가되면 기존 인덱스에 새 벡터를 추가(`index.add()`)하면 됩니다. 단, `IndexFlatIP`는 삭제가 불가능합니다. 삭제가 필요하면 주기적으로 전체 인덱스를 재구축하거나 `IndexIDMap`을 사용합니다.
+**인덱스 업데이트.** 새 문서를 추가하는 일 자체는 단순합니다. 임베딩한 뒤 `index.add()`를 호출하면 됩니다. 다만 `IndexFlatIP`는 삭제를 지원하지 않습니다. 벡터를 제거해야 한다면 주기적으로 인덱스를 재구축하거나, `IndexIDMap`으로 식별자를 관리하면서 삭제된 항목을 건너뛰는 방식을 사용해야 합니다.
 
-**메모리.** `IndexFlatIP`는 모든 벡터를 메모리에 올립니다. 10만 개 × 384차원 × 4바이트 = 약 147MB입니다. 100만 개면 1.5GB입니다. 이 이상이면 `IndexIVFFlat`이나 양자화 인덱스(`IndexPQ`)가 필요합니다.
+**메모리.** `IndexFlatIP`는 모든 벡터를 메모리에 유지합니다. 차원 384, 4바이트 float 기준으로 10만 벡터는 약 147MB이고, 100만 벡터면 약 1.5GB입니다. 그 이상에서는 `IndexIVFFlat`이나 `IndexPQ` 같은 압축형 인덱스가 필요합니다.
 
-**속도.** CPU 환경에서 10만 개 문서 검색은 수십 밀리초 수준입니다. 서비스 레이턴시가 중요하다면 GPU 버전이나 Approximate 인덱스를 고려합니다.
+**지연 시간.** CPU에서 10만 벡터를 검색하면 수십 밀리초 수준이 걸립니다. 서비스 지연 시간이 민감하다면 GPU 빌드나 근사 인덱스를 고려해야 합니다.
 
 ---
 
 ## 마무리
 
-벡터 검색 101 시리즈를 마칩니다. 임베딩의 원리에서 시작해, 유사도 계산, FAISS 인덱스, 청크 전략을 거쳐 완전한 파이프라인까지 조립해 봤습니다.
+이 글에서는 전체 벡터 검색 파이프라인을 조립했습니다. 문서를 불러오고, `RecursiveCharacterTextSplitter`로 청크를 만들고, `HuggingFaceEmbeddings`로 임베딩하고, FAISS로 인덱싱하고, 디스크에 저장한 뒤, 자연어 쿼리로 검색했습니다.
 
-다음으로 자연스러운 진행은 이 파이프라인을 LangChain 컴포넌트와 연결해 RAG 시스템을 구축하는 것입니다. langchain-101 시리즈에서 LCEL, Retriever, Chain 연결을 다룹니다.
+다음으로 자연스러운 확장은 이 파이프라인을 LLM과 연결해 RAG 시스템으로 만드는 일입니다. `langchain-101` 시리즈에서는 LCEL, Retriever, Chain 조합을 다룹니다.
 
 ## 운영 체크리스트
 
-- [ ] ingest -> embed -> index -> search 단계가 독립 배포 가능하도록 분리했다
-- [ ] 임베딩 모델/인덱스 버전을 함께 추적해 reindex 트리거를 자동화했다
-- [ ] lexical + vector 하이브리드 점수 결합 방식(가중치, RRF 등)을 정의했다
-- [ ] 검색 품질 회귀를 막는 평가 셋과 자동 평가 스크립트를 운영했다
-- [ ] 검색 latency, recall, 비용을 동일 대시보드로 추적했다
+- [ ] ingest, embed, index, search를 각각 독립 배포 가능한 단계로 분리했다
+- [ ] 임베딩 모델 버전과 인덱스 버전에 맞춰 재인덱싱 트리거를 자동화했다
+- [ ] lexical 점수와 vector 점수를 어떻게 결합할지 정의했다
+- [ ] 운영에서 평가 셋과 자동 품질 검증 스크립트를 유지했다
+- [ ] 지연 시간, recall, 비용을 같은 대시보드에서 보이게 했다
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -350,9 +352,9 @@ def hybrid_search(
 
 ## 참고 자료
 
-- [FAISS 공식 문서](https://faiss.ai/)
-- [LangChain FAISS 통합](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
-- [rank-bm25 라이브러리](https://github.com/dorianbrown/rank_bm25)
-- [Hybrid Search — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
+- [FAISS documentation](https://faiss.ai/)
+- [LangChain FAISS integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [rank-bm25 library](https://github.com/dorianbrown/rank_bm25)
+- [Hybrid search introduction — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
 
 Tags: Vector Search, FAISS, Embeddings, Python

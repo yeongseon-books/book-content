@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: ko
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-12'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,65 +15,63 @@ targets:
   mkdocs: true
   tistory: true
 title: 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
-seo_description: '!정규화 전후 점수 해석 차이 정규화를 켜지 않으면 코사인 유사도와 내적이 달라집니다.'
+seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 ---
 
 # 코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기
 
-> 벡터 검색 101 시리즈 (3/6)
+이 글은 Vector Search 101 시리즈의 3번째 글입니다. 벡터를 만들었다면 다음 질문은 그것들을 어떻게 비교할지입니다. 거리 척도는 여러 가지가 있고, 어떤 척도를 선택하느냐에 따라 검색 결과도 달라집니다. 코사인 유사도가 가장 흔하지만, 내적과 유클리드 거리에도 더 잘 맞는 경우가 있습니다.
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/03-cosine-similarity)
+이 글에서는 세 가지 척도를 직접 구현하고, 정규화가 왜 중요한지 보여 주며, 외부 라이브러리 없이 브루트 포스 최근접 이웃 검색까지 만들어 봅니다.
 
-이 글은 벡터 검색 101 시리즈의 세 번째 글입니다.
+- 코사인 유사도, 내적, 유클리드 거리 구현
+- 정규화와 각 척도의 관계
+- 브루트 포스 최근접 이웃 검색 만들기
+- 실제 쿼리를 실행하고 결과 읽기
+- 각 척도를 언제 써야 하는지 판단하기
 
-벡터를 만들었다면 다음 질문은 "어떻게 비교하는가"입니다. 벡터 간 거리를 재는 방법은 여러 가지이고, 어떤 척도를 쓰느냐에 따라 검색 결과가 달라집니다. 코사인 유사도가 가장 널리 쓰이지만, 내적(dot product)과 유클리드 거리(L2)가 더 적합한 상황도 있습니다.
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
-이번 글에서는 세 가지 거리 척도를 직접 계산해 보고, 정규화가 왜 중요한지, 그리고 브루트 포스 방식으로 최근접 이웃을 찾는 방법까지 다룹니다.
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 
-- 코사인 유사도, 내적, 유클리드 거리 직접 구현
-- 정규화와 거리 척도의 관계
-- 브루트 포스 최근접 이웃 검색 구현
-- 실제 쿼리를 입력해 검색 결과 확인하기
-- 각 척도를 언제 쓸 것인가
-
-![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
-
-*코사인 내적 유클리드 비교 구조*
+*코사인, 내적, 유클리드 비교 구조*
 <!-- ebook-only:start -->
 
-이 장의 핵심: **코사인 유사도는 벡터 방향의 일치 정도다.** 크기는 무시하고 방향만 비교하므로 문장 길이 차이에 강건하다.
+**핵심 아이디어**: 코사인 유사도는 두 벡터 방향의 정렬 정도를 측정합니다. 크기는 무시하므로 문장 길이 차이가 결과에 직접 영향을 주지 않습니다.
 
 ## 이 장의 위치
 
-이 글은 시리즈 6편 중 3번째 장입니다.
-앞 장에서는 **HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **FAISS 입문 — 고속 근사 최근접 이웃 검색**으로 이어집니다.
+이 글은 시리즈 6편 중 3편입니다.
+이전 글에서는 **HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기**를 다뤘습니다.
+이 글 다음에는 **FAISS 입문 — 고속 근사 최근접 이웃 검색**으로 이어집니다.
 <!-- ebook-only:end -->
 
 ---
 
+> 벡터 검색에서 유사도 함수는 단순한 수학 공식이 아니라, 무엇을 비슷하다고 볼지 정하는 검색 정책입니다.
+
 ## 이 글에서 다룰 문제
 
-- 코사인 유사도(cosine similarity), 내적(dot product), 유클리드 거리(Euclidean distance)는 같은 순위를 만들까요, 아니면 다른 순위를 만들까요?
-- 벡터를 미리 정규화(pre-normalization)하면 왜 코사인 유사도와 내적이 사실상 같은 계산으로 수렴할까요?
-- 유사도 임계값(similarity threshold)을 정할 때는 어떤 데이터를 기준으로 봐야 할까요?
-- 유사도 점수가 높다고 해서 항상 같은 의미라는 뜻은 아닌데, 여기에는 어떤 함정이 있을까요?
-- 음수 유사도(negative similarity), 즉 반대 의미에 가까운 결과는 검색에서 어떻게 처리해야 할까요?
+- 코사인 유사도, 내적, 유클리드 거리는 같은 순위를 만들까요, 아니면 다른 순위를 만들까요?
+- 벡터를 미리 정규화하면 왜 코사인 유사도와 내적이 사실상 같은 계산으로 합쳐질까요?
+- 유사도 임계값을 정할 때 실제로 어떤 데이터를 봐야 할까요?
+- 유사도가 높다고 해서 항상 같은 의미는 아닌데, 어떤 함정을 조심해야 할까요?
+- 음수 유사도, 즉 반대 의미에 가까운 결과는 검색에서 어떻게 처리해야 할까요?
 
 ## 세 가지 거리 척도
 
-![코사인 내적 유클리드 비교 구조](../../../assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
 
-*코사인 내적 유클리드 비교 구조*
+*코사인, 내적, 유클리드 비교 구조*
 ### 코사인 유사도
 
-코사인 유사도는 두 벡터가 이루는 각도의 코사인 값입니다. 벡터의 크기는 무시하고 방향만 비교합니다.
+코사인 유사도는 두 벡터가 이루는 각도를 측정합니다. 벡터의 크기는 무시하고 방향만 비교합니다.
 
 ```text
 cos(θ) = (A · B) / (|A| × |B|)
 ```
 
-값 범위는 -1에서 1입니다. 텍스트 임베딩에서는 음수 값이 드물어서 실제로는 0에서 1 사이로 분포합니다. 1에 가까울수록 유사합니다.
+값 범위는 -1에서 1입니다. 실제 텍스트 임베딩에서는 음수 값이 드물기 때문에 보통 0에서 1 사이에 분포하는 경우가 많습니다. 1에 가까울수록 더 유사합니다.
 
 ```python
 import numpy as np
@@ -82,15 +80,15 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 ```
 
-### 내적 (Dot Product)
+### 내적
 
-내적은 벡터를 구성 요소별로 곱해서 합산합니다.
+내적은 각 차원의 값을 곱해 모두 더한 값입니다.
 
 ```text
 A · B = Σ(Aᵢ × Bᵢ)
 ```
 
-벡터가 L2 정규화되어 있으면(크기 = 1) 내적과 코사인 유사도는 수치적으로 동일합니다. 정규화된 벡터에서는 내적이 코사인 유사도보다 계산이 빠르기 때문에, FAISS 같은 라이브러리는 정규화 후 내적으로 코사인 검색을 구현합니다.
+벡터가 L2 정규화되어 있다면, 즉 크기가 1이라면 내적과 코사인 유사도는 수치적으로 같습니다. 내적은 전체 코사인 공식보다 계산이 빠르기 때문에, FAISS 같은 라이브러리는 먼저 정규화한 뒤 내적을 계산하는 방식으로 코사인 검색을 구현합니다.
 
 ```python
 def dot_product(a: np.ndarray, b: np.ndarray) -> float:
@@ -105,7 +103,7 @@ def dot_product(a: np.ndarray, b: np.ndarray) -> float:
 L2(A, B) = √Σ(Aᵢ - Bᵢ)²
 ```
 
-값이 작을수록 유사합니다. 코사인 유사도와 반대 방향입니다. 정규화된 벡터에서는 코사인 유사도와 단조 관계(monotonic relationship)가 있어서 검색 순위가 같습니다.
+값이 작을수록 더 유사합니다. 즉, 코사인 유사도와는 방향이 반대입니다. 하지만 정규화된 벡터에서는 L2와 코사인 유사도가 단조 관계를 가지므로 순위는 동일합니다.
 
 ```python
 def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
@@ -114,12 +112,12 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ---
 
-## 세 척도 비교
+## 세 척도를 한 번에 비교하기
 
-![같은 문장 쌍에 세 척도를 적용하는 흐름](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.ko.png)
+![Three metrics on one pair flow](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
 
 *같은 문장 쌍에 세 척도를 적용하는 흐름*
-같은 문장 쌍에 세 척도를 모두 적용해 봅니다.
+같은 문장 쌍에 세 가지 척도를 모두 적용해 보겠습니다.
 
 ```python
 import numpy as np
@@ -137,9 +135,9 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 pairs = [
-    ("파이썬 비동기 프로그래밍", "파이썬으로 동시성 처리하기"),
-    ("파이썬 비동기 프로그래밍", "머신러닝 모델 학습하기"),
-    ("파이썬 비동기 프로그래밍", "강아지 산책 시키기"),
+    ("Python async programming", "handling concurrency in Python"),
+    ("Python async programming", "training a machine learning model"),
+    ("Python async programming", "walking the dog in the park"),
 ]
 
 for text_a, text_b in pairs:
@@ -150,42 +148,42 @@ for text_a, text_b in pairs:
     dot = dot_product(a, b)
     l2 = euclidean_distance(a, b)
 
-    print(f"\n'{text_a[:15]}...' vs '{text_b[:15]}...'")
-    print(f"  코사인 유사도: {cos:.4f}")
-    print(f"  내적:         {dot:.4f}")
-    print(f"  유클리드:     {l2:.4f}")
+    print(f"\n'{text_a[:25]}' vs '{text_b[:25]}'")
+    print(f"  cosine:     {cos:.4f}")
+    print(f"  dot:        {dot:.4f}")
+    print(f"  euclidean:  {l2:.4f}")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    '파이썬 비동기 프로그래밍...' vs '파이썬으로 동시성 처리하기...'
-      코사인 유사도: 0.9624
-      내적:         0.9624
-      유클리드:     0.2742
+    'Python async programming' vs 'handling concurrency in P'
+      cosine:     0.6201
+      dot:        0.6201
+      euclidean:  0.8717
 
-    '파이썬 비동기 프로그래밍...' vs '머신러닝 모델 학습하기...'
-      코사인 유사도: 0.6861
-      내적:         0.6861
-      유클리드:     0.7923
+    'Python async programming' vs 'training a machine learni'
+      cosine:     0.1399
+      dot:        0.1399
+      euclidean:  1.3115
 
-    '파이썬 비동기 프로그래밍...' vs '강아지 산책 시키기...'
-      코사인 유사도: 0.7102
-      내적:         0.7102
-      유클리드:     0.7614
+    'Python async programming' vs 'walking the dog in the pa'
+      cosine:     -0.0400
+      dot:        -0.0400
+      euclidean:  1.4423
 
 <!-- injected-output:end -->
 
-정규화된 벡터에서는 코사인 유사도와 내적이 동일한 값을 보입니다. 유클리드 거리는 반대 방향이지만 순위는 같습니다.
+정규화된 벡터에서는 코사인 유사도와 내적이 정확히 일치합니다. 유클리드 거리는 반대 방향의 값이 나오지만 순위는 동일합니다.
 
 ---
 
 ## 정규화가 왜 중요한가
 
-![정규화 전후 점수 해석 차이](../../../assets/vector-search-101/03/03-03-why-normalization-matters.ko.png)
+![Before and after normalization difference](../../../assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
 
-*정규화 전후 점수 해석 차이*
-정규화를 켜지 않으면 코사인 유사도와 내적이 달라집니다.
+*정규화 전후 차이*
+정규화가 없으면 내적과 코사인 유사도는 갈라집니다.
 
 ```python
 import numpy as np
@@ -196,51 +194,48 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-text_a = "파이썬 비동기 프로그래밍"
-text_b = "파이썬으로 동시성 처리하기"
+text_a = "Python async programming"
+text_b = "handling concurrency in Python"
 
-# 정규화 없음
 a_raw = model.encode(text_a, normalize_embeddings=False)
 b_raw = model.encode(text_b, normalize_embeddings=False)
-
-# 정규화 있음
 a_norm = model.encode(text_a, normalize_embeddings=True)
 b_norm = model.encode(text_b, normalize_embeddings=True)
 
-print(f"정규화 전 벡터 크기: a={np.linalg.norm(a_raw):.4f}, b={np.linalg.norm(b_raw):.4f}")
-print(f"정규화 후 벡터 크기: a={np.linalg.norm(a_norm):.4f}, b={np.linalg.norm(b_norm):.4f}")
+print(f"raw magnitudes: a={np.linalg.norm(a_raw):.4f}, b={np.linalg.norm(b_raw):.4f}")
+print(f"norm magnitudes: a={np.linalg.norm(a_norm):.4f}, b={np.linalg.norm(b_norm):.4f}")
 
-print(f"\n정규화 전 코사인 유사도: {cosine_similarity(a_raw, b_raw):.4f}")
-print(f"정규화 전 내적:         {float(np.dot(a_raw, b_raw)):.4f}")
+print(f"\nraw cosine: {cosine_similarity(a_raw, b_raw):.4f}")
+print(f"raw dot:    {float(np.dot(a_raw, b_raw)):.4f}")
 
-print(f"\n정규화 후 코사인 유사도: {cosine_similarity(a_norm, b_norm):.4f}")
-print(f"정규화 후 내적:         {float(np.dot(a_norm, b_norm)):.4f}")
+print(f"\nnorm cosine: {cosine_similarity(a_norm, b_norm):.4f}")
+print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    정규화 전 벡터 크기: a=1.0000, b=1.0000
-    정규화 후 벡터 크기: a=1.0000, b=1.0000
+    raw magnitudes: a=1.0000, b=1.0000
+    norm magnitudes: a=1.0000, b=1.0000
 
-    정규화 전 코사인 유사도: 0.9624
-    정규화 전 내적:         0.9624
+    raw cosine: 0.6201
+    raw dot:    0.6201
 
-    정규화 후 코사인 유사도: 0.9624
-    정규화 후 내적:         0.9624
+    norm cosine: 0.6201
+    norm dot:    0.6201
 
 <!-- injected-output:end -->
 
-정규화 전 내적은 벡터 크기(14.1)의 영향을 받아 코사인 유사도(0.81)와 전혀 다릅니다. FAISS를 비롯한 대부분의 벡터 검색 라이브러리는 정규화된 벡터에서 내적을 계산하는 방식으로 코사인 검색을 지원합니다. 임베딩 시점에 `normalize_embeddings=True`를 일관되게 켜는 이유입니다.
+설명 자체는 더 중요합니다. 정규화가 없으면 원시 내적은 벡터 크기의 영향을 크게 받습니다. 반면 정규화 후에는 내적과 코사인 유사도가 같은 값으로 수렴합니다. FAISS의 `IndexFlatIP`는 바로 이 등가성을 전제로 동작합니다. 그래서 이런 인덱스를 쓸 때 `normalize_embeddings=True`를 일관되게 적용하는 일은 선택 사항이 아니라 계약에 가깝습니다.
 
 ---
 
 ## 브루트 포스 최근접 이웃 검색
 
-![브루트 포스 최근접 이웃 실행 경로](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.ko.png)
+![Brute force nearest neighbor execution path](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
 
 *브루트 포스 최근접 이웃 실행 경로*
-문서가 수백 개 이하라면 FAISS 없이 NumPy만으로 검색을 구현할 수 있습니다. 모든 문서 벡터와 쿼리 벡터의 유사도를 계산해서 가장 높은 것을 고릅니다.
+문서 수가 수백 개 수준이라면 NumPy만으로도 검색이 가능합니다.
 
 ```python
 import numpy as np
@@ -253,81 +248,83 @@ embedding_model = HuggingFaceEmbeddings(
 )
 
 documents = [
-    "FAISS는 Facebook AI Research에서 만든 고속 벡터 검색 라이브러리입니다.",
-    "코사인 유사도는 두 벡터 방향의 유사성을 측정합니다.",
-    "임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.",
-    "sentence-transformers는 문장 수준 임베딩에 특화되어 있습니다.",
-    "벡터 검색은 키워드 검색이 놓치는 의미적 유사성을 잡아냅니다.",
-    "청크 전략은 긴 문서를 검색 가능한 단위로 나누는 방법입니다.",
-    "RAG는 검색 결과를 LLM 프롬프트에 결합하는 패턴입니다.",
+    "FAISS is a high-speed vector search library from Facebook AI Research.",
+    "Cosine similarity measures the directional similarity between two vectors.",
+    "Embedding models project text into a high-dimensional vector space.",
+    "sentence-transformers specializes in sentence-level embeddings.",
+    "Vector search captures semantic similarity that keyword search misses.",
+    "Chunking strategies split long documents into searchable units.",
+    "RAG combines retrieved documents with an LLM prompt.",
 ]
 
 doc_vectors = np.array(embedding_model.embed_documents(documents))
 
 def search(query: str, top_k: int = 3) -> list[tuple[float, str]]:
     query_vector = np.array(embedding_model.embed_query(query))
-    # 정규화된 벡터에서 내적 = 코사인 유사도
+    # normalized vectors: dot product == cosine similarity
     scores = doc_vectors @ query_vector
     top_indices = np.argsort(scores)[::-1][:top_k]
     return [(float(scores[i]), documents[i]) for i in top_indices]
 
-query = "벡터 검색의 원리"
+query = "how vector search finds similar documents"
 results = search(query, top_k=3)
 
-print(f"쿼리: '{query}'\n")
+print(f"query: '{query}'\n")
 for rank, (score, text) in enumerate(results, start=1):
-    print(f"[{rank}] 유사도: {score:.4f}")
+    print(f"[{rank}] score: {score:.4f}")
     print(f"    {text}\n")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    쿼리: '벡터 검색의 원리'
+    query: 'how vector search finds similar documents'
 
-    [1] 유사도: 0.7137
-        벡터 검색은 키워드 검색이 놓치는 의미적 유사성을 잡아냅니다.
+    [1] score: 0.6824
+        Vector search captures semantic similarity that keyword search misses.
 
-    [2] 유사도: 0.6036
-        청크 전략은 긴 문서를 검색 가능한 단위로 나누는 방법입니다.
+    [2] score: 0.4593
+        Chunking strategies split long documents into searchable units.
 
-    [3] 유사도: 0.5958
-        임베딩 모델은 텍스트를 고차원 벡터 공간에 투영합니다.
+    [3] score: 0.4517
+        FAISS is a high-speed vector search library from Facebook AI Research.
 
 <!-- injected-output:end -->
 
-`doc_vectors @ query_vector`는 행렬-벡터 내적 연산입니다. 정규화된 벡터에서는 이것이 코사인 유사도 계산과 같습니다. `np.argsort(scores)[::-1][:top_k]`로 점수 내림차순 상위 k개 인덱스를 뽑습니다.
+`doc_vectors @ query_vector`는 문서마다 코사인 유사도를 한 번씩 계산하는 행렬-벡터 내적입니다. NumPy가 전체 코퍼스에 대해 벡터화해 처리합니다. `np.argsort(scores)[::-1][:top_k]`는 점수 내림차순으로 상위 k개 인덱스를 반환합니다.
+
+이 방식은 정확 검색 또는 브루트 포스 검색이라고 부릅니다. 정확하지만 복잡도는 O(n × d)입니다. 여기서 n은 문서 수, d는 벡터 차원입니다. 문서가 수만 건을 넘어가면 너무 느려집니다. 그 지점에서 FAISS가 필요해집니다.
 
 ---
 
-## 언제 어떤 척도를 쓸 것인가
+## 언제 어떤 척도를 써야 하는가
 
-![거리 척도 선택 기준 흐름](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.ko.png)
+![Metric selection decision flow](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
 
-*거리 척도 선택 기준 흐름*
-| 척도 | 언제 유리한가 | 주의점 |
+*거리 척도 선택 흐름*
+| 척도 | 적합한 상황 | 주의할 점 |
 |---|---|---|
-| 코사인 유사도 | 텍스트 의미 비교, 문서 길이가 다를 때 | 크기 정보 무시 |
-| 내적 | 정규화된 벡터, FAISS IP 인덱스 | 정규화 없으면 크기 영향 받음 |
-| 유클리드 L2 | 절대 거리가 의미 있는 경우 | 정규화된 벡터에서 코사인과 순위 동일 |
+| 코사인 유사도 | 텍스트 의미 비교, 길이가 다른 문서 | 크기 정보를 무시함 |
+| 내적 | 정규화된 벡터, FAISS IP 인덱스 | 정규화가 없으면 크기가 결과를 왜곡함 |
+| 유클리드 L2 | 절대 거리 자체가 의미를 가질 때 | 정규화된 벡터에서는 코사인과 순위가 같음 |
 
-텍스트 검색에서는 코사인 유사도가 기본입니다. 정규화된 벡터를 쓴다면 내적으로 동일한 결과를 더 빠르게 얻을 수 있습니다. FAISS의 `IndexFlatIP`는 이 패턴을 그대로 씁니다.
+텍스트 검색에서는 코사인 유사도가 가장 안전한 기본값입니다. 벡터가 정규화되어 있다면 더 적은 연산으로 같은 결과를 내는 내적을 써도 됩니다. FAISS의 `IndexFlatIP`가 정확히 그 가정 위에 서 있습니다.
 
 ---
 
 ## 마무리
 
-세 가지 거리 척도를 직접 구현하고, 정규화된 벡터에서 코사인 유사도와 내적이 왜 같은지 확인했습니다. 브루트 포스 검색은 문서가 적을 때는 충분하지만, 수만 건 이상에서는 느려집니다.
+세 가지 거리 척도를 직접 구현해 비교했습니다. 핵심은 정규화입니다. 벡터 크기를 1로 맞췄을 때만 내적이 코사인 유사도와 일치합니다. 브루트 포스 검색은 작은 코퍼스에서는 잘 동작하지만, 규모가 커지면 버티지 못합니다.
 
-다음 글에서는 FAISS를 써서 대규모 벡터 집합을 고속으로 검색하는 방법을 다룹니다. 인덱스 유형 선택, 저장과 불러오기, 실제 검색 성능까지 살펴보겠습니다.
+다음 글에서는 FAISS를 소개합니다. 인덱스 유형, 인덱스 구축과 저장, 그리고 근사 검색이 작은 정확도 손실로 큰 속도 이득을 만드는 방식을 살펴보겠습니다.
 
 ## 운영 체크리스트
 
-- [ ] 유사도 함수 선택을 모델 권장사항(권장 distance)과 맞췄다
-- [ ] 검색 전에 모든 벡터를 사전에 normalize 했거나 그러지 않을 이유를 문서화했다
-- [ ] 임계값을 sample query 분포로 calibration 했다
-- [ ] 유사도 점수와 함께 reranker를 적용할 후보 폭을 정했다
-- [ ] 검색 결과의 거짓 양성(false positive) 사례를 회귀 케이스로 보존했다
+- [ ] 유사도 함수 선택을 모델이 권장하는 거리와 맞췄다
+- [ ] 모든 벡터를 미리 정규화했거나, 하지 않은 이유를 명시해 두었다
+- [ ] 샘플 쿼리 분포를 기준으로 임계값을 보정했다
+- [ ] 점수 산정 뒤 리랭커에 넘길 후보 수를 결정했다
+- [ ] 거짓 양성 예시를 회귀 테스트 케이스로 남겼다
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -345,8 +342,8 @@ for rank, (score, text) in enumerate(results, start=1):
 
 ## 참고 자료
 
-- [FAISS 공식 위키 — 인덱스 선택 가이드](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)
-- [sentence-transformers 유사도 계산](https://www.sbert.net/docs/usage/semantic_textual_similarity.html)
-- [Understanding Cosine Similarity — Pinecone](https://www.pinecone.io/learn/vector-similarity/)
+- [FAISS wiki — choosing an index](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)
+- [sentence-transformers semantic similarity](https://www.sbert.net/docs/usage/semantic_textual_similarity.html)
+- [Vector similarity — Pinecone](https://www.pinecone.io/learn/vector-similarity/)
 
 Tags: Vector Search, FAISS, Embeddings, Python

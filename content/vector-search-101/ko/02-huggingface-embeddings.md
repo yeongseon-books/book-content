@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: ko
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-12'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,47 +20,45 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 # HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
 
-> 벡터 검색 101 시리즈 (2/6)
+이 글은 Vector Search 101 시리즈의 2번째 글입니다. 1편에서 개념을 다뤘다면, 이번 글은 실제 코드를 실행하는 단계입니다. 이론에서 실제 임베딩으로 넘어가면 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장하고 효율적으로 다시 불러오려면 어떻게 해야 할지 같은 실무 질문이 바로 등장합니다.
 
-예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/ko/02-huggingface-embeddings)
+`langchain-community`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스 뒤에 감싼 래퍼입니다. LangChain 파이프라인을 직접 만들지 않더라도 이 래퍼 패턴은 이해할 가치가 있습니다. 실제 애플리케이션에서 임베딩 모델이 더 큰 스택 안에 어떻게 통합되는지를 보여 주기 때문입니다.
 
-이 글은 벡터 검색 101 시리즈의 두 번째 글입니다.
-
-지난 글에서 임베딩의 개념을 잡았다면, 이번 글은 실제로 벡터를 만들고 다루는 방법에 집중합니다. 이론을 코드로 옮기는 과정에서 자주 막히는 부분이 있습니다. 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장했다가 재사용하는 방법은 무엇인지 같은 실용적인 질문들입니다.
-
-`langchain-community`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스로 감싼 클래스입니다. LangChain 생태계와 연동하지 않더라도, 임베딩 래퍼 패턴 자체가 실제 앱에서 어떻게 쓰이는지 이해하는 데 좋은 출발점이 됩니다.
-
-이번 글에서 다룰 내용은 다음과 같습니다.
+이 글에서는 다음 다섯 가지를 다룹니다.
 
 - `HuggingFaceEmbeddings` 설치와 초기화
-- 단일 문장과 배치 임베딩의 차이
-- 벡터를 NumPy 파일로 저장하고 불러오기
-- 임베딩 속도를 높이는 실용 팁
-- GPU가 없는 환경에서 CPU로 처리하기
+- 단일 쿼리 임베딩과 배치 임베딩의 차이
+- 벡터를 NumPy 파일로 저장하고 다시 불러오는 방법
+- CPU 환경에서 인코딩 속도를 높이는 실용 팁
+- 래퍼와 원시 `SentenceTransformer` API 비교
 
-![단일 질의 임베딩 호출 흐름](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.ko.png)
+예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
-*단일 질의 임베딩 호출 흐름*
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+
+*단일 쿼리 임베딩 호출 흐름*
 <!-- ebook-only:start -->
 
-이 장의 핵심: **HuggingFace 임베딩은 로컬에서 무료로 실행된다.** `sentence-transformers`가 모델을 내려받고 벡터를 반환한다.
+**핵심 아이디어**: HuggingFace 임베딩은 로컬에서 무료로 실행됩니다. `sentence-transformers`가 모델을 내려받고 벡터를 반환합니다.
 
 ## 이 장의 위치
 
-이 글은 시리즈 6편 중 2번째 장입니다.
-앞 장에서는 **임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기**을 다뤘습니다.
-이 장을 마치면 다음 장에서 **코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기**으로 이어집니다.
+이 글은 시리즈 6편 중 2편입니다.
+이전 글에서는 **임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기**를 다뤘습니다.
+이 글 다음에는 **코사인 유사도와 벡터 검색 — 문장 간 거리 계산하기**로 이어집니다.
 <!-- ebook-only:end -->
 
 ---
 
+> HuggingFace 임베딩 실습의 핵심은 모델 하나를 잘 호출하는 법보다, 같은 벡터를 반복 가능하게 만들고 재사용하는 흐름을 익히는 데 있습니다.
+
 ## 이 글에서 다룰 문제
 
-- Hugging Face `sentence-transformers`와 OpenAI Embeddings API 사이에는 실제로 어떤 트레이드오프(trade-off)가 있을까요?
+- Hugging Face `sentence-transformers`와 OpenAI Embeddings API 사이에는 실제로 어떤 트레이드오프가 있을까요?
 - GPU 없이 로컬 임베딩 모델을 실행할 때 어떤 성능 함정이 생길까요?
-- 다국어 모델(multilingual model)과 영어 전용 모델(English-only model)은 한국어 검색 품질에서 어떻게 차이 날까요?
-- 배치 임베딩(batch embedding)에서는 메모리, 배치 크기(batch size), 토큰 한계를 어떻게 균형 있게 맞출까요?
-- 임베딩 모델 버전이 바뀌면 기존 인덱스(index)는 어떻게 마이그레이션(migration)해야 할까요?
+- 다국어 모델과 영어 전용 모델은 한국어 검색 품질에서 어떻게 갈릴까요?
+- 배치 임베딩에서는 메모리, 배치 크기, 토큰 한계를 어떻게 균형 있게 맞출까요?
+- 임베딩 모델 버전이 바뀌면 기존 인덱스를 어떻게 마이그레이션해야 할까요?
 
 ## 설치
 
@@ -70,16 +68,16 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 pip install langchain-community sentence-transformers numpy
 ```
 
-`langchain-community`가 `HuggingFaceEmbeddings`를 제공하고, `sentence-transformers`가 실제 모델 로딩과 인코딩을 담당합니다. `numpy`는 벡터 저장과 연산에 씁니다.
+`langchain-community`는 `HuggingFaceEmbeddings`를 제공하고, `sentence-transformers`는 실제 모델 로딩과 인코딩을 담당합니다. `numpy`는 벡터 저장과 산술 연산에 사용됩니다.
 
 ---
 
-## 첫 임베딩
+## 첫 번째 임베딩
 
-![단일 질의 임베딩 호출 흐름](../../../assets/vector-search-101/02/02-01-first-embedding.ko.png)
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.en.png)
 
-*단일 질의 임베딩 호출 흐름*
-`HuggingFaceEmbeddings`를 초기화하는 코드부터 보겠습니다.
+*단일 쿼리 임베딩 호출 흐름*
+모델을 초기화하고 문장 하나를 인코딩해 보겠습니다.
 
 ```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -91,46 +89,44 @@ embedding_model = HuggingFaceEmbeddings(
 )
 ```
 
-`model_kwargs={"device": "cpu"}`는 CPU를 명시합니다. GPU가 있다면 `"cuda"`로 바꾸면 됩니다.
+`model_kwargs={"device": "cpu"}`는 CPU 실행을 명시합니다. GPU가 있다면 `"cuda"`로 바꾸면 됩니다.
 
-`encode_kwargs={"normalize_embeddings": True}`는 중요합니다. 정규화(L2-norm=1)를 켜면 코사인 유사도 계산이 내적(dot product)으로 단순화됩니다. FAISS 같은 라이브러리와 연동할 때 일관성 유지에 도움이 됩니다.
-
-단일 문장 임베딩입니다.
+`encode_kwargs={"normalize_embeddings": True}`도 중요합니다. L2 정규화를 적용하면 코사인 유사도 계산이 내적으로 단순화됩니다. FAISS 같은 라이브러리와 연결할 때도 단위 벡터를 가정하는 동작과 일관성을 유지할 수 있습니다.
 
 ```python
-text = "벡터 검색은 의미 기반 검색의 핵심입니다."
+text = "Vector search is the foundation of semantic retrieval."
 vector = embedding_model.embed_query(text)
 
-print(f"타입: {type(vector)}")
-print(f"차원: {len(vector)}")
-print(f"앞 5개 값: {vector[:5]}")
+print(f"type: {type(vector)}")
+print(f"dimension: {len(vector)}")
+print(f"first 5 values: {vector[:5]}")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    타입: <class 'list'>
-    차원: 384
-    앞 5개 값: [0.04539374262094498, 0.06606343388557434, 0.04448622092604637, 0.0185308326035738, -0.08243405818939209]
+    type: <class 'list'>
+    dimension: 384
+    first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
 
 <!-- injected-output:end -->
 
 ```
-타입: <class 'list'>
-차원: 384
-앞 5개 값: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
+type: <class 'list'>
+dimension: 384
+first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
 ```
 
-`embed_query()`는 쿼리 한 건을 처리하는 메서드입니다. 내부적으로 리스트를 반환합니다. FAISS나 NumPy와 연동할 때는 `np.array(vector)`로 변환하면 됩니다.
+`embed_query()`는 입력 하나를 처리하고 일반 Python 리스트를 반환합니다. NumPy 연산이 필요할 때는 `np.array()`로 바꿔 쓰면 됩니다.
 
 ---
 
 ## 배치 임베딩
 
-![단일 호출과 배치 호출의 차이](../../../assets/vector-search-101/02/02-02-batch-embedding.ko.png)
+![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
 
-*단일 호출과 배치 호출의 차이*
-문서가 여러 개면 루프보다 배치가 훨씬 효율적입니다. `embed_documents()`는 리스트를 받아 리스트를 반환합니다.
+*단일 호출과 배치 호출의 대비*
+문서가 여러 개라면 `embed_query()`를 반복 호출하는 것보다 `embed_documents()` 한 번이 더 효율적입니다. 모델이 내부적으로 배치 처리하고, 반복 초기화 오버헤드도 줄일 수 있기 때문입니다.
 
 ```python
 import time
@@ -145,11 +141,11 @@ embedding_model = HuggingFaceEmbeddings(
 )
 
 documents = [
-    "FAISS는 Facebook AI Research에서 만든 벡터 검색 라이브러리입니다.",
-    "코사인 유사도는 벡터 방향의 유사성을 측정합니다.",
-    "임베딩 차원이 높을수록 더 많은 정보를 담을 수 있습니다.",
-    "sentence-transformers는 문장 임베딩에 특화된 라이브러리입니다.",
-    "청크 크기는 임베딩 품질과 검색 정확도에 영향을 줍니다.",
+    "FAISS is a vector search library from Facebook AI Research.",
+    "Cosine similarity measures the angle between two vectors.",
+    "Higher embedding dimensions can capture more information.",
+    "sentence-transformers specializes in sentence-level embeddings.",
+    "Chunk size affects both embedding quality and retrieval accuracy.",
 ]
 
 start = time.perf_counter()
@@ -157,28 +153,28 @@ vectors = embedding_model.embed_documents(documents)
 elapsed = time.perf_counter() - start
 
 vectors_np = np.array(vectors)
-print(f"벡터 행렬 크기: {vectors_np.shape}")  # (5, 384)
-print(f"소요 시간: {elapsed:.3f}초")
+print(f"matrix shape: {vectors_np.shape}")  # (5, 384)
+print(f"elapsed: {elapsed:.3f}s")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    벡터 행렬 크기: (5, 384)
-    소요 시간: 0.201초
+    matrix shape: (5, 384)
+    elapsed: 0.101s
 
 <!-- injected-output:end -->
 
-`embed_documents()`는 배치 단위로 모델을 호출하기 때문에, 같은 수의 문장을 루프로 `embed_query()` 5번 부르는 것보다 빠릅니다. 문서 수가 많을수록 차이가 커집니다.
+문서 수가 늘어날수록 배치 호출과 반복 호출의 차이는 더 커집니다. 코퍼스가 크다면 `embed_documents()`를 기본 선택으로 삼는 편이 좋습니다.
 
 ---
 
-## 벡터 저장과 불러오기
+## 벡터 저장과 다시 불러오기
 
-![벡터와 원문을 저장하는 파일 흐름](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.ko.png)
+![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
 
-*벡터와 원문을 저장하는 파일 흐름*
-임베딩은 한 번 계산하면 재사용하는 편이 좋습니다. 같은 문서 집합을 매번 다시 인코딩하면 시간과 비용이 낭비됩니다. NumPy의 `.npy` 형식으로 저장하는 방법이 가장 단순합니다.
+*벡터와 문서 저장 흐름*
+같은 문서에 대해 실행할 때마다 임베딩을 다시 계산하면 시간이 낭비됩니다. 한 번 계산한 행렬을 저장하고 재사용하는 편이 낫습니다.
 
 ```python
 import numpy as np
@@ -191,33 +187,33 @@ embedding_model = HuggingFaceEmbeddings(
 )
 
 documents = [
-    "FAISS는 고속 벡터 검색 라이브러리입니다.",
-    "임베딩 벡터를 디스크에 저장하면 재사용이 편합니다.",
-    "NumPy는 배열 연산에 최적화된 라이브러리입니다.",
+    "FAISS is a high-speed vector search library.",
+    "Saving embeddings to disk makes reuse straightforward.",
+    "NumPy is optimized for array operations.",
 ]
 
 vectors = np.array(embedding_model.embed_documents(documents))
 
-# 저장
+# save
 np.save("embeddings.npy", vectors)
-print(f"저장 완료: {vectors.shape}")
+print(f"saved: {vectors.shape}")
 
-# 불러오기
+# reload
 loaded = np.load("embeddings.npy")
-print(f"불러오기 완료: {loaded.shape}")
-print(f"동일 여부: {np.allclose(vectors, loaded)}")
+print(f"reloaded: {loaded.shape}")
+print(f"identical: {np.allclose(vectors, loaded)}")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    저장 완료: (3, 384)
-    불러오기 완료: (3, 384)
-    동일 여부: True
+    saved: (3, 384)
+    reloaded: (3, 384)
+    identical: True
 
 <!-- injected-output:end -->
 
-문서 원문도 함께 보관해야 합니다. 벡터 인덱스와 원문 텍스트를 같이 저장하면 검색 결과를 사람이 읽는 형태로 반환할 수 있습니다.
+벡터만 저장하면 결과는 결국 인덱스 위치 번호에 불과합니다. 원문 텍스트도 함께 저장해야 검색 결과를 다시 사용자에게 읽을 수 있는 형태로 보여 줄 수 있습니다.
 
 ```python
 import json
@@ -231,39 +227,39 @@ embedding_model = HuggingFaceEmbeddings(
 )
 
 documents = [
-    "FAISS는 고속 벡터 검색 라이브러리입니다.",
-    "임베딩 벡터를 디스크에 저장하면 재사용이 편합니다.",
-    "NumPy는 배열 연산에 최적화된 라이브러리입니다.",
+    "FAISS is a high-speed vector search library.",
+    "Saving embeddings to disk makes reuse straightforward.",
+    "NumPy is optimized for array operations.",
 ]
 
 vectors = np.array(embedding_model.embed_documents(documents))
 
 np.save("embeddings.npy", vectors)
-with open("documents.json", "w", encoding="utf-8") as f:
-    json.dump(documents, f, ensure_ascii=False, indent=2)
+with open("documents.json", "w") as f:
+    json.dump(documents, f, indent=2)
 
-print("저장 완료")
+print("saved embeddings and documents")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    저장 완료
+    saved embeddings and documents
 
 <!-- injected-output:end -->
 
-나중에 검색할 때는 두 파일을 같이 불러와서 인덱스를 연결합니다. 이 패턴은 4편(FAISS)에서 실제 검색 시스템을 만들 때 그대로 사용합니다.
+4편에서는 정확히 이 패턴을 이용해 실제 FAISS 검색 시스템을 만듭니다.
 
 ---
 
 ## 속도를 높이는 실용 팁
 
-![모델 재사용과 배치 크기 조정 경로](../../../assets/vector-search-101/02/02-04-practical-speed-tips.ko.png)
+![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
 
 *모델 재사용과 배치 크기 조정 경로*
-CPU 환경에서 임베딩 속도를 높이는 방법이 몇 가지 있습니다.
+CPU 기반 인코딩은 규모가 커질수록 느립니다. 몇 가지 조정만으로도 꽤 개선할 수 있습니다.
 
-**배치 크기 조정.** `encode_kwargs={"batch_size": 64}`로 배치 크기를 명시할 수 있습니다. 기본값은 32입니다. 메모리가 충분하다면 64나 128로 늘리면 처리 속도가 개선됩니다.
+**배치 크기 늘리기.** 기본값은 32입니다. 메모리가 허용한다면 64나 128로 늘려 오버헤드를 줄일 수 있습니다.
 
 ```python
 embedding_model = HuggingFaceEmbeddings(
@@ -273,10 +269,10 @@ embedding_model = HuggingFaceEmbeddings(
 )
 ```
 
-**모델 재사용.** `HuggingFaceEmbeddings` 객체를 함수마다 새로 만들지 말고, 모듈 수준에서 한 번만 초기화해서 재사용합니다. 모델 가중치 로딩에 수 초가 걸리기 때문입니다.
+**한 번만 초기화하기.** 모델 가중치를 로드하는 데는 몇 초가 걸릴 수 있습니다. `HuggingFaceEmbeddings` 객체를 모듈 수준에서 한 번 만들고 계속 재사용하는 편이 좋습니다.
 
 ```python
-# 좋은 패턴: 모듈 수준에서 한 번
+# module level — initialize once
 _embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"},
@@ -287,25 +283,24 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
     return _embedding_model
 ```
 
-**캐싱.** 같은 텍스트를 반복 인코딩하는 경우라면 결과를 딕셔너리에 캐시해두는 것도 방법입니다. 문서 수가 수십만 건 이상이면 `diskcache` 같은 라이브러리를 고려할 수 있습니다.
+**반복 입력 캐시하기.** 같은 텍스트를 반복 인코딩한다면 사전에 결과를 캐시할 수 있습니다. 더 큰 워크로드에서는 `diskcache`나 `joblib.Memory` 같은 도구를 사용하면 영속 캐시를 자동으로 관리할 수 있습니다.
 
 ---
 
-## 직접 SentenceTransformer와 비교하기
+## 래퍼와 원시 API 비교
 
-![래퍼와 원시 API 비교 구조](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.ko.png)
+![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
 
 *래퍼와 원시 API 비교 구조*
-`HuggingFaceEmbeddings`는 `SentenceTransformer`를 감싼 래퍼입니다. 두 방식의 결과는 동일합니다.
+`HuggingFaceEmbeddings`는 내부적으로 `SentenceTransformer`를 사용합니다. 출력은 수치적으로 동일합니다.
 
 ```python
 import numpy as np
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 
-text = "두 라이브러리의 출력이 같은지 확인합니다."
+text = "Checking that both libraries produce the same output."
 
-# HuggingFaceEmbeddings
 hf_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"},
@@ -313,41 +308,40 @@ hf_model = HuggingFaceEmbeddings(
 )
 hf_vector = np.array(hf_model.embed_query(text))
 
-# SentenceTransformer 직접
 st_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 st_vector = st_model.encode(text, normalize_embeddings=True)
 
-print(f"HuggingFaceEmbeddings 차원: {hf_vector.shape}")
-print(f"SentenceTransformer 차원: {st_vector.shape}")
-print(f"최대 오차: {np.max(np.abs(hf_vector - st_vector)):.6f}")
+print(f"HuggingFaceEmbeddings shape: {hf_vector.shape}")
+print(f"SentenceTransformer shape:   {st_vector.shape}")
+print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 ```
 
 <!-- injected-output:start -->
 **출력 결과**
 
-    HuggingFaceEmbeddings 차원: (384,)
-    SentenceTransformer 차원: (384,)
-    최대 오차: 0.000000
+    HuggingFaceEmbeddings shape: (384,)
+    SentenceTransformer shape:   (384,)
+    max difference: 0.000000
 
 <!-- injected-output:end -->
 
-부동소수점 오차 수준의 미세한 차이만 있을 뿐 결과는 동일합니다. LangChain 체인과 연동하려면 `HuggingFaceEmbeddings`를 쓰고, 단독으로 쓸 때는 `SentenceTransformer`를 직접 써도 무방합니다.
+부동소수점 반올림 수준의 차이를 제외하면 결과는 같습니다. LangChain 파이프라인을 만들 때는 `HuggingFaceEmbeddings`가 편하고, 추상화가 필요 없을 때는 `SentenceTransformer`를 직접 써도 됩니다.
 
 ---
 
 ## 마무리
 
-`HuggingFaceEmbeddings`로 벡터를 만들고, NumPy로 저장하고 불러오는 방법까지 익혔습니다. 배치 임베딩과 모델 재사용 패턴은 실제 앱에서도 그대로 쓸 수 있는 구조입니다.
+이제 몇 줄의 코드로 임베딩을 만들고 저장하고 다시 불러올 수 있습니다. 배치 인코딩과 모듈 수준 초기화는 처음부터 가져가면 좋은 실전 습관입니다.
 
-다음 글에서는 벡터 간 유사도를 제대로 계산하는 방법을 다룹니다. 코사인 유사도 외에 내적과 유클리드 거리가 언제 유리한지, 정규화가 왜 중요한지, 그리고 직접 최근접 이웃 검색을 만들어 보겠습니다.
+다음 글에서는 유사도 계산으로 넘어갑니다. 코사인 유사도, 내적, 유클리드 거리가 각각 언제 맞는지, 정규화가 계산식을 어떻게 바꾸는지, 그리고 외부 라이브러리 없이 브루트 포스 최근접 이웃 검색을 어떻게 만드는지 살펴보겠습니다.
 
 ## 운영 체크리스트
 
-- [ ] 모델 카드(라이선스, 학습 데이터, 차원)를 확인했다
-- [ ] CPU/GPU 환경에 맞는 배치 크기와 토크나이저 옵션을 튜닝했다
-- [ ] 한국어 입력은 다국어 모델 또는 한국어 특화 모델로 검증했다
-- [ ] 임베딩 결과의 차원과 dtype를 인덱스 스키마와 일치시켰다
-- [ ] 장기 보관 임베딩에 모델 버전 메타데이터를 함께 저장했다
+- [ ] 모델 카드(라이선스, 학습 데이터, 차원 수)를 검토했다
+- [ ] CPU/GPU 환경에 맞게 배치 크기와 토크나이저 옵션을 조정했다
+- [ ] 한국어 입력은 다국어 모델이나 한국어 특화 모델로 검증했다
+- [ ] 결과 차원 수와 dtype를 인덱스 스키마와 맞췄다
+- [ ] 장기 보관하는 임베딩과 함께 모델 버전을 저장했다
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -367,6 +361,6 @@ print(f"최대 오차: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 
 - [langchain-community HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
 - [sentence-transformers encode API](https://www.sbert.net/docs/package_reference/SentenceTransformer.html)
-- [all-MiniLM-L6-v2 모델 카드](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+- [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 
 Tags: Vector Search, FAISS, Embeddings, Python
