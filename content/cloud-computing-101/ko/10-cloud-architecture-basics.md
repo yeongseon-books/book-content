@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 10
 title: Cloud Architecture 기초
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -16,24 +16,34 @@ tags:
   - WellArchitected
   - AWS
   - DevOps
-seo_description: AWS Well-Architected 5대 기둥과 다층 웹 아키텍처 패턴으로 정리한 클라우드 아키텍처 입문 마무리 글
-last_reviewed: '2026-05-11'
+seo_description: Well-Architected 5대 기둥과 기본 웹 아키텍처를 한 그림으로 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # Cloud Architecture 기초
 
-AWS Well-Architected 5대 기둥과 다층 웹 아키텍처 패턴으로 정리한 클라우드 아키텍처 입문 마무리 글
+이 시리즈에서 살펴본 컴퓨트, 스토리지, 네트워크, 보안, 모니터링, 비용은 각각 따로 존재하는 지식이 아닙니다. 실제 시스템에서는 이 조각들이 한 구조 안에서 함께 움직입니다. 이 글은 Cloud Computing 101 시리즈의 마지막 글입니다. 여기서는 Well-Architected의 다섯 가지 관점을 기준으로, 앞선 내용이 하나의 클라우드 아키텍처로 어떻게 이어지는지 정리하겠습니다.
 
-이 글은 Cloud Computing 101 시리즈의 10번째 글입니다.
-
-> Cloud Computing 101 시리즈 (10/10)
-
+좋은 아키텍처는 화려한 서비스 조합이 아니라 변경이 안전하고, 장애가 국소화되며, 운영이 반복 가능하다는 점에서 드러납니다. 그래서 마지막 글에서는 기능 목록보다 구조적 원칙에 집중하는 편이 더 중요합니다.
 
 ## 이 글에서 다룰 문제
 
-같은 기능이라도 아키텍처에 따라 비용, 가용성, 유지보수 난도가 크게 달라집니다. 이 글에서는 시리즈 전체 내용을 하나의 설계 관점으로 묶어 보겠습니다.
+- Well-Architected의 다섯 기둥은 각각 무엇을 보라고 말할까요?
+- 기본적인 다층 웹 아키텍처는 어떤 모습일까요?
+- Stateless와 Stateful을 왜 분리해야 할까요?
+- IaC는 왜 선택이 아니라 필수에 가까울까요?
+- 클라우드 아키텍처에서 가장 자주 하는 실수는 무엇일까요?
 
-## 전체 흐름
+> 운영, 보안, 신뢰성, 성능, 비용이라는 다섯 기둥을 기준으로 느슨하게 결합된 계층형 구조를 조립하는 것이 클라우드 아키텍처의 기본입니다.
+
+## 왜 중요한가
+
+같은 기능이라도 아키텍처에 따라 비용이 몇 배 차이 날 수 있고, 장애의 범위도 달라질 수 있습니다. 단일 서버에 묶인 시스템은 작은 변경도 두렵고, 반대로 계층이 분리된 구조는 변경과 복구가 훨씬 안전합니다.
+
+아키텍처는 추상적인 다이어그램이 아니라 실제 운영 비용과 팀 생산성을 결정하는 선택의 집합입니다. 그래서 마지막 단계에서는 각 서비스 지식을 한 그림으로 묶어 보는 훈련이 필요합니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Client["client"] --> CDN["cdn"]
@@ -44,15 +54,25 @@ flowchart LR
     App --> S3["s3"]
 ```
 
-## Before/After
+이 그림은 전형적인 다층 웹 구조를 보여 줍니다. CDN이 정적 콘텐츠와 글로벌 읽기 트래픽을 흡수하고, ALB가 요청을 분산하며, 앱 계층은 Stateless하게 확장되고, 데이터 계층은 캐시·DB·오브젝트 스토리지로 역할이 나뉩니다.
 
-**Before**: 모놀리식 애플리케이션이 단일 서버 한 대에 묶여 있습니다. 작은 변경도 부담스럽고, 서버 하나의 장애가 곧 전체 장애로 이어집니다.
+## 핵심 용어
 
-**After**: Stateless 앱 계층, Multi-AZ 데이터베이스, IaC 기반 배포를 조합합니다. 구조를 나누면 변경과 복구가 훨씬 안전해집니다.
+- **Well-Architected**: AWS가 정리한 설계 모범 사례 프레임워크입니다.
+- **Stateless**: 서버가 클라이언트 상태를 내부에 오래 들고 있지 않는 구조입니다.
+- **IaC**: 인프라를 코드로 표현하는 방식입니다.
+- **Loose coupling**: 컴포넌트를 큐나 API로 느슨하게 연결하는 방식입니다.
+- **Idempotent**: 같은 요청을 반복해도 안전한 성질입니다.
 
-## 다층 웹 아키텍처 (의사 코드)
+## Before / After
 
-### 1단계 — IaC 골조 (Terraform 의사 코드)
+**Before**에서는 모놀리식 애플리케이션이 단일 서버 한 대에 묶여 있습니다. 변경이 무섭고, 장애 하나가 전체 장애가 됩니다.
+
+**After**에서는 Stateless 앱 계층과 Multi-AZ 데이터베이스, IaC 기반 배포를 조합합니다. 구조가 나뉘면 변경과 복구가 모두 안전해집니다.
+
+## 실습: 다층 웹 아키텍처 의사 코드
+
+### 1단계 — IaC 골조
 
 ```python
 def vpc(): return {"cidr": "10.0.0.0/16", "azs": 2}
@@ -72,7 +92,7 @@ def rds(): return {"engine": "postgres", "multi_az": True, "backup_days": 7}
 def cache(): return {"engine": "redis", "nodes": 2}
 ```
 
-### 4단계 — 객체/큐
+### 4단계 — 객체와 큐
 
 ```python
 def s3(): return {"versioning": True, "lifecycle": "to-glacier-90d"}
@@ -85,34 +105,52 @@ def queue(): return {"visibility_timeout": 30, "dlq": True}
 def alb(): return {"listeners": [{"port": 443, "tls": True}], "target": "asg"}
 ```
 
-## 이 코드에서 주목할 점
+이 코드는 실제 Terraform이 아니지만, 클라우드 아키텍처를 어떤 식으로 계층별로 생각해야 하는지 잘 보여 줍니다. 네트워크, 컴퓨트, 데이터, 비동기 처리, 라우팅이 각각 분리되어 있어야 구조를 바꾸거나 검증하기 쉬워집니다.
 
-- Multi-AZ는 선택 기능이 아니라 기본 전제로 보는 편이 안전합니다.
-- DLQ는 재시도 실패를 흡수하는 안전망 역할을 합니다.
-- ASG를 제대로 활용하려면 애플리케이션이 Stateless해야 합니다.
+## 이 코드에서 먼저 봐야 할 점
+
+- Multi-AZ는 선택 기능이 아니라 기본 전제에 가깝습니다.
+- DLQ는 재시도 실패를 흡수하는 안전망입니다.
+- ASG를 제대로 쓰려면 앱이 Stateless해야 합니다.
+
+## Well-Architected 다섯 기둥은 어떻게 쓰나
+
+이 프레임워크는 정답 목록이라기보다 대화를 위한 질문 세트에 가깝습니다. 운영 우수성에서는 변경과 대응 절차를 보고, 보안에서는 권한과 암호화를 보고, 신뢰성에서는 장애 대응과 복구를 보고, 성능 효율성에서는 자원 선택과 확장 전략을 보고, 비용 최적화에서는 낭비를 줄이는 구조를 봅니다.
+
+강한 팀은 이 다섯 기둥을 분기마다 점검합니다. 모든 항목을 완벽히 맞추는 것이 목적이 아니라, 지금 우리 시스템이 어떤 축에서 취약한지 드러내는 것이 목적입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **상태를 내부 메모리에 둔 앱을 그대로 수평 확장하려고 합니다.** 확장 이후 세션 일관성과 장애 복구가 어려워집니다.
-2. **데이터베이스를 Single-AZ로 운영합니다.** 한 장애 영역의 문제를 그대로 서비스 전체가 떠안게 됩니다.
-3. **IaC 없이 수동 변경에 의존합니다.** 환경 차이와 재현 불가능한 설정이 쌓이기 쉽습니다.
-4. **외부 호출에 재시도를 넣지 않습니다.** 일시적인 네트워크 실패가 바로 사용자 오류로 번질 수 있습니다.
-5. **백업은 하지만 복구 연습을 하지 않습니다.** 실제 복원 시점에 절차가 검증되지 않았다는 문제가 드러납니다.
+1. 상태를 내부 메모리에 둔 앱을 그대로 수평 확장하려고 합니다.
+2. 데이터베이스를 Single-AZ로 운영합니다.
+3. IaC 없이 수동 변경에 의존합니다.
+4. 외부 호출에 재시도를 넣지 않습니다.
+5. 백업은 하지만 복구 연습을 하지 않습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 생각합니다
 
-실무에서는 CloudFront, ALB, ASG, RDS Multi-AZ, Redis, S3를 조합한 전형적인 다층 웹 구조를 자주 봅니다. Terraform 같은 IaC로 환경별 구성을 반복 가능하게 만들고, 온콜 운영은 대시보드와 Runbook에 기대는 방식이 일반적입니다.
+- Well-Architected는 체크리스트보다 대화 도구에 가깝습니다.
+- 모든 품질 중에서도 변경 안전성이 특히 중요합니다.
+- 백업보다 복원 훈련이 더 현실적인 검증입니다.
+- 작게 시작하고 필요할 때 모듈화하는 편이 낫습니다.
+- 문서와 런북도 코드와 함께 출하되어야 합니다.
 
 ## 체크리스트
 
 - [ ] Multi-AZ 구성이 적용되어 있는가.
 - [ ] IaC로 환경을 재현할 수 있는가.
-- [ ] 복원 훈련을 정기적으로 실시하는가.
-- [ ] 5대 기둥 기준 점검을 분기마다 수행하는가.
+- [ ] 복원 훈련 일정이 있는가.
+- [ ] 5대 기둥 기준 점검을 분기마다 하는가.
+
+## 연습 문제
+
+1. Well-Architected의 다섯 기둥을 모두 적어 보세요.
+2. 애플리케이션을 Stateless하게 만드는 대표 기법 하나를 설명해 보세요.
+3. IaC가 수동 변경보다 안전한 이유를 한 줄로 적어 보세요.
 
 ## 정리 및 다음 단계
 
-여기까지가 Cloud Computing 101의 마무리입니다. 다음 시리즈에서는 Containers 101, Kubernetes 101, Serverless 101으로 넘어가 컴퓨트 추상화를 더 깊게 다룰 예정입니다.
+여기까지가 Cloud Computing 101의 마무리입니다. 이제 클라우드를 하나의 서비스 목록이 아니라, 운영·보안·신뢰성·성능·비용을 함께 조립하는 설계 문제로 볼 수 있어야 합니다. 다음 시리즈에서는 Containers 101, Kubernetes 101, Serverless 101처럼 더 구체적인 실행 추상화로 들어가게 됩니다.
 
 <!-- toc:begin -->
 - [Cloud Computing이란 무엇인가?](./01-what-is-cloud-computing.md)
@@ -130,7 +168,7 @@ def alb(): return {"listeners": [{"port": 443, "tls": True}], "target": "asg"}
 ## 참고 자료
 
 - [AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html)
-- [Multi-AZ 설계](https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html)
+- [Multi-AZ design](https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Twelve-Factor App](https://12factor.net/)
 
