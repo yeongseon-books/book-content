@@ -1,52 +1,56 @@
 ---
+title: 다형성
 series: oop-101
 episode: 5
-title: 다형성
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 다형성
   - 덕 타이핑
   - 프로토콜
-seo_description: Python에서 다형성을 구현하는 방법과 덕 타이핑, 프로토콜을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 덕 타이핑과 Protocol을 포함해 Python 다형성을 실무 관점에서 설명합니다.
 ---
 
 # 다형성
 
-> Object-Oriented Programming 101 시리즈 (5/10)
+다형성을 이해하지 못하면 객체지향 코드는 곧 분기문 모음으로 돌아가기 쉽습니다. 결제 수단이 늘 때마다 `if isinstance(...)`가 늘어나고, 파일 저장 방식이 바뀔 때마다 호출부가 함께 수정됩니다. 겉으로는 객체를 썼는데, 실제로는 타입 분기 중심 코드에 머무는 셈입니다.
 
+Python은 여기서 특히 흥미롭습니다. 상속만으로 다형성을 만드는 언어가 아니라, 덕 타이핑과 `Protocol`까지 활용해 같은 인터페이스를 다양한 방식으로 표현할 수 있기 때문입니다. 중요한 것은 클래스 계층보다 호출부가 무엇을 기대하는지 명확히 하는 일입니다.
+
+이 글은 OOP 101 시리즈의 5번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-결제 시스템에서 신용카드, 은행 이체, 전자지갑을 처리한다고 가정합니다. 각 결제 수단의 내부 로직은 다르지만, 호출하는 쪽에서는 `pay(amount)` 하나로 통일하고 싶습니다. 다형성이 이 문제를 해결합니다.
+> 다형성의 핵심은 서로 다른 객체를 하나의 공통 인터페이스로 다루게 만들어 호출부의 분기 수를 줄이는 데 있습니다.
 
-> 다형성 = 같은 인터페이스, 다른 구현
-
-다형성이 없으면 `if isinstance(payment, CreditCard): ...` 같은 분기문이 결제 수단이 추가될 때마다 늘어납니다. 다형성을 활용하면 새 결제 수단을 추가해도 기존 코드를 수정할 필요가 없습니다.
+- 다형성은 왜 타입 분기문을 줄이는 가장 강력한 도구일까요?
+- 상속 기반 다형성과 덕 타이핑은 어떤 차이로 쓰일까요?
+- `Protocol`은 덕 타이핑을 정적 분석 차원에서 어떻게 보강할까요?
+- Python 내장 문법과 연결되는 dunder 메서드는 다형성과 어떤 관계가 있을까요?
 
 ## 핵심 개념 잡기
 
 > Python에서 다형성의 세 가지 방식
 
-```text
-1. 상속 기반 다형성
-   Animal → Dog.speak(), Cat.speak()
+```
+1. Inheritance-based polymorphism
+   Animal -> Dog.speak(), Cat.speak()
 
-2. 덕 타이핑 (Duck Typing)
-   "quack() 메서드가 있으면 오리다"
-   상속 관계 없이 같은 메서드만 있으면 됨
+2. Duck Typing
+   "If it has a quack() method, it's a duck"
+   No inheritance needed — just matching methods
 
-3. 프로토콜 (Protocol) — Python 3.8+
-   구조적 서브타이핑: 타입 힌트로 덕 타이핑 검증
+3. Protocol — Python 3.8+
+   Structural subtyping: type hints verify duck typing
 ```
 
 ## 핵심 개념
@@ -59,37 +63,37 @@ last_reviewed: '2026-05-11'
 | 디스패치(dispatch) | 호출 시점에 실제 타입의 메서드를 선택하는 메커니즘입니다 |
 | 인터페이스(interface) | 객체가 제공해야 하는 메서드의 집합입니다 |
 
-## Before / After
+## 전후 비교
 
 결제 처리를 비교합니다.
 
 ```python
-# before: 타입별 분기 — 결제 수단 추가마다 수정 필요
+# before: type-based branching — requires modification for each new payment method
 def process_payment(payment, amount):
     if payment["type"] == "credit_card":
-        print(f"신용카드 결제: {amount}원")
+        print(f"Credit card payment: ${amount}")
     elif payment["type"] == "bank_transfer":
-        print(f"계좌이체: {amount}원")
-    # 새 결제 수단 추가 → elif 추가 필요
+        print(f"Bank transfer: ${amount}")
+    # new payment method -> add elif
 ```
 
 ```python
-# after: 다형성 — 새 결제 수단 추가 시 기존 코드 수정 불필요
+# after: polymorphism — no modification needed for new payment methods
 class CreditCard:
     def pay(self, amount: int) -> str:
-        return f"신용카드 결제: {amount}원"
+        return f"Credit card payment: ${amount}"
 
 class BankTransfer:
     def pay(self, amount: int) -> str:
-        return f"계좌이체: {amount}원"
+        return f"Bank transfer: ${amount}"
 
 def process_payment(payment, amount: int) -> None:
-    print(payment.pay(amount))  # 어떤 타입이든 pay()만 있으면 됨
+    print(payment.pay(amount))  # any type with pay() works
 ```
 
 ## 단계별 실습
 
-### Step 1: 상속 기반 다형성
+### 1단계: 상속 기반 다형성
 
 ```python
 class Shape:
@@ -97,7 +101,7 @@ class Shape:
         raise NotImplementedError
 
     def describe(self) -> str:
-        return f"{type(self).__name__}: 넓이 = {self.area():.2f}"
+        return f"{type(self).__name__}: area = {self.area():.2f}"
 
 class Circle(Shape):
     def __init__(self, radius: float) -> None:
@@ -126,36 +130,36 @@ class Triangle(Shape):
 shapes: list[Shape] = [Circle(5), Rectangle(4, 6), Triangle(3, 8)]
 for shape in shapes:
     print(shape.describe())
-# Circle: 넓이 = 78.54
-# Rectangle: 넓이 = 24.00
-# Triangle: 넓이 = 12.00
+# Circle: area = 78.54
+# Rectangle: area = 24.00
+# Triangle: area = 12.00
 ```
 
-### Step 2: 덕 타이핑
+### 2단계: 덕 타이핑
 
 ```python
 class FileWriter:
     def write(self, data: str) -> None:
-        print(f"파일에 저장: {data}")
+        print(f"Writing to file: {data}")
 
 class DatabaseWriter:
     def write(self, data: str) -> None:
-        print(f"DB에 저장: {data}")
+        print(f"Saving to DB: {data}")
 
 class ApiWriter:
     def write(self, data: str) -> None:
-        print(f"API로 전송: {data}")
+        print(f"Sending to API: {data}")
 
 def save_data(writer, data: str) -> None:
-    """writer의 타입은 상관없음 — write() 메서드만 있으면 됨"""
+    """The type of writer does not matter — only the write() method"""
     writer.write(data)
 
-save_data(FileWriter(), "hello")       # 파일에 저장: hello
-save_data(DatabaseWriter(), "hello")   # DB에 저장: hello
-save_data(ApiWriter(), "hello")        # API로 전송: hello
+save_data(FileWriter(), "hello")       # Writing to file: hello
+save_data(DatabaseWriter(), "hello")   # Saving to DB: hello
+save_data(ApiWriter(), "hello")        # Sending to API: hello
 ```
 
-### Step 3: Protocol을 사용한 구조적 서브타이핑
+### 3단계: Protocol을 사용한 구조적 서브타이핑
 
 ```python
 from typing import Protocol
@@ -167,12 +171,12 @@ class Writable(Protocol):
 
 class ConsoleWriter:
     def write(self, data: str) -> None:
-        print(f"콘솔 출력: {data}")
+        print(f"Console output: {data}")
 
 
 class NetworkWriter:
     def write(self, data: str) -> None:
-        print(f"네트워크 전송: {data}")
+        print(f"Network send: {data}")
 
 
 def save_all(writers: list[Writable], data: str) -> None:
@@ -181,12 +185,12 @@ def save_all(writers: list[Writable], data: str) -> None:
 
 
 writers: list[Writable] = [ConsoleWriter(), NetworkWriter()]
-save_all(writers, "중요한 데이터")
-# 콘솔 출력: 중요한 데이터
-# 네트워크 전송: 중요한 데이터
+save_all(writers, "important data")
+# Console output: important data
+# Network send: important data
 ```
 
-### Step 4: 내장 다형성 활용
+### 4단계: 내장 다형성 활용
 
 ```python
 class Team:
@@ -203,16 +207,16 @@ class Team:
     def __iter__(self):
         return iter(self.members)
 
-team = Team("백엔드팀", ["김개발", "이서버", "박디비"])
-print(len(team))             # 3
-print("김개발" in team)       # True
-print(list(team))            # ['김개발', '이서버', '박디비']
+team = Team("Backend", ["Kim", "Lee", "Park"])
+print(len(team))          # 3
+print("Kim" in team)      # True
+print(list(team))         # ['Kim', 'Lee', 'Park']
 
 for member in team:
     print(member)
 ```
 
-### Step 5: functools.singledispatch
+### 5단계: functools.singledispatch
 
 ```python
 from functools import singledispatch
@@ -224,7 +228,7 @@ def format_value(value) -> str:
 
 @format_value.register(int)
 def _(value: int) -> str:
-    return f"{value:,}원"
+    return f"{value:,}"
 
 @format_value.register(float)
 def _(value: float) -> str:
@@ -232,11 +236,11 @@ def _(value: float) -> str:
 
 @format_value.register(list)
 def _(value: list) -> str:
-    return f"[{len(value)}개 항목]"
+    return f"[{len(value)} items]"
 
-print(format_value(1000000))       # 1,000,000원
+print(format_value(1000000))       # 1,000,000
 print(format_value(3.14159))       # 3.14
-print(format_value([1, 2, 3]))     # [3개 항목]
+print(format_value([1, 2, 3]))     # [3 items]
 print(format_value("hello"))       # hello
 ```
 
@@ -247,7 +251,7 @@ print(format_value("hello"))       # hello
 - `__len__`, `__contains__`, `__iter__` 등 특수 메서드로 Python 내장 문법과 통합합니다
 - `singledispatch`는 인자 타입에 따라 다른 함수를 호출하는 함수 수준 다형성입니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -289,11 +293,11 @@ Python에서 다형성은 "의도적으로 설계"하기보다 "자연스럽게 
 - [캡슐화](./03-encapsulation.md)
 - [상속](./04-inheritance.md)
 - **다형성 (현재 글)**
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 추상화 (예정)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

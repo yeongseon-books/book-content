@@ -1,52 +1,56 @@
 ---
+title: 객체지향이란 무엇인가?
 series: oop-101
 episode: 1
-title: 객체지향이란 무엇인가?
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 객체지향
   - 프로그래밍 패러다임
   - 클래스
-seo_description: 객체지향 프로그래밍의 기본 개념과 절차지향과의 차이를 알아봅니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 객체지향의 핵심 아이디어와 절차지향 코드와의 차이를 실무 예제로 설명합니다.
 ---
 
 # 객체지향이란 무엇인가?
 
-> Object-Oriented Programming 101 시리즈 (1/10)
+처음 객체지향을 배울 때 가장 자주 생기는 오해는 이것입니다. 클래스를 쓰면 코드가 더 고급스러워지고, 함수를 쓰면 덜 구조적이라는 생각입니다. 하지만 현업에서는 반대로 묻는 편이 더 정확합니다. 이 문제에서 정말 데이터와 동작을 함께 묶어야 하는가, 아니면 함수 몇 개로 끝내는 편이 더 나은가 하는 질문입니다.
 
+객체지향은 문법 기능이 아니라 구조를 잡는 방식입니다. 코드가 커질수록 관련 데이터와 로직이 여러 함수에 흩어지고, 한 군데를 고치면 다른 군데도 함께 손봐야 할 때가 많아집니다. 그때 객체라는 경계를 세워 책임을 모으는 접근이 힘을 발휘합니다.
+
+이 글은 OOP 101 시리즈의 첫 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-소규모 스크립트에서는 함수만으로 충분합니다. 그러나 코드가 수천 줄을 넘어가면 관련된 데이터와 로직이 흩어져 변경할 때마다 여러 함수를 동시에 수정해야 합니다. 객체지향은 관련된 데이터와 행위를 하나의 단위로 묶어 이 문제를 해결합니다.
+> 객체지향은 클래스를 많이 만드는 기법이 아니라, 함께 변하는 데이터와 동작을 한 단위로 묶는 설계 방식입니다.
 
-> 객체지향 = 데이터 + 행위를 하나의 단위(객체)로 묶는 프로그래밍 방식
-
-대부분의 현대 언어(Python, Java, C++, C#)가 객체지향을 지원합니다. 프레임워크와 라이브러리도 객체지향 설계를 기반으로 만들어져 있어서, 이 개념을 이해하지 못하면 코드를 읽는 것조차 어렵습니다.
+- 객체지향은 절차지향과 무엇이 다르고, 왜 등장했을까요?
+- 클래스, 인스턴스, 속성, 메서드는 어떤 관계로 이해하면 쉬울까요?
+- 작은 스크립트에서는 함수만으로 충분한데, 언제 객체가 더 자연스러울까요?
+- Python 코드에서 객체지향이 실제로 어떻게 드러나는지 감을 잡으려면 무엇을 먼저 봐야 할까요?
 
 ## 핵심 개념 잡기
 
 > 절차지향 vs 객체지향 비교
 
 ```text
-절차지향 (Procedural)          객체지향 (Object-Oriented)
+Procedural                     Object-Oriented
 ┌────────────────────┐        ┌────────────────────┐
-│ 함수 A             │        │ 객체 A             │
-│ 함수 B             │        │  ├─ 데이터         │
-│ 함수 C             │        │  └─ 메서드         │
+│ Function A         │        │ Object A           │
+│ Function B         │        │  ├─ Data           │
+│ Function C         │        │  └─ Methods        │
 │                    │        ├────────────────────┤
-│ 전역 데이터        │        │ 객체 B             │
-│  ├─ 변수 1         │        │  ├─ 데이터         │
-│  └─ 변수 2         │        │  └─ 메서드         │
+│ Global Data        │        │ Object B           │
+│  ├─ var 1          │        │  ├─ Data           │
+│  └─ var 2          │        │  └─ Methods        │
 └────────────────────┘        └────────────────────┘
 ```
 
@@ -60,12 +64,12 @@ last_reviewed: '2026-05-11'
 | 메서드(method) | 객체가 수행하는 행위(함수)입니다 |
 | 캡슐화(encapsulation) | 데이터와 메서드를 하나로 묶고 외부 접근을 제한하는 것입니다 |
 
-## Before / After
+## 전후 비교
 
 사용자 관리 로직을 비교합니다.
 
 ```python
-# before: 절차지향 — 데이터와 함수가 분리
+# before: procedural — data and functions are separate
 users = []
 
 def create_user(name, email):
@@ -82,7 +86,7 @@ def get_user_display(user):
 ```
 
 ```python
-# after: 객체지향 — 데이터와 행위가 하나의 클래스에
+# after: OOP — data and behavior live in one class
 class User:
     def __init__(self, name: str, email: str) -> None:
         self.name = name
@@ -99,49 +103,49 @@ class User:
 
 ## 단계별 실습
 
-### Step 1: 첫 번째 클래스 만들기
+### 1단계: 첫 번째 클래스 만들기
 
 ```python
 class Dog:
-    """간단한 강아지 클래스"""
+    """A simple Dog class"""
 
     def __init__(self, name: str, breed: str) -> None:
         self.name = name
         self.breed = breed
 
     def bark(self) -> str:
-        return f"{self.name}이(가) 멍멍 짖습니다!"
+        return f"{self.name} says woof!"
 
     def __repr__(self) -> str:
         return f"Dog(name={self.name!r}, breed={self.breed!r})"
 
 
-my_dog = Dog("바둑이", "진돗개")
-print(my_dog.bark())   # 바둑이이(가) 멍멍 짖습니다!
-print(my_dog)           # Dog(name='바둑이', breed='진돗개')
+my_dog = Dog("Buddy", "Golden Retriever")
+print(my_dog.bark())  # Buddy says woof!
+print(my_dog)          # Dog(name='Buddy', breed='Golden Retriever')
 ```
 
-### Step 2: 여러 인스턴스 생성
+### 2단계: 여러 인스턴스 생성
 
 ```python
-dog1 = Dog("바둑이", "진돗개")
-dog2 = Dog("초코", "푸들")
-dog3 = Dog("맥스", "래브라도")
+dog1 = Dog("Buddy", "Golden Retriever")
+dog2 = Dog("Charlie", "Poodle")
+dog3 = Dog("Max", "Labrador")
 
 dogs = [dog1, dog2, dog3]
 for dog in dogs:
     print(f"{dog.name} ({dog.breed}): {dog.bark()}")
-# 바둑이 (진돗개): 바둑이이(가) 멍멍 짖습니다!
-# 초코 (푸들): 초코이(가) 멍멍 짖습니다!
-# 맥스 (래브라도): 맥스이(가) 멍멍 짖습니다!
+# Buddy (Golden Retriever): Buddy says woof!
+# Charlie (Poodle): Charlie says woof!
+# Max (Labrador): Max says woof!
 
-print(dog1 is dog2)  # False — 서로 다른 인스턴스
+print(dog1 is dog2)  # False — different instances
 ```
 
-### Step 3: 절차지향 → 객체지향 리팩터링
+### 3단계: 절차지향 → 객체지향 리팩터링
 
 ```python
-# 절차지향 버전
+# procedural version
 def create_rect(width, height):
     return {"width": width, "height": height}
 
@@ -157,7 +161,7 @@ print(perimeter(r))  # 16
 ```
 
 ```python
-# 객체지향 버전
+# OOP version
 class Rectangle:
     def __init__(self, width: float, height: float) -> None:
         self.width = width
@@ -177,7 +181,7 @@ print(r.area())       # 15
 print(r.perimeter())  # 16
 ```
 
-### Step 4: self의 의미
+### 4단계: self의 의미
 
 ```python
 class Counter:
@@ -199,29 +203,29 @@ c1.increment()
 c1.increment()
 c2.increment()
 print(c1.value())  # 2
-print(c2.value())  # 1 — 각 인스턴스는 독립적
+print(c2.value())  # 1 — each instance is independent
 ```
 
-### Step 5: 클래스 변수 vs 인스턴스 변수
+### 5단계: 클래스 변수 vs 인스턴스 변수
 
 ```python
 class Student:
-    school = "Python Academy"  # 클래스 변수: 모든 인스턴스가 공유
+    school = "Python Academy"  # class variable: shared by all instances
 
     def __init__(self, name: str, grade: int) -> None:
-        self.name = name    # 인스턴스 변수: 인스턴스마다 다름
+        self.name = name    # instance variable: unique per instance
         self.grade = grade
 
     def introduce(self) -> str:
-        return f"{self.school}의 {self.name}, {self.grade}학년"
+        return f"{self.name} at {self.school}, grade {self.grade}"
 
-s1 = Student("김철수", 3)
-s2 = Student("이영희", 2)
-print(s1.introduce())  # Python Academy의 김철수, 3학년
-print(s2.introduce())  # Python Academy의 이영희, 2학년
+s1 = Student("Alice", 3)
+s2 = Student("Bob", 2)
+print(s1.introduce())  # Alice at Python Academy, grade 3
+print(s2.introduce())  # Bob at Python Academy, grade 2
 
-Student.school = "Code Academy"  # 클래스 변수 변경 → 모든 인스턴스에 영향
-print(s1.introduce())  # Code Academy의 김철수, 3학년
+Student.school = "Code Academy"  # changing class variable affects all instances
+print(s1.introduce())  # Alice at Code Academy, grade 3
 ```
 
 ## 이 코드에서 주목할 점
@@ -231,7 +235,7 @@ print(s1.introduce())  # Code Academy의 김철수, 3학년
 - 클래스 변수는 모든 인스턴스가 공유하고, 인스턴스 변수는 각 인스턴스에 독립적입니다
 - `__repr__`을 정의하면 디버깅 시 객체를 읽기 쉬운 형태로 출력합니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -269,15 +273,15 @@ print(s1.introduce())  # Code Academy의 김철수, 3학년
 
 <!-- toc:begin -->
 - **객체지향이란 무엇인가? (현재 글)**
-- [클래스와 인스턴스](./02-classes-and-instances.md)
-- [캡슐화](./03-encapsulation.md)
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 클래스와 인스턴스 (예정)
+- 캡슐화 (예정)
+- 상속 (예정)
+- 다형성 (예정)
+- 추상화 (예정)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

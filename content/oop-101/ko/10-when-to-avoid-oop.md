@@ -1,49 +1,53 @@
 ---
+title: 객체지향을 언제 피해야 할까?
 series: oop-101
 episode: 10
-title: 객체지향을 언제 피해야 할까?
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 함수형 프로그래밍
   - dataclass
   - 설계 판단
-seo_description: 객체지향이 적합하지 않은 상황과 대안적 접근 방법을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 객체지향이 과한 상황과 함수, dataclass, 함수형 접근이 더 나은 경우를 설명합니다.
 ---
 
 # 객체지향을 언제 피해야 할까?
 
-> Object-Oriented Programming 101 시리즈 (10/10)
+객체지향을 배우고 나면 한동안 모든 문제를 클래스로 풀고 싶어집니다. 하지만 Python에서는 그 습관이 오히려 코드를 무겁게 만드는 경우가 많습니다. 상태 없는 유틸리티 함수, 단순 데이터 컨테이너, 일회성 스크립트까지 전부 클래스 계층으로 감싸면 읽기도 테스트도 번거로워집니다.
 
+좋은 설계자는 객체지향을 잘 쓰는 사람인 동시에, 객체지향을 쓰지 않아야 할 순간도 잘 구분하는 사람입니다. Python이 다중 패러다임 언어라는 점을 받아들이면, 함수와 모듈, `dataclass`, `NamedTuple`, 고차 함수가 더 자연스러운 해법인 장면이 분명히 보이기 시작합니다.
+
+이 글은 OOP 101 시리즈의 마지막 글입니다.
 
 ## 이 글에서 다룰 문제
 
-"망치를 들면 모든 것이 못으로 보인다"는 말처럼, OOP를 배우면 모든 것을 클래스로 만들려는 경향이 있습니다. 그러나 Python은 다중 패러다임 언어이고, 상황에 맞는 도구를 선택하는 것이 좋은 코드의 핵심입니다.
+> 설계의 성숙도는 클래스를 많이 만드는 데서 드러나지 않습니다. 클래스가 필요 없는 문제를 함수와 데이터 구조로 단순하게 끝낼 수 있는지에서 더 잘 드러납니다.
 
-> 좋은 설계 = 문제에 맞는 도구 선택
-
-불필요한 클래스는 코드를 읽기 어렵게 만들고, 유지보수 비용을 높입니다. "이것을 클래스로 만들어야 하는가?"라는 질문을 항상 자문해야 합니다.
+- 어떤 신호가 보이면 객체지향이 과한 설계라고 판단할 수 있을까요?
+- 상태 없는 로직은 왜 클래스보다 함수가 더 읽기 쉬운 경우가 많을까요?
+- `dataclass`, `NamedTuple`, `TypedDict`는 어떤 종류의 클래스를 대체할 수 있을까요?
+- 하나의 코드베이스 안에서 객체지향과 함수형 스타일을 어떻게 균형 있게 섞을 수 있을까요?
 
 ## 핵심 개념 잡기
 
 > OOP vs 대안 — 선택 기준
 
 ```text
-클래스가 필요한 경우              클래스가 불필요한 경우
-─────────────────────           ─────────────────────
-상태 + 행위가 결합               상태 없는 변환 함수
-여러 인스턴스가 필요              단일 실행 스크립트
-교체 가능한 전략이 필요           데이터만 담는 컨테이너
-프레임워크가 클래스를 요구         파이프라인 데이터 처리
+When classes make sense            When classes are overkill
+─────────────────────              ─────────────────────
+State + behavior together          Stateless transformation functions
+Multiple instances needed          Single-run scripts
+Swappable strategies required      Data-only containers
+Framework demands classes          Pipeline data processing
 ```
 
 ## 핵심 개념
@@ -56,12 +60,12 @@ last_reviewed: '2026-05-11'
 | 고차 함수(higher-order function) | 함수를 인자로 받거나 반환하는 함수입니다 |
 | 클로저(closure) | 외부 변수를 기억하는 내부 함수입니다 |
 
-## Before / After
+## 전후 비교
 
 불필요한 클래스를 제거합니다.
 
 ```python
-# before: 메서드 하나뿐인 불필요한 클래스
+# before: unnecessary class with a single method
 class Validator:
     def validate_email(self, email: str) -> bool:
         return "@" in email and "." in email
@@ -71,7 +75,7 @@ print(validator.validate_email("test@example.com"))
 ```
 
 ```python
-# after: 함수로 충분
+# after: a plain function is enough
 def validate_email(email: str) -> bool:
     return "@" in email and "." in email
 
@@ -80,10 +84,10 @@ print(validate_email("test@example.com"))
 
 ## 단계별 실습
 
-### Step 1: 클래스 대신 함수
+### 1단계: 클래스 대신 함수
 
 ```python
-# 불필요한 클래스 — 상태 없이 메서드만 있음
+# Unnecessary class — stateless, methods only
 class StringUtils:
     @staticmethod
     def capitalize_words(text: str) -> str:
@@ -100,7 +104,7 @@ class StringUtils:
         return text[:max_len - 3] + "..."
 
 
-# 개선: 모듈 수준 함수
+# Better: module-level functions
 def capitalize_words(text: str) -> str:
     return " ".join(w.capitalize() for w in text.split())
 
@@ -118,14 +122,14 @@ print(count_words("one two three"))     # 3
 print(truncate("abcdefghij", 8))        # abcde...
 ```
 
-### Step 2: 클래스 대신 dataclass / NamedTuple
+### 2단계: 클래스 대신 dataclass / NamedTuple
 
 ```python
 from dataclasses import dataclass
 from typing import NamedTuple
 
 
-# 불필요한 boilerplate — 수동 __init__, __repr__, __eq__
+# Unnecessary boilerplate — manual __init__, __repr__, __eq__
 class ManualPoint:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
@@ -138,13 +142,13 @@ class ManualPoint:
         return self.x == other.x and self.y == other.y
 
 
-# 개선 1: dataclass
+# Better 1: dataclass
 @dataclass
 class Point:
     x: float
     y: float
 
-# 개선 2: NamedTuple (불변)
+# Better 2: NamedTuple (immutable)
 class ImmutablePoint(NamedTuple):
     x: float
     y: float
@@ -157,13 +161,13 @@ print(p1 == p2)  # True
 
 ip = ImmutablePoint(3, 4)
 print(ip.x)  # 3
-# ip.x = 10  # AttributeError — 불변
+# ip.x = 10  # AttributeError — immutable
 ```
 
-### Step 3: 클래스 대신 고차 함수
+### 3단계: 클래스 대신 고차 함수
 
 ```python
-# 전략 패턴 — 클래스 버전
+# Strategy pattern — class version
 from typing import Protocol
 
 class Formatter(Protocol):
@@ -171,18 +175,18 @@ class Formatter(Protocol):
 
 class CurrencyFormatter:
     def format(self, value: float) -> str:
-        return f"{value:,.0f}원"
+        return f"${value:,.2f}"
 
 class PercentFormatter:
     def format(self, value: float) -> str:
         return f"{value:.1f}%"
 
 
-# 개선: 함수로 충분 — 클래스 없이
+# Better: functions are enough — no classes needed
 from typing import Callable
 
 def currency_format(value: float) -> str:
-    return f"{value:,.0f}원"
+    return f"${value:,.2f}"
 
 def percent_format(value: float) -> str:
     return f"{value:.1f}%"
@@ -196,9 +200,9 @@ def display_values(
 
 
 display_values([1000, 2500, 50000], currency_format)
-# 1,000원
-# 2,500원
-# 50,000원
+# $1,000.00
+# $2,500.00
+# $50,000.00
 
 display_values([0.95, 0.87, 0.12], percent_format)
 # 0.9%
@@ -206,10 +210,10 @@ display_values([0.95, 0.87, 0.12], percent_format)
 # 0.1%
 ```
 
-### Step 4: 클래스 대신 딕셔너리 / 튜플
+### 4단계: 클래스 대신 딕셔너리 / 튜플
 
 ```python
-# 불필요한 클래스 — 데이터만 담는 용도
+# Unnecessary class — just holding data
 class Config:
     def __init__(self, host: str, port: int, debug: bool) -> None:
         self.host = host
@@ -217,7 +221,7 @@ class Config:
         self.debug = debug
 
 
-# 개선 1: TypedDict (구조화된 딕셔너리)
+# Better 1: TypedDict (structured dictionary)
 from typing import TypedDict
 
 class Config(TypedDict):
@@ -229,17 +233,17 @@ config: Config = {"host": "localhost", "port": 8080, "debug": True}
 print(config["host"])  # localhost
 
 
-# 개선 2: 간단한 설정은 dict로 충분
+# Better 2: a plain dict is enough for simple config
 config = {"host": "localhost", "port": 8080, "debug": True}
 ```
 
-### Step 5: 함수형 파이프라인
+### 5단계: 함수형 파이프라인
 
 ```python
 from functools import reduce
 
 
-# 데이터 변환 — 클래스 없이 함수 체이닝
+# Data transformation — function chaining without classes
 def load_data() -> list[dict]:
     return [
         {"name": "  Alice  ", "score": 85},
@@ -258,16 +262,16 @@ def sort_by_score(data: list[dict]) -> list[dict]:
     return sorted(data, key=lambda d: d["score"], reverse=True)
 
 def format_results(data: list[dict]) -> list[str]:
-    return [f"{d['name']}: {d['score']}점" for d in data]
+    return [f"{d['name']}: {d['score']} points" for d in data]
 
 
-# 파이프라인 실행
+# Run the pipeline
 result = format_results(sort_by_score(filter_passing(clean_names(load_data()))))
 for line in result:
     print(line)
-# Diana: 95점
-# Bob: 92점
-# Alice: 85점
+# Diana: 95 points
+# Bob: 92 points
+# Alice: 85 points
 ```
 
 ## 이 코드에서 주목할 점
@@ -277,7 +281,7 @@ for line in result:
 - 단순 전략 패턴은 `Callable`로 대체 가능합니다
 - 데이터 변환 파이프라인은 함수 체이닝이 자연스럽습니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|

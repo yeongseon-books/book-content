@@ -1,37 +1,41 @@
 ---
+title: 객체지향 설계 예제
 series: oop-101
 episode: 9
-title: 객체지향 설계 예제
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 설계 예제
   - 리팩터링
   - 클래스 설계
-seo_description: OOP 원칙을 적용한 실전 설계 예제로 주문 처리 시스템을 구현합니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 온라인 서점 주문 시스템 예제로 OOP 설계와 리팩터링 과정을 단계별로 보여줍니다.
 ---
 
 # 객체지향 설계 예제
 
-> Object-Oriented Programming 101 시리즈 (9/10)
+개념을 따로 배울 때는 캡슐화, 상속, 다형성, 합성, SOLID가 각각 이해되는 듯 보입니다. 그런데 실제 기능 하나를 설계하려고 하면 갑자기 어려워집니다. 어디서 클래스를 나누고, 어떤 규칙은 지금 적용하고 어떤 규칙은 나중으로 미뤄야 할지 판단이 필요해지기 때문입니다.
 
+그래서 실전 예제가 중요합니다. 좋은 설계는 처음부터 완벽한 다이어그램을 그려서 나오기보다, 동작하는 모델을 만들고 변경 가능성이 큰 지점에 유연성을 추가하면서 점점 다듬어집니다. 이 글에서는 그 흐름을 주문 시스템 예제로 따라가 보겠습니다.
+
+이 글은 OOP 101 시리즈의 9번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-실무에서 클래스를 설계할 때 가장 어려운 것은 "어디에 경계를 그을 것인가"입니다. 하나의 클래스에 너무 많은 책임을 넣으면 변경이 어렵고, 너무 잘게 쪼개면 복잡해집니다. 실제 예제를 통해 적절한 균형을 찾는 감각을 기릅니다.
+> 실전 객체지향 설계의 핵심은 원칙을 많이 아는 데 있지 않습니다. 변경이 예상되는 경계에만 적절한 유연성을 두는 데 있습니다.
 
-> 좋은 설계 = 적절한 경계 + 명확한 책임 + 느슨한 결합
-
-설계는 한 번에 완성되지 않습니다. 처음에는 간단하게 시작하고, 요구사항이 변할 때 리팩터링하는 것이 현실적인 접근입니다.
+- 요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요?
+- 값 객체, 엔티티, 서비스 클래스는 어떤 식으로 역할을 나누면 좋을까요?
+- 할인 정책, 결제 수단, 저장소처럼 바뀌기 쉬운 요소는 어떻게 분리해야 할까요?
+- 절차지향 주문 처리 코드를 객체지향 구조로 옮길 때 무엇부터 분리하는 편이 안전할까요?
 
 ## 핵심 개념 잡기
 
@@ -39,10 +43,10 @@ last_reviewed: '2026-05-11'
 
 ```text
 OrderService
-├── Cart          → 장바구니 관리
-├── Discount      → 할인 정책 (전략 패턴)
-├── PaymentGateway → 결제 처리 (DIP)
-└── OrderRepository → 주문 저장 (DIP)
+├── Cart          -> cart management
+├── Discount      -> discount policy (strategy pattern)
+├── PaymentGateway -> payment processing (DIP)
+└── OrderRepository -> order persistence (DIP)
 ```
 
 ## 핵심 개념
@@ -55,25 +59,25 @@ OrderService
 | 엔티티(entity) | 고유 식별자로 구분되는 객체입니다 |
 | 리팩터링 | 동작을 유지하면서 코드 구조를 개선하는 것입니다 |
 
-## Before / After
+## 전후 비교
 
 주문 처리 로직을 비교합니다.
 
 ```python
-# before: 절차지향 — 모든 로직이 하나의 함수에
+# before: procedural — all logic in a single function
 def process_order(items, payment_type, discount_code):
     total = sum(item["price"] * item["qty"] for item in items)
     if discount_code == "SAVE10":
         total = int(total * 0.9)
     if payment_type == "card":
-        print(f"카드 결제: {total}원")
+        print(f"Card payment: ${total}")
     elif payment_type == "bank":
-        print(f"계좌이체: {total}원")
-    print(f"주문 저장: {total}원, {len(items)}개 상품")
+        print(f"Bank transfer: ${total}")
+    print(f"Order saved: ${total}, {len(items)} items")
 ```
 
 ```python
-# after: 객체지향 — 책임 분리
+# after: OOP — responsibilities separated
 class Order:
     def __init__(self, items: list["OrderItem"]) -> None:
         self.items = items
@@ -95,7 +99,7 @@ class OrderItem:
 
 ## 단계별 실습
 
-### Step 1: 도메인 모델 정의
+### 1단계: 도메인 모델 정의
 
 ```python
 from dataclasses import dataclass
@@ -103,7 +107,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Money:
-    """값 객체 — 금액을 표현"""
+    """Value object — represents monetary amounts"""
     amount: int
 
     def __add__(self, other: "Money") -> "Money":
@@ -118,7 +122,7 @@ class Money:
 
 @dataclass
 class Book:
-    """엔티티 — 고유 ID로 구분"""
+    """Entity — identified by unique ID"""
     book_id: str
     title: str
     price: Money
@@ -129,12 +133,12 @@ class Book:
         return self.book_id == other.book_id
 
 
-book = Book("B001", "파이썬 입문", Money(25000))
+book = Book("B001", "Python Basics", Money(25000))
 print(book.price.amount)  # 25000
 print((book.price * 3).amount)  # 75000
 ```
 
-### Step 2: 장바구니 클래스
+### 2단계: 장바구니 클래스
 
 ```python
 @dataclass
@@ -178,13 +182,13 @@ class Cart:
 
 
 cart = Cart()
-cart.add(Book("B001", "파이썬 입문", Money(25000)), 2)
-cart.add(Book("B002", "Django 실전", Money(35000)))
-print(f"합계: {cart.subtotal.amount}원, {cart.item_count}권")
-# 합계: 85000원, 3권
+cart.add(Book("B001", "Python Basics", Money(25000)), 2)
+cart.add(Book("B002", "Django in Practice", Money(35000)))
+print(f"Subtotal: ${cart.subtotal.amount}, {cart.item_count} books")
+# Subtotal: $85000, 3 books
 ```
 
-### Step 3: 할인 정책 — 전략 패턴
+### 3단계: 할인 정책 — 전략 패턴
 
 ```python
 from typing import Protocol
@@ -206,7 +210,7 @@ class PercentDiscount:
         return subtotal.apply_discount(self._percent)
 
 class BulkDiscount:
-    """5만원 이상 시 10% 할인"""
+    """10% off for orders over $50,000"""
     def calculate(self, subtotal: Money) -> Money:
         if subtotal.amount >= 50000:
             return subtotal.apply_discount(10)
@@ -218,7 +222,7 @@ print(PercentDiscount(20).calculate(Money(85000)).amount) # 68000
 print(BulkDiscount().calculate(Money(85000)).amount)      # 76500
 ```
 
-### Step 4: 결제 게이트웨이 — DIP
+### 4단계: 결제 게이트웨이 — DIP
 
 ```python
 from typing import Protocol
@@ -230,12 +234,12 @@ class PaymentGateway(Protocol):
 
 class CardPayment:
     def charge(self, amount: Money) -> bool:
-        print(f"카드 결제: {amount.amount}원")
+        print(f"Card payment: ${amount.amount}")
         return True
 
 class BankTransfer:
     def charge(self, amount: Money) -> bool:
-        print(f"계좌이체: {amount.amount}원")
+        print(f"Bank transfer: ${amount.amount}")
         return True
 
 
@@ -252,11 +256,11 @@ class InMemoryOrderRepo:
         self._counter += 1
         order_id = f"ORD-{self._counter:04d}"
         self._orders[order_id] = order_data
-        print(f"주문 저장: {order_id}")
+        print(f"Order saved: {order_id}")
         return order_id
 ```
 
-### Step 5: 주문 서비스 — 전체 조립
+### 5단계: 주문 서비스 — 전체 조립
 
 ```python
 class OrderService:
@@ -272,7 +276,7 @@ class OrderService:
 
     def checkout(self, cart: Cart) -> str | None:
         if cart.item_count == 0:
-            print("장바구니가 비어있습니다")
+            print("Cart is empty")
             return None
 
         subtotal = cart.subtotal
@@ -280,7 +284,7 @@ class OrderService:
 
         success = self._payment.charge(final)
         if not success:
-            print("결제 실패")
+            print("Payment failed")
             return None
 
         order_data = {
@@ -291,10 +295,10 @@ class OrderService:
         return self._repo.save(order_data)
 
 
-# 조립 및 실행
+# Assembly and execution
 cart = Cart()
-cart.add(Book("B001", "파이썬 입문", Money(25000)), 2)
-cart.add(Book("B002", "Django 실전", Money(35000)))
+cart.add(Book("B001", "Python Basics", Money(25000)), 2)
+cart.add(Book("B002", "Django in Practice", Money(35000)))
 
 service = OrderService(
     discount=BulkDiscount(),
@@ -303,9 +307,9 @@ service = OrderService(
 )
 
 order_id = service.checkout(cart)
-# 카드 결제: 76500원
-# 주문 저장: ORD-0001
-print(f"주문 완료: {order_id}")  # 주문 완료: ORD-0001
+# Card payment: $76500
+# Order saved: ORD-0001
+print(f"Order complete: {order_id}")  # Order complete: ORD-0001
 ```
 
 ## 이 코드에서 주목할 점
@@ -315,7 +319,7 @@ print(f"주문 완료: {order_id}")  # 주문 완료: ORD-0001
 - `DiscountPolicy`는 전략 패턴으로 할인 정책을 런타임에 교체합니다(OCP)
 - `OrderService`는 모든 의존성을 Protocol로 받아 교체와 테스트가 쉽습니다(DIP)
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -361,7 +365,7 @@ print(f"주문 완료: {order_id}")  # 주문 완료: ORD-0001
 - [합성과 상속](./07-composition-vs-inheritance.md)
 - [SOLID 원칙 기초](./08-solid-principles.md)
 - **객체지향 설계 예제 (현재 글)**
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

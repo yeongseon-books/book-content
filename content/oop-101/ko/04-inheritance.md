@@ -1,55 +1,59 @@
 ---
+title: 상속
 series: oop-101
 episode: 4
-title: 상속
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 상속
   - 메서드 오버라이딩
   - super
-seo_description: Python 상속의 기본 구조, 메서드 오버라이딩, super() 활용법을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: Python 상속, 오버라이딩, super(), MRO를 실무 기준으로 이해하기 쉽게 정리합니다.
 ---
 
 # 상속
 
-> Object-Oriented Programming 101 시리즈 (4/10)
+상속은 객체지향에서 가장 먼저 배우는 기능이지만, 현업에서는 가장 쉽게 남용되는 기능이기도 합니다. 공통 코드가 보이면 부모 클래스로 올리고 싶어지지만, 그 공통점이 정말 타입 관계인지 확인하지 않으면 계층만 깊어지고 변경 비용이 빠르게 커집니다.
 
+그래서 상속을 볼 때는 재사용보다 관계를 먼저 봐야 합니다. 자식 객체를 부모 타입이 필요한 모든 자리에 무리 없이 넣을 수 있는가, 그리고 부모의 변경이 자식 전체를 흔들 위험을 감수할 만한가를 먼저 따져야 합니다.
+
+이 글은 OOP 101 시리즈의 4번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-비슷한 기능을 가진 여러 클래스를 만들 때 상속 없이는 같은 코드를 반복해야 합니다. 상속을 사용하면 공통 로직을 부모 클래스에 한 번만 작성하고, 자식 클래스에서 차이점만 구현합니다.
+> 상속은 공통 코드를 모으는 기술이기 전에, 부모와 자식이 같은 종류의 객체인지 선언하는 설계 선택입니다.
 
-> 상속 = "is-a" 관계: 자식 클래스는 부모 클래스의 일종이다
-
-다만, 상속은 강한 결합을 만듭니다. 부모 클래스가 변경되면 모든 자식 클래스에 영향을 미칩니다. 상속이 적절한 경우와 그렇지 않은 경우를 구분하는 것이 중요합니다.
+- 상속이 코드 중복을 줄일 수는 있지만, 왜 동시에 강한 결합도 만들까요?
+- 오버라이딩과 `super()`는 어떤 식으로 함께 써야 안전할까요?
+- `isinstance()`와 `issubclass()`는 상속 관계를 읽을 때 왜 중요할까요?
+- 다중 상속과 MRO는 어떤 상황에서 유용하고, 어디서부터 위험해질까요?
 
 ## 핵심 개념 잡기
 
 > 상속 계층 구조
 
 ```text
-Animal (부모 클래스)
+Animal (parent class)
 ├── name, sound
 ├── speak()
 ├── __repr__()
 │
-├── Dog (자식 클래스)
-│   └── speak() 오버라이딩
-│   └── fetch() 추가
+├── Dog (child class)
+│   └── speak() overridden
+│   └── fetch() added
 │
-└── Cat (자식 클래스)
-    └── speak() 오버라이딩
-    └── purr() 추가
+└── Cat (child class)
+    └── speak() overridden
+    └── purr() added
 ```
 
 ## 핵심 개념
@@ -62,12 +66,12 @@ Animal (부모 클래스)
 | `super()` | 부모 클래스의 메서드를 호출하는 내장 함수입니다 |
 | MRO(Method Resolution Order) | 다중 상속에서 메서드 탐색 순서입니다 |
 
-## Before / After
+## 전후 비교
 
 도형 클래스의 코드 중복을 제거합니다.
 
 ```python
-# before: 상속 없이 — 중복 코드
+# before: no inheritance — duplicated code
 class Circle:
     def __init__(self, name, color, radius):
         self.name = name
@@ -79,16 +83,16 @@ class Circle:
 
 class Square:
     def __init__(self, name, color, side):
-        self.name = name      # 중복
-        self.color = color    # 중복
+        self.name = name      # duplicated
+        self.color = color    # duplicated
         self.side = side
 
-    def describe(self):       # 중복
+    def describe(self):       # duplicated
         return f"{self.color} {self.name}"
 ```
 
 ```python
-# after: 상속으로 공통 로직 통합
+# after: inheritance consolidates common logic
 class Shape:
     def __init__(self, name: str, color: str) -> None:
         self.name = name
@@ -99,18 +103,18 @@ class Shape:
 
 class Circle(Shape):
     def __init__(self, color: str, radius: float) -> None:
-        super().__init__("원", color)
+        super().__init__("circle", color)
         self.radius = radius
 
 class Square(Shape):
     def __init__(self, color: str, side: float) -> None:
-        super().__init__("사각형", color)
+        super().__init__("square", color)
         self.side = side
 ```
 
 ## 단계별 실습
 
-### Step 1: 기본 상속
+### 1단계: 기본 상속
 
 ```python
 class Animal:
@@ -127,28 +131,28 @@ class Animal:
 
 class Dog(Animal):
     def __init__(self, name: str) -> None:
-        super().__init__(name, "멍멍")
+        super().__init__(name, "woof")
 
     def fetch(self, item: str) -> str:
-        return f"{self.name}이(가) {item}을(를) 가져옵니다"
+        return f"{self.name} fetches the {item}"
 
 
 class Cat(Animal):
     def __init__(self, name: str) -> None:
-        super().__init__(name, "야옹")
+        super().__init__(name, "meow")
 
     def purr(self) -> str:
-        return f"{self.name}이(가) 그르릉거립니다"
+        return f"{self.name} is purring"
 
 
-dog = Dog("바둑이")
-cat = Cat("나비")
-print(dog.speak())   # 바둑이: 멍멍
-print(cat.speak())   # 나비: 야옹
-print(dog.fetch("공"))  # 바둑이이(가) 공을(를) 가져옵니다
+dog = Dog("Buddy")
+cat = Cat("Whiskers")
+print(dog.speak())   # Buddy: woof
+print(cat.speak())   # Whiskers: meow
+print(dog.fetch("ball"))  # Buddy fetches the ball
 ```
 
-### Step 2: 메서드 오버라이딩
+### 2단계: 메서드 오버라이딩
 
 ```python
 class Logger:
@@ -172,11 +176,11 @@ class TimestampLogger(Logger):
 
 
 logger = TimestampLogger()
-logger.log("서버 시작")    # [2026-05-04 12:00:00] 서버 시작
-logger.error("연결 실패")  # [2026-05-04 12:00:00] ERROR: 연결 실패
+logger.log("Server started")    # [2026-05-04 12:00:00] Server started
+logger.error("Connection failed")  # [2026-05-04 12:00:00] ERROR: Connection failed
 ```
 
-### Step 3: super()로 부모 기능 확장
+### 3단계: super()로 부모 기능 확장
 
 ```python
 class Vehicle:
@@ -196,56 +200,56 @@ class ElectricVehicle(Vehicle):
 
     def info(self) -> str:
         base = super().info()
-        return f"{base} (배터리: {self.battery_kwh}kWh)"
+        return f"{base} (Battery: {self.battery_kwh}kWh)"
 
 
 ev = ElectricVehicle("Tesla", "Model 3", 2026, 75.0)
-print(ev.info())  # 2026 Tesla Model 3 (배터리: 75.0kWh)
+print(ev.info())  # 2026 Tesla Model 3 (Battery: 75.0kWh)
 ```
 
-### Step 4: isinstance과 issubclass
+### 4단계: isinstance과 issubclass
 
 ```python
-dog = Dog("바둑이")
-cat = Cat("나비")
+dog = Dog("Buddy")
+cat = Cat("Whiskers")
 
 print(isinstance(dog, Dog))     # True
-print(isinstance(dog, Animal))  # True — Dog은 Animal의 일종
+print(isinstance(dog, Animal))  # True — Dog is a kind of Animal
 print(isinstance(dog, Cat))     # False
 
 print(issubclass(Dog, Animal))  # True
 print(issubclass(Cat, Animal))  # True
 print(issubclass(Dog, Cat))     # False
 
-animals: list[Animal] = [Dog("바둑이"), Cat("나비"), Dog("초코")]
+animals: list[Animal] = [Dog("Buddy"), Cat("Whiskers"), Dog("Max")]
 for animal in animals:
     print(animal.speak())
-# 바둑이: 멍멍
-# 나비: 야옹
-# 초코: 멍멍
+# Buddy: woof
+# Whiskers: meow
+# Max: woof
 ```
 
-### Step 5: 다중 상속과 MRO
+### 5단계: 다중 상속과 MRO
 
 ```python
 class Flyable:
     def fly(self) -> str:
-        return f"{self.name}이(가) 날아갑니다"
+        return f"{self.name} is flying"
 
 class Swimmable:
     def swim(self) -> str:
-        return f"{self.name}이(가) 수영합니다"
+        return f"{self.name} is swimming"
 
 class Duck(Animal, Flyable, Swimmable):
     def __init__(self, name: str) -> None:
-        super().__init__(name, "꽥꽥")
+        super().__init__(name, "quack")
 
-duck = Duck("도날드")
-print(duck.speak())  # 도날드: 꽥꽥
-print(duck.fly())    # 도날드이(가) 날아갑니다
-print(duck.swim())   # 도날드이(가) 수영합니다
+duck = Duck("Donald")
+print(duck.speak())  # Donald: quack
+print(duck.fly())    # Donald is flying
+print(duck.swim())   # Donald is swimming
 
-# MRO 확인
+# Check MRO
 print(Duck.__mro__)
 # (Duck, Animal, Flyable, Swimmable, object)
 ```
@@ -257,7 +261,7 @@ print(Duck.__mro__)
 - `isinstance()`은 상속 계층 전체를 검사하여 다형적 코드를 지원합니다
 - MRO는 C3 선형화 알고리즘으로 결정되며 `__mro__`로 확인합니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -298,12 +302,12 @@ print(Duck.__mro__)
 - [클래스와 인스턴스](./02-classes-and-instances.md)
 - [캡슐화](./03-encapsulation.md)
 - **상속 (현재 글)**
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 다형성 (예정)
+- 추상화 (예정)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

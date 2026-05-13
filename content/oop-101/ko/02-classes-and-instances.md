@@ -1,50 +1,54 @@
 ---
+title: 클래스와 인스턴스
 series: oop-101
 episode: 2
-title: 클래스와 인스턴스
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 클래스
   - 인스턴스
   - 생성자
-seo_description: Python 클래스의 생성자, 인스턴스 메서드, 특수 메서드를 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: Python 클래스의 생성자, 메서드, dunder 메서드 설계를 실무 관점에서 정리합니다.
 ---
 
 # 클래스와 인스턴스
 
-> Object-Oriented Programming 101 시리즈 (2/10)
+객체지향 입문에서 가장 흔한 막힘은 클래스와 인스턴스를 문장으로는 아는데, 설계로는 연결되지 않는 순간입니다. 생성자에 무엇을 넣어야 하는지, 어떤 함수는 인스턴스 메서드여야 하고 어떤 함수는 클래스 메서드나 정적 메서드여야 하는지 감이 잘 오지 않습니다.
 
+실무에서 좋은 클래스는 화려한 문법보다 책임이 분명합니다. 어떤 데이터가 이 객체의 상태인지, 어떤 동작이 이 상태를 바꾸는지, 객체를 출력하거나 비교할 때 Python이 어떤 규약을 기대하는지만 이해해도 클래스 설계의 절반은 정리됩니다.
+
+이 글은 OOP 101 시리즈의 2번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-클래스를 만드는 것 자체는 어렵지 않습니다. 어려운 것은 "어떤 데이터를 속성으로, 어떤 동작을 메서드로 설계할 것인가"입니다. 좋은 클래스 설계는 코드 재사용성과 가독성을 동시에 높입니다.
+> 좋은 클래스는 속성을 많이 담는 그릇이 아니라, 상태와 인터페이스의 경계를 또렷하게 드러내는 단위입니다.
 
-> 좋은 클래스 = 명확한 책임 + 적절한 인터페이스 + 내부 구현 은닉
-
-Python의 특수 메서드(매직 메서드)를 활용하면 클래스를 Python의 내장 문법과 자연스럽게 통합할 수 있습니다. `print()`, `==`, `len()`, `for` 루프 등에서 사용자 정의 객체가 매끄럽게 동작합니다.
+- 생성자(`__init__`)는 어디까지 책임져야 하고, 어디서부터 과해질까요?
+- 인스턴스 메서드, 클래스 메서드, 정적 메서드는 어떤 기준으로 나눠야 할까요?
+- Python의 dunder 메서드는 왜 디버깅과 비교 연산에 중요할까요?
+- 데이터 중심 클래스를 만들 때 `dataclass`와 일반 클래스를 어떻게 판단하면 좋을까요?
 
 ## 핵심 개념 잡기
 
 > 클래스의 구성 요소
 
 ```text
-클래스 (Class)
-├── 클래스 변수 (class variable)
-├── __init__()       → 인스턴스 초기화
-├── 인스턴스 메서드   → self를 첫 인자로
-├── @classmethod     → cls를 첫 인자로
-├── @staticmethod    → self/cls 없음
-└── 특수 메서드       → __repr__, __str__, __eq__, ...
+Class
+├── class variable
+├── __init__()       → instance initialization
+├── instance method  → self as first arg
+├── @classmethod     → cls as first arg
+├── @staticmethod    → no self/cls
+└── dunder methods   → __repr__, __str__, __eq__, ...
 ```
 
 ## 핵심 개념
@@ -57,12 +61,12 @@ Python의 특수 메서드(매직 메서드)를 활용하면 클래스를 Python
 | 정적 메서드(`@staticmethod`) | 인스턴스나 클래스에 의존하지 않는 유틸리티 함수입니다 |
 | 특수 메서드(dunder method) | `__`로 시작하고 끝나는 Python 내장 프로토콜 메서드입니다 |
 
-## Before / After
+## 전후 비교
 
 객체 비교와 출력을 개선합니다.
 
 ```python
-# before: 특수 메서드 없이 — 불편한 출력과 비교
+# before: no dunder methods — unhelpful output and comparison
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -71,11 +75,11 @@ class Point:
 p1 = Point(1, 2)
 p2 = Point(1, 2)
 print(p1)        # <__main__.Point object at 0x...>
-print(p1 == p2)  # False — 같은 좌표인데 다르다고 판단
+print(p1 == p2)  # False — same coordinates but considered different
 ```
 
 ```python
-# after: 특수 메서드 활용 — 직관적인 출력과 비교
+# after: dunder methods — intuitive output and comparison
 class Point:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
@@ -97,15 +101,15 @@ print(p1 == p2)  # True
 
 ## 단계별 실습
 
-### Step 1: 생성자 패턴
+### 1단계: 생성자 패턴
 
 ```python
 class Product:
-    """상품 클래스 — 생성자에서 유효성 검증"""
+    """Product class — validation in the constructor"""
 
     def __init__(self, name: str, price: int, quantity: int = 0) -> None:
         if price < 0:
-            raise ValueError(f"가격은 음수일 수 없습니다: {price}")
+            raise ValueError(f"Price cannot be negative: {price}")
         self.name = name
         self.price = price
         self.quantity = quantity
@@ -116,12 +120,12 @@ class Product:
     def __repr__(self) -> str:
         return f"Product({self.name!r}, {self.price}, {self.quantity})"
 
-p = Product("키보드", 50000, 3)
+p = Product("Keyboard", 50000, 3)
 print(p.total_value())  # 150000
-print(p)                # Product('키보드', 50000, 3)
+print(p)                # Product('Keyboard', 50000, 3)
 ```
 
-### Step 2: 클래스 메서드로 대안 생성자 만들기
+### 2단계: 클래스 메서드로 대안 생성자 만들기
 
 ```python
 class Date:
@@ -132,13 +136,13 @@ class Date:
 
     @classmethod
     def from_string(cls, date_str: str) -> "Date":
-        """'YYYY-MM-DD' 형식 문자열에서 Date 생성"""
+        """Create Date from 'YYYY-MM-DD' string"""
         year, month, day = map(int, date_str.split("-"))
         return cls(year, month, day)
 
     @classmethod
     def today(cls) -> "Date":
-        """오늘 날짜로 Date 생성"""
+        """Create Date from today's date"""
         from datetime import date
         d = date.today()
         return cls(d.year, d.month, d.day)
@@ -152,7 +156,7 @@ print(d1)  # Date(2026, 5, 4)
 print(d2)  # Date(2026, 5, 4)
 ```
 
-### Step 3: 정적 메서드
+### 3단계: 정적 메서드
 
 ```python
 class MathUtils:
@@ -163,7 +167,7 @@ class MathUtils:
     @staticmethod
     def factorial(n: int) -> int:
         if n < 0:
-            raise ValueError("음수의 팩토리얼은 정의되지 않습니다")
+            raise ValueError("Factorial is not defined for negative numbers")
         result = 1
         for i in range(2, n + 1):
             result *= i
@@ -173,7 +177,7 @@ print(MathUtils.is_even(4))     # True
 print(MathUtils.factorial(5))   # 120
 ```
 
-### Step 4: 특수 메서드 활용
+### 4단계: 특수 메서드 활용
 
 ```python
 class Vector:
@@ -200,7 +204,7 @@ print(v1 * 2)     # Vector(6, 8)
 print(abs(v1))    # 5.0
 ```
 
-### Step 5: __slots__로 메모리 최적화
+### 5단계: __slots__로 메모리 최적화
 
 ```python
 class RegularPoint:
@@ -219,8 +223,8 @@ import sys
 
 rp = RegularPoint(1, 2)
 op = OptimizedPoint(1, 2)
-print(sys.getsizeof(rp.__dict__))  # 일반 인스턴스의 __dict__ 크기
-# OptimizedPoint에는 __dict__가 없음 → 메모리 절약
+print(sys.getsizeof(rp.__dict__))  # size of regular instance __dict__
+# OptimizedPoint has no __dict__ → saves memory
 ```
 
 ## 이 코드에서 주목할 점
@@ -230,7 +234,7 @@ print(sys.getsizeof(rp.__dict__))  # 일반 인스턴스의 __dict__ 크기
 - `__eq__`에서 `isinstance` 검사와 `NotImplemented` 반환은 타입 안전한 비교의 관례입니다
 - `__slots__`는 인스턴스가 대량 생성될 때 메모리를 절약합니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -269,14 +273,14 @@ Python 3.7 이후에는 `dataclasses`를 먼저 고려합니다. 보일러플레
 <!-- toc:begin -->
 - [객체지향이란 무엇인가?](./01-what-is-oop.md)
 - **클래스와 인스턴스 (현재 글)**
-- [캡슐화](./03-encapsulation.md)
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 캡슐화 (예정)
+- 상속 (예정)
+- 다형성 (예정)
+- 추상화 (예정)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

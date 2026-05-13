@@ -1,52 +1,56 @@
 ---
+title: 합성과 상속
 series: oop-101
 episode: 7
-title: 합성과 상속
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 합성
   - 상속
   - 설계 패턴
-seo_description: 합성과 상속의 차이를 비교하고 실무에서의 올바른 선택 기준을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: 합성과 상속의 차이, 위임, 의존성 주입까지 실무 선택 기준으로 비교합니다.
 ---
 
 # 합성과 상속
 
-> Object-Oriented Programming 101 시리즈 (7/10)
+객체지향 설계에서 가장 자주 나오는 질문 하나를 꼽으라면 이것입니다. 기존 클래스를 확장할 때 상속을 써야 할까, 아니면 다른 객체를 내부에 두는 합성을 써야 할까. 둘 다 재사용을 돕지만, 변경 비용과 테스트 방식은 크게 달라집니다.
 
+실무에서는 상속보다 합성을 먼저 떠올리는 팀이 많습니다. 부모 클래스의 내부 구조를 알지 않아도 되고, 런타임에 전략을 갈아 끼우거나 의존성을 주입하기 쉽기 때문입니다. 그래도 상속이 더 자연스러운 자리도 분명히 있습니다.
+
+이 글은 OOP 101 시리즈의 7번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-상속은 부모 클래스와 강하게 결합됩니다. 부모의 내부 구현이 바뀌면 자식이 깨질 수 있습니다. 합성은 객체를 "포함"하므로 내부 구현에 의존하지 않고, 런타임에 교체도 가능합니다.
+> 합성과 상속의 차이는 문법보다 결합도에 있습니다. 무엇을 내부에 넣고, 무엇을 타입 계층으로 올릴지에 따라 유지보수성이 달라집니다.
 
-> 상속 = 컴파일 타임 결합, 합성 = 런타임 유연성
-
-잘못된 상속은 코드를 수정할수록 복잡해지는 주요 원인입니다. "이 관계가 정말 is-a인가?"를 항상 자문해야 합니다.
+- is-a 관계와 has-a 관계는 실무 설계에서 어떻게 구분하면 좋을까요?
+- 왜 많은 경우 상속보다 합성이 더 안전한 기본 선택이 될까요?
+- 위임과 의존성 주입은 합성의 장점을 어떻게 극대화할까요?
+- 반대로 어떤 문제는 상속이 더 자연스럽고 설명력이 높을까요?
 
 ## 핵심 개념 잡기
 
 > 상속 vs 합성
 
 ```text
-상속 (is-a)                    합성 (has-a)
+Inheritance (is-a)                Composition (has-a)
 ┌─────────────┐               ┌─────────────┐
-│ 부모 클래스  │               │ Car         │
+│ Parent class │               │ Car         │
 └──────┬──────┘               │  ├─ Engine  │
        │                      │  ├─ Wheel   │
 ┌──────┴──────┐               │  └─ GPS     │
-│ 자식 클래스  │               └─────────────┘
+│ Child class  │               └─────────────┘
 └─────────────┘
-강한 결합                      느슨한 결합
+Tight coupling                 Loose coupling
 ```
 
 ## 핵심 개념
@@ -56,41 +60,41 @@ last_reviewed: '2026-05-11'
 | 합성(composition) | 객체가 다른 객체를 속성으로 포함하는 관계입니다 |
 | 위임(delegation) | 요청을 내부 객체에게 전달하는 패턴입니다 |
 | is-a 관계 | "자식은 부모의 일종이다" — 상속에 적합합니다 |
-| has-a 관계 | "이 객체는 저 객체를 가지고 있다" — 합성에 적합합니다 |
+| has-a 관계 | "이 객체 안에 저 객체가 들어 있다" — 합성에 적합합니다 |
 | 의존성 주입(DI) | 외부에서 의존 객체를 전달하는 합성 패턴입니다 |
 
-## Before / After
+## 전후 비교
 
 로깅 기능 추가를 비교합니다.
 
 ```python
-# before: 상속으로 로깅 추가 — 다중 상속 필요
+# before: logging via inheritance — multiple inheritance needed
 class Logger:
     def log(self, msg: str) -> None:
         print(f"[LOG] {msg}")
 
-class UserService(Logger):  # UserService is-a Logger? 아닙니다
+class UserService(Logger):  # UserService is-a Logger? No.
     def create_user(self, name: str) -> None:
-        self.log(f"사용자 생성: {name}")
+        self.log(f"Creating user: {name}")
 ```
 
 ```python
-# after: 합성으로 로깅 — 자연스러운 has-a 관계
+# after: logging via composition — natural has-a relationship
 class Logger:
     def log(self, msg: str) -> None:
         print(f"[LOG] {msg}")
 
 class UserService:
     def __init__(self, logger: Logger) -> None:
-        self._logger = logger  # has-a 관계
+        self._logger = logger  # has-a relationship
 
     def create_user(self, name: str) -> None:
-        self._logger.log(f"사용자 생성: {name}")
+        self._logger.log(f"Creating user: {name}")
 ```
 
 ## 단계별 실습
 
-### Step 1: 합성 기본 — 자동차 조립
+### 1단계: 합성 기본 — 자동차 조립
 
 ```python
 class Engine:
@@ -100,16 +104,16 @@ class Engine:
 
     def start(self) -> str:
         self.running = True
-        return f"{self.horsepower}마력 엔진 시동"
+        return f"{self.horsepower}hp engine started"
 
     def stop(self) -> str:
         self.running = False
-        return "엔진 정지"
+        return "Engine stopped"
 
 
 class GPS:
     def navigate(self, destination: str) -> str:
-        return f"{destination}까지 경로 안내 시작"
+        return f"Navigating to {destination}"
 
 
 class Car:
@@ -126,31 +130,31 @@ class Car:
 
 
 car = Car(Engine(200), GPS())
-car.drive("서울")
-# 200마력 엔진 시동
-# 서울까지 경로 안내 시작
+car.drive("downtown")
+# 200hp engine started
+# Navigating to downtown
 car.park()
-# 엔진 정지
+# Engine stopped
 ```
 
-### Step 2: 위임 패턴
+### 2단계: 위임 패턴
 
 ```python
 class Printer:
     def print_document(self, content: str) -> None:
-        print(f"인쇄: {content}")
+        print(f"Printing: {content}")
 
 class Scanner:
     def scan(self) -> str:
-        return "스캔 완료"
+        return "Scan complete"
 
 class Fax:
     def send_fax(self, number: str, content: str) -> None:
-        print(f"{number}로 팩스 전송: {content}")
+        print(f"Faxing to {number}: {content}")
 
 
 class MultiFunctionDevice:
-    """합성 + 위임: 각 기능을 내부 객체에 위임"""
+    """Composition + delegation: each function delegated to an internal object"""
 
     def __init__(self) -> None:
         self._printer = Printer()
@@ -168,12 +172,12 @@ class MultiFunctionDevice:
 
 
 mfd = MultiFunctionDevice()
-mfd.print_document("보고서")    # 인쇄: 보고서
-print(mfd.scan())               # 스캔 완료
-mfd.send_fax("02-1234", "계약서")  # 02-1234로 팩스 전송: 계약서
+mfd.print_document("Report")       # Printing: Report
+print(mfd.scan())                   # Scan complete
+mfd.send_fax("02-1234", "Contract")  # Faxing to 02-1234: Contract
 ```
 
-### Step 3: 전략 패턴 — 런타임 교체
+### 3단계: 전략 패턴 — 런타임 교체
 
 ```python
 from typing import Protocol
@@ -213,11 +217,11 @@ data = [5, 3, 8, 1, 9]
 sorter = Sorter(BubbleSort())
 print(sorter.execute(data))  # [1, 3, 5, 8, 9]
 
-sorter.set_strategy(QuickSort())  # 런타임 교체
+sorter.set_strategy(QuickSort())  # runtime replacement
 print(sorter.execute(data))  # [1, 3, 5, 8, 9]
 ```
 
-### Step 4: 의존성 주입
+### 4단계: 의존성 주입
 
 ```python
 from typing import Protocol
@@ -241,7 +245,7 @@ class InMemoryDB:
 
 class UserRepository:
     def __init__(self, db: Database) -> None:
-        self._db = db  # 외부에서 주입
+        self._db = db  # injected from outside
 
     def create(self, user_id: str, name: str) -> None:
         self._db.save({"id": user_id, "name": name})
@@ -252,15 +256,15 @@ class UserRepository:
 
 db = InMemoryDB()
 repo = UserRepository(db)
-repo.create("u1", "김개발")
-print(repo.get("u1"))  # {'id': 'u1', 'name': '김개발'}
+repo.create("u1", "Kim")
+print(repo.get("u1"))  # {'id': 'u1', 'name': 'Kim'}
 ```
 
-### Step 5: 상속이 적절한 경우
+### 5단계: 상속이 적절한 경우
 
 ```python
 class HttpError(Exception):
-    """HTTP 에러 기본 클래스 — 상속이 적절한 is-a 관계"""
+    """HTTP error base class — inheritance is appropriate for is-a relationships"""
 
     def __init__(self, status_code: int, message: str) -> None:
         super().__init__(message)
@@ -268,18 +272,18 @@ class HttpError(Exception):
 
 class NotFoundError(HttpError):
     def __init__(self, resource: str) -> None:
-        super().__init__(404, f"{resource}을(를) 찾을 수 없습니다")
+        super().__init__(404, f"{resource} not found")
 
 class UnauthorizedError(HttpError):
     def __init__(self) -> None:
-        super().__init__(401, "인증이 필요합니다")
+        super().__init__(401, "Authentication required")
 
 
 try:
-    raise NotFoundError("사용자")
+    raise NotFoundError("User")
 except HttpError as e:
     print(f"[{e.status_code}] {e}")
-# [404] 사용자을(를) 찾을 수 없습니다
+# [404] User not found
 ```
 
 ## 이 코드에서 주목할 점
@@ -289,7 +293,7 @@ except HttpError as e:
 - 전략 패턴은 합성의 대표적 활용으로 알고리즘을 런타임에 교체합니다
 - Exception 계층은 is-a 관계가 명확한 상속의 좋은 예입니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -333,9 +337,9 @@ except HttpError as e:
 - [다형성](./05-polymorphism.md)
 - [추상화](./06-abstraction.md)
 - **합성과 상속 (현재 글)**
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

@@ -1,37 +1,41 @@
 ---
+title: 추상화
 series: oop-101
 episode: 6
-title: 추상화
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 추상화
   - ABC
   - 인터페이스
-seo_description: Python ABC를 활용한 추상 클래스 설계와 인터페이스 정의 방법을 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: ABC와 abstractmethod로 공통 인터페이스를 강제하는 Python 추상화 설계를 설명합니다.
 ---
 
 # 추상화
 
-> Object-Oriented Programming 101 시리즈 (6/10)
+팀이 커질수록 같은 역할의 클래스가 조금씩 다른 모양으로 만들어지는 문제가 자주 생깁니다. 파일 저장소는 `read_file()`을 쓰고, 데이터베이스 저장소는 `fetch()`를 쓰고, API 클라이언트는 `load()`를 쓰기 시작하면 호출부는 구현체마다 달라집니다. 그때 필요한 것이 구현보다 먼저 합의된 인터페이스입니다.
 
+추상화는 복잡한 내부를 숨기는 이야기로만 끝나지 않습니다. 실제 설계에서는 어떤 메서드를 반드시 구현해야 하는지, 어떤 공통 동작을 부모가 가져가야 하는지, 어디까지를 팀의 계약으로 강제할지를 정하는 문제에 가깝습니다.
+
+이 글은 OOP 101 시리즈의 6번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-여러 개발자가 각자 다른 데이터 소스(파일, DB, API)에 대한 클래스를 만들 때, 공통 인터페이스를 정의하지 않으면 메서드 이름과 시그니처가 제각각이 됩니다. 추상 클래스는 "이 메서드는 반드시 구현하세요"라는 계약을 컴파일(인스턴스 생성) 시점에 강제합니다.
+> 추상화는 구현을 지우는 작업이 아니라, 여러 구현체가 공유해야 할 최소한의 계약을 선명하게 만드는 작업입니다.
 
-> 추상 클래스 = 인스턴스화 불가 + 하위 클래스에 메서드 구현 강제
-
-Protocol은 "구조적으로 일치하면 OK"인 반면, ABC는 "명시적으로 상속해야 OK"입니다. 팀 규모가 크거나 프레임워크를 만들 때는 ABC의 명시성이 실수를 줄여줍니다.
+- 추상 클래스와 `@abstractmethod`는 어떤 시점에 특히 가치가 커질까요?
+- ABC와 Protocol은 비슷해 보여도 어떤 설계 철학 차이를 가질까요?
+- 템플릿 메서드 패턴은 부모와 자식의 책임을 어떻게 나눌까요?
+- 모든 인터페이스를 추상 클래스로 만들면 왜 오히려 설계가 무거워질 수 있을까요?
 
 ## 핵심 개념 잡기
 
@@ -39,17 +43,17 @@ Protocol은 "구조적으로 일치하면 OK"인 반면, ABC는 "명시적으로
 
 ```text
 ABC (Abstract Base Class)
-├── @abstractmethod read()     → 반드시 구현
-├── @abstractmethod write()    → 반드시 구현
-├── close()                    → 공통 구현 (선택적 오버라이딩)
+├── @abstractmethod read()     -> must implement
+├── @abstractmethod write()    -> must implement
+├── close()                    -> shared implementation (optional override)
 │
 ├── FileStorage(ABC)
-│   ├── read()  ✅ 구현
-│   └── write() ✅ 구현
+│   ├── read()  implemented
+│   └── write() implemented
 │
 └── MemoryStorage(ABC)
-    ├── read()  ✅ 구현
-    └── write() ✅ 구현
+    ├── read()  implemented
+    └── write() implemented
 ```
 
 ## 핵심 개념
@@ -62,23 +66,23 @@ ABC (Abstract Base Class)
 | 구체 클래스(concrete class) | 모든 추상 메서드를 구현하여 인스턴스화 가능한 클래스입니다 |
 | 템플릿 메서드 패턴 | 알고리즘 골격을 정의하고 세부 단계를 하위 클래스에 위임합니다 |
 
-## Before / After
+## 전후 비교
 
 데이터 소스 인터페이스를 비교합니다.
 
 ```python
-# before: 인터페이스 강제 없음 — 메서드 이름 불일치 위험
+# before: no interface enforcement — method name mismatch risk
 class FileStorage:
     def read_file(self, path):
         pass
 
 class DbStorage:
-    def fetch_data(self, query):  # 메서드 이름이 다름
+    def fetch_data(self, query):  # different method name
         pass
 ```
 
 ```python
-# after: ABC로 인터페이스 강제
+# after: ABC enforces the interface
 from abc import ABC, abstractmethod
 
 class Storage(ABC):
@@ -90,15 +94,15 @@ class Storage(ABC):
 
 class FileStorage(Storage):
     def read(self, key: str) -> str:
-        return f"파일에서 {key} 읽기"
+        return f"Reading {key} from file"
 
     def write(self, key: str, data: str) -> None:
-        print(f"파일에 {key} 저장: {data}")
+        print(f"Writing {key} to file: {data}")
 ```
 
 ## 단계별 실습
 
-### Step 1: 기본 추상 클래스
+### 1단계: 기본 추상 클래스
 
 ```python
 from abc import ABC, abstractmethod
@@ -110,29 +114,29 @@ class Animal(ABC):
 
     @abstractmethod
     def speak(self) -> str:
-        """동물의 울음소리를 반환합니다"""
+        """Return the animal's sound"""
         ...
 
     def describe(self) -> str:
-        """공통 구현 — 오버라이딩 선택"""
+        """Shared implementation — optional override"""
         return f"{self.name}: {self.speak()}"
 
 
 class Dog(Animal):
     def speak(self) -> str:
-        return "멍멍"
+        return "woof"
 
 class Cat(Animal):
     def speak(self) -> str:
-        return "야옹"
+        return "meow"
 
-dog = Dog("바둑이")
-print(dog.describe())  # 바둑이: 멍멍
+dog = Dog("Buddy")
+print(dog.describe())  # Buddy: woof
 
-# animal = Animal("동물")  # TypeError: Can't instantiate abstract class
+# animal = Animal("animal")  # TypeError: Can't instantiate abstract class
 ```
 
-### Step 2: 추상 프로퍼티
+### 2단계: 추상 프로퍼티
 
 ```python
 from abc import ABC, abstractmethod
@@ -148,13 +152,13 @@ class Vehicle(ABC):
     def max_speed(self) -> int: ...
 
     def specs(self) -> str:
-        return f"연료: {self.fuel_type}, 최대 속도: {self.max_speed}km/h"
+        return f"Fuel: {self.fuel_type}, Max speed: {self.max_speed}km/h"
 
 
 class ElectricCar(Vehicle):
     @property
     def fuel_type(self) -> str:
-        return "전기"
+        return "electric"
 
     @property
     def max_speed(self) -> int:
@@ -164,7 +168,7 @@ class ElectricCar(Vehicle):
 class GasCar(Vehicle):
     @property
     def fuel_type(self) -> str:
-        return "가솔린"
+        return "gasoline"
 
     @property
     def max_speed(self) -> int:
@@ -173,18 +177,18 @@ class GasCar(Vehicle):
 
 ev = ElectricCar()
 gas = GasCar()
-print(ev.specs())   # 연료: 전기, 최대 속도: 250km/h
-print(gas.specs())  # 연료: 가솔린, 최대 속도: 220km/h
+print(ev.specs())   # Fuel: electric, Max speed: 250km/h
+print(gas.specs())  # Fuel: gasoline, Max speed: 220km/h
 ```
 
-### Step 3: 템플릿 메서드 패턴
+### 3단계: 템플릿 메서드 패턴
 
 ```python
 from abc import ABC, abstractmethod
 
 
 class DataPipeline(ABC):
-    """데이터 처리 파이프라인 — 골격은 고정, 단계는 하위 클래스가 구현"""
+    """Data processing pipeline — skeleton fixed, steps delegated to subclasses"""
 
     def run(self) -> list[str]:
         raw = self.extract()
@@ -211,18 +215,18 @@ class CsvPipeline(DataPipeline):
 
     def load(self, data: list[str]) -> None:
         for row in data:
-            print(f"저장: {row}")
+            print(f"Saving: {row}")
 
 
 pipeline = CsvPipeline()
 result = pipeline.run()
-# 저장: Alice,30
-# 저장: Bob,25
-# 저장: Charlie,35
+# Saving: Alice,30
+# Saving: Bob,25
+# Saving: Charlie,35
 print(result)  # ['Alice,30', 'Bob,25', 'Charlie,35']
 ```
 
-### Step 4: ABC의 register()
+### 4단계: ABC의 register()
 
 ```python
 from abc import ABC, abstractmethod
@@ -234,26 +238,26 @@ class Drawable(ABC):
 
 
 class ThirdPartyWidget:
-    """외부 라이브러리 클래스 — 수정 불가"""
+    """External library class — cannot modify"""
     def draw(self) -> str:
-        return "위젯 렌더링"
+        return "Widget rendered"
 
 
 Drawable.register(ThirdPartyWidget)
 
 widget = ThirdPartyWidget()
 print(isinstance(widget, Drawable))  # True
-print(widget.draw())                 # 위젯 렌더링
+print(widget.draw())                 # Widget rendered
 ```
 
-### Step 5: ABC vs Protocol 선택
+### 5단계: ABC vs Protocol 선택
 
 ```python
 from abc import ABC, abstractmethod
 from typing import Protocol
 
 
-# ABC: 명시적 상속 필요 — 프레임워크, 팀 규약에 적합
+# ABC: explicit inheritance required — good for frameworks, team contracts
 class Serializer(ABC):
     @abstractmethod
     def serialize(self, data: dict) -> str: ...
@@ -264,11 +268,11 @@ class JsonSerializer(Serializer):
         return json.dumps(data)
 
 
-# Protocol: 상속 불필요 — 라이브러리 간 호환에 적합
+# Protocol: no inheritance needed — good for cross-library compatibility
 class SerializerProto(Protocol):
     def serialize(self, data: dict) -> str: ...
 
-class YamlSerializer:  # Protocol을 상속하지 않음
+class YamlSerializer:  # does not inherit Protocol
     def serialize(self, data: dict) -> str:
         return "\n".join(f"{k}: {v}" for k, v in data.items())
 
@@ -287,7 +291,7 @@ save(YamlSerializer(), {"name": "Kim"})  # name: Kim
 - `register()`로 기존 클래스를 수정하지 않고 ABC에 등록할 수 있습니다
 - ABC는 명시적 계약, Protocol은 구조적 호환 — 상황에 따라 선택합니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -330,10 +334,10 @@ Python 생태계에서는 ABC와 Protocol을 상황에 따라 혼용합니다. �
 - [상속](./04-inheritance.md)
 - [다형성](./05-polymorphism.md)
 - **추상화 (현재 글)**
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료

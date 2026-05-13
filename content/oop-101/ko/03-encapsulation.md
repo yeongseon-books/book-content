@@ -1,49 +1,53 @@
 ---
+title: 캡슐화
 series: oop-101
 episode: 3
-title: 캡슐화
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Python
   - OOP
   - 캡슐화
   - Property
   - 정보 은닉
-seo_description: Python에서 캡슐화를 구현하는 방법과 property를 활용한 접근 제어를 다룹니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: Python에서 캡슐화와 property를 활용해 안전한 객체 인터페이스를 만드는 법을 설명합니다.
 ---
 
 # 캡슐화
 
-> Object-Oriented Programming 101 시리즈 (3/10)
+객체가 외부에서 아무 제약 없이 내부 상태를 바꿀 수 있게 열려 있으면, 버그는 대개 늦게 발견됩니다. 더 곤란한 점은 원인을 좁히기 어렵다는 데 있습니다. 어디선가 값을 잘못 넣었는데도, 그 시점에는 시스템이 조용히 지나가다가 훨씬 뒤에서야 이상한 상태가 드러나기 때문입니다.
 
+캡슐화는 값을 숨기기 위한 장식이 아니라 상태를 지키기 위한 계약입니다. Python은 Java처럼 강한 접근 제한 키워드를 두지 않지만, 밑줄 관례와 `property`만 제대로 써도 실무에서 충분히 강한 경계를 만들 수 있습니다.
+
+이 글은 OOP 101 시리즈의 3번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-외부 코드가 객체의 내부 데이터를 자유롭게 변경할 수 있으면, 객체가 잘못된 상태에 빠져도 원인을 찾기 어렵습니다. 캡슐화는 "이 데이터는 이 메서드를 통해서만 변경하세요"라는 계약을 만들어 버그를 줄입니다.
+> 캡슐화의 목적은 외부 접근을 무조건 막는 데 있지 않습니다. 객체가 유효한 상태를 스스로 지키게 만드는 데 있습니다.
 
-> 캡슐화 = 내부 구현 숨기기 + 안전한 인터페이스 제공
-
-Python은 Java처럼 `private` 키워드가 없습니다. 대신 밑줄(`_`) 관례와 `property` 데코레이터를 사용합니다. 이 관례를 이해하면 Python 생태계의 코드를 자연스럽게 읽을 수 있습니다.
+- Python에서 public, `_protected`, `__private` 관례는 각각 어떻게 받아들이면 될까요?
+- `property`는 단순 getter/setter 문법을 넘어 어떤 설계 이점을 줄까요?
+- 유효성 검증을 속성 접근에 녹이면 객체 상태 관리가 왜 쉬워질까요?
+- 캡슐화를 과하게 적용하면 오히려 복잡해지는 경우는 언제일까요?
 
 ## 핵심 개념 잡기
 
 > Python의 접근 제어 관례
 
 ```text
-이름 규칙                접근 수준
+Naming Pattern           Access Level
 ─────────────────────────────────────
-name                    public — 누구나 접근 가능
-_name                   protected — 내부/하위 클래스용 (관례)
-__name                  private — 이름 맹글링 적용 (_Class__name)
-__name__                특수 메서드 — Python 내부 프로토콜
+name                    public — accessible by anyone
+_name                   protected — internal / subclass use (convention)
+__name                  private — name mangling applied (_Class__name)
+__name__                dunder — Python internal protocol
 ```
 
 ## 핵심 개념
@@ -56,22 +60,22 @@ __name__                특수 메서드 — Python 내부 프로토콜
 | 이름 맹글링(name mangling) | `__`로 시작하는 이름을 `_클래스명__이름`으로 변환합니다 |
 | getter/setter | 속성 값을 읽거나 설정할 때 호출되는 메서드입니다 |
 
-## Before / After
+## 전후 비교
 
 계좌 잔액 관리를 비교합니다.
 
 ```python
-# before: 직접 접근 — 잘못된 상태 가능
+# before: direct access — invalid state possible
 class BankAccount:
     def __init__(self, balance):
         self.balance = balance
 
 account = BankAccount(1000)
-account.balance = -500  # 음수 잔액 허용 — 버그
+account.balance = -500  # negative balance allowed — bug
 ```
 
 ```python
-# after: property로 보호 — 유효성 검증 보장
+# after: property protection — validation guaranteed
 class BankAccount:
     def __init__(self, balance: int) -> None:
         self._balance = balance  # protected
@@ -82,43 +86,43 @@ class BankAccount:
 
     def deposit(self, amount: int) -> None:
         if amount <= 0:
-            raise ValueError("입금액은 양수여야 합니다")
+            raise ValueError("Deposit amount must be positive")
         self._balance += amount
 
     def withdraw(self, amount: int) -> None:
         if amount > self._balance:
-            raise ValueError("잔액이 부족합니다")
+            raise ValueError("Insufficient balance")
         self._balance -= amount
 
 account = BankAccount(1000)
 account.deposit(500)    # 1500
 account.withdraw(200)   # 1300
-# account.balance = -500  # AttributeError — setter 미정의
+# account.balance = -500  # AttributeError — no setter defined
 ```
 
 ## 단계별 실습
 
-### Step 1: 밑줄 관례 이해
+### 1단계: 밑줄 관례 이해
 
 ```python
 class Employee:
     def __init__(self, name: str, salary: int) -> None:
         self.name = name           # public
-        self._department = "미배정"  # protected (관례)
-        self.__salary = salary      # private (이름 맹글링)
+        self._department = "Unassigned"  # protected (convention)
+        self.__salary = salary      # private (name mangling)
 
     def get_salary(self) -> int:
         return self.__salary
 
-emp = Employee("김개발", 5000)
-print(emp.name)            # 김개발
-print(emp._department)     # 미배정 (접근 가능하지만 관례상 외부 사용 자제)
+emp = Employee("Kim", 5000)
+print(emp.name)            # Kim
+print(emp._department)     # Unassigned (accessible but discouraged)
 # print(emp.__salary)      # AttributeError
-print(emp._Employee__salary)  # 5000 — 맹글링된 이름으로 접근 가능 (비권장)
+print(emp._Employee__salary)  # 5000 — mangled name access (not recommended)
 print(emp.get_salary())    # 5000
 ```
 
-### Step 2: property 기본
+### 2단계: property 기본
 
 ```python
 class Circle:
@@ -132,12 +136,12 @@ class Circle:
     @radius.setter
     def radius(self, value: float) -> None:
         if value <= 0:
-            raise ValueError(f"반지름은 양수여야 합니다: {value}")
+            raise ValueError(f"Radius must be positive: {value}")
         self._radius = value
 
     @property
     def area(self) -> float:
-        """읽기 전용 계산 속성"""
+        """Read-only computed property"""
         import math
         return math.pi * self._radius ** 2
 
@@ -149,15 +153,15 @@ c.radius = 10
 print(c.area)     # 314.159...
 
 # c.radius = -1   # ValueError
-# c.area = 100    # AttributeError — setter 없음
+# c.area = 100    # AttributeError — no setter
 ```
 
-### Step 3: 연쇄 유효성 검증
+### 3단계: 연쇄 유효성 검증
 
 ```python
 class User:
     def __init__(self, name: str, age: int, email: str) -> None:
-        self.name = name    # setter를 통해 검증
+        self.name = name    # triggers setter validation
         self.age = age
         self.email = email
 
@@ -168,7 +172,7 @@ class User:
     @name.setter
     def name(self, value: str) -> None:
         if not value.strip():
-            raise ValueError("이름은 비어있을 수 없습니다")
+            raise ValueError("Name cannot be empty")
         self._name = value.strip()
 
     @property
@@ -178,7 +182,7 @@ class User:
     @age.setter
     def age(self, value: int) -> None:
         if not 0 <= value <= 150:
-            raise ValueError(f"나이가 올바르지 않습니다: {value}")
+            raise ValueError(f"Invalid age: {value}")
         self._age = value
 
     @property
@@ -188,16 +192,16 @@ class User:
     @email.setter
     def email(self, value: str) -> None:
         if "@" not in value:
-            raise ValueError(f"올바른 이메일이 아닙니다: {value}")
+            raise ValueError(f"Invalid email: {value}")
         self._email = value
 
-user = User("홍길동", 30, "hong@example.com")
-print(user.name)   # 홍길동
+user = User("Alice", 30, "alice@example.com")
+print(user.name)   # Alice
 user.age = 31      # OK
 # user.age = -1    # ValueError
 ```
 
-### Step 4: 읽기 전용 속성
+### 4단계: 읽기 전용 속성
 
 ```python
 class ImmutablePoint:
@@ -218,14 +222,14 @@ class ImmutablePoint:
 
 p = ImmutablePoint(3, 4)
 print(p.x, p.y)  # 3 4
-# p.x = 10       # AttributeError — 읽기 전용
+# p.x = 10       # AttributeError — read-only
 ```
 
-### Step 5: 캡슐화와 인터페이스 분리
+### 5단계: 캡슐화와 인터페이스 분리
 
 ```python
 class TemperatureSensor:
-    """센서 내부 구현을 숨기고 변환된 값만 제공"""
+    """Hides internal implementation and exposes only converted values"""
 
     def __init__(self) -> None:
         self._raw_readings: list[float] = []
@@ -253,7 +257,7 @@ sensor.add_reading(25.0)
 sensor.add_reading(22.5)
 print(f"{sensor.average_celsius:.1f}°C")     # 22.5°C
 print(f"{sensor.average_fahrenheit:.1f}°F")   # 72.5°F
-print(f"측정 횟수: {sensor.reading_count}")    # 측정 횟수: 3
+print(f"Readings: {sensor.reading_count}")     # Readings: 3
 ```
 
 ## 이 코드에서 주목할 점
@@ -263,7 +267,7 @@ print(f"측정 횟수: {sensor.reading_count}")    # 측정 횟수: 3
 - 읽기 전용 속성은 setter를 정의하지 않으면 됩니다
 - 이름 맹글링(`__`)은 실수 방지용이지 보안 수단이 아닙니다
 
-## 흔한 실수 5가지
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
 |------|------------|----------|
@@ -303,13 +307,13 @@ Python에서 캡슐화는 "강제"가 아니라 "계약"입니다. 밑줄 관례
 - [객체지향이란 무엇인가?](./01-what-is-oop.md)
 - [클래스와 인스턴스](./02-classes-and-instances.md)
 - **캡슐화 (현재 글)**
-- [상속](./04-inheritance.md)
-- [다형성](./05-polymorphism.md)
-- [추상화](./06-abstraction.md)
-- [합성과 상속](./07-composition-vs-inheritance.md)
-- [SOLID 원칙 기초](./08-solid-principles.md)
-- [객체지향 설계 예제](./09-oop-design-example.md)
-- [객체지향을 언제 피해야 할까?](./10-when-to-avoid-oop.md)
+- 상속 (예정)
+- 다형성 (예정)
+- 추상화 (예정)
+- 합성과 상속 (예정)
+- SOLID 원칙 기초 (예정)
+- 객체지향 설계 예제 (예정)
+- 객체지향을 언제 피해야 할까? (예정)
 <!-- toc:end -->
 
 ## 참고 자료
