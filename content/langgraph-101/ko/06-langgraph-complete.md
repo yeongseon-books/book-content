@@ -19,13 +19,13 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 ---
 
 # LangGraph 완성
-시리즈를 여기까지 따라오면 질문이 바뀝니다. 노드와 엣지를 그릴 수 있는가, 체크포인트를 붙일 수 있는가, 도구를 호출할 수 있는가를 각각 묻는 단계는 지났습니다. 이제 더 중요한 질문은 이것입니다. 이 조각들을 한 그래프 안에 합쳤을 때도 여전히 설명 가능하고, 복구 가능하고, 운영 가능한가입니다.
+이 글은 LangGraph 101 시리즈의 마지막 글입니다. 시리즈를 여기까지 따라오면 질문이 바뀝니다. 노드와 엣지를 그릴 수 있는가, 체크포인트를 붙일 수 있는가, 도구를 호출할 수 있는가를 각각 묻는 단계는 이미 지났습니다. 이제 더 중요한 질문은 이것입니다. 이 조각들을 한 그래프 안에 합쳤을 때도 여전히 설명 가능하고, 복구 가능하고, 운영 가능한가입니다.
 
-현업에서 완성형 에이전트가 무너지는 장면은 대개 비슷합니다. 단순 질문도 불필요하게 tool loop로 보내서 지연과 비용이 커지고, checkpoint는 붙어 있는데 route 판단 근거가 흐려서 재개 뒤 동작이 읽히지 않고, supervisor 비슷한 분기 로직이 실제 답변 생성까지 끌어안으면서 구조가 다시 거대한 단일 프롬프트로 돌아갑니다. 겉으로는 기능을 다 붙인 것처럼 보여도, 안쪽에서는 책임 분리가 사라진 상태입니다.
+현업에서 “완성형” 에이전트가 무너지는 장면은 대개 비슷합니다. 단순한 질문도 불필요하게 tool loop로 보내서 지연과 비용이 커지고, checkpoint는 붙어 있는데 route 판단 근거가 흐려서 재개 뒤 동작을 설명하기 어려워지며, supervisor 비슷한 분기 로직이 실제 답변 생성까지 끌어안으면서 구조가 다시 거대한 단일 프롬프트로 돌아갑니다. 겉으로는 기능을 다 붙인 것처럼 보여도, 안쪽에서는 책임 분리가 사라진 상태입니다.
 
-이 글은 LangGraph 101 시리즈의 마지막 글입니다.
+그래서 이 장은 기능을 하나 더 추가하는 글이 아닙니다. 앞선 글에서 본 개념들을 하나의 운영 골격으로 묶는 글입니다. 체크포인트는 문맥을 이어 붙이고, supervisor는 직접 답할지 도구 경로로 보낼지 결정하며, tool loop는 전체 그래프를 오염시키지 않고 필요한 요청에서만 열립니다. 이 조합이 잡혀야 비로소 튜토리얼 밖에서도 써 볼 만한 구조가 됩니다.
 
-여기서는 routing, tool execution, checkpoint를 하나의 예제 안에 결합해 보겠습니다. 핵심은 기능을 많이 붙이는 데 있지 않습니다. **직접 답변 경로와 도구 경로를 분리하고, 그 전체 대화를 같은 상태 타임라인 위에 저장하는 구조**를 어떻게 읽어야 하는지가 더 중요합니다. 저는 완성형 LangGraph를 볼 때 어떤 요청이 굳이 도구로 가는지, tool loop가 어디서 끝나는지, 다음 턴이 시작될 때 이전 판단과 결과가 어떤 상태로 되살아나는지를 먼저 봅니다. 이 세 가지가 선명하면 그래프는 커져도 읽힙니다.
+여기서는 **직접 답변 경로와 도구 경로를 분리하고, 그 전체 대화를 같은 상태 타임라인 위에 저장하는 구조**를 읽어 보겠습니다. 완성형 LangGraph를 볼 때 먼저 확인할 것은 세 가지입니다. 어떤 요청이 굳이 도구로 가는지, tool loop가 어디서 끝나는지, 그리고 다음 턴이 시작될 때 이전 판단과 결과가 어떤 상태로 되살아나는지입니다. 이 세 가지가 선명하면 그래프는 커져도 읽힙니다.
 
 ## 이 글에서 다룰 문제
 - routing, tool calling, checkpoint를 한 그래프 안에서 어떻게 결합할 수 있을까요?
@@ -35,7 +35,7 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 - 체크포인트가 붙어 있어도 route 설계가 약하면 어떤 종류의 혼선이 반복될까요?
 - “이제 production-ready한 골격이다”라고 말하기 전에 최소한 무엇을 검증해야 할까요?
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.ko.png)
+![이 글에서 답할 질문](../../../assets/langgraph-101/06/06-01-questions-this-post-answers.en.png)
 *이 글에서 답할 질문*
 
 ## 왜 이 글이 중요한가
@@ -57,7 +57,7 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 ## 최소 실행 예제
 이제 시리즈에서 다룬 요소를 하나로 묶어 보겠습니다. 예제는 두 경로를 모두 보여 줍니다. 첫 번째 턴에서는 LangGraph 개념 질문에 직접 답하고, 두 번째 턴에서는 계산 요청을 tool loop로 보냅니다. 그리고 두 턴 모두 같은 `thread_id` 아래에서 저장해, 마지막에 checkpoint 상태를 확인합니다.
 
-![supervisor와 tool loop가 결합된 통합 그래프](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
+![supervisor와 tool loop가 결합된 통합 그래프](../../../assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
 *supervisor와 tool loop가 결합된 통합 그래프*
 
 ```python
@@ -229,7 +229,7 @@ if __name__ == "__main__":
 예제 코드: [github.com/yeongseon-books/langgraph-101](https://github.com/yeongseon-books/langgraph-101/tree/main/en/06-langgraph-complete)
 
 ## 이 코드에서 먼저 봐야 할 점
-![checkpoint와 route 상태 구조](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.ko.png)
+![checkpoint와 route 상태 구조](../../../assets/langgraph-101/06/06-02-what-to-notice-in-this-code.en.png)
 *checkpoint와 route 상태 구조*
 
 - supervisor는 최신 질문만 보고 `direct_answer`와 `tool_agent`를 분리합니다.
@@ -243,7 +243,7 @@ if __name__ == "__main__":
 ## 어디서 자주 헷갈릴까요?
 완성형 예제에서 가장 흔한 오해는 “이제 기능이 다 들어갔으니 거의 끝났다”는 기대입니다. 실제로는 이 단계부터 안티패턴도 더 선명하게 드러납니다. direct path, tool path, checkpoint 중 하나라도 경계가 약하면 나머지 둘이 멀쩡해 보여도 전체 시스템은 금방 흔들립니다.
 
-![human review interrupt가 포함된 검증 경로](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.ko.png)
+![human review interrupt가 포함된 검증 경로](../../../assets/langgraph-101/06/06-03-where-engineers-get-confused.en.png)
 *human review interrupt가 포함된 검증 경로*
 
 - 모든 요청을 tool loop로 보내면 agent는 필요 이상으로 느리고 비싸집니다.
@@ -273,7 +273,7 @@ if __name__ == "__main__":
 현업에서 저는 여기서 평가 경계를 분리합니다. tool 호출 성공률, route 정확도, 최종 답변 품질은 서로 다른 지표입니다. calculator가 정상 동작해도 route가 잘못되면 쓸데없는 계산이 늘고, route가 좋아도 checkpoint가 약하면 다음 턴 품질이 흔들립니다. 완성형 그래프를 잘 운영하는 팀은 모델 하나의 품질보다 경로별 책임과 지표를 먼저 나눕니다.
 
 ## 정리: LangGraph 완성은 기능 나열이 아니라, 상태·분기·도구·체크포인트를 하나의 운영 모델로 묶는 일이다
-![턴 전반의 production 에이전트 흐름](../../../assets/langgraph-101/06/06-04-summary.ko.png)
+![턴 전반의 production 에이전트 흐름](../../../assets/langgraph-101/06/06-04-summary.en.png)
 *턴 전반의 production 에이전트 흐름*
 
 마지막 글에서 가져가야 할 핵심은 분명합니다. 완성형 LangGraph는 거대한 만능 프롬프트가 아닙니다. supervisor 성격의 route 판단이 direct path와 tool path를 나누고, 필요한 경우에만 `ToolNode` 루프가 열리며, 그 전체 대화가 checkpoint를 통해 같은 세션 타임라인에 저장되는 구조입니다.
