@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 1
 title: 분산 시스템이란 무엇인가?
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,22 +17,32 @@ tags:
   - Latency
   - Failure
   - Coordination
-seo_description: 여러 컴퓨터가 하나처럼 동작하기 위해 필요한 latency, failure, coordination의 세 축을 처음부터 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: 분산 시스템을 지연, 장애, 조정이라는 세 축으로 처음부터 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 분산 시스템이란 무엇인가?
 
-> Distributed Systems 101 시리즈 (1/10)
-
+이 글은 Distributed Systems 101 시리즈의 첫 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-요즘은 거의 모든 서비스가 사실상 분산 시스템입니다. 데이터베이스 한 대도 replica를 두면 분산 시스템이고, 마이크로서비스 두 개만 있어도 분산 시스템입니다. 단일 머신의 직관(즉시 응답, 항상 성공, 같은 시계)으로 짜면 production에서 반드시 깨집니다.
+- 분산 시스템은 정확히 무엇이며 단일 머신 프로그램과 무엇이 다를까요?
+- 지연, 장애, 조정이라는 세 축은 왜 분산 시스템의 기본 언어일까요?
+- 분산 컴퓨팅의 8가지 허상은 왜 지금도 반복될까요?
+- 전형적인 분산 시스템 토폴로지는 어떻게 생겼을까요?
+- 이 시리즈 전체는 어떤 그림으로 이어질까요?
 
-> 단일 머신 프로그램의 가정이 깨지는 지점이 곧 분산 시스템의 본질입니다.
+> 분산 시스템은 단순히 컴퓨터가 여러 대인 상태가 아닙니다. 지연, 장애, 조정이라는 세 가지 차이가 단일 머신에서 통하던 직관을 근본부터 꺾는 환경입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+오늘 만드는 거의 모든 서비스는 사실상 분산 시스템입니다. 복제본이 하나라도 붙은 데이터베이스는 이미 분산 시스템이고, 두 개의 마이크로서비스가 서로 통신하는 순간도 분산 시스템입니다. 즉시 응답한다, 항상 성공한다, 시계는 하나다 같은 단일 머신의 직관으로 작성한 코드는 실제 트래픽을 만나면 곧바로 흔들립니다.
+
+> 분산 시스템은 단일 머신 프로그램의 가정이 깨지는 정확한 지점에서 시작됩니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     A["client"] --> B["service A"]
@@ -43,70 +53,77 @@ flowchart LR
     B -.->|network failure| C
 ```
 
-화살표 하나하나가 latency, failure, partial 응답의 가능성을 가집니다. 단일 함수 호출과 본질적으로 다릅니다.
+이 그림의 화살표 하나하나는 지연과 부분 장애, 그리고 응답 불확실성을 품고 있습니다. 이것이 단일 함수 호출과 본질적으로 다른 점입니다.
 
-## Before/After
+## 핵심 용어
+
+- **분산 시스템**: 독립적으로 동작하는 여러 노드가 메시지 전달을 통해 협력하는 시스템입니다.
+- 지연: 메시지가 상대편에 도달하는 데 걸리는 시간입니다.
+- 장애: 노드, 네트워크, 디스크가 일부 또는 전체로 멈추는 현상입니다.
+- 조정: 여러 노드가 하나의 결정을 함께 맞추는 과정입니다.
+- **부분 장애**: 어떤 노드는 살아 있고 어떤 노드는 죽어 있는 상태입니다. 분산 환경의 대표적인 조건입니다.
+
+## Before / After
 
 **Before — 단일 머신 직관**
 
 ```text
-함수 호출은 즉시 끝난다 / 항상 성공한다 / 시계는 하나다
+calls finish instantly / always succeed / there is one clock
 ```
 
 **After — 분산 환경**
 
 ```text
-호출은 ms~s 걸릴 수 있다 / 일부만 실패할 수 있다 / 노드마다 시계가 다르다
+calls take ms to s / can fail in part / each node has its own clock
 ```
 
-이 단순한 차이가 retry, timeout, consensus 같은 이 시리즈의 모든 주제를 만들어 냅니다.
+이 단순한 전환이 이 시리즈의 거의 모든 주제를 만듭니다. 재시도, 타임아웃, 합의는 모두 여기서 출발합니다.
 
-## 단일 vs 분산의 체감 차이
+## 실습: 차이를 몸으로 느껴 보기
 
-### 1단계 — 단일 프로세스 함수 호출
+### 1단계 — 로컬 함수 호출
 
 ```python
-# 예제 파일: 1_local.py
+# 1_local.py
 def add(a, b):
     return a + b
 
-print(add(1, 2))  # 3, 즉시
+print(add(1, 2))  # 3, instantly
 ```
 
-호출은 마이크로초 단위입니다. 실패할 일도 없습니다.
+이 호출은 마이크로초 수준에서 끝납니다. 실패를 따로 걱정할 이유도 없습니다.
 
-### 2단계 — 같은 머신, 다른 프로세스 (HTTP)
+### 2단계 — 같은 머신의 다른 프로세스 호출(HTTP)
 
 ```python
-# 예제 파일: 2_local_http.py
-# 필요 패키지 설치: pip install fastapi uvicorn requests
-# 서버
+# 2_local_http.py
+# pip install fastapi uvicorn requests
 from fastapi import FastAPI
 app = FastAPI()
 @app.get("/add")
 def add(a: int, b: int): return {"r": a + b}
-# 실행: uvicorn 2_local_http:app --port 8001
+# run: uvicorn 2_local_http:app --port 8001
 ```
 
 ```python
-# 예제 파일: 2_client.py
+# 2_client.py
 import requests
 print(requests.get("http://127.0.0.1:8001/add", params={"a":1,"b":2}, timeout=1).json())
 ```
 
-같은 머신인데도 latency가 ms 단위로 늘어납니다. 첫 분산화 비용입니다.
+같은 머신 안인데도 지연은 밀리초 단위로 뛰어오릅니다. 이것이 첫 번째 분리의 비용입니다.
 
 ### 3단계 — 서버를 죽여 보기
 
 ```bash
-# 서버를 ctrl+c로 종료한 뒤
+# after killing the server with ctrl+c
 python3 2_client.py
-# 발생 예외: requests.exceptions.ConnectionError
+# requests.exceptions.ConnectionError
 ```
 
-호출자 코드는 서버 상태를 모릅니다. 단일 머신에서 본 적 없는 종류의 에러입니다.
+호출자는 서버의 실제 상태를 알지 못합니다. 이런 종류의 오류는 단일 머신 함수 호출에서는 나타나지 않았습니다.
 
-### 4단계 — 응답이 늦으면?
+### 4단계 — 응답이 느리면 어떻게 될까요?
 
 ```python
 # 4_slow.py
@@ -118,53 +135,67 @@ def slow():
 
 ```python
 requests.get("http://127.0.0.1:8001/slow", timeout=1)
-# 발생 예외: requests.exceptions.ReadTimeout
+# requests.exceptions.ReadTimeout
 ```
 
-timeout 없이 호출하면 5초간 막힙니다. 분산에서는 timeout이 선택이 아니라 의무입니다.
+타임아웃이 없으면 호출은 5초 동안 그대로 붙잡힙니다. 분산 시스템에서 타임아웃은 옵션이 아니라 기본 장치입니다.
 
-### 5단계 — 두 노드 사이 시계 차이
+### 5단계 — 노드 간 시계 어긋남
 
 ```python
-# 예제 파일: 5_clock.py
+# 5_clock.py
 import time
 print("server time:", time.time())
-# 다른 머신에서도 같은 코드를 실행하면
-# 두 값이 정확히 같지는 않다 (NTP가 있어도 ms 단위 차이)
+# run the same code on another machine and the two values
+# will not match exactly even with NTP (millisecond-level drift)
 ```
 
-"누가 먼저였는가"를 wall clock으로 결정하면 안 됩니다. 6편의 consensus, 8편의 message ordering이 이 문제를 다룹니다.
+실제 순서를 벽시계 시간으로 결정하면 안 됩니다. 6편의 합의와 8편의 메시지 순서 이야기가 이 문제를 직접 다룹니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 같은 함수 호출도 네트워크를 끼면 종류가 다른 에러가 생깁니다.
-- timeout, retry, idempotency는 단일 머신에는 없던 개념입니다.
-- 시계는 절대로 정확히 일치하지 않습니다.
-- "성공/실패" 외에 "모름"이 새 상태로 등장합니다.
+- 네트워크가 끼는 순간 같은 호출도 전혀 다른 종류의 오류를 갖게 됩니다.
+- 타임아웃, 재시도, 멱등성은 단일 머신에서는 거의 의식하지 않던 개념입니다.
+- 시계는 정확히 일치하지 않습니다.
+- 성공과 실패 사이에 모름이라는 상태가 새로 생깁니다.
 
 ## 자주 하는 실수 5가지
 
-1. **timeout 없이 호출한다.** 응답이 영원히 안 올 수 있습니다.
-2. **retry만으로 멱등성을 가정한다.** 두 번 처리되면 중복 결제가 됩니다.
-3. **wall clock으로 순서를 정한다.** 노드마다 시계가 다릅니다.
-4. **partial failure를 무시한다.** 일부 노드만 죽은 상태가 흔합니다.
-5. **단일 머신 latency로 capacity 계산을 한다.** 네트워크 latency가 뼈대를 결정합니다.
+1. **타임아웃 없이 호출합니다.** 응답이 영원히 오지 않을 수 있습니다.
+2. **멱등성 없이 재시도합니다.** 대표적인 결과가 중복 결제입니다.
+3. **벽시계 시간으로 순서를 정합니다.** 노드마다 보는 시간이 다릅니다.
+4. **부분 장애를 무시합니다.** 실제 운영에서 가장 흔한 상태입니다.
+5. **단일 머신 지연으로 용량을 계산합니다.** 네트워크 지연이 전체 예산을 지배합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-웹 서비스의 backend는 사실상 모두 분산 시스템입니다. RDBMS도 replica + failover가 있으면 분산이고, Redis cluster, Kafka, Cassandra는 명백히 분산입니다. Cloud의 AZ 단위 redundancy, multi-region 구성, CDN 모두 분산 시스템 설계입니다.
+현실의 거의 모든 웹 백엔드는 분산 시스템입니다. 복제와 장애 조치를 갖춘 관계형 데이터베이스도 그렇고, Redis Cluster, Kafka, Cassandra는 더 말할 것도 없습니다. 클라우드의 AZ 이중화, 멀티 리전 배치, CDN도 모두 분산 시스템 설계의 일부입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 단일 머신의 직관을 의도적으로 의심합니다.
+- 타임아웃, 재시도, 멱등성을 첫 줄부터 설계합니다.
+- 시스템 모델 안에 모름 상태를 반드시 넣습니다.
+- 벽시계는 표시용으로만 보고, 단조 증가 시계를 더 신뢰합니다.
+- 굳이 분산이 필요 없는 상황에서는 단일 머신으로 끝내는 선택도 합니다.
 
 ## 체크리스트
 
-- [ ] 분산 시스템의 정의를 한 줄로 말할 수 있는가?
-- [ ] latency, failure, coordination 세 축을 설명할 수 있는가?
-- [ ] partial failure가 단일 머신과 어떻게 다른지 답할 수 있는가?
-- [ ] timeout이 왜 의무인지 설명할 수 있는가?
-- [ ] wall clock과 monotonic clock의 차이를 아는가?
+- [ ] 분산 시스템을 한 문장으로 정의할 수 있는가?
+- [ ] 지연, 장애, 조정이라는 세 축을 설명할 수 있는가?
+- [ ] 부분 장애가 단일 머신의 장애와 어떻게 다른지 말할 수 있는가?
+- [ ] 왜 타임아웃이 필수인지 설명할 수 있는가?
+- [ ] 벽시계와 단조 증가 시계의 차이를 알고 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-분산 시스템은 latency, failure, coordination 세 축에서 단일 머신과 본질적으로 다릅니다. 다음 글에서는 그 중 failure를 모델링하는 법(crash, omission, byzantine)을 다룹니다.
+1. 외부 API를 타임아웃 없이 호출하는 코드를 하나 찾아 타임아웃을 추가해 보세요.
+2. 재시도해도 안전한 연산과 위험한 연산을 각각 두 가지씩 적어 보세요.
+3. 같은 메시지를 두 번 처리해도 결과가 같아지도록 멱등성 키 설계를 해 보세요.
+
+## 정리와 다음 글
+
+분산 시스템은 지연, 장애, 조정이라는 세 축에서 단일 머신 프로그램과 본질적으로 다릅니다. 다음 글에서는 그중 장애를 더 정밀하게 다루기 위해 crash, omission, Byzantine 같은 장애 모델을 살펴봅니다.
 
 <!-- toc:begin -->
 - **분산 시스템이란 무엇인가? (현재 글)**

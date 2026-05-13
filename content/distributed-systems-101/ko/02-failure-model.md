@@ -1,8 +1,8 @@
 ---
 series: distributed-systems-101
 episode: 2
-title: failure model
-status: content-ready
+title: 장애 모델
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,145 +17,175 @@ tags:
   - Crash
   - Byzantine
   - Reliability
-seo_description: 분산 시스템에서 노드와 네트워크가 깨지는 방식을 crash, omission, byzantine 모델로 분류해 봅니다.
-last_reviewed: '2026-05-11'
+seo_description: 장애 모델을 crash, omission, timing, Byzantine으로 구분해 봅니다.
+last_reviewed: '2026-05-12'
 ---
 
-# failure model
+# 장애 모델
 
-> Distributed Systems 101 시리즈 (2/10)
-
+이 글은 Distributed Systems 101 시리즈의 두 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-알고리즘이 "노드가 어떻게 망가지느냐"를 가정하지 않으면 정확성도 비용도 알 수 없습니다. Raft, Paxos, BFT 알고리즘이 다른 이유는 가정한 failure model이 다르기 때문입니다. 이 단어를 모르면 논문이나 docs를 읽을 수 없습니다.
+- 장애 모델이란 무엇이며 왜 장애를 모델링해야 할까요?
+- crash, omission, timing, Byzantine은 어떻게 다를까요?
+- 네트워크 파티션은 왜 별도 범주로 봐야 할까요?
+- 타임아웃 기반 장애 감지는 왜 근사치일 뿐일까요?
+- 실제 시스템은 어떤 장애 모델을 전제로 설계될까요?
 
-> failure model은 알고리즘과 시스템의 가격표입니다.
+> 분산 시스템 설계는 어떤 장애를 가정하는지부터 시작합니다. crash, omission, Byzantine은 그 가정을 문서에 적어 넣기 위한 표준 어휘입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+알고리즘이 노드가 어떤 방식으로 망가지는지를 명시하지 않으면 정확성도 비용도 말할 수 없습니다. Raft, Paxos, BFT 계열 알고리즘이 서로 다른 이유는 각자가 전제하는 장애 모델이 다르기 때문입니다. 이 어휘를 모르면 논문도 문서도 절반밖에 읽히지 않습니다.
+
+> 장애 모델은 알고리즘의 가격표입니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     A["fail-stop / crash"] --> B["omission"]
     B --> C["timing"]
     C --> D["byzantine"]
-    A -.->|약한 가정| D
+    A -.->|weaker assumption| D
 ```
 
-오른쪽으로 갈수록 더 험한 세상을 가정합니다. 더 험할수록 알고리즘이 비싸지고 노드 수가 더 필요합니다.
+오른쪽으로 갈수록 더 험한 세계를 가정합니다. 세계가 험해질수록 알고리즘은 더 비싸지고 더 많은 노드를 요구합니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — "그냥 죽었다고 가정"**
+- **Crash (fail-stop)**: 노드가 멈추면 그대로 멈춘 상태로 남는 모델입니다.
+- **Omission**: 노드가 가끔 메시지를 빠뜨리거나 누락하는 모델입니다.
+- **Timing**: 노드의 응답이 임의로 매우 느려질 수 있는 모델입니다.
+- **Byzantine**: 노드가 거짓말하거나 임의의 행동을 할 수 있는 모델입니다.
+- **Network partition**: 노드 자체가 아니라 노드 사이 링크가 끊기는 상태입니다.
+
+## Before / After
+
+**Before — 그냥 죽었다고만 가정**
 
 ```text
-모든 failure가 동일하다고 보면 알고리즘이 과도하게 비싸진다
+treating every failure the same forces algorithms to over-pay
 ```
 
-**After — 명시적 failure model**
+**After — 장애 모델을 명시적으로 선택**
 
 ```text
-crash만 가정 → Raft / Paxos
-byzantine 가정 → BFT (수십 배 비쌈)
+crash only -> Raft / Paxos
+byzantine  -> BFT (an order of magnitude more expensive)
 ```
 
-가정이 다르면 비용도 다릅니다.
+가정이 달라지면 비용도 달라집니다.
 
-## 각 failure 모사하기
+## 실습: 장애를 각각 흉내 내 보기
 
-### 1단계 — crash 모사
+### 1단계 — crash 시뮬레이션
 
 ```python
-# 예제 파일: 1_crash.py
+# 1_crash.py
 import os, sys
 def handler():
     print("doing work")
-    os._exit(1)  # 깔끔히 죽음
+    os._exit(1)  # cleanly dies
 handler()
 ```
 
-이 모델에서 다른 노드는 "죽었으면 영원히 죽었다"고 가정합니다. failure detector가 단순합니다.
+이 모델에서는 다른 노드가 한 번 죽은 노드는 계속 죽어 있다고 가정합니다. 따라서 장애 감지기가 비교적 단순합니다.
 
-### 2단계 — omission 모사
+### 2단계 — omission 시뮬레이션
 
 ```python
-# 예제 파일: 2_omission.py
+# 2_omission.py
 import random
 def send(msg):
     if random.random() < 0.1:
-        return  # 10% 확률로 메시지 drop
+        return  # drop with 10% probability
     transport.send(msg)
 ```
 
-이때부터 retry, sequence number, acknowledgement가 필요해집니다.
+이 시점부터는 재시도, 시퀀스 번호, 확인 응답이 필요해집니다.
 
-### 3단계 — timing(slow) 모사
+### 3단계 — timing(느림) 시뮬레이션
 
 ```python
 # 3_slow.py
 import time, random
 def handle(req):
     if random.random() < 0.05:
-        time.sleep(10)  # 5% 확률 매우 느림
+        time.sleep(10)  # 5% chance of being very slow
     return process(req)
 ```
 
-"느린 노드"와 "죽은 노드"는 외부에서 구분하기 어렵습니다. 이게 timeout 기반 failure detector의 한계입니다.
+밖에서 보기에는 느린 노드와 죽은 노드가 거의 똑같아 보입니다. 이것이 타임아웃 기반 장애 감지의 근본적인 한계입니다.
 
-### 4단계 — byzantine 모사
+### 4단계 — Byzantine 동작 시뮬레이션
 
 ```python
-# 예제 파일: 4_byzantine.py
+# 4_byzantine.py
 def vote(question):
-    # 노드가 거짓말을 한다
     real_answer = compute(question)
     return not real_answer if is_malicious() else real_answer
 ```
 
-이 모델에선 다수결도 충분치 않고, 동일 메시지에 서명을 붙이거나 (3f+1) 노드를 둬야 합니다.
+이 모델에서는 단순 다수결만으로는 충분하지 않습니다. 서명된 메시지나 3f+1 같은 더 비싼 구조가 필요합니다.
 
-### 5단계 — network partition 모사
+### 5단계 — 네트워크 파티션 시뮬레이션
 
 ```bash
-# 예제 파일: 5_partition.sh (linux)
-# 두 IP 사이 트래픽을 막아 partition을 만든다
+# 5_partition.sh (linux)
 sudo iptables -A INPUT -s 10.0.0.5 -j DROP
 sudo iptables -A OUTPUT -d 10.0.0.5 -j DROP
-# 복구
+# restore
 sudo iptables -F
 ```
 
-partition은 "노드는 살아 있는데 서로 못 본다"는 특수한 상태입니다. 4편에서 CAP 트레이드오프가 여기서 등장합니다.
+파티션은 노드는 살아 있지만 서로를 볼 수 없는 상태입니다. 4편의 CAP는 바로 이 상황을 중심으로 전개됩니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- 같은 "에러"라도 종류가 다르고 대응이 다릅니다.
-- omission/timing은 timeout으로만 구분 가능합니다 (정확하지 않음).
-- byzantine은 비용이 한 자리수 더 커집니다.
-- partition은 노드 단위가 아니라 링크 단위 사고입니다.
+- 같은 장애처럼 보여도 실제로는 종류와 대응 방식이 다릅니다.
+- omission과 timing은 타임아웃을 통해서만 구분할 수 있고, 그마저도 정확하지 않습니다.
+- Byzantine 모델은 비용을 한 단계가 아니라 한 자릿수 이상 끌어올립니다.
+- 파티션은 노드 레벨이 아니라 링크 레벨에서 일어나는 사건입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 failure를 crash로 가정한다.** 네트워크가 partial로 깨질 때 알고리즘이 잘못 수렴합니다.
-2. **timeout을 너무 짧게 잡는다.** 살아있는 노드를 죽었다고 오판합니다 (false suspicion).
-3. **byzantine 모델을 모든 곳에 쓴다.** 비용이 폭발합니다.
-4. **partition을 무시한다.** 클라우드에서 일상적인 사건입니다.
-5. **failure detector의 정확성을 가정한다.** 100% 정확한 detector는 비동기 모델에선 불가능합니다.
+1. **모든 장애를 crash로만 가정합니다.** 네트워크가 부분적으로 끊기면 알고리즘이 잘못 수렴할 수 있습니다.
+2. **타임아웃을 너무 짧게 잡습니다.** 살아 있는 노드를 죽었다고 오판합니다.
+3. **모든 곳에 Byzantine 모델을 들이댑니다.** 비용이 급격히 커집니다.
+4. **파티션을 무시합니다.** 클라우드 환경에서는 일상적으로 일어나는 사건입니다.
+5. **완벽한 장애 감지기를 기대합니다.** 비동기 모델에서는 완벽한 감지기가 불가능합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-대부분의 인터넷 서비스는 crash + partition을 가정합니다 (CFT). 금융, 블록체인은 byzantine까지 가정합니다 (BFT, PBFT, Tendermint). Kubernetes, Spanner, Cassandra의 알고리즘 선택을 보면 모두 어떤 failure model을 가정했는지를 명시합니다.
+대부분의 인터넷 서비스는 crash와 partition을 중심에 둔 CFT 모델을 전제로 합니다. 금융이나 블록체인 계열은 Byzantine까지 고려하는 BFT 계열을 선택합니다. Kubernetes, Spanner, Cassandra 같은 시스템의 설계 문서를 보면 어떤 장애 모델을 겨냥했는지가 분명히 적혀 있습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 필요한 수준을 넘는 강한 가정을 피하고, 충분히 약한 가정의 알고리즘을 고릅니다.
+- 장애 감지기는 언제나 근사치라는 사실을 전제로 둡니다.
+- 파티션을 예외가 아니라 상수처럼 다룹니다.
+- 타임아웃 값은 네트워크 측정값을 기준으로 정합니다.
+- 장애 모델이 명시되지 않은 문서나 제품 설명은 곧바로 경계합니다.
 
 ## 체크리스트
 
 - [ ] crash와 omission의 차이를 한 줄로 말할 수 있는가?
-- [ ] byzantine이 왜 비용이 더 큰지 설명할 수 있는가?
-- [ ] network partition이 노드 failure와 어떻게 다른지 답할 수 있는가?
-- [ ] timeout 기반 detector가 왜 부정확한지 아는가?
-- [ ] 우리 시스템이 어떤 model을 가정하는지 답할 수 있는가?
+- [ ] Byzantine이 왜 더 비싼지 설명할 수 있는가?
+- [ ] 파티션이 노드 장애와 어떻게 다른지 말할 수 있는가?
+- [ ] 타임아웃 기반 감지가 왜 불완전한지 알고 있는가?
+- [ ] 우리 시스템이 어떤 장애 모델을 가정하는지 답할 수 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-failure model은 알고리즘 선택과 운영 비용을 결정하는 첫 결정입니다. 다음 글에서는 이 위에서 노드들이 메시지를 주고받는 방식 — RPC와 message passing — 을 다룹니다.
+1. 여러분의 서비스가 crash, omission, Byzantine 중 무엇을 전제로 하는지 적어 보세요.
+2. 타임아웃 값을 정하기 위해 반드시 측정해야 할 지표 두 가지를 적어 보세요.
+3. 파티션이 발생했을 때 split-brain을 막는 메커니즘 하나를 조사해 보세요.
+
+## 정리와 다음 글
+
+장애 모델은 가장 먼저 내려야 하는 설계 결정입니다. 이 결정이 알고리즘과 운영 비용을 함께 정합니다. 다음 글에서는 이런 장애 모델 위에서 노드들이 실제로 어떻게 통신하는지, 즉 RPC와 메시지 전달을 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)
@@ -172,7 +202,7 @@ failure model은 알고리즘 선택과 운영 비용을 결정하는 첫 결정
 
 ## 참고 자료
 
-- [Failure model — Wikipedia](https://en.wikipedia.org/wiki/Failure_semantics)
+- [Failure semantics (Wikipedia)](https://en.wikipedia.org/wiki/Failure_semantics)
 - [Byzantine fault (Wikipedia)](https://en.wikipedia.org/wiki/Byzantine_fault)
 - [Network partition (Wikipedia)](https://en.wikipedia.org/wiki/Network_partition)
 - [Designing Data-Intensive Applications — chapter 8](https://dataintensive.net/)

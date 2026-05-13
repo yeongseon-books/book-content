@@ -1,8 +1,8 @@
 ---
 series: distributed-systems-101
 episode: 3
-title: RPC와 message passing
-status: content-ready
+title: RPC와 메시지 전달
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,22 +17,32 @@ tags:
   - Messaging
   - Async
   - Idempotency
-seo_description: 노드 간 통신의 두 모델인 RPC와 message passing의 차이, 장단점, 사용 시점을 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: RPC와 메시지 전달의 차이와 선택 기준을 구조적으로 비교합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# RPC와 message passing
+# RPC와 메시지 전달
 
-> Distributed Systems 101 시리즈 (3/10)
-
+이 글은 Distributed Systems 101 시리즈의 세 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-서비스를 쪼개기로 결정하면, 다음 결정은 "어떻게 통신할까?"입니다. 이 결정이 latency 예산, 장애 격리, 운영 복잡도를 좌우합니다. 잘못 고르면 RPC 사슬이 길어져 한 노드가 죽으면 전 시스템이 멈추거나, 메시지가 어디 있는지 추적할 수 없는 시스템이 됩니다.
+- RPC와 메시지 전달은 각각 무엇이며 어떻게 다를까요?
+- 동기와 비동기, 요청-응답과 발행-구독은 어디서 갈릴까요?
+- 두 모델은 각각 어떤 장단점이 있고 어디에 어울릴까요?
+- 함수 호출처럼 보이는 RPC가 실제로는 무엇을 숨기고 있을까요?
+- 두 모델을 함께 섞어 쓸 때 어떤 패턴이 필요할까요?
+
+> RPC는 동기 함수 호출의 직관을 따르고, 메시지 전달은 비동기 우편함의 직관을 따릅니다. 이 한 가지 직관 차이가 지연, 결합도, 회복력의 큰 차이를 만듭니다.
+
+## 왜 중요한가
+
+서비스를 분리한 뒤 가장 먼저 내려야 하는 결정 중 하나는 어떻게 통신할 것인가입니다. 이 선택이 지연 예산, 장애 전파 범위, 운영 복잡도를 함께 결정합니다. 잘못 고르면 한 노드의 지연이 전체 RPC 체인을 잡아끌고, 반대로 추적 불가능한 메시지 흐름이 생길 수도 있습니다.
 
 > 통신 모델은 시스템의 결합도를 결정합니다.
 
-## 전체 흐름
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     subgraph RPC[RPC]
@@ -45,51 +55,59 @@ flowchart LR
     end
 ```
 
-RPC는 양방향 약속, message passing은 중간 저장소를 두는 단방향 흐름입니다.
+RPC는 양방향 계약이고, 메시지 전달은 중간 저장소를 둔 단방향 흐름입니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — 모든 통신이 RPC**
+- **RPC (Remote Procedure Call)**: 원격 함수를 로컬 함수처럼 호출하는 방식입니다. gRPC, JSON-RPC가 대표적입니다.
+- **Message passing**: 생산자가 브로커에 메시지를 넣고 소비자가 나중에 가져가는 방식입니다. Kafka, RabbitMQ가 대표적입니다.
+- **Synchronous**: 응답이 올 때까지 기다립니다.
+- **Asynchronous**: 응답을 기다리지 않고 다음 작업으로 넘어갑니다.
+- **At-least-once / exactly-once**: 브로커가 제공하려는 전달 보장 수준입니다.
+
+## Before / After
+
+**Before — 모든 호출을 RPC로 설계**
 
 ```text
-service A → B → C → D 사슬에서 D가 느려지면 A의 응답이 늦어짐
+service A -> B -> C -> D: if D slows down, A's response slows
 ```
 
-**After — 중요한 결합은 message passing**
+**After — 중요한 경계는 메시지로 분리**
 
 ```text
-A는 메시지만 던지고 끝, 처리는 비동기로 D가 따라감
+A drops a message and returns; D processes asynchronously
 ```
 
-장애 격리와 latency 예산이 좋아집니다.
+이 전환으로 장애 전파 범위를 줄이고 사용자 응답 예산을 더 촘촘히 관리할 수 있습니다.
 
-## 두 모델을 한 화면에서
+## 실습: 두 모델을 한 화면에 놓고 보기
 
-### 1단계 — RPC (FastAPI)
+### 1단계 — RPC(FastAPI)
 
 ```python
-# 예제 파일: 1_rpc_server.py
+# 1_rpc_server.py
 from fastapi import FastAPI
 app = FastAPI()
 @app.post("/charge")
 def charge(amount: int):
-    # 동기적으로 결제 처리
+    # process payment synchronously
     return {"ok": True, "id": "txn_1"}
 ```
 
 ```python
-# 예제 파일: 1_rpc_client.py
+# 1_rpc_client.py
 import requests
 r = requests.post("http://127.0.0.1:8000/charge", json={"amount": 100}, timeout=2)
 print(r.json())
 ```
 
-응답이 와야 다음 줄로 갑니다. 함수 호출과 거의 같습니다.
+응답이 도착해야 다음 줄이 실행됩니다. 실제로는 거의 함수 호출과 같은 감각입니다.
 
-### 2단계 — Message passing (간단한 in-memory queue)
+### 2단계 — 메시지 전달(메모리 큐)
 
 ```python
-# 예제 파일: 2_queue.py
+# 2_queue.py
 from queue import Queue
 import threading, time
 
@@ -106,78 +124,92 @@ q.put({"amount": 100, "id": "txn_1"})
 print("producer returned immediately")
 ```
 
-producer는 즉시 끝나고, 처리는 consumer가 자기 속도로 합니다.
+생산자는 즉시 반환되고, 소비자는 자기 속도로 큐를 비웁니다.
 
-### 3단계 — RPC chain의 위험
+### 3단계 — RPC 체인의 위험
 
 ```python
-# 3_chain.py (의사코드)
+# 3_chain.py (pseudocode)
 def order():
     inv = rpc_inventory()    # 100ms
     pay = rpc_payment()      # 200ms
     ship = rpc_shipping()    # 150ms
-    return ok                # 합 450ms + retry/timeout
+    return ok                # total 450ms plus retry/timeout
 ```
 
-각 단계가 살아 있어야만 응답이 옵니다. 하나라도 늦으면 전체가 늦습니다.
+모든 단계가 살아 있어야 응답 하나가 돌아옵니다. 한 노드가 느려지면 전체 호출이 함께 느려집니다.
 
-### 4단계 — async + queue로 분리
+### 4단계 — 비동기와 큐로 분리
 
 ```python
-# 4_async.py (의사코드)
+# 4_async.py (pseudocode)
 def order():
     save_order_local()
     publish("order.created", payload)
-    return "accepted"  # 즉시 응답
-# 별도 worker가 inventory/payment/shipping 처리
+    return "accepted"  # respond immediately
+# separate workers handle inventory/payment/shipping
 ```
 
-응답이 빨라지고, 한 단계가 늦어도 사용자는 영향을 안 받습니다.
+사용자는 빠른 응답을 받고, 느린 하위 단계는 뒤에서 처리됩니다.
 
-### 5단계 — 전달 보장
+### 5단계 — 전달 보장과 중복 처리
 
 ```python
-# 예제 파일: 5_dedup.py
+# 5_dedup.py
 seen = set()
 def consume(msg):
     if msg["id"] in seen:
-        return  # idempotent: 중복 무시
+        return  # idempotent: ignore duplicates
     seen.add(msg["id"])
     process(msg)
 ```
 
-대부분의 broker는 at-least-once입니다. consumer 쪽에서 idempotency key로 중복을 흡수해야 합니다.
+대부분의 브로커는 at-least-once를 전제로 하므로, 소비자는 멱등성 키로 중복을 흡수해야 합니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- RPC는 응답을 기다리는 만큼 결합이 강합니다.
-- message passing은 "지금 받지 않아도 되는 일"에 잘 맞습니다.
-- chain이 깊을수록 RPC는 위험해집니다.
-- exactly-once는 거의 항상 거짓말이며 idempotent consumer가 정답입니다.
+- RPC는 기다림 자체가 강한 결합을 만듭니다.
+- 메시지 전달은 지금 당장 끝낼 필요가 없는 작업에 잘 맞습니다.
+- 체인이 깊어질수록 RPC의 위험은 커집니다.
+- exactly-once는 거의 항상 허상이고, 현실적인 답은 멱등적 소비자입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **모든 호출을 RPC로 만든다.** chain이 길어져 latency와 장애가 폭발합니다.
-2. **모든 호출을 queue로 만든다.** 사용자 응답이 필요한 일까지 비동기로 만들면 UX가 망가집니다.
-3. **exactly-once를 믿는다.** broker 보장 + idempotent consumer 조합이 현실입니다.
-4. **idempotency key를 안 쓴다.** 재전송 한 번에 중복 결제가 됩니다.
-5. **timeout/retry를 client에만 둔다.** broker 쪽 DLQ(dead letter queue)도 설계해야 합니다.
+1. **모든 것을 RPC로 만듭니다.** 체인이 길어지며 지연과 장애 면적이 폭발합니다.
+2. **모든 것을 큐 기반으로 만듭니다.** 즉시 응답이 필요한 사용자 경로가 불편해집니다.
+3. **exactly-once를 그대로 믿습니다.** 현실은 브로커 보장과 멱등성 소비자의 조합입니다.
+4. **멱등성 키를 생략합니다.** 재시도 한 번이 중복 결제로 이어질 수 있습니다.
+5. **타임아웃과 재시도를 클라이언트에만 둡니다.** 브로커 쪽 DLQ와 재시도 정책도 함께 필요합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-사용자 경로(즉시 응답 필요)는 RPC, 긴 작업(메일 발송, 영수증 처리, 분석)은 queue로 보냅니다. Microservices에서는 같은 회사 안에서도 모듈 사이를 RPC로, 도메인 경계 사이는 message로 나누는 패턴이 흔합니다. event sourcing/CQRS는 이 message 모델을 끝까지 밀어붙인 형태입니다.
+즉시 응답이 필요한 사용자 경로는 RPC를 사용하고, 메일 발송이나 분석처럼 오래 걸리는 작업은 큐로 넘깁니다. 많은 마이크로서비스 아키텍처는 내부 모듈 간 호출은 RPC로, 도메인 경계는 메시지로 나눕니다. Event sourcing과 CQRS는 이 메시지 모델을 끝까지 밀어붙인 설계라고 볼 수 있습니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 정말 동기 응답이 필요한지부터 먼저 묻습니다.
+- RPC 체인의 깊이를 제한합니다.
+- 첫 커밋부터 멱등성 키를 설계에 넣습니다.
+- 브로커는 기본적으로 at-least-once라고 가정합니다.
+- DLQ와 재시도 정책을 운영 책임의 일부로 봅니다.
 
 ## 체크리스트
 
-- [ ] RPC와 message passing의 차이를 한 줄로 설명할 수 있는가?
-- [ ] chain이 깊은 RPC가 왜 위험한지 답할 수 있는가?
-- [ ] at-least-once와 exactly-once의 의미를 아는가?
-- [ ] idempotency key를 설계해 본 적 있는가?
-- [ ] DLQ가 무엇이고 언제 쓰는지 답할 수 있는가?
+- [ ] RPC와 메시지 전달의 차이를 한 줄로 설명할 수 있는가?
+- [ ] 깊은 RPC 체인이 왜 위험한지 설명할 수 있는가?
+- [ ] at-least-once와 exactly-once의 의미를 알고 있는가?
+- [ ] 멱등성 키를 설계해 본 적이 있는가?
+- [ ] DLQ가 무엇이며 언제 쓰는지 말할 수 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-RPC와 message passing은 동기/비동기, 결합도, 회복력의 트레이드오프를 결정하는 두 모델입니다. 다음 글에서는 데이터를 여러 노드에 나눌 때 마주치는 가장 큰 트레이드오프 — consistency와 CAP — 를 다룹니다.
+1. 현재 서비스에서 RPC를 메시지로 바꿀 만한 호출 하나를 찾아 이유를 설명해 보세요.
+2. 멱등성 키를 사용하는 결제 API를 한 단락으로 설계해 보세요.
+3. at-least-once 전달에서 안전한 소비자가 갖춰야 할 조건 세 가지를 적어 보세요.
+
+## 정리와 다음 글
+
+RPC와 메시지 전달은 동기와 비동기, 결합도와 회복력을 서로 다르게 교환하는 두 모델입니다. 다음 글에서는 데이터가 여러 노드에 놓이는 순간 바로 등장하는 가장 큰 트레이드오프, 일관성과 CAP를 다룹니다.
 
 <!-- toc:begin -->
 - [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)
@@ -197,6 +229,6 @@ RPC와 message passing은 동기/비동기, 결합도, 회복력의 트레이드
 - [Remote procedure call (Wikipedia)](https://en.wikipedia.org/wiki/Remote_procedure_call)
 - [Message passing (Wikipedia)](https://en.wikipedia.org/wiki/Message_passing)
 - [gRPC documentation](https://grpc.io/docs/)
-- [Apache Kafka — documentation](https://kafka.apache.org/documentation/)
+- [Apache Kafka documentation](https://kafka.apache.org/documentation/)
 
 Tags: Computer Science, Distributed Systems, RPC, Messaging, Async, Idempotency

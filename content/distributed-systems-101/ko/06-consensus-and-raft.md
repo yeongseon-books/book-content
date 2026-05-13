@@ -1,8 +1,8 @@
 ---
 series: distributed-systems-101
 episode: 6
-title: consensus와 Raft
-status: content-ready
+title: 합의와 Raft
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,22 +17,32 @@ tags:
   - Raft
   - Paxos
   - Replication
-seo_description: 분산 노드들이 같은 값에 동의하는 consensus 문제와 Raft 알고리즘의 핵심을 한 화면에 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: 합의 문제와 Raft의 term, log, commit 구조를 코드로 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# consensus와 Raft
+# 합의와 Raft
 
-> Distributed Systems 101 시리즈 (6/10)
-
+이 글은 Distributed Systems 101 시리즈의 여섯 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-etcd, ZooKeeper, Consul, CockroachDB의 핵심에는 모두 consensus 알고리즘이 있습니다. Kubernetes의 control plane도 etcd 위에 서 있습니다. consensus를 이해하면 "왜 이 시스템이 이렇게 동작하는가"의 절반은 풀립니다.
+- 합의 문제란 무엇이며 어떤 안전성과 진행성 속성을 가질까요?
+- Raft의 세 역할인 leader, follower, candidate는 어떻게 나뉠까요?
+- term, log, index, commit은 각각 무엇을 뜻할까요?
+- 왜 다수결, 즉 quorum이 꼭 필요할까요?
+- Paxos와 Raft는 한 줄로 어떻게 비교할 수 있을까요?
 
-> consensus는 분산 시스템에서 동의의 값입니다.
+> 합의는 분산 시스템에서 가장 어려운 문제이고, Raft는 그 해답을 사람 눈에 읽히게 만든 알고리즘입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+합의 알고리즘은 etcd, ZooKeeper, Consul, CockroachDB 같은 시스템의 중심에 놓여 있습니다. Kubernetes control plane도 etcd 위에 서 있습니다. 합의를 이해하면 왜 시스템이 이런 식으로 동작하는지에 대한 질문 절반은 자연스럽게 풀립니다.
+
+> 합의는 분산 시스템에서 동의가 갖는 가치입니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     F1["follower"] --> L["leader"]
@@ -43,30 +53,38 @@ flowchart LR
     L -->|append entries| F3
 ```
 
-leader 한 명이 log를 받고 follower에게 복제합니다. 다수가 받은 entry만 commit으로 인정됩니다.
+하나의 leader가 로그를 받고 follower에게 복제합니다. 다수에게 도달한 엔트리만 commit으로 인정됩니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — leader가 혼자 결정**
+- **Consensus**: N개의 노드가 하나의 값에 동의하는 문제입니다.
+- **Term**: 단조 증가하는 epoch입니다. 새 리더가 뽑히면 새 term이 시작됩니다.
+- **Log**: index로 식별되는 엔트리들의 순서 있는 목록입니다.
+- **Commit**: 다수가 받은 엔트리가 더 이상 사라지지 않는 약속 상태입니다.
+- **Quorum**: 보통 2f+1 중 f+1, 즉 다수를 뜻합니다.
+
+## Before / After
+
+**Before — 리더 혼자 결정**
 
 ```text
-빠르지만 leader가 거짓이면 일관성 깨짐
+fast, but consistency breaks if the leader lies
 ```
 
-**After — majority의 동의**
+**After — 다수의 동의로 결정**
 
 ```text
-조금 느리지만 한 노드가 죽거나 거짓말해도 안전
+slightly slower, but safe even if a node dies or lies
 ```
 
-majority가 분산 시스템의 안전 장치입니다.
+다수결은 분산 시스템의 핵심 안전장치입니다.
 
-## Raft의 핵심을 짧은 코드로
+## 실습: 짧은 코드로 보는 Raft의 핵심
 
 ### 1단계 — 상태 정의
 
 ```python
-# 예제 파일: 1_state.py
+# 1_state.py
 from dataclasses import dataclass, field
 @dataclass
 class Node:
@@ -77,12 +95,12 @@ class Node:
     voted_for: int | None = None
 ```
 
-term, log, commit_index — Raft 페이퍼의 첫 페이지에 나오는 변수들입니다.
+term, log, commit_index는 Raft 논문의 첫 장을 여는 핵심 상태 변수입니다.
 
-### 2단계 — election (간단화)
+### 2단계 — 선거(단순화)
 
 ```python
-# 예제 파일: 2_election.py
+# 2_election.py
 def election_timeout(self, peers):
     self.term += 1
     self.role = "candidate"
@@ -95,26 +113,26 @@ def election_timeout(self, peers):
         self.role = "leader"
 ```
 
-timeout이 먼저 끝난 노드가 candidate가 되어 표를 모읍니다. majority를 모으면 leader.
+가장 먼저 타임아웃에 도달한 노드가 candidate가 되어 표를 모읍니다. 다수를 얻으면 leader가 됩니다.
 
-### 3단계 — log replication
+### 3단계 — 로그 복제
 
 ```python
-# 예제 파일: 3_replicate.py
+# 3_replicate.py
 def append_entries(self, term, prev_index, entries):
     if term < self.term: return False
     if prev_index >= 0 and self.log[prev_index]["term"] != term:
-        return False  # 불일치
+        return False  # mismatch
     self.log = self.log[:prev_index+1] + entries
     return True
 ```
 
-leader는 자기 log를 follower에게 보내고, follower는 일치하지 않으면 거부합니다. 일치 보장은 prev index/term으로.
+leader는 자신의 로그를 follower에게 보내고, follower는 이전 index와 term이 맞지 않으면 거부합니다. 로그 일관성은 바로 이 쌍으로 지켜집니다.
 
 ### 4단계 — commit
 
 ```python
-# 예제 파일: 4_commit.py
+# 4_commit.py
 def maybe_commit(self, peers):
     for i in range(self.commit_index + 1, len(self.log)):
         acks = 1 + sum(1 for p in peers if p.match_index >= i)
@@ -122,49 +140,63 @@ def maybe_commit(self, peers):
             self.commit_index = i
 ```
 
-majority가 받았으면 commit. 이 시점부터 그 entry는 절대 사라지지 않습니다.
+다수가 해당 엔트리를 갖게 되는 순간 commit됩니다. 이 시점부터 그 엔트리는 더 이상 사라지지 않습니다.
 
-### 5단계 — 정전 시나리오
+### 5단계 — 파티션 시나리오
 
 ```python
-# 5_partition.py (의사코드)
-# 5 노드, leader 포함 2 노드만 한쪽 partition
-# - 그쪽엔 majority가 없으니 새 leader 선출 못 함 → 쓰기 못 함
-# - 반대쪽 3 노드는 majority 확보 → 새 leader 선출 → 정상 동작
+# 5_partition.py (pseudocode)
+# 5 nodes, only 2 (leader included) on one side of a partition
+# - that side has no majority -> cannot elect a new leader -> cannot accept writes
+# - the other side has 3 nodes -> majority -> elects a new leader -> keeps working
 ```
 
-majority가 없는 쪽은 의도적으로 멈춥니다. split-brain을 방지하는 핵심 설계.
+다수를 잃은 쪽이 의도적으로 멈추는 설계가 split-brain을 막는 핵심입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- term은 단조 증가합니다. 오래된 term의 메시지는 모두 거부됩니다.
-- log는 순서가 본질입니다 — index와 term의 쌍으로 일치를 검사합니다.
-- commit은 "다수가 받았다"의 약속이지 "모두가 받았다"가 아닙니다.
-- partition된 쪽은 멈추는 것이 정답입니다.
+- term은 단조 증가합니다. 예전 term의 메시지는 거절됩니다.
+- 로그는 순서 자체가 본질이며, 일치는 index와 term 쌍으로 검증합니다.
+- commit은 모두가 받았다는 뜻이 아니라 다수가 받았다는 약속입니다.
+- 파티션된 쪽이 멈추는 것이 오히려 정답입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **leader 한 명만 있으면 안전하다고 본다.** election이 정확해야 안전합니다.
-2. **commit을 단순 "leader가 받았다"로 본다.** majority가 받은 시점이 commit입니다.
-3. **timeout 값을 모두 같게 한다.** split vote가 자주 일어납니다 (Raft는 randomized timeout).
-4. **로그 일치 검사를 건너뛴다.** 잘못된 entry가 commit됩니다.
-5. **partitioned 쪽이 동작 가능하다고 가정한다.** majority 없으면 멈춰야 합니다.
+1. **리더 한 명만 있으면 안전하다고 생각합니다.** 안전성은 올바른 선거에서 나옵니다.
+2. **리더가 받으면 commit이라고 생각합니다.** commit은 다수가 받았을 때입니다.
+3. **모든 노드에 같은 타임아웃을 둡니다.** split vote가 자주 납니다.
+4. **로그 일치 검사를 생략합니다.** 잘못된 엔트리가 commit될 수 있습니다.
+5. **파티션된 쪽이 계속 써도 된다고 생각합니다.** 다수가 없으면 멈춰야 합니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-etcd (Kubernetes의 데이터 저장소), Consul, ZooKeeper(ZAB, Paxos 변형), CockroachDB, TiKV가 모두 consensus 알고리즘 위에 서 있습니다. 데이터베이스의 leader election, 분산 락, configuration 저장이 전형적 use case입니다.
+etcd, Consul, ZooKeeper의 ZAB, CockroachDB, TiKV는 모두 합의 알고리즘 위에 서 있습니다. 데이터베이스의 leader election, 분산 락, 설정 저장소는 전형적인 합의 사용 사례입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 합의는 비싸므로 자주 호출하지 않고 메타데이터 수준에만 씁니다.
+- 타임아웃은 측정값을 바탕으로 무작위화합니다.
+- 노드 수는 3, 5, 7처럼 홀수로 유지합니다.
+- 리더 교체 중에도 안전한 클라이언트 재시도를 설계합니다.
+- 읽기를 leader-only로 둘지 lease 기반으로 풀지 의도적으로 결정합니다.
 
 ## 체크리스트
 
-- [ ] consensus의 정의를 한 줄로 말할 수 있는가?
+- [ ] 합의를 한 줄로 정의할 수 있는가?
 - [ ] term, log, commit의 관계를 설명할 수 있는가?
-- [ ] 5 노드 cluster에서 몇 개가 죽어도 동작하는지 답할 수 있는가?
-- [ ] split vote를 어떻게 막는지 아는가?
-- [ ] etcd가 consensus 위에 있다는 사실을 시스템 설계에 반영하는가?
+- [ ] 5노드 클러스터에서 몇 개까지 장애를 견디는지 말할 수 있는가?
+- [ ] split vote를 어떻게 줄이는지 알고 있는가?
+- [ ] etcd가 합의 위에 있다는 사실을 설계 판단에 반영하고 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-consensus는 분산 시스템의 가장 단단한 문제이고, Raft는 그 해법의 사람-친화적 형태입니다. 다음 글에서는 consensus 위에서 leader를 정하는 더 큰 그림 — leader election — 을 다룹니다.
+1. 3노드와 5노드 클러스터의 장애 허용 능력을 비교해 보세요.
+2. Raft의 randomized election timeout이 split vote를 줄이는 이유를 설명해 보세요.
+3. etcd를 사용해 분산 락을 만드는 방식을 한 단락으로 적어 보세요.
+
+## 정리와 다음 글
+
+합의는 분산 시스템의 가장 단단한 문제이고, Raft는 그 문제를 사람이 읽을 수 있게 정리한 형태입니다. 다음 글에서는 합의 위에서 실제 리더를 안전하게 뽑고 교체하는 문제, 즉 leader election을 다룹니다.
 
 <!-- toc:begin -->
 - [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)

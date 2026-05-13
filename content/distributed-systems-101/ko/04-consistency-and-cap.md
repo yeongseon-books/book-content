@@ -1,8 +1,8 @@
 ---
 series: distributed-systems-101
 episode: 4
-title: consistency와 CAP
-status: content-ready
+title: 일관성과 CAP
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,66 +17,83 @@ tags:
   - CAP
   - Linearizability
   - Eventual Consistency
-seo_description: 분산 데이터의 consistency 모델과 CAP 정리, PACELC까지 읽는 법을 한 장에 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: 일관성 스펙트럼과 CAP, PACELC를 한 번에 읽는 기준을 정리합니다.
+last_reviewed: '2026-05-12'
 ---
 
-# consistency와 CAP
+# 일관성과 CAP
 
-> Distributed Systems 101 시리즈 (4/10)
-
+이 글은 Distributed Systems 101 시리즈의 네 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-"DB가 강하게 일관적이다/eventual하다"라는 한 줄 차이가 시스템 전체 설계를 바꿉니다. 사용자에게 보일 화면, retry 정책, 장애 시 동작이 모두 여기서 정해집니다. CAP를 모르면 docs의 단어를 읽을 수 없습니다.
+- 여기서 말하는 일관성은 정확히 무엇이며 트랜잭션의 C와 어떻게 다를까요?
+- linearizable, sequential, causal, eventual은 어떤 스펙트럼을 이룰까요?
+- CAP 정리는 무엇을 말하며, 어디서 자주 오해될까요?
+- PACELC는 CAP에 무엇을 더해 줄까요?
+- 실제 데이터베이스는 이 스펙트럼의 어디쯤에 놓일까요?
 
-> consistency model은 데이터의 사회 계약입니다.
+> CAP은 파티션이 발생했을 때 일관성과 가용성 중 하나를 포기해야 한다고 말합니다. 그리고 그 타협의 형태가 곧 여러분이 선택한 일관성 모델입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+데이터베이스가 강한 일관성을 가진다, eventual consistency에 가깝다 같은 한 줄 설명은 설계 전체를 바꿉니다. 어떤 화면을 만들 수 있는지, 재시도 정책을 어떻게 둘지, 장애 시 어떤 동작을 허용할지가 모두 여기서 갈립니다. 이 언어를 모르면 데이터베이스 문서를 읽을 때 핵심을 놓치게 됩니다.
+
+> 일관성 모델은 데이터가 맺는 사회적 계약입니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     A["linearizable"] --> B["sequential"]
     B --> C["causal"]
     C --> D["eventual"]
-    A -.->|강함| D
+    A -.->|stronger| D
 ```
 
-왼쪽일수록 사용자가 보기에 직관적이지만 비쌉니다. 오른쪽일수록 싸고 가용성이 좋지만 직관과 멀어집니다.
+왼쪽으로 갈수록 직관적이지만 비싸고, 오른쪽으로 갈수록 싸고 가용성이 높지만 직관에서 멀어집니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — "DB가 알아서"**
+- **Linearizability**: 시스템 전체가 하나의 시간선 위에서 동작하는 것처럼 보이는 모델입니다.
+- **Sequential consistency**: 모든 노드가 같은 순서를 보지만, 실제 시간 순서까지 보장하지는 않는 모델입니다.
+- **Causal consistency**: 인과적으로 연결된 연산의 순서만 보존하는 모델입니다.
+- **Eventual consistency**: 충분한 시간이 지나면 모든 복제본이 같은 상태로 수렴하는 모델입니다.
+- **CAP**: 파티션 중에는 일관성과 가용성을 동시에 끝까지 지킬 수 없다는 정리입니다.
+
+## Before / After
+
+**Before — 데이터베이스가 알아서 정하겠지**
 
 ```text
-잘 모르고 default를 쓴 결과 race, stale read 발생
+defaults silently chosen -> races and stale reads in production
 ```
 
-**After — 명시적 model 선택**
+**After — 모델을 명시적으로 선택**
 
 ```text
-주문/결제 → linearizable, 피드/추천 → eventual
+orders/payments -> linearizable, feeds/recommendations -> eventual
 ```
 
-화면별로 적절한 model을 골라 비용을 분배합니다.
+화면과 데이터셋별로 비용을 다르게 배분할 수 있습니다.
 
-## model의 차이를 코드로
+## 실습: 코드로 보는 일관성 모델
 
-### 1단계 — single node (linearizable의 기준)
+### 1단계 — 단일 노드(linearizable의 기준점)
 
 ```python
-# 예제 파일: 1_single.py
-from collections import deque
+# 1_single.py
 log = []
 def write(x): log.append(x)
 def read(): return log[-1] if log else None
 ```
 
-한 노드 안에선 모든 read가 마지막 write를 봅니다. 이 직관이 우리가 비교할 기준입니다.
+단일 노드에서는 모든 읽기가 최신 쓰기를 봅니다. 우리가 직관이라고 부르는 감각의 출발점입니다.
 
-### 2단계 — async replica (eventual)
+### 2단계 — 비동기 복제본(eventual)
 
 ```python
-# 예제 파일: 2_eventual.py
+# 2_eventual.py
 import threading, time
 primary = []
 replica = []
@@ -87,9 +104,9 @@ def read_primary(): return primary[-1] if primary else None
 def read_replica(): return replica[-1] if replica else None
 ```
 
-방금 쓴 값이 replica에서는 0.5초 동안 안 보입니다. 이게 eventual의 정체입니다.
+방금 쓴 값이 반대편 복제본에서는 0.5초 동안 보이지 않습니다. 이 코드 조각 하나가 eventual consistency의 본질을 보여 줍니다.
 
-### 3단계 — read-your-writes 흉내
+### 3단계 — read-your-writes 흉내 내기
 
 ```python
 # 3_ryw.py
@@ -98,67 +115,81 @@ def write(uid, x):
     primary.append(x); session_writes[uid] = x
 def read(uid):
     if uid in session_writes:
-        return session_writes[uid]   # 자기 write는 즉시 보장
+        return session_writes[uid]   # users see their own writes immediately
     return read_replica()
 ```
 
-session 단위 보장으로 약한 consistency 위에 강한 보장을 얹는 흔한 패턴입니다.
+약한 모델 위에 더 강한 사용자 경험 보장을 얹는 대표적인 방식입니다.
 
-### 4단계 — partition 시뮬레이션 (CAP 선택)
+### 4단계 — 파티션 시뮬레이션(CAP 선택)
 
 ```python
-# 4_partition.py (의사코드)
+# 4_partition.py (pseudocode)
 def write(x):
     if not majority_alive():
-        # CP 선택: 거부
+        # CP: refuse
         raise Exception("no majority")
-        # 또는 AP 선택: 자기 노드에만 쓰고 나중에 merge
+        # AP: accept locally and merge later
 ```
 
-같은 코드 두 줄 차이가 CP와 AP를 가릅니다.
+두 줄의 차이가 CP와 AP를 갈라놓습니다.
 
-### 5단계 — causal 흉내 (vector clock 한 줄)
+### 5단계 — causal consistency 흉내 내기
 
 ```python
-# 예제 파일: 5_vector.py
+# 5_vector.py
 clock = {"A":0, "B":0}
 def tick(node): clock[node] += 1
 def happens_before(a, b):
     return all(a[k] <= b[k] for k in a) and any(a[k] < b[k] for k in a)
 ```
 
-causal model은 happens-before만 보존하면 됩니다. 동시에 일어난 일은 임의 순서를 허용합니다.
+인과 일관성은 happens-before 관계만 보존하면 됩니다. 서로 독립적인 동시 사건은 어떤 순서로 보여도 괜찮습니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- consistency는 binary가 아니라 spectrum입니다.
-- 같은 시스템 안에서도 화면별로 다른 model을 고를 수 있습니다.
-- read-your-writes는 약한 model 위에서 사용자 경험을 살리는 핵심 트릭입니다.
-- partition 시 CP/AP는 정책 결정입니다, 자동이 아닙니다.
+- 일관성은 이분법이 아니라 스펙트럼입니다.
+- 같은 시스템 안에서도 화면이나 데이터셋마다 다른 모델을 선택할 수 있습니다.
+- read-your-writes는 약한 모델에서 사용자 경험을 지키는 핵심 기술입니다.
+- 파티션 중 CP와 AP를 고르는 일은 자동이 아니라 정책 결정입니다.
 
 ## 자주 하는 실수 5가지
 
-1. **CAP의 C를 transaction의 C와 헷갈린다.** 둘은 다른 개념입니다.
-2. **"우리는 CP다"라고 단정한다.** 동일 시스템도 호출별로 다를 수 있습니다.
-3. **eventual을 "결국 빠르게 일관됨"으로 본다.** 보장은 시간 상한 없습니다.
-4. **read-your-writes를 자동으로 가정한다.** 명시적으로 구현해야 합니다.
-5. **partition을 무시한 채 강한 consistency를 약속한다.** 약속을 못 지킵니다.
+1. **CAP의 C를 ACID의 C와 혼동합니다.** 두 개념은 다릅니다.
+2. **시스템 전체를 한 단어로 CP라고 부릅니다.** 같은 시스템 안에서도 호출별 정책이 다를 수 있습니다.
+3. **eventual을 곧바로, 금방으로 읽습니다.** 이 보장은 시간 상한을 주지 않습니다.
+4. **read-your-writes가 자동이라고 생각합니다.** 직접 구현해야 합니다.
+5. **파티션을 무시한 채 강한 일관성을 약속합니다.** 운영에서 곧바로 깨집니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-Spanner, etcd, ZooKeeper는 linearizable에 가깝게 동작합니다 (CP). DynamoDB, Cassandra, Redis Cluster는 기본이 eventual에 가깝습니다 (AP). 같은 회사 안에서도 결제 DB는 CP, 추천 캐시는 AP로 분리합니다. PACELC는 partition 없을 때(latency vs consistency)까지 보게 해 줍니다.
+Spanner, etcd, ZooKeeper는 linearizable에 가깝게 동작하는 CP 계열입니다. DynamoDB, Cassandra, Redis Cluster는 기본적으로 eventual에 가까운 AP 성향을 가집니다. 같은 회사 안에서도 결제 시스템은 CP, 추천 캐시는 AP를 선택하는 경우가 흔합니다. PACELC는 파티션이 없는 평상시에도 지연과 일관성 사이의 비용을 보게 해 줍니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 시스템 전체가 아니라 화면과 경로별로 모델을 매핑합니다.
+- read-your-writes를 sticky session 같은 방식으로 명시적으로 제공합니다.
+- 파티션 정책을 운영 책임의 일부로 다룹니다.
+- 강한 일관성의 비용을 SLO로 측정합니다.
+- 모델이 이름 붙어 있지 않은 문서는 신뢰하지 않습니다.
 
 ## 체크리스트
 
 - [ ] linearizable과 eventual의 차이를 한 줄로 말할 수 있는가?
-- [ ] CAP가 partition 없는 평소엔 어떤 의미인지 답할 수 있는가?
-- [ ] 우리 시스템의 화면별 model을 매핑할 수 있는가?
-- [ ] read-your-writes를 어떻게 구현할지 답할 수 있는가?
-- [ ] PACELC의 ELC가 무엇인지 아는가?
+- [ ] 파티션이 없을 때 CAP를 어떻게 이해해야 하는지 설명할 수 있는가?
+- [ ] 시스템의 주요 화면을 일관성 모델에 매핑할 수 있는가?
+- [ ] read-your-writes를 어떻게 구현할지 설명할 수 있는가?
+- [ ] PACELC의 ELC가 무엇을 뜻하는지 알고 있는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-consistency model은 데이터를 분산할 때 가장 중요한 트레이드오프 축입니다. 다음 글에서는 이 model 선택의 직접적 원인 — replication 의 종류와 동기/비동기 — 를 다룹니다.
+1. 서비스의 핵심 데이터셋 세 개를 골라 linearizable, causal, eventual 중 어디에 놓을지 정해 보세요.
+2. eventual consistency 시스템에서 read-your-writes를 보장하는 설계를 해 보세요.
+3. 파티션 중 CP와 AP 중 무엇을 고를지, 그리고 왜 그런지 적어 보세요.
+
+## 정리와 다음 글
+
+일관성 모델은 데이터를 분산한 뒤 가장 중요한 트레이드오프 축입니다. 다음 글에서는 그 선택의 직접적 원인이 되는 복제 방식, 즉 replication과 동기/비동기 복제를 다룹니다.
 
 <!-- toc:begin -->
 - [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)

@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 10
 title: 운영 가능한 분산 시스템 패턴
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -17,66 +17,84 @@ tags:
   - CircuitBreaker
   - Backpressure
   - Observability
-seo_description: 분산 시스템을 운영 가능하게 만드는 핵심 패턴 - 격벽, 회로 차단기, 백프레셔, 관측성을 한 화면에 묶어 정리합니다.
-last_reviewed: '2026-05-11'
+seo_description: bulkhead, circuit breaker, backpressure, 관측성 패턴을 묶어 설명합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 운영 가능한 분산 시스템 패턴
 
-> Distributed Systems 101 시리즈 (10/10)
-
+이 글은 Distributed Systems 101 시리즈의 마지막 글입니다.
 
 ## 이 글에서 다룰 문제
 
-지금까지 다룬 도구들 — replication, consensus, queue, transaction — 은 시스템을 만드는 재료였습니다. 운영 패턴은 그 재료를 "장애가 흔한 현실"에서도 유지하게 하는 운영자의 도구함입니다.
+- bulkhead로 장애를 어떻게 격리할 수 있을까요?
+- circuit breaker는 연쇄 장애를 어떻게 끊어 줄까요?
+- backpressure는 언제 부하를 안전하게 거절해야 할까요?
+- timeout, retry, jitter는 어떤 조합으로 다뤄야 할까요?
+- metrics, logs, traces를 포함한 관측성이 왜 운영 패턴의 일부일까요?
 
-> 좋은 운영 패턴은 "예상한 실패"를 평범한 일로 만듭니다.
+> 운영 가능한 분산 시스템은 장애가 없는 시스템이 아니라, 장애가 국소적으로 머물고 빠르게 회복되는 시스템입니다.
 
-## 전체 흐름
+## 왜 중요한가
+
+지금까지 다룬 복제, 합의, 큐, 트랜잭션은 모두 건축 재료였습니다. 운영 패턴은 그 재료를 장애가 흔한 현실에서도 버티게 하는 도구함입니다. 실제 프로덕션에서 시스템을 오래 살려 두는 힘은 기능보다 운영 경계에서 나옵니다.
+
+> 좋은 운영 패턴은 예상된 장애를 일상적인 사건으로 바꿉니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
     Cl["client"] -->|timeout| LB["load balancer"]
     LB --> S1["service A"]
-    LB --> S2["service B (격리된 pool)"]
+    LB --> S2["service B (isolated pool)"]
     S1 -->|circuit breaker| Up["upstream"]
     S2 -->|backpressure| Q["queue"]
 ```
 
-호출 경로마다 timeout, breaker, bulkhead, backpressure를 조합해 한 곳의 실패가 전체로 번지지 않게 합니다.
+호출 경계마다 timeout, breaker, bulkhead, backpressure를 조합해야 한 곳의 실패가 옆 경계로 번지지 않습니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — 무한 retry, 공유 pool**
+- **Bulkhead**: 스레드, 연결 풀 같은 자원을 나눠 한 곳의 폭발이 다른 곳으로 퍼지지 않게 하는 경계입니다.
+- **Circuit breaker**: 연속 실패를 감지하면 잠시 호출 자체를 끊는 장치입니다.
+- **Backpressure**: 큐 길이 초과나 명시적 거절로 과부하를 밖으로 드러내는 메커니즘입니다.
+- **Jitter**: thundering herd를 막기 위해 재시도 간격에 넣는 랜덤 오프셋입니다.
+- **Observability**: 메트릭, 로그, 트레이스로 시스템을 바깥에서 이해할 수 있게 하는 신호 체계입니다.
+
+## Before / After
+
+**Before — 무한 재시도와 공유 풀**
 
 ```text
-한 upstream이 느려짐 -> 모든 호출이 retry 폭주 -> 전체 마비
+one upstream slows down -> retry storm everywhere -> total stall
 ```
 
 **After — breaker + bulkhead + backpressure**
 
 ```text
-한 upstream이 느려짐 -> breaker open -> 일부만 거절 -> 다른 경로 정상
+one upstream slows down -> breaker open -> partial rejection -> other paths healthy
 ```
 
-운영 패턴은 "한 곳의 죽음이 다음 곳으로 번지지 않는다"의 약속입니다.
+운영 패턴의 핵심 약속은 한 곳의 죽음이 다음 곳으로 번지지 않게 만드는 것입니다.
 
-## 운영 패턴 짧은 코드
+## 실습: 짧은 코드로 보는 운영 패턴
 
 ### 1단계 — timeout
 
 ```python
-# 예제 파일: 1_timeout.py
+# 1_timeout.py
 import requests
 def call():
     return requests.get("https://api.example.com/x", timeout=2.0)
 ```
 
-timeout 없는 호출은 운영 사고의 가장 흔한 원인입니다.
+타임아웃 없는 외부 호출은 운영 사고의 가장 흔한 원인 중 하나입니다.
 
 ### 2단계 — exponential backoff + jitter
 
 ```python
-# 예제 파일: 2_backoff.py
+# 2_backoff.py
 import time, random
 def with_retry(fn, retries=4):
     for i in range(retries):
@@ -86,12 +104,12 @@ def with_retry(fn, retries=4):
     raise
 ```
 
-jitter가 없으면 모든 클라이언트가 같은 시점에 재시도해 upstream을 두 번 죽입니다.
+jitter가 없으면 모든 클라이언트가 같은 순간 다시 몰려 upstream을 두 번째로 무너뜨립니다.
 
-### 3단계 — circuit breaker (간단)
+### 3단계 — circuit breaker
 
 ```python
-# 예제 파일: 3_breaker.py
+# 3_breaker.py
 import time
 class Breaker:
     def __init__(self, threshold=5, cool=10):
@@ -109,63 +127,77 @@ class Breaker:
             raise
 ```
 
-연속 실패가 threshold를 넘으면 cool down 동안 호출 자체를 거부합니다.
+연속 실패가 임계값을 넘으면 cool-down 동안 호출 자체를 막습니다.
 
-### 4단계 — bulkhead (커넥션 풀 분리)
+### 4단계 — bulkhead(연결 풀 분리)
 
 ```python
-# 4_bulkhead.py (의사코드)
+# 4_bulkhead.py (pseudocode)
 pool_payment = ConnectionPool(size=10)
 pool_search  = ConnectionPool(size=10)
-# payment가 폭주해도 search 풀은 영향 없음
+# payment overload does not affect the search pool
 ```
 
-같은 프로세스 안에서도 자원 풀을 나누는 것만으로 격리가 생깁니다.
+같은 프로세스 안이라도 자원 풀을 나누는 순간 격리 경계가 생깁니다.
 
 ### 5단계 — backpressure
 
 ```python
-# 예제 파일: 5_backpressure.py
+# 5_backpressure.py
 from collections import deque
 q, MAX = deque(), 100
 def enqueue(msg):
     if len(q) >= MAX:
-        return "rejected"   # 거절이 침묵보다 안전
+        return "rejected"   # rejecting is safer than silence
     q.append(msg); return "ok"
 ```
 
-큐가 가득 차면 거절합니다. 침묵하는 시스템보다 빠르게 거절하는 시스템이 안전합니다.
+큐가 가득 찼다면 거절해야 합니다. 조용히 멎는 시스템보다 빠르게 거절하는 시스템이 훨씬 안전합니다.
 
-## 이 코드에서 주목할 점
+## 이 코드에서 먼저 봐야 할 점
 
-- timeout < retry budget < 사용자 응답 시간 — 이 부등식이 깨지면 운영이 무너집니다.
-- breaker는 회복도 자동이어야 합니다 (half-open).
-- bulkhead는 코드가 아니라 자원의 경계입니다.
-- backpressure는 "친절한 거절"입니다 — 실패를 빨리 알립니다.
+- timeout < retry budget < user-facing latency라는 부등식이 깨지면 운영 전체가 무너집니다.
+- breaker는 차단뿐 아니라 자동 회복 경로도 가져야 합니다.
+- bulkhead는 코드 패턴이 아니라 자원 경계 설계입니다.
+- backpressure는 정중한 거절입니다. 실패를 빠르게 밖으로 드러냅니다.
 
 ## 자주 하는 실수 5가지
 
-1. **timeout 없는 외부 호출.** 한 upstream이 느려지면 전체가 멈춥니다.
-2. **jitter 없는 retry.** thundering herd로 upstream을 두 번 죽입니다.
-3. **breaker 없는 무한 retry.** 사용자 대기 시간만 늘어납니다.
-4. **공유 pool 하나로 모든 의존성 처리.** 한 곳의 폭주가 모두에게 번집니다.
-5. **관측성 없이 패턴만 도입.** 효과를 측정 못 하면 다음 사고를 막을 수 없습니다.
+1. **외부 호출에 타임아웃을 두지 않습니다.** 느린 upstream 하나가 전체를 잡아끕니다.
+2. **jitter 없는 재시도를 합니다.** thundering herd가 같은 장애를 두 번 만듭니다.
+3. **breaker 없이 끝없이 재시도합니다.** 사용자 대기 시간만 늘어납니다.
+4. **모든 의존성을 하나의 공유 풀로 처리합니다.** 한쪽 스파이크가 전부에 번집니다.
+5. **관측성 없이 패턴만 붙입니다.** 효과를 재지 못하면 다음 장애를 막을 수 없습니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 드러납니다
 
-Netflix Hystrix(과거), resilience4j, Envoy/Istio의 retry/circuit breaker, AWS App Mesh, Kubernetes의 HPA + PDB, 큐 기반 백프레셔(SQS, Kafka의 lag) 등에서 같은 패턴이 반복됩니다. SRE 조직은 이 패턴들을 SLO와 묶어 자동화 알람으로 바꿉니다.
+Hystrix의 역사적 패턴, resilience4j, Envoy와 Istio의 retry 및 circuit breaker, AWS App Mesh, Kubernetes의 HPA와 PDB, Kafka나 SQS 기반의 backpressure까지 본질은 같습니다. SRE 팀은 이런 패턴을 SLO와 연결해 자동 알람과 대응 절차로 바꿉니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 모든 외부 호출에 명시적 타임아웃과 재시도 예산을 둡니다.
+- breaker와 bulkhead의 임계값은 부하 테스트 결과로 정합니다.
+- 메트릭, 로그, 트레이스 없이 패턴만 도입하지 않습니다.
+- 평상시에 chaos test로 장애를 연습합니다.
+- 사용자 지연 시간을 SLI로 두고 SLO 위반을 자동으로 페이지합니다.
 
 ## 체크리스트
 
-- [ ] 모든 외부 호출에 timeout이 명시되어 있는가?
-- [ ] retry에 jitter가 있는가?
-- [ ] 핵심 의존성에 breaker가 걸려 있는가?
+- [ ] 모든 외부 호출에 명시적 타임아웃이 있는가?
+- [ ] 재시도에 jitter가 포함되어 있는가?
+- [ ] 핵심 의존성마다 breaker가 붙어 있는가?
 - [ ] 자원 풀이 도메인별로 분리되어 있는가?
-- [ ] metric / log / trace가 한 trace ID로 묶이는가?
+- [ ] 메트릭, 로그, 트레이스가 하나의 trace ID로 연결되는가?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-분산 시스템의 모든 도구는 결국 운영 가능성으로 수렴합니다. 시리즈 전체를 한 줄로 묶으면 — "실패는 흔하고, 좋은 시스템은 실패를 평범하게 다룬다"입니다. 다음 학습으로는 secure-by-design, observability, SRE 시리즈를 권합니다.
+1. timeout, retry, breaker를 함께 적용한 단일 호출 의사코드를 작성해 보세요.
+2. backpressure를 도입할지 결정할 때 볼 기준 두 가지를 적어 보세요.
+3. chaos test로 반복해서 리허설할 장애 시나리오 세 가지를 골라 보세요.
+
+## 정리와 다음 학습
+
+분산 시스템의 거의 모든 도구는 결국 운영 가능성으로 수렴합니다. 이 시리즈를 한 문장으로 묶으면 이렇습니다. 실패는 흔하고, 좋은 시스템은 실패를 평범하게 다룹니다. 다음 학습 주제로는 secure-by-design, observability, SRE 시리즈를 권합니다.
 
 <!-- toc:begin -->
 - [분산 시스템이란 무엇인가?](./01-what-is-a-distributed-system.md)
