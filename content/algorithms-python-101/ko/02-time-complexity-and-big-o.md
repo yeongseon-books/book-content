@@ -2,7 +2,7 @@
 series: algorithms-python-101
 episode: 2
 title: 시간 복잡도와 Big-O
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -12,142 +12,152 @@ targets:
 language: ko
 tags:
   - Python
-  - 알고리즘
-  - 시간 복잡도
+  - Algorithms
+  - Time Complexity
   - Big-O
-  - 성능 분석
-seo_description: Big-O 표기법으로 알고리즘의 시간 복잡도를 분석하고 비교합니다.
-last_reviewed: '2026-05-04'
+  - Performance
+seo_description: 시간 복잡도와 Big-O로 알고리즘 성능을 비교하는 법을 익힙니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 시간 복잡도와 Big-O
 
-"이 코드가 얼마나 빠른가?"라는 질문에 "내 컴퓨터에서 0.3초 걸렸다"는 답은 부족합니다. 하드웨어, 데이터 크기, 운영체제에 따라 달라지기 때문입니다. Big-O는 이런 변수를 제거하고 알고리즘 자체의 성능을 비교하는 도구입니다.
+내 노트북에서 몇 초가 걸렸는지만으로 알고리즘을 평가하는 것은 위험합니다. 하드웨어도 바뀌고, 런타임도 바뀌고, 테스트 데이터도 바뀌지만, 입력이 커질 때 실행 시간이 얼마나 빨리 증가하는지는 그대로 남기 때문입니다. 이 글은 Algorithms with Python 101 시리즈의 두 번째 글입니다. 여기서는 시간 복잡도에 대한 감을 잡고, Big-O 표기법으로 알고리즘을 더 엄밀하게 비교해 보겠습니다.
 
-면접에서 "이 알고리즘의 시간 복잡도는?"이라는 질문은 거의 반드시 나옵니다. Big-O로 답할 수 있어야 합니다.
-
-이 글은 Algorithms with Python 101 시리즈의 2번째 글입니다. 여기서는 시간 복잡도라는 관점을 익히고, Big-O 표기법으로 알고리즘 성능을 비교하는 기준을 세우겠습니다.
+Big-O는 코드를 실서비스에 넣기 전이나 코딩 테스트 화이트보드 앞에 서기 전에도 성장 패턴을 비교할 수 있게 해 주는 실용적인 언어입니다.
 
 ## 이 글에서 다룰 문제
 
-> Big-O = 입력 크기 n이 커질 때 연산 횟수의 증가율
+- 시간 복잡도는 무엇이며, 실제 실행 시간만으로는 왜 부족할까요?
+- Big-O 표기법은 어떻게 읽고 써야 할까요?
+- `O(1)`부터 `O(n!)`까지의 대표 복잡도는 어떻게 구분할까요?
+- Python 코드의 시간 복잡도는 어떤 식으로 분석할까요?
 
-## 핵심 개념 잡기
+## 왜 중요한가
 
-> Big-O = 최악의 경우 연산 횟수가 입력 크기에 비례하여 증가하는 비율
+"이 코드는 느립니다"라는 말만으로는 부족합니다. Big-O는 하드웨어와 무관하게 알고리즘의 확장성을 설명하는 정밀한 언어입니다. `O(n)` 알고리즘은 1천만 개의 데이터도 감당할 수 있지만, `O(n^2)` 알고리즘은 10만 개만 되어도 급격히 버거워집니다.
 
-```text
-n=1000일 때 대략적인 연산 횟수:
-O(1)      →           1
-O(log n)  →          10
-O(n)      →       1,000
-O(n log n)→      10,000
-O(n²)     →   1,000,000
-O(2^n)    → 불가능 (우주 나이보다 긺)
+> Big-O 표기법은 입력 크기가 무한히 커질 때 알고리즘 실행 시간의 최악 성장률을, 상수항과 낮은 차수항을 무시하고 표현합니다.
+
+시간 복잡도를 이해하는 일은 코딩 테스트, 코드 리뷰, 시스템 설계에서 이루어지는 거의 모든 알고리즘 대화의 출발점입니다.
+
+## 개념 한눈에 보기
+
+> Big-O = 알고리즘 실행 시간 증가율의 상한
+
+```
+Input Size vs Operations (approximate):
+n=1,000  | O(1): 1       | O(log n): 10    | O(n): 1,000
+         | O(n log n): 10,000 | O(n^2): 1,000,000 | O(2^n): ∞
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| O(1) | 상수 시간 — 입력 크기와 무관합니다 |
-| O(log n) | 로그 시간 — 매 단계마다 탐색 범위가 반으로 줄어듭니다 |
-| O(n) | 선형 시간 — 입력 크기에 비례합니다 |
-| O(n²) | 이차 시간 — 이중 반복문에서 나타납니다 |
-| 최악의 경우(worst case) | 가장 많은 연산이 필요한 입력입니다 |
+| Time complexity | 입력 크기에 따라 실행 시간이 얼마나 늘어나는지를 나타냅니다 |
+| Big-O notation | 최악의 성장률을 표현하는 상한 표기입니다 |
+| O(1) — constant | 입력 크기와 무관하게 시간이 거의 일정합니다 |
+| O(n) — linear | 실행 시간이 입력 크기에 비례해 증가합니다 |
+| O(n^2) — quadratic | 실행 시간이 입력 크기의 제곱에 비례해 증가합니다 |
 
 ## Before / After
 
-리스트에서 특정 값의 존재를 확인하는 두 가지 방법을 비교합니다.
+컬렉션 안에 값이 있는지 확인하는 두 가지 방법입니다.
 
 ```python
-# before: 정렬 후 검색 — O(n log n)
-data = [5, 3, 8, 1, 9, 2, 7]
-data.sort()
-found = 7 in data
+# before: linear search in a list — O(n)
+def contains(data: list, target) -> bool:
+    for item in data:
+        if item == target:
+            return True
+    return False
 ```
 
 ```python
-# after: set 변환 후 검색 — O(n) 변환 + O(1) 검색
-data = [5, 3, 8, 1, 9, 2, 7]
-data_set = set(data)
-found = 7 in data_set
+# after: lookup in a set — O(1) average
+def contains(data: set, target) -> bool:
+    return target in data
 ```
 
 ## 단계별 실습
 
-### Step 1: O(1) — 상수 시간
+### Step 1: O(1) — Constant Time
 
 ```python
-def get_first(data: list) -> object:
-    """리스트의 첫 번째 원소 반환 — O(1)"""
+def get_first(data: list) -> int:
+    """Access the first element — O(1)."""
     return data[0]
 
-def get_by_index(data: list, index: int) -> object:
-    """인덱스로 접근 — O(1)"""
-    return data[index]
+def get_by_key(data: dict, key: str):
+    """Dictionary lookup — O(1) average."""
+    return data.get(key)
 
-data = list(range(1_000_000))
-print(get_first(data))         # 0
-print(get_by_index(data, 500_000))  # 500000
-# 리스트 크기와 무관하게 즉시 반환
+numbers = list(range(1_000_000))
+print(get_first(numbers))  # 0
+
+lookup = {"name": "Alice", "age": 30}
+print(get_by_key(lookup, "name"))  # Alice
 ```
 
-### Step 2: O(n) — 선형 시간
+배열의 첫 원소 접근이나 해시 기반 딕셔너리 조회처럼, 입력이 커져도 비용이 거의 늘지 않는 연산이 `O(1)`입니다.
+
+### Step 2: O(n) — Linear Time
 
 ```python
-def linear_search(data: list[int], target: int) -> int:
-    """선형 탐색 — O(n)"""
-    for i, value in enumerate(data):
-        if value == target:
+def linear_sum(data: list[int]) -> int:
+    """Sum all elements — O(n)."""
+    total = 0
+    for x in data:
+        total += x
+    return total
+
+def find_value(data: list[int], target: int) -> int:
+    """Linear search — O(n)."""
+    for i, val in enumerate(data):
+        if val == target:
             return i
     return -1
 
-def sum_all(data: list[int]) -> int:
-    """합계 — O(n)"""
-    total = 0
-    for num in data:
-        total += num
-    return total
-
 data = list(range(100))
-print(linear_search(data, 73))  # 73
-print(sum_all(data))            # 4950
+print(linear_sum(data))       # 4950
+print(find_value(data, 42))   # 42
 ```
 
-### Step 3: O(n²) — 이차 시간
+데이터를 처음부터 끝까지 한 번 훑어야 하면 보통 `O(n)`입니다. 입력이 두 배가 되면 대체로 실행 시간도 두 배 가까이 늘어납니다.
+
+### Step 3: O(n^2) — Quadratic Time
 
 ```python
 def bubble_sort(data: list[int]) -> list[int]:
-    """버블 정렬 — O(n²)"""
+    """Bubble sort — O(n^2)."""
     arr = data[:]
     n = len(arr)
     for i in range(n):
-        for j in range(0, n - i - 1):
+        for j in range(n - 1 - i):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
 
-def find_pairs(data: list[int], target: int) -> list[tuple]:
-    """합이 target인 모든 쌍 — O(n²)"""
-    pairs = []
+def all_pairs(data: list) -> int:
+    """Count all pairs — O(n^2)."""
+    count = 0
     for i in range(len(data)):
         for j in range(i + 1, len(data)):
-            if data[i] + data[j] == target:
-                pairs.append((data[i], data[j]))
-    return pairs
+            count += 1
+    return count
 
-print(bubble_sort([64, 34, 25, 12, 22, 11, 90]))
-# [11, 12, 22, 25, 34, 64, 90]
-print(find_pairs([1, 2, 3, 4, 5], 6))
-# [(1, 5), (2, 4)]
+print(bubble_sort([5, 3, 8, 1, 2]))  # [1, 2, 3, 5, 8]
+print(all_pairs(list(range(100))))    # 4950
 ```
 
-### Step 4: O(log n) — 로그 시간
+중첩 반복문이 들어가면 가장 먼저 `O(n^2)` 가능성을 의심해야 합니다. 입력이 커질수록 선형 알고리즘과의 차이가 매우 빠르게 벌어집니다.
+
+### Step 4: O(log n) and O(n log n)
 
 ```python
 def binary_search(sorted_data: list[int], target: int) -> int:
-    """이진 탐색 — O(log n)"""
+    """Binary search — O(log n)."""
     left, right = 0, len(sorted_data) - 1
     while left <= right:
         mid = (left + right) // 2
@@ -159,74 +169,89 @@ def binary_search(sorted_data: list[int], target: int) -> int:
             right = mid - 1
     return -1
 
-data = list(range(0, 100, 2))  # [0, 2, 4, ..., 98]
-print(binary_search(data, 42))  # 21
-print(binary_search(data, 43))  # -1
+data = list(range(1_000_000))
+print(binary_search(data, 999_999))  # 999999
+
+# Python's built-in sort is O(n log n) — Timsort
+import random
+random_data = [random.randint(0, 1000) for _ in range(1000)]
+sorted_data = sorted(random_data)  # O(n log n)
+print(sorted_data[:5])
 ```
 
-### Step 5: 시간 복잡도 실측 비교
+이진 탐색처럼 문제 공간을 절반씩 줄이는 알고리즘은 `O(log n)`입니다. 정렬처럼 분할과 병합이 결합된 많은 알고리즘은 `O(n log n)`에 속합니다.
+
+### Step 5: Empirical Measurement
 
 ```python
 import time
 
-def measure(func, *args, repeat=3):
-    times = []
-    for _ in range(repeat):
-        start = time.perf_counter()
-        func(*args)
-        times.append(time.perf_counter() - start)
-    return min(times)
 
-sizes = [1000, 5000, 10000]
+def measure(func, *args) -> float:
+    start = time.perf_counter()
+    func(*args)
+    return time.perf_counter() - start
+
+
+sizes = [1_000, 5_000, 10_000]
 for n in sizes:
     data = list(range(n))
-    t_linear = measure(linear_search, data, n - 1)
-    t_binary = measure(binary_search, data, n - 1)
-    print(f"n={n:>6}: 선형={t_linear:.6f}초  이진={t_binary:.6f}초")
+    t_linear = measure(linear_sum, data)
+    t_quadratic = measure(all_pairs, data)
+    ratio = t_quadratic / t_linear if t_linear > 0 else 0
+    print(f"n={n:>6}: linear={t_linear:.5f}s  quadratic={t_quadratic:.5f}s  ratio={ratio:.0f}x")
 ```
 
-## 이 코드에서 주목할 점
+실측 시간은 환경 영향을 받지만, 입력이 커질수록 어떤 알고리즘의 증가율이 훨씬 가파른지는 분명하게 드러납니다. 그래서 이론과 실측을 함께 보는 연습이 중요합니다.
 
-- O(1)은 리스트 크기가 100만이어도 즉시 반환됩니다
-- O(n)과 O(n²)는 데이터 크기가 10배 되면 각각 10배, 100배 느려집니다
-- O(log n)은 데이터가 100만이어도 약 20단계면 충분합니다
-- 실측 시간은 하드웨어에 따라 다르지만, 증가율은 Big-O를 따릅니다
+## 이 코드에서 먼저 봐야 할 점
 
-## 흔한 실수 5가지
+- 딕셔너리 조회 같은 `O(1)` 연산은 데이터가 커져도 비용이 거의 일정합니다.
+- `O(n)`과 `O(n^2)`는 작은 입력에서는 비슷해 보여도, `n=10,000` 수준만 가도 차이가 압도적으로 커집니다.
+- 이진 탐색은 `O(log n)`의 대표 예시입니다. 100만 개 데이터도 비교 횟수는 대략 20번 수준입니다.
+- Python의 `sorted()`는 `O(n log n)`인 Timsort를 사용합니다.
+
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| 상수 계수에 집착 | Big-O는 증가율이 핵심입니다 | 상수를 무시하고 최고 차수에 집중합니다 |
-| 최선의 경우로 판단 | 최선 O(1)이어도 최악이 O(n²)일 수 있습니다 | 항상 최악의 경우를 기준으로 분석합니다 |
-| 중첩 루프를 항상 O(n²)로 판단 | 내부 루프가 상수이면 O(n)입니다 | 실제 반복 횟수를 세어봅니다 |
-| 공간 복잡도 무시 | 시간은 빠르지만 메모리가 부족할 수 있습니다 | 시간과 공간을 함께 분석합니다 |
-| 숨겨진 비용 무시 | `in` 연산이 list에서 O(n)인 것을 모릅니다 | 내장 연산의 시간 복잡도를 확인합니다 |
+|------|-------------|-----------|
+| `O(n)`과 `O(1)`을 혼동함 | 리스트와 집합의 조회 비용은 다릅니다 | 자료구조별 연산 복잡도를 익힙니다 |
+| 중첩 반복문을 놓침 | 내부 루프 때문에 전체가 `O(n^2)`가 됩니다 | 중첩 깊이를 세어 봅니다 |
+| 숨은 비용을 무시함 | 리스트에서 `in`은 `O(n)`입니다 | 자료구조의 복잡도 표를 확인합니다 |
+| 너무 이른 미세 최적화 | 큰 병목은 놔두고 작은 부분만 손봅니다 | 먼저 가장 큰 병목을 찾습니다 |
+| 최선/평균/최악을 섞어 말함 | Big-O 관례와 설명이 어긋납니다 | 어떤 경우를 말하는지 명확히 합니다 |
 
-## 실무에서 이렇게 쓰입니다
+## 실무에서는 이렇게 연결됩니다
 
-- 데이터베이스 쿼리 최적화에서 인덱스 사용 여부를 결정합니다 (O(n) → O(log n))
-- API 응답 시간을 줄이기 위해 알고리즘을 개선합니다
-- 대규모 데이터 파이프라인에서 O(n²) 병목을 찾아 제거합니다
-- 캐싱 전략을 시간 복잡도 분석을 기반으로 설계합니다
-- 코드 리뷰에서 비효율적인 알고리즘을 식별합니다
+- 데이터베이스 쿼리 플래너는 시간 복잡도 관점에서 인덱스를 선택합니다.
+- 검색 엔진은 역색인 조회에 해시 기반 `O(1)` 접근을 활용합니다.
+- 추천 순위 계산에서는 `O(n log n)` 정렬이 자주 등장합니다.
+- 네트워크 라우터는 포워딩 테이블 탐색에 로그 시간 구조를 사용합니다.
+- 머신러닝 학습 시간도 결국 알고리즘 복잡도의 영향을 받습니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 생각합니다
 
-Big-O는 대략적인 가이드라인입니다. 실제 성능은 캐시 히트율, 메모리 접근 패턴, 상수 계수에 따라 달라집니다. O(n log n) 알고리즘이 O(n) 알고리즘보다 실제로 빠른 경우도 있습니다.
+모든 복잡도 계열을 외우는 것이 목적은 아닙니다. 더 중요한 것은 감을 만드는 일입니다. 입력을 두 배로 늘렸을 때 실행 시간이 두 배인지, 네 배인지, 거의 안 늘어나는지를 떠올릴 수 있어야 합니다.
 
-하지만 Big-O를 모르면 O(n²)와 O(n)의 차이를 인식하지 못합니다. 데이터가 작을 때는 괜찮지만, 프로덕션에서 데이터가 커지면 장애로 이어질 수 있습니다.
+코드 리뷰에서 숙련된 엔지니어는 큰 데이터 위의 중첩 루프를 보면 바로 복잡도를 묻습니다. 이 습관 하나가 많은 성능 문제를 배포 전에 막아 줍니다.
 
 ## 체크리스트
 
-- [ ] O(1), O(log n), O(n), O(n log n), O(n²)를 설명할 수 있다
-- [ ] 주어진 코드의 시간 복잡도를 분석할 수 있다
-- [ ] 최악의 경우와 평균의 경우의 차이를 설명할 수 있다
-- [ ] 공간 복잡도의 개념을 설명할 수 있다
-- [ ] Big-O가 실제 실행 시간과 다를 수 있는 이유를 설명할 수 있다
+- [ ] Big-O 표기법이 무엇을 표현하는지 설명할 수 있습니다
+- [ ] 간단한 Python 코드의 시간 복잡도를 식별할 수 있습니다
+- [ ] 대표 복잡도 계열을 빠른 순서대로 비교할 수 있습니다
+- [ ] 중첩 루프에서 `O(n)`과 `O(n^2)`를 구분할 수 있습니다
+- [ ] 알고리즘 성능을 실측하고 비교할 수 있습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-Big-O 표기법은 알고리즘의 확장성을 객관적으로 비교하는 도구입니다. 입력 크기가 커질 때 연산 횟수의 증가율을 나타냅니다. 다음 글에서는 가장 기본적인 탐색 알고리즘인 선형 탐색과 이진 탐색을 다룹니다.
+1. Python의 `list.index()`와 `dict.__getitem__()`의 시간 복잡도를 분석해 보세요.
+2. 리스트에서 중복을 찾는 `O(n)` 알고리즘을 작성해 보세요. 힌트는 `set`입니다.
+3. `n=10,000`에서 1초가 걸리는 `O(n^2)` 알고리즘이 `n=100,000`에서는 얼마나 걸릴지 예측해 보세요.
+
+## 정리와 다음 글
+
+시간 복잡도와 Big-O 표기법은 알고리즘 성능을 비교하는 공통 언어입니다. 특히 기억해야 할 계열은 `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n^2)`입니다. 다음 글에서는 가장 대표적인 두 탐색 알고리즘인 선형 탐색과 이진 탐색을 구현하고 비교합니다.
 
 <!-- toc:begin -->
 - [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
@@ -243,9 +268,9 @@ Big-O 표기법은 알고리즘의 확장성을 객관적으로 비교하는 도
 
 ## 참고 자료
 
-- [Big-O Cheat Sheet](https://www.bigocheatsheet.com/)
-- [Python TimeComplexity — Python Wiki](https://wiki.python.org/moin/TimeComplexity)
-- [Khan Academy — Asymptotic Notation](https://www.khanacademy.org/computing/computer-science/algorithms/asymptotic-notation/a/asymptotic-notation)
-- [Real Python — Big O Notation and Algorithm Analysis](https://realpython.com/sorting-algorithms-python/#measuring-efficiency-with-big-o-notation)
+- [Python Documentation — Time Complexity](https://wiki.python.org/moin/TimeComplexity)
+- [Real Python — Big O Notation in Python](https://realpython.com/sorting-algorithms-python/)
+- [GeeksforGeeks — Analysis of Algorithms | Big-O Analysis](https://www.geeksforgeeks.org/analysis-algorithms-big-o-analysis/)
+- [Khan Academy — Asymptotic Notation](https://www.khanacademy.org/computing/computer-science/algorithms/asymptotic-notation)
 
-Tags: Python, 알고리즘, 시간 복잡도, Big-O, 성능 분석
+Tags: Python, Algorithms, Time Complexity, Big-O, Performance

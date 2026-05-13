@@ -2,7 +2,7 @@
 series: algorithms-python-101
 episode: 3
 title: 선형 탐색과 이진 탐색
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -12,54 +12,63 @@ targets:
 language: ko
 tags:
   - Python
-  - 알고리즘
-  - 선형 탐색
-  - 이진 탐색
+  - Algorithms
+  - Linear Search
+  - Binary Search
   - bisect
-seo_description: Python으로 선형 탐색과 이진 탐색을 구현하고 성능을 비교합니다.
-last_reviewed: '2026-05-04'
+seo_description: 선형 탐색과 이진 탐색의 차이와 bisect 활용법을 배웁니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 선형 탐색과 이진 탐색
 
-탐색은 프로그래밍에서 가장 빈번한 연산입니다. 데이터가 100개일 때는 선형 탐색으로 충분하지만, 100만 개가 되면 이진 탐색은 최대 20번, 선형 탐색은 최대 100만 번 비교해야 합니다.
+탐색은 프로그래밍에서 가장 자주 하는 작업 가운데 하나입니다. 작은 리스트라면 처음부터 끝까지 훑어도 충분하지만, 큰 정렬 리스트라면 매 단계마다 탐색 범위를 절반으로 줄이는 순간 문제의 성격이 완전히 달라집니다. 이 글은 Algorithms with Python 101 시리즈의 세 번째 글입니다. 여기서는 선형 탐색과 이진 탐색을 나란히 구현하고, 각각이 언제 적절한지 비교해 보겠습니다.
 
-이진 탐색은 단순히 값을 찾는 것을 넘어, 조건을 만족하는 최솟값이나 최댓값을 찾는 패턴으로도 확장됩니다. 이 감각은 코딩 테스트와 실무 코드 모두에서 자주 쓰입니다.
-
-이 글은 Algorithms with Python 101 시리즈의 3번째 글입니다. 여기서는 선형 탐색과 이진 탐색을 나란히 구현하면서, 언제 단순 순회로 충분하고 언제 정렬과 로그 시간 탐색이 필요한지 살펴보겠습니다.
+이진 탐색은 교과서 예제에만 머물지 않습니다. 정확히 같은 값을 찾는 문제뿐 아니라, 어떤 조건을 처음 만족하는 지점을 찾는 문제에도 자주 확장됩니다.
 
 ## 이 글에서 다룰 문제
 
-> 이진 탐색 = 정렬된 데이터에서 매번 절반을 제거하여 O(log n)에 검색
+- 선형 탐색은 어떻게 동작하고, 한계는 무엇일까요?
+- 이진 탐색은 어떤 원리로 동작하며 어떻게 구현할까요?
+- Python의 `bisect` 모듈은 언제 유용할까요?
+- 두 탐색 방식의 성능 차이는 실제로 얼마나 클까요?
 
-## 핵심 개념 잡기
+## 왜 중요한가
 
-> 탐색 = 데이터에서 원하는 값을 찾는 과정
+탐색은 프로그래밍에서 가장 흔한 연산입니다. 데이터가 100개일 때는 선형 탐색으로 충분합니다. 하지만 100만 개가 되면 이진 탐색은 많아야 20번 정도 비교하면 되고, 선형 탐색은 최악의 경우 100만 번 모두 확인해야 합니다.
+
+> 이진 탐색은 매 단계마다 남은 데이터의 절반을 제거해, 정렬된 데이터에서 `O(log n)`을 달성합니다.
+
+단순 조회를 넘어서, "조건을 처음 만족하는 값"이나 "마지막으로 만족하는 값"을 찾는 문제로 확장된다는 점도 코딩 테스트에서 매우 중요합니다.
+
+## 개념 한눈에 보기
+
+> 탐색 = 데이터 집합에서 원하는 값을 찾는 과정
 
 ```text
-선형 탐색: [1, 3, 5, 7, 9, 11, 13]에서 9 찾기
-→ 1, 3, 5, 7, 9 (5번 비교)
+Linear search: [1, 3, 5, 7, 9, 11, 13] — find 9
+→ 1, 3, 5, 7, 9 (5 comparisons)
 
-이진 탐색: [1, 3, 5, 7, 9, 11, 13]에서 9 찾기
-→ 7(중간), 11(오른쪽 중간), 9 (3번 비교)
+Binary search: [1, 3, 5, 7, 9, 11, 13] — find 9
+→ 7 (middle), 11 (right half middle), 9 (3 comparisons)
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 선형 탐색 | 처음부터 끝까지 순서대로 확인하는 O(n) 탐색입니다 |
-| 이진 탐색 | 정렬된 데이터에서 중간값을 기준으로 반씩 줄이는 O(log n) 탐색입니다 |
+| Linear search | 처음부터 끝까지 하나씩 확인하는 탐색으로 `O(n)`입니다 |
+| Binary search | 가운데 값을 기준으로 절반씩 줄여 가는 탐색으로, 정렬 데이터에서 `O(log n)`입니다 |
 | bisect | Python 표준 라이브러리의 이진 탐색 모듈입니다 |
-| 상한/하한(upper/lower bound) | 특정 값 이상/초과의 첫 위치를 찾는 변형입니다 |
-| 매개변수 탐색(parametric search) | 이진 탐색을 "조건 만족 범위"에 적용하는 기법입니다 |
+| Upper/lower bound | 특정 값 이상 또는 초과가 처음 나타나는 위치를 찾는 변형입니다 |
+| Parametric search | 정확한 값 대신 조건의 경계를 찾는 문제에 이진 탐색을 적용하는 방식입니다 |
 
 ## Before / After
 
-정렬된 리스트에서 값을 찾는 두 가지 방법을 비교합니다.
+정렬된 리스트에서 값을 찾는 두 가지 방법입니다.
 
 ```python
-# before: 선형 탐색 — O(n)
+# before: linear search — O(n)
 def search(data, target):
     for i, val in enumerate(data):
         if val == target:
@@ -68,7 +77,7 @@ def search(data, target):
 ```
 
 ```python
-# after: 이진 탐색 — O(log n)
+# after: binary search — O(log n)
 def search(data, target):
     left, right = 0, len(data) - 1
     while left <= right:
@@ -84,11 +93,11 @@ def search(data, target):
 
 ## 단계별 실습
 
-### Step 1: 선형 탐색 구현
+### Step 1: Implement Linear Search
 
 ```python
 def linear_search(data: list, target) -> int:
-    """선형 탐색 — O(n)"""
+    """Linear search — O(n)."""
     for i, value in enumerate(data):
         if value == target:
             return i
@@ -98,14 +107,16 @@ data = [4, 2, 7, 1, 9, 3, 8]
 print(linear_search(data, 9))   # 4
 print(linear_search(data, 5))   # -1
 
-# 정렬 필요 없음 — 어떤 리스트에서도 동작
+# No sorting required — works on any list
 ```
 
-### Step 2: 이진 탐색 구현
+선형 탐색의 장점은 단순함과 범용성입니다. 데이터가 정렬되어 있지 않아도 바로 사용할 수 있지만, 큰 데이터에서는 비용이 빠르게 커집니다.
+
+### Step 2: Implement Binary Search
 
 ```python
 def binary_search(sorted_data: list[int], target: int) -> int:
-    """이진 탐색 — O(log n), 정렬된 데이터 필요"""
+    """Binary search — O(log n), requires sorted data."""
     left, right = 0, len(sorted_data) - 1
     while left <= right:
         mid = (left + right) // 2
@@ -122,18 +133,20 @@ print(binary_search(data, 9))    # 4
 print(binary_search(data, 10))   # -1
 ```
 
-### Step 3: bisect 모듈 활용
+이진 탐색의 핵심 전제는 정렬입니다. 이 조건이 맞으면 비교 횟수를 급격히 줄일 수 있지만, 정렬되지 않은 데이터에 적용하면 결과가 틀립니다.
+
+### Step 3: Use the bisect Module
 
 ```python
 import bisect
 
 data = [1, 3, 5, 7, 9, 11, 13, 15]
 
-# 삽입 위치 찾기 (정렬 유지)
+# Find insertion point (maintains sorted order)
 pos = bisect.bisect_left(data, 9)
-print(f"9의 위치: {pos}")  # 4
+print(f"Position of 9: {pos}")  # 4
 
-# 값이 존재하는지 확인
+# Check whether a value exists
 def bisect_search(sorted_data: list[int], target: int) -> int:
     pos = bisect.bisect_left(sorted_data, target)
     if pos < len(sorted_data) and sorted_data[pos] == target:
@@ -143,54 +156,59 @@ def bisect_search(sorted_data: list[int], target: int) -> int:
 print(bisect_search(data, 9))    # 4
 print(bisect_search(data, 10))   # -1
 
-# 정렬된 리스트에 값 삽입
+# Insert into a sorted list
 scores = [70, 80, 90]
 bisect.insort(scores, 85)
 print(scores)  # [70, 80, 85, 90]
 ```
 
-### Step 4: 하한과 상한
+실무와 코딩 테스트 모두에서, 직접 이진 탐색을 매번 작성하기보다 `bisect`를 적절히 활용하는 편이 안전하고 빠른 경우가 많습니다.
+
+### Step 4: Lower Bound and Upper Bound
 
 ```python
 import bisect
 
 data = [1, 3, 5, 5, 5, 7, 9]
 
-# bisect_left: 같은 값이 있으면 왼쪽(첫 번째) 위치
+# bisect_left: position of the first occurrence
 print(bisect.bisect_left(data, 5))   # 2
 
-# bisect_right: 같은 값이 있으면 오른쪽(마지막+1) 위치
+# bisect_right: position after the last occurrence
 print(bisect.bisect_right(data, 5))  # 5
 
-# 5의 개수
+# Count occurrences of 5
 count = bisect.bisect_right(data, 5) - bisect.bisect_left(data, 5)
-print(f"5의 개수: {count}")  # 3
+print(f"Count of 5: {count}")  # 3
 
-# 5 이상인 첫 번째 값의 인덱스
+# First index >= 5
 lower = bisect.bisect_left(data, 5)
-print(f"5 이상 첫 위치: {lower}")  # 2
+print(f"First position >= 5: {lower}")  # 2
 
-# 5 초과인 첫 번째 값의 인덱스
+# First index > 5
 upper = bisect.bisect_right(data, 5)
-print(f"5 초과 첫 위치: {upper}")  # 5
+print(f"First position > 5: {upper}")   # 5
 ```
 
-### Step 5: 성능 비교
+이 차이를 이해하면 중복 구간 길이 계산, 특정 기준 이상 값의 시작점 찾기 같은 문제를 훨씬 깔끔하게 풀 수 있습니다.
+
+### Step 5: Performance Comparison
 
 ```python
 import time
 import bisect
 
+
 def benchmark_search(n: int):
     data = list(range(n))
-    target = n - 1  # 최악의 경우
+    target = n - 1  # worst case
 
-    # 선형 탐색
+    # Linear search
     start = time.perf_counter()
     linear_search(data, target)
     t_linear = time.perf_counter() - start
 
-    # 이진 탐색
+    # Binary search
     start = time.perf_counter()
     binary_search(data, target)
     t_binary = time.perf_counter() - start
@@ -200,54 +218,62 @@ def benchmark_search(n: int):
     bisect.bisect_left(data, target)
     t_bisect = time.perf_counter() - start
 
-    print(f"n={n:>10,}: 선형={t_linear:.6f}초  이진={t_binary:.6f}초  bisect={t_bisect:.6f}초")
+    print(f"n={n:>10,}: linear={t_linear:.6f}s  binary={t_binary:.6f}s  bisect={t_bisect:.6f}s")
 
 for n in [10_000, 100_000, 1_000_000]:
     benchmark_search(n)
 ```
 
-## 이 코드에서 주목할 점
+입력이 커질수록 선형 탐색과 이진 탐색의 차이는 눈에 띄게 벌어집니다. `bisect`가 직접 구현보다 더 빠른 이유도 함께 확인할 수 있습니다.
 
-- 선형 탐색은 정렬이 필요 없지만, 이진 탐색은 정렬된 데이터에서만 동작합니다
-- 이진 탐색은 100만 개 데이터에서도 최대 20번 비교로 충분합니다
-- bisect 모듈은 C로 구현되어 직접 구현한 이진 탐색보다 빠릅니다
-- bisect_left와 bisect_right의 차이를 이해하면 다양한 문제를 풀 수 있습니다
+## 이 코드에서 먼저 봐야 할 점
 
-## 흔한 실수 5가지
+- 선형 탐색은 정렬되지 않은 데이터에도 동작하지만, 이진 탐색은 정렬이 필수입니다.
+- 이진 탐색은 100만 개 데이터도 많아야 20번 정도의 비교로 처리합니다.
+- `bisect` 모듈은 C로 구현되어 있어 손으로 작성한 이진 탐색보다 더 빠른 경우가 많습니다.
+- `bisect_left`와 `bisect_right`의 차이를 이해하면 문제 변형 대응력이 크게 올라갑니다.
+
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| 정렬 안 된 데이터에 이진 탐색 | 잘못된 결과를 반환합니다 | 이진 탐색 전에 정렬을 확인합니다 |
-| mid 계산에서 오버플로 | `(left + right)`가 정수 범위를 초과합니다 | `left + (right - left) // 2`를 사용합니다 |
-| left <= right 대신 left < right | 원소 1개인 경우를 놓칩니다 | `<=`를 사용합니다 |
-| 무한 루프 | left, right 갱신이 잘못되어 수렴하지 않습니다 | mid+1, mid-1로 범위를 반드시 축소합니다 |
-| bisect 결과를 인덱스로 바로 사용 | 값이 없어도 삽입 위치를 반환합니다 | 반환된 위치의 값을 확인합니다 |
+|------|-------------|-----------|
+| 정렬되지 않은 데이터에 이진 탐색 사용 | 잘못된 결과를 냅니다 | 먼저 정렬하거나 정렬 상태를 보장합니다 |
+| mid 계산을 부정확하게 이해함 | 일부 언어에서는 오버플로우 문제가 있습니다 | `left + (right - left) // 2` 패턴도 익혀 둡니다 |
+| `while left < right`로 잘못 구현 | 마지막 원소를 놓칠 수 있습니다 | 기본형에서는 `<=`를 사용합니다 |
+| left/right 갱신 실수 | 수렴하지 않아 무한 루프가 납니다 | 항상 `mid + 1`, `mid - 1`을 의식합니다 |
+| bisect 결과를 바로 인덱스로 확정함 | 값이 없어도 삽입 위치는 반환됩니다 | 반환 위치의 실제 값을 다시 확인합니다 |
 
-## 실무에서 이렇게 쓰입니다
+## 실무에서는 이렇게 연결됩니다
 
-- 데이터베이스 B-Tree 인덱스가 이진 탐색 원리로 레코드를 찾습니다
-- 로그 파일에서 특정 시간대의 로그를 이진 탐색으로 빠르게 찾습니다
-- 버전 관리에서 버그가 도입된 커밋을 이진 탐색(git bisect)으로 찾습니다
-- 게임 매칭에서 비슷한 실력의 상대를 이진 탐색으로 찾습니다
-- A/B 테스트에서 최적 임계값을 이진 탐색으로 결정합니다
+- 데이터베이스 B-Tree 인덱스는 이진 탐색 원리를 활용합니다.
+- 로그 분석 도구는 시간 범위의 시작점과 끝점을 찾을 때 이진 탐색을 사용합니다.
+- 버그를 도입한 커밋을 찾는 `git bisect`도 같은 아이디어입니다.
+- 게임 매치메이킹은 비슷한 실력 범위를 찾을 때 이진 탐색 응용이 가능합니다.
+- A/B 테스트에서는 적절한 임계값을 찾는 데 파라메트릭 서치가 쓰이기도 합니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 생각합니다
 
-직접 이진 탐색을 구현할 일은 드뭅니다. bisect 모듈이나 데이터베이스 인덱스가 대부분을 처리합니다. 하지만 이진 탐색의 원리를 이해하면 "매개변수 탐색"이라는 강력한 패턴을 활용할 수 있습니다.
+실제로는 매번 이진 탐색을 처음부터 구현하지 않을 수 있습니다. `bisect`나 데이터베이스 인덱스가 대부분의 상황을 대신합니다. 그래도 이진 탐색을 이해하면, 조건의 경계를 찾는 파라메트릭 서치 같은 강력한 패턴을 다룰 수 있습니다.
 
-"정렬된 데이터에서 조건을 만족하는 첫 번째/마지막 값 찾기"는 이진 탐색의 핵심 응용입니다. 이 패턴을 익히면 코딩 면접에서 큰 도움이 됩니다.
+정렬된 데이터에서 "조건을 처음 만족하는 지점" 또는 "마지막으로 만족하는 지점"을 찾는 감각은 코딩 테스트에서 매우 자주 등장합니다.
 
 ## 체크리스트
 
-- [ ] 선형 탐색과 이진 탐색의 시간 복잡도를 비교할 수 있다
-- [ ] 이진 탐색을 반복문으로 구현할 수 있다
-- [ ] bisect_left와 bisect_right의 차이를 설명할 수 있다
-- [ ] 이진 탐색의 전제조건(정렬)을 설명할 수 있다
-- [ ] 이진 탐색의 실무 응용 사례를 설명할 수 있다
+- [ ] 선형 탐색과 이진 탐색의 시간 복잡도를 비교할 수 있습니다
+- [ ] while 루프로 이진 탐색을 구현할 수 있습니다
+- [ ] `bisect_left`와 `bisect_right`의 차이를 설명할 수 있습니다
+- [ ] 이진 탐색의 전제 조건이 정렬임을 설명할 수 있습니다
+- [ ] 이진 탐색의 실무 활용 예를 말할 수 있습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-선형 탐색은 O(n)이고 이진 탐색은 O(log n)입니다. 이진 탐색은 정렬된 데이터에서만 동작하지만, 성능 차이는 데이터가 커질수록 극적입니다. 다음 글에서는 데이터를 정렬하는 핵심 알고리즘들을 다룹니다.
+1. 정렬된 리스트에서 특정 값 이상인 원소 개수를 `O(log n)`에 구하는 함수를 작성해 보세요.
+2. 재귀 방식의 이진 탐색을 구현해 보세요.
+3. 정수 `N`의 제곱근을 이진 탐색으로 소수점 여섯째 자리까지 구해 보세요.
+
+## 정리와 다음 글
+
+선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다. 이진 탐색은 정렬이라는 전제가 필요하지만, 데이터가 커질수록 성능 차이는 매우 극적입니다. 다음 글에서는 데이터를 순서 있게 만드는 핵심 알고리즘, 정렬을 다룹니다.
 
 <!-- toc:begin -->
 - [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
@@ -264,9 +290,9 @@ for n in [10_000, 100_000, 1_000_000]:
 
 ## 참고 자료
 
-- [Python 공식 문서 — bisect](https://docs.python.org/3/library/bisect.html)
+- [Python Documentation — bisect](https://docs.python.org/3/library/bisect.html)
 - [Real Python — Binary Search in Python](https://realpython.com/binary-search-python/)
 - [GeeksforGeeks — Binary Search](https://www.geeksforgeeks.org/binary-search/)
 - [LeetCode — Binary Search Problems](https://leetcode.com/tag/binary-search/)
 
-Tags: Python, 알고리즘, 선형 탐색, 이진 탐색, bisect
+Tags: Python, Algorithms, Linear Search, Binary Search, bisect

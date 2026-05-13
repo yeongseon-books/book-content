@@ -2,7 +2,7 @@
 series: algorithms-python-101
 episode: 8
 title: 최단 경로 기초
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: true
@@ -12,58 +12,67 @@ targets:
 language: ko
 tags:
   - Python
-  - 알고리즘
-  - 최단 경로
-  - 다익스트라
+  - Algorithms
+  - Shortest Path
+  - Dijkstra
   - heapq
-seo_description: Python으로 다익스트라 알고리즘을 구현하고 최단 경로를 구합니다.
-last_reviewed: '2026-05-04'
+seo_description: 다익스트라와 heapq로 가중치 그래프의 최단 경로를 구합니다.
+last_reviewed: '2026-05-12'
 ---
 
 # 최단 경로 기초
 
-내비게이션, 네트워크 라우팅, 물류 최적화처럼 현실 세계의 경로 문제는 가중 그래프로 모델링됩니다. 다익스트라 알고리즘은 이런 문제를 효율적으로 해결하는 가장 기본적인 방법입니다.
+경로 계획, 네트워크 지연, 물류 최적화는 모두 결국 같은 질문으로 모입니다. 여기서 저기까지 가는 가장 싼 길은 무엇인가라는 질문입니다. 이 글은 Algorithms with Python 101 시리즈의 여덟 번째 글입니다. 여기서는 가중치 그래프의 최단 경로 문제를 정리하고, `heapq`를 사용해 Python으로 다익스트라 알고리즘을 구현해 보겠습니다.
 
-다익스트라는 그리디 전략과 우선순위 큐를 결합해 동작합니다. 이 원리를 이해해 두면 A* 같은 더 고급 경로 탐색 알고리즘도 훨씬 쉽게 받아들일 수 있습니다.
-
-이 글은 Algorithms with Python 101 시리즈의 8번째 글입니다. 여기서는 가중 그래프에서 최단 경로를 구하는 기본 모델을 잡고, Python의 `heapq`로 다익스트라를 구현해 보겠습니다.
+간선 가중치가 중요해지는 순간 BFS만으로는 부족합니다. 다음에 볼 후보 경로를 우선순위로 관리해야 하고, 그 지점에서 다익스트라 알고리즘이 힘을 발휘합니다.
 
 ## 이 글에서 다룰 문제
 
-> 다익스트라 = 음이 아닌 가중치 그래프에서 단일 출발점 최단 경로를 구하는 알고리즘
+- 가중치 그래프의 최단 경로 문제는 어떻게 정의할까요?
+- 다익스트라 알고리즘은 어떤 원리로 동작할까요?
+- Python의 `heapq`로 우선순위 큐를 어떻게 구현할까요?
+- 경로 복원은 어떻게 하고, 음수 가중치는 왜 문제가 될까요?
 
-## 핵심 개념 잡기
+## 왜 중요한가
 
-> 최단 경로 = 출발 노드에서 도착 노드까지 간선 가중치의 합이 최소인 경로
+내비게이션, 네트워크 라우팅, 물류 최적화는 모두 가중치 그래프의 최단 경로 문제입니다. 다익스트라는 이 문제를 효율적으로 푸는 가장 기본적인 도구입니다.
+
+> 다익스트라 알고리즘은 음수 가중치가 없는 그래프에서, 하나의 시작점으로부터 모든 노드까지의 최단 경로를 구합니다.
+
+그리디 전략과 우선순위 큐를 결합해 `O((V+E) log V)`로 동작한다는 점이 핵심입니다. A* 같은 고급 알고리즘도 이 원리 위에 있습니다.
+
+## 개념 한눈에 보기
+
+> 최단 경로 = 시작점에서 도착점까지 가는 경로 중 간선 가중치 합이 가장 작은 경로
 
 ```text
-가중 그래프:
+Weighted graph:
 A --4-- B --3-- D
 |       |
 2       1
 |       |
 C --5-- E
 
-A→D 최단 경로: A→B→D (비용 7)
-A→E 최단 경로: A→C→E 또는 A→B→E (비용 7 또는 5)
+A→D shortest path: A→B→D (cost 7)
+A→E shortest path: A→B→E (cost 5)
 ```
 
 ## 핵심 개념
 
 | 용어 | 설명 |
 |------|------|
-| 가중 그래프(weighted graph) | 간선에 비용(가중치)이 부여된 그래프입니다 |
-| 다익스트라(Dijkstra) | 음이 아닌 가중치에서 단일 출발점 최단 경로를 구합니다 |
-| 우선순위 큐(priority queue) | 가장 작은 값을 먼저 꺼내는 자료구조입니다 |
-| 완화(relaxation) | 더 짧은 경로를 발견하면 거리를 갱신하는 연산입니다 |
-| 음의 가중치(negative weight) | 다익스트라에서 처리할 수 없는 음수 간선입니다 |
+| Weighted graph | 각 간선에 비용(가중치)이 있는 그래프입니다 |
+| Dijkstra's algorithm | 음수 가중치가 없는 단일 시작점 최단 경로 알고리즘입니다 |
+| Priority queue | 가장 작은 값을 먼저 꺼내는 자료구조입니다 |
+| Relaxation | 더 짧은 경로를 찾았을 때 거리 추정치를 갱신하는 과정입니다 |
+| Negative weight | 다익스트라가 올바르게 처리하지 못하는 음수 비용 간선입니다 |
 
 ## Before / After
 
-가중 그래프에서 최단 경로를 구하는 두 가지 방법을 비교합니다.
+가중치 그래프에서 최단 경로를 찾는 두 가지 접근입니다.
 
 ```python
-# before: BFS — 가중치를 무시하여 잘못된 결과
+# before: BFS — ignores weights, gives wrong answer
 def shortest(graph, start, end):
     from collections import deque
     queue = deque([(start, [start])])
@@ -71,7 +80,7 @@ def shortest(graph, start, end):
     while queue:
         node, path = queue.popleft()
         if node == end:
-            return path  # 간선 수 최소이지 비용 최소가 아님
+            return path  # minimum hops, NOT minimum cost
         for neighbor, _ in graph[node]:
             if neighbor not in visited:
                 visited.add(neighbor)
@@ -80,7 +89,7 @@ def shortest(graph, start, end):
 ```
 
 ```python
-# after: 다익스트라 — 가중치 기반 최단 경로
+# after: Dijkstra — weight-aware shortest path
 import heapq
 
 def shortest(graph, start, end):
@@ -102,10 +111,9 @@ def shortest(graph, start, end):
 
 ## 단계별 실습
 
-### Step 1: 가중 그래프 표현
+### Step 1: Representing a Weighted Graph
 
 ```python
-# 인접 리스트 — (이웃, 가중치) 튜플
 graph: dict[str, list[tuple[str, int]]] = {
     "A": [("B", 4), ("C", 2)],
     "B": [("A", 4), ("D", 3), ("E", 1)],
@@ -114,13 +122,14 @@ graph: dict[str, list[tuple[str, int]]] = {
     "E": [("B", 1), ("C", 5)],
 }
 
-# 그래프 정보 출력
 for node, neighbors in graph.items():
     edges = [f"{n}({w})" for n, w in neighbors]
-    print(f"  {node} → {', '.join(edges)}")
+    print(f"  {node} -> {', '.join(edges)}")
 ```
 
-### Step 2: 다익스트라 알고리즘 구현
+가중치 그래프는 이웃 노드뿐 아니라 간선 비용까지 함께 저장해야 합니다. 그래서 인접 리스트의 값이 `(neighbor, weight)` 튜플 목록이 됩니다.
+
+### Step 2: Dijkstra's Algorithm
 
 ```python
 import heapq
@@ -129,14 +138,14 @@ import heapq
 def dijkstra(
     graph: dict[str, list[tuple[str, int]]], start: str
 ) -> dict[str, int]:
-    """다익스트라 — O((V+E) log V)"""
+    """Dijkstra's algorithm — O((V+E) log V)."""
     dist: dict[str, int] = {start: 0}
     heap: list[tuple[int, str]] = [(0, start)]
 
     while heap:
         cost, node = heapq.heappop(heap)
         if cost > dist.get(node, float("inf")):
-            continue  # 이미 더 짧은 경로가 확정됨
+            continue
 
         for neighbor, weight in graph[node]:
             new_cost = cost + weight
@@ -148,15 +157,17 @@ def dijkstra(
 
 distances = dijkstra(graph, "A")
 for node, d in sorted(distances.items()):
-    print(f"  A → {node}: {d}")
-# A → A: 0
-# A → B: 4
-# A → C: 2
-# A → D: 7
-# A → E: 5
+    print(f"  A -> {node}: {d}")
+# A -> A: 0
+# A -> B: 4
+# A -> C: 2
+# A -> D: 7
+# A -> E: 5
 ```
 
-### Step 3: 경로 추적
+다익스트라는 현재까지 가장 짧다고 알려진 후보를 먼저 처리합니다. 그래서 우선순위 큐가 핵심이며, 이미 더 짧은 값이 기록된 노드는 건너뛰는 로직이 중요합니다.
+
+### Step 3: Path Reconstruction
 
 ```python
 import heapq
@@ -165,7 +176,7 @@ import heapq
 def dijkstra_with_path(
     graph: dict[str, list[tuple[str, int]]], start: str
 ) -> tuple[dict[str, int], dict[str, list[str]]]:
-    """다익스트라 + 경로 추적"""
+    """Dijkstra with path reconstruction."""
     dist: dict[str, int] = {start: 0}
     prev: dict[str, str | None] = {start: None}
     heap: list[tuple[int, str]] = [(0, start)]
@@ -181,7 +192,6 @@ def dijkstra_with_path(
                 prev[neighbor] = node
                 heapq.heappush(heap, (new_cost, neighbor))
 
-    # 경로 복원
     paths: dict[str, list[str]] = {}
     for node in dist:
         path: list[str] = []
@@ -195,17 +205,19 @@ def dijkstra_with_path(
 
 distances, paths = dijkstra_with_path(graph, "A")
 for node in sorted(paths):
-    print(f"  A → {node}: 거리={distances[node]}, 경로={' → '.join(paths[node])}")
+    print(f"  A -> {node}: cost={distances[node]}, path={' -> '.join(paths[node])}")
 ```
 
-### Step 4: 격자 그래프에서 최단 경로
+거리만 구하는 것과 실제 경로를 복원하는 것은 다릅니다. `prev` 딕셔너리로 이전 노드를 기록해 두면 마지막에 경로를 되짚어 복원할 수 있습니다.
+
+### Step 4: Grid Shortest Path
 
 ```python
 import heapq
 
 
 def grid_shortest_path(grid: list[list[int]]) -> int:
-    """2차원 격자에서 좌상단→우하단 최소 비용 경로"""
+    """Minimum-cost path from top-left to bottom-right in a grid."""
     rows, cols = len(grid), len(grid[0])
     dist = [[float("inf")] * cols for _ in range(rows)]
     dist[0][0] = grid[0][0]
@@ -235,64 +247,73 @@ grid = [
 print(grid_shortest_path(grid))  # 7 (1→1→1→1→2→1)
 ```
 
-### Step 5: 알고리즘 비교
+격자 문제도 노드와 간선으로 해석하면 다익스트라의 전형적인 응용이 됩니다. 코딩 테스트에서 특히 자주 나오는 형태입니다.
+
+### Step 5: Algorithm Comparison
 
 ```python
-# BFS vs 다익스트라 적용 기준
 comparison = [
-    ("가중치 없는 그래프", "BFS — O(V+E)"),
-    ("음이 아닌 가중치", "다익스트라 — O((V+E) log V)"),
-    ("음의 가중치 허용", "벨만-포드 — O(V×E)"),
-    ("모든 쌍 최단 경로", "플로이드-워셜 — O(V³)"),
+    ("Unweighted graph", "BFS — O(V+E)"),
+    ("Non-negative weights", "Dijkstra — O((V+E) log V)"),
+    ("Negative weights allowed", "Bellman-Ford — O(V*E)"),
+    ("All-pairs shortest path", "Floyd-Warshall — O(V^3)"),
 ]
 
-print("최단 경로 알고리즘 선택 기준:")
+print("Shortest-path algorithm selection guide:")
 for condition, algorithm in comparison:
     print(f"  {condition}: {algorithm}")
 ```
 
-## 이 코드에서 주목할 점
+최단 경로 문제는 조건에 따라 알고리즘 선택이 달라집니다. 가중치 유무, 음수 간선 존재, 모든 쌍 경로 필요 여부를 먼저 봐야 합니다.
 
-- heapq는 최소 힙이므로 가장 작은 거리의 노드를 먼저 처리합니다
-- `cost > dist.get(node, float("inf"))` 체크로 이미 확정된 노드를 건너뜁니다
-- 경로 추적은 prev 딕셔너리로 역추적하여 복원합니다
-- 격자 그래프도 다익스트라로 풀 수 있으며, 코딩 테스트에서 자주 출제됩니다
+## 이 코드에서 먼저 봐야 할 점
 
-## 흔한 실수 5가지
+- `heapq`는 최소 힙이므로, 가장 짧은 거리 후보를 항상 먼저 처리할 수 있습니다.
+- `cost > dist.get(node, float("inf"))` 검사는 이미 더 짧은 경로가 확정된 노드를 건너뜁니다.
+- 경로 복원은 `prev` 딕셔너리를 사용해 도착점부터 거꾸로 추적합니다.
+- 격자 최단 경로는 다익스트라가 실제 면접 문제로 자주 변형되는 사례입니다.
+
+## 자주 하는 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
-|------|------------|----------|
-| 음의 가중치에 다익스트라 사용 | 잘못된 결과를 반환합니다 | 벨만-포드 알고리즘을 사용합니다 |
-| 확정된 노드 스킵 누락 | 중복 처리로 시간이 낭비됩니다 | 힙에서 꺼낸 후 거리를 비교합니다 |
-| 리스트로 우선순위 큐 구현 | 삽입/삭제가 O(n)입니다 | heapq를 사용합니다 |
-| 초기 거리를 0이 아닌 값으로 설정 | 출발 노드의 거리가 틀립니다 | 출발 노드의 거리를 0으로 초기화합니다 |
-| 도달 불가능한 노드 미처리 | KeyError가 발생합니다 | dist.get(node, float("inf"))를 사용합니다 |
+|------|-------------|-----------|
+| 음수 가중치에 다익스트라 사용 | 잘못된 결과를 냅니다 | Bellman-Ford를 사용합니다 |
+| 확정 노드 건너뛰기 체크 생략 | 중복 처리가 늘어 비효율적입니다 | 힙에서 꺼낸 비용과 기록된 거리를 비교합니다 |
+| 우선순위 큐를 리스트로 흉내 냄 | 삽입과 삭제가 비효율적입니다 | `heapq`를 사용합니다 |
+| 시작점 초기 거리를 잘못 둠 | 모든 경로 계산이 흔들립니다 | 시작점 거리를 0으로 둡니다 |
+| 도달 불가 노드를 처리하지 않음 | 조회 시 `KeyError`가 날 수 있습니다 | `dist.get(node, float("inf"))`를 사용합니다 |
 
-## 실무에서 이렇게 쓰입니다
+## 실무에서는 이렇게 연결됩니다
 
-- 내비게이션 앱이 다익스트라(또는 A*)로 최적 경로를 계산합니다
-- 네트워크 라우팅 프로토콜(OSPF)이 다익스트라를 사용합니다
-- 물류 시스템에서 배송 경로를 최적화합니다
-- 게임에서 NPC의 이동 경로를 계산합니다
-- SNS에서 사용자 간 최단 연결 관계를 분석합니다
+- 내비게이션 앱은 다익스트라나 A*로 운전 경로를 계산합니다.
+- OSPF 같은 네트워크 라우팅 프로토콜도 다익스트라를 사용합니다.
+- 물류 시스템은 창고와 배송 지점 사이의 최소 비용 경로를 계산합니다.
+- 게임 엔진은 NPC 이동 경로를 찾습니다.
+- 소셜 네트워크는 사용자 간 최소 연결 경로를 분석할 수 있습니다.
 
-## 현업 개발자는 이렇게 생각합니다
+## 현업에서는 이렇게 생각합니다
 
-다익스트라를 직접 구현할 일은 드물지만, 최단 경로 문제를 인식하는 것이 중요합니다. "이 문제가 최단 경로 문제인가?"라는 질문을 할 수 있으면, 적절한 라이브러리나 알고리즘을 선택할 수 있습니다.
+실제로는 다익스트라를 매번 직접 구현하지 않아도 됩니다. 중요한 능력은 문제를 보고 "이건 최단 경로 문제다"라고 알아보는 일입니다. 그 순간 적절한 라이브러리와 알고리즘을 선택할 수 있기 때문입니다.
 
-실무에서는 NetworkX의 shortest_path()나 Google Maps API 같은 도구를 사용합니다. 하지만 내부 동작을 이해하면 성능 문제를 진단하고 적절한 알고리즘을 선택하는 데 도움이 됩니다.
+실무에서는 NetworkX나 지도 API를 사용할 수 있지만, 내부 원리를 이해해야 성능 문제와 알고리즘 선택을 제대로 설명할 수 있습니다.
 
 ## 체크리스트
 
-- [ ] 다익스트라 알고리즘의 동작 원리를 설명할 수 있다
-- [ ] heapq를 사용하여 다익스트라를 구현할 수 있다
-- [ ] 최단 경로를 역추적할 수 있다
-- [ ] 다익스트라의 한계(음의 가중치)를 설명할 수 있다
-- [ ] 문제 유형에 따라 적절한 최단 경로 알고리즘을 선택할 수 있다
+- [ ] 다익스트라 알고리즘의 동작 원리를 설명할 수 있습니다
+- [ ] Python의 `heapq`로 다익스트라를 구현할 수 있습니다
+- [ ] 시작점에서 도착점까지 최단 경로를 복원할 수 있습니다
+- [ ] 음수 가중치에서 다익스트라의 한계를 설명할 수 있습니다
+- [ ] 문제 조건에 맞는 최단 경로 알고리즘을 고를 수 있습니다
 
-## 정리 및 다음 글 안내
+## 연습 문제
 
-다익스트라 알고리즘은 음이 아닌 가중치 그래프에서 최단 경로를 O((V+E) log V)에 구합니다. 핵심은 우선순위 큐로 가장 가까운 노드를 먼저 처리하는 것입니다. 다음 글에서는 "현재 최선의 선택"을 반복하는 그리디 알고리즘을 다룹니다.
+1. 가중치가 있는 방향 그래프에서 특정 두 노드 사이의 최단 경로와 비용을 구해 보세요.
+2. 장애물이 있는 격자에서 최단 경로를 구해 보세요.
+3. 다익스트라를 이용해 k번째 최단 경로를 찾는 함수를 작성해 보세요.
+
+## 정리와 다음 글
+
+다익스트라는 음수 가중치가 없는 그래프에서 `O((V+E) log V)`로 최단 경로를 구합니다. 핵심은 우선순위 큐로 가장 가까운 미확정 노드를 먼저 처리하는 데 있습니다. 다음 글에서는 매 단계의 지역 최적 선택이 핵심인 그리디 알고리즘을 살펴봅니다.
 
 <!-- toc:begin -->
 - [알고리즘이란 무엇인가?](./01-what-are-algorithms.md)
@@ -310,8 +331,8 @@ for condition, algorithm in comparison:
 ## 참고 자료
 
 - [Wikipedia — Dijkstra's Algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
-- [Python 공식 문서 — heapq](https://docs.python.org/3/library/heapq.html)
+- [Python Documentation — heapq](https://docs.python.org/3/library/heapq.html)
 - [Visualgo — Single-Source Shortest Path](https://visualgo.net/en/sssp)
 - [Real Python — Priority Queue in Python](https://realpython.com/python-heapq-module/)
 
-Tags: Python, 알고리즘, 최단 경로, 다익스트라, heapq
+Tags: Python, Algorithms, Shortest Path, Dijkstra, heapq
