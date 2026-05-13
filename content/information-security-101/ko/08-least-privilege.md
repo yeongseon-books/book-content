@@ -1,15 +1,15 @@
 ---
+title: 권한 최소화
 series: information-security-101
 episode: 8
-title: 권한 최소화
-status: content-ready
+language: ko
+status: publish-ready
 targets:
   tistory: true
   medium: true
   hashnode: true
   mkdocs: true
   ebook: true
-language: ko
 tags:
   - Computer Science
   - Security
@@ -17,50 +17,72 @@ tags:
   - IAM
   - AccessControl
   - ZeroTrust
-seo_description: 최소 권한 원칙, IAM 정책, RBAC, zero trust를 짧은 코드로 정리합니다.
-last_reviewed: '2026-05-11'
+last_reviewed: '2026-05-12'
+seo_description: IAM 정책, RBAC, 제로 트러스트로 권한 범위를 줄이는 방법을 정리합니다.
 ---
 
 # 권한 최소화
 
-> Information Security 101 시리즈 (8/10)
+보안 사고를 완전히 막을 수는 없습니다. 대신 사고가 났을 때 얼마나 멀리 번지는지는 설계로 줄일 수 있습니다. 그 중심에 있는 원칙이 권한 최소화입니다. 편하다는 이유로 과한 권한을 열어 두면 평소에는 아무 일도 없어 보이지만, 침해가 발생하는 순간 그 편의가 그대로 폭발 반경이 됩니다.
 
+이 글은 Information Security 101 시리즈의 8번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
-침해는 막을 수 없을 때가 있어도, 폭발 반경은 항상 줄일 수 있습니다. 권한 최소화는 사고의 비용을 결정합니다.
+권한 최소화는 “권한을 적게 주자”는 구호가 아닙니다. 누가 어떤 작업을 위해 얼마 동안 어떤 자원에 접근할 수 있는지 명시적으로 제한하는 설계 원칙입니다.
 
-> 권한은 부여하는 것이 아니라 빌려주는 것입니다.
+> 권한은 영구 지급되는 자산이 아니라, 일을 위해 잠깐 빌려 주는 권리입니다.
 
-## 전체 흐름
+- 권한 최소화 원칙은 정확히 무엇을 뜻할까요?
+- IAM 정책에서 허용과 거부는 어떻게 설계해야 할까요?
+- RBAC, ABAC, ReBAC는 언제 갈릴까요?
+- 제로 트러스트는 실무에서 어떤 운영 습관으로 나타날까요?
+- 사람 권한과 시스템 권한은 왜 분리해야 할까요?
+
+## 왜 중요한가
+
+침해 자체를 항상 막을 수는 없어도, 사고 범위를 줄이는 일은 언제나 가능합니다. 권한 최소화는 바로 그 비용을 결정합니다. 서비스 하나가 뚫렸을 때 전체 클러스터가 넘어갈지, 해당 서비스 자원만 영향을 받을지는 권한 설계에서 갈립니다.
+
+권한은 많을수록 좋은 것이 아니라, 필요한 만큼만 열려 있을수록 안전합니다.
+
+## 한눈에 보는 개념
+
 ```mermaid
 flowchart LR
-    U["사용자"] -->|"역할 가정"| R["Role"]
-    R -->|"정책에 따라"| A["허용된 동작"]
-    A -->|"감사 로그"| L["SIEM"]
+    U["User"] -->|"assume role"| R["Role"]
+    R -->|"per policy"| A["Allowed actions"]
+    A -->|"audit log"| L["SIEM"]
 ```
 
-모든 권한은 명시적이고 추적 가능해야 합니다.
+모든 권한은 명시적으로 부여되고 추적 가능해야 합니다. 누가 어떤 역할을 맡았고 무엇을 할 수 있는지 기록으로 남아야 합니다.
 
-## Before/After
+## 핵심 용어
 
-**Before — 모든 서비스가 admin 자격**
+- **권한 최소화 원칙**: 일을 하는 데 필요한 만큼만 권한을 주는 원칙입니다.
+- **RBAC**: 역할 기반 접근 제어입니다.
+- **ABAC**: 태그, 시간, 위치 같은 속성 기반 접근 제어입니다.
+- **제로 트러스트**: 네트워크 위치와 무관하게 매번 검증하는 접근 방식입니다.
+- **권한 상승**: 더 높은 권한으로 올라가는 경로이며 어디서나 막아야 합니다.
+
+## 전후 비교
+
+### 이전 — 모든 서비스가 관리자 권한으로 실행
 
 ```text
-한 서비스 침해 -> 클러스터 전체 통제권 상실
+One service compromised -> full cluster control lost
 ```
 
-**After — 서비스별 최소 권한**
+### 이후 — 서비스별 최소 권한 적용
 
 ```text
-한 서비스 침해 -> 해당 서비스의 자원만 영향
+One service compromised -> only that service's resources affected
 ```
 
-폭발 반경의 차이가 사고의 등급을 결정합니다.
+사고의 심각도는 종종 최초 침해보다 폭발 반경에서 결정됩니다.
 
-## 최소 권한 적용
+## 단계별 실습
 
-### 1단계 — AWS IAM 정책 (최소 권한)
+### 1단계 — AWS IAM 최소 권한 정책을 씁니다
 
 ```json
 {
@@ -73,12 +95,12 @@ flowchart LR
 }
 ```
 
-`Action: "*"`나 `Resource: "*"`는 위험 신호입니다.
+`Action: "*"`와 `Resource: "*"`는 거의 항상 경고 신호입니다. 편의는 높지만 통제는 사라집니다.
 
-### 2단계 — Kubernetes RBAC
+### 2단계 — Kubernetes RBAC를 좁게 잡습니다
 
 ```yaml
-# 예시 파일: 2_role.yaml
+# 2_role.yaml
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata: { namespace: app, name: pod-reader }
@@ -88,79 +110,93 @@ rules:
   verbs: ["get", "list"]
 ```
 
-특정 namespace + 특정 리소스 + 읽기만.
+하나의 네임스페이스, 하나의 리소스, 읽기 전용처럼 범위를 최대한 좁히는 것이 기본입니다.
 
-### 3단계 — 서비스 계정 분리
+### 3단계 — 서비스 계정을 분리합니다
 
 ```yaml
-# 예시 파일: 3_sa.yaml
+# 3_sa.yaml
 kind: ServiceAccount
 apiVersion: v1
 metadata: { name: reports-reader, namespace: app }
 ```
 
-각 워크로드에 전용 SA를 부여합니다.
+워크로드마다 전용 서비스 계정을 주면 권한 추적과 회수가 쉬워집니다.
 
-### 4단계 — 임시 권한 (sudo 패턴)
+### 4단계 — 임시 권한을 발급합니다
 
 ```python
-# 예시 파일: 4_temp_grant.py
+# 4_temp_grant.py
 def assume_emergency_role():
-    # 비상 권한: 30분 만료, 알림 발송, 감사 로그
+    # break-glass: 30-minute expiry, alerting, audit log
     issue_short_lived_credential(role="incident-responder", ttl_min=30)
 ```
 
-평소엔 권한이 없고, 필요할 때만 발급합니다.
+상시 고권한 대신 필요할 때만 짧게 발급하는 패턴이 안전합니다.
 
-### 5단계 — 정책 검증 (정적 분석)
+### 5단계 — 정책을 정적으로 검사합니다
 
 ```bash
-# 예시 파일: 5_check.sh
-# IAM 정책에서 와일드카드를 찾음
+# 5_check.sh
+# Detect wildcards in IAM policies
 grep -r '"\*"' iam/ && echo "WARNING: wildcard in IAM"
 ```
 
-정책은 코드처럼 검증합니다.
+정책도 코드처럼 다뤄야 합니다. 린트와 리뷰가 없으면 편의를 위한 와일드카드가 금방 쌓입니다.
 
-## 이 코드에서 주목할 점
+## 이 코드와 예제에서 먼저 볼 점
 
-- 와일드카드는 위험 신호로 lint합니다.
-- 권한은 시간 제한이 있을 수 있습니다 (TTL).
-- 사람용/시스템용 권한을 분리합니다.
-- break-glass는 알림과 감사를 동반합니다.
+- 와일드카드는 린트 단계에서 바로 경고해야 합니다.
+- 권한에는 시간 제한이 붙을 수 있어야 합니다.
+- 사람 권한과 시스템 권한은 분리되어야 합니다.
+- 비상 권한은 경보와 감사가 항상 따라와야 합니다.
 
-## 자주 하는 실수 5가지
+## 자주 하는 실수 다섯 가지
 
-1. **모든 서비스에 admin 부여.** 폭발 반경 최대.
-2. **임시로 부여한 권한을 영구 유지.** 권한 누적.
-3. **RBAC 역할의 너무 넓은 정의.** 사실상 admin.
-4. **break-glass에 알림 없음.** 비상 권한이 일상화.
-5. **권한 검토 부재.** 시간이 흐르면 모두 admin이 됩니다.
+1. **모든 곳에 관리자 권한을 주는 실수**: 폭발 반경이 최대가 됩니다.
+2. **임시 권한이 만료되지 않는 실수**: 권한이 계속 쌓입니다.
+3. **범위가 너무 넓은 RBAC 역할을 만드는 실수**: 사실상 관리자와 다르지 않습니다.
+4. **비상 권한 사용에 경보가 없는 실수**: 예외 절차가 일상화됩니다.
+5. **주기적 권한 검토가 없는 실수**: 시간이 지나면 모두가 관리자에 가까워집니다.
 
-## 실무에서는 이렇게 쓰입니다
+## 실무에서는 이렇게 나타납니다
 
-AWS는 SCP + IAM + Resource Policy + Permission Boundary로 다층 제어. K8s는 Namespace + RBAC + NetworkPolicy + PodSecurityAdmission. 사람용 access는 IdP(Okta) + JIT(Just-In-Time) 발급으로 영구 권한을 없앱니다.
+AWS는 SCP, IAM, 리소스 정책, Permission Boundary를 겹겹이 씁니다. Kubernetes는 네임스페이스, RBAC, NetworkPolicy, PodSecurityAdmission을 함께 씁니다. 사람 권한은 Okta 같은 IdP에서 Just-In-Time 발급으로 바꾸고, 상시 권한을 없애는 방향으로 움직입니다. 권한 최소화는 개별 기능이 아니라 여러 통제를 겹쳐 폭발 반경을 줄이는 운영 방식입니다.
+
+## 시니어 엔지니어는 이렇게 생각합니다
+
+- 권한은 정기적으로 검토합니다.
+- 새 권한에는 만료 시점을 함께 둡니다.
+- 정책은 git에 두고 PR로 변경합니다.
+- 사고 회고 때마다 폭발 반경을 다시 봅니다.
+- “임시” 권한도 공식 절차 밖에서는 허용하지 않습니다.
 
 ## 체크리스트
 
-- [ ] 모든 서비스 계정이 전용으로 분리되어 있는가?
-- [ ] IAM 정책에 와일드카드가 없는가?
-- [ ] 권한 검토 주기가 정해져 있는가?
-- [ ] break-glass 절차가 알림과 함께 있는가?
-- [ ] 사람용 access가 JIT로 발급되는가?
+- [ ] 모든 서비스 계정에 전용 신원이 있습니까?
+- [ ] IAM 정책에 와일드카드가 없습니까?
+- [ ] 접근 권한 검토 주기가 정의되어 있습니까?
+- [ ] 비상 권한 사용에 경보가 붙습니까?
+- [ ] 사람 권한이 JIT 방식으로 발급됩니까?
 
-## 정리 및 다음 단계
+## 연습 문제
 
-권한 최소화는 사고의 비용을 결정합니다. 다음 글에서는 사고를 알아챌 수 있게 해주는 — 로그와 감사 — 를 봅니다.
+1. RBAC와 ABAC의 차이를 한 단락으로 설명해 보세요.
+2. 비상 권한 사용 시 반드시 발생해야 할 경보 두 가지를 적어 보세요.
+3. 서비스 하나가 침해됐을 때 폭발 반경을 줄이는 아키텍처 선택 두 가지를 설명해 보세요.
+
+## 정리와 다음 글
+
+권한 최소화는 사고의 비용을 줄이는 가장 현실적인 원칙입니다. 침해를 완전히 막지 못해도 어디까지 번질지는 설계로 줄일 수 있습니다. 다음 글에서는 그 사고를 어떻게 감지할 것인지, 로그와 감사를 다룹니다.
 
 <!-- toc:begin -->
 - [정보보안이란 무엇인가?](./01-what-is-information-security.md)
 - [인증과 인가](./02-authentication-and-authorization.md)
 - [암호화와 해시](./03-cryptography-and-hash.md)
 - [TLS와 인증서](./04-tls-and-certificates.md)
-- [Web 보안 기초](./05-web-security-basics.md)
-- [SQL Injection과 XSS](./06-sql-injection-and-xss.md)
-- [secret 관리](./07-secret-management.md)
+- [웹 보안 기초](./05-web-security-basics.md)
+- [SQL 인젝션과 XSS](./06-sql-injection-and-xss.md)
+- [비밀 정보 관리](./07-secret-management.md)
 - **권한 최소화 (현재 글)**
 - 로그와 감사 (예정)
 - 보안 사고 대응 (예정)
