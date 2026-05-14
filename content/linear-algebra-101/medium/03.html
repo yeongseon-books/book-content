@@ -54,38 +54,24 @@
 </head>
 <body>
 <h1>Matrices</h1>
-<blockquote>
-<p>Linear Algebra 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is a <em>matrix</em> just a <em>grid of numbers</em>, or a <em>representation of a transformation</em>?</p>
-<blockquote>
-<p><em>A matrix is the </em>compressed form<em> of a function that </em>maps vectors to vectors<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the Linear Algebra 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Matrices are the notation you see most often in linear algebra. Sometimes they look like tables that hold data. Sometimes they act like rules that move one vector into another. If you only remember the table view, you can still run the arithmetic without understanding why multiplication deserves so much attention.</p>
+<p>This is post 3 in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.</p>
+<h2>Questions This Post Answers</h2>
 <ul>
-<li>The <em>definition</em> and <em>shape</em> of a <em>matrix</em></li>
-<li><em>Multiplication, transpose, inverse</em></li>
-<li>The meaning of the <em>identity matrix</em> and the <em>inverse</em></li>
-<li>A 5-step hands-on</li>
-<li>Five common pitfalls</li>
+<li>What makes a matrix more than a rectangular table of numbers?</li>
+<li>Why is matrix multiplication easier to read as composition of transformations?</li>
+<li>What do transpose, identity, and inverse each mean operationally?</li>
+<li>Why does checking shape first prevent so many practical mistakes?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>A <em>matrix</em> is both a <em>dataset</em> and a <em>transformation</em>. Every layer of an ML model runs on <em>matrix multiplication</em>.</p>
 <blockquote>
-<p><em>Matrices are linear transformations in disguise.</em></p>
+<p>A matrix is both a compact display of numbers and a compressed rule acting on a vector space. Matrix multiplication comes alive only when those two readings stay connected.</p>
 </blockquote>
+<h2>Why It Matters</h2>
+<p>Design matrices in regression, weight matrices in neural networks, user-item structures in recommenders, and transformation matrices in graphics all rely on the same object. A matrix is simultaneously storage and engine.</p>
+<p>Many production mistakes start as shape mistakes. If you cannot read how many dimensions go in, how many come out, and what kind of transformation is implied, code may run while the meaning is already wrong. Matrices reward the habit of reading structure before values.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Mat[&quot;Matrix A (m x n)&quot;] --&gt; Mul[&quot;Multiplication&quot;]
-    Mat --&gt; T[&quot;Transpose A^T&quot;]
-    Mat --&gt; Inv[&quot;Inverse A^-1 (square)&quot;]
-    Mul --&gt; Trans[&quot;Linear transformation&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>This diagram summarizes how multiplication, transpose, and inversion make matrices readable as transformation rules.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Matrix</strong>: an <code>m x n</code> <em>array of numbers</em>.</li>
@@ -121,6 +107,12 @@ print(&quot;A I = A:&quot;, A @ I)
 print(&quot;A^-1:&quot;, A_inv)
 print(&quot;A A^-1 ~ I:&quot;, A @ A_inv)
 </code></pre>
+<h2>Read One Numeric Pass</h2>
+<ul>
+<li><code>A @ B</code> yields <code>[[19., 22.], [43., 50.]]</code>, while <code>B @ A</code> yields <code>[[23., 34.], [31., 46.]]</code>. The numbers make non-commutativity impossible to ignore.</li>
+<li><code>A @ I</code> returns <code>A</code>, which is the algebraic version of “do nothing.”</li>
+<li><code>A @ A^{-1}</code> lands very close to the identity matrix, apart from floating-point noise.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Matrix multiplication</em> is <em>non-commutative</em> — <code>A B != B A</code>.</li>
@@ -174,10 +166,10 @@ print(&quot;A A^-1 ~ I:&quot;, A @ A_inv)
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.3blue1brown.com/lessons/matrix-multiplication">3Blue1Brown — Matrix multiplication</a></li>
-<li><a href="https://www.khanacademy.org/math/algebra-home/alg-matrices">Khan Academy — Matrices</a></li>
+<li><a href="https://www.3blue1brown.com/lessons/matrix-multiplication">3Blue1Brown — Matrix multiplication as composition</a></li>
+<li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/">MIT OpenCourseWare — Matrix algebra</a></li>
 <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.inv.html">NumPy — linalg.inv</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Matrix_(mathematics)">Wikipedia — Matrix</a></li>
+<li><a href="https://www.khanacademy.org/math/algebra-home/alg-matrices">Khan Academy — Matrices</a></li>
 </ul>
 <p class="tags-line">Tags: LinearAlgebra, Matrices, NumPy, DataScience, Beginner</p>
 </body>
