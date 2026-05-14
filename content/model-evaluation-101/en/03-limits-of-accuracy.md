@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 3
 title: The Limits of Accuracy
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - BaselineModel
   - scikit-learn
 seo_description: Why accuracy fails on imbalanced data, the role of base rates and dummy classifiers, and how balanced accuracy restores fairness in evaluation
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # The Limits of Accuracy
 
-> Model Evaluation 101 series (3/10)
+Accuracy is the most familiar metric in classification. That familiarity is useful, but it also makes the number too easy to trust. On skewed datasets, accuracy can hide the exact failure mode you care about most.
 
-<!-- a-grade-intro:begin -->
+Spam filtering, fraud detection, and rare-disease screening all punish missed positives differently from routine negatives. In those settings, a high accuracy number can be nothing more than a majority-class illusion. Accuracy can still be a useful summary, but it should never be your only verdict.
 
-**Core question**: Is "95% accuracy" always a good score?
+This is post 3 in the Model Evaluation 101 series. In this post, we use baselines, class balance, and per-class reporting to show where accuracy stops being honest.
 
-> *Accuracy is fair only when classes are balanced. On imbalanced data, you need baselines and balanced accuracy.*
-
-<!-- a-grade-intro:end -->
-
-This is post 3 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The accuracy formula and meaning
 - Base rates and dummy classifiers
@@ -42,19 +36,17 @@ This is post 3 in the Model Evaluation 101 series.
 - Limits of accuracy in multiclass settings
 - Five common pitfalls
 
+> Accuracy is fair only when class balance is reasonably stable. Once the data tilts, baselines and per-class behavior matter more than the headline number.
+
 ## Why It Matters
 
 When the comparison standard is a single accuracy number, the entire team can drift unknowingly into wrong decisions.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Bal["balanced data"] --> AccOK["accuracy is fair"]
-    Imb["imbalanced data"] --> AccBad["accuracy is misleading"]
-    Imb --> BAcc["balanced accuracy"]
-```
+![how balanced and imbalanced data change the meaning of accuracy](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
 
+*how balanced and imbalanced data change the meaning of accuracy*
 ## Key Terms
 
 - **Accuracy**: `(TP+TN)/N`.
@@ -111,6 +103,8 @@ print("bacc:", balanced_accuracy_score(yte, pred))
 from sklearn.metrics import classification_report
 print(classification_report(yte, pred))
 ```
+
+**Expected output:** You should see that a dummy classifier can already post a strong accuracy score on imbalanced data, while balanced accuracy and the per-class report reveal whether the minority class is actually being learned.
 
 ## What to Notice in This Code
 
