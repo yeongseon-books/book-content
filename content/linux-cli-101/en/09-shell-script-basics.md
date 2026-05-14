@@ -41,6 +41,8 @@ seo_description: A shell script is a recipe file of CLI commands. Write it once,
 
 <!-- a-grade-intro:end -->
 
+This is post 9 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - The basic flow of writing and running a shell script

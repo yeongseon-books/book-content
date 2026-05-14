@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 2 in the Linear Algebra 101 series.
+
 ## What You Will Learn
 
 - The *three views* of a vector — arrow, coordinates, data row

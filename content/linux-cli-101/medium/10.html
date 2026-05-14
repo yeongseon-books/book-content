@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SSH and Remote Access</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>SSH and Remote Access</h1>
+<blockquote>
+<p>Linux CLI 101 series (10/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What is SSH and why use it instead of Telnet?</li>
+<li>What is the difference between password authentication and key-based authentication?</li>
+<li>How does <code>~/.ssh/config</code> simplify connections?</li>
+<li>How do you transfer files remotely with <code>scp</code> and <code>rsync</code>?</li>
+</ul>
+<blockquote>
+<p>SSH opens a remote terminal over an encrypted channel. Key-based authentication replaces passwords with a lock-and-key pair.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is the final post in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The basic SSH connection flow and key-based authentication setup</li>
+<li>Generating a key pair with <code>ssh-keygen</code> and registering it on a server</li>
+<li>Creating connection aliases with <code>~/.ssh/config</code></li>
+<li>Copying and syncing files remotely with <code>scp</code> and <code>rsync</code></li>
+</ul>
+<h2>Why it matters</h2>
+<p>Deploying code to a server, checking server logs, and connecting to a database all start with remote access. SSH is the foundation of every remote operation.</p>
+<blockquote>
+<p>You create an AWS EC2 instance and receive a public IP address. How do you connect and deploy your code? You cannot open a server terminal from a web browser.</p>
+</blockquote>
+<p>One line — <code>ssh user@ip-address</code> — and the server's terminal appears on your screen.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>SSH creates an encrypted tunnel between two computers. Key-based authentication uses a lock (public key) and a key (private key) instead of a password. You install the lock on the server and open it with the key on your computer — no password required.</p>
+</blockquote>
+<pre><code class="language-text">[My Computer]                       [Server]
+ Private key (~/.ssh/id_ed25519) &lt;-&gt; Public key (~/.ssh/authorized_keys)
+          |                              |
+    &quot;Open with this key&quot;          &quot;Lock matches — access granted&quot;
+          └──── Encrypted SSH tunnel ────┘
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Public key</strong><br>
+- Description: The lock you register on the server<br>
+- Location: <code>~/.ssh/id_ed25519.pub</code></p>
+<p><strong>Private key</strong><br>
+- Description: The key you keep on your computer<br>
+- Location: <code>~/.ssh/id_ed25519</code></p>
+<p><strong>authorized_keys</strong><br>
+- Description: List of public keys the server accepts<br>
+- Location: <code>~/.ssh/authorized_keys</code></p>
+<p><strong>ssh-agent</strong><br>
+- Description: Caches private keys in memory to avoid repeated passphrase entry<br>
+- Location: Process</p>
+<p><strong>known_hosts</strong><br>
+- Description: Records server fingerprints of previously visited hosts<br>
+- Location: <code>~/.ssh/known_hosts</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (password authentication)</strong></p>
+<pre><code class="language-bash">ssh user@192.168.1.100
+# Type password every time
+# Vulnerable to brute-force attacks
+# Cannot automate (putting passwords in scripts is a security incident)
+</code></pre>
+<p><strong>After (key-based authentication + config)</strong></p>
+<pre><code class="language-bash">ssh prod-server
+# Instant login without a password
+# Automatable (CI/CD deploys over SSH)
+# Brute-force impossible
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Generate an SSH key pair</strong></p>
+<pre><code class="language-bash">ssh-keygen -t ed25519 -C &quot;user@example.com&quot;
+# Enter file: (press Enter for default path)
+# Enter passphrase: (recommended for security)
+
+ls -la ~/.ssh/
+# id_ed25519        &lt;- Private key (never share)
+# id_ed25519.pub    &lt;- Public key (register on server)
+</code></pre>
+<p><strong>Step 2. Register the public key on a server</strong></p>
+<pre><code class="language-bash"># Method 1: ssh-copy-id (easiest)
+ssh-copy-id user@192.168.1.100
+
+# Method 2: manual copy
+cat ~/.ssh/id_ed25519.pub | ssh user@192.168.1.100 \
+    'mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys'
+
+# Now you can connect without a password
+ssh user@192.168.1.100
+</code></pre>
+<p><strong>Step 3. Configure SSH aliases</strong></p>
+<pre><code class="language-bash">cat &gt; ~/.ssh/config &lt;&lt; 'EOF'
+Host dev-server
+    HostName 192.168.1.100
+    User developer
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519
+
+Host prod-server
+    HostName 10.0.1.50
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+EOF
+
+chmod 600 ~/.ssh/config
+
+# Connect using aliases
+ssh dev-server          # = ssh developer@192.168.1.100
+ssh prod-server         # = ssh deploy@10.0.1.50 -p 2222
+</code></pre>
+<p><strong>Step 4. Transfer files (scp, rsync)</strong></p>
+<pre><code class="language-bash"># scp: copy single files or directories
+scp app.tar.gz dev-server:/opt/releases/          # Upload
+scp dev-server:/var/log/app.log ./                 # Download
+scp -r project/ dev-server:/home/developer/        # Copy directory
+
+# rsync: incremental sync (transfers only changes)
+rsync -avz project/ dev-server:/home/developer/project/
+# -a: archive (preserves permissions, timestamps)
+# -v: verbose
+# -z: compressed transfer
+</code></pre>
+<p><strong>Step 5. Execute remote commands</strong></p>
+<pre><code class="language-bash"># Run a command remotely without opening a session
+ssh dev-server 'df -h'                        # Check disk usage
+ssh dev-server 'tail -5 /var/log/app.log'     # Last 5 log lines
+
+# Run multiple commands
+ssh dev-server &lt;&lt; 'EOF'
+cd /opt/app
+git pull
+sudo systemctl restart app
+echo &quot;Deploy done&quot;
+EOF
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>ssh-keygen -t ed25519</code> uses the ed25519 algorithm, currently recommended over RSA — shorter keys and faster operations</li>
+<li>Permissions on <code>~/.ssh/</code> and key files matter: if they are too loose, SSH refuses to use the key</li>
+<li><code>rsync</code> transfers only the changed parts, making it far more efficient than <code>scp</code> for large directory syncs</li>
+<li>In SSH config, <code>Host</code> is an alias; <code>HostName</code> is the actual address</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Sharing or committing the private key</strong></p>
+<p>The private key (<code>id_ed25519</code>) must never be sent to anyone or committed to Git. The only key you share is the public key (<code>.pub</code>).</p>
+<p><strong>Mistake 2. Loose permissions on SSH key files</strong></p>
+<pre><code class="language-bash">chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+chmod 600 ~/.ssh/config
+# Looser permissions cause SSH to reject the key
+</code></pre>
+<p><strong>Mistake 3. Ignoring the known_hosts warning</strong></p>
+<p>When you see "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED", the server may have been reinstalled or it could be a man-in-the-middle attack. Verify the server, then run <code>ssh-keygen -R hostname</code> to remove the old fingerprint.</p>
+<p><strong>Mistake 4. Not disabling password authentication</strong></p>
+<p>Even after setting up key-based authentication, leaving password authentication enabled exposes the server to brute-force attacks. Set <code>PasswordAuthentication no</code> in <code>/etc/ssh/sshd_config</code>.</p>
+<p><strong>Mistake 5. Not using SSH config</strong></p>
+<p>Typing <code>ssh -i ~/.ssh/mykey -p 2222 user@long-hostname.example.com</code> every time is inefficient and error-prone. Create an alias in config.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Server deploys</strong>: <code>ssh prod 'cd /opt/app &amp;&amp; git pull &amp;&amp; sudo systemctl restart app'</code></li>
+<li><strong>CI/CD</strong>: GitHub Actions deploys to servers using SSH keys</li>
+<li><strong>Port forwarding</strong>: <code>ssh -L 5432:localhost:5432 db-server</code> accesses a remote DB as if it were local</li>
+<li><strong>File sync</strong>: <code>rsync -avz dist/ prod:/var/www/html/</code> deploys a web frontend</li>
+<li><strong>Jump hosts</strong>: <code>ssh -J bastion internal-server</code> reaches servers behind firewalls</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>SSH is fundamental to server management, but the fewer times you SSH into a server manually, the more mature your infrastructure is. Good teams deploy through CI/CD pipelines, view logs through monitoring tools, and manage servers with Infrastructure as Code.</p>
+<p>That said, you still need to know SSH. When CI/CD fails, when monitoring misses a problem, the last resort is always "SSH in and check directly". SSH is the skill you rarely use day-to-day but absolutely must have for emergencies.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can generate an SSH key pair and register the public key on a server</li>
+<li>[ ] You can create aliases in <code>~/.ssh/config</code> to simplify connections</li>
+<li>[ ] You can upload and download files with <code>scp</code></li>
+<li>[ ] You can incrementally sync directories with <code>rsync</code></li>
+<li>[ ] You know the correct permissions (600, 700) for SSH key files</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Generate a key pair with <code>ssh-keygen -t ed25519</code> and inspect the contents of the public key (<code>~/.ssh/id_ed25519.pub</code>).</li>
+<li>Write a sample <code>~/.ssh/config</code> entry for a hypothetical server (you do not need to actually connect). Include all five fields: <code>Host</code>, <code>HostName</code>, <code>User</code>, <code>Port</code>, <code>IdentityFile</code>.</li>
+<li>Write an <code>scp</code> command that copies a local file to <code>/tmp/</code> using localhost as the remote host.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>SSH is an encrypted remote access protocol; key-based authentication is more secure than passwords.</li>
+<li><code>ssh-keygen</code> creates keys; <code>ssh-copy-id</code> registers the public key on a server.</li>
+<li><code>~/.ssh/config</code> manages connection details with aliases, boosting productivity.</li>
+<li><code>scp</code> handles one-off copies; <code>rsync</code> handles incremental syncs.</li>
+<li>Proper key file permissions and disabling password authentication are security essentials.</li>
+</ul>
+<p>This concludes the Linux CLI 101 series. You now have the CLI fundamentals to connect to servers, analyze logs, and automate deployments with confidence.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Pipes and Redirection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Process Management</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/08-environment-variables.md">Environment Variables and PATH</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/09-shell-script-basics.md">Shell Script Basics</a></li>
+<li><strong>SSH and Remote Access (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.openssh.com/manual.html">OpenSSH Manual Pages</a></li>
+<li><a href="https://www.ssh.com/academy/ssh/keygen">SSH Academy - SSH Key Management</a></li>
+<li><a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">GitHub - Connecting with SSH</a></li>
+<li><a href="https://man7.org/linux/man-pages/man1/rsync.1.html">rsync man page</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, SSH, Remote, scp, Security, Server</p>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>grep, find, xargs — The Search Trio</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>grep, find, xargs — The Search Trio</h1>
+<blockquote>
+<p>Linux CLI 101 series (5/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>How do you find lines containing a specific string across thousands of files?</li>
+<li>What is the difference between content search (grep) and filename search (find)?</li>
+<li>Why is xargs needed, and how does it differ from a pipe?</li>
+<li>Can you use grep effectively without regular expressions?</li>
+</ul>
+<blockquote>
+<p>grep is a detective that finds text inside file contents, and find is a search party that locates files by name and attributes.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is post 5 in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>Searching for strings inside files with <code>grep</code></li>
+<li>Finding files by name, size, and modification time with <code>find</code></li>
+<li>Passing search results as arguments to other commands with <code>xargs</code></li>
+<li>Combining all three commands to automate real-world tasks</li>
+</ul>
+<h2>Why it matters</h2>
+<p>As projects grow, file counts climb into the hundreds. "Where is this function called?", "Which files were modified yesterday?", "Show me only the log lines containing ERROR" — <code>grep</code> and <code>find</code> answer all of these questions.</p>
+<blockquote>
+<p>A "database connection timeout" error hits your production server. There are 30 log files, each tens of thousands of lines long. You need to find which file and which line.</p>
+</blockquote>
+<p>Instead of opening files one by one in an editor, <code>grep -rn "connection timeout" /var/log/app/</code> returns every result in under 1 second.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p><code>grep</code> is a specialist librarian who searches book contents, <code>find</code> is a search party that locates books by title or size on the shelves, and <code>xargs</code> is the courier who hands the found books to someone else.</p>
+</blockquote>
+<pre><code class="language-text">grep: &quot;Find pages containing this word&quot;     -&gt; content search
+find: &quot;Find the red 200-page book&quot;          -&gt; file search
+xargs: &quot;Take the found books to the copier&quot; -&gt; results -&gt; command
+</code></pre>
+<h2>Core Concepts</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Search target</th>
+<th>Key options</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grep</code></td>
+<td>File contents (text)</td>
+<td><code>-r</code>, <code>-n</code>, <code>-i</code>, <code>-l</code></td>
+<td><code>grep -rn "TODO" src/</code></td>
+</tr>
+<tr>
+<td><code>find</code></td>
+<td>Files/directories (metadata)</td>
+<td><code>-name</code>, <code>-type</code>, <code>-mtime</code>, <code>-size</code></td>
+<td><code>find . -name "*.py"</code></td>
+</tr>
+<tr>
+<td><code>xargs</code></td>
+<td>Converts stdin to arguments</td>
+<td><code>-I {}</code>, <code>-P</code></td>
+<td><code>find . -name "*.log" \ | xargs rm</code></td>
+</tr>
+</tbody>
+</table>
+<h2>Before / After</h2>
+<p><strong>Before (manual search)</strong></p>
+<pre><code class="language-text">1. Open files one by one in an editor
+2. Ctrl+F to search
+3. Open next file
+4. Repeat for 30 files -&gt; 20 minutes
+</code></pre>
+<p><strong>After (one grep command)</strong></p>
+<pre><code class="language-bash">grep -rn &quot;connection timeout&quot; /var/log/app/
+# /var/log/app/web.log:1523: 2026-05-04 ERROR database connection timeout
+# /var/log/app/worker.log:89: 2026-05-04 ERROR database connection timeout
+# All locations found in 1 second
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Set up practice environment</strong></p>
+<pre><code class="language-bash">cd ~/practice/linux-cli
+mkdir -p project/src project/tests project/docs
+echo 'def hello():
+    # TODO: add logging
+    print(&quot;hello&quot;)' &gt; project/src/app.py
+echo 'def test_hello():
+    # TODO: fix assertion
+    assert hello() is None' &gt; project/tests/test_app.py
+echo '# Project README
+TODO: write documentation' &gt; project/docs/README.md
+</code></pre>
+<p><strong>Step 2. Search contents with grep</strong></p>
+<pre><code class="language-bash">grep &quot;TODO&quot; project/src/app.py           # Single file
+# TODO: add logging
+
+grep -rn &quot;TODO&quot; project/                  # Recursive + line numbers
+# project/src/app.py:2:    # TODO: add logging
+# project/tests/test_app.py:2:    # TODO: fix assertion
+# project/docs/README.md:2:TODO: write documentation
+
+grep -ri &quot;todo&quot; project/                  # Case insensitive
+grep -rl &quot;TODO&quot; project/                  # File paths only
+# project/src/app.py
+# project/tests/test_app.py
+# project/docs/README.md
+</code></pre>
+<p><strong>Step 3. Find files with find</strong></p>
+<pre><code class="language-bash">find project/ -name &quot;*.py&quot;               # Find by name
+# project/src/app.py
+# project/tests/test_app.py
+
+find project/ -type d                     # Directories only
+find project/ -name &quot;*.py&quot; -newer project/docs/README.md   # Newer than a specific file
+find /tmp -size +1M -mtime -7            # Over 1MB, modified within 7 days
+</code></pre>
+<p><strong>Step 4. Pass results to commands with xargs</strong></p>
+<pre><code class="language-bash">find project/ -name &quot;*.py&quot; | xargs wc -l
+#  3 project/src/app.py
+#  3 project/tests/test_app.py
+#  6 total
+
+grep -rl &quot;TODO&quot; project/ | xargs -I {} echo &quot;Fix needed: {}&quot;
+# Fix needed: project/src/app.py
+# Fix needed: project/tests/test_app.py
+# Fix needed: project/docs/README.md
+</code></pre>
+<p><strong>Step 5. Real-world combinations</strong></p>
+<pre><code class="language-bash"># Find &quot;print&quot; calls in all Python files
+find project/ -name &quot;*.py&quot; | xargs grep -n &quot;print&quot;
+# project/src/app.py:3:    print(&quot;hello&quot;)
+
+# Delete log files older than 30 days
+find /tmp -name &quot;*.log&quot; -mtime +30 -print | xargs rm -v
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>The <code>-r</code> in <code>grep -r</code> stands for recursive — it searches subdirectories</li>
+<li><code>grep -l</code> outputs file paths instead of matching lines, making it useful for pipelines</li>
+<li>The <code>-name</code> pattern in <code>find</code> must be quoted so the Shell does not expand the wildcard first</li>
+<li><code>xargs -I {}</code> substitutes <code>{}</code> with each found item</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Forgetting quotes on find patterns</strong></p>
+<pre><code class="language-bash">find . -name *.py          # Shell expands *.py first -&gt; unexpected results
+find . -name &quot;*.py&quot;        # Correct: find processes the pattern directly
+</code></pre>
+<p><strong>Mistake 2. Using regex in grep without realizing it</strong></p>
+<p>In <code>grep "error.log"</code>, the <code>.</code> means "any character". It matches <code>errorXlog</code> as well as <code>error.log</code>. For a literal match, use <code>grep -F "error.log"</code> or <code>grep "error\.log"</code>.</p>
+<p><strong>Mistake 3. Passing filenames with spaces through xargs</strong></p>
+<pre><code class="language-bash">find . -name &quot;*.txt&quot; | xargs rm          # &quot;My File.txt&quot; splits into &quot;My&quot; and &quot;File.txt&quot;
+find . -name &quot;*.txt&quot; -print0 | xargs -0 rm  # Null delimiter handles spaces safely
+</code></pre>
+<p><strong>Mistake 4. Processing find results with a for loop</strong></p>
+<pre><code class="language-bash"># Slow and unsafe
+for f in $(find . -name &quot;*.log&quot;); do rm &quot;$f&quot;; done
+
+# Fast and safe
+find . -name &quot;*.log&quot; -exec rm {} \;
+# or
+find . -name &quot;*.log&quot; -print0 | xargs -0 rm
+</code></pre>
+<p><strong>Mistake 5. Running grep on binary files</strong></p>
+<p>Running grep on images or executables produces garbled output. Restrict file types with <code>grep --include="*.py" -r "pattern" .</code>.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Code search</strong>: <code>grep -rn "deprecated" src/</code> finds deprecated API calls</li>
+<li><strong>Log analysis</strong>: <code>grep -c "ERROR" app.log</code> counts error occurrences</li>
+<li><strong>Disk cleanup</strong>: <code>find /tmp -mtime +30 -delete</code> removes old temporary files</li>
+<li><strong>Build cleanup</strong>: <code>find . -name "__pycache__" -type d | xargs rm -rf</code></li>
+<li><strong>Code review prep</strong>: <code>find . -name "*.py" -newer last-review.txt</code> finds files changed since the last review</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p><code>grep</code> and <code>find</code> are the most frequently used commands in CLI workflows. The "search entire project" feature in your IDE is doing <code>grep -r</code> internally, and the "file explorer" is doing <code>find</code>. Using them directly in the CLI gives you more flexible options and lets you automate follow-up tasks through pipelines.</p>
+<p>In practice, many teams use <code>ripgrep (rg)</code> which is faster than <code>grep</code>, and <code>fd</code> which is faster than <code>find</code>. But learning the standard commands first is necessary to appreciate the alternatives, and the standard commands have one undeniable advantage — they are installed on every server.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can search for strings across a project with <code>grep -rn</code></li>
+<li>[ ] You can find files by condition with <code>find -name -type -mtime</code></li>
+<li>[ ] You can pass search results to other commands with <code>xargs</code></li>
+<li>[ ] You can safely handle filenames with spaces using <code>-print0</code> and <code>-0</code></li>
+<li>[ ] You can explain the <code>-i</code>, <code>-l</code>, <code>-c</code>, <code>-F</code> options of <code>grep</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Find all files with the <code>.py</code> extension under your home directory.</li>
+<li>Run <code>grep -rn "import" project/</code> and then check the per-file import count with <code>grep -rc</code>.</li>
+<li>Combine <code>find</code> and <code>grep</code> to find files modified within 7 days that contain <code>TODO</code>.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li><code>grep</code> searches file contents for strings, with <code>-r</code> for recursive and <code>-n</code> for line numbers.</li>
+<li><code>find</code> locates files by name, type, size, modification time, and other metadata.</li>
+<li><code>xargs</code> converts standard input into command arguments, with <code>-0</code> to prevent whitespace issues.</li>
+<li>Combining the three commands is a core CLI pattern for automating manual tasks.</li>
+<li>Learn the standard commands first, then move on to alternatives like <code>ripgrep</code> and <code>fd</code>.</li>
+</ul>
+<p>The next post covers <strong>pipes and redirection</strong> — connecting commands and redirecting input/output.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
+<li><strong>grep, find, xargs (current)</strong></li>
+<li>Pipes and Redirection (upcoming)</li>
+<li>Process Management (upcoming)</li>
+<li>Environment Variables and PATH (upcoming)</li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.gnu.org/software/grep/manual/">GNU grep Manual</a></li>
+<li><a href="https://www.gnu.org/software/findutils/manual/html_node/find_html/">GNU find Manual</a></li>
+<li><a href="https://missing.csail.mit.edu/2020/data-wrangling/">The Missing Semester - Data Wrangling</a></li>
+<li><a href="https://github.com/BurntSushi/ripgrep">ripgrep - a faster grep alternative</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, grep, find, xargs, Search, CLI</p>
+</body>
+</html>

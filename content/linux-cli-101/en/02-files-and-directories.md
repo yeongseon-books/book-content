@@ -41,6 +41,8 @@ seo_description: The Linux file system is a giant tree that starts from a single
 
 <!-- a-grade-intro:end -->
 
+This is post 2 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)

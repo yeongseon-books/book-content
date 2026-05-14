@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 3 in the Kubernetes 101 series.
+
 ## What You Will Learn
 
 - *Deployment* and *ReplicaSet* relationship

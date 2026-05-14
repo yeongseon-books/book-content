@@ -41,6 +41,8 @@ seo_description: A pipe connects commands like plumbing, and redirection changes
 
 <!-- a-grade-intro:end -->
 
+This is post 6 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - Passing the output of one command as input to the next with pipe (`|`)

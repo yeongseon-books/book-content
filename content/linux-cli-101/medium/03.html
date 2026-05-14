@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Permissions and Ownership</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Permissions and Ownership</h1>
+<blockquote>
+<p>Linux CLI 101 series (3/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What does <code>rwxr-xr--</code> mean?</li>
+<li>Why are owner and group distinguished for a file?</li>
+<li>What is the difference between <code>chmod 755</code> and <code>chmod u+x</code>?</li>
+<li>How do you diagnose a "Permission denied" error?</li>
+</ul>
+<blockquote>
+<p>File permissions are like a door with three locks. The owner, the group, and everyone else each get a different key.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is post 3 in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)</li>
+<li>How to read permission strings in <code>ls -l</code> output</li>
+<li>Two ways to change permissions with <code>chmod</code> (numeric and symbolic)</li>
+<li>How to change ownership and group with <code>chown</code></li>
+</ul>
+<h2>Why it matters</h2>
+<p>You try to run a script on a server with <code>./deploy.sh</code> and get "Permission denied". The file clearly exists — so why won't it run? Because the execute permission (x) is missing.</p>
+<blockquote>
+<p>A web server cannot read a configuration file and returns a 502 error. The file exists, but a "No such file"-like error appears. The cause is that the directory lacks execute permission (x), making it impossible to enter that path at all.</p>
+</blockquote>
+<p>Permission issues are among the most common problems developers encounter on servers, and not understanding them leads to the dangerous habit of <code>chmod 777</code> for everything, creating security holes.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>File permissions are like a door with three locks. One for the owner, one for the group, and one for others. Each lock has three keys: read (r), write (w), and execute (x).</p>
+</blockquote>
+<pre><code class="language-text">-rwxr-xr--
+│└┬┘└┬┘└┬┘
+│ │  │  └── others: r-- (read only)
+│ │  └── group:  r-x (read+execute)
+│ └── owner:  rwx (read+write+execute)
+└── file type (-: regular file, d: directory)
+</code></pre>
+<h2>Core Concepts</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Number</th>
+<th>File</th>
+<th>Directory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r</td>
+<td>read</td>
+<td>4</td>
+<td>read contents</td>
+<td>list entries (ls)</td>
+</tr>
+<tr>
+<td>w</td>
+<td>write</td>
+<td>2</td>
+<td>modify contents</td>
+<td>create/delete files</td>
+</tr>
+<tr>
+<td>x</td>
+<td>execute</td>
+<td>1</td>
+<td>run as program</td>
+<td>enter directory (cd)</td>
+</tr>
+<tr>
+<td>-</td>
+<td>no permission</td>
+<td>0</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2>Before / After</h2>
+<p><strong>Before (not understanding permissions)</strong></p>
+<pre><code class="language-bash">./deploy.sh
+# bash: ./deploy.sh: Permission denied
+chmod 777 deploy.sh    # &quot;Just 777 if it doesn't work&quot; — security hole
+</code></pre>
+<p><strong>After (understanding permissions)</strong></p>
+<pre><code class="language-bash">ls -l deploy.sh
+# -rw-r--r-- 1 user team 512 May 4 deploy.sh
+# -&gt; execute permission (x) is missing
+
+chmod u+x deploy.sh   # Add execute permission for owner only
+./deploy.sh            # Runs successfully
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Check permissions</strong></p>
+<pre><code class="language-bash">cd ~/practice/linux-cli
+touch secret.txt
+ls -l secret.txt
+# -rw-r--r-- 1 user user 0 May  4 10:00 secret.txt
+</code></pre>
+<p><strong>Step 2. Change permissions with numeric mode</strong></p>
+<pre><code class="language-bash">chmod 644 secret.txt     # owner: rw-, group: r--, others: r--
+chmod 755 secret.txt     # owner: rwx, group: r-x, others: r-x
+chmod 600 secret.txt     # owner: rw-, group: ---, others: ---
+ls -l secret.txt
+# -rw------- 1 user user 0 May  4 10:00 secret.txt
+</code></pre>
+<p>Numeric calculation: add r=4, w=2, x=1. <code>755</code> = <code>rwx</code>(7) + <code>r-x</code>(5) + <code>r-x</code>(5).</p>
+<p><strong>Step 3. Change permissions with symbolic mode</strong></p>
+<pre><code class="language-bash">chmod u+x secret.txt     # Add execute for owner
+chmod g-r secret.txt     # Remove read from group
+chmod o=r secret.txt     # Set others to read only
+chmod a+r secret.txt     # Add read for all
+ls -l secret.txt
+</code></pre>
+<p><strong>Step 4. Directory permissions</strong></p>
+<pre><code class="language-bash">mkdir testdir
+chmod 700 testdir        # Only owner can access
+ls -ld testdir
+# drwx------ 2 user user 4096 May  4 10:00 testdir
+</code></pre>
+<p><strong>Step 5. Change ownership</strong></p>
+<pre><code class="language-bash"># Changing ownership requires root privileges
+sudo chown root:root secret.txt
+ls -l secret.txt
+# -rwxr--r-- 1 root root 0 May  4 10:00 secret.txt
+
+sudo chown user:user secret.txt   # Restore original
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>The first column of <code>ls -l</code> is the permission string — 10 characters (1 type + 9 permissions)</li>
+<li>Numeric mode sets everything at once; symbolic mode changes individual parts</li>
+<li>The <code>x</code> permission on a directory means "enter", not "execute"</li>
+<li><code>chown</code> usually requires <code>sudo</code></li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Solving everything with chmod 777</strong></p>
+<p>777 grants all permissions to every user. Setting 777 on web server files means anyone can modify them — a security vulnerability. Follow the principle of least privilege.</p>
+<p><strong>Mistake 2. Overlooking the x permission on directories</strong></p>
+<p>On a directory, <code>x</code> means "permission to enter". With only <code>r</code> and no <code>x</code>, you can list entries with <code>ls</code> but cannot <code>cd</code> into it. To access a file, every directory in the path must have <code>x</code>.</p>
+<p><strong>Mistake 3. Ignoring group permissions</strong></p>
+<p>When working alone, you only think about owner permissions. But on a team server, other developers in the same group need to read or modify files. Without proper group settings, colleagues cannot open files.</p>
+<p><strong>Mistake 4. Not distinguishing files and directories in recursive permission changes</strong></p>
+<pre><code class="language-bash">chmod -R 755 project/   # All files get execute permission — dangerous
+# Correct approach:
+find project/ -type d -exec chmod 755 {} \;   # Directories only
+find project/ -type f -exec chmod 644 {} \;   # Files only
+</code></pre>
+<p><strong>Mistake 5. Creating files without knowing umask</strong></p>
+<p>The default permissions for new files are determined by <code>umask</code>. With <code>umask 022</code>, files are created as 644 and directories as 755. With <code>umask 077</code>, only the owner can access them.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Deploy scripts</strong>: Add execute permission with <code>chmod u+x deploy.sh</code></li>
+<li><strong>SSH keys</strong>: <code>chmod 600 ~/.ssh/id_rsa</code> is mandatory. SSH refuses keys with loose permissions</li>
+<li><strong>Web server</strong>: HTML/CSS at 644, CGI/scripts at 755, config files at 600 is typical</li>
+<li><strong>Shared directories</strong>: <code>chmod 2775 shared/</code> sets setgid so new files inherit the group</li>
+<li><strong>Docker</strong>: Permission mismatches between container and host cause volume mount issues</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>The guiding principle for permissions is the <strong>Principle of Least Privilege</strong>. Grant only what is needed and close everything else. "Let's open 777 for now and tighten later" is dangerous because "later" never comes.</p>
+<p>On the other hand, permissions that are too strict block team collaboration. A balanced approach is to open group permissions reasonably on dev servers while minimizing them on production. Tracking time lost to permission issues reveals which settings are appropriate.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can read <code>rwxr-xr--</code> and describe the owner/group/others permissions</li>
+<li>[ ] You can calculate what <code>chmod 755</code> grants</li>
+<li>[ ] You can make partial changes with symbolic mode (<code>u+x</code>, <code>g-w</code>)</li>
+<li>[ ] You know that <code>x</code> on a directory means "enter"</li>
+<li>[ ] You can explain why <code>chmod 777</code> should never be used</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>test.sh</code> file with <code>#!/bin/bash</code> and <code>echo "Hello"</code>, add execute permission, and run it with <code>./test.sh</code>.</li>
+<li>Compare the permissions of <code>ls -l /etc/passwd</code> and <code>ls -l /etc/shadow</code>, and guess why they differ.</li>
+<li>Run <code>umask</code> to check the current value, create a new file with <code>touch</code>, and explain how the default permissions relate to the umask.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>Linux file permissions follow a 3x3 structure: owner/group/others x r/w/x.</li>
+<li>Numeric mode (644, 755) sets everything at once; symbolic mode (u+x) changes individual parts.</li>
+<li>The x permission on a directory means permission to enter, and every directory in the path needs it.</li>
+<li>Follow the principle of least privilege and never use 777.</li>
+<li><code>chown</code> requires root privileges to change ownership.</li>
+</ul>
+<p>The next post covers <strong>viewing file contents</strong> — <code>cat</code>, <code>less</code>, <code>head</code>, <code>tail</code>.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><strong>Permissions and Ownership (current)</strong></li>
+<li>cat, less, head, tail (upcoming)</li>
+<li>grep, find, xargs (upcoming)</li>
+<li>Pipes and Redirection (upcoming)</li>
+<li>Process Management (upcoming)</li>
+<li>Environment Variables and PATH (upcoming)</li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.redhat.com/sysadmin/linux-file-permissions-explained">Linux File Permissions Explained</a></li>
+<li><a href="https://www.gnu.org/software/coreutils/manual/html_node/chmod-invocation.html">GNU Coreutils - chmod</a></li>
+<li><a href="https://owasp.org/www-community/Access_Control">OWASP - Principle of Least Privilege</a></li>
+<li><a href="https://man7.org/linux/man-pages/">Linux man page - chmod, chown</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, Permission, chmod, chown, Security, File System</p>
+</body>
+</html>

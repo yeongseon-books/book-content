@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Environment Variables and PATH</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Environment Variables and PATH</h1>
+<blockquote>
+<p>Linux CLI 101 series (8/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What are environment variables and why are they needed?</li>
+<li>What does the output of <code>echo $PATH</code> mean?</li>
+<li>What is the difference between <code>export</code> and a plain variable assignment?</li>
+<li>When do <code>.bashrc</code>, <code>.bash_profile</code>, and <code>.profile</code> each run?</li>
+</ul>
+<blockquote>
+<p>Environment variables are name tags attached to processes, and PATH is the map the Shell uses to find commands.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is post 8 in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>Viewing and setting environment variables with <code>echo</code>, <code>env</code>, <code>export</code></li>
+<li>How PATH drives command lookup</li>
+<li>Adding permanent settings to <code>.bashrc</code> and <code>.bash_profile</code></li>
+<li>Managing application configuration with <code>.env</code> files</li>
+</ul>
+<h2>Why it matters</h2>
+<p>When you type <code>python</code>, the Shell finds and runs the Python executable. How does it find it? Not by searching every directory — it checks only the directories listed in PATH, in order. If the path is not in PATH, you get "command not found".</p>
+<blockquote>
+<p>You install a package with <code>pip install</code> but typing <code>mycommand</code> gives "command not found". The package is installed — so why won't it run? Because the installation path is not in PATH.</p>
+</blockquote>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Environment variables are name tags attached to processes, and PATH is the map the Shell uses to find commands.</p>
+</blockquote>
+<p>A delivery driver checks an address book (PATH) in order. Addresses not in the book are never visited. When a new shop opens, you must add it to the book for the driver to find it.</p>
+<pre><code class="language-text">$ python
+Shell searches PATH in order:
+  /usr/local/bin/python  -&gt; not found
+  /usr/bin/python         -&gt; found! -&gt; execute
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Environment variable</strong><br>
+- Description: key=value pair passed to a process<br>
+- Example: <code>HOME=/home/user</code></p>
+<p><strong>PATH</strong><br>
+- Description: List of command search directories (<code>:</code> separated)<br>
+- Example: <code>/usr/local/bin:/usr/bin:/bin</code></p>
+<p><strong>export</strong><br>
+- Description: Pass variable to child processes<br>
+- Example: <code>export API_KEY=abc123</code></p>
+<p><strong>.bashrc</strong><br>
+- Description: Runs when an interactive bash shell starts<br>
+- Example: <code>~/.bashrc</code></p>
+<p><strong>.bash_profile</strong><br>
+- Description: Runs when a login shell starts<br>
+- Example: <code>~/.bash_profile</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (not knowing PATH)</strong></p>
+<pre><code class="language-bash">pip install httpie
+http GET https://api.example.com
+# bash: http: command not found
+# &quot;Why doesn't it work? I just installed it...&quot;
+</code></pre>
+<p><strong>After (understanding PATH)</strong></p>
+<pre><code class="language-bash">pip install httpie
+which http || pip show httpie | grep Location
+# Location: /home/user/.local/lib/python3.11/site-packages
+# -&gt; check if ~/.local/bin is in PATH
+echo $PATH | tr ':' '\n' | grep local
+# If /home/user/.local/bin is missing:
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;
+http GET https://api.example.com   # Works
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Check environment variables</strong></p>
+<pre><code class="language-bash">echo $HOME                    # Home directory
+echo $USER                    # Current user
+echo $SHELL                   # Current shell
+echo $PATH                    # Command search paths
+
+env                           # Print all environment variables
+env | grep -i python          # Python-related variables only
+</code></pre>
+<p><strong>Step 2. Variable assignment and export</strong></p>
+<pre><code class="language-bash">MY_VAR=&quot;hello&quot;                # Shell variable (not passed to children)
+echo $MY_VAR                  # hello
+
+bash -c 'echo $MY_VAR'       # (empty) — not available in child process
+
+export MY_VAR                 # export passes it to children
+bash -c 'echo $MY_VAR'       # hello
+
+export DB_HOST=&quot;localhost&quot;    # Declare and export at once
+</code></pre>
+<p><strong>Step 3. Modify PATH</strong></p>
+<pre><code class="language-bash">echo $PATH | tr ':' '\n'     # View PATH one entry per line
+
+# Temporary addition (current session only)
+export PATH=&quot;$HOME/mytools:$PATH&quot;
+
+# Check command location
+which python
+which ls
+</code></pre>
+<p><strong>Step 4. Add permanent settings to .bashrc</strong></p>
+<pre><code class="language-bash">echo 'export PATH=&quot;$HOME/.local/bin:$PATH&quot;' &gt;&gt; ~/.bashrc
+echo 'export EDITOR=vim' &gt;&gt; ~/.bashrc
+
+source ~/.bashrc             # Apply immediately (or open a new terminal)
+echo $EDITOR
+# vim
+</code></pre>
+<p><strong>Step 5. The .env file pattern</strong></p>
+<pre><code class="language-bash">cat &gt; ~/practice/linux-cli/.env &lt;&lt; 'EOF'
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp
+API_KEY=secret-key-123
+EOF
+
+# Load .env file in Shell
+set -a                        # Auto-export subsequent variables
+source ~/practice/linux-cli/.env
+set +a
+echo $DB_HOST                 # localhost
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>Variables set without <code>export</code> are only valid in the current Shell and are not passed to child processes</li>
+<li>PATH uses <code>:</code> as a delimiter, and directories on the left take priority</li>
+<li><code>source ~/.bashrc</code> runs the file in the current Shell. <code>.</code> is a synonym</li>
+<li><code>.env</code> files must never be committed to Git (they contain sensitive data like API keys)</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Overwriting PATH</strong></p>
+<pre><code class="language-bash">export PATH=&quot;/my/new/path&quot;              # Entire existing PATH is gone!
+export PATH=&quot;/my/new/path:$PATH&quot;        # Appends to existing PATH — safe
+</code></pre>
+<p><strong>Mistake 2. Confusing .bashrc and .bash_profile</strong></p>
+<p>Login shells (SSH connections) read <code>.bash_profile</code>; non-login interactive shells (terminal apps) read <code>.bashrc</code>. The common practice is to source <code>.bashrc</code> from <code>.bash_profile</code> for consistency.</p>
+<p><strong>Mistake 3. Omitting braces in variable references</strong></p>
+<pre><code class="language-bash">echo &quot;$HOME_backup&quot;           # Looks for a variable named HOME_backup
+echo &quot;${HOME}_backup&quot;         # HOME variable + &quot;_backup&quot; string
+</code></pre>
+<p><strong>Mistake 4. Committing .env files to Git</strong></p>
+<p>If a <code>.env</code> file with API keys and passwords lands in a public repository, it is a security incident. Always add <code>.env</code> to <code>.gitignore</code>.</p>
+<p><strong>Mistake 5. Forgetting export and wondering why "the variable doesn't work"</strong></p>
+<p>To read <code>os.environ["MY_VAR"]</code> in a Python script, the Shell must <code>export</code> the variable. <code>MY_VAR=hello</code> alone is invisible to the child process Python.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>12-Factor App</strong>: Manage configuration through environment variables (DB credentials, API keys)</li>
+<li><strong>Virtual environment activation</strong>: <code>source venv/bin/activate</code> prepends venv's bin/ to PATH</li>
+<li><strong>CI/CD variables</strong>: <code>env:</code> in GitHub Actions sets environment variables</li>
+<li><strong>Docker</strong>: <code>docker run -e DB_HOST=db</code> passes environment variables to a container</li>
+<li><strong>Debugging</strong>: <code>env | sort</code> dumps the current environment for diagnosis</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>Environment variables are the standard method for managing "configuration outside of code". When running the same code across dev/staging/production, you change only the <code>DB_HOST</code> variable instead of the code. This is the core of the 12-Factor App methodology and the default way to inject configuration in Docker and Kubernetes.</p>
+<p>On the other hand, too many environment variables become hard to manage. At that point, you move to per-environment <code>.env</code> files or secrets management tools like AWS Parameter Store and HashiCorp Vault. But the starting point for all of this is understanding <code>export</code> and <code>$PATH</code>.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can read the output of <code>echo $PATH</code> and explain the command search order</li>
+<li>[ ] You know the difference between <code>export</code> and plain variable assignment</li>
+<li>[ ] You can permanently add PATH entries to <code>.bashrc</code></li>
+<li>[ ] You can create a <code>.env</code> file and load it with <code>source</code></li>
+<li>[ ] You know why <code>.env</code> files should be added to <code>.gitignore</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Run <code>echo $PATH | tr ':' '\n' | nl</code> to see the PATH search order with numbering.</li>
+<li>Set <code>MY_SECRET=hello</code> and <code>export MY_SECRET=hello</code> separately, then run <code>bash -c 'echo $MY_SECRET'</code> after each to observe the difference.</li>
+<li>Add <code>alias ll='ls -la'</code> to <code>.bashrc</code>, run <code>source ~/.bashrc</code>, and verify that <code>ll</code> works.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>Environment variables are key=value settings passed to processes, inherited by children via <code>export</code>.</li>
+<li>PATH is the list of directories the Shell searches for commands — <code>:</code> delimited, left-to-right priority.</li>
+<li>Adding settings to <code>.bashrc</code> applies them automatically to every new Shell.</li>
+<li><code>.env</code> files are useful for application configuration but must never be committed to Git.</li>
+<li>Without <code>export</code>, child processes (Python, Docker, etc.) cannot see the variable.</li>
+</ul>
+<p>The next post covers <strong>shell scripting basics</strong> — writing scripts to automate repetitive tasks.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/04-viewing-files.md">cat, less, head, tail</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/05-grep-find-xargs.md">grep, find, xargs</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/06-pipe-and-redirection.md">Pipes and Redirection</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/07-process-management.md">Process Management</a></li>
+<li><strong>Environment Variables and PATH (current)</strong></li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.gnu.org/software/bash/manual/html_node/Shell-Variables.html">GNU Bash Manual - Shell Variables</a></li>
+<li><a href="https://12factor.net/config">The Twelve-Factor App - Config</a></li>
+<li><a href="https://man7.org/linux/man-pages/man7/environ.7.html">Linux man page - environ</a></li>
+<li><a href="https://github.com/motdotla/dotenv">dotenv pattern - Best practices</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, Environment Variable, PATH, bashrc, Shell, Configuration</p>
+</body>
+</html>

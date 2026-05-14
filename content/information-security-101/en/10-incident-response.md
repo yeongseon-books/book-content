@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the final post in the Information Security 101 series.
+
 ## What You Will Learn
 
 - The NIST IR cycle (Prepare, Detect, Contain, Eradicate, Recover, Lessons)

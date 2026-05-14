@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 3 in the Information Security 101 series.
+
 ## What You Will Learn
 
 - Symmetric encryption (AES-GCM) and asymmetric encryption (RSA/ECC)

@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 6 in the GitHub Actions 101 series.
+
 ## What You Will Learn
 
 - Using *upload-artifact / download-artifact*

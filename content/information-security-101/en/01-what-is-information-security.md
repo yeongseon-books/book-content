@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the first post in the Information Security 101 series.
+
 ## What You Will Learn
 
 - The definition of information security and the CIA triad (confidentiality, integrity, availability)

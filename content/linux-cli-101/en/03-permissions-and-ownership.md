@@ -41,6 +41,8 @@ seo_description: Linux file permissions are like a door with three locks. The ow
 
 <!-- a-grade-intro:end -->
 
+This is post 3 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)

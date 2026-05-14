@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the Linear Algebra 101 series.
+
 ## What You Will Learn
 
 - The *definition* and *properties* of a *linear transformation*

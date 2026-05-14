@@ -41,6 +41,8 @@ seo_description: SSH opens a remote terminal over an encrypted channel, and key-
 
 <!-- a-grade-intro:end -->
 
+This is the final post in the Linux CLI 101 series.
+
 ## What you will learn
 
 - The basic SSH connection flow and key-based authentication setup

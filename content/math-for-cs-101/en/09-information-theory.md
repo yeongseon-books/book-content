@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 9 in the Math for CS 101 series.
+
 ## What You Will Learn
 
 - *Bits* and *information content*

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>cat, less, head, tail — Viewing File Contents</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>cat, less, head, tail — Viewing File Contents</h1>
+<blockquote>
+<p>Linux CLI 101 series (4/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Why do we need multiple commands just to view file contents?</li>
+<li>What happens if you run <code>cat</code> on a 1GB log file?</li>
+<li>When would you use <code>tail -f</code>?</li>
+<li>How do you view only the first 10 lines or the last 20 lines of a file?</li>
+</ul>
+<blockquote>
+<p>cat dumps a file all at once like pouring a bucket, and less lets you flip through it one page at a time like reading a book.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is post 4 in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>Using <code>cat</code> to quickly view short files</li>
+<li>Using <code>less</code> to browse long files page by page</li>
+<li>Using <code>head</code> and <code>tail</code> to slice the beginning or end of a file</li>
+<li>Using <code>tail -f</code> to monitor logs in real time</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Viewing file contents comes up constantly during development. You check config values, hunt for errors in logs, and inspect CSV headers. Opening an editor is slow for large files, and edit mode risks accidental changes.</p>
+<blockquote>
+<p>You need to check the last error in a 1GB log file on a server. Opening it in vim consumes all memory, and running cat scrolls the terminal for minutes.</p>
+</blockquote>
+<p>Using the right read-only command for the right job solves this cleanly.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p><code>cat</code> is pouring a bucket all at once, <code>less</code> is flipping through a book one page at a time. <code>head</code> is tearing out the first few pages, and <code>tail</code> is reading only the last few pages.</p>
+</blockquote>
+<pre><code class="language-text">Small file     --&gt; cat (print at once)
+Large file     --&gt; less (page navigation)
+Need beginning --&gt; head -n 20
+Need end       --&gt; tail -n 20
+Real-time      --&gt; tail -f
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong><code>cat</code></strong><br>
+- Purpose: Print entire file<br>
+- Key trait: Best for short files, also used as pipe input</p>
+<p><strong><code>less</code></strong><br>
+- Purpose: Page-by-page navigation<br>
+- Key trait: Searchable, navigable, memory efficient</p>
+<p><strong><code>head</code></strong><br>
+- Purpose: Print beginning of file<br>
+- Key trait: Default 10 lines, adjust with <code>-n</code></p>
+<p><strong><code>tail</code></strong><br>
+- Purpose: Print end of file<br>
+- Key trait: Default 10 lines, <code>-f</code> for real-time tracking</p>
+<p><strong><code>wc</code></strong><br>
+- Purpose: Count lines/words/bytes<br>
+- Key trait: <code>wc -l</code> for line count only</p>
+<h2>Before / After</h2>
+<p><strong>Before (opening every file in an editor)</strong></p>
+<pre><code class="language-text">vim /var/log/app/app.log    # 1GB file -&gt; 30 seconds to load
+# Accidentally press i -&gt; edit mode -&gt; risk of changing contents
+# :q! to exit
+</code></pre>
+<p><strong>After (read-only commands)</strong></p>
+<pre><code class="language-bash">tail -n 50 /var/log/app/app.log    # Last 50 lines printed instantly
+tail -f /var/log/app/app.log       # New log lines appear in real time
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Create practice files</strong></p>
+<pre><code class="language-bash">cd ~/practice/linux-cli
+seq 1 100 &gt; numbers.txt          # Numbers 1 through 100
+echo -e &quot;name,age\nAlice,30\nBob,25\nCharlie,35&quot; &gt; data.csv
+cat /etc/passwd &gt; users.txt      # Copy system user list
+</code></pre>
+<p><strong>Step 2. View short files with cat</strong></p>
+<pre><code class="language-bash">cat data.csv
+# name,age
+# Alice,30
+# Bob,25
+# Charlie,35
+
+cat -n data.csv          # With line numbers
+# 1  name,age
+# 2  Alice,30
+# 3  Bob,25
+# 4  Charlie,35
+</code></pre>
+<p><strong>Step 3. head and tail</strong></p>
+<pre><code class="language-bash">head numbers.txt          # First 10 lines
+head -n 5 numbers.txt     # First 5 lines
+
+tail numbers.txt          # Last 10 lines
+tail -n 3 numbers.txt     # Last 3 lines
+# 98
+# 99
+# 100
+</code></pre>
+<p><strong>Step 4. Browse long files with less</strong></p>
+<pre><code class="language-bash">less users.txt
+# Controls:
+# Space or f: next page
+# b: previous page
+# /keyword: search (n for next result)
+# g: go to beginning
+# G: go to end
+# q: quit
+</code></pre>
+<p><strong>Step 5. Real-time log monitoring with tail -f</strong></p>
+<pre><code class="language-bash"># Terminal 1: monitor logs in real time
+tail -f /tmp/test.log &amp;
+
+# Add log entries
+echo &quot;$(date) INFO: app started&quot; &gt;&gt; /tmp/test.log
+echo &quot;$(date) ERROR: connection failed&quot; &gt;&gt; /tmp/test.log
+
+# tail -f prints new lines immediately
+# Ctrl+C to stop
+kill %1 2&gt;/dev/null
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li>In <code>seq 1 100 &gt; numbers.txt</code>, <code>&gt;</code> is redirection that sends output to a file (covered in detail in Ep6)</li>
+<li><code>cat -n</code> is useful when you need line numbers for debugging</li>
+<li><code>less</code> does not load the entire file into memory, so it opens huge files instantly</li>
+<li>The <code>f</code> in <code>tail -f</code> stands for "follow" — it keeps tracking the end of the file</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Using cat on large files</strong></p>
+<pre><code class="language-bash">cat access.log    # 1GB file -&gt; terminal scrolls for minutes
+# Ctrl+C stops it, but the terminal buffer is already flooded
+</code></pre>
+<p>Use <code>less</code> or <code>tail -n 100</code> to view only what you need.</p>
+<p><strong>Mistake 2. Not knowing how to exit less</strong></p>
+<p>Press <code>q</code>. <code>Ctrl+C</code> does not work inside <code>less</code>. Unlike vim, it is <code>q</code> alone — not <code>:q</code>.</p>
+<p><strong>Mistake 3. Leaving tail -f running without stopping it</strong></p>
+<p><code>tail -f</code> is a never-ending command. You must explicitly stop it with <code>Ctrl+C</code>. Leaving it in the background consumes resources.</p>
+<p><strong>Mistake 4. Not knowing the default (10 lines) for head/tail</strong></p>
+<p><code>head file.txt</code> prints 10 lines by default. To see only 5 lines, you must specify <code>-n 5</code>.</p>
+<p><strong>Mistake 5. Not knowing cat's original purpose — concatenation</strong></p>
+<p><code>cat</code> stands for concatenate. Its original purpose is joining multiple files together.</p>
+<pre><code class="language-bash">cat header.csv data1.csv data2.csv &gt; combined.csv
+</code></pre>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Log monitoring</strong>: <code>tail -f /var/log/nginx/error.log</code> for real-time errors</li>
+<li><strong>CSV header check</strong>: <code>head -n 1 data.csv</code> to quickly see column names</li>
+<li><strong>Config check</strong>: <code>cat config.yaml</code> for short configuration files</li>
+<li><strong>Line counting</strong>: <code>wc -l access.log</code> to quickly gauge request volume</li>
+<li><strong>Log filtering</strong>: <code>tail -n 1000 app.log | grep ERROR</code> to extract recent errors</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>The decision criterion for "which command to view a file with" is <strong>file size and purpose</strong>. A few dozen lines means <code>cat</code>, hundreds of lines or more means <code>less</code>, and only the beginning or end means <code>head</code>/<code>tail</code>. Once this selection becomes automatic, your CLI speed improves noticeably.</p>
+<p>The most-used combination in production is <code>tail -f</code> + <code>grep</code>. Running <code>tail -f app.log | grep --line-buffered ERROR</code> shows errors the instant they occur. Without this combination during incident response, you fall into the inefficiency of "opening the log file in an editor and refreshing".</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can distinguish the purposes of <code>cat</code>, <code>less</code>, <code>head</code>, and <code>tail</code></li>
+<li>[ ] You can search (<code>/</code>) and quit (<code>q</code>) in <code>less</code></li>
+<li>[ ] You can view a specific number of lines with <code>head -n N</code> and <code>tail -n N</code></li>
+<li>[ ] You can monitor logs in real time with <code>tail -f</code></li>
+<li>[ ] You can choose the appropriate command based on file size</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Check the line count of <code>/etc/passwd</code> with <code>wc -l</code>, then print the first 5 and last 5 lines separately.</li>
+<li>Create a file with <code>seq 1 10000 &gt; big.txt</code>, open it in <code>less</code>, and search for <code>/5000</code> to jump to that line.</li>
+<li>Run <code>tail -f /tmp/live.log</code>, then from another terminal run <code>echo "test" &gt;&gt; /tmp/live.log</code> and observe the real-time output.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li><code>cat</code> prints short files at once or concatenates multiple files.</li>
+<li><code>less</code> browses large files page by page with memory efficiency.</li>
+<li><code>head</code>/<code>tail</code> quickly show only the beginning or end of a file.</li>
+<li><code>tail -f</code> is the essential tool for real-time log monitoring.</li>
+<li>Choosing the appropriate command based on file size and purpose is a mark of CLI proficiency.</li>
+</ul>
+<p>The next post covers <strong>text search and file finding</strong> — <code>grep</code>, <code>find</code>, <code>xargs</code>.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/02-files-and-directories.md">Files and Directories</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/03-permissions-and-ownership.md">Permissions and Ownership</a></li>
+<li><strong>cat, less, head, tail (current)</strong></li>
+<li>grep, find, xargs (upcoming)</li>
+<li>Pipes and Redirection (upcoming)</li>
+<li>Process Management (upcoming)</li>
+<li>Environment Variables and PATH (upcoming)</li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.gnu.org/software/coreutils/manual/">GNU Coreutils - cat, head, tail</a></li>
+<li><a href="https://man7.org/linux/man-pages/man1/less.1.html">less man page</a></li>
+<li><a href="https://missing.csail.mit.edu/2020/data-wrangling/">The Missing Semester - Data Wrangling</a></li>
+<li><a href="https://www.linuxjournal.com/content/tail-f-and-friends">Linux Journal - tail -f and friends</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, CLI, cat, less, tail, Log</p>
+</body>
+</html>

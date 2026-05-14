@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What Is the CLI and Shell?</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What Is the CLI and Shell?</h1>
+<blockquote>
+<p>Linux CLI 101 series (1/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>What does it really mean to operate a computer without a GUI?</li>
+<li>What are Terminal, Shell, and CLI, and how do they differ?</li>
+<li>Why should developers learn the CLI in practical terms?</li>
+<li>How do you choose between Bash, Zsh, and other shells?</li>
+</ul>
+<blockquote>
+<p>The CLI is a remote control that operates your computer with keystrokes alone, and the Shell is the interpreter that translates those keystrokes into actions.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is the first post in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The exact difference between CLI, Shell, and Terminal</li>
+<li>How to run your first commands in a Bash shell</li>
+<li>How to read command structure: command, option, argument</li>
+<li>Practical reasons developers use the CLI over GUIs</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Most people start programming with a GUI editor and mouse clicks. Double-click a file to open it, click "Run" in the menu. That approach works at first, but the moment you step into a server environment, it falls apart.</p>
+<blockquote>
+<p>You SSH into a deployment server. The screen shows nothing but a black text prompt. The mouse does not work. There is nothing to click. How do you open a log file?</p>
+</blockquote>
+<p>This is why you need the CLI. Servers, Docker containers, and CI/CD pipelines all run in CLI environments. Without CLI skills, you can develop but you cannot operate.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>The CLI is a remote control that operates your computer with keystrokes alone, and the Shell is the interpreter that translates those keystrokes into actions.</p>
+</blockquote>
+<p>When you press a TV remote button, an infrared signal goes out and the TV interprets it. The CLI works the same way. You type a command (remote button), the Shell interprets it (translator), and passes it to the operating system. The Terminal is the screen where all of this happens.</p>
+<pre><code class="language-text">[User] --typing--&gt; [Terminal window] --passes--&gt; [Shell (Bash)] --executes--&gt; [OS]
+                                                                                |
+[User] &lt;--display-- [Terminal window] &lt;--result-- [Shell (Bash)] &lt;--response-- [OS]
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>CLI</strong><br>
+- Role: Interface for controlling a computer via text commands<br>
+- Example: The overall command-line approach</p>
+<p><strong>Terminal</strong><br>
+- Role: The program (window) where you use the CLI<br>
+- Example: iTerm2, Windows Terminal, GNOME Terminal</p>
+<p><strong>Shell</strong><br>
+- Role: The program that interprets and executes commands<br>
+- Example: Bash, Zsh, Fish</p>
+<p><strong>Prompt</strong><br>
+- Role: The indicator that the Shell is waiting for input<br>
+- Example: <code>user@host:~$</code></p>
+<p><strong>Command</strong><br>
+- Role: An action to execute<br>
+- Example: <code>ls</code>, <code>cd</code>, <code>echo</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (GUI approach)</strong></p>
+<pre><code class="language-text">1. Open file explorer
+2. Double-click Downloads folder
+3. Right-click file → Rename
+4. Type new name and press Enter
+</code></pre>
+<p><strong>After (CLI approach)</strong></p>
+<pre><code class="language-bash">cd ~/Downloads
+mv old-name.txt new-name.txt
+</code></pre>
+<p>Two lines. When you need to rename 100 files, GUI means 100 clicks. CLI means one loop.</p>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Open a Terminal</strong></p>
+<pre><code class="language-bash"># macOS: Cmd + Space → search &quot;Terminal&quot;
+# Ubuntu: Ctrl + Alt + T
+# Windows: Install WSL, then open the &quot;Ubuntu&quot; app
+</code></pre>
+<p>A prompt appears when the Terminal opens.</p>
+<pre><code class="language-text">user@hostname:~$
+</code></pre>
+<p><strong>Step 2. Run your first command</strong></p>
+<pre><code class="language-bash">echo &quot;Hello, CLI!&quot;
+# Output: Hello, CLI!
+</code></pre>
+<p><code>echo</code> prints the text that follows it to the screen.</p>
+<p><strong>Step 3. Understand command structure</strong></p>
+<pre><code class="language-bash">ls -la /home
+#  ^  ^^  ^
+#  |  ||  └── argument: target path
+#  |  |└── option: include hidden files
+#  |  └── option: detailed information
+#  └── command: list files
+</code></pre>
+<p>Every command follows the <code>command [options] [arguments]</code> structure.</p>
+<p><strong>Step 4. Check your Shell</strong></p>
+<pre><code class="language-bash">echo $SHELL
+# Example output: /bin/bash or /bin/zsh
+</code></pre>
+<p><strong>Step 5. Read the manual</strong></p>
+<pre><code class="language-bash">ls --help    # Quick help
+man ls       # Full manual (press q to exit)
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>echo</code> is the simplest output command but it is essential for debugging and scripting</li>
+<li><code>-la</code> combines <code>-l</code> and <code>-a</code> into one flag, and most commands support this shorthand</li>
+<li><code>$SHELL</code> is an environment variable referenced with the <code>$</code> sign (covered in Ep8)</li>
+<li><code>man</code> pages are more accurate than internet searches because they are official documentation</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Confusing Terminal with Shell</strong></p>
+<p>Terminal is the screen (program) and Shell is the command interpreter. You can run different shells inside the same terminal. Switching from <code>bash</code> to <code>zsh</code> is like changing the channel on the same TV.</p>
+<p><strong>Mistake 2. Ignoring case sensitivity</strong></p>
+<p>On Linux, <code>File.txt</code> and <code>file.txt</code> are completely different files. Unlike Windows, Linux is strictly case-sensitive.</p>
+<p><strong>Mistake 3. Mishandling spaces in paths</strong></p>
+<pre><code class="language-bash">cd My Documents     # Error: interpreted as two arguments &quot;My&quot; and &quot;Documents&quot;
+cd &quot;My Documents&quot;   # Correct: quotes wrap the path
+cd My\ Documents    # Correct: backslash escapes the space
+</code></pre>
+<p><strong>Mistake 4. Running everything as root</strong></p>
+<p>Habitually prepending <code>sudo</code> is dangerous. You could accidentally delete system files. Use <code>sudo</code> only when truly necessary.</p>
+<p><strong>Mistake 5. Not knowing Tab completion</strong></p>
+<p>You do not need to type full file names. Type the first few characters and press Tab. The Shell auto-completes. Press Tab twice to see a list of candidates.</p>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Server debugging</strong>: Checking logs and process status after SSH is all CLI</li>
+<li><strong>Docker containers</strong>: There is no GUI inside a container. <code>docker exec</code> drops you into a CLI</li>
+<li><strong>CI/CD pipelines</strong>: GitHub Actions, Jenkins — all automation tools run shell commands</li>
+<li><strong>Script automation</strong>: Bundling repetitive tasks into shell scripts saves significant time</li>
+<li><strong>Remote server management</strong>: Cloud servers (AWS EC2, Azure VM) default to CLI access</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>When someone asks "Why bother with the CLI when there is a GUI?", the answer is <strong>reproducibility and automation</strong>. GUI actions leave no record. If you need to repeat the same task tomorrow, you click from scratch. CLI commands remain in history and can be saved as scripts for permanent reproducibility.</p>
+<p>That said, not everything should be done in the CLI. Code editing is more productive in a GUI editor like VS Code, and file comparison is more intuitive with a GUI diff tool. The decision criterion is: "What if I repeat this task 100 times?" The more repetitive the task, the higher the CLI's value.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can explain Terminal, Shell, and CLI in one sentence each</li>
+<li>[ ] You can open a Terminal and run <code>echo</code> and <code>ls</code></li>
+<li>[ ] You can distinguish command, option, and argument in a command</li>
+<li>[ ] You can check which Shell you are currently using</li>
+<li>[ ] You can use Tab completion and man pages</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Open a terminal and run <code>whoami</code>, <code>hostname</code>, <code>date</code>, and <code>pwd</code> in order. Summarize what each command outputs in one line.</li>
+<li>Run <code>ls -la /etc</code> and guess what each column in the output means. (The answer is covered in Ep3.)</li>
+<li>Run <code>echo $SHELL</code> and <code>echo $HOME</code>. Explain what each environment variable points to.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>The CLI is a text-based interface for controlling computers, essential in server environments without GUIs.</li>
+<li>Terminal is the screen, Shell is the command interpreter, and CLI is the overall approach.</li>
+<li>Every command follows the <code>command [options] [arguments]</code> structure.</li>
+<li>Tab completion and man pages are the core productivity tools for CLI work.</li>
+<li>Learning the CLI enables you to handle server management, Docker, CI/CD, and automation scripts directly.</li>
+</ul>
+<p>The next post covers <strong>files and directories</strong> — <code>ls</code>, <code>cd</code>, <code>mkdir</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><strong>What Is the CLI and Shell? (current)</strong></li>
+<li>Files and Directories (upcoming)</li>
+<li>Permissions and Ownership (upcoming)</li>
+<li>cat, less, head, tail (upcoming)</li>
+<li>grep, find, xargs (upcoming)</li>
+<li>Pipes and Redirection (upcoming)</li>
+<li>Process Management (upcoming)</li>
+<li>Environment Variables and PATH (upcoming)</li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://www.gnu.org/software/bash/manual/">GNU Bash Reference Manual</a></li>
+<li><a href="https://man7.org/linux/man-pages/">Linux man pages online</a></li>
+<li><a href="https://missing.csail.mit.edu/2020/course-shell/">The Missing Semester of Your CS Education - The Shell</a></li>
+<li><a href="https://explainshell.com/">ExplainShell - match command-line arguments to their help text</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, CLI, Shell, Terminal, Bash, Command Line</p>
+</body>
+</html>

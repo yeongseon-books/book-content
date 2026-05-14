@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 2 in the GitHub Actions 101 series.
+
 ## What You Will Learn
 
 - The exact relationship between *Workflow / Job / Step*

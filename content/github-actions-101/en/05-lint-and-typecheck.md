@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the GitHub Actions 101 series.
+
 ## What You Will Learn
 
 - Combined *style + lint* with *Ruff*

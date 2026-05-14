@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the MLOps 101 series.
+
 ## What You Will Learn
 
 - Three deployment patterns (online / batch / streaming)

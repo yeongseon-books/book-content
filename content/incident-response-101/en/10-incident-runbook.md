@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the final post in the Incident Response 101 series.
+
 ## What You Will Learn
 
 - *SEV* mapping

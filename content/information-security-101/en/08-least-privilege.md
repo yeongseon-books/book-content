@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 8 in the Information Security 101 series.
+
 ## What You Will Learn
 
 - The exact meaning of the principle of least privilege (PoLP)

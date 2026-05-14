@@ -41,6 +41,8 @@ seo_description: The CLI operates your computer with keystrokes, and the Shell t
 
 <!-- a-grade-intro:end -->
 
+This is the first post in the Linux CLI 101 series.
+
 ## What you will learn
 
 - The exact difference between CLI, Shell, and Terminal

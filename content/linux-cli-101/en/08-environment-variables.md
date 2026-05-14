@@ -41,6 +41,8 @@ seo_description: Environment variables are name tags attached to processes, and 
 
 <!-- a-grade-intro:end -->
 
+This is post 8 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - Viewing and setting environment variables with `echo`, `env`, `export`

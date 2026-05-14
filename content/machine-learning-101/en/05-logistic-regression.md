@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the Machine Learning 101 series.
+
 ## What You Will Learn
 
 - The sigmoid function and its probabilistic output

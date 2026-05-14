@@ -41,6 +41,8 @@ seo_description: cat dumps a file all at once like pouring a bucket, and less le
 
 <!-- a-grade-intro:end -->
 
+This is post 4 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - Using `cat` to quickly view short files

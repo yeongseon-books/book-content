@@ -41,6 +41,8 @@ seo_description: grep is a detective that finds text inside file contents, and f
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - Searching for strings inside files with `grep`

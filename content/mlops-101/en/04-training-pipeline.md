@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 4 in the MLOps 101 series.
+
 ## What You Will Learn
 
 - The five stages of a training pipeline

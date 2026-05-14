@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Files and Directories</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Files and Directories</h1>
+<blockquote>
+<p>Linux CLI 101 series (2/10)</p>
+</blockquote>
+<hr>
+<!-- a-grade-intro:begin -->
+
+<h2>Key Questions</h2>
+<ul>
+<li>Where does the Linux file system start, and why is there only one root?</li>
+<li>What is the difference between absolute and relative paths?</li>
+<li>What commands create, copy, move, and delete files and directories?</li>
+<li>Can you explain why <code>rm -rf</code> is dangerous?</li>
+</ul>
+<blockquote>
+<p>The Linux file system is a giant tree that starts from a single root (/). Every file and directory is a branch of this tree.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
+<p>This is post 2 in the Linux CLI 101 series.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The Linux file system hierarchy (<code>/</code>, <code>/home</code>, <code>/etc</code>, <code>/var</code>)</li>
+<li>Checking your current location and navigating with <code>pwd</code>, <code>cd</code>, <code>ls</code></li>
+<li>Manipulating files and directories with <code>mkdir</code>, <code>touch</code>, <code>cp</code>, <code>mv</code>, <code>rm</code></li>
+<li>The difference between absolute and relative paths, and when to use each</li>
+</ul>
+<h2>Why it matters</h2>
+<p>A developer's daily routine is an endless cycle of creating, moving, copying, and deleting files. You organize code files, copy configuration files, and remove build artifacts. In a GUI you drag and drop, but on a server everything is done through commands.</p>
+<blockquote>
+<p>You receive a request to back up log files on a deployment server. There are 50 files inside <code>/var/log/app/</code> and you need to copy them to <code>/backup/2026-05-04/</code>. There is no mouse.</p>
+</blockquote>
+<p>To finish this task in 3 seconds with <code>cp -r</code>, you need to understand the file system structure and basic commands.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>The Linux file system is a giant tree that starts from a single root (<code>/</code>). Every file and directory is a branch of this tree.</p>
+</blockquote>
+<p>Windows has multiple drive letters like <code>C:\</code> and <code>D:\</code>, but Linux always starts from a single <code>/</code> (root). Even when you plug in a USB drive or mount a network share, everything hangs somewhere on this tree.</p>
+<pre><code class="language-text">/                       &lt;- root
+├── home/               &lt;- user home directories
+│   └── user/           &lt;- my workspace (~)
+├── etc/                &lt;- system configuration files
+├── var/                &lt;- logs, caches, variable data
+├── tmp/                &lt;- temporary files
+└── usr/                &lt;- user programs
+    └── bin/            &lt;- executables
+</code></pre>
+<h2>Core Concepts</h2>
+<p><strong>Absolute path</strong><br>
+- Description: Full path starting from <code>/</code><br>
+- Example: <code>/home/user/project/main.py</code></p>
+<p><strong>Relative path</strong><br>
+- Description: Path relative to current location<br>
+- Example: <code>./src/main.py</code>, <code>../config.yaml</code></p>
+<p><strong><code>.</code></strong><br>
+- Description: Current directory<br>
+- Example: <code>./run.sh</code> (run.sh in the current folder)</p>
+<p><strong><code>..</code></strong><br>
+- Description: Parent directory<br>
+- Example: <code>cd ..</code> (move one level up)</p>
+<p><strong><code>~</code></strong><br>
+- Description: Home directory<br>
+- Example: <code>cd ~</code> = <code>cd /home/user</code></p>
+<h2>Before / After</h2>
+<p><strong>Before (not knowing paths)</strong></p>
+<pre><code class="language-text">&quot;The file is somewhere... where was it?&quot;
+-&gt; Click through folders one by one in the GUI
+-&gt; 5 minutes spent
+</code></pre>
+<p><strong>After (a CLI user who knows paths)</strong></p>
+<pre><code class="language-bash">find /var/log -name &quot;error*.log&quot; -mtime -1
+# Finds all error logs created since yesterday in 1 second
+</code></pre>
+<h2>Step-by-step practice</h2>
+<p><strong>Step 1. Check your current location</strong></p>
+<pre><code class="language-bash">pwd
+# Example output: /home/user
+</code></pre>
+<p><code>pwd</code> (print working directory) shows where you currently are.</p>
+<p><strong>Step 2. Navigate directories</strong></p>
+<pre><code class="language-bash">cd /tmp           # Move using an absolute path
+cd ~              # Move to home
+mkdir -p ~/practice/linux-cli   # Create a practice directory
+cd ~/practice/linux-cli         # Move into it
+pwd
+# Output: /home/user/practice/linux-cli
+</code></pre>
+<p><strong>Step 3. Create files and directories</strong></p>
+<pre><code class="language-bash">touch hello.txt               # Create an empty file
+mkdir src                     # Create a directory
+mkdir -p src/utils/helpers    # Create nested directories at once
+ls -la
+# hello.txt, src/ are visible
+</code></pre>
+<p><strong>Step 4. Copy, move, and rename</strong></p>
+<pre><code class="language-bash">cp hello.txt hello-backup.txt          # Copy a file
+mv hello-backup.txt src/               # Move a file
+mv src/hello-backup.txt src/backup.txt # Rename
+ls src/
+# backup.txt  utils/
+</code></pre>
+<p><strong>Step 5. Delete</strong></p>
+<pre><code class="language-bash">rm src/backup.txt              # Delete a file
+rmdir src/utils/helpers        # Delete an empty directory
+rm -r src/utils                # Delete a directory and its contents
+ls src/
+# (empty)
+</code></pre>
+<h2>What to notice in this code</h2>
+<ul>
+<li><code>mkdir -p</code> creates intermediate directories at once. Without <code>-p</code>, it fails if the parent directory does not exist</li>
+<li><code>mv</code> serves two roles: moving and renaming. Using <code>mv</code> within the same directory renames the file</li>
+<li><code>rm -r</code> is recursive deletion. There is no recycle bin, so recovery is impossible</li>
+<li>To copy a directory with <code>cp</code>, the <code>-r</code> option is required</li>
+</ul>
+<h2>Common mistakes</h2>
+<p><strong>Mistake 1. Running <code>rm -rf /</code></strong></p>
+<p>Never do this. It deletes every file on the system. Modern systems refuse without <code>--no-preserve-root</code>, but you can still accidentally wipe <code>/home</code> or <code>/var</code>.</p>
+<p><strong>Mistake 2. Using wildcard <code>*</code> without checking first</strong></p>
+<pre><code class="language-bash">rm *.log        # Deletes only .log files — as intended
+rm * .log       # Space causes deletion of ALL files, then tries to delete &quot;.log&quot; — disaster
+</code></pre>
+<p>Check targets with <code>ls *.log</code> before deleting.</p>
+<p><strong>Mistake 3. Using filenames with spaces without quotes</strong></p>
+<pre><code class="language-bash">cp My File.txt backup/     # Error: interpreted as two files &quot;My&quot; and &quot;File.txt&quot;
+cp &quot;My File.txt&quot; backup/   # Correct
+</code></pre>
+<p><strong>Mistake 4. Confusing relative and absolute paths</strong></p>
+<p><code>cd practice</code> only works when <code>practice</code> exists in the current directory. To work from anywhere, use an absolute path or <code>~</code> like <code>cd ~/practice</code>.</p>
+<p><strong>Mistake 5. Forgetting <code>-r</code> when copying directories with <code>cp</code></strong></p>
+<pre><code class="language-bash">cp src/ backup/         # Error: &quot;src/ is a directory&quot;
+cp -r src/ backup/      # Correct: recursive copy
+</code></pre>
+<h2>Practical applications</h2>
+<ul>
+<li><strong>Project initialization</strong>: Create a directory structure in one shot with <code>mkdir -p</code></li>
+<li><strong>Log backup</strong>: <code>cp -r /var/log/app/ /backup/$(date +%F)/</code> creates date-based backups</li>
+<li><strong>Build cleanup</strong>: <code>rm -rf dist/ build/</code> clears previous build artifacts</li>
+<li><strong>Config backup</strong>: <code>cp config.yaml config.yaml.bak</code> before making changes</li>
+<li><strong>Release preparation</strong>: <code>mv app-v2.0.tar.gz /opt/releases/</code> moves release files</li>
+</ul>
+<h2>How practitioners think about this</h2>
+<p>File manipulation commands look simple, but the key point is that <strong>deletion is irreversible</strong>. Code tracked by Git can be recovered, but log files or database dumps outside Git are gone once deleted.</p>
+<p>Teams put safety guards on dangerous commands. Adding <code>alias rm='rm -i'</code> to <code>.bashrc</code> prompts for confirmation before every delete, or tools like <code>trash-cli</code> provide a recycle bin. On servers, a safer pattern is to <code>mv</code> files to a temporary folder instead of <code>rm</code>, then clean up after a set period.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You can check your location with <code>pwd</code> and navigate with <code>cd</code></li>
+<li>[ ] You can explain the difference between absolute and relative paths</li>
+<li>[ ] You can create nested directories in one shot with <code>mkdir -p</code></li>
+<li>[ ] You know the difference between <code>cp</code>, <code>mv</code>, <code>rm</code> and when <code>-r</code> is needed</li>
+<li>[ ] You have the habit of checking targets with <code>ls</code> before using wildcard <code>*</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create the structure <code>project/src/</code>, <code>project/tests/</code>, <code>project/docs/</code> under your home directory using a single <code>mkdir -p</code> command.</li>
+<li>Use <code>touch</code> to create <code>project/src/main.py</code> and <code>project/tests/test_main.py</code>, then rename <code>project/src/main.py</code> to <code>project/src/app.py</code>.</li>
+<li>Copy the entire <code>project/</code> directory to <code>project-backup/</code>, then delete the original <code>project/</code>.</li>
+</ol>
+<h2>Summary and next</h2>
+<ul>
+<li>The Linux file system is a single tree structure starting from <code>/</code> (root).</li>
+<li>You determine your location and navigate with <code>pwd</code>, <code>cd</code>, <code>ls</code>.</li>
+<li>You manipulate files and directories with <code>mkdir</code>, <code>touch</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>.</li>
+<li>Deletion is irreversible, so always verify your targets before executing.</li>
+<li>Absolute paths work from anywhere; relative paths depend on your current location.</li>
+</ul>
+<p>The next post covers <strong>permissions and ownership</strong> — <code>chmod</code>, <code>chown</code>, and the meaning of <code>rwx</code>.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/linux-cli-101/en/01-what-is-cli-and-shell.md">What Is the CLI and Shell?</a></li>
+<li><strong>Files and Directories (current)</strong></li>
+<li>Permissions and Ownership (upcoming)</li>
+<li>cat, less, head, tail (upcoming)</li>
+<li>grep, find, xargs (upcoming)</li>
+<li>Pipes and Redirection (upcoming)</li>
+<li>Process Management (upcoming)</li>
+<li>Environment Variables and PATH (upcoming)</li>
+<li>Shell Script Basics (upcoming)</li>
+<li>SSH and Remote Access (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html">Linux Filesystem Hierarchy Standard</a></li>
+<li><a href="https://www.gnu.org/software/coreutils/manual/">GNU Coreutils Manual</a></li>
+<li><a href="https://missing.csail.mit.edu/2020/course-shell/">The Missing Semester - Navigating the Shell</a></li>
+<li><a href="https://man7.org/linux/man-pages/">Linux man page - cp, mv, rm</a></li>
+</ul>
+<p class="tags-line">Tags: Linux, CLI, File System, Directory, ls, cp</p>
+</body>
+</html>

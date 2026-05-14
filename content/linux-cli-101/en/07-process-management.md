@@ -41,6 +41,8 @@ seo_description: A process is a running instance of a program, each with a uniqu
 
 <!-- a-grade-intro:end -->
 
+This is post 7 in the Linux CLI 101 series.
+
 ## What you will learn
 
 - Checking running processes with `ps` and `top`
