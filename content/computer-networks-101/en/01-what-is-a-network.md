@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 1
 title: What Is a Network?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Layered Model
   - OSI
 seo_description: A network is not cables but a bundle of agreements. Learn the three words that organize the rest of the series — packet, protocol, layered model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is a Network?
@@ -52,13 +52,8 @@ Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, 
 
 > Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.
 
-```text
-[Application] HTTP, DNS, SMTP, gRPC ...
-[Transport]   TCP / UDP
-[Network]     IP, ICMP, routing
-[Link]        Ethernet, Wi-Fi
-[Physical]    electrical / optical / radio signals
-```
+![Layered model and packet travel across a network](../../../assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
+*Packets are encapsulated layer by layer, traverse intermediate devices, and are reassembled at the destination.*
 
 ## Key Terms
 
@@ -226,5 +221,6 @@ Next we move to the most basic addressing system on the Internet — IP and subn
 - [Kurose & Ross — Computer Networking: A Top-Down Approach](https://gaia.cs.umass.edu/kurose_ross/)
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/)
 - [Cloudflare Learning — What is the Internet?](https://www.cloudflare.com/learning/network-layer/what-is-the-internet/)
+- [RFC 1122 — Requirements for Internet Hosts](https://www.rfc-editor.org/rfc/rfc1122)
 
 Tags: Computer Science, Networking, Internet, Packet, Layered Model, OSI
