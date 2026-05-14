@@ -54,35 +54,21 @@
 </head>
 <body>
 <h1>Logistic Regression</h1>
-<blockquote>
-<p>Machine Learning 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: It predicts 0 or 1, so why is it called regression?</p>
-<blockquote>
-<p><em>Logistic regression predicts a continuous probability and uses a threshold to commit to a class.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 5 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Beginner confusion around logistic regression is healthy because the name really is misleading at first glance. It predicts classes in practice, but it does that by assigning probabilities first. The probability layer is where the useful operational decisions live.</p>
+<p>This is post 5 in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The sigmoid function and its probabilistic output</li>
-<li>The trap of always using 0.5 as a threshold</li>
-<li>The meaning of precision, recall, and F1</li>
-<li>How to extend to the multinomial case</li>
-<li>Five common pitfalls</li>
+<li>If the output is 0 or 1, why is the model called regression?</li>
+<li>How does the sigmoid turn a linear score into a probability?</li>
+<li>Why is <code>0.5</code> only a default threshold, not a law?</li>
+<li>What do precision, recall, and F1 tell you that accuracy cannot?</li>
+<li>How should you think about the multiclass extension?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    X[&quot;X&quot;] --&gt; Lin[&quot;z = X w + b&quot;]
-    Lin --&gt; Sig[&quot;sigmoid(z)&quot;]
-    Sig --&gt; P[&quot;P(y=1|X)&quot;]
-    P --&gt; Cls[&quot;class = P &gt; 0.5&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Logistic regression turns a linear score into a probability, then turns that probability into a class decision with a threshold.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Sigmoid</strong>: maps any real number to (0, 1).</li>
@@ -120,11 +106,18 @@ for t in [0.3, 0.5, 0.7]:
     pred = (prob &gt;= t).astype(int)
     print(t, (pred == yte).mean())
 </code></pre>
+<p><strong>Expected output:</strong> <code>classification_report</code> prints class-wise precision and recall, while the threshold loop shows that a different cutoff changes the downstream behavior even when the model weights stay the same. That is the core lesson: thresholding is part of modeling, not a display choice.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>predict_proba</code> returns probabilities, not just labels.</li>
 <li>The threshold is a precision-recall trade-off knob.</li>
 <li><code>StandardScaler</code> helps the optimizer converge.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If accuracy looks high but the expensive positive cases are still missed, inspect recall and the threshold before changing models.</li>
+<li>If probabilities look overconfident, test calibration instead of assuming <code>predict_proba</code> is production-ready.</li>
+<li>If coefficients drift wildly, verify scaling and class balance before arguing about solver choice.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
