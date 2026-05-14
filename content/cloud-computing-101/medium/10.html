@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Cloud Architecture Basics</h1>
+<p>By the end of a cloud fundamentals series, the risk is thinking in product lists instead of systems. Compute, storage, networking, security, monitoring, and cost all make sense individually, but production architecture begins when those pieces reinforce each other inside one design.</p>
+<p>That is why architecture basics matter. Strong cloud systems are not impressive because they use many services. They are impressive because change is safe, failure stays localized, and the operating model can be repeated by the team.</p>
+<p>This is the final post in the Cloud Computing 101 series.</p>
+<p>In this post, we'll pull the series together through the Well-Architected pillars and a layered reference design you can reuse as a review lens.</p>
 <blockquote>
-<p>Cloud Computing 101 series (10/10)</p>
+<p>Cloud architecture is the discipline of turning separate service choices into one coherent operating system for reliability, security, performance, and cost.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do all the pieces from this series stitch together into one well-built cloud system?</p>
-<blockquote>
-<p><em>Anchor on the five Well-Architected pillars (operations, security, reliability, performance, cost), then assemble a layered, loosely coupled design.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The five Well-Architected pillars</li>
 <li>A layered web architecture pattern</li>
@@ -76,14 +72,8 @@
 <h2>Why It Matters</h2>
 <p>The same feature can cost ten times more or ten times less depending on the architecture. This final post pulls the whole series into one picture.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;client&quot;] --&gt; CDN[&quot;cdn&quot;]
-    CDN --&gt; ALB[&quot;load balancer&quot;]
-    ALB --&gt; App[&quot;app (asg)&quot;]
-    App --&gt; Cache[&quot;cache&quot;]
-    App --&gt; DB[&quot;rds (multi-az)&quot;]
-    App --&gt; S3[&quot;s3&quot;]
-</code></pre>
+<p><img alt="A layered web architecture with CDN, load balancer, stateless app tier, and data services" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>A layered web architecture with CDN, load balancer, stateless app tier, and data services</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Well-Architected</strong>: AWS framework of design best practices.</li>
@@ -119,6 +109,20 @@ def queue(): return {&quot;visibility_timeout&quot;: 30, &quot;dlq&quot;: True}
 <li>Multi-AZ is the default, not a feature flag.</li>
 <li>A DLQ is your retry safety net.</li>
 <li>Stateless is the precondition for ASG to actually work.</li>
+</ul>
+<h2>How to Verify This Design</h2>
+<p>In an architecture chapter, verification is mostly about whether the design explains safe behavior under change, failure, and recovery. Read each layer and ask what it protects you from operationally.</p>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>You should be able to explain why the app tier can scale horizontally without breaking user state.</li>
+<li>You should be able to point to which resources absorb retries, which preserve data, and which carry Multi-AZ responsibility.</li>
+<li>You should be able to justify the queue and DLQ as failure-isolation tools rather than decorative components.</li>
+</ul>
+<p><strong>Questions to ask in a real review</strong></p>
+<ul>
+<li>Where does a single point of failure still remain?</li>
+<li>Which changes still require manual intervention, and how would IaC reduce that risk?</li>
+<li>When reliability and cost goals pull in opposite directions, which principle wins for this workload?</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
