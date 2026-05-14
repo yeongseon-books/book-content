@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -428,8 +428,9 @@ In the next chapter we'll connect the local repo to a GitHub remote and walk thr
 
 ## References
 
-- Git Reference Manual: <https://git-scm.com/doc>
-- Pro Git Book - "Basic Branching and Merging": <https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging>
-- `git help merge`, `git help mergetool`
+- [Git Reference Manual](https://git-scm.com/doc)
+- [Pro Git Book - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
+- [git-merge manual](https://git-scm.com/docs/git-merge)
+- [git-mergetool manual](https://git-scm.com/docs/git-mergetool)
 
 Tags: git-merge, fast-forward, three-way-merge, merge-conflict, merge-abort, conflict-markers

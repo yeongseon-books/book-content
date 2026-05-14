@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Merge and Conflict Resolution - Bringing Two Lines Back Together</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Merge and Conflict Resolution - Bringing Two Lines Back Together</h1>
+<p>Creating branches is the easy part; bringing them back together cleanly is where Git starts to feel real. If you can predict when a merge will stay automatic and when it will stop for human judgment, collaboration gets much less stressful.</p>
+<p>This is the fifth post in the Git &amp; GitHub 101 series. Here, we look at fast-forward merges, three-way merges, and the conflict resolution flow that sits between them.</p>
+<h2>What You'll Learn</h2>
+<ul>
+<li>What <code>git merge</code> actually does, and how fast-forward differs from three-way merge</li>
+<li>Why a merge commit has two parents</li>
+<li>How to read and resolve conflict markers (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>)</li>
+<li>What <code>git status</code> tells you in the middle of a conflict</li>
+<li>How <code>git merge --abort</code> rolls back safely</li>
+</ul>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>When does a fast-forward merge happen, and when does Git create a three-way merge instead?</li>
+<li>Why does a merge commit have two parents?</li>
+<li>Which side of a conflict marker (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> / <code>=======</code> / <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) belongs to which branch?</li>
+<li>What extra information does <code>git status</code> show while a conflict is in progress?</li>
+<li>How far back does <code>git merge --abort</code> roll your work, and when is it safe to use?</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>In the previous chapters we created branches and moved between them to keep work separate. Eventually that work has to come back together. Merging happens when a PR lands, when you pull a teammate's changes into your branch, or when a long-running feature finally ships to <code>main</code>.</p>
+<p>Without a clear model for merging, two failure modes show up early.</p>
+<ul>
+<li>First, "why did Git create yet another commit?" turns into a messy history that nobody can read.</li>
+<li>Second, when a conflict appears, panic sets in. People force-reset the branch, copy the folder somewhere safe, and start over.</li>
+</ul>
+<p>The goal of this chapter is to remove both. By the end you should be able to picture which kind of merge will happen before you run the command, and resolve a conflict (or back out of one) without breaking a sweat.</p>
+<h2>Mental Model</h2>
+<p>A merge produces "a new commit that combines two commits." When the two commits sit on the same line of history, Git skips the new commit and just slides a pointer forward (fast-forward). When the two commits sit on diverged lines, Git creates a new merge commit with two parents (three-way).</p>
+<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png"></p>
+<p><em>Mental Model</em><br>
+Three things to internalize:</p>
+<ul>
+<li><strong>Fast-forward</strong>: if the target branch is a direct descendant of the current branch, Git creates no new commit and just moves the current branch pointer forward.</li>
+<li><strong>Three-way merge</strong>: if the two branches diverged from a common ancestor and each has new commits, Git compares the common ancestor and the two tips, then creates a new merge commit. That commit has two parents.</li>
+<li><strong>Conflict</strong>: if both sides changed the same lines of the same file in incompatible ways, Git cannot decide on its own. It pauses the merge and writes conflict markers into the file so you can pick.</li>
+</ul>
+<h2>Core Concepts</h2>
+<ul>
+<li><strong><code>git merge &lt;branch&gt;</code></strong>: brings the changes from <code>&lt;branch&gt;</code> into the current branch. Uses fast-forward when possible; otherwise creates a three-way merge commit.</li>
+<li><strong>Fast-forward</strong>: no new commit, just a pointer move. The history stays linear, but it does not record which commits belonged to which feature.</li>
+<li><strong><code>--no-ff</code></strong>: forces a merge commit even when fast-forward would be possible. Common when teams want each PR to leave a visible "merge bubble" in history.</li>
+<li><strong>Three-way merge</strong>: compares the merge base (common ancestor) with both tips. The default strategy on modern Git is <code>ort</code>.</li>
+<li><strong>Conflict</strong>: the state where Git stops because changes overlap. The repo is mid-merge until you finish or abort.</li>
+<li><strong>Conflict marker</strong>: the <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> ... <code>=======</code> ... <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; &lt;branch&gt;</code> block. The <code>HEAD</code> half is the current branch; the <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> half is the branch being merged in.</li>
+<li><strong><code>git merge --abort</code></strong>: cancels the in-progress merge and restores the working tree to the pre-merge state. When resolving feels too tangled, abort and try again.</li>
+</ul>
+<h2>Before-After</h2>
+<p>Compare two ways of "bringing a feature branch into main."</p>
+<p><strong>Before (manual copy)</strong></p>
+<pre><code class="language-text">$ cp feature/login.md main/login.md
+$ # if both folders changed the same file, you have to remember which is right
+</code></pre>
+<ul>
+<li>Nothing in history records what was combined.</li>
+<li>If both sides edited the same file, you have no signal that they did.</li>
+<li>There is no standard way to undo it.</li>
+</ul>
+<p><strong>After (<code>git merge</code>)</strong></p>
+<pre><code class="language-text">$ git switch main
+$ git merge feature/login
+Updating e7d2c1a..a2b3c4d
+Fast-forward
+ login.md | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 login.md
+</code></pre>
+<ul>
+<li>The result lives in history (pointer move for fast-forward, a merge commit for three-way).</li>
+<li>Conflicts stop the merge and Git writes markers to point you at the lines.</li>
+<li><code>git merge --abort</code> cleanly restores the pre-merge state.</li>
+</ul>
+<h2>Step-by-Step Walkthrough</h2>
+<p>We continue with <code>my-first-repo</code> from the previous chapter. The starting state is:</p>
+<ul>
+<li><code>main</code> -&gt; <code>e7d2c1a</code> (Add author line to README)</li>
+<li><code>feature/login</code> -&gt; <code>a2b3c4d</code> (Add login form draft)</li>
+<li>Files: <code>README.md</code>, <code>notes.md</code> on <code>main</code>; <code>README.md</code>, <code>notes.md</code>, <code>login.md</code> on <code>feature/login</code></li>
+</ul>
+<p><strong>1. Confirm current state</strong></p>
+<pre><code class="language-text">$ git switch main
+Switched to branch 'main'
+$ git log --oneline --graph --decorate --all
+* a2b3c4d (feature/login) Add login form draft
+* e7d2c1a (HEAD -&gt; main) Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p><code>feature/login</code> is one commit ahead of <code>main</code>, on the same straight line. Merging it into <code>main</code> triggers a fast-forward.</p>
+<p><strong>2. Fast-forward merge</strong></p>
+<pre><code class="language-text">$ git merge feature/login
+Updating e7d2c1a..a2b3c4d
+Fast-forward
+ login.md | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 login.md
+</code></pre>
+<p>The clue is <code>Updating &lt;old&gt;..&lt;new&gt;</code> followed by <code>Fast-forward</code>. <strong>No new merge commit is created</strong>; the <code>main</code> pointer simply moves forward to <code>a2b3c4d</code>.</p>
+<pre><code class="language-text">$ git log --oneline --graph --decorate --all
+* a2b3c4d (HEAD -&gt; main, feature/login) Add login form draft
+* e7d2c1a Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p>Both branches now point at the same commit. Since <code>feature/login</code> is fully merged into <code>main</code>, deleting it is safe.</p>
+<pre><code class="language-text">$ git branch -d feature/login
+Deleted branch feature/login (was a2b3c4d).
+</code></pre>
+<blockquote>
+<p>If you want each PR-style merge to leave a visible commit in history, use <code>git merge --no-ff feature/login</code>. The next steps create a three-way merge commit naturally, so you'll see what one looks like.</p>
+</blockquote>
+<p><strong>3. Create divergence</strong></p>
+<p>Now we deliberately fork history: one commit on a new branch, one commit on <code>main</code>.</p>
+<pre><code class="language-text">$ git switch -c feature/header
+Switched to a new branch 'feature/header'
+$ echo &quot;# My Project&quot; &gt; header.md
+$ git add header.md
+$ git commit -m &quot;Add project header&quot;
+[feature/header d4e5f6a] Add project header
+ 1 file changed, 1 insertion(+)
+ create mode 100644 header.md
+</code></pre>
+<p>Back on <code>main</code>, add an unrelated commit.</p>
+<pre><code class="language-text">$ git switch main
+Switched to branch 'main'
+$ echo &quot;Released on 2026-05-04.&quot; &gt;&gt; notes.md
+$ git add notes.md
+$ git commit -m &quot;Append release note&quot;
+[main c1a8e9f] Append release note
+ 1 file changed, 1 insertion(+)
+</code></pre>
+<p>The two branches now share <code>a2b3c4d</code> as their common ancestor and have one commit each on top.</p>
+<pre><code class="language-text">$ git log --oneline --graph --decorate --all
+* c1a8e9f (HEAD -&gt; main) Append release note
+| * d4e5f6a (feature/header) Add project header
+|/
+* a2b3c4d Add login form draft
+* e7d2c1a Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p>The <code>|/</code> shape marks the point where the lines split and rejoin.</p>
+<p><strong>4. Three-way merge (no conflict)</strong></p>
+<p>Merge <code>feature/header</code> into <code>main</code>. The two branches touched different files, so there is no conflict, but they have diverged, so fast-forward is impossible.</p>
+<pre><code class="language-text">$ git merge feature/header
+Merge made by the 'ort' strategy.
+ header.md | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 header.md
+</code></pre>
+<p><code>Merge made by the 'ort' strategy.</code> confirms a three-way merge. A new merge commit appears, and it has two parents.</p>
+<pre><code class="language-text">$ git log --oneline --graph --decorate --all
+*   b5d4c6e (HEAD -&gt; main) Merge branch 'feature/header'
+|\
+| * d4e5f6a (feature/header) Add project header
+* | c1a8e9f Append release note
+|/
+* a2b3c4d Add login form draft
+* e7d2c1a Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p>Merge commit <code>b5d4c6e</code> has parents <code>c1a8e9f</code> (from <code>main</code>) and <code>d4e5f6a</code> (from <code>feature/header</code>). Run <code>git show b5d4c6e</code> and you'll see a <code>Merge: c1a8e9f d4e5f6a</code> line at the top.</p>
+<pre><code class="language-text">$ git branch -d feature/header
+Deleted branch feature/header (was d4e5f6a).
+</code></pre>
+<p><strong>5. Trigger a conflict</strong></p>
+<p>This time, change the same line in the same file from both sides.</p>
+<pre><code class="language-text">$ git switch -c feature/header-emoji
+Switched to a new branch 'feature/header-emoji'
+$ printf &quot;## My Project\n&quot; &gt; header.md
+$ git add header.md
+$ git commit -m &quot;Use h2 for project header&quot;
+[feature/header-emoji a7b8c9d] Use h2 for project header
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</code></pre>
+<p>Switch back to <code>main</code> and change the same line differently.</p>
+<pre><code class="language-text">$ git switch main
+Switched to branch 'main'
+$ printf &quot;# Awesome Project\n&quot; &gt; header.md
+$ git add header.md
+$ git commit -m &quot;Rename project header&quot;
+[main e2f3a4b] Rename project header
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</code></pre>
+<p>Now the merge fails with a conflict.</p>
+<pre><code class="language-text">$ git merge feature/header-emoji
+Auto-merging header.md
+CONFLICT (content): Merge conflict in header.md
+Automatic merge failed; fix conflicts and then commit the result.
+</code></pre>
+<p>The keyword is <code>CONFLICT (content)</code>. Git pauses and waits for you.</p>
+<p><strong>6. Resolve the conflict</strong></p>
+<p><code>git status</code> spells out exactly where you are.</p>
+<pre><code class="language-text">$ git status
+On branch main
+You have unmerged paths.
+  (fix conflicts and run &quot;git commit&quot;)
+  (use &quot;git merge --abort&quot; to abort the merge)
+
+Unmerged paths:
+  (use &quot;git add &lt;file&gt;...&quot; to mark resolution)
+    both modified:   header.md
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+</code></pre>
+<p><code>both modified</code> means both sides changed the same file. Open it and you'll find the markers:</p>
+<pre><code class="language-text">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+# Awesome Project
+=======
+## My Project
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/header-emoji
+</code></pre>
+<p>Reading them is straightforward:</p>
+<ul>
+<li>Everything between <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> and <code>=======</code> is the <strong>current branch (<code>main</code>) version</strong>.</li>
+<li>Everything between <code>=======</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/header-emoji</code> is the <strong>incoming branch version</strong>.</li>
+</ul>
+<p>Edit the file into whatever shape you want and remove the three marker lines. Suppose you decide to keep the new name from <code>main</code> but use the h2 style from the feature branch. The resolved file becomes:</p>
+<pre><code class="language-text">## Awesome Project
+</code></pre>
+<p>Tell Git the conflict is settled, then commit.</p>
+<pre><code class="language-text">$ git add header.md
+$ git status
+On branch main
+All conflicts fixed but you are still merging.
+  (use &quot;git commit&quot; to conclude merge)
+
+Changes to be committed:
+    modified:   header.md
+
+$ git commit
+[main f3a4b5c] Merge branch 'feature/header-emoji'
+</code></pre>
+<p><code>git commit</code> with no <code>-m</code> uses Git's default merge message (<code>Merge branch '&lt;name&gt;'</code>). View <code>git log --oneline --graph --decorate --all</code> and you will see the new merge commit reconnecting the two lines.</p>
+<p><strong>7. Back out with <code>--abort</code></strong></p>
+<p>When resolving feels too tangled, or you'd rather take a different approach, you can cancel the entire merge. We deliberately set up another conflict to demonstrate.</p>
+<pre><code class="language-text">$ git switch -c feature/header-bold
+Switched to a new branch 'feature/header-bold'
+$ printf &quot;**Awesome Project**\n&quot; &gt; header.md
+$ git add header.md
+$ git commit -m &quot;Bold the header&quot;
+[feature/header-bold 9d8e7f6] Bold the header
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git switch main
+Switched to branch 'main'
+$ printf &quot;### Awesome Project\n&quot; &gt; header.md
+$ git add header.md
+$ git commit -m &quot;Demote header to h3&quot;
+[main 1c2d3e4] Demote header to h3
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git merge feature/header-bold
+Auto-merging header.md
+CONFLICT (content): Merge conflict in header.md
+Automatic merge failed; fix conflicts and then commit the result.
+</code></pre>
+<p>Abort returns the working tree to its pre-merge state.</p>
+<pre><code class="language-text">$ git merge --abort
+$ git status
+On branch main
+nothing to commit, working tree clean
+</code></pre>
+<p><code>header.md</code> is restored to whatever it was before the merge started (<code>### Awesome Project</code>). <code>--abort</code> only works while a merge is in progress; once you've committed, you need other tools (<code>git reset</code>, <code>git revert</code>) to roll back. Those land in the workflow chapter near the end of this series.</p>
+<h2>Common Mistakes</h2>
+<ul>
+<li><strong>Treating fast-forward and three-way merge as the same</strong> — fast-forward moves a pointer; three-way creates a new commit with two parents. The shape of <code>git log --graph</code> (straight line vs branching diamond) tells them apart.</li>
+<li><strong>Committing while a marker is still in the file</strong> — leaving any of <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, or <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> behind will break the code. After resolving, double-check that the three marker lines are gone.</li>
+<li><strong>Skipping <code>git add</code> before <code>git commit</code></strong> — the resolution flow is "edit the file -&gt; <code>git add</code> -&gt; <code>git commit</code>". Without the <code>add</code>, Git still considers the path unmerged and refuses to commit.</li>
+<li><strong>Deleting the folder and re-cloning when confused</strong> — one <code>git merge --abort</code> does the same thing without losing untracked files or stash entries.</li>
+<li><strong>Reaching for <code>--no-ff</code> reflexively (or refusing it reflexively)</strong> — both can be reasonable depending on team conventions. Linear history loves fast-forward; PR-flavored history prefers <code>--no-ff</code>.</li>
+<li><strong>Switching branches mid-merge</strong> — Git either refuses or creates a more confusing state. Finish or abort the merge first, then move.</li>
+</ul>
+<h2>Production Notes</h2>
+<ul>
+<li><strong>Pull <code>main</code> before you merge upward</strong>: starting from the latest shared state cuts down on both conflicts and review noise. (Remote sync is the topic of the next chapter.)</li>
+<li><strong>Keep the conflict surface small</strong>: avoid touching the same lines or functions that another branch is editing. Move formatter and linter sweeps into their own commits so they don't tangle with feature changes.</li>
+<li><strong>Run the build and tests after resolving</strong>: removing the markers does not guarantee the result still compiles. A green build before committing the merge is the minimum bar.</li>
+<li><strong>Use <code>git mergetool</code> or your IDE</strong>: VS Code, IntelliJ, and editors with <code>:diffsplit</code> show the three sides (base, ours, theirs) at once. The bigger the conflict, the more these tools help.</li>
+<li><strong>PRs typically use <code>--no-ff</code></strong>: GitHub's "Create a merge commit" option is exactly <code>--no-ff</code>. The history then shows when each PR landed.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Explain when a fast-forward happens and what Git prints when it does.</li>
+<li>[ ] Say in one sentence why a three-way merge commit has two parents.</li>
+<li>[ ] Write the three marker lines (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) on paper and label which side belongs to which branch.</li>
+<li>[ ] Recite the conflict resolution flow: edit file -&gt; <code>git add</code> -&gt; <code>git commit</code>.</li>
+<li>[ ] Tell when <code>git merge --abort</code> works (mid-merge) and when it does not (after the merge commit lands).</li>
+<li>[ ] Look at <code>git log --oneline --graph --decorate --all</code> output and identify fast-forward vs three-way merge.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a branch <code>feature/footer</code> with a single commit that adds <code>footer.md</code>. Switch back to <code>main</code> and run <code>git merge feature/footer</code>. Confirm that <code>Fast-forward</code> appears in the output, and capture the linear shape from <code>git log --oneline --graph --decorate --all</code>.</li>
+<li>From <code>main</code> and a new branch, commit different files on each side, then merge. Look for <code>Merge made by the 'ort' strategy.</code> and confirm with <code>git show &lt;merge-hash&gt;</code> that the merge commit has two parents.</li>
+<li>Edit the same line of the same file on both sides and merge to force a conflict. Capture the <code>both modified</code> line from <code>git status</code> and the marker block from the file, then resolve in one direction and finish the commit.</li>
+<li>Reproduce the same conflict, but this time run <code>git merge --abort</code>. Verify that <code>git status</code> reports <code>nothing to commit, working tree clean</code> and that the file is restored to its pre-merge state.</li>
+<li>Force a merge commit on a fast-forward situation with <code>git merge --no-ff feature/footer-2</code>. Compare the <code>--graph</code> output to the plain fast-forward case and describe what changed.</li>
+</ol>
+<h2>Wrap-Up and What's Next</h2>
+<ul>
+<li>Two kinds of merge: fast-forward (pointer move) when the branches share a straight line, three-way (a new commit with two parents) when they diverged.</li>
+<li>A conflict happens when both sides change the same lines. Git pauses, writes markers, and waits for you. After editing, finish with <code>git add</code> then <code>git commit</code>.</li>
+<li>If resolving looks unsafe, <code>git merge --abort</code> returns to the pre-merge state. It only applies while a merge is in progress.</li>
+<li><code>git log --oneline --graph --decorate --all</code> is the everyday tool for telling fast-forward and three-way merges apart at a glance.</li>
+</ul>
+<p>In the next chapter we'll connect the local repo to a GitHub remote and walk through <code>git remote</code>, <code>git push</code>, and <code>git pull</code> in order.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - The Basics of Distributed Version Control</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Tracking Changes - Reading status, diff, and log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Branch Basics - Create, Switch, Compare</a></li>
+<li><strong>Merge and Conflict Resolution - Bringing Two Lines Back Together (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
+<li>Collaborating with Pull Requests (upcoming)</li>
+<li>Tracking Work with Issues and Projects (upcoming)</li>
+<li>Writing Good Commit Messages (upcoming)</li>
+<li>Real-World Workflow at a Glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">Pro Git Book - Basic Branching and Merging</a></li>
+<li><a href="https://git-scm.com/docs/git-merge">git-merge manual</a></li>
+<li><a href="https://git-scm.com/docs/git-mergetool">git-mergetool manual</a></li>
+</ul>
+<p class="tags-line">Tags: git-merge, fast-forward, three-way-merge, merge-conflict, merge-abort, conflict-markers</p>
+</body>
+</html>
