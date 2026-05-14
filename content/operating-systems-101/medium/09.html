@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>System Calls</h1>
-<p>This is post 9 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What route does user code take to use kernel resources (files, network, processes), and what is the cost of that route?</p>
-<blockquote>
-<p>User code never touches the disk or the network card directly. Every request flows through a narrow door called a system call into the kernel. The door is safe but expensive. Once you understand what a system call is and why it costs, you can predict which of two equivalent programs will be faster.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>User code cannot touch the disk controller or network card directly. Every request goes through a narrow kernel entry point, and the cost of crossing that boundary explains why two equivalent programs can differ in runtime by orders of magnitude.</p>
+<p>System calls are also where performance, debugging, and security meet. Once you can see them, many OS-level mysteries stop being mysterious.</p>
+<p>This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The split between user space and kernel space</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>User space is where ordinary programs run; kernel space is where the OS core runs. There is a privilege boundary between them, and user code can only enter the kernel through the narrow entry of a system call. Each entry pays for context switching and security checks, which is why it costs.</p>
 </blockquote>
+<p><strong>The privilege boundary a syscall crosses</strong></p>
+<p><img alt="The privilege boundary a syscall crosses" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png"><br>
+<em>A syscall is the only door into kernel work, which is why both performance cost and security policy accumulate there.</em></p>
 <pre><code class="language-text">[user space]
   print(...) → write(fd, buf, n)  ← syscall entry
                        ↓
