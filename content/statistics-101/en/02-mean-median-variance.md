@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Mean, Median, and Variance
 
-This is post 2 in the Statistics 101 series.
+The moment you compress a dataset into one or two numbers, you are already shaping the story the report will tell. Whether you write down only the mean, add the median, or explain spread with variance and standard deviation changes the reader's interpretation.
 
-> Statistics 101 series (2/10)
+That choice becomes especially important when the data has outliers or a long tail. In those cases, the mean can move far away from what most observations actually look like.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
 
-**Core question**: When summarizing data with *one or two numbers*, when do we use the *mean* and when do we use the *median*? What does *variance* tell us?
+## Questions this post answers
 
-> *A summary statistic changes shape with the question you ask.*
+- When should we use the mean, and when should we use the median?
+- What do variance and standard deviation tell us that the mean cannot?
+- What happens to summary statistics when one extreme outlier appears?
+- When is IQR the safer measure of spread?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- Measures of *central tendency* — *mean / median / mode*
-- Measures of *spread* — *variance / standard deviation / IQR*
-- Why the *mean is dangerous* on *skewed distributions*
-- A 5-step summary statistics exercise
-- Five common mistakes
+> A good summary statistic is not a pretty compression of the data. It is the number that fits the question.
 
 ## Why It Matters
 
@@ -50,14 +45,9 @@ Data has *thousands of rows*, but humans decide with *one or two numbers*. *Whic
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Center["Center: mean/median/mode"]
-    Data --> Spread["Spread: variance/std/IQR"]
-    Center --> Story["Summary Story"]
-    Spread --> Story
-```
+![Concept at a Glance](../../../assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
 
+*A useful summary needs both a center metric and a spread metric, not just one representative number.*
 ## Key Terms
 
 - **Mean**: sum / count. *Sensitive to outliers*.

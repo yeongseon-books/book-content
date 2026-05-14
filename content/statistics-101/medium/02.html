@@ -54,38 +54,27 @@
 </head>
 <body>
 <h1>Mean, Median, and Variance</h1>
-<p>This is post 2 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When summarizing data with <em>one or two numbers</em>, when do we use the <em>mean</em> and when do we use the <em>median</em>? What does <em>variance</em> tell us?</p>
-<blockquote>
-<p><em>A summary statistic changes shape with the question you ask.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The moment you compress a dataset into one or two numbers, you are already shaping the story the report will tell. Whether you write down only the mean, add the median, or explain spread with variance and standard deviation changes the reader's interpretation.</p>
+<p>That choice becomes especially important when the data has outliers or a long tail. In those cases, the mean can move far away from what most observations actually look like.</p>
+<p>This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>Measures of <em>central tendency</em> — <em>mean / median / mode</em></li>
-<li>Measures of <em>spread</em> — <em>variance / standard deviation / IQR</em></li>
-<li>Why the <em>mean is dangerous</em> on <em>skewed distributions</em></li>
-<li>A 5-step summary statistics exercise</li>
-<li>Five common mistakes</li>
+<li>When should we use the mean, and when should we use the median?</li>
+<li>What do variance and standard deviation tell us that the mean cannot?</li>
+<li>What happens to summary statistics when one extreme outlier appears?</li>
+<li>When is IQR the safer measure of spread?</li>
 </ul>
+<blockquote>
+<p>A good summary statistic is not a pretty compression of the data. It is the number that fits the question.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Data has <em>thousands of rows</em>, but humans decide with <em>one or two numbers</em>. <em>Which number you pick</em> determines the <em>quality of the decision</em>.</p>
 <blockquote>
 <p><em>One wrong mean writes one wrong decision.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;Data&quot;] --&gt; Center[&quot;Center: mean/median/mode&quot;]
-    Data --&gt; Spread[&quot;Spread: variance/std/IQR&quot;]
-    Center --&gt; Story[&quot;Summary Story&quot;]
-    Spread --&gt; Story
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>A useful summary needs both a center metric and a spread metric, not just one representative number.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Mean</strong>: sum / count. <em>Sensitive to outliers</em>.</li>
