@@ -1,22 +1,22 @@
 ---
-title: KEDA inside ACA — what a scale rule actually creates
-series: azure-aca-deep-dive
 episode: 4
 language: en
+last_reviewed: '2026-04-29'
+seo_description: What an ACA scale rule actually creates inside the hidden KEDA, why
+  HTTP/TCP/custom triggers behave differently, and how cold-start works.
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: KEDA inside ACA — what a scale rule actually creates
 ---
 
 # KEDA inside ACA — what a scale rule actually creates

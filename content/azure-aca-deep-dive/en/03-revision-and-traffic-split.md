@@ -1,22 +1,22 @@
 ---
-title: Revisions and traffic splitting — where Envoy weights come from
-series: azure-aca-deep-dive
 episode: 3
 language: en
+last_reviewed: '2026-04-29'
+seo_description: How Azure Container Apps turns a revision update into Envoy weight
+  changes, and where rollouts can silently stall in production.
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Revisions and traffic splitting — where Envoy weights come from
 ---
 
 # Revisions and traffic splitting — where Envoy weights come from

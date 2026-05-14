@@ -1,34 +1,21 @@
 ---
-title: 데이터 정제와 중복 제거
-
-series: ai-data-preparation-101
-
 episode: 3
-
 language: ko
-
+last_reviewed: '2026-05-12'
+seo_description: 대규모 코퍼스 작업자들이 가장 효과 큰 단계로 꼽는 정제와 중복 제거를, 패턴별 처리 전략과 함께 정리합니다.
+series: ai-data-preparation-101
 status: publish-ready
-
-targets:
-
-  tistory: true
-
-  medium: true
-
-  mkdocs: true
-
-  ebook: true
-
 tags:
 - Data Preparation
 - Cleaning
 - Deduplication
 - MinHash
-last_reviewed: '2026-05-12'
-
-seo_description: 'The Pile, C4, RedPajama 같은 대규모 코퍼스 작업자들이 입을 모아 강조하는 한 가지가 있습니다:
-
-  dedup 단계가 가장 큰…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 데이터 정제와 중복 제거
 ---
 
 # 데이터 정제와 중복 제거

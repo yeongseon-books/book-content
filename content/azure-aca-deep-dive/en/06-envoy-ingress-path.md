@@ -1,22 +1,22 @@
 ---
-title: The Envoy ingress path — how the first request reaches your container
-series: azure-aca-deep-dive
 episode: 6
 language: en
+last_reviewed: '2026-04-29'
+seo_description: Tracing the first HTTPS request into Azure Container Apps through
+  the public Envoy fleet, the per-environment frontend, and the per-app data path.
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: The Envoy ingress path — how the first request reaches your container
 ---
 
 # The Envoy ingress path — how the first request reaches your container

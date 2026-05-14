@@ -1,22 +1,23 @@
 ---
-title: Environment internals — the network, observability, and Dapr scope boundary
-series: azure-aca-deep-dive
 episode: 2
 language: en
+last_reviewed: '2026-04-29'
+seo_description: How a Container Apps environment fuses VNet, Log Analytics, Dapr
+  scope, and Envoy ingress into one resource boundary that shapes every app inside
+  it.
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Environment internals — the network, observability, and Dapr scope boundary
 ---
 
 # Environment internals — the network, observability, and Dapr scope boundary

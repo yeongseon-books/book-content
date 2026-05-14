@@ -1,34 +1,21 @@
 ---
-title: 데이터 준비가 모델 품질을 결정하는 이유
-
-series: ai-data-preparation-101
-
 episode: 1
-
 language: ko
-
+last_reviewed: '2026-05-12'
+seo_description: 모델 선택보다 데이터 준비 단계가 LLM 품질을 더 크게 좌우하는 이유와, 운영에서 반복되는 데이터 문제 패턴을 정리합니다.
+series: ai-data-preparation-101
 status: publish-ready
-
-targets:
-
-  tistory: true
-
-  medium: true
-
-  mkdocs: true
-
-  ebook: true
-
 tags:
 - Data Preparation
 - ML Foundations
 - Data Quality
 - Pipelines
-last_reviewed: '2026-05-12'
-
-seo_description: ML 입문자가 가장 많이 던지는 질문입니다. Kaggle에서 데이터셋을 받고, pandas.read_csv()로 읽고,
-
-  모델에 넣으면 끝나는…
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 데이터 준비가 모델 품질을 결정하는 이유
 ---
 
 # 데이터 준비가 모델 품질을 결정하는 이유

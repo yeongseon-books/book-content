@@ -1,14 +1,11 @@
 ---
 episode: 5
-
 language: ko
-
 last_reviewed: '2026-05-12'
-
+seo_description: 토크나이저 선택과 chunking 전략이 모델 입력 단위, context window, retrieval 경계에 미치는
+  영향을 정리합니다.
 series: ai-data-preparation-101
-
 status: publish-ready
-
 tags:
 - Tokenization
 - BPE
@@ -17,20 +14,11 @@ tags:
 - RAG
 - tiktoken
 targets:
-
   ebook: true
-
   medium: true
-
   mkdocs: true
-
   tistory: true
-
 title: Tokenization과 Chunking 전략
-
-seo_description: LLM에서 tokenization은 단순한 전처리가 아닙니다. tokenizer가 정해지는 순간, 모델이 볼 수 있는
-
-  단위와 context…
 ---
 
 # Tokenization과 Chunking 전략

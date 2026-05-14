@@ -1,14 +1,11 @@
 ---
 episode: 9
-
 language: ko
-
 last_reviewed: '2026-05-12'
-
+seo_description: 단순 random split이 운영에서 무너지는 이유와, contamination을 막는 시간/사용자 단위 분할 전략을
+  정리합니다.
 series: ai-data-preparation-101
-
 status: publish-ready
-
 tags:
 - Train/Test Split
 - Contamination
@@ -17,20 +14,11 @@ tags:
 - Temporal Split
 - scikit-learn
 targets:
-
   ebook: true
-
   medium: true
-
   mkdocs: true
-
   tistory: true
-
 title: 학습/평가/테스트 분할과 Contamination 통제
-
-seo_description: train_test_split(data, test_size=0.2)로 끝낸 모델이 production에서 무너지는 패턴은
-
-  매년 반복됩니다.
 ---
 
 # 학습/평가/테스트 분할과 Contamination 통제

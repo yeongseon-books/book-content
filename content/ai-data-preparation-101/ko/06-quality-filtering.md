@@ -1,14 +1,11 @@
 ---
 episode: 6
-
 language: ko
-
 last_reviewed: '2026-05-12'
-
+seo_description: 광고와 스팸이 섞인 corpus를 학습 가능한 상태로 만드는 heuristic 필터와 classifier 기반 필터를
+  비교합니다.
 series: ai-data-preparation-101
-
 status: publish-ready
-
 tags:
 - Quality Filtering
 - Heuristic Rules
@@ -17,20 +14,11 @@ tags:
 - KenLM
 - fastText
 targets:
-
   ebook: true
-
   medium: true
-
   mkdocs: true
-
   tistory: true
-
 title: 데이터 품질 필터링 — Heuristic과 Classifier
-
-seo_description: 원본 corpus는 거의 항상 절반 이상이 쓰레기입니다. 광고, 자동 생성 spam, 깨진 인코딩, 의미 없는 boilerplate가
-
-  섞여…
 ---
 
 # 데이터 품질 필터링 — Heuristic과 Classifier

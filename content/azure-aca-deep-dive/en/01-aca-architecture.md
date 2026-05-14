@@ -1,22 +1,22 @@
 ---
-title: ACA architecture — what Microsoft layered on a hidden Kubernetes
-series: azure-aca-deep-dive
 episode: 1
 language: en
+last_reviewed: '2026-04-29'
+seo_description: 'Inside Azure Container Apps: the hidden Kubernetes layer, the ACA
+  control plane, and the line between platform and tenant workload.'
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: ACA architecture — what Microsoft layered on a hidden Kubernetes
 ---
 
 # ACA architecture — what Microsoft layered on a hidden Kubernetes

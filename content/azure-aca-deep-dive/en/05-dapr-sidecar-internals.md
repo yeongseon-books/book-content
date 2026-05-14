@@ -1,22 +1,22 @@
 ---
-title: Dapr sidecar internals — the Go process that lives next to your container
-series: azure-aca-deep-dive
 episode: 5
 language: en
+last_reviewed: '2026-04-29'
+seo_description: 'Inside the Dapr sidecar Azure Container Apps injects: the Go process,
+  local HTTP/gRPC ports, building-block API surface, and scope rules.'
+series: azure-aca-deep-dive
 status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  mkdocs: true
-  ebook: true
 tags:
 - Container Apps
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-04-29'
-seo_description: 'External references in this post are pinned to these upstream baselines:
-  - Dapr: v1.13.x (https://github.com/dapr/dapr) - KEDA: v2.14.x…'
+targets:
+  ebook: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Dapr sidecar internals — the Go process that lives next to your container
 ---
 
 # Dapr sidecar internals — the Go process that lives next to your container
