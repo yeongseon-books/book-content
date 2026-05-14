@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-05-12'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: ARR Affinity, 슬롯, 커스텀 도메인 기준으로 App Service 요청 라우팅 경로를 설명합니다.
 ---
 
 # Front-End과 ARR — 요청은 어떻게 워커에 도달하는가
@@ -126,6 +125,40 @@ az webapp config ssl list -g my-rg -o table
 ```
 
 이 값들은 단순한 설정 목록이 아닙니다. HTTPS 강제 여부, client certificate 사용 여부, custom domain 바인딩 상태는 모두 Front-End가 요청을 어떻게 해석하고 어떤 보안 경로를 적용할지와 연결됩니다.
+
+### Affinity는 작은 진단 엔드포인트 하나로 바로 검증할 수 있습니다
+
+운영에서 가장 실용적인 확인 방법은 같은 브라우저 세션이 정말 같은 worker에 계속 붙는지 직접 보는 것입니다. 아래처럼 worker 식별값을 돌려주는 아주 작은 진단 엔드포인트를 두면 ARR Affinity의 효과를 재현 없이 확인할 수 있습니다.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/worker")
+def diag_worker():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        slot=os.environ.get("WEBSITE_SLOT_NAME", "production"),
+    )
+```
+
+이 엔드포인트를 만든 뒤에는 cookie jar를 유지한 요청과 유지하지 않은 요청을 나눠 보면 됩니다.
+
+```bash
+# 같은 세션으로 두 번 호출
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+
+# 쿠키 없이 새 세션처럼 반복 호출
+curl -s https://my-app.azurewebsites.net/diag/worker
+curl -s https://my-app.azurewebsites.net/diag/worker
+```
+
+**Expected output:** affinity가 켜져 있으면 cookie jar를 유지한 두 호출에서 같은 `instance_id`가 반복될 가능성이 높습니다. 반대로 쿠키 없이 호출하면 응답 `instance_id`가 더 쉽게 바뀝니다. 부분 장애가 의심될 때도 이 방법으로 "특정 사용자만 같은 worker에 고정되는가"를 먼저 확인할 수 있습니다.
 
 ## 흔히 헷갈리는 지점
 

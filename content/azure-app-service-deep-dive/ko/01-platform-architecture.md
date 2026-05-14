@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-05-12'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: App Service의 Front-End, Worker, 공유 스토리지가 어떻게 이어지는지 운영 관점으로 해설합니다.
 ---
 
 # App Service 플랫폼 아키텍처 — Front-End·Worker·File Server
@@ -118,6 +117,34 @@ az webapp list --plan my-plan -g my-rg \
 ```
 
 이 명령이 보여 주는 값은 단순한 인벤토리가 아닙니다. plan이 실제로 어떤 체급을 갖는지, worker capacity가 몇 개인지, 같은 substrate를 공유하는 앱이 무엇인지가 드러나므로 noisy-neighbour 가능성과 격리 수준을 점검하는 기본 재료가 됩니다.
+
+### 공개 표면을 JSON으로 읽으면 구조가 더 또렷해집니다
+
+아키텍처 멘탈 모델이 실제 운영 표면과 맞는지 확인하려면, 포털 화면보다 JSON 출력을 먼저 보는 편이 좋습니다. 아래 두 명령은 "plan이 capacity를 들고 있고, app은 그 capacity 위에 놓인다"는 사실을 눈으로 확인하게 해 줍니다.
+
+```bash
+PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
+
+az resource show --ids "$PLAN_ID" \
+  --query "{name:name, sku:sku.name, reserved:properties.reserved, workers:properties.numberOfWorkers, perSiteScaling:properties.perSiteScaling}"
+
+az webapp show -n my-app -g my-rg \
+  --query "{serverFarmId:serverFarmId, state:state, hostNames:hostNames, kind:kind}"
+```
+
+**Expected output:** 첫 번째 결과에서는 plan의 worker 수와 Linux 여부(`reserved`)가 보이고, 두 번째 결과에서는 app이 어느 `serverFarmId`에 매달려 있는지 드러납니다. 즉 plan이 capacity의 주체이고 app은 그 위에 얹힌 소비자라는 구조가 그대로 노출됩니다.
+
+```json
+{
+  "name": "my-plan",
+  "sku": "P1v3",
+  "reserved": true,
+  "workers": 3,
+  "perSiteScaling": false
+}
+```
+
+이 정도 출력만 있어도 "앱이 VM 하나를 독점한다"는 오해를 바로 걷어 낼 수 있습니다. 운영 문서에 이 JSON 예시를 붙여 두면 신규 팀원이 plan, worker, app 관계를 훨씬 빨리 이해합니다.
 
 ## 흔히 헷갈리는 지점
 
