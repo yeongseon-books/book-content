@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tracking Work with Issues and Projects - How GitHub Records What's Next</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Tracking Work with Issues and Projects - How GitHub Records What's Next</h1>
+<p>Code history tells you what changed, but teams also need a place to record what should happen next. Issues and Projects give GitHub a planning layer, so decisions, ownership, and progress do not live only in someone's memory.</p>
+<p>This is the eighth post in the Git &amp; GitHub 101 series. Here, we connect issues, pull requests, and project boards into one visible work-tracking flow.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>What a GitHub Issue is, and how it differs from a commit or a Pull Request</li>
+<li>How to open an issue and attach labels, an assignee, and a milestone</li>
+<li>How a single line like <code>Closes #42</code> in a PR body auto-closes an issue on merge</li>
+<li>How to set up a Project board and track issues on a Kanban-style flow</li>
+<li>Why issues are useful even on a solo repository</li>
+</ul>
+<p>By the end you can run a full cycle: define work as an issue, finish it through a PR, and watch the Project board reflect status as you go.</p>
+<h2>Why this matters</h2>
+<p>So far, this series has focused on what changed in the code. Commits recorded the change, and PRs created agreement around it. In real teams, the more frequent question is what comes before the code: "What should I work on now? Who owns this? How much is left this month?"</p>
+<p>GitHub Issues and Projects are how teams answer those questions inside the same repository as the code. Putting the to-do list and the progress board next to the source has three effects:</p>
+<ol>
+<li>Work has a defined start and end. You open an issue, you finish it through a PR, and the merge auto-closes the issue.</li>
+<li>A month later, when someone asks "Why did this change land?", you can trace commit → PR → issue and reach the original intent.</li>
+<li>The same screens scale from one person to a small team. There is no need to spin up a separate tool like Jira on day one.</li>
+</ol>
+<p>Even on a solo repository, issues earn their keep. Writing down the next thing to do gives you somewhere to look when you reopen the project after a week away.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>Issues record "what is to be done", Pull Requests record "how it was actually done", and Projects record "where the work currently sits" — three complementary views of the same work.<br>
+Here is how issues, PRs, and projects interlock.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Read it as a flow:</p>
+<ol>
+<li>The issue is the starting point. It explains what to do and why.</li>
+<li>A branch and a PR are created to handle that issue.</li>
+<li>Writing <code>Closes #42</code> in the PR body tells GitHub to close the issue when the PR merges.</li>
+<li>The Project board surfaces issues and PRs as cards so you can see how far along the work is.</li>
+</ol>
+<p>The key idea: issues are the work, PRs are the change that finishes the work.</p>
+<h2>Core concepts</h2>
+<p><strong>Issue</strong><br>
+- Meaning: A repository-scoped to-do card with a title, body, comment thread, labels, assignees, and a milestone.</p>
+<p><strong>Label</strong><br>
+- Meaning: A colored tag for sorting issues and PRs - examples include <code>bug</code>, <code>enhancement</code>, <code>good first issue</code>.</p>
+<p><strong>Milestone</strong><br>
+- Meaning: A group of issues and PRs sharing a deadline and a percent-complete bar. Often used like "v1.2 release".</p>
+<p><strong>Assignee</strong><br>
+- Meaning: The person responsible for an issue or PR. One or several people can be assigned.</p>
+<p><strong>Project (Projects v2)</strong><br>
+- Meaning: A board view that pulls issues and PRs into columns by status, priority, or any custom field.</p>
+<p><strong>Closing keywords</strong><br>
+- Meaning: Words like <code>Closes</code>, <code>Fixes</code>, <code>Resolves</code>. Writing <code>Closes #42</code> in a PR body closes that issue when the PR merges into the repository's default branch.</p>
+<p><strong>Reference</strong><br>
+- Meaning: Notation like <code>#42</code> or <code>org/repo#42</code> that links to an issue or PR. GitHub auto-renders it as a link.</p>
+<p><code>Closes</code>, <code>Fixes</code>, and <code>Resolves</code> mean the same thing here. GitHub also accepts singular and plural forms (<code>Close</code>, <code>Fix</code>).</p>
+<h2>Before-After</h2>
+<p><strong>Before - PR with no linked issue</strong></p>
+<pre><code class="language-text">PR #5: Fix sidebar overflow
+- (empty body)
+- merged
+
+# 3 months later
+$ git log --oneline | grep sidebar
+9d8e7f6 Fix sidebar overflow
+$ # nobody remembers why this needed fixing
+</code></pre>
+<p>The change is recorded, but the intent is gone. To recover the why, someone has to dig into the design from scratch.</p>
+<p><strong>After - issue plus linked PR</strong></p>
+<pre><code class="language-text">Issue #42: Sidebar text overflows on narrow screens
+- Text is cut off below 1024px
+- Reports note that mouse interactions are blocked
+
+PR #5: Fix sidebar overflow on narrow screens
+Body: Closes #42
+- Add 16px left padding, set max-width to 240px
+- Verified scroll behavior between 320px and 1280px
+</code></pre>
+<p>The moment the PR merges, issue #42 closes itself. Six months later, anyone who finds commit <code>9d8e7f6</code> can click through the PR to the issue and rebuild the full context.</p>
+<h2>Step-by-step walkthrough</h2>
+<p>Reuse the <code>vacation-notes</code> repository from Episode 7. <code>main</code> is at <code>5e6f7a8 Merge pull request #1 from feature/release-notes</code> and the working tree is clean.</p>
+<p><strong>1. Open the first issue</strong></p>
+<p>In the browser, go to the repository's <code>Issues</code> tab and click <code>New issue</code>.</p>
+<ul>
+<li>Title: <code>Add a packing list section to notes</code></li>
+<li>Description (example body):<br>
+  ```text<br>
+  ## Background<br>
+  notes.md has nowhere to keep packing items for a trip.</li>
+</ul>
+<p>## Goal<br>
+  Add a <code>## Packing list</code> section with three default items.<br>
+  Detailed structure can be handled in follow-up PRs.</p>
+<p>## Out of scope<br>
+  - Inline images<br>
+  - i18n<br>
+<code>``
+- Click</code>Submit new issue<code>. The new issue gets number</code>#2` (PR #1 came from Episode 7).</p>
+<p><strong>2. Attach a label and an assignee</strong></p>
+<p>On the right sidebar of the issue:</p>
+<ul>
+<li>Labels: pick <code>enhancement</code>. If you have not made custom labels yet, the GitHub defaults are fine.</li>
+<li>Assignees: assign yourself. That is the signal that this issue has an owner.</li>
+<li>Milestone: leave it empty for now. Attach one later when a release date appears.</li>
+</ul>
+<p>Multiple labels can be applied to one issue. Short, distinct names with clear colors work best.</p>
+<p><strong>3. Create a branch for the issue</strong></p>
+<p>Switch back to your local terminal. Including the issue number in the branch name makes later tracking easier.</p>
+<pre><code class="language-text">$ git switch main
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+$ git pull
+Already up to date.
+$ git switch -c feature/packing-list-2
+Switched to a new branch 'feature/packing-list-2'
+</code></pre>
+<p>The trailing <code>2</code> in <code>feature/packing-list-2</code> matches the issue number. This is a common convention rather than a Git rule.</p>
+<p><strong>4. Commit the change and push the branch</strong></p>
+<pre><code class="language-text">$ printf '\n## Packing list\n\n- Passport\n- Phone charger\n- Travel adapter\n' &gt;&gt; notes.md
+$ git add notes.md
+$ git commit -m &quot;Add packing list section&quot;
+[feature/packing-list-2 a1b2c3d] Add packing list section
+ 1 file changed, 5 insertions(+)
+$ git push -u origin feature/packing-list-2
+Enumerating objects: 5, done.
+...
+remote: Create a pull request for 'feature/packing-list-2' on GitHub by visiting:
+remote:      https://github.com/&lt;your-id&gt;/vacation-notes/pull/new/feature/packing-list-2
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+ * [new branch]      feature/packing-list-2 -&gt; feature/packing-list-2
+Branch 'feature/packing-list-2' set up to track remote branch 'feature/packing-list-2' from 'origin'.
+</code></pre>
+<p>This part follows the Episode 7 flow.</p>
+<p><strong>5. Open the PR linked to the issue</strong></p>
+<p>Open a new PR on GitHub. This time, include one specific line in the body:</p>
+<pre><code class="language-text">Title: Add packing list section to notes
+Body:
+Closes #2
+
+Adds a place to write packing items before a trip.
+Only the default items are included so follow-up PRs can refine the structure.
+</code></pre>
+<p>Writing <code>Closes #2</code> immediately links the issue under the PR's right-side <code>Development</code> section. To close multiple issues from one PR, repeat the keyword for each number, for example <code>Closes #2, closes #3</code>. The shorter <code>Closes #2, #3</code> form does not close the second issue.</p>
+<p><strong>6. Merging the PR auto-closes the issue</strong></p>
+<p>Review the PR, then click <code>Merge pull request</code>. The merge does three things at the same instant:</p>
+<ol>
+<li>The PR's commits land on the base branch (<code>main</code>).</li>
+<li>Issue <code>#2</code> flips from <code>Open</code> to <code>Closed</code>.</li>
+<li>A line like "Closed via PR #N" appears under the issue body.</li>
+</ol>
+<p><code>Closes</code>, <code>Fixes</code>, and <code>Resolves</code> produce identical behavior. An already-closed issue is not closed twice.</p>
+<p><strong>7. See the flow on a Project board</strong></p>
+<p>Open the repository's <code>Projects</code> tab and click <code>New project</code>. Pick the <code>Board</code> template - the default columns are <code>Todo</code>, <code>In Progress</code>, and <code>Done</code>.</p>
+<ul>
+<li>Add issue <code>#2</code> to the board with <code>Add item</code>. It appears as a card in <code>Todo</code>.</li>
+<li>When you start the branch, drag the card to <code>In Progress</code>.</li>
+<li>Add the PR to the board too - it shares the same flow.</li>
+<li>Turn on the built-in <code>Workflows</code> automations so a card moves to <code>Done</code> as soon as the linked issue closes.</li>
+</ul>
+<p>Start with manual moves first. Even hand-dragging cards is a clear improvement over having no board.</p>
+<h2>Define status transitions before the board fills up</h2>
+<p>The fastest way for a Project board to turn into decoration is to create columns without defining what moves a card from one column to the next. If <code>In Progress</code> means “branch created” to one person and “PR open, waiting for review” to another, the board stops being operationally trustworthy.</p>
+<p>Use an explicit transition rule like this instead.</p>
+<p><img alt="Define status transitions before the board fills up" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-define-status-transitions-before-the-boa.en.png"></p>
+<p><em>A work-tracking flow that makes the Issue → PR → Project state transitions explicit</em></p>
+<p>Once the team shares this rule, the board becomes a real progress view instead of a second to-do list that drifts away from reality.</p>
+<h2>When auto-closing does not work</h2>
+<p>The most common failure mode in this chapter is simple: the PR merges, but the issue stays open. When that happens, check in this order.</p>
+<ol>
+<li><strong>Did the PR merge into the default branch?</strong> Closing keywords fire when the change reaches the default branch.</li>
+<li><strong>Was the keyword in the PR body?</strong> That is the safest place. Commit-message-only closing can become harder to reason about after squash or rebase.</li>
+<li><strong>Is the issue reference exact?</strong> Use <code>#42</code> in the same repository or <code>owner/repo#42</code> across repositories.</li>
+<li><strong>Did you repeat the keyword for multiple issues?</strong> <code>Closes #2, closes #3</code> closes both. <code>Closes #2, #3</code> does not.</li>
+<li><strong>Was the issue already closed?</strong> GitHub will not “close it again.”</li>
+</ol>
+<p>That sequence is usually enough to resolve the confusion without guessing.</p>
+<h2>Verification loop before merge</h2>
+<p>Because issues and Projects track flow rather than code, the verification pass is about linkage and state.</p>
+<ul>
+<li>The issue body states a concrete <strong>background</strong> and <strong>goal</strong>.</li>
+<li>The issue has at least one label and one assignee.</li>
+<li>The branch name and the PR body point to the same issue number.</li>
+<li>The PR body contains <code>Closes #N</code> plus a short verification note.</li>
+<li>The Project card is in <code>In Review</code>, not still sitting in <code>Todo</code>.</li>
+<li>After merge, the issue flips to <code>Closed</code> and the card lands in <code>Done</code>.</li>
+</ul>
+<p>This is not glamorous, but it prevents the two most common project-tracking failures: work that looks active but has no owner, and work that looks done but cannot be traced back to a decision.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>Forgetting to close the issue when the work is done. Train the habit of writing <code>Closes #N</code> in the PR body so closing happens for you.</li>
+<li>Issue bodies that say only the title in long form. The reader six months later has to know what it meant. A few lines of background and goal are enough.</li>
+<li>Inventing too many labels too early. Start with <code>bug</code>, <code>enhancement</code>, and <code>chore</code>, then add more when you actually want to filter by them.</li>
+<li>Putting <code>Closes #N</code> only in a commit message rather than the PR body. Keywords inside commit messages do close issues, but only when those exact messages reach the default branch — and squash or rebase can rewrite them. The PR body is the safe place.</li>
+<li>Skipping issues on a solo repository because "I will just remember." Issues turn that mental note into something searchable that links to commits.</li>
+</ul>
+<h2>In real-world projects</h2>
+<p>Teams use issues and projects in patterns like these:</p>
+<ul>
+<li><strong>Issue templates.</strong> A file at <code>.github/ISSUE_TEMPLATE/bug.yml</code> pre-fills new issues with sections like reproduction steps, expected behavior, and actual behavior.</li>
+<li><strong>Milestones for release scope.</strong> Create <code>v1.2</code> as a milestone and attach issues to it. The milestone page shows percent complete at a glance.</li>
+<li><strong><code>good first issue</code> for new contributors.</strong> Open source projects label easy starter issues so newcomers can find a safe place to start.</li>
+<li><strong>Project automations.</strong> Configure rules so a card moves to <code>In Progress</code> when its PR opens and to <code>Done</code> when the issue closes.</li>
+<li><strong>Decision records as issues.</strong> Even when no code changes, an issue like "We will use library X" gives the team a single place to revisit the discussion later.</li>
+</ul>
+<p>Projects also work better when they stay narrow. A four-column board such as <code>Todo / In Progress / In Review / Done</code> is usually enough for a small team. If cards keep drifting out of sync with reality, tighten the transition rule before adding more columns.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Issue body includes a short background and goal</li>
+<li>[ ] Issue has at least one label and an assignee</li>
+<li>[ ] Branch name includes the issue number</li>
+<li>[ ] PR body has at least one <code>Closes #N</code> line</li>
+<li>[ ] Verified the issue closed automatically after the PR merged</li>
+<li>[ ] Issue and PR are visible as cards on a Project board</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>In <code>vacation-notes</code>, open two new issues. Make a PR for each: include <code>Closes #N</code> in one PR body and leave it out of the other. After merging both, compare the two issues' status to see the difference.</li>
+<li>Make a Project board and replace the default columns with <code>Triage</code>, <code>This week</code>, and <code>Done</code>. Choosing column names that match your own workflow is half the value of a board.</li>
+</ol>
+<h2>Wrap-up and what's next</h2>
+<p>This article walked through one full issue-to-PR-to-board cycle. Recap:</p>
+<ul>
+<li>Issues are the work; PRs are the change that finishes the work</li>
+<li>Writing <code>Closes #N</code> in the PR body lets the merge close the issue</li>
+<li>Labels, milestones, and assignees sort, group, and assign issues</li>
+<li>Project boards collect issues and PRs into one shared view</li>
+</ul>
+<p>The next article looks at something even shorter than a PR body: the commit message. Why does <code>git log --oneline</code> lean so heavily on a single line, and what makes that line useful?</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
+<li><strong>Tracking Work with Issues and Projects (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/09-good-commit-message.md">Writing Good Commit Messages</a></li>
+<li>Real-World Workflow at a Glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>GitHub Docs, "About issues": <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues">https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues</a></li>
+<li>GitHub Docs, "Linking a pull request to an issue": <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue">https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue</a></li>
+<li>GitHub Docs, "About Projects": <a href="https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects">https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects</a></li>
+<li>GitHub Docs, "Managing labels": <a href="https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels">https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels</a></li>
+<li>GitHub Docs, "About milestones": <a href="https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones">https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones</a></li>
+<li>GitHub Docs, "Using keywords in issues and pull requests": <a href="https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests">https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests</a></li>
+<li>GitHub Docs, "About automation for projects": <a href="https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/about-automation-for-projects">https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/about-automation-for-projects</a></li>
+</ul>
+<p class="tags-line">Tags: github-issue, github-project, issue-tracking, kanban-board, issue-pr-linking, closes-keyword</p>
+</body>
+</html>
