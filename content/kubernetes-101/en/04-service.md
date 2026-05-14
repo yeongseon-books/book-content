@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 4
 title: Service
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - DNS
   - DevOps
 seo_description: A beginner guide to Kubernetes Services — ClusterIP, NodePort, LoadBalancer, selectors, and how cluster DNS keeps Pods reachable
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Service
 
-> Kubernetes 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When *Pod IPs change all the time*, *how* do you call them *reliably*?
-
-> A *Service* gives a *Pod set selected by labels* a *stable virtual IP* and a *DNS name*.
-
-<!-- a-grade-intro:end -->
+Once several Pods are running, their IP addresses stop being a stable integration surface. Pods restart, move, and get recreated, but callers still need one name and one contract that keeps working.
 
 This is post 4 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will look at Service as the networking contract that hides changing Pod membership behind a stable virtual IP and DNS name for both internal and external traffic patterns.
+
+> A Service is the answer to “how do I keep calling this workload after the Pods behind it change?”
+
+## Questions this chapter answers
 
 - The problem a *Service* solves
 - *ClusterIP / NodePort / LoadBalancer*
@@ -48,13 +44,9 @@ For *microservices* to call each other by *name*, a *Service* is mandatory.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["client"] --> Svc["service (vip)"]
-    Svc --> P1["pod"]
-    Svc --> P2["pod"]
-    Svc --> P3["pod"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
+*Service stabilizes calling patterns by placing one virtual IP and DNS name in front of a changing Pod set.*
+
 
 ## Key Terms
 
@@ -128,6 +120,22 @@ def delete(svc):
     subprocess.run(["kubectl", "delete", "svc", svc], check=True)
 ```
 
+## Verification workflow
+
+```bash
+kubectl get svc web
+kubectl get endpoints web
+kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.default.svc.cluster.local
+```
+
+**Expected output:** the Service should have a ClusterIP, the Endpoints object should list one or more Pod IPs, and DNS lookup should resolve the service name from inside the cluster. Those three checks tell you whether naming, backend selection, and internal discovery all line up.
+
+**Failure modes to check first:**
+
+- A Service with empty Endpoints almost always means selector/label mismatch.
+- DNS success with request failure usually means `targetPort` and the container listen port disagree.
+- Calls from another namespace often fail because the caller dropped the namespace part of the service name.
+
 ## What to Notice in This Code
 
 - The *selector* must match *Deployment labels*.
@@ -190,5 +198,6 @@ Internal traffic is solved. The next post covers *Ingress*, which splits *extern
 - [DNS for Services and Pods](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)
 - [Service types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
 - [Headless Services](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
+- [Debug Services](https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/)
 
 Tags: Kubernetes, Service, Networking, DNS, DevOps

@@ -17,7 +17,7 @@ tags:
   - DNS
   - DevOps
 seo_description: Service가 Pod 집합에 안정적인 주소와 이름을 주는 방식을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Service
@@ -46,13 +46,9 @@ Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Client["client"] --> Svc["service (vip)"]
-    Svc --> P1["pod"]
-    Svc --> P2["pod"]
-    Svc --> P3["pod"]
-```
+![한눈에 보는 구조](../../../assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
+*Service는 변하는 파드 집합 앞에 고정된 가상 IP와 이름을 세워 호출 경로를 안정화합니다.*
+
 
 Service는 특정 파드를 직접 고정해 가리키지 않습니다. 라벨로 선택된 파드 집합을 뒤에 두고, 앞단에는 안정적인 가상 IP와 이름을 제공합니다. 클라이언트는 뒤에서 어떤 파드가 바뀌는지 신경 쓰지 않고 Service 이름만 알면 됩니다.
 
@@ -138,6 +134,22 @@ def delete(svc):
 
 리소스를 지울 때는 Service 삭제 자체보다, 이 Service를 바라보는 다른 애플리케이션이 있는지 먼저 보는 편이 중요합니다. 이름 기반 호출 구조에서는 이름 하나가 계약이 되기 때문입니다.
 
+## 검증 흐름
+
+```bash
+kubectl get svc web
+kubectl get endpoints web
+kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.default.svc.cluster.local
+```
+
+**예상되는 결과:** Service에는 ClusterIP가 할당돼야 하고, Endpoints에는 실제 Pod IP가 하나 이상 연결돼 있어야 합니다. DNS 조회는 서비스 이름이 클러스터 내부에서 해석된다는 사실을 확인하는 가장 빠른 점검입니다.
+
+**먼저 의심할 실패 모드:**
+
+- Service는 있는데 Endpoints가 비어 있으면 selector와 labels 불일치를 먼저 봅니다.
+- DNS는 되는데 응답이 실패하면 `targetPort`와 컨테이너 listen port가 다른지 확인합니다.
+- 다른 네임스페이스에서 실패하면 Service 자체보다 호출 이름에 네임스페이스를 빠뜨린 경우가 흔합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `selector`는 Deployment가 붙인 라벨과 정확히 맞아야 합니다.
@@ -198,5 +210,6 @@ def delete(svc):
 - [DNS for Services and Pods](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)
 - [Service types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
 - [Headless Services](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
+- [Debug Services](https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/)
 
 Tags: Kubernetes, Service, Networking, DNS, DevOps
