@@ -55,6 +55,12 @@ Pipeline visualization:
   x -> [h] -> [g] -> [f] -> result
 ```
 
+## 파이프라인이 읽히는 방식
+
+![함수 파이프라인의 단계별 흐름](../../../assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
+
+*좋은 파이프라인은 각 단계의 책임이 분명해서, 어느 지점에서 데이터를 바꾸는지 한눈에 보입니다.*
+
 ## 핵심 개념
 
 | 용어 | 설명 |
@@ -361,6 +367,71 @@ print(process("  Short URL  "))
 ```
 
 조건부 단계까지 조합할 수 있으면 파이프라인은 단순 직선 구조를 넘어서도 충분히 실용적이 됩니다.
+
+## 실무 예시: 주문 이벤트 정산 파이프라인
+
+```python
+from dataclasses import dataclass, replace
+
+
+@dataclass(frozen=True)
+class OrderEvent:
+    order_id: str
+    store: str
+    amount: int
+    currency: str
+    status: str
+    source: str
+    margin: int = 0
+
+
+def normalize_currency(events: list[OrderEvent]) -> list[OrderEvent]:
+    rates = {"KRW": 1, "USD": 1380}
+    return [replace(e, amount=e.amount * rates[e.currency], currency="KRW") for e in events]
+
+
+def drop_cancelled(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [e for e in events if e.status != "cancelled"]
+
+
+def enrich_margin(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [replace(e, margin=int(e.amount * 0.18)) for e in events]
+
+
+def keep_marketplace(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [e for e in events if e.source == "marketplace"]
+
+
+def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
+    report: dict[str, dict[str, int]] = {}
+    for event in events:
+        store = report.setdefault(event.store, {"revenue": 0, "margin": 0, "orders": 0})
+        store["revenue"] += event.amount
+        store["margin"] += event.margin
+        store["orders"] += 1
+    return report
+
+
+settle_orders = pipe(
+    normalize_currency,
+    drop_cancelled,
+    keep_marketplace,
+    enrich_margin,
+    to_store_report,
+)
+
+events = [
+    OrderEvent("A-1", "seoul", 48000, "KRW", "paid", "marketplace"),
+    OrderEvent("A-2", "seoul", 42, "USD", "paid", "marketplace"),
+    OrderEvent("A-3", "busan", 31000, "KRW", "cancelled", "marketplace"),
+    OrderEvent("A-4", "busan", 27000, "KRW", "paid", "direct"),
+]
+
+print(settle_orders(events))
+# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+```
+
+이 예시는 장난감 문자열 변환보다 실무에 더 가깝습니다. 통화 정규화, 취소 주문 제외, 채널 필터링, 마진 보강, 매장별 집계가 순차적으로 드러나기 때문에, 장애가 나도 어느 단계에서 값이 달라졌는지 바로 추적할 수 있습니다.
 
 ## 이 코드에서 주목할 점
 

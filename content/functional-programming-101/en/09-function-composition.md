@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Function Composition and Pipelines
 
+Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.
+
+Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
+
 This is post 9 in the Functional Programming 101 series.
-
-> Functional Programming 101 Series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Can you snap small functions together like LEGO bricks to build complex transformations?
-
-> Function composition combines multiple functions into a new function. A pipeline is a pattern where data flows through a chain of functions, being transformed at each step. This article covers practical ways to implement composition and pipelines in Python.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -60,6 +54,12 @@ pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right
 Pipeline visualization:
   x -> [h] -> [g] -> [f] -> result
 ```
+
+## How a readable pipeline flows
+
+![Step-by-step function pipeline](../../../assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
+
+*A good pipeline makes each transformation stage explicit, so reviewers and operators can spot where data changes shape.*
 
 ## Key Concepts
 
@@ -357,6 +357,71 @@ print(process("  http://Example.COM/Very-Long-Path-Name-Here  "))
 print(process("  Short URL  "))
 # short url
 ```
+
+## Production-shaped example: order settlement pipeline
+
+```python
+from dataclasses import dataclass, replace
+
+
+@dataclass(frozen=True)
+class OrderEvent:
+    order_id: str
+    store: str
+    amount: int
+    currency: str
+    status: str
+    source: str
+    margin: int = 0
+
+
+def normalize_currency(events: list[OrderEvent]) -> list[OrderEvent]:
+    rates = {"KRW": 1, "USD": 1380}
+    return [replace(e, amount=e.amount * rates[e.currency], currency="KRW") for e in events]
+
+
+def drop_cancelled(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [e for e in events if e.status != "cancelled"]
+
+
+def enrich_margin(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [replace(e, margin=int(e.amount * 0.18)) for e in events]
+
+
+def keep_marketplace(events: list[OrderEvent]) -> list[OrderEvent]:
+    return [e for e in events if e.source == "marketplace"]
+
+
+def to_store_report(events: list[OrderEvent]) -> dict[str, dict[str, int]]:
+    report: dict[str, dict[str, int]] = {}
+    for event in events:
+        store = report.setdefault(event.store, {"revenue": 0, "margin": 0, "orders": 0})
+        store["revenue"] += event.amount
+        store["margin"] += event.margin
+        store["orders"] += 1
+    return report
+
+
+settle_orders = pipe(
+    normalize_currency,
+    drop_cancelled,
+    keep_marketplace,
+    enrich_margin,
+    to_store_report,
+)
+
+events = [
+    OrderEvent("A-1", "seoul", 48000, "KRW", "paid", "marketplace"),
+    OrderEvent("A-2", "seoul", 42, "USD", "paid", "marketplace"),
+    OrderEvent("A-3", "busan", 31000, "KRW", "cancelled", "marketplace"),
+    OrderEvent("A-4", "busan", 27000, "KRW", "paid", "direct"),
+]
+
+print(settle_orders(events))
+# {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+```
+
+This example is closer to a production data flow than a toy string transformation. Currency normalization, cancellation filtering, channel filtering, margin enrichment, and store-level aggregation remain independent stages, which makes failures and business-rule changes easier to isolate.
 
 ## What to Notice in This Code
 
