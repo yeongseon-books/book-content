@@ -2,7 +2,7 @@
 series: mlops-101
 episode: 5
 title: Model Deployment
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,46 +16,44 @@ tags:
   - FastAPI
   - Docker
   - DataScience
-seo_description: How to wrap a trained model in FastAPI and Docker, ship it safely with canary rollout, and avoid five common deployment mistakes.
-last_reviewed: '2026-05-04'
+seo_description: Wrap a trained model in FastAPI and Docker, then ship it with health checks, version tags, rollout policy, and rollback discipline.
+last_reviewed: '2026-05-15'
 ---
 
 # Model Deployment
 
-> MLOps 101 series (5/10)
+Finishing model training does not automatically create a service. If nobody has defined which process loads the model file, how input is validated, or what environment the code runs in, even a strong model becomes unstable the moment it leaves the notebook.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you take a *trained model file* and *expose it to users safely*?
-
-> *Model deployment wraps a model file in an API or batch job and runs it inside a reproducible environment.*
-
-<!-- a-grade-intro:end -->
+When engineers say deployment is hard, they are usually not describing the model itself. They are describing environment drift, missing version traceability, and the lack of a safe rollback path. That is why model deployment is really about a reproducible runtime plus a controlled release policy.
 
 This is post 5 in the MLOps 101 series.
 
-## What You Will Learn
+Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.
 
-- Three deployment patterns (online / batch / streaming)
-- Building a model API with FastAPI
-- Pinning the environment with Docker
-- Blue/Green and Canary releases
-- Five common pitfalls
+## What This Post Answers
+
+- How do you connect a trained model file to a real user request?
+- How should you distinguish online, batch, and streaming inference?
+- What do FastAPI and Docker each contribute to model deployment?
+- Why should version tags and health checks be treated as defaults?
+- When do Blue/Green and Canary reduce risk in different ways?
+
+> Mental model: model deployment packages a model file inside an API or batch job, then versions the entire runtime environment as one deployable artifact.
 
 ## Why It Matters
 
-When people say "deployment is hard," they usually mean *environment drift* and *no rollback*. Containers and gradual rollout are the answer.
+Many teams blame deployment failures on model complexity, but the more common source is environment mismatch and rollback chaos. The model works locally, then breaks in the server because the library version changed. A bad release goes live, and no one can cleanly return to the previous version.
 
-## Concept at a Glance
+That is why deployment is not the final training step. It is the first operating step. The team has to know which version is live, how much traffic it should receive, and exactly how to back out if the release starts misbehaving.
 
-```mermaid
-flowchart LR
-    Model["model.pkl"] --> API["FastAPI"]
-    API --> Image["Docker image"]
-    Image --> Prod["production"]
-    Prod --> Canary["canary 5%"]
-    Canary --> Full["full traffic"]
-```
+## See the Flow First
+
+![See the Flow First](../../../assets/mlops-101/05/05-01-see-the-flow-first.en.png)
+
+*See the Flow First*
+This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.
+
+In other words, deployment is the bundle of model + serving code + runtime environment + rollout policy.
 
 ## Key Terms
 
@@ -129,6 +127,44 @@ docker build -t model-api:1.0.0 .
 docker run -p 8000:8000 model-api:1.0.0
 curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x": 2.5}'
 ```
+
+**Expected output:** a JSON response such as `{"prediction": 1}` and a container that stays healthy on `GET /healthz`.
+
+That `model-api:1.0.0` tag is more than a build label. It is the release identity that tells you which version is live, which version is canarying, and which version you can roll back to.
+
+## First Checks When the Release Looks Wrong
+
+When a freshly deployed model does not behave as expected, the first question is not "is the model bad?" It is "which contract failed first?" A few small checks usually narrow the problem quickly.
+
+### Check 1 — Can the container answer its health endpoint?
+
+```bash
+curl -s http://localhost:8000/healthz
+```
+
+**Expected output:** a JSON payload such as `{"ok": true, "version": "1.0.0"}`.
+
+If this fails, start with container startup logs and import errors before looking at model behavior.
+
+### Check 2 — Which image tag is actually running?
+
+```bash
+docker ps --format "table {{.Image}}\t{{.Status}}\t{{.Names}}"
+```
+
+**Expected output:** the intended image tag, such as `model-api:1.0.0`, in a healthy running state.
+
+If the tag is wrong, the issue is a release-process bug, not a model-quality bug.
+
+### Check 3 — Does the API reject bad payloads cleanly?
+
+```bash
+curl -s -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x":"bad"}'
+```
+
+**Expected output:** a FastAPI validation error rather than a server crash.
+
+This confirms that request validation is containing blast radius the way it should.
 
 ## What to Notice in This Code
 
