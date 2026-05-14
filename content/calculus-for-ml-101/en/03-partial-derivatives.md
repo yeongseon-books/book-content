@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 3
 title: Partial Derivatives
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - MultiVariable
   - Beginner
 seo_description: A beginner-friendly tour of partial derivatives, multivariable functions, holding variables, per-variable slopes, and ML weights
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Partial Derivatives
 
-> Calculus for ML 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a function takes *many inputs*, how do we measure the effect of *one* alone?
-
-> A *partial derivative* is the agreement to *hold the others fixed* and vary *only one*.
+Real ML losses are not single-input functions. They depend on many weights, biases, activations, and inputs at once. If you want to know which parameter is responsible for a change in loss, you need a way to isolate one variable without pretending the others disappeared.
 
 This is post 3 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll use multivariable functions, fixed variables, and per-parameter responsibility to build intuition for partial derivatives. That is the conceptual step that turns "a derivative" into "a gradient for every trainable weight."
+
+> A partial derivative is the rule that lets you ask one focused question at a time: if only this variable moved, how would the loss respond?
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ Every ML *weight* receives its *share of responsibility* through a *partial deri
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[f x y] --> A[Hold y]
-    A --> X[Partial dx]
-    F --> B[Hold x]
-    B --> Y[Partial dy]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
 
+*Partial-derivative flow: hold one variable fixed and isolate responsibility along the other axis.*
 ## Key Terms
 
 - **multivariable**: *many* inputs.

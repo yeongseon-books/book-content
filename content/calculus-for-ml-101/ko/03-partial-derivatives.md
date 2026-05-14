@@ -60,14 +60,9 @@ last_reviewed: '2026-05-12'
 
 편미분의 흐름은 아래처럼 정리할 수 있습니다.
 
-```mermaid
-flowchart LR
-    F[f x y] --> A[y 고정]
-    A --> X[x에 대한 편미분]
-    F --> B[x 고정]
-    B --> Y[y에 대한 편미분]
-```
+![핵심 개념](../../../assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.ko.png)
 
+*편미분 흐름: 한 변수를 고정하고 다른 변수의 변화율을 읽어 변수별 책임을 분리합니다.*
 ### 다변수 함수는 입력 축이 여러 개인 함수입니다
 
 ```python
