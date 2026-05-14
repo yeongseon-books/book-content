@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Image Optimization</h1>
-<p>This is post 9 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Same app, <em>1.2 GB vs 80 MB</em>. <em>What changed</em>?</p>
-<blockquote>
-<p><em>Image optimization is the sum of </em>base choice, multi-stage, and cache mounts<em>. Apply </em>all three together<em> for big wins.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Image optimization is often presented as an aesthetic preference for smaller numbers. In practice, image size changes deploy time, registry traffic, cache hit rates, and the number of unnecessary packages that become part of your attack surface.</p>
+<p>The important point is that optimization is rarely one trick. Base image choice, multi-stage separation, and BuildKit cache reuse work together. If you optimize only one of them, the result is usually smaller than it should be.</p>
+<p>This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Multi-stage builds</em> to split <em>build vs runtime</em></li>
@@ -80,10 +71,8 @@
 <p><em>A 1 GB image costs </em>one minute per deploy<em> and </em>100 points of security score<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Builder[&quot;builder stage (deps + build)&quot;] --&gt; Final[&quot;final stage (runtime only)&quot;]
-    Final --&gt; Slim[&quot;80MB image&quot;]
-</code></pre>
+<p><img alt="Multi-stage build separating builder and runtime stages to produce a smaller final image" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Builder-only tools stay out of the runtime image so build speed, image size, and attack surface all improve together</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Multistage</strong>: multiple <em>FROM</em> statements with only the <em>final image</em> shipped.</li>
@@ -133,6 +122,16 @@ gcr.io/distroless/python3-debian12  ~50 MB (no shell)
 # Use 'dive' to analyze per-layer size
 # https://github.com/wagoodman/dive
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li>Run the BuildKit build twice. The second build should show a clear cache advantage on dependency-related steps.</li>
+<li>Compare <code>docker images myapp</code> with <code>docker history myapp:opt</code> to confirm that builder-only tools stayed out of the runtime image.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If Alpine or distroless causes runtime issues, investigate compatibility and debugging constraints before chasing smaller size numbers.</li>
+<li>If the image barely shrinks, inspect <code>.dockerignore</code> and the copy boundary between builder and runtime stages.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A <em>wheels stage</em> keeps only the <em>compiled artifacts</em> in runtime.</li>
@@ -185,11 +184,16 @@ gcr.io/distroless/python3-debian12  ~50 MB (no shell)
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/build/building/multi-stage/">Multi-stage builds</a></li>
 <li><a href="https://docs.docker.com/build/cache/optimize/">BuildKit cache mounts</a></li>
 <li><a href="https://github.com/GoogleContainerTools/distroless">Distroless images</a></li>
 <li><a href="https://github.com/wagoodman/dive">dive - layer analysis</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/build/cache/optimize/">Optimize cache usage in builds</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Multistage, BuildKit, Alpine, Distroless</p>
 </body>
