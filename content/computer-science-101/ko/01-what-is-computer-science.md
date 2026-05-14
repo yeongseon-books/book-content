@@ -58,23 +58,8 @@ last_reviewed: '2026-05-12'
 
 > 컴퓨터과학은 계산 이론, 시스템, 응용의 세 축으로 구성됩니다. 모든 과목은 "추상화"라는 공통 도구로 연결됩니다.
 
-```text
-         Computation theory
-        /                  \
-  Algorithms          Complexity
-       \                /
-       Data structures
-            |
-   ┌────────┼────────┐
- Computer   OS    Networks
- architecture        |
-   └────────┼────────┘
-            |
-       Software
-       engineering
-            |
-     AI / Data science
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)
+*컴퓨터과학의 주요 층이 이론에서 시스템과 응용으로 이어지는 구조*
 
 ## 핵심 용어
 
@@ -195,6 +180,8 @@ binary_search(data, 999_999)
 print(f"Binary search: {time.time() - start:.6f}s")
 ```
 
+**Expected output:** `Linear search`가 `Binary search`보다 훨씬 오래 걸리고, 입력 크기가 커질수록 차이가 급격히 벌어집니다.
+
 같은 문제를 푸는 두 알고리즘의 성능 차이는 데이터가 커질수록 극적으로 벌어집니다.
 
 ### 4단계: 계층 구조로 이해하는 CS
@@ -302,7 +289,7 @@ for num, title, keywords in roadmap:
 ## 참고 자료
 
 - [CS50 — Introduction to Computer Science (Harvard)](https://cs50.harvard.edu/)
-- [Wikipedia — Computer Science](https://en.wikipedia.org/wiki/Computer_science)
+- [ACM/IEEE-CS/AAAI — Computing Curricula 2020](https://www.acm.org/binaries/content/assets/education/curricula-recommendations/cc2020.pdf)
 - [Structure and Interpretation of Computer Programs (MIT)](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Computer Science Distilled — Wladston Ferreira Filho](https://code.energy/computer-science-distilled/)
 
