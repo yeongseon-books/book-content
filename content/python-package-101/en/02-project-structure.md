@@ -3,7 +3,7 @@ title: Project Structure — src layout and pyproject.toml
 series: python-package-101
 episode: 2
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - Project Structure
 - Packaging
 - setuptools
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: src layout separates source code from the project root to enforce
   install-before-test, and pyproject.toml defines how to build.
 ---
 
 # Project Structure — src layout and pyproject.toml
 
-This is post 2 in the Python Package 101 series.
+Project structure is where many packaging bugs begin. If tests read local source by accident, you can ship a package that only works on your machine.
 
-> Python Package 101 series (2/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 2 in the Python Package 101 series. Here we compare flat layout and src layout, explain why `pyproject.toml` replaced `setup.py`, and build a minimal package skeleton that behaves like a real install.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 2 in the Python Package 101 series.
 - What does a minimal pyproject.toml look like?
 
 > src layout separates source code from the project root to enforce install-before-test, and pyproject.toml defines how to build the package.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -72,6 +66,9 @@ tests/                      core.py
 pyproject.toml          tests/
                         pyproject.toml
 ```
+
+![Mental Model](../../../assets/python-package-101/02/02-01-mental-model.en.png)
+*How src layout separates source, metadata, and installation-time verification*
 
 ## Core Concepts
 
@@ -276,7 +273,7 @@ For the build backend, `setuptools` is the most widely used, but `hatchling` and
 The next post covers **dependency management** — venv, pip, uv, and requirements.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - **Project Structure — src layout and pyproject.toml (current)**
@@ -298,4 +295,4 @@ The next post covers **dependency management** — venv, pip, uv, and requiremen
 - [setuptools - src layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html)
 - [Hynek Schlawack - Testing & Packaging](https://hynek.me/articles/testing-packaging/)
 
-Tags: Python, pyproject.toml, src layout, Project Structure, Packaging, setuptools
+Tags: Python, Packaging, PyPI, pyproject.toml
