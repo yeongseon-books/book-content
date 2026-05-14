@@ -18,12 +18,18 @@ tags:
   - Refactoring
   - Readability
 seo_description: 함수가 한 가지 일만 하도록 작게 쪼개는 원칙과 추출 방법을 배웁니다. 가독성을 높이고 테스트와 재사용이 쉬운 코드를 만드는 기법을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 함수 작게 만들기
 
-긴 함수는 처음에는 편하지만 시간이 갈수록 설명과 예외 처리가 한데 뭉치면서 읽기 어려워집니다. 이 글은 Clean Code 101 시리즈의 3번째 글입니다. 여기서는 함수가 충분히 작다는 말이 실제로 무엇을 뜻하는지, 그리고 큰 함수를 어떻게 안전하게 쪼갤 수 있는지 살펴보겠습니다.
+긴 함수는 처음에는 편하지만 시간이 갈수록 설명과 예외 처리가 한데 뭉치면서 읽기 어려워집니다.
+
+이 글은 Clean Code 101 시리즈의 3번째 글입니다.
+
+여기서는 함수가 충분히 작다는 말이 실제로 무엇을 뜻하는지, 그리고 큰 함수를 어떻게 안전하게 쪼갤 수 있는지 살펴보겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    B["Giant function"] --> E["Extract"]
-    E --> S["Does one thing"]
-    S --> N["Good name"]
-    N --> R["Reuse and test"]
-```
+![함수 작게 만들기](../../../assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
+
+*큰 함수를 잘게 나누는 흐름: 추출이 이름을 만들고, 이름이 재사용과 테스트를 쉽게 만듭니다.*
 
 추출은 이름을 가능하게 만들고, 좋은 이름은 재사용과 테스트를 쉽게 만듭니다.
 
@@ -144,6 +146,23 @@ def discount(price: int, rate: float) -> int:
 
 순수 함수는 테스트가 가장 쉽습니다. 작은 함수와 순수 함수는 함께 갈수록 효과가 커집니다.
 
+## 검증 방법
+
+```bash
+radon cc app/ -a -s
+python -m pytest -q tests/test_checkout.py
+```
+
+**기대 결과**
+
+- 추출 전후 복잡도와 테스트 안정성이 함께 비교됩니다.
+- 함수 본문이 목차처럼 읽히는지 바로 확인할 수 있습니다.
+
+## 실패하기 쉬운 지점
+
+- 추출 뒤 인자 수가 급격히 늘어납니다.
+- 질문 함수가 여전히 상태를 바꿉니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 함수 본문은 목차처럼 읽혀야 합니다.
@@ -207,5 +226,5 @@ def discount(price: int, rate: float) -> int:
 - [Refactoring — Extract Function](https://refactoring.com/catalog/extractFunction.html)
 - [Martin Fowler — Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html)
 - [Refactoring — Introduce Parameter Object](https://refactoring.com/catalog/introduceParameterObject.html)
-
+- [Python dataclasses documentation](https://docs.python.org/3/library/dataclasses.html)
 Tags: Computer Science, CleanCode, Functions, SRP, Refactoring, Readability
