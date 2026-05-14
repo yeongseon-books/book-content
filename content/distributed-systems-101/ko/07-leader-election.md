@@ -18,12 +18,16 @@ tags:
   - Coordination
   - Liveness
 seo_description: 안전한 리더 선출을 위한 임대(Lease), 하트비트 작동 원리와 스플릿 브레인 방지를 위한 펜싱 토큰 기법을 상세히 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 리더 선출
 
+리더 선출에서 가장 위험한 장면은 "누가 이기느냐"가 아닙니다. 죽었다고 믿었던 예전 리더가 늦게 깨어나 다시 쓰기를 시도하는 순간입니다. 이 장면을 막지 못하면 시스템은 아주 짧은 순간에도 두 리더를 허용하게 됩니다.
+
 이 글은 Distributed Systems 101 시리즈의 일곱 번째 글입니다.
+
+여기서는 lease와 fencing token을 함께 써서, 리더를 고르는 문제를 넘어 예전 리더의 영향력을 끊는 운영 안전장치로 설명합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    C1["candidate 1"] -->|request lease| L["lock service (etcd)"]
-    C2["candidate 2"] -->|request lease| L
-    L -->|grant lease| C1
-    C1 -->|heartbeat| L
-```
+![lease 기반 리더 선출과 heartbeat 갱신](../../../assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
+
+*lease 기반 리더 선출과 heartbeat 갱신*
 
 여러 후보가 lock service에 lease를 요청하고, 한 후보만 리더가 되어 heartbeat로 lease를 갱신합니다.
 
@@ -145,6 +145,19 @@ def write(token, data):
 
 토큰이 없는 설계였다면 A의 쓰기가 실제로 반영되어 데이터가 망가졌을 것입니다.
 
+## 운영 시나리오: GC pause 뒤에 깨어난 예전 리더
+
+실전에서 자주 보는 사고는 깔끔한 장애보다 "너무 오래 멈췄다가 돌아온 리더"에 가깝습니다.
+
+1. 리더 A가 `ttl=5초` lease와 fencing token `41`을 받습니다.
+2. 긴 GC pause나 CPU starvation으로 A가 8초 동안 멈춥니다.
+3. lock service는 heartbeat를 받지 못해 lease를 만료시키고 리더 B를 선출합니다.
+4. B는 fencing token `42`를 받고 쓰기를 받기 시작합니다.
+5. A가 깨어나 token `41`로 자원 서버에 쓰기를 시도합니다.
+6. 자원 서버는 `41 < 42`를 보고 A의 요청을 거부합니다.
+
+리더를 고르는 일은 lease 저장소가 맡고, 최종 쓰기 허용 여부는 자원 서버가 판단합니다. 선출 이벤트만 남기고 토큰 검증을 빼면 상황은 보여도 실제 보호는 하지 못합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - lease는 자동 만료되므로 네트워크 파티션을 자연스럽게 다룹니다.
@@ -209,5 +222,6 @@ Kubernetes의 `kube-controller-manager`와 `kube-scheduler`는 etcd lease를 사
 - [How to do distributed locking — Martin Kleppmann](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
 - [etcd lease and leader election](https://etcd.io/docs/v3.5/learning/lock/)
 - [Kubernetes leader election library](https://pkg.go.dev/k8s.io/client-go/tools/leaderelection)
+- [ZooKeeper recipes and solutions — Leader Election](https://zookeeper.apache.org/doc/current/recipes.html#sc_leaderElection)
 
 Tags: Computer Science, Distributed Systems, LeaderElection, Lease, Coordination, Liveness
