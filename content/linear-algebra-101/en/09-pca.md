@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 9
 title: PCA
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to PCA — its definition, SVD-based mechanics, and how it powers dimensionality reduction in ML, with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # PCA
 
-> Linear Algebra 101 series (9/10)
+When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
 
-**Core question**: How do you find the *most important directions* in *high-dimensional data*?
+## Questions This Post Answers
 
-> *PCA finds the *axes of greatest variance* and *projects the data* onto them.*
+- Why is PCA allowed to call some directions more important than others?
+- How do the covariance view and the SVD view connect?
+- Why is centering mandatory before you trust the result?
+- How do you decide how many principal components to keep?
 
-<!-- a-grade-intro:end -->
-
-This is post 9 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- The *definition and intuition* behind *PCA*
-- The two views: *SVD-based* and *covariance-based*
-- *Variance preservation* and *dimensionality reduction*
-- A 5-step hands-on
-- Five common pitfalls
+> PCA finds a new set of orthogonal axes that explain the data well, then keeps only the axes that carry the most of the story.
 
 ## Why It Matters
 
-Dimensionality reduction, visualization, denoising, *feature compression* — *PCA* is the most fundamental and powerful tool.
+Dimensionality reduction, visualization, denoising, and feature compression show up constantly in practice. PCA is often the first reliable linear-algebra tool for that job.
 
-> *PCA finds the directions that explain the most variance.*
+It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["High-dim data X"] --> Center["Center"]
-    Center --> Cov["Covariance or SVD"]
-    Cov --> PC["Principal components"]
-    PC --> Proj["Project to top-k axes"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
+
+*This diagram captures the PCA flow from centering to principal components and projection onto the top axes.*
 
 ## Key Terms
 
@@ -113,6 +102,12 @@ X_rec = X_2d @ Vt[:k]
 err = np.linalg.norm(Xc - X_rec) / np.linalg.norm(Xc)
 print("relative reconstruction error:", err)
 ```
+
+## Read One Numeric Pass
+
+- `X_2d.shape` becomes `(100, 2)`, so the representation really did shrink from three dimensions to two.
+- The explained-variance ratio comes from squared singular values. Large components are not just bigger numbers; they are bigger shares of the story.
+- Reconstruction error stays non-zero because one axis was dropped, but a small error means the compressed view still keeps most of the structure.
 
 ## What to Notice in This Code
 
@@ -172,9 +167,9 @@ PCA is the *standard for dimensionality reduction*. The next post brings everyth
 
 ## References
 
-- [Wikipedia — Principal component analysis](https://en.wikipedia.org/wiki/Principal_component_analysis)
 - [scikit-learn — PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html)
-- [Setosa — Principal Component Analysis](https://setosa.io/ev/principal-component-analysis/)
 - [Stanford CS229 — Notes on PCA](https://cs229.stanford.edu/notes2020spring/cs229-notes10.pdf)
+- [Setosa — Principal Component Analysis](https://setosa.io/ev/principal-component-analysis/)
+- [NumPy — linalg.svd](https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html)
 
 Tags: LinearAlgebra, PCA, DimensionalityReduction, DataScience, Beginner

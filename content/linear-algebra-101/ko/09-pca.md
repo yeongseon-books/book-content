@@ -17,7 +17,7 @@ tags:
   - DataScience
   - Beginner
 seo_description: PCA가 분산이 큰 축을 새로 찾아 차원을 줄이는 원리를 설명하고 SVD와 분산 설명률을 활용한 실무 분석 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # PCA
@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Data["High-dim data X"] --> Center["Center"]
-    Center --> Cov["Covariance or SVD"]
-    Cov --> PC["Principal components"]
-    PC --> Proj["Project to top-k axes"]
-```
+![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)
+
+*중심화된 데이터에서 주성분을 찾고 상위 축으로 투영하는 PCA의 핵심 절차입니다.*
 
 PCA의 핵심 흐름은 단순합니다. 먼저 평균을 빼서 중심화하고, 데이터의 분산이 큰 방향을 찾은 뒤, 상위 몇 개 축에 투영합니다. 남은 축의 수가 곧 줄인 차원입니다.
 
@@ -118,6 +114,12 @@ print("relative reconstruction error:", err)
 ```
 
 차원을 줄인 만큼 정보 손실도 생깁니다. 재구성 오차는 그 손실을 숫자로 보여 줍니다.
+
+## 작은 수치 예시로 다시 보기
+
+- 투영 결과 `X_2d.shape`는 `(100, 2)`가 됩니다. 3차원 표현이 2차원으로 줄어든 셈입니다.
+- 분산 설명률은 특이값 제곱의 비율로 계산됩니다. 큰 값일수록 더 중요한 축입니다.
+- 재구성 오차는 0이 아니지만 충분히 작다면, 줄인 차원으로도 원래 구조를 꽤 잘 보존한 것입니다.
 
 ## 이 코드에서 먼저 볼 점
 
