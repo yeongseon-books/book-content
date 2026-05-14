@@ -1,9 +1,9 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 series: ai-data-preparation-101
-status: content-ready
+status: publish-ready
 tags:
 - Quality Filtering
 - Heuristic Rules
@@ -23,11 +23,19 @@ seo_description: A raw corpus is almost always more than half garbage. Ads, auto
 
 # Quality Filtering - Heuristics and Classifiers
 
-> AI Data Preparation 101 series (6/10)
-
 Collected data is rarely clean enough to become training data as-is. The real question is how quickly you can separate usable samples from ads, spam, encoding breakage, and boilerplate before they distort learning.
 
 This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.
+
+## Questions this chapter answers
+
+- Which low-cost heuristics catch obvious junk before you spend model calls on it?
+- What does language detection remove that simple length or symbol checks cannot?
+- How should perplexity and classifier scores sit behind the heuristic layer?
+- Why do hard-coded thresholds decay as source distributions change?
+- Which stage-level statistics tell you a filter is over-pruning or drifting?
+
+> Quality filtering is a cost-ordered funnel: cheap rules remove obvious garbage, while heavier models spend time only on the ambiguous cases that are worth scoring more carefully.
 
 ---
 ## "Collected does not mean trainable."
@@ -224,6 +232,14 @@ Ordering matters. Heuristics run first because they are fastest. Perplexity and 
 - Episode 7 covers synthetic data generation.
 
 ---
+
+## Operational checklist
+
+- [ ] Keep heuristic thresholds tied to observed distributions rather than frozen constants
+- [ ] Run language detection, perplexity, and classifiers in cheap-to-expensive order
+- [ ] Compare source, language, and token-length distributions before and after filtering
+- [ ] Document the positive and negative corpora used to train the quality classifier
+- [ ] Track drop reasons by stage so threshold changes stay explainable
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Quality Filtering - Heuristics and Classifiers</h1>
+<p>Collected data is rarely clean enough to become training data as-is. The real question is how quickly you can separate usable samples from ads, spam, encoding breakage, and boilerplate before they distort learning.</p>
+<p>This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Which low-cost heuristics catch obvious junk before you spend model calls on it?</li>
+<li>What does language detection remove that simple length or symbol checks cannot?</li>
+<li>How should perplexity and classifier scores sit behind the heuristic layer?</li>
+<li>Why do hard-coded thresholds decay as source distributions change?</li>
+<li>Which stage-level statistics tell you a filter is over-pruning or drifting?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (6/10)</p>
+<p>Quality filtering is a cost-ordered funnel: cheap rules remove obvious garbage, while heavier models spend time only on the ambiguous cases that are worth scoring more carefully.</p>
 </blockquote>
 <hr>
 <h2>"Collected does not mean trainable."</h2>
@@ -225,6 +235,14 @@ keep = quality_score(doc) &gt;= threshold
 <li>Episode 7 covers synthetic data generation.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Keep heuristic thresholds tied to observed distributions rather than frozen constants</li>
+<li>[ ] Run language detection, perplexity, and classifiers in cheap-to-expensive order</li>
+<li>[ ] Compare source, language, and token-length distributions before and after filtering</li>
+<li>[ ] Document the positive and negative corpora used to train the quality classifier</li>
+<li>[ ] Track drop reasons by stage so threshold changes stay explainable</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
