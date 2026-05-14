@@ -26,7 +26,7 @@ last_reviewed: '2026-05-12'
 
 클로저는 처음 보면 조금 신기한 기능처럼 느껴집니다. 바깥 함수가 이미 끝났는데도 안쪽 함수가 예전 변수를 계속 기억하기 때문입니다. 하지만 이 메커니즘을 이해하면 데코레이터, 팩토리 함수, 콜백 설정 같은 패턴이 한꺼번에 정리됩니다.
 
-`functools.partial`은 같은 문제를 다른 각도에서 풉니다. 기존 함수의 일부 인자를 미리 고정해 새 함수를 만들기 때문에, 클로저를 직접 쓰지 않고도 함수를 손쉽게 특화할 수 있습니다. 둘은 비슷해 보이지만 쓰임새가 조금 다릅니다.
+`functools.partial`은 같은 문제를 다른 각도에서 풉니다. 기존 함수의 일부 인자를 미리 고정해 새 함수를 만들기 때문에, 클로저를 직접 쓰지 않고도 함수를 간단히 특화할 수 있습니다. 둘은 비슷해 보이지만 쓰임새가 조금 다릅니다.
 
 ## 이 글에서 다룰 문제
 
@@ -39,7 +39,7 @@ last_reviewed: '2026-05-12'
 
 ## 왜 중요한가
 
-클로저는 클래스를 쓰지 않고도 작은 상태를 캡슐화할 수 있게 해 줍니다. 상태가 단순하고 메서드도 하나면, 클래스보다 클로저가 훨씬 가볍고 읽기 쉬운 경우가 많습니다.
+클로저는 클래스를 쓰지 않고도 작은 상태를 캡슐화하게 해 줍니다. 상태가 단순하고 메서드도 하나면, 클래스보다 클로저가 훨씬 가볍고 읽기 쉬운 경우가 많습니다.
 
 또한 `partial`은 이미 존재하는 함수를 재활용해 특화 버전을 만들 때 매우 유용합니다. `lambda x: f(x, fixed_arg)`보다 더 명확하고, 디버깅 시 고정된 인자도 드러나기 때문에 실무 코드에서 생각보다 큰 이점을 줍니다.
 
@@ -55,8 +55,14 @@ outer_func(x)
   +-- inner_func(y)
        |
        +-- x + y  <- remembers outer x
-           (closure)
+            (closure)
 ```
+
+## 클로저와 `partial` 선택 흐름
+
+![클로저와 partial 선택 흐름](../../../assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
+
+*클로저는 상태를 기억할 때, `partial`은 인자만 고정하면 될 때 더 잘 맞습니다.*
 
 ## 핵심 개념
 
@@ -262,6 +268,53 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 ```
 
 이벤트 시스템, 웹훅, UI 콜백 같은 구조에서 클로저와 `partial`은 아주 자주 만납니다. 문법 장난이 아니라 실전 연결 도구라는 점이 중요합니다.
+
+### Step 6: 실무 예시 — 테넌트별 웹훅 처리기 조립하기
+
+```python
+from dataclasses import dataclass
+from functools import partial
+
+
+@dataclass(frozen=True)
+class TenantPolicy:
+    tenant: str
+    retry_limit: int
+    audit_channel: str
+
+
+def make_retry_decider(policy: TenantPolicy):
+    attempts = 0
+
+    def should_retry(status: str) -> bool:
+        nonlocal attempts
+        attempts += 1
+        return status == "temporary-failure" and attempts < policy.retry_limit
+
+    return should_retry
+
+
+def publish_audit(channel: str, event_name: str, payload: dict) -> None:
+    print(f"[{channel}] {event_name}: {payload}")
+
+
+policy = TenantPolicy(
+    tenant="store-kr",
+    retry_limit=3,
+    audit_channel="orders.webhook",
+)
+
+should_retry = make_retry_decider(policy)
+record_audit = partial(publish_audit, policy.audit_channel)
+
+event = {"order_id": "A-1024", "status": "temporary-failure"}
+record_audit("webhook.received", {"tenant": policy.tenant, **event})
+
+if should_retry(event["status"]):
+    record_audit("webhook.retry_scheduled", {"order_id": event["order_id"], "attempt": 1})
+```
+
+이 패턴은 운영 코드에서 특히 유용합니다. 클로저는 테넌트별 재시도 상태를 기억하고, `partial`은 공통 감사 채널을 고정합니다. 덕분에 각 웹훅 핸들러는 설정 객체를 계속 다시 넘기지 않아도 되고, 어떤 값이 컨텍스트인지도 코드에 바로 드러납니다.
 
 ## 이 코드에서 주목할 점
 
