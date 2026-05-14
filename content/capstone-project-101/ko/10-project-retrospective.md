@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Reflection
   - Beginner
 seo_description: 캡스톤 회고를 KPT와 데이터, 다음 행동 중심으로 정리하는 법을 다룹니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 프로젝트 회고
 
-좋은 회고는 느낌을 남기는 데서 끝나지 않습니다. 무엇이 잘됐고, 무엇이 문제였고, 다음에 무엇을 바꿀지를 남겨야 다음 프로젝트의 자산이 됩니다. 이 글은 Capstone Project 101 시리즈의 마지막 글입니다. 여기서는 회고를 비난 모임이 아니라 학습 문서로 만드는 방법을 정리하겠습니다.
+프로젝트가 끝나면 팀은 보통 안도감부터 느낍니다. 그 순간 바로 흩어지면 이번 학기의 시행착오는 다시 개인 기억으로만 남습니다.
 
-> 멘탈 모델: 회고의 목적은 잘못한 사람을 찾는 데 있지 않고, 사실과 원인을 정리해 다음 프로젝트에서 같은 문제를 반복하지 않게 만드는 데 있습니다.
+회고의 목적은 감정을 털어놓는 데서 멈추지 않고, 사실과 원인과 다음 행동을 문서로 남기는 데 있습니다. 그래야 이번 프로젝트의 실패와 성공이 다음 프로젝트의 입력이 됩니다.
+
+이 글은 Capstone Project 101 시리즈의 마지막 글입니다. 여기서는 KPT, 데이터, 원인 분석, 다음 행동을 묶어 회고를 학습 문서로 남기는 방법을 정리합니다.
+
+> 멘탈 모델: 좋은 회고는 잘못한 사람을 찾는 문서가 아니라, 어떤 사실이 있었고 무엇을 바꿀지 정리하는 다음 프로젝트의 출발 문서입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,29 @@ last_reviewed: '2026-05-12'
 
 실무 팀도 스프린트 회고와 포스트모템을 꾸준히 운영합니다. 중요한 것은 감정을 털어놓는 것보다, 어떤 사실이 있었고 다음에 무엇을 바꿀지를 작게라도 정하는 일입니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    K[Keep] --> P[Problem]
-    P --> T[Try]
-    T --> A[Action]
-    A --> N[Next Project]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/10/10-01-the-flow-at-a-glance.ko.png)
+*회고를 다음 프로젝트 입력으로 바꾸는 흐름*
+
+## 실전 문서 예시: 회고 액션 로그
+
+회고가 실제 변화로 이어지려면 다음 행동을 아래처럼 작고 선명하게 적는 편이 좋습니다.
+
+```text
+구분 | 내용 | 담당자 | 기한
+Keep | 요구사항 변경 기록을 남긴다 | 팀 리드 | 다음 프로젝트 시작 전
+Problem | 데모 리허설이 부족해 발표 직전 오류를 발견했다 | 팀 전체 | 회고 시점 기록
+Try | 매주 금요일 20분 리허설 슬롯을 고정한다 | QA 담당 | 다음 프로젝트 1주차
+Action | 배포 체크리스트 템플릿을 저장소에 추가한다 | 백엔드 담당 | 다음 프로젝트 1주차
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 잘한 점, 문제, 시도를 구분해서 적는지 확인합니다.
+- 데이터가 없는 주장에는 근거를 더 모읍니다.
+- 다음 행동에 담당자와 기한이 있는지 봅니다.
+- 다음 프로젝트에서 다시 열어볼 수 있도록 문서를 남깁니다.
 
 ## 핵심 용어
 
@@ -156,7 +174,7 @@ lessons = ["scope_first", "ci_early", "demo_dryrun"]
 
 ## 정리와 다음 글
 
-회고는 프로젝트의 마지막 문서가 아니라 다음 프로젝트의 첫 문서에 가깝습니다. 사실, 원인, 다음 행동을 남겨 두어야 이번 경험이 자산이 됩니다. 이것으로 Capstone Project 101 시리즈를 마칩니다. 다음 단계에서는 이 경험을 더 넓은 포트폴리오 프로젝트 감각으로 이어갈 수 있습니다.
+회고는 프로젝트의 마지막 문서이면서 다음 프로젝트의 첫 문서입니다. KPT, 데이터, 원인 분석, 다음 행동을 함께 남기면 이번 캡스톤의 시행착오가 다음 작업의 자산으로 바뀝니다. 이것으로 Capstone Project 101 시리즈를 마칩니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +191,11 @@ lessons = ["scope_first", "ci_early", "demo_dryrun"]
 
 ## 참고 자료
 
-- [Agile Retrospectives - Esther Derby](https://pragprog.com/titles/dlret/agile-retrospectives/)
-- [The Five Whys - Toyota Production System](https://en.wikipedia.org/wiki/Five_whys)
-- [Postmortem Culture - Google SRE](https://sre.google/sre-book/postmortem-culture/)
-- [Project Retrospectives - Norman Kerth](https://retrospectives.com/)
+### 공식 문서와 실무 자료
+
+- [Agile Retrospectives](https://pragprog.com/titles/dlret/agile-retrospectives/)
+- [The Five Whys](https://en.wikipedia.org/wiki/Five_whys)
+- [Google SRE — Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)
+- [Project Retrospectives](https://retrospectives.com/)
 
 Tags: Capstone, Retrospective, Learning, Reflection, Beginner
