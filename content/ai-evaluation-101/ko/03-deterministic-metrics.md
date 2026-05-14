@@ -14,7 +14,7 @@ tags:
 - LLM
 - Metrics
 - BLEU
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가 같아도 표현이 다르면 점수가 깎입니다.
 ---
 
@@ -182,6 +182,100 @@ ROUGE는 요약 task에서는 사람 평가와의 상관이 BLEU보다 높지만
 | 기계 번역 (다중 reference) | BLEU, chrF | 참조가 여러 개일 때만 의미 있음 |
 
 핵심 규칙: **답이 닫혀 있고 짧으면 결정적 지표가 잘 작동합니다. 답이 자유 형식이고 길면 LLM-as-judge나 rubric으로 가야 합니다.**
+
+### 같은 예측을 여러 지표로 나란히 돌려 보기
+
+결정적 지표의 성격은 정의를 읽는 것보다 같은 예측에 여러 지표를 동시에 돌려 보면 훨씬 빨리 잡힙니다. 아래 예제는 Exact Match, Token F1, BLEU, ROUGE가 어디서 서로 엇갈리는지 바로 보여 줍니다.
+
+```python
+from collections import Counter
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
+
+
+def exact_match_normalized(pred: str, expected: str) -> int:
+    normalize = lambda s: s.lower().strip().rstrip(".!?")
+    return int(normalize(pred) == normalize(expected))
+
+
+def token_f1(pred: str, expected: str) -> float:
+    pred_tokens = Counter(pred.lower().split())
+    exp_tokens = Counter(expected.lower().split())
+    common = pred_tokens & exp_tokens
+    overlap = sum(common.values())
+    if overlap == 0:
+        return 0.0
+    precision = overlap / sum(pred_tokens.values())
+    recall = overlap / sum(exp_tokens.values())
+    return 2 * precision * recall / (precision + recall)
+
+
+scorer = rouge_scorer.RougeScorer(["rouge1", "rougeL"], use_stemmer=True)
+smooth = SmoothingFunction().method1
+
+cases = [
+    ("Seoul", "Seoul"),
+    ("The capital of Korea is Seoul.", "Seoul"),
+    ("A cat is sitting on a mat", "The cat sat on the mat"),
+]
+
+for pred, expected in cases:
+    bleu = sentence_bleu(
+        [expected.lower().split()],
+        pred.lower().split(),
+        smoothing_function=smooth,
+    )
+    rouge = scorer.score(expected, pred)
+    print(
+        {
+            "prediction": pred,
+            "expected": expected,
+            "exact_match": exact_match_normalized(pred, expected),
+            "token_f1": round(token_f1(pred, expected), 3),
+            "bleu": round(bleu, 3),
+            "rouge1_f": round(rouge["rouge1"].fmeasure, 3),
+            "rougeL_f": round(rouge["rougeL"].fmeasure, 3),
+        }
+    )
+```
+
+**예상 출력:**
+
+```text
+{'prediction': 'Seoul', 'expected': 'Seoul', 'exact_match': 1, 'token_f1': 1.0, 'bleu': 0.178, 'rouge1_f': 1.0, 'rougeL_f': 1.0}
+{'prediction': 'The capital of Korea is Seoul.', 'expected': 'Seoul', 'exact_match': 0, 'token_f1': 0.286, 'bleu': 0.054, 'rouge1_f': 0.286, 'rougeL_f': 0.286}
+{'prediction': 'A cat is sitting on a mat', 'expected': 'The cat sat on the mat', 'exact_match': 0, 'token_f1': 0.462, 'bleu': 0.054, 'rouge1_f': 0.615, 'rougeL_f': 0.462}
+```
+
+두 번째와 세 번째 줄이 핵심입니다. 의미는 꽤 맞는데 Exact Match는 0으로 떨어지고 BLEU도 거의 바닥을 칩니다. 이 장면이 바로 결정적 지표를 최종 심판이 아니라 빠른 필터로 써야 하는 이유입니다.
+
+### 운영에서 안전하게 쓰는 패턴
+
+결정적 지표는 첫 번째 필터로 두고, 애매한 케이스만 의미 기반 평가로 넘기는 층 구조가 가장 실용적입니다.
+
+```python
+def deterministic_gate(task_type: str, pred: str, expected: str) -> str:
+    if task_type in {"classification", "extractive_qa"}:
+        return "PASS" if exact_match_normalized(pred, expected) else "FAIL"
+
+    rouge = scorer.score(expected, pred)["rougeL"].fmeasure
+    if rouge >= 0.7:
+        return "LIKELY_OK"
+    if rouge <= 0.3:
+        return "REVIEW_WITH_LLM_JUDGE"
+    return "HUMAN_SPOT_CHECK"
+```
+
+임계값 숫자 자체보다 중요한 것은 역할 분담입니다. 문자열 겹침이 믿을 만한 구간에서는 싸고 빠르게 처리하고, 그 밖의 구간만 더 비싼 판단 단계로 올리는 구조가 운영 비용을 가장 잘 통제합니다.
+
+### 결정적 지표가 특히 잘 속는 상황
+
+| 상황 | 왜 잘못 읽기 쉬운가 | 더 나은 보완책 |
+|---|---|---|
+| 뜻은 맞지만 표현이 다른 paraphrase | 단어 중첩이 낮아 점수가 과도하게 깎임 | LLM-as-judge 또는 사람 spot check |
+| 사실은 틀렸는데 표현만 비슷함 | ROUGE가 높게 남아 안심하게 만듦 | Faithfulness 또는 rubric 평가 |
+| reference가 매우 짧음 | BLEU가 지나치게 불안정하거나 0에 가까워짐 | 정규화한 Exact Match + Token F1 |
+| 구조화 출력인데 설명 문장이 섞임 | 형식 외 부가 문장 때문에 점수가 내려감 | JSON 파싱 후 필드 단위 채점 |
 
 ## 이 코드에서 먼저 봐야 할 점
 
