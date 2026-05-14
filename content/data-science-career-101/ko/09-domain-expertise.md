@@ -17,10 +17,14 @@ tags:
   - BusinessSense
   - Beginner
 seo_description: 비즈니스 가치 창출에 필수적인 도메인 전문성을 확보하는 방법과 기술적 분석을 비즈니스 언어로 전환하는 능력을 기릅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 도메인 전문성 쌓기
+
+데이터 직무에서 어느 순간부터는 기술만으로 설명되지 않는 차이가 벌어집니다. 같은 대시보드를 보고도 어떤 사람은 “숫자가 조금 흔들렸네”에서 멈추고, 어떤 사람은 “이건 프로모션 구조와 환불 정책 변화까지 같이 봐야 한다”는 식으로 더 좋은 질문을 던집니다. 그 차이를 만드는 축이 바로 도메인 전문성입니다.
+
+입문자일수록 기술 학습만으로도 바쁘기 때문에 도메인 공부를 나중으로 미루기 쉽습니다. 하지만 실제로는 용어, KPI, 현장 흐름을 조금만 이해해도 질문 수준과 해석 품질이 빠르게 달라집니다. 도메인은 나중에 붙는 장식이 아니라, 기술을 실제 가치로 연결하는 번역기입니다.
 
 이 글은 Data Science Career 101 시리즈의 아홉 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 기술만으로는 비즈니스 의미를 해석할 수 없습니다. 업종과 제품 맥락을 이해해야 같은 그래프를 봐도 중요한 변화인지 아닌지 구분할 수 있습니다.
 
+특히 KPI는 업종에 따라 정상 범위와 의미가 다릅니다. 게임의 리텐션과 핀테크의 리텐션은 해석 기준이 다르고, 헬스케어의 전환율과 커머스의 전환율도 위험과 비용 구조가 전혀 다릅니다. 도메인을 알아야 숫자를 읽는 해상도가 올라갑니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    V[Vocab] --> M[Metric]
-    M --> F[Field]
-    F --> L[Loop]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/09/09-01-concept-at-a-glance.ko.png)
 
+*용어, KPI, 현장 관찰, 회고를 반복하며 도메인 전문성이 쌓이는 학습 루프*
 도메인 학습은 보통 이 순서로 쌓입니다. 용어를 알아야 회의가 들리고, 지표를 알아야 숫자가 읽히고, 현장을 알아야 왜 그런 숫자가 나오는지 감이 생깁니다.
 
 ## 핵심 용어
@@ -181,9 +183,9 @@ flowchart LR
 
 ## 참고 자료
 
-- [Domain-Driven Design](https://www.domainlanguage.com/ddd/)
-- [Lean Analytics](https://leananalyticsbook.com/)
-- [Industry KPI catalogs](https://www.klipfolio.com/resources/kpi-examples)
-- [The Personal MBA](https://personalmba.com/)
+- [Eric Evans - Domain-Driven Design](https://www.domainlanguage.com/ddd/)
+- [Alistair Croll and Benjamin Yoskovitz - Lean Analytics](https://leananalyticsbook.com/)
+- [Klipfolio - KPI Examples and Templates](https://www.klipfolio.com/resources/kpi-examples)
+- [Josh Kaufman - The Personal MBA](https://personalmba.com/)
 
 Tags: DataCareer, Domain, Expertise, BusinessSense, Beginner
