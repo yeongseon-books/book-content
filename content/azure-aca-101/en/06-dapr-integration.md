@@ -53,6 +53,8 @@ Adding `--enable-dapr true` to your app injects the sidecar automatically.
 
 ## Mental Model
 
+> Enabling Dapr decides whether this app uses a sidecar; registering components decides what shared capabilities the environment offers. Those two decisions are separate by design.
+
 Think of Dapr at two levels:
 
 1. **App level** — does this app use Dapr? What is its `app-id`? What port does the app listen on?

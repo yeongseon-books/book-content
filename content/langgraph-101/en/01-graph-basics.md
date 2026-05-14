@@ -55,6 +55,8 @@ So the purpose of this post is not merely to get a first graph to execute. It is
 
 ## The best way to understand LangGraph: the explicit state machine mental model
 
+> The point of LangGraph is not the shape of the graph. It is that the state, the nodes that mutate it, and the rules that pick the next step are all visible in code.
+
 The most useful sentence I know for LangGraph is this: **LangGraph is an explicit state machine.** I keep coming back to that wording because it stays useful even as the workflow grows. Nodes read state and update part of it. Edges define how execution moves forward. `invoke()` drives the transitions and gives you the final state after the graph is done.
 
 Many introductions phrase LangGraph as “a way to compose chains into a graph.” That is not wrong, but it is not enough. It explains shape, not operational value. The practical difference is not the number of calls. The practical difference is that **state and transitions are made explicit instead of implied.**

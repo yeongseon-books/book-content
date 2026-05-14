@@ -54,6 +54,8 @@ Scaling rules are simultaneously a cost policy and an SLO policy.
 
 ## Mental Model
 
+> Scaling is a model where you first declare what to observe, how to interpret it, and how far to allow it, and then let the runtime move replica counts within that envelope.
+
 Think of scaling as a three-stage declarative pipeline:
 
 1. **Signal** — what to observe: HTTP concurrent requests, TCP connections, Service Bus queue depth, CPU usage, etc.

@@ -53,6 +53,8 @@ Miss this boundary and you spend an hour during an incident asking "why don't I 
 
 ## Mental Model
 
+> The first job in observability is not to collect more data; it is to know whether the signal you are looking at is a platform log, an application trace, or sidecar telemetry.
+
 ACA observability splits into three independent layers:
 
 1. **Platform layer (Log Analytics)** — emitted automatically by ACA. Container stdout/stderr and system events.

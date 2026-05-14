@@ -40,6 +40,8 @@ This is the 3rd article in the Python DB-API 101 series.
 - What metadata does cursor.description expose?
 - What are the key ingredients of a streaming + transformation pipeline?
 
+> Choosing a fetch method is not a matter of taste; it is a question of result size and memory budget. `fetchall()` is fine for small results; streaming is the default for large ones.
+
 <!-- a-grade-intro:end -->
 
 ## 1. execute - one statement at a time

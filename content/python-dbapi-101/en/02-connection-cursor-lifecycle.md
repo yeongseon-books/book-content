@@ -40,6 +40,8 @@ This is the 2nd article in the Python DB-API 101 series.
 - What is the trade-off between opening a new connection per call vs reusing one?
 - What symptoms appear when you forget to close?
 
+> A connection is both a communication channel and a transaction scope; a cursor is one query running on top of that channel. When that line blurs, leaks and locks tend to arrive together.
+
 <!-- a-grade-intro:end -->
 
 ## 1. What a Connection Is

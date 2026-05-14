@@ -42,6 +42,8 @@ This is the first article in the Python DB-API 101 series.
 - Why does paramstyle differ across drivers, and how do you protect your code?
 - Where does DB-API stop and other layers begin?
 
+> The point of DB-API 2.0 is not to make every driver identical. It is to let application code run on top of a common minimum contract.
+
 <!-- a-grade-intro:end -->
 
 ## 1. The Chaos Before DB-API
