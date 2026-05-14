@@ -18,22 +18,18 @@ tags:
   - Immutability
   - FunctionalDesign
 seo_description: How to make the direction of data flow explicit, build small transformation pipelines, and use immutable data to keep designs simple.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Flow Design
 
+Data flow becomes painful when values change silently in the middle of the request and no one can explain where the mutation happened. That is a design problem long before it becomes a debugging problem.
+
 This is post 7 in the Software Design 101 series.
 
-> Software Design 101 series (7/10)
+In this post, we design the path from input to output so each transformation step stays visible. The goal is to make data move one way, keep side effects at the edge, and make debugging a step-by-step question instead of a scavenger hunt.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it mean to design the flow of data?
-
-> Decide where data comes from, how it gets transformed, and where it ends — and make all of that move in one direction.
-
-<!-- a-grade-intro:end -->
+> Data gets easier to trust when you can point to where it came from, how it changed, and where it is going next.
 
 ## What You Will Learn
 
@@ -51,10 +47,8 @@ Most bugs appear when data changes in unexpected places. A single direction make
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    IN["Input"] --> P1["parse"] --> P2["validate"] --> P3["enrich"] --> OUT["Output"]
-```
+![Concept at a Glance](../../../assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
+*A one-way data pipeline makes each transformation step visible from input to output*
 
 Each step is small and just hands off to the next.
 
@@ -154,6 +148,28 @@ Return new values instead of mutating state.
 
 Breaking cycles makes debugging easier.
 
+## Quick Verification
+
+Pick one request that often breaks and write down the input and output shape of every step. That single exercise usually reveals where values change silently.
+
+```text
+payload(dict) -> SignupCommand -> User -> saved User -> notification event
+```
+
+**Expected output:** you should be able to explain which steps are pure transformations and which steps are side effects.
+
+If it helps, imagine logging the value before and after each step. A one-way flow makes even the log-reading order simple.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| Multiple functions mutate the same dict | Check whether you can return new values instead |
+| A DB call appears in the middle of validation | Separate pure transformation from side effects again |
+| You cannot tell where the value changed | Write down the input/output types step by step first |
+
+Once the flow is visible, debugging changes from “read everything” to “which step distorted the data?”
+
 ## What to Notice in This Code
 
 - Each step has a narrow responsibility.
@@ -217,5 +233,11 @@ Once the flow is visible, change is no longer scary. Next up we look at the desi
 - [Out of the Tar Pit (Moseley & Marks)](https://curtclifton.net/papers/MoseleyMarks06a.pdf)
 - [Flux Architecture — Unidirectional Data Flow](https://facebookarchive.github.io/flux/)
 - [Designing Data-Intensive Applications — Batch and Stream](https://dataintensive.net/)
+
+### Practical Docs
+
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
+- [typing.NamedTuple](https://docs.python.org/3/library/typing.html#typing.NamedTuple)
+
 
 Tags: Computer Science, SoftwareDesign, DataFlow, Pipelines, Immutability, FunctionalDesign
