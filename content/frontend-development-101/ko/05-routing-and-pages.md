@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 라우팅과 페이지
 
-이 글은 Frontend Development 101 시리즈의 다섯 번째 글입니다.
-
 한 화면짜리 앱은 비교적 단순합니다. 하지만 제품이 커지면 홈, 상세, 설정, 검색 결과처럼 여러 화면이 생기고, 사용자는 뒤로 가기와 새로고침과 링크 공유가 모두 자연스럽게 되기를 기대합니다. 이 기대를 만족시키는 핵심이 라우팅입니다.
 
-이 글에서는 SPA가 여러 화면을 어떻게 표현하는지 URL 중심으로 설명하겠습니다. 한 가지 관점이 중요합니다. URL은 단순한 주소가 아니라 현재 화면을 설명하는 상태이며, 라우터는 그 상태를 읽어 어떤 컴포넌트를 그릴지 결정하는 계층이라는 점입니다.
+이 글은 Frontend Development 101 시리즈의 다섯 번째 글입니다. 여기서는 SPA가 여러 화면을 어떻게 표현하는지 URL 중심으로 설명합니다. URL은 단순한 주소가 아니라 현재 화면을 설명하는 상태이며, 라우터는 그 상태를 읽어 어떤 컴포넌트를 그릴지 결정하는 계층입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,12 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    URL["/users/42"] --> Router["Router"]
-    Router --> Match["Match path"]
-    Match --> Comp["UserDetail({id: 42})"]
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/05/05-01-diagram.ko.png)
+
+*URL을 읽은 라우터가 화면 컴포넌트를 고르는 SPA 라우팅 흐름*
 
 결국 라우팅은 URL 패턴을 해석해 컴포넌트 트리를 고르는 일입니다. 이 모델만 잡혀도 정적 경로, 동적 경로, 중첩 경로를 같은 방식으로 읽을 수 있습니다.
 
@@ -134,6 +129,16 @@ const Settings = lazy(() => import("./Settings"));
 
 이 흐름을 보면 라우팅이 단순한 링크 모음이 아니라는 점이 드러납니다. 설치와 경로 정의, 링크 연결, 파라미터 읽기, 코드 분할까지 이어져야 실제 제품에서 쓸 수 있는 라우팅이 됩니다.
 
+## 검증 포인트
+
+- `/`, `/about`, `/users/42`로 이동했을 때 새로고침 없이 화면이 바뀌고 파라미터가 올바르게 보이는지 확인합니다.
+- Network 탭에서 lazy loading한 라우트가 별도 청크로 내려오는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 상세 페이지가 비면 `useParams()` 결과와 라우트 패턴 `/users/:id`가 일치하는지 확인합니다.
+- 배포 후 새로고침 404가 나면 호스팅 환경에 SPA history fallback 설정이 필요한지 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - `<Link>`는 전체 새로고침 없이 라우터 상태만 바꿉니다.
@@ -188,6 +193,7 @@ const Settings = lazy(() => import("./Settings"));
 - [JavaScript 기본](./03-javascript-basics.md)
 - [컴포넌트와 상태](./04-components-and-state.md)
 - **라우팅과 페이지 (현재 글)**
+
 - API 호출과 비동기 (예정)
 - 폼과 유효성 검사 (예정)
 - 스타일링과 디자인 시스템 (예정)
@@ -197,9 +203,13 @@ const Settings = lazy(() => import("./Settings"));
 
 ## 참고 자료
 
-- [React Router docs](https://reactrouter.com/)
+### 공식 문서
+- [React Router documentation](https://reactrouter.com/home)
 - [Next.js routing](https://nextjs.org/docs/app/building-your-application/routing)
-- [URL Living Standard](https://url.spec.whatwg.org/)
-- [MDN History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
+- [MDN: History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
+
+### 확인용 자료
+- [URL Standard](https://url.spec.whatwg.org/)
+- [Vite guide: Deploying a static site](https://vite.dev/guide/static-deploy.html)
 
 Tags: Frontend, Routing, SPA, React, Web
