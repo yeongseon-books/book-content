@@ -16,15 +16,17 @@ tags:
   - Postmortem
   - Analysis
   - Operations
-seo_description: 장애의 직접 계기와 구조적 원인을 구분하고 재발 방지 대책을 세우는 Root Cause Analysis 기법과 5 Whys 활용법을 설명합니다.
-last_reviewed: '2026-05-12'
+seo_description: trigger와 root cause를 구분하고 5 Whys를 action item으로 잇는 RCA 방법을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # Root Cause Analysis
 
-이 글은 Incident Response 101 시리즈의 6번째 글입니다.
+incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그런데 현장에서는 가장 먼저 눈에 보인 사건을 곧바로 근본 원인으로 받아들이는 경우가 많습니다.
 
-incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그런데 현장에서는 가장 먼저 눈에 보인 사건을 곧바로 근본 원인으로 받아들이는 경우가 많습니다. 배포 직후 장애가 났다면 배포가 원인처럼 보이고, 누군가 잘못된 명령을 실행했다면 그 사람이 원인처럼 보입니다. 하지만 그 한 단계 아래를 더 내려가 보면 다른 조건이 함께 드러나는 경우가 대부분입니다.
+배포 직후 장애가 났다면 배포가 원인처럼 보이고, 누군가 잘못된 명령을 실행했다면 그 사람이 원인처럼 보입니다. 하지만 그 한 단계 아래를 더 내려가 보면, 실제로는 보호 장치와 프로세스 빈틈이 함께 드러나는 경우가 대부분입니다.
+
+이 글은 Incident Response 101 시리즈의 6번째 글입니다. 여기서는 trigger와 root cause를 구분하는 기준, 5 Whys를 운영 문서에 남기는 방법, 그리고 검증 가능한 action item으로 이어지는 RCA 흐름을 다룹니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,15 +48,9 @@ RCA는 비난을 위한 절차가 아니라 재발 방지를 위한 분석입니
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Trigger["계기"] --> Why1["왜?"]
-    Why1 --> Why2["왜?"]
-    Why2 --> Why3["왜?"]
-    Why3 --> Root["근본 원인"]
-    Root --> Action["후속 조치"]
-```
+![한눈에 보는 구조](../../../assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
 
+*한눈에 보는 구조*
 이 흐름에서 핵심은 한 번 더 묻는 습관입니다. 처음 눈에 보이는 설명에서 멈추지 않고, 왜 그 설명이 가능했는지 계속 내려가야 root cause에 가까워집니다.
 
 ## 핵심 용어
@@ -149,6 +145,17 @@ def is_actionable(action):
 
 시니어 엔지니어는 RCA에서 사람보다 시스템을 먼저 의심합니다. 그리고 action item이 측정 가능하고 검증 가능한지까지 함께 봅니다. 설명만 길고 바뀌는 것이 없다면, 그 RCA는 기록은 될 수 있어도 예방 장치는 되기 어렵습니다.
 
+## trigger와 root cause를 구분하는 예시
+
+예를 들어 새 배포 직후 결제 장애가 났다고 가정해 보겠습니다. 이때 “배포가 원인”이라고 적는 것은 trigger 수준 설명에 가깝습니다. 조금 더 내려가 보면 이렇게 정리할 수 있습니다.
+
+- trigger: 잘못된 timeout 설정이 포함된 배포
+- contributing factor: staging 환경에 실제 결제 부하 테스트가 없음
+- root cause: timeout 변경이 검증 없이 프로덕션에 들어갈 수 있는 배포 보호 장치 부재
+- action item: timeout 변경 시 회귀 테스트와 배포 차단 규칙 추가
+
+이렇게 쓰면 사람이나 마지막 이벤트를 탓하는 대신, 다음 incident를 막을 수 있는 변경점이 더 또렷해집니다.
+
 ## 체크리스트
 
 - [ ] RCA 템플릿 섹션이 미리 준비되어 있다.
@@ -183,9 +190,13 @@ RCA의 목적은 마지막 계기를 찾는 데서 끝나지 않습니다. trigg
 
 ## 참고 자료
 
-- [Five Whys - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
-- [Root Cause Analysis - PagerDuty](https://response.pagerduty.com/after/root_cause_analysis/)
-- [Incident RCA - Atlassian](https://www.atlassian.com/incident-management/postmortem/templates)
-- [Beyond Root Cause - Increment](https://increment.com/postmortems/beyond-root-cause/)
+### 공식 문서
+- [Root cause analysis - PagerDuty](https://response.pagerduty.com/after/root_cause_analysis/)
+- [Postmortem Culture - Google SRE Book](https://sre.google/sre-book/postmortem-culture/)
+- [Postmortem templates - Atlassian](https://www.atlassian.com/incident-management/postmortem/templates)
+- [NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final)
+
+### 예제 소스
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, RCA, Postmortem, Analysis, Operations
