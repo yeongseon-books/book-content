@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 9
 title: Mentoring and Networking
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Mentoring
-  - Networking
-  - Community
-  - Beginner
-seo_description: A beginner-friendly tour of finding mentors and building a developer network.
-last_reviewed: '2026-05-04'
+- Career
+- Mentoring
+- Networking
+- Community
+- Beginner
+seo_description: A beginner-friendly tour of finding mentors and building a developer
+  network.
+last_reviewed: '2026-05-14'
 ---
 
 # Mentoring and Networking
 
+Solo learning gets you started, but it rarely gives you fast feedback on judgment. Mentors, peers, and communities compress the time between a mistake and a better mental model, provided that you approach them with clear questions, useful follow-up, and a habit of contributing back.
+
 This is post 9 in the Developer Career 101 series.
 
-> Developer Career 101 series (9/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- How do you find a good mentor without turning the first contact into a burden?
+- What makes a question easy for another engineer to answer well?
+- How do communities, conferences, and public writing expand your network?
+- Why does moving from receiving help to giving help matter for career growth?
 
-**Core question**: How do you find a *mentor* and grow a *network*?
-
-> Small contributions, polite requests, sustained contact.
-
-<!-- a-grade-intro:end -->
+> A network is not a list of famous people you know. It is a web of trust built through repeated, useful contact.
 
 ## What You Will Learn
 
@@ -48,12 +50,9 @@ Solo learning has a ceiling. Connection is a shortcut.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    L[Learn] --> A[Ask]
-    A --> G[Give back]
-    G --> N[Network]
-```
+![Networking loop from learning to contribution](../../../assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
+
+*Networking loop from learning to contribution*
 
 ## Key Terms
 
@@ -106,6 +105,33 @@ Could you spare 30 minutes to discuss Z?
 - one blog post per month
 - LinkedIn updates
 ```
+
+## A repeatable networking loop
+
+| Moment | Strong default | What to avoid |
+| --- | --- | --- |
+| First contact | Three sentences: context, attempt, question | Sending only "Will you mentor me?" |
+| Session prep | Bring two or three concrete questions | Showing up with abstract anxiety only |
+| Community participation | Answer, recap, or share before asking | Taking help and disappearing |
+| Follow-up | Send thanks and what you tried next | Never closing the loop |
+
+## A repeatable networking loop
+
+| Moment | Strong default | What to avoid |
+| --- | --- | --- |
+| First contact | Three sentences: context, attempt, question | Sending only "Will you mentor me?" |
+| Session prep | Bring two or three concrete questions | Showing up with abstract anxiety only |
+| Community participation | Answer, recap, or share before asking | Taking help and disappearing |
+| Follow-up | Send thanks and what you tried next | Never closing the loop |
+
+## A repeatable networking loop
+
+| Moment | Strong default | What to avoid |
+| --- | --- | --- |
+| First contact | Three sentences: context, attempt, question | Sending only "Will you mentor me?" |
+| Session prep | Bring two or three concrete questions | Showing up with abstract anxiety only |
+| Community participation | Answer, recap, or share before asking | Taking help and disappearing |
+| Follow-up | Send thanks and what you tried next | Never closing the loop |
 
 ## What to Notice in This Code
 
@@ -165,9 +191,9 @@ Next post covers *The Path to Senior*.
 
 ## References
 
+- [Julia Evans — How to ask good questions](https://jvns.ca/blog/good-questions/)
+- [CNCF mentoring program](https://github.com/cncf/mentoring)
 - [The Mentor's Guide](https://www.lindajzachary.com/)
-- [How to ask good questions](https://jvns.ca/blog/good-questions/)
-- [CNCF Mentoring](https://github.com/cncf/mentoring)
-- [Pay it Forward](https://en.wikipedia.org/wiki/Pay_it_forward)
+- [GitHub Docs — Contributing to open source](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-open-source)
 
 Tags: Career, Mentoring, Networking, Community, Beginner

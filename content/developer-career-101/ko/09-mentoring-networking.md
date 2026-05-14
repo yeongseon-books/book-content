@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Mentoring
-  - Networking
-  - Community
-  - Beginner
+- Career
+- Mentoring
+- Networking
+- Community
+- Beginner
 seo_description: 선배 개발자로부터 배울 수 있는 멘토링 기회 확보 방법과 기술 커뮤니티 네트워킹을 통한 성장 전략을 제시합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 멘토링과 네트워킹
@@ -49,12 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    L[Learn] --> A[Ask]
-    A --> G[Give back]
-    G --> N[Network]
-```
+![학습, 질문, 기여로 이어지는 네트워킹 루프](../../../assets/developer-career-101/09/09-01-concept-at-a-glance.ko.png)
+
+*학습, 질문, 기여로 이어지는 네트워킹 루프*
 
 좋은 네트워크는 부탁만 하는 구조로 자라지 않습니다. 배우고, 구체적으로 묻고, 작은 도움을 되돌려 주는 흐름이 있어야 연결이 오래 갑니다.
 
@@ -120,6 +117,33 @@ Could you spare 30 minutes to discuss Z?
 
 온라인 존재감은 거창한 브랜딩이 아닙니다. 내가 무엇을 배우고 만들고 있는지 꾸준히 보이는 정도만 되어도 기회가 생깁니다.
 
+## 멘토링과 네트워킹 운영 루틴
+
+| 장면 | 좋은 기본값 | 피해야 할 행동 |
+| --- | --- | --- |
+| 첫 연락 | 배경, 시도, 질문을 3문장 안에 적는다 | "멘토가 되어 주세요"만 보낸다 |
+| 세션 준비 | 질문 2~3개와 현재 막힌 지점을 가져간다 | 추상적인 고민만 늘어놓는다 |
+| 커뮤니티 참여 | 답변, 정리, 후기처럼 먼저 기여한다 | 도움만 받고 사라진다 |
+| 후속 관계 | 감사 메모와 실행 결과를 공유한다 | 받은 조언을 어떻게 썼는지 알리지 않는다 |
+
+## 멘토링과 네트워킹 운영 루틴
+
+| 장면 | 좋은 기본값 | 피해야 할 행동 |
+| --- | --- | --- |
+| 첫 연락 | 배경, 시도, 질문을 3문장 안에 적는다 | "멘토가 되어 주세요"만 보낸다 |
+| 세션 준비 | 질문 2~3개와 현재 막힌 지점을 가져간다 | 추상적인 고민만 늘어놓는다 |
+| 커뮤니티 참여 | 답변, 정리, 후기처럼 먼저 기여한다 | 도움만 받고 사라진다 |
+| 후속 관계 | 감사 메모와 실행 결과를 공유한다 | 받은 조언을 어떻게 썼는지 알리지 않는다 |
+
+## 멘토링과 네트워킹 운영 루틴
+
+| 장면 | 좋은 기본값 | 피해야 할 행동 |
+| --- | --- | --- |
+| 첫 연락 | 배경, 시도, 질문을 3문장 안에 적는다 | "멘토가 되어 주세요"만 보낸다 |
+| 세션 준비 | 질문 2~3개와 현재 막힌 지점을 가져간다 | 추상적인 고민만 늘어놓는다 |
+| 커뮤니티 참여 | 답변, 정리, 후기처럼 먼저 기여한다 | 도움만 받고 사라진다 |
+| 후속 관계 | 감사 메모와 실행 결과를 공유한다 | 받은 조언을 어떻게 썼는지 알리지 않는다 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 준비된 질문이 답을 끌어냅니다.
@@ -178,9 +202,9 @@ Could you spare 30 minutes to discuss Z?
 
 ## 참고 자료
 
+- [Julia Evans — How to ask good questions](https://jvns.ca/blog/good-questions/)
+- [CNCF mentoring program](https://github.com/cncf/mentoring)
 - [The Mentor's Guide](https://www.lindajzachary.com/)
-- [How to ask good questions](https://jvns.ca/blog/good-questions/)
-- [CNCF Mentoring](https://github.com/cncf/mentoring)
-- [Pay it Forward](https://en.wikipedia.org/wiki/Pay_it_forward)
+- [GitHub Docs — Contributing to open source](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-open-source)
 
 Tags: Career, Mentoring, Networking, Community, Beginner
