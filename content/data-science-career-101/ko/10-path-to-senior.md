@@ -17,10 +17,14 @@ tags:
   - Impact
   - Beginner
 seo_description: 시니어 데이터 전문가로 도약하기 위해 필요한 기술 리더십과 문제 해결 능력, 팀 전체 성과를 견인하는 전략적 사고방식을 탐구합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 시니어 데이터 직무로 가는 길
+
+시니어로 성장한다는 말을 들으면 많은 사람이 먼저 기술 난도를 떠올립니다. 더 어려운 모델을 다루고, 더 복잡한 파이프라인을 만들고, 더 빨리 문제를 해결하는 모습이 시니어의 전부처럼 보이기 쉽습니다. 물론 그런 역량도 중요하지만, 실제로는 거기서부터 차이가 시작되지는 않습니다.
+
+더 큰 변화는 문제를 보는 관점에서 생깁니다. 무엇을 만들었는지보다 무엇을 바꿨는지, 내가 혼자 잘한 일보다 팀이 더 잘 움직이게 되었는지, 당장 급한 일보다 반복될 문제의 구조를 먼저 잡았는지가 시니어의 행동을 가릅니다.
 
 이 글은 Data Science Career 101 시리즈의 마지막 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 시니어는 직함보다 행동에 가깝습니다. 같은 기술 수준이어도 어떤 문제를 고르고, 어떻게 영향력을 넓히는지에 따라 역할의 무게가 달라집니다.
 
+그래서 시니어 성장은 단순한 기술 숙련의 연장이 아닙니다. 문제 정의, 영향 측정, 문서화, 동료 증폭, 시스템 관점이 함께 붙으면서 같은 기술 역량도 훨씬 더 큰 결과로 이어집니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    J[Junior] --> M[Mid]
-    M --> S[Senior]
-    S --> L[Lead]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
 
+*주니어에서 시니어, 리드로 갈수록 문제 정의와 영향 범위가 확장되는 성장 구조*
 이 흐름은 단순 승진 사다리가 아니라 관점의 확장을 뜻합니다. 주니어가 자신의 작업을 안정적으로 끝내는 데 집중한다면, 시니어는 문제 선정과 영향 측정, 동료 성장, 시스템 전체를 함께 봅니다.
 
 ## 핵심 용어
@@ -178,9 +180,9 @@ Write the "problem", not the "symptom".
 
 ## 참고 자료
 
-- [Staff Engineer book](https://staffeng.com/book)
-- [The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
-- [Designing Machine Learning Systems](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
-- [Engineering Ladders](https://github.com/jorgef/engineeringladders)
+- [Will Larson - Staff Engineer](https://staffeng.com/book)
+- [Camille Fournier - The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
+- [Chip Huyen - Designing Machine Learning Systems](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
+- [Jorge Fioranelli - Engineering Ladders](https://github.com/jorgef/engineeringladders)
 
 Tags: DataCareer, Senior, Leadership, Impact, Beginner
