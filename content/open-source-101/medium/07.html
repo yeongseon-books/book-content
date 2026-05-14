@@ -54,50 +54,41 @@
 </head>
 <body>
 <h1>Community Management</h1>
+<p>Open source projects are not sustained by code alone. At first, features and docs seem like the primary concern. Once users and contributors arrive, the way the community is run begins to shape the project's mood and long-term survival. Slow responses, unclear boundaries, and neglect of first-time contributors can drive people away even when the code is strong.</p>
 <p>This is post 7 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it take to keep contributors <em>around</em> for the long run?</p>
-<blockquote>
-<p>A clear code of conduct and friendly responses.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will focus on the practical basics of community management: code of conduct, contribution guide, discussion spaces, response expectations, and visible welcome habits.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Code of Conduct</em></li>
-<li><em>CONTRIBUTING.md</em></li>
-<li>Using <em>Discussions</em></li>
-<li>Managing <em>response time</em></li>
-<li>Onboarding <em>new contributors</em></li>
+<li>Why does a project need a code of conduct?</li>
+<li>What does a contribution guide do beyond listing steps?</li>
+<li>Why is it useful to separate issues from general discussion?</li>
+<li>How do response speed and welcome messages affect trust directly?</li>
+<li>What is different about projects where first-time contributors stay?</li>
 </ul>
+<blockquote>
+<p>Community management is not about controlling people. It is about making the participation path and the expectations visible in advance.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>A project survives only as long as its community does.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    C[CoC] --&gt; G[Guide]
-    G --&gt; O[Onboarding]
-    O --&gt; R[Recognition]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>CoC</strong>: Code of Conduct.</li>
-<li><strong>CONTRIBUTING</strong>: Contribution guide.</li>
-<li><strong>Discussions</strong>: A conversation space.</li>
-<li><strong>maintainer</strong>: Project owner.</li>
-<li><strong>first-time contributor</strong>: Newcomer.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "Issue comments turn aggressive."</p>
-<p><strong>After</strong>: "A CoC makes the boundaries explicit."</p>
-<h2>Hands-on: Community Docs</h2>
-<p><strong>Step 1 — Code of Conduct</strong></p>
+<p>Projects survive only while their communities stay alive. Even a strong maintainer becomes a bottleneck if contribution rules and communication paths are not repeatable. That is why community management is not just about being nice. It is about project lifespan.</p>
+<p>The same pattern appears in internal platforms and shared libraries. Clear docs, clear channels, and predictable response norms reduce maintenance cost far outside public open source as well.</p>
+<h2>The Smallest Structure That Still Works</h2>
+<p><img alt="The smallest structure that still works" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png"></p>
+<p><em>The minimum community system from code of conduct to onboarding and recognition</em><br>
+The last step is easy to underestimate. Rules and docs alone do not create a healthy community. A first-time contributor has to feel that they were actually received well. Otherwise the project still feels closed.</p>
+<p>That is why community management does not end with writing documents. Documents create the entrance, and responses prove that the entrance is real.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>A <em>code of conduct</em> defines acceptable and unacceptable behavior. A <em>contribution guide</em> gathers the contribution workflow in one place so maintainers do not repeat themselves endlessly. A <em>discussion space</em> separates questions and ideas from issue tracking. A <em>maintainer</em> is not only a reviewer but also a community operator. A <em>first-time contributor</em> is influenced as much by the experience as by the project itself.</p>
+<p>When these pieces are designed together, the cost of entry drops for everyone.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, aggressive comments or channel confusion can feel inevitable. In reality, many of those problems come from unclear structure.</p>
+<p>The code of conduct and response posture are not abstract culture signals. They are operating tools that define boundaries and make people want to stay.</p>
+<h2>Hands-on: Build the Basic Community Docs</h2>
+<p><strong>Step 1 — Add a code of conduct</strong></p>
+<p>The code of conduct is not something you write after a conflict. It is a boundary you place before conflict.</p>
 <pre><code class="language-bash">curl -O https://www.contributor-covenant.org/version/2/1/code_of_conduct.md
 </code></pre>
-<p><strong>Step 2 — CONTRIBUTING.md</strong></p>
+<p><strong>Step 2 — Write the contribution guide</strong></p>
+<p>If contributors do not know where to begin, questions flow straight to maintainers. Even a short clear process helps.</p>
 <pre><code class="language-markdown">## How to contribute
 
 1. Fork
@@ -105,60 +96,61 @@
 3. Test
 4. PR
 </code></pre>
-<p><strong>Step 3 — Issue Templates</strong></p>
+<p><strong>Step 3 — Prepare issue templates</strong></p>
+<p>Good templates encourage good reports. They are the cheapest way to reduce missing information.</p>
 <pre><code class="language-yaml">name: Bug Report
 about: Report a bug
 labels: bug
 </code></pre>
-<p><strong>Step 4 — Discussions</strong></p>
+<p><strong>Step 4 — Split out discussion space</strong></p>
+<p>If every kind of conversation lands in issues, bug reports, ideas, and lightweight questions get mixed together.</p>
 <pre><code class="language-text">- Q&amp;A
 - Show and tell
 - Ideas
 </code></pre>
-<p><strong>Step 5 — Welcome Automation</strong></p>
+<p><strong>Step 5 — Automate the first welcome</strong></p>
+<p>One small automation can change the emotional feel of a project. The first PR moment is especially memorable.</p>
 <pre><code class="language-yaml">- uses: actions/first-interaction@v1
   with:
     pr-message: &quot;Thanks for your first PR!&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>The CoC sets the boundary.</li>
-<li>Templates are guidance.</li>
-<li>A welcome is onboarding.</li>
-</ul>
+<h2>What to Notice in This Walkthrough</h2>
+<p>The code of conduct defines boundaries. The contribution guide saves maintainer time. Templates are guidance devices. Welcome messages look small, but they change onboarding quality.</p>
+<p>Healthy communities need both structure and response. Rules without response make the project feel closed. Response without structure burns maintainers out.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>No CoC.</strong></li>
-<li><strong>Slow responses.</strong></li>
-<li><strong>Ignoring first-time contributors.</strong></li>
-<li><strong>Mixing discussions with issues.</strong></li>
-<li><strong>No expressions of appreciation.</strong></li>
+<li>Shipping with no code of conduct.</li>
+<li>Mixing questions and issues in one channel.</li>
+<li>Responding too slowly to new contributors.</li>
+<li>Treating first contributions as expected rather than appreciated.</li>
+<li>Relying only on maintainer memory instead of documentation.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>DevRel teams run internal channels using the same playbook as healthy open source communities.</p>
+<p>Developer relations teams and platform teams follow very similar rules internally. When people know where to ask, what information to include, and what behavior is out of bounds, channel quality improves quickly.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Community is an asset.</li>
-<li>Kindness is a competitive edge.</li>
-<li>Response speed is trust.</li>
-<li>Explicit rules are safety.</li>
-<li>Recognition is motivation.</li>
+<li>Community health is a maintenance lever.</li>
+<li>Response speed creates trust.</li>
+<li>Explicit rules create safety.</li>
+<li>Recognition supports retention.</li>
+<li>Structure prevents maintainer exhaustion.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] CoC adopted.</li>
-<li>[ ] CONTRIBUTING written.</li>
-<li>[ ] Issue templates set.</li>
-<li>[ ] Discussions enabled.</li>
+<li>[ ] I adopted or planned a code of conduct.</li>
+<li>[ ] I wrote a contribution guide.</li>
+<li>[ ] I prepared an issue template.</li>
+<li>[ ] I decided how questions and discussion will be separated.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: what is the Contributor Covenant?</li>
-<li>One line: difference between good first issue and help wanted.</li>
-<li>One line: role of DevRel.</li>
+<li>Explain what the Contributor Covenant is in one sentence.</li>
+<li>Explain the difference between <code>good first issue</code> and <code>help wanted</code>.</li>
+<li>Explain why a welcome message matters.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>The Maintainer Role</em>.</p>
+<p>In this post, we framed community management as a sustainability problem rather than a soft extra. Rules, guides, response patterns, and welcome cues all work together to make contributors feel that the project is truly open.</p>
+<p>Next, we will look at the maintainer role. Once a community exists, someone still needs to set priorities, review work, and protect the boundaries.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -177,6 +169,7 @@ labels: bug
 <li><a href="https://opensource.guide/building-community/">Open Source Guides — Building Communities</a></li>
 <li><a href="https://docs.github.com/en/discussions">GitHub Discussions</a></li>
 <li><a href="https://github.com/actions/first-interaction">first-interaction action</a></li>
+<li><a href="https://github.com/contributor-covenant/contributor_covenant">contributor-covenant repository</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, Community, CodeOfConduct, Governance, Beginner</p>
 </body>
