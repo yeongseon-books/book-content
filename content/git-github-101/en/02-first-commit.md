@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -274,8 +274,11 @@ The next post takes a closer look at `git status` output and uses `git diff` and
 
 ## References
 
-- Git official docs: <https://git-scm.com/doc>
-- Pro Git Book - "Recording Changes to the Repository": <https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository>
-- `git help init`, `git help status`, `git help add`, `git help commit`
+- [Git Reference Manual](https://git-scm.com/doc)
+- [Pro Git Book - Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository)
+- [git-init manual](https://git-scm.com/docs/git-init)
+- [git-status manual](https://git-scm.com/docs/git-status)
+- [git-add manual](https://git-scm.com/docs/git-add)
+- [git-commit manual](https://git-scm.com/docs/git-commit)
 
 Tags: git-init, git-status, git-add, git-commit, staging-area, first-repository
