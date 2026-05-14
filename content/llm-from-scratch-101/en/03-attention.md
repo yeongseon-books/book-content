@@ -14,64 +14,75 @@ tags:
 - PyTorch
 - Transformer
 - Tutorial
-last_reviewed: '2026-04-29'
-seo_description: Humans don't read every word in a sentence with the same intensity.
-  When you read "He threw it," your eyes instinctively scan back to earlier words…
+last_reviewed: '2026-05-14'
+seo_description: Humans do not read every word with the same intensity. Attention gives a model a way to score which earlier tokens deserve focus.
 ---
 
 # Deciding Which Tokens to Focus On
 
-> LLM from Scratch 101 series (3/9)
+Once embeddings are in place, every token is finally a vector. That still leaves the main question unanswered: how does one token know which other tokens matter? If the current character is part of a pronoun, a quote, or a repeated pattern, who decides which earlier positions it should consult?
 
-Humans don't read every word in a sentence with the same intensity. When you read "He threw it," your eyes instinctively scan back to earlier words to figure out what "it" refers to. You're momentarily assigning different weights to the subject and the object. Transformer attention works in a very similar way.
+That is where attention enters. Humans do something similar when reading. We do not assign the same weight to every earlier word. We glance back to find the noun behind a pronoun, or we check the opening of a clause when the verb lands near the end. Transformer attention gives the model a numerical version of that behavior.
 
-When I first implemented attention, the acronym `QKV` was the most confusing part. The naming makes it feel more complex than it is. In reality, you're just applying three linear layers to the same input tensor, followed by score calculation, masking, softmax, and a weighted sum.
+In this post, we will add `CausalSelfAttention` to `model.py` and read it as a tensor pipeline rather than as a wall of symbols. For this series, traceability matters more than elegant shortcuts.
 
-Today, we're adding `CausalSelfAttention` to `model.py`. We'll skip shortcuts like `einsum` for now and stick with `nn.Linear` and `reshape`. In these first three posts, traceability is more important than elegance.
+This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.
 
-Today's mental model is this: **Each token asks a question with its Query, provides a score with its Key, and pulls the information it needs from the Value.**
+## Questions this chapter answers
 
-This is the 3rd article in the LLM from Scratch 101 series.
+- Why do Q, K, and V come from the same input but play different roles?
+- Why do attention scores use `Q · K^T / sqrt(d)`?
+- What breaks in autoregressive training if the causal mask is missing?
+- What does multi-head attention capture that a single head often misses?
+- Can we build the full attention path with only `nn.Linear`, `reshape`, and `transpose`?
 
----
+> Attention is not a mechanism for blending all tokens equally. It is a dynamic lookup layer that lets the current token give more weight to the earlier positions it actually needs.
 
-<!-- a-grade-intro:begin -->
+## Why this matters
 
-## Key Questions
+Attention is the component that makes a Transformer behave like a Transformer. Embeddings turn token IDs into vectors, but attention is what lets those vectors interact. This is the point where the model stops acting like isolated characters and starts behaving like a sequence model.
 
-- Why do Q, K, V come from the same input but play different roles?
-- Why divide attention scores by sqrt(d)?
-- What breaks during training without the causal mask?
-- Why does multi-head have more capacity than a single head?
+It is also a topic where shape awareness matters as much as the concept. Many real bugs do not come from misunderstanding the equation. They come from a swapped axis in `transpose`, a broken mask range, or forgetting `contiguous()` before a `view()`. That is why this chapter stays close to tensors and printed outputs.
 
-<!-- a-grade-intro:end -->
+The same details matter operationally. Causal masking, score scaling, and head splitting all affect stability during training and quality during generation. If these mechanics feel concrete now, the next post on residual connections and Transformer blocks becomes much easier.
 
-## QKV are Just Three Linear Transformations
+## The most useful mental model: attention is a dynamic lookup across tokens
 
-If the input `x` is `(B, T, C)`, attention creates three projections: `q = Wq x`, `k = Wk x`, and `v = Wv x`. All three come from the same source, but they serve different roles. The Query asks "What am I looking for?", the Key says "Here's what I have," and the Value provides the "actual content to be retrieved."
+If you treat attention as pure notation, it feels heavier than it really is. A more practical interpretation is this: **each token sends out a Query, matches it against Keys from other positions, and uses the resulting weights to retrieve Values**.
 
-Despite the grand names, the implementation is just three linear layers.
+That framing makes the roles easier to remember. The Query says, “What kind of information am I looking for right now?” The Key says, “What kind of signal do I offer?” The Value is the actual content that gets mixed back into the residual stream.
 
-## Calculating Scores: Q · K^T / sqrt(d)
+For an autoregressive language model, one rule sits on top of that lookup: the token must not consult the future. That is why causal masking is not optional decoration. It is the rule that keeps training aligned with generation.
 
-To determine how much one token should focus on another, we need a score. We get this by taking the dot product of the Query and the Key. A higher value means a better match. Since the dot product grows with the number of dimensions, we divide by `sqrt(d)` to keep the variance under control.
+## Core ideas
 
-Visualizing a 4×4 matrix makes this clear. For a sequence of length 4, the score matrix is 4×4. Each row represents "which tokens the current token is attending to."
+### QKV are three linear projections of the same input
 
-Without scaling, the softmax can become extremely sharp early in training. If only a few entries approach 1 while the rest are suppressed to 0, gradients tend to vanish. The `sqrt(d)` isn't just a mathematical flourish; it's essential for training stability.
+If the input tensor `x` is shaped `(B, T, C)`, attention creates three projections from it: `q = Wq x`, `k = Wk x`, and `v = Wv x`. They come from the same source, but they serve different jobs. The Query expresses what this position wants, the Key expresses what each position can offer, and the Value carries the content to retrieve.
 
-## Causal Mask — No Peeking at the Future
+At the implementation level, that means three linear layers. The intimidating names sometimes obscure how direct the code is. Early on, it helps to think in terms of “same source, three projections” rather than in terms of abstract terminology.
 
-A language model is essentially a next-token predictor. The current position shouldn't be allowed to see the future answer. We enforce this by masking the upper triangular part of the score matrix, setting future values to `-inf`.
+### Score calculation is dot product plus scale control
+
+To decide how much one token should attend to another, we need a score. We get it by taking the dot product of Query and Key. Larger scores indicate a better match. Because dot products grow with dimension, we divide by `sqrt(d)` to keep the variance under control.
+
+That division is not cosmetic. Without it, softmax can become too sharp too early. A few entries dominate, everything else collapses toward zero, and training becomes harder to stabilize. `sqrt(d)` is one of those lines that looks small in code and carries real weight in practice.
+
+### The causal mask enforces the no-future rule
+
+An autoregressive model learns next-token prediction. The current position must not peek at the answer to its right. We enforce that rule by masking the upper triangle of the score matrix and filling those entries with `-inf`, which softmax converts into zero probability.
 
 ![Causal mask blocking future-token attention](../../../assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
 
-*Causal mask blocking future-token attention*
-This single line is the core discipline of an autoregressive model. It prevents the model from "cheating" by looking at future lines while it's still learning to predict the next character in Shakespeare.
+*Causal mask blocking future-token attention.*
 
-## Softmax → V Weighted Sum → Output
+This is not a minor implementation detail. If the mask is missing, the model can cheat during training by looking ahead, which produces deceptively good loss and disappointing generation.
 
-A single-head attention mechanism can be implemented with just a few lines of code:
+## Implementing attention step by step
+
+### Step 1. Start with a single head and print the weight matrix
+
+The smallest useful self-attention implementation is short enough to read in one sitting. This version returns both `out` and `wei` so we can inspect exactly where each token looked.
 
 ```python
 import math
@@ -89,7 +100,7 @@ class SingleHeadAttention(nn.Module):
         self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
 
     def forward(self, x: torch.Tensor):
-        _, t, c = x.shape
+        _, t, _ = x.shape
         k = self.key(x)
         q = self.query(x)
         wei = q @ k.transpose(-2, -1) / math.sqrt(k.size(-1))
@@ -106,19 +117,67 @@ print(out.shape)
 print(wei[0])
 ```
 
-The output is `(B, T, head_size)`, and `wei` shows us exactly where each token was looking. I always print this weight matrix during debugging to verify the attention patterns.
+**Expected output:**
 
-## Multi-head: Multiple Perspectives Simultaneously
+```text
+torch.Size([2, 4, 8])
+tensor([[1.0000, 0.0000, 0.0000, 0.0000],
+        [0.47.., 0.52.., 0.0000, 0.0000],
+        [0.31.., 0.28.., 0.40.., 0.0000],
+        [0.22.., 0.19.., 0.27.., 0.30..]])
+```
 
-Using a single head limits the model to one type of relationship. Multi-head attention splits the embedding dimension into several pieces, allowing each piece to score relationships from a different perspective. One head might focus on local context, while another might be sensitive to matching parentheses or changes in speaker.
+The exact numbers do not matter. The pattern does. The upper-right region must be zeroed out, because those are future positions.
 
-Finally, we concatenate the outputs of all heads and apply a single projection to return to the original dimension. In our configuration (`n_embd=128`, `n_head=4`), each head will have 32 dimensions.
+### Step 2. Compare masked and unmasked scores on purpose
 
-Increasing the number of heads doesn't automatically make a model smarter. Within the same `n_embd`, more heads mean fewer dimensions per head. In small models, you're trading representational depth for parallel perspectives. For a 101 series, 4 heads provide a good balance for observing the structure.
+It helps to see what failure looks like. If you remove the mask temporarily and compare the two versions, the future positions remain active and the bug becomes obvious.
 
-## Using nn.Linear and Reshape Without einsum
+```python
+import math
 
-Now let's integrate `CausalSelfAttention` for our series. It might look like a lot of code, but the structure is exactly what we just discussed.
+import torch
+import torch.nn.functional as F
+
+q = torch.randn(1, 4, 8)
+k = torch.randn(1, 4, 8)
+scores = q @ k.transpose(-2, -1) / math.sqrt(k.size(-1))
+
+print("without mask")
+print(F.softmax(scores, dim=-1)[0])
+
+tril = torch.tril(torch.ones(4, 4))
+masked_scores = scores.masked_fill(tril == 0, float("-inf"))
+
+print("with mask")
+print(F.softmax(masked_scores, dim=-1)[0])
+```
+
+**Expected output:**
+
+```text
+without mask
+tensor([[0.20.., 0.29.., 0.24.., 0.25..],
+        [0.10.., 0.31.., 0.27.., 0.30..],
+        ...])
+
+with mask
+tensor([[1.0000, 0.0000, 0.0000, 0.0000],
+        [0.24.., 0.75.., 0.0000, 0.0000],
+        ...])
+```
+
+This is more than a demo. It is one of the fastest sanity checks when training loss looks suspiciously good but generation behaves badly.
+
+### Step 3. Multi-head attention gives the model parallel viewpoints
+
+A single head tends to emphasize one kind of relationship at a time. Multi-head attention splits the embedding dimension into several smaller parts so different heads can score different relationships in parallel. One head may focus on local context, another on repeated structures, and another on speaker shifts.
+
+More heads are not automatically better. If `n_embd` stays fixed, each extra head reduces the per-head dimension. In our configuration of `n_embd=128` and `n_head=4`, each head gets 32 dimensions, which is a clean balance for a small educational model.
+
+### Step 4. Build the series version without shortcuts
+
+Now we can assemble the `CausalSelfAttention` module for this series. No `einsum`, no fancy abstractions—just linear projections, reshaping, transposition, masking, and projection back to the residual dimension.
 
 ```python
 from dataclasses import dataclass
@@ -174,30 +233,62 @@ print(out.shape)
 print(attn.last_attn.shape)
 ```
 
-The output shape is `(2, 8, 128)`. If you want to inspect the attention map, you can read `attn.last_attn`, whose shape is `(2, 4, 8, 8)` in this example.
+**Expected output:**
 
-## Checking a Single Head's Output
+```text
+torch.Size([2, 8, 128])
+torch.Size([2, 4, 8, 8])
+```
 
-You can verify the causal mask by looking at the weights directly. The first row should only show the first token attending to itself, and the second row should only show attention to the first two positions. If the upper right area is blocked with zeros, the implementation is correct.
+If those shapes line up, the split-head path and the merge-back path are both working. The most common failure here is not the formula. It is a tensor layout mistake.
 
-Skipping this verification makes it much harder to find errors when you start stacking blocks. Half of attention debugging is simply confirming shapes and masks.
+### Step 5. Keep one inspectable hook for later debugging
 
-When training behaves unexpectedly, the cause is often a minor tensor manipulation error rather than a deep mathematical flaw. It's usually a swapped transpose axis, a mask that doesn't match the `block_size`, or a missing `contiguous()` after a reshape. In attention, precision in handling tensor shapes is more important than the conceptual understanding.
+Saving `self.last_attn = wei` is not elegant, but it is practical. Once you start stacking blocks in the next post, it gives you a fast way to inspect whether masks still hold, whether a head is saturating, or whether every head is behaving identically.
 
-## What's next
+## Failure modes and the first thing to check
 
-Now that our tokens can "see" each other, we'll move on to the next post. We'll add FeedForward, Residual connections, and LayerNorm to complete a full Transformer block—the fundamental unit of depth in our model.
+Attention bugs often repeat the same pattern. When something breaks, the quickest path is usually to inspect a shape, a mask, or a printed matrix—not to re-read the paper.
 
-<!-- a-grade-example:begin -->
+| Symptom | First thing to inspect | Common cause |
+| --- | --- | --- |
+| Training loss looks great but generation is terrible | Printed mask output | Future-token leakage |
+| `view()` raises shape/layout errors | Tensor continuity after `transpose` | Missing `contiguous()` |
+| Adding more heads breaks immediately | `n_embd % n_head` | Head dimension is not integral |
+| Attention maps all look nearly identical | Score scale before softmax | Missing or incorrect `sqrt(d)` |
+| Memory jumps quickly | `T x T` attention map size | `block_size` is too large |
+
+This checklist is worth keeping nearby. Attention usually fails in concrete, inspectable ways.
+
+## How to think about it in practice
+
+This series uses a small char-level GPT, so the context window and head count stay modest. Even so, the attention cost still scales with `T²`. At `block_size=64`, that is manageable. At 512 or 2048, it becomes one of the first bottlenecks you feel.
+
+That is why it helps to describe attention in engineering terms rather than in slogan form. Think in terms of shapes, score matrices, masks, projections, and residual-stream compatibility. That language scales from toy models to real ones.
+
+## Common mistakes
+
+- It is easy to think Q, K, and V come from different data sources, but in self-attention they are three projections of the same input.
+- `sqrt(d)` can look like decorative math, but it is a real stabilizer for softmax.
+- The causal mask can feel optional in code, but it is mandatory for autoregressive language modeling.
+- More heads do not automatically mean a better model when `n_embd` stays fixed.
+- Many attention bugs are not conceptual at all. They come from shapes, axis order, or mask ranges.
 
 ## Checklist
 
-- [ ] Walked through the scale → softmax → weighted V flow by hand.
-- [ ] Printed a single head's attention weights to see the pattern.
-- [ ] Understood how multi-head outputs are reshaped and concatenated.
-- [ ] Compared logits before and after mask application.
+- [ ] Can explain the shapes of the score matrix and the causal mask by hand.
+- [ ] Printed a single head's `wei` and confirmed the upper-right region is blocked.
+- [ ] Traced the multi-head shape `(B, n_head, T, head_size)` end to end.
+- [ ] Can explain why `out.transpose(...).contiguous().view(...)` is needed.
+- [ ] Understand why preventing future-token access keeps training and inference aligned.
 
-<!-- a-grade-example:end -->
+## Summary
+
+In this post, we framed attention as a dynamic lookup mechanism across tokens. Q, K, and V are different projections of the same input, and softmax over their scores lets each position retrieve the context it needs.
+
+We also saw why causal masking and multi-head structure matter so much. The mask preserves the autoregressive rule, while multiple heads let the model score different relationships in parallel. Together, they are what move GPT beyond simple local character prediction.
+
+In the next post, we will add FeedForward, residual connections, and LayerNorm to turn this attention module into a full Transformer block.
 
 <!-- toc:begin -->
 ## In this series
@@ -216,8 +307,17 @@ Now that our tokens can "see" each other, we'll move on to the next post. We'll 
 
 ## References
 
+### Official Docs
+
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [nanoGPT model.py](https://github.com/karpathy/nanoGPT/blob/master/model.py)
 - [PyTorch scaled_dot_product_attention](https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html)
+- [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
+
+### Related Series
+
+- [LLM App Foundations 101 — Prompt engineering basics](../../llm-app-foundations-101/en/03-prompt-engineering-basics.md)
+- [AI Agent 101 — Context engineering](../../ai-agent-101/en/02-context-engineering.md)
+- [LangGraph 101 — State and checkpoints](../../langgraph-101/en/02-state-and-checkpoints.md)
 
 Tags: LLM, PyTorch, Transformer, Tutorial
