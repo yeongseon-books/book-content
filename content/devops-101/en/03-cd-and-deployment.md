@@ -2,7 +2,7 @@
 series: devops-101
 episode: 3
 title: CD and Deployment Strategies
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - BlueGreen
   - Canary
 seo_description: Compare Rolling, Blue-Green, and Canary deployments and design a safe automated release flow.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # CD and Deployment Strategies
 
-This is post 3 in the DevOps 101 series.
+Many teams say they fear deployment, but the deeper fear is usually rollback. If a release goes bad, how quickly can you stop the blast radius, restore service, and explain what changed? Without a good answer, every deployment feels like a gamble.
 
-> DevOps 101 series (3/10)
+That is why continuous delivery is not just about automation. It is about making releases small, observable, and reversible so production changes become a routine operating motion instead of a high-drama event.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is the *fear of deployment* really about *not being able to roll back*?
-
-> A good deploy strategy turns a release into *small, reversible changes*.
-
-<!-- a-grade-intro:end -->
+This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Deployment is *the most dangerous moment*. A good strategy *shrinks the blast ra
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Build["build"] --> Stage["stage"]
-    Stage --> Canary["10% canary"]
-    Canary --> Full["100%"]
-    Canary --> Rollback["rollback"]
-```
+![Concept at a Glance](../../../assets/devops-101/03/03-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
@@ -127,6 +117,33 @@ kubectl scale deploy/api-v2 --replicas=10
 # NG
 kubectl rollout undo deploy/api
 ```
+
+## The First 10 Minutes After Deploy Matter Most
+
+A canary does not make a release safe by itself. What matters is whether the team checks the same signals in the same order during the first few minutes after traffic shifts. A simple post-deploy sequence like the one below makes promotions much more predictable.
+
+```text
+T+0m  Confirm the health endpoint returns 200
+T+2m  Compare 5xx rate and p95 latency to baseline
+T+5m  Search new-version logs for fresh exception patterns
+T+7m  Check DB connection pool, queue depth, cache hit ratio
+T+10m Promote further or roll back
+```
+
+This sequence works because it checks dependencies as well as the application itself. Many bad deploys do not fail at the HTTP layer first. They show up as connection pressure, queue growth, or cache churn before customers describe the symptom clearly.
+
+## Design Rollback Before You Need It
+
+Rollback is not an after-the-fact emergency button. It has to exist in the release design before the deploy starts. Application rollback and database rollback are different problems, and treating them as one often extends incidents.
+
+A practical release checklist usually includes these questions:
+
+- Can a feature flag contain the blast radius immediately?
+- Does rolling back the image restore the service by itself?
+- Are schema changes backward compatible via an expand/contract pattern?
+- After rollback, is the path to redeploy forward also tested?
+
+If those answers are vague, the deployment is still risk-heavy even if the automation looks polished.
 
 ## What to Notice in This Code
 
