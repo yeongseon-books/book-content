@@ -11,13 +11,14 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Interview
-  - SystemDesign
-  - Architecture
-  - Beginner
-seo_description: 시스템 디자인 인터뷰 4단계 절차를 상세히 다루며, 기술적 의사결정 근거를 명확히 제시하는 전문가 수준 답변 전략을 제시합니다.
-last_reviewed: '2026-05-12'
+- Career
+- Interview
+- SystemDesign
+- Architecture
+- Beginner
+seo_description: 시스템 디자인 인터뷰 4단계 절차를 상세히 다루며, 기술적 의사결정 근거를 명확히 제시하는 전문가 수준 답변 전략을
+  제시합니다.
+last_reviewed: '2026-05-14'
 ---
 
 # 시스템 디자인 인터뷰
@@ -49,12 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    R[Requirements] --> E[Estimate]
-    E --> H[High level]
-    H --> D[Deep dive]
-```
+![시스템 디자인 인터뷰의 네 단계 흐름](../../../assets/developer-career-101/06/06-01-concept-at-a-glance.ko.png)
+
+*시스템 디자인 인터뷰의 네 단계 흐름*
 
 디자인 답변은 순서가 중요합니다. 요구사항을 정리하지 않고 박스부터 그리면 과하게 설계하거나 엉뚱한 방향으로 갈 수 있습니다. 반대로 요구사항, 추정, 상위 구조, 심화 설명의 순서를 지키면 답변이 훨씬 안정적으로 들립니다.
 
@@ -119,6 +117,33 @@ SQL vs KV: consistency vs performance
 
 트레이드오프를 말하지 않으면 설계가 평면적으로 보입니다. 어떤 선택이 어떤 비용을 가져오는지 설명해야 판단의 질이 드러납니다.
 
+## 시스템 디자인 답변에서 깊이를 만드는 질문
+
+| 단계 | 스스로 던질 질문 | 답변에 꼭 남길 것 |
+| --- | --- | --- |
+| 요구사항 | 지금 풀어야 할 핵심 시나리오는 무엇인가 | 기능/비기능 분리 |
+| 추정 | 읽기와 쓰기 비율이 저장소 선택을 어떻게 바꾸는가 | QPS, 용량, 성장 가정 |
+| 상위 설계 | 병목이 생기면 어디부터 흔들리는가 | 주요 흐름과 저장 경계 |
+| 심화 설명 | 어떤 선택이 가장 큰 비용을 만든는가 | 캐시, 일관성, 장애 복구 트레이드오프 |
+
+## 시스템 디자인 답변에서 깊이를 만드는 질문
+
+| 단계 | 스스로 던질 질문 | 답변에 꼭 남길 것 |
+| --- | --- | --- |
+| 요구사항 | 지금 풀어야 할 핵심 시나리오는 무엇인가 | 기능/비기능 분리 |
+| 추정 | 읽기와 쓰기 비율이 저장소 선택을 어떻게 바꾸는가 | QPS, 용량, 성장 가정 |
+| 상위 설계 | 병목이 생기면 어디부터 흔들리는가 | 주요 흐름과 저장 경계 |
+| 심화 설명 | 어떤 선택이 가장 큰 비용을 만드는가 | 캐시, 일관성, 장애 복구 트레이드오프 |
+
+## 시스템 디자인 답변에서 깊이를 만드는 질문
+
+| 단계 | 스스로 던질 질문 | 답변에 꼭 남길 것 |
+| --- | --- | --- |
+| 요구사항 | 지금 풀어야 할 핵심 시나리오는 무엇인가 | 기능/비기능 분리 |
+| 추정 | 읽기와 쓰기 비율이 저장소 선택을 어떻게 바꾸는가 | QPS, 용량, 성장 가정 |
+| 상위 설계 | 병목이 생기면 어디부터 흔들리는가 | 주요 흐름과 저장 경계 |
+| 심화 설명 | 어떤 선택이 가장 큰 비용을 만드는가 | 캐시, 일관성, 장애 복구 트레이드오프 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 요구사항이 항상 먼저입니다.
@@ -179,7 +204,7 @@ SQL vs KV: consistency vs performance
 
 - [Designing Data-Intensive Applications](https://dataintensive.net/)
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
-- [Grokking the System Design Interview](https://www.educative.io/courses/grokking-the-system-design-interview)
 - [High Scalability](http://highscalability.com/)
+- [Google SRE Book](https://sre.google/books/)
 
 Tags: Career, Interview, SystemDesign, Architecture, Beginner
