@@ -45,7 +45,7 @@ An integrated pipeline matters because one request should leave connected traces
 
 When each operational layer lives alone, demos look clean but incidents stay hard to explain. In production, you need one place to tell whether a bad outcome came from unsafe input, rising cost, or degrading output quality.
 
-Example file: `/root/Github/llm-apps-ops-101/en/06-ops-complete/main.py`
+Example file: `en/06-ops-complete/main.py`
 
 ## Minimal runnable example
 ```python

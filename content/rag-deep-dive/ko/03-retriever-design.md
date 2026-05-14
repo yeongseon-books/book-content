@@ -40,7 +40,7 @@ VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrie
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/en/03-retriever-design/main.py`
+예제 파일: `en/03-retriever-design/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

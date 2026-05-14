@@ -135,7 +135,7 @@ def benchmark_model(model_name: str):
 The runnable code lives in `rag-benchmark-101/en/03-embedding-comparison/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/03-embedding-comparison
+cd en/03-embedding-comparison
 python3 main.py
 ```
 

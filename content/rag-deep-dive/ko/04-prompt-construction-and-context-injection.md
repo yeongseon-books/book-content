@@ -40,7 +40,7 @@ PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/en/04-prompt-construction-and-context-injection/main.py`
+예제 파일: `en/04-prompt-construction-and-context-injection/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

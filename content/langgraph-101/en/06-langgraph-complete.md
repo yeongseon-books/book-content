@@ -234,7 +234,7 @@ if __name__ == "__main__":
     print(f"\nCheckpoint message count: {len(snapshot.values['messages'])}")
 ```
 
-Runnable file: `/root/Github/langgraph-101/en/06-langgraph-complete/main.py`
+Runnable file: `en/06-langgraph-complete/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

@@ -160,7 +160,7 @@ print(result)
 The runnable code lives in `rag-benchmark-101/en/05-e2e-evaluation/main.py`. `GROQ_API_KEY` is required.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/05-e2e-evaluation
+cd en/05-e2e-evaluation
 export GROQ_API_KEY=...
 python3 main.py
 ```

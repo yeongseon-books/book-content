@@ -32,7 +32,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 
 > 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
 
-예제 코드: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
+예제 코드: `en/06-pipeline-completion/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
 
@@ -175,7 +175,7 @@ python main.py
 ```text
 loaded_documents: 3
 chunks: 4
-faiss_saved: /root/Github/document-ingestion-101/en/06-pipeline-completion/faiss_store
+faiss_saved: en/06-pipeline-completion/faiss_store
 result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retention rules.
 result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
 ```

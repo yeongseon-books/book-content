@@ -33,7 +33,7 @@ This is the fourth post in the Document Ingestion 101 series. Here, we use file 
 
 > Incremental indexing is less a vector-store trick and more an operational memory problem.
 
-Example code: `/root/Github/document-ingestion-101/en/04-incremental-indexing/main.py`
+Example code: `en/04-incremental-indexing/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/04/04-01-questions-this-post-answers.en.png)
 

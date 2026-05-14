@@ -44,7 +44,7 @@ This is the first article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/01-document-loading-and-chunking/main.py`
+Example file: `en/01-document-loading-and-chunking/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

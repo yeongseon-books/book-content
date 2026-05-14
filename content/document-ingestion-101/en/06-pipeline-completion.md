@@ -33,7 +33,7 @@ This is the final post in the Document Ingestion 101 series. Here, we connect th
 
 > A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
 
-Example code: `/root/Github/document-ingestion-101/en/06-pipeline-completion/main.py`
+Example code: `en/06-pipeline-completion/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
 
@@ -182,7 +182,7 @@ python main.py
 ```text
 loaded_documents: 3
 chunks: 4
-faiss_saved: /root/Github/document-ingestion-101/en/06-pipeline-completion/faiss_store
+faiss_saved: en/06-pipeline-completion/faiss_store
 result=policy.pdf chunk_id=chunk-00 preview=PDF source: access policy and retention rules.
 result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the original file name and format.
 ```

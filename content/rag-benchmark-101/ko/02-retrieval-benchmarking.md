@@ -106,7 +106,7 @@ QUERIES = [
 실행 코드는 `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/02-retrieval-benchmarking
+cd en/02-retrieval-benchmarking
 python3 main.py
 ```
 

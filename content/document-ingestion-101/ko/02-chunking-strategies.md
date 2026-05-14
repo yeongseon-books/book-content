@@ -32,7 +32,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 > 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
 
-예제 코드: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
+예제 코드: `en/02-chunking-strategies/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
 

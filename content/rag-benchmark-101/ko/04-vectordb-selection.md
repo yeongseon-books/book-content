@@ -120,7 +120,7 @@ dimension = doc_vectors.shape[1]
 실행 코드는 `rag-benchmark-101/en/04-vectordb-selection/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/04-vectordb-selection
+cd en/04-vectordb-selection
 python3 main.py
 ```
 

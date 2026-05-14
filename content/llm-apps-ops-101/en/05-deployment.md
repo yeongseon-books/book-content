@@ -44,7 +44,7 @@ A deployment example is only credible when it can start the server and verify a 
 
 The most common documentation mistake is showing server code without proving that it actually boots. For an operations-focused post, health check plus one representative request is the minimum bar.
 
-Example file: `/root/Github/llm-apps-ops-101/en/05-deployment/main.py`
+Example file: `en/05-deployment/main.py`
 
 ## Minimal runnable example
 ```python

@@ -120,7 +120,7 @@ dimension = doc_vectors.shape[1]
 The runnable code lives in `rag-benchmark-101/en/04-vectordb-selection/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/04-vectordb-selection
+cd en/04-vectordb-selection
 python3 main.py
 ```
 

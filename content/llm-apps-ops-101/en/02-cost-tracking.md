@@ -44,7 +44,7 @@ Cost becomes more important as the feature succeeds, which is exactly why the ma
 
 LLM costs usually start small enough to ignore, then jump when repeated prompts, background jobs, or traffic growth hit at once. If you do not record usage per call, optimization becomes guesswork.
 
-Example file: `/root/Github/llm-apps-ops-101/en/02-cost-tracking/main.py`
+Example file: `en/02-cost-tracking/main.py`
 
 ## Minimal runnable example
 ```python

@@ -33,7 +33,7 @@ This is the second post in the Document Ingestion 101 series. Here, we compare c
 
 > Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
 
-Example code: `/root/Github/document-ingestion-101/en/02-chunking-strategies/main.py`
+Example code: `en/02-chunking-strategies/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
 

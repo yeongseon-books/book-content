@@ -160,7 +160,7 @@ print(result)
 실행 코드는 `rag-benchmark-101/en/05-e2e-evaluation/main.py`에 있습니다. `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/05-e2e-evaluation
+cd en/05-e2e-evaluation
 export GROQ_API_KEY=...
 python3 main.py
 ```

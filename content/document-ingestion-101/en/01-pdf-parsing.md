@@ -33,7 +33,7 @@ This is the first post in the Document Ingestion 101 series. Here, we start with
 
 > The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
 
-Example code: `/root/Github/document-ingestion-101/en/01-pdf-parsing/main.py`
+Example code: `en/01-pdf-parsing/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/01/01-01-questions-this-post-answers.en.png)
 

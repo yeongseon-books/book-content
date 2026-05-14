@@ -44,7 +44,7 @@ This is the 3rd article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/03-retriever-design/main.py`
+Example file: `en/03-retriever-design/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

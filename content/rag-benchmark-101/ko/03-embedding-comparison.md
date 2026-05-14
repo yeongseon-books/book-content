@@ -133,7 +133,7 @@ def benchmark_model(model_name: str):
 실행 코드는 `rag-benchmark-101/en/03-embedding-comparison/main.py`에 있습니다. 05편과 06편은 `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/03-embedding-comparison
+cd en/03-embedding-comparison
 python3 main.py
 ```
 

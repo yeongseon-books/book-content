@@ -106,7 +106,7 @@ QUERIES = [
 The runnable code lives in `rag-benchmark-101/en/02-retrieval-benchmarking/main.py`. Episodes 05 and 06 require `GROQ_API_KEY`.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/02-retrieval-benchmarking
+cd en/02-retrieval-benchmarking
 python3 main.py
 ```
 

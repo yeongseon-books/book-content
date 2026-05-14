@@ -32,7 +32,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 
 > 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
 
-예제 코드: `/root/Github/document-ingestion-101/en/05-multi-format-pipeline/main.py`
+예제 코드: `en/05-multi-format-pipeline/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
 

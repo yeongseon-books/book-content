@@ -44,7 +44,7 @@ This is the 2nd article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/02-embeddings-and-vector-index/main.py`
+Example file: `en/02-embeddings-and-vector-index/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

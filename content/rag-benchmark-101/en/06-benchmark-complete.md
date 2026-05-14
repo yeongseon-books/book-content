@@ -122,7 +122,7 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 The runnable code lives at `rag-benchmark-101/en/06-benchmark-complete/main.py`. It expects `GROQ_API_KEY` to be set.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/06-benchmark-complete
+cd en/06-benchmark-complete
 export GROQ_API_KEY=...
 python3 main.py
 ```

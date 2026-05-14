@@ -44,7 +44,7 @@ This is the 4th article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/04-prompt-construction-and-context-injection/main.py`
+Example file: `en/04-prompt-construction-and-context-injection/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

@@ -174,7 +174,7 @@ print(f"AVG: P@3={avg_p:.2f}, R@3={avg_r:.2f}, MRR={avg_mrr:.2f}")
 ### 3단계 — 직접 실행하기
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/01-evaluation-metrics
+cd en/01-evaluation-metrics
 python3 main.py
 ```
 

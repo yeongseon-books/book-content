@@ -44,7 +44,7 @@ Before adding complex judges, build a rule layer that catches obviously bad outp
 
 At scale, nobody reads every answer. A practical pipeline starts by blocking machine-detectable failures: malformed JSON, missing keywords, and answers that are far too short or too long.
 
-Example file: `/root/Github/llm-apps-ops-101/en/03-evaluation/main.py`
+Example file: `en/03-evaluation/main.py`
 
 ## Minimal runnable example
 ```python

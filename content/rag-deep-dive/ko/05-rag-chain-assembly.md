@@ -40,7 +40,7 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 <!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
-예제 파일: `/root/Github/rag-deep-dive/en/05-rag-chain-assembly/main.py`
+예제 파일: `en/05-rag-chain-assembly/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

@@ -33,7 +33,7 @@ This is the fifth post in the Document Ingestion 101 series. Here, we route mult
 
 > The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
 
-Example code: `/root/Github/document-ingestion-101/en/05-multi-format-pipeline/main.py`
+Example code: `en/05-multi-format-pipeline/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/05/05-01-questions-this-post-answers.en.png)
 

@@ -122,7 +122,7 @@ ragas_metrics: ["faithfulness", "answer_relevancy"]
 실행 코드는 `rag-benchmark-101/en/06-benchmark-complete/main.py`에 있습니다. `GROQ_API_KEY`가 필요합니다.
 
 ```bash
-cd /root/Github/rag-benchmark-101/en/06-benchmark-complete
+cd en/06-benchmark-complete
 export GROQ_API_KEY=...
 python3 main.py
 ```

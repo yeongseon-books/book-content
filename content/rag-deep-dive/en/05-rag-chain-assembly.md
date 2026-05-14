@@ -44,7 +44,7 @@ This is the 5th article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/05-rag-chain-assembly/main.py`
+Example file: `en/05-rag-chain-assembly/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py

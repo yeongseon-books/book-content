@@ -44,7 +44,7 @@ A useful security layer fails early both before the model call and after the mod
 
 Prompt injection is not just a model problem. If risky input reaches the model, it also reaches logs, caches, and downstream analytics unless you stop it earlier in the stack.
 
-Example file: `/root/Github/llm-apps-ops-101/en/04-security/main.py`
+Example file: `en/04-security/main.py`
 
 ## Minimal runnable example
 ```python

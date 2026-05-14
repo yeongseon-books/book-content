@@ -44,7 +44,7 @@ Observability starts with a log record that can fully explain one call after the
 
 A normal API can often get away with status code and response time. An LLM app cannot. Two calls may both succeed with HTTP 200 while one burns far more tokens or returns a suspiciously short answer.
 
-Example file: `/root/Github/llm-apps-ops-101/en/01-monitoring-and-logging/main.py`
+Example file: `en/01-monitoring-and-logging/main.py`
 
 ## Minimal runnable example
 ```python

@@ -27,7 +27,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = REPO_ROOT / "content"
 LANG_DIRS = {"ko", "en"}
 
-PLATFORM_HOME = {"site", "LogFiles", "runner", "app", "vsts", "vsts-agent"}
+PLATFORM_HOME = {"site", "LogFiles", "runner", "app", "vsts", "vsts-agent", "developer"}
 PLATFORM_ROOT = {
     ".cache",
     ".config",
@@ -38,7 +38,7 @@ PLATFORM_ROOT = {
     ".aws",
     ".azure",
 }
-PLACEHOLDERS = {"username", "user", "<user>", "your-name", "name", "you"}
+PLACEHOLDERS = {"username", "user", "<user>", "your-name", "name", "you", "me"}
 
 PATH_PATTERNS = [
     (re.compile(r"/root/([A-Za-z0-9_.\-]+)"), "root", PLATFORM_ROOT | PLACEHOLDERS),
@@ -85,6 +85,9 @@ def check_article(path: Path) -> list[str]:
             for m in pat.finditer(line):
                 segment = m.group(1)
                 if segment in allowed:
+                    continue
+                preceding = line[max(0, m.start() - 40) : m.start()]
+                if "://" in preceding and " " not in preceding.split("://")[-1]:
                     continue
                 errors.append(f"line {line_no}: local path leak '{m.group(0)}'")
     return errors

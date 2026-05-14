@@ -33,7 +33,7 @@ This is the third post in the Document Ingestion 101 series. Here, we design a p
 
 > Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
 
-Example code: `/root/Github/document-ingestion-101/en/03-metadata-filtering/main.py`
+Example code: `en/03-metadata-filtering/main.py`
 
 ![Questions this post answers](../../../assets/document-ingestion-101/03/03-01-questions-this-post-answers.en.png)
 

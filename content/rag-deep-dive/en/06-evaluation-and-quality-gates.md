@@ -44,7 +44,7 @@ This is the final article in the RAG Deep Dive series.
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
 
-Example file: `/root/Github/rag-deep-dive/en/06-evaluation-and-quality-gates/main.py`
+Example file: `en/06-evaluation-and-quality-gates/main.py`
 
 ```bash
 export GROQ_API_KEY=... && python main.py
