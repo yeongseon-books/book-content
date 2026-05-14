@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # HTML과 CSS 기본
 
-이 글은 Frontend Development 101 시리즈의 두 번째 글입니다.
-
 프론트엔드를 조금만 공부해도 금방 느끼는 사실이 하나 있습니다. 화면을 빨리 만드는 일과 오래 유지되는 화면을 만드는 일은 전혀 다르다는 점입니다. 전자는 아무 태그나 놓고 색을 입혀도 되지만, 후자는 구조와 의미를 분리해야 합니다.
 
-이 글에서는 HTML을 페이지의 뼈대로, CSS를 그 뼈대 위에 입히는 규칙으로 설명하겠습니다. 한 가지 관점이 중요합니다. HTML은 의미를 담고, CSS는 모양을 담아야 한다는 선을 명확히 그어야 나중에 레이아웃·접근성·SEO가 함께 정리됩니다.
+이 글은 Frontend Development 101 시리즈의 두 번째 글입니다. 여기서는 HTML을 페이지의 뼈대로, CSS를 그 뼈대 위에 입히는 규칙으로 설명합니다. HTML은 의미를 담고 CSS는 모양을 담아야 나중의 레이아웃, 접근성, SEO가 함께 정리됩니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,13 +44,9 @@ HTML과 CSS는 프론트엔드에서 가장 오래 살아남는 기술입니다.
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    HTML["Semantic HTML"] --> Box["Box model"]
-    Box --> Layout["Flexbox/Grid"]
-    Layout --> Resp["Responsive"]
-    Resp --> A11y["Accessibility"]
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/02/02-01-diagram.ko.png)
+
+*시맨틱 구조에서 레이아웃과 접근성까지 이어지는 HTML·CSS 학습 순서*
 
 대부분의 프론트엔드 레이아웃 문제는 결국 이 흐름 안에 들어 있습니다. 구조를 잡고, 박스를 이해하고, 배치를 결정하고, 화면 크기에 맞춰 조정한 뒤, 접근성까지 확인하는 순서입니다.
 
@@ -140,6 +134,16 @@ main {
 
 이 예제에서 중요한 것은 예쁜 카드가 아니라 레이아웃 사고방식입니다. 의미 있는 구조를 먼저 만들고, 박스 모델을 적용하고, Flexbox나 Grid로 배치하고, 마지막에 반응형 보정을 넣는 순서가 안정적입니다.
 
+## 검증 포인트
+
+- 브라우저 폭을 600px 아래로 줄였을 때 카드가 한 열로 접히는지 확인합니다.
+- DevTools Elements 탭에서 `<main>`, `<article>` 같은 시맨틱 태그가 의도한 구조로 들어갔는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 레이아웃이 안 바뀌면 미디어 쿼리 조건과 선택자 이름이 실제 HTML과 일치하는지 확인합니다.
+- 간격이 어색하면 `gap`, `padding`, `margin`이 어느 요소에 걸렸는지 박스 모델로 다시 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - `card`처럼 역할 기반 이름을 쓰고 `red`처럼 표현 중심 이름은 피하는 편이 좋습니다.
@@ -191,6 +195,7 @@ HTML은 뼈대이고 CSS는 그 위에 입는 옷입니다. 두 역할이 분리
 <!-- toc:begin -->
 - [프론트엔드 개발이란 무엇인가?](./01-what-is-frontend-development.md)
 - **HTML과 CSS 기본 (현재 글)**
+
 - JavaScript 기본 (예정)
 - 컴포넌트와 상태 (예정)
 - 라우팅과 페이지 (예정)
@@ -203,9 +208,14 @@ HTML은 뼈대이고 CSS는 그 위에 입는 옷입니다. 두 역할이 분리
 
 ## 참고 자료
 
-- [MDN HTML elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
-- [CSS Tricks Flexbox guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
-- [CSS Tricks Grid guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
-- [WAI ARIA basics](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/WAI-ARIA_basics)
+### 공식 문서
+- [MDN: HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
+- [MDN: CSS box model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model)
+- [MDN: Basic concepts of flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox)
+- [MDN: CSS grid layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout)
+
+### 확인용 자료
+- [web.dev: Responsive web design basics](https://web.dev/articles/responsive-web-design-basics)
+- [WAI: Images and alt decisions](https://www.w3.org/WAI/tutorials/images/)
 
 Tags: Frontend, HTML, CSS, Web, Beginner

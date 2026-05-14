@@ -22,23 +22,16 @@ last_reviewed: '2026-05-04'
 
 # HTML and CSS Basics
 
-This is post 2 in the Frontend Development 101 series.
+One lesson shows up quickly when you study frontend work: building a screen fast and building a screen that survives real product growth are not the same thing. You can ship something quickly with random tags and one-off styles, but maintenance gets expensive as soon as the layout changes, accessibility matters, or another teammate joins the codebase.
 
-> Frontend Development 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you keep the *skeleton* and the *clothes* of a page cleanly apart?
-
-> HTML carries *meaning*. CSS carries *appearance*. Future-you will *thank you* for keeping that line clear.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the Frontend Development 101 series. Here we treat HTML as the page skeleton and CSS as the rule system layered on top of that skeleton. Keeping meaning in HTML and appearance in CSS is what makes layout, accessibility, and SEO improve together instead of fighting each other later.
 
 ## What You Will Learn
 
 - Building *meaningful structure* with semantic HTML
 - The CSS box model
 - *Where Flexbox shines and where Grid shines*
+
 - A *minimal pattern* for responsive design
 - The *starting point* for accessibility
 
@@ -50,13 +43,9 @@ HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *s
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    HTML["Semantic HTML"] --> Box["Box model"]
-    Box --> Layout["Flexbox/Grid"]
-    Layout --> Resp["Responsive"]
-    Resp --> A11y["Accessibility"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
+
+*The learning sequence from semantic structure to layout, responsiveness, and accessibility*
 
 ## Key Terms
 
@@ -138,6 +127,16 @@ main {
 }
 ```
 
+## Verification
+
+- Resize the browser under 600px and verify that the card layout collapses to a single column.
+- Inspect the DOM in DevTools Elements to confirm that semantic tags such as `<main>` and `<article>` describe the page structure you intended.
+
+## If It Fails, Check This First
+
+- If the layout does not change, verify that the media query condition and selector names match the actual HTML.
+- If spacing feels wrong, inspect `gap`, `padding`, and `margin` in the box model instead of guessing from the visual result.
+
 ## What to Notice in This Code
 
 - Use *role-based class names* like `card`, not `red`.
@@ -185,6 +184,7 @@ HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, be
 <!-- toc:begin -->
 - [What Is Frontend Development?](./01-what-is-frontend-development.md)
 - **HTML and CSS Basics (current)**
+
 - JavaScript Basics (upcoming)
 - Components and State (upcoming)
 - Routing and Pages (upcoming)
@@ -197,9 +197,14 @@ HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, be
 
 ## References
 
-- [MDN HTML elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
-- [CSS Tricks Flexbox guide](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
-- [CSS Tricks Grid guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
-- [WAI ARIA basics](https://developer.mozilla.org/en-US/docs/Learn/Accessibility/WAI-ARIA_basics)
+### Official Docs
+- [MDN: HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Element)
+- [MDN: CSS box model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model)
+- [MDN: Basic concepts of flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox)
+- [MDN: CSS grid layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout)
+
+### Verification and Further Reading
+- [web.dev: Responsive web design basics](https://web.dev/articles/responsive-web-design-basics)
+- [WAI: Images and alt decisions](https://www.w3.org/WAI/tutorials/images/)
 
 Tags: Frontend, HTML, CSS, Web, Beginner
