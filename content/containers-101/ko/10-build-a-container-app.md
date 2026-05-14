@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Compose
-  - FastAPI
-  - DevOps
+- Containers
+- Docker
+- Compose
+- FastAPI
+- DevOps
 seo_description: FastAPI와 Postgres를 한 번에 띄우는 컨테이너 앱 구성 흐름을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 실전 컨테이너 앱 만들기
 
+이전 글에서 본 이미지, 네트워크, 볼륨, 보안, 헬스체크는 따로 보면 개념으로만 남기 쉽습니다. 마지막 단계에서는 이 요소들을 하나의 앱 조립 흐름으로 묶어, 누구나 같은 명령으로 올리고 확인하고 정리할 수 있는 작은 시스템으로 바꿔 보는 것이 중요합니다.
+
 이 글은 Containers 101 시리즈의 마지막 글입니다.
+
+여기서는 FastAPI와 Postgres를 예시로 Dockerfile, Compose, healthcheck, 시크릿 분리, 로그 확인을 하나의 실행 스택으로 연결합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,15 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["app code"] --> Image["docker build"]
-    Image --> Compose["compose up"]
-    Compose --> App["app"]
-    Compose --> DB["db"]
-    App --> Log["logs"]
-```
+![Compose가 앱과 데이터베이스를 함께 올리는 실행 흐름](../../../assets/containers-101/10/10-01-concept-at-a-glance.ko.png)
 
+*Compose가 앱과 데이터베이스를 함께 올리는 실행 흐름*
 애플리케이션 코드는 이미지가 되고, Compose는 앱과 DB를 함께 올리며, healthcheck와 로그가 운영 가능성을 받쳐 줍니다. 이제 컨테이너는 단일 명령이 아니라 하나의 작은 시스템이 됩니다.
 
 ## 핵심 용어
@@ -97,8 +95,7 @@ def users():
 
 ### Step 2 — Dockerfile
 
-```python
-"""
+```dockerfile
 FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
@@ -108,15 +105,13 @@ USER 1000
 EXPOSE 8080
 HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
-"""
 ```
 
 비root 실행, 포트 노출, healthcheck까지 Dockerfile 안에 포함합니다. 이미지 단계에서부터 운영 기대치를 명시하는 구조입니다.
 
 ### Step 3 — docker-compose.yml
 
-```python
-"""
+```yaml
 services:
   app:
     build: .
@@ -124,7 +119,8 @@ services:
     environment:
       DB_URL: postgresql://app:secret@db:5432/app
     depends_on:
-      db: { condition: service_healthy }
+      db:
+        condition: service_healthy
     restart: unless-stopped
   db:
     image: postgres:16
@@ -135,7 +131,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app"]
       interval: 5s
-"""
+      timeout: 3s
+      retries: 10
 ```
 
 Compose는 애플리케이션과 데이터베이스를 하나의 스택으로 묶습니다. 여기서 `depends_on + service_healthy` 조합이 중요한 이유는 단순 실행 순서가 아니라 준비 완료 신호까지 함께 보게 해 주기 때문입니다.
@@ -170,6 +167,26 @@ def down():
 - `depends_on + service_healthy`는 짝으로 이해해야 합니다.
 
 이 세 포인트는 실습 앱을 넘어 실제 운영 체크리스트로 그대로 이어집니다. 보안, 기동 순서, 관측성이 이 안에 모두 들어 있습니다.
+
+## 빠른 검증과 장애 신호
+
+```bash
+docker compose up -d --build
+docker compose ps
+curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:8080/users
+docker compose logs --tail=100
+```
+
+**Expected output:**
+- `docker compose ps`에서 app과 db가 모두 기동 상태로 보입니다.
+- `/health`는 `{"ok": true}`를 반환합니다.
+- `/users`는 DB 연결이 정상일 때 카운트 응답을 돌려줍니다.
+
+**먼저 확인할 것:**
+- app이 먼저 죽으면 `depends_on`과 healthcheck 정의를 함께 확인합니다.
+- DB 연결 오류가 나면 Compose 네트워크 안에서 `db` 호스트명이 맞는지 봅니다.
+- 평문 시크릿이 남아 있다면 `.env` 또는 전용 시크릿 시스템 분리부터 진행합니다.
 
 ## 자주 하는 실수 5가지
 
@@ -215,6 +232,8 @@ def down():
 이제 다음 단계는 Kubernetes 101처럼 오케스트레이션 세계로 넘어가, 여러 컨테이너를 더 큰 시스템으로 다루는 방향입니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - [Image와 Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -223,8 +242,9 @@ def down():
 - [Network](./06-network.md)
 - [Registry](./07-registry.md)
 - [Container Security](./08-container-security.md)
-- [Container와 VM 차이](./09-container-vs-vm.md)
+- [Containers vs VMs](./09-container-vs-vm.md)
 - **실전 컨테이너 앱 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -234,4 +254,4 @@ def down():
 - [Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [HEALTHCHECK reference](https://docs.docker.com/engine/reference/builder/#healthcheck)
 
-Tags: Containers, Docker, Compose, FastAPI, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps
