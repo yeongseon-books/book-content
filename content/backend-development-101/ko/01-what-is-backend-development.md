@@ -16,7 +16,7 @@ tags:
   - HTTP
   - Architecture
   - Python
-seo_description: 백엔드의 역할과 다섯 레이어를 한 번에 이해하는 입문 지도입니다
+seo_description: 백엔드 개발의 역할과 계층 구조를 정의하고, 요청이 HTTP 서버부터 데이터베이스까지 흐르는 전체 지도를 한눈에 파악합니다.
 last_reviewed: '2026-05-12'
 ---
 

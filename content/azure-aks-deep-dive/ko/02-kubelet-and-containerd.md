@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: AKS 노드에서 kubelet과 containerd가 CRI를 통해 컨테이너를 실행하는 단계별 과정을 분석하고 디버깅 포인트를 정리합니다.
 ---
 
 # kubelet과 containerd — 노드 위에서 컨테이너가 뜨기까지

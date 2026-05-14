@@ -17,7 +17,7 @@ tags:
 - Latency
 - MRR
 last_reviewed: '2026-05-01'
-seo_description: 'A retrieval benchmark binds four things together:'
+seo_description: Build a RAG retrieval benchmark loop. Measure hit rate, MRR, and latency to quantify search performance before scaling to production.
 ---
 
 # Measuring retrieval performance

@@ -16,7 +16,7 @@ tags:
   - set
   - 집합 연산
   - frozenset
-seo_description: set의 내부 구조와 집합 연산 활용 패턴을 설명합니다.
+seo_description: 파이썬 set의 해시 원리를 이해하고 중복 제거, 집합 연산, 권한 필터링 등 실무 패턴과 불변 객체인 frozenset 활용법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

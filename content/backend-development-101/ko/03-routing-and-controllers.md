@@ -16,7 +16,7 @@ tags:
   - Architecture
   - REST
   - Python
-seo_description: 라우팅과 컨트롤러를 분리해 엔드포인트를 깔끔하게 설계하는 방법입니다
+seo_description: 라우터와 컨트롤러를 분리하여 백엔드 엔드포인트를 깔끔하게 설계하고, 입력 파라미터와 REST 스타일의 설계를 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

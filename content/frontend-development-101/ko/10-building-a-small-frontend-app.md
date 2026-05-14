@@ -16,7 +16,7 @@ tags:
   - Capstone
   - React
   - Web
-seo_description: 앞선 아홉 글의 개념을 모아 작은 노트 앱으로 완성합니다.
+seo_description: 라우팅, API, 폼, 스타일링을 모아 실전 노트 앱을 제작하고 배포합니다. 프로젝트 구조 설계부터 빌드, 배포까지의 전체 흐름을 완주합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: Kubernetes 스케줄러가 Pod를 배치하는 3단계 과정과 메커니즘을 분석하여 배치 실패 원인을 정확히 진단하는 방법을 제시합니다.
 ---
 
 # Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가

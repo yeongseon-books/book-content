@@ -16,7 +16,7 @@ tags:
   - Aggregation
   - DataAnalysis
   - Beginner
-seo_description: groupby의 분할, 적용, 결합 모델과 집계 패턴을 정리한 글입니다
+seo_description: groupby 분할-적용-결합 모델을 이해합니다. 집계, 변환, 필터의 차이와 실무에서 자주 쓰이는 특징 생성 패턴, 최적화 전략을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

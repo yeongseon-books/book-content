@@ -16,7 +16,7 @@ tags:
   - Vite
   - Bundling
   - Performance
-seo_description: 번들러와 Vite가 프론트엔드 성능에 미치는 영향을 정리합니다.
+seo_description: Vite와 번들링 최적화 전략을 익힙니다. Tree shaking, 코드 분할, 번들 분석 등 실무 성능 최적화 계층의 핵심 개념을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

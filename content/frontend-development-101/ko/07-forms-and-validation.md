@@ -16,7 +16,7 @@ tags:
   - Validation
   - UX
   - React
-seo_description: 폼 입력, 유효성 검사, 에러 메시지의 기본 원칙을 정리합니다.
+seo_description: 폼 입력과 유효성 검사 전략을 익힙니다. 제어 컴포넌트, 실시간 피드백, Zod 검증, 접근성 고려 사항 등 실무 UX 패턴을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

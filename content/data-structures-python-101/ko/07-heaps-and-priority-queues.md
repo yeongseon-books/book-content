@@ -1,23 +1,23 @@
 ---
-series: data-structures-python-101
 episode: 7
-title: 힙과 우선순위 큐
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Python
-  - 자료구조
-  - Heap
-  - Priority Queue
-  - heapq
-seo_description: heapq로 힙과 우선순위 큐를 다루는 실전 패턴을 설명합니다.
 last_reviewed: '2026-05-12'
+seo_description: Python heapq 모듈로 최소 힙과 우선순위 큐를 구현하고, 정렬과 K번째 원소 탐색에 활용하는 실전 패턴을 정리합니다.
+series: data-structures-python-101
+status: publish-ready
+tags:
+- Python
+- 자료구조
+- Heap
+- Priority Queue
+- heapq
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 힙과 우선순위 큐
 ---
 
 # 힙과 우선순위 큐

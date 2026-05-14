@@ -16,7 +16,7 @@ tags:
   - Demo
   - Storytelling
   - Beginner
-seo_description: 캡스톤 발표 자료를 문제·해결·결과 흐름으로 구성하는 방법을 정리합니다
+seo_description: 캡스톤 프로젝트 발표 자료를 문제·해결·결과 구조로 구성하고 데모와 Q&A 준비를 통해 프로젝트 가치를 효과적으로 전달하는 법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

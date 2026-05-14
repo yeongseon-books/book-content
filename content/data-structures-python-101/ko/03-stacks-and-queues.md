@@ -16,7 +16,7 @@ tags:
   - Stack
   - Queue
   - deque
-seo_description: Python에서 스택과 큐를 효율적으로 구현하는 기준을 설명합니다.
+seo_description: Python의 list와 deque를 활용해 스택(Stack)과 큐(Queue)를 효율적으로 구현하고 연산 성능과 실무 활용 사례를 분석합니다.
 last_reviewed: '2026-05-12'
 ---
 

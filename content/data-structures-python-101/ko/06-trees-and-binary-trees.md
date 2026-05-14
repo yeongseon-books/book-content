@@ -16,7 +16,7 @@ tags:
   - Tree
   - Binary Tree
   - BST
-seo_description: 트리와 BST의 구조, 순회, 탐색 원리를 Python으로 설명합니다.
+seo_description: 트리와 이진 탐색 트리(BST)의 계층 구조, 순회 방법, 탐색 원리를 Python 예제로 설명하고 재귀적 사고방식을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

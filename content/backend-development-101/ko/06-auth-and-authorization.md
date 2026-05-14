@@ -16,7 +16,7 @@ tags:
   - Security
   - JWT
   - Python
-seo_description: 인증과 권한의 차이, bcrypt와 JWT의 안전한 기본기를 정리합니다
+seo_description: 인증(AuthN)과 권한(AuthZ)의 차이를 이해하고 bcrypt와 JWT를 사용하여 안전한 백엔드 보안 시스템을 구축하는 기본기를 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

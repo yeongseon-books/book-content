@@ -16,7 +16,7 @@ tags:
   - Observability
   - Python
   - ErrorHandling
-seo_description: 구조화 로그와 예외 처리로 장애 원인을 빠르게 찾는 방법입니다
+seo_description: 구조화 로그와 글로벌 예외 처리를 통해 백엔드 운영 가시성을 확보하고, 장애 발생 시 원인을 빠르게 추적하는 방법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

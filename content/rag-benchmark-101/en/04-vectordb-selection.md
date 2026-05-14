@@ -17,7 +17,7 @@ tags:
 - Recall
 - ANN
 last_reviewed: '2026-05-01'
-seo_description: 'The skeleton of a VectorDB comparison:'
+seo_description: Compare VectorDB indexes fairly. Learn to balance accuracy, latency, and memory by benchmarking flat vs. approximate nearest neighbor indexes.
 ---
 
 # VectorDB selection criteria

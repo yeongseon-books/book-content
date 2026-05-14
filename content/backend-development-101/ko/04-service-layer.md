@@ -16,7 +16,7 @@ tags:
   - DesignPatterns
   - Python
   - DDD
-seo_description: Service Layer에 비즈니스 규칙을 모으는 기준을 정리합니다
+seo_description: 서비스 레이어의 역할과 비즈니스 로직을 모으는 기준을 정리하고, 의존성 주입과 트랜잭션 경계 설계를 통해 테스트 가능성을 높입니다.
 last_reviewed: '2026-05-12'
 ---
 

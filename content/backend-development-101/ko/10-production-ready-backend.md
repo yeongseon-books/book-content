@@ -16,7 +16,7 @@ tags:
   - BestPractices
   - Python
   - Production
-seo_description: 운영 가능한 백엔드 구조를 디렉터리와 설정 기준으로 정리합니다
+seo_description: 운영 가능한 백엔드 프로젝트의 구조와 설정 전략, 관측성(Observability)을 프로젝트에 녹여내는 기준을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

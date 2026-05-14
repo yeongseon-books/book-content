@@ -16,7 +16,7 @@ tags:
   - JavaScript
   - HTML
   - Beginner
-seo_description: 브라우저, 렌더링, 자바스크립트로 프론트엔드의 전체 그림을 잡습니다.
+seo_description: 프론트엔드 본질인 브라우저 환경을 이해하고 HTML, CSS, JS의 역할 분담과 DOM, SPA 같은 현대 웹의 핵심 개념을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

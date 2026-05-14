@@ -16,7 +16,7 @@ tags:
   - Planning
   - Project
   - Beginner
-seo_description: 캡스톤 일정을 마일스톤과 주간 계획, 버퍼 기준으로 정리합니다
+seo_description: 캡스톤 프로젝트 일정을 마일스톤, 주간 계획, 위험 버퍼 관점에서 설계하여 계획과 실제 차이를 조기에 발견하고 유연하게 대응하는 법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

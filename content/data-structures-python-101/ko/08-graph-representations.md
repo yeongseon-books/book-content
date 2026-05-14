@@ -16,7 +16,7 @@ tags:
   - Graph
   - 그래프
   - BFS
-seo_description: 그래프를 인접 리스트와 행렬로 표현하고 BFS/DFS를 설명합니다.
+seo_description: 그래프를 인접 리스트와 행렬로 구현하고 BFS와 DFS 순회 알고리즘의 원리, 다익스트라 최단 경로 전략을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: AKS HPA와 Cluster Autoscaler의 작동 원리를 루프별로 분석하여 두 루프 간 지연 현상의 구조적 원인을 설명합니다.
 ---
 
 # HPA와 Cluster Autoscaler 내부 — 두 컨트롤 루프

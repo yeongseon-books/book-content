@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: KEDA가 ScaledObject를 통해 HPA를 생성하고 0에서 1로의 확장 경계를 직접 관리하는 구조적 메커니즘을 분석합니다.
 ---
 
 # KEDA 내부 — ScaledObject가 HPA를 만드는 방식

@@ -17,7 +17,7 @@ tags:
 - MTEB
 - Latency
 last_reviewed: '2026-05-01'
-seo_description: Embedding comparison rests on the one-variable-at-a-time principle.
+seo_description: Compare embedding models on your data. Learn to balance hit rate, MRR, latency, and index costs using one-variable benchmarking.
 ---
 
 # Comparing embedding models

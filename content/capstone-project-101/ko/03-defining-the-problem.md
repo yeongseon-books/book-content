@@ -16,7 +16,7 @@ tags:
   - Definition
   - Scope
   - Beginner
-seo_description: 캡스톤 문제 정의를 사용자, 가치, 가정, 지표 관점에서 정리합니다
+seo_description: 캡스톤 프로젝트의 핵심인 문제 정의를 사용자, 가치, 가정, 지표 관점에서 구체화하여 프로젝트의 흔들리지 않는 기준점을 세웁니다.
 last_reviewed: '2026-05-12'
 ---
 

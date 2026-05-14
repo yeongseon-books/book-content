@@ -17,7 +17,7 @@ tags:
 - Recall
 - MRR
 last_reviewed: '2026-05-01'
-seo_description: 'Retrieval metrics compare two sets:'
+seo_description: "Master RAG metrics: Precision@k, Recall@k, and MRR. Learn why isolating retrieval from generation is key to building reliable RAG pipelines."
 ---
 
 # Understanding RAG evaluation metrics

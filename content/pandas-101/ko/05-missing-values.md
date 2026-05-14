@@ -16,7 +16,7 @@ tags:
   - DataCleaning
   - Python
   - Beginner
-seo_description: 결측치를 진단하고 채우거나 제거하는 판단 기준과 패턴을 정리한 글입니다
+seo_description: 결측치를 분석 신호로 보고 진단, 제거, 대체, 보간 등 상황별 처리 전략을 익힙니다. 왜곡을 줄이는 정제 원칙과 실무 패턴을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

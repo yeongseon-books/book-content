@@ -16,7 +16,7 @@ tags:
   - Join
   - SQL
   - Beginner
-seo_description: 표 두 개를 안전하게 합치는 병합과 조인의 핵심 패턴을 정리한 글입니다
+seo_description: 데이터 병합과 조인 전략을 익힙니다. Inner, Left 조인의 차이와 키 관계 검증, 행 수 폭증 방지 등 안전한 결합 패턴을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

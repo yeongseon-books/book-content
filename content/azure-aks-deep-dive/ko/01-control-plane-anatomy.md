@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: AKS 관리형 컨트롤 플레인의 내부 구조와 API 서버의 역할을 해부하고, 운영자가 읽어야 할 핵심 표면을 정리합니다.
 ---
 
 # Control Plane 해부 — AKS가 사용자에게서 가린 것

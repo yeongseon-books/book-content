@@ -16,7 +16,7 @@ tags:
   - Resample
   - Datetime
   - Beginner
-seo_description: 시계열 데이터에서 날짜 인덱스, 리샘플링, 이동 계산을 정리한 글입니다
+seo_description: 시계열 분석 기법을 익힙니다. DatetimeIndex, 리샘플링, 이동 평균, 시차 이동 및 시간대 처리 등 실무 시계열 패턴을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

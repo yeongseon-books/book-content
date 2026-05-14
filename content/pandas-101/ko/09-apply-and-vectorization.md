@@ -16,7 +16,7 @@ tags:
   - Performance
   - Apply
   - Beginner
-seo_description: apply의 한계와 벡터화의 성능 차이를 실전 감각으로 정리한 글입니다
+seo_description: 성능을 결정하는 벡터화 원리와 apply 한계 및 대안을 익힙니다. np.where, map 등 효율적인 데이터 처리 패턴을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

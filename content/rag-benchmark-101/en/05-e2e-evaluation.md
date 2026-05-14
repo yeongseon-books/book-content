@@ -17,7 +17,7 @@ tags:
 - LLM
 - Evaluation
 last_reviewed: '2026-05-01'
-seo_description: 'The data flow of an end-to-end evaluation:'
+seo_description: Evaluate the RAG pipeline with RAGAS. Measure Faithfulness and Answer Relevancy to detect hallucinations and ensure grounded answers.
 ---
 
 # End-to-end RAG pipeline evaluation

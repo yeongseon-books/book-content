@@ -16,7 +16,7 @@ tags:
   - Decision
   - Architecture
   - Beginner
-seo_description: 캡스톤 기술 스택을 친숙도와 비용 기준으로 고르는 방법을 정리합니다
+seo_description: 캡스톤 프로젝트 기술 스택을 팀의 친숙도, 학습 비용, 운영 부담 관점에서 현실적으로 비교 분석하고 최선의 의사결정을 내리는 기준을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

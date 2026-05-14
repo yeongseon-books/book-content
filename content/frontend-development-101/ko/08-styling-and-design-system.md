@@ -16,7 +16,7 @@ tags:
   - DesignSystem
   - Tailwind
   - UX
-seo_description: 디자인 토큰과 컴포넌트 라이브러리로 스타일 일관성을 잡습니다.
+seo_description: 디자인 토큰과 컴포넌트 기반 스타일 일관성 전략을 익힙니다. Tailwind, 다크 모드 등 실무 스타일링 체계를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

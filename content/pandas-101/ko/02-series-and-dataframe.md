@@ -16,7 +16,7 @@ tags:
   - DataFrame
   - Python
   - Beginner
-seo_description: 시리즈와 데이터프레임의 구조, 인덱스, 열 중심 사고를 정리한 글입니다
+seo_description: 시리즈와 데이터프레임의 관계를 이해합니다. 인덱스 정렬 원리, 열 중심 사고방식, 레이블 연산 등 Pandas 데이터 모델링 기초를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

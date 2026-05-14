@@ -17,7 +17,7 @@ tags:
 - Reproducibility
 - Reporting
 last_reviewed: '2026-05-01'
-seo_description: 'A finished benchmark is a single function:'
+seo_description: Integrate RAG evaluation into a repeatable benchmark. Build a CI pipeline to compare results against baselines and detect regressions automatically.
 ---
 
 # Completing the RAG Benchmark

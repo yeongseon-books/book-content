@@ -16,7 +16,7 @@ tags:
   - Scope
   - Product
   - Beginner
-seo_description: 캡스톤 MVP를 핵심 흐름과 범위 제외 기준으로 설계하는 법을 다룹니다
+seo_description: 캡스톤 프로젝트 MVP를 단순한 기능 축소가 아닌 핵심 가설 검증 도구로 정의하고, 핵심 흐름과 범위 제외 기준을 설계하는 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

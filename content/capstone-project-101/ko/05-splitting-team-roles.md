@@ -16,7 +16,7 @@ tags:
   - Roles
   - Collaboration
   - Beginner
-seo_description: 캡스톤 팀 역할을 주 책임자와 백업 중심으로 나누는 방법을 정리합니다
+seo_description: 캡스톤 프로젝트 팀 역할을 주 책임자와 백업 담당자 중심으로 나누어 협업 속도를 높이고 책임 소재를 명확히 하는 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

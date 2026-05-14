@@ -15,7 +15,7 @@ tags:
 - Distributed Systems
 - Containers
 last_reviewed: '2026-05-12'
-seo_description: 이 글의 외부 인용은 다음 upstream 버전을 기준으로 합니다.
+seo_description: AKS Azure CNI와 Overlay 모델의 IP 할당 방식과 트래픽 경로 차이를 분석하여 네트워크 설계와 운영 기준을 제시합니다.
 ---
 
 # CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가

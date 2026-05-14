@@ -16,7 +16,7 @@ tags:
   - CSS
   - Web
   - Beginner
-seo_description: 시맨틱 HTML과 CSS 레이아웃의 기초를 한 번에 정리합니다.
+seo_description: 시맨틱 HTML 구조 설계와 CSS 박스 모델, Flexbox, Grid 레이아웃 시스템을 익히고 반응형 웹과 접근성 기초를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 
