@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -439,8 +439,19 @@ That closes the series. Structured output fixed the response contract. Tool call
 
 ## References
 
-- <https://console.groq.com/docs/errors>
-- <https://en.wikipedia.org/wiki/Token_bucket>
-- <https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm>
+### Official Docs
+
+- [Groq errors guide](https://console.groq.com/docs/errors)
+- [Wikipedia: Token bucket](https://en.wikipedia.org/wiki/Token_bucket)
+- [Kong Engineering: scalable rate limiting algorithm](https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm)
+
+### Verification-Friendly References
+
+- [HTTP Semantics — Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#field.retry-after)
+
+### Related Series
+
+- [Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
+- [LLM API Production 101 series](../)
 
 Tags: LLM, OpenAI, Streaming, Python

@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 속도 제한 관리 — Rate Limit 대응 패턴
-seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
+seo_description: 토큰 버킷과 슬라이딩 윈도우로 429 전에 요청 흐름을 제어하는 rate limit 패턴을 다룹니다.
 ---
 
 # 속도 제한 관리 — Rate Limit 대응 패턴
@@ -345,9 +345,12 @@ def limited_completion_with_429(prompt: str) -> str:
 ## 참고 자료
 
 ### 공식 문서
-- <https://console.groq.com/docs/errors>
-- <https://en.wikipedia.org/wiki/Token_bucket>
-- <https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm>
+- [Groq errors guide](https://console.groq.com/docs/errors)
+- [Wikipedia: Token bucket](https://en.wikipedia.org/wiki/Token_bucket)
+- [Kong Engineering: scalable rate limiting algorithm](https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm)
+
+### 검증 보조 자료
+- [HTTP Semantics — Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#field.retry-after)
 
 ### 관련 시리즈
 - [재시도와 오류 처리 — 안정적인 API 호출 만들기](./05-retry-and-error-handling.md)
