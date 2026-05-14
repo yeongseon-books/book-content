@@ -113,9 +113,9 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 ## 왜 공급자 대체 실습도 충분히 도움이 될까
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.en.png)
+![최소 실행 예제](../../../assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.ko.png)
 
-*Minimal runnable example*
+*최소 실행 예제*
 
 독자가 항상 HyperCLOVA X나 Solar 키를 갖고 있는 것은 아닙니다. 예제가 실행되지 않으면 프롬프트 설계 교훈도 추상적으로 남습니다. 대체 공급자를 써도 오래 가는 부분은 충분히 배울 수 있습니다. 마지막 단계에서 endpoint와 인증 헤더만 바꾸면, 같은 system 메시지, 샘플링 설정, 응답 검증 로직을 그대로 재사용할 수 있기 때문입니다.
 
@@ -144,9 +144,9 @@ print(response.choices[0].message.content)
 
 ### Step 2 — Constrain output format (force JSON)
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.en.png)
+![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.ko.png)
 
-*What to notice in this code*
+*이 코드에서 주목할 점*
 
 ```python
 import json
@@ -218,9 +218,9 @@ clean = sanitize(validate(raw))
 
 ### Step 5 — Switching to HyperCLOVA / Solar (concept)
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.en.png)
+![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/05/05-03-where-engineers-get-confused.ko.png)
 
-*Where engineers get confused*
+*엔지니어가 헷갈리는 지점*
 
 ```python
 # Solar (Upstage) call — OpenAI SDK compatible

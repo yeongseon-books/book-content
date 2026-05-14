@@ -110,9 +110,9 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 
 ## 왜 dense 기준선부터 시작할까
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.en.png)
+![최소 실행 예제](../../../assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.ko.png)
 
-*Minimal runnable example*
+*최소 실행 예제*
 
 BGE-M3가 dense, sparse, multi-vector 신호를 한꺼번에 낸다고 해서 첫날부터 셋을 모두 합칠 필요는 없습니다. dense 기준선만 놓고 KoSimCSE와 비교하지 않으면, 나중에 개선이 sparse에서 왔는지 dense에서 왔는지, 아니면 가중치 조합 덕분인지 알 수 없습니다. 가장 단순한 dense + `IndexFlatIP` 조합에 Recall@5를 한 번 찍어 두는 일 자체가 이후 모든 실험의 기준점이 됩니다.
 
@@ -153,9 +153,9 @@ print('dim =', embeddings.shape[1])  # 1024
 
 ### Step 3 — Search English+Korean documents with a Korean query
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.en.png)
+![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/03/03-02-what-to-notice-in-this-code.ko.png)
 
-*What to notice in this code*
+*이 코드에서 주목할 점*
 
 ```python
 query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.'
@@ -203,9 +203,9 @@ for score, idx in zip(en_dist[0], en_idx[0]):
 
 ## 이 코드에서 먼저 봐야 할 점
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.en.png)
+![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/03/03-03-where-engineers-get-confused.ko.png)
 
-*Where engineers get confused*
+*엔지니어가 헷갈리는 지점*
 
 - 한국어 문서와 영어 문서는 **하나의 모델**로 인코딩해 하나의 인덱스에 넣습니다. BGE-M3에서는 언어별 인덱스를 따로 둘 필요가 거의 없습니다.
 - 테스트 케이스에 정답 문서 언어를 섞어 넣어야 진짜 다국어 성능이 드러납니다.

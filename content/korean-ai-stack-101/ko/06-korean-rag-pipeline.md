@@ -160,9 +160,9 @@ index.add(vectors)
 
 ### Step 2 — retrieval
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.en.png)
+![최소 실행 예제](../../../assets/korean-ai-stack-101/06/06-01-minimal-runnable-example.ko.png)
 
-*Minimal runnable example*
+*최소 실행 예제*
 
 ```python
 def retrieve(question: str, top_k: int = 2) -> list[dict]:
@@ -181,9 +181,9 @@ for h in hits:
 
 ### Step 3 — generation
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.en.png)
+![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/06/06-02-what-to-notice-in-this-code.ko.png)
 
-*What to notice in this code*
+*이 코드에서 주목할 점*
 
 ```python
 from groq import Groq
@@ -236,9 +236,9 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 
 ## 자주 하는 실수
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.en.png)
+![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/06/06-03-where-engineers-get-confused.ko.png)
 
-*Where engineers get confused*
+*엔지니어가 헷갈리는 지점*
 
 1. **더 강한 LLM이 RAG를 구해 준다고 믿는 것** — 검색이 틀린 청크를 가져오면 GPT-4o든 Claude Opus든 틀린 답을 냅니다. 먼저 Recall@k를 측정해야 합니다.
 2. **검색 점수를 로깅하지 않는 것** — 답변만 보면 어느 단계가 깨졌는지 알 수 없습니다. 검색 결과, 점수, 선택된 청크 ID를 항상 함께 남겨야 합니다.

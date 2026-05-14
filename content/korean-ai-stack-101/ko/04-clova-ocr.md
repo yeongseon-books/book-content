@@ -111,9 +111,9 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 
 ## 왜 mock payload부터 시작할까
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.en.png)
+![최소 실행 예제](../../../assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.ko.png)
 
-*Minimal runnable example*
+*최소 실행 예제*
 
 OCR 연동의 대부분은 API 호출 이후에서 아픕니다. 팀들은 인증보다 행 순서가 꼬이거나 줄이 잘못 합쳐지는 문제를 먼저 만납니다. mock payload를 코드 안에 먼저 재현하면, CI가 같은 입력을 항상 같은 방식으로 검증할 수 있고, 실제 키가 생겼을 때도 달라지는 부분은 응답을 받아 오는 한 줄뿐입니다.
 
@@ -142,9 +142,9 @@ MOCK_RESPONSE = {
 
 ### Step 2 — Reconstruct lines
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.en.png)
+![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.ko.png)
 
-*What to notice in this code*
+*이 코드에서 주목할 점*
 
 ```python
 def reconstruct_lines(payload):
@@ -204,9 +204,9 @@ print(doc)
 
 ### Step 5 — Swap in the real API call (optional)
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.en.png)
+![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/04/04-03-where-engineers-get-confused.ko.png)
 
-*Where engineers get confused*
+*엔지니어가 헷갈리는 지점*
 
 ```python
 import os, requests

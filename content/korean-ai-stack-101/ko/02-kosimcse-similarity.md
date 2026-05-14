@@ -144,9 +144,9 @@ index.add(embeddings)
 
 ### Step 3 — Search a query
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.en.png)
+![최소 실행 예제](../../../assets/korean-ai-stack-101/02/02-01-minimal-runnable-example.ko.png)
 
-*Minimal runnable example*
+*최소 실행 예제*
 
 ```python
 query = '로그인 비밀번호를 다시 설정하고 싶어요.'
@@ -184,9 +184,9 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## 이 코드에서 먼저 봐야 할 점
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.en.png)
+![이 코드에서 주목할 점](../../../assets/korean-ai-stack-101/02/02-02-what-to-notice-in-this-code.ko.png)
 
-*What to notice in this code*
+*이 코드에서 주목할 점*
 
 - 인덱스는 전체 답변이 아니라 **질문 문자열**을 저장합니다.
 - `normalize_embeddings=True`는 inner product를 코사인 유사도와 같게 만들어 줍니다.
@@ -195,9 +195,9 @@ print(f"Recall@1 = {hits / len(test_cases):.2f}")
 
 ## 자주 하는 실수
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.en.png)
+![엔지니어가 헷갈리는 지점](../../../assets/korean-ai-stack-101/02/02-03-where-engineers-get-confused.ko.png)
 
-*Where engineers get confused*
+*엔지니어가 헷갈리는 지점*
 
 - **정규화를 빼먹는 것** — `normalize_embeddings=True` 없이 `IndexFlatIP`를 쓰면 긴 문장이 부당하게 높은 점수를 받습니다.
 - **다른 모델로 인코딩하는 것** — 코퍼스는 KoSimCSE, 쿼리는 BGE-M3로 만들면 거리가 무의미해집니다. 항상 같은 모델을 쓰세요.
