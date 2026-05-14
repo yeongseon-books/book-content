@@ -3,7 +3,7 @@ title: Documentation — README, MkDocs, API Reference
 series: python-package-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - README
 - API Reference
 - Sphinx
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A README is the front door of your package and an API Reference is
   the manual for every function. A package without docs does not get used.
 ---
 
 # Documentation — README, MkDocs, API Reference
 
-This is post 9 in the Python Package 101 series.
+Even a solid package gets ignored if a reader cannot figure out installation and the first useful call within half a minute. Documentation is not decoration around code; it is part of the product surface.
 
-> Python Package 101 series (9/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 9 in the Python Package 101 series. Here we connect README, guides, and API reference into a documentation stack that helps users decide, start, and verify.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 9 in the Python Package 101 series.
 - How do you deploy documentation to GitHub Pages?
 
 > A README is the front door of your package and an API Reference is the manual for every function. A package without docs does not get used.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -65,6 +59,9 @@ README.md          →  30-second decision: install, quick start
 docs/guide.md      →  5-minute tutorial: main features
 docs/api.md        →  detailed reference: specs for every function/class
 ```
+
+![Mental Model](../../../assets/python-package-101/09/09-01-mental-model.en.png)
+*How README, guides, and API reference fit together into a documentation site*
 
 ## Core Concepts
 
@@ -287,7 +284,7 @@ MkDocs + Material theme is the de facto standard in the Python ecosystem today. 
 The next post covers **production package template** — cookiecutter, copier, and GitHub Template.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -309,4 +306,4 @@ The next post covers **production package template** — cookiecutter, copier, a
 - [Google Python Style Guide - Docstrings](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - [Write the Docs - Documentation Guide](https://www.writethedocs.org/guide/)
 
-Tags: Python, Documentation, MkDocs, README, API Reference, Sphinx
+Tags: Python, Packaging, PyPI, pyproject.toml
