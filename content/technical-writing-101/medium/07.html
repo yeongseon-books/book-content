@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Writing the README</h1>
-<p>This is post 7 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can a <em>first-time visitor</em> run the project in <em>five minutes</em> using only the <em>README</em>?</p>
-<blockquote>
-<p>A <em>kind entrance</em> makes the whole <em>house</em> feel <em>kind</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Most readers decide whether to stay in a repository before they inspect a single source file. If the README hides the purpose, the install path, or the first success, the project already feels expensive to approach.</p>
+<p>A strong README does not try to explain everything. It lowers entry friction. It tells the reader what this project is, why it exists, how to try it quickly, and what result should appear when the happy path works.</p>
+<p>This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The <em>five part</em> structure</li>
 <li>Writing the <em>Quick Start</em></li>
@@ -76,13 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>The <em>README</em> is the <em>first impression</em> of a project.</p>
+<blockquote>
+<p>Mental model: the README should get a first-time visitor to a visible success with minimal scrolling.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    W[What] --&gt; Y[Why]
-    Y --&gt; H[How]
-    H --&gt; D[Demo]
-    D --&gt; L[License]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>What</strong>: What it <em>is</em>.</li>
@@ -94,6 +84,21 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "A <em>Python</em> package called <em>Hello</em>."</p>
 <p><strong>After</strong>: A README with all <em>five</em> parts.</p>
+<h2>Treat the README like a five-minute contract</h2>
+<p>You can compress the first-run path near the top of the README like this.</p>
+<pre><code class="language-markdown">## Quick Start
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">Uvicorn running on http://127.0.0.1:8000
+</code></pre>
+<p>This pattern works because install, run, and proof live in one screen. The reader does not need to absorb the whole backstory before seeing a first success. Once the project feels runnable, the rest of the README becomes easier to trust.</p>
 <h2>Hands-on: Five README Parts</h2>
 <p><strong>Step 1 — What</strong></p>
 <pre><code class="language-markdown"># greeter
