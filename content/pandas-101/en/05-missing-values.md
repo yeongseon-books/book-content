@@ -2,7 +2,7 @@
 series: pandas-101
 episode: 5
 title: Handling Missing Values
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Python
   - Beginner
 seo_description: Handle missing data with isna, dropna, fillna, and interpolate — learn the standard patterns and the why behind each choice
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Handling Missing Values
 
+Real datasets are rarely complete. Sensors miss readings, surveys leave blanks behind, and transaction pipelines drop fields at inconvenient moments. That means missing-value handling is not cosmetic cleanup. It is one of the choices that most directly shapes the credibility of your analysis.
+
 This is post 5 in the Pandas 101 series.
 
-> Pandas 101 series (5/10)
+In this chapter, I will treat `NaN` as a signal to interpret before it becomes a value to drop or fill. The right first question is not “which method should I use?” but “why is this value missing at all?”
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Are *missing values* *something to drop*, or *something to model*?
-
-> *Missing values are *messages from your data*. If you do not know *why* a value is missing, you do not know *how* to fill it.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The meaning of *NaN* and its *dtype* impact
 - How to use *isna / dropna / fillna*
@@ -42,18 +36,16 @@ This is post 5 in the Pandas 101 series.
 - A 5-step missing-value hands-on
 - Five common mistakes
 
+> A missing value can mean bad data, but it can also mean an incomplete process. If you fill or drop before you understand the cause, the table may look cleaner while the interpretation gets worse.
+
 ## Why It Matters
 
 Real data is *full of missing values*. How you handle them decides *model performance* and *analysis credibility*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Detect["isna / sum"] --> Decide["why missing?"]
-    Decide --> Drop["dropna"]
-    Decide --> Fill["fillna / interpolate"]
-```
+![A missing-data workflow that starts with cause before drop or fill](../../../assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
+*A missing-data workflow that starts with cause before drop or fill*
 
 ## Key Terms
 
@@ -78,6 +70,16 @@ import numpy as np, pandas as pd
 df = pd.DataFrame({"x": [1, np.nan, 3], "y": [np.nan, 2, 3]})
 print(df.isna())
 print(df.isna().sum())
+```
+
+Start by measuring the pattern, not by choosing a cleanup tool. A one-line diagnostic already tells you where the missingness is concentrated and which columns deserve a closer look.
+
+**Expected output:**
+
+```text
+x    1
+y    1
+dtype: int64
 ```
 
 ### Step 2 — Drop
@@ -106,6 +108,18 @@ print(df.fillna(method="bfill"))
 ```python
 ts = pd.Series([1.0, np.nan, np.nan, 4.0])
 print(ts.interpolate())
+```
+
+Interpolation preserves the shape of a gradual numeric trend better than a blunt constant fill. Time series work is where that difference becomes immediately visible.
+
+**Expected output:**
+
+```text
+0    1.0
+1    2.0
+2    3.0
+3    4.0
+dtype: float64
 ```
 
 ## What to Notice in This Code
@@ -147,7 +161,7 @@ Sensor streams, surveys, transaction logs — the *missingness pattern itself* i
 2. Print *row counts before and after dropna*.
 3. Compare *ffill* and *interpolate* on a *time series* and inspect differences.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Missing-value handling decides *analysis integrity*. Next we cover *groupby*.
 
@@ -157,11 +171,11 @@ Missing-value handling decides *analysis integrity*. Next we cover *groupby*.
 - [Reading CSV and Excel](./03-read-csv-and-excel.md)
 - [Filtering and Selection](./04-filtering-and-selection.md)
 - **Handling Missing Values (current)**
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References
