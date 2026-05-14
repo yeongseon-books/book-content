@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 9
 title: Static vs Dynamic Languages
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Tradeoffs
   - Safety
 seo_description: Static vs dynamic is not better vs worse. It is a choice about when checking happens. See the same function in both forms and weigh the tradeoffs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Static vs Dynamic Languages
 
+People often say static typing is safer, but the moment you ask what that safety really covers, the answer gets fuzzy. The same thing happens on the other side: dynamic languages are called faster, when the real question is faster in what sense and for which stage of work.
+
 This is post 9 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is static typing really "safer" than dynamic typing — and what does that safety actually cover?
-
-> Static and dynamic are not good and bad. They are a choice between **checking at compile time or at run time**. Both catch the same kinds of errors, but at different moments and at different costs. Neither stops every bug.
-
-<!-- a-grade-intro:end -->
+In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
 
 ## What You Will Learn
 
@@ -51,14 +45,9 @@ Every team debates "should we add more types?" Holding that conversation well re
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["source"] --> B{"when is type checked?"}
-    B -->|compile time| C["static: errors blocked before run"]
-    B -->|run time| D["dynamic: only known when hit"]
-    C --> E["TypeError breaks the build"]
-    D --> F["TypeError fires in production"]
-```
+![The same type error surfacing at build time in static typing and at runtime in dynamic typing](../../../assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
+
+*The same type error surfacing at build time in static typing and at runtime in dynamic typing*
 
 The same kind of bug — caught by static at build time, by dynamic at run time.
 
@@ -178,6 +167,32 @@ call_all(ops, 3, 4)
 
 Metaprogramming and plugin patterns are possible in static typing too, but usually with more boilerplate. Dynamic expressiveness shows up here.
 
+### Step 6 — Combine boundary validation with static checking
+
+```python
+# 6_boundary_validation.py
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Item:
+    price: int
+
+
+def parse_item(raw: dict[str, object]) -> Item:
+    price = raw.get("price")
+    if not isinstance(price, int):
+        raise ValueError("price must be int")
+    return Item(price=price)
+
+
+payload = {"price": 10}
+item = parse_item(payload)
+print(item.price + 5)  # 15
+```
+
+This is the common production pattern. Runtime validation narrows uncertain external input first, then static typing takes over inside the codebase and gives you stronger refactoring support.
+
 ## What to Notice in This Code
 
 - Static typing's guarantee ends where external input begins.
@@ -242,7 +257,9 @@ Static and dynamic are not better and worse — they are tradeoffs. In the final
 
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
+- [Pyright documentation](https://microsoft.github.io/pyright/)
 - [TypeScript Handbook — Basic Types](https://www.typescriptlang.org/docs/handbook/2/basic-types.html)
-- [Gradual typing (Wikipedia)](https://en.wikipedia.org/wiki/Gradual_typing)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 
 Tags: Computer Science, Programming Languages, StaticTyping, DynamicTyping, Tradeoffs, Safety
