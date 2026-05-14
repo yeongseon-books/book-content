@@ -79,14 +79,8 @@
 <p>Debugging is less about finding what is broken and more about <strong>confirming, one layer at a time, what is fine</strong>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart TB
-    A[&quot;User: the site is down&quot;] --&gt; B[&quot;1. Link/path: ping, traceroute&quot;]
-    B --&gt; C[&quot;2. Name resolution: dig&quot;]
-    C --&gt; D[&quot;3. TCP connect: nc, ss&quot;]
-    D --&gt; E[&quot;4. TLS: openssl s_client&quot;]
-    E --&gt; F[&quot;5. HTTP: curl -v&quot;]
-    F --&gt; G[&quot;6. Packets: tcpdump&quot;]
-</code></pre>
+<p><img alt="Layer-by-layer order for narrowing a network incident" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>Start with the simplest tools, mark healthy layers off quickly, and leave packet capture for the few hypotheses that survive.</em></p>
 <p>Each step you confirm as healthy cuts the hypothesis space roughly in half.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -159,6 +153,24 @@ dig +trace api.example.com   # walks the delegation chain
 <pre><code class="language-bash">curl -v https://api.example.com/health
 </code></pre>
 <p><code>-v</code> is the point. It shows DNS, TCP connect, TLS negotiation, request headers, and response headers in one go. If you reach a 4xx or 5xx response, the problem is no longer the network — it is the application. If everything looks healthy here, suspicion shifts to the client environment.</p>
+<h2>Step 6: Use the failure shape to guess the layer immediately</h2>
+<p>Even before you run all five commands, the failure shape tells you which layer deserves the next minute.</p>
+<p><strong><code>Could not resolve host</code></strong><br>
+- Most likely layer: DNS<br>
+- Immediate next action: <code>dig +short</code>, then <code>dig +trace</code></p>
+<p><strong><code>Connection refused</code></strong><br>
+- Most likely layer: TCP / process<br>
+- Immediate next action: Check <code>ss -tlnp</code> on the server</p>
+<p><strong><code>Operation timed out</code></strong><br>
+- Most likely layer: Firewall / path<br>
+- Immediate next action: Check <code>traceroute</code>, security groups, ACLs</p>
+<p><strong><code>SSL certificate problem</code></strong><br>
+- Most likely layer: TLS<br>
+- Immediate next action: Run <code>openssl s_client -servername ...</code></p>
+<p><strong><code>HTTP/1.1 502</code> or <code>503</code></strong><br>
+- Most likely layer: App / LB<br>
+- Immediate next action: Check <code>/health</code>, upstream status, app logs</p>
+<p>The goal is not to memorize canned answers. It is to recognize <strong>which layer's language</strong> the error message is written in. Once that habit forms, half the hypotheses disappear before <code>tcpdump</code> even enters the conversation.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Each tool eliminates a different hypothesis: <code>ping</code> for link, <code>dig</code> for name, <code>nc</code> for port, <code>openssl</code> for cert, <code>curl</code> for application behavior.</li>
@@ -224,6 +236,8 @@ dig +trace api.example.com   # walks the delegation chain
 <li><a href="https://www.wireshark.org/docs/wsug_html_chunked/">Wireshark User's Guide</a></li>
 <li><a href="https://man7.org/linux/man-pages/man8/ss.8.html"><code>ss(8)</code> Linux Manual</a></li>
 <li><a href="https://wizardzines.com/zines/networking/">Julia Evans — Networking debugging zines</a></li>
+<li><a href="https://curl.se/docs/manpage.html">curl Manual</a></li>
+<li><a href="https://docs.openssl.org/master/man1/openssl-s_client/">OpenSSL <code>s_client</code> documentation</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Networking, Debugging, tcpdump, Troubleshooting, Diagnostics</p>
 </body>
