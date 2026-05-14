@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Human-in-the-loop does not abandon automation; it inserts human judgment
   only at the points where automation is risky.
 ---
@@ -341,8 +341,8 @@ This series covered six core LLM application patterns — chatbot, RAG Q&A, docu
 
 ## References
 
-- [LangGraph HITL guide](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/)
-- [Human-AI interaction design](https://arxiv.org/abs/2108.00018)
-- [Confidence calibration](https://en.wikipedia.org/wiki/Calibration_(statistics))
+- [LangGraph human-in-the-loop guide](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/)
+- [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework)
+- [Python `json` module documentation](https://docs.python.org/3/library/json.html)
 
 Tags: LLM, RAG, Agent, Python
