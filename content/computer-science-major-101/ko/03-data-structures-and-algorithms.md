@@ -17,7 +17,8 @@ tags:
   - Complexity
   - Beginner
 seo_description: 자료구조와 알고리즘 과목의 핵심 개념, 복잡도, 학습 순서, 코딩 인터뷰 연결을 정리한 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 자료구조와 알고리즘
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    D[Data Structure] --> A[Algorithm]
-    A --> C[Complexity]
-    C --> P[Problem Solving]
-    P --> I[Interview]
-```
+![자료구조와 알고리즘 연결 구조](../../../assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.ko.png)
+
+*자료구조 선택과 알고리즘 판단이 문제 해결로 이어지는 흐름*
 
 > 자료구조는 데이터를 담는 방식이고, 알고리즘은 그 데이터를 처리하는 절차이며, 복잡도는 그 선택의 비용표입니다.
 

@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 3
 title: Data Structures and Algorithms
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - Complexity
   - Beginner
 seo_description: A beginner-friendly tour of data structures and algorithms covering complexity, study order, and interview preparation.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Data Structures and Algorithms
@@ -48,13 +49,9 @@ This is post 3 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    D[Data Structure] --> A[Algorithm]
-    A --> C[Complexity]
-    C --> P[Problem Solving]
-    P --> I[Interview]
-```
+![DSA problem-solving flow](../../../assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
+
+*How data structures and algorithms feed problem solving*
 
 ## Key Terms
 
