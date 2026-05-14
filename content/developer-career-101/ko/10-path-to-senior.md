@@ -11,13 +11,14 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Senior
-  - Growth
-  - Leadership
-  - Beginner
-seo_description: 주니어 개발자가 시니어로 도약하기 위해 필요한 기술적 깊이와 아키텍처 설계 역량, 그리고 팀의 성장을 돕는 리더십 기술을 종합적으로 다룹니다.
-last_reviewed: '2026-05-12'
+- Career
+- Senior
+- Growth
+- Leadership
+- Beginner
+seo_description: 주니어 개발자가 시니어로 도약하기 위해 필요한 기술적 깊이와 아키텍처 설계 역량, 그리고 팀의 성장을 돕는 리더십 기술을
+  종합적으로 다룹니다.
+last_reviewed: '2026-05-14'
 ---
 
 # 시니어로 가는 길
@@ -49,12 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    J[Junior] --> M[Mid]
-    M --> S[Senior]
-    S --> L[Lead]
-```
+![주니어에서 리드로 확장되는 성장 단계](../../../assets/developer-career-101/10/10-01-concept-at-a-glance.ko.png)
+
+*주니어에서 리드로 확장되는 성장 단계*
 
 주니어에서 시니어로 가는 핵심 변화는 실행량보다 책임 범위입니다. 주어진 문제를 잘 푸는 단계에서, 어떤 문제가 중요한지 정의하고 주변의 판단 수준을 함께 끌어올리는 단계로 이동해야 합니다.
 
@@ -122,6 +120,15 @@ Write the "problem", not the "symptom".
 
 시니어가 된 뒤에도 학습은 멈추지 않습니다. 오히려 범위가 넓어질수록 무엇을 배우고 무엇을 버릴지 더 의식적으로 조정해야 합니다.
 
+## 시니어로 가는 성장 사다리
+
+| 단계 | 주로 하는 일 | 다음 단계로 가려면 |
+| --- | --- | --- |
+| 주니어 | 주어진 문제를 안정적으로 푼다 | 맥락 질문과 회고를 늘립니다. |
+| 미드 | 일을 스스로 구조화한다 | 설계 이유와 대안을 문서로 남깁니다. |
+| 시니어 | 중요한 문제를 정의하고 우선순위를 세운다 | 팀 기준과 동료 성장까지 책임집니다. |
+| 그 이후 | 조직 차원의 방향과 기준에 영향 준다 | 반복 가능한 시스템을 만듭니다. |
+
 ## 이 예시에서 먼저 볼 점
 
 - 문서가 영향력을 증폭합니다.
@@ -180,7 +187,7 @@ Write the "problem", not the "symptom".
 
 ## 참고 자료
 
-- [Staff Engineer book](https://staffeng.com/book)
+- [Staff Engineer](https://staffeng.com/)
 - [The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
 - [Engineering Ladders](https://github.com/jorgef/engineeringladders)
 - [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
