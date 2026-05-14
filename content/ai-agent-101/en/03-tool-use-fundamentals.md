@@ -15,7 +15,7 @@ tags:
 - Tool Use
 - Function Calling
 - Integration
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: Agents differ from simple conversational models because they can
   use tools. They can call weather APIs, query databases, read and write files.
 ---
@@ -1127,16 +1127,9 @@ if result["success"]:
 
 ## References
 
-1. **OpenAI Function Calling Guide** - https://platform.openai.com/docs/guides/function-calling  
-   Official OpenAI Function Calling documentation. Covers tool schema design, tool_choice parameter, and practical examples.
-
-2. **LangChain Tools Documentation** - https://python.langchain.com/docs/modules/agents/tools/  
-   LangChain framework's tool system. Discusses custom tool creation, error handling, and tool composition patterns.
-
-3. **Toolformer: Language Models Can Teach Themselves to Use Tools** - https://arxiv.org/abs/2302.04761  
-   Meta AI research paper. Presents methods for LLMs to learn tool use autonomously.
-
-4. **Anthropic Tool Use Best Practices** - https://docs.anthropic.com/claude/docs/tool-use  
-   Claude API tool use guide. Explains error handling, retry strategies, and security considerations.
+- [OpenAI function calling guide](https://platform.openai.com/docs/guides/function-calling)
+- [Anthropic tool use overview](https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview)
+- [LangChain tools](https://python.langchain.com/docs/concepts/tools/)
+- [JSON Schema reference](https://json-schema.org/understanding-json-schema)
 
 Tags: AI Agent, LLM, Tool Use, Python
