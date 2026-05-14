@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Collaboration Process</h1>
-<p>This is post 8 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do outcomes get better when there are fewer meetings?</p>
-<blockquote>
-<p>Async decisions return time to everyone and leave a written trail.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Products are never built by code alone. Requirements, design decisions, risk checks, rollout timing, and support handoffs all pull multiple people into the same system. When the process is weak, decisions start following habit, hierarchy, or who spoke last instead of what the evidence says.</p>
+<p>More meetings do not solve that problem. They often make it worse by consuming the most expensive resource in the team at the same time: focused human hours. Strong collaboration processes protect that resource by making discussion searchable, narrowing sync time to actual decisions, and leaving a trail that survives time zones and handoffs.</p>
+<p>This is post 8 in the Software Engineering 101 series. In this chapter, we treat RFCs, async comments, decision logs, and handoff notes as concrete engineering tools rather than management overhead.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to write an RFC (Request for Comments)</li>
@@ -80,12 +71,8 @@
 <p>A good process protects people.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;RFC draft&quot;] --&gt; C[&quot;Async comments&quot;]
-    C --&gt; M[&quot;Short decision meeting&quot;]
-    M --&gt; D[&quot;Decision log&quot;]
-    D --&gt; E[&quot;Execution&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>The collaboration flow from RFC draft to async discussion and decision log</em></p>
 <p>Async-first; sync only at the moment of decision.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -144,6 +131,26 @@
 - waiting for token format clarification
 </code></pre>
 <p>The async interface of distributed teams.</p>
+<h2>A collaboration-flow check</h2>
+<p>Good process reduces repeated debate more than it increases written artifacts. Take one recent decision and see whether the RFC, approver, and written outcome are all discoverable without asking around.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Pick one recent change and locate the proposal document or RFC.</li>
+<li>Identify the approver and the moment the decision closed.</li>
+<li>Check whether a handoff note exists for the next person or time zone.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>Strong async discussion keeps sync meetings short and decision-focused.</li>
+<li>A searchable decision log prevents the same argument from restarting later.</li>
+<li>Handoff notes reduce work loss across role or timezone boundaries.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>Different attendees remember the decision differently.</li>
+<li>Comments accumulate, but no approver closes the loop.</li>
+<li>The next owner reconstructs context from chat history instead of a written handoff.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Async-first crosses time zones for free.</li>
