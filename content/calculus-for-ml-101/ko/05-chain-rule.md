@@ -60,13 +60,9 @@ last_reviewed: '2026-05-12'
 
 연쇄 법칙의 흐름은 다음과 같습니다.
 
-```mermaid
-flowchart LR
-    X[x] --> G[g x]
-    G --> F[f g]
-    F --> D[df dx = df dg times dg dx]
-```
+![핵심 개념](../../../assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png)
 
+*연쇄 법칙 흐름: 각 단계의 local derivative를 연결해 전체 미분을 계산합니다.*
 ### 먼저 합성함수를 분리해 봅니다
 
 ```python
