@@ -14,18 +14,25 @@ tags:
 - LLM
 - Dataset
 - Quality
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: A good evaluation dataset mirrors production traffic distribution
   while including enough edge cases.
 ---
 
 # Designing Evaluation Datasets
 
-> AI Evaluation 101 Series (2/10)
-
 A good evaluation dataset mirrors production traffic distribution while including enough edge cases.
 
 This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.
+
+## Questions this chapter answers
+
+- What makes an evaluation dataset representative instead of flattering?
+- Why do production samples, past failures, and deliberately adversarial cases each matter?
+- How large should a smoke suite, regression set, or model-comparison dataset be?
+- When should `expected` contain an exact answer versus keywords or a rubric?
+
+> Mental model: an eval dataset is not a scrapbook of pretty demos. It is an operating sample of the traffic you must protect plus the edge cases that would hurt most if they broke.
 
 ---
 ![Designing evaluation datasets](../../../assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
@@ -199,6 +206,14 @@ The next post covers deterministic metrics — when Exact Match, F1, BLEU, and R
 
 ---
 
+## Operational checklist
+
+- [ ] Sample real production traces instead of relying only on hand-written examples.
+- [ ] Keep regression cases from past incidents in the dataset permanently.
+- [ ] Tag each case with a category so you can slice scores by risk type.
+- [ ] Pick the labeling style per case instead of forcing exact match everywhere.
+- [ ] Version the dataset file so model comparisons stay reproducible.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -216,9 +231,15 @@ The next post covers deterministic metrics — when Exact Match, F1, BLEU, and R
 
 ## References
 
+### Official docs
+
+- [OpenAI Evals](https://github.com/openai/evals)
+- [LangSmith — Evaluation concepts](https://docs.smith.langchain.com/evaluation/concepts)
+- [Weights & Biases Weave — Evaluation datasets](https://weave-docs.wandb.ai/guides/evaluation/)
+
+### Additional reading
+
 - [Hamel Husain — Your AI product needs evals](https://hamel.dev/blog/posts/evals/)
-- [OpenAI — Evals framework](https://github.com/openai/evals)
-- [LangSmith — Dataset best practices](https://docs.smith.langchain.com/evaluation/concepts)
 - [Eugene Yan — Building eval datasets](https://eugeneyan.com/writing/evals/)
 
 Tags: AI Evaluation, LLM, Dataset, Quality
