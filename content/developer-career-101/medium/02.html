@@ -54,18 +54,18 @@
 </head>
 <body>
 <h1>Understanding Roles</h1>
+<p>Saying "I want to be a developer" is still too broad to guide real decisions. Frontend, backend, data, SRE, ML, and mobile roles all ship software, but they optimize for different outcomes, carry different failure modes, and measure success with different signals.</p>
 <p>This is post 2 in the Developer Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What actually differs across frontend, backend, data, SRE, ML, and mobile roles?</li>
+<li>Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?</li>
+<li>How can you tell whether your current role fits you or whether a transition is worth exploring?</li>
+<li>What should you inspect first before moving toward a different role?</li>
+</ul>
 <blockquote>
-<p>Developer Career 101 series (2/10)</p>
+<p>Good role choices start with the responsibility you are willing to own, not with the tool you want to learn next.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you decide which developer <em>role</em> fits you?</p>
-<blockquote>
-<p>Compare responsibilities, tools, and metrics — three axes.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>Six common roles</li>
@@ -77,13 +77,8 @@
 <h2>Why It Matters</h2>
 <p>A bad role fit shortens the path to burnout.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[Frontend] --&gt; B[Backend]
-    B --&gt; D[Data]
-    D --&gt; S[SRE]
-    S --&gt; M[ML]
-    M --&gt; Mo[Mobile]
-</code></pre>
+<p><img alt="Comparison flow across common developer roles" src="https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Comparison flow across common developer roles</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>frontend</strong>: User experience.</li>
@@ -121,6 +116,44 @@ metrics: SLO, MTTR
 tools: PyTorch, MLflow
 metrics: AUC, latency
 </code></pre>
+<h2>Decision frame for comparing roles</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Lens</th>
+<th>Frontend</th>
+<th>Backend</th>
+<th>Data / SRE / ML</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frequent failure mode</td>
+<td>Slow or broken user flow</td>
+<td>Error rate, data integrity, service instability</td>
+<td>Stale data, incident load, weak model quality</td>
+</tr>
+<tr>
+<td>What success feels like</td>
+<td>Users move with less friction</td>
+<td>Systems stay predictable under change</td>
+<td>Reliability, freshness, or model quality improves measurably</td>
+</tr>
+<tr>
+<td>Evidence to inspect early</td>
+<td>Performance metrics, design collaboration</td>
+<td>API contracts, storage boundaries, production metrics</td>
+<td>Pipeline shape, on-call expectations, reproducibility tooling</td>
+</tr>
+<tr>
+<td>Fit question</td>
+<td>Do you enjoy polishing interaction details?</td>
+<td>Do you enjoy data flow and edge cases?</td>
+<td>Do you like operating with metrics and explicit risk?</td>
+</tr>
+</tbody>
+</table>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Responsibility defines the role.</li>
@@ -173,10 +206,10 @@ metrics: AUC, latency
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://web.dev/vitals/">Web Vitals</a></li>
+<li><a href="https://web.dev/vitals/">web.dev — Web Vitals</a></li>
 <li><a href="https://sre.google/books/">Google SRE Book</a></li>
-<li><a href="https://www.lakefs.io/blog/state-of-data-engineering-2024/">State of Data Engineering</a></li>
-<li><a href="https://ml-ops.org/">MLOps Maturity</a></li>
+<li><a href="https://mlops.community/">MLOps Community</a></li>
+<li><a href="https://roadmap.sh/">roadmap.sh — Developer roadmaps</a></li>
 </ul>
 <p class="tags-line">Tags: Career, Roles, Frontend, Backend, Beginner</p>
 </body>
