@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 10
 title: Containers and the Operating System
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Cgroup
   - Isolation
 seo_description: Namespaces, cgroups, and overlayfs — how containers build isolated environments on a shared kernel and how far that isolation actually goes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Containers and the Operating System
 
-This is the final post in the Operating Systems 101 series.
+Containers did not invent a new operating system. They recombine existing OS features so one kernel can host many isolated execution environments, which is why container incidents are usually OS incidents wearing a different label.
 
-> Operating Systems 101 series (10/10)
+That is also why this chapter works as the series finale: every concept we covered earlier — processes, memory, file systems, system calls — reappears here in a more operational form.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do containers differ from virtual machines, and how do they make a shared kernel look like an isolated system?
-
-> Containers are not magic. They are a combination of plain Linux features — namespaces, cgroups, and overlayfs. Every concept from this series — processes, memory, file systems, system calls — reappears inside a container. This article closes the series and bridges OS fundamentals to modern infrastructure.
-
-<!-- a-grade-intro:end -->
+This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ In the container era, knowing the OS means knowing namespaces and cgroups. OOM-k
 ## Concept at a Glance
 
 > A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.
+
+### The layers that create container isolation
+
+![The layers that create container isolation](../../../assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
+*Container isolation is the combined effect of visibility boundaries, resource limits, and reduced privilege on top of one shared kernel.*
 
 ```text
 [VM]                          [Container]
@@ -148,6 +147,20 @@ docker run --rm alpine sh -c "
 
 The "root" inside a default container is weaker than the host root. Capabilities and seccomp slice privilege finely.
 
+## First triage: which OS layer failed first?
+
+When a containerized service breaks, asking only "did the app crash?" is too coarse. A faster question is which OS layer failed first.
+
+| Symptom | First check | Underlying OS layer |
+| --- | --- | --- |
+| Container exits suddenly | `docker ps -a`, exit code, OOM evidence | cgroup memory limit |
+| Works inside, not outside | port mapping, network namespace, policy | namespace / network stack |
+| CPU is available but latency jitters | `docker stats`, throttling, CPU quota | cgroup CPU scheduling |
+| Files disappear or feel slow | overlayfs layers, bind mounts, volumes | file system / overlayfs |
+| Root still cannot do something | capabilities, seccomp, rootless mode | privilege model |
+
+This table turns the vague statement "the container is weird" into a sequence of OS-level first checks. In production, that change in framing usually saves more time than any one command.
+
 ## What to Notice in This Code
 
 - Isolation is the sum of namespaces, cgroups, seccomp, and capabilities
@@ -220,5 +233,7 @@ This series ends here. As a next step, follow the same OS concepts outward into 
 - [Linux cgroups(7)](https://man7.org/linux/man-pages/man7/cgroups.7.html)
 - [Open Container Initiative](https://opencontainers.org/)
 - [Docker — Overview](https://docs.docker.com/get-started/overview/)
+- [Docker rootless mode](https://docs.docker.com/engine/security/rootless/)
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)
 
 Tags: Computer Science, Operating Systems, Containers, Namespace, Cgroup, Isolation
