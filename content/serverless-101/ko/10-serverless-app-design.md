@@ -43,18 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Client["client"] --> API["API Gateway"]
-    API --> Upload["upload fn"]
-    Upload --> S3["object store"]
-    S3 --> Trigger["s3 event"]
-    Trigger --> Queue["queue"]
-    Queue --> Worker["worker fn"]
-    Worker --> DB["dynamo / sql"]
-    Worker --> Notify["notify fn"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
 
+*얇은 엣지 함수와 큐 뒤 워커, 명시적인 상태 저장소가 서버리스 앱의 기본 경계를 이룹니다.*
 이 구조는 서버리스 앱 설계의 기본 원칙을 한 장에 담고 있습니다. 요청 경계에 선 함수는 얇게 유지하고, 시간이 걸리는 작업은 큐 뒤로 넘기고, 처리 완료 상태는 저장소에 남기고, 사용자 알림은 별도 책임으로 분리합니다. 이렇게 해야 각 단계가 독립적으로 확장되고 독립적으로 실패할 수 있습니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -141,6 +132,19 @@ queue_policy = {
 }
 ```
 
+## 장애가 났을 때 어디서 다시 시작할지 정해 두기
+
+실전에서 가장 어려운 질문은 구조 설명보다 “여기서 실패하면 어디서부터 다시 안전하게 시작할 수 있는가”입니다. 아래 정도는 설계 단계에서 바로 답할 수 있어야 합니다.
+
+| 단계 | 흔한 실패 | 먼저 볼 항목 |
+| --- | --- | --- |
+| 업로드 엣지 | 요청 타임아웃, 인증 실패 | 요청 로그, 페이로드 크기, 엣지 지연 |
+| 큐 전달 | 워커가 메시지를 못 받음 | 큐 깊이, 발행 오류, 이벤트 스키마 |
+| 워커 변환 | 중복 처리, 부분 처리 | 멱등 키, 재시도 횟수, DLQ |
+| 알림 | 사용자 미통지 | 알림 큐, 공급자 응답, 재시도 정책 |
+
+이 표가 있으면 장애 대응도 빨라집니다. 업로드는 성공했고 워커만 실패한 상황에서, 굳이 처음부터 전체 흐름을 다시 돌리지 않아도 되기 때문입니다. 단계별 재시작 가능성이 곧 운영 난이도를 크게 낮춥니다.
+
 DLQ는 반복 실패 메시지를 따로 격리해 원인 분석과 재처리를 가능하게 합니다. DLQ가 없으면 메시지는 계속 재시도되거나 조용히 사라지고, 운영자는 뒤늦게 로그를 뒤지면서 원인을 추적해야 합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -211,9 +215,15 @@ DLQ는 반복 실패 메시지를 따로 격리해 원인 분석과 재처리를
 
 ## 참고 자료
 
+### 공식 가이드
+
 - [AWS Serverless Application Lens](https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/welcome.html)
 - [Serverless Patterns Collection](https://serverlessland.com/patterns)
+
+### 아키텍처와 코드
+
 - [Enterprise Integration Patterns](https://www.enterpriseintegrationpatterns.com/)
-- [Idempotency in Serverless](https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/)
+- [Idempotency in AWS Powertools for Lambda](https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/)
+- [AWS serverless samples (GitHub)](https://github.com/aws-samples/serverless-patterns)
 
 Tags: Serverless, Architecture, DesignPattern, Cloud, FinOps
