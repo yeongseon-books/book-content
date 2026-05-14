@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 9
 title: Blog vs Documentation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Documentation
   - Diataxis
   - Beginner
-seo_description: A beginner-friendly tour of the difference between blog posts and official documentation in software engineering teams.
-last_reviewed: '2026-05-04'
+seo_description: Separate blog posts from documentation by ownership, freshness, and canonical truth so teams do not mix the two jobs.
+last_reviewed: '2026-05-15'
 ---
 
 # Blog vs Documentation
 
-This is post 9 in the Technical Writing 101 series.
+A postmortem article can be excellent context and still be the wrong place to store today's official rollout steps. A reference page can be correct and still fail to explain why the team made a controversial design choice. Blogs and docs both help engineering teams, but they do different jobs.
 
-> Technical Writing 101 series (9/10)
+Strong teams do not force one format to replace the other. They separate ownership, freshness rules, and publication goals, then connect the two with deliberate links.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
 
-**Core question**: Why must *blogs* and *official docs* not be *mixed up*?
-
-> Their *lifespan* and *ownership* differ.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - The four quadrants of *Diátaxis*
 - The *lifespan* of blog vs docs
@@ -46,16 +40,13 @@ This is post 9 in the Technical Writing 101 series.
 
 When *kinds of writing* mix up, the *reader* gets *lost*.
 
+> Mental model: blogs preserve context and interpretation, while docs preserve the current truth.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Tut[Tutorial] --> Doc[Documentation]
-    HT[How-to] --> Doc
-    Ref[Reference] --> Doc
-    Exp[Explanation] --> Blog[Blog]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Diátaxis**: A *four quadrant* documentation model.
@@ -69,6 +60,18 @@ flowchart LR
 **Before**: A *blog post* gets cited as *official documentation*.
 
 **After**: *Blogs* hold *experience*; *docs* hold *truth*.
+
+## Separate ownership and freshness before channels
+
+| Dimension | Blog | Documentation |
+| --- | --- | --- |
+| Main owner | Individual author or editorial team | Product or platform owner |
+| Freshness rule | Accurate at the time of writing | Kept current as the source of truth |
+| Reader expectation | Context, experience, interpretation | Procedure, policy, reference |
+| Update style | Revised when needed | Updated alongside code or process changes |
+| Link direction | Points readers to canonical docs | Links out to background and rationale |
+
+The difference matters operationally more than stylistically. A deployment blog post can explain trade-offs well, while the official document must keep today's commands, version limits, and rollout order correct. Mixing those jobs usually hurts both.
 
 ## Hands-on: Mapping the Quadrants
 
