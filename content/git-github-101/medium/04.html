@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Branch basics - create, switch, and compare</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Branch basics - create, switch, and compare</h1>
+<p>Git starts to feel powerful the moment you realize separate lines of work do not require separate folders. Branches give you room to experiment, pause, and compare without losing the safety of a shared main line.</p>
+<p>This is the fourth post in the Git &amp; GitHub 101 series. Here, we focus on creating, switching, and comparing branches before we get to merging them.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>What a branch actually is (it is not a folder copy)</li>
+<li>How to list and create branches with <code>git branch</code></li>
+<li>How to move between branches with <code>git switch</code> (and how it relates to <code>git checkout</code>)</li>
+<li>How <code>HEAD</code> moves together with the current branch</li>
+<li>How to compare two branches using <code>git log</code> and <code>git diff</code></li>
+</ul>
+<h2>Why it matters</h2>
+<p>The real value of Git shows up the moment you have more than one thing in flight. If you need to work on a "login feature" and a "bug fix" in the same folder at the same time, zip backups and copy-pasted folders fall apart fast.</p>
+<p>A branch is a way to keep <strong>multiple lines of work</strong> inside the same repository. Each line accumulates its own commits, and you can merge them when you are ready.</p>
+<ul>
+<li>You can try an experimental change without touching <code>main</code>.</li>
+<li>You can park a feature on its own line until review is done.</li>
+<li>In team work, each person works on their own branch and merges through pull requests.</li>
+</ul>
+<p>This article stops just before merging. We focus on <strong>creating, switching, and comparing</strong> branches. Merge and conflict resolution come in the next article.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A branch is not a folder copy; it is a movable pointer to a specific commit. <code>HEAD</code> is another pointer that marks which of those branch pointers you are currently working on.<br>
+A branch is a <strong>pointer</strong> to a commit. When you make a new commit, the current branch pointer moves one step forward.</p>
+</blockquote>
+<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png"></p>
+<p><em>Mental Model</em><br>
+Two ideas to hold together:</p>
+<ul>
+<li><strong>A branch itself is cheap.</strong> It is roughly a 41-byte file under <code>.git/refs/heads/&lt;name&gt;</code> that stores a commit hash.</li>
+<li><strong><code>HEAD</code> is a second pointer that says "which branch am I on right now."</strong> When you switch branches, <code>HEAD</code> moves with you.</li>
+</ul>
+<p>Once that picture is in your head, behaviors like "I created a branch and disk usage stayed about the same" or "I switched and the files in my working tree changed" stop feeling magical.</p>
+<h2>Core concepts</h2>
+<ul>
+<li><strong>branch</strong>: A movable pointer to a commit. When you make a new commit on it, the pointer moves to that new commit.</li>
+<li><strong><code>main</code></strong>: The conventional default branch. Many older repositories use <code>master</code> for the same role.</li>
+<li><strong><code>HEAD</code></strong>: A special pointer that says "the branch I am working on right now." Most of the time it points to a branch name, and that branch points to a commit, which is the current commit.</li>
+<li><strong><code>git branch</code></strong>: Lists branches when called with no arguments, or creates a new branch when given a name.</li>
+<li><strong><code>git switch</code></strong>: The newer command (Git 2.23+) for moving between branches. With <code>-c</code>, it creates and switches in one step.</li>
+<li><strong><code>git checkout</code></strong>: The older command. It bundled branch switching and file restoration into a single command, which was a frequent source of confusion. Since Git 2.23 those jobs are split into <code>switch</code> (move branches) and <code>restore</code> (restore files). Both old and new commands still work.</li>
+<li><strong>fast-forward</strong>: When two branches sit on the same line of history, merging is just moving a pointer forward. When they have diverged, Git needs a merge commit instead (the topic of the next article).</li>
+</ul>
+<h2>Before-After</h2>
+<p>The same situation - "two pieces of work at once" - looks very different with and without branches.</p>
+<p><strong>Before (folder copies)</strong></p>
+<pre><code class="language-text">$ cp -r project project-feature-login
+$ cp -r project project-bugfix
+</code></pre>
+<ul>
+<li>Whole folders get duplicated, and disk usage balloons.</li>
+<li>You have to remember by hand which folder is the latest and where each change lives.</li>
+<li>There is no standard way to move a change from one folder into another.</li>
+</ul>
+<p><strong>After (Git branches)</strong></p>
+<pre><code class="language-text">$ git branch
+* main
+
+$ git switch -c feature/login
+Switched to a new branch 'feature/login'
+
+$ git branch
+* feature/login
+  main
+</code></pre>
+<ul>
+<li>You stay in one folder and step between two lines of work. The only thing that grows is a tiny file under <code>.git/refs/heads/</code>.</li>
+<li>The <code>*</code> marker shows which branch you are on.</li>
+<li>Merging changes back together has standard tools (<code>merge</code>, <code>rebase</code>).</li>
+</ul>
+<h2>Step-by-step walkthrough</h2>
+<p>We continue with the <code>my-first-repo</code> directory from the previous article. We start in a state where <code>git log --oneline</code> shows three commits.</p>
+<pre><code class="language-text">$ git log --oneline
+e7d2c1a Add author line to README
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
+</code></pre>
+<p><strong>1. Check the current branch</strong></p>
+<pre><code class="language-text">$ git branch
+* main
+</code></pre>
+<p>The <code>*</code> marks the current branch. Only <code>main</code> exists right now.</p>
+<p>The first line of <code>git status</code> shows the same information.</p>
+<pre><code class="language-text">$ git status
+On branch main
+nothing to commit, working tree clean
+</code></pre>
+<p><strong>2. Create a new branch</strong></p>
+<p>Pass a name to <code>git branch</code> and you get a new branch that points to the same commit <code>main</code> points to.</p>
+<pre><code class="language-text">$ git branch feature/login
+$ git branch
+  feature/login
+* main
+</code></pre>
+<p>The <code>*</code> is still on <code>main</code>. <strong>Creating a branch does not move you onto it.</strong></p>
+<p><strong>3. Switch branches</strong></p>
+<p>Use <code>git switch</code> to move.</p>
+<pre><code class="language-text">$ git switch feature/login
+Switched to branch 'feature/login'
+$ git branch
+* feature/login
+  main
+</code></pre>
+<p>To create and switch in one step, use <code>-c</code>.</p>
+<pre><code class="language-text">$ git switch -c feature/signup
+Switched to a new branch 'feature/signup'
+</code></pre>
+<p>The older command spelling does the same thing (both still work).</p>
+<pre><code class="language-text">$ git checkout feature/login           # move
+$ git checkout -b feature/signup       # create and move
+</code></pre>
+<p><strong>4. Make a commit on a branch</strong></p>
+<p>Add a new file on <code>feature/login</code> and commit it.</p>
+<pre><code class="language-text">$ git switch feature/login
+$ echo &quot;login form&quot; &gt; login.md
+$ git add login.md
+$ git commit -m &quot;Add login form draft&quot;
+[feature/login a2b3c4d] Add login form draft
+ 1 file changed, 1 insertion(+)
+ create mode 100644 login.md
+</code></pre>
+<p>Now <code>git log --oneline</code> shows four commits.</p>
+<pre><code class="language-text">$ git log --oneline
+a2b3c4d Add login form draft
+e7d2c1a Add author line to README
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
+</code></pre>
+<p>Switch back to <code>main</code> and the new file disappears (more precisely, that commit is not on <code>main</code>).</p>
+<pre><code class="language-text">$ git switch main
+Switched to branch 'main'
+$ ls
+README.md  notes.md
+$ git log --oneline
+e7d2c1a Add author line to README
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
+</code></pre>
+<p><code>login.md</code> was not deleted; <strong>the commit that introduced it does not exist on <code>main</code></strong>. Switch back to <code>feature/login</code> and the file is there again.</p>
+<p><strong>5. Compare two branches</strong></p>
+<p>Ask which commits <code>feature/login</code> has that <code>main</code> does not.</p>
+<pre><code class="language-text">$ git log --oneline main..feature/login
+a2b3c4d Add login form draft
+</code></pre>
+<p><code>A..B</code> means "commits that are in B but not in A." For a two-way comparison use <code>...</code>.</p>
+<pre><code class="language-text">$ git log --oneline --graph --decorate --all
+* a2b3c4d (feature/login) Add login form draft
+* e7d2c1a (HEAD -&gt; main, feature/signup) Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p><code>--all</code> includes commits from each branch, <code>--graph</code> draws the shape, and <code>--decorate</code> adds the branch labels you see in <code>(HEAD -&gt; main, feature/signup)</code> and <code>(feature/login)</code>.</p>
+<p>For file-level differences use <code>git diff</code>.</p>
+<pre><code class="language-text">$ git diff main feature/login
+diff --git a/login.md b/login.md
+new file mode 100644
+index 0000000..2c4e0d2
+--- /dev/null
++++ b/login.md
+@@ -0,0 +1 @@
++login form
+</code></pre>
+<p><code>/dev/null</code> in the <code>a/</code> slot means "this file did not exist on <code>main</code>."</p>
+<p><strong>6. Rename and delete branches</strong></p>
+<p>The <code>feature/signup</code> branch we created in Step 3 still has no commits of its own and points to the same commit as <code>main</code>. Add a small commit there, rename it, and then delete it.</p>
+<pre><code class="language-text">$ git switch feature/signup
+Switched to branch 'feature/signup'
+$ echo &quot;signup form&quot; &gt; signup.md
+$ git add signup.md
+$ git commit -m &quot;Add signup form draft&quot;
+[feature/signup f1e2d3c] Add signup form draft
+ 1 file changed, 1 insertion(+)
+ create mode 100644 signup.md
+$ git switch main
+Switched to branch 'main'
+</code></pre>
+<p>Rename the branch.</p>
+<pre><code class="language-text">$ git branch -m feature/signup feature/sign-up
+</code></pre>
+<p>Delete a branch you no longer need. Git refuses if it has not been merged yet, as a safety net.</p>
+<pre><code class="language-text">$ git branch -d feature/sign-up
+error: The branch 'feature/sign-up' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature/sign-up'.
+</code></pre>
+<p>If you really want to throw the work away, force the delete with capital <code>-D</code>. This is a frequent source of accidents, so pause once before you press it.</p>
+<pre><code class="language-text">$ git branch -D feature/sign-up
+Deleted branch feature/sign-up (was f1e2d3c).
+</code></pre>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Running <code>git branch &lt;name&gt;</code> and assuming you have moved.</strong> The branch is created, but <code>HEAD</code> does not move. Follow up with <code>git switch &lt;name&gt;</code>, or start with <code>git switch -c &lt;name&gt;</code> from the beginning.</li>
+<li><strong>Switching branches with uncommitted changes.</strong> If your changes do not collide with the target branch, Git carries them along. If they do, Git refuses the switch. A quick <code>git status</code> before switching is the safer habit.</li>
+<li><strong>Confusing <code>git checkout &lt;branch&gt;</code> with <code>git checkout -- &lt;file&gt;</code>.</strong> The old <code>checkout</code> did two different jobs. In the modern split, branches are <code>switch</code> and file restoration is <code>restore</code>, which removes most of the confusion.</li>
+<li><strong>Branch names with spaces, mixed case, or special characters.</strong> They cause friction in team work. Stick to lowercase with <code>-</code> or <code>/</code> separators (for example <code>feature/login</code>, <code>bugfix/null-check</code>).</li>
+<li><strong>Force-deleting a branch that has not yet been merged.</strong> Commits that exist only on that branch and are not referenced elsewhere are hard to recover. Try <code>-d</code> (lowercase) first and decide only after you read the rejection message.</li>
+<li><strong>Pinning <code>HEAD</code> to a commit hash and forgetting (detached HEAD).</strong> <code>git checkout &lt;hash&gt;</code> or <code>git switch --detach &lt;hash&gt;</code> puts you on a commit that does not belong to any branch. Use it for a quick look. If you want to keep changes from that state, create a real branch with <code>git switch -c &lt;name&gt;</code>.</li>
+</ul>
+<h2>In practice</h2>
+<ul>
+<li><strong>Create branches per unit of work</strong>: Agree on prefixes like <code>feature/&lt;summary&gt;</code> and <code>bugfix/&lt;summary&gt;</code> so the intent is visible at a glance.</li>
+<li><strong>The shorter the lifetime, the better</strong>: The longer a branch lives, the further it drifts from <code>main</code> and the harder the eventual merge. Keep slices small enough to close in a day or a few days.</li>
+<li><strong>Run <code>status</code> before you switch</strong>: Run <code>git status -s</code> before moving so you can see anything floating in the working tree or staging area. If you need a quick detour, <code>git stash</code> (covered in a later series) keeps your in-flight changes aside.</li>
+<li><strong>Make <code>git log --graph --all</code> an alias</strong>: Something like <code>git config --global alias.lga "log --oneline --graph --decorate --all"</code> makes it cheap to peek at the branch shape often.</li>
+<li><strong>Polish branch names freely</strong>: If a name reads awkwardly, <code>git branch -m</code> renames it cheaply. Good names line up with PR titles and the commit story stays tidy.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You ran <code>git branch</code> and identified the current branch by the <code>*</code> marker.</li>
+<li>[ ] You walked through <code>git switch -c</code> to create and switch in one step.</li>
+<li>[ ] You made different commits on two branches and inspected them with <code>git log --oneline --graph --decorate --all</code>.</li>
+<li>[ ] You can explain in one sentence what <code>main..feature/login</code> means.</li>
+<li>[ ] You can explain in one sentence how <code>git switch</code> and <code>git checkout</code> differ and why they were split.</li>
+<li>[ ] You know the difference between <code>-d</code> and <code>-D</code> and which one to try first.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a <code>feature/notes</code> branch with <code>git branch</code> only and confirm with <code>git status</code> and <code>git branch</code> that you are still on <code>main</code>.</li>
+<li>Use <code>git switch -c feature/notes-2</code> to create and switch, add a <code>notes.md</code> file, and commit it. Then switch back to <code>main</code> and confirm the file is not visible.</li>
+<li>Run <code>git log --oneline --graph --decorate --all</code> and capture the picture of two branches diverging from a shared commit.</li>
+<li>Run <code>git diff main feature/notes-2</code>, look at the file diff, and write one line about which side <code>/dev/null</code> shows up on.</li>
+<li>Try <code>git branch -d feature/notes-2</code>, read the rejection message, then run <code>git branch -D feature/notes-2</code> and write down what message comes back.</li>
+</ol>
+<h2>Wrap-up and next article</h2>
+<ul>
+<li>A branch is a lightweight pointer to a commit, and <code>HEAD</code> is a second pointer that says "which branch am I on."</li>
+<li><code>git branch &lt;name&gt;</code> creates only, <code>git switch &lt;name&gt;</code> moves only, and <code>git switch -c &lt;name&gt;</code> does both at once.</li>
+<li>Compare branches with <code>git log A..B</code> for the commit list and <code>git diff A B</code> for file content.</li>
+<li><code>git log --oneline --graph --decorate --all</code> is the most common combination for seeing the shape of branches and their labels at a glance.</li>
+</ul>
+<p>The next article picks up from a diverged history and walks through <code>git merge</code>, including a hands-on conflict resolution.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - the basics of distributed version control</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Make your first commit - init, status, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Reading change history - status, diff, log</a></li>
+<li><strong>Branch basics - create, switch, and compare (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
+<li>GitHub repositories and remote connections (upcoming)</li>
+<li>Collaborating with Pull Requests (upcoming)</li>
+<li>Managing work with Issues and Projects (upcoming)</li>
+<li>Writing good commit messages (upcoming)</li>
+<li>A real-world workflow at a glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell">Pro Git Book - Branches in a Nutshell</a></li>
+<li><a href="https://git-scm.com/docs/git-branch">git-branch manual</a></li>
+<li><a href="https://git-scm.com/docs/git-switch">git-switch manual</a></li>
+<li><a href="https://git-scm.com/docs/git-checkout">git-checkout manual</a></li>
+</ul>
+<p class="tags-line">Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch</p>
+</body>
+</html>
