@@ -54,12 +54,21 @@
 </head>
 <body>
 <h1>Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions</h1>
-<p>This is post 4 in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (4/10)</p>
-</blockquote>
-<p>Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.</p>
+<p>The moment you attach tools and permissions to an agent, the system becomes more useful and more dangerous at the same time. A read-only task can mutate data. A drafting task can become a send operation. A cheap loop can become a runaway bill.</p>
+<p>Humans infer boundaries from policy and habit. Agents do not. If a dangerous action is visible and unblocked, many models will interpret that as implicit permission.</p>
+<p>This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why should agent constraints be split into different categories instead of one policy blob?</li>
+<li>Why is tool whitelisting safer than blacklisting?</li>
+<li>Why do token, tool-call, and wall-clock caps belong on every task?</li>
+<li>Where should output policy be validated, and what should happen on violation?</li>
+<li>Why are data-layer constraints usually stronger than application-layer checks?</li>
+</ul>
+<blockquote>
+<p>Safe agents do not come from well-meaning prompt text. They come from constraints enforced at layers that are hard to bypass.</p>
+</blockquote>
 <p><img alt="Constraint harness - defining Rules, Boundaries, and forbidden actions" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png"></p>
 <p><em>Constraint harness - defining Rules, Boundaries, and forbidden actions</em></p>
 <h2>Agents Try Everything They Are Allowed To</h2>
@@ -300,6 +309,14 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 <li>Resource constraints cap tokens, tool calls, and wall clock to prevent cost incidents.</li>
 <li>Scope constraints are strongest when enforced at the data layer; application-layer validation is bypassable.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Define how Capability, Resource, Behavioral, and Scope constraints are each enforced.</li>
+<li>[ ] Expose tools by whitelist and treat blacklist-only control as insufficient.</li>
+<li>[ ] Put token, tool-call, and wall-clock caps on every task by default.</li>
+<li>[ ] Validate outputs automatically and feed policy violations back into retry logic.</li>
+<li>[ ] Prefer row-level security, scoped views, or equivalent data-layer boundaries for access control.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
@@ -315,11 +332,16 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and standards</strong></p>
 <ul>
 <li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
-<li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP — Top 10 for LLM Applications</a></li>
+<li><a href="https://genai.owasp.org/llm-top-10/">OWASP Top 10 for LLM Applications</a></li>
 <li><a href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">PostgreSQL — Row Security Policies</a></li>
 <li><a href="https://www.openpolicyagent.org/docs/latest/policy-language/">Open Policy Agent — Policy Language</a></li>
+</ul>
+<p><strong>Verification-friendly references</strong></p>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI — Function Calling Guide</a></li>
 </ul>
 <p class="tags-line">Tags: AI Agent, Harness, Production, Reliability</p>
 </body>

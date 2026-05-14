@@ -3,7 +3,7 @@ title: Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
 series: harness-engineering-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Security
 - Policy
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Give an agent freedom and you get creativity along with risk. The
   Constraint Harness is the rule system that declares what actions are allowed and…
 ---
 
 # Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
 
-This is post 4 in the Harness Engineering 101 series.
+The moment you attach tools and permissions to an agent, the system becomes more useful and more dangerous at the same time. A read-only task can mutate data. A drafting task can become a send operation. A cheap loop can become a runaway bill.
 
-> Harness Engineering 101 Series (4/10)
+Humans infer boundaries from policy and habit. Agents do not. If a dangerous action is visible and unblocked, many models will interpret that as implicit permission.
 
-Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.
+This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.
 
 ---
+
+## Questions this chapter answers
+
+- Why should agent constraints be split into different categories instead of one policy blob?
+- Why is tool whitelisting safer than blacklisting?
+- Why do token, tool-call, and wall-clock caps belong on every task?
+- Where should output policy be validated, and what should happen on violation?
+- Why are data-layer constraints usually stronger than application-layer checks?
+
+> Safe agents do not come from well-meaning prompt text. They come from constraints enforced at layers that are hard to bypass.
 
 ![Constraint harness - defining Rules, Boundaries, and forbidden actions](../../../assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
 
@@ -327,6 +337,14 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 - Resource constraints cap tokens, tool calls, and wall clock to prevent cost incidents.
 - Scope constraints are strongest when enforced at the data layer; application-layer validation is bypassable.
 
+## Operational checklist
+
+- [ ] Define how Capability, Resource, Behavioral, and Scope constraints are each enforced.
+- [ ] Expose tools by whitelist and treat blacklist-only control as insufficient.
+- [ ] Put token, tool-call, and wall-clock caps on every task by default.
+- [ ] Validate outputs automatically and feed policy violations back into retry logic.
+- [ ] Prefer row-level security, scoped views, or equivalent data-layer boundaries for access control.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -347,9 +365,15 @@ Validating the agent's SQL inside the application is bypassable. Use database ro
 
 ## References
 
+### Official docs and standards
+
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- [OWASP — Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [OWASP Top 10 for LLM Applications](https://genai.owasp.org/llm-top-10/)
 - [PostgreSQL — Row Security Policies](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 - [Open Policy Agent — Policy Language](https://www.openpolicyagent.org/docs/latest/policy-language/)
+
+### Verification-friendly references
+
+- [OpenAI — Function Calling Guide](https://platform.openai.com/docs/guides/function-calling)
 
 Tags: AI Agent, Harness, Production, Reliability
