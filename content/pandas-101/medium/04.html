@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Filtering and Selection</h1>
+<p>Pandas gets confusing fast when you notice that there are several ways to pick rows and columns from the same table. <code>loc</code>, <code>iloc</code>, boolean masks, and <code>query</code> can look interchangeable at first, but they are not. If you do not separate them by intent, selection code becomes harder to read and assignment bugs show up sooner than you expect.</p>
 <p>This is post 4 in the Pandas 101 series.</p>
-<blockquote>
-<p>Pandas 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why are there <em>four ways</em> to <em>pick rows</em> in Pandas?</p>
-<blockquote>
-<p><em>Different intents (label, position, condition) need </em>different tools<em>. Do not force one approach to do everything.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The difference between <em>loc</em> and <em>iloc</em></li>
 <li>The intuition behind <em>boolean indexing</em></li>
@@ -74,15 +65,14 @@
 <li>A 5-step selection hands-on</li>
 <li>Five common mistakes</li>
 </ul>
+<blockquote>
+<p>Pandas does not give you four competing selection tools. It gives you different handles for different intent: labels, positions, and conditions. Matching the tool to the intent keeps code readable.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Every step of analysis</em> involves <em>subset extraction</em>. <em>Slow or wrong selection</em> shakes the <em>whole pipeline</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    DF[&quot;DataFrame&quot;] --&gt; Loc[&quot;loc (label)&quot;]
-    DF --&gt; Iloc[&quot;iloc (position)&quot;]
-    DF --&gt; Bool[&quot;boolean mask&quot;]
-    DF --&gt; Q[&quot;query (string)&quot;]
-</code></pre>
+<p><img alt="Choosing between labels, positions, boolean masks, and query syntax" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Choosing between labels, positions, boolean masks, and query syntax</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>loc</strong>: <em>label-based</em> selection.</li>
@@ -105,6 +95,12 @@ print(df[[&quot;x&quot;, &quot;y&quot;]])
 <pre><code class="language-python">print(df.loc[&quot;a&quot;])
 print(df.loc[[&quot;a&quot;, &quot;c&quot;], &quot;x&quot;])
 </code></pre>
+<p>Label-based selection pays off because the output remains easy to read. The result tells you exactly which rows you asked for, without forcing you to remember positional offsets.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">a    1
+c    3
+Name: x, dtype: int64
+</code></pre>
 <p><strong>Step 3 — iloc</strong></p>
 <pre><code class="language-python">print(df.iloc[0])
 print(df.iloc[0:2, 0])
@@ -116,6 +112,15 @@ print(df[(df[&quot;x&quot;] &gt; 1) &amp; (df[&quot;y&quot;] &lt; 30)])
 <p><strong>Step 5 — query and isin</strong></p>
 <pre><code class="language-python">print(df.query(&quot;x &gt; 1 and y &lt; 30&quot;))
 print(df[df[&quot;x&quot;].isin([1, 3])])
+</code></pre>
+<p>This is where readability starts to matter more than syntax trivia. <code>query</code> keeps longer expressions compact, and <code>isin</code> replaces brittle chains of repeated OR conditions.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">   x   y
+b  2  20
+
+   x   y
+a  1  10
+c  3  30
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
@@ -154,7 +159,7 @@ print(df[df[&quot;x&quot;].isin([1, 3])])
 <li>Use <em>iloc</em> to print the <em>first 5 rows</em>.</li>
 <li>Express <em>two or more conditions</em> with <em>query</em>.</li>
 </ol>
-<h2>Wrap-up and Next Steps</h2>
+<h2>Wrap-up and next steps</h2>
 <p>Selection is the <em>primitive operation of analysis</em>. Next we tackle <em>missing value handling</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
@@ -162,11 +167,11 @@ print(df[df[&quot;x&quot;].isin([1, 3])])
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
 <li><strong>Filtering and Selection (current)</strong></li>
 <li>Handling Missing Values (upcoming)</li>
-<li>groupby (upcoming)</li>
+<li>Groupby and Aggregation (upcoming)</li>
 <li>Merge and Join (upcoming)</li>
 <li>Time Series (upcoming)</li>
-<li>apply and Vectorization (upcoming)</li>
-<li>Real-world Data Analysis (upcoming)</li>
+<li>Apply and Vectorization (upcoming)</li>
+<li>Real-World Data Analysis (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
