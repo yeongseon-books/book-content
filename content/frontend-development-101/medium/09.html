@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Build Tools and Bundling</h1>
-<p>This is post 9 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the <em>hundreds</em> of files we write turn into the <em>one or two</em> files the browser actually downloads?</p>
-<blockquote>
-<p>Build tools <em>collect modules, compress them, and split them</em>. The shape of that output decides the <em>user experience</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.</p>
+<p>This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>role</em> of a bundler (module graph, transform, split)</li>
@@ -80,12 +70,8 @@
 <p>A good bundle is <em>small, cacheable, and split</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Src[&quot;src/*.{js,ts,jsx}&quot;] --&gt; Resolver[&quot;Module resolver&quot;]
-    Resolver --&gt; Trans[&quot;Transformer (Babel/SWC/esbuild)&quot;]
-    Trans --&gt; Bundle[&quot;Bundler&quot;]
-    Bundle --&gt; Out[&quot;dist/*.js + assets&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>How source files move through resolve, transform, bundle, and output stages</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Module bundler</strong>: a tool that <em>follows the import graph</em> and merges files.</li>
@@ -135,6 +121,16 @@ VITE_API_URL=https://api.example.com
 # In code
 const url = import.meta.env.VITE_API_URL;
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Run <code>npm run build</code> and confirm that <code>dist/assets</code> contains hashed output files rather than raw source names.</li>
+<li>Run the bundle analyzer and identify the largest module so you have a concrete optimization target before tuning anything else.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If <code>import.meta.env</code> is undefined, confirm the <code>VITE_</code> prefix and the location of <code>.env.production</code>.</li>
+<li>If the bundle is unexpectedly large, inspect full-library imports, large images, and source-map exposure before chasing smaller details.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The dev server serves <em>ESM directly</em>, so <em>startup is fast</em>.</li>
@@ -184,16 +180,21 @@ const url = import.meta.env.VITE_API_URL;
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/08-styling-and-design-system.md">Styling and Design Systems</a></li>
-<li><strong>Build Tools and Bundling (current)</strong></li>
-<li>Building a Small Frontend App (upcoming)</li>
+<li>
+<p><strong>Build Tools and Bundling (current)</strong></p>
+</li>
+<li>
+<p>Building a Small Frontend App (upcoming)</p>
+</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://vitejs.dev/">Vite docs</a></li>
-<li><a href="https://esbuild.github.io/">esbuild docs</a></li>
-<li><a href="https://web.dev/reduce-javascript-payloads-with-tree-shaking/">web.dev: Reduce JavaScript payloads</a></li>
-<li><a href="https://bundlephobia.com/">Bundlephobia</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://vite.dev/guide/">Vite guide</a><br>
+- <a href="https://esbuild.github.io/">esbuild documentation</a><br>
+- <a href="https://web.dev/reduce-javascript-payloads-with-tree-shaking/">web.dev: Tree shaking and code splitting</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://bundlephobia.com/">Bundlephobia</a><br>
+- <a href="https://github.com/btd/rollup-plugin-visualizer">rollup-plugin-visualizer</a></p>
 <p class="tags-line">Tags: Frontend, Build, Vite, Bundling, Performance</p>
 </body>
 </html>
