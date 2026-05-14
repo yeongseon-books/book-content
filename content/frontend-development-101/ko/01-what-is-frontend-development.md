@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 프론트엔드 개발이란 무엇인가?
 
-이 글은 Frontend Development 101 시리즈의 첫 번째 글입니다.
-
 프론트엔드를 처음 배우면 대개 화면을 예쁘게 만드는 일부터 떠올립니다. 물론 맞는 설명입니다. 하지만 실무에서 프론트엔드는 그보다 훨씬 넓습니다. 브라우저가 화면을 어떻게 그리는지, 사용자 입력을 어떤 흐름으로 처리하는지, 서버와 어떤 경계로 연결되는지까지 함께 이해해야 비로소 전체 그림이 잡힙니다.
 
-이 글에서는 프론트엔드를 단순한 UI 작업이 아니라 브라우저 안에서 실행되는 제품 계층으로 설명하겠습니다. 한 가지 관점이 중요합니다. 프론트엔드는 사용자가 보는 모든 것을 그리는 동시에, 사용자가 느끼는 성능과 신뢰를 직접 결정하는 실행 환경이라는 점입니다.
+이 글은 Frontend Development 101 시리즈의 첫 번째 글입니다. 여기서는 프론트엔드를 단순한 UI 작업이 아니라 브라우저 안에서 실행되는 제품 계층으로 설명합니다. 핵심은 프론트엔드가 사용자가 보는 모든 것을 그리는 동시에, 사용자가 느끼는 성능과 신뢰를 직접 결정하는 실행 환경이라는 점입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    User["User"] --> Browser["Browser"]
-    Browser --> HTML["HTML (structure)"]
-    Browser --> CSS["CSS (style)"]
-    Browser --> JS["JavaScript (behavior)"]
-    JS --> API["Backend API"]
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/01/01-01-diagram.ko.png)
+
+*브라우저, HTML, CSS, JavaScript, API 호출이 한 사용자 경험으로 이어지는 흐름*
 
 브라우저는 HTML, CSS, JavaScript 세 요소를 결합해 화면을 만듭니다. 프론트엔드를 이해한다는 것은 결국 이 세 가지가 언제, 어떻게 함께 동작하는지 이해하는 일입니다.
 
@@ -127,6 +120,16 @@ python3 -m http.server 8000
 
 작은 예제지만 프론트엔드의 핵심 역할이 모두 들어 있습니다. HTML이 구조를 만들고, CSS가 모양을 입히고, JavaScript가 클릭이라는 사용자 행동에 반응합니다. 입문 단계에서 가장 중요한 습관은 결과만 보지 말고 DevTools로 브라우저 내부를 함께 보는 것입니다.
 
+## 검증 포인트
+
+- 브라우저에서 `python3 -m http.server 8000`을 열고 버튼을 눌렀을 때 제목 텍스트가 `Hello, frontend!`로 바뀌는지 확인합니다.
+- DevTools Network 탭에서 `index.html`, `app.js` 같은 정적 파일이 실제로 내려오는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 버튼 클릭이 안 되면 `app.js` 경로와 `id="b"`, `id="t"` 선택자가 정확한지 먼저 확인합니다.
+- 콘솔 오류가 보이면 DevTools Console에서 문법 오류와 `null` 참조를 먼저 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - HTML은 구조, CSS는 모양, JavaScript는 동작을 담당합니다.
@@ -177,6 +180,7 @@ python3 -m http.server 8000
 
 <!-- toc:begin -->
 - **프론트엔드 개발이란 무엇인가? (현재 글)**
+
 - HTML과 CSS 기본 (예정)
 - JavaScript 기본 (예정)
 - 컴포넌트와 상태 (예정)
@@ -190,9 +194,13 @@ python3 -m http.server 8000
 
 ## 참고 자료
 
-- [MDN Web Docs](https://developer.mozilla.org/)
-- [web.dev](https://web.dev/)
-- [Frontend Roadmap](https://roadmap.sh/frontend)
-- [HTML Living Standard](https://html.spec.whatwg.org/)
+### 공식 문서
+- [MDN: How browsers work](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Performance/How_browsers_work)
+- [MDN: Client-side web APIs](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Introduction)
+- [web.dev: Learn HTML](https://web.dev/learn/html/)
+
+### 확인용 자료
+- [Chrome DevTools documentation](https://developer.chrome.com/docs/devtools/)
+- [Frontend Developer Roadmap](https://roadmap.sh/frontend)
 
 Tags: Frontend, Web, JavaScript, HTML, Beginner

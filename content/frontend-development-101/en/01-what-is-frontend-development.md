@@ -22,17 +22,9 @@ last_reviewed: '2026-05-04'
 
 # What Is Frontend Development?
 
-This is the first post in the Frontend Development 101 series.
+Most people enter frontend development through the visual door. They see buttons, colors, and layouts, so the work looks like "making screens pretty." That is part of the job, but it is not the whole job. In production, frontend work also includes understanding how the browser renders, how user input becomes state changes, and where the boundary with the backend actually lives.
 
-> Frontend Development 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Where is *everything the user can see* actually built?
-
-> The frontend is *a tiny operating system that runs inside the browser*. HTML, CSS, and JavaScript are the *languages* of that OS.
-
-<!-- a-grade-intro:end -->
+This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.
 
 ## What You Will Learn
 
@@ -40,6 +32,7 @@ This is the first post in the Frontend Development 101 series.
 - *How a browser draws* a page
 - The *distinct roles* of HTML, CSS, and JavaScript
 - A bird's-eye view of *modern frontend tooling*
+
 - A learning roadmap
 
 ## Why It Matters
@@ -50,14 +43,9 @@ This is the first post in the Frontend Development 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] --> Browser["Browser"]
-    Browser --> HTML["HTML (structure)"]
-    Browser --> CSS["CSS (style)"]
-    Browser --> JS["JavaScript (behavior)"]
-    JS --> API["Backend API"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
+
+*How the browser, HTML, CSS, JavaScript, and API calls combine into one user-facing flow*
 
 The browser *combines* the three languages to draw the screen.
 
@@ -127,6 +115,16 @@ python3 -m http.server 8000
 
 Press `F12` and inspect the Elements, Console, and Network tabs to see *what the browser actually received*.
 
+## Verification
+
+- Run `python3 -m http.server 8000`, open the page, and confirm that clicking the button changes the heading text to `Hello, frontend!`.
+- Open DevTools Network and verify that the browser really downloads `index.html`, `app.js`, and the related static assets.
+
+## If It Fails, Check This First
+
+- If the button does nothing, check the `app.js` path first and confirm that `id="b"` and `id="t"` still match the DOM.
+- If the page looks fine but the interaction fails, inspect the Console for syntax errors or `null` selector references.
+
 ## What to Notice in This Code
 
 - HTML is *structure*, CSS is *appearance*, JS is *behavior*.
@@ -173,6 +171,7 @@ The frontend is *the layer where the product meets the user inside the browser*.
 
 <!-- toc:begin -->
 - **What Is Frontend Development? (current)**
+
 - HTML and CSS Basics (upcoming)
 - JavaScript Basics (upcoming)
 - Components and State (upcoming)
@@ -186,9 +185,13 @@ The frontend is *the layer where the product meets the user inside the browser*.
 
 ## References
 
-- [MDN Web Docs](https://developer.mozilla.org/)
-- [web.dev](https://web.dev/)
-- [Frontend Roadmap](https://roadmap.sh/frontend)
-- [HTML Living Standard](https://html.spec.whatwg.org/)
+### Official Docs
+- [MDN: How browsers work](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Performance/How_browsers_work)
+- [MDN: Client-side web APIs](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Introduction)
+- [web.dev: Learn HTML](https://web.dev/learn/html/)
+
+### Verification and Further Reading
+- [Chrome DevTools documentation](https://developer.chrome.com/docs/devtools/)
+- [Frontend Developer Roadmap](https://roadmap.sh/frontend)
 
 Tags: Frontend, Web, JavaScript, HTML, Beginner
