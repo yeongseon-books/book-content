@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Factory and Dependency Injection</h1>
+<p>Object creation and object composition eventually collapse into one practical question: who builds this thing, where is it wired together, and who passes it in? When domain code starts creating its own repositories, mailers, or event buses, usage and assembly get tangled together.</p>
 <p>This is post 8 in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>When, where, and who</em> should create the objects in our system?</p>
-<blockquote>
-<p>Not inside the domain. Assemble them in <em>one outside place</em> and inject them. That place is the Composition Root, and the tools are Factory and DI.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll look at Factory and Dependency Injection as two parts of the same move. Assembly should happen at an outside entry point, while domain code should receive collaborators and focus on using them.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The cost of scattered creation responsibility</li>
 <li>The role of the Factory</li>
@@ -80,13 +71,8 @@
 <p>Separating "use" from "assembly" makes testing and substitution easy.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Root[&quot;Composition Root (main)&quot;] --&gt; F[&quot;Factory&quot;]
-    F --&gt; Obj[&quot;Object graph&quot;]
-    Root --&gt; Inj[&quot;Inject into domain&quot;]
-    Inj --&gt; Domain[&quot;Domain code&quot;]
-</code></pre>
-<p>Assemble in one place; use in many.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>Factory and DI keep assembly in one place so services can focus on using collaborators instead of constructing them.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Factory</strong>: a function or object that encapsulates creation steps.</li>
@@ -172,6 +158,14 @@ class Container:
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>FastAPI's <code>Depends</code>, Spring's <code>@Autowired</code>, Guice/Dagger, backend selection in Django settings — all DI/Factory in shape. Composition Root thinking carries straight into microservice bootstraps.</p>
+<h2>Quick verification</h2>
+<p>Use this pass to see whether assembly is really outside the domain.</p>
+<ul>
+<li>Search for environment variable reads, SDK constructors, or infrastructure imports inside domain services.</li>
+<li>Build one test that assembles the service entirely from in-memory collaborators.</li>
+<li>Verify that production and test wiring differ only at the Composition Root, not inside business methods.</li>
+</ul>
+<p><strong>Expected outcome:</strong> application services become easy to instantiate in tests, and environment-specific choices stay at the bootstrapping edge.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Always ask "who builds this object?"</li>
@@ -209,11 +203,16 @@ class Container:
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://refactoring.guru/design-patterns/factory-method">Factory Method (refactoring.guru)</a></li>
 <li><a href="https://martinfowler.com/articles/injection.html">Inversion of Control Containers and the Dependency Injection pattern (Martin Fowler)</a></li>
 <li><a href="https://blog.ploeh.dk/2011/07/28/CompositionRoot/">Composition Root (Mark Seemann)</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://fastapi.tiangolo.com/tutorial/dependencies/">FastAPI Dependencies</a></li>
+<li><a href="https://python-dependency-injector.ets-labs.org/providers/index.html">Dependency Injector providers overview</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Factory, DependencyInjection, Composition, IoC</p>
 </body>
