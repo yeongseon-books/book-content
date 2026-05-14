@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Workflows and Jobs</h1>
-<blockquote>
-<p>GitHub Actions 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you say "<em>deploy</em> runs only after <em>test</em> passes"?</p>
-<blockquote>
-<p>The <em>graph of jobs</em> is your <em>pipeline</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 2 in the GitHub Actions 101 series.</p>
+<p>Once you start using GitHub Actions, the next question is rarely about YAML syntax. It is about structure. Should lint and test live in one job? Should deploy wait for build only, or for every earlier check? When does a single workflow become harder to reason about than several smaller ones?</p>
+<p>Those questions are really about pipeline design. A workflow file is only the container. The actual pipeline is the graph of jobs inside it, and the quality of that graph determines both feedback speed and operational safety.</p>
+<p>This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use <code>needs</code>, <code>matrix</code>, and <code>outputs</code> to design a graph that is fast without becoming fragile.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The exact relationship between <em>Workflow / Job / Step</em></li>
@@ -80,11 +71,8 @@
 <p><em>Parallel for speed, dependencies for safety</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Lint[&quot;lint&quot;] --&gt; Build[&quot;build&quot;]
-    Test[&quot;test&quot;] --&gt; Build
-    Build --&gt; Deploy[&quot;deploy&quot;]
-</code></pre>
+<p><img alt="A job graph where lint and test run in parallel before build and deploy" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>A job graph where lint and test run in parallel before build and deploy</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Workflow</strong>: one <em>YAML file</em> equals one workflow.</li>

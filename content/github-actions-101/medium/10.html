@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>A Real-World CI/CD Pipeline</h1>
-<blockquote>
-<p>GitHub Actions 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you weave <em>triggers, tests, lint, artifacts, Docker, deploy, and secrets</em> into <em>one pipeline</em>?</p>
-<blockquote>
-<p><em>A good pipeline is a </em>sum of small steps<em>. Each step stays simple; the composition is explicit.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the final post in the GitHub Actions 101 series.</p>
+<p>The pieces we covered one by one are all useful, but real systems do not run them in isolation. Triggers, tests, lint, artifacts, Docker, deployment, and secret handling eventually meet in one delivery path, and the quality of that composition determines whether the pipeline scales or collapses under its own weight.</p>
+<p>The practical question is not “how many checks can we add?” It is “how clearly can we separate responsibility?” Pull requests need fast feedback. Main needs integration and staging confidence. Tags need traceable release and production promotion. Once those roles are clear, the YAML gets simpler instead of larger.</p>
+<p>This is the final post in the GitHub Actions 101 series. In this post, we will combine the earlier topics into a reusable CI/CD shape that separates PR, <code>main</code>, and tag responsibilities without losing traceability.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Responsibility split</em> across <em>PR, main, and tag</em></li>
@@ -80,11 +71,8 @@
 <p><em>The pieces make you </em>fast<em>. The composition keeps you </em>fast<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    PR[&quot;PR open&quot;] --&gt; Lint[&quot;lint + test + typecheck&quot;]
-    Push[&quot;main push&quot;] --&gt; Build[&quot;build + docker + staging&quot;]
-    Tag[&quot;tag push&quot;] --&gt; Release[&quot;release + production (approval)&quot;]
-</code></pre>
+<p><img alt="A full pipeline split into PR feedback, main integration, and tag-based release promotion" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>A full pipeline split into PR feedback, main integration, and tag-based release promotion</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Reusable workflow</strong>: a <em>shared workflow</em> invoked via <code>workflow_call</code>.</li>
@@ -169,6 +157,25 @@ runs:
     - run: pip install -e &quot;.[dev]&quot;
       shell: bash
 </code></pre>
+<h2>What success looks like at this point</h2>
+<p><strong>Pull request</strong><br>
+- Expected run shape: lint, test, typecheck<br>
+- What you validate: feedback stays fast and blocks bad merges</p>
+<p><strong><code>main</code> push</strong><br>
+- Expected run shape: build, docker, staging<br>
+- What you validate: the validated artifact reaches staging unchanged</p>
+<p><strong>Tag push</strong><br>
+- Expected run shape: release, production<br>
+- What you validate: the approved version is traceable all the way to prod</p>
+<p>If your real Actions history matches that table, the responsibility split is doing its job. If pull requests are still running every heavy deployment check, or production can be triggered from an unversioned main build, the pipeline has not been separated enough yet.</p>
+<h2>When the pipeline misbehaves, narrow it in this order</h2>
+<ol>
+<li><strong>PR feedback is too slow</strong>: trim the reusable workflow to the checks reviewers truly need on every change, and watch for oversized matrices.</li>
+<li><strong><code>main</code> is unstable</strong>: verify that build outputs, image tags, and staging deployment all refer to the same validated artifact.</li>
+<li><strong>Production is risky</strong>: confirm tag-based release, required reviewers, and rollback workflow all still exist as live controls rather than documentation promises.</li>
+</ol>
+<h2>Branch protection and promotion policy are half the design</h2>
+<p>In practice, the workflow file is only half the story. Branch protection rules should require status checks before merge. <code>main</code> should not accept casual direct pushes. Production environments should keep reviewers and environment-scoped secrets separate from staging. If those repository-level policies are missing, even a clean YAML design will drift into unsafe operations.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>PR</em> is for <em>feedback</em>, <em>main</em> is for <em>deployment</em>, <em>tag</em> is for <em>release</em>.</li>

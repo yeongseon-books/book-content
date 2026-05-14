@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Deployment Automation</h1>
-<blockquote>
-<p>GitHub Actions 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you express the policy "<em>staging is automatic, production needs approval</em>" in code?</p>
-<blockquote>
-<p><em>Deploy frequently and small</em>; gate the <em>risky parts</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the GitHub Actions 101 series.</p>
+<p>Teams that deploy by hand usually end up with the same blind spots. Staging is automatic but production still depends on a message in chat. Someone can run the command, but no one can reconstruct the exact sequence later. Rollback exists in a document somewhere, yet nobody wants to search for it during an incident.</p>
+<p>Good deployment automation is not about removing every human decision. It is about automating the safe, repeatable path while making the risky path explicit through approval rules, environment policy, and short-lived credentials.</p>
+<p>This is post 8 in the GitHub Actions 101 series. In this post, we will design a deployment flow around GitHub Environments, required reviewers, OIDC, and codified rollback.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>GitHub Environments</em> and <em>required reviewers</em></li>
@@ -80,11 +71,8 @@
 <p>If the <em>deployment runbook</em> lives only in someone's head, an <em>incident is coming</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Merge[&quot;main merge&quot;] --&gt; Stg[&quot;staging deploy&quot;]
-    Stg --&gt; Approve[&quot;required reviewer&quot;]
-    Approve --&gt; Prod[&quot;production deploy&quot;]
-</code></pre>
+<p><img alt="A deployment path from main merge to automatic staging and approval-gated production" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>A deployment path from main merge to automatic staging and approval-gated production</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Environment</strong>: GitHub's <em>deployment environment</em> (staging, production).</li>
@@ -145,6 +133,20 @@ jobs:
     steps:
       - run: ./deploy.sh ${{ inputs.sha }}
 </code></pre>
+<h2>What success looks like at this point</h2>
+<pre><code class="language-text">deploy-staging  Pass
+waiting on environment protection rules for production
+deploy-production  Pending approval
+</code></pre>
+<p>That pattern is usually what you want. Staging finishes automatically, while production stops because environment rules are actually active. After approval, the production job should continue with the same artifact and the same deployment definition rather than rebuilding or improvising a second path.</p>
+<h2>If deploy blocks or fails, check these first</h2>
+<ul>
+<li><strong>Production runs immediately</strong>: the environment exists in the repository, but the protection rules are not actually configured.</li>
+<li><strong>OIDC authentication fails</strong>: verify both <code>id-token: write</code> and the cloud-side trust policy conditions such as audience and subject.</li>
+<li><strong>Staging and production behave differently</strong>: confirm both environments consume the same artifact and only the environment-specific values differ.</li>
+</ul>
+<h2>Keep automatic zones and approval zones intentionally separate</h2>
+<p>Staging is usually your fast feedback lane, so automatic deployment makes sense there. Production is different: required reviewers, wait timers, environment-scoped secrets, and deployment URLs all belong there. If both environments share the same policy, staging often becomes too slow and production too casual.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A single <em>environment</em> line attaches an <em>approval gate</em>.</li>
