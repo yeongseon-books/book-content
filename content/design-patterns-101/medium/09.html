@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Avoiding Pattern Overuse</h1>
+<p>After learning design patterns, many engineers go through a phase where almost every piece of code looks like a pattern candidate. A tiny function starts to resemble a Strategy, a simple constructor wants to become a Factory, and one wrapper invites the Decorator label. The danger is that imagined future complexity can erase present-day clarity.</p>
 <p>This is post 9 in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does a <em>good pattern</em> turn into <em>bad code</em>?</p>
-<blockquote>
-<p>When the pattern arrives before the problem. Patterns are <em>vocabulary</em>, not <em>answers</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll focus on the difference between knowing patterns and using them well. The right direction is not “apply patterns first,” but “let repeated change justify the abstraction.”</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The antipattern that "patterns first" creates</li>
 <li>The power of the simpler alternative</li>
@@ -80,12 +71,8 @@
 <p>The best abstraction shows up <em>late</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Need[&quot;Real need&quot;] --&gt; Refactor[&quot;Refactor&quot;]
-    Refactor --&gt; Pattern[&quot;Pattern emerges&quot;]
-    Premature[&quot;Pre-applied&quot;] --&gt; Junk[&quot;Just more complexity&quot;]
-</code></pre>
-<p>Need <em>summons</em> a pattern. The reverse direction is risky.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>A healthy pattern emerges from repeated pain and refactoring; a premature one usually leaves behind only extra complexity.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>YAGNI</strong>: You Aren't Gonna Need It — not now.</li>
@@ -151,6 +138,14 @@ def member_price(p): return p * 0.9
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>Good libraries use <em>few</em> patterns <em>precisely</em>. Look at requests, FastAPI, or pytest — they solve hard problems with small composition, not vast abstraction. The difference between a junior and a senior is not how many patterns they know, but knowing <em>when to wait</em>.</p>
+<h2>Quick verification</h2>
+<p>Run this check when a proposed abstraction feels suspicious.</p>
+<ul>
+<li>Count whether the change has actually repeated in production code, not just in design discussions.</li>
+<li>Try extracting a function or small module first and see whether the intent is already clear.</li>
+<li>Remove the pattern mentally and ask what concrete pain would return immediately.</li>
+</ul>
+<p><strong>Expected outcome:</strong> if the pain is still hypothetical, the simplest code usually remains the better design for now.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Start with <em>functions</em>.</li>
@@ -188,11 +183,16 @@ def member_price(p): return p * 0.9
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://martinfowler.com/bliki/Yagni.html">YAGNI (Martin Fowler)</a></li>
 <li><a href="https://www.industriallogic.com/xp/refactoring/">Refactoring to Patterns (Joshua Kerievsky)</a></li>
 <li><a href="https://wiki.c2.com/?PrematureGeneralization">Premature Abstraction (C2 wiki)</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">Worse Is Better (Richard Gabriel)</a></li>
+<li><a href="https://peps.python.org/pep-0020/">PEP 20 — The Zen of Python</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Antipatterns, Simplicity, YAGNI, Refactoring</p>
 </body>
