@@ -54,47 +54,39 @@
 </head>
 <body>
 <h1>Prevention</h1>
+<p>An incident is not truly closed when the postmortem is published. It is closed when the learning is pushed back into code, tests, automation, and operating constraints that make the same failure harder to repeat.</p>
+<p>Teams that stop at documentation keep relearning the same lesson. Teams that attach regression tests, guardrails, and review loops turn each incident into a measurable reliability improvement.</p>
+<p>This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.</p>
+<h2>Questions this chapter answers</h2>
+<p>Many organizations stop prevention work at the moment they can say the postmortem is done. But prevention does not live in a document; it lives in tests, controls, and operating constraints that keep the same failure from re-entering production easily.</p>
 <blockquote>
-<p>Incident Response 101 series (9/10)</p>
+<p>Prevention means turning lessons into code, tests, and guardrails that still work months later when the people and context have changed.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you make sure an <em>incident</em> does <em>not</em> happen <em>again</em>?</p>
-<blockquote>
-<p><em>Prevention</em> rests on <em>three pillars</em>: <em>action tracking</em>, <em>regression tests</em>, and <em>guardrails</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li><em>Action tracking</em></li>
-<li><em>Regression tests</em></li>
-<li><em>Guardrail</em> code</li>
-<li><em>Chaos engineering</em></li>
-<li>The <em>learning loop</em></li>
+<li>Why do incidents repeat even after strong postmortems?</li>
+<li>Which follow-up items deserve regression tests first?</li>
+<li>How do guardrails differ from warnings or documentation?</li>
+<li>What role do chaos experiments play in prevention work?</li>
+<li>How do you keep the learning loop alive across quarters?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>If you stop at the <em>postmortem</em>, <em>organizational learning</em> never <em>converts</em> into <em>behavior</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Action[&quot;action item&quot;] --&gt; Test[&quot;regression test&quot;]
-    Test --&gt; Guard[&quot;guardrail&quot;]
-    Guard --&gt; Chaos[&quot;chaos exp&quot;]
-    Chaos --&gt; Learn[&quot;learning&quot;]
-    Learn --&gt; Action
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>Teams get weaker over time when they depend on memory. They get stronger over time when each incident leaves behind a test, a blocking control, or a better operating default.</p>
+<p>That is why prevention is best treated as an engineering output. Good intentions do not survive turnover or fatigue; tests and safeguards do.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+The loop matters as much as the individual controls. Action items become tests, tests become guardrails, and experiments verify that the protection still works under failure.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>action item</strong>: a <em>postmortem</em> follow-up.</li>
-<li><strong>regression test</strong>: confirms the <em>same bug</em> does not return.</li>
-<li><strong>guardrail</strong>: code that <em>blocks</em> dangerous actions.</li>
-<li><strong>chaos exp</strong>: <em>intentional</em> failure injection.</li>
-<li><strong>learning loop</strong>: the <em>cycle</em> of learning.</li>
+<li><strong>action item</strong>: a postmortem follow-up.</li>
+<li><strong>regression test</strong>: confirms the same bug does not return.</li>
+<li><strong>guardrail</strong>: code that blocks dangerous actions.</li>
+<li><strong>chaos exp</strong>: intentional failure injection.</li>
+<li><strong>learning loop</strong>: the cycle of learning.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: only a <em>document</em> remains after the postmortem.</p>
-<p><strong>After</strong>: <em>code</em> and <em>tests</em> remain after the postmortem.</p>
+<p><strong>Before</strong>: only a document remains after the postmortem.</p>
+<p><strong>After</strong>: code and tests remain after the postmortem.</p>
 <h2>Hands-on: A Prevention Kit</h2>
 <p><strong>Step 1 — Register an action</strong></p>
 <pre><code class="language-python">def register(action):
@@ -119,43 +111,83 @@
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li><em>Status</em> has <em>two values</em>: open/done.</li>
-<li>A <em>guardrail</em> is <em>one raise</em>.</li>
-<li><em>Chaos</em> always pairs with an <em>expected result</em>.</li>
+<li>Status has two values: open/done.</li>
+<li>A guardrail is one raise.</li>
+<li>Chaos always pairs with an expected result.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Registering <em>actions</em> and then <em>abandoning</em> them.</strong></li>
-<li><strong>Skipping the <em>regression test</em>.</strong></li>
-<li><strong>Leaving the <em>guardrail</em> as a <em>warning</em> only.</strong></li>
-<li><strong>Stating <em>hypotheses</em> without <em>chaos</em>.</strong></li>
-<li><strong>The <em>loop</em> never crosses a <em>quarter</em>.</strong></li>
+<li><strong>Registering actions and then abandoning them.</strong></li>
+<li><strong>Skipping the regression test.</strong></li>
+<li><strong>Leaving the guardrail as a warning only.</strong></li>
+<li><strong>Stating hypotheses without chaos.</strong></li>
+<li><strong>The loop never crosses a quarter.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Every <em>postmortem</em> action is <em>linked</em> into <em>Jira</em>, <em>converted</em> into <em>regression tests</em> and <em>chaos scenarios</em>, and run <em>weekly in CI</em>.</p>
+<p>Every postmortem action is linked into Jira, converted into regression tests and chaos scenarios, and run weekly in CI.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Prevention</em> is <em>code</em>.</li>
-<li>The <em>document</em> is the <em>starting point</em>.</li>
-<li><em>Chaos</em> is your <em>friend</em>.</li>
-<li>The <em>loop</em> is the <em>quarterly review</em>.</li>
-<li><em>Repetition</em> equals <em>failed learning</em>.</li>
+<li>Prevention is code.</li>
+<li>The document is the starting point.</li>
+<li>Chaos is your friend.</li>
+<li>The loop is the quarterly review.</li>
+<li>Repetition equals failed learning.</li>
 </ul>
+<h2>Prioritizing prevention work</h2>
+<p>Not every prevention item belongs in the same bucket. A simple priority table helps the team focus on work that most directly reduces repeat risk.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Repeat-risk reduction</th>
+<th>Delivery cost</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Add a regression test</td>
+<td>High</td>
+<td>Low</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>Add a feature flag or kill switch</td>
+<td>High</td>
+<td>Medium</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Rework architecture for long-term resilience</td>
+<td>High</td>
+<td>High</td>
+<td>Quarterly planning</td>
+</tr>
+<tr>
+<td>Expand wiki documentation</td>
+<td>Low</td>
+<td>Low</td>
+<td>Supporting work</td>
+</tr>
+</tbody>
+</table>
+<p>Documentation still matters, but tests and guardrails usually deserve priority because they block the failure path directly.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Action tracking</em>.</li>
-<li>[ ] <em>Regression tests</em>.</li>
-<li>[ ] <em>Guardrail policy</em>.</li>
-<li>[ ] <em>Chaos schedule</em>.</li>
+<li>[ ] Action tracking.</li>
+<li>[ ] Regression tests.</li>
+<li>[ ] Guardrail policy.</li>
+<li>[ ] Chaos schedule.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>guardrail</em> in one line.</li>
-<li>Define <em>regression test</em> in one line.</li>
-<li>Define <em>learning loop</em> in one line.</li>
+<li>Define guardrail in one line.</li>
+<li>Define regression test in one line.</li>
+<li>Define learning loop in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next is the capstone: <em>Building an Incident Runbook</em>.</p>
+<p>Next is the capstone: Building an Incident Runbook.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -169,12 +201,13 @@
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://sre.google/workbook/postmortem-culture/">Action Items - Google SRE Workbook</a></li>
-<li><a href="https://principlesofchaos.org/">Chaos Engineering Principles</a></li>
-<li><a href="https://www.thoughtworks.com/insights/blog/guardrails-not-gates">Guardrails vs Gates - Thoughtworks</a></li>
-<li><a href="https://response.pagerduty.com/after/preventing/">Preventing Recurrence - PagerDuty</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://sre.google/workbook/postmortem-culture/">Postmortem Action Items - Google SRE Workbook</a><br>
+- <a href="https://response.pagerduty.com/after/preventing/">Preventing recurrence - PagerDuty</a><br>
+- <a href="https://principlesofchaos.org/">Principles of Chaos Engineering</a><br>
+- <a href="https://www.thoughtworks.com/insights/blog/guardrails-not-gates">Guardrails, not gates - Thoughtworks</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, Prevention, Reliability, Testing, Operations</p>
 </body>
 </html>

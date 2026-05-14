@@ -54,47 +54,39 @@
 </head>
 <body>
 <h1>Building an Incident Runbook</h1>
+<p>During a real incident, scattered documentation is almost as dangerous as missing documentation. If the SEV matrix lives in one wiki, the on-call schedule in another tool, and the customer-update template in a personal note, the team loses time before it even starts acting.</p>
+<p>A runbook is valuable because it turns those fragments into one executable operating surface. It tells the responder where to begin, what to check next, and how the incident should flow into postmortem and prevention work.</p>
+<p>This is the final post in the Incident Response 101 series. This capstone post shows how to assemble a runbook as code so response logic, templates, ownership, and drill practice evolve together.</p>
+<h2>Questions this chapter answers</h2>
+<p>A runbook fails when it is only a reading document. During a live incident, responders need one place that links severity policy, current ownership, communication templates, next-step logic, and postmortem follow-through.</p>
 <blockquote>
-<p>Incident Response 101 series (10/10)</p>
+<p>A good runbook is an operating interface, not a pile of notes. It should let a responder move from page acknowledgement to postmortem creation without hunting through five systems.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you bind everything you learned — <em>severity</em>, <em>response</em>, <em>communication</em>, <em>timeline</em>, <em>RCA</em>, <em>mitigation</em>, <em>postmortem</em>, <em>prevention</em> — into a <em>single runbook</em>?</p>
-<blockquote>
-<p>A <em>runbook</em> is <em>code-shaped documentation</em> that holds <em>SEV mapping</em> through <em>postmortem templates</em> in <em>one repository</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the final post in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li><em>SEV</em> mapping</li>
-<li><em>On-call</em> schedule</li>
-<li><em>Communication</em> templates</li>
-<li><em>Runbooks as code</em></li>
-<li><em>Drills</em> and <em>maintenance</em></li>
+<li>Why does runbook quality show up most clearly at 3 a.m.?</li>
+<li>How should severity policy connect to on-call ownership and templates?</li>
+<li>Why is runbooks-as-code better than keeping everything in a wiki?</li>
+<li>What should be exercised in drills before the runbook is trusted?</li>
+<li>How do you keep the runbook current after real incidents?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>When <em>documents</em> are <em>scattered</em>, you do not know <em>where to start</em> at <em>3 a.m.</em></p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Sev[&quot;sev map&quot;] --&gt; OnCall[&quot;on-call&quot;]
-    OnCall --&gt; Comms[&quot;comms templates&quot;]
-    Comms --&gt; Steps[&quot;response steps&quot;]
-    Steps --&gt; PM[&quot;postmortem template&quot;]
-    PM --&gt; Repo[&quot;runbook repo&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>The first cost of scattered operations knowledge is search time. The second cost is inconsistency: people start from different assumptions and follow different links even though they are handling the same outage.</p>
+<p>A runbook repository reduces both costs. It makes the response path reviewable, versioned, and easy to improve after drills or real incidents.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>runbook</strong>: a collection of <em>response procedures</em>.</li>
-<li><strong>on-call</strong>: the <em>paging</em> schedule.</li>
-<li><strong>sev map</strong>: a mapping from <em>SEV</em> to <em>response</em>.</li>
-<li><strong>template</strong>: a reusable <em>form</em>.</li>
-<li><strong>drill</strong>: a <em>practice</em> exercise.</li>
+<li><strong>runbook</strong>: a collection of response procedures.</li>
+<li><strong>on-call</strong>: the paging schedule.</li>
+<li><strong>sev map</strong>: a mapping from SEV to response.</li>
+<li><strong>template</strong>: a reusable form.</li>
+<li><strong>drill</strong>: a practice exercise.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: scattered across <em>Wikis</em>, <em>Slack pins</em>, and <em>personal notes</em>.</p>
-<p><strong>After</strong>: unified as <em>code</em> in a <em>Git repository</em>.</p>
+<p><strong>Before</strong>: scattered across Wikis, Slack pins, and personal notes.</p>
+<p><strong>After</strong>: unified as code in a Git repository.</p>
 <h2>Hands-on: Runbook Capstone</h2>
 <p><strong>Step 1 — SEV map</strong></p>
 <pre><code class="language-python">SEV = {
@@ -136,44 +128,61 @@ def next_step(current):
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>Every <em>stage</em> is a <em>data structure</em>.</li>
-<li><em>State transitions</em> are <em>tuple indices</em>.</li>
-<li><em>Postmortem</em> is a <em>file link</em>.</li>
+<li>Every stage is a data structure.</li>
+<li>State transitions are tuple indices.</li>
+<li>Postmortem is a file link.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Keeping the <em>runbook</em> only in a <em>Wiki</em>.</strong></li>
-<li><strong>Using the <em>same procedure</em> for <em>every SEV</em>.</strong></li>
-<li><strong><em>On-call</em> info living in an <em>external</em> tool only.</strong></li>
-<li><strong>Templates that are <em>not current</em>.</strong></li>
-<li><strong>Going <em>live</em> without a <em>drill</em>.</strong></li>
+<li><strong>Keeping the runbook only in a Wiki.</strong></li>
+<li><strong>Using the same procedure for every SEV.</strong></li>
+<li><strong>On-call info living in an external tool only.</strong></li>
+<li><strong>Templates that are not current.</strong></li>
+<li><strong>Going live without a drill.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A <em>runbook/</em> directory holds <em>Markdown</em> plus <em>Python scripts</em>; <em>PR review</em> tracks <em>changes</em>. <em>Quarterly drills</em> keep it <em>up to date</em>.</p>
+<p>A runbook/ directory holds Markdown plus Python scripts; PR review tracks changes. Quarterly drills keep it up to date.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A <em>runbook</em> is <em>code</em>.</li>
-<li>Without <em>practice</em>, it is <em>useless</em>.</li>
-<li><em>Quarterly drills</em> are <em>culture</em>.</li>
-<li><em>Changes</em> go through <em>PRs</em>.</li>
-<li>One procedure for <em>all SEVs</em> is <em>dangerous</em>.</li>
+<li>A runbook is code.</li>
+<li>Without practice, it is useless.</li>
+<li>Quarterly drills are culture.</li>
+<li>Changes go through PRs.</li>
+<li>One procedure for all SEVs is dangerous.</li>
 </ul>
+<h2>Example runbook repository layout</h2>
+<p>A runbook works better when the directory structure itself makes the response path obvious.</p>
+<pre><code class="language-text">runbook/
+  sev-matrix.md
+  oncall.md
+  comms/
+    internal.md
+    external.md
+    exec.md
+  procedures/
+    rollback.md
+    scale-out.md
+    statuspage.md
+  postmortems/
+    template.md
+</code></pre>
+<p>The goal is not to flatten every document into one giant file. The goal is to make the start point and the next links obvious enough that a responder can move quickly under stress.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>SEV map</em>.</li>
-<li>[ ] <em>On-call schedule</em>.</li>
-<li>[ ] <em>Communication templates</em>.</li>
-<li>[ ] <em>Postmortem template</em>.</li>
-<li>[ ] <em>Quarterly drill</em>.</li>
+<li>[ ] SEV map.</li>
+<li>[ ] On-call schedule.</li>
+<li>[ ] Communication templates.</li>
+<li>[ ] Postmortem template.</li>
+<li>[ ] Quarterly drill.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>runbook</em> in one line.</li>
-<li>Define <em>drill</em> in one line.</li>
-<li>Define <em>sev map</em> in one line.</li>
+<li>Define runbook in one line.</li>
+<li>Define drill in one line.</li>
+<li>Define sev map in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>This series wraps up here. Next, read the <em>SRE 101</em> and <em>Information Security 101</em> series to grow <em>reliability</em> and <em>security</em> together.</p>
+<p>This series wraps up here. Next, read the SRE 101 and Information Security 101 series to grow reliability and security together.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -187,12 +196,13 @@ def next_step(current):
 <li><strong>Building an Incident Runbook (current)</strong></li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://response.pagerduty.com/oncall/runbooks/">Runbook Template - PagerDuty</a></li>
-<li><a href="https://sre.google/workbook/managing-load/">Runbooks as Code - Google SRE Workbook</a></li>
-<li><a href="https://www.atlassian.com/incident-management/on-call">On-Call Rotations - Atlassian</a></li>
-<li><a href="https://increment.com/reliability/game-days/">Chaos Drills and Game Days - Increment</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://response.pagerduty.com/oncall/runbooks/">Runbooks - PagerDuty</a><br>
+- <a href="https://sre.google/workbook/managing-load/">Managing Load - Google SRE Workbook</a><br>
+- <a href="https://www.atlassian.com/incident-management/on-call">On-call management - Atlassian</a><br>
+- <a href="https://learn.microsoft.com/azure/architecture/framework/resiliency/testing">Game days - Azure Architecture Center</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, Runbook, OnCall, Capstone, Operations</p>
 </body>
 </html>
