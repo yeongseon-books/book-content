@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Environment Variables and Configuration</h1>
-<p>This is post 6 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: With <em>one image</em>, how do you inject <em>different settings per environment</em>?</p>
-<blockquote>
-<p><em>Configuration belongs </em>outside the code<em>; secrets belong </em>outside the image<em>. The most important </em>twelve-factor<em> principle.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Configuration is where reproducibility quietly breaks. If a team builds one image for development, another for staging, and yet another for production, it no longer has one deployable artifact. It has several environment-specific snowflakes that only look similar.</p>
+<p>The better model is simpler: keep the image immutable and move environment-specific behavior to runtime configuration. That is also where secret handling becomes a security decision instead of a convenience shortcut.</p>
+<p>This is post 6 in the Docker 101 series. It covers the contract between image and environment, including <code>ENV</code> vs <code>ARG</code>, runtime injection patterns, secret externalization, and the startup checks that keep missing variables from becoming late incidents.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>ENV</em> and <em>ARG</em></li>
@@ -80,11 +71,8 @@
 <p><em>Images are build artifacts; environments are </em>runtime context<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Image[&quot;app:1.0 (immutable)&quot;] --&gt; Dev[&quot;dev env vars&quot;]
-    Image --&gt; Stg[&quot;staging env vars&quot;]
-    Image --&gt; Prd[&quot;prod env vars&quot;]
-</code></pre>
+<p><img alt="A single immutable image receiving environment-specific variables and secrets at runtime" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>The image stays fixed while development, staging, and production inject different runtime configuration and secrets</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ENV</strong>: a <em>default env var</em> in the Dockerfile.</li>
@@ -129,6 +117,16 @@ doppler run -- docker compose up -d
 # Vault (envconsul)
 envconsul -secret secret/app -- docker compose up -d
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li>Run the image with <code>--env-file</code> and confirm that the expected values actually appear in app diagnostics or logs, especially <code>LOG_LEVEL</code> and database settings.</li>
+<li>Remove a required variable once and confirm that the application fails fast instead of continuing with a silent empty default.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>When a variable resolves to an empty string, inspect the <code>.env</code> file path and shell export state before blaming Docker interpolation.</li>
+<li>If you suspect a secret leaked into the image, review both <code>docker history</code> and every Dockerfile <code>ENV</code> instruction first.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Defaults</em> (<code>${VAR:-default}</code>) protect against <em>missing values</em>.</li>
@@ -181,11 +179,16 @@ envconsul -secret secret/app -- docker compose up -d
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://12factor.net/config">The Twelve-Factor App - Config</a></li>
 <li><a href="https://docs.docker.com/engine/reference/commandline/run/#env">Set environment variables in containers</a></li>
 <li><a href="https://docs.docker.com/compose/environment-variables/">Compose - environment variables</a></li>
 <li><a href="https://docs.docker.com/engine/swarm/secrets/">Manage secrets with Docker</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/">Environment variables in Compose</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Config, EnvVar, Secret, 12Factor</p>
 </body>
