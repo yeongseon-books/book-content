@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 6
 title: Memory Management
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Stack
   - Allocator
 seo_description: How stack and heap differ, what malloc and free really do, how leaks and fragmentation form, and how the OS divides limited RAM among processes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Memory Management
 
-This is post 6 in the Operating Systems 101 series.
+When a service gets slower day after day, the root cause is often memory, not CPU. A cache grows without a ceiling, references keep old objects alive, or reclamation happens so late that the system only becomes noisy when recovery is already expensive.
 
-> Operating Systems 101 series (6/10)
+That is why memory management is really a conversation about ownership and release, not only allocation.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Where does the memory a process uses come from, and how does the OS divide a limited amount of RAM among many processes?
-
-> Memory is the resource that runs out second most often, right after CPU. Without understanding stack vs heap, what malloc and free really do, and how leaks form, you will never track down "why does this service slowly degrade after a few days." This article walks through the fundamentals in one pass.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the Operating Systems 101 series. It connects process memory layout, leaks, fragmentation, and container memory limits into one practical model.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ The most common cause of "the server gets slow after a while" is a memory leak, 
 ## Concept at a Glance
 
 > Process memory has four main regions: code (text), globals (data/bss), heap, and stack. Heap holds dynamic allocations; stack grows and shrinks automatically with function calls. The OS gives each process a virtual address space so each process appears to own its own RAM.
+
+### The four major regions of process memory
+
+![The four major regions of process memory](../../../assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
+*A useful first question in any memory problem is which region is growing and who owns its lifetime.*
 
 ```text
 high addr
