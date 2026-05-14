@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>A Production-Ready Observability Stack</h1>
+<p>The most common small-team mistake is waiting for the perfect observability stack. The perfect mix of features, cost, and future-proofing never arrives, and the team delays the first usable setup for too long.</p>
+<p>A good first stack is less about completeness and more about operability. Collection should be standardized, the three signals should meet in one place, and the team should be able to replace parts later without rewriting the application.</p>
 <p>This is the final post in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a <em>good-enough</em> observability stack look like that a <em>small team</em> can build <em>today</em>?</p>
-<blockquote>
-<p><em>OpenTelemetry to </em>unify collection<em>, Prometheus / Loki / Tempo for the </em>three signals<em>, Grafana for </em>one screen<em> — that is a small team's </em>realistic baseline<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The simple flow <em>collect → store → query</em></li>
@@ -80,15 +71,8 @@
 <p><em>The perfect stack </em>will not arrive tomorrow<em>. Build the operable one </em>today<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;app&quot;] --&gt; Otel[&quot;OpenTelemetry collector&quot;]
-    Otel --&gt; Prom[&quot;Prometheus (metric)&quot;]
-    Otel --&gt; Loki[&quot;Loki (log)&quot;]
-    Otel --&gt; Tempo[&quot;Tempo (trace)&quot;]
-    Prom --&gt; Grafana
-    Loki --&gt; Grafana
-    Tempo --&gt; Grafana
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>A practical small-team stack: OpenTelemetry standardizes collection, Prometheus/Loki/Tempo store the three signals, and Grafana brings them back together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Collector</strong>: a gateway that <em>receives and routes</em> signals.</li>
@@ -138,6 +122,17 @@ Loki  -&gt; Tempo: log &quot;trace_id&quot; -&gt; trace view
 3) Tempo trace arrival &gt; 99%
 4) Grafana dashboard p95 &lt; 2s
 5) Alertmanager dispatch latency &lt; 30s
+</code></pre>
+<h2>How to Verify the Stack Is Actually Connected</h2>
+<p>The first success criterion is not feature count. It is whether all five core components are healthy and whether one request can move across all three signals.</p>
+<pre><code class="language-bash">docker compose ps
+curl -s http://localhost:9464/metrics | grep otelcol
+curl -s http://localhost:3000/api/health
+</code></pre>
+<pre><code class="language-text">Expected output:
+- collector, prometheus, loki, tempo, and grafana all report `running`.
+- Collector metrics show exporter send counters increasing.
+- Grafana health returns `ok`, and one `trace_id` lets you jump between traces and logs.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
