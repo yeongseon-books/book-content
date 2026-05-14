@@ -62,38 +62,6 @@ print(response.tool_calls)
 
 <!-- injected-output:end -->
 
-## What to notice in this code
-
-- The tool name, description, and input schema come from the function signature and docstring.
-- `bind_tools()` exposes tools to the model but does not execute them for you.
-- When `tool_calls` appears in the model response, your application loop takes over.
-- Conceptually, tool calling is still message passing, just with an extra function-execution round trip.
-
-## Where engineers get confused
-
-- Binding a tool does not mean the function runs automatically.
-- Weak docstrings and vague type hints make tool selection worse.
-- For simple math, the model may answer directly unless you explicitly instruct it to use tools.
-
-## Checklist
-
-- [ ] I understand what schema a `@tool` function exposes
-- [ ] I can describe the application loop after `bind_tools()`
-- [ ] I can read `tool_calls` and execute the matching Python function
-
-LangChain 101 (4/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/04-tool-calling)
-
-## Questions this post answers
-
-- What information does LangChain expose to the model when you define a tool?
-- What changes when you call `bind_tools()`?
-- Why must tool results go back into the conversation as `ToolMessage`?
-- Where should a minimal tool loop stop to stay safe?
-
-> Tool calling is not the model executing Python directly. It is the model emitting a structured function request that your application executes and feeds back.
-
 ## The flow at a glance
 
 ![The flow at a glance](../../../assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)

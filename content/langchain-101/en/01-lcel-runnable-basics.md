@@ -56,41 +56,9 @@ print(chain.invoke({"topic": "LCEL"}))
 <!-- injected-output:start -->
 **Output**
 
-    LCEL stands for Low-Cost Carrier Equity-like or Low-Cost Carrier Equity Layer. It is a type of investment product that offers exposure to the low-cost airline sector, often through a combination of stock or debt investments in low-cost carriers. LCELs typically provide a more conservative and stable return profile compared to traditional airline stocks by offering a lower-risk, debt-like investment option with a higher yield. They can be structured as exchange-traded notes (ETNs), closed-end funds, or other types of investment vehicles, and may offer a fixed or floating rate of return, often tied to the performance of a specific low-cost airline or a basket of airlines.
+    LCEL, or LangChain Expression Language, is a declarative way to compose chains in LangChain by piping together components — such as prompts, chat models, output parsers, and retrievers — using the `|` operator. Every component in an LCEL chain implements the same Runnable interface, which means you can invoke, batch, or stream the whole chain with a single method call without writing glue code between steps. Because LCEL is just function composition over a shared contract, the resulting chains are easy to reason about, swap parts in and out of, and run efficiently in parallel or async contexts.
 
 <!-- injected-output:end -->
-
-## What to notice in this code
-
-- `ChatPromptTemplate` turns a dict into chat messages.
-- `ChatGroq` turns those messages into an `AIMessage`.
-- `StrOutputParser` normalizes the final output to a string.
-- The pipe works because all three objects implement Runnable.
-
-## Where engineers get confused
-
-- LCEL is not a model feature; it is a composition syntax.
-- `invoke()` and `stream()` do not change the chain definition, only the execution mode.
-- `RunnableLambda` is best treated as a lightweight transform step, not a replacement for application structure.
-
-## Checklist
-
-- [ ] I can explain what enters and exits each stage of `prompt | llm | parser`
-- [ ] I know when to prefer `invoke()`, `batch()`, and `stream()`
-- [ ] I can run a minimal LCEL chain with Groq end to end
-
-LangChain 101 (1/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/01-lcel-runnable-basics)
-
-## Questions this post answers
-
-- Why does LCEL connect components with the `|` operator?
-- Which methods make up the shared Runnable interface?
-- How do prompt, model, and parser outputs line up inside one chain?
-- When should you use `invoke()` versus `batch()`?
-
-> LCEL is the way LangChain turns prompt, model, and parser steps into one executable data flow by making them all speak the Runnable interface.
 
 ## The flow at a glance
 

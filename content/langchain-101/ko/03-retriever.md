@@ -67,38 +67,6 @@ print(retriever.invoke("What does a Retriever do?")[0].page_content)
 
 이 짧은 예제의 핵심은 검색 엔진 내부 구현이 아니라 계약입니다. 임베딩 모델은 텍스트를 벡터로 만들고, VectorStore는 그것을 저장하고, Retriever는 질문을 받아 관련 문서 리스트를 돌려줍니다. 뒤쪽 체인은 이제 `question -> list[Document]`만 알면 됩니다.
 
-## 이 코드에서 먼저 볼 점
-
-- 임베딩 모델은 텍스트를 벡터로 바꾸고, Retriever는 질문을 문서 리스트로 바꾸는 인터페이스를 제공합니다.
-- 체인 나머지는 `question -> list[Document]` 계약만 알면 됩니다.
-- 검색 결과는 아직 프롬프트에 바로 넣을 수 있는 상태가 아니므로, 포맷팅 단계가 하나 더 필요합니다.
-- RAG에서는 초반에 프롬프트보다 검색 품질이 더 큰 영향을 주는 경우가 많습니다.
-
-## 엔지니어가 여기서 자주 헷갈리는 지점
-
-- VectorStore를 만들었다고 해서 곧바로 usable한 RAG 체인이 생기는 것은 아닙니다.
-- `k`를 크게 올린다고 항상 좋아지지 않습니다. 회수율과 함께 잡음도 늘어납니다.
-- Retriever는 답을 생성하지 않습니다. 답을 위해 필요한 문맥을 고릅니다.
-
-## 체크리스트
-
-- [ ] VectorStore와 Retriever의 차이를 설명할 수 있다
-- [ ] `list[Document]`를 프롬프트용 context 문자열로 바꿀 수 있다
-- [ ] Retriever를 LCEL 체인에 연결할 수 있다
-
-LangChain 101 (3/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
-
-## 이 글에서 다룰 문제
-
-- Retriever는 VectorStore와 어떤 관계일까요?
-- `as_retriever()` 이후에 어떤 검색 파라미터를 먼저 조정해야 할까요?
-- 검색된 문서를 프롬프트 컨텍스트로 바꿀 때 무엇을 조심해야 할까요?
-- 기본 RAG 체인 안에서 Retriever는 어느 위치에 들어갈까요?
-
-> Retriever는 LangChain의 검색 경계입니다. 질문에 관련 문서를 골라 다음 체인이 답을 만들 수 있도록 문맥을 넘깁니다.
-
 ## 전체 흐름 한눈에 보기
 
 ![전체 흐름 한눈에 보기](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.ko.png)

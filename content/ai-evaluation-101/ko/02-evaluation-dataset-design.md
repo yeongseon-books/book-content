@@ -250,8 +250,6 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 - 라벨은 exact, keywords, rubric 3가지 스타일을 케이스별로 골라 쓰세요.
 - JSONL로 git에 커밋하고 파일명에 버전을 박으세요.
 
-다음 글에서는 결정적 지표 — Exact Match, F1, BLEU, ROUGE를 언제 써야 하고 언제 쓰면 안 되는지를 다룹니다.
-
 이제 데이터셋의 바탕이 잡혔다면, 다음 글에서는 여기에 어떤 결정적 지표를 얹을 수 있는지 봅니다. Exact Match, F1, BLEU, ROUGE가 어디까지 유효하고 어디서부터 위험해지는지가 다음 단계입니다.
 
 ## 운영 체크리스트

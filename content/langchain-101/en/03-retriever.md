@@ -60,38 +60,6 @@ print(retriever.invoke("What does a Retriever do?")[0].page_content)
 
 <!-- injected-output:end -->
 
-## What to notice in this code
-
-- The embedding model turns text into vectors, while the Retriever exposes a query-to-documents interface.
-- The rest of the chain only needs to know `question -> list[Document]`.
-- Retrieved output is not yet prompt-ready; you still need a formatting step.
-- In RAG systems, retrieval quality often matters more than prompt wording at the start.
-
-## Where engineers get confused
-
-- Building a VectorStore does not automatically give you a usable RAG chain.
-- Raising `k` is not always better; it often adds noise as well as recall.
-- A Retriever does not answer the question. It selects context for the model.
-
-## Checklist
-
-- [ ] I can explain the difference between a VectorStore and a Retriever
-- [ ] I can turn `list[Document]` into a context string for a prompt
-- [ ] I can connect a Retriever to an LCEL chain
-
-LangChain 101 (3/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/03-retriever)
-
-## Questions this post answers
-
-- How does a Retriever relate to a VectorStore?
-- Which search parameters matter after calling `as_retriever()`?
-- What should you watch when turning retrieved documents into prompt context?
-- Where does the retriever sit inside a basic RAG chain?
-
-> A Retriever is LangChain's search boundary: it selects relevant documents for a question and hands the next chain step the context needed to answer.
-
 ## The flow at a glance
 
 ![The flow at a glance](../../../assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)

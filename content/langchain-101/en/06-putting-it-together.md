@@ -56,38 +56,6 @@ chain = ({"context": retriever | (lambda docs: docs[0].page_content), "question"
 print(chain.invoke("What is LCEL?"))
 ```
 
-## What to notice in this code
-
-- Indexing and query execution happen on different timelines, so the code should keep them separate.
-- Retriever output should be formatted before it enters the prompt.
-- `RunnablePassthrough()` preserves the user's question while other keys in the prompt dictionary are assembled.
-- When an integrated chain fails, inspecting retrieval output is usually faster than tweaking the prompt first.
-
-## Where engineers get confused
-
-- When RAG answers are weak, the retrieval stage is often the real issue rather than the prompt.
-- A complete example does not mean every stage belongs in one giant function.
-- Once conversation history is added, the chain's input schema changes and the Runnable composition changes with it.
-
-## Checklist
-
-- [ ] I can connect retriever, prompt, llm, and parser into one chain
-- [ ] I can explain the difference between indexing time and question-answering time
-- [ ] I know where to start debugging an integrated RAG chain
-
-LangChain 101 (6/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/06-putting-it-together)
-
-## Questions this post answers
-
-- What is the minimum structure for combining the first five posts into one chain?
-- Where should you separate indexing, retrieval, prompting, and generation concerns?
-- How should multi-turn history enter the prompt?
-- How do you keep a one-file integrated example readable?
-
-> An integrated LangChain pipeline separates indexing from query-time execution, and the query path itself is still a simple retriever → prompt → llm → parser composition.
-
 ## The flow at a glance
 
 ![The flow at a glance](../../../assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)

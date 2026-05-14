@@ -305,8 +305,6 @@ Production에서는 API 실패가 빈번합니다. Recovery 평가 없이 출시
 - Tool selection은 **classification_report**로, recovery는 **fault injection**으로 평가합니다.
 - Token cost와 latency는 정확도와 동등하게 중요한 production metric입니다.
 
-다음 글에서는 평가를 **CI에 통합**해서 회귀를 자동으로 막는 법을 다룹니다.
-
 다음 글에서는 이런 평가를 CI에 연결해 매 PR마다 회귀를 자동으로 막는 방법을 다룹니다. 에이전트든 일반 LLM 기능이든, 평가가 반복 실행되어야 비로소 운영 도구가 됩니다.
 
 ## 운영 체크리스트

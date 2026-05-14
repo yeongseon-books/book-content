@@ -56,38 +56,6 @@ for chunk in chain.stream({"topic": "astream"}):
     print(chunk, end="", flush=True)
 ```
 
-## What to notice in this code
-
-- The chain definition is identical to `invoke()`; only the consumption pattern changes.
-- With a parser attached, streaming yields text chunks. Without one, it yields message chunks.
-- You can forward chunks immediately to the client or buffer them into a final string.
-- Streaming improves perceived latency more than total wall-clock time.
-
-## Where engineers get confused
-
-- Streaming does not guarantee the full response finishes sooner.
-- In async applications, `astream()` fits the event loop better than `stream()`.
-- When you need lifecycle visibility, `astream_events()` is more useful than raw text chunks.
-
-## Checklist
-
-- [ ] I can consume the output of `stream()` incrementally
-- [ ] I understand the difference between text chunks and message chunks
-- [ ] I know when to switch to `astream()` in async code
-
-LangChain 101 (5/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/05-streaming)
-
-## Questions this post answers
-
-- How much code changes when you replace `invoke()` with `stream()`?
-- When should you choose `astream()` versus `astream_events()`?
-- What pattern works for reassembling streamed chunks into one string?
-- What do you need to send streaming output through FastAPI?
-
-> Streaming is not a different chain design. It is the same chain executed in a way that yields partial output instead of waiting for the final string.
-
 ## The flow at a glance
 
 ![The flow at a glance](../../../assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)

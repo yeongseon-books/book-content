@@ -69,38 +69,6 @@ print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemp
 
 이 최소 예제는 두 가지를 바로 보여 줍니다. 첫째, 변수 관리는 문자열 조립 코드가 아니라 템플릿 레이어에서 합니다. 둘째, 출력 파서가 붙는 순간 이후 단계는 `AIMessage`가 아니라 평범한 문자열을 다룰 수 있습니다. 이 차이가 작아 보여도, 체인이 길어질수록 가독성과 디버깅 난이도를 크게 바꿉니다.
 
-## 이 코드에서 먼저 볼 점
-
-- 변수는 수동 문자열 조립이 아니라 템플릿 레이어에서 관리됩니다.
-- `system` 메시지는 행동을 정하고 `human` 메시지는 요청을 전달합니다.
-- 파서를 붙이면 다음 단계는 `AIMessage` 대신 문자열을 받습니다.
-- 프롬프트 구조를 바꿔도 체인 나머지를 다시 쓰지 않아도 됩니다.
-
-## 엔지니어가 여기서 자주 헷갈리는 지점
-
-- `ChatPromptTemplate`는 문자열 포매터이면서 동시에 메시지 빌더입니다.
-- 파서가 없으면 많은 예제가 텍스트가 아니라 `AIMessage`를 돌려줍니다.
-- `RunnablePassthrough`는 현재 입력을 그대로 넘길 뿐, 흩어진 상태를 자동으로 합쳐 주지는 않습니다.
-
-## 체크리스트
-
-- [ ] `system`, `human`, `ai` 메시지 역할을 설명할 수 있다
-- [ ] 변수 여러 개를 받는 프롬프트 템플릿을 만들 수 있다
-- [ ] 파서가 체인 출력 타입을 어떻게 바꾸는지 이해했다
-
-LangChain 101 (2/6)
-
-Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeongseon-books/langchain-101/tree/main/02-prompt-llm-chain)
-
-## 이 글에서 다룰 문제
-
-- `ChatPromptTemplate`는 일반 문자열 포매팅과 무엇이 다를까요?
-- 왜 프롬프트, LLM, 출력 파서를 분리된 단계로 유지해야 할까요?
-- 입력 변수가 여러 개일 때 dict 모양을 어떻게 유지해야 할까요?
-- 프롬프트-모델 파이프라인에서 fallback은 어디에 놓는 편이 좋을까요?
-
-> 프롬프트 체인은 가장 작은 단위의 실전 LCEL 파이프라인입니다. 구조화된 입력을 메시지로 바꾸고, 모델을 호출하고, 결과를 애플리케이션 친화적인 출력으로 바꾸는 흐름입니다.
-
 ## 전체 흐름 한눈에 보기
 
 ![전체 흐름 한눈에 보기](../../../assets/langchain-101/02/02-02-the-flow-at-a-glance.ko.png)
