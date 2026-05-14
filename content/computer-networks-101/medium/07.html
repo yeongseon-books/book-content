@@ -79,12 +79,8 @@
 <p>A router sees only one hop at a time. The Internet is the sum of those small decisions.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-text">my laptop (192.168.0.10/24)
-  └─ same /24? yes  → direct delivery
-  └─ same /24? no   → default gateway (192.168.0.1)
-                        └─ ISP router → ... → destination AS
-NAT rewrites source (192.168.0.10:54321) to (203.0.113.5:60000)
-</code></pre>
+<p><img alt="How routing and NAT move a private-IP packet onto the Internet" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>Routing chooses the next hop, while NAT rewrites private source addresses and ports so replies can find their way back to the original host.</em></p>
 <h2>Key Terms</h2>
 <p><strong>Routing table</strong><br>
 - Meaning: A mapping of "this prefix → this interface / next hop"</p>
@@ -138,6 +134,21 @@ ip route show
 sudo ip route del 192.168.50.0/24
 </code></pre>
 <p>You see the routing table change in real time and packet destinations follow.</p>
+<h2>Step 6: Read longest-prefix and NAT state together</h2>
+<p>Routing and NAT failures often look similar from the outside, but their fingerprints are different.</p>
+<p><strong><code>ip route get 1.1.1.1</code> picks an unexpected interface</strong><br>
+- Suspect first: Longest-prefix conflict<br>
+- Why it looks like that: A narrower route beat the default route</p>
+<p><strong>Outbound connects, then long-idle replies disappear</strong><br>
+- Suspect first: NAT session timeout<br>
+- Why it looks like that: The translation state vanished before the return traffic arrived</p>
+<p><strong>A remote corporate range should cross VPN but still goes to local Wi-Fi</strong><br>
+- Suspect first: Missing static route<br>
+- Why it looks like that: The specific corporate prefix is absent from the routing table</p>
+<pre><code class="language-bash">ip route get 1.1.1.1
+# 1.1.1.1 via 192.168.0.1 dev wlan0 src 192.168.0.10
+</code></pre>
+<p>This is the fastest way to ask the OS, "If I send a packet there right now, which interface and source address will you choose?" It is often more actionable than <code>traceroute</code> at the start of a routing incident.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Routing decisions are independent at every hop</li>
@@ -213,6 +224,7 @@ sudo ip route del 192.168.50.0/24
 <li><a href="https://www.cloudflare.com/learning/security/glossary/what-is-bgp/">Cloudflare Learning — What is BGP?</a></li>
 <li><a href="https://man7.org/linux/man-pages/man8/ip-route.8.html">Linux ip-route(8) man page</a></li>
 <li><a href="https://www.pearson.com/store/p/computer-networks/P100000875375">Tanenbaum &amp; Wetherall — Computer Networks</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc4271">RFC 4271 — Border Gateway Protocol 4 (BGP-4)</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Networking, Routing, NAT, Default Gateway, Private IP</p>
 </body>

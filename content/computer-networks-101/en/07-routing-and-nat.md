@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 7
 title: Routing and NAT
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Default Gateway
   - Private IP
 seo_description: How packets cross the Internet through routers, and how NAT lets devices on private IPs reach public services — explained from the routing table.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Routing and NAT
@@ -50,13 +50,8 @@ Without routing, you cannot answer "why does it only fail on our corporate netwo
 
 ## Concept at a Glance
 
-```text
-my laptop (192.168.0.10/24)
-  └─ same /24? yes  → direct delivery
-  └─ same /24? no   → default gateway (192.168.0.1)
-                        └─ ISP router → ... → destination AS
-NAT rewrites source (192.168.0.10:54321) to (203.0.113.5:60000)
-```
+![How routing and NAT move a private-IP packet onto the Internet](../../../assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)
+*Routing chooses the next hop, while NAT rewrites private source addresses and ports so replies can find their way back to the original host.*
 
 ## Key Terms
 
@@ -138,6 +133,23 @@ sudo ip route del 192.168.50.0/24
 
 You see the routing table change in real time and packet destinations follow.
 
+## Step 6: Read longest-prefix and NAT state together
+
+Routing and NAT failures often look similar from the outside, but their fingerprints are different.
+
+| Symptom you observe | Suspect first | Why it looks like that |
+| --- | --- | --- |
+| `ip route get 1.1.1.1` picks an unexpected interface | Longest-prefix conflict | A narrower route beat the default route |
+| Outbound connects, then long-idle replies disappear | NAT session timeout | The translation state vanished before the return traffic arrived |
+| A remote corporate range should cross VPN but still goes to local Wi-Fi | Missing static route | The specific corporate prefix is absent from the routing table |
+
+```bash
+ip route get 1.1.1.1
+# 1.1.1.1 via 192.168.0.1 dev wlan0 src 192.168.0.10
+```
+
+This is the fastest way to ask the OS, "If I send a packet there right now, which interface and source address will you choose?" It is often more actionable than `traceroute` at the start of a routing incident.
+
 ## What to Notice in This Code
 
 - Routing decisions are independent at every hop
@@ -210,5 +222,6 @@ Next we look at the device often sitting at the end of that route — the load b
 - [Cloudflare Learning — What is BGP?](https://www.cloudflare.com/learning/security/glossary/what-is-bgp/)
 - [Linux ip-route(8) man page](https://man7.org/linux/man-pages/man8/ip-route.8.html)
 - [Tanenbaum & Wetherall — Computer Networks](https://www.pearson.com/store/p/computer-networks/P100000875375)
+- [RFC 4271 — Border Gateway Protocol 4 (BGP-4)](https://www.rfc-editor.org/rfc/rfc4271)
 
 Tags: Computer Science, Networking, Routing, NAT, Default Gateway, Private IP
