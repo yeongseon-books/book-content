@@ -60,7 +60,14 @@
 <p>Rate limiting for LLM APIs is not just about requests per second. Token volume, streaming output, and cost all move independently, so abuse control has to watch more than one meter.</p>
 <p>This is post 8 in the AI Safety &amp; Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why is LLM rate limiting about more than requests per second?</li>
+<li>How do token bucket and sliding window serve different goals?</li>
+<li>Why should user, IP, and API-key quotas overlap?</li>
+<li>How do output-token and spend caps differ from request limits?</li>
+<li>Why is staged escalation safer than instant suspension?</li>
+</ul>
 <h2>Why Rate Limiting Is Different for LLM APIs</h2>
 <p>Traditional API abuse control is mostly about requests per second. LLM APIs add two dimensions.</p>
 <ul>
@@ -204,6 +211,14 @@ class AnomalyDetector:
 <li>Apply user, IP, and API key boundaries together so attackers cannot trivially cycle out.</li>
 <li>Charge output tokens during the stream and always set <code>max_tokens</code> plus an application-side cap.</li>
 <li>Combine z-score anomaly detection with tiered escalation to balance abuse prevention against false positives.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Define separate limits for requests, input tokens, output tokens, and spend.</li>
+<li>[ ] Apply quotas at user, IP, and API-key boundaries together.</li>
+<li>[ ] Charge output tokens while the response is still streaming.</li>
+<li>[ ] Use anomaly detection to escalate gradually instead of suspending immediately.</li>
+<li>[ ] Keep cost-critical counters strongly consistent even if regional RPS counters are local.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>

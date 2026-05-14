@@ -14,7 +14,7 @@ tags:
 - Rate Limiting
 - Abuse Prevention
 - Anomaly Detection
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Prevent LLM API abuse and cost overruns by tracking requests, tokens, and spend using hybrid token bucket and anomaly detection algorithms.
 ---
 
@@ -27,7 +27,14 @@ Rate limiting for LLM APIs is not just about requests per second. Token volume, 
 This is post 8 in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Why is LLM rate limiting about more than requests per second?
+- How do token bucket and sliding window serve different goals?
+- Why should user, IP, and API-key quotas overlap?
+- How do output-token and spend caps differ from request limits?
+- Why is staged escalation safer than instant suspension?
 
 ## Why Rate Limiting Is Different for LLM APIs
 
@@ -204,6 +211,14 @@ LLM APIs care about cost caps, so most teams pick strong consistency for cost di
 - Apply user, IP, and API key boundaries together so attackers cannot trivially cycle out.
 - Charge output tokens during the stream and always set `max_tokens` plus an application-side cap.
 - Combine z-score anomaly detection with tiered escalation to balance abuse prevention against false positives.
+
+## Operational Checklist
+
+- [ ] Define separate limits for requests, input tokens, output tokens, and spend.
+- [ ] Apply quotas at user, IP, and API-key boundaries together.
+- [ ] Charge output tokens while the response is still streaming.
+- [ ] Use anomaly detection to escalate gradually instead of suspending immediately.
+- [ ] Keep cost-critical counters strongly consistent even if regional RPS counters are local.
 
 ---
 

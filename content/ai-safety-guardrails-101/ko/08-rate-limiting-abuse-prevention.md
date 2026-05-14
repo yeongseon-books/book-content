@@ -14,7 +14,7 @@ tags:
 - Rate Limiting
 - Abuse Prevention
 - Anomaly Detection
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 전통적인 API 남용은 "초당 요청 수" 위주였습니다. LLM API는 두 가지 차원이 추가됩니다.
 ---
 
@@ -210,7 +210,7 @@ LLM rate limiting은 더 이상 초당 요청 수 제한이 아닙니다. 토큰
 
 운영에서는 token bucket이 좋은 출발점이지만, anomaly detection과 escalation이 빠지면 거친 차단 시스템이 됩니다. 반대로 이상 탐지만 있고 강제 한도가 없으면 사고를 실시간으로 막지 못합니다.
 
-핵심은 간단합니다. 요청을 세지 말고, 소비를 계산해야 합니다.
+여기서 기억할 문장은 하나입니다. 요청을 세지 말고, 소비를 계산해야 합니다.
 
 <!-- toc:begin -->
 ## AI Safety & Guardrails 101 시리즈
