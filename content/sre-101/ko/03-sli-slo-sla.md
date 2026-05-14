@@ -17,7 +17,7 @@ tags:
   - SLA
   - Reliability
 seo_description: SLI, SLO, SLA의 차이와 문서화 방법을 입문자 관점에서 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # SLI, SLO, SLA
@@ -50,12 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    SLI["SLI: indicator"] --> SLO["SLO: objective"]
-    SLO --> SLA["SLA: agreement"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/03/03-01-concept-at-a-glance.ko.png)
 
+*측정 지표가 내부 목표를 거쳐 외부 약속으로 이어지는 책임층 구조입니다.*
 이 흐름을 머릿속에 넣어 두면 문서 구조가 바로 정리됩니다. 먼저 측정 대상을 정하고, 그다음 내부 목표를 세우고, 마지막으로 외부 약속이 필요하면 별도 합의를 문서화합니다.
 
 ## 핵심 용어 먼저 정리
@@ -139,6 +136,33 @@ def report(success, total, target):
 ```
 
 운영에서는 측정 결과를 읽기 쉬운 형식으로 정리하는 일도 중요합니다. 값과 위반 여부가 함께 보여야 주간 리뷰, 장애 회고, 고객 커뮤니케이션까지 자연스럽게 이어집니다.
+
+### 6단계 — 남은 버짓까지 함께 보고하기
+
+```python
+def budget_summary(success, total, target):
+    errors = total - success
+    allowed = (1 - target) * total
+    remaining = allowed - errors
+    return {
+        "availability": success / total,
+        "allowed_errors": allowed,
+        "remaining_errors": remaining,
+    }
+```
+
+여기까지 오면 SLI, SLO, SLA가 단순한 정의 암기가 아니라 운영 숫자로 연결됩니다. 현재 값이 얼마인지, 목표를 넘겼는지, 앞으로 얼마나 더 실패를 감당할 수 있는지를 한 보고 안에서 같이 보여 줄 수 있기 때문입니다.
+
+### 7단계 — 숫자가 다르게 보일 때 먼저 확인할 것
+
+운영 대시보드와 고객 보고서의 수치가 다를 때는 곧바로 목표를 의심하지 않는 편이 좋습니다. 먼저 같은 요청 집합을 보고 있는지, 성공과 실패 정의가 같은지, 측정 기간이 같은지부터 확인해야 합니다. 많은 SLO 논쟁은 사실 지표 정의 불일치에서 시작합니다.
+
+| 먼저 볼 항목 | 왜 중요한가 |
+| --- | --- |
+| 같은 요청 집합을 보고 있는가 | 엣지 트래픽과 앱 내부 트래픽은 가용성 값이 다르게 나올 수 있습니다. |
+| redirect, client error를 어떻게 셌는가 | 공식은 같아 보여도 성공 기준이 다르면 결과가 달라집니다. |
+| 30일 rolling window인가, 달력 월 기준인가 | 같은 99.9%라도 해석해야 할 위험이 달라집니다. |
+| 유지보수 시간을 제외했는가 | 내부 목표와 외부 약속 문서는 예외 처리 방식이 다를 수 있습니다. |
 
 ## 이 코드에서 먼저 봐야 할 점
 
