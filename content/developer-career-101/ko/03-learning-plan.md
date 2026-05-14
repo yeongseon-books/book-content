@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Learning
-  - Plan
-  - Habits
-  - Beginner
+- Career
+- Learning
+- Plan
+- Habits
+- Beginner
 seo_description: 체계적인 학습 계획 수립 방법을 배우고, 바쁜 업무 중에도 기술적 성장을 이뤄낼 수 있는 학습 루틴과 습관 전략을 알아봅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 학습 계획 세우기
@@ -49,12 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Q[Quarter Goal] --> W[Weekly Plan]
-    W --> O[Output]
-    O --> R[Retro]
-```
+![분기 목표에서 회고로 이어지는 학습 루프](../../../assets/developer-career-101/03/03-01-concept-at-a-glance.ko.png)
+
+*분기 목표에서 회고로 이어지는 학습 루프*
 
 학습은 입력을 많이 넣는다고 자동으로 쌓이지 않습니다. 목표가 주간 루틴으로 내려오고, 그 루틴이 결과물로 이어지며, 결과물이 다시 회고로 연결될 때 비로소 다음 분기의 학습이 더 정교해집니다.
 
@@ -121,6 +118,36 @@ Sat 09:00-11:00 (120 min)
 
 회고는 잘했는지 못했는지만 적는 문서가 아닙니다. 달성률, 방해 요인, 다음 분기 보정 방향을 함께 적어야 다음 사이클이 더 좋아집니다.
 
+## 학습 계획을 고정할 때 쓰는 운영 기준
+
+| 항목 | 좋은 기준 | 흔한 실패 |
+| --- | --- | --- |
+| 분기 목표 | 결과물과 마감이 한 문장에 같이 있다 | "공부하기"처럼 끝이 없다 |
+| 주간 루틴 | 요일, 시간, 길이가 캘린더에 박혀 있다 | 남는 시간에 하겠다고 남겨 둔다 |
+| 자료 선택 | 책 1개, 강의 1개, 코드베이스 1개처럼 역할이 다르다 | 비슷한 입문 자료만 여러 개 모은다 |
+| 결과물 | 저장소, 글, 발표처럼 바깥에서 검증된다 | 머릿속 이해로 끝난다 |
+| 회고 | 달성률과 방해 요인을 함께 적는다 | 느낌만 남기고 다음 수정이 없다 |
+
+## 학습 계획을 고정할 때 쓰는 운영 기준
+
+| 항목 | 좋은 기준 | 흔한 실패 |
+| --- | --- | --- |
+| 분기 목표 | 결과물과 마감이 한 문장에 같이 있다 | "공부하기"처럼 끝이 없다 |
+| 주간 루틴 | 요일, 시간, 길이가 캘린더에 박혀 있다 | 남는 시간에 하겠다고 남겨 둔다 |
+| 자료 선택 | 책 1개, 강의 1개, 코드베이스 1개처럼 역할이 다르다 | 비슷한 입문 자료만 여러 개 모은다 |
+| 결과물 | 저장소, 글, 발표처럼 바깥에서 검증된다 | 머릿속 이해로 끝난다 |
+| 회고 | 달성률과 방해 요인을 함께 적는다 | 느낌만 남기고 다음 수정이 없다 |
+
+## 학습 계획을 고정할 때 쓰는 운영 기준
+
+| 항목 | 좋은 기준 | 흔한 실패 |
+| --- | --- | --- |
+| 분기 목표 | 결과물과 마감이 한 문장에 같이 있다 | "공부하기"처럼 끝이 없다 |
+| 주간 루틴 | 요일, 시간, 길이가 캘린더에 박혀 있다 | 남는 시간에 하겠다고 남겨 둔다 |
+| 자료 선택 | 책 1개, 강의 1개, 코드베이스 1개처럼 역할이 다르다 | 비슷한 입문 자료만 여러 개 모은다 |
+| 결과물 | 저장소, 글, 발표처럼 바깥에서 검증된다 | 머릿속 이해로 끝난다 |
+| 회고 | 달성률과 방해 요인을 함께 적는다 | 느낌만 남기고 다음 수정이 없다 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 목표는 결과물로 드러나야 합니다.
@@ -179,9 +206,9 @@ Sat 09:00-11:00 (120 min)
 
 ## 참고 자료
 
-- [Atomic Habits](https://jamesclear.com/atomic-habits)
-- [Deep Work](https://www.calnewport.com/books/deep-work/)
-- [Deliberate Practice](https://www.psychologytoday.com/us/basics/deliberate-practice)
-- [OKR Examples](https://www.whatmatters.com/)
+- [James Clear — Atomic Habits](https://jamesclear.com/atomic-habits)
+- [Cal Newport — Deep Work](https://www.calnewport.com/books/deep-work/)
+- [Harvard Business Review — The Making of an Expert](https://hbr.org/2007/07/the-making-of-an-expert)
+- [Measure What Matters — OKR examples](https://www.whatmatters.com/resources/okr-examples)
 
 Tags: Career, Learning, Plan, Habits, Beginner

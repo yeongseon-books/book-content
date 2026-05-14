@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 3
 title: Building a Learning Plan
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Learning
-  - Plan
-  - Habits
-  - Beginner
-seo_description: A beginner-friendly tour of running a sustainable learning plan in quarters and weeks.
-last_reviewed: '2026-05-04'
+- Career
+- Learning
+- Plan
+- Habits
+- Beginner
+seo_description: A beginner-friendly tour of running a sustainable learning plan in
+  quarters and weeks.
+last_reviewed: '2026-05-14'
 ---
 
 # Building a Learning Plan
 
+Most developers do not struggle because learning resources are unavailable. They struggle because books, courses, and repos pile up faster than calendar time, so learning turns into a backlog of intentions instead of a repeatable system.
+
 This is post 3 in the Developer Career 101 series.
 
-> Developer Career 101 series (3/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What structure keeps learning sustainable during a busy quarter?
+- How should quarterly goals and weekly time blocks connect to each other?
+- How do you choose books, courses, and codebases without drowning in input?
+- Why do outputs and retrospectives matter as much as study time?
 
-**Core question**: How do you keep *learning* sustainable inside a busy life?
-
-> Quarterly goals, a weekly routine, and measurable outputs.
-
-<!-- a-grade-intro:end -->
+> Sustainable learning is not a burst of motivation. It is a system of reserved time, bounded inputs, and visible outputs.
 
 ## What You Will Learn
 
@@ -48,12 +50,9 @@ Learning without a plan disperses.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q[Quarter Goal] --> W[Weekly Plan]
-    W --> O[Output]
-    O --> R[Retro]
-```
+![Learning loop from quarterly goal to retrospective](../../../assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
+
+*Learning loop from quarterly goal to retrospective*
 
 ## Key Terms
 
@@ -107,6 +106,36 @@ Sat 09:00-11:00 (120 min)
 - blocker: ownership
 - next quarter: async/await depth
 ```
+
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
+
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
+
+## Operating criteria for a sustainable plan
+
+| Item | Strong version | Common failure |
+| --- | --- | --- |
+| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
+| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
+| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
+| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
+| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
 
 ## What to Notice in This Code
 
@@ -166,9 +195,9 @@ Next post covers *Resume and Portfolio*.
 
 ## References
 
-- [Atomic Habits](https://jamesclear.com/atomic-habits)
-- [Deep Work](https://www.calnewport.com/books/deep-work/)
-- [Deliberate Practice](https://www.psychologytoday.com/us/basics/deliberate-practice)
-- [OKR Examples](https://www.whatmatters.com/)
+- [James Clear — Atomic Habits](https://jamesclear.com/atomic-habits)
+- [Cal Newport — Deep Work](https://www.calnewport.com/books/deep-work/)
+- [Harvard Business Review — The Making of an Expert](https://hbr.org/2007/07/the-making-of-an-expert)
+- [Measure What Matters — OKR examples](https://www.whatmatters.com/resources/okr-examples)
 
 Tags: Career, Learning, Plan, Habits, Beginner
