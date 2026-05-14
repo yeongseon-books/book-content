@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Scope
   - Beginner
 seo_description: 캡스톤 프로젝트의 핵심인 문제 정의를 사용자, 가치, 가정, 지표 관점에서 구체화하여 프로젝트의 흔들리지 않는 기준점을 세웁니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 문제 정의
 
-문제 정의가 흐리면 해결책도 함께 흔들립니다. 무엇을 만들 것인지보다 먼저, 누구의 어떤 문제를 왜 풀어야 하는지 붙잡아야 합니다. 이 글은 Capstone Project 101 시리즈의 3번째 글입니다. 여기서는 기능 설명과 문제 정의를 구분하고, 문제 문장을 어떻게 선명하게 만들지 살펴보겠습니다.
+문제 정의가 흐리면 팀은 계속 해결책만 바꿉니다. 기능은 늘어나는데 왜 만드는지 설명은 점점 약해지는 경우가 많습니다.
 
-> 멘탈 모델: 기능은 문제를 푸는 수단일 뿐입니다. 문제 문장이 흔들리면 요구사항, MVP, 데모 기준도 함께 흔들립니다.
+문제 문장은 프로젝트의 기준점입니다. 요구사항을 넣을지 뺄지, MVP를 어디까지 자를지, 발표에서 무엇을 강조할지 모두 이 문장으로 다시 돌아와야 합니다.
+
+이 글은 Capstone Project 101 시리즈의 3번째 글입니다. 여기서는 기능 설명과 문제 정의를 구분하고, 사용자·가정·지표가 함께 들어 있는 문제 카드를 만드는 방법을 다룹니다.
+
+> 멘탈 모델: 문제 문장은 기능 목록의 앞줄이 아니라, 이후 모든 요구사항과 우선순위를 묶어 주는 기준 문장입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,29 @@ last_reviewed: '2026-05-12'
 
 좋은 팀은 문제 정의를 한 번에 완성하려 하지 않습니다. 다만 관찰, 사용자, 가치, 가정, 지표를 분리해서 적어 두기 때문에 중간 조정이 와도 기준이 무너지지 않습니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    O[Observation] --> S[Statement]
-    S --> U[User]
-    U --> V[Value]
-    V --> M[Measure]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/03/03-01-the-flow-at-a-glance.ko.png)
+*문제 정의를 사용자, 가정, 지표까지 연결하는 흐름*
+
+## 실전 문서 예시: 문제 카드
+
+짧은 문제 카드 하나만 잘 써도 해결책 논의의 질이 크게 달라집니다. 아래 항목은 최소 구성입니다.
+
+```text
+관찰: 수강 신청 직전에 시간표 충돌을 수동으로 계산하느라 시간이 오래 걸린다
+핵심 사용자: 복수전공 학생, 신입생
+문제 문장: 수강 신청 전 30초 안에 충돌 여부를 확인하기 어렵다
+핵심 가정: 시간표 데이터를 텍스트나 CSV로 쉽게 넣을 수 있다
+성공 지표: 첫 사용자가 30초 안에 충돌 여부를 확인한다
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 문제 문장이 해결책 이름으로 시작하지 않는지 확인합니다.
+- 핵심 사용자를 좁혀 쓰고 있는지 점검합니다.
+- 숨겨진 가정을 별도 항목으로 끌어올립니다.
+- 지표가 시간, 정확도, 완료율처럼 측정 가능한 값인지 봅니다.
 
 ## 핵심 용어
 
@@ -157,7 +175,7 @@ PRD의 첫머리나 프로젝트 제안서의 초반에는 거의 항상 문제 
 
 ## 정리와 다음 글
 
-문제 정의는 기능 목록의 앞페이지가 아니라, 프로젝트 전체 판단을 붙잡는 기준점입니다. 관찰, 사용자, 가치, 가정, 지표를 분리해서 적으면 해결책과 문제를 헷갈릴 가능성이 크게 줄어듭니다. 다음 글에서는 이렇게 정리한 문제를 실제 요구사항 목록으로 바꾸는 과정을 살펴보겠습니다.
+문제 정의는 기능 목록의 서문이 아니라 프로젝트의 기준점입니다. 사용자, 가정, 지표를 함께 적어 두면 요구사항과 MVP를 자를 때도 훨씬 단단한 판단이 가능합니다. 다음 글에서는 이 기준을 실제 요구사항 문서로 바꾸겠습니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -174,9 +192,11 @@ PRD의 첫머리나 프로젝트 제안서의 초반에는 거의 항상 문제 
 
 ## 참고 자료
 
+### 공식 문서와 실무 자료
+
+- [Atlassian requirements guide](https://www.atlassian.com/agile/product-management/requirements)
+- [Working Backwards](https://www.workingbackwards.com/)
 - [The Mom Test](http://momtestbook.com/)
-- [Working Backwards - Amazon](https://www.workingbackwards.com/)
-- [PRD Template - Atlassian](https://www.atlassian.com/agile/product-management/requirements)
-- [Inspired - Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
+- [Inspired — Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
 
 Tags: Capstone, Problem, Definition, Scope, Beginner

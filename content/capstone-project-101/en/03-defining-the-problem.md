@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 3
 title: Defining the Problem
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Scope
   - Beginner
 seo_description: A beginner-friendly tour of defining a capstone problem covering statements, users, value, assumptions, and metrics.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Defining the Problem
 
-> Capstone Project 101 series (3/10)
+When the problem statement is weak, the team keeps changing solutions without knowing what it is optimizing for. Features multiply while the explanation gets thinner.
 
-<!-- a-grade-intro:begin -->
+A good problem statement becomes the project's anchor. Requirements, MVP scope, demo emphasis, and success metrics all need to trace back to it.
 
-**Core question**: *Why* does an *unclear problem* make the *solution shake*?
+This is post 3 in the Capstone Project 101 series. It separates feature talk from problem definition and shows how to build a problem card with users, assumptions, and metrics.
 
-> If the *problem* becomes a *moving target*, *progress* gets *redefined* too.
+## Questions this chapter answers
 
-This is post 3 in the Capstone Project 101 series.
+- Why does an unclear problem statement destabilize the solution?
+- How is a problem definition different from feature description?
+- How much detail do users and assumptions need?
+- Why should metrics appear from the start?
+- When does rewriting the problem signal learning rather than failure?
 
-<!-- a-grade-intro:end -->
+> The problem statement is not the first line of a feature list. It is the sentence that holds later requirements and priorities together.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,33 @@ This is post 3 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-*Problem definition* decides *half* of *project quality*.
+A clear statement lets the team ask the same question whenever a new feature appears: does this directly help solve the stated problem? Without that filter, every idea starts to look equally important.
 
-## Concept at a Glance
+Writing assumptions and metrics next to the problem also strengthens the eventual demo and retrospective. The team can compare what it believed at kickoff with what it later observed.
 
-```mermaid
-flowchart LR
-    O[Observation] --> S[Statement]
-    S --> U[User]
-    U --> V[Value]
-    V --> M[Measure]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
+*Connecting the problem statement to users, assumptions, and metrics*
+
+## Practical artifact: a problem card
+
+A short problem card can dramatically improve solution discussions. The fields below are the minimum useful set.
+
+```text
+Observation: students spend too much time manually checking course schedule conflicts right before registration
+Primary users: freshmen and double-major students
+Problem statement: users cannot confirm schedule conflicts within 30 seconds before course registration
+Core assumption: timetable data can be entered through text or CSV without special setup
+Success metric: a first-time user confirms conflicts within 30 seconds
 ```
+
+## What to validate first
+
+- Make sure the statement does not begin as a solution pitch.
+- Narrow the primary user group instead of writing everyone.
+- Pull hidden assumptions into the document before implementation starts.
+- Prefer measurable values such as time, accuracy, or completion rate.
 
 ## Key Terms
 
@@ -143,7 +164,7 @@ The *first section* of a PRD is the *problem statement*.
 
 ## Wrap-up and Next Steps
 
-Next post: *Organizing Requirements*.
+Problem definition is the decision anchor for the whole project. Once users, assumptions, and metrics are written down together, later requirement and MVP cuts become much easier to justify. The next post turns that anchor into an actual requirements document.
 
 <!-- toc:begin -->
 - [What is a Capstone Project](./01-what-is-capstone.md)
@@ -160,9 +181,11 @@ Next post: *Organizing Requirements*.
 
 ## References
 
+### Official docs and practical guides
+
+- [Atlassian requirements guide](https://www.atlassian.com/agile/product-management/requirements)
+- [Working Backwards](https://www.workingbackwards.com/)
 - [The Mom Test](http://momtestbook.com/)
-- [Working Backwards - Amazon](https://www.workingbackwards.com/)
-- [PRD Template - Atlassian](https://www.atlassian.com/agile/product-management/requirements)
-- [Inspired - Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
+- [Inspired — Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
 
 Tags: Capstone, Problem, Definition, Scope, Beginner
