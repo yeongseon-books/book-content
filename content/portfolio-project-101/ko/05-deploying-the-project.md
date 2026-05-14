@@ -17,7 +17,7 @@ tags:
   - Hosting
   - Beginner
 seo_description: 프로젝트 결과물을 외부에서 확인 가능한 URL로 배포하는 과정과 지속적 업데이트를 위한 자동화 파이프라인 구축을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 배포하기
@@ -45,13 +45,9 @@ last_reviewed: '2026-05-12'
 
 배포를 복잡하게 볼 필요는 없습니다. 코드가 저장소로 올라가고, 빌드되고, 배포되고, 상태를 확인한 뒤, 안정적으로 열리는 URL로 이어지면 됩니다.
 
-```mermaid
-flowchart LR
-    G[Git Push] --> B[Build]
-    B --> D[Deploy]
-    D --> H[Healthcheck]
-    H --> U[URL]
-```
+![배포 이후 공개 URL에 도달하기까지의 흐름](../../../assets/portfolio-project-101/05/05-01-diagram.ko.png)
+
+*배포 이후 공개 URL에 도달하기까지의 흐름*
 
 이 흐름은 문제가 생겼을 때도 유용합니다. 빌드에서 막혔는지, 배포는 됐지만 애플리케이션이 뜨지 않는지, URL은 열리는데 내부 상태가 깨졌는지 구분할 수 있기 때문입니다. 포트폴리오도 결국 이런 구분이 가능한 쪽이 더 성숙하게 보입니다.
 
