@@ -2,7 +2,7 @@
 series: containers-101
 episode: 1
 title: What is a Container?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Linux
-  - DevOps
-  - Architecture
-seo_description: A beginner-friendly definition of containers — how they share the host kernel, how they differ from VMs, with a runnable docker example.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Linux
+- DevOps
+- Architecture
+seo_description: A beginner-friendly definition of containers — how they share the
+  host kernel, how they differ from VMs, with a runnable docker example.
+last_reviewed: '2026-05-15'
 ---
 
 # What is a Container?
 
-> Containers 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Containers look like tiny VMs — so why are they emphatically *not* VMs?
-
-> *A container is a lightweight package of an isolated process tree that shares the host OS kernel.*
-
-<!-- a-grade-intro:end -->
+Containers are often introduced as tiny VMs, but that shortcut hides the exact boundary that matters in operations. The real question is which parts are shared, which parts are isolated, and what that means for reproducibility and security.
 
 This is the first post in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we define a container as an isolated process tree sharing the host kernel, compare that model with a VM, and walk through what `docker run` actually creates when your first container starts.
+
+> A container is not a tiny VM. It is an isolated process tree sharing the host kernel.
+
+## Questions this chapter answers
 
 - The definition of a container
 - What gets shared with the host
@@ -48,14 +45,9 @@ Since 2013, the container has been the default unit of deployment. Without it, m
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Host["host os kernel"] --> C1["container 1"]
-    Host --> C2["container 2"]
-    Host --> C3["container 3"]
-    C1 --> App1["app process"]
-```
+![Container processes sharing the host kernel](../../../assets/containers-101/01/01-01-concept-at-a-glance.en.png)
 
+*Container processes sharing the host kernel*
 ## Key Terms
 
 - **Container**: an isolated bundle of processes.
@@ -120,6 +112,25 @@ def cleanup(name):
 - `-p 8080:80` maps host:container ports.
 - `--name` gives you a stable handle.
 
+## Quick verification and failure signals
+
+```bash
+docker --version
+docker run -d --name web -p 8080:80 nginx:1.27-alpine
+curl -I http://127.0.0.1:8080
+docker ps --filter name=web
+```
+
+**Expected output:**
+- `docker --version` returns a valid engine version.
+- `curl -I` shows `HTTP/1.1 200 OK`.
+- `docker ps` shows `web` with `0.0.0.0:8080->80/tcp`.
+
+**Check first if it fails:**
+- If `docker run` fails, confirm local port `8080` is free.
+- If `curl` fails, inspect `docker logs web` before changing the image.
+- If you swap the image, verify the service still listens on port 80.
+
 ## Five Common Mistakes
 
 1. **Forgetting port mapping — the container is unreachable.**
@@ -158,6 +169,8 @@ Developers build the same image on Docker Desktop. CI pushes that image to a reg
 If an image is a template, you have to understand its internals. The next post covers Image and Layer.
 
 <!-- toc:begin -->
+## In this series
+
 - **What is a Container? (current)**
 - Image and Layer (upcoming)
 - Runtime (upcoming)
@@ -168,6 +181,7 @@ If an image is a template, you have to understand its internals. The next post c
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -177,4 +191,4 @@ If an image is a template, you have to understand its internals. The next post c
 - [Linux namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)
 - [cgroups v2](https://www.kernel.org/doc/Documentation/admin-guide/cgroup-v2.rst)
 
-Tags: Containers, Docker, Linux, DevOps, Architecture
+Tags: Containers, Docker, Kubernetes, DevOps
