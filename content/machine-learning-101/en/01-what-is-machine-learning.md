@@ -2,7 +2,7 @@
 series: machine-learning-101
 episode: 1
 title: What Is Machine Learning?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,30 +17,22 @@ tags:
   - Foundations
   - Beginner
 seo_description: A clear intro to machine learning — what learning, generalization, and prediction mean and how ML differs from statistics and rule-based code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Machine Learning?
 
-> Machine Learning 101 series (1/10)
+Recommendation systems, fraud filters, and medical triage tools all get called “machine learning,” but that label hides the real operating question. Are you writing smarter rules, doing statistics with a new library, or building a system that learns a reusable function from data? If that distinction stays fuzzy, every later discussion about models, metrics, and deployment turns into memorizing API names.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.
 
-**Core question**: Is *machine learning* just *a new name for statistics*, or *a new programming paradigm*?
+## Questions this post answers
 
-> *Machine learning *learns a function from data* and uses it to *predict on new inputs*.*
-
-<!-- a-grade-intro:end -->
-
-This is the first post in the Machine Learning 101 series.
-
-## What You Will Learn
-
-- The *definition* of *machine learning*
-- The intuition of *learning, generalization, prediction*
-- The *difference* from *statistics* and *rule-based code*
-- A 5-step first ML hands-on
-- Five common mistakes
+- What exactly is the model learning when we say “machine learning”?
+- Why is generalization different from scoring well on the training set?
+- Where does machine learning diverge from statistics and rule-based code?
+- What do `fit`, `predict`, and `score` really mean in scikit-learn?
+- Which beginner mistakes break this mental model first?
 
 ## Why It Matters
 
@@ -48,12 +40,9 @@ Recommendation, medicine, finance, autonomous driving — *every industry* is be
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["data (X, y)"] --> Train["train: learn f"]
-    Train --> Model["model f̂"]
-    Model --> Predict["predict y_hat for new X"]
-```
+![Concept at a Glance](../../../assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
+
+*Machine learning starts by fitting a function on data, then reuses that function on inputs the model has never seen before.*
 
 ## Key Terms
 
@@ -104,11 +93,19 @@ print(model.predict(X[:5]))
 print("acc:", model.score(X, y))
 ```
 
+**Expected output:** `X.shape` and `y.shape` should report a small tabular dataset such as `(150, 4)` and `(150,)`, `model.predict(X[:5])` should print class IDs, and the training accuracy will usually look very high. That last number is a teaching device, not proof that the model generalizes.
+
 ## What to Notice in This Code
 
 - *fit / predict / score* is the *scikit-learn standard interface*.
 - *score* here is only *training accuracy* — not generalization.
 - *Model choice* depends on *problem type*.
+
+## Read the first failure signal this way
+
+- If training accuracy looks excellent but live data fails, check whether the input distribution changed or whether the target was defined too loosely.
+- If the team cannot explain what `X` and `y` represent in one sentence, the project is not ready for model comparison yet.
+- If a notebook demo works only on the sample rows you kept reusing, suspect leakage or accidental memorization before you blame the algorithm.
 
 ## Five Common Mistakes
 
