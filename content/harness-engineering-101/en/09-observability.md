@@ -3,7 +3,7 @@ title: Observability — Tracing and Replaying Agent Work
 series: harness-engineering-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Observability
 - Tracing
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: If you cannot see what the agent did, you cannot debug it or improve
   it.
 ---
 
 # Observability — Tracing and Replaying Agent Work
 
-This is post 9 in the Harness Engineering 101 series.
+Many agent systems still preserve only the final answer string. That is enough to impress someone in a demo and almost useless when an incident starts. Once a real run includes retrieval, tool calls, retries, reflection, approval, and cost controls, the final answer alone is not an explanation.
 
-> Harness Engineering 101 Series (9/10)
+Operationally, the real requirement is stronger: after a bad run, you must be able to reconstruct what the agent saw, what it decided, what it called, how long each step took, and where the cost spiked.
 
-If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.
+This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
 
 ---
+
+## Questions this chapter answers
+
+- How do traces and spans represent one agent execution end to end?
+- What inputs and reasoning context must be logged in addition to final output?
+- What makes a run replayable instead of merely inspectable?
+- Why do p95 latency and per-run cost matter more than simple averages?
+- Which anomalies deserve paging and which belong only in dashboards or reports?
+
+> Logging the answer is not enough. Observability begins when you can reconstruct the run, not just read the result.
 
 ![Observability - tracing and replaying agent work](../../../assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 
@@ -229,6 +239,14 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 - Replay only works if prompts and retrieved context are stored.
 - Watch p95 (not average) latency and alert on baseline-relative spikes.
 
+## Operational checklist
+
+- [ ] Record every agent run as a trace with nested spans.
+- [ ] Store What, Why, and Cost metadata together for each critical step.
+- [ ] Preserve prompts, retrieved context, and tool inputs needed for replay.
+- [ ] Track error rate, p95 latency, and average cost per run in dashboards.
+- [ ] Page only on material baseline-relative spikes to avoid alert fatigue.
+
 The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.
 
 <!-- toc:begin -->
@@ -251,9 +269,15 @@ The next post is Production Harness — combining the nine harnesses into a depl
 
 ## References
 
-- [OpenTelemetry — Tracing concepts](https://opentelemetry.io/docs/concepts/signals/traces/)
-- [Google SRE — Monitoring distributed systems](https://sre.google/sre-book/monitoring-distributed-systems/)
-- [LangSmith — Tracing for LLM applications](https://docs.smith.langchain.com/observability)
-- [Honeycomb — Observability engineering](https://www.honeycomb.io/blog/what-is-observability)
+### Official docs and references
+
+- [OpenTelemetry — Tracing Concepts](https://opentelemetry.io/docs/concepts/signals/traces/)
+- [Google SRE — Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [LangSmith — Tracing for LLM Applications](https://docs.smith.langchain.com/observability)
+
+### Verification-friendly observability references
+
+- [Honeycomb — What Is Observability Engineering?](https://www.honeycomb.io/blog/what-is-observability)
+- [OpenAI Agents SDK — Tracing](https://openai.github.io/openai-agents-python/tracing/)
 
 Tags: AI Agent, Harness, Production, Reliability

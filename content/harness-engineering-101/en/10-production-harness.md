@@ -3,7 +3,7 @@ title: Production Harness — Building Operational Environments for Agents
 series: harness-engineering-101
 episode: 10
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Production
 - Deployment
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: The Production Harness is the final layer that binds the nine harnesses
   we have covered into one operable system.
 ---
 
 # Production Harness — Building Operational Environments for Agents
 
-This is the final post in the Harness Engineering 101 series.
+Individual harnesses can look solid in isolation and still fail once they are assembled into one production path. A new prompt affects evals. A new tool changes approval rules. A retry path changes traces, paging, and rollback expectations. In production, the integration points cause more incidents than the parts themselves.
 
-> Harness Engineering 101 Series (10/10)
+That is why the final step is not “add one more pattern.” It is defining how all prior harnesses move together through request handling, canary rollout, rollback, and on-call response.
 
-This episode integrates every harness covered so far into a production-ready agent environment. The Production Harness assembles task, context, constraint, tool, test, feedback, approval, and observability into a single working system.
+This is the final post in the Harness Engineering 101 series. It binds Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability into one deployable operating stack.
 
 ---
+
+## Questions this chapter answers
+
+- How do the previous harnesses fit together inside one request flow?
+- Why do systems fail in production even when individual harnesses look fine on paper?
+- Why should prompt and tool changes never jump to 100% traffic immediately?
+- Why is rollback a minimum operating requirement rather than a nice-to-have feature?
+- Why should runbooks and eval suites move with the same version as prompts and tools?
+
+> A production agent is not just a pile of harnesses. It is a versioned operating stack that can be deployed, observed, and rolled back safely.
 
 ![Production harness - building operational environments for agents](../../../assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
 
@@ -214,6 +224,14 @@ Register this stack with `HarnessRouter`, deploy it 1% → 100% through `CanaryD
 - The on-call runbook lives in the repo and is exercised quarterly via fire drill.
 - Prompts, tools, and eval datasets share the same version_id and roll back together.
 
+## Operational checklist
+
+- [ ] Document where each harness starts, ends, and hands off in one request flow.
+- [ ] Version prompts, tool definitions, approval rules, and eval datasets together.
+- [ ] Use 1% → 10% → 50% → 100% rollout stages for meaningful changes.
+- [ ] Rehearse rollback so the previous version is reachable within 30 seconds.
+- [ ] Keep the on-call runbook in the repo and validate it with regular fire drills.
+
 This is the final post in the series. Combining the nine harnesses from Harness Engineering 101 with this production layer is what turns "a demo that looks good but breaks in production" into "an agent users trust."
 
 <!-- toc:begin -->
@@ -236,9 +254,11 @@ This is the final post in the series. Combining the nine harnesses from Harness 
 
 ## References
 
-- [Google SRE — Release engineering](https://sre.google/sre-book/release-engineering/)
-- [Martin Fowler — CanaryRelease](https://martinfowler.com/bliki/CanaryRelease.html)
+### Official docs and references
+
+- [Google SRE — Release Engineering](https://sre.google/sre-book/release-engineering/)
+- [Martin Fowler — Canary Release](https://martinfowler.com/bliki/CanaryRelease.html)
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- [PagerDuty — Incident response documentation](https://response.pagerduty.com/)
+- [PagerDuty — Incident Response Documentation](https://response.pagerduty.com/)
 
 Tags: AI Agent, Harness, Production, Reliability

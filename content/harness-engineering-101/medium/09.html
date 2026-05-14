@@ -54,12 +54,21 @@
 </head>
 <body>
 <h1>Observability — Tracing and Replaying Agent Work</h1>
-<p>This is post 9 in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (9/10)</p>
-</blockquote>
-<p>If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.</p>
+<p>Many agent systems still preserve only the final answer string. That is enough to impress someone in a demo and almost useless when an incident starts. Once a real run includes retrieval, tool calls, retries, reflection, approval, and cost controls, the final answer alone is not an explanation.</p>
+<p>Operationally, the real requirement is stronger: after a bad run, you must be able to reconstruct what the agent saw, what it decided, what it called, how long each step took, and where the cost spiked.</p>
+<p>This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>How do traces and spans represent one agent execution end to end?</li>
+<li>What inputs and reasoning context must be logged in addition to final output?</li>
+<li>What makes a run replayable instead of merely inspectable?</li>
+<li>Why do p95 latency and per-run cost matter more than simple averages?</li>
+<li>Which anomalies deserve paging and which belong only in dashboards or reports?</li>
+</ul>
+<blockquote>
+<p>Logging the answer is not enough. Observability begins when you can reconstruct the run, not just read the result.</p>
+</blockquote>
 <p><img alt="Observability - tracing and replaying agent work" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png"></p>
 <p><em>Observability - tracing and replaying agent work</em></p>
 <h2>What Is Observability?</h2>
@@ -227,6 +236,14 @@ def aggregate(spans: list[Span]) -&gt; AgentMetrics:
 <li>Replay only works if prompts and retrieved context are stored.</li>
 <li>Watch p95 (not average) latency and alert on baseline-relative spikes.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Record every agent run as a trace with nested spans.</li>
+<li>[ ] Store What, Why, and Cost metadata together for each critical step.</li>
+<li>[ ] Preserve prompts, retrieved context, and tool inputs needed for replay.</li>
+<li>[ ] Track error rate, p95 latency, and average cost per run in dashboards.</li>
+<li>[ ] Page only on material baseline-relative spikes to avoid alert fatigue.</li>
+</ul>
 <p>The next post is Production Harness — combining the nine harnesses into a deployment pattern for real production environments.</p>
 <h2>In this series</h2>
 <ul>
@@ -243,11 +260,16 @@ def aggregate(spans: list[Span]) -&gt; AgentMetrics:
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and references</strong></p>
 <ul>
-<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry — Tracing concepts</a></li>
-<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Monitoring distributed systems</a></li>
-<li><a href="https://docs.smith.langchain.com/observability">LangSmith — Tracing for LLM applications</a></li>
-<li><a href="https://www.honeycomb.io/blog/what-is-observability">Honeycomb — Observability engineering</a></li>
+<li><a href="https://opentelemetry.io/docs/concepts/signals/traces/">OpenTelemetry — Tracing Concepts</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Monitoring Distributed Systems</a></li>
+<li><a href="https://docs.smith.langchain.com/observability">LangSmith — Tracing for LLM Applications</a></li>
+</ul>
+<p><strong>Verification-friendly observability references</strong></p>
+<ul>
+<li><a href="https://www.honeycomb.io/blog/what-is-observability">Honeycomb — What Is Observability Engineering?</a></li>
+<li><a href="https://openai.github.io/openai-agents-python/tracing/">OpenAI Agents SDK — Tracing</a></li>
 </ul>
 <p class="tags-line">Tags: AI Agent, Harness, Production, Reliability</p>
 </body>
