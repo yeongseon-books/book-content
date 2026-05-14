@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Documentation</h1>
-<p>This is post 7 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If the code is good, do you really need docs?</p>
-<blockquote>
-<p>Code answers "how". Documentation answers "why" and "when".</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>It is tempting to say that good code should make documentation unnecessary. Strong names, small modules, and readable tests do carry a lot of information. But code alone rarely explains why a decision was made, when an operator should follow a procedure, or where a new teammate should start on day one.</p>
+<p>The biggest failure mode of weak documentation is not inconvenience. It is dependency on specific people. Every unanswered question routes through memory, availability, and interruption cost. That is why documentation is not a side artifact. It is a core part of asynchronous engineering work.</p>
+<p>This is post 7 in the Software Engineering 101 series. In this chapter, we split documentation by reader need, then look at the minimum useful shapes for a README, ADR, runbook, docstring, and onboarding checklist.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The minimum sections of a useful README</li>
@@ -80,11 +71,8 @@
 <p>Documentation is the infrastructure of async collaboration.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[&quot;Tutorial&quot;] --&gt; H[&quot;How-to&quot;]
-    H --&gt; R[&quot;Reference&quot;]
-    R --&gt; E[&quot;Explanation&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>The Diataxis structure that separates docs by reader intent</em></p>
 <p>Diataxis splits docs by reader intent.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -147,6 +135,26 @@ def compute_invoice(amount: int, tax_rate: float) -&gt; int:
 - [ ] Shadow first incident within a week
 </code></pre>
 <p>Designs the new hire's first thirty days.</p>
+<h2>A document-set verification check</h2>
+<p>Documentation quality is easier to see through a real journey than through word count. Walk the repo like a new engineer or an on-call responder and see whether the right document appears at the right moment.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Try to understand the project from the README alone for the first five minutes.</li>
+<li>Pick one major decision and look for an ADR or RFC that explains it.</li>
+<li>Follow an incident runbook and see whether the steps are executable as written.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>A strong README reveals project value and startup path quickly.</li>
+<li>ADRs reduce repeated "why did we do this?" discussions.</li>
+<li>A runbook gives an operator an order of operations under pressure.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>The answer is "it is somewhere in the wiki."</li>
+<li>There is no owner or review date, so readers cannot trust the document.</li>
+<li>The same onboarding question always routes through the same person.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Splitting by intent makes docs findable.</li>
