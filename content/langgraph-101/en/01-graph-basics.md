@@ -276,7 +276,7 @@ In the next post, we will keep that state alive across calls with checkpoints an
 - [LangGraph introduction tutorial](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
 
 ### Related Series
-- [LangChain 101](../../langchain-101/en/)
+- [LangChain 101](../../langchain-101/en/01-lcel-runnable-basics.md) — covers the Runnable and LCEL primitives that LangGraph invokes inside each node. Drop down to it whenever the question is not about the graph itself but about what actually executes inside one of its nodes.
 - [AI Agent 101](../../ai-agent-101/en/)
 
 ---

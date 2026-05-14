@@ -428,4 +428,8 @@ Next, we move one layer up to **MetaData, Table, Column, and the type system**. 
 - [SQLite URL forms in SQLAlchemy](https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#connect-strings)
 - [PEP 249 - Python Database API Specification 2.0](https://peps.python.org/pep-0249/)
 
+### Related Series
+
+- [Python DB-API 101](../../python-dbapi-101/en/01-why-db-api-pep-249.md) — covers the PEP 249 DB-API that SQLAlchemy is built on top of. Drop down to it when SQLAlchemy connection pooling, transactions, or cursor behavior feels like magic and you need to see the driver calls underneath.
+
 Tags: Python, SQLAlchemy, ORM, Database

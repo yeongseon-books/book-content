@@ -324,6 +324,6 @@ if __name__ == "__main__":
 
 - [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
 - [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
-- [구조화 출력 — JSON 모드와 응답 스키마](../../llm-api-production-101/ko/01-structured-output.md)
+- [LLM API Production 101](../../llm-api-production-101/ko/01-structured-output.md) — 이 시리즈가 끝나는 지점, 즉 첫 호출·토큰·기본 프롬프트 다음 단계를 다룹니다. 구조화 출력, 툴 호출, 스트리밍, 재시도처럼 production 환경에서 부딪히는 문제로 넘어갈 때 권장합니다.
 
 Tags: LLM, OpenAI, Prompt Engineering, Python

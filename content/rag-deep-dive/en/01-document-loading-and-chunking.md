@@ -465,4 +465,8 @@ That baseline matters because the vector index is not neutral. It geometrizes th
 - [LangChain `Document` base type](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/documents/base.py)
 - [Lewis et al., Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks](https://doi.org/10.48550/arXiv.2005.11401)
 
+### Related Series
+
+- [Vector Search 101](../../vector-search-101/en/01-what-is-embedding.md) — covers the actual vector search that RAG consumes as a black box. Drop down to this series when retrieval quality wobbles because of an ANN index choice (FAISS, HNSW) or an embedding model swap.
+
 Tags: RAG, LangChain, Vector Search, LLM

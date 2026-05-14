@@ -188,4 +188,8 @@ The goal is not pretty logs. The goal is one record shape that can answer later 
 - [Python logging cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
 - [OpenTelemetry Python](https://opentelemetry.io/docs/instrumentation/python/)
 
+### Related Series
+
+- [AI Evaluation 101](../../ai-evaluation-101/en/01-why-evaluate-llm-apps.md) — covers how to measure the "LLM quality" this series monitors at runtime, but earlier in the lifecycle. Useful when an ops metric wobbles and you need an evaluation method to confirm whether it counts as a regression.
+
 Tags: LLMOps, Observability, Python, LLM

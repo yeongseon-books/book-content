@@ -194,4 +194,8 @@ The next post covers how to design evaluation datasets — where to source them,
 - [Hugging Face — Evaluating LLMs](https://huggingface.co/learn/cookbook/en/llm_judge)
 - [Eugene Yan — LLM evaluation patterns](https://eugeneyan.com/writing/llm-evaluators/)
 
+### Related Series
+
+- [LLM Apps Ops 101](../../llm-apps-ops-101/en/01-monitoring-and-logging.md) — tackles the same "LLM correctness" problem from the operations side. Where this series builds pre-release quality gates, the ops series tracks the same signal in production via monitoring, logging, and alerting.
+
 Tags: AI Evaluation, LLM, Testing, Quality

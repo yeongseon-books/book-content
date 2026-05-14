@@ -344,5 +344,6 @@ except Exception:
 ### 관련 시리즈
 - [툴 호출 — 함수를 모델에 연결하기](./02-tool-calling.md)
 - [LLM API Production 101 시리즈](../)
+- [LLM App Foundations 101](../../llm-app-foundations-101/ko/01-llm-api-first-call.md) — 이 시리즈가 시작되는 지점에 있는 "첫 호출, 토큰, 프롬프트 기초"를 정리합니다. 구조화 출력이나 툴 호출이 어떤 메시지 패턴 위에서 작동하는지가 흐릿하면 한 단계 위로 올라가 읽기를 권장합니다.
 
 Tags: LLM, OpenAI, Streaming, Python

@@ -54,7 +54,10 @@
 </head>
 <body>
 <h1>Transactions and isolation levels (sqlite3, PEP 249)</h1>
+<p>sqlite3 starts transactions for you, which is convenient until an implicit <code>BEGIN</code> quietly holds a lock or a missing <code>commit()</code> drops data on exit. This post maps that behavior to PEP 249 so isolation levels and autocommit stop feeling magical.</p>
+<p>This is the 5th article in the Python DB-API 101 series.</p>
 <p><img alt="Transactions and isolation levels (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png"></p>
+<p><em>Transactions and isolation levels (sqlite3, PEP 249)</em></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>Why does sqlite3 issue an implicit BEGIN by default?</li>
@@ -65,9 +68,7 @@
 </ul>
 <blockquote>
 <p>A transaction is not "calling commit/rollback" — it is "deciding what runs as one unit." Because sqlite3 picks that unit for you automatically, you must understand the auto-behaviour to avoid surprise locks and data loss.</p>
-<p>Python DB-API 101 (5/10)</p>
 </blockquote>
-<hr>
 <h2>What you will learn</h2>
 <p>This post covers sqlite3 transaction semantics through a PEP 249 lens. Specifically:</p>
 <ol>
@@ -90,7 +91,8 @@
 <hr>
 <h2>Mental Model — connection is the transaction scope</h2>
 <p><img alt="Mental model - connection is the transaction scope" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png"></p>
-<pre><code>Connection lifecycle (sqlite3 default)
+<p><em>Mental model - connection is the transaction scope</em></p>
+<pre><code class="language-text">Connection lifecycle (sqlite3 default)
 ─────────────────────────────────────────
   open
     │
@@ -112,7 +114,8 @@
 </ul>
 <hr>
 <h2>Core concepts</h2>
-<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.en.png"><br>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-03-core-concepts.en.png"></p>
+<p><em>Core concepts</em><br>
 <strong>The five <code>isolation_level</code> values</strong></p>
 <!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
 <table>
@@ -200,7 +203,8 @@ print(con2.execute('SELECT COUNT(*) FROM orders').fetchone())
 <p><code>with con:</code> is a context manager on the connection that <strong>terminates the transaction</strong>. It does not close the connection — close it separately or with <code>contextlib.closing</code>.</p>
 <hr>
 <h2>Step-by-step walkthrough</h2>
-<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png"><br>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png"></p>
+<p><em>Step-by-step walkthrough</em><br>
 <strong>Step 1 — observe default behaviour</strong></p>
 <pre><code class="language-python">import sqlite3
 

@@ -54,15 +54,13 @@
 </head>
 <body>
 <h1>Why DB-API 2.0 - The Problem PEP 249 Solved</h1>
-<blockquote>
-<p>Python DB-API 101 series (1/10)</p>
-</blockquote>
-<hr>
 <p>If you have used Python with a database, you have probably touched <code>sqlite3</code>, <code>psycopg</code>, <code>pymysql</code>, or <code>oracledb</code>. Their APIs feel oddly similar: <code>connect()</code> to open a connection, <code>cursor()</code> to get a cursor, <code>execute()</code> to run a query, <code>fetchone()</code> / <code>fetchall()</code> to read results. That uniformity is not a coincidence. It comes from a 1996 standard called <strong>PEP 249 — Python Database API Specification v2.0</strong> (DB-API 2.0 for short).</p>
 <p>This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.</p>
+<p>This is the first article in the Python DB-API 101 series.</p>
 <!-- a-grade-intro:begin -->
 
 <p><img alt="Why DB-API 2.0 - the problem PEP 249 solved" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png"></p>
+<p><em>Why DB-API 2.0 - the problem PEP 249 solved</em></p>
 <h2>Key Questions</h2>
 <ul>
 <li>How was database access done in Python before PEP 249?</li>
@@ -70,10 +68,14 @@
 <li>Why does paramstyle differ across drivers, and how do you protect your code?</li>
 <li>Where does DB-API stop and other layers begin?</li>
 </ul>
+<blockquote>
+<p>The point of DB-API 2.0 is not to make every driver identical. It is to let application code run on top of a common minimum contract.</p>
+</blockquote>
 <!-- a-grade-intro:end -->
 
 <h2>1. The Chaos Before DB-API</h2>
-<p><img alt="The chaos before DB-API" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png"><br>
+<p><img alt="The chaos before DB-API" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png"></p>
+<p><em>The chaos before DB-API</em><br>
 Before the standard, every database library had its own API.</p>
 <pre><code class="language-python"># Imagined old oracle module
 conn = oracle.open(&quot;dsn&quot;, &quot;user&quot;, &quot;pass&quot;)
@@ -87,7 +89,8 @@ data = db.receive_rows()
 </code></pre>
 <p>Function names, argument order, and return types were all different. Even within a single team, Oracle code and MySQL code looked completely different, and swapping databases meant rewriting the codebase.</p>
 <h2>2. Five Things PEP 249 Standardized</h2>
-<p><img alt="Five things PEP 249 standardized" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png"><br>
+<p><img alt="Five things PEP 249 standardized" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png"></p>
+<p><em>Five things PEP 249 standardized</em><br>
 DB-API 2.0 defines a minimal contract every driver must satisfy.</p>
 <ol>
 <li><strong>Module-level constants</strong>: <code>apilevel</code>, <code>threadsafety</code>, <code>paramstyle</code></li>
@@ -136,7 +139,8 @@ conn.close()
 </code></pre>
 <p>These seven steps are nearly identical for PostgreSQL and MySQL. The differences are limited to <code>connect()</code> arguments and <code>paramstyle</code>.</p>
 <h2>4. Only paramstyle Really Differs</h2>
-<p><img alt="Only paramstyle really differs" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png"><br>
+<p><img alt="Only paramstyle really differs" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png"></p>
+<p><em>Only paramstyle really differs</em><br>
 PEP 249 allows five paramstyles.</p>
 <p><strong><code>qmark</code></strong><br>
 - Example: <code>WHERE id = ?</code><br>
@@ -255,6 +259,10 @@ cur.execute(f&quot;SELECT * FROM users WHERE name = '{name}'&quot;)
 <li><a href="https://docs.python.org/3/library/sqlite3.html">Python sqlite3 module documentation</a></li>
 <li><a href="https://www.sqlite.org/docs.html">SQLite official documentation</a></li>
 <li><a href="https://www.psycopg.org/psycopg3/docs/">psycopg 3 documentation - DB-API 2.0 compliance</a></li>
+</ul>
+<p><strong>Related Series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md">SQLAlchemy 101</a> — covers the ORM and Core layers that sit on top of the DB-API this series unpacks. Drop down to this series whenever SQLAlchemy connection behavior or SQL execution feels opaque and you need to see what the underlying driver actually does.</li>
 </ul>
 <p class="tags-line">Tags: Python, DB-API, PEP 249, Database</p>
 </body>

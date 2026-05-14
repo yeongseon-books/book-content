@@ -274,4 +274,8 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 - [SQLite official documentation](https://www.sqlite.org/docs.html)
 - [psycopg 3 documentation - DB-API 2.0 compliance](https://www.psycopg.org/psycopg3/docs/)
 
+### Related Series
+
+- [SQLAlchemy 101](../../sqlalchemy-101/en/01-sqlalchemy-2x-engine-connection.md) — covers the ORM and Core layers that sit on top of the DB-API this series unpacks. Drop down to this series whenever SQLAlchemy connection behavior or SQL execution feels opaque and you need to see what the underlying driver actually does.
+
 Tags: Python, DB-API, PEP 249, Database

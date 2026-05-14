@@ -583,4 +583,8 @@ In the next post, we will stay close to the same API call and zoom in on token a
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Groq models](https://console.groq.com/docs/models)
 
+### Related Series
+
+- [LLM API Production 101](../../llm-api-production-101/en/01-structured-output.md) — picks up where this series ends. After first calls, tokens, and basic prompting, that series tackles structured output, tool calling, streaming, and retries — the problems you hit once the toy demo has to actually serve users.
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

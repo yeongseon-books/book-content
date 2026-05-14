@@ -275,7 +275,7 @@ LangGraph를 처음 보면 `add_node()`와 `add_edge()` 같은 API가 먼저 눈
 - [LangGraph introduction tutorial](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
 
 ### 관련 시리즈
-- [LangChain 101](../../langchain-101/ko/)
+- [LangChain 101](../../langchain-101/ko/01-lcel-runnable-basics.md) — LangGraph가 노드 안에서 호출하는 Runnable과 LCEL을 다룹니다. 그래프가 아니라 그래프의 한 노드에서 무엇이 실행되는지가 흐릿하면 이 시리즈로 한 단계 내려가 읽기를 권장합니다.
 - [AI Agent 101](../../ai-agent-101/ko/)
 
 ---

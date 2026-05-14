@@ -386,4 +386,8 @@ If the earlier series taught the basic request and response loop, this is the po
 - <https://console.groq.com/docs/text-chat#json-mode>
 - <https://docs.pydantic.dev/latest/concepts/models/>
 
+### Related Series
+
+- [LLM App Foundations 101](../../llm-app-foundations-101/en/01-llm-api-first-call.md) — covers what comes before this series: first API call, tokens, and basic prompting. Step back to it when structured output or tool calling feels like it is built on top of message patterns you never solidified.
+
 Tags: LLM, OpenAI, Streaming, Python

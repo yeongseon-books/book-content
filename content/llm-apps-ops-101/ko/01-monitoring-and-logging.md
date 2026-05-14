@@ -205,4 +205,8 @@ if __name__ == "__main__":
 - [Python logging cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
 - [OpenTelemetry Python](https://opentelemetry.io/docs/instrumentation/python/)
 
+### 관련 시리즈
+
+- [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md) — 이 시리즈가 운영 단계에서 추적하는 "LLM 품질"을 릴리스 전 단계에서 어떻게 측정할지 다룹니다. 모니터링 지표가 흔들릴 때, 어떤 평가 방식으로 회귀 여부를 확인할지 결정하는 데 도움이 됩니다.
+
 Tags: LLMOps, Observability, Python, LLM

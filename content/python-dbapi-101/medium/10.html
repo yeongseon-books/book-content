@@ -56,7 +56,9 @@
 <h1>SQLite Production Patterns: retry, timeout, observability, backup</h1>
 <p>The previous nine posts covered nearly every behavior of SQLite and PEP 249. This finale is about wiring those behaviors into a production-grade application. SQLite is light, but lightness is not an excuse to drop operational visibility. Retries should be measured, slow queries should be flagged automatically, traces should reach the SQL layer, and backups should be verified.</p>
 <p>This post does not introduce many new ideas. It composes the patterns from earlier posts into a single production-ready shape that you can copy into a service.</p>
+<p>This is the final article in the Python DB-API 101 series.</p>
 <p><img alt="SQLite production Patterns: retry, timeout, observability, backup" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png"></p>
+<p><em>SQLite production Patterns: retry, timeout, observability, backup</em></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How should retry, timeout, and <code>busy_timeout</code> be configured together?</li>
@@ -70,6 +72,7 @@
 <p>The goal here is to remove luck from the picture. Retries become measurable thanks to backoff and jitter, timeouts become deliberate, observability is a one-decorator concern, and backups are transactionally consistent and routinely verified.</p>
 <h2>Mental Model: SQLite is still a DBMS</h2>
 <p><img alt="SQLite is still a DBMS" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png"></p>
+<p><em>SQLite is still a DBMS</em></p>
 <blockquote>
 <p>SQLite being a single file simplifies operations, but treating it as "just a file" is dangerous. Copying a file mid-transaction yields a corrupted backup. SQLite is light, but it is a DBMS.</p>
 </blockquote>
@@ -81,7 +84,8 @@
 <li><strong>Recoverability</strong>: backups are transactionally consistent and recovery is verified periodically.</li>
 </ul>
 <h2>Core Concepts</h2>
-<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-03-core-concepts.en.png"><br>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-03-core-concepts.en.png"></p>
+<p><em>Core concepts</em><br>
 <strong>timeout vs busy_timeout vs retry</strong></p>
 <p>Three knobs that look similar live at different layers:</p>
 <p><strong><code>sqlite3.connect(timeout=5.0)</code></strong><br>
@@ -212,7 +216,8 @@ def timed_query(label: str) -&gt; Iterator[None]:
 </code></pre>
 <p>A connection factory with WAL+busy_timeout, a retry decorator scoped to BUSY/LOCKED, and a slow-query timer in one place. The next steps add OpenTelemetry and backups.</p>
 <h2>Step by Step</h2>
-<p><img alt="Step by step" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-04-step-by-step.en.png"><br>
+<p><img alt="Step by step" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-04-step-by-step.en.png"></p>
+<p><em>Step by step</em><br>
 <strong>Step 1. OpenTelemetry SQL spans</strong></p>
 <pre><code class="language-python"># tracing.py
 from opentelemetry import trace

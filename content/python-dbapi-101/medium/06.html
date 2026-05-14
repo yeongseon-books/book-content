@@ -54,7 +54,10 @@
 </head>
 <body>
 <h1>Row factories and type adapters (sqlite3, PEP 249)</h1>
+<p>Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.</p>
+<p>This is the 6th article in the Python DB-API 101 series.</p>
 <p><img alt="Row factories and type adapters (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png"></p>
+<p><em>Row factories and type adapters (sqlite3, PEP 249)</em></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How do you receive default tuple results as dict, dataclass, or Pydantic models?</li>
@@ -65,9 +68,7 @@
 </ul>
 <blockquote>
 <p>Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.</p>
-<p>Python DB-API 101 (6/10)</p>
 </blockquote>
-<hr>
 <h2>What you will learn</h2>
 <p>This post separates how sqlite3 moves data between SQL and Python into two axes.</p>
 <ol>
@@ -85,7 +86,8 @@
 <hr>
 <h2>Mental Model — two-step conversion</h2>
 <p><img alt="Mental model - two-step conversion" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png"></p>
-<pre><code>Database row             Python value
+<p><em>Mental model - two-step conversion</em></p>
+<pre><code class="language-text">Database row             Python value
 ─────────────             ────────────
                 converter
 SQLite TEXT  ─────────────►  Decimal('19.95')
@@ -105,7 +107,8 @@ SQLite TEXT  ◄─────────────  Decimal('19.95')
 <p>Separating these two concerns naturally separates where they live in code.</p>
 <hr>
 <h2>Core concepts</h2>
-<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-03-core-concepts.en.png"><br>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-03-core-concepts.en.png"></p>
+<p><em>Core concepts</em><br>
 <strong><code>sqlite3.Row</code></strong></p>
 <p>The lightest row factory. Accessible by index like a tuple AND by name like a dict.</p>
 <pre><code class="language-python">con.row_factory = sqlite3.Row
@@ -204,7 +207,8 @@ print(p.price * Decimal('1.1'))
 <p>Order-independent and precise.</p>
 <hr>
 <h2>Step-by-step walkthrough</h2>
-<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png"><br>
+<p><img alt="Step-by-step walkthrough" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png"></p>
+<p><em>Step-by-step walkthrough</em><br>
 <strong>Step 1 — <code>sqlite3.Row</code></strong></p>
 <pre><code class="language-python">import sqlite3
 

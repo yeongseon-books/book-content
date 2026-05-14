@@ -56,7 +56,9 @@
 <h1>Asynchronous SQLite with aiosqlite</h1>
 <p>What happens if you call <code>sqlite3.connect()</code> directly inside <code>asyncio</code> code? The code runs, but every <code>execute()</code> is a synchronous call that blocks the event loop for its duration. A 1-second query starves every other request the worker is trying to serve.</p>
 <p><code>aiosqlite</code> solves this. But it is important to understand what "solve" means here. The library does not make SQLite truly asynchronous. It is an <strong>adapter that runs each sqlite3 call in a background thread per connection and returns a Future to the event loop</strong>. The loop stays unblocked, but SQLite's single-writer constraint is unchanged.</p>
+<p>This is the 9th article in the Python DB-API 101 series.</p>
 <p><img alt="Asynchronous SQLite with aiosqlite" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.en.png"></p>
+<p><em>Asynchronous SQLite with aiosqlite</em></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How does <code>aiosqlite</code> work under the hood? Is it real async I/O?</li>
@@ -71,6 +73,7 @@
 <p>The honest pitch: this post is about what <code>aiosqlite</code> actually does and does not do. If the word "async" makes you expect higher write throughput, you will be disappointed.</p>
 <h2>Mental Model: aiosqlite is sqlite3 + thread + Future</h2>
 <p><img alt="Mental Model: aiosqlite is sqlite3 + thread + future" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png"></p>
+<p><em>Mental Model: aiosqlite is sqlite3 + thread + future</em></p>
 <blockquote>
 <p><code>aiosqlite</code> does not make SQLite asynchronous. It spawns a background thread per connection, queues the awaited method calls onto that thread, and returns a Future the event loop can await.</p>
 </blockquote>
@@ -83,7 +86,8 @@
 </ul>
 <p>So the real value of <code>aiosqlite</code> is <strong>event-loop protection</strong>, not "concurrency win". Treat it as an adapter that lets you stay in async code without blocking, not as a way to make SQLite faster.</p>
 <h2>Core Concepts</h2>
-<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-03-core-concepts.en.png"><br>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-03-core-concepts.en.png"></p>
+<p><em>Core concepts</em><br>
 <strong>Install and basic use</strong></p>
 <pre><code class="language-bash">pip install aiosqlite
 </code></pre>
@@ -166,7 +170,8 @@ async def read_note(note_id: int, db: aiosqlite.Connection = Depends(get_db)):
 </code></pre>
 <p>The event loop is protected and transaction boundaries align with requests. The cost is one new connection-with-thread per request, which leads us to consider a pool.</p>
 <h2>Step by Step: a lightweight connection pool</h2>
-<p><img alt="Step by Step: a lightweight connection pool" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-04-step-by-step-a-lightweight-connection-po.en.png"><br>
+<p><img alt="Step by Step: a lightweight connection pool" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-04-step-by-step-a-lightweight-connection-po.en.png"></p>
+<p><em>Step by Step: a lightweight connection pool</em><br>
 <code>aiosqlite</code> does not ship a pool. Building one is straightforward.</p>
 <p><strong>Step 1. Pool interface</strong></p>
 <pre><code class="language-python">import asyncio

@@ -271,4 +271,8 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 - [SQLite official documentation](https://www.sqlite.org/docs.html)
 - [psycopg 3 documentation - DB-API 2.0 compliance](https://www.psycopg.org/psycopg3/docs/)
 
+### 관련 시리즈
+
+- [SQLAlchemy 101](../../sqlalchemy-101/ko/01-sqlalchemy-2x-engine-connection.md) — 이 시리즈가 다루는 DB-API를 한 단계 위에서 추상화하는 ORM·Core 계층을 다룹니다. SQLAlchemy 사용 중 connection 동작이나 SQL 실행 단계가 의심스러울 때 이 시리즈로 한 단계 내려가 디버깅하기를 권장합니다.
+
 Tags: Python, DB-API, PEP 249, Database

@@ -264,4 +264,8 @@ The next post moves from concept to practice. We will use `HuggingFaceEmbeddings
 - [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
 - [The Illustrated Word2Vec — Jay Alammar](https://jalammar.github.io/illustrated-word2vec/)
 
+### Related Series
+
+- [RAG Deep Dive](../../rag-deep-dive/en/01-document-loading-and-chunking.md) — shows how the embeddings and ANN indexes from this series get assembled inside a full RAG pipeline. Read it next if you care more about the "documents → chunks → retrieval → answer" flow than the search engine itself.
+
 Tags: Vector Search, FAISS, Embeddings, Python

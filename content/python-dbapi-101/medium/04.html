@@ -54,7 +54,10 @@
 </head>
 <body>
 <h1>Parameter binding and SQL injection defense (sqlite3, PEP 249)</h1>
+<p>SQL injection starts the moment query text and user input become the same string. This post uses sqlite3 to show how PEP 249 parameter binding keeps them separate and why that design matters in production.</p>
+<p>This is the 4th article in the Python DB-API 101 series.</p>
 <p><img alt="Parameter binding and SQL injection defense (sqlite3, PEP 249)" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png"></p>
+<p><em>Parameter binding and SQL injection defense (sqlite3, PEP 249)</em></p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>Why is building SQL with f-strings dangerous?</li>
@@ -65,9 +68,7 @@
 </ul>
 <blockquote>
 <p>SQL injection happens at the moment the query string and user input meet. PEP 249's parameter binding keeps the two separate end-to-end.</p>
-<p>Python DB-API 101 (4/10)</p>
 </blockquote>
-<hr>
 <h2>What you will learn</h2>
 <p>This post covers PEP 249 parameter binding in depth using <code>sqlite3</code>. Specifically:</p>
 <ol>
@@ -85,7 +86,8 @@
 <hr>
 <h2>Mental Model — keep query string and values separate</h2>
 <p><img alt="Mental model - keep query string and values separate" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png"></p>
-<pre><code>[ User input ] ─┐
+<p><em>Mental model - keep query string and values separate</em></p>
+<pre><code class="language-text">[ User input ] ─┐
                 │
                 ▼
         [ cursor.execute(SQL, params) ]
@@ -106,7 +108,8 @@
 <p>The key point: SQL tokenization happens <strong>before</strong> binding. <code>?</code> tells the parser "a single value goes here." Whatever value arrives is never re-parsed as SQL. The string <code>' OR 1=1 --</code> is treated as a 12-character text value, nothing more.</p>
 <hr>
 <h2>Core concepts</h2>
-<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-03-core-concepts.en.png"><br>
+<p><img alt="Core concepts" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-03-core-concepts.en.png"></p>
+<p><em>Core concepts</em><br>
 <strong>qmark style (<code>?</code>)</strong></p>
 <p>The sqlite3 default. Position-based, so order matters.</p>
 <pre><code class="language-python">cur.execute('SELECT * FROM users WHERE name = ? AND age &gt;= ?', ('Alice', 18))
@@ -147,7 +150,8 @@
 <p>For these positions, validate against a whitelist and inject as a string.</p>
 <hr>
 <h2>Before / After</h2>
-<p><img alt="Before / after" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-04-before-after.en.png"><br>
+<p><img alt="Before / after" src="https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-04-before-after.en.png"></p>
+<p><em>Before / after</em><br>
 <strong>Before — vulnerable code</strong></p>
 <pre><code class="language-python">import sqlite3
 

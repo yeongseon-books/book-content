@@ -406,4 +406,8 @@ The next post goes deeper into `ChatPromptTemplate` and builds a more realistic 
 - [ChatGroq integration](https://python.langchain.com/docs/integrations/chat/groq/)
 - [langchain-groq on PyPI](https://pypi.org/project/langchain-groq/)
 
+### Related Series
+
+- [LangGraph 101](../../langgraph-101/en/01-graph-basics.md) — builds graph-based agent state machines on top of the Runnable and LCEL primitives this series teaches. Move there once a single chain is no longer enough and you need multi-step flows with branching or loops.
+
 Tags: LangChain, LCEL, Python, LLM
