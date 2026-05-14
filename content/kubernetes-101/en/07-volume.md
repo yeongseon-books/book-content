@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 7
 title: Volume
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - StorageClass
   - DevOps
 seo_description: A beginner guide to Kubernetes Volumes, PVCs, StorageClasses, and the dynamic provisioning flow that keeps data alive across Pod restarts
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Volume
 
-> Kubernetes 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a *Pod dies*, what does it take to *keep the data alive*?
-
-> A *PersistentVolumeClaim* uses a *StorageClass* to *dynamically* attach a *durable disk* to a *Pod*.
-
-<!-- a-grade-intro:end -->
+Containers are easy to replace because their local filesystem is disposable. That convenience becomes a liability the moment your workload owns state that cannot disappear on the next reschedule.
 
 This is post 7 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into one storage model so you can separate Pod lifetime from data lifetime before stateful workloads become fragile.
+
+> Kubernetes can restart a Pod for you. It preserves data only when you attach the right storage contract outside the Pod.
+
+## Questions this chapter answers
 
 - *emptyDir* vs *PV/PVC*
 - The role of *StorageClass*
@@ -48,12 +44,9 @@ A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require*
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Pod["pod"] --> PVC["pvc"]
-    PVC --> SC["storageclass"]
-    SC --> PV["pv (disk)"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
+*PVC and StorageClass separate Pod lifetime from data lifetime so state can survive rescheduling and replacement.*
+
 
 ## Key Terms
 
@@ -129,6 +122,22 @@ def delete(name):
     subprocess.run(["kubectl", "delete", "pvc", name], check=True)
 ```
 
+## Verification workflow
+
+```bash
+kubectl get pvc
+kubectl describe pvc data
+kubectl get pv
+```
+
+**Expected output:** the PVC should become `Bound`, `describe pvc` should reveal which StorageClass and PV fulfilled the claim, and the PV list should show the actual storage object and reclaim policy behind the claim.
+
+**Failure modes to check first:**
+
+- A PVC stuck in `Pending` usually means StorageClass, capacity, or access-mode mismatch before it means an app issue.
+- A bound claim with mount failure usually means the Pod spec path or volume wiring is wrong.
+- PVC deletion is dangerous because a `Delete` reclaim policy may remove the underlying disk too.
+
 ## What to Notice in This Code
 
 - The *PVC* receives a *PV dynamically*.
@@ -191,5 +200,6 @@ State is solved. The next post covers *matching Pod count to load* with *HPA*.
 - [Persistent Volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 - [Storage Classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)
 - [Velero](https://velero.io/)
+- [Change the reclaim policy of a PersistentVolume](https://kubernetes.io/docs/tasks/administer-cluster/change-pv-reclaim-policy/)
 
 Tags: Kubernetes, Volume, PersistentVolume, StorageClass, DevOps
