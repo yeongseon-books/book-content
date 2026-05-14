@@ -60,7 +60,14 @@
 <p>LLM applications handle personal data in both directions. Users send sensitive information into the model, and other people's data can leak back out through logs, context, or responses.</p>
 <p>This is post 4 in the AI Safety &amp; Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Where does PII leak into an LLM system besides the user prompt itself?</li>
+<li>Which PII categories are easy for regex and which need NER support?</li>
+<li>When is Microsoft Presidio a better fit than hand-written patterns alone?</li>
+<li>Why is reversible tokenization sometimes safer than plain masking?</li>
+<li>Why does every outbound response need a separate PII re-check?</li>
+</ul>
 <h2>"Did You Mask the Email?"</h2>
 <p>The most frequent question from legal. LLM applications touch PII in two directions:</p>
 <ul>
@@ -78,6 +85,8 @@
 </ul>
 <hr>
 <h2>Section 1 — PII Categories</h2>
+<p><img alt="Section 1 — PII Categories" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png"><br>
+<em>PII protection has to cover inbound detection, model-time masking, outbound re-checking, and storage separation.</em></p>
 <p><strong>National ID</strong><br>
 - Examples: SSN, passport, EU national IDs</p>
 <p><strong>Contact</strong><br>
@@ -238,6 +247,14 @@ final = tk.detokenize(response)  # restore before sending to user
 <li><strong>PII in logs</strong> — debug logs are the most common leak surface. Mask before logging too.</li>
 <li><strong>Not disclosing foreign LLM providers</strong> — direct GDPR / privacy-law violation.</li>
 </ol>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Detect structured PII with regex and unstructured PII with NER.</li>
+<li>[ ] Decide up front whether plain masking or reversible tokenization fits the endpoint.</li>
+<li>[ ] Re-scan outbound responses before they reach the user.</li>
+<li>[ ] Keep raw PII out of general logs and caches.</li>
+<li>[ ] Document retention, deletion, and provider-disclosure rules with legal review.</li>
+</ul>
 <hr>
 <h2>Key Takeaways</h2>
 <ul>
@@ -262,11 +279,17 @@ final = tk.detokenize(response)  # restore before sending to user
 <li>Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://microsoft.github.io/presidio/">Microsoft Presidio</a></li>
-<li><a href="https://gdpr.eu/article-4-definitions/">GDPR Article 4 — Definitions</a></li>
-<li><a href="https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html">HIPAA — Privacy Rule Summary</a></li>
-<li><a href="https://openai.com/enterprise-privacy">OpenAI — Enterprise Privacy</a></li>
+<li><a href="https://microsoft.github.io/presidio/">Microsoft Presidio documentation</a></li>
+<li><a href="https://gdpr-info.eu/art-4-gdpr/">GDPR Article 4 — Definitions</a></li>
+<li><a href="https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html">HIPAA Privacy Rule summary (HHS)</a></li>
+<li><a href="https://openai.com/enterprise-privacy">OpenAI Enterprise privacy commitments</a></li>
+<li><a href="https://learn.microsoft.com/azure/ai-foundry/responsible-ai/openai/data-privacy">Azure OpenAI data, privacy, and security</a></li>
+</ul>
+<p><strong>Verification-Friendly Sources</strong></p>
+<ul>
+<li><a href="https://microsoft.github.io/presidio/api/analyzer_python/">Presidio Analyzer Python API</a></li>
 </ul>
 <p class="tags-line">Tags: AI Safety, PII, Presidio, GDPR</p>
 </body>
