@@ -17,7 +17,7 @@ tags:
   - ROC
   - scikit-learn
 seo_description: 분류와 회귀 지표 선택, 혼동 행렬, ROC·PR 곡선의 읽는 법을 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Model Evaluation
@@ -42,15 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Pred["predictions"] --> CM["confusion matrix"]
-    CM --> P["precision"]
-    CM --> R["recall"]
-    CM --> F["F1"]
-    Prob["probabilities"] --> ROC["ROC-AUC"]
-    Prob --> PR["PR-AUC"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/09/09-01-diagram.ko.png)
+
+*예측 클래스는 혼동 행렬과 정밀도·재현율로 읽고, 확률 출력은 ROC-AUC나 PR-AUC처럼 임계값 전반의 지표로 따로 읽습니다.*
 
 ## 핵심 용어
 
@@ -113,11 +107,19 @@ print("RMSE:", mean_squared_error(yt, yp) ** 0.5)
 print("R^2:", r2_score(yt, yp))
 ```
 
+**Expected output:** 혼동 행렬은 오류 구성을 그대로 보여 주고, ROC-AUC와 PR-AUC는 임계값 전반의 순위 품질을 요약합니다. 회귀 장난감 예제에서는 MAE와 RMSE가 비슷하게 보이지만, 큰 오차가 섞이면 RMSE가 더 민감하게 움직입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - AUC는 특정 임계값 하나에 묶이지 않습니다.
 - PR-AUC는 불균형 데이터에서 더 유용한 경우가 많습니다.
 - RMSE와 MAE는 이상치 민감도가 다릅니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 어떤 지표를 써야 할지 합의가 안 되면, 모델 이야기를 잠시 멈추고 **거짓 양성**과 **거짓 음성**의 비용부터 정리해야 합니다.
+- 클래스 불균형이 심한데 ROC-AUC만 보고 있으면, PR 곡선과 임계값 민감도를 같이 봐야 합니다.
+- 한 지표는 좋은데 다른 지표가 나쁘다면 모순이 아니라, **어떤 실패를 더 싫어하는지** 다시 분명히 하라는 신호입니다.
 
 ## 자주 하는 실수 5가지
 
