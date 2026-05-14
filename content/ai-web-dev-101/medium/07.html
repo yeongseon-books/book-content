@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evaluating and improving an AI app — measuring quality over time</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Evaluating and improving an AI app — measuring quality over time</h1>
+<p>An AI app is not finished when it is deployed. That is when users begin surfacing the real issues: strange answers, regressions after prompt changes, unnecessary verbosity, and brittle retrieval behavior.</p>
+<p>This is the final post in the AI Web Development 101 series.</p>
+<p>Here, we will turn “it feels better” into a repeatable evaluation and improvement loop.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is evaluation part of operations rather than an optional extra?</li>
+<li>Which quality axes should you measure first?</li>
+<li>How do you start with the smallest automatic evaluation?</li>
+<li>When is LLM-as-Judge useful, and what are its limits?</li>
+<li>How do you turn evaluation results into better prompts and retrieval behavior?</li>
+</ul>
+<blockquote>
+<p>AI evaluation converts “looks good to me” into numbers and concrete failure cases. Because models are probabilistic, you need separate input sets and scoring rules if you want to know whether a change really improved the system.</p>
+</blockquote>
+<h2>Why evaluation is necessary</h2>
+<p>Traditional software usually aims for deterministic outputs from fixed inputs. AI systems often do not. The same prompt can vary slightly, and a change that improves one question can silently hurt another.</p>
+<p>That is why evaluation matters for three reasons:</p>
+<ol>
+<li>it gives you an objective comparison point</li>
+<li>it catches regressions after model or prompt changes</li>
+<li>it helps you compare quality against cost and latency</li>
+</ol>
+<p><img alt="Why evaluation matters for regression, accuracy, and cost" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png"></p>
+<p><em>Why evaluation matters for regression, accuracy, and cost</em></p>
+<h2>Start by choosing quality axes</h2>
+<p>For a first evaluation framework, three axes are enough:</p>
+<ul>
+<li><strong>accuracy</strong>: does the answer stay consistent with facts or evidence?</li>
+<li><strong>relevance</strong>: does it answer the actual user intent?</li>
+<li><strong>safety</strong>: does it avoid risky instructions, unsafe speculation, or privacy leaks?</li>
+</ul>
+<p>Different products weight these differently. A customer-support assistant may prioritize accuracy and safety. A brainstorming tool may care more about relevance and tone.</p>
+<p><img alt="Scoring answer quality across accuracy, relevance, and safety" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/test-case-scoring-flow.en.png"></p>
+<p><em>Scoring answer quality across accuracy, relevance, and safety</em></p>
+<h2>The smallest useful dataset</h2>
+<p>Start by collecting question-and-expectation pairs.</p>
+<pre><code class="language-json">[
+  {
+    &quot;id&quot;: &quot;pricing-01&quot;,
+    &quot;question&quot;: &quot;How much does this service cost?&quot;,
+    &quot;expected_keywords&quot;: [&quot;9,900 KRW&quot;, &quot;free trial&quot;, &quot;subscription&quot;],
+    &quot;category&quot;: &quot;pricing&quot;
+  },
+  {
+    &quot;id&quot;: &quot;support-01&quot;,
+    &quot;question&quot;: &quot;I forgot my password.&quot;,
+    &quot;expected_keywords&quot;: [&quot;email verification&quot;, &quot;password reset&quot;],
+    &quot;category&quot;: &quot;support&quot;
+  }
+]
+</code></pre>
+<p>Without a stable input set, every quality comparison depends too much on memory and intuition.</p>
+<h2>Why a keyword scorer is still useful</h2>
+<p>A simple keyword-based scorer is not sophisticated, but it is often enough to catch whether a response contains the must-have facts.</p>
+<pre><code class="language-python">def evaluate_response(response: str, expected_keywords: list[str]) -&gt; float:
+    hits = 0
+    for keyword in expected_keywords:
+        if keyword in response:
+            hits += 1
+    return hits / len(expected_keywords)
+
+user_query = &quot;Tell me the price&quot;
+ai_response = &quot;The service costs 9,900 KRW per month and includes a free trial for the first month.&quot;
+expected = [&quot;9,900 KRW&quot;, &quot;free trial&quot;]
+
+print(f&quot;quality score: {evaluate_response(ai_response, expected) * 100:.0f}%&quot;)
+</code></pre>
+<h2>Batch evaluation for regression checks</h2>
+<pre><code class="language-python">test_cases = [
+    {
+        &quot;id&quot;: &quot;pricing-01&quot;,
+        &quot;question&quot;: &quot;How much does this service cost?&quot;,
+        &quot;expected_keywords&quot;: [&quot;9,900 KRW&quot;, &quot;free trial&quot;],
+    },
+    {
+        &quot;id&quot;: &quot;support-01&quot;,
+        &quot;question&quot;: &quot;I forgot my password.&quot;,
+        &quot;expected_keywords&quot;: [&quot;email verification&quot;, &quot;password reset&quot;],
+    },
+]
+
+def run_batch(responder):
+    report = []
+    for case in test_cases:
+        answer = responder(case[&quot;question&quot;])
+        score = evaluate_response(answer, case[&quot;expected_keywords&quot;])
+        report.append({
+            &quot;id&quot;: case[&quot;id&quot;],
+            &quot;answer&quot;: answer,
+            &quot;score&quot;: score,
+        })
+    return report
+</code></pre>
+<p>This is enough to ask a practical question: after the latest prompt change, did the average score improve or regress?</p>
+<h2>LLM-as-Judge</h2>
+<p>Keyword scoring cannot measure everything. Helpfulness, answer sufficiency, tone, and subtle grounding quality often need a richer judge. That is where LLM-as-Judge becomes useful.</p>
+<pre><code class="language-python">judge_prompt = &quot;&quot;&quot;
+You are an AI response evaluator.
+
+Score the answer on:
+1. accuracy
+2. relevance
+3. safety
+
+Return only this JSON object:
+{
+  &quot;accuracy&quot;: 1-5,
+  &quot;relevance&quot;: 1-5,
+  &quot;safety&quot;: 1-5,
+  &quot;reason&quot;: &quot;one-sentence explanation&quot;
+}
+&quot;&quot;&quot;
+</code></pre>
+<pre><code class="language-python">import json
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+
+def judge_answer(question: str, rubric_context: str, answer: str) -&gt; dict:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        temperature=0,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: judge_prompt},
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: (
+                    f&quot;Question: {question}
+&quot;
+                    f&quot;Reference context: {rubric_context}
+&quot;
+                    f&quot;Answer: {answer}&quot;
+                ),
+            },
+        ],
+    )
+    return json.loads(response.choices[0].message.content)
+</code></pre>
+<p>LLM-as-Judge is valuable for larger batches, but it is still a model-based judgment system. For important changes, sample human review should stay in the loop.</p>
+<p><img alt="Using a judge model to score answer quality" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/llm-as-judge-flow.en.png"></p>
+<p><em>Using a judge model to score answer quality</em></p>
+<h2>Turn evaluation into an improvement loop</h2>
+<ol>
+<li>run evaluation on the current prompt, model, or retrieval setup</li>
+<li>group low-scoring cases by failure pattern</li>
+<li>change one layer at a time: prompt, retrieval, model choice, or safety rule</li>
+<li>rerun the same dataset</li>
+</ol>
+<p>Evaluation becomes useful only when it leads to controlled iteration.</p>
+<p><img alt="Feeding evaluation results back into the next iteration" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/improvement-cycle.en.png"></p>
+<p><em>Feeding evaluation results back into the next iteration</em></p>
+<h2>A concrete RAG improvement example</h2>
+<p>Imagine the RAG chatbot from the previous chapter fails on two out of five test questions.</p>
+<ul>
+<li>if the wrong documents were retrieved, investigate chunking and retrieval first</li>
+<li>if the right documents were retrieved but the answer still hallucinates, strengthen grounding rules in the prompt</li>
+<li>if the answer is correct but too verbose, revise output constraints rather than the search layer</li>
+</ul>
+<p>This separation matters because “the answer is bad” is not a diagnosis.</p>
+<p><img alt="Regression checking after a system change" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/regression-check-flow.en.png"></p>
+<p><em>Regression checking after a system change</em></p>
+<h2>Cost and latency belong in the same report</h2>
+<p>A quality improvement that doubles latency or cost may still be the wrong operational choice.</p>
+<ul>
+<li>route simple tasks to a cheaper model when possible</li>
+<li>cache repeated questions</li>
+<li>trim overly long prompts and excess context</li>
+<li>track latency alongside quality scores</li>
+</ul>
+<p>The goal is not maximum quality at any price. It is sustainable quality.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I keep a stable test set and expected criteria.</li>
+<li>[ ] I chose the most important quality axes for the product.</li>
+<li>[ ] I rerun the same dataset after prompt or model changes.</li>
+<li>[ ] I separate retrieval problems from generation problems.</li>
+<li>[ ] I track cost and latency together with quality scores.</li>
+</ul>
+<h2>Summary</h2>
+<p>Evaluation is not a luxury feature for AI applications. It is part of keeping the system trustworthy over time.</p>
+<ul>
+<li>Start with a stable dataset and a few clear quality axes.</li>
+<li>Even a simple keyword scorer is useful for regression detection.</li>
+<li>LLM-as-Judge helps with larger-scale qualitative scoring, but it should not replace human review entirely.</li>
+<li>Good improvement loops compare the same inputs before and after each change.</li>
+</ul>
+<p>This closes the series. You have now walked through API calls, prompt design, browser chat UI, RAG, tool use, deployment, and evaluation—the full beginner path for AI web applications.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">First steps with AI agents — making the model use tools</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/06-deploy.md">Deploying an AI web app — shipping to Vercel and Azure</a></li>
+<li><strong>Evaluating and improving an AI app — measuring quality over time (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://cookbook.openai.com/categories/evaluation">OpenAI Cookbook: evaluation examples</a></li>
+<li><a href="https://platform.openai.com/docs/guides/evals">OpenAI evals guide</a></li>
+<li><a href="https://www.deeplearning.ai/short-courses/evaluating-debugging-generative-ai/">DeepLearning.AI: Evaluating and debugging generative AI</a></li>
+<li><a href="https://arize.com/docs/phoenix">Arize Phoenix documentation</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>
