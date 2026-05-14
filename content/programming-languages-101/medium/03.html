@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Type Systems</h1>
+<p>Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.</p>
 <p>This is post 3 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Dynamic languages run fine without type annotations, so why do we keep going back and adding them?</p>
-<blockquote>
-<p>A type system is not just data tagging. It is a tool that <strong>proves, before the program runs, that it does not do nonsensical things</strong>. Static typing buys safety and tooling at the cost of a small amount of expressive freedom; dynamic typing trades the other way. This episode looks at the deal both sides accept.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The roles a type plays — checking, documentation, tool support</li>
@@ -80,12 +71,8 @@
 <p>A type narrows down, in advance, which inputs are even legal.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Source code&quot;] --&gt; B[&quot;Type checker&quot;]
-    B --&gt;|pass| C[&quot;Compile / Run&quot;]
-    B --&gt;|fail| D[&quot;Error before run&quot;]
-    E[&quot;Types as docs&quot;] --&gt; F[&quot;IDE: completion, refactor&quot;]
-</code></pre>
+<p><img alt="One layer of type information feeding both compile-time checks and IDE tooling" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>One layer of type information feeding both compile-time checks and IDE tooling</em></p>
 <p>The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -155,6 +142,29 @@ def total_price(items: list[dict]) -&gt; int:
     return sum(item[&quot;price&quot;] for item in items)  # mypy points out the dict value type is unclear
 </code></pre>
 <p>Trying to write the type accurately tends to expose ambiguity in the data model itself. That ambiguity is usually where the real bug lives.</p>
+<p><strong>Step 6 — Validate at the boundary, then narrow to a precise type</strong></p>
+<pre><code class="language-python"># 6_boundary.py
+from typing import TypedDict
+
+class LineItem(TypedDict):
+    price: int
+    quantity: int
+
+def parse_line_item(raw: dict[str, object]) -&gt; LineItem:
+    price = raw.get(&quot;price&quot;)
+    quantity = raw.get(&quot;quantity&quot;)
+    if not isinstance(price, int) or not isinstance(quantity, int):
+        raise ValueError(&quot;price and quantity must be integers&quot;)
+    return {&quot;price&quot;: price, &quot;quantity&quot;: quantity}
+
+def subtotal(item: LineItem) -&gt; int:
+    return item[&quot;price&quot;] * item[&quot;quantity&quot;]
+
+payload = {&quot;price&quot;: 1200, &quot;quantity&quot;: 3}
+item = parse_line_item(payload)
+print(subtotal(item))  # 3600
+</code></pre>
+<p>This is the practical boundary pattern. Runtime validation narrows a JSON-like payload first, then the rest of the program benefits from precise types, safer refactoring, and better autocomplete.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A type is checking, documentation, and tool input all at once.</li>
@@ -212,7 +222,9 @@ def total_price(items: list[dict]) -&gt; int:
 <h2>References</h2>
 <ul>
 <li><a href="https://www.cis.upenn.edu/~bcpierce/tapl/">Types and Programming Languages (Pierce)</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html">Python typing documentation</a></li>
 <li><a href="https://mypy.readthedocs.io/">mypy documentation</a></li>
+<li><a href="https://peps.python.org/pep-0589/">PEP 589 — TypedDict</a></li>
 <li><a href="https://www.typescriptlang.org/docs/handbook/">TypeScript Handbook</a></li>
 <li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
 </ul>

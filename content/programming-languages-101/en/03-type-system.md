@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 3
 title: Type Systems
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Dynamic
   - Inference
 seo_description: A type system is not just data tagging. It is a proof tool that rejects nonsense programs before they run. Walk through the core ideas and tradeoffs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Type Systems
 
+Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.
+
 This is post 3 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Dynamic languages run fine without type annotations, so why do we keep going back and adding them?
-
-> A type system is not just data tagging. It is a tool that **proves, before the program runs, that it does not do nonsensical things**. Static typing buys safety and tooling at the cost of a small amount of expressive freedom; dynamic typing trades the other way. This episode looks at the deal both sides accept.
-
-<!-- a-grade-intro:end -->
+In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
 
 ## What You Will Learn
 
@@ -51,13 +45,9 @@ Most modern languages have some kind of type system, and even Python, JavaScript
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Source code"] --> B["Type checker"]
-    B -->|pass| C["Compile / Run"]
-    B -->|fail| D["Error before run"]
-    E["Types as docs"] --> F["IDE: completion, refactor"]
-```
+![One layer of type information feeding both compile-time checks and IDE tooling](../../../assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
+
+*One layer of type information feeding both compile-time checks and IDE tooling*
 
 The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.
 
@@ -159,6 +149,37 @@ def total_price(items: list[dict]) -> int:
 
 Trying to write the type accurately tends to expose ambiguity in the data model itself. That ambiguity is usually where the real bug lives.
 
+### Step 6 — Validate at the boundary, then narrow to a precise type
+
+```python
+# 6_boundary.py
+from typing import TypedDict
+
+
+class LineItem(TypedDict):
+    price: int
+    quantity: int
+
+
+def parse_line_item(raw: dict[str, object]) -> LineItem:
+    price = raw.get("price")
+    quantity = raw.get("quantity")
+    if not isinstance(price, int) or not isinstance(quantity, int):
+        raise ValueError("price and quantity must be integers")
+    return {"price": price, "quantity": quantity}
+
+
+def subtotal(item: LineItem) -> int:
+    return item["price"] * item["quantity"]
+
+
+payload = {"price": 1200, "quantity": 3}
+item = parse_line_item(payload)
+print(subtotal(item))  # 3600
+```
+
+This is the practical boundary pattern. Runtime validation narrows a JSON-like payload first, then the rest of the program benefits from precise types, safer refactoring, and better autocomplete.
+
 ## What to Notice in This Code
 
 - A type is checking, documentation, and tool input all at once.
@@ -222,7 +243,9 @@ A type system gives you safety, documentation, and tooling at the same time. Not
 ## References
 
 - [Types and Programming Languages (Pierce)](https://www.cis.upenn.edu/~bcpierce/tapl/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/)
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 
