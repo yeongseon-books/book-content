@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Source["event source"] --> Trigger["trigger"]
-    Trigger --> Func["function"]
-    Func --> DLQ["dead letter queue"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
 
+*이벤트 소스, 트리거, 함수, DLQ를 분리해 보면 실패 경로를 더 빨리 찾을 수 있습니다.*
 이 그림은 역할 분리를 잘 보여 줍니다. 이벤트 소스는 신호를 만들고, 트리거는 그 신호를 함수 호출로 바꾸며, 함수가 반복 실패하면 메시지는 DLQ 같은 격리 경로로 이동합니다. 문제 해결도 이 세 지점을 분리해서 봐야 빨라집니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -209,9 +205,15 @@ DLQ는 실패를 숨기는 장치가 아니라 실패를 보이게 하는 장치
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Lambda 이벤트 소스 매핑](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html)
 - [SQS 데드 레터 큐](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
 - [EventBridge 스케줄](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html)
+
+### 패턴과 코드
+
 - [멱등성 패턴](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html)
+- [AWS Powertools for Lambda Python (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)
 
 Tags: Serverless, Trigger, Event, EventDriven, Cloud
