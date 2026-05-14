@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Containerizing a Python App</h1>
-<p>This is post 7 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What do you actually have to handle to containerize a <em>FastAPI app</em> at <em>production grade</em>?</p>
-<blockquote>
-<p><em>Python containerization becomes </em>real<em> the moment you handle </em>PID 1, signals, healthcheck, and non-root<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A Python app running inside a container is not the same thing as a production-ready Python container. The difference shows up when the process receives SIGTERM during deployment, when healthchecks ask whether the app is really ready, and when a compromised process should not be running as root.</p>
+<p>Those details are easy to skip because the app still starts without them. They only become visible when a deployment drains live traffic, a container hangs on shutdown, or an orchestrator keeps restarting something that looked healthy on a laptop.</p>
+<p>This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Containerizing <em>FastAPI + uvicorn</em></li>
@@ -80,11 +71,8 @@
 <p><em>PID 1 in a container needs to be a </em>small init<em> or a process with </em>correct signal handling<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Build[&quot;Dockerfile (slim, deps cache)&quot;] --&gt; Run[&quot;uvicorn app:app&quot;]
-    Run --&gt; HC[&quot;healthcheck&quot;]
-    HC --&gt; Sig[&quot;graceful SIGTERM&quot;]
-</code></pre>
+<p><img alt="Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>A production-grade Python container includes PID 1 handling, an honest healthcheck, and graceful shutdown behavior</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PID 1</strong>: the <em>first process</em> in a container.</li>
@@ -149,6 +137,16 @@ curl http://localhost:8000/healthz
 <pre><code class="language-bash">docker stop api    # sends SIGTERM, uvicorn drains in-flight requests
 docker logs api | tail
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li><code>curl http://localhost:8000/healthz</code> should return <code>{"status":"ok"}</code>, and <code>docker stop api</code> should produce graceful shutdown logs rather than a forced termination pattern.</li>
+<li>It is also worth checking <code>docker exec api id</code> once to confirm the process is not running as root.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If the container exits immediately, confirm that <code>tini</code> is actually installed in the image and not just referenced in <code>ENTRYPOINT</code>.</li>
+<li>If the healthcheck keeps failing, verify that uvicorn is bound to <code>0.0.0.0:8000</code> and that <code>/healthz</code> exists exactly as declared.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Deps -&gt; code</em> ordering for <em>cache efficiency</em>.</li>
@@ -201,11 +199,16 @@ docker logs api | tail
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://fastapi.tiangolo.com/deployment/docker/">FastAPI in containers</a></li>
 <li><a href="https://www.uvicorn.org/deployment/">Uvicorn deployment</a></li>
 <li><a href="https://github.com/krallin/tini">tini - a tiny init for containers</a></li>
 <li><a href="https://docs.docker.com/engine/reference/builder/#healthcheck">Dockerfile HEALTHCHECK</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/reference/cli/docker/container/stop/">Docker stop signal behavior</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Python, FastAPI, Uvicorn, PID1</p>
 </body>
