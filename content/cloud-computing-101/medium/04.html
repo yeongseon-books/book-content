@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Compute</h1>
+<p>Compute is where cloud architecture becomes tangible. The same application can run on a VM, inside a container platform, or in a serverless runtime, but those choices produce very different bills, scaling behavior, and operational load.</p>
+<p>That is why strong teams do not start with a favorite platform. They start with workload fit: how long the code runs, how bursty traffic is, how much control the runtime needs, and how much human operations time the team can afford.</p>
+<p>This is post 4 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll compare VMs, containers, serverless, and bare metal, then connect those choices to Auto Scaling and pricing models.</p>
 <blockquote>
-<p>Cloud Computing 101 series (4/10)</p>
+<p>Compute choices trade control for automation. The right answer depends less on fashion and more on the failure modes and operating rhythm of the workload.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Among VMs, containers, and Lambda, <em>when do you pick which</em>?</p>
-<blockquote>
-<p><em>Compute is anything that runs your code — VM vs container vs serverless trades control for automation.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The four compute styles (VM / container / serverless / bare metal)</li>
 <li>What Auto Scaling actually does</li>
@@ -76,12 +72,8 @@
 <h2>Why It Matters</h2>
 <p>Compute choice drives roughly 60% of your bill and most of your operational pain.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Bare[&quot;bare metal&quot;] --&gt; VM[&quot;vm&quot;]
-    VM --&gt; Container[&quot;container&quot;]
-    Container --&gt; Serverless[&quot;serverless&quot;]
-    Serverless --&gt; Code[&quot;code&quot;]
-</code></pre>
+<p><img alt="The compute spectrum shifts from maximum control to maximum platform automation" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>The compute spectrum shifts from maximum control to maximum platform automation</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>EC2</strong>: AWS VM service.</li>
@@ -127,6 +119,22 @@ print(parse_type(&quot;m5.large&quot;))
 <li>The AMI is the VM's birth photo.</li>
 <li><code>terminate</code> is irreversible.</li>
 <li>Instance type is <code>family.size</code>.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>With compute resources, the useful thing to observe is state transition. Launch, inspect, and terminate are different operating events, and understanding their sequence makes later Auto Scaling and cost discussions much easier to follow.</p>
+<pre><code class="language-bash">aws ec2 describe-instances --instance-ids i-xxxxxxxx --query 'Reservations[0].Instances[0].State.Name'
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>Right after launch you should see <code>pending</code>, then later <code>running</code>.</li>
+<li>After termination you should see <code>shutting-down</code> followed by <code>terminated</code>.</li>
+<li>If you cannot read these transitions, Auto Scaling events will stay mysterious and troubleshooting will stay slow.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>Stopped and terminated are not the same operational state or cost profile.</li>
+<li>Spot capacity belongs on interruption-tolerant work, not on stateful data tiers.</li>
+<li>Instance types are starting hypotheses. Metrics have to confirm whether the fit is still real.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
