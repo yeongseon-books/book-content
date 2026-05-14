@@ -24,7 +24,7 @@ tags:
 - PII
 - Anonymization
 - Privacy
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 
 seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번호를 그대로 출력해 버리는 사고는 이미 여러 사례로 보고됐습니다.
 ---
@@ -37,11 +37,9 @@ seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번
 
 현업에서는 regex만 믿거나, 반대로 NER만 붙여 놓고 끝내는 경우가 많습니다. 그러나 실제 운영 파이프라인은 탐지, 분류, 익명화, 감사라는 네 단계를 모두 가져야 하고, 각 단계의 false negative를 줄이는 별도 장치가 필요합니다.
 
+이 글은 AI Data Preparation 101 시리즈의 4번째 글입니다. 여기서는 학습 데이터에서 PII를 탐지하고 익명화할 때 어떤 계층을 쌓아야 하는지, 그리고 감사 로그와 사람 검토를 어디에 붙여야 하는지 정리하겠습니다.
+
 개인정보 처리는 “최대한 많이 가리자”가 아니라 사용 목적과 리스크에 맞게 적절한 기법을 고르는 문제이기도 합니다. redact, mask, pseudonymize, synthesize는 목적이 서로 다릅니다.
-
-이 글은 AI Data Preparation 101 시리즈의 4번째 글입니다.
-
-여기서는 학습 데이터에서 PII를 탐지하고 익명화할 때 어떤 계층을 쌓아야 하는지, 그리고 감사 로그와 사람 검토를 어디에 붙여야 하는지 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -108,6 +106,51 @@ def detect_regex(text: str) -> dict[str, list[str]]:
 sample = "Contact: alice@example.com or 010-1234-5678."
 print(detect_regex(sample))
 ```
+
+**Expected output:**
+
+```text
+{'email': ['alice@example.com'], 'phone_kr': ['010-1234-5678']}
+```
+
+이 출력은 가장 값싼 1차 검증입니다. 여기서도 명확한 식별자가 잡히지 않으면 뒤 단계가 아무리 정교해도 파이프라인은 이미 눈이 먼 상태입니다.
+
+## 익명화 전에 반드시 거쳐야 할 검증 단계
+
+regex와 NER를 둘 다 붙였다면, 두 계층이 실제로 서로를 보완하는지 확인해야 합니다. 짧은 테스트 하네스만 있어도 회귀를 꽤 많이 막을 수 있습니다.
+
+```python
+TEST_ROWS = [
+    {"text": "Contact Alice at alice@example.com or 010-1234-5678."},
+    {"text": "John Smith from Acme lives in Seoul."},
+]
+
+for row in TEST_ROWS:
+    regex_hits = detect_regex(row["text"])
+    ner_hits = detect_ner(row["text"], language="en")
+    print({
+        "text": row["text"],
+        "regex_types": sorted(regex_hits.keys()),
+        "ner_types": sorted({hit["type"] for hit in ner_hits}),
+    })
+```
+
+**Expected output:**
+
+```text
+{'text': 'Contact Alice at alice@example.com or 010-1234-5678.', 'regex_types': ['email', 'phone_kr'], 'ner_types': ['EMAIL_ADDRESS', 'PERSON', 'PHONE_NUMBER']}
+{'text': 'John Smith from Acme lives in Seoul.', 'regex_types': [], 'ner_types': ['LOCATION', 'PERSON']}
+```
+
+이 결과가 유용한 이유는 두 가지입니다. 빠른 regex 계층이 직접 식별자를 놓치지 않는지 확인할 수 있고, NER 계층이 자연어 안의 이름·위치처럼 regex가 약한 구간을 실제로 보완하는지도 알 수 있습니다.
+
+## 운영에서 자주 놓치는 실패 모드
+
+1. **감사 로그에 원문을 남기는 경우**: 그 순간 감사 로그가 새 개인정보 저장소가 됩니다.
+2. **NER threshold를 지나치게 높게 잡는 경우**: 이름과 위치가 review queue로도 못 올라옵니다.
+3. **한국어 테스트 샘플이 없는 경우**: 주민등록번호, 사업자번호, 한국어 이름 누락이 오래 숨어 있습니다.
+
+중요한 식별자마다 최소 한 줄의 테스트 데이터를 직접 보여 줄 수 없다면, 아직은 개인정보 파이프라인을 신뢰하기 어렵습니다.
 
 이 단계는 false negative가 높다는 한계를 안고 시작해야 합니다. 그래서 regex만으로 끝내지 않고, “명확한 패턴은 빠르게 제거한다”는 역할로 두는 편이 맞습니다.
 

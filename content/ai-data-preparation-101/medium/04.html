@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>PII Detection and Anonymization for Training Data</h1>
+<p>Training-data leaks are no longer theoretical once email addresses, phone numbers, or names make it into the corpus. The later you try to handle PII, the more expensive cleanup becomes across the rest of the pipeline.</p>
+<p>This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why should PII handling be split into detection, classification, anonymization, and audit?</li>
+<li>What does regex catch quickly, and where do you need NER or review queues?</li>
+<li>When should you redact, mask, pseudonymize, or synthesize instead?</li>
+<li>What belongs in an audit log, and what would recreate the privacy risk?</li>
+<li>Which extra patterns matter for Korean datasets beyond English defaults?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (4/10)</p>
+<p>Good PII handling is layered risk control: catch the obvious patterns cheaply, catch the ambiguous ones carefully, transform them for the real use case, and make the whole process auditable without leaking the original identifiers.</p>
 </blockquote>
 <hr>
 <h2>"We Can't Have PII in Training Data, Right?"</h2>
@@ -103,6 +113,39 @@ def detect_regex(text: str) -&gt; dict[str, list[str]]:
 sample = &quot;Contact: alice@example.com or 010-1234-5678.&quot;
 print(detect_regex(sample))
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{'email': ['alice@example.com'], 'phone_kr': ['010-1234-5678']}
+</code></pre>
+<p>This is the fast-path verification. If the obvious identifiers do not show up here, the rest of the pipeline is already blind.</p>
+<h2>Verification before the dataset moves forward</h2>
+<p>Regex and NER need a shared verification step, otherwise false negatives quietly survive. A small harness is enough to catch many regressions.</p>
+<pre><code class="language-python">TEST_ROWS = [
+    {&quot;text&quot;: &quot;Contact Alice at alice@example.com or 010-1234-5678.&quot;},
+    {&quot;text&quot;: &quot;John Smith from Acme lives in Seoul.&quot;},
+]
+
+for row in TEST_ROWS:
+    regex_hits = detect_regex(row[&quot;text&quot;])
+    ner_hits = detect_ner(row[&quot;text&quot;], language=&quot;en&quot;)
+    print({
+        &quot;text&quot;: row[&quot;text&quot;],
+        &quot;regex_types&quot;: sorted(regex_hits.keys()),
+        &quot;ner_types&quot;: sorted({hit[&quot;type&quot;] for hit in ner_hits}),
+    })
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{'text': 'Contact Alice at alice@example.com or 010-1234-5678.', 'regex_types': ['email', 'phone_kr'], 'ner_types': ['EMAIL_ADDRESS', 'PERSON', 'PHONE_NUMBER']}
+{'text': 'John Smith from Acme lives in Seoul.', 'regex_types': [], 'ner_types': ['LOCATION', 'PERSON']}
+</code></pre>
+<p>That output is useful for two reasons. It proves the cheap regex layer still catches direct identifiers, and it proves the NER layer is filling the natural-language gap that regex cannot see.</p>
+<h2>Failure modes to test before signing off</h2>
+<p>Three mistakes routinely escape the happy path:</p>
+<ol>
+<li><strong>Audit logs store the original string</strong>: the log becomes a new PII repository.</li>
+<li><strong>NER confidence threshold is too high</strong>: names and locations disappear from the review queue.</li>
+<li><strong>Korean identifiers are missing from tests</strong>: English-only samples hide gaps in RRN, business-number, or Korean-name handling.</li>
+</ol>
+<p>If you cannot show one test row for each class of identifier you care about, you do not yet have a privacy pipeline.</p>
 <p>Regex alone misses natural-language PII like names and addresses. Add a NER stage.</p>
 <h2>Stage 2: NER Detection</h2>
 <p><code>spaCy</code> or Microsoft's <code>Presidio</code> catches names, organizations, locations.</p>
@@ -238,6 +281,14 @@ def anonymize_with_audit(rows: list[dict], audit_path: str,
 <li>Episode 5 covers tokenization and chunking strategies.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Run regex and NER detection as separate stages and compare their hit counts</li>
+<li>[ ] Choose anonymization mode by use case instead of defaulting every field to the same transformation</li>
+<li>[ ] Keep the pseudonymization pepper outside the dataset and out of logs</li>
+<li>[ ] Store only counts, types, and reduction metrics in audit logs</li>
+<li>[ ] Review a sampled subset of anonymized rows before promoting the dataset</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
