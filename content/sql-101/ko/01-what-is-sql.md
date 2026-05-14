@@ -17,7 +17,7 @@ tags:
   - Postgres
   - Analytics
 seo_description: SQL의 역할, 관계형 모델, 선언형 질의, 그리고 실무에서 SQL이 중요한 이유를 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # SQL이란 무엇인가?
@@ -42,17 +42,9 @@ last_reviewed: '2026-05-12'
 
 또 SQL은 오래된 기술이라서 불리한 것이 아니라, 오래 살아남았기 때문에 유리한 기술입니다. PostgreSQL, MySQL, SQLite, BigQuery, Snowflake처럼 제품은 달라도 핵심 문장은 크게 달라지지 않습니다. 한 번 제대로 익히면 여러 환경으로 옮겨 갈 수 있습니다.
 
-## 한눈에 보는 흐름
+## 질의 흐름 한눈에 보기
 
-```mermaid
-flowchart LR
-    Client["App / BI"] --> SQL["SQL query"]
-    SQL --> Engine["DB engine (planner)"]
-    Engine --> Storage["Tables / Indexes"]
-    Storage --> Engine
-    Engine --> Result["Result set"]
-```
-
+![질의 흐름 한눈에 보기](../../../assets/sql-101/01/01-01-query-flow-at-a-glance.ko.png)
 애플리케이션이나 BI 도구는 SQL 문장을 데이터베이스 엔진에 전달합니다. 그러면 엔진은 테이블과 인덱스를 읽어 실행 계획을 세우고, 최종 결과 집합을 반환합니다. 여기서 중요한 점은 사용자가 인덱스를 어떤 순서로 훑으라고 직접 지시하지 않는다는 것입니다. 사용자는 원하는 결과를 말하고, 엔진이 가능한 실행 방법을 고릅니다.
 
 ## 핵심 개념 정리
@@ -122,6 +114,13 @@ SELECT * FROM users;
 SELECT name FROM users WHERE signup_at >= '2026-02-01';
 ```
 
+**Expected output:**
+
+| name |
+| --- |
+| Linus |
+| Grace |
+
 여기서는 전체 행을 다 읽는 대신 조건을 통과한 사용자만 남깁니다. 그리고 열도 `name`만 고릅니다. SQL은 이런 식으로 열과 행을 동시에 줄여서 원하는 결과를 만듭니다.
 
 ### 5단계 — 개수 세기
@@ -169,6 +168,8 @@ SQL은 데이터를 다루는 팀이 함께 사용하는 공용어입니다. 핵
 다음 글에서는 가장 자주 쓰는 문장인 `SELECT`를 중심으로, 컬럼을 명시하고 정렬하고 제한하는 기본 패턴을 정리합니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **SQL이란 무엇인가? (현재 글)**
 - SELECT 기본 (예정)
 - WHERE와 조건 (예정)
@@ -179,6 +180,7 @@ SQL은 데이터를 다루는 팀이 함께 사용하는 공용어입니다. 핵
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -188,4 +190,4 @@ SQL은 데이터를 다루는 팀이 함께 사용하는 공용어입니다. 핵
 - [Use The Index, Luke](https://use-the-index-luke.com/)
 - [Mode — SQL Tutorial](https://mode.com/sql-tutorial/)
 
-Tags: SQL, Database, RDBMS, Postgres, Analytics
+Tags: SQL, Database, Postgres, Analytics

@@ -54,39 +54,25 @@
 </head>
 <body>
 <h1>What Is SQL?</h1>
-<p>This is the first post in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why did the era of <em>moving rows by hand</em> end? How did we get a language where you only have to <em>describe what you want</em>?</p>
-<blockquote>
-<p><em>SQL is the language for stating </em>what you want<em>, not </em>how to get it<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Most people start SQL by memorizing syntax. In practice, the real turning point is earlier than that. You need a reason SQL survived across spreadsheets, web apps, dashboards, and warehouses, and you need a mental model for why teams still trust it as the common language around data.</p>
+<p>If you start from that angle, the basic clauses stop looking like trivia. They start to look like a compact way to describe the exact rows and columns you want without scripting every step yourself.</p>
+<p>This is the first post in the SQL 101 series. It establishes the declarative mental model that makes later topics like filtering, joins, aggregation, and query plans easier to reason about.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>What <em>SQL</em> is and the heart of the <em>relational model</em></li>
-<li>What it means for a language to be <em>declarative</em></li>
-<li>The split between <em>DDL / DML / DCL</em></li>
-<li>Five steps to your first query</li>
-<li>Five common mistakes</li>
+<li>What kind of language is SQL, exactly?</li>
+<li>Why is the relational model still the default foundation for analytical and application data?</li>
+<li>What does it mean that SQL is declarative?</li>
+<li>How do DDL, DML, and DCL differ?</li>
+<li>What should you notice first when reading your first query?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Analysts, backend engineers, and data engineers <em>all share</em> SQL. The moment data outgrows a spreadsheet, <em>one SQL line saves a day</em>. And SQL has been <em>useful for over 40 years</em>, so the time you spend learning it <em>keeps paying off</em>.</p>
 <blockquote>
-<p><em>As data grows, SQL becomes the only </em>reasonable<em> tool.</em></p>
+<p>SQL is not a language for listing procedural steps. It is a language for declaring the shape of the result you want.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;App / BI&quot;] --&gt; SQL[&quot;SQL query&quot;]
-    SQL --&gt; Engine[&quot;DB engine (planner)&quot;]
-    Engine --&gt; Storage[&quot;Tables / Indexes&quot;]
-    Storage --&gt; Engine
-    Engine --&gt; Result[&quot;Result set&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Analysts, backend engineers, and data engineers all meet the same database from different directions, and SQL is where that conversation becomes concrete. The moment the problem stops fitting inside a spreadsheet, SQL stops being optional and starts becoming the default tool for counting users, filtering orders, and explaining where a metric came from.</p>
+<p>SQL also ages unusually well. PostgreSQL, MySQL, SQLite, BigQuery, and Snowflake differ in details, but the core patterns stay familiar. Once you learn the language properly, you carry that skill across products instead of relearning everything from scratch.</p>
+<h2>Query flow at a glance</h2>
+<p><img alt="Query flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Table</strong>: the basic unit, made of <em>rows</em> and <em>columns</em>.</li>
@@ -118,6 +104,22 @@
 <p><strong>Step 4 — Filter</strong></p>
 <pre><code class="language-sql">SELECT name FROM users WHERE signup_at &gt;= '2026-02-01';
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linus</td>
+</tr>
+<tr>
+<td>Grace</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Step 5 — Count</strong></p>
 <pre><code class="language-sql">SELECT COUNT(*) AS total FROM users;
 </code></pre>
@@ -178,6 +180,7 @@
 <li><a href="https://sqlbolt.com/">SQLBolt — Interactive SQL Lessons</a></li>
 <li><a href="https://use-the-index-luke.com/">Use The Index, Luke</a></li>
 <li><a href="https://mode.com/sql-tutorial/">Mode — SQL Tutorial</a></li>
+<li><a href="https://www.postgresql.org/docs/current/index.html">PostgreSQL — Documentation home</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, Database, RDBMS, Postgres, Analytics</p>
 </body>
