@@ -3,7 +3,7 @@ title: Image Captioning and OCR Pipelines
 series: multimodal-ai-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,17 +16,27 @@ tags:
 - Tesseract
 - PaddleOCR
 - Document AI
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Build efficient image captioning and OCR pipelines. Learn about BLIP, Tesseract, PaddleOCR, and hybrid VLM workflows for multimodal systems.
 ---
 
 # Image Captioning and OCR Pipelines
 
+Teams new to document and screenshot understanding often think OCR is the whole problem. In practice, OCR gives you strings, but it does not preserve scene meaning, emphasis, layout hierarchy, or the fact that two nearby labels belonged to the same visual unit.
+
 This is post 4 in the Multimodal AI 101 series.
 
-> Multimodal AI 101 series (4/10)
+Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.
 
----
+## Questions this chapter answers
+
+- Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?
+- When should you use a lightweight captioner, and when does a full VLM call earn its cost?
+- How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?
+- What does a pragmatic OCR-plus-VLM hybrid look like?
+- Where do rotation, confidence thresholds, accessibility, and PII controls most often break?
+
+> OCR compresses an image into strings. Captioning compresses it into scene meaning. Production document understanding needs both because each one throws away information the other one needs.
 
 ## "Doesn't pulling text out of an image cover it?"
 
@@ -198,6 +208,9 @@ The pattern that works in practice has five stages.
 [Structured output]
 ```
 
+![OCR + VLM hybrid pipeline](../../../assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
+*OCR recovers exact strings and locations. Captioning and VLM description recover scene meaning. The fusion stage is where production quality is decided.*
+
 Below is a minimal implementation of that hybrid.
 
 ```python
@@ -261,6 +274,14 @@ BLIP captions are short and generic ("a person sitting"). They lack the context 
 ### 5. PII leaking through caption/OCR output
 
 Card numbers on receipts, phone numbers on business cards, and ID numbers on passport photos are all readable by OCR. Run a PII filter on caption/OCR output (see ai-data-preparation-101 Episode 4).
+
+## Operations checklist
+
+- [ ] We normalize rotation and resolution before OCR or captioning starts
+- [ ] We load the correct language pack or model weights for the actual document language
+- [ ] We route low-confidence OCR output to fallback or review instead of trusting it blindly
+- [ ] We do not reuse raw BLIP output as final accessibility or SEO text without review
+- [ ] We re-run PII filtering after OCR and caption text have been generated
 
 ## Key Takeaways
 
