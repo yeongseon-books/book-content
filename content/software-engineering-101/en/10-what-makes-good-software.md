@@ -18,22 +18,16 @@ tags:
   - Simplicity
   - Engineering
 seo_description: Quality attributes, SOLID, simplicity, sustainability, and the external signals senior engineers actually look at.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Makes Good Software
 
-This is the final post in the Software Engineering 101 series.
+A working feature and good software are not the same thing. Shipping the feature is only the opening move. The harder question is whether the system still behaves well when requirements change, teammates rotate, traffic grows, and incidents force trade-offs under pressure.
 
-> Software Engineering 101 series (10/10)
+Teams often judge quality first by style or abstraction. Those signals matter, but the stronger truth usually appears outside the code: lead time, recovery speed, onboarding friction, user trust, and the ease of safe change. Quality lives at the intersection of internal structure and external behavior.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Are "good code" and "good software" the same thing?
-
-> Code is a means. Software is a system people live with for years.
-
-<!-- a-grade-intro:end -->
+This is the final post in the Software Engineering 101 series. In this chapter, we tie the series together by looking at quality attributes, practical readings of SOLID, and the operational signals senior engineers use when they say a system is healthy.
 
 ## What You Will Learn
 
@@ -51,14 +45,8 @@ A working feature is the start, not the end. Good software endures over time and
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F["Functional"] --> R["Reliable"]
-    R --> M["Maintainable"]
-    M --> P["Performant"]
-    P --> S["Secure"]
-    S --> U["Usable"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
+*How quality attributes balance each other to define software health*
 
 Quality is not one axis but a balance across many.
 
@@ -140,6 +128,28 @@ Track time from code to deploy.
 ```
 
 External signals tell more truth than internal code metrics.
+
+## A quality-signal check
+
+The fastest way to make quality actionable is to convert it from taste into signals. Pick one weak quality attribute in your current system and pair it with one internal metric and one external outcome.
+
+### Verification steps
+
+1. Choose the weakest current axis such as reliability or maintainability.
+2. Name one internal signal and one external signal that expose that weakness.
+3. Define a baseline and one quarter-scale improvement target.
+
+**Expected output:**
+
+- Quality discussions shift from preference to evidence.
+- Complexity, lead time, MTTR, and onboarding speed start to connect to each other.
+- SOLID principles become tools for reducing change cost instead of slogans.
+
+### Failure modes to watch
+
+- The team measures feature output only.
+- Internal code style stands in for user and operational reality.
+- Metrics exist, but no review cadence turns them into decisions.
 
 ## What to Notice in This Code
 
