@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 빌드 도구와 번들링
 
-이 글은 Frontend Development 101 시리즈의 아홉 번째 글입니다.
-
 프론트엔드 코드는 개발할 때는 수십, 수백 개 파일로 흩어져 있습니다. 그런데 사용자의 브라우저는 그 모든 구조를 그대로 이해하지 않습니다. 결국 누군가는 import 그래프를 따라가고, 필요한 코드를 변환하고, 묶고, 쪼개고, 캐시 가능한 형태로 내보내야 합니다. 그 역할을 맡는 것이 빌드 도구입니다.
 
-이 글에서는 빌드 도구를 단순한 개발 편의 기능이 아니라 사용자 경험을 결정하는 성능 계층으로 설명하겠습니다. 한 가지 관점이 중요합니다. 번들의 모양은 곧 사용자가 처음 화면을 얼마나 빨리 보느냐를 좌우한다는 점입니다.
+이 글은 Frontend Development 101 시리즈의 아홉 번째 글입니다. 여기서는 빌드 도구를 단순한 개발 편의 기능이 아니라 사용자 경험을 결정하는 성능 계층으로 설명합니다. 번들의 모양은 사용자가 첫 화면을 얼마나 빨리 보는지를 좌우합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Src["src/*.{js,ts,jsx}"] --> Resolver["Module resolver"]
-    Resolver --> Trans["Transformer (Babel/SWC/esbuild)"]
-    Trans --> Bundle["Bundler"]
-    Bundle --> Out["dist/*.js + assets"]
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/09/09-01-diagram.ko.png)
+
+*소스 코드가 모듈 해석, 변환, 번들링을 거쳐 배포 산출물로 바뀌는 흐름*
 
 소스 코드는 그대로 배포되지 않습니다. 모듈 해석, 변환, 번들링을 거쳐 브라우저가 이해할 수 있는 최종 산출물로 바뀝니다.
 
@@ -135,6 +129,16 @@ const url = import.meta.env.VITE_API_URL;
 
 실무에서는 3단계와 4단계가 특히 중요합니다. 개발 서버가 빠르다고 해서 프로덕션 번들도 좋다고 자동으로 보장되지는 않습니다. 결국 `dist/` 안에 무엇이 만들어졌는지 직접 보는 습관이 필요합니다.
 
+## 검증 포인트
+
+- `npm run build` 뒤에 `dist/assets`에 해시가 붙은 파일이 생성되는지 확인합니다.
+- 번들 분석 도구에서 가장 큰 모듈을 확인하고, `VITE_API_URL`이 빌드 모드별로 다르게 들어가는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 환경 변수가 비어 있으면 `VITE_` 접두사와 `.env.production` 위치를 먼저 확인합니다.
+- 번들이 예상보다 크면 전체 라이브러리 import, 큰 이미지, source map 노출 여부를 점검합니다.
+
 ## 이 코드에서 주목할 점
 
 - 개발 서버는 ESM을 직접 서빙하므로 초기 부팅이 빠릅니다.
@@ -193,14 +197,19 @@ const url = import.meta.env.VITE_API_URL;
 - [폼과 유효성 검사](./07-forms-and-validation.md)
 - [스타일링과 디자인 시스템](./08-styling-and-design-system.md)
 - **빌드 도구와 번들링 (현재 글)**
+
 - 작은 프론트엔드 앱 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Vite docs](https://vitejs.dev/)
-- [esbuild docs](https://esbuild.github.io/)
-- [web.dev: Reduce JavaScript payloads](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+### 공식 문서
+- [Vite guide](https://vite.dev/guide/)
+- [esbuild documentation](https://esbuild.github.io/)
+- [web.dev: Tree shaking and code splitting](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+
+### 확인용 자료
 - [Bundlephobia](https://bundlephobia.com/)
+- [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer)
 
 Tags: Frontend, Build, Vite, Bundling, Performance
