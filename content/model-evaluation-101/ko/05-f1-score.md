@@ -17,7 +17,7 @@ tags:
   - ImbalancedData
   - scikit-learn
 seo_description: 정밀도와 재현율을 조화롭게 평가하는 F1 점수의 의미를 파악하고, 마이크로 및 매크로 평균 방식의 차이를 비교합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # F1 점수
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    P["precision"] --> F1["F1 = harmonic mean"]
-    R["recall"] --> F1
-    F1 --> Beta["F-beta with weight"]
-    F1 --> Avg["macro / micro / weighted"]
-```
+![정밀도와 재현율을 묶는 F1과 평균 방식의 갈림길](../../../assets/model-evaluation-101/05/05-01-concept-at-a-glance.ko.png)
 
+*정밀도와 재현율을 묶는 F1과 평균 방식의 갈림길*
 이 그림은 F1이 끝점이 아니라 갈림길이라는 점을 보여 줍니다. 기본 F1이 있고, 비용 구조에 따라 F-beta로 확장할 수 있으며, 다중 분류에서는 어떤 평균을 쓸지도 결정해야 합니다.
 
 ## 핵심 용어
@@ -121,6 +116,8 @@ for t in np.arange(0.2, 0.9, 0.1):
     p = (proba >= t).astype(int)
     print(round(t, 1), round(f1_score(yb, p), 3))
 ```
+
+**예상 결과:** 같은 예측 결과도 micro, macro, weighted 평균에 따라 서로 다른 F1을 내고, 임계값을 움직이면 F1 자체도 변한다는 사실을 확인할 수 있습니다. 즉 F1은 하나의 고정 진실이 아니라 요약 방식과 운영점의 영향을 받는 숫자입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

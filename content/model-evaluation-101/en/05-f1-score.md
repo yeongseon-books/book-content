@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 5
 title: F1 Score
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - ImbalancedData
   - scikit-learn
 seo_description: The meaning and limits of F1, weighting precision or recall with F-beta, and how macro, micro, and weighted averages differ in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # F1 Score
 
-> Model Evaluation 101 series (5/10)
+Once you understand why precision and recall both matter, the next temptation is obvious: compress them into a single score. F1 is usually the first answer because it is compact, easy to compare, and common in reports and leaderboards.
 
-<!-- a-grade-intro:begin -->
+But every summary discards detail. F1 tells you how balanced precision and recall are, yet it does not tell you which class is weak, which averaging mode was used, or whether the business cares more about misses than false alarms. It is a useful headline, not a full diagnosis.
 
-**Core question**: When you collapse precision and recall into a single number, what gets distorted?
+This is post 5 in the Model Evaluation 101 series. In this post, we unpack standard F1, F-beta, and the averaging choices that make superficially similar scores mean different things.
 
-> *F1 is the harmonic mean. F-beta generalizes it by weighting one side over the other.*
-
-<!-- a-grade-intro:end -->
-
-This is post 5 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The formula and intuition behind F1
 - F-beta for recall-heavy vs precision-heavy use cases
@@ -42,20 +36,17 @@ This is post 5 in the Model Evaluation 101 series.
 - What F1 means under class imbalance
 - Five common pitfalls
 
+> F1 is a compact summary, not a complete explanation. You still need to name the averaging mode, the class behavior behind it, and the cost trade-off it hides.
+
 ## Why It Matters
 
 Leaderboards usually report a single F1 number. Without specifying which F1, two models cannot be compared.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P["precision"] --> F1["F1 = harmonic mean"]
-    R["recall"] --> F1
-    F1 --> Beta["F-beta with weight"]
-    F1 --> Avg["macro / micro / weighted"]
-```
+![f1 summary branching into averaging modes and f-beta choices](../../../assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
 
+*f1 summary branching into averaging modes and f-beta choices*
 ## Key Terms
 
 - **F1**: `2*P*R/(P+R)`.
@@ -119,6 +110,8 @@ for t in np.arange(0.2, 0.9, 0.1):
     p = (proba >= t).astype(int)
     print(round(t, 1), round(f1_score(yb, p), 3))
 ```
+
+**Expected output:** You should see micro, macro, and weighted F1 disagree on the same predictions, and the binary threshold sweep should make it obvious that F1 itself moves when the operating point moves.
 
 ## What to Notice in This Code
 
