@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is an Operating System?</h1>
-<p>This is the first post in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do all the programs on a single computer coexist without trampling each other's CPU, memory, and files?</p>
-<blockquote>
-<p>An operating system (OS) sits between hardware and applications. It coordinates how CPU, memory, disks, and the network are shared, and it wraps raw hardware in clean abstractions like processes, files, and sockets that application code can use. This series follows both roles end to end and explains the machinery that you depend on every day but rarely see.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When people first hear "operating system," they often picture the software that boots a computer and launches applications. In production, the more useful question is different: why does the same code run fine on one machine, fail to open a file on another, and die with an out-of-memory kill somewhere else?</p>
+<p>To answer that, you have to stop treating the OS as background scenery. It is the execution environment that constantly decides how CPU, memory, disks, and the network are shared.</p>
+<p>This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A working definition of an operating system and its two main roles</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.</p>
 </blockquote>
+<p><strong>Where the operating system sits</strong></p>
+<p><img alt="Where the operating system sits" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png"><br>
+<em>Where the operating system sits between application code and hardware</em></p>
 <pre><code class="language-text">+---------------------------------------------+
 |  Application (Python, Browser, IDE, ...)    |
 +---------------------------------------------+
