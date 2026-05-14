@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Functions and Closures</h1>
+<p>A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.</p>
 <p>This is post 5 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: A function seems to "remember" the variables of the place it was defined in. How is that possible?</p>
-<blockquote>
-<p>Closures are not magic. They are the natural result of combining <strong>lexical scope</strong> with <strong>first-class functions</strong> — the ability to treat a function as a value. When a function is created, it captures references to the bindings of the scope it grew up in. That is a closure.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What first-class functions are and why they matter</li>
@@ -80,12 +71,8 @@
 <p>A closure is "a function plus the environment it grew up in."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;make_adder(10)&quot;] --&gt; B[&quot;function add&quot;]
-    B --&gt; C[&quot;captured: x = 10&quot;]
-    D[&quot;caller&quot;] --&gt; B
-    B --&gt; E[&quot;return x + n&quot;]
-</code></pre>
+<p><img alt="A closure carrying both function logic and the binding it captured" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>A closure carrying both function logic and the binding it captured</em></p>
 <p>The <code>add</code> returned by <code>make_adder</code> carries the binding <code>x = 10</code> along with it. The caller cannot see inside, but <code>add</code> computes on top of that environment.</p>
 <h2>Key Terms</h2>
 <ul>
