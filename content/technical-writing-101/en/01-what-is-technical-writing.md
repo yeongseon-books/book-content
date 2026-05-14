@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 1
 title: What Is Technical Writing
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Documentation
   - Communication
   - Beginner
-seo_description: A beginner-friendly tour of what technical writing is and how it differs from everyday prose for software engineers.
-last_reviewed: '2026-05-04'
+seo_description: Define technical writing with a reader-task-output model so engineering prose leads to action instead of vague explanation.
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Technical Writing
 
-This is the first post in the Technical Writing 101 series.
+When beginners hear *technical writing*, they often picture polish first: clean grammar, nice headings, maybe a few screenshots. In real engineering teams, the harder problem is direction. If the writer does not know who the reader is, what action should follow, and what counts as success, even elegant prose turns into a slow document.
 
-> Technical Writing 101 series (1/10)
+Technical writing matters because it keeps working after the meeting ends. A README, runbook, tutorial, or migration note gets read by someone who still has to install, run, compare, debug, or decide something. That operational handoff is what separates it from everyday explanatory prose.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.
 
-**Core question**: How is *technical writing* different from *everyday writing*?
-
-> The reader must be able to *act* on it.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - A definition of *technical writing*
 - The difference from *everyday* prose
@@ -46,15 +40,13 @@ This is the first post in the Technical Writing 101 series.
 
 Writing tends to *outlive* the *code* it describes.
 
+> Mental model: the post only works when a reader can turn the explanation into an action.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R[Reader] --> Q[Question]
-    Q --> A[Answer]
-    A --> X[Action]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **technical writing**: Prose that *delivers technical information*.
@@ -68,6 +60,17 @@ flowchart LR
 **Before**: "*Python* is a *great language*."
 
 **After**: "A *beginner* can *run Hello World* in *five minutes*."
+
+## One frame that sharpens the whole paragraph
+
+| Element | Weak version | Stronger version |
+| --- | --- | --- |
+| Reader | Developers | A junior backend engineer building a first FastAPI endpoint |
+| Task | Environment setup | Create a virtual environment and install dependencies |
+| Output | Success | `(.venv)` appears and `pip list` shows the package |
+| Boundary | Python basics | Local setup only, not deployment |
+
+This table matters because technical vagueness usually begins in the opening promise. If the reader is broad, the task widens, the output becomes invisible, and the post starts to sound friendly while remaining hard to execute. Filling in these four cells before writing often fixes the paragraph before the prose stage even begins.
 
 ## Hands-on: One Technical Paragraph
 
