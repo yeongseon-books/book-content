@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>CI Pipeline</h1>
-<p>This is post 2 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Do you have <em>one pipe</em> that applies <em>the same checks</em> to <em>every PR</em>?</p>
-<blockquote>
-<p>A CI pipeline is <em>the team's bar</em>. The <em>passing line is encoded</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A pull request without a reliable CI pipeline is still a guess. Reviewers can catch logic issues, but they should not be the only layer standing between a typo, a broken import, or a vulnerable dependency and your main branch.</p>
+<p>A strong CI pipeline turns quality rules into an executable contract. Every PR sees the same checks in the same order, so the team argues less about process and spends more time fixing real failures.</p>
+<p>This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and stages of a <em>CI pipeline</em></li>
@@ -80,13 +71,8 @@
 <p>A PR without CI is <em>wishful thinking</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Push[&quot;push/PR&quot;] --&gt; Lint[&quot;lint&quot;]
-    Lint --&gt; Build[&quot;build&quot;]
-    Build --&gt; Test[&quot;test&quot;]
-    Test --&gt; Scan[&quot;security scan&quot;]
-    Scan --&gt; Pass[&quot;green check&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Pipeline</strong>: an <em>ordered sequence of stages</em>.</li>
