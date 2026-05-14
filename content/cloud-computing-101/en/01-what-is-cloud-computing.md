@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 1
 title: What is Cloud Computing?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - DevOps
   - Networking
 seo_description: A practical primer on cloud computing — five core characteristics, on-prem vs cloud, the major providers, and the shared responsibility model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # What is Cloud Computing?
 
-> Cloud Computing 101 series (1/10)
+Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.
 
-<!-- a-grade-intro:begin -->
+That convenience is only half of the story. Cloud is not just "someone else's server." It is an operating model where you provision compute, storage, and network on demand, pay for what you actually use, and split responsibility with the provider.
 
-**Core question**: Why did we stop buying servers and start *renting computing power* over the internet?
+This is the first post in the Cloud Computing 101 series.
 
-> *Cloud computing rents compute, storage, and network on demand and bills only for what you use.*
+In this post, we'll build the mental model that makes later topics like service models, regions, networking, security, and cost control easier to reason about.
 
-This is post 1 in the Cloud Computing 101 series.
+> Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The five essential characteristics of cloud
 - On-premises vs cloud
@@ -48,14 +46,9 @@ You can launch a global service with *zero up-front capital*. The trade-off is t
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["user"] --> Net["internet"]
-    Net --> CSP["cloud provider"]
-    CSP --> Compute["compute"]
-    CSP --> Storage["storage"]
-    CSP --> Network["network"]
-```
+![Basic flow where a user requests abstracted cloud resources through the provider](../../../assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
+
+*Basic flow where a user requests abstracted cloud resources through the provider*
 
 ## Key Terms
 
@@ -118,6 +111,27 @@ print(upload("my-test-bucket-2026", "hello.txt", b"hi cloud"))
 - Credentials live in environment variables, not source code.
 - Clients are reusable — create once, call many times.
 - Bucket names are globally unique across all of AWS.
+
+## How to Verify This Example
+
+The point of the S3 example is not that the API call returns without throwing. The point is that you can confirm the bucket and object actually exist. That habit matters early because cloud workflows fail most often at the credential, region, and naming layers before the code itself gets interesting.
+
+```bash
+aws s3 ls
+aws s3 ls s3://my-test-bucket-2026
+```
+
+**Expected output:**
+
+- The first command should show the bucket you just created.
+- The second command should show `hello.txt` inside that bucket.
+- If both are empty, check credentials, active profile, region, and bucket-name uniqueness before you change the Python code.
+
+### Where beginners usually get stuck
+
+- `BucketAlreadyExists` usually means the bucket name is globally taken, not that your code is malformed.
+- `AccessDenied` is often a credential or profile issue before it is a boto3 issue.
+- Cleanup matters: even tiny learning resources turn into long-lived cost when no one deletes them.
 
 ## Five Common Mistakes
 
