@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Understanding p-value
 
-This is post 9 in the Statistics 101 series.
+If you read enough statistical reports, you will keep running into lines like p < 0.05. The problem is that this single line is often overloaded. Some readers treat it as the probability that the hypothesis is true, others treat it as the size of the effect, and others read p > 0.05 as proof that nothing is happening.
 
-> Statistics 101 series (9/10)
+The p-value does none of those jobs. It only answers one question: assuming the null hypothesis is true, how surprising is the observed data?
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
 
-**Core question**: What does *p < 0.05* really mean? *Why* is it *misread so often*?
+## Questions this post answers
 
-> *A p-value is not the probability that a hypothesis is true. It is only how surprising the data is.*
+- What does the p-value actually mean?
+- Why is it so often misread?
+- How is p-value different from effect size?
+- Why does repeated peeking at the data create trouble?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *precise definition* of a p-value
-- *Five common misreadings*
-- *p-hacking* and *pre-registration*
-- A 5-step p-value exercise
-- The core of the *ASA 2016 statement*
+> A p-value is not the truth probability of a hypothesis. It is a measure of how surprising the data would be under the null.
 
 ## Why It Matters
 
@@ -50,14 +45,9 @@ Most papers and reports collapse a *conclusion* into one line: *p < 0.05*. Yet *
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    H0["H0 (null)"] --> Sample["Observed sample"]
-    Sample --> Stat["Test statistic"]
-    Stat --> P["p = P(stat >= obs | H0)"]
-    P --> Decide["Compare with alpha"]
-```
+![Concept at a Glance](../../../assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
 
+*A p-value measures how surprising the observed data would be if the null hypothesis were true.*
 ## Key Terms
 
 - **p-value**: under the *assumption that H0 is true*, the probability of seeing a *result at least as extreme* as the observed one.
@@ -179,6 +169,6 @@ A p-value is *not proof*; it is a *measure of surprise*. The next episode wraps 
 - [ASA Statement on p-Values (2016)](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
 - [Nature — Scientists rise up against statistical significance](https://www.nature.com/articles/d41586-019-00857-9)
 - [scipy.stats — ttest_1samp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html)
-- [Wikipedia — Misuse of p-values](https://en.wikipedia.org/wiki/Misuse_of_p-values)
+- [NIST/SEMATECH e-Handbook — Hypothesis Tests](https://www.itl.nist.gov/div898/handbook/prc/section2/prc2.htm)
 
 Tags: Statistics, PValue, Inference, Misconceptions, Beginner
