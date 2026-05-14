@@ -17,7 +17,7 @@ tags:
   - 그래프
   - BFS
 seo_description: 그래프를 인접 리스트와 행렬로 구현하고 BFS와 DFS 순회 알고리즘의 원리, 다익스트라 최단 경로 전략을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 그래프 표현
@@ -52,6 +52,12 @@ last_reviewed: '2026-05-12'
   |  /  |                  C: [A, B]
   C --- D                  D: [B]
 ```
+
+## 그래프 표현을 그림으로 보면
+
+![그래프 표현을 그림으로 보면](../../../assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
+
+*같은 관계 데이터를 그래프와 인접 리스트로 읽는 방식을 함께 보여 주는 그림*
 
 ## 핵심 개념
 
@@ -261,6 +267,10 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 
 그래프 문제를 잘 풀려면 구현보다 먼저 관계를 구조로 보는 눈이 필요합니다. 값 하나를 처리하는 대신, 연결을 따라 움직이는 사고방식으로 전환해야 BFS·DFS·최단 경로가 한 흐름으로 이어집니다.
 
+실무에서는 메모리와 장애 패턴을 같이 봐야 합니다. 인접 행렬은 간선 존재 확인이 단순하지만, 정점이 10만 개만 되어도 O(V²) 메모리 비용이 바로 문제가 됩니다. 반대로 인접 리스트는 희소 그래프에 효율적이지만, 특정 간선 존재 여부를 자주 검사하면 탐색 비용이 누적될 수 있습니다.
+
+탐색 방식도 운영 특성과 연결됩니다. BFS는 최단 경로를 찾는 대신 큐가 빠르게 커질 수 있고, DFS는 메모리는 덜 쓰더라도 깊은 그래프에서 재귀 한계나 편향 탐색 문제가 생길 수 있습니다. 가중치가 있는 경로에 음수 간선이 섞이면 Dijkstra가 틀린 답을 낼 수 있다는 점도 반드시 기억해야 합니다.
+
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
@@ -318,9 +328,9 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 
 ## 참고 자료
 
-- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
-- [GeeksforGeeks — Graph Data Structure](https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/)
-- [Visualgo — Graph Traversal](https://visualgo.net/en/dfsbfs)
 - [NetworkX Documentation](https://networkx.org/documentation/stable/)
+- [Python 공식 문서 — heapq](https://docs.python.org/3/library/heapq.html)
+- [Runestone Academy — Graphs](https://runestone.academy/ns/books/published/pythonds3/Graphs/toctree.html)
+- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
 
 Tags: Python, 자료구조, Graph, 그래프, BFS
