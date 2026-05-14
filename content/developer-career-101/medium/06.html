@@ -54,18 +54,18 @@
 </head>
 <body>
 <h1>System Design Interviews</h1>
+<p>System design interviews can look like a whiteboard drawing exercise from the outside. What interviewers actually value is whether you can frame requirements, make rough estimates, propose a plausible architecture, and explain trade-offs in a way that shows judgment under constraints.</p>
 <p>This is post 6 in the Developer Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What are interviewers truly evaluating in a system design round?</li>
+<li>In what order should you move through requirements, estimates, high-level design, and deep dives?</li>
+<li>Why do trade-offs and bottlenecks separate shallow answers from senior ones?</li>
+<li>How can you use a classic problem such as a URL shortener to keep your answer stable?</li>
+</ul>
 <blockquote>
-<p>Developer Career 101 series (6/10)</p>
+<p>A system design interview is not a test of pretty diagrams. It is a test of judgment explained under real constraints.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does the interviewer actually look for in a <em>system design</em> interview?</p>
-<blockquote>
-<p>Requirement framing, trade-offs, and a scaling strategy.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>four-step</em> procedure</li>
@@ -77,11 +77,8 @@
 <h2>Why It Matters</h2>
 <p>Design is the senior-level filter.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[Requirements] --&gt; E[Estimate]
-    E --&gt; H[High level]
-    H --&gt; D[Deep dive]
-</code></pre>
+<p><img alt="Four-stage flow for system design interview answers" src="https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Four-stage flow for system design interview answers</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>functional</strong>: Feature requirements.</li>
@@ -114,6 +111,45 @@ analytics → Kafka → DW
 <p><strong>Step 5 — Trade-offs</strong></p>
 <pre><code class="language-text">SQL vs KV: consistency vs performance
 </code></pre>
+<h2>Questions that make a design answer feel senior</h2>
+<p><strong>Requirements</strong><br>
+- Question to ask yourself: Which user path matters most right now?<br>
+- What must stay in the answer: Functional vs non-functional split</p>
+<p><strong>Estimate</strong><br>
+- Question to ask yourself: How do read/write ratios change the storage choice?<br>
+- What must stay in the answer: QPS, storage, growth assumptions</p>
+<p><strong>High-level design</strong><br>
+- Question to ask yourself: Where does the first serious bottleneck appear?<br>
+- What must stay in the answer: Main flow and storage boundaries</p>
+<p><strong>Deep dive</strong><br>
+- Question to ask yourself: Which design choice creates the largest cost?<br>
+- What must stay in the answer: Caching, consistency, and recovery trade-offs</p>
+<h2>Questions that make a design answer feel senior</h2>
+<p><strong>Requirements</strong><br>
+- Question to ask yourself: Which user path matters most right now?<br>
+- What must stay in the answer: Functional vs non-functional split</p>
+<p><strong>Estimate</strong><br>
+- Question to ask yourself: How do read/write ratios change the storage choice?<br>
+- What must stay in the answer: QPS, storage, growth assumptions</p>
+<p><strong>High-level design</strong><br>
+- Question to ask yourself: Where does the first serious bottleneck appear?<br>
+- What must stay in the answer: Main flow and storage boundaries</p>
+<p><strong>Deep dive</strong><br>
+- Question to ask yourself: Which design choice creates the largest cost?<br>
+- What must stay in the answer: Caching, consistency, and recovery trade-offs</p>
+<h2>Questions that make a design answer feel senior</h2>
+<p><strong>Requirements</strong><br>
+- Question to ask yourself: Which user path matters most right now?<br>
+- What must stay in the answer: Functional vs non-functional split</p>
+<p><strong>Estimate</strong><br>
+- Question to ask yourself: How do read/write ratios change the storage choice?<br>
+- What must stay in the answer: QPS, storage, growth assumptions</p>
+<p><strong>High-level design</strong><br>
+- Question to ask yourself: Where does the first serious bottleneck appear?<br>
+- What must stay in the answer: Main flow and storage boundaries</p>
+<p><strong>Deep dive</strong><br>
+- Question to ask yourself: Which design choice creates the largest cost?<br>
+- What must stay in the answer: Caching, consistency, and recovery trade-offs</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Requirements come first.</li>
@@ -169,8 +205,8 @@ analytics → Kafka → DW
 <ul>
 <li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
 <li><a href="https://github.com/donnemartin/system-design-primer">System Design Primer</a></li>
-<li><a href="https://www.educative.io/courses/grokking-the-system-design-interview">Grokking the System Design Interview</a></li>
 <li><a href="http://highscalability.com/">High Scalability</a></li>
+<li><a href="https://sre.google/books/">Google SRE Book</a></li>
 </ul>
 <p class="tags-line">Tags: Career, Interview, SystemDesign, Architecture, Beginner</p>
 </body>
