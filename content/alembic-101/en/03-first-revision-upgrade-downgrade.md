@@ -17,7 +17,7 @@ tags:
 - upgrade
 - downgrade
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 'A revision file is a pair of functions: upgrade(): N → N+1 and downgrade():
   N+1 → N.'
 ---
@@ -47,6 +47,11 @@ There is one more reason. Writing a real `downgrade` is what keeps production sa
 > A revision file is **a pair of functions: `upgrade(): N → N+1` and `downgrade(): N+1 → N`**. If the two are exact inverses of each other, alembic can move freely up and down the graph. If either side is asymmetric, that revision is effectively a one-way commit.
 
 To use a git analogy, `upgrade` is the commit and `downgrade` is its precise revert. A good commit is one that reverts cleanly; a good revision is one whose downgrade is precise.
+
+### Diagram: the two-way contract inside a revision file
+
+![Diagram: the two-way contract inside a revision file](../../../assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.en.png)
+*A good revision makes `upgrade` and `downgrade` true round-trips across the same change.*
 
 ## Core concepts
 
@@ -202,6 +207,17 @@ def upgrade() -> None:
 
 You can bundle a schema change and a data fix into the same revision. For larger datasets, splitting the data change into a separate data migration (episode 6) is safer.
 
+## Verification routine
+
+```bash
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+sqlite3 app.db ".schema orders"
+```
+
+**Expected output:** all three Alembic commands succeed, and the final schema dump shows the `orders` table plus the `ix_orders_user_id` index again.
+
 ## Common mistakes
 
 - **Leaving `downgrade` empty.** "We will never roll back" is fine until something breaks and you need to. If you really want to forbid downgrade, raise `NotImplementedError` explicitly instead.
@@ -240,14 +256,28 @@ A revision file boils down to a pair: `upgrade` and `downgrade`. Building the ha
 
 The next post covers `--autogenerate` in earnest — the option that automates this hand-written work. The key question is where the boundary lies between what it catches and what it misses.
 
-## References
-
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
-- Alembic: Working with Branches — https://alembic.sqlalchemy.org/en/latest/branches.html
-- Alembic: Batch Mode — https://alembic.sqlalchemy.org/en/latest/batch.html
-- SQLAlchemy: Schema Definition — https://docs.sqlalchemy.org/en/20/core/schema.html
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- **Your first revision: writing upgrade and downgrade by hand (current)**
+- autogenerate: the line between what it catches and what it misses (upcoming)
+- branches and merges: combining revisions made in parallel (upcoming)
+- Data migrations: separating schema changes from data changes (upcoming)
+- Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, revision, upgrade, downgrade, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
+- [Alembic: Working with Branches](https://alembic.sqlalchemy.org/en/latest/branches.html)
+- [Alembic: Batch Mode](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [SQLAlchemy: Schema Definition](https://docs.sqlalchemy.org/en/20/core/schema.html)
+
+Tags: Python, Alembic, SQLAlchemy, Migration
