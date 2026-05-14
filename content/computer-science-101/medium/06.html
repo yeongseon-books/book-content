@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Operating Systems</h1>
-<blockquote>
-<p>Computer Science 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: Why does it look like hundreds of programs run at the same time on a single machine?</p>
-<blockquote>
-<p>The operating system sits between hardware and applications. It hands CPU and memory out to many programs and gives them a uniform way to reach files, networks, and other resources. Every line of code we write eventually relies on the OS. This article covers processes, threads, virtual memory, system calls, and the basics of concurrency.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The moment one machine seems to run many programs at once, you are already living inside an operating-system abstraction. The same perspective explains why a web server stalls, why a memory leak becomes visible, and why threads do not always make Python faster.</p>
 <p>This is post 6 in the Computer Science 101 series.</p>
+<p>In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>Why does one machine appear to run many programs at once?</li>
+<li>How do processes and threads differ in memory sharing and isolation?</li>
+<li>Why is virtual memory such a useful abstraction?</li>
+<li>What cost appears at the user/kernel boundary when a system call happens?</li>
+<li>Why do CPU-bound and I/O-bound tasks need different concurrency strategies?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between processes and threads</li>
@@ -83,19 +82,8 @@
 <blockquote>
 <p>A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.</p>
 </blockquote>
-<pre><code class="language-text">Process A                       Process B
-┌───────────────────┐           ┌───────────────────┐
-│ Virtual address   │           │ Virtual address   │
-│  ┌─────────────┐  │           │  ┌─────────────┐  │
-│  │ Thread 1    │  │           │  │ Thread 1    │  │
-│  │ Thread 2    │  │           │  │             │  │
-│  └─────────────┘  │           │  └─────────────┘  │
-└─────────┬─────────┘           └─────────┬─────────┘
-          │                               │
-          └───── Operating system ────────┘
-                       │
-                  Hardware (CPU, RAM, disk)
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>Processes stay isolated from one another while the OS multiplexes hardware resources</em></p>
 <h2>Key Terms</h2>
 <p><strong>Process</strong><br>
 - Description: An execution unit with its own memory space</p>
@@ -180,6 +168,7 @@ with ProcessPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
 print(f&quot;processes x4: {time.perf_counter() - start:.2f}s&quot;)  # about 4x faster
 </code></pre>
+<p><strong>Expected output:</strong> for CPU-bound work, <code>threads x4</code> should stay close to <code>sequential</code>, while <code>processes x4</code> should finish noticeably faster.</p>
 <p><strong>Step 3: Look inside a system call</strong></p>
 <pre><code class="language-python"># Python's open() ultimately calls the OS open(2) system call
 import os
