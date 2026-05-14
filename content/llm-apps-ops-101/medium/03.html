@@ -54,13 +54,15 @@
 </head>
 <body>
 <h1>Evaluating LLM output quality</h1>
-<p>As traffic grows, nobody can read every model response by hand. Early in an ops pipeline, the pragmatic move is to catch obvious failures cheaply and consistently before reaching for heavier evaluation machinery.</p>
+<p>As traffic grows, nobody can read every model response by hand.</p>
 <p>This is the third post in the LLM Apps Ops 101 series. Here, we will build a minimal quality gate around length, keyword coverage, and format checks.</p>
+<p>Early in an ops pipeline, the pragmatic move is not to build a brilliant judge. It is to fail obvious bad output cheaply, consistently, and with enough detail to act on it.</p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How do you automate max-length checks for model output?</li>
 <li>When does keyword coverage become a useful quality gate?</li>
 <li>How far should format validation go before you add schema validation?</li>
+<li>What should a batch evaluation report include so failures are actionable?</li>
 </ul>
 <blockquote>
 <p>The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.</p>
@@ -70,8 +72,8 @@
 <p><em>LLM output quality evaluation pipeline</em></p>
 <h2>Why this layer matters</h2>
 <p><img alt="Rule checks catch obvious failures first" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png"></p>
-<p><em>Rule checks catch obvious failures first</em><br>
-Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.</p>
+<p><em>Rule checks catch obvious failures first</em></p>
+<p>Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.</p>
 <p>At scale, nobody reads every answer. A practical pipeline starts by blocking machine-detectable failures: malformed JSON, missing keywords, and answers that are far too short or too long.</p>
 <p>Example file: <code>en/03-evaluation/main.py</code></p>
 <h2>Minimal runnable example</h2>
@@ -156,21 +158,111 @@ if __name__ == &quot;__main__&quot;:
 - Forcing JSON output narrows the shape of the problem before evaluation starts.<br>
 - Returning <code>missing_keywords</code> makes failures actionable instead of mysterious.<br>
 - Length thresholds should reflect the product, not an abstract best practice.</p>
+<h2>What changes when you add JSON Schema</h2>
+<p>If you want format validation to survive real team usage, do not stop at “the keys exist.” Add schema validation so the response contract becomes explicit.</p>
+<pre><code class="language-python">from jsonschema import ValidationError, validate
+
+ANSWER_SCHEMA = {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+        &quot;answer&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 60, &quot;maxLength&quot;: 280},
+        &quot;keywords&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;minItems&quot;: 1,
+        },
+    },
+    &quot;required&quot;: [&quot;answer&quot;, &quot;keywords&quot;],
+    &quot;additionalProperties&quot;: False,
+}
+
+def validate_schema(payload: dict) -&gt; tuple[bool, str | None]:
+    try:
+        validate(instance=payload, schema=ANSWER_SCHEMA)
+        return True, None
+    except ValidationError as exc:
+        return False, exc.message
+</code></pre>
+<p>This is the difference between “the model usually behaves” and “the downstream pipeline can trust the contract.” Schema drift is a quiet way to break batch jobs, dashboards, and storage.</p>
+<h2>Connect it to a batch report</h2>
+<p>Operations work is rarely about one answer. You want to compare prompt versions, model versions, and release candidates across a stable case set.</p>
+<pre><code class="language-python">TEST_CASES = [
+    {&quot;topic&quot;: &quot;Python's GIL&quot;, &quot;expected_keywords&quot;: [&quot;CPython&quot;, &quot;thread&quot;, &quot;lock&quot;]},
+    {&quot;topic&quot;: &quot;asyncio.gather&quot;, &quot;expected_keywords&quot;: [&quot;coroutine&quot;, &quot;concurrent&quot;, &quot;await&quot;]},
+]
+
+def run_batch(client: Groq) -&gt; list[dict]:
+    batch_results = []
+    for case in TEST_CASES:
+        raw = ask_for_json(client, case[&quot;topic&quot;])
+        result = evaluate(raw, case[&quot;expected_keywords&quot;])
+        batch_results.append(
+            {
+                &quot;topic&quot;: case[&quot;topic&quot;],
+                &quot;passed&quot;: result.passed,
+                &quot;missing_keywords&quot;: result.missing_keywords,
+                &quot;answer_length&quot;: result.answer_length,
+            }
+        )
+    return batch_results
+
+print(json.dumps(run_batch(client), indent=2, ensure_ascii=False))
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">[
+  {
+    &quot;topic&quot;: &quot;Python's GIL&quot;,
+    &quot;passed&quot;: true,
+    &quot;missing_keywords&quot;: [],
+    &quot;answer_length&quot;: 148
+  },
+  {
+    &quot;topic&quot;: &quot;asyncio.gather&quot;,
+    &quot;passed&quot;: false,
+    &quot;missing_keywords&quot;: [&quot;await&quot;],
+    &quot;answer_length&quot;: 81
+  }
+]
+</code></pre>
+<p>That result is useful because the failure is replayable. The second case did not just “score badly.” It missed <code>await</code>, which points you directly toward prompt design, model choice, or task phrasing.</p>
+<h2>What comes after the rule layer</h2>
+<p>In practice, the sequence usually looks like this:</p>
+<ol>
+<li><strong>Format checks</strong> keep the pipeline stable.</li>
+<li><strong>Length and keyword checks</strong> catch obvious failures cheaply.</li>
+<li><strong>Small batch reports</strong> detect regressions across releases.</li>
+<li><strong>Human review or LLM-as-judge</strong> is reserved for ambiguous cases.</li>
+</ol>
+<p>The point is cost control as much as quality control. Cheap gates should protect expensive ones.</p>
 <h2>Where engineers get confused</h2>
 <p><img alt="Rule checks layer before judge models" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-03-where-engineers-get-confused.en.png"></p>
 <p><em>Rule checks layer before judge models</em><br>
 - Passing format checks does not mean the answer is good. Failing format checks usually means the answer is unusable.<br>
 - Keyword checks work best in domains with explicit terminology, not creative tasks.<br>
-- Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.</p>
+- Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.<br>
+- If length thresholds are too rigid, they can reject useful answers for the wrong reason.</p>
+<h2>When failures rise, narrow them this way</h2>
+<pre><code class="language-bash"># 1) Pull only failed cases from the latest run
+python3 -m scripts.eval_report --only-failed
+
+# 2) Group failures by reason
+python3 -m scripts.eval_report --group-by reason
+
+# 3) Compare two prompt versions
+python3 -m scripts.eval_report --compare prompt_v12 prompt_v13
+</code></pre>
+<p>The core questions stay simple. Did failures rise because of format, because of length, or because one keyword family keeps disappearing?</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Force JSON-only output</li>
 <li>[ ] Define numeric length thresholds</li>
-<li>[ ] Set expected_keywords per test case</li>
-<li>[ ] Log missing keywords on failure</li>
+<li>[ ] Set <code>expected_keywords</code> per test case</li>
+<li>[ ] Log missing keywords and failure reasons</li>
+<li>[ ] Store batch results with prompt and model versions</li>
 </ul>
 <h2>Summary</h2>
 <p>Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look.</p>
+<p>The next layer is not always a smarter judge. Often it is better reporting, better test cases, and better comparison discipline. In the next post, we will connect this quality layer to the security layer, where even well-formed output can still be operationally unsafe.</p>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
@@ -182,10 +274,15 @@ if __name__ == &quot;__main__&quot;:
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://platform.openai.com/docs/guides/structured-outputs">Structured Outputs guide</a></li>
+<li><a href="https://platform.openai.com/docs/guides/structured-outputs">OpenAI Structured Outputs guide</a></li>
 <li><a href="https://json-schema.org/">JSON Schema</a></li>
+</ul>
+<p><strong>Verification-friendly resources</strong></p>
+<ul>
 <li><a href="https://arxiv.org/abs/2303.16634">G-Eval paper</a></li>
+<li><a href="https://www.promptfoo.dev/docs/">Promptfoo docs</a></li>
 </ul>
 <p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
 </body>
