@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>What is Kubernetes?</h1>
-<blockquote>
-<p>Kubernetes 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can a <em>human</em> really manage <em>tens or hundreds</em> of containers by hand?</p>
-<blockquote>
-<p><em>Kubernetes</em> is the <em>orchestrator</em> that keeps your <em>containers</em> in their <em>desired state</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A few <code>docker run</code> commands feel manageable when the system is small. The moment the service grows into dozens of containers across several nodes, that confidence usually breaks first. Someone has to decide placement, recover failures, and keep versions aligned while the system keeps moving.</p>
 <p>This is the first post in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will frame Kubernetes as an orchestrator that continuously pushes the cluster toward the state you declared, not as a command launcher that starts containers one by one.</p>
+<blockquote>
+<p>Kubernetes is most useful when you stop thinking in terms of “start this container now” and start thinking in terms of “keep the cluster in this desired state over time.”</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The meaning of <em>orchestration</em></li>
 <li><em>Control plane</em> vs <em>worker nodes</em></li>
@@ -77,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A handful of containers fits on <em>Compose</em>. From <em>dozens</em> upward, an <em>orchestrator</em> is a <em>survival requirement</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;kubectl&quot;] --&gt; API[&quot;api-server&quot;]
-    API --&gt; Etcd[&quot;etcd&quot;]
-    API --&gt; Sched[&quot;scheduler&quot;]
-    Sched --&gt; Node[&quot;worker node&quot;]
-    Node --&gt; Pod[&quot;pod&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>This control-flow view shows how <code>kubectl</code> talks to the API server and lets the control plane drive scheduling toward the desired state.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>cluster</strong>: a <em>control plane + worker nodes</em> bundle.</li>
@@ -138,6 +127,18 @@ def current_context():
     )
     return res.stdout
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl config current-context
+kubectl get nodes -o wide
+kubectl cluster-info
+</code></pre>
+<p><strong>Expected output:</strong> you should first see the active context name, then at least one <code>Ready</code> node, and finally a reachable API server endpoint. This is the fastest way to confirm that the cluster model in the article matches a live control plane you can actually talk to.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>If <code>current-context</code> is wrong, stop before deeper debugging because the rest of the commands are reading the wrong cluster.</li>
+<li>If <code>get nodes</code> times out, check API reachability and credentials before assuming a Kubernetes concept issue.</li>
+<li>If <code>cluster-info</code> works but nodes are <code>NotReady</code>, the problem is cluster health, not your mental model of orchestration.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>kubectl</em> talks only to the <em>api-server</em>.</li>
@@ -195,6 +196,7 @@ def current_context():
 <li><a href="https://kubernetes.io/docs/concepts/overview/components/">Kubernetes components</a></li>
 <li><a href="https://kubernetes.io/docs/reference/kubectl/">kubectl reference</a></li>
 <li><a href="https://landscape.cncf.io/">CNCF landscape</a></li>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/">kubectl Cheat Sheet</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Orchestration, Containers, DevOps, SRE</p>
 </body>
