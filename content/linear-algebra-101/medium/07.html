@@ -54,38 +54,24 @@
 </head>
 <body>
 <h1>Eigenvalues and Eigenvectors</h1>
-<blockquote>
-<p>Linear Algebra 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you <em>apply a matrix repeatedly</em>, are there <em>axes that do not change direction</em>?</p>
-<blockquote>
-<p><em>Eigenvectors are the </em>invariant axes<em> of a transformation; eigenvalues are the </em>stretching factors<em> along those axes.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 7 in the Linear Algebra 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>If you apply the same linear transformation again and again, some directions behave differently from the rest. Most directions get mixed or bent, but a few keep their direction and only change length. Eigenvalues and eigenvectors are the tools that describe those privileged axes.</p>
+<p>This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.</p>
+<h2>Questions This Post Answers</h2>
 <ul>
-<li>The <em>definition</em> of <em>eigenvalues / eigenvectors</em></li>
-<li>Their <em>geometric meaning</em></li>
-<li>How to compute them with <em>NumPy</em></li>
-<li>A 5-step hands-on</li>
-<li>Five common pitfalls</li>
+<li>Why do some directions survive repeated matrix application?</li>
+<li>What do eigenvectors and eigenvalues each tell you?</li>
+<li>Why do symmetric matrices produce especially clean results?</li>
+<li>How does this connect to PCA, PageRank, and dynamical systems?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>PCA, dynamics, quantum mechanics, PageRank — all rely on <em>eigendecomposition</em>. It lets you view a matrix in a <em>simple coordinate system</em>.</p>
 <blockquote>
-<p><em>Eigenvectors are the natural axes of a transformation.</em></p>
+<p>An eigenvector is a direction that a transformation does not rotate away from. The eigenvalue tells you how strongly that direction is stretched or compressed.</p>
 </blockquote>
+<h2>Why It Matters</h2>
+<p>Eigendecomposition lets you read a complicated transformation in a simpler coordinate system. If you can find the right axes, a messy matrix may reduce to mostly independent scaling behavior along those axes.</p>
+<p>That is why the topic keeps returning in PCA, stability analysis, and ranking algorithms. Eigenvalues and eigenvectors are powerful not because they are formal, but because they tell you which modes dominate and which directions stay structurally meaningful.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Matrix A&quot;] --&gt; Eq[&quot;A v = lambda v&quot;]
-    Eq --&gt; Vec[&quot;Eigenvector v&quot;]
-    Eq --&gt; Lam[&quot;Eigenvalue lambda&quot;]
-    Vec --&gt; Use[&quot;PCA, dynamics, PageRank&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>This diagram shows how the eigenvalue equation leads to invariant directions and downstream applications.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Eigenvector v</strong>: a <em>non-zero vector</em> satisfying <code>A v = lambda v</code>.</li>
@@ -126,6 +112,12 @@ for _ in range(50):
     v = M @ v
 print(&quot;steady state:&quot;, v / np.linalg.norm(v, 1))
 </code></pre>
+<h2>Read One Numeric Pass</h2>
+<ul>
+<li>The matrix <code>[[2, 1], [0, 3]]</code> has eigenvalues <code>2</code> and <code>3</code>, so it has two especially readable directions.</li>
+<li><code>np.allclose(A @ v, lambda * v)</code> returning <code>True</code> is the fastest sanity check that the computed vector is really an eigenvector.</li>
+<li>Repeated multiplication reveals the dominant direction. In this toy example, the direction settles near <code>[0.5, 0.5]</code>.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Eigendecomposition</em> simplifies the <em>transformation</em>.</li>
@@ -180,7 +172,7 @@ print(&quot;steady state:&quot;, v / np.linalg.norm(v, 1))
 <h2>References</h2>
 <ul>
 <li><a href="https://www.3blue1brown.com/lessons/eigenvalues">3Blue1Brown — Eigenvectors and eigenvalues</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">Wikipedia — Eigenvalues and eigenvectors</a></li>
+<li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/">MIT OpenCourseWare — Eigenvalues and eigenvectors</a></li>
 <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html">NumPy — linalg.eig</a></li>
 <li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigh.html">NumPy — linalg.eigh</a></li>
 </ul>
