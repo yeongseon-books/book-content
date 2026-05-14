@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: How a Container Apps environment fuses VNet, Log Analytics, Dapr
   scope, and Envoy ingress into one resource boundary that shapes every app inside
   it.
@@ -352,6 +352,22 @@ az containerapp env show -n my-env -g my-rg \
 
 az containerapp env workload-profile list -n my-env -g my-rg -o table
 ```
+
+You can also verify which apps are actually sharing the same environment boundary.
+
+```bash
+az containerapp list -g my-rg \
+  --query "[].{app:name, env:properties.managedEnvironmentId, external:properties.configuration.ingress.external}" \
+  -o table
+```
+
+**Expected output:**
+
+- Apps with the same `env` value live inside the same environment boundary.
+- Different `external` values do not imply a different outer network boundary.
+- If strongly separated workloads still share one `env`, the design problem is probably the environment boundary itself, not the per-app ingress toggle.
+
+That table is a fast reality check against the most common mistake in ACA architecture reviews: confusing per-app settings with platform-level isolation.
 
 ## Operational checklist
 
