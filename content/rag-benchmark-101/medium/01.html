@@ -54,11 +54,8 @@
 </head>
 <body>
 <h1>Understanding RAG evaluation metrics</h1>
-<blockquote>
-<p>RAG Benchmark 101 series (1/6)</p>
-</blockquote>
 <p>Retrieval metrics compare a gold document set with a ranked result list. Once you separate those two objects, it becomes much easier to see what Precision@k, Recall@k, and MRR each reveal.</p>
-<p>This is the first article in the RAG Evaluation and Benchmarking 101 series.</p>
+<p>This is the first post in the RAG Evaluation and Benchmarking 101 series.</p>
 <h2>What you'll learn</h2>
 <ul>
 <li>Compute Precision@k, Recall@k, and MRR — the three most common retrieval metrics — by hand.</li>
@@ -190,6 +187,13 @@ def reciprocal_rank(case: QueryCase) -&gt; float:
         if doc_id in case.relevant_ids:
             return 1.0 / i
     return 0.0
+
+def evaluate_case(case: QueryCase, k: int) -&gt; dict[str, float]:
+    return {
+        f&quot;precision@{k}&quot;: round(precision_at_k(case, k), 2),
+        f&quot;recall@{k}&quot;: round(recall_at_k(case, k), 2),
+        &quot;mrr&quot;: round(reciprocal_rank(case), 2),
+    }
 </code></pre>
 <p><strong>Step 2: Apply across queries</strong></p>
 <pre><code class="language-python">cases = [
@@ -212,6 +216,46 @@ print(f&quot;AVG: P@3={avg_p:.2f}, R@3={avg_r:.2f}, MRR={avg_mrr:.2f}&quot;)
 <pre><code class="language-bash">cd en/01-evaluation-metrics
 python3 main.py
 </code></pre>
+<pre><code class="language-text">Q1: P@3=0.67, R@3=0.67, MRR=1.00
+Q2: P@3=0.33, R@3=1.00, MRR=1.00
+Q3: P@3=1.00, R@3=0.60, MRR=1.00
+AVG: P@3=0.67, R@3=0.76, MRR=1.00
+</code></pre>
+<p>That output exposes a pattern the average alone hides. Q2 found the relevant document but still wastes two slots on noise. Q3 keeps the top slots clean but still misses part of the gold set. The same average Precision can imply very different next steps.</p>
+<p><strong>Step 4: Persist the per-query rows</strong></p>
+<p>As soon as the benchmark grows beyond a toy example, a single aggregate print line is not enough. Store the per-query rows so you can answer "which query regressed?" without rerunning everything interactively.</p>
+<pre><code class="language-python">report_rows = []
+for case in cases:
+    metrics = evaluate_case(case, k=3)
+    report_rows.append({
+        &quot;question&quot;: case.question,
+        &quot;retrieved_ids&quot;: case.retrieved_ids,
+        &quot;relevant_ids&quot;: sorted(case.relevant_ids),
+        **metrics,
+    })
+
+for row in report_rows:
+    print(row)
+</code></pre>
+<pre><code class="language-text">{'question': 'Q1', 'retrieved_ids': ['A', 'X', 'B'], 'relevant_ids': ['A', 'B', 'C'], 'precision@3': 0.67, 'recall@3': 0.67, 'mrr': 1.0}
+{'question': 'Q2', 'retrieved_ids': ['A', 'X', 'Y'], 'relevant_ids': ['A'], 'precision@3': 0.33, 'recall@3': 1.0, 'mrr': 1.0}
+{'question': 'Q3', 'retrieved_ids': ['A', 'B', 'C'], 'relevant_ids': ['A', 'B', 'C', 'D', 'E'], 'precision@3': 1.0, 'recall@3': 0.6, 'mrr': 1.0}
+</code></pre>
+<p>With that row-level report, you can immediately tell whether the next hypothesis is reranking, chunking, embedding choice, or gold-set cleanup.</p>
+<p><strong>Step 5: Map metric patterns to actions</strong></p>
+<p><strong>Low precision, high recall</strong><br>
+- Interpretation: The retriever found the right docs but pulled in too much noise<br>
+- First thing to inspect: reranker, filtering, lower k</p>
+<p><strong>High precision, low recall</strong><br>
+- Interpretation: Top slots are clean, but some relevant evidence is still missing<br>
+- First thing to inspect: chunking, embeddings, query expansion</p>
+<p><strong>Low MRR</strong><br>
+- Interpretation: The first relevant hit is too far down<br>
+- First thing to inspect: ranking quality, hybrid retrieval</p>
+<p><strong>Recall@k = 0</strong><br>
+- Interpretation: The retriever missed the answer space entirely<br>
+- First thing to inspect: retrieval pipeline fundamentals</p>
+<p>That table turns scores into an operating workflow. The benchmark is not just there to grade the system. It should shorten the path to the next experiment.</p>
 <p><img alt="Precision@k versus Recall@k decision axes" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.en.png"></p>
 <p><em>Precision@k versus Recall@k decision axes</em></p>
 <h2>Common pitfalls</h2>
@@ -233,6 +277,7 @@ python3 main.py
 <li><strong>Wire it into CI</strong> — embedding model or chunking changes should run the benchmark and flag regressions.</li>
 <li><strong>Next-level metrics</strong> — nDCG measures ranking quality more precisely but needs graded relevance instead of binary labels, raising data-construction cost.</li>
 </ul>
+<p>Also persist the report as JSON, not just a Markdown table or console output. Human-readable summaries are useful in reviews, but regression automation needs a structured artifact it can diff and trend over time.</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Did I define <code>relevant_ids</code> for every query?</li>
@@ -272,10 +317,11 @@ python3 main.py
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Mean_reciprocal_rank">Wikipedia: Mean reciprocal rank</a></li>
-<li><a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">Stanford IR book: Evaluation in information retrieval</a></li>
+<li><a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">Stanford IR Book — Evaluation of ranked retrieval results</a></li>
+<li><a href="https://pyterrier.readthedocs.io/en/latest/experiments.html">PyTerrier documentation — Evaluation and experiment analysis</a></li>
+<li><a href="https://amenra.github.io/ranx/metrics/">ranx documentation — Metrics reference</a></li>
 <li><a href="https://arxiv.org/abs/2104.08663">BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models</a></li>
-<li><a href="https://arxiv.org/abs/2210.07316">MTEB: Massive Text Embedding Benchmark</a></li>
+<li><a href="https://huggingface.co/spaces/mteb/leaderboard">MTEB Leaderboard</a></li>
 </ul>
 <p class="tags-line">Tags: RAG, VectorDB, Benchmarking, LLM</p>
 </body>
