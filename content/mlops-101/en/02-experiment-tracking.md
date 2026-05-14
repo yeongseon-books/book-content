@@ -2,7 +2,7 @@
 series: mlops-101
 episode: 2
 title: Experiment Tracking
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,47 +16,44 @@ tags:
   - MLflow
   - Reproducibility
   - DataScience
-seo_description: Recording experiment metadata, parameters, metrics, and artifacts so ML experiments are reproducible, with runnable MLflow code
-last_reviewed: '2026-05-04'
+seo_description: Record runs, parameters, metrics, and artifacts so ML experiments become reproducible team memory instead of scattered notebook history.
+last_reviewed: '2026-05-15'
 ---
 
 # Experiment Tracking
 
-> MLOps 101 series (2/10)
+Once a team trains a model a few times, memory usually fails before compute does. File names alone do not explain which parameter set won last week, which data version produced the result, or why today's score moved.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Can you rerun last week's best experiment today?
-
-> *Experiment tracking records parameters, metrics, artifacts, and environment together so reproduction is guaranteed.*
-
-<!-- a-grade-intro:end -->
+The problem gets worse when multiple people are involved. One person leaves metrics in Slack, another stores only the best model, and someone else never records failed runs at all. At that point, reconstructing the past becomes harder than improving the model.
 
 This is post 2 in the MLOps 101 series.
 
-## What You Will Learn
+Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
 
-- The four elements of experiment tracking
-- The core MLflow objects
-- How runs and experiments compose
-- Tools for comparison and ranking
-- Five common pitfalls
+## What This Post Answers
+
+- Why does the same model become hard to reproduce without run tracking?
+- Which pieces of metadata must always be captured: params, metrics, artifacts, environment, or data version?
+- How should you think about experiments and runs in MLflow?
+- Why should failed runs stay visible instead of being discarded?
+- What does a team have to standardize before run comparison becomes useful?
+
+> Mental model: an experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format.
 
 ## Why It Matters
 
-When a folder of notebooks becomes the source of truth, team collaboration breaks. A tracker is shared memory.
+Without experiment tracking, training continues but knowledge does not accumulate. When a new score appears, the team cannot tell whether the gain came from the data change, the parameter change, or pure luck.
 
-## Concept at a Glance
+When every run is recorded, the process becomes an asset in its own right. Failed runs prevent repeated mistakes, and successful runs become promotion candidates that can be defended with evidence.
 
-```mermaid
-flowchart LR
-    Code["code + params"] --> Run["run"]
-    Data["data version"] --> Run
-    Run --> Metric["metrics"]
-    Run --> Art["artifacts"]
-    Run --> Tag["tags"]
-    Metric --> Compare["compare runs"]
-```
+## See the Flow First
+
+![See the Flow First](../../../assets/mlops-101/02/02-01-see-the-flow-first.en.png)
+
+*See the Flow First*
+This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.
+
+The key point is not storage by itself, but comparability. The run table matters only when different runs can be read side by side with consistent names and metadata.
 
 ## Key Terms
 

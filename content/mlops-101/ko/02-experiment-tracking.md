@@ -54,16 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Code["code + params"] --> Run["run"]
-    Data["data version"] --> Run
-    Run --> Metric["metrics"]
-    Run --> Art["artifacts"]
-    Run --> Tag["tags"]
-    Metric --> Compare["compare runs"]
-```
+![실험 관리 기록 흐름](../../../assets/mlops-101/02/02-01-see-the-flow-first.ko.png)
 
+*실험 관리 기록 흐름*
 이 흐름은 실험 관리의 본질을 잘 보여 줍니다. 코드와 파라미터, 데이터 버전이 하나의 run으로 묶이고, 그 run에서 메트릭과 아티팩트와 태그가 나옵니다. 그 결과를 여러 run과 비교할 수 있어야 비로소 실험 관리가 됩니다.
 
 즉, 실험 관리의 핵심은 저장 자체가 아니라 비교 가능성입니다. run이 많아지는 것은 자연스러운 일이고, 중요한 것은 그 run들을 같은 축에서 읽을 수 있는가입니다.
