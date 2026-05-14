@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Result Interpretation</h1>
+<p>The model score is not the finish line. Someone still has to explain what changed, how certain that change is, who it applies to, and what action the team should take next. That translation step is where strong technical work often becomes weak communication.</p>
+<p>Interpretation is not about making numbers sound impressive. It is about adding context, uncertainty, and practical significance until the result is honest enough to trust and clear enough to act on.</p>
+<p>This is post 9 in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>How do you move from a metric change to a decision sentence?</li>
+<li>Why must uncertainty travel with the result instead of appearing in a footnote?</li>
+<li>Which interpretation traps make teams overclaim or underclaim?</li>
+<li>How do context and segmentation keep a result from being overgeneralized?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (9/10)</p>
+<p>Interpretation is the act of carrying numbers, context, and uncertainty together into one actionable statement.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we turn analysis results <em>into a decision</em> — without inflating or underselling what we found?</p>
-<blockquote>
-<p><em>Interpretation overlays numbers and context.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A <em>result → decision</em> 5-step flow</li>
@@ -80,12 +81,8 @@
 <p><em>A good interpretation does not overclaim, yet it still enables a decision.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Result[&quot;Numbers&quot;] --&gt; Context[&quot;Context&quot;]
-    Context --&gt; Uncertain[&quot;Uncertainty&quot;]
-    Uncertain --&gt; Story[&quot;Story&quot;]
-    Story --&gt; Decide[&quot;Decision&quot;]
-</code></pre>
+<p><img alt="How numbers gain context and uncertainty before they become a decision" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>How numbers gain context and uncertainty before they become a decision</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Confidence Interval</strong>: an <em>uncertainty range</em> around an estimate.</li>
@@ -114,6 +111,7 @@ n = 50,000 per arm
 <p><strong>Step 5 — Close with a decision</strong></p>
 <pre><code class="language-text">Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 </code></pre>
+<p><strong>Expected output:</strong> a decision-ready paragraph that includes the result, the confidence interval, the affected segment, and the next action.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Numbers</em> and <em>context</em> always travel as a <em>pair</em>.</li>
