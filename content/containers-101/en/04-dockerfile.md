@@ -2,7 +2,7 @@
 series: containers-101
 episode: 4
 title: Dockerfile
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Dockerfile
-  - Build
-  - DevOps
-seo_description: Dockerfile rules, cache-friendly ordering, multi-stage builds, and security defaults — taught with a runnable Python app example.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Dockerfile
+- Build
+- DevOps
+seo_description: Dockerfile rules, cache-friendly ordering, multi-stage builds, and
+  security defaults — taught with a runnable Python app example.
+last_reviewed: '2026-05-15'
 ---
 
 # Dockerfile
 
-> Containers 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How can a five-line difference in a Dockerfile produce a 10x size and 5x build-time gap for the same app?
-
-> *Three principles — instruction order, cache friendliness, and multi-stage — completely change the result.*
-
-<!-- a-grade-intro:end -->
+A Dockerfile is not just a text file that happens to build an image. Instruction order changes cache hit rate, base-image choice changes image size and CVE count, and one user directive can change the security posture of the runtime.
 
 This is post 4 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we focus on cache-friendly instruction order, multi-stage builds, non-root defaults, and secret handling so the resulting image is faster, smaller, and safer to ship.
+
+> Dockerfile quality is really cache quality, image quality, and runtime safety compressed into one file.
+
+## Questions this chapter answers
 
 - The role and order of instructions
 - Cache-friendly authoring
@@ -48,13 +45,9 @@ A Dockerfile directly drives team productivity and security. Get it right once a
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dockerfile["dockerfile"] --> Builder["builder stage"]
-    Builder --> Runtime["runtime stage"]
-    Runtime --> Image["final image"]
-```
+![Builder stage separated from the runtime stage](../../../assets/containers-101/04/04-01-concept-at-a-glance.en.png)
 
+*Builder stage separated from the runtime stage*
 ## Key Terms
 
 - **FROM**: the base image.
@@ -130,6 +123,22 @@ def finalize():
 - `--from=builder` brings results from the previous stage.
 - `USER app` avoids root.
 
+## Quick verification and failure signals
+
+```bash
+docker build -t demo-app:dev .
+docker image inspect demo-app:dev --format "user={{.Config.User}} size={{.Size}}"
+```
+
+**Expected output:**
+- The dependency layer sits early enough to be cached between source-only rebuilds.
+- `Config.User` is not empty and points to a non-root runtime user.
+
+**Check first if it fails:**
+- If dependencies reinstall every time, inspect where `COPY requirements.txt` sits.
+- If the app still runs as root, confirm `USER` exists in the final stage.
+- If the image is too large, check whether build tools leaked into runtime.
+
 ## Five Common Mistakes
 
 1. **`COPY .` first — kills the cache.**
@@ -168,6 +177,8 @@ Multi-stage separates build tools. `.dockerignore` shrinks the build context. Di
 Once images exist, the next question is *where to put state*. The next post covers Volume.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -178,6 +189,7 @@ Once images exist, the next question is *where to put state*. The next post cove
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -187,4 +199,4 @@ Once images exist, the next question is *where to put state*. The next post cove
 - [Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [BuildKit secrets](https://docs.docker.com/build/building/secrets/)
 
-Tags: Containers, Docker, Dockerfile, Build, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps
