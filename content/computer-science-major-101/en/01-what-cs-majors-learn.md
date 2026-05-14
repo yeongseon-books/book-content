@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 1
 title: What Computer Science Majors Learn
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - Career
   - Beginner
 seo_description: A beginner-friendly tour of the CS major map covering math, programming, systems, data, AI, and capstone projects.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # What Computer Science Majors Learn
@@ -48,14 +49,9 @@ A clear *map* keeps your *four years* from drifting.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    M[Math] --> P[Programming]
-    P --> S[Systems]
-    S --> D[Data]
-    D --> A[AI]
-    A --> J[Project]
-```
+![CS major learning flow](../../../assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
+
+*How a CS major moves from foundations to projects*
 
 ## Key Terms
 

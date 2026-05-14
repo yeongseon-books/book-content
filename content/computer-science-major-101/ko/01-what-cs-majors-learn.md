@@ -17,7 +17,8 @@ tags:
   - Career
   - Beginner
 seo_description: 컴퓨터학과 전공 과목 구성, 핵심 영역, 학습 흐름, 진로 연결을 한눈에 정리한 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 컴퓨터학과에서는 무엇을 배우는가
@@ -47,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    M[Math] --> P[Programming]
-    P --> S[Systems]
-    S --> D[Data]
-    D --> A[AI]
-    A --> J[Project]
-```
+![컴퓨터학과 전공 학습 흐름](../../../assets/computer-science-major-101/01/01-01-major-learning-map.ko.png)
+
+*컴퓨터학과 전공이 기초에서 프로젝트로 이어지는 큰 흐름*
 
 > 전공은 과목 이름의 모음이 아니라, 기초에서 응용과 프로젝트로 이동하는 학습 지도입니다.
 
