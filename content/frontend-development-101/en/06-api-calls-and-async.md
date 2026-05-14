@@ -22,22 +22,15 @@ last_reviewed: '2026-05-04'
 
 # API Calls and Async
 
-This is post 6 in the Frontend Development 101 series.
+Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing `fetch`. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.
 
-> Frontend Development 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: What do you show the user *during the brief moment* a server fetch is in flight?
-
-> Async code requires you to keep three states in mind at all times: *loading, success, failure*.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.
 
 ## What You Will Learn
 
 - The *minimum usage* of `fetch` and `async/await`
 - Handling loading/error states *explicitly*
+
 - Cancellation and race conditions
 - Caching and stale-while-revalidate
 - *Why React Query / SWR* became standard
@@ -50,13 +43,9 @@ Async bugs make up *half of frontend defects*. They hide on a fast network and e
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Idle["idle"] --> Loading["loading"]
-    Loading --> Success["success"]
-    Loading --> Error["error"]
-    Error --> Loading
-```
+![Concept at a Glance](../../../assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)
+
+*The async UI state machine moving between idle, loading, success, and error*
 
 ## Key Terms
 
@@ -153,6 +142,16 @@ function Users() {
 }
 ```
 
+## Verification
+
+- With a working API, verify that the UI shows loading first and then renders the user list; with a broken endpoint, verify that a user-facing error appears.
+- Switch DevTools to Slow 3G and confirm that requests can be canceled cleanly when the component unmounts or the screen changes.
+
+## If It Fails, Check This First
+
+- If errors disappear into the console, make sure `res.ok` is checked and the `catch` path updates visible UI state.
+- If older responses overwrite newer ones, inspect your `AbortController` cleanup or the logic that decides which response is still current.
+
 ## What to Notice in This Code
 
 - The state is *explicit*: `idle/loading/success/error`.
@@ -204,6 +203,7 @@ Async is *state*. Next, we look at handling *user input* via forms and validatio
 - [Components and State](./04-components-and-state.md)
 - [Routing and Pages](./05-routing-and-pages.md)
 - **API Calls and Async (current)**
+
 - Forms and Validation (upcoming)
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
@@ -212,9 +212,13 @@ Async is *state*. Next, we look at handling *user input* via forms and validatio
 
 ## References
 
-- [MDN Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-- [TanStack Query](https://tanstack.com/query/latest)
-- [SWR docs](https://swr.vercel.app/)
-- [MDN AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+### Official Docs
+- [MDN: Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+- [MDN: AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+- [TanStack Query docs](https://tanstack.com/query/latest)
+
+### Verification and Further Reading
+- [SWR documentation](https://swr.vercel.app/)
+- [web.dev: Fetch API error handling](https://web.dev/articles/fetch-api-error-handling)
 
 Tags: Frontend, API, Async, Fetch, JavaScript

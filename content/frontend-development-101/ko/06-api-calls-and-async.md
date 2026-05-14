@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # API 호출과 비동기
 
-이 글은 Frontend Development 101 시리즈의 여섯 번째 글입니다.
+프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고 검색 결과를 받고 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 점입니다. 네트워크는 느릴 수 있고 실패할 수 있으며 요청 순서가 뒤집힐 수도 있습니다.
 
-프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고, 검색 결과를 받고, 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 점입니다. 네트워크는 느릴 수 있고, 실패할 수 있으며, 요청 순서가 뒤집힐 수도 있습니다.
-
-이 글에서는 프론트엔드의 비동기 흐름을 상태 중심으로 설명하겠습니다. 한 가지 관점이 중요합니다. 비동기 코드는 결국 로딩, 성공, 실패라는 상태를 어떻게 명시적으로 다루느냐의 문제라는 점입니다.
+이 글은 Frontend Development 101 시리즈의 여섯 번째 글입니다. 여기서는 프론트엔드의 비동기 흐름을 상태 중심으로 설명합니다. 비동기 코드는 결국 로딩, 성공, 실패라는 상태를 얼마나 명시적으로 다루느냐의 문제입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Idle["idle"] --> Loading["loading"]
-    Loading --> Success["success"]
-    Loading --> Error["error"]
-    Error --> Loading
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/06/06-01-diagram.ko.png)
+
+*비동기 UI가 idle, loading, success, error 상태를 오가는 기본 상태 기계*
 
 이 네 가지 상태를 그려 놓고 시작하면 비동기 UI 설계가 훨씬 선명해집니다. 로딩 전, 로딩 중, 성공, 실패를 모두 다른 화면 상태로 다뤄야 합니다.
 
@@ -155,6 +149,16 @@ function Users() {
 
 실무에서 중요한 포인트는 3단계와 4단계입니다. 데이터를 받아오는 코드 자체보다 로딩과 실패를 어떻게 보여 주는지, 그리고 컴포넌트가 사라질 때 오래된 요청이 남지 않게 처리하는지가 안정성을 좌우합니다.
 
+## 검증 포인트
+
+- 정상 API에서는 로딩 메시지 뒤에 목록이 나오고, 잘못된 엔드포인트에서는 사용자에게 에러가 보이는지 확인합니다.
+- Slow 3G로 바꾼 뒤에도 로딩 상태가 비어 있지 않고, 화면 이동 시 오래된 요청이 정리되는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 에러가 화면에 안 보이면 `res.ok` 검사와 `catch` 분기가 실제 렌더링으로 이어지는지 확인합니다.
+- 이전 응답이 덮어쓰면 `AbortController` cleanup이나 최신 요청만 반영하는 분기가 있는지 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - 상태가 `idle/loading/success/error`로 명확히 드러납니다.
@@ -210,6 +214,7 @@ function Users() {
 - [컴포넌트와 상태](./04-components-and-state.md)
 - [라우팅과 페이지](./05-routing-and-pages.md)
 - **API 호출과 비동기 (현재 글)**
+
 - 폼과 유효성 검사 (예정)
 - 스타일링과 디자인 시스템 (예정)
 - 빌드 도구와 번들링 (예정)
@@ -218,9 +223,13 @@ function Users() {
 
 ## 참고 자료
 
-- [MDN Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-- [TanStack Query](https://tanstack.com/query/latest)
-- [SWR docs](https://swr.vercel.app/)
-- [MDN AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+### 공식 문서
+- [MDN: Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+- [MDN: AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController)
+- [TanStack Query docs](https://tanstack.com/query/latest)
+
+### 확인용 자료
+- [SWR documentation](https://swr.vercel.app/)
+- [web.dev: Fetch API error handling](https://web.dev/articles/fetch-api-error-handling)
 
 Tags: Frontend, API, Async, Fetch, JavaScript
