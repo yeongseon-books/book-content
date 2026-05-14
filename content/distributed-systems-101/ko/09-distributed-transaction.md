@@ -18,12 +18,16 @@ tags:
   - Saga
   - Idempotency
 seo_description: 2PC, Saga, Outbox 패턴과 멱등성 설계를 통해 여러 서비스에 걸친 분산 트랜잭션의 정합성을 유지하는 현실적인 해법을 제시합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 분산 트랜잭션
 
+분산 트랜잭션의 진짜 난점은 모두가 정상일 때가 아닙니다. 한쪽은 이미 커밋했고 다른 쪽은 타임아웃 난 상태에서, 비즈니스는 여전히 하나의 결과를 요구하는 그 순간이 문제를 만듭니다.
+
 이 글은 Distributed Systems 101 시리즈의 아홉 번째 글입니다.
+
+여기서는 2PC의 강한 모델과 Saga, outbox, 멱등적 복구 같은 현실적 대안을 비교해, 부분 실패를 어떻게 살아남는지에 초점을 맞춥니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,15 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    C["coordinator"] -->|prepare| A["service A (DB)"]
-    C -->|prepare| B["service B (DB)"]
-    A -->|yes| C
-    B -->|yes| C
-    C -->|commit| A
-    C -->|commit| B
-```
+![2PC의 coordinator와 참여자 흐름](../../../assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
+
+*2PC의 coordinator와 참여자 흐름*
 
 coordinator가 두 참가자에게 prepare를 보내고, 둘 다 yes를 보냈을 때만 commit합니다. 이것이 2PC의 핵심입니다.
 
@@ -157,6 +155,18 @@ def apply(event):
 
 분산 트랜잭션의 마지막 안전망입니다. 같은 메시지가 다시 와도 결과는 한 번만 반영됩니다.
 
+## 운영 시나리오: 주문 저장은 성공했고 relay만 실패한 경우
+
+현실에서 자주 터지는 사고는 트랜잭션 자체보다 커밋 뒤의 전달 경계에서 생깁니다.
+
+1. 서비스가 하나의 로컬 트랜잭션 안에서 `orders`와 `outbox`를 함께 기록합니다.
+2. API는 호출자에게 `201 Created`를 반환합니다.
+3. outbox relay가 Kafka publish 전에 죽습니다.
+4. 재시작한 relay는 outbox 테이블을 다시 훑어 아직 publish되지 않은 row를 전송합니다.
+5. relay가 publish 뒤 상태 업데이트 전에 죽었다면, downstream은 같은 메시지를 두 번 볼 수 있습니다.
+
+이 흐름 때문에 운영 계약은 "relay는 절대 실패하지 않는다"가 아니라 "at-least-once publish와 멱등적 소비자가 함께 안전하다"가 됩니다. outbox는 dual-write 문제를 없애는 것이 아니라, 복구 가능한 backlog 문제로 바꿉니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 2PC는 강하지만 lock이 길고 coordinator 장애에 취약합니다.
@@ -221,5 +231,6 @@ XA와 2PC는 여전히 일부 RDBMS 클러스터와 브로커에서 쓰입니다
 - [Saga pattern — microservices.io](https://microservices.io/patterns/data/saga.html)
 - [Transactional Outbox — microservices.io](https://microservices.io/patterns/data/transactional-outbox.html)
 - [Designing Data-Intensive Applications — chapter 9](https://dataintensive.net/)
+- [Life of a Cloud Spanner read-write transaction](https://cloud.google.com/spanner/docs/transactions)
 
 Tags: Computer Science, Distributed Systems, Transactions, TwoPhaseCommit, Saga, Idempotency

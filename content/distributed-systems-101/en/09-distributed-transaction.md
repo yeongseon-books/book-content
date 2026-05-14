@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 9
 title: Distributed Transactions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Saga
   - Idempotency
 seo_description: We cover the difficulty of distributed transactions and the practical answers - 2PC, Saga, outbox, and idempotent operations - in short code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Distributed Transactions
 
+The painful part of a distributed transaction is not the success path where every service behaves. It is the partial-failure path where one side committed, another side timed out, and the business still expects a single answer.
+
 This is post 9 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (9/10)
+Here we compare the heavyweight answer of 2PC with the more common production answers: Saga, outbox relay, and idempotent recovery.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it take to make two databases either both succeed or both fail?
-
-> A distributed transaction is not the work of imitating ACID; it is the work of designing for an eventually agreed-upon outcome.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The difference between a single-node and a distributed transaction
 - How 2-phase commit works and where it falls short
@@ -51,15 +45,9 @@ As microservices and multi-store architectures grow, "two systems in one transac
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    C["coordinator"] -->|prepare| A["service A (DB)"]
-    C -->|prepare| B["service B (DB)"]
-    A -->|yes| C
-    B -->|yes| C
-    C -->|commit| A
-    C -->|commit| B
-```
+![Coordinator and participant flow in 2PC](../../../assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
+
+*Coordinator and participant flow in 2PC*
 
 The coordinator sends prepare to both, and only commits when both answer yes. That is 2PC.
 
@@ -165,6 +153,18 @@ def apply(event):
 
 The last safety net for distributed transactions. Even if the same message arrives twice, the result happens once.
 
+## Operational walkthrough: order write succeeds, relay fails
+
+One of the most common real incidents is not a broken database transaction but a broken handoff after the transaction commits.
+
+1. The service writes `orders` and `outbox` rows in one local transaction.
+2. The API returns `201 Created` to the caller.
+3. The outbox relay crashes before publishing the message to Kafka.
+4. On restart, the relay scans the outbox table, finds the unpublished row, and publishes it.
+5. Downstream consumers may see the message twice if the relay crashed after publish but before marking the row as sent.
+
+That is why the operational contract is "at-least-once publish plus idempotent consume," not "relay never fails." Outbox reduces the dual-write problem to a recoverable backlog problem, which is a much more survivable failure mode.
+
 ## What to Notice in This Code
 
 - 2PC is strong but holds locks long and is fragile to coordinator failure.
@@ -229,5 +229,6 @@ Distributed transactions are not about imitating ACID — they are about designi
 - [Saga pattern — microservices.io](https://microservices.io/patterns/data/saga.html)
 - [Transactional Outbox — microservices.io](https://microservices.io/patterns/data/transactional-outbox.html)
 - [Designing Data-Intensive Applications — chapter 9](https://dataintensive.net/)
+- [Life of a Cloud Spanner read-write transaction](https://cloud.google.com/spanner/docs/transactions)
 
 Tags: Computer Science, Distributed Systems, Transactions, TwoPhaseCommit, Saga, Idempotency
