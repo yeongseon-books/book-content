@@ -17,7 +17,7 @@ tags:
   - ConfusionMatrix
   - scikit-learn
 seo_description: 정밀도와 재현율의 트레이드오프 관계를 이해하고, 비즈니스 상황에 맞는 임계값 설정으로 모델 유용성을 높이는 전략을 알아봅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 정밀도와 재현율
@@ -48,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Pred["positive prediction"] --> Prec["precision = TP/(TP+FP)"]
-    Actual["actual positive"] --> Rec["recall = TP/(TP+FN)"]
-    Threshold["threshold"] --> Tradeoff["precision/recall trade-off"]
-```
+![임계값에 따라 달라지는 정밀도와 재현율의 균형](../../../assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
 
+*임계값에 따라 달라지는 정밀도와 재현율의 균형*
 정밀도와 재현율은 따로 움직이지 않습니다. 보통 임계값을 낮추면 더 많은 양성을 잡아 재현율이 올라가지만, 동시에 거짓 양성도 늘어 정밀도가 떨어집니다.
 
 ## 핵심 용어
@@ -116,6 +112,8 @@ from sklearn.metrics import precision_recall_curve, average_precision_score
 prec, rec, _ = precision_recall_curve(yte, proba)
 print("AP:", average_precision_score(yte, proba))
 ```
+
+**예상 결과:** 임계값을 높일수록 정밀도는 올라가고 재현율은 내려가는 전형적인 흐름을 확인할 수 있습니다. 불균형 데이터에서는 AP와 PR 곡선이 ROC 기반 요약보다 더 직접적으로 운영 감각을 주는 경우가 많습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
