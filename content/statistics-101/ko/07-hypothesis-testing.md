@@ -47,14 +47,9 @@ A/B 테스트, 캠페인 효과 측정, 모델 성능 비교처럼 비교 중심
 
 가설검정은 먼저 “차이가 없다”는 기본 가정을 세우고, 표본에서 계산한 검정통계량이 그 가정 아래 얼마나 드문지 측정한 뒤, 미리 정한 기준과 비교해 결론을 내리는 절차입니다. 중요한 점은 가설을 데이터 보기 전에 정해야 한다는 것입니다.
 
-```mermaid
-flowchart LR
-    H0["H0: no difference"] --> Test["Test Statistic"]
-    H1["H1: difference"] --> Test
-    Test --> Pvalue["p-value"]
-    Pvalue --> Decide["Reject or Not"]
-```
+![멘탈 모델](../../../assets/statistics-101/07/07-01-concept-at-a-glance.ko.png)
 
+*가설검정은 차이가 없다는 기본 가정에서 출발해, 관측된 데이터가 얼마나 드문지 계산한 뒤 결론을 내립니다.*
 이 구조를 이해하면 p-value는 답 자체가 아니라 판단 재료라는 점이 보입니다. 실제 의사결정은 p-value, 효과 크기, 비용, 맥락을 함께 놓고 이뤄집니다.
 
 ## 핵심 용어
@@ -104,6 +99,8 @@ stat, p = ttest_ind(a, b, equal_var=False)
 print("t:", stat, "p:", p)
 ```
 
+**예상 출력:** `t: ... p: ...` 형태가 나오며, 두 그룹 차이가 우연으로 설명될 가능성을 빠르게 읽을 수 있습니다.
+
 Welch의 t-test를 사용하면 분산이 같지 않아도 더 안전합니다.
 
 ### 4단계 — 기준에 따라 판단한다
@@ -111,6 +108,8 @@ Welch의 t-test를 사용하면 분산이 같지 않아도 더 안전합니다.
 ```python
 print("Reject H0" if p < 0.05 else "Fail to reject H0")
 ```
+
+**예상 출력:** 현재 예시에서는 보통 `Reject H0`가 출력됩니다.
 
 기각 실패는 H0가 참하다고 단정할 근거가 아니라, 현재 데이터로는 충분히 반박하지 못했다는 말입니다.
 
@@ -121,6 +120,8 @@ diff = b.mean() - a.mean()
 pooled = np.sqrt((a.var(ddof=1) + b.var(ddof=1)) / 2)
 print("Cohen's d:", diff / pooled)
 ```
+
+**예상 출력:** `Cohen's d: 0.3`~`0.5` 안팎처럼 효과 크기를 해석할 실마리가 하나 더 생깁니다.
 
 p-value와 효과 크기를 함께 읽어야 실제 의미가 보입니다.
 
