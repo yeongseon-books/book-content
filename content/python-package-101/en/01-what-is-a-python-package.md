@@ -3,7 +3,7 @@ title: What Is a Python Package?
 series: python-package-101
 episode: 1
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - Import
 - pip
 - Library
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A Python package bundles reusable code for sharing. Everything you
   import is a package.
 ---
 
 # What Is a Python Package?
 
-This is the first post in the Python Package 101 series.
+As soon as a Python project stops fitting in one file, you start importing code across modules. That is usually the point where packaging stops feeling optional and starts shaping how you share and maintain code.
 
-> Python Package 101 series (1/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is the first post in the Python Package 101 series. Here we define modules, packages, and distributions, trace what `pip install` actually installs, and set the baseline for the rest of the series.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is the first post in the Python Package 101 series.
 - Why should you turn your code into a package?
 
 > A Python package bundles reusable code for sharing. Everything you `import` is a package.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -70,6 +64,9 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
                      utils.py
                      models.py
 ```
+
+![Mental Model](../../../assets/python-package-101/01/01-01-mental-model.en.png)
+*How a module becomes a package, a distribution, and finally an installable artifact*
 
 ## Core Concepts
 
@@ -262,7 +259,7 @@ At first, packaging feels like overhead. In reality, a single `pyproject.toml` i
 The next post covers **project structure** — src layout and pyproject.toml.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - **What Is a Python Package? (current)**
 - Project Structure — src layout and pyproject.toml (upcoming)
@@ -284,4 +281,4 @@ The next post covers **project structure** — src layout and pyproject.toml.
 - [Real Python - Python Packages](https://realpython.com/python-modules-packages/)
 - [PyPI - Python Package Index](https://pypi.org/)
 
-Tags: Python, Package, Module, Import, pip, Library
+Tags: Python, Packaging, PyPI, pyproject.toml
