@@ -17,13 +17,15 @@ tags:
 - click
 - argparse
 - Command Line
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: entry point와 click으로 pip install 후 바로 실행 가능한 CLI를 만드는 방법입니다.
 ---
 
 # CLI 패키지 만들기
 
-패키지는 import해서 쓰는 라이브러리로만 끝나지 않습니다. 잘 만든 패키지는 설치 직후 터미널 명령어로도 실행할 수 있습니다. 이 글은 Python Package 101 시리즈의 7번째 글입니다. 여기서는 `[project.scripts]` entry point가 어떻게 동작하는지, `argparse`와 `click`의 차이는 무엇인지, 그리고 실무에서 쓰기 좋은 CLI 구조를 어떻게 잡는지 정리하겠습니다.
+패키지는 import해서 쓰는 라이브러리로만 끝나지 않습니다. 잘 만든 패키지는 설치 직후 터미널 명령어로도 실행할 수 있습니다.
+
+이 글은 Python Package 101 시리즈의 7번째 글입니다. 여기서는 `[project.scripts]` entry point가 어떻게 동작하는지, `argparse`와 `click`의 차이는 무엇인지, 그리고 실무에서 쓰기 좋은 CLI 구조를 어떻게 잡는지 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -59,6 +61,9 @@ greet = "mylib.cli:main"    →    Hello, Alice!
          ↓
    runs the main() function in mylib/cli.py
 ```
+
+![멘탈 모델](../../../assets/python-package-101/07/07-01-mental-model.ko.png)
+*설치된 패키지가 entry point를 통해 CLI 명령으로 연결되는 구조*
 
 ## 핵심 개념
 
@@ -309,4 +314,4 @@ CLI에서 가장 중요한 것은 기능 수보다 **일관된 인터페이스**
 - [argparse documentation](https://docs.python.org/3/library/argparse.html)
 - [Real Python - Python CLI with Click](https://realpython.com/python-click/)
 
-Tags: Python, CLI, Entry Point, click, argparse, Command Line
+Tags: Python, Packaging, PyPI, pyproject.toml

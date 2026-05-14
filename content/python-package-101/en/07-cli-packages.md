@@ -3,7 +3,7 @@ title: CLI Packages
 series: python-package-101
 episode: 7
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - click
 - argparse
 - Command Line
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: An entry point registers a terminal command that runs after pip install,
   and click is a library for building CLI interfaces declaratively.
 ---
 
 # CLI Packages
 
-This is post 7 in the Python Package 101 series.
+Packaging becomes much more tangible once `pip install` gives a user an actual command to run. A polished CLI turns your package from shared code into a repeatable workflow.
 
-> Python Package 101 series (7/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 7 in the Python Package 101 series. Here we connect `[project.scripts]` entry points to real Python functions, compare `argparse` with `click`, and design CLIs that hold up in everyday tooling.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 7 in the Python Package 101 series.
 - How do you build a subcommand structure?
 
 > An entry point registers a terminal command that runs after `pip install`, and click is a library for building CLI interfaces declaratively.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -70,6 +64,9 @@ greet = "mylib.cli:main"    →    Hello, Alice!
          ↓
    runs the main() function in mylib/cli.py
 ```
+
+![Mental Model](../../../assets/python-package-101/07/07-01-mental-model.en.png)
+*How an installed package turns an entry point into a usable command-line workflow*
 
 ## Core Concepts
 
@@ -298,7 +295,7 @@ The most important thing when building a CLI is a **consistent interface**. Stan
 The next post covers **type hints and static analysis** — mypy, py.typed, and type-safe packages.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -320,4 +317,4 @@ The next post covers **type hints and static analysis** — mypy, py.typed, and 
 - [argparse documentation](https://docs.python.org/3/library/argparse.html)
 - [Real Python - Python CLI with Click](https://realpython.com/python-click/)
 
-Tags: Python, CLI, Entry Point, click, argparse, Command Line
+Tags: Python, Packaging, PyPI, pyproject.toml
