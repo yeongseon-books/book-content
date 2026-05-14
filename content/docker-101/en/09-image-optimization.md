@@ -2,7 +2,7 @@
 series: docker-101
 episode: 9
 title: Image Optimization
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Alpine
   - Distroless
 seo_description: Multi-stage builds, BuildKit cache mounts, and slim or distroless bases that cut image size and build time in half.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Image Optimization
 
-This is post 9 in the Docker 101 series.
+Image optimization is often presented as an aesthetic preference for smaller numbers. In practice, image size changes deploy time, registry traffic, cache hit rates, and the number of unnecessary packages that become part of your attack surface.
 
-> Docker 101 series (9/10)
+The important point is that optimization is rarely one trick. Base image choice, multi-stage separation, and BuildKit cache reuse work together. If you optimize only one of them, the result is usually smaller than it should be.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.
 
-**Core question**: Same app, *1.2 GB vs 80 MB*. *What changed*?
-
-> *Image optimization is the sum of *base choice, multi-stage, and cache mounts*. Apply *all three together* for big wins.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - *Multi-stage builds* to split *build vs runtime*
 - *BuildKit cache mounts* to *speed rebuilds*
@@ -50,11 +44,9 @@ Smaller images shorten *pull time = deploy time*. Cleaner images also reduce the
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Builder["builder stage (deps + build)"] --> Final["final stage (runtime only)"]
-    Final --> Slim["80MB image"]
-```
+![Multi-stage build separating builder and runtime stages to produce a smaller final image](../../../assets/docker-101/09/09-01-concept-at-a-glance.en.png)
+
+*Builder-only tools stay out of the runtime image so build speed, image size, and attack surface all improve together*
 
 ## Key Terms
 
@@ -124,6 +116,16 @@ docker history myapp:opt
 # https://github.com/wagoodman/dive
 ```
 
+### Verify right after you run it
+
+- Run the BuildKit build twice. The second build should show a clear cache advantage on dependency-related steps.
+- Compare `docker images myapp` with `docker history myapp:opt` to confirm that builder-only tools stayed out of the runtime image.
+
+### If it does not work, check this first
+
+- If Alpine or distroless causes runtime issues, investigate compatibility and debugging constraints before chasing smaller size numbers.
+- If the image barely shrinks, inspect `.dockerignore` and the copy boundary between builder and runtime stages.
+
 ## What to Notice in This Code
 
 - A *wheels stage* keeps only the *compiled artifacts* in runtime.
@@ -182,9 +184,15 @@ Small images lift *team velocity* and *security* at once. Next, the full *produc
 
 ## References
 
+### Official docs
+
 - [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 - [BuildKit cache mounts](https://docs.docker.com/build/cache/optimize/)
 - [Distroless images](https://github.com/GoogleContainerTools/distroless)
 - [dive - layer analysis](https://github.com/wagoodman/dive)
+
+### Verification and troubleshooting
+
+- [Optimize cache usage in builds](https://docs.docker.com/build/cache/optimize/)
 
 Tags: Docker, Multistage, BuildKit, Alpine, Distroless
