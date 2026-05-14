@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>Metrics, Logs, and Traces</h1>
+<p>Many teams say they use all three signals, but still send every question to the same place. Everything becomes a log search, or everything gets flattened into dashboards. That is where cost grows faster than understanding.</p>
+<p>The real skill is not collecting more signals. It is choosing the right one for the question in front of you.</p>
 <p>This is post 2 in the Observability 101 series.</p>
-<p>This is post 2 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the three signals <em>differ</em>, and <em>when do you reach for which</em>?</p>
-<blockquote>
-<p><em>Metrics answer </em>how much<em>, logs answer </em>what happened<em>, traces answer </em>where and how<em>. None of them </em>replaces<em> the others.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>question domain</em> of each signal</li>
@@ -81,11 +71,8 @@
 <p><em>One right signal beats </em>ten wrong dashboards<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[&quot;question&quot;] --&gt; M[&quot;how much? → metric&quot;]
-    Q --&gt; L[&quot;what happened? → log&quot;]
-    Q --&gt; T[&quot;where? → trace&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>A simple decision model: route each operational question to the signal that answers it with the least cost and ambiguity.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Counter / Gauge / Histogram</strong>: the three <em>shapes</em> of metrics.</li>
@@ -134,6 +121,21 @@ def span(name, trace_id):
 <pre><code class="language-text">&quot;overall throughput&quot; → metric
 &quot;why this order failed&quot; → log
 &quot;which service was slow for this request&quot; → trace
+</code></pre>
+<h2>One Failed Order, Three Different Questions</h2>
+<p>If order failures spike, start by separating the questions instead of mixing them.</p>
+<pre><code class="language-text">Question 1. Is the failure broad or isolated?       → metric
+Question 2. Which order failed, and why?            → log
+Question 3. Which service call consumed the time?   → trace
+</code></pre>
+<pre><code class="language-text">metric: 5xx ratio 0.4% → 6.2%
+log: payment_failed reason=card_gateway_timeout
+trace: checkout → payment-gateway span p95 2.4s
+</code></pre>
+<pre><code class="language-text">Expected output:
+- Metrics show the blast radius.
+- Logs classify the failure type.
+- Traces identify the slow or broken hop.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
