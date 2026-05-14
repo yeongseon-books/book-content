@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Error Analysis</h1>
-<blockquote>
-<p>Model Evaluation 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Two models with the same overall score — how do you find where they fail differently?</p>
-<blockquote>
-<p><em>Error analysis breaks the aggregate average into subgroups to reveal patterns of weakness.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Aggregate scores tell you roughly how good a model is, but they rarely tell you how to fix it. A 92% accuracy number can sound reassuring while still hiding the user segment, feature range, or error type that is doing the real damage.</p>
+<p>That is why improvement work often begins not with a better metric, but with a better decomposition of the failures you already have. Error analysis turns one average into a map of weak slices, expensive mistakes, and ambiguous examples.</p>
+<p>This is post 9 in the Model Evaluation 101 series. In this post, we break the score apart by slice, confidence, and error type so the next experiment has a concrete target.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>Decomposing performance by slice</li>
 <li>Classifying error types (FP, FN, class confusion)</li>
@@ -74,16 +65,14 @@
 <li>Telling data problems from model problems</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Error analysis matters because average performance hides the exact place where the system is brittle. You improve faster once the failure pattern has a name.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>92% accuracy overall can hide 60% accuracy on a specific user segment, which is a fairness issue.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    All[&quot;all errors&quot;] --&gt; Slice[&quot;slice by feature&quot;]
-    All --&gt; Conf[&quot;slice by confidence&quot;]
-    All --&gt; Conf2[&quot;confusion pairs&quot;]
-    Slice --&gt; Weak[&quot;weakest segment&quot;]
-    Conf --&gt; Calib[&quot;calibration gap&quot;]
-</code></pre>
+<p><img alt="error analysis moving from all errors to slices and confidence buckets" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>error analysis moving from all errors to slices and confidence buckets</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Slice</strong>: a subset of the data defined by some condition.</li>
@@ -130,6 +119,7 @@ for lo, hi in zip(bins[:-1], bins[1:]):
 <pre><code class="language-python">order = np.argsort(np.abs(proba - 0.5))[:10]
 print(&quot;ambiguous indices:&quot;, order.tolist())
 </code></pre>
+<p><strong>Expected output:</strong> You should identify at least one weak slice, see whether false positives or false negatives dominate, and produce a short list of ambiguous samples that are worth a label audit before you change the model.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Slice scores are the starting point of fairness work.</li>
