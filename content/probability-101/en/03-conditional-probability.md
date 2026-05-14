@@ -2,7 +2,7 @@
 series: probability-101
 episode: 3
 title: Conditional Probability
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,46 +16,39 @@ tags:
   - Independence
   - Inference
   - Beginner
-seo_description: Conditional probability defined with the multiplication rule and independence, walked through code, with the most common misreadings flagged
-last_reviewed: '2026-05-04'
+seo_description: Learn conditional probability, the multiplication rule, and base-rate reasoning so you can interpret context-dependent probabilities correctly.
+last_reviewed: '2026-05-15'
 ---
 
 # Conditional Probability
 
-This is post 3 in the Probability 101 series.
+Real probability questions almost always come with conditions. Traffic given rain, disease given a positive test, spam given a suspicious phrase in the subject line — most useful probabilities are probabilities inside a context, not in the abstract.
 
-> Probability 101 series (3/10)
+That is why conditional probability sits near the center of probability theory rather than at the edge. Once new information arrives, the denominator changes. If you do not feel that denominator shift clearly, model scores, diagnostic tests, and inference results all become easy to misread.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Probability 101 series. Here we define conditional probability, connect it to the multiplication rule, separate independence from dependence, and show why base rates can completely change the meaning of the same test result.
 
-**Core question**: How does probability *change* when we *learn new information*? The single line *P(A | B)* explains *half the world*.
+## What you will learn
 
-> *Conditional probability is the *probability of context*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The definition of *P(A | B)*
-- The *multiplication rule* and *law of total probability*
-- *Independence* vs *dependence*
-- A 5-step conditional exercise
-- Five common mistakes
+- Why conditional probability is fundamentally about changing the denominator
+- Why P(A|B) and P(B|A) can be completely different
+- How the multiplication rule follows from the definition
+- How to tell independence from dependence
+- Why base-rate neglect breaks real-world interpretation
 
 ## Why It Matters
 
-The real world is *conditional*. *P(traffic | rain)*, *P(disease | symptom)* — *every act of inference* starts here.
+One of the most common mistakes in applied probability is reversing the direction of the condition. P(disease | positive test) and P(positive test | disease) look similar, but they answer different questions. Lose that directional sense, and you misread diagnostics, alerts, and model outputs.
 
-> *Conditioning is the heart of probability.*
+The risk gets worse when the base rate is small. A rare disease with a sensitive test can still produce a positive result that does not mean what people assume it means. Conditional probability is the tool that forces context back into the interpretation.
+
+> Conditional probability is not the probability of an event in the original world. It is the probability of that event after the world has been narrowed by new information.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Joint["P(A and B)"] --> CondAB["P(A|B) = P(A and B) / P(B)"]
-    CondAB --> Mult["P(A and B) = P(A|B) * P(B)"]
-    Mult --> Total["Total probability rule"]
-```
+![Concept at a Glance](../../../assets/probability-101/03/03-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
@@ -67,9 +60,9 @@ flowchart LR
 
 ## Before / After
 
-**Before**: *“If the test is positive, the chance of disease equals the positive rate.”* — *Wrong*.
+**Before**: “If the test is positive, the chance of disease must be high.” That conclusion skips the setup.
 
-**After**: *P(disease | positive) = P(positive | disease)·P(disease) / P(positive)* — the *direction of the condition* matters.
+**After**: P(disease | positive) depends on P(positive | disease), the base rate of disease, and the overall positive rate. The direction of the condition is the whole story.
 
 ## Hands-on: 5-step Conditional Probability
 
@@ -115,46 +108,46 @@ print("indep?", round(TP/N - P_sick * P_pos, 6))  # nonzero implies dependence
 
 ## What to Notice in This Code
 
-- Conditioning is essentially *changing the denominator*.
-- *Sensitivity P(+|disease)* ≠ *positive predictive value P(disease|+)* — a *classic confusion*.
-- A *low base rate* yields a *low PPV* even with a sensitive test.
+- Conditioning is essentially changing the denominator.
+- Sensitivity P(+|disease) ≠ positive predictive value P(disease|+) — a classic confusion.
+- A low base rate yields a low PPV even with a sensitive test.
 
 ## Five Common Mistakes
 
-1. **Equating *P(A|B)* with *P(B|A)***.
-2. **Ignoring the *base rate* (base-rate fallacy).**
-3. **Confusing *independence* with *mutual exclusivity*.**
-4. **Failing to *state the condition*.**
-5. **Dropping *conditions* from the *multiplication rule*.**
+1. **Equating P(A|B) with *P(B|A)***.
+2. **Ignoring the base rate (base-rate fallacy).**
+3. **Confusing independence with mutual exclusivity.**
+4. **Failing to state the condition.**
+5. **Dropping conditions from the multiplication rule.**
 
 ## How This Shows Up in Production
 
-Spam filters, medical screening, fraud detection, autocomplete — *conditional probability* drives *what model output really means*.
+Spam filters, medical screening, fraud detection, autocomplete — conditional probability drives what model output really means.
 
 ## How a Senior Engineer Thinks
 
-- Always asks *what the denominator is*.
-- States the *direction of the condition*.
-- Reads numbers alongside the *base rate*.
-- *Verifies* independence assumptions.
-- Decomposes via *total probability*.
+- Always asks what the denominator is.
+- States the direction of the condition.
+- Reads numbers alongside the base rate.
+- Verifies independence assumptions.
+- Decomposes via total probability.
 
 ## Checklist
 
-- [ ] I can define *P(A|B)*.
-- [ ] I can apply the *multiplication rule*.
-- [ ] I can verify *independence*.
-- [ ] I recognize the *base-rate fallacy*.
+- [ ] I can define P(A|B).
+- [ ] I can apply the multiplication rule.
+- [ ] I can verify independence.
+- [ ] I recognize the base-rate fallacy.
 
 ## Practice Problems
 
-1. If *P(umbrella | rain)* is near 1, is *P(rain | umbrella)* also near 1? Explain.
-2. Decide whether a test with PPV 50% is *useful* in practice.
-3. Give one *independent* and one *dependent* pair of events.
+1. If P(umbrella | rain) is near 1, is P(rain | umbrella) also near 1? Explain.
+2. Decide whether a test with PPV 50% is useful in practice.
+3. Give one independent and one dependent pair of events.
 
 ## Wrap-up and Next Steps
 
-Conditional probability is the tool for *handling context*. The next episode reaches its peak: *Bayes' Theorem*.
+Conditional probability is the tool for handling context. The next episode reaches its peak: Bayes' Theorem.
 
 <!-- toc:begin -->
 - [What Is Probability?](./01-what-is-probability.md)

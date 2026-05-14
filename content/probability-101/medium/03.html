@@ -54,37 +54,26 @@
 </head>
 <body>
 <h1>Conditional Probability</h1>
-<p>This is post 3 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does probability <em>change</em> when we <em>learn new information</em>? The single line <em>P(A | B)</em> explains <em>half the world</em>.</p>
-<blockquote>
-<p><em>Conditional probability is the </em>probability of context<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Real probability questions almost always come with conditions. Traffic given rain, disease given a positive test, spam given a suspicious phrase in the subject line — most useful probabilities are probabilities inside a context, not in the abstract.</p>
+<p>That is why conditional probability sits near the center of probability theory rather than at the edge. Once new information arrives, the denominator changes. If you do not feel that denominator shift clearly, model scores, diagnostic tests, and inference results all become easy to misread.</p>
+<p>This is post 3 in the Probability 101 series. Here we define conditional probability, connect it to the multiplication rule, separate independence from dependence, and show why base rates can completely change the meaning of the same test result.</p>
+<h2>What you will learn</h2>
 <ul>
-<li>The definition of <em>P(A | B)</em></li>
-<li>The <em>multiplication rule</em> and <em>law of total probability</em></li>
-<li><em>Independence</em> vs <em>dependence</em></li>
-<li>A 5-step conditional exercise</li>
-<li>Five common mistakes</li>
+<li>Why conditional probability is fundamentally about changing the denominator</li>
+<li>Why P(A|B) and P(B|A) can be completely different</li>
+<li>How the multiplication rule follows from the definition</li>
+<li>How to tell independence from dependence</li>
+<li>Why base-rate neglect breaks real-world interpretation</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>The real world is <em>conditional</em>. <em>P(traffic | rain)</em>, <em>P(disease | symptom)</em> — <em>every act of inference</em> starts here.</p>
+<p>One of the most common mistakes in applied probability is reversing the direction of the condition. P(disease | positive test) and P(positive test | disease) look similar, but they answer different questions. Lose that directional sense, and you misread diagnostics, alerts, and model outputs.</p>
+<p>The risk gets worse when the base rate is small. A rare disease with a sensitive test can still produce a positive result that does not mean what people assume it means. Conditional probability is the tool that forces context back into the interpretation.</p>
 <blockquote>
-<p><em>Conditioning is the heart of probability.</em></p>
+<p>Conditional probability is not the probability of an event in the original world. It is the probability of that event after the world has been narrowed by new information.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Joint[&quot;P(A and B)&quot;] --&gt; CondAB[&quot;P(A|B) = P(A and B) / P(B)&quot;]
-    CondAB --&gt; Mult[&quot;P(A and B) = P(A|B) * P(B)&quot;]
-    Mult --&gt; Total[&quot;Total probability rule&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>P(A | B)</strong>: probability of A given B = P(A∩B) / P(B).</li>
@@ -94,8 +83,8 @@
 <li><strong>Dependent</strong>: P(A | B) ≠ P(A).</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“If the test is positive, the chance of disease equals the positive rate.”</em> — <em>Wrong</em>.</p>
-<p><strong>After</strong>: <em>P(disease | positive) = P(positive | disease)·P(disease) / P(positive)</em> — the <em>direction of the condition</em> matters.</p>
+<p><strong>Before</strong>: “If the test is positive, the chance of disease must be high.” That conclusion skips the setup.</p>
+<p><strong>After</strong>: P(disease | positive) depends on P(positive | disease), the base rate of disease, and the overall positive rate. The direction of the condition is the whole story.</p>
 <h2>Hands-on: 5-step Conditional Probability</h2>
 <p><strong>Step 1 — Build the data</strong></p>
 <pre><code class="language-python"># 100 people; 5 sick. Sensitivity 0.9, specificity 0.95
@@ -124,43 +113,43 @@ print(&quot;indep?&quot;, round(TP/N - P_sick * P_pos, 6))  # nonzero implies de
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>Conditioning is essentially <em>changing the denominator</em>.</li>
-<li><em>Sensitivity P(+|disease)</em> ≠ <em>positive predictive value P(disease|+)</em> — a <em>classic confusion</em>.</li>
-<li>A <em>low base rate</em> yields a <em>low PPV</em> even with a sensitive test.</li>
+<li>Conditioning is essentially changing the denominator.</li>
+<li>Sensitivity P(+|disease) ≠ positive predictive value P(disease|+) — a classic confusion.</li>
+<li>A low base rate yields a low PPV even with a sensitive test.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Equating <em>P(A|B)<em> with </em>P(B|A)</em></strong>.</li>
-<li><strong>Ignoring the <em>base rate</em> (base-rate fallacy).</strong></li>
-<li><strong>Confusing <em>independence</em> with <em>mutual exclusivity</em>.</strong></li>
-<li><strong>Failing to <em>state the condition</em>.</strong></li>
-<li><strong>Dropping <em>conditions</em> from the <em>multiplication rule</em>.</strong></li>
+<li><strong>Equating P(A|B) with <em>P(B|A)</em></strong>.</li>
+<li><strong>Ignoring the base rate (base-rate fallacy).</strong></li>
+<li><strong>Confusing independence with mutual exclusivity.</strong></li>
+<li><strong>Failing to state the condition.</strong></li>
+<li><strong>Dropping conditions from the multiplication rule.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Spam filters, medical screening, fraud detection, autocomplete — <em>conditional probability</em> drives <em>what model output really means</em>.</p>
+<p>Spam filters, medical screening, fraud detection, autocomplete — conditional probability drives what model output really means.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Always asks <em>what the denominator is</em>.</li>
-<li>States the <em>direction of the condition</em>.</li>
-<li>Reads numbers alongside the <em>base rate</em>.</li>
-<li><em>Verifies</em> independence assumptions.</li>
-<li>Decomposes via <em>total probability</em>.</li>
+<li>Always asks what the denominator is.</li>
+<li>States the direction of the condition.</li>
+<li>Reads numbers alongside the base rate.</li>
+<li>Verifies independence assumptions.</li>
+<li>Decomposes via total probability.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I can define <em>P(A|B)</em>.</li>
-<li>[ ] I can apply the <em>multiplication rule</em>.</li>
-<li>[ ] I can verify <em>independence</em>.</li>
-<li>[ ] I recognize the <em>base-rate fallacy</em>.</li>
+<li>[ ] I can define P(A|B).</li>
+<li>[ ] I can apply the multiplication rule.</li>
+<li>[ ] I can verify independence.</li>
+<li>[ ] I recognize the base-rate fallacy.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>If <em>P(umbrella | rain)</em> is near 1, is <em>P(rain | umbrella)</em> also near 1? Explain.</li>
-<li>Decide whether a test with PPV 50% is <em>useful</em> in practice.</li>
-<li>Give one <em>independent</em> and one <em>dependent</em> pair of events.</li>
+<li>If P(umbrella | rain) is near 1, is P(rain | umbrella) also near 1? Explain.</li>
+<li>Decide whether a test with PPV 50% is useful in practice.</li>
+<li>Give one independent and one dependent pair of events.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Conditional probability is the tool for <em>handling context</em>. The next episode reaches its peak: <em>Bayes' Theorem</em>.</p>
+<p>Conditional probability is the tool for handling context. The next episode reaches its peak: Bayes' Theorem.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
