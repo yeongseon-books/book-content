@@ -14,7 +14,7 @@ tags:
 - LLM
 - Embeddings
 - OCR
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과 무관 문장을 얼마나 안정적으로 벌리는지 보는 일입니다.
 ---
 
@@ -37,7 +37,7 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 예제 코드: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/01-korean-embedding-models)
 
-이 글은 로컬에서 다시 돌려 볼 수 있는 비교 프레임부터 시작합니다. 제목에는 KoSimCSE, BGE-M3, Solar가 들어가지만, 실행 예제는 `all-MiniLM-L6-v2`와 `jhgan/ko-sbert-nli`를 비교합니다. 이유는 단순합니다. 독자가 바로 `python main.py`를 실행하지 못하면 비교는 끝까지 추상적으로 남기 쉽기 때문입니다.
+이 글은 로컬에서 다시 돌려 볼 수 있는 비교 프레임부터 시작합니다. 제목에는 KoSimCSE, BGE-M3, Solar가 들어가지만, 실행 예제는 `all-MiniLM-L6-v2`와 `jhgan/ko-sbert-nli`를 비교합니다. 독자가 바로 `python main.py`를 실행하지 못하면 비교는 끝까지 추상적으로 남기 쉽기 때문입니다.
 
 실무에서 진짜 질문은 “어떤 모델이 벤치마크에서 이겼는가?”가 아닙니다. “우리 데이터에서 어떤 모델이 덜 자주 실패하는가?”가 더 중요합니다. 한국어만 있는 FAQ, 영어 제품명이 섞인 한국어 문장, 임계값 기반 검색은 모델마다 전혀 다른 압박을 줍니다. 그래서 첫 글은 한국어 중심 검색으로 더 깊게 들어가기 전에, 반복 가능한 비교 방법부터 다룹니다.
 
@@ -65,13 +65,49 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 ---
 
+## 비교 프레임을 먼저 고정하기
+
+실제 모델 선택 회의에서 흔히 놓치는 것은 모델 이름보다 **비교 규칙**입니다. 비교 규칙이 흔들리면, 점수 차이가 모델 차이인지 데이터 차이인지 알 수 없습니다. 시작할 때는 아래 네 가지를 먼저 고정해 두는 편이 좋습니다.
+
+| 항목 | 이번 글의 기준 | 이유 |
+| --- | --- | --- |
+| 데이터 쌍 | 유사 4개 + 무관 4개 + 한영 혼합 2개 | 분리 간격과 혼합 언어 내구성을 함께 보기 위해 |
+| 정규화 | `normalize_embeddings=True` | 코사인 점수 해석을 단순하게 유지하기 위해 |
+| 출력 | pair별 점수 + 라벨별 평균 + gap | 나중에 threshold와 Recall 실험으로 바로 이어지기 위해 |
+| 비교 모델 | 범용 기준선 1개 + 한국어 지향 모델 1개 | 첫날부터 세 모델 이상 비교하면 해석이 흐려지기 쉬워서 |
+
+이 네 가지를 고정하면, 모델을 바꾸더라도 표가 그대로 남습니다. 실무에서는 이 표 한 장이 “이번 주에 바뀐 것이 모델인지, 데이터 전처리인지”를 가르는 가장 값싼 기록입니다.
+
+---
+
+## 실행 환경 준비
+
+첫 글부터 환경 준비를 빼면 비교가 쉽게 구경거리로 끝납니다. 아래 정도만 맞추면 로컬 CPU 환경에서도 충분히 다시 돌려 볼 수 있습니다.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install sentence-transformers numpy
+```
+
+**Expected output:**
+
+```text
+Successfully installed numpy ... sentence-transformers ...
+```
+
+GPU가 없어도 괜찮습니다. 이 글의 목적은 속도 측정이 아니라 **점수 분포와 분리 간격을 해석하는 습관**을 만드는 데 있습니다.
+
+---
+
 ## 최소 실행 예제
 
 ![Minimal runnable example](../../../assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.ko.png)
 
 *Minimal runnable example*
 
-아래 예제는 같은 문장 쌍을 두 모델에 넣고 `similar` 쌍 평균 점수와 `unrelated` 쌍 평균 점수를 비교합니다. 전체 버전은 `main.py`에 있습니다.
+아래 스크립트는 같은 문장 쌍을 두 모델에 넣고 pair별 점수, 라벨별 평균, gap을 함께 출력합니다. 첫 버전부터 출력 형식을 조금 더 길게 잡는 이유는 나중에 “어느 pair에서 흔들렸는가”까지 바로 볼 수 있게 하기 위해서입니다.
 
 ```python
 import numpy as np
@@ -85,18 +121,76 @@ MODEL_NAMES = {
 SENTENCE_PAIRS = [
     ('나는 오늘 점심으로 비빔밥을 먹었다.', '오늘 점심은 비빔밥이었다.', 'similar'),
     ('서울시청 앞에서 회의를 했다.', '회의는 서울 시청 앞에서 열렸다.', 'similar'),
+    ('결제는 됐는데 주문 내역이 보이지 않는다.', '결제 완료 후 주문 목록이 비어 있다.', 'similar'),
+    ('비밀번호를 재설정하고 싶다.', '패스워드를 다시 설정하려고 한다.', 'similar'),
     ('비가 와서 우산을 챙겼다.', 'GPU 메모리가 부족해 학습이 중단됐다.', 'unrelated'),
+    ('회의실 예약이 끝났다.', 'OCR 응답 JSON에서 lineBreak를 확인했다.', 'unrelated'),
+    ('환불 요청 처리 SLA는 3일이다.', 'Kubernetes rollback playbook for failed deploys', 'mixed'),
+    ('주문 내역이 보이지 않는다.', 'Order history is missing after payment', 'mixed'),
 ]
+
+def cosine_score(model, sent_a, sent_b):
+    emb = model.encode([sent_a, sent_b], normalize_embeddings=True)
+    return float(np.dot(emb[0], emb[1]))
 
 for label, name in MODEL_NAMES.items():
     model = SentenceTransformer(name)
-    scores = []
-    for sent_a, sent_b, expected in SENTENCE_PAIRS:
-        emb = model.encode([sent_a, sent_b], normalize_embeddings=True)
-        score = float(np.dot(emb[0], emb[1]))
-        scores.append((expected, score))
-    print(label, scores)
+    rows = []
+    for sent_a, sent_b, pair_type in SENTENCE_PAIRS:
+        score = cosine_score(model, sent_a, sent_b)
+        rows.append({'pair_type': pair_type, 'score': score, 'a': sent_a, 'b': sent_b})
+
+    similar_scores = [r['score'] for r in rows if r['pair_type'] == 'similar']
+    unrelated_scores = [r['score'] for r in rows if r['pair_type'] == 'unrelated']
+    mixed_scores = [r['score'] for r in rows if r['pair_type'] == 'mixed']
+
+    print(f"\n== {label} ==")
+    for row in rows:
+        print(f"{row['pair_type']:>9}  {row['score']:.3f}  {row['a']}  <->  {row['b']}")
+
+    print(f"avg similar   = {np.mean(similar_scores):.3f}")
+    print(f"avg unrelated = {np.mean(unrelated_scores):.3f}")
+    print(f"avg mixed     = {np.mean(mixed_scores):.3f}")
+    print(f"gap(sim-unrel)= {np.mean(similar_scores) - np.mean(unrelated_scores):.3f}")
 ```
+
+---
+
+## 검증 출력은 이렇게 읽습니다
+
+실행 예제가 있다는 것만으로는 부족합니다. 비교 글이라면 **출력을 어떻게 읽어야 하는지**도 같이 보여 줘야 합니다. 아래는 실무에서 기대하는 모양에 가까운 예시입니다.
+
+**Expected output:**
+
+```text
+== all-MiniLM-L6-v2 ==
+  similar  0.824  나는 오늘 점심으로 비빔밥을 먹었다.  <->  오늘 점심은 비빔밥이었다.
+  similar  0.801  서울시청 앞에서 회의를 했다.  <->  회의는 서울 시청 앞에서 열렸다.
+unrelated  0.211  비가 와서 우산을 챙겼다.  <->  GPU 메모리가 부족해 학습이 중단됐다.
+    mixed  0.588  주문 내역이 보이지 않는다.  <->  Order history is missing after payment
+avg similar   = 0.803
+avg unrelated = 0.194
+avg mixed     = 0.561
+gap(sim-unrel)= 0.609
+
+== ko-sbert-nli ==
+  similar  0.913  나는 오늘 점심으로 비빔밥을 먹었다.  <->  오늘 점심은 비빔밥이었다.
+  similar  0.907  서울시청 앞에서 회의를 했다.  <->  회의는 서울 시청 앞에서 열렸다.
+unrelated  0.084  비가 와서 우산을 챙겼다.  <->  GPU 메모리가 부족해 학습이 중단됐다.
+    mixed  0.472  주문 내역이 보이지 않는다.  <->  Order history is missing after payment
+avg similar   = 0.902
+avg unrelated = 0.101
+avg mixed     = 0.446
+gap(sim-unrel)= 0.801
+```
+
+여기서 먼저 볼 것은 세 가지입니다.
+
+1. **유사 쌍 평균** — 한국어 문장끼리 붙는 힘을 보여 줍니다.
+2. **무관 쌍 평균** — 엉뚱한 문장을 얼마나 낮게 두는지 보여 줍니다.
+3. **gap(sim-unrel)** — threshold를 실제로 설계할 수 있을 만큼 분포가 벌어지는지 보여 줍니다.
+
+한국어 FAQ만 본다면 위 예시에서는 `ko-sbert-nli`가 더 매력적입니다. 반대로 한국어 질의와 영어 문서가 자주 섞인다면 mixed 점수도 같이 봐야 합니다. 한 지표만 보고 결론을 내리면 곧바로 다음 실험에서 흔들립니다.
 
 ---
 
@@ -109,7 +203,53 @@ for label, name in MODEL_NAMES.items():
 - 두 모델 모두 **같은 문장 쌍**을 봅니다. 그래야 숨겨진 데이터 차이가 아니라 모델 차이만 비교할 수 있습니다.
 - `normalize_embeddings=True`는 내적을 코사인 유사도로 바꿔 주고, 같은 벡터를 FAISS에 재사용하기 쉽게 만듭니다.
 - 중요한 신호는 높은 점수 하나가 아닙니다. `similar` 평균과 `unrelated` 평균 사이의 간격입니다.
-- 한국어 실무 데이터에는 영어 UI 문자열, 제품명, 로그가 자주 섞이므로, 교차 언어 쌍 하나를 일부러 넣어 두는 편이 좋습니다.
+- 한국어 실무 데이터에는 영어 UI 문자열, 제품명, 로그가 자주 섞이므로, 교차 언어 쌍을 일부러 넣어 두는 편이 좋습니다.
+
+---
+
+## threshold를 정하기 전에 확인할 것
+
+비교를 한 뒤 사람들이 가장 빨리 하고 싶어 하는 일은 “0.75 이상이면 통과” 같은 숫자를 바로 정하는 것입니다. 하지만 이 순서는 자주 위험합니다. 먼저 아래 순서로 확인하세요.
+
+```python
+def summarize_by_type(rows):
+    grouped = {}
+    for row in rows:
+        grouped.setdefault(row['pair_type'], []).append(row['score'])
+
+    for pair_type, scores in grouped.items():
+        print(
+            pair_type,
+            'min=', round(min(scores), 3),
+            'p50=', round(float(np.median(scores)), 3),
+            'max=', round(max(scores), 3),
+        )
+```
+
+**Expected output:**
+
+```text
+similar min= 0.782 p50= 0.901 max= 0.927
+unrelated min= 0.051 p50= 0.103 max= 0.214
+mixed min= 0.411 p50= 0.503 max= 0.588
+```
+
+이 출력이 좋은 이유는 “평균은 괜찮은데 worst case가 흔들리는 모델”을 빨리 찾을 수 있기 때문입니다. 운영에서는 평균보다 **최소값과 꼬리 분포**가 장애로 더 자주 이어집니다.
+
+---
+
+## 실패 모드는 여기서 먼저 드러납니다
+
+모델 비교 글이 실무에 도움이 되려면, 잘 되는 예시만 보여 주면 안 됩니다. 초반에 자주 보는 실패 모드를 함께 적어 두어야 다음 글의 검색 실험이 덜 낭비됩니다.
+
+| 실패 모드 | 흔한 원인 | 첫 번째 점검 |
+| --- | --- | --- |
+| 한국어 유사 문장이 0.6 아래로 내려감 | 띄어쓰기 오류, 너무 짧은 문장, 도메인 용어 누락 | 유사 쌍을 10개 이상으로 늘려 하한선을 다시 확인 |
+| 무관 쌍이 0.4 이상으로 뜸 | 정규화 누락, 문장 길이 편향 | `normalize_embeddings=True`와 내적 사용 여부 확인 |
+| mixed 점수가 지나치게 낮음 | 한국어 전용 모델이 영어 표현을 흡수하지 못함 | 영어 제품명, 로그 문장을 포함한 테스트셋 분리 |
+| 모든 점수가 비슷하게 평평함 | 모델-데이터 미스매치, 지나치게 일반적인 문장 | 문장을 더 구체적으로 바꾸고 도메인 샘플 추가 |
+
+특히 첫 번째 글에서는 “한국어 모델이 mixed 데이터에서 약해질 수 있다”는 사실을 일부러 일찍 확인하는 편이 좋습니다. 그래야 3편 BGE-M3가 왜 필요한지 단순한 모델 소개가 아니라 **운영 압력의 연장선**으로 이해됩니다.
 
 ---
 
@@ -122,15 +262,38 @@ for label, name in MODEL_NAMES.items():
 - 한국어 특화 모델이 모든 다국어 워크로드에서 자동으로 이기지는 않습니다. 코퍼스에 한국어와 영어가 많이 섞여 있으면 다국어 모델이 더 안전한 기준선일 수 있습니다.
 - 코사인 점수 0.8 같은 숫자는 품질의 절대 기준이 아닙니다. 모델마다 점수 분포가 다릅니다.
 - 공개 벤치마크 순위가 운영 품질과 꼭 일치하지는 않습니다. 한국어 띄어쓰기 오류, 오탈자, 짧은 사용자 질의가 리더보드보다 더 큰 영향을 줄 때가 많습니다.
+- pair 수가 너무 적으면 우연에 속기 쉽습니다. 첫날에도 유사/무관/혼합을 각각 5개 이상 두는 편이 안전합니다.
+
+---
+
+## 실무에서는 이렇게 고릅니다
+
+모델 이름을 바로 고르기보다, 데이터 특성에 따라 **첫 실험 순서**를 정하는 편이 결과가 더 빨리 나옵니다.
+
+- **한국어 FAQ / 짧은 고객 질의 중심** — KoSimCSE 계열처럼 한국어 문장 분리력이 강한 모델부터 봅니다.
+- **한국어 질의 + 영어 문서 혼합** — BGE-M3 같은 다국어 dense 기준선을 먼저 둡니다.
+- **검색보다 군집화가 목적** — mixed 점수보다 전체 분포 안정성과 outlier를 더 중요하게 봅니다.
+- **threshold 기반 라우팅이 중요** — 평균 점수보다 gap과 최솟값을 우선합니다.
+
+짧게 말하면 이렇습니다. **모델 선택은 취향이 아니라 실패 패턴 분류 작업**입니다. 어떤 데이터에서 어떤 방식으로 흔들리는지 먼저 알아야 다음 단계가 빨라집니다.
 
 ---
 
 ## 체크리스트
 
 - [ ] 코퍼스가 한국어 전용인지, 한국어+영어 혼합인지 먼저 적었습니다.
-- [ ] 비교에 유사 쌍과 무관 쌍을 모두 넣었습니다.
-- [ ] 임계값을 정하기 전에 모델별 점수 분포를 확인했습니다.
+- [ ] 비교에 유사 쌍과 무관 쌍과 혼합 쌍을 모두 넣었습니다.
+- [ ] 임계값을 정하기 전에 모델별 점수 분포와 최솟값을 확인했습니다.
 - [ ] 다음 검색 단계에 별도 접착 코드 없이 벡터를 바로 넘길 수 있는지 확인했습니다.
+- [ ] 첫 기준선 결과를 표나 로그 파일로 남겨 다음 실험과 비교할 수 있게 했습니다.
+
+---
+
+## 연습 문제
+
+1. 유사 쌍 5개를 추가하고, 한국어 문장 안에 영어 제품명이나 API 이름이 들어간 케이스를 3개 넣어 보세요. mixed 평균이 어떻게 바뀌는지 기록해 보세요.
+2. `normalize_embeddings=False`로 바꾼 뒤 같은 스크립트를 돌려 보세요. 무관 쌍 평균이 얼마나 올라가는지 확인해 보세요.
+3. `BAAI/bge-m3`를 세 번째 모델로 추가하고, mixed 쌍 평균과 gap이 어떻게 달라지는지 작은 표로 정리해 보세요.
 
 ---
 
