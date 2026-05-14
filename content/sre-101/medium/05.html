@@ -54,35 +54,26 @@
 </head>
 <body>
 <h1>Monitoring</h1>
-<p>This is post 5 in the SRE 101 series.</p>
-<blockquote>
-<p>SRE 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>What</em> do you need to know, and <em>when</em>, to take <em>action</em>?</p>
-<blockquote>
-<p><em>Monitoring</em> is <em>measurement</em> that leads to <em>action</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Early in an operations journey, teams often feel safer when they collect everything. CPU, memory, queue depth, request counts, logs, traces, and every possible warning all look useful because maybe one of them will matter later.</p>
+<p>But monitoring gets better when it becomes more selective, not more crowded. A metric is valuable when it helps someone decide what to do next, and an alert is valuable when it changes behavior quickly enough to reduce user impact.</p>
+<p>This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>four golden signals</em></li>
-<li><em>Metrics</em> and <em>logs</em></li>
-<li><em>Alert</em> design</li>
-<li><em>Dashboard</em> principles</li>
-<li>Managing <em>alert fatigue</em></li>
+<li>How is monitoring different from simply collecting a large amount of telemetry?</li>
+<li>Why do latency, traffic, errors, and saturation have to be read together?</li>
+<li>What questions do metrics answer better than logs, and where does that boundary flip?</li>
+<li>What makes an alert useful enough to wake a human up?</li>
+<li>Why do many dashboards become harder to use as more graphs get added?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>A flood of <em>alerts</em> drowns the <em>real</em> problem.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Metrics[&quot;metrics&quot;] --&gt; Alert[&quot;alert&quot;]
-    Logs[&quot;logs&quot;] --&gt; Alert
-    Alert --&gt; Action[&quot;action&quot;]
-    Metrics --&gt; Dash[&quot;dashboard&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>A flood of alerts drowns the real problem. When every threshold pages someone, the urgent signal and the background noise start to sound the same.</p>
+<p>Good monitoring reduces decision time. It tells the team whether there is user impact, whether the system is recovering, and what to check first before a broad incident turns into a longer one.</p>
+<blockquote>
+<p>Monitoring is measurement that leads to action.</p>
+</blockquote>
+<h2>Concept at a glance</h2>
+<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Monitoring is useful when telemetry flows into alerts, dashboards, and concrete operator action.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>golden signals</strong>: <em>latency, traffic, errors, saturation</em>.</li>
@@ -116,6 +107,27 @@
 <pre><code class="language-python">def should_page(err_ratio, p95_ms, sat):
     return err_ratio &gt; 0.01 or p95_ms &gt; 500 or sat &gt; 0.9
 </code></pre>
+<p><strong>Step 6 — Decide what to check first during a latency spike</strong></p>
+<p>Golden signals are most useful when they shorten triage. A latency alert should not force the responder to guess where to begin; it should narrow the first few questions.</p>
+<p><strong>p95 latency climbs, traffic stays flat</strong><br>
+- First check: Saturation and dependency latency<br>
+- Why this is first: Slowdowns with steady demand often point to resource pressure or a downstream dependency.</p>
+<p><strong>Traffic drops suddenly</strong><br>
+- First check: Ingress, CDN, or upstream routing health<br>
+- Why this is first: Missing traffic can mean the app is healthy but requests never arrive.</p>
+<p><strong>Errors rise with saturation</strong><br>
+- First check: Queue depth and timeouts<br>
+- Why this is first: A service often fails at the edge of capacity before it fully falls over.</p>
+<p><strong>Errors rise without latency movement</strong><br>
+- First check: Deployment diff or bad response path<br>
+- Why this is first: Fast failures often mean logic, config, or auth problems rather than capacity exhaustion.</p>
+<p><strong>Step 7 — Tie structured events to alert decisions</strong></p>
+<pre><code class="language-python">def classify_event(status_code, latency_ms, cache_hit):
+    page = status_code &gt;= 500 or latency_ms &gt; 800
+    investigate = latency_ms &gt; 300 and not cache_hit
+    return {&quot;page&quot;: page, &quot;investigate&quot;: investigate}
+</code></pre>
+<p>This is a small example, but it shows an important monitoring habit: alerts become stronger when they are linked to operational context. A spike in latency means more when the cache is missing or a dependency is timing out than when the workload is simply busier than normal.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>four signals</em> are a <em>shared language</em>.</li>
