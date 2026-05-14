@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Authorization and Permissions</h1>
+<p>Logging in does not answer the question that matters most to a secure application: may this user touch this resource right now? Reading another person's order, editing a document, or downloading an internal report all need a separate decision. Broken access control keeps ranking near the top of real-world incident lists because teams often stop at authentication and never finish the authorization model behind it.</p>
 <p>This is post 4 in the Secure Coding 101 series.</p>
+<p>In this chapter, we will treat authorization as a server-side decision over actor, action, and resource, not as a UI rule or a handful of role names. That framing makes RBAC, ABAC, IDOR defense, list filtering, and default-deny behavior fit together cleanly.</p>
 <blockquote>
-<p>Secure Coding 101 series (4/10)</p>
+<p>Authorization is not a visibility rule. It is a repeated server-side decision over who wants to do what to which resource.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: The user is logged in. But <em>who decides whether they may touch this resource</em>?</p>
-<blockquote>
-<p><em>Authorization is decided per </em>action and resource<em>, not just per </em>role<em>. The server decides — every time.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The difference between <em>RBAC</em> and <em>ABAC</em></li>
 <li>What <em>IDOR</em> is and how to defend</li>
@@ -80,12 +74,8 @@
 <p><em>Authorize at the </em>resource<em> level, not just the </em>route<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Request[&quot;Request&quot;] --&gt; AuthN[&quot;AuthN (who)&quot;]
-    AuthN --&gt; Resource[&quot;Load resource&quot;]
-    Resource --&gt; AuthZ[&quot;AuthZ check&quot;]
-    AuthZ --&gt; Action[&quot;Perform action&quot;]
-</code></pre>
+<p><img alt="The flow from authentication to resource loading, authorization, and action execution" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>The flow from authentication to resource loading, authorization, and action execution</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>RBAC</strong>: <em>role-based</em> (admin, editor, viewer).</li>
@@ -183,6 +173,7 @@
 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html">OWASP Authorization Cheat Sheet</a></li>
 <li><a href="https://csrc.nist.gov/projects/role-based-access-control">NIST RBAC</a></li>
 <li><a href="https://www.openpolicyagent.org/">Open Policy Agent</a></li>
+<li><a href="https://csrc.nist.gov/pubs/sp/800/162/upd2/final">NIST SP 800-162 — Guide to Attribute Based Access Control</a></li>
 </ul>
 <p class="tags-line">Tags: Authorization, RBAC, ABAC, LeastPrivilege, SecureCoding</p>
 </body>
