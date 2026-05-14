@@ -17,7 +17,7 @@ tags:
   - Testing
   - CICD
 seo_description: pytest, coverage, matrix 기반의 Python 테스트 자동화를 실무 흐름으로 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Python 테스트 자동화
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 테스트 흐름
 
-```mermaid
-flowchart LR
-    PR["PR open"] --> Setup["setup python"]
-    Setup --> Install["pip install"]
-    Install --> Test["pytest"]
-    Test --> Cov["coverage"]
-```
+![PR이 열리면 Python 환경 준비, 의존성 설치, pytest, coverage 순서로 이어지는 테스트 흐름](../../../assets/github-actions-101/04/04-01-diagram.ko.png)
+
+*PR이 열리면 Python 환경 준비, 의존성 설치, pytest, coverage 순서로 이어지는 테스트 흐름*
 
 이 흐름은 단순하지만 운영 감각을 잘 보여 줍니다. 실행 환경을 맞추고, 의존성을 설치하고, 테스트를 돌리고, 결과를 남깁니다. 어느 단계에서 시간이 오래 걸리는지 보는 것만으로도 개선 포인트가 드러납니다.
 

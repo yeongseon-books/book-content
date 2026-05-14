@@ -17,7 +17,7 @@ tags:
   - Matrix
   - CICD
 seo_description: Workflow, Job, Step의 관계와 의존성 설계를 실무 흐름으로 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Workflow와 Job
@@ -44,12 +44,9 @@ GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “
 
 ## 한눈에 보는 잡 그래프
 
-```mermaid
-flowchart LR
-    Lint["lint"] --> Build["build"]
-    Test["test"] --> Build
-    Build --> Deploy["deploy"]
-```
+![lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프](../../../assets/github-actions-101/02/02-01-diagram.ko.png)
+
+*lint와 test가 병렬로 실행되고 build와 deploy로 이어지는 잡 그래프*
 
 이 그림은 단순하지만 핵심을 잘 보여 줍니다. lint와 test는 서로 독립이므로 병렬로 돌릴 수 있고, build는 그 둘이 성공한 뒤에만 시작하면 됩니다. deploy는 build가 끝난 뒤에만 허용해야 하므로 마지막에 놓입니다.
 
