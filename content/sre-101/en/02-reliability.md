@@ -17,45 +17,38 @@ tags:
   - Latency
   - Quality
 seo_description: A beginner-friendly guide to reliability covering availability, latency, correctness, durability, and the design principles behind each
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Reliability
 
-This is post 2 in the SRE 101 series.
+Many teams say a service feels stable until an outage or a slow release proves otherwise. That kind of language works in hallway conversation, but it does not help product, platform, and support teams make the same decision from the same evidence.
 
-> SRE 101 series (2/10)
+Reliability gets clearer when you stop treating it like mood and start treating it like a bundle of measurable promises. A service can be up and still feel broken if it is too slow, returns wrong results, or loses data.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the SRE 101 series. Here we break reliability into measurable dimensions so later topics like SLOs, error budgets, and monitoring rest on something more concrete than “it seems okay.”
 
-**Core question**: Is *reliability* a *feeling* or a *measurable* number?
+## Questions this chapter answers
 
-> *Reliability* is the discipline of *proving* a *customer promise* with *numbers*.
+- What does it mean to describe reliability as a measurable property instead of a general sense of stability?
+- Why are availability and latency related but not interchangeable?
+- When do correctness and durability matter more than raw uptime?
+- Why do teams rely on p95 and p99 more than on average latency?
+- How should different systems choose different reliability dimensions?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+Without numbers, every conversation and decision becomes subjective. One team thinks the service is fine, another thinks it is risky, and neither side can show where the disagreement comes from.
 
-- The *definition* of *reliability*
-- The *four measurable dimensions*
-- The difference between *availability* and *latency*
-- *Durability* and *correctness*
-- The core *design principles*
+Once the dimensions are explicit, reliability becomes easier to discuss as product quality. A payment flow, search API, and analytics pipeline can all be reliable, but they rarely need the same emphasis.
 
-## Why It Matters
+> Reliability is the work of proving a customer promise with numbers.
 
-Without numbers, every *conversation* and *decision* becomes *subjective*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/02/02-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Avail["availability"] --> R["reliability"]
-    Lat["latency"] --> R
-    Corr["correctness"] --> R
-    Dur["durability"] --> R
-```
-
+*Reliability only becomes visible when availability, latency, correctness, and durability are read together.*
 ## Key Terms
 
 - **availability**: the *fraction of time* the system works.
