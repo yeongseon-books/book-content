@@ -17,7 +17,7 @@ tags:
   - JWT
   - SecureCoding
 seo_description: 비밀번호 해싱, 세션 쿠키, JWT, MFA, 그리고 안전한 인증 흐름의 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 인증과 세션
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Login["Login"] --> Verify["Verify password (hash)"]
-    Verify --> Issue["Issue session"]
-    Issue --> Cookie["Cookie (HttpOnly, Secure)"]
-    Cookie --> Request["Subsequent requests"]
-```
+![비밀번호 검증 뒤 세션을 발급하고 이후 요청에서 다시 확인하는 흐름](../../../assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
 
+*비밀번호 검증 뒤 세션을 발급하고 이후 요청에서 다시 확인하는 흐름*
 로그인 요청은 먼저 비밀번호 검증을 거치고, 검증이 끝나면 서버가 세션을 발급합니다. 이후 요청은 쿠키나 토큰으로 그 세션을 다시 증명합니다. 여기서 한 단계라도 약하면 나머지 단계 품질이 상쇄됩니다. 예를 들어 해시가 안전해도 쿠키가 `HttpOnly` 없이 내려가면 XSS 한 번으로 세션이 탈취될 수 있습니다.
 
 ## 핵심 용어
@@ -122,6 +117,26 @@ def can_attempt(user_id):
     redis.expire(f"login:{user_id}", 60)
     return n <= 5
 ```
+
+## 실패 징후와 먼저 확인할 것
+
+인증 경로는 평소에는 조용해서, 장애가 나면 어디부터 봐야 할지 바로 떠오르지 않는 경우가 많습니다. 그래서 실패 징후별 첫 확인 순서를 미리 정해 두는 편이 좋습니다.
+
+```text
+증상: 사용자가 갑자기 자주 로그아웃됩니다
+먼저 볼 항목:
+1. 쿠키 만료 시간 또는 max_age 변경
+2. Redis 재시작이나 세션 저장소 eviction
+3. 앱 노드 간 시계 차이
+
+증상: 배포 직후 로그인 실패가 급증합니다
+먼저 볼 항목:
+1. 비밀번호 해시 라이브러리 버전 변경
+2. 쿠키 서명 secret 누락
+3. MFA 콜백 또는 메일 전송 경로 장애
+```
+
+이런 점검 순서가 있으면 “로그인이 안 됩니다”라는 추상적인 신고를 더 빠르게 좁힐 수 있습니다. 인증 품질은 알고리즘 선택만이 아니라, 장애가 났을 때 복구 경로가 명확한지에도 달려 있습니다.
 
 강한 해시만으로는 대입 공격을 충분히 늦추지 못할 수 있습니다. 로그인 엔드포인트에 rate limit와 lockout 정책을 두면 계정 추측 비용이 크게 올라갑니다. MFA와 함께 적용하면 효과가 더 큽니다.
 
@@ -192,5 +207,6 @@ def can_attempt(user_id):
 - [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 - [Argon2 — RFC 9106](https://datatracker.ietf.org/doc/rfc9106/)
 - [NIST 800-63B — Digital Identity](https://pages.nist.gov/800-63-3/sp800-63b.html)
+- [MDN — Secure cookie configuration](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies)
 
 Tags: Authentication, Session, Cookie, JWT, SecureCoding

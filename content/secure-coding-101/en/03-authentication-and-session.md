@@ -17,24 +17,20 @@ tags:
   - JWT
   - SecureCoding
 seo_description: Password hashing, session cookies, JWT trade-offs, MFA, and a five-step playbook for a safe authentication flow.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Authentication and Session
 
+When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.
+
 This is post 3 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (3/10)
+Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.
 
-<!-- a-grade-intro:begin -->
+> Authentication proves identity. Session management preserves that proof across requests. Both need explicit failure handling, not just a happy-path login screen.
 
-**Core question**: When a request asks *who are you*, how should the *code answer* without leaking?
-
-> *Authentication confirms identity. The session remembers it. Both leak quietly when you are not looking.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The difference between *authentication* and *authorization*
 - The principles of *password hashing*
@@ -50,14 +46,9 @@ When auth leaks, *every permission leaks*. The most common incidents are *weak h
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Login["Login"] --> Verify["Verify password (hash)"]
-    Verify --> Issue["Issue session"]
-    Issue --> Cookie["Cookie (HttpOnly, Secure)"]
-    Cookie --> Request["Subsequent requests"]
-```
+![The flow from password verification to session issuance and subsequent requests](../../../assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png)
 
+*The flow from password verification to session issuance and subsequent requests*
 ## Key Terms
 
 - **AuthN**: *who are you* (authentication).
@@ -116,6 +107,26 @@ def can_attempt(user_id):
     redis.expire(f"login:{user_id}", 60)
     return n <= 5
 ```
+
+## Failure signals and what to verify first
+
+The auth path usually looks healthy until a real incident starts. That is why it helps to define the first checks ahead of time.
+
+```text
+Symptom: users say they were logged out unexpectedly
+First checks:
+1. cookie max_age / expiry changes
+2. session-store eviction or Redis restart
+3. clock skew across app nodes
+
+Symptom: login errors spike after deployment
+First checks:
+1. password-hash library version change
+2. missing secret used for cookie signing
+3. MFA callback or email provider failure
+```
+
+This kind of runbook turns "auth is broken" into a bounded investigation. In production, that shortens recovery time more than another generic best-practice bullet ever will.
 
 ## What to Notice in This Code
 
@@ -179,5 +190,6 @@ Auth answers *who*. Next we answer *what may they do* — *authorization and per
 - [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 - [Argon2 — RFC 9106](https://datatracker.ietf.org/doc/rfc9106/)
 - [NIST 800-63B — Digital Identity](https://pages.nist.gov/800-63-3/sp800-63b.html)
+- [MDN — Secure cookie configuration](https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies)
 
 Tags: Authentication, Session, Cookie, JWT, SecureCoding
