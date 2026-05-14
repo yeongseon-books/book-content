@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 2
 title: IaaS, PaaS, SaaS
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - SaaS
   - Architecture
 seo_description: Compare IaaS, PaaS, and SaaS by what you operate vs what the provider runs, with five concrete selection criteria and example services.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # IaaS, PaaS, SaaS
 
-> Cloud Computing 101 series (2/10)
+EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when you operate them. One makes you think about instances and patching. One wants your code and a start command. One gives you a finished application and asks almost nothing about infrastructure.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: EC2, Heroku, and Notion are all "cloud" — *why do they feel completely different*?
-
-> *Cloud service models split work between you and the provider — IaaS, PaaS, SaaS — depending on how much of the OS, runtime, and app you manage yourself.*
+The fastest way to sort out that difference is to stop memorizing acronyms and ask a simpler question: who operates what? Once you do that, IaaS, PaaS, and SaaS become responsibility boundaries instead of marketing labels.
 
 This is post 2 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll compare service models through control, speed, lock-in, and operational burden so you can match them to real workloads.
 
-## What You Will Learn
+> Cloud service models are easiest to understand as operating boundaries: the more the provider runs for you, the less control you keep and the faster you usually move.
+
+## Questions This Chapter Answers
 
 - IaaS, PaaS, SaaS definitions
 - The shared-responsibility diagram
@@ -48,13 +46,9 @@ Pick the wrong model and you waste both *cost* and *speed*. Each stage of an org
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    OS["OS"] --> Run["runtime"]
-    Run --> App["app"]
-    App --> Data["data"]
-    Data --> User["user"]
-```
+![As the service model rises, the portion you operate directly gets smaller](../../../assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
+
+*As the service model rises, the portion you operate directly gets smaller*
 
 ## Key Terms
 
@@ -123,6 +117,28 @@ print("PaaS = git push, IaaS = the four steps above by hand")
 - PaaS deployment is one Procfile line.
 - On IaaS, every step is your responsibility.
 - SaaS removes the code itself from your scope.
+
+## How to Verify This Example
+
+This example is really about the deployment contract. Run it locally in the same shape that a PaaS expects, then compare that short contract with the extra moving parts you would have to own on IaaS.
+
+```bash
+pip install -r requirements.txt
+gunicorn app:app --bind 0.0.0.0:8000
+curl http://127.0.0.1:8000/
+```
+
+**Expected output:**
+
+- Gunicorn should start without import or path errors.
+- `curl` should return a JSON payload like `{"hello":"cloud"}`.
+- Once that works, it becomes obvious why PaaS can remove a large amount of platform setup from the critical path.
+
+### Where teams usually get stuck
+
+- A mismatched process command or module path is one of the most common reasons a PaaS deployment fails after a successful local test.
+- Do not reduce the choice to convenience. The real question is where operations responsibility stops.
+- SaaS evaluation should include export, SSO, and audit concerns, not just feature lists.
 
 ## Five Common Mistakes
 
