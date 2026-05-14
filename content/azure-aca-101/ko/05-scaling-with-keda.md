@@ -62,7 +62,7 @@ YAML이나 명령형 스케일링 코드를 쓰는 것이 아니라, "이 신호
 
 > 스케일링은 무엇을 볼지, 어떻게 해석할지, 어디까지 허용할지를 먼저 선언하고, 런타임이 그 범위 안에서 replica 수를 움직이게 하는 모델입니다.
 
-![Scale signals changing replica counts](../../../assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
+![Scale signals changing replica counts](../../../assets/azure-aca-101/05/05-01-the-scaling-path.ko.png)
 
 *Scale signals changing replica counts*
 

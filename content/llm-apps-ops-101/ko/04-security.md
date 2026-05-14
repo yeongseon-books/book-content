@@ -34,13 +34,13 @@ LLM 보안은 응답이 나온 뒤에야 문제를 발견하는 순간부터 갑
 
 ## 큰 그림
 
-![LLM 앱 보안 레이어 구성](../../../assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
+![LLM 앱 보안 레이어 구성](../../../assets/llm-apps-ops-101/04/04-01-big-picture.ko.png)
 
 *LLM 앱 보안 레이어 구성*
 
 ## 왜 이 레이어가 중요한가
 
-![입력 가드와 출력 필터가 양쪽에서 막는 흐름](../../../assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)
+![입력 가드와 출력 필터가 양쪽에서 막는 흐름](../../../assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.ko.png)
 
 *입력 가드와 출력 필터가 양쪽에서 막는 흐름*
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
 ## 이 코드에서 먼저 볼 점
 
-![인젝션 탐지와 PII 마스킹이 분리된 구조](../../../assets/llm-apps-ops-101/04/04-02-what-to-notice-in-this-code.en.png)
+![인젝션 탐지와 PII 마스킹이 분리된 구조](../../../assets/llm-apps-ops-101/04/04-02-what-to-notice-in-this-code.ko.png)
 
 *인젝션 탐지와 PII 마스킹이 분리된 구조*
 
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
 ## 어디서 자주 헷갈릴까요?
 
-![입력 방어와 출력 방어가 서로 다른 역할을 맡는 구조](../../../assets/llm-apps-ops-101/04/04-03-where-engineers-get-confused.en.png)
+![입력 방어와 출력 방어가 서로 다른 역할을 맡는 구조](../../../assets/llm-apps-ops-101/04/04-03-where-engineers-get-confused.ko.png)
 
 *입력 방어와 출력 방어가 서로 다른 역할을 맡는 구조*
 

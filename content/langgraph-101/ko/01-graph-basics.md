@@ -74,7 +74,7 @@ LangGraph를 처음 배울 때 가장 도움이 되는 문장은 이것입니다
 
 현업에서 저는 여기서 두 부류를 자주 봅니다. 한 부류는 마지막 출력 문자열만 비교합니다. 다른 부류는 상태 필드와 전이 순서를 같이 읽습니다. 전자는 증상부터 보고, 후자는 원인까지 따라갑니다. LangGraph가 주는 실전 이점은 바로 두 번째 읽기 방식을 구조적으로 돕는 데 있습니다.
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/langgraph-101/01/01-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -84,7 +84,7 @@ LangGraph를 처음 배울 때 가장 도움이 되는 문장은 이것입니다
 
 가장 작은 예제로 보겠습니다. 사용자의 요청을 받아 주제를 고르고, 그 주제로 개요를 만든 뒤, 마지막에 답변 문자열을 조립하는 그래프입니다. 구조는 단순하지만 LangGraph의 핵심 요소가 모두 들어 있습니다.
 
-![START에서 END로 이어지는 기본 그래프 흐름](../../../assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
+![START에서 END로 이어지는 기본 그래프 흐름](../../../assets/langgraph-101/01/01-01-minimal-runnable-example.ko.png)
 
 *START에서 END로 이어지는 기본 그래프 흐름*
 
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
 코드 전체를 한 번에 읽기보다, 처음에는 아래 세 지점만 잡는 편이 좋습니다.
 
-![요청이 상태 필드로 매핑되는 구조](../../../assets/langgraph-101/01/01-02-what-to-notice-in-this-code.en.png)
+![요청이 상태 필드로 매핑되는 구조](../../../assets/langgraph-101/01/01-02-what-to-notice-in-this-code.ko.png)
 
 *요청이 상태 필드로 매핑되는 구조*
 
@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
 입문 단계에서 가장 많이 생기는 오해는 문법보다 멘탈 모델에서 나옵니다. 아래 세 가지는 특히 자주 나옵니다.
 
-![정의에서 invoke까지 이어지는 실행 흐름](../../../assets/langgraph-101/01/01-03-where-engineers-get-confused.en.png)
+![정의에서 invoke까지 이어지는 실행 흐름](../../../assets/langgraph-101/01/01-03-where-engineers-get-confused.ko.png)
 
 *정의에서 invoke까지 이어지는 실행 흐름*
 

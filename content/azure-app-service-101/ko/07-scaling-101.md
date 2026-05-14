@@ -58,7 +58,7 @@ More instances
 | **Vertical** | Scale Up/Down | Change instance size |
 | **Horizontal** | Scale Out/In | Change instance count |
 
-![Scaling up versus adding instances](../../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.en.png)
+![Scaling up versus adding instances](../../../assets/azure-app-service-101/07/01-scale-up-vs-scale-out.ko.png)
 
 *인스턴스를 키우는 방식과 개수를 늘리는 방식의 차이*
 
@@ -119,7 +119,7 @@ az appservice plan show \
 - **고가용성**을 위해 여러 인스턴스가 필요할 때
 - 앱이 **stateless**하게 설계되어 있을 때
 
-![Scaling choices by bottleneck type](../../../assets/azure-app-service-101/07/04-scaling-decision-tree.en.png)
+![Scaling choices by bottleneck type](../../../assets/azure-app-service-101/07/04-scaling-decision-tree.ko.png)
 
 *병목 유형에 따라 달라지는 scaling 선택*
 
@@ -175,7 +175,7 @@ az appservice plan update \
 
 메트릭을 기준으로 인스턴스를 **자동으로** 늘리거나 줄일 수 있습니다.
 
-![Autoscale loop from metrics to actions](../../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.en.png)
+![Autoscale loop from metrics to actions](../../../assets/azure-app-service-101/07/02-autoscale-feedback-loop.ko.png)
 
 *메트릭에서 액션으로 이어지는 Autoscale 피드백 루프*
 
@@ -292,7 +292,7 @@ az monitor autoscale rule create \
 
 인스턴스 수가 늘어나면 **외부 의존성에 가해지는 부하도 함께 증가**합니다.
 
-![Instance growth cascading into dependency load](../../../assets/azure-app-service-101/07/03-dependency-cascade.en.png)
+![Instance growth cascading into dependency load](../../../assets/azure-app-service-101/07/03-dependency-cascade.ko.png)
 
 *인스턴스 증가가 의존성 부하로 전이되는 구조*
 

@@ -34,7 +34,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
 
-![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
+![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
 
 *키워드 검색과 임베딩 검색의 대비*
 <!-- ebook-only:start -->
@@ -61,7 +61,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ## 키워드 검색의 한계
 
-![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
+![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.ko.png)
 
 *키워드 검색과 임베딩 검색의 대비*
 전통적인 검색은 단어 빈도와 위치를 기준으로 결과를 정렬합니다. TF-IDF와 BM25가 대표적인 예입니다. 이런 방식은 쿼리와 문서가 같은 어휘를 공유할 때 빠르고 해석 가능하며 정확합니다.
@@ -80,7 +80,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ## 벡터 공간 직관
 
-![Text entering vector space flow](../../../assets/vector-search-101/01/01-02-vector-space-intuition.en.png)
+![Text entering vector space flow](../../../assets/vector-search-101/01/01-02-vector-space-intuition.ko.png)
 
 *텍스트가 벡터 공간으로 들어가는 흐름*
 임베딩 모델은 텍스트를 고정 길이의 부동소수점 배열로 바꿉니다. `sentence-transformers/all-MiniLM-L6-v2`를 사용하면 입력 길이와 무관하게 모든 문장이 384차원 벡터가 됩니다. 768차원이나 1536차원 모델도 흔히 사용됩니다.
@@ -105,7 +105,7 @@ cosine similarity = (A · B) / (|A| × |B|)
 
 ## 임베딩 모델은 어떻게 학습하는가
 
-![Positive and negative pair training structure](../../../assets/vector-search-101/01/01-03-how-embedding-models-learn.en.png)
+![Positive and negative pair training structure](../../../assets/vector-search-101/01/01-03-how-embedding-models-learn.ko.png)
 
 *긍정 쌍과 부정 쌍의 학습 구조*
 임베딩 모델은 의미가 비슷한 문장 쌍은 가깝게, 관련 없는 문장 쌍은 멀게 배치하도록 학습됩니다. 가장 지배적인 학습 방식은 대조 학습입니다.
@@ -123,7 +123,7 @@ cosine similarity = (A · B) / (|A| × |B|)
 
 ## 첫 번째 벡터 만들어 보기
 
-![Three sentence encoding execution path](../../../assets/vector-search-101/01/01-04-creating-your-first-vectors.en.png)
+![Three sentence encoding execution path](../../../assets/vector-search-101/01/01-04-creating-your-first-vectors.ko.png)
 
 *세 문장을 인코딩하는 실행 경로*
 이론을 다시 읽는 것보다 코드를 한 번 실행하는 편이 더 빠릅니다. `sentence-transformers`를 설치한 뒤 세 문장을 인코딩해 보겠습니다.
@@ -196,7 +196,7 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
 
 ## 임베딩이 잘 작동하지 않는 경우
 
-![Limits with exact strings and long documents](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.en.png)
+![Limits with exact strings and long documents](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.ko.png)
 
 *정확 문자열과 긴 문서에서 드러나는 한계*
 임베딩은 키워드 검색을 완전히 대체하는 만능 도구가 아닙니다. 몇몇 상황에서는 오히려 전통적인 방식이 더 낫습니다.

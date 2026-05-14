@@ -107,7 +107,7 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
 
 *Core flow*
 

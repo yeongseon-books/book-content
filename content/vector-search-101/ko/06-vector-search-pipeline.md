@@ -34,7 +34,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
 
-![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.ko.png)
 
 *엔드 투 엔드 인덱싱 및 검색 흐름*
 <!-- ebook-only:start -->
@@ -61,10 +61,10 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ## 파이프라인 구조
 
-![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.en.png)
+![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-pipeline-structure.ko.png)
 
 *엔드 투 엔드 인덱싱 및 검색 흐름*
-![Pipeline component connection structure](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
+![Pipeline component connection structure](../../../assets/vector-search-101/06/06-02-pipeline-structure-2.ko.png)
 
 *파이프라인 구성 요소 연결 구조*
 벡터 검색 파이프라인은 크게 두 단계로 나뉩니다.
@@ -87,7 +87,7 @@ embed query → FAISS search → return ranked chunks
 
 ## 완전한 파이프라인
 
-![Build save load search execution path](../../../assets/vector-search-101/06/06-03-complete-pipeline.en.png)
+![Build save load search execution path](../../../assets/vector-search-101/06/06-03-complete-pipeline.ko.png)
 
 *구축, 저장, 로드, 검색 실행 경로*
 하나의 파일로 바로 실행 가능한 예제를 보겠습니다.
@@ -259,7 +259,7 @@ query: 'FAISS index types'
 
 ## 하이브리드 검색
 
-![Combining vector scores with BM25 scores](../../../assets/vector-search-101/06/06-04-hybrid-search.en.png)
+![Combining vector scores with BM25 scores](../../../assets/vector-search-101/06/06-04-hybrid-search.ko.png)
 
 *벡터 점수와 BM25 점수 결합 구조*
 벡터 검색만으로는 정확한 용어가 중요한 상황에 약합니다. 오류 코드, 제품 ID, 고유명사처럼 정확 일치가 중요한 경우에는 키워드 검색이 더 강합니다. 하이브리드 검색은 두 방식을 결합합니다.
@@ -311,7 +311,7 @@ def hybrid_search(
 
 ## 운영 관점에서 볼 점
 
-![Index update and deletion constraint path](../../../assets/vector-search-101/06/06-05-operational-considerations.en.png)
+![Index update and deletion constraint path](../../../assets/vector-search-101/06/06-05-operational-considerations.ko.png)
 
 *인덱스 갱신과 삭제 제약 경로*
 **인덱스 업데이트.** 새 문서를 추가하는 일 자체는 단순합니다. 임베딩한 뒤 `index.add()`를 호출하면 됩니다. 다만 `IndexFlatIP`는 삭제를 지원하지 않습니다. 벡터를 제거해야 한다면 주기적으로 인덱스를 재구축하거나, `IndexIDMap`으로 식별자를 관리하면서 삭제된 항목을 건너뛰는 방식을 사용해야 합니다.

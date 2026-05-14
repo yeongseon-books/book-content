@@ -34,7 +34,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 
 예제 코드: `en/06-pipeline-completion/main.py`
 
-![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.en.png)
+![Questions this post answers](../../../assets/document-ingestion-101/06/06-01-questions-this-post-answers.ko.png)
 
 *Questions this post answers*
 
@@ -44,7 +44,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 
 ## 엔드투엔드 수집 파이프라인
 
-![End-to-end ingestion pipeline flow](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
+![End-to-end ingestion pipeline flow](../../../assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
 
 *End-to-end ingestion pipeline flow*
 
@@ -52,7 +52,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 
 ## 단계별 검증 체크포인트
 
-![Stage verification checkpoint flow](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.en.png)
+![Stage verification checkpoint flow](../../../assets/document-ingestion-101/06/06-02-stage-verification-checkpoints.ko.png)
 
 *Stage verification checkpoint flow*
 
@@ -184,7 +184,7 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ### 모니터링과 복구 경로
 
-![Monitoring and recovery flow](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.en.png)
+![Monitoring and recovery flow](../../../assets/document-ingestion-101/06/06-01-monitoring-and-recovery-path.ko.png)
 
 *Monitoring and recovery flow*
 
@@ -198,7 +198,7 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ### 재시도와 재실행 제어
 
-![Retry and replay control flow](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.en.png)
+![Retry and replay control flow](../../../assets/document-ingestion-101/06/06-02-retry-and-replay-control.ko.png)
 
 *Retry and replay control flow*
 

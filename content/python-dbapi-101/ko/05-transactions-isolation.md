@@ -29,7 +29,7 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 
 이 글은 Python DB-API 101 시리즈의 다섯 번째 글입니다.
 
-![Transaction과 isolation level (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
+![Transaction과 isolation level (sqlite3, PEP 249)](../../../assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.ko.png)
 
 *Transaction과 isolation level (sqlite3, PEP 249)*
 
@@ -48,7 +48,7 @@ sqlite3 driver는 편의를 위해 implicit BEGIN을 자동으로 거는데, 이
 
 ## Mental Model — connection이 transaction 단위
 
-![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
+![Mental Model - connection이 transaction 단위](../../../assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
 
 *Mental Model - connection이 transaction 단위*
 ```text
@@ -79,7 +79,7 @@ Connection lifecycle (sqlite3 default)
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/python-dbapi-101/05/05-03-core-concepts.en.png)
+![핵심 개념](../../../assets/python-dbapi-101/05/05-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### `isolation_level` 5가지 값
@@ -157,7 +157,7 @@ with sqlite3.connect('shop.db') as con:
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.en.png)
+![단계별 실습](../../../assets/python-dbapi-101/05/05-04-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 단계 1 — 기본 동작 관찰

@@ -104,7 +104,7 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
 
 *Core flow*
 

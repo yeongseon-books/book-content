@@ -34,7 +34,7 @@ LLM이 모르는 최신 정보, 사내 문서, 비공개 지식이 필요한 순
 
 > RAG는 답을 외우는 모델이 아니라, 검색된 문서를 생성 전에 프롬프트에 주입하는 파이프라인입니다.
 
-![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/02/02-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (2/6)
@@ -59,7 +59,7 @@ RAG(Retrieval-Augmented Generation)는 LLM의 두 가지 고질적 한계를 보
 
 ### 오프라인 인덱싱 파이프라인
 
-![오프라인 인덱싱 파이프라인](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
+![오프라인 인덱싱 파이프라인](../../../assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png)
 
 *오프라인 인덱싱 파이프라인*
 인덱싱(오프라인)은 문서를 청크로 나누고, 임베딩을 만들고, 벡터 인덱스에 저장하는 단계입니다.
@@ -77,7 +77,7 @@ retrieval: query → embedding → FAISS search → prompt injection → LLM →
 
 ### 온라인 질의응답 흐름
 
-![온라인 질의응답 흐름](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
+![온라인 질의응답 흐름](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.ko.png)
 
 *온라인 질의응답 흐름*
 ```python
@@ -181,7 +181,7 @@ for question in test_questions:
 
 ### 답변과 출처를 함께 돌려주는 구조
 
-![답변과 출처를 함께 돌려주는 구조](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.en.png)
+![답변과 출처를 함께 돌려주는 구조](../../../assets/ai-app-patterns-101/02/02-03-answer-and-source-return-structure.ko.png)
 
 *답변과 출처를 함께 돌려주는 구조*
 어떤 문서가 답변의 근거였는지 함께 보여 주면 사용자 신뢰가 크게 좋아집니다.
@@ -255,12 +255,12 @@ print(f"sources: {result['sources']}")
 
 ### 검색 누락에 대한 방어 계층
 
-![검색 누락에 대한 방어 계층](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.en.png)
+![검색 누락에 대한 방어 계층](../../../assets/ai-app-patterns-101/02/02-04-defense-layers-against-retrieval-misses.ko.png)
 
 *검색 누락에 대한 방어 계층*
 ### 근거가 없을 때의 폴백 분기
 
-![근거가 없을 때의 폴백 분기](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
+![근거가 없을 때의 폴백 분기](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.ko.png)
 
 *근거가 없을 때의 폴백 분기*
 **관련 청크가 검색되지 않은 경우입니다.** 질의와 맞는 청크를 찾지 못하면 LLM은 내부 지식으로 메우려 하고, 그 과정에서 환각할 수 있습니다. “문서에 없으면 모른다고 말하라”는 프롬프트 지시는 첫 번째 방어선입니다.

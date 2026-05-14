@@ -40,7 +40,7 @@ seo_description: App Service 로그가 어디에 쌓이고 Application Insights�
 
 App Service에서 로그 흐름을 이해하는 것이 첫 단계입니다.
 
-![App logs flowing to files and monitoring](../../../assets/azure-app-service-101/06/01-log-flow-architecture.en.png)
+![App logs flowing to files and monitoring](../../../assets/azure-app-service-101/06/01-log-flow-architecture.ko.png)
 
 *앱 로그가 파일시스템과 모니터링으로 흘러가는 구조*
 
@@ -59,7 +59,7 @@ Flask App (logger.info) → stdout/stderr → App Service Runtime
 | `/home/LogFiles/Application/` | Max 100MB/7 days | Short-term log archive |
 | Application Insights | 90 days default | Long-term analysis, alerts, KQL |
 
-![Observability stages from logs to tracing](../../../assets/azure-app-service-101/06/02-observability-maturity.en.png)
+![Observability stages from logs to tracing](../../../assets/azure-app-service-101/06/02-observability-maturity.ko.png)
 
 *로그에서 tracing으로 가는 observability 성숙도 단계*
 
@@ -195,7 +195,7 @@ logger.info("Order created", extra={"custom_dimensions": {
 
 하나의 요청에서 나온 모든 로그를 묶으려면 **Correlation ID**가 필요합니다.
 
-![Correlation ID across a single request](../../../assets/azure-app-service-101/06/03-correlation-id-flow.en.png)
+![Correlation ID across a single request](../../../assets/azure-app-service-101/06/03-correlation-id-flow.ko.png)
 
 *하나의 요청을 따라가는 Correlation ID 흐름*
 

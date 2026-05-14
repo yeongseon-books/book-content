@@ -29,7 +29,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 이 글은 Python DB-API 101 시리즈의 여섯 번째 글입니다.
 
-![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
+![Row factory와 type adapter (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
@@ -45,7 +45,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## Mental Model — 두 단계 변환
 
-![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental Model - 두 단계 변환*
 ```'
@@ -57,7 +57,7 @@ Tuple-shaped rows are fast, but they turn schema changes and type drift into sub
 
 This is the 6th article in the Python DB-API 101 series.
 
-![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
+![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
 
 *Row factories and type adapters (sqlite3, PEP 249)*
 ## Questions this post answers
@@ -94,7 +94,7 @@ This post unifies row factories and type adapters so your repository layer survi
 
 ## Mental Model — two-step conversion
 
-![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental model - two-step conversion*
 ```
@@ -108,7 +108,7 @@ This post unifies row factories and type adapters so your repository layer survi
 
 ## 핵심 개념
 
-![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
+![핵심 개념](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
 
 *핵심 개념*
 ### `sqlite3.Row`
@@ -126,7 +126,7 @@ Separating these two concerns naturally separates where they live in code.
 
 ## Core concepts
 
-![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.en.png)
+![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
 
 *Core concepts*
 ### `sqlite3.Row`
@@ -223,7 +223,7 @@ If the SELECT column order changes, you suddenly multiply the name string.
 
 ## 단계별 실습
 
-![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
+![단계별 실습](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
 
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`
@@ -236,7 +236,7 @@ Order-independent and precise.
 
 ## Step-by-step walkthrough
 
-![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.en.png)
+![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
 
 *Step-by-step walkthrough*
 ### Step 1 — `sqlite3.Row`

@@ -32,7 +32,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
-![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
 
 *코사인, 내적, 유클리드 비교 구조*
 <!-- ebook-only:start -->
@@ -60,7 +60,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 ## 세 가지 거리 척도
 
-![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
+![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
 
 *코사인, 내적, 유클리드 비교 구조*
 ### 코사인 유사도
@@ -114,7 +114,7 @@ def euclidean_distance(a: np.ndarray, b: np.ndarray) -> float:
 
 ## 세 척도를 한 번에 비교하기
 
-![Three metrics on one pair flow](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.en.png)
+![Three metrics on one pair flow](../../../assets/vector-search-101/03/03-02-comparing-all-three-metrics.ko.png)
 
 *같은 문장 쌍에 세 척도를 적용하는 흐름*
 같은 문장 쌍에 세 가지 척도를 모두 적용해 보겠습니다.
@@ -180,7 +180,7 @@ for text_a, text_b in pairs:
 
 ## 정규화가 왜 중요한가
 
-![Before and after normalization difference](../../../assets/vector-search-101/03/03-03-why-normalization-matters.en.png)
+![Before and after normalization difference](../../../assets/vector-search-101/03/03-03-why-normalization-matters.ko.png)
 
 *정규화 전후 차이*
 정규화가 없으면 내적과 코사인 유사도는 갈라집니다.
@@ -232,7 +232,7 @@ print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
 
 ## 브루트 포스 최근접 이웃 검색
 
-![Brute force nearest neighbor execution path](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.en.png)
+![Brute force nearest neighbor execution path](../../../assets/vector-search-101/03/03-04-brute-force-nearest-neighbor-search.ko.png)
 
 *브루트 포스 최근접 이웃 실행 경로*
 문서 수가 수백 개 수준이라면 NumPy만으로도 검색이 가능합니다.
@@ -299,7 +299,7 @@ for rank, (score, text) in enumerate(results, start=1):
 
 ## 언제 어떤 척도를 써야 하는가
 
-![Metric selection decision flow](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.en.png)
+![Metric selection decision flow](../../../assets/vector-search-101/03/03-05-when-to-use-each-metric.ko.png)
 
 *거리 척도 선택 흐름*
 | 척도 | 적합한 상황 | 주의할 점 |

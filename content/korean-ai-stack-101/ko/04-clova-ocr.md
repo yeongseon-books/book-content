@@ -105,7 +105,7 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
 
 *Core flow*
 

@@ -61,7 +61,7 @@ ACA의 가장 강력한 프로덕션 기능 중 하나가 revision 기반 traffi
 
 ACA의 관리형 Ingress 레이어는 정문 역할을 하고, 그 뒤에서 가중치에 따라 active Revision으로 트래픽을 보냅니다.
 
-![Ingress routing requests to active Revisions](../../../assets/azure-aca-101/04/04-01-the-request-path.en.png)
+![Ingress routing requests to active Revisions](../../../assets/azure-aca-101/04/04-01-the-request-path.ko.png)
 
 *Ingress routing requests to active Revisions*
 

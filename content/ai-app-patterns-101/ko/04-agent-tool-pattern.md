@@ -34,7 +34,7 @@ seo_description: 에이전트는 단계를 미리 고정하지 않고 모델이 
 
 > 에이전트는 모든 단계를 미리 하드코딩하는 대신, 모델이 런타임에 도구 호출 경로를 선택하게 하는 제어기입니다.
 
-![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/04/04-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (4/6)
@@ -56,7 +56,7 @@ seo_description: 에이전트는 단계를 미리 고정하지 않고 모델이 
 
 ### 고정 체인과 동적 에이전트
 
-![고정 체인과 동적 에이전트](../../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
+![고정 체인과 동적 에이전트](../../../assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.ko.png)
 
 *고정 체인과 동적 에이전트*
 **Chain**은 입력 → 단계 A → 단계 B → 출력으로 흐릅니다. 실행 경로는 설계 시점에 결정됩니다.
@@ -71,7 +71,7 @@ seo_description: 에이전트는 단계를 미리 고정하지 않고 모델이 
 
 ### 도구 레지스트리와 선택 표면
 
-![도구 레지스트리와 선택 표면](../../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.en.png)
+![도구 레지스트리와 선택 표면](../../../assets/ai-app-patterns-101/04/04-02-tool-registry-and-selection-surface.ko.png)
 
 *도구 레지스트리와 선택 표면*
 LangChain에서 도구는 `@tool`로 장식한 Python 함수입니다. docstring이 LLM이 도구를 고를 때 읽는 설명이 됩니다. 따라서 대충 쓸 수 없습니다. 모호한 docstring은 잘못된 도구 선택으로 곧장 이어집니다.
@@ -153,7 +153,7 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
 
 ### Thought action observation 루프
 
-![Thought action observation 루프](../../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.en.png)
+![Thought action observation 루프](../../../assets/ai-app-patterns-101/04/04-03-thought-action-observation-loop.ko.png)
 
 *Thought action observation 루프*
 ```python
@@ -225,7 +225,7 @@ for question in questions:
 
 ### 실행 흔적과 중단 조건
 
-![실행 흔적과 중단 조건](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+![실행 흔적과 중단 조건](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.ko.png)
 
 *실행 흔적과 중단 조건*
 `verbose=True`를 주면 콘솔에 Thought, Action, Action Input, Observation이 모두 출력됩니다. 단순한 질문은 보통 한 번의 라운드로 끝납니다. 단어 수를 세고 그 결과에 2를 곱하는 식의 2단계 질문은 보통 두 라운드가 필요하고, 첫 번째 도구 출력이 두 번째 계산의 입력으로 이어집니다.
@@ -238,7 +238,7 @@ for question in questions:
 
 ### Observation으로 되돌리는 도구 오류
 
-![Observation으로 되돌리는 도구 오류](../../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.en.png)
+![Observation으로 되돌리는 도구 오류](../../../assets/ai-app-patterns-101/04/04-05-returning-tool-errors-as-observations.ko.png)
 
 *Observation으로 되돌리는 도구 오류*
 도구가 처리되지 않은 예외를 던지면 에이전트는 멈춥니다. 반대로 도구 안에서 예외를 잡아 설명 문자열을 반환하면 에이전트는 계속 실행됩니다. 그 문자열이 Observation이 되고, LLM은 다른 접근을 시도하거나 실패 이유를 설명할 수 있습니다.

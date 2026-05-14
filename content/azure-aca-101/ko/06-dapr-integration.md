@@ -63,7 +63,7 @@ App 수준은 앱별 옵트인이고, Environment 수준은 공유 인프라 카
 
 > Dapr를 켜는 일은 이 앱이 사이드카를 쓸 것인가를 정하는 일이고, component를 등록하는 일은 이 환경이 어떤 공용 기능을 제공할 것인가를 정하는 일입니다.
 
-![Dapr sidecar next to the app and connections to external services](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
+![Dapr sidecar next to the app and connections to external services](../../../assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
 
 *Dapr sidecar next to the app and connections to external services*
 

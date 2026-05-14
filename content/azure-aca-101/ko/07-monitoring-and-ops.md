@@ -64,7 +64,7 @@ ACA 관측성은 세 개의 독립된 계층으로 나뉩니다.
 
 > 관측성에서 가장 먼저 할 일은 데이터를 더 모으는 것이 아니라, 지금 보고 있는 신호가 플랫폼 로그인지, 앱 트레이스인지, 사이드카 텔레메트리인지 먼저 구분하는 일입니다.
 
-![Where logs and traces converge](../../../assets/azure-aca-101/07/07-01-the-observability-map.en.png)
+![Where logs and traces converge](../../../assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
 
 *Where logs and traces converge*
 

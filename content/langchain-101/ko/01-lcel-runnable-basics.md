@@ -38,7 +38,7 @@ LangChain을 처음 보면 용어가 먼저 몰려옵니다. LCEL, Runnable, Cha
 
 > LangChain에서는 입력과 출력 모양만 맞으면, 많은 컴포넌트를 서로 바꿔 끼울 수 있습니다.
 
-![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/langchain-101/01/01-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -101,7 +101,7 @@ Example code: [github.com/yeongseon-books/langchain-101](https://github.com/yeon
 
 ## 전체 흐름 한눈에 보기
 
-![전체 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
+![전체 흐름 한눈에 보기](../../../assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
 
 *전체 흐름 한눈에 보기*
 

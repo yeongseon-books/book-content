@@ -28,7 +28,7 @@ seo_description: 데이터셋 문제는 양보다 형식에서 더 자주 실패
 
 ## 이 글에서 다룰 문제
 
-![이 글에서 다룰 문제](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.en.png)
+![이 글에서 다룰 문제](../../../assets/llm-finetuning-101/02/02-01-questions-this-post-answers.ko.png)
 
 *이 글에서 다룰 문제*
 
@@ -102,13 +102,13 @@ You can use lst[::-1] or lst.reverse().<eos>
 
 ## 데이터셋에서 먼저 고칠 것
 
-![데이터셋 준비의 세 층](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
+![데이터셋 준비의 세 층](../../../assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
 
 *데이터셋 준비의 세 층*
 
 파인튜닝 데이터는 보통 **원본 샘플**, **템플릿이 적용된 텍스트**, **토큰화된 텐서**라는 세 층으로 나뉩니다. 이 분리를 유지해야 필터링 문제와 토큰 길이 문제를 분리해서 볼 수 있습니다.
 
-![데이터셋에서 먼저 고칠 것](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.en.png)
+![데이터셋에서 먼저 고칠 것](../../../assets/llm-finetuning-101/02/02-01-the-three-layers-of-dataset-preparation.ko.png)
 
 *데이터셋에서 먼저 고칠 것*
 
@@ -184,7 +184,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## 이 코드에서 봐야 할 것
 
-![형식 점검과 길이 검증 흐름](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.en.png)
+![형식 점검과 길이 검증 흐름](../../../assets/llm-finetuning-101/02/02-03-what-to-notice-in-this-code.ko.png)
 
 *형식 점검과 길이 검증 흐름*
 
@@ -195,7 +195,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## 자주 하는 실수
 
-![중복 제거와 분할 결정 흐름](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.en.png)
+![중복 제거와 분할 결정 흐름](../../../assets/llm-finetuning-101/02/02-04-where-engineers-get-confused.ko.png)
 
 *중복 제거와 분할 결정 흐름*
 

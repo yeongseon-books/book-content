@@ -30,7 +30,7 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 이 글은 Python DB-API 101 시리즈의 첫 번째 글입니다.
 
-![Why DB-API 2.0 - the problem PEP 249 solved](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
+![Why DB-API 2.0 - the problem PEP 249 solved](../../../assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.ko.png)
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
 
@@ -45,7 +45,7 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 ## 1. DB-API 이전의 혼돈
 
-![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
+![DB-API 이전의 혼돈](../../../assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
 
 *DB-API 이전의 혼돈*
 표준이 없던 시절, 각 데이터베이스 라이브러리는 자기만의 API를 가졌습니다.
@@ -66,7 +66,7 @@ data = db.receive_rows()
 
 ## 2. PEP 249가 표준화한 5가지
 
-![PEP 249가 표준화한 5가지](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.en.png)
+![PEP 249가 표준화한 5가지](../../../assets/python-dbapi-101/01/01-03-2-five-things-pep-249-standardized.ko.png)
 
 *PEP 249가 표준화한 5가지*
 DB-API 2.0은 모든 driver가 지켜야 할 최소 contract를 정의합니다.
@@ -124,7 +124,7 @@ conn.close()
 
 ## 4. paramstyle 한 가지가 다르다
 
-![paramstyle 한 가지가 다르다](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.en.png)
+![paramstyle 한 가지가 다르다](../../../assets/python-dbapi-101/01/01-04-4-only-paramstyle-really-differs.ko.png)
 
 *paramstyle 한 가지가 다르다*
 PEP 249는 5가지 paramstyle을 허용합니다.

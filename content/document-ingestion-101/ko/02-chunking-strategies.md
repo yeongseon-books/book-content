@@ -34,7 +34,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 예제 코드: `en/02-chunking-strategies/main.py`
 
-![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.en.png)
+![Questions this post answers](../../../assets/document-ingestion-101/02/02-01-questions-this-post-answers.ko.png)
 
 *Questions this post answers*
 
@@ -44,7 +44,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 ## 문서 유형별 청킹 흐름
 
-![Chunking strategy selection flow](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
+![Chunking strategy selection flow](../../../assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
 
 *Chunking strategy selection flow*
 
@@ -52,7 +52,7 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 ## 재귀 분할기의 후퇴 순서
 
-![Recursive separator fallback flow](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.en.png)
+![Recursive separator fallback flow](../../../assets/document-ingestion-101/02/02-02-recursive-splitter-fallback-order.ko.png)
 
 *Recursive separator fallback flow*
 
@@ -119,7 +119,7 @@ python main.py
 
 ### 청크 겹침이 문맥을 이어 주는 방식
 
-![Chunk boundaries with overlap flow](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.en.png)
+![Chunk boundaries with overlap flow](../../../assets/document-ingestion-101/02/02-01-how-chunk-overlap-preserves-context.ko.png)
 
 *Chunk boundaries with overlap flow*
 
@@ -133,7 +133,7 @@ python main.py
 
 ### 청크 품질을 검토하는 방법
 
-![Chunk quality review flow](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.en.png)
+![Chunk quality review flow](../../../assets/document-ingestion-101/02/02-02-how-to-review-chunk-quality.ko.png)
 
 *Chunk quality review flow*
 

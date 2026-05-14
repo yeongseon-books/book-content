@@ -34,7 +34,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 예제 코드: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
-![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.ko.png)
 
 *단일 쿼리 임베딩 호출 흐름*
 <!-- ebook-only:start -->
@@ -74,7 +74,7 @@ pip install langchain-community sentence-transformers numpy
 
 ## 첫 번째 임베딩
 
-![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.en.png)
+![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-first-embedding.ko.png)
 
 *단일 쿼리 임베딩 호출 흐름*
 모델을 초기화하고 문장 하나를 인코딩해 보겠습니다.
@@ -123,7 +123,7 @@ first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
 
 ## 배치 임베딩
 
-![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.en.png)
+![Single call and batch call contrast](../../../assets/vector-search-101/02/02-02-batch-embedding.ko.png)
 
 *단일 호출과 배치 호출의 대비*
 문서가 여러 개라면 `embed_query()`를 반복 호출하는 것보다 `embed_documents()` 한 번이 더 효율적입니다. 모델이 내부적으로 배치 처리하고, 반복 초기화 오버헤드도 줄일 수 있기 때문입니다.
@@ -171,7 +171,7 @@ print(f"elapsed: {elapsed:.3f}s")
 
 ## 벡터 저장과 다시 불러오기
 
-![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.en.png)
+![Vector and document save flow](../../../assets/vector-search-101/02/02-03-saving-and-reloading-vectors.ko.png)
 
 *벡터와 문서 저장 흐름*
 같은 문서에 대해 실행할 때마다 임베딩을 다시 계산하면 시간이 낭비됩니다. 한 번 계산한 행렬을 저장하고 재사용하는 편이 낫습니다.
@@ -254,7 +254,7 @@ print("saved embeddings and documents")
 
 ## 속도를 높이는 실용 팁
 
-![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.en.png)
+![Model reuse and batch size path](../../../assets/vector-search-101/02/02-04-practical-speed-tips.ko.png)
 
 *모델 재사용과 배치 크기 조정 경로*
 CPU 기반 인코딩은 규모가 커질수록 느립니다. 몇 가지 조정만으로도 꽤 개선할 수 있습니다.
@@ -289,7 +289,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ## 래퍼와 원시 API 비교
 
-![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.en.png)
+![Wrapper and raw API comparison structure](../../../assets/vector-search-101/02/02-05-comparing-wrapper-and-raw-api.ko.png)
 
 *래퍼와 원시 API 비교 구조*
 `HuggingFaceEmbeddings`는 내부적으로 `SentenceTransformer`를 사용합니다. 출력은 수치적으로 동일합니다.

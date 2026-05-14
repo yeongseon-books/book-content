@@ -33,7 +33,7 @@ PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는
 
 > 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽는 입력 계약으로 바뀌는 곳입니다.
 
-![이 글에서 답할 질문](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/rag-deep-dive/04/04-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
 소스에서 `PromptTemplate`는 `langchain_core.prompts.prompt.PromptTemplate`에 있지만, 실제 성격은 상속 구조를 같이 봐야 분명해집니다. `PromptTemplate`는 `StringPromptTemplate`를 상속하고, 그 위에는 다시 `BasePromptTemplate`가 있습니다. 이 구조 때문에 LangChain의 프롬프트는 “문자열 한 장”이 아닙니다. 필요한 입력 이름을 `input_variables`로 갖고, 미리 채워 둘 값은 `partial_variables`로 들고, `invoke()`로 runnable처럼 실행되며, `format_prompt()`를 호출하면 최종 문자열을 `StringPromptValue`로 감싼 결과를 돌려줍니다.
 
-![문자열 프롬프트와 채팅 프롬프트 계층 구조](../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
+![문자열 프롬프트와 채팅 프롬프트 계층 구조](../../../assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
 
 *문자열 프롬프트와 채팅 프롬프트 계층 구조*
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
 문자열 프롬프트에서 채팅 프롬프트로 넘어가면 중심이 템플릿 문자열 하나에서 메시지 템플릿 목록으로 바뀝니다. `langchain_core.prompts.chat`의 구조를 보면 이 차이가 명확합니다. `SystemMessagePromptTemplate`, `HumanMessagePromptTemplate`, `AIMessagePromptTemplate`는 모두 내부적으로 문자열 프롬프트 템플릿을 감싼 얇은 래퍼입니다. 다만 최종 출력은 문자열이 아니라 각각 `SystemMessage`, `HumanMessage`, `AIMessage` 같은 concrete message 객체입니다.
 
-![메시지 템플릿이 채팅 메시지로 변환되는 흐름](../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.en.png)
+![메시지 템플릿이 채팅 메시지로 변환되는 흐름](../../../assets/rag-deep-dive/04/04-02-chat-prompt-format-messages-flow.ko.png)
 
 *메시지 템플릿이 채팅 메시지로 변환되는 흐름*
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
 검색 결과가 실제 프롬프트의 `{context}`로 바뀌는 경로는 `langchain/chains/retrieval_qa/base.py`에서 가장 선명하게 볼 수 있습니다. `RetrievalQA`는 0.2.17 시점에도 이미 deprecated지만, 전통적인 RAG 조립 경로를 읽기에는 오히려 더 단순해서 좋습니다. 핵심은 `_get_docs()`와 `_call()`입니다.
 
-![retrieval QA가 문맥 문자열을 조립하는 경로](../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.en.png)
+![retrieval QA가 문맥 문자열을 조립하는 경로](../../../assets/rag-deep-dive/04/04-03-retrieval-qa-context-assembly.ko.png)
 
 *retrieval QA가 문맥 문자열을 조립하는 경로*
 
@@ -264,7 +264,7 @@ Context:
 
 이제 `{context}`가 어디서 오는지 봤으니, 다음은 변수들이 프롬프트 계층을 어떻게 통과하는지 정리할 차례입니다. 여기서는 `BasePromptTemplate`가 기준선입니다. 이 클래스가 partial binding과 runnable `invoke()` 둘 다 정의합니다.
 
-![partial 변수와 invoke 입력이 합쳐지는 흐름](../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.en.png)
+![partial 변수와 invoke 입력이 합쳐지는 흐름](../../../assets/rag-deep-dive/04/04-04-partial-variables-and-lcel-flow.ko.png)
 
 *partial 변수와 invoke 입력이 합쳐지는 흐름*
 
@@ -315,7 +315,7 @@ if __name__ == "__main__":
 
 좋은 RAG 프롬프트는 단순히 “문맥을 보고 답하라”로 끝나지 않습니다. 증거를 어떻게 다뤄야 하는지, 문맥이 부족할 때는 어떻게 말해야 하는지, 여러 청크가 같은 내용을 반복하거나 일부만 겹칠 때는 출처를 어떻게 표기해야 하는지를 명시해 주는 편이 훨씬 안전합니다. LangChain의 프롬프트 계층은 이런 규칙을 구조적으로 표현하기에 충분합니다.
 
-![출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시](../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.en.png)
+![출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시](../../../assets/rag-deep-dive/04/04-05-rag-prompt-construction-example.ko.png)
 
 *출처 인용 지침을 넣은 RAG 채팅 프롬프트 예시*
 

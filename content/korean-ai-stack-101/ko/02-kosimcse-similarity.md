@@ -102,7 +102,7 @@ query = '로그인 비밀번호를 다시 설정하고 싶어요.'  # "I want to
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/02/02-01-core-flow.ko.png)
 
 *Core flow*
 

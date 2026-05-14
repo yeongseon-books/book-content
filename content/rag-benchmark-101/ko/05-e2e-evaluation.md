@@ -31,7 +31,7 @@ seo_description: 종단 간 평가는 질문, 컨텍스트, 답변을 하나의 
 - 검색 품질이 아니라 **답변 품질**을 측정하려면 데이터셋이 어떤 형태여야 할까요?
 - 검색 실패와 생성 실패를 어떻게 분리해서 볼 수 있을까요?
 
-![이 글에서 답할 질문](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/rag-benchmark-101/05/05-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -96,7 +96,7 @@ answer_relevancy    0.82    0.85
 
 ### 1단계 — 평가 데이터셋 만들기
 
-![질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
+![질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조](../../../assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.ko.png)
 
 *질문, 컨텍스트, 답변이 평가 입력으로 묶이는 구조*
 
@@ -121,7 +121,7 @@ dataset = Dataset.from_list(samples)
 
 ### 2단계 — LLM과 임베딩을 wrapper로 연결하기
 
-![RAGAS 평가기로 들어가는 wrapper 경로](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.en.png)
+![RAGAS 평가기로 들어가는 wrapper 경로](../../../assets/rag-benchmark-101/05/05-02-wrapper-path-into-the-ragas-evaluator.ko.png)
 
 *RAGAS 평가기로 들어가는 wrapper 경로*
 
@@ -169,7 +169,7 @@ python3 main.py
 
 ### 4단계 — 결과를 검색 실패와 생성 실패로 나눠 읽기
 
-![검색 실패와 생성 실패를 분리해 읽는 해석 축](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.en.png)
+![검색 실패와 생성 실패를 분리해 읽는 해석 축](../../../assets/rag-benchmark-101/05/05-03-reading-retrieval-and-generation-failure.ko.png)
 
 *검색 실패와 생성 실패를 분리해 읽는 해석 축*
 
@@ -200,7 +200,7 @@ python3 main.py
 
 ## 체크리스트
 
-![지표 실행 전 데이터셋 형태와 실행 조건을 확인하는 흐름](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.en.png)
+![지표 실행 전 데이터셋 형태와 실행 조건을 확인하는 흐름](../../../assets/rag-benchmark-101/05/05-04-verification-flow-before-metric-executio.ko.png)
 
 *지표 실행 전 데이터셋 형태와 실행 조건을 확인하는 흐름*
 

@@ -34,7 +34,7 @@ seo_description: 문서 어시스턴트는 대화형 시스템이 아니라 긴 
 
 > 문서 어시스턴트는 대화형 시스템이 아니라, 긴 입력을 읽고 작업 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
 
-![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/ai-app-patterns-101/03/03-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 > AI App Patterns 101 (3/6)
@@ -56,7 +56,7 @@ seo_description: 문서 어시스턴트는 대화형 시스템이 아니라 긴 
 
 ### 짧은 문서 요약 흐름
 
-![짧은 문서 요약 흐름](../../../assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
+![짧은 문서 요약 흐름](../../../assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png)
 
 *짧은 문서 요약 흐름*
 짧은 문서는 전체 텍스트를 그대로 넘기고 요약만 요청하면 됩니다. 스타일, 길이, 독자층을 매개변수화하면 같은 체인을 여러 소비자에게 재사용할 수 있습니다.
@@ -126,7 +126,7 @@ print(dev_summary)
 
 ### 청크 요약과 최종 합성
 
-![청크 요약과 최종 합성](../../../assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.en.png)
+![청크 요약과 최종 합성](../../../assets/ai-app-patterns-101/03/03-02-chunk-summaries-and-final-synthesis.ko.png)
 
 *청크 요약과 최종 합성*
 문서가 컨텍스트 창을 넘으면 한 번의 호출로 처리할 수 없습니다. Map-Reduce는 문서를 청크로 나누고 각 청크를 독립적으로 요약한 뒤(Map), 그 요약들을 합쳐 하나의 일관된 결과로 만드는 방식입니다(Reduce).
@@ -219,7 +219,7 @@ print(f"\n=== Final summary ===\n{final}")
 
 ### 비정형 텍스트에서 JSON 추출
 
-![비정형 텍스트에서 JSON 추출](../../../assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.en.png)
+![비정형 텍스트에서 JSON 추출](../../../assets/ai-app-patterns-101/03/03-03-json-extraction-from-unstructured-text.ko.png)
 
 *비정형 텍스트에서 JSON 추출*
 비정형 텍스트 안에는 후속 시스템이 필요로 하는 구조화 데이터가 숨어 있는 경우가 많습니다. 추출할 필드를 명시하고 JSON으로만 반환하게 한 뒤, `JsonOutputParser`로 파싱하면 됩니다.
@@ -285,7 +285,7 @@ for i, posting in enumerate(job_postings, start=1):
 
 ### 신뢰도를 함께 돌려주는 배치 분류
 
-![신뢰도를 함께 돌려주는 배치 분류](../../../assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.en.png)
+![신뢰도를 함께 돌려주는 배치 분류](../../../assets/ai-app-patterns-101/03/03-04-batch-classification-with-confidence-out.ko.png)
 
 *신뢰도를 함께 돌려주는 배치 분류*
 문서를 카테고리로 분류하는 일은 콘텐츠 파이프라인, 지원 티켓 라우팅, 규정 준수 워크플로에서 흔한 전처리 단계입니다.
@@ -344,7 +344,7 @@ for text in texts:
 
 ### 요약, 추출, 분류 사이의 패턴 선택
 
-![요약, 추출, 분류 사이의 패턴 선택](../../../assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.en.png)
+![요약, 추출, 분류 사이의 패턴 선택](../../../assets/ai-app-patterns-101/03/03-05-pattern-choice-across-summary-extraction.ko.png)
 
 *요약, 추출, 분류 사이의 패턴 선택*
 - 많은 팀이 먼저 더 큰 모델을 찾지만, 요약 품질에는 대개 청크 크기와 overlap이 더 크게 작용합니다.

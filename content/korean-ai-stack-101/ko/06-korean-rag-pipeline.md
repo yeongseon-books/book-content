@@ -68,7 +68,7 @@ RAG가 어려운 이유는 단계 수가 많아서가 아니라, **단계별 책
 
 ## 멘탈 모델 — 4단계 파이프라인
 
-![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/06/06-01-core-flow.ko.png)
 
 *Core flow*
 

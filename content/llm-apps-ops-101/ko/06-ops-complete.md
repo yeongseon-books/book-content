@@ -34,13 +34,13 @@ seo_description: 운영 성숙도는 기능을 더 쌓는 데 있지 않고, 한
 
 ## 큰 그림
 
-![LLM 운영 파이프라인 전체 구성](../../../assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
+![LLM 운영 파이프라인 전체 구성](../../../assets/llm-apps-ops-101/06/06-01-big-picture.ko.png)
 
 *LLM 운영 파이프라인 전체 구성*
 
 ## 왜 이 레이어가 중요한가
 
-![입력 검증부터 로그 기록까지 이어지는 운영 흐름](../../../assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)
+![입력 검증부터 로그 기록까지 이어지는 운영 흐름](../../../assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.ko.png)
 
 *입력 검증부터 로그 기록까지 이어지는 운영 흐름*
 
@@ -240,7 +240,7 @@ if __name__ == "__main__":
 
 ## 이 코드에서 먼저 볼 점
 
-![health 상태가 누적 호출 수와 비용을 드러내는 구조](../../../assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.en.png)
+![health 상태가 누적 호출 수와 비용을 드러내는 구조](../../../assets/llm-apps-ops-101/06/06-02-what-to-notice-in-this-code.ko.png)
 
 *health 상태가 누적 호출 수와 비용을 드러내는 구조*
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
 ## 어디서 자주 헷갈릴까요?
 
-![배포·관측·평가·최적화가 다시 배포로 이어지는 루프](../../../assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
+![배포·관측·평가·최적화가 다시 배포로 이어지는 루프](../../../assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.ko.png)
 
 *배포·관측·평가·최적화가 다시 배포로 이어지는 루프*
 

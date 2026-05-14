@@ -74,7 +74,7 @@ seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임
 
 현업에서 저는 분기가 많은 그래프를 볼 때 먼저 세 가지를 봅니다. 라우팅 근거가 상태에 남는가, 예상 밖 입력을 처리할 default가 있는가, 루프와 종료가 서로 분리돼 있는가. 이 세 가지를 먼저 확인하면 “가끔 이상한 요청에서만 터지는” 시스템을 훨씬 빨리 해석할 수 있습니다.
 
-![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.en.png)
+![이 글에서 답할 질문](../../../assets/langgraph-101/03/03-01-questions-this-post-answers.ko.png)
 
 *이 글에서 답할 질문*
 
@@ -84,7 +84,7 @@ seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임
 
 가장 작은 분기 예제로 보겠습니다. 사용자의 질문을 읽고 `code`, `concept`, `debug` 셋 중 하나로 분류한 뒤, 조건부 엣지로 다음 노드를 선택하는 구조입니다. 예제는 단순하지만 실제 에이전트의 라우팅 뼈대와 거의 같습니다.
 
-![classify 노드에서 세 갈래로 분기하는 구조](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
+![classify 노드에서 세 갈래로 분기하는 구조](../../../assets/langgraph-101/03/03-01-minimal-runnable-example.ko.png)
 
 *classify 노드에서 세 갈래로 분기하는 구조*
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
 코드 전체를 한 번에 읽기보다, 아래 세 지점부터 보는 편이 이해가 빠릅니다.
 
-![질문이 route 필드로 흐르는 구조](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.en.png)
+![질문이 route 필드로 흐르는 구조](../../../assets/langgraph-101/03/03-02-what-to-notice-in-this-code.ko.png)
 
 *질문이 route 필드로 흐르는 구조*
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
 조건부 엣지 입문에서 가장 흔한 오해는 “route만 잘 나오면 됐다”는 생각입니다. 실제로는 route 값보다 **예상 밖 route를 어떻게 처리할지, 종료는 어디서 보장할지, fallback은 무엇인지**가 더 중요할 때가 많습니다.
 
-![분기와 루프의 종료 설계](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.en.png)
+![분기와 루프의 종료 설계](../../../assets/langgraph-101/03/03-03-where-engineers-get-confused.ko.png)
 
 *분기와 루프의 종료 설계*
 

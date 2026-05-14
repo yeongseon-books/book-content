@@ -28,7 +28,7 @@ seo_description: 파인튜닝은 무엇을 바꾸고 무엇을 그대로 둘지 
 
 ## 이 글에서 다룰 문제
 
-![이 글에서 다룰 문제](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png)
+![이 글에서 다룰 문제](../../../assets/llm-finetuning-101/01/01-01-questions-this-post-answers.ko.png)
 
 *이 글에서 다룰 문제*
 
@@ -95,13 +95,13 @@ Adapter file size                 ~7MB (one per domain)
 
 ## 먼저 이해해야 할 것
 
-![베이스 가중치와 학습 대상 경계](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+![베이스 가중치와 학습 대상 경계](../../../assets/llm-finetuning-101/01/01-02-what-to-understand-first.ko.png)
 
 *베이스 가중치와 학습 대상 경계*
 
 파인튜닝에서 가장 먼저 놓치기 쉬운 지점은 **무엇을 학습 대상으로 삼는가**입니다. 풀 파인튜닝은 기존 가중치 전체를 업데이트하므로 메모리와 옵티마이저 상태가 같이 불어납니다. LoRA는 기존 가중치를 얼려 두고 저랭크 행렬 두 개만 추가합니다. 그래서 비용을 이야기할 때는 전체 모델 크기보다 **학습 가능한 파라미터 수**를 따로 봐야 합니다.
 
-![먼저 이해해야 할 것](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.en.png)
+![먼저 이해해야 할 것](../../../assets/llm-finetuning-101/01/01-01-what-to-understand-first.ko.png)
 
 *먼저 이해해야 할 것*
 
@@ -159,7 +159,7 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 
 ## 이 코드에서 봐야 할 것
 
-![선형 레이어 기준 LoRA 개입 면적](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
+![선형 레이어 기준 LoRA 개입 면적](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.ko.png)
 
 *선형 레이어 기준 LoRA 개입 면적*
 
@@ -169,7 +169,7 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 
 ## 자주 하는 실수
 
-![문제 유형에 따른 선택 기준](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.en.png)
+![문제 유형에 따른 선택 기준](../../../assets/llm-finetuning-101/01/01-04-where-engineers-get-confused.ko.png)
 
 *문제 유형에 따른 선택 기준*
 

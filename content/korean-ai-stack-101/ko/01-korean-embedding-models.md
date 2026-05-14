@@ -45,7 +45,7 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 ## 핵심 흐름
 
-![Core flow](../../../assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
+![Core flow](../../../assets/korean-ai-stack-101/01/01-01-core-flow.ko.png)
 
 *Core flow*
 
@@ -53,7 +53,7 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 ## 왜 재현 가능한 비교부터 시작할까
 
-![Why start with a reproducible comparison](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.en.png)
+![Why start with a reproducible comparison](../../../assets/korean-ai-stack-101/01/01-01-why-start-with-a-reproducible-comparison.ko.png)
 
 *Why start with a reproducible comparison*
 
@@ -67,7 +67,7 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 ## 최소 실행 예제
 
-![Minimal runnable example](../../../assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.en.png)
+![Minimal runnable example](../../../assets/korean-ai-stack-101/01/01-02-minimal-runnable-example.ko.png)
 
 *Minimal runnable example*
 
@@ -102,7 +102,7 @@ for label, name in MODEL_NAMES.items():
 
 ## 이 코드에서 먼저 봐야 할 점
 
-![What to notice in this code](../../../assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.en.png)
+![What to notice in this code](../../../assets/korean-ai-stack-101/01/01-03-what-to-notice-in-this-code.ko.png)
 
 *What to notice in this code*
 
@@ -115,7 +115,7 @@ for label, name in MODEL_NAMES.items():
 
 ## 어디서 자주 헷갈릴까요?
 
-![Where engineers get confused](../../../assets/korean-ai-stack-101/01/01-04-where-engineers-get-confused.en.png)
+![Where engineers get confused](../../../assets/korean-ai-stack-101/01/01-04-where-engineers-get-confused.ko.png)
 
 *Where engineers get confused*
 
