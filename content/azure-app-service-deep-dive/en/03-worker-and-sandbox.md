@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Compare the Windows App Service sandbox with Linux container boundaries to debug worker execution failures faster.
 ---
 
 # Workers and the sandbox — where user code actually runs
@@ -305,6 +304,36 @@ ps -ef | head
 ls /home/site/wwwroot
 cat /home/LogFiles/eventlog.xml 2>/dev/null | tail -40
 ```
+
+### Return the runtime boundary before guessing at the bug
+
+When an app behaves differently on App Service than it does locally, it helps to print the execution surface first. This small Flask endpoint exposes worker identity, storage mode, and port contract in one response.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/runtime")
+def diag_runtime():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        site_name=os.environ.get("WEBSITE_SITE_NAME", "unknown"),
+        storage=os.environ.get("WEBSITES_ENABLE_APP_SERVICE_STORAGE", "unset"),
+        port=os.environ.get("PORT", "unset"),
+    )
+```
+
+```bash
+az webapp config appsettings list -n my-app -g my-rg \
+  --query "[?name=='WEBSITES_ENABLE_APP_SERVICE_STORAGE' || name=='WEBSITES_PORT' || name=='PORT'].{name:name,value:value}" \
+  -o table
+```
+
+**Expected output:** if a Linux custom container shows `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`, `/home` should not be treated like durable shared storage. If `PORT` or `WEBSITES_PORT` is wrong, the startup contract becomes the first suspect, not the application framework.
 
 ## Operational checklist
 

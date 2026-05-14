@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Learn how App Service Front-End routing, ARR Affinity, slots, and custom domains decide which worker serves a request.
 ---
 
 # Front-End and ARR — how a request reaches a worker
@@ -298,6 +297,38 @@ az webapp config show -n my-app -g my-rg \
 az webapp config hostname list -n my-app -g my-rg -o table
 az webapp config ssl list -g my-rg -o table
 ```
+
+### A tiny diagnostic endpoint makes affinity visible
+
+The fastest way to prove ARR stickiness is to return the worker identity to the caller. A minimal endpoint like this lets you compare cookie-preserving requests with fresh-session requests.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/worker")
+def diag_worker():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        slot=os.environ.get("WEBSITE_SLOT_NAME", "production"),
+    )
+```
+
+```bash
+# Same browser-like session twice
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+curl -s -c cookies.txt -b cookies.txt https://my-app.azurewebsites.net/diag/worker
+
+# Fresh session requests
+curl -s https://my-app.azurewebsites.net/diag/worker
+curl -s https://my-app.azurewebsites.net/diag/worker
+```
+
+**Expected output:** with ARR Affinity enabled, the cookie-preserving calls usually repeat the same `instance_id`. Without the cookie jar, the response is more likely to move across workers. That gives you a concrete test for partial-outage suspicion instead of arguing from symptoms alone.
 
 ## Operational checklist
 
