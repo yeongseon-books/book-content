@@ -17,7 +17,7 @@ tags:
   - ScikitLearn
   - Beginner
 seo_description: 정확도의 한계와 정밀도, 재현율, F1, ROC AUC 등 분류 및 회귀 평가지표의 선택 기준과 비즈니스 비용 반영법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 평가
@@ -56,17 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Cls["분류"] --> P["Precision"]
-    Cls --> R["Recall"]
-    Cls --> F["F1"]
-    Cls --> A["ROC AUC"]
-    Reg["회귀"] --> MAE["MAE"]
-    Reg --> RMSE["RMSE"]
-    Reg --> R2["R-squared"]
-```
+![분류와 회귀 문제에서 핵심 평가지표를 나눠 보는 평가 지도](../../../assets/data-science-101/08/08-01-concept-at-a-glance.ko.png)
 
+*분류와 회귀 문제에서 핵심 평가지표를 나눠 보는 평가 지도*
 ## 핵심 용어
 
 - **Confusion matrix**: TP, FP, FN, TN으로 예측 결과를 정리한 표입니다.
@@ -77,7 +69,7 @@ flowchart LR
 
 ## Before / After
 
-**Before**: 사기 탐지 모델이 accuracy 99%를 찍습니다. 숫자만 보면 대단해 보이지만 recall이 5%라면 대부분의 사기를 놓치고 있다는 뜻입니다.
+**Before**: 사기 탐지 모델이 정확도 99%를 찍습니다. 숫자만 보면 대단해 보이지만 재현율이 5%라면 실제 사기 대부분을 놓치고 있습니다.
 
 **After**: recall을 주요 지표로 두고, F1과 비용 기반 지표를 보조 지표로 둡니다. 그제야 문제와 지표가 맞기 시작합니다.
 
@@ -136,6 +128,8 @@ print("expected cost:", cost)
 ```
 
 실무에서는 이 단계가 특히 중요합니다. false negative가 false positive보다 훨씬 비싼 문제라면 그 비용을 직접 숫자로 계산해 지표로 삼아야 합니다. 그래야 모델 점수와 실제 의사결정이 같은 방향을 봅니다.
+
+**Expected output:** confusion matrix와 함께 precision, recall, F1, ROC AUC, 비용 기반 점수를 같은 평가 표에 적습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

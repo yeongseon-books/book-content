@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 8
 title: Evaluation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - ScikitLearn
   - Beginner
 seo_description: Why accuracy can lie, plus a practical tour of precision, recall, F1, ROC AUC, MAE, RMSE, and how to encode business cost into the metric
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Evaluation
 
-> Data Science 101 series (8/10)
+Evaluation is where teams discover whether a model is useful for the problem they actually have, not the benchmark they wish they had. Accuracy feels satisfying because it is easy to explain, but in imbalanced or asymmetric problems it can reward exactly the wrong behavior.
 
-<!-- a-grade-intro:begin -->
+Good evaluation therefore starts with the cost of being wrong. If missing a positive case is expensive, the metric has to show that. If a false alarm is the real operational pain, the metric has to show that instead.
 
-**Core question**: Does *high accuracy* really mean a *good model*? Which *metric* should you use *when*?
+This is post 8 in the Data Science 101 series. In this chapter, we connect classification and regression metrics back to business cost so that model scores line up with real decisions.
 
-> *Choosing a metric is the *same act* as defining the problem.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- When does accuracy become the wrong summary of model quality?
+- How do precision, recall, F1, and ROC AUC support different operational trade-offs?
+- Which regression metric matches which error tolerance?
+- How do you encode business cost so the model score matches the real decision?
 
-This is post 8 in the Data Science 101 series.
+> Metric choice is really cost choice: it tells the team which failure mode matters most.
 
 ## What You Will Learn
 
@@ -50,17 +53,9 @@ If the metric *misaligns with the problem*, the model learns the *wrong directio
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Cls["Classification"] --> P["Precision"]
-    Cls --> R["Recall"]
-    Cls --> F["F1"]
-    Cls --> A["ROC AUC"]
-    Reg["Regression"] --> MAE["MAE"]
-    Reg --> RMSE["RMSE"]
-    Reg --> R2["R-squared"]
-```
+![The main evaluation branches for classification metrics and regression metrics](../../../assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
 
+*The main evaluation branches for classification metrics and regression metrics*
 ## Key Terms
 
 - **Confusion matrix**: TP / FP / FN / TN table.
@@ -120,6 +115,8 @@ print("R^2 :", r2_score(y_test, y_pred))
 cost = 5 * cm[1, 0] + 1 * cm[0, 1]
 print("expected cost:", cost)
 ```
+
+**Expected output:** one evaluation table that puts the confusion matrix, P/R/F1, ROC AUC, and business-cost score side by side.
 
 ## What to Notice in This Code
 
