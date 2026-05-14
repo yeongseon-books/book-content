@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: VectorStoreRetriever와 MMR이 관련성과 다양성을 어떻게 균형잡는지 LangChain 내부 구현으로 살펴봅니다.
 ---
 
@@ -137,9 +137,9 @@ LangChain 0.2.17에서 retriever의 기준 인터페이스는 `langchain_core.re
 
 여기서 `run_manager`가 왜 중요한지도 분명해집니다. custom retriever를 작성할 때 단순히 검색 함수만 구현하는 것이 아니라, 필요하면 내부 단계별 callback 이벤트를 더 내보낼 수 있기 때문입니다. 0.2.17의 `BaseRetriever.__init_subclass__()`는 자식 클래스의 `_get_relevant_documents()` 시그니처를 검사해서 `run_manager` 인자를 지원하는지 확인하고, 구버전 retriever가 public 메서드인 `get_relevant_documents()`를 직접 구현했더라도 deprecation warning과 함께 내부 메서드로 연결해 줍니다. 하위 호환은 유지하되, 새 기준은 분명히 `_get_relevant_documents()`라는 뜻입니다.
 
-비동기 경로도 같은 원칙으로 읽어야 합니다. `ainvoke()`는 `AsyncCallbackManager.configure(...)`로 async run manager를 만들고, `_aget_relevant_documents()`를 호출합니다. 그런데 모든 retriever가 진짜 async 구현을 갖고 있는 것은 아닙니다. 그래서 `BaseRetriever`는 기본 `_aget_relevant_documents()`를 제공하고, 그 구현은 `run_in_executor(...)`로 동기 `_get_relevant_documents()`를 스레드풀에서 실행합니다. 이 fallback이 필요한 이유는 retriever 인터페이스를 async 체인 안에서도 일관되게 연결하기 위해서입니다. 즉 `_aget_relevant_documents()`가 존재하는 이유는 두 가지입니다. 하나는 네이티브 async I/O를 쓰는 retriever가 직접 최적화된 구현을 제공할 수 있게 하기 위해서이고, 다른 하나는 그런 구현이 없더라도 Runnable async 인터페이스를 유지하기 위해서입니다.
+비동기 경로도 같은 원칙으로 읽어야 합니다. `ainvoke()`는 `AsyncCallbackManager.configure(...)`로 async run manager를 만들고, `_aget_relevant_documents()`를 호출합니다. 그런데 모든 retriever가 진짜 async 구현을 갖고 있는 것은 아닙니다. 그래서 `BaseRetriever`는 기본 `_aget_relevant_documents()`를 제공하고, 그 구현은 `run_in_executor(...)`로 동기 `_get_relevant_documents()`를 스레드풀에서 실행합니다. 이 fallback은 async 체인 안에서도 같은 인터페이스를 유지하려고 들어 있습니다. 다시 말해 `_aget_relevant_documents()`가 존재하는 이유는 두 가지입니다. 하나는 네이티브 async I/O를 쓰는 retriever가 직접 최적화된 구현을 내놓을 수 있게 하기 위해서이고, 다른 하나는 그런 구현이 없어도 Runnable async 인터페이스를 유지하기 위해서입니다.
 
-Public 메서드의 deprecation 의미도 여기서 정리됩니다. `get_relevant_documents()`와 `aget_relevant_documents()`는 0.1.46부터 deprecated이며, 각각 `invoke()`와 `ainvoke()`의 호환성 래퍼로만 남아 있습니다. 소스에는 removal target이 1.0으로 적혀 있습니다. 그래서 0.2.x 사용자가 “아직 동작하는데 왜 deprecated인가”라고 묻는다면 답은 명확합니다. 검색 로직의 중심이 이제 retriever 전용 public 메서드가 아니라 Runnable 표준 진입점으로 옮겨졌기 때문입니다. 앞으로는 retriever도 chain, model, parser와 같은 방식으로 `invoke()`와 `batch()`에 맞춰 조합된다는 뜻입니다.
+Public 메서드의 deprecation 의미도 여기서 정리됩니다. `get_relevant_documents()`와 `aget_relevant_documents()`는 0.1.46부터 deprecated이며, 각각 `invoke()`와 `ainvoke()`의 호환성 래퍼로만 남아 있습니다. 소스에는 removal target이 1.0으로 적혀 있습니다. 그래서 0.2.x 사용자가 “아직 동작하는데 왜 deprecated인가”라고 묻는다면 답은 명확합니다. 검색 로직의 중심이 이제 retriever 전용 public 메서드가 아니라 Runnable 표준 진입점으로 옮겨졌기 때문입니다. 앞으로는 retriever도 chain, model, parser처럼 `invoke()`와 `batch()`를 기준으로 조합됩니다.
 
 아래 예시는 `BaseRetriever` 규약을 가장 작게 드러내는 custom 구현입니다.
 
