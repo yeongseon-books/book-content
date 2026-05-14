@@ -2,7 +2,7 @@
 series: probability-101
 episode: 4
 title: Bayes' Theorem
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,60 +16,53 @@ tags:
   - Inference
   - Posterior
   - Beginner
-seo_description: Bayes' theorem walked through with the prior likelihood and posterior triangle, a medical screening example, sequential updates, and odds form
-last_reviewed: '2026-05-04'
+seo_description: See how Bayes' theorem updates belief with new evidence by combining priors, likelihoods, posteriors, sequential updates, and odds form.
+last_reviewed: '2026-05-15'
 ---
 
 # Bayes' Theorem
 
-This is post 4 in the Probability 101 series.
+At some point in probability, simple calculation stops being the whole story. The harder question becomes how to revise a belief once you see new data. Bayes' theorem is the rule that makes that update explicit.
 
-> Probability 101 series (4/10)
+It matters not just because the equation is elegant, but because the same structure appears in medical diagnosis, spam filtering, recommender systems, A/B testing, and reinforcement learning. Any time evidence arrives and a belief needs to move, Bayes is somewhere in the background.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Probability 101 series. Here we break Bayes' theorem into prior, likelihood, evidence, and posterior, then walk through a screening example, sequential updates, and the odds form that often makes the mechanics easier to see.
 
-**Core question**: How do our *beliefs update* when we *see new data*? One *equation* becomes the shared language of *AI, statistics, and decisions*.
+## What you will learn
 
-> *Posterior ∝ Likelihood × Prior.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *equation and intuition* of Bayes' theorem
-- The *prior / likelihood / posterior* triangle
-- *Odds* and *Bayes factors*
-- A 5-step Bayes exercise
-- Five common mistakes
+- What question Bayes' theorem actually answers
+- How priors, likelihoods, and posteriors play different roles
+- Why low base rates change the meaning of a positive result
+- How repeated evidence becomes sequential updates
+- Why the odds form is often easier to reason with
 
 ## Why It Matters
 
-Bayes' theorem is the *only consistent rule for updating uncertainty*. *Spam filtering, medical diagnosis, A/B tests, RL* all use it.
+Statements like “a positive result means the disease is present” fail because they compress too much into one line. What really matters is how the probability of the disease changes after a positive result, given the prior prevalence and the behavior of the test itself.
 
-> *Bayes' theorem is the engine of inference.*
+Bayes' theorem is the compact rule that ties those pieces together. It is both a formula for probability and a grammar for inference, which is why it keeps reappearing far outside classroom examples.
+
+> Bayes' theorem does not throw away what you believed before. It combines prior belief and new evidence in a consistent way.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Prior["Prior P(H)"] --> Update["Likelihood P(D|H)"]
-    Update --> Post["Posterior P(H|D)"]
-    Post --> NewPrior["Becomes new prior"]
-```
+![Concept at a Glance](../../../assets/probability-101/04/04-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
-- **Prior P(H)**: belief *before* seeing data.
-- **Likelihood P(D|H)**: probability of D *given* hypothesis H is true.
-- **Posterior P(H|D)**: belief *after* seeing data.
-- **Evidence P(D)**: *total probability of data* (normalization).
+- **Prior P(H)**: belief before seeing data.
+- **Likelihood P(D|H)**: probability of D given hypothesis H is true.
+- **Posterior P(H|D)**: belief after seeing data.
+- **Evidence P(D)**: total probability of data (normalization).
 - **Bayes factor**: P(D|H₁) / P(D|H₂).
 
 ## Before / After
 
-**Before**: *“Positive test → disease.”*
+**Before**: “Positive test means disease.” That is the shortcut people remember.
 
-**After**: *P(disease|+) = P(+|disease)·P(disease) / P(+)* — a low base rate gives a low *PPV*.
+**After**: P(disease | +) = P(+ | disease)·P(disease) / P(+). A low base rate can keep the posterior much lower than intuition expects.
 
 ## Hands-on: 5-step Bayes
 
@@ -115,46 +108,46 @@ print("posterior odds:", post_odds, "P:", post_odds / (1 + post_odds))
 
 ## What to Notice in This Code
 
-- A small *base rate* keeps *PPV* low even with a *sensitive test*.
-- The *posterior* becomes the next *prior* — *sequential updating*.
-- The *odds form* simplifies the arithmetic.
+- A small base rate keeps PPV low even with a sensitive test.
+- The posterior becomes the next prior — sequential updating.
+- The odds form simplifies the arithmetic.
 
 ## Five Common Mistakes
 
-1. **Treating *P(D|H)* as *P(H|D)*.**
-2. **Ignoring the *base rate*.**
-3. **Pretending *no prior* exists.**
-4. **Confusing *likelihood* with *probability*.**
-5. **Skipping the *independence assumption* in sequential updates.**
+1. **Treating P(D|H) as P(H|D).**
+2. **Ignoring the base rate.**
+3. **Pretending no prior exists.**
+4. **Confusing likelihood with probability.**
+5. **Skipping the independence assumption in sequential updates.**
 
 ## How This Shows Up in Production
 
-Spam filters (Naive Bayes), Bayesian A/B testing, medical diagnosis, RL *belief states* — *Bayesian inference* is the core of *probabilistic ML*.
+Spam filters (Naive Bayes), Bayesian A/B testing, medical diagnosis, RL belief states — Bayesian inference is the core of probabilistic ML.
 
 ## How a Senior Engineer Thinks
 
-- *Names* the prior.
-- Distinguishes *likelihood* from *probability*.
-- Uses *odds* and *Bayes factors*.
-- Validates *independence* in sequential updates.
-- Runs *sensitivity analyses*.
+- Names the prior.
+- Distinguishes likelihood from probability.
+- Uses odds and Bayes factors.
+- Validates independence in sequential updates.
+- Runs sensitivity analyses.
 
 ## Checklist
 
-- [ ] I know Bayes' theorem as a *formula*.
-- [ ] I separate *prior / likelihood / posterior*.
-- [ ] I can compute *PPV*.
-- [ ] I can do *sequential updating*.
+- [ ] I know Bayes' theorem as a formula.
+- [ ] I separate prior / likelihood / posterior.
+- [ ] I can compute PPV.
+- [ ] I can do sequential updating.
 
 ## Practice Problems
 
-1. With *base rate 0.001*, *sensitivity 0.99*, *specificity 0.99*, compute *PPV*.
-2. State the practical meaning of a *Bayes factor of 10*.
-3. Compare the posterior under a *strong* prior vs a *weak* prior.
+1. With base rate 0.001, sensitivity 0.99, specificity 0.99, compute PPV.
+2. State the practical meaning of a Bayes factor of 10.
+3. Compare the posterior under a strong prior vs a weak prior.
 
 ## Wrap-up and Next Steps
 
-Bayes' theorem is the *math of learning*. The next episode introduces *random variables* — handling *numeric outcomes*.
+Bayes' theorem is the math of learning. The next episode introduces random variables — handling numeric outcomes.
 
 <!-- toc:begin -->
 - [What Is Probability?](./01-what-is-probability.md)
