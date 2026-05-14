@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Distributed Tracing Basics</h1>
+<p>Metrics can tell you a request got slower, and logs can tell you a timeout happened somewhere. But once one request crosses several services, that still leaves the central question unanswered: where did the time go?</p>
+<p>Distributed tracing answers that by breaking one request into spans, preserving parent-child relationships, and carrying context across service boundaries.</p>
 <p>This is post 5 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When one request crosses <em>five services</em>, how do you tell <em>where it slowed down</em>?</p>
-<blockquote>
-<p><em>Distributed tracing binds </em>every span of a single request<em> under </em>one trace_id<em> and shows it as a </em>flow graph<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>span</em> and <em>trace</em></li>
@@ -80,12 +71,8 @@
 <p><em>Debugging a distributed system without tracing is </em>walking a maze blindfolded<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;request&quot;] --&gt; A[&quot;service A (span)&quot;]
-    A --&gt; B[&quot;service B (span)&quot;]
-    A --&gt; C[&quot;service C (span)&quot;]
-    B --&gt; D[&quot;DB span&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>One request becomes a trace tree whose spans show where latency accumulated across services and storage.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Trace</strong>: the <em>whole flow</em> of one request.</li>
@@ -129,6 +116,19 @@ ctx = extract(incoming_headers)  # at receiver: restore from headers
 <p><strong>Step 5 — Sampling</strong></p>
 <pre><code class="language-python">from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% only
+</code></pre>
+<h2>How to Verify a Slow Request</h2>
+<p>Tracing becomes valuable when you can point to one slow span instead of blaming the whole service.</p>
+<pre><code class="language-text">trace_id=9f3c...
+handle_request  2450ms
+├─ auth_check    120ms
+├─ payment_call 1980ms
+└─ db_write      210ms
+</code></pre>
+<pre><code class="language-text">Expected output:
+- The root span shows total request time.
+- One child span stands out as the bottleneck.
+- Matching logs with the same `trace_id` explain whether the issue was a timeout, retry storm, or upstream dependency failure.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
