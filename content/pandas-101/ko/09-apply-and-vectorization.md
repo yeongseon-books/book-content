@@ -17,7 +17,7 @@ tags:
   - Apply
   - Beginner
 seo_description: 성능을 결정하는 벡터화 원리와 apply 한계 및 대안을 익힙니다. np.where, map 등 효율적인 데이터 처리 패턴을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 적용 함수와 벡터화
@@ -44,11 +44,8 @@ Pandas를 어느 정도 쓰기 시작하면 코드가 돌아가는 것과 빠르
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Loop["for-loop"] -->|slow| Apply["apply"]
-    Apply -->|faster| Vec["vectorized (NumPy / Pandas ops)"]
-```
+![행 반복에서 열 단위 계산으로 넘어갈 때 성능이 달라지는 이유](../../../assets/pandas-101/09/09-01-concept-at-a-glance.ko.png)
+*행 반복에서 열 단위 계산으로 넘어갈 때 성능이 달라지는 이유*
 
 ## 핵심 용어
 
@@ -90,6 +87,17 @@ df = pd.DataFrame({"a": np.arange(1_000_000), "b": np.arange(1_000_000)})
 df["c"] = df["a"] + df["b"]   # fastest
 ```
 
+열 단위 계산은 백만 행처럼 큰 데이터에서도 같은 문법으로 유지됩니다. 실제 결과를 몇 행만 확인해도 루프 없이 전체가 한 번에 계산됐다는 감각을 잡을 수 있습니다.
+
+**예상 출력:**
+
+```text
+   a  b  c
+0  0  0  0
+1  1  1  2
+2  2  2  4
+```
+
 이 한 줄이 벡터화의 핵심입니다. 계산을 배열 단위로 넘기면 Pandas와 NumPy가 내부 최적화 경로를 사용할 수 있습니다.
 
 ### 4단계 - 조건 분기 벡터화하기
@@ -105,6 +113,17 @@ df["flag"] = np.where(df["a"] % 2 == 0, "even", "odd")
 ```python
 mapping = {0: "zero", 1: "one"}
 print(pd.Series([0, 1, 2]).map(mapping))
+```
+
+`map`은 코드 값 치환처럼 원소별 대응이 분명한 작업에 잘 맞습니다. 정의되지 않은 값은 `NaN`으로 남으므로 사전 범위를 점검하는 데도 도움이 됩니다.
+
+**예상 출력:**
+
+```text
+0    zero
+1     one
+2     NaN
+dtype: object
 ```
 
 값 치환이나 코드 변환은 `map`이 잘 맞습니다. 모든 경우를 `apply`로 처리하려고 하면 코드도 느려지고 의도도 흐려집니다.

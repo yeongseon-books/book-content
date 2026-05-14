@@ -1,8 +1,8 @@
 ---
 series: pandas-101
 episode: 9
-title: apply and Vectorization
-status: content-ready
+title: Apply and Vectorization
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Apply
   - Beginner
 seo_description: Learn the trap of apply and the power of NumPy and Pandas vectorization to make your data pipelines fast and idiomatic
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# apply and Vectorization
+# Apply and Vectorization
+
+Once you get comfortable with Pandas syntax, the next big lesson is that “working code” and “fast code” are not the same thing. `apply(axis=1)` often feels natural because it resembles row-by-row reasoning, but it becomes a bottleneck surprisingly quickly as datasets grow. Performance improves once you understand what Pandas is optimized to do well.
 
 This is post 9 in the Pandas 101 series.
 
-> Pandas 101 series (9/10)
+In this chapter, I do not want to ban `apply` as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when `map`, NumPy operations, or direct Series math are the better tools.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is *apply* really *faster than a for-loop*?
-
-> *apply is a *thin wrapper around for-loops*. Real speed comes from *vectorization*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The meaning of *vectorization*
 - The difference between *apply / map / vectorize*
@@ -42,17 +36,16 @@ This is post 9 in the Pandas 101 series.
 - A 5-step performance hands-on
 - Five common mistakes
 
+> Pandas gets fast when work moves to whole-column array math. The reason apply feels convenient and the reason it becomes slow are the same: it keeps pulling the computation back into Python one row at a time.
+
 ## Why It Matters
 
 Analysis speed can differ by *tens to hundreds of times*. *Vectorization* is the *essence of Pandas*, and *apply abuse* is the *most common antipattern*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Loop["for-loop"] -->|slow| Apply["apply"]
-    Apply -->|faster| Vec["vectorized (NumPy / Pandas ops)"]
-```
+![Why column-wise math outruns row-wise apply calls](../../../assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
+*Why column-wise math outruns row-wise apply calls*
 
 ## Key Terms
 
@@ -90,6 +83,17 @@ df = pd.DataFrame({"a": np.arange(1_000_000), "b": np.arange(1_000_000)})
 df["c"] = df["a"] + df["b"]   # fastest
 ```
 
+Even a three-row preview makes the win obvious: one column expression computes the whole result at once. The real speedup only grows as row counts rise.
+
+**Expected output:**
+
+```text
+   a  b  c
+0  0  0  0
+1  1  1  2
+2  2  2  4
+```
+
 ### Step 4 — np.where for conditional
 
 ```python
@@ -101,6 +105,17 @@ df["flag"] = np.where(df["a"] % 2 == 0, "even", "odd")
 ```python
 mapping = {0: "zero", 1: "one"}
 print(pd.Series([0, 1, 2]).map(mapping))
+```
+
+`map` is a precise fit for code translation tasks. It also leaves unmapped values behind as `NaN`, which makes gaps in the mapping easy to detect.
+
+**Expected output:**
+
+```text
+0    zero
+1     one
+2     NaN
+dtype: object
 ```
 
 ## What to Notice in This Code
@@ -142,7 +157,7 @@ ETL transforms, feature engineering, large reports — *vectorization* directly 
 2. Express a *3-tier condition* with *np.where*.
 3. Translate *country codes* to *country names* using *map*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Vectorization is the *essence of Pandas*. Next we cover a *real-world data analysis* example.
 
@@ -152,11 +167,11 @@ Vectorization is the *essence of Pandas*. Next we cover a *real-world data analy
 - [Reading CSV and Excel](./03-read-csv-and-excel.md)
 - [Filtering and Selection](./04-filtering-and-selection.md)
 - [Handling Missing Values](./05-missing-values.md)
-- [groupby](./06-groupby.md)
+- [Groupby and Aggregation](./06-groupby.md)
 - [Merge and Join](./07-merge-and-join.md)
 - [Time Series](./08-time-series.md)
-- **apply and Vectorization (current)**
-- Real-world Data Analysis (upcoming)
+- **Apply and Vectorization (current)**
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References
