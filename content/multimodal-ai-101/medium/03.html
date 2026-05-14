@@ -54,11 +54,20 @@
 </head>
 <body>
 <h1>Vision-Language Model Architecture</h1>
+<p>Most VLM discussions get lost in model names too early. The useful question is simpler: once an image encoder has emitted visual features, how do those features enter the LLM without blowing up context length, training cost, or multilingual behavior?</p>
 <p>This is post 3 in the Multimodal AI 101 series.</p>
+<p>Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?</li>
+<li>Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?</li>
+<li>When is the simplest adapter good enough, and when does token compression become mandatory?</li>
+<li>Why does fine-tuning policy matter as much as model family?</li>
+<li>Which evaluation slices expose the wrong architecture choice fastest?</li>
+</ul>
 <blockquote>
-<p>Multimodal AI 101 series (3/10)</p>
+<p>A VLM is not an LLM with magic vision added. It is a token contract that decides how much visual information can enter the language model, in what shape, and at what cost.</p>
 </blockquote>
-<hr>
 <h2>How VLMs give an LLM "eyes"</h2>
 <p>Episode 2 covered CLIP, which aligns image and text in the same space. To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and convert the table to markdown"), you need one more step: connecting image vectors so the LLM can consume them like tokens.</p>
 <p>VLM architectures split into three schools by how they wire that connection. LLaVA uses a projection. BLIP-2 uses a Q-Former. Flamingo inserts cross-attention into the LLM. This episode covers what each pattern was trying to solve and what trade-offs come with it.</p>
@@ -73,6 +82,8 @@
 [Text]  -&gt; Tokenizer -&gt; text tokens ----&gt; LLM -&gt; output
 </code></pre>
 <p>The Adapter is where schools differ. It is the module that converts visual features into a token sequence the LLM can understand.</p>
+<p><img alt="Common skeleton: Vision Encoder + Adapter + LLM" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png"><br>
+<em>Most architectural trade-offs in a VLM come from the adapter contract: how many visual tokens survive, how often they interact with text, and where the cost lands.</em></p>
 <h2>School 1: LLaVA - simple MLP projection</h2>
 <p>LLaVA is the simplest. It projects the CLIP image encoder output (e.g., 576 patches x 1024 dim) directly to the LLM hidden dim and prepends those tokens to the LLM input sequence.</p>
 <pre><code class="language-python">import torch
@@ -233,6 +244,14 @@ print(processor.decode(output[0], skip_special_tokens=True))
 <p>LLaVA-1.5 is built on Vicuna (LLaMA), which is weak in many non-English languages. For multilingual multimodal needs, pick a multilingual-strong base such as KoLLaVA, Qwen2-VL, or InternVL2.</p>
 <p><strong>5. Single-benchmark evaluation</strong></p>
 <p>VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, documents. Track MMMU, ChartQA, DocVQA, TextVQA, and RealWorldQA together to expose model weaknesses.</p>
+<h2>Operations checklist</h2>
+<ul>
+<li>[ ] We measure visual-token cost against the real context budget of the serving model</li>
+<li>[ ] We documented which layers stay frozen and which layers are allowed to train</li>
+<li>[ ] We test multilingual prompts separately from English-only benchmarks</li>
+<li>[ ] We evaluate document, chart, OCR, and real-photo workloads as separate slices</li>
+<li>[ ] We chose the adapter pattern based on serving constraints, not model popularity alone</li>
+</ul>
 <h2>Key Takeaways</h2>
 <ul>
 <li>Every VLM is vision encoder + adapter + LLM; the adapter design defines the school.</li>

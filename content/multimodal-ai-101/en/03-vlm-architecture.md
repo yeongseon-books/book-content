@@ -3,7 +3,7 @@ title: Vision-Language Model Architecture
 series: multimodal-ai-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,18 +16,28 @@ tags:
 - Q-Former
 - BLIP-2
 - Multimodal Fusion
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Episode 2 covered CLIP, which aligns image and text in the same space.
   To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and…
 ---
 
 # Vision-Language Model Architecture
 
+Most VLM discussions get lost in model names too early. The useful question is simpler: once an image encoder has emitted visual features, how do those features enter the LLM without blowing up context length, training cost, or multilingual behavior?
+
 This is post 3 in the Multimodal AI 101 series.
 
-> Multimodal AI 101 series (3/10)
+Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.
 
----
+## Questions this chapter answers
+
+- Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?
+- Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?
+- When is the simplest adapter good enough, and when does token compression become mandatory?
+- Why does fine-tuning policy matter as much as model family?
+- Which evaluation slices expose the wrong architecture choice fastest?
+
+> A VLM is not an LLM with magic vision added. It is a token contract that decides how much visual information can enter the language model, in what shape, and at what cost.
 
 ## How VLMs give an LLM "eyes"
 
@@ -50,6 +60,9 @@ Every VLM is a combination of three parts.
 ```
 
 The Adapter is where schools differ. It is the module that converts visual features into a token sequence the LLM can understand.
+
+![Common skeleton: Vision Encoder + Adapter + LLM](../../../assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
+*Most architectural trade-offs in a VLM come from the adapter contract: how many visual tokens survive, how often they interact with text, and where the cost lands.*
 
 ## School 1: LLaVA - simple MLP projection
 
@@ -206,6 +219,14 @@ LLaVA-1.5 is built on Vicuna (LLaMA), which is weak in many non-English language
 ### 5. Single-benchmark evaluation
 
 VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, documents. Track MMMU, ChartQA, DocVQA, TextVQA, and RealWorldQA together to expose model weaknesses.
+
+## Operations checklist
+
+- [ ] We measure visual-token cost against the real context budget of the serving model
+- [ ] We documented which layers stay frozen and which layers are allowed to train
+- [ ] We test multilingual prompts separately from English-only benchmarks
+- [ ] We evaluate document, chart, OCR, and real-photo workloads as separate slices
+- [ ] We chose the adapter pattern based on serving constraints, not model popularity alone
 
 ## Key Takeaways
 
