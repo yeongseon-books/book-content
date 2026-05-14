@@ -54,38 +54,27 @@
 </head>
 <body>
 <h1>Hypothesis Testing</h1>
-<p>This is post 7 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we <em>prove with data</em> that <em>“there is a difference”</em>? How likely is it that the difference <em>appeared by chance</em>?</p>
-<blockquote>
-<p><em>Hypothesis testing turns chance into a number.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In statistical work, we constantly run into questions about differences. Did the new button lift conversion? Is the new treatment better than the old one? Is the model improvement real, or just noise in the sample?</p>
+<p>Hypothesis testing exists because visible differences are not automatically meaningful differences. Samples always wobble. Without a formal procedure, it is easy to mistake random fluctuation for evidence.</p>
+<p>This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The meaning of <em>H0</em> and <em>H1</em></li>
-<li><em>t-test</em>, <em>chi-square</em>, <em>proportion</em> tests</li>
-<li><em>Type I / II errors</em> and <em>power</em></li>
-<li>A 5-step hypothesis testing exercise</li>
-<li>Five common mistakes</li>
+<li>How far can data support the claim that a difference exists?</li>
+<li>What do H0 and H1 actually mean?</li>
+<li>Why is p-value alone not enough?</li>
+<li>How are sample size and statistical power connected?</li>
 </ul>
+<blockquote>
+<p>Hypothesis testing turns chance into something we can reason about before we rush into a conclusion.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>A/B testing, campaign effects, model comparisons</em> — <em>half</em> of all <em>decisions</em> run on hypothesis testing. Asking <em>correctly</em> avoids both <em>overclaiming</em> and <em>underclaiming</em>.</p>
 <blockquote>
 <p><em>Asking the right question matters more than the answer.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    H0[&quot;H0: no difference&quot;] --&gt; Test[&quot;Test Statistic&quot;]
-    H1[&quot;H1: difference&quot;] --&gt; Test
-    Test --&gt; Pvalue[&quot;p-value&quot;]
-    Pvalue --&gt; Decide[&quot;Reject or Not&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Hypothesis testing starts from a no-difference world, measures how unusual the observed data would be there, and then compares that result to a threshold.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>H0 (Null Hypothesis)</strong>: <em>no difference</em>.</li>
@@ -114,14 +103,17 @@ b = np.random.normal(3.6, 1, 1000)
 stat, p = ttest_ind(a, b, equal_var=False)
 print(&quot;t:&quot;, stat, &quot;p:&quot;, p)
 </code></pre>
+<p><strong>Expected output:</strong> a line like <code>t: ... p: ...</code>, which gives the first formal signal for whether the gap is plausibly just chance.</p>
 <p><strong>Step 4 — Decide</strong></p>
 <pre><code class="language-python">print(&quot;Reject H0&quot; if p &lt; 0.05 else &quot;Fail to reject H0&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> in this example you will usually see <code>Reject H0</code>.</p>
 <p><strong>Step 5 — Effect size</strong></p>
 <pre><code class="language-python">diff = b.mean() - a.mean()
 pooled = np.sqrt((a.var(ddof=1) + b.var(ddof=1)) / 2)
 print(&quot;Cohen's d:&quot;, diff / pooled)
 </code></pre>
+<p><strong>Expected output:</strong> a Cohen's d value often around <code>0.3</code> to <code>0.5</code> for this synthetic setup, giving you magnitude rather than only significance.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Never decide from the p-value alone</em>.</li>
