@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>F1 Score</h1>
-<blockquote>
-<p>Model Evaluation 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you collapse precision and recall into a single number, what gets distorted?</p>
-<blockquote>
-<p><em>F1 is the harmonic mean. F-beta generalizes it by weighting one side over the other.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 5 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Once you understand why precision and recall both matter, the next temptation is obvious: compress them into a single score. F1 is usually the first answer because it is compact, easy to compare, and common in reports and leaderboards.</p>
+<p>But every summary discards detail. F1 tells you how balanced precision and recall are, yet it does not tell you which class is weak, which averaging mode was used, or whether the business cares more about misses than false alarms. It is a useful headline, not a full diagnosis.</p>
+<p>This is post 5 in the Model Evaluation 101 series. In this post, we unpack standard F1, F-beta, and the averaging choices that make superficially similar scores mean different things.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The formula and intuition behind F1</li>
 <li>F-beta for recall-heavy vs precision-heavy use cases</li>
@@ -74,15 +65,14 @@
 <li>What F1 means under class imbalance</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>F1 is a compact summary, not a complete explanation. You still need to name the averaging mode, the class behavior behind it, and the cost trade-off it hides.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Leaderboards usually report a single F1 number. Without specifying which F1, two models cannot be compared.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[&quot;precision&quot;] --&gt; F1[&quot;F1 = harmonic mean&quot;]
-    R[&quot;recall&quot;] --&gt; F1
-    F1 --&gt; Beta[&quot;F-beta with weight&quot;]
-    F1 --&gt; Avg[&quot;macro / micro / weighted&quot;]
-</code></pre>
+<p><img alt="f1 summary branching into averaging modes and f-beta choices" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>f1 summary branching into averaging modes and f-beta choices</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>F1</strong>: <code>2*P*R/(P+R)</code>.</li>
@@ -128,6 +118,7 @@ for t in np.arange(0.2, 0.9, 0.1):
     p = (proba &gt;= t).astype(int)
     print(round(t, 1), round(f1_score(yb, p), 3))
 </code></pre>
+<p><strong>Expected output:</strong> You should see micro, macro, and weighted F1 disagree on the same predictions, and the binary threshold sweep should make it obvious that F1 itself moves when the operating point moves.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Macro F1 treats minority classes equally.</li>
