@@ -3,7 +3,7 @@ title: Cleaning and Deduplication
 series: ai-data-preparation-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,18 +14,26 @@ tags:
 - Cleaning
 - Deduplication
 - MinHash
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 'Anyone who has worked on The Pile, C4, or RedPajama will tell you
   the same thing: the dedup stage delivers the biggest single quality improvement.'
 ---
 
 # Cleaning and Deduplication
 
-> AI Data Preparation 101 series (3/10)
-
 Teams that have processed large corpora tend to agree on one point: deduplication is one of the highest-leverage quality steps in the pipeline. You can change nothing about the model and still see better results by cleaning and removing repeated data correctly.
 
 This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cleaning transforms for raw text and the deduplication methods that keep training quality honest.
+
+## Questions this chapter answers
+
+- Which text-cleaning transforms are worth keeping because they solve measurable problems?
+- Why is exact dedup not enough for web-scale corpora?
+- How should you tune MinHash thresholds without creating too many false positives?
+- Why does train/eval cross-dedup matter more than raw corpus size?
+- In what order should cleaning, dedup, and splitting happen to avoid leakage?
+
+> Cleaning removes noise the model should never spend capacity on, while dedup removes repeated information the model would otherwise memorize. Both are quality controls, not cosmetic cleanup.
 
 ---
 ## "Is Deduplication Really That Important?"
@@ -238,6 +246,14 @@ Dedup before cleaning lets whitespace-different copies survive as distinct. Cros
 - Episode 4 covers PII detection and anonymization.
 
 ---
+
+## Operational checklist
+
+- [ ] Keep cleaning transforms small enough that each one targets an explainable noise pattern
+- [ ] Log rows in/out and character reduction whenever cleaning rules change
+- [ ] Normalize text before hashing so exact dedup catches whitespace-only variants
+- [ ] Run MinHash near-dedup before splitting the corpus
+- [ ] Cross-dedup train against every evaluation set and delete only from train
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series
