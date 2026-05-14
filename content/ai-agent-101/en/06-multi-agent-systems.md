@@ -15,7 +15,7 @@ tags:
 - Multi-Agent
 - Coordination
 - Delegation
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: Sometimes it's difficult to handle all tasks with a single agent.
   This happens when tasks span multiple domains, require different expertise at each…
 ---
@@ -45,6 +45,9 @@ This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, i
 ## Multi-Agent Patterns
 
 There are several patterns for handling complex tasks through cooperation among multiple agents.
+
+![Multi-Agent Patterns](../../../assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+*Multi-agent systems are easier to reason about when you draw them as delegation graphs: who routes work, who writes to shared state, and who is allowed to return the final answer.*
 
 ### Orchestrator Pattern (Centralized Coordination)
 
@@ -1034,16 +1037,9 @@ Handling individual agent failures explicitly increases system reliability.
 
 ## References
 
-1. **AutoGPT Multi-Agent Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
-   An autonomous system that demonstrates cooperation among multiple agents. Showcases the Orchestrator and Worker patterns.
-
-2. **LangGraph Multi-Agent Systems** - https://langchain-ai.github.io/langgraph/tutorials/multi_agent/  
-   LangGraph's multi-agent tutorial. Covers message routing and shared state.
-
-3. **CrewAI Documentation** - https://docs.crewai.com/  
-   A role-based multi-agent framework. Explains agent collaboration patterns and delegation strategies.
-
-4. **Microsoft Semantic Kernel: Agent Orchestration** - https://learn.microsoft.com/en-us/semantic-kernel/agents/  
-   Microsoft's guide to agent orchestration. Presents how to design hierarchical agent systems.
+- [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [LangGraph multi-agent workflows](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/)
+- [CrewAI documentation](https://docs.crewai.com/)
+- [Semantic Kernel agents overview](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/)
 
 Tags: AI Agent, LLM, Tool Use, Python
