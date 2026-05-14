@@ -18,7 +18,7 @@ tags:
   - Layers
   - Architecture
 seo_description: 계층 아키텍처의 구성, 허용된 의존 방향, 부패 방지 계층을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 계층 아키텍처
@@ -47,13 +47,8 @@ UI, 비즈니스 규칙, 인프라는 바뀌는 이유도 속도도 다릅니다
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    UI["Presentation"] --> APP["Application"]
-    APP --> DOM["Domain"]
-    APP --> INF["Infrastructure"]
-    INF --> DOM
-```
+![전체 그림](../../../assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
+*표현 계층과 애플리케이션 계층, 도메인, 인프라가 서로 다른 속도로 바뀌도록 나뉜 구조*
 
 계층 구조에서 먼저 기억할 점은 도메인이 가장 안정적인 중심이라는 사실입니다. 바깥 채널과 저장소는 도메인을 향해 붙지만, 도메인은 바깥 세부를 모르는 편이 좋습니다.
 
@@ -151,6 +146,31 @@ def to_domain_user(external_json):
 
 외부 API 응답을 도메인 모델로 바로 쓰기 시작하면 외부 스키마가 도메인 내부 어휘를 오염시킵니다. 번역 계층을 두면 외부 변경 충격을 그 지점에서 흡수할 수 있습니다.
 
+## 빠르게 검증해 보기
+
+라우터 하나를 열고 HTTP 처리, 유스케이스 흐름, 도메인 규칙, 저장소 접근이 몇 줄씩 섞여 있는지 세어 보세요. 계층이 무너진 코드는 이 네 종류가 한 함수 안에 모여 있는 경우가 많습니다.
+
+```text
+router lines: input parsing, status code, JSON response
+use-case lines: orchestration, transaction boundary
+domain lines: validation, policy, invariant
+infra lines: ORM call, SQL, SDK
+```
+
+**Expected output:** 표현 계층에는 HTTP 입출력만, 도메인에는 규칙만 남겨야 한다는 정리 포인트가 분명해집니다.
+
+작은 프로젝트라면 네 계층을 모두 강제할 필요는 없습니다. 다만 서로 다른 이유로 바뀌는 코드를 한 함수에 쌓아 두는 상태는 피해야 합니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 라우터 함수가 길고 테스트도 어렵다 | 업무 흐름이 표현 계층에 남아 있는지 봅니다 |
+| 도메인 모델에 ORM 세부가 많다 | 인프라가 도메인 안으로 새는지 확인합니다 |
+| 외부 SaaS 응답 필드명이 도메인 곳곳에 보인다 | 부패 방지 계층이 필요한지 점검합니다 |
+
+계층의 목적은 파일 구조를 예쁘게 만드는 것이 아니라, 바깥 변화가 안쪽 규칙을 직접 흔들지 못하게 막는 데 있습니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 의존성은 도메인을 향하도록 정리됩니다.
@@ -208,5 +228,11 @@ def to_domain_user(external_json):
 - [Domain-Driven Design — Layered Architecture](https://martinfowler.com/bliki/DomainDrivenDesign.html)
 - [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
 - [Anti-Corruption Layer Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer)
+
+### 실전 확인용 문서
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
+
 
 Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture
