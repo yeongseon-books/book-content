@@ -14,9 +14,8 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: Understand the AKS control plane boundary, the API server surface, and how to separate managed control-plane lag from node-side failures.
 ---
 
 # Control plane anatomy — what AKS hides from you
