@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Data Augmentation - From EDA to Back-Translation</h1>
+<p>Generating brand-new samples and transforming existing ones solve different problems. When you need broader coverage without paying the full cost of new annotation, augmentation is often the more controlled lever.</p>
+<p>This is post 8 in the AI Data Preparation 101 series. Here we cover when to use augmentation techniques such as EDA, back-translation, and paraphrasing.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>How is augmentation different from synthetic generation in the problem it solves?</li>
+<li>Which token-level transforms are safe enough for label-preserving text augmentation?</li>
+<li>Why is back-translation helpful for diversity but risky for fact-critical domains?</li>
+<li>What makes AST-level transforms safer than token edits for code corpora?</li>
+<li>How do you verify that augmentation improved robustness rather than just adding noise?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (8/10)</p>
+<p>Augmentation should widen the training distribution without breaking the original label semantics. If meaning does not survive, the new sample is just noise with extra compute attached.</p>
 </blockquote>
 <hr>
 <h2>"How is augmentation different from synthetic generation?"</h2>
@@ -199,6 +209,14 @@ print(rename_vars(&quot;def add(a, b): return a + b&quot;))
 <li>Episode 9 covers train/eval/test splitting and contamination control.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Define whether augmentation targets minority-class support or robustness before choosing a technique</li>
+<li>[ ] Keep augmentation train-only and protect validation and test sets from leakage</li>
+<li>[ ] Tune augmentation rate and paraphrase count against held-out metrics</li>
+<li>[ ] Deduplicate augmented samples that are too close to their source examples</li>
+<li>[ ] Maintain a short list of domain-specific transformations that change meaning and must stay banned</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>

@@ -3,7 +3,7 @@ episode: 8
 
 language: ko
 
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 
 series: ai-data-preparation-101
 
@@ -39,11 +39,9 @@ seo_description: 지난 편의 synthetic data generation은 LLM을 호출해 새
 
 운영에서는 augmentation을 “데이터를 부풀리는 쉬운 방법”으로 보면 실패합니다. 변환 비율이 지나치면 라벨 의미가 바뀌고, validation set까지 손대면 누수가 생기며, 한국어에서는 영어용 EDA를 그대로 쓰기 어렵습니다.
 
+이 글은 AI Data Preparation 101 시리즈의 8번째 글입니다. 여기서는 EDA, back-translation, paraphrase model, 코드용 AST transform을 중심으로 증강 전략을 비교하고, 실제로 도움이 되었는지 평가하는 방법을 정리하겠습니다.
+
 따라서 증강의 본질은 양을 늘리는 것이 아니라, 원래 라벨 의미를 지키면서 학습 분포를 적절히 넓히는 것입니다. 이 기준이 흔들리면 증강은 노이즈 생성기로 바뀝니다.
-
-이 글은 AI Data Preparation 101 시리즈의 8번째 글입니다.
-
-여기서는 EDA, back-translation, paraphrase model, 코드용 AST transform을 중심으로 증강 전략을 비교하고, 실제로 도움이 되었는지 평가하는 방법을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
