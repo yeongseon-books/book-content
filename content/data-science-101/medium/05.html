@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Exploratory Data Analysis</h1>
+<p>Exploratory data analysis is the stage where the dataset stops being an abstraction and starts behaving like evidence. Before EDA, you mostly have assumptions: which variables matter, what “typical” looks like, and whether the data is even shaped the way the problem statement implied.</p>
+<p>EDA is how you replace those assumptions with observations. If you skip it, you often build a model that is technically correct for the wrong picture of the data. If you do it well, you discover the distributions, gaps, and relationships that should shape every later decision.</p>
+<p>This is post 5 in the Data Science 101 series. Here we walk through a compact but production-friendly EDA loop that helps you read the dataset before you try to optimize it.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>What should you inspect before building any model or dashboard?</li>
+<li>Why are distribution shape and missingness often more important than the mean?</li>
+<li>How do cardinality and pairwise relationships shape later modeling choices?</li>
+<li>What does correlation tell you, and what can it never prove?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (5/10)</p>
+<p>EDA is the fastest way to replace assumptions about the dataset with observations you can verify.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Before you build any model, how do you read the <em>shape of the data</em> — <em>quickly</em> and <em>correctly</em>?</p>
-<blockquote>
-<p><em>EDA is the </em>data's self-introduction<em> you must read before any model.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 5 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>purpose</em> and <em>order</em> of EDA</li>
@@ -80,12 +81,8 @@
 <p><em>A model only </em>imitates<em> the data it was given.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Shape[&quot;Shape &amp; dtypes&quot;] --&gt; Dist[&quot;1D Distribution&quot;]
-    Dist --&gt; Pair[&quot;2D Relations&quot;]
-    Pair --&gt; Miss[&quot;Missing Patterns&quot;]
-    Miss --&gt; Corr[&quot;Correlation&quot;]
-</code></pre>
+<p><img alt="The EDA reading order from dataset shape through distributions, missingness, and correlation" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>The EDA reading order from dataset shape through distributions, missingness, and correlation</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Skewness</strong>: how <em>asymmetric</em> a distribution is.</li>
@@ -121,6 +118,7 @@ sns.scatterplot(data=df.sample(2000), x=&quot;quantity&quot;, y=&quot;amount&quo
 <pre><code class="language-python">print(df.isna().mean().sort_values(ascending=False).head())
 print(df.select_dtypes(&quot;number&quot;).corr().round(2))
 </code></pre>
+<p><strong>Expected output:</strong> an EDA note that lists the core distribution summary, high-cardinality columns, and the top missingness signals.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>describe</code> is a <em>starting point</em>, not the answer — always pair with a <em>distribution plot</em>.</li>
