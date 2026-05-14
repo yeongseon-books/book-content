@@ -54,101 +54,101 @@
 </head>
 <body>
 <h1>Traits of a Good Project</h1>
-<p>This is post 2 in the Portfolio Project 101 series.</p>
+<p>It is tempting to think a portfolio project becomes stronger as you keep adding features. In practice, the opposite is often true. As the scope grows, the finish quality usually drops, the core problem gets harder to explain, and the result becomes harder to defend.</p>
+<p>The projects that leave a strong impression are rarely the biggest ones. They are the ones that stay focused, reach a clear endpoint, and make their outcome easy to verify.</p>
+<p>This is post 2 in the Portfolio Project 101 series. Here we will look at the traits that make a project feel strong from a hiring perspective, and why completion, clarity, and reproducibility usually matter more than sheer feature count.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (2/10)</p>
+<p>Good projects win with focus, visible results, and repeatable verification—not with an endless feature list.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is a <em>bigger project</em> <em>always</em> a <em>better project</em>?</p>
-<blockquote>
-<p><em>Completion</em> and <em>clear problem framing</em> matter <em>much more</em> than <em>size</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Small but complete</em> projects</li>
-<li>A <em>clear problem</em></li>
-<li><em>Measurable</em> results</li>
-<li><em>Maintainability</em></li>
-<li><em>Reproducibility</em></li>
+<li>Why is a bigger project not automatically a better portfolio project?</li>
+<li>How do problem clarity, measurable results, maintainability, and reproducibility show up in practice?</li>
+<li>What makes a small project still feel strong and credible?</li>
+<li>What signals do reviewers trust more than a flashy stack?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Knowing the <em>traits</em> shows where to <em>focus</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[Focused] --&gt; P[Problem Clear]
-    P --&gt; R[Result Measurable]
-    R --&gt; M[Maintainable]
-    M --&gt; X[Reproducible]
-</code></pre>
+<p>Once you know what makes a project strong, you can spend your time in the right places. Many beginners keep investing in new features while leaving the README, tests, deployment quality, and reproducibility for later. Reviewers often do the reverse: they check finish quality first because it tells them how the project was actually carried.</p>
+<p>A portfolio is not product marketing. It is evidence of engineering judgment. That means the best question is not “How much did I build?” but “What did I solve, how far did I take it, and can another person verify the result?”</p>
+<h2>Mental Model</h2>
+<p>A strong project usually connects five traits in one chain: focus, problem clarity, measurable results, maintainability, and reproducibility.</p>
+<p><img alt="How focus, clarity, results, maintainability, and reproducibility connect" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>How focus, clarity, results, maintainability, and reproducibility connect</em></p>
+<p>The chain matters because each quality reinforces the next one. A smaller scope makes it easier to explain the problem clearly. A clear problem makes results easier to measure. Measured results are easier to trust when the code is maintainable and the whole project is reproducible.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>focused</strong>: <em>small scope</em>.</li>
-<li><strong>clear problem</strong>: <em>unambiguous</em>.</li>
-<li><strong>measurable</strong>: <em>numeric</em> result.</li>
-<li><strong>maintainable</strong>: <em>editable</em>.</li>
-<li><strong>reproducible</strong>: <em>replayable</em>.</li>
+<li><strong>Focused scope</strong>: a project centered on a few core flows instead of an expanding feature map.</li>
+<li><strong>Clear problem</strong>: a problem statement you can explain in one sentence.</li>
+<li><strong>Measurable result</strong>: a concrete number or observable change.</li>
+<li><strong>Maintainability</strong>: signs that the project can be edited and verified later.</li>
+<li><strong>Reproducibility</strong>: a setup another person can run again with the same outcome.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: A <em>10-feature</em> <em>unfinished</em> app.</p>
-<p><strong>After</strong>: A <em>3-feature</em> <em>complete</em> app.</p>
-<h2>Hands-on: Trait Table</h2>
-<p><strong>Step 1 — Scope score</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: a ten-feature project that never quite reaches a polished state.</p>
+<p><strong>After</strong>: a three-feature project with a clear problem, a stable demo path, and a repeatable run setup.</p>
+<p>The second project is stronger because the reviewer can see what was attempted, what was finished, and how the result can be checked. That is much easier to trust.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Check the scope</strong></p>
+<p>A portfolio project should be small enough to finish deliberately.</p>
 <pre><code class="language-python">focus = 5
 </code></pre>
-<p><strong>Step 2 — Problem clarity</strong></p>
+<p>The number itself is not important. What matters is whether the core features all point at one problem instead of splitting the project into unrelated directions.</p>
+<p><strong>Step 2 — Rate the problem clarity</strong></p>
+<p>A vague project idea creates vague engineering choices.</p>
 <pre><code class="language-python">problem_score = 4
 </code></pre>
-<p><strong>Step 3 — Result metrics</strong></p>
+<p>“Schedule management app” is weak. “A tool that pulls scattered team schedules into one view” is much stronger because it tells the reviewer why the project exists.</p>
+<p><strong>Step 3 — Capture results in numbers</strong></p>
+<p>Good projects talk about outcomes with data, even if the numbers are small.</p>
 <pre><code class="language-python">result = {&quot;latency_ms&quot;: 120, &quot;users&quot;: 30}
 </code></pre>
-<p><strong>Step 4 — Maintainability</strong></p>
+<p>Metrics make it easier to ask better questions. They also keep the project grounded in observable behavior instead of abstract satisfaction.</p>
+<p><strong>Step 4 — Show maintainability</strong></p>
+<p>Running once is not enough. A project should show signs that it can survive later edits.</p>
 <pre><code class="language-python">maintainable = {&quot;tests&quot;: True, &quot;docs&quot;: True}
 </code></pre>
-<p><strong>Step 5 — Reproducibility</strong></p>
+<p>Tests and documentation are small but strong signals. They show that the project was not left in a one-off state.</p>
+<p><strong>Step 5 — Make it reproducible</strong></p>
+<p>A reviewer should not have to rely on your laptop state.</p>
 <pre><code class="language-python">reproducible = {&quot;docker&quot;: True, &quot;seed&quot;: True}
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>Container setup, seed data, and explicit run commands all reduce ambiguity. A project that only works in the author’s environment usually gets weaker the more you explain it.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li><em>Small scope</em> leads to <em>completion</em>.</li>
-<li><em>Results</em> are <em>numeric</em>.</li>
-<li><em>Reproducibility</em> uses <em>containers</em>.</li>
+<li>Smaller scope usually produces better finish quality and clearer explanation.</li>
+<li>Numeric results are easier to trust and compare.</li>
+<li>Reproducibility is one of the clearest signs that the project was carried to a real endpoint.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>Stacking <em>features</em> only.</strong></li>
-<li><strong>An <em>abstract</em> problem.</strong></li>
-<li><strong>No <em>results</em>.</strong></li>
-<li><strong>No <em>tests</em>.</strong></li>
-<li><strong>No <em>Docker</em>.</strong></li>
+<li>Adding features until the original problem gets blurry.</li>
+<li>Leaving results unmeasured, so the project sounds better than it proves.</li>
+<li>Treating tests and docs as optional cleanup work.</li>
+<li>Shipping no container or seed path, so other people cannot reproduce the environment.</li>
+<li>Refusing to reduce scope, which usually lowers the final quality.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>OSS projects also start from <em>small scope + clear results</em>.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li><em>Completion</em> beats <em>size</em>.</li>
-<li>A <em>clear problem</em> gives <em>code</em> purpose.</li>
-<li><em>Results</em> are <em>numeric</em>.</li>
-<li><em>Maintainability</em> is <em>standard</em>.</li>
-<li><em>Reproducibility</em> uses <em>Docker</em>.</li>
-</ul>
+<p>Good projects are not defined by how much they attempt. They are defined by how clearly they finish.</p>
+<h2>How This Reads in Practice</h2>
+<p>Most well-run open source and early-stage product projects also begin with a narrow, obvious goal. They stabilize the core flow before they widen the surface area. Your portfolio is judged the same way.</p>
+<p>Even a small project can feel strong when it has a clear problem, visible results, and a reproducible path. A larger project with vague boundaries often feels much weaker.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Three</em> features or fewer.</li>
-<li>[ ] <em>One-line</em> problem.</li>
-<li>[ ] <em>Numeric</em> result.</li>
-<li>[ ] <em>Docker + tests</em>.</li>
+<li>[ ] I deliberately reduced the project scope.</li>
+<li>[ ] I can explain the problem in one sentence.</li>
+<li>[ ] I have at least one metric or concrete result.</li>
+<li>[ ] I prepared tests, docs, or a reproducible run path.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>small scope</em> in one line.</li>
-<li>State <em>measurable result</em> in one line.</li>
-<li>State the meaning of <em>reproducibility</em> in one line.</li>
+<li>Name one feature you could remove today without hurting the core value.</li>
+<li>Rewrite your problem statement in a more specific sentence.</li>
+<li>List two numbers you could use to describe the result.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Writing the README</em>.</p>
+<p>Strong portfolio projects do not need to be large. They need to be focused, measurable, maintainable, and reproducible. When those traits line up, even a small project becomes persuasive.</p>
+<p>Next, we will move to the repository entrance itself and look at how the README should present that value.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><strong>Traits of a Good Project (current)</strong></li>
@@ -163,10 +163,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.dreamsongs.com/RiseOfWorseIsBetter.html">Worse Is Better - Richard Gabriel</a></li>
-<li><a href="https://www.amazon.com/Laws-Simplicity-Design-Technology-Business/dp/0262134721">Less is More - John Maeda</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
 <li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer</a></li>
-<li><a href="https://12factor.net/">12 Factor App</a></li>
+<li><a href="https://opensource.guide/starting-a-project/">Open Source Guides — Starting a project</a></li>
+<li><a href="https://basecamp.com/gettingreal/08.4-start-with-no">Getting Real — Start with no</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Quality, Scope, Project, Beginner</p>
 </body>

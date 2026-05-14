@@ -17,7 +17,7 @@ tags:
   - Project
   - Beginner
 seo_description: 문제 해결 능력과 기술적 깊이를 보여줄 수 있는 '좋은 프로젝트'의 조건을 살펴보고, 프로젝트 범위를 효과적으로 설정합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 좋은 프로젝트의 조건
@@ -45,13 +45,9 @@ last_reviewed: '2026-05-12'
 
 좋은 프로젝트는 초점, 문제 선명도, 결과, 유지보수성, 재현성이 한 흐름으로 이어집니다.
 
-```mermaid
-flowchart LR
-    F[Focused] --> P[Problem Clear]
-    P --> R[Result Measurable]
-    R --> M[Maintainable]
-    M --> X[Reproducible]
-```
+![좋은 프로젝트를 이루는 다섯 가지 조건의 연결](../../../assets/portfolio-project-101/02/02-01-diagram.ko.png)
+
+*좋은 프로젝트를 이루는 다섯 가지 조건의 연결*
 
 이 흐름은 단순한 평가표가 아닙니다. 범위가 작아야 문제를 또렷하게 설명할 수 있고, 문제가 또렷해야 결과를 수치로 보여 주기 쉽고, 그 결과를 믿게 하려면 유지보수성과 재현성이 뒤따라야 합니다. 좋은 프로젝트는 이 연결이 매끄럽습니다.
 
