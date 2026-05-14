@@ -136,7 +136,7 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ---
 
-## Retriever 만들기
+## 리트리버 만들기
 
 ![similarity mmr threshold 검색 경로](../../../assets/langchain-101/03/03-02-creating-a-retriever.ko.png)
 
@@ -267,7 +267,7 @@ for question in questions:
 
 <!-- injected-output:end -->
 
-핵심은 이 입력 dict입니다.
+체인에 넘기는 입력은 아래처럼 생깁니다.
 
 ```python
 {
