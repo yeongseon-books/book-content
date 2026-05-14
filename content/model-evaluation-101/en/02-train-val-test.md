@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 2
 title: Train, Validation, and Test
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: How to separate train, validation, and test sets, prevent leakage and group spillover, and split time-series data correctly with scikit-learn
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Train, Validation, and Test
 
-> Model Evaluation 101 series (2/10)
+Model quality is often decided long before you compute the first metric. If the split is wrong, every number that follows can still look polished while being untrustworthy. Leakage from preprocessing, random splits on time-series data, or the same user showing up in multiple splits can all inflate performance fast.
 
-<!-- a-grade-intro:begin -->
+That is why train, validation, and test are not textbook ceremony. They are a discipline for separating learning, selection, and final verification. Once those roles blur together, evaluation stops being evidence and starts becoming wishful thinking.
 
-**Core question**: Why must validation and test be separate?
+This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
 
-> *Train fits, validation tunes, and test is touched exactly once. The discipline of three roles is the foundation of all evaluation.*
-
-<!-- a-grade-intro:end -->
-
-This is post 2 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The role of each dataset
 - Different forms of data leakage
@@ -42,19 +36,17 @@ This is post 2 in the Model Evaluation 101 series.
 - Group-aware splitting to prevent group leakage
 - Five common pitfalls
 
+> Train fits, validation tunes, and test is touched exactly once. When those roles mix together, evaluation stops being trustworthy.
+
 ## Why It Matters
 
 A wrong split invalidates every measurement that follows. Model comparisons become misleading.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    All["all data"] --> Tr["train (fit)"]
-    All --> Va["valid (tune)"]
-    All --> Te["test (final)"]
-```
+![dataset split into train validation and test roles](../../../assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
 
+*dataset split into train validation and test roles*
 ## Key Terms
 
 - **Train**: data used for fitting.
@@ -118,6 +110,8 @@ sc = StandardScaler().fit(Xtr)
 m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
 print("valid:", m.score(sc.transform(Xva), yva))
 ```
+
+**Expected output:** You should see that fitting transforms on the full dataset quietly leaks statistics, while time-aware and group-aware splits preserve the boundary between what the model is allowed to know and what it must still prove.
 
 ## What to Notice in This Code
 

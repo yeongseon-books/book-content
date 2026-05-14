@@ -17,7 +17,7 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: 일반화 성능 보장을 위한 데이터 분할 방법과 데이터 누수를 방지하여 신뢰할 수 있는 실험 환경을 구축하는 원칙을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 훈련·검증·테스트 데이터 나누기
@@ -48,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    All["all data"] --> Tr["train (fit)"]
-    All --> Va["valid (tune)"]
-    All --> Te["test (final)"]
-```
+![학습 검증 테스트로 나뉜 데이터 분할 구조](../../../assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
 
+*학습 검증 테스트로 나뉜 데이터 분할 구조*
 먼저 나누고, 그다음 학습해야 합니다. 전처리 역시 같은 원칙을 따릅니다. 나누기 전에 전체를 들여다보며 통계를 맞추는 순간, 답이 조금씩 새어 들어갑니다.
 
 ## 핵심 용어
@@ -120,6 +116,8 @@ sc = StandardScaler().fit(Xtr)
 m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
 print("valid:", m.score(sc.transform(Xva), yva))
 ```
+
+**예상 결과:** 전체 데이터에 맞춘 스케일러와 훈련 세트에만 맞춘 스케일러의 차이가 왜 중요한지 감이 와야 합니다. 시간 순서와 그룹 경계를 지키는 분할이 단순한 형식이 아니라 평가 신뢰도를 지키는 장치라는 점이 핵심입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
