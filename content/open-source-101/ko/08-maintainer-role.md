@@ -17,7 +17,7 @@ tags:
   - Burnout
   - Beginner
 seo_description: 메인테이너의 책임을 기술적 판단을 넘어 운영과 경계 설정, 위임의 관점에서 정의하고 지속 가능한 프로젝트 유지 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 메인테이너의 역할
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 메인테이너 일을 한 줄로 그리면
 
-```mermaid
-flowchart LR
-    T[트리아지] --> R[리뷰]
-    R --> Re[릴리스]
-    Re --> D[위임]
-```
+![메인테이너 일을 한 줄로 그리면](../../../assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
 
+*트리아지, 리뷰, 릴리스, 위임이 하나의 운영 루프로 이어지는 메인테이너 일상*
 이 순서가 중요한 이유는 일이 쌓이는 방식이 이 흐름을 따르기 때문입니다. triage가 흔들리면 리뷰가 밀리고, 리뷰가 밀리면 릴리스가 늦어지고, 릴리스가 늦어지면 메인테이너에게 더 많은 요청이 몰립니다. 결국 위임이 없으면 루프 전체가 막힙니다.
 
 그래서 메인테이너십은 기술 업무의 확장판이 아닙니다. 운영과 경계 설정이 더해진 별도 역할에 가깝습니다. 혼자 더 열심히 버틴다고 해결되지 않는 문제가 많습니다.
@@ -171,5 +167,6 @@ GitHub Org → Teams → write permission
 - [Bus factor](https://en.wikipedia.org/wiki/Bus_factor)
 - [Maintainer Burnout](https://opensource.guide/maintainer-mental-health/)
 - [GitHub Teams](https://docs.github.com/en/organizations/organizing-members-into-teams)
+- [github/maintainers 저장소](https://github.com/github/maintainers)
 
 Tags: OpenSource, Maintainer, Triage, Burnout, Beginner
