@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
@@ -95,6 +95,8 @@ for chunk in stream:
     print(chunk)
 ```
 
+처음에는 이 출력이 장황해 보이지만, 일부 청크는 텍스트가 아니라 제어 정보만 담는다는 사실을 눈으로 확인하는 데 도움이 됩니다. 스트리밍을 디버깅할 때는 한 번쯤 raw chunk를 그대로 출력해 보는 편이 좋습니다.
+
 이제 응답은 하나의 문자열이 아니라 청크들의 시퀀스입니다. 애플리케이션은 이 시퀀스에서 사용자에게 보여 줄 텍스트만 골라내야 합니다.
 
 ![청크 안에서 텍스트와 종료 정보를 읽는 구조](../../../assets/llm-app-foundations-101/06/06-02-extracting-text-from-each-chunk.ko.png)
@@ -132,6 +134,15 @@ final_text = "".join(parts)
 print("\n---")
 print(final_text)
 ```
+
+<!-- injected-output:start -->
+**출력 예시**
+
+    FastAPI is a modern Python framework for building APIs, while Flask is a minimal web framework that gives you more manual control. FastAPI includes data validation and automatic docs by default, whereas Flask starts smaller and lets you assemble those pieces yourself. Beginners often find FastAPI faster for API-first projects and Flask easier to understand when learning core web concepts.
+    ---
+    FastAPI is a modern Python framework for building APIs, while Flask is a minimal web framework that gives you more manual control. FastAPI includes data validation and automatic docs by default, whereas Flask starts smaller and lets you assemble those pieces yourself. Beginners often find FastAPI faster for API-first projects and Flask easier to understand when learning core web concepts.
+
+<!-- injected-output:end -->
 
 여기서 중요한 습관은 `delta.content`가 비어 있을 수 있음을 정상으로 취급하는 것입니다. 일부 청크는 텍스트가 아니라 역할 정보나 종료 신호만 담을 수 있습니다.
 
@@ -178,6 +189,15 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
+
+<!-- injected-output:start -->
+**출력 예시**
+
+    Asyncio helps web servers because one request can wait on network or database I/O without freezing the whole worker. While that request is waiting, the event loop can schedule other connections and keep throughput high. This matters most when your server spends more time waiting on external systems than using CPU.
+    ---
+    Asyncio helps web servers because one request can wait on network or database I/O without freezing the whole worker. While that request is waiting, the event loop can schedule other connections and keep throughput high. This matters most when your server spends more time waiting on external systems than using CPU.
+
+<!-- injected-output:end -->
 
 작은 CLI 도구라면 동기 스트리밍이 충분하고, FastAPI 같은 다중 사용자 서버라면 비동기 스트리밍이 더 자연스럽습니다.
 
@@ -226,6 +246,33 @@ else:
     print("usage metadata was not present in the final chunk")
 ```
 
+마지막 청크 메타데이터가 비어 있는 상황도 운영에서는 충분히 나올 수 있습니다. 프록시가 연결을 먼저 닫았거나, SDK 버전이 바뀌었거나, 중간에 클라이언트가 취소했을 수 있기 때문입니다. 그래서 usage는 가능하면 마지막 청크와 서버 로그 두 군데에서 함께 잡는 편이 안전합니다.
+
+실전에서는 중단·타임아웃·부분 저장까지 한 번에 다루는 소비 함수를 두면 편합니다.
+
+```python
+import time
+
+def consume_stream(stream) -> tuple[str, float | None]:
+    parts: list[str] = []
+    first_token_at: float | None = None
+    started_at = time.perf_counter()
+
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if not delta:
+            continue
+
+        if first_token_at is None:
+            first_token_at = time.perf_counter() - started_at
+
+        parts.append(delta)
+
+    return "".join(parts), first_token_at
+```
+
+이 함수가 주는 핵심 값은 두 가지입니다. 첫째, 최종 본문을 안전하게 재구성합니다. 둘째, 사용자가 실제로 처음 글자를 본 시점인 time to first token을 측정합니다. 스트리밍 품질은 총 시간보다 이 지표에서 더 잘 드러나는 경우가 많습니다.
+
 현업에서는 보통 마지막 청크 메타데이터와 서버 쪽 요청 단위 계측을 함께 둡니다. 이유는 스트리밍 경로가 중간 연결 종료, 프록시 동작, SDK 변경 같은 운영 변수에 더 민감하기 때문입니다.
 
 스트리밍은 UI뿐 아니라 파일 저장과 파이프라인 연결에도 유용합니다. 긴 초안 생성 중간 결과를 바로 파일에 flush할 수도 있고, 문장 단위로 버퍼링해 다른 소비자에게 넘길 수도 있습니다. 핵심은 스트림을 “터미널 출력”이 아니라 “중간에 끼워 넣을 수 있는 데이터 흐름”으로 보는 것입니다. 이제 서버에서 브라우저로 릴레이하는 패턴까지 보면 스트리밍의 제품적 위치가 더 선명해집니다.
@@ -263,6 +310,8 @@ async def chat_stream(prompt: str) -> StreamingResponse:
 
     return StreamingResponse(event_gen(), media_type="text/event-stream")
 ```
+
+여기서 자주 만나는 실패 모드도 미리 염두에 두는 편이 좋습니다. 브라우저가 중간에 연결을 끊으면 서버는 스트림 정리를 해야 하고, 역방향 프록시가 버퍼링을 켜 두면 청크가 한꺼번에 밀려올 수 있으며, 종료 이벤트가 빠지면 프런트엔드는 정상 완료와 네트워크 실패를 구분하기 어렵습니다. 따라서 SSE 릴레이는 단순 출력 코드처럼 보여도 실제로는 종료 신호와 취소 처리까지 포함한 전송 프로토콜에 가깝습니다.
 
 이 패턴에서는 브라우저에 API 키를 노출하지 않고, 인증·프롬프트 정책·사용량 로깅을 서버에 유지할 수 있습니다. 또한 `[done]` 같은 명시적 종료 이벤트를 보내야 클라이언트가 정상 종료와 네트워크 실패를 구분하기 쉬워집니다.
 
