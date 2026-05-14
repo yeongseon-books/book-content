@@ -2,7 +2,7 @@
 series: oop-101
 episode: 7
 title: Composition vs Inheritance
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,7 @@ tags:
   - Inheritance
   - Design Patterns
 seo_description: Compare composition and inheritance, learn when to use each, and apply delegation and dependency injection patterns.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Composition vs Inheritance
@@ -64,6 +64,9 @@ Inheritance (is-a)                Composition (has-a)
 └─────────────┘
 Tight coupling                 Loose coupling
 ```
+
+![Concept Overview](../../../assets/oop-101/07/07-01-concept-overview.en.png)
+*The composition-versus-inheritance decision starts with substitutability and change radius, not with how much code you can reuse.*
 
 ## Key Concepts
 
@@ -328,6 +331,15 @@ except HttpError as e:
 "Favor composition over inheritance" does not mean "never use inheritance." Exception hierarchies, Enum extensions, and ABC implementations are natural places for inheritance where is-a is clear.
 
 The decision rule is simple: "Can a child object be used wherever a parent type is expected?" (Liskov Substitution Principle). If yes, use inheritance. If no, use composition.
+
+## Failure Modes That Push Teams Back to Composition
+
+| Failure mode | First symptom you notice | Refactoring direction |
+|--------------|--------------------------|-----------------------|
+| Editing the parent breaks multiple children at once | One "small" shared change causes unrelated test failures | Keep only the common contract and move variable behavior into strategies |
+| One child accumulates exception rules | Overrides fill up with `if` branches and special cases | Extract that responsibility into an internal collaborator |
+| Behavior must change at runtime | Config-driven branching grows faster than the hierarchy | Switch to constructor injection plus a strategy object |
+| Parent initialization is too heavy for tests | Every child test must construct the whole parent dependency graph | Move assembly into a separate layer and inject only what is needed |
 
 ## Checklist
 

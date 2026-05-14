@@ -93,6 +93,8 @@
 └─────────────┘
 Tight coupling                 Loose coupling
 </code></pre>
+<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png"><br>
+<em>The composition-versus-inheritance decision starts with substitutability and change radius, not with how much code you can reuse.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Composition</strong><br>
 - Description: An object contains other objects as attributes</p>
@@ -324,6 +326,19 @@ except HttpError as e:
 <h2>How Senior Engineers Think About This</h2>
 <p>"Favor composition over inheritance" does not mean "never use inheritance." Exception hierarchies, Enum extensions, and ABC implementations are natural places for inheritance where is-a is clear.</p>
 <p>The decision rule is simple: "Can a child object be used wherever a parent type is expected?" (Liskov Substitution Principle). If yes, use inheritance. If no, use composition.</p>
+<h2>Failure Modes That Push Teams Back to Composition</h2>
+<p><strong>Editing the parent breaks multiple children at once</strong><br>
+- First symptom you notice: One "small" shared change causes unrelated test failures<br>
+- Refactoring direction: Keep only the common contract and move variable behavior into strategies</p>
+<p><strong>One child accumulates exception rules</strong><br>
+- First symptom you notice: Overrides fill up with <code>if</code> branches and special cases<br>
+- Refactoring direction: Extract that responsibility into an internal collaborator</p>
+<p><strong>Behavior must change at runtime</strong><br>
+- First symptom you notice: Config-driven branching grows faster than the hierarchy<br>
+- Refactoring direction: Switch to constructor injection plus a strategy object</p>
+<p><strong>Parent initialization is too heavy for tests</strong><br>
+- First symptom you notice: Every child test must construct the whole parent dependency graph<br>
+- Refactoring direction: Move assembly into a separate layer and inject only what is needed</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can distinguish is-a relationships from has-a relationships</li>
