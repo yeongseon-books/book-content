@@ -17,47 +17,36 @@ tags:
   - Database
   - Postgres
 seo_description: Safely insert, change, and remove data — transactions, UPSERT, RETURNING, and the habit of never forgetting WHERE.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # INSERT, UPDATE, DELETE
 
-This is post 8 in the SQL 101 series.
+So far the series has mostly focused on reading data. Writing data is different. One misplaced condition can update or delete far more rows than intended, and by the time you notice, the mistake may already be live in production.
 
-> SQL 101 series (8/10)
+That is why data-changing SQL is less about syntax and more about safety procedure. Transactions, preview queries, RETURNING, and rollback habits matter as much as the actual INSERT, UPDATE, or DELETE statement.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
 
-**Core question**: If SELECT is *reading*, why is *writing* an order of magnitude scarier, and how do we build *a safety net to undo it*?
+## Questions this chapter answers
 
-> *Statements that *change data* deserve *ten times more care* than statements that read.*
+- What are the basic shapes of INSERT, UPDATE, and DELETE?
+- Why is a transaction the default safety net for data changes?
+- Why is RETURNING so useful during verification?
+- What assumptions must be true before UPSERT behaves the way you expect?
+- Which habits make DML most dangerous in real work?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The basics of *INSERT*, *UPDATE*, *DELETE*
-- *Transactions* and `BEGIN / COMMIT / ROLLBACK`
-- *UPSERT* with `ON CONFLICT`
-- *RETURNING* to verify affected rows
-- Five common mistakes
+> Data-changing SQL is not just about making a statement valid. It is about making the change reversible until you are sure it is correct.
 
 ## Why It Matters
 
-Forgetting *one WHERE* in production wipes the whole table. Transactions, an explicit WHERE, and RETURNING are the *team's safety net*. The habit prevents incidents.
+Production data is harder to repair than to damage. A missing WHERE clause or a multi-step change executed without a transaction can leave the system in a half-updated state that is difficult to reason about later. That is why strong teams treat DML as operational work, not just query writing.
 
-> *DML turns *irreversible* work into *reversible* work — when you do it right.*
+Transactions and RETURNING help turn risky changes into auditable ones. They let you see what changed before you commit, and they make rollback part of the default workflow instead of an afterthought.
 
-## Concept at a Glance
+## Safe data-change flow
 
-```mermaid
-flowchart LR
-    Begin["BEGIN"] --> Op["INSERT/UPDATE/DELETE"]
-    Op --> Check["RETURNING / SELECT"]
-    Check -->|OK| Commit["COMMIT"]
-    Check -->|wrong| Rollback["ROLLBACK"]
-```
-
+![Safe data-change flow](../../../assets/sql-101/08/08-01-safe-data-change-flow.en.png)
 ## Key Terms
 
 - **DML**: Data Manipulation Language — INSERT, UPDATE, DELETE.
@@ -95,6 +84,12 @@ DELETE FROM users WHERE id = 4 RETURNING *;
 -- review the output, then
 COMMIT;
 ```
+
+**Expected output:**
+
+| id | name | signup_at |
+| --- | --- | --- |
+| 4 | Margaret Hamilton | 2026-04-10 |
 
 ### Step 4 — UPSERT
 
@@ -158,6 +153,8 @@ Production changes go through *PR review* and *migration tools*. Ad-hoc changes 
 DML is the craft of making the *irreversible* feel safe. Next: *Index and query plan*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What Is SQL?](./01-what-is-sql.md)
 - [SELECT Basics](./02-select-basics.md)
 - [WHERE and Conditions](./03-where-and-conditions.md)
@@ -168,6 +165,7 @@ DML is the craft of making the *irreversible* feel safe. Next: *Index and query 
 - **INSERT, UPDATE, DELETE (current)**
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -176,5 +174,6 @@ DML is the craft of making the *irreversible* feel safe. Next: *Index and query 
 - [PostgreSQL — UPDATE](https://www.postgresql.org/docs/current/sql-update.html)
 - [PostgreSQL — DELETE](https://www.postgresql.org/docs/current/sql-delete.html)
 - [PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)
+- [PostgreSQL — Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)
 
-Tags: SQL, DML, Transaction, Database, Postgres
+Tags: SQL, Database, Postgres, Analytics
