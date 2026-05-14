@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Failure Models</h1>
+<p>When an incident channel says "the service is down," that sentence hides several very different realities. A node may be dead, the network may be dropping packets, or the node may simply be so slow that every peer mistakes it for dead.</p>
 <p>This is post 2 in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you say "the server is down," what exactly do you mean? How many flavors does that have?</p>
-<blockquote>
-<p>Distributed systems design starts with one question: which kinds of failure do you assume? Crash, omission, and Byzantine are the standard vocabulary used to write that assumption down.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>What a failure model is and why we model failure</li>
 <li>The differences between crash, omission, timing, and Byzantine</li>
@@ -80,12 +71,8 @@
 <p>A failure model is the price tag of an algorithm.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;fail-stop / crash&quot;] --&gt; B[&quot;omission&quot;]
-    B --&gt; C[&quot;timing&quot;]
-    C --&gt; D[&quot;byzantine&quot;]
-    A -.-&gt;|weaker assumption| D
-</code></pre>
+<p><img alt="Failure-model spectrum from crash to Byzantine" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Failure-model spectrum from crash to Byzantine</em></p>
 <p>The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.</p>
 <h2>Key Terms</h2>
 <ul>
