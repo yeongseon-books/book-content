@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 1
 title: What is Kubernetes?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - DevOps
   - SRE
 seo_description: A beginner-friendly overview of Kubernetes — container orchestration, control plane vs worker nodes, and the desired state model
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What is Kubernetes?
 
-> Kubernetes 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Can a *human* really manage *tens or hundreds* of containers by hand?
-
-> *Kubernetes* is the *orchestrator* that keeps your *containers* in their *desired state*.
-
-<!-- a-grade-intro:end -->
+A few `docker run` commands feel manageable when the system is small. The moment the service grows into dozens of containers across several nodes, that confidence usually breaks first. Someone has to decide placement, recover failures, and keep versions aligned while the system keeps moving.
 
 This is the first post in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will frame Kubernetes as an orchestrator that continuously pushes the cluster toward the state you declared, not as a command launcher that starts containers one by one.
+
+> Kubernetes is most useful when you stop thinking in terms of “start this container now” and start thinking in terms of “keep the cluster in this desired state over time.”
+
+## Questions this chapter answers
 
 - The meaning of *orchestration*
 - *Control plane* vs *worker nodes*
@@ -48,14 +44,9 @@ A handful of containers fits on *Compose*. From *dozens* upward, an *orchestrato
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["kubectl"] --> API["api-server"]
-    API --> Etcd["etcd"]
-    API --> Sched["scheduler"]
-    Sched --> Node["worker node"]
-    Node --> Pod["pod"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
+*This control-flow view shows how `kubectl` talks to the API server and lets the control plane drive scheduling toward the desired state.*
+
 
 ## Key Terms
 
@@ -130,6 +121,22 @@ def cluster_info():
     return res.stdout
 ```
 
+## Verification workflow
+
+```bash
+kubectl config current-context
+kubectl get nodes -o wide
+kubectl cluster-info
+```
+
+**Expected output:** you should first see the active context name, then at least one `Ready` node, and finally a reachable API server endpoint. This is the fastest way to confirm that the cluster model in the article matches a live control plane you can actually talk to.
+
+**Failure modes to check first:**
+
+- If `current-context` is wrong, stop before deeper debugging because the rest of the commands are reading the wrong cluster.
+- If `get nodes` times out, check API reachability and credentials before assuming a Kubernetes concept issue.
+- If `cluster-info` works but nodes are `NotReady`, the problem is cluster health, not your mental model of orchestration.
+
 ## What to Notice in This Code
 
 - *kubectl* talks only to the *api-server*.
@@ -192,5 +199,6 @@ The *big picture* of orchestration is in place. The next post covers the *smalle
 - [Kubernetes components](https://kubernetes.io/docs/concepts/overview/components/)
 - [kubectl reference](https://kubernetes.io/docs/reference/kubectl/)
 - [CNCF landscape](https://landscape.cncf.io/)
+- [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 
 Tags: Kubernetes, Orchestration, Containers, DevOps, SRE

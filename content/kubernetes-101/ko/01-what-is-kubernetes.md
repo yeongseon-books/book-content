@@ -17,7 +17,7 @@ tags:
   - DevOps
   - SRE
 seo_description: Kubernetes의 기본 구조와 원하는 상태 모델을 입문자 관점에서 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Kubernetes란 무엇인가?
@@ -46,14 +46,9 @@ Kubernetes를 배우는 이유도 여기 있습니다. 많은 입문자가 Kuber
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    User["kubectl"] --> API["api-server"]
-    API --> Etcd["etcd"]
-    API --> Sched["scheduler"]
-    Sched --> Node["worker node"]
-    Node --> Pod["pod"]
-```
+![한눈에 보는 구조](../../../assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
+*`kubectl` 요청이 API 서버를 거쳐 스케줄러와 워커 노드로 이어지는 기본 제어 흐름입니다.*
+
 
 이 그림을 볼 때 가장 먼저 기억할 점은 `kubectl`이 직접 컨테이너를 띄우지 않는다는 사실입니다. 사용자는 `kubectl`로 원하는 상태를 API 서버에 전달하고, 이후의 배치와 조정은 컨트롤 플레인 구성요소가 맡습니다. Kubernetes를 이해하려면 이 제어 흐름부터 알아야 합니다.
 
@@ -140,6 +135,22 @@ def cluster_info():
 
 `cluster-info`는 클러스터 접근 경로를 빠르게 확인할 때 유용합니다. 처음에는 단순 조회처럼 보이지만, 실제 운영에서는 API 서버 접근 문제를 확인하는 첫 단계가 되기도 합니다.
 
+## 검증 흐름
+
+```bash
+kubectl config current-context
+kubectl get nodes -o wide
+kubectl cluster-info
+```
+
+**예상되는 결과:** 현재 컨텍스트 이름이 먼저 보이고, 이어서 노드 목록과 API 서버 엔드포인트가 정상적으로 출력돼야 합니다. 최소한 `Ready` 상태 노드 한 개 이상과 접근 가능한 control plane 주소를 확인할 수 있어야 합니다.
+
+**먼저 의심할 실패 모드:**
+
+- `current-context`가 예상한 클러스터가 아니면 잘못된 kubeconfig를 보고 있을 가능성이 큽니다.
+- `kubectl get nodes`가 timeout 나면 인증 정보보다 네트워크 경로나 API 서버 가용성을 먼저 확인하는 편이 빠릅니다.
+- `cluster-info`는 되는데 노드가 `NotReady`면 Kubernetes 개념 문제가 아니라 클러스터 상태 문제입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `kubectl`은 API 서버와 통신합니다.
@@ -200,5 +211,6 @@ def cluster_info():
 - [Kubernetes components](https://kubernetes.io/docs/concepts/overview/components/)
 - [kubectl reference](https://kubernetes.io/docs/reference/kubectl/)
 - [CNCF landscape](https://landscape.cncf.io/)
+- [kubectl cheat sheet](https://kubernetes.io/ko/docs/reference/kubectl/cheatsheet/)
 
 Tags: Kubernetes, Orchestration, Containers, DevOps, SRE
