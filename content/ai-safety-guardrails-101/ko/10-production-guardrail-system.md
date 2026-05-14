@@ -14,7 +14,7 @@ tags:
 - Guardrails
 - Production
 - Architecture
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 지금까지 Ep1~9에서 다룬 guardrail은 모두 독립된 부품입니다.
 ---
 
@@ -57,6 +57,9 @@ guardrail 시스템을 계층 구조로 정리하면 팀은 개별 정책보다 
 ## 핵심 개념
 
 ### 네 계층으로 나누면 책임이 선명해집니다
+
+![네 계층으로 나누면 책임이 선명해집니다](../../../assets/ai-safety-guardrails-101/10/10-01-diagram.ko.png)
+*프로덕션 가드레일은 입력 직후, 프롬프트 직전, 출력 직후, audit 네 경계로 나눠야 어떤 판단이 어디서 일어났는지 설명할 수 있습니다.*
 
 | Layer | When it runs | Guardrails |
 | --- | --- | --- |
@@ -119,6 +122,25 @@ class GuardrailPipeline:
 
 어느 단계에서 허용되었고 어디서 막혔는지가 모두 남아야 나중에 재현이 됩니다.
 
+### pipeline이 남겨야 할 최소 audit 이벤트
+
+구조가 운영 모델이 되려면 각 단계가 기계가 읽을 수 있는 기록을 남겨야 합니다.
+
+```json
+{
+  "request_id": "req_01J9Y3J5M2A4G1K8H0T3V7X9",
+  "stage": "post-output.moderation",
+  "allowed": false,
+  "reason": "self_harm_instructions",
+  "model": "gpt-4o-mini",
+  "latency_ms": 84,
+  "guardrail_overhead_ms": 121,
+  "fallback": "generic_block_message"
+}
+```
+
+이 이벤트가 있어야 “막혔다”가 아니라 “어느 레이어가 왜 막았는지”를 설명할 수 있습니다.
+
 ### 실패 정책은 사전에 명시해야 합니다
 
 | Scenario | Recommended policy | Reason |
@@ -142,6 +164,16 @@ def safe_call(check_fn, request, on_error="closed"):
 
 incident 때마다 사람 판단이 달라지지 않도록, 각 모듈의 `on_error` 정책을 코드와 문서에 함께 남겨야 합니다.
 
+### 실패 정책은 연습으로 검증해야 합니다
+
+문서에 적어 두는 것만으로는 부족합니다. 최소한 아래 세 가지는 실제로 리허설해야 합니다.
+
+1. Redis를 내려 rate limiter가 전체 서비스 장애 대신 경고와 degraded 모드로 가는지 확인합니다.
+2. moderation 공급자 timeout을 강제로 만들고 endpoint가 안전하게 차단되는지 확인합니다.
+3. audit sink를 끊고 production은 fail-closed, dev는 degraded 보고만 하는지 확인합니다.
+
+이 연습이 없으면 `on_error` 정책은 운영 보장이 아니라 희망사항에 머뭅니다.
+
 ### 성능 예산은 직렬 검사를 줄이는 방향으로 잡아야 합니다
 
 1. **Parallelize independent checks**: bundle non-dependent checks (PII masking and jailbreak detection) with `asyncio.gather`.
@@ -150,6 +182,32 @@ incident 때마다 사람 판단이 달라지지 않도록, 각 모듈의 `on_er
 4. **Sample expensive checks**: do not run full grounding on every request; sample a fraction as a regression signal.
 
 P95 guardrail overhead를 모델 호출 제외 300ms 아래로 두는 식의 목표를 두면 설계 판단이 쉬워집니다.
+
+### 독립 검사는 병렬로 실행해야 합니다
+
+가장 큰 latency 절감은 서로 의존하지 않는 검사를 직렬로 돌리지 않는 데서 나옵니다.
+
+```python
+import asyncio
+
+
+async def run_pre_input(request: dict) -> list[GuardrailResult]:
+    return await asyncio.gather(
+        rate_limit_async(request),
+        jailbreak_async(request["prompt"]),
+        authz_async(request),
+    )
+
+
+async def run_post_output(answer: str, chunks: list[dict]) -> list[GuardrailResult]:
+    return await asyncio.gather(
+        moderate_async(answer),
+        grounding_async(answer, chunks),
+        pii_recheck_async(answer),
+    )
+```
+
+뒤 단계가 앞 단계의 결과에 실제로 의존할 때만 직렬 순서를 유지합니다. 그렇지 않으면 안전성은 늘지 않고 지연만 늘어납니다.
 
 ### 관측성은 트래픽·차단·지연·신뢰·비용·보안을 함께 봐야 합니다
 
@@ -179,6 +237,18 @@ def run_regression():
 ```
 
 merge 기준도 수치로 두는 편이 좋습니다. 예를 들어 jailbreak recall < 0.95, benign false positive > 1%, PII recall < 0.98, grounding precision < 0.85이면 차단하는 식입니다.
+
+### 사람이 직접 돌릴 수 있는 검증 명령도 남겨야 합니다
+
+CI만으로는 운영자가 즉시 확인하기 어렵습니다. 사람이 읽기 쉬운 단일 진입점도 있어야 합니다.
+
+```bash
+python3 scripts/run_guardrail_regression.py \
+  --suite jailbreak_attacks,benign_prompts,pii_examples,moderation_cases,rag_grounding \
+  --format summary
+```
+
+**Expected output:** recall, false positive rate, latency, Pass/Fail가 한 표로 정리된 요약입니다. 이 표가 읽기 어려우면 incident 중에 guardrail 상태를 판단하기도 어려워집니다.
 
 ### rollout도 단계적으로 해야 합니다
 
