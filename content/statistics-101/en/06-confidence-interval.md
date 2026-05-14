@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Confidence Interval
 
-This is post 6 in the Statistics 101 series.
+The phrase “95% confidence interval” shows up everywhere in statistical reporting, but it is also one of the most frequently misread phrases in the field. Many readers hear it as “there is a 95% probability the true value is inside this interval,” even though classical confidence intervals do not mean that.
 
-> Statistics 101 series (6/10)
+Confidence belongs to the procedure that generated the interval, not to the one interval you happen to be looking at. Keeping that distinction clear prevents a lot of later confusion about significance, uncertainty, and effect interpretation.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
 
-**Core question**: What does a *95% confidence interval* actually mean? Does it mean *the population mean has a 95% chance* of being inside?
+## Questions this post answers
 
-> *Confidence is in the procedure, not in the value.*
+- What does a 95% confidence interval really mean?
+- Why should we switch to the t-distribution on small samples?
+- What can we use when the distribution is skewed?
+- What can we conclude when a confidence interval contains zero?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *true meaning* of a *95% CI*
-- The *t-distribution* and *small samples*
-- *Asymmetric CIs* via the *bootstrap*
-- A 5-step CI exercise
-- Five common mistakes
+> Confidence belongs to the hit rate of the method, not to the single interval on the page.
 
 ## Why It Matters
 
@@ -50,13 +45,9 @@ Confidence intervals are the *most common tool* for showing uncertainty — and 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Sample["Sample"] --> SE["Standard Error"]
-    SE --> Critical["t / z critical value"]
-    Critical --> CI["Confidence Interval"]
-```
+![Concept at a Glance](../../../assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
 
+*A confidence interval combines an estimate, its standard error, and a critical value; the confidence belongs to that procedure.*
 ## Key Terms
 
 - **Confidence Interval**: an interval such that, if the *procedure* were repeated infinitely, *95% of intervals* would contain the parameter.
@@ -89,6 +80,8 @@ t_crit = stats.t.ppf(0.975, df)
 print("t*:", t_crit)
 ```
 
+**Expected output:** for a sample size of 64, `t*` should land near `2.0`. On smaller samples it will be a bit larger than 1.96.
+
 ### Step 3 — SE and margin of error
 
 ```python
@@ -103,6 +96,8 @@ mean = sample.mean()
 print(f"95% CI: [{mean - moe:.2f}, {mean + moe:.2f}]")
 ```
 
+**Expected output:** something like `95% CI: [95.xx, 104.xx]`, which turns a point estimate into an interval you can actually discuss.
+
 ### Step 5 — Bootstrap
 
 ```python
@@ -111,6 +106,8 @@ rng = default_rng(0)
 boots = [rng.choice(sample, len(sample), replace=True).mean() for _ in range(2000)]
 print("Bootstrap CI:", np.percentile(boots, [2.5, 97.5]))
 ```
+
+**Expected output:** two percentile boundaries in an array. They should be close to, but not necessarily identical to, the t-based interval.
 
 ## What to Notice in This Code
 
