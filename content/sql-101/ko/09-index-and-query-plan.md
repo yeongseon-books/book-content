@@ -17,7 +17,7 @@ tags:
   - Performance
   - Postgres
 seo_description: B-tree 인덱스, EXPLAIN 읽기, 인덱스가 건너뛰어지는 이유, 합성 인덱스 설계를 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 인덱스와 쿼리 계획
@@ -42,17 +42,9 @@ last_reviewed: '2026-05-12'
 
 또 인덱스는 읽기를 빠르게 만드는 대신 쓰기 비용을 늘립니다. 많이 만들수록 좋은 것이 아니라, 어떤 조회를 빠르게 만들고 어떤 쓰기 부담을 감수할지 설계하는 문제에 가깝습니다.
 
-## 한눈에 보는 흐름
+## 실행 계획 선택 흐름
 
-```mermaid
-flowchart LR
-    Q["Query"] --> Planner["Planner"]
-    Planner -->|chooses| Idx["Index Scan"]
-    Planner -->|or| Seq["Seq Scan"]
-    Idx --> Result["Result"]
-    Seq --> Result
-```
-
+![실행 계획 선택 흐름](../../../assets/sql-101/09/09-01-plan-selection-flow.ko.png)
 사용자가 SQL을 보내면 플래너가 여러 실행 방식을 검토합니다. 그리고 비용 추정을 바탕으로 순차 스캔을 할지, 인덱스 스캔을 할지, 어떤 조인 순서를 택할지 결정합니다. 성능 튜닝은 결국 이 선택을 읽고 이해하는 과정입니다.
 
 ## 핵심 개념 정리
@@ -80,6 +72,13 @@ flowchart LR
 ```sql
 EXPLAIN
 SELECT * FROM users WHERE email = 'a@b.com';
+```
+
+**Expected output:**
+
+```text
+Index Scan using idx_users_email on users  (cost=0.28..8.30 rows=1 width=48)
+  Index Cond: (email = 'a@b.com'::text)
 ```
 
 실행하지 않고 계획만 봅니다. 어떤 스캔을 택했는지, 예상 행 수가 얼마인지부터 읽어 보는 출발점입니다.
@@ -116,6 +115,22 @@ ON orders (user_id, created_at DESC);
 CREATE INDEX idx_users_active
 ON users (id) WHERE deleted_at IS NULL;
 ```
+
+## 실행 계획을 볼 때 먼저 확인할 세 가지
+
+`EXPLAIN` 결과를 열었다면 인덱스를 추가하기 전에 먼저 아래 세 질문부터 확인하는 편이 좋습니다.
+
+1. **어떤 스캔이 선택됐는가?** 인덱스를 기대했는데 `Seq Scan`이 보인다면 선택도나 조건식 모양을 먼저 의심해야 합니다.
+2. **예상 행 수가 얼마나 되는가?** 예상 행 수와 실제 행 수가 크게 어긋나면 통계 정보나 데이터 분포를 다시 봐야 합니다.
+3. **가장 비싼 단계가 어디인가?** 정렬, 해시 집계, 중첩 루프가 병목일 수 있으므로 필터만 보고 끝내면 안 됩니다.
+
+## 자주 만나는 튜닝 점검표
+
+| 증상 | 먼저 볼 것 | 자주 하는 대응 |
+| --- | --- | --- |
+| 인덱스가 있는데도 `Seq Scan`이 나온다 | 선택도, 함수/형변환 사용 여부 | 조건식을 바꾸거나 인덱스 종류를 다시 설계 |
+| 합성 인덱스가 기대만큼 안 듣는다 | 왼쪽 컬럼부터 조건에 쓰였는지 | 조회 패턴에 맞게 컬럼 순서 재설계 |
+| `EXPLAIN`은 좋아 보이는데 실제 시간은 길다 | 정렬, 조인, 실제 행 수 | 필터만이 아니라 전체 계획을 다시 점검 |
 
 삭제되지 않은 사용자만 자주 읽는다면, 전체보다 작은 인덱스로도 충분한 경우가 있습니다.
 
@@ -158,6 +173,8 @@ ON users (id) WHERE deleted_at IS NULL;
 다음 글에서는 시리즈 마지막으로, 지금까지 배운 SELECT, JOIN, GROUP BY, 윈도 함수를 조합해 실전 분석 SQL 패턴을 정리하겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - [WHERE와 조건](./03-where-and-conditions.md)
@@ -168,6 +185,7 @@ ON users (id) WHERE deleted_at IS NULL;
 - [데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
 - **인덱스와 쿼리 계획 (현재 글)**
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -176,5 +194,6 @@ ON users (id) WHERE deleted_at IS NULL;
 - [PostgreSQL — EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html)
 - [Use The Index, Luke](https://use-the-index-luke.com/)
 - [PostgreSQL — Partial Indexes](https://www.postgresql.org/docs/current/indexes-partial.html)
+- [PostgreSQL — Planner Statistics](https://www.postgresql.org/docs/current/planner-stats.html)
 
-Tags: SQL, Index, QueryPlan, Performance, Postgres
+Tags: SQL, Database, Postgres, Analytics

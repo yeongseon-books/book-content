@@ -17,48 +17,36 @@ tags:
   - Performance
   - Postgres
 seo_description: How B-tree indexes work, how to read EXPLAIN, why an index might be skipped, and the design principles for composite indexes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Index and Query Plan
 
-This is post 9 in the SQL 101 series.
+Two SQL statements can look almost identical and still differ by orders of magnitude in runtime. That gap usually has less to do with magic database behavior than with the path the planner chose to read the data.
 
-> SQL 101 series (9/10)
+If you cannot read that path, tuning stays stuck at guesswork. Indexes become cargo-cult fixes, and every slow query turns into trial and error instead of a repeatable investigation.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.
 
-**Core question**: Same SQL, *0.1 second* vs *30 seconds* — where does the gap come from, and how do we *read EXPLAIN* and *fix* what we see?
+## Questions this chapter answers
 
-> *Tuning without reading the plan is *guessing*. Guesses are *wrong most of the time*.*
+- What is the simplest mental model for a B-tree index?
+- How do EXPLAIN and EXPLAIN ANALYZE differ?
+- Why can a database skip an index even when one exists?
+- Why does composite index column order matter so much?
+- When are partial and function indexes worth considering?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- How a *B-tree* index works
-- How to read `EXPLAIN` and `EXPLAIN ANALYZE`
-- Five reasons an *index gets skipped*
-- Design principles for *composite indexes*
-- Five common mistakes
+> Tuning without reading the plan is guesswork. The more data grows, the more expensive those guesses become.
 
 ## Why It Matters
 
-Tuning value *grows non-linearly* with data. One read of the plan can *save a server*. Indexes are *not free* — *where to put them* and *where not to* is a design skill.
+Query tuning becomes more valuable as data grows because small predicate differences start turning into noticeable latency. Once tables move beyond toy size, you need to know not only what the SQL says, but also how the planner expects to execute it.
 
-> *Reads get faster but writes get slower. Indexing is a *trade*.*
+Indexes are powerful precisely because they are selective. They make some reads much faster while increasing storage and write cost. That means index work is not about adding more structures everywhere. It is about matching read patterns to the right access path and confirming the plan actually changes.
 
-## Concept at a Glance
+## Plan selection flow
 
-```mermaid
-flowchart LR
-    Q["Query"] --> Planner["Planner"]
-    Planner -->|chooses| Idx["Index Scan"]
-    Planner -->|or| Seq["Seq Scan"]
-    Idx --> Result["Result"]
-    Seq --> Result
-```
-
+![Plan selection flow](../../../assets/sql-101/09/09-01-plan-selection-flow.en.png)
 ## Key Terms
 
 - **B-tree index**: the most common *balanced-tree* index.
@@ -80,6 +68,13 @@ flowchart LR
 ```sql
 EXPLAIN
 SELECT * FROM users WHERE email = 'a@b.com';
+```
+
+**Expected output:**
+
+```text
+Index Scan using idx_users_email on users  (cost=0.28..8.30 rows=1 width=48)
+  Index Cond: (email = 'a@b.com'::text)
 ```
 
 ### Step 2 — EXPLAIN ANALYZE
@@ -108,6 +103,22 @@ ON orders (user_id, created_at DESC);
 CREATE INDEX idx_users_active
 ON users (id) WHERE deleted_at IS NULL;
 ```
+
+## What to check first in an EXPLAIN plan
+
+When you open an EXPLAIN plan, start with three questions before you touch any index definition.
+
+1. **Which scan type did the planner choose?** If you expected an index and got a Seq Scan, the problem is often selectivity or predicate shape.
+2. **How many rows did the planner estimate?** Large gaps between estimated rows and actual rows often point to stale statistics or skewed data.
+3. **Where is the expensive step?** Sorts, hash aggregates, and repeated nested loops can dominate runtime even when the initial filter looks fine.
+
+## Troubleshooting patterns that show up repeatedly
+
+| Symptom | First thing to verify | Common fix |
+| --- | --- | --- |
+| Index exists but Seq Scan appears | Predicate selectivity and function/cast use | Rewrite the predicate or create the right index type |
+| Composite index did not help | Whether the query starts from the leftmost prefix | Reorder columns to match filter and sort patterns |
+| EXPLAIN looks fine but runtime is still high | Sorts, joins, and actual row counts in EXPLAIN ANALYZE | Tune the broader plan, not just the filter |
 
 ## What to Notice in This Code
 
@@ -153,6 +164,8 @@ Performance work is mostly *slow-query log → EXPLAIN → index or query change
 Tuning starts with *reading the plan*. Next: *practical analysis SQL*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What Is SQL?](./01-what-is-sql.md)
 - [SELECT Basics](./02-select-basics.md)
 - [WHERE and Conditions](./03-where-and-conditions.md)
@@ -163,6 +176,7 @@ Tuning starts with *reading the plan*. Next: *practical analysis SQL*.
 - [INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
 - **Index and Query Plan (current)**
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -171,5 +185,6 @@ Tuning starts with *reading the plan*. Next: *practical analysis SQL*.
 - [PostgreSQL — EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html)
 - [Use The Index, Luke](https://use-the-index-luke.com/)
 - [PostgreSQL — Partial Indexes](https://www.postgresql.org/docs/current/indexes-partial.html)
+- [PostgreSQL — Planner Statistics](https://www.postgresql.org/docs/current/planner-stats.html)
 
-Tags: SQL, Index, QueryPlan, Performance, Postgres
+Tags: SQL, Database, Postgres, Analytics
