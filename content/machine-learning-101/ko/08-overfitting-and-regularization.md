@@ -17,7 +17,7 @@ tags:
   - Ridge
   - Lasso
 seo_description: 과적합과 과소적합의 신호, 편향-분산, Ridge·Lasso·ElasticNet의 차이를 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Overfitting과 Regularization
@@ -42,12 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Cap["model capacity"] -->|low| Under["underfit (high bias)"]
-    Cap -->|high| Over["overfit (high variance)"]
-    Cap -->|right| Good["generalize"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/08/08-01-diagram.ko.png)
+
+*모델 자유도가 너무 낮으면 과소적합, 너무 높으면 과적합으로 흐르고, 정규화는 그 균형점을 다시 찾게 돕습니다.*
 
 ## 핵심 용어
 
@@ -109,11 +106,19 @@ for a in np.logspace(-3, 2, 6):
     print(f"alpha={a:.3g}  R^2={s:.3f}")
 ```
 
+**Expected output:** 선형 회귀, Ridge, Lasso 각각의 테스트 점수가 나오고, `alpha`를 바꾸면 성능 곡선이 움직입니다. 어느 값에서도 결과가 시원치 않다면 정규화 강도보다 **피처 품질**이나 **모델 계열**이 먼저 문제일 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - Lasso는 계수를 0으로 만들어 피처 선택 효과까지 냅니다.
 - Ridge는 모든 계수를 부드럽게 줄입니다.
 - `alpha`는 감으로 찍는 값이 아니라 교차검증으로 정해야 합니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 모델 용량이 커질수록 train-test 간격이 벌어지면, 구조 변경 전에 **정규화**와 **데이터 양**을 먼저 점검해야 합니다.
+- Lasso가 실행할 때마다 다른 피처를 고르면, 상관 피처가 많은지 보고 ElasticNet이나 Ridge도 함께 비교해야 합니다.
+- train과 test가 둘 다 낮으면 과적합이 아니라 **과소적합**이나 **피처 설계 부족**일 수 있습니다.
 
 ## 자주 하는 실수 5가지
 
