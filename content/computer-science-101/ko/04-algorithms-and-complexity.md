@@ -58,15 +58,8 @@ last_reviewed: '2026-05-12'
 
 > 같은 결과를 내는 두 알고리즘도 입력이 커지면 차이가 수천 배로 벌어집니다.
 
-```text
-Input size n          n=10    n=1,000     n=1,000,000
-─────────────────────────────────────────────────────
-O(1)    constant       1        1              1
-O(log n) log            3       10             20
-O(n)    linear         10     1,000      1,000,000
-O(n log n) linearithmic 33    10,000     20,000,000
-O(n^2)  quadratic     100  1,000,000   10^12 (impossible)
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
+*같은 문제도 알고리즘과 자료구조 선택에 따라 비용 곡선이 완전히 달라집니다*
 
 ## 핵심 용어
 
@@ -151,6 +144,8 @@ start = time.perf_counter()
 binary_search(big, target)
 print(f"binary : {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** 정렬된 입력에서는 `binary`가 `linear`보다 눈에 띄게 빠르고, 비교 횟수도 수십만 대 수십 수준으로 줄어듭니다.
 
 ### 3단계: 자료구조 선택이 복잡도를 바꾼다
 

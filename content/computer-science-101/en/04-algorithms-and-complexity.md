@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 4
 title: Algorithms and Complexity
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Data Structures
   - Performance
 seo_description: An introductory tour of algorithms, time and space complexity, and Big-O notation for engineers picking data structures.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Algorithms and Complexity
 
-> Computer Science 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: Given two pieces of code that solve the same problem, how do you know which one is faster?
-
-> An algorithm is a clear procedure for solving a problem. Complexity is the language we use to measure how that procedure scales with input size. Two sorting algorithms can produce the same output, but on a million items one might take one second and the other one hour. This article covers the definition of an algorithm, Big-O notation, and the criteria for choosing data structures.
-
-<!-- a-grade-intro:end -->
+Code that feels fine on 100 records can collapse in production once the data grows by three orders of magnitude. At that point, the first explanation is rarely “the machine is slow.” It is usually that the algorithmic cost was hidden while the input stayed small.
 
 This is post 4 in the Computer Science 101 series.
+
+In this article, we'll define algorithms, read time and space complexity, and show how data-structure choice changes performance long before micro-optimization matters.
+
+## Questions This Article Answers
+
+- How can you compare two solutions before you benchmark them?
+- What do time complexity and space complexity each measure?
+- Why does Big-O help you predict behavior as input grows?
+- How can `list`, `set`, and `dict` choices change the order of the whole solution?
+- Why does code that looks acceptable on small inputs fail at scale?
 
 ## What You Will Learn
 
@@ -54,15 +56,8 @@ Reading complexity is one of the clearest dividing lines between senior and juni
 
 > Two algorithms that produce the same result can diverge by thousands of times once the input grows.
 
-```text
-Input size n          n=10    n=1,000     n=1,000,000
-─────────────────────────────────────────────────────
-O(1)    constant       1        1              1
-O(log n) log            3       10             20
-O(n)    linear         10     1,000      1,000,000
-O(n log n) linearithmic 33    10,000     20,000,000
-O(n^2)  quadratic     100  1,000,000   10^12 (impossible)
-```
+![Concept at a Glance](../../../assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
+*The same task can stay manageable or become impossible depending on algorithmic choice*
 
 ## Key Terms
 
@@ -149,6 +144,8 @@ start = time.perf_counter()
 binary_search(big, target)
 print(f"binary : {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** on sorted input, `binary` should be much faster than `linear`, and the comparison gap becomes dramatic at large sizes.
 
 ### Step 3: Data-structure choice changes complexity
 
