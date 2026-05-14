@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 7
 title: Calibration
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Reliability
   - scikit-learn
 seo_description: How to make model probabilities trustworthy with reliability diagrams, Brier score, and Platt or isotonic calibration in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Calibration
 
-> Model Evaluation 101 series (7/10)
+When a model predicts 0.8, most teams instinctively read that as "about an 80% chance." That interpretation only holds if the model is calibrated. Without that check, the score may still be useful for ranking while being misleading as a probability.
 
-<!-- a-grade-intro:begin -->
+This matters most when probabilities flow directly into pricing, prioritization, or expected-value calculations. A model can have strong AUC and still overstate or understate risk badly enough to damage downstream decisions.
 
-**Core question**: When a model says "80% confident," is it actually right 80% of the time?
+This is post 7 in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.
 
-> *Calibration measures how well predicted probabilities match observed frequencies. It is a different axis from threshold tuning.*
-
-<!-- a-grade-intro:end -->
-
-This is post 7 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The definition and purpose of calibration
 - How to read a reliability diagram
@@ -42,20 +36,17 @@ This is post 7 in the Model Evaluation 101 series.
 - Platt scaling and isotonic regression
 - Five common pitfalls
 
+> Calibration asks whether predicted probabilities deserve to be read as probabilities at all. That is a different question from ranking examples correctly.
+
 ## Why It Matters
 
 Systems that multiply probabilities by costs to make decisions need calibration more than AUC.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Raw["raw score"] --> Bin["bin by predicted probability"]
-    Bin --> Freq["empirical frequency per bin"]
-    Freq --> Reli["reliability curve"]
-    Raw --> Calib["Platt / Isotonic"]
-```
+![calibration flow comparing predicted probability buckets to observed frequency](../../../assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
 
+*calibration flow comparing predicted probability buckets to observed frequency*
 ## Key Terms
 
 - **Calibration**: predicted probability equals observed frequency.
@@ -114,6 +105,8 @@ print("brier (platt):", brier_score_loss(yte, platt.predict_proba(Xte)[:, 1]))
 iso = CalibratedClassifierCV(rf, method="isotonic", cv=5).fit(Xtr, ytr)
 print("brier (isotonic):", brier_score_loss(yte, iso.predict_proba(Xte)[:, 1]))
 ```
+
+**Expected output:** You should see raw probabilities drift away from observed frequencies, then compare whether sigmoid or isotonic calibration improves the Brier score without changing the ranking story very much.
 
 ## What to Notice in This Code
 

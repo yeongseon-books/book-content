@@ -17,7 +17,7 @@ tags:
   - Reliability
   - scikit-learn
 seo_description: 분류 모델의 확률값이 실제 빈도와 일치하도록 보정하는 캘리브레이션 개념과 브라이어 점수 기반 신뢰도 측정법을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 확률 보정 이해하기
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Raw["raw score"] --> Bin["bin by predicted probability"]
-    Bin --> Freq["empirical frequency per bin"]
-    Freq --> Reli["reliability curve"]
-    Raw --> Calib["Platt / Isotonic"]
-```
+![예측 확률 구간과 실제 빈도를 비교하는 보정 흐름](../../../assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
 
+*예측 확률 구간과 실제 빈도를 비교하는 보정 흐름*
 예측 확률 구간별 평균과 실제 양성 빈도를 나란히 놓고 비교해야 합니다. 두 값이 대각선 위에 가깝게 맞아야 확률이 정직하다고 말할 수 있습니다.
 
 ## 핵심 용어
@@ -116,6 +111,8 @@ print("brier (platt):", brier_score_loss(yte, platt.predict_proba(Xte)[:, 1]))
 iso = CalibratedClassifierCV(rf, method="isotonic", cv=5).fit(Xtr, ytr)
 print("brier (isotonic):", brier_score_loss(yte, iso.predict_proba(Xte)[:, 1]))
 ```
+
+**예상 결과:** 원래 확률이 실제 빈도와 얼마나 어긋나는지 확인한 뒤, sigmoid와 isotonic 중 어떤 방식이 Brier 점수를 더 안정적으로 낮추는지 비교하면 됩니다. 순위가 좋아도 확률 해석은 여전히 틀릴 수 있다는 점이 핵심입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
