@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 6
 title: Network
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - Security
   - AWS
 seo_description: VPC, subnets, security groups, and load balancers — the core of cloud networking explained with boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Network
 
-> Cloud Computing 101 series (6/10)
+Cloud networking looks simple until you have to change it. VPCs, subnets, security groups, NACLs, and load balancers all sound like pieces of the same thing, but they solve different boundary problems at different layers.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do VPCs, subnets, and security groups all exist *separately*?
-
-> *Cloud networking works in four layers — isolate (VPC), place (subnets), allow (SG/NACL), distribute (LB).*
+The cost of getting the model wrong shows up later. Public exposure becomes too broad, routing rules become hard to reason about, and simple changes start requiring structural rewrites instead of safe configuration updates.
 
 This is post 6 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll use a four-step mental model — isolate, place, allow, distribute — to make the core cloud networking pieces easier to reason about.
 
-## What You Will Learn
+> Cloud networking is mostly boundary design: isolate with VPCs, place with subnets, define trust with SGs and NACLs, and shape traffic with load balancers.
+
+## Questions This Chapter Answers
 
 - VPCs vs subnets
 - Security Groups vs NACLs
@@ -48,13 +46,9 @@ Network design is the hardest decision to undo later. The first hour shapes the 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Internet["internet"] --> ALB["load balancer"]
-    ALB --> Public["public subnet"]
-    Public --> Private["private subnet"]
-    Private --> DB["database"]
-```
+![A common public-private subnet pattern that limits exposure to the load balancer](../../../assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
+
+*A common public-private subnet pattern that limits exposure to the load balancer*
 
 ## Key Terms
 
@@ -127,6 +121,26 @@ def describe(sg_id):
 - DB SGs reference an SG, not a CIDR — that is the canonical pattern.
 - 0.0.0.0/0 is an explicit statement of public exposure.
 - SGs are stateful; NACLs are stateless.
+
+## How to Verify This Example
+
+The real test here is whether trust boundaries are encoded correctly. A database security group should trust the application security group, not a broad CIDR range that is harder to reason about and easier to misuse later.
+
+```bash
+aws ec2 describe-security-groups --group-ids sg-xxxxxxxx sg-yyyyyyyy
+```
+
+**Expected output:**
+
+- The app security group should show inbound `443` rules.
+- The DB security group should show port `5432` scoped to the application SG reference.
+- If the database group exposes `0.0.0.0/0`, the design intent is already compromised.
+
+### Where teams usually get stuck
+
+- NAT only solves outbound routing. It does not magically make inbound exposure safe.
+- Public and private subnet separation should be reflected in both route tables and SG rules.
+- CIDR planning should leave room for future AZ growth and VPC peering decisions.
 
 ## Five Common Mistakes
 
