@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Structured Logging</h1>
+<p>Many incident reviews reveal the same problem: logs existed, but the team still could not answer the first two questions quickly. Which request failed, and what was different about it? Free-form lines are readable, but they are poor query surfaces.</p>
+<p>Structured logging fixes that by turning log lines into data with fields you can filter, aggregate, and join with traces.</p>
 <p>This is post 4 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is free-text logging <em>search hell</em>, and what changes when logs are <em>structured</em>?</p>
-<blockquote>
-<p><em>Structured logs are </em>machine-readable data<em>. When a line is </em>JSON<em>, you can </em>query<em> instead of </em>grep<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Unstructured</em> vs <em>structured</em> logs</li>
@@ -80,12 +71,8 @@
 <p><em>A log is </em>data<em>, not prose.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;code&quot;] --&gt; Logger[&quot;logger.info(event, **fields)&quot;]
-    Logger --&gt; JSON[&quot;one JSON line&quot;]
-    JSON --&gt; Sink[&quot;collector (Loki / ELK)&quot;]
-    Sink --&gt; Query[&quot;query&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Application events become one-line JSON records, flow to a log backend, and come back as field-based queries during incident response.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Level</strong>: DEBUG / INFO / WARNING / ERROR / CRITICAL.</li>
@@ -131,6 +118,19 @@ INFO     → normal events
 WARNING  → cautions (actionable)
 ERROR    → failed requests
 CRITICAL → system risk
+</code></pre>
+<h2>How to Follow One Request</h2>
+<p>The practical win is simple: collect every line for one request without guessing the wording.</p>
+<pre><code class="language-bash">grep '&quot;rid&quot;: &quot;req-7f2a&quot;' app.log
+grep '&quot;lvl&quot;: &quot;ERROR&quot;' app.log | grep '&quot;rid&quot;: &quot;req-7f2a&quot;'
+</code></pre>
+<pre><code class="language-json">{&quot;lvl&quot;:&quot;INFO&quot;,&quot;msg&quot;:&quot;request_in&quot;,&quot;rid&quot;:&quot;req-7f2a&quot;,&quot;path&quot;:&quot;/login&quot;}
+{&quot;lvl&quot;:&quot;ERROR&quot;,&quot;msg&quot;:&quot;login_failed&quot;,&quot;rid&quot;:&quot;req-7f2a&quot;,&quot;reason&quot;:&quot;db_timeout&quot;}
+</code></pre>
+<pre><code class="language-text">Expected output:
+- Every line for the same request clusters under one request ID.
+- The ERROR line exposes the failure class immediately.
+- Sensitive fields such as email or phone number appear masked or hashed, not raw.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
