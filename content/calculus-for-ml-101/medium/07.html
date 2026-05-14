@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Gradient Descent</h1>
+<p>Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.</p>
+<p>This is post 7 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.</p>
 <blockquote>
-<p>Calculus for ML 101 series (7/10)</p>
+<p>Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How can we find <em>optimal weights</em> using only the <em>loss gradient</em>?</p>
-<blockquote>
-<p><em>Gradient descent</em> repeatedly takes a <em>small step</em> in the <em>opposite</em> direction of the gradient.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>gradient descent</em> algorithm</li>
@@ -76,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Most ML training is a <em>variant</em> of gradient descent.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    W[Weights] --&gt; G[Gradient]
-    G --&gt; S[Step]
-    S --&gt; W
-    W --&gt; L[Loss decrease]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Gradient-descent loop: weights produce a gradient, the step flips direction, and loss moves downward.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>GD</strong>: gradient over <em>all data</em>.</li>
