@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First steps with AI agents — making the model use tools</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>First steps with AI agents — making the model use tools</h1>
+<p>So far, the AI features in this series only exchanged text. They could answer questions, but they could not actually fetch live weather, run a calculator, or query an external system. To move beyond text-only answers, you need a loop where the model can request tools.</p>
+<p>This is post 5 in the AI Web Development 101 series.</p>
+<p>Here, we will focus on tool use, function calling, and the boundary between model judgment and application execution.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What makes an agent different from a normal chatbot?</li>
+<li>How does function calling work as a contract?</li>
+<li>How does the model ask for a function invocation?</li>
+<li>How do you build a loop that can use more than one tool?</li>
+<li>What safety rules matter as soon as tool use is enabled?</li>
+</ul>
+<blockquote>
+<p>An agent is not “a smarter chatbot.” It is a system where the model decides when external actions are needed, while the application validates and executes those actions.</p>
+</blockquote>
+<h2>Chatbot versus agent</h2>
+<p>A normal chatbot generates text from the information already available in the prompt or the model weights. An agent goes one step further. It can decide that a tool is needed, request the tool call, read the result, and then continue.</p>
+<ul>
+<li>chatbot: answer from existing context</li>
+<li>agent: ask for tools such as APIs, databases, calculators, or search systems</li>
+</ul>
+<p><img alt="Difference between a chatbot and an AI agent" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png"></p>
+<p><em>Difference between a chatbot and an AI agent</em></p>
+<h2>The basic tool-use loop</h2>
+<ol>
+<li>the application tells the model which tools exist</li>
+<li>the model decides which tool is needed</li>
+<li>the model emits a function-call request with arguments</li>
+<li>the application validates and executes the function</li>
+<li>the result goes back into the conversation so the model can produce the final answer</li>
+</ol>
+<p>The key point is execution ownership. The model proposes. The application decides whether and how to execute.</p>
+<p><img alt="How model judgment and function execution interact" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/function-calling-cycle.en.png"></p>
+<p><em>How model judgment and function execution interact</em></p>
+<h2>A minimal tool definition</h2>
+<pre><code class="language-python">tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_weather&quot;,
+            &quot;description&quot;: &quot;Returns the current weather for a location.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;location&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;description&quot;: &quot;City name, such as Seoul or Busan&quot;
+                    }
+                },
+                &quot;required&quot;: [&quot;location&quot;]
+            }
+        }
+    }
+]
+</code></pre>
+<p>The model does not read your Python implementation. It reads the tool description and parameter schema. Weak descriptions often lead to weak tool selection.</p>
+<h2>Example 1: weather lookup agent</h2>
+<pre><code class="language-python">import json
+from openai import OpenAI
+
+client = OpenAI()
+
+def get_weather(location: str) -&gt; str:
+    if &quot;Seoul&quot; in location:
+        return json.dumps({&quot;location&quot;: &quot;Seoul&quot;, &quot;temperature&quot;: &quot;25C&quot;, &quot;condition&quot;: &quot;Sunny&quot;})
+    if &quot;Busan&quot; in location:
+        return json.dumps({&quot;location&quot;: &quot;Busan&quot;, &quot;temperature&quot;: &quot;22C&quot;, &quot;condition&quot;: &quot;Partly cloudy&quot;})
+    return json.dumps({&quot;location&quot;: location, &quot;temperature&quot;: &quot;Unknown&quot;, &quot;condition&quot;: &quot;No data&quot;})
+
+messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is the weather in Seoul today?&quot;}]
+
+response = client.chat.completions.create(
+    model=&quot;gpt-4o&quot;,
+    messages=messages,
+    tools=tools,
+    tool_choice=&quot;auto&quot;,
+)
+
+tool_calls = response.choices[0].message.tool_calls
+
+if tool_calls:
+    tool_call = tool_calls[0]
+    function_name = tool_call.function.name
+    function_args = json.loads(tool_call.function.arguments)
+    function_response = get_weather(location=function_args[&quot;location&quot;])
+
+    messages.append(response.choices[0].message)
+    messages.append({
+        &quot;tool_call_id&quot;: tool_call.id,
+        &quot;role&quot;: &quot;tool&quot;,
+        &quot;name&quot;: function_name,
+        &quot;content&quot;: function_response,
+    })
+
+    final_response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=messages,
+    )
+
+    print(final_response.choices[0].message.content)
+</code></pre>
+<p>The important boundary is visible here. The model never directly executes <code>get_weather</code>. It only asks for it.</p>
+<h2>Example 2: a multi-tool loop</h2>
+<p>Tool use becomes more interesting when more than one step is required.</p>
+<pre><code class="language-python">import ast
+import json
+import operator as op
+
+ALLOWED_OPERATORS = {
+    ast.Add: op.add,
+    ast.Sub: op.sub,
+    ast.Mult: op.mul,
+    ast.Div: op.truediv,
+    ast.Pow: op.pow,
+    ast.USub: op.neg,
+}
+
+def safe_eval(node):
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in ALLOWED_OPERATORS:
+        return ALLOWED_OPERATORS[type(node.op)](safe_eval(node.left), safe_eval(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in ALLOWED_OPERATORS:
+        return ALLOWED_OPERATORS[type(node.op)](safe_eval(node.operand))
+    raise ValueError(&quot;Unsupported expression&quot;)
+
+def get_exchange_rate(from_currency, to_currency):
+    rates = {&quot;USD_KRW&quot;: 1350}
+    pair = f&quot;{from_currency}_{to_currency}&quot;
+    return json.dumps({&quot;pair&quot;: pair, &quot;rate&quot;: rates.get(pair, 1300)})
+
+def calculate(expression):
+    tree = ast.parse(expression, mode=&quot;eval&quot;)
+    return str(safe_eval(tree.body))
+</code></pre>
+<pre><code class="language-python">tools = [
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;get_exchange_rate&quot;,
+            &quot;description&quot;: &quot;Gets an exchange rate between two currencies.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;from_currency&quot;: {&quot;type&quot;: &quot;string&quot;},
+                    &quot;to_currency&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;from_currency&quot;, &quot;to_currency&quot;]
+            }
+        }
+    },
+    {
+        &quot;type&quot;: &quot;function&quot;,
+        &quot;function&quot;: {
+            &quot;name&quot;: &quot;calculate&quot;,
+            &quot;description&quot;: &quot;Evaluates a simple arithmetic expression.&quot;,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: {
+                    &quot;expression&quot;: {&quot;type&quot;: &quot;string&quot;}
+                },
+                &quot;required&quot;: [&quot;expression&quot;]
+            }
+        }
+    }
+]
+</code></pre>
+<pre><code class="language-python">def run_agent(user_prompt):
+    messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_prompt}]
+
+    for _ in range(5):
+        response = client.chat.completions.create(
+            model=&quot;gpt-4o&quot;,
+            messages=messages,
+            tools=tools,
+        )
+
+        message = response.choices[0].message
+        messages.append(message)
+
+        if not message.tool_calls:
+            break
+
+        for tool_call in message.tool_calls:
+            name = tool_call.function.name
+            args = json.loads(tool_call.function.arguments)
+
+            if name == &quot;get_exchange_rate&quot;:
+                result = get_exchange_rate(**args)
+            elif name == &quot;calculate&quot;:
+                result = calculate(**args)
+            else:
+                result = &quot;Unknown tool&quot;
+
+            messages.append({
+                &quot;tool_call_id&quot;: tool_call.id,
+                &quot;role&quot;: &quot;tool&quot;,
+                &quot;name&quot;: name,
+                &quot;content&quot;: result,
+            })
+
+    return messages[-1].content
+</code></pre>
+<p><img alt="An agent using multiple tools in sequence" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/multi-tool-example-flow.en.png"></p>
+<p><em>An agent using multiple tools in sequence</em></p>
+<h2>How to read the agent loop</h2>
+<ol>
+<li>user input</li>
+<li>model judgment</li>
+<li>tool-call request</li>
+<li>application execution</li>
+<li>result observation</li>
+<li>either final answer or another loop iteration</li>
+</ol>
+<p>That order matters because it keeps debugging grounded. When the behavior looks strange, you can ask whether the issue came from tool selection, argument generation, execution, or result interpretation.</p>
+<p><img alt="The repeating agent loop of judgment and action" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/agent-loop-overview.en.png"></p>
+<p><em>The repeating agent loop of judgment and action</em></p>
+<h2>Safety rules you need immediately</h2>
+<ul>
+<li>clear tool descriptions</li>
+<li>argument validation before execution</li>
+<li>retry limits and timeouts</li>
+<li>maximum loop count</li>
+<li>permission boundaries for side-effecting tools</li>
+</ul>
+<p>The core rule is simple: never execute model-generated arguments blindly.</p>
+<p><img alt="Tool permission boundaries and safety checks" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/tool-permission-boundary.en.png"></p>
+<p><em>Tool permission boundaries and safety checks</em></p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Tool descriptions and parameter schemas are explicit enough.</li>
+<li>[ ] The application validates arguments before execution.</li>
+<li>[ ] The loop has a maximum number of iterations.</li>
+<li>[ ] High-risk tools have stricter permission boundaries.</li>
+</ul>
+<h2>Summary</h2>
+<p>An agent is not “the model doing everything by itself.” It is a controlled loop where the model requests external actions and the application remains the execution owner.</p>
+<ul>
+<li>Tool use lets the model ask for functions rather than guess everything from text alone.</li>
+<li>The application validates and executes those functions.</li>
+<li>Multi-step tool loops make agent behavior feel more capable, but they also expand the risk surface.</li>
+<li>Safety controls are not optional once tools can cause side effects.</li>
+</ul>
+<p>The next chapter shifts from tool use to deployment, where these AI features have to run in real environments with logs, secrets, and cost limits.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
+<li><strong>First steps with AI agents — making the model use tools (current)</strong></li>
+<li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>
+<li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI function calling guide</a></li>
+<li><a href="https://json-schema.org/">JSON Schema</a></li>
+<li><a href="https://cookbook.openai.com/">OpenAI Cookbook: tool calling examples</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>
