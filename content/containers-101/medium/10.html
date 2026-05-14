@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Build a Container App</h1>
-<blockquote>
-<p>Containers 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When everything you have learned is wrapped into <em>one app</em>, <em>what flow</em> does it form?</p>
-<blockquote>
-<p><em>Dockerfile + Compose + healthcheck + secrets + logs</em> working from one <em>single command</em> is the <em>finish line</em> of the basics.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The earlier chapters only become operationally useful when they collapse into one reproducible application workflow. A single command that brings up the stack, verifies health, and tears it down cleanly is where container basics stop being vocabulary and start being practice.</p>
 <p>This is the final post in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we assemble a FastAPI app and Postgres into one stack with Dockerfile, Compose, health checks, secret boundaries, and log inspection as one repeatable flow.</p>
+<blockquote>
+<p>A one-command stack is where container theory becomes an operational habit you can repeat.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>A <em>Dockerfile</em> for a <em>FastAPI</em> app</li>
 <li><em>Compose</em> with a <em>DB</em> connection</li>
@@ -77,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Every concept above only sticks once you <em>integrate</em> it into <em>one running result</em>. That is the meaning of this <em>final post</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;app code&quot;] --&gt; Image[&quot;docker build&quot;]
-    Image --&gt; Compose[&quot;compose up&quot;]
-    Compose --&gt; App[&quot;app&quot;]
-    Compose --&gt; DB[&quot;db&quot;]
-    App --&gt; Log[&quot;logs&quot;]
-</code></pre>
+<p><img alt="Compose bringing up the app and database as one flow" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Compose bringing up the app and database as one flow</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Dockerfile</strong>: a <em>recipe</em> for building an image.</li>
@@ -114,8 +103,7 @@ def users():
             return {&quot;count&quot;: cur.fetchone()[0]}
 </code></pre>
 <p><strong>Step 2 — Dockerfile</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-FROM python:3.12-slim
+<pre><code class="language-dockerfile">FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -124,18 +112,17 @@ USER 1000
 EXPOSE 8080
 HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
 CMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8080&quot;]
-&quot;&quot;&quot;
 </code></pre>
 <p><strong>Step 3 — docker-compose.yml</strong></p>
-<pre><code class="language-python">&quot;&quot;&quot;
-services:
+<pre><code class="language-yaml">services:
   app:
     build: .
     ports: [&quot;8080:8080&quot;]
     environment:
       DB_URL: postgresql://app:secret@db:5432/app
     depends_on:
-      db: { condition: service_healthy }
+      db:
+        condition: service_healthy
     restart: unless-stopped
   db:
     image: postgres:16
@@ -146,7 +133,8 @@ services:
     healthcheck:
       test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U app&quot;]
       interval: 5s
-&quot;&quot;&quot;
+      timeout: 3s
+      retries: 10
 </code></pre>
 <p><strong>Step 4 — Automate startup</strong></p>
 <pre><code class="language-python">import subprocess
@@ -167,6 +155,21 @@ def logs():
 <li>The <em>healthcheck</em> drives <em>Compose</em> dependency ordering.</li>
 <li><em>depends_on + service_healthy</em> is a paired pattern.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker compose up -d --build
+docker compose ps
+curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:8080/users
+docker compose logs --tail=100
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>docker compose ps</code> shows both app and db as running.<br>
+- <code>/health</code> returns <code>{"ok": true}</code>.<br>
+- <code>/users</code> proves the app can reach Postgres through the service name.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If the app crashes early, inspect <code>depends_on</code> and health-check logic together.<br>
+- If DB access fails, verify the Compose network still resolves <code>db</code> by name.<br>
+- If secrets are still plain text, split them out before calling the stack production-ready.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Storing the <em>DB password</em> as plain text in <em>Compose</em> forever.</strong></li>
@@ -200,6 +203,7 @@ def logs():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>This is the <em>finale</em> of <em>Containers 101</em>. The next step is <em>Kubernetes 101</em>, where you enter the world of <em>orchestration</em>.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -219,6 +223,6 @@ def logs():
 <li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Dockerfile best practices</a></li>
 <li><a href="https://docs.docker.com/engine/reference/builder/#healthcheck">HEALTHCHECK reference</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Compose, FastAPI, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
