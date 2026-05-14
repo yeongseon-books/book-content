@@ -17,7 +17,7 @@ tags:
   - GitHub
   - Beginner
 seo_description: 작은 도구를 첫 오픈소스 프로젝트로 공개하는 범위 설정부터 문서, 릴리스, 피드백 수집까지의 최소 절차를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 내 첫 오픈소스 프로젝트
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 공개까지 가는 최소 경로
 
-```mermaid
-flowchart LR
-    I[아이디어] --> M[MVP]
-    M --> D[문서]
-    D --> R[릴리스]
-    R --> A[공지]
-```
+![공개까지 가는 최소 경로](../../../assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
 
+*아이디어에서 문서, 릴리스, 공지까지 작은 도구를 공개 가능한 프로젝트로 바꾸는 최소 경로*
 이 순서에서 중요한 점은 공개가 맨 마지막에 한 번 일어나는 이벤트가 아니라는 사실입니다. 문서를 정리하는 순간부터 이미 외부 사용자를 상정하게 되고, 릴리스와 공지는 그 준비의 자연스러운 결과가 됩니다.
 
 작은 프로젝트일수록 이 순서를 지키는 편이 좋습니다. 기능을 과하게 늘리기 시작하면 끝내기 어려워지고, 끝내지 못한 프로젝트는 공개 경험을 남기지 못합니다.
@@ -183,5 +178,6 @@ gh release create v0.1.0 --generate-notes
 - [Choose a License](https://choosealicense.com/)
 - [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github)
 - [Show HN](https://news.ycombinator.com/showhn.html)
+- [github/opensource.guide 저장소](https://github.com/github/opensource.guide)
 
 Tags: OpenSource, Project, Capstone, GitHub, Beginner
