@@ -14,7 +14,7 @@ tags:
 - Azure Functions
 - Serverless
 - Cloud
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: 'When developers first hear the word "serverless," the reaction is
   usually one of two things: "What do you mean there''s no server?" or "The cloud
   is…'
@@ -126,6 +126,37 @@ Here are those four concepts on a single diagram:
 Two things matter in this picture: **(1) the Host is a per-instance runtime, while your code runs in a worker process for non-.NET languages, and (2) triggers and bindings are the interface between your functions and the outside world.** That combination is what makes Functions work as an event-driven platform.
 
 If you want to go deeper, the companion series **Azure Functions Deep Dive** walks through how the Host starts functions and how it works with multiple language runtimes.
+
+### HTTP is only the easiest entry point
+
+If you stop at the Hello sample, Functions can look like a lightweight web API framework. That is only half the story. The same programming model also covers non-HTTP events with almost the same surface area. Here is the smallest queue-trigger example that reacts to an incoming order message.
+
+```python
+import logging
+import azure.functions as func
+
+app = func.FunctionApp()
+
+@app.function_name(name="order_received")
+@app.queue_trigger(
+    arg_name="msg",
+    queue_name="orders-incoming",
+    connection="StorageConnection",
+)
+def order_received(msg: func.QueueMessage) -> None:
+    payload = msg.get_json()
+    logging.info("order_id=%s total=%s", payload["order_id"], payload["total"])
+```
+
+```json
+{
+  "order_id": "ord-20260515-001",
+  "total": 12900,
+  "currency": "KRW"
+}
+```
+
+The only thing that changed is **what wakes the function up**. The shape of the function stays small, but the execution model is no longer “HTTP request in, HTTP response out.” That is why Azure Functions is better understood as an **event-processing platform** than as a tiny web framework.
 
 ---
 
