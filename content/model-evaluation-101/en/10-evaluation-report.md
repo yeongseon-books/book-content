@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 10
 title: Building an Evaluation Report
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Reproducibility
   - scikit-learn
 seo_description: A reusable model evaluation report template covering data, metrics, threshold, slices, and reproducibility, generated automatically in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Building an Evaluation Report
 
-> Model Evaluation 101 series (10/10)
+Many teams handle training and metric calculation reasonably well. The weak point usually appears right before deployment, when the result gets compressed into a slide, a dashboard tile, or a single message. A few days later, nobody remembers which data produced the score, which threshold was used, or which slices were already known to be weak.
 
-<!-- a-grade-intro:begin -->
+A strong evaluation report prevents that amnesia. It is not paperwork for its own sake. It is the operating record that makes reviews, audits, and post-incident analysis point back to the same evidence.
 
-**Core question**: When you ship a model, what belongs in a one-page evaluation report?
+This is the final post in the Model Evaluation 101 series. In this post, we turn metrics, slices, reproducibility, and known risks into one report that can survive beyond a single model run.
 
-> *A good report gathers the five elements — data, metrics, threshold, slices, and reproducibility — in a single place.*
-
-<!-- a-grade-intro:end -->
-
-This is the final post in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The five sections of an evaluation report
 - How it differs from a Model Card
@@ -42,21 +36,17 @@ This is the final post in the Model Evaluation 101 series.
 - Patterns for automatic generation
 - Five common pitfalls
 
+> A good evaluation report is the deployment record for one concrete model decision. It keeps metrics, threshold, slices, reproducibility, and known risks in the same place.
+
 ## Why It Matters
 
 Reviews, audits, and post-incident analyses all read the same report. A consistent format speeds up the team.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["data section"] --> Report
-    Metric["metrics + threshold"] --> Report
-    Slice["slice scores"] --> Report
-    Repro["reproducibility"] --> Report
-    Risk["known risks"] --> Report
-```
+![evaluation report structure linking metrics slices reproducibility and risk](../../../assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
 
+*evaluation report structure linking metrics slices reproducibility and risk*
 ## Key Terms
 
 - **Model Card**: a document describing a model's intent and limits.
@@ -140,6 +130,8 @@ def to_md(rep):
 
 print(to_md(report))
 ```
+
+**Expected output:** You should end up with a machine-readable report first and a human-readable summary second, including metrics, threshold, slices, reproducibility metadata, and explicitly documented risks.
 
 ## What to Notice in This Code
 
