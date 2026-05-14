@@ -18,7 +18,7 @@ tags:
   - stack
   - allocator
 seo_description: 프로세스 메모리 구조를 파악하고 누수와 단편화 원인 및 해결 방법을 학습합니다. 가비지 컬렉션의 한계와 실무적인 메모리 관리 기법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 메모리 관리
@@ -40,6 +40,11 @@ last_reviewed: '2026-05-12'
 
 ## 기본 모델
 > 프로세스 메모리는 크게 네 영역으로 나뉩니다. 코드(text), 전역 변수(data/bss), heap, stack. heap은 동적 할당, stack은 함수 호출에 따라 자동으로 자라고 줄어듭니다. OS는 가상 주소를 줘서 모든 프로세스가 자신만의 메모리를 가진 것처럼 보이게 합니다.
+
+### 프로세스 메모리의 큰 네 구역
+
+![프로세스 메모리의 큰 네 구역](../../../assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
+*메모리 문제를 볼 때는 스택, 힙, 전역 영역 가운데 어디가 커지고 있는지부터 나눠 보는 편이 빠릅니다.*
 
 ```text
 high addr
@@ -185,6 +190,12 @@ cat /sys/fs/cgroup/memory.current 2>/dev/null || echo 'not in container'
 - [ ] 캐시에 capacity와 eviction policy를 둘 다 적는다
 - [ ] 컨테이너에서는 cgroup 한도를 의식한다
 - [ ] RSS 추세를 모니터링 대상에 넣는다
+
+## 연습 문제
+
+1. 누수 예제의 RSS 변화를 1분 동안 기록하고, 시간이 지날수록 값이 어떻게 바뀌는지 한 문단으로 정리해 보세요.
+2. 무제한 dict 캐시를 `functools.lru_cache(maxsize=...)`로 바꿔 같은 부하를 걸어 보고, 메모리 사용량 차이를 비교해 보세요.
+3. 64MB로 제한된 컨테이너에서 안전한 캐시 상한을 직접 계산해 보고, 그 근거를 적어 보세요.
 
 ## 마무리와 다음 글
 
