@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Bug["Bug report"] --> Repro["Repro test (failing)"]
-    Repro --> Fix["Code fix"]
-    Fix --> Pass["Test passes"]
-    Pass --> CI["Locked into CI"]
-```
+![한눈에 보는 구조](../../../assets/testing-101/08/08-01-diagram.ko.png)
 
+*한눈에 보는 구조*
 좋은 회귀 테스트 흐름은 버그 보고에서 끝나지 않습니다. 먼저 실패하는 재현 테스트를 만들고, 그 테스트를 통과하도록 코드를 고친 뒤, CI에 넣어 다시는 조용히 돌아오지 못하게 만듭니다.
 
 ## 핵심 용어
@@ -147,6 +142,20 @@ git commit -m "fix(cart): reject negative price (PROJ-1234)"
 
 스냅샷을 아무 생각 없이 갱신하는 문제도 자주 보입니다. 변경 이유를 이해하지 못한 채 갱신하면 테스트는 문서 작업만 남고 신뢰는 사라집니다.
 
+## 직접 검증해 볼 것
+
+1. 수정 전 코드에서 재현 테스트를 먼저 실행해 진짜로 빨간색이 되는지 확인합니다. 이 단계가 없으면 회귀 테스트가 장식으로 끝날 수 있습니다.
+2. 버그 ID를 테스트 이름과 주석 중 한 곳에는 남겨 두어, 나중에 왜 이 테스트가 존재하는지 바로 추적할 수 있게 합니다.
+3. 같은 버그를 E2E와 단위 테스트 중 어디에 두는 편이 더 싼지 비교합니다. 가능한 한 낮은 계층으로 내리는 편이 유지비가 낮습니다.
+
+**예상 결과:** 수정 전에는 재현 테스트가 실패하고, 수정 후에는 같은 테스트가 안정적으로 통과해야 합니다.
+
+## 실패 신호와 첫 점검
+
+- 버그를 고친 뒤 초록색 테스트만 추가하면 실제 회귀 방지력이 없습니다.
+- 재현 테스트가 너무 크면 다른 원인까지 섞여 실패 이유가 흐려집니다.
+- 스냅샷을 무심코 갱신하는 습관이 생기면 회귀 테스트가 기억 장치가 아니라 승인 절차로 변합니다.
+
 ## 실무에서는 이렇게 생각합니다
 
 강한 팀은 버그 수정 PR에 회귀 테스트를 거의 기본으로 요구합니다. 특히 재발 가능성이 높은 문제, 고객 영향이 큰 문제, 경계 조건과 예외 처리 문제는 더 그렇습니다.
@@ -185,9 +194,12 @@ git commit -m "fix(cart): reject negative price (PROJ-1234)"
 
 ## 참고 자료
 
-- [Martin Fowler — Regression Testing](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [pytest docs](https://docs.pytest.org/)
-- [Google Testing Blog](https://testing.googleblog.com/)
+### 공식 문서
+- [pytest documentation](https://docs.pytest.org/)
+- [GitHub Issues documentation](https://docs.github.com/en/issues)
+
+### 실무 참고
+- [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [The Pragmatic Programmer — Bug fixing chapter](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
 
 Tags: Testing, Regression, Bugfix, Quality, pytest
