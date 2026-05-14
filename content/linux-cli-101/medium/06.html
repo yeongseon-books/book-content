@@ -54,24 +54,7 @@
 </head>
 <body>
 <h1>Pipes and Redirection</h1>
-<blockquote>
-<p>Linux CLI 101 series (6/10)</p>
-</blockquote>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
-<ul>
-<li>How does <code>|</code> (pipe) connect two commands?</li>
-<li>What is the difference between <code>&gt;</code>, <code>&gt;&gt;</code>, and <code>&lt;</code>?</li>
-<li>Why are stdout and stderr separated?</li>
-<li>How do you save only error messages to a file?</li>
-</ul>
-<blockquote>
-<p>A pipe connects commands like plumbing, and redirection changes the flow of data from the screen to a file.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Single commands are useful, but real CLI work usually starts when you connect them. Filtering logs, saving build output, and separating failures from normal output all depend on understanding where stdin, stdout, and stderr are flowing.</p>
 <p>This is post 6 in the Linux CLI 101 series.</p>
 <h2>What you will learn</h2>
 <ul>
@@ -92,6 +75,8 @@
 <blockquote>
 <p>Commands are faucets and pipe (<code>|</code>) is plumbing. Data flows from left to right. Redirection (<code>&gt;</code>) diverts the flow from the pipe to a bucket (file) instead.</p>
 </blockquote>
+<p><img alt="How stdin, stdout, and stderr move through pipes and files" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png"></p>
+<p><em>How stdin, stdout, and stderr move through pipes and files</em></p>
 <pre><code class="language-text">[Command A] --stdout--|--stdin--&gt; [Command B] --stdout--&gt; screen
                                                           |
 [Command A] --stdout--&gt; file.txt    (overwrite)           |
@@ -248,6 +233,13 @@ grep &quot;pattern&quot; file.txt          # grep reads the file directly — mo
 <h2>How practitioners think about this</h2>
 <p>Pipes are the heart of the Unix philosophy. Composing small tools eliminates the need to write dedicated programs for most text processing tasks. Developing the habit of asking "Can I do this in one pipe line?" before writing a Python script is a hallmark of CLI proficiency.</p>
 <p>On the other hand, when a pipe chain exceeds 5 stages, maintainability drops. At that point, it makes sense to move the logic to a Python or shell script. Pipes are optimal for "one-off analysis"; "logic that runs repeatedly" should be saved as a script for the sake of team collaboration.</p>
+<h2>When it breaks, check these first</h2>
+<ul>
+<li>If the pipeline output is empty, peel it apart from left to right. Check <code>grep "ERROR" app.log</code> first, then add <code>| sort</code>, then <code>| uniq -c</code>, so you can see exactly where data disappears.</li>
+<li>If a file suddenly becomes empty, look for commands like <code>sort file.txt &gt; file.txt</code>. The shell truncates the file before the command reads it, so you need a temporary file or a safer pattern.</li>
+<li>If failure details never show up, verify whether stderr was redirected at all. For build and deploy logs, <code>2&gt;&amp;1 | tee build.log</code> is often the fastest way to keep both the screen view and the forensic record.</li>
+<li>If you are unsure whether to overwrite or append, write to a temporary file first. Production logs and report files are expensive to recreate once <code>&gt;</code> wipes them out.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] You can connect two commands' output/input with <code>|</code></li>
