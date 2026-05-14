@@ -17,12 +17,16 @@ tags:
   - Walkthrough
   - Beginner
 seo_description: 개발자가 기술 문서에서 예제 코드를 효과적으로 제시하고 핵심을 짚어 설명하며 실행 가능한 결과까지 보여주는 방법을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 예제 코드 설명하기
 
-이 글은 Technical Writing 101 시리즈의 5번째 글입니다.
+예제 코드는 길수록 친절해 보이지만, 실제로는 독자를 더 빨리 지치게 만드는 경우가 많습니다. 복사해 붙여 넣기 전에 무엇부터 봐야 하는지, 어디가 핵심인지, 어떤 출력이 정상인지가 보이지 않으면 코드는 설명이 아니라 장애물이 됩니다.
+
+좋은 코드 설명은 많은 줄을 보여 주는 데 있지 않습니다. 가장 작은 예제를 먼저 제시하고, 왜 그 줄이 필요한지 짚고, 실제 실행과 검증 결과로 독자의 불안을 줄이는 데 있습니다.
+
+이 글은 Technical Writing 101 시리즈의 5번째 글입니다. 여기서는 최소 실행 예제를 고르고, 설명 줄과 실행 결과를 연결하는 코드 워크스루 방식을 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -47,13 +51,9 @@ last_reviewed: '2026-05-12'
 
 > 멘탈 모델: 좋은 예제 코드는 양으로 설득하지 않습니다. 가장 작은 코드 조각을 보여 주고, 그중 어디를 봐야 하는지 짚고, 직접 실행하게 하고, 눈에 보이는 출력으로 닫습니다.
 
-```mermaid
-flowchart LR
-    M[Minimal] --> H[Highlight]
-    H --> R[Run]
-    R --> O[Output]
-```
+![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/05/05-01-concept-at-a-glance.ko.png)
 
+*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **MWE**: 최소 실행 예제입니다.
@@ -67,6 +67,33 @@ flowchart LR
 **Before**: A 200 line code dump.
 
 **After**: An 8 line MWE with a 2 line callout.
+
+## 더 나은 코드 워크스루는 설정, 핵심, 검증을 함께 줍니다
+
+아래처럼 예제를 한 단계 더 현실적으로 만들 수 있습니다.
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/add")
+def add(a: int, b: int) -> dict[str, int]:
+    return {"result": a + b}
+```
+
+```bash
+uvicorn main:app --reload
+curl "http://127.0.0.1:8000/add?a=2&b=3"
+```
+
+**Expected output:**
+
+```json
+{"result":5}
+```
+
+이 예제에서 독자가 가장 먼저 봐야 할 줄은 함수 본문이 아니라 `@app.get`과 `curl` 명령입니다. 하나는 진입점을 만들고, 다른 하나는 독자가 직접 성공을 확인하게 합니다. 코드 설명은 소스만 해설하는 일이 아니라 검증 경로를 열어 주는 일입니다.
 
 ## 실습: 예제 하나 설명해 보기
 
