@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Dockerfile</h1>
-<blockquote>
-<p>Containers 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How can a five-line difference in a Dockerfile produce a 10x size and 5x build-time gap for the same app?</p>
-<blockquote>
-<p><em>Three principles — instruction order, cache friendliness, and multi-stage — completely change the result.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A Dockerfile is not just a text file that happens to build an image. Instruction order changes cache hit rate, base-image choice changes image size and CVE count, and one user directive can change the security posture of the runtime.</p>
 <p>This is post 4 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we focus on cache-friendly instruction order, multi-stage builds, non-root defaults, and secret handling so the resulting image is faster, smaller, and safer to ship.</p>
+<blockquote>
+<p>Dockerfile quality is really cache quality, image quality, and runtime safety compressed into one file.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The role and order of instructions</li>
 <li>Cache-friendly authoring</li>
@@ -77,11 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A Dockerfile directly drives team productivity and security. Get it right once and it pays back for years.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Dockerfile[&quot;dockerfile&quot;] --&gt; Builder[&quot;builder stage&quot;]
-    Builder --&gt; Runtime[&quot;runtime stage&quot;]
-    Runtime --&gt; Image[&quot;final image&quot;]
-</code></pre>
+<p><img alt="Builder stage separated from the runtime stage" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Builder stage separated from the runtime stage</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>FROM</strong>: the base image.</li>
@@ -138,6 +129,17 @@
 <li><code>--from=builder</code> brings results from the previous stage.</li>
 <li><code>USER app</code> avoids root.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker build -t demo-app:dev .
+docker image inspect demo-app:dev --format &quot;user={{.Config.User}} size={{.Size}}&quot;
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- The dependency layer sits early enough to be cached between source-only rebuilds.<br>
+- <code>Config.User</code> is not empty and points to a non-root runtime user.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If dependencies reinstall every time, inspect where <code>COPY requirements.txt</code> sits.<br>
+- If the app still runs as root, confirm <code>USER</code> exists in the final stage.<br>
+- If the image is too large, check whether build tools leaked into runtime.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong><code>COPY .</code> first — kills the cache.</strong></li>
@@ -171,6 +173,7 @@
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once images exist, the next question is <em>where to put state</em>. The next post covers Volume.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -190,6 +193,6 @@
 <li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Dockerfile best practices</a></li>
 <li><a href="https://docs.docker.com/build/building/secrets/">BuildKit secrets</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Dockerfile, Build, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
