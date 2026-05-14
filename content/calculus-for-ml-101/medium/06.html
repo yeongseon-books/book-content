@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Loss Function</h1>
+<p>Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.</p>
+<p>This is post 6 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.</p>
 <blockquote>
-<p>Calculus for ML 101 series (6/10)</p>
+<p>A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What <em>function</em> should we use to <em>score</em> how well an ML model did?</p>
-<blockquote>
-<p>A <em>loss function</em> turns the <em>gap</em> between <em>prediction</em> and <em>truth</em> into a <em>number</em>, and its <em>gradient</em> drives training.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>loss</em></li>
@@ -76,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>The <em>wrong loss</em> yields the <em>wrong model</em>. <em>Choosing the loss</em> is <em>defining the problem</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Y[y true] --&gt; L[Loss]
-    P[y pred] --&gt; L
-    L --&gt; G[Gradient]
-    G --&gt; U[Update]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Loss flow: the gap between truth and prediction becomes loss, gradient, and finally an update signal.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>loss</strong>: a <em>number</em> representing <em>error</em>.</li>
