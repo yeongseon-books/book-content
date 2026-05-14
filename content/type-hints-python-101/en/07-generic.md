@@ -18,22 +18,14 @@ tags:
   - Type Parameters
   - Generic Programming
 seo_description: Write reusable, type-safe code with TypeVar and Generic for functions and classes that work across multiple types.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Understanding Generics
 
-This is post 7 in the Type Hints in Python 101 series.
+Reusable Python code often fails at exactly one point: you can make it accept many types, but you accidentally erase the relationship between the input type and the output type. `Any` makes the code flexible but blind.
 
-> Type Hints in Python 101 Series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Can a function accept multiple types while preserving the relationship between input and output types?
-
-> Consider a function that returns the first element of a list. If you pass `list[int]`, you want `int` back. If you pass `list[str]`, you want `str` back. Using `Any` erases type information. Writing separate functions duplicates code. Generics solve this by letting you parameterize types — "the return type is the same as the element type of the input." This article covers TypeVar, Generic classes, bounds, constraints, and the Python 3.12 syntax.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the Type Hints in Python 101 series. In this article, we will use `TypeVar` and `Generic` to preserve those type relationships, then look at where Generics help in real service code and where they become unnecessary abstraction.
 
 ## What You Will Learn
 
@@ -59,10 +51,14 @@ TypeVar("T") ──> function signature uses T
                      │
               call: f([1, 2, 3])
                      │
-              T = int (resolved)
-                     │
-              return type = int
+               T = int (resolved)
+                      │
+               return type = int
 ```
+
+![How Generic preserves the input-output type relationship](../../../assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png)
+
+*How Generic preserves the input-output type relationship*
 
 ## Key Concepts
 
@@ -223,6 +219,37 @@ class Stack[T]:
 
 Python 3.12 eliminates the need to declare `TypeVar` explicitly. The `[T]` syntax declares the type parameter inline.
 
+## Real Migration Pattern: Wrapper Types First
+
+The biggest payoff from Generics in a real repository usually comes from wrapper types, not toy helper functions. Pagination responses, cache entries, `Repository[T]`, and `Result[T]` all repeat the same structure while varying only in the payload type.
+
+The key question is simple: does the payload type flow through the API unchanged? If yes, Generic is usually the right fit. If the return type no longer depends on the input type, a concrete return type or a Protocol is often clearer.
+
+```python
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+
+class Page(Generic[T]):
+    def __init__(self, items: list[T], total: int) -> None:
+        self.items = items
+        self.total = total
+
+
+def first_item(page: Page[T]) -> T:
+    return page.items[0]
+```
+
+With this contract, `Page[int]` produces `int`, and `Page[str]` produces `str`. That is the signal that the abstraction is earning its keep.
+
+## First Checks When Inference Looks Wrong
+
+- Confirm that one `TypeVar` is not trying to represent two unrelated roles in the same function.
+- Remember that mutable containers like `list[T]` are invariant. `list[Child]` is not assignable to `list[Parent]`.
+- If type parameters keep multiplying, split the API before you end up with `T`, `U`, `V`, and `W` everywhere.
+- Do not use Generic as a prettier `Any`. If no relationship is preserved, a concrete type is often better.
+
 ## What to Notice in This Code
 
 - TypeVar resolves to the same concrete type within a single function call
@@ -293,7 +320,9 @@ In the next article, we will cover mypy and pyright — the tools that actually 
 
 - [Python docs — typing.TypeVar](https://docs.python.org/3/library/typing.html#typing.TypeVar)
 - [Python docs — typing.Generic](https://docs.python.org/3/library/typing.html#typing.Generic)
+- [Python typing specification — Generics](https://typing.python.org/en/latest/spec/generics.html)
 - [PEP 695 — Type Parameter Syntax](https://peps.python.org/pep-0695/)
+- [mypy docs — Variance of generic types](https://mypy.readthedocs.io/en/stable/generics.html#variance-of-generic-types)
 - [mypy docs — Generics](https://mypy.readthedocs.io/en/stable/generics.html)
 
 Tags: Python, Type Hints, Generic, TypeVar, Type Parameters, Generic Programming

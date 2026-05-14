@@ -18,7 +18,7 @@ tags:
   - 타입 매개변수
   - 제네릭 프로그래밍
 seo_description: TypeVar와 Generic으로 타입 안전한 재사용 코드를 작성하는 방법을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Generic 이해하기
@@ -49,10 +49,14 @@ TypeVar("T") ──> 함수 시그니처에 T 사용
                      │
               호출: f([1, 2, 3])
                      │
-              T = int 로 결정
-                     │
-              반환 타입 = int
+               T = int 로 결정
+                      │
+               반환 타입 = int
 ```
+
+![Generic이 입력과 출력 타입 관계를 보존하는 흐름](../../../assets/type-hints-python-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Generic이 입력과 출력 타입 관계를 보존하는 흐름*
 
 ## 핵심 용어
 
@@ -211,6 +215,37 @@ class Stack[T]:
 
 새 문법은 `TypeVar` 선언을 위로 끌어올리지 않아도 타입 매개변수를 바로 표시할 수 있습니다.
 
+## 실무 패턴: 제네릭 래퍼를 도입할 때
+
+Generic은 작은 예제에서는 `first()`나 `Stack[T]`로 보이지만, 실제 저장소에서는 **공통 래퍼와 저장소 추상화**에서 가장 빨리 가치를 드러냅니다. 예를 들어 페이지네이션 응답, 캐시 래퍼, `Repository[T]`, `Result[T]` 같은 구조는 내부 데이터 타입만 바뀌고 나머지 계약은 반복되는 경우가 많습니다.
+
+이때 먼저 해야 할 일은 "타입 매개변수가 실제로 어느 경로를 따라 흐르는가"를 확인하는 것입니다. 입력과 출력이 정말 연결돼 있다면 Generic이 맞습니다. 반대로 반환 타입이 입력 타입과 무관하다면 단순한 구체 타입이나 Protocol이 더 읽기 좋을 수 있습니다.
+
+```python
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+
+class Page(Generic[T]):
+    def __init__(self, items: list[T], total: int) -> None:
+        self.items = items
+        self.total = total
+
+
+def first_item(page: Page[T]) -> T:
+    return page.items[0]
+```
+
+이 예제의 핵심은 `Page[int]`를 넣으면 `int`가, `Page[str]`를 넣으면 `str`이 그대로 이어진다는 점입니다. 이런 흐름이 없다면 Generic은 종종 불필요한 추상화가 됩니다.
+
+## 타입 추론이 기대와 다를 때 먼저 볼 점
+
+- 같은 `TypeVar`를 한 함수에서 여러 의미로 재사용하고 있지 않은지 확인합니다.
+- `list[T]` 같은 가변 컨테이너는 invariant이므로 `list[Child]`를 `list[Parent]`로 넘길 수 없다는 점을 기억합니다.
+- 타입 매개변수가 많아질수록 호출부 추론이 어려워지므로, `T`, `U`, `V`가 동시에 늘어나면 API를 나누는 편이 낫습니다.
+- Generic이 필요 없는 곳에서 `Any` 대체재처럼 쓰고 있지 않은지 점검합니다.
+
 ## 여기서 먼저 봐야 할 점
 
 - 한 함수 호출 안에서 같은 `TypeVar`는 같은 구체 타입으로 결정됩니다.
@@ -280,7 +315,9 @@ Generic은 하나의 함수나 클래스가 여러 타입을 다루더라도 타
 
 - [Python 공식 문서 — typing.TypeVar](https://docs.python.org/3/library/typing.html#typing.TypeVar)
 - [Python 공식 문서 — typing.Generic](https://docs.python.org/3/library/typing.html#typing.Generic)
+- [Python typing specification — Generics](https://typing.python.org/en/latest/spec/generics.html)
 - [PEP 695 — Type Parameter Syntax](https://peps.python.org/pep-0695/)
+- [mypy 문서 — Variance of generic types](https://mypy.readthedocs.io/en/stable/generics.html#variance-of-generic-types)
 - [mypy 문서 — Generics](https://mypy.readthedocs.io/en/stable/generics.html)
 
 Tags: Python, Type Hints, Generic, TypeVar, 타입 매개변수, 제네릭 프로그래밍
