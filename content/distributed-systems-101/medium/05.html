@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Replication</h1>
+<p>Copying data sounds easy until you ask the operational questions that follow. Which copy is authoritative? How long can replicas trail? What is acceptable to lose after a crash? The answers are not implementation details; they are the promises your system makes.</p>
 <p>This is post 5 in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Putting the same data on more than one node sounds simple — why does it produce so many modes and knobs?</p>
-<blockquote>
-<p>Replication is the basic tool for durability and availability. But sync vs async, leader count, and quorum settings change visible behavior dramatically.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Why we replicate, what kinds exist, and the tradeoffs</li>
 <li>The leader-follower, multi-leader, and leaderless models</li>
@@ -80,20 +71,8 @@
 <p>Replication settings are the exchange rate between safety and speed.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    subgraph LF[leader-follower]
-        L[&quot;leader&quot;] --&gt; F1[&quot;follower 1&quot;]
-        L --&gt; F2[&quot;follower 2&quot;]
-    end
-    subgraph ML[multi-leader]
-        M1[&quot;leader A&quot;] &lt;--&gt; M2[&quot;leader B&quot;]
-    end
-    subgraph LL[leaderless]
-        N1[&quot;node&quot;] --- N2[&quot;node&quot;]
-        N2 --- N3[&quot;node&quot;]
-        N3 --- N1
-    end
-</code></pre>
+<p><img alt="Comparison of common replication topologies" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Comparison of common replication topologies</em></p>
 <p>These three topologies cover more than ninety percent of real systems.</p>
 <h2>Key Terms</h2>
 <ul>
