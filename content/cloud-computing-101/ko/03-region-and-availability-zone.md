@@ -17,14 +17,18 @@ tags:
   - HighAvailability
   - Architecture
 seo_description: 리전과 AZ의 차이, Multi-AZ와 Multi-Region 판단 기준을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # Region과 Availability Zone
 
-같은 AWS 서비스라도 어떤 팀은 한 장애에도 멀쩡히 버티고, 어떤 팀은 바로 전체 서비스가 내려갑니다. 차이는 기능 이름보다 배치 전략에 있습니다. 이 글은 Cloud Computing 101 시리즈의 3번째 글입니다. 여기서는 Region, Availability Zone, Edge의 차이를 정리하고, 가용성을 위해 무엇을 기본값으로 생각해야 하는지 살펴보겠습니다.
+같은 AWS 서비스라도 어떤 팀은 한 장애에도 멀쩡히 버티고, 어떤 팀은 바로 전체 서비스가 내려갑니다. 차이는 기능 이름보다 배치 전략에 있습니다.
 
-클라우드에서 “어디에 둘 것인가”는 단순한 위치 선택이 아닙니다. 지연 시간, 데이터 복제 비용, 장애 범위, 복구 전략이 모두 이 결정에서 시작됩니다.
+클라우드에서 "어디에 둘 것인가"는 단순한 위치 선택이 아닙니다. 지연 시간, 데이터 복제 비용, 장애 범위, 복구 전략이 모두 이 결정에서 시작됩니다.
+
+이 글은 Cloud Computing 101 시리즈의 3번째 글입니다.
+
+여기서는 Region, Availability Zone, Edge의 차이를 정리하고, 가용성을 위해 무엇을 기본값으로 생각해야 하는지 살펴보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -44,16 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    R["us-east-1 region"] --> A["az a"]
-    R --> B["az b"]
-    R --> C["az c"]
-    A --> DC1["data center"]
-    B --> DC2["data center"]
-    C --> DC3["data center"]
-```
+![리전 내부에 여러 AZ가 배치되어 장애 경계를 나누는 구조](../../../assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)
 
+*리전 내부에 여러 AZ가 배치되어 장애 경계를 나누는 구조*
 리전은 도시 또는 대륙 규모의 위치이고, AZ는 리전 내부에서 물리적으로 분리된 장애 경계입니다. Edge는 CDN이 사용자 가까이에 콘텐츠를 두는 마지막 홉입니다. 이 셋을 구분해야 지연 시간과 가용성을 같은 표 위에서 비교할 수 있습니다.
 
 ## 핵심 용어
@@ -127,6 +124,27 @@ print(placement(["a", "b", "c"], 5))
 - 단순한 라운드로빈 분산도 생각보다 효과적입니다.
 
 특히 첫 번째 포인트가 중요합니다. 내 계정의 `az a`와 다른 계정의 `az a`가 같은 물리 위치라고 단정하면 안 됩니다. 이름보다 장애 경계를 이해하는 편이 더 중요합니다.
+
+## 이 예제를 실제로 검증하는 순서
+
+리전과 AZ를 다룰 때는 문서 설명보다 실제 계정에서 보이는 목록을 먼저 보는 편이 이해에 도움이 됩니다. 특히 AZ 이름은 계정마다 다르게 매핑될 수 있으므로, 표기만 보고 같은 물리 위치라고 단정하면 안 됩니다.
+
+```bash
+python -c 'import boto3; print([z["ZoneName"] for z in boto3.client("ec2", region_name="us-east-1").describe_availability_zones()["AvailabilityZones"]])'
+python -c 'import boto3; print([r["RegionName"] for r in boto3.client("ec2").describe_regions()["Regions"]][:5])'
+```
+
+**Expected output:**
+
+- 첫 번째 명령에서는 `us-east-1a`, `us-east-1b` 같은 AZ 목록이 보여야 합니다.
+- 두 번째 명령에서는 계정이 조회 가능한 리전 이름이 출력되어야 합니다.
+- 이 결과를 보면 "리전 안에 여러 장애 경계가 있다"는 설명이 문서 문장이 아니라 실제 자원 구조로 연결됩니다.
+
+### 자주 막히는 지점
+
+- Multi-AZ를 구성했다고 해도 실제 데이터베이스나 캐시가 단일 AZ에 남아 있으면 장애 범위는 그대로입니다.
+- Multi-Region은 늘 더 좋은 답이 아닙니다. 복제 비용과 운영 복잡도까지 함께 계산해야 합니다.
+- RTT 계산 예제는 정확한 측정값이 아니라 물리 거리의 하한을 감 잡기 위한 도구로 보는 편이 맞습니다.
 
 ## Multi-AZ와 Multi-Region을 어떻게 나눌까
 

@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 3
 title: Region and Availability Zone
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - HighAvailability
   - Architecture
 seo_description: Regions vs Availability Zones, Multi-AZ vs Multi-Region tradeoffs, and how to design for latency and survivability with code examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Region and Availability Zone
 
-> Cloud Computing 101 series (3/10)
+Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does the same AWS service stay alive when one region fails for some teams but go down for others?
-
-> *A region is a geographic location, an AZ is a physically isolated cluster of data centers — distributing across AZs is the foundation of high availability.*
+In cloud systems, choosing where something runs is not a cosmetic decision. It sets the floor for latency, shapes your failover blast radius, and determines how expensive replication will become later.
 
 This is post 3 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.
 
-## What You Will Learn
+> A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.
+
+## Questions This Chapter Answers
 
 - Region vs AZ vs Edge
 - What Multi-AZ really means
@@ -48,15 +46,9 @@ If everything sits in one AZ, a single data center fire takes down your service.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["us-east-1 region"] --> A["az a"]
-    R --> B["az b"]
-    R --> C["az c"]
-    A --> DC1["data center"]
-    B --> DC2["data center"]
-    C --> DC3["data center"]
-```
+![A Region contains multiple Availability Zones that separate failure boundaries](../../../assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
+
+*A Region contains multiple Availability Zones that separate failure boundaries*
 
 ## Key Terms
 
@@ -123,6 +115,27 @@ print(placement(["a", "b", "c"], 5))
 - AZ names are mapped *per account* — your `az a` may not be mine.
 - RTT has a hard physical floor.
 - Round-robin spreading is dumb but effective.
+
+## How to Verify This Example
+
+Placement concepts become easier to trust once you inspect your own account. AZ names are especially important to verify because the labels are account-mapped and should not be treated as a universal physical coordinate.
+
+```bash
+python -c 'import boto3; print([z["ZoneName"] for z in boto3.client("ec2", region_name="us-east-1").describe_availability_zones()["AvailabilityZones"]])'
+python -c 'import boto3; print([r["RegionName"] for r in boto3.client("ec2").describe_regions()["Regions"]][:5])'
+```
+
+**Expected output:**
+
+- The first command should return AZ names such as `us-east-1a`, `us-east-1b`, and `us-east-1c`.
+- The second should list accessible AWS Regions.
+- Seeing both outputs side by side makes the Region/AZ hierarchy much more concrete than the definition alone.
+
+### Where teams usually get stuck
+
+- A service is not really Multi-AZ if the database, cache, or queue still sits behind a single failure boundary.
+- Multi-Region is not automatically better. Replication and operational overhead have to be worth it.
+- The RTT helper is a back-of-the-envelope floor, not a production benchmark.
 
 ## Five Common Mistakes
 
