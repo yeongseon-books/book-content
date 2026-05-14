@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Function Type Hints
 
+This is post 4 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (4/10)
 
 <!-- a-grade-intro:begin -->

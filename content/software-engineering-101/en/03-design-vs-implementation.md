@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Design vs Implementation
 
+This is post 3 in the Software Engineering 101 series.
+
 > Software Engineering 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

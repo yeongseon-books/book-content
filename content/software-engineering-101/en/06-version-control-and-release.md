@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Version Control and Release
 
+This is post 6 in the Software Engineering 101 series.
+
 > Software Engineering 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

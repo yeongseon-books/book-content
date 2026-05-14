@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Technical Writing
 
+This is the first post in the Technical Writing 101 series.
+
 > Technical Writing 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

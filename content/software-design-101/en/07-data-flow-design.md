@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Data Flow Design
 
+This is post 7 in the Software Design 101 series.
+
 > Software Design 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # GROUP BY and Aggregates
 
+This is post 5 in the SQL 101 series.
+
 > SQL 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

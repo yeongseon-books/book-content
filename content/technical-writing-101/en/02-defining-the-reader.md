@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Defining the Reader
 
+This is post 2 in the Technical Writing 101 series.
+
 > Technical Writing 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

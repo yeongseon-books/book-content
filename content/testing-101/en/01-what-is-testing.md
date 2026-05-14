@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Testing?
 
+This is the first post in the Testing 101 series.
+
 > Testing 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

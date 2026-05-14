@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is SQL?
 
+This is the first post in the SQL 101 series.
+
 > SQL 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

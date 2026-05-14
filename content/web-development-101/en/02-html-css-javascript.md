@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # HTML, CSS, and JavaScript
 
+This is post 2 in the Web Development 101 series.
+
 > Web Development 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

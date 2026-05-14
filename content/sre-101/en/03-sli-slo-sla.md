@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # SLI, SLO, SLA
 
+This is post 3 in the SRE 101 series.
+
 > SRE 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

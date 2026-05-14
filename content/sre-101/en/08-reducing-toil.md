@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Reducing Toil
 
+This is post 8 in the SRE 101 series.
+
 > SRE 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

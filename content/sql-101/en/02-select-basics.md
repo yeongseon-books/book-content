@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # SELECT Basics
 
+This is post 2 in the SQL 101 series.
+
 > SQL 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

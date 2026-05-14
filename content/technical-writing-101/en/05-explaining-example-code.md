@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Explaining Example Code
 
+This is post 5 in the Technical Writing 101 series.
+
 > Technical Writing 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

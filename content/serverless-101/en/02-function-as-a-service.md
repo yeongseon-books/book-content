@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Function as a Service
 
+This is post 2 in the Serverless 101 series.
+
 > Serverless 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

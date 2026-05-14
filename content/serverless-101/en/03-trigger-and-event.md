@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Trigger and Event
 
+This is post 3 in the Serverless 101 series.
+
 > Serverless 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

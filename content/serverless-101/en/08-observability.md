@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Observability
 
+This is post 8 in the Serverless 101 series.
+
 > Serverless 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

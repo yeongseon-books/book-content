@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Cost
 
+This is post 9 in the Serverless 101 series.
+
 > Serverless 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

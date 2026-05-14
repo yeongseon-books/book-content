@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Authentication and Sessions
 
+This is post 6 in the Web Development 101 series.
+
 > Web Development 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

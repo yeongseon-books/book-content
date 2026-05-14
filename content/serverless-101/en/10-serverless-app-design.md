@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Designing a Serverless App
 
+This is the final post in the Serverless 101 series.
+
 > Serverless 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

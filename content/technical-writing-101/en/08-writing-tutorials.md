@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Writing Tutorials
 
+This is post 8 in the Technical Writing 101 series.
+
 > Technical Writing 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

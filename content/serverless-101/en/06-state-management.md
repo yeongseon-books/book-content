@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # State Management
 
+This is post 6 in the Serverless 101 series.
+
 > Serverless 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

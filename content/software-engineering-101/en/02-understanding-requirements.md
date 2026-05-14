@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Understanding Requirements
 
+This is post 2 in the Software Engineering 101 series.
+
 > Software Engineering 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

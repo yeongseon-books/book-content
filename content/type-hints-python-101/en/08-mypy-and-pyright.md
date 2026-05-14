@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Using mypy and pyright
 
+This is post 8 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (8/10)
 
 <!-- a-grade-intro:begin -->

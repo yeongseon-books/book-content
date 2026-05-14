@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Layered Architecture
 
+This is post 6 in the Software Design 101 series.
+
 > Software Design 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

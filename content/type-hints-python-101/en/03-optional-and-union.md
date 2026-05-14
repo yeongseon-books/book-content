@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Optional and Union
 
+This is post 3 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (3/10)
 
 <!-- a-grade-intro:begin -->

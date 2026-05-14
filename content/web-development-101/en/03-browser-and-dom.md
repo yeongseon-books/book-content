@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # The Browser and the DOM
 
+This is post 3 in the Web Development 101 series.
+
 > Web Development 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

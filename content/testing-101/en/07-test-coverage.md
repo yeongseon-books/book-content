@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Test Coverage
 
+This is post 7 in the Testing 101 series.
+
 > Testing 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

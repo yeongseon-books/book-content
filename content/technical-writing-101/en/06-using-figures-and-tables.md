@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Using Figures and Tables
 
+This is post 6 in the Technical Writing 101 series.
+
 > Technical Writing 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

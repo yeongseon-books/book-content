@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Reducing Change Impact
 
+This is post 8 in the Software Design 101 series.
+
 > Software Design 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

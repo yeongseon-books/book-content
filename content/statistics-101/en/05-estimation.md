@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Estimation
 
+This is post 5 in the Statistics 101 series.
+
 > Statistics 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

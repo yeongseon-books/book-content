@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Confidence Interval
 
+This is post 6 in the Statistics 101 series.
+
 > Statistics 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

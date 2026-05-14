@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Mock and Stub
 
+This is post 6 in the Testing 101 series.
+
 > Testing 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

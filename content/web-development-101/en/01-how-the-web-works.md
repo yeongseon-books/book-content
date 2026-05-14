@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # How the Web Works
 
+This is the first post in the Web Development 101 series.
+
 > Web Development 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

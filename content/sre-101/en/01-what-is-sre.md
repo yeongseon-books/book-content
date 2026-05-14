@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What is SRE?
 
+This is the first post in the SRE 101 series.
+
 > SRE 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

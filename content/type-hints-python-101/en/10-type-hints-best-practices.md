@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Type Hint Best Practices
 
+This is the final post in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (10/10)
 
 <!-- a-grade-intro:begin -->

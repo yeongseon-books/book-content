@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Window Function
 
+This is post 7 in the SQL 101 series.
+
 > SQL 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

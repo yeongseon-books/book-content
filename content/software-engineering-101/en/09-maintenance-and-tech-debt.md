@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Maintenance and Tech Debt
 
+This is post 9 in the Software Engineering 101 series.
+
 > Software Engineering 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

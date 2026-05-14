@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # WHERE and Conditions
 
+This is post 3 in the SQL 101 series.
+
 > SQL 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

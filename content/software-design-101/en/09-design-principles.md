@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Design Principles
 
+This is post 9 in the Software Design 101 series.
+
 > Software Design 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

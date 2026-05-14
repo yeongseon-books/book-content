@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Understanding Generics
 
+This is post 7 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (7/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # TypedDict and dataclass
 
+This is post 5 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (5/10)
 
 <!-- a-grade-intro:begin -->

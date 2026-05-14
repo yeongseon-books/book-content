@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Modules and Boundaries
 
+This is post 3 in the Software Design 101 series.
+
 > Software Design 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

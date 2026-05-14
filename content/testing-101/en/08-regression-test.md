@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Regression Test
 
+This is post 8 in the Testing 101 series.
+
 > Testing 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

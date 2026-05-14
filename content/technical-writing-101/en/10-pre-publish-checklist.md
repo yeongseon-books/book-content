@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Pre-publish Checklist
 
+This is the final post in the Technical Writing 101 series.
+
 > Technical Writing 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Integration Test
 
+This is post 3 in the Testing 101 series.
+
 > Testing 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

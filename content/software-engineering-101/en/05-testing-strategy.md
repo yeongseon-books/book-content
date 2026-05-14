@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Testing Strategy
 
+This is post 5 in the Software Engineering 101 series.
+
 > Software Engineering 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

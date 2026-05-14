@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Protocol and Structural Typing
 
+This is post 6 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (6/10)
 
 <!-- a-grade-intro:begin -->

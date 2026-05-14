@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Mean, Median, and Variance
 
+This is post 2 in the Statistics 101 series.
+
 > Statistics 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

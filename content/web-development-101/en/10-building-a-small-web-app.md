@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Building a Small Web App
 
+This is the final post in the Web Development 101 series.
+
 > Web Development 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Capacity Planning
 
+This is post 9 in the SRE 101 series.
+
 > SRE 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

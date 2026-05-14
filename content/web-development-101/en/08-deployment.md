@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Deployment
 
+This is post 8 in the Web Development 101 series.
+
 > Web Development 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

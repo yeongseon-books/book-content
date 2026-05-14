@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Cold Start
 
+This is post 4 in the Serverless 101 series.
+
 > Serverless 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

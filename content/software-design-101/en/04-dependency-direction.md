@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Dependency Direction
 
+This is post 4 in the Software Design 101 series.
+
 > Software Design 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

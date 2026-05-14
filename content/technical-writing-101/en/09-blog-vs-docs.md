@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Blog vs Documentation
 
+This is post 9 in the Technical Writing 101 series.
+
 > Technical Writing 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

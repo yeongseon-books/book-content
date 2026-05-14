@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Sample and Population
 
+This is post 4 in the Statistics 101 series.
+
 > Statistics 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

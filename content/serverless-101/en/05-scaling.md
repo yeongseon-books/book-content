@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Scaling
 
+This is post 5 in the Serverless 101 series.
+
 > Serverless 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

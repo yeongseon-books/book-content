@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # What Are Python Type Hints?
 
+This is the first post in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (1/10)
 
 <!-- a-grade-intro:begin -->

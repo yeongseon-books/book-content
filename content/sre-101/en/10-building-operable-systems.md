@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Building Operable Systems
 
+This is the final post in the SRE 101 series.
+
 > SRE 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

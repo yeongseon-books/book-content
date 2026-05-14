@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Error Budget
 
+This is post 4 in the SRE 101 series.
+
 > SRE 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

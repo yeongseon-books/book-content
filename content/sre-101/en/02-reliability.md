@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Reliability
 
+This is post 2 in the SRE 101 series.
+
 > SRE 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

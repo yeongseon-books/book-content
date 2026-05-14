@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Running Tests in CI
 
+This is post 9 in the Testing 101 series.
+
 > Testing 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

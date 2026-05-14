@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Statistical Thinking
 
+This is the final post in the Statistics 101 series.
+
 > Statistics 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

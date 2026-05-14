@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Basic Types and Collection Types
 
+This is post 2 in the Type Hints in Python 101 series.
+
 > Type Hints in Python 101 Series (2/10)
 
 <!-- a-grade-intro:begin -->
