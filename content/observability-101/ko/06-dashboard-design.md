@@ -17,7 +17,7 @@ tags:
   - SRE
   - Monitoring
 seo_description: RED와 USE 패턴으로 장식이 아닌 질문에 답하는 대시보드를 설계하는 법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 대시보드 설계
@@ -46,12 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Q["질문"] --> RED["RED: 요청 수, 오류, 지연"]
-    Q --> USE["USE: 사용률, 포화도, 오류"]
-    Q --> Golden["핵심 신호: 지연, 트래픽, 오류, 포화도"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/06/06-01-concept-at-a-glance.ko.png)
+*질문을 RED, USE, 핵심 신호 패널로 나눠 첫 화면의 판단 순서를 만드는 대시보드 설계 구조*
 
 ## 핵심 용어
 
@@ -125,6 +121,24 @@ $service = api | worker | scheduler
 
 같은 대시보드 구조를 환경과 서비스별로 재사용할 수 있어야 유지 비용이 낮아집니다. 변수는 화면 수를 무한히 늘리지 않고도 비교와 전환을 가능하게 합니다.
 
+## 첫 화면은 이렇게 검증합니다
+
+좋은 대시보드는 패널이 예쁜지보다 첫 30초 안에 다음 행동을 정하게 해 주는지가 중요합니다. 배포 직후 checkout 지연이 올라간 상황을 예로 들면 아래 순서가 가장 실용적입니다.
+
+```text
+1) Latency p95/p99 패널에서 지연 상승 확인
+2) Error 패널에서 같은 시점의 5xx 증가 여부 확인
+3) Saturation 패널에서 큐 길이 또는 CPU 포화 여부 확인
+4) Deploy annotation 과 시간 축을 맞춰 배포 영향인지 확인
+```
+
+```text
+Expected output:
+- 첫 행만 보고도 성능 저하인지 오류 급증인지 구분됩니다.
+- 포화도 패널이 정상이라면 애플리케이션 내부나 외부 의존성을 더 의심하게 됩니다.
+- 배포 주석이 겹치면 롤백 또는 설정 변경 검토가 빨라집니다.
+```
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - RED는 바깥에서 본 사용자 경험이고, USE는 안쪽에서 본 자원 상태입니다.
@@ -181,5 +195,6 @@ $service = api | worker | scheduler
 - [Tom Wilkie — RED Method](https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/)
 - [Google SRE — Golden Signals](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [Grafana dashboard best practices](https://grafana.com/docs/grafana/latest/best-practices/)
+- [Grafana panels and visualizations](https://grafana.com/docs/grafana/latest/panels-visualizations/)
 
 Tags: Observability, Dashboard, Grafana, SRE, Monitoring

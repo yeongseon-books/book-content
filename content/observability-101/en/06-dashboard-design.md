@@ -2,7 +2,7 @@
 series: observability-101
 episode: 6
 title: Dashboard Design
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - SRE
   - Monitoring
 seo_description: USE and RED patterns and how to choose panels that answer questions instead of decorating the wall.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Dashboard Design
 
+Large dashboards often look impressive right until an incident starts. The screen is full, but the first person on call still does not know where to look, what changed first, or whether the problem is user-facing or internal.
+
+Good dashboard design fixes that. The first screen should compress the system into a small number of questions that lead directly to the next action.
+
 This is post 6 in the Observability 101 series.
-
-> Observability 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: What separates a *good* dashboard from one that is *wallpaper*?
-
-> *Good dashboards answer *one question*. Patterns like *USE* and *RED* turn panels into *units of meaning*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,12 +44,8 @@ Most dashboards are *decoration*. If you do not know *where to look* during an i
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q["question"] --> RED["RED: rate, error, duration"]
-    Q --> USE["USE: util, saturation, error"]
-    Q --> Golden["Golden: latency, traffic, error, saturation"]
-```
+![Concept at a Glance](../../../assets/observability-101/06/06-01-concept-at-a-glance.en.png)
+*The first dashboard screen should route the operator from a question to RED, USE, and the golden signals in a predictable order.*
 
 ## Key Terms
 
@@ -117,6 +107,24 @@ annotations:
 ```text
 $env = staging | production
 $service = api | worker | scheduler
+```
+
+## How to Validate the First Screen
+
+The real test is whether the first 30 seconds change your next action. Imagine checkout latency rising right after a deploy.
+
+```text
+1) Check latency p95/p99 on the summary row.
+2) Check whether 5xx rises at the same time.
+3) Check saturation: queue depth, CPU, memory.
+4) Align the anomaly with deploy annotations.
+```
+
+```text
+Expected output:
+- The summary row distinguishes latency regression from error spikes.
+- Healthy saturation suggests the bottleneck is inside the app or a dependency, not the host.
+- A deploy marker overlapping the change makes rollback or config review the next obvious step.
 ```
 
 ## What to Notice in This Code
@@ -181,5 +189,6 @@ Question-driven dashboards change *decision speed*. Next: *alerts and on-call*.
 - [Tom Wilkie — RED Method](https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/)
 - [Google SRE — Golden Signals](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [Grafana dashboard best practices](https://grafana.com/docs/grafana/latest/best-practices/)
+- [Grafana panels and visualizations](https://grafana.com/docs/grafana/latest/panels-visualizations/)
 
 Tags: Observability, Dashboard, Grafana, SRE, Monitoring
