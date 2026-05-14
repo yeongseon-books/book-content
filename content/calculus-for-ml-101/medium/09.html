@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Backpropagation Intuition</h1>
+<p>So far in this series, we've built the math behind derivatives, partial derivatives, gradients, the chain rule, loss, and optimization. The remaining practical question is computational: how do you produce gradients for thousands or millions of weights without numerically perturbing each one?</p>
+<p>This is post 9 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll use computation graphs, forward and backward passes, local derivatives, and gradient accumulation to explain backpropagation. The goal is not to reimplement a deep learning framework, but to understand why one backward pass can still recover the full gradient efficiently.</p>
 <blockquote>
-<p>Calculus for ML 101 series (9/10)</p>
+<p>Backpropagation is not new math. It is the chain rule executed systematically over a computation graph, with cached forward values and accumulated backward signals.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we compute gradients for <em>thousands of weights</em> <em>all at once</em>?</p>
-<blockquote>
-<p><em>Backpropagation</em> applies the <em>chain rule backward</em> and produces <em>every gradient efficiently</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>computation graph</em></li>
@@ -76,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Frameworks</em> compute gradients for you, so understanding the <em>principle</em> enables <em>debugging</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    X[Inputs] --&gt; H[Hidden]
-    H --&gt; Y[Output]
-    Y --&gt; L[Loss]
-    L --&gt; H
-    H --&gt; X
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Backpropagation flow: loss sends gradient signals backward through the computation graph.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>graph</strong>: a <em>graph of computations</em>.</li>
@@ -130,6 +120,26 @@ y = mul(add(a, b), c)
 backward(y)
 # a.grad == 4.0, b.grad == 4.0, c.grad == 5.0
 </code></pre>
+<p><strong>Step 6 — Shared nodes explain why gradients accumulate</strong></p>
+<pre><code class="language-python">a = Node(2.0)
+b = add(a, a)
+y = mul(b, a)
+backward(y)
+
+# y = (a + a) * a = 2a^2
+# dy/da = 4a, so at a=2 the gradient is 8
+print(a.grad)
+</code></pre>
+<p><strong>Expected output:</strong> <code>8.0</code></p>
+<p>This tiny example makes accumulation concrete. The same node <code>a</code> is used twice inside <code>add(a, a)</code>, and the result is multiplied by <code>a</code> again. During backpropagation, the graph therefore exposes multiple paths that contribute to the same variable. If you overwrite instead of accumulate, you lose part of the true gradient.</p>
+<p><strong>Step 7 — A real framework still follows the same logic</strong></p>
+<pre><code class="language-python">optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+</code></pre>
+<p>The reason <code>zero_grad()</code> matters is now easier to see. In many frameworks, gradients accumulate by default because a parameter can receive contributions from multiple paths or multiple backward calls. If you forget to clear the buffer, the next training step mixes the current batch's signal with stale gradient state.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>forward</em> pass produces <em>values</em>.</li>
@@ -187,6 +197,7 @@ backward(y)
 <li><a href="https://colah.github.io/posts/2015-08-Backprop/">Calculus on Computational Graphs - Olah</a></li>
 <li><a href="https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html">PyTorch Autograd</a></li>
 <li><a href="https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html">JAX Autograd Cookbook</a></li>
+<li><a href="https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html">Zeroing out gradients in PyTorch</a></li>
 </ul>
 <p class="tags-line">Tags: Calculus, ML, Backprop, NeuralNetwork, Beginner</p>
 </body>
