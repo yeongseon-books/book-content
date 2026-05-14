@@ -54,48 +54,37 @@
 </head>
 <body>
 <h1>Continuous Distributions</h1>
-<p>This is post 8 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we model <em>continuous quantities</em> like <em>height, time, error</em>?</p>
-<blockquote>
-<p><em>The normal distribution is the </em>most frequently encountered<em> distribution in the world.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In discrete distributions, you can count the possible values one by one. Many real variables do not behave that way. Height, response time, measurement error, weight, and price move along a continuous scale, so they need a different language. That language is the continuous distribution.</p>
+<p>Once continuous distributions click, several things become easier at once: why a PDF value is not itself a probability, why the normal distribution appears so often, and why standardization is such a common move in analysis and machine learning.</p>
+<p>This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.</p>
+<h2>What you will learn</h2>
 <ul>
-<li><em>Uniform / Normal / Exponential / Gamma</em></li>
-<li>The <em>PDF, E, Var</em> of each</li>
-<li><em>Why the normal</em> appears so often</li>
-<li>A 5-step continuous-distribution exercise</li>
-<li>Five common mistakes</li>
+<li>What it means to model a continuous quantity probabilistically</li>
+<li>Why a density is not the same thing as a probability</li>
+<li>When Uniform, Normal, Exponential, and Gamma distributions make sense</li>
+<li>What the memoryless property of the Exponential distribution tells you</li>
+<li>Why standardization is useful when comparing different scales</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>In <em>ML, signal processing, measurement error</em>, <em>continuous distributions</em> are the <em>default assumption</em>. The <em>normal</em> arises <em>naturally</em> via the <em>CLT</em>.</p>
+<p>Much of the data you see in production is continuous: sensor readings, latency, error magnitudes, temperatures, prices, and model residuals. A distribution gives you a way to reason not just about a single measurement, but about typical ranges, rare regions, and the shape of the uncertainty.</p>
+<p>The practical payoff is that a good continuous model turns loose numbers into decisions you can reason about. You can talk about tail probability, expected wait time, standard deviations from the mean, or whether a normal approximation is reasonable at all.</p>
 <blockquote>
-<p><em>Continuous distributions model the analog world.</em></p>
+<p>In continuous probability, the key habit is to think in intervals. Probability lives in area, not in a single point.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    U[&quot;Uniform(a,b)&quot;] --&gt; N[&quot;Normal(mu, sigma)&quot;]
-    N --&gt; Std[&quot;Standardize Z = (X-mu)/sigma&quot;]
-    E[&quot;Exponential(lambda)&quot;] --&gt; G[&quot;Gamma(k, theta)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Uniform(a,b)</strong>: equal density on the interval. E=(a+b)/2.</li>
 <li><strong>Normal(μ,σ)</strong>: bell shape. E=μ, Var=σ².</li>
-<li><strong>Exponential(λ)</strong>: <em>waiting time</em>. E=1/λ.</li>
-<li><strong>Gamma(k,θ)</strong>: <em>generalization of exponential</em>.</li>
+<li><strong>Exponential(λ)</strong>: waiting time. E=1/λ.</li>
+<li><strong>Gamma(k,θ)</strong>: generalization of exponential.</li>
 <li><strong>Standardization</strong>: Z = (X-μ)/σ → N(0,1).</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“Height data”</em> — hard to analyze.</p>
-<p><strong>After</strong>: assume <em>Normal(170, 7)</em> → <em>top 5%</em> of heights from a <em>formula</em>.</p>
+<p><strong>Before</strong>: “Height data” is just a column of numbers.</p>
+<p><strong>After</strong>: “Approximate it as Normal(170, 7)” immediately lets you estimate percentiles, tails, and standardized comparisons.</p>
 <h2>Hands-on: 5-step Continuous Distributions</h2>
 <p><strong>Step 1 — Uniform</strong></p>
 <pre><code class="language-python">from scipy import stats
@@ -126,43 +115,43 @@ print(&quot;Z mean ~ 0:&quot;, z.mean(), &quot;std ~ 1:&quot;, z.std())
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>A <em>PDF value</em> is <em>not a probability</em> — <em>integrate</em> to get one.</li>
-<li>The <em>exponential</em> is <em>memoryless</em>.</li>
-<li>The <em>normal</em> arises from <em>sums and averages</em> (CLT).</li>
+<li>A PDF value is not a probability — integrate to get one.</li>
+<li>The exponential is memoryless.</li>
+<li>The normal arises from sums and averages (CLT).</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Reading <em>PDF values as probabilities</em>.</strong></li>
-<li><strong>Assuming <em>normality</em> without checking.</strong></li>
-<li><strong>Forgetting the <em>units</em> of standard deviation.</strong></li>
-<li><strong>Forgetting the <em>memorylessness</em> of the exponential.</strong></li>
-<li><strong>Ignoring <em>skewed</em> shapes like <em>log-normal</em>.</strong></li>
+<li><strong>Reading PDF values as probabilities.</strong></li>
+<li><strong>Assuming normality without checking.</strong></li>
+<li><strong>Forgetting the units of standard deviation.</strong></li>
+<li><strong>Forgetting the memorylessness of the exponential.</strong></li>
+<li><strong>Ignoring skewed shapes like log-normal.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>The <em>normal</em> model for measurement error, <em>exponential</em> waiting times, <em>log-normal</em> prices, the <em>foundation</em> distributions for confidence intervals and tests — <em>continuous distributions</em> are the <em>vocabulary of modeling</em>.</p>
+<p>The normal model for measurement error, exponential waiting times, log-normal prices, the foundation distributions for confidence intervals and tests — continuous distributions are the vocabulary of modeling.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Visualizes</em> every distribution assumption.</li>
-<li>Uses <em>Q-Q plots</em> to check <em>normality</em>.</li>
-<li>Tries <em>log transforms</em> on <em>skewed</em> data.</li>
-<li>Exploits <em>standardization</em>.</li>
-<li>Acknowledges the <em>limits</em> of distributions.</li>
+<li>Visualizes every distribution assumption.</li>
+<li>Uses Q-Q plots to check normality.</li>
+<li>Tries log transforms on skewed data.</li>
+<li>Exploits standardization.</li>
+<li>Acknowledges the limits of distributions.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I know each <em>PDF</em> and its <em>E/Var</em>.</li>
-<li>[ ] I can <em>standardize</em>.</li>
-<li>[ ] I know <em>PDF ≠ probability</em>.</li>
-<li>[ ] I can draw a <em>Q-Q plot</em>.</li>
+<li>[ ] I know each PDF and its E/Var.</li>
+<li>[ ] I can standardize.</li>
+<li>[ ] I know PDF ≠ probability.</li>
+<li>[ ] I can draw a Q-Q plot.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>For <em>N(0,1)</em>, compute <em>P(|X| &gt; 2)</em>.</li>
-<li>For <em>Exponential(λ=2)</em>, find the <em>median</em>.</li>
-<li>Describe how <em>log-normal</em> differs in <em>shape</em> from <em>normal</em>.</li>
+<li>For N(0,1), compute P(|X| &gt; 2).</li>
+<li>For Exponential(λ=2), find the median.</li>
+<li>Describe how log-normal differs in shape from normal.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Continuous distributions are the <em>priors of measurement</em>. The next episode shows <em>why the normal appears everywhere</em> via the LLN and CLT.</p>
+<p>Continuous distributions are the priors of measurement. The next episode shows why the normal appears everywhere via the LLN and CLT.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
