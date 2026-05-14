@@ -60,6 +60,11 @@ seo_description: 미분의 도함수와 그래디언트를 학습하고, 연쇄 
 
 이 흐름을 잡고 보면 미분은 기호 조작이 아니라, 복잡한 시스템에서 다음 한 걸음을 정하는 도구로 읽힙니다.
 
+## 한 장으로 보는 미분과 최적화
+
+![한 장으로 보는 미분과 최적화](../../../assets/math-for-cs-101/08/08-01-concept-at-a-glance.ko.png)
+*미분은 한 점의 변화율을 읽는 데서 시작해, 여러 변수의 방향 정보와 반복 최적화 절차로 이어집니다.*
+
 ---
 
 ## 다섯 단계로 보는 미분 기초
@@ -180,5 +185,6 @@ def descend(f, x, lr=0.1, steps=100):
 - [Essence of Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
 - [Gradient Descent - Deep Learning Book](https://www.deeplearningbook.org/contents/numerical.html)
 - [SymPy Calculus Documentation](https://docs.sympy.org/latest/modules/calculus/index.html)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)
 
 Tags: Math, Calculus, Derivative, GradientDescent, Beginner
