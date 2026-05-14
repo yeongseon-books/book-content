@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["Write code"] --> Build["Build/Test"]
-    Build --> Deploy["Deploy"]
-    Deploy --> Operate["Operate/Monitor"]
-    Operate --> Code
-```
+![한눈에 보는 개념](../../../assets/devops-101/01/01-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 이 그림은 DevOps를 가장 단순하게 압축한 형태입니다. 코드를 작성하고, 검증하고, 배포하고, 운영하면서 얻은 신호가 다시 코드로 돌아와야 팀이 배웁니다. 이 루프가 끊기면 DevOps는 이름만 남고 실제 개선은 멈춥니다.
 

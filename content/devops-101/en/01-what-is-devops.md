@@ -2,7 +2,7 @@
 series: devops-101
 episode: 1
 title: What Is DevOps?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - CD
   - Engineering
 seo_description: The definition, principles, and first practical steps for DevOps that bridges development and operations.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is DevOps?
 
-This is the first post in the DevOps 101 series.
+Most teams do not fail because they lack tools. They fail because code review, deployment, monitoring, and incident response all live in different conversations. One team says the feature is done. Another team says production is unstable. The handoff itself becomes the bottleneck.
 
-> DevOps 101 series (1/10)
+DevOps is the attempt to remove that handoff cost. It gives one team a shared feedback loop for building, shipping, operating, and learning, so deployment speed and operational stability stop pulling in opposite directions.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Where does it start to go wrong when *the dev team* and *the ops team* keep *blaming each other*?
-
-> DevOps is *not a tool* but *a culture* — a way of working where you *build together and own together*.
-
-<!-- a-grade-intro:end -->
+This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Software produces no value when *only built*. It must be *deployed* and *operate
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Write code"] --> Build["Build/Test"]
-    Build --> Deploy["Deploy"]
-    Deploy --> Operate["Operate/Monitor"]
-    Operate --> Code
-```
+![Concept at a Glance](../../../assets/devops-101/01/01-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
