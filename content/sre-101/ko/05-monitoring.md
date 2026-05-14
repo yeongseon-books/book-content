@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 행동으로 이어지는 모니터링을 위한 골든 시그널과 알림 설계, 알림 피로 감소와 대시보드 구성법을 정리합니다.
 series: sre-101
 status: content-ready
@@ -50,14 +50,9 @@ title: Monitoring
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Metrics["metrics"] --> Alert["alert"]
-    Logs["logs"] --> Alert
-    Alert --> Action["action"]
-    Metrics --> Dash["dashboard"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
 
+*메트릭과 로그가 알림과 대시보드를 거쳐 실제 대응으로 이어지는 모니터링 흐름입니다.*
 메트릭과 로그는 그냥 저장되는 데이터가 아니라, 알림과 대시보드를 거쳐 대응으로 이어져야 합니다. 이 연결이 없으면 관측은 하고 있어도 운영 판단은 여전히 느립니다.
 
 ## 핵심 용어 먼저 정리
@@ -129,6 +124,28 @@ def should_page(err_ratio, p95_ms, sat):
 ```
 
 페이지 알림은 사람이 즉시 개입해야 할 때만 울려야 합니다. 밤에 사람을 깨울 만큼 중요한 조건인지 먼저 묻는 습관이 있으면 알림 설계가 훨씬 단단해집니다.
+
+### 6단계 — 지연 시간 급증 시 첫 확인 순서 정하기
+
+골든 시그널은 많이 보는 지표 묶음이 아니라, 대응 순서를 줄여 주는 질문 묶음이기도 합니다. latency 알림이 울렸을 때 무엇부터 확인할지 정리되어 있지 않으면, 좋은 메트릭이 있어도 대응은 여전히 느립니다.
+
+| 증상 | 첫 확인 대상 | 왜 여기부터 보는가 |
+| --- | --- | --- |
+| p95 latency 상승, traffic은 평소와 비슷 | saturation과 외부 의존성 지연 | 수요 변화 없이 느려지면 자원 압박이나 downstream 지연이 먼저 의심됩니다. |
+| traffic 급감 | ingress, CDN, 상위 라우팅 상태 | 앱은 멀쩡해도 요청이 도달하지 못하면 트래픽이 먼저 줄어듭니다. |
+| errors와 saturation 동시 상승 | 큐 길이, timeout, 연결 풀 | 용량 한계에 닿기 직전의 전형적인 신호입니다. |
+| errors 상승, latency 변화는 작음 | 최근 배포, 인증·권한 경로 | 빠르게 실패하는 문제는 로직이나 설정 이상일 가능성이 큽니다. |
+
+### 7단계 — 구조화 이벤트를 알림 판단과 연결하기
+
+```python
+def classify_event(status_code, latency_ms, cache_hit):
+    page = status_code >= 500 or latency_ms > 800
+    investigate = latency_ms > 300 and not cache_hit
+    return {"page": page, "investigate": investigate}
+```
+
+이 예시는 단순하지만 중요한 감각을 보여 줍니다. 같은 지연 시간 급증이라도 캐시 미스가 늘어난 상황인지, 5xx가 함께 올라가는 상황인지에 따라 대응 우선순위가 달라집니다. 메트릭을 맥락과 함께 읽을수록 알림의 품질도 좋아집니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

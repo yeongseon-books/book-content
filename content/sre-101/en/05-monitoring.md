@@ -17,45 +17,38 @@ tags:
   - Alerting
   - Observability
 seo_description: A beginner-friendly guide to monitoring covering the four golden signals, metrics, logs, alerting design, and dashboard principles
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Monitoring
 
-This is post 5 in the SRE 101 series.
+Early in an operations journey, teams often feel safer when they collect everything. CPU, memory, queue depth, request counts, logs, traces, and every possible warning all look useful because maybe one of them will matter later.
 
-> SRE 101 series (5/10)
+But monitoring gets better when it becomes more selective, not more crowded. A metric is valuable when it helps someone decide what to do next, and an alert is valuable when it changes behavior quickly enough to reduce user impact.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.
 
-**Core question**: *What* do you need to know, and *when*, to take *action*?
+## Questions this chapter answers
 
-> *Monitoring* is *measurement* that leads to *action*.
+- How is monitoring different from simply collecting a large amount of telemetry?
+- Why do latency, traffic, errors, and saturation have to be read together?
+- What questions do metrics answer better than logs, and where does that boundary flip?
+- What makes an alert useful enough to wake a human up?
+- Why do many dashboards become harder to use as more graphs get added?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+A flood of alerts drowns the real problem. When every threshold pages someone, the urgent signal and the background noise start to sound the same.
 
-- The *four golden signals*
-- *Metrics* and *logs*
-- *Alert* design
-- *Dashboard* principles
-- Managing *alert fatigue*
+Good monitoring reduces decision time. It tells the team whether there is user impact, whether the system is recovering, and what to check first before a broad incident turns into a longer one.
 
-## Why It Matters
+> Monitoring is measurement that leads to action.
 
-A flood of *alerts* drowns the *real* problem.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/05/05-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Metrics["metrics"] --> Alert["alert"]
-    Logs["logs"] --> Alert
-    Alert --> Action["action"]
-    Metrics --> Dash["dashboard"]
-```
-
+*Monitoring is useful when telemetry flows into alerts, dashboards, and concrete operator action.*
 ## Key Terms
 
 - **golden signals**: *latency, traffic, errors, saturation*.
@@ -107,6 +100,28 @@ def saturation(used, capacity):
 def should_page(err_ratio, p95_ms, sat):
     return err_ratio > 0.01 or p95_ms > 500 or sat > 0.9
 ```
+
+### Step 6 — Decide what to check first during a latency spike
+
+Golden signals are most useful when they shorten triage. A latency alert should not force the responder to guess where to begin; it should narrow the first few questions.
+
+| Symptom | First check | Why this is first |
+| --- | --- | --- |
+| p95 latency climbs, traffic stays flat | Saturation and dependency latency | Slowdowns with steady demand often point to resource pressure or a downstream dependency. |
+| Traffic drops suddenly | Ingress, CDN, or upstream routing health | Missing traffic can mean the app is healthy but requests never arrive. |
+| Errors rise with saturation | Queue depth and timeouts | A service often fails at the edge of capacity before it fully falls over. |
+| Errors rise without latency movement | Deployment diff or bad response path | Fast failures often mean logic, config, or auth problems rather than capacity exhaustion. |
+
+### Step 7 — Tie structured events to alert decisions
+
+```python
+def classify_event(status_code, latency_ms, cache_hit):
+    page = status_code >= 500 or latency_ms > 800
+    investigate = latency_ms > 300 and not cache_hit
+    return {"page": page, "investigate": investigate}
+```
+
+This is a small example, but it shows an important monitoring habit: alerts become stronger when they are linked to operational context. A spike in latency means more when the cache is missing or a dependency is timing out than when the workload is simply busier than normal.
 
 ## What to Notice in This Code
 
