@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 작은 프론트엔드 앱 만들기
 
-이 글은 Frontend Development 101 시리즈의 마지막 글입니다.
+개념을 따로따로 이해하는 것과 실제 앱으로 끝까지 묶는 것은 완전히 다른 경험입니다. 라우팅도 알고 폼도 알고 API 호출도 이해했는데, 막상 하나의 프로젝트로 합치려면 어디서부터 파일을 나누고 어떤 순서로 조립해야 할지 막막해지는 경우가 많습니다.
 
-개념을 따로따로 이해하는 것과 실제 앱으로 끝까지 묶는 것은 완전히 다른 경험입니다. 라우팅도 알고, 폼도 알고, API 호출도 이해했는데 막상 하나의 프로젝트로 합치려면 어디서부터 파일을 나누고 어떤 순서로 조립해야 할지 막막해지는 경우가 많습니다.
-
-이 글에서는 지금까지 배운 내용을 작은 노트 앱으로 모아 보겠습니다. 한 가지 관점이 중요합니다. 완벽한 앱을 만드는 것이 목표가 아니라, 기초 개념을 하나의 살아 있는 제품 흐름으로 연결해 배포까지 끝내 보는 경험이 목표라는 점입니다.
+이 글은 Frontend Development 101 시리즈의 마지막 글입니다. 여기서는 지금까지 배운 내용을 작은 노트 앱으로 모아 봅니다. 완벽한 앱을 만드는 것이 목표가 아니라, 기초 개념을 하나의 살아 있는 제품 흐름으로 연결해 배포까지 끝내 보는 경험이 목표입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,15 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    User["User"] --> Page["Pages (routing)"]
-    Page --> Comp["Components + state"]
-    Comp --> API["API calls"]
-    API --> Backend["Backend / external API"]
-    Comp --> Style["Styles + design system"]
-    Build["Build (Vite)"] --> Deploy["Deploy (Netlify/Vercel)"]
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/10/10-01-diagram.ko.png)
+
+*페이지, 컴포넌트, API, 스타일, 빌드, 배포가 작은 앱으로 연결되는 전체 그림*
 
 이 흐름은 시리즈 전체를 압축한 그림입니다. 사용자는 페이지를 보고, 페이지는 컴포넌트와 상태로 구성되고, 컴포넌트는 API와 스타일 계층을 사용하며, 마지막에는 빌드와 배포를 거쳐 외부에 공개됩니다.
 
@@ -190,6 +182,16 @@ netlify deploy --dir=dist --prod
 
 배포가 끝나면 공개 URL이 생깁니다. 이 URL을 다른 사람에게 공유하는 순간, 연습 프로젝트는 실제 제품 경험으로 한 단계 올라갑니다.
 
+## 검증 포인트
+
+- 노트 목록 화면에서 새 노트를 추가한 뒤 상세 화면으로 이동하고 다시 돌아오는 기본 흐름이 자연스러운지 확인합니다.
+- `npm run build`가 성공하고, 배포 후 공개 URL에서 새로고침과 라우팅이 함께 동작하는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 배포 후 API 호출이 실패하면 `VITE_API_URL`과 CORS 설정, `fetch` 에러 처리를 먼저 확인합니다.
+- 프로젝트를 다시 실행하기 어렵다면 README와 `.env.example`가 실제 현재 구조를 설명하는지 점검합니다.
+
 ## 이 코드에서 주목할 점
 
 - 폴더 구조가 역할별로 나뉘어 있어 어디를 수정해야 할지 즉시 보입니다.
@@ -251,13 +253,18 @@ netlify deploy --dir=dist --prod
 - [스타일링과 디자인 시스템](./08-styling-and-design-system.md)
 - [빌드 도구와 번들링](./09-build-tools-and-bundling.md)
 - **작은 프론트엔드 앱 만들기 (현재 글)**
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Vite docs](https://vitejs.dev/)
-- [React Router docs](https://reactrouter.com/)
-- [Netlify docs](https://docs.netlify.com/)
-- [Vercel docs](https://vercel.com/docs)
+### 공식 문서
+- [Vite guide](https://vite.dev/guide/)
+- [React Router documentation](https://reactrouter.com/home)
+- [Netlify deploy docs](https://docs.netlify.com/site-deploys/create-deploys/)
+
+### 확인용 자료
+- [Vercel framework guides](https://vercel.com/docs/frameworks)
+- [Create React App alternatives on react.dev](https://react.dev/learn/start-a-new-react-project)
 
 Tags: Frontend, Project, Capstone, React, Web

@@ -22,17 +22,9 @@ last_reviewed: '2026-05-04'
 
 # Building a Small Frontend App
 
-This is the final post in the Frontend Development 101 series.
+Knowing each concept in isolation is very different from tying those concepts into one app that someone can actually open and use. Routing, forms, API calls, styling, and build steps all look manageable on their own. The challenge appears when you have to decide where files live, how pieces connect, and what the deployment path looks like end to end.
 
-> Frontend Development 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we tie all the *pieces* we have learned into *one living app*?
-
-> Building one small app *from scratch to deployment* turns the concepts in a book into *tools in your hand*.
-
-<!-- a-grade-intro:end -->
+This is the final post in the Frontend Development 101 series. Here we assemble a small notes app that pulls together the earlier chapters. The goal is not perfection. The goal is to turn separate concepts into one living product flow and ship it all the way to a public URL.
 
 ## What You Will Learn
 
@@ -49,15 +41,9 @@ Knowledge becomes *yours* only when it is *bound into a project*. The nine posts
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] --> Page["Pages (routing)"]
-    Page --> Comp["Components + state"]
-    Comp --> API["API calls"]
-    API --> Backend["Backend / external API"]
-    Comp --> Style["Styles + design system"]
-    Build["Build (Vite)"] --> Deploy["Deploy (Netlify/Vercel)"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
+
+*The end-to-end picture that ties pages, components, APIs, styles, build, and deployment into one app*
 
 ## Key Terms
 
@@ -189,6 +175,16 @@ netlify deploy --dir=dist --prod
 
 When the deploy finishes you have a *public URL*. Share that URL *with the next person*.
 
+## Verification
+
+- Create a note, return to the list, and confirm that routing, form handling, and API updates all work together as one product flow.
+- Run `npm run build`, deploy the result, and verify that the public URL still supports refresh and client-side routing.
+
+## If It Fails, Check This First
+
+- If the deployed app cannot reach the API, check `VITE_API_URL`, CORS configuration, and the visible fetch error path first.
+- If another person cannot rerun the project quickly, treat the README and `.env.example` as broken parts of the product, not as optional extras.
+
 ## What to Notice in This Code
 
 - The folder layout is split *by role*, so you instantly know *where to edit*.
@@ -250,13 +246,18 @@ If you made it here, *frontend onboarding is done*. Good companion series to rea
 - [Styling and Design Systems](./08-styling-and-design-system.md)
 - [Build Tools and Bundling](./09-build-tools-and-bundling.md)
 - **Building a Small Frontend App (current)**
+
 <!-- toc:end -->
 
 ## References
 
-- [Vite docs](https://vitejs.dev/)
-- [React Router docs](https://reactrouter.com/)
-- [Netlify docs](https://docs.netlify.com/)
-- [Vercel docs](https://vercel.com/docs)
+### Official Docs
+- [Vite guide](https://vite.dev/guide/)
+- [React Router documentation](https://reactrouter.com/home)
+- [Netlify deploy docs](https://docs.netlify.com/site-deploys/create-deploys/)
+
+### Verification and Further Reading
+- [Vercel framework guides](https://vercel.com/docs/frameworks)
+- [Create React App alternatives on react.dev](https://react.dev/learn/start-a-new-react-project)
 
 Tags: Frontend, Project, Capstone, React, Web
