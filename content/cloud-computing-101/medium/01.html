@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>What is Cloud Computing?</h1>
+<p>Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.</p>
+<p>That convenience is only half of the story. Cloud is not just "someone else's server." It is an operating model where you provision compute, storage, and network on demand, pay for what you actually use, and split responsibility with the provider.</p>
+<p>This is the first post in the Cloud Computing 101 series.</p>
+<p>In this post, we'll build the mental model that makes later topics like service models, regions, networking, security, and cost control easier to reason about.</p>
 <blockquote>
-<p>Cloud Computing 101 series (1/10)</p>
+<p>Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why did we stop buying servers and start <em>renting computing power</em> over the internet?</p>
-<blockquote>
-<p><em>Cloud computing rents compute, storage, and network on demand and bills only for what you use.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The five essential characteristics of cloud</li>
 <li>On-premises vs cloud</li>
@@ -76,13 +72,8 @@
 <h2>Why It Matters</h2>
 <p>You can launch a global service with <em>zero up-front capital</em>. The trade-off is that you must understand <em>cost</em> and <em>responsibility boundaries</em> from day one.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;user&quot;] --&gt; Net[&quot;internet&quot;]
-    Net --&gt; CSP[&quot;cloud provider&quot;]
-    CSP --&gt; Compute[&quot;compute&quot;]
-    CSP --&gt; Storage[&quot;storage&quot;]
-    CSP --&gt; Network[&quot;network&quot;]
-</code></pre>
+<p><img alt="Basic flow where a user requests abstracted cloud resources through the provider" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Basic flow where a user requests abstracted cloud resources through the provider</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>CSP</strong>: Cloud Service Provider (AWS, Azure, GCP).</li>
@@ -125,6 +116,23 @@ print(upload(&quot;my-test-bucket-2026&quot;, &quot;hello.txt&quot;, b&quot;hi c
 <li>Credentials live in environment variables, not source code.</li>
 <li>Clients are reusable — create once, call many times.</li>
 <li>Bucket names are globally unique across all of AWS.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>The point of the S3 example is not that the API call returns without throwing. The point is that you can confirm the bucket and object actually exist. That habit matters early because cloud workflows fail most often at the credential, region, and naming layers before the code itself gets interesting.</p>
+<pre><code class="language-bash">aws s3 ls
+aws s3 ls s3://my-test-bucket-2026
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>The first command should show the bucket you just created.</li>
+<li>The second command should show <code>hello.txt</code> inside that bucket.</li>
+<li>If both are empty, check credentials, active profile, region, and bucket-name uniqueness before you change the Python code.</li>
+</ul>
+<p><strong>Where beginners usually get stuck</strong></p>
+<ul>
+<li><code>BucketAlreadyExists</code> usually means the bucket name is globally taken, not that your code is malformed.</li>
+<li><code>AccessDenied</code> is often a credential or profile issue before it is a boto3 issue.</li>
+<li>Cleanup matters: even tiny learning resources turn into long-lived cost when no one deletes them.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
