@@ -55,7 +55,7 @@
 <body>
 <h1>Assembling the RAG Chain — RetrievalQA vs LCEL</h1>
 <p>RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.</p>
-<p>This is the 5th article in the RAG Deep Dive series.</p>
+<p>This is post 5 in the RAG Deep Dive series.</p>
 <!-- a-grade-intro:begin -->
 <h2>Questions this post answers</h2>
 <ul>
@@ -71,9 +71,6 @@
 <p><em>Questions this post answers</em></p>
 <!-- a-grade-intro:end -->
 
-<blockquote>
-<p>RAG Deep Dive series (5/6)</p>
-</blockquote>
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/05-rag-chain-assembly/main.py</code></p>
@@ -534,15 +531,21 @@ if __name__ == &quot;__main__&quot;:
 </ul>
 <hr>
 <h2>References</h2>
-<ol>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py"><code>langchain/chains/retrieval_qa/base.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py"><code>langchain/chains/question_answering/chain.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py"><code>langchain/chains/combine_documents/stuff.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py"><code>langchain_core/runnables/base.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py"><code>langchain_core/runnables/passthrough.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/output_parsers/string.py"><code>langchain_core/output_parsers/string.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/base.py"><code>langchain/chains/base.py</code></a></li>
-</ol>
+<p><strong>Official Docs</strong></p>
+<ul>
+<li><a href="https://python.langchain.com/docs/concepts/retrieval/">LangChain retrieval concept guide</a></li>
+<li><a href="https://python.langchain.com/docs/concepts/lcel/">LangChain Expression Language overview</a></li>
+<li><a href="https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html">LangChain <code>RunnablePassthrough</code> API reference</a></li>
+<li><a href="https://python.langchain.com/api_reference/core/output_parsers/langchain_core.output_parsers.string.StrOutputParser.html">LangChain <code>StrOutputParser</code> API reference</a></li>
+</ul>
+<p><strong>Source Code</strong></p>
+<ul>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py">LangChain <code>RetrievalQA</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py">LangChain QA chain loader source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py">LangChain <code>StuffDocumentsChain</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py">LangChain runnable base source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py">LangChain <code>RunnablePassthrough</code> source</a></li>
+</ul>
 <p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
 </body>
 </html>
