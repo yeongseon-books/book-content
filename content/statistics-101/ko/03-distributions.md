@@ -47,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 분포를 읽는 가장 단순한 순서는 그림을 먼저 보고, 그다음 요약 통계와 분위수를 확인한 뒤, 마지막에 그 모양에 맞는 통계 도구를 선택하는 것입니다. 히스토그램은 진단의 시작점이고, 분위수는 긴 꼬리를 읽는 핵심 도구입니다.
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Hist["Histogram"]
-    Hist --> Shape["Shape: normal/skew/uniform"]
-    Shape --> Tool["Statistical Tool"]
-```
+![멘탈 모델](../../../assets/statistics-101/03/03-01-concept-at-a-glance.ko.png)
 
+*분포 진단은 그림으로 모양을 먼저 보고, 그다음 그 모양에 맞는 통계 도구를 고르는 순서로 진행합니다.*
 정규분포는 대칭적인 종 모양이고, 균등분포는 값이 비슷한 빈도로 나타납니다. 지수분포와 멱법칙 분포는 한쪽 꼬리가 길며, 운영 데이터에서는 이런 형태가 더 자주 보입니다.
 
 ## 핵심 용어
