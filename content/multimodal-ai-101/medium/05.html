@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Multimodal RAG: Searching Images and Text Together</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Multimodal RAG: Searching Images and Text Together</h1>
+<blockquote>
+<p>Multimodal AI 101 series (5/10)</p>
+</blockquote>
+<hr>
+<h2>Questions text RAG cannot answer</h2>
+<p>A typical RAG system splits documents into chunks, embeds them into a vector DB, and retrieves the nearest chunks for a query embedding. But text chunks cannot answer "find the slide that contains a chart shaped like this" or "tell me where the red button is in this screenshot."</p>
+<p>Multimodal RAG solves these by searching images and text in the same vector space. The CLIP work from Episode 2 and the OCR/captioning pipeline from Episode 4 come together here as one pipeline.</p>
+<h2>Three indexing strategies</h2>
+<p><strong>Strategy 1: image embeddings only</strong></p>
+<p>Put CLIP image embeddings into a vector DB and encode queries with the CLIP text encoder. The simplest setup.</p>
+<pre><code class="language-python">import faiss
+import numpy as np
+import torch
+from PIL import Image
+from transformers import CLIPModel, CLIPProcessor
+
+model = CLIPModel.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;).eval()
+proc = CLIPProcessor.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+
+def embed_images(paths: list[str]) -&gt; np.ndarray:
+    imgs = [Image.open(p).convert(&quot;RGB&quot;) for p in paths]
+    inputs = proc(images=imgs, return_tensors=&quot;pt&quot;)
+    with torch.no_grad():
+        feats = model.get_image_features(**inputs)
+    feats = feats / feats.norm(dim=-1, keepdim=True)
+    return feats.cpu().numpy().astype(&quot;float32&quot;)
+
+paths = [&quot;slides/01.png&quot;, &quot;slides/02.png&quot;, &quot;slides/03.png&quot;]
+vecs = embed_images(paths)
+index = faiss.IndexFlatIP(vecs.shape[1])
+index.add(vecs)
+
+def search_by_text(q: str, k: int = 3) -&gt; list[str]:
+    qi = proc(text=[q], return_tensors=&quot;pt&quot;, padding=True)
+    with torch.no_grad():
+        qv = model.get_text_features(**qi)
+    qv = (qv / qv.norm(dim=-1, keepdim=True)).cpu().numpy().astype(&quot;float32&quot;)
+    D, I = index.search(qv, k=k)
+    return [paths[i] for i in I[0]]
+
+print(search_by_text(&quot;a bar chart showing quarterly revenue&quot;))
+</code></pre>
+<p>Strength: simplicity. Weakness: weak on text reasoning. Queries with numeric reasoning ("the slide where Q3 revenue dropped") often miss.</p>
+<p><strong>Strategy 2: index captions + OCR text</strong></p>
+<p>Extract caption (BLIP) and OCR text (PaddleOCR) from each image, then index that text with a regular text embedder. A direct application of the Episode 4 pipeline.</p>
+<pre><code class="language-python">from sentence_transformers import SentenceTransformer
+import faiss
+import numpy as np
+
+embedder = SentenceTransformer(&quot;BAAI/bge-base-en-v1.5&quot;)
+
+def index_text(items: list[dict]):
+    texts = [f&quot;{it['caption']}\n\n{it['ocr_text']}&quot; for it in items]
+    vecs = embedder.encode(texts, normalize_embeddings=True).astype(&quot;float32&quot;)
+    index = faiss.IndexFlatIP(vecs.shape[1])
+    index.add(vecs)
+    return index, items
+
+# Assumes caption / ocr_text are precomputed per image
+items = [
+    {&quot;path&quot;: &quot;slides/01.png&quot;,
+     &quot;caption&quot;: &quot;bar chart of revenue&quot;,
+     &quot;ocr_text&quot;: &quot;Q1: 1.2M Q2: 1.5M Q3: 0.9M&quot;},
+    # ...
+]
+index, items = index_text(items)
+
+def search(q: str, k: int = 3):
+    qv = embedder.encode([q], normalize_embeddings=True).astype(&quot;float32&quot;)
+    D, I = index.search(qv, k=k)
+    return [items[i] for i in I[0]]
+
+for r in search(&quot;Q3 revenue dropped&quot;):
+    print(r[&quot;path&quot;], r[&quot;caption&quot;])
+</code></pre>
+<p>Strength: strong text reasoning. Weakness: extra caption/OCR pipeline cost, and visual details (color, shape, position) are lost.</p>
+<p><strong>Strategy 3: hybrid (both image and text vectors)</strong></p>
+<p>The most common production pattern. Two vectors per image, indexed separately, then either or both searched depending on query intent.</p>
+<pre><code class="language-python">class HybridIndex:
+    def __init__(self, clip_index, text_index, items):
+        self.clip = clip_index   # CLIP image vectors
+        self.text = text_index   # caption+OCR text vectors
+        self.items = items
+
+    def search(self, query: str, k: int = 5,
+               alpha: float = 0.5) -&gt; list[dict]:
+        # alpha=0: text only / alpha=1: image only
+        d_clip, i_clip = self.clip.search(self._clip_q(query), k=k * 3)
+        d_text, i_text = self.text.search(self._text_q(query), k=k * 3)
+        scores: dict[int, float] = {}
+        for d, i in zip(d_clip[0], i_clip[0]):
+            scores[i] = scores.get(i, 0) + alpha * float(d)
+        for d, i in zip(d_text[0], i_text[0]):
+            scores[i] = scores.get(i, 0) + (1 - alpha) * float(d)
+        ranked = sorted(scores.items(), key=lambda x: -x[1])[:k]
+        return [self.items[i] for i, _ in ranked]
+</code></pre>
+<p>Pick <code>alpha</code> dynamically by query intent: 0.7 for visual queries, 0.2 for fact/numeric queries.</p>
+<h2>Generation: feeding retrieval into a VLM</h2>
+<p>RAG rarely stops at retrieval. The retrieved images go into a VLM for the final answer.</p>
+<pre><code class="language-python">import base64
+from openai import OpenAI
+
+client = OpenAI()
+
+def encode(p: str) -&gt; str:
+    return base64.b64encode(open(p, &quot;rb&quot;).read()).decode()
+
+def answer(question: str, top_paths: list[str]) -&gt; str:
+    content = [{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: question}]
+    for p in top_paths[:3]:
+        content.append({
+            &quot;type&quot;: &quot;image_url&quot;,
+            &quot;image_url&quot;: {&quot;url&quot;: f&quot;data:image/png;base64,{encode(p)}&quot;},
+        })
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: content}],
+    )
+    return resp.choices[0].message.content
+</code></pre>
+<p>Retrieve, take top-K images, inline into a VLM, generate. Same shape as text RAG, but the context now contains images.</p>
+<h2>Evaluation: how to measure multimodal RAG</h2>
+<p>Measure retrieval accuracy and generation quality separately.</p>
+<pre><code class="language-python">def hit_at_k(predictions: list[list[str]],
+             gold: list[str], k: int = 5) -&gt; float:
+    hits = sum(1 for pred, g in zip(predictions, gold) if g in pred[:k])
+    return hits / len(gold)
+
+def mrr(predictions: list[list[str]], gold: list[str]) -&gt; float:
+    total = 0.0
+    for pred, g in zip(predictions, gold):
+        if g in pred:
+            total += 1.0 / (pred.index(g) + 1)
+    return total / len(predictions)
+</code></pre>
+<ul>
+<li>Retrieval: Recall@k, MRR, nDCG</li>
+<li>Generation: faithfulness (did the VLM use only the retrieved images?), answer relevancy</li>
+</ul>
+<p>The ai-evaluation-101 series covers this evaluation framework in depth.</p>
+<h2>Five common pitfalls</h2>
+<p><strong>1. Mixing CLIP vectors with text-embedding vectors in one index</strong></p>
+<p>CLIP has its own latent space; BGE/OpenAI embeddings live in different latent spaces. Mixing them in one index makes distances meaningless. Keep separate indexes and combine scores with a weighted average.</p>
+<p><strong>2. Inlining all high-resolution images as base64</strong></p>
+<p>Each base64 image inlined to a VLM is tens to hundreds of kilobytes. Inlining all of top-10 explodes both token cost and latency. Cap at top-3 or use URL references.</p>
+<p><strong>3. Generating captions/OCR at query time</strong></p>
+<p>Re-extracting captions on every query adds seconds of latency. Compute and store caption/OCR at ingestion time.</p>
+<p><strong>4. Searching without metadata filters</strong></p>
+<p>Production indexes commonly grow past 10M images. Running ANN search without filters on user_id, document_type, or date_range causes both authorization leaks and performance degradation.</p>
+<p><strong>5. Eval set with text queries only</strong></p>
+<p>Multimodal RAG must be evaluated on text queries, image-by-image search, and image+text mixed queries. Include multimodal queries when designing the eval set.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Multimodal RAG picks one of three indexing strategies: image embeddings only, caption+OCR text, or hybrid.</li>
+<li>Hybrid is the most common production pattern: separate indexes per modality, weighted by per-query alpha.</li>
+<li>After retrieval, inline the top-K images into a VLM for the final answer. Top-3 is the typical cost/quality balance.</li>
+<li>Evaluate retrieval (Recall@k, MRR) and generation (faithfulness, relevancy) separately.</li>
+<li>Verify index separation, base64 inline limits, ingestion-time caption/OCR storage, metadata filters, and multimodal-query evaluation before production.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
+<li><strong>Multimodal RAG: Searching Images and Text Together (current)</strong></li>
+<li>Audio Processing and Whisper STT (upcoming)</li>
+<li>Text-to-Image with Diffusion (upcoming)</li>
+<li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
+<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://python.langchain.com/docs/use_cases/question_answering/multi_modal_rag/">LangChain - Multi-Modal RAG</a></li>
+<li><a href="https://github.com/facebookresearch/faiss/wiki">FAISS Documentation</a></li>
+<li><a href="https://www.sbert.net/">Sentence-Transformers Documentation</a></li>
+<li><a href="https://huggingface.co/BAAI/bge-base-en-v1.5">BAAI BGE Embedding Model Card</a></li>
+</ul>
+<p class="tags-line">Tags: Multimodal RAG, CLIP Embeddings, Cross-modal Retrieval, FAISS, LangChain, Vector Search</p>
+</body>
+</html>

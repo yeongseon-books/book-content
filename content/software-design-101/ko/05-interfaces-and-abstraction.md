@@ -17,7 +17,7 @@ tags:
   - Abstraction
   - LSP
   - Polymorphism
-seo_description: 좋은 인터페이스의 조건, 추상화 수준, 다형성과 LSP를 정리합니다.
+seo_description: 인터페이스의 조건과 추상화 설계법을 학습하고 다형성으로 분기를 줄입니다. LSP, ISP 원칙으로 유연한 구조를 만드는 실무 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -18,7 +18,7 @@ tags:
 - stdout
 - CLI
 last_reviewed: '2026-05-12'
-seo_description: 파이프와 리다이렉션으로 명령 출력을 연결하고 저장하는 법을 정리합니다.
+seo_description: 표준 입출력 개념을 파악하고 파이프와 리다이렉션을 활용해 명령어를 연결하거나 파일로 저장하는 실무 텍스트 처리 기법을 단계별 예제로 실습합니다.
 ---
 
 # pipe와 redirection

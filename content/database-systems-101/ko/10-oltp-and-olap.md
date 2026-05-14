@@ -17,7 +17,7 @@ tags:
   - OLAP
   - 컬럼지향
   - 분석
-seo_description: OLTP와 OLAP, 행 저장과 컬럼 저장이 왜 분리되는지 설명합니다.
+seo_description: OLTP와 OLAP 워크로드의 근본 차이와 행 저장 대 컬럼 저장의 트레이드오프 및 분석 시스템 분리 필요성을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

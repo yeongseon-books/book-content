@@ -1,23 +1,23 @@
 ---
-title: 그래프
-series: math-for-cs-101
 episode: 4
 language: ko
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
-tags:
-  - Math
-  - Graphs
-  - DataStructure
-  - Algorithms
-  - Beginner
 last_reviewed: '2026-05-12'
-seo_description: 그래프를 관계 중심 모델로 보고 표현과 탐색의 기초를 함께 정리합니다
+seo_description: 그래프를 정점과 간선 모델로 파악하고 인접 리스트, 너비 우선 탐색 기초와 의존성 관리에서의 활용을 정리합니다.
+series: math-for-cs-101
+status: publish-ready
+tags:
+- Math
+- Graphs
+- DataStructure
+- Algorithms
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 그래프
 ---
 
 # 그래프

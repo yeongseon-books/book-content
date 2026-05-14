@@ -18,7 +18,7 @@ tags:
 - Dapr
 - Containers
 last_reviewed: '2026-05-03'
-seo_description: ACA is "App Service for containers."
+seo_description: Azure Container Apps (ACA) is a managed serverless platform that simplifies container deployment by abstracting Kubernetes cluster management.
 ---
 
 # What is Azure Container Apps? — running containers without Kubernetes

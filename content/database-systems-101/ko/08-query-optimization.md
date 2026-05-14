@@ -17,7 +17,7 @@ tags:
   - 통계
   - EXPLAIN
   - 튜닝
-seo_description: 옵티마이저가 통계와 비용 모델로 계획을 고르는 과정을 설명합니다.
+seo_description: 옵티마이저가 통계와 비용 모델로 실행 계획을 선택하는 과정과 EXPLAIN을 활용한 실무 쿼리 튜닝 기법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

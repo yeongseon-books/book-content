@@ -17,7 +17,7 @@ tags:
 - Observability
 - Monitoring
 last_reviewed: '2026-04-29'
-seo_description: 'ACA observability splits into three independent layers:'
+seo_description: Master Azure Container Apps (ACA) monitoring with Log Analytics and Application Insights. Learn to use KQL and OpenTelemetry for observability.
 ---
 
 # Monitoring and ops — Log Analytics and Application Insights

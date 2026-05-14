@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Why Multimodal AI Matters</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Why Multimodal AI Matters</h1>
+<blockquote>
+<p>Multimodal AI 101 series (1/10)</p>
+</blockquote>
+<hr>
+<h2>"Isn't a text LLM enough?"</h2>
+<p>After ChatGPT shipped in late 2022, a quiet assumption took hold: a single text LLM could solve almost any problem worth solving. That assumption broke once GPT-4V landed in September 2023 and Gemini and Claude 3 Opus followed with vision baked in. Users stopped sending plain text. They started pasting screenshots, dropping in chart images, and uploading entire PDFs.</p>
+<p>The places where multimodal beats text-only are easy to enumerate: receipt OCR plus category classification, product image plus description for search, medical imaging plus patient history for diagnosis, code screenshot plus error message for debugging. Single-modality systems consistently underperform on these tasks.</p>
+<p>This series is for engineers who plan to ship multimodal AI to production. Episode 1 covers why multimodal matters, the core architectural flow, and five pitfalls you should know before adoption.</p>
+<h2>What multimodal AI actually solves</h2>
+<p><strong>Document QA</strong><br>
+- Text-only limitation: Tables and figures lost<br>
+- Multimodal solution: VLM understands layout and figures together</p>
+<p><strong>Visual search</strong><br>
+- Text-only limitation: Keywords are imprecise<br>
+- Multimodal solution: CLIP embeddings enable cross-modal retrieval</p>
+<p><strong>Screen automation</strong><br>
+- Text-only limitation: Depends on DOM<br>
+- Multimodal solution: Screenshot-based visual grounding</p>
+<p><strong>Content moderation</strong><br>
+- Text-only limitation: Text can be bypassed<br>
+- Multimodal solution: Joint image+text classification</p>
+<p><strong>Medical and industrial vision</strong><br>
+- Text-only limitation: Domain expertise needed<br>
+- Multimodal solution: Image encoder plus LLM reasoning</p>
+<p>We are moving from an era of one specialized model per task (ResNet for classification, a separate OCR engine, a separate captioning model) into an era where a single VLM handles all of them.</p>
+<h2>Three patterns of modality fusion</h2>
+<p>Multimodal model design ultimately reduces to one question: how do you put different modalities into the same representation space? Three patterns dominate.</p>
+<ol>
+<li><strong>Early fusion</strong>: concatenate raw inputs and feed them to one model. Simple, but modality-specific traits are hard to preserve.</li>
+<li><strong>Late fusion</strong>: encode each modality separately and combine in the final layer. Easy to implement, but cross-modal interaction is weak.</li>
+<li><strong>Hybrid (cross-attention) fusion</strong>: place cross-attention between an image encoder and a language model so they exchange information at every layer. CLIP, BLIP-2, LLaVA, and Flamingo all belong here.</li>
+</ol>
+<p>The diagram below shows the typical hybrid flow.</p>
+<pre><code>[Image] -&gt; Vision Encoder (ViT) -&gt; visual tokens
+                                        |
+                                        v
+[Text]  -&gt; Tokenizer -&gt; text tokens -&gt; LLM (cross-attention) -&gt; output
+</code></pre>
+<p>The key insight: visual tokens emitted by the vision encoder are consumed by the LLM as if they were extra text tokens. That is why LLaVA-style models reach near GPT-4V quality reasoning while leaving the base LLM training mostly untouched.</p>
+<h2>First multimodal call: receipt analysis with GPT-4V</h2>
+<p>The fastest way to feel multimodal value is one OpenAI Vision call. The snippet below takes a receipt image and extracts items and prices as JSON.</p>
+<pre><code class="language-python">import base64
+from openai import OpenAI
+
+client = OpenAI()
+
+def encode_image(path: str) -&gt; str:
+    with open(path, &quot;rb&quot;) as f:
+        return base64.b64encode(f.read()).decode(&quot;utf-8&quot;)
+
+def analyze_receipt(image_path: str) -&gt; dict:
+    b64 = encode_image(image_path)
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: [
+                    {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: (
+                        &quot;Extract each item name and price from this receipt &quot;
+                        &quot;and return a JSON array. &quot;
+                        'Format: [{&quot;item&quot;: &quot;...&quot;, &quot;price&quot;: 0}]'
+                    )},
+                    {
+                        &quot;type&quot;: &quot;image_url&quot;,
+                        &quot;image_url&quot;: {&quot;url&quot;: f&quot;data:image/jpeg;base64,{b64}&quot;},
+                    },
+                ],
+            }
+        ],
+        response_format={&quot;type&quot;: &quot;json_object&quot;},
+    )
+    return resp.choices[0].message.content
+
+print(analyze_receipt(&quot;samples/receipt.jpg&quot;))
+</code></pre>
+<p>A text-only LLM would force the user to type the receipt by hand. One multimodal call covers OCR, parsing, and structuring at once.</p>
+<h2>CLIP for cross-modal search: a preview</h2>
+<p>CLIP (OpenAI, 2021) is fairly called the on-ramp to multimodal AI. It places images and text in the same vector space, so the query "a photo of a cat" retrieves cat images directly.</p>
+<pre><code class="language-python">import torch
+from PIL import Image
+from transformers import CLIPProcessor, CLIPModel
+
+model = CLIPModel.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+processor = CLIPProcessor.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+
+images = [Image.open(p) for p in [&quot;cat.jpg&quot;, &quot;dog.jpg&quot;, &quot;car.jpg&quot;]]
+queries = [&quot;a photo of a cat&quot;, &quot;a vehicle on the street&quot;]
+
+inputs = processor(text=queries, images=images,
+                   return_tensors=&quot;pt&quot;, padding=True)
+
+with torch.no_grad():
+    out = model(**inputs)
+
+# image-text similarity matrix (queries x images)
+logits = out.logits_per_text
+probs = logits.softmax(dim=-1)
+print(probs)
+</code></pre>
+<p>In production we typically precompute image embeddings into a FAISS index, then push the user query through the CLIP text encoder to find the nearest image. Episode 5 (Multimodal RAG) covers this in depth.</p>
+<h2>Five common pitfalls</h2>
+<p><strong>1. Token cost is much higher than text</strong></p>
+<p>A single image in GPT-4o vision usually consumes 765 to 2000 tokens. A 1280x1280 high-res image can take several thousand tokens per call. If your cost dashboard does not break out image tokens as a separate line item, you will not see where money is leaking.</p>
+<p><strong>2. Skipping resolution preprocessing hurts accuracy</strong></p>
+<p>Recommended input resolution differs by VLM. CLIP wants 224x224, GPT-4V works in 768x768 or 1024x2048 tiles. Sending a raw 4K image either loses detail or explodes cost.</p>
+<pre><code class="language-python">from PIL import Image
+
+def prepare_for_vlm(path: str, max_side: int = 1024) -&gt; Image.Image:
+    img = Image.open(path).convert(&quot;RGB&quot;)
+    w, h = img.size
+    scale = min(max_side / max(w, h), 1.0)
+    if scale &lt; 1.0:
+        img = img.resize((int(w * scale), int(h * scale)),
+                         Image.LANCZOS)
+    return img
+</code></pre>
+<p><strong>3. Text-only eval sets miss multimodal regressions</strong></p>
+<p>Running classic text QA benchmarks tells you nothing about vision capability. You need MMMU, ChartQA, DocVQA, and similar multimodal benchmarks as a separate suite.</p>
+<p><strong>4. No policy for cross-modal information conflict</strong></p>
+<p>Image and text often disagree. When the user types "this receipt is 50,000 won" but the image shows 70,000 won, you need an explicit policy for which to trust. Encode the priority into the system prompt up front.</p>
+<p><strong>5. PII slips through inside images</strong></p>
+<p>ID cards, business cards, and screen captures with email addresses are invisible to text-level PII filters. A multimodal system needs an image-side PII detector (Tesseract OCR plus regex, AWS Rekognition Face) as its own stage.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Multimodal AI handles document QA, visual search, screen automation, and video analysis - tasks where text LLMs fall short - in a single model.</li>
+<li>Modality fusion patterns are early, late, and hybrid (cross-attention). Current SOTA is hybrid.</li>
+<li>One GPT-4o vision call covers OCR, parsing, and structuring. CLIP is the on-ramp to cross-modal search.</li>
+<li>Image token cost, resolution preprocessing, multimodal benchmarks, conflict-resolution policy, and image-side PII must be checked before production.</li>
+<li>Episode 2 dives into CLIP and ViT, the core image encoders.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><strong>Why Multimodal AI Matters (current)</strong></li>
+<li>Image Encoders: CLIP and ViT (upcoming)</li>
+<li>Vision-Language Model Architecture (upcoming)</li>
+<li>Image Captioning and OCR Pipelines (upcoming)</li>
+<li>Multimodal RAG: Searching Images and Text Together (upcoming)</li>
+<li>Audio Processing and Whisper STT (upcoming)</li>
+<li>Text-to-Image with Diffusion (upcoming)</li>
+<li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
+<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://openai.com/index/gpt-4v-system-card/">OpenAI - GPT-4V(ision) System Card</a></li>
+<li><a href="https://arxiv.org/abs/2103.00020">Radford et al. - Learning Transferable Visual Models From Natural Language Supervision (CLIP)</a></li>
+<li><a href="https://arxiv.org/abs/2204.14198">Alayrac et al. - Flamingo: a Visual Language Model for Few-Shot Learning</a></li>
+<li><a href="https://arxiv.org/abs/2304.08485">Liu et al. - Visual Instruction Tuning (LLaVA)</a></li>
+</ul>
+<p class="tags-line">Tags: Multimodal AI, CLIP, GPT-4V, Flamingo, Vision Language, Modality Fusion</p>
+</body>
+</html>

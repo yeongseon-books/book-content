@@ -18,7 +18,7 @@ tags:
 - Background
 - CLI
 last_reviewed: '2026-05-12'
-seo_description: 프로세스 조회, 종료, 백그라운드 실행의 기본 흐름을 정리합니다.
+seo_description: 프로세스 조회, 종료, 백그라운드 실행 기법을 학습합니다. ps, top, kill 사용법과 nohup을 활용한 실무 관리 모델을 정리합니다.
 ---
 
 # 프로세스 확인과 종료

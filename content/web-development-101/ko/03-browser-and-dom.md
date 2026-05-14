@@ -17,7 +17,7 @@ tags:
   - DOM
   - JavaScript
   - Frontend
-seo_description: 브라우저가 HTML을 DOM과 화면으로 바꾸는 과정을 설명합니다.
+seo_description: 브라우저가 HTML을 파싱하여 DOM 트리를 형성하고 렌더링 파이프라인을 거쳐 화면을 그리는 과정과 이벤트 루프의 동작 원리를 알아봅니다.
 last_reviewed: '2026-05-12'
 ---
 

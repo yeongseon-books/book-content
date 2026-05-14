@@ -16,7 +16,7 @@ tags:
   - VPC
   - Security
   - AWS
-seo_description: VPC, 서브넷, 보안 그룹, 로드밸런서의 역할을 기초부터 정리합니다.
+seo_description: VPC, 서브넷, 보안 그룹, 로드밸런서의 역할과 설계 패턴을 격리, 배치, 허용, 분산의 관점에서 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

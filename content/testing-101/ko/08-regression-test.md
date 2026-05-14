@@ -16,7 +16,7 @@ tags:
   - Bugfix
   - Quality
   - pytest
-seo_description: 같은 버그가 다시 돌아오지 않게 하는 회귀 테스트 작성법과 운영 흐름.
+seo_description: 동일한 버그가 다시 발생하지 않도록 고정하는 회귀 테스트의 개념과 작성 절차를 알아봅니다.
 last_reviewed: '2026-05-12'
 ---
 

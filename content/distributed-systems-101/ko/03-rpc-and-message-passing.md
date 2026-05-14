@@ -17,7 +17,7 @@ tags:
   - Messaging
   - Async
   - Idempotency
-seo_description: RPC와 메시지 전달의 차이와 선택 기준을 구조적으로 비교합니다.
+seo_description: 분산 시스템의 핵심인 RPC와 메시지 전달의 차이를 동기/비동기 관점에서 구조적으로 비교하고 상황별 선택 기준을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

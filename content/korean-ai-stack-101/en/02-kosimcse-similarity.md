@@ -17,7 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
-seo_description: Sentence similarity search decomposes into four steps.
+seo_description: Build a Korean sentence similarity search using KoSimCSE and FAISS. Learn about embedding normalization, indexing, and retrieval metrics.
 ---
 
 # Building sentence similarity search with KoSimCSE

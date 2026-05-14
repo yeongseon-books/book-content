@@ -15,7 +15,7 @@ tags:
 - Coordination
 - Delegation
 last_reviewed: '2026-05-12'
-seo_description: multi-agent를 역할 분리와 위임 구조 관점에서 정리합니다.
+seo_description: Multi-agent 시스템의 핵심인 역할 분리와 위임 구조를 다양한 설계 패턴과 운영 관점에서 정리합니다.
 ---
 
 # Multi-Agent 시스템

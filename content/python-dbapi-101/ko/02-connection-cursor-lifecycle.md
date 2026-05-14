@@ -18,7 +18,7 @@ tags:
 - Resource Management
 - SQLite
 last_reviewed: '2026-05-12'
-seo_description: DB-API의 두 핵심 객체는 connection과 cursor입니다.
+seo_description: connection과 cursor의 역할을 이해하고 context manager로 자원 누수 없이 DB 연결을 관리하는 실전 패턴을 정리합니다.
 ---
 
 # Connection과 Cursor Lifecycle

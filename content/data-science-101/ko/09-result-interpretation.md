@@ -16,7 +16,7 @@ tags:
   - Storytelling
   - Decision
   - Beginner
-seo_description: 숫자 결과를 과장 없이 의사결정으로 연결하는 해석 프레임을 설명합니다
+seo_description: 숫자 결과에 맥락과 불확실성을 더해 과장 없는 의사결정 문장으로 바꾸는 5단계 해석 프레임워크를 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

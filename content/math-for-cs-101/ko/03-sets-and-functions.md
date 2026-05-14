@@ -1,23 +1,23 @@
 ---
-title: 집합과 함수
-series: math-for-cs-101
 episode: 3
 language: ko
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
-tags:
-  - Math
-  - Sets
-  - Functions
-  - Foundations
-  - Beginner
 last_reviewed: '2026-05-12'
-seo_description: 집합과 함수로 데이터 경계와 변환 규칙을 읽는 법을 차근차근 정리합니다
+seo_description: 집합과 함수의 기본 개념을 자료구조와 연결합니다. 합집합, 교집합, 단사와 전사, 함수 합성을 실무 코드 관점에서 정리합니다.
+series: math-for-cs-101
+status: publish-ready
+tags:
+- Math
+- Sets
+- Functions
+- Foundations
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 집합과 함수
 ---
 
 # 집합과 함수

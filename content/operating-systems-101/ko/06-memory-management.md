@@ -17,7 +17,7 @@ tags:
   - heap
   - stack
   - allocator
-seo_description: 스택과 힙, 누수와 단편화, RAM 분배의 기본 원리를 정리합니다.
+seo_description: 프로세스 메모리 구조를 파악하고 누수와 단편화 원인 및 해결 방법을 학습합니다. 가비지 컬렉션의 한계와 실무적인 메모리 관리 기법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

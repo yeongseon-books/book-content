@@ -17,7 +17,7 @@ tags:
   - Latency
   - Failure
   - Coordination
-seo_description: 분산 시스템을 지연, 장애, 조정이라는 세 축으로 처음부터 정리합니다.
+seo_description: 분산 시스템의 정의와 지연, 장애, 조정이라는 세 가지 핵심 축을 중심으로 단일 머신과의 근본적인 차이점을 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

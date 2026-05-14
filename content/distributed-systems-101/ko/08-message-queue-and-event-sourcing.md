@@ -17,7 +17,7 @@ tags:
   - EventSourcing
   - Kafka
   - CQRS
-seo_description: 메시지 큐와 이벤트 소싱이 시간과 이력을 다루는 방식을 설명합니다.
+seo_description: 메시지 큐를 활용한 결합 해소와 전달 보장 전략, 이벤트 소싱과 CQRS 패턴을 통한 상태 관리 및 시스템 확장 방법을 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

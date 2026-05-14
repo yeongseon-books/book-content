@@ -18,7 +18,7 @@ tags:
 - ls
 - cp
 last_reviewed: '2026-05-12'
-seo_description: 파일과 디렉터리 이동, 복사, 삭제를 경로 개념과 함께 정리합니다.
+seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm까지 필수 명령어를 경로 개념과 함께 실습하며 안전한 파일 조작 습관을 익힙니다.
 ---
 
 # 파일과 디렉터리 다루기

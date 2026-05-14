@@ -16,7 +16,7 @@ tags:
   - Containers
   - YAML
   - DevOps
-seo_description: Pod의 의미와 컨테이너와의 차이, 사이드카와 수명 모델을 설명합니다.
+seo_description: 쿠버네티스 최소 배포 단위인 Pod를 컨테이너와 비교 정의하고, 사이드카 패턴과 네트워크 공유, 수명 주기를 통해 Pod의 구조를 이해합니다.
 last_reviewed: '2026-05-12'
 ---
 

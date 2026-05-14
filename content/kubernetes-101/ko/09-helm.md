@@ -16,7 +16,7 @@ tags:
   - Chart
   - PackageManager
   - DevOps
-seo_description: Helm 차트와 values, 배포와 롤백 흐름의 기본을 설명합니다.
+seo_description: Helm의 차트와 values 분리, 릴리스 관리, 롤백 전략을 학습해 쿠버네티스 배포 체계를 반복 가능하게 관리하는 실무 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

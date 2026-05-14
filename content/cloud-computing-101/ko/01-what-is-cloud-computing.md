@@ -16,7 +16,7 @@ tags:
   - Infrastructure
   - DevOps
   - Networking
-seo_description: 클라우드의 핵심 특성과 책임 경계를 실무 관점에서 정리합니다.
+seo_description: 클라우드 컴퓨팅의 핵심 특성과 온프레미스와의 차이, 공동 책임 모델 및 실무 관점의 운영 원칙을 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

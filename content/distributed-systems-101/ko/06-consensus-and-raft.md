@@ -17,7 +17,7 @@ tags:
   - Raft
   - Paxos
   - Replication
-seo_description: 합의 문제와 Raft의 term, log, commit 구조를 코드로 설명합니다.
+seo_description: 분산 시스템의 핵심인 합의 문제와 Raft 알고리즘의 작동 원리, 로그 복제 및 커밋 구조를 예제 코드로 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

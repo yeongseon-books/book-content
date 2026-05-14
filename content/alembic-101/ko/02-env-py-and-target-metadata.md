@@ -18,7 +18,7 @@ tags:
 - Configuration
 - SQLite
 last_reviewed: '2026-05-12'
-seo_description: env.py는 alembic이 명령마다 실행하는 부트 스크립트입니다.
+seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_metadata를 통한 모델 연결, 환경 변수 활용 패턴을 정리합니다.
 ---
 
 # env.py와 target_metadata: 모델과 마이그레이션 연결

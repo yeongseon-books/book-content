@@ -16,7 +16,7 @@ tags:
   - Linux
   - Hypervisor
   - DevOps
-seo_description: 커널 공유와 격리 수준 관점에서 컨테이너와 VM 차이를 설명합니다
+seo_description: 호스트 커널 공유와 하이퍼바이저 격리의 차이점을 통해 컨테이너와 가상 머신의 속도, 밀도, 보안 trade-off를 분석합니다.
 last_reviewed: '2026-05-12'
 ---
 

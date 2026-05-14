@@ -1,23 +1,23 @@
 ---
-title: 확률
-series: math-for-cs-101
 episode: 6
 language: ko
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
-tags:
-  - Math
-  - Probability
-  - Statistics
-  - Bayes
-  - Beginner
 last_reviewed: '2026-05-12'
-seo_description: 확률로 불확실성을 수치화하고 조건과 기대를 읽는 기본기를 정리합니다
+seo_description: 확률 기초와 조건부 확률, 베이즈 정리, 기댓값, 분산을 배우고 A/B 테스트 등 실무 의사결정에서의 활용을 정리합니다.
+series: math-for-cs-101
+status: publish-ready
+tags:
+- Math
+- Probability
+- Statistics
+- Bayes
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 확률
 ---
 
 # 확률

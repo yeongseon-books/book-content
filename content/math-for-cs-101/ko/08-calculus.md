@@ -17,7 +17,7 @@ tags:
   - GradientDescent
   - Beginner
 last_reviewed: '2026-05-12'
-seo_description: 미분으로 변화율과 최적화 방향을 읽는 기초를 개발자 관점에서 정리합니다
+seo_description: 미분의 도함수와 그래디언트를 학습하고, 연쇄 법칙과 경사하강법이 머신러닝 학습 및 최적화에서 어떻게 활용되는지 개발자 관점에서 정리합니다.
 ---
 
 # 미분

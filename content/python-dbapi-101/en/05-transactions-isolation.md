@@ -18,7 +18,7 @@ tags:
 - WAL
 - PEP 249
 last_reviewed: '2026-05-03'
-seo_description: 'Two operational data incidents dominate in production:'
+seo_description: Master Python sqlite3 transactions and isolation levels. Learn about implicit BEGIN, WAL mode, and Python 3.12 autocommit to ensure data safety.
 ---
 
 # Transactions and isolation levels (sqlite3, PEP 249)

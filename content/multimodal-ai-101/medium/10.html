@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a Production Multimodal Application</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a Production Multimodal Application</h1>
+<blockquote>
+<p>Multimodal AI 101 series (10/10)</p>
+</blockquote>
+<hr>
+<p>The first nine episodes covered image encoders, VLM architecture, captioning, multimodal RAG, audio, diffusion, embeddings, and video. This finale ties all the pieces into one production system. The point is not the model but the system: with the same model, how you serve, cache, and bill it decides the user experience.</p>
+<p>This episode covers a FastAPI-based multimodal API design, step-by-step inference pipeline optimization, caching strategy, cost control, and rollout pitfalls.</p>
+<h2>1. End-to-End System Overview</h2>
+<p>We will assume a multimodal Q&amp;A service:</p>
+<ul>
+<li>The user uploads an image with a question</li>
+<li>The system runs caption + OCR + visual Q&amp;A</li>
+<li>Multimodal RAG fetches relevant documents</li>
+<li>The final answer streams back</li>
+</ul>
+<pre><code class="language-text">client ──► API gateway ──► FastAPI app
+                                │
+                ┌───────────────┼─────────────────┐
+                ▼               ▼                 ▼
+           image preproc    cache layer       rate limiter
+                │               │                 │
+                ▼               ▼                 ▼
+          inference orchestrator (asyncio)
+                │
+       ┌────────┼────────┬─────────┬──────────┐
+       ▼        ▼        ▼         ▼          ▼
+     OCR     Caption   VLM Q&amp;A   Embedding   Vector DB
+   (PaddleOCR)(BLIP-2)(LLaVA)   (CLIP)     (FAISS/Qdrant)
+                │
+                ▼
+         response builder ──► streaming SSE
+</code></pre>
+<p>Each model lives in its own GPU worker (or behind Triton/vLLM); FastAPI only orchestrates.</p>
+<h2>2. FastAPI Skeleton</h2>
+<pre><code class="language-python">from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.responses import StreamingResponse
+import asyncio
+
+app = FastAPI()
+
+@app.post(&quot;/v1/multimodal/query&quot;)
+async def multimodal_query(
+    image: UploadFile = File(...),
+    question: str = Form(...),
+):
+    image_bytes = await image.read()
+    image_id = await store_image(image_bytes)
+
+    # 1. cache check
+    cached = await get_cache(image_id, question)
+    if cached:
+        return {&quot;answer&quot;: cached, &quot;cached&quot;: True}
+
+    # 2. parallel pre-extraction
+    caption_task = asyncio.create_task(run_caption(image_bytes))
+    ocr_task = asyncio.create_task(run_ocr(image_bytes))
+    embed_task = asyncio.create_task(run_embed(image_bytes))
+
+    caption, ocr_text, embed = await asyncio.gather(caption_task, ocr_task, embed_task)
+
+    # 3. RAG retrieval
+    docs = await search_docs(embed, question, k=4)
+
+    # 4. final VLM Q&amp;A with streaming
+    return StreamingResponse(
+        stream_vlm_answer(image_bytes, question, caption, ocr_text, docs),
+        media_type=&quot;text/event-stream&quot;,
+    )
+</code></pre>
+<p>Running the three pre-extractions (caption, OCR, embedding) in parallel via <code>asyncio.gather</code> is the latency lever. Sequential execution stacks all three latencies; parallel execution reveals only the slowest one.</p>
+<h2>3. Separating Inference Workers (vLLM, Triton)</h2>
+<p>FastAPI does not load GPU models directly. It sends HTTP/gRPC requests to dedicated inference servers (vLLM, Triton, TGI).</p>
+<pre><code class="language-python">import httpx
+
+VLM_ENDPOINT = &quot;http://llava-worker:8000/v1/chat/completions&quot;
+
+async def stream_vlm_answer(image_bytes, question, caption, ocr_text, docs):
+    prompt = build_prompt(question, caption, ocr_text, docs)
+    payload = {
+        &quot;model&quot;: &quot;llava-v1.6-mistral-7b&quot;,
+        &quot;messages&quot;: [{
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: [
+                {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: prompt},
+                {&quot;type&quot;: &quot;image_url&quot;, &quot;image_url&quot;: {&quot;url&quot;: f&quot;data:image/png;base64,{b64(image_bytes)}&quot;}},
+            ],
+        }],
+        &quot;stream&quot;: True,
+        &quot;max_tokens&quot;: 512,
+    }
+    async with httpx.AsyncClient(timeout=60) as client:
+        async with client.stream(&quot;POST&quot;, VLM_ENDPOINT, json=payload) as resp:
+            async for line in resp.aiter_lines():
+                if line.startswith(&quot;data: &quot;):
+                    yield f&quot;{line}\n\n&quot;
+</code></pre>
+<p>Decoupling workers means model swaps and GPU scaling happen without touching the API. vLLM exposes LLaVA, Llama 3 Vision, and Qwen-VL through OpenAI-compatible endpoints.</p>
+<h2>4. Caching Layer</h2>
+<p>Multimodal requests repeat similar questions against the same image. A three-tier cache is the standard pattern:</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Key</th>
+<th>Store</th>
+<th>TTL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1 exact</td>
+<td><code>hash(image) + question</code></td>
+<td>Redis</td>
+<td>1 hour</td>
+</tr>
+<tr>
+<td>L2 semantic</td>
+<td><code>hash(image) + embed(question)</code></td>
+<td>Redis + cosine</td>
+<td>24 hours</td>
+</tr>
+<tr>
+<td>L3 feature</td>
+<td><code>hash(image)</code> -&gt; caption / OCR / embed</td>
+<td>Postgres</td>
+<td>30 days</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">import hashlib
+import redis.asyncio as redis
+
+r = redis.from_url(&quot;redis://cache:6379&quot;)
+
+def image_hash(b: bytes) -&gt; str:
+    return hashlib.sha256(b).hexdigest()
+
+async def get_cache(image_id: str, question: str) -&gt; str | None:
+    key = f&quot;qa:{image_id}:{hashlib.sha256(question.encode()).hexdigest()}&quot;
+    return await r.get(key)
+
+async def set_cache(image_id: str, question: str, answer: str):
+    key = f&quot;qa:{image_id}:{hashlib.sha256(question.encode()).hexdigest()}&quot;
+    await r.setex(key, 3600, answer)
+</code></pre>
+<p>L3 feature cache is the most impactful tier. Caption, OCR, and embedding outputs are deterministic, so they can be reused indefinitely. Hit rates climb to 70%+.</p>
+<h2>5. Cost Optimization Checklist</h2>
+<p>GPU time is more than 90% of multimodal serving cost. Real-world levers:</p>
+<ul>
+<li><strong>Batch inference</strong>: vLLM continuous batching gives 5-10x throughput</li>
+<li><strong>Quantization</strong>: BLIP-2 and LLaVA at 4-bit (bitsandbytes, AWQ) cut VRAM in half</li>
+<li><strong>Tiered models</strong>: route easy queries to a small VLM (CogVLM-7B), hard ones to GPT-4V</li>
+<li><strong>Pre-resize images</strong>: a 4K image multiplies tokens 4x; resize to 1024 long edge before inference</li>
+<li><strong>Semantic cache</strong>: question embedding cosine &gt; 0.95 counts as a hit</li>
+<li><strong>Async OCR</strong>: store OCR results in the background after responding, ready for the next query</li>
+</ul>
+<p>It is common for a system spending $5,000/month on GPT-4V to drop to $1,200-$1,800 after applying these six changes.</p>
+<h2>6. Observability and the Feedback Loop</h2>
+<p>Production multimodal apps add multimodal-specific metrics on top of the standard ones.</p>
+<pre><code class="language-python">from prometheus_client import Histogram, Counter
+
+inference_latency = Histogram(
+    &quot;multimodal_inference_seconds&quot;, &quot;End-to-end inference time&quot;,
+    [&quot;model&quot;, &quot;modality&quot;], buckets=[0.1, 0.5, 1, 2, 5, 10, 30],
+)
+cache_hit = Counter(&quot;multimodal_cache_hit_total&quot;, &quot;Cache hits&quot;, [&quot;tier&quot;])
+hallucination_flag = Counter(&quot;multimodal_hallucination_total&quot;, &quot;Detected hallucinations&quot;)
+</code></pre>
+<p>Also track:</p>
+<ul>
+<li><strong>Image upload size distribution</strong>: if P99 exceeds 10MB, force client-side resize</li>
+<li><strong>Question length distribution</strong>: detect token blow-ups early</li>
+<li><strong>Hallucination rate</strong>: when an answer mentions objects not in the image, flag with a small validator</li>
+<li><strong>User feedback (thumbs up/down)</strong>: accumulate as RLHF data</li>
+</ul>
+<h2>7. Production Rollout Sequence</h2>
+<p>Recommended sequence for shipping a new multimodal model:</p>
+<ol>
+<li><strong>Shadow traffic</strong> (1 week): call old and new in parallel, compare responses, serve old to users</li>
+<li><strong>Canary 5%</strong> (3 days): expose the new model to a slice, compare latency / error / hallucination</li>
+<li><strong>Canary 25%</strong> (3 days): confirm cost and quality stability</li>
+<li><strong>Full rollout</strong>: 100% switch, rollback button ready</li>
+<li><strong>Sunset old model</strong> (2 weeks later): reclaim GPUs</li>
+</ol>
+<p>Multimodal has more failure modes than single-modality (corrupted images, broken OCR, audio sync, etc.), so the shadow stage is non-negotiable.</p>
+<h2>Five Common Pitfalls</h2>
+<p><strong>1. Synchronous image upload handling</strong></p>
+<p>Reading a large file synchronously blocks the event loop. <code>await image.read()</code> is fine, but follow-up steps (resize, hash) belong in <code>asyncio.to_thread()</code> or a worker process.</p>
+<p><strong>2. Skipping model warm-up</strong></p>
+<p>Cold-start GPU models take 5-10 seconds for the first inference. Run a dummy request before health checks pass so the first user call is not cold.</p>
+<p><strong>3. Streaming response disconnect handling</strong></p>
+<p>If the user closes the connection, the LLM keeps generating tokens. Check <code>request.is_disconnected()</code> in FastAPI and stop generation immediately. This can cut wasted GPU time by 30%.</p>
+<p><strong>4. Ignoring EXIF orientation</strong></p>
+<p>iPhone photos often carry a 90-degree EXIF rotation. Without <code>ImageOps.exif_transpose()</code> from PIL, the model sees a sideways image and accuracy drops noticeably.</p>
+<pre><code class="language-python">from PIL import Image, ImageOps
+img = ImageOps.exif_transpose(Image.open(path))
+</code></pre>
+<p><strong>5. PII leakage (faces, license plates, on-screen text)</strong></p>
+<p>Multimodal APIs routinely receive personal data the user did not intend to share: ID cards, plates, medical scans. Add a PII detection layer (face blur, OCR + regex masking) at intake before going live, and store only image hashes in logs.</p>
+<h2>Key takeaways</h2>
+<ul>
+<li>The heart of a multimodal app is system design, not the model: orchestration, caching, cost, observability.</li>
+<li>FastAPI plus <code>asyncio.gather</code> parallelizes caption / OCR / embedding so latency converges to the slowest step.</li>
+<li>Decouple inference workers (vLLM, Triton) so model swaps and GPU scaling stay independent.</li>
+<li>A three-tier cache (exact, semantic, feature) reaches 70%+ hit rate and cuts GPU cost by 60%.</li>
+<li>Roll out via shadow → canary → full, and prepare for multimodal-specific pitfalls (EXIF, streaming disconnect, PII).</li>
+</ul>
+<p>Across ten episodes we covered the models, data, and systems behind multimodal AI. Build a multimodal app of your own, and let's go deeper in the next series.</p>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal RAG: Searching Images and Text Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Audio Processing and Whisper STT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Text-to-Image with Diffusion</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal Embeddings and Cross-modal Search</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/09-video-understanding.md">Video Understanding - From Frame Sampling to Video-LLaVA</a></li>
+<li><strong>Building a Production Multimodal Application (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://docs.vllm.ai/en/latest/models/vlm.html">vLLM Documentation - Multimodal Inputs</a></li>
+<li><a href="https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse">FastAPI Documentation - Streaming Responses</a></li>
+<li><a href="https://arxiv.org/abs/2309.06180">Kwon et al. - Efficient Memory Management for Large Language Model Serving with PagedAttention (vLLM)</a></li>
+<li><a href="https://github.com/triton-inference-server/server">NVIDIA Triton Inference Server - Multimodal Model Serving</a></li>
+</ul>
+<p class="tags-line">Tags: Production, Multimodal API, FastAPI, Inference Pipeline, Cost Optimization, Caching</p>
+</body>
+</html>

@@ -17,7 +17,7 @@ tags:
   - LeaderFollower
   - QuorumWrites
   - Durability
-seo_description: 데이터 복제 모델과 quorum, 복제 지연의 의미를 정리합니다.
+seo_description: 데이터 복제 모델인 리더 기반, 리더리스 구조와 쿼럼 합의, 복제 지연의 원인과 해결 방안을 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

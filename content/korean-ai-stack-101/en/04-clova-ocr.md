@@ -17,7 +17,7 @@ tags:
 - DocumentAI
 - Python
 last_reviewed: '2026-05-01'
-seo_description: The OCR pipeline has four stages.
+seo_description: Master Korean document text extraction with CLOVA OCR. Learn to post-process JSON, reconstruct lines, and handle confidence scores for RAG.
 ---
 
 # Document text extraction with CLOVA OCR API

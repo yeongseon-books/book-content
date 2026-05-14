@@ -16,7 +16,7 @@ tags:
   - EC2
   - AutoScaling
   - DevOps
-seo_description: VM, 컨테이너, 서버리스의 차이와 컴퓨트 선택 기준을 정리합니다.
+seo_description: 가상 머신, 컨테이너, 서버리스의 차이와 워크로드별 컴퓨트 선택 기준, 오토스케일링 및 비용 최적화 전략을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

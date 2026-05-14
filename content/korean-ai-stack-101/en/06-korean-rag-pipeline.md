@@ -17,7 +17,7 @@ tags:
 - LLM
 - Python
 last_reviewed: '2026-05-03'
-seo_description: '!Core flow'
+seo_description: Assemble a minimal Korean RAG pipeline by connecting embedding, OCR, and generation. Learn chunking, retrieval metrics, and prompt engineering.
 ---
 
 # Assembling a Korean RAG pipeline

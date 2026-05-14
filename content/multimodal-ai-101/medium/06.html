@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Audio Processing and Whisper STT</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Audio Processing and Whisper STT</h1>
+<blockquote>
+<p>Multimodal AI 101 series (6/10)</p>
+</blockquote>
+<hr>
+<h2>Why Whisper became the STT default</h2>
+<p>Before OpenAI Whisper landed in September 2022, production STT meant Google Speech, AWS Transcribe, or Azure Speech. Non-English accuracy lagged English by a wide margin and pricing sat around USD 0.024 per minute.</p>
+<p>Whisper solved two problems at once: 99 languages from a single model, and open weights so you can self-host. Korean WER lands around 5-8%, on par with or better than cloud APIs, and self-hosting with faster-whisper drops the unit cost to roughly the GPU cost at 1x realtime.</p>
+<p>This episode covers what you actually need to run Whisper in production STT.</p>
+<h2>Whisper architecture at a glance</h2>
+<pre><code>[audio waveform] -&gt; log-Mel spectrogram (80 channels)
+                          |
+                          v
+                  Encoder (Transformer)
+                          |
+                          v
+                  Decoder (Transformer)  &lt;- text tokens (incl. task tokens)
+                          |
+                          v
+                     transcription
+</code></pre>
+<p>The trick is the task token. Special tokens like <code>&lt;|transcribe|&gt;</code>, <code>&lt;|translate|&gt;</code>, or <code>&lt;|ko|&gt;</code> go into the decoder input so one model handles transcription, translation, and language detection.</p>
+<h2>First call: 30 seconds with openai-whisper</h2>
+<pre><code class="language-python">import whisper
+
+model = whisper.load_model(&quot;small&quot;)  # tiny / base / small / medium / large-v3
+result = model.transcribe(&quot;samples/meeting.m4a&quot;, language=&quot;en&quot;)
+print(result[&quot;text&quot;])
+for seg in result[&quot;segments&quot;][:3]:
+    print(f&quot;[{seg['start']:.1f}-{seg['end']:.1f}] {seg['text']}&quot;)
+</code></pre>
+<p>Specifying <code>language</code> skips language detection and runs slightly faster. Six size tiers exist from tiny (39M) to large-v3 (1.55B). Production defaults are <code>medium</code> or <code>large-v3</code>.</p>
+<h2>In production: faster-whisper</h2>
+<p>The reference openai-whisper implementation is PyTorch-based with low throughput. <code>faster-whisper</code>, rewritten on CTranslate2, runs the same model 4-5x faster.</p>
+<pre><code class="language-python">from faster_whisper import WhisperModel
+
+model = WhisperModel(
+    &quot;large-v3&quot;,
+    device=&quot;cuda&quot;,
+    compute_type=&quot;float16&quot;,  # int8_float16 / int8 also available
+)
+
+segments, info = model.transcribe(
+    &quot;samples/meeting.m4a&quot;,
+    language=&quot;en&quot;,
+    beam_size=5,
+    vad_filter=True,
+    vad_parameters={&quot;min_silence_duration_ms&quot;: 500},
+)
+
+print(f&quot;Detected language: {info.language} (prob {info.language_probability:.2f})&quot;)
+for seg in segments:
+    print(f&quot;[{seg.start:.1f}-{seg.end:.1f}] {seg.text}&quot;)
+</code></pre>
+<p><code>vad_filter=True</code> is the key. silero-VAD trims silence automatically and prevents the hallucination that happens when long silent stretches feed back into the autoregressive decoder.</p>
+<h2>Long audio: 30-second chunking and timestamps</h2>
+<p>Whisper's encoder processes 30-second windows. A one-hour meeting recording cannot be fed in directly. faster-whisper handles chunking internally, but accurate word-level timestamps need a separate option.</p>
+<pre><code class="language-python">segments, info = model.transcribe(
+    &quot;samples/lecture.mp3&quot;,
+    language=&quot;en&quot;,
+    word_timestamps=True,
+)
+
+for seg in segments:
+    for w in seg.words:
+        print(f&quot;[{w.start:.2f}-{w.end:.2f}] {w.word}&quot;)
+</code></pre>
+<p>Word-level timestamps are essential for SRT subtitles, speaker diarization, and searchable transcripts.</p>
+<h2>Generating SRT subtitles</h2>
+<pre><code class="language-python">def to_srt(segments) -&gt; str:
+    def fmt(t: float) -&gt; str:
+        h = int(t // 3600)
+        m = int((t % 3600) // 60)
+        s = int(t % 60)
+        ms = int((t - int(t)) * 1000)
+        return f&quot;{h:02}:{m:02}:{s:02},{ms:03}&quot;
+
+    lines = []
+    for i, seg in enumerate(segments, 1):
+        lines.append(str(i))
+        lines.append(f&quot;{fmt(seg.start)} --&gt; {fmt(seg.end)}&quot;)
+        lines.append(seg.text.strip())
+        lines.append(&quot;&quot;)
+    return &quot;\n&quot;.join(lines)
+
+with open(&quot;output.srt&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+    f.write(to_srt(segments))
+</code></pre>
+<p>This composes powerfully with VLMs: extract frames from video (Episode 9) plus transcribe audio, then hand both to an LLM as multimodal context.</p>
+<h2>Realtime streaming</h2>
+<p>Streaming is latency-driven, unlike batch transcription. faster-whisper has no first-class streaming, but wrappers like <code>whisper-streaming</code> exist. Alternatively, slice audio into small chunks (1-2 seconds), process sequentially, and emit a partial result every few seconds.</p>
+<pre><code class="language-python">import sounddevice as sd
+import numpy as np
+from faster_whisper import WhisperModel
+
+model = WhisperModel(&quot;base&quot;, device=&quot;cuda&quot;, compute_type=&quot;float16&quot;)
+SR = 16000  # Whisper standard sample rate
+buffer = np.zeros(0, dtype=np.float32)
+
+def callback(indata, frames, time_, status):
+    global buffer
+    buffer = np.concatenate([buffer, indata[:, 0]])
+    if len(buffer) &gt;= SR * 5:  # transcribe every 5 seconds
+        segs, _ = model.transcribe(buffer, language=&quot;en&quot;)
+        text = &quot; &quot;.join(s.text for s in segs)
+        print(&quot;[partial]&quot;, text)
+        # sliding window: keep only last 1 second
+        buffer = buffer[-SR:]
+
+with sd.InputStream(callback=callback, channels=1, samplerate=SR):
+    sd.sleep(60_000)
+</code></pre>
+<p>For production meeting transcripts, dedicated streaming APIs like OpenAI Realtime or AssemblyAI Streaming are usually more reliable.</p>
+<h2>Calling the OpenAI API</h2>
+<p>If self-hosting is too much, the OpenAI Whisper API is the fastest start.</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+with open(&quot;samples/meeting.m4a&quot;, &quot;rb&quot;) as f:
+    resp = client.audio.transcriptions.create(
+        model=&quot;whisper-1&quot;,
+        file=f,
+        language=&quot;en&quot;,
+        response_format=&quot;verbose_json&quot;,
+        timestamp_granularities=[&quot;segment&quot;],
+    )
+
+for seg in resp.segments:
+    print(f&quot;[{seg.start:.1f}] {seg.text}&quot;)
+</code></pre>
+<p>About USD 0.006 per minute. Past 10K minutes per month, self-hosting wins on cost.</p>
+<h2>Five common pitfalls</h2>
+<p><strong>1. Skipping sample-rate conversion</strong></p>
+<p>Whisper expects 16 kHz mono. Feeding 44.1 kHz stereo wav works through file paths because ffmpeg auto-converts, but when you build numpy waveforms manually you must resample explicitly.</p>
+<pre><code class="language-python">import librosa
+audio, _ = librosa.load(&quot;samples/in.wav&quot;, sr=16000, mono=True)
+</code></pre>
+<p><strong>2. Silence hallucination</strong></p>
+<p>After 10+ seconds of silence, Whisper produces hallucinated text like "Thank you for watching" or "Subscribe and like." Trim silence with <code>vad_filter=True</code> or a silero-VAD preprocessor.</p>
+<p><strong>3. Weak on dialects and domain jargon</strong></p>
+<p>Whisper is strong on standard speech and general vocabulary. Medical, legal, and dialect content drops in accuracy. Putting domain terms in <code>initial_prompt</code> typically improves accuracy 5-10%.</p>
+<pre><code class="language-python">segments, _ = model.transcribe(
+    &quot;samples/medical.m4a&quot;,
+    language=&quot;en&quot;,
+    initial_prompt=&quot;patient, prescription, diagnosis, drug interaction, side effects.&quot;,
+)
+</code></pre>
+<p><strong>4. No speaker diarization built in</strong></p>
+<p>Whisper does not tell you who spoke. Run pyannote-audio or NeMo speaker diarization separately and align on timestamps if you need meeting-minute-style output.</p>
+<p><strong>5. Missing cost monitoring</strong></p>
+<p>Self-hosting still costs USD 1-3 per hour per GPU instance. Push queue length, GPU utilization, and transcription latency into CloudWatch or Prometheus to see where money leaks.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Whisper is the STT default with 99-language coverage from a single model. Korean WER lands at 5-8%, on par with cloud APIs.</li>
+<li>In production, use faster-whisper (CTranslate2-based, 4-5x faster) instead of openai-whisper.</li>
+<li>VAD filter, word-level timestamps, and <code>initial_prompt</code> are critical for accuracy and stability.</li>
+<li>Long audio uses auto-chunking; subtitles use SRT conversion; realtime uses sliding-window streaming.</li>
+<li>Verify sample-rate conversion, silence hallucination, domain prompts, separate diarization, and cost monitoring before production.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal RAG: Searching Images and Text Together</a></li>
+<li><strong>Audio Processing and Whisper STT (current)</strong></li>
+<li>Text-to-Image with Diffusion (upcoming)</li>
+<li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
+<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2212.04356">Radford et al. - Robust Speech Recognition via Large-Scale Weak Supervision (Whisper)</a></li>
+<li><a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper GitHub</a></li>
+<li><a href="https://platform.openai.com/docs/api-reference/audio">OpenAI Whisper API Reference</a></li>
+<li><a href="https://github.com/snakers4/silero-vad">silero-vad Documentation</a></li>
+</ul>
+<p class="tags-line">Tags: Whisper, STT, Speech Recognition, Audio Processing, OpenAI, faster-whisper</p>
+</body>
+</html>

@@ -16,7 +16,7 @@ tags:
   - Optimization
   - Cost
   - Analytics
-seo_description: Warehouse 성능 패턴, 비용을 줄이는 방법, 쿼리 플랜 읽는 법
+seo_description: 데이터 웨어하우스의 성능을 결정하는 스캔 양, 셔플, 스필 등의 핵심 패턴과 비용 절감을 위한 쿼리 최적화 전략을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

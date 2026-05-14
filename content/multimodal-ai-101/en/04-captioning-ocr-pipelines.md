@@ -17,7 +17,7 @@ tags:
 - PaddleOCR
 - Document AI
 last_reviewed: '2026-05-03'
-seo_description: 'Two requests show up constantly in production multimodal systems:'
+seo_description: Build efficient image captioning and OCR pipelines. Learn about BLIP, Tesseract, PaddleOCR, and hybrid VLM workflows for multimodal systems.
 ---
 
 # Image Captioning and OCR Pipelines

@@ -17,7 +17,7 @@ tags:
 - Naver
 - Upstage
 last_reviewed: '2026-05-01'
-seo_description: Generation API calls factor into a 4-layer contract.
+seo_description: Learn to use HyperCLOVA X and Solar APIs for Korean LLM applications. Master API contracts, prompts, and response validation for production.
 ---
 
 # Using HyperCLOVA X and Solar API

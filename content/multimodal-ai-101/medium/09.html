@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Video Understanding - From Frame Sampling to Video-LLaVA</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Video Understanding - From Frame Sampling to Video-LLaVA</h1>
+<blockquote>
+<p>Multimodal AI 101 series (9/10)</p>
+</blockquote>
+<hr>
+<p>An image is a single frame; a video is a frame sequence with a time axis. A one-minute clip at 30fps is 1,800 frames, and feeding all of them into a VLM blows up the token budget and the GPU at the same time. Ninety percent of video understanding is the sampling and aggregation question: which frames do we pick, and which model do we feed them to?</p>
+<p>This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.</p>
+<h2>1. Why Frame Sampling Is the Core Decision</h2>
+<p>Suppose we want to process a 10-minute 1080p clip at 30fps end-to-end:</p>
+<ul>
+<li>frames: 18,000</li>
+<li>ViT-L patch tokens per frame: 256</li>
+<li>total tokens: 4.6M</li>
+</ul>
+<p>GPT-4V has a 128K context window; Gemini 1.5 Pro has 1M. A single video already exceeds every model. So we have to reduce frames.</p>
+<p><strong>Uniform</strong><br>
+- Description: Pick N frames at equal spacing<br>
+- Trade-off: Simple; misses short events</p>
+<p><strong>Keyframe</strong><br>
+- Description: Detect scene changes, keep representative frames<br>
+- Trade-off: Efficient; depends on detector quality</p>
+<p><strong>Dense + downsample</strong><br>
+- Description: Extract every frame, let the model compress<br>
+- Trade-off: Accurate; expensive</p>
+<p><strong>Adaptive</strong><br>
+- Description: Variable rate driven by motion or audio<br>
+- Trade-off: Best quality; complex</p>
+<p>Most production systems land on uniform 8 to 32 frames as the sweet spot. Video-LLaVA uses 8, VideoChat-2 uses 16, Gemini 1.5 handles 100+.</p>
+<h2>2. Pulling Frames with PyAV</h2>
+<pre><code class="language-python">import av
+import numpy as np
+from PIL import Image
+
+def sample_uniform_frames(path: str, n_frames: int = 8) -&gt; list[Image.Image]:
+    container = av.open(path)
+    stream = container.streams.video[0]
+    total = stream.frames or int(stream.duration * stream.average_rate)
+    indices = np.linspace(0, total - 1, n_frames).astype(int)
+
+    frames = []
+    target_set = set(indices.tolist())
+    for i, frame in enumerate(container.decode(stream)):
+        if i in target_set:
+            frames.append(frame.to_image())
+            if len(frames) == n_frames:
+                break
+    container.close()
+    return frames
+
+frames = sample_uniform_frames(&quot;clip.mp4&quot;, n_frames=8)
+print(f&quot;sampled {len(frames)} frames, first size = {frames[0].size}&quot;)
+</code></pre>
+<p>PyAV is an ffmpeg binding, so it handles mp4, webm, and mov through one API. OpenCV (<code>cv2.VideoCapture</code>) works too, but PyAV has better codec compatibility.</p>
+<h2>3. Keyframe Extraction Based on Scene Change</h2>
+<pre><code class="language-python">import av
+import numpy as np
+
+def extract_keyframes(path: str, threshold: float = 30.0) -&gt; list:
+    container = av.open(path)
+    stream = container.streams.video[0]
+
+    keyframes = []
+    prev_hist = None
+    for frame in container.decode(stream):
+        img = frame.to_ndarray(format=&quot;rgb24&quot;)
+        hist = np.histogram(img, bins=32, range=(0, 256))[0].astype(&quot;float32&quot;)
+        hist /= hist.sum() + 1e-8
+
+        if prev_hist is None:
+            keyframes.append(frame.to_image())
+        else:
+            diff = np.sum((hist - prev_hist) ** 2 / (hist + prev_hist + 1e-8))
+            if diff &gt; threshold:
+                keyframes.append(frame.to_image())
+        prev_hist = hist
+    container.close()
+    return keyframes
+</code></pre>
+<p>Scene-change detection grows linearly with clip length, so always cap the result (for example, max 32 frames) to keep downstream cost predictable.</p>
+<h2>4. Comparing Video Encoders: VideoMAE, TimeSformer, X-CLIP</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Input</th>
+<th>Core idea</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TimeSformer</td>
+<td>8-64 frames</td>
+<td>Separate spatial and temporal attention</td>
+<td>Action recognition</td>
+</tr>
+<tr>
+<td>VideoMAE v2</td>
+<td>16 frames</td>
+<td>Masked autoencoder pretraining</td>
+<td>Feature extractor</td>
+</tr>
+<tr>
+<td>X-CLIP</td>
+<td>8-32 frames</td>
+<td>CLIP extended to video, aligned with text</td>
+<td>Zero-shot action</td>
+</tr>
+<tr>
+<td>Video-LLaVA</td>
+<td>8 frames</td>
+<td>LLaVA backbone + video projector</td>
+<td>Video Q&amp;A</td>
+</tr>
+<tr>
+<td>InternVideo2</td>
+<td>Variable</td>
+<td>Video foundation model</td>
+<td>Unified backbone</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">from transformers import VideoMAEImageProcessor, VideoMAEForVideoClassification
+import torch
+
+processor = VideoMAEImageProcessor.from_pretrained(&quot;MCG-NJU/videomae-base-finetuned-kinetics&quot;)
+model = VideoMAEForVideoClassification.from_pretrained(&quot;MCG-NJU/videomae-base-finetuned-kinetics&quot;)
+
+frames = sample_uniform_frames(&quot;clip.mp4&quot;, n_frames=16)
+inputs = processor(frames, return_tensors=&quot;pt&quot;)
+
+with torch.no_grad():
+    logits = model(**inputs).logits
+
+pred_id = logits.argmax(-1).item()
+print(f&quot;Kinetics-400 label: {model.config.id2label[pred_id]}&quot;)
+</code></pre>
+<p>VideoMAE gives a strong baseline on Kinetics-400 (400 actions). For a custom domain, fine-tuning only the classification head is usually enough.</p>
+<h2>5. Video Q&amp;A with Video-LLaVA</h2>
+<pre><code class="language-python">from transformers import VideoLlavaProcessor, VideoLlavaForConditionalGeneration
+import torch
+
+processor = VideoLlavaProcessor.from_pretrained(&quot;LanguageBind/Video-LLaVA-7B-hf&quot;)
+model = VideoLlavaForConditionalGeneration.from_pretrained(
+    &quot;LanguageBind/Video-LLaVA-7B-hf&quot;,
+    torch_dtype=torch.float16,
+    device_map=&quot;auto&quot;,
+)
+
+frames = sample_uniform_frames(&quot;cooking.mp4&quot;, n_frames=8)
+prompt = &quot;USER: &lt;video&gt;\nWhat is the person doing in this video? ASSISTANT:&quot;
+inputs = processor(text=prompt, videos=frames, return_tensors=&quot;pt&quot;).to(model.device, torch.float16)
+
+with torch.no_grad():
+    out = model.generate(**inputs, max_new_tokens=200)
+print(processor.batch_decode(out, skip_special_tokens=True)[0])
+</code></pre>
+<p>Video-LLaVA compresses 8 frames into a single video token sequence. That is enough for short clips (10 seconds to 1 minute). Longer videos use a chunk-and-merge pattern: ask each chunk separately, then summarize the answers with an LLM.</p>
+<h2>6. Action Recognition Pipeline End-to-End</h2>
+<p>A production action recognition pipeline looks like this:</p>
+<pre><code class="language-text">input video ──► frame sampler (8-16) ──► VideoMAE / X-CLIP ──► action label + score
+                                                                   │
+                                                                   ▼
+                                                         confidence threshold
+                                                                   │
+                                                                   ▼
+                                                  high-confidence ──► event store
+                                                  low-confidence  ──► human review
+</code></pre>
+<ul>
+<li><strong>Sampling</strong>: uniform 16 frames as baseline, weighted by motion intensity</li>
+<li><strong>Encoder</strong>: X3D-S on CPU, VideoMAE-Base on GPU</li>
+<li><strong>Aggregation</strong>: smooth clip-level scores over a 5-second window</li>
+<li><strong>Threshold</strong>: 0.7+ if precision matters, 0.4 if recall matters</li>
+</ul>
+<h2>Five Common Pitfalls</h2>
+<p><strong>1. Confusing fps with sampling rate</strong></p>
+<p>Without checking whether the source is 30fps or 60fps, the meaning of "8 frames" changes. Uniform sampling counts frame indices, but the real semantic is "how many seconds apart". Read video metadata first and sample by <code>total_seconds</code>.</p>
+<p><strong>2. Codec and container dependencies</strong></p>
+<p>A <code>.mp4</code> file can wrap H.264, H.265, or AV1, and OpenCV cannot open all of them. PyAV (ffmpeg) and decord have better compatibility; otherwise, transcode upfront with ffmpeg.</p>
+<pre><code class="language-bash">ffmpeg -i input.webm -c:v libx264 -crf 23 -preset fast output.mp4
+</code></pre>
+<p><strong>3. Short events disappear under uniform sampling</strong></p>
+<p>If you need to catch a 0.5-second accident inside a 10-minute clip, uniform 16 frames means a 37-second gap, and the accident is gone. For event detection, you need dense sampling plus a second-stage classifier.</p>
+<p><strong>4. Ignoring the audio track</strong></p>
+<p>Impact sounds, claps, and screams appear in audio before the corresponding frames change. Ensembling an audio encoder (ImageBind or a dedicated model) raises action detection accuracy noticeably. In surveillance and safety domains, audio cues are decisive.</p>
+<p><strong>5. Frame memory management</strong></p>
+<p>Eight 1080p uint8 frames take about 50MB. A batch of 100 videos pins 5GB inside one process. Resize immediately after decode (for example, to 224x224), move large numpy arrays to GPU, and free the CPU copy right away.</p>
+<pre><code class="language-python">img = frame.to_image().resize((224, 224))  # shrink right away
+</code></pre>
+<h2>Key takeaways</h2>
+<ul>
+<li>Video understanding is bottlenecked by frame count, so sampling strategy (uniform, keyframe, adaptive) is the first system design decision.</li>
+<li>Pull frames with PyAV and feed them to VideoMAE, TimeSformer, or X-CLIP for an action recognition baseline.</li>
+<li>Video-LLaVA enables 8-frame Q&A; longer clips use chunk-and-merge with an LLM summarizer.</li>
+<li>The standard pipeline is sampler → encoder → aggregator → threshold → event store.</li>
+<li>fps, codec, short events, audio cues, and memory are the most common production pitfalls.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/04-captioning-ocr-pipelines.md">Image Captioning and OCR Pipelines</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/05-multimodal-rag.md">Multimodal RAG: Searching Images and Text Together</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/06-audio-whisper.md">Audio Processing and Whisper STT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/07-text-to-image-diffusion.md">Text-to-Image with Diffusion</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/08-multimodal-embeddings.md">Multimodal Embeddings and Cross-modal Search</a></li>
+<li><strong>Video Understanding - From Frame Sampling to Video-LLaVA (current)</strong></li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2203.12602">Tong et al. - VideoMAE: Masked Autoencoders Are Data-Efficient Learners for Video</a></li>
+<li><a href="https://arxiv.org/abs/2102.05095">Bertasius et al. - Is Space-Time Attention All You Need for Video Understanding? (TimeSformer)</a></li>
+<li><a href="https://arxiv.org/abs/2311.10122">Lin et al. - Video-LLaVA: Learning United Visual Representation by Alignment Before Projection</a></li>
+<li><a href="https://pyav.org/docs/stable/cookbook/basics.html">PyAV Documentation - Decoding Video Streams</a></li>
+</ul>
+<p class="tags-line">Tags: Video Understanding, Video-LLaVA, Frame Sampling, Temporal Modeling, VideoMAE, Action Recognition</p>
+</body>
+</html>

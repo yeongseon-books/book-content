@@ -18,7 +18,7 @@ tags:
 - git-install
 - git-config
 last_reviewed: '2026-05-12'
-seo_description: Git을 스냅샷 기반 버전 관리 도구로 이해하는 입문 글입니다.
+seo_description: Git의 스냅샷 모델과 세 가지 작업 영역을 이해하고, 초기 설정부터 도움말 활용법까지 실습하며 분산 버전 관리의 기본 멘탈 모델을 정립합니다.
 ---
 
 # Git이란 무엇인가? 버전 관리의 시작

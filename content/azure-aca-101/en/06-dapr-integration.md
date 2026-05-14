@@ -17,7 +17,7 @@ tags:
 - Pub-Sub
 - Service Invocation
 last_reviewed: '2026-04-29'
-seo_description: 'Think of Dapr at two levels:'
+seo_description: Streamline microservices with Azure Container Apps and Dapr. Learn to use the sidecar for service invocation, pub/sub, and state management.
 ---
 
 # Dapr integration — what you get from a sidecar

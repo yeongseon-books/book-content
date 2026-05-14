@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Image Captioning and OCR Pipelines</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Image Captioning and OCR Pipelines</h1>
+<blockquote>
+<p>Multimodal AI 101 series (4/10)</p>
+</blockquote>
+<hr>
+<h2>"Doesn't pulling text out of an image cover it?"</h2>
+<p>Two requests show up constantly in production multimodal systems:</p>
+<ol>
+<li>"Describe what is in this image in one line" (image captioning)</li>
+<li>"Read the text inside this image as-is" (OCR)</li>
+</ol>
+<p>It is tempting to assume one VLM call solves both. In practice, captioning and OCR are usually split across different models because of cost, latency, and accuracy trade-offs. This episode covers how to design those two pipelines.</p>
+<h2>Image Captioning: two approaches</h2>
+<p><strong>BLIP-style dedicated captioning models</strong></p>
+<p>Caption-only models like BLIP, BLIP-2, and GIT are lightweight and fast. They run several images per second on CPU and dozens at a time on GPU.</p>
+<pre><code class="language-python">import torch
+from PIL import Image
+from transformers import BlipForConditionalGeneration, BlipProcessor
+
+processor = BlipProcessor.from_pretrained(&quot;Salesforce/blip-image-captioning-base&quot;)
+model = BlipForConditionalGeneration.from_pretrained(
+    &quot;Salesforce/blip-image-captioning-base&quot;
+).eval()
+
+def caption(img_path: str, prompt: str | None = None) -&gt; str:
+    img = Image.open(img_path).convert(&quot;RGB&quot;)
+    if prompt:
+        inputs = processor(img, prompt, return_tensors=&quot;pt&quot;)
+    else:
+        inputs = processor(img, return_tensors=&quot;pt&quot;)
+    with torch.no_grad():
+        out = model.generate(**inputs, max_new_tokens=50)
+    return processor.decode(out[0], skip_special_tokens=True)
+
+print(caption(&quot;samples/dog.jpg&quot;))
+# &gt; a brown dog sitting on a wooden floor
+print(caption(&quot;samples/dog.jpg&quot;, prompt=&quot;a photography of&quot;))
+# &gt; a photography of a brown dog with a happy face
+</code></pre>
+<p>The wins are latency and cost. BLIP-base does 50-100 ms per caption on GPU and is roughly 1/100 the cost of OpenAI's Vision API. That fits e-commerce catalogs of millions of images and log analysis at scale.</p>
+<p><strong>VLM call for richer captions</strong></p>
+<p>Captions that need reasoning ("explain what trend this chart shows") are not BLIP's strength. VLMs like GPT-4o, Claude, and Gemini are the answer.</p>
+<pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def rich_caption(image_url: str) -&gt; str:
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[{
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: [
+                {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: (
+                    &quot;Describe this image as alt text for visually impaired users &quot;
+                    &quot;in 150 characters or less. &quot;
+                    &quot;Include the objects, the scene, and key numbers if a chart &quot;
+                    &quot;or table is present.&quot;
+                )},
+                {&quot;type&quot;: &quot;image_url&quot;, &quot;image_url&quot;: {&quot;url&quot;: image_url}},
+            ],
+        }],
+    )
+    return resp.choices[0].message.content
+</code></pre>
+<p>Decision rule: object-recognition-level caption goes to BLIP; reasoning-with-context caption goes to a VLM.</p>
+<h2>OCR: what to choose</h2>
+<p>OCR engines split into four categories.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Representative</th>
+<th>Strength</th>
+<th>Weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Classic CV</td>
+<td>Tesseract</td>
+<td>Free, stable, strong on English</td>
+<td>Weak on handwriting, rotation, curves</td>
+</tr>
+<tr>
+<td>Deep-learning OSS</td>
+<td>PaddleOCR, EasyOCR</td>
+<td>80+ languages, layout-aware</td>
+<td>Model size, GPU recommended</td>
+</tr>
+<tr>
+<td>Cloud APIs</td>
+<td>AWS Textract, Google Vision, Azure</td>
+<td>Excellent table/form parsing</td>
+<td>Per-page cost, data leaves the perimeter</td>
+</tr>
+<tr>
+<td>VLM</td>
+<td>GPT-4o, Claude</td>
+<td>Natural-language queries, document QA</td>
+<td>Token cost, accuracy varies</td>
+</tr>
+</tbody>
+</table>
+<p>In production a two-layer setup is typical: <strong>fast and cheap OCR for raw text extraction</strong>, then <strong>a VLM only for stages that actually need reasoning</strong>.</p>
+<p><strong>Tesseract: the fastest start</strong></p>
+<pre><code class="language-python">import pytesseract
+from PIL import Image
+
+def ocr_simple(img_path: str, lang: str = &quot;kor+eng&quot;) -&gt; str:
+    img = Image.open(img_path)
+    return pytesseract.image_to_string(img, lang=lang)
+
+print(ocr_simple(&quot;samples/screenshot.png&quot;))
+</code></pre>
+<p>For Korean recognition you must install <code>tesseract-ocr-kor</code> system data. The appeal is that one CLI call is enough.</p>
+<p><strong>PaddleOCR: when you need Korean and layout</strong></p>
+<pre><code class="language-python">from paddleocr import PaddleOCR
+
+ocr = PaddleOCR(use_angle_cls=True, lang=&quot;korean&quot;)
+
+def ocr_with_boxes(img_path: str) -&gt; list[dict]:
+    result = ocr.ocr(img_path, cls=True)
+    rows = []
+    for line in result[0]:
+        bbox, (text, conf) = line
+        rows.append({
+            &quot;text&quot;: text,
+            &quot;confidence&quot;: float(conf),
+            &quot;bbox&quot;: bbox,  # 4-point polygon
+        })
+    return rows
+
+for r in ocr_with_boxes(&quot;samples/receipt.jpg&quot;)[:5]:
+    print(f&quot;[{r['confidence']:.2f}] {r['text']}&quot;)
+</code></pre>
+<p>Returning bounding boxes makes this strong for layout-aware work like receipts, business cards, and tables.</p>
+<p><strong>Cloud APIs: when you need table structure</strong></p>
+<p>AWS Textract goes beyond plain OCR by structuring cells, key-value pairs, and tables. It excels on structured documents like invoices and insurance claims.</p>
+<pre><code class="language-python">import boto3
+
+textract = boto3.client(&quot;textract&quot;, region_name=&quot;us-east-1&quot;)
+
+def extract_tables(img_path: str) -&gt; list:
+    with open(img_path, &quot;rb&quot;) as f:
+        resp = textract.analyze_document(
+            Document={&quot;Bytes&quot;: f.read()},
+            FeatureTypes=[&quot;TABLES&quot;],
+        )
+    tables = [b for b in resp[&quot;Blocks&quot;] if b[&quot;BlockType&quot;] == &quot;TABLE&quot;]
+    return tables
+</code></pre>
+<p>Cost runs around USD 0.05-0.065 per page. At 1M pages per month, self-hosted PaddleOCR plus post-processing is cheaper.</p>
+<h2>OCR + VLM hybrid pipeline</h2>
+<p>The pattern that works in practice has five stages.</p>
+<pre><code>[Image]
+   |
+   v
+1. Image preprocessing (deskew, denoise, rotation)
+   |
+   v
+2. Fast OCR (PaddleOCR/Tesseract) -&gt; raw text + bbox
+   |
+   v
+3. Layout analysis (optional) -&gt; sections, tables
+   |
+   v
+4. VLM (optional) -&gt; NL reasoning, ambiguous-text correction
+   |
+   v
+[Structured output]
+</code></pre>
+<p>Below is a minimal implementation of that hybrid.</p>
+<pre><code class="language-python">from PIL import Image
+from paddleocr import PaddleOCR
+from openai import OpenAI
+
+ocr = PaddleOCR(use_angle_cls=True, lang=&quot;korean&quot;)
+client = OpenAI()
+
+def extract_then_reason(img_path: str, question: str) -&gt; str:
+    raw = ocr.ocr(img_path, cls=True)[0]
+    text_block = &quot;\n&quot;.join(line[1][0] for line in raw)
+    resp = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: (
+                &quot;The user gives you OCR-extracted text and a question. &quot;
+                &quot;Answer while accounting for OCR errors.&quot;
+            )},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: (
+                f&quot;OCR result:\n```\n{text_block}\n```\n\nQuestion: {question}&quot;
+            )},
+        ],
+    )
+    return resp.choices[0].message.content
+
+answer = extract_then_reason(&quot;samples/receipt.jpg&quot;,
+                             &quot;What is the total amount paid and the store name?&quot;)
+print(answer)
+</code></pre>
+<p>This hybrid cuts cost by 90% or more while keeping accuracy close to VLM-only.</p>
+<h2>Five common pitfalls</h2>
+<p><strong>1. Running OCR on a rotated image as-is</strong></p>
+<p>Receipts shot on a phone carry EXIF orientation metadata. PIL does not rotate automatically, so handle it explicitly.</p>
+<pre><code class="language-python">from PIL import Image, ImageOps
+
+def auto_rotate(path: str) -&gt; Image.Image:
+    img = Image.open(path)
+    return ImageOps.exif_transpose(img)
+</code></pre>
+<p><strong>2. Missing Korean language weights</strong></p>
+<p>Tesseract needs <code>kor.traineddata</code>, EasyOCR needs <code>["ko"]</code>, and PaddleOCR needs <code>lang="korean"</code>. Running Korean images on the English default produces meaningless output.</p>
+<p><strong>3. Ignoring confidence thresholds</strong></p>
+<p>OCR outputs always carry confidence scores. Drop anything below 0.6 or route it to a verification queue. Ignoring confidence lets downstream LLMs reason on garbage.</p>
+<p><strong>4. Using a caption as-is for SEO or accessibility</strong></p>
+<p>BLIP captions are short and generic ("a person sitting"). They lack the context required by alt-text standards (WCAG 1.1.1). For SEO or accessibility, post-process BLIP output or call a VLM separately.</p>
+<p><strong>5. PII leaking through caption/OCR output</strong></p>
+<p>Card numbers on receipts, phone numbers on business cards, and ID numbers on passport photos are all readable by OCR. Run a PII filter on caption/OCR output (see ai-data-preparation-101 Episode 4).</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>Image captioning needs both fast BLIP-family models and reasoning-strong VLMs. Split by task character.</li>
+<li>OCR selection ladder: Tesseract (simple), PaddleOCR (Korean + layout), Cloud APIs (table structure), VLM (NL reasoning).</li>
+<li>In production, a fast-OCR -&gt; layout -&gt; VLM hybrid pipeline is best for both cost and accuracy.</li>
+<li>Verify EXIF rotation, language weights, confidence thresholds, alt-text post-processing, and PII filters before going live.</li>
+<li>Episode 5 covers how to index OCR/caption output into a vector DB for multimodal RAG.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/02-image-encoders-clip-vit.md">Image Encoders: CLIP and ViT</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/03-vlm-architecture.md">Vision-Language Model Architecture</a></li>
+<li><strong>Image Captioning and OCR Pipelines (current)</strong></li>
+<li>Multimodal RAG: Searching Images and Text Together (upcoming)</li>
+<li>Audio Processing and Whisper STT (upcoming)</li>
+<li>Text-to-Image with Diffusion (upcoming)</li>
+<li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
+<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2201.12086">Li et al. - BLIP: Bootstrapping Language-Image Pre-training</a></li>
+<li><a href="https://github.com/PaddlePaddle/PaddleOCR">PaddleOCR Documentation</a></li>
+<li><a href="https://tesseract-ocr.github.io/tessdoc/">Tesseract OCR User Manual</a></li>
+<li><a href="https://docs.aws.amazon.com/textract/latest/dg/what-is.html">AWS Textract Developer Guide</a></li>
+</ul>
+<p class="tags-line">Tags: OCR, Image Captioning, BLIP, Tesseract, PaddleOCR, Document AI</p>
+</body>
+</html>

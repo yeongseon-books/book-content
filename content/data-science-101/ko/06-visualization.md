@@ -16,7 +16,7 @@ tags:
   - Matplotlib
   - Seaborn
   - Beginner
-seo_description: 메시지에 맞는 차트를 고르는 법과 정직한 시각화 원칙을 설명합니다
+seo_description: 데이터의 메시지에 맞는 차트 선택법과 축, 색상, 주석 활용 원칙 및 정직한 시각화를 위한 가이드를 상세히 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

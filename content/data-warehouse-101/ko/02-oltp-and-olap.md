@@ -16,7 +16,7 @@ tags:
   - OLAP
   - Database
   - Analytics
-seo_description: OLTP와 OLAP의 차이, 행 저장과 열 저장, 분리해야 하는 이유
+seo_description: OLTP와 OLAP의 워크로드 차이, 행 저장과 열 저장의 트레이드오프 및 두 시스템을 분리해야 하는 이유를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

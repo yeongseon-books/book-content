@@ -17,7 +17,7 @@ tags:
 - Embeddings
 - Python
 last_reviewed: '2026-05-01'
-seo_description: Multilingual dense retrieval decomposes into four steps.
+seo_description: Implement multilingual search with BGE-M3. Learn to create a dense-only baseline for mixed Korean-English corpora using FAISS and normalization.
 ---
 
 # BGE-M3 multilingual embedding in practice

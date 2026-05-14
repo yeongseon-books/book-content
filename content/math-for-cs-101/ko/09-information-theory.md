@@ -1,23 +1,23 @@
 ---
-title: 정보이론
-series: math-for-cs-101
 episode: 9
 language: ko
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
-tags:
-  - Math
-  - InformationTheory
-  - Entropy
-  - Compression
-  - Beginner
 last_reviewed: '2026-05-12'
-seo_description: 정보이론으로 엔트로피와 압축, 손실 함수의 바닥 개념을 이해합니다
+seo_description: 엔트로피, 교차 엔트로피, KL 발산으로 불확실성을 측정하는 법을 배우고 압축과 손실 함수의 원리를 정리합니다.
+series: math-for-cs-101
+status: publish-ready
+tags:
+- Math
+- InformationTheory
+- Entropy
+- Compression
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 정보이론
 ---
 
 # 정보이론

@@ -15,7 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
-seo_description: '"The app is slow." "There''s an error." "When did this start?"'
+seo_description: Master Azure App Service logging and monitoring. Learn to collect filesystem logs, use Application Insights, and write KQL queries for debugging.
 ---
 
 # Logging and Monitoring Basics

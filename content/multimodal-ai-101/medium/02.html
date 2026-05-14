@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Image Encoders: CLIP and ViT</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Image Encoders: CLIP and ViT</h1>
+<blockquote>
+<p>Multimodal AI 101 series (2/10)</p>
+</blockquote>
+<hr>
+<h2>Why start with the image encoder</h2>
+<p>The quality of any multimodal system ultimately rides on the quality of the representation produced by the image encoder. CLIP and ViT (Vision Transformer) are the two pillars on the image side of nearly every modern VLM, and BLIP-2, LLaVA, and GPT-4V all use ViT-family backbones. Episode 1 covered hybrid fusion; this episode looks directly at the vision encoder that feeds it.</p>
+<h2>ViT: looking at images as a token sequence</h2>
+<p>CNNs process images by growing receptive fields from small to large. ViT does the opposite. It cuts the image into 16x16 patches, treats each patch as a token, and feeds the sequence straight into a Transformer.</p>
+<pre><code>[224x224 image] -&gt; 14x14 = 196 patches -&gt; linear projection -&gt; 196 tokens (+ CLS)
+                                                                |
+                                                                v
+                                          Transformer Encoder (12 layers)
+                                                                |
+                                                                v
+                                                  CLS embedding (= image vector)
+</code></pre>
+<p>Three points to internalize:</p>
+<ol>
+<li><strong>Patch embedding</strong>: each 16x16 patch is flattened and projected to a D-dimensional token. ViT-B/16 uses D = 768.</li>
+<li><strong>Positional embedding</strong>: position information is added the same way as in NLP. A learnable 1D positional embedding is the standard.</li>
+<li><strong>CLS token</strong>: a special token sits at the front of the sequence (BERT-style), and its output vector is used as the image representation.</li>
+</ol>
+<pre><code class="language-python">import torch
+from transformers import ViTModel, ViTImageProcessor
+from PIL import Image
+
+processor = ViTImageProcessor.from_pretrained(&quot;google/vit-base-patch16-224&quot;)
+model = ViTModel.from_pretrained(&quot;google/vit-base-patch16-224&quot;)
+
+img = Image.open(&quot;samples/cat.jpg&quot;).convert(&quot;RGB&quot;)
+inputs = processor(images=img, return_tensors=&quot;pt&quot;)
+
+with torch.no_grad():
+    out = model(**inputs)
+
+cls_vec = out.last_hidden_state[:, 0, :]  # (1, 768)
+print(cls_vec.shape, cls_vec.norm().item())
+</code></pre>
+<p>That single vector becomes the input for a classifier head, an entry in a retrieval index, or the visual-token source for a multimodal model.</p>
+<h2>CLIP: aligning text and images in one space</h2>
+<p>Even a great image vector cannot be compared to text on its own. CLIP trains an image encoder and a text encoder jointly, pulling matched (image, text) pairs together and pushing mismatched pairs apart with a contrastive loss.</p>
+<p>The training signal is InfoNCE, a simple contrastive loss. Given N (image, text) pairs in a batch, you build an NxN similarity matrix and apply cross-entropy in both directions so the diagonal becomes the answer.</p>
+<pre><code class="language-python">import torch
+import torch.nn.functional as F
+
+def clip_loss(image_emb: torch.Tensor, text_emb: torch.Tensor,
+              temperature: float = 0.07) -&gt; torch.Tensor:
+    image_emb = F.normalize(image_emb, dim=-1)
+    text_emb = F.normalize(text_emb, dim=-1)
+    logits = image_emb @ text_emb.T / temperature
+    targets = torch.arange(len(image_emb), device=logits.device)
+    loss_i = F.cross_entropy(logits, targets)
+    loss_t = F.cross_entropy(logits.T, targets)
+    return (loss_i + loss_t) / 2
+</code></pre>
+<p>Trained on 400 million (image, alt-text) pairs, this simple loss yields 76% zero-shot ImageNet accuracy without ever seeing a label.</p>
+<h2>Three patterns for using CLIP as-is</h2>
+<p><strong>Pattern 1: zero-shot classification</strong></p>
+<p>CLIP's strength is that you can add a new class without retraining. Run a prompt through the text encoder to build a class vector, then take cosine similarity against the image vector.</p>
+<pre><code class="language-python">import torch
+from PIL import Image
+from transformers import CLIPModel, CLIPProcessor
+
+model = CLIPModel.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+proc = CLIPProcessor.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+
+labels = [&quot;cat&quot;, &quot;dog&quot;, &quot;car&quot;, &quot;airplane&quot;]
+prompts = [f&quot;a photo of a {l}&quot; for l in labels]
+img = Image.open(&quot;samples/test.jpg&quot;).convert(&quot;RGB&quot;)
+
+inputs = proc(text=prompts, images=img, return_tensors=&quot;pt&quot;, padding=True)
+with torch.no_grad():
+    out = model(**inputs)
+
+probs = out.logits_per_image.softmax(dim=-1)[0]
+for label, p in zip(labels, probs):
+    print(f&quot;{label:&gt;10}: {p:.3f}&quot;)
+</code></pre>
+<p><strong>Pattern 2: store image embeddings in a vector DB</strong></p>
+<p>This is the most common pattern for retrieval-style search. Precompute embeddings for every image into FAISS, then search by image or by text in the same space.</p>
+<pre><code class="language-python">import faiss
+import numpy as np
+import torch
+from PIL import Image
+from transformers import CLIPModel, CLIPProcessor
+
+model = CLIPModel.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;).eval()
+proc = CLIPProcessor.from_pretrained(&quot;openai/clip-vit-base-patch32&quot;)
+
+def embed_images(paths: list[str]) -&gt; np.ndarray:
+    imgs = [Image.open(p).convert(&quot;RGB&quot;) for p in paths]
+    inputs = proc(images=imgs, return_tensors=&quot;pt&quot;)
+    with torch.no_grad():
+        feats = model.get_image_features(**inputs)
+    feats = feats / feats.norm(dim=-1, keepdim=True)
+    return feats.cpu().numpy().astype(&quot;float32&quot;)
+
+paths = [&quot;a.jpg&quot;, &quot;b.jpg&quot;, &quot;c.jpg&quot;, &quot;d.jpg&quot;]
+vecs = embed_images(paths)
+
+index = faiss.IndexFlatIP(vecs.shape[1])  # cosine = inner product on normalized
+index.add(vecs)
+
+# query by text
+query = proc(text=[&quot;a red sports car&quot;], return_tensors=&quot;pt&quot;, padding=True)
+with torch.no_grad():
+    qv = model.get_text_features(**query)
+qv = (qv / qv.norm(dim=-1, keepdim=True)).cpu().numpy().astype(&quot;float32&quot;)
+
+D, I = index.search(qv, k=3)
+print(&quot;top-3:&quot;, [paths[i] for i in I[0]])
+</code></pre>
+<p><strong>Pattern 3: as the image tower of a VLM</strong></p>
+<p>LLaVA, BLIP-2, and MiniGPT-4 all use the last-layer output of a CLIP image encoder as visual tokens, training only a small projection layer to connect to the LLM. Freezing the encoder dramatically reduces training cost.</p>
+<h2>Choosing a ViT</h2>
+<p>The selection table below covers options that come up most often in production.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Params</th>
+<th>Input resolution</th>
+<th>Recommended use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ViT-B/16</td>
+<td>86M</td>
+<td>224x224</td>
+<td>General classification, prototyping</td>
+</tr>
+<tr>
+<td>ViT-L/14</td>
+<td>304M</td>
+<td>224x224</td>
+<td>High-quality embeddings</td>
+</tr>
+<tr>
+<td>CLIP ViT-B/32</td>
+<td>87M</td>
+<td>224x224</td>
+<td>Search, zero-shot classification</td>
+</tr>
+<tr>
+<td>CLIP ViT-L/14-336</td>
+<td>304M</td>
+<td>336x336</td>
+<td>LLaVA backbone, high resolution</td>
+</tr>
+<tr>
+<td>EVA-CLIP-G/14</td>
+<td>1B+</td>
+<td>224-336</td>
+<td>When SOTA embeddings are required</td>
+</tr>
+<tr>
+<td>SigLIP-Base</td>
+<td>200M</td>
+<td>224</td>
+<td>CLIP alternative with better training stability</td>
+</tr>
+</tbody>
+</table>
+<p>In practice, CLIP ViT-L/14-336 is the LLaVA-1.5 default, and SigLIP is adopted by recent VLMs like Google's PaliGemma. For zero-shot classification alone, ViT-B/32 is enough to start.</p>
+<h2>Five common pitfalls</h2>
+<p><strong>1. Preprocessing different from the processor's defaults</strong></p>
+<p>ViT normalizes with ImageNet mean/std, while CLIP uses OpenAI's own mean/std. Hand-rolled preprocessing with PIL/torchvision usually produces wrong values and accuracy collapses. Use the matching <code>*ImageProcessor</code> from <code>transformers</code> directly.</p>
+<p><strong>2. Not normalizing CLIP embeddings before cosine</strong></p>
+<p>CLIP features become cosine similarity only after L2 normalization. Raw dot products introduce length bias and noticeably hurt retrieval quality.</p>
+<p><strong>3. Trying only one zero-shot prompt</strong></p>
+<p>CLIP zero-shot accuracy gains another 3-5% from prompt diversification. Averaging the 80 prompt templates from the original OpenAI paper (<code>a photo of a {}</code>, <code>a blurry photo of a {}</code>, etc.) is a reliable boost.</p>
+<p><strong>4. Fine-tuning by just adding more data</strong></p>
+<p>Fine-tuning a CLIP backbone needs careful LR scheduling and layer-wise learning rate decay. Unfreezing everything at lr=1e-3 destroys the representation. Start by training only the head, or use LoRA.</p>
+<p><strong>5. Mismatched input resolution</strong></p>
+<p>Feeding 224 inputs to a CLIP-336 model (or vice versa) breaks positional embeddings and tanks accuracy. Processors handle resize automatically, but custom data loaders need a manual sanity check.</p>
+<h2>Key Takeaways</h2>
+<ul>
+<li>ViT cuts images into 16x16 patches, feeds them to a Transformer, and uses the CLS token output as the image vector.</li>
+<li>CLIP aligns image and text encoders in one space using InfoNCE contrastive loss. Trained on 400M pairs, it reaches 76% zero-shot ImageNet accuracy.</li>
+<li>Three usage patterns: zero-shot classification, vector-DB embedding, and the image tower of a VLM.</li>
+<li>Model selection ladder: ViT-B/32 (prototyping) -&gt; CLIP ViT-L/14-336 (LLaVA-grade) -&gt; SigLIP (stable modern alternative).</li>
+<li>Verify processor preprocessing, normalization, prompt diversification, fine-tuning policy, and resolution match before going to production.</li>
+</ul>
+<hr>
+<h2>Multimodal AI 101 series</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/multimodal-ai-101/en/01-why-multimodal-matters.md">Why Multimodal AI Matters</a></li>
+<li><strong>Image Encoders: CLIP and ViT (current)</strong></li>
+<li>Vision-Language Model Architecture (upcoming)</li>
+<li>Image Captioning and OCR Pipelines (upcoming)</li>
+<li>Multimodal RAG: Searching Images and Text Together (upcoming)</li>
+<li>Audio Processing and Whisper STT (upcoming)</li>
+<li>Text-to-Image with Diffusion (upcoming)</li>
+<li>Multimodal Embeddings and Cross-modal Search (upcoming)</li>
+<li>Video Understanding (Frame Sampling to Video-LLaVA) (upcoming)</li>
+<li>Building a Production Multimodal Application (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2010.11929">Dosovitskiy et al. - An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (ViT)</a></li>
+<li><a href="https://arxiv.org/abs/2103.00020">Radford et al. - Learning Transferable Visual Models From Natural Language Supervision (CLIP)</a></li>
+<li><a href="https://huggingface.co/docs/transformers/model_doc/clip">HuggingFace - CLIP Documentation</a></li>
+<li><a href="https://arxiv.org/abs/2303.15343">Zhai et al. - Sigmoid Loss for Language Image Pre-Training (SigLIP)</a></li>
+</ul>
+<p class="tags-line">Tags: CLIP, ViT, Image Encoder, Contrastive Learning, OpenAI, Vision Transformer</p>
+</body>
+</html>

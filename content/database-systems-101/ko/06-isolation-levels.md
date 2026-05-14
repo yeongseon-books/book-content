@@ -17,7 +17,7 @@ tags:
   - MVCC
   - 동시성
   - 이상현상
-seo_description: 격리 수준과 MVCC가 동시성 이상 현상을 어떻게 막는지 설명합니다.
+seo_description: 격리 수준과 MVCC가 동시성 이상 현상을 막는 원리와 안전성 대 처리량의 트레이드오프를 예제와 함께 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

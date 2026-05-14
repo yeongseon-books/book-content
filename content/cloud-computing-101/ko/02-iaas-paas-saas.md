@@ -16,7 +16,7 @@ tags:
   - PaaS
   - SaaS
   - Architecture
-seo_description: IaaS, PaaS, SaaS의 책임 경계와 선택 기준을 비교합니다.
+seo_description: 클라우드 서비스 모델인 IaaS, PaaS, SaaS의 책임 경계와 장단점, 선택 기준을 실무 예시와 함께 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

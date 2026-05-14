@@ -17,7 +17,7 @@ tags:
   - TwoPhaseCommit
   - Saga
   - Idempotency
-seo_description: 2PC, Saga, outbox, 멱등성으로 분산 트랜잭션을 설명합니다.
+seo_description: 2PC, Saga, Outbox 패턴과 멱등성 설계를 통해 여러 서비스에 걸친 분산 트랜잭션의 정합성을 유지하는 현실적인 해법을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

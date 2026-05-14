@@ -16,7 +16,7 @@ tags:
   - Metrics
   - ScikitLearn
   - Beginner
-seo_description: 정확도가 왜 위험할 수 있는지와 평가 지표를 고르는 기준을 설명합니다
+seo_description: 정확도의 한계와 정밀도, 재현율, F1, ROC AUC 등 분류 및 회귀 평가지표의 선택 기준과 비즈니스 비용 반영법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

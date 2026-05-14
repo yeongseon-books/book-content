@@ -17,7 +17,7 @@ tags:
   - Lease
   - Coordination
   - Liveness
-seo_description: lease, fencing, split-brain 관점에서 안전한 리더 선출을 설명합니다.
+seo_description: 안전한 리더 선출을 위한 임대(Lease), 하트비트 작동 원리와 스플릿 브레인 방지를 위한 펜싱 토큰 기법을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 
