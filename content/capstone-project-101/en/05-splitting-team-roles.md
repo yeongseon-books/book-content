@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 5
 title: Splitting Team Roles
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Collaboration
   - Beginner
 seo_description: A beginner-friendly tour of splitting capstone team roles, mapping primary owners, backups, and decision rights.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Splitting Team Roles
 
-> Capstone Project 101 series (5/10)
+Teams with fuzzy roles often look busy while moving slowly. Work circulates because nobody is sure who owns the final decision or who can safely take over when someone gets blocked.
 
-<!-- a-grade-intro:begin -->
+In a capstone, role splitting is not about drawing boxes around people. It is about preventing decision bottlenecks and making sure the project can keep moving under schedule pressure.
 
-**Core question**: *Why* does *overlapping* roles slow a team down?
+This is post 5 in the Capstone Project 101 series. It outlines a simple role model that uses primary owners, backups, and explicit decision rights to keep collaboration moving.
 
-> When *responsibility* is *diffused*, *decisions* are *delayed*.
+## Questions this chapter answers
 
-This is post 5 in the Capstone Project 101 series.
+- Why do overlapping roles slow decisions down?
+- How should teams assign primary owners and backups?
+- How is a lead different from a code owner?
+- Why should QA and deployment ownership be visible from the start?
+- How should role changes be recorded?
 
-<!-- a-grade-intro:end -->
+> Role splitting is not about categorizing people. It is about deciding in advance who makes the call and who can continue the work when delivery stalls.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,33 @@ This is post 5 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-*Clear roles* create *responsibility* and *speed*.
+Clear primary ownership speeds up decisions because the team knows exactly where questions and approvals should go.
 
-## Concept at a Glance
+Backup ownership matters just as much. Student teams are vulnerable to exams, interviews, and conflicting schedules, so a single absent owner can quickly turn into a project-wide slowdown.
 
-```mermaid
-flowchart LR
-    L[Lead] --> B[Backend]
-    L --> F[Frontend]
-    L --> D[Data]
-    L --> Q[QA]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
+*A simple structure that connects the lead with domain owners*
+
+## Practical artifact: a responsibility matrix
+
+Even a small team benefits from writing responsibility lines like these before implementation starts.
+
+```text
+Workstream | Primary owner | Backup | Decision right
+Requirement changes | Team lead | Frontend owner | Lead approval
+API design | Backend owner | Data owner | Backend proposes, lead approves
+Demo scenario | QA owner | Team lead | QA proposes, team agrees
+Deployment check | Backend owner | Frontend owner | Must follow deployment checklist
 ```
+
+## What to validate first
+
+- Check that each workstream has one clear primary owner.
+- Look for critical areas with no backup owner.
+- Mark ambiguous decision rights early instead of discovering them mid-sprint.
+- Leave room to record when and why role assignments change.
 
 ## Key Terms
 
@@ -143,7 +164,7 @@ Company teams use *RACI* to clarify decision rights every week.
 
 ## Wrap-up and Next Steps
 
-Next post: *Designing the MVP*.
+Role splitting is a bottleneck-reduction design, not an org-chart exercise. Primary ownership, backup coverage, and explicit decision rights make the team far more resilient under capstone pressure. The next post shows how that structure supports MVP scoping.
 
 <!-- toc:begin -->
 - [What is a Capstone Project](./01-what-is-capstone.md)
@@ -160,9 +181,11 @@ Next post: *Designing the MVP*.
 
 ## References
 
-- [RACI Matrix - PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
+### Official docs and practical guides
+
+- [RACI Matrix — PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
 - [Team Topologies](https://teamtopologies.com/)
+- [Code Ownership — Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)
 - [The Mythical Man-Month](https://en.wikipedia.org/wiki/The_Mythical_Man-Month)
-- [Code Ownership - Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)
 
 Tags: Capstone, Team, Roles, Collaboration, Beginner
