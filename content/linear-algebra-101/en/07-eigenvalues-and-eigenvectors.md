@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 7
 title: Eigenvalues and Eigenvectors
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to eigenvalues and eigenvectors — definition, geometric meaning, and uses in PCA and dynamics with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Eigenvalues and Eigenvectors
 
-> Linear Algebra 101 series (7/10)
+If you apply the same linear transformation again and again, some directions behave differently from the rest. Most directions get mixed or bent, but a few keep their direction and only change length. Eigenvalues and eigenvectors are the tools that describe those privileged axes.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.
 
-**Core question**: When you *apply a matrix repeatedly*, are there *axes that do not change direction*?
+## Questions This Post Answers
 
-> *Eigenvectors are the *invariant axes* of a transformation; eigenvalues are the *stretching factors* along those axes.*
+- Why do some directions survive repeated matrix application?
+- What do eigenvectors and eigenvalues each tell you?
+- Why do symmetric matrices produce especially clean results?
+- How does this connect to PCA, PageRank, and dynamical systems?
 
-<!-- a-grade-intro:end -->
-
-This is post 7 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- The *definition* of *eigenvalues / eigenvectors*
-- Their *geometric meaning*
-- How to compute them with *NumPy*
-- A 5-step hands-on
-- Five common pitfalls
+> An eigenvector is a direction that a transformation does not rotate away from. The eigenvalue tells you how strongly that direction is stretched or compressed.
 
 ## Why It Matters
 
-PCA, dynamics, quantum mechanics, PageRank — all rely on *eigendecomposition*. It lets you view a matrix in a *simple coordinate system*.
+Eigendecomposition lets you read a complicated transformation in a simpler coordinate system. If you can find the right axes, a messy matrix may reduce to mostly independent scaling behavior along those axes.
 
-> *Eigenvectors are the natural axes of a transformation.*
+That is why the topic keeps returning in PCA, stability analysis, and ranking algorithms. Eigenvalues and eigenvectors are powerful not because they are formal, but because they tell you which modes dominate and which directions stay structurally meaningful.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Matrix A"] --> Eq["A v = lambda v"]
-    Eq --> Vec["Eigenvector v"]
-    Eq --> Lam["Eigenvalue lambda"]
-    Vec --> Use["PCA, dynamics, PageRank"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
+
+*This diagram shows how the eigenvalue equation leads to invariant directions and downstream applications.*
 
 ## Key Terms
 
@@ -117,6 +106,12 @@ for _ in range(50):
 print("steady state:", v / np.linalg.norm(v, 1))
 ```
 
+## Read One Numeric Pass
+
+- The matrix `[[2, 1], [0, 3]]` has eigenvalues `2` and `3`, so it has two especially readable directions.
+- `np.allclose(A @ v, lambda * v)` returning `True` is the fastest sanity check that the computed vector is really an eigenvector.
+- Repeated multiplication reveals the dominant direction. In this toy example, the direction settles near `[0.5, 0.5]`.
+
 ## What to Notice in This Code
 
 - *Eigendecomposition* simplifies the *transformation*.
@@ -176,7 +171,7 @@ Eigendecomposition reveals a transformation's *natural axes*. The next post cove
 ## References
 
 - [3Blue1Brown — Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues)
-- [Wikipedia — Eigenvalues and eigenvectors](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors)
+- [MIT OpenCourseWare — Eigenvalues and eigenvectors](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — linalg.eig](https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html)
 - [NumPy — linalg.eigh](https://numpy.org/doc/stable/reference/generated/numpy.linalg.eigh.html)
 
