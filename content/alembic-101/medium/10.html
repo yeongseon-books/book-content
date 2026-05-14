@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Production and team workflow: PR, CI, monitoring, and incident response</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Production and team workflow: PR, CI, monitoring, and incident response</h1>
+<p>In production, a migration is more irreversible than ordinary application code. That is why Alembic safety has to live in team workflow, PR rules, and verification routines rather than in individual discipline alone.</p>
+<p>This is the final post in the Alembic 101 series. Here we will pull the series together into a practical operating model for PRs, CI, monitoring, and incident response.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The one-revision-per-PR rule and why it matters</li>
+<li>How to compose an Alembic-aware PR template and the matching CI checks</li>
+<li>How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL</li>
+<li>A monitoring pattern that detects schema drift in production</li>
+<li>The forward-fix procedure when a migration causes an incident</li>
+</ul>
+<h2>Why this matters</h2>
+<p>Everything in the previous nine posts described how a single engineer can apply migrations safely in their own environment. Once a team starts changing the schema concurrently, a different class of problems appears. Two people creating a new revision at the same time produce a multi-head; if no one tests downgrade, rollback breaks; if production schema starts drifting, you have no idea where to start. Operational stability comes from workflow quality, not from code quality.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A migration is <strong>"the most irreversible kind of code change"</strong>. Ordinary code can be reverted with a single click; a schema change carries data with it and is very hard to undo. So you must treat it more strictly than ordinary code at the PR stage.</p>
+</blockquote>
+<p>The starting point of the operational workflow is: one PR equals one revision, and that revision's upgrade and downgrade are both verified.</p>
+<p><strong>Diagram: the team-level Alembic operating loop</strong></p>
+<p><img alt="Diagram: the team-level Alembic operating loop" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png"><br>
+<em>PR policy, CI, deploy ordering, monitoring, and incident response need to close into one operating loop.</em></p>
+<h2>Core concepts</h2>
+<p><strong>One revision per PR</strong></p>
+<p>Bundling several schema changes into one PR creates two problems.</p>
+<ul>
+<li>The reviewer must understand all changes at once → higher incident probability</li>
+<li>If only one change is wrong, you cannot revert just that part → you must revert all of them together</li>
+</ul>
+<p>When each revision is its own PR, reviews are simpler and the blast radius on failure is smaller. Expand-contract also decomposes naturally into per-phase PRs.</p>
+<p><strong>CI check items</strong></p>
+<pre><code class="language-text">1. python3 -m pytest                                    # unit tests
+2. alembic check                                        # model vs schema drift
+3. alembic upgrade head &amp;&amp; alembic downgrade -1         # downgrade verification
+4. alembic upgrade head --sql                           # SQL preview, attached as PR artifact
+5. python3 scripts/check_alembic_heads.py               # confirm head count = 1
+6. python3 scripts/migrate_smoke_test.py                # apply migrations to a fresh DB
+</code></pre>
+<p><code>alembic check</code> is supported on 1.9 and later. If a model was added but the revision is missing, it fails immediately.</p>
+<p><strong>Multi-environment strategy</strong></p>
+<p><strong>dev</strong><br>
+- DB: SQLite<br>
+- Options: <code>render_as_batch=True</code></p>
+<p><strong>staging</strong><br>
+- DB: PostgreSQL<br>
+- Options: <code>compare_type=True</code>, <code>compare_server_default=True</code></p>
+<p><strong>prod</strong><br>
+- DB: PostgreSQL<br>
+- Options: deploy script invokes <code>alembic upgrade</code></p>
+<p>Using SQLite in dev lets a single engineer get started quickly and simulate migrations fast. From staging onward you use the same PostgreSQL as production, so any incidents caused by SQLite/PostgreSQL differences are caught at staging. Autogenerate verification is also done at staging.</p>
+<p><strong>Team conventions</strong></p>
+<ul>
+<li><strong>Revision message is an imperative one-liner</strong>: "add users phone column" (not "added", not "users phone added")</li>
+<li><strong>PR title carries the expand-contract phase tag</strong>: <code>[expand]</code>, <code>[migrate]</code>, <code>[contract]</code></li>
+<li><strong>One revision per PR</strong></li>
+<li><strong>Resolve down_revision conflicts immediately</strong>: never leave a multi-head state for more than 24 hours</li>
+</ul>
+<p><strong>Operational monitoring</strong></p>
+<p>Have your <code>/health</code> endpoint return the current <code>alembic_version</code>.</p>
+<pre><code class="language-python">@app.get(&quot;/health&quot;)
+def health():
+    with engine.connect() as conn:
+        version = conn.execute(text(&quot;SELECT version_num FROM alembic_version&quot;)).scalar()
+    return {&quot;status&quot;: &quot;ok&quot;, &quot;alembic_version&quot;: version, &quot;expected&quot;: EXPECTED_VERSION}
+</code></pre>
+<p>Inject EXPECTED_VERSION as an env var at deploy time, and raise an alarm if any instance reports a different version. In a multi-instance deploy, you can immediately detect a partially-applied migration or an instance still running outdated code.</p>
+<p><strong>Incident response</strong></p>
+<p>When a migration causes an incident, the first instinct is to downgrade, but as we saw in episode 8 downgrade is only feasible in limited cases. The procedure used most often in practice is the following.</p>
+<pre><code class="language-text">1. Detect the incident (alarm, error rate, /health version mismatch)
+2. Classify the cause:
+   - code issue → code rollback (leave schema as is; safe if you are in expand phase)
+   - schema issue → write a forward-fix revision
+3. forward-fix revision: &quot;fix &lt;broken_revision_id&gt;: &lt;issue&gt;&quot;
+4. After recovery, post-mortem investigates which verification step was missing for the broken revision
+</code></pre>
+<p>A forward-fix adds a new revision that brings the broken state back to a valid one. Unlike downgrade, the alembic_version graph stays moving forward, which gives better traceability and is compatible with blue/green.</p>
+<h2>Before-After</h2>
+<pre><code class="language-text"># Before: 6 revisions per PR, downgrade not verified
+- reviewer spends 30 minutes tracing all revisions
+- one broken downgrade is discovered in prod
+- rollback impossible, 30-minute downtime
+</code></pre>
+<pre><code class="language-text"># After: one PR = one revision, downgrade verified in CI
+- reviewer sees one revision, merges in five minutes
+- CI auto-runs upgrade head + downgrade -1 + upgrade head
+- broken downgrade is blocked at the PR
+</code></pre>
+<p>Keeping PRs small and forcing downgrade verification in CI removes about half of all incidents.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: write a PR template</strong></p>
+<pre><code class="language-markdown">## Migration PR Checklist
+
+- [ ] One revision per PR
+- [ ] expand-contract phase: [ ] expand / [ ] migrate / [ ] contract
+- [ ] alembic check passes
+- [ ] downgrade verified (CI auto)
+- [ ] alembic upgrade head --sql output attached
+- [ ] data migration is idempotent (WHERE clause)
+- [ ] row counts of affected tables
+</code></pre>
+<p>Drop this in <code>.github/pull_request_template.md</code> so every schema PR follows the format.</p>
+<p><strong>Step 2: add downgrade verification to CI</strong></p>
+<pre><code class="language-yaml"># .github/workflows/migrate.yml
+- name: alembic check
+  run: alembic check
+- name: upgrade then downgrade
+  run: |
+    alembic upgrade head
+    alembic downgrade -1
+    alembic upgrade head
+- name: head count guard
+  run: |
+    HEADS=$(alembic heads | wc -l)
+    [ &quot;$HEADS&quot; = &quot;1&quot; ] || (echo &quot;multi-head detected&quot;; exit 1)
+- name: SQL preview
+  run: alembic upgrade head --sql &gt; migration_preview.sql
+- uses: actions/upload-artifact@v4
+  with:
+    name: migration-preview
+    path: migration_preview.sql
+</code></pre>
+<p>This single job blocks multi-head, broken downgrade, and missing revisions.</p>
+<p><strong>Step 3: split per-environment configuration</strong></p>
+<pre><code class="language-python"># part of env.py
+def get_url():
+    env = os.environ.get(&quot;APP_ENV&quot;, &quot;dev&quot;)
+    return {
+        &quot;dev&quot;: &quot;sqlite:///./dev.db&quot;,
+        &quot;staging&quot;: &quot;postgresql://staging-host/app&quot;,
+        &quot;prod&quot;: &quot;postgresql://prod-host/app&quot;,
+    }[env]
+
+def run_migrations_online() -&gt; None:
+    connectable = create_engine(get_url())
+    is_sqlite = connectable.url.get_backend_name() == &quot;sqlite&quot;
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=is_sqlite,
+            compare_type=True,
+            compare_server_default=True,
+        )
+        with context.begin_transaction():
+            context.run_migrations()
+</code></pre>
+<p>In dev, SQLite + batch mode applies automatically; in staging/prod, PostgreSQL with strict comparison is enabled.</p>
+<p><strong>Step 4: wire monitoring</strong></p>
+<pre><code class="language-python"># health.py
+EXPECTED_VERSION = os.environ[&quot;EXPECTED_ALEMBIC_VERSION&quot;]
+
+@app.get(&quot;/health&quot;)
+def health():
+    with engine.connect() as conn:
+        version = conn.execute(text(&quot;SELECT version_num FROM alembic_version&quot;)).scalar()
+    ok = version == EXPECTED_VERSION
+    return {&quot;status&quot;: &quot;ok&quot; if ok else &quot;drift&quot;, &quot;alembic_version&quot;: version, &quot;expected&quot;: EXPECTED_VERSION}
+</code></pre>
+<p>Inject EXPECTED_ALEMBIC_VERSION from your deploy pipeline and compare per-instance responses on your operations dashboard. Alert on drift.</p>
+<h2>Verification routine</h2>
+<pre><code class="language-bash">alembic check
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+alembic heads
+</code></pre>
+<p><strong>Expected output:</strong> drift detection, downgrade round-trip, and single-head validation all pass in one green run.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Multiple revisions in one PR.</strong> Reviews are hard and partial revert is impossible.</li>
+<li><strong>Not verifying downgrade in CI.</strong> You only learn it is broken when you have an incident in prod.</li>
+<li><strong>Forcing PostgreSQL in dev.</strong> Setup cost goes up and quick single-engineer experiments become painful.</li>
+<li><strong>Verifying only on dev SQLite, going straight to prod.</strong> SQLite/PostgreSQL differences cause incidents at staging.</li>
+<li><strong>No alembic_version in monitoring.</strong> No way to detect a partially-applied state.</li>
+</ul>
+<h2>Production patterns</h2>
+<ul>
+<li><strong>PR template + CI enforcement combined.</strong> Even when humans forget, the system enforces.</li>
+<li><strong>dev=SQLite, staging+prod=PostgreSQL.</strong> Fast experiments and accuracy at the same time.</li>
+<li><strong>Forward-fix as the default incident response.</strong> Downgrade only when truly necessary.</li>
+<li><strong>Include the GitHub issue number in the revision message.</strong> "add users phone column (#1234)".</li>
+<li><strong>Schema changes during business hours.</strong> Late-night deploys actually leave you without on-call coverage when an incident happens.</li>
+<li><strong>Always include the schema-change verification flow in the post-mortem.</strong> Look back at what was missing.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] PR template enforces one PR = one revision</li>
+<li>[ ] CI auto-runs alembic check, upgrade+downgrade, head-count guard, and SQL preview</li>
+<li>[ ] Per-environment split: dev=SQLite, staging+prod=PostgreSQL</li>
+<li>[ ] <code>/health</code> response includes alembic_version</li>
+<li>[ ] Forward-fix template and procedure are documented</li>
+<li>[ ] Revision message is an imperative one-liner with issue number</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add the PR template and CI workflow above to your project, deliberately introduce a broken downgrade, and confirm CI blocks it.</li>
+<li>Add alembic_version to your <code>/health</code> endpoint, and write a one-line monitoring script that fires an alarm on drift.</li>
+<li>Pick a hypothetical incident scenario (e.g., a revision that left some rows broken) and write the forward-fix revision.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>Across ten episodes we covered Alembic from init all the way to a production workflow. The core in one sentence:</p>
+<blockquote>
+<p>"Schema changes ship before code, with broader compatibility, one PR per revision, downgrade verified in CI, monitoring detects drift, incidents respond with forward-fix."</p>
+</blockquote>
+<p>This series ends here, but in real operations every item above must be automated and locked in via PR templates and CI enforcement. The next learning step is the depth of SQLAlchemy ORM (relationship, query optimization, async).</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/cookbook.html">Alembic: Cookbook</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#detecting-changes-in-models">Alembic: <code>alembic check</code></a></li>
+<li><a href="https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests">GitHub: PR templates</a></li>
+<li>"Database Reliability Engineering" by Laine Campbell &amp; Charity Majors</li>
+</ul>
+<p class="tags-line">Tags: Python, Alembic, Production, CI, workflow, SQLite</p>
+</body>
+</html>

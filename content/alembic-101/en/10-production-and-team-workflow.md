@@ -17,7 +17,7 @@ tags:
 - CI
 - workflow
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: A migration is "the most irreversible kind of code change". Ordinary
   code can be reverted with a single click; a schema change carries data with it…
 ---
@@ -45,6 +45,11 @@ Everything in the previous nine posts described how a single engineer can apply 
 > A migration is **"the most irreversible kind of code change"**. Ordinary code can be reverted with a single click; a schema change carries data with it and is very hard to undo. So you must treat it more strictly than ordinary code at the PR stage.
 
 The starting point of the operational workflow is: one PR equals one revision, and that revision's upgrade and downgrade are both verified.
+
+### Diagram: the team-level Alembic operating loop
+
+![Diagram: the team-level Alembic operating loop](../../../assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
+*PR policy, CI, deploy ordering, monitoring, and incident response need to close into one operating loop.*
 
 ## Core concepts
 
@@ -222,6 +227,18 @@ def health():
 
 Inject EXPECTED_ALEMBIC_VERSION from your deploy pipeline and compare per-instance responses on your operations dashboard. Alert on drift.
 
+## Verification routine
+
+```bash
+alembic check
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+alembic heads
+```
+
+**Expected output:** drift detection, downgrade round-trip, and single-head validation all pass in one green run.
+
 ## Common mistakes
 
 - **Multiple revisions in one PR.** Reviews are hard and partial revert is impossible.
@@ -262,14 +279,28 @@ Across ten episodes we covered Alembic from init all the way to a production wor
 
 This series ends here, but in real operations every item above must be automated and locked in via PR templates and CI enforcement. The next learning step is the depth of SQLAlchemy ORM (relationship, query optimization, async).
 
-## References
-
-- Alembic: Cookbook — https://alembic.sqlalchemy.org/en/latest/cookbook.html
-- Alembic: `alembic check` — https://alembic.sqlalchemy.org/en/latest/autogenerate.html#detecting-changes-in-models
-- GitHub: PR templates — https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests
-- "Database Reliability Engineering" by Laine Campbell & Charity Majors
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- [Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
+- [Deploy ordering and blue/green: synchronizing schema and application code safely](./09-deploy-ordering-and-blue-green.md)
+- **Production and team workflow: PR, CI, monitoring, and incident response (current)**
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, Production, CI, workflow, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)
+- [Alembic: `alembic check`](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#detecting-changes-in-models)
+- [GitHub: PR templates](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests)
+- "Database Reliability Engineering" by Laine Campbell & Charity Majors
+
+Tags: Python, Alembic, SQLAlchemy, Migration
