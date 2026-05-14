@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Tokenization and Chunking Strategies</h1>
+<p>In LLM systems, the tokenizer is not a minor preprocessing detail. It defines the units the model sees, and poor chunking decisions waste context window budget while hurting retrieval and answer quality.</p>
+<p>This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why do Korean, English, and code consume the context window so differently?</li>
+<li>When should you stay with a general-purpose tokenizer and when should you train your own?</li>
+<li>What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?</li>
+<li>How much overlap is enough to protect meaning at boundaries without bloating retrieval?</li>
+<li>Which measurements should drive chunk-size decisions instead of guesswork?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (5/10)</p>
+<p>Tokenization decides the cost of reading a document, and chunking decides how much meaning survives when that document is split to fit the model. Treat both as one input-design problem.</p>
 </blockquote>
 <hr>
 <h2>"The tokenizer decides model quality?"</h2>
@@ -255,6 +265,14 @@ def semantic_chunk(text: str, threshold: float = 0.3) -&gt; list[str]:
 <li>Episode 6 covers quality filtering.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Measure real token counts for representative Korean, English, and code samples</li>
+<li>[ ] Document why the current tokenizer fits the language and domain mix</li>
+<li>[ ] Prefer sentence-aware or recursive chunking over fixed-size splits for production retrieval</li>
+<li>[ ] Tune chunk size and overlap against retrieval or answer-quality evaluations</li>
+<li>[ ] Include embedding-memory cost when considering larger vocabularies</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>

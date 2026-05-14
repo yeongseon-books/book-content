@@ -3,7 +3,7 @@ title: Tokenization and Chunking Strategies
 series: ai-data-preparation-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,18 +16,26 @@ tags:
 - Chunking
 - RAG
 - tiktoken
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Entities and references cut at chunk boundaries lose information.
   Overlap shares some tokens with adjacent chunks.
 ---
 
 # Tokenization and Chunking Strategies
 
-> AI Data Preparation 101 series (5/10)
-
 In LLM systems, the tokenizer is not a minor preprocessing detail. It defines the units the model sees, and poor chunking decisions waste context window budget while hurting retrieval and answer quality.
 
 This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.
+
+## Questions this chapter answers
+
+- Why do Korean, English, and code consume the context window so differently?
+- When should you stay with a general-purpose tokenizer and when should you train your own?
+- What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?
+- How much overlap is enough to protect meaning at boundaries without bloating retrieval?
+- Which measurements should drive chunk-size decisions instead of guesswork?
+
+> Tokenization decides the cost of reading a document, and chunking decides how much meaning survives when that document is split to fit the model. Treat both as one input-design problem.
 
 ---
 ## "The tokenizer decides model quality?"
@@ -255,6 +263,14 @@ If overlap exceeds 50%, duplicate information actually degrades retrieval qualit
 - Episode 6 covers quality filtering.
 
 ---
+
+## Operational checklist
+
+- [ ] Measure real token counts for representative Korean, English, and code samples
+- [ ] Document why the current tokenizer fits the language and domain mix
+- [ ] Prefer sentence-aware or recursive chunking over fixed-size splits for production retrieval
+- [ ] Tune chunk size and overlap against retrieval or answer-quality evaluations
+- [ ] Include embedding-memory cost when considering larger vocabularies
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series
