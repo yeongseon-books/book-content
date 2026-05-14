@@ -17,7 +17,7 @@ tags:
   - Database
   - Query
 seo_description: 윈도 함수로 행을 유지한 채 순위, 누적값, 이전 값 비교를 계산하는 방법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 윈도 함수
@@ -42,15 +42,9 @@ last_reviewed: '2026-05-12'
 
 특히 코호트, 퍼널, 유지율 같은 분석은 시계열과 그룹별 비교를 자주 포함합니다. 윈도 함수는 SQL이 단순 조회 언어를 넘어 분석 언어로 쓰이게 만든 핵심 도구라고 볼 수 있습니다.
 
-## 한눈에 보는 흐름
+## 윈도 계산 흐름
 
-```mermaid
-flowchart LR
-    Rows["Source rows"] --> Win["OVER(PARTITION BY ... ORDER BY ...)"]
-    Win --> Func["ROW_NUMBER / SUM / LAG"]
-    Func --> Out["Row + computed column"]
-```
-
+![윈도 계산 흐름](../../../assets/sql-101/07/07-01-window-calculation-flow.ko.png)
 원본 행이 먼저 있고, 그 행들을 어떤 그룹으로 나눌지와 어떤 순서로 볼지를 `OVER (...)` 안에서 정의합니다. 그 위에 순위 함수나 누적 합계 함수를 얹어 계산 열을 추가하는 방식입니다.
 
 ## 핵심 개념 정리
@@ -107,6 +101,14 @@ SELECT day, revenue,
 FROM daily_revenue;
 ```
 
+**Expected output:**
+
+| day | revenue | running_total |
+| --- | --- | --- |
+| 2026-04-01 | 100 | 100 |
+| 2026-04-02 | 120 | 220 |
+| 2026-04-03 | 90 | 310 |
+
 날짜가 지날수록 매출이 얼마나 누적되는지 보여 줍니다.
 
 ### 5단계 — 이동 평균 계산하기
@@ -157,6 +159,8 @@ FROM daily_revenue;
 다음 글에서는 데이터를 읽는 쿼리에서 한 걸음 나아가, 실제로 데이터를 넣고 수정하고 삭제하는 DML을 안전하게 다루는 방법을 보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - [WHERE와 조건](./03-where-and-conditions.md)
@@ -167,6 +171,7 @@ FROM daily_revenue;
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -176,4 +181,4 @@ FROM daily_revenue;
 - [Mode — Window Functions](https://mode.com/sql-tutorial/sql-window-functions/)
 - [Use The Index, Luke — Top-N](https://use-the-index-luke.com/sql/partial-results/top-n-queries)
 
-Tags: SQL, WindowFunction, Analytics, Database, Query
+Tags: SQL, Database, Postgres, Analytics
