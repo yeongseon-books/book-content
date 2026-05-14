@@ -56,19 +56,8 @@ last_reviewed: '2026-05-12'
 
 > 계산은 입력을 규칙에 따라 변환하는 과정입니다. 튜링 기계는 이 과정의 가장 기본적인 모델이며, 프로그래밍 언어는 이를 인간이 읽을 수 있게 표현합니다.
 
-```text
-Mathematical functions (theory)
-        │
-Turing machine (computation model)
-        │
-Machine code (hardware)
-        │
-Assembly (low level)
-        │
-High-level languages (Python, Java)
-        │
-Paradigms (imperative, functional, OOP)
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)
+*계산 이론이 기계어와 고급 언어를 거쳐 프로그래밍 패러다임으로 이어지는 흐름*
 
 ## 핵심 용어
 
@@ -208,6 +197,8 @@ dis.dis(add)
 # RETURN_VALUE
 ```
 
+**Expected output:** `LOAD_FAST`, `BINARY_ADD`, `RETURN_VALUE` 같은 바이트코드가 출력되어, Python 코드도 내부적으로 더 낮은 단계 표현을 거친다는 점을 확인할 수 있어야 합니다.
+
 컴파일러는 전체 코드를 미리 번역하고, 인터프리터는 한 줄씩 실행합니다. Python은 바이트코드로 컴파일한 뒤 가상 머신에서 인터프리트합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -277,7 +268,7 @@ dis.dis(add)
 ## 참고 자료
 
 - [Alan Turing — On Computable Numbers (1936)](https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf)
-- [Wikipedia — Halting Problem](https://en.wikipedia.org/wiki/Halting_problem)
+- [Stanford Encyclopedia of Philosophy — The Church-Turing Thesis](https://plato.stanford.edu/entries/church-turing/)
 - [SICP — Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Programming Paradigms for Dummies (Peter Van Roy)](https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf)
 
