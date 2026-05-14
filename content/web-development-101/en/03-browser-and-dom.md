@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 3
 title: The Browser and the DOM
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - JavaScript
   - Frontend
 seo_description: How the browser turns HTML into a moving page — DOM tree, the rendering pipeline, and the event loop explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # The Browser and the DOM
 
-This is post 3 in the Web Development 101 series.
+A browser does much more than print HTML on the screen. It parses text into a tree, calculates styles, decides layout, paints pixels, and keeps the page interactive through the event loop. If that pipeline feels vague, performance bugs and UI glitches are hard to reason about.
 
-> Web Development 101 series (3/10)
+This is post 3 in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How does the browser turn HTML text into a *living screen* you can click?
-
-> It builds a *tree (the DOM)*, computes styles, runs layout and paint, and then handles *behavior* through the event loop.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - What the DOM is and how it gets built
 - The stages of the rendering pipeline
@@ -51,18 +43,21 @@ Without a mental model of the DOM, you will never understand *why your page is s
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    HTML["HTML"] --> Parse["Parse"]
-    Parse --> DOM["DOM tree"]
-    CSS["CSS"] --> Style["Style calc"]
-    DOM --> Layout["Layout"]
-    Style --> Layout
-    Layout --> Paint["Paint"]
-    Paint --> Pixels["Pixels"]
-```
+![Concept at a Glance](../../../assets/web-development-101/03/03-01-concept-at-a-glance.en.png)
 
-Five stages: Parse, Style, Layout, Paint, Composite.
+*A summary of the browser pipeline from HTML parsing to layout and paint.*
+
+The browser does not jump from HTML text straight to pixels. It builds internal structures first, and DOM updates can force part of that pipeline to run again, which is why UI work and performance are tightly connected.
+
+### What to verify yourself
+
+- Inspect the DOM tree in the Elements tab and confirm it matches the input HTML structure.
+- Record a short interaction in the Performance tab and look for layout or paint work after a DOM mutation.
+- Run the `setTimeout(..., 0)` example and compare synchronous log order with callback order.
+
+**Expected output:** DOM changes trigger visible rendering work, and the timeout callback runs after the synchronous logs complete.
+
+**Failure mode to watch for:** Repeated DOM updates inside loops multiply layout cost. Injecting user content through `innerHTML` creates security problems before performance tuning even starts.
 
 ## Key Terms
 
@@ -200,9 +195,13 @@ The browser is *a machine for drawing the DOM*. Next, we look at the bridge betw
 
 ## References
 
-- [DOM (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model)
-- [Critical rendering path (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path)
-- [Event delegation (MDN)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation)
+### Official Docs
+- [Introduction to the DOM (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)
+- [Critical rendering path (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Critical_rendering_path)
 - [Event loop (MDN)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop)
+
+### Practical Tools
+- [Event bubbling and delegation (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling)
+- [Performance panel overview (Chrome DevTools)](https://developer.chrome.com/docs/devtools/performance)
 
 Tags: Computer Science, WebDevelopment, Browser, DOM, JavaScript, Frontend
