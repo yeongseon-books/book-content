@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Turning a Problem into a Data Problem</h1>
+<p>Most analytics requests arrive as loose complaints, not well-formed questions. “Revenue feels down.” “Churn seems worse.” “Did that campaign work?” The problem is not that these questions are unimportant. The problem is that data cannot answer them until someone pins down the metric, the time window, and the population.</p>
+<p>Strong data work starts before SQL, notebooks, or models. It starts when the team rewrites a vague request into a sentence that could be proven wrong. That single rewrite usually decides whether the rest of the project is fast and reliable or slow and argumentative.</p>
+<p>This is post 2 in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>Why are business questions usually too vague for data to answer directly?</li>
+<li>How do metric, time window, and population narrow the scope of analysis?</li>
+<li>What makes a data question falsifiable instead of merely interesting?</li>
+<li>How does stronger framing shorten the rest of the project?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (2/10)</p>
+<p>A data question becomes tractable only after you lock the metric, the time window, the population, and the testable claim.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you turn <em>“why did revenue drop?”</em> into something <em>the data can actually answer</em>?</p>
-<blockquote>
-<p><em>Once a question becomes </em>measurable<em>, the data starts to </em>answer<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 2 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A 5-step framing for <em>business question → data question</em></li>
@@ -80,12 +81,8 @@
 <p><em>One precise sentence saves </em>three weeks<em> of analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Vague[&quot;Vague Question&quot;] --&gt; Metric[&quot;Pick Metric&quot;]
-    Metric --&gt; Window[&quot;Pick Window&quot;]
-    Window --&gt; Pop[&quot;Pick Population&quot;]
-    Pop --&gt; Hypothesis[&quot;Falsifiable Hypothesis&quot;]
-</code></pre>
+<p><img alt="How a vague business request becomes a metric, window, population, and falsifiable hypothesis" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>How a vague business request becomes a metric, window, population, and falsifiable hypothesis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a <em>number</em> you can measure (DAU, conversion rate, revenue).</li>
@@ -113,6 +110,7 @@
 <p><strong>Step 5 — Rewrite as falsifiable</strong></p>
 <pre><code class="language-text">&quot;Paid-subscriber monthly revenue dropped more than 5% in the last 30 days versus the prior 30 days.&quot;
 </code></pre>
+<p><strong>Expected output:</strong> one falsifiable question that explicitly names the metric, time window, and target population.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>metric</em> is the spine of the analysis.</li>
