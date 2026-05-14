@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 7
 title: Gradient Descent
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Optimization
   - Beginner
 seo_description: A beginner-friendly tour of gradient descent, learning rate, convergence, divergence, and stochastic gradient descent for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Gradient Descent
 
-> Calculus for ML 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How can we find *optimal weights* using only the *loss gradient*?
-
-> *Gradient descent* repeatedly takes a *small step* in the *opposite* direction of the gradient.
+Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.
 
 This is post 7 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.
+
+> Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ Most ML training is a *variant* of gradient descent.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    W[Weights] --> G[Gradient]
-    G --> S[Step]
-    S --> W
-    W --> L[Loss decrease]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
 
+*Gradient-descent loop: weights produce a gradient, the step flips direction, and loss moves downward.*
 ## Key Terms
 
 - **GD**: gradient over *all data*.
