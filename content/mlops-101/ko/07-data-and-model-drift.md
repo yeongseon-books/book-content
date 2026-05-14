@@ -54,14 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Train["train dist"] --> Base["baseline"]
-    Live["live dist"] --> Stat["KS / PSI"]
-    Base --> Stat
-    Stat --> Alert["alert"]
-```
+![드리프트 감지 흐름](../../../assets/mlops-101/07/07-01-see-the-flow-first.ko.png)
 
+*드리프트 감지 흐름*
 이 그림은 드리프트 감지의 핵심을 단순하게 보여 줍니다. 학습 시점 분포를 기준선으로 잡고, 운영 중에 들어오는 현재 분포와 통계적으로 비교한 뒤, 차이가 일정 수준을 넘으면 경고를 내보냅니다.
 
 여기서 가장 중요한 선택은 기준선을 무엇으로 둘지입니다. 기준선이 흔들리면 드리프트 감지 자체가 흐려집니다.
