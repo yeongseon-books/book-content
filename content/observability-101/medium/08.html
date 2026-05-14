@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>SLI and SLO Basics</h1>
+<p>Reliability conversations often go in circles because each side is speaking from instinct. One team says the service is fine, another says it is already risky, and nobody has a shared threshold for when feature work should slow down.</p>
+<p>SLIs and SLOs solve that by turning service quality into a number, a target, and a budget the team can spend or protect.</p>
 <p>This is post 8 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can you answer <em>how reliable is reliable enough</em> with a <em>number</em>?</p>
-<blockquote>
-<p><em>SLI is the </em>measured reliability<em>; SLO is the </em>promised reliability<em>; error budget is the </em>amount of failure allowed<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>SLI</em> ("good / total")</li>
@@ -80,12 +71,8 @@
 <p><em>An SLO is </em>the shared language between engineers and the business<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;request&quot;] --&gt; SLI[&quot;SLI = good/total&quot;]
-    SLI --&gt; SLO[&quot;SLO target (e.g. 99.9%)&quot;]
-    SLO --&gt; Budget[&quot;error budget = 1 - SLO&quot;]
-    Budget --&gt; Burn[&quot;burn-rate alert&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>Measured reliability becomes an SLI, the target becomes an SLO, and the remaining room for failure becomes an error budget that alerts can track.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SLI</strong>: a <em>measurable ratio</em> (e.g., success rate).</li>
@@ -123,6 +110,19 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 <pre><code class="language-text">- Availability: 99.92% (target 99.9% PASS)
 - Latency: p95 320ms (target &lt;= 500ms PASS)
 - Budget burned: 38%
+</code></pre>
+<h2>How to Operate an Error Budget</h2>
+<p>An SLO matters only if it changes release behavior and incident response.</p>
+<pre><code class="language-text">30-day SLO target: 99.9%
+allowed downtime: 43.2m
+this month burned: 31.4m (72.7%)
+current burn rate: 2.1x
+decision: keep routine deploys, hold risky changes
+</code></pre>
+<pre><code class="language-text">Expected output:
+- The team shares one number for the target, one for remaining budget, and one for burn rate.
+- Burn-rate alerts catch both fast incidents and slow degradation.
+- Monthly reviews use budget consumption to decide whether feature velocity should slow down.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
@@ -181,6 +181,7 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 <li><a href="https://sre.google/workbook/implementing-slos/">The SRE Workbook — Implementing SLOs</a></li>
 <li><a href="https://sre.google/workbook/alerting-on-slos/">Multi-window burn rate</a></li>
 <li><a href="https://sloth.dev/">Sloth — SLO generator</a></li>
+<li><a href="https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring">Google Cloud — Service monitoring SLO overview</a></li>
 </ul>
 <p class="tags-line">Tags: Observability, SLO, SLI, SRE, Reliability</p>
 </body>
