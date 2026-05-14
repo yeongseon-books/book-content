@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 4
 title: Concurrency and Race Conditions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Debugging
   - Systems
 seo_description: What race conditions are, why they hide so well, and the three axes of concurrency violation — atomicity, visibility, and ordering.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Concurrency and Race Conditions
 
-This is post 4 in the Operating Systems 101 series.
+Concurrency bugs are usually quiet in development and loud in production. They pass tests for days, then corrupt data only under load, which makes them feel random even when the mechanism is precise.
 
-> Operating Systems 101 series (4/10)
+What makes race conditions hard is not that they fail once, but that the result depends on interleaving you did not explicitly write.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does code that works perfectly with one thread break in strange, hard-to-reproduce ways once you go multi-threaded?
-
-> A race condition happens when two or more flows touch the same data at the same time, and the result depends on who got there first. Even a single line like `count += 1` is read-modify-write, and another thread can sneak in between those steps. This article explains why concurrency bugs hide so well, what kinds exist, and which design principles keep them out.
-
-<!-- a-grade-intro:end -->
+This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ Concurrency bugs are quiet during development and loud in production, especially
 ## Concept at a Glance
 
 > When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.
+
+### How one increment gets lost
+
+![How one increment gets lost](../../../assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
+*A race condition often looks like two flows reading the same old value and then overwriting each other's work.*
 
 ```text
 Initial: count = 0   (both threads want to add 1)
