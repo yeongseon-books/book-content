@@ -16,7 +16,7 @@ tags:
 - ImageBind
 - FAISS
 - Multimodal Index
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이번 글에서는 그 심장에 해당하는 multimodal embedding을
   더…
 ---
@@ -94,7 +94,7 @@ image (sleeping cat photo)      ──┘
 
 - 영어 위주, 가벼운 baseline: OpenAI CLIP ViT-B/32
 - 오픈 라이선스에서 최대 품질: OpenCLIP ViT-H/14 또는 SigLIP
-- 한국어/다국어 지원: Jina CLIP v2 또는 multilingual-CLIP
+- 한국어를 포함해 여러 언어를 다뤄야 한다면: Jina CLIP v2 또는 multilingual-CLIP
 - audio까지 한 공간으로 묶고 싶다: ImageBind
 
 ### 3. OpenCLIP으로 embedding 추출하기
@@ -128,7 +128,7 @@ similarity = (text_vec @ img_vec.T).item()
 print(f"cosine similarity: {similarity:.3f}")
 ```
 
-핵심은 마지막의 L2 normalization입니다. cosine similarity로 비교하려면 unit vector여야 하고, FAISS의 inner product index도 normalized vector를 가정합니다.
+핵심은 마지막 L2 정규화입니다. 코사인 유사도로 비교하려면 단위 벡터여야 하고, FAISS의 내적 인덱스도 정규화된 벡터를 가정합니다.
 
 ### 4. FAISS로 cross-modal index 구축
 
