@@ -54,13 +54,25 @@
 </head>
 <body>
 <h1>Image Encoders: CLIP and ViT</h1>
+<p>Many teams jump straight to GPT-4o, Qwen2-VL, or LLaVA because that is where the user-visible magic happens. But most multimodal quality issues start lower in the stack. If the image encoder loses the wrong detail, every downstream classifier, retriever, and VLM adapter inherits the mistake.</p>
 <p>This is post 2 in the Multimodal AI 101 series.</p>
+<p>Here we focus on the layer that turns pixels into something searchable and comparable: ViT as the tokenization scheme for images, and CLIP as the shared space that lets text and images meet.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?</li>
+<li>How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?</li>
+<li>What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?</li>
+<li>Which production patterns can you build with CLIP before you ever fine-tune a VLM?</li>
+<li>Where do preprocessing, normalization, prompt templates, and evaluation most often go wrong?</li>
+</ul>
 <blockquote>
-<p>Multimodal AI 101 series (2/10)</p>
+<p>An image encoder is not trying to solve the task directly. Its job is to preserve the visual evidence in a representation that later search and reasoning layers can still use.</p>
 </blockquote>
-<hr>
 <h2>Why start with the image encoder</h2>
 <p>The quality of any multimodal system ultimately rides on the quality of the representation produced by the image encoder. CLIP and ViT (Vision Transformer) are the two pillars on the image side of nearly every modern VLM, and BLIP-2, LLaVA, and GPT-4V all use ViT-family backbones. Episode 1 covered hybrid fusion; this episode looks directly at the vision encoder that feeds it.</p>
+<h2>Mental model: encode first, decide later</h2>
+<p><img alt="Mental model: encode first, decide later" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png"><br>
+<em>Good image encoders do not answer the question by themselves. They produce a reusable representation that later retrieval, classification, and reasoning stages can trust.</em></p>
 <h2>ViT: looking at images as a token sequence</h2>
 <p>CNNs process images by growing receptive fields from small to large. ViT does the opposite. It cuts the image into 16x16 patches, treats each patch as a token, and feeds the sequence straight into a Transformer.</p>
 <pre><code>[224x224 image] -&gt; 14x14 = 196 patches -&gt; linear projection -&gt; 196 tokens (+ CLS)
@@ -221,6 +233,20 @@ print(&quot;top-3:&quot;, [paths[i] for i in I[0]])
 </tbody>
 </table>
 <p>In practice, CLIP ViT-L/14-336 is the LLaVA-1.5 default, and SigLIP is adopted by recent VLMs like Google's PaliGemma. For zero-shot classification alone, ViT-B/32 is enough to start.</p>
+<h2>How to verify an encoder before production</h2>
+<p>Before you care about leaderboard deltas, verify the contract around the model.</p>
+<ol>
+<li><strong>Processor parity</strong>: the same resize, crop, and normalization used in the model card must also be used in offline indexing and online inference.</li>
+<li><strong>Score stability</strong>: near-duplicate images should preserve ranking under small crops, color shifts, and compression noise.</li>
+<li><strong>Prompt stability</strong>: class prompts like <code>a photo of a {label}</code> should not collapse when a synonym is used.</li>
+<li><strong>Latency ceiling</strong>: the encoder should meet your batch-size and hardware budget before you commit to a corpus rebuild.</li>
+</ol>
+<p>The biggest production mistake is evaluating only one clean image per class. Real failures show up on hard boundaries: similar backgrounds, partial crops, multilingual text inside images, or product variants that differ by one visual detail.</p>
+<pre><code class="language-python">def verify_top1_margin(probs, min_margin: float = 0.15) -&gt; bool:
+    top2 = sorted(probs, reverse=True)[:2]
+    return (top2[0] - top2[1]) &gt;= min_margin
+</code></pre>
+<p><strong>Expected output:</strong> in a stable zero-shot classification setup, the top class should not just win. It should win by a margin that stays reasonably consistent across crops and recompressions. If the margin collapses to noise after a trivial resize change, your preprocessing contract is already broken.</p>
 <h2>Five common pitfalls</h2>
 <p><strong>1. Preprocessing different from the processor's defaults</strong></p>
 <p>ViT normalizes with ImageNet mean/std, while CLIP uses OpenAI's own mean/std. Hand-rolled preprocessing with PIL/torchvision usually produces wrong values and accuracy collapses. Use the matching <code>*ImageProcessor</code> from <code>transformers</code> directly.</p>
@@ -232,6 +258,14 @@ print(&quot;top-3:&quot;, [paths[i] for i in I[0]])
 <p>Fine-tuning a CLIP backbone needs careful LR scheduling and layer-wise learning rate decay. Unfreezing everything at lr=1e-3 destroys the representation. Start by training only the head, or use LoRA.</p>
 <p><strong>5. Mismatched input resolution</strong></p>
 <p>Feeding 224 inputs to a CLIP-336 model (or vice versa) breaks positional embeddings and tanks accuracy. Processors handle resize automatically, but custom data loaders need a manual sanity check.</p>
+<h2>Operations checklist</h2>
+<ul>
+<li>[ ] We reuse the exact processor contract for offline indexing and online inference</li>
+<li>[ ] We normalize image and text embeddings before cosine or inner-product search</li>
+<li>[ ] We test prompt-template sensitivity instead of trusting a single zero-shot phrase</li>
+<li>[ ] We measure score stability on near-duplicate and hard-boundary image sets</li>
+<li>[ ] We pin the encoder version before building or rebuilding a retrieval index</li>
+</ul>
 <h2>Key Takeaways</h2>
 <ul>
 <li>ViT cuts images into 16x16 patches, feeds them to a Transformer, and uses the CLS token output as the image vector.</li>
