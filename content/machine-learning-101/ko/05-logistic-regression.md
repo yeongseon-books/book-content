@@ -17,7 +17,7 @@ tags:
   - scikit-learn
   - Beginner
 seo_description: 로지스틱 회귀가 선형 점수를 확률로 바꾸는 방식과 임계값, 정밀도, 재현율을 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Logistic Regression
@@ -42,13 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    X["X"] --> Lin["z = X w + b"]
-    Lin --> Sig["sigmoid(z)"]
-    Sig --> P["P(y=1|X)"]
-    P --> Cls["class = P > 0.5"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/05/05-01-diagram.ko.png)
+
+*로지스틱 회귀는 선형 점수를 먼저 만들고, 이를 확률로 바꾼 뒤 임계값으로 최종 클래스를 정합니다.*
 
 ## 핵심 용어
 
@@ -106,11 +102,19 @@ for t in [0.3, 0.5, 0.7]:
     print(t, (pred == yte).mean())
 ```
 
+**Expected output:** `classification_report`는 클래스별 정밀도와 재현율을 보여 주고, 임계값 루프는 같은 모델이라도 cutoff를 바꾸면 결과가 달라진다는 점을 드러냅니다. 즉, 임계값 선택은 표시 옵션이 아니라 **모델링 결정**입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `predict_proba`는 레이블이 아니라 확률을 반환합니다.
 - 임계값은 정밀도-재현율 절충을 조절하는 손잡이입니다.
 - `StandardScaler`는 최적화가 수렴하는 데 도움을 줍니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 정확도는 높은데 중요한 양성을 놓친다면, 모델보다 먼저 **재현율**과 **임계값**을 봐야 합니다.
+- 확률이 지나치게 자신 있어 보이면 `predict_proba`를 곧바로 믿기보다 **보정(calibration)** 여부를 확인해야 합니다.
+- 계수가 불안정하게 흔들리면 solver보다 먼저 **스케일링**과 **클래스 불균형**을 점검하는 편이 낫습니다.
 
 ## 자주 하는 실수 5가지
 
