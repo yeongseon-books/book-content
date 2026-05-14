@@ -45,13 +45,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Event["event"] --> Platform["serverless platform"]
-    Platform --> Func["function"]
-    Func --> Result["response / side effect"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
 
+*플랫폼이 이벤트와 함수 실행 사이에서 어떤 책임을 맡는지 보여 주는 기본 구조입니다.*
 이 그림에서 핵심 주체는 함수보다 플랫폼입니다. 이벤트가 들어오면 플랫폼이 적절한 실행 환경을 준비하고, 함수는 짧은 시간 동안 코드를 수행한 뒤 응답이나 부수 효과를 남깁니다. 개발자는 직접 서버를 띄우고 유지보수하지 않지만, 대신 함수의 경계와 입력 구조, 상태 저장 위치를 더 분명하게 설계해야 합니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -196,9 +192,16 @@ def http_response(status, body):
 
 ## 참고 자료
 
+### 공식 문서
+
 - [AWS Lambda 개요](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
-- [Google Cloud Functions](https://cloud.google.com/functions/docs)
-- [Azure Functions](https://learn.microsoft.com/azure/azure-functions/)
+- [Google Cloud Functions 개요](https://cloud.google.com/functions/docs)
+- [Azure Functions 개요](https://learn.microsoft.com/azure/azure-functions/functions-overview)
+
+### 아키텍처와 코드
+
 - [Serverless 정의 - Martin Fowler](https://martinfowler.com/articles/serverless.html)
+- [AWS Lambda 개발자 가이드 예제 (GitHub)](https://github.com/awsdocs/aws-lambda-developer-guide)
+- [Azure Functions 101](../../azure-functions-101/ko/)
 
 Tags: Serverless, Cloud, FaaS, Architecture, DevOps
