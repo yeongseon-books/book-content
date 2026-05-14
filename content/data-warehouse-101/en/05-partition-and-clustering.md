@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 5
 title: Partition and Clustering
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Performance
   - Analytics
 seo_description: How partitioning and clustering differ, the principle of pruning, and the two axes that make huge tables fast to read.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Partition and Clustering
-> Data Warehouse 101 series (5/10)
+
+Warehouse performance is often less about reading faster than about refusing to read what you do not need. On large fact tables, that one design choice is the difference between a cheap daily dashboard refresh and an expensive full-table scan.
 
 This is post 5 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How can you pull *today's data* from a *fact with billions of rows* in seconds? How does the engine *decide what to skip*?
-
-> *Partitions split the file into chunks; clustering sorts inside each chunk.*
-
-<!-- a-grade-intro:end -->
+In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.
 
 ## What You Will Learn
 
@@ -49,13 +44,9 @@ Warehouse facts often hold *billions of rows*. A daily partition alone lets the 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Query["WHERE date = '2026-05-04'"] --> Engine["Query Engine"]
-    Engine --> P1["partition: 2026-05-03 (skip)"]
-    Engine --> P2["partition: 2026-05-04 (scan)"]
-    Engine --> P3["partition: 2026-05-05 (skip)"]
-```
+![Partition pruning example](../../../assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
+
+*A date predicate lets the engine scan only the matching partition and skip adjacent partitions entirely.*
 
 ## Key Terms
 
