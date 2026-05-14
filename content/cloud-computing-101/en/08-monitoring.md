@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 8
 title: Monitoring
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - AWS
   - Observability
 seo_description: CloudWatch metrics, logs, and alarms — the foundation of cloud monitoring explained step by step with boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Monitoring
 
-> Cloud Computing 101 series (8/10)
+If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When do you reach for metrics, logs, or traces — and which tool answers each question?
-
-> *Monitoring makes a system observable through three axes — numbers (metrics), text (logs), and flow (traces).*
+Good monitoring is not about collecting everything. It is about connecting three questions quickly: what changed, why it changed, and who should respond first.
 
 This is post 8 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.
 
-## What You Will Learn
+> Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.
+
+## Questions This Chapter Answers
 
 - Metrics vs logs vs traces
 - CloudWatch basics
@@ -48,14 +46,9 @@ Without monitoring, your *customers* tell you about outages first. A single well
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["app"] --> Logs["log"]
-    App --> Metric["metric"]
-    Metric --> Alarm["alarm"]
-    Alarm --> SNS["sns/email"]
-    Logs --> Insight["query"]
-```
+![Monitoring flow from application signals to alarms, notifications, and log analysis](../../../assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
+
+*Monitoring flow from application signals to alarms, notifications, and log analysis*
 
 ## Key Terms
 
@@ -129,6 +122,26 @@ def emit(value):
 - `Period` and `EvaluationPeriods` together set sensitivity.
 - Custom metrics let you alert on business signals.
 - Topics decouple alarms from recipients.
+
+## How to Verify This Example
+
+The interesting part of an alarm is not that it exists. It is whether you can explain exactly when it fires. Reading `Period`, `EvaluationPeriods`, and `Threshold` together is what separates a useful alarm from either noise or silence.
+
+```bash
+aws cloudwatch describe-alarms --alarm-names high-cpu-demo
+```
+
+**Expected output:**
+
+- `MetricName` should be `CPUUtilization`.
+- You should see `Period=60`, `EvaluationPeriods=5`, and `Threshold=80`.
+- If the SNS email subscription was never confirmed, the alarm may exist while notifications still never reach a human.
+
+### Where teams usually get stuck
+
+- More alarms do not automatically create better observability. Unactionable alerts train teams to ignore the system.
+- Log retention defaults can quietly turn into a cost problem.
+- Infrastructure metrics alone can miss a business outage that is obvious in application signals.
 
 ## Five Common Mistakes
 
