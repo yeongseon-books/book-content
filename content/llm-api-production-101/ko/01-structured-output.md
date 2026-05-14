@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 구조화 출력 — JSON 모드와 응답 스키마
-seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
+seo_description: JSON 모드와 Pydantic 검증으로 LLM 응답을 운영 가능한 데이터 계약으로 바꾸는 방법을 다룹니다.
 ---
 
 # 구조화 출력 — JSON 모드와 응답 스키마
@@ -150,7 +150,7 @@ print(payload)
 
 <!-- injected-output:end -->
 
-여기서 중요한 점은 세 가지입니다. 프롬프트 안에서도 JSON 객체 하나를 반환하라고 다시 적어 계약을 읽기 쉽게 만들었다는 점, `temperature=0`으로 변동성을 줄였다는 점, 그리고 `json.loads()`는 파싱만 할 뿐 의미 검증은 하지 않는다는 점입니다.
+여기서 눈여겨볼 점은 세 가지입니다. 프롬프트 안에서도 JSON 객체 하나를 반환하라고 다시 적어 계약을 읽기 쉽게 만들었다는 점, `temperature=0`으로 변동성을 줄였다는 점, 그리고 `json.loads()`는 파싱만 할 뿐 의미 검증은 하지 않는다는 점입니다.
 
 ### Pydantic으로 응답을 잠그기
 
@@ -298,6 +298,55 @@ except Exception:
 
 이렇게 분리해 두면 요청 실패는 재시도 대상으로, JSON 파싱 실패는 원문 보존과 프롬프트 재검토 대상으로, 스키마 실패는 계약 단순화나 필드 정의 보강 대상으로 각각 다르게 다룰 수 있습니다.
 
+### 검증 실패를 일부러 재현해 보기
+
+운영에서 도움이 되는 테스트는 성공 예제 하나로 끝나지 않습니다. 계약이 깨졌을 때 어떤 로그와 예외가 나오는지도 같이 확인해야 합니다. 아래 코드는 모델 호출 없이도 스키마 검증 실패를 재현합니다.
+
+```python
+from enum import Enum
+
+from pydantic import BaseModel, Field, ValidationError
+
+class Category(str, Enum):
+    billing = "billing"
+    account = "account"
+    bug = "bug"
+    shipping = "shipping"
+
+class TicketClassification(BaseModel):
+    category: Category
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    customer_needs_followup: bool
+
+invalid_payload = {
+    "category": "refund",
+    "priority": 9,
+    "summary": "short",
+    "customer_needs_followup": "later",
+}
+
+try:
+    TicketClassification.model_validate(invalid_payload)
+except ValidationError as exc:
+    print(exc)
+```
+
+<!-- injected-output:start -->
+**실행 결과**
+
+    3 validation errors for TicketClassification
+    category
+      Input should be 'billing', 'account', 'bug' or 'shipping'
+    priority
+      Input should be less than or equal to 5
+    summary
+      String should have at least 8 characters
+
+<!-- injected-output:end -->
+
+이 출력이 중요한 이유는 장애 분류 기준을 바로 코드화할 수 있기 때문입니다. enum 위반인지, 범위 위반인지, 문자열 길이 문제인지가 명확하게 드러나므로 재시도 대신 계약 보강이나 프롬프트 축소로 방향을 바로 잡을 수 있습니다. 회귀 테스트에는 이런 실패 payload를 일부러 포함하는 편이 훨씬 안전합니다.
+
 ## 흔히 헷갈리는 지점
 
 - JSON 모드를 켰다고 해서 비즈니스 규칙까지 자동으로 보장되는 것은 아닙니다.
@@ -337,9 +386,12 @@ except Exception:
 ## 참고 자료
 
 ### 공식 문서
-- <https://console.groq.com/docs/text-chat>
-- <https://console.groq.com/docs/text-chat#json-mode>
-- <https://docs.pydantic.dev/latest/concepts/models/>
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [Groq JSON mode guide](https://console.groq.com/docs/text-chat#json-mode)
+- [Pydantic model concepts](https://docs.pydantic.dev/latest/concepts/models/)
+
+### 검증 보조 자료
+- [JSON Schema object reference](https://json-schema.org/understanding-json-schema/reference/object)
 
 ### 관련 시리즈
 - [툴 호출 — 함수를 모델에 연결하기](./02-tool-calling.md)
