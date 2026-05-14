@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 6
 title: Pagination and Filtering
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Performance
   - Backend
 seo_description: Practical patterns for paginating, sorting, filtering, and searching REST collections — offset vs cursor, with the trade-offs explained.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Pagination and Filtering
 
-Pagination, sorting, and filtering shape both performance and correctness. The real trade-off starts with offset versus cursor.
+List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.
 
 This is post 6 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.
+
+## What you will learn
 
 - The limits of offset / limit pagination
 - Cursor-based pagination
@@ -43,14 +45,11 @@ Bad pagination produces slow queries *and* duplicates *and* gaps — at the same
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["?limit=20"] --> P1["page 1 + next_cursor"]
-    P1 --> A2["?limit=20&cursor=..."]
-    A2 --> P2["page 2 + next_cursor"]
-```
+![Concept at a Glance](../../../assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
+*A cursor is an opaque token that tells the client where the next page should continue.*
 
-A cursor marks the *start of the next page*.
+The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.
+
 
 ## Key Terms
 
@@ -163,6 +162,12 @@ GitHub returns next/prev URLs in the `Link` header. Fast-moving data — Twitter
 - Make total count *optional* — drop it when expensive.
 - Document filter values as enums.
 - Consider moving search to a *separate endpoint*.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** Repeated page traversal should produce no duplicates or gaps at page boundaries, and the documented `limit` cap should match the implementation.
+- **First check:** If calls such as `offset=100000` are common but nobody expects latency to change, you are probably hiding an expensive scan.
+- **Failure mode:** Always computing total count or exposing cursor internals creates a mix of performance and security problems that is painful to unwind later.
 
 ## Checklist
 
