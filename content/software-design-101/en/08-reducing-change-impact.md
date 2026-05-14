@@ -18,22 +18,18 @@ tags:
   - FeatureFlags
   - Refactoring
 seo_description: Design that keeps a single change from shaking the whole system, with the open/closed principle and the expand-contract pattern.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Reducing Change Impact
 
+A change feels scary when one new branch, one schema update, or one pricing tweak can rattle the whole system. Good design does not stop change. It narrows the blast radius.
+
 This is post 8 in the Software Design 101 series.
 
-> Software Design 101 series (8/10)
+In this post, we connect the open/closed principle with expand-contract and feature flags. The aim is to make live changes observable, reversible, and small enough to ship without turning every deployment into a cliff edge.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it take to change one line without rattling the whole system?
-
-> Design that limits the blast radius of change — open/closed, expand-contract, and feature flags are the practical tools.
-
-<!-- a-grade-intro:end -->
+> The safest evolution path is usually: expand, compare, migrate, and only then clean up.
 
 ## What You Will Learn
 
@@ -51,10 +47,8 @@ Most systems are not built well from the start. They are built to change well. T
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Add new path"] --> B["Run side by side"] --> C["Migrate readers"] --> D["Remove old path"]
-```
+![Concept at a Glance](../../../assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
+*Expand-contract keeps live changes safe by adding a new path, comparing it, migrating traffic, and cleaning up*
 
 Expand → switch → contract.
 
@@ -146,6 +140,31 @@ Side-by-side comparison catches regressions.
 
 Cleanup is part of the change.
 
+## Quick Verification
+
+For live code, define the comparison before you write the new path. Spell out what the old and new behavior will be compared on.
+
+```text
+Comparison target: pricing result
+Comparison point: right after request handling
+Tolerance: 0
+Switch-over rule: zero drift logs and regression suite pass
+```
+
+**Expected output:** before enabling the new implementation, you can explain exactly which signals qualify it as safe.
+
+With that in place, the feature flag stops being a mere switch and becomes part of a verification plan.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| The new path ships before anyone compares outputs | Check whether side-by-side drift logging existed |
+| A feature flag lives for months | Check whether it had an expiration date and cleanup plan |
+| Even tiny changes trigger expand-contract | Re-evaluate whether the operational risk justifies the ceremony |
+
+Reducing change impact is not about using more patterns. It is about slicing the risky changes into safe, observable steps.
+
 ## What to Notice in This Code
 
 - Adding a new path does not touch the old one.
@@ -209,5 +228,11 @@ Good design makes change unscary. Next up we look at the principles that compres
 - [ParallelChange (Expand-Contract) — Danilo Sato](https://martinfowler.com/bliki/ParallelChange.html)
 - [Feature Toggles — Pete Hodgson](https://martinfowler.com/articles/feature-toggles.html)
 - [Strangler Fig Application — Martin Fowler](https://martinfowler.com/bliki/StranglerFigApplication.html)
+
+### Practical Docs
+
+- [logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
+- [enum — Support for enumerations](https://docs.python.org/3/library/enum.html)
+
 
 Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring
