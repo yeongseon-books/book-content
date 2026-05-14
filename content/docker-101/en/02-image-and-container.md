@@ -2,7 +2,7 @@
 series: docker-101
 episode: 2
 title: Images and Containers
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,17 @@ tags:
   - Layer
   - Lifecycle
 seo_description: Image and container lifecycle, layer model, and the ten commands you actually use day to day, with hands-on inspection.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Images and Containers
 
-This is post 2 in the Docker 101 series.
+The first serious confusion in Docker usually appears between images and containers. Teams pull an image, change files inside a running container, restart it, and then wonder why the change disappeared. The failure is not mysterious; it comes from mixing up a deployable artifact with a disposable runtime instance.
 
-> Docker 101 series (2/10)
+Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: *Images are immutable; containers change* — what does that *actually* mean in practice?
-
-> *An image is a *class*; a container is an *instance*. Keeping them separate makes debugging tractable.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
+## What you will learn
 
 - The *lifecycle* of *images* and *containers*
 - *Layers* and *copy-on-write*
@@ -50,13 +43,9 @@ If you do not understand how containers behave, *debugging becomes luck*. Knowin
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Image["Image (immutable)"] --> Run["docker run"]
-    Run --> Container["Container (mutable)"]
-    Container --> Stop["Stopped"]
-    Stop --> Rm["Removed"]
-```
+![Immutable image flowing into a mutable container lifecycle from run to stop to removal](../../../assets/docker-101/02/02-01-concept-at-a-glance.en.png)
+
+*An immutable image becomes a mutable container instance that can be created, run, stopped, and removed without changing the source artifact*
 
 ## Key Terms
 
@@ -114,6 +103,16 @@ docker exec web2 ls /tmp/hello   # No such file
 docker image prune -f          # remove dangling
 docker image rm nginx:1.27
 ```
+
+### Verify right after you run it
+
+- `docker history nginx:1.27` should show a list of image layers, and `docker exec web2 ls /tmp/hello` should fail because the file lived only in the first container instance.
+- Those two observations together confirm the difference between image state and container state.
+
+### If it does not work, check this first
+
+- If `docker exec -it web bash` fails, the image may not include `bash`; retry with `sh`.
+- If image cleanup fails, check `docker ps -a` first and make sure no running container still references the image.
 
 ## What to Notice in This Code
 
@@ -173,9 +172,15 @@ Separating images and containers is the *fundamentals* of Docker. Next we *build
 
 ## References
 
+### Official docs
+
 - [Docker images](https://docs.docker.com/engine/reference/commandline/image/)
 - [Docker container lifecycle](https://docs.docker.com/engine/reference/commandline/container/)
 - [Storage drivers and layers](https://docs.docker.com/storage/storagedriver/)
 - [Image digests](https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier)
+
+### Verification and troubleshooting
+
+- [docker exec reference](https://docs.docker.com/engine/reference/commandline/exec/)
 
 Tags: Docker, Image, Container, Layer, Lifecycle
