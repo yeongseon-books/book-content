@@ -16,7 +16,7 @@ tags:
   - Monitoring
   - DataScience
   - Statistics
-seo_description: 입력 분포 변화와 모델 성능 저하를 구분해 감지하는 방법을 다룹니다
+seo_description: 데이터 드리프트와 모델 드리프트를 구분하여 감지하고, PSI와 KS 검정을 활용해 재학습 시점을 결정하는 운영 체계를 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

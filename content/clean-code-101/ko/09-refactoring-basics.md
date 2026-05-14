@@ -17,7 +17,7 @@ tags:
   - Patterns
   - LegacyCode
   - Quality
-seo_description: 안전한 리팩토링 절차와 레거시 코드 접근법을 설명합니다.
+seo_description: 안전한 리팩토링을 위한 특성화 테스트 활용법과 마틴 파울러의 핵심 기법을 통해 레거시 코드를 점진적으로 개선하는 절차를 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

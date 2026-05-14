@@ -17,7 +17,7 @@ tags:
   - Duplication
   - Refactoring
   - Abstraction
-seo_description: DRY의 진짜 의미와 중복 제거의 안전한 기준을 설명합니다.
+seo_description: DRY 원칙의 의미와 중복 제거 기준을 배웁니다. 우연한 유사성과 본질적 중복을 구분하고 지식의 출처를 하나로 관리하는 법을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

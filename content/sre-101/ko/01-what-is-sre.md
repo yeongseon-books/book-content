@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 1
-title: SRE란 무엇인가?
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Reliability
-  - DevOps
-  - Operations
-  - Engineering
-seo_description: SRE의 정의와 역할, DevOps와의 차이, 시작점을 짧게 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 운영을 소프트웨어 문제로 다루는 SRE의 개념과 DevOps의 차이, SLO와 에러 버짓 기반 신뢰성 관리 원칙을 정리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Reliability
+- DevOps
+- Operations
+- Engineering
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: SRE란 무엇인가?
 ---
 
 # SRE란 무엇인가?

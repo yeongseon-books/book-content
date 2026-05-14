@@ -16,7 +16,7 @@ tags:
   - Recursion
   - Divide and Conquer
   - Tower of Hanoi
-seo_description: 재귀와 분할 정복의 핵심을 Python 예제로 익힙니다.
+seo_description: 재귀 함수의 동작 원리와 기저 조건의 중요성을 호출 스택 시각화로 이해합니다. 문제를 쪼개어 해결하는 분할 정복 전략을 파이썬 예제로 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

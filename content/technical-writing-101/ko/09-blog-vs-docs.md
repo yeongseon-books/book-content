@@ -1,23 +1,23 @@
 ---
-series: technical-writing-101
 episode: 9
-title: 블로그와 문서 차이
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - TechnicalWriting
-  - Blog
-  - Documentation
-  - Diataxis
-  - Beginner
-seo_description: 블로그 글과 공식 문서의 차이를 정리하고 각각의 역할을 정리한 글
 last_reviewed: '2026-05-12'
+seo_description: 블로그와 공식 문서의 차이를 Diátaxis 모델로 분석하고 각 역할과 최신성 유지 전략을 함께 정리합니다.
+series: technical-writing-101
+status: publish-ready
+tags:
+- TechnicalWriting
+- Blog
+- Documentation
+- Diataxis
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 블로그와 문서 차이
 ---
 
 # 블로그와 문서 차이

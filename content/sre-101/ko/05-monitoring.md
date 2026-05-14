@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 5
-title: Monitoring
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Monitoring
-  - Metrics
-  - Alerting
-  - Observability
-seo_description: 모니터링의 네 신호, 알림 설계, 대시보드 원칙을 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 행동으로 이어지는 모니터링을 위한 골든 시그널과 알림 설계, 알림 피로 감소와 대시보드 구성법을 정리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Monitoring
+- Metrics
+- Alerting
+- Observability
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Monitoring
 ---
 
 # Monitoring

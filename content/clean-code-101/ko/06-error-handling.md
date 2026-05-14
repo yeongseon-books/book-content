@@ -17,7 +17,7 @@ tags:
   - Exceptions
   - Robustness
   - Reliability
-seo_description: 예외와 반환값의 선택, Fail Fast, 재시도 기준을 설명합니다.
+seo_description: 깔끔한 오류 처리 기법을 배웁니다. 예외와 반환값 선택 기준, Fail Fast 원칙, 재시도 전략을 구현하며 견고함을 높이는 법을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Airflow
   - DAG
   - DataScience
-seo_description: 학습 단계를 파이프라인으로 분리해 반복 가능하게 만드는 방법을 다룹니다
+seo_description: 학습 과정을 단계로 분해하고 DAG로 연결하여, 모델 학습의 재현성과 운영 효율을 높이고 실패 복구 속도를 개선하는 파이프라인 설계법입니다.
 last_reviewed: '2026-05-12'
 ---
 

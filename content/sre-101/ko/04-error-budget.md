@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 4
-title: Error Budget
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - ErrorBudget
-  - Reliability
-  - Release
-  - Risk
-seo_description: 에러 버짓의 계산법, 소진 속도, 릴리스 정책을 함께 설명합니다
 last_reviewed: '2026-05-12'
+seo_description: 에러 버짓 계산법과 burn rate로 위험을 관리하는 법, 버짓 상태에 따른 릴리스 정책 수립 원칙을 정리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- ErrorBudget
+- Reliability
+- Release
+- Risk
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Error Budget
 ---
 
 # Error Budget

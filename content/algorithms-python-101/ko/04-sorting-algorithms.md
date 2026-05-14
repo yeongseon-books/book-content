@@ -16,7 +16,7 @@ tags:
   - Sorting
   - Bubble Sort
   - Quick Sort
-seo_description: 대표 정렬 알고리즘과 Python 정렬의 핵심 차이를 정리합니다.
+seo_description: 버블, 삽입, 퀵, 병합 정렬 원리를 파이썬으로 구현하며 비교합니다. 안정 정렬의 개념과 내장 정렬 함수의 효율성을 이해하고 활용법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

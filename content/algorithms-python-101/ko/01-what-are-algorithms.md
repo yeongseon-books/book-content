@@ -16,7 +16,7 @@ tags:
   - Problem Solving
   - Programming Basics
   - Time Complexity
-seo_description: 알고리즘의 정의와 핵심 성질을 Python 예제로 이해합니다.
+seo_description: 알고리즘의 정의와 다섯 가지 핵심 성질을 파이썬 예제로 배우고, 효율적인 문제 해결을 위한 알고리즘적 사고의 기초를 다집니다.
 last_reviewed: '2026-05-12'
 ---
 

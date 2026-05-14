@@ -17,7 +17,7 @@ tags:
   - Documentation
   - Docstring
   - Readability
-seo_description: 언제 주석을 쓰지 말아야 하는지와 좋은 문서화 기준을 설명합니다.
+seo_description: 코드가 스스로 설명하게 만드는 기법과 좋은 주석의 기준을 배웁니다. 코드로 표현하기 어려운 의도 주석과 docstring 활용법을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

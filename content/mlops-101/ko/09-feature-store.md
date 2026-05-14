@@ -16,7 +16,7 @@ tags:
   - Feast
   - DataScience
   - Pipeline
-seo_description: 학습과 서빙의 피처 차이를 줄이는 피처 스토어 개념과 Feast를 설명합니다
+seo_description: 학습-서빙 불일치를 해결하기 위해, 피처 정의를 표준화하고 온라인/오프라인 저장소를 통합 관리하는 피처 스토어 활용법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Publishing
   - Quality
   - Beginner
-seo_description: 기술 글을 발행하기 전 마지막으로 점검하는 체크리스트를 정리한 글
+seo_description: 발행 전 제목 검토, 링크 검증, 코드 실행 등 품질을 보장하는 최종 체크리스트를 살펴봅니다. 수정 비용을 줄이는 실전 점검 루틴을 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

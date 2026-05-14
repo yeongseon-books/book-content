@@ -16,7 +16,7 @@ tags:
   - OpenSource
   - Documentation
   - Beginner
-seo_description: 처음 본 사람도 5분 안에 실행하는 README 작성 방법을 정리한 글
+seo_description: 프로젝트의 첫인상인 README를 효과적으로 구성하여 독자가 5분 안에 프로젝트를 실행할 수 있게 돕는 핵심 5단계 구조와 작성 팁을 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

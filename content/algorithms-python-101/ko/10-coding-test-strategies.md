@@ -16,7 +16,7 @@ tags:
   - Coding Test
   - Problem Solving
   - Interview
-seo_description: 입력 크기와 패턴으로 코딩 테스트 풀이 전략을 세우는 법입니다.
+seo_description: 코딩 테스트 문제 해결을 위한 체계적 전략을 세웁니다. 투 포인터, 슬라이딩 윈도우 등 핵심 패턴과 파이썬 라이브러리 활용 팁을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

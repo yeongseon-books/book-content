@@ -16,7 +16,7 @@ tags:
   - Dynamic Programming
   - DP
   - Memoization
-seo_description: 메모이제이션과 테뷸레이션으로 DP의 기초를 익힙니다.
+seo_description: 동적 계획법의 핵심인 메모이제이션과 테뷸레이션의 차이를 파이썬 예제로 배웁니다. 중복 계산을 줄이는 점화식 설계와 공간 최적화 기법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - MLSystem
   - Production
   - DataScience
-seo_description: MLOps의 정의와 핵심 루프를 실전 관점에서 이해하는 입문 글입니다
+seo_description: MLOps의 정의와 핵심 운영 루프를 실전 관점에서 이해하고, 모델이 프로덕션에서 지속적으로 살아남기 위한 체계를 구축하는 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

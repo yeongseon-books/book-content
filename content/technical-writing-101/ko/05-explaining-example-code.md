@@ -16,7 +16,7 @@ tags:
   - Examples
   - Walkthrough
   - Beginner
-seo_description: 예제 코드를 보여주고 핵심을 짚어 설명하는 방법을 정리한 글
+seo_description: 개발자가 기술 문서에서 예제 코드를 효과적으로 제시하고 핵심을 짚어 설명하며 실행 가능한 결과까지 보여주는 방법을 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

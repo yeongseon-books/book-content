@@ -17,7 +17,7 @@ tags:
   - Testing
   - DependencyInjection
   - Refactoring
-seo_description: 순수 함수와 의존성 주입으로 테스트 가능한 코드를 만드는 법입니다.
+seo_description: 테스트 가능성을 높이는 구체적인 기법을 배웁니다. 순수 함수와 의존성 주입을 활용해 흔들리지 않는 견고한 단위 테스트 작성법을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

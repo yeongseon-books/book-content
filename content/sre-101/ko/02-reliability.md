@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 2
-title: Reliability
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Reliability
-  - Availability
-  - Latency
-  - Quality
-seo_description: 신뢰성을 가용성, 지연, 정확성, 내구성으로 나눠 설명합니다
 last_reviewed: '2026-05-12'
+seo_description: 신뢰성을 가용성, 지연 시간, 정확성, 내구성으로 정의하고 분위수와 비즈니스별 핵심 지표 선택법을 정리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Reliability
+- Availability
+- Latency
+- Quality
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Reliability
 ---
 
 # Reliability

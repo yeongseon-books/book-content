@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 10
-title: 운영 가능한 시스템 만들기
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Operability
-  - Architecture
-  - Reliability
-  - Engineering
-seo_description: 운영성의 설계 원칙과 관측성, 자동화, 회복력을 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 관측성, 자동화, 안전한 변경, 회복력을 갖춘 운영 가능한 시스템 설계 원칙으로 SRE 시리즈를 마무리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Operability
+- Architecture
+- Reliability
+- Engineering
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 운영 가능한 시스템 만들기
 ---
 
 # 운영 가능한 시스템 만들기

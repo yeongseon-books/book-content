@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 9
-title: Capacity Planning
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - CapacityPlanning
-  - Forecasting
-  - Performance
-  - Operations
-seo_description: 용량 계획의 예측, 헤드룸, 부하 테스트, 비용 판단을 다룹니다
 last_reviewed: '2026-05-12'
+seo_description: 미래 수요를 예측하고 시스템 공급을 최적화하는 용량 계획, 헤드룸 설정과 부하 테스트, 비용 계산법을 다룹니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- CapacityPlanning
+- Forecasting
+- Performance
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Capacity Planning
 ---
 
 # Capacity Planning

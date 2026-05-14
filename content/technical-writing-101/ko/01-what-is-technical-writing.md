@@ -1,23 +1,23 @@
 ---
-series: technical-writing-101
 episode: 1
-title: 기술 글쓰기란 무엇인가
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - TechnicalWriting
-  - Writing
-  - Documentation
-  - Communication
-  - Beginner
-seo_description: 기술 글쓰기의 정의와 일반 글과의 차이를 정리한 글
 last_reviewed: '2026-05-12'
+seo_description: 기술 정보를 독자의 행동으로 연결하는 기술 글쓰기의 정의와 독자, 작업, 결과 중심 멘탈 모델 구축법을 다룹니다.
+series: technical-writing-101
+status: publish-ready
+tags:
+- TechnicalWriting
+- Writing
+- Documentation
+- Communication
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 기술 글쓰기란 무엇인가
 ---
 
 # 기술 글쓰기란 무엇인가

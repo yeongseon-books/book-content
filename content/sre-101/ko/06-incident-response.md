@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 6
-title: Incident Response
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Incident
-  - Response
-  - OnCall
-  - Operations
-seo_description: 장애 대응의 역할, 심각도, 소통, 종료 기준을 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 장애 대응을 팀 시스템으로 만드는 심각도 분류와 Incident Commander의 역할, 실시간 소통 규칙을 정리합니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Incident
+- Response
+- OnCall
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Incident Response
 ---
 
 # Incident Response

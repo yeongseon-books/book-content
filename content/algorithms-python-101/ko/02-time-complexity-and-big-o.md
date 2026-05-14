@@ -16,7 +16,7 @@ tags:
   - Time Complexity
   - Big-O
   - Performance
-seo_description: 시간 복잡도와 Big-O로 알고리즘 성능을 비교하는 법을 익힙니다.
+seo_description: 시간 복잡도와 Big-O 표기법으로 알고리즘 성능을 객관적으로 분석합니다. 입력 증가에 따른 시간 변화를 파이썬 예제로 비교하는 법을 배웁니다.
 last_reviewed: '2026-05-12'
 ---
 

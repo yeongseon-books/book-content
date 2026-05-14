@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 7
-title: Postmortem
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Postmortem
-  - BlamelessCulture
-  - Learning
-  - Operations
-seo_description: 포스트모템의 작성 원칙, 비난 없는 문화, 액션 추적을 설명합니다
 last_reviewed: '2026-05-12'
+seo_description: 비난 없는 포스트모템 작성법으로 장애 학습을 자산화하고 액션 아이템 추적으로 재발을 방지하는 원칙을 다룹니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Postmortem
+- BlamelessCulture
+- Learning
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Postmortem
 ---
 
 # Postmortem

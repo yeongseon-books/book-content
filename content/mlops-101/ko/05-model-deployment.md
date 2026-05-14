@@ -16,7 +16,7 @@ tags:
   - FastAPI
   - Docker
   - DataScience
-seo_description: 학습한 모델을 API와 컨테이너로 안전하게 배포하는 방법을 다룹니다
+seo_description: 학습한 모델을 FastAPI와 Docker로 감싸고, 버전 관리와 전환 정책을 통해 안전하고 재현 가능하게 배포하는 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

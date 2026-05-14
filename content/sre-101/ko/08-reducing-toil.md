@@ -1,23 +1,23 @@
 ---
-series: sre-101
 episode: 8
-title: Toil 줄이기
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - SRE
-  - Toil
-  - Automation
-  - Productivity
-  - Operations
-seo_description: Toil의 정의, 측정, 자동화 우선순위와 손익을 설명합니다
 last_reviewed: '2026-05-12'
+seo_description: 반복 수작업 Toil의 정의와 측정법, 빈도와 시간 기준으로 자동화 우선순위와 손익분기점을 정하는 방법입니다.
+series: sre-101
+status: content-ready
+tags:
+- SRE
+- Toil
+- Automation
+- Productivity
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Toil 줄이기
 ---
 
 # Toil 줄이기

@@ -17,7 +17,7 @@ tags:
   - GuardClauses
   - Refactoring
   - Readability
-seo_description: 가드 절과 다형성으로 중첩 조건문을 줄이는 방법을 설명합니다.
+seo_description: 가드 절과 조기 반환으로 중첩 조건문을 평평하게 고칩니다. 다형성으로 분기를 분리하고 복잡한 분기를 단순화해 가독성을 높이는 기법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

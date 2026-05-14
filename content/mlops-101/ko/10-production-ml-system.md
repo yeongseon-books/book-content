@@ -16,7 +16,7 @@ tags:
   - Production
   - DataScience
   - Pipeline
-seo_description: MLOps 구성 요소를 하나의 운영 시스템으로 묶는 청사진을 정리합니다
+seo_description: 실험 관리부터 재학습까지의 MLOps 요소를 닫힌 운영 루프로 엮고, 팀의 성숙도를 평가하여 지속 가능한 ML 시스템을 구축하는 청사진입니다.
 last_reviewed: '2026-05-12'
 ---
 

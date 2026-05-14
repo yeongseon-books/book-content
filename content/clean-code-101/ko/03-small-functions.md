@@ -17,7 +17,7 @@ tags:
   - SRP
   - Refactoring
   - Readability
-seo_description: 작은 함수가 왜 중요한지와 안전한 추출 절차를 설명합니다.
+seo_description: 함수가 한 가지 일만 하도록 작게 쪼개는 원칙과 추출 방법을 배웁니다. 가독성을 높이고 테스트와 재사용이 쉬운 코드를 만드는 기법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

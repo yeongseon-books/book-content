@@ -16,7 +16,7 @@ tags:
   - Shortest Path
   - Dijkstra
   - heapq
-seo_description: 다익스트라와 heapq로 가중치 그래프의 최단 경로를 구합니다.
+seo_description: 가중치 그래프 최단 경로를 찾는 다익스트라 알고리즘 원리를 파이썬으로 구현합니다. heapq 우선순위 큐 활용과 경로 복원 방법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

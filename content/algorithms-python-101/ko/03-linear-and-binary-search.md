@@ -16,7 +16,7 @@ tags:
   - Linear Search
   - Binary Search
   - bisect
-seo_description: 선형 탐색과 이진 탐색의 차이와 bisect 활용법을 배웁니다.
+seo_description: 선형 탐색과 이진 탐색의 차이를 파이썬 예제로 비교합니다. 정렬된 데이터에서 효율적인 이진 탐색 구현과 bisect 모듈 활용법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

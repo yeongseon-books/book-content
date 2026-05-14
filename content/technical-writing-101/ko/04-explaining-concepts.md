@@ -1,23 +1,23 @@
 ---
-series: technical-writing-101
 episode: 4
-title: 개념 설명하기
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - TechnicalWriting
-  - Concept
-  - Explanation
-  - Analogy
-  - Beginner
-seo_description: 어려운 기술 개념을 비유와 예시로 쉽게 설명하는 방법을 정리한 글
 last_reviewed: '2026-05-12'
+seo_description: 기술 개념을 한 줄 정의, 비유, 반례, 예시로 쉽게 설명하고 흔한 오해를 방지하는 실무적인 설명 원칙을 다룹니다.
+series: technical-writing-101
+status: publish-ready
+tags:
+- TechnicalWriting
+- Concept
+- Explanation
+- Analogy
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 개념 설명하기
 ---
 
 # 개념 설명하기

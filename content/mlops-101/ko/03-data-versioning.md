@@ -16,7 +16,7 @@ tags:
   - DataVersioning
   - Reproducibility
   - DataScience
-seo_description: 데이터 버전을 남겨 재현 가능한 ML 파이프라인을 만드는 방법을 설명합니다
+seo_description: 데이터 포인터와 원격 저장소를 활용하여, 코드와 데이터를 한 세트로 관리하고 학습 결과를 완벽하게 재현하는 데이터 버전 관리 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

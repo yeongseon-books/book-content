@@ -16,7 +16,7 @@ tags:
   - Tables
   - Visual
   - Beginner
-seo_description: 그림과 표를 사용해 기술 글의 이해도를 높이는 방법을 정리한 글
+seo_description: 텍스트 위주의 기술 문서에서 그림과 표를 적재적소에 활용하여 복잡한 흐름을 시각화하고 선택지를 비교 분석하는 효율적인 방법을 안내합니다.
 last_reviewed: '2026-05-12'
 ---
 

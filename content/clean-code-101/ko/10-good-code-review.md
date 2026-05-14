@@ -17,7 +17,7 @@ tags:
   - PullRequest
   - Quality
   - Collaboration
-seo_description: 좋은 PR 리뷰 기준과 실행 가능한 리뷰 코멘트 원칙을 설명합니다.
+seo_description: 좋은 코드 리뷰 기준과 실행 가능한 리뷰 코멘트 작성법을 익혀 팀의 개발 생산성과 코드 품질을 높이는 방법을 제안합니다.
 last_reviewed: '2026-05-12'
 ---
 

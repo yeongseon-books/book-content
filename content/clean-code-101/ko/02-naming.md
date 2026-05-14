@@ -17,7 +17,7 @@ tags:
   - Readability
   - Refactoring
   - SoftwareEngineering
-seo_description: 좋은 이름의 여섯 가지 신호와 안전한 이름 변경 절차를 설명합니다.
+seo_description: 좋은 이름의 신호와 검색 가능성, 도메인 용어 활용법을 배웁니다. 이름만으로 의도가 전달되게 고쳐 가독성과 유지보수성을 높이는 방법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

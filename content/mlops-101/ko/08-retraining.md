@@ -16,7 +16,7 @@ tags:
   - Automation
   - Pipeline
   - DataScience
-seo_description: 일정과 성능 신호를 바탕으로 모델을 안전하게 재학습하는 방법입니다
+seo_description: 명시적 트리거와 챔피언-챌린저 비교 정책을 바탕으로, 모델을 안전하게 재학습하고 프로덕션 환경에 승격시키는 운영 루프 구축 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

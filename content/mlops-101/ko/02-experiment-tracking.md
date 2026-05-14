@@ -16,7 +16,7 @@ tags:
   - MLflow
   - Reproducibility
   - DataScience
-seo_description: 실험 메타데이터를 기록해 재현 가능한 학습을 만드는 방법을 다룹니다
+seo_description: 실험 메타데이터를 기록하여 학습 과정을 재현 가능한 상태로 만들고, 팀 단위의 모델 비교와 의사결정 효율을 높이는 실험 관리 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

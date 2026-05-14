@@ -16,7 +16,7 @@ tags:
   - Prometheus
   - Observability
   - DataScience
-seo_description: 운영 중인 모델의 상태를 메트릭과 알림으로 관찰하는 방법을 설명합니다
+seo_description: 운영 중인 모델의 지연 시간과 예측 분포를 시각화하고, 이상 징후 발생 시 즉각 대응할 수 있는 모니터링 체계 구축 방법을 소개합니다.
 last_reviewed: '2026-05-12'
 ---
 

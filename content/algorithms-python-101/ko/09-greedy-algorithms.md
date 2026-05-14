@@ -16,7 +16,7 @@ tags:
   - Greedy
   - Optimization
   - Activity Selection
-seo_description: 그리디가 통하는 조건과 대표 문제를 Python으로 정리합니다.
+seo_description: 그리디 알고리즘 원리와 최적해 보장 조건을 파이썬으로 배웁니다. 활동 선택과 배낭 문제를 통해 그리디 전략 유효 상황과 반례 구별법을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

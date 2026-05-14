@@ -1,23 +1,23 @@
 ---
-series: technical-writing-101
 episode: 3
-title: 제목과 구조 잡기
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - TechnicalWriting
-  - Title
-  - Structure
-  - Outline
-  - Beginner
-seo_description: 검색에 잡히는 제목과 읽히는 글의 구조를 만드는 방법을 정리한 글
 last_reviewed: '2026-05-12'
+seo_description: SEO 제목과 헤딩 계층, 도입과 본문, 정리로 이어지는 기술 글의 표준 구조와 개요 설계 원칙을 정리합니다.
+series: technical-writing-101
+status: publish-ready
+tags:
+- TechnicalWriting
+- Title
+- Structure
+- Outline
+- Beginner
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 제목과 구조 잡기
 ---
 
 # 제목과 구조 잡기
