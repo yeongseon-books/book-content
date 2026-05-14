@@ -54,18 +54,20 @@
 </head>
 <body>
 <h1>The Data Portfolio</h1>
-<blockquote>
-<p>Data Science Career 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you compose a <em>data portfolio</em>?</p>
-<blockquote>
-<p>Problem to data to analysis to conclusion to reproducibility.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>One of the fastest ways to weaken a data portfolio is to mistake code volume for proof of ability. Repositories full of notebooks and model files can still leave a hiring manager unconvinced if they never make the problem, the decision process, or the result easy to read.</p>
+<p>Strong portfolios do something simpler and harder: they show a problem worth solving, a clean path through the data, a result that matters, and a reproducible way for someone else to inspect the work. That combination tells a much stronger story than “here is a model I trained.”</p>
 <p>This is post 4 in the Data Science Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What mix of projects gives a beginner portfolio better signal?</li>
+<li>Why do code-only repositories usually feel weak in interviews?</li>
+<li>What should a strong README explain first?</li>
+<li>Why does reproducibility matter so much in data work?</li>
+<li>How much visualization and documentation is enough before it turns noisy?</li>
+</ul>
+<blockquote>
+<p>A good data portfolio is not a collection of notebooks. It is a record of problem framing, analysis, results, and reproducibility that another person can evaluate quickly.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The shape of <em>three projects</em></li>
@@ -75,14 +77,11 @@
 <li><em>Documentation</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>It's the narrative, not the numbers, that gets you hired.</p>
+<p>Hiring managers usually remember the shape of the story before they remember the exact metric.</p>
+<p>If they can quickly understand the question, the data source, the method, the conclusion, and how to rerun the work, the project starts to look like evidence of judgment. Without that structure, even solid technical work can look unfinished or fragile.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[Question] --&gt; D[Data]
-    D --&gt; A[Analysis]
-    A --&gt; R[Result]
-    R --&gt; Repro[Reproducible]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>A portfolio becomes credible when problem framing, results, and reproducibility stay connected</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>portfolio</strong>: A curated set of best work.</li>
@@ -137,7 +136,8 @@ make run
 <li><strong>Excessive visualization.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Interviewers look at the problem and conclusion within five minutes.</p>
+<p>Interviewers often decide within a few minutes whether a project is worth deeper discussion. The first screen is usually the README, the main chart, and the conclusion.</p>
+<p>That is why portfolio quality depends less on maximum complexity and more on whether a reviewer can recover the intent and trust the execution without guessing.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Reproducibility first.</li>
@@ -160,7 +160,8 @@ make run
 <li>One line: criterion for a good README.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>SQL and Analytics Interviews</em>.</p>
+<p>The strongest beginner portfolio is usually not the flashiest one. It is the one that makes the problem legible, the method reproducible, and the conclusion easy to challenge or verify.</p>
+<p>The next post moves from portfolio evidence to interview execution by focusing on SQL and analytics interview patterns.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/01-what-is-data-career.md">What Is a Data Career</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/02-analyst-scientist-engineer.md">Analyst vs Scientist vs Engineer</a></li>
@@ -175,10 +176,10 @@ make run
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.kaggle.com/datasets">Kaggle Datasets</a></li>
-<li><a href="https://drivendata.github.io/cookiecutter-data-science/">Cookiecutter Data Science</a></li>
-<li><a href="https://madewithml.com/">Made with ML</a></li>
-<li><a href="https://towardsdatascience.com/">Towards Data Science portfolio guide</a></li>
+<li><a href="https://www.kaggle.com/datasets">Kaggle - Datasets</a></li>
+<li><a href="https://drivendata.github.io/cookiecutter-data-science/">DrivenData - Cookiecutter Data Science</a></li>
+<li><a href="https://madewithml.com/">Made With ML - MLOps and Project Structure Guides</a></li>
+<li><a href="https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">GitHub Docs - About READMEs</a></li>
 </ul>
 <p class="tags-line">Tags: DataCareer, Portfolio, GitHub, Notebook, Beginner</p>
 </body>
