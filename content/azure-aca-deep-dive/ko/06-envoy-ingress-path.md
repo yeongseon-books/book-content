@@ -14,8 +14,8 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-05-12'
-seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
+last_reviewed: '2026-05-15'
+seo_description: ACA의 첫 HTTPS 요청이 Ingress, Envoy형 라우팅, ready replica를 거쳐 사용자 컨테이너에 닿는 경로를 따라갑니다.
 ---
 
 # Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지

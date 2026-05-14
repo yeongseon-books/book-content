@@ -14,8 +14,8 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-05-12'
-seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
+last_reviewed: '2026-05-15'
+seo_description: ACA Revision의 불변성과 트래픽 분할을 묶어 보고 Envoy 가중치가 어디에서 실제 라우팅이 되는지 설명합니다.
 ---
 
 # Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가
