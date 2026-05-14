@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Authorization and Permissions
 
+This is post 4 in the Secure Coding 101 series.
+
 > Secure Coding 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

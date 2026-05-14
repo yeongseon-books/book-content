@@ -24,6 +24,8 @@ seo_description: Type hints declare the input and output types of functions, and
 
 # Type Hints and Static Analysis
 
+This is post 8 in the Python Package 101 series.
+
 > Python Package 101 series (8/10)
 
 ---

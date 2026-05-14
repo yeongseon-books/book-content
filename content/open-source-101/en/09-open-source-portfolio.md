@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # An Open Source Portfolio
 
+This is post 9 in the Open Source 101 series.
+
 > Open Source 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

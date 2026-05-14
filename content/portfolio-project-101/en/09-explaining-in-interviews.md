@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Explaining in Interviews
 
+This is post 9 in the Portfolio Project 101 series.
+
 > Portfolio Project 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

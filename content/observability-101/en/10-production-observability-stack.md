@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # A Production-Ready Observability Stack
 
+This is the final post in the Observability 101 series.
+
 > Observability 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

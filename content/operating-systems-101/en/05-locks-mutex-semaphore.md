@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Locks, Mutexes, and Semaphores
 
+This is post 5 in the Operating Systems 101 series.
+
 > Operating Systems 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

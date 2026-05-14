@@ -24,6 +24,8 @@ seo_description: SemVer assigns meaning to version numbers, and Git tags mark sp
 
 # Versioning and Releases
 
+This is post 6 in the Python Package 101 series.
+
 > Python Package 101 series (6/10)
 
 ---

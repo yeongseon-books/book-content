@@ -23,6 +23,8 @@ title: Writing Testable Code
 
 # Writing Testable Code
 
+This is the final post in the pytest 101 series.
+
 > pytest 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

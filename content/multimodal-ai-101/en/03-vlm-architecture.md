@@ -23,6 +23,8 @@ seo_description: Episode 2 covered CLIP, which aligns image and text in the same
 
 # Vision-Language Model Architecture
 
+This is post 3 in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (3/10)
 
 ---

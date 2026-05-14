@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Expectation and Variance
 
+This is post 6 in the Probability 101 series.
+
 > Probability 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

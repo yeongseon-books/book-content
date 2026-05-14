@@ -21,6 +21,8 @@ seo_description: If you cannot see what the agent did, you cannot debug it or im
 
 # Observability — Tracing and Replaying Agent Work
 
+This is post 9 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (9/10)
 
 If you cannot see what the agent did, you cannot debug it or improve it. Observability is the practice of making every step of the agent traceable, recordable, and replayable.

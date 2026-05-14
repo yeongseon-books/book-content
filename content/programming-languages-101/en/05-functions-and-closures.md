@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Functions and Closures
 
+This is post 5 in the Programming Languages 101 series.
+
 > Programming Languages 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

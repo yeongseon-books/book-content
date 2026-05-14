@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # SQL Injection and Safe ORM Usage
 
+This is post 7 in the Secure Coding 101 series.
+
 > Secure Coding 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

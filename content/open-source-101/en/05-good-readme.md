@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # A Good README
 
+This is post 5 in the Open Source 101 series.
+
 > Open Source 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

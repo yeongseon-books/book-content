@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Merge and Join
 
+This is post 7 in the Pandas 101 series.
+
 > Pandas 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

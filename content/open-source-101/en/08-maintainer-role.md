@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # The Maintainer Role
 
+This is post 8 in the Open Source 101 series.
+
 > Open Source 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

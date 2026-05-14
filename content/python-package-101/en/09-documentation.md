@@ -24,6 +24,8 @@ seo_description: A README is the front door of your package and an API Reference
 
 # Documentation — README, MkDocs, API Reference
 
+This is post 9 in the Python Package 101 series.
+
 > Python Package 101 series (9/10)
 
 ---

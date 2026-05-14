@@ -21,6 +21,8 @@ seo_description: Give an agent a vague instruction and you get a vague result. T
 
 # Task Harness — Turning Vague Work into Executable Tasks
 
+This is post 2 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (2/10)
 
 Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.

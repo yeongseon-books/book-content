@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Safe Logging and Audit
 
+This is the final post in the Secure Coding 101 series.
+
 > Secure Coding 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Secure Coding?
 
+This is the first post in the Secure Coding 101 series.
+
 > Secure Coding 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

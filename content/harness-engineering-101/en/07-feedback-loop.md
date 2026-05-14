@@ -21,6 +21,8 @@ seo_description: Agents rarely succeed on the first try. A Feedback Loop is the 
 
 # Feedback Loops — Building Structures That Let Agents Recover from Failure
 
+This is post 7 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (7/10)
 
 Agents rarely succeed on the first try. A Feedback Loop is the structure that hands failure back to the agent so it can fix its own work.

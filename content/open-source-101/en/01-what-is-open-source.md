@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Open Source
 
+This is the first post in the Open Source 101 series.
+
 > Open Source 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

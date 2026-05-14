@@ -23,6 +23,8 @@ seo_description: The quality of any multimodal system ultimately rides on the qu
 
 # Image Encoders: CLIP and ViT
 
+This is post 2 in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (2/10)
 
 ---

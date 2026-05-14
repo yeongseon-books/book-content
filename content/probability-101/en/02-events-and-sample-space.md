@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Events and Sample Space
 
+This is post 2 in the Probability 101 series.
+
 > Probability 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

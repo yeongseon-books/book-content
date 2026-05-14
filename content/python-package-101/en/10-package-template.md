@@ -24,6 +24,8 @@ seo_description: A package template automates the repetitive setup work when sta
 
 # Production Package Template
 
+This is the final post in the Python Package 101 series.
+
 > Python Package 101 series (10/10)
 
 ---

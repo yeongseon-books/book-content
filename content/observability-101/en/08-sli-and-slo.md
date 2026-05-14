@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # SLI and SLO Basics
 
+This is post 8 in the Observability 101 series.
+
 > Observability 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

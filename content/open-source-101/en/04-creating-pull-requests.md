@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Creating Pull Requests
 
+This is post 4 in the Open Source 101 series.
+
 > Open Source 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

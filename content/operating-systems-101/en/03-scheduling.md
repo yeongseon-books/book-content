@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Scheduling
 
+This is post 3 in the Operating Systems 101 series.
+
 > Operating Systems 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

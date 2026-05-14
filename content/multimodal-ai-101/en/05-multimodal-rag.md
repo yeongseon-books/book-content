@@ -23,6 +23,8 @@ seo_description: A typical RAG system splits documents into chunks, embeds them 
 
 # Multimodal RAG: Searching Images and Text Together
 
+This is post 5 in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (5/10)
 
 ---

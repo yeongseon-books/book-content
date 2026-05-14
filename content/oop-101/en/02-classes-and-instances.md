@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Classes and Instances
 
+This is post 2 in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (2/10)
 
 <!-- a-grade-intro:begin -->

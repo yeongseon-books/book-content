@@ -23,6 +23,8 @@ seo_description: 'After ChatGPT shipped in late 2022, a quiet assumption took ho
 
 # Why Multimodal AI Matters
 
+This is the first post in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (1/10)
 
 ---

@@ -21,6 +21,8 @@ seo_description: Good agents are not made by good models alone. You must design 
 
 # What Is Harness Engineering?
 
+This is the first post in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (1/10)
 
 Good agents are not made by good models alone. You must design the environment, constraints, tools, and verification loops the model works inside. Harness Engineering is the discipline of designing that environment so the agent can work reliably.

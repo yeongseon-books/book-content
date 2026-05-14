@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # What Makes a Good Language Design?
 
+This is the final post in the Programming Languages 101 series.
+
 > Programming Languages 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # SOLID Principles Basics
 
+This is post 8 in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (8/10)
 
 <!-- a-grade-intro:begin -->

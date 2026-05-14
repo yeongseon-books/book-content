@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Release and Versioning
 
+This is post 6 in the Open Source 101 series.
+
 > Open Source 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

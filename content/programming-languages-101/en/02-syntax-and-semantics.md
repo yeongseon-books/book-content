@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Syntax and Semantics
 
+This is post 2 in the Programming Languages 101 series.
+
 > Programming Languages 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

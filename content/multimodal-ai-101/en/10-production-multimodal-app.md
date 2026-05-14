@@ -24,6 +24,8 @@ seo_description: The first nine episodes covered image encoders, VLM architectur
 
 # Building a Production Multimodal Application
 
+This is the final post in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (10/10)
 
 ---

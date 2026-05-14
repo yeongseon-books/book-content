@@ -21,6 +21,8 @@ seo_description: Some actions must never run automatically. Payments, deploys, d
 
 # Approval Gates — Designing Where Humans Must Approve
 
+This is post 8 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (8/10)
 
 Some actions must never run automatically. Payments, deploys, deletes, and outbound messages need human approval. An Approval Gate makes the place where a human must stop and review explicit.

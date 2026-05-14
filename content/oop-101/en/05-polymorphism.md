@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Polymorphism
 
+This is post 5 in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (5/10)
 
 <!-- a-grade-intro:begin -->

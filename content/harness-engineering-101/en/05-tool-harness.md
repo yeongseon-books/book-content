@@ -21,6 +21,8 @@ seo_description: Tools are the hands and feet of an agent. Poorly designed tools
 
 # Tool Harness — Designing Safe Tools for Agents
 
+This is post 5 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (5/10)
 
 Tools are the hands and feet of an agent. Poorly designed tools can corrupt data or blow up costs. The Tool Harness is about designing tools that are safe, predictable, and easy for the agent to use correctly.

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # apply and Vectorization
 
+This is post 9 in the Pandas 101 series.
+
 > Pandas 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

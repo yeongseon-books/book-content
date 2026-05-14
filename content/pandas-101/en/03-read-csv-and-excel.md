@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Reading CSV and Excel
 
+This is post 3 in the Pandas 101 series.
+
 > Pandas 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

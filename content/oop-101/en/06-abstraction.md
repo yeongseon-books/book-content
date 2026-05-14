@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Abstraction
 
+This is post 6 in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (6/10)
 
 <!-- a-grade-intro:begin -->

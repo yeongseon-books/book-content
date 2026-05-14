@@ -21,6 +21,8 @@ seo_description: The context an agent receives shapes its output. Too little and
 
 # Context Harness — Designing What the Agent Should Know and Not Know
 
+This is post 3 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (3/10)
 
 The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.

@@ -24,6 +24,8 @@ seo_description: An entry point registers a terminal command that runs after pip
 
 # CLI Packages
 
+This is post 7 in the Python Package 101 series.
+
 > Python Package 101 series (7/10)
 
 ---

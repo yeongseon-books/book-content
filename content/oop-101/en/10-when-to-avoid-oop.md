@@ -22,6 +22,10 @@ last_reviewed: '2026-05-04'
 
 # When to Avoid OOP
 
+This is the final post in the Object-Oriented Programming 101 series.
+
+This is the final post in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (10/10)
 
 <!-- a-grade-intro:begin -->

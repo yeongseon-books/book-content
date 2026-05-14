@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Observability?
 
+This is the first post in the Observability 101 series.
+
 > Observability 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

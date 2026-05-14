@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Random Variables
 
+This is post 5 in the Probability 101 series.
+
 > Probability 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

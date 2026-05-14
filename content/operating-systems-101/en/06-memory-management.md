@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Memory Management
 
+This is post 6 in the Operating Systems 101 series.
+
 > Operating Systems 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

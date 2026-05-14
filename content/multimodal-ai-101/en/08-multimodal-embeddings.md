@@ -24,6 +24,8 @@ seo_description: 'Episode 5 covered the big picture of multimodal RAG. This epis
 
 # Multimodal Embeddings and Cross-modal Search
 
+This is post 8 in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (8/10)
 
 ---

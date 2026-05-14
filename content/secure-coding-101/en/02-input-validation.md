@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Input Validation
 
+This is post 2 in the Secure Coding 101 series.
+
 > Secure Coding 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

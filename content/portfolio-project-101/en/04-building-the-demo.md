@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Building the Demo
 
+This is post 4 in the Portfolio Project 101 series.
+
 > Portfolio Project 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

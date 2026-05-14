@@ -21,6 +21,8 @@ seo_description: Give an agent freedom and you get creativity along with risk. T
 
 # Constraint Harness — Defining Rules, Boundaries, and Forbidden Actions
 
+This is post 4 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (4/10)
 
 Give an agent freedom and you get creativity along with risk. The Constraint Harness is the rule system that declares what actions are allowed and what actions are forbidden.

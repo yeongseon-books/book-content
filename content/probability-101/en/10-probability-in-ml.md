@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Probability in Machine Learning
 
+This is the final post in the Probability 101 series.
+
 > Probability 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

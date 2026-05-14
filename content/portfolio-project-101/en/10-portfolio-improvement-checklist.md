@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Portfolio Improvement Checklist
 
+This is the final post in the Portfolio Project 101 series.
+
 > Portfolio Project 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

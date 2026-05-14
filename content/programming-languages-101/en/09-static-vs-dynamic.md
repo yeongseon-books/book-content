@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Static vs Dynamic Languages
 
+This is post 9 in the Programming Languages 101 series.
+
 > Programming Languages 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

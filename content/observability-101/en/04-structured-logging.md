@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Structured Logging
 
+This is post 4 in the Observability 101 series.
+
 > Observability 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

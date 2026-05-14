@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Objects and Prototypes
 
+This is post 6 in the Programming Languages 101 series.
+
 > Programming Languages 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

@@ -24,6 +24,8 @@ seo_description: src layout separates source code from the project root to enfor
 
 # Project Structure — src layout and pyproject.toml
 
+This is post 2 in the Python Package 101 series.
+
 > Python Package 101 series (2/10)
 
 ---

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Deploying the Project
 
+This is post 5 in the Portfolio Project 101 series.
+
 > Portfolio Project 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

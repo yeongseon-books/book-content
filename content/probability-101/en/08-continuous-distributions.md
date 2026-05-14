@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Continuous Distributions
 
+This is post 8 in the Probability 101 series.
+
 > Probability 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

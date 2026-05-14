@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # System Calls
 
+This is post 9 in the Operating Systems 101 series.
+
 > Operating Systems 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

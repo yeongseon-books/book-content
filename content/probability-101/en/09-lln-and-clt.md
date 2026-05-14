@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Law of Large Numbers and CLT
 
+This is post 9 in the Probability 101 series.
+
 > Probability 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

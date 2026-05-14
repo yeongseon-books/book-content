@@ -24,6 +24,8 @@ seo_description: A Python package bundles reusable code for sharing. Everything 
 
 # What Is a Python Package?
 
+This is the first post in the Python Package 101 series.
+
 > Python Package 101 series (1/10)
 
 ---

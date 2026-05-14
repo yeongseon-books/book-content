@@ -22,6 +22,8 @@ seo_description: Build efficient image captioning and OCR pipelines. Learn about
 
 # Image Captioning and OCR Pipelines
 
+This is post 4 in the Multimodal AI 101 series.
+
 > Multimodal AI 101 series (4/10)
 
 ---

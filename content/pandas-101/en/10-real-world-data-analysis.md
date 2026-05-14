@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Real-world Data Analysis
 
+This is the final post in the Pandas 101 series.
+
 > Pandas 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,10 @@ last_reviewed: '2026-05-04'
 
 # What Is Object-Oriented Programming?
 
+This is the first post in the Object-Oriented Programming 101 series.
+
+This is the first post in the Object-Oriented Programming 101 series.
+
 > Object-Oriented Programming 101 Series (1/10)
 
 <!-- a-grade-intro:begin -->

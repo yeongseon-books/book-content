@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Bayes' Theorem
 
+This is post 4 in the Probability 101 series.
+
 > Probability 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

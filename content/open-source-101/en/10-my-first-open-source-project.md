@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # My First Open Source Project
 
+This is the final post in the Open Source 101 series.
+
 > Open Source 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

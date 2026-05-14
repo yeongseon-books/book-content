@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Conditional Probability
 
+This is post 3 in the Probability 101 series.
+
 > Probability 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

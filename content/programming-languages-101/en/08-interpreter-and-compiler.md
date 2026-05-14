@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Interpreters and Compilers
 
+This is post 8 in the Programming Languages 101 series.
+
 > Programming Languages 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

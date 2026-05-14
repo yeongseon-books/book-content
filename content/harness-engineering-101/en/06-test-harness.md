@@ -21,6 +21,8 @@ seo_description: When an agent says "done", only tests can confirm whether the w
 
 # Test Harness — Turning Completion Criteria into Tests
 
+This is post 6 in the Harness Engineering 101 series.
+
 > Harness Engineering 101 Series (6/10)
 
 When an agent says "done", only tests can confirm whether the work is actually done. The Test Harness pins completion criteria into automated checks the agent must pass.

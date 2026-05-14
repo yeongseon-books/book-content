@@ -22,6 +22,10 @@ last_reviewed: '2026-05-04'
 
 # Metrics, Logs, and Traces
 
+This is post 2 in the Observability 101 series.
+
+This is post 2 in the Observability 101 series.
+
 > Observability 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

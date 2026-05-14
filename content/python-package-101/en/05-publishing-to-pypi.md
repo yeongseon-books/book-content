@@ -24,6 +24,8 @@ seo_description: PyPI is the app store for Python packages and twine is the tool
 
 # Publishing to PyPI — from TestPyPI to production
 
+This is post 5 in the Python Package 101 series.
+
 > Python Package 101 series (5/10)
 
 ---

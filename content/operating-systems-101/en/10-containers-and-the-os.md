@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Containers and the Operating System
 
+This is the final post in the Operating Systems 101 series.
+
 > Operating Systems 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

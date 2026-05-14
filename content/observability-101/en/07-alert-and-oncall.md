@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Alerts and On-Call
 
+This is post 7 in the Observability 101 series.
+
 > Observability 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

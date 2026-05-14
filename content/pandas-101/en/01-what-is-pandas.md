@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Pandas?
 
+This is the first post in the Pandas 101 series.
+
 > Pandas 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

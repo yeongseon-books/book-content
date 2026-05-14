@@ -24,6 +24,8 @@ seo_description: A virtual environment gives each project its own package space,
 
 # Dependency Management — venv, pip, uv, requirements
 
+This is post 3 in the Python Package 101 series.
+
 > Python Package 101 series (3/10)
 
 ---
