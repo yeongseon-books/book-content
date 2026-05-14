@@ -14,7 +14,7 @@ tags:
 - Audit Logging
 - Compliance
 - GDPR
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: LLM 시스템에서 audit log는 단순 디버깅이 아니라 컴플라이언스, 사고 조사, 모델 개선의 기준 자료입니다.
 ---
 
@@ -147,7 +147,7 @@ def append_with_chain(record: dict):
     audit_db.insert(record)
 ```
 
-hash chain은 비용이 거의 없으면서도 나중에 변조 여부를 자동 검증할 수 있게 해 줍니다.
+hash chain은 비용이 거의 들지 않으면서도 나중에 변조 여부를 자동으로 검증하게 해 줍니다.
 
 ### decision rationale이 있어야 규제 대응이 가능합니다
 
@@ -233,7 +233,7 @@ def monthly_report(year: int, month: int) -> dict:
 
 실무에서는 원문 데이터와 audit 데이터를 분리하고, append-only 무결성을 기술적으로 강제하며, decision rationale을 구조화된 필드로 남기는 방식이 가장 안정적입니다. 여기에 보존과 삭제 기록까지 들어가야 컴플라이언스가 완성됩니다.
 
-핵심은 간단합니다. 로그를 남기는 것보다 중요한 일은, 그 로그가 나중에도 신뢰될 수 있게 만드는 것입니다.
+더 중요한 일은 로그를 남기는 것 자체보다, 그 로그가 나중에도 신뢰될 수 있게 만드는 일입니다.
 
 <!-- toc:begin -->
 ## AI Safety & Guardrails 101 시리즈

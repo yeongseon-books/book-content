@@ -14,7 +14,7 @@ tags:
 - Audit Logging
 - Compliance
 - GDPR
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Maintain decision traceability and compliance with GDPR and HIPAA through immutable audit logs, hash chains, and secure PII-separated storage.
 ---
 
@@ -27,7 +27,14 @@ In an LLM system, audit logs are not just verbose application logs. They are the
 This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Why must audit logs live separately from ordinary application logs?
+- Which fields are required to reconstruct an LLM decision later?
+- Why should raw prompts and responses stay outside the audit store?
+- How do you prove append-only integrity instead of merely claiming it?
+- Why do retention and deletion events need their own audit trail?
 
 ## Why Audit Logs Differ From Application Logs
 
@@ -223,6 +230,14 @@ Send the report monthly to security, compliance, and leadership. Anomalies show 
 - Capture decision rationale (query, chunks, params, guardrail decisions) so replay and regulatory response are possible.
 - Automate retention deletion and log the deletions themselves to preserve audit integrity.
 
+## Operational Checklist
+
+- [ ] Keep audit schema and application-log schema in different stores.
+- [ ] Store raw prompts and responses only in a short-retention encrypted store.
+- [ ] Enforce append-only integrity with WORM controls, hash chains, or both.
+- [ ] Log retrieval context, model parameters, and guardrail decisions for replay.
+- [ ] Audit every retention-driven deletion and user-requested erasure.
+
 ---
 
 <!-- toc:begin -->
@@ -242,9 +257,16 @@ Send the report monthly to security, compliance, and leadership. Anomalies show 
 
 ## References
 
-- [GDPR - Article 30: Records of processing activities](https://gdpr-info.eu/art-30-gdpr/)
-- [HIPAA Security Rule - Audit controls](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
-- [SOC 2 - Trust Services Criteria](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
-- [AWS S3 Object Lock - Compliance mode](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html)
+### Official Docs
+
+- [GDPR Article 30 — Records of processing activities](https://gdpr-info.eu/art-30-gdpr/)
+- [HIPAA Security Rule — audit controls](https://www.hhs.gov/hipaa/for-professionals/security/index.html)
+- [AICPA SOC 2 Trust Services Criteria](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
+- [AWS S3 Object Lock — compliance mode](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html)
+- [Microsoft Learn — Azure Storage immutable blobs](https://learn.microsoft.com/azure/storage/blobs/immutable-policy-configure-version-scope)
+
+### Verification-Friendly Sources
+
+- [ClickHouse documentation — immutable event pipelines](https://clickhouse.com/docs/en/cloud/bestpractices/using-materialized-views)
 
 Tags: AI Safety, Audit Logging, Compliance, GDPR

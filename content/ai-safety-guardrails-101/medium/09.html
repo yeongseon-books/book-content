@@ -60,7 +60,14 @@
 <p>In an LLM system, audit logs are not just verbose application logs. They are the record you rely on later for compliance, incident review, and decision traceability.</p>
 <p>This is post 9 in the AI Safety &amp; Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why must audit logs live separately from ordinary application logs?</li>
+<li>Which fields are required to reconstruct an LLM decision later?</li>
+<li>Why should raw prompts and responses stay outside the audit store?</li>
+<li>How do you prove append-only integrity instead of merely claiming it?</li>
+<li>Why do retention and deletion events need their own audit trail?</li>
+</ul>
 <h2>Why Audit Logs Differ From Application Logs</h2>
 <p>In LLM systems, audit logs are the basis for compliance, incident investigation, and model improvement, not casual debugging. Design them separately from application logs.</p>
 <p><strong>Retention</strong><br>
@@ -237,6 +244,14 @@ def gc_pii_store():
 <li>Capture decision rationale (query, chunks, params, guardrail decisions) so replay and regulatory response are possible.</li>
 <li>Automate retention deletion and log the deletions themselves to preserve audit integrity.</li>
 </ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Keep audit schema and application-log schema in different stores.</li>
+<li>[ ] Store raw prompts and responses only in a short-retention encrypted store.</li>
+<li>[ ] Enforce append-only integrity with WORM controls, hash chains, or both.</li>
+<li>[ ] Log retrieval context, model parameters, and guardrail decisions for replay.</li>
+<li>[ ] Audit every retention-driven deletion and user-requested erasure.</li>
+</ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>
 <ul>
@@ -252,11 +267,17 @@ def gc_pii_store():
 <li>Ep10 Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://gdpr-info.eu/art-30-gdpr/">GDPR - Article 30: Records of processing activities</a></li>
-<li><a href="https://www.hhs.gov/hipaa/for-professionals/security/index.html">HIPAA Security Rule - Audit controls</a></li>
-<li><a href="https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services">SOC 2 - Trust Services Criteria</a></li>
-<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html">AWS S3 Object Lock - Compliance mode</a></li>
+<li><a href="https://gdpr-info.eu/art-30-gdpr/">GDPR Article 30 — Records of processing activities</a></li>
+<li><a href="https://www.hhs.gov/hipaa/for-professionals/security/index.html">HIPAA Security Rule — audit controls</a></li>
+<li><a href="https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services">AICPA SOC 2 Trust Services Criteria</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html">AWS S3 Object Lock — compliance mode</a></li>
+<li><a href="https://learn.microsoft.com/azure/storage/blobs/immutable-policy-configure-version-scope">Microsoft Learn — Azure Storage immutable blobs</a></li>
+</ul>
+<p><strong>Verification-Friendly Sources</strong></p>
+<ul>
+<li><a href="https://clickhouse.com/docs/en/cloud/bestpractices/using-materialized-views">ClickHouse documentation — immutable event pipelines</a></li>
 </ul>
 <p class="tags-line">Tags: AI Safety, Audit Logging, Compliance, GDPR</p>
 </body>
