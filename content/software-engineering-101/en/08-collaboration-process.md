@@ -18,22 +18,16 @@ tags:
   - RFC
   - Async
 seo_description: How to write RFCs, async-first decision making, decision logs, and practical patterns to cut meeting time without losing clarity.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Collaboration Process
 
-This is post 8 in the Software Engineering 101 series.
+Products are never built by code alone. Requirements, design decisions, risk checks, rollout timing, and support handoffs all pull multiple people into the same system. When the process is weak, decisions start following habit, hierarchy, or who spoke last instead of what the evidence says.
 
-> Software Engineering 101 series (8/10)
+More meetings do not solve that problem. They often make it worse by consuming the most expensive resource in the team at the same time: focused human hours. Strong collaboration processes protect that resource by making discussion searchable, narrowing sync time to actual decisions, and leaving a trail that survives time zones and handoffs.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do outcomes get better when there are fewer meetings?
-
-> Async decisions return time to everyone and leave a written trail.
-
-<!-- a-grade-intro:end -->
+This is post 8 in the Software Engineering 101 series. In this chapter, we treat RFCs, async comments, decision logs, and handoff notes as concrete engineering tools rather than management overhead.
 
 ## What You Will Learn
 
@@ -51,13 +45,8 @@ Code can be written alone, but products are not. Without a process, technical de
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["RFC draft"] --> C["Async comments"]
-    C --> M["Short decision meeting"]
-    M --> D["Decision log"]
-    D --> E["Execution"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)
+*The collaboration flow from RFC draft to async discussion and decision log*
 
 Async-first; sync only at the moment of decision.
 
@@ -146,6 +135,28 @@ The same debate never happens twice.
 ```
 
 The async interface of distributed teams.
+
+## A collaboration-flow check
+
+Good process reduces repeated debate more than it increases written artifacts. Take one recent decision and see whether the RFC, approver, and written outcome are all discoverable without asking around.
+
+### Verification steps
+
+1. Pick one recent change and locate the proposal document or RFC.
+2. Identify the approver and the moment the decision closed.
+3. Check whether a handoff note exists for the next person or time zone.
+
+**Expected output:**
+
+- Strong async discussion keeps sync meetings short and decision-focused.
+- A searchable decision log prevents the same argument from restarting later.
+- Handoff notes reduce work loss across role or timezone boundaries.
+
+### Failure modes to watch
+
+- Different attendees remember the decision differently.
+- Comments accumulate, but no approver closes the loop.
+- The next owner reconstructs context from chat history instead of a written handoff.
 
 ## What to Notice in This Code
 
