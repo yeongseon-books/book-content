@@ -17,7 +17,7 @@ tags:
   - Contribution
   - Beginner
 seo_description: 오픈소스를 단순한 무료 코드를 넘어 권리, 책임, 협업 문화가 공존하는 생태계로 정의하고 기본 용어와 참여 경로를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 오픈소스란 무엇인가
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한 번에 잡는 개념 지도
 
-```mermaid
-flowchart LR
-    U[사용자] --> C[기여자]
-    C --> M[메인테이너]
-    M --> P[프로젝트]
-```
+![한 번에 잡는 개념 지도](../../../assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.ko.png)
 
+*사용자, 기여자, 메인테이너가 순환하며 프로젝트를 키우는 기본 참여 구조*
 이 그림을 위계도로 읽으면 반만 이해한 셈입니다. 실제로는 순환 구조에 더 가깝습니다. 사용자는 버그를 발견해 이슈를 남길 수 있고, 문서 오타를 고치면서 기여자가 될 수 있습니다. 기여자는 경험이 쌓이면 리뷰를 맡고, 장기적으로는 메인테이너 역할까지 이어질 수 있습니다. 오픈소스의 핵심은 모두가 같은 수준이라는 말이 아니라, 참여 경로가 열려 있다는 점입니다.
 
 그래서 오픈소스는 파일이 공개돼 있다는 사실만으로 정의되지 않습니다. 코드를 읽을 수 있어야 하고, 수정할 수 있어야 하며, 다시 배포할 수 있어야 합니다. 여기에 실제로 사람을 받아들이는 운영 문화가 더해져야 비로소 살아 있는 프로젝트가 됩니다.
@@ -172,6 +168,7 @@ gh repo star fastapi/fastapi
 - [Open Source Initiative](https://opensource.org/osd)
 - [Free Software Foundation - GNU Project](https://www.gnu.org/philosophy/free-sw.html)
 - [Open Source Guides - GitHub](https://opensource.guide/)
+- [github/opensource.guide 저장소](https://github.com/github/opensource.guide)
 - [The Cathedral and the Bazaar - Eric Raymond](http://www.catb.org/~esr/writings/cathedral-bazaar/)
 
 Tags: OpenSource, GitHub, Community, Contribution, Beginner
