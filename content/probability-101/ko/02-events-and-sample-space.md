@@ -17,7 +17,7 @@ tags:
   - SetTheory
   - Beginner
 seo_description: 모든 결과를 담는 표본공간과 사건의 개념을 집합론 관점에서 정의하고, 복잡한 확률 문제를 푸는 기초 틀을 마련합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 사건과 표본공간
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Omega["표본공간 Omega"] --> A["사건 A"]
-    Omega --> B["사건 B"]
-    A --> Union["A 또는 B"]
-    B --> Inter["A 그리고 B"]
-    A --> Comp["A의 여사건"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/02/02-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
