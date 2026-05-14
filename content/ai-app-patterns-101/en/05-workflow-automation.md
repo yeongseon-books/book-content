@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Workflow automation removes model choice and replaces it with a pipeline
   that follows human-defined stages and data contracts.
 ---
@@ -328,8 +328,8 @@ print(f"\n=== final report ===\n{result['report']}")
 
 ## What to notice in this code
 
-- `main.py` breaks the same support ticket into three sequential stages: summarization, category classification, and tag suggestion.
-- Every stage returns a `dict`, which makes intermediate outputs easy to log, inspect, or persist.
+- `code_review_pipeline()` shows three explicit handoffs: JSON analysis, free-form suggestions, and a final condensed report.
+- The intermediate `analysis` object acts as a contract, which makes logging and validation much easier than passing only raw strings.
 - This structure is friendly to operational controls such as approval, routing, and retry policies.
 
 ---
