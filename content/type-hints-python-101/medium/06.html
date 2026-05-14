@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Protocol and Structural Typing</h1>
-<p>This is post 6 in the Type Hints in Python 101 series.</p>
-<blockquote>
-<p>Type Hints in Python 101 Series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Can you define "this object must have these methods" without requiring inheritance?</p>
-<blockquote>
-<p>Python's duck typing says "if it walks like a duck and quacks like a duck, it is a duck." But traditional Abstract Base Classes (ABCs) require explicit inheritance, which breaks when you cannot modify the class — like third-party library classes. <code>Protocol</code> brings duck typing into the static type system. If a class has the right methods, it satisfies the Protocol — no inheritance needed. This article covers Protocol, its relationship to structural typing, and practical patterns.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Python has always leaned on duck typing. If an object has <code>close()</code>, we close it. If it has <code>render()</code>, we render it. The friction starts when you want that flexibility to survive code review and CI, not just runtime.</p>
+<p>This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how <code>Protocol</code> captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Protocol definition and structural typing principles</li>
@@ -91,6 +81,8 @@
         └──── structural match ──────────────┘
               (no inheritance needed)
 </code></pre>
+<p><img alt="How Protocol and ABC evaluate compatibility" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>How Protocol and ABC evaluate compatibility</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Protocol</strong><br>
 - Description: A class that defines required methods/attributes without requiring inheritance</p>
@@ -229,6 +221,27 @@ class Executable(Protocol):
     def execute(self) -&gt; None: ...
 </code></pre>
 <p>Use ABC when you provide shared implementation. Use Protocol when you define an interface for code you do not control.</p>
+<h2>Migration Pattern for a Real Codebase</h2>
+<p>In a real repository, you usually do not start with a clean <code>Protocol</code> design. You inherit code that already has <code>S3Storage</code>, <code>LocalStorage</code>, <code>FakeStorage</code>, and a service layer that refers to those concrete classes directly. The safest first move is not to force everything under a new base class. It is to extract the smallest interface the service already depends on.</p>
+<p>For example, if the upload flow only needs <code>save()</code> and <code>open()</code>, define a <code>StorageBackend</code> Protocol with just those methods and change the service signature first. Then run mypy or pyright to confirm that the existing implementations satisfy the contract without any inheritance changes.</p>
+<pre><code class="language-python">from typing import Protocol
+
+class StorageBackend(Protocol):
+    def save(self, path: str, data: bytes) -&gt; None: ...
+    def open(self, path: str) -&gt; bytes: ...
+
+def publish_report(storage: StorageBackend, path: str, data: bytes) -&gt; bytes:
+    storage.save(path, data)
+    return storage.open(path)
+</code></pre>
+<p>This keeps the migration reviewable. Call sites move to the new contract first, while implementations only need to match the shape. If you start by designing one giant Protocol for every future use case, the contract becomes noisy and most implementations satisfy only part of it.</p>
+<h2>First Checks When Compatibility Fails</h2>
+<ul>
+<li>Verify that attribute types are not narrower than what the Protocol requires.</li>
+<li>Check return types, not just method names. Structural typing still fails on a mismatched signature.</li>
+<li>Do not confuse <code>@runtime_checkable</code> with full type validation. <code>isinstance()</code> only checks member presence.</li>
+<li>If one Protocol keeps growing, split it into smaller read-only and write-only contracts so implementations can satisfy exactly what they need.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Protocol classes define method signatures but no implementations</li>
@@ -301,7 +314,9 @@ class Executable(Protocol):
 <h2>References</h2>
 <ul>
 <li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">Python docs — typing.Protocol</a></li>
+<li><a href="https://typing.python.org/en/latest/spec/protocol.html">Python typing specification — Protocols</a></li>
 <li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural subtyping</a></li>
+<li><a href="https://docs.python.org/3/library/abc.html">Python docs — abc</a></li>
 <li><a href="https://mypy.readthedocs.io/en/stable/protocols.html">mypy docs — Protocols and structural subtyping</a></li>
 <li><a href="https://realpython.com/python-protocol/">Real Python — Structural Typing</a></li>
 </ul>
