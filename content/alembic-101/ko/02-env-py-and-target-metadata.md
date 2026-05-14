@@ -45,7 +45,12 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
 
-핵심은 매번 실행된다는 점입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`가 해야 할 일은 훨씬 분명해집니다.
+여기서 가장 중요한 사실은 매번 실행된다는 점입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`의 책임이 훨씬 또렷해집니다.
+
+### 다이어그램: `env.py`가 metadata와 연결을 조립하는 위치
+
+![다이어그램: `env.py`가 metadata와 연결을 조립하는 위치](../../../assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
+*Alembic 실행마다 `env.py`가 URL, metadata, 실행 모드를 조립하는 순서*
 
 ## 핵심 개념
 
@@ -201,7 +206,7 @@ SQLite는 컬럼 삭제, 타입 변경, nullable 변경 같은 `ALTER TABLE` 지
 alembic revision --autogenerate -m "add users.tier"
 ```
 
-`versions/<hash>_add_users_tier.py` 안에 `op.add_column(...)`이 생성됐다면 metadata 연결은 성공한 것입니다.
+`versions/<hash>_add_users_tier.py` 안에 `op.add_column(...)`이 생성됐다면 metadata 연결이 제대로 된 것입니다.
 
 ### 6단계: offline SQL 미리 보기
 
@@ -210,6 +215,19 @@ alembic upgrade head --sql
 ```
 
 이 명령은 connection 없이 DDL을 출력합니다. 많은 팀이 이 출력을 CI 산출물로 남기고 PR 본문에 붙입니다. SQL을 사람 눈으로 읽는 과정 자체가 꽤 강한 안전 장치입니다.
+
+## 검증 루틴
+
+```bash
+alembic revision --autogenerate -m "probe metadata wiring"
+python3 - <<'PY'
+from pathlib import Path
+latest = sorted(Path("alembic/versions").glob("*_probe_metadata_wiring.py"))[-1]
+print(latest.read_text())
+PY
+```
+
+**확인할 점:** 생성된 revision 안에 `op.add_column(...)` 같은 실제 diff가 들어 있어야 합니다. 파일이 비어 있으면 `target_metadata` 연결부터 다시 봐야 합니다.
 
 ## 자주 하는 실수
 
@@ -250,13 +268,27 @@ alembic upgrade head --sql
 다음 글에서는 첫 의미 있는 revision을 손으로 작성해 봅니다. `op.create_table`, `op.add_column`, `op.execute`를 중심으로 수동 작성과 autogenerate 결과를 비교하고, `upgrade`와 `downgrade`를 대칭으로 유지하는 법을 다룹니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- **env.py와 target_metadata: 모델과 마이그레이션 연결 (현재 글)**
+- 첫 revision: upgrade와 downgrade를 손으로 작성 (예정)
+- autogenerate: 잡는 것과 못 잡는 것의 경계 (예정)
+- branch와 merge: 동시에 만든 revision을 합치는 법 (예정)
+- 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기 (예정)
+- online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기 (예정)
+- downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가 (예정)
+- 배포 순서와 blue/green: schema와 application code의 안전한 동기화 (예정)
+- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Alembic: env.py — https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file
-- Alembic: target_metadata — https://alembic.sqlalchemy.org/en/latest/autogenerate.html
-- Alembic: Batch Mode — https://alembic.sqlalchemy.org/en/latest/batch.html
-- Alembic: Offline Mode — https://alembic.sqlalchemy.org/en/latest/offline.html
+- [sqlalchemy/alembic GitHub 저장소](https://github.com/sqlalchemy/alembic)
+- [Alembic: env.py](https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file)
+- [Alembic: target_metadata](https://alembic.sqlalchemy.org/en/latest/autogenerate.html)
+- [Alembic: Batch Mode](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [Alembic: Offline Mode](https://alembic.sqlalchemy.org/en/latest/offline.html)
 
-Tags: Python, Alembic, env.py, target_metadata, Configuration, SQLite
+Tags: Python, Alembic, SQLAlchemy, Migration
