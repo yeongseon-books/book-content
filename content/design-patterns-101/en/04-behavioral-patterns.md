@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 4
 title: Behavioral Patterns
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Strategy
   - Observer
   - Command
-seo_description: Behavioral patterns coordinate responsibility and flow between objects. Strategy, Observer, Command, State, and Iterator explained for engineers.
-last_reviewed: '2026-05-04'
+seo_description: How behavioral patterns turn branching, notifications, requests, and state transitions into readable collaboration structures.
+last_reviewed: '2026-05-15'
 ---
 
 # Behavioral Patterns
 
+Splitting objects well is not enough when the hard part is how they collaborate. Who notifies whom, which algorithm gets selected, how a request becomes queueable, and where state transitions live all shape the cost of change. In real systems, those flow decisions are often where complexity hides.
+
 This is post 4 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (4/10)
+In this post, we'll use behavioral patterns as a shared language for object cooperation. The key move is to turn scattered flow into named structures so that algorithms, notifications, requests, and states are easier to test and reason about.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do objects coordinate their *behavior*?
-
-> By swapping algorithms, propagating notifications, or making requests into objects — the named ways are the behavioral patterns.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem behavioral patterns solve
 - Strategy, Observer, Command
@@ -51,16 +45,8 @@ Cooperation between objects quickly hardens into piles of if/elif. Behavioral pa
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    S["Strategy (swap algo)"] --> Ctx["Context"]
-    O["Observer (notify)"] --> Sub["Subject"]
-    Cmd["Command (request as object)"] --> Inv["Invoker"]
-    St["State (per-state behavior)"] --> Obj["Object"]
-    It["Iterator (traversal)"] --> Col["Collection"]
-```
-
-Five styles of cooperation.
+![Concept at a Glance](../../../assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
+*Behavioral patterns organize cooperation by separating algorithms, notifications, requests, states, and traversal into named structures.*
 
 ## Key Terms
 
@@ -198,6 +184,16 @@ Expose the contract for traversal, not the internal structure.
 
 Django signals are Observer. Celery tasks are Command. FSM libraries are State. Every Python collection implements Iterator. Behavioral patterns sit beneath the daily tools.
 
+## Quick verification
+
+Use this pass to check whether a behavioral refactor is earning its keep.
+
+- Trace one business action from trigger to side effects and count how many branches or direct calls it fans into.
+- Verify whether the collaboration can be named clearly as an algorithm, notification, request, state transition, or traversal contract.
+- Test whether one behavior can change without forcing edits in unrelated callers.
+
+**Expected outcome:** the main flow becomes easier to trace, and one kind of behavior can change without reopening a long chain of conditionals.
+
 ## How a Senior Engineer Thinks
 
 - The first candidate for Strategy is a *function*.
@@ -239,9 +235,15 @@ Behavior expressed as objects reduces branching and makes cooperation visible. T
 
 ## References
 
+### Core references
+
 - [Strategy Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/strategy)
 - [Observer Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/observer)
 - [Command Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/command)
 - [State Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/state)
+
+### Practical follow-up
+
+- [The Python Language Reference — Data model (`__iter__`) ](https://docs.python.org/3/reference/datamodel.html)
 
 Tags: Computer Science, DesignPatterns, Behavioral, Strategy, Observer, Command
