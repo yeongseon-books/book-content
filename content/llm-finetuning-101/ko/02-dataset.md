@@ -250,6 +250,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 ## 참고 자료
 
+- [예제 저장소 — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Hugging Face Datasets documentation](https://huggingface.co/docs/datasets)
 - [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)
