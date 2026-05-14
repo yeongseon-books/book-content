@@ -14,7 +14,7 @@ tags:
 - Jailbreak
 - Red Team
 - Detection
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Detect and block jailbreak attempts by combining known pattern matching, payload normalization, and semantic embedding similarity checks.
 ---
 
@@ -27,7 +27,14 @@ A jailbreak does more than override a system instruction. It tries to peel back 
 This is post 5 in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Where does jailbreak overlap with prompt injection, and where does it differ?
+- Which known patterns are worth catching with the cheapest detector?
+- Why do encoded payloads and multilingual variants force a normalization stage?
+- How do embeddings and judge models divide the detection workload?
+- What kind of regression set proves that a detector is really improving?
 
 ## What a Jailbreak Is
 
@@ -258,6 +265,14 @@ Example targets: recall above 0.95, false positive rate below 0.01. Whenever you
 - Quantify detection with separate attack, red-team, and benign sets, and track recall against false positive rate on every change.
 - Order layers by cost so that cheap checks fire first and the expensive judge only sees survivors.
 
+## Operational Checklist
+
+- [ ] Keep known-pattern matching, normalization, embeddings, and judge steps separate.
+- [ ] Evaluate on both attack prompts and benign traffic before adjusting thresholds.
+- [ ] Re-check non-English traffic through translation or a multilingual judge path.
+- [ ] Keep the judge on a separate model from the response path.
+- [ ] Review missed jailbreaks weekly and add them to regression suites.
+
 ---
 
 <!-- toc:begin -->
@@ -277,9 +292,16 @@ Example targets: recall above 0.95, false positive rate below 0.01. Whenever you
 
 ## References
 
+### Official Docs and Papers
+
 - [JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models](https://arxiv.org/abs/2404.01318)
 - [AdvBench: Universal and Transferable Adversarial Attacks on Aligned Language Models](https://arxiv.org/abs/2307.15043)
 - [In-The-Wild Jailbreak Prompts on LLMs](https://arxiv.org/abs/2308.03825)
-- [Anthropic - Many-shot jailbreaking](https://www.anthropic.com/research/many-shot-jailbreaking)
+- [Anthropic — Many-shot jailbreaking](https://www.anthropic.com/research/many-shot-jailbreaking)
+- [Azure AI Content Safety — jailbreak risk overview](https://learn.microsoft.com/azure/ai-services/content-safety/concepts/jailbreak-detection)
+
+### Verification-Friendly Sources
+
+- [JailbreakBench dataset repository](https://github.com/JailbreakBench/jailbreakbench)
 
 Tags: AI Safety, Jailbreak, Red Team, Detection
