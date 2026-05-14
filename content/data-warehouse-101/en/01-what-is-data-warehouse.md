@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 1
 title: What Is a Data Warehouse?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Database
   - BI
 seo_description: What a data warehouse is, how it differs from a service database, and why analytics needs its own dedicated store.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is a Data Warehouse?
-> Data Warehouse 101 series (1/10)
+
+The service database that happily writes one order at a time usually becomes miserable the moment someone asks for six months of revenue by country, product, and hour. The query is not wrong. It is just asking an operational store to behave like an analytical engine.
 
 This is the first post in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does a *service database alone* fail at analytics, and what makes a *dedicated analytical store* different?
-
-> *A data warehouse is a store built to answer questions fast.*
-
-<!-- a-grade-intro:end -->
+In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.
 
 ## What You Will Learn
 
@@ -49,13 +44,9 @@ When a product grows, the database that handles *one order* and the one that ans
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Service["Service DB (OLTP)"] --> ETL["ETL / ELT"]
-    ETL --> DW["Data Warehouse"]
-    DW --> BI["BI / Dashboard"]
-    DW --> ML["ML / Analytics"]
-```
+![Analytics path from the service database into the warehouse](../../../assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
+
+*The basic analytics path: operational writes stay in the service database, while analytical consumers read from the warehouse layer.*
 
 ## Key Terms
 
