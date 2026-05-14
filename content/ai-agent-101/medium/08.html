@@ -59,7 +59,7 @@
 </blockquote>
 <p>Agents can fail because they call external tools, go through networks, and depend on uncertain model judgments. Various failure modes exist: API timeouts, incorrect tool parameters, model hallucinations, unexpected response formats, etc.</p>
 <p>To build reliable agents, you must anticipate and respond to these failures. Retry strategies, fallback patterns, timeout handling, and graceful degradation are key.</p>
-<p>This article covers common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.</p>
+<p>This is post 8 in the AI Agent 101 series. Here we cover common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -444,24 +444,12 @@ return {
 <li>Building Your First Agent (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>Release It! Design and Deploy Production-Ready Software</strong> - Michael Nygard - https://pragprog.com/titles/mnee2/release-it-second-edition/<br>
-   The classic on reliability patterns: circuit breaker, bulkhead, timeout. The patterns apply directly to agent systems.</p>
-</li>
-<li>
-<p><strong>AWS Builders' Library: Timeouts, retries, and backoff with jitter</strong> - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/<br>
-   AWS's best practices for retry and backoff. Explains why jitter matters and shows concrete algorithms.</p>
-</li>
-<li>
-<p><strong>OpenAI: Production Best Practices</strong> - https://platform.openai.com/docs/guides/production-best-practices<br>
-   OpenAI's official operations guide. Covers rate limits, error codes, and retry policies.</p>
-</li>
-<li>
-<p><strong>Hystrix: Latency and Fault Tolerance</strong> - https://github.com/Netflix/Hystrix/wiki<br>
-   Netflix's circuit breaker library docs. Provides core concepts and operational case studies.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/">AWS Builders' Library - Timeouts, retries, and backoff with jitter</a></li>
+<li><a href="https://platform.openai.com/docs/guides/production-best-practices">OpenAI production best practices</a></li>
+<li><a href="https://martinfowler.com/bliki/CircuitBreaker.html">Martin Fowler - Circuit Breaker</a></li>
+<li><a href="https://sre.google/sre-book/handling-overload/">Google SRE Book - Handling Overload</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>
