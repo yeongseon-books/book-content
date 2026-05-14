@@ -14,18 +14,25 @@ tags:
 - Production
 - Drift Detection
 - Monitoring
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Evaluation is not a one-shot pre-deploy check; it must run continuously
   in production.
 ---
 
 # Continuous Evaluation in Production
 
-> AI Evaluation 101 Series (10/10)
-
 Evaluation is not a one-shot pre-deploy check; it must run continuously in production.
 
 This is the final post in the AI Evaluation 101 series. Here we cover sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.
+
+## Questions this chapter answers
+
+- Why does a pre-deploy pass still fail to guarantee production quality?
+- How should uniform, stratified, and failure-biased sampling share the evaluation budget?
+- Which online metrics complement judge-based evaluation instead of duplicating it?
+- How do you close the loop from production failures back into the regression set?
+
+> Mental model: offline evaluation is rehearsal; production evaluation is the ongoing operating loop. Its job is to observe live behavior, detect drift, and feed failures back into the next release gate.
 
 ---
 ![Continuous evaluation in production](../../../assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
@@ -323,6 +330,14 @@ Closing this loop turns production → regression set → next deploy → produc
 Evaluation is not a pre-deployment milestone. It is a continuous operational discipline. This concludes the AI Evaluation 101 series.
 
 ---
+
+## Operational checklist
+
+- [ ] Mix uniform, stratified, and failure-biased sampling instead of relying on one strategy.
+- [ ] Keep online signals like thumbs, re-ask rate, latency, and cost visible in real time.
+- [ ] Alert on drift relative to baseline behavior rather than fixed global thresholds.
+- [ ] Run shadow or canary checks before broad model rollouts.
+- [ ] Feed production failures back into the regression suite so the same incident stays fixed.
 
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
