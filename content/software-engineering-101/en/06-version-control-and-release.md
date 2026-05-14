@@ -18,22 +18,16 @@ tags:
   - Release
   - SemVer
 seo_description: Git branching strategies, semantic versioning, changelog automation, and a safe release pipeline you can copy.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Version Control and Release
 
-This is post 6 in the Software Engineering 101 series.
+You can write solid code and pass every test, then still lose user trust at release time. Users only see the deployed version. They do not care how careful the earlier work was if the release is confusing, hard to roll back, or impossible to explain. That makes version control and release management less of a final ceremony and more of a trust interface.
 
-> Software Engineering 101 series (6/10)
+Teams get into trouble when they think of release as a single event: bump a version, write notes, deploy, done. Resilient teams treat release as a recoverable process. They ship smaller changes more often, verify on narrow traffic first, and assume rollback must work under pressure, not only in theory.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you ship version 1.4.2, what exactly are you promising the user?
-
-> Semantic versioning is the notation for that promise. Break it and trust collapses.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the Software Engineering 101 series. In this chapter, we connect commit conventions, semantic versioning, changelogs, canary rollout, and rollback drills into one release flow you can reason about end to end.
 
 ## What You Will Learn
 
@@ -51,13 +45,8 @@ A release is the only moment your code meets the user. If something fails here, 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F["feature branch"] --> M["main"]
-    M --> S["staging"]
-    S --> C["canary"]
-    C --> P["production"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png)
+*The release path from feature branch to canary and production*
 
 Each stage shrinks the cost of recovery.
 
@@ -140,6 +129,28 @@ kubectl rollout undo deployment/api
 ```
 
 Rollback should complete inside one minute.
+
+## A release-readiness check
+
+Release quality becomes visible when you trace one deploy from commit intent to rollback path. Pick a recent release and check whether every step in the flow leaves evidence behind.
+
+### Verification steps
+
+1. Open one recent release note and the commits behind it.
+2. Check whether the SemVer bump matches the real compatibility impact.
+3. Verify that canary expansion rules and rollback commands are both written down.
+
+**Expected output:**
+
+- Commit conventions map cleanly into changelog and version automation.
+- User-facing release notes explain impact instead of internal implementation details.
+- Teams that rehearse rollback can afford to ship more often.
+
+### Failure modes to watch
+
+- Version numbers are chosen by feel instead of change type.
+- New code reaches 100% of traffic without a narrow validation stage.
+- Rollback commands exist on paper, but no one knows when they were last exercised.
 
 ## What to Notice in This Code
 
