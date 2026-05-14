@@ -59,6 +59,10 @@ A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 ```
 
+![Priority queue and relaxation flow in Dijkstra's algorithm](../../../assets/algorithms-python-101/08/08-01-concept-overview.en.png)
+
+*Dijkstra keeps pulling the nearest candidate first, then updates distances whenever it discovers a cheaper path.*
+
 ## Key Concepts
 
 | Term | Description |
@@ -288,6 +292,13 @@ for condition, algorithm in comparison:
 You rarely implement Dijkstra yourself, but recognizing that a problem is a shortest-path problem is the critical skill. Once you make that connection, you can reach for the right library or algorithm.
 
 In production, you use NetworkX's shortest_path() or a mapping API. But understanding the internals helps you diagnose performance issues and select the right algorithm.
+
+## What to check when Dijkstra looks wrong or slow
+
+- Verify the graph has no negative edges before debugging the implementation. That one assumption breaks the whole algorithm.
+- Skip stale heap entries aggressively. Many “Dijkstra is too slow” reports are really about reprocessing outdated candidates.
+- If reconstructed paths look wrong, inspect when `prev` changes. It should only move when you discover a genuinely shorter route.
+- In systems with constantly changing topology, the operational trade-off is not just correctness. Rebuild cost, cache invalidation, and acceptable staleness matter too.
 
 ## Checklist
 
