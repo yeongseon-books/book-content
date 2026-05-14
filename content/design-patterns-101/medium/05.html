@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>The Strategy Pattern</h1>
+<p>Code tilts toward conditionals when the same job can be done in several ways. It starts with one <code>if kind == ...</code>, then grows as options multiply and policy diverges. After a while, every new case means reopening existing code and retesting the whole branch tree.</p>
 <p>This is post 5 in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When the same job has <em>different ways</em> to be done, what should the code look like?</p>
-<blockquote>
-<p>Make each algorithm an object (or a function) and inject it into the context. That is Strategy.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll look at Strategy as a way to turn algorithms into swappable units that a context can receive from the outside. In Python, that often means using a function before reaching for a class hierarchy.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The problem Strategy solves (branch explosion)</li>
 <li>Strategy and the Open/Closed Principle</li>
@@ -80,13 +71,8 @@
 <p>Strategy is OCP made visible in code.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Ctx[&quot;Context&quot;] --&gt; Iface[&quot;Strategy interface&quot;]
-    Iface --&gt; A[&quot;StrategyA&quot;]
-    Iface --&gt; B[&quot;StrategyB&quot;]
-    Iface --&gt; C[&quot;StrategyC&quot;]
-</code></pre>
-<p>Context only knows the interface; concrete algorithms swap in.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>Strategy works when the context stays ignorant of algorithm internals and concrete behavior can swap in at the edge.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Context</strong>: the object that uses a Strategy.</li>
@@ -179,6 +165,14 @@ print(order.total([10000], 2))
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>The <code>key</code> argument of <code>sorted</code>, the <code>func</code> of <code>pandas.apply</code>, payment-gateway adapter selection, notification-channel selection (email/SMS/Slack) — all Strategy in shape.</p>
+<h2>Quick verification</h2>
+<p>Use these checks to confirm that a Strategy refactor is justified.</p>
+<ul>
+<li>Count how often the algorithm branch changes or receives new variants.</li>
+<li>Replace one concrete strategy with a fake implementation in a test and confirm the context stays untouched.</li>
+<li>Verify whether a plain function already expresses the strategy clearly enough.</li>
+</ul>
+<p><strong>Expected outcome:</strong> new variants become additive, and the context no longer owns the branching logic that selects the algorithm.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>When you feel "another branch coming", suspect Strategy.</li>
@@ -216,11 +210,16 @@ print(order.total([10000], 2))
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://refactoring.guru/design-patterns/strategy">Strategy Pattern (refactoring.guru)</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle">Open/Closed Principle (Wikipedia)</a></li>
 <li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://docs.python.org/3/howto/sorting.html">sorted(key=...) (Python docs)</a></li>
+<li><a href="https://docs.python.org/3/library/functools.html">functools — Higher-order functions and operations on callables (Python docs)</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Strategy, Polymorphism, Behavioral, OCP</p>
 </body>
