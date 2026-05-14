@@ -18,12 +18,18 @@ tags:
   - Quality
   - Collaboration
 seo_description: 좋은 코드 리뷰 기준과 실행 가능한 리뷰 코멘트 작성법을 익혀 팀의 개발 생산성과 코드 품질을 높이는 방법을 제안합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 좋은 코드 리뷰 기준
 
-좋은 코드는 작성 단계에서만 만들어지지 않고, 리뷰 단계에서 팀의 기준으로 다시 다듬어집니다. 이 글은 Clean Code 101 시리즈의 마지막 글입니다. 여기서는 지금까지 다룬 이름, 함수, 분기, 중복, 오류, 테스트, 리팩토링 관점을 실제 PR 리뷰 기준으로 어떻게 묶을지 정리하겠습니다.
+좋은 코드는 작성 단계에서만 만들어지지 않고, 리뷰 단계에서 팀의 기준으로 다시 다듬어집니다.
+
+이 글은 Clean Code 101 시리즈의 마지막 글입니다.
+
+여기서는 지금까지 다룬 이름, 함수, 분기, 중복, 오류, 테스트, 리팩토링 관점을 실제 PR 리뷰 기준으로 어떻게 묶을지 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A["Author: small PR"] --> B["Automated checks"]
-    B --> C["Reviewer: intent/structure"]
-    C --> D["Fast feedback"]
-    D --> E["Merge"]
-```
+![좋은 코드 리뷰 기준](../../../assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)
+
+*좋은 코드 리뷰의 흐름: 자동화가 잡무를 맡고, 사람은 의도와 구조를 검토합니다.*
 
 자동화는 잡무를 처리하고, 사람은 의도와 구조를 봐야 리뷰가 가치 있는 시간이 됩니다.
 
@@ -140,6 +142,24 @@ QUESTION: clarification
 
 반복되는 리뷰 코멘트는 프로세스 개선 신호입니다. 같은 지적이 계속 나온다면 사람을 탓하기보다 자동화나 가이드로 옮겨야 합니다.
 
+## 검증 방법
+
+```bash
+ruff check .
+python -m pytest -q
+GIT_PAGER=cat git diff --stat HEAD~1..HEAD
+```
+
+**기대 결과**
+
+- 자동화가 처리할 문제는 PR에 올라오기 전에 정리됩니다.
+- diff 크기와 검증 결과가 리뷰 설명과 맞아야 합니다.
+
+## 실패하기 쉬운 지점
+
+- 리뷰 코멘트가 취향과 필수를 구분하지 못합니다.
+- 반복 지적이 lint나 템플릿으로 옮겨가지 않습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 자동화가 끝낸 일은 사람이 다시 검사하지 않습니다.
@@ -203,5 +223,5 @@ QUESTION: clarification
 - [Conventional Comments](https://conventionalcomments.org/)
 - [Best Kept Secrets of Peer Code Review (Smart Bear)](https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/)
 - [Microsoft Engineering Fundamentals — Code Review](https://microsoft.github.io/code-with-engineering-playbook/code-reviews/)
-
+- [Google engineering practices — code review](https://google.github.io/eng-practices/review/)
 Tags: Computer Science, CleanCode, CodeReview, PullRequest, Quality, Collaboration
