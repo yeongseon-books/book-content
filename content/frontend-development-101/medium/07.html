@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Forms and Validation</h1>
-<p>This is post 7 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you tell a user <em>kindly</em> that they made a mistake?</p>
-<blockquote>
-<p>A good form <em>helps while typing</em> and never <em>scolds only after submit</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Forms are where products have their longest conversation with users. Sign-up, login, payment, search, and settings changes all pass through fields, buttons, and validation messages. When that conversation is awkward, users feel it immediately.</p>
+<p>This is post 7 in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Controlled vs uncontrolled inputs</li>
@@ -80,13 +70,8 @@
 <p>Great forms <em>ask less</em>, <em>catch typos early</em>, and <em>submit fast</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Input[&quot;Input&quot;] --&gt; Format[&quot;Format check&quot;]
-    Format --&gt; Rule[&quot;Business rule&quot;]
-    Rule --&gt; Submit[&quot;Submit&quot;]
-    Submit --&gt; Server[&quot;Server validation&quot;]
-    Server --&gt;|error| Input
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>The form-validation flow from input and format checks to business rules and server validation</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Controlled input</strong>: value lives in <em>React state</em>.</li>
@@ -138,6 +123,16 @@ const SignupSchema = z.object({
 const result = SignupSchema.safeParse({ email, password });
 if (!result.success) showErrors(result.error.format());
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Type an invalid email and confirm that the inline error appears before submit; then type a valid one and verify that the submit button becomes usable.</li>
+<li>Tab through the form using only the keyboard and confirm that labels, focus order, and <code>aria-invalid</code> all communicate the same state.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If errors never clear, check the controlled state update path and the exact timing of your format validation.</li>
+<li>If assistive feedback is weak, verify the <code>label</code>, <code>id</code>, and <code>aria-describedby</code> connections first.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Validation happens <em>while the user types</em>.</li>
@@ -185,18 +180,23 @@ if (!result.success) showErrors(result.error.format());
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
-<li><strong>Forms and Validation (current)</strong></li>
-<li>Styling and Design Systems (upcoming)</li>
+<li>
+<p><strong>Forms and Validation (current)</strong></p>
+</li>
+<li>
+<p>Styling and Design Systems (upcoming)</p>
+</li>
 <li>Build Tools and Bundling (upcoming)</li>
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://react-hook-form.com/">React Hook Form</a></li>
-<li><a href="https://zod.dev/">Zod docs</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation">MDN Form validation</a></li>
-<li><a href="https://www.w3.org/WAI/tutorials/forms/">W3C Form best practices</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://react-hook-form.com/">React Hook Form documentation</a><br>
+- <a href="https://zod.dev/">Zod documentation</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation">MDN: Client-side form validation</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://www.w3.org/WAI/tutorials/forms/">WAI: Forms tutorial</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid">MDN: ARIA aria-invalid</a></p>
 <p class="tags-line">Tags: Frontend, Forms, Validation, UX, React</p>
 </body>
 </html>
