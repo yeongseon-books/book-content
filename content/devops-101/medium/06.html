@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Containers and Build</h1>
-<p>This is post 6 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What is the <em>only way</em> to make <em>your laptop</em> and <em>the server</em> produce <em>the same result</em>?</p>
-<blockquote>
-<p>Containers freeze <em>the environment itself</em> into an <em>image</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>"It works on my laptop" is usually an environment problem wearing an application mask. If the runtime libraries, OS packages, and process entrypoints differ between local and production, deployment quality depends on luck more than engineering.</p>
+<p>Containers reduce that gap by freezing the runtime environment into an image. Once the image becomes the deployable unit, teams can reason about versioning, rollback, and promotion much more cleanly.</p>
+<p>This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>containers</em> and <em>VMs</em></li>
@@ -80,12 +71,8 @@
 <p>Containers realize <em>Build once, run anywhere</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;app code&quot;] --&gt; Build[&quot;docker build&quot;]
-    Build --&gt; Image[&quot;image (immutable)&quot;]
-    Image --&gt; Registry[&quot;registry push&quot;]
-    Registry --&gt; Run[&quot;docker run / k8s&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Image</strong>: an <em>immutable executable package</em>.</li>
