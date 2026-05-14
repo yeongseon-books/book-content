@@ -18,7 +18,7 @@ tags:
   - Cohesion
   - Coupling
 seo_description: 관심사 분리의 정의, 결합도와 응집도, 책임을 나누는 실전 절차를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 관심사 분리
@@ -47,13 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    M["Giant module"] --> A["UI concern"]
-    M --> B["Domain concern"]
-    M --> C["Infra concern"]
-    A & B & C --> R["Freedom to change"]
-```
+![전체 그림](../../../assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
+*하나의 거대한 모듈에 섞인 관심사를 분리해 변경 자유도를 높이는 구조*
 
 UI, 도메인, 인프라는 바뀌는 속도도 이유도 다릅니다. 이 셋을 같은 상자에 넣으면 작은 변경도 넓게 번집니다. 분리를 잘하면 세 관심사가 서로 다른 속도로 움직일 수 있습니다.
 
@@ -150,6 +145,32 @@ def app(req):
 
 분리가 끝이 아닙니다. 분리된 관심사가 만나는 지점이 적고 명확해야 합니다. 이음새가 많아지면 통합 비용이 커지고, 구조가 다시 흐려집니다.
 
+## 빠르게 검증해 보기
+
+주문 처리 함수 하나를 골라 아래처럼 책임을 색칠해 보면 관심사가 실제로 얼마나 섞였는지 금방 드러납니다.
+
+```text
+parse_request()      -> 입력
+validate_order()     -> 도메인 규칙
+save_order()         -> 저장소
+send_notification()  -> 외부 통신
+to_response()        -> 출력
+```
+
+**Expected output:** 같은 함수 안에 입력·도메인·인프라·출력이 모두 들어 있으면 분리 후보가 뚜렷하게 보입니다.
+
+가능하면 색칠한 결과를 기준으로 “이 단계는 왜 바뀌는가?”를 한 줄씩 적어 보세요. 변경 이유가 다르면 경계 후보도 다릅니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 검증 규칙 변경이 API 응답 코드까지 흔든다 | 입력과 도메인 처리가 섞여 있는지 확인합니다 |
+| 로깅 정책 변경이 핵심 규칙을 건드린다 | 횡단 관심사가 도메인 안에 퍼져 있는지 봅니다 |
+| 함수 수는 많은데 수정 범위는 여전히 넓다 | 이름만 나눈 계층인지, 실제 책임이 분리됐는지 점검합니다 |
+
+관심사 분리는 파일 수를 늘리는 일이 아니라, 다른 이유로 바뀌는 코드를 다른 경계에 두는 일입니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 모듈마다 변경 이유를 하나로 모으려는 방향이 보입니다.
@@ -207,5 +228,11 @@ def app(req):
 - [A Philosophy of Software Design](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Hexagonal Architecture (Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture (Uncle Bob)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+
+### 실전 확인용 문서
+
+- [functools — Higher-order functions and operations on callable objects](https://docs.python.org/3/library/functools.html)
+- [Logging Cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
+
 
 Tags: Computer Science, SoftwareDesign, SeparationOfConcerns, Modularity, Cohesion, Coupling
