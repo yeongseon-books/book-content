@@ -14,7 +14,7 @@ tags:
 - Azure Functions
 - Serverless
 - Cloud
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 서버리스 설명에는 늘 “자동으로 스케일링된다”는 문장이 붙습니다. 맞는 말이지만, 운영에서는 그 한 줄만으로 충분하지
   않습니다.
 ---
@@ -164,7 +164,7 @@ def hello(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse("ok")
 ```
 
-핵심은 간단합니다. 무거운 비용을 호출마다 내지 않고, Worker 수명주기 안에서 한 번만 내도록 구조를 바꾸는 것입니다.
+무거운 초기화 비용을 호출마다 내지 않고, Worker 수명주기 동안 한 번만 내도록 구조를 바꿔야 합니다.
 
 #### 3) 운영 관점
 
