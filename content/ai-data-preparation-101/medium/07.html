@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Synthetic Data Generation - From Self-Instruct to Distillation</h1>
+<p>In production LLM fine-tuning, the bottleneck is often labeled data rather than model capacity. When annotation is too slow or too expensive, synthetic generation becomes the practical way to expand supervision.</p>
+<p>This is post 7 in the AI Data Preparation 101 series. Here we cover common synthetic data generation patterns, from Self-Instruct to distillation.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Which synthetic-data pattern fits instruction tuning, RAG evaluation, or distillation best?</li>
+<li>How do Self-Instruct and Evol-Instruct expand supervision in different ways?</li>
+<li>Why must synthetic QA pairs be verified against the source evidence?</li>
+<li>What license checks belong in a distillation workflow before data generation even starts?</li>
+<li>Which quality metrics reveal that your synthetic set is large but not actually useful?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (7/10)</p>
+<p>Synthetic data is not free accuracy. It is a controlled way to expand supervision, and its value depends more on verification and mixing strategy than on raw sample count.</p>
 </blockquote>
 <hr>
 <h2>"If we run out of data, can't we just generate more?"</h2>
@@ -209,6 +219,14 @@ dataset = [distill_one(p) for p in prompts]
 <li>Episode 8 covers data augmentation.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Pick the synthetic-data pattern that matches the downstream objective instead of defaulting to one prompt style</li>
+<li>[ ] Measure diversity, schema validity, and refusal rate for every generation batch</li>
+<li>[ ] Verify evidence strings for RAG evaluation pairs against the original chunk</li>
+<li>[ ] Review teacher-model license and output-usage constraints before distillation</li>
+<li>[ ] Mix synthetic and human data deliberately rather than fine-tuning on synthetic only</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
