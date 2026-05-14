@@ -54,37 +54,25 @@
 </head>
 <body>
 <h1>JOIN</h1>
-<p>This is post 4 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does combining two tables come in <em>five flavors</em>, and why do results sometimes <em>grow</em>?</p>
-<blockquote>
-<p><em>JOIN combines </em>rows<em>, not columns.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Once you leave single-table questions behind, SQL gets more powerful and more dangerous at the same time. The query still looks readable, but one wrong join assumption can double a metric, erase unmatched rows, or explode the result size before anyone notices.</p>
+<p>That is why JOIN is less about memorizing keywords and more about thinking in relationships. The real skill is predicting how many matches each row can have before you trust any aggregate built on top of the result.</p>
+<p>This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>Differences between <em>INNER, LEFT, RIGHT, FULL, CROSS</em></li>
-<li><em>Join keys</em> and <em>cardinality</em></li>
-<li>How results <em>blow up</em></li>
-<li>A safe approach to <em>multi-table joins</em></li>
-<li>Five common mistakes</li>
+<li>How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?</li>
+<li>Why should you inspect join keys and cardinality before anything else?</li>
+<li>Why do row counts sometimes grow unexpectedly after a join?</li>
+<li>What is the safest pattern for finding rows without a match?</li>
+<li>How should you verify multi-table joins before aggregating?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Most production queries include a JOIN. Misreading the <em>cardinality</em> doubles your totals. Joining well is what makes an analyst <em>trustable</em>.</p>
 <blockquote>
-<p><em>JOIN is the </em>math of sets<em>, not string concatenation.</em></p>
+<p>JOIN combines rows according to a relationship. If the relationship assumption is wrong, the result can still look tidy while the metric becomes wrong.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Table A&quot;] --&gt;|key match| Inner[&quot;INNER JOIN: intersection&quot;]
-    A --&gt;|all of A| Left[&quot;LEFT JOIN: A-side full&quot;]
-    A -.X.-&gt; Cross[&quot;CROSS JOIN: all pairs&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Most real queries include a join somewhere in the middle. Reports pull users, orders, products, payments, and events together; application debugging queries walk relationships to explain what happened to one customer. In all of those cases, the central risk is not the keyword itself. It is the hidden multiplicity behind the relationship.</p>
+<p>Strong SQL reviewers do not just read the ON clause. They ask what kind of match count is expected on each side and whether a later SUM or COUNT will stay stable after that expansion.</p>
+<h2>JOIN result flow</h2>
+<p><img alt="JOIN result flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Join key</strong>: the columns that <em>connect two tables</em>.</li>
@@ -113,6 +101,9 @@ FROM users u
 LEFT JOIN orders o ON o.user_id = u.id
 WHERE o.id IS NULL;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>3</strong><br>
+- name: Grace</p>
 <p><strong>Step 4 — Self-join (direct manager)</strong></p>
 <pre><code class="language-sql">SELECT e.name AS emp, m.name AS manager
 FROM employees e
@@ -182,6 +173,7 @@ JOIN products p ON p.id = oi.product_id;
 <li><a href="https://sqlbolt.com/lesson/select_queries_with_joins">SQLBolt — Multi-table queries with JOIN</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-joins/">Mode — JOIN</a></li>
 <li><a href="https://use-the-index-luke.com/sql/join">Use The Index, Luke — Joins</a></li>
+<li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html">PostgreSQL — Table Expressions</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, JOIN, Relational, Database, Query</p>
 </body>
