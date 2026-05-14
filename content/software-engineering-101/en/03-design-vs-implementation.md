@@ -18,22 +18,16 @@ tags:
   - Implementation
   - Tradeoff
 seo_description: A short, code-first take on design vs implementation, capturing decisions in ADRs, and avoiding over-engineering.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Design vs Implementation
 
-This is post 3 in the Software Engineering 101 series.
+Sometimes you review a change and think, "The code is clean, but the structure still feels fragile." Other times the code itself is ordinary, yet the boundaries are so clear that the system looks like it will survive years of change. That difference usually comes from design quality more than implementation polish.
 
-> Software Engineering 101 series (3/10)
+Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is "well-written code" the same as "well-designed system"?
-
-> Design is "what"; implementation is "how". Mixing the two blurs both.
-
-<!-- a-grade-intro:end -->
+This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
 
 ## What You Will Learn
 
@@ -51,13 +45,8 @@ Design decisions outlive code. Bad design cannot be hidden under good code.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["Requirement"] --> D["Design: what"]
-    D --> I["Implementation: how"]
-    I --> O["Observe"]
-    O --> D
-```
+![Concept at a Glance](../../../assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
+*How design decisions flow into implementation and back through observation*
 
 Design sets the ceiling for implementation.
 
@@ -148,6 +137,28 @@ class EmailNotifier:
 ```
 
 Design must intend for observability.
+
+## A small design stress test
+
+Good design shows up when you try to change the system, not when you stare at the current diagram. Use a small change request to see whether your interfaces and ADRs actually reduce blast radius.
+
+### Verification steps
+
+1. Assume you need to add one more notifier channel to the example.
+2. Count how many files and tests would need to change.
+3. Explain the reason for the abstraction in one short ADR paragraph.
+
+**Expected output:**
+
+- New behavior can be added without rewriting every caller.
+- The ADR makes the trade-off legible to someone who did not make the original choice.
+- Observability needs remain visible instead of getting glued on at the end.
+
+### Failure modes to watch
+
+- One new implementation forces broad edits across unrelated callers.
+- The abstraction exists, but no one can still explain why it exists.
+- Future-proofing added factories and registries long before any real pressure appeared.
 
 ## What to Notice in This Code
 
