@@ -82,7 +82,7 @@
 <blockquote>
 <p>system resource isolation = controlling files, env vars, and time within the test scope</p>
 </blockquote>
-<pre><code>[Before Isolation]                [After Isolation]
+<pre><code class="language-text">[Before Isolation]                [After Isolation]
 files → real path collisions      tmp_path → auto-cleanup
 env vars → global pollution       monkeypatch → restored after test
 time → varies per execution       freezegun → fixed time

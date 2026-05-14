@@ -1,24 +1,24 @@
 ---
-series: programming-languages-101
 episode: 9
-title: 정적 언어와 동적 언어
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Computer Science
-  - Programming Languages
-  - StaticTyping
-  - DynamicTyping
-  - Tradeoffs
-  - Safety
-seo_description: 정적과 동적 언어가 검사를 언제 수행하는지와 그 차이를 설명합니다.
 last_reviewed: '2026-05-12'
+seo_description: 정적 언어와 동적 언어가 타입 검사 시점을 달리하는 방식과 안정성, 표현력의 트레이드오프를 비교 분석합니다.
+series: programming-languages-101
+status: publish-ready
+tags:
+- Computer Science
+- Programming Languages
+- StaticTyping
+- DynamicTyping
+- Tradeoffs
+- Safety
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 정적 언어와 동적 언어
 ---
 
 # 정적 언어와 동적 언어

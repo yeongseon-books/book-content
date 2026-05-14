@@ -1,23 +1,24 @@
 ---
-series: pytest-101
 episode: 8
-title: Coverage and Test Quality
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: en
-tags:
-  - Python
-  - pytest
-  - coverage
-  - pytest-cov
-  - Code Coverage
-seo_description: Measure and analyze code coverage with pytest-cov.
 last_reviewed: '2026-05-04'
+seo_description: Measure code coverage with pytest-cov, interpret line and branch
+  metrics, and use coverage gaps to find untested edge cases in production code.
+series: pytest-101
+status: content-ready
+tags:
+- Python
+- pytest
+- coverage
+- pytest-cov
+- Code Coverage
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Coverage and Test Quality
 ---
 
 # Coverage and Test Quality

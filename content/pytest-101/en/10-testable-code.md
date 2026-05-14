@@ -1,23 +1,24 @@
 ---
-series: pytest-101
 episode: 10
-title: Writing Testable Code
-status: content-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: en
-tags:
-  - Python
-  - pytest
-  - Testable Code
-  - Dependency Injection
-  - Software Design
-seo_description: Design testable code with dependency injection and pure functions.
 last_reviewed: '2026-05-04'
+seo_description: Design testable code with dependency injection, pure functions, and
+  clear seams so pytest can verify behavior without fragile setup.
+series: pytest-101
+status: content-ready
+tags:
+- Python
+- pytest
+- Testable Code
+- Dependency Injection
+- Software Design
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Writing Testable Code
 ---
 
 # Writing Testable Code

@@ -82,7 +82,7 @@
 <blockquote>
 <p>mock = swap the real thing with a fake to isolate the test</p>
 </blockquote>
-<pre><code>[Production]                    [Test]
+<pre><code class="language-text">[Production]                    [Test]
 function → DB query → result    function → Mock(DB) → fake result
 function → HTTP call → response function → Mock(HTTP) → fake response
 </code></pre>

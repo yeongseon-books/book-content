@@ -1,24 +1,24 @@
 ---
-series: programming-languages-101
 episode: 8
-title: 인터프리터와 컴파일러
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Computer Science
-  - Programming Languages
-  - Interpreter
-  - Compiler
-  - JIT
-  - Bytecode
-seo_description: 인터프리터와 컴파일러가 번역 시점을 어떻게 달리하는지 설명합니다.
 last_reviewed: '2026-05-12'
+seo_description: 인터프리터와 컴파일러가 소스 코드 번역 시점을 달리하는 방식과 실행 성능, 디버깅 경험에 미치는 영향을 비교합니다.
+series: programming-languages-101
+status: publish-ready
+tags:
+- Computer Science
+- Programming Languages
+- Interpreter
+- Compiler
+- JIT
+- Bytecode
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 인터프리터와 컴파일러
 ---
 
 # 인터프리터와 컴파일러
