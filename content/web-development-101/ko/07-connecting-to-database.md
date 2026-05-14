@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 7
 title: 데이터베이스 연결
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - ORM
   - Backend
 seo_description: SQL, ORM, 연결 풀, 트랜잭션으로 데이터베이스 연결을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 데이터베이스 연결
@@ -47,15 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    App["Web app"] -->|"SQL"| Pool["Connection pool"]
-    Pool --> DB[("Database")]
-    DB --> Pool
-    Pool --> App
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
 
-데이터베이스 연결은 비용이 큰 자원입니다. 그래서 서버는 매 요청마다 연결을 새로 만드는 대신 풀에서 재사용하는 방식을 많이 씁니다.
+*웹앱이 연결 풀을 거쳐 데이터베이스와 대화하는 기본 구조를 요약한 그림입니다.*
+
+애플리케이션은 요청마다 데이터를 읽고 쓰지만 연결 자체는 비싼 자원입니다. 그래서 연결 풀을 두고, 여러 SQL 작업이 하나의 비즈니스 작업이면 트랜잭션으로 묶습니다.
+
+### 직접 검증해 볼 포인트
+
+- SQLite로 테이블을 만든 뒤 INSERT와 SELECT가 실제 파일에 영속적으로 남는지 확인합니다.
+- 공격자 입력 문자열을 파라미터 바인딩으로 넘겨도 쿼리 구조가 깨지지 않는지 검증합니다.
+- 트랜잭션 중간에 예외를 발생시켜 rollback 뒤 데이터가 이전 상태로 남는지 봅니다.
+
+**기대 결과:** 바인딩을 쓰면 악성 문자열도 값으로만 처리되고, rollback 뒤에는 절반만 반영된 데이터가 남지 않습니다.
+
+**실패 모드:** 문자열 연결로 SQL을 만들면 injection 위험이 생깁니다. 요청마다 연결을 새로 열면 트래픽이 늘 때 연결 비용이 먼저 병목이 됩니다.
 
 ## 먼저 알아둘 용어
 
@@ -227,9 +233,13 @@ except Exception:
 
 ## 참고 자료
 
-- [SQL (MDN glossary)](https://developer.mozilla.org/en-US/docs/Glossary/SQL)
-- [sqlite3 (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [SQLAlchemy ORM tutorial](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
-- [Database connection pool (Wikipedia)](https://en.wikipedia.org/wiki/Connection_pool)
+### 공식 문서
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [SQLAlchemy ORM Quick Start](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
+- [Transaction (Wikipedia)](https://en.wikipedia.org/wiki/Database_transaction)
+
+### 검증용 자료
+- [SQL injection (OWASP)](https://owasp.org/www-community/attacks/SQL_Injection)
+- [EXPLAIN QUERY PLAN (SQLite)](https://www.sqlite.org/eqp.html)
 
 Tags: Computer Science, WebDevelopment, Database, SQL, ORM, Backend
