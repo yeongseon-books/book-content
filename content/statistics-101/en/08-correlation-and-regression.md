@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Correlation and Regression
 
-This is post 8 in the Statistics 101 series.
+When two variables move together, people immediately want an explanation. Does more ad spend increase revenue? Does more study time improve the score? Does a lower price increase demand? Those are natural questions, but the first pattern you see is not automatically a proof of causation.
 
-> Statistics 101 series (8/10)
+Correlation describes direction and strength. Regression writes the relationship as an equation you can inspect and use for prediction. They are closely related, but they do not answer the same question.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.
 
-**Core question**: When two variables *move together*, what does that *prove*? *How strongly* and *in what way* do they move?
+## Questions this post answers
 
-> *Correlation is companionship; regression is predictable companionship.*
+- What does a correlation coefficient tell us, and what does it not tell us?
+- What extra information does a regression equation provide?
+- How should we interpret R²?
+- What do residuals reveal that the fitted line alone cannot?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The meaning of the *Pearson correlation coefficient*
-- *Simple linear regression*
-- The meaning of *R²*
-- A 5-step regression exercise
-- Five common mistakes
+> Correlation tells you that variables move together. Regression organizes that movement into a model you can inspect.
 
 ## Why It Matters
 
@@ -50,14 +45,9 @@ This is post 8 in the Statistics 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    XY["X, Y"] --> Corr["Pearson r"]
-    Corr --> Line["Regression Line"]
-    Line --> R2["R^2"]
-    R2 --> Predict["Predict y from x"]
-```
+![Concept at a Glance](../../../assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
 
+*Correlation summarizes movement together, while regression turns that movement into an equation and then checks the fit with R² and residuals.*
 ## Key Terms
 
 - **Pearson r**: strength of *linear correlation* (-1 to +1).
@@ -88,6 +78,8 @@ sales = np.array([1300, 1280, 1320, 1360, 1410, 1450])
 print("r:", np.corrcoef(ads, sales)[0, 1])
 ```
 
+**Expected output:** something close to `r: 0.9...`, indicating a strong positive linear relationship in this toy dataset.
+
 ### Step 3 — Fit a regression
 
 ```python
@@ -97,11 +89,15 @@ model = LinearRegression().fit(X, sales)
 print("β1:", model.coef_[0], "β0:", model.intercept_)
 ```
 
+**Expected output:** `β1` tells you how much sales move per one-unit increase in ad spend, while `β0` gives the fitted intercept.
+
 ### Step 4 — R²
 
 ```python
 print("R^2:", model.score(X, sales))
 ```
+
+**Expected output:** often something like `R^2: 0.8...` on this simple example. That is high explanatory power, but it is still not a substitute for residual checks.
 
 ### Step 5 — Residuals
 

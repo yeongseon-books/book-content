@@ -54,38 +54,27 @@
 </head>
 <body>
 <h1>Correlation and Regression</h1>
-<p>This is post 8 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When two variables <em>move together</em>, what does that <em>prove</em>? <em>How strongly</em> and <em>in what way</em> do they move?</p>
-<blockquote>
-<p><em>Correlation is companionship; regression is predictable companionship.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>When two variables move together, people immediately want an explanation. Does more ad spend increase revenue? Does more study time improve the score? Does a lower price increase demand? Those are natural questions, but the first pattern you see is not automatically a proof of causation.</p>
+<p>Correlation describes direction and strength. Regression writes the relationship as an equation you can inspect and use for prediction. They are closely related, but they do not answer the same question.</p>
+<p>This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The meaning of the <em>Pearson correlation coefficient</em></li>
-<li><em>Simple linear regression</em></li>
-<li>The meaning of <em>R²</em></li>
-<li>A 5-step regression exercise</li>
-<li>Five common mistakes</li>
+<li>What does a correlation coefficient tell us, and what does it not tell us?</li>
+<li>What extra information does a regression equation provide?</li>
+<li>How should we interpret R²?</li>
+<li>What do residuals reveal that the fitted line alone cannot?</li>
 </ul>
+<blockquote>
+<p>Correlation tells you that variables move together. Regression organizes that movement into a model you can inspect.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Revenue ~ ad spend</em>, <em>study time ~ score</em> — <em>relationships</em> are the <em>start of all analysis</em>. Correlation and regression are the tools that <em>put a relationship into numbers</em>.</p>
 <blockquote>
 <p><em>Correlation is not causation.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    XY[&quot;X, Y&quot;] --&gt; Corr[&quot;Pearson r&quot;]
-    Corr --&gt; Line[&quot;Regression Line&quot;]
-    Line --&gt; R2[&quot;R^2&quot;]
-    R2 --&gt; Predict[&quot;Predict y from x&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Correlation summarizes movement together, while regression turns that movement into an equation and then checks the fit with R² and residuals.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Pearson r</strong>: strength of <em>linear correlation</em> (-1 to +1).</li>
@@ -106,15 +95,18 @@ sales = np.array([1300, 1280, 1320, 1360, 1410, 1450])
 <p><strong>Step 2 — Correlation</strong></p>
 <pre><code class="language-python">print(&quot;r:&quot;, np.corrcoef(ads, sales)[0, 1])
 </code></pre>
+<p><strong>Expected output:</strong> something close to <code>r: 0.9...</code>, indicating a strong positive linear relationship in this toy dataset.</p>
 <p><strong>Step 3 — Fit a regression</strong></p>
 <pre><code class="language-python">from sklearn.linear_model import LinearRegression
 X = ads.reshape(-1, 1)
 model = LinearRegression().fit(X, sales)
 print(&quot;β1:&quot;, model.coef_[0], &quot;β0:&quot;, model.intercept_)
 </code></pre>
+<p><strong>Expected output:</strong> <code>β1</code> tells you how much sales move per one-unit increase in ad spend, while <code>β0</code> gives the fitted intercept.</p>
 <p><strong>Step 4 — R²</strong></p>
 <pre><code class="language-python">print(&quot;R^2:&quot;, model.score(X, sales))
 </code></pre>
+<p><strong>Expected output:</strong> often something like <code>R^2: 0.8...</code> on this simple example. That is high explanatory power, but it is still not a substitute for residual checks.</p>
 <p><strong>Step 5 — Residuals</strong></p>
 <pre><code class="language-python">import matplotlib.pyplot as plt
 resid = sales - model.predict(X)
