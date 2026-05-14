@@ -2,7 +2,7 @@
 series: devops-101
 episode: 4
 title: Environments and Configuration
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Environment
   - TwelveFactor
 seo_description: Safe patterns for separating dev, stage, and prod environments and managing config and secrets across them.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Environments and Configuration
 
-This is post 4 in the DevOps 101 series.
+Teams usually notice configuration discipline only after it breaks. The application works in development, then stage uses a different secret, production needs a different domain, and suddenly the same code requires a different build for every environment.
 
-> DevOps 101 series (4/10)
+Good configuration management prevents that drift. The code stays the same, the build artifact stays the same, and only environment-specific values change. That is what makes deployments repeatable instead of fragile.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If your *environment variables* are *hardcoded into the code*, do you not have to *rebuild for every deploy*?
-
-> Good config management makes *one codebase / N environments* possible.
-
-<!-- a-grade-intro:end -->
+This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ This is post 4 in the DevOps 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["app code (1)"] --> Build["build artifact (1)"]
-    Build --> Dev["dev (config A)"]
-    Build --> Stage["stage (config B)"]
-    Build --> Prod["prod (config C)"]
-```
+![Concept at a Glance](../../../assets/devops-101/04/04-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
