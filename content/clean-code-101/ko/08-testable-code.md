@@ -18,12 +18,18 @@ tags:
   - DependencyInjection
   - Refactoring
 seo_description: 테스트 가능성을 높이는 구체적인 기법을 배웁니다. 순수 함수와 의존성 주입을 활용해 흔들리지 않는 견고한 단위 테스트 작성법을 배웁니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 테스트 가능한 코드
 
-어떤 코드는 테스트 한 줄로 끝나는데, 어떤 코드는 테스트를 쓰려는 순간부터 거대한 준비 작업이 필요합니다. 이 글은 Clean Code 101 시리즈의 8번째 글입니다. 여기서는 그 차이가 어디서 오는지, 그리고 설계를 바꾸면 왜 테스트가 자연스럽게 따라오는지 설명하겠습니다.
+어떤 코드는 테스트 한 줄로 끝나는데, 어떤 코드는 테스트를 쓰려는 순간부터 거대한 준비 작업이 필요합니다.
+
+이 글은 Clean Code 101 시리즈의 8번째 글입니다.
+
+여기서는 그 차이가 어디서 오는지, 그리고 설계를 바꾸면 왜 테스트가 자연스럽게 따라오는지 설명하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    L["Logic"] --> P["Pure functions"]
-    L --> S["Side-effect adapters"]
-    P --> T1["Unit tests"]
-    S --> T2["Integration tests"]
-```
+![테스트 가능한 코드](../../../assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)
+
+*테스트 가능성의 흐름: 순수 로직과 IO 경계를 나누면 단위 테스트와 통합 테스트가 각자 자리를 찾습니다.*
 
 가장 좋은 구조는 순수한 핵심 로직을 얇은 어댑터가 둘러싸는 형태입니다.
 
@@ -153,6 +155,23 @@ def fetch_user(uid, http: HttpClient):
 
 외부 호출을 하나의 어댑터로 집중시키면 테스트 범위를 나누기 쉬워집니다. 단위 테스트는 Fake로, 통합 테스트는 실제 어댑터로 분리할 수 있습니다.
 
+## 검증 방법
+
+```bash
+python -m pytest -q tests/test_total.py tests/test_notify.py
+python -m pytest -q tests/test_http_adapter.py
+```
+
+**기대 결과**
+
+- 순수 함수 테스트는 매우 빠르게 끝나야 합니다.
+- 어댑터 테스트만 외부 의존성과 통합되어야 합니다.
+
+## 실패하기 쉬운 지점
+
+- `datetime.now()`와 난수가 아직 핵심 로직 안에 남아 있습니다.
+- mock 수가 많아졌는데도 함수 책임은 그대로 큽니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 핵심 로직은 IO를 몰라야 합니다.
@@ -216,5 +235,6 @@ def fetch_user(uid, http: HttpClient):
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Mocks Aren't Stubs (Martin Fowler)](https://martinfowler.com/articles/mocksArentStubs.html)
 - [Pytest — Fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
-
+- [Pytest fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
+- [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/)
 Tags: Computer Science, CleanCode, Testability, Testing, DependencyInjection, Refactoring

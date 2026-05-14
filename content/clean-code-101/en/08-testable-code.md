@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 8
 title: Testable Code
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - DependencyInjection
   - Refactoring
 seo_description: Make code testable with pure functions, dependency injection, seams, fakes, and spies; isolate time and IO at boundaries.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Testable Code
 
-> Clean Code 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why is some code one line to test while other code resists testing entirely?
-
-> The way side effects and dependencies are handled decides it. Separate them and tests fall out naturally.
+Some code takes one line to test and some code fights back with clocks, networks, databases, and hidden globals. That difference is usually a design decision, not a testing-library problem.
 
 This is post 8 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will push time, IO, and randomness to the boundaries, then use seams, fakes, and adapters to make tests fast enough that they can guide everyday refactoring.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ Hard-to-test code is a sign of hard-to-change structure. Testability is a measur
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    L["Logic"] --> P["Pure functions"]
-    L --> S["Side-effect adapters"]
-    P --> T1["Unit tests"]
-    S --> T2["Integration tests"]
-```
+![Testable Code](../../../assets/clean-code-101/08/08-01-concept-at-a-glance.en.png)
+
+*Testability flow: separate pure logic from IO boundaries so unit tests and integration tests each get the right job.*
 
 A pure core surrounded by thin adapters.
 
@@ -161,6 +153,23 @@ def fetch_user(uid, http: HttpClient):
 
 Concentrate external calls in a single adapter.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_total.py tests/test_notify.py
+python -m pytest -q tests/test_http_adapter.py
+```
+
+**Expected output**
+
+- Pure-function tests should finish almost instantly.
+- Only adapter tests should cross real IO boundaries.
+
+## Failure Modes to Watch
+
+- `datetime.now()` or randomness still lives inside core logic.
+- Mock count rises but the function responsibilities stay oversized.
+
 ## What to Notice in This Code
 
 - The core logic knows nothing about IO.
@@ -224,5 +233,6 @@ Testability mirrors design. Next: how to safely change code — refactoring basi
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Mocks Aren't Stubs (Martin Fowler)](https://martinfowler.com/articles/mocksArentStubs.html)
 - [Pytest — Fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
-
+- [Pytest fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
+- [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/)
 Tags: Computer Science, CleanCode, Testability, Testing, DependencyInjection, Refactoring
