@@ -14,17 +14,19 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: StateGraph로 노드와 엣지를 정의해 LLM 워크플로를 그래프로 표현하는 방법을 정리합니다
 ---
 
 # LangGraph 소개와 그래프 기초
 
-이 글은 LangGraph 101 시리즈의 첫 번째 글입니다. LangChain 스타일의 에이전트를 처음 묶기 시작하면 많은 팀이 비슷한 벽을 만납니다. 프롬프트를 바꾸면 답변은 달라지는데, 왜 달라졌는지는 설명하기 어렵고, 한 단계에서 생긴 문제가 다음 단계의 문장 안으로 숨어 버립니다. 겉으로는 “모델이 좀 불안정하다”는 문제처럼 보이지만, 실제로는 워크플로가 코드 구조에 드러나지 않아서 생기는 경우가 더 많습니다.
+LangChain 스타일의 에이전트를 처음 묶기 시작하면 많은 팀이 비슷한 벽을 만납니다. 프롬프트를 바꾸면 답변은 달라지는데, 왜 달라졌는지는 설명하기 어렵고, 한 단계에서 생긴 문제가 다음 단계의 문장 안으로 숨어 버립니다. 겉으로는 “모델이 좀 불안정하다”는 문제처럼 보이지만, 실제로는 워크플로가 코드 구조에 드러나지 않아서 생기는 경우가 더 많습니다.
+
+이 글은 LangGraph 101 시리즈의 첫 번째 글입니다. 여기서는 LangGraph를 편리한 에이전트 유틸리티가 아니라, 상태가 단계별로 명시적으로 이동하는 그래프 런타임으로 읽는 출발점을 잡습니다.
 
 운영에 들어가면 이 문제는 훨씬 더 선명해집니다. 어떤 요청은 깔끔하게 끝나는데 어떤 요청은 같은 도구를 두 번 호출하고, 어떤 세션은 중간 상태가 남지 않아 재현이 되지 않으며, 어떤 팀은 마지막 답변만 비교하다가 앞단 라우팅 오류를 한참 뒤에야 발견합니다. 현업에서 제가 자주 본 근본 원인은 단순합니다. 워크플로는 분명 존재하는데, 그 워크플로가 구조로 보이지 않는 것입니다.
 
-여기서는 LangGraph를 편리한 에이전트 유틸리티가 아니라, **상태가 단계별로 명시적으로 이동하는 그래프 런타임**으로 이해해 보겠습니다. 이 관점이 중요합니다. **LangGraph는 프롬프트를 영리하게 쓰는 도구라기보다, 상태 전이와 실행 규칙을 숨기지 않게 만드는 구조**이기 때문입니다.
+이 글에서 붙잡아야 할 관점은 분명합니다. **LangGraph는 프롬프트를 영리하게 쓰는 도구라기보다, 상태 전이와 실행 규칙을 숨기지 않게 만드는 구조**입니다.
 
 이 감각이 한 번 잡히면 뒤의 글도 훨씬 쉬워집니다. 체크포인트는 “기억 기능”이 아니라 상태 스냅샷 저장소로 읽히고, 조건부 엣지는 “if 문 대체재”가 아니라 런타임 라우팅 규칙으로 보이기 시작합니다. 도구 호출 루프도 마찬가지입니다. 노드, 엣지, 상태를 분리해서 보는 팀은 실패를 단계별로 추적하고, 긴 체인 하나로만 보는 팀은 마지막 결과 문자열부터 붙잡는 경우가 많습니다.
 
@@ -163,6 +165,68 @@ if __name__ == "__main__":
 
 ---
 
+## 실행 결과를 먼저 검증해 보기
+
+위 예제가 정말 `StateGraph`처럼 동작하는지 확인하려면, 마지막 문자열만 보지 말고 최종 상태 전체를 함께 확인하는 편이 좋습니다. 입문 단계에서 이 검증 습관을 들여 두면 이후 체크포인트와 조건부 엣지를 붙였을 때도 어디서부터 봐야 할지 빨리 감이 옵니다.
+
+```python
+app = build_graph()
+result = app.invoke(
+    {
+        "user_request": "Explain how a LangGraph StateGraph works.",
+        "topic": "",
+        "outline": [],
+        "answer": "",
+    }
+)
+
+assert result["topic"] == "graph basics"
+assert result["outline"] == [
+    "Define graph basics",
+    "Show the nodes in the graph",
+    "Explain how invoke() runs the graph",
+]
+assert "Chosen topic: graph basics" in result["answer"]
+
+print(result)
+```
+
+**Expected output:**
+
+```text
+{
+  'user_request': 'Explain how a LangGraph StateGraph works.',
+  'topic': 'graph basics',
+  'outline': [
+    'Define graph basics',
+    'Show the nodes in the graph',
+    'Explain how invoke() runs the graph'
+  ],
+  'answer': 'Request: Explain how a LangGraph StateGraph works.\n...'
+}
+```
+
+이 검증이 중요한 이유는 `invoke()`가 마지막 노드의 부분 반환값만 주는 함수처럼 읽히지 않게 만들기 때문입니다. `topic`, `outline`, `answer`가 모두 함께 남아 있음을 눈으로 확인하면, 그래프를 “최종 문장 생성기”가 아니라 “중간 상태가 보이는 워크플로”로 읽기 쉬워집니다.
+
+---
+
+## 실패가 시작되는 지점을 어떻게 좁힐까
+
+그래프 기초 단계에서 가장 자주 만나는 실패는 복잡한 오류가 아니라 구조를 잘못 읽는 데서 시작합니다. 아래 세 가지는 작은 예제에서도 바로 재현됩니다.
+
+1. **입력 초기값을 비워 두지 않기**  
+   `topic`, `outline`, `answer`를 초기화하지 않고 넘기면 노드가 기대하는 상태 계약이 흐려집니다. TypedDict가 계약을 보여 주더라도, 호출부가 그 계약을 지키지 않으면 디버깅이 어려워집니다.
+
+2. **마지막 문자열만 비교하지 않기**  
+   `answer`만 보면 `write_answer()`를 먼저 의심하기 쉽습니다. 하지만 실제 원인은 `choose_topic()`에서 잘못된 route를 골랐거나 `build_outline()`이 비어 있는 리스트를 만들었기 때문일 수 있습니다.
+
+3. **노드 책임을 넓히지 않기**  
+   `choose_topic()`가 outline까지 만들고, `build_outline()`가 answer 일부까지 조립하기 시작하면 노드 이름이 책임을 설명하지 못합니다. 이때부터 그래프는 보이는데 흐름은 설명되지 않는 상태가 됩니다.
+
+제가 실무에서 먼저 하는 점검도 비슷합니다. `StateGraph` 정의를 보고, 각 노드가 바꾸는 필드를 보고, 마지막에 `invoke()` 결과에서 필드별 상태를 따로 확인합니다. 이 순서만 지켜도 “모델이 흔들린다”는 막연한 진단이 “어느 노드가 어느 필드를 잘못 갱신했다”는 구체적인 진단으로 바뀌기 쉽습니다.
+
+---
+
 ## 이 코드에서 먼저 봐야 할 점
 
 코드 전체를 한 번에 읽기보다, 처음에는 아래 세 지점만 잡는 편이 좋습니다.
@@ -273,6 +337,10 @@ LangGraph를 처음 보면 `add_node()`와 `add_edge()` 같은 API가 먼저 눈
 - [LangGraph concepts: low level](https://langchain-ai.github.io/langgraph/concepts/low_level/)
 - [StateGraph API reference](https://langchain-ai.github.io/langgraph/reference/graphs/)
 - [LangGraph introduction tutorial](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
+
+### 소스 코드와 예제
+- [langchain-ai/langgraph GitHub repository](https://github.com/langchain-ai/langgraph)
+- [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/get-started/1-build-basic-chatbot/)
 
 ### 관련 시리즈
 - [LangChain 101](../../langchain-101/ko/01-lcel-runnable-basics.md) — LangGraph가 노드 안에서 호출하는 Runnable과 LCEL을 다룹니다. 그래프가 아니라 그래프의 한 노드에서 무엇이 실행되는지가 흐릿하면 이 시리즈로 한 단계 내려가 읽기를 권장합니다.
