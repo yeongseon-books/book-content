@@ -17,7 +17,7 @@ tags:
   - Workflow
   - Beginner
 seo_description: 적재부터 시각화까지 Pandas 실전 분석 흐름을 한 번에 묶어 보는 글입니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 실전 데이터 분석
@@ -44,13 +44,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Load["load (read_csv)"] --> Clean["clean (dropna / dtype)"]
-    Clean --> Reshape["reshape (groupby / merge)"]
-    Reshape --> Agg["aggregate (KPI)"]
-    Agg --> Vis["visualize / report"]
-```
+![적재부터 지표 집계와 시각화까지 이어지는 재현 가능한 분석 파이프라인](../../../assets/pandas-101/10/10-01-concept-at-a-glance.ko.png)
+*적재부터 지표 집계와 시각화까지 이어지는 재현 가능한 분석 파이프라인*
 
 ## 핵심 용어
 
@@ -121,6 +116,17 @@ monthly = kpi(df)
 print(monthly)
 ```
 
+월별 KPI 표는 파이프라인이 실제로 끝까지 이어졌는지 확인하는 가장 좋은 중간 산출물입니다. 총합, 건수, 평균이 한 번에 나오면 다음 단계 시각화도 훨씬 단순해집니다.
+
+**예상 출력:**
+
+```text
+         total  n   mean
+month                    
+2026-01  450.0  3  150.0
+2026-02  520.0  4  130.0
+```
+
 집계 함수는 결과 표를 만드는 핵심입니다. 월별 총합, 건수, 평균처럼 분석 목적에 맞는 핵심 지표를 한곳에 모아 정의합니다.
 
 ### 5단계 - 시각화하기
@@ -130,6 +136,14 @@ import matplotlib.pyplot as plt
 monthly["total"].plot(kind="bar", title="Monthly Sales")
 plt.tight_layout()
 plt.savefig("monthly.png")
+```
+
+시각화는 노트북 화면에서만 보고 끝내지 말고 파일로 남겨야 공유와 회고가 쉬워집니다. 저장 경로가 분명하면 파이프라인 자동화에도 그대로 연결할 수 있습니다.
+
+**예상 출력:**
+
+```text
+monthly.png saved
 ```
 
 표만 보는 것보다 시각화를 함께 두면 추세와 이상치를 훨씬 빨리 읽을 수 있습니다. 결과를 파일로 저장해 두면 공유와 재검토도 쉬워집니다.
