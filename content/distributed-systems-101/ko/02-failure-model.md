@@ -18,12 +18,16 @@ tags:
   - Byzantine
   - Reliability
 seo_description: 장애 모델을 crash, omission, timing, Byzantine으로 구분해 봅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 장애 모델
 
+운영 채널에서 "서버가 죽었습니다"라고 말할 때, 실제로는 여러 종류의 사건이 한 문장에 섞여 있습니다. 프로세스가 멈춘 것인지, 패킷이 빠지는 것인지, 아니면 너무 느려서 살아 있어도 죽은 것처럼 보이는 것인지부터 갈라야 설계가 흔들리지 않습니다.
+
 이 글은 Distributed Systems 101 시리즈의 두 번째 글입니다.
+
+여기서는 crash, omission, timing, Byzantine을 설계 언어로 정리하고, 뒤이어 나오는 CAP와 합의 이야기가 어떤 가정 위에 서는지 분명히 잡습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A["fail-stop / crash"] --> B["omission"]
-    B --> C["timing"]
-    C --> D["byzantine"]
-    A -.->|weaker assumption| D
-```
+![장애 모델의 강도 스펙트럼](../../../assets/distributed-systems-101/02/02-01-concept-at-a-glance.ko.png)
+
+*장애 모델의 강도 스펙트럼*
 
 오른쪽으로 갈수록 더 험한 세계를 가정합니다. 세계가 험해질수록 알고리즘은 더 비싸지고 더 많은 노드를 요구합니다.
 
@@ -145,7 +145,7 @@ sudo iptables -F
 ## 이 코드에서 먼저 봐야 할 점
 
 - 같은 장애처럼 보여도 실제로는 종류와 대응 방식이 다릅니다.
-- omission과 timing은 타임아웃을 통해서만 구분할 수 있고, 그마저도 정확하지 않습니다.
+- 메시지 누락과 지연 장애는 타임아웃으로만 가늠할 수 있고, 그 판단도 완전하지 않습니다.
 - Byzantine 모델은 비용을 한 단계가 아니라 한 자릿수 이상 끌어올립니다.
 - 파티션은 노드 레벨이 아니라 링크 레벨에서 일어나는 사건입니다.
 
