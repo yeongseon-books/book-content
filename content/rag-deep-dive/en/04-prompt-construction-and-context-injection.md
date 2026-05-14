@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved context into LLM input, traced in code.
 ---
 
@@ -22,7 +22,7 @@ seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved conte
 
 PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.
 
-This is the 4th article in the RAG Deep Dive series.
+This is post 4 in the RAG Deep Dive series.
 
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
@@ -38,8 +38,6 @@ This is the 4th article in the RAG Deep Dive series.
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
-
-> RAG Deep Dive series (4/6)
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -415,15 +413,19 @@ The broader lesson is the same one that has repeated through this series. Retrie
 
 ## References
 
-1. [`langchain_core/prompts/prompt.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
-2. [`langchain_core/prompts/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py)
-3. [`langchain_core/prompts/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py)
-4. [`langchain_core/prompts/chat.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
-5. [`langchain_core/messages/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
-6. [`langchain_core/messages/human.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py)
-7. [`langchain_core/messages/system.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py)
-8. [`langchain_core/messages/ai.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py)
-9. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-10. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+### Official Docs
+
+- [LangChain Prompt Templates concept guide](https://python.langchain.com/docs/concepts/prompt_templates/)
+- [LangChain `PromptTemplate` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.prompt.PromptTemplate.html)
+- [LangChain `ChatPromptTemplate` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html)
+- [LangChain `MessagesPlaceholder` API reference](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.MessagesPlaceholder.html)
+
+### Source Code
+
+- [LangChain `prompt.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
+- [LangChain `chat.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
+- [LangChain `messages/base.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
 
 Tags: RAG, LangChain, Vector Search, LLM

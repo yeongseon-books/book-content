@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: PromptTemplate과 MessagesPlaceholder가 검색된 컨텍스트를 LLM 입력으로 변환하는 방식을 코드로 추적합니다.
 ---
 
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     main()
 ```
 
-핵심은 두 가지입니다. `partial()`은 호출 시마다 반복되는 정책 입력을 줄여 주고, `invoke()`는 프롬프트를 runnable 그래프 안에 남겨 둡니다. RAG에서는 안정적인 규칙과 매번 달라지는 증거가 공존하므로, 이 둘을 분리하는 습관이 특히 유용합니다.
+여기서 기억할 점은 두 가지입니다. `partial()`은 호출할 때마다 되풀이되는 정책 입력을 덜어 주고, `invoke()`는 프롬프트를 runnable 그래프에 그대로 연결해 둡니다. RAG에서는 고정 규칙과 매 호출마다 바뀌는 근거가 함께 움직이므로, 둘을 나눠 두는 편이 실무에서 다루기 쉽습니다.
 
 ---
 
@@ -416,15 +416,19 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-1. [`langchain_core/prompts/prompt.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
-2. [`langchain_core/prompts/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py)
-3. [`langchain_core/prompts/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py)
-4. [`langchain_core/prompts/chat.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
-5. [`langchain_core/messages/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
-6. [`langchain_core/messages/human.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py)
-7. [`langchain_core/messages/system.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py)
-8. [`langchain_core/messages/ai.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py)
-9. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-10. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+### 공식 문서
+
+- [LangChain Prompt Templates 개념 가이드](https://python.langchain.com/docs/concepts/prompt_templates/)
+- [LangChain `PromptTemplate` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.prompt.PromptTemplate.html)
+- [LangChain `ChatPromptTemplate` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html)
+- [LangChain `MessagesPlaceholder` API 레퍼런스](https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.MessagesPlaceholder.html)
+
+### 소스 코드
+
+- [LangChain `prompt.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py)
+- [LangChain `chat.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py)
+- [LangChain `messages/base.py` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py)
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
 
 Tags: RAG, LangChain, Vector Search, LLM
