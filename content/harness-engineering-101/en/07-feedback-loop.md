@@ -3,7 +3,7 @@ title: Feedback Loops — Building Structures That Let Agents Recover from Failu
 series: harness-engineering-101
 episode: 7
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Feedback
 - Reflection
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Agents rarely succeed on the first try. A Feedback Loop is the structure
   that hands failure back to the agent so it can fix its own work.
 ---
 
 # Feedback Loops — Building Structures That Let Agents Recover from Failure
 
-This is post 7 in the Harness Engineering 101 series.
+Agents frequently fail on the first attempt. They choose the wrong tool, pass the wrong arguments, violate an output policy, or claim completion too early. The important distinction is not whether failure exists. It is whether the system can convert failure into a better next attempt.
 
-> Harness Engineering 101 Series (7/10)
+Retrying blindly is usually just a cost amplifier. Returning the raw failure to the user is even worse. Productive feedback loops classify failure, choose the right recovery path, and stop before one task turns into an unbounded loop.
 
-Agents rarely succeed on the first try. A Feedback Loop is the structure that hands failure back to the agent so it can fix its own work.
+This is post 7 in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.
 
 ---
+
+## Questions this chapter answers
+
+- Why is it wasteful to handle every failure with the same retry logic?
+- How do you decide between retry and reflect?
+- What information should a reflect message include and exclude?
+- How do loops turn into cost incidents if they lack exit conditions?
+- What should be stored so the agent avoids repeating the same failure pattern later?
+
+> A good agent is not one that never fails. It is one that turns failure into a controlled improvement signal.
 
 ![Feedback loops - building structures that let agents recover from failure](../../../assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
 
@@ -301,6 +311,14 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 - Prevent infinite loops with max attempts, cost limit, and repetition detection.
 - Failure memory injected into the first-attempt prompt makes the system improve over time.
 
+## Operational checklist
+
+- [ ] Classify failures into transient, reasoning, and deterministic buckets before recovery.
+- [ ] Do not use identical logic for retry and reflect paths.
+- [ ] Include What, Why, How, and a constraint in every reflect message.
+- [ ] Cap attempts, cumulative cost, and repeated failure patterns together.
+- [ ] Escalate unresolved loops to humans and record failure memory for the next run.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -321,9 +339,15 @@ An agent that meets the same mistakes fresh every time does not improve. Failure
 
 ## References
 
+### Official docs and research
+
 - [Shinn et al. — Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366)
 - [Madaan et al. — Self-Refine: Iterative Refinement with Self-Feedback](https://arxiv.org/abs/2303.17651)
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [LangGraph — Reflection Patterns](https://langchain-ai.github.io/langgraph/tutorials/reflection/reflection/)
+
+### Verification-friendly references
+
+- [OpenAI Cookbook — Techniques to Improve Reliability](https://cookbook.openai.com/articles/techniques_to_improve_reliability)
 
 Tags: AI Agent, Harness, Production, Reliability
