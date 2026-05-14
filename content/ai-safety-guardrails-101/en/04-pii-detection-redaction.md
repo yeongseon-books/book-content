@@ -14,7 +14,7 @@ tags:
 - PII
 - Presidio
 - GDPR
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Protect user privacy and maintain GDPR compliance by redacting PII in LLM inputs and outputs using Microsoft Presidio and reversible tokenization.
 ---
 
@@ -27,7 +27,14 @@ LLM applications handle personal data in both directions. Users send sensitive i
 This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Where does PII leak into an LLM system besides the user prompt itself?
+- Which PII categories are easy for regex and which need NER support?
+- When is Microsoft Presidio a better fit than hand-written patterns alone?
+- Why is reversible tokenization sometimes safer than plain masking?
+- Why does every outbound response need a separate PII re-check?
 
 ## "Did You Mask the Email?"
 
@@ -49,6 +56,9 @@ This post covers:
 ---
 
 ## Section 1 — PII Categories
+
+![Section 1 — PII Categories](../../../assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
+*PII protection has to cover inbound detection, model-time masking, outbound re-checking, and storage separation.*
 
 | Category | Examples |
 | --- | --- |
@@ -235,6 +245,14 @@ Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce pr
 4. **PII in logs** — debug logs are the most common leak surface. Mask before logging too.
 5. **Not disclosing foreign LLM providers** — direct GDPR / privacy-law violation.
 
+## Operational Checklist
+
+- [ ] Detect structured PII with regex and unstructured PII with NER.
+- [ ] Decide up front whether plain masking or reversible tokenization fits the endpoint.
+- [ ] Re-scan outbound responses before they reach the user.
+- [ ] Keep raw PII out of general logs and caches.
+- [ ] Document retention, deletion, and provider-disclosure rules with legal review.
+
 ---
 
 ## Key Takeaways
@@ -264,9 +282,16 @@ Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce pr
 
 ## References
 
-- [Microsoft Presidio](https://microsoft.github.io/presidio/)
-- [GDPR Article 4 — Definitions](https://gdpr.eu/article-4-definitions/)
-- [HIPAA — Privacy Rule Summary](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
-- [OpenAI — Enterprise Privacy](https://openai.com/enterprise-privacy)
+### Official Docs
+
+- [Microsoft Presidio documentation](https://microsoft.github.io/presidio/)
+- [GDPR Article 4 — Definitions](https://gdpr-info.eu/art-4-gdpr/)
+- [HIPAA Privacy Rule summary (HHS)](https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html)
+- [OpenAI Enterprise privacy commitments](https://openai.com/enterprise-privacy)
+- [Azure OpenAI data, privacy, and security](https://learn.microsoft.com/azure/ai-foundry/responsible-ai/openai/data-privacy)
+
+### Verification-Friendly Sources
+
+- [Presidio Analyzer Python API](https://microsoft.github.io/presidio/api/analyzer_python/)
 
 Tags: AI Safety, PII, Presidio, GDPR
