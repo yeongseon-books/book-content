@@ -54,101 +54,100 @@
 </head>
 <body>
 <h1>Building the Demo</h1>
-<p>This is post 4 in the Portfolio Project 101 series.</p>
+<p>A README alone is not enough. A portfolio project becomes much more convincing when another person can click around and feel the value directly. If there is no demo, or if the first screen is empty, or if the login step blocks everything, the reviewer often leaves before the project has a chance to explain itself.</p>
+<p>This is post 4 in the Portfolio Project 101 series. Here we will treat the demo not as a feature showroom, but as a short experience that lets a first-time visitor understand the core value within the first few clicks.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (4/10)</p>
+<p>A good demo does not need to show everything. It needs to make the core value obvious quickly.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> should a <em>demo</em> prove <em>value</em> within <em>thirty seconds</em>?</p>
-<blockquote>
-<p>Visitors leave if they cannot feel <em>value</em> in <em>three clicks</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>A <em>demo scenario</em></li>
-<li><em>Seed data</em></li>
-<li><em>Video</em> vs <em>live</em></li>
-<li>A <em>demo account</em></li>
-<li><em>Failure fallback</em></li>
+<li>Why is the first screen the most important part of a portfolio demo?</li>
+<li>What do seed data and a shared demo account solve?</li>
+<li>What role does a backup video play when the live demo is not enough?</li>
+<li>Why should failure handling and health checks count as part of demo quality?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>When a <em>demo</em> is <em>alive</em>, the <em>project</em> is <em>alive</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    L[Land] --&gt; S[Sample]
-    S --&gt; A[Action]
-    A --&gt; R[Result]
-    R --&gt; C[CTA]
-</code></pre>
+<p>A live demo makes the project feel alive. Without it, the reviewer is still depending on your description. With it, they can verify the project on their own terms.</p>
+<p>That does not mean you need to expose every feature. Portfolio demos are usually stronger when they focus on one sharp path and remove friction from the first experience.</p>
+<h2>Mental Model</h2>
+<p>A useful demo often follows a short path: landing screen, sample context, one action, visible result, then a next step.</p>
+<p><img alt="The shortest path from landing screen to felt value in a demo" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>The shortest path from landing screen to felt value in a demo</em></p>
+<p>This flow helps you decide what to remove. Most visitors do not want a full feature tour. They want to know what the product does, why it matters, and whether it really works.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>landing</strong>: the <em>first screen</em>.</li>
-<li><strong>seed</strong>: <em>demo data</em>.</li>
-<li><strong>demo account</strong>: a <em>shared login</em>.</li>
-<li><strong>video</strong>: a <em>backup</em> clip.</li>
-<li><strong>fallback</strong>: a <em>failure</em> response.</li>
+<li><strong>First screen</strong>: the first surface the visitor sees after opening the demo.</li>
+<li><strong>Seed data</strong>: sample data that prevents the product from looking empty.</li>
+<li><strong>Shared account</strong>: a low-friction way to let people try the system.</li>
+<li><strong>Backup video</strong>: a short fallback proof when the live demo has trouble.</li>
+<li><strong>Failure path</strong>: the route you use to understand what broke when the demo misbehaves.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: A <em>blank</em> screen after login.</p>
-<p><strong>After</strong>: <em>Seed + core flow</em> is visible.</p>
-<h2>Hands-on: Demo Table</h2>
-<p><strong>Step 1 — Scenario</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: the visitor logs in and lands on a blank or confusing screen.</p>
+<p><strong>After</strong>: the first screen already contains enough context to explain the core workflow, and one short action produces a visible result.</p>
+<p>The goal is not completeness. It is immediate legibility.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Define the demo scenario</strong></p>
+<p>Start by compressing the core journey into a few steps.</p>
 <pre><code class="language-python">flow = [&quot;land&quot;, &quot;sample&quot;, &quot;action&quot;, &quot;result&quot;]
 </code></pre>
-<p><strong>Step 2 — Seed data</strong></p>
+<p>This protects the demo from turning into a feature maze.</p>
+<p><strong>Step 2 — Prepare seed data</strong></p>
+<p>Blank states are often terrible portfolio experiences.</p>
 <pre><code class="language-python">seed = {&quot;users&quot;: 5, &quot;tasks&quot;: 12}
 </code></pre>
-<p><strong>Step 3 — Demo account</strong></p>
+<p>The seed gives the visitor context immediately. A scheduling app should show schedules. An analytics app should show a realistic example result.</p>
+<p><strong>Step 3 — Offer a shared path</strong></p>
+<p>The project is much easier to inspect when the reviewer can try it without setup friction.</p>
 <pre><code class="language-python">demo = {&quot;id&quot;: &quot;guest@demo&quot;, &quot;pw&quot;: &quot;demo1234&quot;}
 </code></pre>
-<p><strong>Step 4 — Backup video</strong></p>
+<p>A shared account or another guided access path keeps the reviewer from burning time before they reach the actual value.</p>
+<p><strong>Step 4 — Keep a backup video</strong></p>
+<p>Live demos are powerful, but they are not always reliable.</p>
 <pre><code class="language-python">video_url = &quot;https://youtu.be/example&quot;
 </code></pre>
-<p><strong>Step 5 — Healthcheck</strong></p>
+<p>A short backup video prevents one hosting hiccup from turning into a total explanation failure.</p>
+<p><strong>Step 5 — Expose a health check</strong></p>
+<p>You need a quick way to separate “the link is broken” from “the app is down.”</p>
 <pre><code class="language-python">health = &quot;/healthz&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>Health checks are not just for infrastructure. They help you keep the demo trustworthy over time.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li>The <em>first screen</em> shows the <em>seed</em>.</li>
-<li>The <em>account</em> is <em>shared</em>.</li>
-<li>The <em>video</em> is a <em>backup</em>.</li>
+<li>The first screen should prove value, not just show navigation.</li>
+<li>Seed data and shared access reduce the friction that makes many demos feel empty.</li>
+<li>Backup proof and health checks make the demo feel maintained, not accidental.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>Stuck at <em>login</em>.</strong></li>
-<li><strong>No <em>seed</em> data.</strong></li>
-<li><strong>The <em>account</em> is <em>private</em>.</strong></li>
-<li><strong>No <em>backup video</em>.</strong></li>
-<li><strong>No <em>healthcheck</em>.</strong></li>
+<li>The visitor gets stuck at login before seeing any meaningful value.</li>
+<li>The product opens in an empty state with no context.</li>
+<li>The only usable account is private.</li>
+<li>The live demo fails and there is no backup evidence.</li>
+<li>There is no quick path to confirm whether the service itself is healthy.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>SaaS companies offer a <em>30-second guest mode</em> demo.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li>The <em>first screen</em> matters <em>most</em>.</li>
-<li><em>Seed</em> is <em>required</em>.</li>
-<li>The <em>shared account</em> is <em>public</em>.</li>
-<li>The <em>video</em> is the <em>backup</em>.</li>
-<li><em>Healthcheck</em> watches <em>state</em>.</li>
-</ul>
+<p>For portfolio demos, the number of friction points usually matters more than the number of features.</p>
+<h2>How This Reads in Practice</h2>
+<p>Real SaaS teams spend a lot of time on guest mode, sample data, and the first-time user path for exactly this reason: people want to feel value quickly. Portfolio projects benefit from the same thinking.</p>
+<p>If you make one convincing path obvious, the whole project feels stronger.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Four-step</em> scenario.</li>
-<li>[ ] <em>Seed</em> data.</li>
-<li>[ ] <em>Shared</em> account.</li>
-<li>[ ] <em>Backup</em> video.</li>
+<li>[ ] The demo scenario fits into a few steps.</li>
+<li>[ ] The first screen includes sample data or a visible result.</li>
+<li>[ ] There is a shared account or another low-friction access path.</li>
+<li>[ ] A backup video exists in case the live demo is unavailable.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>demo scenario</em> in one line.</li>
-<li>State the purpose of <em>seed data</em> in one line.</li>
-<li>State the role of a <em>backup video</em> in one line.</li>
+<li>Rewrite your demo as a four-step scenario.</li>
+<li>Choose one sample data point that should be visible immediately.</li>
+<li>Decide what proof you would show if the live demo went down.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Deploying the Project</em>.</p>
+<p>A strong demo does not have to show every feature. It should show context on the first screen, let the reviewer take one meaningful action, and produce a clear result. When you add a shared path, a backup video, and a health check, even a small project starts to feel much more real.</p>
+<p>Next, we will look at deployment and at what makes a portfolio project verifiable from a public URL instead of only from your machine.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
@@ -163,10 +162,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.amazon.com/Demo-Driven-Development-Robert-Reppel/dp/B08GFL12CJ">Demo-Driven Development - Robert Reppel</a></li>
-<li><a href="https://greatdemo.com/">Great Demo - Peter Cohan</a></li>
-<li><a href="https://basecamp.com/shapeup/2.4-chapter-09">Showing the Product</a></li>
-<li><a href="https://devcenter.heroku.com/articles/heroku-button">Heroku Buttons</a></li>
+<li><a href="https://greatdemo.com/">Great Demo!</a></li>
+<li><a href="https://momtestbook.com/">The Mom Test</a></li>
+<li><a href="https://opensource.guide/building-community/">Open Source Guides — Building welcoming communities</a></li>
+<li><a href="https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests">About issue and project templates (GitHub Docs)</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Demo, UX, Showcase, Beginner</p>
 </body>
