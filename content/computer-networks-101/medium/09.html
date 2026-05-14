@@ -79,18 +79,8 @@
 <p>"Real time" usually means "shorter than a human's patience." If 200 ms is fine, WebSocket only adds cost.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant C as Client
-    participant S as Server
-    C-&gt;&gt;S: GET /chat (Upgrade: websocket)
-    S--&gt;&gt;C: 101 Switching Protocols
-    Note over C,S: Bidirectional frames over the same TCP connection
-    C-&gt;&gt;S: text frame &quot;hello&quot;
-    S-&gt;&gt;C: text frame &quot;hi&quot;
-    S-&gt;&gt;C: text frame &quot;you have 1 new message&quot;
-    C-&gt;&gt;S: ping
-    S-&gt;&gt;C: pong
-</code></pre>
+<p><img alt="From HTTP Upgrade to a long-lived WebSocket stream" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>After the HTTP upgrade succeeds, the same TCP connection becomes a long-lived bidirectional frame channel.</em></p>
 <p>The pivot is <strong>101 Switching Protocols</strong>. The connection starts as HTTP and, after the response, behaves as a stream of WebSocket frames instead.</p>
 <h2>Key Terms</h2>
 <ul>

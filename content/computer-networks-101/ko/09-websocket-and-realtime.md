@@ -18,7 +18,7 @@ tags:
   - SSE
   - 스트리밍
 seo_description: WebSocket과 SSE, long-polling의 차이와 운영 포인트를 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # WebSocket과 실시간 통신
@@ -42,19 +42,8 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 그림
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    C->>S: GET /chat (Upgrade: websocket)
-    S-->>C: 101 Switching Protocols
-    Note over C,S: 같은 TCP 연결 위 양방향 프레임
-    C->>S: text frame "hello"
-    S->>C: text frame "hi"
-    S->>C: text frame "you have 1 new message"
-    C->>S: ping
-    S->>C: pong
-```
+![HTTP 연결이 WebSocket 프레임 스트림으로 바뀌는 흐름](../../../assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
+*HTTP 핸드셰이크가 끝나면 같은 TCP 연결이 장시간 유지되는 양방향 프레임 채널로 바뀝니다.*
 
 핵심 전환점은 `101 Switching Protocols`입니다. 응답 전까지는 HTTP였던 연결이, 그 뒤에는 WebSocket 프레임 스트림으로 동작합니다.
 
