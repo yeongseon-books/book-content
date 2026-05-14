@@ -105,7 +105,7 @@ LoRA forward:      y = W · x + (alpha / r) · B · A · x
 <h2>Before vs. after</h2>
 <p><strong>Before</strong> — You apply <code>LoraConfig(r=8, target_modules=["q_proj", "v_proj"])</code> to GPT-2 verbatim and <code>print_trainable_parameters()</code> happily reports <code>trainable params: 0</code>. Training runs but loss is flat.</p>
 <p><strong>After</strong> — You inspect GPT-2 and see attention modules are named <code>c_attn</code> (Q, K, V fused) and <code>c_proj</code>, then change to:</p>
-<pre><code>trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
+<pre><code class="language-text">trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 </code></pre>
 <p>That single line confirms attachment. It also lines up with the 1.5% you computed by hand in post 1.</p>
 <h2>What to fix first about the config</h2>
@@ -208,6 +208,7 @@ peft_model.print_trainable_parameters()
 <hr>
 <h2>References</h2>
 <ul>
+<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/peft/quicktour">PEFT quicktour</a></li>
 <li><a href="https://huggingface.co/docs/transformers/index">Transformers model classes</a></li>
 <li><a href="https://arxiv.org/abs/2106.09685">LoRA paper</a></li>

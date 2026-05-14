@@ -227,6 +227,7 @@ Post 4 covers the training loop. We push real gradients through this adapter and
 
 ## References
 
+- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [PEFT quicktour](https://huggingface.co/docs/peft/quicktour)
 - [Transformers model classes](https://huggingface.co/docs/transformers/index)
 - [LoRA paper](https://arxiv.org/abs/2106.09685)
