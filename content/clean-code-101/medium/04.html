@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Simplifying Conditionals</h1>
-<blockquote>
-<p>Clean Code 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do nested if statements grow so fast?</p>
-<blockquote>
-<p>Because one function carries more than one responsibility. Splitting responsibilities reduces depth.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Nested conditionals usually reveal a deeper problem than awkward indentation. They show one function is carrying validation, policy, and type dispatch at the same time.</p>
+<p>This is post 4 in the Clean Code 101 series.</p>
+<p>Here we will flatten the easy cases with guard clauses, then move the harder cases into polymorphism, strategy objects, and tables so the main path stays visible.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Guard clauses and early return</li>
@@ -79,12 +72,8 @@
 <p>Depth is cognitive load.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    N[&quot;Nested if&quot;] --&gt; G[&quot;Guard clause&quot;]
-    G --&gt; P[&quot;Polymorphism&quot;]
-    P --&gt; T[&quot;Table driven&quot;]
-    T --&gt; R[&quot;Flat flow&quot;]
-</code></pre>
+<p><img alt="Simplifying Conditionals" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Conditional-simplification flow: guard clauses, polymorphism, and tables reduce branch depth and expose the main path.</em></p>
 <p>More tools, fewer branches.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -170,6 +159,20 @@ def grade(score):
     return next(g for s, g in GRADES if score &gt;= s)
 </code></pre>
 <p>The if/elif chain becomes data.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">radon cc app/pricing.py -s
+python -m pytest -q tests/test_pricing.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Complexity should drop while tests keep the branch behavior stable.</li>
+<li>Table-driven or strategy-based rules must produce the same result set.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Reordering conditions changes the semantics while flattening.</li>
+<li>Type checks are only renamed, not actually removed from the design.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Guard clauses cut indentation.</li>
