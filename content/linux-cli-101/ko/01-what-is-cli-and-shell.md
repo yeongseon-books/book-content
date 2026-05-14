@@ -17,7 +17,7 @@ tags:
 - Terminal
 - Bash
 - Command Line
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: CLI와 Shell, Terminal의 차이와 첫 명령 실행 흐름을 정리합니다.
 ---
 
@@ -25,7 +25,7 @@ seo_description: CLI와 Shell, Terminal의 차이와 첫 명령 실행 흐름을
 
 처음 프로그래밍을 배울 때 대부분 GUI 에디터와 마우스 클릭으로 시작합니다. 파일을 더블클릭해서 열고, 메뉴에서 "실행"을 누릅니다. 이 방식은 처음에 직관적이지만, 서버 환경에 들어가는 순간 무력해집니다.
 
-이 글은 Linux CLI 101 시리즈의 1번째 글입니다.
+이 글은 Linux CLI 101 시리즈의 첫 번째 글입니다.
 
 ## 이 글에서 다룰 문제
 
