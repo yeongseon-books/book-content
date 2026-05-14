@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Networks</h1>
-<blockquote>
-<p>Computer Science 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: When you type an address into a browser, how does data from another computer end up on your screen?</p>
-<blockquote>
-<p>A network is built from layered agreements (protocols). IP decides where a packet should go, TCP guarantees reliability on top of IP, and HTTP rides on top of TCP to exchange meaningful requests and responses. Once you understand the layered structure, you can quickly narrow down where a failure happened or why a response is slow. This article covers TCP/IP, HTTP, DNS, and the basics of socket programming.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Typing a domain into a browser does not trigger one magical request. It kicks off a layered exchange where DNS, TCP, TLS, and HTTP each do a different job. Engineers who can draw those layers mentally usually find latency and failure faster.</p>
 <p>This is post 7 in the Computer Science 101 series.</p>
+<p>In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>What path does data follow after you type an address into a browser?</li>
+<li>What does each of IP, TCP, HTTP, and DNS do in its own layer?</li>
+<li>What does an HTTP request and response look like on the wire?</li>
+<li>Why do DNS lookup time and the TLS handshake count toward latency?</li>
+<li>When should you choose TCP versus UDP for a workload?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The roles of the four TCP/IP layers</li>
@@ -83,13 +82,8 @@
 <blockquote>
 <p>Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.</p>
 </blockquote>
-<pre><code class="language-text">Layer (TCP/IP)        Example protocols          Unit
-────────────────────────────────────────────────────────
-Application           HTTP, DNS, SMTP, SSH       message
-Transport             TCP, UDP                   segment
-Internet              IP, ICMP                   packet
-Network Access        Ethernet, Wi-Fi            frame
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>A request starts at the application layer and picks up lower-layer headers on the way down</em></p>
 <h2>Key Terms</h2>
 <p><strong>IP</strong><br>
 - Description: Protocol that delivers a packet to the destination host (addressing)</p>
@@ -214,6 +208,7 @@ print(f&quot;DNS    : {(t1 - t0) * 1000:6.1f} ms&quot;)
 print(f&quot;TCP    : {(t2 - t1) * 1000:6.1f} ms&quot;)
 print(f&quot;HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> the script should print separate <code>DNS</code>, <code>TCP</code>, and <code>HTTPS</code> timings so you can see which layer dominates the request.</p>
 <h2>Notable Points in This Code</h2>
 <ul>
 <li>HTTP is, in the end, a chunk of text where headers and body are separated by a blank line.</li>
