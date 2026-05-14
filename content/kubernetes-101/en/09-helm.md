@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 9
 title: Helm
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - PackageManager
   - DevOps
 seo_description: A beginner-friendly tour of Helm covering chart layout, values, install/upgrade/rollback, repos, and dependency management for Kubernetes deployments.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Helm
 
-> Kubernetes 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: should you *copy/paste* dozens of *manifests* across *environments*?
-
-> *Helm* separates *templates* from *values* through a unit called a *chart*.
-
-<!-- a-grade-intro:end -->
+Kubernetes YAML usually starts tidy and then multiplies across environments. Before long, the real problem is no longer writing manifests but keeping the right differences in the right places without copying entire files forever.
 
 This is post 9 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will frame Helm as a repeatable deployment unit that separates shared structure from environment-specific values and gives you install, upgrade, and rollback workflows that are easier to reason about.
+
+> Helm becomes valuable when the chart expresses the common contract and the values file is the only place where environments diverge.
+
+## Questions this chapter answers
 
 - the layout of a *Chart*
 - how *values.yaml* works
@@ -48,12 +44,9 @@ This is post 9 in the Kubernetes 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Values["values.yaml"] --> Tmpl["templates/*.yaml"]
-    Tmpl --> Render["rendered manifests"]
-    Render --> API["kubernetes api"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
+*Helm renders shared templates with environment-specific values so you can keep one deployment shape across many environments.*
+
 
 ## Key Terms
 
@@ -124,6 +117,22 @@ def rollback(release, revision):
     )
 ```
 
+## Verification workflow
+
+```bash
+helm template web ./chart -f values.yaml
+helm lint ./chart
+helm history web
+```
+
+**Expected output:** `helm template` should show the exact manifests you are about to apply, `helm lint` should catch structural issues in the chart early, and `helm history` should prove that a release has revision history available for rollback.
+
+**Failure modes to check first:**
+
+- If the rendered YAML is already wrong, the problem is chart/value separation rather than the cluster.
+- A chart that lints clean can still be operationally unsafe if secrets remain as plain values.
+- If rollback is missing, inspect release-history behavior in the install/upgrade workflow before the next incident.
+
 ## What to Notice in This Code
 
 - *--atomic* triggers an *automatic rollback* on failure.
@@ -186,5 +195,6 @@ With a deploy unit in hand, the final piece is the *operations view*. Next post 
 - [Chart structure](https://helm.sh/docs/topics/charts/)
 - [Helm best practices](https://helm.sh/docs/chart_best_practices/)
 - [Artifact Hub](https://artifacthub.io/)
+- [helm lint](https://helm.sh/docs/helm/helm_lint/)
 
 Tags: Kubernetes, Helm, Chart, PackageManager, DevOps
