@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 5
 title: The Strategy Pattern
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Polymorphism
   - Behavioral
   - OCP
-seo_description: The Strategy pattern turns algorithms into swappable objects. The natural shape in Python and the common pitfalls explained for working engineers.
-last_reviewed: '2026-05-04'
+seo_description: How the Strategy pattern turns branching algorithms into swappable units and how to keep the Python version lightweight.
+last_reviewed: '2026-05-15'
 ---
 
 # The Strategy Pattern
 
+Code tilts toward conditionals when the same job can be done in several ways. It starts with one `if kind == ...`, then grows as options multiply and policy diverges. After a while, every new case means reopening existing code and retesting the whole branch tree.
+
 This is post 5 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (5/10)
+In this post, we'll look at Strategy as a way to turn algorithms into swappable units that a context can receive from the outside. In Python, that often means using a function before reaching for a class hierarchy.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When the same job has *different ways* to be done, what should the code look like?
-
-> Make each algorithm an object (or a function) and inject it into the context. That is Strategy.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem Strategy solves (branch explosion)
 - Strategy and the Open/Closed Principle
@@ -51,15 +45,8 @@ Branching algorithms with if/elif means editing existing code every time a new o
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Ctx["Context"] --> Iface["Strategy interface"]
-    Iface --> A["StrategyA"]
-    Iface --> B["StrategyB"]
-    Iface --> C["StrategyC"]
-```
-
-Context only knows the interface; concrete algorithms swap in.
+![Concept at a Glance](../../../assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
+*Strategy works when the context stays ignorant of algorithm internals and concrete behavior can swap in at the edge.*
 
 ## Key Terms
 
@@ -184,6 +171,16 @@ In tests, inject deterministic strategies to cut external dependencies.
 
 The `key` argument of `sorted`, the `func` of `pandas.apply`, payment-gateway adapter selection, notification-channel selection (email/SMS/Slack) — all Strategy in shape.
 
+## Quick verification
+
+Use these checks to confirm that a Strategy refactor is justified.
+
+- Count how often the algorithm branch changes or receives new variants.
+- Replace one concrete strategy with a fake implementation in a test and confirm the context stays untouched.
+- Verify whether a plain function already expresses the strategy clearly enough.
+
+**Expected outcome:** new variants become additive, and the context no longer owns the branching logic that selects the algorithm.
+
 ## How a Senior Engineer Thinks
 
 - When you feel "another branch coming", suspect Strategy.
@@ -225,9 +222,15 @@ Strategy is OCP made visible. The next post zooms in on the structural pattern f
 
 ## References
 
+### Core references
+
 - [Strategy Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/strategy)
 - [Open/Closed Principle (Wikipedia)](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)
 - [PEP 544 — Protocols](https://peps.python.org/pep-0544/)
+
+### Practical follow-up
+
 - [sorted(key=...) (Python docs)](https://docs.python.org/3/howto/sorting.html)
+- [functools — Higher-order functions and operations on callables (Python docs)](https://docs.python.org/3/library/functools.html)
 
 Tags: Computer Science, DesignPatterns, Strategy, Polymorphism, Behavioral, OCP
