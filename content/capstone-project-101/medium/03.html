@@ -54,17 +54,20 @@
 </head>
 <body>
 <h1>Defining the Problem</h1>
+<p>When the problem statement is weak, the team keeps changing solutions without knowing what it is optimizing for. Features multiply while the explanation gets thinner.</p>
+<p>A good problem statement becomes the project's anchor. Requirements, MVP scope, demo emphasis, and success metrics all need to trace back to it.</p>
+<p>This is post 3 in the Capstone Project 101 series. It separates feature talk from problem definition and shows how to build a problem card with users, assumptions, and metrics.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does an unclear problem statement destabilize the solution?</li>
+<li>How is a problem definition different from feature description?</li>
+<li>How much detail do users and assumptions need?</li>
+<li>Why should metrics appear from the start?</li>
+<li>When does rewriting the problem signal learning rather than failure?</li>
+</ul>
 <blockquote>
-<p>Capstone Project 101 series (3/10)</p>
+<p>The problem statement is not the first line of a feature list. It is the sentence that holds later requirements and priorities together.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> does an <em>unclear problem</em> make the <em>solution shake</em>?</p>
-<blockquote>
-<p>If the <em>problem</em> becomes a <em>moving target</em>, <em>progress</em> gets <em>redefined</em> too.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>Writing a problem <em>statement</em></li>
@@ -74,14 +77,26 @@
 <li>Problem <em>restatement</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Problem definition</em> decides <em>half</em> of <em>project quality</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    O[Observation] --&gt; S[Statement]
-    S --&gt; U[User]
-    U --&gt; V[Value]
-    V --&gt; M[Measure]
+<p>A clear statement lets the team ask the same question whenever a new feature appears: does this directly help solve the stated problem? Without that filter, every idea starts to look equally important.</p>
+<p>Writing assumptions and metrics next to the problem also strengthens the eventual demo and retrospective. The team can compare what it believed at kickoff with what it later observed.</p>
+<h2>The flow at a glance</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png"><br>
+<em>Connecting the problem statement to users, assumptions, and metrics</em></p>
+<h2>Practical artifact: a problem card</h2>
+<p>A short problem card can dramatically improve solution discussions. The fields below are the minimum useful set.</p>
+<pre><code class="language-text">Observation: students spend too much time manually checking course schedule conflicts right before registration
+Primary users: freshmen and double-major students
+Problem statement: users cannot confirm schedule conflicts within 30 seconds before course registration
+Core assumption: timetable data can be entered through text or CSV without special setup
+Success metric: a first-time user confirms conflicts within 30 seconds
 </code></pre>
+<h2>What to validate first</h2>
+<ul>
+<li>Make sure the statement does not begin as a solution pitch.</li>
+<li>Narrow the primary user group instead of writing everyone.</li>
+<li>Pull hidden assumptions into the document before implementation starts.</li>
+<li>Prefer measurable values such as time, accuracy, or completion rate.</li>
+</ul>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>statement</strong>: <em>problem</em> sentence.</li>
@@ -147,7 +162,7 @@
 <li>State the meaning of <em>metric</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Organizing Requirements</em>.</p>
+<p>Problem definition is the decision anchor for the whole project. Once users, assumptions, and metrics are written down together, later requirement and MVP cuts become much easier to justify. The next post turns that anchor into an actual requirements document.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
@@ -161,11 +176,12 @@
 <li>Project Retrospective (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs and practical guides</strong></p>
 <ul>
+<li><a href="https://www.atlassian.com/agile/product-management/requirements">Atlassian requirements guide</a></li>
+<li><a href="https://www.workingbackwards.com/">Working Backwards</a></li>
 <li><a href="http://momtestbook.com/">The Mom Test</a></li>
-<li><a href="https://www.workingbackwards.com/">Working Backwards - Amazon</a></li>
-<li><a href="https://www.atlassian.com/agile/product-management/requirements">PRD Template - Atlassian</a></li>
-<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired - Marty Cagan</a></li>
+<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired — Marty Cagan</a></li>
 </ul>
 <p class="tags-line">Tags: Capstone, Problem, Definition, Scope, Beginner</p>
 </body>
