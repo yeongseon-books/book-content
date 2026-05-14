@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 7
 title: Virtual Memory
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - TLB
   - Swap
 seo_description: Pages, page tables, the TLB, swap, and page faults — how the OS makes limited RAM look infinite, and what it really costs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Virtual Memory
 
-This is post 7 in the Operating Systems 101 series.
+Every process appears to own a huge private memory space even though the machine has only a limited amount of RAM. That illusion is powerful, but it becomes painfully real when page faults climb, swap starts filling, and response time collapses.
 
-> Operating Systems 101 series (7/10)
+To understand those failures, you have to understand the machinery that builds the illusion in the first place.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Every process appears to own its own enormous memory, yet the machine has only a few GB of RAM — how does the OS construct that illusion?
-
-> Virtual memory is the biggest illusion the OS produces. It promises every process its own 4GB while the machine has only 8 or 16. Pages, page tables, the TLB, and page faults hold up that illusion. Once you understand the mechanism, you can see why "the process looks fine but the system freezes" actually happens.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ Without virtual memory you cannot diagnose "RSS is small but the system is slow"
 ## Concept at a Glance
 
 > Each process has its own virtual address space. Virtual addresses are split into pages (typically 4KB) and translated to physical addresses through a page table. The CPU caches recent translations in a TLB. When a translation is missing or the page is on disk, a page fault triggers and the OS handles it.
+
+### How a virtual address reaches RAM
+
+![How a virtual address reaches RAM](../../../assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)
+*The cost of virtual memory depends on whether translation stays hot in cache or falls through to a page fault.*
 
 ```text
 virtual addr  →  [TLB hit]  →  physical addr  →  RAM
