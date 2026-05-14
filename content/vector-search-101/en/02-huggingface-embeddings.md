@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,23 +20,21 @@ seo_description: Learn to use HuggingFace sentence-transformers locally to gener
 
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
 
-> Vector Search 101 (2/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
-
-This is the 2nd article in the Vector Search 101 series.
-
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 
 `HuggingFaceEmbeddings` from `langchain-huggingface` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
 
-This post covers five things:
+This is post 2 in the Vector Search 101 series.
+
+Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely. This post covers five things:
 
 - installing and initializing `HuggingFaceEmbeddings`
 - the difference between single-query and batch embedding
 - saving vectors to NumPy files and reloading them
 - practical tips for speeding up encoding on CPU
 - comparing the wrapper to the raw `SentenceTransformer` API
+
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings)
 
 ![Single query embedding call flow](../../../assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
 
@@ -112,12 +110,6 @@ print(f"first 5 values: {vector[:5]}")
     first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
 
 <!-- injected-output:end -->
-
-```text
-type: <class 'list'>
-dimension: 384
-first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
-```
 
 `embed_query()` handles a single input and returns a plain Python list. Convert to `np.array()` when you need NumPy operations.
 

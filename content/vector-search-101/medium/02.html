@@ -54,14 +54,10 @@
 </head>
 <body>
 <h1>HuggingFace embeddings in practice — creating your first vectors with sentence-transformers</h1>
-<blockquote>
-<p>Vector Search 101 (2/6)</p>
-</blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings">github.com/yeongseon-books/vector-search-101</a></p>
-<p>This is the 2nd article in the Vector Search 101 series.</p>
 <p>Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.</p>
-<p><code>HuggingFaceEmbeddings</code> from <code>langchain-huggingface</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
-<p>This post covers five things:</p>
+<p><code>HuggingFaceEmbeddings</code> from <code>langchain-community</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
+<p>This is post 2 in the Vector Search 101 series.</p>
+<p>Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely. This post covers five things:</p>
 <ul>
 <li>installing and initializing <code>HuggingFaceEmbeddings</code></li>
 <li>the difference between single-query and batch embedding</li>
@@ -69,6 +65,7 @@
 <li>practical tips for speeding up encoding on CPU</li>
 <li>comparing the wrapper to the raw <code>SentenceTransformer</code> API</li>
 </ul>
+<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings">github.com/yeongseon-books/vector-search-101</a></p>
 <p><img alt="Single query embedding call flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png"></p>
 <p><em>Single query embedding call flow</em></p>
 <!-- ebook-only:start -->
@@ -124,10 +121,6 @@ first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754
 </code></pre>
 <!-- injected-output:end -->
 
-<pre><code>type: &lt;class 'list'&gt;
-dimension: 384
-first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
-</code></pre>
 <p><code>embed_query()</code> handles a single input and returns a plain Python list. Convert to <code>np.array()</code> when you need NumPy operations.</p>
 <hr>
 <h2>Batch embedding</h2>
