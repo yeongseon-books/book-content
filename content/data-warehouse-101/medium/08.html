@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Data Mart</h1>
-<blockquote>
-<p>Data Warehouse 101 series (8/10)</p>
-</blockquote>
+<p>One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.</p>
 <p>This is post 8 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: With a big <em>warehouse</em>, why also build <em>small marts</em>? Should <em>sales</em> and <em>finance</em> really see the <em>same view</em>?</p>
-<blockquote>
-<p><em>A mart is a small analytical zone, restated in the team's vocabulary.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>data mart</em></li>
@@ -80,13 +71,8 @@
 <p><em>Common in the warehouse, domain in the mart.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    DW[&quot;Warehouse (Conformed)&quot;] --&gt; SalesMart[&quot;Sales Mart&quot;]
-    DW --&gt; FinanceMart[&quot;Finance Mart&quot;]
-    DW --&gt; OpsMart[&quot;Ops Mart&quot;]
-    SalesMart --&gt; SalesBI[&quot;Sales Dashboard&quot;]
-    FinanceMart --&gt; FinanceBI[&quot;Finance Dashboard&quot;]
-</code></pre>
+<p><img alt="Warehouse-to-mart split" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>The warehouse keeps conformed shared assets, while domain-specific marts reshape them for sales, finance, and operations consumers.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Data Mart</strong>: A <em>domain-scoped</em> analytical zone — a <em>subset</em> of the warehouse.</li>
