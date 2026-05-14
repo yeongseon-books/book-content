@@ -54,15 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Ingest["ingest"] --> Prep["preprocess"]
-    Prep --> Train["train"]
-    Train --> Eval["evaluate"]
-    Eval --> Reg["register"]
-    Reg --> Deploy["deploy"]
-```
+![학습 파이프라인 단계 흐름](../../../assets/mlops-101/04/04-01-see-the-flow-first.ko.png)
 
+*학습 파이프라인 단계 흐름*
 이 그림에서 중요한 것은 각 단계 이름보다 경계입니다. 수집, 전처리, 학습, 평가, 등록이 분리되어 있어야 입력이 바뀐 단계만 다시 실행할 수 있고, 실패한 지점도 빠르게 확인할 수 있습니다.
 
 즉, 파이프라인의 목적은 화려한 스케줄링이 아니라 단계 경계를 명확히 만드는 데 있습니다.
