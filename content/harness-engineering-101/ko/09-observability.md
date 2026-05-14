@@ -14,7 +14,7 @@ tags:
 - Harness
 - Observability
 - Tracing
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: Agent가 무엇을 했는지 모르면 디버깅도 개선도 불가능합니다. Observability는 Agent의 모든 단계를
   추적, 기록, 재현…
 ---
@@ -235,7 +235,7 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 - [ ] baseline 대비 급증 조건에만 paging을 걸고 나머지는 리포트성 알림으로 분리합니다.
 ## 정리
 Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라, 왜 그런 결과가 나왔는지 나중에 다시 설명할 수 있게 만드는 운영 능력입니다. 이것이 있어야 디버깅, 비용 최적화, 사고 분석이 모두 가능해집니다.
-핵심은 구조입니다. span과 trace로 실행을 묶고, 결과뿐 아니라 입력과 근거와 비용을 함께 남겨야 replay가 가능합니다.
+여기서 가장 중요한 것은 구조입니다. span과 trace로 실행을 묶고, 결과뿐 아니라 입력과 근거와 비용을 함께 남겨야 replay가 가능합니다.
 다음 글에서는 마지막으로 Production Harness를 다룹니다. 지금까지 만든 모든 harness를 배포, 롤백, on-call까지 포함한 실제 운영 환경으로 묶는 단계입니다.
 
 <!-- toc:begin -->
