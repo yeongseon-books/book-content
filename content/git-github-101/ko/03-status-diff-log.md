@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -321,8 +321,10 @@ PR 설명을 쓸 때도 `git log --oneline origin/main..HEAD`와 `git log -p ori
 
 ## 참고 자료
 
-- Git 공식 문서: <https://git-scm.com/doc>
-- Pro Git Book - "Viewing the Commit History": <https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History>
-- `git help status`, `git help diff`, `git help log`
+- [Git Reference Manual](https://git-scm.com/doc)
+- [Pro Git Book - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History)
+- [git-status manual](https://git-scm.com/docs/git-status)
+- [git-diff manual](https://git-scm.com/docs/git-diff)
+- [git-log manual](https://git-scm.com/docs/git-log)
 
 Tags: git-status, git-diff, git-log, change-history, working-tree-vs-index, log-formatting
