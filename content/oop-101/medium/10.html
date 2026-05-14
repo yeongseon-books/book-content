@@ -55,7 +55,6 @@
 <body>
 <h1>When to Avoid OOP</h1>
 <p>This is the final post in the Object-Oriented Programming 101 series.</p>
-<p>This is the final post in the Object-Oriented Programming 101 series.</p>
 <blockquote>
 <p>Object-Oriented Programming 101 Series (10/10)</p>
 </blockquote>
@@ -91,6 +90,8 @@ Multiple instances needed          Single-run scripts
 Swappable strategies required      Data-only containers
 Framework demands classes          Pipeline data processing
 </code></pre>
+<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png"><br>
+<em>Once you decide when not to create a class, a surprising amount of Python code becomes simpler with plain functions and data structures.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Multi-paradigm</strong><br>
 - Description: A language that supports procedural, OOP, and functional styles together</p>
@@ -317,6 +318,20 @@ for line in result:
 <h2>How Senior Engineers Think About This</h2>
 <p>Python's greatest strength is its multi-paradigm nature. Combining functions, classes, and modules to fit the situation is what makes code Pythonic. The answer to "should I make this a class?" is "do state and behavior change together?"</p>
 <p>In practice, the most pragmatic approach is to start with functions and upgrade to classes only when state management becomes necessary. Knowing when not to create a class is itself a design skill.</p>
+<h2>Failure Modes of Oversimplifying Too Far</h2>
+<p><strong>Everything stays as free functions</strong><br>
+- Problem that shows up later: The same bundle of data repeats across function parameters<br>
+- Signal to introduce a class again: State and validation rules keep changing together</p>
+<p><strong>All configuration stays in dicts</strong><br>
+- Problem that shows up later: Key typos survive until runtime<br>
+- Signal to introduce a class again: Field count grows and defaults or validation start to matter</p>
+<p><strong>Strategy choices are only callbacks</strong><br>
+- Problem that shows up later: Related setup and post-processing logic scatter around the codebase<br>
+- Signal to introduce a class again: Each strategy starts carrying state or helper behavior</p>
+<p><strong>Pipeline stages are only global functions</strong><br>
+- Problem that shows up later: Shared cache, retry rules, and dependency wiring become tangled<br>
+- Signal to introduce a class again: You need lifecycle control and explicit collaborators per stage</p>
+<p>Avoiding classes is not about making the code look shorter. It is about using only the complexity you need today. That is why a function-first design can still evolve into classes later when state transitions and invariants begin to repeat.</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can identify situations where a class is unnecessary</li>
@@ -347,10 +362,10 @@ for line in result:
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.youtube.com/watch?v=o9pEzgHorH0">Stop Writing Classes — PyCon Talk by Jack Diederich</a></li>
 <li><a href="https://docs.python.org/3/library/dataclasses.html">Python Official Docs — dataclasses</a></li>
-<li><a href="https://realpython.com/python3-object-oriented-programming/">Real Python — When to Use Classes in Python</a></li>
-<li><a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/">Fluent Python — Chapter 6: Design Patterns with First-Class Functions</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html">Python Official Docs — typing (<code>NamedTuple</code>, <code>TypedDict</code>, <code>Callable</code>)</a></li>
+<li><a href="https://docs.python.org/3/library/functools.html">Python Official Docs — functools</a></li>
+<li><a href="https://www.youtube.com/watch?v=o9pEzgHorH0">Stop Writing Classes — PyCon Talk by Jack Diederich</a></li>
 </ul>
 <p class="tags-line">Tags: Python, OOP, Functional Programming, dataclass, Design Decisions</p>
 </body>
