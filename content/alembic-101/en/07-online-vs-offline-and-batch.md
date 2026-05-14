@@ -17,7 +17,7 @@ tags:
 - offline
 - batch
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Alembic runs in two modes. Online connects to the database and runs
   SQL directly.
 ---
@@ -47,6 +47,11 @@ SQLite also has very restricted `ALTER TABLE` support, so every alembic user eve
 > Alembic runs in two modes. **Online connects to the database and runs SQL directly. Offline emits the SQL text to standard output without a database connection.** Offline is for dry-run, review, and scripting. Online is for actual application.
 
 Turning on `render_as_batch` makes calls like `op.alter_column` expand internally — for SQLite — into "create a temporary table, INSERT SELECT, swap names." Batch mode is alembic's safety net for SQLite.
+
+### Diagram: how online, offline, and batch mode divide responsibilities
+
+![Diagram: how online, offline, and batch mode divide responsibilities](../../../assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
+*The same revision can drive apply-time execution, review-time SQL output, and SQLite-specific batch rewriting.*
 
 ## Core concepts
 
@@ -203,6 +208,19 @@ Or split data migrations into separate revisions and only preview the schema-onl
 
 This single line effectively prints the SQL on every PR.
 
+## Verification routine
+
+```bash
+alembic upgrade current:head --sql > preview.sql
+python3 - <<'PY'
+from pathlib import Path
+text = Path('preview.sql').read_text()
+print('BEGIN;' in text, 'INSERT INTO alembic_version' in text)
+PY
+```
+
+**Expected output:** the preview includes transaction boundaries and the `alembic_version` update SQL, so the review artifact matches the real deploy unit.
+
 ## Common mistakes
 
 - **Running `--sql head` and being surprised that everything from the start prints out.** Learn the `<from>:<to>` form.
@@ -239,14 +257,28 @@ Online for application, offline for review. The division of labor between the tw
 
 The next post is downgrade strategy: when to seriously write a downgrade and when to deliberately forbid it.
 
-## References
-
-- Alembic: Generating SQL Scripts (Offline Mode) — https://alembic.sqlalchemy.org/en/latest/offline.html
-- Alembic: Running Batch Migrations for SQLite and Other Databases — https://alembic.sqlalchemy.org/en/latest/batch.html
-- SQLite: ALTER TABLE — https://www.sqlite.org/lang_altertable.html
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- **Online and offline modes: previewing DDL with --sql and handling SQLite batch (current)**
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, online, offline, batch, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Generating SQL Scripts (Offline Mode)](https://alembic.sqlalchemy.org/en/latest/offline.html)
+- [Alembic: Running Batch Migrations for SQLite and Other Databases](https://alembic.sqlalchemy.org/en/latest/batch.html)
+- [SQLite: ALTER TABLE](https://www.sqlite.org/lang_altertable.html)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
+
+Tags: Python, Alembic, SQLAlchemy, Migration
