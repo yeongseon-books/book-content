@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Evaluation</h1>
+<p>Evaluation is where teams discover whether a model is useful for the problem they actually have, not the benchmark they wish they had. Accuracy feels satisfying because it is easy to explain, but in imbalanced or asymmetric problems it can reward exactly the wrong behavior.</p>
+<p>Good evaluation therefore starts with the cost of being wrong. If missing a positive case is expensive, the metric has to show that. If a false alarm is the real operational pain, the metric has to show that instead.</p>
+<p>This is post 8 in the Data Science 101 series. In this chapter, we connect classification and regression metrics back to business cost so that model scores line up with real decisions.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>When does accuracy become the wrong summary of model quality?</li>
+<li>How do precision, recall, F1, and ROC AUC support different operational trade-offs?</li>
+<li>Which regression metric matches which error tolerance?</li>
+<li>How do you encode business cost so the model score matches the real decision?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (8/10)</p>
+<p>Metric choice is really cost choice: it tells the team which failure mode matters most.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Does <em>high accuracy</em> really mean a <em>good model</em>? Which <em>metric</em> should you use <em>when</em>?</p>
-<blockquote>
-<p><em>Choosing a metric is the </em>same act<em> as defining the problem.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How <em>accuracy can mislead</em></li>
@@ -80,15 +81,8 @@
 <p><em>Metrics are </em>what you optimize<em> — choose them carefully.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Cls[&quot;Classification&quot;] --&gt; P[&quot;Precision&quot;]
-    Cls --&gt; R[&quot;Recall&quot;]
-    Cls --&gt; F[&quot;F1&quot;]
-    Cls --&gt; A[&quot;ROC AUC&quot;]
-    Reg[&quot;Regression&quot;] --&gt; MAE[&quot;MAE&quot;]
-    Reg --&gt; RMSE[&quot;RMSE&quot;]
-    Reg --&gt; R2[&quot;R-squared&quot;]
-</code></pre>
+<p><img alt="The main evaluation branches for classification metrics and regression metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>The main evaluation branches for classification metrics and regression metrics</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Confusion matrix</strong>: TP / FP / FN / TN table.</li>
@@ -130,6 +124,7 @@ print(&quot;R^2 :&quot;, r2_score(y_test, y_pred))
 cost = 5 * cm[1, 0] + 1 * cm[0, 1]
 print(&quot;expected cost:&quot;, cost)
 </code></pre>
+<p><strong>Expected output:</strong> one evaluation table that puts the confusion matrix, P/R/F1, ROC AUC, and business-cost score side by side.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>confusion matrix</em> is the <em>root</em> of every classification metric.</li>
