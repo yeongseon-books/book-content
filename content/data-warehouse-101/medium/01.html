@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is a Data Warehouse?</h1>
-<blockquote>
-<p>Data Warehouse 101 series (1/10)</p>
-</blockquote>
+<p>The service database that happily writes one order at a time usually becomes miserable the moment someone asks for six months of revenue by country, product, and hour. The query is not wrong. It is just asking an operational store to behave like an analytical engine.</p>
 <p>This is the first post in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does a <em>service database alone</em> fail at analytics, and what makes a <em>dedicated analytical store</em> different?</p>
-<blockquote>
-<p><em>A data warehouse is a store built to answer questions fast.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>definition</em> and <em>purpose</em> of a data warehouse</li>
@@ -80,12 +71,8 @@
 <p><em>Run analytics on its own road; keep operations on its own.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Service[&quot;Service DB (OLTP)&quot;] --&gt; ETL[&quot;ETL / ELT&quot;]
-    ETL --&gt; DW[&quot;Data Warehouse&quot;]
-    DW --&gt; BI[&quot;BI / Dashboard&quot;]
-    DW --&gt; ML[&quot;ML / Analytics&quot;]
-</code></pre>
+<p><img alt="Analytics path from the service database into the warehouse" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>The basic analytics path: operational writes stay in the service database, while analytical consumers read from the warehouse layer.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>OLTP</strong>: <em>Online Transaction Processing</em>. Short transactions like orders and payments.</li>
