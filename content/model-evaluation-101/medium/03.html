@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>The Limits of Accuracy</h1>
-<blockquote>
-<p>Model Evaluation 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is "95% accuracy" always a good score?</p>
-<blockquote>
-<p><em>Accuracy is fair only when classes are balanced. On imbalanced data, you need baselines and balanced accuracy.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Accuracy is the most familiar metric in classification. That familiarity is useful, but it also makes the number too easy to trust. On skewed datasets, accuracy can hide the exact failure mode you care about most.</p>
+<p>Spam filtering, fraud detection, and rare-disease screening all punish missed positives differently from routine negatives. In those settings, a high accuracy number can be nothing more than a majority-class illusion. Accuracy can still be a useful summary, but it should never be your only verdict.</p>
+<p>This is post 3 in the Model Evaluation 101 series. In this post, we use baselines, class balance, and per-class reporting to show where accuracy stops being honest.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The accuracy formula and meaning</li>
 <li>Base rates and dummy classifiers</li>
@@ -74,14 +65,14 @@
 <li>Limits of accuracy in multiclass settings</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Accuracy is fair only when class balance is reasonably stable. Once the data tilts, baselines and per-class behavior matter more than the headline number.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>When the comparison standard is a single accuracy number, the entire team can drift unknowingly into wrong decisions.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Bal[&quot;balanced data&quot;] --&gt; AccOK[&quot;accuracy is fair&quot;]
-    Imb[&quot;imbalanced data&quot;] --&gt; AccBad[&quot;accuracy is misleading&quot;]
-    Imb --&gt; BAcc[&quot;balanced accuracy&quot;]
-</code></pre>
+<p><img alt="how balanced and imbalanced data change the meaning of accuracy" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>how balanced and imbalanced data change the meaning of accuracy</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Accuracy</strong>: <code>(TP+TN)/N</code>.</li>
@@ -120,6 +111,7 @@ print(&quot;bacc:&quot;, balanced_accuracy_score(yte, pred))
 <pre><code class="language-python">from sklearn.metrics import classification_report
 print(classification_report(yte, pred))
 </code></pre>
+<p><strong>Expected output:</strong> You should see that a dummy classifier can already post a strong accuracy score on imbalanced data, while balanced accuracy and the per-class report reveal whether the minority class is actually being learned.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A 95% dummy is your real baseline.</li>
