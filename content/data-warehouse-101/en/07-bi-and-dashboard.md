@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 7
 title: BI and Dashboard
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Visualization
   - Analytics
 seo_description: The role of BI tools and dashboards, what makes a good dashboard, and the visualization principles that turn numbers into decisions.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # BI and Dashboard
-> Data Warehouse 101 series (7/10)
+
+Warehouses do not create decisions by themselves. Teams still need a screen that turns a broad question into one number, one comparison, and one obvious next drill-down. When that layer is noisy, even clean data models feel useless.
 
 This is post 7 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it take for a *number* to become a *decision*? Why do *dashboards* get *ignored* so often?
-
-> *A dashboard answers a question. It is not a place to show off your data.*
-
-<!-- a-grade-intro:end -->
+In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.
 
 ## What You Will Learn
 
@@ -49,13 +44,9 @@ BI is the *last centimeter* of a warehouse. You can model *billions of rows* per
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    DW["Warehouse / Mart"] --> Semantic["Semantic Layer"]
-    Semantic --> BI["BI Tool"]
-    BI --> Dashboard["Dashboard"]
-    Dashboard --> Decision["Decision"]
-```
+![BI decision flow](../../../assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
+
+*Warehouse data becomes a team decision only after semantic definitions, BI tooling, and dashboard design line up.*
 
 ## Key Terms
 
