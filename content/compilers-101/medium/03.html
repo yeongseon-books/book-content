@@ -65,6 +65,209 @@
 </blockquote>
 <!-- a-grade-intro:end -->
 
+<p>This is post 3 in the Compilers 101 series.</p>
+<h2>What You Will Learn</h2>
+<ul>
+<li>What an AST (abstract syntax tree) is and why it must be a tree</li>
+<li>The basic shape of a recursive descent parser</li>
+<li>How to express operator precedence and associativity in code</li>
+<li>How to pretty-print an AST</li>
+<li>The shape of a good parser error message</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>If the lexer made the "words," the parser builds the "sentence structure." When the AST is clean, every step above it — semantic analysis, optimization, code generation — is clean. When the AST is sloppy, every step has to compensate for the sloppiness.</p>
+<blockquote>
+<p>Almost every compiler bug ends up being "the AST is wrong."</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+    A[&quot;tokens&quot;] --&gt; B[&quot;expression()&quot;]
+    B --&gt; C[&quot;term()&quot;]
+    C --&gt; D[&quot;factor()&quot;]
+    D --&gt; E[&quot;AST node&quot;]
+</code></pre>
+<p>Grammar levels map directly onto function levels. Higher-precedence operators are handled in inner functions.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>AST</strong>: a tree that represents program structure. Surface syntax like parentheses disappears; only meaning remains.</li>
+<li><strong>Recursive descent</strong>: a parser where each grammar rule becomes one function.</li>
+<li><strong>Precedence</strong>: which operator binds tighter (<code>*</code> binds tighter than <code>+</code>).</li>
+<li><strong>Associativity</strong>: at the same precedence, which side groups (<code>-</code> is left-associative).</li>
+<li><strong>Lookahead</strong>: peeking one (or k) tokens ahead.</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — a flat token list</strong></p>
+<pre><code class="language-python">tokens = [(&quot;NUM&quot;,1),(&quot;OP&quot;,&quot;+&quot;),(&quot;NUM&quot;,2),(&quot;OP&quot;,&quot;*&quot;),(&quot;NUM&quot;,3)]
+# this data structure makes meaning hard to read
+</code></pre>
+<p><strong>After — a tree where meaning is visible</strong></p>
+<pre><code class="language-python">ast = Bin(&quot;+&quot;, Num(1), Bin(&quot;*&quot;, Num(2), Num(3)))
+# precedence is engraved into the tree shape
+</code></pre>
+<p>The shape of the tree IS precedence. Evaluators and code generators just walk the tree.</p>
+<h2>Hands-on: a small expression parser</h2>
+<p><strong>Step 1 — Define AST nodes</strong></p>
+<pre><code class="language-python"># 1_ast_nodes.py
+from dataclasses import dataclass
+
+@dataclass
+class Num:    value: int
+@dataclass
+class Bin:
+    op: str
+    left: object
+    right: object
+
+print(Bin(&quot;+&quot;, Num(1), Bin(&quot;*&quot;, Num(2), Num(3))))
+</code></pre>
+<p>Two dataclasses can express expression ASTs. The set of node kinds IS the expressive power of the language.</p>
+<p><strong>Step 2 — Token stream and cursor</strong></p>
+<pre><code class="language-python"># 2_cursor.py
+class Cursor:
+    def __init__(self, tokens):
+        self.tokens, self.i = tokens, 0
+    def peek(self):
+        return self.tokens[self.i] if self.i &lt; len(self.tokens) else (&quot;EOF&quot;,&quot;&quot;)
+    def advance(self):
+        t = self.peek(); self.i += 1; return t
+    def expect(self, kind):
+        t = self.advance()
+        if t[0] != kind:
+            raise SyntaxError(f&quot;expected {kind}, got {t}&quot;)
+        return t
+</code></pre>
+<p><code>peek/advance/expect</code> is the entire flow vocabulary of a recursive descent parser.</p>
+<p><strong>Step 3 — Recursive descent (precedence climbing)</strong></p>
+<pre><code class="language-python"># 3_recursive_descent.py
+from dataclasses import dataclass
+@dataclass
+class Num: value: int
+@dataclass
+class Bin:
+    op: str; left: object; right: object
+
+# expr   := term  ((&quot;+&quot;|&quot;-&quot;) term)*
+# term   := factor ((&quot;*&quot;|&quot;/&quot;) factor)*
+# factor := NUM | &quot;(&quot; expr &quot;)&quot;
+
+def parse(tokens):
+    i = [0]
+    def peek(): return tokens[i[0]] if i[0] &lt; len(tokens) else (&quot;EOF&quot;,&quot;&quot;)
+    def eat(): t = peek(); i[0] += 1; return t
+    def expr():
+        node = term()
+        while peek()[0] == &quot;OP&quot; and peek()[1] in &quot;+-&quot;:
+            op = eat()[1]; node = Bin(op, node, term())
+        return node
+    def term():
+        node = factor()
+        while peek()[0] == &quot;OP&quot; and peek()[1] in &quot;*/&quot;:
+            op = eat()[1]; node = Bin(op, node, factor())
+        return node
+    def factor():
+        t = eat()
+        if t[0] == &quot;NUM&quot;: return Num(t[1])
+        if t == (&quot;LP&quot;,&quot;(&quot;):
+            node = expr()
+            assert eat() == (&quot;RP&quot;,&quot;)&quot;)
+            return node
+        raise SyntaxError(f&quot;unexpected {t}&quot;)
+    return expr()
+
+toks = [(&quot;NUM&quot;,1),(&quot;OP&quot;,&quot;+&quot;),(&quot;NUM&quot;,2),(&quot;OP&quot;,&quot;*&quot;),(&quot;NUM&quot;,3)]
+print(parse(toks))
+</code></pre>
+<p>The <code>expr → term → factor</code> order IS "lower precedence → higher precedence." Since <code>*</code> is caught by <code>term</code>, it always groups deeper.</p>
+<p><strong>Step 4 — Pretty-print the AST</strong></p>
+<pre><code class="language-python"># 4_pretty.py
+def show(n, depth=0):
+    pad = &quot;  &quot; * depth
+    if hasattr(n, &quot;value&quot;):
+        print(f&quot;{pad}Num({n.value})&quot;)
+    else:
+        print(f&quot;{pad}Bin({n.op})&quot;)
+        show(n.left, depth+1); show(n.right, depth+1)
+</code></pre>
+<p>Print the tree as is and precedence is visible at a glance. An AST visualizer solves 80 percent of debugging.</p>
+<p><strong>Step 5 — Verify with an evaluator</strong></p>
+<pre><code class="language-python"># 5_eval.py
+def evaluate(n):
+    if hasattr(n, &quot;value&quot;): return n.value
+    l, r = evaluate(n.left), evaluate(n.right)
+    return {&quot;+&quot;: l+r, &quot;-&quot;: l-r, &quot;*&quot;: l*r, &quot;/&quot;: l//r}[n.op]
+</code></pre>
+<p>If the AST is right, the evaluator agrees with school arithmetic. The fastest way to test a parser is an evaluator.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>One grammar rule equals one function.</li>
+<li>Precedence is expressed by call depth.</li>
+<li>Associativity is decided by the direction of the while loop (left-associative accumulates with while).</li>
+<li>Carrying an explicit token cursor avoids backtracking.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to fit precedence into a single SPEC line.</strong> Precedence has to be expressed by splitting functions.</li>
+<li><strong>Forgetting associativity and ending up right-associative.</strong> A bug where <code>1 - 2 - 3</code> evaluates as <code>1 - (2 - 3) = 2</code>.</li>
+<li><strong>Catching <code>expect</code>'s SyntaxError and ignoring it.</strong> That builds a wrong AST.</li>
+<li><strong>Not pulling error positions from the tokens.</strong> Do not throw away the line/col you collected in step 1.</li>
+<li><strong>Leaving surface syntax (parentheses) in the AST.</strong> Parentheses must disappear after they decide precedence.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>Most hand-written compilers (rustc, clang, CPython) use recursive descent parsers. Generator tools (yacc, bison, lark) end up building similar trees. For most unambiguous grammars, recursive descent is the easiest choice to read and to debug.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>When meeting a new grammar, they first decide which function it belongs in.</li>
+<li>They keep the set of AST node kinds as small as possible (readability beats extensibility).</li>
+<li>They always have a debug tool that draws the parser's AST as a picture.</li>
+<li>They answer "why was this expression grouped this way?" with call depth.</li>
+<li>They fix ambiguous grammars by changing the grammar, not by working around them in the parser.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Can you say why an AST has to be a tree?</li>
+<li>[ ] Can you sketch a recursive descent parser on one screen?</li>
+<li>[ ] Can you explain the difference between precedence and associativity in one sentence?</li>
+<li>[ ] Have you ever built an AST visualizer?</li>
+<li>[ ] Have you defined what message a parser error should give the user?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add unary minus (<code>-1</code>, <code>-(1+2)</code>) to the parser above. Which function does it belong in?</li>
+<li>Add <code>**</code> (exponent, right-associative). Where in the code does it differ from left-associative <code>+</code>?</li>
+<li>Design the error message you would show the user for the bad input <code>1 + * 2</code>.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>A parser turns a flat token stream into a meaningful tree. The next post looks at the step that reads that tree and answers questions like "where was this variable declared? does this type match?" — semantic analysis.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><strong>parsing and AST (current)</strong></li>
+<li>semantic analysis (upcoming)</li>
+<li>symbol table and scope (upcoming)</li>
+<li>intermediate representation (upcoming)</li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://craftinginterpreters.com/parsing-expressions.html">Crafting Interpreters — Parsing Expressions</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser">Recursive descent parser (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Operator-precedence_parser">Operator-precedence parser (Wikipedia)</a></li>
+<li><a href="https://docs.python.org/3/library/ast.html">Python ast module</a></li>
+</ul>
+<blockquote>
+<p>Compilers 101 series (3/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: Why does the compiler group <code>1 + 2 * 3</code> as <code>(1 + (2 * 3))</code> and not as <code>((1 + 2) * 3)</code>?</p>
+<blockquote>
+<p>A parser takes a token stream as input and builds a <strong>tree (AST)</strong> that captures structure. Operator precedence, associativity, and error reporting are all decided in this step.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
 <h2>What You Will Learn</h2>
 <ul>
 <li>What an AST (abstract syntax tree) is and why it must be a tree</li>

@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 7 in the Computer Science 101 series.
+
 ## What You Will Learn
 
 - The roles of the four TCP/IP layers

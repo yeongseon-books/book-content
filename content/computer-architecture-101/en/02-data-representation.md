@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 2 in the Computer Architecture 101 series.
+
 ## What You Will Learn
 
 - The definitions of bit, byte, and word

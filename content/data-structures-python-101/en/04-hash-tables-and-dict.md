@@ -32,6 +32,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 4 in the Data Structures with Python 101 series.
+
 ## What You Will Learn
 
 - How hash tables work

@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 4 in the Computer Architecture 101 series.
+
 ## What You Will Learn
 
 - What a register is and how it differs from memory

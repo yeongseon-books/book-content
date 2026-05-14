@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the final post in the Computer Architecture 101 series.
+
 ## What You Will Learn
 
 - The difference between throughput and latency

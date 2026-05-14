@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the final post in the Computer Networks 101 series.
+
 ## What You Will Learn
 
 - A layer-by-layer approach to narrowing a network problem

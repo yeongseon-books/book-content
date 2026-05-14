@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 2 in the Data Structures 101 series.
+
 ## What You Will Learn
 
 - How a fixed-size array is laid out and why indexing is O(1)

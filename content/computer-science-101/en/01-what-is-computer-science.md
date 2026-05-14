@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the first post in the Computer Science 101 series.
+
 ## What You Will Learn
 
 - The definition of computer science and its central research questions

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # What Is a Compiler?
 
+This is the first post in the Compilers 101 series.
+
 > Compilers 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

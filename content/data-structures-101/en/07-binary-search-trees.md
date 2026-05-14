@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 7 in the Data Structures 101 series.
+
 ## What You Will Learn
 
 - The definition of a BST and how search, insert, and delete work

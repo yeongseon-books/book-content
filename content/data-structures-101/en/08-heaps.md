@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 8 in the Data Structures 101 series.
+
 ## What You Will Learn
 
 - The heap invariant and its relationship to a complete binary tree

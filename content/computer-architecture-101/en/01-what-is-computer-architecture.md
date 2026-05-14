@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is the first post in the Computer Architecture 101 series.
+
 ## What You Will Learn
 
 - A working definition of computer architecture

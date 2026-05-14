@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 5 in the Computer Science 101 series.
+
 ## What You Will Learn
 
 - The core components of the von Neumann architecture

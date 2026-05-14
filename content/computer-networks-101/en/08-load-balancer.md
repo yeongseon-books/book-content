@@ -33,6 +33,8 @@ last_reviewed: '2026-05-04'
 
 <!-- a-grade-intro:end -->
 
+This is post 8 in the Computer Networks 101 series.
+
 ## What You Will Learn
 
 - The difference between an L4 LB and an L7 LB

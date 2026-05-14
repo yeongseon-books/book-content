@@ -65,6 +65,184 @@
 </blockquote>
 <!-- a-grade-intro:end -->
 
+<p>This is post 5 in the Compilers 101 series.</p>
+<h2>What You Will Learn</h2>
+<ul>
+<li>What a symbol table is and why it is the compiler's central data structure</li>
+<li>Expressing scope as a stack or chained dictionary</li>
+<li>The structure where shadowing and lookup follow naturally</li>
+<li>The differences between function, block, and module scope</li>
+<li>IDE features built on the symbol table (rename, go-to-definition)</li>
+</ul>
+<h2>Why It Matters</h2>
+<p>The previous post's analyzer used a single dictionary as its environment. Real languages have many scopes — functions, blocks, classes, modules. How you design the symbol table IS the language's visibility rules.</p>
+<blockquote>
+<p>You must answer "is this variable visible here?" in one step.</p>
+</blockquote>
+<h2>Concept at a Glance</h2>
+<pre><code class="language-mermaid">flowchart TB
+    A[&quot;module scope&quot;] --&gt; B[&quot;function scope&quot;]
+    B --&gt; C[&quot;block scope (if)&quot;]
+    C --&gt; D[&quot;block scope (for)&quot;]
+</code></pre>
+<p>Scope is a tree (or a stack). Lookup proceeds from inner to outer.</p>
+<h2>Key Terms</h2>
+<ul>
+<li><strong>Symbol</strong>: a declaration entry. <code>(name, kind, type, location)</code>.</li>
+<li><strong>Scope</strong>: a group of symbols sharing the same visibility.</li>
+<li><strong>Shadowing</strong>: a name in an inner scope hides a name in an outer scope.</li>
+<li><strong>Lookup</strong>: walking from inner to outer to find the first match.</li>
+<li><strong>Forward declaration</strong>: when a declaration appears later than its use (e.g., calling a function defined below).</li>
+</ul>
+<h2>Before/After</h2>
+<p><strong>Before — flat dictionary</strong></p>
+<pre><code class="language-python">env = {&quot;x&quot;: &quot;int&quot;}  # cannot express x inside a function
+</code></pre>
+<p><strong>After — chained dictionary</strong></p>
+<pre><code class="language-python">class Scope:
+    def __init__(self, parent=None):
+        self.parent, self.table = parent, {}
+</code></pre>
+<p>A single parent pointer brings functions, blocks, and modules into the same data structure.</p>
+<h2>Hands-on: a symbol table, step by step</h2>
+<p><strong>Step 1 — The simplest Scope</strong></p>
+<pre><code class="language-python"># 1_scope.py
+class Scope:
+    def __init__(self, parent=None):
+        self.parent, self.table = parent, {}
+    def define(self, name, sym):
+        if name in self.table:
+            raise SyntaxError(f&quot;redeclared: {name}&quot;)
+        self.table[name] = sym
+    def resolve(self, name):
+        if name in self.table: return self.table[name]
+        if self.parent: return self.parent.resolve(name)
+        return None
+
+g = Scope(); g.define(&quot;x&quot;, &quot;int&quot;)
+f = Scope(g); print(f.resolve(&quot;x&quot;))  # int
+</code></pre>
+<p>A single <code>parent</code> pointer makes nested lookup automatic.</p>
+<p><strong>Step 2 — Shadowing</strong></p>
+<pre><code class="language-python"># 2_shadow.py
+g = Scope(); g.define(&quot;x&quot;, &quot;int(global)&quot;)
+f = Scope(g); f.define(&quot;x&quot;, &quot;int(local)&quot;)
+print(f.resolve(&quot;x&quot;))   # int(local) — inner hides outer
+print(g.resolve(&quot;x&quot;))   # int(global)
+</code></pre>
+<p>Redefining the same name in an inner scope hides it automatically. That is shadowing.</p>
+<p><strong>Step 3 — Operating a scope stack</strong></p>
+<pre><code class="language-python"># 3_stack.py
+class Analyzer:
+    def __init__(self):
+        self.scopes = [Scope()]
+    def enter(self): self.scopes.append(Scope(self.scopes[-1]))
+    def exit(self): self.scopes.pop()
+    def current(self): return self.scopes[-1]
+
+a = Analyzer()
+a.current().define(&quot;x&quot;, &quot;int&quot;)
+a.enter()
+a.current().define(&quot;y&quot;, &quot;int&quot;)
+print(a.current().resolve(&quot;x&quot;))  # int (found in outer scope)
+a.exit()
+</code></pre>
+<p><code>enter/exit</code> express block entry/exit. They must be called as the AST is walked.</p>
+<p><strong>Step 4 — Function scope</strong></p>
+<pre><code class="language-python"># 4_function.py
+def visit_function(name, params, body, analyzer):
+    analyzer.current().define(name, &quot;fn&quot;)
+    analyzer.enter()
+    for p in params:
+        analyzer.current().define(p, &quot;param&quot;)
+    for stmt in body:
+        visit(stmt, analyzer)
+    analyzer.exit()
+</code></pre>
+<p>Make a new scope on function entry, put the parameters in it, analyze the body. Close the scope when the function ends.</p>
+<p><strong>Step 5 — Storing locations for go-to-definition</strong></p>
+<pre><code class="language-python"># 5_goto.py
+class Symbol:
+    def __init__(self, name, kind, ty, line, col):
+        self.name, self.kind, self.ty = name, kind, ty
+        self.line, self.col = line, col
+
+def goto(scope, name):
+    s = scope.resolve(name)
+    return f&quot;{s.name} at line {s.line}, col {s.col}&quot; if s else &quot;not found&quot;
+</code></pre>
+<p>Store the declaration position on the symbol, and IDE go-to-definition becomes a plain lookup.</p>
+<h2>What to Notice in This Code</h2>
+<ul>
+<li>The core data structure is just one — scope with a parent pointer.</li>
+<li>Shadowing is a natural consequence of the lookup algorithm.</li>
+<li>Function, block, and module are all expressed by the same shape.</li>
+<li>Ninety percent of IDE features come out of the symbol table.</li>
+</ul>
+<h2>Five Common Mistakes</h2>
+<ol>
+<li><strong>Trying to live with one dictionary as scope.</strong> You cannot express variables inside a function.</li>
+<li><strong>Calling enter/exit unbalanced.</strong> Scope starts to leak.</li>
+<li><strong>Trying to forbid shadowing by checking every scope.</strong> Shadowing is a feature in most languages, not a bug.</li>
+<li><strong>Not handling forward declarations, breaking calls of functions inside functions.</strong> You need two passes.</li>
+<li><strong>Not storing position on the symbol.</strong> You cannot add go-to-definition later.</li>
+</ol>
+<h2>How This Shows Up in Production</h2>
+<p>The central data structure of an LSP server is the symbol table. "Find all references" sweeps every scope in reverse; "Rename symbol" rewrites every use that points to the same symbol at once. All of this sits on top of the symbol table.</p>
+<h2>How a Senior Engineer Thinks</h2>
+<ul>
+<li>When they see a new language feature, they first ask "which scope does it go into?"</li>
+<li>They decide at the language level whether shadowing is intended or a source of bugs.</li>
+<li>They store position, visibility, and use count on the symbol.</li>
+<li>They default to two-pass analysis (collect declarations, then analyze uses).</li>
+<li>They know the symbol table is the IDE's data model.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Have you accepted that a Scope is a dictionary with a parent pointer?</li>
+<li>[ ] Can you explain why shadowing is a natural result of the lookup rule?</li>
+<li>[ ] Can you express function and block scope in the same data structure?</li>
+<li>[ ] Do you see that go-to-definition is a lookup?</li>
+<li>[ ] Can you give a reason for filling the symbol table in two passes?</li>
+</ul>
+<h2>Practice Problems</h2>
+<ol>
+<li>Add a method that lists every symbol defined in a given scope to the Scope above.</li>
+<li>Add an option that warns when shadowing happens.</li>
+<li>Write pseudocode that splits analysis into two passes to support forward declarations.</li>
+</ol>
+<h2>Wrap-up and Next Steps</h2>
+<p>The symbol table is the memory the compiler uses to answer "what is this name?" The next post looks at how the analyzed AST gets turned into a simpler form — intermediate representation.</p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/01-what-is-a-compiler.md">What Is a Compiler?</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/02-lexical-analysis.md">lexical analysis</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/03-parsing-and-ast.md">parsing and AST</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/compilers-101/en/04-semantic-analysis.md">semantic analysis</a></li>
+<li><strong>symbol table and scope (current)</strong></li>
+<li>intermediate representation (upcoming)</li>
+<li>optimization basics (upcoming)</li>
+<li>code generation (upcoming)</li>
+<li>JIT vs AOT (upcoming)</li>
+<li>building a tiny interpreter (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Symbol_table">Symbol table (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Scope_(computer_science)">Scope (Wikipedia)</a></li>
+<li><a href="https://craftinginterpreters.com/resolving-and-binding.html">Crafting Interpreters — Resolving and Binding</a></li>
+<li><a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocument_documentSymbol">LSP — Document Symbols</a></li>
+</ul>
+<blockquote>
+<p>Compilers 101 series (5/10)</p>
+</blockquote>
+<!-- a-grade-intro:begin -->
+
+<p><strong>Core question</strong>: The <code>x</code> inside a function and the <code>x</code> outside are different variables. How does the compiler tell them apart?</p>
+<blockquote>
+<p>A symbol table is the compiler's memory of "which name points to which declaration." Nested scope and shadowing are expressed directly by the shape of this data structure.</p>
+</blockquote>
+<!-- a-grade-intro:end -->
+
 <h2>What You Will Learn</h2>
 <ul>
 <li>What a symbol table is and why it is the compiler's central data structure</li>
