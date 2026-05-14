@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Functions and Slope</h1>
+<p>An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.</p>
+<p>This is post 2 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.</p>
 <blockquote>
-<p>Calculus for ML 101 series (2/10)</p>
+<p>A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the <em>shape</em> of a function and its <em>slope</em> relate?</p>
-<blockquote>
-<p>A <em>function</em> is a <em>contract</em> from input to output, and a <em>slope</em> is the <em>direction and speed</em> of change.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>function</em></li>
@@ -76,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>ML models are <em>function compositions</em>, and training pushes signals through <em>each function gradient</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    I[Input] --&gt; F[Function]
-    F --&gt; O[Output]
-    F --&gt; S[Slope]
-    S --&gt; D[Derivative]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept flow: the input-function-output contract gains meaning once slope and derivative are layered onto it.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>function</strong>: maps <em>input</em> to <em>output</em>.</li>
