@@ -54,101 +54,102 @@
 </head>
 <body>
 <h1>Writing the README</h1>
-<p>This is post 3 in the Portfolio Project 101 series.</p>
+<p>A good project can still lose power at the entrance if the README is weak. Most visitors read the README before they read any code. In that short window, they need to understand what problem the project solves, whether there is a demo worth opening, and how they could run it themselves.</p>
+<p>If those answers are buried or missing, the reviewer often leaves before your implementation quality gets a chance to matter.</p>
+<p>This is post 3 in the Portfolio Project 101 series. Here we will treat the README as the project's first demo and look at how to arrange it so a reviewer can understand the value in about a minute.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (3/10)</p>
+<p>A strong README is not just a repository description. It is an entry document that helps a first-time visitor decide what to do next.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> must a <em>README</em> be <em>clear in 60 seconds</em>?</p>
-<blockquote>
-<p>Reviewers reach it <em>after</em> scanning <em>dozens</em> of projects.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>A standard <em>README</em> shape</li>
-<li>A <em>problem solution</em> one-liner</li>
-<li><em>Demo</em> and <em>screenshots</em></li>
-<li><em>How to run</em></li>
-<li><em>Decision rationale</em></li>
+<li>What information should a portfolio README show first?</li>
+<li>Why does the order pitch → demo → stack → run → next feel easy to scan?</li>
+<li>Why can a README still feel weak even when it contains many screenshots?</li>
+<li>How do you reduce friction for a reviewer who wants to run or inspect the project immediately?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>The <em>README</em> is the <em>entry door</em> to a project.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Pitch] --&gt; D[Demo]
-    D --&gt; S[Stack]
-    S --&gt; R[Run]
-    R --&gt; N[Next]
-</code></pre>
+<p>A README shapes the first impression of the project. The exact same codebase can feel much stronger when the README is tight, structured, and honest about the current state. Reviewers often read communication quality, onboarding care, and scope discipline from the README itself.</p>
+<p>In portfolio work, that matters a lot because the reviewer is not a teammate who already knows the context. The README has to do the work of orientation on its own.</p>
+<h2>Mental Model</h2>
+<p>The simplest way to design a README is to follow the visitor’s question order.</p>
+<p><img alt="The question order most reviewers follow when reading a README" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>The question order most reviewers follow when reading a README</em></p>
+<p>Most first-time readers think in roughly this order: what is this, does it work, what is it built with, can I run it, and what is still left. A README works best when it follows that flow instead of following the author's implementation history.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>pitch</strong>: <em>one-line</em> summary.</li>
-<li><strong>demo</strong>: <em>URL + screenshot</em>.</li>
-<li><strong>stack</strong>: <em>technology list</em>.</li>
-<li><strong>run</strong>: <em>commands</em>.</li>
-<li><strong>next</strong>: <em>upcoming tasks</em>.</li>
+<li><strong>Pitch</strong>: a one-line summary of the problem and project shape.</li>
+<li><strong>Demo</strong>: a live link or screenshot that proves the product experience exists.</li>
+<li><strong>Stack</strong>: the short list of technologies that matter for orientation.</li>
+<li><strong>Run path</strong>: copy-paste steps for trying the project locally.</li>
+<li><strong>Next</strong>: the unfinished work or improvement list that sets expectations honestly.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: Only <em>title + install</em>.</p>
-<p><strong>After</strong>: All <em>five sections</em> exist.</p>
-<h2>Hands-on: README Skeleton</h2>
-<p><strong>Step 1 — Pitch</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: the README shows a title and maybe an install command, but the actual value of the project is hard to infer.</p>
+<p><strong>After</strong>: a visitor can understand the project, open the demo, and decide whether to inspect the implementation in well under a minute.</p>
+<p>The difference is not length. It is whether the document is written for a first-time reader.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Start with a one-line pitch</strong></p>
+<p>Lead with the problem the project solves, not the framework name.</p>
 <pre><code class="language-markdown">&gt; A mini SaaS that fixes lost team schedules
 </code></pre>
-<p><strong>Step 2 — Demo link</strong></p>
+<p>A strong pitch does not repeat the title. It compresses the reason the project exists.</p>
+<p><strong>Step 2 — Surface the demo early</strong></p>
+<p>A reviewer should not have to hunt for the proof.</p>
 <pre><code class="language-markdown">[Live Demo](https://demo.example.com)
 </code></pre>
-<p><strong>Step 3 — Stack</strong></p>
+<p>A visible demo link creates trust faster than a long explanation paragraph.</p>
+<p><strong>Step 3 — Keep the stack short</strong></p>
+<p>The stack section is for orientation, not for showing off every library.</p>
 <pre><code class="language-markdown">- FastAPI, PostgreSQL, Docker
 </code></pre>
-<p><strong>Step 4 — Run</strong></p>
+<p>The goal is to make the system shape legible. The reasoning behind those choices can live elsewhere.</p>
+<p><strong>Step 4 — Make the run path copy-paste friendly</strong></p>
+<p>The first local run should feel simple.</p>
 <pre><code class="language-bash">docker compose up
 </code></pre>
-<p><strong>Step 5 — Next tasks</strong></p>
+<p>The more setup assumptions you require, the weaker the README becomes as an onboarding path.</p>
+<p><strong>Step 5 — Leave the next tasks visible</strong></p>
+<p>Unfinished work is easier to trust when it is named clearly.</p>
 <pre><code class="language-markdown">- [ ] add notifications
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>A next-tasks section is not a weakness. It shows scope control and gives the reviewer an honest sense of what is done versus what is still planned.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li>The <em>pitch</em> is <em>one</em> sentence.</li>
-<li>The <em>demo</em> is a <em>link</em>.</li>
-<li><em>Run</em> is <em>copy-paste</em> ready.</li>
+<li>The pitch should describe the problem, not restate the title.</li>
+<li>The demo should arrive before deep detail.</li>
+<li>The run path should be short enough that a reviewer can try it without guesswork.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>A <em>long preface</em>.</strong></li>
-<li><strong>Only <em>screenshots</em>.</strong></li>
-<li><strong>A <em>complex</em> run command.</strong></li>
-<li><strong>No <em>decision rationale</em>.</strong></li>
-<li><strong>No <em>next tasks</em>.</strong></li>
+<li>Starting with a long preface that pushes the real value too far down.</li>
+<li>Showing only screenshots without a live link or clear run path.</li>
+<li>Making the setup instructions too complex for a quick first pass.</li>
+<li>Naming the stack without explaining what the project is trying to do.</li>
+<li>Hiding unfinished work so the current state becomes harder to judge.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>The <em>top 10%</em> of OSS projects share the same five-section shape.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li>The <em>pitch</em> matters <em>most</em>.</li>
-<li>The <em>demo</em> must be <em>alive</em>.</li>
-<li><em>Run</em> is <em>one line</em>.</li>
-<li><em>Decisions</em> are <em>documented</em>.</li>
-<li><em>Next</em> uses <em>checkboxes</em>.</li>
-</ul>
+<p>A README does not win by saying everything. It wins by making the next step obvious.</p>
+<h2>How This Reads in Practice</h2>
+<p>Well-maintained open source projects usually repeat the same pattern: short intro, quick start, visible example or demo, and a clear path to the deeper docs. They do that because first-time visitors always need roughly the same things.</p>
+<p>Portfolio projects benefit from the same discipline. A small repository can feel polished when the entry path is easy to follow.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>One-line</em> pitch.</li>
-<li>[ ] <em>Demo</em> link.</li>
-<li>[ ] <em>Run</em> command.</li>
-<li>[ ] <em>Next</em> checkboxes.</li>
+<li>[ ] The README opens with a problem-first pitch.</li>
+<li>[ ] The demo link or screenshot is visible immediately.</li>
+<li>[ ] The local run path is easy to copy and follow.</li>
+<li>[ ] The core stack is listed without unnecessary noise.</li>
+<li>[ ] The next tasks are written down honestly.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>pitch</em> in one line.</li>
-<li>State the <em>demo</em> format in one line.</li>
-<li>State the <em>run</em> requirement in one line.</li>
+<li>Rewrite your project pitch without using technology names.</li>
+<li>List the three things a reviewer should learn within 30 seconds.</li>
+<li>Find the least friendly part of your current run section and rewrite it.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Building the Demo</em>.</p>
+<p>A README is not just a summary page. It is the first user experience of the project. When it leads with the problem, proves the demo, makes the run path simple, and shows unfinished work honestly, even a small project becomes much easier to trust.</p>
+<p>Next, we will move from the repository to the product surface itself and look at how to build a demo that reveals value quickly.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
@@ -163,10 +164,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">README Best Practices - GitHub</a></li>
-<li><a href="https://github.com/matiassingers/awesome-readme">Awesome README</a></li>
+<li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">About READMEs (GitHub Docs)</a></li>
 <li><a href="https://www.makeareadme.com/">Make a README</a></li>
 <li><a href="https://github.com/RichardLitt/standard-readme">Standard Readme</a></li>
+<li><a href="https://github.com/matiassingers/awesome-readme">Awesome README</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, README, Documentation, Onboarding, Beginner</p>
 </body>
