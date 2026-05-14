@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How RAGAS faithfulness and answer_relevancy metrics automate quality evaluation of RAG answers.
 ---
 
@@ -22,7 +22,7 @@ seo_description: How RAGAS faithfulness and answer_relevancy metrics automate qu
 
 RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer quality without rereading every output by hand. This post shows how to turn those signals into a quality gate.
 
-This is the final article in the RAG Deep Dive series.
+This is the final post in the RAG Deep Dive series.
 
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
@@ -38,8 +38,6 @@ This is the final article in the RAG Deep Dive series.
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
-
-> RAG Deep Dive series (6/6)
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -447,12 +445,18 @@ That gives the series a clean ending. Episodes 1 through 5 explained how chunks 
 
 ## References
 
-1. [`ragas==0.1.22` package index](https://pypi.org/project/ragas/0.1.22/)
-2. `ragas/evaluation.py` from installed `ragas==0.1.22`
-3. `ragas/metrics/_faithfulness.py` from installed `ragas==0.1.22`
-4. `ragas/metrics/_answer_relevance.py` from installed `ragas==0.1.22`
-5. `ragas/metrics/_context_precision.py` from installed `ragas==0.1.22`
-6. [`langchain/evaluation/loading.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
-7. [`langchain/evaluation/schema.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py)
+### Official Docs
+
+- [RAGAS evaluation quickstart](https://docs.ragas.io/en/stable/getstarted/evaluation/)
+- [RAGAS metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
+- [LangChain evaluation concepts](https://python.langchain.com/docs/concepts/evaluation/)
+
+### Source Code
+
+- [RAGAS `evaluation.py` source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/evaluation.py)
+- [RAGAS faithfulness metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_faithfulness.py)
+- [RAGAS answer relevancy metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_answer_relevance.py)
+- [RAGAS context precision metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_context_precision.py)
+- [LangChain evaluation loading source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
 
 Tags: RAG, LangChain, Vector Search, LLM

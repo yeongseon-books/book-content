@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: RAGAS의 faithfulness와 answer_relevancy 메트릭으로 RAG 답변 품질을 자동 평가하는 방법을 정리합니다.
 ---
 
@@ -193,7 +193,7 @@ print(column_map)
 
 RAGAS에서 RAG다운 메트릭을 하나만 꼽으라면 많은 팀이 faithfulness를 먼저 봅니다. 이유는 단순합니다. RAG 시스템의 가장 전형적인 실패는 “그럴듯하지만 근거에 없는 말”이기 때문입니다. `ragas/metrics/_faithfulness.py`를 읽으면 이 메트릭이 그 실패를 어떻게 연산으로 바꾸는지 꽤 명확하게 드러납니다.
 
-핵심은 2단계입니다. 첫 단계에서 RAGAS는 답변 전체를 그대로 판단하지 않습니다. 먼저 LLM을 써서 답변을 더 단순한 statement 목록으로 분해합니다. `LONG_FORM_ANSWER_PROMPT`를 보면 문장별 복잡도를 분석하고, 대명사를 없애고, 완전히 이해 가능한 더 작은 statement로 쪼개라고 지시합니다. 예를 들어 “그 작업자는 세 번 재시도한 뒤 포기하고 dead-letter queue로 보낸다”라는 한 문장은 `재시도 횟수는 세 번이다`와 `마지막 재시도 뒤 payload가 dead-letter queue로 이동한다` 같은 원자적 주장 둘로 나뉠 수 있습니다.
+faithfulness 계산은 2단계로 움직입니다. 첫 단계에서 RAGAS는 답변 전체를 그대로 판단하지 않습니다. 먼저 LLM을 써서 답변을 더 단순한 statement 목록으로 분해합니다. `LONG_FORM_ANSWER_PROMPT`를 보면 문장별 복잡도를 분석하고, 대명사를 없애고, 더 작은 statement로 쪼개라고 지시합니다. 예를 들어 “그 작업자는 세 번 재시도한 뒤 포기하고 dead-letter queue로 보낸다”라는 한 문장은 `재시도 횟수는 세 번이다`와 `마지막 재시도 뒤 payload가 dead-letter queue로 이동한다`라는 두 개의 원자적 주장으로 나눌 수 있습니다.
 
 둘째 단계에서는 이렇게 분해된 각 statement를 retrieved context 목록에 대조합니다. `NLI_STATEMENTS_MESSAGE`는 문맥만 보고 각 statement가 직접 추론 가능한지 `verdict` 0 또는 1로 돌려달라고 요구합니다. 구현에서 `_create_nli_prompt()`는 `row["contexts"]`를 줄바꿈으로 합쳐 하나의 premise처럼 만들고, statement 목록을 JSON 문자열로 전달합니다. 그리고 `_compute_score()`는 아주 단순한 비율을 계산합니다.
 
@@ -254,7 +254,7 @@ RAGAS는 먼저 답변을 보고 “이 답변이 어떤 질문의 답처럼 보
 
 여기서 포인트는 방향입니다. 메트릭은 답변을 직접 사실 검증하지 않습니다. 대신 “이 답을 읽고 역으로 추정한 질문이 원래 사용자 질문과 얼마나 비슷한가”를 봅니다. 답변이 장황하게 옆길로 새거나, 질문과 무관한 배경 설명을 길게 붙이거나, 반대로 핵심을 흐리면 생성된 역질문이 원래 질문에서 멀어집니다. 그래서 answer relevancy는 정확히 말해 **정답성보다 초점도와 간결성**을 더 잘 측정합니다.
 
-소스의 `noncommittal` 처리도 이 점을 강화합니다. `ragas==0.1.22` 구현에서는 한 샘플에 대해 생성된 역질문 집합이 noncommittal로 판정되면 그 샘플의 answer relevancy 점수는 0이 됩니다. 그리고 `evaluate()`가 여러 샘플의 점수를 모은 뒤 최종적으로 평균을 냅니다. 즉 “잘 모르겠습니다”, “확실하지 않습니다”, “정보가 부족합니다”처럼 회피적 답변이 달린 샘플은 mean에 0으로 기여합니다. 이는 relevance를 “질문과 붙어 있으면서 실제로 대답하려는 의지까지 가진 응답”으로 해석한다는 뜻입니다.
+소스의 `noncommittal` 처리도 이 점을 강화합니다. `ragas==0.1.22` 구현에서는 한 샘플에 대해 생성된 역질문 집합이 noncommittal로 판정되면 그 샘플의 answer relevancy 점수는 0이 됩니다. 그리고 `evaluate()`가 여러 샘플의 점수를 모은 뒤 최종적으로 평균을 냅니다. 즉 “잘 모르겠습니다”, “확실하지 않습니다”, “정보가 부족합니다”처럼 회피적 답변이 달린 샘플은 mean에 0으로 들어갑니다. 이 메트릭은 relevance를 “질문과 붙어 있으면서 실제로 대답하려는 응답”으로 읽습니다.
 
 이 메트릭을 faithfulness와 혼동하면 안 됩니다. 예를 들어 “몇 번 재시도하나요?”라는 질문에 “세 번 재시도한 뒤 dead-letter queue로 이동합니다. 이 시스템은 분산 워커 구조를 사용하며 장애 격리를 위해…”처럼 맞는 말과 주변 설명을 길게 덧붙인 답은 faithfulness는 높게 나올 수 있습니다. 모두 근거 안에 있는 사실이기 때문입니다. 하지만 answer relevancy는 떨어질 수 있습니다. 역질문을 생성해 보면 “이 시스템의 장애 처리 구조는 무엇인가?” 같은 다른 질문으로도 읽히기 시작하기 때문입니다.
 
@@ -280,7 +280,7 @@ scores = [
 print(sum(scores) / len(scores))
 ```
 
-요약하면 answer relevancy는 “질문에 대한 답처럼 읽히는가”를 재는 메트릭입니다. 사실 검증까지 맡기면 안 되고, 특히 retrieval failure를 직접 잡아내는 도구로 오해하면 안 됩니다. 대신 prompt가 너무 수다스러워졌는지, answer template이 불필요한 boilerplate를 붙이고 있는지, chain 조립 뒤에 질문 원문이 희미해졌는지를 잡는 데는 꽤 민감합니다.
+정리하면 answer relevancy는 “질문에 대한 답처럼 읽히는가”를 재는 메트릭입니다. 사실 검증까지 맡기면 안 되고, 특히 retrieval failure를 직접 잡아내는 도구로 오해하면 안 됩니다. 대신 prompt가 너무 수다스러워졌는지, answer template이 불필요한 boilerplate를 붙이고 있는지, chain 조립 뒤에 질문 원문이 희미해졌는지를 잡는 데는 꽤 민감합니다.
 
 ---
 
@@ -439,12 +439,18 @@ LangChain의 `EvaluatorType`과 `load_evaluator()`는 QA, criteria, exact match 
 
 ## 참고 자료
 
-1. [`ragas==0.1.22` package index](https://pypi.org/project/ragas/0.1.22/)
-2. `ragas/evaluation.py` from installed `ragas==0.1.22`
-3. `ragas/metrics/_faithfulness.py` from installed `ragas==0.1.22`
-4. `ragas/metrics/_answer_relevance.py` from installed `ragas==0.1.22`
-5. `ragas/metrics/_context_precision.py` from installed `ragas==0.1.22`
-6. [`langchain/evaluation/loading.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
-7. [`langchain/evaluation/schema.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py)
+### 공식 문서
+
+- [RAGAS evaluation quickstart](https://docs.ragas.io/en/stable/getstarted/evaluation/)
+- [RAGAS metrics overview](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/)
+- [LangChain evaluation concepts](https://python.langchain.com/docs/concepts/evaluation/)
+
+### 소스 코드
+
+- [RAGAS `evaluation.py` source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/evaluation.py)
+- [RAGAS faithfulness metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_faithfulness.py)
+- [RAGAS answer relevancy metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_answer_relevance.py)
+- [RAGAS context precision metric source](https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_context_precision.py)
+- [LangChain evaluation loading source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
 
 Tags: RAG, LangChain, Vector Search, LLM
