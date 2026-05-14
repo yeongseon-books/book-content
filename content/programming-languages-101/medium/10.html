@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Makes a Good Language Design?</h1>
+<p>We sometimes say a language is well designed, but that phrase usually hides several different claims at once. Do we mean it is fast, easy to learn, resistant to mistakes, or pleasant to read? Without a frame, those judgments blur together.</p>
 <p>This is the final post in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When we say "this language is well designed," what exactly are we scoring?</p>
-<blockquote>
-<p>Language design is the discipline of tradeoffs. More expressiveness costs consistency. Stronger safety adds friction. A good design is not "great at everything" — it is <strong>a design that balances clearly toward what this language is meant to do well</strong>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat language design as an explicit tradeoff problem. The concepts from the earlier chapters — syntax, types, scope, closures, objects, memory, execution, and static vs dynamic checking — all become easier to compare once we place them on a handful of design axes.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Five axes for evaluating a language design</li>
@@ -80,17 +71,8 @@
 <p>Good design is not "good for everyone." It is "an answer that made its choices clear."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;language design&quot;] --&gt; B[&quot;consistency&quot;]
-    A --&gt; C[&quot;simplicity&quot;]
-    A --&gt; D[&quot;expressiveness&quot;]
-    A --&gt; E[&quot;safety&quot;]
-    A --&gt; F[&quot;performance&quot;]
-    B &lt;--&gt;|trade| D
-    C &lt;--&gt;|trade| D
-    E &lt;--&gt;|trade| C
-    F &lt;--&gt;|trade| E
-</code></pre>
+<p><img alt="The five design axes pulling against one another in language design" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>The five design axes pulling against one another in language design</em></p>
 <p>The five axes are coupled — push one down and another rises.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -199,6 +181,17 @@ fn first(xs: &amp;[i32]) -&gt; Option&lt;&amp;i32&gt; {
 </tbody>
 </table>
 <p>Each language's answers cluster around what it tries to be best at.</p>
+<p><strong>Step 6 — The answer changes when the context changes</strong></p>
+<p><strong>A prototype that must ship in a week</strong><br>
+- Axes that deserve more weight: simplicity, expressiveness<br>
+- Common language that rises: Python</p>
+<p><strong>A service where deployment and operational simplicity dominate</strong><br>
+- Axes that deserve more weight: consistency, operational simplicity, performance<br>
+- Common language that rises: Go</p>
+<p><strong>A system boundary where memory control and strong guarantees matter most</strong><br>
+- Axes that deserve more weight: safety, performance<br>
+- Common language that rises: Rust</p>
+<p>The point is not to crown a winner. It is to show that even for the same team, the definition of a “good language” changes when the workload and failure cost change. Good evaluation starts by writing down the context first.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The three answers are not right or wrong — they are <strong>different priority orderings</strong>.</li>
@@ -256,10 +249,11 @@ fn first(xs: &amp;[i32]) -&gt; Option&lt;&amp;i32&gt; {
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Programming_language">Programming language design (Wikipedia)</a></li>
 <li><a href="https://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html">Rob Pike — Less is exponentially more (Go)</a></li>
-<li><a href="https://www.stroustrup.com/ETAPS-corrected-draft.pdf">Bjarne Stroustrup — Foundations of C++</a></li>
-<li><a href="https://peps.python.org/pep-0020/">PEP 20 — The Zen of Python</a></li>
+<li><a href="https://peps.python.org/pep-0020/">The Zen of Python (PEP 20)</a></li>
+<li><a href="https://go.dev/doc/faq">The Go FAQ — language design</a></li>
+<li><a href="https://doc.rust-lang.org/book/foreword.html">The Rust Programming Language — Foreword</a></li>
+<li><a href="https://www.elsevier.com/books/programming-language-pragmatics/scott/978-0-12-410409-9">Programming Language Pragmatics (Scott)</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Programming Languages, LanguageDesign, Consistency, Simplicity, Expressiveness</p>
 </body>

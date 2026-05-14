@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 10
 title: What Makes a Good Language Design?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Simplicity
   - Expressiveness
 seo_description: A good language balances consistency, simplicity, expressiveness, safety, and performance. Revisit this series through the design-tradeoff lens.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Makes a Good Language Design?
 
+We sometimes say a language is well designed, but that phrase usually hides several different claims at once. Do we mean it is fast, easy to learn, resistant to mistakes, or pleasant to read? Without a frame, those judgments blur together.
+
 This is the final post in the Programming Languages 101 series.
 
-> Programming Languages 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When we say "this language is well designed," what exactly are we scoring?
-
-> Language design is the discipline of tradeoffs. More expressiveness costs consistency. Stronger safety adds friction. A good design is not "great at everything" — it is **a design that balances clearly toward what this language is meant to do well**.
-
-<!-- a-grade-intro:end -->
+In this post, we will treat language design as an explicit tradeoff problem. The concepts from the earlier chapters — syntax, types, scope, closures, objects, memory, execution, and static vs dynamic checking — all become easier to compare once we place them on a handful of design axes.
 
 ## What You Will Learn
 
@@ -51,18 +45,9 @@ Design sense is not just for evaluating languages — **the same instinct applie
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["language design"] --> B["consistency"]
-    A --> C["simplicity"]
-    A --> D["expressiveness"]
-    A --> E["safety"]
-    A --> F["performance"]
-    B <-->|trade| D
-    C <-->|trade| D
-    E <-->|trade| C
-    F <-->|trade| E
-```
+![The five design axes pulling against one another in language design](../../../assets/programming-languages-101/10/10-01-concept-at-a-glance.en.png)
+
+*The five design axes pulling against one another in language design*
 
 The five axes are coupled — push one down and another rises.
 
@@ -164,6 +149,16 @@ Rust forces "value may be missing" into the type — high safety, more to learn.
 
 Each language's answers cluster around what it tries to be best at.
 
+### Step 6 — The answer changes when the context changes
+
+| Situation | Axes that deserve more weight | Common language that rises |
+| --- | --- | --- |
+| A prototype that must ship in a week | simplicity, expressiveness | Python |
+| A service where deployment and operational simplicity dominate | consistency, operational simplicity, performance | Go |
+| A system boundary where memory control and strong guarantees matter most | safety, performance | Rust |
+
+The point is not to crown a winner. It is to show that even for the same team, the definition of a “good language” changes when the workload and failure cost change. Good evaluation starts by writing down the context first.
+
 ## What to Notice in This Code
 
 - The three answers are not right or wrong — they are **different priority orderings**.
@@ -228,9 +223,10 @@ This series ends here. Suggested next reading paths: [compilers-101](../../compi
 
 ## References
 
-- [Programming language design (Wikipedia)](https://en.wikipedia.org/wiki/Programming_language)
 - [Rob Pike — Less is exponentially more (Go)](https://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html)
-- [Bjarne Stroustrup — Foundations of C++](https://www.stroustrup.com/ETAPS-corrected-draft.pdf)
-- [PEP 20 — The Zen of Python](https://peps.python.org/pep-0020/)
+- [The Zen of Python (PEP 20)](https://peps.python.org/pep-0020/)
+- [The Go FAQ — language design](https://go.dev/doc/faq)
+- [The Rust Programming Language — Foreword](https://doc.rust-lang.org/book/foreword.html)
+- [Programming Language Pragmatics (Scott)](https://www.elsevier.com/books/programming-language-pragmatics/scott/978-0-12-410409-9)
 
 Tags: Computer Science, Programming Languages, LanguageDesign, Consistency, Simplicity, Expressiveness
