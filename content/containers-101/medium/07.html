@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Registry</h1>
-<blockquote>
-<p>Containers 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Where does your <em>built image</em> live, and <em>how</em> do you pull it back later?</p>
-<blockquote>
-<p>A <em>registry</em> is the <em>remote home</em> of an image and the <em>center</em> of every deployment flow.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A well-built image is still useless if no one can pull the exact same artifact back later. Teams usually feel this when tags drift, push permissions are too broad, or deployment history can no longer prove what actually ran.</p>
 <p>This is post 7 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we treat the registry as the center of deployment identity, covering push and pull flow, digest pinning, permission separation, and the first steps toward image signing.</p>
+<blockquote>
+<p>A registry is not just storage. It is the identity system for what actually gets deployed.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The role of a <em>registry</em></li>
 <li>The <em>push / pull</em> flow</li>
@@ -77,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A reproducible image is useless if there is <em>no place to fetch it from</em>. <em>Deployment starts at the registry.</em></p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Dev[&quot;dev&quot;] --&gt; Build[&quot;docker build&quot;]
-    Build --&gt; Push[&quot;docker push&quot;]
-    Push --&gt; Reg[&quot;registry&quot;]
-    Reg --&gt; Pull[&quot;docker pull&quot;]
-    Pull --&gt; Prod[&quot;prod&quot;]
-</code></pre>
+<p><img alt="Push and pull flow between build output and a registry" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Push and pull flow between build output and a registry</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>registry</strong>: an <em>image storage server</em>.</li>
@@ -131,6 +120,19 @@ def login(registry, user, password):
 <li><em>password-stdin</em> avoids leaking secrets.</li>
 <li>Push happens <em>after role separation</em> only.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker login ghcr.io -u &quot;$GITHUB_USER&quot; --password-stdin
+docker tag myapp:dev ghcr.io/example/myapp:1.0.0
+docker push ghcr.io/example/myapp:1.0.0
+docker inspect --format &quot;{{index .RepoDigests 0}}&quot; ghcr.io/example/myapp:1.0.0
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- After push, <code>RepoDigests</code> exposes an immutable <code>@sha256:</code> reference.<br>
+- Pulling by digest later resolves the exact same content in every environment.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If auth fails, inspect token scope or registry-specific permissions.<br>
+- If the digest is unexpected, verify the tag points at the intended image.<br>
+- Never leave production with only a mutable tag and no recorded digest.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Using <em>latest</em> in production.</strong></li>
@@ -164,6 +166,7 @@ def login(registry, user, password):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once you know <em>where</em> to fetch images, the next question is <em>how to run them safely</em>. The next post covers <em>container security</em>.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -183,6 +186,6 @@ def login(registry, user, password):
 <li><a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry">GitHub Container Registry</a></li>
 <li><a href="https://docs.sigstore.dev/cosign/overview/">Cosign</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Registry, ECR, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
