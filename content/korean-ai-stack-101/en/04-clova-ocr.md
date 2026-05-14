@@ -35,7 +35,7 @@ This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA O
 
 > The first useful OCR output is not plain text. It is a structured extraction payload that still has to be reassembled into meaningful lines.
 
-> Korean AI Stack 101 (3/6)
+> Korean AI Stack 101 (4/6)
 
 Example code: [github.com/yeongseon-books/korean-ai-stack-101](https://github.com/yeongseon-books/korean-ai-stack-101/tree/main/en/04-clova-ocr)
 
