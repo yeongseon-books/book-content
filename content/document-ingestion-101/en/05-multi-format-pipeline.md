@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: The essence of a multi-format pipeline is forcing varied inputs into
   one shared Document contract.
 ---
@@ -138,6 +138,77 @@ source=notes.txt format=txt preview=TXT source: queue backlog grew overnight. ..
 source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 ```
 
+The important thing in that output is not the three lines themselves. It is that all three collapse into the same shape. Later stages can stay format-agnostic only because the pipeline emits a **normalized handoff contract**.
+
+## Why the shared contract comes first
+
+In a multi-format pipeline, adding more loaders is usually easier than keeping downstream stages stable. That is why it is safer to lock the contract first — `page_content`, `source`, `format`, and `loader_name` — and only then expand format coverage.
+
+| Field | Why it exists | Where downstream uses it |
+| --- | --- | --- |
+| `page_content` | Body text for chunking and embedding | chunking, embedding |
+| `source` | Trace back to the original file | debugging, result rendering |
+| `format` | Apply type-specific policy | chunk presets, error handling |
+| `loader_name` | Show which path produced the text | operations logs, failure analysis |
+
+Once that contract is fixed, later additions like HTML or DOCX do not force downstream rewrites. Without it, chunking and indexing code quickly fills with format-specific branching.
+
+## Example normalization layer
+
+```python
+from __future__ import annotations
+
+from langchain_core.documents import Document
+
+def normalize_document(doc: Document, *, source: str, fmt: str, loader_name: str) -> Document:
+    metadata = dict(doc.metadata)
+    metadata.update(
+        {
+            'source': source,
+            'format': fmt,
+            'loader_name': loader_name,
+        }
+    )
+    return Document(page_content=doc.page_content.strip(), metadata=metadata)
+
+def normalize_batch(docs: list[Document], *, source: str, fmt: str, loader_name: str) -> list[Document]:
+    return [normalize_document(doc, source=source, fmt=fmt, loader_name=loader_name) for doc in docs]
+```
+
+This layer is small, but it gives the pipeline a clean seam. Rather than passing raw loader differences downstream, you flatten them once at the handoff point.
+
+## Record failures by format, not as one generic error
+
+As the number of supported formats grows, so do the failure modes. PDFs fail differently from Markdown, and Markdown fails differently from plain text. It is worth logging those failures separately instead of collapsing everything into one generic exception.
+
+```python
+from __future__ import annotations
+
+from pathlib import Path
+
+def safe_load_document(path: Path) -> tuple[list[Document], dict[str, str] | None]:
+    try:
+        docs = load_document(path)
+    except ValueError as exc:
+        return [], {'source': path.name, 'status': 'unsupported', 'reason': str(exc)}
+    except Exception as exc:  # tutorial logging path
+        return [], {'source': path.name, 'status': 'failed', 'reason': str(exc)}
+    return docs, None
+```
+
+That makes operations much easier to explain. An unsupported DOCX file and a broken PDF extraction are both failures, but they are not the same failure.
+
+## Operations-style output example
+
+```text
+source=incident.pdf format=pdf loader=pypdf status=loaded
+source=notes.txt format=txt loader=text status=loaded
+source=runbook.md format=md loader=text status=loaded
+source=diagram.docx format=docx status=unsupported reason=unsupported format: .docx
+```
+
+One short block like this tells you what the pipeline read, what it skipped, and why. That is where multi-format ingestion starts to feel operable instead of merely feature-complete.
+
 ## What to notice in this code
 
 ### Shared Document contract schema
@@ -171,6 +242,12 @@ As the format count grows, explicit fallback paths matter more than pretending e
 - [ ] Extension routing lives in one function.
 - [ ] You confirmed later stages can run without format-specific branching.
 
+## How this looks in production thinking
+
+Early on, it is better to be strict about the handoff contract than ambitious about format count. If the `Document` contract stays stable, chunking and indexing survive much longer. If the contract is vague, every new loader leaks its quirks into the rest of the system.
+
+It is also worth resisting the urge to treat every format as equally mature on day one. PDFs need text-layer verification first. Markdown needs structure preservation first. TXT often needs encoding and newline normalization first. The pipeline is shared, but the first good failure check is still format-specific.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -185,6 +262,14 @@ As the format count grows, explicit fallback paths matter more than pretending e
 
 ## References
 
-- https://python.langchain.com/docs/concepts/document_loaders/
+### Official docs
+
+- [LangChain document loaders concepts](https://python.langchain.com/docs/concepts/document_loaders/)
+- [pypdf user guide](https://pypdf.readthedocs.io/)
+
+### Verification-friendly sources
+
+- [Python pathlib documentation](https://docs.python.org/3/library/pathlib.html)
+- [Markdown Guide - Basic Syntax](https://www.markdownguide.org/basic-syntax/)
 
 Tags: RAG, Document Processing, LangChain, Python
