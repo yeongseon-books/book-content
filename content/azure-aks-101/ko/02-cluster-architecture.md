@@ -162,7 +162,7 @@ User pool은 애플리케이션 워크로드용 풀입니다.
 - Spot 전용 user pool
 - GPU 또는 메모리 최적화용 specialized pool
 
-핵심은 풀을 팀 조직도에 맞추기보다 **워크로드 성격**에 맞추는 것입니다. 같은 팀이 운영해도 API와 배치는 리소스 패턴과 중단 허용도가 다르므로 풀을 나누는 편이 더 읽기 쉽고 안전합니다.
+풀은 팀 조직도보다 **워크로드 성격**에 맞게 나누는 편이 좋습니다. 같은 팀이 운영해도 API와 배치는 리소스 패턴과 중단 허용도가 다르므로, 풀을 분리해야 읽기 쉽고 안전한 구조가 됩니다.
 
 ### Spot node pool은 비용 절감 장치이지 기본 안정성 계층이 아닙니다
 
@@ -218,6 +218,44 @@ kubectl get pods -n kube-system
 ```
 
 첫 번째 명령은 노드 상태와 주소를 보여 주고, 두 번째 명령은 system workload가 어디에서 어떻게 돌아가는지 감각을 줍니다. 구조를 이해한 뒤 이 명령을 보면 system/user 분리가 실제로 어떻게 드러나는지도 읽기 쉬워집니다.
+
+Node Pool 관점까지 더 분명히 보고 싶다면 아래 두 명령을 이어서 보는 편이 좋습니다.
+
+```bash
+az aks nodepool list \
+  --resource-group $RG \
+  --cluster-name $CLUSTER \
+  --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"
+
+kubectl get nodes -L kubernetes.azure.com/agentpool,kubernetes.azure.com/mode
+```
+
+앞의 명령은 **Azure 리소스 관점의 풀 설정**을 보여 주고, 뒤의 명령은 **실제 노드가 어느 풀과 모드에 속하는지**를 Kubernetes 관점에서 보여 줍니다. 둘을 같이 봐야 “설계한 풀”과 “실제로 배치에 쓰이는 노드”가 한 화면에서 연결됩니다.
+
+## 클러스터가 이상해 보일 때는 이 순서로 잘라 봅니다
+
+구조를 아는 가장 좋은 증거는 아키텍처를 설명하는 능력보다, 이상 징후를 올바른 층으로 보내는 능력입니다.
+
+### 1. API 문제인지부터 봅니다
+
+`kubectl get nodes` 자체가 이상하게 느리거나 실패하면, 먼저 Control Plane 경계와 자격 증명 문제를 의심하는 편이 맞습니다. 이 경우는 애플리케이션 Pod부터 보는 것보다 API 연결 상태를 먼저 확인해야 시간을 덜 씁니다.
+
+### 2. Pod가 안 뜨면 Node Pool 수용력을 봅니다
+
+Pod가 `Pending`에 오래 머문다면 스케줄링과 용량 문제일 가능성이 큽니다. 이때는 “클러스터 전체가 죽었다”보다 **어느 풀에 자리가 없고 어떤 제약이 걸렸는가**를 먼저 봐야 합니다.
+
+```bash
+kubectl describe pod <pod-name>
+kubectl top nodes
+```
+
+`describe`에는 taint, selector mismatch, insufficient CPU/memory 같은 단서가 바로 나오고, `kubectl top nodes`는 어느 풀이 실제로 포화 쪽으로 가는지 감을 줍니다.
+
+### 3. system workload부터 흔들리면 blast radius를 크게 봅니다
+
+앱 Pod만 불안정한지, 아니면 `kube-system`의 CoreDNS·metrics-server까지 흔들리는지는 의미가 다릅니다. 후자라면 애플리케이션 한 개의 문제가 아니라 클러스터 운영 기반이 압박받고 있을 가능성이 큽니다.
+
+즉 이 글의 구조는 그림 설명으로 끝나지 않습니다. **Control Plane인지, user pool인지, system pool인지 먼저 자르는 습관**이 생겨야 실제 운영에서 아키텍처 이해가 힘을 발휘합니다.
 
 ## 흔히 헷갈리는 지점
 
