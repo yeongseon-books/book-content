@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 6
 title: Error Handling
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Robustness
   - Reliability
 seo_description: Choose between exceptions and return values, fail fast, use errors as values, and apply retry with backoff safely.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Error Handling
 
-> Clean Code 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Should you raise an exception or return a value?
-
-> Use values when the caller is expected to decide what to do; use exceptions when the caller cannot reasonably handle the situation.
+Error handling becomes dangerous when it is everywhere and nowhere at the same time. The code catches broadly, logs vaguely, and leaves the caller guessing which failures still matter.
 
 This is post 6 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will set boundaries for validation, typed exceptions, return-value failures, and retries so that robustness increases without letting the happy path disappear.
+
+---
 
 ## What You Will Learn
 
@@ -51,14 +47,9 @@ When error handling code outweighs business logic, the code stops being readable
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    I["Input"] --> V["Validate"]
-    V -->|"Invalid"| F["Fail fast"]
-    V -->|"Valid"| L["Logic"]
-    L -->|"Expected"| R["Value"]
-    L -->|"Unexpected"| E["Exception"]
-```
+![Error Handling](../../../assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
+
+*Error-handling flow: validate early, return values for expected failures, chain exceptions, and catch broadly only at boundaries.*
 
 Validate up front; raise only when control is lost.
 
@@ -173,6 +164,23 @@ def handle_request(req):
 
 Use broad catches only at outer boundaries.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_error_handling.py
+python -m pytest -q tests/test_retry_idempotency.py
+```
+
+**Expected output**
+
+- Typed exceptions and boundary mappings stay locked in by tests.
+- Retry logic should pass only for idempotent operations.
+
+## Failure Modes to Watch
+
+- Broad catches still sit deep inside business logic.
+- Retry is added to operations that can duplicate side effects such as billing.
+
 ## What to Notice in This Code
 
 - Validation and handling are separated.
@@ -236,5 +244,6 @@ Treat errors as first-class but never as the lead role. Next: an often misused t
 - [Joel Spolsky — Exceptions](https://www.joelonsoftware.com/2003/10/13/13/)
 - [Google SRE — Handling Overload](https://sre.google/sre-book/handling-overload/)
 - [AWS — Exponential Backoff and Jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
-
+- [Python exception hierarchy](https://docs.python.org/3/library/exceptions.html)
+- [AWS Builders Library — timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
 Tags: Computer Science, CleanCode, ErrorHandling, Exceptions, Robustness, Reliability

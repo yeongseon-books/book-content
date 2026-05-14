@@ -18,12 +18,18 @@ tags:
   - Robustness
   - Reliability
 seo_description: 깔끔한 오류 처리 기법을 배웁니다. 예외와 반환값 선택 기준, Fail Fast 원칙, 재시도 전략을 구현하며 견고함을 높이는 법을 배웁니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 오류 처리
 
-오류 처리는 꼭 필요하지만, 그 코드가 비즈니스 로직보다 더 눈에 띄기 시작하면 구조가 이미 흐려진 경우가 많습니다. 이 글은 Clean Code 101 시리즈의 6번째 글입니다. 여기서는 예외와 반환값을 언제 구분해서 써야 하는지, 그리고 재시도와 경계 처리까지 어떤 기준으로 설계해야 하는지 정리하겠습니다.
+오류 처리는 꼭 필요하지만, 그 코드가 비즈니스 로직보다 더 눈에 띄기 시작하면 구조가 이미 흐려진 경우가 많습니다.
+
+이 글은 Clean Code 101 시리즈의 6번째 글입니다.
+
+여기서는 예외와 반환값을 언제 구분해서 써야 하는지, 그리고 재시도와 경계 처리까지 어떤 기준으로 설계해야 하는지 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,14 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    I["Input"] --> V["Validate"]
-    V -->|"Invalid"| F["Fail fast"]
-    V -->|"Valid"| L["Logic"]
-    L -->|"Expected"| R["Value"]
-    L -->|"Unexpected"| E["Exception"]
-```
+![오류 처리](../../../assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
+
+*오류 처리의 흐름: 입력 검증, 값 기반 실패, 예외 체이닝, 경계 처리로 책임을 분리합니다.*
 
 입력은 먼저 검증하고, 흐름을 잃는 순간에만 예외를 써야 오류 처리가 구조를 해치지 않습니다.
 
@@ -165,6 +166,23 @@ def handle_request(req):
 
 넓은 except는 가장 바깥 경계에서만 허용하는 편이 좋습니다. 내부 로직까지 모두 삼켜 버리면 구조가 보이지 않게 됩니다.
 
+## 검증 방법
+
+```bash
+python -m pytest -q tests/test_error_handling.py
+python -m pytest -q tests/test_retry_idempotency.py
+```
+
+**기대 결과**
+
+- 예외 타입과 HTTP 경계 매핑이 테스트로 고정됩니다.
+- 재시도는 멱등한 호출에서만 통과해야 합니다.
+
+## 실패하기 쉬운 지점
+
+- `except Exception`이 내부 로직 깊숙한 곳에 남아 있습니다.
+- 재시도가 중복 결제를 만들 수 있는 작업에도 붙어 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 검증과 처리 책임이 분리되어 있습니다.
@@ -228,5 +246,6 @@ API 서버에서는 핸들러가 보통 경계가 됩니다. 도메인 로직은
 - [Joel Spolsky — Exceptions](https://www.joelonsoftware.com/2003/10/13/13/)
 - [Google SRE — Handling Overload](https://sre.google/sre-book/handling-overload/)
 - [AWS — Exponential Backoff and Jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
-
+- [Python exception hierarchy](https://docs.python.org/3/library/exceptions.html)
+- [AWS Builders Library — timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
 Tags: Computer Science, CleanCode, ErrorHandling, Exceptions, Robustness, Reliability
