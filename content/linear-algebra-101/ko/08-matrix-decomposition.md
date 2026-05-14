@@ -17,7 +17,7 @@ tags:
   - DataScience
   - Beginner
 seo_description: LU, QR, 고유분해, SVD를 언제 왜 쓰는지 한 흐름으로 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 행렬 분해
@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["Matrix A"] --> LU["LU: A = LU"]
-    A --> QR["QR: A = QR"]
-    A --> Eig["Eig: A = V D V^-1"]
-    A --> SVD["SVD: A = U S V^T"]
-```
+![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)
+
+*LU, QR, 고유분해, SVD가 같은 행렬을 서로 다른 목적에 맞게 나누는 방식을 비교한 개념도입니다.*
 
 이 네 분해는 서로 경쟁 관계라기보다 역할 분담에 가깝습니다. 어떤 문제는 LU가 맞고, 어떤 문제는 QR이나 SVD가 훨씬 자연스럽습니다.
 
@@ -120,6 +116,12 @@ print("close to A:", np.allclose(A_reconstructed, A))
 ```
 
 재구성은 분해 결과를 확인하는 가장 직접적인 방법입니다. 분해가 맞다면 원래 행렬을 다시 얻을 수 있어야 합니다.
+
+## 작은 수치 예시로 다시 보기
+
+- LU 분해는 원래 행렬을 삼각행렬 두 개로 바꿔 방정식 풀이를 단순하게 만듭니다.
+- QR 분해에서는 `Q.T @ Q`가 항등행렬에 가깝게 나옵니다. 직교 구조가 살아 있다는 뜻입니다.
+- SVD 재구성에서 `np.allclose(A_reconstructed, A)`가 `True`면 분해가 원래 행렬을 정확히 설명하고 있다는 뜻입니다.
 
 ## 이 코드에서 먼저 볼 점
 

@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 8
 title: Matrix Decomposition
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to matrix decomposition — LU, QR, eigendecomposition, and SVD with their meaning, use cases, and NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Matrix Decomposition
 
-> Linear Algebra 101 series (8/10)
+Once you work with matrices long enough, direct manipulation starts to hit limits. Computing an inverse can be slow or unstable, and different problems prefer different computational paths. Matrix decomposition enters at that point: break one complicated matrix into pieces that are easier to solve with, interpret, or approximate.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Linear Algebra 101 series. Here we will place LU, QR, eigendecomposition, and SVD on the same map.
 
-**Core question**: Can we *break a matrix* into *simpler pieces*?
+## Questions This Post Answers
 
-> *Matrix decomposition rewrites a *complex transformation* as a *product of interpretable simple transformations*.*
+- Why should decomposition come to mind before explicit inversion?
+- What kinds of problems fit LU, QR, eigendecomposition, and SVD best?
+- Why can’t every decomposition be applied to every matrix?
+- How do you verify that a decomposition still explains the original matrix?
 
-<!-- a-grade-intro:end -->
-
-This is post 8 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- *LU* and *QR* decomposition
-- *Eigendecomposition* and *SVD*
-- The *use case* of each decomposition
-- A 5-step hands-on
-- Five common pitfalls
+> Matrix decomposition breaks a complicated transformation into simpler parts. In practical numerical linear algebra, that is usually how the real work gets done.
 
 ## Why It Matters
 
-Linear systems, least squares, PCA, dimensionality reduction — *matrix decompositions* are the *numerical core*. They are *more stable than inversion*.
+Solving linear systems, fitting least-squares models, compressing data, and building low-rank approximations all depend on decomposition. The choice affects both speed and numerical stability.
 
-> *Decompositions are how numerical linear algebra actually works.*
+This is one of the most useful mindset shifts in the series. Stable linear algebra is usually about selecting the right factorization for the question in front of you, not about reaching for the inverse because the formula looks short.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Matrix A"] --> LU["LU: A = LU"]
-    A --> QR["QR: A = QR"]
-    A --> Eig["Eig: A = V D V^-1"]
-    A --> SVD["SVD: A = U S V^T"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
+
+*This diagram compares LU, QR, eigendecomposition, and SVD as different ways to break a matrix into useful parts.*
 
 ## Key Terms
 
@@ -116,6 +105,12 @@ A_reconstructed = U @ np.diag(S) @ Vt
 print("close to A:", np.allclose(A_reconstructed, A))
 ```
 
+## Read One Numeric Pass
+
+- LU decomposition rewrites the original matrix into triangular factors, which is exactly why linear-system solving becomes easier.
+- In QR decomposition, `Q.T @ Q` comes out very close to the identity matrix, confirming that the basis stayed orthogonal.
+- For SVD, `np.allclose(A_reconstructed, A)` returning `True` tells you the factorization still explains the full original matrix.
+
 ## What to Notice in This Code
 
 - *Each decomposition* has its own *use case*.
@@ -174,9 +169,9 @@ Matrix decompositions are the *core of numerical linear algebra*. The next post 
 
 ## References
 
-- [Wikipedia — Matrix decomposition](https://en.wikipedia.org/wiki/Matrix_decomposition)
-- [Wikipedia — Singular value decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition)
+- [MIT OpenCourseWare — Factorization methods](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — linalg.svd](https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html)
 - [SciPy — linalg.lu](https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.lu.html)
+- [Stanford CS229 — Linear Algebra Review](https://cs229.stanford.edu/section/cs229-linalg.pdf)
 
 Tags: LinearAlgebra, Decomposition, SVD, DataScience, Beginner
