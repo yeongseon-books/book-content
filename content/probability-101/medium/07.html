@@ -54,48 +54,37 @@
 </head>
 <body>
 <h1>Discrete Distributions</h1>
-<p>This is post 7 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Coins, clicks, orders, calls — <em>most real-world counts</em> are <em>reused</em> across a few discrete distributions. <em>Which one</em> fits <em>when</em>?</p>
-<blockquote>
-<p><em>If you know the distribution, you can </em>infer without seeing the data<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>A surprising amount of real-world data is really about counts. Did something succeed or fail? How many successes happened? How many tries did it take before the first success? How many requests arrived in an hour? Once you start seeing these patterns, the same small set of distributions keeps coming back.</p>
+<p>The important thing to memorize is not the names but the situations. What kind of process makes a Bernoulli distribution natural? When should you reach for Binomial, Geometric, or Poisson instead? That mapping is where the practical value lives.</p>
+<p>This is post 7 in the Probability 101 series. Here we use Bernoulli, Binomial, Geometric, and Poisson distributions to build a reusable vocabulary for count data, then connect each distribution to the kind of engineering question it models well.</p>
+<h2>What you will learn</h2>
 <ul>
-<li><em>Bernoulli / Binomial / Geometric / Poisson</em></li>
-<li>Each distribution’s <em>mean / variance</em></li>
-<li>Mapping <em>situations to distributions</em></li>
-<li>A 5-step discrete-distribution exercise</li>
-<li>Five common mistakes</li>
+<li>Why a single 0/1 trial starts with Bernoulli</li>
+<li>When repeated successes turn into Binomial</li>
+<li>Why waiting for the first success leads to Geometric</li>
+<li>Why arrival counts often point to Poisson</li>
+<li>How the model choice changes your interpretation of the same count data</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Most <em>count data</em> fits one of these four. Once you set the <em>parameters</em>, <em>mean / variance / probabilities</em> follow from a <em>formula</em>.</p>
+<p>Count data shows up everywhere: conversion counts, request arrivals, retry attempts, incidents per hour, manufacturing defects, and queue lengths. If you can map those patterns to standard distributions, you do not have to rebuild the reasoning from scratch every time.</p>
+<p>Choosing a distribution gives you more than one probability. It gives you a whole structure: mean, variance, rare-event behavior, and a clearer story about the process that generated the data.</p>
 <blockquote>
-<p><em>Distributions are reusable models of the world.</em></p>
+<p>Discrete distributions are reusable models for counted outcomes. Much of the work is deciding which process your data actually came from.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Bern[&quot;Bernoulli(p)&quot;] --&gt; Bin[&quot;Binomial(n,p)&quot;]
-    Bern --&gt; Geo[&quot;Geometric(p)&quot;]
-    Bin --&gt; Pois[&quot;Poisson(lambda)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>Bernoulli(p)</strong>: a single <em>0/1</em> trial. E=p, Var=p(1-p).</li>
-<li><strong>Binomial(n,p)</strong>: sum of <em>n</em> Bernoullis. E=np, Var=np(1-p).</li>
-<li><strong>Geometric(p)</strong>: trials until <em>first success</em>. E=1/p.</li>
-<li><strong>Poisson(λ)</strong>: count per <em>unit time</em>. E=Var=λ.</li>
-<li><strong>Parameters</strong>: numbers that <em>fix the shape</em> of a distribution.</li>
+<li><strong>Bernoulli(p)</strong>: a single 0/1 trial. E=p, Var=p(1-p).</li>
+<li><strong>Binomial(n,p)</strong>: sum of n Bernoullis. E=np, Var=np(1-p).</li>
+<li><strong>Geometric(p)</strong>: trials until first success. E=1/p.</li>
+<li><strong>Poisson(λ)</strong>: count per unit time. E=Var=λ.</li>
+<li><strong>Parameters</strong>: numbers that fix the shape of a distribution.</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“Orders average 5 per hour”</em> — exact distribution unknown.</p>
-<p><strong>After</strong>: <em>Poisson(λ=5)</em> — even <em>P(0 orders in an hour)</em> follows from a <em>formula</em>.</p>
+<p><strong>Before</strong>: “Orders average 5 per hour” is descriptive, but not yet a model.</p>
+<p><strong>After</strong>: “Assume Poisson(λ=5)” immediately gives you probabilities for zero arrivals, busy hours, and expected variation.</p>
 <h2>Hands-on: 5-step Discrete Distributions</h2>
 <p><strong>Step 1 — Bernoulli / Binomial</strong></p>
 <pre><code class="language-python">from scipy import stats
@@ -121,43 +110,43 @@ print(&quot;mean:&quot;, samples.mean(), &quot;var:&quot;, samples.var())
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The same data yields different answers under different <em>model choices</em>.</li>
-<li>Poisson assumes <em>mean = variance</em>; if violated, consider <em>Negative Binomial</em>.</li>
-<li>Binomial fixes the <em>trial count n</em>; Geometric counts <em>trials to first success</em>.</li>
+<li>The same data yields different answers under different model choices.</li>
+<li>Poisson assumes mean = variance; if violated, consider Negative Binomial.</li>
+<li>Binomial fixes the trial count n; Geometric counts trials to first success.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Using <em>Binomial</em> where <em>Geometric</em> fits.</strong></li>
-<li><strong>Forcing <em>Poisson</em> even when <em>variance ≠ mean</em>.</strong></li>
-<li><strong>Ignoring the <em>independent-trials</em> assumption.</strong></li>
-<li><strong>Estimating <em>parameters</em> from <em>one sample</em>.</strong></li>
-<li><strong>Confusing <em>probability</em> with <em>likelihood</em>.</strong></li>
+<li><strong>Using Binomial where Geometric fits.</strong></li>
+<li><strong>Forcing Poisson even when variance ≠ mean.</strong></li>
+<li><strong>Ignoring the independent-trials assumption.</strong></li>
+<li><strong>Estimating parameters from one sample.</strong></li>
+<li><strong>Confusing probability with likelihood.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A/B <em>conversions</em> (Binomial), <em>call-center arrivals</em> (Poisson), <em>retry counts</em> (Geometric), <em>error counts</em> (Poisson) — the basics of <em>count-data</em> analysis.</p>
+<p>A/B conversions (Binomial), call-center arrivals (Poisson), retry counts (Geometric), error counts (Poisson) — the basics of count-data analysis.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Memorizes the <em>situation → distribution</em> map.</li>
-<li><em>Names</em> the assumptions.</li>
-<li>Diagnoses <em>over-dispersion</em>.</li>
-<li>Builds <em>intuition</em> via simulation.</li>
-<li>Knows <em>alternatives</em> like <em>Negative Binomial</em>.</li>
+<li>Memorizes the situation → distribution map.</li>
+<li>Names the assumptions.</li>
+<li>Diagnoses over-dispersion.</li>
+<li>Builds intuition via simulation.</li>
+<li>Knows alternatives like Negative Binomial.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I know each <em>parameter</em> and <em>E/Var</em>.</li>
-<li>[ ] I can map a <em>situation</em> to a <em>distribution</em>.</li>
-<li>[ ] I use <em>scipy.stats</em> PMFs.</li>
-<li>[ ] I check for <em>over-dispersion</em>.</li>
+<li>[ ] I know each parameter and E/Var.</li>
+<li>[ ] I can map a situation to a distribution.</li>
+<li>[ ] I use scipy.stats PMFs.</li>
+<li>[ ] I check for over-dispersion.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>With <em>p = 0.05, n = 200</em>, compute <em>P(X ≥ 15)</em>.</li>
-<li>If arrivals average <em>3 per hour</em>, what is <em>P(0 in a minute)</em>?</li>
-<li>State what it means for the <em>geometric</em> distribution to be <em>memoryless</em>.</li>
+<li>With p = 0.05, n = 200, compute P(X ≥ 15).</li>
+<li>If arrivals average 3 per hour, what is P(0 in a minute)?</li>
+<li>State what it means for the geometric distribution to be memoryless.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Discrete distributions are the <em>priors of count modeling</em>. The next episode covers <em>continuous distributions</em>.</p>
+<p>Discrete distributions are the priors of count modeling. The next episode covers continuous distributions.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
