@@ -322,6 +322,20 @@ service.notify(&quot;#deploy&quot;, &quot;Deploy complete&quot;)
 <h2>How Senior Engineers Think About This</h2>
 <p>SOLID is a "guideline," not a "rule." You do not need to apply it to every piece of code. Apply it at the points where change becomes difficult as the code grows. The most practical principles are SRP and DIP.</p>
 <p>For small projects, you do not need to think about SOLID. But when team projects exceed tens of thousands of lines, the quality gap between developers who understand SOLID and those who do not becomes strikingly clear.</p>
+<h2>Failure Signals That Tell You Which SOLID Principle to Reach For</h2>
+<p><strong>Adding one feature forces edits in multiple files for the same reason</strong><br>
+- Principle usually involved: OCP, DIP<br>
+- First move to try: Extract the changing rule into a Protocol or strategy object</p>
+<p><strong>One class handles persistence, validation, notifications, and formatting</strong><br>
+- Principle usually involved: SRP<br>
+- First move to try: Split methods by distinct reasons for change</p>
+<p><strong>A parent type is accepted, but one child keeps throwing special-case exceptions</strong><br>
+- Principle usually involved: LSP<br>
+- First move to try: Break the inheritance chain and redefine the shared contract</p>
+<p><strong>Half the interface methods are <code>pass</code>, <code>raise</code>, or no-op</strong><br>
+- Principle usually involved: ISP<br>
+- First move to try: Slice the contract into smaller caller-specific interfaces</p>
+<p>The point is not to memorize SOLID and apply all five at once. The point is to match the failure shape to the smallest useful correction. If test doubles are hard to inject and swapping an external API is expensive, applying DIP alone often gives you more value than a full-scale redesign.</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can explain each of the five SOLID principles</li>
@@ -352,10 +366,10 @@ service.notify(&quot;#deploy&quot;, &quot;Deploy complete&quot;)
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.oreilly.com/library/view/clean-architecture/9780134494272/">Clean Architecture — Robert C. Martin</a></li>
+<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural Subtyping</a></li>
+<li><a href="https://docs.python.org/3/library/abc.html">Python Official Docs — abc</a></li>
 <li><a href="https://realpython.com/solid-principles-python/">Real Python — SOLID Principles in Python</a></li>
-<li><a href="https://www.oreilly.com/library/view/agile-software-development/0135974445/">Agile Software Development — Robert C. Martin</a></li>
-<li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols: Structural subtyping</a></li>
+<li><a href="https://www.oreilly.com/library/view/agile-software-development/0135974445/">Agile Software Development, Principles, Patterns, and Practices in C# — Robert C. Martin</a></li>
 </ul>
 <p class="tags-line">Tags: Python, OOP, SOLID, Design Principles, Clean Code</p>
 </body>

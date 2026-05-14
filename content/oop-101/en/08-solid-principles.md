@@ -2,7 +2,7 @@
 series: oop-101
 episode: 8
 title: SOLID Principles Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,7 @@ tags:
   - Design Principles
   - Clean Code
 seo_description: Learn the five SOLID principles with Python examples and practical guidance for applying them in real projects.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # SOLID Principles Basics
@@ -329,6 +329,17 @@ SOLID is a "guideline," not a "rule." You do not need to apply it to every piece
 
 For small projects, you do not need to think about SOLID. But when team projects exceed tens of thousands of lines, the quality gap between developers who understand SOLID and those who do not becomes strikingly clear.
 
+## Failure Signals That Tell You Which SOLID Principle to Reach For
+
+| Symptom you can observe | Principle usually involved | First move to try |
+|-------------------------|----------------------------|-------------------|
+| Adding one feature forces edits in multiple files for the same reason | OCP, DIP | Extract the changing rule into a Protocol or strategy object |
+| One class handles persistence, validation, notifications, and formatting | SRP | Split methods by distinct reasons for change |
+| A parent type is accepted, but one child keeps throwing special-case exceptions | LSP | Break the inheritance chain and redefine the shared contract |
+| Half the interface methods are `pass`, `raise`, or no-op | ISP | Slice the contract into smaller caller-specific interfaces |
+
+The point is not to memorize SOLID and apply all five at once. The point is to match the failure shape to the smallest useful correction. If test doubles are hard to inject and swapping an external API is expensive, applying DIP alone often gives you more value than a full-scale redesign.
+
 ## Checklist
 
 - [ ] I can explain each of the five SOLID principles
@@ -362,9 +373,9 @@ SOLID principles are guidelines for designs that are resilient to change and fle
 
 ## References
 
-- [Clean Architecture — Robert C. Martin](https://www.oreilly.com/library/view/clean-architecture/9780134494272/)
+- [PEP 544 — Protocols: Structural Subtyping](https://peps.python.org/pep-0544/)
+- [Python Official Docs — abc](https://docs.python.org/3/library/abc.html)
 - [Real Python — SOLID Principles in Python](https://realpython.com/solid-principles-python/)
-- [Agile Software Development — Robert C. Martin](https://www.oreilly.com/library/view/agile-software-development/0135974445/)
-- [PEP 544 — Protocols: Structural subtyping](https://peps.python.org/pep-0544/)
+- [Agile Software Development, Principles, Patterns, and Practices in C# — Robert C. Martin](https://www.oreilly.com/library/view/agile-software-development/0135974445/)
 
 Tags: Python, OOP, SOLID, Design Principles, Clean Code
