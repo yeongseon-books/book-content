@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 8
 title: Writing Tutorials
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Learning
   - HandsOn
   - Beginner
-seo_description: A beginner-friendly tour of writing a tutorial that simply works when the reader follows it step by step.
-last_reviewed: '2026-05-04'
+seo_description: Write tutorials with short verified steps, recovery notes, and a fast first success that keeps readers moving.
+last_reviewed: '2026-05-15'
 ---
 
 # Writing Tutorials
 
-This is post 8 in the Technical Writing 101 series.
+Writers often respond to uncertainty by adding more explanation. Tutorial readers usually need the opposite. They need a short path, clear checkpoints, and quick recovery when one step fails.
 
-> Technical Writing 101 series (8/10)
+A tutorial earns trust by making success predictable. Each step should leave behind a visible proof, and each likely failure should have at least one short recovery note. That is what keeps a hands-on chapter from turning into a lecture transcript.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
 
-**Core question**: How do you make a *tutorial* that simply *works* when the reader *follows* it?
-
-> Every *step* must be *verified*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - Where a tutorial sits in *Diátaxis*
 - Stating *prerequisites*
@@ -46,15 +40,13 @@ This is post 8 in the Technical Writing 101 series.
 
 A *first success* creates the will to keep *learning*.
 
+> Mental model: every tutorial step needs a checkpoint the reader can verify before moving on.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Prereq] --> S[Step]
-    S --> W[Win]
-    W --> N[Next]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **tutorial**: A *learning* oriented post.
@@ -68,6 +60,32 @@ flowchart LR
 **Before**: "Let us learn about *FastAPI*." (lecture)
 
 **After**: "*Run Hello World in five minutes*." (tutorial)
+
+## Make every tutorial step behave like a test case
+
+A tutorial is easier to trust when each step leaves behind a visible checkpoint. For a FastAPI hello-world, that can look like this.
+
+```bash
+cat > main.py <<'PY'
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"hello": "world"}
+PY
+
+fastapi dev main.py
+```
+
+**Expected output:**
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+Recovery notes matter too. If the reader sees `fastapi: command not found`, tell them to rerun `python3 -m pip install "fastapi[standard]"` and retry. That single line often keeps the tutorial self-contained instead of sending the reader into search results.
 
 ## Hands-on: A Five Minute Tutorial
 
