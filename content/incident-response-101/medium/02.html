@@ -54,45 +54,39 @@
 </head>
 <body>
 <h1>Severity Classification</h1>
+<p>Once a team agrees on what counts as an incident, the next question is how serious that incident is. Not every incident deserves the same paging fan-out, the same update cadence, or the same leadership attention.</p>
+<p>That is why severity is more than a label. It is the shorthand that turns impact into response behavior, escalation paths, and communication timing.</p>
+<p>This is post 2 in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.</p>
+<h2>Questions this chapter answers</h2>
+<p>Even after a team agrees that a problem is an incident, people still need a shared way to describe how bad it is. “Serious” means one thing to a payment team and something else to an internal tooling team unless the impact model is explicit.</p>
 <blockquote>
-<p>Incident Response 101 series (2/10)</p>
+<p>Severity is a translation layer between impact and behavior. A SEV label is only useful when it changes who gets paged, how often updates go out, and how fast decisions move.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you say <em>how serious</em> it is in a <em>shared language</em>?</p>
-<blockquote>
-<p><em>Severity</em> is the agreed <em>language</em> that maps <em>impact</em> to <em>levels</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 2 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li>The <em>definition</em> of <em>severity</em></li>
-<li><em>SEV1/2/3</em> mapping</li>
-<li><em>Automated decisions</em></li>
-<li><em>Team-specific</em> differences</li>
-<li><em>Common pitfalls</em></li>
+<li>What separates SEV1, SEV2, and SEV3 in practice?</li>
+<li>Which axes matter most: users, scope, revenue, legal exposure, or duration?</li>
+<li>How should severity affect paging and update cadence?</li>
+<li>Why do boundary examples matter as much as definitions?</li>
+<li>How much classification should be automated?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Using the <em>same word</em> with <em>different meanings</em> makes response <em>misfire</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Impact[&quot;impact&quot;] --&gt; Map[&quot;mapping&quot;]
-    Map --&gt; SEV[&quot;SEV1/2/3&quot;]
-    SEV --&gt; Roles[&quot;roles&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>Without severity, every incident starts with improvised negotiation. People debate the label, the audience, and the pacing at the exact moment when they should already be acting.</p>
+<p>A strong severity system removes those debates from the live path. When someone says “SEV2,” the room should already know the expected fan-out, communication cadence, and decision urgency.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+The point of the flow is the mapping step. Severity is not the impact itself; it is the operating language that turns impact into a response pattern.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>SEV1</strong>: <em>company-wide impact</em>.</li>
-<li><strong>SEV2</strong>: <em>major feature degradation</em>.</li>
-<li><strong>SEV3</strong>: <em>partial degradation</em>.</li>
-<li><strong>scope</strong>: the <em>range of impact</em>.</li>
-<li><strong>duration</strong>: how <em>long</em> it lasts.</li>
+<li><strong>SEV1</strong>: company-wide impact.</li>
+<li><strong>SEV2</strong>: major feature degradation.</li>
+<li><strong>SEV3</strong>: partial degradation.</li>
+<li><strong>scope</strong>: the range of impact.</li>
+<li><strong>duration</strong>: how long it lasts.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: vague phrases like "this is <em>serious</em>".</p>
-<p><strong>After</strong>: an agreed <em>level</em> like "<em>SEV2</em>".</p>
+<p><strong>Before</strong>: vague phrases like "this is serious".</p>
+<p><strong>After</strong>: an agreed level like "SEV2".</p>
 <h2>Hands-on: Severity Mapping</h2>
 <p><strong>Step 1 — Impact axes</strong></p>
 <pre><code class="language-python">def axes(users, region, money_loss):
@@ -121,43 +115,81 @@
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li><em>Axes</em> break down the <em>impact</em>.</li>
-<li>Each <em>level</em> maps to <em>behavior</em>.</li>
-<li><em>Auto routing</em> reduces <em>errors</em>.</li>
+<li>Axes break down the impact.</li>
+<li>Each level maps to behavior.</li>
+<li>Auto routing reduces errors.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong><em>Vague</em> level definitions.</strong></li>
-<li><strong>Forgetting <em>monetary impact</em>.</strong></li>
-<li><strong>Fuzzy line between <em>SEV2</em> and <em>SEV3</em>.</strong></li>
-<li><strong>Manual classification with no <em>automation</em>.</strong></li>
-<li><strong>Centering <em>internal impact</em> over <em>customer impact</em>.</strong></li>
+<li><strong>Vague level definitions.</strong></li>
+<li><strong>Forgetting monetary impact.</strong></li>
+<li><strong>Fuzzy line between SEV2 and SEV3.</strong></li>
+<li><strong>Manual classification with no automation.</strong></li>
+<li><strong>Centering internal impact over customer impact.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A <em>payment failure</em> defaults to <em>SEV1</em>; a <em>search result ordering bug</em> defaults to <em>SEV3</em>.</p>
+<p>A payment failure defaults to SEV1; a search result ordering bug defaults to SEV3.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A <em>level</em> is a <em>shorthand for behavior</em>.</li>
-<li>Keep the <em>axes</em> to a <em>minimum</em>.</li>
-<li>Settle the <em>boundaries</em> with <em>examples</em>.</li>
-<li><em>Automation</em> is the <em>default</em> for decisions.</li>
-<li><em>Differentiate</em> by product or region.</li>
+<li>A level is a shorthand for behavior.</li>
+<li>Keep the axes to a minimum.</li>
+<li>Settle the boundaries with examples.</li>
+<li>Automation is the default for decisions.</li>
+<li>Differentiate by product or region.</li>
 </ul>
+<h2>Example: turning severity into actions</h2>
+<p>Severity definitions are most useful when they can be read as an action matrix rather than a glossary.</p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Typical impact</th>
+<th>Paging scope</th>
+<th>Internal update cadence</th>
+<th>Customer update</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEV1</td>
+<td>Broad outage on a critical path</td>
+<td>Full incident core team + leadership</td>
+<td>15 min</td>
+<td>Immediate</td>
+</tr>
+<tr>
+<td>SEV2</td>
+<td>Major degradation in an important function</td>
+<td>Primary on-call + owning team</td>
+<td>30 min</td>
+<td>As needed, usually early</td>
+</tr>
+<tr>
+<td>SEV3</td>
+<td>Limited or partial impact</td>
+<td>Primary on-call only</td>
+<td>60 min</td>
+<td>Often skipped</td>
+</tr>
+</tbody>
+</table>
+<p>If someone says “This is SEV2,” the room should already know which people to bring in and how fast updates have to move.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Level definitions</em>.</li>
-<li>[ ] <em>Mapping code</em>.</li>
-<li>[ ] <em>Behavior matrix</em>.</li>
-<li>[ ] <em>Example cases</em>.</li>
+<li>[ ] Level definitions.</li>
+<li>[ ] Mapping code.</li>
+<li>[ ] Behavior matrix.</li>
+<li>[ ] Example cases.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>SEV1</em> in one line.</li>
-<li>Define <em>scope</em> in one line.</li>
-<li>Define <em>duration</em> in one line.</li>
+<li>Define SEV1 in one line.</li>
+<li>Define scope in one line.</li>
+<li>Define duration in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>initial response</em>.</p>
+<p>Next, we cover initial response.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><strong>Severity Classification (current)</strong></li>
@@ -171,12 +203,13 @@
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://response.pagerduty.com/before/severity_levels/">Severity Levels - PagerDuty</a></li>
-<li><a href="https://www.atlassian.com/incident-management/kpis/severity-levels">Severity Levels - Atlassian</a></li>
-<li><a href="https://www.datadoghq.com/blog/incident-management/">Incident Severity - Datadog</a></li>
-<li><a href="https://sre.google/workbook/incident-response/">Severity Classification - Google SRE Workbook</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://response.pagerduty.com/before/severity_levels/">Severity Levels - PagerDuty</a><br>
+- <a href="https://www.atlassian.com/incident-management/kpis/severity-levels">Severity level examples - Atlassian</a><br>
+- <a href="https://sre.google/workbook/incident-response/">Incident Response - Google SRE Workbook</a><br>
+- <a href="https://csrc.nist.gov/pubs/sp/800/61/r2/final">NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, Severity, Triage, Response, Operations</p>
 </body>
 </html>
