@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prompt engineering basics — getting the answer you actually want</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Prompt engineering basics — getting the answer you actually want</h1>
+<p>Two developers can use the same model and get very different results. In practice, the difference usually comes from request structure rather than model intelligence. The model does not read your mind. You have to supply context, role, constraints, and output expectations explicitly.</p>
+<p>This is post 2 in the AI Web Development 101 series.</p>
+<p>Here, we will treat prompts as executable contracts, not clever sentences.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>How is a prompt different from just asking a question?</li>
+<li>What responsibilities belong to <code>system</code> and <code>user</code> messages?</li>
+<li>Which ingredients make prompts stable enough for application code?</li>
+<li>When should you adjust <code>temperature</code> and <code>max_tokens</code>?</li>
+<li>What should you debug first when the answer is not good enough?</li>
+</ul>
+<blockquote>
+<p>A prompt is not a persuasive paragraph. It is a task contract for the model. That is why strong prompts make role, context, output shape, and constraints obvious before they try to sound elegant.</p>
+</blockquote>
+<h2>Why prompt engineering deserves separate attention</h2>
+<p>In the previous chapter, the main question was how to call the API at all. From here on, the important question becomes how to shape the request so the answer is useful. A vague request tends to produce a generic answer. A structured request tends to produce something closer to the actual job you want done.</p>
+<p>The easiest analogy is delegating work to a teammate. “Write a report” leaves topic, audience, length, and format open. “Write a three-bullet update for the product manager, focused on risk and next steps” is much easier to execute. Models behave the same way.</p>
+<h2>Separate long-lived rules from the current task</h2>
+<p>In Chat Completions, the most important split is between <code>system</code> and <code>user</code>.</p>
+<ul>
+<li><code>system</code>: long-lived role, tone, safety rules, and task style</li>
+<li><code>user</code>: the concrete task and input values for the current turn</li>
+</ul>
+<p>That split keeps application prompts easier to reason about. If quality changes, you can ask whether the failure came from the role layer or the task layer.</p>
+<p><img alt="How the system prompt and user prompt play different roles" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png"></p>
+<p><em>How the system prompt and user prompt play different roles</em></p>
+<h2>Compare a weak prompt and a better one</h2>
+<p>The fastest way to learn prompt quality is to run the same task twice.</p>
+<pre><code class="language-python">import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+
+def run_prompt(system_prompt: str, user_prompt: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        temperature=0.2,
+        messages=[
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_prompt},
+        ],
+    )
+    return response.choices[0].message.content
+
+bad = run_prompt(
+    system_prompt=&quot;You are a helpful assistant.&quot;,
+    user_prompt=&quot;Write product copy.&quot;,
+)
+
+better = run_prompt(
+    system_prompt=(
+        &quot;You write concise ecommerce copy for practical buyers. Avoid hype and keep the tone clear.&quot;
+    ),
+    user_prompt=(
+        &quot;Product: silent mechanical keyboard
+&quot;
+        &quot;Audience: developers working from home
+&quot;
+        &quot;Highlights: low noise, soft typing feel, pastel blue color
+&quot;
+        &quot;Output: exactly 3 bullet points, 1 sentence each&quot;
+    ),
+)
+
+print(&quot;[bad]
+&quot;, bad)
+print(&quot;
+[better]
+&quot;, better)
+</code></pre>
+<p>A better prompt is not “more beautiful.” It simply makes the contract tighter.</p>
+<p><img alt="How to improve a vague prompt into a concrete one" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-improvement-example.en.png"></p>
+<p><em>How to improve a vague prompt into a concrete one</em></p>
+<h2>Four fundamentals of reliable prompts</h2>
+<p><strong>1. Define the role</strong></p>
+<p>“Help me” is weak. “You are a technical editor reviewing internal product documentation” is much stronger.</p>
+<p><strong>2. Supply the missing context</strong></p>
+<p>Who is the answer for? What domain are we in? What must be avoided? Without that context, the model fills in the blanks with generic assumptions.</p>
+<p><strong>3. Specify output format</strong></p>
+<p>If code will parse the answer later, output format is not optional. JSON, bullet count, column names, and length limits reduce downstream ambiguity.</p>
+<p><strong>4. State constraints and failure behavior</strong></p>
+<p>Rules like “answer in Korean,” “do not guess,” or “say you do not know when evidence is missing” make real systems much safer.</p>
+<p><img alt="Four prompt design principles that stabilize results" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/four-prompt-principles.en.png"></p>
+<p><em>Four prompt design principles that stabilize results</em></p>
+<h2>Turn output format into a real contract</h2>
+<pre><code class="language-python">import json
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+
+response = client.chat.completions.create(
+    model=&quot;gpt-4o-mini&quot;,
+    temperature=0,
+    messages=[
+        {
+            &quot;role&quot;: &quot;system&quot;,
+            &quot;content&quot;: (
+                &quot;You generate customer-support FAQ entries. &quot;
+                &quot;Output exactly one JSON object with keys: title, summary, risk.&quot;
+            ),
+        },
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Create a short FAQ entry for password reset in 2 sentences or less.&quot;,
+        },
+    ],
+)
+
+payload = json.loads(response.choices[0].message.content)
+print(payload)
+</code></pre>
+<p>The point is not the JSON itself. The point is that your application can validate the answer mechanically instead of trusting free-form prose.</p>
+<h2>When to adjust <code>temperature</code> and <code>max_tokens</code></h2>
+<ul>
+<li><code>temperature</code> closer to 0 usually gives more repeatable, conservative answers</li>
+<li>higher <code>temperature</code> allows more variation and creativity</li>
+<li><code>max_tokens</code> controls output length, so too small a value can create truncated answers</li>
+</ul>
+<p>A rough working intuition:</p>
+<ul>
+<li>extraction, classification, code generation: <code>temperature=0.0 ~ 0.3</code></li>
+<li>summaries and explanations: <code>temperature=0.2 ~ 0.5</code></li>
+<li>brainstorming or marketing copy: <code>temperature=0.7+</code></li>
+</ul>
+<pre><code class="language-python">import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+prompt = &quot;Write one sentence introducing a TODO app for remote developers.&quot;
+
+for temp in (0.1, 0.9):
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        temperature=temp,
+        max_tokens=80,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+    )
+    print(f&quot;temperature={temp}: {response.choices[0].message.content}&quot;)
+</code></pre>
+<p><img alt="How temperature and token limits affect generation" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/temperature-max-tokens.en.png"></p>
+<p><em>How temperature and token limits affect generation</em></p>
+<h2>Debug prompts in a fixed order</h2>
+<p>When the answer is bad, do not jump straight to “the model is weak.” Check these layers first:</p>
+<ol>
+<li>Is the role unclear?</li>
+<li>Is important context missing?</li>
+<li>Is the output format under-specified?</li>
+<li>Would an example make the desired shape more obvious?</li>
+<li>Are generation parameters causing variation or truncation?</li>
+</ol>
+<p>You can make that process repeatable with tiny test cases.</p>
+<pre><code class="language-python">test_cases = [
+    {&quot;name&quot;: &quot;length limit&quot;, &quot;user&quot;: &quot;Explain the signup benefit in at most 2 sentences.&quot;},
+    {&quot;name&quot;: &quot;format&quot;, &quot;user&quot;: &quot;Summarize the refund policy in exactly 3 bullet points.&quot;},
+]
+
+system_prompt = &quot;You summarize support information briefly and precisely.&quot;
+
+for case in test_cases:
+    answer = run_prompt(system_prompt, case[&quot;user&quot;])
+    print(f&quot;
+[{case['name']}]
+{answer}&quot;)
+</code></pre>
+<h2>Common failure modes in real services</h2>
+<ul>
+<li>the conversation history becomes too long, so the most important rule gets diluted</li>
+<li>the prompt says what not to do, but not what to do instead</li>
+<li>output format is too weak for the parser that follows</li>
+<li>domain terminology is missing, so the model defaults to generic meaning</li>
+</ul>
+<p>Strong prompts are rarely “written once.” They are revised as failure cases accumulate.</p>
+<p><img alt="A practical prompt iteration loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-iteration-loop.en.png"></p>
+<p><em>A practical prompt iteration loop</em></p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I can explain the difference between <code>system</code> and <code>user</code>.</li>
+<li>[ ] I specify output format and constraints explicitly.</li>
+<li>[ ] I compared the same task with two prompt versions.</li>
+<li>[ ] I know when to lower or raise <code>temperature</code>.</li>
+<li>[ ] I treat prompt refinement as debugging, not as guesswork.</li>
+</ul>
+<h2>Summary</h2>
+<p>Prompt engineering is not about sounding clever. It is about designing a task contract the model can follow consistently.</p>
+<ul>
+<li><code>system</code> holds long-lived rules, while <code>user</code> carries the current task.</li>
+<li>Good prompts make role, context, output format, and constraints explicit.</li>
+<li><code>temperature</code> and <code>max_tokens</code> are part of the prompting strategy, not separate afterthoughts.</li>
+<li>Stable prompt work comes from repeatable testing and debugging loops.</li>
+</ul>
+<p>The next chapter moves from prompt structure to a browser UI, where streaming and state management become part of the experience.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><strong>Prompt engineering basics — getting the answer you actually want (current)</strong></li>
+<li>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (upcoming)</li>
+<li>RAG introduction — answering with your own data (upcoming)</li>
+<li>First steps with AI agents — making the model use tools (upcoming)</li>
+<li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>
+<li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/prompt-engineering">OpenAI prompt engineering guide</a></li>
+<li><a href="https://cookbook.openai.com/">OpenAI Cookbook</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview">Anthropic prompt engineering overview</a></li>
+<li><a href="https://platform.openai.com/docs/guides/text">OpenAI text generation guides</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>
