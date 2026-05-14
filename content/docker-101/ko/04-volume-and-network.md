@@ -17,17 +17,16 @@ tags:
   - Bind Mount
   - Bridge
 seo_description: volume과 network로 데이터 영속성과 컨테이너 통신을 안전하게 다룹니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Volume과 Network
-
-이 글은 Docker 101 시리즈의 네 번째 글입니다.
 
 컨테이너를 한두 개 실행할 때는 모든 것이 단순해 보입니다. 그런데 실제 애플리케이션은 금방 두 가지 문제를 만납니다. 하나는 데이터를 어디에 둘 것인가이고, 다른 하나는 컨테이너끼리 어떻게 통신하게 만들 것인가입니다. 이 두 문제를 제대로 다루지 못하면 재시작 한 번에 데이터가 사라지거나, 서비스가 서로를 찾지 못하는 일이 생깁니다.
 
 Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. volume은 상태의 수명을 결정하고, network는 컨테이너 간 통신 경로를 결정합니다. 결국 이 둘은 컨테이너 운영의 가장 기본적인 인프라입니다.
 
+이 글은 Docker 101 시리즈의 4번째 글입니다. 여기서는 volume과 bind mount, user-defined bridge를 어떤 기준으로 선택해야 하는지, 그리고 데이터 영속성과 컨테이너 간 통신을 어떻게 검증해야 하는지 정리합니다.
 ## 이 글에서 다룰 문제
 
 - volume, bind mount, tmpfs는 각각 언제 써야 할까요?
@@ -46,13 +45,9 @@ Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. v
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Host["Host disk"] -->|bind mount| C1["Container A"]
-    Vol["Docker volume"] -->|named| C2["Container B"]
-    C1 --- Net["bridge network"]
-    C2 --- Net
-```
+![호스트 디스크와 Docker volume, 브리지 네트워크가 컨테이너를 연결하는 구조](../../../assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
+
+*영속 데이터는 volume으로 분리하고 컨테이너 간 통신은 브리지 네트워크로 연결하는 기본 구조*
 
 ## 핵심 용어
 
@@ -123,6 +118,16 @@ docker run --rm \
 
 volume이 영구적이라고 해서 안전한 것은 아닙니다. 삭제, 손상, 잘못된 마이그레이션은 언제든 일어날 수 있습니다. 그래서 영속성 다음 단계는 항상 백업입니다.
 
+### 실행 뒤 바로 확인할 것
+
+- `docker volume inspect app-data`는 volume이 독립적으로 생성되었음을 보여 주어야 하고, `docker exec api ping -c 1 db`는 이름 해석이 성공해야 합니다.
+- 백업 명령을 실행했다면 현재 디렉터리에 `data.tgz`가 생겼는지까지 확인해 둡니다.
+
+### 잘 안 될 때 먼저 볼 것
+
+- 컨테이너가 `localhost`로 DB를 찾으려 한다면 네트워크가 아니라 환경변수 값이 잘못된 경우가 많습니다. `DB_HOST=db`처럼 서비스 이름을 확인합니다.
+- bind mount 권한 오류가 나면 호스트 파일 소유자와 컨테이너 사용자 ID가 맞는지부터 살펴봅니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - named volume은 컨테이너와 독립적으로 살아 있습니다.
@@ -191,9 +196,15 @@ Kubernetes로 가더라도 개념은 크게 바뀌지 않습니다. volume은 Pe
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Manage data in Docker - Volumes](https://docs.docker.com/storage/volumes/)
 - [Bind mounts](https://docs.docker.com/storage/bind-mounts/)
 - [Networking overview](https://docs.docker.com/network/)
 - [Use bridge networks](https://docs.docker.com/network/bridge/)
+
+### 검증과 트러블슈팅
+
+- [docker volume inspect reference](https://docs.docker.com/reference/cli/docker/volume/inspect/)
 
 Tags: Docker, Volume, Network, BindMount, Bridge

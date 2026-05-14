@@ -2,7 +2,7 @@
 series: docker-101
 episode: 4
 title: Volumes and Networks
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - BindMount
   - Bridge
 seo_description: How volumes, bind mounts, and networks let containers persist data and talk to each other safely with named DNS.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Volumes and Networks
 
-This is post 4 in the Docker 101 series.
+Running one container is the easy part. The real operational questions begin as soon as you need data to survive a restart and one container to reach another container without guessing IP addresses. Those two requirements show up almost immediately in real applications.
 
-> Docker 101 series (4/10)
+Docker gives you separate tools for the two problems on purpose. Volumes control data lifetime. Networks control communication paths. Keeping those concerns separate is what prevents “the database disappeared” and “the app cannot find the database” from becoming routine incidents.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
 
-**Core question**: How do you keep *data alive across restarts* and let containers *talk to each other*?
-
-> *Volumes decide *data lifetime*; networks decide *paths between containers*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between *volume / bind mount / tmpfs*
 - *Bridge / host / none* network modes
@@ -50,13 +44,9 @@ This is post 4 in the Docker 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Host["Host disk"] -->|bind mount| C1["Container A"]
-    Vol["Docker volume"] -->|named| C2["Container B"]
-    C1 --- Net["bridge network"]
-    C2 --- Net
-```
+![Host storage, Docker volumes, and a bridge network connecting containers for data and service discovery](../../../assets/docker-101/04/04-01-concept-at-a-glance.en.png)
+
+*Persistent data lives outside the container while a bridge network provides name-based communication between services*
 
 ## Key Terms
 
@@ -112,6 +102,16 @@ docker run --rm \
   -v "$PWD":/backup \
   alpine tar czf /backup/data.tgz -C /data .
 ```
+
+### Verify right after you run it
+
+- `docker volume inspect app-data` should show a named volume that exists independently of any one container, and `docker exec api ping -c 1 db` should prove name-based resolution on the bridge network.
+- If you ran the backup step, confirm that `data.tgz` was actually created in the working directory.
+
+### If it does not work, check this first
+
+- If the app still tries to reach the database on `localhost`, inspect the injected `DB_HOST` value before troubleshooting Docker networking.
+- Permission failures on a bind mount usually come from a mismatch between host ownership and the UID inside the container.
 
 ## What to Notice in This Code
 
@@ -171,9 +171,15 @@ Data and networking are the *pillars* of container ops. Next, *Docker Compose* r
 
 ## References
 
+### Official docs
+
 - [Volumes](https://docs.docker.com/storage/volumes/)
 - [Bind mounts](https://docs.docker.com/storage/bind-mounts/)
 - [Networking overview](https://docs.docker.com/network/)
 - [Use bridge networks](https://docs.docker.com/network/bridge/)
+
+### Verification and troubleshooting
+
+- [docker volume inspect reference](https://docs.docker.com/reference/cli/docker/volume/inspect/)
 
 Tags: Docker, Volume, Network, BindMount, Bridge
