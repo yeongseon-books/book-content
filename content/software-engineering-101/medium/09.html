@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Maintenance and Tech Debt</h1>
-<p>This is post 9 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is tech debt always bad?</p>
-<blockquote>
-<p>No. Deliberate debt is a tool. Inadvertent debt is an incident waiting to happen.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Every codebase gets awkward over time. A quick branch added under pressure, a duplicated workflow, an interface nobody wants to touch, a module that resists testing. Teams often respond with a vague promise to "clean it up later." Usually that later never arrives until a deadline slips or an incident forces the issue.</p>
+<p>Tech debt is not automatically a failure. Sometimes it is a conscious trade: speed now, cleanup later. The dangerous version is debt without explicit ownership, measurement, or repayment intent. That kind of debt quietly taxes reliability, lead time, and team confidence all at once.</p>
+<p>This is post 9 in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The four types of tech debt (Martin Fowler's quadrant)</li>
@@ -80,13 +71,8 @@
 <p>Debt is not the problem. Unconscious debt is.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;Requirement change&quot;] --&gt; D[&quot;Debt accrual&quot;]
-    D --&gt; M[&quot;Measure&quot;]
-    M --&gt; P[&quot;Prioritize&quot;]
-    P --&gt; F[&quot;Pay down&quot;]
-    F --&gt; R
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>The cycle for measuring, prioritizing, and paying down tech debt</em></p>
 <p>Debt is a cycle, not an event.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -144,6 +130,26 @@ def old_api(*a, **kw):
 - Mean time to recovery (MTTR) on incidents
 </code></pre>
 <p>What you do not measure, you do not pay.</p>
+<h2>A debt-management check</h2>
+<p>Debt becomes manageable when it is specific enough to own, time-box, and replace safely. Pick one risky module and describe its debt in a way that could survive beyond the current conversation.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Choose one module tied to a recent incident or slow change.</li>
+<li>Add the debt item to an index with owner, severity, and due window.</li>
+<li>Write the first incremental replacement step using a feature-flag or strangler pattern.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>The debt item becomes a prioritizable object instead of background frustration.</li>
+<li>The safe first step is smaller than the emotional desire for a total rewrite.</li>
+<li>Deprecation starts looking like a staged operational process, not a one-shot deletion.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>The only record is a vague TODO with no owner or due date.</li>
+<li>The team cannot connect debt to incidents, lead time, or recovery cost.</li>
+<li>"We will clean it all up later" is the only plan on the table.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Debt has a due date and an owner.</li>
