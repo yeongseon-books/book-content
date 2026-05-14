@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 10
 title: 작은 웹앱 만들기
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - FullStack
   - Project
 seo_description: Flask, HTML, SQLite, 배포를 묶어 작은 Todo 앱을 만드는 글입니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 작은 웹앱 만들기
@@ -47,17 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    User["User"] --> HTML["HTML form"]
-    HTML --> API["Flask /api/todos"]
-    API --> DB[("SQLite")]
-    DB --> API
-    API --> HTML
-    HTML --> Render["Browser render"]
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
 
-이 그림 안에 시리즈의 거의 모든 개념이 들어 있습니다. 브라우저, API, 데이터베이스, 렌더링, 배포용 헬스 체크까지 모두 한 앱 안에서 만납니다.
+*브라우저, Flask API, SQLite가 하나의 작은 Todo 앱으로 연결되는 전체 구조입니다.*
+
+이 마지막 그림은 시리즈에서 배운 개념이 하나의 수직 슬라이스로 만나는 장면입니다. 사용자가 폼을 제출하면 브라우저가 API를 호출하고, 서버는 데이터베이스를 갱신한 뒤 다시 화면이 읽을 수 있는 JSON을 돌려줍니다.
+
+### 직접 검증해 볼 포인트
+
+- `curl`로 Todo를 추가한 뒤 브라우저 새로고침 없이 목록이 다시 그려지는지 확인합니다.
+- 앱을 컨테이너로 실행하고 `/health`가 정상 응답하는지 확인합니다.
+- `DB_PATH` 값을 바꿔도 코드 수정 없이 다른 데이터 파일을 가리키는지 검증합니다.
+
+**기대 결과:** API와 HTML 화면이 같은 데이터 원본을 공유하고, 환경 변수만 바꿔도 저장 위치가 달라지며, 컨테이너 안에서도 동일한 동작이 재현됩니다.
+
+**실패 모드:** 상태 코드를 제대로 나누지 않으면 Frontend가 실패를 감지하기 어렵습니다. 데이터 경로를 하드코딩하면 로컬과 배포 환경을 같은 코드로 운영하기 어렵습니다.
 
 ## 먼저 알아둘 용어
 
@@ -255,9 +259,13 @@ docker build -t todo-app . && docker run -p 8000:8000 -v $PWD/data:/data todo-ap
 
 ## 참고 자료
 
-- [Flask quickstart](https://flask.palletsprojects.com/quickstart/)
-- [SQLite (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [Docker get started](https://docs.docker.com/get-started/)
+### 공식 문서
+- [Flask quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+
+### 실전 체크 포인트
 - [The Twelve-Factor App](https://12factor.net/)
+- [Fetch API 사용법 (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 
 Tags: Computer Science, WebDevelopment, Capstone, Flask, FullStack, Project
