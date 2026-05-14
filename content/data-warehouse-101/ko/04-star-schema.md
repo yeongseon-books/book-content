@@ -17,7 +17,7 @@ tags:
   - Snowflake
   - Analytics
 seo_description: Star Schema 구조, Snowflake와의 차이, BI가 별 모양을 좋아하는 이유
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Star Schema
@@ -50,13 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    DimUser["dim_user"] --> Fact["fact_orders"]
-    DimProduct["dim_product"] --> Fact
-    DimDate["dim_date"] --> Fact
-    DimStore["dim_store"] --> Fact
-```
+![Star schema 조인 구조](../../../assets/data-warehouse-101/04/04-01-concept-at-a-glance.ko.png)
+
+*중앙 fact 하나에 여러 dimension이 한 번씩만 조인되는 전형적인 star schema 구조*
 
 ## 핵심 용어
 

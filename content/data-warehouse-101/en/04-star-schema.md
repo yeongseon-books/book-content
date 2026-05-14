@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 4
 title: Star Schema
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Snowflake
   - Analytics
 seo_description: The structure of a star schema, comparison with the snowflake schema, and why BI tools love the star shape for analytics.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Star Schema
-> Data Warehouse 101 series (4/10)
+
+Analytical models become fragile the moment every answer needs another hop through another lookup table. A star schema works because it keeps the path from question to answer short enough that both humans and BI tools can follow it without hesitation.
 
 This is post 4 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does the *star shape* work for analytics? Wouldn't *more normalization* make things better?
-
-> *A star schema is the shape of a query that joins once and answers.*
-
-<!-- a-grade-intro:end -->
+In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.
 
 ## What You Will Learn
 
@@ -49,13 +44,9 @@ Analytical queries get faster as joins decrease. A star schema keeps *one fact* 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    DimUser["dim_user"] --> Fact["fact_orders"]
-    DimProduct["dim_product"] --> Fact
-    DimDate["dim_date"] --> Fact
-    DimStore["dim_store"] --> Fact
-```
+![Star schema join structure](../../../assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
+
+*A classic star schema keeps one central fact table surrounded by dimensions that each join in a single hop.*
 
 ## Key Terms
 
