@@ -54,15 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Raw["raw data"] --> Reg["feature registry"]
-    Reg --> Off["offline store"]
-    Reg --> On["online store"]
-    Off --> Train["training"]
-    On --> Serve["serving"]
-```
+![피처 스토어 데이터 흐름](../../../assets/mlops-101/09/09-01-see-the-flow-first.ko.png)
 
+*피처 스토어 데이터 흐름*
 이 구조에서 중심은 피처 레지스트리입니다. 원천 데이터에서 정의된 피처가 오프라인 저장소와 온라인 저장소로 흘러가고, 학습은 오프라인에서, 서빙은 온라인에서 같은 정의를 씁니다.
 
 즉, 피처 스토어는 값보다 정의를 중심에 둡니다.
