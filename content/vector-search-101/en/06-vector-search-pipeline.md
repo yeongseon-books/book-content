@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,23 +20,21 @@ seo_description: Build an end-to-end vector search pipeline from document ingest
 
 # Vector search pipeline — from document ingestion to query
 
-> Vector Search 101 (6/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
-
-This is the final article in the Vector Search 101 series.
-
 The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.
 
 The post closes with the basics of hybrid search, which combines vector retrieval with keyword search.
 
-Topics:
+This is the final post in the Vector Search 101 series.
+
+The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers. Topics:
 
 - loading documents from text
 - the full indexing flow: chunking → embedding → FAISS
 - saving and reloading the index
 - querying and displaying results
 - hybrid search concept and a minimal implementation
+
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline)
 
 ![End to end indexing and retrieval flow](../../../assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
 
@@ -240,22 +238,7 @@ for query in queries:
 
 <!-- injected-output:end -->
 
-Expected output:
-
-```text
-total chunks: 8
-vector shape: (8, 384)
-saved: faiss.index, chunks.json
-loaded: 8 vectors
-
-query: 'how vector search differs from keyword search'
-  [1] 0.8123 — Vector search converts text into numeric vectors for meaning-based...
-  [2] 0.7234 — Unlike keyword search, it matches content even when phrasing differs.
-
-query: 'FAISS index types'
-  [1] 0.8412 — IndexFlatIP is an exact inner-product index equivalent to cosine...
-  [2] 0.7891 — FAISS is a high-speed vector search library developed at Facebook...
-```
+This example ends with 4 chunks because the input corpus is intentionally small. In real systems, the absolute number is not what matters. The real check is whether **document count → chunk count → index vector count** changes in the way you expect after a pipeline update.
 
 ---
 
@@ -309,6 +292,74 @@ def hybrid_search(
 
 `alpha=0.5` weights both methods equally. Increase toward 1.0 for more semantic weight; decrease toward 0.0 for more keyword weight.
 
+Running it makes the benefit clearer.
+
+```python
+bm25_ready_chunks = [
+    "FAISS IndexFlatIP supports exact inner-product search on normalized vectors.",
+    "Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.",
+    "Chunking strategy changes how much context each vector carries.",
+]
+
+for query in ["IndexFlatIP cosine search", "ERR_CONNECTION_REFUSED"]:
+    results = hybrid_search(query, build_index(bm25_ready_chunks)[0], bm25_ready_chunks, top_k=2, alpha=0.5)
+    print(f"\nquery: {query}")
+    for score, text in results:
+        print(f"  {score:.4f} — {text}")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: IndexFlatIP cosine search
+      0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+      0.2173 — Chunking strategy changes how much context each vector carries.
+
+    query: ERR_CONNECTION_REFUSED
+      0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
+      0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+
+<!-- injected-output:end -->
+
+The first query benefits from both semantic and lexical signals pointing at the same chunk. The second depends much more on exact token matching. That contrast is exactly why hybrid search exists.
+
+## When should reindexing run?
+
+One common operational mistake is treating the index as a one-time artifact. In practice, you need an explicit reindex trigger whenever one of these changes:
+
+- the embedding model name or version
+- chunking rules such as `chunk_size`, `chunk_overlap`, or separators
+- the source documents themselves
+- metadata fields stored alongside chunks
+
+Persisting a small manifest next to the index gives you a fast compatibility check at startup.
+
+```python
+import json
+
+manifest = {
+    "embedding_model": EMBED_MODEL,
+    "chunk_size": CHUNK_SIZE,
+    "chunk_overlap": CHUNK_OVERLAP,
+    "document_count": len(documents),
+    "index_type": "IndexFlatIP",
+}
+
+with open("index-manifest.json", "w") as f:
+    json.dump(manifest, f, indent=2)
+
+print(manifest)
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    {'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
+
+<!-- injected-output:end -->
+
+This is not glamorous infrastructure, but it gives you the first thing to compare when someone asks why retrieval quality changed after a deployment.
+
 ---
 
 ## Operational considerations
@@ -358,5 +409,6 @@ The natural next step is connecting this pipeline to an LLM to build a RAG syste
 - [LangChain FAISS integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
 - [rank-bm25 library](https://github.com/dorianbrown/rank_bm25)
 - [Hybrid search introduction — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
 Tags: Vector Search, FAISS, Embeddings, Python
