@@ -18,7 +18,7 @@ tags:
   - Lexical
   - Dynamic
 seo_description: 이름을 값에 연결하는 바인딩과 스코프 규칙을 LEGB 사례로 풀이하고, 렉시컬 스코프가 왜 코드 가독성과 유지보수성에 중요한지 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 스코프와 바인딩
@@ -44,12 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart TB
-    A["Built-in (print, len)"] --> B["Global (module)"]
-    B --> C["Enclosing (outer function)"]
-    C --> D["Local (inner function)"]
-```
+![이름을 찾을 때 안쪽에서 바깥쪽으로 올라가는 LEGB 순서](../../../assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)
+
+*이름을 찾을 때 안쪽에서 바깥쪽으로 올라가는 LEGB 순서*
 
 Python의 LEGB 규칙은 안쪽에서 바깥쪽으로 이름을 찾는 순서입니다. 가장 먼저 발견한 바인딩이 이깁니다. 이 단순한 규칙 하나가 함수 동작의 대부분을 설명해 줍니다.
 
