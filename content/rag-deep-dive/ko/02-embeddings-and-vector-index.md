@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: HuggingFaceEmbeddings와 FAISS IndexFlatL2가 텍스트를 벡터로 바꾸고 검색하는 내부 동작을 코드와 함께 분해합니다.
 ---
 
@@ -92,6 +92,27 @@ if __name__ == "__main__":
 - cosine을 쓰고 있다고 말하면서 실제로는 L2 또는 inner product를 쓰는 경우가 많습니다.
 - 정규화 여부를 모른 채 거리값만 비교하면 순위 의미를 잘못 해석하게 됩니다.
 - 인덱스는 저장소가 아니라 ranking rule이라는 점을 놓치기 쉽습니다.
+
+### 검증 출력 예시
+
+정확한 거리값은 임베딩 모델에 따라 달라지지만, 정상 실행이면 출력 형태는 아래와 비슷해야 합니다.
+
+```text
+rank=1 distance=0.42..
+The worker retries a failed message three times before dead-lettering.
+------------------------------------------------------------
+rank=2 distance=0.67..
+The dead-letter queue keeps the original payload for later inspection.
+------------------------------------------------------------
+rank=3 distance=1.10..
+Operators inspect the exception chain before replaying the message.
+```
+
+신뢰하기 전에 꼭 확인할 것은 세 가지입니다.
+
+- 1위 문서가 질문 의미와 실제로 가장 가깝게 읽히는지
+- `IndexFlatL2`에서는 거리값이 작은 순서로 정렬되는지
+- 반환된 row id가 예상한 원문 텍스트와 다시 연결되는지
 
 <!-- a-grade-example:end -->
 ## 체크리스트
@@ -366,6 +387,19 @@ if __name__ == "__main__":
 ```
 
 결국 persistence의 핵심은 파일 저장 자체가 아닙니다. `.faiss`는 검색 구조를, `.pkl`은 LangChain 문맥 복원을 맡습니다. 그리고 둘을 다시 합칠 때는 신뢰 경계 판단이 필요합니다. 성능 최적화 문서에서 자주 놓치지만, 운영에서 더 큰 사고를 부르는 것은 latency보다 이런 경계 누수입니다.
+
+---
+
+## 인덱스 튜닝 전에 먼저 분리해서 봐야 할 실패 유형
+
+검색 결과가 나쁘다고 해서 곧바로 인덱스 문제라고 보면 순서를 잘못 잡기 쉽습니다. 실제로는 최소 네 층이 서로 다른 실패를 만들 수 있습니다.
+
+- 임베딩 모델이 질문과 문서를 원하는 방향으로 잘 펼치지 못했을 수 있습니다.
+- 정규화 전략과 거리 함수 조합이 의도와 어긋났을 수 있습니다.
+- FAISS row id와 LangChain 문서 복원 매핑이 어긋났을 수 있습니다.
+- 올바른 문서를 찾았지만 이후 프롬프트 조립 단계에서 근거가 묻혔을 수 있습니다.
+
+그래서 exact flat search가 좋은 기준선입니다. 작은 코퍼스에서 `IndexFlatL2`조차 설명하기 어려운 결과를 낸다면, IVF나 HNSW로 넘어가도 문제는 더 빨리 보이지 않습니다. 먼저 임베딩 형태, metric 선택, id 복원, 프롬프트 packing을 검증한 뒤에 속도 최적화로 넘어가는 편이 훨씬 안전합니다.
 
 ---
 

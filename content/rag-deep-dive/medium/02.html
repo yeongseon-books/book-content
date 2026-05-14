@@ -55,7 +55,7 @@
 <body>
 <h1>Embeddings and the Vector Index — Inside FAISS IndexFlatL2</h1>
 <p>HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.</p>
-<p>This is the 2nd article in the RAG Deep Dive series.</p>
+<p>This is post 2 in the RAG Deep Dive series.</p>
 <!-- a-grade-intro:begin -->
 <h2>Questions this post answers</h2>
 <ul>
@@ -71,9 +71,6 @@
 <p><em>Questions this post answers</em></p>
 <!-- a-grade-intro:end -->
 
-<blockquote>
-<p>RAG Deep Dive series (2/6)</p>
-</blockquote>
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/02-embeddings-and-vector-index/main.py</code></p>
@@ -123,6 +120,23 @@ if __name__ == &quot;__main__&quot;:
 <li>Teams often say “cosine” while the implementation is actually L2 or inner product.</li>
 <li>Distance values are easy to misread if normalization assumptions are unstated.</li>
 <li>The index is a ranking rule, not neutral storage.</li>
+</ul>
+<p><strong>Expected output and verification path</strong></p>
+<p>The exact distances will vary with the embedding model, but a healthy run should look like this:</p>
+<pre><code class="language-text">rank=1 distance=0.42..
+The worker retries a failed message three times before dead-lettering.
+------------------------------------------------------------
+rank=2 distance=0.67..
+The dead-letter queue keeps the original payload for later inspection.
+------------------------------------------------------------
+rank=3 distance=1.10..
+Operators inspect the exception chain before replaying the message.
+</code></pre>
+<p>Verify three things before you trust the ranking:</p>
+<ul>
+<li>the closest result really matches the question semantics,</li>
+<li>distances are ordered from smaller to larger for <code>IndexFlatL2</code>,</li>
+<li>returned row ids point back to the document text you expect.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
@@ -357,6 +371,16 @@ if __name__ == &quot;__main__&quot;:
     main()
 </code></pre>
 <p>The lesson is bigger than persistence. A retrieval system is not only math and latency. It also has artifact boundaries, trust assumptions, and operational risks.</p>
+<hr>
+<h2>Failure modes to separate before tuning the index</h2>
+<p>Index tuning often starts too late in the debugging order. A bad retrieval result can come from at least four different layers:</p>
+<ul>
+<li>the embedding model mapped the question and documents poorly,</li>
+<li>the metric semantics are wrong for the normalization strategy,</li>
+<li>the FAISS row id mapped back to the wrong document layer,</li>
+<li>the right document was found but later prompt packing hid it.</li>
+</ul>
+<p>That is why exact flat search is such a useful baseline. If <code>IndexFlatL2</code> already fails on a small corpus, switching to IVF or HNSW will only make the failure harder to explain. First verify embedding shape, metric choice, id reconstruction, and prompt packing. Then optimize index speed.</p>
 <hr>
 <h2>The baseline to carry into episode 3</h2>
 <p>This episode established the geometry layer of the pipeline. <code>OpenAIEmbeddings</code> may currently route <code>embed_query()</code> through <code>embed_documents()</code>, but LangChain still models them as distinct interfaces because retrieval systems may be asymmetric. <code>IndexFlatL2</code> is exact search over squared L2 distance, which makes it a strong baseline and an expensive one at scale. <code>FAISS.from_documents()</code> hides a three-layer reconstruction path made of FAISS row ids, a LangChain docstore, and <code>index_to_docstore_id</code>. <code>IndexIVFFlat</code> introduces approximation and turns <code>nprobe</code> into a real operating knob. And persistence is split between <code>.faiss</code> and <code>.pkl</code>, with the latter carrying explicit deserialization risk.</p>
