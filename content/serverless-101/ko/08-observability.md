@@ -43,14 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Logs["logs"] --> Hub["observability hub"]
-    Metrics["metrics"] --> Hub
-    Traces["traces"] --> Hub
-    Hub --> Alert["alerts"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
 
+*로그, 지표, 추적 정보가 한 조사 흐름으로 만나야 분산된 함수를 끝까지 따라갈 수 있습니다.*
 이 그림이 말하는 핵심은 세 신호를 따로 모으는 것이 목적이 아니라, 서로 연결된 상태로 보는 것이 목적이라는 점입니다. 그래야 특정 요청의 실패를 로그로 보고, 동일 시점의 지표 변화와 함께 읽고, 전체 경로를 추적으로 확인할 수 있습니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -134,6 +129,29 @@ def handler(event, ctx):
     COLD = False
 ```
 
+## 검증 흐름: 한 요청을 끝까지 복원할 수 있어야 합니다
+
+관측성을 붙였다고 해서 바로 운영 가능한 상태가 되지는 않습니다. 실제로는 한 요청을 골라 끝까지 따라갈 수 있는지 확인해야 합니다.
+
+```text
+request_id=8d6...
+correlation_id=ord-2026-05-12-001
+cold=true
+duration_ms=842
+downstream=db
+```
+
+**Expected output:** 같은 상관관계 ID로 엣지 함수, 큐 소비자, 다운스트림 호출 로그를 한 번에 묶어 볼 수 있어야 합니다.
+
+아래 네 질문에 빨리 답할 수 없다면 아직 계측이 약합니다.
+
+- 가장 먼저 실패한 요청은 무엇인가
+- 지연 원인이 콜드 스타트인가, 다운스트림 지연인가
+- 어느 함수가 몇 번 재시도했는가
+- 알람이 실제 행동 가능한 신호를 가리키는가
+
+관측성의 품질은 로그 양이 아니라 이 질문들에 답하는 속도로 드러납니다.
+
 콜드 여부를 같이 기록하면 p99 지연이 초기화 비용인지, 실제 비즈니스 처리 지연인지 더 쉽게 구분할 수 있습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -204,9 +222,15 @@ def handler(event, ctx):
 
 ## 참고 자료
 
-- [OpenTelemetry](https://opentelemetry.io/docs/)
-- [AWS X-Ray](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html)
+### 공식 문서
+
+- [OpenTelemetry 문서](https://opentelemetry.io/docs/)
+- [AWS X-Ray 개발자 가이드](https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html)
 - [CloudWatch Logs Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html)
+
+### 패턴과 코드
+
 - [서버리스 분산 추적](https://aws.amazon.com/blogs/compute/instrumenting-distributed-systems-for-operational-visibility/)
+- [AWS Powertools for Lambda Python (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)
 
 Tags: Serverless, Observability, Logging, Tracing, Metrics
