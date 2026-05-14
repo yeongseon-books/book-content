@@ -16,13 +16,15 @@ tags:
 - Hit-Rate
 - Latency
 - MRR
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
 ---
 
 # 검색 성능 측정
 
-검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다. 이 글은 RAG Benchmark 101 시리즈의 두 번째 글입니다. 여기서는 검색기 변경이 실제 개선인지, 단지 몇 개 예제가 그럴듯해 보인 것인지 구분할 수 있는 최소 측정 루프를 만들겠습니다.
+검색 벤치마크는 질문, 정답 문서, 순위 결과, 지표가 같은 루프 안에 묶여 있을 때만 의미가 있습니다.
+
+이 글은 RAG 평가와 벤치마크 101 시리즈의 두 번째 글입니다. 여기서는 검색기 변경이 실제 개선인지, 단지 몇 개 예제가 그럴듯해 보인 것인지 구분할 수 있는 최소 측정 루프를 만들겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -59,7 +61,7 @@ retriever.invoke(question)  ──►  ranked_ids  ──►  metric(ranked_ids,
 latency_ms                                       hit_rate / MRR
 ```
 
-핵심은 화살표 하나를 계측 코드로 감싸는 것입니다. `retriever.invoke()`만 타이머로 감싸면 검색 구간의 순수 지연 시간을 분리할 수 있습니다. 그리고 검색 결과를 `metadata["id"]` 형태로 정규화해 두면, 이후 BM25든 FAISS든 하이브리드 검색기든 평가 함수는 그대로 둘 수 있습니다.
+여기서 할 일은 단순합니다. `retriever.invoke()`만 타이머로 감싸 검색 구간의 순수 지연 시간을 분리합니다. 검색 결과를 `metadata["id"]`로 정규화해 두면, 이후 BM25·FAISS·하이브리드 검색기로 바뀌어도 평가 함수는 그대로 재사용할 수 있습니다.
 
 이 멘탈 모델이 중요한 이유는 확장성이 있기 때문입니다. 지금은 단일 검색기지만, 나중에 reranker나 다른 벡터 저장소가 들어와도 이 구조만 유지하면 비교 실험을 같은 틀에서 수행할 수 있습니다.
 
@@ -112,10 +114,14 @@ python3 main.py
 
 ```python
 import time
+import numpy as np
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 latencies_ms = []
 all_ranked = []
+
+for question, _ in QUERIES[:1]:
+    retriever.invoke(question)  # warm-up
 
 for question, relevant_ids in QUERIES:
     started_at = time.perf_counter()
@@ -124,9 +130,13 @@ for question, relevant_ids in QUERIES:
     ranked_ids = [doc.metadata["id"] for doc in docs]
     latencies_ms.append(elapsed_ms)
     all_ranked.append((question, ranked_ids, relevant_ids))
+
+p95_latency_ms = float(np.percentile(latencies_ms, 95))
 ```
 
 여기서 중요한 점은 두 가지입니다. 첫째, 짧은 구간은 `time.perf_counter()`로 측정합니다. 둘째, 결과를 문서 ID 목록으로 정규화해 둡니다. 그래야 뒤의 평가 함수가 검색기 구현에 묶이지 않습니다.
+
+워밍업 호출도 실무에서는 거의 필수입니다. 첫 호출에는 모델 로드, 파일 시스템 캐시, 네트워크 초기화가 섞일 수 있습니다. 워밍업 없이 평균을 내면 실제 운영에서 반복 호출될 때의 성능보다 더 느리게 기록될 수 있습니다.
 
 ### 3단계 — 지표 계산하기
 
@@ -150,6 +160,7 @@ rrs = [reciprocal_rank(r, g) for _, r, g in all_ranked]
 print(f"hit_rate@3 = {sum(hits)/len(hits):.2f}")
 print(f"MRR        = {sum(rrs)/len(rrs):.2f}")
 print(f"avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms")
+print(f"p95 latency = {p95_latency_ms:.1f} ms")
 ```
 
 Hit rate는 정답이 상위 k 안에 한 번이라도 들어왔는지만 보고, MRR은 첫 정답의 순위를 봅니다. 둘을 함께 봐야 "찾기는 찾는데 뒤에 나온다" 같은 실패를 구분할 수 있습니다.
@@ -158,13 +169,55 @@ Hit rate는 정답이 상위 k 안에 한 번이라도 들어왔는지만 보고
 
 평균값만 저장하면 디버깅이 막힙니다. 질문별 `ranked_ids`를 로그에 남겨야 어느 질문에서 회귀가 났는지 확인할 수 있습니다. 실제 운영에서는 평균 점수보다 **무너진 질문 목록**이 더 큰 가치를 가집니다.
 
+```python
+report_rows = []
+for question, ranked_ids, relevant_ids in all_ranked:
+    report_rows.append({
+        "question": question,
+        "ranked_ids": ranked_ids,
+        "relevant_ids": sorted(relevant_ids),
+        "hit": hit_rate(ranked_ids, relevant_ids),
+        "rr": reciprocal_rank(ranked_ids, relevant_ids),
+    })
+
+summary = {
+    "hit_rate@3": round(sum(hits) / len(hits), 2),
+    "MRR": round(sum(rrs) / len(rrs), 2),
+    "avg_latency_ms": round(sum(latencies_ms) / len(latencies_ms), 1),
+    "p95_latency_ms": round(p95_latency_ms, 1),
+}
+
+print(summary)
+for row in report_rows:
+    print(row)
+```
+
+```text
+{'hit_rate@3': 0.67, 'MRR': 0.56, 'avg_latency_ms': 4.8, 'p95_latency_ms': 6.1}
+{'question': 'What distance does FAISS use by default?', 'ranked_ids': ['doc-faiss-basics', 'doc-ann-overview', 'doc-chunking'], 'relevant_ids': ['doc-faiss-basics'], 'hit': 1.0, 'rr': 1.0}
+{'question': 'What does MRR measure?', 'ranked_ids': ['doc-bm25', 'doc-mrr-intro', 'doc-ranking'], 'relevant_ids': ['doc-mrr-intro'], 'hit': 1.0, 'rr': 0.5}
+```
+
+이 출력은 바로 행동으로 이어집니다. 두 번째 질문처럼 hit는 1.0인데 rr이 0.5라면, 검색 자체보다 순위화 품질을 먼저 의심해야 합니다.
+
+### 5단계 — 결과를 읽고 첫 번째 점검 순서를 정하기
+
+| 관측값 | 먼저 볼 것 | 흔한 원인 |
+| --- | --- | --- |
+| hit rate 낮음, latency 양호 | 임베딩/청크 전략 | 관련 문서를 아예 못 찾음 |
+| hit rate 높음, MRR 낮음 | reranker, 검색 점수 결합 방식 | 정답은 있지만 뒤쪽에 배치됨 |
+| quality 양호, p95만 높음 | 인프라, 캐시, 네트워크 | 일부 요청만 느림 |
+| 평균 양호, 특정 질문만 붕괴 | 질문별 로그 | 도메인 편향, gold set 누락 |
+
+이 표가 중요한 이유는 "숫자가 이상하다"에서 끝나지 않게 해 주기 때문입니다. 벤치마크는 결국 **다음 수정 방향을 좁혀 주는 도구**여야 합니다.
+
 ## 자주 하는 실수
 
 ![Hit rate는 높지만 순위 품질은 약한 실패 패턴](../../../assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.ko.png)
 
 *Hit rate는 높지만 순위 품질은 약한 실패 패턴*
 
-- **Hit rate만 믿기** — hit rate가 1.0이어도 MRR이 낮으면 정답이 늘 하단에 있다는 뜻입니다.
+- **Hit rate만 믿기** — hit rate가 1.0이어도 MRR이 낮으면 정답이 늘 뒤쪽에 배치된 상태입니다.
 - **임베딩 시간까지 같이 재기** — 검색기 자체의 속도를 보고 싶다면 `retriever.invoke()`만 재야 합니다.
 - **`time.time()` 사용하기** — 시스템 시계 변화에 민감합니다. 짧은 구간은 `time.perf_counter()`가 맞습니다.
 - **첫 호출까지 그대로 집계하기** — 첫 호출에는 모델 로드와 캐시 워밍이 섞입니다. 워밍업 호출 후 본 측정을 하는 편이 안정적입니다.
