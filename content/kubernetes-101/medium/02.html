@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Pod</h1>
-<blockquote>
-<p>Kubernetes 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is the <em>base unit</em> a <em>Pod</em>, and not a <em>container</em>?</p>
-<blockquote>
-<p>A <em>Pod</em> is a <em>bundle of containers</em> that <em>live and die together</em> — the <em>smallest deployable unit</em> in <em>Kubernetes</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The first thing that confuses many Docker users is that Kubernetes does not treat the container itself as the base unit. That design choice looks odd until you hit the real operational problems: shared networking, helper processes, startup ordering, and the fact that several containers sometimes have to live and die together.</p>
 <p>This is post 2 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will define a Pod as the smallest deployable execution bundle in Kubernetes and connect that idea to sidecars, shared storage, and the Pod lifecycle you debug in production.</p>
+<blockquote>
+<p>A Pod is not a prettier name for one container. It is the boundary Kubernetes uses when scheduling, networking, and replacing a unit of work.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The definition of a <em>Pod</em></li>
 <li>How it differs from a <em>container</em></li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Every workload</em> eventually runs <em>on a Pod</em>. You must understand the <em>Pod model</em> before higher-level objects make sense.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Pod[&quot;pod&quot;] --&gt; C1[&quot;app container&quot;]
-    Pod --&gt; C2[&quot;sidecar&quot;]
-    Pod --&gt; Vol[&quot;shared volume&quot;]
-    Pod --&gt; Net[&quot;shared network ns&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>A Pod groups the app container, sidecars, shared storage, and shared networking into one scheduled execution unit.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>pod</strong>: a <em>shared bundle</em> of <em>one or more containers</em>.</li>
@@ -134,6 +124,18 @@ def apply(path):
 <pre><code class="language-python">def delete(name):
     subprocess.run([&quot;kubectl&quot;, &quot;delete&quot;, &quot;pod&quot;, name], check=True)
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl get pod web -o wide
+kubectl describe pod web
+kubectl logs web
+</code></pre>
+<p><strong>Expected output:</strong> <code>get pod</code> should show a Pod that is <code>Running</code> or still becoming ready, <code>describe</code> should list scheduling and container-start events in order, and <code>logs</code> should surface the first app messages from standard output. Together they show state, reason, and app-level evidence instead of only a green/red summary.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>A long <code>Pending</code> state usually means scheduling or resource issues before it means application failure.</li>
+<li><code>ImagePullBackOff</code> points to image tag or registry access before it points to Pod YAML shape.</li>
+<li>Empty logs often mean the process exited immediately or the app is still writing only to files inside the container.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>Pod name</em> must be <em>unique</em>.</li>
@@ -191,6 +193,7 @@ def apply(path):
 <li><a href="https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/">Pod lifecycle</a></li>
 <li><a href="https://kubernetes.io/docs/concepts/workloads/pods/init-containers/">Init containers</a></li>
 <li><a href="https://kubernetes.io/blog/2023/08/25/native-sidecar-containers/">Sidecar containers</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/">Debug Pods</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Pod, Containers, YAML, DevOps</p>
 </body>
