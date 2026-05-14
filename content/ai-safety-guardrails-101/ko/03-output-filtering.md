@@ -14,7 +14,7 @@ tags:
 - Content Moderation
 - Output Filtering
 - Llama Guard
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: OpenAI나 Anthropic 같은 공급사는 RLHF와 자체 가드레일로 모델을 훈련시킵니다. 그래도 다음과 같은 일이
   일어납니다.
 ---
@@ -305,7 +305,7 @@ def fp_rate(logs: list[ModerationLog], window_days: int = 7) -> float:
 
 실무적으로는 표준 moderation API, 오픈소스 분류기, 회사 정책 judge를 계층으로 조합하는 방식이 가장 현실적입니다. 여기에 스트리밍 제약과 false positive 측정을 함께 넣어야 운영 가능한 시스템이 됩니다.
 
-핵심은 간단합니다. 모델 응답은 결과물이 아니라 심사 대상입니다. 이 관점을 받아들이면 다음 편의 PII 재검사와도 자연스럽게 연결됩니다.
+여기서 놓치지 말아야 할 점은 모델 응답이 결과물이 아니라 심사 대상이라는 사실입니다. 이 관점을 받아들이면 다음 편의 PII 재검사와도 자연스럽게 연결됩니다.
 
 <!-- toc:begin -->
 ## AI Safety & Guardrails 101 시리즈
