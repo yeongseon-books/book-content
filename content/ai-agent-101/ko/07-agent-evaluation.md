@@ -247,7 +247,7 @@ agent 평가는 단순한 정답 채점이 아닙니다. 어떤 도구를 어떤
 다음 글에서는 이렇게 발견한 실패를 어떻게 처리하고 시스템 신뢰성을 높일지 살펴봅니다. 결국 평가가 문제를 드러내면, reliability 설계가 그 문제를 운영 가능한 수준으로 낮춰야 하기 때문입니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -276,4 +276,4 @@ agent 평가는 단순한 정답 채점이 아닙니다. 어떤 도구를 어떤
 - [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 - [LangGraph 101 - trajectory와 상태 추적](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
-Tags: AI Agent, Evaluation, Testing, Metrics
+Tags: AI Agent, LLM, Tool Use, Python

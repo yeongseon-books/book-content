@@ -275,11 +275,11 @@ Provisioning 성공은 control plane 응답일 뿐, 애플리케이션이 건강
 
 - [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
 - [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
-- <strong>첫 배포하기 — Python/FastAPI (현재 글)</strong>
-- Ingress and traffic splitting — revision-based deployment strategies (예정)
-- Scaling — KEDA scalers and zero-to-N (예정)
-- Dapr integration — what you get from a sidecar (예정)
-- Monitoring and ops — Log Analytics and Application Insights (예정)
+- **첫 배포하기 — Python/FastAPI (현재 글)**
+- Ingress와 트래픽 분할 — revision 기반 배포 전략 (예정)
+- 스케일링 — KEDA scaler와 zero-to-N (예정)
+- Dapr 통합 — 사이드카로 얻는 것 (예정)
+- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 

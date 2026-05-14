@@ -291,7 +291,7 @@ async def chat_stream(prompt: str) -> StreamingResponse:
 이 시리즈는 여기서 기초를 마칩니다. 첫 호출, 토큰, 역할 기반 프롬프트, few-shot 유도, 대화 상태, 스트리밍까지 이해했다면 이제 작은 LLM 앱을 설계하고 설명할 수 있는 기반이 생긴 것입니다. 다음 단계는 구조화 출력, 툴 호출, 더 깊은 스트리밍 운영 패턴, 캐싱과 재시도처럼 프로덕션 쪽 관심사로 넘어가는 일입니다.
 
 <!-- toc:begin -->
-## 이 시리즈의 다른 글
+## 시리즈 목차
 
 - [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
 - [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)

@@ -186,7 +186,7 @@ A: My lord, I serve thee with a faithful heart.
 다음 글에서는 이렇게 미세 조정한 모델을 FastAPI 서버와 브라우저 UI로 감쌉니다. 즉, 지금까지 만든 LLM을 실제로 대화할 수 있는 작은 챗봇 시스템으로 마무리하게 됩니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

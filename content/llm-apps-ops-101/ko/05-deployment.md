@@ -179,7 +179,7 @@ if __name__ == "__main__":
 배포 예제에서는 엔드포인트 코드보다 self-test가 더 값질 때가 많습니다. 예제가 실제로 작동한다는 사실을 증명해 주기 때문입니다.
 
 <!-- toc:begin -->
-## 이 시리즈의 글
+## 시리즈 목차
 
 - [LLM 앱 모니터링과 로깅](./01-monitoring-and-logging.md)
 - [LLM 비용 추적과 최적화](./02-cost-tracking.md)

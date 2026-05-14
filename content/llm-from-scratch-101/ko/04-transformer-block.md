@@ -169,7 +169,7 @@ for block in self.blocks:
 다음 글에서는 지금까지 만든 임베딩과 블록들을 모두 조립해 `GPT(nn.Module)` 전체 클래스를 완성합니다. 즉, 입력부터 logits와 loss까지 한 번에 계산하는 모델 껍질을 만들게 됩니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

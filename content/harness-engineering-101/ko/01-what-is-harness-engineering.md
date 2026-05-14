@@ -279,21 +279,23 @@ def classify_email_with_harness(email_body: str) -> ClassificationResult:
 Harness Engineering은 좋은 모델을 고르는 기술이 아니라, 모델이 좋은 결과를 낼 수밖에 없도록 환경을 설계하는 기술입니다. 이 관점을 놓치면 팀은 계속 모델을 바꾸고 프롬프트를 덧붙이면서도, 왜 시스템이 불안정한지 설명하지 못합니다.
 이 글에서 가장 먼저 가져가야 할 문장은 단순합니다. 에이전트 품질은 모델 안쪽보다 모델 바깥쪽에서 더 많이 결정됩니다. 태스크, 컨텍스트, 제약, 도구, 검증, 피드백, 승인, 관측성은 부가 옵션이 아니라 운영 환경의 본체입니다.
 다음 글부터는 그 환경을 구성하는 각 harness를 하나씩 분해합니다. 첫 번째 출발점은 Task Harness입니다. 모호한 일을 실행 가능한 작업으로 바꾸지 못하면, 나머지 harness도 설 자리가 없습니다.
+
 <!-- toc:begin -->
-## Harness Engineering 101 시리즈
+## 시리즈 목차
 
 - **Harness Engineering이란 무엇인가? (현재 글)**
-- [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
-- [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
-- [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
-- [Tool Harness — Agent가 사용할 도구를 안전하게 설계하기](./05-tool-harness.md)
-- [Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
-- [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
-- [Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
-- [Observability — Agent 작업을 추적하고 재현하기](./09-observability.md)
-- [Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
+- Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기 (예정)
+- Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기 (예정)
+- Constraint Harness — 규칙, 경계, 금지 행동 정의하기 (예정)
+- Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (예정)
+- Test Harness — 완료 조건을 테스트로 고정하기 (예정)
+- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
 ## 참고 자료
 ### 공식 문서
 
@@ -305,4 +307,5 @@ Harness Engineering은 좋은 모델을 고르는 기술이 아니라, 모델이
 
 - [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
-Tags: AI Agent, Harness, Reliability, Production
+
+Tags: AI Agent, Harness, Production, Reliability

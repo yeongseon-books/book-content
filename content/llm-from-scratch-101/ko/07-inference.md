@@ -191,7 +191,7 @@ Thee no more of men.
 다음 글에서는 이 베이스 모델 위에 instruction-response 형식을 덧입히는 파인튜닝을 수행합니다. 즉, 셰익스피어풍 문자 예측기에서 조금 더 질문-응답에 가까운 출력 습관으로 모델을 이동시키게 됩니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

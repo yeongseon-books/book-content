@@ -240,7 +240,7 @@ short-term memory는 현재 세션의 working set이고, long-term memory는 나
 다음 글에서는 이 기반 위에서 여러 agent가 협업하는 multi-agent 시스템을 살펴봅니다. 역할이 늘어날수록 누가 어떤 state를 읽고 어떤 memory를 공유할지 더 명확히 설계해야 하기 때문입니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -269,4 +269,4 @@ short-term memory는 현재 세션의 working set이고, long-term memory는 나
 - [LangGraph 101 - 체크포인트와 상태 관리](../../langgraph-101/ko/02-state-and-checkpoints.md)
 - [RAG 101 - 검색 컨텍스트 구성](../../multimodal-ai-101/ko/05-multimodal-rag.md)
 
-Tags: AI Agent, Memory, State Management, Context Window
+Tags: AI Agent, LLM, Tool Use, Python

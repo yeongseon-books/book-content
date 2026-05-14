@@ -254,10 +254,10 @@ ACA traffic split은 비율 기반입니다. "이 user-agent만 v2로 보내기"
 - [Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기](./01-what-is-aca.md)
 - [Environment, Container App, Revision — ACA in three words](./02-environment-app-revision.md)
 - [첫 배포하기 — Python/FastAPI](./03-first-deploy.md)
-- <strong>Ingress와 트래픽 분할 — revision 기반 배포 전략 (현재 글)</strong>
-- Scaling — KEDA scalers and zero-to-N (예정)
-- Dapr integration — what you get from a sidecar (예정)
-- Monitoring and ops — Log Analytics and Application Insights (예정)
+- **Ingress와 트래픽 분할 — revision 기반 배포 전략 (현재 글)**
+- 스케일링 — KEDA scaler와 zero-to-N (예정)
+- Dapr 통합 — 사이드카로 얻는 것 (예정)
+- 모니터링과 운영 — Log Analytics와 Application Insights (예정)
 
 <!-- toc:end -->
 

@@ -218,7 +218,7 @@ print(attn.last_attn.shape)
 다음 글에서는 여기에 FeedForward, Residual, LayerNorm을 더해 트랜스포머 블록 하나를 완성합니다. 즉, 토큰 간 정보 교환에 이어 각 위치 내부 표현을 더 깊게 가공하는 단계로 넘어갑니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

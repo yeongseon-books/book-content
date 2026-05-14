@@ -259,7 +259,7 @@ class ResearchAgent:
 이 시리즈는 여기서 마무리되지만 실제 작업은 여기서 시작됩니다. 다음 단계에서는 이 작은 agent를 LangGraph 같은 workflow 프레임워크로 옮겨 보거나, 더 정교한 evaluation과 observability를 붙이며 production-grade 구조로 확장해 보면 좋습니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -288,4 +288,4 @@ class ResearchAgent:
 - [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md)
 - [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 
-Tags: AI Agent, Tutorial, Python, Hands-on
+Tags: AI Agent, LLM, Tool Use, Python

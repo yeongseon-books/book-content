@@ -219,7 +219,7 @@ Output: Sorry, I cannot execute DELETE statements.
 다음 글에서는 이 구조 위에서 실제로 도구를 어떻게 정의하고 호출 루프에 연결하는지 살펴보겠습니다. context engineering이 행동 계약이라면, tool use는 그 계약이 실제 시스템 호출로 이어지는 첫 번째 지점입니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - **컨텍스트 엔지니어링 (현재 글)**
@@ -248,4 +248,4 @@ Output: Sorry, I cannot execute DELETE statements.
 - [Prompt Engineering 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [LangGraph 101 - 상태와 라우팅 설계](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
-Tags: AI Agent, Context, Prompt Engineering, System Prompt
+Tags: AI Agent, LLM, Tool Use, Python

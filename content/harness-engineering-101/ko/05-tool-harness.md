@@ -312,21 +312,23 @@ shell 실행, 파일 쓰기, 무제한 HTTP 호출은 sandboxing 없이는 produ
 Tool Harness는 도구 개수를 늘리는 기술이 아니라, 에이전트가 올바르게 쓰기 쉬운 인터페이스를 설계하는 기술입니다. 좁은 책임, 강한 스키마, idempotency, 행동 가능한 에러, 격리가 갖춰져야 도구는 생산성을 올리는 요소가 됩니다.
 실무에서는 모델보다 도구가 더 자주 사고를 냅니다. 모델은 잘못 생각할 수 있지만, 시스템을 망가뜨리는 것은 결국 그 생각을 실행하는 도구입니다. 그래서 도구 설계는 프롬프트보다 더 보수적이어야 합니다.
 다음 글에서는 Test Harness를 다룹니다. 에이전트가 작업을 끝냈다고 말하는 것과 실제로 끝난 것은 다르기 때문에, 이제 완료 조건을 테스트로 고정해야 합니다.
+
 <!-- toc:begin -->
-## Harness Engineering 101 시리즈
+## 시리즈 목차
 
 - [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
 - [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
 - [Context Harness — Agent에게 줄 정보와 숨길 정보 설계하기](./03-context-harness.md)
 - [Constraint Harness — 규칙, 경계, 금지 행동 정의하기](./04-constraint-harness.md)
 - **Tool Harness — Agent가 사용할 도구를 안전하게 설계하기 (현재 글)**
-- [Test Harness — 완료 조건을 테스트로 고정하기](./06-test-harness.md)
-- [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
-- [Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
-- [Observability — Agent 작업을 추적하고 재현하기](./09-observability.md)
-- [Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
+- Test Harness — 완료 조건을 테스트로 고정하기 (예정)
+- Feedback Loop — 실패를 고치게 만드는 반복 구조 (예정)
+- Approval Gate — 사람 승인이 필요한 지점 설계하기 (예정)
+- Observability — Agent 작업을 추적하고 재현하기 (예정)
+- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
 ## 참고 자료
 ### 공식 문서
 
@@ -338,4 +340,5 @@ Tool Harness는 도구 개수를 늘리는 기술이 아니라, 에이전트가 
 
 - [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
-Tags: AI Agent, Harness, Tool Design, Sandboxing
+
+Tags: AI Agent, Harness, Production, Reliability

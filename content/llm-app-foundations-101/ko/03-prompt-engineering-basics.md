@@ -74,9 +74,9 @@ seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-
 
 system 메시지의 효과는 직접 비교해 보는 편이 빠릅니다.
 
-![system 유무가 답변 구조를 어떻게 바꾸는지 비교](../../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.ko.png)
+![system 메시지가 답변 구조를 바꾸는 방식](../../../assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.ko.png)
 
-*system 유무가 답변 구조를 어떻게 바꾸는지 비교*
+*system 메시지가 답변 구조를 바꾸는 방식*
 
 ```python
 import os
@@ -312,7 +312,7 @@ print(completion.choices[0].message.content)
 다음 글에서는 few-shot과 chain-of-thought를 다룹니다. 이번 글이 역할의 분리였다면, 다음 글은 그 위에 예시와 단계적 추론을 얹어 응답 패턴을 더 강하게 유도하는 단계입니다.
 
 <!-- toc:begin -->
-## 이 시리즈의 다른 글
+## 시리즈 목차
 
 - [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
 - [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)
@@ -337,4 +337,5 @@ print(completion.choices[0].message.content)
 - [Few-shot과 Chain-of-Thought — 더 나은 답변 유도하기](./04-few-shot-and-cot.md)
 - [대화 상태 관리 — 멀티턴 챗봇 만들기](./05-conversation-state.md)
 - [툴 호출 — 함수를 모델에 연결하기](../../llm-api-production-101/ko/02-tool-calling.md)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

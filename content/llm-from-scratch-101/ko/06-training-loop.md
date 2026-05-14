@@ -242,7 +242,7 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 이제 다음 글에서는 저장한 `ckpt.pt`를 불러와 생성 루프를 붙입니다. 즉, 지금까지 학습한 가중치를 사용해 실제로 셰익스피어풍 텍스트를 한 글자씩 뽑아내는 단계로 넘어갑니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

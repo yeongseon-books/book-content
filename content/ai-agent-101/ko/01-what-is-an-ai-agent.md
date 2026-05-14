@@ -167,7 +167,7 @@ AI Agent는 단순히 말을 잘하는 모델이 아닙니다. 목표를 받고,
 이 글의 목적은 화려한 예제를 보여 주는 데 있지 않습니다. 시리즈 전체를 읽는 동안 계속 재사용할 기준선을 만드는 데 있습니다. 다음 글부터는 이 기준선 위에서 context engineering, tool use, workflow, memory를 하나씩 더 구체적으로 쌓아 올리겠습니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - **AI Agent란 무엇인가? (현재 글)**
 - 컨텍스트 엔지니어링 (예정)
@@ -196,4 +196,4 @@ AI Agent는 단순히 말을 잘하는 모델이 아닙니다. 목표를 받고,
 - [LangGraph 101 - 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Evaluation 101 - 평가 관점 확장](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 
-Tags: AI Agent, LLM, Tool Use, Autonomy, ReAct, Automation
+Tags: AI Agent, LLM, Tool Use, Python

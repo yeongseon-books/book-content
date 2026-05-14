@@ -11,6 +11,10 @@ check-content:
 	python3 scripts/check_catalog.py
 	python3 scripts/check_nav_coverage.py
 	python3 scripts/check_frontmatter.py
+	python3 scripts/check_seo_quality.py
+	python3 scripts/check_status_sync.py
+	python3 scripts/check_local_paths.py
+	python3 scripts/check_image_language.py
 	python3 scripts/lint_captions.py
 	python3 scripts/check_article_structure.py
 

@@ -224,7 +224,7 @@ agent reliability는 실패를 없애는 기술이 아니라 실패를 제어하
 다음 글에서는 이렇게 설계한 agent를 실제 운영 환경에서 어떻게 관측하고 비용을 관리할지 다룹니다. 안정성 장치가 있어도 보이지 않으면 개선할 수 없기 때문입니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -253,4 +253,4 @@ agent reliability는 실패를 없애는 기술이 아니라 실패를 제어하
 - [AI Evaluation 101 - 실패 분석과 회귀 검사](../../ai-evaluation-101/ko/08-regression-testing.md)
 - [LangGraph 101 - 상태와 재시도](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
-Tags: AI Agent, Error Handling, Reliability, Retry Logic
+Tags: AI Agent, LLM, Tool Use, Python

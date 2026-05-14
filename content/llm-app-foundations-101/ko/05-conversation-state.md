@@ -298,7 +298,7 @@ def enforce_budget(messages: list[dict[str, str]], max_input_tokens: int = 6000)
 다음 글에서는 마지막 기초 주제로 스트리밍 응답을 다룹니다. 이번 글이 “무엇을 기억할 것인가”의 문제였다면, 다음 글은 “생성 중인 답을 어떻게 즉시 보여 줄 것인가”의 문제입니다.
 
 <!-- toc:begin -->
-## 이 시리즈의 다른 글
+## 시리즈 목차
 
 - [LLM API 첫걸음 — 모델에게 첫 번째 요청 보내기](./01-llm-api-first-call.md)
 - [토큰 이해하기 — 비용, 한계, 컨텍스트 창](./02-understanding-tokens.md)

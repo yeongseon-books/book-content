@@ -228,7 +228,7 @@ source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 이 시리즈는 토크나이저에서 출발해 임베딩, 어텐션, 블록, GPT 클래스, 학습, 샘플링, 파인튜닝, 챗봇 래퍼까지 이어졌습니다. 작은 모델이지만 LLM 애플리케이션의 전체 흐름을 끝에서 끝까지 직접 만져 본 셈입니다.
 
 <!-- toc:begin -->
-## LLM from Scratch 101 시리즈
+## 시리즈 목차
 
 - [글자를 숫자로 바꾸기](./01-tokenizer.md)
 - [정수에서 벡터로, 그리고 위치](./02-embedding.md)

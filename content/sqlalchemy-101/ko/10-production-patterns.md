@@ -232,11 +232,11 @@ production 운영의 결정은 풀, 관측, 마이그레이션 세 축으로 좁
 - [SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기](./03-core-select-insert-update-delete.md)
 - [ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기](./04-orm-declarative-mapped-column.md)
 - [Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리](./05-session-unit-of-work-identity-map.md)
-- [ORM Relationships: relationship과 back_populates로 양방향 탐색 안전하게 잇기](./06-relationships-back-populates.md)
+- [ORM 관계 매핑: relationship과 back_populates로 양방향 탐색 안전하게 잇기](./06-relationships-back-populates.md)
 - [로딩 전략과 N+1 문제: lazy/joined/selectin을 언제 골라야 하는가](./07-loading-strategies-n-plus-one.md)
 - [이벤트, hybrid_property, 그리고 커스텀 타입](./08-events-hybrid-types.md)
 - [비동기 SQLAlchemy: aiosqlite와 AsyncSession](./09-async-aiosqlite.md)
-- **production 패턴: 풀, 관측, 마이그레이션, 배포 (현재 글)**
+- **프로덕션 패턴: 풀, 관측, 마이그레이션, 배포 (현재 글)**
 
 <!-- toc:end -->
 

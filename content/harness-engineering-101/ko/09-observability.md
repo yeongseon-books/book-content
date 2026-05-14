@@ -237,8 +237,9 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라, 왜 그런 결과가 나왔는지 나중에 다시 설명할 수 있게 만드는 운영 능력입니다. 이것이 있어야 디버깅, 비용 최적화, 사고 분석이 모두 가능해집니다.
 핵심은 구조입니다. span과 trace로 실행을 묶고, 결과뿐 아니라 입력과 근거와 비용을 함께 남겨야 replay가 가능합니다.
 다음 글에서는 마지막으로 Production Harness를 다룹니다. 지금까지 만든 모든 harness를 배포, 롤백, on-call까지 포함한 실제 운영 환경으로 묶는 단계입니다.
+
 <!-- toc:begin -->
-## Harness Engineering 101 시리즈
+## 시리즈 목차
 
 - [Harness Engineering이란 무엇인가?](./01-what-is-harness-engineering.md)
 - [Task Harness — 모호한 일을 실행 가능한 작업으로 바꾸기](./02-task-harness.md)
@@ -249,9 +250,10 @@ Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라,
 - [Feedback Loop — 실패를 고치게 만드는 반복 구조](./07-feedback-loop.md)
 - [Approval Gate — 사람 승인이 필요한 지점 설계하기](./08-approval-gate.md)
 - **Observability — Agent 작업을 추적하고 재현하기 (현재 글)**
-- [Production Harness — 운영 가능한 Agent 작업 환경 만들기](./10-production-harness.md)
+- Production Harness — 운영 가능한 Agent 작업 환경 만들기 (예정)
 
 <!-- toc:end -->
+
 ## 참고 자료
 ### 공식 문서
 
@@ -263,4 +265,5 @@ Observability는 에이전트가 무엇을 했는지 보는 기능이 아니라,
 
 - [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
-Tags: AI Agent, Harness, Observability, Tracing
+
+Tags: AI Agent, Harness, Production, Reliability

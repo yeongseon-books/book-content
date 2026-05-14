@@ -247,7 +247,7 @@ tool use는 agent를 실세계 시스템과 연결하는 첫 번째 계층입니
 다음 글에서는 이 tool use를 더 큰 작업 흐름 안에 넣는 방법을 다룹니다. 결국 agent는 도구 하나를 부르는 시스템이 아니라, 여러 단계를 어떤 순서와 조건으로 엮을지 설계하는 시스템이기 때문입니다.
 
 <!-- toc:begin -->
-## AI Agent 101 시리즈
+## 시리즈 목차
 
 - [AI Agent란 무엇인가?](./01-what-is-an-ai-agent.md)
 - [컨텍스트 엔지니어링](./02-context-engineering.md)
@@ -276,4 +276,4 @@ tool use는 agent를 실세계 시스템과 연결하는 첫 번째 계층입니
 - [LangGraph 101 - Tool Calling](../../langgraph-101/ko/04-tool-calling-agent.md)
 - [Prompt Engineering 101 - 구조화 출력](../../multimodal-ai-101/ko/05-multimodal-rag.md)
 
-Tags: AI Agent, Tool Use, Function Calling, Integration
+Tags: AI Agent, LLM, Tool Use, Python
