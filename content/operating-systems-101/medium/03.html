@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Scheduling</h1>
-<p>This is post 3 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Hundreds of processes are alive on your machine. How does the OS decide who gets the next millisecond of CPU?</p>
-<blockquote>
-<p>The scheduler is one of the most frequently invoked parts of the OS. Every few milliseconds it picks "who runs next?" and that choice shapes responsiveness, throughput, fairness, and power. This article walks through why a scheduler exists, the policies it uses, and why context switch cost keeps showing up in performance discussions.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>On a busy machine, many tasks are ready to run at once, but the number of CPU cores is fixed. The operating system has to decide who gets the next slice of CPU time, and that decision shows up as latency, throughput, fairness, and power draw.</p>
+<p>That is why scheduler behavior matters long before you start reading kernel code. It explains why a system feels sluggish, why identical runs vary, and why container CPU limits can make software feel uneven.</p>
+<p>This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The scheduler's goals and the trade-offs between them</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>The scheduler picks a runnable task from a queue and puts it on the CPU. It is invoked again whenever a task blocks on I/O, exhausts its time slice, or is preempted by a higher-priority task waking up.</p>
 </blockquote>
+<p><strong>How tasks move through the scheduler</strong></p>
+<p><img alt="How tasks move through the scheduler" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png"><br>
+<em>The scheduler keeps moving work between runnable and blocked states while picking the next CPU owner.</em></p>
 <pre><code class="language-text">Runnable queue        Running              Blocked (waiting I/O)
 +--------------+      +----------+         +-------------------+
 | T1, T3, T5   | ---&gt; |   T2     |         |  T4 (read)        |
