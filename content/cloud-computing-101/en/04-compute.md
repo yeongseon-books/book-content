@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 4
 title: Compute
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - AutoScaling
   - DevOps
 seo_description: VMs, containers, and serverless — when to pick which, plus Auto Scaling and pricing tradeoffs, with practical EC2 boto3 examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Compute
 
-> Cloud Computing 101 series (4/10)
+Compute is where cloud architecture becomes tangible. The same application can run on a VM, inside a container platform, or in a serverless runtime, but those choices produce very different bills, scaling behavior, and operational load.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Among VMs, containers, and Lambda, *when do you pick which*?
-
-> *Compute is anything that runs your code — VM vs container vs serverless trades control for automation.*
+That is why strong teams do not start with a favorite platform. They start with workload fit: how long the code runs, how bursty traffic is, how much control the runtime needs, and how much human operations time the team can afford.
 
 This is post 4 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll compare VMs, containers, serverless, and bare metal, then connect those choices to Auto Scaling and pricing models.
 
-## What You Will Learn
+> Compute choices trade control for automation. The right answer depends less on fashion and more on the failure modes and operating rhythm of the workload.
+
+## Questions This Chapter Answers
 
 - The four compute styles (VM / container / serverless / bare metal)
 - What Auto Scaling actually does
@@ -48,13 +46,9 @@ Compute choice drives roughly 60% of your bill and most of your operational pain
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Bare["bare metal"] --> VM["vm"]
-    VM --> Container["container"]
-    Container --> Serverless["serverless"]
-    Serverless --> Code["code"]
-```
+![The compute spectrum shifts from maximum control to maximum platform automation](../../../assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
+
+*The compute spectrum shifts from maximum control to maximum platform automation*
 
 ## Key Terms
 
@@ -120,6 +114,26 @@ print(parse_type("m5.large"))
 - The AMI is the VM's birth photo.
 - `terminate` is irreversible.
 - Instance type is `family.size`.
+
+## How to Verify This Example
+
+With compute resources, the useful thing to observe is state transition. Launch, inspect, and terminate are different operating events, and understanding their sequence makes later Auto Scaling and cost discussions much easier to follow.
+
+```bash
+aws ec2 describe-instances --instance-ids i-xxxxxxxx --query 'Reservations[0].Instances[0].State.Name'
+```
+
+**Expected output:**
+
+- Right after launch you should see `pending`, then later `running`.
+- After termination you should see `shutting-down` followed by `terminated`.
+- If you cannot read these transitions, Auto Scaling events will stay mysterious and troubleshooting will stay slow.
+
+### Where teams usually get stuck
+
+- Stopped and terminated are not the same operational state or cost profile.
+- Spot capacity belongs on interruption-tolerant work, not on stateful data tiers.
+- Instance types are starting hypotheses. Metrics have to confirm whether the fit is still real.
 
 ## Five Common Mistakes
 
