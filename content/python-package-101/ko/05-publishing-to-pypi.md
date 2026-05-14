@@ -17,13 +17,15 @@ tags:
 - Publishing
 - TestPyPI
 - Distribution
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드된 패키지를 PyPI에 업로드하는 도구입니다.
 ---
 
 # PyPI에 배포하기 — TestPyPI부터 실제 배포까지
 
-패키지를 빌드했다면 이제 다른 사람이 실제로 설치할 수 있는 저장소에 올려야 합니다. 이 단계부터는 단순한 로컬 연습을 넘어 배포 안정성, 인증 정보 관리, 버전 고정 같은 운영 감각이 중요해집니다. 이 글은 Python Package 101 시리즈의 5번째 글입니다. 여기서는 TestPyPI와 PyPI의 역할 차이, `twine` 업로드 흐름, 그리고 배포 실패를 피하기 위한 기본 원칙을 정리하겠습니다.
+패키지를 빌드했다면 이제 다른 사람이 실제로 설치할 수 있는 저장소에 올려야 합니다. 이 단계부터는 단순한 로컬 연습을 넘어 배포 안정성, 인증 정보 관리, 버전 고정 같은 운영 감각이 중요해집니다.
+
+이 글은 Python Package 101 시리즈의 5번째 글입니다. 여기서는 TestPyPI와 PyPI의 역할 차이, `twine` 업로드 흐름, 그리고 배포 실패를 피하기 위한 기본 원칙을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -62,6 +64,9 @@ python -m build → dist/*.whl, dist/*.tar.gz
                      ↓
           twine upload dist/*          (production)
 ```
+
+![멘탈 모델](../../../assets/python-package-101/05/05-01-mental-model.ko.png)
+*빌드부터 TestPyPI 검증, 실제 PyPI 배포까지의 운영 흐름*
 
 ## 핵심 개념
 
@@ -250,4 +255,4 @@ twine upload dist/*    # upload only the current version
 - [twine documentation](https://twine.readthedocs.io/)
 - [TestPyPI](https://test.pypi.org/)
 
-Tags: Python, PyPI, twine, Publishing, TestPyPI, Distribution
+Tags: Python, Packaging, PyPI, pyproject.toml

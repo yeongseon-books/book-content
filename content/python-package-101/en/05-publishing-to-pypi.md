@@ -3,7 +3,7 @@ title: Publishing to PyPI — from TestPyPI to production
 series: python-package-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - Publishing
 - TestPyPI
 - Distribution
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: PyPI is the app store for Python packages and twine is the tool that
   uploads your built package to PyPI.
 ---
 
 # Publishing to PyPI — from TestPyPI to production
 
-This is post 5 in the Python Package 101 series.
+Publishing is where packaging shifts from local correctness to operational discipline. Account setup, token handling, staging uploads, and install verification all matter before you expose a package to real users.
 
-> Python Package 101 series (5/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 5 in the Python Package 101 series. Here we separate TestPyPI from PyPI, walk through the `twine` upload flow, and build a safer release habit around staging-first validation.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 5 in the Python Package 101 series.
 - Can you modify a version after uploading it?
 
 > PyPI is the app store for Python packages and twine is the tool that uploads your built package to PyPI.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -73,6 +67,9 @@ python -m build → dist/*.whl, dist/*.tar.gz
                      ↓
           twine upload dist/*          (production)
 ```
+
+![Mental Model](../../../assets/python-package-101/05/05-01-mental-model.en.png)
+*The release path from build output to TestPyPI validation and final PyPI publishing*
 
 ## Core Concepts
 
@@ -239,7 +236,7 @@ Package names are hard to change once chosen. Pick a name that is intuitive, doe
 The next post covers **versioning and releases** — SemVer, Git tags, and CHANGELOG.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -261,4 +258,4 @@ The next post covers **versioning and releases** — SemVer, Git tags, and CHANG
 - [twine documentation](https://twine.readthedocs.io/)
 - [TestPyPI](https://test.pypi.org/)
 
-Tags: Python, PyPI, twine, Publishing, TestPyPI, Distribution
+Tags: Python, Packaging, PyPI, pyproject.toml
