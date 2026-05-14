@@ -18,7 +18,7 @@ tags:
 - blue-green
 - ordering
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: A migration always ships "before the code, and with broader compatibility
   than the code".
 ---
@@ -46,6 +46,11 @@ Most production schema incidents are caused by code and schema being deployed in
 > A migration always ships **"before the code, and with broader compatibility than the code"**. When you add a column the column exists first; when you drop a column the code stops using it first. Memorize those two directions and most deploy incidents disappear.
 
 If git is your analogy, a migration is a PR that lands earlier than the code PR, and a drop is a PR that lands later than the "stop using" PR.
+
+### Diagram: the blue/green compatibility window
+
+![Diagram: the blue/green compatibility window](../../../assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
+*The expanded schema must stay compatible with both versions throughout the overlap window.*
 
 ## Core concepts
 
@@ -196,6 +201,17 @@ stages:
 
 Force `migrate` to always run before `deploy`.
 
+## Verification routine
+
+```bash
+python3 - <<'PY'
+print('migrate -> deploy -> smoke-test')
+print('assert no NULL rows before NOT NULL tighten')
+PY
+```
+
+**Expected output:** your pipeline always migrates before deploy, and the tightening step is blocked until the NULL-row assertion is clean.
+
 ## Common mistakes
 
 - **Code-first deploy.** If the code assumes the new schema first, you fail immediately.
@@ -235,14 +251,28 @@ Deploy ordering is an operations policy concern, not an Alembic feature. Keep th
 
 The next post covers real team workflows: PR conventions, CI checks, and operational automation.
 
-## References
-
-- Alembic: Cookbook — https://alembic.sqlalchemy.org/en/latest/cookbook.html
-- Martin Fowler: Blue Green Deployment — https://martinfowler.com/bliki/BlueGreenDeployment.html
-- "Refactoring Databases" by Scott Ambler & Pramod Sadalage
-- Kubernetes: Init Containers — https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- [Downgrade strategy: when to write it for real and when to forbid it](./08-downgrade-strategy.md)
+- **Deploy ordering and blue/green: synchronizing schema and application code safely (current)**
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, deploy, blue-green, ordering, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)
+- [Martin Fowler: Blue Green Deployment](https://martinfowler.com/bliki/BlueGreenDeployment.html)
+- "Refactoring Databases" by Scott Ambler & Pramod Sadalage
+- [Kubernetes: Init Containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
+
+Tags: Python, Alembic, SQLAlchemy, Migration
