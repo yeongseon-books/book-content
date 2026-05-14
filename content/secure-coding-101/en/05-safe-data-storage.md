@@ -17,24 +17,20 @@ tags:
   - SecureCoding
   - Cryptography
 seo_description: At-rest encryption, transport encryption, sensitive data separation, and a five-step playbook for safe data storage.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Safe Data Storage
 
+The moment an application stores sensitive data, it stops being only a feature system and becomes a custody system as well. From the user's perspective, it may be a simple signup flow. From the operator's perspective, it may already include password hashes, address history, export files, and backups that become extremely expensive the moment they leak.
+
 This is post 5 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (5/10)
+Here, we will look past the usual shorthand of "turn on disk encryption" and treat storage security as a chain: data classification, transport protection, storage encryption, key separation, and backup handling. That is the level where real incident cost is determined.
 
-<!-- a-grade-intro:begin -->
+> Secure storage starts before encryption. First decide what not to collect, then separate what you keep, and finally protect the transport, storage, and backup path as one system.
 
-**Core question**: If somebody walks off with one of *our disks*, how much of the data inside is *readable*?
-
-> *Data must be protected *in motion* and *at rest*. If only one is safe, *everything is at risk*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The difference between *at-rest* and *in-transit*
 - Classifying *PII* and *sensitive data*
@@ -50,13 +46,9 @@ Both legally (GDPR, regional privacy laws) and in incident cost, *sensitive data
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["App"] -->|TLS| DB["Database"]
-    DB -->|At-rest encryption| Disk["Disk"]
-    App --> KMS["KMS (key management)"]
-```
+![The safe storage path across the application, database, and KMS](../../../assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png)
 
+*The safe storage path across the application, database, and KMS*
 ## Key Terms
 
 - **PII**: information that *identifies* a person.
@@ -173,5 +165,6 @@ Encrypted data is useless if the *keys leak*. Next we look at *secret and key ma
 - [AWS KMS — Envelope Encryption](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html)
 - [Google Cloud KMS](https://cloud.google.com/kms/docs)
 - [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
+- [NIST SP 800-57 Part 1 Rev. 5 — Key Management](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final)
 
 Tags: Encryption, DataProtection, PII, SecureCoding, Cryptography

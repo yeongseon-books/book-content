@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Safe Data Storage</h1>
+<p>The moment an application stores sensitive data, it stops being only a feature system and becomes a custody system as well. From the user's perspective, it may be a simple signup flow. From the operator's perspective, it may already include password hashes, address history, export files, and backups that become extremely expensive the moment they leak.</p>
 <p>This is post 5 in the Secure Coding 101 series.</p>
+<p>Here, we will look past the usual shorthand of "turn on disk encryption" and treat storage security as a chain: data classification, transport protection, storage encryption, key separation, and backup handling. That is the level where real incident cost is determined.</p>
 <blockquote>
-<p>Secure Coding 101 series (5/10)</p>
+<p>Secure storage starts before encryption. First decide what not to collect, then separate what you keep, and finally protect the transport, storage, and backup path as one system.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If somebody walks off with one of <em>our disks</em>, how much of the data inside is <em>readable</em>?</p>
-<blockquote>
-<p><em>Data must be protected </em>in motion<em> and </em>at rest<em>. If only one is safe, </em>everything is at risk<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The difference between <em>at-rest</em> and <em>in-transit</em></li>
 <li>Classifying <em>PII</em> and <em>sensitive data</em></li>
@@ -80,11 +74,8 @@
 <p><em>Collect less, separate more, lock harder.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;App&quot;] --&gt;|TLS| DB[&quot;Database&quot;]
-    DB --&gt;|At-rest encryption| Disk[&quot;Disk&quot;]
-    App --&gt; KMS[&quot;KMS (key management)&quot;]
-</code></pre>
+<p><img alt="The safe storage path across the application, database, and KMS" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>The safe storage path across the application, database, and KMS</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PII</strong>: information that <em>identifies</em> a person.</li>
@@ -177,6 +168,7 @@ gpg --symmetric --cipher-algo AES256 backup.sql
 <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html">AWS KMS — Envelope Encryption</a></li>
 <li><a href="https://cloud.google.com/kms/docs">Google Cloud KMS</a></li>
 <li><a href="https://developer.hashicorp.com/vault/docs">HashiCorp Vault</a></li>
+<li><a href="https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final">NIST SP 800-57 Part 1 Rev. 5 — Key Management</a></li>
 </ul>
 <p class="tags-line">Tags: Encryption, DataProtection, PII, SecureCoding, Cryptography</p>
 </body>

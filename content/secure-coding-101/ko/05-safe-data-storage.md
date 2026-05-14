@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - Cryptography
 seo_description: At-rest 암호화, 전송 암호화, 민감정보 분리 그리고 안전한 저장 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 안전한 데이터 저장
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    App["App"] -->|TLS| DB["Database"]
-    DB -->|At-rest encryption| Disk["Disk"]
-    App --> KMS["KMS (key management)"]
-```
+![애플리케이션, 데이터베이스, KMS로 이어지는 안전한 저장 경로](../../../assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
 
+*애플리케이션, 데이터베이스, KMS로 이어지는 안전한 저장 경로*
 이 구조에서 데이터는 애플리케이션과 데이터베이스 사이를 이동할 때도 보호돼야 하고, 데이터베이스가 디스크에 저장할 때도 보호돼야 합니다. 동시에 암호화 키는 데이터와 분리된 KMS에서 관리돼야 진짜 분리 효과가 생깁니다.
 
 ## 핵심 용어
@@ -186,5 +182,6 @@ gpg --symmetric --cipher-algo AES256 backup.sql
 - [AWS KMS — Envelope Encryption](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html)
 - [Google Cloud KMS](https://cloud.google.com/kms/docs)
 - [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
+- [NIST SP 800-57 Part 1 Rev. 5 — Key Management](https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final)
 
 Tags: Encryption, DataProtection, PII, SecureCoding, Cryptography
