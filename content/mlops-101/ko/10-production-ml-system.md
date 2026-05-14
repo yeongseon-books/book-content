@@ -54,19 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Data["data versioning"] --> Pipe["training pipeline"]
-    Pipe --> Reg["model registry"]
-    Reg --> Deploy["deployment"]
-    Deploy --> Mon["monitoring"]
-    Mon --> Drift["drift"]
-    Drift --> Retrain["retraining"]
-    Retrain --> Pipe
-    Feat["feature store"] --> Pipe
-    Feat --> Deploy
-```
+![운영 가능한 ML 시스템 루프](../../../assets/mlops-101/10/10-01-see-the-loop-first.ko.png)
 
+*운영 가능한 ML 시스템 루프*
 이 그림은 시리즈 전체를 하나의 루프로 압축한 모습입니다. 데이터 버전 관리와 피처 스토어가 입력 일관성을 잡고, 학습 파이프라인이 모델을 만들고, 모델 레지스트리가 버전을 관리하고, 배포와 모니터링이 운영 상태를 관찰합니다. 드리프트와 재학습은 다시 학습 루프로 되돌아가게 만듭니다.
 
 중요한 것은 이 구조가 직선이 아니라 순환 구조라는 사실입니다. 운영 중 나온 신호가 다시 학습으로 들어와야 MLOps가 완성됩니다.

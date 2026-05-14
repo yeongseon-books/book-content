@@ -2,7 +2,7 @@
 series: mlops-101
 episode: 10
 title: Building a Production ML System
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,50 +16,44 @@ tags:
   - Production
   - DataScience
   - Pipeline
-seo_description: A blueprint that wires data, training, deployment, monitoring, and retraining into one production ML system, with a maturity checklist.
-last_reviewed: '2026-05-04'
+seo_description: Connect data, training, deployment, monitoring, drift detection, and retraining into one closed-loop production ML system.
+last_reviewed: '2026-05-15'
 ---
 
 # Building a Production ML System
 
-> MLOps 101 series (10/10)
+Earlier in this series, we looked at experiment tracking, data versioning, training pipelines, deployment, monitoring, drift detection, retraining, and feature stores one by one. But knowing the parts individually is very different from wiring them into one operating system.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you assemble the *nine pieces* from this series into *one running production system*?
-
-> *A production ML system runs the loop of data → training → deployment → monitoring → retraining automatically.*
-
-<!-- a-grade-intro:end -->
+This is where many real teams struggle. Knowing the tool names does not create a system. Data has to move into training on a clear path, trained artifacts need an explicit promotion rule, and when something degrades in production the team needs a known response path.
 
 This is the final post in the MLOps 101 series.
 
-## What You Will Learn
+Here, we will connect the previous nine pieces into one closed operational loop and end with a practical maturity checklist.
 
-- The full system blueprint
-- How nine components connect
-- Runbooks and on-call
-- Maturity stages
-- Five common pitfalls
+## What This Post Answers
+
+- How do the earlier nine components connect in a real system?
+- Why is tool knowledge alone not enough to create an operating model?
+- How do runbooks, on-call, and SLI/SLOs fit into the technical path?
+- What is a practical way to assess team maturity?
+- In what order should a team improve without absorbing too much complexity at once?
+
+> Mental model: a production ML system is not a box of tools. It is a closed loop where data → training → deployment → observation → retraining are connected and each stage has a clear owner.
 
 ## Why It Matters
 
-Knowing each tool individually does not give you a system. The wiring and the boundaries are the real work.
+Building one good model and building an operable system are different jobs. The first is closer to experimentation. The second is closer to boundary design and recovery design. That is why individual tool knowledge is never enough.
 
-## Concept at a Glance
+An operable system needs three things at the same time. Data and model flow have to connect automatically, observation has to trigger response when signals go abnormal, and the team has to distinguish between what automation should do and what still needs human judgment.
 
-```mermaid
-flowchart LR
-    Data["data versioning"] --> Pipe["training pipeline"]
-    Pipe --> Reg["model registry"]
-    Reg --> Deploy["deployment"]
-    Deploy --> Mon["monitoring"]
-    Mon --> Drift["drift"]
-    Drift --> Retrain["retraining"]
-    Retrain --> Pipe
-    Feat["feature store"] --> Pipe
-    Feat --> Deploy
-```
+## See the Loop First
+
+![See the Loop First](../../../assets/mlops-101/10/10-01-see-the-loop-first.en.png)
+
+*See the Loop First*
+This diagram compresses the whole series into one loop. Data versioning and the feature store stabilize the inputs, the training pipeline produces a candidate model, the registry holds the version, deployment puts it into production, monitoring observes it, and drift plus retraining feed the next cycle.
+
+The key detail is that this is a loop, not a line. Production signals have to flow back into training for MLOps to be complete.
 
 ## Key Terms
 
