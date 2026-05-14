@@ -17,44 +17,38 @@ tags:
   - Release
   - Risk
 seo_description: A beginner-friendly guide to error budgets covering the definition, calculation, burn-rate alerting, release decisions, and operational policy
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Error Budget
 
-This is post 4 in the SRE 101 series.
+As soon as a team writes down an SLO, the next practical question shows up: how much failure are we willing to tolerate while we keep shipping changes? Without a clear answer, every incident becomes a fresh argument between “move faster” and “slow everything down.”
 
-> SRE 101 series (4/10)
+The error budget is useful because it turns that argument into policy. It gives the team a shared number for how much reliability risk remains, and that number should change release behavior before emotions do.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
 
-**Core question**: How do you decide *how much failure* is *acceptable*?
+## Questions this chapter answers
 
-> An *error budget* is the *allowed distance* between *goal* and *reality*.
+- Why does an error budget become the common language between speed and stability?
+- How do you calculate the allowed failure from an SLO target?
+- Why do total budget spend and burn rate answer different operating questions?
+- What should change when the budget is disappearing too quickly?
+- Why does the budget stop helping if teams use it as a blame mechanism?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+Speed and stability are not enemies, but they do need a shared decision rule. Otherwise every outage triggers a different reaction depending on who is loudest in the room.
 
-- The *definition* of an *error budget*
-- How to *calculate* it
-- *Burn-rate* alerting
-- Its relationship to *release decisions*
-- The cultural effect on a *team*
+With a budget, the discussion becomes more precise. If the service still has room, the team can take measured risk. If the budget is burning too fast, stability work moves to the front of the queue.
 
-## Why It Matters
+> An error budget is the allowed distance between the reliability goal and actual behavior.
 
-*Speed* and *stability* are not enemies — a *budget* mediates them.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/04/04-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    SLO["SLO target"] --> Budget["error budget"]
-    Actual["actual errors"] --> Spent["spent"]
-    Spent --> Decision["release decision"]
-```
-
+*An error budget matters only when actual failure spend changes release behavior.*
 ## Key Terms
 
 - **error budget**: the *allowed amount of failure*.
