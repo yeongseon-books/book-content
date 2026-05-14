@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Visualization</h1>
+<p>Charts are not the decorative end of analysis. They are the moment when your conclusions become fast enough for other people to consume. A good chart compresses a page of explanation into one glance. A bad chart makes a bad decision look reasonable.</p>
+<p>That is why visualization is really about judgment, not software. The core skill is picking a visual form that matches the message, then removing the distortions that exaggerate or hide what the data is actually saying.</p>
+<p>This is post 6 in the Data Science 101 series. In this chapter, we connect common analytical messages to chart choices, and we treat axes, color, labels, and annotations as decision-support tools rather than styling details.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>How do you choose a chart from the message instead of from habit?</li>
+<li>Which chart choices most often create misleading comparisons or trends?</li>
+<li>Why do axis scale, labels, and annotations change the decision a chart supports?</li>
+<li>How can one chart remain readable and honest for more than one audience?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (6/10)</p>
+<p>The right chart is the one that makes the intended decision easier without exaggerating the pattern.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Which chart</em> fits <em>which message</em>, and how do you keep the picture <em>honest</em>?</p>
-<blockquote>
-<p><em>One good picture beats </em>three pages<em> of writing.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 6 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A mapping from <em>5 messages</em> to <em>5 charts</em></li>
@@ -80,13 +81,8 @@
 <p><em>Visualization is the </em>last line<em> of an analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Dist[&quot;Distribution&quot;] --&gt; Hist[&quot;Histogram / Box&quot;]
-    Comp[&quot;Comparison&quot;] --&gt; Bar[&quot;Bar Chart&quot;]
-    Trend[&quot;Trend&quot;] --&gt; Line[&quot;Line Chart&quot;]
-    Rel[&quot;Relation&quot;] --&gt; Scatter[&quot;Scatter&quot;]
-    Part[&quot;Part of Whole&quot;] --&gt; Stack[&quot;Stacked Bar&quot;]
-</code></pre>
+<p><img alt="A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Encoding</strong>: mapping data to <em>position, length, color</em>.</li>
@@ -132,6 +128,7 @@ sns.relplot(
 ax.axvline(pd.Timestamp(&quot;2026-04-01&quot;), color=&quot;red&quot;, linestyle=&quot;--&quot;, label=&quot;campaign&quot;)
 ax.legend()
 </code></pre>
+<p><strong>Expected output:</strong> a first-pass chart choice tied to the message, plus the annotation points needed to keep the chart honest.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>message-to-chart</em> mapping comes <em>first</em>.</li>
