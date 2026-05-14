@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 3
 title: Sets and Functions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,41 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Sets and Functions
 
-> Math for CS 101 series (3/10)
+When you learn data structures, you usually start with lists, dictionaries, mapping, and filtering. Step back a little, though, and two simpler ideas sit underneath all of them: sets tell you what belongs, and functions tell you how one value becomes another.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What lies at the *foundation* of *data structures*?
-
-> A *set* is a *collection of elements*; a *function* is a *rule* from *input* to *output*.
-
-<!-- a-grade-intro:end -->
+In real systems these two ideas rarely stay separate. Deduplication, permission checks, feature preprocessing, key mapping, and serialization pipelines all become easier to reason about once you can describe them as set boundaries plus transformation rules.
 
 This is post 3 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we use sets and functions as the foundation for data modeling and transformation, not just as definitions to memorize.
 
-- The definition of a *set*
-- *Union*, *intersection*, *difference*
-- The definition of a *function*
-- *Injective*, *surjective*, *bijective*
-- *Composition* of functions
+## Questions this chapter answers
+
+- Why are sets such a useful foundation for data structures and validation?
+- How do union, intersection, and difference show up in ordinary code?
+- What separates a function from a more general relation?
+- Why do injective, surjective, and bijective mappings matter in practice?
+- How does function composition resemble a production data pipeline?
+
+> Sets make the boundary of allowed values explicit. Functions make the transformation from input to output explicit. Once those two axes are clear, both code and design decisions get easier to defend.
 
 ## Why It Matters
 
-Python's *set*, *dict*, *map*, and *filter* are all reinterpretations of *sets and functions*.
+Python's `set`, `dict`, `map`, and `filter` already carry the mental model of sets and functions. Deduplication is a set operation. Data transformation is often a chain of functions. Permission checks usually become set membership or set intersection once you make the model explicit.
+
+That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Set["set"] --> Union["union"]
-    Set --> Inter["intersection"]
-    Set --> Diff["difference"]
-    Func["function"] --> Inj["injective"]
-    Func --> Sur["surjective"]
-    Func --> Bij["bijective"]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png)
+*Sets define the boundary of values, while functions define the rule that moves values through the system.*
 
 ## Key Terms
 
@@ -149,7 +142,9 @@ def compose(f, g):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *graphs*.
+Sets clarify the shape of data, and functions clarify the shape of change. Together they provide a compact vocabulary for boundary checks, deterministic transformations, and reversible mappings.
+
+Next, we broaden that structural view into graphs, where relationships between objects become the main story.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -170,5 +165,6 @@ Next, we cover *graphs*.
 - [Functions - Khan Academy](https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:functions)
 - [Discrete Math - Rosen](https://en.wikipedia.org/wiki/Discrete_Mathematics_and_Its_Applications)
 - [Python Set Operations](https://docs.python.org/3/tutorial/datastructures.html#sets)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)
 
 Tags: Math, Sets, Functions, Foundations, Beginner
