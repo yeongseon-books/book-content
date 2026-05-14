@@ -17,7 +17,7 @@ tags:
   - Posterior
   - Beginner
 seo_description: 데이터로 가설 신뢰도를 갱신하는 베이즈 정리의 수식 의미와 사전확률의 전환 메커니즘을 파악하여 추론 능력을 강화합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 베이즈 정리
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Prior["Prior P(H)"] --> Update["Likelihood P(D|H)"]
-    Update --> Post["Posterior P(H|D)"]
-    Post --> NewPrior["Becomes new prior"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/04/04-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
