@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Blog vs Documentation</h1>
-<p>This is post 9 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why must <em>blogs</em> and <em>official docs</em> not be <em>mixed up</em>?</p>
-<blockquote>
-<p>Their <em>lifespan</em> and <em>ownership</em> differ.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>A postmortem article can be excellent context and still be the wrong place to store today's official rollout steps. A reference page can be correct and still fail to explain why the team made a controversial design choice. Blogs and docs both help engineering teams, but they do different jobs.</p>
+<p>Strong teams do not force one format to replace the other. They separate ownership, freshness rules, and publication goals, then connect the two with deliberate links.</p>
+<p>This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The four quadrants of <em>Diátaxis</em></li>
 <li>The <em>lifespan</em> of blog vs docs</li>
@@ -76,13 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>When <em>kinds of writing</em> mix up, the <em>reader</em> gets <em>lost</em>.</p>
+<blockquote>
+<p>Mental model: blogs preserve context and interpretation, while docs preserve the current truth.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Tut[Tutorial] --&gt; Doc[Documentation]
-    HT[How-to] --&gt; Doc
-    Ref[Reference] --&gt; Doc
-    Exp[Explanation] --&gt; Blog[Blog]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Diátaxis</strong>: A <em>four quadrant</em> documentation model.</li>
@@ -94,6 +84,23 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: A <em>blog post</em> gets cited as <em>official documentation</em>.</p>
 <p><strong>After</strong>: <em>Blogs</em> hold <em>experience</em>; <em>docs</em> hold <em>truth</em>.</p>
+<h2>Separate ownership and freshness before channels</h2>
+<p><strong>Main owner</strong><br>
+- Blog: Individual author or editorial team<br>
+- Documentation: Product or platform owner</p>
+<p><strong>Freshness rule</strong><br>
+- Blog: Accurate at the time of writing<br>
+- Documentation: Kept current as the source of truth</p>
+<p><strong>Reader expectation</strong><br>
+- Blog: Context, experience, interpretation<br>
+- Documentation: Procedure, policy, reference</p>
+<p><strong>Update style</strong><br>
+- Blog: Revised when needed<br>
+- Documentation: Updated alongside code or process changes</p>
+<p><strong>Link direction</strong><br>
+- Blog: Points readers to canonical docs<br>
+- Documentation: Links out to background and rationale</p>
+<p>The difference matters operationally more than stylistically. A deployment blog post can explain trade-offs well, while the official document must keep today's commands, version limits, and rollout order correct. Mixing those jobs usually hurts both.</p>
 <h2>Hands-on: Mapping the Quadrants</h2>
 <p><strong>Step 1 — Tutorial</strong></p>
 <pre><code class="language-python">tutorial = &quot;First-time learning&quot;
