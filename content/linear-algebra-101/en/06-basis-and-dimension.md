@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 6
 title: Basis and Dimension
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to basis and dimension — linear independence, rank, and choosing axes for a vector space, with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Basis and Dimension
 
-> Linear Algebra 101 series (6/10)
+As soon as you go one step deeper into linear algebra, a natural question appears: why can one space be described by multiple sets of axes, and how many axes do you really need? Basis and dimension answer that question. Rank, PCA, and rank-deficient models all come back here.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.
 
-**Core question**: What determines *how many vectors* you need to *describe a space*?
+## Questions This Post Answers
 
-> *A basis is a *set of axes*; the dimension is the *count of those axes*.*
+- What does it mean for a set of vectors to describe a space completely?
+- Why is linear independence the key condition behind a basis?
+- How are dimension and rank connected?
+- What does it mean for the same space to admit multiple bases?
 
-<!-- a-grade-intro:end -->
-
-This is post 6 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- The definition of *linear independence*
-- The relationship between *basis* and *dimension*
-- *Rank* and the *null space*
-- A 5-step hands-on
-- Five common pitfalls
+> A basis is a choice of axes for a space, and dimension is the answer to how many axes are required. Separating those ideas makes the geometry far easier to read.
 
 ## Why It Matters
 
-*Singular matrices*, *overfitting*, *PCA's principal axes* — all are explained by *basis and dimension*.
+Multicollinearity, dimensionality reduction, principal components, and singular matrices all depend on these concepts. This is not an isolated definitions chapter. It feeds directly into model stability and data representation quality.
 
-> *Dimension is the count; basis is the choice of axes.*
+In practice, some features add almost no new information because they are nearly explained by others. Good basis choices can make the same data easier to compress, inspect, and reason about. Basis and dimension are tools for reading the real complexity of a space.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Vecs["Set of vectors"] --> Indep["Linearly independent?"]
-    Indep --> Basis["Basis"]
-    Basis --> Dim["Dimension"]
-    Dim --> Rank["Rank of matrix"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
+
+*This diagram condenses the flow from linear independence to basis, dimension, and matrix rank.*
 
 ## Key Terms
 
@@ -114,6 +103,12 @@ v = np.array([3.0, 4.0])
 coords = np.linalg.solve(B, v)
 print("coords in {b1,b2}:", coords)
 ```
+
+## Read One Numeric Pass
+
+- The standard basis stacked into a matrix has rank `2`, which means it spans the full 2D plane.
+- The pair `[1, 2]` and `[2, 4]` has rank `1`, so the second vector adds no new direction.
+- Expressing `[3, 4]` in the basis `{[1,1], [1,-1]}` gives coordinates `[3.5, -0.5]`. Same vector, different coordinate system.
 
 ## What to Notice in This Code
 
@@ -173,9 +168,9 @@ A basis is a *choice of axes*; dimension is *their count*. The next post covers 
 
 ## References
 
-- [3Blue1Brown — Basis vectors](https://www.3blue1brown.com/lessons/span)
-- [Wikipedia — Basis (linear algebra)](https://en.wikipedia.org/wiki/Basis_(linear_algebra))
-- [Wikipedia — Rank (linear algebra)](https://en.wikipedia.org/wiki/Rank_(linear_algebra))
+- [3Blue1Brown — Span, basis, and linear independence](https://www.3blue1brown.com/lessons/span)
+- [MIT OpenCourseWare — Basis and dimension](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — matrix_rank](https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html)
+- [Khan Academy — Linear independence and basis](https://www.khanacademy.org/math/linear-algebra/vectors-and-spaces/linear-independence-basis)
 
 Tags: LinearAlgebra, Basis, Dimension, DataScience, Beginner
