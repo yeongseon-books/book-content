@@ -17,7 +17,7 @@ tags:
   - Binary Tree
   - BST
 seo_description: Implement binary trees and binary search trees in Python and practice traversal algorithms.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Trees and Binary Trees
@@ -67,6 +67,12 @@ Binary Search Tree (BST):
     /   \      \
   [1]   [6]   [14]
 ```
+
+## Tree Shape at a Glance
+
+![Tree Shape at a Glance](../../../assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)
+
+*A simple tree shape and the BST ordering pattern from root to leaves*
 
 ## Key Concepts
 
@@ -248,6 +254,10 @@ print(f"node count: {count_nodes(bst.root)}")   # 6
 - Level-order traversal uses a queue (deque) — this is the BFS pattern
 - BST search discards half the tree at each step, achieving O(log n)
 
+That O(log n) story holds only while the tree stays reasonably balanced. Insert already-sorted data into a naive BST and it degenerates into a linked-list-shaped structure, pushing search and insert back toward O(n). Production systems avoid that failure mode with self-balancing trees or B-Tree variants.
+
+There is also a Python-specific constraint: recursion depth. Recursive traversal is elegant, but very deep trees can trigger RecursionError and large node graphs can add heavy object overhead. In production, the right question is not just "is a tree correct?" but also "how deep can it get, and who maintains balance?"
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -305,9 +315,9 @@ Trees represent hierarchical structures, and BSTs search sorted data in O(log n)
 
 ## References
 
+- [Runestone Academy — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)
+- [Python Docs — bisect](https://docs.python.org/3/library/bisect.html)
+- [SQLite File Format — B-Tree Pages](https://www.sqlite.org/fileformat.html#b_tree_pages)
 - [Real Python — Binary Trees in Python](https://realpython.com/binary-search-python/)
-- [GeeksforGeeks — Binary Search Tree](https://www.geeksforgeeks.org/binary-search-tree-data-structure/)
-- [Visualgo — Binary Search Tree Visualization](https://visualgo.net/en/bst)
-- [Problem Solving with Algorithms — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)
 
 Tags: Python, Data Structures, Tree, Binary Tree, BST

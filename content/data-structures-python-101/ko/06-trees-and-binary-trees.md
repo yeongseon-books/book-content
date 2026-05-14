@@ -17,7 +17,7 @@ tags:
   - Binary Tree
   - BST
 seo_description: 트리와 이진 탐색 트리(BST)의 계층 구조, 순회 방법, 탐색 원리를 Python 예제로 설명하고 재귀적 사고방식을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 트리와 이진 트리
@@ -59,6 +59,12 @@ Binary Search Tree (BST):
     /   \      \
   [1]   [6]   [14]
 ```
+
+## 트리 구조를 그림으로 보면
+
+![트리 구조를 그림으로 보면](../../../assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.ko.png)
+
+*루트에서 리프까지 갈라지는 트리와 BST의 기본 형태를 보여 주는 그림*
 
 ## 핵심 개념
 
@@ -244,6 +250,10 @@ print(f"node count: {count_nodes(bst.root)}")   # 6
 
 트리는 구현 세부사항보다 사고방식이 중요합니다. “현재 노드를 처리하고, 왼쪽과 오른쪽 서브트리에 같은 규칙을 적용한다”라는 반복 패턴을 익히면 순회, 높이 계산, 탐색, 검증 문제들이 하나의 패밀리처럼 보이기 시작합니다.
 
+실무에서는 BST의 평균 O(log n)만 기억하면 위험합니다. 입력이 이미 정렬되어 있거나 편향된 순서로 들어오면 트리는 한쪽으로 길게 늘어져 O(n)으로 퇴화합니다. 그래서 운영 시스템은 단순 BST보다 AVL, Red-Black Tree, B-Tree 계열처럼 균형을 유지하는 구조를 택합니다.
+
+Python 코드에서는 재귀 깊이도 함께 봐야 합니다. 트리가 깊어질수록 `RecursionError` 가능성이 생기고, 순회 중 노드 객체 수가 많으면 메모리 사용량도 커집니다. 즉, 트리 선택은 “탐색이 빠르다”는 장점만이 아니라 균형 유지 비용, 재귀 한계, 저장 형태까지 묶어서 판단해야 합니다.
+
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
@@ -301,9 +311,9 @@ print(f"node count: {count_nodes(bst.root)}")   # 6
 
 ## 참고 자료
 
+- [Runestone Academy — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)
+- [Python 공식 문서 — bisect](https://docs.python.org/3/library/bisect.html)
+- [SQLite File Format — B-Tree Pages](https://www.sqlite.org/fileformat.html#b_tree_pages)
 - [Real Python — Binary Trees in Python](https://realpython.com/binary-search-python/)
-- [GeeksforGeeks — Binary Search Tree](https://www.geeksforgeeks.org/binary-search-tree-data-structure/)
-- [Visualgo — Binary Search Tree Visualization](https://visualgo.net/en/bst)
-- [Problem Solving with Algorithms — Trees](https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html)
 
 Tags: Python, 자료구조, Tree, Binary Tree, BST
