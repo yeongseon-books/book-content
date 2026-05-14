@@ -18,7 +18,7 @@ tags:
   - DesignPrinciples
   - Maintainability
 seo_description: 소프트웨어 설계의 정의와 목적, 좋은 설계 판단 기준, 코드와 설계의 차이를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 소프트웨어 설계란 무엇인가?
@@ -47,14 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    R["Requirements"] --> D["Design decisions"]
-    D --> C["Code"]
-    C --> M["Change cost"]
-    M --> R2["New requirements"]
-    R2 --> D
-```
+![전체 그림](../../../assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
+*요구사항이 설계 결정을 거쳐 다음 변경 비용으로 이어지는 흐름*
 
 요구사항은 설계 결정으로 바뀌고, 설계 결정은 코드로 굳어집니다. 그리고 그 코드는 다음 요구사항이 들어왔을 때의 변경 비용을 결정합니다. 이 순환을 이해하면 설계를 단발성 산출물이 아니라 계속 누적되는 비용 구조로 보게 됩니다.
 
@@ -136,6 +130,31 @@ Can a new teammate understand a module in 30 minutes?
 
 설계는 사람을 위한 일입니다. 새 팀원이 모듈 하나를 이해하는 데 한참 걸린다면 코드 양보다 구조가 더 큰 문제일 수 있습니다. 온보딩 속도는 설계 품질을 꽤 정직하게 보여 줍니다.
 
+## 빠르게 검증해 보기
+
+설계를 논의할 때는 감으로 말하기보다, 같은 변경을 실제 코드베이스에 대입해 보는 편이 훨씬 정확합니다. 아래처럼 가장 자주 들어오는 요구사항 하나를 고른 뒤, 수정 파일 수와 의존성 방향을 함께 적어 보세요.
+
+```text
+변경 시나리오: 결제 수단 추가
+수정 파일 수: 1개 / 4개 / 9개
+순환 의존: 없음 / 있음
+테스트 범위: 도메인만 / 도메인+DB / 전체 회귀
+```
+
+**Expected output:** 같은 기능을 넣을 때 수정 파일 수가 적고, 순환 의존이 없고, 테스트 범위를 좁게 유지할수록 설계 품질이 더 좋다는 근거가 보입니다.
+
+이 간단한 표만으로도 “이 코드는 읽기 좋은가?”보다 “이 구조는 다음 변경을 얼마나 비싸게 만드는가?”라는 질문으로 시선을 옮길 수 있습니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 기능 하나를 넣는데 여러 폴더를 모두 연다 | 변경이 어느 모듈 경계에서 새고 있는지 확인합니다 |
+| 작은 수정인데 통합 테스트만 믿어야 한다 | 도메인 규칙이 IO와 붙어 있지 않은지 봅니다 |
+| 새 팀원이 구조 설명을 오래 못 한다 | 모듈 책임을 한 문장으로 요약해 봅니다 |
+
+실패 신호를 빠르게 읽는 습관이 생기면, 설계는 추상적인 미학이 아니라 운영 비용을 낮추는 진단 도구가 됩니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 변경 범위, 의존성, 책임, 테스트 가능성을 같이 봐야 설계가 보입니다.
@@ -193,5 +212,11 @@ Can a new teammate understand a module in 30 minutes?
 - [Software Architecture Guide (Martin Fowler)](https://martinfowler.com/architecture/)
 - [Architecture Decision Records (ADR)](https://adr.github.io/)
 - [Designing Data-Intensive Applications](https://dataintensive.net/)
+
+### 실전 확인용 문서
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [unittest.mock — mock object library](https://docs.python.org/3/library/unittest.mock.html)
+
 
 Tags: Computer Science, SoftwareDesign, Architecture, Modularity, DesignPrinciples, Maintainability
