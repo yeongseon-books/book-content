@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 3
 title: Resource Design
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - URL
   - Backend
 seo_description: A practical guide to modeling REST resources — naming, plurals, hierarchies, sub-resources, and identifiers — for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Resource Design
 
-Good REST URLs come from solid resource modeling, naming, hierarchies, and identifiers, not from path style alone.
+Public URLs usually outlive the database tables and controller names that inspired them. A sloppy path chosen in week one can still be sitting in SDKs, logs, dashboards, and customer code a year later.
 
 This is post 3 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.
+
+## What you will learn
 
 - How to draw resource boundaries
 - Rules for nouns, plurals, and hierarchy
@@ -43,14 +45,11 @@ Once a URL is public, it is *expensive to change*. A bad resource model warps ev
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["/users"] --> B["/users/42"]
-    B --> C["/users/42/orders"]
-    C --> D["/users/42/orders/9"]
-```
+![Concept at a Glance](../../../assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
+*The URL shape shows the path from collection to item to sub-resource.*
 
-Collection → item → sub-collection → sub-item.
+When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.
+
 
 ## Key Terms
 
@@ -162,6 +161,12 @@ GitHub's `/repos/{owner}/{repo}/issues/{number}` is the canonical example of nou
 - Two levels by default, three by exception.
 - Express *actions* as state changes; if unavoidable, mark them with `:verb`.
 - Public ids should be *opaque* (UUIDs, slugs).
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** Looking at `/users`, `/users/42`, and `/users/42/orders`, you should be able to explain collection, item, and sub-collection roles without extra narration.
+- **First check:** If the same resource appears under `/user/42`, `/users?id=42`, and `/members/42`, you no longer have a stable canonical URL.
+- **Failure mode:** Let nesting grow without restraint and caching, authorization, and documentation all become harder—until explicit action endpoints start appearing as damage control.
 
 ## Checklist
 

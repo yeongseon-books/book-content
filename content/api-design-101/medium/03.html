@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>Resource Design</h1>
-<blockquote>
-<p>API Design 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it actually mean to <em>design good URLs</em> in a REST API?</p>
-<blockquote>
-<p>It means modeling <em>resource boundaries</em> and <em>relationships</em> well. The URL is just the visible result.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Public URLs usually outlive the database tables and controller names that inspired them. A sloppy path chosen in week one can still be sitting in SDKs, logs, dashboards, and customer code a year later.</p>
+<p>This is post 3 in the API Design 101 series.</p>
+<p>Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>How to draw resource boundaries</li>
 <li>Rules for nouns, plurals, and hierarchy</li>
@@ -79,12 +71,9 @@
 <p>If your resources wobble, everything wobbles.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;/users&quot;] --&gt; B[&quot;/users/42&quot;]
-    B --&gt; C[&quot;/users/42/orders&quot;]
-    C --&gt; D[&quot;/users/42/orders/9&quot;]
-</code></pre>
-<p>Collection → item → sub-collection → sub-item.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>The URL shape shows the path from collection to item to sub-resource.</em></p>
+<p>When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Collection</strong>: a set of same-kind resources — <code>/users</code>.</li>
@@ -95,10 +84,10 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (verbs, singular, flat)</strong></p>
-<pre><code>GET /getUserOrder?userId=42&amp;orderId=9
+<pre><code class="language-http">GET /getUserOrder?userId=42&amp;orderId=9
 </code></pre>
 <p><strong>After (nouns, plural, hierarchical)</strong></p>
-<pre><code>GET /users/42/orders/9
+<pre><code class="language-http">GET /users/42/orders/9
 </code></pre>
 <p>You can read it and understand it.</p>
 <h2>Hands-on: Five Steps to a Resource Model</h2>
@@ -164,6 +153,12 @@ def get_user(uid): return jsonify(USERS[uid])
 <li>Two levels by default, three by exception.</li>
 <li>Express <em>actions</em> as state changes; if unavoidable, mark them with <code>:verb</code>.</li>
 <li>Public ids should be <em>opaque</em> (UUIDs, slugs).</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> Looking at <code>/users</code>, <code>/users/42</code>, and <code>/users/42/orders</code>, you should be able to explain collection, item, and sub-collection roles without extra narration.</li>
+<li><strong>First check:</strong> If the same resource appears under <code>/user/42</code>, <code>/users?id=42</code>, and <code>/members/42</code>, you no longer have a stable canonical URL.</li>
+<li><strong>Failure mode:</strong> Let nesting grow without restraint and caching, authorization, and documentation all become harder—until explicit action endpoints start appearing as damage control.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
