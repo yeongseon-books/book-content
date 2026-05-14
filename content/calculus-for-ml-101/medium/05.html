@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Chain Rule</h1>
+<p>Neural networks are not single functions. They are functions composed inside other functions, layer after layer, until a final loss is produced. In that setting, the key question is no longer "can I differentiate this formula?" but "how does a change at one stage travel through the whole path?"</p>
+<p>This is post 5 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll use outer and inner functions, stage-by-stage derivatives, and broken gradient paths to explain the chain rule. The point is not to memorize a formula, but to see why backpropagation is fundamentally a disciplined application of local derivatives.</p>
 <blockquote>
-<p>Calculus for ML 101 series (5/10)</p>
+<p>The chain rule says you do not differentiate the whole system in one mysterious jump. You differentiate each local stage and connect those local sensitivities in the right order.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a function is <em>inside another</em>, how do we <em>propagate</em> the gradient?</p>
-<blockquote>
-<p>The <em>chain rule</em> is <em>outer derivative times inner derivative</em>, and it is the <em>math foundation of backprop</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Function composition</em></li>
@@ -76,11 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A <em>neural network</em> is a <em>long composition</em> of functions, and only the chain rule computes the full gradient <em>efficiently</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    X[x] --&gt; G[g x]
-    G --&gt; F[f g]
-    F --&gt; D[df dx = df dg times dg dx]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Chain-rule flow: local derivatives from each stage connect to produce the full derivative.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>composition</strong>: a <em>function of a function</em>.</li>
