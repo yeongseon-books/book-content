@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 3
 title: Structural Patterns
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Adapter
   - Decorator
   - Facade
-seo_description: Structural patterns compose objects into larger structures. Adapter, Decorator, Facade, Proxy, and Composite explained for working engineers.
-last_reviewed: '2026-05-04'
+seo_description: How structural patterns use composition and delegation to connect objects without freezing the design too early.
+last_reviewed: '2026-05-15'
 ---
 
 # Structural Patterns
 
+Once object creation is under control, the next question is how those objects should connect. Do you expose an external SDK directly to the domain, wrap an object to add behavior, or place a simpler entry point in front of a subsystem? Those are structure decisions, and they show up in almost every real codebase.
+
 This is post 3 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (3/10)
+In this post, we'll treat structural patterns as named ways of assembling objects through composition and delegation. The real goal is to keep change local instead of freezing the whole design into an inheritance tree.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we compose objects into larger structures without locking the design?
-
-> Through composition and delegation — the named ways of doing this are the structural patterns.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem structural patterns solve
 - Adapter, Decorator, Facade
@@ -51,16 +45,8 @@ Inheritance freezes the structure quickly. Composition lets you assemble respons
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Adapter (translate)"] --> X["Existing iface"]
-    D["Decorator (wrap)"] --> O["Object"]
-    F["Facade (simplify)"] --> S["Subsystem"]
-    P["Proxy (stand-in)"] --> R["Real subject"]
-    C["Composite (tree)"] --> L["Leaf or Node"]
-```
-
-Five ways to compose.
+![Concept at a Glance](../../../assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
+*Structural patterns show five ways to translate, wrap, simplify, proxy, and tree-shape object relationships without freezing the design.*
 
 ## Key Terms
 
@@ -187,6 +173,16 @@ Single items and groups behave alike.
 
 Flask middleware is a Decorator chain. The `requests.Session` object is a Facade. ORM lazy proxies are Proxies. Structural patterns sit quietly inside almost every library you use.
 
+## Quick verification
+
+Run this check before introducing a structural pattern.
+
+- Identify the boundary, wrapper, or subsystem that is making the current code hard to change.
+- Verify that the new structure keeps the caller-facing contract simpler or more stable.
+- Confirm that composition removes knowledge from the caller instead of just moving the same complexity sideways.
+
+**Expected outcome:** after the refactor, the caller should depend on a cleaner seam while implementation-specific wiring stays behind the structural boundary.
+
 ## How a Senior Engineer Thinks
 
 - Composition is the default.
@@ -228,9 +224,15 @@ Composition keeps structure ready for change. The next post moves from structure
 
 ## References
 
+### Core references
+
 - [Adapter Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/adapter)
 - [Decorator Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/decorator)
 - [Facade Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/facade)
 - [Composite Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/composite)
+
+### Practical follow-up
+
+- [The Python Tutorial — Classes (Python docs)](https://docs.python.org/3/tutorial/classes.html)
 
 Tags: Computer Science, DesignPatterns, Structural, Adapter, Decorator, Facade

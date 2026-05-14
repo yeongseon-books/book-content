@@ -17,8 +17,8 @@ tags:
   - Adapter
   - Decorator
   - Facade
-seo_description: 합성과 위임을 통해 객체 구조를 유연하게 조립하는 Adapter, Decorator 등 Structural 패턴의 핵심 원리를 설명합니다.
-last_reviewed: '2026-05-12'
+seo_description: Structural 패턴으로 합성과 위임을 활용해 구조 변경 비용을 낮추는 방법을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # Structural 패턴
@@ -47,16 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A["Adapter (translate)"] --> X["Existing iface"]
-    D["Decorator (wrap)"] --> O["Object"]
-    F["Facade (simplify)"] --> S["Subsystem"]
-    P["Proxy (stand-in)"] --> R["Real subject"]
-    C["Composite (tree)"] --> L["Leaf or Node"]
-```
-
-Structural 패턴은 객체를 연결하는 다섯 가지 대표 방식입니다. 번역하고, 감싸고, 단순화하고, 대리하고, 트리로 묶는다는 관점으로 보면 구분이 쉬워집니다.
+![한눈에 보는 개념](../../../assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
+*Structural 패턴은 객체를 번역하고, 감싸고, 단순화하고, 대리하고, 트리로 묶는 다섯 가지 연결 방식을 한눈에 보여 줍니다.*
 
 ## 핵심 용어
 
@@ -183,6 +175,16 @@ class Folder(Node):
 
 Flask 미들웨어 체인은 Decorator 모양이고, `requests.Session`은 Facade처럼 읽히며, ORM의 지연 로딩 객체는 Proxy의 성격을 띱니다. 외부 서비스 SDK를 도메인 인터페이스 뒤로 숨기는 순간에는 Adapter가 등장합니다. Structural 패턴은 조용하지만 거의 모든 라이브러리 안에 들어 있습니다.
 
+## 빠르게 검증해 보기
+
+Structural 패턴을 넣기 전에 아래를 점검해 보세요.
+
+- 지금 어려운 점이 외부 경계, 래핑, 하위 시스템 단순화, 캐시/대리 책임 중 어디에 있는지 먼저 적습니다.
+- 새 구조가 호출자 계약을 더 단순하게 만드는지 확인합니다.
+- 합성이 실제로 호출자의 지식을 줄이는지, 아니면 복잡성을 옆으로 옮기기만 하는지 비교합니다.
+
+**기대 결과:** 리팩터링 뒤에는 호출자가 더 안정적인 인터페이스만 보고, 구현 세부는 구조 경계 뒤에 남아 있어야 합니다.
+
 ## 시니어 엔지니어는 이렇게 판단합니다
 
 - 합성을 기본값으로 둡니다.
@@ -224,9 +226,15 @@ Flask 미들웨어 체인은 Decorator 모양이고, `requests.Session`은 Facad
 
 ## 참고 자료
 
+### 핵심 자료
+
 - [Adapter Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/adapter)
 - [Decorator Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/decorator)
 - [Facade Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/facade)
 - [Composite Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/composite)
+
+### 실무 확장 읽을거리
+
+- [The Python Tutorial — Classes (Python docs)](https://docs.python.org/3/tutorial/classes.html)
 
 Tags: Computer Science, DesignPatterns, Structural, Adapter, Decorator, Facade
