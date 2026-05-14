@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 2
 title: HTML, CSS, JavaScript
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - JavaScript
   - Frontend
 seo_description: HTML, CSS, JavaScript가 구조, 스타일, 동작을 어떻게 나누는지 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # HTML, CSS, JavaScript
@@ -47,14 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    HTML["HTML (structure)"] --> Page["Web page"]
-    CSS["CSS (style)"] --> Page
-    JS["JavaScript (behavior)"] --> Page
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
 
-세 언어는 하나의 페이지를 함께 만듭니다. HTML이 뼈대를 만들고, CSS가 보이는 모양을 정하고, JavaScript가 사용자 입력에 반응하게 만듭니다.
+*구조, 스타일, 동작이 한 페이지를 함께 만드는 책임 분리를 보여 주는 그림입니다.*
+
+이 그림에서 중요한 점은 세 언어가 같은 페이지를 만들더라도 같은 문제를 해결하지는 않는다는 사실입니다. HTML은 구조를, CSS는 시각 규칙을, JavaScript는 사용자 반응을 맡으므로 수정 범위를 분리할 수 있습니다.
+
+### 직접 검증해 볼 포인트
+
+- HTML만 있는 파일을 열어 제목과 버튼 구조가 먼저 보이는지 확인합니다.
+- 같은 파일에 CSS를 연결한 뒤 색상과 여백만 바뀌는지 관찰합니다.
+- JavaScript를 붙여 클릭 시 경고창이 뜨는지 확인해 구조·스타일·동작이 따로 바뀌는 경험을 만듭니다.
+
+**기대 결과:** HTML 없이 CSS나 JavaScript만으로는 페이지 골격이 생기지 않고, 각 파일을 따로 수정할 때 영향 범위도 분리됩니다.
+
+**실패 모드:** 모든 스타일과 동작을 HTML 안에 섞어 넣으면 작은 변경에도 파일 전체를 다시 읽어야 하고, 캐시 이점도 크게 줄어듭니다.
 
 ## 먼저 알아둘 용어
 
@@ -209,9 +216,13 @@ HTML, CSS, JavaScript는 관심사를 분리하는 가장 기본적인 훈련입
 
 ## 참고 자료
 
-- [HTML basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics)
-- [CSS basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics)
-- [JavaScript basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics)
+### 공식 문서
+- [HTML basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Creating_the_content)
+- [CSS basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content)
+- [JavaScript basics (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Adding_interactivity)
+
+### 개념 보강
 - [Semantic HTML (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/Semantics)
+- [script 요소와 defer/async (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script)
 
 Tags: Computer Science, WebDevelopment, HTML, CSS, JavaScript, Frontend
