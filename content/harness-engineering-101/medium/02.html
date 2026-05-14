@@ -54,12 +54,21 @@
 </head>
 <body>
 <h1>Task Harness — Turning Vague Work into Executable Tasks</h1>
-<p>This is post 2 in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (2/10)</p>
-</blockquote>
-<p>Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.</p>
+<p>The fastest way to make an agent expensive is to ask it to do a vague job. Humans respond to ambiguity by asking back. Agents usually respond by filling in the blanks on their own.</p>
+<p>Those blanks quickly turn into concrete risk: the wrong data source, the wrong output format, the wrong completion bar, or the wrong scope of work. Once that ambiguity reaches tool calls, quality issues become cost incidents.</p>
+<p>This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why should you separate a business goal from an agent task?</li>
+<li>Which fields are the minimum for an executable TaskSpec?</li>
+<li>How do you decide that a task is too large and must be decomposed?</li>
+<li>How do natural-language completion conditions become machine-checkable criteria?</li>
+<li>Why should prompts, verifiers, and eval datasets derive from the same TaskSpec?</li>
+</ul>
+<blockquote>
+<p>Goals tell the business where to go. Tasks tell the agent what to do now. Task Harness is the layer that turns one into the other.</p>
+</blockquote>
 <p><img alt="Task harness - turning vague work into executable tasks" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png"></p>
 <p><em>Task harness - turning vague work into executable tasks</em></p>
 <h2>Vague Work Cannot Be Executed</h2>
@@ -307,6 +316,14 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 <li>Completion criteria must be objective, automatically verifiable, and measurable. Rewrite natural-language statements into code expressions.</li>
 <li>A single TaskSpec produces the system prompt, the verifier, and the eval dataset. The Task is the single source of truth.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Require Goal, Inputs, Outputs, and Completion Criteria before the agent starts work.</li>
+<li>[ ] Keep each task scoped to one deliverable and one retry unit.</li>
+<li>[ ] Turn completion criteria into code-expressible checks, not review-only prose.</li>
+<li>[ ] Send missing fields back as clarifying questions instead of letting the agent guess.</li>
+<li>[ ] Generate prompts, verifiers, and eval cases from the same TaskSpec.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
@@ -322,11 +339,12 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and research</strong></p>
 <ul>
 <li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
 <li><a href="https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf">OpenAI — A Practical Guide to Building Agents</a></li>
 <li><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic Documentation — Models</a></li>
-<li><a href="https://cloud.google.com/architecture/ai-agent-patterns">Google — Agent Design Patterns</a></li>
+<li><a href="https://cloud.google.com/architecture/ai-agent-patterns">Google Cloud — Agent Design Patterns</a></li>
 </ul>
 <p class="tags-line">Tags: AI Agent, Harness, Production, Reliability</p>
 </body>

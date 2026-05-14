@@ -3,7 +3,7 @@ title: Context Harness — Designing What the Agent Should Know and Not Know
 series: harness-engineering-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Context
 - RAG
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: The context an agent receives shapes its output. Too little and it
   guesses. Too much and it loses focus.
 ---
 
 # Context Harness — Designing What the Agent Should Know and Not Know
 
-This is post 3 in the Harness Engineering 101 series.
+Teams often assume context is free: add more chat history, more retrieved documents, more tool schemas, and quality should improve. In production, the opposite is common. Bigger context often means slower, noisier, and harder-to-reproduce behavior.
 
-> Harness Engineering 101 Series (3/10)
+An agent does not see one abstract “window.” It sees a contested budget shared by system prompts, task specs, conversation history, retrieved documents, tool schemas, and recent tool outputs.
 
-The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.
+This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.
 
 ---
+
+## Questions this chapter answers
+
+- Why does a large context window still feel too small in practice?
+- How should system prompts, task specs, history, retrieval, and tool schemas share a token budget?
+- When should you use sliding windows, summarization, or selective recall for history?
+- Why is retrieval only the first stage of a usable RAG pipeline?
+- Which classes of information should be deliberately excluded from context?
+
+> Context quality is decided less by raw length than by density. The real job is putting the right information into the right slots.
 
 ![Context harness - designing what the agent should know and not know](../../../assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
 
@@ -314,6 +324,14 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 - Context Harness designs what to hide as carefully as what to show. Deliberately remove secrets, irrelevant tools, and stale outputs.
 - Context snapshots are the foundation of reproducibility and debugging in production agents.
 
+## Operational checklist
+
+- [ ] Assign explicit token budgets to prompt, task, history, retrieval, tool schemas, and response buffer.
+- [ ] Choose a history-compaction strategy before the first long-running task ships.
+- [ ] Add reranking and compression after retrieval instead of pasting raw documents into prompts.
+- [ ] Strip secrets, irrelevant tools, contradictory instructions, and stale tool outputs from context assembly.
+- [ ] Capture inference-time context snapshots so incidents can be replayed later.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -334,9 +352,11 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 
 ## References
 
+### Official docs and research
+
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [Liu et al. — Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172)
 - [LangChain — Contextual Compression Retriever](https://python.langchain.com/docs/how_to/contextual_compression/)
-- [OpenAI — Retrieval-Augmented Generation Best Practices](https://cookbook.openai.com/examples/question_answering_using_embeddings)
+- [OpenAI Cookbook — Question Answering Using Embeddings](https://cookbook.openai.com/examples/question_answering_using_embeddings)
 
 Tags: AI Agent, Harness, Production, Reliability
