@@ -54,47 +54,39 @@
 </head>
 <body>
 <h1>Writing the Timeline</h1>
+<p>One of the most expensive mistakes after an incident is trusting memory more than recorded evidence. Everyone thinks they saw the same thing, but a few days later the sequence of events, the basis for decisions, and even the time of mitigation start to blur.</p>
+<p>A useful timeline is not a polished story reconstructed after the fact. It is a fact log captured during the response and cleaned up later without mixing observation and interpretation.</p>
+<p>This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.</p>
+<h2>Questions this chapter answers</h2>
+<p>A timeline becomes unreliable the moment it mixes memory, hindsight, and interpretation. By the time a team writes a postmortem days later, everyone already knows more than they knew while the incident was live.</p>
 <blockquote>
-<p>Incident Response 101 series (5/10)</p>
+<p>A trustworthy timeline records what the team observed and when it observed it. Interpretation can be useful, but it must stay visibly separate from the facts.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: After an <em>incident</em> ends, how do you <em>reconstruct</em> what happened <em>and when</em>?</p>
-<blockquote>
-<p>A <em>timeline</em> is captured <em>during</em> the response and ordered by <em>time</em>, with <em>facts only</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 5 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li><em>Contemporaneous logging</em></li>
-<li><em>Channel scraping</em></li>
-<li><em>Time ordering</em></li>
-<li>Separating <em>fact vs interpretation</em></li>
-<li>Feeding the <em>postmortem</em></li>
+<li>Why should timeline work begin during the incident instead of after it?</li>
+<li>Which channels need to be collected besides the main response chat?</li>
+<li>How do you separate recorded facts from later theories?</li>
+<li>Why do anchor moments like detected and mitigated matter so much?</li>
+<li>How should time zones be handled in shared documentation?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p><em>Memory</em> drifts. The <em>one line</em> you write <em>now</em> saves <em>tomorrow's RCA</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Slack[&quot;slack&quot;] --&gt; Scrape[&quot;scrape&quot;]
-    Pager[&quot;pager&quot;] --&gt; Scrape
-    Deploy[&quot;deploy log&quot;] --&gt; Scrape
-    Scrape --&gt; Sort[&quot;sort by time&quot;]
-    Sort --&gt; Doc[&quot;timeline doc&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>Memory drifts fast, especially after a stressful outage. People remember the final explanation and unconsciously pull it backward into earlier moments where it did not yet exist.</p>
+<p>A clear timeline protects the team from that distortion. It creates a fact base that later RCA and postmortem work can trust without rewriting history.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>timestamp</strong>: a <em>UTC</em> time stamp.</li>
-<li><strong>scrape</strong>: gathering events from <em>multiple channels</em>.</li>
-<li><strong>fact</strong>: a <em>recorded observation</em>.</li>
-<li><strong>interpretation</strong>: <em>guesses</em> and <em>opinions</em>.</li>
-<li><strong>anchor</strong>: reference moments like <em>Detection</em> or <em>Mitigation</em>.</li>
+<li><strong>timestamp</strong>: a UTC time stamp.</li>
+<li><strong>scrape</strong>: gathering events from multiple channels.</li>
+<li><strong>fact</strong>: a recorded observation.</li>
+<li><strong>interpretation</strong>: guesses and opinions.</li>
+<li><strong>anchor</strong>: reference moments like Detection or Mitigation.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: reconstruct from <em>memory</em>.</p>
-<p><strong>After</strong>: reconstruct from <em>contemporaneous logs</em> and <em>channel scrapes</em>.</p>
+<p><strong>Before</strong>: reconstruct from memory.</p>
+<p><strong>After</strong>: reconstruct from contemporaneous logs and channel scrapes.</p>
 <h2>Hands-on: A Tiny Timeline Builder</h2>
 <p><strong>Step 1 — Event model</strong></p>
 <pre><code class="language-python">def event(ts, source, text):
@@ -122,43 +114,52 @@ def mark(event):
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>Every <em>event</em> has <em>three fields</em>.</li>
-<li><em>Interpretation</em> is split off by a <em>prefix</em>.</li>
-<li><em>Anchors</em> are the <em>dashboard</em> reference points.</li>
+<li>Every event has three fields.</li>
+<li>Interpretation is split off by a prefix.</li>
+<li>Anchors are the dashboard reference points.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Writing the timeline <em>after</em> the incident ends.</strong></li>
-<li><strong>Treating <em>interpretation</em> as <em>fact</em>.</strong></li>
-<li><strong>Mixing <em>time zones</em> (KST/UTC).</strong></li>
-<li><strong>Scraping only <em>one channel</em>.</strong></li>
-<li><strong>Pasting <em>sensitive data</em> directly.</strong></li>
+<li><strong>Writing the timeline after the incident ends.</strong></li>
+<li><strong>Treating interpretation as fact.</strong></li>
+<li><strong>Mixing time zones (KST/UTC).</strong></li>
+<li><strong>Scraping only one channel.</strong></li>
+<li><strong>Pasting sensitive data directly.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A <em>Slack bot</em> collects events with <code>!ts &lt;text&gt;</code> and <em>exports</em> them into a <em>postmortem doc</em>.</p>
+<p>A Slack bot collects events with <code>!ts &lt;text&gt;</code> and exports them into a postmortem doc.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Contemporaneous logging</em> is the rule.</li>
-<li>Standardize on <em>UTC</em>.</li>
-<li><em>Short, frequent</em> lines.</li>
-<li><em>Speculation</em> goes elsewhere.</li>
-<li>If the <em>anchors</em> are right, you can recover the rest.</li>
+<li>Contemporaneous logging is the rule.</li>
+<li>Standardize on UTC.</li>
+<li>Short, frequent lines.</li>
+<li>Speculation goes elsewhere.</li>
+<li>If the anchors are right, you can recover the rest.</li>
 </ul>
+<h2>Example timeline entries</h2>
+<p>A timeline becomes much more useful when facts and interpretation are visibly separated.</p>
+<pre><code class="language-text">2026-05-15T00:03Z fact: error rate exceeded 12%
+2026-05-15T00:05Z fact: primary on-call acknowledged page
+2026-05-15T00:08Z note: ?possible DB connection pool exhaustion
+2026-05-15T00:11Z fact: rollback initiated
+2026-05-15T00:19Z fact: error rate returned below 1%
+</code></pre>
+<p>The <code>fact</code> lines preserve what the team knew at the time. The <code>note</code> line preserves a hypothesis without rewriting it into truth.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Recording owner</em>.</li>
-<li>[ ] <em>Bot command</em>.</li>
-<li>[ ] <em>UTC enforcement</em>.</li>
-<li>[ ] <em>Anchor definitions</em>.</li>
+<li>[ ] Recording owner.</li>
+<li>[ ] Bot command.</li>
+<li>[ ] UTC enforcement.</li>
+<li>[ ] Anchor definitions.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>anchor</em> in one line.</li>
-<li>Distinguish <em>fact</em> and <em>interpretation</em> in one line.</li>
-<li>Explain why <em>UTC</em> matters in one line.</li>
+<li>Define anchor in one line.</li>
+<li>Distinguish fact and interpretation in one line.</li>
+<li>Explain why UTC matters in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>root cause analysis</em>.</p>
+<p>Next, we cover root cause analysis.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -172,12 +173,13 @@ def mark(event):
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://sre.google/workbook/postmortem-culture/">Postmortem Timeline - Google SRE Workbook</a></li>
-<li><a href="https://response.pagerduty.com/after/post_mortem_process/">Building an Incident Timeline - PagerDuty</a></li>
-<li><a href="https://www.atlassian.com/incident-management/postmortem">Incident Documentation - Atlassian</a></li>
-<li><a href="https://increment.com/postmortems/">Time and Postmortems - Increment</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a><br>
+- <a href="https://response.pagerduty.com/after/post_mortem_process/">Postmortem Process - PagerDuty</a><br>
+- <a href="https://www.atlassian.com/incident-management/postmortem">Postmortem guide - Atlassian</a><br>
+- <a href="https://github.com/open-telemetry/semantic-conventions">OpenTelemetry Semantic Conventions</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, Timeline, Postmortem, Logging, Operations</p>
 </body>
 </html>

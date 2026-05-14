@@ -54,47 +54,39 @@
 </head>
 <body>
 <h1>Root Cause Analysis</h1>
+<p>When an incident hurts production, the first visible event often gets blamed as the cause. A deployment happened before the outage, so the deployment gets blamed. A human ran a command, so the human gets blamed.</p>
+<p>That reaction is understandable, but it is usually shallow. The trigger explains what fired last. The root cause explains why the system was still able to fail that way.</p>
+<p>This is post 6 in the Incident Response 101 series. This post shows how to separate triggers from structural causes, collect contributing factors, and turn an RCA into follow-up work that can actually be verified.</p>
+<h2>Questions this chapter answers</h2>
+<p>RCA fails most often when the team stops at the first plausible answer. The trigger is visible and emotionally satisfying, so it gets written down as the cause even though the system conditions remain untouched.</p>
 <blockquote>
-<p>Incident Response 101 series (6/10)</p>
+<p>The goal of RCA is not to name the final spark. It is to uncover the conditions that allowed the spark to turn into customer-facing impact.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What is the <em>real cause</em> of an <em>incident</em>, and <em>how</em> do you find it?</p>
-<blockquote>
-<p><em>RCA</em> uses <em>five whys</em> and <em>contributing factors</em> to find the <em>root cause</em>, not the <em>trigger</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 6 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li>The <em>five whys</em> technique</li>
-<li><em>Fishbone diagrams</em></li>
-<li><em>Contributing factors</em></li>
-<li><em>Trigger vs root cause</em></li>
-<li><em>Systems thinking</em></li>
+<li>How do you distinguish a trigger from a root cause?</li>
+<li>Why does the Five Whys method still help even in modern systems?</li>
+<li>Which contributing-factor axes are worth tracking explicitly?</li>
+<li>Why is “human error” usually an incomplete answer?</li>
+<li>What makes an action item strong enough to verify later?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>If you only fix the <em>trigger</em>, the <em>same root cause</em> explodes <em>again</em> in the <em>next incident</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Trigger[&quot;trigger&quot;] --&gt; Why1[&quot;why?&quot;]
-    Why1 --&gt; Why2[&quot;why?&quot;]
-    Why2 --&gt; Why3[&quot;why?&quot;]
-    Why3 --&gt; Root[&quot;root cause&quot;]
-    Root --&gt; Action[&quot;action item&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>If the team only removes the trigger, the incident pattern returns with different packaging. A safer deployment process, stronger defaults, or better checks are often more important than the visible last event.</p>
+<p>RCA is valuable when it changes the system. That means tracing beyond the obvious symptom and turning the result into work that can be owned, reviewed, and tested.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+Each “why” step is a reminder not to stop at the first explanation. The useful endpoint is the structural condition that can be changed, not the easiest object to blame.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>trigger</strong>: the <em>event</em> that <em>fired</em> directly.</li>
-<li><strong>root cause</strong>: the <em>condition</em> that made it possible.</li>
-<li><strong>contributing factor</strong>: a <em>contributing element</em>.</li>
-<li><strong>5 whys</strong>: ask <em>why</em> <em>five times</em>.</li>
-<li><strong>systems thinking</strong>: thinking in <em>systems</em>.</li>
+<li><strong>trigger</strong>: the event that fired directly.</li>
+<li><strong>root cause</strong>: the condition that made it possible.</li>
+<li><strong>contributing factor</strong>: a contributing element.</li>
+<li><strong>5 whys</strong>: ask why five times.</li>
+<li><strong>systems thinking</strong>: thinking in systems.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: mistake the <em>trigger</em> for the <em>root cause</em>.</p>
-<p><strong>After</strong>: trace down to the <em>condition</em> with the <em>five whys</em>.</p>
+<p><strong>Before</strong>: mistake the trigger for the root cause.</p>
+<p><strong>After</strong>: trace down to the condition with the five whys.</p>
 <h2>Hands-on: A Mini RCA Workbook</h2>
 <p><strong>Step 1 — Five whys</strong></p>
 <pre><code class="language-python">def five_whys(start):
@@ -121,43 +113,52 @@
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>A <em>chain</em> preserves <em>depth</em>.</li>
-<li><em>Contributing factors</em> sit on <em>four axes</em>.</li>
-<li><em>Actions</em> start with a <em>verb</em>.</li>
+<li>A chain preserves depth.</li>
+<li>Contributing factors sit on four axes.</li>
+<li>Actions start with a verb.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Stopping at the <em>first answer</em>.</strong></li>
-<li><strong>Naming a <em>person</em> as the <em>root cause</em>.</strong></li>
-<li><strong>Fixing only the <em>trigger</em> and closing.</strong></li>
-<li><strong><em>Vague</em>, abstract actions.</strong></li>
-<li><strong>Actions that <em>cannot be verified</em>.</strong></li>
+<li><strong>Stopping at the first answer.</strong></li>
+<li><strong>Naming a person as the root cause.</strong></li>
+<li><strong>Fixing only the trigger and closing.</strong></li>
+<li><strong>Vague, abstract actions.</strong></li>
+<li><strong>Actions that cannot be verified.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>The <em>postmortem doc</em> embeds a <em>Five Whys</em> section and a <em>Contributing Factors</em> table as part of the <em>template</em>.</p>
+<p>The postmortem doc embeds a Five Whys section and a Contributing Factors table as part of the template.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Suspect the <em>system</em>.</li>
-<li>Do not blame <em>people</em>.</li>
-<li>The <em>root cause</em> is usually <em>process</em>.</li>
-<li><em>Actions</em> are <em>measurable</em>.</li>
-<li>The <em>five whys</em> is a <em>starting point</em>, not the <em>end</em>.</li>
+<li>Suspect the system.</li>
+<li>Do not blame people.</li>
+<li>The root cause is usually process.</li>
+<li>Actions are measurable.</li>
+<li>The five whys is a starting point, not the end.</li>
 </ul>
+<h2>Example: separating the trigger from the root cause</h2>
+<p>Imagine a checkout incident that starts right after a deployment.</p>
+<ul>
+<li>Trigger: a deployment introduced the wrong timeout value</li>
+<li>Contributing factor: staging never exercised realistic payment load</li>
+<li>Root cause: the deployment process allowed timeout changes to reach production without a regression gate</li>
+<li>Action item: add a timeout-focused regression test and block deployment when it fails</li>
+</ul>
+<p>That framing changes the follow-up work. Instead of blaming the deployment itself, the team fixes the conditions that made the deployment unsafe.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Template section</em>.</li>
-<li>[ ] <em>Four-axis factor model</em>.</li>
-<li>[ ] <em>Verb-first action</em> rule.</li>
-<li>[ ] <em>Verification criteria</em>.</li>
+<li>[ ] Template section.</li>
+<li>[ ] Four-axis factor model.</li>
+<li>[ ] Verb-first action rule.</li>
+<li>[ ] Verification criteria.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Distinguish <em>trigger</em> and <em>root cause</em> in one line.</li>
-<li>Define the <em>five whys</em> in one line.</li>
-<li>Define <em>contributing factor</em> in one line.</li>
+<li>Distinguish trigger and root cause in one line.</li>
+<li>Define the five whys in one line.</li>
+<li>Define contributing factor in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>mitigation and resolution</em>.</p>
+<p>Next, we cover mitigation and resolution.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -171,12 +172,13 @@
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://sre.google/workbook/postmortem-culture/">Five Whys - Google SRE Workbook</a></li>
-<li><a href="https://response.pagerduty.com/after/root_cause_analysis/">Root Cause Analysis - PagerDuty</a></li>
-<li><a href="https://www.atlassian.com/incident-management/postmortem/templates">Incident RCA - Atlassian</a></li>
-<li><a href="https://increment.com/postmortems/beyond-root-cause/">Beyond Root Cause - Increment</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://response.pagerduty.com/after/root_cause_analysis/">Root cause analysis - PagerDuty</a><br>
+- <a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a><br>
+- <a href="https://www.atlassian.com/incident-management/postmortem/templates">Postmortem templates - Atlassian</a><br>
+- <a href="https://csrc.nist.gov/pubs/sp/800/61/r2/final">NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, RCA, Postmortem, Analysis, Operations</p>
 </body>
 </html>
