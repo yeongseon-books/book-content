@@ -54,37 +54,29 @@
 </head>
 <body>
 <h1>What Is MLOps?</h1>
-<blockquote>
-<p>MLOps 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it take to turn a model that demos well into a system that runs 365 days a year?</p>
-<blockquote>
-<p><em>MLOps binds the three axes of model, data, and code together with DevOps principles so the result is operable.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Training one good model and running that model in production for months are very different jobs. A model can look great inside a notebook, then become hard to reproduce after deployment, drift when the input shape changes, or lose performance with no trace of when the decline started.</p>
+<p>Many teams make the same assumption at this point: if model quality improves, operations will take care of themselves. In practice, the opposite is usually true. In production, the model, data, code, deployment path, monitoring, and retraining loop all have to move together.</p>
 <p>This is the first post in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat MLOps not as a list of tool names, but as the operational loop that lets a model stay alive in production.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>The definition of MLOps</li>
-<li>What MLOps shares with DevOps and where it diverges</li>
-<li>Six core components</li>
-<li>Maturity levels 0 through 2</li>
-<li>Five common pitfalls</li>
+<li>What makes MLOps different from simply attaching DevOps habits to ML?</li>
+<li>Why do even accurate models break down quickly in real production systems?</li>
+<li>What does it actually mean to manage data, code, and models together?</li>
+<li>Which building blocks let a team reproduce, deploy, observe, and improve a model over time?</li>
+<li>How does MLOps maturity usually progress in practice?</li>
 </ul>
+<blockquote>
+<p>Mental model: MLOps is not the technique for deploying one model file. It is the operating system around a loop of data → training → registration → deployment → monitoring → retraining.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>Most ML projects never reach production. MLOps is the discipline that closes that gap.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;data&quot;] --&gt; Train[&quot;training pipeline&quot;]
-    Code[&quot;code&quot;] --&gt; Train
-    Train --&gt; Reg[&quot;model registry&quot;]
-    Reg --&gt; Deploy[&quot;deployment&quot;]
-    Deploy --&gt; Mon[&quot;monitoring&quot;]
-    Mon --&gt; Train
-</code></pre>
+<p>Most ML projects fail first at the operating model, not at the model metric. Teams cannot rerun last week's best experiment, cannot tell which data trained the live model, and cannot explain why performance is slipping because the evidence was never captured.</p>
+<p>That is why the starting point for MLOps is not buying a larger platform. It is deciding whether the same inputs can produce the same result again, whether the live model can be observed, and whether the team knows which part of the loop to revisit when something goes wrong.</p>
+<h2>See the Loop First</h2>
+<p><img alt="See the Loop First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png"></p>
+<p><em>See the Loop First</em><br>
+This loop is the shortest useful picture of MLOps. Data and code feed a training pipeline, the trained model moves into a registry, deployment sends that version into production, and monitoring feeds real operating signals back into the next training cycle.</p>
+<p>The important detail is that this is not a one-time delivery pipeline. Models age, input distributions change, and production conditions keep moving. MLOps exists to make that change manageable.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>MLOps</strong>: ML plus DevOps; continuous training, deployment, and monitoring.</li>
