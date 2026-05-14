@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Collecting and Visualizing Metrics</h1>
+<p>It is easy to say metrics matter and still have no reliable path from application code to a graph an engineer can trust. A number in memory is not observability yet. Someone has to expose it, scrape it, store it, and query it correctly.</p>
+<p>Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.</p>
 <p>This is post 3 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How are metrics <em>collected</em>, and how do they <em>become a graph</em>?</p>
-<blockquote>
-<p><em>Prometheus </em>pulls<em> exporters; Grafana </em>draws<em> what Prometheus stored.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Pull</em> vs <em>push</em> models</li>
@@ -80,11 +71,8 @@
 <p><em>What you do not measure </em>does not exist<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;app + /metrics&quot;] --&gt; Prom[&quot;Prometheus (pull)&quot;]
-    Prom --&gt; TSDB[&quot;time-series DB&quot;]
-    TSDB --&gt; Graf[&quot;Grafana&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>The first metric pipeline: the app exposes metrics, Prometheus scrapes them, and Grafana turns stored time series into questions.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Exporter</strong>: a component that <em>exposes metrics over HTTP</em>.</li>
@@ -128,6 +116,19 @@ sum by (path) (rate(http_requests_total[5m]))
 # Browser: http://localhost:3000
 # Datasource: Prometheus → http://prom:9090
 # Panel: rate(http_requests_total[1m])
+</code></pre>
+<h2>How to Verify the Pipeline End to End</h2>
+<p>The pipeline fails more often at the seams than in the code itself, so verify each hop explicitly.</p>
+<pre><code class="language-bash"># 1) The application exposes metrics
+curl -s http://localhost:8000/metrics | grep http_requests_total
+
+# 2) Prometheus sees the target as healthy
+curl -s http://localhost:9090/api/v1/targets | grep '&quot;health&quot;:&quot;up&quot;'
+</code></pre>
+<pre><code class="language-text">Expected output:
+- `/metrics` contains `http_requests_total`.
+- The Prometheus target shows `up`.
+- Grafana renders a non-zero `rate(http_requests_total[1m])` line.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
