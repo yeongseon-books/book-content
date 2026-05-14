@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>API Versioning</h1>
-<blockquote>
-<p>API Design 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you must <em>change</em> a contract, how do you do it without breaking external clients?</p>
-<blockquote>
-<p>Define your <em>compatibility rules</em> first; isolate change behind <em>version channels</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Running an API for a long time teaches the same lesson repeatedly: the hard part is not changing the contract, but changing it without breaking trust. A field tweak that feels minor to the backend can still be a production incident for clients that upgrade months later.</p>
+<p>This is post 9 in the API Design 101 series.</p>
+<p>Here, we treat versioning as change-management discipline rather than just <code>/v1</code> syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>Distinguishing breaking from non-breaking changes</li>
 <li>URL versioning vs header versioning</li>
@@ -79,11 +71,9 @@
 <p>Compatibility is not free.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    V1[&quot;/v1/users&quot;] --&gt; H1[&quot;v1 handler&quot;]
-    V2[&quot;/v2/users&quot;] --&gt; H2[&quot;v2 handler&quot;]
-    H1 -.deprecated.-&gt; Sunset[&quot;sunset 2027-01&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Older versions do not disappear instantly. They move through deprecation notices toward a clearly announced sunset date.</em></p>
+<p>That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Breaking change</strong>: clients must be updated to keep working.</li>
@@ -94,7 +84,7 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (silently broken)</strong></p>
-<pre><code>PATCH /users/42  → response date format changes one day
+<pre><code class="language-text">PATCH /users/42  → response date format changes one day
 </code></pre>
 <p><strong>After (explicit version)</strong></p>
 <pre><code>PATCH /v2/users/42
@@ -125,7 +115,7 @@ def user(uid):
 </code></pre>
 <p>URLs stay clean, but <em>debugging and caching get harder</em>.</p>
 <p><strong>Step 3 — Non-breaking additions</strong></p>
-<pre><code>Add a new field to a response → non-breaking (if clients can ignore it)
+<pre><code class="language-text">Add a new field to a response → non-breaking (if clients can ignore it)
 Add an *optional* field to a request → non-breaking
 </code></pre>
 <p>Adding fields is <em>usually</em> safe.</p>
@@ -170,6 +160,12 @@ def v1(uid):
 <li>Use <em>standard headers + an explicit sunset</em> to deprecate.</li>
 <li>Quantify the <em>internal cost</em> of multiple versions (code, tests, docs).</li>
 <li>Sunset only after usage drops — let data decide.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> After a new version launches, responses from the old version should consistently carry <code>Deprecation</code>, <code>Sunset</code>, and successor <code>Link</code> signals.</li>
+<li><strong>First check:</strong> If five recent changes get classified differently by different engineers, the compatibility policy itself is still too vague.</li>
+<li><strong>Failure mode:</strong> Announce a sunset date without measuring actual client usage, and the remaining integrations all fail at once when the deadline arrives.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
