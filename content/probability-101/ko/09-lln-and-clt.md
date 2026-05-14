@@ -17,7 +17,7 @@ tags:
   - Sampling
   - Beginner
 seo_description: 표본 크기에 따른 평균 수렴의 대수의 법칙과 임의 분포가 정규분포로 수렴하는 중심극한정리의 중요성을 파악합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 대수의 법칙과 중심극한정리
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Sample["i.i.d. samples"] --> Mean["Sample mean Xbar"]
-    Mean --> LLN["LLN: Xbar -> mu"]
-    Mean --> CLT["CLT: sqrt(n)(Xbar - mu) -> N(0, sigma^2)"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/09/09-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
