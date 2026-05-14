@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Locks, Mutexes, and Semaphores</h1>
-<p>This is post 5 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the locks that prevent concurrency bugs actually work, and why can misusing them freeze an entire system?</p>
-<blockquote>
-<p>Mutexes, semaphores, and condition variables are the most basic OS-level tools for writing concurrent code. They look simple, but the order in which you take them, how long you hold them, and what they protect change the outcome dramatically. This article walks through the lock families, how deadlock is constructed and avoided, and the lock-free alternatives that often produce safer designs.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Once you realize a race condition is real, the next instinct is usually "add a lock." That instinct is useful, but incomplete. A badly scoped lock or one inconsistent lock order can freeze an entire system just as effectively as the original bug.</p>
+<p>Synchronization primitives are simple only on the surface. Safety depends on the exact rules around ownership, order, and duration.</p>
+<p>This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The differences between mutex, RLock, semaphore, and condition variable</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>A mutex lets one flow at a time enter the critical section. A semaphore lets up to N flows enter at once. An RLock (reentrant lock) lets the same flow take the same lock multiple times. A condition variable is a mechanism for waiting until some predicate becomes true and then waking the waiter.</p>
 </blockquote>
+<p><strong>How synchronization tools gate entry</strong></p>
+<p><img alt="How synchronization tools gate entry" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png"><br>
+<em>Each synchronization primitive controls entry differently, which is why the wrong one changes both safety and throughput.</em></p>
 <pre><code class="language-text">Mutex     : capacity = 1
 Semaphore : capacity = N (e.g., DB connection pool of 10)
 RLock     : same owner can re-enter (recursive functions, etc.)

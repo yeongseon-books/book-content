@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 5
 title: Locks, Mutexes, and Semaphores
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Semaphore
   - Concurrency
 seo_description: How mutexes, semaphores, and condition variables work, why deadlock happens, and how a single misordered lock can freeze a whole system.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Locks, Mutexes, and Semaphores
 
-This is post 5 in the Operating Systems 101 series.
+Once you realize a race condition is real, the next instinct is usually "add a lock." That instinct is useful, but incomplete. A badly scoped lock or one inconsistent lock order can freeze an entire system just as effectively as the original bug.
 
-> Operating Systems 101 series (5/10)
+Synchronization primitives are simple only on the surface. Safety depends on the exact rules around ownership, order, and duration.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do the locks that prevent concurrency bugs actually work, and why can misusing them freeze an entire system?
-
-> Mutexes, semaphores, and condition variables are the most basic OS-level tools for writing concurrent code. They look simple, but the order in which you take them, how long you hold them, and what they protect change the outcome dramatically. This article walks through the lock families, how deadlock is constructed and avoided, and the lock-free alternatives that often produce safer designs.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ A lock is the seat belt of concurrent code, but a wrongly fastened belt can pin 
 ## Concept at a Glance
 
 > A mutex lets one flow at a time enter the critical section. A semaphore lets up to N flows enter at once. An RLock (reentrant lock) lets the same flow take the same lock multiple times. A condition variable is a mechanism for waiting until some predicate becomes true and then waking the waiter.
+
+### How synchronization tools gate entry
+
+![How synchronization tools gate entry](../../../assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
+*Each synchronization primitive controls entry differently, which is why the wrong one changes both safety and throughput.*
 
 ```text
 Mutex     : capacity = 1
