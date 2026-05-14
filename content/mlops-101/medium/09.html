@@ -54,36 +54,29 @@
 </head>
 <body>
 <h1>Feature Store</h1>
-<blockquote>
-<p>MLOps 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do <em>training-time features</em> and <em>serving-time features</em> keep diverging?</p>
-<blockquote>
-<p><em>A Feature Store defines features once and serves them identically to training and serving, eliminating train-serve skew.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When a feature with the same name starts being calculated separately in training code and serving code, the two paths drift sooner or later. Training may use a daily aggregate, serving may use a slightly different real-time expression, and the model ends up seeing two different worlds.</p>
+<p>Train-serve skew is difficult precisely because it is not always obvious. Offline evaluation can still look healthy while production behavior is already weaker because the feature path changed.</p>
 <p>This is post 9 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat a feature store not as a storage box for features, but as the contract layer that lets training and serving share the same definitions.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>What train-serve skew really is</li>
-<li>Online vs offline stores</li>
-<li>Core concepts in Feast</li>
-<li>Feature reuse across teams</li>
-<li>Five common pitfalls</li>
+<li>Why does train-serve skew keep reappearing in ML systems?</li>
+<li>What are the distinct roles of online and offline stores?</li>
+<li>How should you think about entities and feature views in Feast?</li>
+<li>Why are point-in-time joins so important?</li>
+<li>How does a feature store increase reuse across teams?</li>
 </ul>
+<blockquote>
+<p>Mental model: a feature store is not just a place to keep feature values. It is the layer where a feature is defined once and reused consistently by both training and serving.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>If two systems compute the <em>same feature name</em> in two different places, they <em>will</em> diverge. A Feature Store centralizes the definition.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Raw[&quot;raw data&quot;] --&gt; Reg[&quot;feature registry&quot;]
-    Reg --&gt; Off[&quot;offline store&quot;]
-    Reg --&gt; On[&quot;online store&quot;]
-    Off --&gt; Train[&quot;training&quot;]
-    On --&gt; Serve[&quot;serving&quot;]
-</code></pre>
+<p>If two systems compute the same feature separately, divergence is only a matter of time. A small difference in timestamp handling, null behavior, or aggregation logic is enough to create a different model input.</p>
+<p>That is why the real value of a feature store is consistency rather than storage. Training extraction and serving lookup have to reference the same definition if you want train-serve skew to shrink.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/09/09-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+The center of this picture is the feature registry. Raw data becomes a shared feature definition, that definition flows into offline and online paths, training reads one side, serving reads the other, and both consume the same contract.</p>
+<p>That is why the feature store should be definition-centered, not value-centered.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Entity</strong>: the join key for features (e.g., <code>user_id</code>).</li>
