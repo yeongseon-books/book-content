@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Docker Compose</h1>
-<p>This is post 5 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you start many containers <em>reproducibly</em> and <em>all at once</em>?</p>
-<blockquote>
-<p><em>Compose codifies a </em>multi-container environment<em> into </em>one YAML file<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A few <code>docker run</code> commands are manageable when you have only one service. The moment you need a web app, a database, a cache, and maybe a worker, that command-line memory game stops scaling. Teams start depending on tribal knowledge instead of a reproducible environment definition.</p>
+<p>Compose matters because it turns that memory into a checked-in declaration. Services, ports, volumes, healthchecks, and optional profiles become reviewable configuration instead of setup folklore.</p>
+<p>This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what <code>depends_on</code> can and cannot guarantee, and which verification steps tell you the stack is actually ready.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Defining <em>services / networks / volumes</em></li>
@@ -80,14 +71,8 @@
 <p><em>Compose is the shortest path to </em>environment-as-code<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Compose[&quot;compose.yaml&quot;] --&gt; Web[&quot;web service&quot;]
-    Compose --&gt; Db[&quot;db service&quot;]
-    Compose --&gt; Cache[&quot;cache service&quot;]
-    Web --&gt; Net[&quot;app-net&quot;]
-    Db --&gt; Net
-    Cache --&gt; Net
-</code></pre>
+<p><img alt="One Compose file declaring web, database, and cache services on a shared network" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Compose turns a multi-container environment into one reviewable declaration of services, networks, volumes, and health checks</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Service</strong>: a <em>group of containers</em> from one image.</li>
@@ -149,6 +134,16 @@ ports: [&quot;${APP_PORT}:8000&quot;]
 <pre><code class="language-bash">docker compose down            # remove containers
 docker compose down -v         # also remove volumes
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li>In <code>docker compose ps</code>, the database should become <code>healthy</code> before the web service settles into its running state.</li>
+<li><code>docker compose logs -f web</code> should show the application starting without immediate database connection errors.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If the web container exits too early, verify that <code>depends_on</code> uses <code>condition: service_healthy</code> rather than plain start order.</li>
+<li>If test data vanished after <code>down -v</code>, that is expected; make sure disposable and persistent data do not share the same volume strategy.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>healthcheck + condition: service_healthy</em> waits for <em>real readiness</em>.</li>
@@ -201,11 +196,16 @@ docker compose down -v         # also remove volumes
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/compose/compose-file/">Compose specification</a></li>
 <li><a href="https://docs.docker.com/compose/">Overview of Compose</a></li>
 <li><a href="https://docs.docker.com/compose/profiles/">Compose profiles</a></li>
 <li><a href="https://docs.docker.com/compose/compose-file/05-services/#healthcheck">Healthcheck in Compose</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/compose/how-tos/startup-order/">Compose startup order and dependency conditions</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Compose, YAML, MultiContainer, Dev</p>
 </body>
