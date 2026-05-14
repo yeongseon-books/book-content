@@ -17,7 +17,7 @@ tags:
   - PMF
   - Beginner
 seo_description: 불확실한 결과를 숫자로 변환하는 확률변수와 PMF, PDF, CDF의 차이를 구분하여 데이터 분포를 읽는 기초를 다집니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 확률변수
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Sample["표본공간"] --> RV["X: Omega -> R"]
-    RV --> Discrete["이산형: PMF"]
-    RV --> Cont["연속형: PDF"]
-    Discrete --> CDF["CDF"]
-    Cont --> CDF
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/05/05-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
