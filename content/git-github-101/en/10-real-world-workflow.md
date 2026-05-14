@@ -1,7 +1,7 @@
 ---
 episode: 10
 language: en
-last_reviewed: '2026-05-05'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -226,6 +226,41 @@ Closed • yeongseon opened about 1 hour ago
 
 That is one full cycle. The next change starts at a new issue.
 
+## The decision flow before you press merge
+
+In practice, the risky part is rarely opening the PR. The risky part is deciding whether the branch is truly ready to merge. A simple decision flow makes that judgment repeatable.
+
+![The decision flow before you press merge](../../../assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.en.png)
+
+*A GitHub Flow decision map from issue scope to merge method and release tagging*
+
+This turns the merge button from a habit into the last step of a checklist.
+
+## Verification loop just before merge
+
+The most useful workflow guardrail is a fixed pre-merge review pass.
+
+1. Run `git status` and confirm the working tree is clean.
+2. Run `git log --oneline origin/main..HEAD` and read the exact commits entering the PR.
+3. Run `git diff --stat origin/main...HEAD` and confirm the scope is still what the issue promised.
+4. Re-read the PR body: `Closes #N`, verification steps, and release-tag intent should all be present.
+5. Confirm CI and required reviews are green.
+6. After the merge, pull `main`, create an annotated tag if needed, and delete the branch.
+
+That sequence catches the most common workflow failures: oversized PRs, missing issue linkage, and merge-ready branches that were never actually verified.
+
+## Choosing squash, merge commit, or rebase merge
+
+Beginners should usually follow one team default, but it still helps to understand the trade-off.
+
+| Method | Best fit | Main trade-off |
+| --- | --- | --- |
+| Squash merge | Keep `main` readable as one line per PR | Branch-level commit detail disappears from `main` |
+| Merge commit | Preserve the branch structure and the exact landing point | The graph grows more complex faster |
+| Rebase merge | Keep each commit while avoiding a merge bubble | Rewritten commit hashes can make tracing discussion harder |
+
+For small teams and tutorial repositories, squash merge is usually the clearest default. If the branch structure itself matters, or if individual commits inside the PR are worth preserving on `main`, a merge commit can be the better fit.
+
 ## Recovery flows
 
 Here are the mid-flow accidents teams run into most often, paired with the first command to type when they happen.
@@ -262,6 +297,8 @@ To keep the same flow stable across a team, lean on four automated guardrails ra
 Add the `commit-msg` hook and `commitlint` from Episode 9 on top, and the format holds at every step of the flow.
 
 Defaulting to squash merge keeps the history readable too. Small commits inside a feature branch collapse into one commit per PR, so `git log --oneline` on `main` reads as one line per PR.
+
+The recovery table belongs in team documentation too. If a branch gets force-pushed incorrectly or a secret leaks into history, the team should not be inventing the response live during the incident. A small runbook linked from the repository makes the workflow much calmer under pressure.
 
 ## Checklist
 
@@ -311,5 +348,7 @@ This post closes the Git & GitHub 101 series. The natural next step is automatio
 - Git docs, `git revert -m`: <https://git-scm.com/docs/git-revert>
 - GitHub Docs, "About protected branches": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches>
 - GitHub Docs, "About code owners": <https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners>
+- GitHub Docs, "About merge methods on GitHub": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
+- GitHub Docs, "About required status checks": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging>
 
 Tags: github-flow, git-workflow, conventional-commits, semantic-versioning, code-review, release-tag
