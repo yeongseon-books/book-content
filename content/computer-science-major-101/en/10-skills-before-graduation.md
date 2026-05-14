@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 10
 title: Skills to Have Before Graduation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,58 +17,58 @@ tags:
   - Career
   - Capstone
 seo_description: A beginner-friendly tour of skills to have before graduation, covering self check axes and a clear next study path.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Skills to Have Before Graduation
 
-> Computer Science Major 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: *Beyond* the *diploma*, *which skills* actually *land* at work?
-
-> Five axes — *fundamentals + systems + data + collaboration + writing* — are the field standard.
-
-<!-- a-grade-intro:end -->
+As graduation gets closer, many students feel the same anxiety. They have almost finished the coursework, but they are still not sure whether they are actually ready for work.
 
 This is the final post in the Computer Science Major 101 series.
 
+## Questions This Post Answers
+
+- Which abilities matter beyond the diploma itself?
+- Why should you evaluate fundamentals, systems, data, collaboration, and writing together?
+- Why are GPA and certificates alone not enough to explain readiness?
+- What standard can you use to check yourself right before graduation?
+
 ## What You Will Learn
 
-- *Fundamental* skills
-- *Systems* sense
-- *Data* sense
-- *Collaboration* tools
-- *Writing* ability
+- Fundamental skills
+- Systems sense
+- Data sense
+- Collaboration tools
+- Writing ability
 
 ## Why It Matters
 
-Your *first six months* set the *baseline* for your *whole career*.
+The first few months of your first job matter more than many students expect. That period often sets the baseline for how the rest of your early career unfolds, so a graduation self-check is less about self-esteem and more about strengthening your starting point.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Fundamentals] --> S[Systems]
-    S --> D[Data]
-    D --> C[Collab]
-    C --> W[Writing]
-```
+![Graduation skill map](../../../assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
+
+*How fundamentals, systems, data, collaboration, and writing form graduation readiness*
+
+> A graduation self-check is not about counting completed courses. It is about making sure the five practical axes you will use at work are not empty.
+
+These five axes do not stand alone. Fundamentals support systems thinking, systems and data support service building, and collaboration plus writing are what let your results scale inside a real team.
 
 ## Key Terms
 
-- **fundamentals**: *base strength*.
-- **systems sense**: *runtime feel*.
-- **data sense**: *data intuition*.
-- **collab**: *teamwork*.
-- **writing**: *documentation*.
+- **fundamentals**: the base strength you keep using for years.
+- **systems sense**: the ability to reason about runtime behavior.
+- **data sense**: the ability to store, query, and interpret data.
+- **collaboration**: how you work effectively with other people.
+- **writing**: the ability to leave behind decisions and reasoning in documents.
 
 ## Before/After
 
-**Before**: *GPA* equals *skill*.
+**Before**: You treat GPA as the same thing as skill.
 
-**After**: *Evidence* equals *skill*.
+**After**: You judge yourself by evidence rather than by scores alone.
 
 ## Hands-on: Graduation Self Check
 
@@ -78,11 +78,15 @@ flowchart LR
 fund = ["array", "list", "tree", "graph", "hash"]
 ```
 
+Fundamentals can often be checked through a list of explainable concepts. The point is not whether you have seen the term before, but whether you can explain the trade-offs in your own words.
+
 ### Step 2 — Systems
 
 ```python
 sys_topics = ["process", "memory", "io", "network"]
 ```
+
+Systems sense connects directly to debugging ability. It is the axis that helps you explain where code spends time and resources.
 
 ### Step 3 — Data
 
@@ -90,11 +94,15 @@ sys_topics = ["process", "memory", "io", "network"]
 data_topics = ["sql", "stats", "ml_basic"]
 ```
 
+Data storage and interpretation keep resurfacing across modern software teams. SQL and statistics show up far more often than many students expect.
+
 ### Step 4 — Collab
 
 ```python
 collab = ["git", "review", "issues", "ci"]
 ```
+
+Experience with collaboration tools strongly affects how fast you adapt after joining a team. Code written alone and code handled by a team live under different constraints.
 
 ### Step 5 — Docs
 
@@ -102,48 +110,64 @@ collab = ["git", "review", "issues", "ci"]
 docs = ["readme", "design_doc", "post_mortem"]
 ```
 
+This document list is really an evidence list. Code alone cannot explain every decision, so writing is not a decorative skill. It is part of the core skill set.
+
 ## What to Notice in This Code
 
-- The *list* is your *self check sheet*.
-- *3 to 5 items* per area is enough.
-- *Evidence* lives in both *code* and *docs*.
+- This list is a self-check sheet.
+- Three to five items per area is usually enough.
+- Evidence should exist in both code and documentation.
 
 ## Five Common Mistakes
 
-1. **Listing *certificates* only.**
-2. **Emphasizing *GPA* only.**
-3. **An *empty GitHub*.**
-4. **Not a single *doc*.**
-5. **No *retrospectives*.**
+1. **Listing certificates only.**
+2. **Overemphasizing GPA only.**
+3. **Leaving GitHub empty.**
+4. **Finishing school without a single usable document.**
+5. **Letting experience pass by with no retrospective or written learning.**
 
 ## How This Shows Up in Production
 
-Hiring looks at the *balance* of all *five axes* — a *zero* anywhere shakes the *whole*.
+Hiring and onboarding both care about balance across the five axes. If one axis is nearly empty, the rest of your strengths become harder to trust. Code alone, communication alone, or project count alone rarely carries someone for long.
+
+## Evidence Mapping Example
+
+The most important graduation question is not "Can I say I know this?" but "What can I show for it?" When you map each axis to concrete evidence, your preparation level becomes much easier to judge.
+
+| Axis | Minimum evidence example | Self-check question |
+| --- | --- | --- |
+| Fundamentals | algorithm notes, data structure practice repository | Can I explain time complexity and trade-offs in my own words? |
+| Systems | debugging notes, OS or networking measurement exercise | Can I explain why a slow program is slow one layer below the code? |
+| Data | SQL coursework, a small analysis report | Can I explain storage shape and query cost together? |
+| Collaboration | GitHub PRs, issues, review history | Can I explain how I changed code through team process rather than alone? |
+| Writing | README, design note, retrospective | Can I leave behind reasoning and lessons in a way others can read? |
+
+The point of this table is not size. It is linkage. You do not need a huge project, but you do need at least one result per axis that you can actually show.
 
 ## How a Senior Engineer Thinks
 
-- *Fundamentals* decide.
-- *Systems* means *debugging*.
-- *Data* is the *common language*.
-- *Collaboration* is *evidence*.
-- *Docs* are *wealth*.
+- Fundamentals last the longest.
+- Systems sense becomes debugging skill.
+- Data is the common language of many teams.
+- Collaboration records show attitude as much as output.
+- Documents become assets over time.
 
 ## Checklist
 
-- [ ] *Five-axis* self check.
-- [ ] *Evidence* mapped.
-- [ ] *Weak areas* marked.
-- [ ] *Next study* plan.
+- [ ] I checked myself across all five axes.
+- [ ] I mapped evidence to each axis.
+- [ ] I marked the weakest area.
+- [ ] I wrote at least a one-line next study plan.
 
 ## Practice Problems
 
-1. Define *fundamentals* in one line.
-2. Define *systems sense* in one line.
-3. State the meaning of *writing ability* in one line.
+1. Define fundamentals in one line.
+2. State the meaning of systems sense in one line.
+3. Explain why writing ability matters in one line.
 
 ## Wrap-up and Next Steps
 
-This series ends here. Next: *Capstone Project 101*.
+Before graduation, it is more useful to check which abilities you can actually demonstrate than to count how many courses you completed. If you revisit yourself through the five axes of fundamentals, systems, data, collaboration, and writing, the empty spots become much easier to see. This series ends here, but the next stage of study usually starts with the weakest axis you still need to strengthen.
 
 <!-- toc:begin -->
 - [What Computer Science Majors Learn](./01-what-cs-majors-learn.md)
