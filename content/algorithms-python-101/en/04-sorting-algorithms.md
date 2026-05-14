@@ -252,6 +252,12 @@ In practice, you almost never implement a sorting algorithm yourself. sorted() a
 
 Still, knowing the principles matters. Understanding "why this sort is slow" or "why stability matters here" helps you choose the right tool.
 
+## Sorting decisions in production systems
+
+- If you sort once and read many times, spending O(n log n) up front may simplify everything downstream.
+- If equal items must preserve arrival order for pagination, logs, or event playback, stability is a correctness issue, not just a nice-to-have.
+- If sorting becomes a bottleneck, the first check is usually whether you are sorting too much data too often, not whether Python's built-in sort is inadequate.
+
 ## Checklist
 
 - [ ] Explain the differences among the three O(n^2) sorts
