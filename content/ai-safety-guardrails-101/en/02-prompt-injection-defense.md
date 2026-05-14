@@ -14,7 +14,7 @@ tags:
 - Prompt Injection
 - Guardrails
 - Red Team
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Defend against direct and indirect prompt injection using a layered strategy of regex filters, embedding classifiers, and secondary LLM judges.
 ---
 
@@ -27,7 +27,14 @@ Prompt injection works because system and user messages end up in the same conte
 This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- What separates direct injection from indirect injection structurally?
+- Where does regex help, and where does it fail immediately?
+- Why do embedding classifiers catch variants that pattern matching misses?
+- When is a secondary LLM judge worth the latency and cost?
+- How should untrusted external documents be wrapped before the model sees them?
 
 ## Why "Ignore Previous Instructions" Works
 
@@ -277,6 +284,14 @@ Wire this red-team set into CI (the regression pattern from Ep8) so every guardr
 - All external data must be treated as **untrusted** and wrapped with clear delimiters.
 - The LLM judge is strong but injectable itself; isolate user input inside it.
 - Maintain a **red-team regression set** in CI to validate every guardrail change.
+
+## Operational Checklist
+
+- [ ] Run a cheap regex layer on every request.
+- [ ] Route suspicious but not obvious prompts to a semantic classifier or judge.
+- [ ] Wrap every retrieved document and external message as untrusted data.
+- [ ] Keep red-team prompts in CI and track both recall and false positives.
+- [ ] Return generic block messages while logging detailed reasons internally.
 
 ---
 

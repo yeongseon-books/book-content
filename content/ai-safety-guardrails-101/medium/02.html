@@ -60,7 +60,14 @@
 <p>Prompt injection works because system and user messages end up in the same context window. If you treat user input as harmless text, an attacker can turn it into an instruction channel.</p>
 <p>This is post 2 in the AI Safety &amp; Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>What separates direct injection from indirect injection structurally?</li>
+<li>Where does regex help, and where does it fail immediately?</li>
+<li>Why do embedding classifiers catch variants that pattern matching misses?</li>
+<li>When is a secondary LLM judge worth the latency and cost?</li>
+<li>How should untrusted external documents be wrapped before the model sees them?</li>
+</ul>
 <h2>Why "Ignore Previous Instructions" Works</h2>
 <p>The simplest prompt injection from Ep1 was:</p>
 <pre><code class="language-text">[System] Do not output the password.
@@ -264,6 +271,14 @@ def evaluate_guardrail():
 <li>All external data must be treated as <strong>untrusted</strong> and wrapped with clear delimiters.</li>
 <li>The LLM judge is strong but injectable itself; isolate user input inside it.</li>
 <li>Maintain a <strong>red-team regression set</strong> in CI to validate every guardrail change.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Run a cheap regex layer on every request.</li>
+<li>[ ] Route suspicious but not obvious prompts to a semantic classifier or judge.</li>
+<li>[ ] Wrap every retrieved document and external message as untrusted data.</li>
+<li>[ ] Keep red-team prompts in CI and track both recall and false positives.</li>
+<li>[ ] Return generic block messages while logging detailed reasons internally.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>
