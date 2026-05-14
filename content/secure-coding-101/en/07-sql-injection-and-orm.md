@@ -17,24 +17,20 @@ tags:
   - SecureCoding
   - OWASP
 seo_description: Parameterized queries, safe ORM patterns, raw SQL pitfalls, and a five-step playbook to defeat SQL injection for good.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # SQL Injection and Safe ORM Usage
 
+SQL injection is old, but it remains expensive because one mistake can hand over not just a page or a user account, but the entire database behind the application. A single f-string in the wrong place can become an authentication bypass, a data dump, and a destructive write path at the same time.
+
 This is post 7 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (7/10)
+Here, we will treat SQL injection as a structural error in how code combines syntax and data, not as a problem that disappears automatically once an ORM is in place. That distinction is what helps you reason clearly about raw SQL, dynamic identifiers, ORM escape hatches, and database account permissions.
 
-<!-- a-grade-intro:begin -->
+> SQL injection almost always comes from the same root cause: building SQL by string composition instead of sending data as data.
 
-**Core question**: Twenty-five years on, why is *SQL injection still the top issue*?
-
-> *The cause is always the same — *building SQL by string concatenation*. So is the fix — *use parameters*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - How *SQL injection* works
 - Why *parameterized queries* matter
@@ -50,14 +46,9 @@ A single SQLi exposes the *entire database*. Auth bypass, data exfiltration, and
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Input["User input"] -->|concat| Bad["SQL string"]
-    Bad --> Vuln["Vulnerable (SQLi)"]
-    Input -->|parameter| Good["Prepared statement"]
-    Good --> Safe["Safe"]
-```
+![The difference between string-built SQL and parameterized SQL](../../../assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
 
+*The difference between string-built SQL and parameterized SQL*
 ## Key Terms
 
 - **SQL Injection**: input that *changes the meaning* of the SQL.
@@ -113,6 +104,22 @@ session.execute(text("SELECT * FROM logs WHERE user_id=:uid"), {"uid": uid})
 -- The app account does DML only; DDL belongs to a separate account.
 GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 ```
+
+## How to verify the query path before production
+
+It is worth checking the dangerous cases explicitly instead of assuming the ORM got everything right.
+
+```python
+payload = "' OR 1=1 --"
+
+# Safe path: returns only matching rows for the literal payload value
+cursor.execute("SELECT id FROM users WHERE name=%s", (payload,))
+
+# Unsafe path: payload changes the SQL itself
+sql = f"SELECT id FROM users WHERE name='{payload}'"
+```
+
+**Expected result:** the parameterized version treats the payload as a string value and returns either zero or legitimate matches. The interpolated version changes the query meaning and can return unintended rows. This is the fastest possible demonstration to keep in a team code review.
 
 ## What to Notice in This Code
 
@@ -176,5 +183,6 @@ A safe DB removes the attacker's *biggest prize*. Next we cover the two browser-
 - [PortSwigger — SQL injection](https://portswigger.net/web-security/sql-injection)
 - [SQLAlchemy security](https://docs.sqlalchemy.org/)
 - [psycopg parameter binding](https://www.psycopg.org/psycopg3/docs/basic/params.html)
+- [SQLAlchemy — Selecting with textual SQL](https://docs.sqlalchemy.org/en/20/tutorial/dbapi_transactions.html)
 
 Tags: SQLInjection, ORM, Database, SecureCoding, OWASP

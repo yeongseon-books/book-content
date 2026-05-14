@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - OWASP
 seo_description: Parameterized query, ORM 안전 사용, raw SQL 위험성 그리고 SQLi 방어 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # SQL Injection과 ORM 안전 사용
@@ -46,14 +46,9 @@ SQL injection은 단일 필드 검증 실수가 데이터베이스 전체 사고
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Input["User input"] -->|concat| Bad["SQL string"]
-    Bad --> Vuln["Vulnerable (SQLi)"]
-    Input -->|parameter| Good["Prepared statement"]
-    Good --> Safe["Safe"]
-```
+![문자열 결합 SQL과 파라미터 바인딩 SQL의 차이](../../../assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
 
+*문자열 결합 SQL과 파라미터 바인딩 SQL의 차이*
 이 그림은 SQL injection의 본질을 단순하게 보여 줍니다. 문자열 연결은 입력값을 SQL 문법 안으로 섞어 넣고, prepared statement는 SQL과 값을 분리합니다. 이 한 차이가 공격 가능성과 안전성을 가릅니다.
 
 ## 핵심 용어
@@ -119,6 +114,22 @@ session.execute(text("SELECT * FROM logs WHERE user_id=:uid"), {"uid": uid})
 -- 애플리케이션 계정은 DML만 수행하고 DDL은 별도 계정이 맡습니다.
 GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 ```
+
+## 배포 전에 꼭 해 볼 검증
+
+SQL injection 방어는 “ORM을 쓰니까 괜찮다”로 끝내지 말고, 위험한 입력을 직접 넣어 보며 확인하는 편이 좋습니다.
+
+```python
+payload = "' OR 1=1 --"
+
+# 안전한 경로: payload를 문자열 값으로만 취급
+cursor.execute("SELECT id FROM users WHERE name=%s", (payload,))
+
+# 위험한 경로: payload가 SQL 의미를 바꿔 버림
+sql = f"SELECT id FROM users WHERE name='{payload}'"
+```
+
+**기대 결과:** 파라미터 바인딩 버전은 해당 문자열과 정확히 일치하는 값만 찾고, 문자열 결합 버전은 의도하지 않은 행을 돌려줄 수 있습니다. 이 차이를 팀 전체가 한 번 눈으로 확인하면 코드 리뷰 기준도 훨씬 단단해집니다.
 
 SQL injection이 완전히 막히지 못하더라도 DB 계정 권한이 최소화돼 있으면 피해 범위를 줄일 수 있습니다. 애플리케이션 계정에 `DROP`이나 광범위한 관리자 권한이 있으면 취약점 하나가 곧 데이터 파괴로 이어집니다.
 
@@ -189,5 +200,6 @@ SQL injection은 새로운 종류의 공격이라기보다, SQL과 데이터를 
 - [PortSwigger — SQL injection](https://portswigger.net/web-security/sql-injection)
 - [SQLAlchemy security](https://docs.sqlalchemy.org/)
 - [psycopg parameter binding](https://www.psycopg.org/psycopg3/docs/basic/params.html)
+- [SQLAlchemy — Working with DBAPI transactions and statements](https://docs.sqlalchemy.org/en/20/tutorial/dbapi_transactions.html)
 
 Tags: SQLInjection, ORM, Database, SecureCoding, OWASP
