@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Defining the Reader</h1>
-<p>This is post 2 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does a post for <em>everyone</em> end up <em>helping no one</em>?</p>
-<blockquote>
-<p>A <em>clear reader</em> makes <em>clear sentences</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The same FastAPI example can be a friendly introduction for a junior engineer and a useless wall of text for the on-call engineer trying to restore service. The writing is not necessarily wrong. The target moved.</p>
+<p>Once the reader is blurry, everything else drifts with it: how much background to include, which terms need explanation, how hard the example can be, and what the post should deliberately leave out. A concrete reader makes those decisions faster.</p>
+<p>This is post 2 in the Technical Writing 101 series. Here we turn the reader into a working model with persona, prior knowledge, goal, and non-goal.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>Building a <em>persona</em></li>
 <li>Mapping <em>prior knowledge</em></li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>A blurry <em>reader</em> leads to blurry <em>sentences</em>.</p>
+<blockquote>
+<p>Mental model: once one reader becomes concrete, scope and vocabulary stop drifting.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Persona] --&gt; K[Knowledge]
-    K --&gt; G[Goal]
-    G --&gt; S[Scope]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>persona</strong>: A <em>model of the reader</em>.</li>
@@ -93,6 +84,39 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "A post for <em>developers</em>."</p>
 <p><strong>After</strong>: "A post for a <em>first-year Python</em> engineer learning <em>FastAPI</em>."</p>
+<h2>The same feature changes shape for different readers</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Reader</th>
+<th>Already knows</th>
+<th>Needs right now</th>
+<th>Should be left out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Beginner</td>
+<td>Python syntax, <code>pip</code></td>
+<td>A first FastAPI endpoint</td>
+<td>Deployment strategy, performance tuning</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>API basics</td>
+<td>Missing prerequisites in the draft</td>
+<td>Full install walkthrough</td>
+</tr>
+<tr>
+<td>On-call engineer</td>
+<td>Production environment</td>
+<td>Triage steps and logs</td>
+<td>Refresher on beginner concepts</td>
+</tr>
+</tbody>
+</table>
+<p>The same <code>/health</code> endpoint example serves different purposes for each row. That is why a persona is not decorative UX language. It is an editing boundary for depth, vocabulary, and scope.</p>
 <h2>Hands-on: A Persona Card</h2>
 <p><strong>Step 1 — Name and role</strong></p>
 <pre><code class="language-python">persona = {&quot;name&quot;: &quot;Jimin&quot;, &quot;role&quot;: &quot;First-year Python backend&quot;}
