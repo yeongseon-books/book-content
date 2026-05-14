@@ -14,8 +14,8 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-05-12'
-seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
+last_reviewed: '2026-05-15'
+seo_description: ACA를 숨은 Kubernetes 위의 제품 계층으로 읽고 Environment·Revision·KEDA·Dapr·Envoy 경계를 정리합니다.
 ---
 
 # ACA 아키텍처 — 사용자에게 보이지 않는 Kubernetes 위에 얹은 것
@@ -207,6 +207,22 @@ az containerapp env workload-profile list \
 ```
 
 이 명령은 “내가 지금 어느 Environment 위에서 어떤 경계를 공유하고 있는가”를 빠르게 확인할 때 유용합니다. 특히 이후 글의 네트워크, Dapr, scale 관련 논의를 실제 환경과 연결하는 첫 점검으로 좋습니다.
+
+여기서 한 단계 더 나가면 아키텍처 지도를 실제 리소스와 바로 연결할 수 있습니다.
+
+```bash
+az containerapp show \
+  --name my-app --resource-group my-rg \
+  --query "{app:name, env:properties.managedEnvironmentId, latestRevision:properties.latestRevisionName, ingress:properties.configuration.ingress.external}"
+```
+
+**Expected output:**
+
+- `env` 값으로 이 앱이 어느 Environment 경계에 속하는지 바로 확인합니다.
+- `latestRevision` 값으로 앱이라는 논리 이름 뒤에 실제 런타임 스냅샷이 따로 존재함을 확인합니다.
+- `ingress` 값으로 사용자 요청 경로가 열려 있는지 닫혀 있는지 확인합니다.
+
+이 두 명령을 묶어 보면, 1편에서 설명한 큰 그림이 포털 설명이 아니라 실제 리소스 관계라는 점이 더 분명해집니다. Environment는 바깥 경계이고, Revision은 런타임 단위이며, Ingress는 그 위에 얹힌 노출 표면입니다.
 
 ## 흔히 헷갈리는 지점
 

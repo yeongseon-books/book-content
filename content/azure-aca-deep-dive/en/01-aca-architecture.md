@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: en
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: 'Inside Azure Container Apps: the hidden Kubernetes layer, the ACA
   control plane, and the line between platform and tenant workload.'
 series: azure-aca-deep-dive
@@ -354,6 +354,22 @@ az containerapp env workload-profile list \
   --name my-env --resource-group my-rg \
   -o table
 ```
+
+Add one app-level check and the architecture map becomes concrete immediately.
+
+```bash
+az containerapp show \
+  --name my-app --resource-group my-rg \
+  --query "{app:name, env:properties.managedEnvironmentId, latestRevision:properties.latestRevisionName, ingress:properties.configuration.ingress.external}"
+```
+
+**Expected output:**
+
+- `env` tells you which environment boundary the app belongs to.
+- `latestRevision` confirms that the app name is only the logical surface, while runtime execution hangs off a distinct revision snapshot.
+- `ingress` tells you whether the user-facing path is exposed.
+
+Together, these commands turn the big-picture diagram into an operator check: environment as boundary, revision as runtime unit, ingress as exposure surface.
 
 ## Operational checklist
 
