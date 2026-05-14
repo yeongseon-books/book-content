@@ -16,7 +16,7 @@ tags:
   - Variance
   - Moments
   - Beginner
-seo_description: 기대값과 분산으로 분포의 중심과 퍼짐을 읽는 방법입니다.
+seo_description: 확률 분포의 중심인 기대값과 데이터가 흩어진 정도인 분산의 통계적 의미를 배우고, 필수적인 수학적 성질을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

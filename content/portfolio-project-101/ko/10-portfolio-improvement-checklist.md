@@ -16,7 +16,7 @@ tags:
   - Quality
   - Review
   - Beginner
-seo_description: 포트폴리오 공개 전 마지막 점검 항목을 정리합니다.
+seo_description: 포트폴리오 공개 전 코드 품질, 문서화 수준, 데모 작동 여부 등 최종 점검 항목을 체크리스트로 정리하여 완성합니다.
 last_reviewed: '2026-05-12'
 ---
 

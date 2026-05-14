@@ -16,7 +16,7 @@ tags:
   - Slicing
   - Debugging
   - scikit-learn
-seo_description: 평균 점수 뒤의 실패 패턴을 오류 분석으로 드러내는 법입니다
+seo_description: 평균 점수에 가려진 모델의 취약점을 파악하기 위한 오류 분석 기법을 소개하고, 실패 패턴을 찾아 모델을 개선합니다.
 last_reviewed: '2026-05-12'
 ---
 

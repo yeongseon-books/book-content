@@ -16,7 +16,7 @@ tags:
   - DevOps
   - Hosting
   - Beginner
-seo_description: 공개 URL과 재배포 흐름을 갖춘 배포 기본기를 설명합니다.
+seo_description: 프로젝트 결과물을 외부에서 확인 가능한 URL로 배포하는 과정과 지속적 업데이트를 위한 자동화 파이프라인 구축을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

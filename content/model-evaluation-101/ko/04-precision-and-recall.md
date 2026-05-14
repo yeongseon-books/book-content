@@ -16,7 +16,7 @@ tags:
   - Recall
   - ConfusionMatrix
   - scikit-learn
-seo_description: 정밀도와 재현율의 균형을 임계값 관점에서 설명합니다
+seo_description: 정밀도와 재현율의 트레이드오프 관계를 이해하고, 비즈니스 상황에 맞는 임계값 설정으로 모델 유용성을 높이는 전략을 알아봅니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Networking
   - Community
   - Beginner
-seo_description: 멘토를 찾고 네트워크를 키우는 방법을 정리한 글
+seo_description: 선배 개발자로부터 배울 수 있는 멘토링 기회 확보 방법과 기술 커뮤니티 네트워킹을 통한 성장 전략을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - AUC
   - PRCurve
   - scikit-learn
-seo_description: ROC와 AUC를 임계값 없는 순위 평가 관점에서 설명합니다
+seo_description: 임계값 변화에 따른 모델의 변별력을 나타내는 ROC 곡선과 AUC 지표의 의미를 이해하고, 모델 성능을 객관적으로 측정합니다.
 last_reviewed: '2026-05-12'
 ---
 

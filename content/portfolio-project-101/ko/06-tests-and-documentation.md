@@ -16,7 +16,7 @@ tags:
   - Documentation
   - Quality
   - Beginner
-seo_description: 포트폴리오 신뢰를 높이는 테스트와 문서화 기준을 설명합니다.
+seo_description: 코드 안정성을 증명하는 단위 테스트 작성법과 기술 깊이를 보여주는 상세 문서화 기준으로 프로젝트 신뢰를 높입니다.
 last_reviewed: '2026-05-12'
 ---
 

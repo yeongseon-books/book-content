@@ -16,7 +16,7 @@ tags:
   - Documentation
   - Onboarding
   - Beginner
-seo_description: 60초 안에 읽히는 포트폴리오 README 작성법을 설명합니다.
+seo_description: 채용 담당자가 1분 안에 프로젝트 가치를 파악하도록 돕는 구조적 README 작성법과 가독성 있는 레이아웃 구성을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

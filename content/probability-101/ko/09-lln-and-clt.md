@@ -16,7 +16,7 @@ tags:
   - CLT
   - Sampling
   - Beginner
-seo_description: 평균이 왜 수렴하고 왜 정규분포가 자주 나타나는지 설명합니다.
+seo_description: 표본 크기에 따른 평균 수렴의 대수의 법칙과 임의 분포가 정규분포로 수렴하는 중심극한정리의 중요성을 파악합니다.
 last_reviewed: '2026-05-12'
 ---
 

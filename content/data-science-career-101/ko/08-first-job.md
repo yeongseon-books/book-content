@@ -16,7 +16,7 @@ tags:
   - Stakeholders
   - Communication
   - Beginner
-seo_description: 첫 데이터 직무의 90일 적응 전략과 우선순위를 정리합니다
+seo_description: 데이터 직군 입사 후 첫 90일 온보딩 전략과 유관 부서 이해관계자들과 효과적으로 소통하며 신뢰를 쌓는 방법을 알아봅니다.
 last_reviewed: '2026-05-12'
 ---
 

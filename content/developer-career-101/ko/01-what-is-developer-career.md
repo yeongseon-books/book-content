@@ -16,7 +16,7 @@ tags:
   - Growth
   - Junior
   - Beginner
-seo_description: 개발자 커리어의 단계와 성장 축을 정리한 글
+seo_description: 개발자 커리어의 단계별 성장 과정과 필수 역량 축을 분석하고, 지속 가능한 성장을 이루기 위한 핵심 로드맵을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

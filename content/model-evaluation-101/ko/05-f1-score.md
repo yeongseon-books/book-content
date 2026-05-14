@@ -16,7 +16,7 @@ tags:
   - Fbeta
   - ImbalancedData
   - scikit-learn
-seo_description: F1과 F-beta, 평균 방식 차이를 실습 코드와 함께 설명합니다
+seo_description: 정밀도와 재현율을 조화롭게 평가하는 F1 점수의 의미를 파악하고, 마이크로 및 매크로 평균 방식의 차이를 비교합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - ModelCard
   - Reproducibility
   - scikit-learn
-seo_description: 배포 판단에 필요한 평가 리포트 구조와 자동화 방식을 다룹니다
+seo_description: 프로덕션 배포 결정의 근거가 되는 종합적인 모델 평가 리포트 구성 요소와 자동화된 파이프라인 구축 방법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

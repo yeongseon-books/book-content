@@ -16,7 +16,7 @@ tags:
   - Leadership
   - Impact
   - Beginner
-seo_description: 시니어 데이터 직무로 성장할 때 필요한 행동 변화를 정리합니다
+seo_description: 시니어 데이터 전문가로 도약하기 위해 필요한 기술 리더십과 문제 해결 능력, 팀 전체 성과를 견인하는 전략적 사고방식을 탐구합니다.
 last_reviewed: '2026-05-12'
 ---
 

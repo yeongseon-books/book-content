@@ -16,7 +16,7 @@ tags:
   - BrierScore
   - Reliability
   - scikit-learn
-seo_description: 예측 확률을 얼마나 믿을 수 있는지 보정 관점에서 설명합니다
+seo_description: 분류 모델의 확률값이 실제 빈도와 일치하도록 보정하는 캘리브레이션 개념과 브라이어 점수 기반 신뢰도 측정법을 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

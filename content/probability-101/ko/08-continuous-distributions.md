@@ -16,7 +16,7 @@ tags:
   - Normal
   - Exponential
   - Beginner
-seo_description: 대표 연속분포와 표준화의 의미를 실무 감각으로 정리합니다.
+seo_description: 정규분포와 지수분포 등 연속 확률 분포 특징을 이해하고, 데이터 비교에 필수적인 표준화 과정의 의의를 고찰합니다.
 last_reviewed: '2026-05-12'
 ---
 

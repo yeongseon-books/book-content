@@ -16,7 +16,7 @@ tags:
   - UX
   - Showcase
   - Beginner
-seo_description: 30초 안에 가치를 보여 주는 데모 구성 원칙을 설명합니다.
+seo_description: 결과물을 즉시 체험하는 데모 구성 전략을 알아보고, 짧은 시간 안에 핵심 기능을 강렬하게 전달하는 기법을 학습합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - MachineLearning
   - Foundations
   - Beginner
-seo_description: 정확도 한 줄이 왜 부족한지 평가의 기준부터 다시 잡습니다
+seo_description: 머신러닝 모델 평가가 비즈니스 목표와 일치해야 하는 이유를 설명하고, 올바른 평가 지표 설정을 위한 접근법을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

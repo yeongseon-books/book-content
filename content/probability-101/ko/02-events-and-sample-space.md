@@ -16,7 +16,7 @@ tags:
   - Events
   - SetTheory
   - Beginner
-seo_description: 사건과 표본공간을 집합 관점으로 정리하는 확률 기초 글입니다.
+seo_description: 모든 결과를 담는 표본공간과 사건의 개념을 집합론 관점에서 정의하고, 복잡한 확률 문제를 푸는 기초 틀을 마련합니다.
 last_reviewed: '2026-05-12'
 ---
 

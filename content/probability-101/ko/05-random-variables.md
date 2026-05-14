@@ -16,7 +16,7 @@ tags:
   - Distribution
   - PMF
   - Beginner
-seo_description: 확률변수와 PMF, PDF, CDF의 차이를 한 흐름으로 설명합니다.
+seo_description: 불확실한 결과를 숫자로 변환하는 확률변수와 PMF, PDF, CDF의 차이를 구분하여 데이터 분포를 읽는 기초를 다집니다.
 last_reviewed: '2026-05-12'
 ---
 

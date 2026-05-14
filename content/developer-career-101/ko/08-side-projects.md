@@ -16,7 +16,7 @@ tags:
   - Learning
   - Portfolio
   - Beginner
-seo_description: 직장과 병행 가능한 사이드 프로젝트 운영 원칙을 정리한 글
+seo_description: 역량 향상으로 이어지는 실무형 사이드 프로젝트 기획 원칙과 시간 관리를 통해 직장과 병행하며 포트폴리오를 강화합니다.
 last_reviewed: '2026-05-12'
 ---
 

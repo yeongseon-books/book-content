@@ -16,7 +16,7 @@ tags:
   - Interview
   - Modeling
   - Beginner
-seo_description: ML 인터뷰에서 나오는 질문 구조와 답변 원칙을 정리합니다
+seo_description: 머신러닝 인터뷰 빈출 모델링 개념과 평가지표를 파악하고, 기술 질문에 논리적으로 답변하는 체계적인 준비 프로세스를 학습합니다.
 last_reviewed: '2026-05-12'
 ---
 

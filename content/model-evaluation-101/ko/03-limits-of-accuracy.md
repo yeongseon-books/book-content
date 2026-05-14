@@ -16,7 +16,7 @@ tags:
   - ImbalancedData
   - BaselineModel
   - scikit-learn
-seo_description: 불균형 데이터에서 정확도가 왜 위험한지 기준부터 설명합니다
+seo_description: 불균형 데이터에서 정확도 지표가 초래하는 오해를 분석하고, 베이스라인 설정을 통해 모델 성능을 객관적으로 파악합니다.
 last_reviewed: '2026-05-12'
 ---
 

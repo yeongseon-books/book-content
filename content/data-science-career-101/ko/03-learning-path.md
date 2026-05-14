@@ -16,7 +16,7 @@ tags:
   - SQL
   - Python
   - Beginner
-seo_description: 데이터 직무 입문자를 위한 12주 학습 경로를 정리합니다
+seo_description: 데이터 직무 입문을 위한 12주 단계별 학습 경로를 설계하고, SQL부터 파이썬까지 필수 기술을 익히는 효율적인 순서와 방법을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - GitHub
   - Notebook
   - Beginner
-seo_description: A beginner-friendly tour of a data portfolio that lands interviews.
+seo_description: Learn how to build a high-impact data science portfolio that demonstrates your technical ability and problem-solving skills to hiring managers.
 last_reviewed: '2026-05-04'
 ---
 

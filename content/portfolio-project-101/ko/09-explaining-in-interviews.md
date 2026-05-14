@@ -16,7 +16,7 @@ tags:
   - STAR
   - Communication
   - Beginner
-seo_description: 포트폴리오 프로젝트를 면접에서 설명하는 구조를 정리합니다.
+seo_description: 면접에서 프로젝트 성과와 기술 난관 극복을 STAR 기법으로 설명하여, 자신의 역량을 어필하는 커뮤니케이션을 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

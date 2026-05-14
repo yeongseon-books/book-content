@@ -16,7 +16,7 @@ tags:
   - Algorithms
   - Practice
   - Beginner
-seo_description: 코딩 인터뷰를 위한 패턴 학습과 모의 면접 루틴을 정리한 글
+seo_description: 효율적인 코딩 인터뷰 준비를 위한 알고리즘 학습 패턴과 실전 감각을 익히는 모의 면접 및 커뮤니케이션 기술을 공유합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Analyst
   - Scientist
   - Engineer
-seo_description: 분석가, 사이언티스트, 엔지니어의 목적과 산출물 차이를 정리합니다
+seo_description: 데이터 분석가, 사이언티스트, 엔지니어의 핵심 역할과 산출물 차이를 분석하고 본인에게 맞는 커리어 방향을 설정하는 방법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

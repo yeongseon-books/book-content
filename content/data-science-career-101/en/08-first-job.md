@@ -16,7 +16,7 @@ tags:
   - Stakeholders
   - Communication
   - Beginner
-seo_description: A beginner-friendly tour of the first 90 days in a data role.
+seo_description: Navigate your first 90 days in a data role with practical advice on onboarding, stakeholder management, and establishing effective communication.
 last_reviewed: '2026-05-04'
 ---
 

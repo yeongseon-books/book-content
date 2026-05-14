@@ -16,7 +16,7 @@ tags:
   - Decision
   - Architecture
   - Beginner
-seo_description: 기술 선택의 이유를 ADR로 남기는 방법을 설명합니다.
+seo_description: 기술 선택 배경과 대안 분석을 기록하는 기술 의사결정 기록(ADR) 작성법을 배우고, 설계 역량을 논리적으로 증명합니다.
 last_reviewed: '2026-05-12'
 ---
 

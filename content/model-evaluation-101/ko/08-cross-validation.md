@@ -16,7 +16,7 @@ tags:
   - KFold
   - Stratified
   - scikit-learn
-seo_description: 교차 검증으로 점수의 평균과 분산을 읽는 법을 정리합니다
+seo_description: 데이터 변동성에 따른 성능 변화를 측정하는 교차 검증 기법을 배우고, K-폴드 분할로 모델의 안정성과 신뢰도를 높입니다.
 last_reviewed: '2026-05-12'
 ---
 

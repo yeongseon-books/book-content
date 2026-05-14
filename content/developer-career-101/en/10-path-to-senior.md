@@ -16,7 +16,7 @@ tags:
   - Growth
   - Leadership
   - Beginner
-seo_description: A beginner-friendly tour of growing from junior to senior engineer.
+seo_description: Master the transition from junior to senior engineer by developing technical depth, architectural thinking, and mentoring teams.
 last_reviewed: '2026-05-04'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Likelihood
   - Inference
   - Beginner
-seo_description: 확률이 머신러닝의 손실, 추론, 보정에 들어가는 방식을 정리합니다.
+seo_description: 확률 개념이 머신러닝의 손실 함수, 최대 우도 추정, 예측 불확실성 측정 등에 어떻게 적용되는지 종합적으로 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

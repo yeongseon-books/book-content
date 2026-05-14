@@ -16,7 +16,7 @@ tags:
   - Independence
   - Inference
   - Beginner
-seo_description: 조건부확률과 곱셈정리의 뜻을 기저율과 함께 정리합니다.
+seo_description: 조건부확률과 곱셈정리를 배우고, 기저율 오류를 방지하며 정보를 업데이트하는 논리적 과정을 학습합니다.
 last_reviewed: '2026-05-12'
 ---
 

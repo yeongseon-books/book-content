@@ -16,7 +16,7 @@ tags:
   - Growth
   - Leadership
   - Beginner
-seo_description: 주니어에서 시니어로 성장하는 길을 정리한 글
+seo_description: 주니어 개발자가 시니어로 도약하기 위해 필요한 기술적 깊이와 아키텍처 설계 역량, 그리고 팀의 성장을 돕는 리더십 기술을 종합적으로 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

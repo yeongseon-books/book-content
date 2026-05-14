@@ -16,7 +16,7 @@ tags:
   - GitHub
   - Notebook
   - Beginner
-seo_description: 인터뷰로 이어지는 데이터 포트폴리오 구성 원칙을 정리합니다
+seo_description: 실무 역량을 증명하는 고품질 데이터 포트폴리오 구성 원칙을 알아보고, 채용 담당자에게 좋은 인상을 주는 프로젝트 관리 팁을 공유합니다.
 last_reviewed: '2026-05-12'
 ---
 

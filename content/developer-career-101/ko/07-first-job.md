@@ -16,7 +16,7 @@ tags:
   - Onboarding
   - Junior
   - Beginner
-seo_description: 첫 직장에서 첫 90일을 잘 보내는 방법을 정리한 글
+seo_description: 주니어 개발자의 성공적인 온보딩을 위한 실무 팁과 코드 분석, 협업 적응, 팀 내 신뢰 확보를 위한 구체적 지침을 제공합니다.
 last_reviewed: '2026-05-12'
 ---
 

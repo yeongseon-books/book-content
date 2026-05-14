@@ -16,7 +16,7 @@ tags:
   - Analyst
   - Scientist
   - Engineer
-seo_description: A beginner-friendly tour of how the three core data roles differ.
+seo_description: Compare the responsibilities and technical requirements of data analysts, scientists, and engineers to find the right career path for your skillset.
 last_reviewed: '2026-05-04'
 ---
 

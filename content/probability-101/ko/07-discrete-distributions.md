@@ -16,7 +16,7 @@ tags:
   - Bernoulli
   - Binomial
   - Beginner
-seo_description: 대표 이산분포 네 가지를 상황별로 구분해 정리합니다.
+seo_description: 베르누이, 이항, 포아송 등 대표적 이산 확률 분포의 정의와 활용 상황을 분석하여 현실 문제를 확률 모델로 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 

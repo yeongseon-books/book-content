@@ -16,7 +16,7 @@ tags:
   - Analytics
   - Interview
   - Beginner
-seo_description: SQL과 분석 인터뷰를 준비하는 핵심 패턴을 정리합니다
+seo_description: 데이터 직군 인터뷰의 필수 관문인 SQL 및 분석 면접에 대비하기 위한 문제 풀이 패턴과 비즈니스 로직 설명 전략을 전수합니다.
 last_reviewed: '2026-05-12'
 ---
 

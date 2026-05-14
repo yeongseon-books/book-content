@@ -16,7 +16,7 @@ tags:
   - Scientist
   - Engineer
   - Beginner
-seo_description: A beginner-friendly tour of data career roles and entry paths.
+seo_description: Identify core data roles including analyst, scientist, and engineer while exploring entry paths and essential skills for a data science career.
 last_reviewed: '2026-05-04'
 ---
 

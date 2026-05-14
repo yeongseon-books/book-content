@@ -16,7 +16,7 @@ tags:
   - Writing
   - Storytelling
   - Beginner
-seo_description: 프로젝트를 발견 가능한 블로그 글로 바꾸는 방법을 설명합니다.
+seo_description: 완성 프로젝트를 기술 블로그 포스팅으로 전환하여 지식 공유 능력을 보여주고, 개인 브랜드와 도달 범위를 넓힙니다.
 last_reviewed: '2026-05-12'
 ---
 

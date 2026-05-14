@@ -16,7 +16,7 @@ tags:
   - Intuition
   - DataScience
   - Beginner
-seo_description: 확률의 정의와 두 해석을 바탕부터 정리하는 입문 글입니다.
+seo_description: 데이터 과학의 기초인 확률 정의와 빈도주의 및 베이즈 관점 차이를 이해하고, 불확실성 수치화 원리를 체계적으로 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Scope
   - Project
   - Beginner
-seo_description: 좋은 포트폴리오 프로젝트를 만드는 핵심 조건을 정리합니다.
+seo_description: 문제 해결 능력과 기술적 깊이를 보여줄 수 있는 '좋은 프로젝트'의 조건을 살펴보고, 프로젝트 범위를 효과적으로 설정합니다.
 last_reviewed: '2026-05-12'
 ---
 

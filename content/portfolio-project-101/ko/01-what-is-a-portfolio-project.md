@@ -16,7 +16,7 @@ tags:
   - Project
   - Hiring
   - Beginner
-seo_description: 포트폴리오 프로젝트의 기준과 최소 구성 요소를 설명합니다.
+seo_description: 면접에서 실무 능력을 증명하는 강력한 도구인 포트폴리오 프로젝트의 정의와 채용 담당자의 시선을 끄는 구성 요소를 정의합니다.
 last_reviewed: '2026-05-12'
 ---
 

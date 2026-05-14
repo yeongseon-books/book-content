@@ -16,7 +16,7 @@ tags:
   - SystemDesign
   - Architecture
   - Beginner
-seo_description: 시스템 디자인 인터뷰의 4단계 절차와 평가 기준을 정리한 글
+seo_description: 시스템 디자인 인터뷰 4단계 절차를 상세히 다루며, 기술적 의사결정 근거를 명확히 제시하는 전문가 수준 답변 전략을 제시합니다.
 last_reviewed: '2026-05-12'
 ---
 

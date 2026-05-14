@@ -16,7 +16,7 @@ tags:
   - Expertise
   - BusinessSense
   - Beginner
-seo_description: 데이터 직무에서 도메인 전문성을 쌓는 방법을 정리합니다
+seo_description: 비즈니스 가치 창출에 필수적인 도메인 전문성을 확보하는 방법과 기술적 분석을 비즈니스 언어로 전환하는 능력을 기릅니다.
 last_reviewed: '2026-05-12'
 ---
 

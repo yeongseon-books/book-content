@@ -16,7 +16,7 @@ tags:
   - Frontend
   - Backend
   - Beginner
-seo_description: 프론트엔드, 백엔드, SRE 등 주요 개발자 직무를 비교한 글
+seo_description: 프론트엔드, 백엔드 등 주요 개발 직무별 특징과 기술 스택을 비교하여 본인의 적성에 맞는 최적의 경로 선택을 돕습니다.
 last_reviewed: '2026-05-12'
 ---
 

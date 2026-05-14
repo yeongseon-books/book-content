@@ -16,7 +16,7 @@ tags:
   - Plan
   - Habits
   - Beginner
-seo_description: 분기와 주 단위로 운영하는 개발자 학습 계획을 정리한 글
+seo_description: 체계적인 학습 계획 수립 방법을 배우고, 바쁜 업무 중에도 기술적 성장을 이뤄낼 수 있는 학습 루틴과 습관 전략을 알아봅니다.
 last_reviewed: '2026-05-12'
 ---
 

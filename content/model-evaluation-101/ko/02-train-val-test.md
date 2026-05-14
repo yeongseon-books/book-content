@@ -16,7 +16,7 @@ tags:
   - DataLeakage
   - CrossValidation
   - scikit-learn
-seo_description: 데이터 분할과 누수 방지 원칙을 실습 코드와 함께 정리합니다
+seo_description: 일반화 성능 보장을 위한 데이터 분할 방법과 데이터 누수를 방지하여 신뢰할 수 있는 실험 환경을 구축하는 원칙을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

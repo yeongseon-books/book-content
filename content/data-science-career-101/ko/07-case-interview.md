@@ -16,7 +16,7 @@ tags:
   - ProductSense
   - Metrics
   - Beginner
-seo_description: 케이스 인터뷰를 푸는 구조적 답변 프레임을 정리합니다
+seo_description: 데이터로 비즈니스 문제를 해결하는 케이스 인터뷰를 대비하여 지표 설계와 가설 검정 과정을 전개하는 문제 해결 프레임워크를 익힙니다.
 last_reviewed: '2026-05-12'
 ---
 
