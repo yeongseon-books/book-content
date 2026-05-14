@@ -17,7 +17,7 @@ tags:
   - Workflow
   - Beginner
 seo_description: 막연한 질문을 측정 가능한 데이터 질문으로 바꾸는 5단계 프레임을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 문제를 데이터 문제로 바꾸기
@@ -56,14 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Vague["막연한 질문"] --> Metric["지표 선택"]
-    Metric --> Window["기간 선택"]
-    Window --> Pop["대상 집단 선택"]
-    Pop --> Hypothesis["반증 가능한 가설"]
-```
+![막연한 질문을 지표, 기간, 대상 집단, 가설로 좁혀 가는 프레이밍 흐름](../../../assets/data-science-101/02/02-01-concept-at-a-glance.ko.png)
 
+*막연한 질문을 지표, 기간, 대상 집단, 가설로 좁혀 가는 프레이밍 흐름*
 ## 핵심 용어
 
 - **Metric**: DAU, 전환율, 매출처럼 실제로 측정할 수 있는 숫자입니다.
@@ -119,6 +114,8 @@ population = paid subscribers (excluding trials)
 ```
 
 이제야 비로소 데이터가 답할 수 있는 질문이 됩니다. 맞는지 틀린지 확인할 수 있고, 필요한 집계도 분명합니다. 좋은 데이터 질문은 대부분 이 수준으로 구체적입니다.
+
+**Expected output:** 지표·기간·대상 집단이 명시된 반증 가능한 질문 한 줄을 문서로 남깁니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
