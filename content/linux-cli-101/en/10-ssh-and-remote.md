@@ -3,7 +3,7 @@ title: SSH and Remote Access
 series: linux-cli-101
 episode: 10
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - scp
 - Security
 - Server
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: SSH opens a remote terminal over an encrypted channel, and key-based
   authentication replaces passwords with a lock-and-key pair.
 ---
 
 # SSH and Remote Access
 
-> Linux CLI 101 series (10/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What is SSH and why use it instead of Telnet?
-- What is the difference between password authentication and key-based authentication?
-- How does `~/.ssh/config` simplify connections?
-- How do you transfer files remotely with `scp` and `rsync`?
-
-> SSH opens a remote terminal over an encrypted channel. Key-based authentication replaces passwords with a lock-and-key pair.
-
-<!-- a-grade-intro:end -->
+The CLI becomes truly operational the moment you leave your own machine. Deploying code, checking logs on a server, copying build artifacts, and tunneling to a remote database all start with secure remote access.
 
 This is the final post in the Linux CLI 101 series.
 
@@ -231,6 +216,13 @@ Typing `ssh -i ~/.ssh/mykey -p 2222 user@long-hostname.example.com` every time i
 SSH is fundamental to server management, but the fewer times you SSH into a server manually, the more mature your infrastructure is. Good teams deploy through CI/CD pipelines, view logs through monitoring tools, and manage servers with Infrastructure as Code.
 
 That said, you still need to know SSH. When CI/CD fails, when monitoring misses a problem, the last resort is always "SSH in and check directly". SSH is the skill you rarely use day-to-day but absolutely must have for emergencies.
+
+## When it breaks, check these first
+
+- If you get `Permission denied (publickey)`, check key paths and permissions before blaming the network. `chmod 700 ~/.ssh`, `chmod 600 ~/.ssh/id_ed25519`, and `ssh -v host` usually surface the real cause.
+- If you see `REMOTE HOST IDENTIFICATION HAS CHANGED`, do not blindly delete the warning. First verify whether the server was rebuilt or replaced, then remove the old fingerprint with `ssh-keygen -R host`.
+- If `scp` or `rsync` fails, confirm the SSH user and port first. Many production hosts do not use port 22, and that often gets mistaken for a bad remote path.
+- If a remote command only half-runs, check whether shell init files or a `sudo` prompt interrupted non-interactive execution. In automation, break the flow into smaller remote steps until the failure point is obvious.
 
 ## Checklist
 
