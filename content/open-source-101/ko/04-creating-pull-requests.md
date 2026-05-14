@@ -17,7 +17,7 @@ tags:
   - GitHub
   - Beginner
 seo_description: 풀 리퀘스트를 단순한 코드 덩어리가 아니라 검토 가능한 변경 제안서로 작성하는 법과 포크부터 리뷰 대응까지의 협업 절차를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 풀 리퀘스트 만들기
@@ -46,15 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 흐름을 먼저 눈에 넣기
 
-```mermaid
-flowchart LR
-    F[포크] --> B[브랜치]
-    B --> C[커밋]
-    C --> P[푸시]
-    P --> O[풀 리퀘스트 열기]
-    O --> R[리뷰]
-```
+![흐름을 먼저 눈에 넣기](../../../assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.ko.png)
 
+*포크에서 리뷰까지 단계를 분리해야 작은 변경이 깔끔한 PR로 정리되는 흐름*
 이 흐름을 귀찮은 절차로 보면 매 단계가 번거롭습니다. 하지만 역할을 나눠 보면 훨씬 이해가 쉽습니다. 포크는 개인 작업 공간, 브랜치는 변경 단위, 커밋은 이력, 풀 리퀘스트는 검토 요청입니다. 섞지 않는 이유가 분명합니다.
 
 좋은 풀 리퀘스트는 구현보다 구조가 먼저 정리된 풀 리퀘스트입니다. 브랜치가 독립돼 있고, 변경 범위가 작고, 설명이 분명하고, 관련 이슈와 테스트가 연결돼 있으면 리뷰는 훨씬 부드럽게 흐릅니다.
@@ -173,5 +167,6 @@ gh pr create --title "fix: Safari 15 login" \
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [How to write a Git commit message](https://cbea.ms/git-commit/)
 - [gh CLI](https://cli.github.com/manual/gh_pr_create)
+- [GitHub pull request templates 예시](https://github.com/github/docs/tree/main/.github)
 
 Tags: OpenSource, PullRequest, Git, GitHub, Beginner
