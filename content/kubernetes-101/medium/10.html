@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Kubernetes in Operation</h1>
-<blockquote>
-<p>Kubernetes 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: does <em>the cluster is running</em> mean <em>the cluster is operable</em>?</p>
-<blockquote>
-<p><em>Probes, RBAC, policies, observability,</em> and <em>runbooks</em> together make <em>operations</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A running cluster is not the same thing as an operable one. You can have healthy-looking Pods and still lack safe traffic gates, clear permissions, useful telemetry, and a repeatable incident path when something breaks at night.</p>
 <p>This is the final post in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will connect probes, RBAC, network boundaries, observability, GitOps, and runbooks into one operating model instead of treating them as unrelated checkboxes.</p>
+<blockquote>
+<p>Kubernetes operations become reliable only when traffic rules, permissions, telemetry, and change procedures reinforce each other.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li><em>liveness/readiness/startup</em> probes</li>
 <li><em>RBAC</em> and <em>NetworkPolicy</em></li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Functionally working</em> and <em>staying up overnight without issues</em> are different. <em>Operability</em> is <em>service trust</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Probe[&quot;probes&quot;] --&gt; App[&quot;application&quot;]
-    App --&gt; Obs[&quot;metrics/logs/traces&quot;]
-    Obs --&gt; SRE[&quot;sre runbooks&quot;]
-    SRE --&gt; GitOps[&quot;gitops&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>Operations become repeatable only when probes, telemetry, runbooks, and GitOps all feed the same response system.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>liveness probe</strong>: signals when to <em>restart</em>.</li>
@@ -144,6 +134,18 @@ def top_pods(ns):
         &quot;actions&quot;: [&quot;check probe&quot;, &quot;rollout status&quot;, &quot;rollback if needed&quot;],
     }
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl describe pod web-xxxxx
+kubectl auth can-i get pods --as system:serviceaccount:web:default -n web
+kubectl get networkpolicy -n web
+</code></pre>
+<p><strong>Expected output:</strong> <code>describe pod</code> should let you separate readiness failures from restart signals, <code>auth can-i</code> should confirm the service account permissions you intended, and the NetworkPolicy list should show that communication boundaries exist as declared objects rather than assumptions.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>A running Pod with failed readiness is an operations contract failure even when the process itself is alive.</li>
+<li>RBAC that looks correct in YAML may still fail if the actual service-account binding is missing.</li>
+<li>An empty NetworkPolicy list usually means the security problem is the absence of a boundary, not one broken rule.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>When <em>readiness</em> is <em>0/1</em>, <em>traffic is blocked</em>.</li>
@@ -202,6 +204,7 @@ def top_pods(ns):
 <li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">RBAC</a></li>
 <li><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">NetworkPolicy</a></li>
 <li><a href="https://argo-cd.readthedocs.io/">Argo CD</a></li>
+<li><a href="https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/kubectl_auth_can-i/">kubectl auth can-i</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, SRE, Observability, GitOps, DevOps</p>
 </body>
