@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Good Code Review Standards</h1>
-<blockquote>
-<p>Clean Code 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What should a good code review actually look at?</p>
-<blockquote>
-<p>Everything this series taught — names, functions, branches, duplication, errors, tests, refactoring — checked at one moment.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A code review slows down when the reviewer must rediscover the author’s intent, rerun basic style checks by eye, and guess which comments are mandatory. Good reviews depend on design, but they also depend on process.</p>
+<p>This is the final post in the Clean Code 101 series.</p>
+<p>Here we will convert the themes from the series into a practical review checklist, then connect them to CI, PR sizing, comment labels, and measurable team feedback loops.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>PR size and reviewability</li>
@@ -79,12 +72,8 @@
 <p>Review is not where defects are caught. It is where the team finds a better answer together.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Author: small PR&quot;] --&gt; B[&quot;Automated checks&quot;]
-    B --&gt; C[&quot;Reviewer: intent/structure&quot;]
-    C --&gt; D[&quot;Fast feedback&quot;]
-    D --&gt; E[&quot;Merge&quot;]
-</code></pre>
+<p><img alt="Good Code Review Standards" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Review flow: automation handles toil so reviewers can focus on intent, structure, and risk.</em></p>
 <p>Automation handles chores. Humans look at intent.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -144,6 +133,21 @@ QUESTION: clarification
 - Measure review time and treat it as an improvement target.
 </code></pre>
 <p>Refactor the review process itself.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">ruff check .
+python -m pytest -q
+GIT_PAGER=cat git diff --stat HEAD~1..HEAD
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Automation should clear style and test failures before review starts.</li>
+<li>Diff size and verification notes should match the PR description.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Comments do not distinguish preference from merge-blocking issues.</li>
+<li>Repeated feedback never graduates into lint rules or templates.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>What automation finishes is not re-checked by humans.</li>
@@ -202,6 +206,7 @@ QUESTION: clarification
 <li><a href="https://conventionalcomments.org/">Conventional Comments</a></li>
 <li><a href="https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/">Best Kept Secrets of Peer Code Review (Smart Bear)</a></li>
 <li><a href="https://microsoft.github.io/code-with-engineering-playbook/code-reviews/">Microsoft Engineering Fundamentals — Code Review</a></li>
+<li><a href="https://google.github.io/eng-practices/review/">Google engineering practices — code review</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, CodeReview, PullRequest, Quality, Collaboration</p>
 </body>
