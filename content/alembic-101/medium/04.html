@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>autogenerate: the line between what it catches and what it misses</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>autogenerate: the line between what it catches and what it misses</h1>
+<p>Autogenerate can diff the live database against <code>target_metadata</code>, but it cannot infer your intent. Renames are the classic example: the tool sees structural change, while you still have to judge safety.</p>
+<p>This is post 4 in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>What <code>alembic revision --autogenerate</code> actually compares under the hood</li>
+<li>Which kinds of changes autogenerate handles well, and which it misses</li>
+<li>The <code>compare_type</code>, <code>compare_server_default</code>, <code>include_object</code>, and <code>include_name</code> options</li>
+<li>How to handle table and column renames safely</li>
+<li>Why you still need to read the generated file by eye</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Autogenerate is alembic's most powerful feature, but the moment you treat it as a "press a button and you're done" tool, production incidents start. Committing a generated file as-is and watching a column rename get expanded into drop+create — losing the data — is a real, common failure.</p>
+<p>The goal of this post is not to make you afraid of autogenerate, but to map its limits precisely so you can patch the parts that need a human touch.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Autogenerate is <strong>a tool that diffs the live database (ground truth) against <code>target_metadata</code> (desired state)</strong> and serializes that diff into op calls. Anything the diff algorithm cannot see — semantic intent at the data level, identifier renames, DB-specific objects — cannot be detected automatically.</p>
+</blockquote>
+<p>The git diff analogy fits: autogenerate is a line-level diff. A semantically equivalent change (a rename) shows up as two-line delete plus two-line add, with the same blind spot you would expect.</p>
+<p><strong>Diagram: the autogenerate diff pipeline</strong></p>
+<p><img alt="Diagram: the autogenerate diff pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png"><br>
+<em>Autogenerate builds a diff, but intent-heavy decisions such as renames still belong to a human review.</em></p>
+<h2>Core concepts</h2>
+<p><strong>How it works</strong></p>
+<p>Running <code>alembic revision --autogenerate -m "..."</code> does the following in order:</p>
+<ol>
+<li><code>env.py</code> connects to the database.</li>
+<li>The current schema is introspected via the SQLAlchemy <code>Inspector</code> into a <code>MetaData</code>.</li>
+<li>That introspected metadata is compared against <code>target_metadata</code> (usually <code>Base.metadata</code>).</li>
+<li>The differences are turned into a <code>MigrationOps</code> tree.</li>
+<li>The result is rendered as op calls into <code>versions/&lt;hash&gt;_&lt;msg&gt;.py</code>.</li>
+</ol>
+<p>The key point is that everything up to step 4 is an in-memory diff. What gets caught and what gets missed is fully decided in that diff phase.</p>
+<p><strong>What autogenerate handles well</strong></p>
+<p><strong>New table created or dropped</strong><br>
+- Notes: Reliable</p>
+<p><strong>New column added or dropped</strong><br>
+- Notes: Reliable</p>
+<p><strong>Index added or dropped</strong><br>
+- Notes: When defined on the <code>MetaData</code></p>
+<p><strong>Foreign key added or dropped</strong><br>
+- Notes: Basic cases</p>
+<p><strong><code>nullable</code> change</strong><br>
+- Notes: On by default</p>
+<p><strong>What it misses (or needs an option for)</strong></p>
+<p><strong>Column type change (e.g., <code>String(50)</code> → <code>String(100)</code>)</strong><br>
+- Default: Ignored<br>
+- Required setting: <code>compare_type=True</code></p>
+<p><strong><code>server_default</code> change</strong><br>
+- Default: Ignored<br>
+- Required setting: <code>compare_server_default=True</code></p>
+<p><strong><code>CHECK</code> constraint</strong><br>
+- Default: Mostly ignored<br>
+- Required setting: DB-dependent</p>
+<p><strong>table rename</strong><br>
+- Default: Seen as drop + create<br>
+- Required setting: Hand-edit to <code>op.rename_table</code></p>
+<p><strong>column rename</strong><br>
+- Default: Seen as drop + add<br>
+- Required setting: Hand-edit to <code>op.alter_column(... new_column_name=...)</code></p>
+<p><strong>trigger / function / sequence (PostgreSQL)</strong><br>
+- Default: Ignored<br>
+- Required setting: Write by hand</p>
+<p><strong>Data changes</strong><br>
+- Default: Ignored (always)<br>
+- Required setting: <code>op.execute</code> or a data migration</p>
+<p>In particular, <strong>renames</strong> can never be detected automatically. This is the most common cause of data-loss incidents.</p>
+<p><strong><code>compare_type</code> and <code>compare_server_default</code></strong></p>
+<p>To detect type and default changes, both options need to go into your <code>context.configure(...)</code> call inside <code>env.py</code>.</p>
+<pre><code class="language-python">context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    render_as_batch=connection.dialect.name == &quot;sqlite&quot;,
+    compare_type=True,
+    compare_server_default=True,
+)
+</code></pre>
+<p>The reason these default to <code>False</code> is that they produce false positives. <code>String(50)</code> and <code>VARCHAR(50)</code> mean the same thing but show up as different in the diff. Turning them on is generally safer, but be aware that on first enable you may see one or two "why is this here?" revisions.</p>
+<p><strong><code>include_object</code> and <code>include_name</code></strong></p>
+<p>Use these when you want to exclude certain tables or schemas from the diff.</p>
+<pre><code class="language-python">def include_object(object, name, type_, reflected, compare_to):
+    # Skip audit tables managed by an external system
+    if type_ == &quot;table&quot; and name.startswith(&quot;legacy_&quot;):
+        return False
+    return True
+
+context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    include_object=include_object,
+)
+</code></pre>
+<p>This is useful in multi-tenant setups, when another team owns some tables, or when there are temporary tables you do not want in your diff.</p>
+<h2>Before-After</h2>
+<pre><code class="language-python"># Before: column rename misread as drop + add
+def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;display_name&quot;, sa.String(100)))
+    op.drop_column(&quot;users&quot;, &quot;name&quot;)  # ← data loss!
+
+def downgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;name&quot;, sa.String(100)))
+    op.drop_column(&quot;users&quot;, &quot;display_name&quot;)
+</code></pre>
+<pre><code class="language-python"># After: hand-edited to a real rename
+def upgrade() -&gt; None:
+    op.alter_column(&quot;users&quot;, &quot;name&quot;, new_column_name=&quot;display_name&quot;)
+
+def downgrade() -&gt; None:
+    op.alter_column(&quot;users&quot;, &quot;display_name&quot;, new_column_name=&quot;name&quot;)
+</code></pre>
+<p>The After version preserves the data. This is the single biggest reason to read every autogenerate result before you commit it.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: change a model</strong></p>
+<pre><code class="language-python"># models.py
+class User(Base):
+    __tablename__ = &quot;users&quot;
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
+    tier: Mapped[str] = mapped_column(String(16), server_default=&quot;free&quot;)  # ← new
+</code></pre>
+<p><strong>Step 2: run autogenerate</strong></p>
+<pre><code class="language-bash">alembic revision --autogenerate -m &quot;add users.tier&quot;
+</code></pre>
+<p><strong>Step 3: review the generated file</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;tier&quot;, sa.String(length=16), server_default=&quot;free&quot;, nullable=False))
+
+def downgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;tier&quot;)
+</code></pre>
+<p>Something this simple is safe to commit as-is. But if a type change or rename is mixed in, you always need to fix it by hand.</p>
+<p><strong>Step 4: a change that needs a rename</strong></p>
+<p>If you rename the model column from <code>name</code> to <code>display_name</code> and run autogenerate, you get the Before snippet above — drop + add. Fix it by hand:</p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;name&quot;, new_column_name=&quot;display_name&quot;)
+
+def downgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;display_name&quot;, new_column_name=&quot;name&quot;)
+</code></pre>
+<p>On SQLite, batch mode is required (see episode 3).</p>
+<p><strong>Step 5: exclude what should not be diffed</strong></p>
+<p>If your test environment has a temporary table that someone made by hand, use <code>include_object</code> to keep it out of every diff.</p>
+<h2>Verification routine</h2>
+<pre><code class="language-bash">alembic revision --autogenerate -m &quot;rename probe&quot;
+python3 - &lt;&lt;'PY'
+from pathlib import Path
+latest = sorted(Path(&quot;alembic/versions&quot;).glob(&quot;*_rename_probe.py&quot;))[-1]
+print(latest.read_text())
+PY
+</code></pre>
+<p><strong>Expected output:</strong> intent-heavy changes such as renames usually show up as <code>drop_column</code> + <code>add_column</code>. That is the signal that the generated file still needs a human patch.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Committing autogenerate output as-is.</strong> The most common cause of incidents. Always read it like a git diff and fix anything suspicious by hand.</li>
+<li><strong>Renaming by changing the model and trusting autogenerate.</strong> It expands to drop + add and your data is gone.</li>
+<li><strong>Changing types without <code>compare_type</code>.</strong> The revision is empty while the schema actually drifts.</li>
+<li><strong>Missing <code>server_default</code> changes.</strong> You need <code>compare_server_default=True</code>.</li>
+<li><strong>Catching another team's tables.</strong> Isolate them with <code>include_object</code>.</li>
+</ul>
+<h2>Practical patterns</h2>
+<ul>
+<li><strong>PR diff review checklist.</strong> "Is any rename expanded into drop+add?" and "Is any type change missing?" are non-negotiable items.</li>
+<li><strong>Run with <code>compare_type</code> and <code>compare_server_default</code> on.</strong> Accept the false positives in the first one or two revisions in exchange for ongoing safety.</li>
+<li><strong>For large changes, take the autogenerate result as a draft, then write the final revision by hand.</strong> Keep the auto output open beside you for reference.</li>
+<li><strong>Isolate library-owned tables.</strong> Celery, APScheduler, and similar third-party tables go into <code>include_object</code> exclusions or a separate metadata.</li>
+<li><strong>Run <code>alembic check</code> in CI.</strong> It detects when the model and migrations have drifted (alembic 1.9+).</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Read the generated file line by line and patched anything suspicious</li>
+<li>[ ] No rename expanded into drop + add</li>
+<li>[ ] <code>compare_type=True</code> and <code>compare_server_default=True</code> are on</li>
+<li>[ ] Tables owned by other teams or libraries are excluded via <code>include_object</code></li>
+<li>[ ] Large changes follow the "empty revision, write by hand" policy</li>
+<li>[ ] CI runs <code>alembic check</code> (1.9+)</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add a <code>bio</code> column to the <code>User</code> model, run autogenerate, and decide whether the result is safe to commit as-is.</li>
+<li>Rename the <code>name</code> column to <code>display_name</code>, then fix the broken autogenerate output by hand.</li>
+<li>Change the <code>users.tier</code> default from <code>"free"</code> to <code>"basic"</code> and compare the autogenerate output with <code>compare_server_default</code> off vs on.</li>
+</ol>
+<h2>Wrap up, next post</h2>
+<p>Autogenerate is highly efficient when used well, but ignoring its limits leads directly to data loss. Keep the "it makes a diff" mental model in your head and build the habit of reading every result with human eyes.</p>
+<p>The next post covers the branches that appear when several people generate revisions concurrently, and how to consolidate them with <code>alembic merge</code>.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html">Alembic: Auto Generating Migrations</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-types">Alembic: Comparing Types</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-server-defaults">Alembic: Comparing Server Defaults</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect">Alembic: Limitations of Autogenerate</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Alembic, autogenerate, compare_type, MetaData, SQLite</p>
+</body>
+</html>

@@ -17,7 +17,7 @@ tags:
 - compare_type
 - MetaData
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Autogenerate is a tool that diffs the live database (ground truth)
   against target_metadata (desired state) and serializes that diff into op calls.
 ---
@@ -47,6 +47,11 @@ The goal of this post is not to make you afraid of autogenerate, but to map its 
 > Autogenerate is **a tool that diffs the live database (ground truth) against `target_metadata` (desired state)** and serializes that diff into op calls. Anything the diff algorithm cannot see — semantic intent at the data level, identifier renames, DB-specific objects — cannot be detected automatically.
 
 The git diff analogy fits: autogenerate is a line-level diff. A semantically equivalent change (a rename) shows up as two-line delete plus two-line add, with the same blind spot you would expect.
+
+### Diagram: the autogenerate diff pipeline
+
+![Diagram: the autogenerate diff pipeline](../../../assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
+*Autogenerate builds a diff, but intent-heavy decisions such as renames still belong to a human review.*
 
 ## Core concepts
 
@@ -197,6 +202,19 @@ On SQLite, batch mode is required (see episode 3).
 
 If your test environment has a temporary table that someone made by hand, use `include_object` to keep it out of every diff.
 
+## Verification routine
+
+```bash
+alembic revision --autogenerate -m "rename probe"
+python3 - <<'PY'
+from pathlib import Path
+latest = sorted(Path("alembic/versions").glob("*_rename_probe.py"))[-1]
+print(latest.read_text())
+PY
+```
+
+**Expected output:** intent-heavy changes such as renames usually show up as `drop_column` + `add_column`. That is the signal that the generated file still needs a human patch.
+
 ## Common mistakes
 
 - **Committing autogenerate output as-is.** The most common cause of incidents. Always read it like a git diff and fix anything suspicious by hand.
@@ -234,14 +252,28 @@ Autogenerate is highly efficient when used well, but ignoring its limits leads d
 
 The next post covers the branches that appear when several people generate revisions concurrently, and how to consolidate them with `alembic merge`.
 
-## References
-
-- Alembic: Auto Generating Migrations — https://alembic.sqlalchemy.org/en/latest/autogenerate.html
-- Alembic: Comparing Types — https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-types
-- Alembic: Comparing Server Defaults — https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-server-defaults
-- Alembic: Limitations of Autogenerate — https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- **autogenerate: the line between what it catches and what it misses (current)**
+- branches and merges: combining revisions made in parallel (upcoming)
+- Data migrations: separating schema changes from data changes (upcoming)
+- Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, autogenerate, compare_type, MetaData, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Auto Generating Migrations](https://alembic.sqlalchemy.org/en/latest/autogenerate.html)
+- [Alembic: Comparing Types](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-types)
+- [Alembic: Comparing Server Defaults](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#comparing-server-defaults)
+- [Alembic: Limitations of Autogenerate](https://alembic.sqlalchemy.org/en/latest/autogenerate.html#what-does-autogenerate-detect-and-what-does-it-not-detect)
+
+Tags: Python, Alembic, SQLAlchemy, Migration
