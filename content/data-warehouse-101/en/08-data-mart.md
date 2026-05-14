@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 8
 title: Data Mart
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Domain
   - Analytics
 seo_description: What a data mart is, how it differs from a warehouse, and why teams keep small domain-specific analytical zones.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Mart
-> Data Warehouse 101 series (8/10)
+
+One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.
 
 This is post 8 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: With a big *warehouse*, why also build *small marts*? Should *sales* and *finance* really see the *same view*?
-
-> *A mart is a small analytical zone, restated in the team's vocabulary.*
-
-<!-- a-grade-intro:end -->
+In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
 
 ## What You Will Learn
 
@@ -49,14 +44,9 @@ A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *d
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    DW["Warehouse (Conformed)"] --> SalesMart["Sales Mart"]
-    DW --> FinanceMart["Finance Mart"]
-    DW --> OpsMart["Ops Mart"]
-    SalesMart --> SalesBI["Sales Dashboard"]
-    FinanceMart --> FinanceBI["Finance Dashboard"]
-```
+![Warehouse-to-mart split](../../../assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
+
+*The warehouse keeps conformed shared assets, while domain-specific marts reshape them for sales, finance, and operations consumers.*
 
 ## Key Terms
 

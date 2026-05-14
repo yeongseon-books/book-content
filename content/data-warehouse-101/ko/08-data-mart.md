@@ -17,7 +17,7 @@ tags:
   - Domain
   - Analytics
 seo_description: Data Mart의 정의, Warehouse와의 차이, 도메인별 분석 구역의 역할
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Mart
@@ -50,14 +50,9 @@ Warehouse는 조직 전체가 공유하는 공통 데이터를 담습니다. 하
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    DW["Warehouse (Conformed)"] --> SalesMart["Sales Mart"]
-    DW --> FinanceMart["Finance Mart"]
-    DW --> OpsMart["Ops Mart"]
-    SalesMart --> SalesBI["Sales Dashboard"]
-    FinanceMart --> FinanceBI["Finance Dashboard"]
-```
+![Warehouse와 Mart 분리 구조](../../../assets/data-warehouse-101/08/08-01-concept-at-a-glance.ko.png)
+
+*공통 Warehouse 위에 영업·재무·운영 mart를 분리하고 각 팀 대시보드로 연결하는 구조*
 
 ## 핵심 용어
 
