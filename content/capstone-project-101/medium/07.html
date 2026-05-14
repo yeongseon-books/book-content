@@ -54,17 +54,20 @@
 </head>
 <body>
 <h1>Choosing the Tech Stack</h1>
+<p>Tech-stack decisions in capstones usually mix two different desires: the urge to try something new and the obligation to finish the semester with a stable demo.</p>
+<p>Those goals often pull in opposite directions. The right stack is therefore not the most impressive one, but the one your team can operate without burning the schedule on tooling friction.</p>
+<p>This is post 7 in the Capstone Project 101 series. It defines a practical stack-selection rubric built on familiarity, learning cost, operational burden, and documentation strength.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is the newest technology not automatically the best choice?</li>
+<li>How does familiarity map directly to schedule risk?</li>
+<li>How should teams separate learning cost from operational burden?</li>
+<li>How much alternative comparison is enough?</li>
+<li>Why should the decision be recorded in writing?</li>
+</ul>
 <blockquote>
-<p>Capstone Project 101 series (7/10)</p>
+<p>A good tech stack is not the flashiest combination. It is the combination the team can learn, build, and operate inside the semester.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> is the <em>newest stack</em> not always the <em>right</em> one?</p>
-<blockquote>
-<p><em>Learning cost</em> and <em>ops burden</em> eat into your <em>schedule</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>Assessing <em>familiarity</em></li>
@@ -74,14 +77,27 @@
 <li>Comparing <em>alternatives</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>The right choice</em> creates <em>focus</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[Requirements] --&gt; F[Familiar]
-    F --&gt; L[Learning Cost]
-    L --&gt; O[Ops]
-    O --&gt; D[Decide]
+<p>Trying new technology is not inherently bad. The risk appears when the team treats learning time as if it were outside the project schedule. Unfamiliar frameworks increase debugging, deployment, and documentation-reading time together.</p>
+<p>Operational burden matters separately too. A tool that feels simple on a laptop may become fragile in a demo environment. Deployment steps, configuration drift, and error handling all belong in the decision.</p>
+<h2>The flow at a glance</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png"><br>
+<em>A stack-selection flow that ends in a written ADR</em></p>
+<h2>Practical artifact: a lightweight ADR</h2>
+<p>Stack decisions get revisited constantly when they only exist in conversation. A short ADR like the one below preserves the context.</p>
+<pre><code class="language-text">Title: choose Flask as the backend framework
+Context: three of four teammates have Flask experience and the demo must ship in six weeks
+Alternatives: FastAPI, Django
+Decision: Flask has the lowest learning cost, the simplest deployment path, and sufficient documentation
+Known downside: weaker built-in structure and API documentation than FastAPI
+Review trigger: reconsider if authentication, async APIs, or admin features expand significantly
 </code></pre>
+<h2>What to validate first</h2>
+<ul>
+<li>Write familiarity separately from learning cost.</li>
+<li>Include deployment and failure handling in operational burden.</li>
+<li>Keep alternatives to two or three realistic options.</li>
+<li>Add review triggers so the team knows when a new decision is justified.</li>
+</ul>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>familiarity</strong>: prior <em>experience</em>.</li>
@@ -147,7 +163,7 @@
 <li>Define <em>ops burden</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Schedule Management</em>.</p>
+<p>Tech-stack selection is risk shaping, not taste ranking. When familiarity, learning cost, operational burden, and written rationale stay together, the stack starts serving the project instead of dominating it. The next post turns those decisions into an executable schedule.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
@@ -161,11 +177,12 @@
 <li>Project Retrospective (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs and practical guides</strong></p>
 <ul>
 <li><a href="https://adr.github.io/">Architecture Decision Records</a></li>
-<li><a href="https://boringtechnology.club/">Choose Boring Technology - Dan McKinley</a></li>
+<li><a href="https://boringtechnology.club/">Choose Boring Technology</a></li>
 <li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
-<li><a href="https://www.thoughtworks.com/radar">Tech Radar - Thoughtworks</a></li>
+<li><a href="https://www.thoughtworks.com/radar">Thoughtworks Technology Radar</a></li>
 </ul>
 <p class="tags-line">Tags: Capstone, TechStack, Decision, Architecture, Beginner</p>
 </body>
