@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 1
 title: 웹은 어떻게 동작하는가?
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - Browser
   - Frontend
 seo_description: URL 입력 뒤 DNS, HTTP, 서버, 렌더링이 이어지는 흐름을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 웹은 어떻게 동작하는가?
@@ -47,17 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    User["User"] --> Browser["Browser"]
-    Browser --> DNS["DNS"]
-    DNS --> Browser
-    Browser -->|"HTTP request"| Server["Web server"]
-    Server -->|"HTML/CSS/JS"| Browser
-    Browser --> Render["Render to screen"]
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/01/01-01-concept-at-a-glance.ko.png)
 
-이 글에서 기억할 흐름은 다섯 단계입니다. DNS 조회, 연결, HTTP 요청, 서버 응답, 브라우저 렌더링입니다.
+*브라우저가 URL을 화면으로 바꾸는 최소 경로를 한 장에 묶은 그림입니다.*
+
+이 그림을 볼 때는 사용자가 주소를 입력한 뒤 브라우저가 DNS를 조회하고, 서버와 HTTP를 주고받고, 마지막에 렌더링으로 넘어가는 순서를 왼쪽에서 오른쪽으로 따라가면 됩니다. 이후 글에서 배우는 DOM, API, 배포, 캐싱도 모두 이 기본 흐름 위에 올라갑니다.
+
+### 직접 검증해 볼 포인트
+
+- `socket.gethostbyname("example.com")`를 실행해 도메인이 실제 IP로 바뀌는지 확인합니다.
+- DevTools Network 탭에서 문서 요청 하나 아래에 CSS, JavaScript, 이미지 요청이 이어지는지 관찰합니다.
+- `curl -I https://example.com`으로 서버가 어떤 상태 코드와 헤더를 먼저 돌려주는지 확인합니다.
+
+**기대 결과:** DNS 조회가 성공하면 IP가 출력되고, Network 탭에서는 문서 요청 뒤에 추가 리소스 요청이 연쇄적으로 보입니다.
+
+**실패 모드:** DNS 조회가 실패하면 HTTP 요청 자체가 시작되지 않습니다. HTML 응답은 200인데 화면이 깨지면 문제는 서버보다 렌더링 단계에 있을 가능성이 큽니다.
 
 ## 먼저 알아둘 용어
 
@@ -201,9 +205,13 @@ print(title)
 
 ## 참고 자료
 
-- [How the Web works (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works)
-- [What is DNS? (Cloudflare Learning)](https://www.cloudflare.com/learning/dns/what-is-dns/)
-- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
-- [Chrome DevTools Network](https://developer.chrome.com/docs/devtools/network/)
+### 공식 문서
+- [How the Web works (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works)
+- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview)
+- [Chrome DevTools Network features](https://developer.chrome.com/docs/devtools/network/)
+
+### 개념 보강
+- [What is DNS? (Cloudflare Learning Center)](https://www.cloudflare.com/learning/dns/what-is-dns/)
+- [URI generic syntax (RFC 3986)](https://www.rfc-editor.org/rfc/rfc3986)
 
 Tags: Computer Science, WebDevelopment, HTTP, DNS, Browser, Frontend
