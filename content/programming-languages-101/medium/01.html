@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is a Programming Language?</h1>
+<p>When you write Python every day, it is easy to treat the language as nothing more than a convenient tool. But solving the same problem in assembly changes more than line count. It changes how you break the problem apart, how you name things, and how you manage state.</p>
 <p>This is the first post in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do we use Python instead of assembly, and why do we keep inventing new languages even when Python already works?</p>
-<blockquote>
-<p>A programming language is not just "syntax for telling a machine what to do." It is a frame that shapes <strong>how we decompose a problem and how we express it</strong>. The fact that the same problem can be solved imperatively, with objects, functionally, or declaratively shows how a language both constrains and expands our thinking. This first episode lays that foundation.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The abstraction layers from machine code up to high-level languages</li>
@@ -79,12 +70,8 @@
 <p>"Learning a language" really means learning the way of thinking that language emphasizes.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;High-level (Python, Java)&quot;] --&gt; B[&quot;Bytecode / IR&quot;]
-    B --&gt; C[&quot;Assembly&quot;]
-    C --&gt; D[&quot;Machine code (CPU)&quot;]
-    E[&quot;Source code&quot;] --&gt; A
-</code></pre>
+<p><img alt="Abstraction layers from high-level code down to machine code" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Abstraction layers from high-level code down to machine code</em></p>
 <p>The higher up, the easier for humans to read; the lower down, the closer to what the CPU executes directly. A programming language picks a layer and decides what abstractions to offer there. One line of Python can correspond to dozens of lines of assembly.</p>
 <h2>Key Terms</h2>
 <ul>
