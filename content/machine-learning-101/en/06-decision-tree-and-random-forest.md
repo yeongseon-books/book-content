@@ -2,7 +2,7 @@
 series: machine-learning-101
 episode: 6
 title: Decision Tree and Random Forest
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,30 +17,22 @@ tags:
   - Ensemble
   - scikit-learn
 seo_description: How decision trees split the feature space, why a single tree overfits, and how random forests combine many trees into a strong tabular baseline
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Decision Tree and Random Forest
 
-> Machine Learning 101 series (6/10)
+On tabular data, a stack of well-chosen `if-else` rules often beats more fashionable models. That feels counterintuitive until you remember what trees do well: they capture nonlinear structure, handle mixed feature behavior naturally, and produce a baseline that is hard to embarrass.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.
 
-**Core question**: How can a giant pile of if-else rules outperform a neural network on tabular data?
+## Questions this post answers
 
-> *Decision trees are interpretable nonlinear models. Random forests turn many trees into a robust ensemble.*
-
-<!-- a-grade-intro:end -->
-
-This is post 6 in the Machine Learning 101 series.
-
-## What You Will Learn
-
-- Splitting criteria (Gini and entropy)
-- Overfitting and pruning
-- Bagging and the random forest construction
-- Feature importance and its limits
-- Five common pitfalls
+- How does a decision tree split the feature space?
+- What do Gini and entropy actually measure?
+- Why does a single deep tree overfit so quickly?
+- What does bagging fix when we move to a random forest?
+- How far can you trust feature importance numbers?
 
 ## Why It Matters
 
@@ -48,13 +40,9 @@ Random forests and gradient-boosted trees still dominate tabular data. They belo
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Tree["1 tree"] -->|deep| Over["overfit"]
-    Tree -->|shallow| Under["underfit"]
-    Many["many trees"] --> Forest["Random Forest"]
-    Forest --> Stable["stable + accurate"]
-```
+![Concept at a Glance](../../../assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
+
+*A single deep tree can overfit quickly, while a random forest reduces that variance by averaging many differently sampled trees.*
 
 ## Key Terms
 
@@ -110,11 +98,19 @@ order = np.argsort(rf.feature_importances_)[::-1][:5]
 print("top:", order)
 ```
 
+**Expected output:** the single tree and the forest both print test accuracy, but the forest should usually be more stable. The feature-importance list is useful as a ranking hint, not as a proof of causality.
+
 ## What to Notice in This Code
 
 - `max_depth` is the main lever against overfitting.
 - More `n_estimators` is more stable, with diminishing returns.
 - `feature_importances_` splits credit across correlated features.
+
+## Read the first failure signal this way
+
+- If the training score is perfect and the test score drops, cap tree depth before trying a more exotic model.
+- If feature importance seems to contradict domain knowledge, check for correlated predictors and compare with permutation importance.
+- If the forest wins only by a tiny margin, keep the simpler baseline in the conversation because interpretability may matter more than the last point of accuracy.
 
 ## Five Common Mistakes
 

@@ -17,7 +17,7 @@ tags:
   - Ensemble
   - scikit-learn
 seo_description: 결정 트리가 피처 공간을 나누는 방식과 랜덤 포레스트가 분산을 줄이는 원리를 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Decision Tree와 Random Forest
@@ -42,13 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Tree["1 tree"] -->|deep| Over["overfit"]
-    Tree -->|shallow| Under["underfit"]
-    Many["many trees"] --> Forest["Random Forest"]
-    Forest --> Stable["stable + accurate"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/06/06-01-diagram.ko.png)
+
+*하나의 깊은 트리는 쉽게 과적합되지만, 여러 트리를 모은 포레스트는 같은 아이디어를 더 안정적으로 사용합니다.*
 
 ## 핵심 용어
 
@@ -104,11 +100,19 @@ order = np.argsort(rf.feature_importances_)[::-1][:5]
 print("top:", order)
 ```
 
+**Expected output:** 단일 트리와 랜덤 포레스트의 테스트 정확도가 출력되고, 포레스트 쪽이 대체로 더 안정적인 편입니다. 중요도 목록은 어디를 더 볼지 알려 주는 **순위 힌트**이지, 인과관계를 증명하는 표는 아닙니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `max_depth`는 과적합을 막는 가장 중요한 손잡이입니다.
 - `n_estimators`가 많을수록 더 안정적이지만, 증가 효과는 점점 줄어듭니다.
 - `feature_importances_`는 상관된 피처들 사이에 기여도를 나눠 가집니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 훈련 점수는 완벽한데 테스트 점수가 떨어지면, 더 복잡한 모델보다 먼저 **깊이 제한**을 걸어야 합니다.
+- 중요도 결과가 도메인 상식과 어긋나면 상관 피처와 **permutation importance**를 같이 봐야 합니다.
+- 포레스트가 겨우 조금만 더 좋다면, 마지막 몇 점보다 **해석 가능성**이 더 중요한지 함께 판단해야 합니다.
 
 ## 자주 하는 실수 5가지
 
