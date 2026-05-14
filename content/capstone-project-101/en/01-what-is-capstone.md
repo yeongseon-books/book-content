@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 1
 title: What is a Capstone Project
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Career
   - Beginner
 seo_description: A beginner-friendly tour of the capstone project covering goals, evaluation, and how it differs from regular coursework.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # What is a Capstone Project
 
-> Capstone Project 101 series (1/10)
+Many teams introduce a capstone project as 'the big final team assignment.' That description is not wrong, but it does not explain why some teams finish with a coherent demo while others spend the semester chasing loosely connected features.
 
-<!-- a-grade-intro:begin -->
+A capstone is better understood as a small product-delivery exercise. The team defines a problem, narrows scope, ships a demoable flow, and explains what it learned. Without that frame, the project keeps changing its own success criteria.
 
-**Core question**: *How* does a *capstone* differ from a *regular class assignment*?
+This is the first post in the Capstone Project 101 series. It defines what separates a capstone from ordinary coursework and establishes the delivery flow used throughout the series.
 
-> Students *own* the *whole flow* — from *problem definition* to *demo*.
+## Questions this chapter answers
 
-This is post 1 in the Capstone Project 101 series.
+- How is a capstone project different from a regular class assignment?
+- Why do some teams build features but still finish with a weak project story?
+- What should you evaluate besides feature count?
+- Why must topic, requirements, MVP, and demo stay connected?
+- How does the rest of this series build on this definition?
 
-<!-- a-grade-intro:end -->
+> A capstone is not a feature-collection exercise. It is a small product-delivery loop that connects problem definition, scope, MVP, demo, and retrospective.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,34 @@ This is post 1 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-The capstone is the *final bridge* between *school* and *industry*.
+The framing in this post affects every later project document. Once a team treats the capstone as a delivery exercise, topic selection becomes a scope decision, requirements become a contract, and the MVP becomes a deliberate learning step instead of a random subset of features.
 
-## Concept at a Glance
+The same pattern appears in real product work. Teams define the problem, commit to a narrow flow, prepare a demo, and capture lessons for the next iteration. Treating the capstone this way makes the bridge from school to delivery much shorter.
 
-```mermaid
-flowchart LR
-    P[Problem] --> R[Requirement]
-    R --> M[MVP]
-    M --> D[Demo]
-    D --> X[Retro]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
+*The core capstone flow from problem definition to retrospective*
+
+## Practical artifact: a one-page project brief
+
+One simple way to separate a capstone from a generic assignment is to ask whether the team can produce a short brief like the one below before building features.
+
+```text
+Project title: Course schedule conflict checker
+Primary users: freshmen and double-major students
+Problem statement: students spend too long manually checking schedule conflicts before registration
+Core value: confirm conflicts within 30 seconds
+Demo bar: enter a sample timetable, show conflicts, and suggest alternatives
+Success signal: a first-time user completes the main flow without explanation
 ```
+
+## What to validate first
+
+- Check whether the problem statement describes a user situation rather than a feature list.
+- Confirm that the value is expressed as a measurable change such as time, confidence, or effort.
+- Make sure the demo bar is realistic enough to reproduce during presentation week.
+- Prefer observable success signals over vague team confidence.
 
 ## Key Terms
 
@@ -143,7 +165,7 @@ A new hire's *onboarding project* looks *almost the same* as a capstone.
 
 ## Wrap-up and Next Steps
 
-Next post: *Choosing a Topic*.
+A capstone starts with a delivery frame, not a feature list. When problem definition, requirements, MVP, demo, and retrospective stay connected, the rest of the project becomes easier to steer. The next post focuses on choosing a topic that can survive that full flow.
 
 <!-- toc:begin -->
 - **What is a Capstone Project (current)**
@@ -160,9 +182,11 @@ Next post: *Choosing a Topic*.
 
 ## References
 
-- [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
-- [Inspired - Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
-- [Lean Startup](http://theleanstartup.com/)
+### Official docs and practical guides
+
 - [Atlassian Project Management Guide](https://www.atlassian.com/agile/project-management)
+- [Scrum Guide](https://scrumguides.org/scrum-guide.html)
+- [The Lean Startup](http://theleanstartup.com/)
+- [Inspired — Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
 
 Tags: Capstone, Project, Graduation, Career, Beginner

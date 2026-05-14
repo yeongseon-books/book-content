@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Career
   - Beginner
 seo_description: 캡스톤 프로젝트의 의미와 일반 과제와의 차이를 입문자 관점에서 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 캡스톤 프로젝트란 무엇인가
 
-캡스톤 프로젝트를 처음 들으면 보통 졸업 전 큰 팀 과제라고 이해합니다. 틀린 설명은 아니지만 충분한 설명도 아닙니다. 이 글은 Capstone Project 101 시리즈의 첫 번째 글입니다. 여기서는 캡스톤을 단순히 제출용 과제가 아니라, 문제 정의부터 데모와 회고까지 한 번 끝까지 밀어 보는 작은 제품 개발 연습으로 이해해 보겠습니다.
+캡스톤 프로젝트를 처음 설명할 때 많은 팀이 '졸업 전 큰 과제'라는 말로 끝냅니다. 틀린 말은 아니지만, 그 설명만으로는 왜 어떤 팀은 끝까지 완주하고 어떤 팀은 중간에 흔들리는지 설명하기 어렵습니다.
 
-> 멘탈 모델: 캡스톤은 기능을 많이 만드는 수업이 아니라, 문제·요구사항·MVP·데모·회고를 하나의 흐름으로 연결하는 작은 제품 개발 연습입니다.
+캡스톤은 기능 몇 개를 구현하는 수업이 아니라 문제를 정하고, 제한된 시간 안에 검증 가능한 결과를 만들고, 그 과정을 다시 설명하는 연습입니다. 이 관점이 없으면 초반의 주제 선정부터 마지막 발표와 회고까지 기준이 계속 바뀝니다.
+
+이 글은 Capstone Project 101 시리즈의 첫 번째 글입니다. 여기서는 캡스톤을 일반 과제와 구분하는 기준과, 시리즈 전체를 읽을 때 붙잡아야 할 기본 흐름을 정리합니다.
+
+> 멘탈 모델: 캡스톤은 큰 기능을 많이 만드는 수업이 아니라, 문제 정의부터 데모와 회고까지 하나의 실무 흐름으로 연결하는 작은 제품 개발 연습입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,30 @@ last_reviewed: '2026-05-12'
 
 현업에서도 첫 프로젝트의 구조는 비슷합니다. 문제를 설명하고, 사용자 가치를 정리하고, 제한된 시간 안에 설득력 있는 결과를 만들어야 합니다. 캡스톤을 잘 이해한 팀은 초반부터 기능 목록보다 문제와 데모를 먼저 붙잡습니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    P[Problem] --> R[Requirement]
-    R --> M[MVP]
-    M --> D[Demo]
-    D --> X[Retro]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/01/01-01-the-flow-at-a-glance.ko.png)
+*캡스톤 프로젝트를 실무 흐름으로 보는 기본 구조*
+
+## 실전 문서 예시: 한 장짜리 프로젝트 브리프
+
+캡스톤을 일반 과제와 구분하는 가장 쉬운 방법은, 프로젝트 시작 시점에 아래처럼 한 장짜리 브리프를 만들 수 있는지 보는 것입니다.
+
+```text
+프로젝트 제목: 수강 신청 시간표 충돌 검사기
+대상 사용자: 복수전공 학생과 신입생
+문제 문장: 수강 신청 직전에 시간표 충돌을 직접 계산하느라 시간이 오래 걸린다
+핵심 가치: 30초 안에 충돌 여부를 확인한다
+데모 기준: 샘플 시간표를 넣고 충돌 여부와 추천 대안을 보여 준다
+성공 기준: 첫 사용자가 설명 없이 핵심 흐름을 끝낸다
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 문제 문장이 기능 설명이 아니라 사용자 상황으로 적혀 있는지 확인합니다.
+- 핵심 가치가 시간, 정확도, 편의 같은 변화로 표현되어 있는지 봅니다.
+- 데모 기준이 발표 당일 실제로 재현 가능한 수준인지 점검합니다.
+- 성공 기준이 팀 내부 감상이 아니라 관찰 가능한 행동인지 살핍니다.
 
 ## 핵심 용어
 
@@ -157,7 +176,7 @@ demo = "demo.mp4 + readme.md"
 
 ## 정리와 다음 글
 
-캡스톤은 큰 과제가 아니라 작은 제품 개발 연습입니다. 문제를 정의하고, 요구사항을 정리하고, MVP를 만들고, 데모와 회고까지 이어 보는 경험이 핵심입니다. 다음 글에서는 좋은 캡스톤 주제를 어떻게 고를지 이어서 살펴보겠습니다.
+캡스톤의 출발점은 기능 목록이 아니라 프로젝트 전체 흐름을 보는 관점입니다. 문제 정의, 요구사항, MVP, 데모, 회고가 하나의 체인으로 이어져야 이후 판단도 흔들리지 않습니다. 다음 글에서는 이 흐름을 감당할 수 있는 주제를 어떻게 고를지 다룹니다.
 
 <!-- toc:begin -->
 - **캡스톤 프로젝트란 무엇인가 (현재 글)**
@@ -174,9 +193,11 @@ demo = "demo.mp4 + readme.md"
 
 ## 참고 자료
 
-- [The Pragmatic Programmer](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
-- [Inspired - Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
-- [Lean Startup](http://theleanstartup.com/)
+### 공식 문서와 실무 자료
+
 - [Atlassian Project Management Guide](https://www.atlassian.com/agile/project-management)
+- [Scrum Guide](https://scrumguides.org/scrum-guide.html)
+- [The Lean Startup](http://theleanstartup.com/)
+- [Inspired — Marty Cagan](https://svpg.com/inspired-how-to-create-products-customers-love/)
 
 Tags: Capstone, Project, Graduation, Career, Beginner
