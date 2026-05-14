@@ -54,39 +54,26 @@
 </head>
 <body>
 <h1>Random Variables</h1>
-<p>This is post 5 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What changes when we <em>map outcomes to numbers</em>? A random variable is <em>the world seen as numbers</em>.</p>
-<blockquote>
-<p><em>A random variable is a </em>function that maps outcomes to numbers<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Events and probabilities can already describe many problems, but once you need to work with measurements, scores, or waiting times, you need a stronger tool. You need a way to move from outcomes to numbers so that averages, variances, and full distributions become possible. That tool is the random variable.</p>
+<p>Once you understand random variables, expectation, variance, distributions, and even model outputs in machine learning start to connect much more naturally. A lot of “statistics” is really probability after that translation into numbers has happened.</p>
+<p>This is post 5 in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.</p>
+<h2>What you will learn</h2>
 <ul>
-<li>The definition of a <em>random variable</em></li>
-<li>The difference between <em>discrete</em> and <em>continuous</em></li>
-<li><em>PMF</em>, <em>PDF</em>, <em>CDF</em></li>
-<li>A 5-step random-variable exercise</li>
-<li>Five common mistakes</li>
+<li>Why random variables are more expressive than raw events</li>
+<li>How discrete and continuous variables differ</li>
+<li>What PMF, PDF, and CDF each answer</li>
+<li>Why P(X = x) = 0 for continuous variables</li>
+<li>How sampling makes a distribution feel less abstract</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Random variables enable <em>numeric statistics</em> — <em>expectation, variance, distributions, regression</em>. <em>Every ML model output</em> is a random variable.</p>
+<p>If you treat a die roll only as an event, you can talk about “3 happened.” If you define X = die face, you can talk about expectation 3.5, variance about 2.92, cumulative probability, and simulation. The moment outcomes become numbers, a much richer set of questions becomes available.</p>
+<p>The same move happens in production systems. Sensor readings, response times, user scores, and predicted probabilities are all observed as numbers. Without the random-variable viewpoint, it is easy to see them as isolated values rather than as draws from a distribution.</p>
 <blockquote>
-<p><em>Random variables put numbers on outcomes.</em></p>
+<p>A random variable is a function that maps possible outcomes into numbers, and a distribution is the rule that places probability mass or density on those numbers.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Sample[&quot;Sample space&quot;] --&gt; RV[&quot;X: Omega -&gt; R&quot;]
-    RV --&gt; Discrete[&quot;Discrete: PMF&quot;]
-    RV --&gt; Cont[&quot;Continuous: PDF&quot;]
-    Discrete --&gt; CDF[&quot;CDF&quot;]
-    Cont --&gt; CDF
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Random variable X</strong>: a function Ω → ℝ.</li>
@@ -97,8 +84,8 @@
 <li><strong>CDF F(x)</strong>: P(X ≤ x).</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“A die outcome”</em> — just an event.</p>
-<p><strong>After</strong>: <em>X = the face value</em> → enables <em>numeric analysis</em> like <em>expectation 3.5</em> and <em>variance 2.92</em>.</p>
+<p><strong>Before</strong>: “A die outcome” is just a result.</p>
+<p><strong>After</strong>: “Let X be the face value of the die” turns the same setup into something you can summarize, compare, and compute with numerically.</p>
 <h2>Hands-on: 5-step Random Variables</h2>
 <p><strong>Step 1 — Discrete RV</strong></p>
 <pre><code class="language-python">import numpy as np
@@ -127,43 +114,43 @@ print(&quot;P(-1 &lt;= X &lt;= 1):&quot;, rv.cdf(1) - rv.cdf(-1))
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>A <em>PMF</em> value <em>is</em> a probability; a <em>PDF</em> value is a <em>density</em>, not a probability.</li>
-<li>For continuous RVs, <em>P(X = x) = 0</em>.</li>
-<li>The <em>CDF</em> is <em>always</em> defined.</li>
+<li>A PMF value is a probability; a PDF value is a density, not a probability.</li>
+<li>For continuous RVs, P(X = x) = 0.</li>
+<li>The CDF is always defined.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Reading <em>PDF values as probabilities</em>.</strong></li>
-<li><strong>Mixing up <em>discrete</em> and <em>continuous</em>.</strong></li>
-<li><strong>Using a PMF whose <em>sum ≠ 1</em>.</strong></li>
-<li><strong>Confusing <em>CDF</em> with <em>PDF</em>.</strong></li>
-<li><strong>Treating <em>sample statistics</em> as <em>parameters</em>.</strong></li>
+<li><strong>Reading PDF values as probabilities.</strong></li>
+<li><strong>Mixing up discrete and continuous.</strong></li>
+<li><strong>Using a PMF whose sum ≠ 1.</strong></li>
+<li><strong>Confusing CDF with PDF.</strong></li>
+<li><strong>Treating sample statistics as parameters.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Softmax probabilities from ML models, Gaussian noise assumptions, survival-time analysis — <em>random variables</em> are the foundation of <em>all modeling</em>.</p>
+<p>Softmax probabilities from ML models, Gaussian noise assumptions, survival-time analysis — random variables are the foundation of all modeling.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Distinguishes <em>PMF / PDF / CDF</em>.</li>
-<li>Knows <em>P(X = x) = 0</em> in continuous cases.</li>
-<li><em>Visualizes</em> every distribution.</li>
-<li>Computes probabilities by <em>integration / summation</em>.</li>
-<li>Separates <em>sample</em> from <em>parameter</em>.</li>
+<li>Distinguishes PMF / PDF / CDF.</li>
+<li>Knows P(X = x) = 0 in continuous cases.</li>
+<li>Visualizes every distribution.</li>
+<li>Computes probabilities by integration / summation.</li>
+<li>Separates sample from parameter.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I separate <em>discrete</em> and <em>continuous</em> RVs.</li>
-<li>[ ] I know <em>PMF / PDF / CDF</em>.</li>
-<li>[ ] I use <em>scipy.stats</em> for distributions.</li>
-<li>[ ] I can simulate by <em>sampling</em>.</li>
+<li>[ ] I separate discrete and continuous RVs.</li>
+<li>[ ] I know PMF / PDF / CDF.</li>
+<li>[ ] I use scipy.stats for distributions.</li>
+<li>[ ] I can simulate by sampling.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Build the PMF and CDF for the <em>sum of two dice</em>.</li>
-<li>Compute <em>P(|X| &lt; 2)</em> for <em>N(0,1)</em>.</li>
-<li>Answer: <em>can a PDF value be greater than 1</em>?</li>
+<li>Build the PMF and CDF for the sum of two dice.</li>
+<li>Compute P(|X| &lt; 2) for N(0,1).</li>
+<li>Answer: can a PDF value be greater than 1?</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Random variables are the bridge from <em>probability to numeric analysis</em>. The next episode covers <em>expectation and variance</em>.</p>
+<p>Random variables are the bridge from probability to numeric analysis. The next episode covers expectation and variance.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>

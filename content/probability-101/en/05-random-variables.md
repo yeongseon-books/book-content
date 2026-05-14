@@ -2,7 +2,7 @@
 series: probability-101
 episode: 5
 title: Random Variables
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,48 +16,39 @@ tags:
   - Distribution
   - PMF
   - Beginner
-seo_description: Random variables defined cleanly, with discrete and continuous cases, PMF, PDF, CDF in code, and the most common misreadings called out
-last_reviewed: '2026-05-04'
+seo_description: Learn how random variables map outcomes to numbers, and how PMF, PDF, and CDF help you reason about discrete and continuous data.
+last_reviewed: '2026-05-15'
 ---
 
 # Random Variables
 
-This is post 5 in the Probability 101 series.
+Events and probabilities can already describe many problems, but once you need to work with measurements, scores, or waiting times, you need a stronger tool. You need a way to move from outcomes to numbers so that averages, variances, and full distributions become possible. That tool is the random variable.
 
-> Probability 101 series (5/10)
+Once you understand random variables, expectation, variance, distributions, and even model outputs in machine learning start to connect much more naturally. A lot of “statistics” is really probability after that translation into numbers has happened.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.
 
-**Core question**: What changes when we *map outcomes to numbers*? A random variable is *the world seen as numbers*.
+## What you will learn
 
-> *A random variable is a *function that maps outcomes to numbers*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The definition of a *random variable*
-- The difference between *discrete* and *continuous*
-- *PMF*, *PDF*, *CDF*
-- A 5-step random-variable exercise
-- Five common mistakes
+- Why random variables are more expressive than raw events
+- How discrete and continuous variables differ
+- What PMF, PDF, and CDF each answer
+- Why P(X = x) = 0 for continuous variables
+- How sampling makes a distribution feel less abstract
 
 ## Why It Matters
 
-Random variables enable *numeric statistics* — *expectation, variance, distributions, regression*. *Every ML model output* is a random variable.
+If you treat a die roll only as an event, you can talk about “3 happened.” If you define X = die face, you can talk about expectation 3.5, variance about 2.92, cumulative probability, and simulation. The moment outcomes become numbers, a much richer set of questions becomes available.
 
-> *Random variables put numbers on outcomes.*
+The same move happens in production systems. Sensor readings, response times, user scores, and predicted probabilities are all observed as numbers. Without the random-variable viewpoint, it is easy to see them as isolated values rather than as draws from a distribution.
+
+> A random variable is a function that maps possible outcomes into numbers, and a distribution is the rule that places probability mass or density on those numbers.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Sample["Sample space"] --> RV["X: Omega -> R"]
-    RV --> Discrete["Discrete: PMF"]
-    RV --> Cont["Continuous: PDF"]
-    Discrete --> CDF["CDF"]
-    Cont --> CDF
-```
+![Concept at a Glance](../../../assets/probability-101/05/05-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
@@ -70,9 +61,9 @@ flowchart LR
 
 ## Before / After
 
-**Before**: *“A die outcome”* — just an event.
+**Before**: “A die outcome” is just a result.
 
-**After**: *X = the face value* → enables *numeric analysis* like *expectation 3.5* and *variance 2.92*.
+**After**: “Let X be the face value of the die” turns the same setup into something you can summarize, compare, and compute with numerically.
 
 ## Hands-on: 5-step Random Variables
 
@@ -118,46 +109,46 @@ print("P(-1 <= X <= 1):", rv.cdf(1) - rv.cdf(-1))
 
 ## What to Notice in This Code
 
-- A *PMF* value *is* a probability; a *PDF* value is a *density*, not a probability.
-- For continuous RVs, *P(X = x) = 0*.
-- The *CDF* is *always* defined.
+- A PMF value is a probability; a PDF value is a density, not a probability.
+- For continuous RVs, P(X = x) = 0.
+- The CDF is always defined.
 
 ## Five Common Mistakes
 
-1. **Reading *PDF values as probabilities*.**
-2. **Mixing up *discrete* and *continuous*.**
-3. **Using a PMF whose *sum ≠ 1*.**
-4. **Confusing *CDF* with *PDF*.**
-5. **Treating *sample statistics* as *parameters*.**
+1. **Reading PDF values as probabilities.**
+2. **Mixing up discrete and continuous.**
+3. **Using a PMF whose sum ≠ 1.**
+4. **Confusing CDF with PDF.**
+5. **Treating sample statistics as parameters.**
 
 ## How This Shows Up in Production
 
-Softmax probabilities from ML models, Gaussian noise assumptions, survival-time analysis — *random variables* are the foundation of *all modeling*.
+Softmax probabilities from ML models, Gaussian noise assumptions, survival-time analysis — random variables are the foundation of all modeling.
 
 ## How a Senior Engineer Thinks
 
-- Distinguishes *PMF / PDF / CDF*.
-- Knows *P(X = x) = 0* in continuous cases.
-- *Visualizes* every distribution.
-- Computes probabilities by *integration / summation*.
-- Separates *sample* from *parameter*.
+- Distinguishes PMF / PDF / CDF.
+- Knows P(X = x) = 0 in continuous cases.
+- Visualizes every distribution.
+- Computes probabilities by integration / summation.
+- Separates sample from parameter.
 
 ## Checklist
 
-- [ ] I separate *discrete* and *continuous* RVs.
-- [ ] I know *PMF / PDF / CDF*.
-- [ ] I use *scipy.stats* for distributions.
-- [ ] I can simulate by *sampling*.
+- [ ] I separate discrete and continuous RVs.
+- [ ] I know PMF / PDF / CDF.
+- [ ] I use scipy.stats for distributions.
+- [ ] I can simulate by sampling.
 
 ## Practice Problems
 
-1. Build the PMF and CDF for the *sum of two dice*.
-2. Compute *P(|X| < 2)* for *N(0,1)*.
-3. Answer: *can a PDF value be greater than 1*?
+1. Build the PMF and CDF for the sum of two dice.
+2. Compute P(|X| < 2) for N(0,1).
+3. Answer: can a PDF value be greater than 1?
 
 ## Wrap-up and Next Steps
 
-Random variables are the bridge from *probability to numeric analysis*. The next episode covers *expectation and variance*.
+Random variables are the bridge from probability to numeric analysis. The next episode covers expectation and variance.
 
 <!-- toc:begin -->
 - [What Is Probability?](./01-what-is-probability.md)
