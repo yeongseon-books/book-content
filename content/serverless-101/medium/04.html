@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Cold Start</h1>
+<p>You usually notice <em>cold start</em> from the outside first. A function that feels fast most of the time suddenly takes seconds on the first request after idle time, during a burst, or right after deployment. The average looks fine, but the user experience does not.</p>
+<p>That is why cold start is one of the earliest serverless topics worth understanding well. It shapes <em>p99 latency</em>, user-visible reliability, and the cost you are willing to pay to keep latency stable.</p>
 <p>This is post 4 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: why is the <em>first call</em> of a <em>function</em> slow?</p>
-<blockquote>
-<p><em>Cold start</em> is the <em>time</em> to <em>create</em> the <em>container</em> and <em>load</em> the <em>runtime</em> and <em>code</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the definition of <em>Cold Start</em></li>
@@ -75,13 +66,12 @@
 <li>when to <em>accept</em> it</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>If <em>p99</em> spikes from <em>cold start</em>, <em>SLOs break</em>. You need a balance between <em>mitigation</em> and <em>acceptance</em>.</p>
+<p>Cold start is not just “sometimes slower.” On login, payment, webhook, or synchronous API paths, a few cold invocations can dominate the latency story that users actually feel.</p>
+<p>The trap is that averages hide the problem. If warm invocations are common, the mean looks healthy while the tail still hurts real traffic. That makes cold start less of a micro-optimization topic and more of a design decision about where latency matters enough to spend money.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;request&quot;] --&gt; Init[&quot;init container&quot;]
-    Init --&gt; Load[&quot;load runtime + code&quot;]
-    Load --&gt; Run[&quot;handler&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Cold start combines environment creation, runtime loading, and your own initialization code into one delay.</em><br>
+This diagram matters because it shows that <em>cold start</em> is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>cold start</strong>: <em>initialization latency</em> on the <em>first run</em>.</li>
@@ -133,6 +123,22 @@ provisioned_concurrency:
     s = sorted(values)
     return s[int(len(s) * p) - 1]
 </code></pre>
+<h2>Verification Workflow</h2>
+<p>When you suspect cold-start regressions, measure them in a way that separates initialization from steady-state work.</p>
+<pre><code class="language-bash"># hit the function once after an idle window
+curl -s https://example.com/hello
+
+# hit it again immediately
+curl -s https://example.com/hello
+</code></pre>
+<p><strong>Expected output:</strong> the second call should usually be faster than the first if the platform reused a warm environment.</p>
+<p>Then compare platform logs or traces with these questions in mind:</p>
+<ul>
+<li>Did the runtime create a fresh environment?</li>
+<li>Did dependency loading dominate the delay?</li>
+<li>Did your own initialization code do more work than the business logic?</li>
+</ul>
+<p>If the first request is consistently slow even after package trimming, that is the moment to evaluate provisioned concurrency rather than guessing from averages.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Code <em>outside the handler</em> runs <em>only once</em> on cold.</li>
@@ -185,11 +191,17 @@ provisioned_concurrency:
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">Lambda cold start</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html">Provisioned Concurrency</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html">Package optimization</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">SnapStart</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html">AWS Lambda runtime environment</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html">AWS Lambda Provisioned Concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html">AWS Lambda best practices</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html">AWS Lambda SnapStart</a></li>
+</ul>
+<p><strong>Code and Related Reading</strong></p>
+<ul>
+<li><a href="https://github.com/alexcasalboni/aws-lambda-power-tuning">AWS Lambda power tuning (GitHub)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en">Azure Functions 101</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, ColdStart, Performance, Latency, Cloud</p>
 </body>
