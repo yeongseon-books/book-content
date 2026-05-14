@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Evaluating RAG Systems</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (6/10)</p>
-</blockquote>
 <p>RAG requires evaluating both retrieval and generation stages.</p>
 <p>This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does a single end-to-end accuracy number hide the real RAG failure point?</li>
+<li>What do recall and precision tell you specifically about retrieval quality?</li>
+<li>Why is faithfulness the highest-priority production metric for most RAG systems?</li>
+<li>How do the four core metrics combine into a concrete diagnosis?</li>
+</ul>
+<blockquote>
+<p>Mental model: treat RAG as a two-stage pipeline under test. Retrieval decides what evidence is available; generation decides whether the model actually stays faithful to that evidence.</p>
+</blockquote>
 <hr>
 <p><img alt="Evaluating RAG systems" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png"></p>
 <p><em>Evaluating RAG systems</em></p>
@@ -336,6 +343,14 @@ print(result)
 </ul>
 <p>The next post moves from single responses to evaluating <strong>agent trajectories</strong>.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Measure retrieval and generation separately instead of relying on one answer score.</li>
+<li>[ ] Treat low faithfulness as a production-severity issue, not a cosmetic quality drop.</li>
+<li>[ ] Tune top-K only while watching both context precision and answer quality.</li>
+<li>[ ] Keep reference answers in the eval set so recall remains measurable.</li>
+<li>[ ] Use the four-metric diagnosis table to decide which subsystem to change first.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
@@ -350,11 +365,15 @@ print(result)
 <li>Ep10 Production Evaluation (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
+<ul>
+<li><a href="https://docs.ragas.io/">RAGAS documentation</a></li>
+<li><a href="https://www.trulens.org/getting_started/core_concepts/rag_triad/">TruLens — RAG Triad and evaluation docs</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/rag">LangSmith — Evaluate a RAG application</a></li>
+</ul>
+<p><strong>Papers and background</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/2309.15217">RAGAS — Reference-Free Evaluation of RAG Pipelines (Es et al., 2023)</a></li>
-<li><a href="https://docs.ragas.io/">RAGAS Documentation</a></li>
-<li><a href="https://www.trulens.org/">TruLens — Evaluation and Tracking for LLM Apps</a></li>
-<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/rag">LangChain — RAG Evaluation Guide</a></li>
 </ul>
 <p class="tags-line">Tags: AI Evaluation, RAG, Faithfulness, Retrieval</p>
 </body>

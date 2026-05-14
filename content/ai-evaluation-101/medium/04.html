@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>LLM-as-Judge — Evaluating Models with Models</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (4/10)</p>
-</blockquote>
 <p>When humans cannot grade every response, you can delegate scoring to a strong LLM.</p>
 <p>This is post 4 in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>When does LLM-as-judge outperform lexical metrics enough to justify its cost?</li>
+<li>Which judge pattern fits single-score grading, A/B comparison, or reference checking?</li>
+<li>What biases make a judge look more confident than it should be?</li>
+<li>How much human agreement do you need before trusting a judge in production?</li>
+</ul>
+<blockquote>
+<p>Mental model: an LLM judge is not a magic scorer. It is a fast junior evaluator that becomes trustworthy only when you constrain the prompt, measure agreement, and deliberately control its biases.</p>
+</blockquote>
 <hr>
 <p><img alt="LLM-as-Judge - evaluating models with models" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png"></p>
 <p><em>LLM-as-Judge - evaluating models with models</em></p>
@@ -284,6 +291,14 @@ print(f&quot;Cohen's kappa: {kappa:.3f}&quot;)
 </ul>
 <p>The next post covers <strong>multi-dimensional rubrics</strong>, where you grade several axes instead of one number.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Choose the judge pattern based on the task: single-score, pairwise, or reference-based.</li>
+<li>[ ] Set <code>temperature=0</code> and log the exact prompt version used for grading.</li>
+<li>[ ] Swap answer order in pairwise runs to neutralize position bias.</li>
+<li>[ ] Compare at least 50 human-rated samples against the judge before production use.</li>
+<li>[ ] Track judge cost separately so evaluation spend stays visible.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>

@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Why Evaluate LLM Applications</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (1/10)</p>
-</blockquote>
 <p>LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today.</p>
 <p>This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does traditional <code>==</code>-style testing stop working as soon as an LLM starts paraphrasing?</li>
+<li>What kinds of product risk stay invisible when a team ships prompt or model changes without evaluation?</li>
+<li>Which quality dimensions should you track separately instead of collapsing into a single score?</li>
+<li>What does a minimal evaluation loop look like before you have a mature platform or a large dataset?</li>
+</ul>
+<blockquote>
+<p>Mental model: evaluation is not a research luxury. It is the change-management dashboard that tells you whether a prompt, model, or retrieval change improved the system or quietly pushed it backward.</p>
+</blockquote>
 <hr>
 <p><img alt="Why evaluate LLM applications" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png"></p>
 <p><em>Why evaluate LLM applications</em></p>
@@ -158,6 +165,76 @@ results = run_evaluation(eval_set, summarize)
 print(f&quot;Accuracy: {results['accuracy']:.0%}&quot;)
 </code></pre>
 <p>Even ten cases give you signals like "case #5 dropped after the prompt change." That single signal catches 90% of regressions.</p>
+<h2>A Minimal Evaluation Harness You Can Run Today</h2>
+<p>If you want the first useful version, make it boring. Put the task behind one function, store a tiny eval set in version control, and print both the aggregate score and the failed case IDs.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class EvalCase:
+    case_id: str
+    prompt: str
+    must_include: list[str]
+
+def run_smoke_eval(cases: list[EvalCase], system_under_test) -&gt; dict:
+    failed_cases = []
+    scores = []
+
+    for case in cases:
+        answer = system_under_test(case.prompt)
+        matched = sum(1 for kw in case.must_include if kw.lower() in answer.lower())
+        passed = matched == len(case.must_include)
+        scores.append(int(passed))
+        if not passed:
+            failed_cases.append(
+                {
+                    &quot;case_id&quot;: case.case_id,
+                    &quot;answer&quot;: answer,
+                    &quot;missing&quot;: [kw for kw in case.must_include if kw.lower() not in answer.lower()],
+                }
+            )
+
+    return {
+        &quot;pass_rate&quot;: sum(scores) / len(scores),
+        &quot;failed_cases&quot;: failed_cases,
+    }
+
+smoke_cases = [
+    EvalCase(&quot;rag-001&quot;, &quot;What is RAG?&quot;, [&quot;retrieval&quot;, &quot;generation&quot;]),
+    EvalCase(&quot;async-001&quot;, &quot;Explain async/await&quot;, [&quot;coroutine&quot;, &quot;await&quot;]),
+    EvalCase(&quot;json-001&quot;, &quot;Return valid JSON with a title field&quot;, [&quot;title&quot;]),
+]
+
+report = run_smoke_eval(smoke_cases, summarize)
+print(report)
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{
+  'pass_rate': 0.67,
+  'failed_cases': [
+    {
+      'case_id': 'async-001',
+      'answer': '...',
+      'missing': ['coroutine']
+    }
+  ]
+}
+</code></pre>
+<p>That is enough to make a pull request actionable. Instead of arguing about whether the output "feels better," you can point to the exact case that regressed.</p>
+<h2>Failure Modes to Watch in Week One</h2>
+<p>The first evaluation loop usually fails for process reasons, not math reasons.</p>
+<p><strong>Only happy-path cases</strong><br>
+- What it looks like: Pass rate looks strong, but support tickets keep rising<br>
+- What to do next: Add two or three recent user complaints every week</p>
+<p><strong>One giant aggregate score</strong><br>
+- What it looks like: Accuracy improves while safety or format compliance worsens<br>
+- What to do next: Split results by correctness, relevance, safety, and style</p>
+<p><strong>No per-case diff</strong><br>
+- What it looks like: The team knows the score dropped but not why<br>
+- What to do next: Print failed case IDs, missing keywords, and raw answers</p>
+<p><strong>Eval is run manually</strong><br>
+- What it looks like: Prompt tweaks skip evaluation because "this is a tiny change"<br>
+- What to do next: Wire the smoke suite into CI or pre-merge review</p>
+<p>The point of the first harness is not elegance. The point is to make regressions visible faster than user complaints.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>"We will evaluate once production stabilizes."</strong> Without evaluation, you cannot know whether it has stabilized. Start with ten cases on day one.</li>
@@ -176,6 +253,14 @@ print(f&quot;Accuracy: {results['accuracy']:.0%}&quot;)
 </ul>
 <p>The next post covers how to design evaluation datasets — where to source them, how many you need, and how to label them.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Pick 10 real user tasks that represent the current product surface area.</li>
+<li>[ ] Track at least correctness, relevance, safety, and style as separate signals.</li>
+<li>[ ] Store the eval set in version control next to the code or prompts it protects.</li>
+<li>[ ] Print failed case IDs and raw outputs, not just a single average score.</li>
+<li>[ ] Run the smoke suite before every prompt or model change reaches production.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><strong>Why Evaluate LLM Applications (current)</strong></li>
@@ -190,10 +275,15 @@ print(f&quot;Accuracy: {results['accuracy']:.0%}&quot;)
 <li>Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
-<li><a href="https://github.com/openai/evals">OpenAI — Evals framework</a></li>
-<li><a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests">Anthropic — Building evals</a></li>
-<li><a href="https://huggingface.co/learn/cookbook/en/llm_judge">Hugging Face — Evaluating LLMs</a></li>
+<li><a href="https://github.com/openai/evals">OpenAI Evals</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests">Anthropic — Develop tests and evaluations</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/concepts">LangSmith — Evaluation concepts</a></li>
+</ul>
+<p><strong>Additional reading</strong></p>
+<ul>
+<li><a href="https://huggingface.co/learn/cookbook/en/llm_judge">Hugging Face — Evaluating LLMs as a judge</a></li>
 <li><a href="https://eugeneyan.com/writing/llm-evaluators/">Eugene Yan — LLM evaluation patterns</a></li>
 </ul>
 <p><strong>Related Series</strong></p>

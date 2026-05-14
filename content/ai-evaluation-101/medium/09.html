@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>A/B Testing LLMs — Which Prompt Is Better?</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (9/10)</p>
-</blockquote>
 <p>How do you decide which of two prompts is better?</p>
 <p>This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is "this one feels better" too weak to justify a rollout decision?</li>
+<li>When is pairwise judging better than comparing average scalar scores?</li>
+<li>How many samples do you need before a difference becomes trustworthy?</li>
+<li>Why must p-values and effect size travel together in the final decision?</li>
+</ul>
+<blockquote>
+<p>Mental model: A/B testing is how you turn taste into evidence. The job is not to crown a winner quickly, but to decide whether the observed win rate is large enough and stable enough to justify a production switch.</p>
+</blockquote>
 <hr>
 <p><img alt="A/B testing LLMs - which prompt is Better" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png"></p>
 <p><em>A/B testing LLMs - which prompt is Better</em></p>
@@ -281,6 +288,14 @@ print(f&quot;A satisfaction: {a.mean():.3f}, B: {b.mean():.3f}, p={p:.4f}&quot;)
 </ul>
 <p>The next post covers <strong>continuous evaluation in production</strong> — sampling live traffic, drift detection.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Swap answer order in pairwise judging so position bias does not fake a winner.</li>
+<li>[ ] Compute sample size from the effect you want to detect before running the test.</li>
+<li>[ ] Report tie rate alongside win rate because high ties often mean the variants are effectively equivalent.</li>
+<li>[ ] Require both statistical significance and practical effect size before switching variants.</li>
+<li>[ ] Run online experiments long enough to cover weekday and weekend behavior.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
@@ -295,8 +310,14 @@ print(f&quot;A satisfaction: {a.mean():.3f}, B: {b.mean():.3f}, p={p:.4f}&quot;)
 <li>Ep10 Production Evaluation (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportions_ztest.html">statsmodels — proportions_ztest</a></li>
+<li><a href="https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportion_effectsize.html">statsmodels — proportion_effectsize</a></li>
+<li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html">SciPy — ttest_ind</a></li>
+</ul>
+<p><strong>Books and papers</strong></p>
+<ul>
 <li><a href="https://www.routledge.com/Statistical-Power-Analysis-for-the-Behavioral-Sciences/Cohen/p/book/9780805802832">Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences</a></li>
 <li><a href="https://experimentguide.com/">Kohavi, Tang, Xu — Trustworthy Online Controlled Experiments (2020)</a></li>
 <li><a href="https://arxiv.org/abs/2403.04132">Chatbot Arena — Crowdsourced LLM A/B (Chiang et al., 2024)</a></li>
