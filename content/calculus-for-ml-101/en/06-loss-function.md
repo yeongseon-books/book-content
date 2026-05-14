@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 6
 title: Loss Function
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - MSE
   - Beginner
 seo_description: A beginner-friendly tour of loss functions, MSE, cross entropy, gradients, and the training signal intuition for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Loss Function
 
-> Calculus for ML 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: What *function* should we use to *score* how well an ML model did?
-
-> A *loss function* turns the *gap* between *prediction* and *truth* into a *number*, and its *gradient* drives training.
+Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.
 
 This is post 6 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.
+
+> A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ The *wrong loss* yields the *wrong model*. *Choosing the loss* is *defining the 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Y[y true] --> L[Loss]
-    P[y pred] --> L
-    L --> G[Gradient]
-    G --> U[Update]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
 
+*Loss flow: the gap between truth and prediction becomes loss, gradient, and finally an update signal.*
 ## Key Terms
 
 - **loss**: a *number* representing *error*.
