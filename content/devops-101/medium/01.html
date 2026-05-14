@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is DevOps?</h1>
-<p>This is the first post in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Where does it start to go wrong when <em>the dev team</em> and <em>the ops team</em> keep <em>blaming each other</em>?</p>
-<blockquote>
-<p>DevOps is <em>not a tool</em> but <em>a culture</em> — a way of working where you <em>build together and own together</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Most teams do not fail because they lack tools. They fail because code review, deployment, monitoring, and incident response all live in different conversations. One team says the feature is done. Another team says production is unstable. The handoff itself becomes the bottleneck.</p>
+<p>DevOps is the attempt to remove that handoff cost. It gives one team a shared feedback loop for building, shipping, operating, and learning, so deployment speed and operational stability stop pulling in opposite directions.</p>
+<p>This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>DevOps</em> and the context that produced it</li>
@@ -80,12 +71,8 @@
 <p><em>Fast deploys</em> and <em>stable operations</em> are <em>not in conflict</em>. They go together.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;Write code&quot;] --&gt; Build[&quot;Build/Test&quot;]
-    Build --&gt; Deploy[&quot;Deploy&quot;]
-    Deploy --&gt; Operate[&quot;Operate/Monitor&quot;]
-    Operate --&gt; Code
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Dev</strong>: <em>Development</em>.</li>
