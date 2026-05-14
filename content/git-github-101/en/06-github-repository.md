@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -358,11 +358,11 @@ Episode 7 picks up where this one leaves off: the most common collaboration unit
 
 ## References
 
-- Git docs, `git remote`: <https://git-scm.com/docs/git-remote>
-- Git docs, `git push`: <https://git-scm.com/docs/git-push>
-- Git docs, `git fetch`: <https://git-scm.com/docs/git-fetch>
-- Git docs, `git pull`: <https://git-scm.com/docs/git-pull>
-- Git docs, `git clone`: <https://git-scm.com/docs/git-clone>
+- [git-remote manual](https://git-scm.com/docs/git-remote)
+- [git-push manual](https://git-scm.com/docs/git-push)
+- [git-fetch manual](https://git-scm.com/docs/git-fetch)
+- [git-pull manual](https://git-scm.com/docs/git-pull)
+- [git-clone manual](https://git-scm.com/docs/git-clone)
 - GitHub Docs, "About remote repositories": <https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories>
 - GitHub Docs, "Connecting to GitHub with SSH": <https://docs.github.com/en/authentication/connecting-to-github-with-ssh>
 
