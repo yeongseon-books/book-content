@@ -54,37 +54,25 @@
 </head>
 <body>
 <h1>Subquery</h1>
-<p>This is post 6 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When and how should you split a query that <em>won't fit on one line</em>, and why have <em>CTEs</em> become the <em>team standard</em>?</p>
-<blockquote>
-<p><em>A subquery is a </em>small question inside a question<em>. The big answer is right only when the small one is.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Real SQL rarely stays flat. One question turns into a smaller question about big spenders, another about recent activity, and another about whether a user has done something at least once. If all of that logic gets packed into one layer, the statement becomes technically valid but hard for a team to review.</p>
+<p>Subqueries and CTEs are the tools that let you split that complexity into readable steps. They matter less because they are advanced syntax and more because they let you express a multi-stage thought process without losing control of the result.</p>
+<p>This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Scalar subqueries</em> and <em>IN / EXISTS</em></li>
-<li><em>Inline views (subquery in FROM)</em></li>
-<li><em>CTEs (<code>WITH</code>)</em> and readability</li>
-<li><em>Correlated subqueries</em> — meaning and cost</li>
-<li>Five common mistakes</li>
+<li>When is a subquery enough, and when is a CTE the better fit?</li>
+<li>What is the difference between a scalar subquery and an inline view?</li>
+<li>How do IN and EXISTS differ in intent and behavior?</li>
+<li>Why do correlated subqueries become expensive so easily?</li>
+<li>How should you name intermediate layers in longer SQL files?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Real analysis is <em>layered</em>. Cramming everything into one statement makes it <em>unreadable</em> and <em>unmaintainable</em>. CTEs and subqueries split the work into <em>named steps</em> the team can read together.</p>
 <blockquote>
-<p><em>A query you can read is a query you can fix.</em></p>
+<p>A subquery is a smaller question nested inside a larger one. If the smaller question is unclear, the final answer is usually untrustworthy too.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart TB
-    Inner[&quot;Inner query&quot;] --&gt; Outer[&quot;Outer query&quot;]
-    Outer --&gt; Result[&quot;Result&quot;]
-    CTE[&quot;WITH ... AS&quot;] --&gt; Outer
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Analytical queries are usually layered. You compute a cohort start date, attach later activity, aggregate it, and maybe join the result back to user attributes. If that logic is crammed into one long statement, it becomes difficult to debug or modify without breaking something unrelated.</p>
+<p>Readable layers are operationally valuable. Once each step has a name, you can test intermediate results, reason about row counts, and explain the logic during review instead of staring at one oversized FROM clause.</p>
+<h2>Subquery layering flow</h2>
+<p><img alt="Subquery layering flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Scalar subquery</strong>: returns a <em>single value</em>.</li>
@@ -130,6 +118,11 @@ SELECT u.name, b.spend
 FROM big_orders b
 JOIN users u ON u.id = b.user_id;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>Ada</strong><br>
+- spend: 1450</p>
+<p><strong>Grace</strong><br>
+- spend: 2100</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>EXISTS</em> is <em>NULL-safe</em> and can <em>short-circuit</em>, unlike <code>IN</code>.</li>
@@ -187,6 +180,7 @@ JOIN users u ON u.id = b.user_id;
 <li><a href="https://www.postgresql.org/docs/current/queries-with.html">PostgreSQL — WITH Queries (CTE)</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-sub-queries/">Mode — Subqueries</a></li>
 <li><a href="https://use-the-index-luke.com/sql/where-clause/null/not-in">Use The Index, Luke — IN vs EXISTS</a></li>
+<li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-FROM">PostgreSQL — FROM Clause</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, Subquery, CTE, Database, Query</p>
 </body>

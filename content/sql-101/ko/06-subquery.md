@@ -17,7 +17,7 @@ tags:
   - Database
   - Query
 seo_description: 서브쿼리, EXISTS, 인라인 뷰, CTE로 복잡한 SQL을 읽기 좋은 단계로 나누는 법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 서브쿼리와 CTE
@@ -42,15 +42,9 @@ last_reviewed: '2026-05-12'
 
 반대로 의미 있는 단계 이름을 붙여 CTE로 나누면, 쿼리를 위에서 아래로 읽으며 각 중간 결과를 검증할 수 있습니다. 실무에서 좋은 SQL은 짧은 SQL이 아니라, 중간 의도를 설명할 수 있는 SQL인 경우가 많습니다.
 
-## 한눈에 보는 흐름
+## 서브쿼리 분해 흐름
 
-```mermaid
-flowchart TB
-    Inner["Inner query"] --> Outer["Outer query"]
-    Outer --> Result["Result"]
-    CTE["WITH ... AS"] --> Outer
-```
-
+![서브쿼리 분해 흐름](../../../assets/sql-101/06/06-01-subquery-layering-flow.ko.png)
 내부 쿼리는 바깥 쿼리에 재료를 제공합니다. 이 재료를 이름 붙여 꺼내 놓은 형태가 CTE입니다. 의미는 비슷하지만, 사람이 읽는 경험은 꽤 달라집니다.
 
 ## 핵심 개념 정리
@@ -129,6 +123,13 @@ FROM big_orders b
 JOIN users u ON u.id = b.user_id;
 ```
 
+**Expected output:**
+
+| name | spend |
+| --- | --- |
+| Ada | 1450 |
+| Grace | 2100 |
+
 의미 있는 중간 결과에 `big_orders`라는 이름을 붙였습니다. 쿼리를 읽는 사람은 먼저 이 단계의 의미를 이해한 뒤, 다음 조인 단계로 내려오면 됩니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -166,6 +167,8 @@ CTE는 쪼개기 도구이지만, 무조건 많이 쪼갠다고 좋아지지는 
 다음 글에서는 집계 결과를 각 행 옆에 다시 붙이는 윈도 함수를 다루겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - [WHERE와 조건](./03-where-and-conditions.md)
@@ -176,6 +179,7 @@ CTE는 쪼개기 도구이지만, 무조건 많이 쪼갠다고 좋아지지는 
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -185,4 +189,4 @@ CTE는 쪼개기 도구이지만, 무조건 많이 쪼갠다고 좋아지지는 
 - [Mode — Subqueries](https://mode.com/sql-tutorial/sql-sub-queries/)
 - [Use The Index, Luke — IN vs EXISTS](https://use-the-index-luke.com/sql/where-clause/null/not-in)
 
-Tags: SQL, Subquery, CTE, Database, Query
+Tags: SQL, Database, Postgres, Analytics
