@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # What Is Statistics?
 
-This is the first post in the Statistics 101 series.
+As data accumulates, so do numbers. But more numbers do not automatically produce better judgment. Monthly revenue is up, conversion changed, survey satisfaction looks high—those statements all contain numbers, but they do not say whether the conclusion is stable enough to trust.
 
-> Statistics 101 series (1/10)
+Statistics is the tool that closes that gap. It is not just a way to format numbers neatly. It is a way to move from observation to a decision while keeping uncertainty visible.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Statistics 101 series. Here we will split statistics into its two major branches—descriptive and inferential statistics—and build the basic flow that connects data to a decision.
 
-**Core question**: What does statistics actually study, and why do we need it? How do we turn a collection of formulas into a *language for decisions*?
+## Questions this post answers
 
-> *Statistics is the shared language of uncertainty.*
+- What does statistics actually study?
+- How are descriptive statistics and inferential statistics different?
+- How does statistics connect numbers to decision-making?
+- In what order should we read a statistical result?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *two pillars* of statistics — descriptive and inferential
-- The *data → decision* thinking flow
-- The *four questions* statistics answers
-- A 5-step statistical thinking exercise
-- Five common mistakes
+> Statistics is the shared language that lets us make decisions in uncertain situations.
 
 ## Why It Matters
 
@@ -50,13 +45,9 @@ As data piles up, the question *“is this really true?”* shows up more and mo
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Desc["Descriptive"]
-    Desc --> Infer["Inferential"]
-    Infer --> Decide["Decision"]
-```
+![Concept at a Glance](../../../assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
 
+*The basic flow of statistics: summarize the data, infer beyond the sample, then write the decision.*
 ## Key Terms
 
 - **Descriptive Statistics**: statistics that *summarize* data (mean, variance, etc.).
@@ -87,11 +78,15 @@ df = pd.read_csv("clicks.csv")
 print(df.shape, df.columns.tolist())
 ```
 
+**Expected output:** something like `(2000, ['group', 'ctr'])`, which confirms the row count and the columns you expect to analyze.
+
 ### Step 3 — Summarize (descriptive)
 
 ```python
 print(df.groupby("group")["ctr"].agg(["mean", "std", "count"]))
 ```
+
+**Expected output:** a small table with one row per group and columns for mean CTR, standard deviation, and sample count.
 
 ### Step 4 — Infer
 
@@ -100,6 +95,8 @@ from scipy.stats import ttest_ind
 a, b = df.loc[df.group == "control", "ctr"], df.loc[df.group == "test", "ctr"]
 print(ttest_ind(a, b, equal_var=False))
 ```
+
+**Expected output:** a `TtestResult(statistic=..., pvalue=...)` object. The p-value is the first signal for whether the observed gap is plausibly just noise.
 
 ### Step 5 — Decide
 
