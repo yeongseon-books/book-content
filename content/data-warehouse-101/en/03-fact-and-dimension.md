@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 3
 title: Fact and Dimension
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Modeling
   - Analytics
 seo_description: The roles of fact and dimension tables, why we separate measures from attributes, and the base unit of analytical modeling.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Fact and Dimension
-> Data Warehouse 101 series (3/10)
+
+Most analytical questions hide the same structure: how much happened, and by which slice do you want to explain it? The moment you mix those two jobs in one wide table, every later change becomes more expensive than it needs to be.
 
 This is post 3 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do we *separate measures from attributes*? What *breaks* if we put them together?
-
-> *Fact tables hold *how much*. Dimension tables hold *what, who, when*.*
-
-<!-- a-grade-intro:end -->
+In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.
 
 ## What You Will Learn
 
@@ -49,12 +44,9 @@ Analytical questions almost always read as *how much (measure)* by *which slice 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Fact["fact_orders (amount, qty)"] --> DimUser["dim_user"]
-    Fact --> DimProduct["dim_product"]
-    Fact --> DimDate["dim_date"]
-```
+![Fact-to-dimension relationship](../../../assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
+
+*Facts carry the measurable events, while user, product, and date dimensions provide the context needed to group and explain them.*
 
 ## Key Terms
 
