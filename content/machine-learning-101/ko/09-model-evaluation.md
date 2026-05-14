@@ -107,7 +107,7 @@ print("RMSE:", mean_squared_error(yt, yp) ** 0.5)
 print("R^2:", r2_score(yt, yp))
 ```
 
-**Expected output:** 혼동 행렬은 오류 구성을 그대로 보여 주고, ROC-AUC와 PR-AUC는 임계값 전반의 순위 품질을 요약합니다. 회귀 장난감 예제에서는 MAE와 RMSE가 비슷하게 보이지만, 큰 오차가 섞이면 RMSE가 더 민감하게 움직입니다.
+**예상 출력:** 혼동 행렬은 오류 구성을 그대로 보여 주고, ROC-AUC와 PR-AUC는 임계값 전반의 순위 품질을 요약합니다. 회귀 장난감 예제에서는 MAE와 RMSE가 비슷하게 보이지만, 큰 오차가 섞이면 RMSE가 더 민감하게 움직입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
