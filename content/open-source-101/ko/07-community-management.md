@@ -17,7 +17,7 @@ tags:
   - Governance
   - Beginner
 seo_description: 건강한 오픈소스 커뮤니티 유지를 위한 행동 강령, 기여 안내, 토론 공간 분리와 첫 기여자를 환영하는 운영 원칙을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 커뮤니티 운영
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 커뮤니티가 굴러가는 최소 구조
 
-```mermaid
-flowchart LR
-    C[행동 강령] --> G[가이드]
-    G --> O[온보딩]
-    O --> R[인정과 환영]
-```
+![커뮤니티가 굴러가는 최소 구조](../../../assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)
 
+*행동 강령에서 환영 메시지까지 이어지는 최소 커뮤니티 운영 구조*
 이 흐름에서 빠지기 쉬운 부분이 마지막 단계입니다. 규칙과 문서만 있다고 커뮤니티가 돌아가지는 않습니다. 신규 기여자가 실제로 환영받는 경험을 해야 다음 참여가 이어집니다.
 
 그래서 커뮤니티 운영은 문서 작성으로 끝나지 않습니다. 문서는 입구를 만들고, 응답은 그 입구가 실제로 열려 있음을 증명합니다. 둘 중 하나라도 빠지면 프로젝트는 닫힌 공간처럼 보이기 쉽습니다.
@@ -182,5 +178,6 @@ labels: bug
 - [Open Source Guides — Building Communities](https://opensource.guide/building-community/)
 - [GitHub Discussions](https://docs.github.com/en/discussions)
 - [first-interaction action](https://github.com/actions/first-interaction)
+- [contributor-covenant 저장소](https://github.com/contributor-covenant/contributor_covenant)
 
 Tags: OpenSource, Community, CodeOfConduct, Governance, Beginner
