@@ -302,6 +302,12 @@ The essence of a coding test is "choosing the right algorithm and implementing i
 
 The same mindset applies in production work. "Is this algorithm fast enough for this data size?" is a fundamental question in system design.
 
+## Why this matters beyond interviews
+
+- Production incidents often start with the same mistake as a failed coding test: choosing an algorithm that does not match the input scale.
+- Constraint-first thinking transfers directly to batch jobs, API latency budgets, and memory-sensitive data pipelines.
+- A reusable problem-solving checklist is valuable because it reduces debugging time even when the task is not presented as an “algorithm problem.”
+
 ## Checklist
 
 - [ ] I can reverse-engineer allowed time complexity from input size
@@ -335,9 +341,15 @@ The most important skill in coding tests is identifying the problem type at a gl
 
 ## References
 
-- [LeetCode — Top Interview Questions](https://leetcode.com/problem-list/top-interview-questions/)
+### Language and library references
+
+- [Python Documentation — collections](https://docs.python.org/3/library/collections.html)
+- [Python Documentation — heapq](https://docs.python.org/3/library/heapq.html)
+- [Python Documentation — itertools](https://docs.python.org/3/library/itertools.html)
+
+### Practice sets
+
 - [Baekjoon Online Judge — Step-by-Step Problems](https://www.acmicpc.net/step)
 - [Programmers — Coding Test Practice](https://programmers.co.kr/learn/challenges)
-- [Real Python — Python Practice Problems](https://realpython.com/python-practice-problems/)
 
 Tags: Python, Algorithms, Coding Test, Problem Solving, Interview
