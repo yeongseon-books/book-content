@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Test Coverage</h1>
-<p>This is post 7 in the Testing 101 series.</p>
+<p>Ask a team how much they tested, and someone will usually answer with a percentage. That number is useful—but only up to the point where people start mistaking execution for verification. A line can run without the test proving anything meaningful about it.</p>
+<p>Coverage helps when it reveals blind spots. It hurts when it becomes a vanity metric that rewards shallow tests and distracts from risky branches or exception paths.</p>
+<p>This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run <code>pytest-cov</code>, and focus on how to turn a report into better decisions rather than prettier dashboards.</p>
 <blockquote>
-<p>Testing 101 series (7/10)</p>
+<p>Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>How much</em> did you test? Is 100% <em>enough</em>?</p>
-<blockquote>
-<p>Coverage is a <em>measurement tool</em>. The moment it becomes <em>a target</em> it loses meaning.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>line/branch/function</em> coverage</li>
@@ -80,11 +74,8 @@
 <p>Coverage is a <em>compass</em>, not a <em>map</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;Production code&quot;] --&gt; Cov[&quot;Coverage tool&quot;]
-    Cov --&gt; Report[&quot;Line/branch report&quot;]
-    Report --&gt; Action[&quot;Add tests for gaps&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Line coverage</strong>: ratio of <em>executed lines / total lines</em>.</li>
@@ -145,6 +136,19 @@ fail_under = 80
 <li><strong>Ignoring <em>branch coverage</em>.</strong> Testing only one side of an if-else still gives <em>100% line</em>.</li>
 <li><strong>Holding <em>new code and legacy code</em> to the <em>same gate</em>.</strong> Improvement becomes hard.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Run <code>pytest --cov=src --cov-report=term-missing</code> and inspect two or three uncovered lines in the source itself. The point is to read the gap, not just the percentage.</li>
+<li>Re-run the same suite with <code>--cov-branch</code> and compare the numbers. The distance between line and branch coverage usually teaches more than the headline percentage.</li>
+<li>Add a small new exception path and confirm that the coverage report notices it. That is how you verify the CI gate is watching real change.</li>
+</ol>
+<p><strong>Expected output:</strong> the report should make missing branches and exception paths more visible than the total percentage alone.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>High line coverage with recurring incidents often means weak assertions or missing branch checks.</li>
+<li>Measuring generated files or migrations together with core logic inflates the number and lowers the signal.</li>
+<li>If one hard gate blocks both new and legacy code indiscriminately, teams often start gaming the metric instead of improving it.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most teams aim for <em>70\~85% on production code</em>. Core domain stays <em>high</em>; adapters and UI sit <em>lower</em>. Many add a separate gate on <em>patch coverage</em> (coverage of changed lines).</p>
 <h2>How a Senior Engineer Thinks</h2>
