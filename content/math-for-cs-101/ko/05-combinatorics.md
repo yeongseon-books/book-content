@@ -60,6 +60,11 @@ seo_description: 조합론으로 경우의 수를 세고 복잡도와 확률의 
 
 이항계수는 조합론이 확률로 넘어가는 다리 역할을 합니다. 파스칼 삼각형, 이항 전개, 이산 확률 분포가 모두 이 한 구조 위에서 연결됩니다.
 
+## 한 장으로 보는 경우의 수 구조
+
+![한 장으로 보는 경우의 수 구조](../../../assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)
+*조합론은 공식을 외우는 과목이 아니라 구조를 먼저 읽고 그 구조에 맞는 셈을 고르는 훈련입니다.*
+
 ---
 
 ## 다섯 단계로 보는 셈의 기초
@@ -179,5 +184,6 @@ A/B 테스트 버킷 수를 설계할 때, 해시 충돌 가능성을 대략 볼
 - [Counting - Khan Academy](https://www.khanacademy.org/math/statistics-probability/counting-permutations-and-combinations)
 - [Concrete Mathematics - Graham, Knuth, Patashnik](https://www-cs-faculty.stanford.edu/~knuth/gkp.html)
 - [Python math.comb Documentation](https://docs.python.org/3/library/math.html#math.comb)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)
 
 Tags: Math, Combinatorics, Counting, Probability, Beginner

@@ -60,6 +60,11 @@ A/B 테스트 결과를 읽을 때도, 분류기의 오탐률을 볼 때도, 장
 
 베이즈 정리는 새로운 증거를 받아 믿음을 갱신하는 방식입니다. 기댓값은 평균적인 결과를, 분산은 그 결과의 흔들림을 보여 줍니다. 결국 확률은 가능성뿐 아니라 위험도 같이 말하게 해 주는 언어입니다.
 
+## 한 장으로 보는 확률의 흐름
+
+![한 장으로 보는 확률의 흐름](../../../assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
+*확률은 가능한 결과를 세는 데서 시작해, 조건을 붙이고, 믿음을 갱신하고, 평균과 흔들림까지 함께 읽게 해 줍니다.*
+
 ---
 
 ## 다섯 단계로 보는 확률 기초
@@ -177,5 +182,6 @@ def variance(values, probs):
 - [Bayes Theorem - Stanford Encyclopedia](https://plato.stanford.edu/entries/bayes-theorem/)
 - [Introduction to Probability - Blitzstein](https://projects.iq.harvard.edu/stat110)
 - [Python statistics Module](https://docs.python.org/3/library/statistics.html)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)
 
 Tags: Math, Probability, Statistics, Bayes, Beginner
