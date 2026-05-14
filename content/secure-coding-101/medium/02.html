@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Input Validation</h1>
+<p>Most applications first become unstable at the input boundary. A login form, search box, JSON body, file name, or query string may look harmless, but the moment the server trusts it too early, ordinary bugs and attack paths start to overlap. SQL injection, XSS, path traversal, and unsafe deserialization all begin with the same mistake: giving external input more trust than it deserves.</p>
 <p>This is post 2 in the Secure Coding 101 series.</p>
+<p>In this chapter, we will frame validation as a contract that makes the system predictable at every trust boundary, not as a scattered pile of <code>if</code> statements. Once that idea is clear, schema validation, allowlists, normalization, and safe error handling stop feeling like separate tricks and start looking like one coherent design choice.</p>
 <blockquote>
-<p>Secure Coding 101 series (2/10)</p>
+<p>Input validation is the first security control most systems execute, and the first reliability control they cannot afford to skip.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we keep the system <em>predictable</em> no matter <em>what</em> a user sends?</p>
-<blockquote>
-<p><em>Input validation is the </em>first defense against attacks<em> and the </em>first defense against bugs<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The difference between <em>allowlists</em> and <em>denylists</em></li>
 <li>The power of <em>schema-based</em> validation</li>
@@ -80,12 +74,8 @@
 <p><em>The client is </em>hostile<em>. Validate again on the </em>server<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;Client&quot;] --&gt; Edge[&quot;Edge checks&quot;]
-    Edge --&gt; Schema[&quot;Schema validation&quot;]
-    Schema --&gt; Business[&quot;Business rules&quot;]
-    Business --&gt; Storage[&quot;Storage&quot;]
-</code></pre>
+<p><img alt="Input validation split across edge checks, schema validation, and business rules" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Input validation split across edge checks, schema validation, and business rules</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Allowlist</strong>: only <em>what is allowed</em> gets through.</li>
@@ -189,6 +179,7 @@ class CreateUser(BaseModel):
 <li><a href="https://docs.pydantic.dev/">Pydantic docs</a></li>
 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html">OWASP — Mass Assignment</a></li>
 <li><a href="https://portswigger.net/web-security">PortSwigger — Input validation</a></li>
+<li><a href="https://unicode.org/reports/tr39/">Unicode Technical Standard #39 — Unicode Security Mechanisms</a></li>
 </ul>
 <p class="tags-line">Tags: InputValidation, SecureCoding, Pydantic, OWASP, AppSec</p>
 </body>

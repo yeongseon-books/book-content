@@ -17,24 +17,20 @@ tags:
   - OWASP
   - AppSec
 seo_description: Allowlists, schema-based validation, and a five-step playbook for safe, predictable input handling at every trust boundary.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Input Validation
 
+Most applications first become unstable at the input boundary. A login form, search box, JSON body, file name, or query string may look harmless, but the moment the server trusts it too early, ordinary bugs and attack paths start to overlap. SQL injection, XSS, path traversal, and unsafe deserialization all begin with the same mistake: giving external input more trust than it deserves.
+
 This is post 2 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (2/10)
+In this chapter, we will frame validation as a contract that makes the system predictable at every trust boundary, not as a scattered pile of `if` statements. Once that idea is clear, schema validation, allowlists, normalization, and safe error handling stop feeling like separate tricks and start looking like one coherent design choice.
 
-<!-- a-grade-intro:begin -->
+> Input validation is the first security control most systems execute, and the first reliability control they cannot afford to skip.
 
-**Core question**: How do we keep the system *predictable* no matter *what* a user sends?
-
-> *Input validation is the *first defense against attacks* and the *first defense against bugs*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The difference between *allowlists* and *denylists*
 - The power of *schema-based* validation
@@ -50,14 +46,9 @@ Half of the OWASP Top 10 comes from *trusting input*. SQL injection, XSS, path t
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] --> Edge["Edge checks"]
-    Edge --> Schema["Schema validation"]
-    Schema --> Business["Business rules"]
-    Business --> Storage["Storage"]
-```
+![Input validation split across edge checks, schema validation, and business rules](../../../assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
 
+*Input validation split across edge checks, schema validation, and business rules*
 ## Key Terms
 
 - **Allowlist**: only *what is allowed* gets through.
@@ -185,5 +176,6 @@ With validation, behavior becomes *predictable*. Next we look at *who is who* �
 - [Pydantic docs](https://docs.pydantic.dev/)
 - [OWASP — Mass Assignment](https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html)
 - [PortSwigger — Input validation](https://portswigger.net/web-security)
+- [Unicode Technical Standard #39 — Unicode Security Mechanisms](https://unicode.org/reports/tr39/)
 
 Tags: InputValidation, SecureCoding, Pydantic, OWASP, AppSec
