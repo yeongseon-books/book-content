@@ -54,35 +54,29 @@
 </head>
 <body>
 <h1>Retraining</h1>
-<blockquote>
-<p>MLOps 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When should you <em>retrain</em>, and how do you know the new model is <em>actually</em> better?</p>
-<blockquote>
-<p><em>Retraining runs train, evaluate, compare against champion, and promote — automatically — based on explicit triggers.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Deploying a model once is not the end of the job. Input distributions move, user behavior changes, and performance targets change. At some point, the team has to train again. The hard part is deciding who should trigger that retraining and on what evidence.</p>
+<p>If retraining depends only on human instinct, it becomes slow and inconsistent. One team retrains on a schedule, another retrains only after an incident, and another swaps in a new model without proving it is actually better.</p>
 <p>This is post 8 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>Three trigger types (schedule / drift / performance)</li>
-<li>The Champion / Challenger pattern</li>
-<li>Shadow evaluation</li>
-<li>Automatic promotion policies</li>
-<li>Five common pitfalls</li>
+<li>Which signals should trigger retraining in the first place?</li>
+<li>How do schedule-based, drift-based, and performance-based triggers differ?</li>
+<li>Why do champion-versus-challenger comparisons need a margin?</li>
+<li>What risk does shadow evaluation remove?</li>
+<li>Why should retraining and deployment never be treated as the same step?</li>
 </ul>
+<blockquote>
+<p>Mental model: retraining creates a new candidate model. Promotion decides whether that candidate should become the new live model. The stages are connected, but they are not the same decision.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>Manual retraining is slow and biased. Automated retraining is fast and evidence-driven.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Trig[&quot;trigger&quot;] --&gt; Train[&quot;train challenger&quot;]
-    Train --&gt; Eval[&quot;evaluate&quot;]
-    Eval --&gt; Cmp[&quot;vs champion&quot;]
-    Cmp --&gt; Promo[&quot;promote / reject&quot;]
-</code></pre>
+<p>Without retraining, a model ages quietly. But a fully automatic retraining loop is not automatically safe either. If the policy is weak, the system may replace models too often and trade stability for false momentum.</p>
+<p>That is why the real problem is policy, not automation for its own sake. The team has to define what starts retraining, how much better the challenger must be, and what path exists if the decision was wrong.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+This structure explains retraining well. A trigger fires, a challenger is trained, the challenger is evaluated against the champion, and the system either promotes it or rejects it.</p>
+<p>So retraining is not just about running training again. It is about adding comparison and promotion policy around the training run.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Champion</strong>: the model currently serving production.</li>
