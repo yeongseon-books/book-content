@@ -14,18 +14,25 @@ tags:
 - LLM-as-Judge
 - Bias
 - Cohen Kappa
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: When humans cannot grade every response, you can delegate scoring
   to a strong LLM.
 ---
 
 # LLM-as-Judge — Evaluating Models with Models
 
-> AI Evaluation 101 Series (4/10)
-
 When humans cannot grade every response, you can delegate scoring to a strong LLM.
 
 This is post 4 in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.
+
+## Questions this chapter answers
+
+- When does LLM-as-judge outperform lexical metrics enough to justify its cost?
+- Which judge pattern fits single-score grading, A/B comparison, or reference checking?
+- What biases make a judge look more confident than it should be?
+- How much human agreement do you need before trusting a judge in production?
+
+> Mental model: an LLM judge is not a magic scorer. It is a fast junior evaluator that becomes trustworthy only when you constrain the prompt, measure agreement, and deliberately control its biases.
 
 ---
 ![LLM-as-Judge - evaluating models with models](../../../assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
@@ -278,6 +285,14 @@ A judge giving 90 does not mean the system is good. **Before production, grade 5
 The next post covers **multi-dimensional rubrics**, where you grade several axes instead of one number.
 
 ---
+
+## Operational checklist
+
+- [ ] Choose the judge pattern based on the task: single-score, pairwise, or reference-based.
+- [ ] Set `temperature=0` and log the exact prompt version used for grading.
+- [ ] Swap answer order in pairwise runs to neutralize position bias.
+- [ ] Compare at least 50 human-rated samples against the judge before production use.
+- [ ] Track judge cost separately so evaluation spend stays visible.
 
 <!-- toc:begin -->
 ## AI Evaluation 101 Series

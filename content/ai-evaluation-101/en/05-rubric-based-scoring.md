@@ -14,18 +14,25 @@ tags:
 - Rubric
 - Multi-Dimensional
 - JSON Output
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far
   more useful than a single 1-5 score.
 ---
 
 # Designing Rubric-Based Scoring
 
-> AI Evaluation 101 Series (5/10)
-
 Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score.
 
 This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
+
+## Questions this chapter answers
+
+- Why does a single judge score hide the exact thing your team needs to fix?
+- How do you turn user value into 3-5 practical scoring dimensions?
+- Why are 1/3/5 anchors mandatory if you want judges and humans to stay aligned?
+- Which aggregation strategies preserve safety-critical failures instead of averaging them away?
+
+> Mental model: a rubric is a fault-isolation tool. Its job is not to make the score look sophisticated, but to show which quality dimension failed so the next engineering move is obvious.
 
 ---
 ![Designing Rubric-Based scoring](../../../assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
@@ -288,6 +295,14 @@ If Helpfulness and Completeness correlate at 0.95 they are one dimension. **Merg
 The next post covers RAG pipeline evaluation — retrieval, faithfulness, answer relevance.
 
 ---
+
+## Operational checklist
+
+- [ ] Keep the rubric to 3-5 dimensions that map to actual user value.
+- [ ] Write concrete 1, 3, and 5 anchors for every dimension.
+- [ ] Check correlations so duplicate dimensions do not distort the score.
+- [ ] Add hard fail thresholds for safety-critical dimensions like correctness.
+- [ ] Review per-dimension agreement with humans before trusting the rubric at scale.
 
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
