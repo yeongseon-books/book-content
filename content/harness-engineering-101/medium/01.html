@@ -54,18 +54,33 @@
 </head>
 <body>
 <h1>What Is Harness Engineering?</h1>
-<p>This is the first post in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (1/10)</p>
-</blockquote>
-<p>Good agents are not made by good models alone. You must design the environment, constraints, tools, and verification loops the model works inside. Harness Engineering is the discipline of designing that environment so the agent can work reliably.</p>
+<p>Every frontier-model release triggers the same hope: maybe this is the one that finally makes agents production-ready. In practice, teams using the same model still land in very different places. One team gets a stable operator. Another gets an expensive demo that keeps guessing.</p>
+<p>The difference is usually not the model. It is the work environment around the model: what task it receives, what context it sees, what tools it may touch, how completion is verified, and where risky actions stop.</p>
+<p>This is the first post in the Harness Engineering 101 series. It establishes the operating model for the rest of the series, so Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability read as one system rather than eight isolated tips.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why do agents still behave unpredictably even when the underlying model is strong?</li>
+<li>What does the word harness mean when you apply it to an agent system?</li>
+<li>How does an agent without a harness differ from one with a harness in code and in operations?</li>
+<li>What questions do the eight harnesses answer across the rest of the series?</li>
+<li>Why is Harness Engineering a different decision layer from framework choice?</li>
+</ul>
+<blockquote>
+<p>A reliable agent is decided more by the system around the model than by the model alone. Harness Engineering is the work of designing that surrounding system.</p>
+</blockquote>
 <p><img alt="What is harness Engineering" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png"></p>
 <p><em>What is harness Engineering</em></p>
+<h2>Why this chapter matters</h2>
+<p>If you miss this frame, every later decision starts to look like prompt tuning or framework preference. Teams keep swapping models, adding tools, and lengthening instructions without being able to explain why the system still drifts, loops, or performs risky actions at the wrong time.</p>
+<p>Once you look at the problem through the harness lens, the order of questions changes. You ask what the agent must do, what it should see, what it must never do, which tools it may call, how completion is proven, how failure is recovered, where a human must stop it, and how a run can be replayed later. That is the shift from demo thinking to operating-system thinking.</p>
 <h2>A Good Model Alone Is Not Enough</h2>
 <p>Every time a new frontier model lands — GPT-4, Claude 3.5, Gemini 1.5 — the same hope follows: "now real agents are finally possible." But with the same model, one team builds a reliable automation system and another team gets different results on every run. The difference is rarely the model. It is <strong>the environment around the model</strong>.</p>
 <p>Even a skilled person produces poor work at a messy desk with broken tools. Agents work the same way. Without a clear task definition, clean context, safe tools, explicit completion criteria, a loop that recovers from failure, an approval flow for risky actions, and observability into what was done, even a capable model looks incompetent.</p>
 <p>Harness Engineering is the practice of designing that environment. Building a good agent is not about picking a good model. It is about constructing a system the model can work inside.</p>
+<h2>The simplest mental model: design the workbench outside the model</h2>
+<p>Harness Engineering is easiest to understand if you picture the model as a capable worker and the harness as the workbench around that worker. A stronger worker helps, but a messy bench, unclear instructions, unsafe tools, and missing verification still produce bad work.</p>
+<p>That is why production failures should not default to “the model is weak.” More often the agent had to infer too much, saw too much irrelevant context, had access to the wrong tool surface, or claimed completion without an external check. The harness tells you where to debug first.</p>
 <hr>
 <h2>What Is a Harness?</h2>
 <p>The English word "harness" originally describes the equipment fitted onto a horse or working animal. It is not a restraint. It is the device that channels the animal's strength in a useful direction. Without a harness, a horse's power scatters and stays uncontrolled. With a harness, the same horse pulls a carriage, plows a field, or carries a rider safely.</p>
@@ -144,6 +159,20 @@ def run_agent_with_harness(task: TaskSpec, ctx: AgentContext, policy: ToolPolicy
 <li>Every decision is recorded (Observability).</li>
 </ul>
 <p>Same model, completely different system.</p>
+<p>One practical difference is that the harnessed version gives the rest of the system something concrete to verify. The task has a schema, approvals can be intercepted, and the trace can be inspected after the run. That turns “the model said it is done” into something a verifier, an approver, and an on-call engineer can all reason about.</p>
+<pre><code class="language-text">Harness-free run
+- Input: &quot;Build a sales report&quot;
+- Output: free-form answer
+- Verification: none
+- Replay path: none
+
+Harnessed run
+- Input: TaskSpec + scoped context + tool policy
+- Output: typed result + trace
+- Verification: completion criteria checked
+- Replay path: trace and tool history available
+</code></pre>
+<p><strong>Expected output:</strong> the harnessed path produces artifacts the rest of your system can inspect, reject, retry, or replay. The unharnessed path produces only text.</p>
 <hr>
 <h2>The Eight Harnesses</h2>
 <p><img alt="The eight harnesses" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-03-the-eight-harnesses.en.png"></p>
@@ -206,6 +235,27 @@ If the agent repeats the same search 100 times or loops forever, your Constraint
 <p><strong>5. You cannot tell when the agent is done.</strong><br>
 Without a Test Harness, "I am done" from the agent means nothing.</p>
 <p>If you see any one of these, switching models will not save you. You need to design harnesses.</p>
+<h2>A minimal verification loop for a harnessed agent</h2>
+<p>The key difference between a demo agent and a production candidate is not how clever the answer sounds. It is whether the rest of the system can reject an incomplete answer automatically.</p>
+<pre><code class="language-python">from pydantic import BaseModel, ValidationError
+
+class ReportResult(BaseModel):
+    title: str
+    summary: str
+    next_actions: list[str]
+
+def verify_report_result(payload: dict) -&gt; tuple[bool, str]:
+    try:
+        result = ReportResult.model_validate(payload)
+    except ValidationError as exc:
+        return False, f&quot;schema validation failed: {exc.errors()}&quot;
+
+    if len(result.next_actions) &lt; 2:
+        return False, &quot;need at least two follow-up actions&quot;
+
+    return True, &quot;pass&quot;
+</code></pre>
+<p>This is a tiny example, but it captures the real point. Once outputs are pinned down, the rest of the harness can do useful work: Test Harness can fail the run, Feedback Loop can retry with guidance, Approval Gate can hold risky actions, and Observability can record which check failed.</p>
 <hr>
 <h2>A Small Example: Email Classification Agent</h2>
 <p><img alt="A small Example: email classification agent" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-04-a-small-example-email-classification-age.en.png"></p>
@@ -290,6 +340,14 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 <li>Harness Engineering is a design discipline, not a framework. Use frameworks like LangGraph as tools to implement your harness design.</li>
 <li>Non-deterministic behavior, undebuggable runs, automated risky actions, runaway costs, and "is it done?" ambiguity are signals that you need to start designing harnesses.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Before changing models, check whether Task, Context, Tool, Test, or Approval gaps explain the failure first.</li>
+<li>[ ] Treat harness design as a system problem, not as a prompt-writing problem.</li>
+<li>[ ] Require every serious agent to expose completion criteria and a replay path.</li>
+<li>[ ] Keep framework choice separate from harness design documents and reviews.</li>
+<li>[ ] Use the eight harnesses as a diagnostic map when production behavior drifts.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><strong>What Is Harness Engineering? (current)</strong></li>
@@ -305,11 +363,16 @@ Adopting LangGraph does not give you harnesses for free. Frameworks are tools. H
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and research</strong></p>
 <ul>
 <li><a href="https://www.anthropic.com/research/building-effective-agents">Building Effective Agents — Anthropic</a></li>
 <li><a href="https://lilianweng.github.io/posts/2023-06-23-agent/">LLM Powered Autonomous Agents — Lilian Weng</a></li>
-<li><a href="https://www.langchain.com/blog">The Rise of Agent Engineering</a></li>
 <li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI Function Calling Guide</a></li>
+</ul>
+<p><strong>Related series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/05-multi-agent.md">LangGraph 101 — Multi-Agent Systems</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-safety-guardrails-101/en/10-production-guardrail-system.md">AI Safety &amp; Guardrails 101 — Building Production Guardrail Systems</a></li>
 </ul>
 <p class="tags-line">Tags: AI Agent, Harness, Production, Reliability</p>
 </body>
