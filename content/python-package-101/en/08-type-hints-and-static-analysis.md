@@ -3,7 +3,7 @@ title: Type Hints and Static Analysis
 series: python-package-101
 episode: 8
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - py.typed
 - Static Analysis
 - Typing
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: Type hints declare the input and output types of functions, and mypy
   catches type errors without running the code.
 ---
 
 # Type Hints and Static Analysis
 
-This is post 8 in the Python Package 101 series.
+The moment other developers import your package, they need more than working code. They need a contract they can read quickly, and type hints are the fastest way to make that contract visible to both humans and tools.
 
-> Python Package 101 series (8/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 8 in the Python Package 101 series. Here we use type hints, `mypy`, and `py.typed` to turn Python packaging into something safer to consume and easier to refactor.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 8 in the Python Package 101 series.
 - How do you use generic types and Union types?
 
 > Type hints declare the input and output types of functions, and mypy catches type errors without running the code.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -68,6 +62,9 @@ mypy checks:
   greet(42)    # Error: expected str, got int
   x: int = greet("Alice")  # Error: str assigned to int
 ```
+
+![Mental Model](../../../assets/python-package-101/08/08-01-mental-model.en.png)
+*How type hints feed static analysis and improve the package consumer experience*
 
 ## Core Concepts
 
@@ -275,7 +272,7 @@ For new projects, start with `strict = true` from day one. For existing projects
 The next post covers **documentation** — README, MkDocs, and API Reference.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -297,4 +294,4 @@ The next post covers **documentation** — README, MkDocs, and API Reference.
 - [PEP 561 - Distributing and Packaging Type Information](https://peps.python.org/pep-0561/)
 - [Python typing documentation](https://docs.python.org/3/library/typing.html)
 
-Tags: Python, Type Hints, mypy, py.typed, Static Analysis, Typing
+Tags: Python, Packaging, PyPI, pyproject.toml
