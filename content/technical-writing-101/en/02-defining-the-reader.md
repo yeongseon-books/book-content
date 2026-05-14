@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 2
 title: Defining the Reader
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Persona
   - Writing
   - Beginner
-seo_description: A beginner-friendly tour of defining the reader through personas so a technical post stays focused and useful.
-last_reviewed: '2026-05-04'
+seo_description: Define the reader with persona, prior knowledge, goal, and non-goal so a technical post stays narrow and useful.
+last_reviewed: '2026-05-15'
 ---
 
 # Defining the Reader
 
-This is post 2 in the Technical Writing 101 series.
+The same FastAPI example can be a friendly introduction for a junior engineer and a useless wall of text for the on-call engineer trying to restore service. The writing is not necessarily wrong. The target moved.
 
-> Technical Writing 101 series (2/10)
+Once the reader is blurry, everything else drifts with it: how much background to include, which terms need explanation, how hard the example can be, and what the post should deliberately leave out. A concrete reader makes those decisions faster.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Technical Writing 101 series. Here we turn the reader into a working model with persona, prior knowledge, goal, and non-goal.
 
-**Core question**: Why does a post for *everyone* end up *helping no one*?
-
-> A *clear reader* makes *clear sentences*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - Building a *persona*
 - Mapping *prior knowledge*
@@ -46,15 +40,13 @@ This is post 2 in the Technical Writing 101 series.
 
 A blurry *reader* leads to blurry *sentences*.
 
+> Mental model: once one reader becomes concrete, scope and vocabulary stop drifting.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Persona] --> K[Knowledge]
-    K --> G[Goal]
-    G --> S[Scope]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **persona**: A *model of the reader*.
@@ -68,6 +60,16 @@ flowchart LR
 **Before**: "A post for *developers*."
 
 **After**: "A post for a *first-year Python* engineer learning *FastAPI*."
+
+## The same feature changes shape for different readers
+
+| Reader | Already knows | Needs right now | Should be left out |
+| --- | --- | --- | --- |
+| Beginner | Python syntax, `pip` | A first FastAPI endpoint | Deployment strategy, performance tuning |
+| Reviewer | API basics | Missing prerequisites in the draft | Full install walkthrough |
+| On-call engineer | Production environment | Triage steps and logs | Refresher on beginner concepts |
+
+The same `/health` endpoint example serves different purposes for each row. That is why a persona is not decorative UX language. It is an editing boundary for depth, vocabulary, and scope.
 
 ## Hands-on: A Persona Card
 
