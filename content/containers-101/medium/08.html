@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Container Security</h1>
-<blockquote>
-<p>Containers 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Just because a <em>container</em> is <em>isolated</em>, is it really <em>safe</em>?</p>
-<blockquote>
-<p><em>Container security</em> is built on three pillars: <em>least privilege</em>, <em>image trust</em>, and <em>runtime policy</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Isolation does not make a container automatically safe. Default settings can still leave you with a root process, excess capabilities, weak secret handling, and unsigned artifacts moving through production.</p>
 <p>This is post 8 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we build a practical baseline around non-root users, capability reduction, seccomp, read-only filesystems, image scanning, and signature-aware delivery.</p>
+<blockquote>
+<p>Container security improves when defaults get narrower: fewer privileges, fewer writable paths, fewer blind spots.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>What <em>non-root</em> means</li>
 <li><em>Capabilities</em> and <em>seccomp</em></li>
@@ -77,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A default container runs as <em>root</em> with <em>too many privileges</em> and easily becomes the <em>starting point</em> of a security incident.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Image[&quot;image&quot;] --&gt; Scan[&quot;scan&quot;]
-    Scan --&gt; Sign[&quot;sign&quot;]
-    Sign --&gt; Run[&quot;run as user&quot;]
-    Run --&gt; Caps[&quot;drop caps&quot;]
-    Caps --&gt; Secrets[&quot;mount secrets&quot;]
-</code></pre>
+<p><img alt="Security flow from scanning to least-privilege runtime" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Security flow from scanning to least-privilege runtime</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>non-root</strong>: running as a <em>normal user</em> such as UID 1000.</li>
@@ -140,6 +129,20 @@ def scan(image):
 <li>After <em>--cap-drop=ALL</em> we add only what is needed.</li>
 <li><em>Secrets</em> are mounted as volumes.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">trivy image --severity HIGH,CRITICAL python:3.12-slim
+docker run --rm --user 1000:1000 python:3.12-slim id
+docker run --rm --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx:1.27-alpine nginx -t
+docker run --rm --read-only --tmpfs /tmp python:3.12-slim python -c &quot;print(&quot;ok&quot;)&quot;
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>id</code> shows a non-root UID and GID.<br>
+- The process still works with only the minimum extra capability added back.<br>
+- The container can run read-only as long as writable scratch paths are explicit.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If non-root fails, inspect writable paths and ownership before broadening permissions.<br>
+- If read-only mode fails, trace which directory the app expects to write to.<br>
+- If scan results are noisy, start with base-image choice and package removal.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Running as <em>root</em> and trusting the inside.</strong></li>
@@ -173,6 +176,7 @@ def scan(image):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>With security principles in place, the next topic is the <em>fundamental difference</em> between <em>containers and VMs</em>. The next post covers <em>containers vs VMs</em>.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -192,6 +196,6 @@ def scan(image):
 <li><a href="https://aquasecurity.github.io/trivy/">Trivy</a></li>
 <li><a href="https://docs.docker.com/engine/security/seccomp/">seccomp profiles</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Security, seccomp, Cosign, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
