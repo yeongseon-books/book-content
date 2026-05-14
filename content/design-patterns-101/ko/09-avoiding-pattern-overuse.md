@@ -17,8 +17,8 @@ tags:
   - Simplicity
   - YAGNI
   - Refactoring
-seo_description: 불필요한 패턴 남용을 피하고 단순한 코드를 지키는 기준과 리팩터링을 통해 패턴을 발견하는 실무적 접근법을 설명합니다.
-last_reviewed: '2026-05-12'
+seo_description: 패턴 남용을 피하고 반복되는 변화가 생겼을 때만 추상화를 올리는 실무적 기준을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # 패턴을 남용하지 않는 법
@@ -47,14 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Need["Real need"] --> Refactor["Refactor"]
-    Refactor --> Pattern["Pattern emerges"]
-    Premature["Pre-applied"] --> Junk["Just more complexity"]
-```
-
-패턴은 필요가 부를 때 등장해야 합니다. 반대 방향은 대부분 복잡성 증가로 끝납니다.
+![한눈에 보는 개념](../../../assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
+*패턴은 실제 필요와 리팩터링이 불러와야 하고, 문제보다 먼저 도착한 추상화는 대개 복잡성만 남깁니다.*
 
 ## 핵심 용어
 
@@ -152,6 +146,16 @@ def member_price(p): return p * 0.9
 
 좋은 라이브러리는 패턴을 많이 쓰는 대신 정확하게 씁니다. requests, FastAPI, pytest 같은 도구를 보면 어렵지 않은 조합으로 큰 문제를 해결합니다. 주니어와 시니어의 차이는 패턴 이름을 많이 아느냐보다, 언제 기다려야 하는지 아느냐에 더 가깝습니다.
 
+## 빠르게 검증해 보기
+
+새 추상화가 과한지 의심되면 아래를 먼저 확인해 보세요.
+
+- 그 변화가 실제 코드에서 반복되었는지, 아니면 설계 회의 안에서만 예상되는지 구분합니다.
+- 함수 추출이나 작은 모듈 분리만으로 의도가 충분히 드러나는지 시험해 봅니다.
+- 패턴을 빼면 당장 어떤 구체적 고통이 돌아오는지 적어 봅니다.
+
+**기대 결과:** 고통이 아직 가정에 머문다면, 지금은 단순한 코드가 더 좋은 설계일 가능성이 큽니다.
+
 ## 시니어 엔지니어는 이렇게 판단합니다
 
 - 함수에서 시작합니다.
@@ -193,9 +197,15 @@ def member_price(p): return p * 0.9
 
 ## 참고 자료
 
+### 핵심 자료
+
 - [YAGNI (Martin Fowler)](https://martinfowler.com/bliki/Yagni.html)
 - [Refactoring to Patterns (Joshua Kerievsky)](https://www.industriallogic.com/xp/refactoring/)
 - [Premature Abstraction (C2 wiki)](https://wiki.c2.com/?PrematureGeneralization)
+
+### 실무 확장 읽을거리
+
 - [Worse Is Better (Richard Gabriel)](https://www.dreamsongs.com/RiseOfWorseIsBetter.html)
+- [PEP 20 — The Zen of Python](https://peps.python.org/pep-0020/)
 
 Tags: Computer Science, DesignPatterns, Antipatterns, Simplicity, YAGNI, Refactoring
