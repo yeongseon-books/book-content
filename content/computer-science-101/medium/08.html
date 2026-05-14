@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Databases</h1>
-<blockquote>
-<p>Computer Science 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: How can a database find a single row out of hundreds of millions in 1 ms?</p>
-<blockquote>
-<p>A database stores large amounts of data permanently and lets many users read and write it safely at the same time. SQL is the standard language for working with that data, indexes are the data structures that make lookups fast, and transactions keep data consistent. This article covers SQL basics, how indexes work, ACID transactions, and the performance traps you'll meet most often.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Finding one row out of millions in milliseconds is rarely about the SQL sentence alone. It is about the data structures, execution plan, and locking behavior hidden underneath that sentence. That is why so many production incidents end up tracing back to the database layer.</p>
 <p>This is post 8 in the Computer Science 101 series.</p>
+<p>In this article, we'll connect SQL, indexes, execution plans, and ACID transactions so that database behavior stops feeling like a black box.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>How does a database store large amounts of data and still answer quickly?</li>
+<li>Why can an index change lookup time so dramatically?</li>
+<li>What is the gap between a SQL statement and the plan the DB actually executes?</li>
+<li>What failures do transactions and ACID protect you from?</li>
+<li>Why do N+1 queries and long transactions so often become production incidents?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The basic concepts of relational databases</li>
@@ -83,16 +82,8 @@
 <blockquote>
 <p>An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.</p>
 </blockquote>
-<pre><code class="language-text">Without an index:  SELECT * FROM users WHERE email = 'a@b.com'
-  -&gt; scan every row (Full Table Scan)  -- O(n)
-
-With a B-Tree index
-  -&gt; binary search through the tree    -- O(log n)
-
-For 1,000,000 rows
-  - full scan : about 1,000,000 comparisons
-  - B-Tree    : about 20 comparisons
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>An index swaps a row-by-row scan for a structured lookup path</em></p>
 <h2>Key Terms</h2>
 <p><strong>Table</strong><br>
 - Description: The basic unit of relational data, made of rows and columns</p>
@@ -201,6 +192,7 @@ start = time.perf_counter()
 cur.execute(&quot;SELECT COUNT(*) FROM big WHERE k = ?&quot;, (target,)).fetchone()
 print(f&quot;after  index: {time.perf_counter() - start:.6f}s&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> <code>after index</code> should be much faster than <code>before index</code>, and <code>EXPLAIN QUERY PLAN</code> should confirm that the index is used.</p>
 <p><strong>Step 4: Inspect with EXPLAIN QUERY PLAN</strong></p>
 <pre><code class="language-python">for row in cur.execute(&quot;EXPLAIN QUERY PLAN SELECT * FROM big WHERE k = 12345&quot;):
     print(row)
