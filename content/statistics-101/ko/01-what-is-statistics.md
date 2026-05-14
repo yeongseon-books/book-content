@@ -47,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 통계를 처음 배울 때는 공식을 하나씩 외우기보다 흐름을 먼저 보는 편이 좋습니다. 데이터는 먼저 요약되고, 요약된 데이터는 모집단에 대한 추론으로 이어지고, 그 추론은 의사결정 문장으로 마무리됩니다. 통계를 잘 읽는 사람은 이 세 단계를 섞지 않습니다.
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Desc["Descriptive"]
-    Desc --> Infer["Inferential"]
-    Infer --> Decide["Decision"]
-```
+![멘탈 모델](../../../assets/statistics-101/01/01-01-concept-at-a-glance.ko.png)
 
+*통계를 데이터 요약, 추론, 의사결정으로 이어서 읽는 기본 흐름입니다.*
 위 그림을 하나의 문장으로 바꾸면 이렇습니다. 먼저 데이터의 현재 모습을 설명하고, 그다음 표본 바깥의 세계를 추론하고, 마지막에 무엇을 할지 결정합니다. 시리즈 전체도 이 순서로 전개됩니다.
 
 ## 핵심 용어
@@ -94,6 +90,8 @@ df = pd.read_csv("clicks.csv")
 print(df.shape, df.columns.tolist())
 ```
 
+**예상 출력:** `(2000, ['group', 'ctr'])`처럼 행 수와 핵심 열 이름이 먼저 보여야 합니다.
+
 행 수, 열 이름, 그룹 구성이 기대와 맞는지 보는 단계입니다. 통계 작업은 여기서 자주 갈립니다.
 
 ### 3단계 — 기술 통계로 먼저 요약한다
@@ -101,6 +99,8 @@ print(df.shape, df.columns.tolist())
 ```python
 print(df.groupby("group")["ctr"].agg(["mean", "std", "count"]))
 ```
+
+**예상 출력:** control/test 두 그룹 각각의 평균 클릭률, 표준편차, 표본 수가 표 형태로 출력됩니다.
 
 평균, 표준편차, 표본 크기를 먼저 확인하면 데이터의 규모와 흔들림을 빠르게 읽을 수 있습니다.
 
@@ -111,6 +111,8 @@ from scipy.stats import ttest_ind
 a, b = df.loc[df.group == "control", "ctr"], df.loc[df.group == "test", "ctr"]
 print(ttest_ind(a, b, equal_var=False))
 ```
+
+**예상 출력:** `TtestResult(statistic=..., pvalue=...)` 형태가 나오며, 여기서 p-value가 우연으로 설명될 수준인지 확인합니다.
 
 요약된 차이가 우연으로 설명될 수준인지 점검하는 단계입니다.
 
