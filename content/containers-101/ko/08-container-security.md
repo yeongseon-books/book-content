@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Security
-  - seccomp
-  - Cosign
-  - DevOps
+- Containers
+- Security
+- seccomp
+- Cosign
+- DevOps
 seo_description: 비root, capability, seccomp, 시크릿 처리까지 컨테이너 보안 기초를 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Container Security
 
+컨테이너는 격리되어 있으니 기본적으로 안전할 것처럼 느껴집니다. 하지만 기본값 그대로 실행하면 root 사용자, 과한 capability, 느슨한 시크릿 처리, 검증 없는 이미지가 그대로 운영에 들어가기도 합니다.
+
 이 글은 Containers 101 시리즈의 여덟 번째 글입니다.
+
+여기서는 non-root, capability 축소, seccomp, 읽기 전용 파일시스템, 이미지 스캔과 서명이 어떻게 하나의 보안 기본선으로 이어지는지 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,15 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Image["image"] --> Scan["scan"]
-    Scan --> Sign["sign"]
-    Sign --> Run["run as user"]
-    Run --> Caps["drop caps"]
-    Caps --> Secrets["mount secrets"]
-```
+![스캔, 서명, 최소 권한 실행으로 이어지는 보안 흐름](../../../assets/containers-101/08/08-01-concept-at-a-glance.ko.png)
 
+*스캔, 서명, 최소 권한 실행으로 이어지는 보안 흐름*
 이미지는 먼저 검사하고, 가능하면 서명하고, 실행 시에는 비root·최소 capability·적절한 시크릿 마운트로 공격 표면을 줄입니다.
 
 ## 핵심 용어
@@ -144,6 +142,25 @@ def run_with_secret(image, secret_path):
 
 이 세 가지는 복잡한 보안 제품이 없어도 바로 적용할 수 있는 기본값입니다. 초반에 이 기준만 잡아도 보안 수준이 눈에 띄게 좋아집니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+trivy image --severity HIGH,CRITICAL python:3.12-slim
+docker run --rm --user 1000:1000 python:3.12-slim id
+docker run --rm --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx:1.27-alpine nginx -t
+docker run --rm --read-only --tmpfs /tmp python:3.12-slim python -c "print("ok")"
+```
+
+**Expected output:**
+- `id` 출력에서 root가 아닌 UID/GID가 보입니다.
+- 필요한 capability만 추가해도 서비스가 동작하는지 확인할 수 있습니다.
+- 읽기 전용 루트 파일시스템에서도 예외 경로만 쓰면 기동 가능합니다.
+
+**먼저 확인할 것:**
+- non-root에서 실패하면 쓰기 경로와 파일 소유권을 먼저 봅니다.
+- `--read-only` 실패 시 앱이 어디에 임시 파일을 쓰는지 추적합니다.
+- 스캔 결과가 많으면 베이스 이미지와 패키지 구성을 먼저 정리합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **root로 실행하면서 내부를 믿습니다.**
@@ -188,6 +205,8 @@ Kubernetes에서는 Pod Security, admission controller 같은 정책을 통해 n
 다음 글에서는 컨테이너와 VM의 차이를 비교하며, 어떤 격리 모델을 언제 선택해야 하는지 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - [Image와 Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -196,8 +215,9 @@ Kubernetes에서는 Pod Security, admission controller 같은 정책을 통해 n
 - [Network](./06-network.md)
 - [Registry](./07-registry.md)
 - **Container Security (현재 글)**
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -207,4 +227,4 @@ Kubernetes에서는 Pod Security, admission controller 같은 정책을 통해 n
 - [Trivy](https://aquasecurity.github.io/trivy/)
 - [seccomp profiles](https://docs.docker.com/engine/security/seccomp/)
 
-Tags: Containers, Security, seccomp, Cosign, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

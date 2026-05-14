@@ -2,7 +2,7 @@
 series: containers-101
 episode: 8
 title: Container Security
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Security
-  - seccomp
-  - Cosign
-  - DevOps
-seo_description: A beginner guide to container security covering non-root users, capabilities, seccomp, image scanning, and proper secret handling with examples
-last_reviewed: '2026-05-04'
+- Containers
+- Security
+- seccomp
+- Cosign
+- DevOps
+seo_description: A beginner guide to container security covering non-root users, capabilities,
+  seccomp, image scanning, and proper secret handling with examples
+last_reviewed: '2026-05-15'
 ---
 
 # Container Security
 
-> Containers 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Just because a *container* is *isolated*, is it really *safe*?
-
-> *Container security* is built on three pillars: *least privilege*, *image trust*, and *runtime policy*.
-
-<!-- a-grade-intro:end -->
+Isolation does not make a container automatically safe. Default settings can still leave you with a root process, excess capabilities, weak secret handling, and unsigned artifacts moving through production.
 
 This is post 8 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we build a practical baseline around non-root users, capability reduction, seccomp, read-only filesystems, image scanning, and signature-aware delivery.
+
+> Container security improves when defaults get narrower: fewer privileges, fewer writable paths, fewer blind spots.
+
+## Questions this chapter answers
 
 - What *non-root* means
 - *Capabilities* and *seccomp*
@@ -48,15 +45,9 @@ A default container runs as *root* with *too many privileges* and easily becomes
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Image["image"] --> Scan["scan"]
-    Scan --> Sign["sign"]
-    Sign --> Run["run as user"]
-    Run --> Caps["drop caps"]
-    Caps --> Secrets["mount secrets"]
-```
+![Security flow from scanning to least-privilege runtime](../../../assets/containers-101/08/08-01-concept-at-a-glance.en.png)
 
+*Security flow from scanning to least-privilege runtime*
 ## Key Terms
 
 - **non-root**: running as a *normal user* such as UID 1000.
@@ -132,6 +123,25 @@ def run_with_secret(image, secret_path):
 - After *--cap-drop=ALL* we add only what is needed.
 - *Secrets* are mounted as volumes.
 
+## Quick verification and failure signals
+
+```bash
+trivy image --severity HIGH,CRITICAL python:3.12-slim
+docker run --rm --user 1000:1000 python:3.12-slim id
+docker run --rm --cap-drop=ALL --cap-add=NET_BIND_SERVICE nginx:1.27-alpine nginx -t
+docker run --rm --read-only --tmpfs /tmp python:3.12-slim python -c "print("ok")"
+```
+
+**Expected output:**
+- `id` shows a non-root UID and GID.
+- The process still works with only the minimum extra capability added back.
+- The container can run read-only as long as writable scratch paths are explicit.
+
+**Check first if it fails:**
+- If non-root fails, inspect writable paths and ownership before broadening permissions.
+- If read-only mode fails, trace which directory the app expects to write to.
+- If scan results are noisy, start with base-image choice and package removal.
+
 ## Five Common Mistakes
 
 1. **Running as *root* and trusting the inside.**
@@ -170,6 +180,8 @@ def run_with_secret(image, secret_path):
 With security principles in place, the next topic is the *fundamental difference* between *containers and VMs*. The next post covers *containers vs VMs*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -180,6 +192,7 @@ With security principles in place, the next topic is the *fundamental difference
 - **Container Security (current)**
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -189,4 +202,4 @@ With security principles in place, the next topic is the *fundamental difference
 - [Trivy](https://aquasecurity.github.io/trivy/)
 - [seccomp profiles](https://docs.docker.com/engine/security/seccomp/)
 
-Tags: Containers, Security, seccomp, Cosign, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps
