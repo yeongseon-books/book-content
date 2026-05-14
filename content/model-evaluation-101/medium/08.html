@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Cross Validation</h1>
-<blockquote>
-<p>Model Evaluation 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is one test-set score enough to choose between models?</p>
-<blockquote>
-<p><em>Cross validation quantifies estimation confidence by averaging over many splits and measuring the spread.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>One train/test split can make evaluation look more certain than it really is. On small or moderately noisy datasets, a tiny shift in the split can reorder two models that looked clearly separated a minute earlier.</p>
+<p>That is why cross validation is better understood as an uncertainty tool than as a score factory. The average matters, but the spread matters too. If the variance is large, a small lead is rarely a real lead.</p>
+<p>This is post 8 in the Model Evaluation 101 series. In this post, we use fold-based evaluation to separate stable comparisons from noisy ones and to spot leakage that survives a single split.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The meaning and trade-offs of K-Fold</li>
 <li>Why stratified is the default</li>
@@ -74,16 +65,14 @@
 <li>How to read variance</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Cross validation is not just repeated scoring. It measures how much your estimate moves when the split moves, which is often the difference between a real win and noise.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A single split is noisy. Reporting the standard deviation alongside the mean makes comparisons meaningful.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;dataset&quot;] --&gt; Split[&quot;k folds&quot;]
-    Split --&gt; Train[&quot;k-1 folds train&quot;]
-    Split --&gt; Val[&quot;1 fold validate&quot;]
-    Val --&gt; Score[&quot;k scores&quot;]
-    Score --&gt; Stat[&quot;mean and std&quot;]
-</code></pre>
+<p><img alt="cross-validation flow from folds to score mean and variance" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>cross-validation flow from folds to score mean and variance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>K-Fold</strong>: split into k parts, train and validate k times.</li>
@@ -127,6 +116,7 @@ print(&quot;time cv:&quot;, scores.mean(), scores.std())
 out = cross_validate(m, X, y, cv=cv, scoring=[&quot;f1_macro&quot;, &quot;roc_auc&quot;])
 print({k: v.mean() for k, v in out.items() if k.startswith(&quot;test_&quot;)})
 </code></pre>
+<p><strong>Expected output:</strong> You should get a mean and standard deviation rather than one fragile score, and you should see how group-aware or time-aware cross validation can reduce false confidence caused by leakage-prone splits.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Stratified is the classification default.</li>
