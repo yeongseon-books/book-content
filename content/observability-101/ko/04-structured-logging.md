@@ -17,7 +17,7 @@ tags:
   - JSON
   - DevOps
 seo_description: JSON 로그와 상관관계 ID로 운영 로그를 질의 가능한 데이터로 바꾸는 방법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 구조화된 로깅
@@ -46,13 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Code["애플리케이션 코드"] --> Logger["로거"]
-    Logger --> JSON["JSON 한 줄"]
-    JSON --> Sink["수집 저장소"]
-    Sink --> Query["질의"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/04/04-01-concept-at-a-glance.ko.png)
+*애플리케이션 이벤트가 JSON 로그가 되어 저장소로 흘러가고 필드 기반 질의로 이어지는 구조*
 
 ## 핵심 용어
 
@@ -128,6 +123,30 @@ CRITICAL → system risk
 ```
 
 모든 로그를 INFO로 남기면 중요한 줄이 묻힙니다. 수준 정책은 저장량과 주목도를 동시에 통제하는 장치입니다.
+
+## 요청 하나를 이렇게 따라갑니다
+
+구조화된 로그의 가장 큰 장점은 요청 하나를 필드 조건으로 바로 모을 수 있다는 점입니다. 아래처럼 request_id 또는 trace_id를 기준으로 좁히면 장애 대응의 첫 5분이 훨씬 짧아집니다.
+
+```bash
+# JSON 로그에서 특정 요청만 필터링
+grep '"rid": "req-7f2a"' app.log
+
+# ERROR 레벨만 다시 확인
+grep '"lvl": "ERROR"' app.log | grep '"rid": "req-7f2a"'
+```
+
+```json
+{"lvl":"INFO","msg":"request_in","rid":"req-7f2a","path":"/login"}
+{"lvl":"ERROR","msg":"login_failed","rid":"req-7f2a","reason":"db_timeout"}
+```
+
+```text
+Expected output:
+- 같은 rid를 가진 로그 줄만 모입니다.
+- ERROR 한 줄에서 실패 유형을 바로 읽을 수 있습니다.
+- user_email 같은 민감 필드는 원문 대신 마스킹 또는 해시 값으로 남습니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 

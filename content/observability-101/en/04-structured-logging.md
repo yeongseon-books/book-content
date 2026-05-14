@@ -2,7 +2,7 @@
 series: observability-101
 episode: 4
 title: Structured Logging
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - JSON
   - DevOps
 seo_description: Replace print with JSON logs that carry level and context, so production debugging becomes a query instead of a grep.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Structured Logging
 
+Many incident reviews reveal the same problem: logs existed, but the team still could not answer the first two questions quickly. Which request failed, and what was different about it? Free-form lines are readable, but they are poor query surfaces.
+
+Structured logging fixes that by turning log lines into data with fields you can filter, aggregate, and join with traces.
+
 This is post 4 in the Observability 101 series.
-
-> Observability 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why is free-text logging *search hell*, and what changes when logs are *structured*?
-
-> *Structured logs are *machine-readable data*. When a line is *JSON*, you can *query* instead of *grep*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,13 +44,8 @@ To find the responsible line *within five minutes* of an incident, logs must be 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["code"] --> Logger["logger.info(event, **fields)"]
-    Logger --> JSON["one JSON line"]
-    JSON --> Sink["collector (Loki / ELK)"]
-    Sink --> Query["query"]
-```
+![Concept at a Glance](../../../assets/observability-101/04/04-01-concept-at-a-glance.en.png)
+*Application events become one-line JSON records, flow to a log backend, and come back as field-based queries during incident response.*
 
 ## Key Terms
 
@@ -121,6 +110,27 @@ INFO     → normal events
 WARNING  → cautions (actionable)
 ERROR    → failed requests
 CRITICAL → system risk
+```
+
+## How to Follow One Request
+
+The practical win is simple: collect every line for one request without guessing the wording.
+
+```bash
+grep '"rid": "req-7f2a"' app.log
+grep '"lvl": "ERROR"' app.log | grep '"rid": "req-7f2a"'
+```
+
+```json
+{"lvl":"INFO","msg":"request_in","rid":"req-7f2a","path":"/login"}
+{"lvl":"ERROR","msg":"login_failed","rid":"req-7f2a","reason":"db_timeout"}
+```
+
+```text
+Expected output:
+- Every line for the same request clusters under one request ID.
+- The ERROR line exposes the failure class immediately.
+- Sensitive fields such as email or phone number appear masked or hashed, not raw.
 ```
 
 ## What to Notice in This Code
