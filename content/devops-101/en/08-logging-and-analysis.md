@@ -2,7 +2,7 @@
 series: devops-101
 episode: 8
 title: Logging and Analysis
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - ELK
   - Loki
 seo_description: Structured logs, central collection, search, and analysis. A practical logging strategy that makes debugging fast.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Logging and Analysis
 
-This is post 8 in the DevOps 101 series.
+Logs become valuable long after they are written. When an incident starts at 3 AM or a customer reports a failure from last week, the real question is whether your team can search across services, correlate one request, and find the useful lines quickly.
 
-> DevOps 101 series (8/10)
+That is why logging is not just about emitting more text. It is about structure, retention, central collection, and the fields that make later investigation possible.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Out of 100 servers, can you find *where the error happened* in one query?
-
-> Logs only have value when they are *collected and searchable*.
-
-<!-- a-grade-intro:end -->
+This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
 
 ## What You Will Learn
 
@@ -50,12 +44,9 @@ The era of *ssh-ing* into a single server and running *grep* is over. In distrib
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["app stdout"] --> Agent["log agent (Promtail/Fluent Bit)"]
-    Agent --> Store["Loki/Elasticsearch"]
-    Store --> UI["Grafana/Kibana"]
-```
+![Concept at a Glance](../../../assets/devops-101/08/08-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 

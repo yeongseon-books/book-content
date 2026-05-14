@@ -44,12 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    App["app stdout"] --> Agent["log agent (Promtail/Fluent Bit)"]
-    Agent --> Store["Loki/Elasticsearch"]
-    Store --> UI["Grafana/Kibana"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/08/08-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 애플리케이션은 stdout으로 로그를 내보내고, 수집 에이전트가 이를 중앙 저장소로 보내며, 운영자는 Grafana나 Kibana에서 검색합니다. 이 구조가 갖춰져야 "어디서 어떤 에러가 났는가"를 한 번에 찾을 수 있습니다.
 
