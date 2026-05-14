@@ -54,8 +54,9 @@
 </head>
 <body>
 <h1>LLM Fine-tuning Primer</h1>
-<p>Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact. This article frames that decision around three variables so the rest of the series has a stable mental model.</p>
+<p>Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact.</p>
 <p>This is the first post in the LLM Fine-tuning 101 series.</p>
+<p>This article frames that decision around three variables so the rest of the series has a stable mental model. If you skip this framing and jump straight into GPUs and loss curves, learning rate, dataset format, and adapter rank all start wobbling at once.</p>
 <h2>Questions this post answers</h2>
 <p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-01-questions-this-post-answers.en.png"></p>
 <p><em>Questions this post answers</em></p>
@@ -81,23 +82,28 @@ one fine-tune  =  │ ② With what? (dataset)                 │
                   ├───────────────────────────────────────┤
                   │ ③ How? (optimizer)                     │
                   └───────────────────────────────────────┘
-</code></pre>
-<p>Full fine-tuning sets ① to "everything," which inflates ② and ③. LoRA narrows ① to "small adapters strapped onto a few linear layers," which simultaneously lightens ② (small datasets work) and ③ (tiny optimizer state). For the same dataset and learning rate, the GPU memory requirement can differ by 10× depending only on how ① is defined.</p>
-<h2>Core concepts</h2>
-<p><strong>Full fine-tuning</strong><br>
-- Meaning: Updates every weight of the base model. With optimizer state, peak memory is 4× model size or more</p>
-<p><strong>LoRA</strong><br>
-- Meaning: Freezes the base weights and trains two low-rank matrices (A, B). Extra parameters are usually 1–3%</p>
-<p><strong>Rank (r)</strong><br>
-- Meaning: LoRA adapter's middle dimension. Larger r increases expressiveness but also trainable parameters linearly</p>
-<p><strong>Target module</strong><br>
-- Meaning: Linear layers where LoRA is injected (<code>q_proj</code>, <code>v_proj</code>, …)</p>
-<p><strong>Adapter weight</strong><br>
-- Meaning: Small file saved/deployed separately after training. Combined with the base at inference time</p>
-<h2>Before vs. after</h2>
-<p><strong>Before</strong> — Asked "GPT-4's answers feel off, do we need to retrain a model?", you cannot give a quick answer. You vaguely recall that full fine-tuning was expensive and that LoRA is supposed to be cheap, and the meeting drags on.</p>
-<p><strong>After</strong> — After post 1 you can put the following on the table:</p>
-<pre><code>Model size                       124M params (GPT-2 small class)
+```text
+
+Full fine-tuning sets ① to &quot;everything,&quot; which inflates ② and ③. LoRA narrows ① to &quot;small adapters strapped onto a few linear layers,&quot; which simultaneously lightens ② (small datasets work) and ③ (tiny optimizer state). For the same dataset and learning rate, the GPU memory requirement can differ by 10× depending only on how ① is defined.
+
+## Core concepts
+
+| Term | Meaning |
+| --- | --- |
+| Full fine-tuning | Updates every weight of the base model. With optimizer state, peak memory is 4× model size or more |
+| LoRA | Freezes the base weights and trains two low-rank matrices (A, B). Extra parameters are usually 1–3% |
+| Rank (r) | LoRA adapter's middle dimension. Larger r increases expressiveness but also trainable parameters linearly |
+| Target module | Linear layers where LoRA is injected (`q_proj`, `v_proj`, …) |
+| Adapter weight | Small file saved/deployed separately after training. Combined with the base at inference time |
+
+## Before vs. after
+
+**Before** — Asked &quot;GPT-4's answers feel off, do we need to retrain a model?&quot;, you cannot give a quick answer. You vaguely recall that full fine-tuning was expensive and that LoRA is supposed to be cheap, and the meeting drags on.
+
+**After** — After post 1 you can put the following on the table:
+
+```text
+Model size                       124M params (GPT-2 small class)
 Full fine-tuning trainable        ≈ 124M (100%)
 LoRA(r=8) trainable               ≈ 1.8M (≈ 1.5%)
 GPU memory (incl. optimizer)      Full: ~5GB / LoRA: ~1.5GB
@@ -146,6 +152,73 @@ print(base_linear_params, lora_params)
 print(f&quot;ratio = {lora_params / base_linear_params:.4%}&quot;)
 </code></pre>
 <p>You will see a ratio around 1.5%. Try <code>rank</code> 16 and 32 to feel how the number scales — that intuition pays off when estimating training time in post 4.</p>
+<h2>Runnable verification script</h2>
+<p>If you want one copy-paste check instead of reading the math in pieces, run the whole calculation as a tiny standalone script.</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class TransformerShape:
+    hidden_size: int
+    intermediate_size: int
+    num_layers: int
+
+def total_linear_params(shape: TransformerShape) -&gt; int:
+    return shape.num_layers * (
+        4 * shape.hidden_size * shape.hidden_size
+        + 2 * shape.hidden_size * shape.intermediate_size
+    )
+
+def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -&gt; int:
+    attention = 4 * rank * (hidden_size + hidden_size)
+    mlp = rank * (hidden_size + intermediate_size) + rank * (intermediate_size + hidden_size)
+    return attention + mlp
+
+shape = TransformerShape(hidden_size=768, intermediate_size=3072, num_layers=12)
+base_linear_params = total_linear_params(shape)
+
+for rank in [4, 8, 16, 32]:
+    trainable = shape.num_layers * lora_params_per_layer(
+        shape.hidden_size,
+        shape.intermediate_size,
+        rank,
+    )
+    ratio = trainable / base_linear_params
+    print(
+        f&quot;rank={rank:&lt;2} trainable={trainable:,} &quot;
+        f&quot;ratio={ratio:.4%}&quot;
+    )
+</code></pre>
+<p>Run it with:</p>
+<pre><code class="language-bash">python main.py
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">rank=4  trainable=884,736   ratio=0.7812%
+rank=8  trainable=1,769,472 ratio=1.5625%
+rank=16 trainable=3,538,944 ratio=3.1250%
+rank=32 trainable=7,077,888 ratio=6.2500%
+</code></pre>
+<p>The exact commas and spacing can vary, but the slope should not: doubling rank should almost double the trainable parameter count. That is the operational point to retain before you even open PEFT.</p>
+<h2>Failure modes to catch before post 2</h2>
+<ul>
+<li><strong>The ratio is much larger than expected</strong> — you probably counted embeddings or every model weight instead of the linear layers LoRA actually targets.</li>
+<li><strong>The ratio looks tiny but the base model still does not fit</strong> — LoRA reduces trainable parameters, not the inference footprint of the frozen base model.</li>
+<li><strong>You conclude that LoRA solves knowledge gaps</strong> — it helps style, format, and domain behavior, but it is a poor substitute for retrieval when the missing problem is fresh facts.</li>
+<li><strong>You compare ranks without fixing everything else</strong> — change one variable at a time. Rank, dataset shape, and learning rate all move quality in different ways.</li>
+</ul>
+<h2>Decision frame: prompt, LoRA, RAG, or full fine-tuning?</h2>
+<p>Use post 1 to make the first branching decision before you spend GPU time.</p>
+<p><strong>Tone, format, response style drift</strong><br>
+- Default move: LoRA<br>
+- Why: Small behavior shift with cheap trainable state</p>
+<p><strong>Missing product facts or frequently changing data</strong><br>
+- Default move: RAG<br>
+- Why: The issue is knowledge freshness, not model behavior</p>
+<p><strong>Narrow domain wording + stable output schema</strong><br>
+- Default move: LoRA + curated dataset<br>
+- Why: The model needs repeated examples, not a whole new base</p>
+<p><strong>Deep capability shift across many tasks</strong><br>
+- Default move: Full fine-tuning or a stronger base model<br>
+- Why: The requested change exceeds what a small adapter usually carries</p>
 <h2>What to notice in this code</h2>
 <p><img alt="LoRA's surface area per linear layer measured by the script" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png"></p>
 <p><em>LoRA's surface area per linear layer measured by the script</em></p>
@@ -200,6 +273,7 @@ print(f&quot;ratio = {lora_params / base_linear_params:.4%}&quot;)
 <hr>
 <h2>References</h2>
 <ul>
+<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://arxiv.org/abs/2106.09685">LoRA paper</a></li>
 <li><a href="https://huggingface.co/docs/peft">Hugging Face PEFT documentation</a></li>
 <li><a href="https://arxiv.org/abs/2305.14314">QLoRA paper</a></li>
