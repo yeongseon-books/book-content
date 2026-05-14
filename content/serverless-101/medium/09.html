@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Cost</h1>
+<p>Serverless often gets sold with the easiest line item to quote: the price per invocation. That number is memorable, but it rarely explains the bill you eventually pay. What surprises teams is usually everything wrapped around the call count.</p>
+<p>Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.</p>
 <p>This is post 9 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If each invocation costs <em>$0.0000002</em>, why does the <em>bill</em> still surprise you?</p>
-<blockquote>
-<p><em>Cost</em> is the <em>sum</em> of <em>calls + duration + memory + data transfer + downstream services</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>cost components</em> of serverless</li>
@@ -75,14 +66,12 @@
 <li>A starting point for <em>FinOps</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Serverless</em> is <em>not always cheaper</em>. For some workloads it can cost <em>more</em> than a steady <em>EC2</em> instance.</p>
+<p>Serverless is not automatically cheaper. It can be extremely efficient for short and bursty work, and surprisingly expensive for long-running, high-volume, or network-heavy workloads.</p>
+<p>That is why cost belongs in architecture review, not just in monthly reporting. The same feature can land in a very different cost envelope depending on memory size, downstream calls, egress, and whether you pay an idle tax for provisioned capacity.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Calls[&quot;calls&quot;] --&gt; Bill[&quot;bill&quot;]
-    Mem[&quot;memory * duration&quot;] --&gt; Bill
-    Net[&quot;data transfer&quot;] --&gt; Bill
-    Deps[&quot;downstream services&quot;] --&gt; Bill
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>A serverless bill is the sum of invocation, compute time, network transfer, and downstream service usage.</em><br>
+The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>invocation cost</strong>: price <em>per call</em>.</li>
@@ -120,6 +109,21 @@
 for s in sizes:
     print(s, total(1_000_000, s, 200, 5))
 </code></pre>
+<h2>Scenario Review</h2>
+<p>Before choosing a cost posture, compare at least two realistic operating scenarios.</p>
+<p><strong>Spiky low-volume API</strong><br>
+- What usually dominates: invocation + tail latency mitigation<br>
+- First question to ask: do we need provisioned capacity?</p>
+<p><strong>High-volume short jobs</strong><br>
+- What usually dominates: memory × duration<br>
+- First question to ask: can memory tuning cut runtime enough to win overall?</p>
+<p><strong>Media-heavy responses</strong><br>
+- What usually dominates: egress<br>
+- First question to ask: can CDN or object storage reduce outbound traffic?</p>
+<p><strong>Async pipeline</strong><br>
+- What usually dominates: downstream services<br>
+- First question to ask: which queue, database, and retry costs grow with traffic?</p>
+<p>This keeps the discussion anchored in workload shape instead of in isolated pricing units.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Memory</em> sets both <em>CPU</em> and <em>cost</em>.</li>
@@ -172,11 +176,16 @@ for s in sizes:
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Pricing Docs</strong></p>
 <ul>
-<li><a href="https://aws.amazon.com/lambda/pricing/">Lambda Pricing</a></li>
-<li><a href="https://cloud.google.com/functions/pricing">Cloud Functions Pricing</a></li>
-<li><a href="https://azure.microsoft.com/pricing/details/functions/">Azure Functions Pricing</a></li>
+<li><a href="https://aws.amazon.com/lambda/pricing/">AWS Lambda pricing</a></li>
+<li><a href="https://cloud.google.com/functions/pricing">Google Cloud Functions pricing</a></li>
+<li><a href="https://azure.microsoft.com/pricing/details/functions/">Azure Functions pricing</a></li>
+</ul>
+<p><strong>FinOps and Related Reading</strong></p>
+<ul>
 <li><a href="https://www.finops.org/">FinOps Foundation</a></li>
+<li><a href="https://github.com/alexcasalboni/aws-lambda-power-tuning">AWS Lambda power tuning (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Cost, FinOps, Pricing, Cloud</p>
 </body>
