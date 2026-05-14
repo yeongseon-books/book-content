@@ -18,22 +18,14 @@ tags:
   - Duck Typing
   - Interface
 seo_description: Define interfaces without inheritance using Protocol and structural typing for flexible, duck-typing-friendly code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Protocol and Structural Typing
 
-This is post 6 in the Type Hints in Python 101 series.
+Python has always leaned on duck typing. If an object has `close()`, we close it. If it has `render()`, we render it. The friction starts when you want that flexibility to survive code review and CI, not just runtime.
 
-> Type Hints in Python 101 Series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Can you define "this object must have these methods" without requiring inheritance?
-
-> Python's duck typing says "if it walks like a duck and quacks like a duck, it is a duck." But traditional Abstract Base Classes (ABCs) require explicit inheritance, which breaks when you cannot modify the class — like third-party library classes. `Protocol` brings duck typing into the static type system. If a class has the right methods, it satisfies the Protocol — no inheritance needed. This article covers Protocol, its relationship to structural typing, and practical patterns.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how `Protocol` captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.
 
 ## What You Will Learn
 
@@ -63,6 +55,10 @@ class Closeable(Protocol):     class FileHandler:
         └──── structural match ──────────────┘
               (no inheritance needed)
 ```
+
+![How Protocol and ABC evaluate compatibility](../../../assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
+
+*How Protocol and ABC evaluate compatibility*
 
 ## Key Concepts
 
@@ -254,6 +250,35 @@ class Executable(Protocol):
 
 Use ABC when you provide shared implementation. Use Protocol when you define an interface for code you do not control.
 
+## Migration Pattern for a Real Codebase
+
+In a real repository, you usually do not start with a clean `Protocol` design. You inherit code that already has `S3Storage`, `LocalStorage`, `FakeStorage`, and a service layer that refers to those concrete classes directly. The safest first move is not to force everything under a new base class. It is to extract the smallest interface the service already depends on.
+
+For example, if the upload flow only needs `save()` and `open()`, define a `StorageBackend` Protocol with just those methods and change the service signature first. Then run mypy or pyright to confirm that the existing implementations satisfy the contract without any inheritance changes.
+
+```python
+from typing import Protocol
+
+
+class StorageBackend(Protocol):
+    def save(self, path: str, data: bytes) -> None: ...
+    def open(self, path: str) -> bytes: ...
+
+
+def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
+    storage.save(path, data)
+    return storage.open(path)
+```
+
+This keeps the migration reviewable. Call sites move to the new contract first, while implementations only need to match the shape. If you start by designing one giant Protocol for every future use case, the contract becomes noisy and most implementations satisfy only part of it.
+
+## First Checks When Compatibility Fails
+
+- Verify that attribute types are not narrower than what the Protocol requires.
+- Check return types, not just method names. Structural typing still fails on a mismatched signature.
+- Do not confuse `@runtime_checkable` with full type validation. `isinstance()` only checks member presence.
+- If one Protocol keeps growing, split it into smaller read-only and write-only contracts so implementations can satisfy exactly what they need.
+
 ## What to Notice in This Code
 
 - Protocol classes define method signatures but no implementations
@@ -323,7 +348,9 @@ In the next article, we will explore Generics — parameterizing types with type
 ## References
 
 - [Python docs — typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [Python typing specification — Protocols](https://typing.python.org/en/latest/spec/protocol.html)
 - [PEP 544 — Protocols: Structural subtyping](https://peps.python.org/pep-0544/)
+- [Python docs — abc](https://docs.python.org/3/library/abc.html)
 - [mypy docs — Protocols and structural subtyping](https://mypy.readthedocs.io/en/stable/protocols.html)
 - [Real Python — Structural Typing](https://realpython.com/python-protocol/)
 
