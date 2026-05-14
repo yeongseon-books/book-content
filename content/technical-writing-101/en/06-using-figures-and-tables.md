@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 6
 title: Using Figures and Tables
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Tables
   - Visual
   - Beginner
-seo_description: A beginner-friendly tour of using diagrams and tables to make a technical post easier to scan and understand.
-last_reviewed: '2026-05-04'
+seo_description: Choose figures and tables by the reader's question, then write captions and alt text that make the visual actionable.
+last_reviewed: '2026-05-15'
 ---
 
 # Using Figures and Tables
 
-This is post 6 in the Technical Writing 101 series.
+Not every dense paragraph should become a diagram. Not every list of options deserves a table. The real skill is choosing the visual form that best answers the reader's question. If that choice is wrong, visuals add noise instead of clarity.
 
-> Technical Writing 101 series (6/10)
+Figures are strongest when the reader needs direction, sequence, or system shape. Tables are strongest when the reader needs side-by-side differences, limits, and trade-offs. Once you see that split, visual choices stop feeling decorative and start feeling editorial.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.
 
-**Core question**: When does a *figure* beat *prose*, and when does a *table* win?
-
-> *Flow* wants a *figure*; *comparison* wants a *table*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - *Flowcharts* and *sequence diagrams*
 - *Comparison* and *decision* tables
@@ -46,14 +40,13 @@ This is post 6 in the Technical Writing 101 series.
 
 One *figure* often replaces *five* paragraphs.
 
+> Mental model: use a figure for flow and a table for side-by-side decisions.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Flow] --> Img[Diagram]
-    C[Comparison] --> Tbl[Table]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **flowchart**: A *flow diagram*.
@@ -68,26 +61,29 @@ flowchart LR
 
 **After**: One *flowchart*.
 
+## Choose the visual from the reader's question
+
+| Reader question | Better fit | Why |
+| --- | --- | --- |
+| Where does the request go? | Flowchart | Direction and order matter most. |
+| Which option is cheaper? | Comparison table | Criteria need side-by-side alignment. |
+| Where does the failure happen? | Sequence diagram | Timing and handoff points matter. |
+| What policy should we choose? | Decision table | Trade-offs must stay visible at once. |
+
+Captions should answer the same question. `Architecture diagram` is too broad to help. `Request path from client to API server and database` tells the reader what to extract before they even inspect the figure.
+
 ## Hands-on: A Figure and a Table
 
 ### Step 1 — Flowchart
 
-```mermaid
-flowchart LR
-    Client --> Server
-    Server --> DB
-```
+![request flow from client to server and database](../../../assets/technical-writing-101/06/06-02-step-1-flowchart.en.png)
 
+*This flowchart shows the basic path from the client to the server and database.*
 ### Step 2 — Sequence
 
-```mermaid
-sequenceDiagram
-    Client->>Server: GET /user
-    Server->>DB: SELECT
-    DB-->>Server: row
-    Server-->>Client: JSON
-```
+![call order between the client server and database](../../../assets/technical-writing-101/06/06-03-step-2-sequence.en.png)
 
+*This sequence diagram shows the call order between the client, server, and database.*
 ### Step 3 — Comparison table
 
 ```markdown
