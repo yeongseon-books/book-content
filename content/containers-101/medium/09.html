@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Containers vs VMs</h1>
-<blockquote>
-<p>Containers 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If both provide <em>isolation</em>, <em>when</em> should you choose a <em>container</em> and <em>when</em> a <em>VM</em>?</p>
-<blockquote>
-<p><em>Containers</em> are <em>light</em> because they <em>share a kernel</em>; <em>VMs</em> offer <em>strong isolation</em> with their <em>own kernel</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The container-versus-VM decision is not a speed contest. It is a boundary decision about isolation strength, boot cost, density, and which workloads deserve a harder separation line.</p>
 <p>This is post 9 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we compare shared-kernel isolation with hypervisor-based isolation, then map those differences to service workloads, multi-tenant boundaries, and hybrid options such as microVMs.</p>
+<blockquote>
+<p>Containers and VMs solve different boundary problems. Choosing well means matching the boundary to the workload.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li><em>Kernel sharing</em> vs <em>hypervisor</em></li>
 <li>Differences in <em>isolation level</em></li>
@@ -77,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Choosing <em>isolation that fits the workload</em> keeps both <em>cost</em> and <em>security</em> under control. The two are <em>complementary</em>, not competitors.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HW[&quot;hardware&quot;] --&gt; Hyp[&quot;hypervisor&quot;]
-    Hyp --&gt; VM1[&quot;VM (kernel)&quot;]
-    HW --&gt; Host[&quot;host kernel&quot;]
-    Host --&gt; C1[&quot;container&quot;]
-    Host --&gt; C2[&quot;container&quot;]
-</code></pre>
+<p><img alt="VM isolation through a hypervisor versus shared-kernel containers" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>VM isolation through a hypervisor versus shared-kernel containers</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>hypervisor</strong>: the <em>virtualization layer</em> that boots VMs.</li>
@@ -138,6 +127,17 @@ def run_container(image):
 <li>VMs start in <em>seconds to minutes</em>.</li>
 <li>Measurements are <em>automated and reproducible</em>.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">/usr/bin/time -p docker run --rm nginx:1.27-alpine true
+/usr/bin/time -p qemu-system-x86_64 -m 1024 -display none -daemonize -hda vm.img
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- Containers usually finish startup in milliseconds to seconds.<br>
+- VMs pay a visibly larger boot cost because they bring their own kernel.</p>
+<p><strong>Check first if it fails:</strong><br>
+- Repeat the comparison on the same host under the same load before drawing conclusions.<br>
+- If QEMU fails, verify virtualization support and whether the VM disk image exists.<br>
+- In strong multi-tenant settings, isolation strength may matter more than the startup delta.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Putting everything in <em>containers</em> — weak <em>multi-tenant</em> isolation.</strong></li>
@@ -171,6 +171,7 @@ def run_container(image):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>It is time to <em>apply</em> every concept you have learned to <em>one real app</em>. The next post covers <em>building a real container app</em>.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -190,6 +191,6 @@ def run_container(image):
 <li><a href="https://katacontainers.io/">Kata Containers</a></li>
 <li><a href="https://gvisor.dev/">gVisor</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, VM, Linux, Hypervisor, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
