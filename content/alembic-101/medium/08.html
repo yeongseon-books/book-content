@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Downgrade strategy: when to write it for real and when to forbid it</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Downgrade strategy: when to write it for real and when to forbid it</h1>
+<p>The existence of a <code>downgrade()</code> function does not make a change safe to reverse. Some revisions can be undone precisely, while others imply immediate data loss the moment you try.</p>
+<p>This is post 8 in the Alembic 101 series. Here we will separate reversible from irreversible changes and show how to encode that policy honestly.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>When a production downgrade is possible and when it is effectively impossible</li>
+<li>The kinds of irreversible changes and how to handle them</li>
+<li>How the expand-contract pattern restores the ability to downgrade</li>
+<li>How to express a "no downgrade" policy at the code level</li>
+<li>How to choose between forward-fix and downgrade when something goes wrong</li>
+</ul>
+<h2>Why it matters</h2>
+<p>When you first learn alembic, downgrade looks like an obvious built-in feature. In real production, it is rarely used and frequently dangerous. But leaving it as an empty function is not the right answer either. "How do we handle downgrade" is an operational policy decision, and that policy should be expressed explicitly in code.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Downgrade splits into two kinds. <strong>(1) Reversible changes: a precise inverse exists with no data loss (e.g., adding a nullable column). (2) Irreversible changes: the inverse implies data loss (e.g., dropping a column, a data migration).</strong> Write the first kind for real and explicitly block the second.</p>
+</blockquote>
+<p>The git analogy: type 1 is a commit that reverts cleanly; type 2 is a merged history you cannot undo without a force-push.</p>
+<p><strong>Diagram: deciding between reversible and irreversible changes</strong></p>
+<p><img alt="Diagram: deciding between reversible and irreversible changes" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png"><br>
+<em>You decide whether downgrade is honest only after classifying the change by reversibility.</em></p>
+<h2>Core concepts</h2>
+<p><strong>Reversible vs irreversible</strong></p>
+<p><strong>Add nullable column</strong><br>
+- Reversible?: Yes<br>
+- Note: Drop reverts precisely</p>
+<p><strong>Add or drop index</strong><br>
+- Reversible?: Yes<br>
+- Note: Recreate to recover</p>
+<p><strong>Add table</strong><br>
+- Reversible?: Yes<br>
+- Note: Drop reverts</p>
+<p><strong>Drop column</strong><br>
+- Reversible?: No<br>
+- Note: Data loss</p>
+<p><strong>Data migration</strong><br>
+- Reversible?: No<br>
+- Note: Hard to restore pre-transform state</p>
+<p><strong>Tighten to NOT NULL</strong><br>
+- Reversible?: Effectively no<br>
+- Note: The default to use is ambiguous</p>
+<p><strong>Narrow column type (<code>String(100)</code> → <code>String(50)</code>)</strong><br>
+- Reversible?: No<br>
+- Note: Truncation risk</p>
+<p>For irreversible changes, you cannot honestly write a downgrade — blocking it is more honest.</p>
+<p><strong>Declaring "no downgrade"</strong></p>
+<pre><code class="language-python">def downgrade() -&gt; None:
+    raise NotImplementedError(
+        &quot;Irreversible: tier column drop loses data. &quot;
+        &quot;If rollback needed, restore from backup.&quot;
+    )
+</code></pre>
+<p>Leaving it as <code>pass</code> lets a stray <code>alembic downgrade -1</code> succeed silently — the graph rewinds while the schema stays the same, leaving you in a dangerous state. <code>raise NotImplementedError</code> prevents that.</p>
+<p><strong>The expand-contract pattern</strong></p>
+<p>The strongest tool for turning irreversible changes into reversible ones.</p>
+<pre><code class="language-text">Phase 1 (expand):   add the new schema, keep the old
+Phase 2 (migrate):  move data into the new schema
+Phase 3 (deploy):   application starts using the new schema
+Phase 4 (contract): remove the old schema
+</code></pre>
+<p>Each phase is <strong>an individually reversible change</strong>, so even if something fails at a given phase you can roll back one phase at a time. Take a column rename as an example:</p>
+<pre><code class="language-text">1. add display_name (nullable=True)         ← reversible
+2. backfill display_name from name          ← data migration (irreversible)
+3. app code uses display_name               ← code deploy
+4. drop name                                ← irreversible, but with safety nets between phases
+</code></pre>
+<p>You only move to phase 4 once production has stabilized through phase 3. Until phase 4, you can rewind to phase 2 at any time.</p>
+<p><strong>Forward-fix vs downgrade</strong></p>
+<p>When something breaks in production, you pick one:</p>
+<ul>
+<li><strong>forward-fix</strong>: a new revision that corrects the problem (recommended in most cases)</li>
+<li><strong>downgrade</strong>: rewind to the previous revision (risky when irreversible work is involved)</li>
+</ul>
+<p>Why forward-fix should be the default: it keeps the <code>alembic_version</code> table, other instances' state, and application code consistency moving in a single direction, which is far easier to reason about.</p>
+<h2>Before-After</h2>
+<pre><code class="language-python"># Before: empty downgrade on an irreversible change
+def upgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;legacy_token&quot;)  # ← data lost forever
+
+def downgrade() -&gt; None:
+    pass  # ← silently &quot;succeeds&quot; on accident
+</code></pre>
+<pre><code class="language-python"># After: explicit block
+def upgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;legacy_token&quot;)
+
+def downgrade() -&gt; None:
+    raise NotImplementedError(
+        &quot;drop column users.legacy_token is irreversible (data loss). &quot;
+        &quot;Restore from backup or apply a new revision that re-adds the column.&quot;
+    )
+</code></pre>
+<p>The After version makes intent explicit. If someone runs <code>alembic downgrade -1</code> by accident, it fails immediately and prevents a real incident.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: write a reversible revision</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;nickname&quot;, sa.String(50), nullable=True))
+
+def downgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;nickname&quot;)
+</code></pre>
+<p>Adding with <code>nullable=True</code> is schema-only and there is no data, so the drop is safe. Write the downgrade for real.</p>
+<p><strong>Step 2: block an irreversible revision</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;old_field&quot;)
+
+def downgrade() -&gt; None:
+    raise NotImplementedError(&quot;drop is irreversible (data loss)&quot;)
+</code></pre>
+<p><strong>Step 3: handle a rename via expand-contract</strong></p>
+<p>revision 1 (expand):</p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;display_name&quot;, sa.String(100), nullable=True))
+
+def downgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;display_name&quot;)
+</code></pre>
+<p>revision 2 (data backfill, irreversible):</p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    bind = op.get_bind()
+    bind.execute(text(&quot;UPDATE users SET display_name = name WHERE display_name IS NULL&quot;))
+
+def downgrade() -&gt; None:
+    raise NotImplementedError(&quot;data migration is irreversible&quot;)
+</code></pre>
+<p>revision 3 (contract):</p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;name&quot;)
+
+def downgrade() -&gt; None:
+    raise NotImplementedError(&quot;drop name is irreversible&quot;)
+</code></pre>
+<p>Before applying 3, you can move freely between 1 and 2. Incidents after 3 are handled with forward-fix.</p>
+<p><strong>Step 4: document the policy</strong></p>
+<p>Add one line to <code>alembic.ini</code> or the README.</p>
+<pre><code class="language-text">Downgrade policy:
+- Reversible revisions: real downgrade()
+- Irreversible (drop, data migration): raise NotImplementedError
+- Production rollback: forward-fix only; restore from backup if necessary
+</code></pre>
+<h2>Verification routine</h2>
+<pre><code class="language-bash">alembic downgrade -1
+</code></pre>
+<p><strong>Expected output:</strong> for an irreversible revision, the command fails fast with <code>NotImplementedError</code> instead of appearing to succeed.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong><code>pass</code> on an irreversible change.</strong> Silent success is the most dangerous outcome. Use <code>NotImplementedError</code> to be explicit.</li>
+<li><strong>Aggressively using downgrade in production.</strong> Sync with other instances and data state breaks easily. Forward-fix is the default.</li>
+<li><strong>Big changes without expand-contract.</strong> Renames and tightening to NOT NULL handled in one revision are effectively irreversible.</li>
+<li><strong>Not testing downgrade.</strong> Run <code>downgrade -1 &amp;&amp; upgrade head</code> once on the PR to verify reversibility.</li>
+<li><strong>Assuming downgrade is actually reversible.</strong> Schema may rewind while data has changed and the application assumes the new schema — that situation is common.</li>
+</ul>
+<h2>Practical patterns</h2>
+<ul>
+<li><strong>Three-phase split (expand-contract).</strong> Apply this pattern to renames, NOT NULL tightening, and column drops.</li>
+<li><strong>Disable production downgrade at the deploy script level.</strong> Make sure no human can accidentally invoke <code>alembic downgrade</code> in operations.</li>
+<li><strong>Add "is this reversible?" to the PR checklist.</strong> Make the decision explicit during code review.</li>
+<li><strong>Backup-and-restore is the real rollback tool.</strong> Do not treat alembic downgrade as a backup substitute.</li>
+<li><strong>Forward-fix revision template.</strong> Express intent with a <code>"fix &lt;old_revision&gt;"</code> style message.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Every revision is classified as reversible or irreversible</li>
+<li>[ ] Irreversible revisions have <code>NotImplementedError</code> in <code>downgrade</code></li>
+<li>[ ] Big changes (rename, NOT NULL, drop) are split into three expand-contract phases</li>
+<li>[ ] Reversible revisions pass a <code>downgrade -1 &amp;&amp; upgrade head</code> cycle on the PR</li>
+<li>[ ] Production downgrade policy is documented in the README</li>
+<li>[ ] Backup-and-restore is verified as a real rollback path</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create a column-drop revision with <code>NotImplementedError</code> in <code>downgrade</code>, then confirm <code>alembic downgrade -1</code> fails.</li>
+<li>Implement the <code>name</code> → <code>display_name</code> rename as a three-phase expand-contract sequence.</li>
+<li>After application code starts using the new column, attempt a downgrade and observe what error occurs.</li>
+</ol>
+<h2>Wrap up, next post</h2>
+<p>Downgrade is not a "feature on by default" — it is a feature decided by policy. Classifying changes into reversible and irreversible and explicitly blocking the latter is honest operations. The expand-contract pattern is the strongest tool for turning irreversible changes back into reversible ones.</p>
+<p>The next post covers deploy ordering between application code and schema changes, and the blue/green safety rules.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/ops.html">Alembic: Operation Reference</a></li>
+<li><a href="https://martinfowler.com/articles/evodb.html">Martin Fowler: Evolutionary Database Design</a></li>
+<li>"Refactoring Databases" by Scott Ambler &amp; Pramod Sadalage (expand-contract origin)</li>
+<li><a href="https://wiki.postgresql.org/wiki/Don%27t_Do_This">PostgreSQL Wiki: Don't Do This</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Alembic, downgrade, expand-contract, rollback, SQLite</p>
+</body>
+</html>

@@ -17,7 +17,7 @@ tags:
 - expand-contract
 - rollback
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: 'Downgrade splits into two kinds. (1) Reversible changes: a precise
   inverse exists with no data loss (e.g., adding a nullable column).'
 ---
@@ -45,6 +45,11 @@ When you first learn alembic, downgrade looks like an obvious built-in feature. 
 > Downgrade splits into two kinds. **(1) Reversible changes: a precise inverse exists with no data loss (e.g., adding a nullable column). (2) Irreversible changes: the inverse implies data loss (e.g., dropping a column, a data migration).** Write the first kind for real and explicitly block the second.
 
 The git analogy: type 1 is a commit that reverts cleanly; type 2 is a merged history you cannot undo without a force-push.
+
+### Diagram: deciding between reversible and irreversible changes
+
+![Diagram: deciding between reversible and irreversible changes](../../../assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
+*You decide whether downgrade is honest only after classifying the change by reversibility.*
 
 ## Core concepts
 
@@ -197,6 +202,14 @@ Downgrade policy:
 - Production rollback: forward-fix only; restore from backup if necessary
 ```
 
+## Verification routine
+
+```bash
+alembic downgrade -1
+```
+
+**Expected output:** for an irreversible revision, the command fails fast with `NotImplementedError` instead of appearing to succeed.
+
 ## Common mistakes
 
 - **`pass` on an irreversible change.** Silent success is the most dangerous outcome. Use `NotImplementedError` to be explicit.
@@ -234,14 +247,28 @@ Downgrade is not a "feature on by default" — it is a feature decided by policy
 
 The next post covers deploy ordering between application code and schema changes, and the blue/green safety rules.
 
-## References
-
-- Alembic: Operation Reference — https://alembic.sqlalchemy.org/en/latest/ops.html
-- Martin Fowler: Evolutionary Database Design — https://martinfowler.com/articles/evodb.html
-- "Refactoring Databases" by Scott Ambler & Pramod Sadalage (expand-contract origin)
-- PostgreSQL Wiki: Don't Do This — https://wiki.postgresql.org/wiki/Don%27t_Do_This
-
 <!-- toc:begin -->
+## In this series
+
+- [Why Alembic, and getting to alembic init](./01-why-alembic-and-init.md)
+- [env.py and target_metadata: wiring models to migrations](./02-env-py-and-target-metadata.md)
+- [Your first revision: writing upgrade and downgrade by hand](./03-first-revision-upgrade-downgrade.md)
+- [autogenerate: the line between what it catches and what it misses](./04-autogenerate-and-its-limits.md)
+- [branches and merges: combining revisions made in parallel](./05-branches-and-merges.md)
+- [Data migrations: separating schema changes from data changes](./06-data-migrations.md)
+- [Online and offline modes: previewing DDL with --sql and handling SQLite batch](./07-online-vs-offline-and-batch.md)
+- **Downgrade strategy: when to write it for real and when to forbid it (current)**
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, downgrade, expand-contract, rollback, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Operation Reference](https://alembic.sqlalchemy.org/en/latest/ops.html)
+- [Martin Fowler: Evolutionary Database Design](https://martinfowler.com/articles/evodb.html)
+- "Refactoring Databases" by Scott Ambler & Pramod Sadalage (expand-contract origin)
+- [PostgreSQL Wiki: Don't Do This](https://wiki.postgresql.org/wiki/Don%27t_Do_This)
+
+Tags: Python, Alembic, SQLAlchemy, Migration
