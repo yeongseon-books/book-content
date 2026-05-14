@@ -17,22 +17,16 @@ tags:
   - Capstone
   - ReusableWorkflow
 seo_description: A capstone that ties episodes 1-9 into one pipeline split by PR, main, and tag, standardized with reusable workflows for the whole team.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # A Real-World CI/CD Pipeline
 
-> GitHub Actions 101 series (10/10)
+The pieces we covered one by one are all useful, but real systems do not run them in isolation. Triggers, tests, lint, artifacts, Docker, deployment, and secret handling eventually meet in one delivery path, and the quality of that composition determines whether the pipeline scales or collapses under its own weight.
 
-<!-- a-grade-intro:begin -->
+The practical question is not “how many checks can we add?” It is “how clearly can we separate responsibility?” Pull requests need fast feedback. Main needs integration and staging confidence. Tags need traceable release and production promotion. Once those roles are clear, the YAML gets simpler instead of larger.
 
-**Core question**: How do you weave *triggers, tests, lint, artifacts, Docker, deploy, and secrets* into *one pipeline*?
-
-> *A good pipeline is a *sum of small steps*. Each step stays simple; the composition is explicit.*
-
-<!-- a-grade-intro:end -->
-
-This is the final post in the GitHub Actions 101 series.
+This is the final post in the GitHub Actions 101 series. In this post, we will combine the earlier topics into a reusable CI/CD shape that separates PR, `main`, and tag responsibilities without losing traceability.
 
 ## What You Will Learn
 
@@ -50,12 +44,9 @@ The parts you have learned only improve *DORA* (deploy frequency, lead time, cha
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    PR["PR open"] --> Lint["lint + test + typecheck"]
-    Push["main push"] --> Build["build + docker + staging"]
-    Tag["tag push"] --> Release["release + production (approval)"]
-```
+![A full pipeline split into PR feedback, main integration, and tag-based release promotion](../../../assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
+
+*A full pipeline split into PR feedback, main integration, and tag-based release promotion*
 
 ## Key Terms
 
@@ -159,6 +150,26 @@ runs:
     - run: pip install -e ".[dev]"
       shell: bash
 ```
+
+## What success looks like at this point
+
+| Trigger | Expected run shape | What you validate |
+| --- | --- | --- |
+| Pull request | lint, test, typecheck | feedback stays fast and blocks bad merges |
+| `main` push | build, docker, staging | the validated artifact reaches staging unchanged |
+| Tag push | release, production | the approved version is traceable all the way to prod |
+
+If your real Actions history matches that table, the responsibility split is doing its job. If pull requests are still running every heavy deployment check, or production can be triggered from an unversioned main build, the pipeline has not been separated enough yet.
+
+## When the pipeline misbehaves, narrow it in this order
+
+1. **PR feedback is too slow**: trim the reusable workflow to the checks reviewers truly need on every change, and watch for oversized matrices.
+2. **`main` is unstable**: verify that build outputs, image tags, and staging deployment all refer to the same validated artifact.
+3. **Production is risky**: confirm tag-based release, required reviewers, and rollback workflow all still exist as live controls rather than documentation promises.
+
+## Branch protection and promotion policy are half the design
+
+In practice, the workflow file is only half the story. Branch protection rules should require status checks before merge. `main` should not accept casual direct pushes. Production environments should keep reviewers and environment-scoped secrets separate from staging. If those repository-level policies are missing, even a clean YAML design will drift into unsafe operations.
 
 ## What to Notice in This Code
 

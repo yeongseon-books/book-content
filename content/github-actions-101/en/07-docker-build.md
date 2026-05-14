@@ -17,22 +17,16 @@ tags:
   - GHCR
   - CICD
 seo_description: Buildx, cache, multi-platform, and GHCR push. Build Docker images the standard way in CI without paying for slow rebuilds.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Docker Build
 
-> GitHub Actions 101 series (7/10)
+Docker build is usually the slowest and most failure-prone stage in a GitHub Actions pipeline. Without cache, every PR rebuilds layers from scratch. Without a tag policy, you lose traceability. Without the right permissions, the build succeeds only to fail at the final push with a 401.
 
-<!-- a-grade-intro:begin -->
+That is why container automation is not just “run `docker build` in CI.” It is a design problem that combines Buildx, cache layout, registry authentication, and branch-specific push policy.
 
-**Core question**: How do you build a *Docker image per PR* *fast and safely* and push it to a *registry*?
-
-> *Docker builds* are *all about cache design*.
-
-<!-- a-grade-intro:end -->
-
-This is post 7 in the GitHub Actions 101 series.
+This is post 7 in the GitHub Actions 101 series. In this post, we will build a practical Docker workflow around Buildx, GitHub Actions cache, GHCR authentication, multi-platform builds, and tagging strategy.
 
 ## What You Will Learn
 
@@ -50,12 +44,9 @@ The *slowest CI step* is usually the *Docker build*. Done right (cache + multi-s
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dockerfile["Dockerfile"] --> Buildx["docker/build-push-action"]
-    Buildx --> Cache["gha cache"]
-    Buildx --> GHCR["ghcr.io"]
-```
+![A Docker build path from Dockerfile through Buildx and cache to GHCR](../../../assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)
+
+*A Docker build path from Dockerfile through Buildx and cache to GHCR*
 
 ## Key Terms
 
@@ -119,6 +110,27 @@ permissions:
   contents: read
   packages: write
 ```
+
+## What success looks like at this point
+
+```text
+#17 [linux/amd64] exporting to image
+#17 exporting manifest sha256:8f4c...
+#17 naming to ghcr.io/acme/demo:4d2e9f1
+#17 DONE 2.1s
+```
+
+If you see a digest plus the expected tag, the minimum contract is working. In PR validation runs, even when `push: false`, the logs should still tell you whether cache hit, which layers rebuilt, and how expensive the workflow will be once the repository gets busier.
+
+## If the build fails, check these first
+
+- **401 or permission denied**: confirm `permissions: packages: write` is present and the repository is allowed to publish to the target GHCR package.
+- **Cache never hits**: check whether frequently changing files are copied too early in the Dockerfile. Layer order usually explains the miss.
+- **Only multi-platform builds are slow or flaky**: keep PR runs to amd64 only, then reserve arm64 for `main` or release tags.
+
+## Use a different branch policy from your release policy
+
+On pull requests, I usually build with `push: false` so the job validates the Dockerfile and cache path without publishing images for every review iteration. On `main`, I push a pinned `sha` tag and, if the repository really needs it, a convenience `latest` tag. On release tags, I expand to multi-platform output and signing. That split keeps feedback fast without giving up rollback discipline.
 
 ## What to Notice in This Code
 

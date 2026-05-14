@@ -17,22 +17,16 @@ tags:
   - Release
   - CICD
 seo_description: From upload-artifact and download-artifact to Releases. Safely store and pass build outputs across jobs and to users.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Build Artifacts
 
-> GitHub Actions 101 series (6/10)
+If a CI run finishes the build and then throws the output away, the pipeline is only half done. The logs say “success,” but no one can later confirm which wheel, archive, or report actually passed validation, and deploy often ends up rebuilding work it should have reused.
 
-<!-- a-grade-intro:begin -->
+That is why artifacts matter more than they first appear to. They preserve the exact output a workflow produced and give later jobs, release tooling, and humans a traceable handoff point.
 
-**Core question**: How do you *pass build outputs* to the *next job* or to *external users*?
-
-> *Artifacts* are the *bridge* between *build and deploy*.
-
-<!-- a-grade-intro:end -->
-
-This is post 6 in the GitHub Actions 101 series.
+This is post 6 in the GitHub Actions 101 series. In this post, we will use artifacts to keep build outputs, move them across jobs, and carry them into GitHub Releases when the workflow becomes an external delivery channel.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ A workflow that *throws build outputs away* offers *no reuse, no trace*. Artifac
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Build["build job"] --> Up["upload-artifact"]
-    Up --> Store["GitHub storage"]
-    Store --> Down["download-artifact"]
-    Down --> Deploy["deploy job"]
-```
+![A build job uploading artifacts to GitHub storage before a deploy job downloads them](../../../assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
+
+*A build job uploading artifacts to GitHub storage before a deploy job downloads them*
 
 ## Key Terms
 
