@@ -54,110 +54,112 @@
 </head>
 <body>
 <h1>My First Open Source Project</h1>
+<p>By this point in the series, you have seen the definition of open source, licenses, issues, pull requests, README quality, releases, community management, and maintainership. The final question is simple and difficult at the same time: what should you actually publish? Many people stop here because the idea feels too small, or because the project does not yet feel “finished enough” to make public.</p>
 <p>This is the final post in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What do you need to release one <em>small tool</em> as open source?</p>
-<blockquote>
-<p>Code, docs, license, release, and community.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will walk through the smallest complete path from idea to MVP, docs, first release, and feedback loop for a first open source project.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>Picking an <em>idea</em></li>
-<li>Building an <em>MVP</em></li>
-<li>Preparing for <em>publication</em></li>
-<li>Cutting the <em>first release</em></li>
-<li><em>Announcing</em> and gathering <em>feedback</em></li>
+<li>How large should a first open source project be?</li>
+<li>What order works well for idea, scope, MVP, docs, and release?</li>
+<li>Why do docs and licensing become more important right before publication?</li>
+<li>What should count as the minimum bar before the first release?</li>
+<li>Why is collecting feedback part of the project rather than something that happens after it?</li>
 </ul>
+<blockquote>
+<p>Your first open source project is not a museum display. It is the process of making one small tool usable by someone else.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>Releasing is what completes the learning.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    I[Idea] --&gt; M[MVP]
-    M --&gt; D[Docs]
-    D --&gt; R[Release]
-    R --&gt; A[Announce]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>MVP</strong>: Minimum viable product.</li>
-<li><strong>scope</strong>: What is in.</li>
-<li><strong>roadmap</strong>: The plan.</li>
-<li><strong>announcement</strong>: A public release note.</li>
-<li><strong>feedback loop</strong>: The cycle of input and revision.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "I have an idea but no code."</p>
-<p><strong>After</strong>: "I shipped v0.1.0 and gathered feedback."</p>
-<h2>Hands-on: Ship Your First Project</h2>
-<p><strong>Step 1 — Idea and Scope</strong></p>
+<p>Learning closes differently once the work is public. There is a big gap between code that runs on your machine and a project that another person can realistically install, understand, and evaluate. README, LICENSE, CHANGELOG, release tags, and a feedback path are what turn code into a shareable artifact.</p>
+<p>That process teaches a surprising amount of practical engineering. You practice scoping, documentation priorities, packaging, release discipline, and user feedback collection all at once. For a first project, finishing matters more than scale.</p>
+<h2>The Smallest Path to Publication</h2>
+<p><img alt="The Smallest Path to Publication" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png"></p>
+<p><em>The minimum path from idea to docs, release, and announcement for a first public tool</em><br>
+The key insight is that publication does not happen only at the last second. As soon as you write docs with another user in mind, you have already started preparing for public use.</p>
+<p>Small projects benefit the most from respecting that order. Once the scope keeps expanding, shipping becomes harder, and unfinished projects do not create release experience.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>An <em>MVP</em> is the smallest version that is still useful. <em>Scope</em> defines what is in and what is deliberately out. A <em>roadmap</em> gives future work a visible home rather than forcing it into the first release. An <em>announcement</em> is the public message that introduces the release. A <em>feedback loop</em> is the cycle that turns user response into the next improvement.</p>
+<p>Those five ideas are what help you escape perfectionism.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, it can feel like your idea is not big enough to deserve publication. For a first open source project, it does not need to be big at all.</p>
+<p>If a small MVP has working docs and a real release, it already qualifies as a meaningful first project. The point is not spectacle. The point is finishing something that another person can genuinely try.</p>
+<h2>Hands-on: Publish the First Version</h2>
+<p><strong>Step 1 — Decide the idea and the scope</strong></p>
+<p>The first question is not only what to build, but also what to exclude from the first version. Small scope is what makes completion possible.</p>
 <pre><code class="language-markdown">- Name: tinytool
 - Goal: do X in one command
 - Non-goals: GUI, i18n
 </code></pre>
-<p><strong>Step 2 — MVP Code</strong></p>
+<p><strong>Step 2 — Build the MVP code</strong></p>
+<p>Set up the smallest working structure and confirm that the minimum feature runs locally.</p>
 <pre><code class="language-bash">mkdir tinytool &amp;&amp; cd tinytool
 git init
 python -m venv .venv
 </code></pre>
-<p><strong>Step 3 — Five Docs</strong></p>
+<p><strong>Step 3 — Prepare the five basic docs</strong></p>
+<p>Without these docs, the project is difficult to try, trust, or extend.</p>
 <pre><code class="language-text">README.md
 LICENSE
 CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 CHANGELOG.md
 </code></pre>
-<p><strong>Step 4 — Release v0.1.0</strong></p>
+<p><strong>Step 4 — Cut the first release</strong></p>
+<p>The first version acts as a baseline as much as a feature bundle. People now know where the usable project begins.</p>
 <pre><code class="language-bash">git tag v0.1.0
 gh release create v0.1.0 --generate-notes
 </code></pre>
-<p><strong>Step 5 — Announce</strong></p>
+<p><strong>Step 5 — Publish and ask for feedback</strong></p>
+<p>The project does not end when you push it out. That is when the next learning loop begins.</p>
 <pre><code class="language-markdown">&gt; Released tinytool v0.1.0. Feedback welcome!
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>The scope is small.</li>
-<li>Documentation is complete.</li>
-<li>The announcement drives traffic.</li>
-</ul>
+<h2>A Minimum Publication Gate</h2>
+<p><strong>README</strong><br>
+- Why it matters: Gives a usable entry path</p>
+<p><strong>LICENSE</strong><br>
+- Why it matters: Defines the sharing rules</p>
+<p><strong>CHANGELOG</strong><br>
+- Why it matters: Records what changed</p>
+<p><strong>Tag or release</strong><br>
+- Why it matters: Marks the first stable checkpoint</p>
+<p><strong>Feedback channel</strong><br>
+- Why it matters: Turns users into signal</p>
+<h2>What to Notice in This Walkthrough</h2>
+<p>First projects are easier to finish when the scope stays small. Documentation is a major part of the product. Release tags create a baseline. Announcements create a surface where people can respond.</p>
+<p>The goal is not perfect execution on day one. The goal is to pass through the full cycle of scope, docs, release, and feedback at least once.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Perfectionism delays release.</strong></li>
-<li><strong>No license.</strong></li>
-<li><strong>A vague README.</strong></li>
-<li><strong>No feedback channel.</strong></li>
-<li><strong>No roadmap.</strong></li>
+<li>Delaying publication until the project feels perfect.</li>
+<li>Publishing the repository with no license.</li>
+<li>Leaving the README too vague for anyone to start.</li>
+<li>Providing no feedback channel.</li>
+<li>Forgetting to signal what is intentionally out of scope.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Internal tools at companies onboard faster when they reuse the open source release playbook.</p>
+<p>Internal tools also become easier to adopt when they follow the same playbook. Even a small script becomes more reusable once it has a name, a README, a release point, and a change history. Open source habits improve shareability whether the audience is public or internal.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>MVP is the start.</li>
-<li>Docs are half the product.</li>
-<li>Announcements are marketing.</li>
-<li>Feedback is direction.</li>
-<li>Sustainment completes the work.</li>
+<li>Small scope increases the chance of shipping.</li>
+<li>Docs are part of the product.</li>
+<li>A release is a baseline, not a trophy.</li>
+<li>Feedback is directional data.</li>
+<li>Finishing a small public tool teaches more than endlessly polishing a private idea.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] MVP works.</li>
-<li>[ ] Five docs in place.</li>
-<li>[ ] v0.1.0 released.</li>
-<li>[ ] Announcement posted.</li>
+<li>[ ] My MVP works.</li>
+<li>[ ] I prepared the five basic docs.</li>
+<li>[ ] I have a first tag or release plan.</li>
+<li>[ ] I know where feedback will be collected.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: define MVP.</li>
-<li>One line: effect of stating non-goals.</li>
-<li>One line: example of a feedback loop.</li>
+<li>Define <em>MVP</em> in one sentence.</li>
+<li>Explain why non-goals are worth writing down.</li>
+<li>Give one example of a feedback loop.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>The series ends here. Begin with your first PR or your first release.</p>
+<p>In this final post, we treated a first open source project as a complete publication loop rather than a giant product launch. The important thing is not building something huge. It is carrying one useful tool all the way to a state another person can actually try.</p>
+<p>This series ends here. Your next move can be a first pull request or a first release. The key step is not learning one more concept. It is finishing one public unit of work end to end.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -176,6 +178,7 @@ gh release create v0.1.0 --generate-notes
 <li><a href="https://choosealicense.com/">Choose a License</a></li>
 <li><a href="https://docs.github.com/en/repositories/releasing-projects-on-github">GitHub Releases</a></li>
 <li><a href="https://news.ycombinator.com/showhn.html">Show HN</a></li>
+<li><a href="https://github.com/github/opensource.guide">github/opensource.guide</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, Project, Capstone, GitHub, Beginner</p>
 </body>
