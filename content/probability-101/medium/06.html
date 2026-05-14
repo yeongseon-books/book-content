@@ -54,37 +54,26 @@
 </head>
 <body>
 <h1>Expectation and Variance</h1>
-<p>This is post 6 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If we had <em>one number for the center</em> and <em>one for the spread</em> of an uncertain quantity, what would they be?</p>
-<blockquote>
-<p><em>Expectation is the </em>center<em>; variance is the </em>spread<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Learning a distribution is not the same as being able to summarize it. In practice, you often need to answer two faster questions: where is the center, and how much does the value spread around that center? Expectation and variance are the basic answers.</p>
+<p>Even a die shows why the pair matters. Knowing that the average face value is 3.5 is useful, but it says nothing about how much the values swing. Variance and standard deviation supply that second coordinate.</p>
+<p>This is post 6 in the Probability 101 series. Here we define expectation and variance, compute them in code, use linearity to simplify reasoning, and connect the formulas to the way engineers read noisy metrics and model behavior.</p>
+<h2>What you will learn</h2>
 <ul>
-<li>The definition of <em>E[X]</em></li>
-<li><em>Var(X)</em> and <em>standard deviation</em></li>
-<li><em>Linearity of expectation</em></li>
-<li>A 5-step moments exercise</li>
-<li>Five common mistakes</li>
+<li>Why expectation is called the center of a distribution</li>
+<li>What variance measures and why standard deviation is often easier to interpret</li>
+<li>How linearity of expectation simplifies many problems</li>
+<li>Why a mean alone often hides instability</li>
+<li>How simulation helps check the formulas against intuition</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Expectation and variance <em>summarize a distribution in two numbers</em>. <em>Loss functions, A/B analysis, risk evaluation</em> all rest on them.</p>
+<p>Loss functions, A/B analysis, risk evaluation, and monitoring metrics all rely on expectation and variance. Mean squared error is written directly in this language. So are many discussions of performance, volatility, and uncertainty.</p>
+<p>The key habit is to read center and spread together. A system with the same average latency but much larger variance can feel far worse in production than a more stable one. The same is true for predictions and experiments.</p>
 <blockquote>
-<p><em>Mean and variance summarize a distribution.</em></p>
+<p>Expectation tells you where a distribution is centered. Variance tells you how much it tends to move around that center.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    X[&quot;RV X&quot;] --&gt; E[&quot;E[X] = sum x*p(x)&quot;]
-    E --&gt; Var[&quot;Var(X) = E[(X - E[X])^2]&quot;]
-    Var --&gt; SD[&quot;SD = sqrt(Var)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Expectation E[X]</strong>: mean. Discrete: Σ x·p(x). Continuous: ∫x f(x) dx.</li>
@@ -94,8 +83,8 @@
 <li><strong>Moments</strong>: 1st (mean), 2nd (variance), 3rd (skew)...</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“A die averages 3.5”</em> — but the <em>spread</em> is unknown.</p>
-<p><strong>After</strong>: <em>E[X] = 3.5</em>, <em>Var(X) ≈ 2.92</em>, <em>SD ≈ 1.71</em> — <em>center plus spread</em>.</p>
+<p><strong>Before</strong>: “A die averages 3.5.” That is true, but incomplete.</p>
+<p><strong>After</strong>: E[X] = 3.5, Var(X) ≈ 2.92, SD ≈ 1.71 gives both the center and the spread.</p>
 <h2>Hands-on: 5-step Moments</h2>
 <p><strong>Step 1 — Discrete expectation</strong></p>
 <pre><code class="language-python">import numpy as np
@@ -125,43 +114,43 @@ print(&quot;mean:&quot;, rv.mean(), &quot;var:&quot;, rv.var())
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The <em>mean</em> is a <em>summary</em>; it need not be an attainable value.</li>
-<li><em>Var = E[X²] - (E[X])²</em> is the <em>computational</em> form.</li>
-<li><em>Linearity</em> holds <em>without independence</em>.</li>
+<li>The mean is a summary; it need not be an attainable value.</li>
+<li>Var = E[X²] - (E[X])² is the computational form.</li>
+<li>Linearity holds without independence.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Assuming <em>E[X]</em> must be an <em>attainable value of X</em>.</strong></li>
-<li><strong>Treating <em>Var(aX)</em> as <em>a·Var(X)</em> (it is <em>a²·Var(X)</em>).</strong></li>
-<li><strong>Confusing units of <em>standard deviation</em> and <em>variance</em>.</strong></li>
-<li><strong>Forgetting that <em>outliers shake the mean</em>.</strong></li>
-<li><strong>Forgetting the <em>(n-1) denominator</em> for <em>sample variance</em>.</strong></li>
+<li><strong>Assuming E[X] must be an attainable value of X.</strong></li>
+<li><strong>Treating Var(aX) as a·Var(X) (it is a²·Var(X)).</strong></li>
+<li><strong>Confusing units of standard deviation and variance.</strong></li>
+<li><strong>Forgetting that outliers shake the mean.</strong></li>
+<li><strong>Forgetting the (n-1) denominator for sample variance.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>The <em>MSE = E[(y - ŷ)²]</em> loss, <em>expected lift</em> in A/B tests, <em>expected return / risk</em> in finance — all are applications of <em>expectation and variance</em>.</p>
+<p>The MSE = E[(y - ŷ)²] loss, expected lift in A/B tests, expected return / risk in finance — all are applications of expectation and variance.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Reads <em>mean alongside SD</em>.</li>
-<li>Also checks <em>median / IQR</em>.</li>
-<li>Exploits <em>linearity</em>.</li>
-<li>Distinguishes <em>sample</em> and <em>population</em> denominators.</li>
-<li>Verifies via <em>simulation</em>.</li>
+<li>Reads mean alongside SD.</li>
+<li>Also checks median / IQR.</li>
+<li>Exploits linearity.</li>
+<li>Distinguishes sample and population denominators.</li>
+<li>Verifies via simulation.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I can define and compute <em>E[X]</em>.</li>
-<li>[ ] I know both <em>Var(X)</em> formulas.</li>
-<li>[ ] I know <em>linearity</em>.</li>
-<li>[ ] I use <em>(n-1)</em> for sample variance.</li>
+<li>[ ] I can define and compute E[X].</li>
+<li>[ ] I know both Var(X) formulas.</li>
+<li>[ ] I know linearity.</li>
+<li>[ ] I use (n-1) for sample variance.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Compute <em>E</em> and <em>Var</em> for the <em>sum of two dice</em>.</li>
-<li>Under what condition does <em>Var(X+Y) = Var(X) + Var(Y)</em>?</li>
-<li>Compare the impact of an <em>outlier</em> on <em>mean vs median</em>.</li>
+<li>Compute E and Var for the sum of two dice.</li>
+<li>Under what condition does Var(X+Y) = Var(X) + Var(Y)?</li>
+<li>Compare the impact of an outlier on mean vs median.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Expectation and variance are the <em>two axes of a distribution</em>. The next episode covers the main <em>discrete distributions</em>.</p>
+<p>Expectation and variance are the two axes of a distribution. The next episode covers the main discrete distributions.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>
