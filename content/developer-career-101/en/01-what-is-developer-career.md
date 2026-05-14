@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 1
 title: What Is a Developer Career
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Developer
-  - Growth
-  - Junior
-  - Beginner
-seo_description: A beginner-friendly tour of the stages and growth axes of a developer career.
-last_reviewed: '2026-05-04'
+- Career
+- Developer
+- Growth
+- Junior
+- Beginner
+seo_description: A beginner-friendly tour of the stages and growth axes of a developer
+  career.
+last_reviewed: '2026-05-14'
 ---
 
 # What Is a Developer Career
 
+People often start by mapping a developer career to company names, years of experience, or the next title. In practice, two engineers with the same title can be operating at very different levels because the real difference shows up in problem scope, judgment, and how much leverage they create for other people.
+
 This is the first post in the Developer Career 101 series.
 
-> Developer Career 101 series (1/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?
+- What actually changes between junior, mid-level, senior, and staff-like expectations?
+- Why do skill, influence, and written evidence matter together instead of separately?
+- What should you track over the next six months if you want your growth to stay visible?
 
-**Core question**: Is a developer *career* just a chronological list of *job titles*?
-
-> It is the joint growth of role, skill, and impact.
-
-<!-- a-grade-intro:end -->
+> A developer career is not a chronological list of titles. It is the compound growth of role, skill, and impact.
 
 ## What You Will Learn
 
@@ -48,13 +50,9 @@ Without direction, five years later you are still at square one.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    J[Junior] --> M[Mid]
-    M --> S[Senior]
-    S --> L[Lead]
-    S --> P[Principal]
-```
+![Career stages and expanding impact radius](../../../assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
+
+*Career stages and expanding impact radius*
 
 ## Key Terms
 
@@ -111,6 +109,15 @@ one of: junior / mid / senior
 - gaps
 - one thing for next quarter
 ```
+
+## Decision frame for reading your own career
+
+| Axis | Question to ask now | Useful next move |
+| --- | --- | --- |
+| Role | Are you mostly executing assigned work, or are you defining the work too? | Review the last four weeks and count how many tasks included framing, not just implementation. |
+| Skill | Which of technical depth, collaboration, or domain understanding is weakest? | Pick the weakest axis and connect one concrete deliverable to it this quarter. |
+| Impact | Who gets faster or safer because of your work besides you? | Leave one reusable artifact behind: a doc, review pattern, template, or automation. |
+| Record | Could you prove your growth in the next review loop? | Start a weekly work log and a monthly retro. |
 
 ## What to Notice in This Code
 
@@ -170,9 +177,9 @@ Next post covers *Understanding Roles*.
 
 ## References
 
-- [Career Ladders for Software Engineers](https://www.progression.fyi/)
+- [Progression.fyi — Engineering career ladders](https://www.progression.fyi/)
 - [Dropbox Engineering Career Framework](https://dropbox.github.io/dbx-career-framework/)
-- [Staff Engineer's Path](https://noidea.dog/staff)
-- [Developer roadmap](https://roadmap.sh/)
+- [Staff Engineer: The Path](https://staffeng.com/guides/staff-engineer-path/)
+- [The Pragmatic Engineer — Career ladders and scope](https://newsletter.pragmaticengineer.com/)
 
 Tags: Career, Developer, Growth, Junior, Beginner
