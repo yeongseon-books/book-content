@@ -15,7 +15,7 @@ tags:
 - Operations
 - Monitoring
 - Observability
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: When you deploy agents to production, new problems arise. You need
   to monitor how much it costs, how long responses take, where it fails, and which…
 ---
@@ -45,6 +45,9 @@ This is post 9 in the AI Agent 101 series. Here we cover agent observability, co
 ## Observability
 
 Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.
+
+![Observability](../../../assets/ai-agent-101/09/09-01-observability.en.png)
+*Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.*
 
 ### Structured Logging
 
@@ -600,16 +603,9 @@ A leading cause of GDPR/CCPA violations and security incidents.
 
 ## References
 
-1. **OpenTelemetry: LLM Observability** - https://opentelemetry.io/docs/specs/semconv/gen-ai/  
-   OpenTelemetry semantic conventions for LLM/agent observability. Defines standard trace attributes.
-
-2. **LangSmith Production Monitoring** - https://docs.smith.langchain.com/observability  
-   LangChain's operations monitoring tool. Integrates traces, metrics, and evaluation.
-
-3. **Google SRE Book: Monitoring Distributed Systems** - https://sre.google/sre-book/monitoring-distributed-systems/  
-   Google's SRE monitoring principles. The Four Golden Signals apply to agents too.
-
-4. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
-   OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.
+- [OpenTelemetry generative AI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)
+- [LangSmith observability](https://docs.smith.langchain.com/observability)
+- [Google SRE Book - Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/)
+- [OpenAI production best practices](https://platform.openai.com/docs/guides/production-best-practices)
 
 Tags: AI Agent, LLM, Tool Use, Python
