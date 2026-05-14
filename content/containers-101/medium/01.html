@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>What is a Container?</h1>
-<blockquote>
-<p>Containers 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Containers look like tiny VMs — so why are they emphatically <em>not</em> VMs?</p>
-<blockquote>
-<p><em>A container is a lightweight package of an isolated process tree that shares the host OS kernel.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Containers are often introduced as tiny VMs, but that shortcut hides the exact boundary that matters in operations. The real question is which parts are shared, which parts are isolated, and what that means for reproducibility and security.</p>
 <p>This is the first post in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we define a container as an isolated process tree sharing the host kernel, compare that model with a VM, and walk through what <code>docker run</code> actually creates when your first container starts.</p>
+<blockquote>
+<p>A container is not a tiny VM. It is an isolated process tree sharing the host kernel.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The definition of a container</li>
 <li>What gets shared with the host</li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Since 2013, the container has been the default unit of deployment. Without it, modern DevOps is closed off to you.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Host[&quot;host os kernel&quot;] --&gt; C1[&quot;container 1&quot;]
-    Host --&gt; C2[&quot;container 2&quot;]
-    Host --&gt; C3[&quot;container 3&quot;]
-    C1 --&gt; App1[&quot;app process&quot;]
-</code></pre>
+<p><img alt="Container processes sharing the host kernel" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Container processes sharing the host kernel</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Container</strong>: an isolated bundle of processes.</li>
@@ -128,6 +118,20 @@ def docker_version():
 <li><code>-p 8080:80</code> maps host:container ports.</li>
 <li><code>--name</code> gives you a stable handle.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker --version
+docker run -d --name web -p 8080:80 nginx:1.27-alpine
+curl -I http://127.0.0.1:8080
+docker ps --filter name=web
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>docker --version</code> returns a valid engine version.<br>
+- <code>curl -I</code> shows <code>HTTP/1.1 200 OK</code>.<br>
+- <code>docker ps</code> shows <code>web</code> with <code>0.0.0.0:8080-&gt;80/tcp</code>.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If <code>docker run</code> fails, confirm local port <code>8080</code> is free.<br>
+- If <code>curl</code> fails, inspect <code>docker logs web</code> before changing the image.<br>
+- If you swap the image, verify the service still listens on port 80.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Forgetting port mapping — the container is unreachable.</strong></li>
@@ -161,6 +165,7 @@ def docker_version():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>If an image is a template, you have to understand its internals. The next post covers Image and Layer.</p>
+<h2>In this series</h2>
 <ul>
 <li><strong>What is a Container? (current)</strong></li>
 <li>Image and Layer (upcoming)</li>
@@ -180,6 +185,6 @@ def docker_version():
 <li><a href="https://man7.org/linux/man-pages/man7/namespaces.7.html">Linux namespaces</a></li>
 <li><a href="https://www.kernel.org/doc/Documentation/admin-guide/cgroup-v2.rst">cgroups v2</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Linux, DevOps, Architecture</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
