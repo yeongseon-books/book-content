@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 8
 title: Optimization
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Adam
   - Beginner
 seo_description: A beginner-friendly tour of momentum, RMSProp, Adam, learning-rate schedules, and regularization for ML optimization
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Optimization
 
-> Calculus for ML 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *patch* the *weaknesses* of plain gradient descent?
-
-> *Momentum*, *adaptive learning rates*, and *schedules* boost both *speed* and *stability*.
+Plain gradient descent gives you the basic learning loop, but real deep learning losses are rougher than that simple picture suggests. Valleys can be long and narrow, gradient scale can vary by coordinate, and the first few hundred steps may need very different behavior from the last few thousand.
 
 This is post 8 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization as one optimization toolkit. The goal is not to memorize optimizer names, but to see which weakness of plain gradient descent each tool is trying to fix.
+
+> Modern optimizers do not replace gradient descent with unrelated magic. They are gradient descent with extra machinery for stability, scale mismatch, and stage-specific control.
 
 ## What You Will Learn
 
@@ -48,15 +44,9 @@ Modern optimizers like *Adam* work well — and you should *understand why*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    G[Gradient] --> M[Momentum]
-    G --> R[RMSProp]
-    M --> A[Adam]
-    R --> A
-    A --> S[Schedule]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png)
 
+*Optimization flow: gradient signals are shaped by momentum, adaptive scaling, and scheduling.*
 ## Key Terms
 
 - **momentum**: a *running mean of gradients*.
