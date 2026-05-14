@@ -54,18 +54,20 @@
 </head>
 <body>
 <h1>The ML Interview</h1>
-<blockquote>
-<p>Data Science Career 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does the <em>ML interview</em> actually ask?</p>
-<blockquote>
-<p>Fundamentals, model choice, evaluation, traps, systems.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Many candidates prepare for ML interviews by collecting model names and metric definitions. That is necessary, but it is not what makes an answer convincing. The hard part starts when the interviewer asks why a metric fits the business cost structure, what kind of leakage might exist, or how the model would be monitored after deployment.</p>
+<p>That is why strong ML interview answers sound less like a glossary and more like a decision process. They begin with the problem, move through model choice and evaluation, and then widen into failure modes, retraining, and system behavior over time.</p>
 <p>This is post 6 in the Data Science Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What topics do ML interviews usually cover besides algorithm basics?</li>
+<li>How should you explain model choice in a way that reflects real trade-offs?</li>
+<li>Why can metric selection not be separated from the problem definition?</li>
+<li>Which operational traps are worth surfacing early in an answer?</li>
+<li>What changes when you answer from a system-design perspective instead of a model-only perspective?</li>
+</ul>
+<blockquote>
+<p>Good ML interview answers do not stop at naming a model. They connect problem framing, evaluation, production risks, and monitoring into one operating story.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Fundamentals</em> questions</li>
@@ -75,13 +77,11 @@
 <li><em>ML system</em> design</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Memorizing models without "why" misses the point.</p>
+<p>Memorizing models without a decision frame usually produces shallow answers.</p>
+<p>Interviewers want to hear how you reason under constraints: data size, interpretability, latency, class imbalance, labeling quality, and post-deployment drift. The model matters, but the reasoning matters more.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Problem] --&gt; M[Model]
-    M --&gt; E[Evaluation]
-    E --&gt; D[Deployment]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>An ML interview answer should connect problem framing, evaluation, and deployment concerns</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>bias-variance</strong>: The balance between underfit and overfit.</li>
@@ -129,7 +129,8 @@
 <li><strong>Ignoring interpretability.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Interviewers spend more time on operations than on accuracy.</p>
+<p>Many ML interviews spend more time on operations than candidates expect because production systems fail in more ways than a notebook suggests.</p>
+<p>Accuracy is only one part of the story. A model can score well offline and still fail if the data pipeline changes, the monitoring is weak, or the retraining loop is undefined.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Start from problem definition.</li>
@@ -152,7 +153,8 @@
 <li>One line: AUC vs recall.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>The Case Interview</em>.</p>
+<p>The most useful preparation move is to build a repeatable answer structure: define the problem, choose a model class, justify the metric, name the traps, and describe the deployment and monitoring loop.</p>
+<p>The next post shifts from model judgment to product and business judgment through the case interview format.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/01-what-is-data-career.md">What Is a Data Career</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/02-analyst-scientist-engineer.md">Analyst vs Scientist vs Engineer</a></li>
@@ -167,10 +169,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/">Designing Machine Learning Systems</a></li>
-<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn metrics</a></li>
-<li><a href="https://huyenchip.com/ml-interviews-book/">ML Interview Book</a></li>
-<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Rules of ML</a></li>
+<li><a href="https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/">Chip Huyen - Designing Machine Learning Systems</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/model_evaluation.html">scikit-learn - Model Evaluation: Quantifying the Quality of Predictions</a></li>
+<li><a href="https://huyenchip.com/ml-interviews-book/">Chip Huyen - Machine Learning Interviews Book</a></li>
+<li><a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google Developers - Rules of ML</a></li>
 </ul>
 <p class="tags-line">Tags: DataCareer, ML, Interview, Modeling, Beginner</p>
 </body>
