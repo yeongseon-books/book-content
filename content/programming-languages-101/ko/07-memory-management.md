@@ -18,7 +18,7 @@ tags:
   - Stack
   - Heap
 seo_description: 스택/힙의 차이와 참조 카운팅, 순환 참조를 해결하는 GC 원리를 정리합니다. GC 환경에서도 누수가 생기는 이유와 관리 도구를 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 메모리 관리
@@ -44,16 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["function call"] --> B["stack frame"]
-    B --> C["locals (auto freed)"]
-    A --> D["heap allocation"]
-    D --> E["refcount"]
-    D --> F["GC tracing"]
-    E -->|drops to 0| G["freed"]
-    F -->|cycle collected| G
-```
+![스택 프레임, 힙 객체, 참조 카운트와 GC가 만나는 메모리 수명 흐름](../../../assets/programming-languages-101/07/07-01-concept-at-a-glance.ko.png)
+
+*스택 프레임, 힙 객체, 참조 카운트와 GC가 만나는 메모리 수명 흐름*
 
 함수 호출이 끝나면 스택 프레임은 자동으로 사라집니다. 반면 힙에 있는 객체는 누가 더 참조하는지 따로 추적해야 합니다. CPython은 참조 카운팅과 순환 수집기를 함께 사용해 이 문제를 풉니다.
 
