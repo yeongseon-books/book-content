@@ -166,6 +166,59 @@ if __name__ == &quot;__main__&quot;:
 <p>There is another useful contrast here. This code makes the difference visible between “a function that looks conversational” and “a system that can genuinely resume.” That distinction matters a lot once branching and tool loops arrive, because reliable recovery depends on it.</p>
 <p>Example code: <a href="https://github.com/yeongseon-books/langgraph-101/tree/main/en/02-state-and-checkpoints">github.com/yeongseon-books/langgraph-101</a></p>
 <hr>
+<h2>Verify what was actually persisted</h2>
+<p>The important checkpointing question is not “did the code run?” but “did the graph really save the state we think it saved?” The easiest way to answer that is to inspect the stored snapshot directly after the second turn.</p>
+<pre><code class="language-python">app = build_graph()
+config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;memory-demo&quot;}}
+
+app.invoke(
+    {&quot;messages&quot;: [HumanMessage(content=&quot;My project is about LangGraph.&quot;)], &quot;turn_count&quot;: 0},
+    config=config,
+)
+app.invoke(
+    {&quot;messages&quot;: [HumanMessage(content=&quot;What did I say my project was about?&quot;)]},
+    config=config,
+)
+
+snapshot = app.get_state(config)
+
+assert snapshot.values[&quot;turn_count&quot;] == 2
+assert len(snapshot.values[&quot;messages&quot;]) == 4
+assert any(&quot;LangGraph&quot; in message.content for message in snapshot.values[&quot;messages&quot;])
+
+print(snapshot.values)
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{
+  'messages': [
+    HumanMessage(content='My project is about LangGraph.'),
+    AIMessage(content='Turn 1. Latest user message: My project is about LangGraph. ...'),
+    HumanMessage(content='What did I say my project was about?'),
+    AIMessage(content='Turn 2. Latest user message: What did I say my project was about?. Earlier user turns: My project is about LangGraph.')
+  ],
+  'turn_count': 2
+}
+</code></pre>
+<p>That small check is doing real operational work. It confirms that message history accumulated, that <code>turn_count</code> advanced, and that the graph is persisting a session timeline instead of merely returning nice-looking answers.</p>
+<hr>
+<h2>The limits of the in-memory example</h2>
+<p><code>MemorySaver</code> is a good teaching tool, but it also helps to say out loud what it does <strong>not</strong> guarantee.</p>
+<ul>
+<li>
+<p><strong>A process restart clears the in-memory checkpoint store.</strong><br>
+  That is fine for learning. It is not the final persistence shape for a long-lived service.</p>
+</li>
+<li>
+<p><strong>A weak <code>thread_id</code> strategy still produces confusing recovery.</strong><br>
+  If session keys are unstable or too broad, the graph may either fail to resume or resume the wrong conversation.</p>
+</li>
+<li>
+<p><strong>Different fields need different merge behavior.</strong><br>
+<code>messages</code> should accumulate. <code>turn_count</code> should overwrite with the latest value. Treating every field the same way produces graphs that “remember” in a shallow sense while still corrupting the timeline.</p>
+</li>
+</ul>
+<p>That is why I encourage readers to ask two questions together: is the saved value correct, and would this storage pattern still hold up under the service boundary we actually care about? <code>get_state()</code> answers the first one immediately. Session-key and storage design answer the second.</p>
+<hr>
 <h2>What to notice in this code</h2>
 <p>Do not try to interpret every line at once. Three observations matter first.</p>
 <p><img alt="Message accumulation and turn_count updates" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-02-what-to-notice-in-this-code.en.png"></p>
@@ -240,6 +293,9 @@ if __name__ == &quot;__main__&quot;:
 - <a href="https://langchain-ai.github.io/langgraph/how-tos/persistence/">LangGraph persistence guide</a><br>
 - <a href="https://langchain-ai.github.io/langgraph/reference/checkpoints/">MemorySaver reference</a><br>
 - <a href="https://langchain-ai.github.io/langgraph/concepts/low_level/#working-with-messages-in-graph-state">Working with messages in graph state</a></p>
+<p><strong>Source code and examples</strong><br>
+- <a href="https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint">LangGraph checkpoint package source</a><br>
+- <a href="https://langchain-ai.github.io/langgraph/tutorials/get-started/3-add-memory/">LangGraph memory tutorial</a></p>
 <p><strong>Related Series</strong><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langchain-101/en">LangChain 101</a></p>
