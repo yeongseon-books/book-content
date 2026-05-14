@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Train/Eval/Test Splitting and Contamination Control</h1>
+<p>Many experiments look healthy right up until they meet production traffic because a simple random split hid the real failure mode. If your split ignores time, users, or benchmark contamination, validation scores can tell the wrong story.</p>
+<p>This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>When does a random split stop representing the production problem you actually care about?</li>
+<li>How do stratified, group, and temporal splits protect against different leakage patterns?</li>
+<li>Why is contamination now a first-class evaluation problem for LLMs?</li>
+<li>What can a simple 13-gram overlap check tell you before you trust a benchmark score?</li>
+<li>How should teams keep the test set separate from tuning in everyday workflow?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (9/10)</p>
+<p>A split strategy is an evaluation simulator. If it does not mirror the real deployment constraints, even beautiful validation numbers can still be answers to the wrong question.</p>
 </blockquote>
 <hr>
 <h2>"Doesn't random_split cover it?"</h2>
@@ -209,6 +219,14 @@ def canary_check(model_call, canary: str = &quot;Th3_C@nary_X9z!&quot;) -&gt; bo
 <li>Episode 10 covers production data pipeline construction.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Document why the current problem needs random, stratified, group, temporal, or hybrid splitting</li>
+<li>[ ] Verify that no user, session, or patient identifiers cross the train/test boundary</li>
+<li>[ ] Run contamination overlap checks on LLM evaluation sets before publishing scores</li>
+<li>[ ] Keep the test set out of hyperparameter tuning and define who may access it</li>
+<li>[ ] Record the time cutoff and backtest strategy whenever temporal split is in use</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>
