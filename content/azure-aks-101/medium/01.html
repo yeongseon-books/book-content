@@ -189,6 +189,33 @@ Managed Kubernetes does not mean “operations disappear.” It means the center
   --resource-group $RG --name $CLUSTER \
   --query '{kubernetesVersion:kubernetesVersion, fqdn:fqdn, nodeResourceGroup:nodeResourceGroup}'
 </code></pre>
+<p>If you can already talk to a live cluster, add these three commands right away.</p>
+<pre><code class="language-bash">kubectl get nodes -o wide
+kubectl get pods -n kube-system -o wide
+kubectl get svc -A
+</code></pre>
+<p>Each command sharpens a different part of the mental model.</p>
+<ul>
+<li><code>kubectl get nodes -o wide</code> shows the actual execution layer.</li>
+<li><code>kubectl get pods -n kube-system -o wide</code> shows whether the cluster's own critical components are healthy and where they landed.</li>
+<li><code>kubectl get svc -A</code> shows the stable network entry points the cluster is exposing internally and externally.</li>
+</ul>
+<p>That combination is useful because it turns the responsibility-boundary discussion into something inspectable. You are no longer only reading AKS as an Azure resource. You are checking nodes, system workloads, and traffic entry points together.</p>
+<h2>A fast first-cut failure workflow</h2>
+<p>One of the biggest early AKS mistakes is describing everything as “the cluster is broken.” Usually the first win is not a fix. It is cutting the symptom at the right layer.</p>
+<p><strong><code>kubectl</code> feels slow or fails</strong><br>
+- First layer to check: control-plane boundary<br>
+- First command: <code>az aks show --resource-group $RG --name $CLUSTER</code></p>
+<p><strong>Pods stay <code>Pending</code></strong><br>
+- First layer to check: node-pool capacity / scheduling<br>
+- First command: <code>kubectl describe pod &lt;pod-name&gt;</code></p>
+<p><strong>App is running but unreachable from outside</strong><br>
+- First layer to check: Service / LoadBalancer / Ingress<br>
+- First command: <code>kubectl get svc -A</code></p>
+<p><strong>CoreDNS or metrics-server looks unstable</strong><br>
+- First layer to check: system workload layer<br>
+- First command: <code>kubectl get pods -n kube-system -o wide</code></p>
+<p>The point is not to solve every failure from a single table. The point is to build the habit of asking which layer owns the symptom first. In AKS, that habit matters more than memorizing a long list of service features.</p>
 <h2>Operational checklist</h2>
 <ul>
 <li>[ ] Made sure the team shares the AKS responsibility model</li>

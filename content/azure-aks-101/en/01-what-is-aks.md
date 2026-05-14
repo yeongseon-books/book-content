@@ -205,6 +205,35 @@ az aks show \
   --query '{kubernetesVersion:kubernetesVersion, fqdn:fqdn, nodeResourceGroup:nodeResourceGroup}'
 ```
 
+If you can already talk to a live cluster, add these three commands right away.
+
+```bash
+kubectl get nodes -o wide
+kubectl get pods -n kube-system -o wide
+kubectl get svc -A
+```
+
+Each command sharpens a different part of the mental model.
+
+- `kubectl get nodes -o wide` shows the actual execution layer.
+- `kubectl get pods -n kube-system -o wide` shows whether the cluster's own critical components are healthy and where they landed.
+- `kubectl get svc -A` shows the stable network entry points the cluster is exposing internally and externally.
+
+That combination is useful because it turns the responsibility-boundary discussion into something inspectable. You are no longer only reading AKS as an Azure resource. You are checking nodes, system workloads, and traffic entry points together.
+
+## A fast first-cut failure workflow
+
+One of the biggest early AKS mistakes is describing everything as “the cluster is broken.” Usually the first win is not a fix. It is cutting the symptom at the right layer.
+
+| Symptom | First layer to check | First command |
+|---|---|---|
+| `kubectl` feels slow or fails | control-plane boundary | `az aks show --resource-group $RG --name $CLUSTER` |
+| Pods stay `Pending` | node-pool capacity / scheduling | `kubectl describe pod <pod-name>` |
+| App is running but unreachable from outside | Service / LoadBalancer / Ingress | `kubectl get svc -A` |
+| CoreDNS or metrics-server looks unstable | system workload layer | `kubectl get pods -n kube-system -o wide` |
+
+The point is not to solve every failure from a single table. The point is to build the habit of asking which layer owns the symptom first. In AKS, that habit matters more than memorizing a long list of service features.
+
 ## Operational checklist
 
 - [ ] Made sure the team shares the AKS responsibility model
