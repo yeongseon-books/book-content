@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 툴 호출 — 함수를 모델에 연결하기
-seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Groq tools와 Pydantic 검증으로 안전한 툴 호출 루프를 설계하는 방법을 다룹니다.
 ---
 
 # 툴 호출 — 함수를 모델에 연결하기
@@ -173,7 +173,7 @@ print(message.tool_calls)
 
 <!-- injected-output:end -->
 
-`tool_choice="auto"`는 모델이 필요할 때만 도구를 고르게 합니다. 이 시점의 응답은 최종 사용자 답이 아니라 실행 요청입니다. 즉, 애플리케이션이 아직 한 번 더 일해야 한다는 뜻입니다.
+`tool_choice="auto"`는 모델이 필요할 때만 도구를 고르게 합니다. 이 시점의 응답은 최종 사용자 답이 아니라 실행 요청입니다. 애플리케이션이 아직 한 단계를 더 거쳐야 합니다.
 
 ### `tool_calls`를 파싱하고 안전하게 라우팅하기
 
@@ -356,7 +356,66 @@ final = client.chat.completions.create(
 print(final.choices[0].message.content)
 ```
 
-이 구조의 장점은 역할이 분리된다는 점입니다. 모델은 어떤 도구가 필요한지 제안하고, 애플리케이션은 실제 실행과 검증을 책임지며, 마지막 응답은 다시 모델이 자연어로 정리합니다.
+이 구조의 장점은 역할이 분리된다는 점입니다. 모델은 어떤 도구가 필요한지 제안하고, 애플리케이션은 실제 실행과 검증을 맡으며, 마지막 응답은 다시 모델이 자연어로 정리합니다.
+
+### 실패한 툴 호출도 구조화해 되돌리기
+
+성공 경로만 예쁘게 만들면 운영에서는 절반만 끝난 셈입니다. 도구가 타임아웃되거나 권한 오류가 나면 애플리케이션은 예외 문자열을 그대로 노출하는 대신, 모델이 다시 해석할 수 있는 표준화된 오류 payload를 주는 편이 낫습니다.
+
+```python
+import json
+
+from pydantic import BaseModel, ValidationError
+
+class OrderStatusArgs(BaseModel):
+    order_id: str
+
+def run_tool(function_name: str, raw_arguments: str) -> dict:
+    try:
+        arguments = json.loads(raw_arguments)
+        validated = OrderStatusArgs.model_validate(arguments)
+    except json.JSONDecodeError as exc:
+        return {
+            "ok": False,
+            "error_type": "invalid_json",
+            "message": str(exc),
+        }
+    except ValidationError as exc:
+        return {
+            "ok": False,
+            "error_type": "invalid_arguments",
+            "message": exc.errors()[0]["msg"],
+        }
+
+    if function_name != "get_order_status":
+        return {
+            "ok": False,
+            "error_type": "unknown_tool",
+            "message": f"unsupported tool: {function_name}",
+        }
+
+    return {
+        "ok": True,
+        "data": {
+            "order_id": validated.order_id,
+            "status": "in_transit",
+            "eta_days": 2,
+        },
+    }
+
+print(run_tool("get_order_status", '{"order_id": 1001}'))
+print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
+```
+
+<!-- injected-output:start -->
+**실행 결과**
+
+    {'ok': False, 'error_type': 'invalid_arguments', 'message': 'Input should be a valid string'}
+    {'ok': False, 'error_type': 'unknown_tool', 'message': 'unsupported tool: cancel_order'}
+
+<!-- injected-output:end -->
+
+이 패턴이 실용적인 이유는 실패가 자연어 예외가 아니라 계약된 데이터로 돌아오기 때문입니다. 모델에게는 `ok: false`와 `error_type`을 보고 "주문 번호 형식이 잘못되었습니다" 같은 설명을 만들게 할 수 있고, 애플리케이션은 같은 필드로 메트릭과 알림을 모을 수 있습니다. 특히 상태 변경 도구에서는 이 표준화가 감사 로그와 재실행 금지 정책까지 자연스럽게 이어집니다.
 
 ### 운영에서 특히 지켜야 할 방어선
 
@@ -388,7 +447,7 @@ print(final.choices[0].message.content)
 
 이번 글에서는 툴 호출을 모델 자율성으로 보지 않고 애플리케이션이 설계한 실행 경계로 정리했습니다. `tools` 파라미터는 허용된 함수 집합과 인자 계약을 공개하고, `tool_calls`는 모델이 선택한 실행 요청을 구조적으로 돌려줍니다. 애플리케이션은 그 요청을 검증하고 실행한 뒤 다시 모델에 결과를 넣어 최종 응답을 완성합니다.
 
-핵심은 실행 권한이 모델에 있지 않다는 점입니다. 모델은 도구를 제안할 뿐이고, 실행 책임은 여전히 애플리케이션이 집니다. 이 책임 분리가 있어야 조회, 검색, 데이터 접근, 외부 API 연동을 붙여도 운영 품질을 유지할 수 있습니다.
+모델에는 실행 권한이 없습니다. 모델은 도구를 제안할 뿐이고, 실행 책임은 여전히 애플리케이션이 집니다. 이 책임 분리가 있어야 조회, 검색, 데이터 접근, 외부 API 연동을 붙여도 운영 품질을 유지할 수 있습니다.
 
 다음 글에서는 같은 계약 중심 관점을 스트리밍에 적용합니다. 툴 호출이 함수 실행 경계를 다뤘다면, 스트리밍은 시간에 걸쳐 도착하는 부분 응답을 어떻게 안정적으로 소비할 것인가의 문제입니다.
 
@@ -407,8 +466,11 @@ print(final.choices[0].message.content)
 ## 참고 자료
 
 ### 공식 문서
-- <https://console.groq.com/docs/tool-use>
-- <https://json-schema.org/understanding-json-schema/>
+- [Groq tool use guide](https://console.groq.com/docs/tool-use)
+- [JSON Schema fundamentals](https://json-schema.org/understanding-json-schema/)
+
+### 검증 보조 자료
+- [Pydantic validation errors](https://docs.pydantic.dev/latest/errors/errors/)
 
 ### 관련 시리즈
 - [구조화 출력 — JSON 모드와 응답 스키마](./01-structured-output.md)
