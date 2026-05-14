@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>Frontend and Backend</h1>
-<p>This is post 5 in the Web Development 101 series.</p>
-<blockquote>
-<p>Web Development 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Where</em> does the frontend's job end and the backend's begin?</p>
-<blockquote>
-<p>Whoever owns the <em>source of truth</em> is the backend; whoever <em>shows</em> it to the user is the frontend.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.</p>
+<p>This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>How responsibility splits between frontend and backend</li>
 <li>SPA (Single Page App) vs SSR (Server-Side Rendering)</li>
@@ -80,15 +70,17 @@
 <p>Good systems have <em>clear boundaries</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User&quot;] --&gt; FE[&quot;Frontend (browser)&quot;]
-    FE --&gt;|&quot;API call&quot;| BE[&quot;Backend (server)&quot;]
-    BE --&gt; DB[&quot;Database&quot;]
-    DB --&gt; BE
-    BE --&gt; FE
-    FE --&gt; User
-</code></pre>
-<p>Data flows <em>DB → BE → FE → User</em>.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>A boundary map for user experience, server logic, and persistent data.</em></p>
+<p>This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.</p>
+<p><strong>What to verify yourself</strong></p>
+<ul>
+<li>Build a tiny <code>/api/items</code> endpoint and render its response in the browser.</li>
+<li>Compare the same feature as a fetch-driven SPA and as server-rendered HTML.</li>
+<li>Trigger a CORS error on purpose and read exactly which origin restriction the browser reports.</li>
+</ul>
+<p><strong>Expected output:</strong> When the backend response shape changes, the frontend must adjust with it, and the browser blocks cross-origin requests until the server explicitly allows them.</p>
+<p><strong>Failure mode to watch for:</strong> Authorization logic on the frontend can be bypassed. Changing both sides without a contract quickly leads to mismatched field names and broken assumptions.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Frontend</strong>: the part that <em>shows</em> things to the user (runs in the browser).</li>
@@ -209,12 +201,13 @@ SSR: server returns fully built HTML on every request
 <li>Building a Small Web App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Client-Server_overview">Client-side vs server-side (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/SPA">SPA (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/SSR">Server-side rendering (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS (MDN)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Client-Server_overview">Client-side and server-side website programming (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/SPA">Single-page application (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/SSR">Server-side rendering (MDN)</a></p>
+<p><strong>Verification Resources</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS">CORS guide (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch">Using the Fetch API (MDN)</a></p>
 <p class="tags-line">Tags: Computer Science, WebDevelopment, Frontend, Backend, Architecture, FullStack</p>
 </body>
 </html>
