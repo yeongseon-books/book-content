@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 1
 title: Why Model Evaluation Is Hard
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Foundations
   - Beginner
 seo_description: Why a single accuracy number is the wrong evaluation, and how data distribution, business cost, and thresholds change the answer
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Why Model Evaluation Is Hard
 
-> Model Evaluation 101 series (1/10)
+Model evaluation tends to feel easier in a notebook than it does in production. A single score can look clean, yet the decision behind it is rarely clean. The same 95% accuracy means very different things depending on the data distribution, the cost of mistakes, and the threshold that turns scores into action.
 
-<!-- a-grade-intro:begin -->
+When evaluation gets shaky, model selection gets shaky with it. The real danger is not one bad number, but a whole team optimizing toward the wrong number. That is why evaluation is less about metric calculation and more about decision design.
 
-**Core question**: Is a model with 99% accuracy actually a good model?
+This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.
 
-> *Evaluation is not one number. It is the intersection of data distribution, cost structure, and the decision the model supports.*
-
-<!-- a-grade-intro:end -->
-
-This is the first post in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - Four reasons evaluation is hard
 - Why metrics are not business value
@@ -42,20 +36,17 @@ This is the first post in the Model Evaluation 101 series.
 - How thresholds drive decisions
 - Five common pitfalls
 
+> Evaluation is not one number. It is the meeting point of data distribution, cost structure, thresholds, and the decision the model is supposed to support.
+
 ## Why It Matters
 
 Evaluation is the language of model selection. When the language is wrong, the entire team aims at the wrong target.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["data"] --> Pred["predictions"]
-    Pred --> Metric["metric(s)"]
-    Cost["business cost"] --> Metric
-    Metric --> Decide["decision"]
-```
+![evaluation flow from predictions to metrics and decisions](../../../assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
 
+*evaluation flow from predictions to metrics and decisions*
 ## Key Terms
 
 - **Metric**: a numerical summary of performance.
@@ -112,6 +103,8 @@ def cost(tp, fp, fn, c_fp=1, c_fn=10):
     return c_fp * fp + c_fn * fn
 print("cost:", cost(tp=5, fp=10, fn=2))
 ```
+
+**Expected output:** You should see that the dummy model can look strong on accuracy while still collapsing on recall, and that the "best" threshold changes once you price false positives and false negatives differently.
 
 ## What to Notice in This Code
 
