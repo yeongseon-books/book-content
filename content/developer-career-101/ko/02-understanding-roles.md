@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Roles
-  - Frontend
-  - Backend
-  - Beginner
+- Career
+- Roles
+- Frontend
+- Backend
+- Beginner
 seo_description: 프론트엔드, 백엔드 등 주요 개발 직무별 특징과 기술 스택을 비교하여 본인의 적성에 맞는 최적의 경로 선택을 돕습니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 직무 이해하기
@@ -49,14 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    F[Frontend] --> B[Backend]
-    B --> D[Data]
-    D --> S[SRE]
-    S --> M[ML]
-    M --> Mo[Mobile]
-```
+![주요 개발 직무 비교 흐름](../../../assets/developer-career-101/02/02-01-concept-at-a-glance.ko.png)
+
+*주요 개발 직무 비교 흐름*
 
 직무를 가르는 첫 기준은 도구가 아니라 책임입니다. 도구는 바뀔 수 있지만, 무엇을 최적화하고 어떤 실패를 가장 먼저 책임지는지는 직무의 성격을 오래 결정합니다.
 
@@ -126,6 +121,15 @@ metrics: AUC, latency
 
 ML은 모델 정확도만 보는 역할이 아닙니다. 예측 품질과 지연 시간, 데이터 품질, 재현성과 배포 운영까지 함께 다뤄야 실제 서비스에서 의미가 생깁니다.
 
+## 직무를 고를 때 보는 판단 기준
+
+| 기준 | 프론트엔드 | 백엔드 | 데이터/SRE/ML |
+| --- | --- | --- | --- |
+| 가장 자주 만나는 실패 | 느린 화면, 깨진 상호작용 | 오류율 상승, 데이터 정합성 문제 | 신선도 저하, 장애 대응, 모델 품질 저하 |
+| 잘했을 때 드러나는 신호 | 사용자가 흐름을 덜 헤맨다 | 기능이 안정적으로 오래 간다 | 운영 비용과 리스크가 함께 줄어든다 |
+| 초반에 확인할 증거 | 성능 지표, 디자인 협업 방식 | API 계약, 저장소 구조, 운영 지표 | 배치/실시간 흐름, 온콜 구조, 재현성 도구 |
+| 나와 맞는지 보는 질문 | UI 디테일을 오래 다듬는 일이 즐거운가 | 데이터 흐름과 경계 조건을 좋아하는가 | 품질 기준을 수치로 다루는 일이 편한가 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 책임이 직무를 정의합니다.
@@ -183,9 +187,9 @@ ML은 모델 정확도만 보는 역할이 아닙니다. 예측 품질과 지연
 
 ## 참고 자료
 
-- [Web Vitals](https://web.dev/vitals/)
+- [web.dev — Web Vitals](https://web.dev/vitals/)
 - [Google SRE Book](https://sre.google/books/)
-- [State of Data Engineering](https://www.lakefs.io/blog/state-of-data-engineering-2024/)
-- [MLOps Maturity](https://ml-ops.org/)
+- [MLOps Community](https://mlops.community/)
+- [roadmap.sh — Developer roadmaps](https://roadmap.sh/)
 
 Tags: Career, Roles, Frontend, Backend, Beginner
