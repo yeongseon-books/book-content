@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Data Collection</h1>
+<p>The easiest way to lose trust in an analysis is to lose the origin story of the data. A CSV arrives in Slack, an API export gets copied into a notebook, or someone hand-edits an Excel file “just for now.” Weeks later the team still has charts, but nobody can explain where the rows came from or whether the result is reproducible.</p>
+<p>Collection is where reliability starts. Before cleaning or modeling ever matter, someone has to decide which source is authoritative, which copy is disposable, and what metadata must be recorded so the same dataset can be reconstructed later.</p>
+<p>This is post 3 in the Data Science 101 series. Here we treat collection as an engineering discipline: source selection, provenance, and repeatability come first, and the code that fetches the rows comes second.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>Which collection paths are most common in analytics and ML projects?</li>
+<li>Why should original sources, copies, and snapshots be treated differently?</li>
+<li>What provenance metadata makes a dataset reproducible later?</li>
+<li>How do collection mistakes leak all the way into the final report?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (3/10)</p>
+<p>Collection is not just retrieval; it is the first reproducibility checkpoint in the project.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Where</em> and <em>how</em> do you actually collect the data your analysis needs — and how do you tell the <em>original</em> from a <em>copy</em>?</p>
-<blockquote>
-<p><em>Every analysis starts by writing down </em>where the data came from<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Four common <em>data sources</em>: files, APIs, databases, event logs</li>
@@ -80,13 +81,8 @@
 <p><em>Only </em>traceable<em> data is </em>trustworthy<em> data.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    File[&quot;File / CSV&quot;] --&gt; Stage[&quot;Staging&quot;]
-    API[&quot;API&quot;] --&gt; Stage
-    DB[&quot;Database&quot;] --&gt; Stage
-    Log[&quot;Event Log&quot;] --&gt; Stage
-    Stage --&gt; Analysis[&quot;Analysis&quot;]
-</code></pre>
+<p><img alt="Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Source of truth</strong>: the <em>authoritative origin</em> of the data.</li>
@@ -138,6 +134,7 @@ meta = {
 }
 print(meta)
 </code></pre>
+<p><strong>Expected output:</strong> one provenance record containing <code>source</code>, <code>fetched_at</code>, <code>row_count</code>, and <code>sha256</code> for the pulled dataset.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Always record the <em>source and timestamp</em> together.</li>
