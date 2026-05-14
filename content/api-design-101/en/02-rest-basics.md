@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 2
 title: REST Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Backend
   - WebDevelopment
 seo_description: A junior backend engineer's guide to the six REST constraints and resource-centric thinking — what it really means and what it does not.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # REST Basics
 
-REST is easier to use well once you understand its six constraints and the resource-centric model behind them.
+Two APIs can both look "REST-ish" in screenshots and still feel completely different in production. The difference is usually not the path shape alone. It is whether the client can predict what each call means without re-learning the rules every time.
 
 This is post 2 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.
+
+## What you will learn
 
 - The definition and history of REST
 - The six architectural constraints
@@ -43,14 +45,11 @@ REST is the most common API style. Follow it well and your API becomes *predicta
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET /users/42"| Server["Server"]
-    Server -->|"200 OK + JSON"| Client
-    Server --- DB[("Resources")]
-```
+![Concept at a Glance](../../../assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
+*In REST, the URL identifies the resource and the HTTP method expresses the action on it.*
 
-Resources are identified by URLs; actions are expressed as HTTP methods.
+A client should be able to read `GET /users/42` and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.
+
 
 ## Key Terms
 
@@ -170,6 +169,12 @@ GitHub, Stripe, GitLab — most public APIs are *mostly REST*. Pure HATEOAS is r
 - Treat caching, auth, and errors as part of the formal contract.
 - Do not turn REST into a religion — RPC has its place.
 - Always ask: is this *predictable* from the client side?
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** You should be able to describe read, create, and delete behavior on the same resource without changing the URL shape—only the HTTP method.
+- **First check:** Repeated paths such as `/getUser` or `/deleteOrder` are strong signals that the API is drifting back toward RPC over HTTP.
+- **Failure mode:** Once auth depends on server-side session memory or every response becomes `200 OK`, caching, retries, and horizontal scaling all get harder at the same time.
 
 ## Checklist
 
