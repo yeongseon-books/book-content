@@ -54,107 +54,98 @@
 </head>
 <body>
 <h1>An Open Source Portfolio</h1>
+<p>Once you start contributing to open source, a new question appears: does your GitHub profile look like a random warehouse of repositories, or does it show how you choose problems and follow them through? A large number of contributions does not automatically become a strong portfolio. People trust context and continuity more than raw counts.</p>
 <p>This is post 9 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does open source contribution become a <em>portfolio</em>?</p>
-<blockquote>
-<p>Present context, evidence, and a narrative — together.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will look at how to turn GitHub activity into a portfolio that shows problem selection, execution style, and sustained evidence rather than just activity noise.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Profile</em> optimization</li>
-<li><em>Pinned</em> repositories</li>
-<li><em>PR</em> curation</li>
-<li>A <em>contribution</em> narrative</li>
-<li><em>Sustained</em> evidence</li>
+<li>How does open source contribution become a portfolio?</li>
+<li>What should a profile README and pinned repositories each communicate?</li>
+<li>Which pull requests are worth highlighting as representative work?</li>
+<li>What does it mean to present both narrative and evidence?</li>
+<li>Why is sustained activity often more convincing than one flashy event?</li>
 </ul>
+<blockquote>
+<p>A portfolio is not a list of activity. It is a bundle of evidence that shows what problems you solve and how you work through them.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>A portfolio is the proof of your career.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Profile] --&gt; R[Pinned]
-    R --&gt; C[Contribs]
-    C --&gt; N[Narrative]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>profile README</strong>: Self-introduction repo.</li>
-<li><strong>pinned</strong>: Highlighted repos.</li>
-<li><strong>contributions</strong>: Activity graph.</li>
-<li><strong>narrative</strong>: Your story.</li>
-<li><strong>proof of work</strong>: Evidence of effort.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "My GitHub is full of forks."</p>
-<p><strong>After</strong>: "Three notable PRs and one original project are pinned."</p>
-<h2>Hands-on: Portfolio Cleanup</h2>
-<p><strong>Step 1 — Profile README</strong></p>
+<p>For early-career engineers or people moving into a new domain, public contribution history can become stronger evidence than a generic self-description. Review history, merged fixes, docs work, and release notes all create interview-friendly proof.</p>
+<p>The opposite is also true. A messy GitHub profile can work against you. If all people see are unlabeled forks, broken links, and no signal of which projects matter, it becomes hard to read your work. Portfolio strength comes from editing, not just from producing more artifacts.</p>
+<h2>The Smallest Portfolio Structure</h2>
+<p><img alt="The smallest portfolio structure" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png"></p>
+<p><em>A portfolio emerges when profile, representative work, evidence, and narrative are connected</em><br>
+That final step matters most. A page full of links is only a storage shelf. A page full of personal claims is only a self-introduction. A portfolio appears when evidence and explanation meet.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>A <em>profile README</em> introduces you on the GitHub front page. <em>Pinned repositories</em> decide which work gets immediate attention. A contribution graph shows volume but not meaning. A <em>contribution narrative</em> explains growth and choice. <em>Proof of work</em> means links that other people can actually inspect: pull requests, commits, docs, releases, and repositories.</p>
+<p>Strong portfolios make verification easy.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, it can feel like many forks automatically make you look active. In practice, selection usually looks stronger than volume.</p>
+<p>Three representative pull requests, one original project, and a clear profile story often create more trust than thirty shallow traces. Readability beats spectacle.</p>
+<h2>Hands-on: Clean Up Your Portfolio</h2>
+<p><strong>Step 1 — Create a profile README</strong></p>
+<p>Your front page can state what areas you care about and what kind of open source work you have done.</p>
 <pre><code class="language-bash">gh repo create &lt;username&gt; --public
 echo &quot;# Hi, I am ...&quot; &gt; README.md
 </code></pre>
-<p><strong>Step 2 — Choose Six Pinned Items</strong></p>
+<p><strong>Step 2 — Choose six pinned items</strong></p>
+<p>The goal is not to show everything. Balance original work, meaningful PRs, and projects where you contribute steadily.</p>
 <pre><code class="language-text">- 1 original project
 - 3 meaningful PRs
 - 1 learning notebook
 - 1 OSS you contribute to
 </code></pre>
-<p><strong>Step 3 — PR Index</strong></p>
+<p><strong>Step 3 — Build a PR index</strong></p>
+<p>When notable PRs are collected in one place, a reviewer can judge your work far faster. Add a one-line summary for each.</p>
 <pre><code class="language-markdown">## Notable PRs
 - pandas#123 — Fix x
 - requests#456 — Add y
 </code></pre>
-<p><strong>Step 4 — Contribution Narrative</strong></p>
+<p><strong>Step 4 — Write the contribution narrative</strong></p>
+<p>Once you explain the sequence of your work, a scoreboard starts to look like a growth path.</p>
 <pre><code class="language-markdown">## Story
 Started with docs, moved to bugs, now feature work.
 </code></pre>
-<p><strong>Step 5 — Evidence of Sustainment</strong></p>
+<p><strong>Step 5 — Show continuity</strong></p>
+<p>One strong week is less persuasive than a stable pattern over time.</p>
 <pre><code class="language-text">At least 2 commits per week, three months straight
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>Narrative provides context.</li>
-<li>Pinned items are your face.</li>
-<li>Sustainment builds trust.</li>
-</ul>
+<h2>What to Notice in This Walkthrough</h2>
+<p>The profile is the entrance. Pinned items shape the first impression. Pull request links are evidence. Sustained activity shows reliability, not just excitement.</p>
+<p>The point is not to look busy. It is to make someone understand quickly what kind of engineer you have already practiced being.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Stacking only forks.</strong></li>
-<li><strong>An empty profile README.</strong></li>
-<li><strong>Broken PR links.</strong></li>
-<li><strong>Sporadic activity.</strong></li>
-<li><strong>No descriptions.</strong></li>
+<li>Leaving only forks visible.</li>
+<li>Keeping the profile README empty.</li>
+<li>Letting important PR links break or go stale.</li>
+<li>Showing isolated activity with no explanation.</li>
+<li>Listing repositories without saying why they matter.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Hiring teams check GitHub activity before technical interviews as a baseline reference.</p>
+<p>Hiring teams and collaboration partners often use GitHub as a pre-interview reference. The most useful signal is rarely the full repository list. It is whether your representative work is easy to inspect and easy to interpret.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>Narrative beats raw data.</li>
-<li>Three is better than thirty.</li>
-<li>Persistence is talent.</li>
-<li>A PR link is evidence.</li>
-<li>Profile README is the door.</li>
+<li>Narrative beats raw activity.</li>
+<li>Fewer stronger examples usually win.</li>
+<li>Sustained effort creates trust.</li>
+<li>Verifiable links matter more than self-claims.</li>
+<li>Portfolio curation is part of communication skill.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Profile README written.</li>
-<li>[ ] Six pinned items chosen.</li>
-<li>[ ] Notable PRs indexed.</li>
-<li>[ ] Three months of activity.</li>
+<li>[ ] I wrote a profile README.</li>
+<li>[ ] I selected pinned items intentionally.</li>
+<li>[ ] I gathered notable pull requests in one place.</li>
+<li>[ ] I can explain a sustained contribution pattern from the last few months.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: difference between pinned and fork.</li>
-<li>One line: purpose of the profile README.</li>
-<li>One line: example of sustained evidence.</li>
+<li>Explain the difference between a pinned item and a fork.</li>
+<li>Explain the purpose of a profile README.</li>
+<li>Give one example of sustained contribution evidence.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>My First Open Source Project</em>.</p>
+<p>In this post, we treated open source contribution as career evidence rather than a count of random activity. The goal is to show what you worked on, why it mattered, and how another person can verify it.</p>
+<p>Next, in the final post, we will walk through turning one small tool into your first actual open source project.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -173,6 +164,7 @@ Started with docs, moved to bugs, now feature work.
 <li><a href="https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile">Pinning items</a></li>
 <li><a href="https://opensource.guide/finding-users/">Open Source Guides — Finding Users</a></li>
 <li><a href="https://github.com/readme">Hiring with GitHub</a></li>
+<li><a href="https://github.com/readme">github/readme repository</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, Portfolio, Career, GitHub, Beginner</p>
 </body>
