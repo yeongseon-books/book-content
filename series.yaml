@@ -9,7 +9,7 @@ meta:
   license: all-rights-reserved
 series:
 - id: llm-app-foundations-101
-  status: content-ready
+  status: publish-ready
   category: ai
   title:
     ko: LLM 앱 기초
@@ -1388,43 +1388,43 @@ series:
       - idx: 1
         slug: 01-what-is-a-python-package
         title: Python Package란 무엇인가?
-        status: content-ready
+        status: publish-ready
       - idx: 2
         slug: 02-project-structure
         title: 프로젝트 구조 잡기 — src layout과 pyproject.toml
-        status: content-ready
+        status: publish-ready
       - idx: 3
         slug: 03-dependency-management
         title: 의존성 관리 — venv, pip, uv, requirements
-        status: content-ready
+        status: publish-ready
       - idx: 4
         slug: 04-building-packages
         title: 패키지 빌드하기 — wheel과 sdist
-        status: content-ready
+        status: publish-ready
       - idx: 5
         slug: 05-publishing-to-pypi
         title: PyPI에 배포하기 — TestPyPI부터 실제 배포까지
-        status: content-ready
+        status: publish-ready
       - idx: 6
         slug: 06-versioning-and-releases
         title: 버전 관리와 릴리스
-        status: content-ready
+        status: publish-ready
       - idx: 7
         slug: 07-cli-packages
         title: CLI 패키지 만들기
-        status: content-ready
+        status: publish-ready
       - idx: 8
         slug: 08-type-hints-and-static-analysis
         title: 타입 힌트와 정적 검사
-        status: content-ready
+        status: publish-ready
       - idx: 9
         slug: 09-documentation
         title: 문서화 — README, MkDocs, API Reference
-        status: content-ready
+        status: publish-ready
       - idx: 10
         slug: 10-package-template
         title: 실전 패키지 템플릿 만들기
-        status: content-ready
+        status: publish-ready
     en:
       articles:
       - idx: 1
