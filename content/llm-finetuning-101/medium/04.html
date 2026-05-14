@@ -54,8 +54,9 @@
 </head>
 <body>
 <h1>Training Loop and Hyperparameters</h1>
-<p>Training loops are easier to debug once you stop treating them like framework magic. This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles.</p>
+<p>Training loops are easier to debug once you stop treating them like framework magic.</p>
 <p>This is the fourth post in the LLM Fine-tuning 101 series.</p>
+<p>This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.</p>
 <h2>Questions this post answers</h2>
 <p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-01-questions-this-post-answers.en.png"></p>
 <p><em>Questions this post answers</em></p>
@@ -160,6 +161,104 @@ args.gradient_accumulation_steps = 2
 args.max_steps = 1
 </code></pre>
 <p>The two configurations have the same effective batch size, so the loss output should be nearly identical. If it differs, there is a data leak somewhere.</p>
+<h2>Runnable smoke test: one real training step</h2>
+<p>The most useful addition to this chapter is a self-contained script that performs exactly one weight update with the same ingredients you will later scale up.</p>
+<pre><code class="language-python">from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
+
+tokenizer = AutoTokenizer.from_pretrained(&quot;sshleifer/tiny-gpt2&quot;)
+tokenizer.pad_token = tokenizer.eos_token
+
+texts = [
+    &quot;Q: How do I sort a Python list? A: Use sorted(lst) or lst.sort().&quot;,
+    &quot;Q: What does HTTP 404 mean? A: The requested resource was not found.&quot;,
+]
+
+rows = []
+for text in texts:
+    encoded = tokenizer(text, truncation=True, padding=&quot;max_length&quot;, max_length=64)
+    encoded[&quot;labels&quot;] = encoded[&quot;input_ids&quot;].copy()
+    rows.append(encoded)
+
+dataset = Dataset.from_list(rows)
+
+base = AutoModelForCausalLM.from_pretrained(&quot;sshleifer/tiny-gpt2&quot;)
+config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=[&quot;c_attn&quot;, &quot;c_proj&quot;],
+    bias=&quot;none&quot;,
+)
+model = get_peft_model(base, config)
+
+args = TrainingArguments(
+    output_dir=&quot;artifacts&quot;,
+    per_device_train_batch_size=2,
+    max_steps=1,
+    learning_rate=5e-4,
+    save_strategy=&quot;no&quot;,
+    logging_steps=1,
+    report_to=[],
+)
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=dataset,
+    data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+)
+
+metrics = trainer.train().metrics
+print(metrics)
+</code></pre>
+<p>Run it with:</p>
+<pre><code class="language-bash">python main.py
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{'train_runtime': 1.2, 'train_samples_per_second': 1.6,
+ 'train_steps_per_second': 0.8, 'train_loss': 8.7, 'epoch': 1.0}
+</code></pre>
+<p>Your exact runtime and loss will differ by hardware and seed. The invariants to verify are simpler:</p>
+<ol>
+<li>the process exits cleanly,</li>
+<li><code>train_loss</code> is finite,</li>
+<li><code>train_steps_per_second</code> is non-zero, and</li>
+<li>the training loop reports one completed step.</li>
+</ol>
+<h2>First-check guide when the step fails</h2>
+<p><strong><code>KeyError: 'labels'</code></strong><br>
+- Check first: Dataset columns<br>
+- Likely cause: You forgot to create <code>labels</code> or renamed the field</p>
+<p><strong>Loss is <code>NaN</code> on step 1</strong><br>
+- Check first: Learning rate and dtype<br>
+- Likely cause: LR too high, unstable precision, or broken inputs</p>
+<p><strong>Training runs but loss never changes</strong><br>
+- Check first: Adapter wiring<br>
+- Likely cause: <code>target_modules</code> are wrong or trainable params are 0</p>
+<p><strong>CUDA OOM</strong><br>
+- Check first: Effective batch size<br>
+- Likely cause: Batch too large, sequence too long, or accumulation too high</p>
+<p><strong>Step is extremely slow</strong><br>
+- Check first: Model loading and padding<br>
+- Likely cause: Base model too large or <code>max_length</code> is much bigger than needed</p>
+<h2>Hyperparameter sweep order that stays debuggable</h2>
+<p>Once the single-step smoke test passes, widen only one dimension at a time.</p>
+<ol>
+<li><strong>Hold the dataset fixed</strong> and sweep <code>learning_rate</code> on a log scale.</li>
+<li><strong>Hold lr fixed</strong> and change effective batch size with accumulation.</li>
+<li><strong>Hold both fixed</strong> and extend <code>max_steps</code> or epochs.</li>
+<li><strong>Only then</strong> compare LoRA ranks or target modules.</li>
+</ol>
+<p>This order matters because it preserves blame. If a run regresses, you can still point to one changed cause instead of three overlapping ones.</p>
 <h2>What to notice in this code</h2>
 <p><img alt="Relationship between batch size and gradient accumulation" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png"></p>
 <p><em>Relationship between batch size and gradient accumulation</em></p>
@@ -219,6 +318,7 @@ args.max_steps = 1
 <hr>
 <h2>References</h2>
 <ul>
+<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/trainer">Transformers Trainer documentation</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">TrainingArguments reference</a></li>
 <li><a href="https://huggingface.co/docs/transformers/main_classes/data_collator">DataCollatorForLanguageModeling</a></li>

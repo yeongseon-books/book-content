@@ -22,9 +22,11 @@ seo_description: Deconstruct one LLM training step into six stages to understand
 
 # Training Loop and Hyperparameters
 
-Training loops are easier to debug once you stop treating them like framework magic. This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles.
+Training loops are easier to debug once you stop treating them like framework magic.
 
 This is the fourth post in the LLM Fine-tuning 101 series.
+
+This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.
 
 ## Questions this post answers
 
@@ -167,6 +169,110 @@ args.max_steps = 1
 
 The two configurations have the same effective batch size, so the loss output should be nearly identical. If it differs, there is a data leak somewhere.
 
+## Runnable smoke test: one real training step
+
+The most useful addition to this chapter is a self-contained script that performs exactly one weight update with the same ingredients you will later scale up.
+
+```python
+from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
+
+tokenizer = AutoTokenizer.from_pretrained("sshleifer/tiny-gpt2")
+tokenizer.pad_token = tokenizer.eos_token
+
+texts = [
+    "Q: How do I sort a Python list? A: Use sorted(lst) or lst.sort().",
+    "Q: What does HTTP 404 mean? A: The requested resource was not found.",
+]
+
+rows = []
+for text in texts:
+    encoded = tokenizer(text, truncation=True, padding="max_length", max_length=64)
+    encoded["labels"] = encoded["input_ids"].copy()
+    rows.append(encoded)
+
+dataset = Dataset.from_list(rows)
+
+base = AutoModelForCausalLM.from_pretrained("sshleifer/tiny-gpt2")
+config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=["c_attn", "c_proj"],
+    bias="none",
+)
+model = get_peft_model(base, config)
+
+args = TrainingArguments(
+    output_dir="artifacts",
+    per_device_train_batch_size=2,
+    max_steps=1,
+    learning_rate=5e-4,
+    save_strategy="no",
+    logging_steps=1,
+    report_to=[],
+)
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=dataset,
+    data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+)
+
+metrics = trainer.train().metrics
+print(metrics)
+```
+
+Run it with:
+
+```bash
+python main.py
+```
+
+**Expected output:**
+
+```text
+{'train_runtime': 1.2, 'train_samples_per_second': 1.6,
+ 'train_steps_per_second': 0.8, 'train_loss': 8.7, 'epoch': 1.0}
+```
+
+Your exact runtime and loss will differ by hardware and seed. The invariants to verify are simpler:
+
+1. the process exits cleanly,
+2. `train_loss` is finite,
+3. `train_steps_per_second` is non-zero, and
+4. the training loop reports one completed step.
+
+## First-check guide when the step fails
+
+| Symptom | Check first | Likely cause |
+| --- | --- | --- |
+| `KeyError: 'labels'` | Dataset columns | You forgot to create `labels` or renamed the field |
+| Loss is `NaN` on step 1 | Learning rate and dtype | LR too high, unstable precision, or broken inputs |
+| Training runs but loss never changes | Adapter wiring | `target_modules` are wrong or trainable params are 0 |
+| CUDA OOM | Effective batch size | Batch too large, sequence too long, or accumulation too high |
+| Step is extremely slow | Model loading and padding | Base model too large or `max_length` is much bigger than needed |
+
+## Hyperparameter sweep order that stays debuggable
+
+Once the single-step smoke test passes, widen only one dimension at a time.
+
+1. **Hold the dataset fixed** and sweep `learning_rate` on a log scale.
+2. **Hold lr fixed** and change effective batch size with accumulation.
+3. **Hold both fixed** and extend `max_steps` or epochs.
+4. **Only then** compare LoRA ranks or target modules.
+
+This order matters because it preserves blame. If a run regresses, you can still point to one changed cause instead of three overlapping ones.
+
 ## What to notice in this code
 
 ![Relationship between batch size and gradient accumulation](../../../assets/llm-finetuning-101/04/04-03-what-to-notice-in-this-code.en.png)
@@ -237,6 +343,7 @@ The next article (episode 5) covers evaluation. We will use perplexity as a quic
 
 ## References
 
+- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Transformers Trainer documentation](https://huggingface.co/docs/transformers/main_classes/trainer)
 - [TrainingArguments reference](https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments)
 - [DataCollatorForLanguageModeling](https://huggingface.co/docs/transformers/main_classes/data_collator)
