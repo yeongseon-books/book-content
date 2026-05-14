@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>The Browser and the DOM</h1>
-<p>This is post 3 in the Web Development 101 series.</p>
-<blockquote>
-<p>Web Development 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does the browser turn HTML text into a <em>living screen</em> you can click?</p>
-<blockquote>
-<p>It builds a <em>tree (the DOM)</em>, computes styles, runs layout and paint, and then handles <em>behavior</em> through the event loop.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>A browser does much more than print HTML on the screen. It parses text into a tree, calculates styles, decides layout, paints pixels, and keeps the page interactive through the event loop. If that pipeline feels vague, performance bugs and UI glitches are hard to reason about.</p>
+<p>This is post 3 in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>What the DOM is and how it gets built</li>
 <li>The stages of the rendering pipeline</li>
@@ -80,16 +70,17 @@
 <p>The browser is <em>a machine for drawing the DOM</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HTML[&quot;HTML&quot;] --&gt; Parse[&quot;Parse&quot;]
-    Parse --&gt; DOM[&quot;DOM tree&quot;]
-    CSS[&quot;CSS&quot;] --&gt; Style[&quot;Style calc&quot;]
-    DOM --&gt; Layout[&quot;Layout&quot;]
-    Style --&gt; Layout
-    Layout --&gt; Paint[&quot;Paint&quot;]
-    Paint --&gt; Pixels[&quot;Pixels&quot;]
-</code></pre>
-<p>Five stages: Parse, Style, Layout, Paint, Composite.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>A summary of the browser pipeline from HTML parsing to layout and paint.</em></p>
+<p>The browser does not jump from HTML text straight to pixels. It builds internal structures first, and DOM updates can force part of that pipeline to run again, which is why UI work and performance are tightly connected.</p>
+<p><strong>What to verify yourself</strong></p>
+<ul>
+<li>Inspect the DOM tree in the Elements tab and confirm it matches the input HTML structure.</li>
+<li>Record a short interaction in the Performance tab and look for layout or paint work after a DOM mutation.</li>
+<li>Run the <code>setTimeout(..., 0)</code> example and compare synchronous log order with callback order.</li>
+</ul>
+<p><strong>Expected output:</strong> DOM changes trigger visible rendering work, and the timeout callback runs after the synchronous logs complete.</p>
+<p><strong>Failure mode to watch for:</strong> Repeated DOM updates inside loops multiply layout cost. Injecting user content through <code>innerHTML</code> creates security problems before performance tuning even starts.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DOM (Document Object Model)</strong>: HTML represented as an object tree.</li>
@@ -195,12 +186,13 @@ console.log(&quot;3&quot;);
 <li>Building a Small Web App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">DOM (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path">Critical rendering path (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation">Event delegation (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop">Event loop (MDN)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction">Introduction to the DOM (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Critical_rendering_path">Critical rendering path (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop">Event loop (MDN)</a></p>
+<p><strong>Practical Tools</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling">Event bubbling and delegation (MDN)</a><br>
+- <a href="https://developer.chrome.com/docs/devtools/performance">Performance panel overview (Chrome DevTools)</a></p>
 <p class="tags-line">Tags: Computer Science, WebDevelopment, Browser, DOM, JavaScript, Frontend</p>
 </body>
 </html>
