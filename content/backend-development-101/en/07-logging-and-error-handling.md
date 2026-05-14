@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 7
 title: Logging and Error Handling
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - Python
   - ErrorHandling
 seo_description: Use structured logging and a global exception handler to diagnose backend incidents in minutes instead of hours.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Logging and Error Handling
 
-> Backend Development 101 series (7/10)
+When the pager goes off at 3 a.m., re-reading the code is rarely the fastest path to an answer. What matters in production is whether the system leaves enough evidence behind to explain a failed request from logs and error responses alone.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.
 
-**Core question**: At 3 a.m. when the pager fires, what does it take to find the *cause* in 30 minutes?
-
-> Structured logs, meaningful status codes, and a global exception handler. With those three, the answer is in the logs — not in re-reading the code.
-
-This is post 7 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Why we use a logger instead of `print`
 - The shape of a structured log
@@ -50,17 +42,9 @@ Code is written once and *operated for years*. Ninety percent of operations is *
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Mw["Middleware"]
-    Mw -->|"add request_id"| App["Handler"]
-    App --> Err{"Error?"}
-    Err -->|"yes"| Handler["Global handler"]
-    Err -->|"no"| OK["200"]
-    Handler --> Log["Logger"]
-    OK --> Log
-```
+![request ID middleware and global exception handling flow into logs](../../../assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
 
+*request ID middleware and global exception handling flow into logs*
 Every path leads to the *log*.
 
 ## Key Terms
@@ -175,6 +159,16 @@ log.error("payment failed")
 log.critical("database is down")
 ```
 
+## Verification points
+
+**Expected output:** log lines produced during the same request should share one `request_id`, and `DomainError` should always become the same JSON error shape.
+
+### First failure modes to check
+
+- If logs are hard to search, confirm the JSON formatter still emits one line per event.
+- If `X-Request-ID` is missing from responses, inspect the middleware where the response header is set.
+- If stack traces never appear, some exception path is swallowing errors before they reach the logger.
+
 ## What to Notice in This Code
 
 - A log line stays on *one line* so search works.
@@ -234,9 +228,14 @@ Good logs and consistent error handling are the *eyes of operations*. Next, we m
 
 ## References
 
+### Official Docs
+
 - [Python logging HOWTO](https://docs.python.org/3/howto/logging.html)
 - [FastAPI exception handlers](https://fastapi.tiangolo.com/tutorial/handling-errors/)
 - [Twelve-Factor logs](https://12factor.net/logs)
+
+### Further Reading
+
 - [structlog docs](https://www.structlog.org/en/stable/)
 
 Tags: Backend, Logging, Observability, Python, ErrorHandling

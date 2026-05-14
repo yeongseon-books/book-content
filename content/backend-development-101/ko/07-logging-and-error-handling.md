@@ -17,12 +17,14 @@ tags:
   - Python
   - ErrorHandling
 seo_description: 구조화 로그와 글로벌 예외 처리를 통해 백엔드 운영 가시성을 확보하고, 장애 발생 시 원인을 빠르게 추적하는 방법을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Logging과 Error Handling
 
-이 글은 Backend Development 101 시리즈의 일곱 번째 글입니다. 새벽에 장애 알림이 왔을 때 코드를 다시 읽는 것만으로는 원인을 빨리 찾기 어렵습니다. 여기서는 구조화 로그, request_id, 글로벌 예외 처리라는 세 가지 축을 중심으로 운영에서 읽히는 백엔드를 만드는 방법을 정리해 보겠습니다.
+새벽에 장애 알림이 왔을 때 코드를 처음부터 다시 읽는 것만으로는 원인을 빨리 찾기 어렵습니다. 운영에서 중요한 것은 실패를 다시 실행하는 능력보다, 이미 일어난 요청을 로그와 오류 응답만으로 설명하는 능력입니다.
+
+이 글은 Backend Development 101 시리즈의 일곱 번째 글입니다. 여기서는 구조화 로그, request_id, 글로벌 예외 처리라는 세 가지 축을 중심으로 운영에서 읽히는 백엔드를 만드는 방법을 정리해 보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,17 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Mw["Middleware"]
-    Mw -->|"add request_id"| App["Handler"]
-    App --> Err{"Error?"}
-    Err -->|"yes"| Handler["Global handler"]
-    Err -->|"no"| OK["200"]
-    Handler --> Log["Logger"]
-    OK --> Log
-```
+![request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름](../../../assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
 
+*request_id middleware와 글로벌 예외 처리가 로그로 모이는 흐름*
 정상 경로든 오류 경로든 결국 모두 로그로 모입니다. 운영 가능한 시스템은 이 흐름이 일관되게 설계되어 있습니다.
 
 ## 핵심 용어
@@ -177,6 +171,16 @@ log.critical("database is down")
 
 모든 것을 ERROR로 찍으면 알람은 금방 소음이 됩니다. 레벨은 중요도의 차이를 전달하기 위해 존재합니다.
 
+## 검증 포인트
+
+**Expected output:** 같은 요청에서 남은 로그 라인은 모두 같은 `request_id`를 가져야 하고, `DomainError`는 일관된 JSON 오류 응답으로 바뀌어야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- 로그를 검색하기 어렵다면 한 줄 JSON 형식이 깨졌는지 먼저 봅니다.
+- `request_id`가 응답 헤더에 없으면 middleware에서 response에 넣는 부분을 확인합니다.
+- stack trace가 전혀 남지 않으면 예외를 잡고 버리고 있지 않은지 점검합니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 로그 한 줄은 한 줄로 끝나야 검색이 잘 됩니다.
@@ -240,9 +244,14 @@ log.critical("database is down")
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Python logging HOWTO](https://docs.python.org/3/howto/logging.html)
 - [FastAPI exception handlers](https://fastapi.tiangolo.com/tutorial/handling-errors/)
 - [Twelve-Factor logs](https://12factor.net/logs)
+
+### 추가 읽을거리
+
 - [structlog docs](https://www.structlog.org/en/stable/)
 
 Tags: Backend, Logging, Observability, Python, ErrorHandling
