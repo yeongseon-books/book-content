@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Alert["alert"] --> OnCall["on-call engineer"]
-    OnCall --> Runbook["runbook"]
-    Runbook --> Mitigate["mitigation"]
-    Mitigate --> Postmortem["blameless postmortem"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/09/09-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 좋은 장애 대응은 영웅적인 개인에게 기대지 않습니다. 알림을 받은 사람이 런북을 열고, 완화 조치를 하고, 필요하면 조율 역할이 붙고, 마지막에 포스트모템으로 학습이 남는 흐름이 있어야 합니다.
 
@@ -144,6 +140,32 @@ IC = decision maker. Does NOT fix things directly.
 - Root cause: typo in feature flag default
 - Prevention: add flag-validation checklist to PR template
 ```
+
+## 알림 후 첫 15분 대응 순서
+
+장애 대응은 무엇을 아느냐보다, 처음 15분 동안 무엇부터 하느냐가 더 크게 좌우합니다. 알림 직후에 순서가 없으면 팀은 기술적으로 맞는 조치를 해도 전체 복구 시간은 오히려 늘어납니다.
+
+```text
+0-3분   알림 확인, SEV 판정, incident channel 개설
+3-5분   on-call이 런북 시작, 최근 배포/변경 여부 확인
+5-8분   고객 영향 범위와 우회 가능성 판단
+8-12분  IC 지정, 역할 분리, 외부 공지 필요 여부 결정
+12-15분 완화 조치 실행 또는 상위 에스컬레이션
+```
+
+이 순서가 좋은 이유는 기술 조사와 커뮤니케이션을 동시에 분리하기 때문입니다. 복구를 하는 사람과 상태를 정리하는 사람이 같아지면 정보는 많아도 결정은 느려집니다.
+
+## 좋은 포스트모템이 남기는 산출물
+
+포스트모템의 품질은 문장 톤보다 후속 산출물에서 드러납니다. 좋은 포스트모템은 최소한 세 가지를 남깁니다. 첫째, 재현 가능한 타임라인입니다. 둘째, 다시는 같은 방식으로 놓치지 않게 만드는 감지 또는 예방 조치입니다. 셋째, owner와 due date가 있는 액션 아이템입니다.
+
+예를 들어 `feature flag 기본값 오타`가 원인이었다면, "조심하자"로 끝내는 대신 아래처럼 바뀌어야 합니다.
+
+- PR 템플릿에 flag validation 체크박스 추가
+- 배포 전 smoke test에 기본 플래그 상태 검증 포함
+- 2주 내 기존 플래그 기본값 일괄 점검
+
+이렇게 남겨야 장애가 문서가 아니라 시스템 변경으로 이어집니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
