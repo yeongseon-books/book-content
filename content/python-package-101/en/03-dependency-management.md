@@ -3,7 +3,7 @@ title: Dependency Management — venv, pip, uv, requirements
 series: python-package-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - uv
 - Dependencies
 - Virtual Environment
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A virtual environment gives each project its own package space, and
   dependency management records which packages at which versions are needed.
 ---
 
 # Dependency Management — venv, pip, uv, requirements
 
-This is post 3 in the Python Package 101 series.
+The same code can behave differently just because two environments installed different package versions. Dependency management is how you turn that uncertainty into something reproducible.
 
-> Python Package 101 series (3/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 3 in the Python Package 101 series. Here we cover virtual environments, the different jobs of `requirements.txt` and `pyproject.toml`, and why `uv` is becoming the fast path for new Python projects.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 3 in the Python Package 101 series.
 - How do pyproject.toml `dependencies` and `requirements.txt` differ?
 
 > A virtual environment gives each project its own package space, and dependency management records which packages at which versions are needed.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -72,6 +66,9 @@ site-packages/             project-a/.venv/site-packages/
                               requests 2.31
                               django 4.2
 ```
+
+![Mental Model](../../../assets/python-package-101/03/03-01-mental-model.en.png)
+*How per-project environments isolate package versions and lock files*
 
 ## Core Concepts
 
@@ -255,7 +252,7 @@ The core of dependency management is **reproducibility**. "It works on my machin
 The next post covers **building packages** — wheel and sdist.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -277,4 +274,4 @@ The next post covers **building packages** — wheel and sdist.
 - [uv - An extremely fast Python package installer](https://github.com/astral-sh/uv)
 - [pip documentation - Requirements Files](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
 
-Tags: Python, venv, pip, uv, Dependencies, Virtual Environment
+Tags: Python, Packaging, PyPI, pyproject.toml

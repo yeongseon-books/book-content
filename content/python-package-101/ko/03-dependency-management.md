@@ -17,13 +17,15 @@ tags:
 - uv
 - Dependencies
 - Virtual Environment
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 가상환경은 프로젝트마다 독립된 패키지 공간을 만드는 것이고, 의존성 관리는 어떤 패키지의 어떤 버전이 필요한지를 기록하는 것입니다.
 ---
 
 # 의존성 관리 — venv, pip, uv, requirements
 
-패키지를 만들었다면 이제 그 패키지가 어떤 환경에서 어떤 버전의 라이브러리와 함께 동작하는지 관리해야 합니다. 같은 코드라도 설치된 패키지 버전이 다르면 전혀 다른 결과가 나올 수 있기 때문입니다. 이 글은 Python Package 101 시리즈의 3번째 글입니다. 여기서는 가상환경이 왜 필요한지, `requirements.txt`와 `pyproject.toml`의 역할이 어떻게 다른지, 그리고 `uv`가 왜 빠르게 표준 도구가 되고 있는지 정리하겠습니다.
+패키지를 만들었다면 이제 그 패키지가 어떤 환경에서 어떤 버전의 라이브러리와 함께 동작하는지 관리해야 합니다. 같은 코드라도 설치된 패키지 버전이 다르면 전혀 다른 결과가 나올 수 있기 때문입니다.
+
+이 글은 Python Package 101 시리즈의 3번째 글입니다. 여기서는 가상환경이 왜 필요한지, `requirements.txt`와 `pyproject.toml`의 역할이 어떻게 다른지, 그리고 `uv`가 왜 빠르게 표준 도구가 되고 있는지 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -61,6 +63,9 @@ site-packages/             project-a/.venv/site-packages/
                               requests 2.31
                               django 4.2
 ```
+
+![멘탈 모델](../../../assets/python-package-101/03/03-01-mental-model.ko.png)
+*프로젝트별 가상환경과 버전 고정 파일이 분리되는 구조*
 
 ## 핵심 개념
 
@@ -266,4 +271,4 @@ dependencies = ["requests>=2.28"]
 - [uv - An extremely fast Python package installer](https://github.com/astral-sh/uv)
 - [pip documentation - Requirements Files](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
 
-Tags: Python, venv, pip, uv, Dependencies, Virtual Environment
+Tags: Python, Packaging, PyPI, pyproject.toml
