@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</h1>
+<p>Once a terminal call works, the next step is building something a user can actually touch. That is where browser state, streaming responses, server routes, and user experience start interacting.</p>
+<p>This is post 3 in the AI Web Development 101 series.</p>
+<p>Here, we will build a browser chatbot and focus on the boundary between client UI state and the server route that talks to the model.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What changes when you move a terminal example into a browser UI?</li>
+<li>Why is the Next.js plus Vercel AI SDK combination a strong beginner path?</li>
+<li>What should <code>/api/chat</code> actually do?</li>
+<li>How does streaming text arrive in the browser?</li>
+<li>Where should system prompts and UI state live?</li>
+</ul>
+<blockquote>
+<p>A web chatbot is not just “an input box plus a model.” It is a two-layer system: the client owns the interaction experience, and the server owns the model call and the response stream.</p>
+</blockquote>
+<h2>Why Next.js and the Vercel AI SDK work well here</h2>
+<p>The first friction point in AI web features is not intelligence. It is perceived latency and state handling. If a long answer appears only after full completion, the UI feels slower than it really is.</p>
+<p>The Vercel AI SDK helps with that in three ways:</p>
+<ul>
+<li>streaming responses arrive incrementally</li>
+<li><code>useChat</code> gives you a structured state layer for messages and request status</li>
+<li>Next.js App Router fits naturally with server routes and client components</li>
+</ul>
+<p><img alt="High-level architecture of the chatbot service" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png"></p>
+<p><em>High-level architecture of the chatbot service</em></p>
+<h2>Initial project setup</h2>
+<pre><code class="language-bash">npx create-next-app@latest my-ai-chatbot --typescript --tailwind --eslint
+cd my-ai-chatbot
+npm install ai @ai-sdk/react @ai-sdk/openai
+</code></pre>
+<p>For local development, keep only an example file in source control.</p>
+<pre><code class="language-text"># .env.local.example
+OPENAI_API_KEY=your_api_key_here
+</code></pre>
+<p>Commit the example file, not the real <code>.env.local</code>.</p>
+<h2>Step 1: build the API route</h2>
+<p><code>app/api/chat/route.ts</code> is the thin server layer between browser messages and the model.</p>
+<pre><code class="language-typescript">import { openai } from &quot;@ai-sdk/openai&quot;;
+import { convertToModelMessages, streamText, type UIMessage } from &quot;ai&quot;;
+
+export const runtime = &quot;edge&quot;;
+export const maxDuration = 30;
+
+export async function POST(req: Request) {
+  const { messages }: { messages: UIMessage[] } = await req.json();
+
+  const result = streamText({
+    model: openai(&quot;gpt-4o-mini&quot;),
+    system: &quot;You are a friendly cooking assistant. Recommend recipes from the user's ingredients.&quot;,
+    messages: convertToModelMessages(messages),
+  });
+
+  return result.toUIMessageStreamResponse();
+}
+</code></pre>
+<p>Read this route in terms of responsibility:</p>
+<ul>
+<li><code>UIMessage[]</code>: browser-side message history</li>
+<li><code>convertToModelMessages(...)</code>: transforms UI messages into model-facing messages</li>
+<li><code>toUIMessageStreamResponse()</code>: converts the model stream into a response the client can consume incrementally</li>
+</ul>
+<p><img alt="Request handling flow inside the API route" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/api-route-handler-flow.en.png"></p>
+<p><em>Request handling flow inside the API route</em></p>
+<p><img alt="How a user message turns into a model response" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chat-message-roundtrip.en.png"></p>
+<p><em>How a user message turns into a model response</em></p>
+<h2>Step 2: build the chat page</h2>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useChat } from &quot;@ai-sdk/react&quot;;
+import { useState } from &quot;react&quot;;
+
+export default function Chat() {
+  const [input, setInput] = useState(&quot;&quot;);
+  const { messages, sendMessage, status } = useChat();
+  const isLoading = status === &quot;submitted&quot; || status === &quot;streaming&quot;;
+
+  return (
+    &lt;div className=&quot;flex flex-col w-full max-w-md py-24 mx-auto stretch&quot;&gt;
+      &lt;div className=&quot;space-y-4&quot;&gt;
+        {messages.map((m) =&gt; (
+          &lt;div key={m.id} className=&quot;whitespace-pre-wrap&quot;&gt;
+            &lt;span className=&quot;font-bold&quot;&gt;
+              {m.role === &quot;user&quot; ? &quot;User: &quot; : &quot;Assistant: &quot;}
+            &lt;/span&gt;
+            {m.parts.map((part, i) =&gt;
+              part.type === &quot;text&quot; ? &lt;span key={i}&gt;{part.text}&lt;/span&gt; : null,
+            )}
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;form
+        onSubmit={(e) =&gt; {
+          e.preventDefault();
+          if (input.trim()) {
+            sendMessage({ text: input });
+            setInput(&quot;&quot;);
+          }
+        }}
+        className=&quot;fixed bottom-0 w-full max-w-md mb-8&quot;
+      &gt;
+        &lt;input
+          className=&quot;w-full p-2 border border-gray-300 rounded shadow-xl text-black&quot;
+          value={input}
+          placeholder=&quot;What ingredients do you have?&quot;
+          onChange={(e) =&gt; setInput(e.target.value)}
+          disabled={isLoading}
+        /&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<p>What matters here:</p>
+<ul>
+<li><code>messages</code> is the conversation state</li>
+<li><code>sendMessage(...)</code> forwards the current input to the server route</li>
+<li><code>status</code> lets the UI avoid duplicate submissions and communicate activity</li>
+<li><code>message.parts</code> keeps the rendering future-proof for non-text response parts</li>
+</ul>
+<p><img alt="State flow inside the useChat hook" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/usechat-state-flow.en.png"></p>
+<p><em>State flow inside the useChat hook</em></p>
+<h2>Step 3: why streaming changes perceived speed</h2>
+<p>With <code>useChat</code> on the client and <code>streamText</code> on the server, you get streaming without building raw SSE wiring yourself. The server emits chunks. The browser appends them as they arrive.</p>
+<p>That matters because users trust a system more when they see progress quickly. A response that starts rendering immediately feels much faster than a response that stays silent for three seconds and then appears all at once.</p>
+<p><img alt="How streaming responses arrive incrementally" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/streaming-response-flow.en.png"></p>
+<p><em>How streaming responses arrive incrementally</em></p>
+<h2>Step 4: use the system prompt as behavior control</h2>
+<p>The <code>system</code> string in the route is not just an introduction. It is closer to a business rule layer for the chatbot.</p>
+<ul>
+<li>expert mode: “You are a senior software engineer focused on reliability and performance.”</li>
+<li>playful mode: “You speak like a Joseon-era scholar reacting to modern technology.”</li>
+</ul>
+<p>Even when the user asks the same question, changing the system prompt can change the experience dramatically.</p>
+<h2>Where the first version usually breaks</h2>
+<p>The first version often fails in predictable ways:</p>
+<ul>
+<li>duplicate submits while a request is already streaming</li>
+<li>missing environment variables in deployment</li>
+<li>route-level errors that never reach the UI clearly</li>
+<li>a system prompt that is too vague to keep the behavior stable</li>
+</ul>
+<p>The important habit is to debug across both layers. A browser chatbot problem is often partly a UI-state problem and partly a server-route problem.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>/api/chat</code> owns the model call and the response stream.</li>
+<li>[ ] <code>useChat</code> manages message state and request status.</li>
+<li>[ ] The input is disabled while a request is still in flight.</li>
+<li>[ ] The system prompt lives in one predictable place.</li>
+</ul>
+<h2>Summary</h2>
+<p>The heart of a browser chatbot is not the model call by itself. It is the connection between client state and a streaming server route.</p>
+<ul>
+<li><code>useChat</code> gives you a practical baseline for messages and loading state.</li>
+<li><code>/api/chat</code> acts as the transformation layer between UI messages and model messages.</li>
+<li>Streaming improves perceived speed and trust.</li>
+<li>System prompts define behavior, not just tone.</li>
+</ul>
+<p>The next chapter moves from chat UI to retrieval, where your app answers from your own documents instead of model memory alone.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
+<li><strong>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (current)</strong></li>
+<li>RAG introduction — answering with your own data (upcoming)</li>
+<li>First steps with AI agents — making the model use tools (upcoming)</li>
+<li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>
+<li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot">Vercel AI SDK docs: Chatbot guide</a></li>
+<li><a href="https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat">Vercel AI SDK docs: useChat</a></li>
+<li><a href="https://nextjs.org/docs/app/building-your-application/routing/route-handlers">Next.js docs: Route Handlers</a></li>
+<li><a href="https://github.com/vercel/ai/tree/main/examples">Vercel AI SDK examples repository</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>
