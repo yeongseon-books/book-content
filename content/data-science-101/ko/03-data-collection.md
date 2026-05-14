@@ -17,7 +17,7 @@ tags:
   - Database
   - Beginner
 seo_description: 파일, API, DB, 로그에서 데이터를 모으는 방법과 출처 기록 원칙을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 데이터 수집
@@ -56,15 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    File["파일 / CSV"] --> Stage["스테이징"]
-    API["API"] --> Stage
-    DB["데이터베이스"] --> Stage
-    Log["이벤트 로그"] --> Stage
-    Stage --> Analysis["분석"]
-```
+![파일, API, 데이터베이스, 로그를 스테이징으로 모아 분석에 연결하는 수집 경로](../../../assets/data-science-101/03/03-01-concept-at-a-glance.ko.png)
 
+*파일, API, 데이터베이스, 로그를 스테이징으로 모아 분석에 연결하는 수집 경로*
 ## 핵심 용어
 
 - **Source of truth**: 데이터의 권위 있는 원본입니다.
@@ -144,6 +138,8 @@ print(meta)
 ```
 
 출처, 시각, 행 수, 해시를 함께 남기면 나중에 같은 데이터였는지 빠르게 확인할 수 있습니다. 해시는 완벽한 메타데이터는 아니지만, 데이터가 바뀌었는지 감지하는 값싼 안전장치로 유용합니다.
+
+**Expected output:** `source`, `fetched_at`, `row_count`, `sha256`가 담긴 provenance 메타데이터 한 건을 출력합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
