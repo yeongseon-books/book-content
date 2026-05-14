@@ -80,19 +80,8 @@
 <p>HTTP is "the agreed shape of a text message", and REST is a style that organizes those agreements around resources.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-text">Request
-GET /users/42 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer ...
-
-Response
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: max-age=60
-
-{&quot;id&quot;: 42, &quot;name&quot;: &quot;...&quot;}
-</code></pre>
+<p><img alt="HTTP request and the TLS layer that turns it into HTTPS" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>HTTP defines the message shape, while HTTPS adds TLS so the same message travels with confidentiality, integrity, and identity checks.</em></p>
 <p>Both requests and responses are "start line + headers + blank line + body".</p>
 <h2>Key Terms</h2>
 <p><strong>Method</strong><br>

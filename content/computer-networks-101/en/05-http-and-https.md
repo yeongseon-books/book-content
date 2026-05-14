@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 5
 title: HTTP and HTTPS
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - REST
   - Headers
 seo_description: HTTP request and response anatomy, methods and status codes, important headers, and what the S in HTTPS actually adds — explained from the wire up.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # HTTP and HTTPS
@@ -51,20 +51,8 @@ HTTP is the common language of essentially every service — backend, frontend, 
 
 ## Concept at a Glance
 
-```text
-Request
-GET /users/42 HTTP/1.1
-Host: api.example.com
-Accept: application/json
-Authorization: Bearer ...
-
-Response
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: max-age=60
-
-{"id": 42, "name": "..."}
-```
+![HTTP request and the TLS layer that turns it into HTTPS](../../../assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)
+*HTTP defines the message shape, while HTTPS adds TLS so the same message travels with confidentiality, integrity, and identity checks.*
 
 Both requests and responses are "start line + headers + blank line + body".
 
