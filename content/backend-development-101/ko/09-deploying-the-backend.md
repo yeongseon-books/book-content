@@ -17,12 +17,14 @@ tags:
   - DevOps
   - Python
 seo_description: Docker와 healthcheck로 백엔드를 안전하게 배포하는 기본기입니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 백엔드 배포
 
-이 글은 Backend Development 101 시리즈의 아홉 번째 글입니다. 로컬에서는 잘 되던 애플리케이션이 운영에서 깨지는 이유는 코드만의 문제가 아니라 환경 차이 때문인 경우가 많습니다. 여기서는 Docker, 환경 변수, healthcheck, rolling update를 중심으로 배포를 재현성의 문제로 이해해 보겠습니다.
+로컬에서는 잘 되던 애플리케이션이 운영에서 깨지는 이유는 코드만의 문제가 아니라 환경 차이 때문인 경우가 많습니다. 같은 코드를 어디서나 같은 방식으로 실행할 수 없다면, 배포는 언제나 사람 기억과 현장 판단에 의존하게 됩니다.
+
+이 글은 Backend Development 101 시리즈의 아홉 번째 글입니다. 여기서는 Docker, 환경 변수, healthcheck, rolling update를 중심으로 배포를 재현성의 문제로 이해해 보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,16 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["Source"] --> Build["Build"]
-    Build --> Image["Container image"]
-    Image --> Reg["Registry"]
-    Reg --> Run["Runner"]
-    Run --> LB["Load balancer"]
-    LB --> Users["Users"]
-```
+![소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름](../../../assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
 
+*소스 코드가 컨테이너 이미지와 실행 환경을 거쳐 사용자에게 전달되는 배포 흐름*
 코드는 이미지가 되고, 이미지는 어디에서나 같은 방식으로 실행되어야 합니다. 이 재현성이 있어야 운영 문제를 환경 탓으로만 돌리지 않을 수 있습니다.
 
 ## 핵심 용어
@@ -154,7 +149,17 @@ healthcheck:
 # 4) remove the old version
 ```
 
-핵심은 새 버전이 건강하다는 사실을 증명한 뒤 트래픽을 옮기는 것입니다. 무중단 배포는 마법이 아니라, 검증과 점진적 전환의 조합입니다.
+새 버전이 실제로 준비됐는지 먼저 확인하고, 통과한 뒤에만 트래픽을 옮겨야 합니다. 무중단 배포는 마법이 아니라, 검증과 점진적 전환을 순서대로 밟는 운영 절차입니다.
+
+## 검증 포인트
+
+**Expected output:** `docker build`가 같은 Dockerfile에서 같은 이미지를 만들고, `/healthz`는 `{"status": "ok"}`를 반환하며, 새 버전은 healthcheck를 통과한 뒤에만 트래픽을 받아야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- 컨테이너가 바로 종료되면 `CMD` 경로와 포트 바인딩부터 확인합니다.
+- 이미지마다 동작이 다르면 secret이나 설정이 이미지 안에 고정된 경우가 많습니다.
+- rollout 중 오류가 커지면 healthcheck 통과 전에 트래픽을 붙이고 있지 않은지 먼저 봅니다.
 
 ## 이 코드에서 먼저 볼 점
 
@@ -219,9 +224,14 @@ healthcheck:
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Docker get-started](https://docs.docker.com/get-started/)
-- [The Twelve-Factor App](https://12factor.net/)
 - [Kubernetes probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 - [GitHub Actions for Python](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python)
+
+### 추가 읽을거리
+
+- [The Twelve-Factor App](https://12factor.net/)
 
 Tags: Backend, Deployment, Docker, DevOps, Python
