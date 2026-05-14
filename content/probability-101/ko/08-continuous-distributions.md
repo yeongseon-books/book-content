@@ -17,7 +17,7 @@ tags:
   - Exponential
   - Beginner
 seo_description: 정규분포와 지수분포 등 연속 확률 분포 특징을 이해하고, 데이터 비교에 필수적인 표준화 과정의 의의를 고찰합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 연속분포
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    U["Uniform(a,b)"] --> N["Normal(mu, sigma)"]
-    N --> Std["Standardize Z = (X-mu)/sigma"]
-    E["Exponential(lambda)"] --> G["Gamma(k, theta)"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/08/08-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
