@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Incremental indexing is less a vector-store trick and more an operational
   memory problem.
 ---
@@ -210,6 +210,14 @@ Past a certain scale, knowing which run produced which index version becomes as 
 
 ## References
 
-- https://docs.python.org/3/library/hashlib.html
+### Official docs
+
+- [Python hashlib documentation](https://docs.python.org/3/library/hashlib.html)
+- [Python json documentation](https://docs.python.org/3/library/json.html)
+
+### Verification-friendly sources
+
+- [Python pathlib documentation](https://docs.python.org/3/library/pathlib.html)
+- [Python datetime documentation](https://docs.python.org/3/library/datetime.html)
 
 Tags: RAG, Document Processing, LangChain, Python

@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 증분 인덱싱은 벡터 저장소 기법이라기보다 무엇이 바뀌었는지 기억하는 운영 문제입니다.
 ---
 
@@ -217,6 +217,14 @@ python main.py
 
 ## 참고 자료
 
-- https://docs.python.org/3/library/hashlib.html
+### 공식 문서
+
+- [Python hashlib documentation](https://docs.python.org/3/library/hashlib.html)
+- [Python json documentation](https://docs.python.org/3/library/json.html)
+
+### 검증에 도움 되는 자료
+
+- [Python pathlib documentation](https://docs.python.org/3/library/pathlib.html)
+- [Python datetime documentation](https://docs.python.org/3/library/datetime.html)
 
 Tags: RAG, Document Processing, LangChain, Python
