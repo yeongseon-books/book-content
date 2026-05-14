@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 5
 title: Ingress
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - TLS
   - DevOps
 seo_description: A beginner guide to Kubernetes Ingress — host and path routing, TLS termination, and how to choose an Ingress Controller
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Ingress
 
-> Kubernetes 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you split *several services* under *one domain* by *path*?
-
-> *Ingress* consolidates *L7 HTTP routing* and *TLS termination* into a *single entry point*.
-
-<!-- a-grade-intro:end -->
+Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.
 
 This is post 5 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will separate the declarative Ingress rule from the controller that enforces it, then use that split to reason about host routing, path routing, and TLS termination.
+
+> Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.
+
+## Questions this chapter answers
 
 - Splitting *Ingress* and *IngressController*
 - *Host / path* routing
@@ -48,13 +44,9 @@ A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["client"] --> LB["external lb"]
-    LB --> IC["ingress controller"]
-    IC --> S1["svc a"]
-    IC --> S2["svc b"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
+*Ingress keeps one external entry point while the controller fans HTTP traffic out to multiple Services by host and path.*
+
 
 ## Key Terms
 
@@ -136,6 +128,22 @@ def curl(host, path):
     return res.stdout
 ```
 
+## Verification workflow
+
+```bash
+kubectl get ingress web
+kubectl describe ingress web
+curl -sk -H 'Host: example.com' https://<ingress-address>/api
+```
+
+**Expected output:** `get ingress` should show an address or controller-managed endpoint, `describe ingress` should list the expected host/path/backend mapping, and the `curl` response should prove that `/api` reaches a different backend than the site root.
+
+**Failure modes to check first:**
+
+- An address-less Ingress usually means the controller path is broken, not the rule object itself.
+- TLS handshake failures often come from the secret namespace or secret name before they come from certificate content.
+- If `/` works and `/api` does not, inspect path precedence and `pathType` interpretation first.
+
 ## What to Notice in This Code
 
 - *Ingress* is the *rule*; the *Controller* is the *executor*.
@@ -198,5 +206,6 @@ With routing in place, the next step is *separating config and secrets*. The nex
 - [Ingress Controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
 - [cert-manager](https://cert-manager.io/docs/)
 - [Gateway API](https://gateway-api.sigs.k8s.io/)
+- [Set up Ingress on Minikube](https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/)
 
 Tags: Kubernetes, Ingress, HTTP, TLS, DevOps
