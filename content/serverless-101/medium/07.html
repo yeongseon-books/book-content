@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Queue and Event-driven Architecture</h1>
+<p>As systems grow, what gets heavy first is often not the code but the connections between services. A synchronous chain can look simple on a quiet day and turn brittle as soon as one dependency slows down or fails.</p>
+<p>Queues and event buses help because they separate responsibilities in both time and failure scope. In a serverless system, that separation is often what keeps a short function from turning into a long, fragile request path.</p>
 <p>This is post 7 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: how do you connect <em>services</em> without <em>direct calls</em>?</p>
-<blockquote>
-<p><em>Queues</em> and <em>event buses</em> <em>decouple</em> <em>producers</em> and <em>consumers</em> across <em>time and space</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the meaning of <em>decoupling</em></li>
@@ -75,13 +66,12 @@
 <li><em>retries/DLQ</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>A <em>synchronous call chain</em> fails <em>whole</em> when <em>one node</em> fails. <em>Async messaging</em> provides <em>resilience</em>.</p>
+<p>When an order API directly calls payment, email, analytics, and inventory in sequence, one slow dependency stretches the whole response path. In a serverless environment, that also means more timeout risk, wider failure blast radius, and less flexibility about retries.</p>
+<p>Async messaging changes that shape. It lets producers publish facts and lets consumers move at their own speed, with their own retry policy and their own failure handling.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Producer[&quot;producer&quot;] --&gt; Queue[&quot;queue / topic&quot;]
-    Queue --&gt; C1[&quot;consumer A&quot;]
-    Queue --&gt; C2[&quot;consumer B&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Queues and topics decouple producers from consumers across both time and failure boundaries.</em><br>
+The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>queue</strong>: <em>1:1</em> or <em>competing consumers</em>.</li>
@@ -165,6 +155,7 @@ def mail(event): print(&quot;mail&quot;, event)
 <li>In one line, the <em>role</em> of a <em>FIFO key</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>Event-driven design is valuable because it separates time, responsibility, and failure handling. The best result is not “more messaging.” It is a system where independent work can stay independent under load and under failure.</p>
 <p>Next, we cover <em>Observability</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
@@ -179,11 +170,17 @@ def mail(event): print(&quot;mail&quot;, event)
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">SQS</a></li>
-<li><a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">SNS</a></li>
-<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html">EventBridge</a></li>
-<li><a href="https://martinfowler.com/articles/201701-event-driven.html">Event-driven architecture</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">Amazon SQS developer guide</a></li>
+<li><a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html">Amazon SNS developer guide</a></li>
+<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html">Amazon EventBridge overview</a></li>
+</ul>
+<p><strong>Patterns and Related Reading</strong></p>
+<ul>
+<li><a href="https://martinfowler.com/articles/201701-event-driven.html">Event-driven architecture (Martin Fowler)</a></li>
+<li><a href="https://serverlessland.com/patterns">Serverless patterns collection</a></li>
+<li><a href="https://github.com/aws-samples/serverless-patterns">AWS serverless samples (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Queue, EventDriven, PubSub, Cloud</p>
 </body>
