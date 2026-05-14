@@ -17,7 +17,8 @@ tags:
   - Teamwork
   - Beginner
 seo_description: 프로젝트 과목의 목적, 팀 구성, 기획, 산출물, 발표까지 전체 흐름을 정리한 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 프로젝트 과목
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    P[Plan] --> D[Design]
-    D --> I[Implement]
-    I --> T[Test]
-    T --> S[Show]
-```
+![프로젝트 진행 흐름](../../../assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
+
+*계획부터 설계, 구현, 테스트, 시연으로 이어지는 프로젝트 흐름*
 
 > 프로젝트 과목은 지식을 묻는 수업이 아니라, 제한된 시간 안에 작은 제품을 완성하는 수업에 가깝습니다.
 

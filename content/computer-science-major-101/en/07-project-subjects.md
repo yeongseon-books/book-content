@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 7
 title: Project Subjects
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - Teamwork
   - Beginner
 seo_description: A beginner-friendly tour of CS project courses covering planning, teams, scope, deliverables, and demos.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Project Subjects
@@ -48,13 +49,9 @@ The *start* of your *portfolio* is often a *major project*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Plan] --> D[Design]
-    D --> I[Implement]
-    I --> T[Test]
-    T --> S[Show]
-```
+![Project delivery flow](../../../assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
+
+*How a project moves from planning to demo*
 
 ## Key Terms
 
