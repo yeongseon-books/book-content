@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -377,7 +377,18 @@ The earlier posts focused on response shape and execution flow. Caching adds a n
 
 ## References
 
-- <https://console.groq.com/docs/text-chat>
-- <https://docs.python.org/3/library/hashlib.html>
+### Official Docs
+
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [Python hashlib documentation](https://docs.python.org/3/library/hashlib.html)
+
+### Verification-Friendly References
+
+- [Python json.dumps documentation](https://docs.python.org/3/library/json.html#json.dumps)
+
+### Related Series
+
+- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
+- [Retry and error handling — making API calls reliable](./05-retry-and-error-handling.md)
 
 Tags: LLM, OpenAI, Streaming, Python
