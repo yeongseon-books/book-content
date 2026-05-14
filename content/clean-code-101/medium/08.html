@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Testable Code</h1>
-<blockquote>
-<p>Clean Code 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is some code one line to test while other code resists testing entirely?</p>
-<blockquote>
-<p>The way side effects and dependencies are handled decides it. Separate them and tests fall out naturally.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Some code takes one line to test and some code fights back with clocks, networks, databases, and hidden globals. That difference is usually a design decision, not a testing-library problem.</p>
+<p>This is post 8 in the Clean Code 101 series.</p>
+<p>Here we will push time, IO, and randomness to the boundaries, then use seams, fakes, and adapters to make tests fast enough that they can guide everyday refactoring.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Separating pure logic from side effects</li>
@@ -79,12 +72,8 @@
 <p>Testability is not an outcome. It is a result of design.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    L[&quot;Logic&quot;] --&gt; P[&quot;Pure functions&quot;]
-    L --&gt; S[&quot;Side-effect adapters&quot;]
-    P --&gt; T1[&quot;Unit tests&quot;]
-    S --&gt; T2[&quot;Integration tests&quot;]
-</code></pre>
+<p><img alt="Testable Code" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Testability flow: separate pure logic from IO boundaries so unit tests and integration tests each get the right job.</em></p>
 <p>A pure core surrounded by thin adapters.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -157,6 +146,20 @@ def fetch_user(uid, http: HttpClient):
     return http.get(f&quot;/users/{uid}&quot;).json()
 </code></pre>
 <p>Concentrate external calls in a single adapter.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">python -m pytest -q tests/test_total.py tests/test_notify.py
+python -m pytest -q tests/test_http_adapter.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Pure-function tests should finish almost instantly.</li>
+<li>Only adapter tests should cross real IO boundaries.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li><code>datetime.now()</code> or randomness still lives inside core logic.</li>
+<li>Mock count rises but the function responsibilities stay oversized.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The core logic knows nothing about IO.</li>
@@ -215,6 +218,8 @@ def fetch_user(uid, http: HttpClient):
 <li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
 <li><a href="https://martinfowler.com/articles/mocksArentStubs.html">Mocks Aren't Stubs (Martin Fowler)</a></li>
 <li><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html">Pytest — Fixtures</a></li>
+<li><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html">Pytest fixtures</a></li>
+<li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal architecture</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, Testability, Testing, DependencyInjection, Refactoring</p>
 </body>
