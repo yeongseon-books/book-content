@@ -15,6 +15,7 @@ check-content:
 	python3 scripts/check_status_sync.py
 	python3 scripts/check_local_paths.py
 	python3 scripts/check_image_language.py
+	python3 scripts/check_target_language_alignment.py
 	python3 scripts/lint_captions.py
 	python3 scripts/check_article_structure.py
 
