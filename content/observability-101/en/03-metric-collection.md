@@ -2,7 +2,7 @@
 series: observability-101
 episode: 3
 title: Collecting and Visualizing Metrics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Grafana
   - Monitoring
 seo_description: Build your first metric pipeline with the Prometheus pull model, exporters, and Grafana dashboards from one Python service.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Collecting and Visualizing Metrics
 
+It is easy to say metrics matter and still have no reliable path from application code to a graph an engineer can trust. A number in memory is not observability yet. Someone has to expose it, scrape it, store it, and query it correctly.
+
+Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.
+
 This is post 3 in the Observability 101 series.
-
-> Observability 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How are metrics *collected*, and how do they *become a graph*?
-
-> *Prometheus *pulls* exporters; Grafana *draws* what Prometheus stored.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,12 +44,8 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["app + /metrics"] --> Prom["Prometheus (pull)"]
-    Prom --> TSDB["time-series DB"]
-    TSDB --> Graf["Grafana"]
-```
+![Concept at a Glance](../../../assets/observability-101/03/03-01-concept-at-a-glance.en.png)
+*The first metric pipeline: the app exposes metrics, Prometheus scrapes them, and Grafana turns stored time series into questions.*
 
 ## Key Terms
 
@@ -118,6 +108,25 @@ docker run -d --name graf -p 3000:3000 grafana/grafana
 # Browser: http://localhost:3000
 # Datasource: Prometheus → http://prom:9090
 # Panel: rate(http_requests_total[1m])
+```
+
+## How to Verify the Pipeline End to End
+
+The pipeline fails more often at the seams than in the code itself, so verify each hop explicitly.
+
+```bash
+# 1) The application exposes metrics
+curl -s http://localhost:8000/metrics | grep http_requests_total
+
+# 2) Prometheus sees the target as healthy
+curl -s http://localhost:9090/api/v1/targets | grep '"health":"up"'
+```
+
+```text
+Expected output:
+- `/metrics` contains `http_requests_total`.
+- The Prometheus target shows `up`.
+- Grafana renders a non-zero `rate(http_requests_total[1m])` line.
 ```
 
 ## What to Notice in This Code

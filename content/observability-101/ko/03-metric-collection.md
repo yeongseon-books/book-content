@@ -17,7 +17,7 @@ tags:
   - Grafana
   - Monitoring
 seo_description: Prometheus pull 모델, PromQL, Grafana까지 메트릭 파이프라인의 첫 구성을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 메트릭 수집과 시각화
@@ -46,12 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    App["애플리케이션 + /metrics"] --> Prom["Prometheus 수집"]
-    Prom --> TSDB["시계열 저장소"]
-    TSDB --> Graf["Grafana"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/03/03-01-concept-at-a-glance.ko.png)
+*애플리케이션이 메트릭을 노출하고 Prometheus가 수집한 뒤 Grafana가 질문 형태의 그래프로 바꾸는 흐름*
 
 ## 핵심 용어
 
@@ -125,6 +121,25 @@ docker run -d --name graf -p 3000:3000 grafana/grafana
 ```
 
 대시보드는 숫자를 꾸미는 화면이 아니라 질문을 붙이는 화면입니다. 첫 패널은 "지금 요청이 얼마나 들어오는가"처럼 하나의 질문만 정확히 답하게 두는 편이 좋습니다.
+
+## 수집 경로를 이렇게 검증합니다
+
+메트릭 파이프라인은 코드가 아니라 경로가 끊겨도 바로 무용지물이 됩니다. 그래서 애플리케이션, 수집기, 대시보드를 각각 한 번씩 확인하는 절차가 필요합니다.
+
+```bash
+# 1) 애플리케이션이 메트릭을 노출하는지 확인
+curl -s http://localhost:8000/metrics | grep http_requests_total
+
+# 2) Prometheus 타깃이 살아 있는지 확인
+curl -s http://localhost:9090/api/v1/targets | grep '"health":"up"'
+```
+
+```text
+Expected output:
+- /metrics 응답에 http_requests_total 이 보입니다.
+- Prometheus /targets 에서 app 타깃이 up 으로 보입니다.
+- Grafana 패널에서 rate(http_requests_total[1m]) 값이 0이 아닌 선으로 그려집니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 
