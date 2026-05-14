@@ -17,22 +17,16 @@ tags:
   - Schedule
   - CICD
 seo_description: From push and PR to schedule and workflow_dispatch. Take precise control of when your workflows run.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Understanding Triggers
 
-> GitHub Actions 101 series (3/10)
+As automation grows, a new kind of waste appears. Why did a docs-only edit trigger a full build? Why did three quick pushes to the same PR queue three identical runs? Why did the nightly job fire at the wrong local time even though the cron expression looked correct?
 
-<!-- a-grade-intro:begin -->
+Trigger design is where GitHub Actions stops being just syntax and becomes policy. The practical question is not only when a workflow should run, but when it should stay silent so cost, queue time, and alert noise remain under control.
 
-**Core question**: How do you build a *nightly job* that runs *automatically at 2 AM on weekends*?
-
-> *When* a workflow runs matters as much as *why* it runs.
-
-<!-- a-grade-intro:end -->
-
-This is post 3 in the GitHub Actions 101 series.
+This is post 3 in the GitHub Actions 101 series. In this post, we will use `push`, `pull_request`, `schedule`, `workflow_dispatch`, path filters, and `concurrency` to make workflows run at the right moment and only at the right moment.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Trigger design dictates your *cost and noise*. Running *every workflow on every 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Push["push"] --> WF["workflow"]
-    PR["pull_request"] --> WF
-    Cron["schedule"] --> WF
-    Manual["workflow_dispatch"] --> WF
-```
+![A workflow triggered by push, pull_request, schedule, and workflow_dispatch events](../../../assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)
+
+*A workflow triggered by push, pull_request, schedule, and workflow_dispatch events*
 
 ## Key Terms
 
