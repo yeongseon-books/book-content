@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Interfaces and Abstraction</h1>
+<p>Interface design usually breaks long before the implementation does. You can see it the moment the caller needs to know too much about channels, protocols, or internal branching.</p>
 <p>This is post 5 in the Software Design 101 series.</p>
+<p>In this post, we treat interfaces as contracts written in the caller's language. The focus is on abstraction level, polymorphism, and the signals that tell you when a contract is leaking implementation detail.</p>
 <blockquote>
-<p>Software Design 101 series (5/10)</p>
+<p>A good interface speaks in user intent and stays stable while implementations change underneath.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What makes one interface clearly better than another?</p>
-<blockquote>
-<p>It speaks the caller's intent and survives even when the implementation changes underneath.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The role of an interface</li>
@@ -80,11 +74,8 @@
 <p>Write interfaces in the user's language, not the implementer's.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    C[&quot;Caller&quot;] --&gt; I[&quot;Interface&quot;]
-    I --&gt; A[&quot;Impl A&quot;]
-    I --&gt; B[&quot;Impl B&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>A good interface lets callers depend on one contract while multiple implementations sit behind it</em></p>
 <p>The caller knows one shape; multiple implementations sit behind it.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -148,6 +139,21 @@ class Writer:
 # Better than one giant IO interface.
 </code></pre>
 <p>Do not force a read-only caller to depend on writes.</p>
+<h2>Quick Verification</h2>
+<p>The fastest way to inspect an interface is to read only the method names and parameters. If the caller's intent is still obvious with the implementation stripped away, the abstraction level is probably right.</p>
+<pre><code class="language-python">class Notifier:
+    def send(self, user, msg): ...
+</code></pre>
+<p><strong>Expected output:</strong> the name alone should tell you what the caller wants, and swapping implementations should not force caller rewrites.</p>
+<p>Then pick one subtype and verify that it really honors the contract. The moment it starts throwing <code>NotImplementedError</code>, the interface itself is suspect.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>Method names are full of implementation terms</strong><br>
+- First check: Check whether the interface is speaking in the implementer's language</p>
+<p><strong>Parameter lists keep growing</strong><br>
+- First check: Check whether the interface is carrying too many responsibilities</p>
+<p><strong>A subtype escapes through exceptions</strong><br>
+- First check: Redesign the supertype contract itself</p>
+<p>A strong interface is less about hiding implementation and more about expressing caller intent in a short, stable shape.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The interface name reads in the caller's vocabulary.</li>
@@ -206,6 +212,11 @@ class Writer:
 <li><a href="https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/isp.pdf">Interface Segregation Principle</a></li>
 <li><a href="https://www.youtube.com/watch?v=heh4OeB9A-c">Joshua Bloch — How to Design a Good API</a></li>
 <li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Abstractions</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">typing.Protocol</a></li>
+<li><a href="https://docs.python.org/3/library/abc.html">abc — Abstract Base Classes</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, Interfaces, Abstraction, LSP, Polymorphism</p>
 </body>
