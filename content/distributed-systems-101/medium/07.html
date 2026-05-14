@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Leader Election</h1>
+<p>The dangerous moment in leader election is not the happy path where one node wins. It is the messy moment where the old leader wakes up late, still thinks it owns the world, and tries to write after a new leader has already taken over.</p>
 <p>This is post 7 in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What happens when a leader you thought was dead comes back to life?</p>
-<blockquote>
-<p>Leader election is not just about deciding "who is the leader" — it is about safely cutting off the influence of the previous one.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Why leader election is needed and what its safety conditions are</li>
 <li>The roles of lease and heartbeat</li>
@@ -80,12 +71,8 @@
 <p>A good election is the promise that "there is no moment with two leaders."</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    C1[&quot;candidate 1&quot;] --&gt;|request lease| L[&quot;lock service (etcd)&quot;]
-    C2[&quot;candidate 2&quot;] --&gt;|request lease| L
-    L --&gt;|grant lease| C1
-    C1 --&gt;|heartbeat| L
-</code></pre>
+<p><img alt="Lease-based leader election and heartbeat renewal" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Lease-based leader election and heartbeat renewal</em></p>
 <p>Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -150,6 +137,17 @@ def write(token, data):
 # B's write with token=6 succeeds
 </code></pre>
 <p>In a design without tokens, A's write would land and corrupt the data.</p>
+<h2>Operational walkthrough: lease expiry under a GC pause</h2>
+<p>The failure mode worth rehearsing is not "a node cleanly dies" but "a node stalls long enough to miss renewals." A practical sequence looks like this:</p>
+<ol>
+<li>Leader A acquires lease <code>ttl=5s</code> and gets fencing token <code>41</code>.</li>
+<li>A long GC pause or CPU starvation freezes A for 8 seconds.</li>
+<li>The lock service sees no heartbeat, expires the lease, and elects leader B.</li>
+<li>B receives fencing token <code>42</code> and starts handling writes.</li>
+<li>A wakes up and tries to write with token <code>41</code>.</li>
+<li>The resource server rejects A because <code>41 &lt; 42</code>.</li>
+</ol>
+<p>That last comparison is the real safety boundary. The lease service decides who may lead, but the resource server decides which writes are still legal. If you only log leadership changes and never validate tokens at the write target, you have observability but not protection.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A lease expires automatically — it handles network partitions naturally.</li>
@@ -209,6 +207,7 @@ def write(token, data):
 <li><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">How to do distributed locking — Martin Kleppmann</a></li>
 <li><a href="https://etcd.io/docs/v3.5/learning/lock/">etcd lease and leader election</a></li>
 <li><a href="https://pkg.go.dev/k8s.io/client-go/tools/leaderelection">Kubernetes leader election library</a></li>
+<li><a href="https://zookeeper.apache.org/doc/current/recipes.html#sc_leaderElection">ZooKeeper recipes and solutions — Leader Election</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Distributed Systems, LeaderElection, Lease, Coordination, Liveness</p>
 </body>
