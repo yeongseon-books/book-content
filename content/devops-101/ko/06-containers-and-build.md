@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["app code"] --> Build["docker build"]
-    Build --> Image["image (immutable)"]
-    Image --> Registry["registry push"]
-    Registry --> Run["docker run / k8s"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/06/06-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 코드가 이미지가 되고, 이미지는 레지스트리에 올라가고, 운영 환경은 그 이미지를 가져다 실행합니다. 이 흐름이 명확할수록 배포는 더 단순해지고 롤백도 쉬워집니다.
 
