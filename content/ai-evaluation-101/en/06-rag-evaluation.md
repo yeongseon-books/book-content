@@ -14,18 +14,25 @@ tags:
 - RAG
 - Faithfulness
 - Retrieval
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: RAG requires evaluating both retrieval and generation stages. This
   post covers RAG-specific metrics like retrieval recall, context precision…
 ---
 
 # Evaluating RAG Systems
 
-> AI Evaluation 101 Series (6/10)
-
 RAG requires evaluating both retrieval and generation stages.
 
 This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
+
+## Questions this chapter answers
+
+- Why does a single end-to-end accuracy number hide the real RAG failure point?
+- What do recall and precision tell you specifically about retrieval quality?
+- Why is faithfulness the highest-priority production metric for most RAG systems?
+- How do the four core metrics combine into a concrete diagnosis?
+
+> Mental model: treat RAG as a two-stage pipeline under test. Retrieval decides what evidence is available; generation decides whether the model actually stays faithful to that evidence.
 
 ---
 ![Evaluating RAG systems](../../../assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
@@ -321,6 +328,14 @@ The next post moves from single responses to evaluating **agent trajectories**.
 
 ---
 
+## Operational checklist
+
+- [ ] Measure retrieval and generation separately instead of relying on one answer score.
+- [ ] Treat low faithfulness as a production-severity issue, not a cosmetic quality drop.
+- [ ] Tune top-K only while watching both context precision and answer quality.
+- [ ] Keep reference answers in the eval set so recall remains measurable.
+- [ ] Use the four-metric diagnosis table to decide which subsystem to change first.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -338,9 +353,14 @@ The next post moves from single responses to evaluating **agent trajectories**.
 
 ## References
 
+### Official docs
+
+- [RAGAS documentation](https://docs.ragas.io/)
+- [TruLens — RAG Triad and evaluation docs](https://www.trulens.org/getting_started/core_concepts/rag_triad/)
+- [LangSmith — Evaluate a RAG application](https://docs.smith.langchain.com/evaluation/tutorials/rag)
+
+### Papers and background
+
 - [RAGAS — Reference-Free Evaluation of RAG Pipelines (Es et al., 2023)](https://arxiv.org/abs/2309.15217)
-- [RAGAS Documentation](https://docs.ragas.io/)
-- [TruLens — Evaluation and Tracking for LLM Apps](https://www.trulens.org/)
-- [LangChain — RAG Evaluation Guide](https://docs.smith.langchain.com/evaluation/tutorials/rag)
 
 Tags: AI Evaluation, RAG, Faithfulness, Retrieval

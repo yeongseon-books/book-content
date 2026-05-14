@@ -14,18 +14,25 @@ tags:
 - Agent
 - Trajectory
 - Tool Use
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Agents reach answers through multiple steps. You need to evaluate
   not just the final response but 'which tools, in what order, how many times.' This…
 ---
 
 # Evaluating Agents — Trajectories, Not Single Responses
 
-> AI Evaluation 101 Series (7/10)
-
 Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'
 
 This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
+
+## Questions this chapter answers
+
+- Why is a correct final answer still not enough evidence that an agent is production-ready?
+- How should end-to-end success and step-level analysis complement each other?
+- What do tool confusion, step overhead, and recovery metrics reveal that answer quality misses?
+- How do you turn agent traces into an evaluation dashboard instead of anecdotal debugging?
+
+> Mental model: the agent answer is only the visible tip. The actual product quality lives in the trajectory—tool choice, argument quality, recovery behavior, latency, and cost.
 
 ---
 ![Evaluating agents - Trajectories, not single responses](../../../assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
@@ -268,6 +275,14 @@ The next post integrates evaluation into **CI** so regressions are blocked autom
 
 ---
 
+## Operational checklist
+
+- [ ] Track task success and trajectory metrics together, not as separate projects.
+- [ ] Measure tool confusion so prompt and tool-schema fixes are evidence-based.
+- [ ] Watch step overhead, token cost, and latency on the same dashboard as success rate.
+- [ ] Inject failures deliberately to confirm the agent retries or finds an alternative path.
+- [ ] Allow multiple valid trajectories when the task can be solved in different orders.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -285,9 +300,15 @@ The next post integrates evaluation into **CI** so regressions are blocked autom
 
 ## References
 
-- [Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
-- [LangSmith — Agent Evaluation Patterns](https://docs.smith.langchain.com/evaluation/tutorials/agents)
-- [AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)](https://arxiv.org/abs/2308.03688)
+### Official docs
+
+- [LangSmith — Agent evaluation tutorial](https://docs.smith.langchain.com/evaluation/tutorials/agents)
+- [OpenAI — Built-in tools guide](https://platform.openai.com/docs/guides/tools)
 - [scikit-learn — classification_report](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html)
+
+### Papers and background
+
+- [Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
+- [AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)](https://arxiv.org/abs/2308.03688)
 
 Tags: AI Evaluation, Agent, Trajectory, Tool Use
