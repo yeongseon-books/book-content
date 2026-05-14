@@ -14,9 +14,8 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: Trace how kubelet, CRI, containerd, and runc start a Pod on an AKS node and learn where image pull, sandbox, and runtime failures split apart.
 ---
 
 # kubelet and containerd — how a container actually starts on a node
