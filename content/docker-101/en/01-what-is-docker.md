@@ -2,7 +2,7 @@
 series: docker-101
 episode: 1
 title: What Is Docker?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,17 @@ tags:
   - Linux
   - Virtualization
 seo_description: Containers vs virtual machines and what Docker actually does, in a five-minute introduction with a runnable first container.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Docker?
 
-This is the first post in the Docker 101 series.
+Docker usually gets introduced as a convenience tool for developers. That framing is not wrong, but it is too small. What teams actually buy with Docker is reproducibility: the ability to move one runnable artifact across a laptop, CI, staging, and production without rewriting the environment story each time.
 
-> Docker 101 series (1/10)
+When that reproducibility is missing, debugging turns vague very quickly. You stop asking whether the code is wrong and start asking whether Python, OpenSSL, libc, or a forgotten package version changed under your feet. Docker is valuable because it makes that ambiguity much smaller.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does Docker do to *eliminate* "*it works on my machine*"?
-
-> *Docker bundles your *application + dependencies + runtime* into *one unit* so it runs *the same everywhere*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+This is the first post in the Docker 101 series. It sets the mental model for the rest of the series by clarifying what Docker is, how containers differ from virtual machines, and what you should verify when you run your first container.
+## What you will learn
 
 - The difference between *containers* and *virtual machines*
 - The *environment-drift* problem Docker solves
@@ -50,12 +43,9 @@ This is the first post in the Docker 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["my code"] --> Image["Docker image"]
-    Image --> Container["container run"]
-    Container --> Anywhere["local / CI / server"]
-```
+![Code and dependencies bundled into one image that runs the same container across laptop, CI, and server](../../../assets/docker-101/01/01-01-concept-at-a-glance.en.png)
+
+*One image packages code and dependencies so the same container can run across local development, CI, and servers*
 
 ## Key Terms
 
@@ -108,6 +98,16 @@ docker stop web && docker rm web
 docker pull redis:7-alpine
 docker images
 ```
+
+### Verify right after you run it
+
+- After `docker run hello-world`, Docker should print the standard success message explaining that it pulled the image and ran the test container.
+- `curl http://localhost:8080` should return the default nginx page. If the connection is refused, start with the port mapping.
+
+### If it does not work, check this first
+
+- Confirm that Docker Desktop or the Docker daemon is actually running; installation alone is not enough.
+- If the container is running but unreachable, verify that `-p 8080:80` maps host port to container port in the intended order.
 
 ## What to Notice in This Code
 
@@ -167,9 +167,15 @@ Docker is the fastest way to kill *environment drift*. Next we look deeper into 
 
 ## References
 
+### Official docs
+
 - [Docker overview](https://docs.docker.com/get-started/overview/)
 - [Get Docker](https://docs.docker.com/get-docker/)
 - [Docker Hub](https://hub.docker.com/)
 - [What is a container?](https://www.docker.com/resources/what-container/)
+
+### Verification and troubleshooting
+
+- [docker run reference](https://docs.docker.com/engine/reference/run/)
 
 Tags: Docker, Container, DevOps, Linux, Virtualization
