@@ -14,9 +14,8 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: Separate HPA from Cluster Autoscaler in AKS and see why Pending Pods, race windows, and slow scale-down are normal parts of the design.
 ---
 
 # HPA and Cluster Autoscaler internals — two control loops
