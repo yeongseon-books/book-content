@@ -89,6 +89,9 @@
   |  /  |                  C: [A, B]
   C --- D                  D: [B]
 </code></pre>
+<h2>Graph Representation at a Glance</h2>
+<p><img alt="Graph Representation at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png"></p>
+<p><em>The same relationship data shown as an undirected graph and as an adjacency list view</em></p>
 <h2>Key Concepts</h2>
 <p><strong>vertex</strong><br>
 - Description: A node in the graph</p>
@@ -272,6 +275,8 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 <li>BFS guarantees shortest paths in unweighted graphs</li>
 <li>Dijkstra finds shortest paths in weighted graphs using a heap</li>
 </ul>
+<p>In production, representation choice is often a memory decision before it becomes an algorithm decision. An adjacency matrix gives constant-time edge checks, but it burns O(V^2) space even when the graph has very few edges. Adjacency lists scale far better for sparse graphs, but frequent edge-existence checks can still add noticeable traversal cost.</p>
+<p>Failure modes matter too. BFS can explode memory on wide graphs because the frontier grows level by level. Recursive DFS can blow the call stack on deep graphs. And Dijkstra quietly becomes the wrong tool the moment negative edges enter the model. A good graph design starts by naming those constraints, not just by picking BFS or DFS from habit.</p>
 <h2>5 Common Mistakes</h2>
 <p><strong>Traversing without visit checks</strong><br>
 - Why It Is a Problem: Causes infinite loops in cyclic graphs<br>
@@ -329,10 +334,10 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://realpython.com/python-graph-algorithm/">Real Python — Graphs in Python</a></li>
-<li><a href="https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/">GeeksforGeeks — Graph Data Structure</a></li>
-<li><a href="https://visualgo.net/en/dfsbfs">Visualgo — Graph Traversal</a></li>
 <li><a href="https://networkx.org/documentation/stable/">NetworkX Documentation</a></li>
+<li><a href="https://docs.python.org/3/library/heapq.html">Python Docs — heapq</a></li>
+<li><a href="https://runestone.academy/ns/books/published/pythonds3/Graphs/toctree.html">Runestone Academy — Graphs</a></li>
+<li><a href="https://realpython.com/python-graph-algorithm/">Real Python — Graphs in Python</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Data Structures, Graph, BFS, DFS</p>
 </body>

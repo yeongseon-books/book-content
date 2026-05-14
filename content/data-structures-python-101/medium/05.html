@@ -89,6 +89,9 @@
 [Doubly Linked List]
   None &lt;- [&lt;-|A|-&gt;] &lt;-&gt; [&lt;-|B|-&gt;] &lt;-&gt; [&lt;-|C|-&gt;] -&gt; None
 </code></pre>
+<h2>Linked Structure at a Glance</h2>
+<p><img alt="Linked Structure at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png"></p>
+<p><em>How node references flow in singly linked lists and doubly linked lists</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Node</strong><br>
 - Description: A unit that holds data and a reference to the next node</p>
@@ -272,6 +275,8 @@ print(has_cycle(a))  # True
 <li>Reversal and cycle detection are classic interview problems</li>
 <li>Python's collections.deque is implemented internally as a doubly linked list</li>
 </ul>
+<p>The practical trade-off is that linked lists win on pointer updates, not on total throughput. Python lists keep elements in contiguous memory, which is friendly to CPU caches and fast for iteration. Linked lists spread nodes across separate objects, so following pointers can cost more than their O(1) insertion story suggests.</p>
+<p>You also need to separate "finding the node" from "rewiring the node." Deleting a node is O(1) only after you already have a reference to the previous node. If every operation starts with a linear scan, the overall workload may still be O(n). That is why production Python code usually reaches for deque, OrderedDict, or library implementations instead of a custom linked list.</p>
 <h2>5 Common Mistakes</h2>
 <p><strong>Wrong order of next-pointer updates</strong><br>
 - Why It Is a Problem: Nodes are lost and the list breaks<br>
@@ -329,10 +334,10 @@ print(has_cycle(a))  # True
 </ul>
 <h2>References</h2>
 <ul>
+<li><a href="https://docs.python.org/3/library/collections.html#collections.deque">Python Docs — collections.deque</a></li>
+<li><a href="https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c">CPython Source — collections module implementation</a></li>
 <li><a href="https://realpython.com/linked-lists-python/">Real Python — Linked Lists in Python</a></li>
-<li><a href="https://www.geeksforgeeks.org/data-structures/linked-list/">GeeksforGeeks — Linked List Data Structure</a></li>
-<li><a href="https://visualgo.net/en/list">Visualgo — Linked List Visualization</a></li>
-<li><a href="https://leetcode.com/tag/linked-list/">LeetCode — Linked List Problems</a></li>
+<li><a href="https://runestone.academy/ns/books/published/pythonds3/BasicDS/ImplementinganUnorderedListLinkedLists.html">Runestone Academy — Linked Lists</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Data Structures, Linked List, Node, Pointers</p>
 </body>
