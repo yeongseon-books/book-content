@@ -2,22 +2,22 @@ id: ai-web-dev-101
 articles:
 - idx: 1
   slug: 01-hello-ai-api
-  status: needs-update
+  status: publish-ready
 - idx: 2
   slug: 02-prompt-engineering
-  status: needs-update
+  status: publish-ready
 - idx: 3
   slug: 03-ai-chatbot
-  status: needs-update
+  status: publish-ready
 - idx: 4
   slug: 04-rag-intro
-  status: needs-update
+  status: publish-ready
 - idx: 5
   slug: 05-ai-agent
-  status: needs-update
+  status: publish-ready
 - idx: 6
   slug: 06-deploy
-  status: needs-update
+  status: publish-ready
 - idx: 7
   slug: 07-eval-improve
-  status: needs-update
+  status: publish-ready

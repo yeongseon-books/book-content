@@ -2,31 +2,31 @@ id: ai-data-preparation-101
 articles:
 - idx: 1
   slug: 01-why-data-preparation-matters
-  status: draft
+  status: content-ready
 - idx: 2
   slug: 02-source-data-collection-cataloging
-  status: draft
+  status: content-ready
 - idx: 3
   slug: 03-cleaning-deduplication
-  status: draft
+  status: content-ready
 - idx: 4
   slug: 04-pii-detection-anonymization
-  status: draft
+  status: content-ready
 - idx: 5
   slug: 05-tokenization-chunking
-  status: draft
+  status: content-ready
 - idx: 6
   slug: 06-quality-filtering
-  status: draft
+  status: content-ready
 - idx: 7
   slug: 07-synthetic-data-generation
-  status: draft
+  status: content-ready
 - idx: 8
   slug: 08-data-augmentation
-  status: draft
+  status: content-ready
 - idx: 9
   slug: 09-train-eval-test-splitting
-  status: draft
+  status: content-ready
 - idx: 10
   slug: 10-production-data-pipeline
-  status: draft
+  status: content-ready

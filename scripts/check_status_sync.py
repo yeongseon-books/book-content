@@ -1,7 +1,8 @@
 """Verify status sync between content/<series>/series.yaml and article front matter.
 
-For every entry in content/<series>/series.yaml.articles[] with a `status:`,
-check that content/<series>/{ko,en}/<slug>.md front matter has the same status.
+Convention: an episode's catalog-level status equals the FLOOR of its language
+statuses. So if ko=publish-ready and en=content-ready, series.yaml must say
+content-ready. Drift = series.yaml.status != floor(article statuses).
 
 Exit code: 0 on success, 1 on any drift.
 """
@@ -18,6 +19,15 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = REPO_ROOT / "content"
 LANG_DIRS = ("ko", "en")
+
+STATUS_ORDER = {
+    "draft": 0,
+    "needs-update": 0,
+    "content-ready": 1,
+    "publish-ready": 2,
+    "ready": 2,
+    "published": 3,
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,7 +48,6 @@ def iter_series(series: str | None) -> list[Path]:
 def check_series(series_yaml: Path) -> list[str]:
     errors: list[str] = []
     raw = yaml.safe_load(series_yaml.read_text(encoding="utf-8")) or {}
-    series_id = raw.get("id") or series_yaml.parent.name
     articles = raw.get("articles") or []
     series_dir = series_yaml.parent
 
@@ -49,6 +58,7 @@ def check_series(series_yaml: Path) -> list[str]:
         catalog_status = entry.get("status")
         if not slug or not catalog_status:
             continue
+        lang_statuses: dict[str, str] = {}
         for lang in LANG_DIRS:
             md = series_dir / lang / f"{slug}.md"
             if not md.is_file():
@@ -58,12 +68,20 @@ def check_series(series_yaml: Path) -> list[str]:
             except Exception as e:
                 errors.append(f"{lang}/{slug}.md: front matter parse error: {e}")
                 continue
-            article_status = post.metadata.get("status")
-            if article_status != catalog_status:
-                errors.append(
-                    f"{lang}/{slug}.md: status drift "
-                    f"(series.yaml={catalog_status!r}, article={article_status!r})"
-                )
+            s = post.metadata.get("status")
+            if s:
+                lang_statuses[lang] = s
+        if not lang_statuses:
+            continue
+        floor = min(lang_statuses.values(), key=lambda s: STATUS_ORDER.get(s, -1))
+        if catalog_status != floor:
+            langs_str = ", ".join(
+                f"{k}={v!r}" for k, v in sorted(lang_statuses.items())
+            )
+            errors.append(
+                f"{slug}: status drift "
+                f"(series.yaml={catalog_status!r}, floor={floor!r}, langs: {langs_str})"
+            )
     return errors
 
 
