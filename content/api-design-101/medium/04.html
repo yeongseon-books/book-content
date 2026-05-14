@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>HTTP Methods and Status Codes</h1>
-<blockquote>
-<p>API Design 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Which method should you use, and which status code should you return — what is the <em>criterion</em> for those two decisions?</p>
-<blockquote>
-<p><em>Idempotency</em> and the <em>meaning of the result</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.</p>
+<p>This is post 4 in the API Design 101 series.</p>
+<p>Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The meaning of GET / POST / PUT / PATCH / DELETE</li>
 <li>Safe vs idempotent operations</li>
@@ -79,17 +71,9 @@
 <p>A status code is not a <em>number</em>. It is a <em>contract</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;request&quot;] --&gt; M{&quot;method&quot;}
-    M --&gt;|&quot;GET&quot;| Read[&quot;read&quot;]
-    M --&gt;|&quot;POST&quot;| Create[&quot;create / action&quot;]
-    M --&gt;|&quot;PUT/PATCH&quot;| Update[&quot;update&quot;]
-    M --&gt;|&quot;DELETE&quot;| Remove[&quot;delete&quot;]
-    Read --&gt; S{&quot;status&quot;}
-    Create --&gt; S
-    Update --&gt; S
-    Remove --&gt; S
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>The HTTP method expresses intent, and the status code expresses the outcome.</em></p>
+<p>Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Safe</strong>: a call that does not <em>mutate</em> the resource (GET, HEAD).</li>
@@ -100,11 +84,11 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (intent unclear)</strong></p>
-<pre><code>POST /users/42/update   200 OK   {&quot;ok&quot;: true}
+<pre><code class="language-http">POST /users/42/update   200 OK   {&quot;ok&quot;: true}
 POST /users/42/delete   200 OK   {&quot;ok&quot;: true}
 </code></pre>
 <p><strong>After (method × status)</strong></p>
-<pre><code>PATCH  /users/42   200 OK
+<pre><code class="language-http">PATCH  /users/42   200 OK
 DELETE /users/42   204 No Content
 </code></pre>
 <p>The status alone tells you what happened.</p>
@@ -194,6 +178,12 @@ def create():
 <li><code>4xx</code> = the <em>user</em> can fix it; <code>5xx</code> = the <em>server</em> must fix it.</li>
 <li>Pick from standard codes; resist inventing new ones.</li>
 <li>Put the <em>detailed reason</em> in the body, in a consistent shape.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> Creation should read as <code>201 + Location</code>, successful deletion as <code>204</code>, and a missing resource as <code>404</code> without extra explanation.</li>
+<li><strong>First check:</strong> If similar failures bounce randomly between <code>400</code>, <code>409</code>, and <code>422</code>, the client contract is already ambiguous.</li>
+<li><strong>Failure mode:</strong> Collapse every success into <code>200 OK</code>, and retries, SDK exceptions, and cache behavior all start depending on body parsing instead of protocol signals.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
