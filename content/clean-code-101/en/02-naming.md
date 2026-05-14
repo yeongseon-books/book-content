@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 2
 title: Naming
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Refactoring
   - SoftwareEngineering
 seo_description: Six signals of a good name, naming variables vs functions vs classes, and the most common naming mistakes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Naming
 
-> Clean Code 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How much shorter does a good name make your code?
-
-> A good name removes half of the comments. And it makes a single grep accurate.
+Bad names waste time before any logic is understood. A reviewer pauses at `data`, guesses what it means, and rereads the same block twice.
 
 This is post 2 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ Names are the most-read element of code. Pick a wrong one and you keep saying it
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    I["Intent"] --> N["Name"]
-    N --> S["Search"]
-    N --> R["Read"]
-    N --> D["Doc"]
-```
+![Naming](../../../assets/clean-code-101/02/02-01-concept-at-a-glance.en.png)
+
+*Naming flow: once intent is visible in the name, search, reading, and documentation all get easier.*
 
 The name lifts intent into view.
 
@@ -137,6 +129,23 @@ customer_balance_cents           # domain names can be long
 
 Narrow scope: short. Wide scope: precise.
 
+## How to Verify This in a Real Codebase
+
+```bash
+ruff check app/ --select N
+python -m pytest -q tests/test_naming_examples.py
+```
+
+**Expected output**
+
+- Inconsistent naming patterns and weak abbreviations surface first.
+- After a rename, tests should stay green without behavior drift.
+
+## Failure Modes to Watch
+
+- Renaming only types while leaving domain language muddy.
+- Verifying the declaration but missing the full set of call sites.
+
 ## What to Notice in This Code
 
 - The name creates meaning at the call site.
@@ -200,5 +209,6 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 - [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/)
 - [Google Style Guide — Naming](https://google.github.io/styleguide/pyguide.html#316-naming)
 - [PEP 8 — Naming Conventions](https://peps.python.org/pep-0008/#naming-conventions)
-
+- [Ruff pep8-naming rules](https://docs.astral.sh/ruff/rules/#pep8-naming-n)
+- [PEP 8 naming conventions](https://peps.python.org/pep-0008/#naming-conventions)
 Tags: Computer Science, CleanCode, Naming, Readability, Refactoring, SoftwareEngineering
