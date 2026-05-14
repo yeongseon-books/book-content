@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Title and Structure</h1>
-<p>This is post 3 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why must a <em>good title</em> and a <em>good structure</em> travel <em>together</em>?</p>
-<blockquote>
-<p>The <em>title</em> is a <em>promise</em>, and the <em>structure</em> is the <em>delivery</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Some posts earn the click and lose the reader two scrolls later. Others contain useful material but hide it behind a vague title, so the right reader never opens them in the first place. Those failures look different, but they come from the same source: the title promised one thing while the structure delivered another.</p>
+<p>A strong title is not just marketing copy. It compresses the reader action and the payoff. The structure is the route that gets the reader there with the least friction. That is why these two pieces should be designed together, not fixed separately at the end.</p>
+<p>This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li><em>SEO</em> titles</li>
 <li><em>H heading</em> hierarchy</li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>The <em>title</em> earns the <em>click</em>, and the <em>structure</em> earns the <em>time</em>.</p>
+<blockquote>
+<p>Mental model: the title makes the promise, and the section order delivers it.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[Title] --&gt; O[Outline]
-    O --&gt; B[Body]
-    B --&gt; S[Summary]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SEO title</strong>: A <em>search-friendly title</em>.</li>
@@ -93,6 +84,24 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "<em>FastAPI</em> notes".</p>
 <p><strong>After</strong>: "<em>Ship your first FastAPI endpoint in five minutes</em>".</p>
+<h2>Run a quick scannability test on the outline</h2>
+<p>Compare these two skeletons.</p>
+<pre><code class="language-markdown"># FastAPI notes
+
+## Overview
+## Part 1
+## Part 2
+## Summary
+</code></pre>
+<pre><code class="language-markdown"># Ship your first FastAPI endpoint in five minutes
+
+## Why this matters
+## Install
+## Write the code
+## Run and verify
+## Common blockers
+</code></pre>
+<p>The second outline is stronger because the headings expose the route. The title promise continues into the H2s, the verification point is visible, and the likely blocker is named early. A simple test works well here: if a reader can skim only the title and H2s and still predict the next action, the structure is probably doing its job.</p>
 <h2>Hands-on: A Skeleton for One Post</h2>
 <p><strong>Step 1 — Title</strong></p>
 <pre><code class="language-python">title = &quot;Ship your first FastAPI endpoint in five minutes&quot;
