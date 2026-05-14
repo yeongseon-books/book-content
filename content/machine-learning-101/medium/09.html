@@ -54,37 +54,21 @@
 </head>
 <body>
 <h1>Model Evaluation</h1>
-<blockquote>
-<p>Machine Learning 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When someone asks which model is better and you do not push back with "by which metric," you are already in trouble.</p>
-<blockquote>
-<p><em>Model evaluation is where you prove, in code, that picking the metric comes before picking the model.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>“Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.</p>
+<p>This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>Classification metrics: accuracy, precision, recall, F1, ROC-AUC, PR-AUC</li>
-<li>Regression metrics: MAE, MSE, RMSE, R-squared</li>
-<li>The anatomy of a confusion matrix</li>
-<li>When to choose ROC over PR (and vice versa)</li>
-<li>Five common pitfalls</li>
+<li>Which metrics belong to classification versus regression?</li>
+<li>What does each cell of the confusion matrix tell you operationally?</li>
+<li>When should PR outrank ROC in your analysis?</li>
+<li>Why do MAE, RMSE, and <code>R^2</code> answer different questions?</li>
+<li>Which evaluation mistakes quietly leak into model selection?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Pred[&quot;predictions&quot;] --&gt; CM[&quot;confusion matrix&quot;]
-    CM --&gt; P[&quot;precision&quot;]
-    CM --&gt; R[&quot;recall&quot;]
-    CM --&gt; F[&quot;F1&quot;]
-    Prob[&quot;probabilities&quot;] --&gt; ROC[&quot;ROC-AUC&quot;]
-    Prob --&gt; PR[&quot;PR-AUC&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Predicted classes feed confusion-matrix metrics, while probability outputs support threshold-free views such as ROC-AUC and PR-AUC.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>TP / FP / FN / TN</strong>: the four quadrants of the confusion matrix.</li>
@@ -127,11 +111,18 @@ print(&quot;MAE:&quot;, mean_absolute_error(yt, yp))
 print(&quot;RMSE:&quot;, mean_squared_error(yt, yp) ** 0.5)
 print(&quot;R^2:&quot;, r2_score(yt, yp))
 </code></pre>
+<p><strong>Expected output:</strong> the confusion matrix should expose the actual error mix, while ROC-AUC and PR-AUC summarize ranking quality across thresholds. In the regression toy example, MAE and RMSE stay close only because the errors are small and fairly even.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>AUC is independent of the threshold.</li>
 <li>PR-AUC is more informative on imbalanced data.</li>
 <li>RMSE and MAE differ in their sensitivity to outliers.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If metric debates drag on, translate the disagreement into the cost of false positives versus false negatives.</li>
+<li>If the dataset is imbalanced, do not stop at ROC-AUC before checking PR behavior and threshold sensitivity.</li>
+<li>If a model looks good by one metric and bad by another, that is not a contradiction; it is a prompt to clarify which failure matters.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
