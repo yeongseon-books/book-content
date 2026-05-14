@@ -54,13 +54,15 @@
 </head>
 <body>
 <h1>LLM app deployment strategies</h1>
-<p>Operations-focused deployment advice only matters if the application can prove that it really starts. A believable example should bring up the server, pass health, and complete one representative request without manual glue.</p>
+<p>Operations-focused deployment advice only matters if the application can prove that it really starts.</p>
 <p>This is the fifth post in the LLM Apps Ops 101 series. Here, we will make a FastAPI-based LLM endpoint deployable and add a self-test that verifies the full startup path.</p>
+<p>A believable example should bring up the server, pass health, and complete one representative request without manual glue.</p>
 <h2>Questions this post answers</h2>
 <ul>
 <li>How much should a health check prove for a FastAPI LLM endpoint?</li>
 <li>How do you call the synchronous Groq client safely from an async endpoint?</li>
 <li>What is the simplest self-test flow that proves the server really starts?</li>
+<li>How should local self-tests connect to container deployment checks?</li>
 </ul>
 <blockquote>
 <p>A deployable example is not defined by nice-looking server code. It is defined by whether the same script can start the server, hit health, and complete a real chat request.</p>
@@ -70,8 +72,8 @@
 <p><em>Self-test flow for health and chat</em></p>
 <h2>Why this layer matters</h2>
 <p><img alt="Startup verification reaches health check" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png"></p>
-<p><em>Startup verification reaches health check</em><br>
-A deployment example is only credible when it can start the server and verify a real request on its own.</p>
+<p><em>Startup verification reaches health check</em></p>
+<p>A deployment example is only credible when it can start the server and verify a real request on its own.</p>
 <p>The most common documentation mistake is showing server code without proving that it actually boots. For an operations-focused post, health check plus one representative request is the minimum bar.</p>
 <p>Example file: <code>en/05-deployment/main.py</code></p>
 <h2>Minimal runnable example</h2>
@@ -168,21 +170,93 @@ if __name__ == &quot;__main__&quot;:
 - <code>asyncio.to_thread</code> prevents the synchronous Groq SDK from blocking the FastAPI event loop.<br>
 - Starting <code>uvicorn.Server</code> in code keeps documentation and verification in one place.<br>
 - Hitting both <code>/health</code> and <code>/chat</code> checks more than process startup; it verifies the real dependency path.</p>
+<h2>Minimum deployment artifacts before the container exists</h2>
+<p>Real deployment guidance needs more than app code. It also needs the dependency file and the startup command.</p>
+<pre><code class="language-text">app/
+├── main.py
+├── requirements.txt
+└── Dockerfile
+</code></pre>
+<pre><code class="language-text">fastapi==0.115.0
+uvicorn==0.30.6
+httpx==0.27.2
+groq==0.11.0
+</code></pre>
+<pre><code class="language-dockerfile">FROM python:3.12-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY main.py .
+
+ENV PORT=8000
+EXPOSE 8000
+
+CMD [&quot;uvicorn&quot;, &quot;main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8000&quot;]
+</code></pre>
+<p>Those three files close the loop between local proof and runtime packaging.</p>
+<h2>Turn the self-test into an external HTTP check</h2>
+<p>In-process self-tests are useful, but deployment verification should also test the app from the outside.</p>
+<pre><code class="language-bash">uvicorn main:app --host 127.0.0.1 --port 8015 &amp;
+SERVER_PID=$!
+
+curl --fail http://127.0.0.1:8015/health
+
+curl --fail \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;message&quot;:&quot;Explain Python async functions in two sentences.&quot;}' \
+  http://127.0.0.1:8015/chat
+
+kill $SERVER_PID
+wait $SERVER_PID 2&gt;/dev/null || true
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">{&quot;status&quot;:&quot;ok&quot;,&quot;model&quot;:&quot;llama-3.1-8b-instant&quot;}
+{&quot;response&quot;:&quot;Async functions let Python suspend work at await points so other tasks can run.&quot;,&quot;model&quot;:&quot;llama-3.1-8b-instant&quot;}
+</code></pre>
+<p>That output proves readiness across the HTTP boundary, not just inside Python.</p>
+<h2>Separate failure modes before deployment</h2>
+<p>Treat these as different failures, not one generic “deployment bug”:</p>
+<ol>
+<li><strong>startup failure</strong> — environment variables, import errors, lifespan initialization</li>
+<li><strong>health failure</strong> — routing or readiness problem after the process starts</li>
+<li><strong>chat failure</strong> — SDK auth, model networking, timeout, or dependency path issue</li>
+<li><strong>shutdown failure</strong> — threads or blocking work not exiting cleanly</li>
+</ol>
+<p>Self-tests are valuable because they make those failure boundaries obvious.</p>
 <h2>Where engineers get confused</h2>
 <p><img alt="Self-test verifies startup and shutdown" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-04-where-engineers-get-confused.en.png"></p>
 <p><em>Self-test verifies startup and shutdown</em><br>
 - A health endpoint does not guarantee model quality. It only confirms basic service readiness.<br>
 - Using an async web framework does not magically make every external SDK async.<br>
-- A local self-test passing does not remove the need to verify secrets, networking, and timeout settings in deployment.</p>
+- A local self-test passing does not remove the need to verify secrets, networking, and timeout settings in deployment.<br>
+- A container starting does not guarantee readiness. A real request still needs to pass.</p>
+<h2>Deployment verification order</h2>
+<pre><code class="language-bash"># 1) Install dependencies and verify imports
+python3 -m pip install -r requirements.txt
+
+# 2) Start the app process
+uvicorn main:app --host 127.0.0.1 --port 8015
+
+# 3) Check health
+curl --fail http://127.0.0.1:8015/health
+
+# 4) Check one representative chat request
+curl --fail -H &quot;Content-Type: application/json&quot; -d '{&quot;message&quot;:&quot;Explain Python async functions in two sentences.&quot;}' http://127.0.0.1:8015/chat
+</code></pre>
+<p>The same order works well in CI because each step narrows the failure surface.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Call /health automatically after startup</li>
-<li>[ ] Send one real /chat request in the self-test</li>
-<li>[ ] Move blocking SDK calls into to_thread</li>
+<li>[ ] Call <code>/health</code> automatically after startup</li>
+<li>[ ] Send one real <code>/chat</code> request in the self-test</li>
+<li>[ ] Move blocking SDK calls into <code>to_thread</code></li>
 <li>[ ] Confirm the background server exits cleanly</li>
+<li>[ ] Version the Dockerfile and dependency file beside the app code</li>
 </ul>
 <h2>Summary</h2>
 <p>In deployment examples, the self-test is often more valuable than the endpoint code because it proves the instructions are real.</p>
+<p>The next step is to combine deployment, security, quality, cost, and logging into one integrated request path so the service leaves a full operational trail.</p>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-apps-ops-101/en/01-monitoring-and-logging.md">Monitoring and logging for LLM apps</a></li>
@@ -194,9 +268,14 @@ if __name__ == &quot;__main__&quot;:
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://fastapi.tiangolo.com/">FastAPI</a></li>
+<li><a href="https://fastapi.tiangolo.com/deployment/">FastAPI deployment</a></li>
 <li><a href="https://www.uvicorn.org/settings/">Uvicorn settings</a></li>
+<li><a href="https://docs.docker.com/reference/dockerfile/">Dockerfile reference</a></li>
+</ul>
+<p><strong>Verification-friendly resource</strong></p>
+<ul>
 <li><a href="https://www.python-httpx.org/quickstart/">HTTPX quickstart</a></li>
 </ul>
 <p class="tags-line">Tags: LLMOps, Observability, Python, LLM</p>
