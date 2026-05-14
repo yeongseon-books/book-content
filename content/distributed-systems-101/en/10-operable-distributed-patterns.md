@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 10
 title: Patterns for Operable Distributed Systems
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Backpressure
   - Observability
 seo_description: We tie together the patterns that make a distributed system operable - bulkhead, circuit breaker, backpressure, and observability.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Patterns for Operable Distributed Systems
 
+The final question is not how to eliminate failure. It is how to keep one slow dependency from turning into a full-system outage, and how to give operators enough signals to react before users start telling you first.
+
 This is the final post in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (10/10)
+Here we gather the patterns that turn distributed-system theory into day-two operations: timeout budgets, circuit breaking, load shedding, and observability tied back to SLOs.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If you cannot make a system that never dies, how do you make one that survives death?
-
-> An operable distributed system is not one without failures — it is one where failures stay local and recover quickly.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - How to isolate failure with bulkheads
 - How to break cascade failures with a circuit breaker
@@ -51,14 +45,9 @@ The tools we covered so far — replication, consensus, queues, transactions —
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Cl["client"] -->|timeout| LB["load balancer"]
-    LB --> S1["service A"]
-    LB --> S2["service B (isolated pool)"]
-    S1 -->|circuit breaker| Up["upstream"]
-    S2 -->|backpressure| Q["queue"]
-```
+![Timeout, breaker, bulkhead, and backpressure boundaries](../../../assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
+
+*Timeout, breaker, bulkhead, and backpressure boundaries*
 
 At every call boundary, combine timeout, breaker, bulkhead, and backpressure so a single failure does not spread.
 
@@ -162,6 +151,19 @@ def enqueue(msg):
 
 When the queue is full, refuse. A system that rejects quickly is safer than a system that goes silent.
 
+## Operational walkthrough: stopping a retry storm
+
+The classic day-two disaster is a slow upstream that triggers every protection too late.
+
+1. Upstream latency jumps from 80ms to 3s.
+2. Clients without tight timeouts pile up blocked sockets.
+3. Retries begin, multiplying load on the already struggling upstream.
+4. The circuit breaker opens after the failure threshold.
+5. Bulkheads preserve capacity for unrelated paths.
+6. Backpressure rejects new work instead of hiding it in an infinitely growing queue.
+
+The important lesson is ordering. A timeout budget without a retry budget still amplifies load. A breaker without observability becomes mysterious refusal. A queue without backpressure simply delays the outage. Operational patterns work as a system, not as isolated snippets.
+
 ## What to Notice in This Code
 
 - timeout < retry budget < user-facing latency — break this inequality and operations break.
@@ -226,5 +228,6 @@ Every tool in distributed systems eventually converges on operability. One sente
 - [Circuit Breaker — Martin Fowler](https://martinfowler.com/bliki/CircuitBreaker.html)
 - [Google SRE Book](https://sre.google/sre-book/table-of-contents/)
 - [AWS Well-Architected — Reliability Pillar](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html)
+- [Resilience4j CircuitBreaker guide](https://resilience4j.readme.io/docs/circuitbreaker)
 
 Tags: Computer Science, Distributed Systems, Resilience, CircuitBreaker, Backpressure, Observability
