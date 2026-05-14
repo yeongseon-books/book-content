@@ -17,7 +17,7 @@ tags:
   - resolver
   - 캐싱
   - TTL
-seo_description: DNS 계층 구조와 TTL, 캐시가 운영에 미치는 영향을 설명합니다.
+seo_description: 도메인 이름을 IP 주소로 변환하는 DNS의 계층 구조와 동작 원리, TTL 및 캐싱이 시스템 운영에 미치는 영향을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

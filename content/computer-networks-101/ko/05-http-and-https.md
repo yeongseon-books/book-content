@@ -17,7 +17,7 @@ tags:
   - HTTPS
   - REST
   - 헤더
-seo_description: HTTP 메시지 구조와 HTTPS가 더하는 보안 의미를 설명합니다.
+seo_description: HTTP 메시지 구조와 메서드, 상태 코드의 의미를 파악하고 HTTPS가 보안을 강화하는 방식과 주요 헤더의 역할을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

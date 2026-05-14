@@ -17,7 +17,7 @@ tags:
   - PubSub
   - Events
   - Behavioral
-seo_description: Observer 패턴으로 결합을 통지로 바꾸는 방법을 설명합니다
+seo_description: 객체 간의 직접 호출을 통지로 바꾸어 결합도를 낮추는 Observer 패턴의 핵심 원리와 실무 활용법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Statuspage
   - OnCall
   - Operations
-seo_description: incident 중 청중별 공지와 업데이트 주기 원칙을 정리합니다
+seo_description: 장애 상황에서 내부 팀, 고객, 경영진 등 청중별 맞춤형 공지 원칙과 업데이트 주기 수립 방법을 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

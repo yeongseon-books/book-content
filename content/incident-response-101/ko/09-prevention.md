@@ -1,23 +1,23 @@
 ---
-series: incident-response-101
 episode: 9
-title: 재발 방지
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Incident
-  - Prevention
-  - Reliability
-  - Testing
-  - Operations
-seo_description: incident 재발 방지를 코드와 테스트로 남기는 법을 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 장애 재발을 코드와 테스트, 자동화 가드레일로 남겨 같은 실수를 반복하지 않도록 만드는 실무 방법을 정리합니다.
+series: incident-response-101
+status: publish-ready
+tags:
+- Incident
+- Prevention
+- Reliability
+- Testing
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 재발 방지
 ---
 
 # 재발 방지

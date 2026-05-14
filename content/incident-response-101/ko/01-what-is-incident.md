@@ -16,7 +16,7 @@ tags:
   - SRE
   - Operations
   - OnCall
-seo_description: incident의 기준과 고객 영향 중심 판단법을 정리합니다
+seo_description: 장애와 일반 버그를 구분하는 판단 기준과 고객 영향 중심의 Incident 정의 및 운영 원칙을 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

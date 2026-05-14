@@ -16,7 +16,7 @@ tags:
   - SemanticAnalysis
   - TypeChecking
   - NameResolution
-seo_description: AST가 의미상 타당한지 검사하는 시맨틱 분석의 핵심을 설명합니다
+seo_description: 문법을 넘어 코드의 의미적 타당성을 검사하는 시맨틱 분석의 원리와 이름 해석 및 타입 검사 구현 방법을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

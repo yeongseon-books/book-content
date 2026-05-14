@@ -17,7 +17,7 @@ tags:
   - GoF
   - Architecture
   - Foundations
-seo_description: 디자인 패턴의 정의와 GoF 분류, 패턴이 푸는 문제를 설명합니다
+seo_description: 디자인 패턴의 정의와 GoF 분류, 반복되는 설계 문제를 해결하기 위한 공통 어휘로서의 가치를 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

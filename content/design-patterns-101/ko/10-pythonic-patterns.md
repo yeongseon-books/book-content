@@ -1,24 +1,24 @@
 ---
-series: design-patterns-101
 episode: 10
-title: Python에 어울리는 패턴
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Computer Science
-  - DesignPatterns
-  - Python
-  - Idioms
-  - Protocols
-  - Decorators
-seo_description: Python다운 도구로 GoF 패턴을 더 가볍게 푸는 법을 설명합니다
 last_reviewed: '2026-05-12'
+seo_description: Python의 일급 함수, 데코레이터, 컨텍스트 매니저로 GoF 패턴을 더 가볍게 표현하는 방법을 정리합니다.
+series: design-patterns-101
+status: publish-ready
+tags:
+- Computer Science
+- DesignPatterns
+- Python
+- Idioms
+- Protocols
+- Decorators
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Python에 어울리는 패턴
 ---
 
 # Python에 어울리는 패턴

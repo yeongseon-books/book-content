@@ -17,7 +17,7 @@ tags:
   - Tokens
   - Regex
   - Position
-seo_description: 렉서가 토큰과 위치 정보를 어떻게 만드는지 핵심 원리를 설명합니다
+seo_description: 텍스트를 의미 단위의 토큰으로 분리하는 렉시컬 분석의 원리와 정규식 기반 렉서 구현 방법을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

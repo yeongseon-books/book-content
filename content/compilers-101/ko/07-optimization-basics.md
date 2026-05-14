@@ -16,7 +16,7 @@ tags:
   - Optimization
   - ConstantFolding
   - DeadCode
-seo_description: 의미를 보존하면서 IR을 개선하는 기본 최적화 패턴을 설명합니다
+seo_description: 프로그램의 의미를 보존하면서 성능을 개선하는 컴파일러 최적화의 원리와 주요 패스 구현 방법을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

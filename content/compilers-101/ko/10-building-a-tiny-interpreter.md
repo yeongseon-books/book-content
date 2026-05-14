@@ -17,7 +17,7 @@ tags:
   - Capstone
   - AST
   - REPL
-seo_description: 렉서와 파서, 평가기를 한 파일로 합쳐 작은 인터프리터를 만듭니다
+seo_description: 렉서, 파서, 평가기를 한 파일로 통합하여 동작하는 산술식 인터프리터를 직접 구현하고 전체적인 컴파일 파이프라인 흐름을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

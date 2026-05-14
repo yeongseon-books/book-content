@@ -16,7 +16,7 @@ tags:
   - CodeGen
   - RegisterAllocation
   - Assembly
-seo_description: IR을 실제 명령어로 내리는 코드 생성의 핵심 원리를 설명합니다
+seo_description: 중간 표현을 실제 CPU 명령어로 변환하는 코드 생성의 원리와 레지스터 할당 및 명령어 선택 기법을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

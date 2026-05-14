@@ -17,7 +17,7 @@ tags:
   - Structural
   - Compatibility
   - Wrapper
-seo_description: Adapter 패턴으로 외부 인터페이스를 경계 뒤에 두는 법을 설명합니다
+seo_description: 외부 라이브러리 인터페이스를 도메인 경계 뒤에 가두고 교체 가능성을 높이는 Adapter 패턴의 설계와 실무 활용법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

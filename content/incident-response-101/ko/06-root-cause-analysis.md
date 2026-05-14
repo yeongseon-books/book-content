@@ -16,7 +16,7 @@ tags:
   - Postmortem
   - Analysis
   - Operations
-seo_description: trigger와 root cause를 구분하는 RCA 방법을 정리합니다
+seo_description: 장애의 직접 계기와 구조적 원인을 구분하고 재발 방지 대책을 세우는 Root Cause Analysis 기법과 5 Whys 활용법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Response
   - OnCall
   - Operations
-seo_description: incident 초반 5분에 해야 할 초기 대응 원칙을 정리합니다
+seo_description: 장애 발생 초반 5분간 수행해야 할 안정화 및 역할 배정 등 초기 대응 원칙과 체크리스트를 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

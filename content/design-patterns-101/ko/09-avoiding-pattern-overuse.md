@@ -17,7 +17,7 @@ tags:
   - Simplicity
   - YAGNI
   - Refactoring
-seo_description: 패턴 남용을 피하고 단순한 코드를 지키는 기준을 설명합니다
+seo_description: 불필요한 패턴 남용을 피하고 단순한 코드를 지키는 기준과 리팩터링을 통해 패턴을 발견하는 실무적 접근법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

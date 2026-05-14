@@ -17,7 +17,7 @@ tags:
   - Strategy
   - Observer
   - Command
-seo_description: 객체 사이의 책임과 흐름을 다루는 Behavioral 패턴을 설명합니다
+seo_description: 협력과 알고리즘 교환, 상태 변화를 구조적으로 다루는 Strategy, Observer 등 Behavioral 패턴의 핵심 원리를 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

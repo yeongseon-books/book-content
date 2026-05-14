@@ -17,7 +17,7 @@ tags:
   - Adapter
   - Decorator
   - Facade
-seo_description: 객체를 조합해 구조를 만드는 Structural 패턴의 핵심을 설명합니다
+seo_description: 합성과 위임을 통해 객체 구조를 유연하게 조립하는 Adapter, Decorator 등 Structural 패턴의 핵심 원리를 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

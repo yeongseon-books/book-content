@@ -16,7 +16,7 @@ tags:
   - Postmortem
   - Logging
   - Operations
-seo_description: incident timeline을 사실과 시간 순서로 남기는 법을 정리합니다
+seo_description: 장애 대응 과정의 사실과 가설을 시간 순서로 기록하여 사후 분석의 근거를 마련하는 Timeline 작성법을 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

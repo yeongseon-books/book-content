@@ -17,7 +17,7 @@ tags:
   - NAT
   - default gateway
   - 사설IP
-seo_description: 라우팅 테이블과 NAT가 패킷 이동을 어떻게 결정하는지 설명합니다.
+seo_description: 라우팅 테이블의 결정 원리와 NAT가 사설 IP와 공인 IP 사이를 연결하는 방식을 통해 패킷이 목적지까지 도달하는 과정을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

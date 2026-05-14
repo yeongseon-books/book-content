@@ -16,7 +16,7 @@ tags:
   - Triage
   - Response
   - Operations
-seo_description: severity 등급을 영향과 대응 행동으로 연결하는 법을 정리합니다
+seo_description: 장애 영향의 크기를 등급화하고 대응 행동으로 연결하는 Severity 분류 체계의 수립 기준과 실무 원칙을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

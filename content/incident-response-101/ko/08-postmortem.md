@@ -1,23 +1,23 @@
 ---
-series: incident-response-101
 episode: 8
-title: Postmortem
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Incident
-  - Postmortem
-  - Blameless
-  - Learning
-  - Operations
-seo_description: postmortem을 비난 없이 쓰고 추적하는 원칙을 정리합니다
 last_reviewed: '2026-05-12'
+seo_description: 비난 없는 포스트모템 작성법과 액션 아이템 추적으로 장애 학습을 조직 자산으로 만드는 실무 원칙을 정리합니다.
+series: incident-response-101
+status: publish-ready
+tags:
+- Incident
+- Postmortem
+- Blameless
+- Learning
+- Operations
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: Postmortem
 ---
 
 # Postmortem

@@ -16,7 +16,7 @@ tags:
   - Resolution
   - Rollback
   - Operations
-seo_description: mitigation과 resolution의 차이와 운영 원칙을 정리합니다
+seo_description: 장애 피해를 즉시 멈추는 완화 조치와 근본 원인을 제거하는 해결 조치의 차이점 및 단계별 운영 원칙을 상세히 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

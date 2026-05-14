@@ -1,24 +1,24 @@
 ---
-series: data-structures-101
 episode: 9
-title: 그래프
-status: publish-ready
-targets:
-  tistory: true
-  medium: true
-  hashnode: true
-  mkdocs: true
-  ebook: true
 language: ko
-tags:
-  - Computer Science
-  - 자료구조
-  - 그래프
-  - 인접 리스트
-  - 인접 행렬
-  - 그래프 탐색
-seo_description: 그래프의 표현 방식과 BFS, DFS의 핵심 개념을 설명합니다.
 last_reviewed: '2026-05-12'
+seo_description: 그래프의 인접 리스트와 인접 행렬 표현 방식, BFS와 DFS의 동작 원리와 실무에서의 활용 사례를 정리합니다.
+series: data-structures-101
+status: publish-ready
+tags:
+- Computer Science
+- 자료구조
+- 그래프
+- 인접 리스트
+- 인접 행렬
+- 그래프 탐색
+targets:
+  ebook: true
+  hashnode: true
+  medium: true
+  mkdocs: true
+  tistory: true
+title: 그래프
 ---
 
 # 그래프

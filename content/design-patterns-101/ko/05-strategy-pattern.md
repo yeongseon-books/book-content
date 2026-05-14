@@ -17,7 +17,7 @@ tags:
   - Polymorphism
   - Behavioral
   - OCP
-seo_description: Strategy 패턴의 핵심과 Python에서의 자연스러운 구현을 설명합니다
+seo_description: 알고리즘을 교체 가능한 단위로 분리하여 OCP를 실현하는 Strategy 패턴의 핵심과 Python에서의 효율적인 구현을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

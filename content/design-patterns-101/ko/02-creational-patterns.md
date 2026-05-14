@@ -17,7 +17,7 @@ tags:
   - Factory
   - Singleton
   - Builder
-seo_description: 객체 생성 책임을 분리하는 Creational 패턴의 핵심을 설명합니다
+seo_description: 객체 생성 책임을 분리하여 결합도를 낮추는 Factory, Builder 등 Creational 패턴의 핵심 원리와 실무 적용법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

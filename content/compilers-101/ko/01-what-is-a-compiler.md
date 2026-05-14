@@ -17,7 +17,7 @@ tags:
   - AST
   - Bytecode
   - Frontend
-seo_description: 컴파일러 파이프라인을 따라 식 한 줄이 어떻게 번역되는지 설명합니다
+seo_description: 소스 코드를 타깃 언어로 번역하는 컴파일러의 6단계 파이프라인 구조와 인터프리터의 차이점을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

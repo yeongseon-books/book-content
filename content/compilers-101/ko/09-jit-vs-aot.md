@@ -17,7 +17,7 @@ tags:
   - AOT
   - Tradeoffs
   - Warmup
-seo_description: JIT와 AOT가 시작 시간과 최고 성능을 어떻게 바꾸는지 설명합니다
+seo_description: 컴파일 시점에 따른 JIT와 AOT 방식의 차이점을 비교하고 각 방식이 시작 성능과 최고 성능에 미치는 영향을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

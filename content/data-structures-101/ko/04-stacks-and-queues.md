@@ -17,7 +17,7 @@ tags:
   - 큐
   - LIFO
   - FIFO
-seo_description: 스택과 큐의 핵심 규칙, 구현 방식, 실전 활용을 설명합니다.
+seo_description: LIFO와 FIFO라는 단순한 규칙이 시스템 동작을 결정하는 스택과 큐의 원리 및 구현 방식과 실무 활용 사례를 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

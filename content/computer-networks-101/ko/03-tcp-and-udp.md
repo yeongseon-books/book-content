@@ -17,7 +17,7 @@ tags:
   - UDP
   - 전송계층
   - 신뢰성
-seo_description: TCP와 UDP를 연결, 순서, 재전송, 속도 관점에서 비교합니다.
+seo_description: 신뢰성의 TCP와 속도의 UDP를 연결, 순서 보장, 재전송 관점에서 비교하고 각 워크로드에 맞는 선택 기준을 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -17,7 +17,7 @@ tags:
   - 우선순위 큐
   - heapq
   - 정렬
-seo_description: 힙의 구조, 우선순위 큐 구현, 파이썬 heapq 사용법을 설명합니다.
+seo_description: 최소값과 최대값을 빠르게 추출하는 힙의 구조와 배열 기반 구현 방법, 파이썬 heapq 사용법 및 우선순위 큐 활용 사례를 상세히 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

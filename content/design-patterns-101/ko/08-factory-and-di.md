@@ -17,7 +17,7 @@ tags:
   - DependencyInjection
   - Composition
   - IoC
-seo_description: Factory와 DI로 조립과 사용을 분리하는 방법을 설명합니다
+seo_description: 객체의 조립과 사용을 분리하여 테스트 가능성을 높이는 Factory와 의존성 주입의 핵심 원리와 실무 적용법을 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 
