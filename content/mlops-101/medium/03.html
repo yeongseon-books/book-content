@@ -54,35 +54,29 @@
 </head>
 <body>
 <h1>Data Versioning</h1>
-<blockquote>
-<p>MLOps 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Code and models live in git, but where does the data live?</p>
-<blockquote>
-<p><em>Data versioning keeps large files in remote storage and commits only hash pointers to git.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Teams usually remember to keep code in git and sometimes remember to save model files. The largest input of all—the data—is often the least controlled. When yesterday's training run works and today's result shifts unexpectedly, this is where the investigation usually begins.</p>
+<p>The same code with different data produces a different model. That means MLOps without data versioning is only half built. You might be able to reproduce the code path, but you still cannot reproduce the outcome.</p>
 <p>This is post 3 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>Why data needs versioning and how it works</li>
-<li>DVC versus git-LFS</li>
-<li>Synchronizing data, code, and model versions</li>
-<li>Using hashes to guarantee reproduction</li>
-<li>Five common pitfalls</li>
+<li>Why can code versioning alone never reproduce an ML result?</li>
+<li>How should you think about DVC versus git-LFS?</li>
+<li>How do you keep large data files outside git without losing version consistency?</li>
+<li>Why are pointer files and hashes so important?</li>
+<li>How should data versions and model versions move together?</li>
 </ul>
+<blockquote>
+<p>Mental model: data versioning is not about putting large files into git. It is about operating a pointer plus remote-storage system that identifies the exact state of the input data.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>The same code with different data produces a different model. Without data versioning, reproduction is impossible.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Git[&quot;git repo&quot;] --&gt; Pointer[&quot;data.dvc pointer&quot;]
-    Pointer --&gt; Remote[&quot;remote storage&quot;]
-    Remote --&gt; File[&quot;actual data file&quot;]
-    Pointer --&gt; Pipeline[&quot;pipeline reproducer&quot;]
-</code></pre>
+<p>One of the most common mistakes in ML systems is assuming the model came from the code. In practice, the model comes from the combination of code and data. When the input changes, the result changes, even if the repository did not.</p>
+<p>That is why experiment tracking alone is not enough. A high metric becomes hard to explain, and an older model becomes impossible to rebuild, if the training data state was never preserved.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+This picture explains why a tool such as DVC exists. The git repository stores a pointer file instead of the large dataset itself, the real data lives in remote storage, and the pipeline reads the pointer to recover the exact input state.</p>
+<p>The pointer and the remote have to move together. If either side is missing, reproducibility breaks.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DVC</strong>: Data Version Control. Tracks data and models on top of git.</li>
