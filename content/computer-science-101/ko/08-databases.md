@@ -58,17 +58,8 @@ last_reviewed: '2026-05-12'
 
 > 인덱스는 책의 색인과 같습니다. 본문 전체를 뒤지지 않고 색인을 따라 곧장 페이지를 펼칩니다.
 
-```text
-Without an index:  SELECT * FROM users WHERE email = 'a@b.com'
-  -> scan every row (Full Table Scan)  -- O(n)
-
-With a B-Tree index
-  -> binary search through the tree    -- O(log n)
-
-For 1,000,000 rows
-  - full scan : about 1,000,000 comparisons
-  - B-Tree    : about 20 comparisons
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
+*인덱스는 모든 행을 훑는 경로를 트리 탐색 경로로 바꿔 조회 비용을 크게 낮춥니다*
 
 ## 핵심 용어
 
@@ -192,6 +183,8 @@ start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
 print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** `after index`가 `before index`보다 훨씬 짧아지고, 이어지는 `EXPLAIN QUERY PLAN`에서 인덱스 사용 여부를 확인할 수 있어야 합니다.
 
 ### 4단계: EXPLAIN QUERY PLAN으로 들여다보기
 
