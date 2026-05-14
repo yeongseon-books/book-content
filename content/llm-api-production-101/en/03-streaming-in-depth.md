@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -369,7 +369,18 @@ Structured output and tool calling made the response boundary more explicit. Str
 
 ## References
 
-- <https://console.groq.com/docs/text-chat>
-- <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events>
+### Official Docs
+
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [MDN Server-sent events guide](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+
+### Verification-Friendly References
+
+- [Python asyncio.wait_for documentation](https://docs.python.org/3/library/asyncio-task.html#asyncio.wait_for)
+
+### Related Series
+
+- [Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
 
 Tags: LLM, OpenAI, Streaming, Python

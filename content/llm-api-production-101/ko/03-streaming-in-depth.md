@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 스트리밍 심화 — 청크 처리와 오류 복구
-seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
+seo_description: 스트리밍 응답의 부분 상태, inactivity timeout, 부분 결과 보존을 운영 관점에서 정리합니다.
 ---
 
 # 스트리밍 심화 — 청크 처리와 오류 복구
@@ -179,7 +179,7 @@ async def consume_stream(prompt: str) -> dict:
 asyncio.run(consume_stream("Explain why Python context managers are useful."))
 ```
 
-핵심은 총 요청 시간이 아니라 “진전이 계속 있는가”를 보는 것입니다. 동기 경로를 유지해야 한다면 transport timeout을 두는 편이 낫지만, 진짜 청크 간 무응답 감지는 읽기 자체를 감싸는 방식에서만 정확해집니다.
+여기서 봐야 할 것은 총 요청 시간이 아니라 “진전이 계속 있는가”입니다. 동기 경로를 유지해야 한다면 transport timeout을 두는 편이 낫지만, 진짜 청크 간 무응답 감지는 읽기 자체를 감싸는 방식에서만 정확해집니다.
 
 ```python
 import os
@@ -300,7 +300,7 @@ else:
 
 이번 글에서는 스트리밍을 화려한 출력 모드가 아니라 부분 상태를 가진 응답 세션으로 다뤘습니다. 기본 청크 루프는 출발점일 뿐이고, 실제 운영에서는 빈 청크 처리, 읽기 타임아웃 제어, 부분 결과 보존, 정상 종료 여부 확인이 함께 있어야 합니다.
 
-핵심은 스트림이 끊겨도 무슨 일이 일어났는지 설명할 수 있어야 한다는 점입니다. 어디까지 출력이 왔는지, 왜 멈췄는지, 다시 시도할 때 무엇을 유지할지를 상태로 남겨야 스트리밍 경로가 신뢰할 수 있는 시스템 구성 요소가 됩니다.
+중요한 점은 스트림이 끊겨도 무슨 일이 일어났는지 설명할 수 있어야 한다는 데 있습니다. 어디까지 출력이 왔는지, 왜 멈췄는지, 다시 시도할 때 무엇을 유지할지를 상태로 남겨야 스트리밍 경로가 신뢰할 수 있는 시스템 구성 요소가 됩니다.
 
 다음 글에서는 같은 운영 관점을 비용과 지연 시간에 적용합니다. 스트리밍이 부분 응답을 다루는 문제였다면, 캐싱은 반복되는 동일 작업을 다시 계산하지 않도록 만드는 문제입니다.
 
@@ -319,8 +319,11 @@ else:
 ## 참고 자료
 
 ### 공식 문서
-- <https://console.groq.com/docs/text-chat>
-- <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events>
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [MDN Server-sent events guide](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+
+### 검증 보조 자료
+- [Python asyncio.wait_for documentation](https://docs.python.org/3/library/asyncio-task.html#asyncio.wait_for)
 
 ### 관련 시리즈
 - [툴 호출 — 함수를 모델에 연결하기](./02-tool-calling.md)
