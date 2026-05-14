@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -176,6 +176,50 @@ head -n1 "$1" | grep -Eq "$pattern" || {
 $ chmod +x .git/hooks/commit-msg
 ```
 
+## push 전에 message를 검증하는 순서
+
+좋은 message 규칙을 알아도 실제로는 commit 직후 한 번 더 읽지 않으면 subject가 너무 길거나, body가 diff를 그대로 반복하거나, footer가 빠진 채 push되는 일이 자주 생깁니다. 가장 실용적인 방법은 push 전에 짧은 검증 순서를 고정하는 것입니다.
+
+```bash
+$ git log -1 --pretty=fuller
+$ git show --stat --summary --format=fuller HEAD
+```
+
+이 두 명령으로 다음을 확인합니다.
+
+1. **subject만 읽어도 변경 의도가 드러나는가**
+2. **body가 있다면 왜를 설명하는가**
+3. **issue 번호나 breaking change가 footer에 분리돼 있는가**
+4. **diff 범위와 subject가 서로 어긋나지 않는가**
+
+예를 들어 README 오탈자 하나를 고쳤는데 subject가 `refactor(readme): improve docs architecture`처럼 과하면 log를 읽는 사람이 실제 변경을 과대평가하게 됩니다. 반대로 인증 흐름 수정인데 `fix` 한 단어로 끝나면 의도가 사라집니다.
+
+## amend와 rebase를 고르기 전 판단 기준
+
+message를 고칠 때는 명령보다 먼저 **이 commit이 이미 공유됐는가**를 따져야 합니다.
+
+- **아직 push하지 않았다면** `git commit --amend`와 `git rebase -i`로 자유롭게 다듬어도 됩니다.
+- **이미 push했고 다른 사람이 가져갔다면** message를 예쁘게 고치기 위해 history를 다시 쓰지 않는 편이 안전합니다.
+- **PR 리뷰 중이고 내 개인 branch만 쓰는 상황**이라면 `--force-with-lease`를 전제로 amend/rebase가 가능합니다.
+
+이 기준이 중요한 이유는 message 품질보다 협업 안정성이 더 우선인 순간이 있기 때문입니다. history 정리는 branch 경계 안에서 하고, 공유된 `main` 이력은 새 commit으로 보정하는 편이 사고를 줄입니다.
+
+## hook이 commit을 막을 때 읽는 법
+
+형식 검증을 붙이면 처음에는 "왜 commit이 안 되지?"라는 순간이 꼭 옵니다. 이때는 에러를 한 줄씩 읽으면 됩니다.
+
+```text
+Subject does not match the Conventional Commits format.
+```
+
+이 메시지가 나오면 보통 세 가지를 먼저 확인합니다.
+
+- type이 `feat`, `fix`, `docs` 같은 허용 목록 안에 있는가
+- `type(scope): subject` 뒤의 공백과 콜론 위치가 맞는가
+- 첫 줄이 너무 길거나 마침표로 끝나지 않았는가
+
+형식 검증의 목적은 작성자를 괴롭히는 것이 아니라, `main`의 log를 한 번 더 읽기 쉽게 유지하는 것입니다. 그래서 hook이 막았을 때는 우회보다 수정이 기본값이어야 합니다.
+
 ## 자주 하는 실수
 
 - 서로 다른 두 변경을 한 commit에 섞습니다.
@@ -189,6 +233,8 @@ $ chmod +x .git/hooks/commit-msg
 팀은 보통 commit message 규칙을 README나 CONTRIBUTING 문서에 적어 둡니다. subject 길이, 명령형 사용, body의 역할, footer 메타데이터, force push 제한 같은 규칙이 대표적입니다. 그리고 사람의 기억만 믿지 않고 `commit-msg` hook과 CI의 lint 단계로 형식을 강제합니다.
 
 특히 squash merge를 쓰는 팀에서는 PR 제목이 그대로 `main`의 commit message가 되므로, PR 제목도 같은 형식으로 맞추는 편이 유리합니다.
+
+또한 commit message 검증은 log를 위한 일일 뿐 아니라 release note 품질을 위한 일이기도 합니다. `feat`, `fix`, `docs`가 꾸준히 맞아 떨어지면 changelog 초안, 배포 공지, 회귀 분석이 모두 쉬워집니다. 결국 좋은 message는 "나중에 덜 고생하기 위한 선불 비용"에 가깝습니다.
 
 ## 체크리스트
 
@@ -234,5 +280,7 @@ $ chmod +x .git/hooks/commit-msg
 - Git docs, `git commit --amend`: <https://git-scm.com/docs/git-commit>
 - Git docs, `git rebase -i`: <https://git-scm.com/docs/git-rebase>
 - Git docs, "githooks - commit-msg": <https://git-scm.com/docs/githooks#_commit_msg>
+- Git docs, `git show`: <https://git-scm.com/docs/git-show>
+- GitHub Docs, "About squash merges": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
 
 Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame
