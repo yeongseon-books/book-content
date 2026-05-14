@@ -18,22 +18,16 @@ tags:
   - ADR
   - Knowledge
 seo_description: README, ADR, docstring, and runbook roles, plus the Diataxis four-quadrant model in a practical short form.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Documentation
 
-This is post 7 in the Software Engineering 101 series.
+It is tempting to say that good code should make documentation unnecessary. Strong names, small modules, and readable tests do carry a lot of information. But code alone rarely explains why a decision was made, when an operator should follow a procedure, or where a new teammate should start on day one.
 
-> Software Engineering 101 series (7/10)
+The biggest failure mode of weak documentation is not inconvenience. It is dependency on specific people. Every unanswered question routes through memory, availability, and interruption cost. That is why documentation is not a side artifact. It is a core part of asynchronous engineering work.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If the code is good, do you really need docs?
-
-> Code answers "how". Documentation answers "why" and "when".
-
-<!-- a-grade-intro:end -->
+This is post 7 in the Software Engineering 101 series. In this chapter, we split documentation by reader need, then look at the minimum useful shapes for a README, ADR, runbook, docstring, and onboarding checklist.
 
 ## What You Will Learn
 
@@ -51,12 +45,8 @@ Without docs, every question routes through a person. The moment a person become
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    T["Tutorial"] --> H["How-to"]
-    H --> R["Reference"]
-    R --> E["Explanation"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/07/07-01-concept-at-a-glance.en.png)
+*The Diataxis structure that separates docs by reader intent*
 
 Diataxis splits docs by reader intent.
 
@@ -149,6 +139,28 @@ It must be followable at 3 a.m.
 ```
 
 Designs the new hire's first thirty days.
+
+## A document-set verification check
+
+Documentation quality is easier to see through a real journey than through word count. Walk the repo like a new engineer or an on-call responder and see whether the right document appears at the right moment.
+
+### Verification steps
+
+1. Try to understand the project from the README alone for the first five minutes.
+2. Pick one major decision and look for an ADR or RFC that explains it.
+3. Follow an incident runbook and see whether the steps are executable as written.
+
+**Expected output:**
+
+- A strong README reveals project value and startup path quickly.
+- ADRs reduce repeated "why did we do this?" discussions.
+- A runbook gives an operator an order of operations under pressure.
+
+### Failure modes to watch
+
+- The answer is "it is somewhere in the wiki."
+- There is no owner or review date, so readers cannot trust the document.
+- The same onboarding question always routes through the same person.
 
 ## What to Notice in This Code
 
