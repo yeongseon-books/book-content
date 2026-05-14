@@ -14,7 +14,7 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-14'
 seo_description: StateGraph is a blueprint that turns node functions plus transition
   rules into an executable workflow over shared state.
 ---
@@ -164,6 +164,68 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 ---
 
+## Validate the full state, not just the final prose
+
+The fastest way to miss the real lesson in this example is to print only the final answer string. A graph becomes much easier to reason about once you verify the final state object directly.
+
+```python
+app = build_graph()
+result = app.invoke(
+    {
+        "user_request": "Explain how a LangGraph StateGraph works.",
+        "topic": "",
+        "outline": [],
+        "answer": "",
+    }
+)
+
+assert result["topic"] == "graph basics"
+assert result["outline"] == [
+    "Define graph basics",
+    "Show the nodes in the graph",
+    "Explain how invoke() runs the graph",
+]
+assert "Chosen topic: graph basics" in result["answer"]
+
+print(result)
+```
+
+**Expected output:**
+
+```text
+{
+  'user_request': 'Explain how a LangGraph StateGraph works.',
+  'topic': 'graph basics',
+  'outline': [
+    'Define graph basics',
+    'Show the nodes in the graph',
+    'Explain how invoke() runs the graph'
+  ],
+  'answer': 'Request: Explain how a LangGraph StateGraph works.\n...'
+}
+```
+
+That check matters because it keeps `invoke()` from being mentally reduced to “the last function call.” You can see directly that `topic`, `outline`, and `answer` all survive as graph state after execution finishes.
+
+---
+
+## How to narrow down the first failures
+
+Most early failures here are not syntax problems. They come from reading the structure incorrectly.
+
+1. **Keep the initial state explicit.**  
+   If the call site stops initializing fields such as `topic`, `outline`, and `answer`, the graph contract becomes harder to inspect and easier to misuse.
+
+2. **Inspect upstream fields before patching the last node.**  
+   When the final prose looks wrong, the cause is often that `choose_topic()` chose poorly or `build_outline()` returned the wrong structure.
+
+3. **Do not let one node quietly absorb another node’s job.**  
+   Once `choose_topic()` starts building outlines or `build_outline()` starts formatting final prose, the graph still runs but the responsibility boundaries stop explaining themselves.
+
+This is the operational habit I want readers to leave with: inspect the state contract, inspect which fields each node owns, then inspect the final state object. That order turns “the model feels flaky” into a much more concrete debugging question.
+
+---
+
 ## What to notice in this code
 
 Do not try to absorb the entire file at once. On a first pass, there are three things worth locking in.
@@ -274,6 +336,10 @@ In the next post, we will keep that state alive across calls with checkpoints an
 - [LangGraph concepts: low level](https://langchain-ai.github.io/langgraph/concepts/low_level/)
 - [StateGraph API reference](https://langchain-ai.github.io/langgraph/reference/graphs/)
 - [LangGraph introduction tutorial](https://langchain-ai.github.io/langgraph/tutorials/introduction/)
+
+### Source code and examples
+- [langchain-ai/langgraph GitHub repository](https://github.com/langchain-ai/langgraph)
+- [LangGraph quickstart](https://langchain-ai.github.io/langgraph/tutorials/get-started/1-build-basic-chatbot/)
 
 ### Related Series
 - [LangChain 101](../../langchain-101/en/01-lcel-runnable-basics.md) — covers the Runnable and LCEL primitives that LangGraph invokes inside each node. Drop down to it whenever the question is not about the graph itself but about what actually executes inside one of its nodes.
