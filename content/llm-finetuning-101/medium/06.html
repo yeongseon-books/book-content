@@ -74,7 +74,7 @@
 <p>There is a clear reason to make serving its own stage. Training thinks in batches and epochs, but serving must think in <strong>per-request latency and concurrency</strong>. The same model under these two viewpoints needs different code structure, memory policy, and error handling. Episode 6 practices that switch in the smallest possible unit.</p>
 <h2>Mental Model</h2>
 <p>A serving system decomposes into four layers.</p>
-<pre><code>[client] -&gt; HTTP -&gt; [API layer] -&gt; [model layer] -&gt; [weights store]
+<pre><code class="language-text">[client] -&gt; HTTP -&gt; [API layer] -&gt; [model layer] -&gt; [weights store]
                        |              |              |
                     FastAPI      tokenizer +     base model
                     Pydantic     model.generate  + adapter
@@ -225,6 +225,7 @@ print(client.post(&quot;/generate&quot;, json={&quot;prompt&quot;: &quot;Python 
 <hr>
 <h2>References</h2>
 <ul>
+<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://fastapi.tiangolo.com/">FastAPI documentation</a></li>
 <li><a href="https://www.starlette.io/testclient/">Starlette TestClient reference</a></li>
 <li><a href="https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters">PEFT — Multiple adapters</a></li>

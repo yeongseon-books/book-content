@@ -243,6 +243,7 @@ The next step is leaving the series and repeating this same flow on your own dom
 
 ## References
 
+- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
 - [Starlette TestClient reference](https://www.starlette.io/testclient/)
 - [PEFT — Multiple adapters](https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters)
