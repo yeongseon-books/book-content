@@ -17,7 +17,7 @@ tags:
   - DataAnalysis
   - Beginner
 seo_description: CSV와 Excel을 정확히 읽는 핵심 옵션과 점검 순서를 정리한 글입니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # CSV와 Excel 읽기
@@ -44,12 +44,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    File["CSV / Excel"] --> Read["read_csv / read_excel"]
-    Read --> Check["dtypes / shape / head"]
-    Check --> Fix["fix encoding / dtype / header"]
-```
+![인코딩, 자료형, 헤더를 점검하며 파일을 읽는 적재 흐름](../../../assets/pandas-101/03/03-01-concept-at-a-glance.ko.png)
+*인코딩, 자료형, 헤더를 점검하며 파일을 읽는 적재 흐름*
 
 ## 핵심 용어
 
@@ -73,6 +69,18 @@ flowchart LR
 import pandas as pd
 df = pd.read_csv("sales.csv")
 print(df.shape, df.dtypes)
+```
+
+파일을 읽자마자 크기와 자료형을 함께 보는 이유가 여기 있습니다. 열 개수는 맞아도 자료형이 어긋나면 이후 계산이 모두 흔들릴 수 있습니다.
+
+**예상 출력:**
+
+```text
+(3, 3)
+product_id    object
+qty            int64
+amount       float64
+dtype: object
 ```
 
 기본 호출은 빠른 확인에는 좋지만, 그대로 운영 코드가 되면 위험합니다. 읽은 직후 `shape`와 `dtypes`를 같이 보는 습관이 중요합니다.
@@ -115,6 +123,14 @@ total = 0
 for chunk in pd.read_csv("big.csv", chunksize=100_000):
     total += len(chunk)
 print(total)
+```
+
+청크 단위 적재는 큰 파일을 통째로 메모리에 올리지 않고도 행 수나 부분 집계를 확인할 수 있게 해 줍니다. 운영 환경에서는 이런 중간 확인이 메모리 사고를 예방합니다.
+
+**예상 출력:**
+
+```text
+1000000
 ```
 
 메모리에 한 번에 올리기 어려운 파일은 `chunksize`를 기준으로 나눠 읽는 편이 안전합니다. 행 수 계산, 부분 집계, 전처리처럼 순차 처리가 가능한 작업에서 특히 유용합니다.
