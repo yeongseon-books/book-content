@@ -17,7 +17,7 @@ tags:
   - DBSCAN
   - UnsupervisedLearning
 seo_description: KMeans와 DBSCAN의 차이, K 선택, 표준화, 군집 해석의 책임까지 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Clustering
@@ -42,14 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Data["X (no y)"] --> Std["standardize"]
-    Std --> KM["KMeans (K)"]
-    Std --> DB["DBSCAN (eps)"]
-    KM --> Out["clusters"]
-    DB --> Out
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/07/07-01-diagram.ko.png)
+
+*표준화된 입력을 KMeans나 DBSCAN에 넣으면 서로 다른 기준으로 데이터의 잠재 구조를 묶어 볼 수 있습니다.*
 
 ## 핵심 용어
 
@@ -106,11 +101,19 @@ db = DBSCAN(eps=0.5, min_samples=5).fit(X)
 print("labels:", set(db.labels_))
 ```
 
+**Expected output:** KMeans는 inertia와 silhouette 점수를 내고, DBSCAN은 `-1`을 포함할 수 있는 레이블 집합을 반환합니다. `-1`이 보이면 그 점들은 어느 군집에도 자연스럽게 속하지 않는 **노이즈 후보**라는 뜻입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - KMeans는 `K`가 필요하고, DBSCAN은 `eps`가 필요합니다.
 - 표준화 여부가 결과 전체를 바꿉니다.
 - DBSCAN에서 `-1` 레이블은 노이즈를 뜻합니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 표준화 전후로 군집이 크게 바뀌면, 데이터 구조보다 **거리 스케일**이 더 많은 일을 하고 있던 것입니다.
+- Elbow와 Silhouette이 서로 다른 답을 가리키면, 그림을 직접 보고 **비즈니스 의미**까지 포함해 결정해야 합니다.
+- DBSCAN이 거의 전부를 노이즈로 보내면, 데이터에 구조가 없다고 결론 내리기보다 `eps`, `min_samples`, 스케일을 먼저 다시 봐야 합니다.
 
 ## 자주 하는 실수 5가지
 
