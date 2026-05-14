@@ -17,7 +17,7 @@ tags:
   - GitHub
   - Beginner
 seo_description: 리드미 문서를 단순한 소개글이 아니라 첫 5분 온보딩을 책임지는 안내서로 보고 설치부터 라이선스까지의 필수 구성을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 좋은 리드미 문서
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 사용자의 읽기 순서를 따라가기
 
-```mermaid
-flowchart LR
-    T[제목] --> D[설명]
-    D --> I[설치]
-    I --> U[사용 예시]
-    U --> L[라이선스]
-```
+![사용자의 읽기 순서를 따라가기](../../../assets/open-source-101/05/05-01-follow-the-reader-s-order.ko.png)
 
+*처음 방문한 사용자가 제목에서 설치와 사용 예시로 이동하는 읽기 순서*
 이 흐름이 중요한 이유는 읽는 사람의 관심사가 이 순서로 움직이기 때문입니다. 먼저 이 프로젝트가 무엇인지 알고 싶고, 다음에는 설치 가능한지 보고, 그다음 실제로 어떻게 쓰는지 확인합니다. 라이선스와 기여 안내는 그 다음입니다.
 
 리드미 문서가 길어도 괜찮습니다. 다만 첫 5분 안에 필요한 정보가 위로 올라와 있어야 합니다. 처음부터 아키텍처 전체와 세부 설계까지 밀어 넣으면 입구 문서가 아니라 장벽이 됩니다.
@@ -192,5 +187,6 @@ MIT © 2026 Author Name
 - [GitHub README guide](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
 - [Awesome README](https://github.com/matiassingers/awesome-readme)
 - [Shields.io](https://shields.io/)
+- [GitHub Docs 저장소](https://github.com/github/docs)
 
 Tags: OpenSource, README, Documentation, GitHub, Beginner
