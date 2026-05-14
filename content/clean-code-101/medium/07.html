@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Comments and Documentation</h1>
-<blockquote>
-<p>Clean Code 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a good comment look like?</p>
-<blockquote>
-<p>One that explains the "why" the code cannot. The "what" should be visible in the code itself.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.</p>
+<p>This is post 7 in the Clean Code 101 series.</p>
+<p>Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>When not to write a comment</li>
@@ -79,12 +72,8 @@
 <p>The best comment is the one you no longer need.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[&quot;Need explanation?&quot;] --&gt;|&quot;Code can do it&quot;| C[&quot;Improve naming/structure&quot;]
-    Q --&gt;|&quot;Why is missing&quot;| W[&quot;Intent comment&quot;]
-    Q --&gt;|&quot;Hazard&quot;| A[&quot;Warning comment&quot;]
-    Q --&gt;|&quot;Public API&quot;| D[&quot;Docstring&quot;]
-</code></pre>
+<p><img alt="Comments and Documentation" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Commenting flow: code should explain what, while comments and docs explain why, risk, and contract.</em></p>
 <p>If something needs explaining, fix the code first.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -158,6 +147,20 @@ Payment domain service that responds within 5 seconds.
 def retry_simple(): ...
 </code></pre>
 <p>Every TODO needs a person and a date.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">ruff check app/
+python -m pytest -q tests/test_public_api_docs.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Names and structure should carry the main explanation without comment noise.</li>
+<li>Public API contracts should match both tests and docs.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Comments merely restate the code.</li>
+<li>TODOs have no owner or tracking link and turn into permanent debt.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Code expresses "what"; comments express "why".</li>
