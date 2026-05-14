@@ -26,7 +26,7 @@ tags:
 - Airflow
 - pandera
 - MLOps
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 
 seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunking, quality…
 ---
@@ -37,13 +37,11 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 
 이 단계에서 요구되는 것은 알고리즘이 아니라 시스템 속성입니다. 같은 입력이면 같은 출력이 나와야 하고, 어느 단계에서 몇 행이 떨어졌는지 관측 가능해야 하며, 중간 산출물과 데이터 버전이 코드 커밋과 연결돼야 합니다.
 
-프로덕션 데이터 파이프라인은 결국 데이터셋을 코드처럼 다루는 문제입니다. 버전, 캐시, lineage, schema validation, scheduler, retry가 모두 필요합니다. 한 단계라도 임시 스크립트로 남겨 두면 파이프라인 전체의 신뢰도가 떨어집니다.
-
 좋은 팀은 모델 학습보다 먼저 데이터 파이프라인의 재실행 가능성과 관측성을 검증합니다. 모델은 바뀌어도 파이프라인은 계속 남기 때문입니다.
 
-이 글은 AI Data Preparation 101 시리즈의 마지막 글입니다.
+이 글은 AI Data Preparation 101 시리즈의 마지막 글입니다. 여기서는 앞선 아홉 편의 단계를 하나의 프로덕션 데이터 파이프라인으로 묶기 위해 필요한 버전 관리, 캐싱, 오케스트레이션, 관측성, 스키마 검증을 정리하겠습니다.
 
-여기서는 앞선 아홉 편의 단계를 하나의 프로덕션 데이터 파이프라인으로 묶기 위해 필요한 버전 관리, 캐싱, 오케스트레이션, 관측성, 스키마 검증을 정리하겠습니다.
+프로덕션 데이터 파이프라인은 결국 데이터셋을 코드처럼 다루는 문제입니다. 버전, 캐시, lineage, schema validation, scheduler, retry가 모두 필요합니다. 한 단계라도 임시 스크립트로 남겨 두면 파이프라인 전체의 신뢰도가 떨어집니다.
 
 ## 이 글에서 다룰 문제
 
