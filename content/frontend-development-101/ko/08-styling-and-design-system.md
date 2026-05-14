@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 스타일링과 디자인 시스템
 
-이 글은 Frontend Development 101 시리즈의 여덟 번째 글입니다.
-
 초기 프로젝트에서는 버튼 하나쯤 직접 색을 주고 간격을 맞춰도 큰 문제가 없어 보입니다. 하지만 화면이 늘어나고 팀원이 늘어나면 작은 차이가 금방 누적됩니다. 페이지마다 파란색이 조금씩 다르고, 간격 기준이 섞이고, 다크 모드는 나중에 붙이려다 전체를 다시 만지게 됩니다.
 
-이 글에서는 스타일링을 단순한 CSS 작성이 아니라 일관성을 운영하는 체계로 설명하겠습니다. 한 가지 관점이 중요합니다. 색, 간격, 타이포그래피 같은 시각 규칙은 개별 컴포넌트 안에 흩어져 있으면 안 되고, 토큰과 공용 컴포넌트 계층으로 모여 있어야 한다는 점입니다.
+이 글은 Frontend Development 101 시리즈의 여덟 번째 글입니다. 여기서는 스타일링을 단순한 CSS 작성이 아니라 일관성을 운영하는 체계로 설명합니다. 색, 간격, 타이포그래피 같은 시각 규칙은 개별 컴포넌트 안에 흩어져 있으면 안 되고 토큰과 공용 컴포넌트 계층으로 모여 있어야 합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Tokens["Design tokens"] --> Comp["Components"]
-    Comp --> Pages["Pages"]
-    Tokens --> Theme["Light/Dark theme"]
-    Theme --> Pages
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/08/08-01-diagram.ko.png)
+
+*디자인 토큰, 컴포넌트, 페이지, 테마가 한 시스템으로 연결되는 구조*
 
 디자인 토큰이 가장 아래의 공통 규칙이고, 컴포넌트는 그 규칙을 구현하며, 페이지는 그 컴포넌트를 조합합니다. 다크 모드도 대개 구조 자체를 바꾸는 것이 아니라 토큰 값을 바꾸는 문제로 다뤄야 합니다.
 
@@ -136,6 +130,16 @@ function Button({ children, variant = "primary" }) {
 
 이 예제에서 핵심은 스타일이 컴포넌트 내부에 흩어져 있지 않다는 점입니다. 이름 있는 토큰을 기준으로 버튼 변형을 정의하고, 다크 모드도 새 코드를 많이 추가하는 대신 토큰 조합으로 해결합니다.
 
+## 검증 포인트
+
+- 토큰 값 하나를 바꿨을 때 버튼과 표면색이 한 번에 바뀌는지 확인합니다.
+- 다크 모드 클래스를 켰을 때 대비와 상태 스타일이 모두 같이 바뀌는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 색이 일부만 바뀌면 하드코딩 색상이 남아 있는지 확인합니다.
+- 다크 모드가 안 먹으면 `darkMode` 설정과 실제 클래스 부착 위치를 먼저 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - 모든 색이 `primary` 같은 이름으로 표현되어 변경 지점이 한곳으로 모입니다.
@@ -193,15 +197,20 @@ function Button({ children, variant = "primary" }) {
 - [API 호출과 비동기](./06-api-calls-and-async.md)
 - [폼과 유효성 검사](./07-forms-and-validation.md)
 - **스타일링과 디자인 시스템 (현재 글)**
+
 - 빌드 도구와 번들링 (예정)
 - 작은 프론트엔드 앱 만들기 (예정)
 <!-- toc:end -->
 
 ## 참고 자료
 
-- [Tailwind CSS docs](https://tailwindcss.com/)
-- [Storybook](https://storybook.js.org/)
-- [Design Tokens W3C draft](https://www.w3.org/community/design-tokens/)
-- [Material Design](https://m3.material.io/)
+### 공식 문서
+- [Tailwind CSS documentation](https://tailwindcss.com/docs/installation)
+- [Storybook documentation](https://storybook.js.org/docs)
+- [W3C Design Tokens Community Group](https://www.w3.org/community/design-tokens/)
+
+### 확인용 자료
+- [Material Design 3](https://m3.material.io/)
+- [MDN: prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
 
 Tags: Frontend, CSS, DesignSystem, Tailwind, UX

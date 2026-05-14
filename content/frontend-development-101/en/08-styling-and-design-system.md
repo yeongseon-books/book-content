@@ -22,23 +22,16 @@ last_reviewed: '2026-05-04'
 
 # Styling and Design Systems
 
-This is post 8 in the Frontend Development 101 series.
+At the start of a project, it feels harmless to hand-pick one color for one button and one spacing value for one card. That convenience disappears as the project and the team grow. Tiny inconsistencies accumulate, dark mode becomes expensive, and the interface starts to feel unfinished even when the logic works.
 
-> Frontend Development 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you keep design *consistent* as a project grows?
-
-> Through *design tokens* and a *component library*. Manage every color, spacing, and typography choice *in one place*.
-
-<!-- a-grade-intro:end -->
+This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.
 
 ## What You Will Learn
 
 - A *comparison* of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)
 - The role of *design tokens* (color, spacing, typography)
 - The internal structure of a *component library*
+
 - Dark mode and theming
 - *Automatically enforcing* consistency
 
@@ -50,13 +43,9 @@ Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons t
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Tokens["Design tokens"] --> Comp["Components"]
-    Comp --> Pages["Pages"]
-    Tokens --> Theme["Light/Dark theme"]
-    Theme --> Pages
-```
+![Concept at a Glance](../../../assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
+
+*How design tokens, components, pages, and themes connect into one styling system*
 
 ## Key Terms
 
@@ -134,6 +123,16 @@ function Button({ children, variant = "primary" }) {
 # Catches arbitrary class names and bad token usage at lint time.
 ```
 
+## Verification
+
+- Change one token value and confirm that the button and surface styles update together rather than one component at a time.
+- Turn on dark mode and verify that contrast and state styles move with the theme instead of remaining hard-coded.
+
+## If It Fails, Check This First
+
+- If only part of the UI changes, search for hard-coded colors or spacing values that bypass the token layer.
+- If dark mode does not apply, check the `darkMode` configuration and where the theme class is attached.
+
 ## What to Notice in This Code
 
 - All colors appear by *name* (like `primary`) — change in *one place*.
@@ -157,6 +156,7 @@ Most teams catalog components in *Storybook* and unify styling with *Tailwind/CS
 - *Color without a token* gets caught in code review.
 - Build the design system *with designers*, not for them.
 - New components must answer: *why doesn't an existing one work?*
+
 - Storybook is *unit testing for components*.
 - Dark mode should be solved *purely by tokens*.
 
@@ -187,15 +187,20 @@ Even styling needs *shared vocabulary*. Next, we look at the build tools that tu
 - [API Calls and Async](./06-api-calls-and-async.md)
 - [Forms and Validation](./07-forms-and-validation.md)
 - **Styling and Design Systems (current)**
+
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
 <!-- toc:end -->
 
 ## References
 
-- [Tailwind CSS docs](https://tailwindcss.com/)
-- [Storybook](https://storybook.js.org/)
-- [Design Tokens W3C draft](https://www.w3.org/community/design-tokens/)
-- [Material Design](https://m3.material.io/)
+### Official Docs
+- [Tailwind CSS documentation](https://tailwindcss.com/docs/installation)
+- [Storybook documentation](https://storybook.js.org/docs)
+- [W3C Design Tokens Community Group](https://www.w3.org/community/design-tokens/)
+
+### Verification and Further Reading
+- [Material Design 3](https://m3.material.io/)
+- [MDN: prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme)
 
 Tags: Frontend, CSS, DesignSystem, Tailwind, UX
