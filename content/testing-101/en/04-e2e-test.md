@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # E2E Test
 
-This is post 4 in the Testing 101 series.
+It is entirely possible for the UI team to say the page renders, the backend team to say the API returns 200, and the database team to say persistence is healthy—while users still cannot log in. End-to-end tests exist for that exact gap between local confidence and real user success.
 
-> Testing 101 series (4/10)
+They are expensive because they run through the most surface area: browser, frontend, backend, and storage. That cost is precisely why they need to be selective and operationally disciplined.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.
 
-**Core question**: How do we automatically confirm that signup works *on the screen the user actually sees*?
-
-> An E2E test *spins up a browser* and *clicks and types* like a user. It is the most expensive verification, and the *closest to reality*.
-
-<!-- a-grade-intro:end -->
+> E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.
 
 ## What You Will Learn
 
@@ -50,13 +46,9 @@ A passing E2E test means *frontend, backend, and DB work together*. It is the *m
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Browser["Browser"] --> FE["Frontend"]
-    FE --> API["Backend API"]
-    API --> DB[("DB")]
-```
+![Concept at a Glance](../../../assets/testing-101/04/04-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **E2E (end-to-end)**: the full flow from *user start to result*.
@@ -156,6 +148,20 @@ def test_login_with_page_object(page):
 4. **Using *CSS class* selectors.** They *break with every UI change*.
 5. **Scenarios *depending on each other*.** Isolation is what enables *re-runs*.
 
+## Verification Points
+
+1. Run the same login scenario three times in a row. A scenario that passes once but fails on repeat is already telling you something about selector or wait instability.
+2. Compare a `sleep`-based version with a `wait_for_url` or locator-based wait. The flakiness difference usually shows up immediately.
+3. Confirm the scenario still makes sense with staging or sandbox credentials. If it depends on live production data, it is not safely repeatable.
+
+**Expected output:** the core scenario should behave the same across repeated runs, and failures should tell you exactly which screen condition was never reached.
+
+## Failure Signals and First Checks
+
+- If CSS-class selectors break often, switch to role-based locators or `data-testid`.
+- If scenarios share login state, reruns and parallel execution will become fragile fast.
+- If PR feedback is too slow, keep only critical paths in the default E2E tier and move the heavier flows elsewhere.
+
 ## How This Shows Up in Production
 
 Most teams keep only *5\~20 critical scenarios* as E2E. *Playwright/Cypress* are standard, and some add *visual regression* tests.
@@ -200,8 +206,12 @@ E2E is the *most realistic* signal. From the next post we cover *test doubles* f
 
 ## References
 
-- [Playwright docs](https://playwright.dev/python/)
-- [Cypress docs](https://docs.cypress.io/)
+### Official Docs
+- [Playwright for Python](https://playwright.dev/python/)
+- [Playwright locators guide](https://playwright.dev/python/docs/locators)
+- [Playwright auto-waiting](https://playwright.dev/python/docs/actionability)
+
+### Practical Reading
 - [Martin Fowler — Test Pyramid](https://martinfowler.com/bliki/TestPyramid.html)
 - [Google Testing Blog — Flaky Tests](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html)
 

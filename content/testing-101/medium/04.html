@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>E2E Test</h1>
-<p>This is post 4 in the Testing 101 series.</p>
+<p>It is entirely possible for the UI team to say the page renders, the backend team to say the API returns 200, and the database team to say persistence is healthy—while users still cannot log in. End-to-end tests exist for that exact gap between local confidence and real user success.</p>
+<p>They are expensive because they run through the most surface area: browser, frontend, backend, and storage. That cost is precisely why they need to be selective and operationally disciplined.</p>
+<p>This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.</p>
 <blockquote>
-<p>Testing 101 series (4/10)</p>
+<p>E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we automatically confirm that signup works <em>on the screen the user actually sees</em>?</p>
-<blockquote>
-<p>An E2E test <em>spins up a browser</em> and <em>clicks and types</em> like a user. It is the most expensive verification, and the <em>closest to reality</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>E2E</em> and how it relates to other tests</li>
@@ -80,11 +74,8 @@
 <p>E2E is the <em>user's point of view</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Browser[&quot;Browser&quot;] --&gt; FE[&quot;Frontend&quot;]
-    FE --&gt; API[&quot;Backend API&quot;]
-    API --&gt; DB[(&quot;DB&quot;)]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>E2E (end-to-end)</strong>: the full flow from <em>user start to result</em>.</li>
@@ -161,6 +152,19 @@ def test_login_with_page_object(page):
 <li><strong>Using <em>CSS class</em> selectors.</strong> They <em>break with every UI change</em>.</li>
 <li><strong>Scenarios <em>depending on each other</em>.</strong> Isolation is what enables <em>re-runs</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Run the same login scenario three times in a row. A scenario that passes once but fails on repeat is already telling you something about selector or wait instability.</li>
+<li>Compare a <code>sleep</code>-based version with a <code>wait_for_url</code> or locator-based wait. The flakiness difference usually shows up immediately.</li>
+<li>Confirm the scenario still makes sense with staging or sandbox credentials. If it depends on live production data, it is not safely repeatable.</li>
+</ol>
+<p><strong>Expected output:</strong> the core scenario should behave the same across repeated runs, and failures should tell you exactly which screen condition was never reached.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If CSS-class selectors break often, switch to role-based locators or <code>data-testid</code>.</li>
+<li>If scenarios share login state, reruns and parallel execution will become fragile fast.</li>
+<li>If PR feedback is too slow, keep only critical paths in the default E2E tier and move the heavier flows elsewhere.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most teams keep only <em>5\~20 critical scenarios</em> as E2E. <em>Playwright/Cypress</em> are standard, and some add <em>visual regression</em> tests.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -199,12 +203,13 @@ def test_login_with_page_object(page):
 <li>Building a Test Strategy (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://playwright.dev/python/">Playwright docs</a></li>
-<li><a href="https://docs.cypress.io/">Cypress docs</a></li>
-<li><a href="https://martinfowler.com/bliki/TestPyramid.html">Martin Fowler — Test Pyramid</a></li>
-<li><a href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html">Google Testing Blog — Flaky Tests</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://playwright.dev/python/">Playwright for Python</a><br>
+- <a href="https://playwright.dev/python/docs/locators">Playwright locators guide</a><br>
+- <a href="https://playwright.dev/python/docs/actionability">Playwright auto-waiting</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://martinfowler.com/bliki/TestPyramid.html">Martin Fowler — Test Pyramid</a><br>
+- <a href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html">Google Testing Blog — Flaky Tests</a></p>
 <p class="tags-line">Tags: Testing, E2E, Playwright, Browser, Automation</p>
 </body>
 </html>
