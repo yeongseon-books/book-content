@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Graph Traversal — BFS and DFS</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: How do you determine whether two points in a network are connected?</p>
-<blockquote>
-<p>A graph is a data structure made of nodes (vertices) and edges. BFS and DFS are two strategies for systematically visiting every node. This article shows how to represent graphs in Python and implement both traversals.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Networks, maps, dependency trees, and recommendation systems all reduce to relationships between nodes. That is why graph thinking shows up so often once you move past basic arrays and lists.</p>
+<p>BFS and DFS are the two foundational traversal strategies. If you can tell when to use each one, shortest paths, cycle checks, and connected-component problems become much easier to reason about.</p>
+<p>This is post 7 in the Algorithms with Python 101 series. Here, we'll represent graphs in Python and implement both BFS and DFS with practical use cases in mind.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Graph basics and how to represent them in Python</li>
@@ -82,13 +74,15 @@
 <blockquote>
 <p>A graph is a collection of nodes (vertices) and edges</p>
 </blockquote>
-<pre><code>Example graph:     BFS order:           DFS order:
+<pre><code class="language-text">Example graph:     BFS order:           DFS order:
   A—B               A (layer 0)         A → B → D → E → C → F
   |\ \              B, C (layer 1)
   | C  D            D, E, F (layer 2)
   |/ \
   E   F
 </code></pre>
+<p><img alt="BFS layers compared with a DFS-first path" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.en.png"></p>
+<p><em>BFS expands level by level, while DFS commits to one branch first and backtracks later.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Vertex (node)</strong><br>
 - Description: An individual element in a graph</p>
@@ -315,6 +309,13 @@ print(has_cycle(graph, &quot;A&quot;))  # True
 <h2>How Senior Engineers Think About This</h2>
 <p>BFS and DFS are the building blocks of graph algorithms. Once you understand these two, advanced algorithms like Dijkstra, topological sort, and minimum spanning tree follow naturally.</p>
 <p>In production, you would use libraries like NetworkX, but knowing BFS/DFS internals helps you choose the right algorithm for the job.</p>
+<h2>What to check before choosing BFS or DFS</h2>
+<ul>
+<li>If you need the minimum number of hops, start with BFS. On unweighted graphs, arrival order is already the answer.</li>
+<li>If you need structure-oriented answers like cycle detection, dependency ordering, or full path exploration, DFS is usually the more natural fit.</li>
+<li>If the graph can become very deep, prefer iterative DFS over recursive DFS. Stack-depth failures are a production bug, not just an interview concern.</li>
+<li>When traversal looks too slow or memory-heavy, check visited-state handling before changing algorithms. Duplicate visits are the most common real-world failure mode.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Represent a graph using an adjacency list</li>

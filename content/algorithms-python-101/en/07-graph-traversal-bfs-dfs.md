@@ -56,6 +56,10 @@ Example graph:     BFS order:           DFS order:
   E   F
 ```
 
+![BFS layers compared with a DFS-first path](../../../assets/algorithms-python-101/07/07-01-concept-overview.en.png)
+
+*BFS expands level by level, while DFS commits to one branch first and backtracks later.*
+
 ## Key Concepts
 
 | Term | Description |
@@ -303,6 +307,13 @@ print(has_cycle(graph, "A"))  # True
 BFS and DFS are the building blocks of graph algorithms. Once you understand these two, advanced algorithms like Dijkstra, topological sort, and minimum spanning tree follow naturally.
 
 In production, you would use libraries like NetworkX, but knowing BFS/DFS internals helps you choose the right algorithm for the job.
+
+## What to check before choosing BFS or DFS
+
+- If you need the minimum number of hops, start with BFS. On unweighted graphs, arrival order is already the answer.
+- If you need structure-oriented answers like cycle detection, dependency ordering, or full path exploration, DFS is usually the more natural fit.
+- If the graph can become very deep, prefer iterative DFS over recursive DFS. Stack-depth failures are a production bug, not just an interview concern.
+- When traversal looks too slow or memory-heavy, check visited-state handling before changing algorithms. Duplicate visits are the most common real-world failure mode.
 
 ## Checklist
 
