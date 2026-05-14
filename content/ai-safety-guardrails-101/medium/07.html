@@ -60,7 +60,14 @@
 <p>People use "hallucination" for any confident mistake, but production guardrails need a tighter target. In RAG systems, the practical question is whether the answer is actually grounded in the provided evidence.</p>
 <p>This is post 7 in the AI Safety &amp; Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why should a production guardrail focus on closed-domain hallucinations first?</li>
+<li>What is the difference between citation, source, and semantic grounding?</li>
+<li>Why does claim-level verification catch errors that sentence-level checks miss?</li>
+<li>When should NLI stop and a judge model take over?</li>
+<li>What fallback works better than simply blocking every failed answer?</li>
+</ul>
 <h2>The Trap in the Word "Hallucination"</h2>
 <p>People call any confidently wrong LLM output a hallucination, but for operations you need a tighter definition.</p>
 <ul>
@@ -69,6 +76,8 @@
 </ul>
 <p>This episode focuses on <strong>closed-domain</strong>, because most production guardrails are RAG-based and grounding checks are the most reliable defense.</p>
 <h2>What Grounding Actually Means</h2>
+<p><img alt="What Grounding Actually Means" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png"><br>
+<em>Grounding verification becomes manageable once the answer is decomposed into claims and checked in increasing-cost stages.</em></p>
 <p>Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.</p>
 <p><strong>Citation grounding</strong><br>
 - Meaning: Every factual sentence carries a citation marker<br>
@@ -215,6 +224,14 @@ def citation_check(answer: str, retrieved_ids: set[int]) -&gt; dict:
 <li>Order checks by cost: claim extraction, NLI first pass, LLM judge only for the grey zone.</li>
 <li>Enforce citation format so chunk-ID matching can verify source grounding automatically.</li>
 <li>Track claim-level precision and recall on public and internal regression sets to tune thresholds with data.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Require a stable citation format in every grounded answer.</li>
+<li>[ ] Decompose answers into atomic claims before semantic verification.</li>
+<li>[ ] Reserve the judge model for grey-zone claims to control cost.</li>
+<li>[ ] Choose a fallback policy for failed grounding before launch.</li>
+<li>[ ] Track claim precision, recall, latency, and cost on regression sets.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>
