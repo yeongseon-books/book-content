@@ -2,7 +2,7 @@
 series: incident-response-101
 episode: 10
 title: Building an Incident Runbook
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,60 +16,56 @@ tags:
   - OnCall
   - Capstone
   - Operations
-seo_description: A capstone guide to building an incident runbook covering SEV mapping, on-call schedules, communication templates, and runbooks-as-code
-last_reviewed: '2026-05-04'
+seo_description: Learn how to assemble SEV policy, on-call ownership, templates, and drills into a practical runbook-as-code workflow.
+last_reviewed: '2026-05-15'
 ---
 
 # Building an Incident Runbook
 
-> Incident Response 101 series (10/10)
+During a real incident, scattered documentation is almost as dangerous as missing documentation. If the SEV matrix lives in one wiki, the on-call schedule in another tool, and the customer-update template in a personal note, the team loses time before it even starts acting.
 
-<!-- a-grade-intro:begin -->
+A runbook is valuable because it turns those fragments into one executable operating surface. It tells the responder where to begin, what to check next, and how the incident should flow into postmortem and prevention work.
 
-**Core question**: How do you bind everything you learned — *severity*, *response*, *communication*, *timeline*, *RCA*, *mitigation*, *postmortem*, *prevention* — into a *single runbook*?
+This is the final post in the Incident Response 101 series. This capstone post shows how to assemble a runbook as code so response logic, templates, ownership, and drill practice evolve together.
 
-> A *runbook* is *code-shaped documentation* that holds *SEV mapping* through *postmortem templates* in *one repository*.
+## Questions this chapter answers
 
-<!-- a-grade-intro:end -->
+A runbook fails when it is only a reading document. During a live incident, responders need one place that links severity policy, current ownership, communication templates, next-step logic, and postmortem follow-through.
 
-This is the final post in the Incident Response 101 series.
+> A good runbook is an operating interface, not a pile of notes. It should let a responder move from page acknowledgement to postmortem creation without hunting through five systems.
 
-## What You Will Learn
+- Why does runbook quality show up most clearly at 3 a.m.?
+- How should severity policy connect to on-call ownership and templates?
+- Why is runbooks-as-code better than keeping everything in a wiki?
+- What should be exercised in drills before the runbook is trusted?
+- How do you keep the runbook current after real incidents?
 
-- *SEV* mapping
-- *On-call* schedule
-- *Communication* templates
-- *Runbooks as code*
-- *Drills* and *maintenance*
+## Why this topic matters
 
-## Why It Matters
+The first cost of scattered operations knowledge is search time. The second cost is inconsistency: people start from different assumptions and follow different links even though they are handling the same outage.
 
-When *documents* are *scattered*, you do not know *where to start* at *3 a.m.*
+A runbook repository reduces both costs. It makes the response path reviewable, versioned, and easy to improve after drills or real incidents.
 
-## Concept at a Glance
+## Diagram at a glance
 
-```mermaid
-flowchart LR
-    Sev["sev map"] --> OnCall["on-call"]
-    OnCall --> Comms["comms templates"]
-    Comms --> Steps["response steps"]
-    Steps --> PM["postmortem template"]
-    PM --> Repo["runbook repo"]
-```
+![Diagram at a glance](../../../assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
+
+*Diagram at a glance*
+Think of the runbook as a graph, not a page. Severity, on-call, templates, response steps, and postmortem linkage have to connect cleanly for the system to be usable under stress.
 
 ## Key Terms
 
-- **runbook**: a collection of *response procedures*.
-- **on-call**: the *paging* schedule.
-- **sev map**: a mapping from *SEV* to *response*.
-- **template**: a reusable *form*.
-- **drill**: a *practice* exercise.
+- **runbook**: a collection of response procedures.
+- **on-call**: the paging schedule.
+- **sev map**: a mapping from SEV to response.
+- **template**: a reusable form.
+- **drill**: a practice exercise.
 
 ## Before/After
 
-**Before**: scattered across *Wikis*, *Slack pins*, and *personal notes*.
+**Before**: scattered across Wikis, Slack pins, and personal notes.
 
-**After**: unified as *code* in a *Git repository*.
+**After**: unified as code in a Git repository.
 
 ## Hands-on: Runbook Capstone
 
@@ -131,47 +127,69 @@ def run_incident(sev, schedule, now, summary):
 
 ## What to Notice in This Code
 
-- Every *stage* is a *data structure*.
-- *State transitions* are *tuple indices*.
-- *Postmortem* is a *file link*.
+- Every stage is a data structure.
+- State transitions are tuple indices.
+- Postmortem is a file link.
 
 ## Five Common Mistakes
 
-1. **Keeping the *runbook* only in a *Wiki*.**
-2. **Using the *same procedure* for *every SEV*.**
-3. ***On-call* info living in an *external* tool only.**
-4. **Templates that are *not current*.**
-5. **Going *live* without a *drill*.**
+1. **Keeping the runbook only in a Wiki.**
+2. **Using the same procedure for every SEV.**
+3. **On-call info living in an external tool only.**
+4. **Templates that are not current.**
+5. **Going live without a drill.**
 
 ## How This Shows Up in Production
 
-A *runbook/* directory holds *Markdown* plus *Python scripts*; *PR review* tracks *changes*. *Quarterly drills* keep it *up to date*.
+A runbook/ directory holds Markdown plus Python scripts; PR review tracks changes. Quarterly drills keep it up to date.
 
 ## How a Senior Engineer Thinks
 
-- A *runbook* is *code*.
-- Without *practice*, it is *useless*.
-- *Quarterly drills* are *culture*.
-- *Changes* go through *PRs*.
-- One procedure for *all SEVs* is *dangerous*.
+- A runbook is code.
+- Without practice, it is useless.
+- Quarterly drills are culture.
+- Changes go through PRs.
+- One procedure for all SEVs is dangerous.
+
+## Example runbook repository layout
+
+A runbook works better when the directory structure itself makes the response path obvious.
+
+```text
+runbook/
+  sev-matrix.md
+  oncall.md
+  comms/
+    internal.md
+    external.md
+    exec.md
+  procedures/
+    rollback.md
+    scale-out.md
+    statuspage.md
+  postmortems/
+    template.md
+```
+
+The goal is not to flatten every document into one giant file. The goal is to make the start point and the next links obvious enough that a responder can move quickly under stress.
 
 ## Checklist
 
-- [ ] *SEV map*.
-- [ ] *On-call schedule*.
-- [ ] *Communication templates*.
-- [ ] *Postmortem template*.
-- [ ] *Quarterly drill*.
+- [ ] SEV map.
+- [ ] On-call schedule.
+- [ ] Communication templates.
+- [ ] Postmortem template.
+- [ ] Quarterly drill.
 
 ## Practice Problems
 
-1. Define *runbook* in one line.
-2. Define *drill* in one line.
-3. Define *sev map* in one line.
+1. Define runbook in one line.
+2. Define drill in one line.
+3. Define sev map in one line.
 
 ## Wrap-up and Next Steps
 
-This series wraps up here. Next, read the *SRE 101* and *Information Security 101* series to grow *reliability* and *security* together.
+This series wraps up here. Next, read the SRE 101 and Information Security 101 series to grow reliability and security together.
 
 <!-- toc:begin -->
 - [What is an Incident?](./01-what-is-incident.md)
@@ -188,9 +206,13 @@ This series wraps up here. Next, read the *SRE 101* and *Information Security 10
 
 ## References
 
-- [Runbook Template - PagerDuty](https://response.pagerduty.com/oncall/runbooks/)
-- [Runbooks as Code - Google SRE Workbook](https://sre.google/workbook/managing-load/)
-- [On-Call Rotations - Atlassian](https://www.atlassian.com/incident-management/on-call)
-- [Chaos Drills and Game Days - Increment](https://increment.com/reliability/game-days/)
+### Official Docs
+- [Runbooks - PagerDuty](https://response.pagerduty.com/oncall/runbooks/)
+- [Managing Load - Google SRE Workbook](https://sre.google/workbook/managing-load/)
+- [On-call management - Atlassian](https://www.atlassian.com/incident-management/on-call)
+- [Game days - Azure Architecture Center](https://learn.microsoft.com/azure/architecture/framework/resiliency/testing)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Runbook, OnCall, Capstone, Operations
