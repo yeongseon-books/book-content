@@ -2,7 +2,7 @@
 series: observability-101
 episode: 2
 title: Metrics, Logs, and Traces
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - Tracing
   - SRE
 seo_description: How metrics, logs, and traces differ, and when to reach for each — answers to how much, what happened, and where it slowed down.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Metrics, Logs, and Traces
 
-This is post 2 in the Observability 101 series.
+Many teams say they use all three signals, but still send every question to the same place. Everything becomes a log search, or everything gets flattened into dashboards. That is where cost grows faster than understanding.
+
+The real skill is not collecting more signals. It is choosing the right one for the question in front of you.
 
 This is post 2 in the Observability 101 series.
-
-> Observability 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do the three signals *differ*, and *when do you reach for which*?
-
-> *Metrics answer *how much*, logs answer *what happened*, traces answer *where and how*. None of them *replaces* the others.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -52,12 +44,8 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q["question"] --> M["how much? → metric"]
-    Q --> L["what happened? → log"]
-    Q --> T["where? → trace"]
-```
+![Concept at a Glance](../../../assets/observability-101/02/02-01-concept-at-a-glance.en.png)
+*A simple decision model: route each operational question to the signal that answers it with the least cost and ambiguity.*
 
 ## Key Terms
 
@@ -125,6 +113,29 @@ def span(name, trace_id):
 "overall throughput" → metric
 "why this order failed" → log
 "which service was slow for this request" → trace
+```
+
+## One Failed Order, Three Different Questions
+
+If order failures spike, start by separating the questions instead of mixing them.
+
+```text
+Question 1. Is the failure broad or isolated?       → metric
+Question 2. Which order failed, and why?            → log
+Question 3. Which service call consumed the time?   → trace
+```
+
+```text
+metric: 5xx ratio 0.4% → 6.2%
+log: payment_failed reason=card_gateway_timeout
+trace: checkout → payment-gateway span p95 2.4s
+```
+
+```text
+Expected output:
+- Metrics show the blast radius.
+- Logs classify the failure type.
+- Traces identify the slow or broken hop.
 ```
 
 ## What to Notice in This Code
