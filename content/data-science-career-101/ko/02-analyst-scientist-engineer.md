@@ -17,10 +17,14 @@ tags:
   - Scientist
   - Engineer
 seo_description: 데이터 분석가, 사이언티스트, 엔지니어의 핵심 역할과 산출물 차이를 분석하고 본인에게 맞는 커리어 방향을 설정하는 방법을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 분석가 vs 사이언티스트 vs 엔지니어
+
+입문자가 데이터 직무를 알아볼 때 가장 자주 묻는 질문은 결국 이것입니다. “분석가와 사이언티스트와 엔지니어는 정확히 뭐가 다른가요?” 겉으로 보면 모두 SQL과 Python을 쓰고, 모두 데이터를 다루기 때문에 차이가 흐릿하게 느껴질 수 있습니다.
+
+하지만 실무에서는 누가 어떤 질문을 맡고, 어떤 결과물을 남기고, 무엇으로 평가받는지가 분명히 다릅니다. 이 차이를 모르고 준비하면 학습 계획도 넓게만 퍼지고, 지원서도 애매해지기 쉽습니다.
 
 이 글은 Data Science Career 101 시리즈의 두 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 역할 차이를 잘못 이해하면 학습 방향도 엇나가고 지원 전략도 모호해집니다. 특히 입문자일수록 “무엇을 잘해야 하는 직무인가”를 먼저 잡아야 불필요한 우회를 줄일 수 있습니다.
 
+예를 들어 실험 설계와 해석이 강점인 사람에게는 사이언티스트 트랙이 맞을 수 있지만, 데이터 모델과 파이프라인 안정화에 더 끌리는 사람에게는 엔지니어 트랙이 더 자연스러울 수 있습니다. 같은 노력도 어디에 쓰느냐에 따라 체감 성장 속도가 크게 달라집니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A[Analyst] --> D[Decision]
-    S[Scientist] --> H[Hypothesis]
-    E[Engineer] --> P[Pipeline]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
 
+*분석가, 사이언티스트, 엔지니어가 각각 의사결정, 가설 검증, 데이터 흐름에 무게를 두는 구조*
 이 그림은 세 역할의 중심축을 압축합니다. 분석가는 의사결정 지원, 사이언티스트는 가설 검증, 엔지니어는 데이터 흐름 보장에 무게를 둡니다.
 
 ## 핵심 용어
@@ -185,9 +187,9 @@ Engineer <-> backend/platform
 
 ## 참고 자료
 
-- [Type A vs Type B Data Scientist](https://www.quora.com/What-is-data-science)
-- [Analytics Engineer role](https://www.getdbt.com/what-is-analytics-engineering)
-- [Designing Data-Intensive Applications](https://dataintensive.net/)
-- [The Data Engineering Cookbook](https://github.com/andkret/Cookbook)
+- [dbt Labs - What Is Analytics Engineering?](https://www.getdbt.com/blog/what-is-analytics-engineering)
+- [Martin Kleppmann - Designing Data-Intensive Applications](https://dataintensive.net/)
+- [IBM - What Is a Data Scientist?](https://www.ibm.com/think/topics/data-scientist)
+- [IBM - What Is a Data Engineer?](https://www.ibm.com/think/topics/data-engineer)
 
 Tags: DataCareer, Roles, Analyst, Scientist, Engineer
