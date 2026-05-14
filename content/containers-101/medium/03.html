@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Runtime</h1>
-<blockquote>
-<p>Containers 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do Docker, containerd, and runc all exist <em>separately</em>?</p>
-<blockquote>
-<p><em>The container runtime is split across three layers — a high-level UX (Docker), a daemon (containerd), and a low-level executor (runc).</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When a container fails, many beginners assume the Docker CLI is always the first place to look. In real clusters, that mental model breaks quickly because Docker, containerd, runc, and CRI sit at different layers with different responsibilities.</p>
 <p>This is post 3 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we separate the user-facing layer, lifecycle daemon, low-level executor, and Kubernetes runtime interface so you know which layer is actually failing when the node misbehaves.</p>
+<blockquote>
+<p>Runtime trouble gets easier to debug once you know which layer owns UX, lifecycle, and process execution.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>High-level vs low-level runtimes</li>
 <li>The Docker → containerd → runc flow</li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Since Kubernetes 1.24 removed <code>dockershim</code>, you cannot debug effectively without knowing the runtime layers.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;user/k8s&quot;] --&gt; CRI[&quot;cri&quot;]
-    CRI --&gt; Containerd[&quot;containerd&quot;]
-    Containerd --&gt; Runc[&quot;runc&quot;]
-    Runc --&gt; Process[&quot;container process&quot;]
-</code></pre>
+<p><img alt="Runtime layers from Docker down to runc" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Runtime layers from Docker down to runc</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Docker</strong>: a high-level user CLI plus daemon.</li>
@@ -129,6 +119,20 @@ def ctr_version():
 <li><code>task</code> and <code>container</code> are separate concepts.</li>
 <li>Kubernetes uses <code>crictl</code> instead.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">ctr version
+ctr image pull docker.io/library/nginx:1.27-alpine
+ctr images ls | grep nginx
+crictl info
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>ctr version</code> reports both client and server versions.<br>
+- <code>ctr images ls</code> shows the pulled image under containerd.<br>
+- On a Kubernetes node, <code>crictl info</code> reveals the CRI endpoint and runtime data.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If <code>ctr</code> is missing, confirm whether you are on a real containerd host.<br>
+- If <code>crictl info</code> fails, inspect the CRI socket path first.<br>
+- If the pull fails, check registry reachability, proxy policy, and node credentials.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Learning Docker but ignoring containerd entirely.</strong></li>
@@ -162,6 +166,7 @@ def ctr_version():
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>To run an image, you must build one. The next post covers Dockerfile.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -181,6 +186,6 @@ def ctr_version():
 <li><a href="https://kubernetes.io/docs/concepts/architecture/cri/">Kubernetes CRI</a></li>
 <li><a href="https://opencontainers.org/">OCI standards</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Runtime, containerd, runc, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>
