@@ -17,7 +17,7 @@ tags:
   - Compliance
   - SIEM
 seo_description: 민감정보 마스킹, 감사 로그, 위변조 방지, 보존 정책 그리고 안전한 로깅 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 안전한 로깅과 감사
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    App["App"] -->|JSON log| Mask["Masking"]
-    Mask --> Storage["Immutable storage"]
-    Storage --> SIEM["SIEM / alerts"]
-    Audit["Auth / authz / payments"] --> Storage
-```
+![구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름](../../../assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
 
+*구조화 로그, 마스킹, 불변 저장소, SIEM으로 이어지는 감사 흐름*
 애플리케이션은 구조화된 로그를 남기고, 민감 필드는 먼저 마스킹됩니다. 중요한 감사 이벤트는 중앙 저장소에 별도로 보관되며, 저장소는 위변조가 어려운 형태여야 합니다. SIEM은 그 기록을 모아 이상 징후를 탐지하고 알림을 보냅니다.
 
 ## 핵심 용어
@@ -124,6 +119,18 @@ aws s3api put-object-lock-configuration ...
 - integrity check every quarter
 ```
 
+## 실제 조사 흐름으로 로그를 읽는 예
+
+좋은 로그는 많이 남기는 로그가 아니라, 사건 순서를 빠르게 복원할 수 있는 로그입니다. 그래서 요청 ID, 사용자 ID, 자원 ID, UTC 타임스탬프가 꾸준히 이어져야 합니다.
+
+```json
+{"ts":"2026-05-15T09:00:11Z","event":"login","user_id":"u-42","request_id":"r-100"}
+{"ts":"2026-05-15T09:00:15Z","event":"role_change","actor_id":"admin-7","target_user_id":"u-42","request_id":"r-101"}
+{"ts":"2026-05-15T09:01:02Z","event":"export_started","user_id":"u-42","request_id":"r-102"}
+```
+
+이 정도만 갖춰도 “무슨 일이 있었지?”라는 질문을 “이 권한 변경 뒤에 어떤 내보내기 요청이 이어졌지?”라는 조사 가능한 질문으로 바꿀 수 있습니다. 감사 로그가 독자에게 실제로 주는 가치는 바로 이런 재구성 가능성입니다.
+
 로그를 무한정 쌓는 것은 보안이 아니라 비용과 위험을 키울 수 있습니다. 반대로 너무 짧게 지우면 조사에 필요한 기록이 남지 않습니다. 용도와 규제에 맞춘 보존 기간을 문서화하고 주기적으로 무결성을 점검해야 합니다.
 
 ## 이 코드에서 먼저 볼 점
@@ -193,5 +200,6 @@ aws s3api put-object-lock-configuration ...
 - [NIST 800-92 — Log Management](https://csrc.nist.gov/publications/detail/sp/800-92/final)
 - [Google SRE — Logging](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [AWS S3 Object Lock](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html)
+- [OpenTelemetry Logs Data Model](https://opentelemetry.io/docs/specs/otel/logs/data-model/)
 
 Tags: Logging, AuditLog, SecureCoding, Compliance, SIEM
