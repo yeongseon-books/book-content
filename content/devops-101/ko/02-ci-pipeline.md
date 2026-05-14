@@ -44,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Push["push/PR"] --> Lint["lint"]
-    Lint --> Build["build"]
-    Build --> Test["test"]
-    Test --> Scan["security scan"]
-    Scan --> Pass["green check"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/02/02-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 좋은 CI 파이프라인은 단순히 단계를 많이 붙이는 것이 아니라, 빠르게 실패시키고 명확하게 통과시키는 순서를 가집니다. 가장 싼 검사를 앞에 두고, 더 무거운 검사는 뒤로 보내는 이유가 여기에 있습니다.
 
