@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 3
 title: Matrices
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to matrices — definition, multiplication, transpose, identity, and inverse with NumPy code and geometric intuition
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Matrices
 
-> Linear Algebra 101 series (3/10)
+Matrices are the notation you see most often in linear algebra. Sometimes they look like tables that hold data. Sometimes they act like rules that move one vector into another. If you only remember the table view, you can still run the arithmetic without understanding why multiplication deserves so much attention.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.
 
-**Core question**: Is a *matrix* just a *grid of numbers*, or a *representation of a transformation*?
+## Questions This Post Answers
 
-> *A matrix is the *compressed form* of a function that *maps vectors to vectors*.*
+- What makes a matrix more than a rectangular table of numbers?
+- Why is matrix multiplication easier to read as composition of transformations?
+- What do transpose, identity, and inverse each mean operationally?
+- Why does checking shape first prevent so many practical mistakes?
 
-<!-- a-grade-intro:end -->
-
-This is post 3 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- The *definition* and *shape* of a *matrix*
-- *Multiplication, transpose, inverse*
-- The meaning of the *identity matrix* and the *inverse*
-- A 5-step hands-on
-- Five common pitfalls
+> A matrix is both a compact display of numbers and a compressed rule acting on a vector space. Matrix multiplication comes alive only when those two readings stay connected.
 
 ## Why It Matters
 
-A *matrix* is both a *dataset* and a *transformation*. Every layer of an ML model runs on *matrix multiplication*.
+Design matrices in regression, weight matrices in neural networks, user-item structures in recommenders, and transformation matrices in graphics all rely on the same object. A matrix is simultaneously storage and engine.
 
-> *Matrices are linear transformations in disguise.*
+Many production mistakes start as shape mistakes. If you cannot read how many dimensions go in, how many come out, and what kind of transformation is implied, code may run while the meaning is already wrong. Matrices reward the habit of reading structure before values.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Mat["Matrix A (m x n)"] --> Mul["Multiplication"]
-    Mat --> T["Transpose A^T"]
-    Mat --> Inv["Inverse A^-1 (square)"]
-    Mul --> Trans["Linear transformation"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
+
+*This diagram summarizes how multiplication, transpose, and inversion make matrices readable as transformation rules.*
 
 ## Key Terms
 
@@ -111,6 +100,12 @@ A_inv = np.linalg.inv(A)
 print("A^-1:", A_inv)
 print("A A^-1 ~ I:", A @ A_inv)
 ```
+
+## Read One Numeric Pass
+
+- `A @ B` yields `[[19., 22.], [43., 50.]]`, while `B @ A` yields `[[23., 34.], [31., 46.]]`. The numbers make non-commutativity impossible to ignore.
+- `A @ I` returns `A`, which is the algebraic version of “do nothing.”
+- `A @ A^{-1}` lands very close to the identity matrix, apart from floating-point noise.
 
 ## What to Notice in This Code
 
@@ -170,9 +165,9 @@ A matrix is a *compressed transformation*. The next post covers *inner product a
 
 ## References
 
-- [3Blue1Brown — Matrix multiplication](https://www.3blue1brown.com/lessons/matrix-multiplication)
-- [Khan Academy — Matrices](https://www.khanacademy.org/math/algebra-home/alg-matrices)
+- [3Blue1Brown — Matrix multiplication as composition](https://www.3blue1brown.com/lessons/matrix-multiplication)
+- [MIT OpenCourseWare — Matrix algebra](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/video-lectures/)
 - [NumPy — linalg.inv](https://numpy.org/doc/stable/reference/generated/numpy.linalg.inv.html)
-- [Wikipedia — Matrix](https://en.wikipedia.org/wiki/Matrix_(mathematics))
+- [Khan Academy — Matrices](https://www.khanacademy.org/math/algebra-home/alg-matrices)
 
 Tags: LinearAlgebra, Matrices, NumPy, DataScience, Beginner
