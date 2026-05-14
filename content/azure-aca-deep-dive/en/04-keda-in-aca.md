@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: en
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: What an ACA scale rule actually creates inside the hidden KEDA, why
   HTTP/TCP/custom triggers behave differently, and how cold-start works.
 series: azure-aca-deep-dive
@@ -368,6 +368,23 @@ az containerapp update -n my-app -g my-rg \
   --scale-rule-metadata queueName=jobs queueLength=5 \
   --scale-rule-auth connection=queue-conn
 ```
+
+Then verify that the scale rule lives on the revision template and that the update minted a revision-level runtime target.
+
+```bash
+az containerapp show -n my-app -g my-rg \
+  --query "properties.template.scale"
+
+az containerapp revision list -n my-app -g my-rg -o table
+```
+
+**Expected output:**
+
+- The first command shows the active revision template's `minReplicas`, `maxReplicas`, and `rules`.
+- The second command shows whether the scale-rule update produced a new revision entry.
+- Traffic percentages may remain unchanged while the revision set changes underneath, which is exactly the app-scope versus revision-scope split this chapter described.
+
+This is the quickest hands-on proof that scaling belongs to immutable revision snapshots, not to one mutable app identity.
 
 ## Operational checklist
 
