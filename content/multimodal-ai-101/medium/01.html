@@ -54,15 +54,21 @@
 </head>
 <body>
 <h1>Why Multimodal AI Matters</h1>
+<p>For a brief moment after ChatGPT broke into the mainstream, many teams assumed a strong text LLM was enough. That assumption held only until real user input showed up. Receipts arrived as photos, support tickets arrived as screenshots, slide decks arrived as PDFs, and product search stopped being "find this sentence" and became "find something that looks like this."</p>
+<p>Multimodal AI matters because it changes the system boundary. You are no longer deciding how to turn every input into text before reasoning starts. You are deciding which visual, textual, and layout signals should survive all the way to retrieval, extraction, and final answer generation.</p>
 <p>This is the first post in the Multimodal AI 101 series.</p>
+<p>Here we set the mental model for the rest of the series: where text-only systems break, what multimodal systems really add, and which operating constraints you should lock down before you scale usage.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Where do text-only LLM pipelines break first once real document and image input arrives?</li>
+<li>Which product problems genuinely improve with multimodal models, rather than just looking better in demos?</li>
+<li>How should you think about early fusion, late fusion, and cross-attention without getting lost in paper terminology?</li>
+<li>What does a first practical multimodal call look like in production-adjacent code?</li>
+<li>Which adoption traps show up first around token cost, evaluation, policy, and privacy?</li>
+</ul>
 <blockquote>
-<p>Multimodal AI 101 series (1/10)</p>
+<p>Multimodal AI is not just "an LLM that also accepts images." It is a shift from text-normalized pipelines to systems that preserve raw visual evidence long enough for retrieval and reasoning to use it.</p>
 </blockquote>
-<hr>
-<h2>"Isn't a text LLM enough?"</h2>
-<p>After ChatGPT shipped in late 2022, a quiet assumption took hold: a single text LLM could solve almost any problem worth solving. That assumption broke once GPT-4V landed in September 2023 and Gemini and Claude 3 Opus followed with vision baked in. Users stopped sending plain text. They started pasting screenshots, dropping in chart images, and uploading entire PDFs.</p>
-<p>The places where multimodal beats text-only are easy to enumerate: receipt OCR plus category classification, product image plus description for search, medical imaging plus patient history for diagnosis, code screenshot plus error message for debugging. Single-modality systems consistently underperform on these tasks.</p>
-<p>This series is for engineers who plan to ship multimodal AI to production. Episode 1 covers why multimodal matters, the core architectural flow, and five pitfalls you should know before adoption.</p>
 <h2>What multimodal AI actually solves</h2>
 <p><strong>Document QA</strong><br>
 - Text-only limitation: Tables and figures lost<br>
@@ -80,6 +86,11 @@
 - Text-only limitation: Domain expertise needed<br>
 - Multimodal solution: Image encoder plus LLM reasoning</p>
 <p>We are moving from an era of one specialized model per task (ResNet for classification, a separate OCR engine, a separate captioning model) into an era where a single VLM handles all of them.</p>
+<h2>Mental model: multimodal expands the reasoning boundary</h2>
+<p>The cleanest way to understand multimodal AI is to stop thinking in terms of input channels and start thinking in terms of evidence preservation. A text-only pipeline asks, "How quickly can I compress everything into text?" A multimodal pipeline asks, "What information becomes unrecoverable if I compress too early?"</p>
+<p><img alt="Mental model: multimodal expands the reasoning boundary" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png"><br>
+<em>A multimodal pipeline is valuable when it preserves visual evidence long enough for retrieval and reasoning to use it instead of discarding it up front.</em></p>
+<p>That shift immediately changes engineering priorities. Resolution policy matters because cost now depends on pixels. OCR is no longer the whole story because layout and iconography may carry the meaning. Privacy review changes because PII may live inside screenshots, IDs, and scanned forms rather than inside typed text.</p>
 <h2>Three patterns of modality fusion</h2>
 <p>Multimodal model design ultimately reduces to one question: how do you put different modalities into the same representation space? Three patterns dominate.</p>
 <ol>
@@ -94,6 +105,7 @@
 [Text]  -&gt; Tokenizer -&gt; text tokens -&gt; LLM (cross-attention) -&gt; output
 </code></pre>
 <p>The key insight: visual tokens emitted by the vision encoder are consumed by the LLM as if they were extra text tokens. That is why LLaVA-style models reach near GPT-4V quality reasoning while leaving the base LLM training mostly untouched.</p>
+<p>In practice, the choice among these patterns becomes a serving decision as much as a model decision. Early fusion is conceptually neat but often too rigid once modalities differ in length and noise profile. Late fusion is easy to deploy but weak when the answer depends on fine-grained interaction between text and visual evidence. Cross-attention and related hybrid approaches win in production because they preserve that interaction without forcing every input into the same early bottleneck.</p>
 <h2>First multimodal call: receipt analysis with GPT-4V</h2>
 <p>The fastest way to feel multimodal value is one OpenAI Vision call. The snippet below takes a receipt image and extracts items and prices as JSON.</p>
 <pre><code class="language-python">import base64
@@ -132,6 +144,7 @@ def analyze_receipt(image_path: str) -&gt; dict:
 print(analyze_receipt(&quot;samples/receipt.jpg&quot;))
 </code></pre>
 <p>A text-only LLM would force the user to type the receipt by hand. One multimodal call covers OCR, parsing, and structuring at once.</p>
+<p><strong>Expected output:</strong> for a clean grocery receipt, you should expect a structured JSON payload with item names and prices, not a paragraph summary. If the model responds with prose instead of structured fields, your first check should be the prompt contract and response-format constraint before you assume the model missed the image.</p>
 <h2>CLIP for cross-modal search: a preview</h2>
 <p>CLIP (OpenAI, 2021) is fairly called the on-ramp to multimodal AI. It places images and text in the same vector space, so the query "a photo of a cat" retrieves cat images directly.</p>
 <pre><code class="language-python">import torch
@@ -156,6 +169,25 @@ probs = logits.softmax(dim=-1)
 print(probs)
 </code></pre>
 <p>In production we typically precompute image embeddings into a FAISS index, then push the user query through the CLIP text encoder to find the nearest image. Episode 5 (Multimodal RAG) covers this in depth.</p>
+<h2>Choosing the first problem to move to multimodal</h2>
+<p>The best first multimodal use case is usually not the flashiest one. It is the one where humans are already looking at the image before they decide what the text means. Receipt review, screenshot-based support, product-image matching, chart QA, and document triage all fit that pattern.</p>
+<p>The worst first use case is often the opposite: an input that technically includes an image, but where the final decision is still almost entirely textual. In those cases, multimodal cost rises faster than quality. Treating every upload as a vision problem is one of the fastest ways to build an expensive system with unclear benefit.</p>
+<p>A useful triage test is simple:</p>
+<ol>
+<li>Does a human reviewer look at the image before making the decision?</li>
+<li>Does OCR alone regularly miss something important?</li>
+<li>Does the answer improve only when text and image are considered together?</li>
+</ol>
+<p>If all three answers are yes, multimodal should move up your backlog quickly.</p>
+<h2>Operational traps that show up before accuracy does</h2>
+<p>The first multimodal production failure is rarely "the model is too dumb." More often it is one of these:</p>
+<ul>
+<li>images are sent at a resolution that makes cost explode,</li>
+<li>the eval set is still text-only, so regressions are invisible,</li>
+<li>no conflict policy exists when image evidence and user text disagree,</li>
+<li>privacy filters only inspect typed text and ignore on-image PII.</li>
+</ul>
+<p>That is why good teams define the operating policy before the model benchmark winner. Resolution limits, image retention rules, evidence priority, and evaluation slices make later model choices far simpler.</p>
 <h2>Five common pitfalls</h2>
 <p><strong>1. Token cost is much higher than text</strong></p>
 <p>A single image in GPT-4o vision usually consumes 765 to 2000 tokens. A 1280x1280 high-res image can take several thousand tokens per call. If your cost dashboard does not break out image tokens as a separate line item, you will not see where money is leaking.</p>
@@ -178,6 +210,14 @@ def prepare_for_vlm(path: str, max_side: int = 1024) -&gt; Image.Image:
 <p>Image and text often disagree. When the user types "this receipt is 50,000 won" but the image shows 70,000 won, you need an explicit policy for which to trust. Encode the priority into the system prompt up front.</p>
 <p><strong>5. PII slips through inside images</strong></p>
 <p>ID cards, business cards, and screen captures with email addresses are invisible to text-level PII filters. A multimodal system needs an image-side PII detector (Tesseract OCR plus regex, AWS Rekognition Face) as its own stage.</p>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] We break out image-token cost separately from text-token cost in dashboards</li>
+<li>[ ] We defined a resize policy per model rather than accepting arbitrary source resolution</li>
+<li>[ ] We evaluate with DocVQA, ChartQA, MMMU, or equivalent multimodal tasks in addition to text QA</li>
+<li>[ ] We documented how to resolve conflicts between user text and image evidence</li>
+<li>[ ] We run image-side PII checks before storage, retrieval, and final answer generation</li>
+</ul>
 <h2>Key Takeaways</h2>
 <ul>
 <li>Multimodal AI handles document QA, visual search, screen automation, and video analysis - tasks where text LLMs fall short - in a single model.</li>
@@ -201,11 +241,22 @@ def prepare_for_vlm(path: str, max_side: int = 1024) -&gt; Image.Image:
 <li>Building a Production Multimodal Application (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://openai.com/index/gpt-4v-system-card/">OpenAI - GPT-4V(ision) System Card</a></li>
+<li><a href="https://platform.openai.com/docs/guides/images">OpenAI Responses guide for image input</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/build-with-claude/vision">Anthropic vision capability overview</a></li>
+<li><a href="https://ai.google.dev/gemini-api/docs/vision">Google Gemini vision documentation</a></li>
+</ul>
+<p><strong>Papers and system references</strong></p>
+<ul>
+<li><a href="https://openai.com/index/gpt-4v-system-card/">OpenAI - GPT-4V(ision) system card</a></li>
 <li><a href="https://arxiv.org/abs/2103.00020">Radford et al. - Learning Transferable Visual Models From Natural Language Supervision (CLIP)</a></li>
 <li><a href="https://arxiv.org/abs/2204.14198">Alayrac et al. - Flamingo: a Visual Language Model for Few-Shot Learning</a></li>
 <li><a href="https://arxiv.org/abs/2304.08485">Liu et al. - Visual Instruction Tuning (LLaVA)</a></li>
+</ul>
+<p><strong>Related series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/vector-search-101/en/04-faiss-fundamentals.md">Vector Search 101 - FAISS fundamentals</a></li>
 </ul>
 <p class="tags-line">Tags: Multimodal AI, CLIP, GPT-4V, Flamingo, Vision Language, Modality Fusion</p>
 </body>
