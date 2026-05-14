@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Building a Test Strategy
 
-This is the final post in the Testing 101 series.
+A team can accumulate a large number of tests and still operate poorly. If every screen gets an E2E scenario, every helper gets a unit test, and CI stretches to half an hour, the suite starts protecting itself more than it protects the product. At that point, the missing piece is not effort. It is strategy.
 
-> Testing 101 series (10/10)
+Strategy is how a team decides where to spend testing cost: which flows deserve E2E coverage, which contracts belong in integration tests, and which logic should be guarded by fast unit tests that run on every change.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Testing 101 series. Here we connect the earlier layers into one operating model and focus on how to keep test investment aligned with risk, team speed, and maintenance reality.
 
-**Core question**: Is *more tests* always *better*?
-
-> A good strategy is *write less, catch more*. The real question is *where to invest*.
-
-<!-- a-grade-intro:end -->
+> Test strategy is not about proving you test a lot. It is about proving you spend testing effort where failure would hurt most.
 
 ## What You Will Learn
 
@@ -50,12 +46,9 @@ Tests are *not free*. They cost time to write, to run, and to fix. A strategy-le
 
 ## Concept at a Glance
 
-```mermaid
-flowchart TB
-    E2E["E2E (tens)"] --> Int["Integration (hundreds)"]
-    Int --> Unit["Unit (thousands)"]
-```
+![Concept at a Glance](../../../assets/testing-101/10/10-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Test pyramid**: a distribution model with *many unit / fewer integration / even fewer E2E* tests.
@@ -143,6 +136,20 @@ def test_payment_response_schema():
 4. **No contract tests.** External API changes get caught *in production*.
 5. **Setting the strategy *once and forgetting it*.** Revisit *quarterly*.
 
+## Verification Points
+
+1. Write down the current counts and runtime for unit, integration, and E2E tests. A strategy cannot improve a distribution you have never measured.
+2. Pick three business-critical flows—such as login, payment, and password reset—and mark which layer protects each one today.
+3. Review the last quarter’s flaky tests and CI duration together to decide whether any layer is overgrown or misplaced.
+
+**Expected output:** the strategy discussion should produce explicit investment priorities, not a generic desire to increase tests everywhere.
+
+## Failure Signals and First Checks
+
+- If all code gets the same test intensity, teams eventually work around the cost instead of benefiting from the protection.
+- If E2E count keeps rising without reducing major incidents, the layer placement is probably wrong.
+- If flaky rate and CI duration are not measured, there is no feedback loop to tell you whether the strategy is improving.
+
 ## How This Shows Up in Production
 
 Mature teams record their *target distribution* and *flaky budget* in an *Engineering Excellence* document. Every new service follows that baseline, and *quarterly OKRs* include *CI duration* and *flaky ratio*.
@@ -187,8 +194,12 @@ Test strategy is not *technique* but *decision-making*. With this we close out T
 
 ## References
 
+### Official Docs
+- [GitHub documentation for pull request templates](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-issue-and-pull-request-templates)
+- [Pact contract testing guides](https://docs.pact.io/)
+
+### Practical Reading
 - [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [Google Testing Blog](https://testing.googleblog.com/)
 - [Accelerate (Forsgren, Humble, Kim)](https://itrevolution.com/product/accelerate/)
 - [ThoughtWorks — Test Strategy](https://www.thoughtworks.com/insights/blog/testing-strategy)
 
