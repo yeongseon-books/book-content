@@ -1,7 +1,7 @@
 ---
 episode: 7
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 비난 없는 포스트모템 작성법으로 장애 학습을 자산화하고 액션 아이템 추적으로 재발을 방지하는 원칙을 다룹니다.
 series: sre-101
 status: content-ready
@@ -50,14 +50,9 @@ title: Postmortem
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Incident["incident"] --> Doc["postmortem"]
-    Doc --> Actions["actions"]
-    Actions --> Tracker["tracker"]
-    Tracker --> Review["review"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/07/07-01-concept-at-a-glance.ko.png)
 
+*장애 기록이 액션 아이템과 추적으로 이어질 때 포스트모템이 학습 시스템이 됩니다.*
 장애가 문서로 끝나면 의미가 약합니다. 문서가 액션으로 연결되고, 그 액션이 추적과 리뷰로 이어질 때 비로소 재발 방지 효과가 생깁니다.
 
 ## 핵심 용어 먼저 정리
