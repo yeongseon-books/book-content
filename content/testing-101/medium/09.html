@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Running Tests in CI</h1>
-<p>This is post 9 in the Testing 101 series.</p>
+<p>A local green run is useful, but it is still only one machine, one dependency cache, and one engineer’s environment. Teams get into trouble when they treat that as sufficient evidence for everyone else, especially once multiple Python versions, operating systems, or contributors are involved.</p>
+<p>Continuous Integration exists to turn “works on my laptop” into a shared standard. The point is not just automation—it is consistent automation under conditions the whole team can trust.</p>
+<p>This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.</p>
 <blockquote>
-<p>Testing 101 series (9/10)</p>
+<p>CI is where personal confidence becomes organizational evidence.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If your tests pass <em>only on your laptop</em>, did they really <em>pass</em>?</p>
-<blockquote>
-<p>CI applies <em>the same standard to every commit</em>. It is <em>the safety net for the whole team</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and purpose of <em>CI (Continuous Integration)</em></li>
@@ -80,12 +74,8 @@
 <p>Tests without CI are tests that <em>passed by accident</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Push[&quot;git push&quot;] --&gt; Trigger[&quot;GitHub Actions trigger&quot;]
-    Trigger --&gt; Setup[&quot;Python and cache setup&quot;]
-    Setup --&gt; Run[&quot;Run pytest&quot;]
-    Run --&gt; Report[&quot;Upload results and coverage&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>CI</strong>: <em>Continuous Integration</em>. <em>Auto-validate</em> every commit.</li>
@@ -156,6 +146,19 @@ pytest -n auto             # parallel across CPU cores
 <li><strong>Printing <em>secrets to the log</em>.</strong> Never do <code>echo $SECRET</code>.</li>
 <li><strong>Build time exceeds <em>10 minutes</em> and you ignore it.</strong> Aim for <em>under 5 minutes</em> with parallelism and caching.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Compare the local command you trust with the command CI runs. If they differ, the meaning of a green build is already diluted.</li>
+<li>Measure runtime with and without dependency caching so you know whether the optimization is actually worth the complexity.</li>
+<li>Compare a single all-in-one job with split unit/integration/E2E jobs and inspect the feedback time difference.</li>
+</ol>
+<p><strong>Expected output:</strong> the default PR path should finish within a few minutes, and the logs should tell you exactly which stage failed without additional guesswork.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>CI-only flakes usually point to order dependence, timing assumptions, or real external resources.</li>
+<li>A stale cache can keep broken dependency changes hidden until much later.</li>
+<li>Secrets in logs turn a test pipeline problem into a security incident.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Large teams <em>split</em> their suites into a <em>unit job</em> (1-2 minutes), an <em>integration job</em> (5 minutes), and an <em>E2E job</em> (15 minutes, nightly). PRs only require <em>unit and integration</em>; <em>E2E</em> runs after merge during the night.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -194,12 +197,13 @@ pytest -n auto             # parallel across CPU cores
 <li>Building a Test Strategy (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://docs.github.com/en/actions">GitHub Actions docs</a></li>
-<li><a href="https://pytest-xdist.readthedocs.io/">pytest-xdist</a></li>
-<li><a href="https://martinfowler.com/articles/continuousIntegration.html">Martin Fowler — Continuous Integration</a></li>
-<li><a href="https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html">Google Testing Blog — Flaky Tests</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://docs.github.com/en/actions">GitHub Actions documentation</a><br>
+- <a href="https://github.com/actions/setup-python">actions/setup-python</a><br>
+- <a href="https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows">Caching dependencies to speed up workflows</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://pytest-xdist.readthedocs.io/">pytest-xdist</a><br>
+- <a href="https://martinfowler.com/articles/continuousIntegration.html">Martin Fowler — Continuous Integration</a></p>
 <p class="tags-line">Tags: Testing, CI, GitHub Actions, Automation, Quality</p>
 </body>
 </html>

@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Running Tests in CI
 
-This is post 9 in the Testing 101 series.
+A local green run is useful, but it is still only one machine, one dependency cache, and one engineer’s environment. Teams get into trouble when they treat that as sufficient evidence for everyone else, especially once multiple Python versions, operating systems, or contributors are involved.
 
-> Testing 101 series (9/10)
+Continuous Integration exists to turn “works on my laptop” into a shared standard. The point is not just automation—it is consistent automation under conditions the whole team can trust.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.
 
-**Core question**: If your tests pass *only on your laptop*, did they really *pass*?
-
-> CI applies *the same standard to every commit*. It is *the safety net for the whole team*.
-
-<!-- a-grade-intro:end -->
+> CI is where personal confidence becomes organizational evidence.
 
 ## What You Will Learn
 
@@ -50,14 +46,9 @@ Local environments *differ from person to person*. *CI* validates *every PR* in 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Push["git push"] --> Trigger["GitHub Actions trigger"]
-    Trigger --> Setup["Python and cache setup"]
-    Setup --> Run["Run pytest"]
-    Run --> Report["Upload results and coverage"]
-```
+![Concept at a Glance](../../../assets/testing-101/09/09-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **CI**: *Continuous Integration*. *Auto-validate* every commit.
@@ -151,6 +142,20 @@ pytest -n auto             # parallel across CPU cores
 4. **Printing *secrets to the log*.** Never do `echo $SECRET`.
 5. **Build time exceeds *10 minutes* and you ignore it.** Aim for *under 5 minutes* with parallelism and caching.
 
+## Verification Points
+
+1. Compare the local command you trust with the command CI runs. If they differ, the meaning of a green build is already diluted.
+2. Measure runtime with and without dependency caching so you know whether the optimization is actually worth the complexity.
+3. Compare a single all-in-one job with split unit/integration/E2E jobs and inspect the feedback time difference.
+
+**Expected output:** the default PR path should finish within a few minutes, and the logs should tell you exactly which stage failed without additional guesswork.
+
+## Failure Signals and First Checks
+
+- CI-only flakes usually point to order dependence, timing assumptions, or real external resources.
+- A stale cache can keep broken dependency changes hidden until much later.
+- Secrets in logs turn a test pipeline problem into a security incident.
+
 ## How This Shows Up in Production
 
 Large teams *split* their suites into a *unit job* (1-2 minutes), an *integration job* (5 minutes), and an *E2E job* (15 minutes, nightly). PRs only require *unit and integration*; *E2E* runs after merge during the night.
@@ -195,9 +200,13 @@ CI is *the safety net for the whole team*. In the next post we tie everything to
 
 ## References
 
-- [GitHub Actions docs](https://docs.github.com/en/actions)
+### Official Docs
+- [GitHub Actions documentation](https://docs.github.com/en/actions)
+- [actions/setup-python](https://github.com/actions/setup-python)
+- [Caching dependencies to speed up workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows)
+
+### Practical Reading
 - [pytest-xdist](https://pytest-xdist.readthedocs.io/)
 - [Martin Fowler — Continuous Integration](https://martinfowler.com/articles/continuousIntegration.html)
-- [Google Testing Blog — Flaky Tests](https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html)
 
 Tags: Testing, CI, GitHub Actions, Automation, Quality
