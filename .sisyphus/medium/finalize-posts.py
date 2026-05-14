@@ -16,12 +16,29 @@ TOC links: ko->ko/<file>.md, en->en/<file>.md, medium->medium/<NN>.md (relative 
 
 from __future__ import annotations
 
+import argparse
+import importlib.util
 import re
+import sys
 from pathlib import Path
+from typing import Any, cast
 
 import yaml
 
-from _catalog import ROOT, is_present, load_catalog
+if __package__:
+    from . import _catalog as catalog_module
+else:
+    _catalog_path = Path(__file__).resolve().with_name("_catalog.py")
+    _catalog_spec = importlib.util.spec_from_file_location("_catalog", _catalog_path)
+    if _catalog_spec is None or _catalog_spec.loader is None:
+        raise RuntimeError(f"cannot load _catalog from {_catalog_path}")
+    catalog_module = importlib.util.module_from_spec(_catalog_spec)
+    sys.modules[_catalog_spec.name] = catalog_module
+    _catalog_spec.loader.exec_module(catalog_module)
+
+ROOT = catalog_module.ROOT
+is_present = catalog_module.is_present
+load_catalog = catalog_module.load_catalog
 
 SERIES_TAGS: dict[str, list[str]] = {
     "azure-app-service-101": ["Azure", "App Service", "Cloud", "Web Apps"],
@@ -57,7 +74,7 @@ SERIES_TAGS: dict[str, list[str]] = {
     "llm-finetuning-101": ["Fine-tuning", "LoRA", "LLM", "Python"],
     "python-dbapi-101": ["Python", "DB-API", "PEP 249", "Database"],
     "sqlalchemy-101": ["Python", "SQLAlchemy", "ORM", "Database"],
-    "sql-101": ["SQL", "Database", "Postgres", "Analytics"],
+    "python-package-101": ["Python", "Packaging", "PyPI", "pyproject.toml"],
     "ai-agent-101": ["AI Agent", "LLM", "Tool Use", "Python"],
     "harness-engineering-101": ["AI Agent", "Harness", "Production", "Reliability"],
 }
@@ -106,12 +123,23 @@ def load_planned(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
     planned_path = series_dir / "planned.yaml"
     if not planned_path.exists():
         return {}
-    raw = yaml.safe_load(planned_path.read_text(encoding="utf-8")) or {}
+    raw_obj = yaml.safe_load(planned_path.read_text(encoding="utf-8")) or {}
+    raw = cast(dict[str, Any], raw_obj)
     result: dict[str, dict[int, dict[str, str]]] = {}
-    for variant, posts in raw.items():
-        if not isinstance(posts, dict):
+    for variant, posts_obj in raw.items():
+        if not isinstance(variant, str) or not isinstance(posts_obj, dict):
             continue
-        result[variant] = {int(k): v for k, v in posts.items()}
+        posts = cast(dict[Any, Any], posts_obj)
+        normalized: dict[int, dict[str, str]] = {}
+        for k, v in posts.items():
+            if not isinstance(v, dict):
+                continue
+            title = v.get("title")
+            filename = v.get("filename")
+            if title is None or filename is None:
+                continue
+            normalized[int(k)] = {"title": str(title), "filename": str(filename)}
+        result[variant] = normalized
     return result
 
 
@@ -165,7 +193,7 @@ def apply_tag_line(lines: list[str], series: str) -> list[str]:
     out = [ln for ln in lines if not ln.startswith(TAG_COMMENT_PREFIX)]
     out = [ln for ln in out if not ln.startswith(TAG_LINE_PREFIX)]
     while out and out[-1].strip() == "":
-        out.pop()
+        _ = out.pop()
     out.append("")
     out.append(desired)
     return out
@@ -251,7 +279,7 @@ def process_post(
     new_text = "\n".join(new_lines) + "\n"
     if new_text != text:
         if not dry_run:
-            path.write_text(new_text, encoding="utf-8")
+            _ = path.write_text(new_text, encoding="utf-8")
         return "updated"
     return "unchanged"
 
@@ -271,23 +299,21 @@ def collapse_redundant(lines: list[str]) -> list[str]:
                 continue
         out.append(line)
     while out and out[-1].strip() == "":
-        out.pop()
+        _ = out.pop()
     out.append("")
     return out
 
 
 def main() -> int:
-    import argparse
-
     ap = argparse.ArgumentParser(
         description="Finalize tags, TOC, and ko refs for all series."
     )
-    ap.add_argument(
+    _ = ap.add_argument(
         "--check",
         action="store_true",
         help="Dry-run: report files that would change and exit 1 if any found.",
     )
-    args = ap.parse_args()
+    args: argparse.Namespace = ap.parse_args()
 
     totals = {
         "updated": 0,
