@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Storytelling
   - Beginner
 seo_description: 캡스톤 프로젝트 발표 자료를 문제·해결·결과 구조로 구성하고 데모와 Q&A 준비를 통해 프로젝트 가치를 효과적으로 전달하는 법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 발표 자료 만들기
 
-발표 자료는 기능 목록을 예쁘게 정리하는 문서가 아니라, 무엇을 왜 만들었고 어떤 결과가 나왔는지 짧은 시간 안에 설득력 있게 전달하는 도구입니다. 이 글은 Capstone Project 101 시리즈의 9번째 글입니다. 여기서는 문제·해결·결과 흐름으로 발표 자료를 구성하는 방법을 살펴보겠습니다.
+발표 자료가 길어지는 가장 흔한 이유는, 팀이 만든 모든 기능을 다 보여 주려 하기 때문입니다. 하지만 청중은 보통 기능 개수보다 왜 이 프로젝트가 의미 있었는지부터 알고 싶어 합니다.
 
-> 멘탈 모델: 좋은 발표는 기능 설명이 아니라 서사입니다. 듣는 사람은 무엇을 만들었는지보다, 왜 만들었고 무엇이 달라졌는지를 더 빠르게 이해합니다.
+좋은 발표 자료는 기능 카탈로그가 아니라 선택과 결과를 설명하는 서사입니다. 무엇을 왜 만들었는지, 어떤 결과가 나왔는지, 다음에 무엇을 바꿀지까지 짧게 이어져야 설득력이 생깁니다.
+
+이 글은 Capstone Project 101 시리즈의 9번째 글입니다. 여기서는 문제·해결·결과 구조로 슬라이드를 설계하고, 데모 실패 대비안과 Q&A까지 함께 준비하는 방법을 다룹니다.
+
+> 멘탈 모델: 좋은 발표는 만든 기능을 다 보여 주는 자리가 아니라, 문제와 선택과 결과를 짧은 서사로 묶어 청중이 바로 이해하게 만드는 자리입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,30 @@ last_reviewed: '2026-05-12'
 
 실무 발표나 투자자 발표도 문제, 해결, 결과 구조를 자주 사용합니다. 듣는 사람은 기능 개수보다 어떤 문제를 풀었고 어떤 변화가 있었는지에 더 빠르게 반응합니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    P[Problem] --> S[Solution]
-    S --> D[Demo]
-    D --> R[Result]
-    R --> N[Next]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/09/09-01-the-flow-at-a-glance.ko.png)
+*문제에서 다음 단계까지 이어지는 발표 서사 구조*
+
+## 실전 문서 예시: 발표 운영 시트
+
+슬라이드 파일보다 먼저 아래 같은 운영 시트를 만들면 발표 흐름이 훨씬 안정됩니다.
+
+```text
+구간 | 시간 | 핵심 메시지 | 백업 자료
+문제 설명 | 2분 | 왜 이 문제가 불편한가 | 사용자 인터뷰 한 장
+해결 방식 | 3분 | 왜 이 흐름을 선택했는가 | 요구사항 표 한 장
+데모 | 4분 | 핵심 흐름 60초 시연 | 스크린샷 3장, 녹화 영상
+결과와 학습 | 2분 | 무엇이 확인되었고 무엇이 남았는가 | 피드백 요약 표
+Q&A | 4분 | 스택, 테스트, 범위 컷 설명 | ADR, 회고 메모
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 한 슬라이드에 한 메시지만 남겼는지 확인합니다.
+- 데모 실패 시 바로 전환할 백업 자료가 있는지 점검합니다.
+- 시간 분배가 실제 발표 시간과 맞는지 리허설합니다.
+- 예상 질문에 대한 근거 문서를 따로 준비합니다.
 
 ## 핵심 용어
 
@@ -156,7 +175,7 @@ minutes = {"talk": 8, "demo": 5, "qna": 7}
 
 ## 정리와 다음 글
 
-발표 자료는 프로젝트의 마지막 포장지가 아니라, 팀이 무엇을 배웠는지 보여 주는 요약본입니다. 문제·해결·결과 흐름이 잡히면 기능 수보다 더 강한 설득력이 생깁니다. 다음 글에서는 프로젝트를 마친 뒤 무엇을 남겨야 하는지 회고 관점에서 정리하겠습니다.
+발표 자료의 핵심은 많이 보여 주는 것이 아니라 빨리 이해시키는 것입니다. 문제·해결·결과 구조, 데모 각본, 백업 자료, Q&A 근거를 함께 준비하면 발표가 훨씬 단단해집니다. 다음 글에서는 프로젝트를 마친 뒤 학습을 남기는 회고를 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +192,11 @@ minutes = {"talk": 8, "demo": 5, "qna": 7}
 
 ## 참고 자료
 
-- [Presentation Zen - Garr Reynolds](https://www.presentationzen.com/)
-- [The Cognitive Style of PowerPoint - Edward Tufte](https://www.edwardtufte.com/tufte/powerpoint)
-- [TED Talks - Chris Anderson](https://www.ted.com/playlists/574/how_to_make_a_great_presentation)
-- [Pyramid Principle - Barbara Minto](https://en.wikipedia.org/wiki/Pyramid_principle)
+### 공식 문서와 실무 자료
+
+- [Presentation Zen](https://www.presentationzen.com/)
+- [The Cognitive Style of PowerPoint](https://www.edwardtufte.com/tufte/powerpoint)
+- [TED guide to public speaking](https://www.ted.com/playlists/574/how_to_make_a_great_presentation)
+- [Pyramid Principle](https://en.wikipedia.org/wiki/Pyramid_principle)
 
 Tags: Capstone, Presentation, Demo, Storytelling, Beginner
