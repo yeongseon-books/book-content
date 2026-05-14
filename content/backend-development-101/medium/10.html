@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>A Production-Ready Backend Structure</h1>
-<blockquote>
-<p>Backend Development 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you combine the nine layers you have learned into <em>one coherent project</em>?</p>
-<blockquote>
-<p>Writing code that works and writing a backend that <em>runs in production</em> are different jobs. Production-readiness starts with structure.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Once you try to fit HTTP handling, routing, services, databases, auth, logging, testing, and deployment into one project, structure stops being an aesthetic preference. It becomes the thing that determines whether the code is merely working or genuinely operable.</p>
+<p>This is the final post in the Backend Development 101 series. Here, we tie the earlier layers together into one production-ready backend shape and turn those ideas into directory boundaries, configuration rules, and observability defaults.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>A <em>project directory layout</em> that hosts all nine layers</li>
 <li>A strategy for splitting config across dev/staging/prod</li>
@@ -79,16 +70,9 @@
 <p>Production-grade code is <em>easy to read</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;Request&quot;] --&gt; Mid[&quot;Middleware&quot;]
-    Mid --&gt; Ctl[&quot;Controller&quot;]
-    Ctl --&gt; Svc[&quot;Service&quot;]
-    Svc --&gt; Repo[&quot;Repository&quot;]
-    Repo --&gt; DB[&quot;Database&quot;]
-    Svc --&gt; Log[&quot;Logs/Metrics&quot;]
-    Log --&gt; Obs[&quot;Observability&quot;]
-</code></pre>
-<p>Each arrow should align with a <em>directory boundary</em>.</p>
+<p><img alt="production request flow with observability attached to each layer" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>production request flow with observability attached to each layer</em><br>
+Each arrow should align with a <em>directory boundary</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Project layout</strong>: rules for the physical location of code.</li>
@@ -181,6 +165,14 @@ def setup_metrics(app):
 - 1 instance = 200 RPS (capacity baseline)
 </code></pre>
 <p>Once written down, alerts and capacity planning <em>follow naturally</em>.</p>
+<h2>Verification points</h2>
+<p><strong>Expected output:</strong> a new teammate should be able to follow the request path by directory names alone, and <code>main.py</code> should contain wiring only.</p>
+<p><strong>First failure modes to check</strong></p>
+<ul>
+<li>Once business rules enter <code>main.py</code>, test setup becomes heavier immediately.</li>
+<li>If environment differences live in conditionals across the codebase, config layering has already started to fail.</li>
+<li>If logs and metrics are added only after incidents, the structure is still prioritizing features over operations.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The thinner <code>main.py</code> is, the easier testing becomes.</li>
@@ -242,11 +234,15 @@ def setup_metrics(app):
 <li><strong>A Production-Ready Backend Structure (current)</strong></li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://12factor.net/">Twelve-Factor App</a></li>
-<li><a href="https://sre.google/books/">Google SRE Book</a></li>
 <li><a href="https://fastapi.tiangolo.com/tutorial/bigger-applications/">FastAPI Bigger Applications</a></li>
 <li><a href="https://github.com/prometheus/client_python">Prometheus Python client</a></li>
+<li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
+</ul>
+<p><strong>Further Reading</strong></p>
+<ul>
+<li><a href="https://sre.google/books/">Google SRE Book</a></li>
 </ul>
 <p class="tags-line">Tags: Backend, Architecture, BestPractices, Python, Production</p>
 </body>
