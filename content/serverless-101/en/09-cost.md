@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Cost
 
+Serverless often gets sold with the easiest line item to quote: the price per invocation. That number is memorable, but it rarely explains the bill you eventually pay. What surprises teams is usually everything wrapped around the call count.
+
+Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.
+
 This is post 9 in the Serverless 101 series.
-
-> Serverless 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: If each invocation costs *$0.0000002*, why does the *bill* still surprise you?
-
-> *Cost* is the *sum* of *calls + duration + memory + data transfer + downstream services*.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -44,17 +38,16 @@ This is post 9 in the Serverless 101 series.
 
 ## Why It Matters
 
-*Serverless* is *not always cheaper*. For some workloads it can cost *more* than a steady *EC2* instance.
+Serverless is not automatically cheaper. It can be extremely efficient for short and bursty work, and surprisingly expensive for long-running, high-volume, or network-heavy workloads.
+
+That is why cost belongs in architecture review, not just in monthly reporting. The same feature can land in a very different cost envelope depending on memory size, downstream calls, egress, and whether you pay an idle tax for provisioned capacity.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Calls["calls"] --> Bill["bill"]
-    Mem["memory * duration"] --> Bill
-    Net["data transfer"] --> Bill
-    Deps["downstream services"] --> Bill
-```
+![Concept at a Glance](../../../assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
+
+*A serverless bill is the sum of invocation, compute time, network transfer, and downstream service usage.*
+The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.
 
 ## Key Terms
 
@@ -113,6 +106,19 @@ sizes = [128, 256, 512, 1024]
 for s in sizes:
     print(s, total(1_000_000, s, 200, 5))
 ```
+
+## Scenario Review
+
+Before choosing a cost posture, compare at least two realistic operating scenarios.
+
+| Scenario | What usually dominates | First question to ask |
+| --- | --- | --- |
+| Spiky low-volume API | invocation + tail latency mitigation | do we need provisioned capacity? |
+| High-volume short jobs | memory × duration | can memory tuning cut runtime enough to win overall? |
+| Media-heavy responses | egress | can CDN or object storage reduce outbound traffic? |
+| Async pipeline | downstream services | which queue, database, and retry costs grow with traffic? |
+
+This keeps the discussion anchored in workload shape instead of in isolated pricing units.
 
 ## What to Notice in This Code
 
@@ -173,9 +179,15 @@ The final episode is *Designing a Serverless App*.
 
 ## References
 
-- [Lambda Pricing](https://aws.amazon.com/lambda/pricing/)
-- [Cloud Functions Pricing](https://cloud.google.com/functions/pricing)
-- [Azure Functions Pricing](https://azure.microsoft.com/pricing/details/functions/)
+### Official Pricing Docs
+
+- [AWS Lambda pricing](https://aws.amazon.com/lambda/pricing/)
+- [Google Cloud Functions pricing](https://cloud.google.com/functions/pricing)
+- [Azure Functions pricing](https://azure.microsoft.com/pricing/details/functions/)
+
+### FinOps and Related Reading
+
 - [FinOps Foundation](https://www.finops.org/)
+- [AWS Lambda power tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
 
 Tags: Serverless, Cost, FinOps, Pricing, Cloud
