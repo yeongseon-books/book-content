@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>What Are Design Patterns?</h1>
+<p>When people first learn design patterns, they usually start by memorizing the names. Strategy, Adapter, and Observer stand out quickly. In production code, though, the value does not show up as trivia. It shows up when the same design problem keeps returning.</p>
 <p>This is the first post in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do we even need design patterns?</p>
-<blockquote>
-<p>Because solving the same problem from scratch every time is exhausting. Patterns are name tags for solutions that have already been proven.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll treat design patterns not as an answer catalog but as shared vocabulary for recurring design problems. The goal is to understand the problem shape, the solution shape, and the tradeoffs that come with the pattern name.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>A working definition of a design pattern</li>
 <li>The GoF classification of 23 patterns</li>
@@ -80,12 +71,8 @@
 <p>Patterns shine in conversation before they shine in code.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[&quot;Problem&quot;] --&gt; N[&quot;Pattern Name&quot;]
-    N --&gt; S[&quot;Solution structure&quot;]
-    S --&gt; T[&quot;Tradeoffs&quot;]
-</code></pre>
-<p>The name calls up the solution.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>A pattern becomes useful when the name brings back the problem shape, the solution shape, and the tradeoffs together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Design pattern</strong>: A proven solution to a recurring design problem.</li>
@@ -150,6 +137,14 @@ processor.charge(...)
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>Patterns earn their keep most often as code-review vocabulary — "drop an Adapter here", "pull this into a Strategy". The name is the agreement.</p>
+<h2>Quick verification</h2>
+<p>Use this quick pass before you declare that a piece of code “needs a pattern.”</p>
+<ul>
+<li>Look for the same branching, notification, or construction shape in at least three places.</li>
+<li>Write the problem in one sentence before naming a pattern.</li>
+<li>Confirm that the pattern makes the design easier to explain, not just more abstract.</li>
+</ul>
+<p><strong>Expected outcome:</strong> after this pass, you should be able to say both <strong>why</strong> the pattern helps and <strong>what complexity it adds</strong>.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>They treat patterns as vocabulary.</li>
@@ -187,11 +182,16 @@ processor.charge(...)
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://en.wikipedia.org/wiki/Design_Patterns">Design Patterns: Elements of Reusable Object-Oriented Software (GoF)</a></li>
 <li><a href="https://refactoring.guru/design-patterns">refactoring.guru — Design Patterns</a></li>
 <li><a href="https://martinfowler.com/eaaCatalog/">Patterns of Enterprise Application Architecture</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://www.oreilly.com/library/view/head-first-design/9781492077992/">Head First Design Patterns</a></li>
+<li><a href="https://martinfowler.com/books/refactoring.html">Refactoring (Martin Fowler)</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, SoftwareDesign, GoF, Architecture, Foundations</p>
 </body>
