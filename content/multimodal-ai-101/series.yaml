@@ -2,19 +2,19 @@ id: multimodal-ai-101
 articles:
 - idx: 1
   slug: 01-why-multimodal-matters
-  status: content-ready
+  status: publish-ready
 - idx: 2
   slug: 02-image-encoders-clip-vit
-  status: content-ready
+  status: publish-ready
 - idx: 3
   slug: 03-vlm-architecture
-  status: content-ready
+  status: publish-ready
 - idx: 4
   slug: 04-captioning-ocr-pipelines
-  status: content-ready
+  status: publish-ready
 - idx: 5
   slug: 05-multimodal-rag
-  status: content-ready
+  status: publish-ready
 - idx: 6
   slug: 06-audio-whisper
   status: content-ready
@@ -26,7 +26,7 @@ articles:
   status: content-ready
 - idx: 9
   slug: 09-video-understanding
-  status: content-ready
+  status: publish-ready
 - idx: 10
   slug: 10-production-multimodal-app
   status: content-ready
