@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Discrete Mathematics and Algorithms
 
+This is the final post in the Discrete Math 101 series.
+
 > Discrete Math 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

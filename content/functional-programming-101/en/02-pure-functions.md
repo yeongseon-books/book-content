@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Pure Functions and Side Effects
 
+This is post 2 in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (2/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # The Relational Model
 
+This is post 2 in the Database Systems 101 series.
+
 > Database Systems 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

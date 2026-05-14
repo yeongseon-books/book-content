@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Lazy Evaluation and Generators
 
+This is post 8 in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (8/10)
 
 <!-- a-grade-intro:begin -->

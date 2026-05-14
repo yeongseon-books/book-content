@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # ETL and ELT
-
 > Data Warehouse 101 series (6/10)
+
+This is post 6 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

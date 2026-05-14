@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Balancing OOP and Functional Programming
 
+This is the final post in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (10/10)
 
 <!-- a-grade-intro:begin -->

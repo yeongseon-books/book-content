@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Pythonic Patterns
 
+This is the final post in the Design Patterns 101 series.
+
 > Design Patterns 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

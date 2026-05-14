@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Building a Small Frontend App
 
+This is the final post in the Frontend Development 101 series.
+
 > Frontend Development 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

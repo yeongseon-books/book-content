@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Sequences and Recurrence
 
+This is post 6 in the Discrete Math 101 series.
+
 > Discrete Math 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

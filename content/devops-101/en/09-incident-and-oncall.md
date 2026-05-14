@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Incident Response and On-Call
 
+This is post 9 in the DevOps 101 series.
+
 > DevOps 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

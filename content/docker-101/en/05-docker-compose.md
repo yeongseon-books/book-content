@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Docker Compose
 
+This is post 5 in the Docker 101 series.
+
 > Docker 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

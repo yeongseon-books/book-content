@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Infrastructure as Code
 
+This is post 5 in the DevOps 101 series.
+
 > DevOps 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

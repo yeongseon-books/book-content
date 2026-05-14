@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # CI Pipeline
 
+This is post 2 in the DevOps 101 series.
+
 > DevOps 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

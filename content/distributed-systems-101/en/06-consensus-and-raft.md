@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Consensus and Raft
 
+This is post 6 in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Patterns for Operable Distributed Systems
 
+This is the final post in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

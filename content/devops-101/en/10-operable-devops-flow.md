@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # An Operable DevOps Flow
 
+This is the final post in the DevOps 101 series.
+
 > DevOps 101 series (10/10)
 
 <!-- a-grade-intro:begin -->

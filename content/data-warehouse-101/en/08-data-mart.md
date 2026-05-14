@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # Data Mart
-
 > Data Warehouse 101 series (8/10)
+
+This is post 8 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Proof Techniques
 
+This is post 5 in the Discrete Math 101 series.
+
 > Discrete Math 101 series (5/10)
 
 <!-- a-grade-intro:begin -->

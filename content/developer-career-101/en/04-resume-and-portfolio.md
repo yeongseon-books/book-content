@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Resume and Portfolio
 
+This is post 4 in the Developer Career 101 series.
+
 > Developer Career 101 series (4/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Structural Patterns
 
+This is post 3 in the Design Patterns 101 series.
+
 > Design Patterns 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

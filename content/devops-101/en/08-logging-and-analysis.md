@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Logging and Analysis
 
+This is post 8 in the DevOps 101 series.
+
 > DevOps 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

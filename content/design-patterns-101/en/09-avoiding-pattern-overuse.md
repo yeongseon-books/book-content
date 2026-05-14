@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Avoiding Pattern Overuse
 
+This is post 9 in the Design Patterns 101 series.
+
 > Design Patterns 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

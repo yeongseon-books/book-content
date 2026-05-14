@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Mentoring and Networking
 
+This is post 9 in the Developer Career 101 series.
+
 > Developer Career 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

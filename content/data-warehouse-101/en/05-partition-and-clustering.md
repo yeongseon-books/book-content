@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # Partition and Clustering
-
 > Data Warehouse 101 series (5/10)
+
+This is post 5 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

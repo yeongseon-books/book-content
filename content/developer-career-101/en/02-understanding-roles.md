@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Understanding Roles
 
+This is post 2 in the Developer Career 101 series.
+
 > Developer Career 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

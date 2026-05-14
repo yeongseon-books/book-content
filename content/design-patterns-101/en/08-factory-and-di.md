@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Factory and Dependency Injection
 
+This is post 8 in the Design Patterns 101 series.
+
 > Design Patterns 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

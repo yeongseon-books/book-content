@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Closures and Partial Application
 
+This is post 6 in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (6/10)
 
 <!-- a-grade-intro:begin -->

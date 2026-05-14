@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Side Projects and Learning
 
+This is post 8 in the Developer Career 101 series.
+
 > Developer Career 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

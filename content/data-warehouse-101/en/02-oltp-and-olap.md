@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # OLTP and OLAP
-
 > Data Warehouse 101 series (2/10)
+
+This is post 2 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

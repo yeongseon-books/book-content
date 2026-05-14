@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Trees and Graph Traversal
 
+This is post 9 in the Discrete Math 101 series.
+
 > Discrete Math 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

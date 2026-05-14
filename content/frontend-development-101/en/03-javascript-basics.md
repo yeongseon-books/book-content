@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # JavaScript Basics
 
+This is post 3 in the Frontend Development 101 series.
+
 > Frontend Development 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

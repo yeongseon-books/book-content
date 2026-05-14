@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Immutable Data
 
+This is post 3 in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (3/10)
 
 <!-- a-grade-intro:begin -->

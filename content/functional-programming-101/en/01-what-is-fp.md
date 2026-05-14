@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Functional Programming?
 
+This is the first post in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (1/10)
 
 <!-- a-grade-intro:begin -->

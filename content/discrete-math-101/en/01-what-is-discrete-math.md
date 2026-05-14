@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Discrete Mathematics?
 
+This is the first post in the Discrete Math 101 series.
+
 > Discrete Math 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

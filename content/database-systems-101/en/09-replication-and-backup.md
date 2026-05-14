@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Replication and Backup
 
+This is post 9 in the Database Systems 101 series.
+
 > Database Systems 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

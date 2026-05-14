@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # Star Schema
-
 > Data Warehouse 101 series (4/10)
+
+This is post 4 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

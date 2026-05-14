@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Settling into the First Job
 
+This is post 7 in the Developer Career 101 series.
+
 > Developer Career 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

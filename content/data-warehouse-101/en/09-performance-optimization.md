@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # Performance Optimization
-
 > Data Warehouse 101 series (9/10)
+
+This is post 9 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

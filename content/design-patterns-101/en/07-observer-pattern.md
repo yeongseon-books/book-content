@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # The Observer Pattern
 
+This is post 7 in the Design Patterns 101 series.
+
 > Design Patterns 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

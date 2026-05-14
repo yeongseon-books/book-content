@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # What Is a Data Warehouse?
-
 > Data Warehouse 101 series (1/10)
+
+This is the first post in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

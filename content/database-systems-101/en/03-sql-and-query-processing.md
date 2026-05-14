@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # SQL and Query Processing
 
+This is post 3 in the Database Systems 101 series.
+
 > Database Systems 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # What Is a Distributed System?
 
+This is the first post in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

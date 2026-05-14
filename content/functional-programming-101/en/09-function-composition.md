@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Function Composition and Pipelines
 
+This is post 9 in the Functional Programming 101 series.
+
 > Functional Programming 101 Series (9/10)
 
 <!-- a-grade-intro:begin -->

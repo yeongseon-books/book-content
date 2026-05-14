@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Graph Theory Basics
 
+This is post 8 in the Discrete Math 101 series.
+
 > Discrete Math 101 series (8/10)
 
 <!-- a-grade-intro:begin -->

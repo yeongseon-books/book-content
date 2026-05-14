@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Leader Election
 
+This is post 7 in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

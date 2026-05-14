@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Combinatorics
 
+This is post 7 in the Discrete Math 101 series.
+
 > Discrete Math 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Environment Variables and Configuration
 
+This is post 6 in the Docker 101 series.
+
 > Docker 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

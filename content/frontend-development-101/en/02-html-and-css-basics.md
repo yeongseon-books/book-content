@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # HTML and CSS Basics
 
+This is post 2 in the Frontend Development 101 series.
+
 > Frontend Development 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

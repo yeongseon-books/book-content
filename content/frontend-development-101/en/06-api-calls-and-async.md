@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # API Calls and Async
 
+This is post 6 in the Frontend Development 101 series.
+
 > Frontend Development 101 series (6/10)
 
 <!-- a-grade-intro:begin -->

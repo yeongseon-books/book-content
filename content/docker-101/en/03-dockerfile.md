@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Writing a Dockerfile
 
+This is post 3 in the Docker 101 series.
+
 > Docker 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Creational Patterns
 
+This is post 2 in the Design Patterns 101 series.
+
 > Design Patterns 101 series (2/10)
 
 <!-- a-grade-intro:begin -->

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is DevOps?
 
+This is the first post in the DevOps 101 series.
+
 > DevOps 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

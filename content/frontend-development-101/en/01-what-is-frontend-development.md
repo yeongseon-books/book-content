@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # What Is Frontend Development?
 
+This is the first post in the Frontend Development 101 series.
+
 > Frontend Development 101 series (1/10)
 
 <!-- a-grade-intro:begin -->

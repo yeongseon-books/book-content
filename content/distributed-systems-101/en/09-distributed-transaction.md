@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # Distributed Transactions
 
+This is post 9 in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

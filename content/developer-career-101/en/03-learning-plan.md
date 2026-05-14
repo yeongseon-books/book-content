@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Building a Learning Plan
 
+This is post 3 in the Developer Career 101 series.
+
 > Developer Career 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

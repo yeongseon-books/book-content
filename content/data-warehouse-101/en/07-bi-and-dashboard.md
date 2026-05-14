@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # BI and Dashboard
-
 > Data Warehouse 101 series (7/10)
+
+This is post 7 in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

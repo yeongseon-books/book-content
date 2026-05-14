@@ -21,8 +21,9 @@ last_reviewed: '2026-05-04'
 ---
 
 # Warehouse Design Example
-
 > Data Warehouse 101 series (10/10)
+
+This is the final post in the Data Warehouse 101 series.
 
 <!-- a-grade-intro:begin -->
 

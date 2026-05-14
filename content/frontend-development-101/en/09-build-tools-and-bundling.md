@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Build Tools and Bundling
 
+This is post 9 in the Frontend Development 101 series.
+
 > Frontend Development 101 series (9/10)
 
 <!-- a-grade-intro:begin -->

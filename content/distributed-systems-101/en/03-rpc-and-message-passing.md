@@ -23,6 +23,8 @@ last_reviewed: '2026-05-04'
 
 # RPC and Message Passing
 
+This is post 3 in the Distributed Systems 101 series.
+
 > Distributed Systems 101 series (3/10)
 
 <!-- a-grade-intro:begin -->

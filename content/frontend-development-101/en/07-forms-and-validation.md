@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # Forms and Validation
 
+This is post 7 in the Frontend Development 101 series.
+
 > Frontend Development 101 series (7/10)
 
 <!-- a-grade-intro:begin -->

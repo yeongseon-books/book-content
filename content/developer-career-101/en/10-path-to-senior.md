@@ -22,6 +22,8 @@ last_reviewed: '2026-05-04'
 
 # The Path to Senior
 
+This is the final post in the Developer Career 101 series.
+
 > Developer Career 101 series (10/10)
 
 <!-- a-grade-intro:begin -->
