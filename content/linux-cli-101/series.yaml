@@ -2,31 +2,31 @@ id: linux-cli-101
 articles:
 - idx: 1
   slug: 01-what-is-cli-and-shell
-  status: content-ready
+  status: publish-ready
 - idx: 2
   slug: 02-files-and-directories
-  status: content-ready
+  status: publish-ready
 - idx: 3
   slug: 03-permissions-and-ownership
-  status: content-ready
+  status: publish-ready
 - idx: 4
   slug: 04-viewing-files
-  status: content-ready
+  status: publish-ready
 - idx: 5
   slug: 05-grep-find-xargs
-  status: content-ready
+  status: publish-ready
 - idx: 6
   slug: 06-pipe-and-redirection
-  status: content-ready
+  status: publish-ready
 - idx: 7
   slug: 07-process-management
-  status: content-ready
+  status: publish-ready
 - idx: 8
   slug: 08-environment-variables
-  status: content-ready
+  status: publish-ready
 - idx: 9
   slug: 09-shell-script-basics
-  status: content-ready
+  status: publish-ready
 - idx: 10
   slug: 10-ssh-and-remote
-  status: content-ready
+  status: publish-ready
