@@ -18,22 +18,18 @@ tags:
   - Encapsulation
   - PackageDesign
 seo_description: Define a module, design small public APIs, hide volatile decisions, and build deep modules with clear boundaries.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Modules and Boundaries
 
+A code base can have many files and still have weak module boundaries. If callers must understand the internals to use a module safely, the boundary is mostly theater.
+
 This is post 3 in the Software Design 101 series.
 
-> Software Design 101 series (3/10)
+In this post, we focus on deep modules, small public surfaces, and information hiding. The practical question is how to keep internal changes inside the module instead of leaking them into every caller.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What makes a module boundary good?
-
-> A small surface area and the absence of leaks from internal changes to external callers.
-
-<!-- a-grade-intro:end -->
+> A strong boundary lets the caller know less while still getting more useful work done.
 
 ## What You Will Learn
 
@@ -51,12 +47,8 @@ Module boundaries are walls that contain change. Good walls keep changes on one 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P["Public API"] -. small .-> M["Module"]
-    M -. deep .-> I["Internal"]
-    I --> R["Rich behavior"]
-```
+![Concept at a Glance](../../../assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
+*A deep module keeps a small public surface while hiding rich internal behavior behind it*
 
 Small surface, deep interior.
 
@@ -144,6 +136,33 @@ Internal changes do not break the external contract.
 
 Direction reinforces the boundary.
 
+## Quick Verification
+
+Pick one module and write down its public symbols separately from its internal helpers. That single inventory usually exposes whether the boundary is doing any real work.
+
+```python
+__all__ = [
+    "read_file",
+    "read_chunk",
+    "open_file",
+    "close_file",
+]
+```
+
+**Expected output:** if callers truly need only one or two entry points, the rest are candidates to hide behind the boundary.
+
+Then inspect data exposure as well. More leaks come from returning internal structures directly than from having one extra function.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| Internal refactors force caller changes | Check whether the public API exposes too much procedure |
+| External code knows your internal dict layout | Check whether internal models escaped without DTOs |
+| There are many modules but little abstraction value | Check whether you created only shallow modules |
+
+The best boundaries let callers know little and still get meaningful work done.
+
 ## What to Notice in This Code
 
 - The surface is small and intentional.
@@ -207,5 +226,11 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 - [A Philosophy of Software Design — Deep Modules](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Effective Java — API Design](https://www.oracle.com/technical-resources/articles/java/bloch-effective-08-qa.html)
 - [Domain-Driven Design — Bounded Context](https://martinfowler.com/bliki/BoundedContext.html)
+
+### Practical Docs
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [Python Reference — import statement](https://docs.python.org/3/reference/simple_stmts.html#import)
+
 
 Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign
