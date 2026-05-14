@@ -54,42 +54,29 @@
 </head>
 <body>
 <h1>Events and Sample Space</h1>
-<p>This is post 2 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Before computing a probability</em>, what must we <em>define</em>? Get <em>sets</em> right and you have <em>half the answer</em>.</p>
-<blockquote>
-<p><em>Half of every probability problem is solved the moment you </em>write down the sample space<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>People often miss probability questions not because the arithmetic is hard, but because they start from a vague picture of the problem. If you jump straight to the calculation without writing down all possible outcomes, two people can read the same sentence and quietly solve two different problems.</p>
+<p>In probability, the sample space and the event are closer to grammar than to decoration. If that grammar is shaky, the final number can look clean while meaning something else entirely.</p>
+<p>This is post 2 in the Probability 101 series. Here we define sample spaces and events in set language, then use unions, intersections, complements, and independence to show why a careful setup often does half the work for you.</p>
+<h2>What you will learn</h2>
 <ul>
-<li>The definition of <em>sample space Ω</em> and <em>events</em></li>
-<li><em>Union</em>, <em>intersection</em>, <em>complement</em></li>
-<li><em>Mutually exclusive</em> vs <em>independent</em></li>
-<li>A 5-step events exercise</li>
-<li>Five common mistakes</li>
+<li>Why the sample space must come before the probability</li>
+<li>How events become subsets once the setup is explicit</li>
+<li>What union, intersection, and complement mean in practice</li>
+<li>Why mutually exclusive and independent are easy to confuse</li>
+<li>How ordered versus unordered outcomes change the answer</li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>90% of wrong probability answers</em> trace back to a <em>wrong sample space</em>. Writing it <em>cleanly as a set</em> makes many problems <em>self-evident</em>.</p>
+<p>Many wrong answers in probability come from the wrong sample space. If you treat (1,6) and (6,1) as the same outcome in one step and different outcomes in the next, everything after that can be numerically tidy and conceptually wrong.</p>
+<p>Once the sample space is explicit, many probability problems turn into set problems. Events become subsets. “A or B” becomes a union. “A and B” becomes an intersection. That shift makes the structure of the problem much more stable.</p>
 <blockquote>
-<p><em>Define before you compute.</em></p>
+<p>In many probability problems, the moment you write down the sample space carefully, half the solution is already visible.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Omega[&quot;Sample space Omega&quot;] --&gt; A[&quot;Event A&quot;]
-    Omega --&gt; B[&quot;Event B&quot;]
-    A --&gt; Union[&quot;A or B&quot;]
-    B --&gt; Inter[&quot;A and B&quot;]
-    A --&gt; Comp[&quot;not A&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>Sample space Ω</strong>: the set of <em>all outcomes</em>.</li>
+<li><strong>Sample space Ω</strong>: the set of all outcomes.</li>
 <li><strong>Event A</strong>: a subset of Ω.</li>
 <li><strong>Union A∪B</strong>: A or B.</li>
 <li><strong>Intersection A∩B</strong>: A and B.</li>
@@ -98,8 +85,8 @@
 <li><strong>Independent</strong>: P(A∩B) = P(A)·P(B).</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“What is P(sum is even) for two dice?”</em> — Where do we start?</p>
-<p><strong>After</strong>: Ω = {(i,j) : 1≤i,j≤6} (36 outcomes); A = {sum is even} → 18/36 = 1/2.</p>
+<p><strong>Before</strong>: “What is the probability that the sum of two dice is even?” The question feels simple, but the setup is often left implicit.</p>
+<p><strong>After</strong>: Ω = {(i,j) : 1≤i,j≤6} gives 36 ordered outcomes, A = {sum is even} gives 18 of them, so the answer is 18/36 = 1/2.</p>
 <h2>Hands-on: 5-step Events</h2>
 <p><strong>Step 1 — Sample space</strong></p>
 <pre><code class="language-python">omega = [(i, j) for i in range(1, 7) for j in range(1, 7)]
@@ -124,43 +111,43 @@ print(&quot;indep?&quot;, round(P(set(A) &amp; set(B)) - P(A) * P(B), 6))
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>Stating <em>Ω explicitly</em> turns probability into <em>set arithmetic</em>.</li>
-<li><em>Mutually exclusive ≠ independent</em> — a frequent confusion.</li>
-<li>A <em>fair die</em> assumption means <em>uniform probability</em>.</li>
+<li>Stating Ω explicitly turns probability into set arithmetic.</li>
+<li>Mutually exclusive ≠ independent — a frequent confusion.</li>
+<li>A fair die assumption means uniform probability.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Computing <em>without writing Ω</em>.</strong></li>
-<li><strong>Mixing up <em>mutually exclusive</em> and <em>independent</em>.</strong></li>
-<li><strong>Mixing <em>ordered</em> and <em>unordered</em> outcomes.</strong></li>
-<li><strong>Ignoring <em>with-</em> vs <em>without-replacement</em> draws.</strong></li>
-<li><strong>Failing to <em>state symmetry</em> assumptions.</strong></li>
+<li><strong>Computing without writing Ω.</strong></li>
+<li><strong>Mixing up mutually exclusive and independent.</strong></li>
+<li><strong>Mixing ordered and unordered outcomes.</strong></li>
+<li><strong>Ignoring with- vs without-replacement draws.</strong></li>
+<li><strong>Failing to state symmetry assumptions.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A/B test <em>group definitions</em>, fraud-detection <em>rule events</em>, search-evaluation <em>relevance events</em> — <em>defining the event set</em> is the starting point of <em>every metric</em>.</p>
+<p>A/B test group definitions, fraud-detection rule events, search-evaluation relevance events — defining the event set is the starting point of every metric.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Always writes Ω</em>.</li>
-<li>Reasons in <em>set operations</em>.</li>
-<li>Distinguishes <em>independent</em> and <em>mutually exclusive</em>.</li>
-<li>States <em>symmetry</em> assumptions.</li>
-<li>Verifies with <em>code</em>.</li>
+<li>Always writes Ω.</li>
+<li>Reasons in set operations.</li>
+<li>Distinguishes independent and mutually exclusive.</li>
+<li>States symmetry assumptions.</li>
+<li>Verifies with code.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can define Ω.</li>
-<li>[ ] I know <em>union/intersection/complement</em>.</li>
-<li>[ ] I separate <em>mutually exclusive</em> from <em>independent</em>.</li>
-<li>[ ] I verify with a <em>simulation</em>.</li>
+<li>[ ] I know union/intersection/complement.</li>
+<li>[ ] I separate mutually exclusive from independent.</li>
+<li>[ ] I verify with a simulation.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Write the sample space of a <em>card draw</em> (52) and find P(face card).</li>
-<li>Give an example that is <em>mutually exclusive</em> but <em>not independent</em>.</li>
-<li>Show the size difference between <em>ordered</em> and <em>unordered</em> sampling spaces.</li>
+<li>Write the sample space of a card draw (52) and find P(face card).</li>
+<li>Give an example that is mutually exclusive but not independent.</li>
+<li>Show the size difference between ordered and unordered sampling spaces.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Sample spaces and events are the <em>grammar of probability</em>. The next episode covers <em>conditional probability</em> — what changes when we are <em>given new information</em>.</p>
+<p>Sample spaces and events are the grammar of probability. The next episode covers conditional probability — what changes when we are given new information.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><strong>Events and Sample Space (current)</strong></li>
