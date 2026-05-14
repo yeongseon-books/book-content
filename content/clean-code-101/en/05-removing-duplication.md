@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 5
 title: Removing Duplication
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Refactoring
   - Abstraction
 seo_description: Apply DRY, extract function, parameterize, and table-driven techniques to remove duplication without creating wrong abstractions.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Removing Duplication
 
-> Clean Code 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is all duplication bad?
-
-> No. Code that looks the same but changes for different reasons is not the same code. Only remove duplication that changes for the same reason.
+Duplication is expensive, but wrong abstractions are expensive in a different way. The hard part is not spotting repetition. It is proving that the same knowledge really changes together.
 
 This is post 5 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will separate shared change reasons from accidental similarity, then verify when extraction, parameterization, or a data table actually reduces future maintenance cost.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ Duplication multiplies bugs. Fix one site and you forget the other.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    D["Duplication found"] --> S["Same reason?"]
-    S -->|Yes| E["Extract / parameterize"]
-    S -->|No| K["Leave it"]
-    E --> R["Single source"]
-```
+![Removing Duplication](../../../assets/clean-code-101/05/05-01-concept-at-a-glance.en.png)
+
+*Duplication-removal flow: only knowledge that changes for the same reason should move into a single source.*
 
 Extract only when the change reason is shared.
 
@@ -152,6 +144,23 @@ Three branching functions become one data structure.
 
 Roll back when abstraction adds more burden than benefit.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_pricing_rules.py
+ruff check app/
+```
+
+**Expected output**
+
+- Behavior stays stable before and after extraction.
+- Table-driven rules should make new cases cheaper to add.
+
+## Failure Modes to Watch
+
+- The shared helper turns into a six-argument mini framework.
+- Coincidental similarity gets merged and couples unrelated change reasons.
+
 ## What to Notice in This Code
 
 - Only the changing parts become arguments.
@@ -215,5 +224,5 @@ DRY is about a single source of change. Next, we tidy up another rotting place: 
 - [Sandi Metz — The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
 - [Refactoring — Extract Function](https://refactoring.com/catalog/extractFunction.html)
 - [Refactoring — Inline Function](https://refactoring.com/catalog/inlineFunction.html)
-
+- [The wrong abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
 Tags: Computer Science, CleanCode, DRY, Duplication, Refactoring, Abstraction
