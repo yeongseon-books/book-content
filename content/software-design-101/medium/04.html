@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Dependency Direction</h1>
+<p>The expensive part of a dependency is not the line of code that imports something. It is the direction of the arrow and who now has to absorb future change.</p>
 <p>This is post 4 in the Software Design 101 series.</p>
+<p>In this post, we look at dependency direction as the mechanism that keeps a stable core from depending on volatile details. DIP and ports-and-adapters matter because they buy freedom where vendors, databases, and SDKs churn fastest.</p>
 <blockquote>
-<p>Software Design 101 series (4/10)</p>
+<p>Stable code should define what it needs; volatile code should adapt to it.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the direction of a dependency matter so much?</p>
-<blockquote>
-<p>Because the way arrows point decides who pays the cost of change. Make the core ignorant of the details and you buy yourself freedom.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>How dependency relates to coupling</li>
@@ -80,10 +74,8 @@
 <p>Stable things must not depend on volatile things.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    D[&quot;Domain (stable)&quot;] --&gt; P[&quot;Port (interface)&quot;]
-    A[&quot;Adapter (volatile)&quot;] -- implements --&gt; P
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Dependency direction stays healthy when the stable core defines the port and volatile adapters implement it</em></p>
 <p>Details point toward the core.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -153,6 +145,22 @@ def test_charge():
     assert repo.calls == [(&quot;u-1&quot;, 500)]
 </code></pre>
 <p>You can verify the domain without any database.</p>
+<h2>Quick Verification</h2>
+<p>Dependency direction becomes visible as soon as you sketch the imports. Start by listing whether the domain imports any DB driver, HTTP client, or SDK directly.</p>
+<pre><code class="language-text">domain -&gt; typing, dataclasses
+domain -&gt; psycopg2        # warning sign
+infra  -&gt; domain          # expected direction
+</code></pre>
+<p><strong>Expected output:</strong> if an arrow runs from the domain into infrastructure, you know immediately that either the port location or the composition location needs work.</p>
+<p>That same check should hold in tests. If a fake repository is enough to test the domain, the direction is probably healthy.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>The domain test cannot run without a real DB</strong><br>
+- First check: Check whether the domain knows the concrete repository</p>
+<p><strong>The interface lives in an infrastructure folder</strong><br>
+- First check: Revisit who is defining the need</p>
+<p><strong>You created too many ports</strong><br>
+- First check: Check whether you inverted places that are not real stable/volatile boundaries</p>
+<p>The point of fixing dependency direction is not “more abstraction.” It is protecting the core from detail churn.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The domain is free of external libraries.</li>
@@ -211,6 +219,11 @@ def test_charge():
 <li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
 <li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture — Dependency Rule</a></li>
 <li><a href="https://herbertograca.com/2017/09/14/ports-adapters-architecture/">Ports and Adapters Pattern</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/library/typing.html">typing — Support for type hints</a></li>
+<li><a href="https://docs.python.org/3/library/abc.html">abc — Abstract Base Classes</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, Dependencies, DIP, Inversion, Architecture</p>
 </body>
