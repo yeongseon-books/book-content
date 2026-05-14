@@ -2,7 +2,7 @@
 series: observability-101
 episode: 1
 title: What Is Observability?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - DevOps
   - Metrics
 seo_description: Monitoring versus observability, the three pillars (metrics, logs, traces), and where production visibility actually starts.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Observability?
 
+Production systems rarely fail in a dramatic way. Checkout gets slower, a small slice of requests starts timing out, and logs leave only a few clues. You can see the symptom, but not the mechanism, and that gap is what makes incident response expensive.
+
+Observability is what closes that gap. It is the difference between watching a known threshold and being able to infer the inside of a system from the outside when the failure mode is new.
+
 This is the first post in the Observability 101 series.
-
-> Observability 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When systems *fail quietly*, how do we *understand the inside from the outside*?
-
-> *Observability is the ability to *understand a system's internal state from external signals alone*. Monitoring *watches known problems*; observability *asks unknown questions*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,15 +44,8 @@ Production systems break in *unpredictable ways*. Pre-built dashboards cannot ex
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["application"] --> Metric["metric"]
-    App --> Log["log"]
-    App --> Trace["trace"]
-    Metric --> Dashboard["dashboard / alert"]
-    Log --> Search["log search"]
-    Trace --> Flow["request flow"]
-```
+![Concept at a Glance](../../../assets/observability-101/01/01-01-concept-at-a-glance.en.png)
+*The baseline observability loop: one application emits metrics, logs, and traces, and each signal answers a different operational question.*
 
 ## Key Terms
 
@@ -126,6 +113,25 @@ grep '"trace_id": "abc-123"' app.log
 1. metric: latency curve rises
 2. trace: payment span is long
 3. log: db connection timeout
+```
+
+## How to Narrow the First Incident
+
+Suppose checkout latency jumps right after a deploy. The fastest path is not to open every tool at once, but to keep the three signals in a fixed order.
+
+```text
+1) metric  → checkout p95 rises from 180ms to 1.8s
+2) trace   → one payment span dominates the request time
+3) log     → db_pool_timeout, retry=3, trace_id=9f3c...
+```
+
+That order matters. Metrics tell you when the symptom started, traces show where the latency accumulated, and logs explain why that part of the path failed.
+
+```text
+Expected output:
+- The latency chart shows checkout getting worse before the incident ticket arrives.
+- The trace view points to one slow span instead of the whole service.
+- The matching log lines confirm whether the cause is a timeout, retry storm, or dependency failure.
 ```
 
 ## What to Notice in This Code
