@@ -54,14 +54,10 @@
 </head>
 <body>
 <h1>FAISS fundamentals — fast approximate nearest-neighbor search</h1>
-<blockquote>
-<p>Vector Search 101 (4/6)</p>
-</blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/04-faiss-fundamentals">github.com/yeongseon-books/vector-search-101</a></p>
-<p>This is the 4th article in the Vector Search 101 series.</p>
 <p>Once documents number in the thousands or tens of thousands, NumPy brute-force search slows down. Comparing a query against 100,000 vectors of dimension 384 requires 38.4 million multiplications per query. At that scale, search latency climbs into the hundreds of milliseconds or higher, which is too slow for interactive applications.</p>
 <p>FAISS (Facebook AI Similarity Search) was built for this problem. It supports approximate nearest-neighbor (ANN) search that trades a small accuracy cost for a large speed gain. It handles billion-scale vector collections and runs fast on both CPU and GPU.</p>
-<p>This post covers five things:</p>
+<p>This is post 4 in the Vector Search 101 series.</p>
+<p>This post covers the baseline FAISS workflow you need before tuning larger ANN deployments. We will go through five things:</p>
 <ul>
 <li>installing FAISS and choosing an index type</li>
 <li>exact search with <code>IndexFlatL2</code> and <code>IndexFlatIP</code></li>
@@ -69,6 +65,7 @@
 <li>running real queries against a small corpus</li>
 <li>how to choose between index types</li>
 </ul>
+<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/04-faiss-fundamentals">github.com/yeongseon-books/vector-search-101</a></p>
 <p><img alt="FAISS index type comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png"></p>
 <p><em>FAISS index type comparison structure</em></p>
 <!-- ebook-only:start -->
