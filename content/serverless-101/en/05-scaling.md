@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Scaling
 
+Serverless often gets introduced with a seductive sentence: “it scales automatically.” That is directionally true, but in production it is also one of the most dangerous half-truths. Functions may scale quickly while the database, queue consumers, and third-party APIs behind them remain finite.
+
+That means scaling is not just a story about how far the platform can stretch. It is a story about how much downstream pressure your system can survive without turning a traffic spike into a reliability incident.
+
 This is post 5 in the Serverless 101 series.
-
-> Serverless 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: *how fast* and *how many* can *functions* scale to?
-
-> *Serverless* defaults to *horizontal scale*, but *limits* and *burst rules* still apply.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -44,16 +38,16 @@ This is post 5 in the Serverless 101 series.
 
 ## Why It Matters
 
-Scale looks *infinite* until your *DB* and *external APIs* — which are *finite* — buckle under it. *Scaling* itself can *cause incidents*.
+Serverless is strong at horizontal expansion, but that strength becomes a liability if you measure only function throughput. A rapid increase in concurrency can exhaust database connections, hit third-party API limits, or starve peer functions that share the same account-level budget.
+
+That is why experienced operators treat concurrency like a budget. The point is not to remove every limit. The point is to place limits deliberately so that the whole system stays healthy.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Burst["request burst"] --> Func["function instances"]
-    Func --> DB["downstream db"]
-    Func --> API["external api"]
-```
+![Concept at a Glance](../../../assets/serverless-101/05/05-01-concept-at-a-glance.en.png)
+
+*Function elasticity is only safe when downstream systems can absorb the resulting parallelism.*
+The most important part of this diagram is what happens *after* the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.
 
 ## Key Terms
 
@@ -117,6 +111,19 @@ def backoff(attempt):
     return min(2 ** attempt, 30)
 ```
 
+## Failure-mode Walkthrough
+
+The usual scaling failure is not “the platform refused to scale.” It is “the platform scaled faster than the downstream system could handle.” A simple first-pass check looks like this:
+
+| Signal | What to inspect first | Typical mitigation |
+| --- | --- | --- |
+| Database timeouts | connection pool saturation | reserved concurrency, queue buffering |
+| 429 from external API | vendor rate limit | backoff, token bucket, async buffering |
+| Peer function slowdown | shared account concurrency | reserved concurrency per critical path |
+| Queue age growing | workers too slow for arrival rate | more worker budget, smaller batch, faster handler |
+
+The pattern is consistent: front-door elasticity is only useful when you also control the rate at which work reaches fragile dependencies.
+
 ## What to Notice in This Code
 
 - *Reserved concurrency* protects the *DB*.
@@ -175,9 +182,16 @@ Next, we cover *State Management*.
 
 ## References
 
-- [Lambda concurrency](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
-- [Reserved/Provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html)
-- [SQS buffering pattern](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
-- [Throttling guide](https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html)
+### Official Docs
+
+- [AWS Lambda concurrency](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
+- [AWS Lambda reserved and provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html)
+- [Amazon SQS developer guide](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [AWS Lambda scaling behavior](https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html)
+
+### Patterns and Code
+
+- [AWS Lambda power tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Serverless patterns collection](https://serverlessland.com/patterns)
 
 Tags: Serverless, Scaling, Concurrency, Throttling, Cloud

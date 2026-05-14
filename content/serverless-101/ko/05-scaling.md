@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Burst["request burst"] --> Func["function instances"]
-    Func --> DB["downstream db"]
-    Func --> API["external api"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/05/05-01-concept-at-a-glance.ko.png)
 
+*함수 확장은 빠르지만, 안전한 스케일링은 다운스트림 보호 전략까지 포함해야 합니다.*
 이 그림에서 중요한 것은 함수 뒤쪽입니다. 스케일링은 함수 인스턴스를 늘리는 일로 끝나지 않습니다. 늘어난 인스턴스가 데이터베이스와 외부 API, 큐 소비 속도에 어떤 압력을 주는지까지 함께 읽어야 합니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -128,6 +124,19 @@ def backoff(attempt):
     return min(2 ** attempt, 30)
 ```
 
+## 장애 관점에서 먼저 보는 점검표
+
+스케일링 문제는 대개 “함수가 안 늘어난다”보다 “함수가 너무 빨리 늘어났다”에서 시작합니다. 그래서 아래처럼 다운스트림 중심으로 먼저 보는 편이 좋습니다.
+
+| 신호 | 가장 먼저 볼 항목 | 흔한 대응 |
+| --- | --- | --- |
+| 데이터베이스 타임아웃 | 연결 풀 포화 여부 | 예약 동시성, 큐 버퍼링 |
+| 외부 API 429 | 공급자 호출 한도 | 백오프, 토큰 버킷, 비동기 완충 |
+| 다른 함수까지 느려짐 | 계정 단위 동시성 예산 | 중요한 함수에 예약 동시성 배정 |
+| 큐 적체 증가 | 소비 속도와 배치 크기 | 워커 수 조정, 배치 크기 조정, 핸들러 단순화 |
+
+이 표가 중요한 이유는 확장 자체보다 확장 이후의 압력을 보게 만들기 때문입니다. 앞단의 자동 확장은 빠를수록 좋을 수 있지만, 뒤쪽 시스템이 감당 못 하면 그 빠름이 곧 장애 전파 속도가 됩니다.
+
 백오프는 재시도 폭주를 막는 가장 기본적인 장치입니다. 실패 직후 즉시 재시도를 반복하면 원래의 장애보다 더 큰 부하를 스스로 만들어 낼 수 있습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -198,9 +207,16 @@ def backoff(attempt):
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Lambda 동시성](https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html)
 - [Reserved/Provisioned concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html)
-- [SQS 버퍼링 패턴](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [Amazon SQS 개발자 가이드](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
 - [Lambda 스로틀링과 스케일링](https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html)
+
+### 패턴과 코드
+
+- [AWS Lambda Power Tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Serverless Patterns Collection](https://serverlessland.com/patterns)
 
 Tags: Serverless, Scaling, Concurrency, Throttling, Cloud
