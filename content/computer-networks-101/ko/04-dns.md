@@ -18,7 +18,7 @@ tags:
   - 캐싱
   - TTL
 seo_description: 도메인 이름을 IP 주소로 변환하는 DNS의 계층 구조와 동작 원리, TTL 및 캐싱이 시스템 운영에 미치는 영향을 상세히 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # DNS
@@ -44,14 +44,8 @@ last_reviewed: '2026-05-12'
 
 > 클라이언트는 운영 체제의 stub resolver에 물어보고, stub resolver는 보통 ISP나 회사의 recursive resolver에 질의를 넘깁니다. recursive resolver는 루트 서버, TLD 서버, authoritative 서버를 순서대로 따라가며 답을 찾고, 그 결과를 TTL 동안 캐시합니다.
 
-```text
-browser
-  └─ stub resolver (OS)
-       └─ recursive resolver (ISP / 8.8.8.8 / 1.1.1.1)
-            ├─ root server      (".")
-            ├─ TLD server       (".com")
-            └─ authoritative    ("example.com.")
-```
+![DNS 조회가 루트에서 authoritative까지 내려가는 흐름](../../../assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
+*recursive resolver가 위임 체인을 따라 내려가 답을 찾고, TTL 동안 캐시해 다음 조회를 빠르게 만듭니다.*
 
 ## 핵심 용어
 
@@ -87,7 +81,7 @@ dig example.com +noall +answer
 # example.com.  86400  IN  A  93.184.216.34
 ```
 
-`86400`은 TTL입니다. 최대 24시간 동안 캐시될 수 있다는 뜻입니다.
+`86400`은 TTL입니다. 최대 24시간 동안 캐시에 남겨 둘 수 있다는 말입니다.
 
 ### 2단계: 위임 체인 따라가기
 
