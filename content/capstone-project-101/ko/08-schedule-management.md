@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Project
   - Beginner
 seo_description: 캡스톤 프로젝트 일정을 마일스톤, 주간 계획, 위험 버퍼 관점에서 설계하여 계획과 실제 차이를 조기에 발견하고 유연하게 대응하는 법을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 일정 관리
 
-일정 관리는 바쁜 상태를 기록하는 일이 아니라, 무엇이 늦고 왜 늦는지 설명할 수 있게 만드는 일입니다. 이 글은 Capstone Project 101 시리즈의 8번째 글입니다. 여기서는 마일스톤, 주간 계획, 스탠드업, 위험 버퍼를 묶어서 현실적인 일정 감각을 만드는 방법을 살펴보겠습니다.
+대부분의 캡스톤 일정은 마지막 주에 갑자기 망가지지 않습니다. 실제로는 중간부터 조금씩 밀리는데, 그 차이를 일찍 드러내는 장치가 없어서 마지막에 한꺼번에 터집니다.
 
-> 멘탈 모델: 좋은 일정은 완벽한 계획표가 아니라, 실제와 계획의 차이를 빨리 드러내고 바로 조정할 수 있게 만드는 시스템입니다.
+좋은 일정은 보기 좋은 계획표가 아니라 계획과 실제의 차이를 계속 드러내는 시스템입니다. 마일스톤, 주간 계획, 버퍼, 블로커 기록이 모두 필요한 이유도 여기에 있습니다.
+
+이 글은 Capstone Project 101 시리즈의 8번째 글입니다. 여기서는 마일스톤, 주간 계획, 스탠드업, 위험 버퍼를 묶어 현실적인 일정 운영 리듬을 만드는 방법을 설명합니다.
+
+> 멘탈 모델: 좋은 일정은 완벽한 예측이 아니라, 계획과 실제의 차이를 빨리 드러내고 조정할 수 있게 만드는 운영 리듬입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,29 @@ last_reviewed: '2026-05-12'
 
 좋은 일정은 세밀해서 좋은 것이 아니라, 조정 가능해서 좋습니다. 무엇이 밀렸는지 보이게 만들고, 블로커가 생겼을 때 바로 드러나게 해야 합니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    M[Milestones] --> W[Weekly Plan]
-    W --> S[Standup]
-    S --> R[Risk Buffer]
-    R --> P[Progress]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/08/08-01-the-flow-at-a-glance.ko.png)
+*마일스톤에서 버퍼 조정까지 이어지는 일정 운영 흐름*
+
+## 실전 문서 예시: 주간 실행 보드
+
+아래 같은 보드는 예쁜 간트 차트보다 훨씬 빨리 현실을 보여 줍니다.
+
+```text
+주차 | 목표 | 완료 조건 | 블로커 | 버퍼 사용
+1주차 | 요구사항 확정 | Must 스토리 승인 | 없음 | 0일
+2주차 | 핵심 흐름 구현 | 입력과 결과 화면 연결 | CSV 데이터 정리 지연 | 1일
+3주차 | 데모 리허설 | 60초 시연 성공 | 로그인 오류 재현 | 2일
+4주차 | 발표 자료 확정 | Q&A 준비 완료 | 없음 | 0.5일
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 주간 목표가 한 줄로 읽히는지 확인합니다.
+- 완료 조건이 결과 중심인지 봅니다.
+- 블로커를 숨기지 않고 기록합니다.
+- 버퍼 사용량을 따로 적어 일정 체력을 추적합니다.
 
 ## 핵심 용어
 
@@ -156,7 +174,7 @@ progress = {"done": 12, "todo": 8, "blocked": 2}
 
 ## 정리와 다음 글
 
-일정 관리는 예쁜 계획표를 만드는 일이 아니라, 늦어지는 지점을 빨리 드러내는 일입니다. 마일스톤, 주간 계획, 버퍼, 블로커 관리가 함께 있어야 일정이 현실을 따라갑니다. 다음 글에서는 프로젝트 결과를 어떻게 발표 자료로 정리할지 살펴보겠습니다.
+일정 관리는 바쁜 상태를 기록하는 일이 아니라 차이를 빨리 드러내는 일입니다. 마일스톤, 주간 계획, 블로커, 버퍼를 함께 운영하면 캡스톤 후반의 불확실성을 훨씬 안정적으로 다룰 수 있습니다. 다음 글에서는 이렇게 만든 결과를 발표 자료로 어떻게 정리할지 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +191,11 @@ progress = {"done": 12, "todo": 8, "blocked": 2}
 
 ## 참고 자료
 
-- [Scrum Guide](https://scrumguides.org/)
+### 공식 문서와 실무 자료
+
+- [Scrum Guide](https://scrumguides.org/scrum-guide.html)
+- [Burndown chart tutorial](https://www.atlassian.com/agile/tutorials/burndown-charts)
 - [Critical Path Method](https://en.wikipedia.org/wiki/Critical_path_method)
-- [Burndown Chart - Atlassian](https://www.atlassian.com/agile/tutorials/burndown-charts)
-- [Estimation - Steve McConnell](https://stevemcconnell.com/sea/)
+- [Software Estimation resources — Steve McConnell](https://stevemcconnell.com/sea/)
 
 Tags: Capstone, Schedule, Planning, Project, Beginner
