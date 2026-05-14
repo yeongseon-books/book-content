@@ -17,13 +17,17 @@ tags:
   - RFC7807
   - Validation
   - Backend
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 일관된 error response를 만드는 envelope, code, validation 규칙을 정리합니다.
 ---
 
 # Error response 설계
 
-이 글은 API Design 101 시리즈의 일곱 번째 글입니다. 에러 응답은 성공 응답보다 더 많은 경로를 다룹니다. 그래서 envelope, machine-readable code, validation detail이 일관되게 유지되어야 클라이언트와 운영팀 모두 덜 고생합니다.
+성공 응답은 한두 개만 잘 맞춰도 눈에 잘 띄지 않지만, 에러 응답은 조금만 흔들려도 바로 운영 비용으로 돌아옵니다. 지원 요청은 늘고, 클라이언트는 예외 분기를 늘리고, 로그에서는 같은 실패가 여러 모양으로 찍히기 시작합니다.
+
+이 글은 API Design 101 시리즈의 일곱 번째 글입니다.
+
+여기서는 에러를 부가 정보가 아니라 정식 계약으로 다룹니다. 상태 코드, machine-readable code, validation detail, trace id가 어떻게 함께 움직여야 디버깅과 보안이 동시에 버틸 수 있는지 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -41,13 +45,10 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    R["request"] --> H["handler"]
-    H -->|"bad input"| V["422 + problem+json"]
-    H -->|"not allowed"| F["403 + problem+json"]
-    H -->|"internal"| S["500 + problem+json"]
-```
+![한눈에 보는 개념](../../../assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
+*입력 오류, 권한 오류, 내부 오류가 같은 envelope 안에서 다른 상태 코드와 detail로 분기됩니다.*
+
+이렇게 모양을 고정해 두면 클라이언트는 공통 파서를 유지한 채 `status`, `code`, `errors[]`만 보고도 적절한 사용자 메시지와 재시도 전략을 고를 수 있습니다.
 
 ## 핵심 용어
 
@@ -185,6 +186,12 @@ Stripe의 error object는 `type`, `code`, `param`, `message` 조합으로 사실
 - 4xx에도 trace id를 함께 돌려줍니다.
 - 사용자 메시지는 보안과 UX 관점에서 따로 검토합니다.
 - 자주 발생하는 에러는 문서 상단에서 먼저 보여 줍니다.
+
+## 검증 포인트와 실패 신호
+
+- **Expected output:** validation 실패는 필드별 `errors[]`, 인증/권한 오류는 안정적인 `code`, 서버 오류는 추적 가능한 `trace_id`를 함께 돌려줘야 합니다.
+- **First check:** 같은 404라도 어떤 엔드포인트는 문자열, 어떤 엔드포인트는 JSON 객체를 반환한다면 envelope 통일이 아직 끝나지 않은 상태입니다.
+- **Failure mode:** 보안 민감 정보를 `detail`에 그대로 넣거나 trace id를 빼먹으면, 지원 속도와 보안 태세가 동시에 나빠집니다.
 
 ## 체크리스트
 
