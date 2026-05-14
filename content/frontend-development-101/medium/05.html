@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Routing and Pages</h1>
-<p>This is post 5 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does a <em>single-page</em> app render <em>multiple screens</em>?</p>
-<blockquote>
-<p>URLs are <em>state</em>. The router reads the URL and decides <em>which component to render</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A one-screen app is easy to reason about. Real products are not. As soon as you add a home page, detail page, settings, and search results, users expect refresh, back navigation, and shareable links to work as if those screens were always separate places. Routing is the layer that makes that expectation feel natural.</p>
+<p>This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>principle</em> behind SPA routing</li>
@@ -80,11 +70,8 @@
 <p>Good routing makes the screen <em>guessable from the URL alone</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    URL[&quot;/users/42&quot;] --&gt; Router[&quot;Router&quot;]
-    Router --&gt; Match[&quot;Match path&quot;]
-    Match --&gt; Comp[&quot;UserDetail({id: 42})&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>The SPA routing flow in which the router reads the URL and selects the screen component</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Route</strong>: a <em>mapping</em> from URL pattern to component.</li>
@@ -137,6 +124,16 @@ const Settings = lazy(() =&gt; import(&quot;./Settings&quot;));
 
 { path: &quot;/settings&quot;, element: &lt;Suspense&gt;&lt;Settings /&gt;&lt;/Suspense&gt; }
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Navigate between <code>/</code>, <code>/about</code>, and <code>/users/42</code> and confirm that the screen changes without a full reload while the param value renders correctly.</li>
+<li>In the Network tab, confirm that the lazy-loaded route downloads as a separate chunk rather than inflating the initial bundle.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If the detail page is empty, check that the route pattern <code>/users/:id</code> matches the <code>useParams()</code> lookup exactly.</li>
+<li>If refresh fails after deployment, verify whether your host needs SPA history-fallback configuration.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>&lt;Link&gt;</code> updates router state <em>without a full page reload</em>.</li>
@@ -182,20 +179,25 @@ const Settings = lazy(() =&gt; import(&quot;./Settings&quot;));
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
-<li><strong>Routing and Pages (current)</strong></li>
-<li>API Calls and Async (upcoming)</li>
+<li>
+<p><strong>Routing and Pages (current)</strong></p>
+</li>
+<li>
+<p>API Calls and Async (upcoming)</p>
+</li>
 <li>Forms and Validation (upcoming)</li>
 <li>Styling and Design Systems (upcoming)</li>
 <li>Build Tools and Bundling (upcoming)</li>
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://reactrouter.com/">React Router docs</a></li>
-<li><a href="https://nextjs.org/docs/app/building-your-application/routing">Next.js routing</a></li>
-<li><a href="https://url.spec.whatwg.org/">URL Living Standard</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">MDN History API</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://reactrouter.com/home">React Router documentation</a><br>
+- <a href="https://nextjs.org/docs/app/building-your-application/routing">Next.js routing</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">MDN: History API</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://url.spec.whatwg.org/">URL Standard</a><br>
+- <a href="https://vite.dev/guide/static-deploy.html">Vite guide: Deploying a static site</a></p>
 <p class="tags-line">Tags: Frontend, Routing, SPA, React, Web</p>
 </body>
 </html>
