@@ -15,7 +15,7 @@ tags:
 - Evaluation
 - Testing
 - Metrics
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: What's harder than building an agent is evaluating "whether this
   agent works properly." Simple LLMs only need response quality evaluation, but…
 ---
@@ -641,16 +641,9 @@ Pre-deploy regression testing is mandatory.
 
 ## References
 
-1. **AgentBench: Evaluating LLMs as Agents** - https://arxiv.org/abs/2308.03688  
-   Comprehensive Tsinghua/Stanford agent benchmark paper. Evaluates LLM agent reasoning and tool use across 8 environments.
-
-2. **GAIA: A Benchmark for General AI Assistants** - https://arxiv.org/abs/2311.12983  
-   Meta's general AI assistant benchmark. A 466-question set measuring real problem-solving capability.
-
-3. **LangSmith: Agent Evaluation** - https://docs.smith.langchain.com/evaluation  
-   LangChain's agent evaluation tooling docs. Provides trajectory recording and an automated evaluation pipeline.
-
-4. **OpenAI Evals Framework** - https://github.com/openai/evals  
-   OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.
+- [OpenAI evals design guide](https://platform.openai.com/docs/guides/evals)
+- [LangSmith evaluation](https://docs.smith.langchain.com/evaluation)
+- [AgentBench: Evaluating LLMs as Agents](https://arxiv.org/abs/2308.03688)
+- [GAIA: a benchmark for General AI Assistants](https://arxiv.org/abs/2311.12983)
 
 Tags: AI Agent, LLM, Tool Use, Python
