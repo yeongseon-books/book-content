@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 8
 title: Testing the Backend
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - Python
   - QualityAssurance
 seo_description: Split backend tests into unit, integration, and E2E levels and use pytest plus FastAPI TestClient to make every change safe.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Testing the Backend
 
-> Backend Development 101 series (8/10)
+Changing backend code without tests is a bet every single time. As a system grows, the real skill is not writing perfect code once, but making sure you can change it later without breaking the parts that already matter.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
 
-**Core question**: Why is "no time to write tests" the *biggest* time waste of all?
-
-> Without tests, every change is a *bet*. A single unit test prevents *hours* of debugging later.
-
-This is post 8 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between unit, integration, and E2E tests
 - How to test a service with pytest
@@ -50,14 +42,9 @@ Code without tests can be *read but not changed safely*. The mark of a good back
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Unit["Unit"] --> Int["Integration"]
-    Int --> E2E["E2E"]
-    Unit -->|"fast and many"| Pyramid
-    E2E -->|"slow and few"| Pyramid
-```
+![test pyramid from unit to integration and end-to-end coverage](../../../assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
 
+*test pyramid from unit to integration and end-to-end coverage*
 The test pyramid â€” *many* at the bottom, *few* at the top.
 
 ## Key Terms
@@ -159,6 +146,16 @@ def test_create_user(client, engine):
 
 FastAPI's `dependency_overrides` lets you test *without a real database*.
 
+## Verification points
+
+**Expected output:** `pytest -q` should pass the basic unit test, `/health` via `TestClient` should return `200`, and the bad-login path should return `401`.
+
+### First failure modes to check
+
+- If tests interfere with each other, revisit fixture scope and database reset strategy first.
+- If mocks replace too much behavior, add one integration test on the real path.
+- When you use `dependency_overrides`, clear them after the test so later cases do not inherit hidden state.
+
 ## What to Notice in This Code
 
 - Unit tests *cut external dependencies* with mocks.
@@ -218,9 +215,14 @@ Tests are the *safety net for change*. Next, we deliver the code to real users â
 
 ## References
 
+### Official Docs
+
 - [pytest documentation](https://docs.pytest.org/en/stable/)
 - [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
-- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [unittest.mock](https://docs.python.org/3/library/unittest.mock.html)
+
+### Further Reading
+
+- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)
 
 Tags: Backend, Testing, Pytest, Python, QualityAssurance
