@@ -54,17 +54,20 @@
 </head>
 <body>
 <h1>Designing the MVP</h1>
+<p>Many teams describe an MVP as building fewer features. That usually leads to half-finished surfaces everywhere and no fully working core flow.</p>
+<p>An MVP is better understood as the cheapest meaningful test of the project's main hypothesis. That means the cut list is often more important than the feature list.</p>
+<p>This is post 6 in the Capstone Project 101 series. It designs the MVP as a package of one core flow, an explicit out-of-scope list, a demo bar, and a feedback loop.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is an MVP closer to a learning tool than a small product?</li>
+<li>What does picking one core flow force the team to remove?</li>
+<li>Why must the out-of-scope list be documented?</li>
+<li>How do demo criteria connect to success criteria?</li>
+<li>Why should feedback collection be part of the MVP itself?</li>
+</ul>
 <blockquote>
-<p>Capstone Project 101 series (6/10)</p>
+<p>The goal of an MVP is not to shrink feature count for its own sake. It is to complete one critical user flow deeply enough that the team can actually learn from it.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> is an <em>MVP</em> a <em>learning tool</em> rather than a <em>small product</em>?</p>
-<blockquote>
-<p>Because it lets you <em>test</em> a <em>hypothesis</em> at <em>minimum cost</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>MVP</em> definition</li>
@@ -74,14 +77,26 @@
 <li>Collecting <em>feedback</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>An <em>MVP</em> is where <em>learning</em> actually begins.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Problem] --&gt; H[Hypothesis]
-    H --&gt; M[MVP]
-    M --&gt; F[Feedback]
-    F --&gt; N[Next]
+<p>An MVP with one complete flow is also stronger on demo day. A user who can sign in, act, and see a result tells a much better story than a project that exposes many shallow screens.</p>
+<p>The out-of-scope list protects that flow. Naming postponed items such as payments, admin tools, or internationalization keeps the team from quietly rebuilding the project every week.</p>
+<h2>The flow at a glance</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png"><br>
+<em>An MVP structure that links hypothesis, demo bar, and feedback</em></p>
+<h2>Practical artifact: an MVP contract</h2>
+<p>One of the best tools for protecting scope is a short MVP contract that states the current boundary in plain language.</p>
+<pre><code class="language-text">Core flow: sign in → enter timetable → calculate conflicts → view results
+Out of scope: payments, admin dashboard, internationalization, advanced recommendation logic
+Demo bar: show the full flow with sample data in under 60 seconds
+Success signal: at least 2 of 3 first-time users reach the result screen without explanation
+Feedback prompts: was the flow clear, was it fast enough, would you use it in real life
 </code></pre>
+<h2>What to validate first</h2>
+<ul>
+<li>Confirm that the core flow fits into one readable sentence.</li>
+<li>Check whether the out-of-scope list is aggressive enough to protect the flow.</li>
+<li>Make sure the demo bar is realistic in the actual presentation environment.</li>
+<li>Use feedback questions that can influence the next iteration.</li>
+</ul>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>MVP</strong>: <em>Minimum Viable Product</em>.</li>
@@ -147,7 +162,7 @@
 <li>State the meaning of <em>out of scope</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Choosing the Tech Stack</em>.</p>
+<p>An MVP is a small experiment, not a small product. When the core flow, cut list, demo bar, and feedback prompts live together, the team can protect what matters even when the semester gets noisy. The next post chooses a tech stack that fits that MVP.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
@@ -161,11 +176,12 @@
 <li>Project Retrospective (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs and practical guides</strong></p>
 <ul>
-<li><a href="http://theleanstartup.com/">The Lean Startup - Eric Ries</a></li>
-<li><a href="https://www.atlassian.com/agile/product-management/minimum-viable-product">MVP - Lean Methodology</a></li>
-<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired - Marty Cagan</a></li>
+<li><a href="https://www.atlassian.com/agile/product-management/minimum-viable-product">Minimum Viable Product guide</a></li>
+<li><a href="http://theleanstartup.com/">The Lean Startup</a></li>
 <li><a href="https://www.producttalk.org/continuous-discovery/">Continuous Discovery Habits</a></li>
+<li><a href="https://svpg.com/inspired-how-to-create-products-customers-love/">Inspired — Marty Cagan</a></li>
 </ul>
 <p class="tags-line">Tags: Capstone, MVP, Scope, Product, Beginner</p>
 </body>
