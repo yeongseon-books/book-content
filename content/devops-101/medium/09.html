@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Incident Response and On-Call</h1>
-<p>This is post 9 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a page fires at 3 AM, <em>who does what, and how</em>?</p>
-<blockquote>
-<p><em>Incidents will happen.</em> The difference is <em>how fast and how calmly</em> you recover.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Incidents rarely become chaotic because the engineers are weak. They become chaotic because roles are unclear, runbooks are missing, and the same person tries to diagnose, mitigate, communicate, and document at the same time.</p>
+<p>A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.</p>
+<p>This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to classify <em>severity (SEV)</em></li>
@@ -80,12 +71,8 @@
 <p><em>Process</em> is a substitute for <em>memory</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Alert[&quot;alert&quot;] --&gt; OnCall[&quot;on-call engineer&quot;]
-    OnCall --&gt; Runbook[&quot;runbook&quot;]
-    Runbook --&gt; Mitigate[&quot;mitigation&quot;]
-    Mitigate --&gt; Postmortem[&quot;blameless postmortem&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SEV1 to SEV4</strong>: severity from <em>1 (company-wide outage)</em> to <em>4 (minor)</em>.</li>
@@ -142,6 +129,24 @@ SEV4: low-impact bug          | backlog
 - Root cause: typo in feature flag default
 - Prevention: add flag-validation checklist to PR template
 </code></pre>
+<h2>The First 15 Minutes Set the Direction</h2>
+<p>Incident response is often decided less by deep expertise than by the order of actions in the first few minutes. Without a shared sequence, teams may perform technically correct work while still stretching recovery time through confusion.</p>
+<pre><code class="language-text">0-3m   Acknowledge the page, assign SEV, open the incident channel
+3-5m   Start the runbook, check recent deploys and config changes
+5-8m   Estimate customer impact and possible mitigations
+8-12m  Assign an IC, split roles, decide on external communication
+12-15m Execute mitigation or escalate further
+</code></pre>
+<p>This order helps because it separates technical recovery from coordination. The engineer debugging the system should not also be the only person maintaining shared situational awareness.</p>
+<h2>What Good Postmortems Produce</h2>
+<p>The quality of a postmortem is visible in its outputs, not just its tone. A strong postmortem leaves at least three things behind: a reproducible timeline, a prevention or detection improvement, and action items with owners and deadlines.</p>
+<p>If the root cause was a bad feature-flag default, for example, the system should change in concrete ways:</p>
+<ul>
+<li>add a flag-validation checkbox to the PR template</li>
+<li>include default-flag validation in smoke tests</li>
+<li>review existing flag defaults within a fixed time window</li>
+</ul>
+<p>That is how incidents become system improvement instead of archived storytelling.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>We <em>fix the system and the process</em>, not the person.</li>
