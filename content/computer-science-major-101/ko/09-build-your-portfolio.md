@@ -17,7 +17,8 @@ tags:
   - Career
   - Beginner
 seo_description: 전공 과제와 프로젝트를 GitHub 포트폴리오로 연결하는 방법, 문서화, README 정리법을 다룬 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 포트폴리오로 연결하기
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A[Assignment] --> R[Repo]
-    R --> D[README]
-    D --> P[Portfolio]
-    P --> J[Job]
-```
+![과제에서 포트폴리오로 가는 흐름](../../../assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
+
+*과제가 저장소와 README를 거쳐 포트폴리오로 바뀌는 흐름*
 
 > 과제는 제출로 끝나지만, 포트폴리오는 설명 가능한 저장소와 문서가 붙을 때 시작됩니다.
 
@@ -132,6 +129,25 @@ demo = "https://example.com/demo"
 ## 실무에서는 이렇게 드러납니다
 
 면접관과 리뷰어는 종종 코드를 열기 전에 README부터 읽습니다. 프로젝트를 어떻게 소개하는지, 실행 방법을 얼마나 분명하게 적는지, 문서를 어느 정도 신경 쓰는지에서 협업 감각을 빠르게 읽을 수 있기 때문입니다.
+
+## README 초안 예시
+
+포트폴리오 초반에는 README를 너무 길게 쓰려다가 오히려 핵심이 흐려지는 경우가 많습니다. 처음에는 아래 네 줄을 채운 뒤, 필요한 내용만 덧붙이는 방식이 더 실용적입니다.
+
+```markdown
+# Schedule Checker
+
+대학생 시간표 충돌을 찾아 주는 웹 도구입니다.
+
+## Demo
+- https://example.com/demo
+
+## Run
+- pip install -r requirements.txt
+- python app.py
+```
+
+이 정도만 있어도 읽는 사람은 세 가지를 바로 파악할 수 있습니다. 무엇을 만드는 프로젝트인지, 실제로 어디서 볼 수 있는지, 로컬에서 어떻게 실행하는지입니다. 포트폴리오의 첫 관문은 화려함보다 재현 가능성입니다.
 
 ## 선배 엔지니어는 이렇게 봅니다
 
