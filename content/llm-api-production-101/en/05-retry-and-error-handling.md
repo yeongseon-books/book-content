@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -318,7 +318,18 @@ Caching reduced repeated work. Retries smooth over temporary failure. The final 
 
 ## References
 
-- <https://tenacity.readthedocs.io/en/latest/>
-- <https://console.groq.com/docs/text-chat>
+### Official Docs
+
+- [Tenacity documentation](https://tenacity.readthedocs.io/en/latest/)
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+
+### Verification-Friendly References
+
+- [HTTP Semantics — 429 Too Many Requests](https://www.rfc-editor.org/rfc/rfc9110.html#name-429-too-many-requests)
+
+### Related Series
+
+- [Caching strategies — reducing cost and latency](./04-caching-strategies.md)
+- [Rate limit management — patterns for staying within limits](./06-rate-limit-management.md)
 
 Tags: LLM, OpenAI, Streaming, Python
