@@ -15,7 +15,7 @@ tags:
 - Compliance
 - GDPR
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (9/10)
+seo_description: Maintain decision traceability and compliance with GDPR and HIPAA through immutable audit logs, hash chains, and secure PII-separated storage.
 ---
 
 # Audit Logging and Compliance

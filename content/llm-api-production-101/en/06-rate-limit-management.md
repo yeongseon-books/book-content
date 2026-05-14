@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Rate limit management — patterns for staying within limits
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Manage LLM API traffic effectively using token-bucket and sliding-window patterns to prevent 429 errors and optimize throughput.
 ---
 
 # Rate limit management — patterns for staying within limits

@@ -15,7 +15,7 @@ tags:
 - Presidio
 - GDPR
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (4/10)
+seo_description: Protect user privacy and maintain GDPR compliance by redacting PII in LLM inputs and outputs using Microsoft Presidio and reversible tokenization.
 ---
 
 # PII Detection and Redaction

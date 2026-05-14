@@ -15,7 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (4/7)
+seo_description: Learn the core Kubernetes objects—Pod, Deployment, and Service—and how they work together to manage application workloads in AKS.
 ---
 
 # Pod, Deployment, Service — the three ways you express a workload

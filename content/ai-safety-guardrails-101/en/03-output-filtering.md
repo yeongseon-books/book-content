@@ -15,7 +15,7 @@ tags:
 - Output Filtering
 - Llama Guard
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (3/10)
+seo_description: Implement independent output filtering and content moderation using the OpenAI Moderation API, Llama Guard, and custom policy-based LLM judges.
 ---
 
 # Output Filtering and Content Moderation

@@ -15,7 +15,7 @@ tags:
 - RAG
 - Grounding
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (7/10)
+seo_description: Reduce LLM hallucinations in RAG systems by implementing grounding checks, claim extraction, and NLI-based verification against source context.
 ---
 
 # Hallucination Guardrails — Grounding Checks

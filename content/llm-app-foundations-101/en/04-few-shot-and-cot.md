@@ -15,7 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Improve LLM performance on complex tasks using few-shot prompting for style consistency and chain-of-thought reasoning for logical accuracy.
 ---
 
 # Few-shot and chain-of-thought — steering better answers

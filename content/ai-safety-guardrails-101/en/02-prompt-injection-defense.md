@@ -15,7 +15,7 @@ tags:
 - Guardrails
 - Red Team
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (2/10)
+seo_description: Defend against direct and indirect prompt injection using a layered strategy of regex filters, embedding classifiers, and secondary LLM judges.
 ---
 
 # Prompt Injection Defense

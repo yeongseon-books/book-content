@@ -15,7 +15,7 @@ tags:
 - Red Team
 - Detection
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (5/10)
+seo_description: Detect and block jailbreak attempts by combining known pattern matching, payload normalization, and semantic embedding similarity checks.
 ---
 
 # Jailbreak Detection

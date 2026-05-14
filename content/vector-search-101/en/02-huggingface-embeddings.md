@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: HuggingFace embeddings in practice — creating your first vectors with sentence-transformers
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Learn to use HuggingFace sentence-transformers locally to generate text vectors, manage batches, and save embeddings for semantic search applications.
 ---
 
 # HuggingFace embeddings in practice — creating your first vectors with sentence-transformers

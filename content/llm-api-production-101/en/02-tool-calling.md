@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Tool calling — connecting functions to the model
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Implement a secure tool-calling loop that connects LLMs to application functions while maintaining control over execution and permissions.
 ---
 
 # Tool calling — connecting functions to the model

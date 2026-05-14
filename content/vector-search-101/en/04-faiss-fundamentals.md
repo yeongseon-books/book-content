@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: FAISS fundamentals — fast approximate nearest-neighbor search
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Implement fast approximate nearest-neighbor search with FAISS to handle large-scale vector collections with high accuracy and low latency.
 ---
 
 # FAISS fundamentals — fast approximate nearest-neighbor search

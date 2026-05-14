@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: What is an embedding — converting text into vectors
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Learn how text embeddings transform natural language into numeric vectors to enable semantic search, machine-readable meaning, and vector similarity.
 ---
 
 # What is an embedding — converting text into vectors

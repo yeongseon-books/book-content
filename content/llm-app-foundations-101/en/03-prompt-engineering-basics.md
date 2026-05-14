@@ -15,7 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Learn how to structure LLM prompts effectively by separating system, user, and assistant roles to ensure consistent, controllable model behavior.
 ---
 
 # Prompt engineering basics — system, user, and assistant roles

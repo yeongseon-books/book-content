@@ -15,7 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (7/7)
+seo_description: Learn how to operate and monitor AKS using Container Insights, KQL queries, and Prometheus-style metrics for effective day-2 operations.
 ---
 
 # Monitoring and ops — Container Insights, logs, alerts

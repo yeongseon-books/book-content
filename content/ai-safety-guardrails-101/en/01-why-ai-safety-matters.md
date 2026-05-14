@@ -15,7 +15,7 @@ tags:
 - Threat Model
 - LLM Security
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (1/10)
+seo_description: Establish a robust threat model for LLM applications and learn why code-level guardrails are essential for production security beyond simple prompts.
 ---
 
 # Why AI Safety Matters

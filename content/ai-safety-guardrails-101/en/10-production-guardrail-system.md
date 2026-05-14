@@ -15,7 +15,7 @@ tags:
 - Production
 - Architecture
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (10/10)
+seo_description: Architect a production-grade LLM safety system by integrating multiple guardrail layers with explicit fail-safe policies and performance optimization.
 ---
 
 # Building a Production Guardrail System

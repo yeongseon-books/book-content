@@ -15,7 +15,7 @@ tags:
 - Bias
 - Fairness
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (6/10)
+seo_description: Address toxicity with real-time blocking and manage systematic bias through offline audits and counterfactual evaluation to ensure AI fairness.
 ---
 
 # Toxicity and Bias Detection

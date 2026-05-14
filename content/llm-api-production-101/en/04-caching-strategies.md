@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Caching strategies — reducing cost and latency
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Reduce LLM API costs and latency by implementing a robust request-hash caching strategy with TTL-based expiration and stable key generation.
 ---
 
 # Caching strategies — reducing cost and latency

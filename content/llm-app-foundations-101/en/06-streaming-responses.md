@@ -15,7 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Enhance user experience by implementing real-time LLM output with streaming, incremental rendering, and efficient async response handling.
 ---
 
 # Handling streaming responses — real-time output

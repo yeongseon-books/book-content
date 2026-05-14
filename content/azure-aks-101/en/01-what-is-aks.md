@@ -16,7 +16,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (1/7)
+seo_description: Understand the responsibility boundary of Azure Kubernetes Service (AKS), its managed control plane, and how it differs from other Azure compute.
 ---
 
 # What is Azure Kubernetes Service? — what managed Kubernetes actually gives you

@@ -15,7 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (2/7)
+seo_description: Explore Azure Kubernetes Service (AKS) architecture, including the managed control plane, system vs. user node pools, and Spot capacity strategy.
 ---
 
 # Cluster architecture — control plane and node pools

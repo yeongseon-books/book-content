@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Retry and error handling — making API calls reliable
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Build reliable LLM applications by implementing an error classification system and bounded retry policies using exponential backoff and jitter.
 ---
 
 # Retry and error handling — making API calls reliable

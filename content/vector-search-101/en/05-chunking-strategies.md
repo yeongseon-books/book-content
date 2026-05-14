@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Chunking strategies — how to split long documents
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Optimize retrieval quality by choosing effective chunking strategies, adjusting chunk size, and managing overlap to preserve context in vector search.
 ---
 
 # Chunking strategies — how to split long documents

@@ -15,7 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (5/7)
+seo_description: Understand AKS networking models (CNI vs. Overlay), Ingress controllers, and how traffic flows into your Kubernetes cluster.
 ---
 
 # Networking and Ingress — the path in and out of the cluster

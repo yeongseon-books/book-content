@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Cosine similarity and vector search — computing sentence distances
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Compare cosine similarity, dot product, and Euclidean distance for vector search to understand how normalization affects semantic ranking results.
 ---
 
 # Cosine similarity and vector search — computing sentence distances

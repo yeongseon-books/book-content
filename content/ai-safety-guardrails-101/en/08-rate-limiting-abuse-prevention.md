@@ -15,7 +15,7 @@ tags:
 - Abuse Prevention
 - Anomaly Detection
 last_reviewed: '2026-05-03'
-seo_description: AI Safety & Guardrails 101 Series (8/10)
+seo_description: Prevent LLM API abuse and cost overruns by tracking requests, tokens, and spend using hybrid token bucket and anomaly detection algorithms.
 ---
 
 # Rate Limiting and Abuse Prevention

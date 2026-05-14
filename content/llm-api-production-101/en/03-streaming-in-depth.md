@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Streaming in depth — chunk handling and error recovery
-seo_description: 'Example code: github.com/yeongseon-books/llm-api-production-101'
+seo_description: Master LLM streaming by treating responses as partial state, enforcing inactivity timeouts, and preserving output during connection failures.
 ---
 
 # Streaming in depth — chunk handling and error recovery

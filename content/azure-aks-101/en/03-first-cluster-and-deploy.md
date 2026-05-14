@@ -15,7 +15,7 @@ tags:
 - Kubernetes
 - Cloud
 last_reviewed: '2026-04-29'
-seo_description: Azure Kubernetes Service 101 series (3/7)
+seo_description: Build your first Azure Kubernetes Service (AKS) cluster and deploy a Python/FastAPI app using Azure CLI and kubectl.
 ---
 
 # Your first cluster, your first deploy — Python/FastAPI

@@ -15,7 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Master the economics and limits of LLM applications by understanding tokens, context windows, and practical estimation using the tiktoken library.
 ---
 
 # Understanding tokens — cost, limits, and context windows

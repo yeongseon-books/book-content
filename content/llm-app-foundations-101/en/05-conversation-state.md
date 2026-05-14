@@ -15,7 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Example code: github.com/yeongseon-books/llm-app-foundations-101'
+seo_description: Build stateful LLM chatbots by managing conversation history through full-replay, sliding-window, and summary-based compression strategies.
 ---
 
 # Managing conversation state — building a multi-turn chatbot

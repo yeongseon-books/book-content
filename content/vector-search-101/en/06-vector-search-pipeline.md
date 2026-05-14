@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: Vector search pipeline — from document ingestion to query
-seo_description: 'Example code: github.com/yeongseon-books/vector-search-101'
+seo_description: Build an end-to-end vector search pipeline from document ingestion to retrieval, including hybrid search combining keywords and embeddings.
 ---
 
 # Vector search pipeline — from document ingestion to query
