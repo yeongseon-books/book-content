@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 6
 title: TLS Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Encryption
   - PKI
 seo_description: How the TLS handshake delivers confidentiality, integrity, and identity at the same time, and what role certificates and PKI play in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # TLS Basics
@@ -50,14 +50,8 @@ Without TLS in your head, certificate-expiry incidents are paralyzing and danger
 
 ## Concept at a Glance
 
-```text
-Client                          Server
-  --- ClientHello (cipher list) -->
-  <-- ServerHello + Certificate ---
-  --- key share / Finished ------->
-  <-- Finished --------------------
-  ===== application data encrypted with the symmetric key =====
-```
+![TLS handshake and session-key creation](../../../assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png)
+*TLS proves identity with certificates, derives a shared session key, and then uses that symmetric key to protect the rest of the traffic efficiently.*
 
 A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.
 
@@ -227,5 +221,6 @@ Next we follow how the TLS-protected packet actually moves across the Internet �
 - [Mozilla SSL Configuration Generator](https://ssl-config.mozilla.org/)
 - [Let's Encrypt](https://letsencrypt.org/)
 - [Bulletproof TLS — Ivan Ristic](https://www.feistyduck.com/books/bulletproof-tls-and-pki/)
+- [RFC 5280 — PKIX Certificate and CRL Profile](https://www.rfc-editor.org/rfc/rfc5280)
 
 Tags: Computer Science, Networking, TLS, Certificates, Encryption, PKI

@@ -79,13 +79,8 @@
 <p>TLS is not "this channel is safe". It is the combination "this key really belongs to this domain, and only that key can decrypt".</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-text">Client                          Server
-  --- ClientHello (cipher list) --&gt;
-  &lt;-- ServerHello + Certificate ---
-  --- key share / Finished -------&gt;
-  &lt;-- Finished --------------------
-  ===== application data encrypted with the symmetric key =====
-</code></pre>
+<p><img alt="TLS handshake and session-key creation" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>TLS proves identity with certificates, derives a shared session key, and then uses that symmetric key to protect the rest of the traffic efficiently.</em></p>
 <p>A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.</p>
 <h2>Key Terms</h2>
 <p><strong>Symmetric crypto</strong><br>
@@ -229,6 +224,7 @@ curl -v https://untrusted-root.badssl.com/ # untrusted root
 <li><a href="https://ssl-config.mozilla.org/">Mozilla SSL Configuration Generator</a></li>
 <li><a href="https://letsencrypt.org/">Let's Encrypt</a></li>
 <li><a href="https://www.feistyduck.com/books/bulletproof-tls-and-pki/">Bulletproof TLS — Ivan Ristic</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc5280">RFC 5280 — PKIX Certificate and CRL Profile</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Networking, TLS, Certificates, Encryption, PKI</p>
 </body>
