@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 8
 title: Message Queues and Event Sourcing
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Kafka
   - CQRS
 seo_description: We cover how message queues and event sourcing decouple distributed services and turn time and history into first-class tools.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Message Queues and Event Sourcing
 
+Direct calls force every participant to be healthy at the same moment. Queues and logs change that rule: one side can finish now, the other can catch up later, and the system can still preserve a trustworthy history.
+
 This is post 8 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (8/10)
+Here we use queues, offsets, and event logs to show how distributed systems turn time and replay into design tools rather than accidental side effects.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When two services depend on the same data, how do they exchange work without calling each other directly?
-
-> Message queues and event sourcing promote time and history into first-class tools of distributed systems.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The decoupling and guarantees that a message queue provides
 - The meaning of at-most-once, at-least-once, and exactly-once
@@ -51,13 +45,9 @@ Direct service-to-service calls strongly couple availability and latency. Put a 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P["producer"] --> Q["queue / log"]
-    Q --> C1["consumer 1"]
-    Q --> C2["consumer 2"]
-    Q --> C3["consumer 3"]
-```
+![Producer-consumer decoupling through a message queue](../../../assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
+
+*Producer-consumer decoupling through a message queue*
 
 Producers write to the queue and consumers read at their own pace. A single message can be processed by several consumers.
 
@@ -162,6 +152,18 @@ def project(event):
 
 Writes go through events; reads use a precomputed model. Splitting the two paths makes each easier to optimize.
 
+## Operational walkthrough: consumer lag and replay recovery
+
+The real operational test for a queue is what happens when consumers fall behind.
+
+1. A producer keeps appending order events at 2,000 messages per second.
+2. One consumer group instance restarts and stops committing offsets for three minutes.
+3. Lag grows, but producers keep succeeding because the log boundary absorbs time.
+4. The consumer returns, reads from the last committed offset, and replays the backlog.
+5. Duplicate deliveries happen around the restart boundary, so the consumer's idempotency key decides whether recovery is safe.
+
+This is why teams monitor lag, replay time, and offset-commit age as first-class metrics. Without those signals a queue can hide overload for a while, then suddenly convert it into stale read models or duplicated side effects.
+
 ## What to Notice in This Code
 
 - The moment the queue becomes a file, the fate of messages changes — durability and replay.
@@ -226,5 +228,6 @@ Queues and event sourcing are tools that handle time in distributed systems. Nex
 - [Event Sourcing — Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html)
 - [CQRS — Martin Fowler](https://martinfowler.com/bliki/CQRS.html)
 - [Designing Data-Intensive Applications — chapter 11](https://dataintensive.net/)
+- [Kafka consumer design](https://docs.confluent.io/platform/current/clients/consumer.html)
 
 Tags: Computer Science, Distributed Systems, MessageQueue, EventSourcing, Kafka, CQRS
