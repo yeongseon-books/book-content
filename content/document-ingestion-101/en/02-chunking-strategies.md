@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Chunking is not just cutting text smaller; it is designing the smallest
   context unit retrieval can still trust.
 ---
@@ -122,6 +122,64 @@ python main.py
 [policy] chunks=4 avg=224.8 min=118 max=297
 ```
 
+Those numbers can make the policy preset look strongest at first glance. But fewer chunks alone do not mean better retrieval. In practice, you still need to inspect **which structure survived** and **which failure mode the preset introduced**.
+
+## Starting presets by document type
+
+| Document type | Starting `chunk_size` | Starting `chunk_overlap` | First signal to inspect | Common failure |
+| --- | ---: | ---: | --- | --- |
+| FAQ | 120 | 20 | Does one chunk still contain both question and answer? | The question survives but the answer drifts away |
+| Manual | 220 | 40 | Do heading and numbered steps stay together? | Step 2 lands in another chunk and execution order gets fuzzy |
+| Policy | 320 | 60 | Do definitions and exception clauses stay together? | Exception text gets detached from the surrounding rule |
+
+The key is not the number itself but the failure mode each document shape produces. FAQs degrade when question-answer pairs split apart. Manuals degrade when step order breaks. Policy documents degrade when long clauses lose their nearby exceptions.
+
+## Quick review loop before embedding
+
+Before paying embedding cost, a lightweight review loop catches most bad presets early. I usually check **length distribution**, **first and last chunk preview**, and **warning counts by document type**.
+
+```python
+from __future__ import annotations
+
+from collections.abc import Iterable
+
+def review_chunks(name: str, chunks: list[str], min_len: int, max_len: int) -> None:
+    too_short = [chunk for chunk in chunks if len(chunk) < min_len]
+    too_long = [chunk for chunk in chunks if len(chunk) > max_len]
+    print(f'[{name}] warnings short={len(too_short)} long={len(too_long)} total={len(chunks)}')
+    if chunks:
+        print(f'  first={chunks[0][:100]!r}')
+        print(f'  last={chunks[-1][:100]!r}')
+
+def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
+    thresholds = {
+        'faq': (60, 160),
+        'manual': (100, 260),
+        'policy': (140, 360),
+    }
+    for name, chunks in items:
+        min_len, max_len = thresholds[name]
+        review_chunks(name, chunks, min_len=min_len, max_len=max_len)
+```
+
+This is simple code, but it is operationally useful. Retrieval tuning gets much faster once you separate obviously too-short chunks from too-long chunks and define thresholds per document family.
+
+## Failure mode example: tidy numbers, damaged structure
+
+Smaller chunks can still look numerically neat while destroying the unit retrieval actually needed to preserve.
+
+```text
+[faq-small] chunks=14 avg=58.1 min=21 max=79
+  first_chunk='Question: what is the upload limit?'
+  last_chunk='incremental job.'
+
+[manual-small] chunks=11 avg=73.5 min=18 max=97
+  first_chunk='# Deployment guide'
+  last_chunk='Check logs and chunk counts after deployment.'
+```
+
+The problem becomes obvious once you read the previews. FAQ chunks stop carrying full answers, and the manual loses step grouping. The count got higher, but the retrieval unit got worse.
+
 ## What to notice in this code
 
 ### How chunk overlap preserves context
@@ -155,6 +213,12 @@ Chunk count alone is too weak. Distribution and preview checks reveal whether th
 - [ ] You used the first-chunk preview to validate structure preservation.
 - [ ] You defined thresholds for chunks that are too long or too short before embedding.
 
+## How this gets tuned in practice
+
+There is rarely a perfect preset on day one. The usual workflow is to set a starting profile per document type, then revisit the retrieval log for **boundaries that cut too aggressively** and **sentences that should have stayed together**. FAQs care about keeping question-answer pairs intact. Manuals care about keeping headings and steps together. Policy documents care about keeping exceptions adjacent to the rule they qualify.
+
+Just as important, do not confuse chunking failure with embedding-model failure too early. When search results look wrong, inspect chunk previews and warning counts before you swap the model.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -169,6 +233,14 @@ Chunk count alone is too weak. Distribution and preview checks reveal whether th
 
 ## References
 
-- https://python.langchain.com/docs/how_to/recursive_text_splitter/
+### Official docs
+
+- [LangChain - How to recursively split text by characters](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+- [LangChain text splitters integration package](https://docs.langchain.com/oss/python/integrations/splitters/index)
+
+### Verification-friendly sources
+
+- [LangChain RecursiveCharacterTextSplitter API reference](https://python.langchain.com/api_reference/text_splitters/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html)
+- [The Unicode Standard - Text segmentation overview](https://www.unicode.org/reports/tr29/)
 
 Tags: RAG, Document Processing, LangChain, Python

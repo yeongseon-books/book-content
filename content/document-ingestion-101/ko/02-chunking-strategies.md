@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 신뢰할 최소 문맥 단위를 설계하는 일입니다.
 ---
 
@@ -115,6 +115,64 @@ python main.py
 [policy] chunks=4 avg=224.8 min=118 max=297
 ```
 
+이 숫자만 보면 정책 문서 프리셋이 가장 좋아 보일 수 있습니다. 하지만 청크 개수만 적다고 품질이 높은 것은 아닙니다. 실제 운영에서는 **어떤 구조를 살렸는지**와 **검색 실패가 어디서 나는지**를 함께 봐야 합니다.
+
+## 문서 유형별 시작 프리셋
+
+| 문서 유형 | 시작 `chunk_size` | 시작 `chunk_overlap` | 먼저 볼 신호 | 흔한 실패 |
+| --- | ---: | ---: | --- | --- |
+| FAQ | 120 | 20 | 질문-답변 쌍이 한 청크 안에 남는지 | 답변이 둘로 갈라져 질문만 남음 |
+| 매뉴얼 | 220 | 40 | 제목, 번호 목록, 단계가 유지되는지 | 단계 2가 다른 청크로 밀려 실행 순서가 깨짐 |
+| 정책 문서 | 320 | 60 | 정의 문장과 예외 조항이 같이 남는지 | 예외 문장이 잘려 필터 조건이 누락됨 |
+
+여기서 중요한 점은 숫자보다 문서의 실패 모드입니다. FAQ는 질문-답변 쌍이 깨지면 바로 검색 품질이 떨어지고, 매뉴얼은 단계 순서가 분리되면 실행 가이드 역할을 잃습니다. 정책 문서는 문단이 길기 때문에 겹침이 너무 작으면 예외 조항이 앞뒤 문맥과 떨어집니다.
+
+## 임베딩 전에 돌리는 빠른 검증 루프
+
+임베딩 비용을 쓰기 전에, 저는 먼저 다음 세 가지를 확인하는 편입니다. **길이 분포**, **첫 청크와 마지막 청크 미리보기**, **문서 유형별 경고 수**입니다. 이 세 가지면 조악한 프리셋을 초기에 거의 걸러낼 수 있습니다.
+
+```python
+from __future__ import annotations
+
+from collections.abc import Iterable
+
+def review_chunks(name: str, chunks: list[str], min_len: int, max_len: int) -> None:
+    too_short = [chunk for chunk in chunks if len(chunk) < min_len]
+    too_long = [chunk for chunk in chunks if len(chunk) > max_len]
+    print(f'[{name}] warnings short={len(too_short)} long={len(too_long)} total={len(chunks)}')
+    if chunks:
+        print(f'  first={chunks[0][:100]!r}')
+        print(f'  last={chunks[-1][:100]!r}')
+
+def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
+    thresholds = {
+        'faq': (60, 160),
+        'manual': (100, 260),
+        'policy': (140, 360),
+    }
+    for name, chunks in items:
+        min_len, max_len = thresholds[name]
+        review_chunks(name, chunks, min_len=min_len, max_len=max_len)
+```
+
+이 코드는 복잡하지 않지만 실무에서 바로 쓸 수 있습니다. 검색 정확도를 논하기 전에, 너무 짧은 청크와 너무 긴 청크를 분리해 보고 문서별 허용 범위를 정하면 이후 튜닝 비용이 크게 줄어듭니다.
+
+## 실패 모드 예시: 숫자가 좋아 보여도 구조가 망가진 경우
+
+아래처럼 `chunk_size`를 더 줄이면 평균 길이는 깔끔해 보일 수 있습니다. 대신 의미 단위가 깨져서 검색 결과가 설명이 아니라 파편 목록이 되는 경우가 많습니다.
+
+```text
+[faq-small] chunks=14 avg=58.1 min=21 max=79
+  first_chunk='Question: what is the upload limit?'
+  last_chunk='incremental job.'
+
+[manual-small] chunks=11 avg=73.5 min=18 max=97
+  first_chunk='# Deployment guide'
+  last_chunk='Check logs and chunk counts after deployment.'
+```
+
+이 출력이 보여 주는 문제는 간단합니다. FAQ에서는 질문과 답변이 나뉘고, 매뉴얼에서는 제목과 단계 목록이 여러 청크로 흩어집니다. 청크 수가 늘어난 사실보다 이런 구조 파손을 먼저 잡아야 합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 ### 청크 겹침이 문맥을 이어 주는 방식
@@ -150,6 +208,12 @@ python main.py
 - [ ] 첫 번째 청크 미리보기로 구조 보존 여부를 검증했습니다.
 - [ ] 임베딩 전에 너무 길거나 너무 짧은 청크의 기준을 정했습니다.
 
+## 실무에서는 이렇게 조정합니다
+
+처음부터 완벽한 청킹 프리셋은 거의 없습니다. 보통은 문서 유형별 시작점을 정한 뒤, 검색 로그에서 **자주 끊기는 경계**와 **자주 함께 나와야 하는 문장 쌍**을 다시 봅니다. FAQ는 질문-답변 결합 유지가 중요하고, 매뉴얼은 제목과 단계 목록의 결속이 중요하며, 정책 문서는 예외 조항의 문맥 유지가 중요합니다.
+
+또 하나 중요한 점은 청킹 실패를 임베딩 품질 문제로 착각하지 않는 것입니다. 검색 결과가 엉뚱하면 모델을 바꾸기 전에, 먼저 잘린 청크 미리보기와 길이 경고부터 확인하는 편이 훨씬 빠릅니다.
+
 ## 정리
 
 청킹은 텍스트를 잘게 쪼개는 기계적 단계가 아닙니다. 검색이 다시 회수해야 할 최소 문맥 단위를 어디에 둘지 정하는 설계 단계입니다.
@@ -170,6 +234,14 @@ python main.py
 
 ## 참고 자료
 
-- https://python.langchain.com/docs/how_to/recursive_text_splitter/
+### 공식 문서
+
+- [LangChain - How to recursively split text by characters](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+- [LangChain text splitters integration package](https://docs.langchain.com/oss/python/integrations/splitters/index)
+
+### 검증에 도움 되는 자료
+
+- [LangChain RecursiveCharacterTextSplitter API reference](https://python.langchain.com/api_reference/text_splitters/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html)
+- [The Unicode Standard - Text segmentation overview](https://www.unicode.org/reports/tr29/)
 
 Tags: RAG, Document Processing, LangChain, Python
