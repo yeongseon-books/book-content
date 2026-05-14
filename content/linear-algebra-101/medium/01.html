@@ -54,37 +54,24 @@
 </head>
 <body>
 <h1>What Is Linear Algebra?</h1>
-<blockquote>
-<p>Linear Algebra 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>linear algebra</em> just a <em>grid of numbers</em>, or is it the <em>language of space</em>?</p>
-<blockquote>
-<p><em>Linear algebra is the language of </em>vectors and linear transformations<em> — the grammar behind every ML model.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the first post in the Linear Algebra 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>If you learn machine learning through formulas, there is usually a moment when the notation suddenly gets dense. Data becomes vectors, parameters become matrices, and one model layer starts to look like a transformation. If linear algebra still feels like a table of numbers, the formulas remain memorized procedures instead of connected ideas.</p>
+<p>This is the first post in the Linear Algebra 101 series. Here we will treat linear algebra as the language that ties vectors, matrices, and linear transformations into one picture.</p>
+<h2>Questions This Post Answers</h2>
 <ul>
-<li>The <em>definition</em> of <em>linear algebra</em></li>
-<li>Intuition for <em>vectors</em> and <em>matrices</em></li>
-<li><em>Linear transformations</em> as the unifying concept</li>
-<li>A 5-step hands-on walk-through</li>
-<li>Five common pitfalls</li>
+<li>What does linear algebra actually study beyond symbol manipulation?</li>
+<li>Why do vectors and matrices keep reappearing in ML, graphics, and statistics?</li>
+<li>Why is matrix multiplication easier to understand as composition of transformations?</li>
+<li>How does the linear-transformation viewpoint connect the rest of the series?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>ML, statistics, graphics, and signal processing all run on <em>vectors and matrices</em>. If your <em>linear algebra is shaky</em>, you cannot <em>see inside</em> a model.</p>
 <blockquote>
-<p><em>Linear algebra is the language of data.</em></p>
+<p>Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.</p>
 </blockquote>
+<h2>Why It Matters</h2>
+<p>In machine learning, input data arrives as vectors, parameters live in matrices, and an entire layer is usually a linear transformation followed by a nonlinearity. Recommender systems, graphics, and signal processing are not all the same field, but they keep returning to the same vector-and-matrix grammar.</p>
+<p>If your linear algebra intuition is weak, the inside of a model stays opaque. Once you can read what a vector stores, what a matrix compresses, and why multiplication depends on order, the notation stops feeling like decoration and starts revealing structure.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Vec[&quot;Vectors&quot;] --&gt; Mat[&quot;Matrices&quot;]
-    Mat --&gt; Trans[&quot;Linear transformations&quot;]
-    Trans --&gt; App[&quot;ML, graphics, signals&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>This diagram shows how vectors, matrices, and linear transformations connect into one learning path.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Vector</strong>: a <em>bundle of numbers</em> with <em>direction and magnitude</em>.</li>
@@ -121,6 +108,12 @@ print(&quot;R v:&quot;, R @ v)
 <pre><code class="language-python">print(&quot;R(A v):&quot;, R @ (A @ v))
 print(&quot;(R A) v:&quot;, (R @ A) @ v)
 </code></pre>
+<h2>Read One Numeric Pass</h2>
+<ul>
+<li><code>np.linalg.norm([3, 4])</code> returns <code>5.0</code>. One vector length already gives you a geometric anchor.</li>
+<li><code>A @ v</code> becomes <code>array([11., 25.])</code>, which shows that the same input vector can be reinterpreted by a matrix rule.</li>
+<li>A 90-degree rotation sends <code>[3, 4]</code> to <code>[-4., 3.]</code>, making the idea of a transformation visible instead of purely symbolic.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A <em>vector</em> has <em>direction + magnitude</em> — not just a list of numbers.</li>
@@ -175,9 +168,9 @@ print(&quot;(R A) v:&quot;, (R @ A) @ v)
 <h2>References</h2>
 <ul>
 <li><a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown — Essence of Linear Algebra</a></li>
-<li><a href="https://www.khanacademy.org/math/linear-algebra">Khan Academy — Linear Algebra</a></li>
-<li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">Gilbert Strang — Linear Algebra (MIT OCW)</a></li>
-<li><a href="https://numpy.org/doc/stable/reference/routines.linalg.html">NumPy — Linear algebra</a></li>
+<li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">MIT OpenCourseWare — 18.06 Linear Algebra</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/routines.linalg.html">NumPy — Linear algebra routines</a></li>
+<li><a href="https://www.khanacademy.org/math/linear-algebra">Khan Academy — Linear algebra</a></li>
 </ul>
 <p class="tags-line">Tags: LinearAlgebra, Foundations, Vectors, DataScience, Beginner</p>
 </body>
