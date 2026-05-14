@@ -54,35 +54,26 @@
 </head>
 <body>
 <h1>Reliability</h1>
-<p>This is post 2 in the SRE 101 series.</p>
-<blockquote>
-<p>SRE 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>reliability</em> a <em>feeling</em> or a <em>measurable</em> number?</p>
-<blockquote>
-<p><em>Reliability</em> is the discipline of <em>proving</em> a <em>customer promise</em> with <em>numbers</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Many teams say a service feels stable until an outage or a slow release proves otherwise. That kind of language works in hallway conversation, but it does not help product, platform, and support teams make the same decision from the same evidence.</p>
+<p>Reliability gets clearer when you stop treating it like mood and start treating it like a bundle of measurable promises. A service can be up and still feel broken if it is too slow, returns wrong results, or loses data.</p>
+<p>This is post 2 in the SRE 101 series. Here we break reliability into measurable dimensions so later topics like SLOs, error budgets, and monitoring rest on something more concrete than “it seems okay.”</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>definition</em> of <em>reliability</em></li>
-<li>The <em>four measurable dimensions</em></li>
-<li>The difference between <em>availability</em> and <em>latency</em></li>
-<li><em>Durability</em> and <em>correctness</em></li>
-<li>The core <em>design principles</em></li>
+<li>What does it mean to describe reliability as a measurable property instead of a general sense of stability?</li>
+<li>Why are availability and latency related but not interchangeable?</li>
+<li>When do correctness and durability matter more than raw uptime?</li>
+<li>Why do teams rely on p95 and p99 more than on average latency?</li>
+<li>How should different systems choose different reliability dimensions?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Without numbers, every <em>conversation</em> and <em>decision</em> becomes <em>subjective</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Avail[&quot;availability&quot;] --&gt; R[&quot;reliability&quot;]
-    Lat[&quot;latency&quot;] --&gt; R
-    Corr[&quot;correctness&quot;] --&gt; R
-    Dur[&quot;durability&quot;] --&gt; R
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>Without numbers, every conversation and decision becomes subjective. One team thinks the service is fine, another thinks it is risky, and neither side can show where the disagreement comes from.</p>
+<p>Once the dimensions are explicit, reliability becomes easier to discuss as product quality. A payment flow, search API, and analytics pipeline can all be reliable, but they rarely need the same emphasis.</p>
+<blockquote>
+<p>Reliability is the work of proving a customer promise with numbers.</p>
+</blockquote>
+<h2>Concept at a glance</h2>
+<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Reliability only becomes visible when availability, latency, correctness, and durability are read together.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>availability</strong>: the <em>fraction of time</em> the system works.</li>
