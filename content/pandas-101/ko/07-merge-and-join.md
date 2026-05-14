@@ -17,7 +17,7 @@ tags:
   - SQL
   - Beginner
 seo_description: 데이터 병합과 조인 전략을 익힙니다. Inner, Left 조인의 차이와 키 관계 검증, 행 수 폭증 방지 등 안전한 결합 패턴을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 병합과 조인
@@ -44,12 +44,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Left["Left DF"] --> M["merge / join"]
-    Right["Right DF"] --> M
-    M --> Result["combined DF"]
-```
+![키 관계와 행 수 변화를 함께 점검하는 안전한 병합 흐름](../../../assets/pandas-101/07/07-01-concept-at-a-glance.ko.png)
+*키 관계와 행 수 변화를 함께 점검하는 안전한 병합 흐름*
 
 ## 핵심 용어
 
@@ -92,6 +88,18 @@ print(users.merge(orders, on="uid", how="left"))
 print(users.merge(orders, on="uid", how="outer", indicator=True))
 ```
 
+조인 결과를 눈으로 확인할 때는 값보다 `_merge` 열이 더 중요할 때가 많습니다. 어느 키가 양쪽에 있었고, 어느 키가 한쪽에만 있었는지를 즉시 알려 주기 때문입니다.
+
+**예상 출력:**
+
+```text
+   uid name  amount     _merge
+0    1    a   100.0       both
+1    1    a   200.0       both
+2    2    b    50.0       both
+3    3    c     NaN  left_only
+```
+
 왼쪽 조인은 기준 표를 보존하고, 바깥쪽 조인은 양쪽 키를 모두 살립니다. `indicator=True`를 켜면 각 행이 어느 쪽에서 왔는지 추적할 수 있습니다.
 
 ### 4단계 - 같은 이름의 열 충돌 피하기
@@ -111,6 +119,14 @@ try:
     users.merge(orders, on="uid", validate="one_to_one")
 except Exception as e:
     print("expected:", type(e).__name__)
+```
+
+`validate`는 잘못된 조인을 조용히 통과시키지 않게 만드는 안전장치입니다. 기대한 관계와 다르면 바로 예외가 나와서 행 수 폭증을 조기에 막아 줍니다.
+
+**예상 출력:**
+
+```text
+expected: MergeError
 ```
 
 `validate`는 조인 가정을 코드에 선언하는 매우 좋은 방법입니다. 기대한 관계와 실제 데이터 관계가 다르면 즉시 오류를 내서 조용한 데이터 오염을 막아 줍니다.

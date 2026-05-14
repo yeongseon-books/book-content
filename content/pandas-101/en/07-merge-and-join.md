@@ -2,7 +2,7 @@
 series: pandas-101
 episode: 7
 title: Merge and Join
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - SQL
   - Beginner
 seo_description: Master inner, left, right, outer, and cross joins, and learn the difference between merge and join with hands-on code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Merge and Join
 
+Production data rarely lives in one perfect table. Customer attributes sit in one dataset, orders in another, and campaign or event data somewhere else. That means the skill of combining tables safely is not optional. It is one of the most important parts of analysis work.
+
 This is post 7 in the Pandas 101 series.
 
-> Pandas 101 series (7/10)
+Here we will treat `merge` and `join` as tools for validating relationships between key systems, not just for gluing columns together. Row counts and key assumptions matter as much as the output table itself.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why are there *both merge and join*?
-
-> *merge keys on *columns*; join keys on *indexes*. They do the same thing, but *the key location differs*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - *inner / left / right / outer / cross* joins
 - The difference between *merge* and *join*
@@ -42,18 +36,16 @@ This is post 7 in the Pandas 101 series.
 - A 5-step join hands-on
 - Five common mistakes
 
+> Joining tables is really about validating relationships between key systems. If you ignore row counts and key duplication, a join can look successful while the result is already wrong.
+
 ## Why It Matters
 
 Real data is *spread across many tables*. *Joining ability* equals *analysis ability*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Left["Left DF"] --> M["merge / join"]
-    Right["Right DF"] --> M
-    M --> Result["combined DF"]
-```
+![A safe join flow that checks key assumptions and row counts](../../../assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
+*A safe join flow that checks key assumptions and row counts*
 
 ## Key Terms
 
@@ -92,6 +84,18 @@ print(users.merge(orders, on="uid", how="left"))
 print(users.merge(orders, on="uid", how="outer", indicator=True))
 ```
 
+When you review a join, the `_merge` column is often more valuable than the payload columns. It tells you immediately whether your assumptions about overlap and coverage were actually true.
+
+**Expected output:**
+
+```text
+   uid name  amount     _merge
+0    1    a   100.0       both
+1    1    a   200.0       both
+2    2    b    50.0       both
+3    3    c     NaN  left_only
+```
+
 ### Step 4 — suffixes
 
 ```python
@@ -107,6 +111,14 @@ try:
     users.merge(orders, on="uid", validate="one_to_one")
 except Exception as e:
     print("expected:", type(e).__name__)
+```
+
+`validate` is the difference between a quiet data bug and an explicit contract check. If your join cardinality assumption is wrong, you want the failure right here.
+
+**Expected output:**
+
+```text
+expected: MergeError
 ```
 
 ## What to Notice in This Code
@@ -148,7 +160,7 @@ CRM x orders, ads x conversions, users x events — *80% of analysis is joins*. 
 2. Construct data where *validate='one_to_one'* fails and inspect the *exception message*.
 3. Use the *indicator column* to find *right-only rows*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Joining is *half of analysis*. Next we cover *time series*.
 
@@ -158,11 +170,11 @@ Joining is *half of analysis*. Next we cover *time series*.
 - [Reading CSV and Excel](./03-read-csv-and-excel.md)
 - [Filtering and Selection](./04-filtering-and-selection.md)
 - [Handling Missing Values](./05-missing-values.md)
-- [groupby](./06-groupby.md)
+- [Groupby and Aggregation](./06-groupby.md)
 - **Merge and Join (current)**
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References
