@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Naming</h1>
-<blockquote>
-<p>Clean Code 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How much shorter does a good name make your code?</p>
-<blockquote>
-<p>A good name removes half of the comments. And it makes a single grep accurate.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Bad names waste time before any logic is understood. A reviewer pauses at <code>data</code>, guesses what it means, and rereads the same block twice.</p>
+<p>This is post 2 in the Clean Code 101 series.</p>
+<p>Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Six signals of a good name</li>
@@ -79,12 +72,8 @@
 <p>A searchable name is the start of maintainability.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    I[&quot;Intent&quot;] --&gt; N[&quot;Name&quot;]
-    N --&gt; S[&quot;Search&quot;]
-    N --&gt; R[&quot;Read&quot;]
-    N --&gt; D[&quot;Doc&quot;]
-</code></pre>
+<p><img alt="Naming" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Naming flow: once intent is visible in the name, search, reading, and documentation all get easier.</em></p>
 <p>The name lifts intent into view.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -133,6 +122,20 @@ i, j, k                          # short loops are fine
 customer_balance_cents           # domain names can be long
 </code></pre>
 <p>Narrow scope: short. Wide scope: precise.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">ruff check app/ --select N
+python -m pytest -q tests/test_naming_examples.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Inconsistent naming patterns and weak abbreviations surface first.</li>
+<li>After a rename, tests should stay green without behavior drift.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Renaming only types while leaving domain language muddy.</li>
+<li>Verifying the declaration but missing the full set of call sites.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The name creates meaning at the call site.</li>
@@ -191,6 +194,8 @@ customer_balance_cents           # domain names can be long
 <li><a href="https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/">Domain-Driven Design — Eric Evans</a></li>
 <li><a href="https://google.github.io/styleguide/pyguide.html#316-naming">Google Style Guide — Naming</a></li>
 <li><a href="https://peps.python.org/pep-0008/#naming-conventions">PEP 8 — Naming Conventions</a></li>
+<li><a href="https://docs.astral.sh/ruff/rules/#pep8-naming-n">Ruff pep8-naming rules</a></li>
+<li><a href="https://peps.python.org/pep-0008/#naming-conventions">PEP 8 naming conventions</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, Naming, Readability, Refactoring, SoftwareEngineering</p>
 </body>
