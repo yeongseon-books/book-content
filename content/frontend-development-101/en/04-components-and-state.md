@@ -22,21 +22,14 @@ last_reviewed: '2026-05-04'
 
 # Components and State
 
-This is post 4 in the Frontend Development 101 series.
+A small screen can survive on a few lines of JavaScript and direct DOM manipulation. As the screen grows, that approach collapses under its own weight. Logic piles into one file, every change feels risky, and reading the code becomes harder than writing the next feature.
 
-> Frontend Development 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you manage a screen once it grows past *a thousand lines*?
-
-> The answer is *components*. Split the screen into small functions; each function owns *only its props and state*.
-
-<!-- a-grade-intro:end -->
+This is post 4 in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.
 
 ## What You Will Learn
 
 - The *component mindset*
+
 - The *clear distinction* between props and state
 - Unidirectional data flow
 - *When to split* a component
@@ -50,13 +43,9 @@ The component mindset is not exclusive to React. The same pattern works in Vue, 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart TD
-    App["App (state)"] --> Header["Header"]
-    App --> List["List (props)"]
-    List --> Item["Item (props)"]
-    Item -->|event| App
-```
+![Concept at a Glance](../../../assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
+
+*A component tree where state flows down and events travel back up*
 
 State flows *down*, events flow *up*.
 
@@ -142,6 +131,16 @@ function App() {
 }
 ```
 
+## Verification
+
+- Render two counters and confirm that each instance increments independently before you try a lifted-state version.
+- After lifting state up, verify that the shared total updates consistently everywhere the parent renders it.
+
+## If It Fails, Check This First
+
+- If state never changes, confirm the `useState` import and make sure the setter runs inside the click handler.
+- If parent and child fall out of sync, re-check where the state lives and whether the prop names still match.
+
 ## What to Notice in This Code
 
 - `props` are *input*; `state` is *internal memory*.
@@ -191,6 +190,7 @@ Components and state make screens *composable*. Next, we connect multiple screen
 - [HTML and CSS Basics](./02-html-and-css-basics.md)
 - [JavaScript Basics](./03-javascript-basics.md)
 - **Components and State (current)**
+
 - Routing and Pages (upcoming)
 - API Calls and Async (upcoming)
 - Forms and Validation (upcoming)
@@ -201,9 +201,13 @@ Components and state make screens *composable*. Next, we connect multiple screen
 
 ## References
 
-- [React docs](https://react.dev/)
-- [Thinking in React](https://react.dev/learn/thinking-in-react)
-- [Vue Components](https://vuejs.org/guide/essentials/component-basics.html)
+### Official Docs
+- [React: Thinking in React](https://react.dev/learn/thinking-in-react)
+- [React: Sharing state between components](https://react.dev/learn/sharing-state-between-components)
+- [Vue: Component basics](https://vuejs.org/guide/essentials/component-basics.html)
+
+### Verification and Further Reading
 - [Svelte tutorial](https://svelte.dev/tutorial)
+- [React: State as a snapshot](https://react.dev/learn/state-as-a-snapshot)
 
 Tags: Frontend, React, Components, State, JavaScript
