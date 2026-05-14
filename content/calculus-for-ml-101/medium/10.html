@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Calculus in Deep Learning</h1>
+<p>The ideas from this series do not live in isolation. Functions and slopes, partial derivatives, gradients, the chain rule, loss functions, gradient descent, optimizers, and backpropagation all show up inside the same training loop. The goal of this final post is to put those pieces back together as one working system.</p>
+<p>This is the final post in the Calculus for ML 101 series.</p>
+<p>In this post, we'll walk through the forward pass, loss computation, backward pass, optimizer update, and the operating rules around that loop. Once the full cycle is visible, calculus stops feeling like a separate math chapter and starts feeling like the control interface for learning itself.</p>
 <blockquote>
-<p>Calculus for ML 101 series (10/10)</p>
+<p>In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does the <em>calculus</em> from this series come together in the <em>deep learning training loop</em>?</p>
-<blockquote>
-<p><em>Networks</em>, <em>losses</em>, <em>backprop</em>, and <em>optimizers</em> all run on calculus inside <em>one cycle</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>5 stages</em> of the training loop</li>
@@ -76,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>This <em>capstone</em> synthesizes the series and lets you implement the <em>common skeleton</em> shared by every ML training run.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[Forward] --&gt; L[Loss]
-    L --&gt; B[Backward]
-    B --&gt; U[Update]
-    U --&gt; F
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Training-loop flow: forward, loss, backward, and update repeat as one closed cycle.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>forward</strong>: produce a <em>prediction</em>.</li>
@@ -126,6 +117,28 @@ def sigmoid(z):
             w, b = step(x, y, w, b, lr)
     return w, b
 </code></pre>
+<p><strong>Step 6 — Framework code uses the same loop</strong></p>
+<pre><code class="language-python">optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+</code></pre>
+<p>These few lines compress the entire series. <code>pred = model(x)</code> is function composition. <code>loss = criterion(pred, y)</code> makes the training objective explicit. <code>loss.backward()</code> executes the chain rule across the computation graph. <code>optimizer.step()</code> converts gradient information into real parameter movement.</p>
+<p><strong>Step 7 — Evaluation follows different rules</strong></p>
+<pre><code class="language-python">with torch.no_grad():
+    pred = model(x)
+    metric = accuracy(pred, y)
+</code></pre>
+<p>Evaluation does not need gradients, so it should not build a backward graph. Once you see training as a forward-loss-backward-update loop, it becomes obvious why <code>train()</code>/<code>eval()</code> mode switches and <code>no_grad()</code> blocks matter. They are not framework rituals. They are part of running the loop correctly.</p>
+<p><strong>Step 8 — The first failure points to check</strong></p>
+<ul>
+<li>Did you forget <code>zero_grad()</code>, so stale gradients are leaking across steps?</li>
+<li>Is the loss decreasing while the evaluation metric gets worse, suggesting the loss design is misaligned with the real objective?</li>
+<li>Are scheduler timing, <code>train()</code>/<code>eval()</code> mode, or optimizer-step ordering inconsistent across experiments?</li>
+<li>Is reproducibility weak enough that you are blaming the model architecture for what is really a training-loop configuration issue?</li>
+</ul>
+<p>Many training bugs come from this operating layer rather than from exotic calculus mistakes. That is why a clear loop-level mental model is so valuable.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>forward pass</em> yields a <em>prediction</em>.</li>
@@ -167,7 +180,7 @@ def sigmoid(z):
 <li>State the meaning of <em>eval mode</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>This post wraps the <em>Calculus for ML 101</em> series. <em>Calculus</em> is the <em>mathematical essence</em> of what we mean by <em>deep learning learns</em>.</p>
+<p>This post wraps the <em>Calculus for ML 101</em> series. When people say a deep learning model <em>learns</em>, what they really mean is that the training loop keeps converting prediction error into gradients and then into parameter updates. Calculus is the language that makes that conversion possible.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/01-what-is-derivative.md">What Is a Derivative</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/calculus-for-ml-101/en/02-functions-and-slope.md">Functions and Slope</a></li>
@@ -186,6 +199,7 @@ def sigmoid(z):
 <li><a href="https://pytorch.org/tutorials/">PyTorch Tutorials</a></li>
 <li><a href="https://cs231n.stanford.edu/">CS231n - Convolutional Neural Networks</a></li>
 <li><a href="https://pytorch.org/docs/stable/notes/randomness.html">Reproducibility - PyTorch</a></li>
+<li><a href="https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html">Zeroing out gradients in PyTorch</a></li>
 </ul>
 <p class="tags-line">Tags: Calculus, ML, DeepLearning, Capstone, Beginner</p>
 </body>
