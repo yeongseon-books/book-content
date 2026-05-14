@@ -17,7 +17,7 @@ tags:
   - Debugging
   - scikit-learn
 seo_description: 평균 점수에 가려진 모델의 취약점을 파악하기 위한 오류 분석 기법을 소개하고, 실패 패턴을 찾아 모델을 개선합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 오류 분석으로 약점 찾기
@@ -48,15 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    All["all errors"] --> Slice["slice by feature"]
-    All --> Conf["slice by confidence"]
-    All --> Conf2["confusion pairs"]
-    Slice --> Weak["weakest segment"]
-    Conf --> Calib["calibration gap"]
-```
+![슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부](../../../assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
 
+*슬라이스 분석과 신뢰도 구간 분석으로 이어지는 오류 해부*
 평균을 쪼개면 패턴이 보입니다. 특성별 슬라이스, 오류 유형, 신뢰도 구간을 나눠 보면 같은 모델도 전혀 다른 얼굴을 드러냅니다.
 
 ## 핵심 용어
@@ -123,6 +117,8 @@ for lo, hi in zip(bins[:-1], bins[1:]):
 order = np.argsort(np.abs(proba - 0.5))[:10]
 print("ambiguous indices:", order.tolist())
 ```
+
+**예상 결과:** 전체 점수 하나 대신 약한 슬라이스, FP/FN 비율, 확신도 구간별 오류율, 라벨 재검토 후보가 함께 나와야 합니다. 그래야 다음 실험이 막연한 개선이 아니라 구체적인 처방으로 이어집니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
