@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 7
 title: Linear Algebra
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,40 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Linear Algebra
 
-> Math for CS 101 series (7/10)
+Linear algebra often feels intimidating to beginners because the notation becomes dense fast. In practice, though, the topic is less about ceremonial symbols and more about one useful idea: representing data and transformations in a compact, reusable form.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What *language* lets us handle *data* and *transforms* efficiently?
-
-> *Linear algebra* is the *common language* of data and transforms behind *ML*, *graphics*, and *simulation*.
-
-<!-- a-grade-intro:end -->
+Embeddings, dimensionality reduction, camera transforms, and neural network forward passes all become easier to understand once vectors and matrices stop looking like mysterious tables and start looking like data plus movement rules.
 
 This is post 7 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we use linear algebra as a practical language for data, similarity, and transformation.
 
-- What a *vector* means
-- What a *matrix* means
-- *Dot product* and *angle*
-- *Matrix multiplication* and *transpose*
-- Intuition for *basis*
+## Questions this chapter answers
+
+- How do vectors and matrices represent data in a useful way?
+- Why is the dot product so central to similarity and scoring?
+- What is the difference between a matrix as a table and a matrix as a transform?
+- When does a transpose change the way you should interpret the data?
+- Why does basis intuition matter once dimensions carry meaning?
+
+> Linear algebra lets you treat data and transforms with the same grammar. That is why it appears in ML, graphics, simulation, and ranking systems so often.
 
 ## Why It Matters
 
-*Embeddings*, *PCA*, *recommenders*, and *3D transforms* all run on linear algebra.
+Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on linear algebra. The common theme is not just computation speed. It is that vectors and matrices give you a way to describe meaning, similarity, and transformation in one framework.
+
+That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    V[Vector] --> D[Dot Product]
-    V --> M[Matrix]
-    M --> T[Transpose]
-    M --> X[Matmul]
-    M --> B[Basis]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
+*Linear algebra treats vectors as data and matrices as the transformations that move or reinterpret that data.*
 
 ## Key Terms
 
@@ -150,7 +144,9 @@ def matmul(A, B):
 
 ## Wrap-up and Next Steps
 
-Next post: *Calculus*.
+Linear algebra gives you a compact way to talk about direction, similarity, and transformation. Once those concepts feel natural, modern data and ML systems look much less like black boxes.
+
+Next, we move into calculus, where the focus becomes change, direction, and optimization.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -171,5 +167,6 @@ Next post: *Calculus*.
 - [Linear Algebra - Khan Academy](https://www.khanacademy.org/math/linear-algebra)
 - [Introduction to Linear Algebra - Strang](https://math.mit.edu/~gs/linearalgebra/)
 - [NumPy Linear Algebra Documentation](https://numpy.org/doc/stable/reference/routines.linalg.html)
+- [NumPy GitHub repository](https://github.com/numpy/numpy)
 
 Tags: Math, LinearAlgebra, Vectors, Matrices, Beginner
