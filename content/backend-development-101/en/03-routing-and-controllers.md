@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 3
 title: Routing and Controllers
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - REST
   - Python
 seo_description: Split routers from controllers and learn the difference between path, query, and body parameters so your backend stays clean as it grows.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Routing and Controllers
 
-> Backend Development 101 series (3/10)
+A single file feels fine when your API only has a few endpoints. Once features start stacking up, though, the real problem is not line count but the constant question of where each new path, validation rule, and response shape should live.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.
 
-**Core question**: When a server has a hundred endpoints, how do you keep the code *clean*?
-
-> The router decides *the address*; the controller *receives input and delegates to the next layer*. Splitting these two responsibilities lets the code organize itself.
-
-This is post 3 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between routers and controllers
 - The difference between path, query, and body parameters
@@ -50,14 +42,9 @@ In a tiny project, a single file works. As endpoints grow, that single file *bec
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Router["Router"]
-    Router --> Ctrl["Controller"]
-    Ctrl --> Service["Service"]
-    Service --> Repo["Repository"]
-```
+![request routing flow from router to controller, service, and repository](../../../assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
 
+*request routing flow from router to controller, service, and repository*
 Routers are the *map*, controllers are the *front desk*, services are the *experts*.
 
 ## Key Terms
@@ -184,6 +171,16 @@ class UserController:
 
 Controllers stay *thin* — validate, then delegate.
 
+## Verification points
+
+**Expected output:** `/users/10` should return `{"id": 10}`, and `GET /users?active=false&limit=5` should echo the filter values in JSON.
+
+### First failure modes to check
+
+- A wrong path-parameter type should produce `422`, which is the framework doing its validation job.
+- If split routers do not show up, check `include_router()` before changing any business code.
+- When a controller starts growing, make sure only input mapping and service delegation remain there.
+
 ## What to Notice in This Code
 
 - Use path for *identity*, query for *filtering*.
@@ -243,9 +240,14 @@ Routers are the *map*; controllers are the *front desk*. Next, we open the door 
 
 ## References
 
+### Official Docs
+
 - [FastAPI Path operations](https://fastapi.tiangolo.com/tutorial/path-params/)
 - [FastAPI APIRouter](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
-- [REST API Tutorial](https://restfulapi.net/)
 - [Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
+
+### Further Reading
+
+- [REST API Tutorial](https://restfulapi.net/)
 
 Tags: Backend, FastAPI, Architecture, REST, Python
