@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Routing and Controllers</h1>
-<blockquote>
-<p>Backend Development 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a server has a hundred endpoints, how do you keep the code <em>clean</em>?</p>
-<blockquote>
-<p>The router decides <em>the address</em>; the controller <em>receives input and delegates to the next layer</em>. Splitting these two responsibilities lets the code organize itself.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>A single file feels fine when your API only has a few endpoints. Once features start stacking up, though, the real problem is not line count but the constant question of where each new path, validation rule, and response shape should live.</p>
+<p>This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The difference between routers and controllers</li>
 <li>The difference between path, query, and body parameters</li>
@@ -79,13 +70,9 @@
 <p>Good structure removes the question of <em>where to put code</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;Request&quot;] --&gt; Router[&quot;Router&quot;]
-    Router --&gt; Ctrl[&quot;Controller&quot;]
-    Ctrl --&gt; Service[&quot;Service&quot;]
-    Service --&gt; Repo[&quot;Repository&quot;]
-</code></pre>
-<p>Routers are the <em>map</em>, controllers are the <em>front desk</em>, services are the <em>experts</em>.</p>
+<p><img alt="request routing flow from router to controller, service, and repository" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>request routing flow from router to controller, service, and repository</em><br>
+Routers are the <em>map</em>, controllers are the <em>front desk</em>, services are the <em>experts</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Router</strong>: maps URL patterns to handlers.</li>
@@ -185,6 +172,14 @@ class UserController:
         return self.svc.register(payload.name, payload.age)
 </code></pre>
 <p>Controllers stay <em>thin</em> — validate, then delegate.</p>
+<h2>Verification points</h2>
+<p><strong>Expected output:</strong> <code>/users/10</code> should return <code>{"id": 10}</code>, and <code>GET /users?active=false&amp;limit=5</code> should echo the filter values in JSON.</p>
+<p><strong>First failure modes to check</strong></p>
+<ul>
+<li>A wrong path-parameter type should produce <code>422</code>, which is the framework doing its validation job.</li>
+<li>If split routers do not show up, check <code>include_router()</code> before changing any business code.</li>
+<li>When a controller starts growing, make sure only input mapping and service delegation remain there.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Use path for <em>identity</em>, query for <em>filtering</em>.</li>
@@ -238,11 +233,15 @@ class UserController:
 <li>A Production-Ready Backend Structure (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://fastapi.tiangolo.com/tutorial/path-params/">FastAPI Path operations</a></li>
 <li><a href="https://fastapi.tiangolo.com/tutorial/bigger-applications/">FastAPI APIRouter</a></li>
-<li><a href="https://restfulapi.net/">REST API Tutorial</a></li>
 <li><a href="https://docs.pydantic.dev/latest/concepts/models/">Pydantic Models</a></li>
+</ul>
+<p><strong>Further Reading</strong></p>
+<ul>
+<li><a href="https://restfulapi.net/">REST API Tutorial</a></li>
 </ul>
 <p class="tags-line">Tags: Backend, FastAPI, Architecture, REST, Python</p>
 </body>
