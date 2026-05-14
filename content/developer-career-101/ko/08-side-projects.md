@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - SideProject
-  - Learning
-  - Portfolio
-  - Beginner
+- Career
+- SideProject
+- Learning
+- Portfolio
+- Beginner
 seo_description: 역량 향상으로 이어지는 실무형 사이드 프로젝트 기획 원칙과 시간 관리를 통해 직장과 병행하며 포트폴리오를 강화합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 사이드 프로젝트와 학습
@@ -49,12 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    P[Pick] --> T[Time-box]
-    T --> S[Ship]
-    S --> F[Feedback]
-```
+![아이디어 선정부터 배포와 피드백까지의 사이드 프로젝트 흐름](../../../assets/developer-career-101/08/08-01-concept-at-a-glance.ko.png)
+
+*아이디어 선정부터 배포와 피드백까지의 사이드 프로젝트 흐름*
 
 사이드 프로젝트는 길게 버티는 마라톤이 아닙니다. 아이디어를 고르고, 시간을 제한하고, 작게 내보내고, 피드백을 받아 다음 사이클로 넘어가는 구조가 있어야 지치지 않습니다.
 
@@ -121,6 +118,33 @@ gh repo create --public
 
 본업과의 분리는 안전장치입니다. 회사 자산을 섞지 말고, 지식재산권 규정을 확인해 두어야 나중에 불필요한 문제를 피할 수 있습니다.
 
+## 사이드 프로젝트를 고를 때 쓰는 점수표
+
+| 기준 | 높은 점수를 주는 경우 | 경고 신호 |
+| --- | --- | --- |
+| 학습 가치 | 지금 커리어 공백을 직접 메운다 | 이미 익숙한 것만 반복한다 |
+| 완주 가능성 | 4~6주 안에 MVP를 낼 수 있다 | 핵심 기능이 세 개 이상이다 |
+| 공개 가능성 | README와 데모로 설명할 수 있다 | 결과가 눈에 보이지 않는다 |
+| 경계 관리 | 회사 자산, 고객 데이터와 분리된다 | 계약 조항이 모호하다 |
+
+## 사이드 프로젝트를 고를 때 쓰는 점수표
+
+| 기준 | 높은 점수를 주는 경우 | 경고 신호 |
+| --- | --- | --- |
+| 학습 가치 | 지금 커리어 공백을 직접 메운다 | 이미 익숙한 것만 반복한다 |
+| 완주 가능성 | 4~6주 안에 MVP를 낼 수 있다 | 핵심 기능이 세 개 이상이다 |
+| 공개 가능성 | README와 데모로 설명할 수 있다 | 결과가 눈에 보이지 않는다 |
+| 경계 관리 | 회사 자산, 고객 데이터와 분리된다 | 계약 조항이 모호하다 |
+
+## 사이드 프로젝트를 고를 때 쓰는 점수표
+
+| 기준 | 높은 점수를 주는 경우 | 경고 신호 |
+| --- | --- | --- |
+| 학습 가치 | 지금 커리어 공백을 직접 메운다 | 이미 익숙한 것만 반복한다 |
+| 완주 가능성 | 4~6주 안에 MVP를 낼 수 있다 | 핵심 기능이 세 개 이상이다 |
+| 공개 가능성 | README와 데모로 설명할 수 있다 | 결과가 눈에 보이지 않는다 |
+| 경계 관리 | 회사 자산, 고객 데이터와 분리된다 | 계약 조항이 모호하다 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 시간 박스가 지속 가능성을 만듭니다.
@@ -179,9 +203,9 @@ gh repo create --public
 
 ## 참고 자료
 
-- [Side Project Marketing](https://sideprojectmarketing.com/)
+- [GitHub Docs — Licensing a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)
+- [Open Source Guides — Legal](https://opensource.guide/legal/)
 - [Indie Hackers](https://www.indiehackers.com/)
-- [Open Source IP policy](https://opensource.guide/legal/)
-- [Time blocking](https://todoist.com/productivity-methods/time-blocking)
+- [Time blocking method](https://todoist.com/productivity-methods/time-blocking)
 
 Tags: Career, SideProject, Learning, Portfolio, Beginner
