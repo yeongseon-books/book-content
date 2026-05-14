@@ -16,7 +16,7 @@ tags:
   - DimensionalityReduction
   - DataScience
   - Beginner
-seo_description: PCA가 분산이 큰 축을 찾고 차원을 줄이는 원리를 설명합니다
+seo_description: PCA가 분산이 큰 축을 새로 찾아 차원을 줄이는 원리를 설명하고 SVD와 분산 설명률을 활용한 실무 분석 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - mock
   - monkeypatch
   - Test Doubles
-seo_description: Isolate external dependencies with mock and monkeypatch in pytest.
+seo_description: Isolate dependencies with mock and monkeypatch in pytest. Master function replacement, exception simulation, and call verification with assert.
 last_reviewed: '2026-05-04'
 ---
 

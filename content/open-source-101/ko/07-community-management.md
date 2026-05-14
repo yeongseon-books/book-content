@@ -16,7 +16,7 @@ tags:
   - CodeOfConduct
   - Governance
   - Beginner
-seo_description: 건강한 오픈소스 커뮤니티를 만드는 운영 문서와 응답 원칙을 설명합니다
+seo_description: 건강한 오픈소스 커뮤니티 유지를 위한 행동 강령, 기여 안내, 토론 공간 분리와 첫 기여자를 환영하는 운영 원칙을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

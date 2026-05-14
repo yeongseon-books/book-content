@@ -17,7 +17,7 @@ tags:
 - HuggingFace
 - Python
 last_reviewed: '2026-05-12'
-seo_description: 데이터셋 문제는 양보다 형식에서 더 자주 실패합니다.
+seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 분석하고 원본, 템플릿, 텐서라는 세 층으로 나누어 전처리하는 실무 방법을 정리합니다.
 ---
 
 # 데이터셋 준비와 전처리

@@ -17,7 +17,7 @@ tags:
   - Closure
   - FirstClass
   - Capture
-seo_description: 클로저가 렉시컬 스코프와 일급 함수에서 어떻게 생기는지 설명합니다.
+seo_description: 일급 함수와 렉시컬 스코프가 결합된 클로저 원리를 정리합니다. 캡처와 늦은 바인딩 함정, 데코레이터로 함수가 환경을 보존하는 법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

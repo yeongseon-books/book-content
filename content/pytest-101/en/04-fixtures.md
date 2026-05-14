@@ -16,7 +16,7 @@ tags:
   - Fixtures
   - conftest
   - Test Data
-seo_description: Master pytest fixtures including scope, yield, and conftest patterns.
+seo_description: Master pytest fixtures to manage test data efficiently. Learn about fixture injection, scopes, yield teardown, and sharing with conftest.py.
 last_reviewed: '2026-05-04'
 ---
 

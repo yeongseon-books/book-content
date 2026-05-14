@@ -16,7 +16,7 @@ tags:
   - tmp_path
   - freezegun
   - System Resource Testing
-seo_description: Test file I/O, environment variables, and time-dependent code with pytest.
+seo_description: Test file I/O with tmp_path, environment variables with monkeypatch, and time-dependent logic with freezegun for stable and reproducible tests.
 last_reviewed: '2026-05-04'
 ---
 

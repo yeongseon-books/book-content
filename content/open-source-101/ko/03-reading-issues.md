@@ -16,7 +16,7 @@ tags:
   - GitHub
   - Triage
   - Beginner
-seo_description: 깃허브 이슈를 읽고 범위와 맥락을 파악하는 기본 절차를 정리합니다
+seo_description: 깃허브 이슈를 단순한 할 일 목록이 아니라 문제 정의와 재현 절차, 합의 기록이 담긴 공동 작업 기록으로 읽는 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

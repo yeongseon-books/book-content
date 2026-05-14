@@ -17,7 +17,7 @@ tags:
   - Binding
   - Lexical
   - Dynamic
-seo_description: 이름이 어떤 값을 가리키는지 결정하는 스코프와 바인딩을 비교합니다.
+seo_description: 이름을 값에 연결하는 바인딩과 스코프 규칙을 LEGB 사례로 풀이하고, 렉시컬 스코프가 왜 코드 가독성과 유지보수성에 중요한지 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

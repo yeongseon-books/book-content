@@ -17,7 +17,7 @@ tags:
 - Transformers
 - Python
 last_reviewed: '2026-05-12'
-seo_description: LoRA 어댑터는 특정 선형 변환 옆에 붙는 작은 보정 경로입니다.
+seo_description: LoRA 어댑터의 랭크, 스케일, 대상 모듈 설정 방법을 설명하고 모델별 명명 규칙 확인을 통한 올바른 배선 검증 실습을 진행합니다.
 ---
 
 # LoRA 어댑터 구성

@@ -16,7 +16,7 @@ tags:
   - Capstone
   - GitHub
   - Beginner
-seo_description: 작은 도구를 첫 오픈소스 프로젝트로 공개하는 최소 절차를 정리합니다
+seo_description: 작은 도구를 첫 오픈소스 프로젝트로 공개하는 범위 설정부터 문서, 릴리스, 피드백 수집까지의 최소 절차를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

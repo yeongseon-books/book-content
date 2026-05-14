@@ -16,7 +16,7 @@ tags:
   - Eigenvectors
   - DataScience
   - Beginner
-seo_description: 고유값과 고유벡터를 변환의 축과 확대율 관점에서 설명합니다
+seo_description: 고유값과 고유벡터를 변환의 축과 확대율 관점에서 정의하고 PCA나 페이지랭크 같은 실무 문제와 어떻게 연결되는지 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

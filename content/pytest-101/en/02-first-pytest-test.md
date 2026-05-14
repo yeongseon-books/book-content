@@ -16,7 +16,7 @@ tags:
   - Test Writing
   - Test Discovery
   - Project Structure
-seo_description: Set up a pytest project structure and write your first tests.
+seo_description: Learn pytest discovery rules, project layout with the src directory, and how to execute specific tests using node IDs and keyword filtering.
 last_reviewed: '2026-05-04'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - assert
   - Exception Testing
   - pytest.raises
-seo_description: Master pytest assertion introspection and exception testing patterns.
+seo_description: Master pytest assertion introspection, floating-point comparison with pytest.approx, and exception testing using pytest.raises with matching.
 last_reviewed: '2026-05-04'
 ---
 

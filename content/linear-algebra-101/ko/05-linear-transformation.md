@@ -16,7 +16,7 @@ tags:
   - Geometry
   - DataScience
   - Beginner
-seo_description: 회전, 확대, 반사, 전단으로 선형변환의 기하학적 의미를 설명합니다
+seo_description: 회전, 확대, 반사, 전단 변환을 예로 들어 행렬이 공간을 어떻게 바꾸는지 그 기하학적 의미를 명확하게 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

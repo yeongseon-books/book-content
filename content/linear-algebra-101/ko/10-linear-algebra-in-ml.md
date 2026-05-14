@@ -16,7 +16,7 @@ tags:
   - DeepLearning
   - DataScience
   - Beginner
-seo_description: 선형대수가 회귀, 신경망, 임베딩, 학습 과정에 쓰이는 흐름을 묶습니다
+seo_description: 선형대수가 회귀, 신경망, 임베딩, 최적화 과정에서 어떻게 뼈대 역할을 하는지 종합적으로 정리하며 시리즈를 마무리합니다.
 last_reviewed: '2026-05-12'
 ---
 

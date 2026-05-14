@@ -17,7 +17,7 @@ tags:
 - Transformers
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'A LoRA adapter is summarized by:'
+seo_description: Master LoRA adapter configuration by understanding rank, scaling, and target modules while verifying proper wiring using real model objects.
 ---
 
 # Configuring LoRA Adapters

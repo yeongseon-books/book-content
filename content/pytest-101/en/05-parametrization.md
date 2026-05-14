@@ -16,7 +16,7 @@ tags:
   - parametrize
   - Test Cases
   - Data-Driven Testing
-seo_description: Write data-driven tests with pytest parametrize.
+seo_description: Learn to use @pytest.mark.parametrize for data-driven tests. Master syntax, multi-parameter usage, custom test IDs, and Cartesian products.
 last_reviewed: '2026-05-04'
 ---
 

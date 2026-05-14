@@ -17,7 +17,7 @@ tags:
   - Static
   - Dynamic
   - Inference
-seo_description: 타입 시스템이 안전성과 도구 지원을 어떻게 동시에 만드는지 설명합니다.
+seo_description: 정적/동적 타입과 강한/약한 타입의 차이를 정리하고, 제네릭과 타입 추론이 안전성과 생산성을 어떻게 동시에 보장하는지 코드 예시로 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - Community
   - Contribution
   - Beginner
-seo_description: 오픈소스를 무료 코드가 아니라 권리와 협업 문화로 이해하는 출발점입니다
+seo_description: 오픈소스를 단순한 무료 코드를 넘어 권리, 책임, 협업 문화가 공존하는 생태계로 정의하고 기본 용어와 참여 경로를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

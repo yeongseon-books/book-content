@@ -17,7 +17,7 @@ tags:
   - GC
   - Stack
   - Heap
-seo_description: 객체가 언제 살아 있고 언제 사라지는지 메모리 관리 관점에서 설명합니다.
+seo_description: 스택/힙의 차이와 참조 카운팅, 순환 참조를 해결하는 GC 원리를 정리합니다. GC 환경에서도 누수가 생기는 이유와 관리 도구를 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

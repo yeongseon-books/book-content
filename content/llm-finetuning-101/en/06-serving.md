@@ -17,7 +17,7 @@ tags:
 - Adapter
 - Python
 last_reviewed: '2026-05-01'
-seo_description: A serving system decomposes into four layers.
+seo_description: Wrap your fine-tuned LLM in a FastAPI service by breaking the system into API and model layers for efficient inference and serving.
 ---
 
 # Model Serving

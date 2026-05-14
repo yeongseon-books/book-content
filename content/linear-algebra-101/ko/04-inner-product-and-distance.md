@@ -16,7 +16,7 @@ tags:
   - Distance
   - DataScience
   - Beginner
-seo_description: 내적과 거리, 코사인 유사도의 의미를 벡터 비교 관점에서 설명합니다
+seo_description: 내적과 코사인 유사도, 다양한 거리 함수의 의미를 벡터 비교와 임베딩 검색 관점에서 그 차이를 명확하게 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

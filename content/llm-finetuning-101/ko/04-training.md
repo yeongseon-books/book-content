@@ -17,7 +17,7 @@ tags:
 - Optimizer
 - Python
 last_reviewed: '2026-05-12'
-seo_description: 학습 루프 한 스텝은 여섯 단계로 나눌 수 있습니다.
+seo_description: 학습 루프 한 스텝의 여섯 단계를 분석하고 학습률, 배치 크기 등의 하이퍼파라미터가 손실 곡선에 미치는 영향을 원리부터 이해합니다.
 ---
 
 # 학습 루프와 하이퍼파라미터

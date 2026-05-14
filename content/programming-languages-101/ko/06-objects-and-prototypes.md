@@ -17,7 +17,7 @@ tags:
   - Prototype
   - Class
   - Inheritance
-seo_description: 클래스 기반과 프로토타입 기반 객체 모델의 차이를 메서드 탐색으로 설명합니다.
+seo_description: 상태와 동작을 묶는 객체지향의 본질을 정의하고, 클래스와 프로토타입 기반 모델의 메서드 탐색 차이를 위임과 MRO 관점에서 비교 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

@@ -16,7 +16,7 @@ tags:
   - NumPy
   - DataScience
   - Beginner
-seo_description: 벡터의 정의와 연산, 노름과 정규화의 의미를 직관적으로 정리합니다
+seo_description: 벡터를 좌표열, 화살표, 데이터의 세 관점으로 이해하고 노름과 정규화 같은 핵심 연산을 실무 관점에서 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

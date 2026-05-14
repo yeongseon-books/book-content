@@ -17,7 +17,7 @@ tags:
   - Semantics
   - Grammar
   - 파싱
-seo_description: 구문과 의미를 분리해 보면 컴파일 오류와 실행 오류가 달리 보입니다.
+seo_description: 렉서, 파서, AST, 평가기로 이어지는 흐름을 통해 구문 합법성과 의미 해석의 차이를 명확히 구분하고 에러의 층위를 이해하는 법을 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 

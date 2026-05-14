@@ -16,7 +16,7 @@ tags:
   - Triage
   - Burnout
   - Beginner
-seo_description: 메인테이너가 맡는 책임과 번아웃 없이 역할을 지속하는 기준을 설명합니다
+seo_description: 메인테이너의 책임을 기술적 판단을 넘어 운영과 경계 설정, 위임의 관점에서 정의하고 지속 가능한 프로젝트 유지 방법을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

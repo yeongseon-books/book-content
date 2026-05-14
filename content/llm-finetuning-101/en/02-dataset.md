@@ -17,7 +17,7 @@ tags:
 - HuggingFace
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'Treat the dataset as three layers:'
+seo_description: Learn how to preprocess LLM datasets by breaking them into raw samples, templated text, and tokenized tensors to ensure consistent fine-tuning.
 ---
 
 # Dataset Preparation and Preprocessing

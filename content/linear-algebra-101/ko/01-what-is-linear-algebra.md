@@ -16,7 +16,7 @@ tags:
   - Vectors
   - DataScience
   - Beginner
-seo_description: 선형대수의 핵심 대상인 벡터, 행렬, 선형변환을 한 흐름으로 소개합니다
+seo_description: 선형대수를 벡터, 행렬, 선형변환을 한 줄로 잇는 언어로 정의하고 왜 머신러닝의 기초가 되는지 그 이유를 설명합니다.
 last_reviewed: '2026-05-12'
 ---
 

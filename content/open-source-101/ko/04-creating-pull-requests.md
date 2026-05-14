@@ -16,7 +16,7 @@ tags:
   - Git
   - GitHub
   - Beginner
-seo_description: 포크부터 리뷰까지 메인테이너가 반기는 풀 리퀘스트 작성법을 정리합니다
+seo_description: 풀 리퀘스트를 단순한 코드 덩어리가 아니라 검토 가능한 변경 제안서로 작성하는 법과 포크부터 리뷰 대응까지의 협업 절차를 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

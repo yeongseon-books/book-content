@@ -17,7 +17,7 @@ tags:
 - Python
 - GPT-2
 last_reviewed: '2026-05-12'
-seo_description: 파인튜닝은 무엇을 바꾸고 무엇을 그대로 둘지 먼저 나누는 일입니다.
+seo_description: LLM 파인튜닝의 핵심인 LoRA의 원리를 풀 파인튜닝과 비교하고 학습 파라미터 수 계산을 통해 산술적 감각을 익힙니다.
 ---
 
 # LLM 파인튜닝 입문

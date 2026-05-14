@@ -17,7 +17,7 @@ tags:
 - Optimizer
 - Python
 last_reviewed: '2026-05-01'
-seo_description: 'A single training step decomposes into six stages:'
+seo_description: Deconstruct one LLM training step into six stages to understand how learning rate, batch size, and gradient accumulation drive convergence.
 ---
 
 # Training Loop and Hyperparameters

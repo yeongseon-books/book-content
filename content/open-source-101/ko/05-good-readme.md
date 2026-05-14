@@ -16,7 +16,7 @@ tags:
   - Documentation
   - GitHub
   - Beginner
-seo_description: 사용자가 5분 안에 시작할 수 있는 리드미 문서 구성 원칙을 정리합니다
+seo_description: 리드미 문서를 단순한 소개글이 아니라 첫 5분 온보딩을 책임지는 안내서로 보고 설치부터 라이선스까지의 필수 구성을 정리합니다.
 last_reviewed: '2026-05-12'
 ---
 

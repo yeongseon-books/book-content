@@ -16,7 +16,7 @@ tags:
   - NumPy
   - DataScience
   - Beginner
-seo_description: 행렬의 형상과 곱셈, 전치, 항등행렬, 역행렬의 의미를 정리합니다
+seo_description: 행렬을 단순한 숫자 표를 넘어 벡터 공간에 작용하는 변환 규칙으로 정의하고 형상과 역행렬의 핵심 의미를 다룹니다.
 last_reviewed: '2026-05-12'
 ---
 
