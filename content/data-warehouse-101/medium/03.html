@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Fact and Dimension</h1>
-<blockquote>
-<p>Data Warehouse 101 series (3/10)</p>
-</blockquote>
+<p>Most analytical questions hide the same structure: how much happened, and by which slice do you want to explain it? The moment you mix those two jobs in one wide table, every later change becomes more expensive than it needs to be.</p>
 <p>This is post 3 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do we <em>separate measures from attributes</em>? What <em>breaks</em> if we put them together?</p>
-<blockquote>
-<p><em>Fact tables hold </em>how much<em>. Dimension tables hold </em>what, who, when<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>fact</em> table</li>
@@ -80,11 +71,8 @@
 <p><em>Split measures from attributes. Together they slow each other down.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Fact[&quot;fact_orders (amount, qty)&quot;] --&gt; DimUser[&quot;dim_user&quot;]
-    Fact --&gt; DimProduct[&quot;dim_product&quot;]
-    Fact --&gt; DimDate[&quot;dim_date&quot;]
-</code></pre>
+<p><img alt="Fact-to-dimension relationship" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Facts carry the measurable events, while user, product, and date dimensions provide the context needed to group and explain them.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Fact</strong>: A <em>measurable event</em>. Amount, quantity, duration — numbers.</li>
