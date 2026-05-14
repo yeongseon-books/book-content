@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Removing Duplication</h1>
-<blockquote>
-<p>Clean Code 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is all duplication bad?</p>
-<blockquote>
-<p>No. Code that looks the same but changes for different reasons is not the same code. Only remove duplication that changes for the same reason.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Duplication is expensive, but wrong abstractions are expensive in a different way. The hard part is not spotting repetition. It is proving that the same knowledge really changes together.</p>
+<p>This is post 5 in the Clean Code 101 series.</p>
+<p>Here we will separate shared change reasons from accidental similarity, then verify when extraction, parameterization, or a data table actually reduces future maintenance cost.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The real meaning of DRY</li>
@@ -79,12 +72,8 @@
 <p>When the same knowledge lives in two places, they will diverge.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    D[&quot;Duplication found&quot;] --&gt; S[&quot;Same reason?&quot;]
-    S --&gt;|Yes| E[&quot;Extract / parameterize&quot;]
-    S --&gt;|No| K[&quot;Leave it&quot;]
-    E --&gt; R[&quot;Single source&quot;]
-</code></pre>
+<p><img alt="Removing Duplication" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Duplication-removal flow: only knowledge that changes for the same reason should move into a single source.</em></p>
 <p>Extract only when the change reason is shared.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -148,6 +137,20 @@ def quota(plan): return PLANS[plan][&quot;limit&quot;]
 # (Inline Function).
 </code></pre>
 <p>Roll back when abstraction adds more burden than benefit.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">python -m pytest -q tests/test_pricing_rules.py
+ruff check app/
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Behavior stays stable before and after extraction.</li>
+<li>Table-driven rules should make new cases cheaper to add.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>The shared helper turns into a six-argument mini framework.</li>
+<li>Coincidental similarity gets merged and couples unrelated change reasons.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Only the changing parts become arguments.</li>
@@ -206,6 +209,7 @@ def quota(plan): return PLANS[plan][&quot;limit&quot;]
 <li><a href="https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction">Sandi Metz — The Wrong Abstraction</a></li>
 <li><a href="https://refactoring.com/catalog/extractFunction.html">Refactoring — Extract Function</a></li>
 <li><a href="https://refactoring.com/catalog/inlineFunction.html">Refactoring — Inline Function</a></li>
+<li><a href="https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction">The wrong abstraction</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, DRY, Duplication, Refactoring, Abstraction</p>
 </body>
