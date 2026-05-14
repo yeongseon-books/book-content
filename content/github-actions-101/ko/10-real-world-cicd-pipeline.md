@@ -17,7 +17,7 @@ tags:
   - Capstone
   - ReusableWorkflow
 seo_description: PR, main, tag를 분리한 실전 GitHub Actions CI/CD 파이프라인을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 실전 CI/CD 파이프라인
@@ -44,12 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 전체 파이프라인
 
-```mermaid
-flowchart LR
-    PR["PR open"] --> Lint["lint + test + typecheck"]
-    Push["main push"] --> Build["build + docker + staging"]
-    Tag["tag push"] --> Release["release + production (approval)"]
-```
+![PR, main push, tag push가 서로 다른 책임의 파이프라인 단계로 분리되는 전체 흐름](../../../assets/github-actions-101/10/10-01-diagram.ko.png)
+
+*PR, main push, tag push가 서로 다른 책임의 파이프라인 단계로 분리되는 전체 흐름*
 
 이 구조에서 중요한 것은 세 단계가 동일한 무게를 갖지 않는다는 점입니다. PR은 빠른 피드백이 중요하고, main은 통합과 staging 반영이 중요하며, tag는 공식 릴리스와 production 승격이 중요합니다.
 
@@ -167,6 +164,26 @@ runs:
 ```
 
 reusable workflow가 잡 단위 재사용이라면, composite action은 스텝 단위 재사용에 가깝습니다. 둘의 역할을 구분해 쓰면 구조가 더 깔끔해집니다.
+
+## 여기까지 했을 때 기대할 결과
+
+| 트리거 | 기대하는 실행 | 머지/배포 판단 기준 |
+| --- | --- | --- |
+| PR | lint, test, typecheck | 빠른 피드백이 5분 안쪽에 돌아오는가 |
+| main push | build, docker, staging | 검증한 산출물이 staging까지 동일하게 이어지는가 |
+| tag push | release, production | 승인 후 같은 버전이 production으로 승격되는가 |
+
+이 표가 실제 실행 로그와 맞아떨어지면 파이프라인 책임 분리가 잘 된 것입니다. 반대로 PR에서 production 직전 검증까지 전부 돈다면 구조를 다시 쪼개야 할 신호로 보는 편이 맞습니다.
+
+## 운영 중 문제가 생기면 이런 순서로 좁힙니다
+
+1. **PR 단계가 느리다**: reusable workflow 안에서 꼭 필요한 검사만 남았는지, matrix가 과한지부터 봅니다.
+2. **main 단계가 흔들린다**: build 결과물과 Docker 이미지 태그가 staging에 동일하게 전달되는지 확인합니다.
+3. **production 배포가 불안하다**: tag 기준 승격인지, required reviewers와 rollback workflow가 실제로 살아 있는지 점검합니다.
+
+## 브랜치 보호와 승격 정책이 파이프라인의 절반입니다
+
+실전에서는 YAML 자체보다 branch protection과 environment protection이 더 중요할 때가 많습니다. PR에는 status check 강제, main에는 직접 push 제한, production에는 승인 게이트와 환경별 secret 분리를 함께 걸어야 합니다. 파이프라인 파일만 좋아 보여도 저장소 정책이 비어 있으면 운영 품질은 쉽게 무너집니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

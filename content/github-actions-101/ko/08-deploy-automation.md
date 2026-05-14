@@ -17,7 +17,7 @@ tags:
   - OIDC
   - CICD
 seo_description: GitHub Environments, 승인, OIDC 기반의 안전한 배포 자동화를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 배포 자동화
@@ -44,12 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 배포 흐름
 
-```mermaid
-flowchart LR
-    Merge["main merge"] --> Stg["staging deploy"]
-    Stg --> Approve["required reviewer"]
-    Approve --> Prod["production deploy"]
-```
+![main 머지 뒤 staging 자동 배포와 production 승인 게이트로 이어지는 배포 흐름](../../../assets/github-actions-101/08/08-01-diagram.ko.png)
+
+*main 머지 뒤 staging 자동 배포와 production 승인 게이트로 이어지는 배포 흐름*
 
 이 흐름에서 핵심은 역할 분리입니다. staging은 빠른 자동 반영, production은 의식적인 승인 후 반영입니다. 둘을 같은 방식으로 다루면 배포 정책이 흐려집니다.
 
@@ -143,6 +140,26 @@ jobs:
 ```
 
 롤백 절차가 문서에만 있으면 새벽 사고 때 찾기 어렵습니다. 실행 가능한 워크플로우로 만들어 두면 운영자가 훨씬 빠르게 대응할 수 있습니다.
+
+## 여기까지 했을 때 기대할 결과
+
+```text
+deploy-staging  Pass
+waiting on environment protection rules for production
+deploy-production  Pending approval
+```
+
+이런 형태로 staging은 자동으로 끝나고, production은 environment 규칙 때문에 대기 상태로 멈추면 의도한 구조에 가깝습니다. 승인 뒤 production 잡이 같은 산출물과 같은 매니페스트를 사용해 이어져야 진짜 승격 흐름이 됩니다.
+
+## 배포가 막히거나 실패하면 먼저 볼 지점
+
+- **production이 바로 실행된다면**: repository 설정의 Environment protection rules가 실제로 연결됐는지 확인합니다.
+- **OIDC 인증이 실패한다면**: `id-token: write` 권한과 클라우드 쪽 trust policy의 audience, subject 조건을 먼저 봅니다.
+- **staging과 production 결과가 다르다면**: 이미지 태그나 매니페스트가 환경마다 달라진 것은 아닌지 점검합니다. 승격은 같은 산출물을 옮기는 흐름이어야 합니다.
+
+## 자동 반영 구간과 승인 구간을 섞지 않는 편이 좋습니다
+
+staging은 빠른 피드백 채널이므로 자동 반영이 맞는 경우가 많습니다. 반대로 production은 사람 승인, wait timer, 환경별 secret, 배포 URL 추적까지 함께 묶어 두는 편이 안전합니다. 둘을 같은 정책으로 다루면 결국 staging은 느려지고 production은 가벼워지는 어색한 구조가 되기 쉽습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
