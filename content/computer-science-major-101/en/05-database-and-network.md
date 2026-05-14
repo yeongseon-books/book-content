@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 5
 title: Database and Network
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - SQL
   - Beginner
 seo_description: A beginner-friendly tour of database and network courses covering SQL, TCP/IP, HTTP, and how the two connect.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Database and Network
@@ -48,13 +49,9 @@ This is post 5 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    C[Client] --> H[HTTP]
-    H --> S[Server]
-    S --> Q[SQL]
-    Q --> D[Database]
-```
+![Request-to-database flow](../../../assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
+
+*The basic service path from network request to database query*
 
 ## Key Terms
 
