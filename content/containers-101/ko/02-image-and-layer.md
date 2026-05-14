@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Image
-  - Layer
-  - DevOps
+- Containers
+- Docker
+- Image
+- Layer
+- DevOps
 seo_description: 이미지와 레이어 구조, 캐시, OverlayFS의 역할을 입문자 기준으로 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Image와 Layer
 
+이미지는 파일 하나처럼 보이지만, 레이어 순서 하나가 빌드 시간과 전송 비용, 취약점 표면까지 바꿉니다. 같은 앱인데도 어떤 팀은 캐시를 거의 못 쓰고, 어떤 팀은 바뀐 부분만 다시 만들어 빠르게 배포하는 이유가 여기서 갈립니다.
+
 이 글은 Containers 101 시리즈의 두 번째 글입니다.
+
+여기서는 이미지가 왜 레이어 스택으로 설계되는지, OverlayFS와 캐시, digest 기반 재현성이 왜 이 구조에서 나오는지 설명합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Base["base layer (os)"] --> Lib["lib layer"]
-    Lib --> Code["app code"]
-    Code --> Container["container (rw layer)"]
-```
+![레이어 스택과 쓰기 가능한 컨테이너 레이어](../../../assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
 
+*레이어 스택과 쓰기 가능한 컨테이너 레이어*
 아래쪽은 운영 체제나 런타임 같은 공통 기반이고, 위쪽으로 갈수록 애플리케이션 고유 변경이 쌓입니다. 실행 시에는 여기에 쓰기 가능한 컨테이너 레이어가 하나 더 붙습니다.
 
 ## 핵심 용어
@@ -135,6 +135,25 @@ def diff(a, b):
 
 이 세 가지를 함께 보면 “왜 이번 빌드가 느렸는가”, “왜 이미지가 갑자기 커졌는가”, “왜 같은 tag인데 결과가 다르게 보이는가” 같은 질문에 훨씬 빨리 답할 수 있습니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+docker pull python:3.12-slim
+docker image inspect python:3.12-slim --format "{{json .RootFS.Layers}}"
+docker history python:3.12-slim
+docker inspect --format "{{index .RepoDigests 0}}" python:3.12-slim
+```
+
+**Expected output:**
+- `RootFS.Layers`에 여러 레이어 해시가 배열로 출력됩니다.
+- `docker history`에 각 레이어의 명령과 크기가 보입니다.
+- push된 이미지라면 `RepoDigests`로 불변 식별자를 확인할 수 있습니다.
+
+**먼저 확인할 것:**
+- 레이어 수가 과하면 Dockerfile의 `RUN` 분리를 먼저 점검합니다.
+- digest가 비어 있으면 아직 로컬 전용 이미지인지 확인합니다.
+- 이미지가 크면 build context와 multi-stage 사용 여부를 봅니다.
+
 ## 자주 하는 실수 5가지
 
 1. **RUN 명령을 지나치게 잘게 쪼개 레이어를 불필요하게 늘립니다.**
@@ -179,6 +198,8 @@ def diff(a, b):
 다음 글에서는 이렇게 준비된 이미지를 실제로 누가 어떻게 실행하는지, 즉 Runtime 계층을 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - **Image와 Layer (현재 글)**
 - Runtime (예정)
@@ -187,8 +208,9 @@ def diff(a, b):
 - Network (예정)
 - Registry (예정)
 - Container Security (예정)
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -198,4 +220,4 @@ def diff(a, b):
 - [OCI Image Spec — manifest](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
 - [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 
-Tags: Containers, Docker, Image, Layer, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps
