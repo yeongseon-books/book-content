@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: An agent is a controller that lets the model choose tool-call paths
   at runtime instead of hardcoding every step ahead of time.
 ---
@@ -144,6 +144,23 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
         return f"unsupported conversion: {from_unit} to {to_unit}"
     result = conversions[key](value)
     return f"{value} {from_unit} = {result:.4f} {to_unit}"
+
+@tool
+def search_policy(query: str) -> str:
+    """
+    Search the internal support policy knowledge base.
+    Use this for refund rules, shipping delays, account recovery, or SLA questions.
+    """
+    kb = {
+        "refund": "Annual plans can be refunded within 14 days if usage stays below 100 API calls.",
+        "shipping": "Orders delayed more than 10 business days qualify for expedited reshipment.",
+        "password": "Account recovery requires email verification and one recent billing detail.",
+    }
+    lowered = query.lower()
+    for keyword, answer in kb.items():
+        if keyword in lowered:
+            return answer
+    return "policy not found"
 ```
 
 ---
@@ -167,7 +184,7 @@ llm = ChatGroq(
     api_key=os.environ["GROQ_API_KEY"],
 )
 
-tools = [calculate, get_current_time, word_count, unit_convert]
+tools = [calculate, get_current_time, word_count, unit_convert, search_policy]
 
 # ReAct prompt — instructs the LLM to follow the Thought/Action/Observation loop
 react_prompt = PromptTemplate.from_template("""
@@ -202,6 +219,7 @@ agent_executor = AgentExecutor(
     verbose=True,
     max_iterations=5,
     handle_parsing_errors=True,
+    return_intermediate_steps=True,
 )
 
 questions = [
@@ -209,6 +227,7 @@ questions = [
     "What time is it now?",
     "How many miles is 100 kilometers?",
     "Count the words in this text, then multiply by 2: 'The quick brown fox jumps over the lazy dog'",
+    "What is the refund policy for annual plans?",
 ]
 
 for question in questions:
@@ -217,6 +236,52 @@ for question in questions:
     result = agent_executor.invoke({"input": question})
     print(f"final answer: {result['output']}")
 ```
+
+---
+
+## Verify which tool the agent actually picked
+
+### Intermediate-step trace for tool selection
+
+![Execution trace and stopping conditions](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.en.png)
+
+*Execution trace and stopping conditions*
+An agent demo is not trustworthy until you can inspect the chosen tool path. `verbose=True` is useful for humans, but structured traces are better when you want regression checks.
+
+```python
+def run_with_trace(question: str) -> dict:
+    result = agent_executor.invoke({"input": question})
+    tool_sequence = [action.tool for action, _ in result["intermediate_steps"]]
+    return {
+        "question": question,
+        "tools": tool_sequence,
+        "answer": result["output"],
+    }
+
+test_cases = [
+    ("What is 2 to the power of 10?", "calculate"),
+    ("What is the refund policy for annual plans?", "search_policy"),
+    ("How many feet is 3 meters?", "unit_convert"),
+]
+
+for question, expected_first_tool in test_cases:
+    traced = run_with_trace(question)
+    print(f"\nquestion: {traced['question']}")
+    print(f"tools used: {traced['tools']}")
+    print(f"expected first tool: {expected_first_tool}")
+    print(f"answer: {traced['answer']}")
+```
+
+**Expected output:**
+
+```text
+question: What is the refund policy for annual plans?
+tools used: ['search_policy']
+expected first tool: search_policy
+answer: Annual plans can be refunded within 14 days if usage stays below 100 API calls.
+```
+
+This is where agent debugging becomes practical. You stop saying “the model was weird” and instead ask whether the wrong tool was chosen, whether the right tool description was missing, or whether the loop continued longer than it should have.
 
 ---
 
@@ -230,6 +295,15 @@ for question in questions:
 With `verbose=True`, the console prints every Thought, Action, Action Input, and Observation. For a simple question, the agent usually completes in one round. For a two-step question — count words, then multiply — it completes in two rounds, using the output of the first tool as input to the next computation.
 
 `max_iterations` prevents infinite loops. Five to ten iterations cover most practical tasks.
+
+### First checks when the agent picks the wrong tool
+
+When tool choice looks wrong, inspect these in order:
+
+1. **tool description clarity** — does the docstring say when the tool should and should not be used?
+2. **overlapping capability** — are two tools both plausible for the same question?
+3. **trace length** — is the agent looping because the first Observation was too vague?
+4. **stopping criteria** — is `max_iterations` high enough to finish but low enough to fail safely?
 
 ---
 
@@ -255,9 +329,9 @@ def safe_divide(a: float, b: float) -> str:
 
 ## What to notice in this code
 
-- `main.py` splits the `AgentExecutor` demo into a calculator executor and a search executor to show the smallest reliable tool-selection pattern.
-- Each tool uses `@tool(return_direct=True)` so the selected tool result comes back directly.
-- Short prompts and narrow tool descriptions reduce function-calling failure modes.
+- `main.py` keeps the tool surface intentionally narrow: arithmetic, time, word counting, unit conversion, and policy lookup.
+- `return_intermediate_steps=True` makes the chosen tool path visible enough for regression-style verification.
+- Short prompts and narrow tool descriptions reduce tool-selection failure modes.
 
 ---
 
@@ -273,8 +347,8 @@ def safe_divide(a: float, b: float) -> str:
 
 - [ ] Each tool has a clear description and input shape
 - [ ] The AgentExecutor invokes the calculator tool once
-- [ ] The AgentExecutor invokes the search tool once
-- [ ] The selected tool result is returned directly to the caller
+- [ ] The AgentExecutor can choose the policy search tool for a knowledge-base question
+- [ ] Intermediate steps make the chosen tool sequence visible to the caller
 
 ---
 
