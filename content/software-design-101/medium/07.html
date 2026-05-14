@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Data Flow Design</h1>
+<p>Data flow becomes painful when values change silently in the middle of the request and no one can explain where the mutation happened. That is a design problem long before it becomes a debugging problem.</p>
 <p>This is post 7 in the Software Design 101 series.</p>
+<p>In this post, we design the path from input to output so each transformation step stays visible. The goal is to make data move one way, keep side effects at the edge, and make debugging a step-by-step question instead of a scavenger hunt.</p>
 <blockquote>
-<p>Software Design 101 series (7/10)</p>
+<p>Data gets easier to trust when you can point to where it came from, how it changed, and where it is going next.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it mean to design the flow of data?</p>
-<blockquote>
-<p>Decide where data comes from, how it gets transformed, and where it ends — and make all of that move in one direction.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The single-direction principle for data flow</li>
@@ -80,9 +74,8 @@
 <p>Good code keeps a short distance between input and output.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    IN[&quot;Input&quot;] --&gt; P1[&quot;parse&quot;] --&gt; P2[&quot;validate&quot;] --&gt; P3[&quot;enrich&quot;] --&gt; OUT[&quot;Output&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>A one-way data pipeline makes each transformation step visible from input to output</em></p>
 <p>Each step is small and just hands off to the next.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -151,6 +144,20 @@ class User:
 # No silent mid-flow data updates.
 </code></pre>
 <p>Breaking cycles makes debugging easier.</p>
+<h2>Quick Verification</h2>
+<p>Pick one request that often breaks and write down the input and output shape of every step. That single exercise usually reveals where values change silently.</p>
+<pre><code class="language-text">payload(dict) -&gt; SignupCommand -&gt; User -&gt; saved User -&gt; notification event
+</code></pre>
+<p><strong>Expected output:</strong> you should be able to explain which steps are pure transformations and which steps are side effects.</p>
+<p>If it helps, imagine logging the value before and after each step. A one-way flow makes even the log-reading order simple.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>Multiple functions mutate the same dict</strong><br>
+- First check: Check whether you can return new values instead</p>
+<p><strong>A DB call appears in the middle of validation</strong><br>
+- First check: Separate pure transformation from side effects again</p>
+<p><strong>You cannot tell where the value changed</strong><br>
+- First check: Write down the input/output types step by step first</p>
+<p>Once the flow is visible, debugging changes from “read everything” to “which step distorted the data?”</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Each step has a narrow responsibility.</li>
@@ -209,6 +216,11 @@ class User:
 <li><a href="https://curtclifton.net/papers/MoseleyMarks06a.pdf">Out of the Tar Pit (Moseley &amp; Marks)</a></li>
 <li><a href="https://facebookarchive.github.io/flux/">Flux Architecture — Unidirectional Data Flow</a></li>
 <li><a href="https://dataintensive.net/">Designing Data-Intensive Applications — Batch and Stream</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">dataclasses — Data Classes</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.NamedTuple">typing.NamedTuple</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, DataFlow, Pipelines, Immutability, FunctionalDesign</p>
 </body>
