@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>Performance and Caching</h1>
-<p>This is post 9 in the Web Development 101 series.</p>
-<blockquote>
-<p>Web Development 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a page is slow, <em>where</em> should you start fixing it?</p>
-<blockquote>
-<p>Measure, cache, reduce, defer. Make the same work happen <em>less often</em> and <em>closer</em> to the user.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>When a page feels slow, the biggest risk is fixing the wrong layer first. The bottleneck might be the browser, the network, a missing cache, or an expensive database query. Without a measurement-first model, “optimization” easily becomes random code movement.</p>
+<p>This is post 9 in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>Basic performance measurement (browser and server)</li>
 <li>HTTP cache headers (Cache-Control, ETag)</li>
@@ -80,13 +70,17 @@
 <p>Performance starts with <em>measuring</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User&quot;] --&gt; CDN[&quot;CDN cache&quot;]
-    CDN --&gt; Server[&quot;App server&quot;]
-    Server --&gt; AppCache[&quot;App cache (Redis)&quot;]
-    AppCache --&gt; DB[(&quot;Database&quot;)]
-</code></pre>
-<p>The closest cache that has the answer is the <em>fastest</em>.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>A layered cache picture from the user edge down to the database.</em></p>
+<p>Performance work gets easier once you see each cache as a separate distance-reduction tool. The browser, CDN, application cache, and database are not interchangeable; they remove different kinds of repeated work.</p>
+<p><strong>What to verify yourself</strong></p>
+<ul>
+<li>Capture a baseline with Lighthouse or the Performance tab before changing anything.</li>
+<li>Add <code>Cache-Control</code> headers to static assets and compare request cost on the second load.</li>
+<li>Compare query time before and after an index or a join-based fix for an N+1 pattern.</li>
+</ul>
+<p><strong>Expected output:</strong> Cached static assets become cheaper to reload, and database improvements produce measurable latency reductions rather than vague “it feels faster” impressions.</p>
+<p><strong>Failure mode to watch for:</strong> Caching dynamic per-user responses at the wrong layer can leak data. Optimizing before measuring often targets the wrong bottleneck entirely.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>TTFB</strong>: time to first byte (server response speed).</li>
@@ -200,12 +194,13 @@ posts = db.fetch(&quot;SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.
 <li>Building a Small Web App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching">HTTP caching (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading">Lazy loading (MDN)</a></li>
-<li><a href="https://developer.chrome.com/docs/lighthouse/overview/">Lighthouse overview</a></li>
-<li><a href="https://use-the-index-luke.com/">Database indexes (Use The Index, Luke!)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching">HTTP caching (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading">Lazy loading (MDN)</a><br>
+- <a href="https://developer.chrome.com/docs/lighthouse/overview">Lighthouse overview (Chrome)</a></p>
+<p><strong>Verification Resources</strong><br>
+- <a href="https://web.dev/explore/metrics">Web performance metrics (web.dev)</a><br>
+- <a href="https://use-the-index-luke.com/">Use The Index, Luke!</a></p>
 <p class="tags-line">Tags: Computer Science, WebDevelopment, Performance, Caching, CDN, Optimization</p>
 </body>
 </html>
