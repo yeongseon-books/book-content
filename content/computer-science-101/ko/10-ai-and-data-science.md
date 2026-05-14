@@ -58,12 +58,8 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 
 > 규칙 기반은 사람이 규칙을 적고, 머신러닝은 데이터로부터 규칙을 추론합니다.
 
-```text
-Rule-based                              Machine learning
-input ──┐                               input ──┐
-        ├─ human-written rules ─→ out          ├─ learned model ─→ out
-rules ──┘                               model ←── estimated from training data
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
+*규칙 기반 시스템은 사람이 규칙을 쓰고, 머신러닝은 데이터로 규칙을 추정합니다*
 
 ## 핵심 용어
 
@@ -169,6 +165,8 @@ for x in range(1_000_000):
 print(f"1M inferences: {time.perf_counter() - start:.3f}s")
 # Simpler models infer faster — a key metric for real-time services
 ```
+
+**Expected output:** 백만 번의 추론 시간이 숫자로 출력되고, 같은 정확도라면 더 단순한 모델이 운영 비용과 지연 시간에서 유리하다는 점을 확인할 수 있어야 합니다.
 
 ### 4단계: 데이터 품질 확인
 

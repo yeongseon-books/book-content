@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 10
 title: From CS to AI and Data Science
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Statistics
   - Career
 seo_description: How CS fundamentals connect to AI and data science, plus a learning roadmap — the closing article of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # From CS to AI and Data Science
 
-> Computer Science 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: How do the CS fundamentals you just learned actually show up in AI and data science work?
-
-> AI and data science are computer science with statistics and domain knowledge layered on top. The data representations, algorithmic complexity, memory hierarchy, databases, and engineering habits we've covered are used every single day in ML/DS. This closing article explains how ML works, how every previous article connects to it, and where to study next.
-
-<!-- a-grade-intro:end -->
+AI and data science did not arrive from some separate universe. They sit on top of data representation, algorithmic cost, memory hierarchy, databases, and engineering habits, with statistics and domain knowledge added on top.
 
 This is the final post in the Computer Science 101 series.
+
+In this article, we'll connect the previous nine posts to machine learning and data science work, then turn that map into a concrete study roadmap.
+
+## Questions This Article Answers
+
+- Where do the CS fundamentals from this series show up directly in AI and data science?
+- What is the core difference between rule-based systems and machine-learning systems?
+- Why are training, inference, and data validation still computation and systems problems?
+- Why do AI systems need the same testing, monitoring, and cost awareness as any other service?
+- What should you study next if you want to keep going toward AI/DS?
 
 ## What You Will Learn
 
@@ -54,12 +56,8 @@ Tools change quickly; foundations stay valid for a long time.
 
 > A rule-based system has humans write the rules. Machine learning infers the rules from data.
 
-```text
-Rule-based                              Machine learning
-input ──┐                               input ──┐
-        ├─ human-written rules ─→ out          ├─ learned model ─→ out
-rules ──┘                               model ←── estimated from training data
-```
+![Concept at a Glance](../../../assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
+*Rule-based systems rely on human-authored logic, while ML systems infer that logic from data*
 
 ## Key Terms
 
@@ -169,6 +167,8 @@ for x in range(1_000_000):
 print(f"1M inferences: {time.perf_counter() - start:.3f}s")
 # Simpler models infer faster — a key metric for real-time services
 ```
+
+**Expected output:** the script should print the time for one million inferences and make it obvious why model simplicity matters for latency-sensitive systems.
 
 ### Step 4: Inspect data quality
 
