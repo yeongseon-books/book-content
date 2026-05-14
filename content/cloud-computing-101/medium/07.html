@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Identity and Security</h1>
+<p>Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.</p>
+<p>That is why IAM matters so much. In API-driven infrastructure, identity is not a side concern. It is the operating model that decides who may call what, from where, and for how long.</p>
+<p>This is post 7 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.</p>
 <blockquote>
-<p>Cloud Computing 101 series (7/10)</p>
+<p>Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When and how do IAM <em>users</em> and <em>roles</em> differ in practice?</p>
-<blockquote>
-<p><em>Cloud security starts with least privilege, runs on role-based delegation, and protects data with encryption plus key management.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>IAM users, groups, roles, and policies</li>
 <li>The least privilege principle</li>
@@ -76,13 +72,8 @@
 <h2>Why It Matters</h2>
 <p>Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;user&quot;] --&gt; Group[&quot;group&quot;]
-    Group --&gt; Policy[&quot;policy&quot;]
-    App[&quot;app/ec2&quot;] --&gt; Role[&quot;role&quot;]
-    Role --&gt; Policy
-    Policy --&gt; Resource[&quot;resource&quot;]
-</code></pre>
+<p><img alt="Core IAM relationship between users, roles, policies, and protected resources" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Core IAM relationship between users, roles, policies, and protected resources</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>User</strong>: a person or long-lived credential.</li>
@@ -141,6 +132,23 @@ def create_role(name):
 <li>A role needs both a <em>trust</em> policy and a <em>permissions</em> policy.</li>
 <li>Keep <code>Resource</code> as narrow as possible.</li>
 <li>Avoid wildcards in <code>Action</code>.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>In IAM, the most useful verification step is reading the trust relationship and the attached permission scope separately. That is where the conceptual difference between roles and policies becomes operationally obvious.</p>
+<pre><code class="language-bash">aws iam get-role --role-name my-app-role
+aws iam list-attached-role-policies --role-name my-app-role
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li><code>AssumeRolePolicyDocument</code> should show <code>ec2.amazonaws.com</code> as the trusted principal.</li>
+<li>The attached-policy list should include the least-privilege policy ARN you created.</li>
+<li>You need both outputs to answer the two different questions: who may assume the role, and what may the role do after assumption.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>A permissions policy without the right trust policy creates a role that nobody can actually use.</li>
+<li><code>Action: *</code> feels fast today and expensive during every later audit.</li>
+<li>Long-lived user keys become an operational liability long before they become a public incident.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
