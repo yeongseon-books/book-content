@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Scope
   - Beginner
 seo_description: 캡스톤 요구사항을 스토리, 수용 기준, 우선순위로 정리하는 법을 다룹니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 요구사항 정리
 
-요구사항은 기능 목록을 길게 적는 일로 끝나지 않습니다. 사용자 관점, 수용 기준, 비기능 조건, 우선순위까지 정리되어야 팀이 같은 문서를 보고 같은 결정을 할 수 있습니다. 이 글은 Capstone Project 101 시리즈의 4번째 글입니다. 여기서는 문제 정의를 실제 구현 가능한 요구사항으로 바꾸는 방법을 살펴보겠습니다.
+요구사항 문서가 기능 목록으로만 끝나면 일정이 밀릴 때 무엇을 줄여야 할지 결정하기 어렵습니다. 구현이 끝났는지도 사람마다 다르게 해석합니다.
 
-> 멘탈 모델: 요구사항 문서는 기능 나열이 아니라, 무엇을 왜 만들고 어디까지 할지 추적 가능하게 만드는 작은 명세서입니다.
+좋은 요구사항 문서는 기능 이름을 모아 놓은 목록이 아니라 사용자 스토리, 수용 기준, 비기능 조건, 우선순위를 연결한 작은 계약서에 가깝습니다.
+
+이 글은 Capstone Project 101 시리즈의 4번째 글입니다. 여기서는 문제 문장을 실제 구현 대상과 검증 항목으로 바꾸는 요구사항 문서 구조를 설명합니다.
+
+> 멘탈 모델: 요구사항 문서는 기능을 모아 두는 저장소가 아니라, 무엇을 만들고 무엇을 검증할지 합의하는 추적 가능한 문서입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,30 @@ last_reviewed: '2026-05-12'
 
 좋은 팀은 요구사항을 스토리, 기준, 우선순위, 비기능 조건으로 분리해 둡니다. 그렇게 해야 일정이 밀릴 때 무엇을 남기고 무엇을 줄일지 빠르게 결정할 수 있습니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    U[User Story] --> A[Accept]
-    A --> N[Non-Functional]
-    N --> P[Priority]
-    P --> T[Trace]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/04/04-01-the-flow-at-a-glance.ko.png)
+*요구사항을 스토리, 기준, 우선순위, 추적으로 연결하는 구조*
+
+## 실전 문서 예시: 요구사항 시트
+
+아래처럼 ID를 붙여 문서를 쓰면 구현 항목과 테스트 체크리스트를 나중에 연결하기가 쉬워집니다.
+
+```text
+ID: ST-1
+사용자 스토리: 학생으로서 시간표 충돌을 바로 확인하고 싶다
+수용 기준: 5초 안에 입력, 1초 안에 결과 표시, 오류 메시지 명확
+비기능 요구: 모바일 우선, 로그인 없이 체험 가능, 한국어 우선
+우선순위: Must
+연결 기능: F-1 일정 입력, F-2 충돌 계산, F-3 결과 화면
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 수용 기준이 관찰 가능한 문장인지 확인합니다.
+- 비기능 요구를 별도 항목으로 분리합니다.
+- Must와 Should를 모두 Must로 적지 않았는지 점검합니다.
+- 요구사항 ID가 구현 기능이나 테스트 항목과 연결되는지 봅니다.
 
 ## 핵심 용어
 
@@ -156,7 +175,7 @@ trace = {"ST-1": ["F-1", "F-2"]}
 
 ## 정리와 다음 글
 
-요구사항 정리는 프로젝트 초반의 문서 작업이 아니라, 이후 설계와 일정 판단의 기준을 세우는 일입니다. 스토리, 수용 기준, 비기능 요건, 우선순위를 분리해 두면 변경이 와도 무엇을 지켜야 하는지 선명해집니다. 다음 글에서는 이렇게 정리한 일을 팀 안에서 어떻게 나눌지 살펴보겠습니다.
+요구사항 정리는 기능 목록을 예쁘게 적는 일이 아니라, 범위와 완료 조건을 추적 가능하게 만드는 작업입니다. 스토리, 수용 기준, 비기능 요구, 우선순위를 함께 적어 두면 이후 설계와 일정 판단이 훨씬 빨라집니다. 다음 글에서는 이 일을 팀 안에서 어떻게 나눌지 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,8 +192,10 @@ trace = {"ST-1": ["F-1", "F-2"]}
 
 ## 참고 자료
 
-- [User Stories Applied - Mike Cohn](https://www.mountaingoatsoftware.com/books/user-stories-applied)
-- [MoSCoW Method - Atlassian](https://www.atlassian.com/agile/product-management/requirements)
+### 공식 문서와 실무 자료
+
+- [Atlassian requirements guide](https://www.atlassian.com/agile/product-management/requirements)
+- [User Stories Applied](https://www.mountaingoatsoftware.com/books/user-stories-applied)
 - [Specification by Example](https://gojko.net/books/specification-by-example/)
 - [INVEST in Good Stories](https://www.agilealliance.org/glossary/invest/)
 
