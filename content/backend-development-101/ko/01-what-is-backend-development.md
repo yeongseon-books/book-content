@@ -17,12 +17,14 @@ tags:
   - Architecture
   - Python
 seo_description: 백엔드 개발의 역할과 계층 구조를 정의하고, 요청이 HTTP 서버부터 데이터베이스까지 흐르는 전체 지도를 한눈에 파악합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 백엔드 개발이란 무엇인가?
 
-이 글은 Backend Development 101 시리즈의 첫 번째 글입니다. 사용자는 화면만 보지만, 실제 서비스가 오래 버티는지는 화면 뒤에 있는 백엔드가 결정합니다. 여기서는 백엔드를 하나의 기술이 아니라 요청을 받고, 규칙을 적용하고, 데이터를 다루고, 응답을 돌려주는 책임의 집합으로 이해해 보겠습니다.
+사용자는 화면만 보지만, 서비스가 오래 버티는지는 화면 뒤의 구조가 결정합니다. 요청을 어디서 받고, 어떤 규칙을 어디에 두고, 데이터를 어디까지 믿을지 정하지 않으면 기능은 금방 붙어도 운영은 오래 가지 못합니다.
+
+이 글은 Backend Development 101 시리즈의 첫 번째 글입니다. 여기서는 백엔드를 하나의 기술이 아니라 요청을 받고, 규칙을 적용하고, 데이터를 다루고, 응답을 돌려주는 책임의 집합으로 이해해 보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,19 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Client["Client"] --> HTTP["HTTP server"]
-    HTTP --> Route["Router"]
-    Route --> Service["Service"]
-    Service --> DB["Database"]
-    Service --> Ext["External API"]
-    DB --> Service
-    Service --> Route
-    Route --> HTTP
-    HTTP --> Client
-```
+![클라이언트 요청이 HTTP 서버, 라우터, 서비스, 데이터베이스를 통과하는 흐름](../../../assets/backend-development-101/01/01-01-concept-at-a-glance.ko.png)
 
+*클라이언트 요청이 HTTP 서버, 라우터, 서비스, 데이터베이스를 통과하는 흐름*
 요청은 왼쪽에서 오른쪽으로 흘러가고, 응답은 같은 길을 되짚어 돌아옵니다. 이 그림만 이해해도 이후 글에서 배우는 HTTP, 라우팅, 서비스, 데이터베이스, 인증, 로깅, 테스트, 배포가 모두 하나의 구조 안에 들어간다는 감각을 잡을 수 있습니다.
 
 ## 핵심 용어
@@ -65,7 +57,7 @@ flowchart LR
 - **Repository**: 데이터베이스와 대화하는 계층입니다.
 - **Middleware**: 모든 요청에 공통으로 적용되는 동작입니다.
 
-이 용어들이 중요한 이유는, 백엔드 코드를 읽을 때 결국 “이 책임이 어느 층에 있어야 하는가”를 계속 판단하게 되기 때문입니다. 용어가 곧 구조의 경계라고 생각하면 훨씬 덜 헷갈립니다.
+이 용어들이 중요한 이유는, 백엔드 코드를 읽을 때 결국 “이 책임을 어느 층에 두어야 하는가”를 계속 판단하게 되기 때문입니다. 용어가 곧 구조의 경계라고 생각하면 훨씬 덜 헷갈립니다.
 
 ## Before/After
 
@@ -158,6 +150,16 @@ curl -X POST -H "Content-Type: application/json" \
 
 요청을 보내고 JSON을 돌려받으면, 백엔드의 가장 기본적인 책임이 모두 한 바퀴 연결됩니다. 경로를 고르고, 입력을 검증하고, 데이터를 만들고, 응답을 반환하는 흐름입니다.
 
+## 검증 포인트
+
+**Expected output:** `uvicorn 1_app:app --reload` 뒤에 `/`는 `{"message": "hello"}`를, `POST /users`는 새 사용자 JSON을 반환해야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- `uvicorn`이 `1_app:app`을 찾지 못하면 파일명과 앱 객체 이름이 맞는지 봅니다.
+- `POST /users`가 `422`를 반환하면 `name` 필드가 payload에 포함되었는지 확인합니다.
+- `GET /users`가 비어 있어도 정상입니다. 여기서 중요한 것은 요청 흐름이 라우트와 응답으로 연결되는지입니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 서버는 결국 경로를 함수에 연결하는 구조입니다.
@@ -221,9 +223,14 @@ curl -X POST -H "Content-Type: application/json" \
 
 ## 참고 자료
 
+### 공식 문서
+
 - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
 - [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
 - [The Twelve-Factor App](https://12factor.net/)
+
+### 추가 읽을거리
+
 - [Backend roadmap](https://roadmap.sh/backend)
 
 Tags: Backend, WebDevelopment, HTTP, Architecture, Python
