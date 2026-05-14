@@ -14,7 +14,7 @@ tags:
 - Toxicity
 - Bias
 - Fairness
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Address toxicity with real-time blocking and manage systematic bias through offline audits and counterfactual evaluation to ensure AI fairness.
 ---
 
@@ -27,7 +27,14 @@ Toxicity and bias often get grouped together, but they are not the same operatio
 This is post 6 in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Why do toxicity and bias need different operational workflows?
+- Which classifier families are practical for inline toxicity blocking?
+- How should streaming responses be buffered to avoid leaking toxic tokens?
+- Why does bias evaluation require counterfactual sets instead of single examples?
+- Which fairness metrics matter once the model influences decisions?
 
 ## Toxicity and Bias Are Different Problems
 
@@ -199,6 +206,14 @@ Surface three numbers on a dashboard at all times: per-category block rate, fals
 - Combine Detoxify, Perspective API, OpenAI Moderation, or Llama Guard with per-category thresholds.
 - Protect streaming output with chunk buffering or delayed delivery.
 - Measure bias with counterfactual sets that compare length, sentiment, and recommendation distributions, then track the gap as a regression metric.
+
+## Operational Checklist
+
+- [ ] Keep inline toxicity blocking separate from offline bias evaluation.
+- [ ] Tune thresholds per toxicity category instead of using one global score.
+- [ ] Protect streaming endpoints with buffering or delayed delivery.
+- [ ] Maintain counterfactual test sets for protected attributes.
+- [ ] Review false positives and fairness gaps on a regular schedule.
 
 ---
 
