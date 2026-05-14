@@ -60,14 +60,9 @@ last_reviewed: '2026-05-12'
 
 training loop의 핵심 흐름은 아래와 같습니다.
 
-```mermaid
-flowchart LR
-    F[Forward] --> L[Loss]
-    L --> B[Backward]
-    B --> U[Update]
-    U --> F
-```
+![핵심 개념](../../../assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.ko.png)
 
+*학습 루프 흐름: forward, loss, backward, update가 닫힌 순환을 이루며 반복됩니다.*
 ### 모델은 입력을 예측으로 바꾸는 함수입니다
 
 ```python
@@ -125,6 +120,37 @@ def train(data, epochs=100, lr=0.1):
 
 학습은 거창한 것이 아니라 이 반복입니다. 데이터가 들어오고, 예측이 만들어지고, 손실이 계산되고, gradient가 업데이트로 바뀌며, 그 결과 새로운 파라미터가 다음 forward에 사용됩니다. 이 닫힌 고리가 학습의 전부라고 해도 과언이 아닙니다.
 
+### 프레임워크 코드에서도 같은 루프가 그대로 드러납니다
+
+```python
+optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+```
+
+이 다섯 줄에는 지금까지 본 개념이 모두 압축되어 있습니다. `pred = model(x)`는 함수 합성이고, `loss = criterion(pred, y)`는 목적 함수를 구체화하는 단계이며, `loss.backward()`는 연쇄 법칙과 역전파를 실행하는 부분입니다. 마지막 `optimizer.step()`은 그래디언트를 실제 파라미터 이동으로 바꿉니다.
+
+### 평가 루프가 다른 이유도 같은 구조로 설명할 수 있습니다
+
+```python
+with torch.no_grad():
+    pred = model(x)
+    metric = accuracy(pred, y)
+```
+
+평가 단계에서는 그래디언트가 필요하지 않으므로 backward 그래프를 만들지 않는 편이 맞습니다. 이 차이를 이해하면 왜 `train()`/`eval()` 모드 전환과 `no_grad()` 문맥이 중요한지 자연스럽게 연결됩니다. 같은 모델 코드를 쓰더라도 학습 루프와 평가 루프는 목표가 다르기 때문입니다.
+
+### 학습 루프를 볼 때 가장 먼저 확인할 실패 지점
+
+- `zero_grad`를 빼먹어 이전 step의 gradient가 계속 누적되고 있지 않은가
+- `loss`는 내려가는데 평가 metric은 나빠져 손실 설계가 실제 목표와 어긋나고 있지 않은가
+- `optimizer.step()`은 호출했지만 scheduler 순서나 train/eval 모드 전환이 꼬이지 않았는가
+- reproducibility 설정이 없어 실험 차이를 모델 구조 문제로 오해하고 있지 않은가
+
+실전에서 자주 만나는 학습 버그는 복잡한 수식보다 이런 운영 디테일에서 시작합니다. 그래서 마지막 글에서는 루프 자체를 하나의 운영 단위로 보는 감각이 중요합니다.
+
 ### 실무에서는 루프 주변의 운영 규칙도 함께 봐야 합니다
 
 실제 코드에서는 `zero_grad`, `model.train()`, `model.eval()`, seed 고정, mixed precision, gradient clipping, scheduler step 같은 규칙이 이 루프 주변에 붙습니다. 하지만 이런 운영 요소들도 결국 forward-loss-backward-update 구조를 안정적으로 실행하기 위한 보조 장치입니다.
@@ -149,7 +175,7 @@ def train(data, epochs=100, lr=0.1):
 
 딥러닝에서 미분은 특정 수식의 일부가 아니라 학습 루프 전체를 움직이는 중심 메커니즘입니다. forward는 함수 합성으로 예측을 만들고, loss는 오차를 숫자로 바꾸고, backward는 chain rule로 gradient를 계산하고, optimizer는 그 gradient를 파라미터 업데이트로 바꿉니다.
 
-이 시리즈에서 본 미분, 편미분, gradient, 연쇄 법칙, 손실 함수, 경사하강법, 최적화, 역전파는 모두 이 하나의 루프 안에서 각자 자리를 갖습니다. 그래서 딥러닝을 이해한다는 것은 결국 이 루프의 각 단계가 어떤 수학적 역할을 맡는지 설명할 수 있다는 뜻입니다.
+이 시리즈에서 본 미분, 편미분, 그래디언트, 연쇄 법칙, 손실 함수, 경사하강법, 최적화, 역전파는 모두 이 하나의 루프 안에서 각자 자리를 갖습니다. 그래서 딥러닝을 이해한다면 결국 이 루프의 각 단계가 어떤 수학적 역할을 맡는지 설명할 수 있어야 합니다.
 
 이 글로 Calculus for ML 101 시리즈를 마칩니다. 이제 이후 어떤 모델이나 프레임워크를 보더라도, 그 안에서 학습이 실제로 어떻게 일어나는지 미분의 언어로 다시 읽어 낼 수 있을 것입니다.
 
@@ -176,6 +202,7 @@ def train(data, epochs=100, lr=0.1):
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 - [CS231n - Convolutional Neural Networks](https://cs231n.stanford.edu/)
 - [Reproducibility - PyTorch](https://pytorch.org/docs/stable/notes/randomness.html)
+- [Zeroing out gradients in PyTorch](https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)

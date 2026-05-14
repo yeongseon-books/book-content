@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 10
 title: Calculus in Deep Learning
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Capstone
   - Beginner
 seo_description: A capstone tour of how networks, loss, optimizers, backprop, and calculus combine into the deep learning training loop
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Calculus in Deep Learning
 
-> Calculus for ML 101 series (10/10)
+The ideas from this series do not live in isolation. Functions and slopes, partial derivatives, gradients, the chain rule, loss functions, gradient descent, optimizers, and backpropagation all show up inside the same training loop. The goal of this final post is to put those pieces back together as one working system.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Calculus for ML 101 series.
 
-**Core question**: How does the *calculus* from this series come together in the *deep learning training loop*?
+In this post, we'll walk through the forward pass, loss computation, backward pass, optimizer update, and the operating rules around that loop. Once the full cycle is visible, calculus stops feeling like a separate math chapter and starts feeling like the control interface for learning itself.
 
-> *Networks*, *losses*, *backprop*, and *optimizers* all run on calculus inside *one cycle*.
-
-This is post 10 in the Calculus for ML 101 series.
-
-<!-- a-grade-intro:end -->
+> In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ This *capstone* synthesizes the series and lets you implement the *common skelet
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Forward] --> L[Loss]
-    L --> B[Backward]
-    B --> U[Update]
-    U --> F
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
 
+*Training-loop flow: forward, loss, backward, and update repeat as one closed cycle.*
 ## Key Terms
 
 - **forward**: produce a *prediction*.
@@ -119,6 +110,37 @@ def train(data, epochs=100, lr=0.1):
     return w, b
 ```
 
+### Step 6 — Framework code uses the same loop
+
+```python
+optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+```
+
+These few lines compress the entire series. `pred = model(x)` is function composition. `loss = criterion(pred, y)` makes the training objective explicit. `loss.backward()` executes the chain rule across the computation graph. `optimizer.step()` converts gradient information into real parameter movement.
+
+### Step 7 — Evaluation follows different rules
+
+```python
+with torch.no_grad():
+    pred = model(x)
+    metric = accuracy(pred, y)
+```
+
+Evaluation does not need gradients, so it should not build a backward graph. Once you see training as a forward-loss-backward-update loop, it becomes obvious why `train()`/`eval()` mode switches and `no_grad()` blocks matter. They are not framework rituals. They are part of running the loop correctly.
+
+### Step 8 — The first failure points to check
+
+- Did you forget `zero_grad()`, so stale gradients are leaking across steps?
+- Is the loss decreasing while the evaluation metric gets worse, suggesting the loss design is misaligned with the real objective?
+- Are scheduler timing, `train()`/`eval()` mode, or optimizer-step ordering inconsistent across experiments?
+- Is reproducibility weak enough that you are blaming the model architecture for what is really a training-loop configuration issue?
+
+Many training bugs come from this operating layer rather than from exotic calculus mistakes. That is why a clear loop-level mental model is so valuable.
+
 ## What to Notice in This Code
 
 - The *forward pass* yields a *prediction*.
@@ -163,7 +185,7 @@ def train(data, epochs=100, lr=0.1):
 
 ## Wrap-up and Next Steps
 
-This post wraps the *Calculus for ML 101* series. *Calculus* is the *mathematical essence* of what we mean by *deep learning learns*.
+This post wraps the *Calculus for ML 101* series. When people say a deep learning model *learns*, what they really mean is that the training loop keeps converting prediction error into gradients and then into parameter updates. Calculus is the language that makes that conversion possible.
 
 <!-- toc:begin -->
 - [What Is a Derivative](./01-what-is-derivative.md)
@@ -184,5 +206,6 @@ This post wraps the *Calculus for ML 101* series. *Calculus* is the *mathematica
 - [PyTorch Tutorials](https://pytorch.org/tutorials/)
 - [CS231n - Convolutional Neural Networks](https://cs231n.stanford.edu/)
 - [Reproducibility - PyTorch](https://pytorch.org/docs/stable/notes/randomness.html)
+- [Zeroing out gradients in PyTorch](https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html)
 
 Tags: Calculus, ML, DeepLearning, Capstone, Beginner
