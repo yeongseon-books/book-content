@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Linear Search and Binary Search</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: How many comparisons does it take to find a value in a sorted list of one million items?</p>
-<blockquote>
-<p>Linear search checks every element from start to finish — O(n). Binary search halves the search space each step — O(log n). This article implements both, introduces Python's bisect module, and compares their performance.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Searching is one of the most common operations in programming. On a small list, a linear scan is fine. On a large sorted list, cutting the search space in half each step changes the problem completely.</p>
+<p>That is why binary search shows up far beyond textbook examples. The same pattern appears whenever you need the first value that satisfies a condition, not just an exact match.</p>
+<p>This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How linear search works and its limitations</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Search = the process of finding a target value in a collection of data</p>
 </blockquote>
-<pre><code>Linear search: [1, 3, 5, 7, 9, 11, 13] — find 9
+<pre><code class="language-text">Linear search: [1, 3, 5, 7, 9, 11, 13] — find 9
 → 1, 3, 5, 7, 9 (5 comparisons)
 
 Binary search: [1, 3, 5, 7, 9, 11, 13] — find 9
@@ -263,6 +255,12 @@ for n in [10_000, 100_000, 1_000_000]:
 <h2>How Senior Engineers Think About This</h2>
 <p>You rarely implement binary search from scratch. The bisect module or database indexes handle most cases. But understanding binary search enables a powerful pattern called parametric search.</p>
 <p>"Find the first/last value satisfying a condition in sorted data" is the core application of binary search and a staple of coding interviews.</p>
+<h2>When not to reach for binary search</h2>
+<ul>
+<li>If the data is not already sorted and updates constantly, the sorting cost may erase the theoretical gain.</li>
+<li>If you only run the query once on a tiny list, a linear scan is usually simpler and easier to debug.</li>
+<li>If requirements are really about range indexing or repeated lookups, the better fix may be a database index, tree structure, or cached lookup table rather than handwritten search code.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Compare the time complexity of linear search and binary search</li>
