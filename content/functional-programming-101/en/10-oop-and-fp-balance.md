@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Balancing OOP and Functional Programming
 
+Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.
+
+Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.
+
 This is the final post in the Functional Programming 101 series.
-
-> Functional Programming 101 Series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: Do you have to choose between OOP and functional programming, or can you use both together?
-
-> Python is a multi-paradigm language. OOP and functional programming are not opposites — they complement each other. This article covers practical guidelines for choosing the right paradigm for each situation and combining their strengths.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -61,6 +55,12 @@ Managing multiple instances   Pipeline data processing
 Framework integration         Concurrency / parallelism
 Complex domain models         Mathematical / declarative logic
 ```
+
+## Where to draw the OOP/FP boundary
+
+![OOP and FP boundary in one service](../../../assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
+
+*Keep handlers and repositories at the edge, and push the important business rules into a pure core. That is the simplest repeatable way to mix OOP and FP without losing consistency.*
 
 ## Key Concepts
 
