@@ -47,16 +47,9 @@ last_reviewed: '2026-05-12'
 
 통계적 사고는 질문에서 출발해 데이터, 분포, 추정, 신뢰구간, 검정, 효과 크기, 결정으로 이어집니다. 이 순서가 정리되면 시리즈 전체가 하나의 작업 흐름처럼 읽히기 시작합니다.
 
-```mermaid
-flowchart LR
-    Q["Question"] --> D["Data"]
-    D --> Dist["Distribution"]
-    Dist --> Est["Estimate + CI"]
-    Est --> Test["Hypothesis Test"]
-    Test --> Eff["Effect Size"]
-    Eff --> Dec["Decision"]
-```
+![멘탈 모델](../../../assets/statistics-101/10/10-01-concept-at-a-glance.ko.png)
 
+*통계적 사고는 질문에서 시작해 분포, 추정, 검정, 효과 크기, 의사결정으로 이어지는 하나의 흐름입니다.*
 중요한 점은 마지막 결정이 통계량 하나에서 바로 나오지 않는다는 사실입니다. 추정값과 불확실성, 효과 크기, 비즈니스 비용이 함께 모여서 결정이 됩니다.
 
 ## 핵심 용어
@@ -183,9 +176,9 @@ print(decision)
 
 ## 참고 자료
 
-- [Nate Silver — The Signal and the Noise](https://en.wikipedia.org/wiki/The_Signal_and_the_Noise)
-- [Hans Rosling — Factfulness](https://en.wikipedia.org/wiki/Factfulness)
+- [OpenIntro Statistics](https://www.openintro.org/book/os/)
+- [NIST/SEMATECH e-Handbook of Statistical Methods](https://www.itl.nist.gov/div898/handbook/)
 - [ASA Statement on p-Values (2016)](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
-- [Wikipedia — Statistical Thinking](https://en.wikipedia.org/wiki/Statistical_thinking)
+- [Seeing Theory — Visual Introduction to Probability and Statistics](https://seeing-theory.brown.edu/)
 
 Tags: Statistics, Thinking, Mindset, Decision, Beginner
