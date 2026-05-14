@@ -14,9 +14,8 @@ tags:
 - Observability
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: Cost tracking is not bookkeeping for its own sake. It is the feedback
-  loop that makes caching, prompt compression, and routing decisions measurable.
+last_reviewed: '2026-05-14'
+seo_description: Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 ---
 
 # LLM cost tracking and optimization
@@ -25,10 +24,14 @@ LLM costs often look harmless until repeated prompts, traffic growth, or backgro
 
 This is the second post in the LLM Apps Ops 101 series. Here, we will turn token usage into an explicit cost feedback loop that supports caching, prompt compression, and routing decisions.
 
+Cost optimization does not work as a slogan. You need to know which calls create spend before you can decide what to compress, cache, reroute, or rate-limit.
+
 ## Questions this post answers
+
 - How should token usage accumulate across repeated calls?
 - How much abstraction is enough for a simple price-per-million model?
 - Which numbers reveal the highest-value cost-saving opportunities first?
+- How do you compare caching, prompt compression, and model routing with the same report?
 
 > Cost tracking is not bookkeeping for its own sake. It is the feedback loop that makes caching, prompt compression, and routing decisions measurable.
 
@@ -36,10 +39,12 @@ This is the second post in the LLM Apps Ops 101 series. Here, we will turn token
 ![Cost tracking flow and optimization points](../../../assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
 
 *Cost tracking flow and optimization points*
+
 ## Why this layer matters
 ![Per-call tokens become cumulative cost](../../../assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)
 
 *Per-call tokens become cumulative cost*
+
 Cost becomes more important as the feature succeeds, which is exactly why the math should exist in code early.
 
 LLM costs usually start small enough to ignore, then jump when repeated prompts, background jobs, or traffic growth hit at once. If you do not record usage per call, optimization becomes guesswork.
@@ -121,6 +126,91 @@ if __name__ == "__main__":
 - Persisting one `CostRecord` per call lets you analyze outliers without recomputing reports.
 - Repeating one prompt on purpose gives you a baseline for later cache experiments.
 
+## Separate the price card before you need it
+
+Real systems quickly hit two complications. Different models cost different amounts, and input tokens may be priced differently from output tokens. If your code shape already reflects that split, pricing changes become a data update instead of a report rewrite.
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class PriceCard:
+    input_per_million: float
+    output_per_million: float
+
+PRICE_CARDS = {
+    "llama-3.1-8b-instant": PriceCard(input_per_million=0.05, output_per_million=0.08),
+    "llama-3.1-70b-versatile": PriceCard(input_per_million=0.59, output_per_million=0.79),
+}
+
+def estimate_split_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+    price = PRICE_CARDS[model]
+    input_cost = (prompt_tokens / 1_000_000) * price.input_per_million
+    output_cost = (completion_tokens / 1_000_000) * price.output_per_million
+    return round(input_cost + output_cost, 8)
+```
+
+This matters because a request with a long prompt and short answer behaves differently from a request with a short prompt and long answer, even when total tokens look similar.
+
+## Build one report shape for every optimization experiment
+
+Cost reduction rarely comes from one lever. You usually combine caching, prompt compression, and model routing. The discipline is to compare those experiments through the same report shape rather than inventing a new spreadsheet every time.
+
+```python
+from collections import Counter
+from dataclasses import asdict, dataclass
+
+@dataclass
+class OptimizationReport:
+    total_calls: int
+    repeated_prompt_count: int
+    cache_candidate_ratio: float
+    total_prompt_tokens: int
+    total_completion_tokens: int
+    total_cost_usd: float
+
+def build_optimization_report(records: list[CostRecord]) -> OptimizationReport:
+    prompt_counter = Counter(record.prompt for record in records)
+    repeated = sum(count for count in prompt_counter.values() if count > 1)
+    return OptimizationReport(
+        total_calls=len(records),
+        repeated_prompt_count=repeated,
+        cache_candidate_ratio=round(repeated / len(records), 3),
+        total_prompt_tokens=sum(record.prompt_tokens for record in records),
+        total_completion_tokens=sum(record.completion_tokens for record in records),
+        total_cost_usd=round(sum(record.cost_usd for record in records), 8),
+    )
+
+report = build_optimization_report(records)
+print(json.dumps(asdict(report), indent=2, ensure_ascii=False))
+```
+
+**Expected output:**
+
+```text
+{
+  "total_calls": 3,
+  "repeated_prompt_count": 2,
+  "cache_candidate_ratio": 0.667,
+  "total_prompt_tokens": 126,
+  "total_completion_tokens": 74,
+  "total_cost_usd": 0.00001
+}
+```
+
+That output immediately answers three operational questions: how much repetition exists, whether prompt-side or completion-side spend dominates, and whether the next experiment should target caching, prompt shortening, or model choice.
+
+## What to cut first in practice
+
+In early production systems, this order is usually the fastest:
+
+1. **Find repeated prompts.** Repetition is the cleanest caching opportunity.
+2. **Measure the system prompt.** A long instruction block taxes every request.
+3. **Inspect completion length.** Verbose answers can inflate spend without improving product value.
+4. **Test model routing.** Send easy cases to cheaper models, but only with a quality gate beside the cost metric.
+
+The important part is not the sequence itself. It is refusing to optimize based on intuition alone.
+
 ## Where engineers get confused
 ![Optimization levers need quality checks](../../../assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png)
 
@@ -128,15 +218,34 @@ if __name__ == "__main__":
 - Many vendors price input and output tokens differently. Model your cost records that way from the start.
 - A total-cost number alone hides spikes. You also need call count and token distribution.
 - Cost optimization without quality checks often means quietly making the product worse.
+- High cache hit rate can still be harmful if cache invalidation lets stale answers survive too long.
+
+## When spend jumps, check in this order
+
+```bash
+# 1) Compare call volume and average token size first
+python3 -m scripts.cost_report --since 2026-05-01 --until 2026-05-02
+
+# 2) Check repeated prompts and the heaviest prompts
+python3 -m scripts.cost_report --top-prompts 20
+
+# 3) Break down cost by model
+python3 -m scripts.cost_report --group-by model
+```
+
+Your real script names may differ. The questions rarely do. Did request count rise? Did token size rise? Did one prompt family or one model create the spike?
 
 ## Checklist
-- [ ] Store total_tokens per call
-- [ ] Keep pricing constants in one place
+- [ ] Store `prompt_tokens`, `completion_tokens`, and `total_tokens` per call
+- [ ] Keep pricing constants in one place and split them by model
 - [ ] Report both cumulative and per-call cost
 - [ ] Mark repeated prompts as cache candidates
+- [ ] Pair every cost experiment with a quality check
 
 ## Summary
 You cannot reduce spend responsibly until you can point to the exact calls that create it.
+
+The real goal is not adding one more metric. It is turning cost signals into operating decisions. In the next post, we will look at the evaluation layer that tells you whether those cheaper calls are still good enough.
 
 <!-- toc:begin -->
 ## In this series
@@ -154,8 +263,14 @@ You cannot reduce spend responsibly until you can point to the exact calls that 
 
 ## References
 
-- [Groq pricing](https://groq.com/pricing/)
-- [OpenAI pricing](https://openai.com/api/pricing/)
-- [Anthropic API pricing](https://www.anthropic.com/pricing#api)
+### Official Docs
+
+- [OpenAI API Pricing](https://openai.com/api/pricing/)
+- [Anthropic API Pricing](https://www.anthropic.com/pricing#api)
+- [Google AI Studio pricing](https://ai.google.dev/gemini-api/docs/pricing)
+
+### Verification-friendly resource
+
+- [OpenAI Prompt Caching 101](https://cookbook.openai.com/examples/prompt_caching101)
 
 Tags: LLMOps, Observability, Python, LLM
