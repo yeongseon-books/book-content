@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 4
 title: Explaining Concepts
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Explanation
   - Analogy
   - Beginner
-seo_description: A beginner-friendly tour of explaining hard technical concepts with definitions, analogies, and worked examples.
-last_reviewed: '2026-05-04'
+seo_description: Explain technical concepts with definition, analogy, counterexample, and worked example so first-time readers grasp the boundary.
+last_reviewed: '2026-05-15'
 ---
 
 # Explaining Concepts
 
-This is post 4 in the Technical Writing 101 series.
+The most common failure in concept writing is accuracy without traction. The definition may be technically correct, yet the reader still cannot predict where the concept applies, where it breaks, or how it should affect code and design decisions.
 
-> Technical Writing 101 series (4/10)
+Useful concept writing needs more than a polished sentence. It needs a boundary. That usually means pairing a definition with an analogy, a counterexample, and a worked example so the reader can test the idea instead of just memorizing it.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
 
-**Core question**: How do you make a *first-time reader* grasp a *concept* right away?
-
-> *Analogies* and *counterexamples* must travel *together*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - A *one line* definition
 - Using an *analogy*
@@ -46,15 +40,13 @@ This is post 4 in the Technical Writing 101 series.
 
 If the *concept* stays blurry, everything after it is a *sandcastle*.
 
+> Mental model: define the concept, mark the boundary, then prove it with an example.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    D[Definition] --> A[Analogy]
-    A --> C[Counterexample]
-    C --> E[Example]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **definition**: A *one line definition*.
@@ -68,6 +60,23 @@ flowchart LR
 **Before**: "*Async* means *running at the same time*." (Wrong.)
 
 **After**: "*Async* means *doing other work while you wait*."
+
+## The fastest way to test whether a definition works
+
+This explanation is technically correct but still weak.
+
+```text
+A cache stores frequently used data.
+```
+
+It does not tell the reader what belongs in the cache, what should stay out, or where the boundary breaks. Adding a boundary and counterexample turns the concept into a decision tool.
+
+```text
+A cache stores answers that are expensive to fetch or compute again.
+A large file read once during a migration is usually a poor cache candidate.
+```
+
+A strong concept explanation helps the reader classify the next example without asking you again. That is why edge cases and counterexamples often teach more than an expanded definition alone.
 
 ## Hands-on: One Concept Explained
 
