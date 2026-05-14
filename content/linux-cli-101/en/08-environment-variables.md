@@ -3,7 +3,7 @@ title: Environment Variables and PATH
 series: linux-cli-101
 episode: 8
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - bashrc
 - Shell
 - Configuration
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: Environment variables are name tags attached to processes, and PATH
   is the map the Shell uses to find commands.
 ---
 
 # Environment Variables and PATH
 
-> Linux CLI 101 series (8/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What are environment variables and why are they needed?
-- What does the output of `echo $PATH` mean?
-- What is the difference between `export` and a plain variable assignment?
-- When do `.bashrc`, `.bash_profile`, and `.profile` each run?
-
-> Environment variables are name tags attached to processes, and PATH is the map the Shell uses to find commands.
-
-<!-- a-grade-intro:end -->
+Environment variables sit behind a lot of everyday confusion: a command installs successfully but cannot be found, a script sees a variable in your shell but not in Python, or a setting works in one terminal and disappears in the next.
 
 This is post 8 in the Linux CLI 101 series.
 
