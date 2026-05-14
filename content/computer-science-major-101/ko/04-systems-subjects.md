@@ -17,7 +17,8 @@ tags:
   - Architecture
   - Beginner
 seo_description: 운영체제, 컴퓨터 구조, 컴파일러, 시스템 프로그래밍 과목의 의미를 정리한 입문 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 시스템 과목 이해하기
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    H[Hardware] --> A[Architecture]
-    A --> O[OS]
-    O --> C[Compiler]
-    C --> P[Program]
-```
+![시스템 과목 이해 구조](../../../assets/computer-science-major-101/04/04-01-systems-stack-map.ko.png)
+
+*하드웨어에서 운영체제, 컴파일러, 프로그램 실행으로 이어지는 층*
 
 > 코드는 운영체제와 하드웨어라는 무대 위에서만 실행되므로, 시스템 과목은 그 무대를 읽는 법을 가르칩니다.
 

@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 4
 title: Understanding Systems Subjects
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - Architecture
   - Beginner
 seo_description: A beginner-friendly tour of systems courses covering OS, computer architecture, compilers, and systems programming.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Understanding Systems Subjects
@@ -48,13 +49,9 @@ This is post 4 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    H[Hardware] --> A[Architecture]
-    A --> O[OS]
-    O --> C[Compiler]
-    C --> P[Program]
-```
+![Systems stack map](../../../assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
+
+*How hardware, OS, compilers, and programs connect*
 
 ## Key Terms
 
