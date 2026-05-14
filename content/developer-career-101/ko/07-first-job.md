@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - FirstJob
-  - Onboarding
-  - Junior
-  - Beginner
+- Career
+- FirstJob
+- Onboarding
+- Junior
+- Beginner
 seo_description: 주니어 개발자의 성공적인 온보딩을 위한 실무 팁과 코드 분석, 협업 적응, 팀 내 신뢰 확보를 위한 구체적 지침을 제공합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 첫 직장 적응
@@ -49,12 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    L[Learn] --> A[Ask]
-    A --> C[Contribute]
-    C --> F[Feedback]
-```
+![학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프](../../../assets/developer-career-101/07/07-01-concept-at-a-glance.ko.png)
+
+*학습, 질문, 기여, 피드백으로 이어지는 온보딩 루프*
 
 좋은 온보딩은 혼자 버티는 과정이 아닙니다. 먼저 배우고, 질문하고, 작은 기여를 내고, 피드백으로 보정하는 루프가 돌아야 자리를 빨리 잡을 수 있습니다.
 
@@ -121,6 +118,33 @@ weekly with manager, biweekly with mentor
 
 온보딩 회고는 잘한 점과 부족한 점을 빠르게 드러냅니다. 초반에는 작은 보정만 해도 체감 성장 속도가 크게 달라집니다.
 
+## 첫 90일을 설계할 때 보는 기준
+
+| 기간 | 우선순위 | 확인할 산출물 |
+| --- | --- | --- |
+| 0~30일 | 맥락 파악과 용어 정리 | 팀 용어집, 구조 메모 |
+| 31~60일 | 질문의 질 높이기 | 질문 노트, 1:1 아젠다 |
+| 61~90일 | 작은 기여와 피드백 루프 | 첫 PR, 회고 메모 |
+| 공통 | 모르는 것을 빨리 드러내기 | 도움 요청 기록, 체크인 루틴 |
+
+## 첫 90일을 설계할 때 보는 기준
+
+| 기간 | 우선순위 | 확인할 산출물 |
+| --- | --- | --- |
+| 0~30일 | 맥락 파악과 용어 정리 | 팀 용어집, 구조 메모 |
+| 31~60일 | 질문의 질 높이기 | 질문 노트, 1:1 아젠다 |
+| 61~90일 | 작은 기여와 피드백 루프 | 첫 PR, 회고 메모 |
+| 공통 | 모르는 것을 빨리 드러내기 | 도움 요청 기록, 체크인 루틴 |
+
+## 첫 90일을 설계할 때 보는 기준
+
+| 기간 | 우선순위 | 확인할 산출물 |
+| --- | --- | --- |
+| 0~30일 | 맥락 파악과 용어 정리 | 팀 용어집, 구조 메모 |
+| 31~60일 | 질문의 질 높이기 | 질문 노트, 1:1 아젠다 |
+| 61~90일 | 작은 기여와 피드백 루프 | 첫 PR, 회고 메모 |
+| 공통 | 모르는 것을 빨리 드러내기 | 도움 요청 기록, 체크인 루틴 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 질문이 학습 속도를 올립니다.
@@ -180,8 +204,8 @@ weekly with manager, biweekly with mentor
 ## 참고 자료
 
 - [The First 90 Days](https://hbr.org/books/watkins)
-- [Stripe Engineering Onboarding](https://stripe.com/blog/engineering-principles)
-- [Will Larson — Onboarding](https://lethain.com/onboarding-checklist/)
-- [Psychological Safety](https://rework.withgoogle.com/blog/five-keys-to-a-successful-google-team/)
+- [Will Larson — Onboarding checklist](https://lethain.com/onboarding-checklist/)
+- [GitHub Docs — Pull requests](https://docs.github.com/en/pull-requests)
+- [re:Work — Psychological safety](https://rework.withgoogle.com/guides/understanding-team-effectiveness/steps/introduction/)
 
 Tags: Career, FirstJob, Onboarding, Junior, Beginner
