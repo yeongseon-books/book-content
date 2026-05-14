@@ -3,7 +3,7 @@ title: Approval Gates — Designing Where Humans Must Approve
 series: harness-engineering-101
 episode: 8
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Approval
 - Human-in-the-loop
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Some actions must never run automatically. Payments, deploys, deletes,
   and outbound messages need human approval.
 ---
 
 # Approval Gates — Designing Where Humans Must Approve
 
-This is post 8 in the Harness Engineering 101 series.
+The moment agent automation starts creating real business value, a harder question follows immediately: which actions may flow through automatically, and which actions must stop in front of a human? If you cannot answer that question clearly, the automation reads as latent incident potential.
 
-> Harness Engineering 101 Series (8/10)
+Payments, deploys, deletes, and outbound communication are not just another class of output. They are irreversible or high-liability actions. The right question is not “is the model usually right?” but “where does a human decision belong even when the model looks confident?”
 
-Some actions must never run automatically. Payments, deploys, deletes, and outbound messages need human approval. An Approval Gate makes the place where a human must stop and review explicit.
+This is post 8 in the Harness Engineering 101 series. It defines Approval Gates as an operating protocol inside the agent loop rather than a vague promise of manual review.
 
 ---
+
+## Questions this chapter answers
+
+- How is an Approval Gate different from generic manual review?
+- Which actions should stop for human approval before execution?
+- What information makes an approval request easy to decide quickly and correctly?
+- Why is dry-run versus commit separation so valuable for risky tools?
+- Why does approval logging matter as much as the action itself?
+
+> The point of an Approval Gate is not to fight automation. It is to restore human accountability exactly where only humans should own the risk.
 
 ![Approval gates - designing where humans must approve](../../../assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
 
@@ -182,6 +192,35 @@ The log must answer five questions:
 4. **Why this decision?** reason (required field)
 5. **What actually executed?** result
 
+## Failure modes approval design must survive
+
+Approval systems usually fail in operationally boring ways before they fail in dramatic ones. The common problems are stale requests no one owns, humans receiving too little context to decide, and approval rules that are so broad that reviewers stop reading carefully.
+
+An approval path needs explicit timeout behavior, a fallback approver or authority matrix, and a way to turn rejection reasons into feedback the agent can use next time. Otherwise the same bad request simply comes back with slightly different wording.
+
+```python
+def resolve_timeout(action_id: str, requested_at, now, timeout_sec: int = 600) -> dict:
+    elapsed = (now - requested_at).total_seconds()
+    if elapsed < timeout_sec:
+        return {"status": "waiting"}
+    return {
+        "status": "timed_out",
+        "decision": "reject",
+        "reason": "No approver responded within the policy window.",
+        "next_action": "escalate_or_cancel",
+    }
+```
+
+```text
+Expected approval log fragment
+- action_id: 7c4f...
+- action_type: refund
+- risk_level: high
+- dry_run.remaining_balance: -500
+- decision: reject
+- reason: "Would overdraw the account after refund"
+```
+
 ## Five Common Mistakes
 
 1. **Requiring approval for everything.** You lose the value of automation, and humans stop reading the requests carefully. Set explicit risk thresholds.
@@ -197,6 +236,14 @@ The log must answer five questions:
 - The workflow is four stages: request, wait, execute, log.
 - Include a dry-run preview in the request so humans see consequences before deciding.
 - An ApprovalLog must answer the 5W1H so post-incident review can succeed.
+
+## Operational checklist
+
+- [ ] Define irreversible or high-liability actions and encode them in approval rules.
+- [ ] Include action summary, risk level, payload, and dry-run preview in every approval request.
+- [ ] Implement approve, reject, and timeout as first-class code paths.
+- [ ] Require rejection reasons and reuse them as feedback on the next attempt.
+- [ ] Record who decided, when, why, and what actually executed in the approval log.
 
 The next post covers Observability — how to record, trace, and replay agent runs.
 
@@ -220,9 +267,15 @@ The next post covers Observability — how to record, trace, and replay agent ru
 
 ## References
 
+### Official docs and references
+
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- [OpenAI — Best practices for safety in agent systems](https://platform.openai.com/docs/guides/safety-best-practices)
-- [Google SRE — Postmortem culture](https://sre.google/sre-book/postmortem-culture/)
+- [OpenAI — Best Practices for Safety in Agent Systems](https://platform.openai.com/docs/guides/safety-best-practices)
 - [LangChain — Human-in-the-loop](https://python.langchain.com/docs/concepts/human_in_the_loop/)
+
+### Verification-friendly operations references
+
+- [Google SRE — Postmortem Culture](https://sre.google/sre-book/postmortem-culture/)
+- [PagerDuty Incident Response Guide](https://response.pagerduty.com/)
 
 Tags: AI Agent, Harness, Production, Reliability
