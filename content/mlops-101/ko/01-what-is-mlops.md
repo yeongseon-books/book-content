@@ -54,16 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Data["data"] --> Train["training pipeline"]
-    Code["code"] --> Train
-    Train --> Reg["model registry"]
-    Reg --> Deploy["deployment"]
-    Deploy --> Mon["monitoring"]
-    Mon --> Train
-```
+![MLOps 운영 루프](../../../assets/mlops-101/01/01-01-see-the-loop-first.ko.png)
 
+*MLOps 운영 루프*
 이 그림이 MLOps의 핵심을 가장 간단하게 보여 줍니다. 데이터와 코드가 학습 파이프라인으로 들어가고, 결과 모델은 레지스트리에 등록된 뒤 배포됩니다. 배포가 끝나도 시스템은 멈추지 않고, 모니터링 결과가 다시 학습으로 이어지면서 운영 루프를 닫습니다.
 
 중요한 점은 이 흐름이 일회성 배포 파이프라인이 아니라는 사실입니다. 모델은 시간이 지나면 낡고, 입력 분포는 바뀌고, 운영 조건도 달라집니다. MLOps는 바로 그 변화까지 시스템 안에서 다루려는 시도입니다.
