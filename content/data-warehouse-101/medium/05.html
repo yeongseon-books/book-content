@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Partition and Clustering</h1>
-<blockquote>
-<p>Data Warehouse 101 series (5/10)</p>
-</blockquote>
+<p>Warehouse performance is often less about reading faster than about refusing to read what you do not need. On large fact tables, that one design choice is the difference between a cheap daily dashboard refresh and an expensive full-table scan.</p>
 <p>This is post 5 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How can you pull <em>today's data</em> from a <em>fact with billions of rows</em> in seconds? How does the engine <em>decide what to skip</em>?</p>
-<blockquote>
-<p><em>Partitions split the file into chunks; clustering sorts inside each chunk.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and effect of <em>partitioning</em></li>
@@ -80,12 +71,8 @@
 <p><em>You do not pay for data you do not read.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Query[&quot;WHERE date = '2026-05-04'&quot;] --&gt; Engine[&quot;Query Engine&quot;]
-    Engine --&gt; P1[&quot;partition: 2026-05-03 (skip)&quot;]
-    Engine --&gt; P2[&quot;partition: 2026-05-04 (scan)&quot;]
-    Engine --&gt; P3[&quot;partition: 2026-05-05 (skip)&quot;]
-</code></pre>
+<p><img alt="Partition pruning example" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>A date predicate lets the engine scan only the matching partition and skip adjacent partitions entirely.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Partition</strong>: A <em>physical chunk</em> of a table — usually keyed by <em>date</em>.</li>
