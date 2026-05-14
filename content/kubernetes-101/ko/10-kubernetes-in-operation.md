@@ -17,7 +17,7 @@ tags:
   - GitOps
   - DevOps
 seo_description: 프로브, RBAC, 관측성, GitOps로 보는 Kubernetes 운영 기본기를 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 운영 관점의 Kubernetes
@@ -46,13 +46,9 @@ Kubernetes는 많은 자동화를 제공하지만, 운영 감각까지 자동으
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Probe["probes"] --> App["application"]
-    App --> Obs["metrics/logs/traces"]
-    Obs --> SRE["sre runbooks"]
-    SRE --> GitOps["gitops"]
-```
+![한눈에 보는 구조](../../../assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
+*운영 관점에서는 probe, 관측성, 런북, GitOps가 따로가 아니라 하나의 대응 체계로 연결됩니다.*
+
 
 이 그림은 운영이 단일 기능이 아니라 연결된 체계라는 점을 보여 줍니다. probe는 트래픽과 재시작 조건을 만들고, 관측성은 상태를 읽게 하며, 런북과 GitOps는 대응과 변경 절차를 반복 가능하게 만듭니다.
 
@@ -146,6 +142,22 @@ def runbook_step(name):
 
 런북은 문서만 예쁘게 쓰는 일이 아닙니다. 어떤 알림이 울렸을 때 무엇부터 확인하고, 어디서 멈추고, 언제 롤백할지까지 표준화하는 운영 도구입니다.
 
+## 검증 흐름
+
+```bash
+kubectl describe pod web-xxxxx
+kubectl auth can-i get pods --as system:serviceaccount:web:default -n web
+kubectl get networkpolicy -n web
+```
+
+**예상되는 결과:** `describe pod`에서는 readiness/liveness 이벤트를 통해 트래픽 차단과 재시작 신호를 분리해서 읽을 수 있어야 합니다. `auth can-i`는 서비스어카운트 권한이 실제로 최소 권한에 맞는지 검증하고, NetworkPolicy 목록은 네트워크 경계가 선언으로 남아 있는지 보여 줍니다.
+
+**먼저 의심할 실패 모드:**
+
+- Pod가 살아 있어도 readiness가 실패하면 애플리케이션 성공이 아니라 운영 계약 실패로 봐야 합니다.
+- RBAC를 YAML로만 보고 안심하면 실제 서비스어카운트 바인딩 누락을 놓치기 쉽습니다.
+- NetworkPolicy가 하나도 없다면 보안 문제는 구현 세부가 아니라 기본 경계 부재에서 시작합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - readiness가 실패하면 트래픽을 막는다는 사실이 중요합니다.
@@ -207,5 +219,6 @@ def runbook_step(name):
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 - [Argo CD](https://argo-cd.readthedocs.io/)
+- [kubectl auth can-i](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/kubectl_auth_can-i/)
 
 Tags: Kubernetes, SRE, Observability, GitOps, DevOps

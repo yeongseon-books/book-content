@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 10
 title: Kubernetes in Operation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - GitOps
   - DevOps
 seo_description: A beginner-friendly tour of operating Kubernetes covering probes, RBAC, network policies, observability, capacity planning, GitOps, and runbooks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Kubernetes in Operation
 
-> Kubernetes 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: does *the cluster is running* mean *the cluster is operable*?
-
-> *Probes, RBAC, policies, observability,* and *runbooks* together make *operations*.
-
-<!-- a-grade-intro:end -->
+A running cluster is not the same thing as an operable one. You can have healthy-looking Pods and still lack safe traffic gates, clear permissions, useful telemetry, and a repeatable incident path when something breaks at night.
 
 This is the final post in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will connect probes, RBAC, network boundaries, observability, GitOps, and runbooks into one operating model instead of treating them as unrelated checkboxes.
+
+> Kubernetes operations become reliable only when traffic rules, permissions, telemetry, and change procedures reinforce each other.
+
+## Questions this chapter answers
 
 - *liveness/readiness/startup* probes
 - *RBAC* and *NetworkPolicy*
@@ -48,13 +44,9 @@ This is the final post in the Kubernetes 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Probe["probes"] --> App["application"]
-    App --> Obs["metrics/logs/traces"]
-    Obs --> SRE["sre runbooks"]
-    SRE --> GitOps["gitops"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
+*Operations become repeatable only when probes, telemetry, runbooks, and GitOps all feed the same response system.*
+
 
 ## Key Terms
 
@@ -136,6 +128,22 @@ def runbook_step(name):
     }
 ```
 
+## Verification workflow
+
+```bash
+kubectl describe pod web-xxxxx
+kubectl auth can-i get pods --as system:serviceaccount:web:default -n web
+kubectl get networkpolicy -n web
+```
+
+**Expected output:** `describe pod` should let you separate readiness failures from restart signals, `auth can-i` should confirm the service account permissions you intended, and the NetworkPolicy list should show that communication boundaries exist as declared objects rather than assumptions.
+
+**Failure modes to check first:**
+
+- A running Pod with failed readiness is an operations contract failure even when the process itself is alive.
+- RBAC that looks correct in YAML may still fail if the actual service-account binding is missing.
+- An empty NetworkPolicy list usually means the security problem is the absence of a boundary, not one broken rule.
+
 ## What to Notice in This Code
 
 - When *readiness* is *0/1*, *traffic is blocked*.
@@ -199,5 +207,6 @@ That wraps the *Kubernetes 101* series. Next, the *Serverless* and *SRE* series 
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 - [Argo CD](https://argo-cd.readthedocs.io/)
+- [kubectl auth can-i](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_auth/kubectl_auth_can-i/)
 
 Tags: Kubernetes, SRE, Observability, GitOps, DevOps
