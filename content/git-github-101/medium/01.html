@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>What is Git? Version control fundamentals</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>What is Git? Version control fundamentals</h1>
+<p>If version control still feels like a tool you are supposed to learn before real work begins, this is the place to reset that picture. Git becomes much easier once you see it less as a command list and more as a way to preserve and recover changes over time.</p>
+<p>This is the first post in the Git &amp; GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The problem that a version control system (VCS) solves</li>
+<li>Why Git is a distributed VCS</li>
+<li>The "snapshot" model and how it differs from line-by-line tracking</li>
+<li>How to install Git and finish the initial <code>git config</code></li>
+<li>What you need before making the first commit in the next post</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Even when you write code alone, given enough time you hit situations like these.</p>
+<ul>
+<li>"The code that worked yesterday no longer runs. What changed?"</li>
+<li>"I think this function looked different a month ago."</li>
+<li>"I edited multiple files at the same time and now everything is tangled."</li>
+</ul>
+<p>Git lets you answer those questions. You can pull back any past version of your code and see who changed what and when. Add collaboration, and the value grows further: multiple people can edit the same file and only the conflicting spots need human attention.</p>
+<p>Many teams and open-source projects treat Git as a standard tool. Learning it is less a "nice to have" and more a shared language for collaboration.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>Git's core model is "a tool that keeps snapshots of your files in time order", and each snapshot is produced through three areas: the working directory, the staging area, and the repository.<br>
+In one sentence, Git is "a tool that stores snapshots of your files in time order." Each commit is a photograph of the tracked files at that moment.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Git distinguishes three areas.</p>
+<ul>
+<li><strong>Working Directory</strong>: where the files you are editing live.</li>
+<li><strong>Staging Area</strong> (a.k.a. the index): a buffer where you collect the changes that will go into the next commit.</li>
+<li><strong>Repository</strong>: the local store of commits over time. A remote repository is a separate repository you sync with; it sits outside these three local areas.</li>
+</ul>
+<p>Once you internalize this model, the reason <code>add</code>, <code>commit</code>, and <code>push</code> are separate commands becomes natural.</p>
+<h2>Core concepts</h2>
+<ul>
+<li><strong>Version Control System (VCS)</strong>: A tool that records and recovers changes to files over time.</li>
+<li><strong>Distributed VCS</strong>: A model where a normal clone gives the local repository the full history. Git is the canonical example. Work continues even when the central server is briefly unreachable.</li>
+<li><strong>Snapshot model</strong>: Git stores a snapshot of the tracked files at commit time, not just the changed lines (internally, identical files are reused to save space).</li>
+<li><strong>Commit</strong>: The unit of change. It records a message, an author, a timestamp, and the parent commit.</li>
+<li><strong>Branch</strong>: A movable pointer to a commit. Creating a branch does not copy files.</li>
+<li><strong>Remote</strong>: An external repository (often on GitHub) linked to your local repository. It maintains its own commit graph.</li>
+</ul>
+<h2>Before-after</h2>
+<p>Compare two ways a small team might share code.</p>
+<p><strong>Before (without Git)</strong></p>
+<pre><code>project_v1.zip
+project_v2_FINAL.zip
+project_v2_FINAL_real.zip
+project_v2_FINAL_real_alice_edits.zip
+</code></pre>
+<p>This snippet has three problems.</p>
+<ul>
+<li>You guess which file is current from its filename alone.</li>
+<li>To see what changed, you unzip both archives and diff them by hand.</li>
+<li>Combining two people's edits means manual copy-paste.</li>
+</ul>
+<p><strong>After (with Git)</strong></p>
+<pre><code class="language-text">$ git log --oneline
+b3a1c0f Add login form (alice)
+8e2f5d1 Refactor session helper (bob)
+1a9b2c4 Initial commit (alice)
+</code></pre>
+<p>Three changes happened.</p>
+<ul>
+<li>Each change shows who made it and when, in one line.</li>
+<li>The diff between any two commits is one <code>git diff</code> away.</li>
+<li>Combining work runs through <code>git merge</code>, which auto-merges what it can and asks the human to resolve only the conflicting hunks.</li>
+</ul>
+<h2>Step-by-step practice</h2>
+<p>This article assumes you are installing Git for the first time. The commands are shell examples; lines starting with <code>$</code> are input, the lines below are output.</p>
+<p><strong>1. Confirm Git is installed</strong></p>
+<pre><code class="language-text">$ git --version
+git version 2.43.0
+</code></pre>
+<p>If Git is missing, install it for your OS.</p>
+<ul>
+<li>macOS: <code>brew install git</code> (with Homebrew) or use the git bundled with Xcode Command Line Tools.</li>
+<li>Ubuntu/Debian: <code>sudo apt update &amp;&amp; sudo apt install git</code></li>
+<li>Windows: install <a href="https://git-scm.com/download/win">Git for Windows</a>.</li>
+</ul>
+<p>After installing, open a fresh shell and re-run <code>git --version</code> to confirm the version prints.</p>
+<p><strong>2. Set your identity</strong></p>
+<p>Each commit records the author's name and email. You set this once.</p>
+<pre><code class="language-text">$ git config --global user.name &quot;Ada Lovelace&quot;
+$ git config --global user.email &quot;ada@example.com&quot;
+</code></pre>
+<p>The <code>--global</code> flag stores the values in the <code>.gitconfig</code> file in your home directory. To use a different email in one specific repository, run the same command inside that repository without <code>--global</code>.</p>
+<p><strong>3. Set the default branch name</strong></p>
+<p>Choose the default name for the branch a fresh repository starts on. <code>main</code> is the common modern choice.</p>
+<pre><code class="language-text">$ git config --global init.defaultBranch main
+</code></pre>
+<p><strong>4. Inspect your settings</strong></p>
+<p>You can see the values you have set in one place.</p>
+<pre><code class="language-text">$ git config --global --list
+user.name=Ada Lovelace
+user.email=ada@example.com
+init.defaultBranch=main
+</code></pre>
+<p><strong>5. Use the help system</strong></p>
+<p>When you forget how a command works, three patterns cover most cases.</p>
+<pre><code class="language-text">$ git help                # list of common Git commands
+$ git help commit         # full manual (browser or man page)
+$ git commit --help       # same manual as `git help commit`
+$ git commit -h           # one-screen option summary (short usage)
+</code></pre>
+<p><code>git help &lt;cmd&gt;</code> and <code>git &lt;cmd&gt; --help</code> open the same full manual. The lower-case <code>-h</code> flag is the short usage summary, handy when an option name is on the tip of your tongue.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Leaving a work email on personal repositories</strong> — A <code>--global</code> setting applies user-wide, so other repositories pick up the same email. To split per-repository identities, re-run the command inside that repository without <code>--global</code>.</li>
+<li><strong>Skipping <code>user.name</code> and <code>user.email</code> after install</strong> — Your first commit greets you with <code>Please tell me who you are</code>.</li>
+<li><strong>Avoiding the command line and using only a GUI</strong> — GUIs are quick, but troubleshooting is faster on the CLI. Knowing both is the safer setup.</li>
+<li><strong>Running an outdated git binary</strong> — Some features (such as <code>git switch</code>, <code>git restore</code>, and the newer <code>git sparse-checkout</code>) require a recent release. Prefer the official installer or current Homebrew/apt over very old OS packages.</li>
+<li><strong>Backing up the project as a zip</strong> — If <code>.git/</code> is excluded, the history disappears. To back things up, push to a remote.</li>
+<li><strong>Confusing <code>git</code> with <code>GitHub</code></strong> — Git is the tool; GitHub is one hosting service for Git repositories. GitLab and Bitbucket are other hosts.</li>
+</ul>
+<h2>In practice</h2>
+<p>Git shows up in real development environments in several recurring places.</p>
+<ul>
+<li><strong>A safety net for solo work</strong>: rolling back yesterday's changes with one command provides large psychological comfort.</li>
+<li><strong>A shared language for teams</strong>: the Pull Request flow assumes Git underneath. Without a model of Git, PR review turns into guesswork.</li>
+<li><strong>A trigger for CI/CD</strong>: most CI systems (GitHub Actions, GitLab CI, and so on) start jobs from commit or PR events.</li>
+<li><strong>Incident archaeology</strong>: <code>git bisect</code> and <code>git blame</code> answer "when did this bug appear?" quickly, provided the history is well kept.</li>
+<li><strong>Infrastructure code</strong>: Terraform plans and Kubernetes manifests are still text files, so they live in Git too.</li>
+</ul>
+<p>When you are first learning Git, the most useful exercise is not memorizing commands but picturing where each change currently sits — working directory, staging area, or repository.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>git --version</code> prints a version.</li>
+<li>[ ] <code>git config --global user.name</code> and <code>user.email</code> are set.</li>
+<li>[ ] <code>git config --global init.defaultBranch</code> is set (e.g. to <code>main</code>).</li>
+<li>[ ] You can describe Working Directory, Staging Area, and Repository in one sentence each.</li>
+<li>[ ] You can describe the relationship between <code>git</code> and GitHub in one sentence.</li>
+<li>[ ] You know the difference between <code>git help &lt;command&gt;</code>, <code>git &lt;command&gt; --help</code>, and <code>git &lt;command&gt; -h</code>.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Install Git on your OS and write down what <code>git --version</code> prints.</li>
+<li>Set <code>git config --global user.name</code> and <code>user.email</code>, then confirm with <code>git config --global --list</code>.</li>
+<li>Set <code>git config --global init.defaultBranch main</code>, then run <code>git init</code> in a fresh directory and verify the default branch is <code>main</code>.</li>
+<li>Run <code>git help commit</code>, <code>git commit --help</code>, and <code>git commit -h</code> and compare how the three outputs differ.</li>
+<li>Define "Working Directory", "Staging Area", and "Repository" in your own words, one sentence each.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<ul>
+<li>Git is a distributed version control tool that stores snapshots of files in time order so you can track and recover changes.</li>
+<li>Changes flow Working Directory → Staging Area → Repository.</li>
+<li>Before first use, set <code>user.name</code>, <code>user.email</code>, and <code>init.defaultBranch</code> once.</li>
+<li>Git is the tool; GitHub is one hosting service for Git repositories. Keep them mentally separate.</li>
+<li>When you forget syntax, reach for <code>git help &lt;command&gt;</code> or <code>git &lt;command&gt; -h</code>.</li>
+</ul>
+<p>In the next post we start from an empty directory and build the first commit. <code>git init</code>, <code>git status</code>, <code>git add</code>, and <code>git commit</code> come in, in that order.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><strong>What is Git? Version control fundamentals (current)</strong></li>
+<li>Your first commit - init, status, add, commit (upcoming)</li>
+<li>Reading change history - status, diff, log (upcoming)</li>
+<li>Branch basics - create, switch, and compare (upcoming)</li>
+<li>Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)</li>
+<li>Creating a GitHub repository - remote, push, and pull in one go (upcoming)</li>
+<li>Collaborating with Pull Requests - From Branch to Review to Main (upcoming)</li>
+<li>Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)</li>
+<li>Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)</li>
+<li>Building a real-world Git workflow: from issue to release in one cycle (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control">Git docs — About Version Control</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup">Git docs — First-Time Git Setup</a></li>
+<li><a href="https://git-scm.com/downloads">Git downloads</a></li>
+<li><a href="https://docs.github.com/en/get-started/quickstart/set-up-git">GitHub Docs — Set up Git</a></li>
+</ul>
+<p class="tags-line">Tags: git-basics, version-control, distributed-vcs, snapshot-model, git-install, git-config</p>
+</body>
+</html>
