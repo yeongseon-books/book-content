@@ -54,35 +54,27 @@
 </head>
 <body>
 <h1>Graphs</h1>
-<blockquote>
-<p>Math for CS 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you <em>represent</em> and <em>traverse</em> data with <em>relationships</em>?</p>
-<blockquote>
-<p>A <em>graph</em> is a collection of <em>vertices</em> and <em>edges</em> — the <em>common model</em> for every <em>network</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Lists and tables are not enough once the important question becomes who is connected to whom, which task depends on which other task, or which route can reach a target. At that point the data is no longer just a collection of values. It is a web of relationships.</p>
+<p>Graphs are the standard way to make those relationships explicit. Social networks, road systems, build pipelines, service dependencies, and recommendation paths all look different on the surface, but a graph often exposes the common structure underneath.</p>
 <p>This is post 4 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Vertices</em> and <em>edges</em></li>
-<li><em>Directed</em> vs <em>undirected</em></li>
-<li><em>Trees</em></li>
-<li><em>Adjacency matrix</em> vs <em>list</em></li>
-<li>A starter <em>BFS</em></li>
+<li>Why do relationship-heavy problems become clearer when modeled as graphs?</li>
+<li>What do vertices and edges correspond to in real systems?</li>
+<li>How do directed and undirected graphs change the meaning of a model?</li>
+<li>When is an adjacency list better than an adjacency matrix?</li>
+<li>Why is breadth-first search such a common starting point?</li>
 </ul>
+<blockquote>
+<p>A graph is not mainly a storage trick. It is a model for problems where relationships matter more than isolated values.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p><em>Social networks</em>, <em>maps</em>, <em>dependencies</em>, <em>recommendations</em> — all are <em>graphs</em>.</p>
+<p>Friend recommendations, route planning, build dependencies, and service maps all become easier to reason about once you stop pretending they are simple lists. What matters is not just the objects but the shape of the connections between them.</p>
+<p>That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A((A)) --&gt; B((B))
-    A --&gt; C((C))
-    B --&gt; D((D))
-    C --&gt; D
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Graphs turn connected data into a structure you can traverse, measure, and reason about step by step.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>vertex</strong>: a <em>node</em>.</li>
@@ -162,7 +154,8 @@ def bfs(G, s):
 <li>Define <em>tree</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>combinatorics</em>.</p>
+<p>Graphs give you a way to describe systems where connections drive the behavior. Once that model is explicit, traversal and path questions become much easier to phrase and solve.</p>
+<p>Next, we turn to combinatorics, where the focus shifts from connection structure to counting how quickly possibilities grow.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
@@ -181,6 +174,7 @@ def bfs(G, s):
 <li><a href="https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs">Graphs - Khan Academy</a></li>
 <li><a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/">Introduction to Algorithms - CLRS</a></li>
 <li><a href="https://networkx.org/">NetworkX Documentation</a></li>
+<li><a href="https://github.com/networkx/networkx">NetworkX GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, Graphs, DataStructure, Algorithms, Beginner</p>
 </body>
