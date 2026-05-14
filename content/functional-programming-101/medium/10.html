@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Balancing OOP and Functional Programming</h1>
+<p>Teams rarely fail because they picked OOP or FP. They fail because stateful orchestration, validation rules, persistence, and formatting all get mixed into the same place. Once that happens, the debate becomes ideological even though the real problem is boundary design.</p>
+<p>Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.</p>
 <p>This is the final post in the Functional Programming 101 series.</p>
-<blockquote>
-<p>Functional Programming 101 Series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Do you have to choose between OOP and functional programming, or can you use both together?</p>
-<blockquote>
-<p>Python is a multi-paradigm language. OOP and functional programming are not opposites — they complement each other. This article covers practical guidelines for choosing the right paradigm for each situation and combining their strengths.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>Comparing the strengths and weaknesses of OOP and FP</li>
@@ -90,6 +81,9 @@ Managing multiple instances   Pipeline data processing
 Framework integration         Concurrency / parallelism
 Complex domain models         Mathematical / declarative logic
 </code></pre>
+<h2>Where to draw the OOP/FP boundary</h2>
+<p><img alt="OOP and FP boundary in one service" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png"></p>
+<p><em>Keep handlers and repositories at the edge, and push the important business rules into a pure core. That is the simplest repeatable way to mix OOP and FP without losing consistency.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Multi-paradigm</strong><br>
 - Description: A language that supports multiple programming styles</p>

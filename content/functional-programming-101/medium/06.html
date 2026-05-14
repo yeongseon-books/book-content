@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Closures and Partial Application</h1>
+<p>Closures start to feel practical the moment you need a callback, decorator, or handler to carry a little bit of context. The function itself may be small, but once it has to remember which tenant it belongs to, how many retries are left, or which logger prefix to use, a plain parameter list stops being the whole story.</p>
+<p><code>functools.partial</code> solves a nearby problem from a different angle. Instead of remembering mutable context, it pre-fills stable arguments of an existing function. That distinction matters in production code because it tells you whether you are carrying state or simply specializing configuration.</p>
 <p>This is post 6 in the Functional Programming 101 series.</p>
-<blockquote>
-<p>Functional Programming 101 Series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: If a function remembers variables from the scope where it was defined, what patterns become possible?</p>
-<blockquote>
-<p>A closure is an inner function that remembers variables from its enclosing scope. <code>functools.partial</code> fixes some arguments of an existing function to create a new one. This article covers how closures work and practical patterns with partial application.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and mechanics of closures</li>
@@ -90,8 +81,11 @@
   +-- inner_func(y)
        |
        +-- x + y  &lt;- remembers outer x
-           (closure)
+            (closure)
 </code></pre>
+<h2>Closure vs partial decision flow</h2>
+<p><img alt="Closure vs partial decision flow" src="https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png"></p>
+<p><em>Use closures when the function must remember context. Use <code>partial</code> when an existing function only needs a few fixed arguments.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Closure</strong><br>
 - Description: An inner function that remembers variables from its enclosing scope</p>
@@ -255,6 +249,45 @@ bus.emit(&quot;user.created&quot;, name=&quot;Alice&quot;, email=&quot;alice@exa
 # [UserService] {'name': 'Alice', 'email': 'alice@example.com'}
 # [INFO] {'name': 'Alice', 'email': 'alice@example.com'}
 </code></pre>
+<p><strong>Step 6: Production-shaped example — tenant-aware webhook handlers</strong></p>
+<pre><code class="language-python">from dataclasses import dataclass
+from functools import partial
+
+@dataclass(frozen=True)
+class TenantPolicy:
+    tenant: str
+    retry_limit: int
+    audit_channel: str
+
+def make_retry_decider(policy: TenantPolicy):
+    attempts = 0
+
+    def should_retry(status: str) -&gt; bool:
+        nonlocal attempts
+        attempts += 1
+        return status == &quot;temporary-failure&quot; and attempts &lt; policy.retry_limit
+
+    return should_retry
+
+def publish_audit(channel: str, event_name: str, payload: dict) -&gt; None:
+    print(f&quot;[{channel}] {event_name}: {payload}&quot;)
+
+policy = TenantPolicy(
+    tenant=&quot;store-kr&quot;,
+    retry_limit=3,
+    audit_channel=&quot;orders.webhook&quot;,
+)
+
+should_retry = make_retry_decider(policy)
+record_audit = partial(publish_audit, policy.audit_channel)
+
+event = {&quot;order_id&quot;: &quot;A-1024&quot;, &quot;status&quot;: &quot;temporary-failure&quot;}
+record_audit(&quot;webhook.received&quot;, {&quot;tenant&quot;: policy.tenant, **event})
+
+if should_retry(event[&quot;status&quot;]):
+    record_audit(&quot;webhook.retry_scheduled&quot;, {&quot;order_id&quot;: event[&quot;order_id&quot;], &quot;attempt&quot;: 1})
+</code></pre>
+<p>This is closer to the kind of code you meet in production. The closure keeps retry state for one tenant policy, while <code>partial</code> binds a shared audit channel once so every handler does not have to pass it around again.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Closures store outer variables in <code>__closure__</code>, keeping them alive after the outer function returns</li>
