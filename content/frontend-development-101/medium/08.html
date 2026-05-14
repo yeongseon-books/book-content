@@ -54,24 +54,18 @@
 </head>
 <body>
 <h1>Styling and Design Systems</h1>
-<p>This is post 8 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you keep design <em>consistent</em> as a project grows?</p>
-<blockquote>
-<p>Through <em>design tokens</em> and a <em>component library</em>. Manage every color, spacing, and typography choice <em>in one place</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>At the start of a project, it feels harmless to hand-pick one color for one button and one spacing value for one card. That convenience disappears as the project and the team grow. Tiny inconsistencies accumulate, dark mode becomes expensive, and the interface starts to feel unfinished even when the logic works.</p>
+<p>This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A <em>comparison</em> of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)</li>
 <li>The role of <em>design tokens</em> (color, spacing, typography)</li>
-<li>The internal structure of a <em>component library</em></li>
-<li>Dark mode and theming</li>
+<li>
+<p>The internal structure of a <em>component library</em></p>
+</li>
+<li>
+<p>Dark mode and theming</p>
+</li>
 <li><em>Automatically enforcing</em> consistency</li>
 </ul>
 <h2>Why It Matters</h2>
@@ -80,12 +74,8 @@
 <p>A great design system gets <em>designers and engineers speaking the same language</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Tokens[&quot;Design tokens&quot;] --&gt; Comp[&quot;Components&quot;]
-    Comp --&gt; Pages[&quot;Pages&quot;]
-    Tokens --&gt; Theme[&quot;Light/Dark theme&quot;]
-    Theme --&gt; Pages
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>How design tokens, components, pages, and themes connect into one styling system</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Design token</strong>: an <em>atomic unit</em> of color/spacing/typography (e.g., <code>color.primary.500</code>).</li>
@@ -139,6 +129,16 @@ module.exports = {
 <pre><code class="language-bash"># eslint-plugin-tailwindcss
 # Catches arbitrary class names and bad token usage at lint time.
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Change one token value and confirm that the button and surface styles update together rather than one component at a time.</li>
+<li>Turn on dark mode and verify that contrast and state styles move with the theme instead of remaining hard-coded.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If only part of the UI changes, search for hard-coded colors or spacing values that bypass the token layer.</li>
+<li>If dark mode does not apply, check the <code>darkMode</code> configuration and where the theme class is attached.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>All colors appear by <em>name</em> (like <code>primary</code>) — change in <em>one place</em>.</li>
@@ -159,8 +159,12 @@ module.exports = {
 <ul>
 <li><em>Color without a token</em> gets caught in code review.</li>
 <li>Build the design system <em>with designers</em>, not for them.</li>
-<li>New components must answer: <em>why doesn't an existing one work?</em></li>
-<li>Storybook is <em>unit testing for components</em>.</li>
+<li>
+<p>New components must answer: <em>why doesn't an existing one work?</em></p>
+</li>
+<li>
+<p>Storybook is <em>unit testing for components</em>.</p>
+</li>
 <li>Dark mode should be solved <em>purely by tokens</em>.</li>
 </ul>
 <h2>Checklist</h2>
@@ -187,17 +191,22 @@ module.exports = {
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/06-api-calls-and-async.md">API Calls and Async</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/07-forms-and-validation.md">Forms and Validation</a></li>
-<li><strong>Styling and Design Systems (current)</strong></li>
-<li>Build Tools and Bundling (upcoming)</li>
+<li>
+<p><strong>Styling and Design Systems (current)</strong></p>
+</li>
+<li>
+<p>Build Tools and Bundling (upcoming)</p>
+</li>
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://tailwindcss.com/">Tailwind CSS docs</a></li>
-<li><a href="https://storybook.js.org/">Storybook</a></li>
-<li><a href="https://www.w3.org/community/design-tokens/">Design Tokens W3C draft</a></li>
-<li><a href="https://m3.material.io/">Material Design</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://tailwindcss.com/docs/installation">Tailwind CSS documentation</a><br>
+- <a href="https://storybook.js.org/docs">Storybook documentation</a><br>
+- <a href="https://www.w3.org/community/design-tokens/">W3C Design Tokens Community Group</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://m3.material.io/">Material Design 3</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">MDN: prefers-color-scheme</a></p>
 <p class="tags-line">Tags: Frontend, CSS, DesignSystem, Tailwind, UX</p>
 </body>
 </html>
