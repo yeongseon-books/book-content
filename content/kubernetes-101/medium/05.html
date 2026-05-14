@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Ingress</h1>
-<blockquote>
-<p>Kubernetes 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you split <em>several services</em> under <em>one domain</em> by <em>path</em>?</p>
-<blockquote>
-<p><em>Ingress</em> consolidates <em>L7 HTTP routing</em> and <em>TLS termination</em> into a <em>single entry point</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.</p>
 <p>This is post 5 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will separate the declarative Ingress rule from the controller that enforces it, then use that split to reason about host routing, path routing, and TLS termination.</p>
+<blockquote>
+<p>Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Splitting <em>Ingress</em> and <em>IngressController</em></li>
 <li><em>Host / path</em> routing</li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>A <em>LoadBalancer Service per app</em> explodes <em>cost</em>. <em>Ingress</em> collapses everything into a <em>single entry</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;client&quot;] --&gt; LB[&quot;external lb&quot;]
-    LB --&gt; IC[&quot;ingress controller&quot;]
-    IC --&gt; S1[&quot;svc a&quot;]
-    IC --&gt; S2[&quot;svc b&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>Ingress keeps one external entry point while the controller fans HTTP traffic out to multiple Services by host and path.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Ingress</strong>: an <em>L7 routing rule</em> object.</li>
@@ -144,6 +134,18 @@ spec:
     )
     return res.stdout
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl get ingress web
+kubectl describe ingress web
+curl -sk -H 'Host: example.com' https://&lt;ingress-address&gt;/api
+</code></pre>
+<p><strong>Expected output:</strong> <code>get ingress</code> should show an address or controller-managed endpoint, <code>describe ingress</code> should list the expected host/path/backend mapping, and the <code>curl</code> response should prove that <code>/api</code> reaches a different backend than the site root.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>An address-less Ingress usually means the controller path is broken, not the rule object itself.</li>
+<li>TLS handshake failures often come from the secret namespace or secret name before they come from certificate content.</li>
+<li>If <code>/</code> works and <code>/api</code> does not, inspect path precedence and <code>pathType</code> interpretation first.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Ingress</em> is the <em>rule</em>; the <em>Controller</em> is the <em>executor</em>.</li>
@@ -201,6 +203,7 @@ spec:
 <li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/">Ingress Controllers</a></li>
 <li><a href="https://cert-manager.io/docs/">cert-manager</a></li>
 <li><a href="https://gateway-api.sigs.k8s.io/">Gateway API</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/">Set up Ingress on Minikube</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Ingress, HTTP, TLS, DevOps</p>
 </body>
