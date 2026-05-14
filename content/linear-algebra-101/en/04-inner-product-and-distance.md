@@ -2,7 +2,7 @@
 series: linear-algebra-101
 episode: 4
 title: Inner Product and Distance
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,46 +17,35 @@ tags:
   - DataScience
   - Beginner
 seo_description: A beginner-friendly intro to inner products and distance — dot product, cosine similarity, Euclidean and Manhattan distance with NumPy code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Inner Product and Distance
 
-> Linear Algebra 101 series (4/10)
+Once vectors are in play, the next question comes immediately: how similar are two vectors, and how far apart are they? Recommenders, embedding search, and nearest-neighbor lookups are all versions of that question turned into numbers.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Linear Algebra 101 series. Here we will connect the inner product, cosine similarity, Euclidean distance, and Manhattan distance into one comparison toolkit.
 
-**Core question**: How do we *quantify* how *similar* two vectors are?
+## Questions This Post Answers
 
-> *Inner product measures *alignment*; distance measures *separation*.*
+- Why does the inner product collapse two vectors into one scalar?
+- How does cosine similarity grow out of the inner product?
+- What changes when you compare Euclidean distance with Manhattan distance?
+- Why are “similar” and “close” not always the same claim?
 
-<!-- a-grade-intro:end -->
-
-This is post 4 in the Linear Algebra 101 series.
-
-## What You Will Learn
-
-- The *definition* and *geometric meaning* of the *inner product*
-- *Cosine similarity*
-- *Euclidean* and *Manhattan* distance
-- A 5-step hands-on
-- Five common pitfalls
+> The inner product measures directional alignment. Distance measures separation in space. Because the questions differ, the numbers should be read differently too.
 
 ## Why It Matters
 
-Recommenders, search, and NLP use *similarity / distance* derived from *inner products and distances*. *Vector search* is the same.
+Document embeddings often care about direction, which is why cosine similarity shows up everywhere. Coordinate differences, travel costs, and physical displacement often care about actual gap size, where Euclidean or Manhattan distance can be a better fit.
 
-> *Inner product is the engine of similarity.*
+Without that distinction, metric choice becomes habit instead of judgment. You start using cosine everywhere or L2 everywhere, even though search rankings, clusters, and neighbor sets can shift dramatically when the metric changes. This chapter is about choosing the comparison question, not memorizing one more formula.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dot["v . w"] --> Mag["||v|| ||w|| cos theta"]
-    Dot --> Cos["Cosine similarity"]
-    Dist["||v - w||"] --> Euc["Euclidean distance"]
-    Dist --> Man["Manhattan distance"]
-```
+![Concept at a Glance](../../../assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
+
+*This diagram links the inner product to cosine similarity and distance metrics as separate comparison questions.*
 
 ## Key Terms
 
@@ -107,6 +96,12 @@ print("Euclidean:", np.linalg.norm(v - w))
 ```python
 print("Manhattan:", np.sum(np.abs(v - w)))
 ```
+
+## Read One Numeric Pass
+
+- `v @ w` is `32.0`, so one scalar is already summarizing how strongly the two vectors align.
+- Cosine similarity is about `0.975`, which tells you the directions are close even before you look at raw distance.
+- Euclidean distance is about `5.196`, while Manhattan distance is `9.0`. Same vectors, different question, different number.
 
 ## What to Notice in This Code
 
@@ -166,9 +161,9 @@ Inner product is *similarity*; distance is *dissimilarity*. The next post covers
 
 ## References
 
-- [Wikipedia — Dot product](https://en.wikipedia.org/wiki/Dot_product)
-- [Wikipedia — Cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity)
 - [3Blue1Brown — Dot products](https://www.3blue1brown.com/lessons/dot-products)
+- [Stanford CS229 — Linear Algebra Review](https://cs229.stanford.edu/section/cs229-linalg.pdf)
 - [scikit-learn — Pairwise metrics](https://scikit-learn.org/stable/modules/metrics.html)
+- [Khan Academy — Dot and cross products](https://www.khanacademy.org/math/linear-algebra/vectors-and-spaces/dot-cross-products)
 
 Tags: LinearAlgebra, InnerProduct, Distance, DataScience, Beginner
