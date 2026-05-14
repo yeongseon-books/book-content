@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 2
 title: Pod
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - YAML
   - DevOps
 seo_description: A beginner guide to Kubernetes Pods — what they are, how they relate to containers, the sidecar pattern, and the pod lifecycle in YAML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Pod
 
-> Kubernetes 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why is the *base unit* a *Pod*, and not a *container*?
-
-> A *Pod* is a *bundle of containers* that *live and die together* — the *smallest deployable unit* in *Kubernetes*.
-
-<!-- a-grade-intro:end -->
+The first thing that confuses many Docker users is that Kubernetes does not treat the container itself as the base unit. That design choice looks odd until you hit the real operational problems: shared networking, helper processes, startup ordering, and the fact that several containers sometimes have to live and die together.
 
 This is post 2 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will define a Pod as the smallest deployable execution bundle in Kubernetes and connect that idea to sidecars, shared storage, and the Pod lifecycle you debug in production.
+
+> A Pod is not a prettier name for one container. It is the boundary Kubernetes uses when scheduling, networking, and replacing a unit of work.
+
+## Questions this chapter answers
 
 - The definition of a *Pod*
 - How it differs from a *container*
@@ -48,13 +44,9 @@ This is post 2 in the Kubernetes 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Pod["pod"] --> C1["app container"]
-    Pod --> C2["sidecar"]
-    Pod --> Vol["shared volume"]
-    Pod --> Net["shared network ns"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
+*A Pod groups the app container, sidecars, shared storage, and shared networking into one scheduled execution unit.*
+
 
 ## Key Terms
 
@@ -126,6 +118,22 @@ def delete(name):
     subprocess.run(["kubectl", "delete", "pod", name], check=True)
 ```
 
+## Verification workflow
+
+```bash
+kubectl get pod web -o wide
+kubectl describe pod web
+kubectl logs web
+```
+
+**Expected output:** `get pod` should show a Pod that is `Running` or still becoming ready, `describe` should list scheduling and container-start events in order, and `logs` should surface the first app messages from standard output. Together they show state, reason, and app-level evidence instead of only a green/red summary.
+
+**Failure modes to check first:**
+
+- A long `Pending` state usually means scheduling or resource issues before it means application failure.
+- `ImagePullBackOff` points to image tag or registry access before it points to Pod YAML shape.
+- Empty logs often mean the process exited immediately or the app is still writing only to files inside the container.
+
 ## What to Notice in This Code
 
 - The *Pod name* must be *unique*.
@@ -188,5 +196,6 @@ With *Pods* understood, the next step is the *Deployment*, which owns *restarts 
 - [Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 - [Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 - [Sidecar containers](https://kubernetes.io/blog/2023/08/25/native-sidecar-containers/)
+- [Debug Pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/)
 
 Tags: Kubernetes, Pod, Containers, YAML, DevOps
