@@ -22,17 +22,9 @@ last_reviewed: '2026-05-04'
 
 # Forms and Validation
 
-This is post 7 in the Frontend Development 101 series.
+Forms are where products have their longest conversation with users. Sign-up, login, payment, search, and settings changes all pass through fields, buttons, and validation messages. When that conversation is awkward, users feel it immediately.
 
-> Frontend Development 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you tell a user *kindly* that they made a mistake?
-
-> A good form *helps while typing* and never *scolds only after submit*.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.
 
 ## What You Will Learn
 
@@ -50,14 +42,9 @@ Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkw
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Input["Input"] --> Format["Format check"]
-    Format --> Rule["Business rule"]
-    Rule --> Submit["Submit"]
-    Submit --> Server["Server validation"]
-    Server -->|error| Input
-```
+![Concept at a Glance](../../../assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)
+
+*The form-validation flow from input and format checks to business rules and server validation*
 
 ## Key Terms
 
@@ -133,6 +120,16 @@ const result = SignupSchema.safeParse({ email, password });
 if (!result.success) showErrors(result.error.format());
 ```
 
+## Verification
+
+- Type an invalid email and confirm that the inline error appears before submit; then type a valid one and verify that the submit button becomes usable.
+- Tab through the form using only the keyboard and confirm that labels, focus order, and `aria-invalid` all communicate the same state.
+
+## If It Fails, Check This First
+
+- If errors never clear, check the controlled state update path and the exact timing of your format validation.
+- If assistive feedback is weak, verify the `label`, `id`, and `aria-describedby` connections first.
+
 ## What to Notice in This Code
 
 - Validation happens *while the user types*.
@@ -185,6 +182,7 @@ Forms are *the longest conversation with the user*. Next, we look at how the for
 - [Routing and Pages](./05-routing-and-pages.md)
 - [API Calls and Async](./06-api-calls-and-async.md)
 - **Forms and Validation (current)**
+
 - Styling and Design Systems (upcoming)
 - Build Tools and Bundling (upcoming)
 - Building a Small Frontend App (upcoming)
@@ -192,9 +190,13 @@ Forms are *the longest conversation with the user*. Next, we look at how the for
 
 ## References
 
-- [React Hook Form](https://react-hook-form.com/)
-- [Zod docs](https://zod.dev/)
-- [MDN Form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
-- [W3C Form best practices](https://www.w3.org/WAI/tutorials/forms/)
+### Official Docs
+- [React Hook Form documentation](https://react-hook-form.com/)
+- [Zod documentation](https://zod.dev/)
+- [MDN: Client-side form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
+
+### Verification and Further Reading
+- [WAI: Forms tutorial](https://www.w3.org/WAI/tutorials/forms/)
+- [MDN: ARIA aria-invalid](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid)
 
 Tags: Frontend, Forms, Validation, UX, React

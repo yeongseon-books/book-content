@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 폼과 유효성 검사
 
-이 글은 Frontend Development 101 시리즈의 일곱 번째 글입니다.
+사용자는 폼을 통해 제품과 가장 길게 대화합니다. 회원가입, 로그인, 결제, 검색, 설정 변경까지 대부분의 중요한 순간이 폼에서 일어납니다. 그런데도 많은 폼은 제출 버튼을 누른 뒤에야 뒤늦게 오류를 보여 줍니다.
 
-사용자는 폼을 통해 제품과 가장 길게 대화합니다. 회원가입, 로그인, 결제, 검색, 설정 변경까지 대부분의 중요한 순간이 폼에서 일어납니다. 그런데도 많은 폼은 여전히 제출 버튼을 누른 뒤에야 뒤늦게 사용자를 혼내듯 오류를 보여 줍니다.
-
-이 글에서는 폼을 단순한 입력 묶음이 아니라 사용자와의 대화 인터페이스로 설명하겠습니다. 한 가지 관점이 중요합니다. 좋은 폼은 제출 후에만 검사하지 않고, 입력하는 동안 도와주며, 에러를 친절하고 구체적으로 보여 준다는 점입니다.
+이 글은 Frontend Development 101 시리즈의 일곱 번째 글입니다. 여기서는 폼을 단순한 입력 묶음이 아니라 사용자와의 대화 인터페이스로 설명합니다. 좋은 폼은 제출 후에만 검사하지 않고, 입력하는 동안 도와주며, 에러를 친절하고 구체적으로 보여 줍니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Input["Input"] --> Format["Format check"]
-    Format --> Rule["Business rule"]
-    Rule --> Submit["Submit"]
-    Submit --> Server["Server validation"]
-    Server -->|error| Input
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/07/07-01-diagram.ko.png)
+
+*입력, 형식 검사, 비즈니스 규칙, 서버 검증으로 이어지는 폼 검증 흐름*
 
 이 흐름을 보면 프론트엔드 검증이 서버 검증을 대체하는 것이 아님을 알 수 있습니다. 프론트엔드는 사용자 경험을 개선하고, 서버는 최종 보안을 책임집니다.
 
@@ -135,6 +128,16 @@ if (!result.success) showErrors(result.error.format());
 
 이 예제에서 핵심은 3단계와 5단계입니다. 입력 중 피드백을 주는 UX와, 프론트와 백엔드에서 같은 스키마 개념을 공유하는 구조가 결합되면 폼은 훨씬 일관되고 안전해집니다.
 
+## 검증 포인트
+
+- 잘못된 이메일 형식에서는 inline 에러가 보이고, 올바른 값에서는 제출 버튼이 활성화되는지 확인합니다.
+- 키보드만으로 필드 이동과 제출이 가능하고, 에러 필드에 `aria-invalid`가 붙는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 에러가 안 사라지면 controlled state 업데이트와 정규식 검사 시점을 확인합니다.
+- 스크린 리더 정보가 비면 `label`, `id`, `aria-describedby` 연결을 먼저 확인합니다.
+
 ## 이 코드에서 주목할 점
 
 - 사용자가 입력하는 동안 검사가 진행됩니다.
@@ -191,6 +194,7 @@ if (!result.success) showErrors(result.error.format());
 - [라우팅과 페이지](./05-routing-and-pages.md)
 - [API 호출과 비동기](./06-api-calls-and-async.md)
 - **폼과 유효성 검사 (현재 글)**
+
 - 스타일링과 디자인 시스템 (예정)
 - 빌드 도구와 번들링 (예정)
 - 작은 프론트엔드 앱 만들기 (예정)
@@ -198,9 +202,13 @@ if (!result.success) showErrors(result.error.format());
 
 ## 참고 자료
 
-- [React Hook Form](https://react-hook-form.com/)
-- [Zod docs](https://zod.dev/)
-- [MDN Form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
-- [W3C Form best practices](https://www.w3.org/WAI/tutorials/forms/)
+### 공식 문서
+- [React Hook Form documentation](https://react-hook-form.com/)
+- [Zod documentation](https://zod.dev/)
+- [MDN: Client-side form validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation)
+
+### 확인용 자료
+- [WAI: Forms tutorial](https://www.w3.org/WAI/tutorials/forms/)
+- [MDN: ARIA aria-invalid](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid)
 
 Tags: Frontend, Forms, Validation, UX, React
