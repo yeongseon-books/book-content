@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>ETL and ELT</h1>
-<blockquote>
-<p>Data Warehouse 101 series (6/10)</p>
-</blockquote>
+<p>The argument is not really about acronym order. It is about where you want complexity to live when a pipeline fails at 2 a.m. If raw data disappears before you can replay it, the recovery story gets expensive fast.</p>
 <p>This is post 6 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Should we transform <em>before</em> loading or <em>after</em>? The answer hinges on <em>how warehouse compute has evolved</em>.</p>
-<blockquote>
-<p><em>Yesterday it was </em>transform then load<em>. Today it is </em>load then transform in SQL<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>ETL</em> and <em>ELT</em></li>
@@ -80,12 +71,8 @@
 <p><em>Pull transforms into SQL. Visibility and reproducibility come along for the ride.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Src[&quot;Source&quot;] --&gt; ELoad[&quot;Load (raw)&quot;]
-    ELoad --&gt; DW[&quot;Warehouse&quot;]
-    DW --&gt; Transform[&quot;Transform (SQL)&quot;]
-    Transform --&gt; Mart[&quot;Mart&quot;]
-</code></pre>
+<p><img alt="ELT pipeline flow" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>In a typical ELT pipeline, raw data lands first, then warehouse SQL transforms it into marts for downstream consumption.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ETL</strong>: Extract → Transform → Load. Transform <em>before</em> loading.</li>
