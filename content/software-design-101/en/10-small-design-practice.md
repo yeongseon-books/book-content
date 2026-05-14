@@ -1,7 +1,7 @@
 ---
 series: software-design-101
 episode: 10
-title: Small Design Practice
+title: Practicing Design with a Small Project
 status: content-ready
 targets:
   tistory: false
@@ -18,22 +18,18 @@ tags:
   - Modularity
   - Architecture
 seo_description: Build a tiny URL shortener and apply every design tool from this series in one place.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
-# Small Design Practice
+# Practicing Design with a Small Project
+
+A small project is where design habits either become real or stay theoretical. If you cannot keep the seams clean in a URL shortener, they will not stay clean in a larger system either.
 
 This is the final post in the Software Design 101 series.
 
-> Software Design 101 series (10/10)
+In this post, we pull the whole toolkit together in one small Python service: domain rules, ports, adapters, layering, and one-way data flow. The goal is not framework ceremony. The goal is seeing how these design ideas cooperate when the code is still small enough to hold in your head.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you actually use all the tools from this series in one project?
-
-> By building a small URL shortener and unfolding separation of concerns, dependency direction, layers, and data flow line by line.
-
-<!-- a-grade-intro:end -->
+> A small code base is the best place to practice putting the domain in the center and the changing details at the edge.
 
 ## What You Will Learn
 
@@ -51,13 +47,8 @@ The same principles work in small code. The mini-project here is small but it is
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    HTTP["HTTP layer"] --> APP["shorten_use_case"]
-    APP --> DOM["ShortLink domain"]
-    APP --> REPO["LinkRepo (port)"]
-    REPO --> SQL["SqlLinkRepo (adapter)"]
-```
+![Concept at a Glance](../../../assets/software-design-101/10/10-01-concept-at-a-glance.en.png)
+*The URL shortener example brings presentation, use case, domain, ports, and adapters together in one flow*
 
 Domain → port → adapter → infrastructure.
 
@@ -181,6 +172,28 @@ def redirect_view(key):
 
 Composition at the edge, view stays thin.
 
+## Quick Verification
+
+For a small project, the best verification is to run the happy path end to end. Start with the shortest useful check.
+
+```bash
+curl -X POST http://localhost:5000/   -H "Content-Type: application/json"   -d '{"url": "https://example.com/docs"}'
+```
+
+**Expected output:** you get a response shaped like `{"short": "/r/xxxxxx"}`, and a follow-up `GET /r/<key>` returns `302` with a `Location` header. That proves presentation, use case, and repository collaboration are all wired correctly.
+
+Run the same check against an in-memory adapter and a SQL adapter, and the value of ports and adapters becomes very concrete.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| The view hashes the URL and writes to the DB itself | Pull that work into the use case and adapters |
+| Swapping storage shakes both the view and the domain | Check whether the port is defined on the domain side |
+| URL validation requires Flask to test | Check whether the rule truly lives in the domain |
+
+When these three seams stay clean in a tiny project, the whole series stops being theory and starts feeling like one connected toolkit.
+
 ## What to Notice in This Code
 
 - The domain has no external dependencies.
@@ -246,5 +259,12 @@ This is the end of the series. Put the domain in the center, surround it with po
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture (Uncle Bob)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Domain-Driven Design (Eric Evans)](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+
+### Practical Docs
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
+
 
 Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture

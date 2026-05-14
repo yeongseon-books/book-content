@@ -18,7 +18,7 @@ tags:
   - Modularity
   - Architecture
 seo_description: URL 단축기 프로젝트로 시리즈의 모든 설계 도구를 한 자리에서 적용해 봅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 작은 프로젝트로 설계 연습
@@ -47,13 +47,8 @@ URL 단축기는 예제가 작으면서도 설계 요소가 고르게 들어 있
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    HTTP["HTTP layer"] --> APP["shorten_use_case"]
-    APP --> DOM["ShortLink domain"]
-    APP --> REPO["LinkRepo (port)"]
-    REPO --> SQL["SqlLinkRepo (adapter)"]
-```
+![전체 그림](../../../assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
+*URL 단축기 예제에서 표현 계층과 유스케이스, 도메인, 포트, 어댑터가 협력하는 전체 구조*
 
 도메인은 가운데 있고, 포트가 필요한 모양을 정의하며, 어댑터가 그 바깥 구현을 맡습니다. 표현 계층은 이 흐름을 호출만 합니다.
 
@@ -177,6 +172,28 @@ def redirect_view(key):
 
 조립은 가장자리에서 한 번만 일어납니다. 표현 계층은 HTTP 입력과 출력만 처리하고, 핵심 규칙은 안쪽에 남겨 둡니다.
 
+## 빠르게 검증해 보기
+
+작은 프로젝트에서는 실제로 한 번 실행해 보는 검증이 가장 좋습니다. 아래 순서대로 최소 동작을 확인해 보세요.
+
+```bash
+curl -X POST http://localhost:5000/   -H "Content-Type: application/json"   -d '{"url": "https://example.com/docs"}'
+```
+
+**Expected output:** `{"short": "/r/xxxxxx"}` 형태의 응답이 오고, 이어서 `GET /r/<key>` 요청에서 `302`와 `Location` 헤더가 보이면 표현 계층과 유스케이스, 저장소 협력이 정상이라는 뜻입니다.
+
+같은 검증을 메모리 저장소와 SQL 저장소 양쪽에서 해 보면, 포트와 어댑터 분리가 실제 교체 비용을 얼마나 낮추는지도 바로 체감할 수 있습니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 뷰 함수에서 해시 생성과 DB 저장을 모두 한다 | 유스케이스와 어댑터로 끌어낼 수 있는지 봅니다 |
+| 저장소를 바꾸려는데 뷰와 도메인이 함께 흔들린다 | 포트가 도메인 쪽에 정의됐는지 확인합니다 |
+| URL 검증 규칙 테스트에 Flask가 필요하다 | 규칙이 도메인 안에 있는지 점검합니다 |
+
+작은 프로젝트에서 이 세 가지가 깔끔하게 분리되면, 시리즈에서 다룬 설계 도구가 실제로 연결된다는 감각을 얻을 수 있습니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 도메인은 외부 라이브러리를 직접 모르고 있습니다.
@@ -236,5 +253,12 @@ def redirect_view(key):
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture (Uncle Bob)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Domain-Driven Design (Eric Evans)](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+
+### 실전 확인용 문서
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
+
 
 Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture
