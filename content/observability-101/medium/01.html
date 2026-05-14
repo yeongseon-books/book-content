@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is Observability?</h1>
+<p>Production systems rarely fail in a dramatic way. Checkout gets slower, a small slice of requests starts timing out, and logs leave only a few clues. You can see the symptom, but not the mechanism, and that gap is what makes incident response expensive.</p>
+<p>Observability is what closes that gap. It is the difference between watching a known threshold and being able to infer the inside of a system from the outside when the failure mode is new.</p>
 <p>This is the first post in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When systems <em>fail quietly</em>, how do we <em>understand the inside from the outside</em>?</p>
-<blockquote>
-<p><em>Observability is the ability to </em>understand a system's internal state from external signals alone<em>. Monitoring </em>watches known problems<em>; observability </em>asks unknown questions<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>monitoring</em> and <em>observability</em></li>
@@ -80,14 +71,8 @@
 <p><em>Dashboards are </em>answers<em>; observability is </em>questions<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;application&quot;] --&gt; Metric[&quot;metric&quot;]
-    App --&gt; Log[&quot;log&quot;]
-    App --&gt; Trace[&quot;trace&quot;]
-    Metric --&gt; Dashboard[&quot;dashboard / alert&quot;]
-    Log --&gt; Search[&quot;log search&quot;]
-    Trace --&gt; Flow[&quot;request flow&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>The baseline observability loop: one application emits metrics, logs, and traces, and each signal answers a different operational question.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a <em>number</em> that changes over time. Example: requests per second.</li>
@@ -136,6 +121,18 @@ grep '&quot;trace_id&quot;: &quot;abc-123&quot;' app.log
 1. metric: latency curve rises
 2. trace: payment span is long
 3. log: db connection timeout
+</code></pre>
+<h2>How to Narrow the First Incident</h2>
+<p>Suppose checkout latency jumps right after a deploy. The fastest path is not to open every tool at once, but to keep the three signals in a fixed order.</p>
+<pre><code class="language-text">1) metric  → checkout p95 rises from 180ms to 1.8s
+2) trace   → one payment span dominates the request time
+3) log     → db_pool_timeout, retry=3, trace_id=9f3c...
+</code></pre>
+<p>That order matters. Metrics tell you when the symptom started, traces show where the latency accumulated, and logs explain why that part of the path failed.</p>
+<pre><code class="language-text">Expected output:
+- The latency chart shows checkout getting worse before the incident ticket arrives.
+- The trace view points to one slow span instead of the whole service.
+- The matching log lines confirm whether the cause is a timeout, retry storm, or dependency failure.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
