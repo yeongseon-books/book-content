@@ -54,47 +54,39 @@
 </head>
 <body>
 <h1>Postmortem</h1>
+<p>Once an incident is over, the emotional temptation is to move on quickly. The channel quiets down, customer impact is gone, and everyone wants to get back to roadmap work.</p>
+<p>That is exactly when the most valuable learning can be lost. A good postmortem converts a stressful event into an organizational asset instead of a fading memory or a blame ritual.</p>
+<p>This is post 8 in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.</p>
+<h2>Questions this chapter answers</h2>
+<p>Postmortems swing toward two unhealthy extremes: blame documents that make people defensive, or polished narratives that never create meaningful follow-up work.</p>
 <blockquote>
-<p>Incident Response 101 series (8/10)</p>
+<p>A useful postmortem records facts, impact, causes, and concrete next actions without collapsing into either personal blame or empty documentation.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: After an <em>incident</em> ends, <em>how</em> do you turn the <em>learning</em> into an <em>organizational asset</em>?</p>
-<blockquote>
-<p>A <em>postmortem</em> is a <em>blameless</em> document recording <em>facts</em>, <em>impact</em>, <em>cause</em>, and <em>actions</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li>The <em>blameless</em> principle</li>
-<li><em>Template</em> structure</li>
-<li><em>Action items</em></li>
-<li><em>Tracking</em> methods</li>
-<li><em>Sharing</em> scope</li>
+<li>Why is a postmortem still necessary after the incident is already over?</li>
+<li>What does blameless analysis mean in practical terms?</li>
+<li>Why should the template stay stable across incidents?</li>
+<li>What fields make an action item traceable?</li>
+<li>How do you keep the review loop alive after publication?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>When the <em>same incident</em> keeps <em>repeating</em>, learning stops at the <em>document</em> and never reaches <em>behavior</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Incident[&quot;incident&quot;] --&gt; Draft[&quot;draft&quot;]
-    Draft --&gt; Review[&quot;review&quot;]
-    Review --&gt; Publish[&quot;publish&quot;]
-    Publish --&gt; Action[&quot;action items&quot;]
-    Action --&gt; Track[&quot;track&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>If the team cannot convert the incident into reusable learning, the same outage pattern comes back under a new name. Recovery restores service, but postmortem work is what restores organizational memory.</p>
+<p>A strong postmortem also protects accuracy. It captures facts before memory fades and links them to work that can be prioritized, assigned, and revisited later.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+Publishing the document is only the midpoint. The real payoff comes when the review leads to tracked action items that are still checked later.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>blameless</strong>: no <em>personal</em> blame.</li>
-<li><strong>summary</strong>: a <em>three-sentence</em> recap.</li>
-<li><strong>impact</strong>: what the <em>customer</em> experienced.</li>
-<li><strong>action item</strong>: a <em>verifiable</em> follow-up.</li>
-<li><strong>owner</strong>: the <em>action's</em> responsible person.</li>
+<li><strong>blameless</strong>: no personal blame.</li>
+<li><strong>summary</strong>: a three-sentence recap.</li>
+<li><strong>impact</strong>: what the customer experienced.</li>
+<li><strong>action item</strong>: a verifiable follow-up.</li>
+<li><strong>owner</strong>: the action's responsible person.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: an <em>internal</em> document of <em>blame</em>.</p>
-<p><strong>After</strong>: an <em>organization-wide</em>, <em>blameless</em> document.</p>
+<p><strong>Before</strong>: an internal document of blame.</p>
+<p><strong>After</strong>: an organization-wide, blameless document.</p>
 <h2>Hands-on: A Mini Postmortem Builder</h2>
 <p><strong>Step 1 — Template</strong></p>
 <pre><code class="language-python">TEMPLATE = (&quot;summary&quot;, &quot;impact&quot;, &quot;timeline&quot;, &quot;rca&quot;, &quot;actions&quot;)
@@ -120,43 +112,50 @@ def new_doc():
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The <em>template</em> is <em>fixed</em> as a <em>tuple</em>.</li>
-<li><em>Impact</em> is <em>numeric</em>.</li>
-<li><em>Tracking</em> is one <em>deadline comparison</em>.</li>
+<li>The template is fixed as a tuple.</li>
+<li>Impact is numeric.</li>
+<li>Tracking is one deadline comparison.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Naming an <em>individual</em> as the <em>cause</em>.</strong></li>
-<li><strong>Actions with <em>no owner</em>.</strong></li>
-<li><strong>Actions with <em>no deadline</em>.</strong></li>
-<li><strong>Sharing only <em>internally</em>.</strong></li>
-<li><strong>Reinventing the <em>template</em> every time.</strong></li>
+<li><strong>Naming an individual as the cause.</strong></li>
+<li><strong>Actions with no owner.</strong></li>
+<li><strong>Actions with no deadline.</strong></li>
+<li><strong>Sharing only internally.</strong></li>
+<li><strong>Reinventing the template every time.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Teams keep a <em>Notion/Confluence</em> postmortem template and <em>link</em> action items to <em>Jira</em>. A <em>quarterly review</em> tracks them.</p>
+<p>Teams keep a Notion/Confluence postmortem template and link action items to Jira. A quarterly review tracks them.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Blameless</em> is <em>culture</em>.</li>
-<li>No <em>actions</em>, no <em>document</em>.</li>
-<li><em>Impact</em> is in <em>numbers</em>.</li>
-<li><em>Sharing</em> is <em>company-wide</em>.</li>
-<li>The <em>quarterly review</em> closes the <em>loop</em>.</li>
+<li>Blameless is culture.</li>
+<li>No actions, no document.</li>
+<li>Impact is in numbers.</li>
+<li>Sharing is company-wide.</li>
+<li>The quarterly review closes the loop.</li>
 </ul>
+<h2>Good and bad postmortem action items</h2>
+<p>Small wording differences determine whether a postmortem item will ever change production.</p>
+<ul>
+<li>Bad: <code>Improve monitoring.</code></li>
+<li>Good: <code>Add an Alertmanager rule that opens a PagerDuty SEV2 incident when checkout API 5xx stays above 2% for three consecutive minutes. Owner: platform-oncall. Due: 2026-06-01.</code></li>
+</ul>
+<p>A strong action item starts with a verb, names an owner, includes a due date, and leaves behind something that can be checked later.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Template</em>.</li>
-<li>[ ] <em>Action register</em>.</li>
-<li>[ ] <em>Tracking tool</em>.</li>
-<li>[ ] <em>Quarterly review</em> on the calendar.</li>
+<li>[ ] Template.</li>
+<li>[ ] Action register.</li>
+<li>[ ] Tracking tool.</li>
+<li>[ ] Quarterly review on the calendar.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>blameless</em> in one line.</li>
-<li>Define <em>action item</em> in one line.</li>
-<li>Define <em>owner</em> in one line.</li>
+<li>Define blameless in one line.</li>
+<li>Define action item in one line.</li>
+<li>Define owner in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>prevention</em>.</p>
+<p>Next, we cover prevention.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -170,12 +169,11 @@ def new_doc():
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a></li>
-<li><a href="https://response.pagerduty.com/after/post_mortem_process/">Blameless Postmortems - PagerDuty</a></li>
-<li><a href="https://www.atlassian.com/incident-management/postmortem/templates">Postmortem Templates - Atlassian</a></li>
-<li><a href="https://www.etsy.com/codeascraft/blameless-postmortems/">Etsy Code as Craft Postmortems</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://sre.google/sre-book/postmortem-culture/">Postmortem Culture - Google SRE Book</a><br>
+- <a href="https://response.pagerduty.com/after/post_mortem_process/">Postmortem Process - PagerDuty</a><br>
+- <a href="https://www.atlassian.com/incident-management/postmortem/templates">Postmortem templates - Atlassian</a><br>
+- <a href="https://www.etsy.com/codeascraft/blameless-postmortems/">Blameless PostMortems and a Just Culture</a></p>
 <p class="tags-line">Tags: Incident, Postmortem, Blameless, Learning, Operations</p>
 </body>
 </html>
