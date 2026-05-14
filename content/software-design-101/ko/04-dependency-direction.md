@@ -18,7 +18,7 @@ tags:
   - Inversion
   - Architecture
 seo_description: 의존성의 방향을 통제해 변경 비용을 낮추는 방법, DIP와 포트/어댑터를 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 의존성 방향
@@ -47,11 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    D["Domain (stable)"] --> P["Port (interface)"]
-    A["Adapter (volatile)"] -- implements --> P
-```
+![전체 그림](../../../assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
+*안정적인 도메인 쪽에서 포트를 정의하고 변동이 큰 어댑터가 이를 구현하는 의존성 방향*
 
 핵심 아이디어는 간단합니다. 세부 구현이 코어를 향하게 하고, 코어는 자신이 필요한 모양만 추상으로 선언합니다. 그러면 구현 교체가 코어를 직접 흔들지 않습니다.
 
@@ -152,6 +149,30 @@ def test_charge():
 
 가짜 어댑터로 도메인을 검증할 수 있다면 방향이 잘 잡혔을 가능성이 높습니다. 이 단계에서 DB 연결이 필요하다면 코어와 세부가 너무 가깝게 붙어 있는 편입니다.
 
+## 빠르게 검증해 보기
+
+의존성 방향은 import 목록만 그려도 상당 부분 확인할 수 있습니다. 도메인 패키지에서 외부 DB 드라이버나 HTTP 클라이언트를 직접 import하는지 먼저 적어 보세요.
+
+```text
+domain -> typing, dataclasses
+domain -> psycopg2        # 위험 신호
+infra  -> domain          # 기대하는 방향
+```
+
+**Expected output:** 도메인에서 인프라 라이브러리로 가는 화살표가 보이면, 포트 위치나 구현 조립 위치를 다시 봐야 한다는 결론이 나옵니다.
+
+이 확인은 테스트로도 이어집니다. 가짜 저장소로 도메인 테스트가 가능하면 방향이 맞을 가능성이 높습니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 도메인 테스트가 DB 없이는 못 돈다 | 도메인이 구체 저장소를 직접 아는지 확인합니다 |
+| 인터페이스가 인프라 폴더에 있다 | 필요를 누가 정의하는지 다시 봅니다 |
+| 포트 수가 지나치게 많다 | 안정적/변동 경계가 아닌 곳까지 역전했는지 점검합니다 |
+
+의존성 방향을 바로잡는 목적은 추상화를 늘리는 것이 아니라, 코어를 세부 구현 변경에서 보호하는 데 있습니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 도메인 코드가 외부 라이브러리로부터 비교적 자유롭습니다.
@@ -209,5 +230,11 @@ def test_charge():
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture — Dependency Rule](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Ports and Adapters Pattern](https://herbertograca.com/2017/09/14/ports-adapters-architecture/)
+
+### 실전 확인용 문서
+
+- [typing — Support for type hints](https://docs.python.org/3/library/typing.html)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
+
 
 Tags: Computer Science, SoftwareDesign, Dependencies, DIP, Inversion, Architecture
