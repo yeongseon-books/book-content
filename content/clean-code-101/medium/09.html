@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Refactoring Basics</h1>
-<blockquote>
-<p>Clean Code 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When should you stop refactoring?</p>
-<blockquote>
-<p>When the next change is easier — not when the code looks cleaner.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Refactoring looks risky when it is approached as a rewrite. It becomes manageable when every step is small enough that a failing test can tell you exactly where the move went wrong.</p>
+<p>This is post 9 in the Clean Code 101 series.</p>
+<p>Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What refactoring is and what it is not</li>
@@ -79,11 +72,8 @@
 <p>Refactoring is an investment that lowers the cost of the next change.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[&quot;Tests pass&quot;] --&gt; R[&quot;Tiny refactor&quot;]
-    R --&gt; T2[&quot;Tests pass&quot;]
-    T2 --&gt; R2[&quot;Next step&quot;]
-</code></pre>
+<p><img alt="Refactoring Basics" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Refactoring rhythm: move from one green test state to the next through small, reversible steps.</em></p>
 <p>Small steps between green and green.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -148,6 +138,20 @@ class OrderPricing:
 # PR-2: add feature (new behavior)
 </code></pre>
 <p>Make the change reviewable.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">python -m pytest -q tests/test_order_total.py
+python -m pytest -q tests/test_legacy_characterization.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>Characterization tests should go green before structural changes begin.</li>
+<li>Extraction, rename, and move steps must preserve the same result set.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Feature changes slip into the same refactoring commit.</li>
+<li>Names improve but misplaced responsibilities stay where they were.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Tests stay green after every step.</li>
@@ -206,6 +210,8 @@ class OrderPricing:
 <li><a href="https://refactoring.com/catalog/">Refactoring Catalog</a></li>
 <li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code (M. Feathers)</a></li>
 <li><a href="https://mikadomethod.info/">The Mikado Method</a></li>
+<li><a href="https://refactoring.com/catalog/">Refactoring catalog</a></li>
+<li><a href="https://www.oreilly.com/library/view/working-effectively-with/0131177052/">Working Effectively with Legacy Code</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, Refactoring, Patterns, LegacyCode, Quality</p>
 </body>
