@@ -2,7 +2,7 @@
 series: observability-101
 episode: 8
 title: SLI and SLO Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - SRE
   - Reliability
 seo_description: Define SLIs, set SLO targets, and use the error budget to make reliability a number instead of a feeling.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # SLI and SLO Basics
 
+Reliability conversations often go in circles because each side is speaking from instinct. One team says the service is fine, another says it is already risky, and nobody has a shared threshold for when feature work should slow down.
+
+SLIs and SLOs solve that by turning service quality into a number, a target, and a budget the team can spend or protect.
+
 This is post 8 in the Observability 101 series.
-
-> Observability 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Can you answer *how reliable is reliable enough* with a *number*?
-
-> *SLI is the *measured reliability*; SLO is the *promised reliability*; error budget is the *amount of failure allowed*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,13 +44,8 @@ This is post 8 in the Observability 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Req["request"] --> SLI["SLI = good/total"]
-    SLI --> SLO["SLO target (e.g. 99.9%)"]
-    SLO --> Budget["error budget = 1 - SLO"]
-    Budget --> Burn["burn-rate alert"]
-```
+![Concept at a Glance](../../../assets/observability-101/08/08-01-concept-at-a-glance.en.png)
+*Measured reliability becomes an SLI, the target becomes an SLO, and the remaining room for failure becomes an error budget that alerts can track.*
 
 ## Key Terms
 
@@ -113,6 +102,25 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 - Availability: 99.92% (target 99.9% PASS)
 - Latency: p95 320ms (target <= 500ms PASS)
 - Budget burned: 38%
+```
+
+## How to Operate an Error Budget
+
+An SLO matters only if it changes release behavior and incident response.
+
+```text
+30-day SLO target: 99.9%
+allowed downtime: 43.2m
+this month burned: 31.4m (72.7%)
+current burn rate: 2.1x
+decision: keep routine deploys, hold risky changes
+```
+
+```text
+Expected output:
+- The team shares one number for the target, one for remaining budget, and one for burn rate.
+- Burn-rate alerts catch both fast incidents and slow degradation.
+- Monthly reviews use budget consumption to decide whether feature velocity should slow down.
 ```
 
 ## What to Notice in This Code
@@ -177,5 +185,6 @@ SLOs are a *shared language*. Next: *cost and cardinality*.
 - [The SRE Workbook — Implementing SLOs](https://sre.google/workbook/implementing-slos/)
 - [Multi-window burn rate](https://sre.google/workbook/alerting-on-slos/)
 - [Sloth — SLO generator](https://sloth.dev/)
+- [Google Cloud — Service monitoring SLO overview](https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring)
 
 Tags: Observability, SLO, SLI, SRE, Reliability
