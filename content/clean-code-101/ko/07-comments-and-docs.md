@@ -18,12 +18,18 @@ tags:
   - Docstring
   - Readability
 seo_description: 코드가 스스로 설명하게 만드는 기법과 좋은 주석의 기준을 배웁니다. 코드로 표현하기 어려운 의도 주석과 docstring 활용법을 배웁니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 주석과 문서화
 
-주석은 친절해 보이지만, 잘못 쓰이면 가장 빨리 낡는 설명이 됩니다. 이 글은 Clean Code 101 시리즈의 7번째 글입니다. 여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
+주석은 친절해 보이지만, 잘못 쓰이면 가장 빨리 낡는 설명이 됩니다.
+
+이 글은 Clean Code 101 시리즈의 7번째 글입니다.
+
+여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Q["Need explanation?"] -->|"Code can do it"| C["Improve naming/structure"]
-    Q -->|"Why is missing"| W["Intent comment"]
-    Q -->|"Hazard"| A["Warning comment"]
-    Q -->|"Public API"| D["Docstring"]
-```
+![주석과 문서화](../../../assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
+
+*주석과 문서화의 흐름: 코드는 무엇을 설명하고, 주석과 문서는 왜와 계약을 설명합니다.*
 
 무언가를 설명해야 한다면, 먼저 코드를 고칠 수 있는지 보고 그다음에만 주석을 써야 합니다.
 
@@ -154,6 +156,23 @@ def retry_simple(): ...
 
 TODO는 언젠가 할 일이 아니라, 누가 언제까지 볼 것인지가 분명한 작업이어야 합니다. 익명 TODO는 거의 항상 영구 부채가 됩니다.
 
+## 검증 방법
+
+```bash
+ruff check app/
+python -m pytest -q tests/test_public_api_docs.py
+```
+
+**기대 결과**
+
+- 주석 없이도 이름과 구조가 핵심 흐름을 설명해야 합니다.
+- 공개 함수의 계약이 테스트와 문서 둘 다에서 맞아야 합니다.
+
+## 실패하기 쉬운 지점
+
+- 주석이 코드를 그대로 반복합니다.
+- TODO에 담당자나 추적 링크가 빠져 영구 부채가 됩니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 코드는 "무엇"을, 주석은 "왜"를 설명합니다.
@@ -217,5 +236,4 @@ TODO는 언젠가 할 일이 아니라, 누가 언제까지 볼 것인지가 분
 - [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide — Comments](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - [Write the Docs — Documentation Guide](https://www.writethedocs.org/guide/)
-
 Tags: Computer Science, CleanCode, Comments, Documentation, Docstring, Readability

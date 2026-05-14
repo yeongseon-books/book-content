@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 7
 title: Comments and Documentation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Docstring
   - Readability
 seo_description: Learn when not to comment, how to write intent comments and docstrings, and how to manage TODO discipline well.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Comments and Documentation
 
-> Clean Code 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does a good comment look like?
-
-> One that explains the "why" the code cannot. The "what" should be visible in the code itself.
+Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.
 
 This is post 7 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ Comments tend to lie. Code changes; comments rarely follow.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q["Need explanation?"] -->|"Code can do it"| C["Improve naming/structure"]
-    Q -->|"Why is missing"| W["Intent comment"]
-    Q -->|"Hazard"| A["Warning comment"]
-    Q -->|"Public API"| D["Docstring"]
-```
+![Comments and Documentation](../../../assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
+
+*Commenting flow: code should explain what, while comments and docs explain why, risk, and contract.*
 
 If something needs explaining, fix the code first.
 
@@ -162,6 +154,23 @@ def retry_simple(): ...
 
 Every TODO needs a person and a date.
 
+## How to Verify This in a Real Codebase
+
+```bash
+ruff check app/
+python -m pytest -q tests/test_public_api_docs.py
+```
+
+**Expected output**
+
+- Names and structure should carry the main explanation without comment noise.
+- Public API contracts should match both tests and docs.
+
+## Failure Modes to Watch
+
+- Comments merely restate the code.
+- TODOs have no owner or tracking link and turn into permanent debt.
+
 ## What to Notice in This Code
 
 - Code expresses "what"; comments express "why".
@@ -225,5 +234,4 @@ Good comments are few and accurate. Next we tackle what truly decides a codebase
 - [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide — Comments](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - [Write the Docs — Documentation Guide](https://www.writethedocs.org/guide/)
-
 Tags: Computer Science, CleanCode, Comments, Documentation, Docstring, Readability
