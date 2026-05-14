@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>Data Cleaning</h1>
+<p>Cleaning is where data projects quietly win or lose. Most teams do not fail because the final model was mathematically weak. They fail because dates were still strings, duplicates were silently kept, or a fill rule changed the distribution without anybody noticing.</p>
+<p>That is why cleaning should feel less like “tidying up” and more like quality control. You are not polishing data for presentation. You are deciding which evidence is safe enough to carry into EDA, metrics, and models.</p>
+<p>This is post 4 in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>Which quality problems should you inspect first in tabular data?</li>
+<li>Why do type fixes, missingness, duplicates, and outliers need different treatment?</li>
+<li>How do simple fill rules distort later analysis if you apply them blindly?</li>
+<li>What should a cleaning report capture before you move on?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (4/10)</p>
+<p>Cleaning is the stage where you decide which rows are trustworthy enough to become evidence.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: In what <em>order</em> should we find and fix <em>missing values, duplicates, outliers, and type mismatches</em>?</p>
-<blockquote>
-<p><em>80% of the time goes into cleaning — good cleaning makes the other 20% </em>real<em> analysis.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 4 in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>four big data-quality problems</em></li>
@@ -80,13 +81,8 @@
 <p><em>Cleaning is the </em>insurance policy<em> of analysis.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Raw[&quot;Raw Data&quot;] --&gt; Type[&quot;Fix Types&quot;]
-    Type --&gt; Dup[&quot;Drop Duplicates&quot;]
-    Dup --&gt; Null[&quot;Handle Missing&quot;]
-    Null --&gt; Out[&quot;Detect Outliers&quot;]
-    Out --&gt; Clean[&quot;Clean Data&quot;]
-</code></pre>
+<p><img alt="A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Missing</strong>: a value is <em>empty</em> (<code>NaN</code>, <code>None</code>, <code>''</code>).</li>
@@ -133,6 +129,7 @@ print(df[&quot;amount_flag&quot;].mean())
 }
 print(report)
 </code></pre>
+<p><strong>Expected output:</strong> a validation report with remaining row count, null counts by column, and the outlier rate after cleaning.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Fixing types</em> is the starting point of all cleaning.</li>
