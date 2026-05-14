@@ -17,7 +17,7 @@ tags:
   - Database
   - "NULL"
 seo_description: WHERE 조건식, AND/OR 우선순위, IN·BETWEEN·LIKE, NULL 비교의 핵심을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # WHERE와 조건
@@ -42,15 +42,9 @@ last_reviewed: '2026-05-12'
 
 정확도 관점에서도 마찬가지입니다. `NULL`을 잘못 비교하거나 `AND`와 `OR`의 괄호를 빠뜨리면, 쿼리는 빠르게 실행되더라도 잘못된 답을 줄 수 있습니다. 실무에서 더 무서운 것은 느린 쿼리보다 틀린 결과를 조용히 내는 쿼리입니다.
 
-## 한눈에 보는 흐름
+## WHERE 평가 흐름
 
-```mermaid
-flowchart LR
-    Rows["All rows"] --> Where["WHERE evaluation"]
-    Where -->|true| Pass["Next step"]
-    Where -->|false or NULL| Drop["Discarded"]
-```
-
+![WHERE 평가 흐름](../../../assets/sql-101/03/03-01-where-evaluation-flow.ko.png)
 모든 행이 일단 후보로 들어오고, `WHERE` 조건식을 평가한 뒤 참인 행만 다음 단계로 넘어갑니다. 거짓뿐 아니라 `NULL` 결과도 통과하지 못한다는 점이 중요합니다. 이 세 값 논리가 `= NULL` 실수를 낳는 원인입니다.
 
 ## 핵심 개념 정리
@@ -107,6 +101,13 @@ SELECT * FROM users WHERE email LIKE '%@example.com';
 SELECT * FROM users WHERE deleted_at IS NULL;
 ```
 
+**Expected output:**
+
+| id | name | deleted_at |
+| --- | --- | --- |
+| 1 | Ada | NULL |
+| 2 | Linus | NULL |
+
 `NULL`은 `IS NULL`, `IS NOT NULL`로 다뤄야 합니다. 입문 단계에서 가장 먼저 몸에 익혀야 할 규칙 중 하나입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -146,6 +147,8 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 다음 글에서는 여러 테이블을 연결하는 `JOIN`을 다루며, 결과가 왜 갑자기 불어나는지와 카디널리티를 어떻게 읽어야 하는지 정리하겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - **WHERE와 조건 (현재 글)**
@@ -156,6 +159,7 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -165,4 +169,4 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 - [Use The Index, Luke — Where Clause](https://use-the-index-luke.com/sql/where-clause)
 - [Mode — WHERE](https://mode.com/sql-tutorial/sql-where/)
 
-Tags: SQL, WHERE, Filter, Database, NULL
+Tags: SQL, Database, Postgres, Analytics
