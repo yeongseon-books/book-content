@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Distributions
 
-This is post 3 in the Statistics 101 series.
+Two datasets can share the same mean and still behave in completely different ways. One may stay tightly clustered around the center, while the other may have a long tail or a few values far away from the rest. Matching one summary number does not mean the data has the same character.
 
-> Statistics 101 series (3/10)
+In statistics, the distribution is the shape of the data. If you misread that shape, later decisions about averages, confidence intervals, tests, or SLAs start to drift.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.
 
-**Core question**: Why does the *shape* of data matter? Why do datasets with the *same mean* sometimes *behave so differently*?
+## Questions this post answers
 
-> *A distribution is the personality of the data.*
+- Why does the shape of a distribution matter?
+- How do normal, uniform, exponential, and power-law distributions differ?
+- What do skewness and kurtosis tell us numerically?
+- Which summary statistics matter first on long-tail data?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- Four *common distributions*
-- The *risk of assuming normality*
-- The meaning of *skewness* and *kurtosis*
-- A 5-step distribution diagnosis exercise
-- Five common mistakes
+> A distribution is the data's character sheet. Statistical tools only make sense when they match that character.
 
 ## Why It Matters
 
@@ -50,13 +45,9 @@ This is post 3 in the Statistics 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Hist["Histogram"]
-    Hist --> Shape["Shape: normal/skew/uniform"]
-    Shape --> Tool["Statistical Tool"]
-```
+![Concept at a Glance](../../../assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
 
+*Distribution diagnosis starts with shape, then moves to the summary statistics and tools that fit that shape.*
 ## Key Terms
 
 - **Normal**: a *symmetric bell* shape; common in nature and measurement noise.

@@ -54,37 +54,27 @@
 </head>
 <body>
 <h1>Distributions</h1>
-<p>This is post 3 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the <em>shape</em> of data matter? Why do datasets with the <em>same mean</em> sometimes <em>behave so differently</em>?</p>
-<blockquote>
-<p><em>A distribution is the personality of the data.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Two datasets can share the same mean and still behave in completely different ways. One may stay tightly clustered around the center, while the other may have a long tail or a few values far away from the rest. Matching one summary number does not mean the data has the same character.</p>
+<p>In statistics, the distribution is the shape of the data. If you misread that shape, later decisions about averages, confidence intervals, tests, or SLAs start to drift.</p>
+<p>This is post 3 in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>Four <em>common distributions</em></li>
-<li>The <em>risk of assuming normality</em></li>
-<li>The meaning of <em>skewness</em> and <em>kurtosis</em></li>
-<li>A 5-step distribution diagnosis exercise</li>
-<li>Five common mistakes</li>
+<li>Why does the shape of a distribution matter?</li>
+<li>How do normal, uniform, exponential, and power-law distributions differ?</li>
+<li>What do skewness and kurtosis tell us numerically?</li>
+<li>Which summary statistics matter first on long-tail data?</li>
 </ul>
+<blockquote>
+<p>A distribution is the data's character sheet. Statistical tools only make sense when they match that character.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Most</em> summary statistics and tests stand on <em>distribution assumptions</em>. If the <em>shape is assumed wrong</em>, the <em>conclusion as a whole</em> shakes.</p>
 <blockquote>
 <p><em>Pick the tool by the shape.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;Data&quot;] --&gt; Hist[&quot;Histogram&quot;]
-    Hist --&gt; Shape[&quot;Shape: normal/skew/uniform&quot;]
-    Shape --&gt; Tool[&quot;Statistical Tool&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Distribution diagnosis starts with shape, then moves to the summary statistics and tools that fit that shape.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Normal</strong>: a <em>symmetric bell</em> shape; common in nature and measurement noise.</li>
