@@ -58,13 +58,8 @@ last_reviewed: '2026-05-12'
 
 > 모든 데이터는 비트(0/1)로 표현됩니다. 인코딩 규칙이 비트열에 의미를 부여합니다.
 
-```text
-Bits: 01000001
-   │
-   ├── Read as integer  -> 65
-   ├── Read as ASCII    -> 'A'
-   └── Read as a color  -> very dark blue
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)
+*같은 비트열도 해석 규칙에 따라 숫자, 문자, 색상으로 달라집니다*
 
 ## 핵심 용어
 
@@ -97,6 +92,8 @@ result = Decimal("0.1") + Decimal("0.2")
 print(result)              # 0.3
 print(result == Decimal("0.3"))  # True
 ```
+
+**Expected output:** `float`에서는 `0.30000000000000004`가 보이지만 `Decimal`에서는 정확히 `0.3`이 출력되어 표현 방식의 차이가 드러나야 합니다.
 
 ## 단계별로 따라하기
 
@@ -278,7 +275,7 @@ for name, bits in data_sizes.items():
 ## 참고 자료
 
 - [Unicode 공식 문서](https://home.unicode.org/)
-- [IEEE 754 — 부동소수점 표준](https://en.wikipedia.org/wiki/IEEE_754)
+- [Python 문서 — Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html)
 - [What Every Programmer Should Know About Floating-Point](https://floating-point-gui.de/)
 - [Joel Spolsky — The Absolute Minimum About Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
 
