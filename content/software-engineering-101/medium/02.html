@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Understanding Requirements</h1>
-<p>This is post 2 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is hearing a requirement the same as understanding it?</p>
-<blockquote>
-<p>Solving the wrong problem precisely is the most expensive kind of waste.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Requirements often sound obvious at first. "Add search." "Improve response time." "Let users reset passwords." The danger is that everyone hears familiar words and imagines a different finish line. Product, design, engineering, and operations can all agree with the same sentence while still carrying different assumptions about scope, risk, and success.</p>
+<p>That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.</p>
+<p>This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What makes a requirement good</li>
@@ -80,12 +71,8 @@
 <p>The most expensive code is code you rewrite.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    U[&quot;User&quot;] --&gt; N[&quot;Need&quot;]
-    N --&gt; R[&quot;Requirement&quot;]
-    R --&gt; A[&quot;Acceptance Criteria&quot;]
-    A --&gt; T[&quot;Tests&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>How user needs become acceptance criteria and tests</em></p>
 <p>Requirements only become real when they map to tests.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -144,6 +131,26 @@ I can quickly recover account access.
 - Decision log (options and reason chosen)
 </code></pre>
 <p>A spoken agreement does not exist.</p>
+<h2>A practical ambiguity check</h2>
+<p>When a requirement arrives, resist the urge to design immediately. First convert the sentence into something a tester, reviewer, and operator can all inspect. That small pause is where most requirement quality is won.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Copy a real feature request into a scratch note.</li>
+<li>Rewrite it in terms of role, input, success condition, and failure behavior.</li>
+<li>Add at least two non-functional constraints such as latency, security, or observability.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>The original sentence becomes testable instead of merely familiar.</li>
+<li>Missing edge cases show up before they turn into implementation drift.</li>
+<li>The acceptance criteria start looking like the future PR checklist.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>The requirement still depends on words like "fast" or "properly" with no threshold.</li>
+<li>Unregistered users, failed requests, or measurement points are undefined.</li>
+<li>The agreement lives only in meeting memory instead of a ticket, RFC, or PRD.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>"Verifiable" is the start of a good requirement.</li>
