@@ -14,7 +14,7 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: The integrated chain is not a new abstraction; it is the same Runnables
   from earlier posts lined up in input-output order.
 ---
@@ -136,6 +136,41 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ---
 
+## Inspect retrieval before blaming the model
+
+The fastest way to debug an integrated RAG chain is to inspect the retrieved chunks before rewriting the prompt. If the wrong documents come back, the model never had a fair chance.
+
+```python
+queries = [
+    "Where was FAISS developed?",
+    "How does vector search differ from keyword search?",
+]
+
+for query in queries:
+    print(f"\nquery: {query}")
+    hits = vectorstore.similarity_search_with_score(query, k=2)
+    for idx, (doc, score) in enumerate(hits, start=1):
+        preview = doc.page_content.replace("\n", " ")[:90]
+        print(f"  [{idx}] score={score:.4f} text={preview}...")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: Where was FAISS developed?
+      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
+      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
+
+    query: How does vector search differ from keyword search?
+      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
+      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
+
+<!-- injected-output:end -->
+
+That one inspection step lets you separate three failure modes quickly: wrong top-k documents means a retrieval problem, correct documents with a bad answer means a prompt or model problem, and too many noisy documents means `k` or chunking needs work.
+
+---
+
 ## Assembling the RAG chain
 
 ![Retriever prompt llm parser assembly](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png)
@@ -180,6 +215,44 @@ rag_chain = (
 
 ---
 
+## Guard against empty or noisy context
+
+In a real application, "no useful documents found" should not look the same as "here are ten barely related chunks." Add one guardrail before the prompt so the chain can fail cleanly when retrieval quality drops.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def format_docs_guarded(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
+
+    selected = docs[:2]
+    return "\n\n".join(doc.page_content for doc in selected)
+
+guarded_chain = (
+    {
+        "context": retriever | RunnableLambda(format_docs_guarded),
+        "question": RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
+
+<!-- injected-output:end -->
+
+This guard looks small, but it removes one of the most common failure patterns in demo RAG apps: forcing the model to guess when the index does not actually contain the answer.
+
+---
+
 ## Running with streaming
 
 ![Integrated RAG streaming execution path](../../../assets/langchain-101/06/06-03-running-with-streaming.en.png)
@@ -200,6 +273,8 @@ for question in questions:
         print(chunk, end="", flush=True)
     print()
 ```
+
+That is useful beyond UX. Running the same question once with `invoke()` and once with `stream()` proves that retrieval, prompting, and generation stayed the same while only the delivery path changed.
 
 ---
 
@@ -370,7 +445,9 @@ if __name__ == "__main__":
 ## What to notice in this code
 
 - Separating the indexing pipeline from the query pipeline makes document preparation costs and request-time costs easier to reason about.
+- A quick `similarity_search_with_score()` check tells you whether to debug retrieval, prompting, or generation first.
 - Even the integrated chain is still built from small LCEL pieces such as `retriever | format_docs` and `prompt | llm | parser`.
+- A small context guard is often enough to turn "hallucinate anyway" into a clean, verifiable refusal.
 - `MessagesPlaceholder` is the insertion point that lets multi-turn history enter the prompt without collapsing the structure.
 - The full application is long, but the maintainable pattern is still to split small Runnable assemblies into focused helper functions.
 
@@ -411,5 +488,11 @@ The next series, ai-app-patterns-101, applies these components to real applicati
 - [LangChain RAG tutorial](https://python.langchain.com/docs/use_cases/question_answering/)
 - [LCEL reference](https://python.langchain.com/docs/expression_language/)
 - [MessagesPlaceholder](https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder)
+- [FAISS VectorStore integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [RecursiveCharacterTextSplitter](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+
+### Related Series
+
+- [LangGraph 101](../../langgraph-101/en/01-graph-basics.md) — this is the natural next step once a single RAG chain grows into branching workflows, approvals, or long-lived state.
 
 Tags: LangChain, LCEL, Python, LLM
