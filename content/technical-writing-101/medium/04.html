@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Explaining Concepts</h1>
-<p>This is post 4 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you make a <em>first-time reader</em> grasp a <em>concept</em> right away?</p>
-<blockquote>
-<p><em>Analogies</em> and <em>counterexamples</em> must travel <em>together</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The most common failure in concept writing is accuracy without traction. The definition may be technically correct, yet the reader still cannot predict where the concept applies, where it breaks, or how it should affect code and design decisions.</p>
+<p>Useful concept writing needs more than a polished sentence. It needs a boundary. That usually means pairing a definition with an analogy, a counterexample, and a worked example so the reader can test the idea instead of just memorizing it.</p>
+<p>This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>A <em>one line</em> definition</li>
 <li>Using an <em>analogy</em></li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>If the <em>concept</em> stays blurry, everything after it is a <em>sandcastle</em>.</p>
+<blockquote>
+<p>Mental model: define the concept, mark the boundary, then prove it with an example.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    D[Definition] --&gt; A[Analogy]
-    A --&gt; C[Counterexample]
-    C --&gt; E[Example]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>definition</strong>: A <em>one line definition</em>.</li>
@@ -93,6 +84,15 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "<em>Async</em> means <em>running at the same time</em>." (Wrong.)</p>
 <p><strong>After</strong>: "<em>Async</em> means <em>doing other work while you wait</em>."</p>
+<h2>The fastest way to test whether a definition works</h2>
+<p>This explanation is technically correct but still weak.</p>
+<pre><code class="language-text">A cache stores frequently used data.
+</code></pre>
+<p>It does not tell the reader what belongs in the cache, what should stay out, or where the boundary breaks. Adding a boundary and counterexample turns the concept into a decision tool.</p>
+<pre><code class="language-text">A cache stores answers that are expensive to fetch or compute again.
+A large file read once during a migration is usually a poor cache candidate.
+</code></pre>
+<p>A strong concept explanation helps the reader classify the next example without asking you again. That is why edge cases and counterexamples often teach more than an expanded definition alone.</p>
 <h2>Hands-on: One Concept Explained</h2>
 <p><strong>Step 1 — Definition</strong></p>
 <pre><code class="language-python">definition = &quot;A cache stores frequent answers ahead of time&quot;
