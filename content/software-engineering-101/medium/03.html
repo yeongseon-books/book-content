@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Design vs Implementation</h1>
-<p>This is post 3 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is "well-written code" the same as "well-designed system"?</p>
-<blockquote>
-<p>Design is "what"; implementation is "how". Mixing the two blurs both.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Sometimes you review a change and think, "The code is clean, but the structure still feels fragile." Other times the code itself is ordinary, yet the boundaries are so clear that the system looks like it will survive years of change. That difference usually comes from design quality more than implementation polish.</p>
+<p>Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.</p>
+<p>This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Definitions of design and implementation</li>
@@ -80,12 +71,8 @@
 <p>Code can be rewritten; the trace of decisions follows you forever.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;Requirement&quot;] --&gt; D[&quot;Design: what&quot;]
-    D --&gt; I[&quot;Implementation: how&quot;]
-    I --&gt; O[&quot;Observe&quot;]
-    O --&gt; D
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>How design decisions flow into implementation and back through observation</em></p>
 <p>Design sets the ceiling for implementation.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -146,6 +133,26 @@ class EmailNotifier:
         # ...
 </code></pre>
 <p>Design must intend for observability.</p>
+<h2>A small design stress test</h2>
+<p>Good design shows up when you try to change the system, not when you stare at the current diagram. Use a small change request to see whether your interfaces and ADRs actually reduce blast radius.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Assume you need to add one more notifier channel to the example.</li>
+<li>Count how many files and tests would need to change.</li>
+<li>Explain the reason for the abstraction in one short ADR paragraph.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>New behavior can be added without rewriting every caller.</li>
+<li>The ADR makes the trade-off legible to someone who did not make the original choice.</li>
+<li>Observability needs remain visible instead of getting glued on at the end.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>One new implementation forces broad edits across unrelated callers.</li>
+<li>The abstraction exists, but no one can still explain why it exists.</li>
+<li>Future-proofing added factories and registries long before any real pressure appeared.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The interface defines responsibility.</li>

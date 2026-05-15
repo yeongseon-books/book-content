@@ -18,22 +18,16 @@ tags:
   - Collaboration
   - Quality
 seo_description: The real purpose of code review, how to write a reviewable PR, what reviewers actually look at, and the most common mistakes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Code Review
 
-This is post 4 in the Software Engineering 101 series.
+Code review is one of the most common collaboration rituals in software teams, and one of the easiest to hollow out. The author wants to merge, the reviewer is busy, CI is already green, and the diff is hundreds of lines long. In that situation, review can quietly degrade into a formality that catches neither defects nor knowledge gaps.
 
-> Software Engineering 101 series (4/10)
+A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is code review about catching defects, or about sharing knowledge?
-
-> Both. But run it badly and you do neither.
-
-<!-- a-grade-intro:end -->
+This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
 
 ## What You Will Learn
 
@@ -51,13 +45,8 @@ Code review shapes both code quality and the distribution of knowledge in a team
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Author: PR"] --> B["Automated checks"]
-    B --> C["Reviewer comments"]
-    C --> D["Revise or discuss"]
-    D --> E["Approve and merge"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
+*How automation and human review combine inside a pull request workflow*
 
 Automation first, humans focus on judgment.
 
@@ -153,6 +142,28 @@ The smallest mergeable unit is the right unit.
 ```
 
 Tags accelerate decision making.
+
+## A two-minute reviewability check
+
+The fastest way to improve code review is not to ask reviewers for more time. It is to make the first two minutes enough for them to understand the intent, the risk, and the verification path.
+
+### Verification steps
+
+1. Read the PR title alone and try to describe the change in one sentence.
+2. Check whether the body covers What, Why, How, and Test without opening the diff.
+3. Count how many review comments could have been replaced by automation.
+
+**Expected output:**
+
+- A good PR exposes the review order before the reviewer scrolls through the code.
+- Missing automation shows up as human comments about formatting and static checks.
+- Oversized PRs reveal how quickly structure and risk questions get replaced by surface-level comments.
+
+### Failure modes to watch
+
+- The title says "misc fixes" or bundles unrelated concerns.
+- The test path is unclear, so the reviewer must guess how to validate behavior.
+- The comment tone evaluates the author instead of the code.
 
 ## What to Notice in This Code
 

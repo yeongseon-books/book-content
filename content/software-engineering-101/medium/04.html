@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Code Review</h1>
-<p>This is post 4 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is code review about catching defects, or about sharing knowledge?</p>
-<blockquote>
-<p>Both. But run it badly and you do neither.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Code review is one of the most common collaboration rituals in software teams, and one of the easiest to hollow out. The author wants to merge, the reviewer is busy, CI is already green, and the diff is hundreds of lines long. In that situation, review can quietly degrade into a formality that catches neither defects nor knowledge gaps.</p>
+<p>A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.</p>
+<p>This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The real purpose of code review</li>
@@ -80,12 +71,8 @@
 <p>A review is a consensus, not a verdict.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Author: PR&quot;] --&gt; B[&quot;Automated checks&quot;]
-    B --&gt; C[&quot;Reviewer comments&quot;]
-    C --&gt; D[&quot;Revise or discuss&quot;]
-    D --&gt; E[&quot;Approve and merge&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>How automation and human review combine inside a pull request workflow</em></p>
 <p>Automation first, humans focus on judgment.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -151,6 +138,26 @@ jobs:
 [blocking] A secret key ends up in the log. Must fix before merge.
 </code></pre>
 <p>Tags accelerate decision making.</p>
+<h2>A two-minute reviewability check</h2>
+<p>The fastest way to improve code review is not to ask reviewers for more time. It is to make the first two minutes enough for them to understand the intent, the risk, and the verification path.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Read the PR title alone and try to describe the change in one sentence.</li>
+<li>Check whether the body covers What, Why, How, and Test without opening the diff.</li>
+<li>Count how many review comments could have been replaced by automation.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>A good PR exposes the review order before the reviewer scrolls through the code.</li>
+<li>Missing automation shows up as human comments about formatting and static checks.</li>
+<li>Oversized PRs reveal how quickly structure and risk questions get replaced by surface-level comments.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>The title says "misc fixes" or bundles unrelated concerns.</li>
+<li>The test path is unclear, so the reviewer must guess how to validate behavior.</li>
+<li>The comment tone evaluates the author instead of the code.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Automation clears the human's field of view.</li>

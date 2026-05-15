@@ -18,22 +18,16 @@ tags:
   - Refactoring
   - Legacy
 seo_description: The four types of tech debt, how to prioritize repayment, safe refactoring, and a phased deprecation procedure you can copy.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Maintenance and Tech Debt
 
-This is post 9 in the Software Engineering 101 series.
+Every codebase gets awkward over time. A quick branch added under pressure, a duplicated workflow, an interface nobody wants to touch, a module that resists testing. Teams often respond with a vague promise to "clean it up later." Usually that later never arrives until a deadline slips or an incident forces the issue.
 
-> Software Engineering 101 series (9/10)
+Tech debt is not automatically a failure. Sometimes it is a conscious trade: speed now, cleanup later. The dangerous version is debt without explicit ownership, measurement, or repayment intent. That kind of debt quietly taxes reliability, lead time, and team confidence all at once.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is tech debt always bad?
-
-> No. Deliberate debt is a tool. Inadvertent debt is an incident waiting to happen.
-
-<!-- a-grade-intro:end -->
+This is post 9 in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.
 
 ## What You Will Learn
 
@@ -51,14 +45,8 @@ There is no codebase without debt. The question is whether you are aware of it, 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["Requirement change"] --> D["Debt accrual"]
-    D --> M["Measure"]
-    M --> P["Prioritize"]
-    P --> F["Pay down"]
-    F --> R
-```
+![Concept at a Glance](../../../assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
+*The cycle for measuring, prioritizing, and paying down tech debt*
 
 Debt is a cycle, not an event.
 
@@ -146,6 +134,28 @@ Warn -> trace callers -> remove (one phase per quarter).
 ```
 
 What you do not measure, you do not pay.
+
+## A debt-management check
+
+Debt becomes manageable when it is specific enough to own, time-box, and replace safely. Pick one risky module and describe its debt in a way that could survive beyond the current conversation.
+
+### Verification steps
+
+1. Choose one module tied to a recent incident or slow change.
+2. Add the debt item to an index with owner, severity, and due window.
+3. Write the first incremental replacement step using a feature-flag or strangler pattern.
+
+**Expected output:**
+
+- The debt item becomes a prioritizable object instead of background frustration.
+- The safe first step is smaller than the emotional desire for a total rewrite.
+- Deprecation starts looking like a staged operational process, not a one-shot deletion.
+
+### Failure modes to watch
+
+- The only record is a vague TODO with no owner or due date.
+- The team cannot connect debt to incidents, lead time, or recovery cost.
+- "We will clean it all up later" is the only plan on the table.
 
 ## What to Notice in This Code
 

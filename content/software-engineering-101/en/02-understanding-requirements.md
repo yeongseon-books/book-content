@@ -18,22 +18,16 @@ tags:
   - UserStory
   - Process
 seo_description: A short, code-first guide to requirements — what makes one good, user stories, and the INVEST principle that keeps stories shippable.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Understanding Requirements
 
-This is post 2 in the Software Engineering 101 series.
+Requirements often sound obvious at first. "Add search." "Improve response time." "Let users reset passwords." The danger is that everyone hears familiar words and imagines a different finish line. Product, design, engineering, and operations can all agree with the same sentence while still carrying different assumptions about scope, risk, and success.
 
-> Software Engineering 101 series (2/10)
+That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is hearing a requirement the same as understanding it?
-
-> Solving the wrong problem precisely is the most expensive kind of waste.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
 
 ## What You Will Learn
 
@@ -51,13 +45,8 @@ Over half of code defects originate at the requirements stage. The later you fin
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    U["User"] --> N["Need"]
-    N --> R["Requirement"]
-    R --> A["Acceptance Criteria"]
-    A --> T["Tests"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
+*How user needs become acceptance criteria and tests*
 
 Requirements only become real when they map to tests.
 
@@ -146,6 +135,28 @@ Append 5W1H to expose vagueness.
 ```
 
 A spoken agreement does not exist.
+
+## A practical ambiguity check
+
+When a requirement arrives, resist the urge to design immediately. First convert the sentence into something a tester, reviewer, and operator can all inspect. That small pause is where most requirement quality is won.
+
+### Verification steps
+
+1. Copy a real feature request into a scratch note.
+2. Rewrite it in terms of role, input, success condition, and failure behavior.
+3. Add at least two non-functional constraints such as latency, security, or observability.
+
+**Expected output:**
+
+- The original sentence becomes testable instead of merely familiar.
+- Missing edge cases show up before they turn into implementation drift.
+- The acceptance criteria start looking like the future PR checklist.
+
+### Failure modes to watch
+
+- The requirement still depends on words like "fast" or "properly" with no threshold.
+- Unregistered users, failed requests, or measurement points are undefined.
+- The agreement lives only in meeting memory instead of a ticket, RFC, or PRD.
 
 ## What to Notice in This Code
 

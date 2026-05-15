@@ -18,22 +18,16 @@ tags:
   - Quality
   - Career
 seo_description: A short, code-first take on the difference between coding and software engineering, and the five areas an engineer owns.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Software Engineering?
 
-This is the first post in the Software Engineering 101 series.
+When you first learn programming, it is natural to think the job ends when the code runs. A small script reads an input, prints an output, and the goal feels complete. That instinct is fine for learning. It breaks down the moment the code must survive handoffs, incidents, changing requirements, and years of maintenance.
 
-> Software Engineering 101 series (1/10)
+In real teams, the important question is no longer "Can we write code?" but "Can we keep this system operable as time, traffic, and people change?" The same function now has to live inside requirements, tests, deployment, observability, documentation, and shared ownership. That is the boundary where coding turns into engineering.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If you can write code, are you a software engineer?
-
-> Code is only part of the deliverable. Engineering is code plus time plus people.
-
-<!-- a-grade-intro:end -->
+This is the first post in the Software Engineering 101 series. In this chapter, we use that boundary as the starting mental model: software engineering is not just producing code, but building a system that stays understandable and changeable over time.
 
 ## What You Will Learn
 
@@ -51,15 +45,8 @@ Most learning stops at "how to write code". Real work is code + collaboration + 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["Requirements"] --> D["Design"]
-    D --> I["Implementation"]
-    I --> T["Test"]
-    T --> O["Operate"]
-    O --> M["Maintain"]
-    M --> R
-```
+![Concept at a Glance](../../../assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
+*The engineering loop from requirements to operations and maintenance*
 
 Engineering is a loop that does not break.
 
@@ -155,6 +142,28 @@ Without tests, you cannot change the code.
 ```
 
 Minimum guidance for the next engineer.
+
+## A quick verification pass
+
+Pick one small utility or script in your current repository and score it against the five steps in this chapter. Even a tiny piece of code usually reveals which engineering layers are missing once you force yourself to check requirements, tests, observability, and documentation separately.
+
+### Verification steps
+
+1. Choose one function you changed in the last two weeks.
+2. Check whether it has an explicit requirement, tests, logs, and a handoff note or README entry.
+3. Write down the first missing layer you would add on the next change.
+
+**Expected output:**
+
+- You can place the code on one of the five steps without hand-waving.
+- The missing engineering layers become obvious faster than the code defects do.
+- You get a concrete next action instead of the vague feeling that "the code needs cleanup."
+
+### Failure modes to watch
+
+- Different teammates give different answers for the same completion criteria.
+- The code works, but failure behavior is invisible because there is no logging or runbook note.
+- A new engineer would not know where to start because no surrounding context is written down.
 
 ## What to Notice in This Code
 

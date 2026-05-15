@@ -18,22 +18,16 @@ tags:
   - CI
   - Quality
 seo_description: The roles of unit, integration, and E2E tests, the test pyramid, the coverage trap, and how to keep CI fast.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Testing Strategy
 
-This is post 5 in the Software Engineering 101 series.
+Most teams agree that tests matter. Disagreement starts immediately after that. Should you invest harder in unit tests, rely on integration tests, or trust end-to-end coverage because it looks closest to production? Without a strategy, test suites grow in the most expensive direction: slower feedback, shakier trust, and harder debugging.
 
-> Software Engineering 101 series (5/10)
+The real problem is not test quantity. It is test placement. A healthy test system tells you where to look when something breaks, keeps PR feedback short enough to preserve flow, and treats flaky tests as defects in the delivery system rather than background noise.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Does more tests mean better software?
-
-> No. The right tests at the right layer make better software.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
 
 ## What You Will Learn
 
@@ -51,11 +45,8 @@ Tests determine the cost of change. Good tests let you refactor without fear; ba
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    U["Unit (many, fast)"] --> I["Integration (some)"]
-    I --> E["E2E (few, slow)"]
-```
+![Concept at a Glance](../../../assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
+*The test pyramid as a balance between speed, cost, and confidence*
 
 The pyramid balances cost against speed.
 
@@ -155,6 +146,28 @@ def test_uses_external_clock(): ...
 ```
 
 Quarantine, then fix next sprint. Do not mute.
+
+## A confidence-oriented test check
+
+Test strategy is easier to judge from feedback speed and diagnosability than from raw counts. Take one recent CI failure and see how quickly the suite told you where to look.
+
+### Verification steps
+
+1. Pick one recent failing build and note whether it failed in unit, integration, or E2E.
+2. Measure how long it took to identify the real cause.
+3. Ask whether the same behavior could have been asserted at a lower layer.
+
+**Expected output:**
+
+- A healthy pyramid narrows the search space immediately.
+- Too much E2E weight translates into long debugging loops.
+- Flaky tests stand out as delivery-system defects, not mere annoyances.
+
+### Failure modes to watch
+
+- Coverage is high, but no one can explain where to start debugging.
+- PR feedback time is long enough to change merge behavior.
+- Red builds are ignored because the team expects to hit rerun anyway.
 
 ## What to Notice in This Code
 

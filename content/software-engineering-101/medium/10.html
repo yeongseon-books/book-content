@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Makes Good Software</h1>
-<p>This is the final post in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Are "good code" and "good software" the same thing?</p>
-<blockquote>
-<p>Code is a means. Software is a system people live with for years.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A working feature and good software are not the same thing. Shipping the feature is only the opening move. The harder question is whether the system still behaves well when requirements change, teammates rotate, traffic grows, and incidents force trade-offs under pressure.</p>
+<p>Teams often judge quality first by style or abstraction. Those signals matter, but the stronger truth usually appears outside the code: lead time, recovery speed, onboarding friction, user trust, and the ease of safe change. Quality lives at the intersection of internal structure and external behavior.</p>
+<p>This is the final post in the Software Engineering 101 series. In this chapter, we tie the series together by looking at quality attributes, practical readings of SOLID, and the operational signals senior engineers use when they say a system is healthy.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Quality attributes (a short take on ISO/IEC 25010)</li>
@@ -80,13 +71,8 @@
 <p>What is simple lasts.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[&quot;Functional&quot;] --&gt; R[&quot;Reliable&quot;]
-    R --&gt; M[&quot;Maintainable&quot;]
-    M --&gt; P[&quot;Performant&quot;]
-    P --&gt; S[&quot;Secure&quot;]
-    S --&gt; U[&quot;Usable&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>How quality attributes balance each other to define software health</em></p>
 <p>Quality is not one axis but a balance across many.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -138,6 +124,26 @@ git log --pretty='%H %as' -- app/ | head
 - User satisfaction (NPS, CSAT)
 </code></pre>
 <p>External signals tell more truth than internal code metrics.</p>
+<h2>A quality-signal check</h2>
+<p>The fastest way to make quality actionable is to convert it from taste into signals. Pick one weak quality attribute in your current system and pair it with one internal metric and one external outcome.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Choose the weakest current axis such as reliability or maintainability.</li>
+<li>Name one internal signal and one external signal that expose that weakness.</li>
+<li>Define a baseline and one quarter-scale improvement target.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>Quality discussions shift from preference to evidence.</li>
+<li>Complexity, lead time, MTTR, and onboarding speed start to connect to each other.</li>
+<li>SOLID principles become tools for reducing change cost instead of slogans.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>The team measures feature output only.</li>
+<li>Internal code style stands in for user and operational reality.</li>
+<li>Metrics exist, but no review cadence turns them into decisions.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>One class, one reason to change.</li>

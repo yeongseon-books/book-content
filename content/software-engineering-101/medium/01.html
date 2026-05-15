@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What Is Software Engineering?</h1>
-<p>This is the first post in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If you can write code, are you a software engineer?</p>
-<blockquote>
-<p>Code is only part of the deliverable. Engineering is code plus time plus people.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When you first learn programming, it is natural to think the job ends when the code runs. A small script reads an input, prints an output, and the goal feels complete. That instinct is fine for learning. It breaks down the moment the code must survive handoffs, incidents, changing requirements, and years of maintenance.</p>
+<p>In real teams, the important question is no longer "Can we write code?" but "Can we keep this system operable as time, traffic, and people change?" The same function now has to live inside requirements, tests, deployment, observability, documentation, and shared ownership. That is the boundary where coding turns into engineering.</p>
+<p>This is the first post in the Software Engineering 101 series. In this chapter, we use that boundary as the starting mental model: software engineering is not just producing code, but building a system that stays understandable and changeable over time.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between coding and software engineering</li>
@@ -80,14 +71,8 @@
 <p>Code that runs once and a system that survives five years are different things.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;Requirements&quot;] --&gt; D[&quot;Design&quot;]
-    D --&gt; I[&quot;Implementation&quot;]
-    I --&gt; T[&quot;Test&quot;]
-    T --&gt; O[&quot;Operate&quot;]
-    O --&gt; M[&quot;Maintain&quot;]
-    M --&gt; R
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>The engineering loop from requirements to operations and maintenance</em></p>
 <p>Engineering is a loop that does not break.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -153,6 +138,26 @@ def test_sum_to_negative():
 - history: 2026-05 v1
 </code></pre>
 <p>Minimum guidance for the next engineer.</p>
+<h2>A quick verification pass</h2>
+<p>Pick one small utility or script in your current repository and score it against the five steps in this chapter. Even a tiny piece of code usually reveals which engineering layers are missing once you force yourself to check requirements, tests, observability, and documentation separately.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Choose one function you changed in the last two weeks.</li>
+<li>Check whether it has an explicit requirement, tests, logs, and a handoff note or README entry.</li>
+<li>Write down the first missing layer you would add on the next change.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>You can place the code on one of the five steps without hand-waving.</li>
+<li>The missing engineering layers become obvious faster than the code defects do.</li>
+<li>You get a concrete next action instead of the vague feeling that "the code needs cleanup."</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>Different teammates give different answers for the same completion criteria.</li>
+<li>The code works, but failure behavior is invisible because there is no logging or runbook note.</li>
+<li>A new engineer would not know where to start because no surrounding context is written down.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The same function takes on more responsibility per step.</li>

@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Version Control and Release</h1>
-<p>This is post 6 in the Software Engineering 101 series.</p>
-<blockquote>
-<p>Software Engineering 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you ship version 1.4.2, what exactly are you promising the user?</p>
-<blockquote>
-<p>Semantic versioning is the notation for that promise. Break it and trust collapses.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>You can write solid code and pass every test, then still lose user trust at release time. Users only see the deployed version. They do not care how careful the earlier work was if the release is confusing, hard to roll back, or impossible to explain. That makes version control and release management less of a final ceremony and more of a trust interface.</p>
+<p>Teams get into trouble when they think of release as a single event: bump a version, write notes, deploy, done. Resilient teams treat release as a recoverable process. They ship smaller changes more often, verify on narrow traffic first, and assume rollback must work under pressure, not only in theory.</p>
+<p>This is post 6 in the Software Engineering 101 series. In this chapter, we connect commit conventions, semantic versioning, changelogs, canary rollout, and rollback drills into one release flow you can reason about end to end.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Branching strategies (Trunk-Based vs Git Flow)</li>
@@ -80,12 +71,8 @@
 <p>Safe releases build trust faster than fast releases.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[&quot;feature branch&quot;] --&gt; M[&quot;main&quot;]
-    M --&gt; S[&quot;staging&quot;]
-    S --&gt; C[&quot;canary&quot;]
-    C --&gt; P[&quot;production&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>The release path from feature branch to canary and production</em></p>
 <p>Each stage shrinks the cost of recovery.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -138,6 +125,26 @@ strategy:
 kubectl rollout undo deployment/api
 </code></pre>
 <p>Rollback should complete inside one minute.</p>
+<h2>A release-readiness check</h2>
+<p>Release quality becomes visible when you trace one deploy from commit intent to rollback path. Pick a recent release and check whether every step in the flow leaves evidence behind.</p>
+<p><strong>Verification steps</strong></p>
+<ol>
+<li>Open one recent release note and the commits behind it.</li>
+<li>Check whether the SemVer bump matches the real compatibility impact.</li>
+<li>Verify that canary expansion rules and rollback commands are both written down.</li>
+</ol>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>Commit conventions map cleanly into changelog and version automation.</li>
+<li>User-facing release notes explain impact instead of internal implementation details.</li>
+<li>Teams that rehearse rollback can afford to ship more often.</li>
+</ul>
+<p><strong>Failure modes to watch</strong></p>
+<ul>
+<li>Version numbers are chosen by feel instead of change type.</li>
+<li>New code reaches 100% of traffic without a narrow validation stage.</li>
+<li>Rollback commands exist on paper, but no one knows when they were last exercised.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Commit conventions feed automation.</li>
