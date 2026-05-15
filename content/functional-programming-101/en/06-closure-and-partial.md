@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Closures and Partial Application
 
+Closures start to feel practical the moment you need a callback, decorator, or handler to carry a little bit of context. The function itself may be small, but once it has to remember which tenant it belongs to, how many retries are left, or which logger prefix to use, a plain parameter list stops being the whole story.
+
+`functools.partial` solves a nearby problem from a different angle. Instead of remembering mutable context, it pre-fills stable arguments of an existing function. That distinction matters in production code because it tells you whether you are carrying state or simply specializing configuration.
+
 This is post 6 in the Functional Programming 101 series.
-
-> Functional Programming 101 Series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key Question**: If a function remembers variables from the scope where it was defined, what patterns become possible?
-
-> A closure is an inner function that remembers variables from its enclosing scope. `functools.partial` fixes some arguments of an existing function to create a new one. This article covers how closures work and practical patterns with partial application.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -61,8 +55,14 @@ outer_func(x)
   +-- inner_func(y)
        |
        +-- x + y  <- remembers outer x
-           (closure)
+            (closure)
 ```
+
+## Closure vs partial decision flow
+
+![Closure vs partial decision flow](../../../assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
+
+*Use closures when the function must remember context. Use `partial` when an existing function only needs a few fixed arguments.*
 
 ## Key Concepts
 
@@ -258,6 +258,53 @@ bus.emit("user.created", name="Alice", email="alice@example.com")
 # [UserService] {'name': 'Alice', 'email': 'alice@example.com'}
 # [INFO] {'name': 'Alice', 'email': 'alice@example.com'}
 ```
+
+### Step 6: Production-shaped example — tenant-aware webhook handlers
+
+```python
+from dataclasses import dataclass
+from functools import partial
+
+
+@dataclass(frozen=True)
+class TenantPolicy:
+    tenant: str
+    retry_limit: int
+    audit_channel: str
+
+
+def make_retry_decider(policy: TenantPolicy):
+    attempts = 0
+
+    def should_retry(status: str) -> bool:
+        nonlocal attempts
+        attempts += 1
+        return status == "temporary-failure" and attempts < policy.retry_limit
+
+    return should_retry
+
+
+def publish_audit(channel: str, event_name: str, payload: dict) -> None:
+    print(f"[{channel}] {event_name}: {payload}")
+
+
+policy = TenantPolicy(
+    tenant="store-kr",
+    retry_limit=3,
+    audit_channel="orders.webhook",
+)
+
+should_retry = make_retry_decider(policy)
+record_audit = partial(publish_audit, policy.audit_channel)
+
+event = {"order_id": "A-1024", "status": "temporary-failure"}
+record_audit("webhook.received", {"tenant": policy.tenant, **event})
+
+if should_retry(event["status"]):
+    record_audit("webhook.retry_scheduled", {"order_id": event["order_id"], "attempt": 1})
+```
+
+This is closer to the kind of code you meet in production. The closure keeps retry state for one tenant policy, while `partial` binds a shared audit channel once so every handler does not have to pass it around again.
 
 ## What to Notice in This Code
 
