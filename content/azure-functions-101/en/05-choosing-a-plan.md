@@ -254,3 +254,4 @@ az functionapp plan create \
 - [Migrate from Consumption to Flex Consumption](https://learn.microsoft.com/en-us/azure/azure-functions/migration/migrate-plan-consumption-to-flex)
 
 Tags: Azure, Azure Functions, Serverless, Cloud
+
