@@ -80,7 +80,7 @@ Full fine-tuning sets ① to "everything," which inflates ② and ③. LoRA narr
 
 **After** — After post 1 you can put the following on the table:
 
-```
+```text
 Model size                       124M params (GPT-2 small class)
 Full fine-tuning trainable        ≈ 124M (100%)
 LoRA(r=8) trainable               ≈ 1.8M (≈ 1.5%)

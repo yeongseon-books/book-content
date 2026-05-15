@@ -145,7 +145,7 @@ pytest tests/
 ## License
 
 MIT
-```
+```text
 
 ### Step 2. Add docstrings
 

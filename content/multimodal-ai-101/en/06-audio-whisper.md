@@ -39,7 +39,7 @@ This episode covers what you actually need to run Whisper in production STT.
 
 ## Whisper architecture at a glance
 
-```
+```text
 [audio waveform] -> log-Mel spectrogram (80 channels)
                           |
                           v

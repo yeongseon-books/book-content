@@ -79,7 +79,7 @@ Compare two ways a small team might share code.
 
 **Before (without Git)**
 
-```
+```text
 project_v1.zip
 project_v2_FINAL.zip
 project_v2_FINAL_real.zip

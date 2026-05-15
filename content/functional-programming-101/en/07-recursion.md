@@ -53,7 +53,7 @@ Python does not support tail call optimization, so in practice you must be aware
 
 > Flow of a Recursive Call
 
-```
+```text
 factorial(4)
   -> 4 * factorial(3)
        -> 3 * factorial(2)

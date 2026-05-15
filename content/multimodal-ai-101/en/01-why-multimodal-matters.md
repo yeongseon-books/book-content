@@ -59,7 +59,7 @@ Multimodal model design ultimately reduces to one question: how do you put diffe
 
 The diagram below shows the typical hybrid flow.
 
-```
+```text
 [Image] -> Vision Encoder (ViT) -> visual tokens
                                         |
                                         v

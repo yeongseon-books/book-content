@@ -54,7 +54,7 @@ Code with high testability is flexible to change, easy to reuse, and fast to deb
 
 > testable code = clear inputs + predictable outputs
 
-```
+```text
 [Hard to Test]                   [Easy to Test]
   DB call inside the function     DB passed as parameter
   Depends on global variables     Values passed as arguments

@@ -45,7 +45,7 @@ last_reviewed: '2026-05-12'
 
 > Stack = LIFO, Queue = FIFO
 
-```
+```text
 [Stack — LIFO]            [Queue — FIFO]
   push -> | C |           enqueue -> | A | B | C | -> dequeue
           | B |                     ^               ^

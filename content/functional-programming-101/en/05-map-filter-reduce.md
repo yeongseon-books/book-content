@@ -53,7 +53,7 @@ In Python, list comprehensions often replace map/filter, but understanding the p
 
 > The Role of Each Operation
 
-```
+```text
 Input list    [1, 2, 3, 4, 5]
               |
 map(f)        [f(1), f(2), f(3), f(4), f(5)]    -> transform

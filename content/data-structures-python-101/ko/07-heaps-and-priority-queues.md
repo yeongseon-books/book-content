@@ -45,7 +45,7 @@ title: 힙과 우선순위 큐
 
 > 힙 = 부모가 자식보다 항상 작도록 유지되는 완전 이진 트리 (min-heap 기준)
 
-```
+```text
 [Min-Heap]               [Array Representation]
       1                   index: 0  1  2  3  4  5
     /   \                  value: [1, 3, 5, 7, 4, 8]

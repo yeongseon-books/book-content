@@ -213,7 +213,7 @@ def extract_tables(img_path: str) -> list:
 
 실무에서 권장하는 패턴은 다음 5단계입니다.
 
-```
+```text
 [Image]
    |
    v

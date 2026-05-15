@@ -53,7 +53,7 @@ Set operations are used heavily in data analysis, permission management, and tag
 
 > set = a collection of unique elements, backed by a hash table
 
-```
+```text
 A = {1, 2, 3, 4}      B = {3, 4, 5, 6}
 
 union        A | B  = {1, 2, 3, 4, 5, 6}

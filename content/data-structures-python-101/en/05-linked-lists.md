@@ -53,7 +53,7 @@ Linked list problems are among the most frequently tested in coding interviews. 
 
 > Linked list = a linear data structure where nodes are connected by pointers
 
-```
+```text
 [Singly Linked List]
   head -> [A|->] -> [B|->] -> [C|->] -> None
 

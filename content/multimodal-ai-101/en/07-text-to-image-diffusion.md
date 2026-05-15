@@ -37,7 +37,7 @@ Diffusion models address both. Training is far more stable than GANs, and combin
 
 ## Forward / reverse process at a glance
 
-```
+```text
 original image x_0
     | progressively add Gaussian noise (T steps)
     v
@@ -100,7 +100,7 @@ image.save("nook.png")
 
 CFG runs the forward pass twice. It compares the result with and without the text condition and pushes the difference harder.
 
-```
+```text
 eps_guided = eps_uncond + scale * (eps_text - eps_uncond)
 ```
 

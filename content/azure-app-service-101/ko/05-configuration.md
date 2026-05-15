@@ -102,7 +102,7 @@ az webapp config appsettings list \
 ```
 
 **Example output:**
-```
+```text
 Name Value
 ----------------------------- -----------------
 FLASK_DEBUG 0

@@ -270,7 +270,7 @@ Internal tools, low traffic apps → Shared Plan
 
 ### Practical Patterns
 
-```
+```text
 1. Start with production-ready tier (Standard or higher)
 2. Load test with actual traffic patterns
 3. Configure Autoscale thresholds and cooldowns

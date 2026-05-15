@@ -45,7 +45,7 @@ last_reviewed: '2026-05-12'
 
 > 그래프 = 정점과 간선으로 관계를 표현하는 구조
 
-```
+```text
 [Undirected Graph]        [Adjacency List]
   A --- B                  A: [B, C]
   |   / |                  B: [A, C, D]

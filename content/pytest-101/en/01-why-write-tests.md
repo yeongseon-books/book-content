@@ -158,7 +158,7 @@ pytest test_calculator.py -v
 
 Output:
 
-```
+```text
 test_calculator.py::test_add PASSED
 test_calculator.py::test_add_negative PASSED
 test_calculator.py::test_divide PASSED

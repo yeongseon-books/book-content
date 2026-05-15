@@ -53,7 +53,7 @@ dict is the second most used data structure in Python. JSON parsing, configurati
 
 > Hash table = a data structure that maps keys to array indices via a hash function
 
-```
+```text
 key "alice"   -> hash("alice")  -> index 3
 key "bob"     -> hash("bob")    -> index 7
 key "charlie" -> hash("charlie")-> index 1

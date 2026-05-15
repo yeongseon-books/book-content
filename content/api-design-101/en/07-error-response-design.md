@@ -121,7 +121,7 @@ Wrap *per-field* failures in `errors[]`.
 
 ### Step 3 — Stable error codes
 
-```
+```text
 user.not_found
 order.payment_required
 order.already_paid

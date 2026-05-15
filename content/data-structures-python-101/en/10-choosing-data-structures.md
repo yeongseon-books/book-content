@@ -53,7 +53,7 @@ In interviews, "why did you choose this data structure?" matters more than imple
 
 > Data structure selection = optimizing based on the frequency of key operations and data characteristics
 
-```
+```text
 Frequent lookups?
   +-- Key-value mapping? -> dict
   +-- Existence only? -> set

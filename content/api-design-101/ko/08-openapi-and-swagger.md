@@ -61,7 +61,7 @@ flowchart LR
 
 **Before (손으로 쓴 문서)**
 
-```
+```text
 README.md "GET /users/{id} returns user. id is integer."
 ```
 

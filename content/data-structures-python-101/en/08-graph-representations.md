@@ -53,7 +53,7 @@ Graph problems appear at medium-to-hard difficulty in coding interviews. You nee
 
 > Graph = a set of nodes (vertices) connected by edges
 
-```
+```text
 [Undirected Graph]        [Adjacency List]
   A --- B                  A: [B, C]
   |   / |                  B: [A, C, D]

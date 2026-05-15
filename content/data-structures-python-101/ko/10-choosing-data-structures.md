@@ -45,7 +45,7 @@ last_reviewed: '2026-05-12'
 
 > 자료구조 선택 = 데이터 특성과 연산 빈도를 함께 보는 설계 판단
 
-```
+```text
 Frequent lookups?
   +-- Key-value mapping? -> dict
   +-- Existence only? -> set

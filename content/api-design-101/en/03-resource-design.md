@@ -80,7 +80,7 @@ You can read it and understand it.
 
 ### Step 1 — Start with Nouns
 
-```
+```text
 /users
 /orders
 /articles
@@ -90,7 +90,7 @@ Plurals by default — collections hold *many*.
 
 ### Step 2 — Attach Identifiers
 
-```
+```text
 /users/42
 /orders/9
 /articles/python-logging
@@ -100,7 +100,7 @@ Numeric ids and meaningful slugs both work.
 
 ### Step 3 — Sub-resources
 
-```
+```text
 /users/42/orders          # the orders that belong to user 42
 /users/42/orders/9        # order 9 within that scope
 ```
@@ -127,7 +127,7 @@ A collection and a single item are *different endpoints*.
 
 ### Step 5 — Restraint on Depth
 
-```
+```text
 # Good
 /users/42/orders
 

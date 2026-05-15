@@ -53,7 +53,7 @@ Closures encapsulate state without using classes — a lightweight pattern. Deco
 
 > Structure of a Closure
 
-```
+```text
 outer_func(x)
   |
   +-- local variable x (becomes a free variable)

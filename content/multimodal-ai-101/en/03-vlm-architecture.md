@@ -39,7 +39,7 @@ VLM architectures split into three schools by how they wire that connection. LLa
 
 Every VLM is a combination of three parts.
 
-```
+```text
 [Image] -> Vision Encoder (CLIP/SigLIP) -> visual features
                                                |
                                                v
@@ -115,7 +115,7 @@ Trade-off: the Q-Former itself trains in stages with mixed losses (ITC, ITM, ITG
 
 Flamingo took a different direction. It inserts new cross-attention layers between the LLM's transformer blocks, training only those new layers. Existing LLM weights are frozen.
 
-```
+```text
 LLM Block 1
 GATED CROSS-ATTENTION (new) <- vision features
 LLM Block 2

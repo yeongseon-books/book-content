@@ -87,7 +87,7 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 
 모든 샘플이 같은 템플릿을 거치면 각 샘플은 아래 같은 문자열이 됩니다.
 
-```
+```text
 ### Instruction:
 Explain two ways to reverse a Python list.
 

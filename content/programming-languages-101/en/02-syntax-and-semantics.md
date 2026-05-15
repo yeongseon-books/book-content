@@ -128,7 +128,7 @@ This step only cuts text into meaningful chunks. It does not interpret meaning.
 
 In BNF-flavored notation:
 
-```
+```text
 expr    = term  ("+" term  | "-" term)*
 term    = factor ("*" factor | "/" factor)*
 factor  = NUM | "(" expr ")"

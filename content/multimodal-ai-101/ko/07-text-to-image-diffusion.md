@@ -70,7 +70,7 @@ Diffusion model은 두 문제를 동시에 풉니다. 학습 안정성이 GAN보
 
 ### Forward / Reverse process 한눈에
 
-```
+```text
 original image x_0
     | progressively add Gaussian noise (T steps)
     v
@@ -133,7 +133,7 @@ image.save("nook.png")
 
 CFG는 두 번 forward를 돌립니다. text condition이 있을 때와 없을 때를 비교해서 차이를 강하게 밀어주는 방식입니다.
 
-```
+```text
 eps_guided = eps_uncond + scale * (eps_text - eps_uncond)
 ```
 

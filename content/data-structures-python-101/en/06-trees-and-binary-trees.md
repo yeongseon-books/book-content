@@ -53,7 +53,7 @@ Binary search trees maintain sorted data while performing insertion, deletion, a
 
 > Tree = a hierarchical structure that branches from a root to child nodes
 
-```
+```text
         [root]
        /      \
     [child]  [child]

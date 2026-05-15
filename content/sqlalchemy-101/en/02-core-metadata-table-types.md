@@ -439,7 +439,7 @@ You can pull an existing schema and use it for SQL building immediately.
 
 In real apps, `MetaData` lives in a single module and `Table` definitions are split by domain.
 
-```
+```text
 app/
   db/
     __init__.py        # metadata, engine, get_conn

@@ -53,7 +53,7 @@ This follows the UNIX philosophy (`cat file | grep error | sort | uniq`). Each t
 
 > compose vs pipe — a matter of direction
 
-```
+```text
 compose(f, g, h)(x)  =  f(g(h(x)))     <- right to left
 pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right
 
