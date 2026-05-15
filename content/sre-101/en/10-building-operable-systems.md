@@ -17,46 +17,38 @@ tags:
   - Reliability
   - Engineering
 seo_description: A capstone guide to building operable systems covering observability, automation, safe change, resilience, and integrated operational design
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Building Operable Systems
 
-This is the final post in the SRE 101 series.
+Many systems treat operability as something to bolt on after the first incidents arrive. Logs are added later, rollback gets documented later, and automation only appears after people have already repeated the same painful task enough times to feel forced into it.
 
-> SRE 101 series (10/10)
+That delay is expensive because operability compounds. Systems that are easy to observe, change safely, recover, and automate become easier to improve; systems that are not become progressively harder to trust.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the SRE 101 series. It gathers the earlier ideas into one design lens: observability, safe change, resilience, and automation should be built into the system the same way functional behavior is.
 
-**Core question**: How do you build a system that is *operable from day one*?
+## Questions this chapter answers
 
-> *Operability* is *designed in* like a *feature*, not bolted on later.
+- Why is operability a design property instead of a post-launch enhancement?
+- Why do observability, automation, safe change, and resilience need to be judged together?
+- What should a team ask first when auditing whether a system is truly operable?
+- How do you stop partial failures from becoming full-service failures?
+- How do the earlier SRE topics connect into one operating design rather than a list of tools?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+A feature without operability returns as debt. It may ship successfully once, but every later change, incident, and debugging session becomes more expensive than it needed to be.
 
-- The *definition* of *operability*
-- *Observability*, *automation*, and *safe change*
-- *Resilience* patterns
-- The *integrated* operational picture
-- A *series synthesis*
+Strong teams therefore design the operational path on purpose. They ask not only “does this feature work?” but also “can we understand it, roll it back, recover it, and automate it?”
 
-## Why It Matters
+> Operability should be designed in like a feature, not bolted on later.
 
-A *feature* without *operability* returns as *debt*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/10/10-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Obs["observability"] --> Op["operable"]
-    Auto["automation"] --> Op
-    Safe["safe change"] --> Op
-    Resil["resilience"] --> Op
-    Op --> Trust["customer trust"]
-```
-
+*Operability emerges when observability, automation, safe change, and resilience are designed together.*
 ## Key Terms
 
 - **operability**: how *easy* it is to *operate* the system.

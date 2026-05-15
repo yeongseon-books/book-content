@@ -1,7 +1,7 @@
 ---
 episode: 10
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 관측성, 자동화, 안전한 변경, 회복력을 갖춘 운영 가능한 시스템 설계 원칙으로 SRE 시리즈를 마무리합니다.
 series: sre-101
 status: content-ready
@@ -50,15 +50,9 @@ title: 운영 가능한 시스템 만들기
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Obs["observability"] --> Op["operable"]
-    Auto["automation"] --> Op
-    Safe["safe change"] --> Op
-    Resil["resilience"] --> Op
-    Op --> Trust["customer trust"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/10/10-01-concept-at-a-glance.ko.png)
 
+*관측성, 자동화, 안전한 변경, 회복력이 함께 있어야 운영 가능한 시스템이 완성됩니다.*
 운영 가능한 시스템은 한 가지 도구로 만들어지지 않습니다. 관측성, 자동화, 안전한 변경, 회복력이 함께 맞물려야 운영성이 생기고, 그 운영성이 결국 고객 신뢰로 이어집니다.
 
 ## 핵심 용어 먼저 정리

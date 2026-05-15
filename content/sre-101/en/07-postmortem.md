@@ -17,45 +17,38 @@ tags:
   - Learning
   - Operations
 seo_description: A beginner-friendly guide to postmortems covering definitions, blameless culture, writing templates, action tracking, and organizational learning
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Postmortem
 
-This is post 7 in the SRE 101 series.
+Once an incident is mitigated, teams feel relief first. That is natural, but it also creates the risk that recovery becomes the end of the story even when the same weakness is still sitting in the system.
 
-> SRE 101 series (7/10)
+Postmortems matter because they capture what was visible, what was missing, why decisions made sense at the time, and what has to change so the next incident is smaller or easier to resolve.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the SRE 101 series. Here we treat postmortems as a learning system built from blameless analysis, reusable structure, and tracked follow-up work.
 
-**Core question**: After an outage ends, what should the *team leave behind*?
+## Questions this chapter answers
 
-> A *postmortem* is a *learning system*, not a *document*.
+- Why is a postmortem closer to an organizational learning tool than to a simple report?
+- Why does blame suppress the very context a team needs to improve?
+- What sections should a useful postmortem always contain?
+- Why do action items matter more than the document alone?
+- How do you make incident lessons survive beyond the memory of the people involved?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+Repeated outages are often the result of missing learning, not missing effort. If the team cannot preserve the timeline, causes, and follow-up changes, the next incident starts from the same weak foundation.
 
-- The *definition* of a *postmortem*
-- *Blameless culture*
-- A writing *template*
-- *Action item* tracking
-- *Organizational learning*
+Good postmortems turn one painful event into shared operating knowledge. That is how incident response becomes better over time instead of merely familiar.
 
-## Why It Matters
+> A postmortem is a learning system, not a document.
 
-*Repeated outages* are the result of *missing learning*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/07/07-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Incident["incident"] --> Doc["postmortem"]
-    Doc --> Actions["actions"]
-    Actions --> Tracker["tracker"]
-    Tracker --> Review["review"]
-```
-
+*A postmortem becomes valuable when the incident record turns into tracked follow-up work.*
 ## Key Terms
 
 - **postmortem**: a *post-incident analysis* document.

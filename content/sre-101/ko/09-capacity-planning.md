@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 미래 수요를 예측하고 시스템 공급을 최적화하는 용량 계획, 헤드룸 설정과 부하 테스트, 비용 계산법을 다룹니다.
 series: sre-101
 status: content-ready
@@ -50,14 +50,9 @@ title: Capacity Planning
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Demand["forecast demand"] --> Sizing["sizing"]
-    LoadTest["load test"] --> Sizing
-    Sizing --> Buy["provision"]
-    Buy --> Monitor["monitor"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/09/09-01-concept-at-a-glance.ko.png)
 
+*예측 수요와 부하 테스트 결과를 바탕으로 증설과 모니터링을 반복하는 용량 계획 흐름입니다.*
 이 흐름은 용량 계획이 한 번의 계산으로 끝나지 않는다는 점을 보여 줍니다. 예측하고, 검증하고, 증설하고, 실제 사용량을 다시 보면서 계속 보정해야 합니다.
 
 ## 핵심 용어 먼저 정리
@@ -130,6 +125,29 @@ def cost(nodes, monthly_per_node):
 ```
 
 용량 계획은 비용 계획이기도 합니다. 확장 단위가 늘어나면 곧 월간 비용이 바뀌므로, 성능 수치와 예산 수치를 한 표에서 같이 봐야 합니다.
+
+### 6단계 — 프로모션 주간 용량으로 바꿔 보기
+
+```python
+history = [1200, 1350, 1500, 1650]
+forecast = linear_forecast(history, weeks_ahead=4)
+promotion_peak = int(forecast * 1.3)
+required_nodes = nodes(predicted_rps=promotion_peak, rps_per_node=350)
+monthly_cost = cost(required_nodes, monthly_per_node=180)
+```
+
+이 계산이 중요한 이유는 추세 그래프를 실제 운영 결정으로 바꿔 주기 때문입니다. 예상 트래픽을 피크 기준으로 보정하고, 단일 노드 처리량과 연결하면 필요한 증설 단위와 월간 비용을 같은 문맥에서 설명할 수 있습니다.
+
+### 7단계 — 부하 테스트에서 꼭 답해야 할 질문
+
+부하 테스트는 숫자 한 줄을 받기 위해 하는 일이 아닙니다. 어떤 지점에서 시스템이 무너지기 시작하는지, 어떤 의존성이 먼저 한계에 닿는지, 피크가 지난 뒤 회복이 얼마나 걸리는지까지 함께 봐야 용량 계획의 품질이 올라갑니다.
+
+| 질문 | 왜 필요한가 |
+| --- | --- |
+| latency가 완만하게 오르는가, 임계점 뒤에 급격히 무너지는가 | 큐, 풀, 외부 의존성 한계 같은 병목 위치를 읽게 해 줍니다. |
+| 어떤 의존성이 가장 먼저 포화되는가 | 앱 서버보다 DB나 캐시가 먼저 문제를 만들 수 있습니다. |
+| 피크가 지나간 뒤 회복 시간은 얼마나 되는가 | 순간 최대치보다 tail recovery가 더 큰 사용자 영향을 줄 수 있습니다. |
+| autoscaling이 성능 저하 전에 반응하는가 | 확장 정책과 워크로드 패턴은 실제로 같이 검증해야 합니다. |
 
 ## 이 코드에서 먼저 봐야 할 점
 

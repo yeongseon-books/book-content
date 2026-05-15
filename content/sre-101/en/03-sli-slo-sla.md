@@ -17,43 +17,38 @@ tags:
   - SLA
   - Reliability
 seo_description: A beginner-friendly guide to SLI, SLO, and SLA covering their definitions, the agreement process, and what makes a good objective
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # SLI, SLO, SLA
 
-This is post 3 in the SRE 101 series.
+The moment a reliability conversation becomes serious, three acronyms show up: SLI, SLO, and SLA. Because they all involve numbers, teams often compress them into one vague statement like “we promise 99.9%,” which is exactly where confusion starts.
 
-> SRE 101 series (3/10)
+What matters operationally is the separation. You need one layer that defines what you measure, another that defines the target you run the system against, and a final layer that defines what you are willing to promise outside the team.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the SRE 101 series. Here we separate measurement, internal objective, and external agreement so later error-budget and alerting decisions have a clean contract underneath them.
 
-**Core question**: How do *measurement*, *objective*, and *agreement* differ?
+## Questions this chapter answers
 
-> *SLI* is the *indicator*, *SLO* is the *internal goal*, *SLA* is the *external promise*.
+- Where exactly is the line between an indicator, an objective, and an external agreement?
+- Why should internal targets and customer-facing promises almost never be the same document?
+- What information makes an SLO operational instead of decorative?
+- Why does a metric become dangerous if its data source or time window is unclear?
+- What turns a reliability target into a real SLA instead of a slide-deck number?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+If you mix the three terms, every decision gets wobbly. Operations may think the team is talking about an internal goal while sales repeats the same number as a public promise.
 
-- The *definitions* of *SLI*, *SLO*, *SLA*
-- *Internal goals* vs *external promises*
-- What makes a *good SLO*
-- The *legal* side of *SLAs*
-- The *agreement* process
+Separating them makes ownership and consequences clearer. The indicator tells you what changed, the objective tells you when to act, and the agreement tells you what happens if you miss the promise.
 
-## Why It Matters
+> SLI is the indicator, SLO is the internal goal, and SLA is the external promise.
 
-If you mix the *three terms*, every *decision* gets *wobbly*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/03/03-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    SLI["SLI: indicator"] --> SLO["SLO: objective"]
-    SLO --> SLA["SLA: agreement"]
-```
-
+*Indicators feed internal objectives, and only a subset of those objectives should become external promises.*
 ## Key Terms
 
 - **SLI**: a *service-level indicator*.
@@ -117,6 +112,33 @@ def report(success, total, target):
         "violated": (success / total) < target,
     }
 ```
+
+### Step 6 — Calculate the remaining budget in the same report
+
+```python
+def budget_summary(success, total, target):
+    errors = total - success
+    allowed = (1 - target) * total
+    remaining = allowed - errors
+    return {
+        "availability": success / total,
+        "allowed_errors": allowed,
+        "remaining_errors": remaining,
+    }
+```
+
+This is where the three layers start to feel operational. The SLI value tells you what happened, the SLO target tells you whether the result is acceptable, and the remaining-error view tells the team how much room is left before release policy should tighten.
+
+### Step 7 — Resolve metric disputes before they turn into policy disputes
+
+When two dashboards disagree, do not start by arguing about the target. Start by checking whether both dashboards use the same traffic boundary, the same success definition, and the same time window. Many “SLO debates” are really data-source debates in disguise.
+
+| First check | Why it matters |
+| --- | --- |
+| Are both teams looking at the same request population? | Edge traffic and app-only traffic often produce different availability numbers. |
+| Is a redirect or client error counted as success or failure? | The formula can drift even when the chart title stays the same. |
+| Is the window rolling 30 days or calendar month? | The same percentage can mean different risk depending on the window. |
+| Is maintenance excluded in one report but not the other? | Agreement language often differs from internal measurement language. |
 
 ## What to Notice in This Code
 

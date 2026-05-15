@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 반복 수작업 Toil의 정의와 측정법, 빈도와 시간 기준으로 자동화 우선순위와 손익분기점을 정하는 방법입니다.
 series: sre-101
 status: content-ready
@@ -50,13 +50,9 @@ Toil이 팀 시간의 큰 비중을 차지하면 개선 작업이 멈춥니다. 
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Manual["manual"] --> Toil["toil"]
-    Toil --> Automate["automate"]
-    Automate --> Saved["time saved"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/08/08-01-concept-at-a-glance.ko.png)
 
+*반복 수작업을 Toil로 식별하고 자동화로 넘겨 시간을 되찾는 기본 구조입니다.*
 이 흐름은 측정과 자동화의 방향을 단순하게 보여 줍니다. 수작업을 그냥 익숙한 절차로 두지 말고, Toil로 식별하고, 자동화로 넘겨 팀 시간을 되찾아야 합니다.
 
 ## 핵심 용어 먼저 정리

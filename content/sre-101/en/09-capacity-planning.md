@@ -17,45 +17,38 @@ tags:
   - Performance
   - Operations
 seo_description: A beginner-friendly guide to capacity planning covering demand forecasting, headroom, load testing, scaling units, and cost trade-offs
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Capacity Planning
 
-This is post 9 in the SRE 101 series.
+Capacity conversations often start with the last traffic graph because it is the easiest artifact to reach for. But planning is not about copying the past. It is about estimating future demand, checking what the system can really sustain, and leaving enough room for mistakes, spikes, and lead times.
 
-> SRE 101 series (9/10)
+That is why capacity planning belongs with reliability, not just cost control. If you wait until traffic has already risen, the most important decision has already been made for you by production behavior.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
 
-**Core question**: How do you *prepare* for *next year's traffic*?
+## Questions this chapter answers
 
-> *Capacity planning* is the work of *aligning supply with demand* using *numbers*.
+- Why is capacity planning a future-demand problem instead of a past-usage replay?
+- Why is headroom closer to insurance than to waste?
+- How should load tests be used to correct a forecast model?
+- Why do node count and monthly cost belong in the same calculation?
+- What kinds of failure show up when lead time is ignored?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+Without a forecast, the next traffic spike usually gets handled too late. By the time the team is discussing more instances or more budget, users may already be feeling the impact.
 
-- The *definition* of *capacity planning*
-- *Demand forecasting*
-- Sizing *headroom*
-- *Load testing*
-- The *cost* trade-off
+At the same time, excess capacity is not free. Good planning explains how much uncertainty the team wants to absorb and what that protection costs.
 
-## Why It Matters
+> Capacity planning is the work of aligning supply with demand using numbers.
 
-Without a *forecast*, the next *traffic spike* takes the service *down*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/09/09-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Demand["forecast demand"] --> Sizing["sizing"]
-    LoadTest["load test"] --> Sizing
-    Sizing --> Buy["provision"]
-    Buy --> Monitor["monitor"]
-```
-
+*Capacity planning combines demand forecasts, load tests, provisioning, and monitoring into one loop.*
 ## Key Terms
 
 - **demand forecast**: predicted *future demand*.
@@ -108,6 +101,29 @@ def nodes(predicted_rps, rps_per_node):
 def cost(nodes, monthly_per_node):
     return nodes * monthly_per_node
 ```
+
+### Step 6 — Turn a forecast into a promotion-week plan
+
+```python
+history = [1200, 1350, 1500, 1650]
+forecast = linear_forecast(history, weeks_ahead=4)
+promotion_peak = int(forecast * 1.3)
+required_nodes = nodes(predicted_rps=promotion_peak, rps_per_node=350)
+monthly_cost = cost(required_nodes, monthly_per_node=180)
+```
+
+This kind of calculation turns an abstract growth trend into an operating decision. Once the team translates the forecast into expected peak traffic, it can add headroom, pick an instance count, and explain the cost of that decision in the same review.
+
+### Step 7 — Ask the load test questions that forecasts cannot answer
+
+Forecasts tell you how much demand might arrive. Load tests tell you where the system bends first when that demand actually hits.
+
+| Question | Why it matters |
+| --- | --- |
+| Does latency rise smoothly or collapse after a threshold? | A cliff usually means a queue, pool, or dependency limit is being crossed. |
+| Which dependency saturates first? | The app tier may look healthy while the database or cache is already near failure. |
+| How long does recovery take after the peak passes? | Slow recovery can create user impact even when raw capacity looks adequate. |
+| Does autoscaling react before or after the service degrades? | Scaling policy and workload shape have to be tested together, not separately. |
 
 ## What to Notice in This Code
 

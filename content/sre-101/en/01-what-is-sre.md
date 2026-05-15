@@ -17,46 +17,38 @@ tags:
   - Operations
   - Engineering
 seo_description: A beginner-friendly overview of Site Reliability Engineering, its origin, how it differs from DevOps, the core activities, and where to start
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # What is SRE?
 
-This is the first post in the SRE 101 series.
+Teams usually meet reliability through pain first: midnight pages, releases that suddenly feel dangerous, and a few people carrying too much operational knowledge in their heads. When that happens, adding more effort or more meetings rarely fixes the underlying problem.
 
-> SRE 101 series (1/10)
+SRE starts by changing the frame. Instead of treating operations as heroics, it treats reliability as an engineering system with measurable goals, automation, feedback loops, and explicit trade-offs.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the SRE 101 series. It sets up the mental model for the rest of the series: reliability is part of the product, and operating it well requires code, metrics, and deliberate policies.
 
-**Core question**: *Whose* job is it to keep the *service* from *going down*?
+## Questions this chapter answers
 
-> *SRE* is the discipline that treats *operations* as a *software problem*.
+- What does SRE actually mean beyond “the people who handle incidents”?
+- How is SRE different from DevOps even though the two ideas often overlap?
+- Why does SRE treat reliability work as a software problem instead of a staffing problem?
+- How do SLOs, error budgets, toil reduction, and postmortems fit into one operating model?
+- Where should a beginner start if their team has never worked this way before?
 
-<!-- a-grade-intro:end -->
+## Why this topic matters
 
-## What You Will Learn
+You can ship features quickly, but if the service keeps going down customers leave. Reliability is part of the product, not a clean-up task after the product ships.
 
-- The *definition* of *SRE*
-- How it differs from *DevOps*
-- The *five core activities*
-- Where SRE fits in the *org*
-- How to *get started*
+Teams that ignore this usually become dependent on memory, heroics, and manual recovery. Teams that adopt the SRE frame turn those same problems into measurable indicators, automation work, and explicit operating rules.
 
-## Why It Matters
+> SRE is the discipline that treats operations as a software problem.
 
-You can ship *features* quickly, but if the *service* keeps *going down* customers leave. *Reliability* is part of the *product*.
+## Concept at a glance
 
-## Concept at a Glance
+![Concept at a glance](../../../assets/sre-101/01/01-01-concept-at-a-glance.en.png)
 
-```mermaid
-flowchart LR
-    Dev["dev"] --> Build["build"]
-    Build --> Run["run"]
-    Run --> SLO["measure"]
-    SLO --> Feedback["feedback"]
-    Feedback --> Dev
-```
-
+*The SRE feedback loop turns production signals back into engineering decisions.*
 ## Key Terms
 
 - **reliability**: the *fraction* of time the system behaves as *expected*.

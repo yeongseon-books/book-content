@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 장애 대응을 팀 시스템으로 만드는 심각도 분류와 Incident Commander의 역할, 실시간 소통 규칙을 정리합니다.
 series: sre-101
 status: content-ready
@@ -50,14 +50,9 @@ title: Incident Response
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Detect["detect"] --> Triage["triage"]
-    Triage --> Mitigate["mitigate"]
-    Mitigate --> Resolve["resolve"]
-    Resolve --> PM["postmortem"]
-```
+![한눈에 보는 구조](../../../assets/sre-101/06/06-01-concept-at-a-glance.ko.png)
 
+*탐지부터 분류, 완화, 해결, 포스트모템까지 이어지는 incident response 기본 순서입니다.*
 탐지, 분류, 완화, 해결, 포스트모템이라는 흐름을 기준으로 보면 장애 대응이 훨씬 읽기 쉬워집니다. 복구만 끝내면 되는 일이 아니라, 기록과 후속 학습까지 이어지는 전 과정으로 봐야 합니다.
 
 ## 핵심 용어 먼저 정리

@@ -54,33 +54,26 @@
 </head>
 <body>
 <h1>SLI, SLO, SLA</h1>
-<p>This is post 3 in the SRE 101 series.</p>
-<blockquote>
-<p>SRE 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do <em>measurement</em>, <em>objective</em>, and <em>agreement</em> differ?</p>
-<blockquote>
-<p><em>SLI</em> is the <em>indicator</em>, <em>SLO</em> is the <em>internal goal</em>, <em>SLA</em> is the <em>external promise</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The moment a reliability conversation becomes serious, three acronyms show up: SLI, SLO, and SLA. Because they all involve numbers, teams often compress them into one vague statement like “we promise 99.9%,” which is exactly where confusion starts.</p>
+<p>What matters operationally is the separation. You need one layer that defines what you measure, another that defines the target you run the system against, and a final layer that defines what you are willing to promise outside the team.</p>
+<p>This is post 3 in the SRE 101 series. Here we separate measurement, internal objective, and external agreement so later error-budget and alerting decisions have a clean contract underneath them.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>definitions</em> of <em>SLI</em>, <em>SLO</em>, <em>SLA</em></li>
-<li><em>Internal goals</em> vs <em>external promises</em></li>
-<li>What makes a <em>good SLO</em></li>
-<li>The <em>legal</em> side of <em>SLAs</em></li>
-<li>The <em>agreement</em> process</li>
+<li>Where exactly is the line between an indicator, an objective, and an external agreement?</li>
+<li>Why should internal targets and customer-facing promises almost never be the same document?</li>
+<li>What information makes an SLO operational instead of decorative?</li>
+<li>Why does a metric become dangerous if its data source or time window is unclear?</li>
+<li>What turns a reliability target into a real SLA instead of a slide-deck number?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>If you mix the <em>three terms</em>, every <em>decision</em> gets <em>wobbly</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    SLI[&quot;SLI: indicator&quot;] --&gt; SLO[&quot;SLO: objective&quot;]
-    SLO --&gt; SLA[&quot;SLA: agreement&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>If you mix the three terms, every decision gets wobbly. Operations may think the team is talking about an internal goal while sales repeats the same number as a public promise.</p>
+<p>Separating them makes ownership and consequences clearer. The indicator tells you what changed, the objective tells you when to act, and the agreement tells you what happens if you miss the promise.</p>
+<blockquote>
+<p>SLI is the indicator, SLO is the internal goal, and SLA is the external promise.</p>
+</blockquote>
+<h2>Concept at a glance</h2>
+<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Indicators feed internal objectives, and only a subset of those objectives should become external promises.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SLI</strong>: a <em>service-level indicator</em>.</li>
@@ -126,6 +119,28 @@
         &quot;violated&quot;: (success / total) &lt; target,
     }
 </code></pre>
+<p><strong>Step 6 — Calculate the remaining budget in the same report</strong></p>
+<pre><code class="language-python">def budget_summary(success, total, target):
+    errors = total - success
+    allowed = (1 - target) * total
+    remaining = allowed - errors
+    return {
+        &quot;availability&quot;: success / total,
+        &quot;allowed_errors&quot;: allowed,
+        &quot;remaining_errors&quot;: remaining,
+    }
+</code></pre>
+<p>This is where the three layers start to feel operational. The SLI value tells you what happened, the SLO target tells you whether the result is acceptable, and the remaining-error view tells the team how much room is left before release policy should tighten.</p>
+<p><strong>Step 7 — Resolve metric disputes before they turn into policy disputes</strong></p>
+<p>When two dashboards disagree, do not start by arguing about the target. Start by checking whether both dashboards use the same traffic boundary, the same success definition, and the same time window. Many “SLO debates” are really data-source debates in disguise.</p>
+<p><strong>Are both teams looking at the same request population?</strong><br>
+- Why it matters: Edge traffic and app-only traffic often produce different availability numbers.</p>
+<p><strong>Is a redirect or client error counted as success or failure?</strong><br>
+- Why it matters: The formula can drift even when the chart title stays the same.</p>
+<p><strong>Is the window rolling 30 days or calendar month?</strong><br>
+- Why it matters: The same percentage can mean different risk depending on the window.</p>
+<p><strong>Is maintenance excluded in one report but not the other?</strong><br>
+- Why it matters: Agreement language often differs from internal measurement language.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>SLI</em> names its <em>data source</em>.</li>

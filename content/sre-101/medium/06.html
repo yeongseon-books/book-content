@@ -54,35 +54,26 @@
 </head>
 <body>
 <h1>Incident Response</h1>
-<p>This is post 6 in the SRE 101 series.</p>
-<blockquote>
-<p>SRE 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When an <em>outage hits</em>, how should the <em>team</em> <em>move</em>?</p>
-<blockquote>
-<p><em>Incident response</em> is a <em>team activity</em> with fixed <em>roles</em> and a fixed <em>order</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>When an outage starts, the technical problem is only half the problem. The other half is human coordination: who decides priorities, who works the fix, who updates customers, and who keeps the timeline coherent enough for later learning.</p>
+<p>Teams that decide those things during the outage usually lose time in confusion. Teams that decide them beforehand recover faster because the response structure is already available when stress is highest.</p>
+<p>This is post 6 in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>definition</em> of an <em>incident</em></li>
-<li><em>Severity</em> classification</li>
-<li><em>Roles</em> and <em>responsibilities</em></li>
-<li><em>Communication</em> channels</li>
-<li><em>Closure</em> and <em>handover</em></li>
+<li>Why does incident response depend so heavily on team structure instead of only on technical skill?</li>
+<li>Why should severity be defined by impact rather than intuition?</li>
+<li>What should an Incident Commander do directly, and what should they deliberately avoid doing?</li>
+<li>Why do recovery work and stakeholder communication have to move in parallel?</li>
+<li>What goes wrong when closure and handover rules stay vague?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p><em>Chaos</em> magnifies <em>impact</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Detect[&quot;detect&quot;] --&gt; Triage[&quot;triage&quot;]
-    Triage --&gt; Mitigate[&quot;mitigate&quot;]
-    Mitigate --&gt; Resolve[&quot;resolve&quot;]
-    Resolve --&gt; PM[&quot;postmortem&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>Chaos magnifies impact. A technically recoverable issue can become a prolonged incident when decisions stall and communication lags behind the actual state of the system.</p>
+<p>The response process also shapes trust. Customers, leadership, and the team itself all experience the incident through the quality of updates, coordination, and follow-through.</p>
+<blockquote>
+<p>Incident response is a team activity with fixed roles and a fixed order.</p>
+</blockquote>
+<h2>Concept at a glance</h2>
+<p><img alt="Concept at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>A healthy incident process moves from detection to triage, mitigation, resolution, and learning in order.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>incident</strong>: an <em>abnormal</em> condition with <em>impact</em>.</li>
