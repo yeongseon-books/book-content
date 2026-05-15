@@ -14,7 +14,7 @@ tags:
 - Harness
 - Approval
 - Human-in-the-loop
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다. 결제, 배포, 삭제, 발송은 사람의 승인이 필요합니다.
 ---
 # Approval Gate — 사람 승인이 필요한 지점 설계하기
@@ -162,6 +162,19 @@ class RefundTool:
 
 Approval Gate는 `dry_run` 결과를 `ApprovalRequest.summary`에 포함시켜야 합니다. 그래야 사람이 "이 환불을 승인하면 잔액이 -50만 원이 된다"는 사실을 미리 보고 거절할 수 있습니다.
 
+실무에서는 이 분리가 승인 속도에도 직접 영향을 줍니다. preview가 없는 승인 요청은 결국 사람이 다른 시스템을 다시 조회하게 만들고, 그 순간 승인 병목이 생깁니다. 반대로 dry-run preview가 좋으면 승인자는 몇 초 안에 "이건 진행"인지 "여기서 멈춤"인지 판단할 수 있습니다.
+
+```text
+Expected approval preview
+- action_type: refund
+- amount: 500000
+- account_id: acct_1234
+- remaining_balance_after_refund: -500000
+- affected_records: transactions, ledger, audit_log
+```
+
+이 정도 정보가 한 화면에 보여야 gate가 실제 운영 속도를 지켜 줍니다.
+
 ### Decision Logging — 누가, 언제, 왜 승인했는가
 
 승인 자체보다 더 중요한 것은 승인의 기록입니다. 사고가 났을 때 "왜 이 결정이 내려졌는가"를 추적하지 못하면 같은 사고가 반복됩니다.
@@ -189,6 +202,38 @@ class ApprovalLog:
 3. **누가 결정했는가**: approver
 4. **왜 그런 결정을 내렸는가**: reason (필수 입력)
 5. **실제로 무엇이 실행되었는가**: result
+
+### timeout과 대기열 정체를 어떻게 다룰 것인가
+
+승인 시스템은 보통 거절보다 timeout에서 더 자주 망가집니다. 아무도 응답하지 않으면 요청이 대기열에 쌓이고, 에이전트는 영원히 기다리거나 같은 요청을 다시 올립니다. timeout 정책은 UX가 아니라 운영 안정성 규칙입니다.
+
+```python
+from datetime import datetime
+
+def resolve_timeout(action_id: str, requested_at: datetime, now: datetime, timeout_sec: int = 600) -> dict:
+    elapsed = (now - requested_at).total_seconds()
+    if elapsed < timeout_sec:
+        return {"status": "waiting"}
+
+    return {
+        "status": "timed_out",
+        "decision": "reject",
+        "reason": "정책상 허용된 응답 시간 안에 승인자가 응답하지 않았습니다.",
+        "next_action": "escalate_or_cancel",
+    }
+```
+
+이런 기본 동작이 없으면 시스템은 두 가지 나쁜 방향으로 흐릅니다. 첫째, 위험한 요청이 승인 대기열에 오래 남아 어느 순간 맥락 없이 다시 처리됩니다. 둘째, 요청자가 재시도 버튼을 눌러 같은 action이 여러 번 중복 생성됩니다.
+
+### 승인 게이트가 느려지는 대표 실패 모드
+
+승인 게이트는 원칙보다 운영 설계가 약할 때 병목이 됩니다. 대표적인 실패는 세 가지입니다.
+
+- 승인 요청에 핵심 정보가 부족해 기본값이 거의 항상 거절이 됩니다.
+- 승인 권한자가 한 명뿐이라 휴가나 야간 시간대에 대기열이 멈춥니다.
+- reject reason이 비어 있어 같은 요청이 조금만 바뀐 채 반복해서 올라옵니다.
+
+그래서 gate 설계는 request, wait, decide, execute뿐 아니라 timeout, delegation, feedback 재사용까지 한 세트로 가져가야 합니다.
 ## 흔히 헷갈리는 지점
 - 모든 행동에 승인을 붙이면 더 안전하다고 생각하기 쉽지만, 실제로는 사람도 더 이상 꼼꼼히 보지 않게 됩니다.
 - 승인 요청에 맥락이 적을수록 빠를 것 같지만, 정보가 부족하면 기본값은 거의 항상 거절이 됩니다.
@@ -203,7 +248,7 @@ class ApprovalLog:
 - [ ] 누가 언제 왜 승인했고 실제로 무엇이 실행됐는지 ApprovalLog에 남깁니다.
 ## 정리
 Approval Gate는 사람이 검토하는 문화를 선언하는 장치가 아니라, 사람의 결정 권한을 실행 흐름 안에 구조적으로 삽입하는 장치입니다. 그 구조가 있어야 자동화는 책임 있는 시스템이 됩니다.
-핵심은 gate 위치와 승인 페이로드입니다. 어디서 멈출지 명확해야 하고, 멈춘 뒤 사람에게 보여 줄 정보가 충분히 좋아야 빠르고 정확한 판단이 가능합니다.
+이 글에서 특히 중요한 것은 gate 위치와 승인 페이로드입니다. 어디서 멈출지 명확해야 하고, 멈춘 뒤 사람에게 보여 줄 정보가 충분히 좋아야 빠르고 정확한 판단이 가능합니다.
 다음 글에서는 Observability를 다룹니다. 승인과 거절, 도구 호출과 모델 판단을 모두 추적할 수 있어야 비로소 에이전트 시스템을 재현하고 운영할 수 있습니다.
 
 <!-- toc:begin -->

@@ -3,7 +3,7 @@ title: Test Harness — Turning Completion Criteria into Tests
 series: harness-engineering-101
 episode: 6
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Testing
 - Eval
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: When an agent says "done", only tests can confirm whether the work
   is actually done.
 ---
 
 # Test Harness — Turning Completion Criteria into Tests
 
-This is post 6 in the Harness Engineering 101 series.
+Agent demos usually look fine because the inputs were carefully chosen and the path was obvious to the person who built them. Real users immediately invalidate that comfort by bringing messy requests, partial data, and edge cases you did not rehearse.
 
-> Harness Engineering 101 Series (6/10)
+That is why “the agent says it is done” is not evidence. Completion must be decided by an external test surface that can run again after every prompt, tool, or model change.
 
-When an agent says "done", only tests can confirm whether the work is actually done. The Test Harness pins completion criteria into automated checks the agent must pass.
+This is post 6 in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
 
 ---
+
+## Questions this chapter answers
+
+- What is the same and different between agent testing and traditional software testing?
+- Why should unit, integration, and eval checks exist as separate layers?
+- Where do useful eval examples come from in practice?
+- How do you score agent outputs when there is no single exact string answer?
+- Why must these checks live inside CI instead of manual review habit?
+
+> “Works in the demo” is not proof. A test you can rerun on every change is proof.
 
 ![Test harness - turning completion criteria into tests](../../../assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 
@@ -306,6 +316,14 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 - Score with exact match, heuristics, and LLM-as-judge in combination, calibrating the judge against humans.
 - Wire all tests into CI for every PR. Manual tests soon become unrun tests.
 
+## Operational checklist
+
+- [ ] Split tests into unit, integration, and eval layers rather than collapsing them into one suite.
+- [ ] Build an initial eval dataset before shipping the first serious task.
+- [ ] Mix production-derived, synthetic, and adversarial cases in the dataset.
+- [ ] Use exact checks, heuristics, and judge models together, then recalibrate judges against humans.
+- [ ] Run the suites automatically in CI and block merges on failed thresholds.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -325,6 +343,8 @@ Tests run manually only sometimes soon become tests run never. Auto-run on every
 ---
 
 ## References
+
+### Official docs and references
 
 - [OpenAI Evals Framework](https://github.com/openai/evals)
 - [Anthropic — Evaluating LLMs](https://docs.anthropic.com/en/docs/build-with-claude/develop-tests)

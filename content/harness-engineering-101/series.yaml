@@ -2,31 +2,31 @@ id: harness-engineering-101
 articles:
 - idx: 1
   slug: 01-what-is-harness-engineering
-  status: content-ready
+  status: publish-ready
 - idx: 2
   slug: 02-task-harness
-  status: content-ready
+  status: publish-ready
 - idx: 3
   slug: 03-context-harness
-  status: content-ready
+  status: publish-ready
 - idx: 4
   slug: 04-constraint-harness
-  status: content-ready
+  status: publish-ready
 - idx: 5
   slug: 05-tool-harness
-  status: content-ready
+  status: publish-ready
 - idx: 6
   slug: 06-test-harness
-  status: content-ready
+  status: publish-ready
 - idx: 7
   slug: 07-feedback-loop
-  status: content-ready
+  status: publish-ready
 - idx: 8
   slug: 08-approval-gate
-  status: content-ready
+  status: publish-ready
 - idx: 9
   slug: 09-observability
-  status: content-ready
+  status: publish-ready
 - idx: 10
   slug: 10-production-harness
-  status: content-ready
+  status: publish-ready

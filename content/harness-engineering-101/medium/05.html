@@ -54,12 +54,21 @@
 </head>
 <body>
 <h1>Tool Harness — Designing Safe Tools for Agents</h1>
-<p>This is post 5 in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (5/10)</p>
-</blockquote>
-<p>Tools are the hands and feet of an agent. Poorly designed tools can corrupt data or blow up costs. The Tool Harness is about designing tools that are safe, predictable, and easy for the agent to use correctly.</p>
+<p>Once an agent starts reading databases, writing files, calling APIs, or executing code, it stops being only a text generator. It becomes a task runner, and the shape of its tool interface now matters as much as the quality of the model behind it.</p>
+<p>Most production incidents in agent systems are not caused by poetic model failures. They happen because a tool name hid a side effect, a schema allowed ambiguous arguments, or a retry repeated a non-idempotent write.</p>
+<p>This is post 5 in the Harness Engineering 101 series. Here we design tool surfaces that are narrow, honest, and difficult to misuse.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What practical rules separate a good agent tool from a dangerous one?</li>
+<li>What semantic detail belongs in a tool schema beyond plain types?</li>
+<li>Why is idempotency mandatory in retry-heavy agent environments?</li>
+<li>What makes a tool error directly actionable by an agent?</li>
+<li>What isolation layers should protect code execution, file access, and shell tools?</li>
+</ul>
+<blockquote>
+<p>Strong capability is not enough. Agent tools must be easy to call correctly and hard to misuse disastrously.</p>
+</blockquote>
 <p><img alt="Tool harness - designing safe tools for agents" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png"></p>
 <p><em>Tool harness - designing safe tools for agents</em></p>
 <h2>Tools Are an Agent's Hands and Feet</h2>
@@ -287,6 +296,14 @@ Shell execution, file writes, and unbounded HTTP calls cause production incident
 <li>Errors must include What/Why/How, with a retryable flag to guide the agent's next action.</li>
 <li>Dangerous tools like code execution and file/network access require process, filesystem, and network isolation together.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Make every tool own a single responsibility with an honest name and description.</li>
+<li>[ ] Express semantic meaning, constraints, and field dependencies in the input schema itself.</li>
+<li>[ ] Add idempotency keys to tools that write, send, charge, or mutate state.</li>
+<li>[ ] Standardize What/Why/How/retryable in tool errors so agents can recover intelligently.</li>
+<li>[ ] Require sandboxing for code execution and unrestricted file or network access.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
@@ -302,6 +319,7 @@ Shell execution, file writes, and unbounded HTTP calls cause production incident
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and references</strong></p>
 <ul>
 <li><a href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use">Anthropic — Tool Use Best Practices</a></li>
 <li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI — Function Calling Guide</a></li>

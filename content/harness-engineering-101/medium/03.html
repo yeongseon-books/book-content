@@ -54,12 +54,21 @@
 </head>
 <body>
 <h1>Context Harness — Designing What the Agent Should Know and Not Know</h1>
-<p>This is post 3 in the Harness Engineering 101 series.</p>
-<blockquote>
-<p>Harness Engineering 101 Series (3/10)</p>
-</blockquote>
-<p>The context an agent receives shapes its output. Too little and it guesses. Too much and it loses focus. The Context Harness is about deciding what to give the agent and what to withhold.</p>
+<p>Teams often assume context is free: add more chat history, more retrieved documents, more tool schemas, and quality should improve. In production, the opposite is common. Bigger context often means slower, noisier, and harder-to-reproduce behavior.</p>
+<p>An agent does not see one abstract “window.” It sees a contested budget shared by system prompts, task specs, conversation history, retrieved documents, tool schemas, and recent tool outputs.</p>
+<p>This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.</p>
 <hr>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does a large context window still feel too small in practice?</li>
+<li>How should system prompts, task specs, history, retrieval, and tool schemas share a token budget?</li>
+<li>When should you use sliding windows, summarization, or selective recall for history?</li>
+<li>Why is retrieval only the first stage of a usable RAG pipeline?</li>
+<li>Which classes of information should be deliberately excluded from context?</li>
+</ul>
+<blockquote>
+<p>Context quality is decided less by raw length than by density. The real job is putting the right information into the right slots.</p>
+</blockquote>
 <p><img alt="Context harness - designing what the agent should know and not know" src="https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png"></p>
 <p><em>Context harness - designing what the agent should know and not know</em></p>
 <h2>Context Is a Resource</h2>
@@ -287,6 +296,14 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 <li>Context Harness designs what to hide as carefully as what to show. Deliberately remove secrets, irrelevant tools, and stale outputs.</li>
 <li>Context snapshots are the foundation of reproducibility and debugging in production agents.</li>
 </ul>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Assign explicit token budgets to prompt, task, history, retrieval, tool schemas, and response buffer.</li>
+<li>[ ] Choose a history-compaction strategy before the first long-running task ships.</li>
+<li>[ ] Add reranking and compression after retrieval instead of pasting raw documents into prompts.</li>
+<li>[ ] Strip secrets, irrelevant tools, contradictory instructions, and stale tool outputs from context assembly.</li>
+<li>[ ] Capture inference-time context snapshots so incidents can be replayed later.</li>
+</ul>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/harness-engineering-101/en/01-what-is-harness-engineering.md">What Is Harness Engineering?</a></li>
@@ -302,11 +319,12 @@ API keys, PII, and medical data placed straight into context leak via logs and o
 </ul>
 <hr>
 <h2>References</h2>
+<p><strong>Official docs and research</strong></p>
 <ul>
 <li><a href="https://www.anthropic.com/research/building-effective-agents">Anthropic — Building Effective Agents</a></li>
 <li><a href="https://arxiv.org/abs/2307.03172">Liu et al. — Lost in the Middle: How Language Models Use Long Contexts</a></li>
 <li><a href="https://python.langchain.com/docs/how_to/contextual_compression/">LangChain — Contextual Compression Retriever</a></li>
-<li><a href="https://cookbook.openai.com/examples/question_answering_using_embeddings">OpenAI — Retrieval-Augmented Generation Best Practices</a></li>
+<li><a href="https://cookbook.openai.com/examples/question_answering_using_embeddings">OpenAI Cookbook — Question Answering Using Embeddings</a></li>
 </ul>
 <p class="tags-line">Tags: AI Agent, Harness, Production, Reliability</p>
 </body>

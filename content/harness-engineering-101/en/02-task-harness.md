@@ -3,7 +3,7 @@ title: Task Harness — Turning Vague Work into Executable Tasks
 series: harness-engineering-101
 episode: 2
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,20 +14,30 @@ tags:
 - Harness
 - Reliability
 - Production
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Give an agent a vague instruction and you get a vague result. The
   Task Harness turns vague work into executable tasks with clear inputs, outputs…
 ---
 
 # Task Harness — Turning Vague Work into Executable Tasks
 
-This is post 2 in the Harness Engineering 101 series.
+The fastest way to make an agent expensive is to ask it to do a vague job. Humans respond to ambiguity by asking back. Agents usually respond by filling in the blanks on their own.
 
-> Harness Engineering 101 Series (2/10)
+Those blanks quickly turn into concrete risk: the wrong data source, the wrong output format, the wrong completion bar, or the wrong scope of work. Once that ambiguity reaches tool calls, quality issues become cost incidents.
 
-Give an agent a vague instruction and you get a vague result. The Task Harness turns vague work into executable tasks with clear inputs, outputs, and completion criteria.
+This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.
 
 ---
+
+## Questions this chapter answers
+
+- Why should you separate a business goal from an agent task?
+- Which fields are the minimum for an executable TaskSpec?
+- How do you decide that a task is too large and must be decomposed?
+- How do natural-language completion conditions become machine-checkable criteria?
+- Why should prompts, verifiers, and eval datasets derive from the same TaskSpec?
+
+> Goals tell the business where to go. Tasks tell the agent what to do now. Task Harness is the layer that turns one into the other.
 
 ![Task harness - turning vague work into executable tasks](../../../assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
 
@@ -331,6 +341,14 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 - Completion criteria must be objective, automatically verifiable, and measurable. Rewrite natural-language statements into code expressions.
 - A single TaskSpec produces the system prompt, the verifier, and the eval dataset. The Task is the single source of truth.
 
+## Operational checklist
+
+- [ ] Require Goal, Inputs, Outputs, and Completion Criteria before the agent starts work.
+- [ ] Keep each task scoped to one deliverable and one retry unit.
+- [ ] Turn completion criteria into code-expressible checks, not review-only prose.
+- [ ] Send missing fields back as clarifying questions instead of letting the agent guess.
+- [ ] Generate prompts, verifiers, and eval cases from the same TaskSpec.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -351,9 +369,11 @@ Throwing "handle customer support well" straight at the agent. An undecomposed G
 
 ## References
 
+### Official docs and research
+
 - [Anthropic — Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - [OpenAI — A Practical Guide to Building Agents](https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf)
 - [Pydantic Documentation — Models](https://docs.pydantic.dev/latest/concepts/models/)
-- [Google — Agent Design Patterns](https://cloud.google.com/architecture/ai-agent-patterns)
+- [Google Cloud — Agent Design Patterns](https://cloud.google.com/architecture/ai-agent-patterns)
 
 Tags: AI Agent, Harness, Production, Reliability
