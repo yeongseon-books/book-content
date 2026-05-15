@@ -54,40 +54,25 @@
 </head>
 <body>
 <h1>SELECT Basics</h1>
-<p>This is post 2 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is <code>SELECT *</code> <em>risky</em>, and what changes when you make <em>naming columns</em> a habit?</p>
-<blockquote>
-<p><em>SELECT looks like a simple read, but writing it well lowers the </em>cost for the whole team<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>SELECT is usually the first SQL statement people become comfortable with, and that familiarity is exactly why teams get sloppy with it. A query that looks harmless can still waste memory, hide intent, and make later review harder if it pulls too many columns or leaves ordering vague.</p>
+<p>Good SELECT habits pay off long after the query leaves your editor. The column list explains the business question, aliases make the result readable, and LIMIT keeps exploration fast instead of noisy.</p>
+<p>This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>logical order</em> of SELECT clauses</li>
-<li>Column projection and <em>aliases</em></li>
-<li><em>ORDER BY</em> and <em>LIMIT</em></li>
-<li>The meaning and cost of <em>DISTINCT</em></li>
-<li>Five common mistakes</li>
+<li>What is the safest way to read a SELECT statement?</li>
+<li>Why is naming columns explicitly more than a style preference?</li>
+<li>Where do aliases work, and where do they not?</li>
+<li>What costs come with ORDER BY, LIMIT, and DISTINCT?</li>
+<li>When does SELECT * start to become risky?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>An analyst issues SELECT <em>hundreds of times a day</em>. One small habit changes <em>reading speed, cost, and trust</em>. Naming columns and using clear aliases is a gift to the <em>future-you in six months</em>.</p>
 <blockquote>
-<p><em>SELECT is </em>easy to say<em> and </em>easy to misread<em>.</em></p>
+<p>SELECT is not just a way to read data. It is a way to declare exactly which result shape you want another person to trust.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    From[&quot;FROM table&quot;] --&gt; Where[&quot;WHERE filter&quot;]
-    Where --&gt; Group[&quot;GROUP BY&quot;]
-    Group --&gt; Having[&quot;HAVING&quot;]
-    Having --&gt; Select[&quot;SELECT columns&quot;]
-    Select --&gt; Order[&quot;ORDER BY&quot;]
-    Order --&gt; Limit[&quot;LIMIT&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Analysts write SELECT statements dozens of times a day, and application code behind an ORM still emits SELECT under the hood. That makes this clause the place where readability, cost, and trust start to diverge. Two queries can answer the same question while leaving very different maintenance burdens behind.</p>
+<p>Explicit column lists help more than the current query. They show future readers what information was actually needed, and they make it obvious when a query starts dragging along unused JSON blobs, large text columns, or unstable positional ordering.</p>
+<h2>SELECT evaluation flow</h2>
+<p><img alt="SELECT evaluation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Projection</strong>: the <em>set of columns</em> SELECT picks.</li>
@@ -112,6 +97,13 @@
 <p><strong>Step 4 — Top N</strong></p>
 <pre><code class="language-sql">SELECT id, name FROM users ORDER BY id LIMIT 10;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>1</strong><br>
+- name: Ada</p>
+<p><strong>2</strong><br>
+- name: Linus</p>
+<p><strong>3</strong><br>
+- name: Grace</p>
 <p><strong>Step 5 — Drop duplicates</strong></p>
 <pre><code class="language-sql">SELECT DISTINCT country FROM users;
 </code></pre>
@@ -172,6 +164,7 @@
 <li><a href="https://sqlbolt.com/lesson/select_queries_introduction">SQLBolt — SELECT queries</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-select-statement/">Mode — SELECT statement</a></li>
 <li><a href="https://www.sqlstyle.guide/">SQL Style Guide</a></li>
+<li><a href="https://www.postgresql.org/docs/current/queries-order.html">PostgreSQL — ORDER BY</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, SELECT, Query, Database, Postgres</p>
 </body>

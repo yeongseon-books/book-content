@@ -17,47 +17,36 @@ tags:
   - Funnel
   - Retention
 seo_description: Cohort, funnel, retention, top-N — patterns for assembling real analytical reports from one SQL file using everything you have learned.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Practical Analysis SQL
 
-This is the final post in the SQL 101 series.
+By the time you reach real reporting work, SQL features stop appearing one at a time. A single analytics request usually asks for filtering, grouping, window calculations, and layered intermediate steps in the same query.
 
-> SQL 101 series (10/10)
+That is why the final chapter is best approached as pattern assembly. The goal is not to learn one more clause. It is to see how familiar building blocks combine into the shapes teams actually reuse for dashboards and decision-making.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the SQL 101 series. It ties the earlier clauses together into practical query patterns for analysis work.
 
-**Core question**: How do you *assemble* SELECT, JOIN, GROUP BY, and windows into *real reports* like *cohort, funnel, retention*?
+## Questions this chapter answers
 
-> *Analysis is *not magic*. It is the same tools *stacked in layers*.*
+- What do DAU, WAU, and MAU queries usually look like?
+- How do you structure cohort and retention logic in layers?
+- What is the cleanest shape for a funnel query?
+- Why are window functions a natural fit for top-N per group?
+- Which verification steps keep analytical SQL from drifting into misleading metrics?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The SQL pattern for *DAU / WAU / MAU*
-- The basic shape of *cohort retention*
-- A *funnel* analysis
-- *Top-N per group*
-- Five common mistakes
+> Analytical SQL is not a new kind of magic. It is the same familiar tools stacked in layers and named clearly enough for a team to reuse.
 
 ## Why It Matters
 
-Most dashboard numbers are variations on a few patterns. Learn them, and you can write a *first draft in minutes* for any new request. Over time, these queries become *team assets*.
+Most analytics requests are variations on a small set of patterns: active users, retention, conversion, top performers, and trend changes over time. Once those shapes become familiar, new requests stop starting from a blank screen.
 
-> *Analytics SQL is the *final exam* of the series — and *the starting point* of real work.*
+Well-structured analytics SQL also becomes reusable team knowledge. A clean cohort query or funnel query does not just answer one ticket. It becomes the basis for dashboards, models, and later reviews about whether the metric definition is still correct.
 
-## Concept at a Glance
+## Analytics query layering flow
 
-```mermaid
-flowchart LR
-    Events["Events"] --> CTE1["1. clean"]
-    CTE1 --> CTE2["2. aggregate"]
-    CTE2 --> CTE3["3. window"]
-    CTE3 --> Report["report"]
-```
-
+![Analytics query layering flow](../../../assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
 ## Key Terms
 
 - **DAU/WAU/MAU**: daily / weekly / monthly *active users*.
@@ -110,6 +99,12 @@ SELECT
 FROM events;
 ```
 
+**Expected output:**
+
+| s1_view | s2_cart | s3_pay |
+| --- | --- | --- |
+| 1200 | 420 | 180 |
+
 ### Step 4 — Top-N per group
 
 ```sql
@@ -134,6 +129,22 @@ SELECT month, rev,
         / NULLIF(LAG(rev) OVER (ORDER BY month), 0) AS mom_pct
 FROM monthly;
 ```
+
+## Verification checks before you trust the metric
+
+Analytical SQL should be treated like logic you can audit, not just a query that happened to run.
+
+- **Check the definition first.** Confirm what counts as an active user, a cohort start, or a funnel step before comparing numbers.
+- **Check row counts at each layer.** CTE boundaries are the easiest places to confirm whether the dataset is shrinking or expanding as expected.
+- **Check the time boundary.** Timezone handling can move daily and monthly metrics enough to invalidate a dashboard.
+
+## Troubleshooting patterns for real reports
+
+| Symptom | First thing to verify | Common fix |
+| --- | --- | --- |
+| DAU looks lower than expected | Event definition and timezone cutoff | Align the metric definition and date truncation logic |
+| Funnel conversion looks too good | Whether users are counted out of chronological order | Add explicit time-order checks between steps |
+| Retention shifts after a model change | Cohort definition and deduplication logic | Recheck the cohort layer before blaming the chart |
 
 ## What to Notice in This Code
 
@@ -179,6 +190,8 @@ Analytics teams maintain a *pattern library* of these queries. With PR review an
 Closing the series: *SQL is the shared language of reads, writes, and analytics*. Next stops: *deeper query plans*, *running PostgreSQL*, and *data warehouses*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What Is SQL?](./01-what-is-sql.md)
 - [SELECT Basics](./02-select-basics.md)
 - [WHERE and Conditions](./03-where-and-conditions.md)
@@ -189,6 +202,7 @@ Closing the series: *SQL is the shared language of reads, writes, and analytics*
 - [INSERT, UPDATE, DELETE](./08-insert-update-delete.md)
 - [Index and Query Plan](./09-index-and-query-plan.md)
 - **Practical Analysis SQL (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -197,5 +211,6 @@ Closing the series: *SQL is the shared language of reads, writes, and analytics*
 - [PostgreSQL — Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
 - [dbt — Analytics Engineering](https://docs.getdbt.com/)
 - [Looker — Block Library](https://cloud.google.com/looker/docs)
+- [PostgreSQL — Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)
 
-Tags: SQL, Analytics, Cohort, Funnel, Retention
+Tags: SQL, Database, Postgres, Analytics

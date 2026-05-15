@@ -17,46 +17,36 @@ tags:
   - Database
   - Query
 seo_description: Scalar subqueries, IN, EXISTS, inline views, and CTEs — the toolkit for breaking complex SQL into layers your team can read.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Subquery
 
-This is post 6 in the SQL 101 series.
+Real SQL rarely stays flat. One question turns into a smaller question about big spenders, another about recent activity, and another about whether a user has done something at least once. If all of that logic gets packed into one layer, the statement becomes technically valid but hard for a team to review.
 
-> SQL 101 series (6/10)
+Subqueries and CTEs are the tools that let you split that complexity into readable steps. They matter less because they are advanced syntax and more because they let you express a multi-stage thought process without losing control of the result.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.
 
-**Core question**: When and how should you split a query that *won't fit on one line*, and why have *CTEs* become the *team standard*?
+## Questions this chapter answers
 
-> *A subquery is a *small question inside a question*. The big answer is right only when the small one is.*
+- When is a subquery enough, and when is a CTE the better fit?
+- What is the difference between a scalar subquery and an inline view?
+- How do IN and EXISTS differ in intent and behavior?
+- Why do correlated subqueries become expensive so easily?
+- How should you name intermediate layers in longer SQL files?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- *Scalar subqueries* and *IN / EXISTS*
-- *Inline views (subquery in FROM)*
-- *CTEs (`WITH`)* and readability
-- *Correlated subqueries* — meaning and cost
-- Five common mistakes
+> A subquery is a smaller question nested inside a larger one. If the smaller question is unclear, the final answer is usually untrustworthy too.
 
 ## Why It Matters
 
-Real analysis is *layered*. Cramming everything into one statement makes it *unreadable* and *unmaintainable*. CTEs and subqueries split the work into *named steps* the team can read together.
+Analytical queries are usually layered. You compute a cohort start date, attach later activity, aggregate it, and maybe join the result back to user attributes. If that logic is crammed into one long statement, it becomes difficult to debug or modify without breaking something unrelated.
 
-> *A query you can read is a query you can fix.*
+Readable layers are operationally valuable. Once each step has a name, you can test intermediate results, reason about row counts, and explain the logic during review instead of staring at one oversized FROM clause.
 
-## Concept at a Glance
+## Subquery layering flow
 
-```mermaid
-flowchart TB
-    Inner["Inner query"] --> Outer["Outer query"]
-    Outer --> Result["Result"]
-    CTE["WITH ... AS"] --> Outer
-```
-
+![Subquery layering flow](../../../assets/sql-101/06/06-01-subquery-layering-flow.en.png)
 ## Key Terms
 
 - **Scalar subquery**: returns a *single value*.
@@ -121,6 +111,13 @@ FROM big_orders b
 JOIN users u ON u.id = b.user_id;
 ```
 
+**Expected output:**
+
+| name | spend |
+| --- | --- |
+| Ada | 1450 |
+| Grace | 2100 |
+
 ## What to Notice in This Code
 
 - *EXISTS* is *NULL-safe* and can *short-circuit*, unlike `IN`.
@@ -165,6 +162,8 @@ ETL pipelines are mostly CTE-based *named transformations*. *Cohort analysis*, *
 Subqueries split a question into pieces. Next up: *Window functions*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What Is SQL?](./01-what-is-sql.md)
 - [SELECT Basics](./02-select-basics.md)
 - [WHERE and Conditions](./03-where-and-conditions.md)
@@ -175,6 +174,7 @@ Subqueries split a question into pieces. Next up: *Window functions*.
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -183,5 +183,6 @@ Subqueries split a question into pieces. Next up: *Window functions*.
 - [PostgreSQL — WITH Queries (CTE)](https://www.postgresql.org/docs/current/queries-with.html)
 - [Mode — Subqueries](https://mode.com/sql-tutorial/sql-sub-queries/)
 - [Use The Index, Luke — IN vs EXISTS](https://use-the-index-luke.com/sql/where-clause/null/not-in)
+- [PostgreSQL — FROM Clause](https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-FROM)
 
-Tags: SQL, Subquery, CTE, Database, Query
+Tags: SQL, Database, Postgres, Analytics

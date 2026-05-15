@@ -17,7 +17,7 @@ tags:
   - Database
   - Postgres
 seo_description: INSERT, UPDATE, DELETE를 트랜잭션과 RETURNING으로 안전하게 다루는 방법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE
@@ -42,16 +42,9 @@ last_reviewed: '2026-05-12'
 
 트랜잭션과 `RETURNING`은 이런 안전 장치를 만드는 기본 도구입니다. 데이터를 바꾸기 전후를 확인하고, 결과가 이상하면 롤백할 수 있어야 합니다. 이 감각은 입문 단계부터 몸에 익혀 두는 편이 좋습니다.
 
-## 한눈에 보는 흐름
+## 안전한 변경 흐름
 
-```mermaid
-flowchart LR
-    Begin["BEGIN"] --> Op["INSERT/UPDATE/DELETE"]
-    Op --> Check["RETURNING / SELECT"]
-    Check -->|OK| Commit["COMMIT"]
-    Check -->|wrong| Rollback["ROLLBACK"]
-```
-
+![안전한 변경 흐름](../../../assets/sql-101/08/08-01-safe-data-change-flow.ko.png)
 안전한 데이터 변경 작업은 대개 이런 흐름을 따릅니다. 트랜잭션을 시작하고, 변경을 실행하고, 영향을 받은 행을 확인한 뒤, 맞으면 커밋하고 아니면 롤백합니다.
 
 ## 핵심 개념 정리
@@ -99,6 +92,12 @@ DELETE FROM users WHERE id = 4 RETURNING *;
 -- 결과를 검토한 뒤
 COMMIT;
 ```
+
+**Expected output:**
+
+| id | name | signup_at |
+| --- | --- | --- |
+| 4 | Margaret Hamilton | 2026-04-10 |
 
 삭제는 특히 되돌리기 어렵기 때문에, 트랜잭션과 `RETURNING`을 함께 쓰는 습관이 중요합니다.
 
@@ -159,6 +158,8 @@ INSERT INTO users (id, name, signup_at) VALUES
 다음 글에서는 읽기 성능을 좌우하는 인덱스와 쿼리 계획을 다루겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - [WHERE와 조건](./03-where-and-conditions.md)
@@ -169,6 +170,7 @@ INSERT INTO users (id, name, signup_at) VALUES
 - **데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (현재 글)**
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -178,4 +180,4 @@ INSERT INTO users (id, name, signup_at) VALUES
 - [PostgreSQL — DELETE](https://www.postgresql.org/docs/current/sql-delete.html)
 - [PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)
 
-Tags: SQL, DML, Transaction, Database, Postgres
+Tags: SQL, Database, Postgres, Analytics

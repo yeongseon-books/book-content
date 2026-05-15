@@ -54,37 +54,25 @@
 </head>
 <body>
 <h1>Window Function</h1>
-<p>This is post 7 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: GROUP BY <em>shrinks rows</em> to make answers. Is there a way to <em>add per-group computations</em> while <em>keeping the rows</em>?</p>
-<blockquote>
-<p><em>A window function </em>attaches an aggregate result to every row<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>After GROUP BY, many readers hit the same wall: they can compute one total per group, but they still want to keep the original rows visible. Rankings, previous-value comparisons, running totals, and moving averages all come from that need.</p>
+<p>Window functions solve exactly that problem. They let you add group-aware calculations to each row without collapsing the table, which is why they show up constantly in analytical work.</p>
+<p>This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The meaning of <code>OVER (PARTITION BY ...)</code></li>
-<li><em>ROW_NUMBER, RANK, DENSE_RANK</em></li>
-<li><em>LAG / LEAD</em> and <em>time comparisons</em></li>
-<li><em>Running totals</em></li>
-<li>Five common mistakes</li>
+<li>What does OVER (PARTITION BY ...) really mean?</li>
+<li>How do ROW_NUMBER, RANK, and DENSE_RANK differ?</li>
+<li>Why are LAG and LEAD so common in time-series analysis?</li>
+<li>What is the safest shape for running totals and moving averages?</li>
+<li>Why should you make the frame explicit instead of trusting defaults?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Rankings, differences, cumulative sums — essential for <em>row-level analysis</em>. GROUP BY alone <em>discards detail</em>. Windows give you <em>detail + aggregate together</em>. They are core tools for <em>cohort, funnel, retention</em>.</p>
 <blockquote>
-<p><em>Windows are what made SQL </em>an analytics language<em>.</em></p>
+<p>Window functions keep the original rows and attach calculations beside them. That is what makes them so useful for ranking, comparison, and trend analysis.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Rows[&quot;Source rows&quot;] --&gt; Win[&quot;OVER(PARTITION BY ... ORDER BY ...)&quot;]
-    Win --&gt; Func[&quot;ROW_NUMBER / SUM / LAG&quot;]
-    Func --&gt; Out[&quot;Row + computed column&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Rankings, differences, cumulative sums, and month-over-month comparisons are all row-level questions. GROUP BY alone cannot answer them cleanly because it removes the detail you still need. Window functions keep that detail while still letting you reason about the group around each row.</p>
+<p>This is one of the places where SQL becomes more than a retrieval language. Once windows become natural, cohort analysis, retention, funnels, and trend reporting stop feeling like special tricks and start looking like combinations of familiar building blocks.</p>
+<h2>Window calculation flow</h2>
+<p><img alt="Window calculation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Partition</strong>: rows <em>grouped together</em>.</li>
@@ -117,6 +105,16 @@ FROM users;
     SUM(revenue) OVER (ORDER BY day) AS running_total
 FROM daily_revenue;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>2026-04-01</strong><br>
+- revenue: 100<br>
+- running_total: 100</p>
+<p><strong>2026-04-02</strong><br>
+- revenue: 120<br>
+- running_total: 220</p>
+<p><strong>2026-04-03</strong><br>
+- revenue: 90<br>
+- running_total: 310</p>
 <p><strong>Step 5 — 7-day moving average</strong></p>
 <pre><code class="language-sql">SELECT day, revenue,
     AVG(revenue) OVER (
@@ -182,6 +180,7 @@ FROM daily_revenue;
 <li><a href="https://www.postgresql.org/docs/current/functions-window.html">PostgreSQL — Window Function Reference</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-window-functions/">Mode — Window Functions</a></li>
 <li><a href="https://use-the-index-luke.com/sql/partial-results/top-n-queries">Use The Index, Luke — Top-N</a></li>
+<li><a href="https://www.postgresql.org/docs/current/sql-expressions.html">PostgreSQL — Value Expressions</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, WindowFunction, Analytics, Database, Query</p>
 </body>

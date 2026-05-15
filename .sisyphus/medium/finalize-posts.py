@@ -25,9 +25,19 @@ from _catalog import ROOT, is_present, load_catalog
 
 SERIES_TAGS: dict[str, list[str]] = {
     "azure-app-service-101": ["Azure", "App Service", "Cloud", "Web Apps"],
-    "azure-app-service-deep-dive": ["Azure", "App Service", "Distributed Systems", "Platform Engineering"],
+    "azure-app-service-deep-dive": [
+        "Azure",
+        "App Service",
+        "Distributed Systems",
+        "Platform Engineering",
+    ],
     "azure-functions-101": ["Azure", "Azure Functions", "Serverless", "Cloud"],
-    "azure-functions-deep-dive": ["Azure Functions", "Serverless", "Distributed Systems", "gRPC"],
+    "azure-functions-deep-dive": [
+        "Azure Functions",
+        "Serverless",
+        "Distributed Systems",
+        "gRPC",
+    ],
     "azure-aks-101": ["Azure", "AKS", "Kubernetes", "Cloud"],
     "azure-aks-deep-dive": ["AKS", "Kubernetes", "Distributed Systems", "Containers"],
     "azure-aca-101": ["Azure", "Container Apps", "Serverless", "Containers"],
@@ -47,6 +57,7 @@ SERIES_TAGS: dict[str, list[str]] = {
     "llm-finetuning-101": ["Fine-tuning", "LoRA", "LLM", "Python"],
     "python-dbapi-101": ["Python", "DB-API", "PEP 249", "Database"],
     "sqlalchemy-101": ["Python", "SQLAlchemy", "ORM", "Database"],
+    "sql-101": ["SQL", "Database", "Postgres", "Analytics"],
     "ai-agent-101": ["AI Agent", "LLM", "Tool Use", "Python"],
     "harness-engineering-101": ["AI Agent", "Harness", "Production", "Reliability"],
 }
@@ -129,7 +140,9 @@ def collect_series(series_dir: Path) -> dict[str, dict[int, dict[str, str]]]:
     return result
 
 
-def build_toc(entries: dict[int, dict[str, str]], current_idx: int, variant: str) -> list[str]:
+def build_toc(
+    entries: dict[int, dict[str, str]], current_idx: int, variant: str
+) -> list[str]:
     heading = TOC_HEADING_KO if variant == "ko" else TOC_HEADING_EN
     current_label = "현재 글" if variant == "ko" else "current"
     upcoming_label = "예정" if variant == "ko" else "upcoming"
@@ -161,7 +174,11 @@ def apply_tag_line(lines: list[str], series: str) -> list[str]:
 def rename_ko_references(lines: list[str]) -> list[str]:
     out = []
     for line in lines:
-        if line.startswith("## ") and line.strip() in {"## References", "## 참고문헌", "## 참고"}:
+        if line.startswith("## ") and line.strip() in {
+            "## References",
+            "## 참고문헌",
+            "## 참고",
+        }:
             out.append(KO_REF_HEADING)
         else:
             out.append(line)
@@ -206,7 +223,14 @@ def find_toc_insert_point(lines: list[str], ref_idx: int) -> int:
     return i + 1
 
 
-def process_post(path: Path, series: str, idx: int, variant: str, entries: dict[int, dict[str, str]], dry_run: bool = False) -> str:
+def process_post(
+    path: Path,
+    series: str,
+    idx: int,
+    variant: str,
+    entries: dict[int, dict[str, str]],
+    dry_run: bool = False,
+) -> str:
     if variant == "medium":
         return "skipped-medium"
     text = path.read_text(encoding="utf-8")
@@ -254,12 +278,23 @@ def collapse_redundant(lines: list[str]) -> list[str]:
 
 def main() -> int:
     import argparse
-    ap = argparse.ArgumentParser(description="Finalize tags, TOC, and ko refs for all series.")
-    ap.add_argument("--check", action="store_true",
-                    help="Dry-run: report files that would change and exit 1 if any found.")
+
+    ap = argparse.ArgumentParser(
+        description="Finalize tags, TOC, and ko refs for all series."
+    )
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="Dry-run: report files that would change and exit 1 if any found.",
+    )
     args = ap.parse_args()
 
-    totals = {"updated": 0, "unchanged": 0, "no-references-section": 0, "skipped-medium": 0}
+    totals = {
+        "updated": 0,
+        "unchanged": 0,
+        "no-references-section": 0,
+        "skipped-medium": 0,
+    }
     would_change: list[str] = []
     catalog = {e.id: e for e in load_catalog()}
     for series_id in sorted(SERIES_TAGS):
@@ -279,7 +314,9 @@ def main() -> int:
                 if not path.exists():
                     continue
                 if args.check:
-                    r = process_post(path, series_id, idx, variant, entries, dry_run=True)
+                    r = process_post(
+                        path, series_id, idx, variant, entries, dry_run=True
+                    )
                 else:
                     r = process_post(path, series_id, idx, variant, entries)
                 totals[r] = totals.get(r, 0) + 1
@@ -293,7 +330,9 @@ def main() -> int:
     for k, v in sorted(totals.items()):
         print(f"  {k}: {v}")
     if args.check and would_change:
-        print(f"\nCheck failed: {len(would_change)} file(s) need finalize-posts.py to be run.")
+        print(
+            f"\nCheck failed: {len(would_change)} file(s) need finalize-posts.py to be run."
+        )
         return 1
     return 0
 

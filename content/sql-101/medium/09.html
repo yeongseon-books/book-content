@@ -54,39 +54,25 @@
 </head>
 <body>
 <h1>Index and Query Plan</h1>
-<p>This is post 9 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Same SQL, <em>0.1 second</em> vs <em>30 seconds</em> — where does the gap come from, and how do we <em>read EXPLAIN</em> and <em>fix</em> what we see?</p>
-<blockquote>
-<p><em>Tuning without reading the plan is </em>guessing<em>. Guesses are </em>wrong most of the time<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Two SQL statements can look almost identical and still differ by orders of magnitude in runtime. That gap usually has less to do with magic database behavior than with the path the planner chose to read the data.</p>
+<p>If you cannot read that path, tuning stays stuck at guesswork. Indexes become cargo-cult fixes, and every slow query turns into trial and error instead of a repeatable investigation.</p>
+<p>This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>How a <em>B-tree</em> index works</li>
-<li>How to read <code>EXPLAIN</code> and <code>EXPLAIN ANALYZE</code></li>
-<li>Five reasons an <em>index gets skipped</em></li>
-<li>Design principles for <em>composite indexes</em></li>
-<li>Five common mistakes</li>
+<li>What is the simplest mental model for a B-tree index?</li>
+<li>How do EXPLAIN and EXPLAIN ANALYZE differ?</li>
+<li>Why can a database skip an index even when one exists?</li>
+<li>Why does composite index column order matter so much?</li>
+<li>When are partial and function indexes worth considering?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Tuning value <em>grows non-linearly</em> with data. One read of the plan can <em>save a server</em>. Indexes are <em>not free</em> — <em>where to put them</em> and <em>where not to</em> is a design skill.</p>
 <blockquote>
-<p><em>Reads get faster but writes get slower. Indexing is a </em>trade<em>.</em></p>
+<p>Tuning without reading the plan is guesswork. The more data grows, the more expensive those guesses become.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[&quot;Query&quot;] --&gt; Planner[&quot;Planner&quot;]
-    Planner --&gt;|chooses| Idx[&quot;Index Scan&quot;]
-    Planner --&gt;|or| Seq[&quot;Seq Scan&quot;]
-    Idx --&gt; Result[&quot;Result&quot;]
-    Seq --&gt; Result
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Query tuning becomes more valuable as data grows because small predicate differences start turning into noticeable latency. Once tables move beyond toy size, you need to know not only what the SQL says, but also how the planner expects to execute it.</p>
+<p>Indexes are powerful precisely because they are selective. They make some reads much faster while increasing storage and write cost. That means index work is not about adding more structures everywhere. It is about matching read patterns to the right access path and confirming the plan actually changes.</p>
+<h2>Plan selection flow</h2>
+<p><img alt="Plan selection flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>B-tree index</strong>: the most common <em>balanced-tree</em> index.</li>
@@ -103,6 +89,10 @@
 <pre><code class="language-sql">EXPLAIN
 SELECT * FROM users WHERE email = 'a@b.com';
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">Index Scan using idx_users_email on users  (cost=0.28..8.30 rows=1 width=48)
+  Index Cond: (email = 'a@b.com'::text)
+</code></pre>
 <p><strong>Step 2 — EXPLAIN ANALYZE</strong></p>
 <pre><code class="language-sql">EXPLAIN ANALYZE
 SELECT * FROM users WHERE email = 'a@b.com';
@@ -118,6 +108,23 @@ ON orders (user_id, created_at DESC);
 <pre><code class="language-sql">CREATE INDEX idx_users_active
 ON users (id) WHERE deleted_at IS NULL;
 </code></pre>
+<h2>What to check first in an EXPLAIN plan</h2>
+<p>When you open an EXPLAIN plan, start with three questions before you touch any index definition.</p>
+<ol>
+<li><strong>Which scan type did the planner choose?</strong> If you expected an index and got a Seq Scan, the problem is often selectivity or predicate shape.</li>
+<li><strong>How many rows did the planner estimate?</strong> Large gaps between estimated rows and actual rows often point to stale statistics or skewed data.</li>
+<li><strong>Where is the expensive step?</strong> Sorts, hash aggregates, and repeated nested loops can dominate runtime even when the initial filter looks fine.</li>
+</ol>
+<h2>Troubleshooting patterns that show up repeatedly</h2>
+<p><strong>Index exists but Seq Scan appears</strong><br>
+- First thing to verify: Predicate selectivity and function/cast use<br>
+- Common fix: Rewrite the predicate or create the right index type</p>
+<p><strong>Composite index did not help</strong><br>
+- First thing to verify: Whether the query starts from the leftmost prefix<br>
+- Common fix: Reorder columns to match filter and sort patterns</p>
+<p><strong>EXPLAIN looks fine but runtime is still high</strong><br>
+- First thing to verify: Sorts, joins, and actual row counts in EXPLAIN ANALYZE<br>
+- Common fix: Tune the broader plan, not just the filter</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A composite index's <em>column order</em> matters — only the <em>leftmost prefix</em> is usable.</li>
@@ -175,6 +182,7 @@ ON users (id) WHERE deleted_at IS NULL;
 <li><a href="https://www.postgresql.org/docs/current/sql-explain.html">PostgreSQL — EXPLAIN</a></li>
 <li><a href="https://use-the-index-luke.com/">Use The Index, Luke</a></li>
 <li><a href="https://www.postgresql.org/docs/current/indexes-partial.html">PostgreSQL — Partial Indexes</a></li>
+<li><a href="https://www.postgresql.org/docs/current/planner-stats.html">PostgreSQL — Planner Statistics</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, Index, QueryPlan, Performance, Postgres</p>
 </body>

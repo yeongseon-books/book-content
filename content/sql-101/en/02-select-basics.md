@@ -17,49 +17,36 @@ tags:
   - Database
   - Postgres
 seo_description: A practical tour of SELECT — clause order, column projection, aliases, ORDER BY, and LIMIT — the patterns you use every day.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # SELECT Basics
 
-This is post 2 in the SQL 101 series.
+SELECT is usually the first SQL statement people become comfortable with, and that familiarity is exactly why teams get sloppy with it. A query that looks harmless can still waste memory, hide intent, and make later review harder if it pulls too many columns or leaves ordering vague.
 
-> SQL 101 series (2/10)
+Good SELECT habits pay off long after the query leaves your editor. The column list explains the business question, aliases make the result readable, and LIMIT keeps exploration fast instead of noisy.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
 
-**Core question**: Why is `SELECT *` *risky*, and what changes when you make *naming columns* a habit?
+## Questions this chapter answers
 
-> *SELECT looks like a simple read, but writing it well lowers the *cost for the whole team*.*
+- What is the safest way to read a SELECT statement?
+- Why is naming columns explicitly more than a style preference?
+- Where do aliases work, and where do they not?
+- What costs come with ORDER BY, LIMIT, and DISTINCT?
+- When does SELECT * start to become risky?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *logical order* of SELECT clauses
-- Column projection and *aliases*
-- *ORDER BY* and *LIMIT*
-- The meaning and cost of *DISTINCT*
-- Five common mistakes
+> SELECT is not just a way to read data. It is a way to declare exactly which result shape you want another person to trust.
 
 ## Why It Matters
 
-An analyst issues SELECT *hundreds of times a day*. One small habit changes *reading speed, cost, and trust*. Naming columns and using clear aliases is a gift to the *future-you in six months*.
+Analysts write SELECT statements dozens of times a day, and application code behind an ORM still emits SELECT under the hood. That makes this clause the place where readability, cost, and trust start to diverge. Two queries can answer the same question while leaving very different maintenance burdens behind.
 
-> *SELECT is *easy to say* and *easy to misread*.*
+Explicit column lists help more than the current query. They show future readers what information was actually needed, and they make it obvious when a query starts dragging along unused JSON blobs, large text columns, or unstable positional ordering.
 
-## Concept at a Glance
+## SELECT evaluation flow
 
-```mermaid
-flowchart LR
-    From["FROM table"] --> Where["WHERE filter"]
-    Where --> Group["GROUP BY"]
-    Group --> Having["HAVING"]
-    Having --> Select["SELECT columns"]
-    Select --> Order["ORDER BY"]
-    Order --> Limit["LIMIT"]
-```
-
+![SELECT evaluation flow](../../../assets/sql-101/02/02-01-select-evaluation-flow.en.png)
 ## Key Terms
 
 - **Projection**: the *set of columns* SELECT picks.
@@ -99,6 +86,14 @@ SELECT id, name FROM users ORDER BY signup_at DESC;
 ```sql
 SELECT id, name FROM users ORDER BY id LIMIT 10;
 ```
+
+**Expected output:**
+
+| id | name |
+| --- | --- |
+| 1 | Ada |
+| 2 | Linus |
+| 3 | Grace |
 
 ### Step 5 — Drop duplicates
 
@@ -150,6 +145,8 @@ Dashboards repeat the `SELECT cols + ORDER BY + LIMIT` pattern *hundreds of time
 SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What Is SQL?](./01-what-is-sql.md)
 - **SELECT Basics (current)**
 - WHERE and Conditions (upcoming)
@@ -160,6 +157,7 @@ SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*
 - INSERT, UPDATE, DELETE (upcoming)
 - Index and Query Plan (upcoming)
 - Practical Analysis SQL (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -168,5 +166,6 @@ SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*
 - [SQLBolt — SELECT queries](https://sqlbolt.com/lesson/select_queries_introduction)
 - [Mode — SELECT statement](https://mode.com/sql-tutorial/sql-select-statement/)
 - [SQL Style Guide](https://www.sqlstyle.guide/)
+- [PostgreSQL — ORDER BY](https://www.postgresql.org/docs/current/queries-order.html)
 
-Tags: SQL, SELECT, Query, Database, Postgres
+Tags: SQL, Database, Postgres, Analytics

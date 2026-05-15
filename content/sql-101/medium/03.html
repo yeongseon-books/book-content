@@ -54,37 +54,25 @@
 </head>
 <body>
 <h1>WHERE and Conditions</h1>
-<p>This is post 3 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How does <em>one condition</em> drop millions of rows, and where do the <em>NULLs we miss</em> sneak in?</p>
-<blockquote>
-<p><em>WHERE is the </em>front gate<em> for data. It must block precisely and pass precisely.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Most SQL mistakes do not come from exotic syntax. They come from one condition that was slightly too broad, one NULL comparison that silently dropped rows, or one expression shape that forced the database into a full scan.</p>
+<p>That is why WHERE deserves more attention than its short syntax suggests. It decides both correctness and cost, and it is often the line that determines whether a query stays cheap or turns into a production incident.</p>
+<p>This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Comparison operators</em> and the precedence of <em>AND / OR</em></li>
-<li>The differences between <em>IN, BETWEEN, LIKE</em></li>
-<li>Why NULL comparisons are different</li>
-<li>How condition shape affects <em>performance</em></li>
-<li>Five common mistakes</li>
+<li>How should you read comparison operators and predicates?</li>
+<li>Why do AND and OR precedence mistakes keep showing up in production?</li>
+<li>When do IN, BETWEEN, and LIKE fit best?</li>
+<li>Why does NULL comparison behave differently from ordinary value comparison?</li>
+<li>How can predicate shape change whether an index is usable?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>A single line in WHERE often decides <em>90% of the cost</em>. Whether an <em>index hits</em>, how many rows scan, how much memory the server uses — it all flows from WHERE. And <em>NULL</em> is the most common silent corruptor of results.</p>
 <blockquote>
-<p><em>Returning a </em>wrong answer fast<em> happens </em>more often than people think<em>.</em></p>
+<p>WHERE is the front gate for data. If the gate is wrong, the query can be fast and still deliver the wrong answer.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Rows[&quot;All rows&quot;] --&gt; Where[&quot;WHERE evaluation&quot;]
-    Where --&gt;|true| Pass[&quot;Next step&quot;]
-    Where --&gt;|false or NULL| Drop[&quot;Discarded&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>A single predicate often decides most of the cost of a query. Whether an index is used, how many rows survive, and how much memory the database spends all flow from the condition shape. A broad filter and a selective filter can look almost identical while behaving very differently on large tables.</p>
+<p>Correctness is just as important. A query that returns the wrong answer quickly is more dangerous than one that fails loudly, and NULL handling plus precedence mistakes are common reasons apparently reasonable queries end up lying quietly.</p>
+<h2>WHERE evaluation flow</h2>
+<p><img alt="WHERE evaluation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Predicate</strong>: a <em>condition expression</em> deciding row passage.</li>
@@ -112,6 +100,13 @@
 <p><strong>Step 5 — NULL-safe</strong></p>
 <pre><code class="language-sql">SELECT * FROM users WHERE deleted_at IS NULL;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>1</strong><br>
+- name: Ada<br>
+- deleted_at: NULL</p>
+<p><strong>2</strong><br>
+- name: Linus<br>
+- deleted_at: NULL</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>LIKE '%xxx'</code> <em>cannot use an index</em>. Trailing wildcards are <em>expensive</em>.</li>
@@ -169,6 +164,7 @@
 <li><a href="https://www.postgresql.org/docs/current/functions-matching.html">PostgreSQL — Pattern Matching</a></li>
 <li><a href="https://use-the-index-luke.com/sql/where-clause">Use The Index, Luke — Where Clause</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-where/">Mode — WHERE</a></li>
+<li><a href="https://www.postgresql.org/docs/current/functions-comparison.html">PostgreSQL — Comparison Functions and Operators</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, WHERE, Filter, Database, NULL</p>
 </body>

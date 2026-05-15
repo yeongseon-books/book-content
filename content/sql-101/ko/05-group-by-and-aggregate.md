@@ -17,7 +17,7 @@ tags:
   - Database
   - Analytics
 seo_description: GROUP BY, 집계 함수, HAVING, NULL 그룹, 다중 그룹화의 실무 감각을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # GROUP BY와 집계 함수
@@ -42,17 +42,9 @@ last_reviewed: '2026-05-12'
 
 또 집계는 행을 압축하는 작업이기 때문에, 무엇이 사라지고 무엇이 남는지 항상 의식해야 합니다. 개별 주문 행은 사라지지만, 국가별 총액은 남습니다. 이 감각이 있어야 집계 결과를 읽고 검증할 수 있습니다.
 
-## 한눈에 보는 흐름
+## 집계 흐름
 
-```mermaid
-flowchart LR
-    Rows["Rows"] --> Where["WHERE"]
-    Where --> Group["GROUP BY keys"]
-    Group --> Agg["SUM/COUNT/AVG"]
-    Agg --> Having["HAVING"]
-    Having --> Out["Result"]
-```
-
+![집계 흐름](../../../assets/sql-101/05/05-01-aggregation-flow.ko.png)
 `WHERE`는 집계 전에 행을 걸러 내고, `GROUP BY`는 남은 행을 묶고, 집계 함수는 그룹마다 숫자를 계산합니다. 그 뒤 `HAVING`은 계산된 그룹 결과를 다시 걸러 냅니다. 이 순서를 머리에 넣어 두면 `WHERE COUNT(*) > 1` 같은 오류가 왜 생기는지 바로 이해됩니다.
 
 ## 핵심 개념 정리
@@ -86,6 +78,13 @@ SELECT country, COUNT(*) AS users
 FROM users
 GROUP BY country;
 ```
+
+**Expected output:**
+
+| country | users |
+| --- | --- |
+| KR | 2 |
+| US | 1 |
 
 국가마다 몇 명이 있는지처럼 그룹별 숫자를 만들 때 가장 기본이 되는 형태입니다.
 
@@ -155,6 +154,8 @@ GROUP BY country;
 다음 글에서는 복잡한 질문을 여러 단계로 나누는 방법인 서브쿼리와 CTE를 다루겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [SQL이란 무엇인가?](./01-what-is-sql.md)
 - [SELECT 기본](./02-select-basics.md)
 - [WHERE와 조건](./03-where-and-conditions.md)
@@ -165,6 +166,7 @@ GROUP BY country;
 - 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE (예정)
 - 인덱스와 쿼리 계획 (예정)
 - 실전 분석 SQL (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -174,4 +176,4 @@ GROUP BY country;
 - [Mode — GROUP BY](https://mode.com/sql-tutorial/sql-group-by/)
 - [SQLBolt — Aggregates](https://sqlbolt.com/lesson/select_queries_with_aggregates)
 
-Tags: SQL, GroupBy, Aggregate, Database, Analytics
+Tags: SQL, Database, Postgres, Analytics

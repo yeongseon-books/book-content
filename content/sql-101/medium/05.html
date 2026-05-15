@@ -54,39 +54,25 @@
 </head>
 <body>
 <h1>GROUP BY and Aggregates</h1>
-<p>This is post 5 in the SQL 101 series.</p>
-<blockquote>
-<p>SQL 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: A single total is easy. Why is <em>one total per category</em> harder, and how does <em>HAVING</em> differ from <em>WHERE</em>?</p>
-<blockquote>
-<p><em>Aggregation is </em>shrinking rows to make meaning<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>As soon as someone asks for daily revenue, users per country, or the average order size, you stop reading rows one by one and start compressing them into numbers. That compression is where GROUP BY and aggregate functions become the core of analytical SQL.</p>
+<p>The tricky part is not writing SUM or COUNT. It is deciding what a group actually means, what detail disappears when rows collapse, and whether the resulting number still matches the business question you thought you were answering.</p>
+<p>This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>When <em>GROUP BY</em> runs and what <em>aggregate functions</em> do</li>
-<li>The split between <em>WHERE</em> and <em>HAVING</em></li>
-<li>Multi-column grouping</li>
-<li>Handling <em>NULL</em> groups</li>
-<li>Five common mistakes</li>
+<li>When does GROUP BY run, and what exactly gets grouped?</li>
+<li>How do SUM, COUNT, and AVG differ in practice?</li>
+<li>What is the real split between WHERE and HAVING?</li>
+<li>What changes when you group by multiple columns?</li>
+<li>How should you interpret groups that include NULL?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Most dashboard numbers come from a GROUP BY. <em>Daily revenue, orders per user, average per country</em> — same shape every time. Miss <em>NULL</em> or <em>join cardinality</em> and the numbers <em>lie</em>.</p>
 <blockquote>
-<p><em>Aggregation compresses rows. That means knowing </em>what gets dropped<em>.</em></p>
+<p>Aggregation is not just shrinking rows. It is choosing which detail disappears so a useful number can remain.</p>
 </blockquote>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Rows[&quot;Rows&quot;] --&gt; Where[&quot;WHERE&quot;]
-    Where --&gt; Group[&quot;GROUP BY keys&quot;]
-    Group --&gt; Agg[&quot;SUM/COUNT/AVG&quot;]
-    Agg --&gt; Having[&quot;HAVING&quot;]
-    Having --&gt; Out[&quot;Result&quot;]
-</code></pre>
+<h2>Why It Matters</h2>
+<p>Most dashboard metrics are grouped metrics. Daily active users, revenue by country, average rating per product, and orders per customer all depend on taking raw rows and reducing them to one line per business category. That makes aggregation one of the most reusable shapes in SQL.</p>
+<p>It is also one of the easiest places to create plausible but incorrect numbers. A missing grouping key, a join that multiplies rows, or a misunderstood NULL rule can produce a chart that looks clean while hiding a logic bug underneath.</p>
+<h2>Aggregation flow</h2>
+<p><img alt="Aggregation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png"></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Aggregate function</strong>: <code>SUM, COUNT, AVG, MIN, MAX</code>, etc.</li>
@@ -107,6 +93,11 @@
 FROM users
 GROUP BY country;
 </code></pre>
+<p><strong>Expected output:</strong></p>
+<p><strong>KR</strong><br>
+- users: 2</p>
+<p><strong>US</strong><br>
+- users: 1</p>
 <p><strong>Step 3 — Multiple keys</strong></p>
 <pre><code class="language-sql">SELECT country, signup_at::date AS day, COUNT(*) AS users
 FROM users
@@ -180,6 +171,7 @@ GROUP BY country;
 <li><a href="https://www.postgresql.org/docs/current/functions-aggregate.html">PostgreSQL — Aggregate Functions</a></li>
 <li><a href="https://mode.com/sql-tutorial/sql-group-by/">Mode — GROUP BY</a></li>
 <li><a href="https://sqlbolt.com/lesson/select_queries_with_aggregates">SQLBolt — Aggregates</a></li>
+<li><a href="https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-GROUPING-SETS">PostgreSQL — GROUPING SETS, CUBE, and ROLLUP</a></li>
 </ul>
 <p class="tags-line">Tags: SQL, GroupBy, Aggregate, Database, Analytics</p>
 </body>
