@@ -221,6 +221,28 @@ The left side is the Azure-managed layer. The right side is the layer you shape 
 <pre><code class="language-bash">kubectl get nodes -o wide
 kubectl get pods -n kube-system
 </code></pre>
+<p>To connect the Azure-resource view with the Kubernetes view, add these as a pair.</p>
+<pre><code class="language-bash">az aks nodepool list \
+  --resource-group $RG \
+  --cluster-name $CLUSTER \
+  --query &quot;[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}&quot;
+
+kubectl get nodes -L kubernetes.azure.com/agentpool,kubernetes.azure.com/mode
+</code></pre>
+<p>The first command shows the pool definitions as Azure resources. The second shows which nodes actually belong to which pool and mode from the Kubernetes side. Reading them together is how node-pool design stops being abstract.</p>
+<h2>A practical first-pass troubleshooting order</h2>
+<p>Architecture becomes real when it shortens the first five minutes of debugging.</p>
+<p><strong>1. Decide whether the problem starts at the API layer</strong></p>
+<p>If <code>kubectl get nodes</code> is unexpectedly slow or fails outright, start with the control-plane boundary and credentials before diving into workload YAML. That is usually a faster cut than inspecting application pods immediately.</p>
+<p><strong>2. If pods do not start, inspect pool capacity and scheduling signals</strong></p>
+<p>When pods stay <code>Pending</code>, the question is often not “is Kubernetes broken?” but “what prevented this pod from landing on a node?”</p>
+<pre><code class="language-bash">kubectl describe pod &lt;pod-name&gt;
+kubectl top nodes
+</code></pre>
+<p><code>describe</code> exposes selector mismatches, taints, and insufficient CPU or memory. <code>kubectl top nodes</code> gives you a quick read on which pool is actually under pressure.</p>
+<p><strong>3. If system workloads wobble, treat the blast radius as larger</strong></p>
+<p>There is a meaningful difference between an app Deployment being unhealthy and <code>kube-system</code> components such as CoreDNS or metrics-server wobbling. The latter usually means you are no longer looking at one workload problem. You are looking at cluster-operability risk.</p>
+<p>That is why the control-plane vs node-pool model matters operationally. It is not only an architecture diagram. It is the fastest way to decide whether you should inspect the API boundary, system pools, or user-pool capacity first.</p>
 <h2>Operational checklist</h2>
 <ul>
 <li>[ ] Can articulate the role of each control-plane component</li>

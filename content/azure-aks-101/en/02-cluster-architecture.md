@@ -242,6 +242,44 @@ kubectl get nodes -o wide
 kubectl get pods -n kube-system
 ```
 
+To connect the Azure-resource view with the Kubernetes view, add these as a pair.
+
+```bash
+az aks nodepool list \
+  --resource-group $RG \
+  --cluster-name $CLUSTER \
+  --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"
+
+kubectl get nodes -L kubernetes.azure.com/agentpool,kubernetes.azure.com/mode
+```
+
+The first command shows the pool definitions as Azure resources. The second shows which nodes actually belong to which pool and mode from the Kubernetes side. Reading them together is how node-pool design stops being abstract.
+
+## A practical first-pass troubleshooting order
+
+Architecture becomes real when it shortens the first five minutes of debugging.
+
+### 1. Decide whether the problem starts at the API layer
+
+If `kubectl get nodes` is unexpectedly slow or fails outright, start with the control-plane boundary and credentials before diving into workload YAML. That is usually a faster cut than inspecting application pods immediately.
+
+### 2. If pods do not start, inspect pool capacity and scheduling signals
+
+When pods stay `Pending`, the question is often not “is Kubernetes broken?” but “what prevented this pod from landing on a node?”
+
+```bash
+kubectl describe pod <pod-name>
+kubectl top nodes
+```
+
+`describe` exposes selector mismatches, taints, and insufficient CPU or memory. `kubectl top nodes` gives you a quick read on which pool is actually under pressure.
+
+### 3. If system workloads wobble, treat the blast radius as larger
+
+There is a meaningful difference between an app Deployment being unhealthy and `kube-system` components such as CoreDNS or metrics-server wobbling. The latter usually means you are no longer looking at one workload problem. You are looking at cluster-operability risk.
+
+That is why the control-plane vs node-pool model matters operationally. It is not only an architecture diagram. It is the fastest way to decide whether you should inspect the API boundary, system pools, or user-pool capacity first.
+
 ## Operational checklist
 
 - [ ] Can articulate the role of each control-plane component
