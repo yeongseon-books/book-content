@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Star Schema</h1>
-<blockquote>
-<p>Data Warehouse 101 series (4/10)</p>
-</blockquote>
+<p>Analytical models become fragile the moment every answer needs another hop through another lookup table. A star schema works because it keeps the path from question to answer short enough that both humans and BI tools can follow it without hesitation.</p>
 <p>This is post 4 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the <em>star shape</em> work for analytics? Wouldn't <em>more normalization</em> make things better?</p>
-<blockquote>
-<p><em>A star schema is the shape of a query that joins once and answers.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The structure of a <em>star schema</em></li>
@@ -80,12 +71,8 @@
 <p><em>Analytics is a read game. The simpler the shape, the faster the answer.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    DimUser[&quot;dim_user&quot;] --&gt; Fact[&quot;fact_orders&quot;]
-    DimProduct[&quot;dim_product&quot;] --&gt; Fact
-    DimDate[&quot;dim_date&quot;] --&gt; Fact
-    DimStore[&quot;dim_store&quot;] --&gt; Fact
-</code></pre>
+<p><img alt="Star schema join structure" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>A classic star schema keeps one central fact table surrounded by dimensions that each join in a single hop.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Star Schema</strong>: Central <em>fact</em>, surrounding <em>dimensions</em>. <em>One join hop</em>.</li>

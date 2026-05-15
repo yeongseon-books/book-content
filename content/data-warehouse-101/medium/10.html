@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Warehouse Design Example</h1>
-<blockquote>
-<p>Data Warehouse 101 series (10/10)</p>
-</blockquote>
+<p>Knowing the parts of warehouse design is useful. Designing one coherent system from source data to dashboard is the harder skill. That is where grain, dimensions, loading strategy, and marts stop being isolated concepts and start becoming engineering decisions.</p>
 <p>This is the final post in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we <em>combine</em> everything we have learned and <em>design one warehouse</em> from scratch?</p>
-<blockquote>
-<p><em>Every good design starts with one line of grain.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>An <em>e-commerce</em> example designed <em>end to end</em></li>
@@ -80,15 +71,8 @@
 <p><em>All clean designs begin with one line of grain.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Source[&quot;Source Systems&quot;] --&gt; Lake[&quot;Data Lake&quot;]
-    Lake --&gt; Stage[&quot;Staging&quot;]
-    Stage --&gt; Fact[&quot;fact_orders&quot;]
-    Stage --&gt; Dim[&quot;dim_user, dim_product, dim_date&quot;]
-    Fact --&gt; Mart[&quot;mart_sales&quot;]
-    Dim --&gt; Mart
-    Mart --&gt; BI[&quot;Dashboard&quot;]
-</code></pre>
+<p><img alt="End-to-end warehouse design flow" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>An end-to-end warehouse design flows from source systems through staging, facts and dimensions, marts, and finally into dashboard consumption.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Grain</strong>: what <em>one row</em> of a fact table represents. The <em>starting point</em> of design.</li>

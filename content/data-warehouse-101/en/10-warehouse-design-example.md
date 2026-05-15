@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 10
 title: Warehouse Design Example
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - EndToEnd
   - Analytics
 seo_description: An end-to-end e-commerce warehouse walkthrough — grain, dimensions, star schema, partition, ETL, and a final mart for the dashboard
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Warehouse Design Example
-> Data Warehouse 101 series (10/10)
+
+Knowing the parts of warehouse design is useful. Designing one coherent system from source data to dashboard is the harder skill. That is where grain, dimensions, loading strategy, and marts stop being isolated concepts and start becoming engineering decisions.
 
 This is the final post in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *combine* everything we have learned and *design one warehouse* from scratch?
-
-> *Every good design starts with one line of grain.*
-
-<!-- a-grade-intro:end -->
+In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.
 
 ## What You Will Learn
 
@@ -49,16 +44,9 @@ Knowing the parts is not enough — *putting them together* is the real skill. A
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Source["Source Systems"] --> Lake["Data Lake"]
-    Lake --> Stage["Staging"]
-    Stage --> Fact["fact_orders"]
-    Stage --> Dim["dim_user, dim_product, dim_date"]
-    Fact --> Mart["mart_sales"]
-    Dim --> Mart
-    Mart --> BI["Dashboard"]
-```
+![End-to-end warehouse design flow](../../../assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
+
+*An end-to-end warehouse design flows from source systems through staging, facts and dimensions, marts, and finally into dashboard consumption.*
 
 ## Key Terms
 

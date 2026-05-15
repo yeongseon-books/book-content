@@ -17,7 +17,7 @@ tags:
   - EndToEnd
   - Analytics
 seo_description: 전자상거래 Warehouse를 grain부터 mart까지 설계하는 전체 예제
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Warehouse 설계 예제
@@ -50,16 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Source["Source Systems"] --> Lake["Data Lake"]
-    Lake --> Stage["Staging"]
-    Stage --> Fact["fact_orders"]
-    Stage --> Dim["dim_user, dim_product, dim_date"]
-    Fact --> Mart["mart_sales"]
-    Dim --> Mart
-    Mart --> BI["Dashboard"]
-```
+![엔드투엔드 Warehouse 설계 흐름](../../../assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
+
+*원천 시스템에서 staging, fact/dimension, mart를 거쳐 최종 대시보드로 이어지는 전체 Warehouse 설계 흐름*
 
 ## 핵심 용어
 

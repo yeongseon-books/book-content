@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 9
 title: Performance Optimization
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Cost
   - Analytics
 seo_description: Patterns that drive warehouse performance, five ways to cut cost, and how to read a query plan like a senior analyst.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Performance Optimization
-> Data Warehouse 101 series (9/10)
+
+Warehouse tuning starts when someone asks why two queries that look similar cost wildly different amounts. In practice, the answer is usually hiding in scan volume, shuffle volume, or work the engine had no chance to skip.
 
 This is post 9 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does *one query finish in a second* and another *take five minutes*? How do you *cut cost*?
-
-> *Warehouse performance is shaped by *bytes read* and *data shuffled*.*
-
-<!-- a-grade-intro:end -->
+In this post, we treat optimization as a measurement discipline instead of a bag of tricks. The goal is to read the plan, locate the expensive stage, and change the query shape before cost becomes a surprise.
 
 ## What You Will Learn
 
@@ -49,14 +44,9 @@ Warehouses charge by *what you read*. The same answer with *fewer bytes* means *
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Query["SQL"] --> Plan["Query Plan"]
-    Plan --> Scan["Bytes Scanned"]
-    Plan --> Shuffle["Shuffle"]
-    Plan --> Spill["Spill to Disk"]
-    Scan --> Cost["Cost"]
-```
+![Query-plan cost signals](../../../assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
+
+*Query cost usually traces back to three signals in the plan: bytes scanned, data shuffled between workers, and spill caused by memory pressure.*
 
 ## Key Terms
 

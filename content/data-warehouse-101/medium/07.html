@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>BI and Dashboard</h1>
-<blockquote>
-<p>Data Warehouse 101 series (7/10)</p>
-</blockquote>
+<p>Warehouses do not create decisions by themselves. Teams still need a screen that turns a broad question into one number, one comparison, and one obvious next drill-down. When that layer is noisy, even clean data models feel useless.</p>
 <p>This is post 7 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it take for a <em>number</em> to become a <em>decision</em>? Why do <em>dashboards</em> get <em>ignored</em> so often?</p>
-<blockquote>
-<p><em>A dashboard answers a question. It is not a place to show off your data.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The role of <em>BI tools</em></li>
@@ -80,12 +71,8 @@
 <p><em>A dashboard's success is measured in </em>decisions made<em>, not in </em>opens<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    DW[&quot;Warehouse / Mart&quot;] --&gt; Semantic[&quot;Semantic Layer&quot;]
-    Semantic --&gt; BI[&quot;BI Tool&quot;]
-    BI --&gt; Dashboard[&quot;Dashboard&quot;]
-    Dashboard --&gt; Decision[&quot;Decision&quot;]
-</code></pre>
+<p><img alt="BI decision flow" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Warehouse data becomes a team decision only after semantic definitions, BI tooling, and dashboard design line up.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>BI Tool</strong>: Tableau, Looker, Power BI — <em>visualization tools</em>.</li>

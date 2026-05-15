@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>OLTP and OLAP</h1>
-<blockquote>
-<p>Data Warehouse 101 series (2/10)</p>
-</blockquote>
+<p>From far away, both systems speak SQL. Up close, they solve opposite problems. One is built to confirm a payment in milliseconds. The other is built to scan months of history without dragging production down with it.</p>
 <p>This is post 2 in the Data Warehouse 101 series.</p>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: It is the <em>same SQL</em> — why do we need <em>different engines</em>? Why does <em>row vs column</em> storage make such a <em>big difference</em>?</p>
-<blockquote>
-<p><em>OLTP writes short and often; OLAP reads long and rarely.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The workload difference between <em>OLTP</em> and <em>OLAP</em></li>
@@ -80,12 +71,8 @@
 <p><em>Pick the right tool. Trying to do both with one makes both unhappy.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User&quot;] --&gt; OLTP[&quot;OLTP DB (row store)&quot;]
-    OLTP --&gt; CDC[&quot;CDC / ETL&quot;]
-    CDC --&gt; OLAP[&quot;OLAP DB (column store)&quot;]
-    Analyst[&quot;Analyst&quot;] --&gt; OLAP
-</code></pre>
+<p><img alt="Separated OLTP-to-OLAP flow" src="https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Short transactional writes stay on OLTP, while change capture feeds a separate OLAP engine for broad analytical reads.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>OLTP</strong>: Short, <em>concurrent</em> read/write workloads.</li>

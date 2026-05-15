@@ -17,7 +17,7 @@ tags:
   - Visualization
   - Analytics
 seo_description: BI 도구와 대시보드의 역할, 시맨틱 레이어를 통한 지표 정의 통일 및 효과적인 시각화 설계 원칙을 상세히 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # BI와 Dashboard
@@ -52,13 +52,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    DW["Warehouse / Mart"] --> Semantic["Semantic Layer"]
-    Semantic --> BI["BI Tool"]
-    BI --> Dashboard["Dashboard"]
-    Dashboard --> Decision["Decision"]
-```
+![BI 의사결정 흐름](../../../assets/data-warehouse-101/07/07-01-concept-at-a-glance.ko.png)
+
+*Warehouse의 숫자가 시맨틱 레이어와 BI 도구를 거쳐 실제 의사결정 화면으로 소비되는 흐름*
 
 ## 핵심 용어
 

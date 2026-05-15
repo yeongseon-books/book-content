@@ -17,7 +17,7 @@ tags:
   - Modeling
   - Analytics
 seo_description: Fact와 Dimension의 역할, 분리 이유, 분석 모델의 기본 단위
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Fact와 Dimension
@@ -50,12 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Fact["fact_orders (amount, qty)"] --> DimUser["dim_user"]
-    Fact --> DimProduct["dim_product"]
-    Fact --> DimDate["dim_date"]
-```
+![Fact와 Dimension 관계](../../../assets/data-warehouse-101/03/03-01-concept-at-a-glance.ko.png)
+
+*Fact가 측정값을 담고, 사용자·상품·날짜 dimension이 해석에 필요한 맥락을 제공하는 구조*
 
 ## 핵심 용어
 

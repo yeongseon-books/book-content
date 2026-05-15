@@ -17,7 +17,7 @@ tags:
   - Database
   - BI
 seo_description: Data Warehouse의 정의와 역할, 서비스 DB와 다른 점, 분리해야 하는 이유
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Warehouse란 무엇인가?
@@ -50,13 +50,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Service["Service DB (OLTP)"] --> ETL["ETL / ELT"]
-    ETL --> DW["Data Warehouse"]
-    DW --> BI["BI / Dashboard"]
-    DW --> ML["ML / Analytics"]
-```
+![서비스 DB에서 Warehouse로 이어지는 분석 경로](../../../assets/data-warehouse-101/01/01-01-concept-at-a-glance.ko.png)
+
+*서비스 DB에서 Warehouse와 BI, ML 소비 계층으로 이어지는 기본 분석 경로*
 
 ## 핵심 용어
 

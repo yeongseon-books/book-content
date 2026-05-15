@@ -2,7 +2,7 @@
 series: data-warehouse-101
 episode: 6
 title: ETL and ELT
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,21 +17,16 @@ tags:
   - Pipeline
   - Analytics
 seo_description: How ETL and ELT differ, where to perform transformations, and why modern warehouses lean toward ELT for clarity and replay.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # ETL and ELT
-> Data Warehouse 101 series (6/10)
+
+The argument is not really about acronym order. It is about where you want complexity to live when a pipeline fails at 2 a.m. If raw data disappears before you can replay it, the recovery story gets expensive fast.
 
 This is post 6 in the Data Warehouse 101 series.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Should we transform *before* loading or *after*? The answer hinges on *how warehouse compute has evolved*.
-
-> *Yesterday it was *transform then load*. Today it is *load then transform in SQL*.*
-
-<!-- a-grade-intro:end -->
+In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
 
 ## What You Will Learn
 
@@ -49,13 +44,9 @@ As warehouse *compute became cheap*, loading the *raw source* and *transforming 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Src["Source"] --> ELoad["Load (raw)"]
-    ELoad --> DW["Warehouse"]
-    DW --> Transform["Transform (SQL)"]
-    Transform --> Mart["Mart"]
-```
+![ELT pipeline flow](../../../assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
+
+*In a typical ELT pipeline, raw data lands first, then warehouse SQL transforms it into marts for downstream consumption.*
 
 ## Key Terms
 
