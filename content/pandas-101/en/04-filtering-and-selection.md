@@ -2,7 +2,7 @@
 series: pandas-101
 episode: 4
 title: Filtering and Selection
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Indexing
   - Beginner
 seo_description: Master loc, iloc, boolean indexing, and query — the four ways Pandas selects rows and columns, with code and a clear mental model
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Filtering and Selection
 
+Pandas gets confusing fast when you notice that there are several ways to pick rows and columns from the same table. `loc`, `iloc`, boolean masks, and `query` can look interchangeable at first, but they are not. If you do not separate them by intent, selection code becomes harder to read and assignment bugs show up sooner than you expect.
+
 This is post 4 in the Pandas 101 series.
 
-> Pandas 101 series (4/10)
+My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why are there *four ways* to *pick rows* in Pandas?
-
-> *Different intents (label, position, condition) need *different tools*. Do not force one approach to do everything.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between *loc* and *iloc*
 - The intuition behind *boolean indexing*
@@ -42,19 +36,16 @@ This is post 4 in the Pandas 101 series.
 - A 5-step selection hands-on
 - Five common mistakes
 
+> Pandas does not give you four competing selection tools. It gives you different handles for different intent: labels, positions, and conditions. Matching the tool to the intent keeps code readable.
+
 ## Why It Matters
 
 *Every step of analysis* involves *subset extraction*. *Slow or wrong selection* shakes the *whole pipeline*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    DF["DataFrame"] --> Loc["loc (label)"]
-    DF --> Iloc["iloc (position)"]
-    DF --> Bool["boolean mask"]
-    DF --> Q["query (string)"]
-```
+![Choosing between labels, positions, boolean masks, and query syntax](../../../assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
+*Choosing between labels, positions, boolean masks, and query syntax*
 
 ## Key Terms
 
@@ -88,6 +79,16 @@ print(df.loc["a"])
 print(df.loc[["a", "c"], "x"])
 ```
 
+Label-based selection pays off because the output remains easy to read. The result tells you exactly which rows you asked for, without forcing you to remember positional offsets.
+
+**Expected output:**
+
+```text
+a    1
+c    3
+Name: x, dtype: int64
+```
+
 ### Step 3 — iloc
 
 ```python
@@ -107,6 +108,19 @@ print(df[(df["x"] > 1) & (df["y"] < 30)])
 ```python
 print(df.query("x > 1 and y < 30"))
 print(df[df["x"].isin([1, 3])])
+```
+
+This is where readability starts to matter more than syntax trivia. `query` keeps longer expressions compact, and `isin` replaces brittle chains of repeated OR conditions.
+
+**Expected output:**
+
+```text
+   x   y
+b  2  20
+
+   x   y
+a  1  10
+c  3  30
 ```
 
 ## What to Notice in This Code
@@ -148,7 +162,7 @@ KPI dashboards, outlier detection, A/B test slicing — *condition-based selecti
 2. Use *iloc* to print the *first 5 rows*.
 3. Express *two or more conditions* with *query*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Selection is the *primitive operation of analysis*. Next we tackle *missing value handling*.
 
@@ -158,11 +172,11 @@ Selection is the *primitive operation of analysis*. Next we tackle *missing valu
 - [Reading CSV and Excel](./03-read-csv-and-excel.md)
 - **Filtering and Selection (current)**
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References

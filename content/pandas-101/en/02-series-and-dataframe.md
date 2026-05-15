@@ -2,7 +2,7 @@
 series: pandas-101
 episode: 2
 title: Series and DataFrame
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Python
   - Beginner
 seo_description: A clear introduction to the two core Pandas data structures — Series and DataFrame — covering index, dtype, and column-wise thinking with code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Series and DataFrame
 
+Very early in Pandas, most people run into the same question: are Series and DataFrame just two names for similar containers, or are they different views of one data model? If that relationship stays fuzzy, column selection, arithmetic, sorting, and joins all feel like memorized syntax instead of predictable behavior.
+
 This is post 2 in the Pandas 101 series.
 
-> Pandas 101 series (2/10)
+The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Are *Series* and *DataFrame* *two unrelated things*, or *one family*?
-
-> *A DataFrame is *a collection of Series* sharing the *same label system*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The *internal structure* of a *Series*
 - *Column-oriented* thinking with *DataFrame*
@@ -42,19 +36,16 @@ This is post 2 in the Pandas 101 series.
 - A 5-step build-from-scratch
 - Five common mistakes
 
+> A DataFrame stops being mysterious once you see it as a set of Series sharing one index. That perspective explains column selection, label alignment, and arithmetic far better than row-by-row thinking.
+
 ## Why It Matters
 
 *Every Pandas operation* eventually reduces to *Series-level work*. A *DataFrame column is a Series*. Understanding this model makes *everything else easy*.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Series1["Series A"] --> DF["DataFrame"]
-    Series2["Series B"] --> DF
-    Series3["Series C"] --> DF
-    DF --> Index["shared Index"]
-```
+![A DataFrame built from multiple Series sharing one index](../../../assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
+*A DataFrame built from multiple Series sharing one index*
 
 ## Key Terms
 
@@ -97,6 +88,17 @@ df = pd.DataFrame({
 print(df)
 ```
 
+This output makes the model concrete: two labeled columns sharing one index. That shared label system is why later alignment, joins, and selections feel so natural in Pandas.
+
+**Expected output:**
+
+```text
+   x   y
+a  1  10
+b  2  20
+c  3  30
+```
+
 ### Step 4 — Column selection returns a Series
 
 ```python
@@ -110,6 +112,18 @@ print(type(col), col)
 s1 = pd.Series([1, 2, 3], index=["a", "b", "c"])
 s2 = pd.Series([10, 20, 30], index=["b", "c", "d"])
 print(s1 + s2)
+```
+
+The important part is not the arithmetic itself but the label alignment behind it. Pandas lines the indexes up first, then performs the addition only where labels overlap.
+
+**Expected output:**
+
+```text
+a     NaN
+b    12.0
+c    23.0
+d     NaN
+dtype: float64
 ```
 
 ## What to Notice in This Code
@@ -151,7 +165,7 @@ A/B test comparison, time series aggregation, joining *data from multiple source
 2. Add two Series with *different indexes* and inspect the *NaN positions*.
 3. Show in code the *type difference* between *df["x"]* and *df[["x"]]*.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel files*.
 
@@ -161,11 +175,11 @@ A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel fi
 - Reading CSV and Excel (upcoming)
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References

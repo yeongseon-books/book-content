@@ -17,7 +17,7 @@ tags:
   - Indexing
   - Beginner
 seo_description: loc, iloc, 조건 마스크, query로 행과 열을 고르는 방법을 정리한 글입니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 필터링과 선택
@@ -44,13 +44,8 @@ Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    DF["DataFrame"] --> Loc["loc (label)"]
-    DF --> Iloc["iloc (position)"]
-    DF --> Bool["boolean mask"]
-    DF --> Q["query (string)"]
-```
+![레이블, 위치, 조건에 따라 선택 도구를 나눠 쓰는 기준](../../../assets/pandas-101/04/04-01-concept-at-a-glance.ko.png)
+*레이블, 위치, 조건에 따라 선택 도구를 나눠 쓰는 기준*
 
 ## 핵심 용어
 
@@ -86,6 +81,16 @@ print(df.loc["a"])
 print(df.loc[["a", "c"], "x"])
 ```
 
+레이블 기반 선택은 “어느 행을 뽑았는가”를 바로 읽게 해 줍니다. 위치가 아니라 이름으로 고르는 코드라서 유지보수에도 유리합니다.
+
+**예상 출력:**
+
+```text
+a    1
+c    3
+Name: x, dtype: int64
+```
+
 `loc`는 행과 열의 이름을 기준으로 고를 때 가장 명확합니다. 특히 할당과 함께 쓰일 때도 의도가 분명하게 드러납니다.
 
 ### 3단계 - 위치로 고르기
@@ -111,6 +116,19 @@ print(df[(df["x"] > 1) & (df["y"] < 30)])
 ```python
 print(df.query("x > 1 and y < 30"))
 print(df[df["x"].isin([1, 3])])
+```
+
+조건식이 길어질수록 `query`와 `isin`이 얼마나 읽기 쉬운지 차이가 납니다. 특히 집합 포함 검사는 긴 OR 체인을 대체하는 실전 패턴입니다.
+
+**예상 출력:**
+
+```text
+   x   y
+b  2  20
+
+   x   y
+a  1  10
+c  3  30
 ```
 
 조건이 길어지면 `query`가 가독성을 높여 줄 수 있습니다. 특정 값 집합을 기준으로 고를 때는 `isin`이 긴 OR 체인보다 낫습니다.

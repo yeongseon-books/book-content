@@ -2,7 +2,7 @@
 series: pandas-101
 episode: 1
 title: What Is Pandas?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - DataFrame
   - Beginner
 seo_description: A beginner-friendly intro to Pandas — what Series and DataFrame are, why Pandas became the standard tool for tabular data analysis in Python
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Pandas?
 
+Pandas is easy to misunderstand when you first learn it. On one day it feels like a friendlier spreadsheet library. On another day it looks like the entire foundation of Python data work. If you never settle that ambiguity, filtering, aggregation, joins, and time series features keep feeling like disconnected tricks instead of one coherent toolkit.
+
 This is the first post in the Pandas 101 series.
 
-> Pandas 101 series (1/10)
+In this post, I want to define Pandas by role rather than by feature list. Pandas is the standard environment for reading, inspecting, reshaping, and summarizing in-memory tabular data with short, expressive code.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is *Pandas* just *a fancy spreadsheet*, or *the lingua franca of data analysis*?
-
-> *Pandas is *Python's standard library for tabular data*, and it is the *front door* to data science.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The *definition* of *Pandas* and where it sits
 - The intuition behind *Series* and *DataFrame*
@@ -50,12 +44,8 @@ CSV, Excel, databases, APIs — *80% of real-world data* is *tabular*. If you ca
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Source["CSV / Excel / DB"] --> DF["DataFrame"]
-    DF --> Ops["filter / group / join"]
-    Ops --> Out["chart / report / model"]
-```
+![Pandas between raw files, tabular transforms, and analysis outputs](../../../assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
+*Pandas between raw files, tabular transforms, and analysis outputs*
 
 ## Key Terms
 
@@ -99,6 +89,17 @@ df = pd.DataFrame({
 print(df)
 ```
 
+The first thing to check is whether the whole table looks like the shape you expected. A tiny printout tells you whether column names, row counts, and value types already make sense.
+
+**Expected output:**
+
+```text
+    name  age
+0    Ada   36
+1  Linus   54
+2  Grace   85
+```
+
 ### Step 4 — First summary
 
 ```python
@@ -111,6 +112,16 @@ print(df.describe(include="all"))
 
 ```python
 print(df[df["age"] > 40])
+```
+
+A boolean filter is your first proof that Pandas is thinking in terms of whole columns, not manual row loops. If the filtered table shrinks exactly where you expect, the condition is working.
+
+**Expected output:**
+
+```text
+    name  age
+1  Linus   54
+2  Grace   85
 ```
 
 ## What to Notice in This Code
@@ -152,7 +163,7 @@ Data cleaning, report generation, ML preprocessing, dashboard prep — *every da
 2. List *three differences* between a *Series* and a Python *list*.
 3. Compare *describe()* with and without *include="all"* and note what changes.
 
-## Wrap-up and Next Steps
+## Wrap-up and next steps
 
 Pandas is the *standard language for tabular data*. Next we go deep into the *internal structure* of *Series and DataFrame*.
 
@@ -162,11 +173,11 @@ Pandas is the *standard language for tabular data*. Next we go deep into the *in
 - Reading CSV and Excel (upcoming)
 - Filtering and Selection (upcoming)
 - Handling Missing Values (upcoming)
-- groupby (upcoming)
+- Groupby and Aggregation (upcoming)
 - Merge and Join (upcoming)
 - Time Series (upcoming)
-- apply and Vectorization (upcoming)
-- Real-world Data Analysis (upcoming)
+- Apply and Vectorization (upcoming)
+- Real-World Data Analysis (upcoming)
 <!-- toc:end -->
 
 ## References

@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Time Series</h1>
+<p>Sales, traffic, sensor, and financial data often stop behaving like ordinary tables once time becomes the main organizing dimension. If dates stay as strings, comparisons feel awkward and weekly summaries or moving averages become noisier to implement than they should be. The whole experience changes once time becomes the index.</p>
 <p>This is post 8 in the Pandas 101 series.</p>
-<blockquote>
-<p>Pandas 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do <em>time series</em> need <em>their own toolkit</em>?</p>
-<blockquote>
-<p><em>Time has </em>irregular gaps, time zones, and missing points<em>. Pandas' time series tools handle all of that </em>out of the box<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The intuition of <em>DatetimeIndex</em></li>
 <li><em>resample</em> and <em>rolling</em></li>
@@ -74,14 +65,14 @@
 <li>A 5-step time series hands-on</li>
 <li>Five common mistakes</li>
 </ul>
+<blockquote>
+<p>In time series work, the real primary key is the timeline itself. Once time becomes the index, slicing, resampling, and rolling calculations stop feeling like separate tricks and start feeling like one language.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Sales, traffic, sensors, finance — <em>most operational data</em> is time series. Treating <em>time as an index</em> makes <em>KPI trends</em> visible immediately.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    TS[&quot;DatetimeIndex&quot;] --&gt; R[&quot;resample (downsample)&quot;]
-    TS --&gt; W[&quot;rolling window&quot;]
-    TS --&gt; S[&quot;shift / diff / pct_change&quot;]
-</code></pre>
+<p><img alt="A time-first workflow with resampling, rolling windows, and time zones" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>A time-first workflow with resampling, rolling windows, and time zones</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DatetimeIndex</strong>: an index of <em>time labels</em>.</li>
@@ -106,12 +97,29 @@ print(ts.head())
 <p><strong>Step 3 — resample</strong></p>
 <pre><code class="language-python">print(ts.resample(&quot;3D&quot;).sum())
 </code></pre>
+<p>Resampling makes the time-axis transformation visible. Once you see daily data collapse into three-day buckets, the difference between plain aggregation and time-aware aggregation becomes much easier to reason about.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">2026-01-01     3
+2026-01-04    12
+2026-01-07    21
+2026-01-10     9
+Freq: 3D, dtype: int64
+</code></pre>
 <p><strong>Step 4 — rolling</strong></p>
 <pre><code class="language-python">print(ts.rolling(window=3).mean())
 </code></pre>
 <p><strong>Step 5 — Time zones</strong></p>
 <pre><code class="language-python">ts2 = ts.tz_localize(&quot;UTC&quot;).tz_convert(&quot;Asia/Seoul&quot;)
 print(ts2.head())
+</code></pre>
+<p>Time-zone conversion is one of those details that feels abstract until you print it. The output shows the same underlying instants represented in a different local clock.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">2026-01-01 09:00:00+09:00    0
+2026-01-02 09:00:00+09:00    1
+2026-01-03 09:00:00+09:00    2
+2026-01-04 09:00:00+09:00    3
+2026-01-05 09:00:00+09:00    4
+Freq: D, dtype: int64
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
@@ -150,7 +158,7 @@ print(ts2.head())
 <li>Build a <em>7-day moving average</em> and handle <em>boundary NaN</em>.</li>
 <li>Print the result of <em>UTC → Asia/Seoul</em> conversion.</li>
 </ol>
-<h2>Wrap-up and Next Steps</h2>
+<h2>Wrap-up and next steps</h2>
 <p>Time series is <em>a Pandas strength</em>. Next we cover <em>apply and vectorization</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
@@ -158,11 +166,11 @@ print(ts2.head())
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">groupby</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Groupby and Aggregation</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
 <li><strong>Time Series (current)</strong></li>
-<li>apply and Vectorization (upcoming)</li>
-<li>Real-world Data Analysis (upcoming)</li>
+<li>Apply and Vectorization (upcoming)</li>
+<li>Real-World Data Analysis (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

@@ -14,29 +14,29 @@ episodes:
     en: Reading CSV and Excel
 - slug: filtering-and-selection
   title:
-    ko: "filtering\uACFC selection"
+    ko: 필터링과 선택
     en: Filtering and Selection
 - slug: missing-values
   title:
-    ko: "missing value \uCC98\uB9AC"
+    ko: 결측치 처리
     en: Handling Missing Values
 - slug: groupby
   title:
-    ko: groupby
-    en: groupby
+    ko: 그룹화와 집계
+    en: Groupby and Aggregation
 - slug: merge-and-join
   title:
     ko: "merge\uC640 join"
     en: Merge and Join
 - slug: time-series
   title:
-    ko: time series
+    ko: 시계열 데이터 다루기
     en: Time Series
 - slug: apply-and-vectorization
   title:
-    ko: "apply\uC640 vectorization"
-    en: apply and Vectorization
+    ko: 적용 함수와 벡터화
+    en: Apply and Vectorization
 - slug: real-world-data-analysis
   title:
     ko: "\uC2E4\uC804 \uB370\uC774\uD130 \uBD84\uC11D"
-    en: Real-world Data Analysis
+    en: Real-World Data Analysis

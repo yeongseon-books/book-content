@@ -17,7 +17,7 @@ tags:
   - DataAnalysis
   - Beginner
 seo_description: groupby 분할-적용-결합 모델을 이해합니다. 집계, 변환, 필터의 차이와 실무에서 자주 쓰이는 특징 생성 패턴, 최적화 전략을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 그룹화와 집계
@@ -44,12 +44,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Data["DataFrame"] --> Split["split by key"]
-    Split --> Apply["apply (agg / transform / filter)"]
-    Apply --> Combine["combine into result"]
-```
+![분할, 적용, 결합으로 이어지는 groupby 계산 흐름](../../../assets/pandas-101/06/06-01-concept-at-a-glance.ko.png)
+*분할, 적용, 결합으로 이어지는 groupby 계산 흐름*
 
 ## 핵심 용어
 
@@ -85,6 +81,17 @@ df = pd.DataFrame({
 ```python
 print(df.groupby("city")["sales"].sum())
 ```
+단순 합계만 보더라도 split과 combine이 이미 동작한다는 사실을 확인할 수 있습니다. 더 복잡한 통계로 가기 전에, 묶은 결과가 머릿속 계산과 맞는지 먼저 점검하는 습관이 중요합니다.
+
+**예상 출력:**
+
+```text
+city
+Busan    175
+Seoul    220
+Name: sales, dtype: int64
+```
+
 
 가장 기본적인 그룹화입니다. 도시별로 묶은 뒤 매출 열의 합계를 계산합니다. 이 한 줄이 `groupby`의 가장 단순한 얼굴입니다.
 
@@ -105,6 +112,18 @@ print(df.groupby("city").agg(
 ```python
 df["share"] = df["sales"] / df.groupby("city")["sales"].transform("sum")
 print(df)
+```
+
+`transform`은 원본 행 수를 유지한 채 그룹 정보를 되돌려 준다는 점이 핵심입니다. 그래서 각 도시 안에서 자기 매출 비중이 얼마인지 같은 특징을 바로 붙일 수 있습니다.
+
+**예상 출력:**
+
+```text
+    city month  sales     share
+0  Seoul   Jan    100  0.454545
+1  Seoul   Feb    120  0.545455
+2  Busan   Jan     80  0.457143
+3  Busan   Feb     95  0.542857
 ```
 
 `transform`은 그룹별 계산 결과를 원본 행 수에 맞춰 되돌려 줍니다. 그래서 비율, 평균 대비 편차, 표준화 같은 특징 생성에 잘 맞습니다.

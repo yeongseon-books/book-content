@@ -17,7 +17,7 @@ tags:
   - Python
   - Beginner
 seo_description: 결측치를 분석 신호로 보고 진단, 제거, 대체, 보간 등 상황별 처리 전략을 익힙니다. 왜곡을 줄이는 정제 원칙과 실무 패턴을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 결측치 처리
@@ -44,12 +44,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Detect["isna / sum"] --> Decide["why missing?"]
-    Decide --> Drop["dropna"]
-    Decide --> Fill["fillna / interpolate"]
-```
+![결측 원인을 먼저 묻고 제거, 대체, 보간을 고르는 판단 흐름](../../../assets/pandas-101/05/05-01-concept-at-a-glance.ko.png)
+*결측 원인을 먼저 묻고 제거, 대체, 보간을 고르는 판단 흐름*
 
 ## 핵심 용어
 
@@ -74,6 +70,16 @@ import numpy as np, pandas as pd
 df = pd.DataFrame({"x": [1, np.nan, 3], "y": [np.nan, 2, 3]})
 print(df.isna())
 print(df.isna().sum())
+```
+
+진단 단계에서는 어떤 열에 결측이 몰려 있는지 먼저 확인해야 합니다. 숫자 하나만 봐도 제거가 나은지, 채우기가 나은지 판단의 출발점이 생깁니다.
+
+**예상 출력:**
+
+```text
+x    1
+y    1
+dtype: int64
 ```
 
 결측치 처리는 항상 진단에서 시작합니다. 특히 `isna().sum()`은 열별 결측 규모를 가장 빠르게 보여 주는 기본 점검입니다.
@@ -110,6 +116,18 @@ print(df.fillna(method="bfill"))
 ```python
 ts = pd.Series([1.0, np.nan, np.nan, 4.0])
 print(ts.interpolate())
+```
+
+보간은 앞뒤 값을 이어 빈 구간을 메우는 방식이라 시계열에서 특히 자연스럽습니다. 단순 상수 대체와 달리 흐름을 어느 정도 보존한다는 점을 눈으로 확인해 보세요.
+
+**예상 출력:**
+
+```text
+0    1.0
+1    2.0
+2    3.0
+3    4.0
+dtype: float64
 ```
 
 보간은 시계열처럼 흐름이 있는 데이터에 특히 잘 맞습니다. 모든 결측에 쓸 수 있는 만능 도구는 아니지만, 연속값의 빈 구간을 다룰 때는 매우 자연스럽습니다.

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>apply and Vectorization</title>
+<title>Apply and Vectorization</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,11 @@
 </style>
 </head>
 <body>
-<h1>apply and Vectorization</h1>
+<h1>Apply and Vectorization</h1>
+<p>Once you get comfortable with Pandas syntax, the next big lesson is that “working code” and “fast code” are not the same thing. <code>apply(axis=1)</code> often feels natural because it resembles row-by-row reasoning, but it becomes a bottleneck surprisingly quickly as datasets grow. Performance improves once you understand what Pandas is optimized to do well.</p>
 <p>This is post 9 in the Pandas 101 series.</p>
-<blockquote>
-<p>Pandas 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>apply</em> really <em>faster than a for-loop</em>?</p>
-<blockquote>
-<p><em>apply is a </em>thin wrapper around for-loops<em>. Real speed comes from </em>vectorization<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this chapter, I do not want to ban <code>apply</code> as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when <code>map</code>, NumPy operations, or direct Series math are the better tools.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The meaning of <em>vectorization</em></li>
 <li>The difference between <em>apply / map / vectorize</em></li>
@@ -74,13 +65,14 @@
 <li>A 5-step performance hands-on</li>
 <li>Five common mistakes</li>
 </ul>
+<blockquote>
+<p>Pandas gets fast when work moves to whole-column array math. The reason apply feels convenient and the reason it becomes slow are the same: it keeps pulling the computation back into Python one row at a time.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Analysis speed can differ by <em>tens to hundreds of times</em>. <em>Vectorization</em> is the <em>essence of Pandas</em>, and <em>apply abuse</em> is the <em>most common antipattern</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Loop[&quot;for-loop&quot;] --&gt;|slow| Apply[&quot;apply&quot;]
-    Apply --&gt;|faster| Vec[&quot;vectorized (NumPy / Pandas ops)&quot;]
-</code></pre>
+<p><img alt="Why column-wise math outruns row-wise apply calls" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Why column-wise math outruns row-wise apply calls</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Vectorization</strong>: array-level computation <em>without explicit loops</em>.</li>
@@ -104,12 +96,26 @@ df = pd.DataFrame({&quot;a&quot;: np.arange(1_000_000), &quot;b&quot;: np.arange
 <p><strong>Step 3 — Vectorized</strong></p>
 <pre><code class="language-python">df[&quot;c&quot;] = df[&quot;a&quot;] + df[&quot;b&quot;]   # fastest
 </code></pre>
+<p>Even a three-row preview makes the win obvious: one column expression computes the whole result at once. The real speedup only grows as row counts rise.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">   a  b  c
+0  0  0  0
+1  1  1  2
+2  2  2  4
+</code></pre>
 <p><strong>Step 4 — np.where for conditional</strong></p>
 <pre><code class="language-python">df[&quot;flag&quot;] = np.where(df[&quot;a&quot;] % 2 == 0, &quot;even&quot;, &quot;odd&quot;)
 </code></pre>
 <p><strong>Step 5 — map for code translation</strong></p>
 <pre><code class="language-python">mapping = {0: &quot;zero&quot;, 1: &quot;one&quot;}
 print(pd.Series([0, 1, 2]).map(mapping))
+</code></pre>
+<p><code>map</code> is a precise fit for code translation tasks. It also leaves unmapped values behind as <code>NaN</code>, which makes gaps in the mapping easy to detect.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">0    zero
+1     one
+2     NaN
+dtype: object
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
@@ -148,7 +154,7 @@ print(pd.Series([0, 1, 2]).map(mapping))
 <li>Express a <em>3-tier condition</em> with <em>np.where</em>.</li>
 <li>Translate <em>country codes</em> to <em>country names</em> using <em>map</em>.</li>
 </ol>
-<h2>Wrap-up and Next Steps</h2>
+<h2>Wrap-up and next steps</h2>
 <p>Vectorization is the <em>essence of Pandas</em>. Next we cover a <em>real-world data analysis</em> example.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
@@ -156,11 +162,11 @@ print(pd.Series([0, 1, 2]).map(mapping))
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">groupby</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/06-groupby.md">Groupby and Aggregation</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/07-merge-and-join.md">Merge and Join</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/08-time-series.md">Time Series</a></li>
-<li><strong>apply and Vectorization (current)</strong></li>
-<li>Real-world Data Analysis (upcoming)</li>
+<li><strong>Apply and Vectorization (current)</strong></li>
+<li>Real-World Data Analysis (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>

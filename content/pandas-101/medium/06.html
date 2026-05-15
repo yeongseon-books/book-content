@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>groupby</title>
+<title>Groupby and Aggregation</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,20 +53,11 @@
 </style>
 </head>
 <body>
-<h1>groupby</h1>
+<h1>Groupby and Aggregation</h1>
+<p>Analysis almost never ends with reading a table. Sooner or later you need sales by city, conversion rate by segment, or monthly KPI summaries. That is why <code>groupby</code> is not just another Pandas method. It is one of the main ways raw tables become decisions.</p>
 <p>This is post 6 in the Pandas 101 series.</p>
-<blockquote>
-<p>Pandas 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>Pandas groupby</em> exactly <em>the same as SQL GROUP BY</em>?</p>
-<blockquote>
-<p><em>groupby is the </em>split-apply-combine<em> pattern. It has three faces: agg, transform, and filter.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this chapter, we will frame <code>groupby</code> as the split-apply-combine workflow. That gives you a clearer mental model for when to reach for <code>agg</code>, <code>transform</code>, or <code>filter</code>.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The <em>split-apply-combine</em> model</li>
 <li>The difference between <em>agg / transform / filter</em></li>
@@ -74,14 +65,14 @@
 <li>A 5-step groupby hands-on</li>
 <li>Five common mistakes</li>
 </ul>
+<blockquote>
+<p>If you think of groupby as just a summary function, you only see the output. If you think of it as split, apply, and combine, the difference between agg, transform, and filter becomes much easier to reason about.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p><em>Aggregation is the core of analysis</em>. With <em>groupby</em>, <em>dozens of for-loop lines</em> collapse into <em>one</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;DataFrame&quot;] --&gt; Split[&quot;split by key&quot;]
-    Split --&gt; Apply[&quot;apply (agg / transform / filter)&quot;]
-    Apply --&gt; Combine[&quot;combine into result&quot;]
-</code></pre>
+<p><img alt="The split, apply, and combine flow behind groupby work" src="https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>The split, apply, and combine flow behind groupby work</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>groupby</strong>: <em>split into groups</em> by key.</li>
@@ -105,6 +96,13 @@ df = pd.DataFrame({
 <p><strong>Step 2 — Simple sum</strong></p>
 <pre><code class="language-python">print(df.groupby(&quot;city&quot;)[&quot;sales&quot;].sum())
 </code></pre>
+<p>A simple grouped sum is the first proof that split and combine already work. Before you reach for richer statistics, make sure the grouped totals themselves match your mental math.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">city
+Busan    175
+Seoul    220
+Name: sales, dtype: int64
+</code></pre>
 <p><strong>Step 3 — agg with multiple stats</strong></p>
 <pre><code class="language-python">print(df.groupby(&quot;city&quot;).agg(
     total=(&quot;sales&quot;, &quot;sum&quot;),
@@ -115,6 +113,14 @@ df = pd.DataFrame({
 <p><strong>Step 4 — transform</strong></p>
 <pre><code class="language-python">df[&quot;share&quot;] = df[&quot;sales&quot;] / df.groupby(&quot;city&quot;)[&quot;sales&quot;].transform(&quot;sum&quot;)
 print(df)
+</code></pre>
+<p><code>transform</code> matters because it keeps the original row shape intact. That makes it the natural tool for feature engineering like per-group shares, z-scores, and deviations from a group average.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">    city month  sales     share
+0  Seoul   Jan    100  0.454545
+1  Seoul   Feb    120  0.545455
+2  Busan   Jan     80  0.457143
+3  Busan   Feb     95  0.542857
 </code></pre>
 <p><strong>Step 5 — filter</strong></p>
 <pre><code class="language-python">big = df.groupby(&quot;city&quot;).filter(lambda g: g[&quot;sales&quot;].sum() &gt; 200)
@@ -157,7 +163,7 @@ print(big)
 <li>Use <em>transform</em> to attach the <em>group mean</em> back to the original DataFrame.</li>
 <li>Use <em>filter</em> to keep groups whose <em>sum exceeds a threshold</em>.</li>
 </ol>
-<h2>Wrap-up and Next Steps</h2>
+<h2>Wrap-up and next steps</h2>
 <p>groupby is the <em>engine of analysis</em>. Next we cover <em>merge and join</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/01-what-is-pandas.md">What Is Pandas?</a></li>
@@ -165,11 +171,11 @@ print(big)
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/03-read-csv-and-excel.md">Reading CSV and Excel</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/04-filtering-and-selection.md">Filtering and Selection</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/pandas-101/en/05-missing-values.md">Handling Missing Values</a></li>
-<li><strong>groupby (current)</strong></li>
+<li><strong>Groupby and Aggregation (current)</strong></li>
 <li>Merge and Join (upcoming)</li>
 <li>Time Series (upcoming)</li>
-<li>apply and Vectorization (upcoming)</li>
-<li>Real-world Data Analysis (upcoming)</li>
+<li>Apply and Vectorization (upcoming)</li>
+<li>Real-World Data Analysis (upcoming)</li>
 </ul>
 <h2>References</h2>
 <ul>
