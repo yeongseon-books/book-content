@@ -76,7 +76,7 @@ flowchart LR
 
 ```yaml
 - run: python -m build
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: dist
     path: dist/*
@@ -92,7 +92,7 @@ deploy:
   needs: build
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: dist
         path: dist/
@@ -104,7 +104,7 @@ deploy:
 ### 3단계 — 여러 파일을 묶어 보관하기
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: reports
     path: |
@@ -130,7 +130,7 @@ deploy:
 ### 5단계 — 보관 정책 정하기
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: nightly-build
     path: dist/
@@ -165,7 +165,7 @@ deploy:
 
 ## 체크리스트
 
-- [ ] `upload-artifact@v4`를 사용한다.
+- [ ] `upload-artifact@v7`를 사용한다.
 - [ ] 보관 기간을 명시했다.
 - [ ] 태그 푸시 시 Release 발행 흐름이 있다.
 - [ ] 체크섬이나 서명 같은 무결성 정보가 붙는다.

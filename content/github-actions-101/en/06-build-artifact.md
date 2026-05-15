@@ -78,7 +78,7 @@ flowchart LR
 
 ```yaml
 - run: python -m build
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: dist
     path: dist/*
@@ -92,7 +92,7 @@ deploy:
   needs: build
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         name: dist
         path: dist/
@@ -102,7 +102,7 @@ deploy:
 ### Step 3 — Bundle by patterns
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: reports
     path: |
@@ -124,7 +124,7 @@ deploy:
 ### Step 5 — Retention policy
 
 ```yaml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   with:
     name: nightly-build
     path: dist/
@@ -159,7 +159,7 @@ Mature teams emit *checksum + SBOM* with every build and *sign* releases (e.g., 
 
 ## Checklist
 
-- [ ] Use *upload-artifact@v4*.
+- [ ] Use *upload-artifact@v7*.
 - [ ] *retention-days* is set.
 - [ ] *Releases* are auto-published on *tag push*.
 - [ ] *Checksums* or *signatures* are attached.
