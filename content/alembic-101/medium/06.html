@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Data migrations: separating schema changes from data changes</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Data migrations: separating schema changes from data changes</h1>
+<p>Data migrations are often slower and more irreversible than the schema changes around them. How you isolate row transformation work inside revisions determines lock time, retry behavior, and recovery difficulty.</p>
+<p>This is post 6 in the Alembic 101 series. Here we will focus on why schema changes and data changes should be split, and what safe execution patterns look like.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>How a "data migration" is different from a schema migration</li>
+<li>Two writing styles for <code>op.execute</code> — raw SQL and SQLAlchemy core</li>
+<li>A pattern for splitting a large dataset into batches</li>
+<li>Why schema-only and data-only revisions should be separated</li>
+<li>How to ensure idempotency and safe re-execution</li>
+</ul>
+<h2>Why it matters</h2>
+<p><code>ALTER TABLE</code> is not the only kind of migration. Column renames, enum value changes, JSON structure conversions — these all change the data alongside the schema. If you mix a data migration into the same revision as a schema change, large datasets cause lock issues and timeouts, and <code>downgrade</code> becomes effectively impossible.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A data migration is <strong>a revision that leaves the schema alone and transforms rows</strong>. Separating it from schema-only revisions lets you (1) split a giant transaction into smaller batches, (2) preserve the schema part and re-run only the data part on failure, and (3) make the intent obvious to reviewers.</p>
+</blockquote>
+<p>To borrow a git analogy: schema changes are code refactors, and data changes are database migration scripts. Mixing both into one commit clouds the history.</p>
+<p><strong>Diagram: the three-stage split for data migrations</strong></p>
+<p><img alt="Diagram: the three-stage split for data migrations" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png"><br>
+<em>Isolating row transformation in the middle stage keeps long-running work separate from short schema changes.</em></p>
+<h2>Core concepts</h2>
+<p><strong>Two styles of <code>op.execute</code></strong></p>
+<p><strong>Raw SQL</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.execute(&quot;UPDATE users SET tier = 'free' WHERE tier IS NULL&quot;)
+</code></pre>
+<p>Fast and simple, but dialect-bound and your IDE cannot help much.</p>
+<p><strong>SQLAlchemy core</strong></p>
+<pre><code class="language-python">from sqlalchemy import table, column, String
+
+def upgrade() -&gt; None:
+    users = table(&quot;users&quot;, column(&quot;tier&quot;, String))
+    op.execute(
+        users.update()
+        .where(users.c.tier.is_(None))
+        .values(tier=&quot;free&quot;)
+    )
+</code></pre>
+<p>A bit longer but dialect-agnostic, and safer when the transformation logic is complex. <strong>Important</strong>: do not import models from <code>Base.metadata</code> inside migrations. If a model changes in the future, an old migration will break. Use <code>table()</code> / <code>column()</code> to declare an inline schema that captures the schema as it was at that moment.</p>
+<p><strong>Batched processing</strong></p>
+<p>A single <code>UPDATE</code> over millions of rows blows up locks and the transaction log. SQLite hits concurrency issues, while PostgreSQL and MySQL block other transactions.</p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    bind = op.get_bind()
+    batch_size = 1000
+    while True:
+        result = bind.execute(text(
+            &quot;UPDATE users SET tier = 'free' &quot;
+            &quot;WHERE id IN (SELECT id FROM users WHERE tier IS NULL LIMIT :n)&quot;
+        ), {&quot;n&quot;: batch_size})
+        if result.rowcount == 0:
+            break
+</code></pre>
+<p>If you also commit explicitly inside the loop, it gets even safer. SQLite is single-writer, so the time a large transaction blocks other work shrinks.</p>
+<p><strong>Splitting schema and data revisions</strong></p>
+<p>The standard form is three steps:</p>
+<ol>
+<li><strong>schema add</strong>: add the new column or table with <code>nullable=True</code> (fast).</li>
+<li><strong>data backfill</strong>: a data migration that fills existing rows (slow, batched).</li>
+<li><strong>schema tighten</strong>: enforce <code>nullable=False</code>, drop the default, etc. (fast).</li>
+</ol>
+<p>Each step is its own revision and the deploys are decoupled. Episode 9 formalizes this as the expand-contract pattern.</p>
+<h2>Before-After</h2>
+<pre><code class="language-python"># Before: schema and data bundled into one revision and timing out
+def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;tier&quot;, sa.String(16), nullable=False, server_default=&quot;free&quot;))
+    # 100M-row UPDATE — lock + transaction log explosion
+    op.execute(&quot;UPDATE users SET tier = 'paid' WHERE last_payment_at IS NOT NULL&quot;)
+    op.alter_column(&quot;users&quot;, &quot;tier&quot;, server_default=None)
+</code></pre>
+<pre><code class="language-python"># After: split into three revisions
+# revision 1: schema add (nullable=True)
+def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;tier&quot;, sa.String(16), nullable=True))
+
+# revision 2: data backfill (batch loop)
+def upgrade() -&gt; None:
+    bind = op.get_bind()
+    while True:
+        result = bind.execute(text(
+            &quot;UPDATE users SET tier = CASE &quot;
+            &quot;  WHEN last_payment_at IS NOT NULL THEN 'paid' ELSE 'free' END &quot;
+            &quot;WHERE id IN (SELECT id FROM users WHERE tier IS NULL LIMIT 1000)&quot;
+        ))
+        if result.rowcount == 0:
+            break
+
+# revision 3: schema tighten
+def upgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;tier&quot;, existing_type=sa.String(16), nullable=False)
+</code></pre>
+<p>The After version finishes each step quickly and moves on. Even if revision 2 takes a long time, the other steps are unaffected.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: add the schema</strong></p>
+<pre><code class="language-bash">alembic revision -m &quot;add users.tier (nullable)&quot;
+</code></pre>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    op.add_column(&quot;users&quot;, sa.Column(&quot;tier&quot;, sa.String(16), nullable=True))
+
+def downgrade() -&gt; None:
+    op.drop_column(&quot;users&quot;, &quot;tier&quot;)
+</code></pre>
+<p><strong>Step 2: data backfill revision</strong></p>
+<pre><code class="language-bash">alembic revision -m &quot;backfill users.tier&quot;
+</code></pre>
+<pre><code class="language-python">from sqlalchemy import text
+
+def upgrade() -&gt; None:
+    bind = op.get_bind()
+    batch = 1000
+    while True:
+        result = bind.execute(text(
+            &quot;UPDATE users SET tier = 'free' &quot;
+            &quot;WHERE id IN (SELECT id FROM users WHERE tier IS NULL LIMIT :n)&quot;
+        ), {&quot;n&quot;: batch})
+        if result.rowcount == 0:
+            break
+
+def downgrade() -&gt; None:
+    pass  # data migrations usually do not roll back (raise NotImplementedError is also fine)
+</code></pre>
+<p><strong>Step 3: tighten the schema</strong></p>
+<pre><code class="language-bash">alembic revision -m &quot;tighten users.tier NOT NULL&quot;
+</code></pre>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;tier&quot;, existing_type=sa.String(16), nullable=False)
+
+def downgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;tier&quot;, existing_type=sa.String(16), nullable=True)
+</code></pre>
+<p><strong>Step 4: ensure idempotency</strong></p>
+<p>Write the migration so that if it fails partway through and is re-run, nothing breaks.</p>
+<pre><code class="language-python">op.execute(&quot;UPDATE users SET tier = 'free' WHERE tier IS NULL&quot;)  # idempotent
+op.execute(&quot;UPDATE users SET counter = counter + 1&quot;)              # non-idempotent (dangerous)
+</code></pre>
+<p>Use a <code>WHERE</code> clause to exclude rows that have already been processed.</p>
+<p><strong>Step 5: verification query</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    bind = op.get_bind()
+    # ... backfill work ...
+    remaining = bind.execute(text(&quot;SELECT COUNT(*) FROM users WHERE tier IS NULL&quot;)).scalar()
+    assert remaining == 0, f&quot;backfill incomplete: {remaining} rows remain&quot;
+</code></pre>
+<p>An assertion validates backfill completeness. On failure, the transaction rolls back and the schema-tighten step never runs.</p>
+<h2>Verification routine</h2>
+<pre><code class="language-bash">alembic upgrade head
+sqlite3 app.db &quot;SELECT COUNT(*) FROM users WHERE tier IS NULL;&quot;
+</code></pre>
+<p><strong>Expected output:</strong> the NULL row count is zero before you ship the tighten revision. If it is not zero, the backfill is incomplete.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Bundling schema and data into one revision.</strong> The leading cause of timeouts and lock incidents on large datasets.</li>
+<li><strong>Importing models inside the migration.</strong> When the model changes in the future, the old revision breaks. Use inline <code>table()</code> / <code>column()</code> instead.</li>
+<li><strong><code>UPDATE</code> over the entire table without batching.</strong> Transactions explode at millions of rows.</li>
+<li><strong>Ignoring idempotency.</strong> Non-idempotent code that processes the same row twice on re-run is dangerous.</li>
+<li><strong>Writing a serious <code>downgrade</code> for a data migration.</strong> Data is generally a one-way commit. <code>pass</code> or <code>raise NotImplementedError</code> is honest.</li>
+</ul>
+<h2>Practical patterns</h2>
+<ul>
+<li><strong>Three-stage split: schema / data / tighten.</strong> The standard expand-contract pattern (episode 9).</li>
+<li><strong>Use <code>op.get_bind()</code> to grab a connection and use SQLAlchemy core.</strong> High portability.</li>
+<li><strong>Inline schema (<code>table</code> / <code>column</code>) to freeze the moment.</strong> Cuts the dependency on the live model.</li>
+<li><strong>Batch loop with explicit commits.</strong> Safe across SQLite, PostgreSQL, and MySQL.</li>
+<li><strong>Finish with a verification query.</strong> A single assertion prevents production incidents.</li>
+<li><strong>Dry-run data migrations in CI.</strong> Run the batch loop on a small dataset and confirm it terminates cleanly.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Schema and data migrations are split into separate revisions</li>
+<li>[ ] No model imports — inline <code>table()</code> / <code>column()</code> is used instead</li>
+<li>[ ] Large <code>UPDATE</code> statements run in a batch loop</li>
+<li>[ ] A <code>WHERE</code> clause makes the operation idempotent</li>
+<li>[ ] An assertion verifies backfill completeness</li>
+<li>[ ] The data migration's <code>downgrade</code> is intentionally empty or raises <code>NotImplementedError</code></li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Add a <code>display_name</code> column to <code>users</code>, backfill from <code>name</code>, and drop <code>name</code> in a separate revision. Three-stage migration.</li>
+<li>Generate one million fake rows and measure how long the batch loop takes.</li>
+<li>Force the backfill assertion to fail and confirm the transaction rolls back as expected.</li>
+</ol>
+<h2>Wrap up, next post</h2>
+<p>The standard form for data migrations is to split them out as separate revisions from schema changes. Batch loops, idempotency, and verification assertions are the three core tools.</p>
+<p>The next post goes deep on <code>--sql</code> for offline DDL and the SQLite-specific batch mode — the online vs offline DDL story.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.execute">Alembic: Operation Reference (<code>op.execute</code>)</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/cookbook.html#run-arbitrary-python-during-migrations">Alembic: Run Code at Migration Time</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/index.html">SQLAlchemy: SQL Expression Language Tutorial</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/cookbook.html">Alembic: Working With Custom Types and Data</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Alembic, data-migration, op.execute, batch, SQLite</p>
+</body>
+</html>

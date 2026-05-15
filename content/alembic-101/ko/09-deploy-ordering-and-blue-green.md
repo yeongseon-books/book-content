@@ -45,6 +45,11 @@ production schema 사고의 상당수는 코드와 schema가 잘못된 순서로
 
 git 비유로 보면 migration은 코드 PR보다 먼저 들어가는 PR이고, drop은 “이 컬럼 사용을 중단한다”는 코드 PR보다 나중에 들어가는 PR입니다.
 
+### 다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점
+
+![다이어그램: blue/green에서 schema가 두 버전을 동시에 받아야 하는 시점](../../../assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.ko.png)
+*확장 단계의 schema는 전환 구간 동안 v1과 v2를 동시에 수용해야 합니다*
+
 ## 핵심 개념
 
 ### migration-first vs code-first
@@ -56,7 +61,7 @@ git 비유로 보면 migration은 코드 PR보다 먼저 들어가는 PR이고, 
 | **Type widen** (`String(50)` → `String(100)`) | migration → code | 더 큰 값을 저장할 수 있어야 코드가 쓸 수 있다 |
 | **Type narrow** | code → migration | 코드가 작은 값만 쓰기 시작한 뒤에 줄여야 한다 |
 
-핵심은 전환 중에도 이전 버전 코드가 계속 살아 있어야 한다는 점입니다. 이것이 blue/green과 rolling deploy의 기본 가정입니다.
+전환 중에도 이전 버전 코드가 계속 살아 있어야 한다는 점이 가장 중요합니다. 이것이 blue/green과 롤링 배포의 기본 가정입니다.
 
 ### blue/green에서의 schema 호환성
 
@@ -194,6 +199,17 @@ stages:
 
 `migrate`가 항상 `deploy`보다 먼저 오도록 강제해야 합니다.
 
+## 검증 루틴
+
+```bash
+python3 - <<'PY'
+print('migrate -> deploy -> smoke-test')
+print('assert no NULL rows before NOT NULL tighten')
+PY
+```
+
+**확인할 점:** deploy pipeline이 항상 `migrate`를 먼저 실행하고, tighten 직전에는 NULL row 검증이 들어 있어야 blue/green 전환 중 이전 버전 코드까지 보호할 수 있습니다.
+
 ## 자주 하는 실수
 
 - **code-first deploy.** 코드가 새 schema를 먼저 가정하면 즉시 실패합니다.
@@ -234,13 +250,27 @@ deploy ordering은 Alembic 기능이 아니라 운영 정책입니다. “schema
 다음 글에서는 팀 단위의 실제 workflow, 즉 PR 규칙, CI 체크, 모니터링, incident response를 다룹니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
+- [왜 Alembic인가, 그리고 init까지](./01-why-alembic-and-init.md)
+- [env.py와 target_metadata: 모델과 마이그레이션 연결](./02-env-py-and-target-metadata.md)
+- [첫 revision: upgrade와 downgrade를 손으로 작성](./03-first-revision-upgrade-downgrade.md)
+- [autogenerate: 잡는 것과 못 잡는 것의 경계](./04-autogenerate-and-its-limits.md)
+- [branch와 merge: 동시에 만든 revision을 합치는 법](./05-branches-and-merges.md)
+- [데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기](./06-data-migrations.md)
+- [online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기](./07-online-vs-offline-and-batch.md)
+- [downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가](./08-downgrade-strategy.md)
+- **배포 순서와 blue/green: schema와 application code의 안전한 동기화 (현재 글)**
+- Production과 team workflow: PR, CI, 모니터링, 그리고 incident response (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
 
-- Alembic: Cookbook — https://alembic.sqlalchemy.org/en/latest/cookbook.html
-- Martin Fowler: Blue Green Deployment — https://martinfowler.com/bliki/BlueGreenDeployment.html
+- [sqlalchemy/alembic GitHub 저장소](https://github.com/sqlalchemy/alembic)
+- [Alembic: Cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)
+- [Martin Fowler: Blue Green Deployment](https://martinfowler.com/bliki/BlueGreenDeployment.html)
 - "Refactoring Databases" by Scott Ambler & Pramod Sadalage
-- Kubernetes: Init Containers — https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+- [Kubernetes: Init Containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 
-Tags: Python, Alembic, deploy, blue-green, ordering, SQLite
+Tags: Python, Alembic, SQLAlchemy, Migration

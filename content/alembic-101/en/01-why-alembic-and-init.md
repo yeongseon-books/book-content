@@ -16,7 +16,7 @@ tags:
 - SQLAlchemy
 - Migration
 - SQLite
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-12'
 seo_description: Alembic is git for your database schema. Each migration file is a
   commit, the alembic_version table is the current HEAD pointer, upgrade head is…
 ---
@@ -46,6 +46,11 @@ Alembic is the migration tool by SQLAlchemy's author, and it treats this problem
 > Alembic is **git for your database schema**. Each migration file is a commit, the `alembic_version` table is the current HEAD pointer, `upgrade head` is fast-forward, and `downgrade -1` is a one-step reset.
 
 Once that analogy lands, almost every command makes sense. `revision` creates a new commit, `merge` reconciles two heads, and `stamp` is like `git reset` — it changes HEAD without touching the working tree.
+
+### Diagram: how revision history reaches the database
+
+![Diagram: how revision history reaches the database](../../../assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
+*The revision file, `alembic_version`, and the deploy command form one auditable history chain.*
 
 ## Core concepts
 
@@ -171,6 +176,16 @@ sqlite3 app.db "SELECT * FROM alembic_version;"
 
 Seeing that single row in `alembic_version` makes the model click. That table is the reference point for every migration command.
 
+## Verification routine
+
+```bash
+alembic history
+alembic current
+sqlite3 app.db "SELECT version_num FROM alembic_version;"
+```
+
+**Expected output:** the latest revision appears in `alembic history`, and `alembic current` points at the same hash returned from `alembic_version`.
+
 ## Common mistakes
 
 - **Starting production with `create_all`.** Adopting Alembic later means an extra step of stamping the current schema as the first revision. Use Alembic from day one if you can.
@@ -208,14 +223,28 @@ Alembic boils down to one analogy: it is git for your database schema. Once you 
 
 The next episode opens up `env.py`. We will wire it to your model metadata, read the DB URL safely from the environment, and look at what online vs offline mode actually means.
 
-## References
-
-- Alembic: Tutorial — https://alembic.sqlalchemy.org/en/latest/tutorial.html
-- Alembic: Configuration — https://alembic.sqlalchemy.org/en/latest/config.html
-- SQLAlchemy: MetaData — https://docs.sqlalchemy.org/en/20/core/metadata.html
-- SQLite Documentation — https://www.sqlite.org/docs.html
-
 <!-- toc:begin -->
+## In this series
+
+- **Why Alembic, and getting to alembic init (current)**
+- env.py and target_metadata: wiring models to migrations (upcoming)
+- Your first revision: writing upgrade and downgrade by hand (upcoming)
+- autogenerate: the line between what it catches and what it misses (upcoming)
+- branches and merges: combining revisions made in parallel (upcoming)
+- Data migrations: separating schema changes from data changes (upcoming)
+- Online and offline modes: previewing DDL with --sql and handling SQLite batch (upcoming)
+- Downgrade strategy: when to write it for real and when to forbid it (upcoming)
+- Deploy ordering and blue/green: synchronizing schema and application code safely (upcoming)
+- Production and team workflow: PR, CI, monitoring, and incident response (upcoming)
+
 <!-- toc:end -->
 
-Tags: Python, Alembic, SQLAlchemy, Migration, init, SQLite
+## References
+
+- [sqlalchemy/alembic GitHub repository](https://github.com/sqlalchemy/alembic)
+- [Alembic: Tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+- [Alembic: Configuration](https://alembic.sqlalchemy.org/en/latest/config.html)
+- [SQLAlchemy: MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html)
+- [SQLite Documentation](https://www.sqlite.org/docs.html)
+
+Tags: Python, Alembic, SQLAlchemy, Migration

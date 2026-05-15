@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Online and offline modes: previewing DDL with --sql and handling SQLite batch</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Online and offline modes: previewing DDL with --sql and handling SQLite batch</h1>
+<p>Before a production deploy, there are times when you need to see the exact SQL a migration will emit. Add SQLite's DDL limits to the mix, and you need to understand offline mode and batch mode together.</p>
+<p>This is post 7 in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>The two execution modes alembic offers — online and offline</li>
+<li>How to preview the actual SQL with <code>--sql</code></li>
+<li>A workflow for producing SQL scripts that a DBA can review</li>
+<li>The limits of <code>ALTER TABLE</code> on SQLite and what <code>batch_alter_table</code> does internally</li>
+<li>Patterns to avoid when running in offline mode</li>
+</ul>
+<h2>Why it matters</h2>
+<p>There are times before a production deploy when you want to see exactly what SQL a migration will run — when an external DBA needs to review it, or when the impact is so large that PR review alone is not reassuring. Alembic's offline mode is the tool for that.</p>
+<p>SQLite also has very restricted <code>ALTER TABLE</code> support, so every alembic user eventually has to learn batch mode. The two topics are best learned together.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>Alembic runs in two modes. <strong>Online connects to the database and runs SQL directly. Offline emits the SQL text to standard output without a database connection.</strong> Offline is for dry-run, review, and scripting. Online is for actual application.</p>
+</blockquote>
+<p>Turning on <code>render_as_batch</code> makes calls like <code>op.alter_column</code> expand internally — for SQLite — into "create a temporary table, INSERT SELECT, swap names." Batch mode is alembic's safety net for SQLite.</p>
+<p><strong>Diagram: how online, offline, and batch mode divide responsibilities</strong></p>
+<p><img alt="Diagram: how online, offline, and batch mode divide responsibilities" src="https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png"><br>
+<em>The same revision can drive apply-time execution, review-time SQL output, and SQLite-specific batch rewriting.</em></p>
+<h2>Core concepts</h2>
+<p><strong>Online vs offline</strong></p>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>DB connection</th>
+<th>Output</th>
+<th>Use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>online (default)</td>
+<td>Required</td>
+<td>Application log</td>
+<td>Apply migration</td>
+</tr>
+<tr>
+<td>offline (<code>--sql</code>)</td>
+<td>Not needed</td>
+<td>SQL text (stdout)</td>
+<td>Review, scripting, dry-run</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash"># online (apply)
+alembic upgrade head
+
+# offline (SQL only)
+alembic upgrade head --sql &gt; migration.sql
+
+# only a specific span
+alembic upgrade &lt;from&gt;:&lt;to&gt; --sql &gt; step.sql
+</code></pre>
+<p>The <code>&lt;from&gt;:&lt;to&gt;</code> syntax is the key. <code>head</code> alone means <code>None:head</code>, which prints SQL from the very beginning to the head. To skip what is already applied, write <code>&lt;current&gt;:&lt;target&gt;</code> explicitly.</p>
+<p><strong>Constraints of offline mode</strong></p>
+<p>Without a DB, the following do not work in offline mode:</p>
+<ul>
+<li><code>op.get_bind()</code> (no connection)</li>
+<li>Data verification queries</li>
+<li>Helpers that use introspection</li>
+<li>Conditional logic (branching based on row counts, etc.)</li>
+</ul>
+<p>Therefore data migrations do not produce meaningful SQL in offline mode. The standard practice is to use offline mode for schema migrations only.</p>
+<p><strong><code>--sql</code> review workflow</strong></p>
+<pre><code class="language-bash"># 1) attach an SQL preview to the PR
+alembic upgrade &lt;prev&gt;:head --sql &gt; review.sql
+git add review.sql &amp;&amp; git commit -m &quot;ddl preview&quot;
+
+# 2) DBA reviews review.sql
+
+# 3) production deploy uses online as usual
+alembic upgrade head
+</code></pre>
+<p>This is a common flow in large operations. With SQL attached to the PR, reviewers can evaluate impact based on real SQL rather than op calls.</p>
+<p><strong>SQLite and batch mode</strong></p>
+<p>SQLite supports only the following <code>ALTER TABLE</code> operations:</p>
+<ul>
+<li><code>RENAME TABLE</code></li>
+<li><code>RENAME COLUMN</code> (3.25+)</li>
+<li><code>ADD COLUMN</code></li>
+<li><code>DROP COLUMN</code> (3.35+)</li>
+</ul>
+<p>That means type changes, nullable changes, default changes, and FK additions/removals cannot be done with a direct <code>ALTER</code>. Alembic's <code>batch_alter_table</code> expands them automatically:</p>
+<pre><code class="language-sql">CREATE TABLE _alembic_tmp_users (...);   -- temp table with the new schema
+INSERT INTO _alembic_tmp_users SELECT ... FROM users;
+DROP TABLE users;
+ALTER TABLE _alembic_tmp_users RENAME TO users;
+-- recreate the original indexes/triggers
+</code></pre>
+<p>This entire process happens inside one transaction so it is safe, but it takes time on large tables.</p>
+<p><strong>Automating <code>render_as_batch</code></strong></p>
+<p>In <code>env.py</code>, enable batch mode automatically only on SQLite.</p>
+<pre><code class="language-python">context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    render_as_batch=connection.dialect.name == &quot;sqlite&quot;,
+)
+</code></pre>
+<p>Even with this option on, the explicit <code>with op.batch_alter_table(...)</code> context is still recommended. It makes intent clearer and lets you bundle multiple alters into one batch.</p>
+<h2>Before-After</h2>
+<pre><code class="language-sql">-- Before: applied to production without looking at the SQL
+-- Result: column type changed without dropping the index, query performance regresses
+</code></pre>
+<pre><code class="language-bash"># After: previewed with --sql
+$ alembic upgrade &lt;prev&gt;:head --sql
+
+BEGIN;
+-- Running upgrade abc123 -&gt; def456, change users.tier type
+DROP INDEX ix_users_tier;
+ALTER TABLE users ALTER COLUMN tier TYPE VARCHAR(64);
+CREATE INDEX ix_users_tier ON users (tier);
+COMMIT;
+</code></pre>
+<p>If this SQL had been on the PR, the reviewer could have evaluated the cost of "drop and rebuild the index." That is the value of the dry-run workflow.</p>
+<h2>Step-by-step walkthrough</h2>
+<p><strong>Step 1: emit offline SQL</strong></p>
+<pre><code class="language-bash">alembic upgrade head --sql &gt; preview.sql
+cat preview.sql
+</code></pre>
+<p>On first use, you will notice it includes <code>BEGIN;</code> ... <code>COMMIT;</code> blocks and the <code>INSERT INTO alembic_version</code> statements as well.</p>
+<p><strong>Step 2: only a specific revision span</strong></p>
+<pre><code class="language-bash">alembic upgrade abc123:def456 --sql &gt; step.sql
+</code></pre>
+<p>Use this when production is already on <code>abc123</code> and you want to advance to <code>def456</code>.</p>
+<p><strong>Step 3: apply SQLite batch</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    with op.batch_alter_table(&quot;users&quot;) as batch:
+        batch.alter_column(&quot;tier&quot;,
+                           existing_type=sa.String(16),
+                           type_=sa.String(64))
+        batch.create_index(&quot;ix_users_tier&quot;, [&quot;tier&quot;])
+</code></pre>
+<p>Bundling multiple changes in one batch means the temp-table create-and-copy happens once.</p>
+<p><strong>Step 4: identify ops that do not work offline</strong></p>
+<pre><code class="language-python">def upgrade() -&gt; None:
+    bind = op.get_bind()                  # None in offline mode
+    if bind:                              # add a guard
+        bind.execute(text(&quot;UPDATE ...&quot;))
+</code></pre>
+<p>Or split data migrations into separate revisions and only preview the schema-only revisions in offline mode.</p>
+<p><strong>Step 5: add <code>--sql</code> dry-run to CI</strong></p>
+<pre><code class="language-yaml">- run: alembic upgrade head --sql &gt; /tmp/preview.sql &amp;&amp; cat /tmp/preview.sql
+</code></pre>
+<p>This single line effectively prints the SQL on every PR.</p>
+<h2>Verification routine</h2>
+<pre><code class="language-bash">alembic upgrade current:head --sql &gt; preview.sql
+python3 - &lt;&lt;'PY'
+from pathlib import Path
+text = Path('preview.sql').read_text()
+print('BEGIN;' in text, 'INSERT INTO alembic_version' in text)
+PY
+</code></pre>
+<p><strong>Expected output:</strong> the preview includes transaction boundaries and the <code>alembic_version</code> update SQL, so the review artifact matches the real deploy unit.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Running <code>--sql head</code> and being surprised that everything from the start prints out.</strong> Learn the <code>&lt;from&gt;:&lt;to&gt;</code> form.</li>
+<li><strong>Expecting data migration SQL in offline mode.</strong> Offline produces meaningful output mainly for schema changes.</li>
+<li><strong><code>ALTER</code> on SQLite without batch.</strong> Fails with "no such function ALTER" or "syntax error."</li>
+<li><strong>Ignoring the temp-table cost in batch mode.</strong> For tables with millions of rows, the schema add → data backfill → schema tighten pattern (episode 6) is safer.</li>
+<li><strong>Trusting <code>render_as_batch=True</code> and skipping the explicit batch context.</strong> Intent becomes muddled, and you lose the per-batch bundling effect.</li>
+</ul>
+<h2>Practical patterns</h2>
+<ul>
+<li><strong>Attach <code>--sql</code> previews to PRs.</strong> Standard for environments where DBA review is required.</li>
+<li><strong>Auto-print the dry-run from CI.</strong> Reduces reviewer effort.</li>
+<li><strong>Always write SQLite schema changes inside a batch context.</strong> Makes the difference from PostgreSQL behavior explicit.</li>
+<li><strong>Production deploys use online + transaction.</strong> Hand-running an offline SQL file is not recommended (transaction-boundary and <code>alembic_version</code> sync risks).</li>
+<li><strong>Alias <code>alembic upgrade &lt;prev&gt;:head --sql</code> to <code>make ddl-preview</code>.</strong> Standardize as a single command.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] <code>--sql</code> is invoked with <code>&lt;from&gt;:&lt;to&gt;</code> syntax</li>
+<li>[ ] Data migration output is not expected in offline mode</li>
+<li>[ ] SQLite <code>ALTER</code> changes always run inside a <code>batch_alter_table</code> context</li>
+<li>[ ] An SQL preview is attached to PRs or auto-printed from CI</li>
+<li>[ ] Production deploys go through online (no manual offline SQL execution)</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Make any schema change and run <code>alembic upgrade head --sql &gt; out.sql</code>; inspect the output structure.</li>
+<li>On SQLite, try to change a column type with <code>op.alter_column</code> outside a batch context and observe the error.</li>
+<li>Use the <code>&lt;prev&gt;:&lt;head&gt;</code> syntax to extract only the SQL for the last single step.</li>
+</ol>
+<h2>Wrap up, next post</h2>
+<p>Online for application, offline for review. The division of labor between the two modes increases safety in operations. On SQLite, build the habit of always using batch mode explicitly.</p>
+<p>The next post is downgrade strategy: when to seriously write a downgrade and when to deliberately forbid it.</p>
+<h2>References</h2>
+<ul>
+<li><a href="https://github.com/sqlalchemy/alembic">sqlalchemy/alembic GitHub repository</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/offline.html">Alembic: Generating SQL Scripts (Offline Mode)</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/batch.html">Alembic: Running Batch Migrations for SQLite and Other Databases</a></li>
+<li><a href="https://www.sqlite.org/lang_altertable.html">SQLite: ALTER TABLE</a></li>
+<li><a href="https://alembic.sqlalchemy.org/en/latest/ops.html">Alembic: Operation Reference</a></li>
+</ul>
+<p class="tags-line">Tags: Python, Alembic, online, offline, batch, SQLite</p>
+</body>
+</html>
