@@ -255,3 +255,4 @@ az functionapp plan create \
 
 Tags: Azure, Azure Functions, Serverless, Cloud
 
+
