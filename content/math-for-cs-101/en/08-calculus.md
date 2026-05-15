@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 8
 title: Calculus
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,39 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Calculus
 
-> Math for CS 101 series (8/10)
+When a model trains by reducing a loss, when a numerical method searches for a better answer, or when a simulation tracks how a system evolves over time, the core question is the same: from the current position, which way should we move?
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *quantify change* and find *optimal values*?
-
-> *Calculus* is the *language of change* and the foundation of *optimization* and *learning*.
-
-<!-- a-grade-intro:end -->
+Calculus gives you that directional sense. You do not need to understand an entire curve at once to learn something useful. Often it is enough to understand how the value wants to change right here, right now, at a single point.
 
 This is post 8 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.
 
-- Intuition for *limits*
-- *Derivatives*
-- *Gradients*
-- *Chain rule*
-- *Gradient descent* intuition
+## Questions this chapter answers
+
+- Why can local slope tell you so much about a global optimization process?
+- How are limits and derivatives connected?
+- What changes when one variable becomes many variables?
+- Why is the chain rule the backbone of backpropagation?
+- How does gradient descent turn slope information into repeated improvement?
+
+> Calculus is not mainly about memorizing curves. It is about reading change, choosing direction, and iterating toward a better state.
 
 ## Why It Matters
 
-*ML training*, *numerical optimization*, *physics simulation*, and *A/B test curves* all run on calculus.
+Machine learning training, numerical optimization, physical simulation, and many control problems rely on calculus because they all need a way to reason about change. The point is not to understand every detail of a function globally before you act. The point is to know enough local structure to take the next useful step.
+
+That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    L[Limit] --> D[Derivative]
-    D --> G[Gradient]
-    G --> C[Chain Rule]
-    G --> X[Gradient Descent]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
+*Calculus turns tiny local change into practical direction: first a derivative, then a gradient, then a repeated optimization procedure.*
 
 ## Key Terms
 
@@ -152,7 +147,9 @@ def descend(f, x, lr=0.1, steps=100):
 
 ## Wrap-up and Next Steps
 
-Next post: *Information Theory*.
+Calculus gives you a language for change that scales from one slope to full optimization loops. Once you connect derivatives, gradients, and the chain rule, many ML and numerical methods stop feeling like magic.
+
+Next, we move into information theory, where uncertainty gets measured in bits instead of slopes.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -173,5 +170,6 @@ Next post: *Information Theory*.
 - [Essence of Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
 - [Gradient Descent - Deep Learning Book](https://www.deeplearningbook.org/contents/numerical.html)
 - [SymPy Calculus Documentation](https://docs.sympy.org/latest/modules/calculus/index.html)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)
 
 Tags: Math, Calculus, Derivative, GradientDescent, Beginner

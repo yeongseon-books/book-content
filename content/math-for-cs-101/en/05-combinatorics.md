@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 5
 title: Combinatorics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,39 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Combinatorics
 
-> Math for CS 101 series (5/10)
+If you want to explain why an algorithm suddenly becomes too slow, why test cases explode, or why collisions become unavoidable, you end up counting possibilities. The problem is that real systems produce too many cases to enumerate by hand.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *count* possibilities *correctly* without listing them?
-
-> *Combinatorics* is the *art of counting*, and it underpins *complexity analysis* and *probability*.
-
-<!-- a-grade-intro:end -->
+Combinatorics is what lets you count without listing everything. Once you know whether order matters, whether repetition is allowed, and whether choices are independent or exclusive, the structure often tells you how to count.
 
 This is post 5 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.
 
-- *Product rule* and *sum rule*
-- *Permutations* nPr
-- *Combinations* nCr
-- *Pigeonhole principle*
-- *Binomial coefficients*
+## Questions this chapter answers
+
+- Why can we count accurately without enumerating every case?
+- When should you use the product rule versus the sum rule?
+- What is the practical difference between permutations and combinations?
+- Why does the pigeonhole principle prove collisions so quickly?
+- How do binomial coefficients connect counting to probability?
+
+> Combinatorics is really about structure before arithmetic. Once the structure is right, the count usually follows.
 
 ## Why It Matters
 
-*Algorithm complexity*, *probability*, *hash collisions*, and *test case generation* all rest on counting.
+Complexity analysis, probability, collision analysis, and test generation all depend on counting. If you underestimate the size of the possibility space, you can choose an algorithm that already fails before optimization begins.
+
+The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A[Counting] --> B[Permutation nPr]
-    A --> C[Combination nCr]
-    A --> D[Pigeonhole]
-    A --> E[Binomial]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
+*Counting principles help you detect search-space explosion early, before an implementation commits you to impossible work.*
 
 ## Key Terms
 
@@ -151,7 +146,9 @@ def row(n):
 
 ## Wrap-up and Next Steps
 
-Next post: *Probability*.
+Combinatorics teaches you to read possibility spaces structurally instead of by brute force. That shift is what makes complexity analysis and probability feel connected instead of separate topics.
+
+Next, we continue into probability, where counting becomes a way to reason about uncertainty instead of certainty alone.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -172,5 +169,6 @@ Next post: *Probability*.
 - [Counting - Khan Academy](https://www.khanacademy.org/math/statistics-probability/counting-permutations-and-combinations)
 - [Concrete Mathematics - Graham, Knuth, Patashnik](https://www-cs-faculty.stanford.edu/~knuth/gkp.html)
 - [Python math.comb Documentation](https://docs.python.org/3/library/math.html#math.comb)
+- [SymPy GitHub repository](https://github.com/sympy/sympy)
 
 Tags: Math, Combinatorics, Counting, Probability, Beginner

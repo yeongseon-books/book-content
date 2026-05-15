@@ -54,36 +54,27 @@
 </head>
 <body>
 <h1>Linear Algebra</h1>
-<blockquote>
-<p>Math for CS 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What <em>language</em> lets us handle <em>data</em> and <em>transforms</em> efficiently?</p>
-<blockquote>
-<p><em>Linear algebra</em> is the <em>common language</em> of data and transforms behind <em>ML</em>, <em>graphics</em>, and <em>simulation</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Linear algebra often feels intimidating to beginners because the notation becomes dense fast. In practice, though, the topic is less about ceremonial symbols and more about one useful idea: representing data and transformations in a compact, reusable form.</p>
+<p>Embeddings, dimensionality reduction, camera transforms, and neural network forward passes all become easier to understand once vectors and matrices stop looking like mysterious tables and start looking like data plus movement rules.</p>
 <p>This is post 7 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we use linear algebra as a practical language for data, similarity, and transformation.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>What a <em>vector</em> means</li>
-<li>What a <em>matrix</em> means</li>
-<li><em>Dot product</em> and <em>angle</em></li>
-<li><em>Matrix multiplication</em> and <em>transpose</em></li>
-<li>Intuition for <em>basis</em></li>
+<li>How do vectors and matrices represent data in a useful way?</li>
+<li>Why is the dot product so central to similarity and scoring?</li>
+<li>What is the difference between a matrix as a table and a matrix as a transform?</li>
+<li>When does a transpose change the way you should interpret the data?</li>
+<li>Why does basis intuition matter once dimensions carry meaning?</li>
 </ul>
+<blockquote>
+<p>Linear algebra lets you treat data and transforms with the same grammar. That is why it appears in ML, graphics, simulation, and ranking systems so often.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p><em>Embeddings</em>, <em>PCA</em>, <em>recommenders</em>, and <em>3D transforms</em> all run on linear algebra.</p>
+<p>Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on linear algebra. The common theme is not just computation speed. It is that vectors and matrices give you a way to describe meaning, similarity, and transformation in one framework.</p>
+<p>That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    V[Vector] --&gt; D[Dot Product]
-    V --&gt; M[Matrix]
-    M --&gt; T[Transpose]
-    M --&gt; X[Matmul]
-    M --&gt; B[Basis]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>Linear algebra treats vectors as data and matrices as the transformations that move or reinterpret that data.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>vector</strong>: <em>direction and magnitude</em>.</li>
@@ -155,7 +146,8 @@
 <li>State the <em>condition</em> for matrix multiplication.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Calculus</em>.</p>
+<p>Linear algebra gives you a compact way to talk about direction, similarity, and transformation. Once those concepts feel natural, modern data and ML systems look much less like black boxes.</p>
+<p>Next, we move into calculus, where the focus becomes change, direction, and optimization.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
@@ -174,6 +166,7 @@
 <li><a href="https://www.khanacademy.org/math/linear-algebra">Linear Algebra - Khan Academy</a></li>
 <li><a href="https://math.mit.edu/~gs/linearalgebra/">Introduction to Linear Algebra - Strang</a></li>
 <li><a href="https://numpy.org/doc/stable/reference/routines.linalg.html">NumPy Linear Algebra Documentation</a></li>
+<li><a href="https://github.com/numpy/numpy">NumPy GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, LinearAlgebra, Vectors, Matrices, Beginner</p>
 </body>

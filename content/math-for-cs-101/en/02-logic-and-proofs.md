@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 2
 title: Logic and Proofs
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,40 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Logic and Proofs
 
-> Math for CS 101 series (2/10)
+Developers make logical claims all the time: this condition is sufficient, that state transition is safe, and this algorithm stays correct for every valid input. At first you can test a few examples and move on, but important logic eventually demands a stronger explanation.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you *prove* a *program* is *correct*?
-
-> *Logic* gives us *propositions* and *implication*; *proof* uses *direct*, *contradiction*, and *induction*.
-
-<!-- a-grade-intro:end -->
+As the number of branches and state transitions grows, writing more tests alone is not enough. You also need a clean way to separate the claim itself, the assumptions behind it, and the counterexamples that would invalidate it.
 
 This is post 2 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.
 
-- *Propositions* and *truth tables*
-- *Implication* and *equivalence*
-- *Direct proof*
-- *Proof by contradiction*
-- *Mathematical induction*
+## Questions this chapter answers
+
+- How is a proof different from running a handful of examples?
+- How do propositions, implication, and equivalence map to real code?
+- When is a direct proof clearer than proof by contradiction?
+- Why does induction feel so close to loop reasoning?
+- Why is a single counterexample often enough to overturn a broad claim?
+
+> Logic gives you the grammar for true and false statements. Proof turns that grammar into a disciplined way to explain why an algorithm or program behavior should hold in all relevant cases.
 
 ## Why It Matters
 
-A *test* checks a *few* cases. A *proof* covers *all* of them.
+A test checks specific cases. A proof targets the whole claim. Those two tools are complementary, but they are not interchangeable. Three passing examples do not establish correctness for every `n`, every input ordering, or every edge case.
+
+That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Prop["proposition"] --> Truth["truth table"]
-    Prop --> Imply["implication"]
-    Imply --> Direct["direct proof"]
-    Imply --> Contra["contradiction"]
-    Imply --> Induct["induction"]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
+*Logic organizes the claim, and proof chooses the route from assumption to conclusion: direct reasoning, contradiction, or induction.*
 
 ## Key Terms
 
@@ -150,7 +144,9 @@ def sum_to(n):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *sets and functions*.
+Logic and proofs give you a way to explain correctness instead of only hoping repeated examples are representative. Once you can separate assumptions, implications, and counterexamples, design reviews become far more precise.
+
+Next, we move into sets and functions, where that logical precision starts shaping data boundaries and transformation rules.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -171,5 +167,6 @@ Next, we cover *sets and functions*.
 - [How to Prove It - Velleman](https://www.cambridge.org/core/books/how-to-prove-it/)
 - [Mathematical Induction - Khan Academy](https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:induction/v/proof-by-induction)
 - [Logic in Computer Science - Huth, Ryan](https://www.cambridge.org/core/books/logic-in-computer-science/)
+- [Z3 Theorem Prover GitHub repository](https://github.com/Z3Prover/z3)
 
 Tags: Math, Logic, Proof, Boolean, Beginner

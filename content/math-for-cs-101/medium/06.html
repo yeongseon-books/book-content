@@ -54,36 +54,27 @@
 </head>
 <body>
 <h1>Probability</h1>
-<blockquote>
-<p>Math for CS 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we <em>quantify</em> uncertainty instead of guessing?</p>
-<blockquote>
-<p><em>Probability</em> is the <em>language of uncertainty</em> and the foundation of <em>machine learning</em> and <em>reliability</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Engineering work is full of uncertainty. Was that A/B test result luck or a real signal? Is a false positive rate acceptable? How likely is a failure pattern to repeat? If you do not have a probability model, those questions often collapse into intuition dressed up as confidence.</p>
+<p>Probability does not eliminate uncertainty. It gives you a structured way to compare and update beliefs under uncertainty. Once you separate the possible outcomes, the event you care about, and the conditions already known, fuzzy judgment becomes something you can reason about.</p>
 <p>This is post 6 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Sample space</em> and <em>events</em></li>
-<li><em>Conditional probability</em></li>
-<li><em>Bayes theorem</em></li>
-<li><em>Expectation</em></li>
-<li><em>Variance</em></li>
+<li>How do you turn uncertainty into a model instead of a vague guess?</li>
+<li>What is the difference between a sample space and an event?</li>
+<li>Why is conditional probability really about changing the denominator world?</li>
+<li>How does Bayes theorem update a belief when new evidence arrives?</li>
+<li>Why do expectation and variance matter together in decision-making?</li>
 </ul>
+<blockquote>
+<p>Probability is not a magic prediction tool. It is a way to structure uncertainty so that comparisons, trade-offs, and updates become explicit.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p><em>A/B testing</em>, <em>recommendation</em>, <em>classifiers</em>, and <em>failure rates</em> are all probability models.</p>
+<p>A/B testing, recommendation ranking, classifier evaluation, and reliability work all rely on probability. Without the model, the numbers are still there, but the interpretation is shaky because the conditions behind the numbers stay hidden.</p>
+<p>The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    S[Sample Space] --&gt; E[Event]
-    E --&gt; P[P E]
-    P --&gt; C[Conditional]
-    C --&gt; B[Bayes]
-    P --&gt; X[Expectation]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>Probability starts with possible outcomes, then adds conditions, updates beliefs, and separates average outcome from risk.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>sample space</strong>: set of <em>possible outcomes</em>.</li>
@@ -155,7 +146,8 @@
 <li>State the difference between <em>expectation</em> and <em>variance</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Linear Algebra</em>.</p>
+<p>Probability gives you a way to reason about uncertainty without pretending that uncertainty disappears. Once you can describe events, conditions, priors, averages, and spread clearly, many engineering discussions become less emotional and more precise.</p>
+<p>Next, we move into linear algebra, where the focus shifts from uncertainty to representing data and transformations in a compact form.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
@@ -174,6 +166,7 @@
 <li><a href="https://plato.stanford.edu/entries/bayes-theorem/">Bayes Theorem - Stanford Encyclopedia</a></li>
 <li><a href="https://projects.iq.harvard.edu/stat110">Introduction to Probability - Blitzstein</a></li>
 <li><a href="https://docs.python.org/3/library/statistics.html">Python statistics Module</a></li>
+<li><a href="https://github.com/scipy/scipy">SciPy GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, Probability, Statistics, Bayes, Beginner</p>
 </body>

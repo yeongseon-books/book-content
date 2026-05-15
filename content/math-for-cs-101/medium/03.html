@@ -54,37 +54,27 @@
 </head>
 <body>
 <h1>Sets and Functions</h1>
-<blockquote>
-<p>Math for CS 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What lies at the <em>foundation</em> of <em>data structures</em>?</p>
-<blockquote>
-<p>A <em>set</em> is a <em>collection of elements</em>; a <em>function</em> is a <em>rule</em> from <em>input</em> to <em>output</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When you learn data structures, you usually start with lists, dictionaries, mapping, and filtering. Step back a little, though, and two simpler ideas sit underneath all of them: sets tell you what belongs, and functions tell you how one value becomes another.</p>
+<p>In real systems these two ideas rarely stay separate. Deduplication, permission checks, feature preprocessing, key mapping, and serialization pipelines all become easier to reason about once you can describe them as set boundaries plus transformation rules.</p>
 <p>This is post 3 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we use sets and functions as the foundation for data modeling and transformation, not just as definitions to memorize.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The definition of a <em>set</em></li>
-<li><em>Union</em>, <em>intersection</em>, <em>difference</em></li>
-<li>The definition of a <em>function</em></li>
-<li><em>Injective</em>, <em>surjective</em>, <em>bijective</em></li>
-<li><em>Composition</em> of functions</li>
+<li>Why are sets such a useful foundation for data structures and validation?</li>
+<li>How do union, intersection, and difference show up in ordinary code?</li>
+<li>What separates a function from a more general relation?</li>
+<li>Why do injective, surjective, and bijective mappings matter in practice?</li>
+<li>How does function composition resemble a production data pipeline?</li>
 </ul>
+<blockquote>
+<p>Sets make the boundary of allowed values explicit. Functions make the transformation from input to output explicit. Once those two axes are clear, both code and design decisions get easier to defend.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>Python's <em>set</em>, <em>dict</em>, <em>map</em>, and <em>filter</em> are all reinterpretations of <em>sets and functions</em>.</p>
+<p>Python's <code>set</code>, <code>dict</code>, <code>map</code>, and <code>filter</code> already carry the mental model of sets and functions. Deduplication is a set operation. Data transformation is often a chain of functions. Permission checks usually become set membership or set intersection once you make the model explicit.</p>
+<p>That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Set[&quot;set&quot;] --&gt; Union[&quot;union&quot;]
-    Set --&gt; Inter[&quot;intersection&quot;]
-    Set --&gt; Diff[&quot;difference&quot;]
-    Func[&quot;function&quot;] --&gt; Inj[&quot;injective&quot;]
-    Func --&gt; Sur[&quot;surjective&quot;]
-    Func --&gt; Bij[&quot;bijective&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>Sets define the boundary of values, while functions define the rule that moves values through the system.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>set</strong>: a collection of <em>distinct</em> elements.</li>
@@ -154,7 +144,8 @@
 <li>Define <em>composition</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>graphs</em>.</p>
+<p>Sets clarify the shape of data, and functions clarify the shape of change. Together they provide a compact vocabulary for boundary checks, deterministic transformations, and reversible mappings.</p>
+<p>Next, we broaden that structural view into graphs, where relationships between objects become the main story.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
@@ -173,6 +164,7 @@
 <li><a href="https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:functions">Functions - Khan Academy</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Discrete_Mathematics_and_Its_Applications">Discrete Math - Rosen</a></li>
 <li><a href="https://docs.python.org/3/tutorial/datastructures.html#sets">Python Set Operations</a></li>
+<li><a href="https://github.com/sympy/sympy">SymPy GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, Sets, Functions, Foundations, Beginner</p>
 </body>

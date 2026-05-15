@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 9
 title: Information Theory
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,39 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Information Theory
 
-> Math for CS 101 series (9/10)
+To understand why compression works, why cross entropy appears in classifier loss functions, or why language-model perplexity drops when predictions improve, you need a common concept underneath all three. That concept is information theory.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *measure* the *amount* of information?
-
-> *Information theory* gives us a *bit-level* unit for uncertainty behind *compression*, *communication*, and *ML loss*.
-
-<!-- a-grade-intro:end -->
+Information theory treats information as something measurable instead of something merely descriptive. It lets you ask how surprising an event is, how uncertain a distribution is, and how far a predictive distribution is from the real one, all in a shared quantitative language.
 
 This is post 9 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.
 
-- *Bits* and *information content*
-- *Entropy*
-- *Cross entropy*
-- *KL divergence*
-- *Compression* intuition
+## Questions this chapter answers
+
+- What does it mean to measure information in bits?
+- Why is entropy called average information content?
+- Why is cross entropy so common as an ML loss function?
+- What does KL divergence reveal that entropy alone does not?
+- How does information theory tell us both what is possible and what is impossible in compression?
+
+> Information theory measures uncertainty in bits. That is why it can connect compression, communication, and predictive modeling without changing languages.
 
 ## Why It Matters
 
-*Classifier losses*, *zip compression*, *communication codes*, and *language models* are all defined on top of information theory.
+Classifier losses, communication codes, compression formats, and language-model evaluation all rely on information-theoretic ideas. The formulas differ by domain, but the underlying questions are similar: how surprising is this event, how uncertain is this source, and how expensive is it to encode reality with the wrong distribution?
+
+Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Distribution] --> H[Entropy]
-    P --> C[Cross Entropy]
-    C --> K[KL Divergence]
-    H --> Z[Compression]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
+*Information theory links distributional uncertainty to coding cost, model loss, and the floor that compression cannot cross.*
 
 ## Key Terms
 
@@ -150,7 +145,9 @@ def avg_len(probs, lengths):
 
 ## Wrap-up and Next Steps
 
-Next post: the *Algorithms and Math* capstone.
+Information theory gives you a way to read surprise, uncertainty, and coding cost as parts of the same system. That makes compression, language modeling, and classification losses much easier to interpret.
+
+Next, we close the series by tying these mathematical tools back into algorithm design as one capstone view.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -171,5 +168,6 @@ Next post: the *Algorithms and Math* capstone.
 - [A Mathematical Theory of Communication - Shannon](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf)
 - [Elements of Information Theory - Cover and Thomas](https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959)
 - [SciPy Stats Entropy Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)
 
 Tags: Math, InformationTheory, Entropy, Compression, Beginner

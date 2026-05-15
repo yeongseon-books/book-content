@@ -54,35 +54,27 @@
 </head>
 <body>
 <h1>Combinatorics</h1>
-<blockquote>
-<p>Math for CS 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we <em>count</em> possibilities <em>correctly</em> without listing them?</p>
-<blockquote>
-<p><em>Combinatorics</em> is the <em>art of counting</em>, and it underpins <em>complexity analysis</em> and <em>probability</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>If you want to explain why an algorithm suddenly becomes too slow, why test cases explode, or why collisions become unavoidable, you end up counting possibilities. The problem is that real systems produce too many cases to enumerate by hand.</p>
+<p>Combinatorics is what lets you count without listing everything. Once you know whether order matters, whether repetition is allowed, and whether choices are independent or exclusive, the structure often tells you how to count.</p>
 <p>This is post 5 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Product rule</em> and <em>sum rule</em></li>
-<li><em>Permutations</em> nPr</li>
-<li><em>Combinations</em> nCr</li>
-<li><em>Pigeonhole principle</em></li>
-<li><em>Binomial coefficients</em></li>
+<li>Why can we count accurately without enumerating every case?</li>
+<li>When should you use the product rule versus the sum rule?</li>
+<li>What is the practical difference between permutations and combinations?</li>
+<li>Why does the pigeonhole principle prove collisions so quickly?</li>
+<li>How do binomial coefficients connect counting to probability?</li>
 </ul>
+<blockquote>
+<p>Combinatorics is really about structure before arithmetic. Once the structure is right, the count usually follows.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p><em>Algorithm complexity</em>, <em>probability</em>, <em>hash collisions</em>, and <em>test case generation</em> all rest on counting.</p>
+<p>Complexity analysis, probability, collision analysis, and test generation all depend on counting. If you underestimate the size of the possibility space, you can choose an algorithm that already fails before optimization begins.</p>
+<p>The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[Counting] --&gt; B[Permutation nPr]
-    A --&gt; C[Combination nCr]
-    A --&gt; D[Pigeonhole]
-    A --&gt; E[Binomial]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>Counting principles help you detect search-space explosion early, before an implementation commits you to impossible work.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>product rule</strong>: multiply <em>sequential</em> choices.</li>
@@ -156,7 +148,8 @@
 <li>Why is <em>0! = 1</em>?</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Probability</em>.</p>
+<p>Combinatorics teaches you to read possibility spaces structurally instead of by brute force. That shift is what makes complexity analysis and probability feel connected instead of separate topics.</p>
+<p>Next, we continue into probability, where counting becomes a way to reason about uncertainty instead of certainty alone.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/02-logic-and-proofs.md">Logic and Proofs</a></li>
@@ -175,6 +168,7 @@
 <li><a href="https://www.khanacademy.org/math/statistics-probability/counting-permutations-and-combinations">Counting - Khan Academy</a></li>
 <li><a href="https://www-cs-faculty.stanford.edu/~knuth/gkp.html">Concrete Mathematics - Graham, Knuth, Patashnik</a></li>
 <li><a href="https://docs.python.org/3/library/math.html#math.comb">Python math.comb Documentation</a></li>
+<li><a href="https://github.com/sympy/sympy">SymPy GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, Combinatorics, Counting, Probability, Beginner</p>
 </body>

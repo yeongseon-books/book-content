@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 4
 title: Graphs
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,39 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Graphs
 
-> Math for CS 101 series (4/10)
+Lists and tables are not enough once the important question becomes who is connected to whom, which task depends on which other task, or which route can reach a target. At that point the data is no longer just a collection of values. It is a web of relationships.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you *represent* and *traverse* data with *relationships*?
-
-> A *graph* is a collection of *vertices* and *edges* — the *common model* for every *network*.
-
-<!-- a-grade-intro:end -->
+Graphs are the standard way to make those relationships explicit. Social networks, road systems, build pipelines, service dependencies, and recommendation paths all look different on the surface, but a graph often exposes the common structure underneath.
 
 This is post 4 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.
 
-- *Vertices* and *edges*
-- *Directed* vs *undirected*
-- *Trees*
-- *Adjacency matrix* vs *list*
-- A starter *BFS*
+## Questions this chapter answers
+
+- Why do relationship-heavy problems become clearer when modeled as graphs?
+- What do vertices and edges correspond to in real systems?
+- How do directed and undirected graphs change the meaning of a model?
+- When is an adjacency list better than an adjacency matrix?
+- Why is breadth-first search such a common starting point?
+
+> A graph is not mainly a storage trick. It is a model for problems where relationships matter more than isolated values.
 
 ## Why It Matters
 
-*Social networks*, *maps*, *dependencies*, *recommendations* — all are *graphs*.
+Friend recommendations, route planning, build dependencies, and service maps all become easier to reason about once you stop pretending they are simple lists. What matters is not just the objects but the shape of the connections between them.
+
+That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A((A)) --> B((B))
-    A --> C((C))
-    B --> D((D))
-    C --> D
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
+*Graphs turn connected data into a structure you can traverse, measure, and reason about step by step.*
 
 ## Key Terms
 
@@ -157,7 +152,9 @@ def is_tree(G):
 
 ## Wrap-up and Next Steps
 
-Next, we cover *combinatorics*.
+Graphs give you a way to describe systems where connections drive the behavior. Once that model is explicit, traversal and path questions become much easier to phrase and solve.
+
+Next, we turn to combinatorics, where the focus shifts from connection structure to counting how quickly possibilities grow.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -178,5 +175,6 @@ Next, we cover *combinatorics*.
 - [Graphs - Khan Academy](https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs)
 - [Introduction to Algorithms - CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)
 - [NetworkX Documentation](https://networkx.org/)
+- [NetworkX GitHub repository](https://github.com/networkx/networkx)
 
 Tags: Math, Graphs, DataStructure, Algorithms, Beginner

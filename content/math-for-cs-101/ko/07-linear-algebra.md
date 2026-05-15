@@ -60,6 +60,11 @@ seo_description: 선형대수로 데이터와 변환을 한 문법으로 읽는 
 
 기저는 이 공간을 어떤 축으로 설명할지를 정하는 기준입니다. 기저를 이해하면 숫자가 무엇을 뜻하는지, 좌표가 왜 그렇게 보이는지 해석이 쉬워집니다.
 
+## 한 장으로 보는 선형대수의 기본 구조
+
+![한 장으로 보는 선형대수의 기본 구조](../../../assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)
+*선형대수는 데이터를 벡터로 보고, 변환을 행렬로 보게 하면서 계산과 해석을 한 문법으로 묶습니다.*
+
 ---
 
 ## 다섯 단계로 보는 선형대수 기초
@@ -177,5 +182,6 @@ def matmul(A, B):
 - [Linear Algebra - Khan Academy](https://www.khanacademy.org/math/linear-algebra)
 - [Introduction to Linear Algebra - Strang](https://math.mit.edu/~gs/linearalgebra/)
 - [NumPy Linear Algebra Documentation](https://numpy.org/doc/stable/reference/routines.linalg.html)
+- [NumPy GitHub repository](https://github.com/numpy/numpy)
 
 Tags: Math, LinearAlgebra, Vectors, Matrices, Beginner

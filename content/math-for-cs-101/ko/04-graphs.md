@@ -60,6 +60,11 @@ title: 그래프
 
 탐색에서는 너비 우선 탐색과 깊이 우선 탐색이 출발점이 됩니다. 여기서는 너비 우선 탐색을 먼저 봅니다. 시작점에서 가까운 정점부터 차례대로 넓혀 가는 방식이라, 최소 간선 수 경로 같은 문제와 자연스럽게 이어지기 때문입니다.
 
+## 한 장으로 보는 그래프 탐색
+
+![한 장으로 보는 그래프 탐색](../../../assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)
+*그래프는 대상보다 관계가 중심인 모델입니다. 탐색은 이 연결을 어떤 순서로 읽을지 정하는 절차입니다.*
+
 ---
 
 ## 다섯 단계로 보는 그래프 기초
@@ -185,5 +190,6 @@ def is_tree(G):
 - [Graphs - Khan Academy](https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs)
 - [BFS and DFS - CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)
 - [NetworkX Documentation](https://networkx.org/)
+- [NetworkX GitHub repository](https://github.com/networkx/networkx)
 
 Tags: Math, Graphs, DataStructure, Algorithms, Beginner

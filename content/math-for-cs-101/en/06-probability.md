@@ -2,7 +2,7 @@
 series: math-for-cs-101
 episode: 6
 title: Probability
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -22,40 +22,34 @@ last_reviewed: '2026-05-04'
 
 # Probability
 
-> Math for CS 101 series (6/10)
+Engineering work is full of uncertainty. Was that A/B test result luck or a real signal? Is a false positive rate acceptable? How likely is a failure pattern to repeat? If you do not have a probability model, those questions often collapse into intuition dressed up as confidence.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we *quantify* uncertainty instead of guessing?
-
-> *Probability* is the *language of uncertainty* and the foundation of *machine learning* and *reliability*.
-
-<!-- a-grade-intro:end -->
+Probability does not eliminate uncertainty. It gives you a structured way to compare and update beliefs under uncertainty. Once you separate the possible outcomes, the event you care about, and the conditions already known, fuzzy judgment becomes something you can reason about.
 
 This is post 6 in the Math for CS 101 series.
 
-## What You Will Learn
+Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.
 
-- *Sample space* and *events*
-- *Conditional probability*
-- *Bayes theorem*
-- *Expectation*
-- *Variance*
+## Questions this chapter answers
+
+- How do you turn uncertainty into a model instead of a vague guess?
+- What is the difference between a sample space and an event?
+- Why is conditional probability really about changing the denominator world?
+- How does Bayes theorem update a belief when new evidence arrives?
+- Why do expectation and variance matter together in decision-making?
+
+> Probability is not a magic prediction tool. It is a way to structure uncertainty so that comparisons, trade-offs, and updates become explicit.
 
 ## Why It Matters
 
-*A/B testing*, *recommendation*, *classifiers*, and *failure rates* are all probability models.
+A/B testing, recommendation ranking, classifier evaluation, and reliability work all rely on probability. Without the model, the numbers are still there, but the interpretation is shaky because the conditions behind the numbers stay hidden.
+
+The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    S[Sample Space] --> E[Event]
-    E --> P[P E]
-    P --> C[Conditional]
-    C --> B[Bayes]
-    P --> X[Expectation]
-```
+![Concept at a Glance](../../../assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
+*Probability starts with possible outcomes, then adds conditions, updates beliefs, and separates average outcome from risk.*
 
 ## Key Terms
 
@@ -150,7 +144,9 @@ def variance(values, probs):
 
 ## Wrap-up and Next Steps
 
-Next post: *Linear Algebra*.
+Probability gives you a way to reason about uncertainty without pretending that uncertainty disappears. Once you can describe events, conditions, priors, averages, and spread clearly, many engineering discussions become less emotional and more precise.
+
+Next, we move into linear algebra, where the focus shifts from uncertainty to representing data and transformations in a compact form.
 
 <!-- toc:begin -->
 - [Why Math for CS](./01-why-math-for-cs.md)
@@ -171,5 +167,6 @@ Next post: *Linear Algebra*.
 - [Bayes Theorem - Stanford Encyclopedia](https://plato.stanford.edu/entries/bayes-theorem/)
 - [Introduction to Probability - Blitzstein](https://projects.iq.harvard.edu/stat110)
 - [Python statistics Module](https://docs.python.org/3/library/statistics.html)
+- [SciPy GitHub repository](https://github.com/scipy/scipy)
 
 Tags: Math, Probability, Statistics, Bayes, Beginner

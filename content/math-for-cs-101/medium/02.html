@@ -54,36 +54,27 @@
 </head>
 <body>
 <h1>Logic and Proofs</h1>
-<blockquote>
-<p>Math for CS 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you <em>prove</em> a <em>program</em> is <em>correct</em>?</p>
-<blockquote>
-<p><em>Logic</em> gives us <em>propositions</em> and <em>implication</em>; <em>proof</em> uses <em>direct</em>, <em>contradiction</em>, and <em>induction</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Developers make logical claims all the time: this condition is sufficient, that state transition is safe, and this algorithm stays correct for every valid input. At first you can test a few examples and move on, but important logic eventually demands a stronger explanation.</p>
+<p>As the number of branches and state transitions grows, writing more tests alone is not enough. You also need a clean way to separate the claim itself, the assumptions behind it, and the counterexamples that would invalidate it.</p>
 <p>This is post 2 in the Math for CS 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Propositions</em> and <em>truth tables</em></li>
-<li><em>Implication</em> and <em>equivalence</em></li>
-<li><em>Direct proof</em></li>
-<li><em>Proof by contradiction</em></li>
-<li><em>Mathematical induction</em></li>
+<li>How is a proof different from running a handful of examples?</li>
+<li>How do propositions, implication, and equivalence map to real code?</li>
+<li>When is a direct proof clearer than proof by contradiction?</li>
+<li>Why does induction feel so close to loop reasoning?</li>
+<li>Why is a single counterexample often enough to overturn a broad claim?</li>
 </ul>
+<blockquote>
+<p>Logic gives you the grammar for true and false statements. Proof turns that grammar into a disciplined way to explain why an algorithm or program behavior should hold in all relevant cases.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>A <em>test</em> checks a <em>few</em> cases. A <em>proof</em> covers <em>all</em> of them.</p>
+<p>A test checks specific cases. A proof targets the whole claim. Those two tools are complementary, but they are not interchangeable. Three passing examples do not establish correctness for every <code>n</code>, every input ordering, or every edge case.</p>
+<p>That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Prop[&quot;proposition&quot;] --&gt; Truth[&quot;truth table&quot;]
-    Prop --&gt; Imply[&quot;implication&quot;]
-    Imply --&gt; Direct[&quot;direct proof&quot;]
-    Imply --&gt; Contra[&quot;contradiction&quot;]
-    Imply --&gt; Induct[&quot;induction&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>Logic organizes the claim, and proof chooses the route from assumption to conclusion: direct reasoning, contradiction, or induction.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>proposition</strong>: a <em>true/false</em> statement.</li>
@@ -155,7 +146,8 @@
 <li>Define <em>induction</em> in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>sets and functions</em>.</p>
+<p>Logic and proofs give you a way to explain correctness instead of only hoping repeated examples are representative. Once you can separate assumptions, implications, and counterexamples, design reviews become far more precise.</p>
+<p>Next, we move into sets and functions, where that logical precision starts shaping data boundaries and transformation rules.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/math-for-cs-101/en/01-why-math-for-cs.md">Why Math for CS</a></li>
 <li><strong>Logic and Proofs (current)</strong></li>
@@ -174,6 +166,7 @@
 <li><a href="https://www.cambridge.org/core/books/how-to-prove-it/">How to Prove It - Velleman</a></li>
 <li><a href="https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:induction/v/proof-by-induction">Mathematical Induction - Khan Academy</a></li>
 <li><a href="https://www.cambridge.org/core/books/logic-in-computer-science/">Logic in Computer Science - Huth, Ryan</a></li>
+<li><a href="https://github.com/Z3Prover/z3">Z3 Theorem Prover GitHub repository</a></li>
 </ul>
 <p class="tags-line">Tags: Math, Logic, Proof, Boolean, Beginner</p>
 </body>
