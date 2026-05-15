@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How PyPDFLoader and RecursiveCharacterTextSplitter break documents into semantically meaningful chunks, walked through with runnable code.
 ---
 
@@ -22,7 +22,7 @@ seo_description: How PyPDFLoader and RecursiveCharacterTextSplitter break docume
 
 PyPDFLoader and RecursiveCharacterTextSplitter decide where a document becomes retrievable context. This post breaks that path down with runnable examples.
 
-This is the first article in the RAG Deep Dive series.
+This is the first post in the RAG Deep Dive series.
 
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
@@ -38,8 +38,6 @@ This is the first article in the RAG Deep Dive series.
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
-
-> RAG Deep Dive series (1/6)
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -107,6 +105,31 @@ if __name__ == "__main__":
 - `chunk_overlap=10` does not guarantee an exact 10-character overlap in merge-based splitting.
 - Recursive splitting preserves structure better, but it is not magically domain-aware.
 - Character budgets can look safe while token budgets still overflow later.
+
+### Expected output and verification path
+
+When you run the example, the exact strings will vary a little by splitter implementation, but the verification shape should stay stable:
+
+```text
+=== CharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] 'After the final retry, the payload moves ...'
+
+=== RecursiveCharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] '## Operator action\nThe on-call engineer checks ...'
+
+=== TokenTextSplitter (3 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker ...'
+[2] 'three times. After the final retry ...'
+[3] '## Operator action\nThe on-call engineer ...'
+```
+
+The important checks are not the exact chunk strings but these three invariants:
+
+- Character splitting should usually preserve your chosen separator first.
+- Recursive splitting should preserve higher-level structure longer than plain character splitting.
+- Token splitting should produce a more predictable window count once the text gets denser.
 
 ## Checklist
 
@@ -431,6 +454,18 @@ if __name__ == "__main__":
 ```
 
 This is still not enough by itself. The final judge is retrieval behavior against representative questions. But once you understand the source-level mechanics, you can at least explain *why* a given configuration behaved the way it did, instead of tuning chunk sizes by superstition.
+
+---
+
+## Failure signals to check before blaming the retriever
+
+Before you touch `top_k`, MMR, or reranking, check whether chunking already damaged the evidence shape.
+
+- If headings keep coming back without their explanatory paragraph, the chunk boundary is too aggressive or the overlap is not realized the way you thought.
+- If one policy clause keeps appearing in several near-duplicate chunks, the chunks are probably too small and the retriever is seeing the same evidence fragment over and over.
+- If the final prompt overflows even though the ingest chunks looked small, character counts are hiding the real token cost.
+
+The fastest debugging order is simple: inspect the loader boundary, print real chunk output, measure token lengths, and only then tune retrieval. That order saves a lot of false retriever work.
 
 ---
 

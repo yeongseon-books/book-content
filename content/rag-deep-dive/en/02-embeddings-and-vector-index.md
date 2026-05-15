@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into vectors and search them, decomposed step by step.
 ---
 
@@ -22,7 +22,7 @@ seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into 
 
 HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.
 
-This is the 2nd article in the RAG Deep Dive series.
+This is post 2 in the RAG Deep Dive series.
 
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
@@ -38,8 +38,6 @@ This is the 2nd article in the RAG Deep Dive series.
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
-
-> RAG Deep Dive series (2/6)
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example
@@ -96,6 +94,27 @@ if __name__ == "__main__":
 - Teams often say “cosine” while the implementation is actually L2 or inner product.
 - Distance values are easy to misread if normalization assumptions are unstated.
 - The index is a ranking rule, not neutral storage.
+
+### Expected output and verification path
+
+The exact distances will vary with the embedding model, but a healthy run should look like this:
+
+```text
+rank=1 distance=0.42..
+The worker retries a failed message three times before dead-lettering.
+------------------------------------------------------------
+rank=2 distance=0.67..
+The dead-letter queue keeps the original payload for later inspection.
+------------------------------------------------------------
+rank=3 distance=1.10..
+Operators inspect the exception chain before replaying the message.
+```
+
+Verify three things before you trust the ranking:
+
+- the closest result really matches the question semantics,
+- distances are ordered from smaller to larger for `IndexFlatL2`,
+- returned row ids point back to the document text you expect.
 
 ## Checklist
 
@@ -396,6 +415,19 @@ if __name__ == "__main__":
 ```
 
 The lesson is bigger than persistence. A retrieval system is not only math and latency. It also has artifact boundaries, trust assumptions, and operational risks.
+
+---
+
+## Failure modes to separate before tuning the index
+
+Index tuning often starts too late in the debugging order. A bad retrieval result can come from at least four different layers:
+
+- the embedding model mapped the question and documents poorly,
+- the metric semantics are wrong for the normalization strategy,
+- the FAISS row id mapped back to the wrong document layer,
+- the right document was found but later prompt packing hid it.
+
+That is why exact flat search is such a useful baseline. If `IndexFlatL2` already fails on a small corpus, switching to IVF or HNSW will only make the failure harder to explain. First verify embedding shape, metric choice, id reconstruction, and prompt packing. Then optimize index speed.
 
 ---
 

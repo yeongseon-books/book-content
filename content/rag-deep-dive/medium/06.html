@@ -55,7 +55,7 @@
 <body>
 <h1>Evaluation and Quality Gates — RAGAS Metrics and Faithfulness</h1>
 <p>RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer quality without rereading every output by hand. This post shows how to turn those signals into a quality gate.</p>
-<p>This is the final article in the RAG Deep Dive series.</p>
+<p>This is the final post in the RAG Deep Dive series.</p>
 <!-- a-grade-intro:begin -->
 <h2>Questions this post answers</h2>
 <ul>
@@ -71,9 +71,6 @@
 <p><em>Questions this post answers</em></p>
 <!-- a-grade-intro:end -->
 
-<blockquote>
-<p>RAG Deep Dive series (6/6)</p>
-</blockquote>
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/06-evaluation-and-quality-gates/main.py</code></p>
@@ -392,15 +389,20 @@ def test_rag_quality_gate() -&gt; None:
 </ul>
 <hr>
 <h2>References</h2>
-<ol>
-<li><a href="https://pypi.org/project/ragas/0.1.22/"><code>ragas==0.1.22</code> package index</a></li>
-<li><code>ragas/evaluation.py</code> from installed <code>ragas==0.1.22</code></li>
-<li><code>ragas/metrics/_faithfulness.py</code> from installed <code>ragas==0.1.22</code></li>
-<li><code>ragas/metrics/_answer_relevance.py</code> from installed <code>ragas==0.1.22</code></li>
-<li><code>ragas/metrics/_context_precision.py</code> from installed <code>ragas==0.1.22</code></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py"><code>langchain/evaluation/loading.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/schema.py"><code>langchain/evaluation/schema.py</code></a></li>
-</ol>
+<p><strong>Official Docs</strong></p>
+<ul>
+<li><a href="https://docs.ragas.io/en/stable/getstarted/evaluation/">RAGAS evaluation quickstart</a></li>
+<li><a href="https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/">RAGAS metrics overview</a></li>
+<li><a href="https://python.langchain.com/docs/concepts/evaluation/">LangChain evaluation concepts</a></li>
+</ul>
+<p><strong>Source Code</strong></p>
+<ul>
+<li><a href="https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/evaluation.py">RAGAS <code>evaluation.py</code> source</a></li>
+<li><a href="https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_faithfulness.py">RAGAS faithfulness metric source</a></li>
+<li><a href="https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_answer_relevance.py">RAGAS answer relevancy metric source</a></li>
+<li><a href="https://github.com/explodinggradients/ragas/blob/v0.1.22/src/ragas/metrics/_context_precision.py">RAGAS context precision metric source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py">LangChain evaluation loading source</a></li>
+</ul>
 <p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
 </body>
 </html>

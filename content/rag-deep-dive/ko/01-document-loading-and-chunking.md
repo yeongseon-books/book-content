@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: PyPDFLoader와 RecursiveCharacterTextSplitter가 문서를 청크로 나누는 내부 동작을 예제와 함께 분해합니다.
 ---
 
@@ -103,6 +103,31 @@ if __name__ == "__main__":
 - `chunk_overlap=10`이 항상 정확히 10문자 겹침을 뜻하지는 않습니다.
 - 재귀 분할은 구조 보존에 강하지만, 도메인별 경계를 자동으로 이해하는 것은 아닙니다.
 - 문자 기준으로 안전해 보여도 토큰 기준 컨텍스트 한도는 초과할 수 있습니다.
+
+### 검증 출력 예시
+
+예제를 실행하면 정확한 문자열은 약간 달라도, 아래와 비슷한 형태가 나와야 합니다.
+
+```text
+=== CharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] 'After the final retry, the payload moves ...'
+
+=== RecursiveCharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] '## Operator action\nThe on-call engineer checks ...'
+
+=== TokenTextSplitter (3 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker ...'
+[2] 'three times. After the final retry ...'
+[3] '## Operator action\nThe on-call engineer ...'
+```
+
+여기서 확인할 핵심은 세 가지입니다.
+
+- 문자 분할은 먼저 선택한 구분자를 최대한 지키는지
+- 재귀 분할은 일반 문자 분할보다 상위 구조를 더 오래 보존하는지
+- 토큰 분할은 텍스트가 조밀해질수록 창 개수를 더 예측 가능하게 만드는지
 
 <!-- a-grade-example:end -->
 ## 체크리스트
@@ -414,6 +439,18 @@ if __name__ == "__main__":
 ```
 
 이 스크립트만으로 품질을 다 알 수는 없습니다. 그래도 설정 숫자를 감으로 고르는 단계에서 한 걸음 나아갑니다. chunk 전략은 결국 retrieval 실험으로 닫혀야 합니다. 다만 실험 전에 소스 코드를 읽어 두면 왜 특정 설정이 그렇게 동작했는지 설명할 수 있게 됩니다. 그것이 운영에서 중요합니다. 튜닝은 우연히 맞출 수 있어도, 재현 가능한 개선은 내부 동작을 이해해야만 가능합니다.
+
+---
+
+## retriever를 의심하기 전에 먼저 볼 실패 신호
+
+retriever 설정을 만지기 전에, 청킹이 이미 근거를 망가뜨렸는지부터 확인해야 합니다.
+
+- 제목만 반복해서 검색되고 본문 설명이 자꾸 빠진다면 경계가 너무 공격적이거나 overlap이 기대만큼 실현되지 않은 경우가 많습니다.
+- 같은 정책 문장이 비슷한 청크 여러 개로 계속 돌아오면 청크가 너무 작아서 같은 근거 조각을 여러 번 저장한 것에 가깝습니다.
+- ingest 단계에서는 작아 보였는데 최종 프롬프트에서 자꾸 길이 초과가 나면 문자 수가 실제 토큰 비용을 가리고 있을 가능성이 큽니다.
+
+가장 빠른 점검 순서는 단순합니다. 로더 경계를 먼저 보고, 실제 청크 출력을 찍고, 토큰 길이를 재고, 그다음에야 retrieval을 조정합니다. 이 순서를 지키면 retriever를 억울하게 탓하는 일을 크게 줄일 수 있습니다.
 
 ---
 

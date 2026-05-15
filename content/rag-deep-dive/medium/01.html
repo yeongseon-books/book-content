@@ -55,7 +55,7 @@
 <body>
 <h1>Document Loading and Chunking — Inside LangChain TextSplitter</h1>
 <p>PyPDFLoader and RecursiveCharacterTextSplitter decide where a document becomes retrievable context. This post breaks that path down with runnable examples.</p>
-<p>This is the first article in the RAG Deep Dive series.</p>
+<p>This is the first post in the RAG Deep Dive series.</p>
 <!-- a-grade-intro:begin -->
 <h2>Questions this post answers</h2>
 <ul>
@@ -71,9 +71,6 @@
 <p><em>Questions this post answers</em></p>
 <!-- a-grade-intro:end -->
 
-<blockquote>
-<p>RAG Deep Dive series (1/6)</p>
-</blockquote>
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/01-document-loading-and-chunking/main.py</code></p>
@@ -134,6 +131,27 @@ if __name__ == &quot;__main__&quot;:
 <li><code>chunk_overlap=10</code> does not guarantee an exact 10-character overlap in merge-based splitting.</li>
 <li>Recursive splitting preserves structure better, but it is not magically domain-aware.</li>
 <li>Character budgets can look safe while token budgets still overflow later.</li>
+</ul>
+<p><strong>Expected output and verification path</strong></p>
+<p>When you run the example, the exact strings will vary a little by splitter implementation, but the verification shape should stay stable:</p>
+<pre><code class="language-text">=== CharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] 'After the final retry, the payload moves ...'
+
+=== RecursiveCharacterTextSplitter (2 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker retries ...'
+[2] '## Operator action\nThe on-call engineer checks ...'
+
+=== TokenTextSplitter (3 chunks) ===
+[1] '# Incident runbook\n\n## Retry policy\nThe worker ...'
+[2] 'three times. After the final retry ...'
+[3] '## Operator action\nThe on-call engineer ...'
+</code></pre>
+<p>The important checks are not the exact chunk strings but these three invariants:</p>
+<ul>
+<li>Character splitting should usually preserve your chosen separator first.</li>
+<li>Recursive splitting should preserve higher-level structure longer than plain character splitting.</li>
+<li>Token splitting should produce a more predictable window count once the text gets denser.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
@@ -389,6 +407,15 @@ if __name__ == &quot;__main__&quot;:
     measure_chunks(documents)
 </code></pre>
 <p>This is still not enough by itself. The final judge is retrieval behavior against representative questions. But once you understand the source-level mechanics, you can at least explain <em>why</em> a given configuration behaved the way it did, instead of tuning chunk sizes by superstition.</p>
+<hr>
+<h2>Failure signals to check before blaming the retriever</h2>
+<p>Before you touch <code>top_k</code>, MMR, or reranking, check whether chunking already damaged the evidence shape.</p>
+<ul>
+<li>If headings keep coming back without their explanatory paragraph, the chunk boundary is too aggressive or the overlap is not realized the way you thought.</li>
+<li>If one policy clause keeps appearing in several near-duplicate chunks, the chunks are probably too small and the retriever is seeing the same evidence fragment over and over.</li>
+<li>If the final prompt overflows even though the ingest chunks looked small, character counts are hiding the real token cost.</li>
+</ul>
+<p>The fastest debugging order is simple: inspect the loader boundary, print real chunk output, measure token lengths, and only then tune retrieval. That order saves a lot of false retriever work.</p>
 <hr>
 <h2>The baseline to carry into episode 2</h2>
 <p>The first part of a RAG pipeline is built from relatively small pieces of code. <code>TextLoader</code> mostly gives you one document per file plus <code>source</code> metadata, but its autodetected encoding fallback has a real 0.2.17 quirk when all candidates fail. <code>PDFMinerLoader</code> can either preserve page identity or flatten it away, depending on <code>concatenate_pages</code>. <code>UnstructuredFileLoader</code>, itself a deprecated compatibility shim in this release line, can promote document structure into element-level metadata. Above that, <code>CharacterTextSplitter</code> and <code>RecursiveCharacterTextSplitter</code> create chunks through a split-then-merge strategy, while <code>TokenTextSplitter</code> redefines the budget in model-token terms.</p>

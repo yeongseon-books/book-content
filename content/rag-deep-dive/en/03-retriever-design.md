@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: How VectorStoreRetriever and MMR balance relevance and diversity, walked through LangChain internals.
 ---
 
@@ -22,7 +22,7 @@ seo_description: How VectorStoreRetriever and MMR balance relevance and diversit
 
 VectorStoreRetriever and MMR define how a retriever trades off relevance against coverage. This post walks that policy layer through LangChain internals.
 
-This is the 3rd article in the RAG Deep Dive series.
+This is post 3 in the RAG Deep Dive series.
 
 <!-- a-grade-intro:begin -->
 ## Questions this post answers
@@ -38,8 +38,6 @@ This is the 3rd article in the RAG Deep Dive series.
 
 *Questions this post answers*
 <!-- a-grade-intro:end -->
-
-> RAG Deep Dive series (3/6)
 
 <!-- a-grade-example:begin -->
 ## Minimal runnable example

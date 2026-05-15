@@ -14,7 +14,7 @@ tags:
 - LangChain
 - Vector Search
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: RetrievalQA의 한계와 LCEL 파이프라인이 같은 RAG 흐름을 어떻게 더 명확하게 표현하는지 비교합니다.
 ---
 
@@ -577,12 +577,19 @@ if __name__ == "__main__":
 
 ## 참고 자료
 
-1. [`langchain/chains/retrieval_qa/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
-2. [`langchain/chains/question_answering/chain.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
-3. [`langchain/chains/combine_documents/stuff.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
-4. [`langchain_core/runnables/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
-5. [`langchain_core/runnables/passthrough.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
-6. [`langchain_core/output_parsers/string.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/output_parsers/string.py)
-7. [`langchain/chains/base.py`](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/base.py)
+### 공식 문서
+
+- [LangChain retrieval 개념 가이드](https://python.langchain.com/docs/concepts/retrieval/)
+- [LangChain Expression Language 개요](https://python.langchain.com/docs/concepts/lcel/)
+- [LangChain `RunnablePassthrough` API 레퍼런스](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html)
+- [LangChain `StrOutputParser` API 레퍼런스](https://python.langchain.com/api_reference/core/output_parsers/langchain_core.output_parsers.string.StrOutputParser.html)
+
+### 소스 코드
+
+- [LangChain `RetrievalQA` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py)
+- [LangChain QA chain loader source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/question_answering/chain.py)
+- [LangChain `StuffDocumentsChain` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py)
+- [LangChain runnable base source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
+- [LangChain `RunnablePassthrough` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
 
 Tags: RAG, LangChain, Vector Search, LLM

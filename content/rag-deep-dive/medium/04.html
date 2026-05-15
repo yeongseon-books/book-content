@@ -55,7 +55,7 @@
 <body>
 <h1>Prompt Construction and Context Injection — Inside PromptTemplate</h1>
 <p>PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.</p>
-<p>This is the 4th article in the RAG Deep Dive series.</p>
+<p>This is post 4 in the RAG Deep Dive series.</p>
 <!-- a-grade-intro:begin -->
 <h2>Questions this post answers</h2>
 <ul>
@@ -71,9 +71,6 @@
 <p><em>Questions this post answers</em></p>
 <!-- a-grade-intro:end -->
 
-<blockquote>
-<p>RAG Deep Dive series (4/6)</p>
-</blockquote>
 <!-- a-grade-example:begin -->
 <h2>Minimal runnable example</h2>
 <p>Example file: <code>en/04-prompt-construction-and-context-injection/main.py</code></p>
@@ -364,18 +361,21 @@ if __name__ == &quot;__main__&quot;:
 </ul>
 <hr>
 <h2>References</h2>
-<ol>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py"><code>langchain_core/prompts/prompt.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/string.py"><code>langchain_core/prompts/string.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/base.py"><code>langchain_core/prompts/base.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py"><code>langchain_core/prompts/chat.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py"><code>langchain_core/messages/base.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/human.py"><code>langchain_core/messages/human.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/system.py"><code>langchain_core/messages/system.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/ai.py"><code>langchain_core/messages/ai.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py"><code>langchain/chains/retrieval_qa/base.py</code></a></li>
-<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py"><code>langchain/chains/combine_documents/stuff.py</code></a></li>
-</ol>
+<p><strong>Official Docs</strong></p>
+<ul>
+<li><a href="https://python.langchain.com/docs/concepts/prompt_templates/">LangChain Prompt Templates concept guide</a></li>
+<li><a href="https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.prompt.PromptTemplate.html">LangChain <code>PromptTemplate</code> API reference</a></li>
+<li><a href="https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.ChatPromptTemplate.html">LangChain <code>ChatPromptTemplate</code> API reference</a></li>
+<li><a href="https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.chat.MessagesPlaceholder.html">LangChain <code>MessagesPlaceholder</code> API reference</a></li>
+</ul>
+<p><strong>Source Code</strong></p>
+<ul>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/prompt.py">LangChain <code>prompt.py</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/prompts/chat.py">LangChain <code>chat.py</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/messages/base.py">LangChain <code>messages/base.py</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/retrieval_qa/base.py">LangChain <code>RetrievalQA</code> source</a></li>
+<li><a href="https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/chains/combine_documents/stuff.py">LangChain <code>StuffDocumentsChain</code> source</a></li>
+</ul>
 <p class="tags-line">Tags: RAG, LangChain, Vector Search, LLM</p>
 </body>
 </html>
