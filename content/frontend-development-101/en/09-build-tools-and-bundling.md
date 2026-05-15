@@ -4,7 +4,7 @@ episode: 9
 title: Build Tools and Bundling
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

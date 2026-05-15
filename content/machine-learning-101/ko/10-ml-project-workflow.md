@@ -5,8 +5,8 @@ title: ML 프로젝트 전체 흐름
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

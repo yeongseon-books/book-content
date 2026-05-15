@@ -4,7 +4,7 @@ episode: 5
 title: The Database Layer
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

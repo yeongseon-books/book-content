@@ -11,7 +11,7 @@ tags:
 - Python
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 구조화 출력 — JSON 모드와 응답 스키마

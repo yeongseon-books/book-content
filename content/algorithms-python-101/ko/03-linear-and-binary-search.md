@@ -5,8 +5,8 @@ title: 선형 탐색과 이진 탐색
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

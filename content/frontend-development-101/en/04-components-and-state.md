@@ -4,7 +4,7 @@ episode: 4
 title: Components and State
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

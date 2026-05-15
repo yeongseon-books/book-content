@@ -5,8 +5,8 @@ title: 모델 평가는 왜 어려운가?
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

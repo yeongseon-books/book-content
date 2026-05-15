@@ -17,7 +17,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Coverage and Test Quality
 ---
 

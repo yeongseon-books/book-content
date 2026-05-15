@@ -11,7 +11,7 @@ tags:
 - Python
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: FAISS 입문 — 고속 근사 최근접 이웃 검색

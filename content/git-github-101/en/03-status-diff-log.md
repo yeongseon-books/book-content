@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Reading change history - status, diff, log
 seo_description: 'status, diff, and log are three read-only windows that answer three
   different questions: where am I right now, what is different and how, and how…'

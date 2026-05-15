@@ -4,7 +4,7 @@ episode: 5
 title: Web Security Basics
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

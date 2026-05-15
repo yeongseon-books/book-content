@@ -5,8 +5,8 @@ title: 왜 테스트를 작성해야 할까?
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

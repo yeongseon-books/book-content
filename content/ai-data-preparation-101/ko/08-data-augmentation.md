@@ -20,7 +20,7 @@ targets:
 
   ebook: true
 
-  medium: true
+  medium: false
 
   mkdocs: true
 

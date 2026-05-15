@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Structured output — JSON mode and response schemas
 seo_description: Define a reliable application contract using JSON mode and Pydantic validation to transform unpredictable LLM text into stable, machine-readable data.
 ---

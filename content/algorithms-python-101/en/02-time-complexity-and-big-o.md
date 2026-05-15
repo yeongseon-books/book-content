@@ -4,7 +4,7 @@ episode: 2
 title: Time Complexity and Big-O
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

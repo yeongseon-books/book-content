@@ -13,8 +13,8 @@ tags:
 - Engineering
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 운영 가능한 시스템 만들기

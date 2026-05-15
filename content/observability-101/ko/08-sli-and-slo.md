@@ -5,8 +5,8 @@ title: 서비스 수준 지표와 목표 기초
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

@@ -13,8 +13,8 @@ tags:
 - first-repository
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 첫 commit 만들기 - init, status, add, commit

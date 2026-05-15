@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Tracking Work with Issues and Projects - How GitHub Records What's Next
 seo_description: Issues record "what is to be done", Pull Requests record "how it
   was actually done", and Projects record "where the work currently sits" — three…

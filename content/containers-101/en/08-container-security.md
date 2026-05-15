@@ -4,7 +4,7 @@ episode: 8
 title: Container Security
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

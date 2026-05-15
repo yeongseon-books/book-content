@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Chunking strategies — how to split long documents
 seo_description: Optimize retrieval quality by choosing effective chunking strategies, adjusting chunk size, and managing overlap to preserve context in vector search.
 ---

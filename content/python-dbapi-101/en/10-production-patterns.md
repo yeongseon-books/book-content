@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: 'SQLite Production Patterns: retry, timeout, observability, backup'
 seo_description: SQLite being a single file simplifies operations, but treating it
   as "just a file" is dangerous.

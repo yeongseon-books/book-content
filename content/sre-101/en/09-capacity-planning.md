@@ -4,7 +4,7 @@ episode: 9
 title: Capacity Planning
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

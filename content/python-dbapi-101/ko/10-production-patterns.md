@@ -13,8 +13,8 @@ tags:
 - Retry
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 'SQLite Production 패턴: retry, timeout, 관측성, 백업'

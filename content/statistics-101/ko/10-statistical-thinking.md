@@ -5,8 +5,8 @@ title: 통계적 사고방식
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

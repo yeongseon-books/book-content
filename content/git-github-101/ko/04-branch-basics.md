@@ -13,8 +13,8 @@ tags:
 - feature-branch
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: branch 기초 - 만들고 옮기고 비교하기

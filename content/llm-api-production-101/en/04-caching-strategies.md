@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Caching strategies — reducing cost and latency
 seo_description: Reduce LLM API costs and latency by implementing a robust request-hash caching strategy with TTL-based expiration and stable key generation.
 ---

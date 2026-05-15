@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: What is an embedding — converting text into vectors
 seo_description: Learn how text embeddings transform natural language into numeric vectors to enable semantic search, machine-readable meaning, and vector similarity.
 ---

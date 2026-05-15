@@ -5,8 +5,8 @@ title: 객체지향과 함수형의 균형
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

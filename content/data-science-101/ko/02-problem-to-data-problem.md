@@ -5,8 +5,8 @@ title: 문제를 데이터 문제로 바꾸기
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

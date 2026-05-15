@@ -16,7 +16,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Environment internals — the network, observability, and Dapr scope boundary
 ---
 

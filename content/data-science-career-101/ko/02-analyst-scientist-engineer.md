@@ -5,8 +5,8 @@ title: 분석가 vs 사이언티스트 vs 엔지니어
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

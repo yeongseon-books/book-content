@@ -13,8 +13,8 @@ tags:
 - origin
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: GitHub repository 만들기 - remote, push, pull 한 번에 익히기

@@ -5,8 +5,8 @@ title: 타입 힌트를 잘 쓰는 기준
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

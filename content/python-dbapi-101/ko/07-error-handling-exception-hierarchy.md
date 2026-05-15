@@ -13,8 +13,8 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: PEP 249 예외 계층과 SQLite 에러 처리

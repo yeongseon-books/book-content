@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Vector search pipeline — from document ingestion to query
 seo_description: Build an end-to-end vector search pipeline from document ingestion to retrieval, including hybrid search combining keywords and embeddings.
 ---

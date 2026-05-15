@@ -5,8 +5,8 @@ title: Secret과 키 관리
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

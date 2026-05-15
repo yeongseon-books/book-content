@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Rate limit management — patterns for staying within limits
 seo_description: Manage LLM API traffic effectively using token-bucket and sliding-window patterns to prevent 429 errors and optimize throughput.
 ---

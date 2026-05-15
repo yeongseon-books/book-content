@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: FAISS fundamentals — fast approximate nearest-neighbor search
 seo_description: Implement fast approximate nearest-neighbor search with FAISS to handle large-scale vector collections with high accuracy and low latency.
 ---

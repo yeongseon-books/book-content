@@ -13,8 +13,8 @@ tags:
 - pr-workflow
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: Pull Request로 협업하기 - branch에서 review를 거쳐 main까지

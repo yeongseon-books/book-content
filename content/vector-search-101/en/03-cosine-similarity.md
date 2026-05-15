@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Cosine similarity and vector search — computing sentence distances
 seo_description: Compare cosine similarity, dot product, and Euclidean distance for vector search to understand how normalization affects semantic ranking results.
 ---

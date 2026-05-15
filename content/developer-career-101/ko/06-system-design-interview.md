@@ -5,8 +5,8 @@ title: 시스템 디자인 인터뷰
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

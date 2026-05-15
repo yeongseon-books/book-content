@@ -4,7 +4,7 @@ episode: 6
 title: API Calls and Async
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

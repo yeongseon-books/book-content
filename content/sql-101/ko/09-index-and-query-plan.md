@@ -5,8 +5,8 @@ title: 인덱스와 쿼리 계획
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

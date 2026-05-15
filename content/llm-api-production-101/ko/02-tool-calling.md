@@ -11,7 +11,7 @@ tags:
 - Python
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 툴 호출 — 함수를 모델에 연결하기

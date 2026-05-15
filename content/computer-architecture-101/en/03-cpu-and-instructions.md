@@ -4,7 +4,7 @@ episode: 3
 title: CPU and Instructions
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -11,7 +11,7 @@ tags:
 - Python
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 속도 제한 관리 — Rate Limit 대응 패턴

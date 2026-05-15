@@ -4,7 +4,7 @@ episode: 7
 title: Data Drift and Model Drift
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

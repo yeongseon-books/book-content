@@ -4,7 +4,7 @@ episode: 7
 title: Recording Tech Decisions
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

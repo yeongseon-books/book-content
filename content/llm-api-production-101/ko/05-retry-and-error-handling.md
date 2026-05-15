@@ -11,7 +11,7 @@ tags:
 - Python
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 재시도와 오류 처리 — 안정적인 API 호출 만들기

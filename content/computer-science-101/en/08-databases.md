@@ -4,7 +4,7 @@ episode: 8
 title: Databases
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -4,7 +4,7 @@ episode: 10
 title: A Production-Ready Backend Structure
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -5,8 +5,8 @@ title: SQL Injection과 ORM 안전 사용
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

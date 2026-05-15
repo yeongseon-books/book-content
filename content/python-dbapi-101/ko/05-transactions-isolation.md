@@ -6,8 +6,8 @@ language: ko
 status: publish-ready
 targets:
   tistory: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   ebook: true
 tags:

@@ -5,8 +5,8 @@ title: GitHub Actions에서 테스트 자동화하기
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

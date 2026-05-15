@@ -4,7 +4,7 @@ episode: 9
 title: Mentoring and Networking
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

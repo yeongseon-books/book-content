@@ -13,8 +13,8 @@ tags:
 - log-formatting
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 변경 사항 확인하기 - status, diff, log로 읽기

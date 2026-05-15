@@ -5,8 +5,8 @@ title: 웹은 어떻게 동작하는가?
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

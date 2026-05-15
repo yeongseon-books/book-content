@@ -13,8 +13,8 @@ tags:
 - Observability
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: Monitoring

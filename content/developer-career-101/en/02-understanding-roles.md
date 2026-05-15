@@ -4,7 +4,7 @@ episode: 2
 title: Understanding Roles
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

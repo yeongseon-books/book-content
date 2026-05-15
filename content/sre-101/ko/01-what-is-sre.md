@@ -13,8 +13,8 @@ tags:
 - Engineering
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: SRE란 무엇인가?

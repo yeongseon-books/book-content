@@ -5,8 +5,8 @@ title: 함수형 서비스(FaaS)란 무엇인가?
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

@@ -5,8 +5,8 @@ title: 패턴을 남용하지 않는 법
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

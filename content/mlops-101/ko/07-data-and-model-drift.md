@@ -5,8 +5,8 @@ title: 데이터 드리프트와 모델 드리프트
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

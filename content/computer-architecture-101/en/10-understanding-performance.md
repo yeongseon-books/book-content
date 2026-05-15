@@ -4,7 +4,7 @@ episode: 10
 title: Understanding Performance
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

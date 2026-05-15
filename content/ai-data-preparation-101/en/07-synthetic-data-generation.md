@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Synthetic Data Generation - From Self-Instruct to Distillation
 seo_description: The most common bottleneck in production LLM fine-tuning is a shortage
   of labeled data. Human annotation costs $1-5 per sample and takes days.

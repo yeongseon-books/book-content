@@ -4,7 +4,7 @@ episode: 1
 title: What Is Clean Code?
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

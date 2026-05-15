@@ -13,8 +13,8 @@ tags:
 - conflict-markers
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: merge와 conflict 해결하기 - 두 줄기를 다시 합치기

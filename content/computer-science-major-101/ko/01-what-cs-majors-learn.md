@@ -5,8 +5,8 @@ title: 컴퓨터학과에서는 무엇을 배우는가
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

@@ -4,7 +4,7 @@ episode: 2
 title: Severity Classification
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

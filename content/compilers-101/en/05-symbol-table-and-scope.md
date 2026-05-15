@@ -4,7 +4,7 @@ episode: 5
 title: symbol table and scope
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

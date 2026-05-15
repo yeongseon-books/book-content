@@ -15,7 +15,7 @@ tags:
 - tiktoken
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: Tokenization과 Chunking 전략

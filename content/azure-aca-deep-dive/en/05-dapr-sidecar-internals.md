@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Dapr sidecar internals — the Go process that lives next to your container
 ---
 

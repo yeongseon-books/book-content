@@ -14,8 +14,8 @@ tags:
 - 그래프 탐색
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 그래프

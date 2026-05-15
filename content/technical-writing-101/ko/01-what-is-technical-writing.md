@@ -13,8 +13,8 @@ tags:
 - Beginner
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 기술 글쓰기란 무엇인가

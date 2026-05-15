@@ -4,7 +4,7 @@ episode: 8
 title: Message Queues and Event Sourcing
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

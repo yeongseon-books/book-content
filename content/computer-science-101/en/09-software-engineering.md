@@ -4,7 +4,7 @@ episode: 9
 title: Software Engineering
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -12,7 +12,7 @@ tags:
 - MinHash
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 데이터 정제와 중복 제거

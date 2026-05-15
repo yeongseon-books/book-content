@@ -5,8 +5,8 @@ title: 컴퓨터 구조란 무엇인가?
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
