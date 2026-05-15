@@ -15,7 +15,7 @@ tags:
 - Error Handling
 - Reliability
 - Retry Logic
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: Agents can fail because they call external tools, go through networks,
   and depend on uncertain model judgments.
 ---
@@ -476,16 +476,9 @@ Show users a friendly message; manage internal trace IDs separately.
 
 ## References
 
-1. **Release It! Design and Deploy Production-Ready Software** - Michael Nygard - https://pragprog.com/titles/mnee2/release-it-second-edition/  
-   The classic on reliability patterns: circuit breaker, bulkhead, timeout. The patterns apply directly to agent systems.
-
-2. **AWS Builders' Library: Timeouts, retries, and backoff with jitter** - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/  
-   AWS's best practices for retry and backoff. Explains why jitter matters and shows concrete algorithms.
-
-3. **OpenAI: Production Best Practices** - https://platform.openai.com/docs/guides/production-best-practices  
-   OpenAI's official operations guide. Covers rate limits, error codes, and retry policies.
-
-4. **Hystrix: Latency and Fault Tolerance** - https://github.com/Netflix/Hystrix/wiki  
-   Netflix's circuit breaker library docs. Provides core concepts and operational case studies.
+- [AWS Builders' Library - Timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
+- [OpenAI production best practices](https://platform.openai.com/docs/guides/production-best-practices)
+- [Martin Fowler - Circuit Breaker](https://martinfowler.com/bliki/CircuitBreaker.html)
+- [Google SRE Book - Handling Overload](https://sre.google/sre-book/handling-overload/)
 
 Tags: AI Agent, LLM, Tool Use, Python

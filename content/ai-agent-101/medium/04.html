@@ -59,7 +59,7 @@
 </blockquote>
 <p>To perform complex tasks, agents must break work into steps, execute each step in order, and verify results. This process is called a workflow. It's not just about calling tools—it's about designing "what to do in what order to achieve the goal."</p>
 <p>Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.</p>
-<p>This article covers major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.</p>
+<p>This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -74,6 +74,9 @@
 
 <h2>Key Workflow Patterns</h2>
 <p>Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.</p>
+<p><strong>Draw the control flow before you tune the prompt</strong></p>
+<p><img alt="Draw the control flow before you tune the prompt" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png"><br>
+<em>A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.</em></p>
 <p><strong>ReAct (Reasoning + Acting)</strong></p>
 <p><strong>ReAct</strong> alternates between Reasoning and Acting. The agent thinks, uses tools, and observes results iteratively.</p>
 <pre><code class="language-python">from typing import Dict, Any, List
@@ -1231,24 +1234,12 @@ else:
 <li>Building Your First Agent (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>ReAct: Synergizing Reasoning and Acting in Language Models</strong> - https://arxiv.org/abs/2210.03629<br>
-   Yao et al.'s ReAct pattern paper. Presents theoretical background and experimental results for alternating reasoning and acting.</p>
-</li>
-<li>
-<p><strong>LangGraph Documentation</strong> - https://langchain-ai.github.io/langgraph/<br>
-   LangChain's workflow construction framework. Covers state management and graph-based workflow design methods.</p>
-</li>
-<li>
-<p><strong>Reflexion: Language Agents with Verbal Reinforcement Learning</strong> - https://arxiv.org/abs/2303.11366<br>
-   Agent performance improvement through self-reflection. Explains mechanisms for learning from failures.</p>
-</li>
-<li>
-<p><strong>AutoGPT Architecture</strong> - https://github.com/Significant-Gravitas/AutoGPT<br>
-   Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://arxiv.org/abs/2210.03629">ReAct: Synergizing Reasoning and Acting in Language Models</a></li>
+<li><a href="https://arxiv.org/abs/2305.04091">Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models</a></li>
+<li><a href="https://arxiv.org/abs/2303.11366">Reflexion: Language Agents with Verbal Reinforcement Learning</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/">LangGraph overview</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

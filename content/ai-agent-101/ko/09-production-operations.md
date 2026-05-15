@@ -14,7 +14,7 @@ tags:
 - Operations
 - Monitoring
 - Observability
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: production agent 운영에 필요한 observability와 비용 통제를 정리합니다.
 ---
 
@@ -57,6 +57,11 @@ agent 운영은 모델 응답을 모니터링하는 일이 아닙니다. 요청 
 > production agent 운영의 핵심은 "모델이 무엇을 답했는가"보다 "요청이 어떤 경로와 비용으로 처리되었는가"를 관측 가능하게 만드는 데 있습니다.
 
 ## 핵심 개념
+
+### 운영 관측은 요청 하나의 흐름을 끝까지 따라갈 수 있어야 합니다
+
+![요청 하나의 흐름을 끝까지 따라가는 운영 관측](../../../assets/ai-agent-101/09/09-01-observability.ko.png)
+*production agent 운영은 답변 품질만 보는 일이 아니라, 요청이 어떤 경로와 비용으로 흘렀는지 추적 가능한 상태를 만드는 일입니다.*
 
 ### structured logging은 사건을 검색 가능한 형태로 남깁니다
 
@@ -190,11 +195,57 @@ class BudgetEnforcer:
 
 모델 비용은 프롬프트 설계와 workflow 구조에 따라 흔들립니다. 그래서 사용자별 한도, 조직별 예산, 고비용 모델 사용 제한 같은 장치를 시스템 차원에서 걸어 두는 편이 안전합니다. 비용이 관측만 되고 제어되지 않으면 운영은 곧 불안정해집니다.
 
-기존 워크로드에서 `gpt-3.5-turbo`를 유지한다면 legacy 모델 기준으로 예산을 잡아야 합니다. 현재 legacy 단가는 입력 1M tokens당 $0.50, 출력 1M tokens당 $1.50이며, 새 비용 최적화 예시는 `gpt-4o-mini`를 기준으로 설명하는 편이 더 현실적입니다.
+### 로그와 예산 차단을 함께 돌려 보면 운영 포인트가 더 선명해집니다
+
+아래 예시는 요청 하나를 처리하면서 request_id, token 비용, 예산 초과 여부를 함께 남기는 가장 작은 형태입니다. 운영 초기에 이 정도만 있어도 "왜 차단됐는가"와 "어느 요청이 비쌌는가"를 바로 추적할 수 있습니다.
+
+```python
+from uuid import uuid4
+
+def estimate_cost(prompt_tokens: int, completion_tokens: int) -> float:
+    return prompt_tokens * 0.00003 + completion_tokens * 0.00006
+
+daily_budget = 0.20
+spent_today = 0.11
+request_id = f"req-{uuid4().hex[:8]}"
+prompt_tokens = 1200
+completion_tokens = 400
+estimated = estimate_cost(prompt_tokens, completion_tokens)
+
+print({
+    "request_id": request_id,
+    "prompt_tokens": prompt_tokens,
+    "completion_tokens": completion_tokens,
+    "estimated_usd": round(estimated, 4),
+})
+
+if spent_today + estimated > daily_budget:
+    print({"request_id": request_id, "status": "blocked", "reason": "budget_exceeded"})
+else:
+    print({"request_id": request_id, "status": "allowed"})
+```
+
+**예상 출력:**
+
+```text
+{'request_id': 'req-1a2b3c4d', 'prompt_tokens': 1200, 'completion_tokens': 400, 'estimated_usd': 0.06}
+{'request_id': 'req-1a2b3c4d', 'status': 'allowed'}
+```
+
+이 출력은 단순하지만 실제 운영 질문에 바로 연결됩니다. 한 요청이 얼마를 썼는지, 차단됐다면 어떤 기준 때문인지, 동일 request_id를 기준으로 로그와 트레이스를 어떻게 묶을지 바로 확인할 수 있기 때문입니다.
 
 ### 배포는 모델만이 아니라 프롬프트와 tool registry의 릴리스입니다
 
 agent 배포는 새 코드 배포이면서 동시에 새 프롬프트, 새 schema, 새 workflow 배포입니다. 따라서 canary, rollback, version pinning, replay eval이 함께 있어야 합니다. 특히 tool contract가 바뀌는 릴리스는 기능 코드 못지않게 조심해야 합니다.
+
+### 운영 failure mode를 미리 정리해 두면 장애가 훨씬 빨리 분해됩니다
+
+- p95 latency가 급증했는데 LLM 호출 수는 그대로라면 병목은 tool 계층일 가능성이 큽니다.
+- 성공률은 유지되는데 비용만 치솟는다면 불필요한 step 증가나 prompt 비대화부터 의심해야 합니다.
+- canary에서만 에러가 늘면 모델 버전보다 prompt, schema, tool registry diff를 먼저 비교하는 편이 빠릅니다.
+- 로그는 있는데 request_id가 없으면 한 요청의 실패 경로를 복원하기 어렵습니다.
+
+그래서 운영 초기에 가장 먼저 필요한 것은 거대한 플랫폼이 아니라, request_id 기준 상관관계와 `cost`, `latency`, `tool_error`, `fallback_used` 네 지표입니다. 이 네 가지가 있어야 앞선 reliability와 evaluation 원칙이 실제 장애 분석으로 이어집니다.
 
 ## 흔히 헷갈리는 지점
 

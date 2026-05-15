@@ -59,7 +59,7 @@
 </blockquote>
 <p>What's harder than building an agent is evaluating "whether this agent works properly." Simple LLMs only need response quality evaluation, but agents require multiple metrics: tool calling accuracy, task completion rate, unnecessary step count, cost efficiency, etc.</p>
 <p>Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).</p>
-<p>This article covers agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.</p>
+<p>This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -594,24 +594,12 @@ else:
 <li>Building Your First Agent (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>AgentBench: Evaluating LLMs as Agents</strong> - https://arxiv.org/abs/2308.03688<br>
-   Comprehensive Tsinghua/Stanford agent benchmark paper. Evaluates LLM agent reasoning and tool use across 8 environments.</p>
-</li>
-<li>
-<p><strong>GAIA: A Benchmark for General AI Assistants</strong> - https://arxiv.org/abs/2311.12983<br>
-   Meta's general AI assistant benchmark. A 466-question set measuring real problem-solving capability.</p>
-</li>
-<li>
-<p><strong>LangSmith: Agent Evaluation</strong> - https://docs.smith.langchain.com/evaluation<br>
-   LangChain's agent evaluation tooling docs. Provides trajectory recording and an automated evaluation pipeline.</p>
-</li>
-<li>
-<p><strong>OpenAI Evals Framework</strong> - https://github.com/openai/evals<br>
-   OpenAI's model evaluation framework. Applicable to a wide range of LLM systems including agents.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/evals">OpenAI evals design guide</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation">LangSmith evaluation</a></li>
+<li><a href="https://arxiv.org/abs/2308.03688">AgentBench: Evaluating LLMs as Agents</a></li>
+<li><a href="https://arxiv.org/abs/2311.12983">GAIA: a benchmark for General AI Assistants</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

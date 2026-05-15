@@ -15,7 +15,7 @@ tags:
 - Memory
 - State Management
 - Context Window
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: For agents to perform multi-step tasks, they must remember what they
   did in previous steps. This is memory.
 ---
@@ -48,6 +48,9 @@ This is post 5 in the AI Agent 101 series. Here we cover the difference between 
 ## Short-term Memory vs Long-term Memory
 
 Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.
+
+![Short-term Memory vs Long-term Memory](../../../assets/ai-agent-101/05/05-01-short-term-memory-vs-long-term-memory.en.png)
+*A practical memory design separates the working set for the current turn, the execution state for the current workflow position, and the long-term store for information worth retrieving later.*
 
 ### Short-term Memory
 
@@ -1320,16 +1323,9 @@ def save_conversation(user_id, messages):
 
 ## References
 
-1. **LangChain Memory Documentation** - https://python.langchain.com/docs/modules/memory/  
-   LangChain's various memory pattern implementations. Covers sliding window, summarization-based, and vector store utilization methods.
-
-2. **OpenAI Embeddings API** - https://platform.openai.com/docs/guides/embeddings  
-   Embedding API documentation for converting text to vectors. Essential for implementing semantic search-based memory.
-
-3. **tiktoken** - https://github.com/openai/tiktoken  
-   OpenAI's official token counting library. Essential for context window management.
-
-4. **Building LLM Applications: Memory Systems** - https://www.pinecone.io/learn/series/langchain/langchain-conversational-memory/  
-   Pinecone's guide on conversational agent memory systems. Explains vector DB utilization patterns.
+- [OpenAI conversation state guide](https://platform.openai.com/docs/guides/conversation-state)
+- [OpenAI embeddings guide](https://platform.openai.com/docs/guides/embeddings)
+- [LangGraph persistence](https://langchain-ai.github.io/langgraph/concepts/persistence/)
+- [tiktoken](https://github.com/openai/tiktoken)
 
 Tags: AI Agent, LLM, Tool Use, Python

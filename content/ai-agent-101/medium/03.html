@@ -59,7 +59,7 @@
 </blockquote>
 <p>Agents differ from simple conversational models because they can use tools. They can call weather APIs, query databases, read and write files. This capability makes agents practical automation tools.</p>
 <p>The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.</p>
-<p>This article covers the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.</p>
+<p>This is post 3 in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -1006,24 +1006,12 @@ if result[&quot;success&quot;]:
 </ul>
 <hr>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>OpenAI Function Calling Guide</strong> - https://platform.openai.com/docs/guides/function-calling<br>
-   Official OpenAI Function Calling documentation. Covers tool schema design, tool_choice parameter, and practical examples.</p>
-</li>
-<li>
-<p><strong>LangChain Tools Documentation</strong> - https://python.langchain.com/docs/modules/agents/tools/<br>
-   LangChain framework's tool system. Discusses custom tool creation, error handling, and tool composition patterns.</p>
-</li>
-<li>
-<p><strong>Toolformer: Language Models Can Teach Themselves to Use Tools</strong> - https://arxiv.org/abs/2302.04761<br>
-   Meta AI research paper. Presents methods for LLMs to learn tool use autonomously.</p>
-</li>
-<li>
-<p><strong>Anthropic Tool Use Best Practices</strong> - https://docs.anthropic.com/claude/docs/tool-use<br>
-   Claude API tool use guide. Explains error handling, retry strategies, and security considerations.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI function calling guide</a></li>
+<li><a href="https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview">Anthropic tool use overview</a></li>
+<li><a href="https://python.langchain.com/docs/concepts/tools/">LangChain tools</a></li>
+<li><a href="https://json-schema.org/understanding-json-schema">JSON Schema reference</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

@@ -14,7 +14,7 @@ tags:
 - Workflow
 - Planning
 - Task Decomposition
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: ReAct, 계획 실행, 반성 루프를 workflow 관점에서 비교합니다.
 ---
 
@@ -57,6 +57,11 @@ workflow 패턴은 모델의 성격 설명이 아니라 **제어 흐름 패턴**
 > 좋은 workflow 설계는 agent를 더 복잡하게 만드는 일이 아니라, 어떤 종류의 작업에서 어떤 종류의 제어 흐름이 가장 예측 가능하게 동작하는지 고르는 일입니다.
 
 ## 핵심 개념
+
+### workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다
+
+![workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다](../../../assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.ko.png)
+*Agent workflow는 목표를 step으로 쪼개고, 실행 결과를 검증한 뒤 필요할 때만 재계획하는 구조로 보는 편이 안전합니다.*
 
 ### ReAct는 관찰에 따라 즉시 적응하는 패턴입니다
 
@@ -241,6 +246,66 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
 ```
 
 Reflexion은 정답이 즉시 보이지 않는 작업에서 유용합니다. 다만 evaluation 함수가 부실하면 agent가 잘못된 반성을 반복할 수 있습니다. 따라서 이 패턴에서는 reflection 품질보다 평가 기준 품질이 먼저 중요합니다.
+
+### 실행 전에 검증 가능한 workflow 스켈레톤을 만들어 두면 설계가 덜 흔들립니다
+
+아래 예시는 planner가 만든 step 목록을 실행하고, step마다 성공 여부와 재시도 가능 여부를 남기는 가장 작은 workflow 스켈레톤입니다. OpenAI SDK나 LangGraph 없이도 workflow의 뼈대를 먼저 검증할 수 있습니다.
+
+```python
+from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class StepResult:
+    name: str
+    ok: bool
+    output: Any
+    retryable: bool = False
+
+def fetch_customer(customer_id: str) -> StepResult:
+    fake_db = {"C-001": {"name": "Minji", "tier": "pro"}}
+    customer = fake_db.get(customer_id)
+    if not customer:
+        return StepResult("fetch_customer", False, "customer not found")
+    return StepResult("fetch_customer", True, customer)
+
+def draft_reply(customer: dict) -> StepResult:
+    text = f"{customer['name']} 고객은 {customer['tier']} 요금제를 사용 중입니다."
+    return StepResult("draft_reply", True, text)
+
+def run_workflow(customer_id: str) -> list[StepResult]:
+    results: list[StepResult] = []
+
+    customer_result = fetch_customer(customer_id)
+    results.append(customer_result)
+    if not customer_result.ok:
+        return results
+
+    reply_result = draft_reply(customer_result.output)
+    results.append(reply_result)
+    return results
+
+for step in run_workflow("C-001"):
+    print(step)
+```
+
+**예상 출력:**
+
+```text
+StepResult(name='fetch_customer', ok=True, output={'name': 'Minji', 'tier': 'pro'}, retryable=False)
+StepResult(name='draft_reply', ok=True, output='Minji 고객은 pro 요금제를 사용 중입니다.', retryable=False)
+```
+
+이 정도 검증만 해도 step 순서, 실패 시 조기 종료, downstream 입력 계약이 눈에 들어옵니다. 실제 LLM 호출을 붙이기 전에 이런 최소 스켈레톤을 먼저 돌려 보면 workflow가 과하게 복잡해지는 것을 막기 쉽습니다.
+
+### failure mode를 미리 넣지 않으면 workflow는 길어질수록 흔들립니다
+
+- planner가 너무 큰 step을 만들면 실패 원인이 묻히고 재시도 범위도 과하게 넓어집니다.
+- 검증기가 없으면 중간 결과가 틀려도 다음 step으로 넘어가서 잘못된 답을 더 그럴듯하게 포장합니다.
+- 재계획 조건이 없으면 ReAct와 Reflexion이 모두 같은 실패를 반복하는 비싼 루프로 바뀝니다.
+- step별 로그가 없으면 production에서 실패했을 때 "모델이 이상했다"는 말 외에 남는 설명이 없습니다.
+
+실무에서는 step마다 최소한 `입력`, `출력`, `검증 기준`, `재시도 가능 여부` 네 가지를 남겨 두는 편이 안전합니다. 이 네 칸만 있어도 workflow 실패를 planner 문제인지, tool 문제인지, validator 문제인지 더 빠르게 분해할 수 있습니다.
 
 ### 패턴 선택은 작업의 변동성과 검증 가능성으로 판단합니다
 

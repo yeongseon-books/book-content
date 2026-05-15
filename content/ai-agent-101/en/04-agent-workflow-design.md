@@ -15,7 +15,7 @@ tags:
 - Workflow
 - Planning
 - Task Decomposition
-last_reviewed: '2026-05-02'
+last_reviewed: '2026-05-15'
 seo_description: To perform complex tasks, agents must break work into steps, execute
   each step in order, and verify results. This process is called a workflow.
 ---
@@ -46,6 +46,11 @@ This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns
 ## Key Workflow Patterns
 
 Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
+
+### Draw the control flow before you tune the prompt
+
+![Draw the control flow before you tune the prompt](../../../assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
+*A stable workflow starts by making the control flow explicit: plan, execute, validate, then replan only when the validator says the current path is not safe enough.*
 
 ### ReAct (Reasoning + Acting)
 
@@ -1338,16 +1343,9 @@ else:
 
 ## References
 
-1. **ReAct: Synergizing Reasoning and Acting in Language Models** - https://arxiv.org/abs/2210.03629  
-   Yao et al.'s ReAct pattern paper. Presents theoretical background and experimental results for alternating reasoning and acting.
-
-2. **LangGraph Documentation** - https://langchain-ai.github.io/langgraph/  
-   LangChain's workflow construction framework. Covers state management and graph-based workflow design methods.
-
-3. **Reflexion: Language Agents with Verbal Reinforcement Learning** - https://arxiv.org/abs/2303.11366  
-   Agent performance improvement through self-reflection. Explains mechanisms for learning from failures.
-
-4. **AutoGPT Architecture** - https://github.com/Significant-Gravitas/AutoGPT  
-   Real implementation example of Plan-and-Execute pattern. Shows autonomous agent task decomposition and execution strategies.
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
+- [Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models](https://arxiv.org/abs/2305.04091)
+- [Reflexion: Language Agents with Verbal Reinforcement Learning](https://arxiv.org/abs/2303.11366)
+- [LangGraph overview](https://langchain-ai.github.io/langgraph/)
 
 Tags: AI Agent, LLM, Tool Use, Python

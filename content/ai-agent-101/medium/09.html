@@ -59,7 +59,7 @@
 </blockquote>
 <p>When you deploy agents to production, new problems arise. You need to monitor how much it costs, how long responses take, where it fails, and which tools are called most frequently.</p>
 <p>The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.</p>
-<p>This article covers agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.</p>
+<p>This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -74,6 +74,8 @@
 
 <h2>Observability</h2>
 <p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
+<p><img alt="Observability" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png"><br>
+<em>Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.</em></p>
 <p><strong>Structured Logging</strong></p>
 <p>Plaintext logs are hard to parse and query. JSON-structured logs are the standard.</p>
 <pre><code class="language-python">import logging
@@ -557,24 +559,12 @@ logger.info(&quot;request&quot;,
 <li>Building Your First Agent (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>OpenTelemetry: LLM Observability</strong> - https://opentelemetry.io/docs/specs/semconv/gen-ai/<br>
-   OpenTelemetry semantic conventions for LLM/agent observability. Defines standard trace attributes.</p>
-</li>
-<li>
-<p><strong>LangSmith Production Monitoring</strong> - https://docs.smith.langchain.com/observability<br>
-   LangChain's operations monitoring tool. Integrates traces, metrics, and evaluation.</p>
-</li>
-<li>
-<p><strong>Google SRE Book: Monitoring Distributed Systems</strong> - https://sre.google/sre-book/monitoring-distributed-systems/<br>
-   Google's SRE monitoring principles. The Four Golden Signals apply to agents too.</p>
-</li>
-<li>
-<p><strong>OpenAI: Production Best Practices</strong> - https://platform.openai.com/docs/guides/production-best-practices<br>
-   OpenAI's official operations guide. Covers rate limits, monitoring, and cost management.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/">OpenTelemetry generative AI semantic conventions</a></li>
+<li><a href="https://docs.smith.langchain.com/observability">LangSmith observability</a></li>
+<li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE Book - Monitoring Distributed Systems</a></li>
+<li><a href="https://platform.openai.com/docs/guides/production-best-practices">OpenAI production best practices</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>

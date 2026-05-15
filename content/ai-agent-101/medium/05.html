@@ -59,7 +59,7 @@
 </blockquote>
 <p>For agents to perform multi-step tasks, they must remember what they did in previous steps. This is memory. Short-term memory persists during the current conversation session, while long-term memory persists beyond sessions.</p>
 <p>However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).</p>
-<p>This article covers the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.</p>
+<p>This is post 5 in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.</p>
 <hr>
 <!-- a-grade-intro:begin -->
 
@@ -75,6 +75,8 @@
 <h2>Short-term Memory vs Long-term Memory</h2>
 <h2>Short-term Memory vs Long-term Memory</h2>
 <p>Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.</p>
+<p><img alt="Short-term Memory vs Long-term Memory" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-short-term-memory-vs-long-term-memory.en.png"><br>
+<em>A practical memory design separates the working set for the current turn, the execution state for the current workflow position, and the long-term store for information worth retrieving later.</em></p>
 <p><strong>Short-term Memory</strong></p>
 <p>Short-term memory is information retained only within the current execution session. It holds the context from conversation start to end.</p>
 <p><strong>Characteristics:</strong><br>
@@ -1229,24 +1231,12 @@ def save_conversation(user_id, messages):
 </ul>
 <hr>
 <h2>References</h2>
-<ol>
-<li>
-<p><strong>LangChain Memory Documentation</strong> - https://python.langchain.com/docs/modules/memory/<br>
-   LangChain's various memory pattern implementations. Covers sliding window, summarization-based, and vector store utilization methods.</p>
-</li>
-<li>
-<p><strong>OpenAI Embeddings API</strong> - https://platform.openai.com/docs/guides/embeddings<br>
-   Embedding API documentation for converting text to vectors. Essential for implementing semantic search-based memory.</p>
-</li>
-<li>
-<p><strong>tiktoken</strong> - https://github.com/openai/tiktoken<br>
-   OpenAI's official token counting library. Essential for context window management.</p>
-</li>
-<li>
-<p><strong>Building LLM Applications: Memory Systems</strong> - https://www.pinecone.io/learn/series/langchain/langchain-conversational-memory/<br>
-   Pinecone's guide on conversational agent memory systems. Explains vector DB utilization patterns.</p>
-</li>
-</ol>
+<ul>
+<li><a href="https://platform.openai.com/docs/guides/conversation-state">OpenAI conversation state guide</a></li>
+<li><a href="https://platform.openai.com/docs/guides/embeddings">OpenAI embeddings guide</a></li>
+<li><a href="https://langchain-ai.github.io/langgraph/concepts/persistence/">LangGraph persistence</a></li>
+<li><a href="https://github.com/openai/tiktoken">tiktoken</a></li>
+</ul>
 <p class="tags-line">Tags: AI Agent, LLM, Tool Use, Python</p>
 </body>
 </html>
