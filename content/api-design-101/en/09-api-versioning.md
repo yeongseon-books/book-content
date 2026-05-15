@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 9
 title: API Versioning
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Deprecation
   - Backend
 seo_description: A backend junior's guide to URL and header versioning, compatibility policy, and the deprecation and sunset workflow for REST APIs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # API Versioning
 
-Versioning gets easier once you separate compatibility policy from the version channel itself, whether that channel is a URL or a header.
+Running an API for a long time teaches the same lesson repeatedly: the hard part is not changing the contract, but changing it without breaking trust. A field tweak that feels minor to the backend can still be a production incident for clients that upgrade months later.
 
 This is post 9 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat versioning as change-management discipline rather than just `/v1` syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.
+
+## What you will learn
 
 - Distinguishing breaking from non-breaking changes
 - URL versioning vs header versioning
@@ -43,12 +45,11 @@ External clients depend on your API. One break stops *dozens or hundreds* of cli
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    V1["/v1/users"] --> H1["v1 handler"]
-    V2["/v2/users"] --> H2["v2 handler"]
-    H1 -.deprecated.-> Sunset["sunset 2027-01"]
-```
+![Concept at a Glance](../../../assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
+*Older versions do not disappear instantly. They move through deprecation notices toward a clearly announced sunset date.*
+
+That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.
+
 
 ## Key Terms
 
@@ -165,6 +166,12 @@ Stripe uses *date-based versions* (calver) in headers (`Stripe-Version: 2024-04-
 - Use *standard headers + an explicit sunset* to deprecate.
 - Quantify the *internal cost* of multiple versions (code, tests, docs).
 - Sunset only after usage drops — let data decide.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** After a new version launches, responses from the old version should consistently carry `Deprecation`, `Sunset`, and successor `Link` signals.
+- **First check:** If five recent changes get classified differently by different engineers, the compatibility policy itself is still too vague.
+- **Failure mode:** Announce a sunset date without measuring actual client usage, and the remaining integrations all fail at once when the deadline arrives.
 
 ## Checklist
 

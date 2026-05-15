@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 1
 title: What Is an API?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Backend
   - WebDevelopment
 seo_description: The definition of an API, what role it plays, and the conditions for a good one — the first step of the API Design 101 series for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is an API?
 
-If you want the rest of this series to make sense, start by getting clear on what an API is, what role it plays, and what makes one good.
+Teams rarely get into trouble because the server code is impossible to change. They get into trouble because clients and servers are guessing at the contract in different ways, and a small backend tweak turns into a visible outage.
 
 This is the first post in the API Design 101 series.
 
-## What You Will Learn
+Here, we frame an API as a long-lived external contract rather than a bag of functions or URLs. That mental model is what makes the later topics—REST, resources, status codes, schemas, and documentation—fit together instead of feeling like isolated rules.
+
+## What you will learn
 
 - The definition and kinds of APIs
 - Five conditions for a "good API"
@@ -43,15 +45,11 @@ An API is the *face* of a system. The internals can change freely as long as the
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] -->|"request"| API["API contract"]
-    API --> Server["Server (impl)"]
-    Server -->|"response"| API
-    API --> Client
-```
+![Concept at a Glance](../../../assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
+*The client talks to the API contract, not to the server's internal implementation.*
 
-The client only needs to know the *contract*.
+That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.
+
 
 ## Key Terms
 
@@ -168,6 +166,12 @@ GitHub's REST API, Stripe's API, Google Maps API — all *documented contracts*.
 - Specify both status codes and bodies.
 - Errors deserve a *shape* too.
 - Documentation grows with the code (auto-generated OpenAPI).
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** `GET /health` should return both `200` and `{"status": "ok"}`. That is the smallest possible proof that the contract exists and works.
+- **First check:** If client examples mention private file paths, ORM models, or internal function names, the contract boundary is already leaking.
+- **Failure mode:** Once clients branch on undocumented response shapes instead of documented status + body contracts, later changes become accidental breaking changes.
 
 ## Checklist
 

@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>Pagination and Filtering</h1>
-<blockquote>
-<p>API Design 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you must return a large collection in <em>chunks</em>, what is the safe and fast way to do it?</p>
-<blockquote>
-<p>The answer depends on how <em>fast the data changes</em> — offset for static data, cursor for fast-changing data.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.</p>
+<p>This is post 6 in the API Design 101 series.</p>
+<p>Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The limits of offset / limit pagination</li>
 <li>Cursor-based pagination</li>
@@ -79,12 +71,9 @@
 <p>Large collections must travel in <em>chunks</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;?limit=20&quot;] --&gt; P1[&quot;page 1 + next_cursor&quot;]
-    P1 --&gt; A2[&quot;?limit=20&amp;cursor=...&quot;]
-    A2 --&gt; P2[&quot;page 2 + next_cursor&quot;]
-</code></pre>
-<p>A cursor marks the <em>start of the next page</em>.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>A cursor is an opaque token that tells the client where the next page should continue.</em></p>
+<p>The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Offset / Limit</strong>: <code>?offset=40&amp;limit=20</code> — simple, but <em>slow as offsets grow</em>.</li>
@@ -95,10 +84,10 @@
 </ul>
 <h2>Before / After</h2>
 <p><strong>Before (sort, filter, page mashed together)</strong></p>
-<pre><code>GET /orders?p=3&amp;s=date&amp;q=paid
+<pre><code class="language-http">GET /orders?p=3&amp;s=date&amp;q=paid
 </code></pre>
 <p><strong>After (named, standard, with metadata)</strong></p>
-<pre><code>GET /orders?status=paid&amp;sort=created_at:desc&amp;limit=20&amp;cursor=eyJpZCI6MTIzfQ
+<pre><code class="language-http">GET /orders?status=paid&amp;sort=created_at:desc&amp;limit=20&amp;cursor=eyJpZCI6MTIzfQ
 </code></pre>
 <h2>Hands-on: Five Pagination Steps</h2>
 <p><strong>Step 1 — offset / limit</strong></p>
@@ -130,17 +119,17 @@ def items():
 </code></pre>
 <p>Cursors are <em>opaque</em> — clients do not parse them.</p>
 <p><strong>Step 3 — sorting</strong></p>
-<pre><code>GET /items?sort=created_at:desc
+<pre><code class="language-http">GET /items?sort=created_at:desc
 GET /items?sort=name:asc,id:desc
 </code></pre>
 <p>Standardize multi-key sort too.</p>
 <p><strong>Step 4 — filtering</strong></p>
-<pre><code>GET /orders?status=paid&amp;tier=pro
+<pre><code class="language-http">GET /orders?status=paid&amp;tier=pro
 GET /orders?created_at__gte=2026-01-01
 </code></pre>
 <p>Use explicit operator suffixes like <code>__gte</code>, <code>__lt</code>.</p>
 <p><strong>Step 5 — search</strong></p>
-<pre><code>GET /articles?q=python+logging
+<pre><code class="language-http">GET /articles?q=python+logging
 </code></pre>
 <p>Search lives in its own parameter <code>q</code> — kept separate from filters.</p>
 <h2>What to Notice in This Code</h2>
@@ -166,6 +155,12 @@ GET /orders?created_at__gte=2026-01-01
 <li>Make total count <em>optional</em> — drop it when expensive.</li>
 <li>Document filter values as enums.</li>
 <li>Consider moving search to a <em>separate endpoint</em>.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> Repeated page traversal should produce no duplicates or gaps at page boundaries, and the documented <code>limit</code> cap should match the implementation.</li>
+<li><strong>First check:</strong> If calls such as <code>offset=100000</code> are common but nobody expects latency to change, you are probably hiding an expensive scan.</li>
+<li><strong>Failure mode:</strong> Always computing total count or exposing cursor internals creates a mix of performance and security problems that is painful to unwind later.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>

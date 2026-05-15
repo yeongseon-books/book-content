@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>Request and Response Schemas</h1>
-<blockquote>
-<p>API Design 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you define the <em>shape of the data</em> an API exchanges so that it does not wobble?</p>
-<blockquote>
-<p>Treat the schema as a <em>contract outside the code</em>, and validate at the <em>boundary</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.</p>
+<p>This is post 5 in the API Design 101 series.</p>
+<p>Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>JSON and content types</li>
 <li>Field naming conventions</li>
@@ -79,13 +71,9 @@
 <p>A schema is the <em>grammar</em> of your data.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;client&quot;] --&gt;|&quot;JSON request&quot;| Validate[&quot;validate&quot;]
-    Validate --&gt;|&quot;typed object&quot;| Handler[&quot;handler&quot;]
-    Handler --&gt;|&quot;typed object&quot;| Serialize[&quot;serialize&quot;]
-    Serialize --&gt;|&quot;JSON response&quot;| Client
-</code></pre>
-<p>Validate at the entrance; serialize at the exit.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>Validate at the boundary on the way in, and serialize into a stable response shape on the way out.</em></p>
+<p>That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Schema</strong>: the format and meaning of data.</li>
@@ -173,6 +161,12 @@ currency = &quot;USD&quot;
 <li>Use <em>standard</em> formats for time and money.</li>
 <li>Add new fields; never reinterpret existing ones.</li>
 <li>Design responses so clients can <em>ignore unknown fields</em>.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> The wrong <code>Content-Type</code> should fail with <code>415</code>, missing required fields should trigger validation errors, and valid payloads should come back in a predictable JSON shape.</li>
+<li><strong>First check:</strong> If response examples expose ORM field names or temporary abbreviations, input and output schemas are not truly separated.</li>
+<li><strong>Failure mode:</strong> Leave time zones and money representation undefined early on, and every downstream client and analytics job starts inventing its own correction logic.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>

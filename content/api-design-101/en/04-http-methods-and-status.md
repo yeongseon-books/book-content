@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 4
 title: HTTP Methods and Status Codes
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - StatusCodes
   - Backend
 seo_description: A backend junior's reference for picking GET/POST/PUT/PATCH/DELETE and the right 2xx, 4xx, and 5xx status code for each response.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # HTTP Methods and Status Codes
 
-Picking GET, POST, PUT, PATCH, DELETE and the right 2xx, 4xx, and 5xx response codes is what makes an API predictable to clients.
+Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.
 
 This is post 4 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.
+
+## What you will learn
 
 - The meaning of GET / POST / PUT / PATCH / DELETE
 - Safe vs idempotent operations
@@ -43,18 +45,10 @@ Methods and status codes drive the *branching logic* on the client. Return the w
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Req["request"] --> M{"method"}
-    M -->|"GET"| Read["read"]
-    M -->|"POST"| Create["create / action"]
-    M -->|"PUT/PATCH"| Update["update"]
-    M -->|"DELETE"| Remove["delete"]
-    Read --> S{"status"}
-    Create --> S
-    Update --> S
-    Remove --> S
-```
+![Concept at a Glance](../../../assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
+*The HTTP method expresses intent, and the status code expresses the outcome.*
+
+Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.
 
 ## Key Terms
 
@@ -191,6 +185,12 @@ Look at GitHub's responses — method × status reads almost like a textbook: 20
 - `4xx` = the *user* can fix it; `5xx` = the *server* must fix it.
 - Pick from standard codes; resist inventing new ones.
 - Put the *detailed reason* in the body, in a consistent shape.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** Creation should read as `201 + Location`, successful deletion as `204`, and a missing resource as `404` without extra explanation.
+- **First check:** If similar failures bounce randomly between `400`, `409`, and `422`, the client contract is already ambiguous.
+- **Failure mode:** Collapse every success into `200 OK`, and retries, SDK exceptions, and cache behavior all start depending on body parsing instead of protocol signals.
 
 ## Checklist
 

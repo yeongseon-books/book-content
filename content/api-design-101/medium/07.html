@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>Designing Error Responses</h1>
-<blockquote>
-<p>API Design 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What should an error response <em>contain</em> so that clients can branch precisely and humans can read and understand it?</p>
-<blockquote>
-<p>A <em>status code + a stable body shape + a stable error code</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Success responses can stay quiet for a long time even when they are mediocre. Error responses cannot. The moment they drift, support tickets multiply, client exception logic forks, and logs stop telling one coherent story.</p>
+<p>This is post 7 in the API Design 101 series.</p>
+<p>Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The four parts of an error response</li>
 <li>RFC 7807 <code>application/problem+json</code></li>
@@ -79,12 +71,9 @@
 <p>A good error response cuts <em>debugging time</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;request&quot;] --&gt; H[&quot;handler&quot;]
-    H --&gt;|&quot;bad input&quot;| V[&quot;422 + problem+json&quot;]
-    H --&gt;|&quot;not allowed&quot;| F[&quot;403 + problem+json&quot;]
-    H --&gt;|&quot;internal&quot;| S[&quot;500 + problem+json&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>Input errors, authorization failures, and internal faults all branch into the same envelope shape with different status and detail fields.</em></p>
+<p>That stable shape lets clients keep one parser and branch cleanly on <code>status</code>, <code>code</code>, and <code>errors[]</code> instead of reverse-engineering a different payload for each endpoint.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Status code</strong>: the broad category — <code>4xx</code> user, <code>5xx</code> server.</li>
@@ -188,6 +177,12 @@ def server_error(e):
 <li>Return the trace id on 4xx responses too.</li>
 <li>Always review the user-visible message — for both security and UX.</li>
 <li>Document the most common errors <em>near the top</em> of the docs.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> Validation failures should include per-field <code>errors[]</code>, auth failures should return stable <code>code</code> values, and server failures should carry a traceable <code>trace_id</code>.</li>
+<li><strong>First check:</strong> If one endpoint returns a plain string for 404 while another returns JSON, the shared envelope is not actually shared yet.</li>
+<li><strong>Failure mode:</strong> Leak sensitive information in <code>detail</code> or omit trace IDs, and both supportability and security posture degrade at the same time.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>

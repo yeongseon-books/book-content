@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 10
 title: Writing Good API Documentation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Examples
   - Backend
 seo_description: A practical guide to API docs that get adopted — Getting Started, Tutorials, Reference, Changelog, and SDKs as a single system.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Writing Good API Documentation
 
-Good API docs are a system, not a reference dump. Getting Started, tutorials, reference, changelog, and SDK guidance all matter.
+APIs often get abandoned not because they lack features, but because the path to the first successful call is too long. Inside a company, experienced teammates can fill the gaps verbally. External users do not have that safety net, so documentation quality becomes adoption speed.
 
 This is the final post in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat documentation as the full adoption path rather than as a reference dump. Getting Started, scenario tutorials, example-rich reference pages, changelogs, and SDK guidance all need to support the same journey.
+
+## What you will learn
 
 - The five axes of documentation
 - Reaching the first call in *under five minutes*
@@ -43,13 +45,11 @@ Documentation drives *adoption* more than the API itself. The same endpoint can 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Getting Started"] --> B["Tutorials"]
-    B --> C["Reference"]
-    C --> D["Changelog"]
-    D --> E["SDKs / CLIs"]
-```
+![Concept at a Glance](../../../assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
+*Good API documentation guides the reader from the first successful call through scenarios, reference detail, change tracking, and tools.*
+
+That means strong reference pages are necessary but not sufficient. Users also need a visible starting point, runnable examples, and a reliable way to see what changed after they integrate.
+
 
 ## Key Terms
 
@@ -181,6 +181,12 @@ Stripe and Twilio set the *gold standard* — their five axes are consistent and
 - *Auto-generate* the changelog (PR labels → release notes).
 - *Measure* the five-minute rule — observe real users.
 - Improve the most-visited pages first.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** A new user should be able to follow only the Getting Started page and make one successful authenticated call within five minutes.
+- **First check:** If the docs have many reference pages but no obvious tutorial path or changelog entry point, they are acting like a dictionary instead of an onboarding system.
+- **Failure mode:** Once examples stop being executed and verified, the most-copied snippets decay first and trust in the rest of the docs falls quickly.
 
 ## Checklist
 

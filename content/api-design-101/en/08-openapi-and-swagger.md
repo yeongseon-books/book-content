@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 8
 title: OpenAPI and Swagger
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Documentation
   - Backend
 seo_description: A practical introduction to OpenAPI 3 and Swagger UI, comparing code-first and schema-first approaches for backend juniors.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # OpenAPI and Swagger
 
-OpenAPI 3 and Swagger UI turn one contract into docs, validation, and generated clients. The key design choice is where that contract lives.
+Once documentation starts lagging behind the code, teams quietly stop trusting it. They probe the API directly, SDKs fall out of sync, and review conversations move away from the contract that callers are supposed to rely on.
 
 This is post 8 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.
+
+## What you will learn
 
 - The structure of the OpenAPI 3 spec
 - Swagger UI and Redoc
@@ -43,13 +45,11 @@ A single spec file produces *docs + validation + client code + mock server*. Han
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Spec["openapi.yaml"] --> Docs["Swagger UI / Redoc"]
-    Spec --> Validate["request validation"]
-    Spec --> Client["client SDK generation"]
-    Spec --> Mock["mock server"]
-```
+![Concept at a Glance](../../../assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
+*One OpenAPI spec can drive documentation, request validation, SDK generation, and mock behavior at the same time.*
+
+The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.
+
 
 ## Key Terms
 
@@ -179,6 +179,12 @@ GitHub publishes its OpenAPI spec at `api.github.com/openapi`. Internally, havin
 - Always fill in examples — users *copy-paste* to start.
 - Document 4xx and 5xx in the spec, not just 200.
 - Separate *public* and *internal* specs.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** `/openapi.json` and `/docs` should describe the same endpoints, schemas, and examples, and CI should fail if they drift.
+- **First check:** If the code changes with no spec diff, or the spec changes with no code review, contract drift has already started.
+- **Failure mode:** Document only 200 responses and the try-it surface stops teaching users how failure paths actually behave.
 
 ## Checklist
 

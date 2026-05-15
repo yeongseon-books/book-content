@@ -54,18 +54,10 @@
 </head>
 <body>
 <h1>OpenAPI and Swagger</h1>
-<blockquote>
-<p>API Design 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If you could capture <em>every promise</em> of an API in a single file, what would happen?</p>
-<blockquote>
-<p>Documentation, validation, client SDKs, and mock servers all <em>follow automatically</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Once documentation starts lagging behind the code, teams quietly stop trusting it. They probe the API directly, SDKs fall out of sync, and review conversations move away from the contract that callers are supposed to rely on.</p>
+<p>This is post 8 in the API Design 101 series.</p>
+<p>Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The structure of the OpenAPI 3 spec</li>
 <li>Swagger UI and Redoc</li>
@@ -79,12 +71,9 @@
 <p>Keep one <em>single source of truth</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Spec[&quot;openapi.yaml&quot;] --&gt; Docs[&quot;Swagger UI / Redoc&quot;]
-    Spec --&gt; Validate[&quot;request validation&quot;]
-    Spec --&gt; Client[&quot;client SDK generation&quot;]
-    Spec --&gt; Mock[&quot;mock server&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>One OpenAPI spec can drive documentation, request validation, SDK generation, and mock behavior at the same time.</em></p>
+<p>The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>OpenAPI</strong>: the API spec standard (formerly Swagger spec).</li>
@@ -150,7 +139,7 @@ def user(uid: int) -&gt; User: return User(id=uid, name=&quot;Y&quot;)
 # /docs and /openapi.json are generated automatically
 </code></pre>
 <p><strong>Step 4 — Swagger UI / Redoc</strong></p>
-<pre><code>GET /docs        # Swagger UI (try it)
+<pre><code class="language-http">GET /docs        # Swagger UI (try it)
 GET /redoc       # Redoc (read it)
 GET /openapi.json
 </code></pre>
@@ -184,6 +173,12 @@ openapi-generator-cli generate \
 <li>Always fill in examples — users <em>copy-paste</em> to start.</li>
 <li>Document 4xx and 5xx in the spec, not just 200.</li>
 <li>Separate <em>public</em> and <em>internal</em> specs.</li>
+</ul>
+<h2>Verification Signals and Failure Modes</h2>
+<ul>
+<li><strong>Expected output:</strong> <code>/openapi.json</code> and <code>/docs</code> should describe the same endpoints, schemas, and examples, and CI should fail if they drift.</li>
+<li><strong>First check:</strong> If the code changes with no spec diff, or the spec changes with no code review, contract drift has already started.</li>
+<li><strong>Failure mode:</strong> Document only 200 responses and the try-it surface stops teaching users how failure paths actually behave.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>

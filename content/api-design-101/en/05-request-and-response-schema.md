@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 5
 title: Request and Response Schemas
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Validation
   - Backend
 seo_description: A junior backend engineer's guide to JSON schemas, content types, naming, validation, and date and money handling in REST APIs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Request and Response Schemas
 
-Schemas stay useful when you make naming, content types, validation, and date handling explicit instead of leaving them to convention.
+At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.
 
 This is post 5 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.
+
+## What you will learn
 
 - JSON and content types
 - Field naming conventions
@@ -43,15 +45,11 @@ If schemas wobble, *everything* on the client wobbles. Good schemas are *readabl
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["client"] -->|"JSON request"| Validate["validate"]
-    Validate -->|"typed object"| Handler["handler"]
-    Handler -->|"typed object"| Serialize["serialize"]
-    Serialize -->|"JSON response"| Client
-```
+![Concept at a Glance](../../../assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
+*Validate at the boundary on the way in, and serialize into a stable response shape on the way out.*
 
-Validate at the entrance; serialize at the exit.
+That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.
+
 
 ## Key Terms
 
@@ -171,6 +169,12 @@ Large APIs converge on *snake_case*, ISO 8601, and integer minor-unit currency (
 - Use *standard* formats for time and money.
 - Add new fields; never reinterpret existing ones.
 - Design responses so clients can *ignore unknown fields*.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** The wrong `Content-Type` should fail with `415`, missing required fields should trigger validation errors, and valid payloads should come back in a predictable JSON shape.
+- **First check:** If response examples expose ORM field names or temporary abbreviations, input and output schemas are not truly separated.
+- **Failure mode:** Leave time zones and money representation undefined early on, and every downstream client and analytics job starts inventing its own correction logic.
 
 ## Checklist
 

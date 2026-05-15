@@ -2,7 +2,7 @@
 series: api-design-101
 episode: 7
 title: Designing Error Responses
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,16 +18,18 @@ tags:
   - Validation
   - Backend
 seo_description: A practical guide to error responses for REST APIs — RFC 7807 problem+json envelopes, error codes, and validation error shapes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Designing Error Responses
 
-Error responses work better when the envelope, machine-readable code, and validation details stay consistent across the API.
+Success responses can stay quiet for a long time even when they are mediocre. Error responses cannot. The moment they drift, support tickets multiply, client exception logic forks, and logs stop telling one coherent story.
 
 This is post 7 in the API Design 101 series.
 
-## What You Will Learn
+Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.
+
+## What you will learn
 
 - The four parts of an error response
 - RFC 7807 `application/problem+json`
@@ -43,13 +45,11 @@ There is one success path and *hundreds of error paths*. If the shape is inconsi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["request"] --> H["handler"]
-    H -->|"bad input"| V["422 + problem+json"]
-    H -->|"not allowed"| F["403 + problem+json"]
-    H -->|"internal"| S["500 + problem+json"]
-```
+![Concept at a Glance](../../../assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
+*Input errors, authorization failures, and internal faults all branch into the same envelope shape with different status and detail fields.*
+
+That stable shape lets clients keep one parser and branch cleanly on `status`, `code`, and `errors[]` instead of reverse-engineering a different payload for each endpoint.
+
 
 ## Key Terms
 
@@ -183,6 +183,12 @@ Stripe's error object (`type`, `code`, `param`, `message`) has become the de fac
 - Return the trace id on 4xx responses too.
 - Always review the user-visible message — for both security and UX.
 - Document the most common errors *near the top* of the docs.
+
+## Verification Signals and Failure Modes
+
+- **Expected output:** Validation failures should include per-field `errors[]`, auth failures should return stable `code` values, and server failures should carry a traceable `trace_id`.
+- **First check:** If one endpoint returns a plain string for 404 while another returns JSON, the shared envelope is not actually shared yet.
+- **Failure mode:** Leak sensitive information in `detail` or omit trace IDs, and both supportability and security posture degrade at the same time.
 
 ## Checklist
 
