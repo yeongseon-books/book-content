@@ -104,13 +104,15 @@ App Service Plan은 앱이 실행되는 **컴퓨팅 리소스 풀**입니다.
 | SSL Certificate | Basic |
 | Deployment Slots | Standard |
 | Autoscale | Standard |
-| VNet Integration | Standard |
-| Private Endpoint | Premium |
+| VNet Integration | Basic |
+| Private Endpoint | Basic |
 | Zone Redundancy | Premium |
 
 ### Practical Advice
 
 > 프로덕션은 최소 Standard부터 시작하는 편이 안전합니다. Autoscale과 Deployment Slot 없이 운영하면 결국 사람이 직접 사고를 막아야 합니다.
+
+VNet Integration과 Private Endpoint 자체는 Basic부터 사용할 수 있지만, 실제 프로덕션 시작선은 여전히 Autoscale과 Deployment Slot이 열리는 Standard로 보는 편이 맞습니다.
 
 ---
 
