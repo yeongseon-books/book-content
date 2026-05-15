@@ -54,24 +54,7 @@
 </head>
 <body>
 <h1>Shell Script Basics</h1>
-<blockquote>
-<p>Linux CLI 101 series (9/10)</p>
-</blockquote>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
-<ul>
-<li>What is a shell script and why use it instead of Python?</li>
-<li>Why is the shebang (<code>#!/bin/bash</code>) required?</li>
-<li>What is the basic syntax for variables, conditionals, and loops?</li>
-<li>How do you pass arguments and check exit codes?</li>
-</ul>
-<blockquote>
-<p>A shell script is a recipe file of CLI commands. Write it once, and it runs repetitive tasks automatically every time.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.</p>
 <p>This is post 9 in the Linux CLI 101 series.</p>
 <h2>What you will learn</h2>
 <ul>
@@ -276,6 +259,13 @@ echo &quot;Error: file not found&quot;       # stdout — gets mixed in pipes
 <h2>How practitioners think about this</h2>
 <p>The strength of shell scripts is that you can use CLI commands directly. For gluing together tools like <code>git</code>, <code>docker</code>, and <code>kubectl</code>, a script is ideal. Writing <code>subprocess.run(["git", "pull"])</code> in Python is more verbose than a plain <code>git pull</code> one-liner.</p>
 <p>On the other hand, complex logic — JSON parsing, API calls, error handling — is far better in Python. The rule of thumb is: "Will this script exceed 50 lines?" If so, write it in Python. Shell scripts shine as "sub-50-line command compositions".</p>
+<h2>When it breaks, check these first</h2>
+<ul>
+<li>If the script does not start and shows <code>Permission denied</code>, verify both <code>chmod u+x script.sh</code> and the presence of a shebang. Correct logic does not matter if the file is not executable.</li>
+<li>If Bash syntax mysteriously fails, check how the script was launched. <code>sh script.sh</code> can break Bash-only features, so reproduce with <code>./script.sh</code> or <code>bash script.sh</code> first.</li>
+<li>If files are "missing", check the working directory before changing the code. <code>pwd</code>, <code>dirname "$0"</code>, and <code>set -x</code> usually reveal relative-path mistakes much faster than manual guesswork.</li>
+<li>If a deploy script keeps going after a failure, confirm that <code>set -e</code> and explicit exit handling exist. Silent mid-script failure is one of the most expensive automation mistakes.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] You understand the purpose of a shebang (<code>#!/bin/bash</code>) and always include it</li>

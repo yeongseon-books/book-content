@@ -3,7 +3,7 @@ title: What Is the CLI and Shell?
 series: linux-cli-101
 episode: 1
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - Terminal
 - Bash
 - Command Line
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: The CLI operates your computer with keystrokes, and the Shell translates
   those keystrokes into actions.
 ---
 
 # What Is the CLI and Shell?
 
-> Linux CLI 101 series (1/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What does it really mean to operate a computer without a GUI?
-- What are Terminal, Shell, and CLI, and how do they differ?
-- Why should developers learn the CLI in practical terms?
-- How do you choose between Bash, Zsh, and other shells?
-
-> The CLI is a remote control that operates your computer with keystrokes alone, and the Shell is the interpreter that translates those keystrokes into actions.
-
-<!-- a-grade-intro:end -->
+Sooner or later every developer lands on a machine with nothing to click: a cloud VM over SSH, a Docker container, or a CI runner that only accepts text commands. That is the moment when the difference between "I can code" and "I can operate" becomes very visible.
 
 This is the first post in the Linux CLI 101 series.
 

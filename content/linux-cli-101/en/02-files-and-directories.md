@@ -3,7 +3,7 @@ title: Files and Directories
 series: linux-cli-101
 episode: 2
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - Directory
 - ls
 - cp
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: The Linux file system is a giant tree that starts from a single root
   (/). Every file and directory is a branch of this tree.
 ---
 
 # Files and Directories
 
-> Linux CLI 101 series (2/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- Where does the Linux file system start, and why is there only one root?
-- What is the difference between absolute and relative paths?
-- What commands create, copy, move, and delete files and directories?
-- Can you explain why `rm -rf` is dangerous?
-
-> The Linux file system is a giant tree that starts from a single root (/). Every file and directory is a branch of this tree.
-
-<!-- a-grade-intro:end -->
+Most server work is not glamorous. You move release bundles, back up config files, clean up logs, and figure out where a missing file actually lives. If your path sense is weak, even simple maintenance work slows down fast.
 
 This is post 2 in the Linux CLI 101 series.
 

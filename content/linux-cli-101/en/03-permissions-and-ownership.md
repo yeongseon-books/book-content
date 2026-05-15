@@ -3,7 +3,7 @@ title: Permissions and Ownership
 series: linux-cli-101
 episode: 3
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - chown
 - Security
 - File System
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: Linux file permissions are like a door with three locks. The owner,
   the group, and everyone else each get a different key.
 ---
 
 # Permissions and Ownership
 
-> Linux CLI 101 series (3/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What does `rwxr-xr--` mean?
-- Why are owner and group distinguished for a file?
-- What is the difference between `chmod 755` and `chmod u+x`?
-- How do you diagnose a "Permission denied" error?
-
-> File permissions are like a door with three locks. The owner, the group, and everyone else each get a different key.
-
-<!-- a-grade-intro:end -->
+Permission problems often look misleading. A file is right there, but the script will not run. A config path exists, but the process still cannot read it. Until you can read `rwx` fluently, these errors feel arbitrary.
 
 This is post 3 in the Linux CLI 101 series.
 

@@ -3,7 +3,7 @@ title: Process Management
 series: linux-cli-101
 episode: 7
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - kill
 - Background
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A process is a running instance of a program, each with a unique
   PID, acting as an independent worker.
 ---
 
 # Process Management
 
-> Linux CLI 101 series (7/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What is the difference between a program and a process?
-- How do you check which processes are running on the system?
-- What is the safe way to stop an unresponsive process?
-- Why would you run a command in the background?
-
-> A process is a running instance of a program, each with a unique PID, acting as an independent worker.
-
-<!-- a-grade-intro:end -->
+Process problems show up in very practical ways: a port is already in use, CPU spikes to 100 percent, or a long-running job dies the moment your SSH session closes. If you cannot inspect and control processes, those problems stay mysterious longer than they should.
 
 This is post 7 in the Linux CLI 101 series.
 
@@ -59,6 +44,10 @@ When a web server is consuming 100% CPU, a Python script is stuck in an infinite
 ## Mental Model
 
 > A program is a recipe (code file), and a process is a cook actually cooking with that recipe (running instance). Just as 3 cooks can cook the same recipe simultaneously, 3 processes can run from the same program at the same time.
+
+![A practical escalation path for process troubleshooting](../../../assets/linux-cli-101/07/07-01-mental-model.en.png)
+
+*A practical escalation path for checking and stopping problematic processes*
 
 ```text
 Program (python)  ->  Process 1 (PID 1234)  <- check with ps
@@ -200,6 +189,13 @@ Rebooting a server because a port is occupied is an overreaction. Use `lsof -i :
 Process management is not just "run it and forget" — it includes "how to manage it after running". In production, process managers like `systemd`, `supervisor`, and `pm2` handle auto-restart on crash, log management, and resource limits.
 
 Even during development, process awareness matters. Building the habit of asking "Will the server die if I close this terminal?" and "Is something still running in the background?" prevents production incidents down the road.
+
+## When it breaks, check these first
+
+- If a port conflict appears, do not reboot first. Run `lsof -i :PORT` and confirm which command is holding the port so you can tell whether it is your dev server, another service, or a stale background job.
+- If `kill PID` does nothing, re-check the state with `ps -p PID -o pid,stat,cmd`. States like `D` or zombie cleanup issues behave differently from a normal running process.
+- If `ps aux | grep python` gives too many lines, use `pgrep -af "python app.py"` or `ps -ef --forest` to narrow the search. Misidentifying the PID is more common than the process itself being weird.
+- If jobs die after SSH disconnects, assume they were launched in the foreground until proven otherwise. For anything long-running, make `nohup`, `tmux`, or a process manager part of the default plan.
 
 ## Checklist
 

@@ -3,7 +3,7 @@ title: "grep, find, xargs — The Search Trio"
 series: linux-cli-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - xargs
 - Search
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: grep is a detective that finds text inside file contents, and find
   is a search party that locates files by name and attributes.
 ---
 
 # grep, find, xargs — The Search Trio
 
-> Linux CLI 101 series (5/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- How do you find lines containing a specific string across thousands of files?
-- What is the difference between content search (grep) and filename search (find)?
-- Why is xargs needed, and how does it differ from a pipe?
-- Can you use grep effectively without regular expressions?
-
-> grep is a detective that finds text inside file contents, and find is a search party that locates files by name and attributes.
-
-<!-- a-grade-intro:end -->
+Once a project stops fitting in your head, search becomes a workflow, not a convenience. You need to answer questions like "Where is this called?", "Which logs changed today?", and "Which matching files should I delete?" without opening everything one by one.
 
 This is post 5 in the Linux CLI 101 series.
 
@@ -61,6 +46,10 @@ Instead of opening files one by one in an editor, `grep -rn "connection timeout"
 ## Mental Model
 
 > `grep` is a specialist librarian who searches book contents, `find` is a search party that locates books by title or size on the shelves, and `xargs` is the courier who hands the found books to someone else.
+
+![How grep, find, and xargs fit together](../../../assets/linux-cli-101/05/05-01-mental-model.en.png)
+
+*How content search, file search, and follow-up actions fit into one workflow*
 
 ```text
 grep: "Find pages containing this word"     -> content search
@@ -224,6 +213,13 @@ Running grep on images or executables produces garbled output. Restrict file typ
 `grep` and `find` are the most frequently used commands in CLI workflows. The "search entire project" feature in your IDE is doing `grep -r` internally, and the "file explorer" is doing `find`. Using them directly in the CLI gives you more flexible options and lets you automate follow-up tasks through pipelines.
 
 In practice, many teams use `ripgrep (rg)` which is faster than `grep`, and `fd` which is faster than `find`. But learning the standard commands first is necessary to appreciate the alternatives, and the standard commands have one undeniable advantage — they are installed on every server.
+
+## When it breaks, check these first
+
+- If you get no matches at all, shrink the scope first. Run `grep -n "TODO" one-file.txt` before going recursive so you can tell whether the pattern is wrong or the path is wrong.
+- If `find` behaves strangely, check your quoting. `find . -name *.py` lets the shell expand `*.py` too early; `find . -name "*.py"` keeps the pattern where it belongs.
+- If filenames with spaces break downstream commands, switch to `-print0` and `xargs -0` before doing anything destructive. This matters most when the next step is `rm`, `mv`, or `chmod`.
+- If grep output is noisy or slow, limit the target set with options like `--include="*.py"` or `--exclude-dir=.git`. In real codebases, controlling scope is usually the first optimization.
 
 ## Checklist
 

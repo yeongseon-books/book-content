@@ -54,24 +54,7 @@
 </head>
 <body>
 <h1>Process Management</h1>
-<blockquote>
-<p>Linux CLI 101 series (7/10)</p>
-</blockquote>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
-<ul>
-<li>What is the difference between a program and a process?</li>
-<li>How do you check which processes are running on the system?</li>
-<li>What is the safe way to stop an unresponsive process?</li>
-<li>Why would you run a command in the background?</li>
-</ul>
-<blockquote>
-<p>A process is a running instance of a program, each with a unique PID, acting as an independent worker.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Process problems show up in very practical ways: a port is already in use, CPU spikes to 100 percent, or a long-running job dies the moment your SSH session closes. If you cannot inspect and control processes, those problems stay mysterious longer than they should.</p>
 <p>This is post 7 in the Linux CLI 101 series.</p>
 <h2>What you will learn</h2>
 <ul>
@@ -89,6 +72,8 @@
 <blockquote>
 <p>A program is a recipe (code file), and a process is a cook actually cooking with that recipe (running instance). Just as 3 cooks can cook the same recipe simultaneously, 3 processes can run from the same program at the same time.</p>
 </blockquote>
+<p><img alt="A practical escalation path for process troubleshooting" src="https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png"></p>
+<p><em>A practical escalation path for checking and stopping problematic processes</em></p>
 <pre><code class="language-text">Program (python)  -&gt;  Process 1 (PID 1234)  &lt;- check with ps
                  -&gt;  Process 2 (PID 5678)  &lt;- terminate with kill
                  -&gt;  Process 3 (PID 9012)  &lt;- keep with nohup
@@ -195,6 +180,13 @@ bg %1                            # Send back to background
 <h2>How practitioners think about this</h2>
 <p>Process management is not just "run it and forget" — it includes "how to manage it after running". In production, process managers like <code>systemd</code>, <code>supervisor</code>, and <code>pm2</code> handle auto-restart on crash, log management, and resource limits.</p>
 <p>Even during development, process awareness matters. Building the habit of asking "Will the server die if I close this terminal?" and "Is something still running in the background?" prevents production incidents down the road.</p>
+<h2>When it breaks, check these first</h2>
+<ul>
+<li>If a port conflict appears, do not reboot first. Run <code>lsof -i :PORT</code> and confirm which command is holding the port so you can tell whether it is your dev server, another service, or a stale background job.</li>
+<li>If <code>kill PID</code> does nothing, re-check the state with <code>ps -p PID -o pid,stat,cmd</code>. States like <code>D</code> or zombie cleanup issues behave differently from a normal running process.</li>
+<li>If <code>ps aux | grep python</code> gives too many lines, use <code>pgrep -af "python app.py"</code> or <code>ps -ef --forest</code> to narrow the search. Misidentifying the PID is more common than the process itself being weird.</li>
+<li>If jobs die after SSH disconnects, assume they were launched in the foreground until proven otherwise. For anything long-running, make <code>nohup</code>, <code>tmux</code>, or a process manager part of the default plan.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] You can check all system processes with <code>ps aux</code></li>

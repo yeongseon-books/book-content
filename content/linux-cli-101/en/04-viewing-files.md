@@ -3,7 +3,7 @@ title: "cat, less, head, tail — Viewing File Contents"
 series: linux-cli-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - less
 - tail
 - Log
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: cat dumps a file all at once like pouring a bucket, and less lets
   you flip through it one page at a time like reading a book.
 ---
 
 # cat, less, head, tail — Viewing File Contents
 
-> Linux CLI 101 series (4/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- Why do we need multiple commands just to view file contents?
-- What happens if you run `cat` on a 1GB log file?
-- When would you use `tail -f`?
-- How do you view only the first 10 lines or the last 20 lines of a file?
-
-> cat dumps a file all at once like pouring a bucket, and less lets you flip through it one page at a time like reading a book.
-
-<!-- a-grade-intro:end -->
+When you work on servers, reading files efficiently matters almost as much as editing them. Logs, config files, CSVs, and generated output all need different reading habits, and using the wrong command can waste time or flood your terminal.
 
 This is post 4 in the Linux CLI 101 series.
 

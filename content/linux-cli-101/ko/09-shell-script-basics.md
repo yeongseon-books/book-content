@@ -17,7 +17,7 @@ tags:
 - Automation
 - Scripting
 - CLI
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: Shell script로 반복 명령을 파일에 담아 자동화하는 기본을 정리합니다.
 ---
 
@@ -263,6 +263,13 @@ echo "Error: file not found"       # stdout — gets mixed in pipes
 Shell script의 강점은 **CLI 명령어를 그대로 쓸 수 있다**는 것입니다. `git`, `docker`, `kubectl` 같은 CLI 도구를 조합하는 글루 코드(glue code)로 최적입니다. Python으로 `subprocess.run(["git", "pull"])`을 쓰는 것보다 `git pull` 한 줄이 명확합니다.
 
 반면 복잡한 로직(JSON 파싱, API 호출, 에러 핸들링)은 Python이 훨씬 낫습니다. 기준은 "이 스크립트가 50줄을 넘을까?"입니다. 넘을 것 같으면 Python으로 쓰세요. Shell script는 "50줄 이하의 명령어 조합"에서 가장 빛납니다.
+
+## 문제가 생기면 먼저 이렇게 확인하세요
+
+- 스크립트가 `Permission denied`로 시작조차 안 되면 `chmod u+x script.sh`와 shebang 존재 여부를 먼저 확인하세요. 실행 권한과 인터프리터 지정이 빠지면 내용이 맞아도 실행되지 않습니다.
+- Bash 문법이 맞는데도 이상한 오류가 나면 어떤 셸로 실행됐는지 보세요. `sh script.sh`로 실행하면 Bash 전용 문법이 깨질 수 있으니 `./script.sh` 또는 `bash script.sh`로 재현해 보는 편이 정확합니다.
+- 특정 파일을 못 찾는다면 현재 작업 디렉터리부터 확인해야 합니다. `pwd`, `dirname "$0"`, `set -x`를 조합하면 상대 경로 실수를 빠르게 찾을 수 있습니다.
+- 배포 스크립트가 중간 실패 후에도 계속 진행되면 `set -e`와 명시적 종료 코드 처리가 있는지 보세요. 자동화에서 가장 위험한 실패는 조용히 지나가는 실패입니다.
 
 ## 체크리스트
 

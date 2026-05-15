@@ -54,24 +54,7 @@
 </head>
 <body>
 <h1>SSH and Remote Access</h1>
-<blockquote>
-<p>Linux CLI 101 series (10/10)</p>
-</blockquote>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
-<ul>
-<li>What is SSH and why use it instead of Telnet?</li>
-<li>What is the difference between password authentication and key-based authentication?</li>
-<li>How does <code>~/.ssh/config</code> simplify connections?</li>
-<li>How do you transfer files remotely with <code>scp</code> and <code>rsync</code>?</li>
-</ul>
-<blockquote>
-<p>SSH opens a remote terminal over an encrypted channel. Key-based authentication replaces passwords with a lock-and-key pair.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The CLI becomes truly operational the moment you leave your own machine. Deploying code, checking logs on a server, copying build artifacts, and tunneling to a remote database all start with secure remote access.</p>
 <p>This is the final post in the Linux CLI 101 series.</p>
 <h2>What you will learn</h2>
 <ul>
@@ -226,6 +209,13 @@ chmod 600 ~/.ssh/config
 <h2>How practitioners think about this</h2>
 <p>SSH is fundamental to server management, but the fewer times you SSH into a server manually, the more mature your infrastructure is. Good teams deploy through CI/CD pipelines, view logs through monitoring tools, and manage servers with Infrastructure as Code.</p>
 <p>That said, you still need to know SSH. When CI/CD fails, when monitoring misses a problem, the last resort is always "SSH in and check directly". SSH is the skill you rarely use day-to-day but absolutely must have for emergencies.</p>
+<h2>When it breaks, check these first</h2>
+<ul>
+<li>If you get <code>Permission denied (publickey)</code>, check key paths and permissions before blaming the network. <code>chmod 700 ~/.ssh</code>, <code>chmod 600 ~/.ssh/id_ed25519</code>, and <code>ssh -v host</code> usually surface the real cause.</li>
+<li>If you see <code>REMOTE HOST IDENTIFICATION HAS CHANGED</code>, do not blindly delete the warning. First verify whether the server was rebuilt or replaced, then remove the old fingerprint with <code>ssh-keygen -R host</code>.</li>
+<li>If <code>scp</code> or <code>rsync</code> fails, confirm the SSH user and port first. Many production hosts do not use port 22, and that often gets mistaken for a bad remote path.</li>
+<li>If a remote command only half-runs, check whether shell init files or a <code>sudo</code> prompt interrupted non-interactive execution. In automation, break the flow into smaller remote steps until the failure point is obvious.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] You can generate an SSH key pair and register the public key on a server</li>

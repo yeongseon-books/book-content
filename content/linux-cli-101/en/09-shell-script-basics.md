@@ -3,7 +3,7 @@ title: Shell Script Basics
 series: linux-cli-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,29 +17,14 @@ tags:
 - Automation
 - Scripting
 - CLI
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A shell script is a recipe file of CLI commands. Write it once, and
   it runs repetitive tasks automatically every time.
 ---
 
 # Shell Script Basics
 
-> Linux CLI 101 series (9/10)
-
----
-
-<!-- a-grade-intro:begin -->
-
-## Key Questions
-
-- What is a shell script and why use it instead of Python?
-- Why is the shebang (`#!/bin/bash`) required?
-- What is the basic syntax for variables, conditionals, and loops?
-- How do you pass arguments and check exit codes?
-
-> A shell script is a recipe file of CLI commands. Write it once, and it runs repetitive tasks automatically every time.
-
-<!-- a-grade-intro:end -->
+Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.
 
 This is post 9 in the Linux CLI 101 series.
 
@@ -285,6 +270,13 @@ echo "Error: file not found"       # stdout — gets mixed in pipes
 The strength of shell scripts is that you can use CLI commands directly. For gluing together tools like `git`, `docker`, and `kubectl`, a script is ideal. Writing `subprocess.run(["git", "pull"])` in Python is more verbose than a plain `git pull` one-liner.
 
 On the other hand, complex logic — JSON parsing, API calls, error handling — is far better in Python. The rule of thumb is: "Will this script exceed 50 lines?" If so, write it in Python. Shell scripts shine as "sub-50-line command compositions".
+
+## When it breaks, check these first
+
+- If the script does not start and shows `Permission denied`, verify both `chmod u+x script.sh` and the presence of a shebang. Correct logic does not matter if the file is not executable.
+- If Bash syntax mysteriously fails, check how the script was launched. `sh script.sh` can break Bash-only features, so reproduce with `./script.sh` or `bash script.sh` first.
+- If files are "missing", check the working directory before changing the code. `pwd`, `dirname "$0"`, and `set -x` usually reveal relative-path mistakes much faster than manual guesswork.
+- If a deploy script keeps going after a failure, confirm that `set -e` and explicit exit handling exist. Silent mid-script failure is one of the most expensive automation mistakes.
 
 ## Checklist
 
