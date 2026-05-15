@@ -162,7 +162,7 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 
 `IScaleMonitor`는 기존 증분형 모델입니다. 각 monitor가 자기 메트릭을 보고 `ScaleVote`를 던지며, 한 라운드에 최대 1개 인스턴스만 증감합니다. 모든 trigger가 지원합니다.
 
-`ITargetScaler`는 2022년 도입된 target-based 모델입니다. 기본식은 “event source length / target executions per instance = desired instances”입니다. Microsoft 문서 기준으로 여러 trigger에서 기본값이 정해져 있고, 4.19.0+에서는 기본 활성화됩니다. 필요하면 `TARGET_BASED_SCALING_ENABLED=0`으로 증분형으로 되돌릴 수 있습니다.
+`ITargetScaler`는 2022년 도입된 target-based 모델입니다. 기본식은 “event source length / target executions per instance = desired instances”입니다. Microsoft 문서 기준으로 여러 trigger에서 기본값이 정해져 있지만, Event Hubs처럼 extension 버전에 따라 기본값이 바뀐 항목도 있습니다. 4.19.0+에서는 기본 활성화되며, 필요하면 `TARGET_BASED_SCALING_ENABLED=0`으로 증분형으로 되돌릴 수 있습니다.
 
 대표 trigger 기본값은 아래와 같습니다.
 
@@ -171,9 +171,12 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 | Storage Queue | `extensions.queues.batchSize` | 16 |
 | Service Bus (single dispatch, v5+) | `extensions.serviceBus.maxConcurrentCalls` | 16 |
 | Service Bus (batch, v5+) | `extensions.serviceBus.maxMessageBatchSize` | 1000 |
-| Event Hubs (v5+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
+| Event Hubs (v5.x) | `extensions.eventHubs.maxEventBatchSize` | 10 |
+| Event Hubs (v6+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
 | Cosmos DB | `MaxItemsPerInvocation` (function attribute) | 100 |
 | Apache Kafka | `LagThreshold` (function attribute) | 1000 |
+
+특히 Event Hubs의 `100`을 `v5+` 전체에 공통인 기본값으로 읽으면 안 됩니다. Microsoft 문서 기준으로 `Microsoft.Azure.WebJobs.Extensions.EventHubs` v6.0.0에서 `maxEventBatchSize` 기본값이 `10`에서 `100`으로 바뀌었습니다.
 
 호스트의 역할은 이 메트릭을 저장하는 repository입니다. 그 구현이 `TableStorageScaleMetricsRepository`이고, 외부 Scale Controller가 이 값을 읽어 판단합니다. 따라서 호스트는 메트릭 흐름의 중간 저장소이지 의사결정 주체가 아닙니다.
 
