@@ -54,39 +54,44 @@
 </head>
 <body>
 <h1>Deciding Which Tokens to Focus On</h1>
-<blockquote>
-<p>LLM from Scratch 101 series (3/9)</p>
-</blockquote>
-<p>Humans don't read every word in a sentence with the same intensity. When you read "He threw it," your eyes instinctively scan back to earlier words to figure out what "it" refers to. You're momentarily assigning different weights to the subject and the object. Transformer attention works in a very similar way.</p>
-<p>When I first implemented attention, the acronym <code>QKV</code> was the most confusing part. The naming makes it feel more complex than it is. In reality, you're just applying three linear layers to the same input tensor, followed by score calculation, masking, softmax, and a weighted sum.</p>
-<p>Today, we're adding <code>CausalSelfAttention</code> to <code>model.py</code>. We'll skip shortcuts like <code>einsum</code> for now and stick with <code>nn.Linear</code> and <code>reshape</code>. In these first three posts, traceability is more important than elegance.</p>
-<p>Today's mental model is this: <strong>Each token asks a question with its Query, provides a score with its Key, and pulls the information it needs from the Value.</strong></p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<p>Once embeddings are in place, every token is finally a vector. That still leaves the main question unanswered: how does one token know which other tokens matter? If the current character is part of a pronoun, a quote, or a repeated pattern, who decides which earlier positions it should consult?</p>
+<p>That is where attention enters. Humans do something similar when reading. We do not assign the same weight to every earlier word. We glance back to find the noun behind a pronoun, or we check the opening of a clause when the verb lands near the end. Transformer attention gives the model a numerical version of that behavior.</p>
+<p>In this post, we will add <code>CausalSelfAttention</code> to <code>model.py</code> and read it as a tensor pipeline rather than as a wall of symbols. For this series, traceability matters more than elegant shortcuts.</p>
+<p>This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>Why do Q, K, V come from the same input but play different roles?</li>
-<li>Why divide attention scores by sqrt(d)?</li>
-<li>What breaks during training without the causal mask?</li>
-<li>Why does multi-head have more capacity than a single head?</li>
+<li>Why do Q, K, and V come from the same input but play different roles?</li>
+<li>Why do attention scores use <code>Q · K^T / sqrt(d)</code>?</li>
+<li>What breaks in autoregressive training if the causal mask is missing?</li>
+<li>What does multi-head attention capture that a single head often misses?</li>
+<li>Can we build the full attention path with only <code>nn.Linear</code>, <code>reshape</code>, and <code>transpose</code>?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
-<h2>QKV are Just Three Linear Transformations</h2>
-<p>If the input <code>x</code> is <code>(B, T, C)</code>, attention creates three projections: <code>q = Wq x</code>, <code>k = Wk x</code>, and <code>v = Wv x</code>. All three come from the same source, but they serve different roles. The Query asks "What am I looking for?", the Key says "Here's what I have," and the Value provides the "actual content to be retrieved."</p>
-<p>Despite the grand names, the implementation is just three linear layers.</p>
-<h2>Calculating Scores: Q · K^T / sqrt(d)</h2>
-<p>To determine how much one token should focus on another, we need a score. We get this by taking the dot product of the Query and the Key. A higher value means a better match. Since the dot product grows with the number of dimensions, we divide by <code>sqrt(d)</code> to keep the variance under control.</p>
-<p>Visualizing a 4×4 matrix makes this clear. For a sequence of length 4, the score matrix is 4×4. Each row represents "which tokens the current token is attending to."</p>
-<p>Without scaling, the softmax can become extremely sharp early in training. If only a few entries approach 1 while the rest are suppressed to 0, gradients tend to vanish. The <code>sqrt(d)</code> isn't just a mathematical flourish; it's essential for training stability.</p>
-<h2>Causal Mask — No Peeking at the Future</h2>
-<p>A language model is essentially a next-token predictor. The current position shouldn't be allowed to see the future answer. We enforce this by masking the upper triangular part of the score matrix, setting future values to <code>-inf</code>.</p>
-<p><img alt="Causal mask blocking future-token attention" src="data:image/png;base64,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"></p>
-<p><em>Causal mask blocking future-token attention</em><br>
-This single line is the core discipline of an autoregressive model. It prevents the model from "cheating" by looking at future lines while it's still learning to predict the next character in Shakespeare.</p>
-<h2>Softmax → V Weighted Sum → Output</h2>
-<p>A single-head attention mechanism can be implemented with just a few lines of code:</p>
+<blockquote>
+<p>Attention is not a mechanism for blending all tokens equally. It is a dynamic lookup layer that lets the current token give more weight to the earlier positions it actually needs.</p>
+</blockquote>
+<h2>Why this matters</h2>
+<p>Attention is the component that makes a Transformer behave like a Transformer. Embeddings turn token IDs into vectors, but attention is what lets those vectors interact. This is the point where the model stops acting like isolated characters and starts behaving like a sequence model.</p>
+<p>It is also a topic where shape awareness matters as much as the concept. Many real bugs do not come from misunderstanding the equation. They come from a swapped axis in <code>transpose</code>, a broken mask range, or forgetting <code>contiguous()</code> before a <code>view()</code>. That is why this chapter stays close to tensors and printed outputs.</p>
+<p>The same details matter operationally. Causal masking, score scaling, and head splitting all affect stability during training and quality during generation. If these mechanics feel concrete now, the next post on residual connections and Transformer blocks becomes much easier.</p>
+<h2>The most useful mental model: attention is a dynamic lookup across tokens</h2>
+<p>If you treat attention as pure notation, it feels heavier than it really is. A more practical interpretation is this: <strong>each token sends out a Query, matches it against Keys from other positions, and uses the resulting weights to retrieve Values</strong>.</p>
+<p>That framing makes the roles easier to remember. The Query says, “What kind of information am I looking for right now?” The Key says, “What kind of signal do I offer?” The Value is the actual content that gets mixed back into the residual stream.</p>
+<p>For an autoregressive language model, one rule sits on top of that lookup: the token must not consult the future. That is why causal masking is not optional decoration. It is the rule that keeps training aligned with generation.</p>
+<h2>Core ideas</h2>
+<p><strong>QKV are three linear projections of the same input</strong></p>
+<p>If the input tensor <code>x</code> is shaped <code>(B, T, C)</code>, attention creates three projections from it: <code>q = Wq x</code>, <code>k = Wk x</code>, and <code>v = Wv x</code>. They come from the same source, but they serve different jobs. The Query expresses what this position wants, the Key expresses what each position can offer, and the Value carries the content to retrieve.</p>
+<p>At the implementation level, that means three linear layers. The intimidating names sometimes obscure how direct the code is. Early on, it helps to think in terms of “same source, three projections” rather than in terms of abstract terminology.</p>
+<p><strong>Score calculation is dot product plus scale control</strong></p>
+<p>To decide how much one token should attend to another, we need a score. We get it by taking the dot product of Query and Key. Larger scores indicate a better match. Because dot products grow with dimension, we divide by <code>sqrt(d)</code> to keep the variance under control.</p>
+<p>That division is not cosmetic. Without it, softmax can become too sharp too early. A few entries dominate, everything else collapses toward zero, and training becomes harder to stabilize. <code>sqrt(d)</code> is one of those lines that looks small in code and carries real weight in practice.</p>
+<p><strong>The causal mask enforces the no-future rule</strong></p>
+<p>An autoregressive model learns next-token prediction. The current position must not peek at the answer to its right. We enforce that rule by masking the upper triangle of the score matrix and filling those entries with <code>-inf</code>, which softmax converts into zero probability.</p>
+<p><img alt="Causal mask blocking future-token attention" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png"></p>
+<p><em>Causal mask blocking future-token attention.</em></p>
+<p>This is not a minor implementation detail. If the mask is missing, the model can cheat during training by looking ahead, which produces deceptively good loss and disappointing generation.</p>
+<h2>Implementing attention step by step</h2>
+<p><strong>Step 1. Start with a single head and print the weight matrix</strong></p>
+<p>The smallest useful self-attention implementation is short enough to read in one sitting. This version returns both <code>out</code> and <code>wei</code> so we can inspect exactly where each token looked.</p>
 <pre><code class="language-python">import math
 
 import torch
@@ -102,7 +107,7 @@ class SingleHeadAttention(nn.Module):
         self.register_buffer(&quot;tril&quot;, torch.tril(torch.ones(block_size, block_size)))
 
     def forward(self, x: torch.Tensor):
-        _, t, c = x.shape
+        _, t, _ = x.shape
         k = self.key(x)
         q = self.query(x)
         wei = q @ k.transpose(-2, -1) / math.sqrt(k.size(-1))
@@ -118,13 +123,51 @@ out, wei = head(x)
 print(out.shape)
 print(wei[0])
 </code></pre>
-<p>The output is <code>(B, T, head_size)</code>, and <code>wei</code> shows us exactly where each token was looking. I always print this weight matrix during debugging to verify the attention patterns.</p>
-<h2>Multi-head: Multiple Perspectives Simultaneously</h2>
-<p>Using a single head limits the model to one type of relationship. Multi-head attention splits the embedding dimension into several pieces, allowing each piece to score relationships from a different perspective. One head might focus on local context, while another might be sensitive to matching parentheses or changes in speaker.</p>
-<p>Finally, we concatenate the outputs of all heads and apply a single projection to return to the original dimension. In our configuration (<code>n_embd=128</code>, <code>n_head=4</code>), each head will have 32 dimensions.</p>
-<p>Increasing the number of heads doesn't automatically make a model smarter. Within the same <code>n_embd</code>, more heads mean fewer dimensions per head. In small models, you're trading representational depth for parallel perspectives. For a 101 series, 4 heads provide a good balance for observing the structure.</p>
-<h2>Using nn.Linear and Reshape Without einsum</h2>
-<p>Now let's integrate <code>CausalSelfAttention</code> for our series. It might look like a lot of code, but the structure is exactly what we just discussed.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">torch.Size([2, 4, 8])
+tensor([[1.0000, 0.0000, 0.0000, 0.0000],
+        [0.47.., 0.52.., 0.0000, 0.0000],
+        [0.31.., 0.28.., 0.40.., 0.0000],
+        [0.22.., 0.19.., 0.27.., 0.30..]])
+</code></pre>
+<p>The exact numbers do not matter. The pattern does. The upper-right region must be zeroed out, because those are future positions.</p>
+<p><strong>Step 2. Compare masked and unmasked scores on purpose</strong></p>
+<p>It helps to see what failure looks like. If you remove the mask temporarily and compare the two versions, the future positions remain active and the bug becomes obvious.</p>
+<pre><code class="language-python">import math
+
+import torch
+import torch.nn.functional as F
+
+q = torch.randn(1, 4, 8)
+k = torch.randn(1, 4, 8)
+scores = q @ k.transpose(-2, -1) / math.sqrt(k.size(-1))
+
+print(&quot;without mask&quot;)
+print(F.softmax(scores, dim=-1)[0])
+
+tril = torch.tril(torch.ones(4, 4))
+masked_scores = scores.masked_fill(tril == 0, float(&quot;-inf&quot;))
+
+print(&quot;with mask&quot;)
+print(F.softmax(masked_scores, dim=-1)[0])
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">without mask
+tensor([[0.20.., 0.29.., 0.24.., 0.25..],
+        [0.10.., 0.31.., 0.27.., 0.30..],
+        ...])
+
+with mask
+tensor([[1.0000, 0.0000, 0.0000, 0.0000],
+        [0.24.., 0.75.., 0.0000, 0.0000],
+        ...])
+</code></pre>
+<p>This is more than a demo. It is one of the fastest sanity checks when training loss looks suspiciously good but generation behaves badly.</p>
+<p><strong>Step 3. Multi-head attention gives the model parallel viewpoints</strong></p>
+<p>A single head tends to emphasize one kind of relationship at a time. Multi-head attention splits the embedding dimension into several smaller parts so different heads can score different relationships in parallel. One head may focus on local context, another on repeated structures, and another on speaker shifts.</p>
+<p>More heads are not automatically better. If <code>n_embd</code> stays fixed, each extra head reduces the per-head dimension. In our configuration of <code>n_embd=128</code> and <code>n_head=4</code>, each head gets 32 dimensions, which is a clean balance for a small educational model.</p>
+<p><strong>Step 4. Build the series version without shortcuts</strong></p>
+<p>Now we can assemble the <code>CausalSelfAttention</code> module for this series. No <code>einsum</code>, no fancy abstractions—just linear projections, reshaping, transposition, masking, and projection back to the residual dimension.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 import math
 
@@ -177,24 +220,54 @@ out = attn(x)
 print(out.shape)
 print(attn.last_attn.shape)
 </code></pre>
-<p>The output shape is <code>(2, 8, 128)</code>. If you want to inspect the attention map, you can read <code>attn.last_attn</code>, whose shape is <code>(2, 4, 8, 8)</code> in this example.</p>
-<h2>Checking a Single Head's Output</h2>
-<p>You can verify the causal mask by looking at the weights directly. The first row should only show the first token attending to itself, and the second row should only show attention to the first two positions. If the upper right area is blocked with zeros, the implementation is correct.</p>
-<p>Skipping this verification makes it much harder to find errors when you start stacking blocks. Half of attention debugging is simply confirming shapes and masks.</p>
-<p>When training behaves unexpectedly, the cause is often a minor tensor manipulation error rather than a deep mathematical flaw. It's usually a swapped transpose axis, a mask that doesn't match the <code>block_size</code>, or a missing <code>contiguous()</code> after a reshape. In attention, precision in handling tensor shapes is more important than the conceptual understanding.</p>
-<h2>What's next</h2>
-<p>Now that our tokens can "see" each other, we'll move on to the next post. We'll add FeedForward, Residual connections, and LayerNorm to complete a full Transformer block—the fundamental unit of depth in our model.</p>
-<!-- a-grade-example:begin -->
-
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">torch.Size([2, 8, 128])
+torch.Size([2, 4, 8, 8])
+</code></pre>
+<p>If those shapes line up, the split-head path and the merge-back path are both working. The most common failure here is not the formula. It is a tensor layout mistake.</p>
+<p><strong>Step 5. Keep one inspectable hook for later debugging</strong></p>
+<p>Saving <code>self.last_attn = wei</code> is not elegant, but it is practical. Once you start stacking blocks in the next post, it gives you a fast way to inspect whether masks still hold, whether a head is saturating, or whether every head is behaving identically.</p>
+<h2>Failure modes and the first thing to check</h2>
+<p>Attention bugs often repeat the same pattern. When something breaks, the quickest path is usually to inspect a shape, a mask, or a printed matrix—not to re-read the paper.</p>
+<p><strong>Training loss looks great but generation is terrible</strong><br>
+- First thing to inspect: Printed mask output<br>
+- Common cause: Future-token leakage</p>
+<p><strong><code>view()</code> raises shape/layout errors</strong><br>
+- First thing to inspect: Tensor continuity after <code>transpose</code><br>
+- Common cause: Missing <code>contiguous()</code></p>
+<p><strong>Adding more heads breaks immediately</strong><br>
+- First thing to inspect: <code>n_embd % n_head</code><br>
+- Common cause: Head dimension is not integral</p>
+<p><strong>Attention maps all look nearly identical</strong><br>
+- First thing to inspect: Score scale before softmax<br>
+- Common cause: Missing or incorrect <code>sqrt(d)</code></p>
+<p><strong>Memory jumps quickly</strong><br>
+- First thing to inspect: <code>T x T</code> attention map size<br>
+- Common cause: <code>block_size</code> is too large</p>
+<p>This checklist is worth keeping nearby. Attention usually fails in concrete, inspectable ways.</p>
+<h2>How to think about it in practice</h2>
+<p>This series uses a small char-level GPT, so the context window and head count stay modest. Even so, the attention cost still scales with <code>T²</code>. At <code>block_size=64</code>, that is manageable. At 512 or 2048, it becomes one of the first bottlenecks you feel.</p>
+<p>That is why it helps to describe attention in engineering terms rather than in slogan form. Think in terms of shapes, score matrices, masks, projections, and residual-stream compatibility. That language scales from toy models to real ones.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>It is easy to think Q, K, and V come from different data sources, but in self-attention they are three projections of the same input.</li>
+<li><code>sqrt(d)</code> can look like decorative math, but it is a real stabilizer for softmax.</li>
+<li>The causal mask can feel optional in code, but it is mandatory for autoregressive language modeling.</li>
+<li>More heads do not automatically mean a better model when <code>n_embd</code> stays fixed.</li>
+<li>Many attention bugs are not conceptual at all. They come from shapes, axis order, or mask ranges.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Walked through the scale → softmax → weighted V flow by hand.</li>
-<li>[ ] Printed a single head's attention weights to see the pattern.</li>
-<li>[ ] Understood how multi-head outputs are reshaped and concatenated.</li>
-<li>[ ] Compared logits before and after mask application.</li>
+<li>[ ] Can explain the shapes of the score matrix and the causal mask by hand.</li>
+<li>[ ] Printed a single head's <code>wei</code> and confirmed the upper-right region is blocked.</li>
+<li>[ ] Traced the multi-head shape <code>(B, n_head, T, head_size)</code> end to end.</li>
+<li>[ ] Can explain why <code>out.transpose(...).contiguous().view(...)</code> is needed.</li>
+<li>[ ] Understand why preventing future-token access keeps training and inference aligned.</li>
 </ul>
-<!-- a-grade-example:end -->
-
+<h2>Summary</h2>
+<p>In this post, we framed attention as a dynamic lookup mechanism across tokens. Q, K, and V are different projections of the same input, and softmax over their scores lets each position retrieve the context it needs.</p>
+<p>We also saw why causal masking and multi-head structure matter so much. The mask preserves the autoregressive rule, while multiple heads let the model score different relationships in parallel. Together, they are what move GPT beyond simple local character prediction.</p>
+<p>In the next post, we will add FeedForward, residual connections, and LayerNorm to turn this attention module into a full Transformer block.</p>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
@@ -208,10 +281,18 @@ print(attn.last_attn.shape)
 <li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></li>
 <li><a href="https://github.com/karpathy/nanoGPT/blob/master/model.py">nanoGPT model.py</a></li>
 <li><a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch scaled_dot_product_attention</a></li>
+<li><a href="https://jalammar.github.io/illustrated-transformer/">The Illustrated Transformer</a></li>
+</ul>
+<p><strong>Related Series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-app-foundations-101/en/03-prompt-engineering-basics.md">LLM App Foundations 101 — Prompt engineering basics</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/02-context-engineering.md">AI Agent 101 — Context engineering</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/02-state-and-checkpoints.md">LangGraph 101 — State and checkpoints</a></li>
 </ul>
 <p class="tags-line">Tags: LLM, PyTorch, Transformer, Tutorial</p>
 </body>

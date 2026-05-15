@@ -54,36 +54,40 @@
 </head>
 <body>
 <h1>Learning via Gradients</h1>
-<blockquote>
-<p>LLM from Scratch 101 series (6/9)</p>
-</blockquote>
-<p>Once the model class is complete, you're left with what seems like the most daunting phase: training. While the name suggests a complex control system, the PyTorch implementation is remarkably concise. You pull a mini-batch, calculate the loss, backpropagate, and let the optimizer nudge the parameters. You simply repeat these four steps for a long time.</p>
-<p>When I first trained a model on TinyShakespeare, I actually enjoyed seeing the loss numbers decrease slowly. It lacks the flash of a large-scale model demo, but it provides a tangible sense that the model is genuinely learning the next character.</p>
-<p>In this post, we'll implement <code>train.py</code>. We'll include AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpointing, while keeping the code compact.</p>
-<p>Today's mental model is this: <strong>Training is about repeatedly showing the model quality batches, flowing gradients back based on its errors, and adjusting weights slightly in the direction of those gradients.</strong></p>
-<hr>
-<!-- a-grade-intro:begin -->
-
-<h2>Key Questions</h2>
+<p>Once the model class is complete, training is the moment where everything starts to feel real. Until now, we have been assembling structure: embeddings, attention, blocks, and the GPT wrapper. The training loop is where those pieces finally meet data and start changing.</p>
+<p>The reassuring part is that the core loop is short. You pull a batch, compute a loss, backpropagate, and let the optimizer update the weights. The harder part is that the surrounding details matter immediately: batch construction, optimizer choice, learning-rate scheduling, gradient clipping, evaluation cadence, and checkpointing.</p>
+<p>TinyShakespeare is especially helpful here because the numbers move quickly enough to watch. The loss starts around 4 and gradually drops, which is often the first moment when the model stops feeling like a static class definition and starts feeling like a learner.</p>
+<p>This is post 6 in the LLM from Scratch 101 series. Here we will build a compact but usable <code>train.py</code> with AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpoint saving.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>What are the 5 lines that drive the training loop?</li>
-<li>Why does AdamW work better than SGD for transformers?</li>
-<li>How does warmup + cosine LR affect training stability?</li>
-<li>How does one line of gradient clipping prevent explosion?</li>
+<li>What are the five lines at the heart of the training loop?</li>
+<li>Why is AdamW usually easier to work with than SGD for Transformers?</li>
+<li>What do warmup and cosine decay do for stability?</li>
+<li>What kind of failure does gradient clipping prevent?</li>
+<li>Why should train and validation loss always be read together?</li>
 </ul>
-<!-- a-grade-intro:end -->
-
-<h2>The 5-line Core of the Training Loop</h2>
-<p>The heart of the training loop consists of just five lines: <code>zero_grad()</code>, <code>forward</code>, <code>backward()</code>, <code>clip_grad_norm_</code>, and <code>step()</code>. Everything else is operational code—handling evaluation intervals, logging, and learning rate scheduling.</p>
-<p><img alt="Core training loop from forward to update" src="data:image/png;base64,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"></p>
-<p><em>Core training loop from forward to update</em><br>
-At first, <code>backward()</code> might seem like magic. In reality, autograd traverses the computation graph in reverse to populate the <code>grad</code> attribute for each parameter. The optimizer then reads those values and takes a step.</p>
-<h2>Why AdamW Beats SGD for Transformers</h2>
-<p>For small language models like our char-level GPT, AdamW is much easier to manage than SGD. It combines momentum—remembering the direction of previous gradients—with adaptive variance estimation, which scales updates for each parameter automatically.</p>
-<p>Decoupling weight decay from the update rule is another advantage. In Transformers with many embeddings and linear layers, this separation significantly improves the training experience. We'll use <code>lr=3e-4</code>, <code>weight_decay=0.1</code>, and <code>betas=(0.9, 0.95)</code>, which is a solid starting point for a small GPT.</p>
-<h2>Learning Rate Warmup + Cosine Decay</h2>
-<p>Starting with a high learning rate can cause parameters to oscillate wildly when starting from a random initialization. We'll linearly increase the rate for the first 100 steps and then gradually decrease it following a cosine curve up to 5,000 steps.</p>
-<p>Warmup is like letting an engine reach operating temperature before hitting the highway. The subsequent cosine decay helps the model converge by reducing the step size towards the end. This intuition, common in ResNet training, works perfectly for small GPT models as well.</p>
+<blockquote>
+<p>Training is a closed loop that repeats the same correction over and over: show a batch, measure the error, flow gradients backward, and move the weights slightly in that direction.</p>
+</blockquote>
+<h2>Why this matters</h2>
+<p>The training loop is the boundary between a static architecture and a working learning system. Everything we built in earlier posts—embeddings, attention, blocks, and the GPT class—only becomes meaningful once it participates in repeated updates against real data.</p>
+<p>It is also where many beginners finally connect the theory to code. In practice, what matters is not just knowing the definition of gradient descent. It is knowing when gradients are cleared, where the loss is computed, when the optimizer steps, and how to detect when the loop has gone off the rails.</p>
+<p>From an engineering perspective, the support code matters early. Learning-rate schedules, clipping, validation checks, and checkpoints are not “advanced extras.” They are part of making experiments debuggable and repeatable from the start.</p>
+<h2>The most practical mental model: training is repeated error correction</h2>
+<p>Training is not a magical state change. <strong>The model predicts, compares itself against the target, computes gradients from that error, and shifts its weights slightly in the downhill direction.</strong> That sequence repeats thousands of times.</p>
+<p>The quality of the loop depends on its discipline. Batches must be valid, losses must be computed correctly, the optimizer must move at a safe scale, and monitoring must tell us whether the model is actually learning or simply memorizing noise.</p>
+<p>That is why the loop is both simple and operational. It is a short core surrounded by the instrumentation that keeps the experiment trustworthy.</p>
+<h2>Core ideas</h2>
+<p><strong>The center of the loop is five lines</strong></p>
+<p>At its smallest, the loop is <code>zero_grad()</code>, <code>forward</code>, <code>backward()</code>, <code>clip_grad_norm_</code>, and <code>step()</code>. Everything else is support code for scheduling, logging, validation, and saving.</p>
+<p><img alt="Core training loop from forward to update" src="https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png"></p>
+<p><em>Core training loop from forward to update.</em></p>
+<p>The most important detail here is what <code>backward()</code> actually does. Autograd walks the computation graph in reverse and fills the <code>grad</code> field on each parameter. The optimizer then consumes those gradients and updates the weights.</p>
+<p><strong>AdamW is a practical default for small GPTs</strong></p>
+<p>For a small char-level Transformer, AdamW is usually far easier to manage than SGD. It combines momentum-like behavior with adaptive scaling per parameter, which makes early training less brittle.</p>
+<p>The decoupled weight decay is also important. In Transformer-style models full of embeddings and linear layers, that separation tends to produce a cleaner optimization experience. In this series, <code>lr=3e-4</code>, <code>weight_decay=0.1</code>, and <code>betas=(0.9, 0.95)</code> form a solid starting point.</p>
+<p><strong>Warmup and cosine decay soften the start and finish</strong></p>
+<p>Applying a large learning rate immediately after random initialization can make the first updates too violent. We usually ramp up the rate for a short warmup period and then gradually reduce it with cosine decay.</p>
 <pre><code class="language-python">import math
 
 def get_lr(it: int, learning_rate: float) -&gt; float:
@@ -100,14 +104,13 @@ def get_lr(it: int, learning_rate: float) -&gt; float:
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
     return min_lr + coeff * (learning_rate - min_lr)
 </code></pre>
-<h2>Gradient Clipping — A Single Line to Prevent Explosion</h2>
-<p>Even when training goes well, gradients can suddenly spike at certain steps, especially early on. Adding <code>torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)</code> is a simple way to prevent catastrophic instabilities.</p>
-<p>Clipping is more of a safety mechanism than a performance trick. When loss spikes, it's hard to tell if the cause is the learning rate, the data batch, or a mask bug. Clipping allows you to rule out gradient explosion as the culprit.</p>
-<h2>Monitoring Progress with eval_interval</h2>
-<p>Don't rely solely on training loss. By setting <code>eval_interval=500</code> and tracking both train and validation loss, you can quickly identify overfitting or data bugs. A quick average across several batches under <code>@torch.no_grad()</code> is sufficient for evaluation.</p>
-<p>When monitoring small models, I focus on the trend rather than the absolute values. If train loss drops while validation loss plateaus, it's likely overfitting. If neither drops, the issue might be the learning rate or batching. The patterns in the numbers are often quite clear.</p>
-<h2>Running train.py — 5 Minutes on CPU, 1 Minute on GPU</h2>
-<p>Let's combine the training script into a single file. This script assumes the <code>GPT</code> class and the <code>train.bin</code>/<code>val.bin</code> files from previous posts are available.</p>
+<p>Warmup is the engine reaching operating temperature. Cosine decay is the model shortening its step size as it gets closer to a useful basin.</p>
+<p><strong>Gradient clipping is a small line with a large payoff</strong></p>
+<p>Even healthy training runs can hit occasional gradient spikes, especially early on. <code>torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)</code> is a simple guardrail that prevents those spikes from turning into numerical damage.</p>
+<p>Clipping is not a glamorous trick. It is a stability tool. When a run behaves badly, it helps separate “the learning rate is too high” from “a single bad step just exploded the norm.”</p>
+<h2>Building the training script step by step</h2>
+<p><strong>Step 1. Put the full loop in one <code>train.py</code></strong></p>
+<p>The following script assumes the <code>GPT</code> class and the <code>train.bin</code> / <code>val.bin</code> files from earlier posts already exist.</p>
 <pre><code class="language-python">from dataclasses import asdict
 from pathlib import Path
 import math
@@ -197,25 +200,89 @@ for iter_num in range(max_iters + 1):
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
     optimizer.step()
 
-torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
+torch.save({&quot;model&quot;: model.state_dict(), &quot;config&quot;: asdict(config)}, &quot;ckpt.pt&quot;)
 </code></pre>
-<p>With these settings, initial loss on TinyShakespeare is typically around 4.17, dropping to roughly 1.5 by step 5,000. It takes a few minutes on a CPU and about a minute on a GPU to see the trend. If the results are significantly worse, you should re-verify the model connections and batching code.</p>
-<h2>Saving the Trained Model with torch.save</h2>
-<p>Always save checkpoints for your experiments. Storing the config along with the model weights allows you to easily restore the model for generation in the next post.</p>
-<p>The line <code>torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')</code> is all you need. I prefer saving the context length and dimensions together so that information isn't lost when opening the file later. This becomes invaluable as you accumulate multiple experiments.</p>
-<h2>What's next</h2>
-<p>The weights are now trained. In the next post, we'll load <code>ckpt.pt</code> and implement the autoregressive generation loop. We'll use a prompt like <code>ROMEO:</code> to see how our TinyShakespeare model predicts the next characters.</p>
-<!-- a-grade-example:begin -->
+<p>This script is compact, but it already contains the essentials: batch sampling, scheduling, evaluation, clipping, and checkpoint saving.</p>
+<p><strong>Step 2. Know what a healthy log trend looks like</strong></p>
+<p>When you first run training, focus on the trend rather than exact numbers. With random initialization and 65 output classes, the initial loss should land near <code>ln(65)</code>, which is about 4.17. From there, it should decline steadily over time.</p>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">step 0: train 4.1731, val 4.1748, lr 0.000003
+step 500: train 2.2114, val 2.3457, lr 0.000300
+step 1000: train 1.9262, val 2.0410, lr 0.000293
+step 2500: train 1.6038, val 1.7489, lr 0.000180
+step 5000: train 1.4725, val 1.6182, lr 0.000030
+</code></pre>
+<p>The exact values will vary, but the shape of the run should not. If you start with <code>nan</code>, or if the loss barely moves after many hundreds of steps, revisit the model wiring and the batch logic before tuning anything else.</p>
+<p><strong>Step 3. Train loss alone only tells half the story</strong></p>
+<p>By evaluating both train and validation loss at a fixed interval, you can spot overfitting, learning-rate issues, or data bugs much earlier. For a small experiment, averaging over a few batches under <code>@torch.no_grad()</code> is enough.</p>
+<p>In small models, the trend is often easier to read than the absolute magnitude. If train keeps falling but validation stalls, overfitting is likely. If neither moves, the problem is often in the learning rate or the data pipeline.</p>
+<p><strong>Step 4. Use a one-batch overfit test as a fast debugger</strong></p>
+<p>When full training looks broken, the fastest narrow test is often to overfit a single batch on purpose. If the loss falls quickly there, your forward pass, backward pass, and optimizer path are probably wired correctly.</p>
+<pre><code class="language-python">xb, yb = get_batch(&quot;train&quot;)
 
+for step in range(200):
+    optimizer.zero_grad(set_to_none=True)
+    _, loss = model(xb, yb)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    optimizer.step()
+
+    if step % 20 == 0:
+        print(step, loss.item())
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">0 4.15
+20 2.73
+40 1.82
+60 1.21
+80 0.79
+100 0.54
+</code></pre>
+<p>If even this does not improve, the bug is likely structural rather than statistical. At that point, re-check target shifting, logits flattening, and attention masking.</p>
+<p><strong>Step 5. Save the experiment context, not just the weights</strong></p>
+<p>Saving only model weights is tempting, but incomplete. The config matters too. The generation script in the next post needs the same <code>block_size</code>, <code>n_embd</code>, <code>n_layer</code>, and related settings to rebuild the model correctly.</p>
+<p>That is why <code>torch.save({'model': ..., 'config': ...}, 'ckpt.pt')</code> is worth keeping from the beginning. Once you have multiple experiments, it becomes the difference between reproducible work and mystery checkpoints.</p>
+<h2>Fast failure triage</h2>
+<p>Training problems can feel vague at first. In practice, a short symptom-to-check sequence is enough to narrow most failures quickly.</p>
+<p><strong><code>nan</code> from the first few steps</strong><br>
+- First thing to inspect: Learning rate, mask, logits scale<br>
+- Common cause: LR too high or broken attention</p>
+<p><strong>Train and val both refuse to improve</strong><br>
+- First thing to inspect: <code>get_batch()</code> and target shift<br>
+- Common cause: Incorrect <code>y</code> alignment</p>
+<p><strong>Train improves but val does not</strong><br>
+- First thing to inspect: Validation log trend<br>
+- Common cause: Overfitting or split issue</p>
+<p><strong>Loss occasionally spikes hard</strong><br>
+- First thing to inspect: Gradient norm<br>
+- Common cause: Missing clipping or unstable batch</p>
+<p><strong>Reloaded runs are hard to compare</strong><br>
+- First thing to inspect: Saved config and checkpoint naming<br>
+- Common cause: Missing experiment context</p>
+<p>This table matters because it turns “training feels wrong” into a concrete inspection plan.</p>
+<h2>How to think about it in practice</h2>
+<p>The goal of this series is not maximum throughput. It is to build a training loop that is transparent and repeatable. That is why we leave mixed precision, gradient accumulation, and distributed training for later. First, the loop itself should be understandable and debuggable.</p>
+<p>Even in a toy project, operational habits matter. A five-minute CPU run or a one-minute GPU run is still wasted if you cannot explain the loss curve or reproduce the checkpoint. Conversely, once the loop logs cleanly and saves enough context, even a small experiment becomes a solid learning artifact.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>It is easy to assume the training loop must be long and complex, but the core is just five lines.</li>
+<li>AdamW can look interchangeable with SGD, but for small Transformers it is usually much easier to tune.</li>
+<li>Warmup and decay can look optional, yet they directly affect startup stability and late-stage convergence.</li>
+<li>Watching only training loss hides overfitting and data issues.</li>
+<li>Saving weights without config makes checkpoints much less useful later.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Wrote the 5-line training loop by hand.</li>
-<li>[ ] Plotted the warmup + cosine curve to see lr per step.</li>
-<li>[ ] Plotted train and val loss together using eval_interval.</li>
-<li>[ ] Saved ckpt.pt and reloaded it successfully.</li>
+<li>[ ] Can explain <code>zero_grad -&gt; forward -&gt; backward -&gt; clip -&gt; step</code> without reciting it mechanically.</li>
+<li>[ ] Printed or plotted the warmup + cosine schedule.</li>
+<li>[ ] Logged both train and validation loss through <code>estimate_loss()</code>.</li>
+<li>[ ] Ran a one-batch overfit test to verify the learning path.</li>
+<li>[ ] Saved both model weights and config into <code>ckpt.pt</code>.</li>
 </ul>
-<!-- a-grade-example:end -->
-
+<h2>Summary</h2>
+<p>In this post, we built a minimal but practical <code>train.py</code> for GPT training. Batch sampling, AdamW, scheduling, clipping, periodic evaluation, and checkpointing now work together as one loop.</p>
+<p>We also saw that training is less mysterious than it sounds. The core is just repeated error correction. The extra structure around it exists to keep that correction stable, observable, and reproducible.</p>
+<p>In the next post, we will load <code>ckpt.pt</code> and turn the trained model into a generator, producing Shakespeare-like text one token at a time.</p>
 <h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-from-scratch-101/en/01-tokenizer.md">Turning Text into Numbers</a></li>
@@ -229,11 +296,18 @@ torch.save({'model': model.state_dict(), 'config': asdict(config)}, 'ckpt.pt')
 <li>Turning Your LLM into a Chatbot — FastAPI + Streaming (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/1711.05101">Decoupled Weight Decay Regularization (AdamW)</a></li>
 <li><a href="https://github.com/karpathy/nanoGPT/blob/master/train.py">nanoGPT train.py</a></li>
-<li><a href="https://myrtle.ai/how-to-train-your-resnet-8-bag-of-tricks/">How to Train Your ResNet-8: Bag of Tricks</a></li>
 <li><a href="https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html">PyTorch clip_grad_norm_</a></li>
+<li><a href="https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html">PyTorch AdamW</a></li>
+</ul>
+<p><strong>Related Series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/llm-api-production-101/en/05-retry-and-error-handling.md">LLM API Production 101 — Retry and error handling</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/07-agent-evaluation.md">AI Agent 101 — Agent evaluation</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/02-state-and-checkpoints.md">LangGraph 101 — State and checkpoints</a></li>
 </ul>
 <p class="tags-line">Tags: LLM, PyTorch, Transformer, Tutorial</p>
 </body>
