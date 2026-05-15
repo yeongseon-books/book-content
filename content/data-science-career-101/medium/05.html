@@ -54,18 +54,20 @@
 </head>
 <body>
 <h1>SQL and Analytics Interviews</h1>
-<blockquote>
-<p>Data Science Career 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you prepare for SQL and analytics interviews?</p>
-<blockquote>
-<p>Decompose the question, JOIN, aggregate, window, interpret.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Many candidates prepare for SQL interviews as if they were grammar exams. They memorize JOIN types, aggregation syntax, and window functions, but they still struggle once the interviewer asks, “What exactly are you counting?” or “How would you explain this result to a product manager?”</p>
+<p>That gap exists because SQL interviews are usually reasoning interviews in disguise. The query matters, but so do the assumptions behind it: the metric definition, the NULL behavior, the time boundary, and the interpretation that turns a result set into an insight.</p>
 <p>This is post 5 in the Data Science Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What do SQL and analytics interviews actually evaluate beyond syntax?</li>
+<li>How should you break a business question into query steps?</li>
+<li>What are the recurring patterns around JOINs, aggregation, windows, and funnels?</li>
+<li>Why does metric definition often matter more than the final number?</li>
+<li>What makes a one-sentence interpretation strong enough to sound analytical rather than mechanical?</li>
+</ul>
+<blockquote>
+<p>The core skill in a SQL interview is not typing fast. It is turning a vague question into a readable query, then turning the output into a defensible interpretation.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Core <em>SQL</em> patterns</li>
@@ -75,13 +77,11 @@
 <li>Mock <em>practice</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>SQL is the lingua franca of every data role.</p>
+<p>SQL is the shared language across most data roles, which is why interviewers use it to observe more than database fluency.</p>
+<p>They are also watching how you define the metric, whether you surface assumptions, and whether you can tell the difference between “I got a number” and “I understand what this number means.”</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[Question] --&gt; S[SQL]
-    S --&gt; R[Result]
-    R --&gt; I[Insight]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>The SQL interview loop from question framing to query output to interpretation</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>JOIN</strong>: Combining tables.</li>
@@ -140,7 +140,8 @@ SELECT SUM(s1), SUM(s2), SUM(s3) FROM steps;
 <li><strong>No interpretation.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Analytics interviews typically pair one SQL problem with one case.</p>
+<p>Analytics interviews commonly pair one SQL problem with one interpretation or case-style follow-up because real work almost never stops at query execution.</p>
+<p>In production, the important part is often the sentence after the query: what changed, whether the result is trustworthy, and what should be checked next.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Define the metric first.</li>
@@ -163,7 +164,8 @@ SELECT SUM(s1), SUM(s2), SUM(s3) FROM steps;
 <li>One line: criterion for a metric definition.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>The ML Interview</em>.</p>
+<p>The strongest answers in SQL interviews feel structured before they feel clever. They define the metric, make the query readable, call out the edge cases, and close with a compact interpretation that points to the next useful question.</p>
+<p>The next post applies the same problem-first thinking to machine learning interviews.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/01-what-is-data-career.md">What Is a Data Career</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/02-analyst-scientist-engineer.md">Analyst vs Scientist vs Engineer</a></li>
@@ -178,10 +180,10 @@ SELECT SUM(s1), SUM(s2), SUM(s3) FROM steps;
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://mode.com/sql-tutorial/">Mode SQL Tutorial</a></li>
-<li><a href="https://leetcode.com/studyplan/top-sql-50/">LeetCode SQL</a></li>
-<li><a href="https://www.postgresql.org/docs/current/tutorial-window.html">Window Functions</a></li>
-<li><a href="https://experimentguide.com/">Trustworthy Online Controlled Experiments</a></li>
+<li><a href="https://mode.com/sql-tutorial/">Mode - SQL Tutorial</a></li>
+<li><a href="https://leetcode.com/studyplan/top-sql-50/">LeetCode - Top SQL 50</a></li>
+<li><a href="https://www.postgresql.org/docs/current/tutorial-window.html">PostgreSQL Documentation - Window Functions Tutorial</a></li>
+<li><a href="https://experimentguide.com/">Ron Kohavi et al. - Trustworthy Online Controlled Experiments</a></li>
 </ul>
 <p class="tags-line">Tags: DataCareer, SQL, Analytics, Interview, Beginner</p>
 </body>

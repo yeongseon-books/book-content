@@ -2,7 +2,7 @@
 series: data-science-career-101
 episode: 8
 title: Settling into the First Data Job
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,26 @@ tags:
   - Communication
   - Beginner
 seo_description: Navigate your first 90 days in a data role with practical advice on onboarding, stakeholder management, and establishing effective communication.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Settling into the First Data Job
 
-> Data Science Career 101 series (8/10)
+The first data job often creates pressure in the wrong place. New hires feel they need to prove technical strength immediately, so they rush into tickets, dashboards, or model ideas before they have learned how the data flows, who owns which decisions, or what the team actually values.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How should you spend your *first 90 days*?
-
-> Data, people, metrics, small wins, documents.
-
-<!-- a-grade-intro:end -->
+That usually slows the ramp instead of accelerating it. In the first 90 days, the highest-leverage work is often quieter: mapping the data, meeting stakeholders, finding one or two small wins, and leaving behind documentation that makes future work easier for everyone.
 
 This is post 8 in the Data Science Career 101 series.
+
+## Questions this chapter answers
+
+- How should you think about the first 30, 60, and 90 days in a data role?
+- What should you listen for and document before trying to move fast?
+- Why is a data map one of the most useful early artifacts?
+- What qualifies as a good quick win in a new team?
+- Why does documentation change how quickly trust accumulates?
+
+> The first 90 days are not about looking impressive. They are about reading the terrain—data, people, ownership, and decision patterns—well enough to create useful trust.
 
 ## What You Will Learn
 
@@ -44,17 +48,15 @@ This is post 8 in the Data Science Career 101 series.
 
 ## Why It Matters
 
-The first 90 days plant the seed of your reputation.
+The first 90 days shape the reputation that later proposals will inherit.
+
+If you learn the context well, even small improvements land with more credibility. If you skip the context, bigger ideas often miss the real bottleneck and cost trust instead of building it.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    M[Map] --> S[Stakeholders]
-    S --> W[Win]
-    W --> D[Doc]
-```
+![Concept at a Glance](../../../assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
 
+*The first 90 days work best when data mapping, stakeholder learning, wins, and documentation reinforce each other*
 ## Key Terms
 
 - **data map**: Inventory of data sources.
@@ -121,7 +123,9 @@ flowchart LR
 
 ## How This Shows Up in Production
 
-Managers use 90-day check-ins to gauge ramp-up.
+Managers often use 30/60/90-day check-ins to assess ramp-up, but the interesting signals are rarely “worked hard” or “closed tickets.”
+
+They look more like: understood the decision surface, met the right people, documented key context, identified one meaningful improvement, and started to translate local learning into reusable team knowledge.
 
 ## How a Senior Engineer Thinks
 
@@ -146,7 +150,9 @@ Managers use 90-day check-ins to gauge ramp-up.
 
 ## Wrap-up and Next Steps
 
-Next post covers *Building Domain Expertise*.
+The best first-quarter outcome is usually not a giant project. It is a combination of context, trust, one or two visible wins, and documentation that makes the second quarter faster than the first.
+
+The next post looks at domain expertise, which is often the hidden multiplier behind that trust.
 
 <!-- toc:begin -->
 - [What Is a Data Career](./01-what-is-data-career.md)
@@ -163,9 +169,9 @@ Next post covers *Building Domain Expertise*.
 
 ## References
 
-- [The First 90 Days](https://hbr.org/books/watkins)
-- [The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
-- [DAMA Data Management](https://www.dama.org/)
-- [DACI decision framework](https://www.atlassian.com/team-playbook/plays/daci)
+- [Michael D. Watkins - The First 90 Days](https://www.michaelwatkins.com/books/the-first-90-days/)
+- [Camille Fournier - The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
+- [DAMA International](https://www.dama.org/)
+- [Atlassian Team Playbook - DACI Decision-Making Framework](https://www.atlassian.com/team-playbook/plays/daci)
 
 Tags: DataCareer, Onboarding, Stakeholders, Communication, Beginner

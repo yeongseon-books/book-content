@@ -17,10 +17,14 @@ tags:
   - Python
   - Beginner
 seo_description: 데이터 직무 입문을 위한 12주 단계별 학습 경로를 설계하고, SQL부터 파이썬까지 필수 기술을 익히는 효율적인 순서와 방법을 제시합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 학습 경로 설계
+
+데이터 직무를 준비하는 입문자가 가장 자주 빠지는 함정은 열심히 공부하는데도 순서가 없다는 점입니다. 강의를 몇 개 듣고, 책을 몇 권 사고, Kaggle 노트북을 따라 해 봐도 어느 순간 “그래서 지금 나는 무엇을 쌓고 있는가?”라는 질문 앞에서 멈추게 됩니다.
+
+좋은 학습 경로는 더 많은 자료를 소비하게 만드는 계획이 아니라, 다음 단계로 넘어가기 위한 기준을 만들어 주는 계획입니다. 무엇을 먼저 익히고, 어떤 결과물을 남기고, 어느 시점에 회고할지 정해 두어야 공부가 취미가 아니라 자산으로 남습니다.
 
 이 글은 Data Science Career 101 시리즈의 세 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 무작정 공부하면 의욕보다 먼저 방향을 잃습니다. 반대로 경로가 있으면 배운 내용이 다음 단계의 재료가 되고, 중간에 지치더라도 다시 돌아올 기준점이 남습니다.
 
+특히 데이터 직무는 SQL, Python, 통계, 시각화, 실험, 모델링처럼 배워야 할 항목이 많아서 순서를 잘못 잡으면 체감 난도가 급격히 올라갑니다. 그래서 “무엇을 더 많이 하느냐”보다 “무엇을 어떤 순서로 쌓느냐”가 더 중요합니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    F[Fundamentals] --> A[Analytics]
-    A --> M[Modeling]
-    M --> P[Product]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/03/03-01-concept-at-a-glance.ko.png)
 
+*기초에서 분석과 모델링을 거쳐 제품 맥락으로 이어지는 12주 학습 경로의 큰 흐름*
 입문 단계에서는 이 순서가 중요합니다. 기초가 받쳐 줘야 분석이 흔들리지 않고, 분석 감각이 있어야 모델링 결과를 해석할 수 있으며, 마지막에는 제품과 사용자 맥락으로 연결해야 합니다.
 
 ## 핵심 용어
@@ -188,9 +190,9 @@ What went well / Improve / Next
 
 ## 참고 자료
 
-- [Mode SQL Tutorial](https://mode.com/sql-tutorial/)
-- [pandas docs](https://pandas.pydata.org/docs/)
-- [scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Mode - SQL Tutorial](https://mode.com/sql-tutorial/)
+- [pandas documentation - User Guide](https://pandas.pydata.org/docs/user_guide/index.html)
+- [scikit-learn - User Guide](https://scikit-learn.org/stable/user_guide.html)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)
 
 Tags: DataCareer, LearningPath, SQL, Python, Beginner

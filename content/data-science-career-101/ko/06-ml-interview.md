@@ -17,10 +17,14 @@ tags:
   - Modeling
   - Beginner
 seo_description: 머신러닝 인터뷰 빈출 모델링 개념과 평가지표를 파악하고, 기술 질문에 논리적으로 답변하는 체계적인 준비 프로세스를 학습합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # ML 인터뷰
+
+머신러닝 인터뷰를 처음 준비할 때는 보통 모델 이름과 알고리즘 개념부터 외우기 시작합니다. Random Forest, XGBoost, Logistic Regression, Precision, Recall 같은 키워드는 익숙해지지만, 막상 면접에서 “이 문제에서는 왜 이 지표를 보겠는가?”라는 질문이 나오면 답변이 급격히 얕아지기 쉽습니다.
+
+실무 인터뷰는 모델 암기보다 판단 구조를 더 많이 봅니다. 어떤 문제를 풀고 있는지, 데이터 누수나 드리프트 같은 운영 함정을 알고 있는지, 그리고 모델을 서비스 안에서 어떻게 모니터링할지를 연결해 말할 수 있어야 깊이가 드러납니다.
 
 이 글은 Data Science Career 101 시리즈의 여섯 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 머신러닝 면접은 모델 암기 시험이 아닙니다. 어떤 문제를 풀고 있는지, 어떤 지표를 우선해야 하는지, 운영에서 어떤 리스크가 있는지를 함께 생각할 수 있는지 보는 자리입니다.
 
+특히 최근 면접은 모델 선택보다 배포 이후를 더 자주 묻습니다. 데이터가 언제 들어오는지, 재학습 주기는 어떻게 잡는지, 성능 저하를 어떻게 감지하는지 설명해야 실제 서비스 감각이 있는 지원자로 보입니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    P[Problem] --> M[Model]
-    M --> E[Evaluation]
-    E --> D[Deployment]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/06/06-01-concept-at-a-glance.ko.png)
 
+*문제 정의에서 모델 선택, 평가, 배포로 이어지는 ML 인터뷰 답변 구조*
 이 흐름을 답변 구조로 잡으면 훨씬 단단해집니다. 문제를 정의하고, 모델을 선택하고, 평가 기준을 설명한 뒤, 배포와 모니터링까지 연결해야 합니다.
 
 ## 핵심 용어
@@ -180,9 +182,9 @@ ML 인터뷰에서 중요한 것은 모델 이름을 많이 아는 일이 아니
 
 ## 참고 자료
 
-- [Designing Machine Learning Systems](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
-- [scikit-learn metrics](https://scikit-learn.org/stable/modules/model_evaluation.html)
-- [ML Interview Book](https://huyenchip.com/ml-interviews-book/)
-- [Rules of ML](https://developers.google.com/machine-learning/guides/rules-of-ml)
+- [Chip Huyen - Designing Machine Learning Systems](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
+- [scikit-learn - Model Evaluation: Quantifying the Quality of Predictions](https://scikit-learn.org/stable/modules/model_evaluation.html)
+- [Chip Huyen - Machine Learning Interviews Book](https://huyenchip.com/ml-interviews-book/)
+- [Google Developers - Rules of ML](https://developers.google.com/machine-learning/guides/rules-of-ml)
 
 Tags: DataCareer, ML, Interview, Modeling, Beginner

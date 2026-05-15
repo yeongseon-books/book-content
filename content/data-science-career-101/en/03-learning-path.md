@@ -2,7 +2,7 @@
 series: data-science-career-101
 episode: 3
 title: Designing the Learning Path
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,26 @@ tags:
   - Python
   - Beginner
 seo_description: A beginner-friendly tour of a 12-week learning roadmap for data roles.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Designing the Learning Path
 
-> Data Science Career 101 series (3/10)
+Many beginners do not fail because they study too little. They fail because they study in a way that never compounds. A course here, a notebook there, a few SQL exercises over the weekend—effort accumulates, but the path does not, so it becomes hard to tell what is foundational and what is optional.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: In what order should you learn what?
-
-> Fundamentals to analytics to modeling to product.
-
-<!-- a-grade-intro:end -->
+In data work, sequence matters. If you jump into modeling before you are comfortable with SQL, data cleaning, and basic statistics, you end up building on a surface that cannot support the kinds of questions interviews and real projects actually ask.
 
 This is post 3 in the Data Science Career 101 series.
+
+## Questions this chapter answers
+
+- What should a beginner learn first, and what can wait?
+- Why is a 12-week roadmap a more useful frame than a loose reading list?
+- What outcomes should each four-week phase produce?
+- Why do weekly artifacts matter more than passive study hours?
+- How does a simple retro keep the plan sustainable?
+
+> A strong learning path is not a list of resources. It is an order of operations that turns fundamentals into analysis, analysis into modeling, and every week into visible evidence of progress.
 
 ## What You Will Learn
 
@@ -44,17 +48,15 @@ This is post 3 in the Data Science Career 101 series.
 
 ## Why It Matters
 
-Random study burns you out. A path keeps you going.
+Random study usually produces random confidence. You touch many topics, but you cannot tell which ones you can actually use.
+
+An ordered path gives you something more valuable than motivation: it gives you checkpoints. You know when to move from syntax to analysis, when to build a small project, and when to pause and correct the pace instead of just collecting more material.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Fundamentals] --> A[Analytics]
-    A --> M[Modeling]
-    M --> P[Product]
-```
+![Concept at a Glance](../../../assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
 
+*A staged learning path from fundamentals to analytics, modeling, and product context*
 ## Key Terms
 
 - **fundamentals**: Core building blocks.
@@ -130,7 +132,9 @@ What went well / Improve / Next
 
 ## How This Shows Up in Production
 
-Bootcamps run on roughly the same 12-week roadmap.
+Most bootcamps and internal training programs follow some version of this progression because the dependency chain is hard to escape: fundamentals first, analysis second, modeling third, product judgment throughout.
+
+The exact tools vary, but the structure holds because real work still depends on being able to query data, clean it, explain it, and only then decide whether a model is even the right move.
 
 ## How a Senior Engineer Thinks
 
@@ -155,7 +159,9 @@ Bootcamps run on roughly the same 12-week roadmap.
 
 ## Wrap-up and Next Steps
 
-Next post covers *The Data Portfolio*.
+The goal is not to consume the maximum number of resources in 12 weeks. It is to finish the period with a stronger base, a set of reusable artifacts, and at least one small body of work that proves you can turn study into output.
+
+The next post shows how those artifacts become a portfolio instead of a pile of disconnected exercises.
 
 <!-- toc:begin -->
 - [What Is a Data Career](./01-what-is-data-career.md)
@@ -172,9 +178,9 @@ Next post covers *The Data Portfolio*.
 
 ## References
 
-- [Mode SQL Tutorial](https://mode.com/sql-tutorial/)
-- [pandas docs](https://pandas.pydata.org/docs/)
-- [scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Mode - SQL Tutorial](https://mode.com/sql-tutorial/)
+- [pandas documentation - User Guide](https://pandas.pydata.org/docs/user_guide/index.html)
+- [scikit-learn - User Guide](https://scikit-learn.org/stable/user_guide.html)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)
 
 Tags: DataCareer, LearningPath, SQL, Python, Beginner

@@ -17,10 +17,14 @@ tags:
   - Notebook
   - Beginner
 seo_description: 실무 역량을 증명하는 고품질 데이터 포트폴리오 구성 원칙을 알아보고, 채용 담당자에게 좋은 인상을 주는 프로젝트 관리 팁을 공유합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 데이터 포트폴리오
+
+데이터 포트폴리오를 준비할 때 가장 흔한 오해는 “코드를 올리면 곧 실력 증명이 된다”는 생각입니다. 하지만 채용 관점에서 더 중요한 것은 코드량보다 문제를 어떻게 정의했고, 어떤 판단을 했고, 결과를 어떻게 설명했는지입니다.
+
+특히 데이터 프로젝트는 노트북 몇 개만 남겨 두면 맥락이 금방 사라집니다. 데이터 출처는 무엇인지, 비교 기준은 무엇인지, 재현은 가능한지, 결과가 왜 의미 있는지까지 같이 보여 줘야 포트폴리오가 단순 저장소가 아니라 실무 증거로 읽힙니다.
 
 이 글은 Data Science Career 101 시리즈의 네 번째 글입니다.
 
@@ -46,16 +50,13 @@ last_reviewed: '2026-05-12'
 
 채용에서 기억에 남는 것은 숫자 자체보다 서사입니다. 무슨 문제를 풀었고, 어떤 판단을 했고, 어떤 결론에 도달했는지를 빠르게 전달할 수 있어야 인터뷰로 이어집니다.
 
+작은 프로젝트라도 질문, 데이터, 접근 방식, 결론, 재현 경로가 분명하면 훨씬 신뢰도가 높아집니다. 반대로 모델 성능 수치만 강조하면 인터뷰어는 “이 사람이 실제로 문제를 이해했는가?”를 판단하기 어려워집니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Q[Question] --> D[Data]
-    D --> A[Analysis]
-    A --> R[Result]
-    R --> Repro[Reproducible]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/04/04-01-concept-at-a-glance.ko.png)
 
+*문제 정의에서 결과와 재현 가능성까지 이어져야 포트폴리오가 실무 증거로 읽힌다는 흐름*
 좋은 포트폴리오는 이 흐름을 빠짐없이 보여 줍니다. 질문이 없으면 맥락이 없고, 결과만 있으면 신뢰가 약하며, 재현 방법이 없으면 협업 가능성이 잘 드러나지 않습니다.
 
 ## 핵심 용어
@@ -188,9 +189,9 @@ make run
 
 ## 참고 자료
 
-- [Kaggle Datasets](https://www.kaggle.com/datasets)
-- [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/)
-- [Made with ML](https://madewithml.com/)
-- [Towards Data Science portfolio guide](https://towardsdatascience.com/)
+- [Kaggle - Datasets](https://www.kaggle.com/datasets)
+- [DrivenData - Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/)
+- [Made With ML - MLOps and Project Structure Guides](https://madewithml.com/)
+- [GitHub Docs - About READMEs](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
 
 Tags: DataCareer, Portfolio, GitHub, Notebook, Beginner

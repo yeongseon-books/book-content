@@ -17,10 +17,14 @@ tags:
   - Metrics
   - Beginner
 seo_description: 데이터로 비즈니스 문제를 해결하는 케이스 인터뷰를 대비하여 지표 설계와 가설 검정 과정을 전개하는 문제 해결 프레임워크를 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 케이스 인터뷰
+
+케이스 인터뷰는 많은 지원자에게 가장 추상적으로 느껴지는 단계입니다. SQL처럼 정답 형태가 명확하지도 않고, 머신러닝처럼 알고리즘 이름을 기준으로 준비할 수도 없기 때문입니다. 그래서 질문을 들으면 곧바로 아이디어를 던지다가 구조 없이 끝나는 경우가 많습니다.
+
+하지만 면접관이 보고 싶은 것은 아이디어의 양이 아니라 사고의 질입니다. 문제를 어떻게 명확히 하고, 어떤 지표를 중심에 둘지 정하고, 어떤 가설을 세운 뒤, 어떤 데이터로 검증하고, 마지막에 어떤 결정을 내릴지까지 보여 줘야 답변이 단단해집니다.
 
 이 글은 Data Science Career 101 시리즈의 일곱 번째 글입니다.
 
@@ -46,16 +50,13 @@ last_reviewed: '2026-05-12'
 
 기술 역량만으로는 제품 문제를 풀 수 없습니다. 데이터 직무가 커질수록 질문을 구조화하고, 모호한 상황에서 판단 기준을 세우는 힘이 더 중요해집니다.
 
+실무에서는 문제 정의가 늘 불완전한 상태에서 시작합니다. 숫자 하나가 떨어졌을 때도 세그먼트, 기간, 최근 변경 사항, 지표의 의미를 먼저 정리해야 합니다. 케이스 인터뷰는 바로 그 초기 구조화 능력을 압축해서 보는 방식이라고 생각하면 이해가 쉽습니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Q[Clarify] --> M[Metric]
-    M --> H[Hypothesis]
-    H --> D[Data]
-    D --> Dec[Decision]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/07/07-01-concept-at-a-glance.ko.png)
 
+*명확화에서 지표, 가설, 데이터, 결정으로 이어지는 케이스 인터뷰 답변 프레임*
 이 다섯 단계는 답변 템플릿으로 그대로 써도 좋습니다. 문제를 명확히 하지 않으면 뒤의 지표와 데이터 계획이 모두 흔들립니다.
 
 ## 핵심 용어
@@ -182,9 +183,9 @@ flowchart LR
 
 ## 참고 자료
 
-- [Decode and Conquer](https://www.amazon.com/Decode-Conquer-Lewis-Lin/dp/0615930417)
-- [Cracking the PM Interview](https://www.amazon.com/Cracking-PM-Interview-Product-Technology/dp/0984782818)
-- [Stratechery](https://stratechery.com/)
-- [Trustworthy Online Controlled Experiments](https://experimentguide.com/)
+- [Lewis C. Lin - Decode and Conquer](https://www.lewis-lin.com/decode-and-conquer)
+- [Cracking the PM Interview](https://www.crackingthepminterview.com/)
+- [Ben Thompson - Stratechery](https://stratechery.com/)
+- [Ron Kohavi et al. - Trustworthy Online Controlled Experiments](https://experimentguide.com/)
 
 Tags: DataCareer, CaseInterview, ProductSense, Metrics, Beginner

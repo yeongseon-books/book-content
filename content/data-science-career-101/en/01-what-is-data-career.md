@@ -2,7 +2,7 @@
 series: data-science-career-101
 episode: 1
 title: What Is a Data Career
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,26 @@ tags:
   - Engineer
   - Beginner
 seo_description: Identify core data roles including analyst, scientist, and engineer while exploring entry paths and essential skills for a data science career.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # What Is a Data Career
 
-> Data Science Career 101 series (1/10)
+When people first look into data careers, the landscape often feels flatter than it really is. Job boards list analyst, scientist, engineer, analytics engineer, and ML engineer side by side, but they rarely explain which questions each role owns or what kind of evidence each role is expected to produce.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does a *data career* actually look like as a job?
-
-> Answer questions and improve products with data.
-
-<!-- a-grade-intro:end -->
+That ambiguity matters early. If you cannot tell whether a team mainly values business interpretation, experimentation, data modeling, or production pipelines, it becomes easy to study the wrong things, build the wrong portfolio, and apply for titles that sound right but do not match the work you actually want.
 
 This is the first post in the Data Science Career 101 series.
+
+## Questions this chapter answers
+
+- What roles are usually grouped together when people say “data career”?
+- Why is it safer to distinguish data jobs by responsibility and deliverable than by title alone?
+- What do analyst, scientist, engineer, ML engineer, and analytics engineer each optimize for?
+- How do company size and team structure change the role boundaries?
+- What is the simplest starting point for deciding which path fits you best?
+
+> A data career is not one statistics-heavy job. It is a family of roles that turn questions into data work, and then turn that work into decisions, product change, or reliable infrastructure.
 
 ## What You Will Learn
 
@@ -44,17 +48,15 @@ This is the first post in the Data Science Career 101 series.
 
 ## Why It Matters
 
-The same data carries different expectations across roles.
+The same dataset leads to very different expectations depending on the role around it.
+
+An analyst may be asked to define a metric and explain a drop in conversion. A scientist may need to frame that same change as a hypothesis and test it. An engineer may care more about whether the underlying event table is complete, trustworthy, and fresh enough to support either of those conversations. The earlier you see those differences, the easier it becomes to make deliberate learning trade-offs.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q[Question] --> D[Data]
-    D --> A[Analysis]
-    A --> P[Product]
-```
+![Concept at a Glance](../../../assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
 
+*A basic map of data work flowing from question to data to analysis to product change*
 ## Key Terms
 
 - **data analyst**: Decision support specialist.
@@ -117,7 +119,9 @@ Builds reliable analytics models with dbt and friends.
 
 ## How This Shows Up in Production
 
-Big tech separates Analyst, Scientist, ML Engineer, and Analytics Engineer.
+Large organizations usually separate Analyst, Scientist, ML Engineer, and Analytics Engineer much more clearly because the volume of data, the number of stakeholders, and the cost of ambiguity are all higher.
+
+Smaller teams often combine two or three of these responsibilities into one role. Even then, the distinction still matters. The title might say “data scientist,” but the day-to-day work may still lean toward analytics, experimentation, pipeline ownership, or model operations.
 
 ## How a Senior Engineer Thinks
 
@@ -142,7 +146,9 @@ Big tech separates Analyst, Scientist, ML Engineer, and Analytics Engineer.
 
 ## Wrap-up and Next Steps
 
-Next post covers *Analyst vs Scientist vs Engineer*.
+The first useful mental shift is to stop treating “data” as a single job family with one skill checklist. Different roles use overlapping tools, but they create value in different ways, leave different deliverables behind, and are judged by different success metrics.
+
+The next post compares analyst, scientist, and engineer directly so you can see those differences in a more concrete side-by-side format.
 
 <!-- toc:begin -->
 - **What Is a Data Career (current)**
@@ -159,9 +165,9 @@ Next post covers *Analyst vs Scientist vs Engineer*.
 
 ## References
 
-- [Data roles overview](https://www.oreilly.com/library/view/data-science-from/9781492041122/)
-- [dbt analytics engineering](https://www.getdbt.com/what-is-analytics-engineering)
-- [Google Data Analytics Professional Certificate](https://grow.google/dataanalytics/)
-- [DJ Patil — Data Scientist](https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century)
+- [Google Career Certificates - Google Data Analytics Professional Certificate](https://grow.google/certificates/data-analytics/)
+- [dbt Labs - What Is Analytics Engineering?](https://www.getdbt.com/blog/what-is-analytics-engineering)
+- [IBM - What Is a Data Engineer?](https://www.ibm.com/think/topics/data-engineer)
+- [Harvard Business Review - Data Scientist: The Sexiest Job of the 21st Century](https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century)
 
 Tags: DataCareer, Analyst, Scientist, Engineer, Beginner

@@ -17,10 +17,14 @@ tags:
   - Communication
   - Beginner
 seo_description: 데이터 직군 입사 후 첫 90일 온보딩 전략과 유관 부서 이해관계자들과 효과적으로 소통하며 신뢰를 쌓는 방법을 알아봅니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 첫 직장 적응
+
+첫 데이터 직무에 합류하면 대부분은 기술보다 속도에서 압박을 느낍니다. 빨리 성과를 보여 줘야 할 것 같고, 아는 것이 부족하다는 사실이 더 크게 보이기 때문입니다. 그래서 데이터 지도도 없이 대시보드 수정이나 티켓 처리부터 반복하다가, 정작 중요한 맥락은 놓치는 경우가 많습니다.
+
+하지만 첫 90일의 핵심은 존재감을 과시하는 데 있지 않습니다. 어떤 데이터가 어디서 오고, 누가 무엇을 중요하게 보고, 작은 신뢰를 어디서 만들 수 있는지 읽는 데 있습니다. 초반에 이 지도를 그려 두면 이후 제안의 방향도 훨씬 안정적이 됩니다.
 
 이 글은 Data Science Career 101 시리즈의 여덟 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 첫 90일은 평판의 씨앗이 심어지는 시기입니다. 이 시기에 무엇을 듣고, 무엇을 남기고, 어디에서 작은 성과를 만들었는지가 이후의 속도를 크게 바꿉니다.
 
+특히 데이터 직무는 문맥 의존성이 높아서, 도메인과 데이터 출처를 모른 채 기술만 앞세우면 방향이 쉽게 어긋납니다. 반대로 이해관계자와 데이터 지도를 먼저 정리하면 작은 개선도 훨씬 더 적절한 문제를 겨냥하게 됩니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    M[Map] --> S[Stakeholders]
-    S --> W[Win]
-    W --> D[Doc]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/08/08-01-concept-at-a-glance.ko.png)
 
+*데이터 지도, 이해관계자, 빠른 성과, 문서화 순서로 신뢰를 쌓는 첫 90일 구조*
 온보딩의 우선순위는 이 순서로 이해하면 좋습니다. 지도를 그리고, 사람을 파악하고, 작은 승리를 만들고, 그 과정을 문서화해야 자산이 남습니다.
 
 ## 핵심 용어
@@ -179,9 +181,9 @@ flowchart LR
 
 ## 참고 자료
 
-- [The First 90 Days](https://hbr.org/books/watkins)
-- [The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
-- [DAMA Data Management](https://www.dama.org/)
-- [DACI decision framework](https://www.atlassian.com/team-playbook/plays/daci)
+- [Michael D. Watkins - The First 90 Days](https://www.michaelwatkins.com/books/the-first-90-days/)
+- [Camille Fournier - The Manager's Path](https://www.oreilly.com/library/view/the-managers-path/9781491973882/)
+- [DAMA International](https://www.dama.org/)
+- [Atlassian Team Playbook - DACI Decision-Making Framework](https://www.atlassian.com/team-playbook/plays/daci)
 
 Tags: DataCareer, Onboarding, Stakeholders, Communication, Beginner

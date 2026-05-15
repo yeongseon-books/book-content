@@ -54,18 +54,20 @@
 </head>
 <body>
 <h1>Analyst vs Scientist vs Engineer</h1>
-<blockquote>
-<p>Data Science Career 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the three roles really differ?</p>
-<blockquote>
-<p>Different goals, deliverables, tools, and metrics.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The most common early-career confusion in data work is not “Which language should I learn first?” but “What job am I actually preparing for?” Analyst, scientist, and engineer often appear in the same team, use overlapping tools, and are all expected to be comfortable with data, so the boundaries can look blurry from the outside.</p>
+<p>The overlap is real, but the center of gravity is different. Each role is hired to reduce a different kind of uncertainty: business interpretation, experimental confidence, or pipeline reliability. If you miss that distinction, your learning plan becomes broad in a way that looks ambitious but produces weak signal.</p>
 <p>This is post 2 in the Data Science Career 101 series.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What goal sits at the center of analyst, scientist, and engineer work?</li>
+<li>What deliverables most clearly reveal the difference between the three roles?</li>
+<li>Why do similar tools still lead to very different day-to-day jobs?</li>
+<li>How do success metrics and collaboration patterns change by role?</li>
+<li>What should you use as the fallback distinction when one person covers more than one title?</li>
+</ul>
+<blockquote>
+<p>The safest way to separate these roles is not by tool name but by purpose, deliverable, and the metric that proves the work mattered.</p>
+</blockquote>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>purpose</em> of each role</li>
@@ -75,13 +77,11 @@
 <li><em>Collaboration</em> style</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Misunderstanding roles misaligns learning and applications.</p>
+<p>Misunderstanding the role changes what you study, how you describe your work, and where your portfolio looks credible.</p>
+<p>Someone aiming for analytics may need much stronger metric interpretation and dashboard storytelling. Someone aiming for engineering may need to show data modeling, orchestration, and reliability habits. The tools overlap, but the evidence of fit is different.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[Analyst] --&gt; D[Decision]
-    S[Scientist] --&gt; H[Hypothesis]
-    E[Engineer] --&gt; P[Pipeline]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Analyst, scientist, and engineer roles anchored on decisions, hypotheses, and pipelines</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>decision support</strong>: Driving decisions with data.</li>
@@ -134,7 +134,8 @@ Engineer &lt;-&gt; backend/platform
 <li><strong>Ignoring the domain.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Large orgs encourage T-shaped collaboration across roles.</p>
+<p>Large organizations usually separate these roles more clearly because each one supports a different bottleneck in the decision-making stack.</p>
+<p>Smaller organizations blur them more aggressively, but that does not erase the distinction. It just means one person may spend the morning defining a metric, the afternoon fixing a broken ingestion job, and the next day explaining experiment results to a PM.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Make the purpose explicit.</li>
@@ -157,7 +158,8 @@ Engineer &lt;-&gt; backend/platform
 <li>One line: metric difference between analyst and scientist.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>Designing the Learning Path</em>.</p>
+<p>These roles are not competitors as much as complementary specialists in the same operating loop. Analysts help the business read reality, scientists help the team test explanations, and engineers make sure the data layer stays trustworthy enough for either job to work.</p>
+<p>The next post turns that role distinction into a concrete beginner learning path.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/data-science-career-101/en/01-what-is-data-career.md">What Is a Data Career</a></li>
 <li><strong>Analyst vs Scientist vs Engineer (current)</strong></li>
@@ -172,10 +174,10 @@ Engineer &lt;-&gt; backend/platform
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.quora.com/What-is-data-science">Type A vs Type B Data Scientist</a></li>
-<li><a href="https://www.getdbt.com/what-is-analytics-engineering">Analytics Engineer role</a></li>
-<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
-<li><a href="https://github.com/andkret/Cookbook">The Data Engineering Cookbook</a></li>
+<li><a href="https://www.getdbt.com/blog/what-is-analytics-engineering">dbt Labs - What Is Analytics Engineering?</a></li>
+<li><a href="https://dataintensive.net/">Martin Kleppmann - Designing Data-Intensive Applications</a></li>
+<li><a href="https://www.ibm.com/think/topics/data-scientist">IBM - What Is a Data Scientist?</a></li>
+<li><a href="https://www.ibm.com/think/topics/data-engineer">IBM - What Is a Data Engineer?</a></li>
 </ul>
 <p class="tags-line">Tags: DataCareer, Roles, Analyst, Scientist, Engineer</p>
 </body>

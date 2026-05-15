@@ -17,10 +17,14 @@ tags:
   - Engineer
   - Beginner
 seo_description: 데이터 직무의 범위와 대표 역할, 진입 관점을 입문자 눈높이로 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 데이터 직무란 무엇인가
+
+처음 데이터 커리어를 알아볼 때 가장 자주 생기는 혼란은 직함은 많은데, 실제로 누가 무슨 문제를 푸는지 잘 보이지 않는다는 점입니다. 채용 공고에는 analyst, scientist, engineer가 모두 등장하지만, 막상 입문자 입장에서는 무엇부터 구분해야 하는지 막막해지기 쉽습니다.
+
+특히 같은 회사 안에서도 데이터 직무 정의가 제각각이라 더 헷갈립니다. 어떤 팀은 분석가가 실험 설계까지 맡고, 어떤 팀은 엔지니어가 지표 테이블까지 책임집니다. 그래서 처음에는 직함보다 질문, 산출물, 협업 상대를 기준으로 지형을 읽는 편이 훨씬 안전합니다.
 
 이 글은 Data Science Career 101 시리즈의 첫 번째 글입니다.
 
@@ -46,15 +50,13 @@ last_reviewed: '2026-05-12'
 
 같은 데이터라도 역할이 달라지면 기대되는 질문, 산출물, 협업 방식이 모두 달라집니다. 이 차이를 초반에 구분하지 못하면 학습 계획도 흐려지고, 지원서와 포트폴리오도 애매해집니다.
 
+예를 들어 SQL을 더 파야 하는지, 모델링을 먼저 연습해야 하는지, 대시보드와 지표 설계를 강조해야 하는지는 지원하려는 역할에 따라 달라집니다. 입문 단계에서 이 기준을 세워 두면 학습 시간도 아끼고, 포트폴리오 방향도 더 또렷하게 잡을 수 있습니다.
+
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Q[Question] --> D[Data]
-    D --> A[Analysis]
-    A --> P[Product]
-```
+![한눈에 보는 개념](../../../assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)
 
+*질문에서 데이터와 분석을 거쳐 제품 변화로 이어지는 데이터 직무의 기본 흐름*
 데이터 직무를 가장 단순하게 보면 질문에서 출발해 데이터를 거쳐 분석과 제품 변화로 이어지는 흐름입니다. 차이는 이 흐름의 어느 구간을 책임지느냐에 있습니다.
 
 ## 핵심 용어
@@ -175,9 +177,9 @@ Builds reliable analytics models with dbt and friends.
 
 ## 참고 자료
 
-- [Data roles overview](https://www.oreilly.com/library/view/data-science-from/9781492041122/)
-- [dbt analytics engineering](https://www.getdbt.com/what-is-analytics-engineering)
-- [Google Data Analytics Professional Certificate](https://grow.google/dataanalytics/)
-- [DJ Patil — Data Scientist](https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century)
+- [Google Career Certificates - Google Data Analytics Professional Certificate](https://grow.google/certificates/data-analytics/)
+- [dbt Labs - What Is Analytics Engineering?](https://www.getdbt.com/blog/what-is-analytics-engineering)
+- [IBM - What Is a Data Engineer?](https://www.ibm.com/think/topics/data-engineer)
+- [Harvard Business Review - Data Scientist: The Sexiest Job of the 21st Century](https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century)
 
 Tags: DataCareer, Analyst, Scientist, Engineer, Beginner
