@@ -403,5 +403,3 @@ The next post covers **row factories and type adapters** — returning rows as d
 - [Python 3.12 sqlite3 autocommit](https://docs.python.org/3/library/sqlite3.html#sqlite3.Connection.autocommit)
 
 Tags: Python, DB-API, PEP 249, Database
-
-
