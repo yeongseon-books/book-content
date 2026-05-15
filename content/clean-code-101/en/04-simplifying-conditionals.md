@@ -4,7 +4,7 @@ episode: 4
 title: Simplifying Conditionals
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

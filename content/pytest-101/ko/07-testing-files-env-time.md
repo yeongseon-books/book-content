@@ -5,8 +5,8 @@ title: 파일, 환경변수, 시간 테스트하기
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

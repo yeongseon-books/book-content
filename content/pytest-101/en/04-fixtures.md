@@ -4,7 +4,7 @@ episode: 4
 title: Understanding Fixtures
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

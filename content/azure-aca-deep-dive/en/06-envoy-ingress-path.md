@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: The Envoy ingress path — how the first request reaches your container
 ---
 

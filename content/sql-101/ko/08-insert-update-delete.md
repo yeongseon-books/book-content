@@ -5,8 +5,8 @@ title: 데이터를 바꾸는 SQL — INSERT, UPDATE, DELETE
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

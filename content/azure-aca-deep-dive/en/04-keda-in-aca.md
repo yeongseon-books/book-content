@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: KEDA inside ACA — what a scale rule actually creates
 ---
 

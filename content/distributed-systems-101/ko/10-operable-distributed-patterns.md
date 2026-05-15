@@ -5,8 +5,8 @@ title: 운영 가능한 분산 시스템 패턴
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

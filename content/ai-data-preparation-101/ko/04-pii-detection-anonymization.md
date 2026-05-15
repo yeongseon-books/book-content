@@ -13,7 +13,7 @@ targets:
 
   tistory: true
 
-  medium: true
+  medium: false
 
   mkdocs: true
 

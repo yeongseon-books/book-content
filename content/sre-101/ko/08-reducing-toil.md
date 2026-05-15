@@ -13,8 +13,8 @@ tags:
 - Operations
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: Toil 줄이기

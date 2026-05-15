@@ -4,7 +4,7 @@ episode: 9
 title: Trees and Graph Traversal
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

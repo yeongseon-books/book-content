@@ -5,8 +5,8 @@ title: 소프트웨어 엔지니어링이란 무엇인가?
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

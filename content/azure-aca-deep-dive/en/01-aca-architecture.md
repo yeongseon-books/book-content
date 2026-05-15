@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: ACA architecture — what Microsoft layered on a hidden Kubernetes
 ---
 

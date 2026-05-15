@@ -4,7 +4,7 @@ episode: 10
 title: The Path to Senior in Data
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

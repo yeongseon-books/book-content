@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Merge and Conflict Resolution - Bringing Two Lines Back Together
 seo_description: A merge produces "a new commit that combines two commits." When the
   two commits sit on the same line of history, Git skips the new commit and just…

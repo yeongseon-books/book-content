@@ -5,8 +5,8 @@ title: 큐와 이벤트 기반 아키텍처
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

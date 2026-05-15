@@ -4,7 +4,7 @@ episode: 5
 title: SQL and Analytics Interviews
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

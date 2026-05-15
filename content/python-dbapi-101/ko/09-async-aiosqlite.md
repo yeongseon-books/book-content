@@ -13,8 +13,8 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: aiosqlite로 비동기 SQLite 다루기

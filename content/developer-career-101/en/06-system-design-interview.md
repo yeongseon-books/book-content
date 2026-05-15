@@ -4,7 +4,7 @@ episode: 6
 title: System Design Interviews
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

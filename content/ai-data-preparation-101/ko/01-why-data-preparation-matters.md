@@ -12,7 +12,7 @@ tags:
 - Pipelines
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 데이터 준비가 모델 품질을 결정하는 이유

@@ -5,8 +5,8 @@ title: 스타일링과 디자인 시스템
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

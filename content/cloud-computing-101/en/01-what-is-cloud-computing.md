@@ -4,7 +4,7 @@ episode: 1
 title: What is Cloud Computing?
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

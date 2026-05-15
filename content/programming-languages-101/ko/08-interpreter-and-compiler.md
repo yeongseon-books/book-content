@@ -14,8 +14,8 @@ tags:
 - Bytecode
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 인터프리터와 컴파일러

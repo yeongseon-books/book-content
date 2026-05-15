@@ -4,7 +4,7 @@ episode: 1
 title: Why Math for CS
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

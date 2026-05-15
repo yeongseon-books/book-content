@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Branch basics - create, switch, and compare
 seo_description: A branch is not a folder copy; it is a movable pointer to a specific
   commit.

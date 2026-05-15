@@ -15,7 +15,7 @@ tags:
 - scikit-learn
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 학습/평가/테스트 분할과 Contamination 통제

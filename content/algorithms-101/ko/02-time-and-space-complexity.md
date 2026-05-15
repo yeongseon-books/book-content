@@ -5,8 +5,8 @@ title: 시간 복잡도와 공간 복잡도
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

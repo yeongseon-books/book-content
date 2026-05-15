@@ -5,8 +5,8 @@ title: 좋은 소프트웨어의 기준
 status: content-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

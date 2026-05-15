@@ -15,7 +15,7 @@ tags:
 - fastText
 targets:
   ebook: true
-  medium: true
+  medium: false
   mkdocs: true
   tistory: true
 title: 데이터 품질 필터링 — Heuristic과 Classifier

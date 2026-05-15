@@ -4,7 +4,7 @@ episode: 3
 title: Designing the Learning Path
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

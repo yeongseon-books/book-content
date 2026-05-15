@@ -5,8 +5,8 @@ title: 시니어 데이터 직무로 가는 길
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

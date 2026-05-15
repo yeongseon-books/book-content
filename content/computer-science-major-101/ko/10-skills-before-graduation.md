@@ -5,8 +5,8 @@ title: 졸업 전 갖춰야 할 역량
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

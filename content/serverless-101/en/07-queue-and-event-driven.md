@@ -4,7 +4,7 @@ episode: 7
 title: Queue and Event-driven Architecture
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

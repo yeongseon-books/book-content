@@ -4,7 +4,7 @@ episode: 10
 title: Choosing the Right Data Structure
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

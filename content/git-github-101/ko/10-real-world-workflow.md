@@ -13,8 +13,8 @@ tags:
 - release-tag
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: '실전 Git workflow 만들기: issue부터 release까지 한 흐름으로'

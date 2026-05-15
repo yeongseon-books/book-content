@@ -4,7 +4,7 @@ episode: 5
 title: GROUP BY and Aggregates
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

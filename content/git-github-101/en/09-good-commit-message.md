@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: 'Writing Good Commit Messages: Conventional Commits and Useful Bodies'
 seo_description: A good commit message is a small document that lets you and your
   teammate, six months later, see in one read what changed and why.

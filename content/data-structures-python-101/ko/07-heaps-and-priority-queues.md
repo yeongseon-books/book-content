@@ -13,8 +13,8 @@ tags:
 - heapq
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 힙과 우선순위 큐

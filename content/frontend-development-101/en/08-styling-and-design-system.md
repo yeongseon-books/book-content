@@ -4,7 +4,7 @@ episode: 8
 title: Styling and Design Systems
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

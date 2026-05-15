@@ -4,7 +4,7 @@ episode: 5
 title: Removing Duplication
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -5,8 +5,8 @@ title: AI와 데이터사이언스까지의 연결
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

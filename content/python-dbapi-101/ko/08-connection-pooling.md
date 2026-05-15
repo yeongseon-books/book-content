@@ -13,8 +13,8 @@ tags:
 - PEP 249
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 'SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링'

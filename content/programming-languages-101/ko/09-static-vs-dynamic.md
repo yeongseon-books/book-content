@@ -14,8 +14,8 @@ tags:
 - Safety
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: 정적 언어와 동적 언어

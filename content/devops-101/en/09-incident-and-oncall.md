@@ -4,7 +4,7 @@ episode: 9
 title: Incident Response and On-Call
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

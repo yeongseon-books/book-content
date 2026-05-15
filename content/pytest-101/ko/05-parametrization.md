@@ -5,8 +5,8 @@ title: parametrization으로 테스트 케이스 늘리기
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

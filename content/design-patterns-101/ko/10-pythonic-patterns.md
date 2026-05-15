@@ -14,8 +14,8 @@ tags:
 - Decorators
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: Python에 어울리는 패턴

@@ -4,7 +4,7 @@ episode: 9
 title: Building Presentation Materials
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

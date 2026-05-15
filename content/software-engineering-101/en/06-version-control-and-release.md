@@ -4,7 +4,7 @@ episode: 6
 title: Version Control and Release
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -4,7 +4,7 @@ episode: 2
 title: Arrays and Dynamic Arrays
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

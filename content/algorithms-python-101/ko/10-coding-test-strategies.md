@@ -5,8 +5,8 @@ title: 코딩 테스트 문제 접근법
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

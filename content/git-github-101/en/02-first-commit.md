@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Your first commit - init, status, add, commit
 seo_description: A first commit is the act of "gathering changes from the working
   directory into the staging area, then moving them into the repository as a single…

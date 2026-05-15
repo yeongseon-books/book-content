@@ -4,7 +4,7 @@ episode: 8
 title: I/O and Devices
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

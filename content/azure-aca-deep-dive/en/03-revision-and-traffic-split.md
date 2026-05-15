@@ -15,7 +15,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Revisions and traffic splitting — where Envoy weights come from
 ---
 

@@ -13,8 +13,8 @@ tags:
 - code-blame
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: '좋은 commit message 쓰기: Conventional Commits와 좋은 본문'

@@ -4,7 +4,7 @@ episode: 9
 title: Replication and Backup
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

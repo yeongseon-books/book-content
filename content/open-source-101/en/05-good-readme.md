@@ -4,7 +4,7 @@ episode: 5
 title: A Good README
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

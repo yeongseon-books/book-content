@@ -5,7 +5,7 @@ episode: 6
 language: en
 status: publish-ready
 targets:
-  tistory: true
+  tistory: false
   hashnode: true
   medium: true
   mkdocs: true

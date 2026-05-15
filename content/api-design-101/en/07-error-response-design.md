@@ -4,7 +4,7 @@ episode: 7
 title: Designing Error Responses
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

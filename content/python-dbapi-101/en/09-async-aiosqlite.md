@@ -16,7 +16,7 @@ targets:
   hashnode: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Asynchronous SQLite with aiosqlite
 seo_description: aiosqlite does not make SQLite asynchronous. It spawns a background
   thread per connection, queues the awaited method calls onto that thread, and…

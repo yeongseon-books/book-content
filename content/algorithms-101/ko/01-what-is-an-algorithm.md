@@ -5,8 +5,8 @@ title: 알고리즘이란 무엇인가?
 status: publish-ready
 targets:
   tistory: true
-  medium: true
-  hashnode: true
+  medium: false
+  hashnode: false
   mkdocs: true
   ebook: true
 language: ko

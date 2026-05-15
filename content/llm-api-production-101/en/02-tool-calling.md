@@ -13,7 +13,7 @@ targets:
   ebook: true
   medium: true
   mkdocs: true
-  tistory: true
+  tistory: false
 title: Tool calling — connecting functions to the model
 seo_description: Implement a secure tool-calling loop that connects LLMs to application functions while maintaining control over execution and permissions.
 ---

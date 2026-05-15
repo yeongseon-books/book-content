@@ -4,7 +4,7 @@ episode: 7
 title: The Case Interview
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

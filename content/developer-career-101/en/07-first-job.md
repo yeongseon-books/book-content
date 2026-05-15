@@ -4,7 +4,7 @@ episode: 7
 title: Settling into the First Job
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -13,8 +13,8 @@ tags:
 - closes-keyword
 targets:
   ebook: true
-  hashnode: true
-  medium: true
+  hashnode: false
+  medium: false
   mkdocs: true
   tistory: true
 title: Issue와 Project로 일감 관리하기 - GitHub에서 할 일을 추적하는 법

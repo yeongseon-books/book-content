@@ -4,7 +4,7 @@ episode: 6
 title: Pagination and Filtering
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

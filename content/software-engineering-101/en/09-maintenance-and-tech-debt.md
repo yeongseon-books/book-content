@@ -4,7 +4,7 @@ episode: 9
 title: Maintenance and Tech Debt
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true

@@ -4,7 +4,7 @@ episode: 6
 title: Closures and Partial Application
 status: content-ready
 targets:
-  tistory: true
+  tistory: false
   medium: true
   hashnode: true
   mkdocs: true
