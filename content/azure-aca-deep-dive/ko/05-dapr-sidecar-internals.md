@@ -14,8 +14,8 @@ tags:
 - KEDA
 - Dapr
 - Envoy
-last_reviewed: '2026-05-12'
-seo_description: '이 글의 외부 인용은 다음 upstream 기준으로 고정했습니다: - Dapr: v1.13.x…'
+last_reviewed: '2026-05-15'
+seo_description: ACA에서 Dapr를 켤 때 붙는 daprd 사이드카의 부팅 경로, localhost 포트, component scope를 설명합니다.
 ---
 
 # Dapr 사이드카 내부 — 컨테이너 옆에 뜨는 Go 프로세스
@@ -108,7 +108,7 @@ Pinned upstream 코드에서 `cmd/daprd/main.go`는 작고, 실제 부팅은 `ap
 
 *Bootstrap path from main.go to runtime*
 
-여기서 모든 bootstrap detail을 외울 필요는 없습니다. 중요한 것은 Dapr enablement가 complete runtime program을 띄운다는 사실입니다. 정상적인 프로세스 lifecycle과 구성 파이프라인이 있다는 뜻입니다.
+여기서 모든 부팅 세부를 외울 필요는 없습니다. 중요한 것은 Dapr를 켜는 순간 완전한 런타임 프로그램이 함께 뜬다는 사실입니다. 독립적인 프로세스 수명주기와 구성 파이프라인이 있다는 뜻입니다.
 
 ### sidecar 포트는 구체적이고 운영적으로 중요합니다
 
