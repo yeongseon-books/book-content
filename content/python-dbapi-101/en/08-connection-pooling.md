@@ -363,5 +363,3 @@ The next post leaves the synchronous world and moves to `aiosqlite`. We will loo
 - [FastAPI — Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
 
 Tags: Python, DB-API, PEP 249, Database
-
-
