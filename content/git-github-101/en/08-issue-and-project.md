@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -219,6 +219,43 @@ Open the repository's `Projects` tab and click `New project`. Pick the `Board` t
 
 Start with manual moves first. Even hand-dragging cards is a clear improvement over having no board.
 
+## Define status transitions before the board fills up
+
+The fastest way for a Project board to turn into decoration is to create columns without defining what moves a card from one column to the next. If `In Progress` means “branch created” to one person and “PR open, waiting for review” to another, the board stops being operationally trustworthy.
+
+Use an explicit transition rule like this instead.
+
+![Define status transitions before the board fills up](../../../assets/git-github-101/08/08-01-define-status-transitions-before-the-boa.en.png)
+
+*A work-tracking flow that makes the Issue → PR → Project state transitions explicit*
+
+Once the team shares this rule, the board becomes a real progress view instead of a second to-do list that drifts away from reality.
+
+## When auto-closing does not work
+
+The most common failure mode in this chapter is simple: the PR merges, but the issue stays open. When that happens, check in this order.
+
+1. **Did the PR merge into the default branch?** Closing keywords fire when the change reaches the default branch.
+2. **Was the keyword in the PR body?** That is the safest place. Commit-message-only closing can become harder to reason about after squash or rebase.
+3. **Is the issue reference exact?** Use `#42` in the same repository or `owner/repo#42` across repositories.
+4. **Did you repeat the keyword for multiple issues?** `Closes #2, closes #3` closes both. `Closes #2, #3` does not.
+5. **Was the issue already closed?** GitHub will not “close it again.”
+
+That sequence is usually enough to resolve the confusion without guessing.
+
+## Verification loop before merge
+
+Because issues and Projects track flow rather than code, the verification pass is about linkage and state.
+
+- The issue body states a concrete **background** and **goal**.
+- The issue has at least one label and one assignee.
+- The branch name and the PR body point to the same issue number.
+- The PR body contains `Closes #N` plus a short verification note.
+- The Project card is in `In Review`, not still sitting in `Todo`.
+- After merge, the issue flips to `Closed` and the card lands in `Done`.
+
+This is not glamorous, but it prevents the two most common project-tracking failures: work that looks active but has no owner, and work that looks done but cannot be traced back to a decision.
+
 ## Common mistakes
 
 - Forgetting to close the issue when the work is done. Train the habit of writing `Closes #N` in the PR body so closing happens for you.
@@ -236,6 +273,8 @@ Teams use issues and projects in patterns like these:
 - **`good first issue` for new contributors.** Open source projects label easy starter issues so newcomers can find a safe place to start.
 - **Project automations.** Configure rules so a card moves to `In Progress` when its PR opens and to `Done` when the issue closes.
 - **Decision records as issues.** Even when no code changes, an issue like "We will use library X" gives the team a single place to revisit the discussion later.
+
+Projects also work better when they stay narrow. A four-column board such as `Todo / In Progress / In Review / Done` is usually enough for a small team. If cards keep drifting out of sync with reality, tighten the transition rule before adding more columns.
 
 ## Checklist
 
@@ -284,5 +323,7 @@ The next article looks at something even shorter than a PR body: the commit mess
 - GitHub Docs, "About Projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects>
 - GitHub Docs, "Managing labels": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels>
 - GitHub Docs, "About milestones": <https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones>
+- GitHub Docs, "Using keywords in issues and pull requests": <https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/using-keywords-in-issues-and-pull-requests>
+- GitHub Docs, "About automation for projects": <https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/about-automation-for-projects>
 
 Tags: github-issue, github-project, issue-tracking, kanban-board, issue-pr-linking, closes-keyword

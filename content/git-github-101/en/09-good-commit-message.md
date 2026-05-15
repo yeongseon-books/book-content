@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -200,6 +200,50 @@ $ chmod +x .git/hooks/commit-msg
 
 Now `git commit -m "fix"` is rejected before the commit is recorded. For richer rules, move the same check into a tool such as `commitlint`.
 
+## A verification pass before you push
+
+Knowing the rules is not the same as verifying the message you just wrote. The cheapest habit is to read the latest commit one more time before pushing it.
+
+```bash
+$ git log -1 --pretty=fuller
+$ git show --stat --summary --format=fuller HEAD
+```
+
+Those two commands answer four practical questions.
+
+1. **Does the subject alone explain the intent?**
+2. **If there is a body, does it explain the why rather than restating the diff?**
+3. **Is issue metadata separated into the footer instead of polluting the subject line?**
+4. **Does the scope of the message still match the actual diff?**
+
+This matters because message drift is common. A commit may begin life as a README typo fix, then pick up a second docs change before you commit it. Reading the message and the stat together is how you catch that mismatch.
+
+## When to choose amend, rebase, or leave history alone
+
+Before editing a message, ask one question first: **has anyone else already based work on this commit?**
+
+- **Not pushed yet**: `git commit --amend` and `git rebase -i` are both fair game.
+- **Pushed to your own feature branch**: rewriting can still be fine, but only with `--force-with-lease` and only if no one else depends on it.
+- **Already shared on a common branch**: do not rewrite just to make the message prettier. Prefer a follow-up commit and keep the shared history stable.
+
+That boundary is more important than the message style itself. A perfect subject line is not worth destabilizing a branch other people are already using.
+
+## How to read a hook failure
+
+Once you enforce a format, the next beginner pain point is "why did my commit get rejected?" Read the hook message literally.
+
+```text
+Subject does not match the Conventional Commits format.
+```
+
+In practice, that usually means one of three things.
+
+- The type is outside the allowed list (`feat`, `fix`, `docs`, ...).
+- The `type(scope): subject` punctuation is malformed.
+- The first line is too long or ends with a period.
+
+The point of the hook is not to punish the author. It is to protect the quality of `git log` and any release automation built on top of it. When the hook stops a commit, the default action should be to fix the message, not work around the guardrail.
+
 ## Common mistakes
 
 - Mixing two unrelated changes into one commit. Review and revert both become harder. Use `git add -p` to split the work into hunk-sized commits.
@@ -221,6 +265,8 @@ Teams usually write the message rules into the repository itself. A short list o
 The rules are enforced in two places: a local `commit-msg` hook and a CI step running `commitlint`. A message that fails CI blocks the PR from merging. Two automated nets are safer than relying on memory alone.
 
 PR titles often follow the same format. With squash merges, the PR title becomes the commit message on the default branch, so a well-written PR title turns into a well-written log entry for free.
+
+The same discipline also improves release notes. If the repository consistently distinguishes `feat`, `fix`, and `docs`, a changelog generator can draft a surprisingly useful release summary with almost no extra author effort.
 
 ## Checklist
 
@@ -268,5 +314,7 @@ The next post stitches the tools from this series into one realistic workflow. W
 - Git docs, `git commit --amend`: <https://git-scm.com/docs/git-commit>
 - Git docs, `git rebase -i`: <https://git-scm.com/docs/git-rebase>
 - Git docs, "githooks - commit-msg": <https://git-scm.com/docs/githooks#_commit_msg>
+- Git docs, `git show`: <https://git-scm.com/docs/git-show>
+- GitHub Docs, "About merge methods on GitHub": <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github>
 
 Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame

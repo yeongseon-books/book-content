@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building a real-world Git workflow: from issue to release in one cycle</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Building a real-world Git workflow: from issue to release in one cycle</h1>
+<p>Knowing isolated Git commands is not the same as knowing how a team actually ships work. The last step is to connect those commands into one repeatable loop that starts with an issue and ends with a merge, a tag, and a clean main branch.</p>
+<p>This is the final post in the Git &amp; GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>How the commands from Episodes 1–9 fit together as one realistic workflow.</li>
+<li>How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close.</li>
+<li>Which recovery commands to reach for when something goes wrong mid-flow.</li>
+<li>Which automated guardrails (branch protection, PR template, CI) keep the same flow stable across a team.</li>
+</ul>
+<h2>Why it matters</h2>
+<p>Episodes 1 through 9 introduced commands one by one. Knowing a command and knowing a workflow are different. The same <code>git commit</code> carries a different meaning depending on which branch it lands on, which PR it belongs to, and which release it is heading toward. A workflow is a contract between teammates. Once everyone follows the same loop, a new hire can tell within a week where a change starts and where it ends.</p>
+<p>GitHub Flow is the simplest version of that contract. Keep <code>main</code> deployable at all times. Do new work on a short feature branch, open a PR, get review, and squash merge. Tag a release when you need one. That single sentence is the whole post. Everything else is repetition — running the loop end to end so it sticks.</p>
+<p>When the loop becomes muscle memory, accidents drop. Force-pushing over a teammate's commit, committing on the wrong branch, leaking a secret you cannot scrub from history — each comes from skipping a step in the flow. The last section maps those moments to the command that pulls you back.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A realistic workflow is one repeating cycle: an issue defines the work, a branch carries the change, a Pull Request invites review, a merge brings it into the shared state, a tag marks the point, and the issue is closed.<br>
+A GitHub Flow cycle looks like this.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+The issue is the entrance, the tag and issue close are the exit. Every step in the middle is a command from earlier episodes. The job here is to make the diagram run as a single sentence in your head.</p>
+<h2>Core concepts</h2>
+<p><strong>GitHub Flow</strong><br>
+- Description: <code>main</code> is always deployable, every change rides on a short feature branch, and PRs are the merge path. The simplicity fits small teams well.</p>
+<p><strong>Squash merge</strong><br>
+- Description: Collapses the feature branch's commits into a single commit on <code>main</code>. The PR title becomes the commit message.</p>
+<p><strong>Semantic versioning</strong><br>
+- Description: <code>MAJOR.MINOR.PATCH</code>. Break compatibility, bump MAJOR. Add a feature, bump MINOR. Fix a bug, bump PATCH.</p>
+<p><strong>Release tag</strong><br>
+- Description: A name attached to a specific commit. Create with <code>git tag -a v0.3.0</code> and share with <code>git push --tags</code>.</p>
+<p><strong><code>--force-with-lease</code></strong><br>
+- Description: A force push that refuses to overwrite remote work added since you last fetched. The safe form of force push.</p>
+<p><strong>Branch protection</strong><br>
+- Description: A GitHub setting that blocks direct pushes to <code>main</code> and requires PR + review + CI to merge.</p>
+<h2>Step-by-step walkthrough</h2>
+<p>Run the loop end to end on the <code>vacation-notes</code> repository from Episode 9. The change for this round is "add a rate limit to the login endpoint".</p>
+<p><strong>1. Open an issue to define the work</strong></p>
+<p>Work begins at an issue. Two readers should be able to read the same short sentence and agree on what is being done and why.</p>
+<pre><code class="language-bash">$ gh issue create \
+    --title &quot;Add rate limit to login endpoint&quot; \
+    --body &quot;Block password-guessing attempts by capping logins from a single IP at 5 per minute.&quot;
+
+Creating issue in yeongseon/vacation-notes
+
+https://github.com/yeongseon/vacation-notes/issues/42
+</code></pre>
+<p>Assume the new issue is <code>#42</code>. The body focuses on the "why". The "how" goes into the PR.</p>
+<p><strong>2. Work on a feature branch</strong></p>
+<p>Bring <code>main</code> up to date, then branch off it.</p>
+<pre><code class="language-bash">$ git switch main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+$ git pull
+Already up to date.
+$ git switch -c feat/login-rate-limit
+Switched to a new branch 'feat/login-rate-limit'
+</code></pre>
+<p>The branch name follows <code>&lt;type&gt;/&lt;short-slug&gt;</code>. The type aligns with the Conventional Commits classification. One person, one issue, one branch — that pairing is the heart of the flow.</p>
+<p><strong>3. Stack two small commits</strong></p>
+<p>Following Episode 9, keep one logical change per commit.</p>
+<pre><code class="language-bash">$ git add app/auth/rate_limit.py
+$ git commit -m &quot;feat(auth): add per-IP rate limiter&quot;
+[feat/login-rate-limit a1b2c3d] feat(auth): add per-IP rate limiter
+ 1 file changed, 28 insertions(+)
+$ git add tests/auth/test_rate_limit.py
+$ git commit -m &quot;test(auth): cover rate-limit boundary cases&quot;
+[feat/login-rate-limit b2c3d4e] test(auth): cover rate-limit boundary cases
+ 1 file changed, 34 insertions(+)
+</code></pre>
+<p>Splitting production code from tests lets a reviewer read "how the feature works" and "which boundaries are tested" as two separate stories.</p>
+<p><strong>4. Push to origin</strong></p>
+<p>The first push uses <code>-u</code> to set the upstream. Later pushes are just <code>git push</code>.</p>
+<pre><code class="language-bash">$ git push -u origin feat/login-rate-limit
+Enumerating objects: 12, done.
+Counting objects: 100% (12/12), done.
+Writing objects: 100% (8/8), 1.42 KiB | 1.42 MiB/s, done.
+Total 8 (delta 4), reused 0 (delta 0)
+remote:
+remote: Create a pull request for 'feat/login-rate-limit' on GitHub by visiting:
+remote:      https://github.com/yeongseon/vacation-notes/pull/new/feat/login-rate-limit
+remote:
+To github.com:yeongseon/vacation-notes.git
+ * [new branch]      feat/login-rate-limit -&gt; feat/login-rate-limit
+Branch 'feat/login-rate-limit' set up to track 'origin/feat/login-rate-limit'.
+</code></pre>
+<p>The remote prints a PR-creation link. That link is the entry to the next step.</p>
+<p><strong>5. Open the PR and link the issue</strong></p>
+<p>Use <code>gh pr create</code> and include <code>Closes #42</code> in the body. That keyword closes the issue when the PR is merged into the default branch, <code>main</code>.</p>
+<pre><code class="language-bash">$ gh pr create \
+    --base main \
+    --title &quot;feat(auth): add login rate limit&quot; \
+    --body &quot;Closes #42
+
+Returns 429 once the per-minute cap is hit. The limiter starts as an
+in-memory dict and moves to a Redis backend in the next PR.&quot;
+
+Creating pull request for feat/login-rate-limit into main in yeongseon/vacation-notes
+
+https://github.com/yeongseon/vacation-notes/pull/17
+</code></pre>
+<p>The PR title is itself a Conventional Commits line. After squash merging, that title becomes the commit message on <code>main</code>.</p>
+<p><strong>6. Apply review feedback with <code>--amend</code> and <code>--force-with-lease</code></strong></p>
+<p>Suppose a reviewer flags a test variable name. Even after the branch is pushed and the PR is open, a tiny fix that belongs only to the latest commit is a good case for <code>--amend</code>, followed by <code>--force-with-lease</code>.</p>
+<pre><code class="language-bash">$ # rename the test variable, then
+$ git add tests/auth/test_rate_limit.py
+$ git commit --amend --no-edit
+[feat/login-rate-limit c3d4e5f] test(auth): cover rate-limit boundary cases
+ Date: Tue May 5 14:08:11 2026 +0900
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+$ git push --force-with-lease
+To github.com:yeongseon/vacation-notes.git
+ + b2c3d4e...c3d4e5f feat/login-rate-limit -&gt; feat/login-rate-limit (forced update)
+</code></pre>
+<p><code>--force-with-lease</code> remembers the remote state from your last fetch. If a teammate has pushed to the same branch in the meantime, the push is refused. That is what makes it safer than plain <code>--force</code>. Use it on personal feature branches only.</p>
+<p><strong>7. Squash merge into main</strong></p>
+<p>Once review is finished, click "Squash and merge" on GitHub or run <code>gh</code>.</p>
+<pre><code class="language-bash">$ gh pr merge 17 --squash --delete-branch
+✓ Squashed and merged pull request #17 (feat(auth): add login rate limit)
+✓ Deleted branch feat/login-rate-limit and switched to branch main
+$ git pull
+Updating 9c8b7a6..d5e6f7a
+Fast-forward
+ app/auth/rate_limit.py        | 28 ++++++++++++++++
+ tests/auth/test_rate_limit.py | 34 +++++++++++++++++++
+ 2 files changed, 62 insertions(+)
+</code></pre>
+<p><code>--delete-branch</code> removes the feature branch on origin. Locally you land back on <code>main</code> automatically.</p>
+<p><strong>8. Tag a release</strong></p>
+<p>To pin this change to a release, add a tag. The previous release was <code>v0.2.0</code>, so the new feature bumps the MINOR digit to <code>v0.3.0</code>.</p>
+<pre><code class="language-bash">$ git tag -a v0.3.0 -m &quot;Add per-IP login rate limit (#17)&quot;
+$ git push --tags
+Enumerating objects: 1, done.
+To github.com:yeongseon/vacation-notes.git
+ * [new tag]         v0.3.0 -&gt; v0.3.0
+</code></pre>
+<p><code>-a</code> creates an annotated tag — tagger info and a message live alongside the hash. Release-note tooling pulls that message verbatim. A lightweight tag (<code>git tag v0.3.0</code>) only points at a hash, so <code>-a</code> is the default for release work.</p>
+<p><strong>9. Confirm the issue auto-closed</strong></p>
+<p>Because the PR body included <code>Closes #42</code>, merging this PR into the default branch, <code>main</code>, closed <code>#42</code> automatically. Verify once.</p>
+<pre><code class="language-bash">$ gh issue view 42
+Add rate limit to login endpoint
+Closed • yeongseon opened about 1 hour ago
+
+  Block password-guessing attempts by capping logins from a single IP at 5 per minute.
+
+  ...
+
+  Closed by pull request #17 (Squashed and merged)
+</code></pre>
+<p>That is one full cycle. The next change starts at a new issue.</p>
+<h2>The decision flow before you press merge</h2>
+<p>In practice, the risky part is rarely opening the PR. The risky part is deciding whether the branch is truly ready to merge. A simple decision flow makes that judgment repeatable.</p>
+<p><img alt="The decision flow before you press merge" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-the-decision-flow-before-you-press-merge.en.png"></p>
+<p><em>A GitHub Flow decision map from issue scope to merge method and release tagging</em></p>
+<p>This turns the merge button from a habit into the last step of a checklist.</p>
+<h2>Verification loop just before merge</h2>
+<p>The most useful workflow guardrail is a fixed pre-merge review pass.</p>
+<ol>
+<li>Run <code>git status</code> and confirm the working tree is clean.</li>
+<li>Run <code>git log --oneline origin/main..HEAD</code> and read the exact commits entering the PR.</li>
+<li>Run <code>git diff --stat origin/main...HEAD</code> and confirm the scope is still what the issue promised.</li>
+<li>Re-read the PR body: <code>Closes #N</code>, verification steps, and release-tag intent should all be present.</li>
+<li>Confirm CI and required reviews are green.</li>
+<li>After the merge, pull <code>main</code>, create an annotated tag if needed, and delete the branch.</li>
+</ol>
+<p>That sequence catches the most common workflow failures: oversized PRs, missing issue linkage, and merge-ready branches that were never actually verified.</p>
+<h2>Choosing squash, merge commit, or rebase merge</h2>
+<p>Beginners should usually follow one team default, but it still helps to understand the trade-off.</p>
+<p><strong>Squash merge</strong><br>
+- Best fit: Keep <code>main</code> readable as one line per PR<br>
+- Main trade-off: Branch-level commit detail disappears from <code>main</code></p>
+<p><strong>Merge commit</strong><br>
+- Best fit: Preserve the branch structure and the exact landing point<br>
+- Main trade-off: The graph grows more complex faster</p>
+<p><strong>Rebase merge</strong><br>
+- Best fit: Keep each commit while avoiding a merge bubble<br>
+- Main trade-off: Rewritten commit hashes can make tracing discussion harder</p>
+<p>For small teams and tutorial repositories, squash merge is usually the clearest default. If the branch structure itself matters, or if individual commits inside the PR are worth preserving on <code>main</code>, a merge commit can be the better fit.</p>
+<h2>Recovery flows</h2>
+<p>Here are the mid-flow accidents teams run into most often, paired with the first command to type when they happen.</p>
+<p><strong>Committed on the wrong branch (not yet pushed)</strong><br>
+- Recovery command: <code>git log -1 --format=%H</code> → <code>git switch &lt;correct-branch&gt;</code> → <code>git cherry-pick &lt;hash&gt;</code> → on the original branch run <code>git reset --hard HEAD~1</code><br>
+- Note: <code>reset</code> is safe only before the push.</p>
+<p><strong>Want to rewrite only the previous message (not yet pushed)</strong><br>
+- Recovery command: <code>git commit --amend -m "..."</code><br>
+- Note: The hash changes. Avoid amending after a push.</p>
+<p><strong>Need to undo a commit you already pushed</strong><br>
+- Recovery command: <code>git revert &lt;hash&gt;</code> → <code>git push</code><br>
+- Note: Creates a new commit that reverses the change, so history stays linear.</p>
+<p><strong>Need to undo a squash-merged PR</strong><br>
+- Recovery command: <code>git revert &lt;squash-commit-hash&gt;</code> → <code>git push</code><br>
+- Note: In this article's default flow, the PR lands as one squashed commit on <code>main</code>, so you usually revert that commit directly.</p>
+<p><strong>Lost local work by accident</strong><br>
+- Recovery command: <code>git reflog</code> → find the previous HEAD hash → <code>git switch -c rescue &lt;hash&gt;</code><br>
+- Note: Reflog entries linger for roughly 90 days.</p>
+<p><strong>Pushed a secret to GitHub</strong><br>
+- Recovery command: Rotate the secret first → use <code>git filter-repo</code> (external tool) to scrub history → ask all collaborators to re-clone<br>
+- Note: Secret rotation comes before any history rewrite.</p>
+<p><strong>Force-pushed over a teammate's commit</strong><br>
+- Recovery command: Pull the lost hash from your reflog or theirs → branch off that hash → push back with <code>--force-with-lease</code><br>
+- Note: The whole reason to default to <code>--force-with-lease</code> from day one.</p>
+<p>This table is not meant to be memorized. The goal is to remember it exists and reopen it when something breaks.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>Committing directly on <code>main</code>. Lock it down with branch protection so the flow cannot collapse silently.</li>
+<li>Opening PRs that are too big. Reviewers stop reading carefully past around 500 changed lines. Split the issue, then split the PR.</li>
+<li>Reaching for plain <code>--force</code>. Use <code>--force-with-lease</code> every time. Aliasing it as <code>git fpush</code> removes the temptation.</li>
+<li>Forgetting the tag right after a merge. Finding the release commit weeks later turns into archaeology. Add a "needs release tag?" checkbox to the PR template.</li>
+<li>Opening a PR without an issue. Capturing intent only inside the PR body means the next PR on the same topic has to repeat the context.</li>
+</ul>
+<h2>In practice</h2>
+<p>To keep the same flow stable across a team, lean on four automated guardrails rather than memory.</p>
+<ol>
+<li><strong>Branch protection.</strong> Under Settings → Branches on GitHub, require all of these for <code>main</code>: PRs only (no direct push), at least one approving review, passing CI, and no force pushes.</li>
+<li><strong>PR template.</strong> A <code>.github/pull_request_template.md</code> with sections for "Summary / Linked issue / How to test / Needs release tag" prefills every new PR with the same shape.</li>
+<li><strong>CODEOWNERS.</strong> A <code>.github/CODEOWNERS</code> file maps directories to reviewers. PRs that touch those paths get the owners auto-requested.</li>
+<li><strong>Required CI.</strong> Run lint, type check, tests, and build on every PR. Block the merge button until they pass.</li>
+</ol>
+<p>Add the <code>commit-msg</code> hook and <code>commitlint</code> from Episode 9 on top, and the format holds at every step of the flow.</p>
+<p>Defaulting to squash merge keeps the history readable too. Small commits inside a feature branch collapse into one commit per PR, so <code>git log --oneline</code> on <code>main</code> reads as one line per PR.</p>
+<p>The recovery table belongs in team documentation too. If a branch gets force-pushed incorrectly or a secret leaks into history, the team should not be inventing the response live during the incident. A small runbook linked from the repository makes the workflow much calmer under pressure.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Did an issue come first, with its number landing in the PR body as <code>Closes #N</code>?</li>
+<li>[ ] Does the feature branch name follow <code>&lt;type&gt;/&lt;slug&gt;</code>?</li>
+<li>[ ] Are commits atomic, with each message in Conventional Commits form?</li>
+<li>[ ] Is the PR title in Conventional Commits form, with the body explaining the "why"?</li>
+<li>[ ] When force pushing was needed, was it <code>--force-with-lease</code>?</li>
+<li>[ ] Is squash merge the team default, with the feature branch deleted after merge?</li>
+<li>[ ] At release time, did you create an annotated tag (<code>-a</code>) and push it with <code>--tags</code>?</li>
+</ul>
+<h2>Practice questions</h2>
+<ol>
+<li>On a personal repository, create a <code>feat/&lt;slug&gt;</code> branch, split the change into two commits, and open a PR. Add <code>Closes #N</code> to the body and confirm the issue closes after the squash merge.</li>
+<li>Register a git config alias that prefers the safer push: <code>git config --global alias.fpush "push --force-with-lease"</code>. Use <code>git fpush</code> from now on.</li>
+<li>Squash-merge a small PR, then tag the release with <code>git tag -a v0.0.1 -m "first tagged release"</code> and push it via <code>git push --tags</code>. Verify it appears in the GitHub Releases tab.</li>
+<li>Add a <code>.github/pull_request_template.md</code> to your repository with four sections: "Summary / Linked issue / How to test / Needs release tag".</li>
+<li>Pretend a commit was pushed to <code>main</code> by mistake and walk through <code>git revert &lt;hash&gt;</code>. Confirm a new revert commit appears in <code>git log --oneline</code>.</li>
+</ol>
+<h2>Wrap-up</h2>
+<p>Every command from Episodes 1 through 9 was a step inside this single cycle. Define the work in an issue, stack atomic commits on a short feature branch, get review through a PR, squash-merge into <code>main</code>, and tag a release when one is needed. When something breaks, reopen the recovery table. At team scale, lean on branch protection, the PR template, CODEOWNERS, and required CI to make the flow self-enforcing.</p>
+<p>This post closes the Git &amp; GitHub 101 series. The natural next step is automation. Wiring GitHub Actions into the same repository so that every PR runs lint and tests, and pushing a tag triggers an auto-generated release note, is the topic of the next series. Until then, the most useful thing you can do is run this loop once on a project of your own. A command becomes your tool only when your fingers can type it without thinking.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Tracking Work with Issues and Projects</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/09-good-commit-message.md">Writing Good Commit Messages</a></li>
+<li><strong>Building a Real-World Git Workflow (current)</strong></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>GitHub Docs, "GitHub flow": <a href="https://docs.github.com/en/get-started/using-github/github-flow">https://docs.github.com/en/get-started/using-github/github-flow</a></li>
+<li>Semantic Versioning 2.0.0: <a href="https://semver.org/spec/v2.0.0.html">https://semver.org/spec/v2.0.0.html</a></li>
+<li>Git docs, <code>git tag</code>: <a href="https://git-scm.com/docs/git-tag">https://git-scm.com/docs/git-tag</a></li>
+<li>Git docs, <code>git push --force-with-lease</code>: <a href="https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease">https://git-scm.com/docs/git-push#Documentation/git-push.txt---force-with-lease</a></li>
+<li>Git docs, <code>git revert -m</code>: <a href="https://git-scm.com/docs/git-revert">https://git-scm.com/docs/git-revert</a></li>
+<li>GitHub Docs, "About protected branches": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches</a></li>
+<li>GitHub Docs, "About code owners": <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners">https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-security/customizing-your-repository/about-code-owners</a></li>
+<li>GitHub Docs, "About merge methods on GitHub": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github</a></li>
+<li>GitHub Docs, "About required status checks": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-status-checks-before-merging</a></li>
+</ul>
+<p class="tags-line">Tags: github-flow, git-workflow, conventional-commits, semantic-versioning, code-review, release-tag</p>
+</body>
+</html>

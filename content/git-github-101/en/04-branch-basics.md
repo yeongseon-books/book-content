@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: en
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -346,8 +346,10 @@ The next article picks up from a diverged history and walks through `git merge`,
 
 ## References
 
-- Git official documentation: <https://git-scm.com/doc>
-- Pro Git Book - "Branches in a Nutshell": <https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell>
-- `git help branch`, `git help switch`, `git help checkout`
+- [Git Reference Manual](https://git-scm.com/doc)
+- [Pro Git Book - Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
+- [git-branch manual](https://git-scm.com/docs/git-branch)
+- [git-switch manual](https://git-scm.com/docs/git-switch)
+- [git-checkout manual](https://git-scm.com/docs/git-checkout)
 
 Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch

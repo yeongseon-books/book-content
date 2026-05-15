@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reading change history - status, diff, log</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Reading change history - status, diff, log</h1>
+<p>Most Git mistakes get cheaper the moment you learn to read before you act. <code>status</code>, <code>diff</code>, and <code>log</code> are the three commands that let you inspect the current state, the exact content of a change, and the history behind it.</p>
+<p>This is the third post in the Git &amp; GitHub 101 series. Here, we focus on reading change history accurately before branches and collaboration enter the picture.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>How to read each line of <code>git status</code> output with confidence</li>
+<li>How to scan the same state quickly with <code>git status -s</code></li>
+<li>Which area <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> each compare</li>
+<li>How to compare two specific commits with <code>git diff &lt;a&gt; &lt;b&gt;</code></li>
+<li>The most useful shapes of <code>git log</code> output: <code>--oneline</code>, <code>--graph</code>, <code>--stat</code>, <code>--patch</code></li>
+</ul>
+<h2>Why it matters</h2>
+<p>The previous post walked through one full edit-to-commit cycle. From here on, real collaboration begins when you can answer not only "where does my change live?" but also "what exactly is in that change?"</p>
+<p>The three commands play different roles.</p>
+<ul>
+<li><code>git status</code> shows <strong>which area</strong> holds your changes.</li>
+<li><code>git diff</code> shows the <strong>content</strong> of those changes line by line.</li>
+<li><code>git log</code> shows the <strong>order and intent</strong> of changes that have already been committed.</li>
+</ul>
+<p>Used together, they let you self-review what your next commit will contain. That habit leads directly to better commit messages and tighter pull requests.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p><code>status</code>, <code>diff</code>, and <code>log</code> are three read-only windows that answer three different questions: where am I right now, what is different and how, and how did I get here.<br>
+Each command compares a different pair of areas.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+A one-line rule of thumb:</p>
+<ul>
+<li><code>git diff</code> shows <strong>changes not yet staged</strong> (WD vs Staging).</li>
+<li><code>--cached</code> (or the synonym <code>--staged</code>) shows <strong>changes that are staged</strong> (Staging vs HEAD).</li>
+<li>Adding <code>HEAD</code> shows <strong>everything different from the last commit</strong> (WD vs HEAD), staged or not.</li>
+</ul>
+<h2>Core concepts</h2>
+<ul>
+<li><strong><code>git status</code> long form</strong>: human-readable sections such as <code>On branch</code>, <code>Your branch is ...</code>, <code>Changes to be committed</code>, <code>Changes not staged for commit</code>, and <code>Untracked files</code>.</li>
+<li><strong><code>git status -s</code> (short form)</strong>: one line per file with a two-letter code. The left letter is staging; the right letter is the working directory.</li>
+<li><strong><code>git diff</code></strong>: defaults to WD vs Staging. <code>+</code> lines are added, <code>-</code> lines are removed.</li>
+<li><strong><code>git diff --cached</code></strong>: Staging vs HEAD. "What would land in the next commit."</li>
+<li><strong><code>git diff HEAD</code></strong>: WD vs HEAD. The full diff against the last commit, regardless of staging.</li>
+<li><strong><code>git log</code></strong>: walks back from HEAD, printing one commit at a time. Options shape both the form and the depth.</li>
+<li><strong><code>--oneline</code></strong>: one line per commit (short hash + subject).</li>
+<li><strong><code>--graph</code></strong>: ASCII branch graph alongside the commits (its value shows once branches diverge).</li>
+<li><strong><code>--stat</code></strong>: per-file summary of inserted and deleted lines.</li>
+<li><strong><code>-p</code> (or <code>--patch</code>)</strong>: includes the actual diff for each commit.</li>
+</ul>
+<h2>Before-after</h2>
+<p>Here is the same question - "what just changed?" - answered two ways.</p>
+<p><strong>Before (the editor's undo history)</strong></p>
+<pre><code class="language-text">- You scroll back through Ctrl+Z one keystroke at a time
+- Changes in other files are invisible
+- Yesterday's edits are likely gone
+</code></pre>
+<p><strong>After (Git's status / diff / log)</strong></p>
+<pre><code class="language-text">$ git status -s
+ M README.md
+?? draft.md
+
+$ git diff README.md
+diff --git a/README.md b/README.md
+index 6e85ca6..b7f5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # My First Repo
+
+ Some notes.
++Author: me
+</code></pre>
+<p>In one place you see which file changed, which area it lives in (<code>status -s</code>), exactly which line was added (<code>diff</code>), and the entire history since the last commit (<code>log</code>).</p>
+<h2>Step-by-step practice</h2>
+<p>We continue from the <code>my-first-repo</code> directory built in the previous post. Start with <code>git log --oneline</code> showing both commits.</p>
+<pre><code class="language-text">$ git log --oneline
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
+</code></pre>
+<p><strong>1. Read status in two forms</strong></p>
+<p>Edit <code>README.md</code> by one line and create a new file.</p>
+<pre><code class="language-text">$ echo &quot;Author: me&quot; &gt;&gt; README.md
+$ echo &quot;draft&quot; &gt; draft.md
+</code></pre>
+<p>The long form names both the area and the next likely command.</p>
+<pre><code class="language-text">$ git status
+On branch main
+Changes not staged for commit:
+  (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+  (use &quot;git restore &lt;file&gt;...&quot; to discard changes in working directory)
+        modified:   README.md
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+        draft.md
+
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+</code></pre>
+<p>The short form fits the same state on two lines.</p>
+<pre><code class="language-text">$ git status -s
+ M README.md
+?? draft.md
+</code></pre>
+<p>How to read those two letters:</p>
+<ul>
+<li>Left letter: <strong>staging</strong> state (<code>M</code>=modified, <code>A</code>=added, <code>D</code>=deleted, blank=unchanged).</li>
+<li>Right letter: <strong>working directory</strong> state (same letters, plus <code>?</code> for untracked).</li>
+<li><code>??</code> means neither side knows the file yet - it is brand new.</li>
+</ul>
+<p><strong>2. <code>git diff</code> for unstaged changes</strong></p>
+<p><code>README.md</code> is modified but not yet staged.</p>
+<pre><code class="language-text">$ git diff
+diff --git a/README.md b/README.md
+index 6e85ca6..b7f5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # My First Repo
+
+ Some notes.
++Author: me
+</code></pre>
+<p>Read it top down:</p>
+<ul>
+<li><code>diff --git a/README.md b/README.md</code>: which file is being compared.</li>
+<li><code>index 6e85ca6..b7f5a1e 100644</code>: blob hashes before and after, plus file mode.</li>
+<li><code>--- a/...</code> / <code>+++ b/...</code>: the two sides. <code>a</code> is staging (or HEAD); <code>b</code> is the working directory.</li>
+<li><code>@@ -1,3 +1,4 @@</code>: the hunk header. "Three lines starting at line 1 in the original; four lines starting at line 1 in the new version."</li>
+<li>Lines starting with <code>+</code> are added, <code>-</code> are removed, and a leading space marks unchanged context.</li>
+</ul>
+<p><strong>3. <code>git diff --cached</code> for staged changes</strong></p>
+<p>Stage README and compare both commands.</p>
+<pre><code class="language-text">$ git add README.md
+$ git diff
+$ git diff --cached
+diff --git a/README.md b/README.md
+index 6e85ca6..b7f5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # My First Repo
+
+ Some notes.
++Author: me
+</code></pre>
+<p><code>git diff</code> is empty because the change has moved into staging. <code>--cached</code> shows "what would land in the next commit." Running it once before each <code>commit</code> is a cheap habit that catches surprises.</p>
+<p>The long-form <code>git status</code> at this point also makes the staging-area hint visible.</p>
+<pre><code class="language-text">$ git status
+On branch main
+Changes to be committed:
+  (use &quot;git restore --staged &lt;file&gt;...&quot; to unstage)
+        modified:   README.md
+
+Untracked files:
+  (use &quot;git add &lt;file&gt;...&quot; to include in what will be committed)
+        draft.md
+
+</code></pre>
+<p>The line <code>(use "git restore --staged &lt;file&gt;..." to unstage)</code> under <code>Changes to be committed:</code> is Git telling you exactly which command moves the change back out of staging.</p>
+<p><strong>4. <code>git diff HEAD</code> to combine both areas</strong></p>
+<p><code>draft.md</code> is still untracked while README is staged. <code>git diff HEAD</code> collapses both areas into a single comparison against the last commit.</p>
+<pre><code class="language-text">$ git diff HEAD
+diff --git a/README.md b/README.md
+index 6e85ca6..b7f5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # My First Repo
+
+ Some notes.
++Author: me
+</code></pre>
+<p><code>draft.md</code> is missing from this output. <code>git diff</code> shows changes to <strong>tracked files</strong>; an untracked file is not one. To include it, run <code>git status</code> or <code>git add -N draft.md</code> (intent-to-add) first.</p>
+<p><strong>5. Compare two commits</strong></p>
+<p>Pass two hashes to compare specific commits.</p>
+<pre><code class="language-text">$ git diff 4f1a2c0 9b8c3e2
+diff --git a/README.md b/README.md
+index a1b2c3d..6e85ca6 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,3 @@
+ # My First Repo
++
++Some notes.
+</code></pre>
+<p>The order is "older then newer." Swap the order and <code>+</code> and <code>-</code> flip. To see the change introduced by a single commit, <code>git show &lt;hash&gt;</code> is shorter.</p>
+<p><strong>6. Shape <code>git log</code> output</strong></p>
+<p>Commit the staged README change and then read the resulting log in different shapes.</p>
+<pre><code class="language-text">$ git commit -m &quot;Add author line to README&quot;
+[main e7d2c1a] Add author line to README
+ 1 file changed, 1 insertion(+)
+</code></pre>
+<p>Compare the same history through different options.</p>
+<pre><code class="language-text">$ git log --oneline
+e7d2c1a Add author line to README
+9b8c3e2 Add intro paragraph to notes
+4f1a2c0 Initial commit
+</code></pre>
+<pre><code class="language-text">$ git log --oneline --graph
+* e7d2c1a Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+</code></pre>
+<p>The graph is a straight line today because there are no branches yet. Once branches start to merge, the shape becomes the most useful part of the output.</p>
+<pre><code class="language-text">$ git log --stat
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
+Author: Me &lt;me@example.com&gt;
+Date:   Mon May 4 10:30:00 2026 +0900
+
+    Add author line to README
+
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+</code></pre>
+<p><code>--stat</code> summarises which files changed and by how much. It is the line you most often borrow when writing a PR description.</p>
+<pre><code class="language-text">$ git log -p -1
+commit e7d2c1a4b9f0c5d2e1a8b7c6d5e4f3a2b1c0d9e8
+Author: Me &lt;me@example.com&gt;
+Date:   Mon May 4 10:30:00 2026 +0900
+
+    Add author line to README
+
+diff --git a/README.md b/README.md
+index 6e85ca6..b7f5a1e 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,4 @@
+ # My First Repo
+
+ Some notes.
++Author: me
+</code></pre>
+<p><code>-p</code> (or <code>--patch</code>) expands each commit with its full diff. <code>-1</code> limits the output to a single commit.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Reading "no diff" as "no change"</strong> - changes already staged do not appear in plain <code>git diff</code>. Use <code>git diff --cached</code> or <code>git diff HEAD</code>.</li>
+<li><strong>Swapping the two arguments to <code>git diff &lt;a&gt; &lt;b&gt;</code></strong> - <code>&lt;a&gt;</code> is older, <code>&lt;b&gt;</code> is newer. Reverse them and <code>+/-</code> flip too.</li>
+<li><strong>Trusting <code>git log</code> subjects alone</strong> - if the subject is vague, <code>--stat</code> or <code>-p</code> gives you the truth.</li>
+<li><strong>Reading the two letters of <code>git status -s</code> as one</strong> - left is staging, right is working directory. <code>MM</code> is a different state ("staged change with further edits on top of it") from <code>M</code>.</li>
+<li><strong>Thinking an untracked file vanished from <code>git diff</code></strong> - it does not appear there. Use <code>git status</code> or <code>git add -N</code>.</li>
+<li><strong>Stuck inside <code>git log</code> output</strong> - the pager (<code>less</code>) is open. Press <code>q</code> to exit.</li>
+</ul>
+<h2>In practice</h2>
+<ul>
+<li><strong>Pre-commit self-check</strong>: scan with <code>git status -s</code>, then read <code>git diff --cached</code> once. If something unexpected is staged, drop it with <code>git restore --staged &lt;file&gt;</code>.</li>
+<li><strong>Drafting a PR description</strong>: list the commits with <code>git log --oneline origin/main..HEAD</code>, then review the contents with <code>git log -p origin/main..HEAD</code>.</li>
+<li><strong>Bug hunting</strong>: trace a file's history with <code>git log -p &lt;file&gt;</code>, or for harder cases reach for <code>git bisect</code> (covered later in the series).</li>
+<li><strong>Aliases that stick</strong>: a single line such as <code>git config --global alias.lg "log --oneline --graph --decorate"</code> saves a lot of typing.</li>
+<li><strong>Colour output</strong>: most environments enable it by default. If yours does not, run <code>git config --global color.ui auto</code>.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] You read both the long form and the <code>-s</code> short form of <code>git status</code>.</li>
+<li>[ ] You can describe what <code>git diff</code>, <code>git diff --cached</code>, and <code>git diff HEAD</code> each compare in one sentence.</li>
+<li>[ ] You can explain what the hunk header <code>@@ -1,3 +1,4 @@</code> means.</li>
+<li>[ ] You compared <code>git log --oneline</code>, <code>--graph</code>, <code>--stat</code>, and <code>-p</code> outputs side by side.</li>
+<li>[ ] You can describe what the order of <code>git diff &lt;a&gt; &lt;b&gt;</code> arguments means.</li>
+<li>[ ] Your fingers know that <code>q</code> exits the pager.</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Edit one line of <code>README.md</code> and capture the output of both <code>git diff</code> and <code>git diff --cached</code> for comparison.</li>
+<li>Stage the change, confirm that <code>git diff</code> is empty, and confirm that <code>git diff HEAD</code> still shows it.</li>
+<li>Compare your first two commits with <code>git diff 4f1a2c0 9b8c3e2</code> (substitute your real hashes), then run <code>git show 9b8c3e2</code> for the same information.</li>
+<li>Run <code>git log --oneline --graph --stat</code> once and write a sentence about which option produces which line.</li>
+<li>Create a fresh file, observe the <code>??</code> in <code>git status -s</code>, then <code>git add</code> it and watch the marker change.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<ul>
+<li><code>git status</code> tells you where changes live, <code>git diff</code> tells you what is in them, and <code>git log</code> tells you the shape of the history already saved.</li>
+<li><code>git diff</code> defaults to WD vs Staging, <code>--cached</code> to Staging vs HEAD, and <code>HEAD</code> to a combined comparison against the last commit.</li>
+<li><code>git log</code> shows the same history at different depths depending on which options you combine. <code>--oneline --graph</code> is great for scanning; <code>--stat</code> and <code>-p</code> are great for review.</li>
+<li>The cheapest habit before any commit is <code>status -s</code> followed by <code>diff --cached</code>.</li>
+</ul>
+<p>The next post moves into branches: how to start a parallel line of work in the same folder and switch between them safely.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? - foundations of distributed version control</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your first commit - init, status, add, commit</a></li>
+<li><strong>Reading change history - status, diff, log (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Branch Basics - Create, Switch, Compare</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merge and Conflict Resolution - Bringing Two Lines Back Together</a></li>
+<li>Connecting GitHub repositories and remotes (upcoming)</li>
+<li>Collaborating with Pull Requests (upcoming)</li>
+<li>Tracking work with Issues and Projects (upcoming)</li>
+<li>Writing good commit messages (upcoming)</li>
+<li>A real-world workflow at a glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://git-scm.com/doc">Git Reference Manual</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History">Pro Git Book - Viewing the Commit History</a></li>
+<li><a href="https://git-scm.com/docs/git-status">git-status manual</a></li>
+<li><a href="https://git-scm.com/docs/git-diff">git-diff manual</a></li>
+<li><a href="https://git-scm.com/docs/git-log">git-log manual</a></li>
+</ul>
+<p class="tags-line">Tags: git-status, git-diff, git-log, change-history, working-tree-vs-index, log-formatting</p>
+</body>
+</html>

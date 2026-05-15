@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Creating a GitHub repository - remote, push, and pull in one go</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Creating a GitHub repository - remote, push, and pull in one go</h1>
+<p>Up to this point, every command has stayed on one machine. The real collaboration shift begins when your local repository gains a remote home that other people and other devices can reach.</p>
+<p>This is the sixth post in the Git &amp; GitHub 101 series. Here, we connect a local repository to GitHub and walk through the first push, fetch, pull, and clone flow.</p>
+<h2>What you'll learn</h2>
+<ul>
+<li>What a <code>remote</code> is, and why the first one is conventionally called <code>origin</code></li>
+<li>How to create an empty GitHub repository and wire it to your local one</li>
+<li>The two things <code>git push -u origin main</code> does in a single shot</li>
+<li>How <code>git fetch</code> and <code>git pull</code> differ from each other</li>
+<li>What <code>git clone</code> actually downloads</li>
+<li>When to choose HTTPS vs SSH</li>
+</ul>
+<p>Up through Episode 5, each command ran inside one machine. Starting now, the local repository becomes something other people can see and other machines can keep working on.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What exactly is a <code>remote</code>, and why is the first one conventionally called <code>origin</code>?</li>
+<li>Which commands, in what order, connect an empty GitHub repository to your local one?</li>
+<li>What two things does <code>git push -u origin main</code> do in a single shot?</li>
+<li>How does <code>git fetch</code> differ from <code>git pull</code> in behavior?</li>
+<li>Beyond the working tree, what else does <code>git clone</code> actually download?</li>
+<li>Which signal should drive the choice between HTTPS and SSH for a remote?</li>
+</ul>
+<h2>Why it matters</h2>
+<p>A repository that lives only on your laptop is, for collaboration purposes, not very different from a personal notebook. To share code with teammates, or to survive a stolen laptop without losing history, the repository has to exist somewhere else as well. GitHub is the most common "somewhere else."</p>
+<p>A <code>remote</code> is an alias that points to a repository at another location. Once registered, you reference it by a short name instead of typing the URL each time. The first remote is conventionally named <code>origin</code> - the word means "where this project came from," and Git uses it as the automatic default.</p>
+<p><code>push</code>, <code>pull</code>, and <code>fetch</code> are the three verbs that move commits between a local repository and a remote.</p>
+<ul>
+<li><code>push</code>: upload commits you've made locally to the remote.</li>
+<li><code>fetch</code>: download commits the remote has but you don't, without merging them.</li>
+<li><code>pull</code>: <code>fetch</code> followed automatically by <code>merge</code> (or <code>rebase</code>).</li>
+</ul>
+<p>Keeping these three apart is what makes "how do I safely incorporate someone else's push?" stop feeling intimidating.</p>
+<h2>Mental Model</h2>
+<blockquote>
+<p>A GitHub repository is just "another Git repository that lives across the network", and a <code>remote</code> is the nickname you give to such a repository. <code>push</code> and <code>pull</code> are synchronization moves that exchange commits between the two.<br>
+A GitHub repository is just another Git repository. The only differences are that it lives on GitHub's servers and that anyone with access can reach it. Local and remote act as mirrors of each other, and push/fetch/pull are the commands that keep them aligned.</p>
+</blockquote>
+<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png"></p>
+<p><em>Mental Model</em><br>
+Three reminders make this picture solid. First, a GitHub repository is itself nothing more than a <code>.git</code> directory. Second, each collaborator owns a complete copy on their own machine. Third, synchronization is explicit - it happens when you run a command. Skip <code>push</code>, and GitHub doesn't know. Skip <code>pull</code>, and your laptop doesn't know.</p>
+<h2>Core concepts</h2>
+<p><strong>remote</strong><br>
+- Meaning: An alias pointing to a repository at another location (typically GitHub)</p>
+<p><strong>origin</strong><br>
+- Meaning: The default name attached to the first remote</p>
+<p><strong>upstream</strong><br>
+- Meaning: The remote branch a local branch is configured to track</p>
+<p><strong><code>git remote add</code></strong><br>
+- Meaning: Register a new remote alias</p>
+<p><strong><code>git push</code></strong><br>
+- Meaning: Upload local commits to a remote</p>
+<p><strong><code>git fetch</code></strong><br>
+- Meaning: Download remote commits without merging them</p>
+<p><strong><code>git pull</code></strong><br>
+- Meaning: <code>fetch</code> plus <code>merge</code> (or <code>rebase</code>)</p>
+<p><strong><code>git clone</code></strong><br>
+- Meaning: Copy an entire remote repository into a new directory</p>
+<p><strong>HTTPS URL</strong><br>
+- Meaning: <code>https://github.com/&lt;user&gt;/&lt;repo&gt;.git</code>, authenticated with a token</p>
+<p><strong>SSH URL</strong><br>
+- Meaning: <code>git@github.com:&lt;user&gt;/&lt;repo&gt;.git</code>, authenticated with an SSH key</p>
+<p><code>origin</code> is a convention, not a rule. You can run <code>git remote add backup ...</code> and use a different name. Tools and documentation, however, mostly assume <code>origin</code>, so leaving it alone tends to make collaboration smoother.</p>
+<p>The word <code>upstream</code> shows up in two senses. The first is "the remote branch that a local branch defaults to for push and pull." That is what the <code>-u</code> in <code>git push -u origin main</code> configures. The second is the conventional name for "the original repository a fork came from," which Episode 7 returns to.</p>
+<h2>Before-After</h2>
+<p>Comparing the local-only flow to the remote-connected flow makes the difference concrete.</p>
+<p><strong>Before - a repository that lives only locally</strong></p>
+<pre><code class="language-text">$ git log --oneline
+1c2d3e4 Demote header to h3
+b5d4c6e Merge branch 'feature/header'
+...
+$ git push
+fatal: No configured push destination.
+Either specify the URL from the command-line or configure a remote repository using
+    git remote add &lt;name&gt; &lt;url&gt;
+and then push using the remote name
+    git push &lt;name&gt;
+</code></pre>
+<p>With no remote, there is nowhere to push. The history exists only on your laptop.</p>
+<p><strong>After - a repository wired to origin</strong></p>
+<pre><code class="language-text">$ git remote -v
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (fetch)
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (push)
+$ git push -u origin main
+Enumerating objects: 12, done.
+...
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+ * [new branch]      main -&gt; main
+</code></pre>
+<p>Once the remote is registered and upstream is set, a single <code>git push</code> mirrors the same commits onto GitHub, and any other machine that runs <code>git clone</code> receives the same copy. The role of <code>-u origin main</code> is covered in detail in Step 3 of the walkthrough.</p>
+<h2>Step-by-step walkthrough</h2>
+<p>Reuse the <code>vacation-notes</code> repository from Episode 5. The ending state was <code>main</code> pointing at <code>1c2d3e4 Demote header to h3</code> with a clean working tree.</p>
+<p><strong>1. Create an empty GitHub repository</strong></p>
+<p>In a browser, open <code>https://github.com/new</code>. Fill in the following fields and leave the rest at their defaults.</p>
+<ul>
+<li>Repository name: <code>vacation-notes</code></li>
+<li>Description: optional</li>
+<li>Public / Private: Public is fine for learning</li>
+<li>Leave each of "Add a README file," "Add .gitignore," and "Choose a license" <strong>unchecked</strong></li>
+</ul>
+<p>Those three checkboxes are unchecked deliberately. If GitHub creates an initial commit on its side, the local history and the GitHub history diverge from the very beginning, and the first push gets awkward. An empty repository accepts your local history exactly as it is.</p>
+<p>After clicking <code>Create repository</code>, GitHub displays a "set up an existing repository" panel with the exact commands you're about to run.</p>
+<p><strong>2. Register the remote</strong></p>
+<p>Back in the local repository, register the remote. Replace <code>&lt;your-id&gt;</code> with your own GitHub handle.</p>
+<pre><code class="language-text">$ git remote add origin https://github.com/&lt;your-id&gt;/vacation-notes.git
+$ git remote -v
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (fetch)
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (push)
+</code></pre>
+<p><code>git remote add</code> produces no output. Use <code>git remote -v</code> to confirm both the fetch URL and the push URL point to the right place. Two lines means registration succeeded.</p>
+<p>If you typed the URL wrong, <code>git remote set-url origin &lt;correct-URL&gt;</code> fixes it, or <code>git remote remove origin</code> lets you start over.</p>
+<p><strong>3. First push and upstream setup</strong></p>
+<p>Now publish the <code>main</code> branch to GitHub.</p>
+<pre><code class="language-text">$ git push -u origin main
+Enumerating objects: 24, done.
+Counting objects: 100% (24/24), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (16/16), done.
+Writing objects: 100% (24/24), 2.31 KiB | 1.16 MiB/s, done.
+Total 24 (delta 5), reused 0 (delta 0)
+remote: Resolving deltas: 100% (5/5), completed with 0 local objects.
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+ * [new branch]      main -&gt; main
+Branch 'main' set up to track remote branch 'main' from 'origin'.
+</code></pre>
+<p><code>-u</code> (or its long form <code>--set-upstream</code>) does two things at once.</p>
+<ol>
+<li>It configures the local <code>main</code> to track <code>origin/main</code>.</li>
+<li>From this push onward, plain <code>git push</code> knows where to send commits.</li>
+</ol>
+<p>The closing line <code>Branch 'main' set up to track remote branch 'main' from 'origin'.</code> confirms the tracking setup. After this, <code>git push</code> by itself is enough.</p>
+<p><strong>4. A second commit and a shorter push</strong></p>
+<p>Make a small additional commit to see how the flow shortens after upstream is set.</p>
+<pre><code class="language-text">$ printf &quot;## Quickstart\n\n1. Clone the repo.\n2. Open notes.md.\n&quot; &gt; quickstart.md
+$ git add quickstart.md
+$ git commit -m &quot;Add quickstart section&quot;
+[main 2b3c4d5] Add quickstart section
+ 1 file changed, 4 insertions(+)
+$ git push
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 351 bytes | 351.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+   1c2d3e4..2b3c4d5  main -&gt; main
+</code></pre>
+<p>With upstream configured, you no longer need <code>-u origin main</code>. The closing line <code>1c2d3e4..2b3c4d5 main -&gt; main</code> reports the hash range that <code>origin/main</code> just received.</p>
+<p>Refresh the browser tab on GitHub: the <code>Add quickstart section</code> commit is at the top. The same history now lives in two places.</p>
+<p><strong>5. Clone into a different location</strong></p>
+<p>Pretend you've moved to another machine (or simply another directory) and clone the repository.</p>
+<pre><code class="language-text">$ cd /tmp
+$ git clone https://github.com/&lt;your-id&gt;/vacation-notes.git
+Cloning into 'vacation-notes'...
+remote: Enumerating objects: 27, done.
+remote: Counting objects: 100% (27/27), done.
+remote: Compressing objects: 100% (18/18), done.
+remote: Total 27 (delta 5), reused 27 (delta 5), pack-reused 0
+Receiving objects: 100% (27/27), 2.66 KiB | 2.66 MiB/s, done.
+Resolving deltas: 100% (5/5), done.
+$ cd vacation-notes
+$ git log --oneline -3
+2b3c4d5 Add quickstart section
+1c2d3e4 Demote header to h3
+b5d4c6e Merge branch 'feature/header'
+$ git remote -v
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (fetch)
+origin  https://github.com/&lt;your-id&gt;/vacation-notes.git (push)
+</code></pre>
+<p><code>git clone</code> did three things. First, it created a <code>vacation-notes</code> directory and populated <code>.git</code> inside it. Second, it registered an <code>origin</code> remote automatically (which is why <code>git remote -v</code> shows two lines even though we did not run <code>git remote add</code> here). Third, it checked out the default branch (<code>main</code>).</p>
+<p>A cloned repository is a complete copy. Disconnect the network and <code>git log</code>, <code>git diff</code>, and <code>git checkout</code> keep working.</p>
+<p><strong>6. Push from one side, then fetch and pull on the other</strong></p>
+<p>In the cloned directory (<code>/tmp/vacation-notes</code>), make one more commit and push it.</p>
+<pre><code class="language-text">$ printf &quot;## Deployment\n\nDeploy by pushing to main.\n&quot; &gt; deployment.md
+$ git add deployment.md
+$ git commit -m &quot;Add deployment notes&quot;
+[main 7e8f9a0] Add deployment notes
+ 1 file changed, 3 insertions(+)
+$ git push
+...
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+   2b3c4d5..7e8f9a0  main -&gt; main
+</code></pre>
+<p>Switch back to the original working directory. GitHub's <code>main</code> is now at <code>7e8f9a0</code>, but your local <code>main</code> is still at <code>2b3c4d5</code>. Start by running <code>git fetch</code> to download the new commit without merging it.</p>
+<pre><code class="language-text">$ git fetch
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 3 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), 358 bytes | 358.00 KiB/s, done.
+From https://github.com/&lt;your-id&gt;/vacation-notes
+   2b3c4d5..7e8f9a0  main       -&gt; origin/main
+$ git status
+On branch main
+Your branch is behind 'origin/main' by 1 commit, and can be fast-forwarded.
+  (use &quot;git pull&quot; to update your local branch)
+
+nothing to commit, working tree clean
+</code></pre>
+<p><code>fetch</code> updates only the remote-tracking branch <code>origin/main</code>. The local <code>main</code> stays where it was, which is why <code>git status</code> reports being one commit behind and the working tree is unchanged. <code>git log --oneline --decorate --all</code> would show <code>origin/main</code> one step ahead of <code>main</code>.</p>
+<p>Catch up with <code>git pull</code>.</p>
+<pre><code class="language-text">$ git pull
+Updating 2b3c4d5..7e8f9a0
+Fast-forward
+ deployment.md | 3 +++
+ 1 file changed, 3 insertions(+)
+$ git log --oneline -2
+7e8f9a0 Add deployment notes
+2b3c4d5 Add quickstart section
+</code></pre>
+<p><code>pull</code> is, internally, <code>fetch</code> then <code>merge</code>. Because the local side had no new commits, this resolves as a fast-forward. With commits on both sides, the three-way merge from Episode 5 would have run instead.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li><strong>Creating the GitHub repo with README/.gitignore/license checked, then watching the first push fail</strong> - GitHub's auto-commit and your local commits diverge, producing <code>! [rejected] main -&gt; main (fetch first)</code>. The fixes are <code>git pull --rebase origin main</code> followed by another push, or starting over with an empty repository.</li>
+<li><strong>Trying to authenticate an HTTPS push with a password</strong> - GitHub stopped accepting passwords for HTTPS pushes in August 2021. Use a Personal Access Token (PAT) or switch to SSH.</li>
+<li><strong>Reaching for <code>git pull</code> as the first command of the day</strong> - if local changes are uncommitted, a pull can drop conflicts into your working tree. Confirming a clean tree with <code>git status</code> first is the safer habit.</li>
+<li><strong>Treating <code>git fetch</code> as the whole job</strong> - fetch only updates information. To move the local branch forward, <code>merge</code> or <code>pull</code> has to follow.</li>
+<li><strong>Changing a remote URL and pushing somewhere unintended</strong> - run <code>git remote -v</code> after any URL edit so you know exactly where the next push lands.</li>
+<li><strong>Pushing without realizing more than one remote is registered</strong> - in repositories with both <code>origin</code> and <code>upstream</code> (the fork-original convention), an unqualified <code>git push</code> can land in a place you didn't mean.</li>
+</ul>
+<h2>In real-world use</h2>
+<p>Three early choices shape day-to-day collaboration.</p>
+<p><strong>HTTPS vs SSH</strong> - HTTPS is convenient on networks that block SSH ports. Otherwise, registering an SSH key once spares you from typing credentials each time. Add the public key under <code>SSH and GPG keys</code> in your GitHub account settings, then clone with <code>git@github.com:&lt;user&gt;/&lt;repo&gt;.git</code>.</p>
+<p><strong>Default branch name</strong> - GitHub has used <code>main</code> as the default branch for new repositories since 2020. Older repositories and a handful of tools still assume <code>master</code>, so checking which convention your team uses up front avoids confusion later.</p>
+<p><strong>Branch protection rules</strong> - production repositories usually disable direct pushes to <code>main</code>. That is exactly the gap Pull Requests fill, which Episode 7 covers. The push and pull commands from this episode shift roles - they become the way you sync your own working branch with its counterpart on GitHub.</p>
+<p>GitHub Desktop and IDE Git panels collapse these commands behind buttons. Knowing what each button bundles makes the difference when something goes wrong; running them on the command line a few times is worth the small effort.</p>
+<h2>Checklist</h2>
+<p>If you can tick each of these, this episode has done its job.</p>
+<ul>
+<li>[ ] You can explain a <code>remote</code> in one sentence</li>
+<li>[ ] You know where the name <code>origin</code> comes from</li>
+<li>[ ] You can create an empty GitHub repository and connect it to a local one</li>
+<li>[ ] You know the two things <code>git push -u origin main</code> configures simultaneously</li>
+<li>[ ] You can state the difference between <code>git fetch</code> and <code>git pull</code> in one sentence</li>
+<li>[ ] You know what <code>git clone</code> registers automatically</li>
+<li>[ ] You can list registered remotes with <code>git remote -v</code></li>
+<li>[ ] You can recognize HTTPS and SSH URL formats at a glance</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>Create another empty GitHub repository (<code>practice-remote</code>), then in an empty local directory run the full sequence: <code>git init</code> -&gt; commit one file -&gt; <code>git remote add origin ...</code> -&gt; <code>git push -u origin main</code>.</li>
+<li>Clone the repository from exercise 1 into a different directory (e.g., <code>/tmp/practice-clone</code>) and alternate commits and push/pull between the two working copies. Try pulling while you have uncommitted local changes and read the message Git prints.</li>
+<li>Run <code>git fetch</code> and observe how <code>git status</code> changes. Then look at <code>git log --oneline --decorate --all</code> and locate <code>origin/main</code> relative to your local <code>main</code>.</li>
+</ol>
+<h2>Summary, and what's next</h2>
+<p>This episode walked through the lifecycle of connecting a local repository to GitHub. The takeaways are short.</p>
+<ul>
+<li>A <code>remote</code> is an alias for a repository elsewhere, and the first one is usually <code>origin</code></li>
+<li><code>git push</code> uploads local commits, <code>git fetch</code> only downloads them, and <code>git pull</code> does both download and merge</li>
+<li>The <code>-u</code> flag in <code>git push -u origin main</code> sets up an upstream so future pushes and pulls can omit arguments</li>
+<li><code>git clone</code> creates a fresh local copy and registers <code>origin</code> for you</li>
+</ul>
+<p>Episode 7 picks up where this one leaves off: the most common collaboration unit on GitHub, the Pull Request. We'll commit and push on a branch, request review, and follow the change back to <code>main</code>.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
+<li><strong>Creating a GitHub Repository: remote, push, pull (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
+<li>Tracking Work with Issues and Projects (upcoming)</li>
+<li>Writing Good Commit Messages (upcoming)</li>
+<li>Real-World Workflow at a Glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://git-scm.com/docs/git-remote">git-remote manual</a></li>
+<li><a href="https://git-scm.com/docs/git-push">git-push manual</a></li>
+<li><a href="https://git-scm.com/docs/git-fetch">git-fetch manual</a></li>
+<li><a href="https://git-scm.com/docs/git-pull">git-pull manual</a></li>
+<li><a href="https://git-scm.com/docs/git-clone">git-clone manual</a></li>
+<li>GitHub Docs, "About remote repositories": <a href="https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories">https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories</a></li>
+<li>GitHub Docs, "Connecting to GitHub with SSH": <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh">https://docs.github.com/en/authentication/connecting-to-github-with-ssh</a></li>
+</ul>
+<p class="tags-line">Tags: github-remote, git-push, git-pull, git-clone, git-fetch, origin</p>
+</body>
+</html>

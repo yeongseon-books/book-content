@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Collaborating with Pull Requests - From Branch to Review to Main</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Collaborating with Pull Requests - From Branch to Review to Main</h1>
+<p>Once a second person is involved, a branch is no longer just your workspace. It becomes a proposal, and the Pull Request is the place where that proposal is explained, reviewed, and either accepted or sent back for another pass.</p>
+<p>This is the seventh post in the Git &amp; GitHub 101 series. Here, we follow one change from feature branch to review to merge on <code>main</code>.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>What a Pull Request (PR) really is, and how it differs from a plain <code>git merge</code></li>
+<li>The order of operations: feature branch, commit, push, open PR</li>
+<li>How to respond to review comments by adding more commits to the same branch</li>
+<li>How to merge the PR and update your local <code>main</code> afterward</li>
+<li>How to keep PRs small enough that reviewers actually look at them</li>
+</ul>
+<p>By the end you will be able to take a feature branch like <code>feature/release-notes</code>, open a PR, get it reviewed, merge it, and clean up locally - end to end, by yourself.</p>
+<h2>Why this matters</h2>
+<p>When you work alone, <code>git merge feature/x</code> ends the story. The moment a second person joins, that command becomes painful. There is no place to record what changed, why it was needed, or who agreed it was a good idea.</p>
+<p>Pull Requests are GitHub's answer to that gap. A PR is not just a merge tool. It is a screen that says, "Let us talk about this change first, agree, then merge."</p>
+<p>Once PRs become routine, three habits follow naturally:</p>
+<ol>
+<li>Each change ends up with at least one human pair of eyes on it (even if that pair is yours, a day later).</li>
+<li>When a bad commit slips in, the PR number and description give you a starting point for the search.</li>
+<li>You start slicing big changes into small PRs, because each PR has to fit one reviewer's attention span.</li>
+</ol>
+<h2>Mental model</h2>
+<blockquote>
+<p>A Pull Request is not a plain merge; it is a place to "propose merging your branch into main and host the review and discussion that surrounds that proposal".<br>
+A PR is a request: "Please accept my branch as a proposal against <code>main</code>." The request has a title, a description, a list of changed files, and a comment thread.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+The diagram reads like this:</p>
+<ol>
+<li>Locally you create <code>feature/release-notes</code> on top of <code>main</code> and stack commits on it.</li>
+<li>Pushing the branch to GitHub creates <code>origin/feature/release-notes</code>.</li>
+<li>The PR screen is the request to merge that branch into the base, <code>main</code>.</li>
+<li>Reviews and follow-up commits live inside the PR. Pressing the merge button updates GitHub's <code>main</code>.</li>
+<li>Finally, <code>git pull</code> brings the result back to your local <code>main</code>.</li>
+</ol>
+<p>The key idea: a PR is a conversation about merging a branch, not the merge command itself.</p>
+<h2>Core concepts</h2>
+<p><strong>base branch</strong><br>
+- Meaning: The branch the PR will be merged into. Usually <code>main</code>.</p>
+<p><strong>compare branch</strong><br>
+- Meaning: The branch that contains the changes. Usually a <code>feature/...</code> branch.</p>
+<p><strong>draft PR</strong><br>
+- Meaning: A PR marked "not ready for review yet, but I want to share progress."</p>
+<p><strong>review</strong><br>
+- Meaning: Another person's verdict on the change. Three outcomes: Approve, Request changes, or Comment.</p>
+<p><strong>merge commit</strong><br>
+- Meaning: A commit GitHub creates when merging a PR. It has two parents and a message like <code>Merge pull request #1 ...</code>.</p>
+<p><strong>squash merge</strong><br>
+- Meaning: Compresses each commit on the PR into a single new commit on the base branch. Useful when the branch has noisy WIP commits.</p>
+<p><strong>rebase merge</strong><br>
+- Meaning: Replays the PR's commits on top of the base. No merge commit is created.</p>
+<p>Which of the three merge styles you use is a team decision. This article uses the default - a regular merge commit.</p>
+<h2>Before-After</h2>
+<p><strong>Before - branch made, not shared</strong></p>
+<pre><code class="language-text">$ git switch -c feature/release-notes
+$ git commit -am &quot;Draft release notes&quot;
+$ # a few days pass
+$ git log --oneline main..feature/release-notes
+3c4d5e6 Draft release notes
+$ # nobody else has seen the change yet
+</code></pre>
+<p>If you now run <code>git merge feature/release-notes</code> directly, your teammates only learn about the change after it has already landed. There is no place to ask, "Why did this line appear?"</p>
+<p><strong>After - same branch, opened as a PR</strong></p>
+<pre><code class="language-text">$ git push -u origin feature/release-notes
+$ # open a PR on GitHub, a teammate leaves a one-line review
+$ git commit -am &quot;Tweak release checklist heading&quot;
+$ git push
+$ # click &quot;Merge pull request&quot; on GitHub
+$ git switch main
+$ git pull
+</code></pre>
+<p>It is the same branch, but now the intent (PR description), the feedback (review comments), and the consensus (merge commit) live on GitHub. A month from now, anyone who finds that commit in <code>git log</code> can click through to the PR number and rebuild the context.</p>
+<h2>Step-by-step walkthrough</h2>
+<p>Reuse the <code>vacation-notes</code> repository from Episode 6. <code>main</code> points at <code>7e8f9a0 Add deployment notes</code>, and <code>origin</code> is wired up to GitHub.</p>
+<p><strong>1. Sync main first</strong></p>
+<pre><code class="language-text">$ git switch main
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+$ git pull
+Already up to date.
+</code></pre>
+<p>Before starting any new work, confirm your local <code>main</code> is in the same place as <code>origin/main</code>.</p>
+<p><strong>2. Create the feature branch</strong></p>
+<pre><code class="language-text">$ git switch -c feature/release-notes
+Switched to a new branch 'feature/release-notes'
+$ git status
+On branch feature/release-notes
+nothing to commit, working tree clean
+</code></pre>
+<p><code>-c</code> creates a new branch and switches to it in one step. Branch names typically use prefixes like <code>feature/</code>, <code>fix/</code>, or <code>chore/</code> to signal intent.</p>
+<p><strong>3. Make your first commit</strong></p>
+<pre><code class="language-text">$ printf '\n## Release checklist\n\n- [ ] Tag version\n- [ ] Update CHANGELOG\n' &gt;&gt; notes.md
+$ git add notes.md
+$ git commit -m &quot;Add release checklist&quot;
+[feature/release-notes 3c4d5e6] Add release checklist
+ 1 file changed, 5 insertions(+)
+</code></pre>
+<p>This is the first commit that will appear on the PR. Try not to mix unrelated changes in one commit - smaller commits are easier to review.</p>
+<p><strong>4. Push the branch to GitHub</strong></p>
+<pre><code class="language-text">$ git push -u origin feature/release-notes
+Enumerating objects: 5, done.
+...
+remote: Create a pull request for 'feature/release-notes' on GitHub by visiting:
+remote:      https://github.com/&lt;your-id&gt;/vacation-notes/pull/new/feature/release-notes
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+ * [new branch]      feature/release-notes -&gt; feature/release-notes
+Branch 'feature/release-notes' set up to track remote branch 'feature/release-notes' from 'origin'.
+</code></pre>
+<p>You only need <code>-u origin feature/release-notes</code> on the first push to set the upstream. After that, plain <code>git push</code> works. Notice the <code>remote:</code> line: GitHub gives you a direct link to open a PR.</p>
+<p><strong>5. Open the PR on GitHub</strong></p>
+<p>Open the link printed above, or hit "Compare &amp; pull request" on the repository's main page. Fill in:</p>
+<ul>
+<li>Title: <code>Add release checklist to notes</code></li>
+<li>Description: a short note on the motivation, how you verified it, and the scope of impact.</li>
+<li>Reviewers: pick a teammate (leave it blank if you are practicing alone).</li>
+</ul>
+<p>Press "Create pull request" and you get a PR number. This article calls it <code>#1</code>.</p>
+<p><strong>6. Address review comments with another commit</strong></p>
+<p>Suppose a reviewer leaves a comment: "Please make the checklist heading clearer."</p>
+<pre><code class="language-text">$ git switch feature/release-notes
+$ sed -i 's/## Release checklist/## Release checklist (per version)/' notes.md
+$ git add notes.md
+$ git commit -m &quot;Tweak release checklist heading&quot;
+[feature/release-notes 4d5e6f7] Tweak release checklist heading
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+$ git push
+Enumerating objects: 5, done.
+...
+To https://github.com/&lt;your-id&gt;/vacation-notes.git
+   3c4d5e6..4d5e6f7  feature/release-notes -&gt; feature/release-notes
+</code></pre>
+<p>The new commit shows up on the PR automatically. No extra command is needed - one push refreshes the PR view.</p>
+<p><strong>7. Merge the PR</strong></p>
+<p>Once the review is approved, click "Merge pull request" at the bottom of the PR page. The default is a regular merge commit, which adds something like this to <code>main</code>:</p>
+<pre><code class="language-text">Merge pull request #1 from &lt;your-id&gt;/feature/release-notes
+
+Add release checklist to notes
+</code></pre>
+<p>After the merge, GitHub offers a "Delete branch" button. If you have nothing more to add, delete the remote branch right there.</p>
+<p><strong>8. Clean up locally</strong></p>
+<pre><code class="language-text">$ git switch main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+$ git pull
+remote: Enumerating objects: 1, done.
+...
+Updating 7e8f9a0..5e6f7a8
+Fast-forward
+ notes.md | 5 +++++
+ 1 file changed, 5 insertions(+)
+$ git branch -d feature/release-notes
+Deleted branch feature/release-notes (was 4d5e6f7).
+</code></pre>
+<p><code>git pull</code> brings the merge into your local <code>main</code>. Only after that should you delete the local feature branch. Branches are temporary workspaces - once the work is done, clear them out so they do not pile up.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>Committing directly to <code>main</code> and getting rejected by branch protection. Make a habit of starting each change on a new branch.</li>
+<li>Opening a PR that is too large for anyone to review. PRs over 200-400 changed lines tend to stall; split them.</li>
+<li>Creating a brand-new branch in response to review comments. Push another commit to the same branch instead - the PR updates itself.</li>
+<li>Skipping <code>git pull</code> on <code>main</code> after a merge and starting the next change on stale code. That is the fastest path to a conflict.</li>
+<li>Editing the auto-generated merge commit message by hand. The default format is searchable and consistent; leave it alone.</li>
+</ul>
+<h2>In real-world projects</h2>
+<p>A PR is less of a merge tool and more of a decision log. Teams use it like this:</p>
+<ul>
+<li><strong>Explain the why in the PR body.</strong> If commit messages are short, the PR body becomes the long version.</li>
+<li><strong>Read CI results on the PR.</strong> Wire GitHub Actions to your repo so each PR shows test status. If it is red, do not press merge.</li>
+<li><strong>Use draft PRs to share progress early.</strong> A reviewer can spot the wrong direction before you have invested another day in it.</li>
+<li><strong>Link related issues.</strong> Writing <code>Closes #42</code> in the body auto-closes the issue when the PR merges (the topic of the next article).</li>
+<li><strong>Revert at the PR level.</strong> GitHub's PR page has a "Revert" button that creates a new PR undoing the merge. That is safer than picking commits one by one.</li>
+</ul>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Pulled <code>main</code> to the latest commit before branching</li>
+<li>[ ] Used a prefixed branch name like <code>feature/</code>, <code>fix/</code>, or <code>chore/</code></li>
+<li>[ ] First push used <code>-u origin &lt;branch&gt;</code> to set upstream</li>
+<li>[ ] PR body explains motivation and how you verified the change</li>
+<li>[ ] Responded to review comments by pushing more commits to the same branch</li>
+<li>[ ] Pulled <code>main</code> and deleted the merged branch after merging</li>
+</ul>
+<h2>Exercises</h2>
+<ol>
+<li>In the same <code>vacation-notes</code> repo, create a branch named <code>feature/contact-section</code>, append a contact line to <code>notes.md</code>, and open a PR. Pretend you are reviewing your own PR: read it once, then merge it.</li>
+<li>Open a PR with an empty description on purpose. See what GitHub prompts you with, then try a PR with a real description. Imagine yourself six months later and pick the one you would rather receive - that is the value of writing a real PR body.</li>
+</ol>
+<h2>Wrap-up and what's next</h2>
+<p>This article ran through one full PR cycle. The recap:</p>
+<ul>
+<li>A PR is a request to merge a branch. The merge itself is one click at the end</li>
+<li>First push uses <code>git push -u origin &lt;branch&gt;</code>; later pushes are plain <code>git push</code></li>
+<li>Reply to review comments by adding commits to the same branch</li>
+<li>After merging, sync <code>main</code> with <code>git pull</code> and delete the branch you used</li>
+</ul>
+<p>The next article zooms in on something you saw in the PR body: <code>Closes #42</code>. That is GitHub Issues, and along with Projects, it is how teams keep a record of what to do, not just what was done.</p>
+<h2>Series Table of Contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
+<li><strong>Collaborating with Pull Requests (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Tracking Work with Issues and Projects</a></li>
+<li>Writing Good Commit Messages (upcoming)</li>
+<li>Real-World Workflow at a Glance (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>GitHub Docs, "About pull requests": <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests</a></li>
+<li>GitHub Docs, "Creating a pull request": <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request</a></li>
+<li>GitHub Docs, "Reviewing changes in pull requests": <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests</a></li>
+<li>GitHub Docs, "About protected branches": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches</a></li>
+<li>Git docs, <code>git switch</code>: <a href="https://git-scm.com/docs/git-switch">https://git-scm.com/docs/git-switch</a></li>
+</ul>
+<p class="tags-line">Tags: github-pull-request, code-review, feature-branch, merge-commit, github-collaboration, pr-workflow</p>
+</body>
+</html>

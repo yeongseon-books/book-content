@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Writing Good Commit Messages: Conventional Commits and Useful Bodies</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Writing Good Commit Messages: Conventional Commits and Useful Bodies</h1>
+<p>Every repository eventually reaches the point where the code alone is not enough to explain why a change happened. A good commit message turns the history itself into documentation that survives long after the context in chat and review threads fades away.</p>
+<p>This is the ninth post in the Git &amp; GitHub 101 series. Here, we look at message structure, Conventional Commits, and the habits that keep <code>git log</code> useful.</p>
+<h2>What you will learn</h2>
+<ul>
+<li>Why a good commit message is an asset that pays off as much as the code itself.</li>
+<li>How to structure a commit message with a subject, body, and footer.</li>
+<li>How Conventional Commits (<code>feat</code>, <code>fix</code>, <code>docs</code>, etc.) signal the kind of change at a glance.</li>
+<li>How to polish messages after the fact with <code>git commit --amend</code> and <code>git rebase -i</code>.</li>
+</ul>
+<h2>Why it matters</h2>
+<p><code>git log</code> is a letter to your future self and to your teammates. Six months later, when <code>git blame</code> lands on a single line, a clear commit message restores the context in five seconds. The opposite — <code>fix bug</code>, <code>update</code>, <code>wip</code> — forces a reader to pull up the original PR and re-read the entire diff to figure out what happened.</p>
+<p>Good messages also feed automation. With Conventional Commits, a release script can collect each <code>feat</code> commit into a changelog and bump the major version when a <code>BREAKING CHANGE</code> footer appears. The message itself becomes the first draft of release notes.</p>
+<p>The benefit shows up in code review too. Even when a PR description is thin, well-written commit messages let reviewers walk through the change one commit at a time and follow the author's intent. Think of a commit message as the layer of abstraction that lives one step above the code.</p>
+<h2>Mental model</h2>
+<blockquote>
+<p>A good commit message is a small document that lets you and your teammate, six months later, see in one read what changed and why. The subject, body, and footer each carry one face of that document.<br>
+A solid commit message has a fixed skeleton.</p>
+</blockquote>
+<p><img alt="Mental model" src="https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png"></p>
+<p><em>Mental model</em><br>
+Three habits define the shape. Keep the subject short and in the imperative mood. Add a body — separated by a blank line — when the change needs the "why". Use the footer for issue references and breaking-change notices.</p>
+<h2>Core concepts</h2>
+<p><strong>Subject</strong><br>
+- Description: First line, 50 characters or fewer, no trailing period, written in the imperative mood. <code>Add login button</code> is good; <code>Added login button</code> is not.</p>
+<p><strong>Body</strong><br>
+- Description: After a blank line. Wrap at 72 characters. Cover the "why" and the "how", not the "what".</p>
+<p><strong>Footer</strong><br>
+- Description: Holds metadata such as <code>Refs: #42</code>, <code>Closes #42</code>, or <code>BREAKING CHANGE: ...</code>.</p>
+<p><strong>Type</strong><br>
+- Description: The Conventional Commits classification: <code>feat</code>, <code>fix</code>, <code>docs</code>, <code>refactor</code>, <code>test</code>, <code>chore</code>, <code>perf</code>, <code>build</code>, <code>ci</code>, <code>style</code>.</p>
+<p><strong>Scope</strong><br>
+- Description: An optional area marker in parentheses: <code>feat(auth): support OAuth login</code>.</p>
+<p><strong>Imperative mood</strong><br>
+- Description: The verb that completes the sentence "If applied, this commit will ___". <code>Add</code>, <code>Fix</code>, <code>Refactor</code>.</p>
+<p><strong>Atomic commit</strong><br>
+- Description: A commit that captures a single logical change, which keeps review and revert simple.</p>
+<h2>Before-After</h2>
+<p>Compare two logs that record identical work but with different message quality.</p>
+<p><strong>Before</strong> (messages only the author can decode)</p>
+<pre><code class="language-text">$ git log --oneline -5
+9f8e7d6 fix
+8e7d6c5 update
+7d6c5b4 wip
+6c5b4a3 stuff
+5b4a3f2 final
+</code></pre>
+<p>Six months later this log is opaque. Even when <code>git blame</code> points at a specific line, the message offers nothing.</p>
+<p><strong>After</strong> (Conventional Commits with a short body)</p>
+<pre><code class="language-text">$ git log --oneline -5
+9f8e7d6 fix(auth): handle expired refresh tokens
+8e7d6c5 feat(auth): add OAuth login button
+7d6c5b4 refactor(auth): extract token validation helper
+6c5b4a3 test(auth): cover login redirect cases
+5b4a3f2 docs(auth): document OAuth setup steps
+</code></pre>
+<p>A reader sees in five lines that the auth module was reorganized, OAuth was added, and a token-expiry bug was fixed. Filtering release notes to just <code>feat</code> commits becomes a one-liner thanks to the type prefix.</p>
+<h2>Step-by-step walkthrough</h2>
+<p>Polish messages directly inside the <code>vacation-notes</code> repository from Episode 8. <code>main</code> now points at the merge commit <code>Merge pull request #2 from feature/packing-list-2</code> produced at the end of Episode 8.</p>
+<p><strong>1. Create one commit worth polishing</strong></p>
+<p>Make a tiny change and commit it with a deliberately weak message.</p>
+<pre><code class="language-bash">$ git switch -c chore/readme-typo
+Switched to a new branch 'chore/readme-typo'
+$ printf '\nThanks for reading.\n' &gt;&gt; README.md
+$ git add README.md
+$ git commit -m &quot;fix&quot;
+[chore/readme-typo c4d5e6f] fix
+ 1 file changed, 2 insertions(+)
+</code></pre>
+<p><code>git log -1</code> shows a single word, <code>fix</code>. There is no way to tell what was fixed.</p>
+<p><strong>2. Rewrite the message with <code>git commit --amend</code></strong></p>
+<p>If the commit has not been pushed yet, <code>--amend</code> rewrites the message in place.</p>
+<pre><code class="language-bash">$ git commit --amend -m &quot;docs(readme): add closing thank-you note&quot;
+[chore/readme-typo a8b7c6d] docs(readme): add closing thank-you note
+ Date: Mon May 4 10:21:40 2026 +0900
+ 1 file changed, 2 insertions(+)
+$ git log -1 --pretty=full
+commit a8b7c6d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8
+Author: You &lt;you@example.com&gt;
+Commit: You &lt;you@example.com&gt;
+
+    docs(readme): add closing thank-you note
+</code></pre>
+<p>The hash moved from <code>c4d5e6f</code> to <code>a8b7c6d</code>. <code>--amend</code> is, in effect, a new commit. That is why amending a commit you have already pushed is risky.</p>
+<p><strong>3. Open an editor when you need a body</strong></p>
+<p><code>-m</code> is a fit only for one-line messages. When a body is needed, drop <code>-m</code> and let Git open an editor.</p>
+<pre><code class="language-bash">$ git commit
+</code></pre>
+<p>Inside the editor, write something like this.</p>
+<pre><code class="language-text">feat(packing): add weather-aware section
+
+Summary: extend the packing list section so recommended items shift
+based on the weather forecast for the trip date.
+
+Items used to be static, so users departing during the rainy season
+got the same checklist as everyone else. The external weather API
+call is wrapped in a cache layer to keep response time under 50ms.
+
+Refs: #2
+</code></pre>
+<p>After saving, the first line becomes the subject, the blank line separates the body, and the trailing line is parsed as the footer.</p>
+<p><strong>4. Polish older messages with <code>git rebase -i</code></strong></p>
+<p>To clean up several recent messages at once, reach for an interactive rebase. Use it only on commits that have not been pushed.</p>
+<pre><code class="language-bash">$ git rebase -i HEAD~3
+</code></pre>
+<p>Git opens an editor like this.</p>
+<pre><code class="language-text">pick a8b7c6d docs(readme): add closing thank-you note
+pick b9c8d7e fix
+pick c0d1e2f wip
+
+# Rebase ...
+# Commands:
+# p, pick   = use commit
+# r, reword = use commit, but edit the commit message
+# ...
+</code></pre>
+<p>Change the second and third <code>pick</code> to <code>reword</code> and save. Git then opens a message editor for each of those commits in order. Replace <code>fix</code> and <code>wip</code> with meaningful messages, save, and let the rebase finish. <code>git log --oneline</code> reads cleanly afterwards.</p>
+<p><strong>5. Enforce the format with a <code>commit-msg</code> hook</strong></p>
+<p>The last step is automation. Drop a script into the repository to reject messages that do not follow the format.</p>
+<pre><code class="language-bash">$ cat .git/hooks/commit-msg
+#!/bin/sh
+pattern='^(feat|fix|docs|refactor|test|chore|perf|build|ci|style)(\([a-z0-9-]+\))?: .{1,50}$'
+head -n1 &quot;$1&quot; | grep -Eq &quot;$pattern&quot; || {
+  echo &quot;Subject does not match the Conventional Commits format.&quot; &gt;&amp;2
+  exit 1
+}
+$ chmod +x .git/hooks/commit-msg
+</code></pre>
+<p>Now <code>git commit -m "fix"</code> is rejected before the commit is recorded. For richer rules, move the same check into a tool such as <code>commitlint</code>.</p>
+<h2>A verification pass before you push</h2>
+<p>Knowing the rules is not the same as verifying the message you just wrote. The cheapest habit is to read the latest commit one more time before pushing it.</p>
+<pre><code class="language-bash">$ git log -1 --pretty=fuller
+$ git show --stat --summary --format=fuller HEAD
+</code></pre>
+<p>Those two commands answer four practical questions.</p>
+<ol>
+<li><strong>Does the subject alone explain the intent?</strong></li>
+<li><strong>If there is a body, does it explain the why rather than restating the diff?</strong></li>
+<li><strong>Is issue metadata separated into the footer instead of polluting the subject line?</strong></li>
+<li><strong>Does the scope of the message still match the actual diff?</strong></li>
+</ol>
+<p>This matters because message drift is common. A commit may begin life as a README typo fix, then pick up a second docs change before you commit it. Reading the message and the stat together is how you catch that mismatch.</p>
+<h2>When to choose amend, rebase, or leave history alone</h2>
+<p>Before editing a message, ask one question first: <strong>has anyone else already based work on this commit?</strong></p>
+<ul>
+<li><strong>Not pushed yet</strong>: <code>git commit --amend</code> and <code>git rebase -i</code> are both fair game.</li>
+<li><strong>Pushed to your own feature branch</strong>: rewriting can still be fine, but only with <code>--force-with-lease</code> and only if no one else depends on it.</li>
+<li><strong>Already shared on a common branch</strong>: do not rewrite just to make the message prettier. Prefer a follow-up commit and keep the shared history stable.</li>
+</ul>
+<p>That boundary is more important than the message style itself. A perfect subject line is not worth destabilizing a branch other people are already using.</p>
+<h2>How to read a hook failure</h2>
+<p>Once you enforce a format, the next beginner pain point is "why did my commit get rejected?" Read the hook message literally.</p>
+<pre><code class="language-text">Subject does not match the Conventional Commits format.
+</code></pre>
+<p>In practice, that usually means one of three things.</p>
+<ul>
+<li>The type is outside the allowed list (<code>feat</code>, <code>fix</code>, <code>docs</code>, ...).</li>
+<li>The <code>type(scope): subject</code> punctuation is malformed.</li>
+<li>The first line is too long or ends with a period.</li>
+</ul>
+<p>The point of the hook is not to punish the author. It is to protect the quality of <code>git log</code> and any release automation built on top of it. When the hook stops a commit, the default action should be to fix the message, not work around the guardrail.</p>
+<h2>Common mistakes</h2>
+<ul>
+<li>Mixing two unrelated changes into one commit. Review and revert both become harder. Use <code>git add -p</code> to split the work into hunk-sized commits.</li>
+<li>Ending the subject with a period and going past 50 characters. <code>git log --oneline</code> truncates the line and hides the rest.</li>
+<li>Describing only "what changed". The diff already carries that information; the message should explain "why".</li>
+<li>Amending a commit that was already pushed and pushing again. A force push becomes mandatory and other contributors' history drifts.</li>
+<li>Stuffing email addresses or issue numbers into the subject. That metadata belongs in the footer so the one-line summary stays clean.</li>
+</ul>
+<h2>In practice</h2>
+<p>Teams usually write the message rules into the repository itself. A short list of five commitments in <code>README.md</code> or <code>CONTRIBUTING.md</code> is enough.</p>
+<ol>
+<li>Subject is 50 characters or fewer, imperative, with no trailing period.</li>
+<li>Type is one of the Conventional Commits ten.</li>
+<li>Body wraps at 72 characters and explains the "why".</li>
+<li>Footer carries issue numbers and any breaking change.</li>
+<li>Force push is allowed only on personal feature branches.</li>
+</ol>
+<p>The rules are enforced in two places: a local <code>commit-msg</code> hook and a CI step running <code>commitlint</code>. A message that fails CI blocks the PR from merging. Two automated nets are safer than relying on memory alone.</p>
+<p>PR titles often follow the same format. With squash merges, the PR title becomes the commit message on the default branch, so a well-written PR title turns into a well-written log entry for free.</p>
+<p>The same discipline also improves release notes. If the repository consistently distinguishes <code>feat</code>, <code>fix</code>, and <code>docs</code>, a changelog generator can draft a surprisingly useful release summary with almost no extra author effort.</p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Is the subject 50 characters or fewer, imperative, and free of a trailing period?</li>
+<li>[ ] Does the type belong to the Conventional Commits classification?</li>
+<li>[ ] If a body is present, does it sit after a blank line and wrap at 72 characters?</li>
+<li>[ ] Does the body explain the "why" rather than restating the diff?</li>
+<li>[ ] Does the footer reference an issue or call out a breaking change when relevant?</li>
+<li>[ ] Is a <code>commit-msg</code> hook or a CI lint enforcing the format automatically?</li>
+<li>[ ] Did you re-read the message and refine it with <code>--amend</code> before pushing?</li>
+</ul>
+<h2>Practice questions</h2>
+<ol>
+<li>Run <code>git log --oneline -20</code> on a recent project. Pick three commits that violate the 50-character subject rule and write better replacements on paper.</li>
+<li>Use <code>git commit --amend -m "..."</code> to rewrite the message of your latest commit. Confirm with <code>git log -1</code> that the hash changed.</li>
+<li>On a fresh branch, create three small commits, then run <code>git rebase -i HEAD~3</code> and <code>reword</code> the second one.</li>
+<li>Add the <code>commit-msg</code> hook above to a sample repository. Try committing with an out-of-format message and confirm it is rejected.</li>
+<li>Add a four-to-six-line commit-message policy to the <code>README.md</code> of a personal or team repository.</li>
+</ol>
+<h2>Wrap-up and next post</h2>
+<p>A well-written commit message is the cheapest documentation that explains the intent of a change without rereading the code. With the 50-character imperative subject, the "why" body, the metadata footer, and the Conventional Commits type prefix, <code>git log</code> doubles as a change-history document. Polish unpushed commits freely with <code>--amend</code> and <code>rebase -i</code>, and let a hook plus CI lint enforce the format automatically.</p>
+<p>The next post stitches the tools from this series into one realistic workflow. We will follow a single change from the issue that opens it through PR merge and release, and look at how to recover with the right commands when something goes wrong along the way.</p>
+<h2>Series TOC</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/01-what-is-git.md">What is Git? Version Control Fundamentals</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/02-first-commit.md">Your First Commit: init, add, commit</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/03-status-diff-log.md">Inspecting Changes: status, diff, log</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/04-branch-basics.md">Understanding Branches: Diverging and Switching</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/05-merge-and-conflict.md">Merging Branches and Resolving Conflicts</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/06-github-repository.md">Creating a GitHub Repository: remote, push, pull</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/07-pull-request.md">Collaborating with Pull Requests</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/08-issue-and-project.md">Tracking Work with Issues and Projects</a></li>
+<li><strong>Writing Good Commit Messages (current)</strong></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/git-github-101/en/10-real-world-workflow.md">Building a Real-World Git Workflow</a></li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>Conventional Commits, "Conventional Commits 1.0.0": <a href="https://www.conventionalcommits.org/en/v1.0.0/">https://www.conventionalcommits.org/en/v1.0.0/</a></li>
+<li>Tim Pope, "A Note About Git Commit Messages": <a href="https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html">https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html</a></li>
+<li>Git docs, <code>git commit --amend</code>: <a href="https://git-scm.com/docs/git-commit">https://git-scm.com/docs/git-commit</a></li>
+<li>Git docs, <code>git rebase -i</code>: <a href="https://git-scm.com/docs/git-rebase">https://git-scm.com/docs/git-rebase</a></li>
+<li>Git docs, "githooks - commit-msg": <a href="https://git-scm.com/docs/githooks#_commit_msg">https://git-scm.com/docs/githooks#_commit_msg</a></li>
+<li>Git docs, <code>git show</code>: <a href="https://git-scm.com/docs/git-show">https://git-scm.com/docs/git-show</a></li>
+<li>GitHub Docs, "About merge methods on GitHub": <a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github">https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github</a></li>
+</ul>
+<p class="tags-line">Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame</p>
+</body>
+</html>

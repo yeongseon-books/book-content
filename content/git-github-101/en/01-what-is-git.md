@@ -17,7 +17,7 @@ tags:
 - snapshot-model
 - git-install
 - git-config
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-15'
 seo_description: 'Git''s core model is "a tool that keeps snapshots of your files
   in time order", and each snapshot is produced through three areas: the working…'
 ---
@@ -218,6 +218,19 @@ When you are first learning Git, the most useful exercise is not memorizing comm
 In the next post we start from an empty directory and build the first commit. `git init`, `git status`, `git add`, and `git commit` come in, in that order.
 
 <!-- toc:begin -->
+## Series TOC
+
+- **What is Git? Version control fundamentals (current)**
+- Your first commit - init, status, add, commit (upcoming)
+- Reading change history - status, diff, log (upcoming)
+- Branch basics - create, switch, and compare (upcoming)
+- Merge and Conflict Resolution - Bringing Two Lines Back Together (upcoming)
+- Creating a GitHub repository - remote, push, and pull in one go (upcoming)
+- Collaborating with Pull Requests - From Branch to Review to Main (upcoming)
+- Tracking Work with Issues and Projects - How GitHub Records What's Next (upcoming)
+- Writing Good Commit Messages: Conventional Commits and Useful Bodies (upcoming)
+- Building a real-world Git workflow: from issue to release in one cycle (upcoming)
+
 <!-- toc:end -->
 
 ## References

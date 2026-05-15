@@ -9,45 +9,45 @@ articles:
 - episode: 2
   slug: first-commit
   title:
-    ko: "\uCCAB commit \uB9CC\uB4E4\uAE30: init, add, commit"
-    en: 'Your first commit: init, add, commit'
+    ko: "\uCCAB commit \uB9CC\uB4E4\uAE30 - init, status, add, commit"
+    en: Your first commit - init, status, add, commit
 - episode: 3
   slug: status-diff-log
   title:
-    ko: "\uBCC0\uACBD \uC0AC\uD56D \uD655\uC778\uD558\uAE30: status, diff, log"
-    en: 'Inspecting changes: status, diff, log'
+    ko: "\uBCC0\uACBD \uC0AC\uD56D \uD655\uC778\uD558\uAE30 - status, diff, log\uB85C \uC77D\uAE30"
+    en: Reading change history - status, diff, log
 - episode: 4
   slug: branch-basics
   title:
-    ko: "branch \uC774\uD574\uD558\uAE30: \uBD84\uAE30\uC640 \uC804\uD658"
-    en: 'Understanding branches: diverging and switching'
+    ko: "branch \uAE30\uCD08 - \uB9CC\uB4E4\uACE0 \uC62E\uAE30\uACE0 \uBE44\uAD50\uD558\uAE30"
+    en: Branch basics - create, switch, and compare
 - episode: 5
   slug: merge-and-conflict
   title:
-    ko: "merge\uC640 conflict \uD574\uACB0"
-    en: Merging branches and resolving conflicts
+    ko: "merge\uC640 conflict \uD574\uACB0\uD558\uAE30 - \uB450 \uC904\uAE30\uB97C \uB2E4\uC2DC \uD569\uCE58\uAE30"
+    en: Merge and Conflict Resolution - Bringing Two Lines Back Together
 - episode: 6
   slug: github-repository
   title:
-    ko: "GitHub repository \uB9CC\uB4E4\uAE30\uC640 remote, push, pull"
-    en: 'Creating a GitHub repository: remote, push, pull'
+    ko: "GitHub repository \uB9CC\uB4E4\uAE30 - remote, push, pull \uD55C \uBC88\uC5D0 \uC775\uD788\uAE30"
+    en: Creating a GitHub repository - remote, push, and pull in one go
 - episode: 7
   slug: pull-request
   title:
-    ko: "Pull Request\uB85C \uD611\uC5C5\uD558\uAE30"
-    en: Collaborating with Pull Requests
+    ko: "Pull Request\uB85C \uD611\uC5C5\uD558\uAE30 - branch\uC5D0\uC11C review\uB97C \uAC70\uCCD0 main\uAE4C\uC9C0"
+    en: Collaborating with Pull Requests - From Branch to Review to Main
 - episode: 8
   slug: issue-and-project
   title:
-    ko: "issue\uC640 project\uB85C \uC791\uC5C5 \uAD00\uB9AC\uD558\uAE30"
-    en: Tracking work with issues and projects
+    ko: "Issue\uC640 Project\uB85C \uC77C\uAC10 \uAD00\uB9AC\uD558\uAE30 - GitHub\uC5D0\uC11C \uD560 \uC77C\uC744 \uCD94\uC801\uD558\uB294 \uBC95"
+    en: Tracking Work with Issues and Projects - How GitHub Records What's Next
 - episode: 9
   slug: good-commit-message
   title:
-    ko: "\uC88B\uC740 commit message \uC4F0\uAE30"
-    en: Writing good commit messages
+    ko: '\uC88B\uC740 commit message \uC4F0\uAE30: Conventional Commits\uC640 \uC88B\uC740 \uBCF8\uBB38'
+    en: 'Writing Good Commit Messages: Conventional Commits and Useful Bodies'
 - episode: 10
   slug: real-world-workflow
   title:
-    ko: "\uC2E4\uC804 Git workflow \uB9CC\uB4E4\uAE30"
-    en: Building a real-world Git workflow
+    ko: '\uC2E4\uC804 Git workflow \uB9CC\uB4E4\uAE30: issue\uBD80\uD130 release\uAE4C\uC9C0 \uD55C \uD750\uB984\uC73C\uB85C'
+    en: 'Building a real-world Git workflow: from issue to release in one cycle'

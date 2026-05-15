@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: git-github-101
 status: publish-ready
 tags:
@@ -293,8 +293,10 @@ branch는 commit을 가리키는 가벼운 포인터이고, `HEAD`는 현재 작
 
 ## 참고 자료
 
-- Git official documentation: <https://git-scm.com/doc>
-- Pro Git Book - "Branches in a Nutshell": <https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell>
-- `git help branch`, `git help switch`, `git help checkout`
+- [Git Reference Manual](https://git-scm.com/doc)
+- [Pro Git Book - Branches in a Nutshell](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
+- [git-branch manual](https://git-scm.com/docs/git-branch)
+- [git-switch manual](https://git-scm.com/docs/git-switch)
+- [git-checkout manual](https://git-scm.com/docs/git-checkout)
 
 Tags: git-branch, git-switch, git-checkout, HEAD, parallel-development, feature-branch
