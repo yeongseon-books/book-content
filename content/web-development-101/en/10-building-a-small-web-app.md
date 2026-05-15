@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 10
 title: Building a Small Web App
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - FullStack
   - Project
 seo_description: Tying it all together — Flask, HTML, SQLite, and deployment in one small Todo app that uses every concept from the series for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Building a Small Web App
 
-This is the final post in the Web Development 101 series.
+Concepts feel separate until you force them to cooperate inside one real project. A tiny app is where routing, templates, APIs, persistence, configuration, health checks, and deployment suddenly become one continuous engineering story instead of ten isolated lessons.
 
-> Web Development 101 series (10/10)
+This is the final post in the Web Development 101 series. Here we turn the series into a working Todo app so the core layers of web development can be practiced end to end in one small but complete system.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do the nine pieces from this series fit *into one app*?
-
-> The smallest possible *Todo app* — HTML + Flask + SQLite + deployment in one continuous flow.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - See every concept from the series live *in one app*
 - A folder layout for a small full-stack project
@@ -51,17 +43,21 @@ Knowledge sets only when you *make something small*. One small full-stack app te
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] --> HTML["HTML form"]
-    HTML --> API["Flask /api/todos"]
-    API --> DB[("SQLite")]
-    DB --> API
-    API --> HTML
-    HTML --> Render["Browser render"]
-```
+![Concept at a Glance](../../../assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
 
-Every stage from the series fits *in one picture*.
+*The end-to-end shape of the Todo app built in this capstone chapter.*
+
+This final figure is the whole series compressed into one vertical slice. The browser submits input, Flask accepts and stores it, SQLite persists it, and the same data comes back through JSON for rendering.
+
+### What to verify yourself
+
+- Add a Todo through `curl` and confirm that the browser-rendered list updates from the same data source.
+- Run the app inside a container and confirm that `/health` still answers correctly.
+- Change `DB_PATH` and verify that the app switches storage locations without changing application code.
+
+**Expected output:** The HTML view and API share one source of truth, environment variables redirect storage cleanly, and container execution reproduces local behavior.
+
+**Failure mode to watch for:** If error cases still return 200, the frontend cannot tell success from failure. Hardcoded storage paths make local and deployed environments drift apart quickly.
 
 ## Key Terms
 
@@ -249,9 +245,13 @@ That is *Web Development 101*. Next steps are depth — Frontend Development 101
 
 ## References
 
-- [Flask quickstart](https://flask.palletsprojects.com/quickstart/)
-- [SQLite (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [Docker get started](https://docs.docker.com/get-started/)
+### Official Docs
+- [Flask quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+
+### Practical Checks
 - [The Twelve-Factor App](https://12factor.net/)
+- [Using the Fetch API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 
 Tags: Computer Science, WebDevelopment, Capstone, Flask, FullStack, Project

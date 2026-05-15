@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 9
 title: 성능과 캐싱
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - CDN
   - Optimization
 seo_description: 측정, HTTP 캐시, CDN, 지연 로딩, DB 인덱스로 성능을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 성능과 캐싱
@@ -47,15 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    User["User"] --> CDN["CDN cache"]
-    CDN --> Server["App server"]
-    Server --> AppCache["App cache (Redis)"]
-    AppCache --> DB[("Database")]
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
 
-가장 가까운 캐시에서 답이 나오면 가장 빠릅니다. 브라우저, CDN, 애플리케이션 캐시, 데이터베이스 순으로 멀어질수록 비용이 커집니다.
+*사용자와 가장 가까운 캐시부터 데이터베이스까지 성능 계층을 한눈에 묶은 그림입니다.*
+
+같은 데이터를 더 가까운 계층에서 더 적게 계산할수록 응답은 빨라집니다. 그래서 브라우저 캐시, CDN, 애플리케이션 캐시, 데이터베이스 최적화는 경쟁 관계가 아니라 서로 다른 층의 협업입니다.
+
+### 직접 검증해 볼 포인트
+
+- Lighthouse나 Performance 탭으로 첫 측정치를 먼저 남깁니다.
+- 정적 파일에 `Cache-Control`을 붙인 뒤 두 번째 요청에서 전송 크기와 응답 시간이 줄어드는지 봅니다.
+- 인덱스 추가 전후 또는 join 적용 전후 쿼리 시간을 비교합니다.
+
+**기대 결과:** 캐시가 적용된 정적 파일은 재요청 비용이 크게 줄고, 인덱스나 join 개선 뒤 데이터베이스 응답 시간이 눈에 띄게 낮아집니다.
+
+**실패 모드:** 동적 사용자 응답을 잘못 캐시하면 데이터가 섞일 수 있습니다. 측정 없이 최적화하면 가장 느린 구간이 아닌 곳에 시간을 쓰기 쉽습니다.
 
 ## 먼저 알아둘 용어
 
@@ -214,9 +220,13 @@ posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_
 
 ## 참고 자료
 
+### 공식 문서
 - [HTTP caching (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)
 - [Lazy loading (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading)
-- [Lighthouse overview](https://developer.chrome.com/docs/lighthouse/overview/)
-- [Database indexes (Use The Index, Luke!)](https://use-the-index-luke.com/)
+- [Lighthouse overview (Chrome)](https://developer.chrome.com/docs/lighthouse/overview)
+
+### 검증용 자료
+- [Web performance metrics (web.dev)](https://web.dev/explore/metrics)
+- [Use The Index, Luke!](https://use-the-index-luke.com/)
 
 Tags: Computer Science, WebDevelopment, Performance, Caching, CDN, Optimization

@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 5
 title: Frontend and Backend
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - Architecture
   - FullStack
 seo_description: Where the frontend ends and the backend begins — SPA, SSR, and the API contract that joins them, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Frontend and Backend
 
-This is post 5 in the Web Development 101 series.
+New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.
 
-> Web Development 101 series (5/10)
+This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: *Where* does the frontend's job end and the backend's begin?
-
-> Whoever owns the *source of truth* is the backend; whoever *shows* it to the user is the frontend.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - How responsibility splits between frontend and backend
 - SPA (Single Page App) vs SSR (Server-Side Rendering)
@@ -51,17 +43,21 @@ Even when one person writes both sides, blurring the *boundary of responsibility
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] --> FE["Frontend (browser)"]
-    FE -->|"API call"| BE["Backend (server)"]
-    BE --> DB["Database"]
-    DB --> BE
-    BE --> FE
-    FE --> User
-```
+![Concept at a Glance](../../../assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
 
-Data flows *DB → BE → FE → User*.
+*A boundary map for user experience, server logic, and persistent data.*
+
+This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.
+
+### What to verify yourself
+
+- Build a tiny `/api/items` endpoint and render its response in the browser.
+- Compare the same feature as a fetch-driven SPA and as server-rendered HTML.
+- Trigger a CORS error on purpose and read exactly which origin restriction the browser reports.
+
+**Expected output:** When the backend response shape changes, the frontend must adjust with it, and the browser blocks cross-origin requests until the server explicitly allows them.
+
+**Failure mode to watch for:** Authorization logic on the frontend can be bypassed. Changing both sides without a contract quickly leads to mismatched field names and broken assumptions.
 
 ## Key Terms
 
@@ -214,9 +210,13 @@ Boundaries are *promises about responsibility*. Next, we layer *authentication a
 
 ## References
 
-- [Client-side vs server-side (MDN)](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Client-Server_overview)
-- [SPA (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SPA)
+### Official Docs
+- [Client-side and server-side website programming (MDN)](https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Client-Server_overview)
+- [Single-page application (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SPA)
 - [Server-side rendering (MDN)](https://developer.mozilla.org/en-US/docs/Glossary/SSR)
-- [CORS (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+
+### Verification Resources
+- [CORS guide (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS)
+- [Using the Fetch API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 
 Tags: Computer Science, WebDevelopment, Frontend, Backend, Architecture, FullStack

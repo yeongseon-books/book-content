@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 6
 title: Authentication and Sessions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - Security
   - Backend
 seo_description: Cookies, sessions, JWT, and OAuth — the four ways servers remember a user on top of stateless HTTP, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Authentication and Sessions
 
-This is post 6 in the Web Development 101 series.
+HTTP does not remember who you are between requests, but real products absolutely need memory: who signed in, what permissions they have, and whether this request should be trusted. That gap is where many early security mistakes happen.
 
-> Web Development 101 series (6/10)
+This is post 6 in the Web Development 101 series. Here we connect cookies, sessions, JWTs, and OAuth into one practical model so login stops looking like a black box and starts looking like a set of explicit trade-offs.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: HTTP is *stateless* — so how does a server *remember* who you are?
-
-> Cookies, sessions, JWTs, and OAuth — four tools that lay *memory* on top of *no memory*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between authentication and authorization
 - How cookies and sessions actually work
@@ -51,15 +43,21 @@ Almost every app has login. A weak design lets *account takeover* happen in one 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] -->|"id/pw"| Server["Server"]
-    Server -->|"session id (cookie)"| Browser["Browser"]
-    Browser -->|"cookie"| Server
-    Server -->|"data"| Browser
-```
+![Concept at a Glance](../../../assets/web-development-101/06/06-01-concept-at-a-glance.en.png)
 
-The server issues a *session id*; the browser sends it on every request.
+*The default login flow where a session id survives across requests through a cookie.*
+
+The key idea in this picture is that the password should not travel on every request. One successful login creates an identifier, and the browser replays that identifier so the server can recover user context safely.
+
+### What to verify yourself
+
+- Log in once and inspect the cookie stored in DevTools.
+- Use `curl -c` and `curl -b` to prove that cookie storage and cookie replay are separate steps.
+- After logout, call a protected endpoint again and verify that it now returns 401.
+
+**Expected output:** A session cookie appears after login, protected endpoints work while the session is active, and the same cookie stops working after logout.
+
+**Failure mode to watch for:** Missing `HttpOnly`, `Secure`, or `SameSite` flags increases replay and theft risk. Secrets placed inside JWT payloads remain visible even when the token is signed.
 
 ## Key Terms
 
@@ -206,9 +204,13 @@ Auth is *foundation*. Next, we look at the database connection that makes user d
 
 ## References
 
-- [HTTP cookies (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
-- [Flask sessions](https://flask.palletsprojects.com/en/latest/quickstart/#sessions)
+### Official Docs
+- [Using HTTP cookies (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies)
+- [Flask sessions](https://flask.palletsprojects.com/en/stable/quickstart/#sessions)
+- [OAuth 2.0 Authorization Framework (RFC 6749)](https://www.rfc-editor.org/rfc/rfc6749)
+
+### Security Guides
 - [JWT introduction](https://jwt.io/introduction)
-- [OAuth 2.0 simplified](https://www.oauth.com/)
+- [Session Management Cheat Sheet (OWASP)](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 
 Tags: Computer Science, WebDevelopment, Authentication, Sessions, Security, Backend

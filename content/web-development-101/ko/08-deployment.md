@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 8
 title: 배포
-status: content-ready
+status: publish-ready
 targets:
   tistory: true
   medium: false
@@ -18,7 +18,7 @@ tags:
   - CICD
   - Hosting
 seo_description: 환경 분리, 빌드 산출물, PaaS, CI/CD로 배포 기본을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 배포
@@ -47,15 +47,21 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념 지도
 
-```mermaid
-flowchart LR
-    Code["Source code"] --> CI["CI build"]
-    CI --> Artifact["Build artifact"]
-    Artifact --> Staging["Staging"]
-    Staging --> Prod["Production"]
-```
+![한눈에 보는 개념 지도](../../../assets/web-development-101/08/08-01-concept-at-a-glance.ko.png)
 
-중요한 원칙은 하나입니다. 코드는 빌드되어 산출물이 되고, 같은 산출물이 환경을 옮겨 다녀야 합니다.
+*코드가 빌드 산출물이 되어 스테이징과 운영으로 승격되는 배포 흐름입니다.*
+
+배포 그림에서 가장 중요한 원칙은 같은 산출물을 여러 환경으로 승격시키는 것입니다. 환경마다 코드를 다시 빌드하면 같은 커밋이 다른 결과를 낼 수 있어 사고 원인 추적이 어려워집니다.
+
+### 직접 검증해 볼 포인트
+
+- 환경 변수 없이 실행했을 때 앱이 어떤 설정 값을 요구하는지 확인합니다.
+- `docker build` 뒤 같은 이미지로 로컬과 스테이징 설정만 바꿔 실행합니다.
+- `/health` 엔드포인트가 200을 돌려주는지 배포 직후 `curl`로 확인합니다.
+
+**기대 결과:** 설정은 환경 변수에서만 달라지고, 동일한 이미지가 여러 환경에서 재사용되며, 헬스 체크는 배포 성공 여부를 빠르게 알려 줍니다.
+
+**실패 모드:** 환경마다 다른 빌드를 만들면 재현성이 깨집니다. 롤백 경로가 없으면 작은 배포 실패가 긴 장애로 바뀝니다.
 
 ## 먼저 알아둘 용어
 
@@ -204,9 +210,13 @@ def health(): return {"status": "ok"}, 200
 
 ## 참고 자료
 
+### 공식 문서
 - [The Twelve-Factor App](https://12factor.net/)
-- [Docker get started](https://docs.docker.com/get-started/)
-- [GitHub Actions quickstart](https://docs.github.com/en/actions/quickstart)
-- [Heroku dev center (deployment)](https://devcenter.heroku.com/categories/deployment)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+- [GitHub Actions Quickstart](https://docs.github.com/en/actions/writing-workflows/quickstart)
+
+### 실전 체크 포인트
+- [Deploying Flask with Gunicorn](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/)
+- [Health checks for containers (Docker docs)](https://docs.docker.com/reference/dockerfile/#healthcheck)
 
 Tags: Computer Science, WebDevelopment, Deployment, DevOps, CICD, Hosting

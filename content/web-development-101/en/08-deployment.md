@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 8
 title: Deployment
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - CICD
   - Hosting
 seo_description: Build artifacts, environment variables, PaaS vs IaaS, and basic CI/CD — how a small web app reaches the world, explained for new developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Deployment
 
-This is post 8 in the Web Development 101 series.
+“Works on my laptop” usually means the application is still missing part of its operating model. Once code leaves a personal machine, configuration, secrets, repeatable builds, health checks, and rollback paths all become part of the feature.
 
-> Web Development 101 series (8/10)
+This is post 8 in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you take an app that only runs on your laptop and *show it to the world*?
-
-> Separate environments (config), build (immutable artifact), host (where it runs), automate (CI/CD) — four steps in concert.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Splitting dev / staging / production environments
 - Managing environment variables and secrets
@@ -51,15 +43,21 @@ Manual deploys cause weekly accidents. Automated deploys change *team velocity* 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Source code"] --> CI["CI build"]
-    CI --> Artifact["Build artifact"]
-    Artifact --> Staging["Staging"]
-    Staging --> Prod["Production"]
-```
+![Concept at a Glance](../../../assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
 
-Code → artifact → environment. The same artifact goes everywhere.
+*A release flow where source code becomes one artifact that moves across environments.*
+
+The point of this picture is repeatability. If the artifact changes per environment, you are no longer promoting the same release through a pipeline—you are rebuilding the product under different conditions and hoping the results match.
+
+### What to verify yourself
+
+- Start the app without the expected environment variables and confirm which values are truly required.
+- Build one Docker image and run it with different environment values instead of rebuilding for each stage.
+- After deployment, call `/health` directly and confirm that the platform sees a 200 response.
+
+**Expected output:** Configuration changes through environment variables only, the same image can run in multiple stages, and the health endpoint gives a fast Pass/Fail signal.
+
+**Failure mode to watch for:** Different builds per environment destroy reproducibility. No rollback path turns a small deploy failure into a long outage.
 
 ## Key Terms
 
@@ -208,9 +206,13 @@ Deployment is *a habit*. Next, when the deployed app is *slow*, what do we look 
 
 ## References
 
+### Official Docs
 - [The Twelve-Factor App](https://12factor.net/)
-- [Docker get started](https://docs.docker.com/get-started/)
-- [GitHub Actions quickstart](https://docs.github.com/en/actions/quickstart)
-- [Heroku dev center (deployment)](https://devcenter.heroku.com/categories/deployment)
+- [Docker Get Started](https://docs.docker.com/get-started/)
+- [GitHub Actions Quickstart](https://docs.github.com/en/actions/writing-workflows/quickstart)
+
+### Practical Checks
+- [Deploying Flask with Gunicorn](https://flask.palletsprojects.com/en/stable/deploying/gunicorn/)
+- [HEALTHCHECK in Dockerfiles](https://docs.docker.com/reference/dockerfile/#healthcheck)
 
 Tags: Computer Science, WebDevelopment, Deployment, DevOps, CICD, Hosting

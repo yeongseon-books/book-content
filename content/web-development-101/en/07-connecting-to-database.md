@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 7
 title: Connecting to a Database
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - ORM
   - Backend
 seo_description: SQL basics, ORMs, and connection pools — how a web app talks to a database without falling over under load, explained for new web developers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Connecting to a Database
 
-This is post 7 in the Web Development 101 series.
+A web app can feel complete while everything still lives in process memory, right up until the first restart, the first concurrent write, or the first report that data disappeared. Durable storage changes how you design correctness, concurrency, and performance.
 
-> Web Development 101 series (7/10)
+This is post 7 in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How does a web server hold onto data *forever*?
-
-> One line of SQL plus a *connection* — and a *pool* that reuses those connections.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Why we need a database in the first place
 - The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)
@@ -51,15 +43,21 @@ Almost all *state* in a web app lives in the database. Mishandle the connection 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["Web app"] -->|"SQL"| Pool["Connection pool"]
-    Pool --> DB[("Database")]
-    DB --> Pool
-    Pool --> App
-```
+![Concept at a Glance](../../../assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
 
-Connections are *expensive*, so a pool reuses them.
+*A high-level view of an app talking to a database through a reusable connection pool.*
+
+The app does not just “use SQL.” It opens or borrows a connection, issues work, and often needs to bundle multiple statements into one transaction. That lifecycle matters as much as the query text itself.
+
+### What to verify yourself
+
+- Create a SQLite table and confirm that inserted rows persist across process restarts.
+- Pass attacker-like input through a parameterized query and verify that the SQL shape does not change.
+- Force an exception inside a transaction and confirm that rollback leaves the database in its previous state.
+
+**Expected output:** Parameter binding treats malicious strings as values, and rollback prevents half-finished writes from surviving an error.
+
+**Failure mode to watch for:** String-built SQL introduces injection risk. Opening a brand-new connection for every request makes connection overhead the first scaling bottleneck.
 
 ## Key Terms
 
@@ -225,9 +223,13 @@ The DB is *the keeper of truth*. Next, we ship our app to the world — deployme
 
 ## References
 
-- [SQL (MDN glossary)](https://developer.mozilla.org/en-US/docs/Glossary/SQL)
-- [sqlite3 (Python docs)](https://docs.python.org/3/library/sqlite3.html)
-- [SQLAlchemy ORM tutorial](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
-- [Database connection pool (Wikipedia)](https://en.wikipedia.org/wiki/Connection_pool)
+### Official Docs
+- [sqlite3 — DB-API 2.0 interface for SQLite databases](https://docs.python.org/3/library/sqlite3.html)
+- [SQLAlchemy ORM Quick Start](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
+- [Database transaction (Wikipedia)](https://en.wikipedia.org/wiki/Database_transaction)
+
+### Verification Resources
+- [SQL injection (OWASP)](https://owasp.org/www-community/attacks/SQL_Injection)
+- [EXPLAIN QUERY PLAN (SQLite)](https://www.sqlite.org/eqp.html)
 
 Tags: Computer Science, WebDevelopment, Database, SQL, ORM, Backend

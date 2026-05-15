@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 9
 title: Performance and Caching
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - CDN
   - Optimization
 seo_description: HTTP cache, CDNs, lazy loading, and DB indexes — four tools to make a slow web app fast, explained for new web developers with examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Performance and Caching
 
-This is post 9 in the Web Development 101 series.
+When a page feels slow, the biggest risk is fixing the wrong layer first. The bottleneck might be the browser, the network, a missing cache, or an expensive database query. Without a measurement-first model, “optimization” easily becomes random code movement.
 
-> Web Development 101 series (9/10)
+This is post 9 in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a page is slow, *where* should you start fixing it?
-
-> Measure, cache, reduce, defer. Make the same work happen *less often* and *closer* to the user.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Basic performance measurement (browser and server)
 - HTTP cache headers (Cache-Control, ETag)
@@ -51,15 +43,21 @@ A fast site is *money* — conversion, search rank, and user satisfaction all sc
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] --> CDN["CDN cache"]
-    CDN --> Server["App server"]
-    Server --> AppCache["App cache (Redis)"]
-    AppCache --> DB[("Database")]
-```
+![Concept at a Glance](../../../assets/web-development-101/09/09-01-concept-at-a-glance.en.png)
 
-The closest cache that has the answer is the *fastest*.
+*A layered cache picture from the user edge down to the database.*
+
+Performance work gets easier once you see each cache as a separate distance-reduction tool. The browser, CDN, application cache, and database are not interchangeable; they remove different kinds of repeated work.
+
+### What to verify yourself
+
+- Capture a baseline with Lighthouse or the Performance tab before changing anything.
+- Add `Cache-Control` headers to static assets and compare request cost on the second load.
+- Compare query time before and after an index or a join-based fix for an N+1 pattern.
+
+**Expected output:** Cached static assets become cheaper to reload, and database improvements produce measurable latency reductions rather than vague “it feels faster” impressions.
+
+**Failure mode to watch for:** Caching dynamic per-user responses at the wrong layer can leak data. Optimizing before measuring often targets the wrong bottleneck entirely.
 
 ## Key Terms
 
@@ -208,9 +206,13 @@ Performance starts with *measurement*. In the final post we tie everything toget
 
 ## References
 
+### Official Docs
 - [HTTP caching (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)
 - [Lazy loading (MDN)](https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading)
-- [Lighthouse overview](https://developer.chrome.com/docs/lighthouse/overview/)
-- [Database indexes (Use The Index, Luke!)](https://use-the-index-luke.com/)
+- [Lighthouse overview (Chrome)](https://developer.chrome.com/docs/lighthouse/overview)
+
+### Verification Resources
+- [Web performance metrics (web.dev)](https://web.dev/explore/metrics)
+- [Use The Index, Luke!](https://use-the-index-luke.com/)
 
 Tags: Computer Science, WebDevelopment, Performance, Caching, CDN, Optimization

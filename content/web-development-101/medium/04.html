@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>HTTP and APIs</h1>
-<p>This is post 4 in the Web Development 101 series.</p>
-<blockquote>
-<p>Web Development 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What do clients and servers actually <em>send</em> each other?</p>
-<blockquote>
-<p>A request (method, URL, headers, body) and a response (status, headers, body). That is <em>all</em> of HTTP.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.</p>
+<p>This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The shape of HTTP requests and responses</li>
 <li>Methods (GET/POST/PUT/DELETE) and status codes</li>
@@ -80,11 +70,17 @@
 <p>HTTP is <em>a protocol made of plain text</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;Client&quot;] --&gt;|&quot;GET /users/1&quot;| Server[&quot;Server&quot;]
-    Server --&gt;|&quot;200 OK + JSON&quot;| Client
-</code></pre>
-<p>One line of request, one line of response.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>The smallest useful picture of an HTTP request and response contract.</em></p>
+<p>Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.</p>
+<p><strong>What to verify yourself</strong></p>
+<ul>
+<li>Run <code>curl -v https://httpbin.org/get</code> and inspect the raw request and response lines.</li>
+<li>Send both GET and POST requests to the same service and compare how the method changes behavior.</li>
+<li>Confirm that a JSON API returns <code>Content-Type: application/json</code> before parsing the body.</li>
+</ul>
+<p><strong>Expected output:</strong> The method changes server intent, and JSON endpoints advertise that intent through both status codes and headers.</p>
+<p><strong>Failure mode to watch for:</strong> If every failure still returns 200, clients lose a reliable error boundary. If <code>Content-Type</code> is ignored, HTML and JSON can be parsed the wrong way.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Method</strong>: what to do (GET reads, POST creates, etc.).</li>
@@ -196,12 +192,13 @@ for url in [&quot;https://httpbin.org/status/200&quot;, &quot;https://httpbin.or
 <li>Building a Small Web App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview">HTTP overview (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">HTTP methods (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">HTTP status codes (MDN)</a></li>
-<li><a href="https://httpbin.org/">httpbin (request/response service)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview">HTTP overview (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">HTTP request methods (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">HTTP response status codes (MDN)</a></p>
+<p><strong>Verification Resources</strong><br>
+- <a href="https://httpbin.org/">httpbin</a><br>
+- <a href="https://www.rfc-editor.org/rfc/rfc9110">HTTP Semantics (RFC 9110)</a></p>
 <p class="tags-line">Tags: Computer Science, WebDevelopment, HTTP, API, REST, Networking</p>
 </body>
 </html>

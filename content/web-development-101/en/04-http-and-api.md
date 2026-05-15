@@ -2,7 +2,7 @@
 series: web-development-101
 episode: 4
 title: HTTP and APIs
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,16 @@ tags:
   - REST
   - Networking
 seo_description: The shape of HTTP requests and responses — methods, status codes, headers, and JSON APIs explained for new web developers with runnable examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # HTTP and APIs
 
-This is post 4 in the Web Development 101 series.
+Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.
 
-> Web Development 101 series (4/10)
+This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What do clients and servers actually *send* each other?
-
-> A request (method, URL, headers, body) and a response (status, headers, body). That is *all* of HTTP.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The shape of HTTP requests and responses
 - Methods (GET/POST/PUT/DELETE) and status codes
@@ -51,13 +43,21 @@ Half of web work is *building and reading HTTP messages*. If you cannot picture 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET /users/1"| Server["Server"]
-    Server -->|"200 OK + JSON"| Client
-```
+![Concept at a Glance](../../../assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
 
-One line of request, one line of response.
+*The smallest useful picture of an HTTP request and response contract.*
+
+Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.
+
+### What to verify yourself
+
+- Run `curl -v https://httpbin.org/get` and inspect the raw request and response lines.
+- Send both GET and POST requests to the same service and compare how the method changes behavior.
+- Confirm that a JSON API returns `Content-Type: application/json` before parsing the body.
+
+**Expected output:** The method changes server intent, and JSON endpoints advertise that intent through both status codes and headers.
+
+**Failure mode to watch for:** If every failure still returns 200, clients lose a reliable error boundary. If `Content-Type` is ignored, HTML and JSON can be parsed the wrong way.
 
 ## Key Terms
 
@@ -200,9 +200,13 @@ HTTP is *a contract made of plain text*. Next, we look at the two sides of that 
 
 ## References
 
-- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
-- [HTTP methods (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
-- [HTTP status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
-- [httpbin (request/response service)](https://httpbin.org/)
+### Official Docs
+- [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview)
+- [HTTP request methods (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods)
+- [HTTP response status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status)
+
+### Verification Resources
+- [httpbin](https://httpbin.org/)
+- [HTTP Semantics (RFC 9110)](https://www.rfc-editor.org/rfc/rfc9110)
 
 Tags: Computer Science, WebDevelopment, HTTP, API, REST, Networking

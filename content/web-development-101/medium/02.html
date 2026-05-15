@@ -54,19 +54,9 @@
 </head>
 <body>
 <h1>HTML, CSS, and JavaScript</h1>
-<p>This is post 2 in the Web Development 101 series.</p>
-<blockquote>
-<p>Web Development 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is one web page split into <em>three</em> different languages?</p>
-<blockquote>
-<p>Because separating structure, style, and behavior lets each one change without breaking the others.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>At first glance, splitting one page across three languages can feel like unnecessary ceremony. In practice, though, every production frontend becomes easier to debug once you can answer three separate questions: what is the structure, what controls the visual result, and what changes behavior after the page loads.</p>
+<p>This is post 2 in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The <em>structure</em> HTML draws</li>
 <li>The <em>style</em> CSS applies</li>
@@ -80,12 +70,17 @@
 <p>Good web code keeps roles separate.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HTML[&quot;HTML (structure)&quot;] --&gt; Page[&quot;Web page&quot;]
-    CSS[&quot;CSS (style)&quot;] --&gt; Page
-    JS[&quot;JavaScript (behavior)&quot;] --&gt; Page
-</code></pre>
-<p>Three pillars build one page.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>A responsibility map for structure, style, and behavior on one page.</em></p>
+<p>The point of this figure is not that three files are trendy. It is that one visible page is easier to change when structure, visual rules, and runtime behavior can move independently.</p>
+<p><strong>What to verify yourself</strong></p>
+<ul>
+<li>Open an HTML file without CSS or JS and confirm that the structure still exists.</li>
+<li>Attach the stylesheet and verify that only presentation changes.</li>
+<li>Attach the JavaScript file and confirm that behavior changes without rewriting the markup.</li>
+</ul>
+<p><strong>Expected output:</strong> HTML defines the page skeleton, CSS changes appearance, and JavaScript changes behavior without needing the other layers to absorb every edit.</p>
+<p><strong>Failure mode to watch for:</strong> If style and behavior are embedded directly into the markup, even a small change becomes harder to review, cache, and debug.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>HTML</strong>: meaningful <em>structure</em> (headings, paragraphs, links, forms).</li>
@@ -195,12 +190,13 @@ document.getElementById(&quot;say&quot;).addEventListener(&quot;click&quot;, () 
 <li>Building a Small Web App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics">HTML basics (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/CSS_basics">CSS basics (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics">JavaScript basics (MDN)</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Semantics">Semantic HTML (MDN)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Creating_the_content">HTML basics (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Styling_the_content">CSS basics (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Adding_interactivity">JavaScript basics (MDN)</a></p>
+<p><strong>Deepen the Model</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/Semantics">Semantic HTML (MDN)</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script">The <code>script</code> element: <code>defer</code> and <code>async</code> (MDN)</a></p>
 <p class="tags-line">Tags: Computer Science, WebDevelopment, HTML, CSS, JavaScript, Frontend</p>
 </body>
 </html>
