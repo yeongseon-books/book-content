@@ -145,7 +145,7 @@ print(f&quot;index vector count: {vectorstore.index.ntotal}&quot;)
 <p><em>Similarity mmr threshold search paths</em><br>
 <code>as_retriever()</code> wraps the VectorStore in the Retriever interface.</p>
 <pre><code class="language-python">retriever = vectorstore.as_retriever(
-    search_type=&quot;similarity&quot;,  # default: cosine similarity
+    search_type=&quot;similarity&quot;,  # default top-k search; FAISS defaults to L2 distance
     search_kwargs={&quot;k&quot;: 3},    # number of results to return
 )
 
@@ -156,10 +156,11 @@ for i, doc in enumerate(docs):
 </code></pre>
 <p>Three <code>search_type</code> options are available:</p>
 <ul>
-<li><code>"similarity"</code>: cosine similarity, returns top k results</li>
+<li><code>"similarity"</code>: plain top-k retrieval; in the default FAISS path this uses L2 distance unless you configure a different metric</li>
 <li><code>"mmr"</code>: maximal marginal relevance — balances relevance and diversity</li>
 <li><code>"similarity_score_threshold"</code>: returns only documents above a similarity threshold</li>
 </ul>
+<p><code>encode_kwargs={"normalize_embeddings": True}</code> makes the embedding vectors unit length, so L2 ranking and cosine-style ranking often become close in practice. But that normalization does <strong>not</strong> change the FAISS default itself: unless you configure a different distance strategy, the backend still searches with <code>IndexFlatL2</code>.</p>
 <pre><code class="language-python"># MMR — prioritize diversity
 retriever_mmr = vectorstore.as_retriever(
     search_type=&quot;mmr&quot;,

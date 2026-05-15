@@ -146,7 +146,7 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ```python
 retriever = vectorstore.as_retriever(
-    search_type="similarity",  # default: cosine similarity
+    search_type="similarity",  # default top-k search; FAISS 기본값은 L2 거리
     search_kwargs={"k": 3},    # number of results to return
 )
 
@@ -158,9 +158,11 @@ for i, doc in enumerate(docs):
 
 여기서 조정할 수 있는 대표 `search_type`은 세 가지입니다.
 
-- `"similarity"`: 코사인 유사도 기반 top-k 검색
+- `"similarity"`: 기본 top-k 검색이며, FAISS 기본 경로에서는 별도 설정이 없으면 L2 거리를 사용합니다
 - `"mmr"`: 관련성과 다양성을 함께 고려하는 maximal marginal relevance
 - `"similarity_score_threshold"`: 임계치 이상인 문서만 반환
+
+위 예제처럼 `encode_kwargs={"normalize_embeddings": True}`를 주면 벡터 길이가 1로 맞춰져 L2 순위와 cosine 계열 순위가 실무에서 비슷해지는 경우가 많습니다. 하지만 이 정규화가 FAISS의 기본 metric 자체를 바꾸는 것은 아닙니다. 별도 distance strategy를 설정하지 않으면 backend는 계속 `IndexFlatL2`로 검색합니다.
 
 ```python
 # MMR — 다양성을 우선합니다
