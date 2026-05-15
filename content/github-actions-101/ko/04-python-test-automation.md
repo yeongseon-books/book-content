@@ -76,7 +76,7 @@ flowchart LR
 ### 1단계 — Python과 캐시 설정하기
 
 ```yaml
-- uses: actions/setup-python@v5
+- uses: actions/setup-python@v6
   with:
     python-version: "3.11"
     cache: "pip"
@@ -89,7 +89,7 @@ flowchart LR
 
 ```yaml
 - run: pytest -q --junitxml=report.xml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   if: always()
   with:
     name: pytest-report
@@ -116,7 +116,7 @@ strategy:
   matrix:
     python: ["3.10", "3.11", "3.12"]
 steps:
-  - uses: actions/setup-python@v5
+  - uses: actions/setup-python@v6
     with:
       python-version: ${{ matrix.python }}
 ```
