@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 메타데이터는 장식이 아니라 검색 후보군을 먼저 줄이는 첫 번째 인덱스입니다.
 ---
 
@@ -220,6 +220,14 @@ Q4 infrastructure cost engineering - ...
 
 ## 참고 자료
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
+### 공식 문서
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [LangChain Document object concepts](https://python.langchain.com/docs/concepts/documents/)
+
+### 검증에 도움 되는 자료
+
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)
+- [FAISS documentation](https://faiss.ai/)
 
 Tags: RAG, Document Processing, LangChain, Python

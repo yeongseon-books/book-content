@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간 handoff가 깨지지 않는지로 판단해야 합니다.
 ---
 
@@ -235,7 +235,14 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 
 ## 참고 자료
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
-- https://github.com/facebookresearch/faiss
+### 공식 문서
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [FAISS documentation](https://faiss.ai/)
+
+### 검증에 도움 되는 자료
+
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)
+- [LangChain text splitters integration package](https://docs.langchain.com/oss/python/integrations/splitters/index)
 
 Tags: RAG, Document Processing, LangChain, Python

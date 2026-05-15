@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Metadata is not decoration around the text; it is the first index
   that shrinks the candidate set.
 ---
@@ -211,6 +211,14 @@ When an answer looks wrong, source and scope metadata usually explain the failur
 
 ## References
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
+### Official docs
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [LangChain Document object concepts](https://python.langchain.com/docs/concepts/documents/)
+
+### Verification-friendly sources
+
+- [FAISS documentation](https://faiss.ai/)
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)
 
 Tags: RAG, Document Processing, LangChain, Python

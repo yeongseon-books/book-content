@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: The first goal of PDF parsing is to turn a visual document into a
   verifiable list of strings.
 ---
@@ -202,7 +202,14 @@ OCR is safer as a fallback path after a text-layer check, not as the default pat
 
 ## References
 
-- https://pypdf.readthedocs.io/
-- https://docs.reportlab.com/reportlab/userguide/ch1_intro/
+### Official docs
+
+- [pypdf user guide](https://pypdf.readthedocs.io/)
+- [ReportLab User Guide - Getting Started](https://docs.reportlab.com/reportlab/userguide/ch1_intro/)
+
+### Verification-friendly sources
+
+- [pypdf extract-text guide](https://pypdf.readthedocs.io/en/stable/user/extract-text.html)
+- [PDF 32000-1:2008 overview (Adobe-hosted index)](https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf)
 
 Tags: RAG, Document Processing, LangChain, Python

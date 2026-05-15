@@ -14,7 +14,7 @@ tags:
 - Document Processing
 - LangChain
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: A complete ingestion pipeline is not defined by how many stages exist
   but by whether each stage hands off cleanly to the next.
 ---
@@ -234,7 +234,14 @@ Retrying and replaying are different control paths, and collapsing them into one
 
 ## References
 
-- https://python.langchain.com/docs/integrations/vectorstores/faiss/
-- https://github.com/facebookresearch/faiss
+### Official docs
+
+- [LangChain FAISS integration guide](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [FAISS documentation](https://faiss.ai/)
+
+### Verification-friendly sources
+
+- [FAISS GitHub repository](https://github.com/facebookresearch/faiss)
+- [LangChain text splitters integration package](https://docs.langchain.com/oss/python/integrations/splitters/index)
 
 Tags: RAG, Document Processing, LangChain, Python
