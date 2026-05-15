@@ -14,18 +14,25 @@ tags:
 - A/B Testing
 - Statistics
 - Win Rate
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: How do you decide which of two prompts is better? This post covers
   paired comparison, win rate, statistical significance, and sample size…
 ---
 
 # A/B Testing LLMs — Which Prompt Is Better?
 
-> AI Evaluation 101 Series (9/10)
-
 How do you decide which of two prompts is better?
 
 This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
+
+## Questions this chapter answers
+
+- Why is "this one feels better" too weak to justify a rollout decision?
+- When is pairwise judging better than comparing average scalar scores?
+- How many samples do you need before a difference becomes trustworthy?
+- Why must p-values and effect size travel together in the final decision?
+
+> Mental model: A/B testing is how you turn taste into evidence. The job is not to crown a winner quickly, but to decide whether the observed win rate is large enough and stable enough to justify a production switch.
 
 ---
 ![A/B testing LLMs - which prompt is Better](../../../assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
@@ -305,6 +312,14 @@ The next post covers **continuous evaluation in production** — sampling live t
 
 ---
 
+## Operational checklist
+
+- [ ] Swap answer order in pairwise judging so position bias does not fake a winner.
+- [ ] Compute sample size from the effect you want to detect before running the test.
+- [ ] Report tie rate alongside win rate because high ties often mean the variants are effectively equivalent.
+- [ ] Require both statistical significance and practical effect size before switching variants.
+- [ ] Run online experiments long enough to cover weekday and weekend behavior.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -322,7 +337,14 @@ The next post covers **continuous evaluation in production** — sampling live t
 
 ## References
 
+### Official docs
+
 - [statsmodels — proportions_ztest](https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportions_ztest.html)
+- [statsmodels — proportion_effectsize](https://www.statsmodels.org/stable/generated/statsmodels.stats.proportion.proportion_effectsize.html)
+- [SciPy — ttest_ind](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html)
+
+### Books and papers
+
 - [Cohen, J. (1988). Statistical Power Analysis for the Behavioral Sciences](https://www.routledge.com/Statistical-Power-Analysis-for-the-Behavioral-Sciences/Cohen/p/book/9780805802832)
 - [Kohavi, Tang, Xu — Trustworthy Online Controlled Experiments (2020)](https://experimentguide.com/)
 - [Chatbot Arena — Crowdsourced LLM A/B (Chiang et al., 2024)](https://arxiv.org/abs/2403.04132)

@@ -14,18 +14,25 @@ tags:
 - LLM
 - Metrics
 - BLEU
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Deterministic metrics are fast and reproducible, but they penalize
   different wording even when the meaning matches.
 ---
 
 # Deterministic Metrics — Exact Match, BLEU, ROUGE
 
-> AI Evaluation 101 Series (3/10)
-
 Deterministic metrics are fast and reproducible, but they penalize different wording even when the meaning matches.
 
 This is post 3 in the AI Evaluation 101 series. Here we cover when to use Exact Match, F1, BLEU, and ROUGE — and when not to.
+
+## Questions this chapter answers
+
+- Why are deterministic metrics attractive for CI, and where do they become misleading?
+- How do Exact Match and token-level F1 differ when the answer is short but phrased differently?
+- Why do BLEU and ROUGE struggle when the model is free to paraphrase?
+- What safety rails keep deterministic metrics useful instead of dangerous?
+
+> Mental model: deterministic metrics are fast lexical filters. They are strong when the answer space is short and closed, but they become supporting evidence rather than final judgment once meaning can be expressed in many valid ways.
 
 ---
 ![Deterministic metrics - exact Match, BLEU, ROUGE](../../../assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)
@@ -154,6 +161,100 @@ For summarization, ROUGE correlates better with human judgment than BLEU does, b
 
 Core rule: **deterministic metrics work when the answer space is closed and short. When the answer is free-form and long, switch to LLM-as-judge or rubric.**
 
+## A Side-by-Side Metric Run
+
+The quickest way to build intuition is to score the same predictions with multiple metrics and compare the disagreements.
+
+```python
+from collections import Counter
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from rouge_score import rouge_scorer
+
+
+def exact_match_normalized(pred: str, expected: str) -> int:
+    normalize = lambda s: s.lower().strip().rstrip(".!?")
+    return int(normalize(pred) == normalize(expected))
+
+
+def token_f1(pred: str, expected: str) -> float:
+    pred_tokens = Counter(pred.lower().split())
+    exp_tokens = Counter(expected.lower().split())
+    common = pred_tokens & exp_tokens
+    overlap = sum(common.values())
+    if overlap == 0:
+        return 0.0
+    precision = overlap / sum(pred_tokens.values())
+    recall = overlap / sum(exp_tokens.values())
+    return 2 * precision * recall / (precision + recall)
+
+
+scorer = rouge_scorer.RougeScorer(["rouge1", "rougeL"], use_stemmer=True)
+smooth = SmoothingFunction().method1
+
+cases = [
+    ("Seoul", "Seoul"),
+    ("The capital of Korea is Seoul.", "Seoul"),
+    ("A cat is sitting on a mat", "The cat sat on the mat"),
+]
+
+for pred, expected in cases:
+    bleu = sentence_bleu(
+        [expected.lower().split()],
+        pred.lower().split(),
+        smoothing_function=smooth,
+    )
+    rouge = scorer.score(expected, pred)
+    print(
+        {
+            "prediction": pred,
+            "expected": expected,
+            "exact_match": exact_match_normalized(pred, expected),
+            "token_f1": round(token_f1(pred, expected), 3),
+            "bleu": round(bleu, 3),
+            "rouge1_f": round(rouge["rouge1"].fmeasure, 3),
+            "rougeL_f": round(rouge["rougeL"].fmeasure, 3),
+        }
+    )
+```
+
+**Expected output:**
+
+```text
+{'prediction': 'Seoul', 'expected': 'Seoul', 'exact_match': 1, 'token_f1': 1.0, 'bleu': 0.178, 'rouge1_f': 1.0, 'rougeL_f': 1.0}
+{'prediction': 'The capital of Korea is Seoul.', 'expected': 'Seoul', 'exact_match': 0, 'token_f1': 0.286, 'bleu': 0.054, 'rouge1_f': 0.286, 'rougeL_f': 0.286}
+{'prediction': 'A cat is sitting on a mat', 'expected': 'The cat sat on the mat', 'exact_match': 0, 'token_f1': 0.462, 'bleu': 0.054, 'rouge1_f': 0.615, 'rougeL_f': 0.462}
+```
+
+The last two rows are the real lesson. The answer can be directionally correct while Exact Match collapses to zero and BLEU stays tiny. That is exactly why these metrics are good filters but poor final arbiters for open-ended tasks.
+
+## A Safe Evaluation Pattern for Deterministic Metrics
+
+Use deterministic metrics as the first layer, then escalate uncertain cases.
+
+```python
+def deterministic_gate(task_type: str, pred: str, expected: str) -> str:
+    if task_type in {"classification", "extractive_qa"}:
+        return "PASS" if exact_match_normalized(pred, expected) else "FAIL"
+
+    rouge = scorer.score(expected, pred)["rougeL"].fmeasure
+    if rouge >= 0.7:
+        return "LIKELY_OK"
+    if rouge <= 0.3:
+        return "REVIEW_WITH_LLM_JUDGE"
+    return "HUMAN_SPOT_CHECK"
+```
+
+This layered pattern matters more than the exact threshold. The goal is to spend the cheap metric where it is reliable and escalate only the cases where lexical overlap stops being trustworthy.
+
+## Failure Modes That Fool Deterministic Metrics
+
+| Situation | Why the metric misleads | Better fallback |
+|---|---|---|
+| Good paraphrase, different wording | Lexical overlap is low even though meaning is right | LLM-as-judge or human spot check |
+| Wrong fact, similar words | ROUGE can stay high because the phrasing overlaps | Faithfulness or rubric scoring |
+| Very short reference | BLEU becomes unstable or near-zero | Exact Match + normalization or token F1 |
+| Structured output with optional wording | The model adds polite framing and gets penalized | Parse the structure, then score the fields |
+
 ## Five Common Mistakes
 
 1. **Using BLEU on free-form answers.** Answers with right meaning but different wording all score zero, leading you to the wrong "the model is bad" conclusion.
@@ -174,6 +275,14 @@ The next post covers LLM-as-judge — delegating scoring to a strong LLM, design
 
 ---
 
+## Operational checklist
+
+- [ ] Decide first whether the answer space is closed or open before picking a metric.
+- [ ] Normalize case, whitespace, and punctuation before running Exact Match.
+- [ ] Compare at least two deterministic metrics before trusting a trend.
+- [ ] Read the lowest-scoring cases by hand instead of relying only on the average.
+- [ ] Escalate free-form or ambiguous cases to LLM-as-judge or human review.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -191,7 +300,14 @@ The next post covers LLM-as-judge — delegating scoring to a strong LLM, design
 
 ## References
 
-- [Hugging Face — A guide to LLM evaluation](https://huggingface.co/docs/evaluate/index)
+### Official docs
+
+- [Hugging Face Evaluate](https://huggingface.co/docs/evaluate/index)
+- [NLTK — BLEU score API](https://www.nltk.org/api/nltk.translate.bleu_score.html)
+- [rouge-score on PyPI](https://pypi.org/project/rouge-score/)
+
+### Papers and benchmarks
+
 - [Papineni et al. — BLEU paper](https://aclanthology.org/P02-1040/)
 - [Lin — ROUGE paper](https://aclanthology.org/W04-1013/)
 - [SQuAD — Exact Match and F1](https://rajpurkar.github.io/SQuAD-explorer/)

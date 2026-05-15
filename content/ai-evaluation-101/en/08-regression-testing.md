@@ -14,18 +14,25 @@ tags:
 - Regression Testing
 - CI
 - GitHub Actions
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Changing one line of a prompt can break other cases. This post covers
   a CI-integrated LLM regression test suite, golden datasets, and…
 ---
 
 # Regression Testing — Don't Let Yesterday's Wins Break Today
 
-> AI Evaluation 101 Series (8/10)
-
 Changing one line of a prompt can break other cases.
 
 This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
+
+## Questions this chapter answers
+
+- Why do manual evaluation runs still allow regressions to reach production?
+- How is a regression golden set different from a broader quality benchmark set?
+- Which fail policy should you start with, and when should you relax it?
+- How do seed and tolerance help keep stochastic models from creating noisy CI failures?
+
+> Mental model: regression evaluation is the quality gate that turns yesterday's hard-won cases into today's automated branch protection.
 
 ---
 ![Regression testing - Don't let Yesterday's wins break today](../../../assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
@@ -305,6 +312,14 @@ $5 per PR over 100 PRs/month = $500/month. **Track CI cost weekly**; if it climb
 The next post covers **A/B testing** to decide statistically which of two models or prompts is actually better.
 
 ---
+
+## Operational checklist
+
+- [ ] Keep the golden regression suite small enough to run on every PR.
+- [ ] Encode thresholds and fail policy in code instead of tribal memory.
+- [ ] Add a tolerance policy that reflects recent baseline variance.
+- [ ] Diff failed cases against main so reviewers can see the exact regression.
+- [ ] Revisit thresholds on a schedule instead of freezing them forever.
 
 <!-- toc:begin -->
 ## AI Evaluation 101 Series

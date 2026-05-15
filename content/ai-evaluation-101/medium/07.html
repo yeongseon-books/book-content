@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Evaluating Agents — Trajectories, Not Single Responses</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (7/10)</p>
-</blockquote>
 <p>Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'</p>
 <p>This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is a correct final answer still not enough evidence that an agent is production-ready?</li>
+<li>How should end-to-end success and step-level analysis complement each other?</li>
+<li>What do tool confusion, step overhead, and recovery metrics reveal that answer quality misses?</li>
+<li>How do you turn agent traces into an evaluation dashboard instead of anecdotal debugging?</li>
+</ul>
+<blockquote>
+<p>Mental model: the agent answer is only the visible tip. The actual product quality lives in the trajectory—tool choice, argument quality, recovery behavior, latency, and cost.</p>
+</blockquote>
 <hr>
 <p><img alt="Evaluating agents - Trajectories, not single responses" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png"></p>
 <p><em>Evaluating agents - Trajectories, not single responses</em></p>
@@ -236,6 +243,14 @@ print(df.describe())
 </ul>
 <p>The next post integrates evaluation into <strong>CI</strong> so regressions are blocked automatically.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Track task success and trajectory metrics together, not as separate projects.</li>
+<li>[ ] Measure tool confusion so prompt and tool-schema fixes are evidence-based.</li>
+<li>[ ] Watch step overhead, token cost, and latency on the same dashboard as success rate.</li>
+<li>[ ] Inject failures deliberately to confirm the agent retries or finds an alternative path.</li>
+<li>[ ] Allow multiple valid trajectories when the task can be solved in different orders.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>
@@ -250,11 +265,16 @@ print(df.describe())
 <li>Ep10 Production Evaluation (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
+<ul>
+<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/agents">LangSmith — Agent evaluation tutorial</a></li>
+<li><a href="https://platform.openai.com/docs/guides/tools">OpenAI — Built-in tools guide</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html">scikit-learn — classification_report</a></li>
+</ul>
+<p><strong>Papers and background</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/2210.03629">Yao et al. (2022). ReAct — Synergizing Reasoning and Acting in Language Models</a></li>
-<li><a href="https://docs.smith.langchain.com/evaluation/tutorials/agents">LangSmith — Agent Evaluation Patterns</a></li>
 <li><a href="https://arxiv.org/abs/2308.03688">AgentBench — Evaluating LLMs as Agents (Liu et al., 2023)</a></li>
-<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html">scikit-learn — classification_report</a></li>
 </ul>
 <p class="tags-line">Tags: AI Evaluation, Agent, Trajectory, Tool Use</p>
 </body>

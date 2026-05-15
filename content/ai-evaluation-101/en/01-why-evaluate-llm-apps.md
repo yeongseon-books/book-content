@@ -14,18 +14,25 @@ tags:
 - LLM
 - Testing
 - Quality
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: LLMs return different answers for the same input. Without evaluation,
   you cannot tell that a feature working yesterday is broken today.
 ---
 
 # Why Evaluate LLM Applications
 
-> AI Evaluation 101 Series (1/10)
-
 LLMs return different answers for the same input. Without evaluation, you cannot tell that a feature working yesterday is broken today.
 
 This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.
+
+## Questions this chapter answers
+
+- Why does traditional `==`-style testing stop working as soon as an LLM starts paraphrasing?
+- What kinds of product risk stay invisible when a team ships prompt or model changes without evaluation?
+- Which quality dimensions should you track separately instead of collapsing into a single score?
+- What does a minimal evaluation loop look like before you have a mature platform or a large dataset?
+
+> Mental model: evaluation is not a research luxury. It is the change-management dashboard that tells you whether a prompt, model, or retrieval change improved the system or quietly pushed it backward.
 
 ---
 ![Why evaluate LLM applications](../../../assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
@@ -152,6 +159,85 @@ print(f"Accuracy: {results['accuracy']:.0%}")
 
 Even ten cases give you signals like "case #5 dropped after the prompt change." That single signal catches 90% of regressions.
 
+## A Minimal Evaluation Harness You Can Run Today
+
+If you want the first useful version, make it boring. Put the task behind one function, store a tiny eval set in version control, and print both the aggregate score and the failed case IDs.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class EvalCase:
+    case_id: str
+    prompt: str
+    must_include: list[str]
+
+
+def run_smoke_eval(cases: list[EvalCase], system_under_test) -> dict:
+    failed_cases = []
+    scores = []
+
+    for case in cases:
+        answer = system_under_test(case.prompt)
+        matched = sum(1 for kw in case.must_include if kw.lower() in answer.lower())
+        passed = matched == len(case.must_include)
+        scores.append(int(passed))
+        if not passed:
+            failed_cases.append(
+                {
+                    "case_id": case.case_id,
+                    "answer": answer,
+                    "missing": [kw for kw in case.must_include if kw.lower() not in answer.lower()],
+                }
+            )
+
+    return {
+        "pass_rate": sum(scores) / len(scores),
+        "failed_cases": failed_cases,
+    }
+
+
+smoke_cases = [
+    EvalCase("rag-001", "What is RAG?", ["retrieval", "generation"]),
+    EvalCase("async-001", "Explain async/await", ["coroutine", "await"]),
+    EvalCase("json-001", "Return valid JSON with a title field", ["title"]),
+]
+
+report = run_smoke_eval(smoke_cases, summarize)
+print(report)
+```
+
+**Expected output:**
+
+```text
+{
+  'pass_rate': 0.67,
+  'failed_cases': [
+    {
+      'case_id': 'async-001',
+      'answer': '...',
+      'missing': ['coroutine']
+    }
+  ]
+}
+```
+
+That is enough to make a pull request actionable. Instead of arguing about whether the output "feels better," you can point to the exact case that regressed.
+
+## Failure Modes to Watch in Week One
+
+The first evaluation loop usually fails for process reasons, not math reasons.
+
+| Failure mode | What it looks like | What to do next |
+|---|---|---|
+| Only happy-path cases | Pass rate looks strong, but support tickets keep rising | Add two or three recent user complaints every week |
+| One giant aggregate score | Accuracy improves while safety or format compliance worsens | Split results by correctness, relevance, safety, and style |
+| No per-case diff | The team knows the score dropped but not why | Print failed case IDs, missing keywords, and raw answers |
+| Eval is run manually | Prompt tweaks skip evaluation because "this is a tiny change" | Wire the smoke suite into CI or pre-merge review |
+
+The point of the first harness is not elegance. The point is to make regressions visible faster than user complaints.
+
 ## Five Common Mistakes
 
 1. **"We will evaluate once production stabilizes."** Without evaluation, you cannot know whether it has stabilized. Start with ten cases on day one.
@@ -172,6 +258,14 @@ The next post covers how to design evaluation datasets — where to source them,
 
 ---
 
+## Operational checklist
+
+- [ ] Pick 10 real user tasks that represent the current product surface area.
+- [ ] Track at least correctness, relevance, safety, and style as separate signals.
+- [ ] Store the eval set in version control next to the code or prompts it protects.
+- [ ] Print failed case IDs and raw outputs, not just a single average score.
+- [ ] Run the smoke suite before every prompt or model change reaches production.
+
 <!-- toc:begin -->
 ## AI Evaluation 101 Series
 
@@ -189,9 +283,15 @@ The next post covers how to design evaluation datasets — where to source them,
 
 ## References
 
-- [OpenAI — Evals framework](https://github.com/openai/evals)
-- [Anthropic — Building evals](https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests)
-- [Hugging Face — Evaluating LLMs](https://huggingface.co/learn/cookbook/en/llm_judge)
+### Official docs
+
+- [OpenAI Evals](https://github.com/openai/evals)
+- [Anthropic — Develop tests and evaluations](https://docs.anthropic.com/en/docs/test-and-evaluate/develop-tests)
+- [LangSmith — Evaluation concepts](https://docs.smith.langchain.com/evaluation/concepts)
+
+### Additional reading
+
+- [Hugging Face — Evaluating LLMs as a judge](https://huggingface.co/learn/cookbook/en/llm_judge)
 - [Eugene Yan — LLM evaluation patterns](https://eugeneyan.com/writing/llm-evaluators/)
 
 ### Related Series

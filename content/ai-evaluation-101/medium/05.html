@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Designing Rubric-Based Scoring</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (5/10)</p>
-</blockquote>
 <p>Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score.</p>
 <p>This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does a single judge score hide the exact thing your team needs to fix?</li>
+<li>How do you turn user value into 3-5 practical scoring dimensions?</li>
+<li>Why are 1/3/5 anchors mandatory if you want judges and humans to stay aligned?</li>
+<li>Which aggregation strategies preserve safety-critical failures instead of averaging them away?</li>
+</ul>
+<blockquote>
+<p>Mental model: a rubric is a fault-isolation tool. Its job is not to make the score look sophisticated, but to show which quality dimension failed so the next engineering move is obvious.</p>
+</blockquote>
 <hr>
 <p><img alt="Designing Rubric-Based scoring" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png"></p>
 <p><em>Designing Rubric-Based scoring</em></p>
@@ -288,6 +295,14 @@ for dim in dimensions:
 </ul>
 <p>The next post covers RAG pipeline evaluation — retrieval, faithfulness, answer relevance.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Keep the rubric to 3-5 dimensions that map to actual user value.</li>
+<li>[ ] Write concrete 1, 3, and 5 anchors for every dimension.</li>
+<li>[ ] Check correlations so duplicate dimensions do not distort the score.</li>
+<li>[ ] Add hard fail thresholds for safety-critical dimensions like correctness.</li>
+<li>[ ] Review per-dimension agreement with humans before trusting the rubric at scale.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>

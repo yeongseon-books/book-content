@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Designing Evaluation Datasets</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (2/10)</p>
-</blockquote>
 <p>A good evaluation dataset mirrors production traffic distribution while including enough edge cases.</p>
 <p>This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What makes an evaluation dataset representative instead of flattering?</li>
+<li>Why do production samples, past failures, and deliberately adversarial cases each matter?</li>
+<li>How large should a smoke suite, regression set, or model-comparison dataset be?</li>
+<li>When should <code>expected</code> contain an exact answer versus keywords or a rubric?</li>
+</ul>
+<blockquote>
+<p>Mental model: an eval dataset is not a scrapbook of pretty demos. It is an operating sample of the traffic you must protect plus the edge cases that would hurt most if they broke.</p>
+</blockquote>
 <hr>
 <p><img alt="Designing evaluation datasets" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png"></p>
 <p><em>Designing evaluation datasets</em></p>
@@ -198,6 +205,14 @@ def load_eval_set(path: Path) -&gt; list[EvalExample]:
 </ul>
 <p>The next post covers deterministic metrics — when Exact Match, F1, BLEU, and ROUGE help, and when they hurt.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Sample real production traces instead of relying only on hand-written examples.</li>
+<li>[ ] Keep regression cases from past incidents in the dataset permanently.</li>
+<li>[ ] Tag each case with a category so you can slice scores by risk type.</li>
+<li>[ ] Pick the labeling style per case instead of forcing exact match everywhere.</li>
+<li>[ ] Version the dataset file so model comparisons stay reproducible.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Why Evaluate LLM Applications</a></li>
@@ -212,10 +227,15 @@ def load_eval_set(path: Path) -&gt; list[EvalExample]:
 <li>Continuous Evaluation in Production (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
+<ul>
+<li><a href="https://github.com/openai/evals">OpenAI Evals</a></li>
+<li><a href="https://docs.smith.langchain.com/evaluation/concepts">LangSmith — Evaluation concepts</a></li>
+<li><a href="https://weave-docs.wandb.ai/guides/evaluation/">Weights &amp; Biases Weave — Evaluation datasets</a></li>
+</ul>
+<p><strong>Additional reading</strong></p>
 <ul>
 <li><a href="https://hamel.dev/blog/posts/evals/">Hamel Husain — Your AI product needs evals</a></li>
-<li><a href="https://github.com/openai/evals">OpenAI — Evals framework</a></li>
-<li><a href="https://docs.smith.langchain.com/evaluation/concepts">LangSmith — Dataset best practices</a></li>
 <li><a href="https://eugeneyan.com/writing/evals/">Eugene Yan — Building eval datasets</a></li>
 </ul>
 <p class="tags-line">Tags: AI Evaluation, LLM, Dataset, Quality</p>

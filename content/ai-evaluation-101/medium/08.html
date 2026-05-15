@@ -54,11 +54,18 @@
 </head>
 <body>
 <h1>Regression Testing — Don't Let Yesterday's Wins Break Today</h1>
-<blockquote>
-<p>AI Evaluation 101 Series (8/10)</p>
-</blockquote>
 <p>Changing one line of a prompt can break other cases.</p>
 <p>This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why do manual evaluation runs still allow regressions to reach production?</li>
+<li>How is a regression golden set different from a broader quality benchmark set?</li>
+<li>Which fail policy should you start with, and when should you relax it?</li>
+<li>How do seed and tolerance help keep stochastic models from creating noisy CI failures?</li>
+</ul>
+<blockquote>
+<p>Mental model: regression evaluation is the quality gate that turns yesterday's hard-won cases into today's automated branch protection.</p>
+</blockquote>
 <hr>
 <p><img alt="Regression testing - Don't let Yesterday's wins break today" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png"></p>
 <p><em>Regression testing - Don't let Yesterday's wins break today</em></p>
@@ -310,6 +317,14 @@ def check_with_tolerance(metric: str, score: float) -&gt; bool:
 </ul>
 <p>The next post covers <strong>A/B testing</strong> to decide statistically which of two models or prompts is actually better.</p>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Keep the golden regression suite small enough to run on every PR.</li>
+<li>[ ] Encode thresholds and fail policy in code instead of tribal memory.</li>
+<li>[ ] Add a tolerance policy that reflects recent baseline variance.</li>
+<li>[ ] Diff failed cases against main so reviewers can see the exact regression.</li>
+<li>[ ] Revisit thresholds on a schedule instead of freezing them forever.</li>
+</ul>
 <h2>AI Evaluation 101 Series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-evaluation-101/en/01-why-evaluate-llm-apps.md">Ep1 Why Evaluate LLM Apps</a></li>

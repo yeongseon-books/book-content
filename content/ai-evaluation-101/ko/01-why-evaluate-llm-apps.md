@@ -14,7 +14,7 @@ tags:
 - LLM
 - Testing
 - Quality
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: LLM은 같은 입력에도 다른 답을 내놓습니다. 평가 없이 운영하면 어제 잘 되던 기능이 오늘 망가지는 것을 알 수 없습니다.
 ---
 
@@ -180,6 +180,84 @@ print(f"Accuracy: {results['accuracy']:.0%}")
 ```
 
 10건으로도 "5번 케이스에서 prompt 변경 후 점수가 떨어졌다"는 신호를 받을 수 있습니다. 이 신호 하나가 회귀의 90%를 잡습니다.
+
+### 오늘 바로 돌릴 수 있는 최소 평가 하네스
+
+첫 평가를 시작할 때는 거창한 플랫폼보다 작동하는 습관이 중요합니다. 시스템 호출 함수 하나, 작은 평가셋 하나, 실패 케이스를 그대로 보여 주는 출력만 있어도 운영 대화가 달라집니다.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class EvalCase:
+    case_id: str
+    prompt: str
+    must_include: list[str]
+
+
+def run_smoke_eval(cases: list[EvalCase], system_under_test) -> dict:
+    failed_cases = []
+    scores = []
+
+    for case in cases:
+        answer = system_under_test(case.prompt)
+        matched = sum(1 for kw in case.must_include if kw.lower() in answer.lower())
+        passed = matched == len(case.must_include)
+        scores.append(int(passed))
+
+        if not passed:
+            failed_cases.append(
+                {
+                    "case_id": case.case_id,
+                    "answer": answer,
+                    "missing": [kw for kw in case.must_include if kw.lower() not in answer.lower()],
+                }
+            )
+
+    return {
+        "pass_rate": sum(scores) / len(scores),
+        "failed_cases": failed_cases,
+    }
+
+
+smoke_cases = [
+    EvalCase("rag-001", "What is RAG?", ["retrieval", "generation"]),
+    EvalCase("async-001", "Explain async/await", ["coroutine", "await"]),
+    EvalCase("json-001", "Return valid JSON with a title field", ["title"]),
+]
+
+report = run_smoke_eval(smoke_cases, summarize)
+print(report)
+```
+
+**예상 출력:**
+
+```text
+{
+  'pass_rate': 0.67,
+  'failed_cases': [
+    {
+      'case_id': 'async-001',
+      'answer': '...',
+      'missing': ['coroutine']
+    }
+  ]
+}
+```
+
+이 정도 출력만 있어도 PR 리뷰가 훨씬 실용적으로 바뀝니다. "이번 응답이 더 자연스러워 보인다"가 아니라 "async-001에서 회귀가 생겼다"처럼 케이스 단위로 대화할 수 있기 때문입니다.
+
+### 첫 주에 가장 자주 터지는 실패 양상
+
+| 실패 양상 | 겉으로 보이는 증상 | 바로 취할 조치 |
+|---|---|---|
+| 보기 좋은 happy path만 넣음 | 평균 점수는 높지만 운영 불만이 계속 나옴 | 최근 사용자 불만 2~3건을 매주 추가 |
+| 평균 점수 하나만 봄 | 정확성은 올랐는데 안전성·형식 준수가 떨어져도 못 봄 | correctness, relevance, safety, style를 분리 |
+| 케이스 diff를 안 남김 | 점수 하락은 보이는데 왜 떨어졌는지 모름 | failed case id, 원문 답변, 누락 키워드 출력 |
+| 수동 실행에만 의존 | "작은 prompt 수정이라 괜찮겠지" 하고 평가를 건너뜀 | smoke eval을 PR 검토나 CI에 연결 |
+
+첫 하네스의 목표는 우아함이 아닙니다. 사용자 제보보다 먼저 회귀를 드러내는 속도입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
