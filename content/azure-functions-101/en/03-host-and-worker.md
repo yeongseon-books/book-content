@@ -14,7 +14,7 @@ tags:
 - Azure Functions
 - Serverless
 - Cloud
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: 'Over the last two posts, we built up a mental model: triggers wake
   your function, and bindings wire up its inputs and outputs.'
 ---
@@ -115,6 +115,29 @@ When a Function App scales out, the number of instances grows, and each instance
 That is why Python on Functions does not behave like Node.js in a one-to-one sense. The worker is still a **single Python process under the GIL**, so concurrency comes from a mix of thread-pool execution for sync functions and cooperative async scheduling for `async def`, not from a pure “one event loop for everything” model. You can widen concurrency further with `FUNCTIONS_WORKER_PROCESS_COUNT`, which starts multiple worker processes inside one instance.
 
 One more caveat matters operationally on **Flex Consumption**: the default per-instance HTTP concurrency for Python is **1** unless you deliberately tune it. In practice, that means HTTP scale behavior is shaped not only by instance count, but also by Python thread-pool settings such as `PYTHON_THREADPOOL_THREAD_COUNT` and the per-instance HTTP concurrency settings in Functions host/HTTP configuration. So there is a third axis between scale up and scale out: **how much concurrency you allow inside each instance before the platform adds another one**.
+
+## You can verify the split locally in two minutes
+
+The Host/Worker model does not have to stay conceptual. Once you run `func start`, you can inspect the process split on your own machine.
+
+```bash
+# Terminal 1
+func start --verbose
+
+# Terminal 2
+ps -ef | grep -E "func|python.*worker" | grep -v grep
+```
+
+```text
+...
+Worker process started and initialized.
+Functions:
+    hello: [GET,POST] http://localhost:7071/api/hello
+...
+python ... azure_functions_worker ...
+```
+
+Those two lines are the key artifact. `Worker process started and initialized.` shows the Host brought up a language worker, and the `azure_functions_worker` process shows your code is not running inside the same process as the Host. That small inspection step makes the later discussion about logs, restarts, and concurrency much more concrete.
 
 ---
 
