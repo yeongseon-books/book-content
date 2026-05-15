@@ -49,54 +49,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 *Mental Model - 두 단계 변환*
 
----
-
-# Row factories and type adapters (sqlite3, PEP 249)
-
-Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.
-
-This is the 6th article in the Python DB-API 101 series.
-
-![Row factories and type adapters (sqlite3, PEP 249)](../../../assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.ko.png)
-
-*Row factories and type adapters (sqlite3, PEP 249)*
-## Questions this post answers
-
-- How do you receive default tuple results as dict, dataclass, or Pydantic models?
-- What is `sqlite3.Row` and when is it enough?
-- What does `detect_types` actually detect?
-- How do you safely map custom types such as `Decimal`, `datetime`, `Enum`, or JSON?
-- How do adapters and converters fit into the PEP 249 model?
-
-> Raw tuples returned by the database are fast but dangerous: you must remember column order, and SQLite has only five storage classes (NULL, INTEGER, REAL, TEXT, BLOB). Row factories and type adapters consolidate every conversion in one place.
-
-## What you will learn
-
-This post separates how sqlite3 moves data between SQL and Python into two axes.
-
-1. **Row factory** — the **shape** of `cursor.fetch*()` results (tuple → Row → dict → dataclass → Pydantic).
-2. **Type adapter / converter** — the **type of a single value** (Python `Decimal` ↔ SQLite TEXT).
-3. **`detect_types`** — selects automatic conversion based on declared column type or `[type-name]` column aliases.
-4. **Registering custom types** — `register_adapter` / `register_converter` for `Decimal`, `Enum`, JSON dicts.
-5. **Type-safe repository layer** — using Pydantic or dataclass as the result model.
-
----
-
-## Why this matters
-
-Code like `row[3]` shatters silently the moment the schema changes. `row['name']` (or `row.name` from a dataclass) turns schema changes into immediate import errors.
-
-The same applies to type conversion. Storing money as `REAL` (float) in SQLite leads to precision incidents like `0.1 + 0.2 = 0.30000000000000004`. Registering `Decimal` and storing as `TEXT` keeps full precision.
-
-This post unifies row factories and type adapters so your repository layer survives schema and type changes.
-
----
-
-## Mental Model — two-step conversion
-
-![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
-
-*Mental model - two-step conversion*
+> SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
 
 - **adapter / converter** = **단일 값**의 타입 변환 (Python ↔ SQLite storage class).
 - **row_factory** = **행 전체**의 shape 변환 (tuple → 원하는 형태).
@@ -114,21 +67,11 @@ This post unifies row factories and type adapters so your repository layer survi
 
 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
 
-- **adapter / converter** = type conversion of a **single value** (Python ↔ SQLite storage class).
-- **row_factory** = shape conversion of an **entire row** (tuple → desired form).
-
-Separating these two concerns naturally separates where they live in code.
-
----
-
-## Core concepts
-
-![Core concepts](../../../assets/python-dbapi-101/06/06-03-core-concepts.ko.png)
-
-*Core concepts*
-### `sqlite3.Row`
-
-The lightest row factory. Accessible by index like a tuple AND by name like a dict.
+```python
+con.row_factory = sqlite3.Row
+row = con.execute('SELECT id, name FROM users WHERE id=?', (1,)).fetchone()
+print(row[0], row['name'], row.keys())
+```
 
 dict는 아니지만 80% 케이스에 충분합니다.
 
@@ -136,31 +79,17 @@ dict는 아니지만 80% 케이스에 충분합니다.
 
 진짜 dict가 필요하면:
 
-It is not a real dict, but it covers ~80% of cases.
-
-### dict factory
-
-For a true dict:
-
 ### dataclass factory
 
 타입 안전성과 IDE 자동완성을 원하면:
-
-### dataclass factory
-
-For type safety and IDE autocomplete:
 
 ### Pydantic factory
 
 검증과 직렬화가 함께 필요하면:
 
-### Pydantic factory
-
-For combined validation and serialisation:
-
 ### `detect_types`
 
-### `detect_types`
+자동 변환은 connection을 열 때 `detect_types` 플래그로 켭니다.
 
 - `PARSE_DECLTYPES` — `CREATE TABLE`의 컬럼 declared type(예: `created_at TIMESTAMP`)을 보고 등록된 converter 호출.
 - `PARSE_COLNAMES` — `SELECT created_at AS "ts [timestamp]"`처럼 컬럼 별칭에 `[type-name]`을 붙여 강제 변환.
@@ -171,20 +100,7 @@ For combined validation and serialisation:
 
 ### Before — raw tuple + 컬럼 인덱스
 
-- `PARSE_DECLTYPES` — looks at the column's declared type from `CREATE TABLE` (e.g., `created_at TIMESTAMP`) and dispatches the registered converter.
-- `PARSE_COLNAMES` — forces conversion via aliases like `SELECT created_at AS "ts [timestamp]"`.
-
----
-
-## Before / After
-
-### Before — raw tuple + column index
-
 `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
-
-### After — Pydantic + Decimal converter
-
-If the SELECT column order changes, you suddenly multiply the name string.
 
 ### After — Pydantic + Decimal converter
 
@@ -199,40 +115,27 @@ If the SELECT column order changes, you suddenly multiply the name string.
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`
 
-Order-independent and precise.
-
----
-
-## Step-by-step walkthrough
-
-![Step-by-step walkthrough](../../../assets/python-dbapi-101/06/06-04-step-by-step-walkthrough.ko.png)
-
-*Step-by-step walkthrough*
-### Step 1 — `sqlite3.Row`
+컬럼 이름 기반 접근을 도입하는 가장 가벼운 출발점입니다.
 
 ### 단계 2 — `Decimal` adapter/converter
 
-### Step 2 — `Decimal` adapter / converter
+금액과 정밀 수치를 float 대신 `Decimal`로 정확하게 왕복시킵니다.
 
 ### 단계 3 — `Enum` adapter
 
-### Step 3 — `Enum` adapter
+문자열 코드 대신 도메인 enum을 바로 받게 만들 수 있습니다.
 
 ### 단계 4 — JSON adapter
 
-### Step 4 — JSON adapter
+JSON 문자열을 애플리케이션 dict로 복원해 repository 밖으로 새지 않게 합니다.
 
 ### 단계 5 — `[type-name]` 컬럼 별칭
 
-declared type을 못 쓰는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
-
-### Step 5 — `[type-name]` column aliases
-
-For views or computed columns where declared type is unavailable, force conversion via aliases.
+선언된 타입을 쓸 수 없는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
 
 ### 단계 6 — Pydantic + adapter 통합
 
-### Step 6 — Pydantic + adapters together
+행 shape와 값 변환을 함께 묶으면 repository는 도메인 모델만 다루게 됩니다.
 
 이제 repository는 `Order` 객체만 다루며, SQLite의 storage class는 외부에 새지 않습니다.
 
@@ -255,28 +158,7 @@ For views or computed columns where declared type is unavailable, force conversi
 
 ### Repository 레이어 패턴
 
-The repository now deals only in `Order` objects; SQLite storage classes never leak outward.
-
----
-
-## Common mistakes
-
-1. **Direct column-index access.** `row[0]`, `row[2]` are fragile across schema changes. Start with at least `sqlite3.Row`.
-2. **Storing money as `REAL`.** Float precision incidents follow. Always use `Decimal` + `TEXT`, or `INTEGER` (cents).
-3. **Forgetting `detect_types`.** You register the adapter, but the converter never fires — and you wonder why bytes come back. Enable `PARSE_DECLTYPES`.
-4. **Converters always receive `bytes`, not `str`.** Do not forget `b.decode()`.
-5. **Adapter must return one of SQLite's five storage classes** — `int`, `float`, `str`, `bytes`, or `None`. Returning a custom object raises.
-6. **Timestamp clashes.** Python 3.12 deprecated the default timestamp converter. Be explicit with your own converter.
-7. **Assuming `dict_factory` is fast.** Each row builds a dict via comprehension. For million-row workloads, `sqlite3.Row` (C-implemented) is much faster.
-8. **Setting `row_factory` only on the cursor, not the connection.** Set it on the connection — every cursor inherits.
-
----
-
-## Production application
-
-### Repository layer pattern
-
-호출자는 dict 키 오타나 컬럼 순서를 신경 쓸 필요가 없습니다.
+호출자는 dict 키 오타나 컬럼 순서를 기억할 필요 없이, 도메인 모델만 받아서 쓰면 됩니다.
 
 ### 마이그레이션과 타입
 
@@ -284,17 +166,7 @@ The repository now deals only in `Order` objects; SQLite storage classes never l
 
 ### 컬럼 별칭으로 view 처리
 
-view나 join 결과는 declared type이 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
-
-Callers no longer need to remember dict keys or column order.
-
-### Migration and types
-
-Adopting `Decimal` requires migrating `REAL` columns to `TEXT`. Wrap it in `BEGIN IMMEDIATE → ALTER TABLE → data conversion → COMMIT` together with the transaction patterns from the previous post.
-
-### Handling views with column aliases
-
-Views and join results lose declared types. The `[type-name]` alias pattern is widely used in production.
+view나 join 결과는 선언된 타입 정보가 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
 
 ### 성능 vs 안전 균형
 
