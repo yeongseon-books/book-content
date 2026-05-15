@@ -17,7 +17,8 @@ tags:
   - SQL
   - Beginner
 seo_description: 데이터베이스와 네트워크 과목의 핵심 개념, SQL, TCP/IP, 학습 흐름을 정리한 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 데이터베이스와 네트워크
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    C[Client] --> H[HTTP]
-    H --> S[Server]
-    S --> Q[SQL]
-    Q --> D[Database]
-```
+![요청에서 데이터베이스까지의 흐름](../../../assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
+
+*네트워크 요청이 데이터베이스 조회로 이어지는 서비스 기본 경로*
 
 > 서비스는 네트워크가 요청을 옮기고 데이터베이스가 상태를 보관할 때 비로소 완성됩니다.
 

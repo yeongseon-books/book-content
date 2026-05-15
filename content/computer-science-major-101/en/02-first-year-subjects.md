@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 2
 title: Understanding First Year Subjects
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - Programming
   - Beginner
 seo_description: A beginner-friendly tour of first year CS subjects covering calculus, linear algebra, discrete math, and intro programming.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # Understanding First Year Subjects
@@ -48,13 +49,9 @@ Year-one *foundations* underlie *algorithms*, *AI*, and *systems* — every late
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    C[Calculus] --> L[Linear Algebra]
-    L --> D[Discrete Math]
-    D --> P[Programming]
-    P --> N[Next Year]
-```
+![First-year foundation map](../../../assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
+
+*How first-year subjects support later CS courses*
 
 ## Key Terms
 

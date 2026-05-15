@@ -2,7 +2,7 @@
 series: computer-science-major-101
 episode: 6
 title: AI and Data Science
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,8 @@ tags:
   - ML
   - Beginner
 seo_description: A beginner-friendly tour of AI and data science covering statistics, ML, deep learning, and data analysis.
-last_reviewed: '2026-05-04'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # AI and Data Science
@@ -48,13 +49,9 @@ This is post 6 in the Computer Science Major 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    D[Data] --> S[Statistics]
-    S --> M[ML]
-    M --> N[Neural Net]
-    N --> A[Analysis]
-```
+![AI learning pipeline](../../../assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)
+
+*How data, statistics, models, and analysis connect*
 
 ## Key Terms
 

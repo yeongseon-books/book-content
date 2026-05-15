@@ -54,102 +54,125 @@
 </head>
 <body>
 <h1>How to Study Computer Science</h1>
-<blockquote>
-<p>Computer Science Major 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can changing only your <em>study method</em> really <em>double</em> the <em>result</em> in the <em>same time</em>?</p>
-<blockquote>
-<p>Yes. The <em>combo</em> of <em>routine</em>, <em>review</em>, and <em>coding drills</em> is the key.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Some students remember concepts weeks later, while others lose them almost as soon as the lecture ends. The gap is often less about talent than about whether their study method has a repeatable structure.</p>
 <p>This is post 8 in the Computer Science Major 101 series.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>Why does the same amount of study time produce very different results depending on the method?</li>
+<li>How should lectures, notes, review, and coding practice fit together?</li>
+<li>Why does cramming fail especially badly in computer science courses?</li>
+<li>Why do questions and written records create such a large long-term advantage?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
-<li><em>Weekly routine</em></li>
-<li><em>Lecture notes</em></li>
-<li><em>Review cycle</em></li>
-<li><em>Coding drills</em></li>
-<li><em>Asking</em> questions</li>
+<li>A weekly routine</li>
+<li>How to structure lecture notes</li>
+<li>How to build a review cycle</li>
+<li>How to use coding drills</li>
+<li>Why asking questions matters</li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Study efficiency</em> makes the <em>remaining gap</em> among CS students.</p>
+<p>Study efficiency creates a large share of the gap between students in a CS major. Two students can attend the same lecture, but review spacing, practice frequency, and question habits create very different levels of understanding and retention.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    L[Lecture] --&gt; N[Note]
-    N --&gt; R[Review]
-    R --&gt; P[Practice]
-    P --&gt; Q[Question]
-</code></pre>
+<p><img alt="Study loop for CS majors" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png"></p>
+<p><em>The study loop from lecture to questions and practice</em></p>
+<blockquote>
+<p>Studying computer science does not end when the lecture ends. It becomes real only when you revisit the idea, test it with your hands, and use questions to clear what still feels vague.</p>
+</blockquote>
+<p>Listening to a lecture is only the beginning. You need to compress the idea into notes, reopen it during review, test it through practice, and resolve weak spots through questions. When that loop keeps running, knowledge starts to stick instead of fading after the exam.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>routine</strong>: <em>repeating</em> schedule.</li>
-<li><strong>note</strong>: <em>summary</em> memo.</li>
-<li><strong>review</strong>: <em>re study</em>.</li>
-<li><strong>drill</strong>: repeated <em>practice</em>.</li>
-<li><strong>office hour</strong>: <em>consult</em> time.</li>
+<li><strong>routine</strong>: a repeatable study schedule.</li>
+<li><strong>note</strong>: a short record of core ideas.</li>
+<li><strong>review</strong>: the act of revisiting something you already studied.</li>
+<li><strong>drill</strong>: repeated hands-on practice.</li>
+<li><strong>office hour</strong>: time when you can ask a professor or TA questions.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: You only study <em>right before exams</em>.</p>
-<p><strong>After</strong>: You <em>spread</em> it through a <em>weekly routine</em>.</p>
+<p><strong>Before</strong>: You study only right before exams.</p>
+<p><strong>After</strong>: You spread lectures, review, and practice across a weekly routine.</p>
 <h2>Hands-on: Study Tracking Script</h2>
 <p><strong>Step 1 — Register subjects</strong></p>
 <pre><code class="language-python">log = {&quot;algorithms&quot;: [], &quot;os&quot;: [], &quot;db&quot;: []}
 </code></pre>
+<p>First decide what you want to track. The structure does not need to be elaborate. Even a tiny record is enough if it makes your habits visible.</p>
 <p><strong>Step 2 — Record sessions</strong></p>
 <pre><code class="language-python">log[&quot;algorithms&quot;].append({&quot;date&quot;: &quot;2026-05-01&quot;, &quot;hours&quot;: 2})
 </code></pre>
+<p>Writing down when and how long you studied already changes your behavior. Memory alone often distorts how much time you actually spent.</p>
 <p><strong>Step 3 — Mark reviewed</strong></p>
 <pre><code class="language-python">def reviewed(entry):
     return entry.get(&quot;review&quot;, False)
 </code></pre>
+<p>Once you track review separately, the log stops being a time sheet and starts becoming a learning-cycle record. That distinction matters a lot in CS study.</p>
 <p><strong>Step 4 — Weekly total</strong></p>
 <pre><code class="language-python">total = sum(e[&quot;hours&quot;] for e in log[&quot;algorithms&quot;])
 </code></pre>
+<p>Totals reveal whether one course is quietly receiving too little attention. Time distribution is far easier to judge with numbers than with intuition.</p>
 <p><strong>Step 5 — Find weak subjects</strong></p>
 <pre><code class="language-python">weak = [c for c, es in log.items() if sum(e[&quot;hours&quot;] for e in es) &lt; 5]
 </code></pre>
+<p>The subjects you want to avoid are often the ones that need the clearest label. The earlier you surface a weak area, the cheaper it is to fix.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li><em>Logging</em> builds <em>habits</em>.</li>
-<li><em>Review marks</em> show <em>spacing</em>.</li>
-<li><em>Totals</em> reveal <em>weight</em>.</li>
+<li>Logging makes habits visible.</li>
+<li>Review marks are what make spaced learning possible.</li>
+<li>Totals reveal imbalance across subjects.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Just <em>transcribing</em> notes.</strong></li>
-<li><strong>Watching <em>progress</em> without <em>review</em>.</strong></li>
-<li><strong>Pushing <em>coding drills</em> to <em>exam week</em>.</strong></li>
-<li><strong>Being <em>embarrassed</em> to <em>ask</em>.</strong></li>
-<li><strong>Replacing <em>sleep</em> with <em>study</em>.</strong></li>
+<li><strong>Only transcribing notes and never reopening them.</strong></li>
+<li><strong>Following the schedule without building any review loop.</strong></li>
+<li><strong>Pushing coding drills into exam week.</strong></li>
+<li><strong>Feeling embarrassed about asking questions and dragging confusion for too long.</strong></li>
+<li><strong>Trying to buy more study time by cutting sleep.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A new hire's <em>growth speed</em> tracks <em>question frequency</em> and <em>logging habit</em>.</p>
+<p>The growth speed of a new engineer often shows up first in question frequency and note-taking habits. People who surface blockers quickly, record how they solved them, and reduce repeated mistakes usually adapt much faster.</p>
+<h2>A Sample Weekly Routine</h2>
+<p>The table below is not a perfect routine. It is a practical example of the minimum rhythm needed when you are taking several CS courses at once. The goal is to build a weekly loop you can sustain.</p>
+<p><strong>Monday</strong><br>
+- What to do: Summarize the lecture in three lines right after class<br>
+- Why it matters: Compression works best while the memory is still fresh.</p>
+<p><strong>Tuesday</strong><br>
+- What to do: Spend one hour on algorithms or programming drills<br>
+- Why it matters: Ideas do not become execution skill until your hands move.</p>
+<p><strong>Wednesday</strong><br>
+- What to do: Review concept-heavy courses such as OS or databases<br>
+- Why it matters: Theory sticks better when you revisit it after a short gap.</p>
+<p><strong>Thursday</strong><br>
+- What to do: Gather question lists and ask a professor, TA, or peer<br>
+- Why it matters: It is important to clear blockers within the same week.</p>
+<p><strong>Friday</strong><br>
+- What to do: Check study hours and identify weak subjects<br>
+- Why it matters: Numbers make subject imbalance immediately visible.</p>
+<p><strong>Weekend</strong><br>
+- What to do: Preview next week for 30 minutes and finish leftover assignments<br>
+- Why it matters: Weekends work better for consolidation than for impulsive new learning.</p>
+<p>You do not need to copy this table exactly. The important part is that lecture, review, practice, questions, and reflection all happen at least once inside the same week.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Routine</em> beats <em>talent</em>.</li>
-<li><em>Logs</em> compound.</li>
-<li><em>Questions</em> are <em>honest</em>.</li>
-<li><em>Sleep</em> is <em>productivity</em>.</li>
-<li><em>Review</em> is <em>real learning</em>.</li>
+<li>Routine lasts longer than talent.</li>
+<li>Written records compound over time.</li>
+<li>Questions are not weakness. They are learning tools.</li>
+<li>Sleep is part of productivity.</li>
+<li>Review is what turns exposure into real learning.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Routine</em> table.</li>
-<li>[ ] <em>Note</em> format.</li>
-<li>[ ] <em>Review</em> cycle.</li>
-<li>[ ] <em>Question</em> list.</li>
+<li>[ ] I wrote down a weekly routine.</li>
+<li>[ ] I chose one note format.</li>
+<li>[ ] I defined a review cycle.</li>
+<li>[ ] I started keeping a separate question list.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>routine</em> in one line.</li>
-<li>Define <em>review</em> in one line.</li>
-<li>State the meaning of <em>office hours</em> in one line.</li>
+<li>Define a routine in one line.</li>
+<li>State the meaning of review in one line.</li>
+<li>Explain how you would use office hours in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Build Your Portfolio</em>.</p>
+<p>You cannot sustain CS study for long on motivation alone. Lectures, notes, review, practice, and questions need to form one loop before learning starts to accumulate. The same amount of time can produce very different results depending on the method. In the next post, we will look at how to turn coursework and projects into a portfolio that other people can read.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>

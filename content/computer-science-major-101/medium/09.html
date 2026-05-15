@@ -54,101 +54,117 @@
 </head>
 <body>
 <h1>Build Your Portfolio</h1>
-<blockquote>
-<p>Computer Science Major 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>How</em> can a <em>class assignment</em> become a <em>portfolio piece</em>?</p>
-<blockquote>
-<p><em>Documentation</em> and <em>publishing</em> turn <em>assignments</em> into <em>evidence</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Assignments and projects disappear faster than most students expect if they are left inside local folders with no explanation. A year later, even the person who built them may struggle to remember what they did and why it mattered.</p>
 <p>This is post 9 in the Computer Science Major 101 series.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>How can assignments and major projects become portfolio pieces?</li>
+<li>Why do a GitHub repository, README, run instructions, and demo link all matter?</li>
+<li>What is the difference between dumping code online and publishing a result that another person can actually read?</li>
+<li>Why does a portfolio often become the thing that starts the conversation during applications?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
-<li>Definition of <em>portfolio</em></li>
-<li>Using <em>GitHub</em></li>
-<li>Writing a <em>README</em></li>
-<li><em>Documentation</em> patterns</li>
-<li>Meaning of <em>going public</em></li>
+<li>What a portfolio really is</li>
+<li>How to use GitHub well</li>
+<li>How to write a README</li>
+<li>Useful documentation patterns</li>
+<li>Why publishing your work matters</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>You need <em>visible results</em> to start a <em>conversation</em> during <em>applications</em>.</p>
+<p>Applications need visible evidence to start a real conversation. A repository, README, and demo link say far more than a single line on a resume because they reveal not only what you built, but how you explain and present your work.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[Assignment] --&gt; R[Repo]
-    R --&gt; D[README]
-    D --&gt; P[Portfolio]
-    P --&gt; J[Job]
-</code></pre>
+<p><img alt="Portfolio publishing flow" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png"></p>
+<p><em>How coursework becomes a portfolio through repositories and documentation</em></p>
+<blockquote>
+<p>An assignment ends at submission, but a portfolio starts only when the work is organized into a repository and explained through documentation.</p>
+</blockquote>
+<p>An assignment does not automatically become a portfolio piece. You need to organize it into a repository, add context through a README, and attach a demo when possible. That is when the work becomes readable to someone other than you.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>repo</strong>: code <em>repository</em>.</li>
-<li><strong>README</strong>: <em>first impression</em>.</li>
-<li><strong>license</strong>: <em>use rights</em>.</li>
-<li><strong>commit</strong>: change <em>unit</em>.</li>
-<li><strong>release</strong>: <em>distribution</em> unit.</li>
+<li><strong>repository</strong>: a place that holds code and supporting documents together.</li>
+<li><strong>README</strong>: the first document most people read when they open a repository.</li>
+<li><strong>license</strong>: a document that defines usage rights.</li>
+<li><strong>commit</strong>: the basic unit of change history.</li>
+<li><strong>release</strong>: a packaged version you can point to and share.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: <em>Assignment folders</em> live <em>locally</em>.</p>
-<p><strong>After</strong>: <em>Public repo</em> + <em>README</em> + <em>demo</em>.</p>
+<p><strong>Before</strong>: Your assignment folders live only on your local machine.</p>
+<p><strong>After</strong>: You leave behind a public repository, README, and demo that other people can verify.</p>
 <h2>Hands-on: Mini Portfolio Setup</h2>
 <p><strong>Step 1 — Repo name</strong></p>
 <pre><code class="language-python">name = &quot;schedule-checker&quot;
 </code></pre>
+<p>Names shape searchability and first impression. A short name that clearly reveals the function is much easier for other people to remember.</p>
 <p><strong>Step 2 — README sections</strong></p>
 <pre><code class="language-python">sections = [&quot;overview&quot;, &quot;demo&quot;, &quot;stack&quot;, &quot;run&quot;, &quot;license&quot;]
 </code></pre>
+<p>These five sections already make a repository much easier to read. In many student projects, overview, demo, stack, run instructions, and license are enough to establish trust.</p>
 <p><strong>Step 3 — One-line overview</strong></p>
 <pre><code class="language-python">overview = &quot;Conflict checker for course schedules&quot;
 </code></pre>
+<p>This line compresses the problem definition into a single sentence. A short, sharp description usually works better than a long abstract introduction.</p>
 <p><strong>Step 4 — Run commands</strong></p>
 <pre><code class="language-python">run = [&quot;pip install -r requirements.txt&quot;, &quot;python app.py&quot;]
 </code></pre>
+<p>If there are no run instructions, other people cannot verify the project. This is where README quality often separates one repository from another.</p>
 <p><strong>Step 5 — Demo link</strong></p>
 <pre><code class="language-python">demo = &quot;https://example.com/demo&quot;
 </code></pre>
+<p>A demo is one of the strongest forms of proof. A live deployment or even a short video often persuades faster than paragraphs of explanation.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The <em>name</em> drives <em>searchability</em>.</li>
-<li><em>README sections</em> set <em>expectations</em>.</li>
-<li>A <em>demo</em> is <em>evidence</em>.</li>
+<li>The repository name affects searchability and memory.</li>
+<li>README sections help the reader set expectations quickly.</li>
+<li>A demo is stronger evidence than explanation alone.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>An <em>empty README</em>.</strong></li>
-<li><strong>All commit messages saying <em>'update'</em>.</strong></li>
-<li><strong>No <em>license</em>.</strong></li>
-<li><strong>No <em>screenshots</em>.</strong></li>
-<li><strong>Unclear <em>run instructions</em>.</strong></li>
+<li><strong>Leaving the README empty.</strong></li>
+<li><strong>Using vague commit messages such as <code>update</code> everywhere.</strong></li>
+<li><strong>Forgetting to add a license.</strong></li>
+<li><strong>Leaving only explanation with no screenshots or demo.</strong></li>
+<li><strong>Writing run instructions so vaguely that the project is hard to reproduce.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Interviewers read the <em>README</em> before the <em>code</em>.</p>
+<p>Interviewers and reviewers often read the README before they open the code. How you introduce the project, explain run steps, and care for documentation tells them a great deal about your collaboration habits.</p>
+<h2>README Draft Example</h2>
+<p>Many students try to write an overly long README and end up burying the essentials. In the beginning, it is often better to fill in the four lines below and then add only what the project truly needs.</p>
+<pre><code class="language-markdown"># Schedule Checker
+
+A web tool that finds conflicts in a student's class schedule.
+
+## Demo
+- https://example.com/demo
+
+## Run
+- pip install -r requirements.txt
+- python app.py
+</code></pre>
+<p>Even this small draft already answers three questions for the reader: what the project is, where they can see it, and how they can run it locally. The first gate of a portfolio is not flashiness. It is reproducibility.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Publishing</em> is <em>learning</em>.</li>
-<li><em>Docs</em> matter as much as <em>code</em>.</li>
-<li>Brag about <em>small PRs</em>.</li>
-<li>A <em>license</em> is basic.</li>
-<li>A <em>demo link</em> is the strongest.</li>
+<li>Publishing your work is part of learning.</li>
+<li>Documentation matters as much as code.</li>
+<li>Small improvement records can still be strong evidence.</li>
+<li>A license is a basic expectation.</li>
+<li>A demo link is one of the strongest persuasive signals.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Five <em>README</em> sections.</li>
-<li>[ ] <em>License</em> added.</li>
-<li>[ ] <em>Screenshot</em>.</li>
-<li>[ ] <em>Run command</em> listed.</li>
+<li>[ ] I added the five core README sections.</li>
+<li>[ ] I included a license.</li>
+<li>[ ] I prepared a screenshot or demo.</li>
+<li>[ ] I wrote run commands where they are easy to find.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>README</em> in one line.</li>
-<li>Define <em>license</em> in one line.</li>
-<li>State the meaning of <em>demo</em> in one line.</li>
+<li>Define a README in one line.</li>
+<li>State the meaning of a license in one line.</li>
+<li>Explain why a demo is strong evidence in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Skills to Have Before Graduation</em>.</p>
+<p>A portfolio is not a decorative extra for exceptional students. It is the work of turning assignments and projects you already built into a form that another person can read. Once repository name, README, run steps, demo, and documentation are in place, even a small class project can become credible evidence. In the next post, we will close the series by looking at the skills worth checking before graduation.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/01-what-cs-majors-learn.md">What Computer Science Majors Learn</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/computer-science-major-101/en/02-first-year-subjects.md">Understanding First Year Subjects</a></li>

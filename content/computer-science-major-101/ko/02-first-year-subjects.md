@@ -17,7 +17,8 @@ tags:
   - Programming
   - Beginner
 seo_description: 1학년 필수 과목인 미적분, 선형대수, 이산수학, 프로그래밍 입문의 의미를 정리한 글
-last_reviewed: '2026-05-12'
+code_required: false
+last_reviewed: '2026-05-14'
 ---
 
 # 1학년 과목 이해하기
@@ -47,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    C[Calculus] --> L[Linear Algebra]
-    L --> D[Discrete Math]
-    D --> P[Programming]
-    P --> N[Next Year]
-```
+![1학년 기초 과목 연결 구조](../../../assets/computer-science-major-101/02/02-01-first-year-foundation-map.ko.png)
+
+*1학년 과목이 다음 학년 과목의 바탕이 되는 흐름*
 
 > 1학년 과목은 나중에 다시 만날 개념을 미리 깔아 두는 기반 공사에 가깝습니다.
 
