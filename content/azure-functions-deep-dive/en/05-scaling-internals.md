@@ -210,9 +210,12 @@ The supported triggers are a fixed set:
 | Storage Queue | `extensions.queues.batchSize` | 16 |
 | Service Bus (single dispatch, v5+) | `extensions.serviceBus.maxConcurrentCalls` | 16 |
 | Service Bus (batch, v5+) | `extensions.serviceBus.maxMessageBatchSize` | 1000 |
-| Event Hubs (v5+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
+| Event Hubs (v5.x) | `extensions.eventHubs.maxEventBatchSize` | 10 |
+| Event Hubs (v6+) | `extensions.eventHubs.maxEventBatchSize` | 100 |
 | Cosmos DB | `MaxItemsPerInvocation` (function attribute) | 100 |
 | Apache Kafka | `LagThreshold` (function attribute) | 1000 |
+
+For Event Hubs specifically, do not read `100` as a generic default for every `v5+` extension build. Microsoft documents that `maxEventBatchSize` changed from `10` to `100` in `Microsoft.Azure.WebJobs.Extensions.EventHubs` v6.0.0.
 
 Target-based scaling is enabled by default on **Functions runtime 4.19.0 and above**, and you can disable it with `TARGET_BASED_SCALING_ENABLED=0` to fall back to incremental.
 
