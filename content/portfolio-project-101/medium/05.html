@@ -54,101 +54,100 @@
 </head>
 <body>
 <h1>Deploying the Project</h1>
-<p>This is post 5 in the Portfolio Project 101 series.</p>
+<p>A portfolio project is only halfway finished if it runs on localhost and nowhere else. There is a big difference between saying the project works and giving another person a URL where they can verify it. Without that public path, the project still depends on explanation.</p>
+<p>This is post 5 in the Portfolio Project 101 series. Here we will treat deployment not as a giant infrastructure project, but as the discipline of creating a public URL, separating secrets, keeping a repeatable release path, and exposing a basic health check.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (5/10)</p>
+<p>Deployment is not about getting the app up once. It is about making the app reachable, repeatable, and inspectable.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> can <em>localhost-only</em> code never become a <em>portfolio</em>?</p>
-<blockquote>
-<p>Without <em>access</em>, there is no <em>proof</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>Choosing <em>hosting</em></li>
-<li>Linking a <em>domain</em></li>
-<li><em>Environment variables</em></li>
-<li><em>Continuous deploy</em></li>
-<li>Watching <em>cost</em></li>
+<li>Why is a public URL close to mandatory for a portfolio project?</li>
+<li>What should you optimize for when choosing a hosting platform?</li>
+<li>Why should secrets and environment configuration live outside the codebase?</li>
+<li>How do health checks and repeatable deploys raise trust in a small project?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Deployment</em> connects your <em>work</em> to the <em>world</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    G[Git Push] --&gt; B[Build]
-    B --&gt; D[Deploy]
-    D --&gt; H[Healthcheck]
-    H --&gt; U[URL]
-</code></pre>
+<p>Deployment connects your work to the outside world. Hiring reviewers do not evaluate a portfolio by imagining your laptop environment. They click, inspect, and decide whether the project feels real.</p>
+<p>A deployment setup also reveals operational judgment. Even a small project looks stronger when secrets are separated, redeploys follow the same path, and there is an obvious way to confirm service health.</p>
+<h2>Mental Model</h2>
+<p>You do not need a complicated model: code is pushed, built, deployed, checked, and then made available through a public URL.</p>
+<p><img alt="The path from git push to a public URL that others can verify" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>The path from git push to a public URL that others can verify</em></p>
+<p>This flow is also what helps you debug. Was the build broken? Did deployment finish but the app fail to start? Is the URL reachable while internal state is unhealthy? Reviewers will not ask those questions explicitly, but your project feels more mature when the deployment story can answer them.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>hosting</strong>: a <em>server provider</em>.</li>
-<li><strong>domain</strong>: an <em>address</em>.</li>
-<li><strong>env var</strong>: an <em>environment variable</em>.</li>
-<li><strong>CD</strong>: <em>continuous deploy</em>.</li>
-<li><strong>cost</strong>: <em>monthly bill</em>.</li>
+<li><strong>Hosting</strong>: the service that runs the application.</li>
+<li><strong>Official URL</strong>: the public address you want people to use and remember.</li>
+<li><strong>Environment variables</strong>: deployment-time configuration and secrets.</li>
+<li><strong>Continuous delivery</strong>: a repeatable path from code change to deployment.</li>
+<li><strong>Health check</strong>: a small route that tells you whether the app is alive enough to serve traffic.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: Only <em>localhost</em> runs.</p>
-<p><strong>After</strong>: A <em>public URL</em> exists.</p>
-<h2>Hands-on: Deploy Table</h2>
-<p><strong>Step 1 — Choose hosting</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: only localhost works, and no one else can verify the result.</p>
+<p><strong>After</strong>: the project has a public URL, secrets live outside the code, and the app can be redeployed through a known path.</p>
+<p>The second project reads like an operating service instead of a local exercise.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Choose simple hosting first</strong></p>
+<p>You do not need a complex platform to make a portfolio project credible.</p>
 <pre><code class="language-python">host = &quot;fly.io&quot;  # or render, railway
 </code></pre>
-<p><strong>Step 2 — Environment variables</strong></p>
+<p>The best beginner choice is usually the platform you can understand, redeploy, and afford to keep alive.</p>
+<p><strong>Step 2 — Separate environment variables</strong></p>
+<p>Public repositories should never carry real secrets.</p>
 <pre><code class="language-python">env = {&quot;DATABASE_URL&quot;: &quot;...&quot;, &quot;SECRET_KEY&quot;: &quot;...&quot;}
 </code></pre>
-<p><strong>Step 3 — Build command</strong></p>
+<p>This separation is both a security baseline and an operational baseline. It lets you distinguish local, test, and production settings cleanly.</p>
+<p><strong>Step 3 — Keep the build path explicit</strong></p>
+<p>Deployment should be a repeatable process, not a manual ritual.</p>
 <pre><code class="language-bash">docker build -t app .
 </code></pre>
-<p><strong>Step 4 — Deploy</strong></p>
+<p>A container image is often the easiest way to reduce machine-specific surprises and make the run environment legible.</p>
+<p><strong>Step 4 — Make the actual deploy repeatable</strong></p>
+<p>One successful push is not enough if you cannot do it again reliably.</p>
 <pre><code class="language-bash">fly deploy
 </code></pre>
-<p><strong>Step 5 — Healthcheck</strong></p>
+<p>Repeatability matters because portfolio demos age quickly. If updating the demo is painful, the project goes stale fast.</p>
+<p><strong>Step 5 — Add a health check</strong></p>
+<p>Deployment is not complete until you have a quick signal for service state.</p>
 <pre><code class="language-python">url = &quot;https://app.fly.dev/healthz&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>That small route gives you a first check when something looks wrong, and it makes operations feel less guess-driven.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li><em>Hosting</em> uses a <em>free tier</em>.</li>
-<li><em>Env vars</em> hold <em>secrets</em>.</li>
-<li><em>Healthchecks</em> are <em>automated</em>.</li>
+<li>Hosting should optimize for simplicity and maintainability before sophistication.</li>
+<li>Environment variables are the basic safety layer for public work.</li>
+<li>Health checks and repeatable deploys are visible signs of operational awareness.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong><em>Secrets</em> in <em>code</em>.</strong></li>
-<li><strong>No <em>domain</em>.</strong></li>
-<li><strong>No <em>healthcheck</em>.</strong></li>
-<li><strong>Unknown <em>cost</em>.</strong></li>
-<li><strong>Manual <em>redeploy</em>.</strong></li>
+<li>Leaving secrets in code or in README examples.</li>
+<li>Having multiple URLs with no clear “official” one.</li>
+<li>Shipping no health route, so a broken demo is harder to diagnose.</li>
+<li>Ignoring monthly cost until the demo quietly disappears.</li>
+<li>Relying on a manual redeploy path that discourages updates.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>Startups also ship MVPs on <em>Render</em>, <em>Fly.io</em>, and <em>Vercel</em>.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li><em>Hosting</em> is <em>simple</em>.</li>
-<li>A <em>domain</em> is <em>professional</em>.</li>
-<li><em>Secrets</em> live in <em>env vars</em>.</li>
-<li><em>Continuous deploy</em> runs on <em>git push</em>.</li>
-<li><em>Cost</em> is <em>monthly</em>.</li>
-</ul>
+<p>These are not just infrastructure mistakes. They shorten the life of the demo itself.</p>
+<h2>How This Reads in Practice</h2>
+<p>Small startups and solo products often begin on platforms such as Render, Fly.io, Railway, or Vercel because they reduce operational friction. The same logic applies to a portfolio.</p>
+<p>What matters most is not how ambitious the infrastructure sounds. It is whether the public URL stays usable and the project can be updated without drama.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Hosting</em> picked.</li>
-<li>[ ] <em>Public URL</em>.</li>
-<li>[ ] <em>Env vars</em>.</li>
-<li>[ ] <em>Healthcheck</em>.</li>
+<li>[ ] I picked one hosting platform on purpose.</li>
+<li>[ ] The official public URL is documented clearly.</li>
+<li>[ ] Database credentials and secrets live in environment variables.</li>
+<li>[ ] There is at least one health-check route.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>hosting</em> in one line.</li>
-<li>State the purpose of <em>env vars</em> in one line.</li>
-<li>State the role of <em>healthcheck</em> in one line.</li>
+<li>Pick one hosting option for your project and write down why it fits.</li>
+<li>Name three values that should move from code into environment variables.</li>
+<li>Decide what route you would check first if the demo stopped working.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Tests and Documentation</em>.</p>
+<p>Portfolio deployment does not require giant infrastructure. A public URL, separated secrets, a repeatable deployment path, and a basic health check already go a long way. Once those exist, even a small project starts to read like something another person can trust.</p>
+<p>Next, we will turn that trust into explicit proof through tests, documentation, and automated verification.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
@@ -163,10 +162,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://fly.io/docs/">Fly.io Docs</a></li>
-<li><a href="https://render.com/docs">Render Docs</a></li>
 <li><a href="https://12factor.net/">The Twelve-Factor App</a></li>
-<li><a href="https://martinfowler.com/bliki/BlueGreenDeployment.html">Deployment Strategies - Martin Fowler</a></li>
+<li><a href="https://render.com/docs/deploy-an-image">Deploying Containers on Render</a></li>
+<li><a href="https://fly.io/docs/">Fly.io Docs</a></li>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions documentation</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Deploy, DevOps, Hosting, Beginner</p>
 </body>

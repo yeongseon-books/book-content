@@ -17,7 +17,7 @@ tags:
   - Architecture
   - Beginner
 seo_description: 기술 선택 배경과 대안 분석을 기록하는 기술 의사결정 기록(ADR) 작성법을 배우고, 설계 역량을 논리적으로 증명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 기술적 의사결정 기록
@@ -45,13 +45,9 @@ last_reviewed: '2026-05-12'
 
 결정 기록은 상황, 대안, 선택, 결과, 다음 변화 가능성으로 이어집니다.
 
-```mermaid
-flowchart LR
-    C[Context] --> O[Options]
-    O --> D[Decision]
-    D --> R[Result]
-    R --> N[Next]
-```
+![상황에서 결과까지 이어지는 ADR 기록 흐름](../../../assets/portfolio-project-101/07/07-01-diagram.ko.png)
+
+*상황에서 결과까지 이어지는 ADR 기록 흐름*
 
 이 흐름이 중요한 이유는 결정이 항상 맥락 안에서 읽혀야 하기 때문입니다. FastAPI를 골랐다는 사실 자체보다, 왜 그 시점에 그 선택이 합리적이었는지가 더 중요합니다. 기록은 바로 그 맥락을 붙여 줍니다.
 

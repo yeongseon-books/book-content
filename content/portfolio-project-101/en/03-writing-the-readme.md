@@ -2,7 +2,7 @@
 series: portfolio-project-101
 episode: 3
 title: Writing the README
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,136 +16,158 @@ tags:
   - Documentation
   - Onboarding
   - Beginner
-seo_description: A beginner-friendly tour of writing a portfolio README that a hiring reviewer can grasp in 60 seconds.
-last_reviewed: '2026-05-04'
+seo_description: How to write a README that helps a hiring reviewer understand your project quickly and decide what to inspect next.
+last_reviewed: '2026-05-15'
 ---
 
 # Writing the README
 
-This is post 3 in the Portfolio Project 101 series.
+A good project can still lose power at the entrance if the README is weak. Most visitors read the README before they read any code. In that short window, they need to understand what problem the project solves, whether there is a demo worth opening, and how they could run it themselves.
 
-> Portfolio Project 101 series (3/10)
+If those answers are buried or missing, the reviewer often leaves before your implementation quality gets a chance to matter.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Portfolio Project 101 series. Here we will treat the README as the project's first demo and look at how to arrange it so a reviewer can understand the value in about a minute.
 
-**Core question**: *Why* must a *README* be *clear in 60 seconds*?
+---
 
-> Reviewers reach it *after* scanning *dozens* of projects.
+> A strong README is not just a repository description. It is an entry document that helps a first-time visitor decide what to do next.
 
-<!-- a-grade-intro:end -->
+## Questions this chapter answers
 
-## What You Will Learn
-
-- A standard *README* shape
-- A *problem solution* one-liner
-- *Demo* and *screenshots*
-- *How to run*
-- *Decision rationale*
+- What information should a portfolio README show first?
+- Why does the order pitch → demo → stack → run → next feel easy to scan?
+- Why can a README still feel weak even when it contains many screenshots?
+- How do you reduce friction for a reviewer who wants to run or inspect the project immediately?
 
 ## Why It Matters
 
-The *README* is the *entry door* to a project.
+A README shapes the first impression of the project. The exact same codebase can feel much stronger when the README is tight, structured, and honest about the current state. Reviewers often read communication quality, onboarding care, and scope discipline from the README itself.
 
-## Concept at a Glance
+In portfolio work, that matters a lot because the reviewer is not a teammate who already knows the context. The README has to do the work of orientation on its own.
 
-```mermaid
-flowchart LR
-    P[Pitch] --> D[Demo]
-    D --> S[Stack]
-    S --> R[Run]
-    R --> N[Next]
-```
+## Mental Model
+
+The simplest way to design a README is to follow the visitor’s question order.
+
+![The question order most reviewers follow when reading a README](../../../assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
+
+*The question order most reviewers follow when reading a README*
+
+Most first-time readers think in roughly this order: what is this, does it work, what is it built with, can I run it, and what is still left. A README works best when it follows that flow instead of following the author's implementation history.
 
 ## Key Terms
 
-- **pitch**: *one-line* summary.
-- **demo**: *URL + screenshot*.
-- **stack**: *technology list*.
-- **run**: *commands*.
-- **next**: *upcoming tasks*.
+- **Pitch**: a one-line summary of the problem and project shape.
+- **Demo**: a live link or screenshot that proves the product experience exists.
+- **Stack**: the short list of technologies that matter for orientation.
+- **Run path**: copy-paste steps for trying the project locally.
+- **Next**: the unfinished work or improvement list that sets expectations honestly.
 
-## Before/After
+## Before and After
 
-**Before**: Only *title + install*.
+**Before**: the README shows a title and maybe an install command, but the actual value of the project is hard to infer.
 
-**After**: All *five sections* exist.
+**After**: a visitor can understand the project, open the demo, and decide whether to inspect the implementation in well under a minute.
 
-## Hands-on: README Skeleton
+The difference is not length. It is whether the document is written for a first-time reader.
 
-### Step 1 — Pitch
+## Step by Step
+
+### Step 1 — Start with a one-line pitch
+
+Lead with the problem the project solves, not the framework name.
 
 ```markdown
 > A mini SaaS that fixes lost team schedules
 ```
 
-### Step 2 — Demo link
+A strong pitch does not repeat the title. It compresses the reason the project exists.
+
+### Step 2 — Surface the demo early
+
+A reviewer should not have to hunt for the proof.
 
 ```markdown
 [Live Demo](https://demo.example.com)
 ```
 
-### Step 3 — Stack
+A visible demo link creates trust faster than a long explanation paragraph.
+
+### Step 3 — Keep the stack short
+
+The stack section is for orientation, not for showing off every library.
 
 ```markdown
 - FastAPI, PostgreSQL, Docker
 ```
 
-### Step 4 — Run
+The goal is to make the system shape legible. The reasoning behind those choices can live elsewhere.
+
+### Step 4 — Make the run path copy-paste friendly
+
+The first local run should feel simple.
 
 ```bash
 docker compose up
 ```
 
-### Step 5 — Next tasks
+The more setup assumptions you require, the weaker the README becomes as an onboarding path.
+
+### Step 5 — Leave the next tasks visible
+
+Unfinished work is easier to trust when it is named clearly.
 
 ```markdown
 - [ ] add notifications
 ```
 
-## What to Notice in This Code
+A next-tasks section is not a weakness. It shows scope control and gives the reviewer an honest sense of what is done versus what is still planned.
 
-- The *pitch* is *one* sentence.
-- The *demo* is a *link*.
-- *Run* is *copy-paste* ready.
+## What to Notice in the Code
 
-## Five Common Mistakes
+- The pitch should describe the problem, not restate the title.
+- The demo should arrive before deep detail.
+- The run path should be short enough that a reviewer can try it without guesswork.
 
-1. **A *long preface*.**
-2. **Only *screenshots*.**
-3. **A *complex* run command.**
-4. **No *decision rationale*.**
-5. **No *next tasks*.**
+## Common Mistakes
 
-## How This Shows Up in Production
+1. Starting with a long preface that pushes the real value too far down.
+2. Showing only screenshots without a live link or clear run path.
+3. Making the setup instructions too complex for a quick first pass.
+4. Naming the stack without explaining what the project is trying to do.
+5. Hiding unfinished work so the current state becomes harder to judge.
 
-The *top 10%* of OSS projects share the same five-section shape.
+A README does not win by saying everything. It wins by making the next step obvious.
 
-## How a Senior Engineer Thinks
+## How This Reads in Practice
 
-- The *pitch* matters *most*.
-- The *demo* must be *alive*.
-- *Run* is *one line*.
-- *Decisions* are *documented*.
-- *Next* uses *checkboxes*.
+Well-maintained open source projects usually repeat the same pattern: short intro, quick start, visible example or demo, and a clear path to the deeper docs. They do that because first-time visitors always need roughly the same things.
+
+Portfolio projects benefit from the same discipline. A small repository can feel polished when the entry path is easy to follow.
 
 ## Checklist
 
-- [ ] *One-line* pitch.
-- [ ] *Demo* link.
-- [ ] *Run* command.
-- [ ] *Next* checkboxes.
+- [ ] The README opens with a problem-first pitch.
+- [ ] The demo link or screenshot is visible immediately.
+- [ ] The local run path is easy to copy and follow.
+- [ ] The core stack is listed without unnecessary noise.
+- [ ] The next tasks are written down honestly.
 
 ## Practice Problems
 
-1. Define *pitch* in one line.
-2. State the *demo* format in one line.
-3. State the *run* requirement in one line.
+1. Rewrite your project pitch without using technology names.
+2. List the three things a reviewer should learn within 30 seconds.
+3. Find the least friendly part of your current run section and rewrite it.
 
 ## Wrap-up and Next Steps
 
-Next post: *Building the Demo*.
+A README is not just a summary page. It is the first user experience of the project. When it leads with the problem, proves the demo, makes the run path simple, and shows unfinished work honestly, even a small project becomes much easier to trust.
+
+Next, we will move from the repository to the product surface itself and look at how to build a demo that reveals value quickly.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
 - [Traits of a Good Project](./02-traits-of-a-good-project.md)
 - **Writing the README (current)**
@@ -160,9 +182,9 @@ Next post: *Building the Demo*.
 
 ## References
 
-- [README Best Practices - GitHub](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
-- [Awesome README](https://github.com/matiassingers/awesome-readme)
+- [About READMEs (GitHub Docs)](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes)
 - [Make a README](https://www.makeareadme.com/)
 - [Standard Readme](https://github.com/RichardLitt/standard-readme)
+- [Awesome README](https://github.com/matiassingers/awesome-readme)
 
 Tags: Portfolio, README, Documentation, Onboarding, Beginner

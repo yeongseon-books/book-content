@@ -54,104 +54,103 @@
 </head>
 <body>
 <h1>Portfolio Improvement Checklist</h1>
-<p>This is the final post in the Portfolio Project 101 series.</p>
+<p>The biggest quality gap in a portfolio often appears in the final polish, not in the first implementation pass. Many projects feel almost done, but still leave a strangely incomplete impression because the README is stale, the demo is brittle, or the project story is spread across too many places.</p>
+<p>This is the final post in the Portfolio Project 101 series. Here we will walk through a pre-release checklist for README quality, demo quality, code confidence, project narrative, and external publishing paths.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (10/10)</p>
+<p>Finishing a portfolio is mostly about removing the points where a first-time visitor is likely to stop.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What is the <em>last</em> thing to <em>check</em> before you <em>share</em> your <em>portfolio</em>?</p>
-<blockquote>
-<p>The <em>eyes of a first-time visitor</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>A <em>pre-launch</em> checklist</li>
-<li><em>README</em> review</li>
-<li><em>Demo</em> review</li>
-<li><em>Code</em> review</li>
-<li><em>Story</em> review</li>
+<li>What are the most important areas to check before sharing a project publicly?</li>
+<li>Why should README, demo, code, story, and publishing links be reviewed separately?</li>
+<li>Where do the author's assumptions usually diverge most from a first-time visitor’s experience?</li>
+<li>How does a small review routine raise quality over time?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>The <em>first impression</em> is decided in <em>three minutes</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[README] --&gt; D[Demo]
-    D --&gt; C[Code]
-    C --&gt; S[Story]
-    S --&gt; P[Publish]
-</code></pre>
+<p>First impressions happen quickly. Most visitors read the README, try the demo, skim the repository structure, and decide whether the project feels worth deeper inspection. If those steps contain too much friction, the whole project becomes easier to dismiss.</p>
+<p>A portfolio is also something you reuse. You send the link more than once. You return to it months later. The review checklist helps not only at launch time, but also when keeping the project alive.</p>
+<h2>Mental Model</h2>
+<p>The most practical review order often follows the same sequence a visitor follows: README, demo, code, story, then public sharing channels.</p>
+<p><img alt="The final review order before you share a portfolio project publicly" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>The final review order before you share a portfolio project publicly</em></p>
+<p>That order works because it mirrors how the project is actually experienced from the outside. The better your review order matches the visitor’s path, the fewer blind spots you leave behind.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>smoke test</strong>: A <em>basic functional check</em>.</li>
-<li><strong>fresh eyes</strong>: A <em>first-time visitor</em>.</li>
-<li><strong>dead link</strong>: A <em>broken link</em>.</li>
-<li><strong>stale</strong>: <em>Out of date</em>.</li>
-<li><strong>launch</strong>: A <em>public release</em>.</li>
+<li><strong>Smoke test</strong>: a fast check that the core path still works.</li>
+<li><strong>Fresh eyes</strong>: the perspective of someone who has never seen the project before.</li>
+<li><strong>Broken link</strong>: a URL that no longer opens or no longer points at the right thing.</li>
+<li><strong>Stale information</strong>: docs or screenshots that no longer match the project.</li>
+<li><strong>Launch</strong>: the moment you intentionally share the project beyond your own machine.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: Only the <em>author</em> understands the <em>README</em>.</p>
-<p><strong>After</strong>: A <em>first-time visitor</em> can <em>run it</em> in <em>five minutes</em>.</p>
-<h2>Hands-on: A Five Step Review</h2>
-<p><strong>Step 1 — README Review</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: the README mostly makes sense only to the author, and the demo either breaks or reveals value too slowly.</p>
+<p><strong>After</strong>: a first-time visitor can understand the project, verify the main flow, and move between the repository and public explanation without confusion.</p>
+<p>Portfolio quality is often felt through friction count more than feature count.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Review the README</strong></p>
+<p>The README should answer what the project is, why it exists, how to run it, where the demo is, and what its usage or license conditions are.</p>
 <pre><code class="language-python">readme = [&quot;What&quot;, &quot;Why&quot;, &quot;How&quot;, &quot;Demo&quot;, &quot;License&quot;]
 </code></pre>
-<p><strong>Step 2 — Demo Review</strong></p>
+<p>Those five elements give a first-time visitor the minimum context to interpret the repository.</p>
+<p><strong>Step 2 — Review the demo</strong></p>
+<p>Do not stop at checking whether the link opens. Check whether the core flow is still understandable.</p>
 <pre><code class="language-python">demo = {&quot;url&quot;: &quot;https://demo.example.com&quot;, &quot;uptime&quot;: 0.99}
 </code></pre>
-<p><strong>Step 3 — Code Review</strong></p>
+<p>A working but confusing demo can still waste the reviewer’s short attention window.</p>
+<p><strong>Step 3 — Review the code baseline</strong></p>
+<p>The public version of the code should still be in a state you can defend.</p>
 <pre><code class="language-python">code = {&quot;tests&quot;: True, &quot;lint&quot;: True, &quot;ci&quot;: True}
 </code></pre>
-<p><strong>Step 4 — Story Review</strong></p>
+<p>If the verification path is broken, the rest of the project becomes harder to trust.</p>
+<p><strong>Step 4 — Review the project story</strong></p>
+<p>The repository, blog post, and interview answer should all tell the same story.</p>
 <pre><code class="language-python">story = [&quot;Problem&quot;, &quot;Solution&quot;, &quot;Result&quot;, &quot;Lesson&quot;]
 </code></pre>
-<p><strong>Step 5 — Launch</strong></p>
+<p>If those elements drift apart, the project starts to feel fragmented even when the code is fine.</p>
+<p><strong>Step 5 — Review the launch paths</strong></p>
+<p>Finally, check how the project will be shared and rediscovered.</p>
 <pre><code class="language-python">launch = [&quot;GitHub&quot;, &quot;Blog&quot;, &quot;LinkedIn&quot;]
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>Each channel plays a different role, so the links between them should feel deliberate rather than accidental.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li><em>README</em> is the <em>entrance</em>.</li>
-<li><em>Demo</em> is the <em>evidence</em>.</li>
-<li><em>Story</em> is the <em>memory</em>.</li>
+<li>The README is still the entrance to everything else.</li>
+<li>The demo is the strongest proof point.</li>
+<li>The project story is what makes the work memorable after the reviewer closes the tab.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>A <em>stale</em> README.</strong></li>
-<li><strong>A <em>broken</em> demo link.</strong></li>
-<li><strong>A <em>failing</em> test suite.</strong></li>
-<li><strong>A <em>missing</em> license.</strong></li>
-<li><strong>No <em>screenshots</em>.</strong></li>
+<li>README text that no longer matches the current code or deploy state.</li>
+<li>A broken demo link or a live demo with a blocked main flow.</li>
+<li>Skipping test or verification checks before sharing the project.</li>
+<li>Leaving licensing or usage conditions ambiguous.</li>
+<li>Providing too little visual or narrative proof for a first-time visitor.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>Open source projects run the same <em>pre-release checklist</em> before every release.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li>See it through <em>fresh eyes</em>.</li>
-<li>The <em>value</em> must show in <em>three minutes</em>.</li>
-<li>The <em>demo</em> must be <em>live</em>.</li>
-<li>The <em>story</em> must travel with <em>numbers</em>.</li>
-<li>The <em>checklist</em> becomes a <em>routine</em>.</li>
-</ul>
+<p>These are all visitor-path problems. Authors often miss them because they already know what the project is supposed to do.</p>
+<h2>How This Reads in Practice</h2>
+<p>Open source projects and product releases also run similar pre-release checklists before every release because small inconsistencies become visible very quickly after launch. The same idea applies to a personal portfolio.</p>
+<p>A portfolio project may be small, but once it is public, it is read like a product.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] All <em>five README</em> parts present.</li>
-<li>[ ] <em>Demo</em> link <em>works</em>.</li>
-<li>[ ] <em>Tests</em> pass.</li>
-<li>[ ] <em>License</em> is declared.</li>
-<li>[ ] At least <em>one screenshot</em>.</li>
+<li>[ ] The README clearly covers what, why, how, demo, and usage or license notes.</li>
+<li>[ ] The demo link works and the core flow is still easy to verify.</li>
+<li>[ ] The tests or baseline verification path still pass.</li>
+<li>[ ] The problem, solution, result, and lesson are consistent across channels.</li>
+<li>[ ] GitHub, blog posts, and external sharing paths connect naturally.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Write the meaning of <em>smoke test</em> in one line.</li>
-<li>Write the definition of <em>fresh eyes</em> in one line.</li>
-<li>Write the last check before <em>launch</em> in one line.</li>
+<li>List the five things a first-time visitor should confirm in three minutes.</li>
+<li>Find the stalest piece of information in the project today.</li>
+<li>Decide whether the README, the demo, or the public summary needs attention first.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>This is the <em>final</em> post in <em>Portfolio Project 101</em>. The next series covers <em>Technical Writing</em>.</p>
+<p>Final portfolio polish is mostly about removing friction. If you review the README, the demo, the code baseline, the project story, and the public sharing path in order, you dramatically reduce the chance that a visitor will stop for the wrong reason.</p>
+<p>This closes the Portfolio Project 101 series. Reusing the same review loop on future projects is one of the easiest ways to raise your baseline quality over time.</p>
+<h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What Is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Building the Demo</a></li>
@@ -164,10 +163,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer - Hunt &amp; Thomas</a></li>
-<li><a href="https://opensource.guide/">Open Source Guides - GitHub</a></li>
-<li><a href="https://sre.google/sre-book/release-engineering/">Release Engineering - Google SRE Book</a></li>
+<li><a href="https://opensource.guide/">Open Source Guides</a></li>
 <li><a href="https://choosealicense.com/">Choose a License</a></li>
+<li><a href="https://sre.google/sre-book/release-engineering/">Release Engineering — Google SRE Book</a></li>
+<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Checklist, Quality, Review, Beginner</p>
 </body>

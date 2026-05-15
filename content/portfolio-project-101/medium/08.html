@@ -54,102 +54,102 @@
 </head>
 <body>
 <h1>Summarizing as Blog Posts</h1>
-<p>This is post 8 in the Portfolio Project 101 series.</p>
+<p>A GitHub repository is a strong place to show the finished artifact, but it is not usually where people discover the work in the first place. Most readers search for the problem, the debugging path, or the lesson behind the project. If your portfolio stops at the repository, the result is visible, but the process and judgment are much harder to find.</p>
+<p>This is post 8 in the Portfolio Project 101 series. Here we will turn a project into a technical blog post that emphasizes problem, approach, result, and learning instead of dumping the entire implementation into prose.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (8/10)</p>
+<p>Good technical posts do not paste the whole codebase. They explain why a problem mattered, how it was approached, and what result or lesson came out of it.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> do <em>blog posts</em> attract more traffic than <em>GitHub</em>?</p>
-<blockquote>
-<p>People <em>search</em> for <em>process</em>, not just <em>results</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>A <em>problem solution</em> format</li>
-<li>Code <em>excerpts</em> with <em>links</em></li>
-<li><em>Screenshot</em> usage</li>
-<li><em>SEO</em> titles</li>
-<li><em>Series</em> structure</li>
+<li>Why does a problem-first structure work better than a code-first structure in technical writing?</li>
+<li>How should code excerpts and repository links divide responsibility?</li>
+<li>Why do numbers make a blog post more persuasive?</li>
+<li>How do titles and series links improve discoverability?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>A <em>blog</em> makes a <em>project</em> <em>discoverable</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Problem] --&gt; A[Approach]
-    A --&gt; C[Code]
-    C --&gt; R[Result]
-    R --&gt; L[Lesson]
-</code></pre>
+<p>A blog post makes the project discoverable. Many people will never search for your repository name, but they will search for the exact pain point your project addressed.</p>
+<p>Posts also preserve context better than code alone. The reason you chose the problem, the mistakes you made, and the lesson you would reuse next time are often much easier to explain in article form.</p>
+<h2>Mental Model</h2>
+<p>Strong technical posts usually move from problem to approach, then into code, result, and lesson.</p>
+<p><img alt="The standard flow of a technical post from problem to lesson" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>The standard flow of a technical post from problem to lesson</em></p>
+<p>That flow matches reader curiosity. Once the reader understands the problem, they want the approach. Once the approach makes sense, they want the key implementation idea. Then they want the result and the reusable takeaway.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>post</strong>: a <em>single</em> article.</li>
-<li><strong>excerpt</strong>: a <em>small slice</em>.</li>
-<li><strong>SEO</strong>: <em>search optimization</em>.</li>
-<li><strong>series</strong>: a <em>thread</em> of posts.</li>
-<li><strong>canonical</strong>: the <em>original URL</em>.</li>
+<li><strong>Post</strong>: one article focused on one problem or lesson.</li>
+<li><strong>Excerpt</strong>: a small piece of code chosen to support explanation.</li>
+<li><strong>SEO</strong>: search-oriented structure and wording that helps the right reader find the article.</li>
+<li><strong>Series</strong>: a chain of related articles with explicit progression.</li>
+<li><strong>Canonical link</strong>: the main repository or source location the reader can visit next.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: A <em>code dump</em> post.</p>
-<p><strong>After</strong>: A <em>problem solution result</em> post.</p>
-<h2>Hands-on: Post Skeleton</h2>
-<p><strong>Step 1 — One-line problem</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: a post becomes a long code dump with little context.</p>
+<p><strong>After</strong>: the post separates the problem, the approach, the key implementation idea, the result, and the lesson.</p>
+<p>The second version is easier to read, easier to remember, and much easier to share.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Write the problem in one line</strong></p>
+<p>Start with a pain point the reader can recognize.</p>
 <pre><code class="language-markdown">&gt; How we fixed the lost team schedule problem
 </code></pre>
-<p><strong>Step 2 — Approach</strong></p>
+<p>That one line gives the whole post a center of gravity.</p>
+<p><strong>Step 2 — Summarize the approach</strong></p>
+<p>Explain the reasoning path, not just the final code.</p>
 <pre><code class="language-python">approach = [&quot;observe&quot;, &quot;hypothesis&quot;, &quot;MVP&quot;, &quot;deploy&quot;]
 </code></pre>
-<p><strong>Step 3 — Code excerpt</strong></p>
+<p>Readers often care more about the order of decisions than the raw list of tools.</p>
+<p><strong>Step 3 — Use code as an excerpt, not as the article</strong></p>
+<p>Pick the smallest code block that reveals the key idea.</p>
 <pre><code class="language-python">def normalize(date_str):
     return date_str.replace(&quot;.&quot;, &quot;-&quot;)
 </code></pre>
-<p><strong>Step 4 — Result</strong></p>
+<p>The rest can live in the repository. The post should keep the narrative readable.</p>
+<p><strong>Step 4 — Show the result in numbers</strong></p>
+<p>Specific outcomes are easier to trust than vague success claims.</p>
 <pre><code class="language-python">result = {&quot;users&quot;: 30, &quot;latency_ms&quot;: 120}
 </code></pre>
-<p><strong>Step 5 — Lesson</strong></p>
+<p>Even small metrics help because they give the reader something concrete to evaluate.</p>
+<p><strong>Step 5 — End with a reusable lesson</strong></p>
+<p>Close with a principle you would apply again.</p>
 <pre><code class="language-python">lesson = &quot;MVP only survives when small&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>That line keeps the article from ending as a diary entry. It turns the project into a transferable lesson.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li>The <em>problem</em> is <em>one line</em>.</li>
-<li><em>Code</em> is an <em>excerpt</em>.</li>
-<li><em>Result</em> is <em>numeric</em>.</li>
+<li>The problem should be short enough to anchor the rest of the article.</li>
+<li>Code works best when it supports the explanation instead of replacing it.</li>
+<li>Numeric outcomes make the project feel like a case study instead of a vague story.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>A <em>code dump</em>.</strong></li>
-<li><strong>No <em>result</em>.</strong></li>
-<li><strong>An <em>unclear SEO title</em>.</strong></li>
-<li><strong>No <em>screenshots</em>.</strong></li>
-<li><strong>No <em>next-post</em> link.</strong></li>
+<li>Pasting large code blocks before explaining the problem.</li>
+<li>Writing no result section, so the post has no visible payoff.</li>
+<li>Using a title that does not match search intent.</li>
+<li>Forgetting screenshots, demo links, or repository links that would prove the story.</li>
+<li>Leaving the article disconnected from the rest of the series.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>Engineering blogs use the same <em>problem solution result</em> format.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li><em>Problem</em> drives <em>empathy</em>.</li>
-<li><em>Approach</em> is a <em>story</em>.</li>
-<li><em>Code</em> is <em>minimal</em>.</li>
-<li><em>Result</em> is <em>numeric</em>.</li>
-<li><em>Lesson</em> is <em>honest</em>.</li>
-</ul>
+<p>A technical post is not better because it is longer. It is better because it helps the reader move through the problem with less friction.</p>
+<h2>How This Reads in Practice</h2>
+<p>Most good engineering blogs follow a version of problem → solution → result because readers care about consequences, not just tools. Company blogs do the same thing when they explain incidents, migrations, or new features.</p>
+<p>Portfolio writing gets much stronger when it follows that same pattern.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>One-line</em> problem.</li>
-<li>[ ] At most <em>three</em> code blocks.</li>
-<li>[ ] <em>Numeric</em> result.</li>
-<li>[ ] <em>One-line</em> lesson.</li>
+<li>[ ] The article states the problem in one sentence.</li>
+<li>[ ] Code excerpts stay limited to the pieces that matter most.</li>
+<li>[ ] The result section includes at least one metric.</li>
+<li>[ ] The ending includes a reusable lesson.</li>
+<li>[ ] The post links naturally to the next article or the repository.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>State the meaning of <em>SEO</em> in one line.</li>
-<li>Define <em>excerpt</em> in one line.</li>
-<li>State the <em>series</em> structure in one line.</li>
+<li>Rewrite your project as a search-oriented title.</li>
+<li>Pick one code block that deserves to appear in the article.</li>
+<li>If you do not have metrics yet, decide what you could measure.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Explaining in Interviews</em>.</p>
+<p>When you turn a project into a blog post, clarity matters more than code volume. Lead with the problem, explain the approach, show only the implementation that earns its place, report the result, and finish with a lesson. That is how a repository becomes a discoverable engineering story.</p>
+<p>Next, we will take the same project and compress it into an interview answer that sounds clear under time pressure.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
@@ -164,10 +164,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.harpercollins.com/products/on-writing-well-william-zinsser">On Writing Well - William Zinsser</a></li>
-<li><a href="https://developers.google.com/search/docs">Google Search Central</a></li>
-<li><a href="https://hashnode.com/">Hashnode for Devs</a></li>
-<li><a href="https://world.hey.com/dhh">Writing for Engineers - Heinemeier Hansson</a></li>
+<li><a href="https://developers.google.com/search/docs">Google Search Central documentation</a></li>
+<li><a href="https://hashnode.com/">Hashnode</a></li>
+<li><a href="https://www.harpercollins.com/products/on-writing-well-william-zinsser">On Writing Well</a></li>
+<li><a href="https://www.writethedocs.org/guide/writing/docs-principles/">Write the Docs — Documentation principles</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Blog, Writing, Storytelling, Beginner</p>
 </body>

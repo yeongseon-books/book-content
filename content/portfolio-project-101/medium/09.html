@@ -54,102 +54,102 @@
 </head>
 <body>
 <h1>Explaining in Interviews</h1>
-<p>This is post 9 in the Portfolio Project 101 series.</p>
+<p>Interview answers do not get stronger just because they get longer. In most cases, a tighter explanation of the problem, the decision, and the result is much more persuasive than a broad tour of every library in the stack. Interviewers usually want to hear judgment, not a dependency list.</p>
+<p>This is post 9 in the Portfolio Project 101 series. Here we will shape a portfolio project into a short interview answer that makes the problem, the action, and the result easy to follow under time pressure.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (9/10)</p>
+<p>A strong interview answer is not a product pitch. It is a compressed record of problem, task, action, result, and learning.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What do <em>interviewers</em> really want to <em>hear</em> about your <em>portfolio</em>?</p>
-<blockquote>
-<p>Less <em>code</em>, more <em>judgment</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>STAR</em> format</li>
-<li>Problem to solution narrative</li>
-<li>Speaking with <em>numbers</em></li>
-<li>Predicting <em>follow-up</em> questions</li>
-<li>A <em>two minute</em> summary</li>
+<li>What do interviewers usually want to hear before they care about implementation detail?</li>
+<li>Why is the STAR structure especially useful for short project answers?</li>
+<li>How do numbers and trade-offs change the credibility of the answer?</li>
+<li>How do you make your personal contribution clear in solo and team contexts?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Interviews are <em>short</em>, and <em>stories</em> are what people <em>remember</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    S[Situation] --&gt; T[Task]
-    T --&gt; A[Action]
-    A --&gt; R[Result]
-</code></pre>
+<p>Interviews are short, and people remember stories more than stacks. Many candidates have touched similar tools. Fewer can explain a project as a chain of problem, decision, and result.</p>
+<p>The first minute or two matters a lot because it shapes the quality of the follow-up questions. If the initial answer is vague, the rest of the conversation tends to stay vague too.</p>
+<h2>Mental Model</h2>
+<p>A project answer becomes much easier to control when it follows situation, task, action, and result.</p>
+<p><img alt="The STAR answer shape from situation to measurable result" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>The STAR answer shape from situation to measurable result</em></p>
+<p>This structure prevents a common failure mode: jumping straight into implementation without first explaining why the project existed or what success looked like.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>STAR</strong>: <em>Situation, Task, Action, Result</em>.</li>
-<li><strong>elevator pitch</strong>: A <em>two minute</em> summary.</li>
-<li><strong>trade-off</strong>: The <em>cost of a choice</em>.</li>
-<li><strong>metric</strong>: A <em>numeric indicator</em>.</li>
-<li><strong>follow-up</strong>: A <em>next question</em>.</li>
+<li><strong>Answer structure</strong>: the order that keeps the explanation easy to follow.</li>
+<li><strong>Short summary answer</strong>: a project explanation that fits into about two minutes.</li>
+<li><strong>Trade-off</strong>: what you gained and what you knowingly accepted as a cost.</li>
+<li><strong>Metric</strong>: a number that supports the result.</li>
+<li><strong>Follow-up question</strong>: the deeper question that comes after your first explanation lands.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "I built an <em>API</em> with <em>Flask</em>."</p>
-<p><strong>After</strong>: "I solved a <em>thirty user</em> concurrency problem with <em>Flask and Redis</em>."</p>
-<h2>Hands-on: A Two Minute Answer</h2>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: “I built an API with Flask.”</p>
+<p><strong>After</strong>: “I built a scheduling tool to unify scattered team schedules, used Flask plus PostgreSQL to keep the first version simple, and kept average response time around 120 ms for a 30-user pilot.”</p>
+<p>Both may be true, but the second answer gives the interviewer a problem, a design choice, and a result in a single pass.</p>
+<h2>Step by Step</h2>
 <p><strong>Step 1 — Situation</strong></p>
+<p>Open with the real context that made the project worth building.</p>
 <pre><code class="language-python">situation = &quot;The team schedule kept getting lost across tools&quot;
 </code></pre>
+<p>The situation should be concrete enough that the interviewer can picture the pain quickly.</p>
 <p><strong>Step 2 — Task</strong></p>
+<p>State what the project needed to accomplish.</p>
 <pre><code class="language-python">task = &quot;Show every schedule on a single screen&quot;
 </code></pre>
+<p>That line clarifies scope and makes later trade-offs easier to explain.</p>
 <p><strong>Step 3 — Action</strong></p>
+<p>Describe what you actually did and why that path made sense.</p>
 <pre><code class="language-python">action = [&quot;Flask API&quot;, &quot;PostgreSQL&quot;, &quot;Deploy to Render&quot;]
 </code></pre>
+<p>The tools matter less than the reason they were chosen. One sentence about why you picked the path often does more work than three sentences of implementation detail.</p>
 <p><strong>Step 4 — Result</strong></p>
+<p>Give the interviewer at least one number.</p>
 <pre><code class="language-python">result = {&quot;users&quot;: 30, &quot;latency_ms&quot;: 120}
 </code></pre>
+<p>Metrics create evidence. They do not need to be huge. They need to be real.</p>
 <p><strong>Step 5 — Lesson</strong></p>
+<p>Close with what the project taught you.</p>
 <pre><code class="language-python">lesson = &quot;Small MVPs survive&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>That line is often what turns a build log into an engineering answer.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li><em>STAR</em> is the <em>order</em>.</li>
-<li><em>Numbers</em> are the <em>evidence</em>.</li>
-<li><em>Lesson</em> is the <em>closing line</em>.</li>
+<li>STAR is not a memorization trick. It is a way to stabilize the explanation order.</li>
+<li>Metrics do the work of proof.</li>
+<li>The lesson gives the answer a strong closing line and a natural bridge to follow-up discussion.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>Just <em>listing</em> technologies.</strong></li>
-<li><strong>Having no <em>numbers</em>.</strong></li>
-<li><strong>Skipping the <em>trade-off</em>.</strong></li>
-<li><strong>Blurring your <em>personal contribution</em>.</strong></li>
-<li><strong>Forgetting the <em>lesson</em>.</strong></li>
+<li>Listing technologies without explaining the problem or result.</li>
+<li>Giving no numbers, so the scale and impact stay abstract.</li>
+<li>Avoiding trade-offs, which makes the answer sound shallow.</li>
+<li>Blurring personal contribution in a group project.</li>
+<li>Ending without a lesson or reflection.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>Senior engineers also document <em>project retrospectives</em> in <em>STAR</em> form.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li><em>Situation</em> invites <em>empathy</em>.</li>
-<li><em>Task</em> must be <em>clear</em>.</li>
-<li><em>Action</em> is <em>your</em> part.</li>
-<li><em>Result</em> is in <em>numbers</em>.</li>
-<li><em>Lesson</em> is <em>honest</em>.</li>
-</ul>
+<p>Those mistakes often leave the interviewer wondering whether the candidate really understood the project end to end.</p>
+<h2>How This Reads in Practice</h2>
+<p>Teams use the same basic structure when they write retrospectives or summarize incidents: what happened, what needed to be done, what action was taken, and what happened next. Interview answers work well for the same reason.</p>
+<p>The goal is not to sound rehearsed. The goal is to sound clear.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] You finish in <em>two minutes</em>.</li>
-<li>[ ] At least <em>one number</em>.</li>
-<li>[ ] At least <em>one trade-off</em>.</li>
-<li>[ ] At least <em>one lesson</em>.</li>
+<li>[ ] I can finish the answer in about two minutes.</li>
+<li>[ ] The answer includes at least one metric.</li>
+<li>[ ] I can name at least one trade-off.</li>
+<li>[ ] I can end with one lesson I would reuse.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Write the meaning of <em>STAR</em> in one line.</li>
-<li>Write the definition of <em>trade-off</em> in one line.</li>
-<li>Write the length of an <em>elevator pitch</em> in one line.</li>
+<li>Rewrite your project in four sentences using STAR.</li>
+<li>Choose one number that should appear in the result.</li>
+<li>Name one technical choice and explain why an alternative was rejected.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>The next post is the <em>Portfolio Improvement Checklist</em>.</p>
+<p>Explaining a portfolio project well is about structure, not volume. When situation, task, action, result, and lesson appear in a clean order, the answer becomes easier to follow and much easier to trust. Add one real metric and one real trade-off, and the same project suddenly sounds far more mature.</p>
+<p>Next, we will close the series with a final checklist you can use before sharing a portfolio project publicly.</p>
+<h2>In this series</h2>
 <ul>
-<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What Is a Portfolio Project</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/03-writing-the-readme.md">Writing the README</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/04-building-the-demo.md">Building the Demo</a></li>
@@ -162,10 +162,10 @@
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.indeed.com/career-advice/interviewing/how-to-use-the-star-interview-response-technique">STAR Method - Indeed</a></li>
-<li><a href="https://www.crackingthecodinginterview.com/">Cracking the Coding Interview - McDowell</a></li>
-<li><a href="https://rework.withgoogle.com/guides/hiring-use-structured-interviewing/steps/introduction/">Behavioral Interviews - Google re:Work</a></li>
-<li><a href="https://thetechresume.com/">The Tech Resume Inside Out - Orosz</a></li>
+<li><a href="https://www.indeed.com/career-advice/interviewing/how-to-use-the-star-interview-response-technique">How to use the STAR interview response technique</a></li>
+<li><a href="https://rework.withgoogle.com/guides/hiring-use-structured-interviewing/steps/introduction/">Google re:Work — Structured interviewing</a></li>
+<li><a href="https://thetechresume.com/">The Tech Resume Inside Out</a></li>
+<li><a href="https://www.oreilly.com/library/view/the-managers-path/9781491973882/">The Manager's Path</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, Interview, STAR, Communication, Beginner</p>
 </body>

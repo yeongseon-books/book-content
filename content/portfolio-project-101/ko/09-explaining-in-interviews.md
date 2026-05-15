@@ -17,7 +17,7 @@ tags:
   - Communication
   - Beginner
 seo_description: 면접에서 프로젝트 성과와 기술 난관 극복을 STAR 기법으로 설명하여, 자신의 역량을 어필하는 커뮤니케이션을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 면접에서 설명하기
@@ -45,12 +45,9 @@ last_reviewed: '2026-05-12'
 
 프로젝트 설명은 상황, 과제, 행동, 결과 순서로 정리하면 놓치기 쉽지 않습니다.
 
-```mermaid
-flowchart LR
-    S[Situation] --> T[Task]
-    T --> A[Action]
-    A --> R[Result]
-```
+![상황에서 결과로 이어지는 STAR 답변 구조](../../../assets/portfolio-project-101/09/09-01-diagram.ko.png)
+
+*상황에서 결과로 이어지는 STAR 답변 구조*
 
 이 구조는 답변이 자연스럽게 질문을 예방하게 만듭니다. 왜 이걸 만들었는지, 정확히 무엇을 해야 했는지, 본인이 무엇을 했는지, 결국 어떤 결과가 나왔는지가 한 흐름으로 이어지기 때문입니다.
 

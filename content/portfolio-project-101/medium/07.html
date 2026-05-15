@@ -54,101 +54,100 @@
 </head>
 <body>
 <h1>Recording Tech Decisions</h1>
-<p>This is post 7 in the Portfolio Project 101 series.</p>
+<p>When reviewers inspect a portfolio project, they care about more than the final code. They also want to know why a specific stack was chosen, what alternatives were considered, and what trade-offs were accepted. Code shows the outcome, but it rarely shows the judgment on its own.</p>
+<p>This is post 7 in the Portfolio Project 101 series. Here we will use a lightweight ADR-style format to record technical choices and make design judgment visible in a way that is easy to keep up.</p>
+<hr>
 <blockquote>
-<p>Portfolio Project 101 series (7/10)</p>
+<p>A good decision note does not declare a perfect answer. It records what options existed, why one was chosen, and what consequences came with it.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> does <em>the reason</em> for picking a tech matter more than the <em>code</em> itself?</p>
-<blockquote>
-<p>Reviewers grade <em>judgment</em>, not just <em>output</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>ADR</em> idea</li>
-<li><em>Context decision result</em></li>
-<li>Comparing <em>options</em></li>
-<li><em>Reversibility</em></li>
-<li><em>Document location</em></li>
+<li>Why do technical choices usually stay invisible if you only show code?</li>
+<li>How do alternatives and consequences make a project more persuasive?</li>
+<li>How lightweight can an ADR be and still be useful?</li>
+<li>What kinds of written traces make judgment visible in a portfolio?</li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Decision records</em> are <em>evidence</em> of <em>judgment</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    C[Context] --&gt; O[Options]
-    O --&gt; D[Decision]
-    D --&gt; R[Result]
-    R --&gt; N[Next]
-</code></pre>
+<p>Hiring loops often care as much about decision quality as implementation quality. Two projects may ship the same capability, but the one that explains why a framework was chosen and what was sacrificed for speed or simplicity usually reads much deeper.</p>
+<p>Decision records help because they make constraint-aware thinking visible. They also help you later, when you need to remember why something was done a certain way.</p>
+<h2>Mental Model</h2>
+<p>A useful decision record usually flows from context to options, then to the decision, the consequence, and the likely next step.</p>
+<p><img alt="The ADR flow from context and options to consequence and next step" src="https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>The ADR flow from context and options to consequence and next step</em></p>
+<p>This order matters because choices only make sense inside a real situation. “We picked FastAPI” is weak on its own. “We picked FastAPI because we had a solo developer, a short deadline, and a need for fast API docs” is much more informative.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>ADR</strong>: <em>Architecture Decision Record</em>.</li>
-<li><strong>context</strong>: the <em>situation</em>.</li>
-<li><strong>options</strong>: the <em>alternatives</em>.</li>
-<li><strong>decision</strong>: the <em>choice</em>.</li>
-<li><strong>consequence</strong>: the <em>outcome</em>.</li>
+<li><strong>ADR</strong>: Architecture Decision Record, usually a short document for one decision.</li>
+<li><strong>Context</strong>: the project constraints or conditions behind the choice.</li>
+<li><strong>Options</strong>: the realistic alternatives you considered.</li>
+<li><strong>Decision</strong>: the chosen direction.</li>
+<li><strong>Consequence</strong>: what the decision improved and what it cost.</li>
 </ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: <em>We just did it that way</em>.</p>
-<p><strong>After</strong>: The <em>reason</em> is written down.</p>
-<h2>Hands-on: ADR Table</h2>
-<p><strong>Step 1 — Context</strong></p>
+<h2>Before and After</h2>
+<p><strong>Before</strong>: “We just built it that way,” with no explanation of why the choice happened.</p>
+<p><strong>After</strong>: the project keeps a short note that captures the situation, options, decision, and result.</p>
+<p>The second project makes judgment much easier to see.</p>
+<h2>Step by Step</h2>
+<p><strong>Step 1 — Write the context first</strong></p>
+<p>A choice only becomes meaningful when its constraints are visible.</p>
 <pre><code class="language-python">context = &quot;solo dev, 2-week deadline, Python familiar&quot;
 </code></pre>
-<p><strong>Step 2 — Options</strong></p>
+<p>This prevents hindsight from flattening every decision into a generic “best practice.”</p>
+<p><strong>Step 2 — List the real options</strong></p>
+<p>Comparison gives the final choice weight.</p>
 <pre><code class="language-python">options = [&quot;FastAPI&quot;, &quot;Flask&quot;, &quot;Django&quot;]
 </code></pre>
-<p><strong>Step 3 — Decision</strong></p>
+<p>You do not need a giant matrix. Two or three realistic options are enough.</p>
+<p><strong>Step 3 — State the decision clearly</strong></p>
+<p>The final choice should be plain and unambiguous.</p>
 <pre><code class="language-python">decision = &quot;FastAPI&quot;
 </code></pre>
-<p><strong>Step 4 — Reasoning</strong></p>
+<p>The power comes from placing that line after the context and the options.</p>
+<p><strong>Step 4 — Record the reasoning as criteria</strong></p>
+<p>The explanation is stronger when it uses criteria rather than taste.</p>
 <pre><code class="language-python">why = [&quot;async&quot;, &quot;type_hints&quot;, &quot;swagger_auto&quot;]
 </code></pre>
-<p><strong>Step 5 — Result</strong></p>
+<p>Those criteria are easy to connect back to the problem and the constraints.</p>
+<p><strong>Step 5 — Record the consequence honestly</strong></p>
+<p>Good notes include both gains and costs.</p>
 <pre><code class="language-python">result = {&quot;build_time&quot;: &quot;fast&quot;, &quot;trade&quot;: &quot;smaller_ecosystem&quot;}
 </code></pre>
-<h2>What to Notice in This Code</h2>
+<p>That honesty is what makes the note feel like judgment instead of self-promotion.</p>
+<h2>What to Notice in the Code</h2>
 <ul>
-<li><em>Context</em> sits <em>on top</em>.</li>
-<li><em>Options</em> are <em>at least two</em>.</li>
-<li><em>Results</em> are <em>honest</em>.</li>
+<li>Context belongs at the top because choices only make sense inside constraints.</li>
+<li>Options matter because they prove the decision was not arbitrary.</li>
+<li>Consequences matter because trade-offs are where engineering judgment becomes visible.</li>
 </ul>
-<h2>Five Common Mistakes</h2>
+<h2>Common Mistakes</h2>
 <ol>
-<li><strong>No <em>options</em>.</strong></li>
-<li><strong>Reasoning is just <em>trend</em>.</strong></li>
-<li><strong>No <em>result</em> recorded.</strong></li>
-<li><strong>No <em>ADR</em> next to the <em>code</em>.</strong></li>
-<li><strong>No <em>version</em> control.</strong></li>
+<li>Writing only the final decision without alternatives.</li>
+<li>Using trend or preference as the whole justification.</li>
+<li>Recording no consequence, so the note cannot be evaluated later.</li>
+<li>Keeping ADRs outside the repository where reviewers never see them.</li>
+<li>Forgetting numbering or dates, which makes the history hard to follow.</li>
 </ol>
-<h2>How This Shows Up in Production</h2>
-<p>Companies keep ADRs as <code>docs/adr/0001-...md</code> files.</p>
-<h2>How a Senior Engineer Thinks</h2>
-<ul>
-<li><em>Decisions</em> are <em>recorded</em>.</li>
-<li><em>Options</em> are <em>documented</em>.</li>
-<li><em>Results</em> are <em>honest</em>.</li>
-<li><em>Numbers</em> are <em>ordered</em>.</li>
-<li><em>Location</em> is <em>in repo</em>.</li>
-</ul>
+<p>Decision records do not need to be long. They need to be clear and complete.</p>
+<h2>How This Reads in Practice</h2>
+<p>Many teams keep notes like <code>docs/adr/0001-...md</code> for exactly this reason. As time passes, people forget why a decision happened. New contributors only see the final state. ADRs close that gap.</p>
+<p>The same habit helps portfolio work. A small project starts to read like a thoughtful engineering artifact when reviewers can see not only what was built, but why.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>ADR</em> folder.</li>
-<li>[ ] At least <em>three</em> ADRs.</li>
-<li>[ ] <em>Options + decision + result</em>.</li>
-<li>[ ] <em>Numbered</em>.</li>
+<li>[ ] I chose a folder for ADR notes.</li>
+<li>[ ] I recorded at least a few meaningful technical choices.</li>
+<li>[ ] Each note includes context, options, decision, and consequence.</li>
+<li>[ ] The notes are ordered by number or date.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>State the meaning of <em>ADR</em> in one line.</li>
-<li>Define <em>context</em> in one line.</li>
-<li>State the value of recording <em>results</em> in one line.</li>
+<li>Choose one project decision that deserves an ADR today.</li>
+<li>List two alternatives you genuinely considered.</li>
+<li>Write one benefit and one cost of the chosen option.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Summarizing as Blog Posts</em>.</p>
+<p>Technical decision records reveal the judgment behind the result. When you write down the context, compare the alternatives, explain the decision criteria, and record the consequence honestly, even a small project becomes much easier to evaluate as real engineering work.</p>
+<p>Next, we will expand the project beyond the repository and look at how to turn it into a technical post that others can discover through search.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/01-what-is-a-portfolio-project.md">What is a Portfolio Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/portfolio-project-101/en/02-traits-of-a-good-project.md">Traits of a Good Project</a></li>
@@ -163,10 +162,10 @@
 </ul>
 <h2>References</h2>
 <ul>
+<li><a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Documenting Architecture Decisions</a></li>
 <li><a href="https://adr.github.io/">Architecture Decision Records</a></li>
-<li><a href="https://github.com/npryce/adr-tools">ADR Tools - Nat Pryce</a></li>
-<li><a href="https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Documenting Architecture Decisions - Michael Nygard</a></li>
-<li><a href="https://www.thoughtworks.com/radar/techniques/lightweight-architecture-decision-records">ThoughtWorks Tech Radar</a></li>
+<li><a href="https://www.thoughtworks.com/en-us/radar/techniques/lightweight-architecture-decision-records">Thoughtworks Technology Radar — Lightweight ADRs</a></li>
+<li><a href="https://github.com/npryce/adr-tools">ADR Tools</a></li>
 </ul>
 <p class="tags-line">Tags: Portfolio, ADR, Decision, Architecture, Beginner</p>
 </body>

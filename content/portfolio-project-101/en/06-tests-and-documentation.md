@@ -2,7 +2,7 @@
 series: portfolio-project-101
 episode: 6
 title: Tests and Documentation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,83 +16,96 @@ tags:
   - Documentation
   - Quality
   - Beginner
-seo_description: A beginner-friendly tour of the minimum tests and documentation that build trust in a portfolio project.
-last_reviewed: '2026-05-04'
+seo_description: How to prove a portfolio project is reliable through a minimum testing stack, clear documentation, and CI automation.
+last_reviewed: '2026-05-15'
 ---
 
 # Tests and Documentation
 
-This is post 6 in the Portfolio Project 101 series.
+Saying that a project works is very different from showing that it has been verified. If a reviewer opens the repository and finds no tests and no docs beyond a short README, the whole project starts to look like practice code—even if the app itself is functional.
 
-> Portfolio Project 101 series (6/10)
+This is post 6 in the Portfolio Project 101 series. Here we will look at the level of testing and documentation that makes a small portfolio project feel trustworthy instead of accidental.
 
-<!-- a-grade-intro:begin -->
+---
 
-**Core question**: *Why* is there *no trust* without *tests*?
+> Working code is only a claim until another person can verify it through tests, docs, and repeatable checks.
 
-> Code without *proof* is only a *claim*.
+## Questions this chapter answers
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- Three *minimum tests*
-- *CI* automation
-- *Code coverage*
-- *API docs*
-- A *user guide*
+- What do unit tests, integration tests, and end-to-end checks each prove?
+- Why does even a small portfolio project benefit from automated verification?
+- What kinds of docs make a repository easier to trust and adopt?
+- Why do projects without tests or docs feel unfinished so quickly?
 
 ## Why It Matters
 
-*Tests + docs* are *proof* of *professionalism*.
+Tests and docs are fast signals of professionalism. A reviewer does not need a huge test suite to feel the difference. Even a few well-chosen checks tell them that you expected breakage, created a verification path, and cared about life after the first successful run.
 
-## Concept at a Glance
+Documentation does the same thing for humans. It lowers the cost of understanding the project, which is exactly what a portfolio should do.
 
-```mermaid
-flowchart LR
-    U[Unit] --> I[Integration]
-    I --> E[E2E]
-    E --> D[Docs]
-    D --> C[CI]
-```
+## Mental Model
+
+Verification usually grows from small logic checks to full user flow checks, then out to docs and CI.
+
+![How tests, documentation, and CI stack into one verification flow](../../../assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
+
+*How tests, documentation, and CI stack into one verification flow*
+
+That order matters. Unit tests catch fast local mistakes. Integration tests validate boundaries. End-to-end checks confirm the main user path. Documentation and CI make the whole verification story reusable.
 
 ## Key Terms
 
-- **unit test**: a *unit* check.
-- **integration**: a *boundary* check.
-- **E2E**: a *full flow*.
-- **CI**: *automatic verification*.
-- **docs**: *documentation*.
+- **Unit test**: a small, fast check for one function or logic unit.
+- **Integration test**: a check across boundaries such as API routes or storage.
+- **End-to-end test**: a full user scenario from start to finish.
+- **CI**: automatic verification when code changes.
+- **Project docs**: the documents that help another person understand and use the project.
 
-## Before/After
+## Before and After
 
-**Before**: *Manual* checks only.
+**Before**: all validation happens manually and depends on the author remembering what to click.
 
-**After**: Automatic checks on *push*.
+**After**: code changes trigger repeatable checks, and the repository gives another person a clear path to understanding the project.
 
-## Hands-on: Test Table
+The difference is repeatability. One successful run is less convincing than a project that can prove itself again.
 
-### Step 1 — Unit test
+## Step by Step
+
+### Step 1 — Start with a unit test
+
+The fastest failures are often the cheapest to fix.
 
 ```python
 def test_add():
     assert 1 + 1 == 2
 ```
 
-### Step 2 — Integration
+The example is tiny on purpose. The point is to create the habit of verifying logic explicitly.
+
+### Step 2 — Add an integration check
+
+Many issues only appear when multiple pieces meet.
 
 ```python
 def test_api(client):
     assert client.get("/health").status_code == 200
 ```
 
-### Step 3 — E2E
+Even one integration test gives the reviewer a stronger signal that the project was checked as a system, not just as isolated functions.
+
+### Step 3 — Name one end-to-end path
+
+You do not need dozens of E2E flows. You do need one meaningful one.
 
 ```python
 e2e_steps = ["login", "create", "delete"]
 ```
 
-### Step 4 — CI config
+A single core user path tells people what the project considers essential.
+
+### Step 4 — Automate the verification
+
+Checks are stronger when they do not depend on memory.
 
 ```yaml
 on: [push]
@@ -101,56 +114,62 @@ jobs:
     runs-on: ubuntu-latest
 ```
 
-### Step 5 — Docs
+CI is especially persuasive in a portfolio because it shows you treat verification as default behavior.
+
+### Step 5 — Keep docs beyond the README
+
+The README is the entrance, but not the whole documentation story.
 
 ```python
 docs = ["README", "API.md", "CHANGELOG.md"]
 ```
 
-## What to Notice in This Code
+An API note, a changelog, or a short architecture page helps the reviewer see that the project can be understood and maintained over time.
 
-- *Unit* tests are *fast*.
-- *Integration* tests cover *boundaries*.
-- *E2E* tests cover *flows*.
+## What to Notice in the Code
 
-## Five Common Mistakes
+- Unit tests are the fastest safety net.
+- Integration and end-to-end checks show what the project trusts as a real flow.
+- CI and docs turn one person’s memory into a repeatable team habit.
 
-1. **Only *unit* tests.**
-2. **No *E2E*.**
-3. **No *CI*.**
-4. **No *API docs*.**
-5. **No *CHANGELOG*.**
+## Common Mistakes
 
-## How This Shows Up in Production
+1. Keeping only unit tests and never checking the main user path.
+2. Having no end-to-end proof before deployment.
+3. Leaving verification entirely manual.
+4. Providing no API or usage docs beyond a thin README.
+5. Failing to record how the project changed over time.
 
-OSS projects also run *CI* on every push.
+Tests and docs are not nice extras. They are what make the project believable.
 
-## How a Senior Engineer Thinks
+## How This Reads in Practice
 
-- *Tests* form a *pyramid*.
-- *CI* is *standard*.
-- *API docs* are *auto-generated*.
-- *CHANGELOG* is *kept*.
-- *Coverage* is a *metric*.
+Well-run open source projects also rely on push-time verification, small but explicit docs, and visible change history. The same habits matter in portfolio work because they reveal how you think about maintenance, not just implementation.
+
+A small project with one unit test, one important user flow, and clear docs can feel much stronger than a larger project with none of those signals.
 
 ## Checklist
 
-- [ ] *Unit* tests.
-- [ ] One *E2E*.
-- [ ] *CI* workflow.
-- [ ] *API docs*.
+- [ ] There is at least one unit test.
+- [ ] One core user flow is described or checked end to end.
+- [ ] Verification runs automatically on code changes.
+- [ ] The repository has docs beyond the README when the project needs them.
 
 ## Practice Problems
 
-1. Define *unit test* in one line.
-2. State what *E2E* means in one line.
-3. State the role of *CI* in one line.
+1. Pick the first function in your project that deserves a unit test.
+2. Write the three steps of your most important user flow.
+3. Choose one extra document you should add next.
 
 ## Wrap-up and Next Steps
 
-Next post: *Recording Tech Decisions*.
+In a portfolio project, tests and documentation are evidence. Unit checks create the fast safety net. Integration and user-flow checks raise confidence. Docs and CI make the whole thing reusable. Together they turn “it worked once” into “it can be verified again.”
+
+Next, we will look at how to record the technical decisions behind the project so reviewers can see not just the result, but the judgment behind it.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Portfolio Project](./01-what-is-a-portfolio-project.md)
 - [Traits of a Good Project](./02-traits-of-a-good-project.md)
 - [Writing the README](./03-writing-the-readme.md)
@@ -165,9 +184,9 @@ Next post: *Recording Tech Decisions*.
 
 ## References
 
-- [Test Pyramid - Martin Fowler](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [pytest Docs](https://docs.pytest.org/)
-- [GitHub Actions Docs](https://docs.github.com/actions)
+- [The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
+- [pytest documentation](https://docs.pytest.org/)
+- [GitHub Actions documentation](https://docs.github.com/en/actions)
 - [Keep a Changelog](https://keepachangelog.com/)
 
 Tags: Portfolio, Testing, Documentation, Quality, Beginner
