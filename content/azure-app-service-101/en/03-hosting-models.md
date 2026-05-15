@@ -103,13 +103,15 @@ Deploying multiple apps to the same Plan means they **share compute resources**.
 | SSL Certificate | Basic |
 | Deployment Slots | Standard |
 | Autoscale | Standard |
-| VNet Integration | Standard |
-| Private Endpoint | Premium |
+| VNet Integration | Basic |
+| Private Endpoint | Basic |
 | Zone Redundancy | Premium |
 
 ### Practical Advice
 
 > "Start with Standard minimum for production. Operating without Autoscale and Deployment Slots is asking for trouble."
+
+Basic already unlocks VNet Integration and Private Endpoint, but Standard is still the more practical production floor because Autoscale and Deployment Slots start there.
 
 ---
 
