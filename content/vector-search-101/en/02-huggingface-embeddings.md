@@ -28,7 +28,7 @@ This is the 2nd article in the Vector Search 101 series.
 
 Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.
 
-`HuggingFaceEmbeddings` from `langchain-community` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
+`HuggingFaceEmbeddings` from `langchain-huggingface` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
 
 This post covers five things:
 
@@ -67,10 +67,10 @@ After this chapter, the next one moves on to **Cosine similarity and vector sear
 Three packages are needed.
 
 ```bash
-pip install langchain-community sentence-transformers numpy
+pip install langchain-huggingface sentence-transformers numpy
 ```
 
-`langchain-community` provides `HuggingFaceEmbeddings`. `sentence-transformers` handles model loading and encoding. `numpy` handles vector storage and arithmetic.
+`langchain-huggingface` provides `HuggingFaceEmbeddings`. `sentence-transformers` handles model loading and encoding. `numpy` handles vector storage and arithmetic.
 
 ---
 
@@ -82,7 +82,7 @@ pip install langchain-community sentence-transformers numpy
 Initialize the model and encode a single sentence.
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -134,7 +134,7 @@ For multiple documents, a single `embed_documents()` call outperforms a loop of 
 import time
 
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -180,7 +180,7 @@ Recomputing embeddings for the same documents on every run wastes time. Save the
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -220,7 +220,7 @@ Save the source texts alongside the vectors. Without the original text, search r
 ```python
 import json
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -298,7 +298,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 
 text = "Checking that both libraries produce the same output."
@@ -361,7 +361,7 @@ The next post moves to similarity computation. We will look at when cosine simil
 
 ## References
 
-- [langchain-community HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
+- [langchain-huggingface HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
 - [sentence-transformers encode API](https://www.sbert.net/docs/package_reference/SentenceTransformer.html)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 

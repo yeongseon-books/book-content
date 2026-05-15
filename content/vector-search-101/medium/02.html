@@ -60,7 +60,7 @@
 <p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/02-huggingface-embeddings">github.com/yeongseon-books/vector-search-101</a></p>
 <p>This is the 2nd article in the Vector Search 101 series.</p>
 <p>Post 1 covered the concept. This post is about running real code. Moving from theory to working embeddings surfaces a set of practical questions that conceptual explanations skip: how to reduce model loading time, how to structure batches, how to save vectors to disk and reload them efficiently.</p>
-<p><code>HuggingFaceEmbeddings</code> from <code>langchain-community</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
+<p><code>HuggingFaceEmbeddings</code> from <code>langchain-huggingface</code> wraps <code>sentence-transformers</code> behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.</p>
 <p>This post covers five things:</p>
 <ul>
 <li>installing and initializing <code>HuggingFaceEmbeddings</code></li>
@@ -91,15 +91,15 @@ After this chapter, the next one moves on to <strong>Cosine similarity and vecto
 </ul>
 <h2>Installation</h2>
 <p>Three packages are needed.</p>
-<pre><code class="language-bash">pip install langchain-community sentence-transformers numpy
+<pre><code class="language-bash">pip install langchain-huggingface sentence-transformers numpy
 </code></pre>
-<p><code>langchain-community</code> provides <code>HuggingFaceEmbeddings</code>. <code>sentence-transformers</code> handles model loading and encoding. <code>numpy</code> handles vector storage and arithmetic.</p>
+<p><code>langchain-huggingface</code> provides <code>HuggingFaceEmbeddings</code>. <code>sentence-transformers</code> handles model loading and encoding. <code>numpy</code> handles vector storage and arithmetic.</p>
 <hr>
 <h2>First embedding</h2>
 <p><img alt="Single query embedding call flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.en.png"></p>
 <p><em>Single query embedding call flow</em><br>
 Initialize the model and encode a single sentence.</p>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
@@ -137,7 +137,7 @@ For multiple documents, a single <code>embed_documents()</code> call outperforms
 <pre><code class="language-python">import time
 
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
@@ -175,7 +175,7 @@ elapsed: 0.101s
 <p><em>Vector and document save flow</em><br>
 Recomputing embeddings for the same documents on every run wastes time. Save the matrix once and reload it.</p>
 <pre><code class="language-python">import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
@@ -211,7 +211,7 @@ identical: True
 <p>Save the source texts alongside the vectors. Without the original text, search results are just index positions.</p>
 <pre><code class="language-python">import json
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;,
@@ -270,7 +270,7 @@ def get_embedding_model() -&gt; HuggingFaceEmbeddings:
 <p><em>Wrapper and raw API comparison structure</em><br>
 <code>HuggingFaceEmbeddings</code> wraps <code>SentenceTransformer</code>. Their outputs are numerically identical.</p>
 <pre><code class="language-python">import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 
 text = &quot;Checking that both libraries produce the same output.&quot;
@@ -322,7 +322,7 @@ max difference: 0.000000
 <hr>
 <h2>References</h2>
 <ul>
-<li><a href="https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/">langchain-community HuggingFaceEmbeddings</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/">langchain-huggingface HuggingFaceEmbeddings</a></li>
 <li><a href="https://www.sbert.net/docs/package_reference/SentenceTransformer.html">sentence-transformers encode API</a></li>
 <li><a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">all-MiniLM-L6-v2 model card</a></li>
 </ul>

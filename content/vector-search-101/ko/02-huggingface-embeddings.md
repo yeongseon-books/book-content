@@ -22,7 +22,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 이 글은 Vector Search 101 시리즈의 2번째 글입니다. 1편에서 개념을 다뤘다면, 이번 글은 실제 코드를 실행하는 단계입니다. 이론에서 실제 임베딩으로 넘어가면 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장하고 효율적으로 다시 불러오려면 어떻게 해야 할지 같은 실무 질문이 바로 등장합니다.
 
-`langchain-community`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스 뒤에 감싼 래퍼입니다. LangChain 파이프라인을 직접 만들지 않더라도 이 래퍼 패턴은 이해할 가치가 있습니다. 실제 애플리케이션에서 임베딩 모델이 더 큰 스택 안에 어떻게 통합되는지를 보여 주기 때문입니다.
+`langchain-huggingface`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스 뒤에 감싼 래퍼입니다. LangChain 파이프라인을 직접 만들지 않더라도 이 래퍼 패턴은 이해할 가치가 있습니다. 실제 애플리케이션에서 임베딩 모델이 더 큰 스택 안에 어떻게 통합되는지를 보여 주기 때문입니다.
 
 이 글에서는 다음 다섯 가지를 다룹니다.
 
@@ -65,10 +65,10 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 필요한 패키지는 세 가지입니다.
 
 ```bash
-pip install langchain-community sentence-transformers numpy
+pip install langchain-huggingface sentence-transformers numpy
 ```
 
-`langchain-community`는 `HuggingFaceEmbeddings`를 제공하고, `sentence-transformers`는 실제 모델 로딩과 인코딩을 담당합니다. `numpy`는 벡터 저장과 산술 연산에 사용됩니다.
+`langchain-huggingface`는 `HuggingFaceEmbeddings`를 제공하고, `sentence-transformers`는 실제 모델 로딩과 인코딩을 담당합니다. `numpy`는 벡터 저장과 산술 연산에 사용됩니다.
 
 ---
 
@@ -80,7 +80,7 @@ pip install langchain-community sentence-transformers numpy
 모델을 초기화하고 문장 하나를 인코딩해 보겠습니다.
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -132,7 +132,7 @@ first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
 import time
 
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -178,7 +178,7 @@ print(f"elapsed: {elapsed:.3f}s")
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -218,7 +218,7 @@ print(f"identical: {np.allclose(vectors, loaded)}")
 ```python
 import json
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
@@ -296,7 +296,7 @@ def get_embedding_model() -> HuggingFaceEmbeddings:
 
 ```python
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 
 text = "Checking that both libraries produce the same output."
@@ -359,7 +359,7 @@ print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 
 ## 참고 자료
 
-- [langchain-community HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
+- [langchain-huggingface HuggingFaceEmbeddings](https://python.langchain.com/docs/integrations/text_embedding/huggingfacehub/)
 - [sentence-transformers encode API](https://www.sbert.net/docs/package_reference/SentenceTransformer.html)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 

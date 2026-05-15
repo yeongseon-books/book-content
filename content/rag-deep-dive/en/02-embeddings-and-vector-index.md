@@ -53,7 +53,7 @@ export GROQ_API_KEY=... && python main.py
 ```python
 import faiss
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 DOCS = [
     "The worker retries a failed message three times before dead-lettering.",
@@ -134,7 +134,7 @@ The more interesting source function is `_get_len_safe_embeddings()`. That metho
 At the API layer, the request shape is straightforward. `embed_with_retry()` calls `embeddings.client.create(**kwargs)`, and in the OpenAI v1 path `_invocation_params` carries only `model` plus any `model_kwargs`. Auth, timeout, and related transport settings are configured earlier on the `openai.OpenAI(...)` client object during environment validation rather than packed into this dict. In practice the call shape looks like this:
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 def build_embeddings() -> HuggingFaceEmbeddings:
     return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -242,7 +242,7 @@ This is a realistic example of the full call path.
 ```python
 from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 def build_vector_store() -> FAISS:
     docs = [
@@ -366,7 +366,7 @@ This is the normal trusted-path example.
 ```python
 from pathlib import Path
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 

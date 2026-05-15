@@ -42,7 +42,7 @@ This is the final post in the LangChain 101 series. It assembles the earlier pie
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -78,7 +78,7 @@ Topics:
 
 *From document chunking to index build*
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -213,7 +213,7 @@ A simple RAG chain treats each question independently. To reference earlier turn
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -289,11 +289,11 @@ print(f"[3] {turn3}")
 langchain_rag_app.py
 
 Run: python langchain_rag_app.py
-Requires: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+Requires: langchain langchain-community langchain-huggingface langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
 """
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate

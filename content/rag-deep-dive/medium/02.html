@@ -81,7 +81,7 @@
 </code></pre>
 <pre><code class="language-python">import faiss
 import numpy as np
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 DOCS = [
     &quot;The worker retries a failed message three times before dead-lettering.&quot;,
@@ -147,7 +147,7 @@ if __name__ == &quot;__main__&quot;:
 <p>This is the practical lesson: in 0.2.17 <code>OpenAIEmbeddings</code>, query and document embedding share the same code path, but you should not bake that assumption into your application architecture. If you later switch to a provider or model family with stronger query/document asymmetry, collapsing those two entry points will quietly distort retrieval quality.</p>
 <p>The more interesting source function is <code>_get_len_safe_embeddings()</code>. That method tokenizes input text, splits any overlong text into pieces under <code>embedding_ctx_length</code>, embeds those pieces in batches, and then averages the partial embeddings with token-count weights. Finally, it L2-normalizes the result with <code>average / np.linalg.norm(average)</code>. So even before FAISS sees a vector, the LangChain wrapper has already made a representational choice: a long chunk is not stored as one raw model output, but as a weighted average of sub-embeddings collapsed back into one normalized vector.</p>
 <p>At the API layer, the request shape is straightforward. <code>embed_with_retry()</code> calls <code>embeddings.client.create(**kwargs)</code>, and in the OpenAI v1 path <code>_invocation_params</code> carries only <code>model</code> plus any <code>model_kwargs</code>. Auth, timeout, and related transport settings are configured earlier on the <code>openai.OpenAI(...)</code> client object during environment validation rather than packed into this dict. In practice the call shape looks like this:</p>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 
 def build_embeddings() -&gt; HuggingFaceEmbeddings:
     return HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
@@ -227,7 +227,7 @@ if __name__ == &quot;__main__&quot;:
 <p>This is a realistic example of the full call path.</p>
 <pre><code class="language-python">from langchain_core.documents import Document
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 def build_vector_store() -&gt; FAISS:
     docs = [
@@ -328,7 +328,7 @@ if __name__ == &quot;__main__&quot;:
 <p>This is the normal trusted-path example.</p>
 <pre><code class="language-python">from pathlib import Path
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 

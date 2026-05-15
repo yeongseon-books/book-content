@@ -69,7 +69,7 @@
 <p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-questions-this-post-answers.en.png"></p>
 <p><em>Questions this post answers</em></p>
 <h2>Minimal runnable example</h2>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding = HuggingFaceEmbeddings(model_name=&quot;sentence-transformers/all-MiniLM-L6-v2&quot;)
@@ -105,9 +105,9 @@ A Retriever accepts a query and returns a list of relevant documents. LangChain 
 <p><img alt="Documents turning into a vector index" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-01-creating-a-faiss-vectorstore.en.png"></p>
 <p><em>Documents turning into a vector index</em><br>
 LangChain's <code>FAISS</code> class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.</p>
-<pre><code class="language-bash">pip install langchain langchain-community faiss-cpu sentence-transformers langchain-groq
+<pre><code class="language-bash">pip install langchain langchain-community langchain-huggingface faiss-cpu sentence-transformers langchain-groq
 </code></pre>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(
@@ -173,7 +173,7 @@ retriever_mmr = vectorstore.as_retriever(
 The standard RAG pattern: retrieve relevant documents, inject them as context, pass to the LLM.</p>
 <pre><code class="language-python">import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -262,7 +262,7 @@ answer: Embedding models project text into a high-dimensional vector space.
 <h2>Saving and reloading a VectorStore</h2>
 <p><img alt="Saving and reloading index lifecycle" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-04-saving-and-reloading-a-vectorstore.en.png"></p>
 <p><em>Saving and reloading index lifecycle</em></p>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(
