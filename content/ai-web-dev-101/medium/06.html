@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deploying an AI web app — shipping to Vercel and Azure</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>Deploying an AI web app — shipping to Vercel and Azure</h1>
+<p>An AI app that only works on your laptop is still a local experiment. Once other people need to access it, deployment turns secrets, startup commands, logging, and budget control into real operational concerns.</p>
+<p>This is post 6 in the AI Web Development 101 series.</p>
+<p>Here, we will walk through the first deployment path for a frontend-heavy app on Vercel and a Python backend on Azure App Service.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why is deployment more than uploading source code?</li>
+<li>When does Vercel fit better, and when does Azure App Service fit better?</li>
+<li>What should you verify first in Vercel?</li>
+<li>Where do Python deployments often fail on App Service?</li>
+<li>How should you handle API keys, logs, and budget alerts?</li>
+</ul>
+<blockquote>
+<p>Deployment means making your code start correctly on someone else's infrastructure. That is why the real contract is not “did I push the files?” but “did I define dependencies, environment variables, startup behavior, and logs clearly enough?”</p>
+</blockquote>
+<h2>What to prepare before deployment</h2>
+<p>Before you deploy, verify four things:</p>
+<ul>
+<li>dependency files actually describe the runtime you need</li>
+<li>secrets are injected through environment variables, not source code</li>
+<li>the application entry point is explicit</li>
+<li>the app can bind to the platform-provided port</li>
+</ul>
+<p><img alt="From local development to live deployment" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png"></p>
+<p><em>From local development to live deployment</em></p>
+<h2>Picking a platform</h2>
+<p><strong>Best fit</strong><br>
+- Vercel: frontend-heavy Next.js apps<br>
+- Azure App Service: Python or mixed backend workloads</p>
+<p><strong>Setup style</strong><br>
+- Vercel: minimal<br>
+- Azure App Service: more explicit runtime configuration</p>
+<p><strong>Typical beginner benefit</strong><br>
+- Vercel: fastest first deployment<br>
+- Azure App Service: better control over backend runtime</p>
+<p>A common combination is simple: frontend on Vercel, Python API on Azure.</p>
+<p><img alt="Comparing the Vercel and Azure hosting structure" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/vercel-azure-hosting-overview.en.png"></p>
+<p><em>Comparing the Vercel and Azure hosting structure</em></p>
+<h2>Deploying to Vercel</h2>
+<p><strong>Step 1: push the repository</strong></p>
+<pre><code class="language-bash">GIT_MASTER=1 git add .
+GIT_MASTER=1 git commit -m &quot;feat: initial AI chatbot&quot;
+GIT_MASTER=1 git push origin main
+</code></pre>
+<p><strong>Step 2: import the project</strong></p>
+<ol>
+<li>Sign in to <a href="https://vercel.com">Vercel</a>.</li>
+<li>Choose <strong>Add New &gt; Project</strong>.</li>
+<li>Import your GitHub repository.</li>
+</ol>
+<p><strong>Step 3: set environment variables</strong></p>
+<p>Add <code>OPENAI_API_KEY</code> through the Vercel project settings. Do not commit the real value.</p>
+<p><strong>Step 4: verify the deployment</strong></p>
+<p>After deployment, inspect the build log first. Missing dependencies, missing environment variables, and type errors usually show up there before you ever open the app URL.</p>
+<p><img alt="The runtime path from deployed app to model call" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/production-request-path.en.png"></p>
+<p><em>The runtime path from deployed app to model call</em></p>
+<h2>Deploying a Python app to Azure App Service</h2>
+<p>For Flask or FastAPI, App Service is a good beginner option, but it expects you to be more explicit about startup behavior.</p>
+<p><strong>Step 1: log in with the Azure CLI</strong></p>
+<pre><code class="language-bash">az login
+az account list --output table
+</code></pre>
+<p><strong>Step 2: make sure the Python dependencies are present</strong></p>
+<pre><code class="language-text">fastapi
+uvicorn[standard]
+gunicorn
+openai
+</code></pre>
+<p><strong>Step 3: use <code>az webapp up</code> for the first deployment</strong></p>
+<pre><code class="language-bash">az webapp up --sku F1 --name my-ai-chatbot-app --location koreacentral
+</code></pre>
+<p>This is a good first path because it creates the resource group, plan, and app together.</p>
+<p><strong>Step 4: make the startup command explicit</strong></p>
+<pre><code class="language-bash">az webapp config set   --resource-group myResourceGroup   --name my-ai-chatbot-app   --startup-file &quot;gunicorn -w 2 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app&quot;
+</code></pre>
+<p>Without this, a deployment can appear successful while the app still fails to boot correctly.</p>
+<p><strong>Step 5: inject the API key</strong></p>
+<pre><code class="language-bash">az webapp config appsettings set   --name my-ai-chatbot-app   --resource-group myResourceGroup   --settings OPENAI_API_KEY=&quot;$OPENAI_API_KEY&quot;
+</code></pre>
+<p><strong>Step 6: read live logs first</strong></p>
+<pre><code class="language-bash">az webapp log tail --name my-ai-chatbot-app --resource-group myResourceGroup
+</code></pre>
+<p>This is usually where missing environment variables, package-install failures, or startup-command mistakes become obvious.</p>
+<h2>Secret handling is part of deployment design</h2>
+<p>The most common beginner mistake is committing an API key directly into source code. In AI apps, that can turn into a billing incident immediately.</p>
+<pre><code class="language-text"># .gitignore
+.env
+__pycache__/
+node_modules/
+.venv/
+.DS_Store
+</code></pre>
+<p>Only commit an example file such as <code>.env.example</code>. Keep the real values in local environments and deployment platform settings.</p>
+<p><img alt="Environment-variable boundaries versus hardcoded secret exposure" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/secret-key-boundary.en.png"></p>
+<p><em>Environment-variable boundaries versus hardcoded secret exposure</em></p>
+<h2>Cost and monitoring basics</h2>
+<p>Even if hosting starts on a free tier, model calls can still create ongoing cost. The operational goal is to catch unexpected spend and quiet failures early.</p>
+<ul>
+<li>set an OpenAI budget or usage threshold</li>
+<li>create Azure budget alerts if you use App Service</li>
+<li>inspect deployment logs immediately after each rollout</li>
+<li>watch cold-start behavior and 500-level errors on the live URL</li>
+</ul>
+<p><img alt="Operational checks from budget guardrails to error visibility" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/cost-guardrails-flow.en.png"></p>
+<p><em>Operational checks from budget guardrails to error visibility</em></p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] Dependency files and startup commands match the deployment runtime.</li>
+<li>[ ] Secrets are injected only through environment variables.</li>
+<li>[ ] I know where to read logs right after deployment.</li>
+<li>[ ] I configured budget or usage alerts before opening the app widely.</li>
+</ul>
+<h2>Summary</h2>
+<p>Deployment is not the final coding step. It is the first real operating step.</p>
+<ul>
+<li>Vercel is a strong starting point for frontend-heavy AI apps.</li>
+<li>Azure App Service is flexible for Python backends, but it rewards explicit runtime configuration.</li>
+<li>Secret handling belongs inside the deployment design, not outside it.</li>
+<li>Logs and budget alerts should be in place before real user traffic arrives.</li>
+</ul>
+<p>The final chapter focuses on what happens after deployment: how to measure response quality, catch regressions, and improve an AI app over time.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/01-hello-ai-api.md">AI API first steps — sending your first request with the OpenAI API</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/02-prompt-engineering.md">Prompt engineering basics — getting the answer you actually want</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/03-ai-chatbot.md">Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/04-rag-intro.md">RAG introduction — answering with your own data</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-web-dev-101/en/05-ai-agent.md">First steps with AI agents — making the model use tools</a></li>
+<li><strong>Deploying an AI web app — shipping to Vercel and Azure (current)</strong></li>
+<li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://vercel.com/docs">Vercel documentation</a></li>
+<li><a href="https://learn.microsoft.com/azure/app-service/quickstart-python">Azure App Service Python quickstart</a></li>
+<li><a href="https://platform.openai.com/docs/guides/production-best-practices">OpenAI production best practices</a></li>
+<li><a href="https://learn.microsoft.com/azure/cost-management-billing/">Azure Cost Management documentation</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>

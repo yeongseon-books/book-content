@@ -15,7 +15,7 @@ tags:
 - 웹 개발
 - Python
 - Tutorial
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며 브라우저와 모델 API를 연결하는 기본 구조를 익힙니다.
 ---
 
@@ -51,7 +51,7 @@ Vercel AI SDK는 이 지점을 꽤 잘 줄여 줍니다.
 
 ![브라우저와 모델 API를 잇는 챗봇 서비스 구조](../../../assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
 
-브라우저와 모델 API를 잇는 챗봇 서비스 구조
+*브라우저와 모델 API를 잇는 챗봇 서비스 구조*
 
 ## 프로젝트 초기 설정
 
@@ -113,11 +113,11 @@ export async function POST(req: Request) {
 
 ![API Route의 요청 처리 흐름](../../../assets/ai-web-dev-101/03/api-route-handler-flow.ko.png)
 
-API Route의 요청 처리 흐름
+*API Route의 요청 처리 흐름*
 
 ![사용자 메시지가 AI 답변으로 변환되는 과정](../../../assets/ai-web-dev-101/03/chat-message-roundtrip.ko.png)
 
-사용자 메시지가 AI 답변으로 변환되는 과정
+*사용자 메시지가 AI 답변으로 변환되는 과정*
 
 ## Step 2: 채팅 UI 만들기
 
@@ -183,7 +183,7 @@ export default function Chat() {
 
 ![useChat 훅의 상태 관리 흐름](../../../assets/ai-web-dev-101/03/usechat-state-flow.ko.png)
 
-useChat 훅의 상태 관리 흐름
+*useChat 훅의 상태 관리 흐름*
 
 ## Step 3: 스트리밍이 체감 속도를 바꾸는 이유
 
@@ -193,7 +193,7 @@ useChat 훅의 상태 관리 흐름
 
 ![스트리밍 방식으로 답변이 전달되는 흐름](../../../assets/ai-web-dev-101/03/streaming-response-flow.ko.png)
 
-스트리밍 방식으로 답변이 전달되는 흐름
+*스트리밍 방식으로 답변이 전달되는 흐름*
 
 ## Step 4: 시스템 프롬프트로 챗봇 성격 정하기
 
@@ -339,7 +339,9 @@ export default function Chat() {
 
 ## 참고 자료
 
-- [Vercel AI SDK Documentation](https://sdk.vercel.ai/docs)
-- [Next.js App Router Guide](https://nextjs.org/docs/app)
+- [Vercel AI SDK docs: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot)
+- [Vercel AI SDK docs: useChat](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat)
+- [Next.js docs: Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
+- [Vercel AI SDK examples repository](https://github.com/vercel/ai/tree/main/examples)
 
 Tags: AI, LLM, 웹 개발, Python, Tutorial

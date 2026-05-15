@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AI API first steps — sending your first request with the OpenAI API</title>
+<style>
+  /* Preview-only styles. Medium strips CSS on paste; this is for
+     the author's local preview in Chrome before copying. */
+  body {
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #292929;
+  }
+  h1 { font-size: 2.4rem; line-height: 1.2; margin-top: 0; }
+  h2 { font-size: 1.6rem; margin-top: 2rem; }
+  h3 { font-size: 1.25rem; }
+  pre {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  pre code { font-size: 14px; }
+  table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+    font-size: 0.95em;
+  }
+  th, td { border: 1px solid #d0d7de; padding: 6px 12px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  blockquote {
+    border-left: 3px solid #d0d7de;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    color: #57606a;
+  }
+  img { max-width: 100%; height: auto; }
+  hr { border: none; border-top: 1px solid #d0d7de; margin: 2rem 0; }
+  .tags-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #d0d7de;
+    color: #57606a;
+    font-size: 0.95em;
+  }
+</style>
+</head>
+<body>
+<h1>AI API first steps — sending your first request with the OpenAI API</h1>
+<p>Using ChatGPT in a browser and calling a model from your own service are two different experiences. One is a finished product. The other is application development: authentication, request shape, response parsing, timeouts, and cost tracking all become your responsibility.</p>
+<p>This is the first post in the AI Web Development 101 series.</p>
+<p>Here, we will build the smallest successful OpenAI API call and turn it into a practical mental model you can reuse in later chapters.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What is different between using ChatGPT on the web and integrating an AI API into my own service?</li>
+<li>What is the minimum setup for the OpenAI API?</li>
+<li>What does the first request look like, and where do I read the response?</li>
+<li>Which fields matter most in the response JSON?</li>
+<li>When the first call fails, should I suspect authentication, the model id, or prompt design first?</li>
+</ul>
+<blockquote>
+<p>An AI API is not a ready-made chatbot. It is an interface that lets your application call a remote model as one component inside your system. That is why the first skill is not “asking better questions.” It is reading the request-response contract clearly.</p>
+</blockquote>
+<h2>Why the first call matters more than it seems</h2>
+<p>At the beginning, the blurry part is rarely model quality. The blurry part is the service boundary. A chat UI hides it. Runtime code does not. Your application sends an HTTP request with authentication headers and a JSON body, and the model service sends a JSON response back.</p>
+<p>If that structure is clear, later topics become easier. Token accounting, prompt design, streaming responses, RAG context injection, and evaluation workflows all build on the same first round trip. If the structure stays fuzzy, every later feature feels like “it works somehow, but I do not really know why.”</p>
+<p><img alt="Overview of a basic AI API call" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png"></p>
+<p><em>Overview of a basic AI API call</em></p>
+<h2>Minimum setup</h2>
+<p>The setup is short. Create an OpenAI account, issue an API key, check billing, and load the key through an environment variable.</p>
+<pre><code class="language-bash">export OPENAI_API_KEY=&quot;your-issued-key&quot;
+
+python3 - &lt;&lt;'PY2'
+import os
+print(&quot;key loaded:&quot;, bool(os.environ.get(&quot;OPENAI_API_KEY&quot;)))
+PY2
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">key loaded: True
+</code></pre>
+<p>If this prints <code>False</code>, do not start tweaking prompts yet. Fix the environment variable first.</p>
+<h2>Think in JSON request and JSON response</h2>
+<p>The Python SDK is convenient, but it does not change the underlying contract. <code>client.chat.completions.create()</code> still creates a JSON request and returns parsed response data.</p>
+<p>Conceptually, the request body looks like this:</p>
+<pre><code class="language-json">{
+  &quot;model&quot;: &quot;gpt-4o-mini&quot;,
+  &quot;messages&quot;: [
+    {
+      &quot;role&quot;: &quot;user&quot;,
+      &quot;content&quot;: &quot;Give one encouraging sentence to a developer starting AI API work.&quot;
+    }
+  ]
+}
+</code></pre>
+<p>The first three blocks to read in the response are <code>model</code>, <code>choices</code>, and <code>usage</code>.</p>
+<pre><code class="language-json">{
+  &quot;model&quot;: &quot;gpt-4o-mini-2024-07-18&quot;,
+  &quot;choices&quot;: [
+    {
+      &quot;message&quot;: {
+        &quot;role&quot;: &quot;assistant&quot;,
+        &quot;content&quot;: &quot;Start with one tiny automation. Once the first connection works, the next step becomes much clearer.&quot;
+      },
+      &quot;finish_reason&quot;: &quot;stop&quot;
+    }
+  ],
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 24,
+    &quot;completion_tokens&quot;: 19,
+    &quot;total_tokens&quot;: 43
+  }
+}
+</code></pre>
+<p><img alt="Key fields in the response JSON" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/request-response-anatomy.en.png"></p>
+<p><em>Key fields in the response JSON</em></p>
+<h2>The smallest successful SDK example</h2>
+<pre><code class="language-bash">python3 -m venv .venv
+source .venv/bin/activate
+pip install &quot;openai&gt;=2.0&quot;
+</code></pre>
+<pre><code class="language-python">import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+
+response = client.chat.completions.create(
+    model=&quot;gpt-4o-mini&quot;,
+    messages=[
+        {
+            &quot;role&quot;: &quot;user&quot;,
+            &quot;content&quot;: &quot;Give one encouraging sentence to a developer starting AI API work.&quot;
+        }
+    ],
+)
+
+print(&quot;assistant:&quot;, response.choices[0].message.content)
+print(&quot;model:&quot;, response.model)
+print(&quot;usage:&quot;, response.usage)
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">assistant: Start with one tiny automation. Once the first connection works, the next step becomes much clearer.
+model: gpt-4o-mini-2024-07-18
+usage: CompletionUsage(completion_tokens=19, prompt_tokens=24, total_tokens=43)
+</code></pre>
+<p>The exact wording will vary, but you should confirm these three things:</p>
+<ul>
+<li><code>response.choices[0].message.content</code> contains the text you want to show the user</li>
+<li><code>response.model</code> tells you which model version answered</li>
+<li><code>response.usage</code> gives token counts you can log for cost tracking</li>
+</ul>
+<h2>Add the minimum protection for application code</h2>
+<p>Terminal success is not enough for production-minded code. Model calls are remote network calls, so timeouts and explicit error handling should be part of the first design.</p>
+<pre><code class="language-python">import os
+from openai import OpenAI
+from openai import APIConnectionError, APIStatusError, RateLimitError
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;], timeout=20.0)
+
+def ask_model(user_text: str) -&gt; dict:
+    try:
+        response = client.chat.completions.create(
+            model=&quot;gpt-4o-mini&quot;,
+            temperature=0.2,
+            messages=[
+                {
+                    &quot;role&quot;: &quot;system&quot;,
+                    &quot;content&quot;: &quot;You explain things briefly and practically to junior developers.&quot;
+                },
+                {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_text},
+            ],
+        )
+    except RateLimitError as exc:
+        return {&quot;ok&quot;: False, &quot;error&quot;: f&quot;rate_limit: {exc}&quot;}
+    except APIConnectionError as exc:
+        return {&quot;ok&quot;: False, &quot;error&quot;: f&quot;network: {exc}&quot;}
+    except APIStatusError as exc:
+        return {&quot;ok&quot;: False, &quot;error&quot;: f&quot;status_{exc.status_code}: {exc}&quot;}
+
+    return {
+        &quot;ok&quot;: True,
+        &quot;answer&quot;: response.choices[0].message.content,
+        &quot;prompt_tokens&quot;: response.usage.prompt_tokens,
+        &quot;completion_tokens&quot;: response.usage.completion_tokens,
+        &quot;total_tokens&quot;: response.usage.total_tokens,
+    }
+</code></pre>
+<p>The goal is simple: classify failure modes before you start debating prompt quality.</p>
+<h2>Use cURL once to see the raw contract</h2>
+<p>When the SDK feels too magical, <code>curl</code> is a useful reality check.</p>
+<pre><code class="language-bash">curl https://api.openai.com/v1/chat/completions   -H &quot;Content-Type: application/json&quot;   -H &quot;Authorization: Bearer $OPENAI_API_KEY&quot;   -d '{
+    &quot;model&quot;: &quot;gpt-4o-mini&quot;,
+    &quot;messages&quot;: [
+      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Why does usage matter in the response JSON?&quot;}
+    ]
+  }'
+</code></pre>
+<p>This is not the final integration style you will ship, but it makes the HTTP endpoint, auth header, and JSON body visible.</p>
+<h2>What you should read from every response</h2>
+<p>A common beginner mistake is treating the response as “just a string.” In real applications, you usually need more than that.</p>
+<ul>
+<li><code>choices[0].message.content</code>: user-facing text</li>
+<li><code>finish_reason</code>: whether the answer stopped normally or was cut off</li>
+<li><code>usage.prompt_tokens</code>: input cost signal</li>
+<li><code>usage.completion_tokens</code>: output cost signal</li>
+<li><code>model</code>: which model version actually answered</li>
+</ul>
+<p>If <code>finish_reason</code> is <code>length</code>, the first suspect is not necessarily prompt quality. It may be your output limit.</p>
+<h2>Start logging token usage early</h2>
+<p>AI APIs are typically billed by tokens. Tokens are not identical to characters, but the basic operational intuition is enough: longer prompts and longer answers cost more.</p>
+<pre><code class="language-python">def log_usage(result: dict) -&gt; None:
+    if not result[&quot;ok&quot;]:
+        print(&quot;request failed:&quot;, result[&quot;error&quot;])
+        return
+
+    print(
+        &quot;usage =&gt; prompt:&quot;, result[&quot;prompt_tokens&quot;],
+        &quot;completion:&quot;, result[&quot;completion_tokens&quot;],
+        &quot;total:&quot;, result[&quot;total_tokens&quot;],
+    )
+</code></pre>
+<p><img alt="How token count and response cost relate" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/tokens-and-cost-flow.en.png"></p>
+<p><em>How token count and response cost relate</em></p>
+<h2>What to check first when the first call fails</h2>
+<p><strong>1. <code>401</code> or authentication problems</strong></p>
+<ul>
+<li>Is <code>OPENAI_API_KEY</code> really loaded in the shell or runtime environment?</li>
+<li>Did you accidentally copy whitespace into the key?</li>
+<li>Are you using the right project or organization context?</li>
+</ul>
+<p><strong>2. <code>404</code> or wrong model id</strong></p>
+<ul>
+<li>Check the model name against current docs or the dashboard.</li>
+<li>Do not copy a stale model id from an old blog post without verifying it.</li>
+</ul>
+<p><strong>3. <code>429</code> or rate limits</strong></p>
+<ul>
+<li>Did you send too many requests in a short time?</li>
+<li>Is an automatic retry loop amplifying the traffic?</li>
+<li>Did you already hit the account budget or quota limit?</li>
+</ul>
+<p><strong>4. The request succeeds but the answer is weak</strong></p>
+<ul>
+<li>Confirm the request structure first.</li>
+<li>Then inspect role separation, instruction clarity, and output constraints.</li>
+<li>Only after that should prompt refinement become the main suspect.</li>
+</ul>
+<h2>Small follow-up exercise: a translator</h2>
+<pre><code class="language-python">import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ[&quot;OPENAI_API_KEY&quot;])
+
+def translate_ko_to_en(text: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o-mini&quot;,
+        temperature=0.1,
+        messages=[
+            {
+                &quot;role&quot;: &quot;system&quot;,
+                &quot;content&quot;: &quot;You are a technical translator. Translate Korean into natural English.&quot;
+            },
+            {
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: f&quot;Translate this sentence into English: {text}&quot;
+            },
+        ],
+    )
+    return response.choices[0].message.content
+
+print(translate_ko_to_en(&quot;오늘은 API 응답 구조를 먼저 이해하는 것이 중요합니다.&quot;))
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">Today, it is important to understand the API response structure first.
+</code></pre>
+<p><img alt="How a system prompt and user prompt combine in a translation request" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/translation-exercise-flow.en.png"></p>
+<p><em>How a system prompt and user prompt combine in a translation request</em></p>
+<h2>Checklist</h2>
+<ul>
+<li>[ ] I am not hardcoding <code>OPENAI_API_KEY</code> in source code.</li>
+<li>[ ] I can explain <code>model</code>, <code>messages</code>, <code>choices</code>, and <code>usage</code>.</li>
+<li>[ ] I verified token usage after a successful call.</li>
+<li>[ ] I can separate <code>401</code>, <code>404</code>, and <code>429</code> from prompt-design problems.</li>
+</ul>
+<h2>Summary</h2>
+<p>The important part of the first call is not “I talked to a model.” It is “I can now read the API contract.”</p>
+<ul>
+<li>An AI API is not a finished chat product. It is a remote model interface your service calls.</li>
+<li>Under the SDK, you still have an HTTP request and a JSON response.</li>
+<li>You should read <code>usage</code>, <code>finish_reason</code>, and <code>model</code>, not only the text body.</li>
+<li>Early debugging becomes much easier when you separate authentication, model id, rate-limit, and prompt-structure failures.</li>
+</ul>
+<p>The next chapter builds directly on this. Once the request-response shape is clear, prompt engineering stops feeling mysterious.</p>
+<h2>Series table of contents</h2>
+<ul>
+<li><strong>AI API first steps — sending your first request with the OpenAI API (current)</strong></li>
+<li>Prompt engineering basics — getting the answer you actually want (upcoming)</li>
+<li>Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK (upcoming)</li>
+<li>RAG introduction — answering with your own data (upcoming)</li>
+<li>First steps with AI agents — making the model use tools (upcoming)</li>
+<li>Deploying an AI web app — shipping to Vercel and Azure (upcoming)</li>
+<li>Evaluating and improving an AI app — measuring quality over time (upcoming)</li>
+</ul>
+<h2>References</h2>
+<ul>
+<li><a href="https://platform.openai.com/docs/api-reference/chat">OpenAI API reference: Chat Completions</a></li>
+<li><a href="https://platform.openai.com/docs/quickstart">OpenAI Quickstart</a></li>
+<li><a href="https://github.com/openai/openai-python">openai-python README</a></li>
+<li><a href="https://platform.openai.com/docs/pricing">OpenAI pricing</a></li>
+</ul>
+<p class="tags-line">Tags: AI, LLM, Web Development, Python, Tutorial</p>
+</body>
+</html>
