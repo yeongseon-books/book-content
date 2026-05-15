@@ -44,13 +44,9 @@ IaC는 이 문제를 구조적으로 줄입니다. 인프라를 코드로 정의
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["main.tf"] --> Plan["terraform plan"]
-    Plan --> Apply["terraform apply"]
-    Apply --> Cloud["AWS/GCP/Azure"]
-    Apply --> State["state file"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/05/05-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 이 흐름의 의미는 단순합니다. 먼저 코드로 정의하고, 변경 결과를 눈으로 확인한 뒤, 실제 클라우드에 반영하고, 그 결과를 state에 기록합니다.
 
@@ -143,6 +139,39 @@ module "vpc" {
   cidr    = "10.0.0.0/16"
 }
 ```
+
+## 원격 state와 잠금은 왜 먼저 갖춰야 할까
+
+Terraform을 혼자 연습할 때는 로컬 state도 얼핏 괜찮아 보입니다. 하지만 팀이 둘만 되어도 state 저장 위치와 잠금이 곧 운영 이슈가 됩니다. 한 사람은 `apply` 중인데 다른 사람도 같은 시점에 `plan`이나 `apply`를 돌리면, state 충돌과 잘못된 diff가 빠르게 쌓입니다.
+
+그래서 실무에서는 리소스를 늘리기보다 먼저 원격 state와 locking을 잡습니다. AWS 예시라면 S3 + DynamoDB 조합이 가장 흔합니다.
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-tf-state"
+    key            = "network/prod.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+```
+
+이 구성의 핵심은 저장 위치보다 팀 동시성 제어입니다. 잠금이 없으면 plan 결과를 믿기 어려워지고, 결국 IaC가 오히려 더 위험한 자동화가 됩니다.
+
+## 드리프트를 찾는 확인 절차
+
+IaC를 써도 콘솔 수동 변경이 완전히 사라지지는 않습니다. 그래서 운영팀은 plan을 단순 생성 단계로 보지 않고, 실제 상태와 코드가 어긋났는지 감시하는 드리프트 점검 절차로도 사용합니다.
+
+```bash
+terraform plan -detailed-exitcode
+# 0 = no changes
+# 2 = drift or intentional change detected
+# 1 = error
+```
+
+이 명령을 PR 검증이나 야간 점검에 넣어 두면 "누가 콘솔에서 손댔는지"를 늦지 않게 발견할 수 있습니다. IaC의 가치는 선언형 문법보다 이런 반복 검증 루프에서 더 크게 드러납니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

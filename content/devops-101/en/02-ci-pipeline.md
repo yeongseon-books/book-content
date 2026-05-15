@@ -2,7 +2,7 @@
 series: devops-101
 episode: 2
 title: CI Pipeline
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Automation
   - Pipeline
 seo_description: How to design and build a CI pipeline that automates build, test, lint, and security checks for every pull request.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # CI Pipeline
 
-This is post 2 in the DevOps 101 series.
+A pull request without a reliable CI pipeline is still a guess. Reviewers can catch logic issues, but they should not be the only layer standing between a typo, a broken import, or a vulnerable dependency and your main branch.
 
-> DevOps 101 series (2/10)
+A strong CI pipeline turns quality rules into an executable contract. Every PR sees the same checks in the same order, so the team argues less about process and spends more time fixing real failures.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Do you have *one pipe* that applies *the same checks* to *every PR*?
-
-> A CI pipeline is *the team's bar*. The *passing line is encoded*.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.
 
 ## What You Will Learn
 
@@ -50,14 +44,9 @@ Tests alone are not enough. *Lint, type checks, and security scans* must be bund
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Push["push/PR"] --> Lint["lint"]
-    Lint --> Build["build"]
-    Build --> Test["test"]
-    Test --> Scan["security scan"]
-    Scan --> Pass["green check"]
-```
+![Concept at a Glance](../../../assets/devops-101/02/02-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 

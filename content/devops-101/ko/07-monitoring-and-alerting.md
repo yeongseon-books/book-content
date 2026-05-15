@@ -44,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    App["app /metrics"] --> Scrape["Prometheus scrape"]
-    Scrape --> TSDB["time-series DB"]
-    TSDB --> Grafana["Grafana dashboard"]
-    TSDB --> Alert["Alertmanager"]
-    Alert --> Slack["Slack/PagerDuty"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/07/07-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 애플리케이션이 메트릭을 노출하고, Prometheus가 이를 수집하고, Grafana가 시각화하며, Alertmanager가 기준을 넘는 이상 신호를 알립니다. 좋은 운영은 이 흐름이 팀의 대응 절차와 자연스럽게 연결될 때 만들어집니다.
 

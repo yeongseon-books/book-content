@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Monitoring and Alerting</h1>
-<p>This is post 7 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Has your <em>customer ever told you first</em> that <em>the service is down</em>?</p>
-<blockquote>
-<p>Good monitoring tells <em>us before the customer does</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The most painful monitoring failure is not a missing dashboard. It is learning about an outage from a customer before your team sees the signal. At that point, your observability stack is not helping you operate the system.</p>
+<p>Good monitoring shortens two loops at once: how quickly you notice trouble and how quickly you narrow it down. Metrics, dashboards, and alerts matter because they help the team answer "what changed?" and "where do we look first?" under pressure.</p>
+<p>This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>three signals</em> of monitoring (logs, metrics, traces)</li>
@@ -80,13 +71,8 @@
 <p>Operating without monitoring is <em>driving with eyes closed</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;app /metrics&quot;] --&gt; Scrape[&quot;Prometheus scrape&quot;]
-    Scrape --&gt; TSDB[&quot;time-series DB&quot;]
-    TSDB --&gt; Grafana[&quot;Grafana dashboard&quot;]
-    TSDB --&gt; Alert[&quot;Alertmanager&quot;]
-    Alert --&gt; Slack[&quot;Slack/PagerDuty&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a <em>number over time</em> (request count, latency, etc.).</li>

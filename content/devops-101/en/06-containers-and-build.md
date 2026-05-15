@@ -2,7 +2,7 @@
 series: devops-101
 episode: 6
 title: Containers and Build
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Build
   - Image
 seo_description: Write Dockerfiles, use multi-stage builds, and optimize images for lightweight, secure containers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Containers and Build
 
-This is post 6 in the DevOps 101 series.
+"It works on my laptop" is usually an environment problem wearing an application mask. If the runtime libraries, OS packages, and process entrypoints differ between local and production, deployment quality depends on luck more than engineering.
 
-> DevOps 101 series (6/10)
+Containers reduce that gap by freezing the runtime environment into an image. Once the image becomes the deployable unit, teams can reason about versioning, rollback, and promotion much more cleanly.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What is the *only way* to make *your laptop* and *the server* produce *the same result*?
-
-> Containers freeze *the environment itself* into an *image*.
-
-<!-- a-grade-intro:end -->
+This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ The same build artifact must *behave the same* in *every environment*. Container
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["app code"] --> Build["docker build"]
-    Build --> Image["image (immutable)"]
-    Image --> Registry["registry push"]
-    Registry --> Run["docker run / k8s"]
-```
+![Concept at a Glance](../../../assets/devops-101/06/06-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 

@@ -2,7 +2,7 @@
 series: devops-101
 episode: 9
 title: Incident Response and On-Call
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - SRE
   - Postmortem
 seo_description: Severity levels, on-call rotations, runbooks, and blameless postmortems. The operations playbook that reduces incidents.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Incident Response and On-Call
 
-This is post 9 in the DevOps 101 series.
+Incidents rarely become chaotic because the engineers are weak. They become chaotic because roles are unclear, runbooks are missing, and the same person tries to diagnose, mitigate, communicate, and document at the same time.
 
-> DevOps 101 series (9/10)
+A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a page fires at 3 AM, *who does what, and how*?
-
-> *Incidents will happen.* The difference is *how fast and how calmly* you recover.
-
-<!-- a-grade-intro:end -->
+This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Incidents are an *organizational* problem more than a *technical* one. Without *
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Alert["alert"] --> OnCall["on-call engineer"]
-    OnCall --> Runbook["runbook"]
-    Runbook --> Mitigate["mitigation"]
-    Mitigate --> Postmortem["blameless postmortem"]
-```
+![Concept at a Glance](../../../assets/devops-101/09/09-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
@@ -132,6 +122,32 @@ IC = decision maker. Does NOT fix things directly.
 - Root cause: typo in feature flag default
 - Prevention: add flag-validation checklist to PR template
 ```
+
+## The First 15 Minutes Set the Direction
+
+Incident response is often decided less by deep expertise than by the order of actions in the first few minutes. Without a shared sequence, teams may perform technically correct work while still stretching recovery time through confusion.
+
+```text
+0-3m   Acknowledge the page, assign SEV, open the incident channel
+3-5m   Start the runbook, check recent deploys and config changes
+5-8m   Estimate customer impact and possible mitigations
+8-12m  Assign an IC, split roles, decide on external communication
+12-15m Execute mitigation or escalate further
+```
+
+This order helps because it separates technical recovery from coordination. The engineer debugging the system should not also be the only person maintaining shared situational awareness.
+
+## What Good Postmortems Produce
+
+The quality of a postmortem is visible in its outputs, not just its tone. A strong postmortem leaves at least three things behind: a reproducible timeline, a prevention or detection improvement, and action items with owners and deadlines.
+
+If the root cause was a bad feature-flag default, for example, the system should change in concrete ways:
+
+- add a flag-validation checkbox to the PR template
+- include default-flag validation in smoke tests
+- review existing flag defaults within a fixed time window
+
+That is how incidents become system improvement instead of archived storytelling.
 
 ## What to Notice in This Code
 

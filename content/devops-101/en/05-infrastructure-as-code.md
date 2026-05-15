@@ -2,7 +2,7 @@
 series: devops-101
 episode: 5
 title: Infrastructure as Code
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Cloud
   - Automation
 seo_description: Treat infrastructure as code with Terraform so changes are versioned, reviewable, and reproducible.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Infrastructure as Code
 
-This is post 5 in the DevOps 101 series.
+Console-built infrastructure feels fast right up until you need the same environment again. Then you discover that the real system lives partly in screenshots, partly in memory, and partly in one person's habits.
 
-> DevOps 101 series (5/10)
+Infrastructure as Code fixes that by moving cloud changes into the same review-and-history model we already expect from application code. The value is not the syntax itself. The value is repeatability, visibility, and safer change control.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Can you explain why a *server clicked together in the AWS console* *does not exist in another environment*?
-
-> IaC turns *infrastructure into code* so it becomes *reproducible*.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Console-built infrastructure exists *only in memory*. Replicating it elsewhere r
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["main.tf"] --> Plan["terraform plan"]
-    Plan --> Apply["terraform apply"]
-    Apply --> Cloud["AWS/GCP/Azure"]
-    Apply --> State["state file"]
-```
+![Concept at a Glance](../../../assets/devops-101/05/05-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
@@ -131,6 +121,39 @@ module "vpc" {
   cidr    = "10.0.0.0/16"
 }
 ```
+
+## Remote State and Locking Come Before Scale
+
+Local state feels acceptable during solo experiments, but the moment multiple engineers touch the same stack, state location and locking become operational issues. One person may be applying while another is planning from stale data, and the resulting diff becomes harder to trust.
+
+That is why mature teams usually set up remote state before they expand their Terraform footprint. On AWS, the common starting point is S3 plus DynamoDB locking.
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-tf-state"
+    key            = "network/prod.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+```
+
+The most important feature here is not storage. It is concurrency control. Without locking, teams stop trusting the plan output, which makes IaC automation more dangerous instead of safer.
+
+## Use Plan as a Drift Detection Loop
+
+IaC does not magically eliminate manual console changes. It gives you a better way to detect them. In practice, teams use `plan` not only before apply, but also as a repeated drift check in CI or scheduled reviews.
+
+```bash
+terraform plan -detailed-exitcode
+# 0 = no changes
+# 2 = drift or intentional change detected
+# 1 = error
+```
+
+That single command is enough to tell you when code and reality no longer match. The operational value of IaC shows up in that loop as much as in the resource syntax.
 
 ## What to Notice in This Code
 

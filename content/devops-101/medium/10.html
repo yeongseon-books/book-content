@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>An Operable DevOps Flow</h1>
-<p>This is the final post in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Does <em>Code -&gt; CI -&gt; CD -&gt; Monitor -&gt; Incident -&gt; Postmortem</em> close as a <em>feedback loop</em>?</p>
-<blockquote>
-<p><em>DevOps</em> is <em>a flow</em>, not <em>a toolbox</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>It is possible to have CI, CD, dashboards, and postmortems and still not have an actual DevOps system. The missing piece is often the loop between them: what ships, what breaks, what gets measured, and how that knowledge changes the next release.</p>
+<p>Operational maturity appears when those parts stop behaving like isolated tools and start behaving like one learning system. That is where DORA metrics, team rituals, and platform choices become more than reporting overhead.</p>
+<p>This is the final post in the DevOps 101 series. Here we connect the earlier chapters into one operable feedback loop and show how a team can measure, review, and improve the whole path from pull request to postmortem.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>whole flow</em> that ties this series together</li>
@@ -79,14 +70,8 @@
 <p>What is <em>not measured</em> is <em>not improved</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;code&quot;] --&gt; CI[&quot;CI&quot;]
-    CI --&gt; CD[&quot;CD&quot;]
-    CD --&gt; Monitor[&quot;monitor &amp; log&quot;]
-    Monitor --&gt; Incident[&quot;incident&quot;]
-    Incident --&gt; Postmortem[&quot;postmortem&quot;]
-    Postmortem --&gt; Code
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>DORA metrics</strong>: the <em>four metrics</em> from Google's research.</li>
@@ -130,6 +115,21 @@ metrics = {
 - Add or remove tools
 - Propose org-structure changes
 </code></pre>
+<h2>Turn DORA Metrics Into Operating Questions</h2>
+<p>DORA metrics become ceremony when teams collect the numbers but never connect them to decisions. Each metric is most useful when it drives a concrete operating question.</p>
+<pre><code class="language-text">Deploy frequency      -&gt; Are changes small enough to ship routinely?
+Lead time             -&gt; Is the bottleneck review, build, approval, or rollout?
+Change failure rate   -&gt; Which kinds of changes create the most incidents?
+MTTR                  -&gt; Is detection, diagnosis, or recovery the slow step?
+</code></pre>
+<p>Reading the metrics this way turns them from status reporting into input for the next engineering change.</p>
+<h2>A Practical 90-Day Improvement Plan</h2>
+<p>The final chapter is most useful when it ends with a plan that a small team could actually execute. One workable first quarter looks like this:</p>
+<pre><code class="language-text">Days 1-30   Clean up required PR checks, add staging smoke tests, write 3 runbooks
+Days 31-60  Build a RED dashboard, link alerts to runbooks, start hand-tracking DORA
+Days 61-90  Lock weekly deploy review and monthly postmortems, automate one repeated failure mode
+</code></pre>
+<p>This kind of plan works because it optimizes the loop, not the tool count. It helps the team ship smaller changes, learn faster, and recover with less guesswork.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Metrics can start by hand</em>. Automate them later.</li>

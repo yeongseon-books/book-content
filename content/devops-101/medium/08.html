@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Logging and Analysis</h1>
-<p>This is post 8 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Out of 100 servers, can you find <em>where the error happened</em> in one query?</p>
-<blockquote>
-<p>Logs only have value when they are <em>collected and searchable</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Logs become valuable long after they are written. When an incident starts at 3 AM or a customer reports a failure from last week, the real question is whether your team can search across services, correlate one request, and find the useful lines quickly.</p>
+<p>That is why logging is not just about emitting more text. It is about structure, retention, central collection, and the fields that make later investigation possible.</p>
+<p>This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>structured</em> and <em>unstructured</em> logs</li>
@@ -80,11 +71,8 @@
 <p>You read logs <em>three weeks later</em> far more often than you do <em>right now</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;app stdout&quot;] --&gt; Agent[&quot;log agent (Promtail/Fluent Bit)&quot;]
-    Agent --&gt; Store[&quot;Loki/Elasticsearch&quot;]
-    Store --&gt; UI[&quot;Grafana/Kibana&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Structured log</strong>: a log emitted as <em>key-value</em> pairs, usually JSON.</li>

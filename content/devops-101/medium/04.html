@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Environments and Configuration</h1>
-<p>This is post 4 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If your <em>environment variables</em> are <em>hardcoded into the code</em>, do you not have to <em>rebuild for every deploy</em>?</p>
-<blockquote>
-<p>Good config management makes <em>one codebase / N environments</em> possible.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Teams usually notice configuration discipline only after it breaks. The application works in development, then stage uses a different secret, production needs a different domain, and suddenly the same code requires a different build for every environment.</p>
+<p>Good configuration management prevents that drift. The code stays the same, the build artifact stays the same, and only environment-specific values change. That is what makes deployments repeatable instead of fragile.</p>
+<p>This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The meaning of <em>dev / stage / prod</em> environments</li>
@@ -80,12 +71,8 @@
 <p><em>Build once, run anywhere</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;app code (1)&quot;] --&gt; Build[&quot;build artifact (1)&quot;]
-    Build --&gt; Dev[&quot;dev (config A)&quot;]
-    Build --&gt; Stage[&quot;stage (config B)&quot;]
-    Build --&gt; Prod[&quot;prod (config C)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Environment</strong>: an <em>execution context</em> like <em>dev/stage/prod</em>.</li>

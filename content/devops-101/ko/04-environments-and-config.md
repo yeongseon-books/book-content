@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Code["app code (1)"] --> Build["build artifact (1)"]
-    Build --> Dev["dev (config A)"]
-    Build --> Stage["stage (config B)"]
-    Build --> Prod["prod (config C)"]
-```
+![한눈에 보는 개념](../../../assets/devops-101/04/04-01-diagram.ko.png)
+
+*한눈에 보는 개념*
 
 핵심은 간단합니다. 코드는 하나이고, 달라지는 것은 환경별 설정뿐입니다. 같은 빌드 산출물이 dev, stage, prod에 각각 다른 설정을 주입받아 실행돼야 합니다.
 

@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>CD and Deployment Strategies</h1>
-<p>This is post 3 in the DevOps 101 series.</p>
-<blockquote>
-<p>DevOps 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is the <em>fear of deployment</em> really about <em>not being able to roll back</em>?</p>
-<blockquote>
-<p>A good deploy strategy turns a release into <em>small, reversible changes</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Many teams say they fear deployment, but the deeper fear is usually rollback. If a release goes bad, how quickly can you stop the blast radius, restore service, and explain what changed? Without a good answer, every deployment feels like a gamble.</p>
+<p>That is why continuous delivery is not just about automation. It is about making releases small, observable, and reversible so production changes become a routine operating motion instead of a high-drama event.</p>
+<p>This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of <em>CD</em> and its relationship with <em>CI</em></li>
@@ -80,12 +71,8 @@
 <p><em>Deployability</em> and <em>feature activation</em> must be <em>separated</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Build[&quot;build&quot;] --&gt; Stage[&quot;stage&quot;]
-    Stage --&gt; Canary[&quot;10% canary&quot;]
-    Canary --&gt; Full[&quot;100%&quot;]
-    Canary --&gt; Rollback[&quot;rollback&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>CD</strong>: <em>Continuous Delivery/Deployment</em>. <em>Automated deployment</em>.</li>
@@ -133,6 +120,25 @@ kubectl scale deploy/api-v2 --replicas=10
 # NG
 kubectl rollout undo deploy/api
 </code></pre>
+<h2>The First 10 Minutes After Deploy Matter Most</h2>
+<p>A canary does not make a release safe by itself. What matters is whether the team checks the same signals in the same order during the first few minutes after traffic shifts. A simple post-deploy sequence like the one below makes promotions much more predictable.</p>
+<pre><code class="language-text">T+0m  Confirm the health endpoint returns 200
+T+2m  Compare 5xx rate and p95 latency to baseline
+T+5m  Search new-version logs for fresh exception patterns
+T+7m  Check DB connection pool, queue depth, cache hit ratio
+T+10m Promote further or roll back
+</code></pre>
+<p>This sequence works because it checks dependencies as well as the application itself. Many bad deploys do not fail at the HTTP layer first. They show up as connection pressure, queue growth, or cache churn before customers describe the symptom clearly.</p>
+<h2>Design Rollback Before You Need It</h2>
+<p>Rollback is not an after-the-fact emergency button. It has to exist in the release design before the deploy starts. Application rollback and database rollback are different problems, and treating them as one often extends incidents.</p>
+<p>A practical release checklist usually includes these questions:</p>
+<ul>
+<li>Can a feature flag contain the blast radius immediately?</li>
+<li>Does rolling back the image restore the service by itself?</li>
+<li>Are schema changes backward compatible via an expand/contract pattern?</li>
+<li>After rollback, is the path to redeploy forward also tested?</li>
+</ul>
+<p>If those answers are vague, the deployment is still risk-heavy even if the automation looks polished.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Staging</em> must mirror <em>production</em>.</li>

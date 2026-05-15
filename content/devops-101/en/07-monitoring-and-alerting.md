@@ -2,7 +2,7 @@
 series: devops-101
 episode: 7
 title: Monitoring and Alerting
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Alerting
   - SRE
 seo_description: A practical guide to Prometheus metrics, Grafana dashboards, and meaningful alert design.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Monitoring and Alerting
 
-This is post 7 in the DevOps 101 series.
+The most painful monitoring failure is not a missing dashboard. It is learning about an outage from a customer before your team sees the signal. At that point, your observability stack is not helping you operate the system.
 
-> DevOps 101 series (7/10)
+Good monitoring shortens two loops at once: how quickly you notice trouble and how quickly you narrow it down. Metrics, dashboards, and alerts matter because they help the team answer "what changed?" and "where do we look first?" under pressure.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Has your *customer ever told you first* that *the service is down*?
-
-> Good monitoring tells *us before the customer does*.
-
-<!-- a-grade-intro:end -->
+This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
 
 ## What You Will Learn
 
@@ -50,14 +44,9 @@ Incidents *always come*. The difference is *how fast you know* and *how fast you
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["app /metrics"] --> Scrape["Prometheus scrape"]
-    Scrape --> TSDB["time-series DB"]
-    TSDB --> Grafana["Grafana dashboard"]
-    TSDB --> Alert["Alertmanager"]
-    Alert --> Slack["Slack/PagerDuty"]
-```
+![Concept at a Glance](../../../assets/devops-101/07/07-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
