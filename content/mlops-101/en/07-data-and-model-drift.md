@@ -2,7 +2,7 @@
 series: mlops-101
 episode: 7
 title: Data Drift and Model Drift
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,45 +16,44 @@ tags:
   - Monitoring
   - DataScience
   - Statistics
-seo_description: Detect input distribution shifts and model degradation in production with PSI and KS tests, plus a clear retraining trigger policy.
-last_reviewed: '2026-05-04'
+seo_description: Separate input-distribution drift from model-quality drift with PSI, KS, and an explicit policy for investigation and retraining.
+last_reviewed: '2026-05-15'
 ---
 
 # Data Drift and Model Drift
 
-> MLOps 101 series (7/10)
+When a live model stops feeling as reliable as it used to, the cause is rarely one thing. The input distribution may have changed, or the inputs may look similar while the relationship between input and label has shifted underneath the model.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you tell *the input distribution changed* apart from *the model just got worse*?
-
-> *Data drift means input distributions shift, model drift means prediction quality drops. Statistical tests catch both.*
-
-<!-- a-grade-intro:end -->
+Teams often notice the problem only after a business metric drops. In practice, the input distribution usually changes first, and only later do the performance and business losses become obvious.
 
 This is post 7 in the MLOps 101 series.
 
-## What You Will Learn
+Here, we will separate data drift from model drift and connect statistical signals such as PSI and KS to concrete operating thresholds.
 
-- Data drift vs concept drift
-- KS test and PSI
-- Choosing a baseline distribution
-- Setting alert thresholds
-- Five common pitfalls
+## What This Post Answers
+
+- What is the difference between data drift and model drift in practice?
+- Why does a weak baseline make drift hard to see?
+- When are PSI and the KS test useful?
+- Why should thresholds be treated as team policy rather than a magic formula?
+- How do you connect drift detection to a retraining trigger?
+
+> Mental model: data drift is a change in the input distribution. Model drift is the business or prediction impact that follows. The first is an early warning; the second is the confirmed consequence.
 
 ## Why It Matters
 
-The world keeps moving. The distribution at training time will not last forever. Without drift detection, *silent losses* pile up.
+The world does not freeze after training. User behavior changes, seasonality changes, policy changes, and collection pipelines change. The moment a team assumes that the training distribution will stay stable forever, the model starts aging.
 
-## Concept at a Glance
+Without drift detection, the loss accumulates quietly. Only later do accuracy or business alarms make the problem visible. That is why drift detection has to exist as an early warning system.
 
-```mermaid
-flowchart LR
-    Train["train dist"] --> Base["baseline"]
-    Live["live dist"] --> Stat["KS / PSI"]
-    Base --> Stat
-    Stat --> Alert["alert"]
-```
+## See the Flow First
+
+![See the Flow First](../../../assets/mlops-101/07/07-01-see-the-flow-first.en.png)
+
+*See the Flow First*
+This diagram captures the core workflow. A training-time distribution becomes the baseline, live inputs are compared against it with statistical tests, and the system emits a warning when the difference crosses the operating threshold.
+
+The most important design choice is the baseline. If the baseline moves carelessly, drift itself becomes difficult to detect.
 
 ## Key Terms
 

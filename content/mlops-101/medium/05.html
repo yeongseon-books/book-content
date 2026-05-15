@@ -54,36 +54,29 @@
 </head>
 <body>
 <h1>Model Deployment</h1>
-<blockquote>
-<p>MLOps 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you take a <em>trained model file</em> and <em>expose it to users safely</em>?</p>
-<blockquote>
-<p><em>Model deployment wraps a model file in an API or batch job and runs it inside a reproducible environment.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Finishing model training does not automatically create a service. If nobody has defined which process loads the model file, how input is validated, or what environment the code runs in, even a strong model becomes unstable the moment it leaves the notebook.</p>
+<p>When engineers say deployment is hard, they are usually not describing the model itself. They are describing environment drift, missing version traceability, and the lack of a safe rollback path. That is why model deployment is really about a reproducible runtime plus a controlled release policy.</p>
 <p>This is post 5 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>Three deployment patterns (online / batch / streaming)</li>
-<li>Building a model API with FastAPI</li>
-<li>Pinning the environment with Docker</li>
-<li>Blue/Green and Canary releases</li>
-<li>Five common pitfalls</li>
+<li>How do you connect a trained model file to a real user request?</li>
+<li>How should you distinguish online, batch, and streaming inference?</li>
+<li>What do FastAPI and Docker each contribute to model deployment?</li>
+<li>Why should version tags and health checks be treated as defaults?</li>
+<li>When do Blue/Green and Canary reduce risk in different ways?</li>
 </ul>
+<blockquote>
+<p>Mental model: model deployment packages a model file inside an API or batch job, then versions the entire runtime environment as one deployable artifact.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>When people say "deployment is hard," they usually mean <em>environment drift</em> and <em>no rollback</em>. Containers and gradual rollout are the answer.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Model[&quot;model.pkl&quot;] --&gt; API[&quot;FastAPI&quot;]
-    API --&gt; Image[&quot;Docker image&quot;]
-    Image --&gt; Prod[&quot;production&quot;]
-    Prod --&gt; Canary[&quot;canary 5%&quot;]
-    Canary --&gt; Full[&quot;full traffic&quot;]
-</code></pre>
+<p>Many teams blame deployment failures on model complexity, but the more common source is environment mismatch and rollback chaos. The model works locally, then breaks in the server because the library version changed. A bad release goes live, and no one can cleanly return to the previous version.</p>
+<p>That is why deployment is not the final training step. It is the first operating step. The team has to know which version is live, how much traffic it should receive, and exactly how to back out if the release starts misbehaving.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+This diagram helps frame deployment as a delivery path instead of a file copy. The model artifact moves into an API, the API is packaged into an image, the image reaches production, and traffic shifts only gradually.</p>
+<p>In other words, deployment is the bundle of model + serving code + runtime environment + rollout policy.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Online inference</strong>: request in, response out.</li>
@@ -138,6 +131,25 @@ CMD [&quot;uvicorn&quot;, &quot;main:app&quot;, &quot;--host&quot;, &quot;0.0.0.
 docker run -p 8000:8000 model-api:1.0.0
 curl -X POST localhost:8000/predict -H &quot;Content-Type: application/json&quot; -d '{&quot;x&quot;: 2.5}'
 </code></pre>
+<p><strong>Expected output:</strong> a JSON response such as <code>{"prediction": 1}</code> and a container that stays healthy on <code>GET /healthz</code>.</p>
+<p>That <code>model-api:1.0.0</code> tag is more than a build label. It is the release identity that tells you which version is live, which version is canarying, and which version you can roll back to.</p>
+<h2>First Checks When the Release Looks Wrong</h2>
+<p>When a freshly deployed model does not behave as expected, the first question is not "is the model bad?" It is "which contract failed first?" A few small checks usually narrow the problem quickly.</p>
+<p><strong>Check 1 — Can the container answer its health endpoint?</strong></p>
+<pre><code class="language-bash">curl -s http://localhost:8000/healthz
+</code></pre>
+<p><strong>Expected output:</strong> a JSON payload such as <code>{"ok": true, "version": "1.0.0"}</code>.</p>
+<p>If this fails, start with container startup logs and import errors before looking at model behavior.</p>
+<p><strong>Check 2 — Which image tag is actually running?</strong></p>
+<pre><code class="language-bash">docker ps --format &quot;table {{.Image}}\t{{.Status}}\t{{.Names}}&quot;
+</code></pre>
+<p><strong>Expected output:</strong> the intended image tag, such as <code>model-api:1.0.0</code>, in a healthy running state.</p>
+<p>If the tag is wrong, the issue is a release-process bug, not a model-quality bug.</p>
+<p><strong>Check 3 — Does the API reject bad payloads cleanly?</strong></p>
+<pre><code class="language-bash">curl -s -X POST localhost:8000/predict -H &quot;Content-Type: application/json&quot; -d '{&quot;x&quot;:&quot;bad&quot;}'
+</code></pre>
+<p><strong>Expected output:</strong> a FastAPI validation error rather than a server crash.</p>
+<p>This confirms that request validation is containing blast radius the way it should.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The model is loaded once at startup, not per request.</li>

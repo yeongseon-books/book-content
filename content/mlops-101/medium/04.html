@@ -54,36 +54,29 @@
 </head>
 <body>
 <h1>Model Training Pipeline</h1>
-<blockquote>
-<p>MLOps 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you turn a training script that "behaves differently every run" into a reliable, staged pipeline?</p>
-<blockquote>
-<p><em>A training pipeline splits ingest, preprocess, train, evaluate, and register into explicit stages, so re-runs and caching become possible.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Scheduling one <code>train.py</code> file does not automatically give you an operable training system. When ingest, preprocessing, training, evaluation, and registration are fused into one script, failures are hard to localize and partial re-runs become expensive.</p>
+<p>The more the training process depends on manual steps, the faster reproducibility and recovery speed fall apart. In MLOps, a pipeline is not a convenience feature. It is the structure that turns training into explicit, repeatable stages.</p>
 <p>This is post 4 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>The five stages of a training pipeline</li>
-<li>The meaning of a DAG</li>
-<li>How Airflow, Prefect, and Kubeflow differ</li>
-<li>Retries and caching</li>
-<li>Five common pitfalls</li>
+<li>Why split a single training script into multiple pipeline stages?</li>
+<li>How is a DAG different from a plain execution order?</li>
+<li>Where do Airflow, Prefect, and Kubeflow fit into the picture?</li>
+<li>Why do retries and caching matter so much in training pipelines?</li>
+<li>Which design mistakes force the whole pipeline to re-run unnecessarily?</li>
 </ul>
+<blockquote>
+<p>Mental model: a training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed to shrink the re-run scope.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>Manual training is unreproducible, slow, and a team bottleneck. Pipelines are automatic and auditable.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Ingest[&quot;ingest&quot;] --&gt; Prep[&quot;preprocess&quot;]
-    Prep --&gt; Train[&quot;train&quot;]
-    Train --&gt; Eval[&quot;evaluate&quot;]
-    Eval --&gt; Reg[&quot;register&quot;]
-    Reg --&gt; Deploy[&quot;deploy&quot;]
-</code></pre>
+<p>Manual training is slow, hard to reproduce, and difficult to debug. When a nightly training job fails and the whole process has to restart from the beginning, the operating cost rises quickly.</p>
+<p>When stages are split cleanly, the team can narrow the failure immediately and rerun only the part whose inputs changed. A pipeline is the mechanism that raises both observability and recoverability for training.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+The most important part of this diagram is not the stage names, but the boundaries between them. Ingest, preprocess, train, evaluate, and register have to be separate if the team wants partial re-runs and faster root-cause analysis.</p>
+<p>The goal of a training pipeline is not fancy scheduling. It is clear stage boundaries.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Stage</strong>: a unit of inputs, command, and outputs.</li>

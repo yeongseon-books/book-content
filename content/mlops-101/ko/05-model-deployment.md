@@ -54,15 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 전체 흐름을 먼저 보겠습니다
 
-```mermaid
-flowchart LR
-    Model["model.pkl"] --> API["FastAPI"]
-    API --> Image["Docker image"]
-    Image --> Prod["production"]
-    Prod --> Canary["canary 5%"]
-    Canary --> Full["full traffic"]
-```
+![모델 배포 전달 경로](../../../assets/mlops-101/05/05-01-see-the-flow-first.ko.png)
 
+*모델 배포 전달 경로*
 이 그림은 모델 배포를 파일 복사 작업이 아니라 전달 경로로 보게 해 줍니다. 모델 파일은 API 안으로 들어가고, API는 Docker 이미지로 묶이고, 이미지는 프로덕션에 배포된 뒤 점진적으로 트래픽을 받습니다.
 
 즉, 모델 배포는 "모델 + 실행 코드 + 런타임 환경 + 전환 정책"의 묶음입니다.
@@ -158,7 +152,45 @@ docker run -p 8000:8000 model-api:1.0.0
 curl -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x": 2.5}'
 ```
 
+**Expected output:** `{"prediction": 1}` 같은 JSON 응답이 돌아오고, `/healthz`가 계속 정상 상태를 반환해야 합니다.
+
 여기서 `model-api:1.0.0` 같은 태그가 왜 중요한지 봐야 합니다. 운영 중인 모델이 무엇인지, 문제 발생 시 무엇으로 되돌릴지, 카나리 대상이 어느 버전인지 모두 이 태그 체계에 달려 있습니다.
+
+---
+
+## 배포가 이상할 때 가장 먼저 볼 것
+
+새 모델을 올린 직후 요청이 실패하거나 응답이 이상하면, 바로 모델 품질부터 의심하기보다 어느 계약이 먼저 깨졌는지 좁혀 가는 편이 빠릅니다.
+
+### 1단계 — 헬스 체크가 정상인지 확인합니다
+
+```bash
+curl -s http://localhost:8000/healthz
+```
+
+**Expected output:** `{"ok": true, "version": "1.0.0"}` 같은 응답입니다.
+
+여기서 실패하면 모델 성능보다 먼저 컨테이너 기동 로그, import 오류, 포트 바인딩 상태를 확인해야 합니다.
+
+### 2단계 — 실제로 어떤 이미지 태그가 떠 있는지 확인합니다
+
+```bash
+docker ps --format "table {{.Image}}\t{{.Status}}\t{{.Names}}"
+```
+
+**Expected output:** 의도한 태그(`model-api:1.0.0`)가 실행 중으로 보여야 합니다.
+
+태그가 다르면 모델 문제라기보다 배포 절차 문제입니다.
+
+### 3단계 — 잘못된 입력을 안전하게 막는지 봅니다
+
+```bash
+curl -s -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{"x":"bad"}'
+```
+
+**Expected output:** 서버 크래시가 아니라 입력 검증 오류가 반환되어야 합니다.
+
+이 확인은 잘못된 요청이 서비스 전체 장애로 번지지 않도록 막고 있는지 보여 줍니다.
 
 ---
 

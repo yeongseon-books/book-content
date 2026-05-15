@@ -54,37 +54,29 @@
 </head>
 <body>
 <h1>Experiment Tracking</h1>
-<blockquote>
-<p>MLOps 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can you rerun last week's best experiment today?</p>
-<blockquote>
-<p><em>Experiment tracking records parameters, metrics, artifacts, and environment together so reproduction is guaranteed.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Once a team trains a model a few times, memory usually fails before compute does. File names alone do not explain which parameter set won last week, which data version produced the result, or why today's score moved.</p>
+<p>The problem gets worse when multiple people are involved. One person leaves metrics in Slack, another stores only the best model, and someone else never records failed runs at all. At that point, reconstructing the past becomes harder than improving the model.</p>
 <p>This is post 2 in the MLOps 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.</p>
+<h2>What This Post Answers</h2>
 <ul>
-<li>The four elements of experiment tracking</li>
-<li>The core MLflow objects</li>
-<li>How runs and experiments compose</li>
-<li>Tools for comparison and ranking</li>
-<li>Five common pitfalls</li>
+<li>Why does the same model become hard to reproduce without run tracking?</li>
+<li>Which pieces of metadata must always be captured: params, metrics, artifacts, environment, or data version?</li>
+<li>How should you think about experiments and runs in MLflow?</li>
+<li>Why should failed runs stay visible instead of being discarded?</li>
+<li>What does a team have to standardize before run comparison becomes useful?</li>
 </ul>
+<blockquote>
+<p>Mental model: an experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>When a folder of notebooks becomes the source of truth, team collaboration breaks. A tracker is shared memory.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;code + params&quot;] --&gt; Run[&quot;run&quot;]
-    Data[&quot;data version&quot;] --&gt; Run
-    Run --&gt; Metric[&quot;metrics&quot;]
-    Run --&gt; Art[&quot;artifacts&quot;]
-    Run --&gt; Tag[&quot;tags&quot;]
-    Metric --&gt; Compare[&quot;compare runs&quot;]
-</code></pre>
+<p>Without experiment tracking, training continues but knowledge does not accumulate. When a new score appears, the team cannot tell whether the gain came from the data change, the parameter change, or pure luck.</p>
+<p>When every run is recorded, the process becomes an asset in its own right. Failed runs prevent repeated mistakes, and successful runs become promotion candidates that can be defended with evidence.</p>
+<h2>See the Flow First</h2>
+<p><img alt="See the Flow First" src="https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png"></p>
+<p><em>See the Flow First</em><br>
+This is the essence of experiment tracking. Code, parameters, and data version become one run; that run emits metrics, artifacts, and tags; and the team can compare many runs on the same axis.</p>
+<p>The key point is not storage by itself, but comparability. The run table matters only when different runs can be read side by side with consistent names and metadata.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Experiment</strong>: a named container for related runs.</li>
