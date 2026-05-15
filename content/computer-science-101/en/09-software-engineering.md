@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 9
 title: Software Engineering
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Code Review
   - Refactoring
 seo_description: Coding vs software engineering — covered through testing, version control, code review, and refactoring in the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Software Engineering
 
-> Computer Science 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: What separates a small script you wrote alone from a system that 100 people maintain for 10 years?
-
-> Coding is making a program that works. Software engineering is making a system that keeps working as time passes and people change. Tests are the safety net for change, version control is the foundation for collaboration, code review is the last quality gate, and refactoring is the tool for paying down technical debt. This article walks the path from coding to engineering through these four pillars.
-
-<!-- a-grade-intro:end -->
+There is a big difference between a script that runs once for you and a system that many people can keep changing for years. Software engineering is the set of habits that preserves “still works” while time passes, teammates change, and requirements shift.
 
 This is post 9 in the Computer Science 101 series.
+
+In this article, we'll use testing, version control, code review, and refactoring to show where coding turns into engineering.
+
+## Questions This Article Answers
+
+- What separates coding from software engineering in practice?
+- Why are tests the minimum safety mechanism for change?
+- What habits make a Git-based workflow sustainable for a team?
+- Why should refactoring be managed separately from feature work?
+- What happens to speed and quality when technical debt accumulates?
 
 ## What You Will Learn
 
@@ -54,13 +56,8 @@ Good code is not the code that's quickest to write today; it's the code that's e
 
 > Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."
 
-```text
-Coding only
-  requirements -> write -> verify it runs -> deploy
-
-Software engineering
-  requirements -> design -> write + test -> review -> CI -> deploy -> monitor -> refactor
-```
+![Concept at a Glance](../../../assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
+*Engineering adds repeatable safety and long-term maintainability on top of “it runs”*
 
 ## Key Terms
 
@@ -132,6 +129,8 @@ pip install pytest
 # Place the two files above in the same folder and run
 pytest -v
 ```
+
+**Expected output:** all four tests should pass, giving you a baseline that you can rerun after a refactor to confirm behavior stayed the same.
 
 ### Step 2: Use regression tests to keep bugs from coming back
 

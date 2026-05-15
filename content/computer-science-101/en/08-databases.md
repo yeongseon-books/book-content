@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 8
 title: Databases
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Transactions
   - ACID
 seo_description: How databases store, query, and protect data — focused on indexes and transactions, as part of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Databases
 
-> Computer Science 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: How can a database find a single row out of hundreds of millions in 1 ms?
-
-> A database stores large amounts of data permanently and lets many users read and write it safely at the same time. SQL is the standard language for working with that data, indexes are the data structures that make lookups fast, and transactions keep data consistent. This article covers SQL basics, how indexes work, ACID transactions, and the performance traps you'll meet most often.
-
-<!-- a-grade-intro:end -->
+Finding one row out of millions in milliseconds is rarely about the SQL sentence alone. It is about the data structures, execution plan, and locking behavior hidden underneath that sentence. That is why so many production incidents end up tracing back to the database layer.
 
 This is post 8 in the Computer Science 101 series.
+
+In this article, we'll connect SQL, indexes, execution plans, and ACID transactions so that database behavior stops feeling like a black box.
+
+## Questions This Article Answers
+
+- How does a database store large amounts of data and still answer quickly?
+- Why can an index change lookup time so dramatically?
+- What is the gap between a SQL statement and the plan the DB actually executes?
+- What failures do transactions and ACID protect you from?
+- Why do N+1 queries and long transactions so often become production incidents?
 
 ## What You Will Learn
 
@@ -54,17 +56,8 @@ Queries are short, but deep algorithms sit behind them.
 
 > An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.
 
-```text
-Without an index:  SELECT * FROM users WHERE email = 'a@b.com'
-  -> scan every row (Full Table Scan)  -- O(n)
-
-With a B-Tree index
-  -> binary search through the tree    -- O(log n)
-
-For 1,000,000 rows
-  - full scan : about 1,000,000 comparisons
-  - B-Tree    : about 20 comparisons
-```
+![Concept at a Glance](../../../assets/computer-science-101/08/08-01-concept-at-a-glance.en.png)
+*An index swaps a row-by-row scan for a structured lookup path*
 
 ## Key Terms
 
@@ -188,6 +181,8 @@ start = time.perf_counter()
 cur.execute("SELECT COUNT(*) FROM big WHERE k = ?", (target,)).fetchone()
 print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```
+
+**Expected output:** `after index` should be much faster than `before index`, and `EXPLAIN QUERY PLAN` should confirm that the index is used.
 
 ### Step 4: Inspect with EXPLAIN QUERY PLAN
 

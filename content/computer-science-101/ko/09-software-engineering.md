@@ -58,13 +58,8 @@ last_reviewed: '2026-05-12'
 
 > 엔지니어링은 "지금 동작" 위에 "내일도 동작"을 보장하는 활동입니다.
 
-```text
-Coding only
-  requirements -> write -> verify it runs -> deploy
-
-Software engineering
-  requirements -> design -> write + test -> review -> CI -> deploy -> monitor -> refactor
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
+*엔지니어링은 단순 실행 성공 위에 변경 안전성과 운영 지속성을 추가합니다*
 
 ## 핵심 용어
 
@@ -131,6 +126,8 @@ pip install pytest
 # Place the two files above in the same folder and run
 pytest -v
 ```
+
+**Expected output:** 테스트 네 개가 모두 통과하고, 이후 리팩터링 전후에 같은 테스트를 다시 돌려 동작 보존을 검증할 수 있어야 합니다.
 
 ### 2단계: 회귀 테스트로 버그 막기
 

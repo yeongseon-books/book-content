@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Computer Architecture</h1>
-<blockquote>
-<p>Computer Science 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: Two pieces of code share the same Big-O. Why is one ten times slower than the other in practice?</p>
-<blockquote>
-<p>Even with the same algorithm, performance depends heavily on how the code uses hardware. The CPU does not touch memory directly — it goes through a cache. Cache-friendly code can be tens of times faster than code that misses the cache constantly. This article covers the von Neumann model, the CPU and memory and cache hierarchy, and how all of it shows up in your code.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.</p>
 <p>This is post 5 in the Computer Science 101 series.</p>
+<p>In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>Why can two algorithms with the same order run at very different speeds?</li>
+<li>What roles do the CPU, registers, cache, and RAM each play?</li>
+<li>Why does row-major versus column-major traversal matter?</li>
+<li>What does locality mean in practical code?</li>
+<li>Why does a Python <code>list</code> feel different from a dense numeric array?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The core components of the von Neumann architecture</li>
@@ -83,17 +82,8 @@
 <blockquote>
 <p>Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.</p>
 </blockquote>
-<pre><code class="language-text">Tier            Approx. access time   Size
-────────────────────────────────────────────
-Register        &lt; 1 ns                tens of bytes
-L1 cache        ~1 ns                 32-64 KB
-L2 cache        ~4 ns                 hundreds of KB
-L3 cache        ~10 ns                tens of MB
-Main memory     ~100 ns               tens of GB
-SSD             ~100 µs               hundreds of GB - TB
-HDD             ~10 ms                TB
-Network         ~ms - seconds         —
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.en.png"><br>
+<em>Higher layers are faster and smaller; lower layers are slower but larger</em></p>
 <h2>Key Terms</h2>
 <p><strong>CPU</strong><br>
 - Description: The unit that decodes instructions and performs operations</p>
@@ -143,6 +133,7 @@ for j in range(N):
         matrix[i][j] += 1
 print(f&quot;column-major: {time.perf_counter() - start:.3f}s&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> even with the same O(n²), <code>row-major</code> should finish faster than <code>column-major</code>, making cache locality visible in the timings.</p>
 <p><strong>Step 2: Inspect memory layout with NumPy</strong></p>
 <pre><code class="language-python">import numpy as np
 

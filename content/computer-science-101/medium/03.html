@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Data Representation</h1>
-<blockquote>
-<p>Computer Science 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: A computer only knows 0 and 1, so how does it store and process letters, numbers, and images?</p>
-<blockquote>
-<p>Inside a computer every piece of data is a sequence of bits (0 or 1). The number 42, the letter 'A', and a single pixel in an image are all bit sequences in the end. The same bits can mean an integer in one context and a character in another. This article covers binary, character encodings, and the representation of integers and floating-point numbers.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.</p>
 <p>This is post 3 in the Computer Science 101 series.</p>
+<p>In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>How does a computer store numbers, text, and images using only 0 and 1?</li>
+<li>Why do ASCII and UTF-8 use different byte counts?</li>
+<li>Why are negative integers usually represented with two's complement?</li>
+<li>Why does <code>0.1 + 0.2 != 0.3</code> happen in real programs?</li>
+<li>What kinds of bugs appear when you confuse character length with byte length?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to convert between binary and decimal</li>
@@ -83,12 +82,8 @@
 <blockquote>
 <p>Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.</p>
 </blockquote>
-<pre><code class="language-text">Bits: 01000001
-   │
-   ├── Read as integer  -&gt; 65
-   ├── Read as ASCII    -&gt; 'A'
-   └── Read as a color  -&gt; very dark blue
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>The same bit sequence changes meaning depending on the decoding rule</em></p>
 <h2>Key Terms</h2>
 <p><strong>Bit</strong><br>
 - Description: The smallest unit, storing 0 or 1</p>
@@ -115,6 +110,7 @@ result = Decimal(&quot;0.1&quot;) + Decimal(&quot;0.2&quot;)
 print(result)              # 0.3
 print(result == Decimal(&quot;0.3&quot;))  # True
 </code></pre>
+<p><strong>Expected output:</strong> the <code>float</code> version should show <code>0.30000000000000004</code>, while the <code>Decimal</code> version should print an exact <code>0.3</code>.</p>
 <h2>Hands-On: Step by Step</h2>
 <p><strong>Step 1: Binary and decimal conversion</strong></p>
 <pre><code class="language-python"># Decimal -&gt; binary
@@ -284,7 +280,7 @@ for name, bits in data_sizes.items():
 <h2>References</h2>
 <ul>
 <li><a href="https://home.unicode.org/">Unicode official site</a></li>
-<li><a href="https://en.wikipedia.org/wiki/IEEE_754">IEEE 754 — Floating-point standard</a></li>
+<li><a href="https://docs.python.org/3/tutorial/floatingpoint.html">Python docs — Floating Point Arithmetic: Issues and Limitations</a></li>
 <li><a href="https://floating-point-gui.de/">What Every Programmer Should Know About Floating-Point</a></li>
 <li><a href="https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/">Joel Spolsky — The Absolute Minimum About Unicode</a></li>
 </ul>

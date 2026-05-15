@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 7
 title: Networks
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - DNS
   - Sockets
 seo_description: How TCP/IP, HTTP, and DNS actually work — explained with hands-on socket programming as part of the CS 101 series.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Networks
 
-> Computer Science 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: When you type an address into a browser, how does data from another computer end up on your screen?
-
-> A network is built from layered agreements (protocols). IP decides where a packet should go, TCP guarantees reliability on top of IP, and HTTP rides on top of TCP to exchange meaningful requests and responses. Once you understand the layered structure, you can quickly narrow down where a failure happened or why a response is slow. This article covers TCP/IP, HTTP, DNS, and the basics of socket programming.
-
-<!-- a-grade-intro:end -->
+Typing a domain into a browser does not trigger one magical request. It kicks off a layered exchange where DNS, TCP, TLS, and HTTP each do a different job. Engineers who can draw those layers mentally usually find latency and failure faster.
 
 This is post 7 in the Computer Science 101 series.
+
+In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.
+
+## Questions This Article Answers
+
+- What path does data follow after you type an address into a browser?
+- What does each of IP, TCP, HTTP, and DNS do in its own layer?
+- What does an HTTP request and response look like on the wire?
+- Why do DNS lookup time and the TLS handshake count toward latency?
+- When should you choose TCP versus UDP for a workload?
 
 ## What You Will Learn
 
@@ -54,14 +56,8 @@ Each layer trusts the one below it and focuses on its own job.
 
 > Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.
 
-```text
-Layer (TCP/IP)        Example protocols          Unit
-────────────────────────────────────────────────────────
-Application           HTTP, DNS, SMTP, SSH       message
-Transport             TCP, UDP                   segment
-Internet              IP, ICMP                   packet
-Network Access        Ethernet, Wi-Fi            frame
-```
+![Concept at a Glance](../../../assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
+*A request starts at the application layer and picks up lower-layer headers on the way down*
 
 ## Key Terms
 
@@ -209,6 +205,8 @@ print(f"DNS    : {(t1 - t0) * 1000:6.1f} ms")
 print(f"TCP    : {(t2 - t1) * 1000:6.1f} ms")
 print(f"HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)")
 ```
+
+**Expected output:** the script should print separate `DNS`, `TCP`, and `HTTPS` timings so you can see which layer dominates the request.
 
 ## Notable Points in This Code
 

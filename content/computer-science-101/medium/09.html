@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Software Engineering</h1>
-<blockquote>
-<p>Computer Science 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: What separates a small script you wrote alone from a system that 100 people maintain for 10 years?</p>
-<blockquote>
-<p>Coding is making a program that works. Software engineering is making a system that keeps working as time passes and people change. Tests are the safety net for change, version control is the foundation for collaboration, code review is the last quality gate, and refactoring is the tool for paying down technical debt. This article walks the path from coding to engineering through these four pillars.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>There is a big difference between a script that runs once for you and a system that many people can keep changing for years. Software engineering is the set of habits that preserves “still works” while time passes, teammates change, and requirements shift.</p>
 <p>This is post 9 in the Computer Science 101 series.</p>
+<p>In this article, we'll use testing, version control, code review, and refactoring to show where coding turns into engineering.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>What separates coding from software engineering in practice?</li>
+<li>Why are tests the minimum safety mechanism for change?</li>
+<li>What habits make a Git-based workflow sustainable for a team?</li>
+<li>Why should refactoring be managed separately from feature work?</li>
+<li>What happens to speed and quality when technical debt accumulates?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between coding and software engineering</li>
@@ -83,12 +82,8 @@
 <blockquote>
 <p>Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."</p>
 </blockquote>
-<pre><code class="language-text">Coding only
-  requirements -&gt; write -&gt; verify it runs -&gt; deploy
-
-Software engineering
-  requirements -&gt; design -&gt; write + test -&gt; review -&gt; CI -&gt; deploy -&gt; monitor -&gt; refactor
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Engineering adds repeatable safety and long-term maintainability on top of “it runs”</em></p>
 <h2>Key Terms</h2>
 <p><strong>Unit test</strong><br>
 - Description: Verifies that a small unit (function/class) behaves as intended</p>
@@ -146,6 +141,7 @@ pip install pytest
 # Place the two files above in the same folder and run
 pytest -v
 </code></pre>
+<p><strong>Expected output:</strong> all four tests should pass, giving you a baseline that you can rerun after a refactor to confirm behavior stayed the same.</p>
 <p><strong>Step 2: Use regression tests to keep bugs from coming back</strong></p>
 <pre><code class="language-python"># When you find a bug, first write a test that reproduces it
 def test_zero_price_returns_zero():

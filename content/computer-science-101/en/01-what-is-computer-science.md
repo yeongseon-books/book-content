@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 1
 title: What Is Computer Science?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Curriculum Overview
   - Learning Roadmap
 seo_description: A map of what computer science actually studies, why abstraction is its central tool, and how the core subjects connect.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Computer Science?
 
-> Computer Science 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: Is computer science the study of "how to use computers well"?
-
-> Computer science studies *computation*, not computers. It asks which problems can be solved by computation, how efficiently they can be solved, and how we can design that process systematically. This article defines the field, lays out its core questions, and draws a map of how the major subjects connect.
-
-<!-- a-grade-intro:end -->
+When people first encounter computer science, it is easy to mistake it for “being good at programming languages.” In practice, the engineers who keep growing are usually the ones who can model computation, reason about abstraction, and explain where a system's limits come from.
 
 This is the first post in the Computer Science 101 series.
+
+In this article, we'll define what computer science actually studies, why abstraction is the field's shared tool, and how the rest of the series connects into one map.
+
+## Questions This Article Answers
+
+- How is computer science different from programming, and what does it actually study?
+- Why does abstraction keep showing up as the field's central tool?
+- How do algorithms, systems, and applications connect as layers?
+- Why can the same problem produce very different solutions when viewed through a CS lens?
+- How should you read this series so that the full picture becomes clearer over time?
 
 ## What You Will Learn
 
@@ -54,23 +56,8 @@ This series walks through the major subjects of a CS curriculum, one at a time, 
 
 > Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.
 
-```text
-         Computation theory
-        /                  \
-  Algorithms          Complexity
-       \                /
-       Data structures
-            |
-   ┌────────┼────────┐
- Computer   OS    Networks
- architecture        |
-   └────────┼────────┘
-            |
-       Software
-       engineering
-            |
-     AI / Data science
-```
+![Concept at a Glance](../../../assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
+*The main CS layers, moving from theory into systems and applications*
 
 ## Key Terms
 
@@ -196,6 +183,8 @@ binary_search(data, 999_999)
 print(f"Binary search: {time.time() - start:.6f}s")
 ```
 
+**Expected output:** `Linear search` should take much longer than `Binary search`, and the gap grows quickly as the input size increases.
+
 The performance gap between two algorithms that solve the same problem widens dramatically as the input grows.
 
 ### Step 4: CS as a layered structure
@@ -305,7 +294,7 @@ The next article digs into the most basic CS question — "What is computation?"
 ## References
 
 - [CS50 — Introduction to Computer Science (Harvard)](https://cs50.harvard.edu/)
-- [Wikipedia — Computer Science](https://en.wikipedia.org/wiki/Computer_science)
+- [ACM/IEEE-CS/AAAI — Computing Curricula 2020](https://www.acm.org/binaries/content/assets/education/curricula-recommendations/cc2020.pdf)
 - [Structure and Interpretation of Computer Programs (MIT)](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Computer Science Distilled — Wladston Ferreira Filho](https://code.energy/computer-science-distilled/)
 

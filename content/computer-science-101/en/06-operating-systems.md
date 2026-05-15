@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 6
 title: Operating Systems
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Virtual Memory
   - Concurrency
 seo_description: How an operating system manages processes, threads, memory, and system calls — and why your concurrency choices depend on it.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Operating Systems
 
-> Computer Science 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: Why does it look like hundreds of programs run at the same time on a single machine?
-
-> The operating system sits between hardware and applications. It hands CPU and memory out to many programs and gives them a uniform way to reach files, networks, and other resources. Every line of code we write eventually relies on the OS. This article covers processes, threads, virtual memory, system calls, and the basics of concurrency.
-
-<!-- a-grade-intro:end -->
+The moment one machine seems to run many programs at once, you are already living inside an operating-system abstraction. The same perspective explains why a web server stalls, why a memory leak becomes visible, and why threads do not always make Python faster.
 
 This is post 6 in the Computer Science 101 series.
+
+In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.
+
+## Questions This Article Answers
+
+- Why does one machine appear to run many programs at once?
+- How do processes and threads differ in memory sharing and isolation?
+- Why is virtual memory such a useful abstraction?
+- What cost appears at the user/kernel boundary when a system call happens?
+- Why do CPU-bound and I/O-bound tasks need different concurrency strategies?
 
 ## What You Will Learn
 
@@ -54,20 +56,8 @@ Without understanding OS abstractions, debugging starts to feel like magic.
 
 > A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.
 
-```text
-Process A                       Process B
-┌───────────────────┐           ┌───────────────────┐
-│ Virtual address   │           │ Virtual address   │
-│  ┌─────────────┐  │           │  ┌─────────────┐  │
-│  │ Thread 1    │  │           │  │ Thread 1    │  │
-│  │ Thread 2    │  │           │  │             │  │
-│  └─────────────┘  │           │  └─────────────┘  │
-└─────────┬─────────┘           └─────────┬─────────┘
-          │                               │
-          └───── Operating system ────────┘
-                       │
-                  Hardware (CPU, RAM, disk)
-```
+![Concept at a Glance](../../../assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
+*Processes stay isolated from one another while the OS multiplexes hardware resources*
 
 ## Key Terms
 
@@ -169,6 +159,8 @@ with ProcessPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
 print(f"processes x4: {time.perf_counter() - start:.2f}s")  # about 4x faster
 ```
+
+**Expected output:** for CPU-bound work, `threads x4` should stay close to `sequential`, while `processes x4` should finish noticeably faster.
 
 ### Step 3: Look inside a system call
 

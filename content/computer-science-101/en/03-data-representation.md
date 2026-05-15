@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 3
 title: Data Representation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Floating Point
   - Data Types
 seo_description: How computers represent data — binary, character encoding (ASCII, UTF-8), and the way integers and floating-point numbers are stored.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Representation
 
-> Computer Science 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: A computer only knows 0 and 1, so how does it store and process letters, numbers, and images?
-
-> Inside a computer every piece of data is a sequence of bits (0 or 1). The number 42, the letter 'A', and a single pixel in an image are all bit sequences in the end. The same bits can mean an integer in one context and a character in another. This article covers binary, character encodings, and the representation of integers and floating-point numbers.
-
-<!-- a-grade-intro:end -->
+People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.
 
 This is post 3 in the Computer Science 101 series.
+
+In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.
+
+## Questions This Article Answers
+
+- How does a computer store numbers, text, and images using only 0 and 1?
+- Why do ASCII and UTF-8 use different byte counts?
+- Why are negative integers usually represented with two's complement?
+- Why does `0.1 + 0.2 != 0.3` happen in real programs?
+- What kinds of bugs appear when you confuse character length with byte length?
 
 ## What You Will Learn
 
@@ -54,13 +56,8 @@ Bit-level understanding is the foundation of debugging and performance work.
 
 > Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.
 
-```text
-Bits: 01000001
-   │
-   ├── Read as integer  -> 65
-   ├── Read as ASCII    -> 'A'
-   └── Read as a color  -> very dark blue
-```
+![Concept at a Glance](../../../assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
+*The same bit sequence changes meaning depending on the decoding rule*
 
 ## Key Terms
 
@@ -93,6 +90,8 @@ result = Decimal("0.1") + Decimal("0.2")
 print(result)              # 0.3
 print(result == Decimal("0.3"))  # True
 ```
+
+**Expected output:** the `float` version should show `0.30000000000000004`, while the `Decimal` version should print an exact `0.3`.
 
 ## Hands-On: Step by Step
 
@@ -279,7 +278,7 @@ The next article covers algorithms — how to process data efficiently — and c
 ## References
 
 - [Unicode official site](https://home.unicode.org/)
-- [IEEE 754 — Floating-point standard](https://en.wikipedia.org/wiki/IEEE_754)
+- [Python docs — Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html)
 - [What Every Programmer Should Know About Floating-Point](https://floating-point-gui.de/)
 - [Joel Spolsky — The Absolute Minimum About Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
 

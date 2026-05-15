@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 2
 title: Computation and Programs
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Compilers
   - Interpreters
 seo_description: The definition of computation, the Turing machine, the evolution of programming languages, and the major paradigms that shape software design.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Computation and Programs
 
-> Computer Science 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: What does it precisely mean that something is "computable," and how does a program express computation?
-
-> In 1936 Alan Turing gave a mathematical definition of "what can be computed." The surprising conclusion: a simple machine that moves along a tape and reads or writes symbols can carry out *every* computation. That theoretical machine is the foundation of every modern computer. This article covers the definition of computation, problems that cannot be computed, the evolution of programming languages, and the major paradigms.
-
-<!-- a-grade-intro:end -->
+“Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.
 
 This is post 2 in the Computer Science 101 series.
+
+In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.
+
+## Questions This Article Answers
+
+- What does it actually mean to call a problem computable?
+- Why is the Turing machine still the reference model for modern computing?
+- What does the halting problem tell us about the limits of software?
+- How do imperative, functional, and object-oriented styles express the same computation differently?
+- How do compilers and interpreters change the way code reaches execution?
 
 ## What You Will Learn
 
@@ -52,19 +54,8 @@ The answer to "Can every problem be solved by a program?" is no. Computation the
 
 > Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.
 
-```text
-Mathematical functions (theory)
-        │
-Turing machine (computation model)
-        │
-Machine code (hardware)
-        │
-Assembly (low level)
-        │
-High-level languages (Python, Java)
-        │
-Paradigms (imperative, functional, OOP)
-```
+![Concept at a Glance](../../../assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
+*A ladder from the theory of computation to the paradigms we use to express code*
 
 ## Key Terms
 
@@ -213,6 +204,8 @@ dis.dis(add)
 # RETURN_VALUE
 ```
 
+**Expected output:** you should see bytecode operations such as `LOAD_FAST`, `BINARY_ADD`, and `RETURN_VALUE`, confirming that Python code is translated into a lower-level form before execution.
+
 A compiler translates the entire program ahead of time, while an interpreter runs it line by line. Python is a hybrid: it compiles to bytecode and then interprets that bytecode on a virtual machine.
 
 ## Notable Points in This Code
@@ -284,7 +277,7 @@ The next article looks at how computers represent data — binary, character enc
 ## References
 
 - [Alan Turing — On Computable Numbers (1936)](https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf)
-- [Wikipedia — Halting Problem](https://en.wikipedia.org/wiki/Halting_problem)
+- [Stanford Encyclopedia of Philosophy — The Church-Turing Thesis](https://plato.stanford.edu/entries/church-turing/)
 - [SICP — Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Programming Paradigms for Dummies (Peter Van Roy)](https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf)
 

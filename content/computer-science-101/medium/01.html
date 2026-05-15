@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>What Is Computer Science?</h1>
-<blockquote>
-<p>Computer Science 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: Is computer science the study of "how to use computers well"?</p>
-<blockquote>
-<p>Computer science studies <em>computation</em>, not computers. It asks which problems can be solved by computation, how efficiently they can be solved, and how we can design that process systematically. This article defines the field, lays out its core questions, and draws a map of how the major subjects connect.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>When people first encounter computer science, it is easy to mistake it for “being good at programming languages.” In practice, the engineers who keep growing are usually the ones who can model computation, reason about abstraction, and explain where a system's limits come from.</p>
 <p>This is the first post in the Computer Science 101 series.</p>
+<p>In this article, we'll define what computer science actually studies, why abstraction is the field's shared tool, and how the rest of the series connects into one map.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>How is computer science different from programming, and what does it actually study?</li>
+<li>Why does abstraction keep showing up as the field's central tool?</li>
+<li>How do algorithms, systems, and applications connect as layers?</li>
+<li>Why can the same problem produce very different solutions when viewed through a CS lens?</li>
+<li>How should you read this series so that the full picture becomes clearer over time?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of computer science and its central research questions</li>
@@ -83,22 +82,8 @@
 <blockquote>
 <p>Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.</p>
 </blockquote>
-<pre><code class="language-text">         Computation theory
-        /                  \
-  Algorithms          Complexity
-       \                /
-       Data structures
-            |
-   ┌────────┼────────┐
- Computer   OS    Networks
- architecture        |
-   └────────┼────────┘
-            |
-       Software
-       engineering
-            |
-     AI / Data science
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>The main CS layers, moving from theory into systems and applications</em></p>
 <h2>Key Terms</h2>
 <p><strong>Computation</strong><br>
 - Description: Producing output from input by following rules</p>
@@ -200,6 +185,7 @@ start = time.time()
 binary_search(data, 999_999)
 print(f&quot;Binary search: {time.time() - start:.6f}s&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> <code>Linear search</code> should take much longer than <code>Binary search</code>, and the gap grows quickly as the input size increases.</p>
 <p>The performance gap between two algorithms that solve the same problem widens dramatically as the input grows.</p>
 <p><strong>Step 4: CS as a layered structure</strong></p>
 <pre><code class="language-python"># Express the layered relationship of CS subjects as a dictionary
@@ -304,7 +290,7 @@ for num, title, keywords in roadmap:
 <h2>References</h2>
 <ul>
 <li><a href="https://cs50.harvard.edu/">CS50 — Introduction to Computer Science (Harvard)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Computer_science">Wikipedia — Computer Science</a></li>
+<li><a href="https://www.acm.org/binaries/content/assets/education/curricula-recommendations/cc2020.pdf">ACM/IEEE-CS/AAAI — Computing Curricula 2020</a></li>
 <li><a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html">Structure and Interpretation of Computer Programs (MIT)</a></li>
 <li><a href="https://code.energy/computer-science-distilled/">Computer Science Distilled — Wladston Ferreira Filho</a></li>
 </ul>

@@ -2,7 +2,7 @@
 series: computer-science-101
 episode: 5
 title: Computer Architecture
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,24 @@ tags:
   - Cache
   - Performance
 seo_description: How CPUs, memory, and the cache hierarchy work, and how they shape the real performance of your code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Computer Architecture
 
-> Computer Science 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Key question**: Two pieces of code share the same Big-O. Why is one ten times slower than the other in practice?
-
-> Even with the same algorithm, performance depends heavily on how the code uses hardware. The CPU does not touch memory directly — it goes through a cache. Cache-friendly code can be tens of times faster than code that misses the cache constantly. This article covers the von Neumann model, the CPU and memory and cache hierarchy, and how all of it shows up in your code.
-
-<!-- a-grade-intro:end -->
+Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.
 
 This is post 5 in the Computer Science 101 series.
+
+In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.
+
+## Questions This Article Answers
+
+- Why can two algorithms with the same order run at very different speeds?
+- What roles do the CPU, registers, cache, and RAM each play?
+- Why does row-major versus column-major traversal matter?
+- What does locality mean in practical code?
+- Why does a Python `list` feel different from a dense numeric array?
 
 ## What You Will Learn
 
@@ -54,18 +56,8 @@ An algorithm written without hardware awareness is fast only on paper.
 
 > Higher in the hierarchy means faster, more expensive, and smaller. Lower means slower, cheaper, and bigger.
 
-```text
-Tier            Approx. access time   Size
-────────────────────────────────────────────
-Register        < 1 ns                tens of bytes
-L1 cache        ~1 ns                 32-64 KB
-L2 cache        ~4 ns                 hundreds of KB
-L3 cache        ~10 ns                tens of MB
-Main memory     ~100 ns               tens of GB
-SSD             ~100 µs               hundreds of GB - TB
-HDD             ~10 ms                TB
-Network         ~ms - seconds         —
-```
+![Concept at a Glance](../../../assets/computer-science-101/05/05-01-concept-at-a-glance.en.png)
+*Higher layers are faster and smaller; lower layers are slower but larger*
 
 ## Key Terms
 
@@ -125,6 +117,8 @@ for j in range(N):
         matrix[i][j] += 1
 print(f"column-major: {time.perf_counter() - start:.3f}s")
 ```
+
+**Expected output:** even with the same O(n²), `row-major` should finish faster than `column-major`, making cache locality visible in the timings.
 
 ### Step 2: Inspect memory layout with NumPy
 

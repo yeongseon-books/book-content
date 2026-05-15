@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>From CS to AI and Data Science</h1>
-<blockquote>
-<p>Computer Science 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: How do the CS fundamentals you just learned actually show up in AI and data science work?</p>
-<blockquote>
-<p>AI and data science are computer science with statistics and domain knowledge layered on top. The data representations, algorithmic complexity, memory hierarchy, databases, and engineering habits we've covered are used every single day in ML/DS. This closing article explains how ML works, how every previous article connects to it, and where to study next.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>AI and data science did not arrive from some separate universe. They sit on top of data representation, algorithmic cost, memory hierarchy, databases, and engineering habits, with statistics and domain knowledge added on top.</p>
 <p>This is the final post in the Computer Science 101 series.</p>
+<p>In this article, we'll connect the previous nine posts to machine learning and data science work, then turn that map into a concrete study roadmap.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>Where do the CS fundamentals from this series show up directly in AI and data science?</li>
+<li>What is the core difference between rule-based systems and machine-learning systems?</li>
+<li>Why are training, inference, and data validation still computation and systems problems?</li>
+<li>Why do AI systems need the same testing, monitoring, and cost awareness as any other service?</li>
+<li>What should you study next if you want to keep going toward AI/DS?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The basics of machine learning (training, inference, features, models)</li>
@@ -83,11 +82,8 @@
 <blockquote>
 <p>A rule-based system has humans write the rules. Machine learning infers the rules from data.</p>
 </blockquote>
-<pre><code class="language-text">Rule-based                              Machine learning
-input ──┐                               input ──┐
-        ├─ human-written rules ─→ out          ├─ learned model ─→ out
-rules ──┘                               model ←── estimated from training data
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>Rule-based systems rely on human-authored logic, while ML systems infer that logic from data</em></p>
 <h2>Key Terms</h2>
 <p><strong>Machine learning</strong><br>
 - Description: A technique that learns patterns from data to predict outputs for new inputs</p>
@@ -178,6 +174,7 @@ for x in range(1_000_000):
 print(f&quot;1M inferences: {time.perf_counter() - start:.3f}s&quot;)
 # Simpler models infer faster — a key metric for real-time services
 </code></pre>
+<p><strong>Expected output:</strong> the script should print the time for one million inferences and make it obvious why model simplicity matters for latency-sensitive systems.</p>
 <p><strong>Step 4: Inspect data quality</strong></p>
 <pre><code class="language-python">def basic_stats(values: list[float]) -&gt; dict:
     n = len(values)

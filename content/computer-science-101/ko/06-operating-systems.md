@@ -58,20 +58,8 @@ OS의 추상화를 모르면 디버깅은 마법이 됩니다.
 
 > 프로세스는 격리된 실행 단위, 스레드는 같은 프로세스 안에서 메모리를 공유하는 실행 흐름입니다.
 
-```text
-Process A                       Process B
-┌───────────────────┐           ┌───────────────────┐
-│ Virtual address   │           │ Virtual address   │
-│  ┌─────────────┐  │           │  ┌─────────────┐  │
-│  │ Thread 1    │  │           │  │ Thread 1    │  │
-│  │ Thread 2    │  │           │  │             │  │
-│  └─────────────┘  │           │  └─────────────┘  │
-└─────────┬─────────┘           └─────────┬─────────┘
-          │                               │
-          └───── Operating system ────────┘
-                       │
-                  Hardware (CPU, RAM, disk)
-```
+![한눈에 보는 개념](../../../assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)
+*프로세스는 서로 격리되고, 운영체제가 하드웨어 자원을 나눠 배분합니다*
 
 ## 핵심 용어
 
@@ -168,6 +156,8 @@ with ProcessPoolExecutor(max_workers=4) as pool:
     list(pool.map(cpu_heavy, work))
 print(f"processes x4: {time.perf_counter() - start:.2f}s")  # about 4x faster
 ```
+
+**Expected output:** CPU 바운드 작업에서는 `threads x4`가 `sequential`과 비슷하고, `processes x4`가 더 빨라 GIL의 한계가 드러나야 합니다.
 
 ### 3단계: 시스템 콜 들여다보기
 

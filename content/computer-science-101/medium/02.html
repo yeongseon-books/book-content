@@ -54,18 +54,17 @@
 </head>
 <body>
 <h1>Computation and Programs</h1>
-<blockquote>
-<p>Computer Science 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key question</strong>: What does it precisely mean that something is "computable," and how does a program express computation?</p>
-<blockquote>
-<p>In 1936 Alan Turing gave a mathematical definition of "what can be computed." The surprising conclusion: a simple machine that moves along a tape and reads or writes symbols can carry out <em>every</em> computation. That theoretical machine is the foundation of every modern computer. This article covers the definition of computation, problems that cannot be computed, the evolution of programming languages, and the major paradigms.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>“Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.</p>
 <p>This is post 2 in the Computer Science 101 series.</p>
+<p>In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.</p>
+<h2>Questions This Article Answers</h2>
+<ul>
+<li>What does it actually mean to call a problem computable?</li>
+<li>Why is the Turing machine still the reference model for modern computing?</li>
+<li>What does the halting problem tell us about the limits of software?</li>
+<li>How do imperative, functional, and object-oriented styles express the same computation differently?</li>
+<li>How do compilers and interpreters change the way code reaches execution?</li>
+</ul>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The Turing machine and the idea of computability</li>
@@ -82,18 +81,8 @@
 <blockquote>
 <p>Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.</p>
 </blockquote>
-<pre><code class="language-text">Mathematical functions (theory)
-        │
-Turing machine (computation model)
-        │
-Machine code (hardware)
-        │
-Assembly (low level)
-        │
-High-level languages (Python, Java)
-        │
-Paradigms (imperative, functional, OOP)
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>A ladder from the theory of computation to the paradigms we use to express code</em></p>
 <h2>Key Terms</h2>
 <p><strong>Turing machine</strong><br>
 - Description: A theoretical model that defines computability</p>
@@ -206,6 +195,7 @@ dis.dis(add)
 # BINARY_ADD
 # RETURN_VALUE
 </code></pre>
+<p><strong>Expected output:</strong> you should see bytecode operations such as <code>LOAD_FAST</code>, <code>BINARY_ADD</code>, and <code>RETURN_VALUE</code>, confirming that Python code is translated into a lower-level form before execution.</p>
 <p>A compiler translates the entire program ahead of time, while an interpreter runs it line by line. Python is a hybrid: it compiles to bytecode and then interprets that bytecode on a virtual machine.</p>
 <h2>Notable Points in This Code</h2>
 <ul>
@@ -279,7 +269,7 @@ dis.dis(add)
 <h2>References</h2>
 <ul>
 <li><a href="https://www.cs.virginia.edu/~robins/Turing_Paper_1936.pdf">Alan Turing — On Computable Numbers (1936)</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Halting_problem">Wikipedia — Halting Problem</a></li>
+<li><a href="https://plato.stanford.edu/entries/church-turing/">Stanford Encyclopedia of Philosophy — The Church-Turing Thesis</a></li>
 <li><a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html">SICP — Structure and Interpretation of Computer Programs</a></li>
 <li><a href="https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf">Programming Paradigms for Dummies (Peter Van Roy)</a></li>
 </ul>
