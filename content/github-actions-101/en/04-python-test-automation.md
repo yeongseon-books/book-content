@@ -77,7 +77,7 @@ flowchart LR
 ### Step 1 — Python + cache
 
 ```yaml
-- uses: actions/setup-python@v5
+- uses: actions/setup-python@v6
   with:
     python-version: "3.11"
     cache: "pip"
@@ -88,7 +88,7 @@ flowchart LR
 
 ```yaml
 - run: pytest -q --junitxml=report.xml
-- uses: actions/upload-artifact@v4
+- uses: actions/upload-artifact@v7
   if: always()
   with:
     name: pytest-report
@@ -111,7 +111,7 @@ strategy:
   matrix:
     python: ["3.10", "3.11", "3.12"]
 steps:
-  - uses: actions/setup-python@v5
+  - uses: actions/setup-python@v6
     with:
       python-version: ${{ matrix.python }}
 ```

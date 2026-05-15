@@ -85,8 +85,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python-version }}
       - run: pip install -e ".[dev]"
@@ -160,7 +160,7 @@ tag를 production 승격의 기준으로 삼으면 어떤 버전이 나갔는지
 runs:
   using: composite
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with: { python-version: "3.12" }
     - run: pip install -e ".[dev]"
       shell: bash
