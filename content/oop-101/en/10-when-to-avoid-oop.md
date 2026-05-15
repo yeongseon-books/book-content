@@ -2,7 +2,7 @@
 series: oop-101
 episode: 10
 title: When to Avoid OOP
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,12 +17,10 @@ tags:
   - dataclass
   - Design Decisions
 seo_description: Learn when OOP is overkill and how to use functions, dataclasses, and functional patterns as simpler alternatives.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # When to Avoid OOP
-
-This is the final post in the Object-Oriented Programming 101 series.
 
 This is the final post in the Object-Oriented Programming 101 series.
 
@@ -63,6 +61,9 @@ Multiple instances needed          Single-run scripts
 Swappable strategies required      Data-only containers
 Framework demands classes          Pipeline data processing
 ```
+
+![Concept Overview](../../../assets/oop-101/10/10-01-concept-overview.en.png)
+*Once you decide when not to create a class, a surprising amount of Python code becomes simpler with plain functions and data structures.*
 
 ## Key Concepts
 
@@ -319,6 +320,17 @@ Python's greatest strength is its multi-paradigm nature. Combining functions, cl
 
 In practice, the most pragmatic approach is to start with functions and upgrade to classes only when state management becomes necessary. Knowing when not to create a class is itself a design skill.
 
+## Failure Modes of Oversimplifying Too Far
+
+| Over-simplification | Problem that shows up later | Signal to introduce a class again |
+|--------------------|-----------------------------|-----------------------------------|
+| Everything stays as free functions | The same bundle of data repeats across function parameters | State and validation rules keep changing together |
+| All configuration stays in dicts | Key typos survive until runtime | Field count grows and defaults or validation start to matter |
+| Strategy choices are only callbacks | Related setup and post-processing logic scatter around the codebase | Each strategy starts carrying state or helper behavior |
+| Pipeline stages are only global functions | Shared cache, retry rules, and dependency wiring become tangled | You need lifecycle control and explicit collaborators per stage |
+
+Avoiding classes is not about making the code look shorter. It is about using only the complexity you need today. That is why a function-first design can still evolve into classes later when state transitions and invariants begin to repeat.
+
 ## Checklist
 
 - [ ] I can identify situations where a class is unnecessary
@@ -352,9 +364,9 @@ Object-oriented programming is a powerful tool, but it is not the right fit for 
 
 ## References
 
-- [Stop Writing Classes — PyCon Talk by Jack Diederich](https://www.youtube.com/watch?v=o9pEzgHorH0)
 - [Python Official Docs — dataclasses](https://docs.python.org/3/library/dataclasses.html)
-- [Real Python — When to Use Classes in Python](https://realpython.com/python3-object-oriented-programming/)
-- [Fluent Python — Chapter 6: Design Patterns with First-Class Functions](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
+- [Python Official Docs — typing (`NamedTuple`, `TypedDict`, `Callable`)](https://docs.python.org/3/library/typing.html)
+- [Python Official Docs — functools](https://docs.python.org/3/library/functools.html)
+- [Stop Writing Classes — PyCon Talk by Jack Diederich](https://www.youtube.com/watch?v=o9pEzgHorH0)
 
 Tags: Python, OOP, Functional Programming, dataclass, Design Decisions

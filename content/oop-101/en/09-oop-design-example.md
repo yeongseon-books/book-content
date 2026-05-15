@@ -2,7 +2,7 @@
 series: oop-101
 episode: 9
 title: OOP Design Example
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,7 @@ tags:
   - Refactoring
   - Class Design
 seo_description: Apply OOP principles to a real-world online bookstore order system with step-by-step class design and refactoring.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # OOP Design Example
@@ -60,6 +60,9 @@ OrderService
 ├── PaymentGateway -> payment processing (DIP)
 └── OrderRepository -> order persistence (DIP)
 ```
+
+![Concept Overview](../../../assets/oop-101/09/09-01-concept-overview.en.png)
+*The service does not do everything itself. It pushes discount, payment, and persistence concerns behind collaborators that can change independently.*
 
 ## Key Concepts
 
@@ -355,6 +358,22 @@ The core of good design is "placing flexibility where change is expected." If di
 
 Do not try to design everything perfectly from the start. Write simple working code first, then apply principles and refactor when duplication or coupling becomes a problem. This is the practical approach.
 
+## Where This Design Usually Breaks First in Production
+
+| Weak spot | Typical symptom | What to tighten first |
+|-----------|-----------------|-----------------------|
+| Payment gateway integration | Charge failures and save failures get mixed into one retry path | Split payment result handling from persistence and make the order outcome explicit |
+| Discount policy growth | Checkout logic turns into a branching block inside the service | Keep policies as objects and move composition rules into a factory or rule layer |
+| Repository implementation | Tests are fast, but real DB transactions behave differently | Keep the repository contract stable and make transaction boundaries explicit |
+| Cart model | Quantity updates, stock checks, and coupon rules pile into one class | Separate state mutation from validation and move stock checks into a collaborator |
+
+## A Safer Refactoring Order
+
+1. Freeze the current procedural flow with tests first.
+2. Move pure calculations into value objects such as `Money`.
+3. Push payment and persistence behind Protocol boundaries only after the calculations are stable.
+4. Keep final assembly in one place so that domain objects do not learn about framework or infrastructure details.
+
 ## Checklist
 
 - [ ] I can derive classes from requirements
@@ -388,9 +407,9 @@ Real-world design applies multiple OOP principles together, not in isolation. St
 
 ## References
 
-- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
-- [Clean Code — Robert C. Martin](https://www.oreilly.com/library/view/clean-code/9780136083238/)
+- [Python Official Docs — dataclasses](https://docs.python.org/3/library/dataclasses.html)
+- [Python Official Docs — typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [Refactoring — Martin Fowler](https://refactoring.com/)
-- [Python Patterns — Brandon Rhodes](https://python-patterns.guide/)
+- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
 
 Tags: Python, OOP, Design Example, Refactoring, Class Design

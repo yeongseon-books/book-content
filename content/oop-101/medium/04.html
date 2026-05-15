@@ -96,6 +96,8 @@
     └── speak() overridden
     └── purr() added
 </code></pre>
+<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png"><br>
+<em>Inheritance centralizes shared behavior, but it also widens the blast radius of parent-class changes.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Parent class (base)</strong><br>
 - Description: The existing class that provides attributes and methods</p>
@@ -300,6 +302,19 @@ print(Duck.__mro__)
 <h2>How Senior Engineers Think About This</h2>
 <p>Inheritance is powerful but the most overused OOP feature. If you are not confident that the relationship is truly "is-a," choosing composition is the safer bet.</p>
 <p>In practice, the trend favors composition over inheritance. Inheritance is mainly used at framework-provided extension points (Django views, exceptions), while business logic relies on composition and interfaces.</p>
+<h2>Signals That Tell You to Reconsider Inheritance</h2>
+<p><strong>Each child overrides most of the parent method</strong><br>
+- What usually breaks first: The base class is no longer truly shared<br>
+- Refactoring move to try first: Keep only the common interface and move variable behavior into composition or strategies</p>
+<p><strong>The parent keeps gaining option flags</strong><br>
+- What usually breaks first: The base class turns into <code>if self.kind == ...</code> logic<br>
+- Refactoring move to try first: Thin the parent and extract changing behavior into separate collaborators</p>
+<p><strong>One child needs special initialization order</strong><br>
+- What usually breaks first: <code>super()</code> rules become fragile and hard to debug<br>
+- Refactoring move to try first: Move creation concerns into a factory or assembly layer</p>
+<p><strong>Callers accept the parent type but still need child-specific checks</strong><br>
+- What usually breaks first: LSP is already failing in practice<br>
+- Refactoring move to try first: Split the hierarchy or redefine the contract as smaller interfaces</p>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can extend a parent class using single inheritance</li>

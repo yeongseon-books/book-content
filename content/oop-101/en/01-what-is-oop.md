@@ -2,7 +2,7 @@
 series: oop-101
 episode: 1
 title: What Is Object-Oriented Programming?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,12 +17,10 @@ tags:
   - Programming Paradigm
   - Classes
 seo_description: Understand the core idea of object-oriented programming and how it differs from procedural code with practical Python examples.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Object-Oriented Programming?
-
-This is the first post in the Object-Oriented Programming 101 series.
 
 This is the first post in the Object-Oriented Programming 101 series.
 

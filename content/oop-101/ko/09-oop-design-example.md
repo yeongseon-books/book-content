@@ -16,7 +16,7 @@ tags:
   - 설계 예제
   - 리팩터링
   - 클래스 설계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 온라인 서점 주문 시스템 예제로 OOP 설계와 리팩터링 과정을 단계별로 보여줍니다.
 ---
 
@@ -48,6 +48,9 @@ OrderService
 ├── PaymentGateway -> payment processing (DIP)
 └── OrderRepository -> order persistence (DIP)
 ```
+
+![핵심 개념 잡기](../../../assets/oop-101/09/09-01-concept-overview.ko.png)
+*주문 서비스는 모든 일을 직접 하지 않고, 바뀌기 쉬운 결제·할인·저장 경계를 협력 객체로 밀어냅니다.*
 
 ## 핵심 개념
 
@@ -343,6 +346,22 @@ print(f"Order complete: {order_id}")  # Order complete: ORD-0001
 
 처음부터 모든 것을 완벽하게 설계하려 하지 마세요. 동작하는 간단한 코드를 먼저 작성하고, 중복이나 결합도가 문제가 될 때 원칙을 적용하여 리팩터링하는 것이 실무적 접근입니다.
 
+## 실전에서 먼저 깨지는 지점
+
+| 먼저 흔들리는 지점 | 전형적인 증상 | 대응 포인트 |
+|--------------------|--------------|-------------|
+| 결제 게이트웨이 | 승인 실패와 저장 실패가 뒤섞여 재시도 기준이 모호합니다 | 결제 성공/실패를 도메인 이벤트처럼 분리하고 저장은 그 뒤에 수행합니다 |
+| 할인 정책 | 주문 금액 계산 로직이 서비스 메서드 안 분기문으로 커집니다 | 정책 객체를 유지하고, 조합 규칙만 별도 팩토리나 룰 엔진으로 올립니다 |
+| 저장소 | 테스트는 빠른데 실제 DB 붙이면 트랜잭션 경계가 달라집니다 | 저장소 인터페이스를 유지한 채 커밋 시점과 예외 번역 규칙을 명시합니다 |
+| 장바구니 모델 | 수량 변경, 재고 확인, 쿠폰 적용 책임이 한 클래스에 몰립니다 | 상태 변경 메서드와 검증 메서드를 분리하고, 재고 확인은 별도 협력 객체로 둡니다 |
+
+## 안전하게 리팩터링하는 순서
+
+1. 먼저 현재 절차지향 흐름을 테스트로 고정합니다.
+2. 그다음 계산 로직처럼 순수한 부분부터 값 객체(`Money`)로 옮깁니다.
+3. 외부 I/O가 섞인 결제와 저장은 마지막에 Protocol 경계 뒤로 밀어냅니다.
+4. 마지막으로 조립 코드에서 어떤 구현을 넣을지 결정하게 만들어, 도메인 모델이 프레임워크나 인프라를 직접 모르도록 유지합니다.
+
 ## 체크리스트
 
 - [ ] 요구사항에서 클래스를 도출할 수 있다
@@ -370,9 +389,9 @@ print(f"Order complete: {order_id}")  # Order complete: ORD-0001
 
 ## 참고 자료
 
-- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
-- [Clean Code — Robert C. Martin](https://www.oreilly.com/library/view/clean-code/9780136083238/)
+- [Python 공식 문서 — dataclasses](https://docs.python.org/3/library/dataclasses.html)
+- [Python 공식 문서 — typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
 - [Refactoring — Martin Fowler](https://refactoring.com/)
-- [Python Patterns — Brandon Rhodes](https://python-patterns.guide/)
+- [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
 
 Tags: Python, OOP, 설계 예제, 리팩터링, 클래스 설계

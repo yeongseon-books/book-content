@@ -2,7 +2,7 @@
 series: oop-101
 episode: 4
 title: Inheritance
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,7 @@ tags:
   - Method Overriding
   - super
 seo_description: Learn Python inheritance basics including method overriding, super(), isinstance(), and multiple inheritance with MRO.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Inheritance
@@ -67,6 +67,9 @@ Animal (parent class)
     └── speak() overridden
     └── purr() added
 ```
+
+![Concept Overview](../../../assets/oop-101/04/04-01-concept-overview.en.png)
+*Inheritance centralizes shared behavior, but it also widens the blast radius of parent-class changes.*
 
 ## Key Concepts
 
@@ -296,6 +299,15 @@ print(Duck.__mro__)
 Inheritance is powerful but the most overused OOP feature. If you are not confident that the relationship is truly "is-a," choosing composition is the safer bet.
 
 In practice, the trend favors composition over inheritance. Inheritance is mainly used at framework-provided extension points (Django views, exceptions), while business logic relies on composition and interfaces.
+
+## Signals That Tell You to Reconsider Inheritance
+
+| Signal | What usually breaks first | Refactoring move to try first |
+|--------|---------------------------|-------------------------------|
+| Each child overrides most of the parent method | The base class is no longer truly shared | Keep only the common interface and move variable behavior into composition or strategies |
+| The parent keeps gaining option flags | The base class turns into `if self.kind == ...` logic | Thin the parent and extract changing behavior into separate collaborators |
+| One child needs special initialization order | `super()` rules become fragile and hard to debug | Move creation concerns into a factory or assembly layer |
+| Callers accept the parent type but still need child-specific checks | LSP is already failing in practice | Split the hierarchy or redefine the contract as smaller interfaces |
 
 ## Checklist
 

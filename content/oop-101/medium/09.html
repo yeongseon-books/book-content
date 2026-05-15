@@ -89,6 +89,8 @@
 ├── PaymentGateway -&gt; payment processing (DIP)
 └── OrderRepository -&gt; order persistence (DIP)
 </code></pre>
+<p><img alt="Concept Overview" src="https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png"><br>
+<em>The service does not do everything itself. It pushes discount, payment, and persistence concerns behind collaborators that can change independently.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Domain model</strong><br>
 - Description: Business concepts expressed as classes</p>
@@ -352,6 +354,26 @@ print(f&quot;Order complete: {order_id}&quot;)  # Order complete: ORD-0001
 <h2>How Senior Engineers Think About This</h2>
 <p>The core of good design is "placing flexibility where change is expected." If discount policies change frequently, use the strategy pattern. If payment methods will be added, prepare with DIP.</p>
 <p>Do not try to design everything perfectly from the start. Write simple working code first, then apply principles and refactor when duplication or coupling becomes a problem. This is the practical approach.</p>
+<h2>Where This Design Usually Breaks First in Production</h2>
+<p><strong>Payment gateway integration</strong><br>
+- Typical symptom: Charge failures and save failures get mixed into one retry path<br>
+- What to tighten first: Split payment result handling from persistence and make the order outcome explicit</p>
+<p><strong>Discount policy growth</strong><br>
+- Typical symptom: Checkout logic turns into a branching block inside the service<br>
+- What to tighten first: Keep policies as objects and move composition rules into a factory or rule layer</p>
+<p><strong>Repository implementation</strong><br>
+- Typical symptom: Tests are fast, but real DB transactions behave differently<br>
+- What to tighten first: Keep the repository contract stable and make transaction boundaries explicit</p>
+<p><strong>Cart model</strong><br>
+- Typical symptom: Quantity updates, stock checks, and coupon rules pile into one class<br>
+- What to tighten first: Separate state mutation from validation and move stock checks into a collaborator</p>
+<h2>A Safer Refactoring Order</h2>
+<ol>
+<li>Freeze the current procedural flow with tests first.</li>
+<li>Move pure calculations into value objects such as <code>Money</code>.</li>
+<li>Push payment and persistence behind Protocol boundaries only after the calculations are stable.</li>
+<li>Keep final assembly in one place so that domain objects do not learn about framework or infrastructure details.</li>
+</ol>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can derive classes from requirements</li>
@@ -382,10 +404,10 @@ print(f&quot;Order complete: {order_id}&quot;)  # Order complete: ORD-0001
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://www.oreilly.com/library/view/domain-driven-design/0321125215/">Domain-Driven Design — Eric Evans</a></li>
-<li><a href="https://www.oreilly.com/library/view/clean-code/9780136083238/">Clean Code — Robert C. Martin</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python Official Docs — dataclasses</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">Python Official Docs — typing.Protocol</a></li>
 <li><a href="https://refactoring.com/">Refactoring — Martin Fowler</a></li>
-<li><a href="https://python-patterns.guide/">Python Patterns — Brandon Rhodes</a></li>
+<li><a href="https://www.oreilly.com/library/view/domain-driven-design/0321125215/">Domain-Driven Design — Eric Evans</a></li>
 </ul>
 <p class="tags-line">Tags: Python, OOP, Design Example, Refactoring, Class Design</p>
 </body>
