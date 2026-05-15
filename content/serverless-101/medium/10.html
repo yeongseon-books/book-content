@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Designing a Serverless App</h1>
+<p>One function by itself is simple. A real product is not. It has an upload edge, background processing, retries, state updates, notifications, metrics, and a failure path that still has to be visible when something breaks. At that point, you are still designing a distributed system, even if every piece is “just a function.”</p>
+<p>That is why the capstone topic is not another isolated feature. It is composition. The challenge is deciding which responsibilities stay on the request path, which move behind queues, where state lives, and how failures become observable instead of silent.</p>
 <p>This is the final post in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you weave the <em>pieces</em> you have learned into <em>one</em> working <em>app</em>?</p>
-<blockquote>
-<p>A <em>serverless app</em> is a <em>distributed system</em> of <em>small functions</em> connected by <em>triggers</em> and <em>queues</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The core <em>design principles</em></li>
@@ -75,18 +66,12 @@
 <li><em>Cost</em> and <em>operational</em> tradeoffs</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>A single <em>function</em> is easy. <em>Dozens</em> of them tangled together drag in every <em>distributed-systems</em> trap.</p>
+<p>The difficulty of serverless app design is not the number of functions. It is the quality of the boundaries between them. Weak boundaries create long request paths, unclear retry ownership, mixed responsibilities, and debugging pain.</p>
+<p>Strong boundaries make the system easier to scale, easier to retry safely, and easier to operate when only one stage fails. That is why good serverless design is mostly about separation, not about function count.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;client&quot;] --&gt; API[&quot;API Gateway&quot;]
-    API --&gt; Upload[&quot;upload fn&quot;]
-    Upload --&gt; S3[&quot;object store&quot;]
-    S3 --&gt; Trigger[&quot;s3 event&quot;]
-    Trigger --&gt; Queue[&quot;queue&quot;]
-    Queue --&gt; Worker[&quot;worker fn&quot;]
-    Worker --&gt; DB[&quot;dynamo / sql&quot;]
-    Worker --&gt; Notify[&quot;notify fn&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>A thin edge function, queued background work, and explicit state boundaries keep the app easier to scale and recover.</em><br>
+This shape captures the default serverless instinct worth keeping: keep the request-path function thin, push long work behind a queue, store durable state explicitly, and separate notification from the business-critical path.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>edge function</strong>: a thin function at the <em>request boundary</em>.</li>
@@ -139,6 +124,21 @@ queue_policy = {
     &quot;DeadLetterQueue&quot;: &quot;arn:.../thumb-dlq&quot;,
 }
 </code></pre>
+<h2>Failure Walkthrough</h2>
+<p>In production, the hardest question is often not “what is the architecture?” but “where do I restart safely?” A simple review table helps:</p>
+<p><strong>Upload edge</strong><br>
+- Typical failure: request timeout or auth failure<br>
+- First check: request logs, payload size, edge latency</p>
+<p><strong>Queue handoff</strong><br>
+- Typical failure: event never reaches worker<br>
+- First check: queue depth, publish errors, event schema</p>
+<p><strong>Worker transform</strong><br>
+- Typical failure: duplicate or partial processing<br>
+- First check: idempotency marker, retry count, DLQ</p>
+<p><strong>Notification</strong><br>
+- Typical failure: user never informed<br>
+- First check: notification queue, downstream provider response</p>
+<p>If each stage can fail independently and still be inspected independently, the design is usually on the right track.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Boundaries</em> are made <em>explicit</em> by the queues.</li>
@@ -177,6 +177,7 @@ queue_policy = {
 <li>Explain how a <em>queue</em> <em>buffers</em> time in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>The point of serverless design is not to split everything into tiny pieces. It is to draw boundaries that make retries safe, state explicit, failure visible, and costs easier to reason about.</p>
 <p>Congratulations on finishing the series. Take the next step: design a <em>small distributed system</em> of your own, woven from <em>functions</em>, <em>queues</em>, and <em>triggers</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
@@ -191,11 +192,16 @@ queue_policy = {
 <li><strong>Designing a Serverless App (current)</strong></li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Guidance</strong></p>
 <ul>
 <li><a href="https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/welcome.html">AWS Serverless Application Lens</a></li>
-<li><a href="https://serverlessland.com/patterns">Serverless Patterns Collection</a></li>
+<li><a href="https://serverlessland.com/patterns">Serverless patterns collection</a></li>
+</ul>
+<p><strong>Architecture and Code</strong></p>
+<ul>
 <li><a href="https://www.enterpriseintegrationpatterns.com/">Enterprise Integration Patterns</a></li>
-<li><a href="https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/">Idempotency in Serverless</a></li>
+<li><a href="https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/">Idempotency in AWS Powertools for Lambda</a></li>
+<li><a href="https://github.com/aws-samples/serverless-patterns">AWS serverless samples (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Architecture, DesignPattern, Cloud, FinOps</p>
 </body>

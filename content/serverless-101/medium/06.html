@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>State Management</h1>
+<p>Sooner or later, serverless beginners hit the same objection. “If functions must stay stateless, where do sessions, carts, workflow progress, and deduplication state go?” If that question stays fuzzy, serverless feels like an arbitrary restriction instead of a usable design rule.</p>
+<p>The important distinction is simple: the business still has state, but the function process is not the place to trust that state. Once you accept that, the rest becomes an architecture exercise about choosing the right external stores.</p>
 <p>This is post 6 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: how do <em>stateless</em> functions handle a <em>stateful business</em>?</p>
-<blockquote>
-<p><em>Functions</em> are <em>stateless</em>; <em>state</em> lives in an <em>external store</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the meaning of <em>stateless</em></li>
@@ -75,13 +66,12 @@
 <li>pairing with <em>idempotency</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>A <em>function instance</em> can vanish at any moment. State that is not <em>external</em> is <em>data lost</em>.</p>
+<p>A function instance can disappear at any time, and the next request from the same user may land on a different instance. That makes in-memory or local-disk state look acceptable in a local demo and dangerously unreliable in production.</p>
+<p>State management is not a side concern in serverless. It determines where sessions live, how retries become safe, where workflow progress is stored, and how much complexity you keep inside one function versus pushing into a clearer orchestration model.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Func[&quot;function&quot;] --&gt; Cache[&quot;redis&quot;]
-    Func --&gt; DB[&quot;database&quot;]
-    Func --&gt; Workflow[&quot;state machine&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Functions do the work, while caches, databases, and workflow engines hold the durable state.</em><br>
+This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>stateless</strong>: the <em>function</em> holds no <em>state</em>.</li>
@@ -169,6 +159,7 @@ on Failure: -&gt; Refund
 <li>In one line, the <em>benefit</em> of a <em>workflow state machine</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>The goal is not to erase state. The goal is to put each kind of state in the place that matches its lifetime, consistency needs, and recovery model.</p>
 <p>Next, we cover <em>Queues</em> and <em>Event-driven Architecture</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
@@ -183,11 +174,16 @@ on Failure: -&gt; Refund
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html">DynamoDB single-table design</a></li>
-<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html">ElastiCache overview</a></li>
-<li><a href="https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html">Step Functions</a></li>
+<li><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html">DynamoDB data modeling best practices</a></li>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html">Amazon ElastiCache overview</a></li>
+<li><a href="https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html">AWS Step Functions developer guide</a></li>
+</ul>
+<p><strong>Patterns and Code</strong></p>
+<ul>
 <li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html">Idempotency pattern</a></li>
+<li><a href="https://github.com/aws-powertools/powertools-lambda-python">AWS Powertools idempotency utility (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, State, Database, Cache, Cloud</p>
 </body>

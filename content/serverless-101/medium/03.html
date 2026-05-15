@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Trigger and Event</h1>
+<p>Serverless functions do not wake themselves. Something invokes them, on a schedule, in response to an HTTP request, because a queue received a message, or because storage emitted an event. If you miss the meaning of that invocation path, clean function code still turns into duplicate processing or retry storms in production.</p>
+<p>In practice, trigger semantics matter at least as much as handler logic. <em>Sync</em> and <em>async</em> invocation change who sees failure, who retries, and what “success” even means.</p>
 <p>This is post 3 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>when</em> and <em>who</em> wakes a <em>function</em>?</p>
-<blockquote>
-<p>A <em>trigger</em> delivers an <em>event</em> to a <em>function</em>. The <em>behavior</em> and <em>retry semantics</em> depend on the <em>type</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>categories of <em>triggers</em></li>
@@ -75,13 +66,12 @@
 <li>the importance of <em>idempotency</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Without understanding <em>trigger semantics</em>, you ship <em>duplicate processing, lost messages,</em> and <em>retry storms</em> into production.</p>
+<p>Many production failures are not caused by the handler body at all. They come from misunderstanding the trigger contract: whether the event is delivered at least once, whether records arrive as a batch, whether retries are automatic, and whether ordering is guaranteed.</p>
+<p>That is why a trigger discussion should start with failure semantics. The most useful question is often not “how do I parse this payload?” but “what happens when the same payload comes back again?”</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Source[&quot;event source&quot;] --&gt; Trigger[&quot;trigger&quot;]
-    Trigger --&gt; Func[&quot;function&quot;]
-    Func --&gt; DLQ[&quot;dead letter queue&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Each trigger type adds its own delivery contract, retry behavior, and failure path.</em><br>
+This separation is operationally important. The event source produces the signal, the trigger converts that signal into invocation behavior, and the DLQ captures work that keeps failing after the normal retry path is exhausted. Faster debugging starts when you know which of those three layers is actually failing.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>trigger</strong>: connects an <em>event</em> to a <em>function</em>.</li>
@@ -174,6 +164,7 @@ def idempotent(handler):
 <li>In one line, the <em>risk</em> of missing <em>idempotency keys</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>Once you understand triggers and events, a function invocation stops looking like a simple entry point. It becomes a delivery contract with retry rules, batching behavior, and failure paths attached.</p>
 <p>Next, we look at the causes and mitigations of <em>Cold Start</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
@@ -188,11 +179,16 @@ def idempotent(handler):
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html">Lambda event sources</a></li>
-<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">SQS DLQ</a></li>
-<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html">EventBridge schedules</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html">AWS Lambda event source mappings</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html">Amazon SQS dead-letter queues</a></li>
+<li><a href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html">Amazon EventBridge schedules</a></li>
+</ul>
+<p><strong>Delivery Guarantees and Patterns</strong></p>
+<ul>
 <li><a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html">Idempotency pattern</a></li>
+<li><a href="https://github.com/aws-powertools/powertools-lambda-python">AWS Powertools idempotency utility (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Trigger, Event, EventDriven, Cloud</p>
 </body>

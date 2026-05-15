@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # Queue and Event-driven Architecture
 
+As systems grow, what gets heavy first is often not the code but the connections between services. A synchronous chain can look simple on a quiet day and turn brittle as soon as one dependency slows down or fails.
+
+Queues and event buses help because they separate responsibilities in both time and failure scope. In a serverless system, that separation is often what keeps a short function from turning into a long, fragile request path.
+
 This is post 7 in the Serverless 101 series.
-
-> Serverless 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: how do you connect *services* without *direct calls*?
-
-> *Queues* and *event buses* *decouple* *producers* and *consumers* across *time and space*.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -44,16 +38,16 @@ This is post 7 in the Serverless 101 series.
 
 ## Why It Matters
 
-A *synchronous call chain* fails *whole* when *one node* fails. *Async messaging* provides *resilience*.
+When an order API directly calls payment, email, analytics, and inventory in sequence, one slow dependency stretches the whole response path. In a serverless environment, that also means more timeout risk, wider failure blast radius, and less flexibility about retries.
+
+Async messaging changes that shape. It lets producers publish facts and lets consumers move at their own speed, with their own retry policy and their own failure handling.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Producer["producer"] --> Queue["queue / topic"]
-    Queue --> C1["consumer A"]
-    Queue --> C2["consumer B"]
-```
+![Concept at a Glance](../../../assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
+
+*Queues and topics decouple producers from consumers across both time and failure boundaries.*
+The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.
 
 ## Key Terms
 
@@ -160,6 +154,8 @@ Domain teams (*orders, billing, analytics*) are *loosely coupled* through an *ev
 
 ## Wrap-up and Next Steps
 
+Event-driven design is valuable because it separates time, responsibility, and failure handling. The best result is not “more messaging.” It is a system where independent work can stay independent under load and under failure.
+
 Next, we cover *Observability*.
 
 <!-- toc:begin -->
@@ -177,9 +173,16 @@ Next, we cover *Observability*.
 
 ## References
 
-- [SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
-- [SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
-- [EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
-- [Event-driven architecture](https://martinfowler.com/articles/201701-event-driven.html)
+### Official Docs
+
+- [Amazon SQS developer guide](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [Amazon SNS developer guide](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
+- [Amazon EventBridge overview](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
+
+### Patterns and Related Reading
+
+- [Event-driven architecture (Martin Fowler)](https://martinfowler.com/articles/201701-event-driven.html)
+- [Serverless patterns collection](https://serverlessland.com/patterns)
+- [AWS serverless samples (GitHub)](https://github.com/aws-samples/serverless-patterns)
 
 Tags: Serverless, Queue, EventDriven, PubSub, Cloud

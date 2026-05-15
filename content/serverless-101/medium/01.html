@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>What is Serverless?</h1>
+<p>When people first hear <em>serverless</em>, they usually land on the same shortcut. “So the servers are gone.” The direction is understandable, but the conclusion is wrong enough to distort every decision that follows.</p>
+<p>The servers do not disappear. The operational responsibility moves. Once you see that shift clearly, topics like <em>cold start</em>, <em>state management</em>, <em>observability</em>, and <em>cost</em> stop feeling like scattered caveats and start reading like one operating model.</p>
 <p>This is the first post in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: does <em>serverless</em> really mean running <em>without servers</em>?</p>
-<blockquote>
-<p><em>Serverless</em> does not mean <em>no servers</em>; it means the <em>platform</em> takes on the <em>server-operation</em> responsibility for you.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the definition of <em>serverless</em></li>
@@ -75,13 +66,12 @@
 <li>which <em>workloads</em> fit and which do not</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Less time on <em>infrastructure</em> means more time on <em>product</em>. <em>Serverless</em> is <em>leverage</em> for <em>small teams</em>.</p>
+<p><em>Serverless</em> is not a convenience toggle. It is an architectural choice. For a small team, it can be powerful because the platform absorbs patching, baseline scaling, and part of the runtime operations burden so the team can stay focused on product work.</p>
+<p>That benefit comes with a trade. Paying by usage does not automatically make the system cheap, and breaking logic into small functions does not make distributed-system complexity disappear. If you start with “who owns which responsibility now?” the rest of the series becomes much easier to reason about.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Event[&quot;event&quot;] --&gt; Platform[&quot;serverless platform&quot;]
-    Platform --&gt; Func[&quot;function&quot;]
-    Func --&gt; Result[&quot;response / side effect&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>The platform sits between events and function execution, which is why responsibility transfer matters more than the slogan “no servers.”</em><br>
+The key actor in this diagram is the <em>platform</em>, not the function. The platform decides when to create an execution environment, how to invoke the function, and what operational guarantees exist around scaling and retries. That is why a serverless design discussion usually starts with boundaries and responsibility, not with the function body itself.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Serverless</strong>: a model that <em>delegates server operation</em> to the <em>platform</em>.</li>
@@ -158,6 +148,7 @@ def slow_handler(event, context):
 <li>In one line, a workload that is a <em>poor fit</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>The core idea is not <em>server removal</em> but <em>responsibility transfer</em>. The platform takes over more of the operational surface, while you become more responsible for event boundaries, state placement, observability, and cost-aware design.</p>
 <p>The next post explores the <em>structure</em> and <em>usage patterns</em> of <em>FaaS</em>.</p>
 <ul>
 <li><strong>What is Serverless? (current)</strong></li>
@@ -172,11 +163,21 @@ def slow_handler(event, context):
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">AWS Lambda overview</a></li>
-<li><a href="https://cloud.google.com/functions/docs">Google Cloud Functions</a></li>
-<li><a href="https://learn.microsoft.com/azure/azure-functions/">Azure Functions</a></li>
+<li><a href="https://cloud.google.com/functions/docs">Google Cloud Functions overview</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-functions/functions-overview">Azure Functions overview</a></li>
+</ul>
+<p><strong>Architecture and Patterns</strong></p>
+<ul>
 <li><a href="https://martinfowler.com/articles/serverless.html">Serverless (Martin Fowler)</a></li>
+<li><a href="https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/welcome.html">AWS Serverless Lens</a></li>
+</ul>
+<p><strong>Code and Related Reading</strong></p>
+<ul>
+<li><a href="https://github.com/awsdocs/aws-lambda-developer-guide">AWS Lambda developer guide examples (GitHub)</a></li>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/azure-functions-101/en">Azure Functions 101</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Cloud, FaaS, Architecture, DevOps</p>
 </body>

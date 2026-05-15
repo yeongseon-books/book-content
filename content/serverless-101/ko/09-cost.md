@@ -43,14 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Calls["calls"] --> Bill["bill"]
-    Mem["memory * duration"] --> Bill
-    Net["data transfer"] --> Bill
-    Deps["downstream services"] --> Bill
-```
+![한눈에 보는 구조](../../../assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
 
+*서버리스 비용은 호출 수만이 아니라 실행 시간, 네트워크, 연계 서비스까지 합쳐서 만들어집니다.*
 이 그림은 비용이 하나의 숫자에서 오지 않는다는 점을 분명하게 보여 줍니다. 호출 수만 낮추는 것으로는 충분하지 않을 수 있고, 코드 최적화만으로도 전체 비용을 다 설명할 수 없습니다. 네트워크와 주변 서비스 비용까지 포함한 전체 시나리오를 봐야 합니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -125,6 +120,19 @@ for s in sizes:
     print(s, total(1_000_000, s, 200, 5))
 ```
 
+## 시나리오 기준으로 비용을 비교해야 합니다
+
+비용은 숫자 하나보다 워크로드 모양에서 더 잘 드러납니다. 최소한 아래 정도의 시나리오는 따로 계산해 보는 편이 좋습니다.
+
+| 시나리오 | 대개 커지는 항목 | 먼저 던질 질문 |
+| --- | --- | --- |
+| 스파이크가 큰 저트래픽 API | 호출 + 꼬리 지연 완화 비용 | 프로비저닝이 정말 필요한가 |
+| 짧지만 대량인 배치 작업 | 메모리 × 실행 시간 | 메모리 튜닝으로 전체 비용을 줄일 수 있는가 |
+| 이미지·파일 응답 중심 서비스 | 데이터 송신 비용 | CDN이나 객체 저장소 직접 제공으로 줄일 수 있는가 |
+| 비동기 파이프라인 | 큐·DB·재시도 비용 | 트래픽 증가가 어느 주변 서비스 비용을 키우는가 |
+
+이 표는 단가 암기보다 훨씬 실용적입니다. 같은 서버리스라도 어떤 종류의 트래픽과 데이터를 다루느냐에 따라 가장 비싼 항목이 달라지기 때문입니다.
+
 메모리 크기를 바꿔 가며 비교하면 비용이 단순히 메모리 크기에 비례하지 않는다는 점을 체감할 수 있습니다. 성능 개선이 비용 절감으로 이어지는 경우도 있기 때문입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -196,9 +204,15 @@ for s in sizes:
 
 ## 참고 자료
 
+### 공식 가격 문서
+
 - [Lambda 요금](https://aws.amazon.com/lambda/pricing/)
 - [Cloud Functions 요금](https://cloud.google.com/functions/pricing)
 - [Azure Functions 요금](https://azure.microsoft.com/pricing/details/functions/)
+
+### FinOps와 추가 읽을거리
+
 - [FinOps Foundation](https://www.finops.org/)
+- [AWS Lambda Power Tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
 
 Tags: Serverless, Cost, FinOps, Pricing, Cloud

@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Scaling</h1>
+<p>Serverless often gets introduced with a seductive sentence: “it scales automatically.” That is directionally true, but in production it is also one of the most dangerous half-truths. Functions may scale quickly while the database, queue consumers, and third-party APIs behind them remain finite.</p>
+<p>That means scaling is not just a story about how far the platform can stretch. It is a story about how much downstream pressure your system can survive without turning a traffic spike into a reliability incident.</p>
 <p>This is post 5 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>how fast</em> and <em>how many</em> can <em>functions</em> scale to?</p>
-<blockquote>
-<p><em>Serverless</em> defaults to <em>horizontal scale</em>, but <em>limits</em> and <em>burst rules</em> still apply.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the <em>concurrency</em> model</li>
@@ -75,13 +66,12 @@
 <li><em>backpressure</em> patterns</li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Scale looks <em>infinite</em> until your <em>DB</em> and <em>external APIs</em> — which are <em>finite</em> — buckle under it. <em>Scaling</em> itself can <em>cause incidents</em>.</p>
+<p>Serverless is strong at horizontal expansion, but that strength becomes a liability if you measure only function throughput. A rapid increase in concurrency can exhaust database connections, hit third-party API limits, or starve peer functions that share the same account-level budget.</p>
+<p>That is why experienced operators treat concurrency like a budget. The point is not to remove every limit. The point is to place limits deliberately so that the whole system stays healthy.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Burst[&quot;request burst&quot;] --&gt; Func[&quot;function instances&quot;]
-    Func --&gt; DB[&quot;downstream db&quot;]
-    Func --&gt; API[&quot;external api&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Function elasticity is only safe when downstream systems can absorb the resulting parallelism.</em><br>
+The most important part of this diagram is what happens <em>after</em> the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>concurrency</strong>: number of <em>parallel</em> <em>instances</em>.</li>
@@ -125,6 +115,21 @@ def drain(queue, handler, batch=10):
 <pre><code class="language-python">def backoff(attempt):
     return min(2 ** attempt, 30)
 </code></pre>
+<h2>Failure-mode Walkthrough</h2>
+<p>The usual scaling failure is not “the platform refused to scale.” It is “the platform scaled faster than the downstream system could handle.” A simple first-pass check looks like this:</p>
+<p><strong>Database timeouts</strong><br>
+- What to inspect first: connection pool saturation<br>
+- Typical mitigation: reserved concurrency, queue buffering</p>
+<p><strong>429 from external API</strong><br>
+- What to inspect first: vendor rate limit<br>
+- Typical mitigation: backoff, token bucket, async buffering</p>
+<p><strong>Peer function slowdown</strong><br>
+- What to inspect first: shared account concurrency<br>
+- Typical mitigation: reserved concurrency per critical path</p>
+<p><strong>Queue age growing</strong><br>
+- What to inspect first: workers too slow for arrival rate<br>
+- Typical mitigation: more worker budget, smaller batch, faster handler</p>
+<p>The pattern is consistent: front-door elasticity is only useful when you also control the rate at which work reaches fragile dependencies.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Reserved concurrency</em> protects the <em>DB</em>.</li>
@@ -177,11 +182,17 @@ def drain(queue, handler, batch=10):
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html">Lambda concurrency</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">Reserved/Provisioned concurrency</a></li>
-<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">SQS buffering pattern</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html">Throttling guide</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html">AWS Lambda concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">AWS Lambda reserved and provisioned concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html">Amazon SQS developer guide</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-scaling.html">AWS Lambda scaling behavior</a></li>
+</ul>
+<p><strong>Patterns and Code</strong></p>
+<ul>
+<li><a href="https://github.com/alexcasalboni/aws-lambda-power-tuning">AWS Lambda power tuning (GitHub)</a></li>
+<li><a href="https://serverlessland.com/patterns">Serverless patterns collection</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, Scaling, Concurrency, Throttling, Cloud</p>
 </body>

@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # What is Serverless?
 
+When people first hear *serverless*, they usually land on the same shortcut. “So the servers are gone.” The direction is understandable, but the conclusion is wrong enough to distort every decision that follows.
+
+The servers do not disappear. The operational responsibility moves. Once you see that shift clearly, topics like *cold start*, *state management*, *observability*, and *cost* stop feeling like scattered caveats and start reading like one operating model.
+
 This is the first post in the Serverless 101 series.
-
-> Serverless 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: does *serverless* really mean running *without servers*?
-
-> *Serverless* does not mean *no servers*; it means the *platform* takes on the *server-operation* responsibility for you.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -44,16 +38,16 @@ This is the first post in the Serverless 101 series.
 
 ## Why It Matters
 
-Less time on *infrastructure* means more time on *product*. *Serverless* is *leverage* for *small teams*.
+*Serverless* is not a convenience toggle. It is an architectural choice. For a small team, it can be powerful because the platform absorbs patching, baseline scaling, and part of the runtime operations burden so the team can stay focused on product work.
+
+That benefit comes with a trade. Paying by usage does not automatically make the system cheap, and breaking logic into small functions does not make distributed-system complexity disappear. If you start with “who owns which responsibility now?” the rest of the series becomes much easier to reason about.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Event["event"] --> Platform["serverless platform"]
-    Platform --> Func["function"]
-    Func --> Result["response / side effect"]
-```
+![Concept at a Glance](../../../assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
+
+*The platform sits between events and function execution, which is why responsibility transfer matters more than the slogan “no servers.”*
+The key actor in this diagram is the *platform*, not the function. The platform decides when to create an execution environment, how to invoke the function, and what operational guarantees exist around scaling and retries. That is why a serverless design discussion usually starts with boundaries and responsibility, not with the function body itself.
 
 ## Key Terms
 
@@ -153,6 +147,8 @@ It fits *event handling, ETL, API backends, scheduled jobs* — work that is *sh
 
 ## Wrap-up and Next Steps
 
+The core idea is not *server removal* but *responsibility transfer*. The platform takes over more of the operational surface, while you become more responsible for event boundaries, state placement, observability, and cost-aware design.
+
 The next post explores the *structure* and *usage patterns* of *FaaS*.
 
 <!-- toc:begin -->
@@ -170,9 +166,20 @@ The next post explores the *structure* and *usage patterns* of *FaaS*.
 
 ## References
 
+### Official Docs
+
 - [AWS Lambda overview](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
-- [Google Cloud Functions](https://cloud.google.com/functions/docs)
-- [Azure Functions](https://learn.microsoft.com/azure/azure-functions/)
+- [Google Cloud Functions overview](https://cloud.google.com/functions/docs)
+- [Azure Functions overview](https://learn.microsoft.com/azure/azure-functions/functions-overview)
+
+### Architecture and Patterns
+
 - [Serverless (Martin Fowler)](https://martinfowler.com/articles/serverless.html)
+- [AWS Serverless Lens](https://docs.aws.amazon.com/wellarchitected/latest/serverless-applications-lens/welcome.html)
+
+### Code and Related Reading
+
+- [AWS Lambda developer guide examples (GitHub)](https://github.com/awsdocs/aws-lambda-developer-guide)
+- [Azure Functions 101](../../azure-functions-101/en/)
 
 Tags: Serverless, Cloud, FaaS, Architecture, DevOps

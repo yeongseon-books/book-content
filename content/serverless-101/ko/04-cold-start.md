@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Req["request"] --> Init["init container"]
-    Init --> Load["load runtime + code"]
-    Load --> Run["handler"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
 
+*콜드 스타트는 환경 생성, 런타임 로딩, 코드 초기화가 합쳐진 지연 시간입니다.*
 이 흐름을 보면 콜드 스타트가 단일 원인이 아니라는 점이 보입니다. 실행 환경 생성, 런타임 초기화, 코드와 의존성 로딩이 모두 합쳐져 첫 호출 지연으로 나타납니다. 그래서 해결책도 하나가 아니라 여러 층에서 나옵니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -136,6 +132,29 @@ def percentile(values, p):
     return s[int(len(s) * p) - 1]
 ```
 
+## 검증 흐름: 콜드 스타트를 추측하지 않고 확인하기
+
+콜드 스타트 문제를 의심할 때는 먼저 초기화 지연과 비즈니스 처리 지연을 분리해서 봐야 합니다. 가장 단순한 확인 흐름은 아래와 같습니다.
+
+```bash
+# 유휴 구간 뒤 첫 호출
+curl -s https://example.com/hello
+
+# 바로 이어서 두 번째 호출
+curl -s https://example.com/hello
+```
+
+**Expected output:** 첫 번째 호출이 두 번째 호출보다 의미 있게 느리다면, 웜 재사용 여부와 초기화 비용을 함께 의심할 수 있습니다.
+
+그다음에는 로그나 추적 정보에서 아래 항목을 순서대로 확인합니다.
+
+- 새 실행 환경이 실제로 만들어졌는가
+- 지연의 대부분이 런타임 초기화에서 나왔는가
+- 의존성 로딩이 길었는가
+- 핸들러 바깥 초기화 코드가 비즈니스 로직보다 더 오래 걸렸는가
+
+여기서 원인이 보이면 대응도 달라집니다. 패키지가 무거우면 의존성을 줄이고, 초기화가 무거우면 핸들러 바깥 작업을 줄이고, 그 뒤에도 중요한 경로에서만 지연이 허용되지 않으면 프로비저닝을 검토합니다.
+
 평균 대신 백분위 지표를 봐야 콜드 스타트 영향을 읽을 수 있습니다. 서버리스에서는 특히 p99가 진실에 가깝습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
@@ -206,9 +225,16 @@ def percentile(values, p):
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Lambda 런타임 환경과 콜드 스타트](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
 - [Provisioned Concurrency](https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html)
 - [패키지 최적화 모범 사례](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)
 - [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html)
+
+### 코드와 추가 읽을거리
+
+- [AWS Lambda Power Tuning (GitHub)](https://github.com/alexcasalboni/aws-lambda-power-tuning)
+- [Azure Functions 101](../../azure-functions-101/ko/)
 
 Tags: Serverless, ColdStart, Performance, Latency, Cloud

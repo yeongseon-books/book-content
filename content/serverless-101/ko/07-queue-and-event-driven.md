@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Producer["producer"] --> Queue["queue / topic"]
-    Queue --> C1["consumer A"]
-    Queue --> C2["consumer B"]
-```
+![한눈에 보는 구조](../../../assets/serverless-101/07/07-01-concept-at-a-glance.ko.png)
 
+*큐와 토픽은 생산자와 소비자를 시간과 책임 양쪽에서 분리해 줍니다.*
 이 그림이 보여 주는 핵심은 생산자와 소비자가 서로의 내부를 몰라도 된다는 점입니다. 생산자는 이벤트를 발행하고, 소비자는 자신의 책임에 맞게 그것을 처리합니다. 이 분리가 있어야 서비스 간 결합도가 낮아지고, 각 단계의 실패를 개별적으로 다룰 수 있습니다.
 
 ## 핵심 용어 먼저 정리하기
@@ -200,9 +196,16 @@ def fifo_key(order):
 
 ## 참고 자료
 
-- [SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
-- [SNS](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
-- [EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
+### 공식 문서
+
+- [Amazon SQS 개발자 가이드](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html)
+- [Amazon SNS 개발자 가이드](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
+- [Amazon EventBridge 개요](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html)
+
+### 패턴과 추가 읽을거리
+
 - [이벤트 기반 아키텍처 - Martin Fowler](https://martinfowler.com/articles/201701-event-driven.html)
+- [Serverless Patterns Collection](https://serverlessland.com/patterns)
+- [AWS serverless samples (GitHub)](https://github.com/aws-samples/serverless-patterns)
 
 Tags: Serverless, Queue, EventDriven, PubSub, Cloud

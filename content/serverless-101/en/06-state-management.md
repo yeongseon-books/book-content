@@ -22,17 +22,11 @@ last_reviewed: '2026-05-04'
 
 # State Management
 
+Sooner or later, serverless beginners hit the same objection. “If functions must stay stateless, where do sessions, carts, workflow progress, and deduplication state go?” If that question stays fuzzy, serverless feels like an arbitrary restriction instead of a usable design rule.
+
+The important distinction is simple: the business still has state, but the function process is not the place to trust that state. Once you accept that, the rest becomes an architecture exercise about choosing the right external stores.
+
 This is post 6 in the Serverless 101 series.
-
-> Serverless 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: how do *stateless* functions handle a *stateful business*?
-
-> *Functions* are *stateless*; *state* lives in an *external store*.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -44,16 +38,16 @@ This is post 6 in the Serverless 101 series.
 
 ## Why It Matters
 
-A *function instance* can vanish at any moment. State that is not *external* is *data lost*.
+A function instance can disappear at any time, and the next request from the same user may land on a different instance. That makes in-memory or local-disk state look acceptable in a local demo and dangerously unreliable in production.
+
+State management is not a side concern in serverless. It determines where sessions live, how retries become safe, where workflow progress is stored, and how much complexity you keep inside one function versus pushing into a clearer orchestration model.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Func["function"] --> Cache["redis"]
-    Func --> DB["database"]
-    Func --> Workflow["state machine"]
-```
+![Concept at a Glance](../../../assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
+
+*Functions do the work, while caches, databases, and workflow engines hold the durable state.*
+This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.
 
 ## Key Terms
 
@@ -164,6 +158,8 @@ def model(record):
 
 ## Wrap-up and Next Steps
 
+The goal is not to erase state. The goal is to put each kind of state in the place that matches its lifetime, consistency needs, and recovery model.
+
 Next, we cover *Queues* and *Event-driven Architecture*.
 
 <!-- toc:begin -->
@@ -181,9 +177,15 @@ Next, we cover *Queues* and *Event-driven Architecture*.
 
 ## References
 
-- [DynamoDB single-table design](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html)
-- [ElastiCache overview](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html)
-- [Step Functions](https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html)
+### Official Docs
+
+- [DynamoDB data modeling best practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-modeling-nosql-B.html)
+- [Amazon ElastiCache overview](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html)
+- [AWS Step Functions developer guide](https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html)
+
+### Patterns and Code
+
 - [Idempotency pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html)
+- [AWS Powertools idempotency utility (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)
 
 Tags: Serverless, State, Database, Cache, Cloud

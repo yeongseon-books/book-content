@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Function as a Service</h1>
+<p>Once <em>serverless</em> makes sense as a responsibility model, the next question becomes more concrete. How does a function actually run on the cloud? If you cannot answer that, <em>cold start</em>, <em>memory tuning</em>, and <em>concurrency</em> remain intuition games.</p>
+<p>FaaS is where serverless becomes operationally real. The platform packages code, prepares a runtime, invokes a handler, and tears the environment down or reuses it later depending on traffic.</p>
 <p>This is post 2 in the Serverless 101 series.</p>
-<blockquote>
-<p>Serverless 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>how</em> does a <em>function</em> actually run on the <em>cloud</em>?</p>
-<blockquote>
-<p><em>FaaS</em> runs <em>functions</em> briefly inside <em>containers</em> and returns <em>only the result</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>the <em>FaaS</em> execution model</li>
@@ -75,13 +66,12 @@
 <li><em>concurrency</em> and <em>isolation</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>Without the <em>base assumptions</em> of <em>FaaS</em>, your intuition for <em>cold start, concurrency, memory</em> will all be off.</p>
+<p>If you treat FaaS like “just upload a function,” your intuition will keep missing the real cost centers. Runtime initialization, package size, dependency loading, and concurrency limits are all part of the platform contract.</p>
+<p>That is why experienced teams do not tune only the handler body. They also tune packaging, runtime choice, initialization work, and the concurrency budget that the function can consume.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;function code&quot;] --&gt; Pkg[&quot;package zip/image&quot;]
-    Pkg --&gt; Runtime[&quot;runtime container&quot;]
-    Runtime --&gt; Exec[&quot;handler(event, context)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Packaging and runtime initialization shape how a FaaS handler actually behaves in production.</em><br>
+This is the most useful mental model for FaaS in practice. You write a handler, but the production outcome is shaped by the package around it and by the runtime that has to load that package before the handler ever sees an event.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>handler</strong>: the <em>entry point</em> function.</li>
@@ -163,6 +153,7 @@ def burst(handler, n):
 <li>In one line, the relation of <em>concurrency</em> and <em>cost</em>.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
+<p>FaaS is not merely a function runner. It is a standardized execution contract that includes the handler shape, the runtime, the deployment package, the resource model, and the concurrency rules around execution.</p>
 <p>Next, we look at <em>Triggers</em> and <em>Events</em>.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/serverless-101/en/01-what-is-serverless.md">What is Serverless?</a></li>
@@ -177,11 +168,17 @@ def burst(handler, n):
 <li>Designing a Serverless App (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html">AWS Lambda handler</a></li>
-<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html">Lambda container images</a></li>
-<li><a href="https://cloud.google.com/functions/docs/runtime-support">Cloud Functions runtimes</a></li>
-<li><a href="https://learn.microsoft.com/azure/azure-functions/functions-scale">Azure Functions hosting</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html">AWS Lambda Python handler</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html">AWS Lambda container images</a></li>
+<li><a href="https://cloud.google.com/functions/docs/runtime-support">Google Cloud Functions runtime support</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-functions/functions-scale">Azure Functions hosting and scale</a></li>
+</ul>
+<p><strong>Code and Runtime Examples</strong></p>
+<ul>
+<li><a href="https://github.com/awsdocs/aws-lambda-developer-guide">AWS Lambda developer guide examples (GitHub)</a></li>
+<li><a href="https://github.com/Azure/azure-functions-python-worker">Azure Functions Python worker samples (GitHub)</a></li>
 </ul>
 <p class="tags-line">Tags: Serverless, FaaS, Lambda, Runtime, Cloud</p>
 </body>
