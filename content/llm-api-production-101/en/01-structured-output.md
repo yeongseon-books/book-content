@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -382,9 +382,15 @@ If the earlier series taught the basic request and response loop, this is the po
 
 ## References
 
-- <https://console.groq.com/docs/text-chat>
-- <https://console.groq.com/docs/text-chat#json-mode>
-- <https://docs.pydantic.dev/latest/concepts/models/>
+### Official Docs
+
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [Groq JSON mode guide](https://console.groq.com/docs/text-chat#json-mode)
+- [Pydantic model concepts](https://docs.pydantic.dev/latest/concepts/models/)
+
+### Verification-Friendly References
+
+- [JSON Schema object reference](https://json-schema.org/understanding-json-schema/reference/object)
 
 ### Related Series
 

@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -432,7 +432,18 @@ Structured output gave us a contract for data. Tool calling extends that contrac
 
 ## References
 
-- <https://console.groq.com/docs/tool-use>
-- <https://json-schema.org/understanding-json-schema/>
+### Official Docs
+
+- [Groq tool use guide](https://console.groq.com/docs/tool-use)
+- [JSON Schema fundamentals](https://json-schema.org/understanding-json-schema/)
+
+### Verification-Friendly References
+
+- [Pydantic validation errors](https://docs.pydantic.dev/latest/errors/errors/)
+
+### Related Series
+
+- [Structured output — JSON mode and response schemas](./01-structured-output.md)
+- [Streaming in depth — chunk handling and error recovery](./03-streaming-in-depth.md)
 
 Tags: LLM, OpenAI, Streaming, Python

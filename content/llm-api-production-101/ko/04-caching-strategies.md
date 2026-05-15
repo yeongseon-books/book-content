@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: llm-api-production-101
 status: publish-ready
 tags:
@@ -15,7 +15,7 @@ targets:
   mkdocs: true
   tistory: true
 title: 캐싱 전략 — 비용과 지연 시간 줄이기
-seo_description: '예제 코드: github.com/yeongseon-books/llm-api-production-101'
+seo_description: 요청 해시와 TTL을 기준으로 LLM 캐시 키를 설계하고 오래된 응답을 안전하게 무효화하는 방법을 다룹니다.
 ---
 
 # 캐싱 전략 — 비용과 지연 시간 줄이기
@@ -135,7 +135,7 @@ print(build_cache_key(request_payload))
 
 해시 키만 있으면 캐시는 만들 수 있습니다. 하지만 TTL이 없으면 응답이 영원히 남습니다. 모델 버전이 바뀌거나 프롬프트 정책이 바뀌어도 예전 답을 계속 재사용할 수 있고, 메모리도 계속 증가합니다. TTL은 캐시가 진실의 원본이 아니라 일정 시간 동안만 유효한 복사본이라는 사실을 코드로 표현합니다.
 
-정적 FAQ는 긴 TTL이 가능하지만, 실시간성이 높은 요약은 더 짧아야 합니다. 외부 상태에 의존하는 툴 호출 결과는 TTL을 아주 짧게 두거나 아예 캐시하지 않는 편이 낫습니다. 정답 숫자보다 중요한 것은 TTL을 명시적으로 설계한다는 습관입니다.
+정적 FAQ는 긴 TTL이 가능하지만, 실시간성이 높은 요약은 더 짧아야 합니다. 외부 상태에 의존하는 툴 호출 결과는 TTL을 아주 짧게 두거나 아예 캐시하지 않는 편이 낫습니다. 숫자 하나를 고르는 일보다 TTL을 명시적으로 설계하는 습관이 더 중요합니다.
 
 ### 인메모리 TTL 캐시 구현
 
@@ -289,6 +289,73 @@ payload = {
 
 이 패턴은 오래된 항목이 자연 만료되기를 기다리는 것보다 훨씬 예측 가능합니다. 새 계약에는 새 버전을 쓰면 됩니다.
 
+### 적중률과 오래된 응답을 함께 측정하기
+
+캐시를 붙였다고 끝이 아닙니다. 운영에서는 적중률이 얼마나 나오는지, 오래된 응답이 너무 오래 남지 않는지, 어떤 경로가 계속 미스가 나는지 함께 봐야 합니다. 아래처럼 최소 메트릭 카운터를 붙여 두면 캐시가 실제로 비용을 줄이는지 확인하기 쉽습니다.
+
+```python
+import hashlib
+import json
+import time
+from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class CacheEntry:
+    value: Any
+    expires_at: float
+
+class TTLCache:
+    def __init__(self) -> None:
+        self._store: dict[str, CacheEntry] = {}
+        self.metrics = {"hits": 0, "misses": 0, "expired": 0}
+
+    def get(self, key: str) -> Any | None:
+        entry = self._store.get(key)
+        if entry is None:
+            self.metrics["misses"] += 1
+            return None
+
+        if time.time() >= entry.expires_at:
+            self.metrics["expired"] += 1
+            self.metrics["misses"] += 1
+            del self._store[key]
+            return None
+
+        self.metrics["hits"] += 1
+        return entry.value
+
+    def set(self, key: str, value: Any, ttl_seconds: int) -> None:
+        self._store[key] = CacheEntry(value=value, expires_at=time.time() + ttl_seconds)
+
+def build_cache_key(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+cache = TTLCache()
+payload = {"model": "llama-3.1-8b-instant", "messages": [{"role": "user", "content": "hi"}]}
+key = build_cache_key(payload)
+
+print(cache.get(key))
+cache.set(key, "cached-response", ttl_seconds=1)
+print(cache.get(key))
+time.sleep(1.1)
+print(cache.get(key))
+print(cache.metrics)
+```
+
+<!-- injected-output:start -->
+**실행 결과**
+
+    None
+    cached-response
+    None
+    {'hits': 1, 'misses': 2, 'expired': 1}
+
+<!-- injected-output:end -->
+
+이 정도만 있어도 운영 판단이 쉬워집니다. 적중률은 낮은데 만료가 거의 없다면 키가 너무 엄격할 수 있고, 만료가 자주 나는데도 오래된 응답 이슈가 생긴다면 TTL이 여전히 길 수 있습니다. 캐시는 성능 기능이면서 동시에 정확성 기능이기 때문에, hit/miss/expired를 함께 보는 습관이 필요합니다.
+
 ## 흔히 헷갈리는 지점
 
 - 사용자 질문만 같으면 같은 캐시 키로 봐도 된다고 생각하기 쉽지만 대부분은 너무 느슨합니다.
@@ -328,8 +395,11 @@ payload = {
 ## 참고 자료
 
 ### 공식 문서
-- <https://console.groq.com/docs/text-chat>
-- <https://docs.python.org/3/library/hashlib.html>
+- [Groq Text Chat docs](https://console.groq.com/docs/text-chat)
+- [Python hashlib documentation](https://docs.python.org/3/library/hashlib.html)
+
+### 검증 보조 자료
+- [Python json.dumps documentation](https://docs.python.org/3/library/json.html#json.dumps)
 
 ### 관련 시리즈
 - [스트리밍 심화 — 청크 처리와 오류 복구](./03-streaming-in-depth.md)
