@@ -15,7 +15,7 @@ tags:
 - Cloud
 - Web Apps
 last_reviewed: '2026-04-29'
-seo_description: 처음 Azure App Service를 접하면 대개 이렇게 생각합니다.
+seo_description: "처음 Azure App Service를 접하면 이렇게 생각합니다: 코드만 올리면 됩니다."
 ---
 
 # Azure App Service란? - 플랫폼 아키텍처 이해하기
