@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: RAG is not a model that memorizes answers; it is a pipeline that
   injects retrieved documents into the prompt before generation.
 ---
@@ -174,6 +174,68 @@ for question in test_questions:
     print(f"answer: {answer}")
 ```
 
+The point of this example is not just that the chain works when the answer exists. It also forces one operational rule into the prompt: **if the evidence is missing, fail closed instead of filling the gap with model confidence**. That is the difference between a demo that looks plausible and a retrieval pipeline you can debug.
+
+---
+
+## Inspect retrieval before blaming generation
+
+### Retrieval inspection with scores and chunk metadata
+
+![Online question answering flow](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.en.png)
+
+*Online question answering flow*
+Before tuning the prompt, inspect what the retriever is actually returning. If the wrong chunk ranks first, generation quality is already capped.
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="Python was created by Guido van Rossum in 1991.",
+        metadata={"source": "python_intro.txt", "section": "history"},
+    ),
+    Document(
+        page_content="Python's primary strength is readability and its broad package ecosystem.",
+        metadata={"source": "python_features.txt", "section": "strengths"},
+    ),
+    Document(
+        page_content="Python is slower than C for CPU-bound work and the GIL limits some threaded workloads.",
+        metadata={"source": "python_limits.txt", "section": "weaknesses"},
+    ),
+]
+
+vectorstore = FAISS.from_documents(docs, embedding_model)
+
+def inspect_retrieval(query: str, top_k: int = 3) -> None:
+    matches = vectorstore.similarity_search_with_relevance_scores(query, k=top_k)
+    print(f"query: {query}")
+    for rank, (doc, score) in enumerate(matches, start=1):
+        print(
+            f"  {rank}. score={score:.3f} "
+            f"source={doc.metadata['source']} "
+            f"section={doc.metadata['section']}"
+        )
+        print(f"     {doc.page_content}")
+
+inspect_retrieval("Why is Python sometimes slow?")
+inspect_retrieval("Who created Python?")
+```
+
+**Expected output:**
+
+```text
+query: Why is Python sometimes slow?
+  1. score=0.91 source=python_limits.txt section=weaknesses
+     Python is slower than C for CPU-bound work and the GIL limits some threaded workloads.
+
+query: Who created Python?
+  1. score=0.94 source=python_intro.txt section=history
+     Python was created by Guido van Rossum in 1991.
+```
+
+If the best match is wrong, do not start with prompt rewrites. Check chunk boundaries, metadata quality, and whether the embedding model captures the way your users phrase the question.
+
 ---
 
 ## Returning answers with source attribution
@@ -250,6 +312,64 @@ print(f"sources: {result['sources']}")
 
 ---
 
+## Guard the answer path when evidence is weak
+
+### Fallback branch driven by minimum relevance
+
+![Fallback branch for missing evidence](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.en.png)
+
+*Fallback branch for missing evidence*
+The prompt alone is not enough. In production, add an application-side guard that checks whether retrieval produced evidence strong enough to justify generation.
+
+```python
+from langchain_core.documents import Document
+
+MIN_RELEVANCE = 0.80
+
+docs = [
+    Document(page_content=text, metadata=meta)
+    for text, meta in documents_with_metadata
+]
+vectorstore = FAISS.from_documents(docs, embedding_model)
+
+def answer_with_guard(question: str) -> dict:
+    matches = vectorstore.similarity_search_with_relevance_scores(question, k=3)
+
+    if not matches or matches[0][1] < MIN_RELEVANCE:
+        return {
+            "route": "fallback_no_evidence",
+            "answer": "I cannot find this in the indexed documents.",
+            "sources": [],
+        }
+
+    selected_docs = [doc for doc, _ in matches]
+    context = format_docs(selected_docs)
+    answer = (prompt | llm | StrOutputParser()).invoke({
+        "context": context,
+        "question": question,
+    })
+
+    return {
+        "route": "answer_from_documents",
+        "answer": answer,
+        "sources": get_sources(selected_docs),
+    }
+
+print(answer_with_guard("Who created Python?"))
+print(answer_with_guard("What are the main features of Rust?"))
+```
+
+**Expected output:**
+
+```text
+{'route': 'answer_from_documents', 'answer': 'Python was created by Guido van Rossum in 1991.', 'sources': ['python_intro.txt']}
+{'route': 'fallback_no_evidence', 'answer': 'I cannot find this in the indexed documents.', 'sources': []}
+```
+
+This is the point where many RAG systems become safer. You stop asking the model to self-police retrieval quality and instead let the application decide when evidence is insufficient.
+
+---
+
 ## When RAG fails
 
 ### Defense layers against retrieval misses
@@ -268,11 +388,20 @@ print(f"sources: {result['sources']}")
 
 **Query and document phrasing diverge too much.** A casual query like "is python slow?" may not match a chunk containing "interpreted language execution performance". Query expansion or hybrid search helps here.
 
+### First checks when answers look wrong
+
+When a RAG answer looks weak, inspect in this order:
+
+1. **retrieval ranking** — did the right chunk appear in the top-k at all?
+2. **chunk shape** — was the evidence split too aggressively or mixed with unrelated text?
+3. **fallback threshold** — did the app allow generation even though the evidence quality was low?
+4. **prompt contract** — does the answer prompt clearly forbid speculation and require evidence-only answers?
+
 ---
 
 ## What to notice in this code
 
-- `main.py` uses `RecursiveCharacterTextSplitter` for chunking and `FAISS.from_documents()` for immediate indexing.
+- `main.py` uses `RecursiveCharacterTextSplitter` for chunking and `FAISS.from_texts()` for immediate indexing.
 - The script keeps the retrieved `Document` objects around so it can print both the answer and the supporting sources.
 - The prompt explicitly says to answer only from context and admit when the documents do not contain the answer.
 

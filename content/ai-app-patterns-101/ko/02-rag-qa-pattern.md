@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: RAG는 답을 외우는 모델이 아니라 검색한 문서를 생성 전에 프롬프트에 주입하는 파이프라인입니다.
 ---
 
@@ -175,6 +175,68 @@ for question in test_questions:
     print(f"answer: {answer}")
 ```
 
+이 예제의 핵심은 단지 정답이 있을 때 잘 답한다는 데 있지 않습니다. **근거가 없으면 자신 있게 메우지 말고 멈춘다**는 운영 규칙을 프롬프트에 먼저 심는 데 있습니다. 이 차이가 보기 좋은 데모와 디버깅 가능한 검색 파이프라인을 갈라놓습니다.
+
+---
+
+## 생성보다 먼저 검색을 검증하기
+
+### 점수와 메타데이터로 보는 검색 결과
+
+![온라인 질의응답 흐름](../../../assets/ai-app-patterns-101/02/02-02-online-question-answering-flow.ko.png)
+
+*온라인 질의응답 흐름*
+프롬프트를 다듬기 전에 retriever가 실제로 무엇을 꺼내 오는지 먼저 확인해야 합니다. 1등 청크가 틀리면 생성 품질의 상한선도 이미 정해진 셈입니다.
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="Python은 Guido van Rossum이 1991년에 만든 언어입니다.",
+        metadata={"source": "python_intro.txt", "section": "history"},
+    ),
+    Document(
+        page_content="Python의 대표 강점은 가독성과 넓은 패키지 생태계입니다.",
+        metadata={"source": "python_features.txt", "section": "strengths"},
+    ),
+    Document(
+        page_content="Python은 CPU 중심 작업에서 C보다 느릴 수 있고, GIL 때문에 일부 스레드 작업이 제한됩니다.",
+        metadata={"source": "python_limits.txt", "section": "weaknesses"},
+    ),
+]
+
+vectorstore = FAISS.from_documents(docs, embedding_model)
+
+def inspect_retrieval(query: str, top_k: int = 3) -> None:
+    matches = vectorstore.similarity_search_with_relevance_scores(query, k=top_k)
+    print(f"query: {query}")
+    for rank, (doc, score) in enumerate(matches, start=1):
+        print(
+            f"  {rank}. score={score:.3f} "
+            f"source={doc.metadata['source']} "
+            f"section={doc.metadata['section']}"
+        )
+        print(f"     {doc.page_content}")
+
+inspect_retrieval("왜 Python이 느릴 때가 있나요?")
+inspect_retrieval("Python을 만든 사람은 누구인가요?")
+```
+
+**Expected output:**
+
+```text
+query: 왜 Python이 느릴 때가 있나요?
+  1. score=0.91 source=python_limits.txt section=weaknesses
+     Python은 CPU 중심 작업에서 C보다 느릴 수 있고, GIL 때문에 일부 스레드 작업이 제한됩니다.
+
+query: Python을 만든 사람은 누구인가요?
+  1. score=0.94 source=python_intro.txt section=history
+     Python은 Guido van Rossum이 1991년에 만든 언어입니다.
+```
+
+최상위 결과가 엉뚱하다면 프롬프트부터 다시 쓰지 마세요. 청크 경계, 메타데이터 품질, 사용자 질의 표현과 임베딩 모델의 궁합을 먼저 점검해야 합니다.
+
 ---
 
 ## 출처를 함께 반환하는 응답
@@ -251,6 +313,64 @@ print(f"sources: {result['sources']}")
 
 ---
 
+## 근거가 약할 때 답변 경로를 끊기
+
+### 최소 관련도 기준으로 폴백 분기
+
+![근거가 없을 때의 폴백 분기](../../../assets/ai-app-patterns-101/02/02-05-fallback-branch-for-missing-evidence.ko.png)
+
+*근거가 없을 때의 폴백 분기*
+프롬프트만으로는 부족합니다. 운영 환경에서는 검색 결과가 충분히 강한지 애플리케이션 쪽에서도 확인해야 합니다.
+
+```python
+from langchain_core.documents import Document
+
+MIN_RELEVANCE = 0.80
+
+docs = [
+    Document(page_content=text, metadata=meta)
+    for text, meta in documents_with_metadata
+]
+vectorstore = FAISS.from_documents(docs, embedding_model)
+
+def answer_with_guard(question: str) -> dict:
+    matches = vectorstore.similarity_search_with_relevance_scores(question, k=3)
+
+    if not matches or matches[0][1] < MIN_RELEVANCE:
+        return {
+            "route": "fallback_no_evidence",
+            "answer": "색인된 문서 안에서 이 질문의 근거를 찾지 못했습니다.",
+            "sources": [],
+        }
+
+    selected_docs = [doc for doc, _ in matches]
+    context = format_docs(selected_docs)
+    answer = (prompt | llm | StrOutputParser()).invoke({
+        "context": context,
+        "question": question,
+    })
+
+    return {
+        "route": "answer_from_documents",
+        "answer": answer,
+        "sources": get_sources(selected_docs),
+    }
+
+print(answer_with_guard("Python을 만든 사람은 누구인가요?"))
+print(answer_with_guard("Rust의 주요 특징은 무엇인가요?"))
+```
+
+**Expected output:**
+
+```text
+{'route': 'answer_from_documents', 'answer': 'Python은 Guido van Rossum이 1991년에 만들었습니다.', 'sources': ['python_intro.txt']}
+{'route': 'fallback_no_evidence', 'answer': '색인된 문서 안에서 이 질문의 근거를 찾지 못했습니다.', 'sources': []}
+```
+
+이 지점에서 많은 RAG 시스템이 한 단계 더 안전해집니다. 검색 품질을 모델의 자기 판단에 맡기지 않고, 근거가 약할 때는 애플리케이션이 먼저 생성 경로를 끊기 때문입니다.
+
+---
+
 ## RAG가 실패하는 순간
 
 ### 검색 누락에 대한 방어 계층
@@ -271,11 +391,20 @@ print(f"sources: {result['sources']}")
 
 > 멘탈 모델은 검색 품질이 생성 품질의 상한선을 만든다는 것입니다. 생성 모델은 검색이 가져온 근거 위에서만 안전하게 답할 수 있습니다.
 
+### 답변이 이상할 때 먼저 보는 순서
+
+RAG 답변이 약하게 느껴지면 다음 순서로 확인하는 편이 빠릅니다.
+
+1. **검색 순위** — 맞는 청크가 top-k 안에 들어왔는가?
+2. **청크 형태** — 근거가 너무 잘게 잘리거나 무관한 텍스트와 섞이지 않았는가?
+3. **폴백 기준** — 근거 점수가 낮은데도 생성 경로를 허용하지 않았는가?
+4. **프롬프트 계약** — 추측 금지와 근거 기반 답변 규칙이 충분히 분명한가?
+
 ---
 
 ## 이 코드에서 먼저 볼 점
 
-- `main.py`는 `RecursiveCharacterTextSplitter`로 청킹하고, `FAISS.from_documents()`로 즉시 인덱싱하는 흐름을 보여 줍니다.
+- `main.py`는 `RecursiveCharacterTextSplitter`로 청킹하고, `FAISS.from_texts()`로 즉시 인덱싱하는 흐름을 보여 줍니다.
 - 스크립트는 검색된 `Document` 객체를 유지해 답변과 근거 출처를 함께 출력할 수 있게 합니다.
 - 프롬프트는 문맥 안의 정보만 쓰고, 답이 없으면 없다고 말하라고 명시합니다.
 

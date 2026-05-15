@@ -14,7 +14,7 @@ tags:
 - RAG
 - Agent
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 에이전트는 단계를 미리 고정하지 않고 모델이 런타임에 도구 호출 경로를 고르는 제어기입니다.
 ---
 
@@ -145,6 +145,23 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
         return f"unsupported conversion: {from_unit} to {to_unit}"
     result = conversions[key](value)
     return f"{value} {from_unit} = {result:.4f} {to_unit}"
+
+@tool
+def search_policy(query: str) -> str:
+    """
+    내부 지원 정책 지식베이스를 검색합니다.
+    환불 규정, 배송 지연, 계정 복구, SLA 질문에 사용합니다.
+    """
+    kb = {
+        "refund": "연간 플랜은 사용량이 100 API 호출 이하일 때 14일 안에 환불할 수 있습니다.",
+        "shipping": "주문이 영업일 기준 10일 이상 지연되면 긴급 재배송 대상이 됩니다.",
+        "password": "계정 복구에는 이메일 인증과 최근 결제 정보 한 가지가 필요합니다.",
+    }
+    lowered = query.lower()
+    for keyword, answer in kb.items():
+        if keyword in lowered:
+            return answer
+    return "policy not found"
 ```
 
 ---
@@ -168,7 +185,7 @@ llm = ChatGroq(
     api_key=os.environ["GROQ_API_KEY"],
 )
 
-tools = [calculate, get_current_time, word_count, unit_convert]
+tools = [calculate, get_current_time, word_count, unit_convert, search_policy]
 
 # ReAct prompt — instructs the LLM to follow the Thought/Action/Observation loop
 react_prompt = PromptTemplate.from_template("""
@@ -203,6 +220,7 @@ agent_executor = AgentExecutor(
     verbose=True,
     max_iterations=5,
     handle_parsing_errors=True,
+    return_intermediate_steps=True,
 )
 
 questions = [
@@ -210,6 +228,7 @@ questions = [
     "What time is it now?",
     "How many miles is 100 kilometers?",
     "Count the words in this text, then multiply by 2: 'The quick brown fox jumps over the lazy dog'",
+    "What is the refund policy for annual plans?",
 ]
 
 for question in questions:
@@ -218,6 +237,52 @@ for question in questions:
     result = agent_executor.invoke({"input": question})
     print(f"final answer: {result['output']}")
 ```
+
+---
+
+## 실제로 어떤 도구를 골랐는지 검증하기
+
+### 중간 실행 단계를 남기는 도구 선택 추적
+
+![실행 흔적과 중단 조건](../../../assets/ai-app-patterns-101/04/04-04-execution-trace-and-stopping-conditions.ko.png)
+
+*실행 흔적과 중단 조건*
+에이전트 데모는 고른 도구 경로를 눈으로 확인할 수 있어야 믿을 수 있습니다. `verbose=True`는 사람이 보기에는 좋지만, 회귀 점검까지 하려면 구조화된 추적이 더 낫습니다.
+
+```python
+def run_with_trace(question: str) -> dict:
+    result = agent_executor.invoke({"input": question})
+    tool_sequence = [action.tool for action, _ in result["intermediate_steps"]]
+    return {
+        "question": question,
+        "tools": tool_sequence,
+        "answer": result["output"],
+    }
+
+test_cases = [
+    ("What is 2 to the power of 10?", "calculate"),
+    ("What is the refund policy for annual plans?", "search_policy"),
+    ("How many feet is 3 meters?", "unit_convert"),
+]
+
+for question, expected_first_tool in test_cases:
+    traced = run_with_trace(question)
+    print(f"\nquestion: {traced['question']}")
+    print(f"tools used: {traced['tools']}")
+    print(f"expected first tool: {expected_first_tool}")
+    print(f"answer: {traced['answer']}")
+```
+
+**Expected output:**
+
+```text
+question: What is the refund policy for annual plans?
+tools used: ['search_policy']
+expected first tool: search_policy
+answer: Annual plans can be refunded within 14 days if usage stays below 100 API calls.
+```
+
+이 지점부터 에이전트 디버깅이 실전성이 생깁니다. “모델이 이상했다”라고 뭉뚱그리지 않고, 잘못된 도구를 골랐는지, 설명이 부족했는지, 루프가 너무 오래 돌았는지를 분해해서 볼 수 있기 때문입니다.
 
 ---
 
@@ -231,6 +296,15 @@ for question in questions:
 `verbose=True`를 주면 콘솔에 Thought, Action, Action Input, Observation이 모두 출력됩니다. 단순한 질문은 보통 한 번의 라운드로 끝납니다. 단어 수를 세고 그 결과에 2를 곱하는 식의 2단계 질문은 보통 두 라운드가 필요하고, 첫 번째 도구 출력이 두 번째 계산의 입력으로 이어집니다.
 
 `max_iterations`는 무한 루프를 막는 안전장치입니다. 실용적인 작업은 대개 5~10회 안에서 충분합니다.
+
+### 에이전트가 엉뚱한 도구를 고를 때 먼저 볼 것
+
+도구 선택이 이상하게 보이면 다음 순서로 확인하는 편이 빠릅니다.
+
+1. **도구 설명의 명확성** — 언제 쓰고 언제 쓰지 말아야 하는지가 docstring에 드러나는가?
+2. **기능 중복** — 둘 이상의 도구가 같은 질문에 그럴듯하게 보이지 않는가?
+3. **실행 흔적 길이** — 첫 Observation이 모호해서 루프가 길어지지 않는가?
+4. **중단 기준** — `max_iterations`가 끝내기에는 충분하고, 실패를 늦추지는 않는가?
 
 ---
 
@@ -258,9 +332,9 @@ def safe_divide(a: float, b: float) -> str:
 
 ## 이 코드에서 먼저 볼 점
 
-- `main.py`는 `AgentExecutor` 데모를 계산기 실행기와 검색 실행기로 나누어 가장 작은 신뢰 가능한 도구 선택 패턴을 보여 줍니다.
-- 각 도구는 `@tool(return_direct=True)`를 사용해 선택된 도구 결과를 즉시 돌려줍니다.
-- 짧은 프롬프트와 좁은 도구 설명이 함수 호출 실패 모드를 줄입니다.
+- `main.py`는 산술, 시간, 단어 수, 단위 변환, 정책 조회처럼 도구 표면을 의도적으로 좁게 유지합니다.
+- `return_intermediate_steps=True`로 어떤 도구 경로를 탔는지 검증 가능한 실행 흔적을 남깁니다.
+- 짧은 프롬프트와 좁은 도구 설명이 도구 선택 실패 모드를 줄입니다.
 
 ---
 
@@ -276,8 +350,8 @@ def safe_divide(a: float, b: float) -> str:
 
 - [ ] 각 도구에 명확한 설명과 입력 형태가 있다
 - [ ] `AgentExecutor`가 계산기 도구를 한 번 호출한다
-- [ ] `AgentExecutor`가 검색 도구를 한 번 호출한다
-- [ ] 선택된 도구 결과가 호출자에게 직접 반환된다
+- [ ] 지식베이스 질문에서는 정책 검색 도구를 고를 수 있다
+- [ ] 중간 실행 단계로 어떤 도구를 골랐는지 호출자가 확인할 수 있다
 
 ---
 
