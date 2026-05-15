@@ -40,7 +40,7 @@ This is the third post in the LangChain 101 series. It covers Retrievers, Vector
 ## Minimal runnable example
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -87,11 +87,11 @@ Topics:
 LangChain's `FAISS` class wraps the FAISS index behind a VectorStore interface. Pass a list of text strings and an embedding model — the class handles the rest.
 
 ```bash
-pip install langchain langchain-community faiss-cpu sentence-transformers langchain-groq
+pip install langchain langchain-community langchain-huggingface faiss-cpu sentence-transformers langchain-groq
 ```
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(
@@ -174,7 +174,7 @@ The standard RAG pattern: retrieve relevant documents, inject them as context, p
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -273,7 +273,7 @@ The key is the chain input dict:
 
 *Saving and reloading index lifecycle*
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 embedding_model = HuggingFaceEmbeddings(

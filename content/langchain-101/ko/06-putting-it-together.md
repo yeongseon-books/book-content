@@ -47,7 +47,7 @@ seo_description: Prompt와 Retriever, Tool, Streaming을 하나의 LCEL 체인�
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -87,7 +87,7 @@ print(chain.invoke("What is LCEL?"))
 *문서 청킹부터 인덱스 생성까지의 흐름*
 
 ```python
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -231,7 +231,7 @@ for question in questions:
 ```python
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -309,11 +309,11 @@ print(f"[3] {turn3}")
 langchain_rag_app.py
 
 Run: python langchain_rag_app.py
-Requires: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+Requires: langchain langchain-community langchain-huggingface langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
 """
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate

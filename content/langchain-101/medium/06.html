@@ -71,7 +71,7 @@
 <h2>Minimal runnable example</h2>
 <pre><code class="language-python">import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -99,7 +99,7 @@ The previous five posts covered LCEL, prompt templates, Retrievers, Tool Calling
 <h2>Document indexing pipeline</h2>
 <p><img alt="From document chunking to index build" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-01-document-indexing-pipeline.en.png"></p>
 <p><em>From document chunking to index build</em></p>
-<pre><code class="language-python">from langchain_community.embeddings import HuggingFaceEmbeddings
+<pre><code class="language-python">from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -217,7 +217,7 @@ for question in questions:
 A simple RAG chain treats each question independently. To reference earlier turns, pass conversation history to the chain.</p>
 <pre><code class="language-python">import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -289,11 +289,11 @@ print(f&quot;[3] {turn3}&quot;)
 langchain_rag_app.py
 
 Run: python langchain_rag_app.py
-Requires: langchain langchain-community langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
+Requires: langchain langchain-community langchain-huggingface langchain-groq faiss-cpu sentence-transformers langchain-text-splitters
 &quot;&quot;&quot;
 import os
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
