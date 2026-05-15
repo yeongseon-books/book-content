@@ -62,7 +62,8 @@ from dataclasses import asdict, dataclass
 from groq import Groq
 
 MODEL = "llama-3.1-8b-instant"
-PRICE_PER_MILLION_TOKENS = 0.05
+INPUT_PRICE_PER_MILLION_TOKENS = 0.05
+OUTPUT_PRICE_PER_MILLION_TOKENS = 0.08
 
 @dataclass
 class CostRecord:
@@ -72,8 +73,10 @@ class CostRecord:
     total_tokens: int
     cost_usd: float
 
-def estimate_cost(total_tokens: int) -> float:
-    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
+def estimate_cost(prompt_tokens: int, completion_tokens: int) -> float:
+    prompt_cost = (prompt_tokens / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS
+    completion_cost = (completion_tokens / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS
+    return round(prompt_cost + completion_cost, 8)
 
 def run_prompt(client: Groq, prompt: str) -> CostRecord:
     response = client.chat.completions.create(
@@ -92,7 +95,7 @@ def run_prompt(client: Groq, prompt: str) -> CostRecord:
         prompt_tokens=usage.prompt_tokens,
         completion_tokens=usage.completion_tokens,
         total_tokens=usage.total_tokens,
-        cost_usd=estimate_cost(usage.total_tokens),
+        cost_usd=estimate_cost(usage.prompt_tokens, usage.completion_tokens),
     )
 
 def main() -> None:
@@ -104,7 +107,8 @@ def main() -> None:
     ]
     records = [run_prompt(client, prompt) for prompt in prompts]
     report = {
-        "price_per_million_tokens": PRICE_PER_MILLION_TOKENS,
+        "input_price_per_million_tokens": INPUT_PRICE_PER_MILLION_TOKENS,
+        "output_price_per_million_tokens": OUTPUT_PRICE_PER_MILLION_TOKENS,
         "total_calls": len(records),
         "total_tokens": sum(record.total_tokens for record in records),
         "total_cost_usd": round(sum(record.cost_usd for record in records), 8),
@@ -122,7 +126,7 @@ if __name__ == "__main__":
 
 *반복 프롬프트가 캐시 후보가 되는 구조*
 
-- `PRICE_PER_MILLION_TOKENS` 상수 하나로 계산식을 드러내 두면, 단가 정책이 바뀌어도 어디를 수정해야 하는지가 명확합니다.
+- 입력 단가 상수와 출력 단가 상수를 분리해 두면, 이 모델의 실제 Groq 과금 방식과 예제가 맞아떨어집니다.
 - 호출마다 `CostRecord`를 남기면 나중에 리포트를 다시 계산하지 않아도 이상치와 반복 패턴을 바로 볼 수 있습니다.
 - 예제에서 같은 프롬프트를 일부러 반복한 이유는 캐시 후보를 보여 주기 위해서입니다.
 
@@ -134,7 +138,7 @@ if __name__ == "__main__":
 
 *최적화 레버에 품질 검증이 함께 필요한 구조*
 
-- 많은 벤더는 입력 토큰과 출력 토큰의 단가를 다르게 책정합니다. 예제는 단순화했지만, 실제 설계에서는 이 분리를 처음부터 염두에 두는 편이 안전합니다.
+- 많은 벤더는 입력 토큰과 출력 토큰의 단가를 다르게 책정합니다. 비용 레코드도 처음부터 그 분리를 반영하는 편이 안전합니다.
 - 총비용 한 숫자만 보면 어디서 급증했는지가 가려집니다. 호출 수와 토큰 분포를 같이 봐야 합니다.
 - 품질 검증 없이 비용만 줄이면, 결국 더 싼 대신 더 나쁜 제품을 만들 가능성이 큽니다.
 
