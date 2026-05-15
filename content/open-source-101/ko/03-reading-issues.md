@@ -17,7 +17,7 @@ tags:
   - Triage
   - Beginner
 seo_description: 깃허브 이슈를 단순한 할 일 목록이 아니라 문제 정의와 재현 절차, 합의 기록이 담긴 공동 작업 기록으로 읽는 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 이슈 읽기
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 이슈를 읽는 순서부터 고정하기
 
-```mermaid
-flowchart LR
-    T[제목] --> B[본문]
-    B --> R[재현 절차]
-    R --> L[라벨]
-    L --> C[댓글]
-```
+![이슈를 읽는 순서부터 고정하기](../../../assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png)
 
+*이슈를 제목에서 댓글까지 순서대로 읽어야 맥락을 놓치지 않는 기본 흐름*
 읽는 순서가 중요한 이유는 이슈의 정보가 이 흐름으로 쌓이기 때문입니다. 제목만 보면 증상만 보이고, 댓글만 먼저 보면 맥락이 흐려집니다. 기본 정보에서 세부 정보로 내려가는 순서를 지키면 실수를 크게 줄일 수 있습니다.
 
 이 관점을 잡고 나면 이슈는 막연한 게시글처럼 보이지 않습니다. 오히려 어떤 정보가 빠졌는지, 누구의 확인이 더 필요한지, 지금 바로 구현해도 되는지까지 눈에 들어오기 시작합니다.
@@ -180,5 +175,6 @@ reporter: Safari 15.1 on macOS 12
 - [good first issue](https://github.blog/2020-01-22-how-we-built-good-first-issues/)
 - [Triage guide](https://opensource.guide/best-practices/)
 - [Issue templates](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests)
+- [github/issue-labeler](https://github.com/github/issue-labeler)
 
 Tags: OpenSource, Issues, GitHub, Triage, Beginner

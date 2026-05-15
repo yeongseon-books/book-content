@@ -16,8 +16,8 @@ tags:
   - MIT
   - GPL
   - Beginner
-seo_description: MIT, Apache, GPL의 차이와 라이선스를 읽는 기본 기준을 정리합니다
-last_reviewed: '2026-05-12'
+seo_description: MIT, Apache 2.0, GPL의 차이와 오픈소스 라이선스를 권한과 의무 기준으로 읽는 법을 정리합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # 라이선스 이해하기
@@ -46,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 라이선스 지도를 먼저 그려 보기
 
-```mermaid
-flowchart LR
-    P[허용형] --> M[MIT]
-    P --> A[Apache]
-    C[카피레프트] --> G[GPL]
-    C --> L[LGPL]
-```
+![라이선스 지도를 먼저 그려 보기](../../../assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
 
+*허용형과 카피레프트 계열을 비교할 때 먼저 떠올리면 좋은 라이선스 분류 지도*
 이 분류를 선악 구도로 읽을 필요는 없습니다. 허용형 라이선스는 재사용이 쉽고, 카피레프트 라이선스는 수정과 공유의 의무를 더 강하게 밀어 줍니다. 어느 쪽이 더 낫다기보다, 프로젝트 목표와 배포 방식에 따라 부담과 이점이 달라진다고 보는 편이 현실적입니다.
 
 라이선스를 읽을 때는 이름보다 질문이 중요합니다. 이 코드를 수정해도 되는가, 재배포해도 되는가, 저작권 고지를 남겨야 하는가, 파생물의 소스를 공개해야 하는가, 특허 관련 보호는 있는가. 이 질문에 답할 수 있으면 이미 절반은 이해한 셈입니다.
@@ -172,6 +167,7 @@ MIT는 마찰이 적은 대신 공유 의무를 강제하지는 않습니다. Ap
 - [Choose a License](https://choosealicense.com/)
 - [SPDX License List](https://spdx.org/licenses/)
 - [Open Source Initiative Licenses](https://opensource.org/licenses)
+- [github/choosealicense.com 저장소](https://github.com/github/choosealicense.com)
 - [tl;dr Legal](https://www.tldrlegal.com/)
 
 Tags: OpenSource, License, MIT, GPL, Beginner

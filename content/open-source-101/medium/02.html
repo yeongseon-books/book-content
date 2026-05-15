@@ -54,104 +54,132 @@
 </head>
 <body>
 <h1>Understanding Licenses</h1>
+<p>Beginners usually look at features first when they evaluate an open source project. They want to know whether it solves today's problem, whether installation is easy, and whether examples are good. In real production work, though, there is often one document you should read before all of that: the license. It defines what you may do, what notice you must keep, and how redistribution works.</p>
 <p>This is post 2 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What <em>risk</em> do you take when you use code without reading its <em>license</em>?</p>
-<blockquote>
-<p>The <em>legal liability</em> lands on <em>you</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will use MIT, Apache 2.0, and GPL as the main reference points and learn to read licenses as permission-and-obligation documents rather than brand names.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li><em>Permissive</em> vs <em>copyleft</em></li>
-<li><em>MIT, Apache, GPL</em> compared</li>
-<li>The meaning of <em>public domain</em></li>
-<li><em>Dual</em> licensing</li>
-<li>Checking <em>compatibility</em></li>
+<li>What is the practical difference between <em>permissive</em> and <em>copyleft</em> licenses?</li>
+<li>How do MIT, Apache 2.0, and GPL v3 create different operational burdens?</li>
+<li>Why does an SPDX identifier matter for automation and compliance work?</li>
+<li>How should you read terms such as <em>public domain</em> and <em>dual license</em>?</li>
+<li>Why do companies run license scanners on dependency trees?</li>
 </ul>
+<blockquote>
+<p>A license is not decoration for a repository. It is the usage contract that defines how far you may go with the code.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>The <em>license</em> shapes the <em>future</em> of the project.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Permissive] --&gt; M[MIT]
-    P --&gt; A[Apache]
-    C[Copyleft] --&gt; G[GPL]
-    C --&gt; L[LGPL]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>permissive</strong>: A <em>permissive</em> license.</li>
-<li><strong>copyleft</strong>: A <em>copyleft</em> license.</li>
-<li><strong>public domain</strong>: The <em>public domain</em>.</li>
-<li><strong>dual license</strong>: A <em>dual license</em>.</li>
-<li><strong>SPDX</strong>: A <em>license identifier standard</em>.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "<em>MIT</em> and <em>GPL</em> are both just <em>open source</em>."</p>
-<p><strong>After</strong>: "You can <em>sell</em> MIT code; <em>GPL</em> requires <em>source disclosure</em>."</p>
-<h2>Hands-on: Comparing Licenses</h2>
+<p>Licenses shape a project's future, not just its current usability. A library may run perfectly today, but later questions such as commercial distribution, derivative work obligations, and patent risk all depend on the license text.</p>
+<p>Open source choices are both technical choices and legal choices. A developer may think they selected a convenient library, but an organization also selected a redistribution burden and a compliance cost. That is why reading the license early is cheaper than discovering the constraints during release.</p>
+<h2>Draw the License Map First</h2>
+<p><img alt="Draw the license map first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png"></p>
+<p><em>A quick map for comparing permissive and copyleft license families before reading fine print</em><br>
+There is no reason to treat this split as a moral ranking. Permissive licenses make reuse easier. Copyleft licenses push sharing obligations harder. Neither side is universally better. The practical question is what kind of project behavior and distribution model you want to support.</p>
+<p>When you read a license, the name matters less than the questions you ask. Can I modify this code? Can I redistribute it? Must I keep the copyright notice? Must I publish source for derivative work? Is there explicit patent language? If you can answer those questions, you already understand the important part.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>A <em>permissive</em> license broadly allows use, modification, distribution, and often commercial use. A <em>copyleft</em> license ties stronger sharing obligations to derivative work. <em>Public domain</em> aims to remove most copyright restriction, but legal treatment still differs across jurisdictions. A <em>dual license</em> offers the same software under two licensing models, often to balance open source distribution and commercial terms. <em>SPDX</em> is a short, standardized identifier that automated tools can read reliably.</p>
+<p>The real goal is not memorizing license names. It is building the habit of seeing where rights and obligations diverge. Selling, redistributing, preserving notice, disclosing source, and handling patent terms do not all behave the same way.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, MIT and GPL can feel like two labels under the same broad category of open source. With one closer look, the difference becomes operationally large. The shared category is not enough to make an implementation decision.</p>
+<p>Once you start reading licenses properly, your question changes from “Can I use this?” to “Under what conditions can I use this?” That shift is what matters in real projects.</p>
+<h2>Hands-on: A License Comparison Procedure</h2>
 <p><strong>Step 1 — MIT essentials</strong></p>
+<p>MIT is one of the most common beginner-facing licenses. It is broad, simple, and frequently used by libraries and small tools.</p>
 <pre><code class="language-text">Allows: use, modify, distribute, sell
 Requires: keep the copyright notice
 </code></pre>
 <p><strong>Step 2 — Apache 2.0 essentials</strong></p>
+<p>Apache 2.0 can look similar to MIT at a glance, but its explicit patent grant makes it a separate conversation in many organizations.</p>
 <pre><code class="language-text">Allows: same as MIT
 Adds: explicit patent grant
 </code></pre>
 <p><strong>Step 3 — GPL v3 essentials</strong></p>
+<p>GPL protects sharing more aggressively. It is especially important to distinguish between internal use and distribution.</p>
 <pre><code class="language-text">Allows: use, modify, distribute
 Requires: derivative works share their source
 </code></pre>
 <p><strong>Step 4 — SPDX identifier</strong></p>
+<p>Do not stop at dropping a <code>LICENSE</code> file into the repository. If your package metadata or release automation can expose a machine-readable identifier, that will help scanners and governance tools.</p>
 <pre><code class="language-yaml">license: MIT
 </code></pre>
-<p><strong>Step 5 — License file</strong></p>
+<p><strong>Step 5 — Bring in verified source text</strong></p>
+<p>Copy-paste from a random blog is not a great plan. Use a trusted source for the original license text.</p>
 <pre><code class="language-bash">curl -O https://choosealicense.com/licenses/mit/
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li><em>Permissive</em> is <em>flexible</em>.</li>
-<li><em>Copyleft</em> is <em>contagious</em>.</li>
-<li><em>SPDX</em> is the <em>standard identifier</em>.</li>
-</ul>
+<h2>A Fast Decision Matrix</h2>
+<!-- TODO: render this table as PNG and replace with ![alt](../../../assets/.../table.png) -->
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>MIT</th>
+<th>Apache 2.0</th>
+<th>GPL v3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commercial use</td>
+<td>Easy</td>
+<td>Easy</td>
+<td>Possible, but obligations matter</td>
+</tr>
+<tr>
+<td>Patent language</td>
+<td>Minimal</td>
+<td>Explicit grant</td>
+<td>Present, but with stronger reciprocity context</td>
+</tr>
+<tr>
+<td>Derivative source disclosure</td>
+<td>No</td>
+<td>No</td>
+<td>Yes, when distributed</td>
+</tr>
+<tr>
+<td>Beginner friction</td>
+<td>Low</td>
+<td>Low to medium</td>
+<td>Medium to high</td>
+</tr>
+</tbody>
+</table>
+<h2>What to Notice in This Walkthrough</h2>
+<p>Permissive licenses optimize for low friction. Copyleft licenses optimize for stronger reciprocal sharing. SPDX looks small, but it is what keeps humans and automation aligned. Once you see that, license reading stops feeling like clerical work and starts feeling like architecture risk management.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Just <em>copying</em> the license.</strong></li>
-<li><strong>Stripping the <em>copyright notice</em>.</strong></li>
-<li><strong>Mixing <em>GPL</em> code into <em>proprietary</em> products.</strong></li>
-<li><strong>Misreading a <em>dual license</em>.</strong></li>
-<li><strong>No <em>SPDX</em> identifier.</strong></li>
+<li>Copying the license text without understanding the obligations.</li>
+<li>Removing copyright notices when redistributing code.</li>
+<li>Pulling GPL code into a proprietary product without checking distribution consequences.</li>
+<li>Reading only one side of a dual-license offer.</li>
+<li>Skipping SPDX identifiers and breaking automated compliance chains.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Companies run <em>license scanners</em> (FOSSA, Snyk) to check <em>compatibility</em> automatically.</p>
+<p>Companies rarely leave license decisions to individual intuition alone. They use scanners such as FOSSA or Snyk to traverse dependency trees, compare them against allowlists or review lists, and surface risky combinations early. Once a release ships, license cleanup is much more expensive.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A <em>license</em> is <em>law</em>.</li>
-<li><em>MIT</em> means <em>minimal friction</em>.</li>
-<li><em>GPL</em> enforces <em>sharing</em>.</li>
-<li><em>Apache</em> is <em>patent-safe</em>.</li>
-<li><em>Dual licensing</em> is a <em>strategy</em>.</li>
+<li>A license is a usage condition, not metadata fluff.</li>
+<li>MIT is low-friction reuse.</li>
+<li>Apache 2.0 matters when patent language matters.</li>
+<li>GPL changes the distribution conversation.</li>
+<li>Dual licensing is often a business strategy, not a legal oddity.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>LICENSE</em> file present.</li>
-<li>[ ] <em>SPDX</em> identifier set.</li>
-<li>[ ] <em>Copyright</em> notice kept.</li>
-<li>[ ] <em>Compatibility</em> checked.</li>
+<li>[ ] I checked whether the repository has a <code>LICENSE</code> file.</li>
+<li>[ ] I know where to place or expose an SPDX identifier.</li>
+<li>[ ] I understand whether copyright notice must be preserved.</li>
+<li>[ ] I reviewed compatibility between the dependency license and my distribution model.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Write the difference between <em>permissive</em> and <em>copyleft</em> in one line.</li>
-<li>Write the meaning of <em>SPDX</em> in one line.</li>
-<li>Write an example of a <em>dual license</em> in one line.</li>
+<li>Summarize the difference between <em>permissive</em> and <em>copyleft</em> in one sentence.</li>
+<li>Explain why SPDX matters in one sentence.</li>
+<li>Explain why a dual license can also be a business strategy.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>The next post is <em>Reading Issues</em>.</p>
+<p>In this post, we treated licenses as the terms that define what you may do with open source code, not as a checkbox at the bottom of a repository. The important shift is that using open source means accepting its rules, not only its features.</p>
+<p>Next, we will move into issues. To contribute well, you need to know not only which problem to pick, but also how to interpret the problem statement already on the table.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><strong>Understanding Licenses (current)</strong></li>
@@ -169,6 +197,7 @@ Requires: derivative works share their source
 <li><a href="https://choosealicense.com/">Choose a License</a></li>
 <li><a href="https://spdx.org/licenses/">SPDX License List</a></li>
 <li><a href="https://opensource.org/licenses">Open Source Initiative Licenses</a></li>
+<li><a href="https://github.com/github/choosealicense.com">choosealicense.com repository</a></li>
 <li><a href="https://www.tldrlegal.com/">tl;dr Legal</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, License, MIT, GPL, Beginner</p>

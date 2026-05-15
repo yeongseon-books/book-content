@@ -54,100 +54,105 @@
 </head>
 <body>
 <h1>The Maintainer Role</h1>
+<p>When people first look at open source, they often think a maintainer is simply the person who knows the code best. Technical judgment is part of the job, but the real role is wider. Maintainers triage issues, review contributions, cut releases, set community boundaries, and grow successors.</p>
 <p>This is post 8 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a maintainer actually do, and how do they avoid burnout?</p>
-<blockquote>
-<p>Priorities, delegation, and boundaries.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will define the maintainer not as a heroic programmer who does everything alone, but as the operator who keeps project flow and responsibility sustainable over time.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>A maintainer's <em>responsibilities</em></li>
-<li>A <em>triage</em> routine</li>
-<li><em>Delegation</em> and permissions</li>
-<li><em>Burnout</em> prevention</li>
-<li>Growing a <em>successor</em></li>
+<li>What responsibilities does a maintainer really carry?</li>
+<li>Why should triage, review, and release be seen as one operating loop?</li>
+<li>Why are delegation and successor growth sustainability issues rather than optional extras?</li>
+<li>What boundaries help prevent burnout?</li>
+<li>What does a low bus factor actually put at risk?</li>
 </ul>
+<blockquote>
+<p>A maintainer is not the developer who handles every task personally. They are closer to the conductor who keeps project flow and responsibility coordinated.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>A maintainer's health is the project's lifespan.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[Triage] --&gt; R[Review]
-    R --&gt; Re[Release]
-    Re --&gt; D[Delegate]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>maintainer</strong>: Project owner.</li>
-<li><strong>triage</strong>: Sorting work.</li>
-<li><strong>review</strong>: Inspection.</li>
-<li><strong>delegate</strong>: Hand off authority.</li>
-<li><strong>bus factor</strong>: Single point of failure metric.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "I handle every issue alone."</p>
-<p><strong>After</strong>: "I delegate authority to trusted contributors."</p>
-<h2>Hands-on: A Maintainer Routine</h2>
-<p><strong>Step 1 — Weekly Triage</strong></p>
+<p>The health of a maintainer is often tied directly to the lifespan of the project. When review, release, and community responses all pile onto one person, sustainability breaks before code quality does.</p>
+<p>Maintainers also become the reference point for project culture. Review tone, response speed, documentation discipline, and release habits often begin there. So understanding the maintainer role is close to understanding open source operations itself.</p>
+<h2>The Maintainer Loop in One Line</h2>
+<p><img alt="The Maintainer Loop in One Line" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png"></p>
+<p><em>The operating loop where triage, review, release, and delegation keep maintainership sustainable</em><br>
+That order matters because work accumulates along that path. Weak triage slows review. Slow review delays releases. Delayed releases attract even more demand to the maintainer. Without delegation, the whole loop clogs.</p>
+<p>That is why maintainership is not simply “more coding.” It is a separate operating role with boundaries and coordination built into it.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>A <em>maintainer</em> protects direction and quality. <em>Triage</em> sorts incoming work and sets priority. <em>Review</em> checks not only correctness but also whether the change fits the project's direction. <em>Delegation</em> hands authority and responsibility to trusted people. <em>Bus factor</em> describes how dangerous it is if a key person disappears.</p>
+<p>Those concepts all sit inside an ordinary maintainer week.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, it can feel like a “real maintainer” should personally handle every issue and pull request. In practice, that structure rarely lasts.</p>
+<p>Projects live longer when authority is distributed, routines are visible, and maintainers are explicit about their boundaries. A strong maintainer is not the one who absorbs infinite work. It is the one who ensures the project is not trapped inside one person.</p>
+<h2>Hands-on: Design a Maintainer Routine</h2>
+<p><strong>Step 1 — Set triage time</strong></p>
+<p>If you react continuously, the queue will always feel chaotic. A small scheduled triage block often works better.</p>
 <pre><code class="language-text">Monday, 30 minutes: label and prioritize
 </code></pre>
-<p><strong>Step 2 — PR Review</strong></p>
+<p><strong>Step 2 — Define first-response expectations</strong></p>
+<p>Predictable response is often more important than perfect speed. Contributors can wait more calmly when they understand the rhythm.</p>
 <pre><code class="language-text">Aim for first response within two days
 </code></pre>
-<p><strong>Step 3 — Release</strong></p>
+<p><strong>Step 3 — Create a release rhythm</strong></p>
+<p>Regular patch and minor release expectations stabilize user trust.</p>
 <pre><code class="language-text">Patch weekly, minor monthly
 </code></pre>
-<p><strong>Step 4 — Delegate</strong></p>
+<p><strong>Step 4 — Delegate permissions</strong></p>
+<p>Delegation is not a shortcut for laziness. It is a way to lower project risk. Review, labels, and docs are often good starting points.</p>
 <pre><code class="language-text">GitHub Org → Teams → write permission
 </code></pre>
-<p><strong>Step 5 — Rest</strong></p>
+<p><strong>Step 5 — Announce time off</strong></p>
+<p>If you hide empty capacity, contributors may read silence as rejection. Visible boundaries are often more respectful than vague absence.</p>
 <pre><code class="language-markdown">&gt; Maintainer is on vacation Aug 1-14.
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>A routine reduces fatigue.</li>
-<li>Delegation enables sustainability.</li>
-<li>Announcements set expectations.</li>
-</ul>
+<h2>A Simple Responsibility Table</h2>
+<p><strong>Labeling and triage</strong><br>
+- One maintainer only: No<br>
+- Safe to delegate early: Yes</p>
+<p><strong>Docs review</strong><br>
+- One maintainer only: No<br>
+- Safe to delegate early: Yes</p>
+<p><strong>Release tag creation</strong><br>
+- One maintainer only: Sometimes<br>
+- Safe to delegate early: Gradually</p>
+<p><strong>Final merge rights</strong><br>
+- One maintainer only: Often at first<br>
+- Safe to delegate early: Later</p>
+<h2>What to Notice in This Walkthrough</h2>
+<p>Routines reduce fatigue. Delegation is how scale starts. Announcements create boundaries. Lowering bus factor is less about code tricks than about people structure.</p>
+<p>The strongest maintainer is not the one who holds every answer. It is the one who makes the project work even when they are not available.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Reviewing every PR alone.</strong></li>
-<li><strong>Not announcing your time off.</strong></li>
-<li><strong>Letting the bus factor stay at 1.</strong></li>
-<li><strong>No labels.</strong></li>
-<li><strong>Not growing a successor.</strong></li>
+<li>Reviewing every pull request alone.</li>
+<li>Not announcing time away.</li>
+<li>Letting the bus factor stay at 1 for too long.</li>
+<li>Running without labels or priority rules.</li>
+<li>Failing to grow a successor.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A company's Tech Lead carries responsibilities very similar to a maintainer.</p>
+<p>This looks a lot like the role of a tech lead or platform owner inside a company. Incoming requests need sorting, quality bars need to stay visible, release cadence needs protecting, and people need to grow into more responsibility.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A maintainer is a conductor.</li>
-<li>Delegation is scale.</li>
-<li>Routine is endurance.</li>
-<li>Announcements are boundaries.</li>
-<li>A successor is legacy.</li>
+<li>Maintainer work is systems work.</li>
+<li>Routine preserves energy.</li>
+<li>Delegation is part of architecture.</li>
+<li>Boundaries are part of trust.</li>
+<li>Successors are part of sustainability.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Weekly triage.</li>
-<li>[ ] Delegation granted.</li>
-<li>[ ] Time-off announced.</li>
-<li>[ ] Bus factor ≥ 2.</li>
+<li>[ ] I have a regular triage rhythm.</li>
+<li>[ ] I set review response expectations.</li>
+<li>[ ] I know what can be delegated first.</li>
+<li>[ ] I have a plan to raise the bus factor above 1.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: define bus factor.</li>
-<li>One line: difference between triage and review.</li>
-<li>One line: a way to grow a successor.</li>
+<li>Define <em>bus factor</em> in one sentence.</li>
+<li>Explain the difference between <em>triage</em> and <em>review</em>.</li>
+<li>Give one way to grow a successor.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>An Open Source Portfolio</em>.</p>
+<p>In this post, we reframed the maintainer as an operating owner rather than only a strong developer. Sustainable open source needs people who can divide work, set boundaries, and keep project flow healthy.</p>
+<p>Next, we will turn that experience back toward your own career and discuss how open source work becomes a real portfolio.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -166,6 +171,7 @@
 <li><a href="https://en.wikipedia.org/wiki/Bus_factor">Bus factor</a></li>
 <li><a href="https://opensource.guide/maintainer-mental-health/">Maintainer Burnout</a></li>
 <li><a href="https://docs.github.com/en/organizations/organizing-members-into-teams">GitHub Teams</a></li>
+<li><a href="https://github.com/github/maintainers">github/maintainers repository</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, Maintainer, Triage, Burnout, Beginner</p>
 </body>

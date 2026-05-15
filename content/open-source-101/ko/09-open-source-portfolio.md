@@ -16,8 +16,8 @@ tags:
   - Career
   - GitHub
   - Beginner
-seo_description: 깃허브 활동을 신뢰할 수 있는 오픈소스 포트폴리오로 정리하는 법을 설명합니다
-last_reviewed: '2026-05-12'
+seo_description: 깃허브 활동을 근거와 서사가 보이는 오픈소스 포트폴리오로 정리하는 방법을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # 오픈소스 포트폴리오
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 포트폴리오를 구성하는 최소 구조
 
-```mermaid
-flowchart LR
-    P[프로필] --> R[고정 저장소]
-    R --> C[기여 기록]
-    C --> N[서사]
-```
+![포트폴리오를 구성하는 최소 구조](../../../assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
 
+*프로필, 대표 작업, 기여 증거, 서사가 연결될 때 포트폴리오가 되는 구조*
 이 그림에서 마지막 단계가 중요합니다. 링크만 모아 두면 자료실에 가깝고, 서사만 있으면 자기소개에 그칩니다. 둘이 합쳐져야 포트폴리오가 됩니다.
 
 즉, 좋은 포트폴리오는 "무엇을 했는가"와 "왜 그 일이 의미 있는가"를 같이 보여 줍니다. 보는 사람이 직접 검증할 수 있는 링크와, 그 링크를 어떻게 읽어야 하는지 알려 주는 설명이 함께 있어야 합니다.
@@ -180,5 +176,6 @@ At least 2 commits per week, three months straight
 - [Pinning items](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/pinning-items-to-your-profile)
 - [Open Source Guides — Finding Users](https://opensource.guide/finding-users/)
 - [Hiring with GitHub](https://github.com/readme)
+- [github/readme](https://github.com/readme)
 
 Tags: OpenSource, Portfolio, Career, GitHub, Beginner

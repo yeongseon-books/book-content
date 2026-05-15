@@ -54,56 +54,47 @@
 </head>
 <body>
 <h1>A Good README</h1>
+<p>Even a strong project makes a weak first impression if the README is confusing. In open source, the README is the product page, installation guide, and often the first indicator of a maintainer's care. Most visitors read it before they read the code.</p>
 <p>This is post 5 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a first-time visitor need to <em>start</em> using your project in <em>five minutes</em>?</p>
-<blockquote>
-<p>Title, one-line summary, install, usage, license.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will define a good README as the document that helps a first-time visitor understand and run the project within the first five minutes.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>five core sections</em> of a README</li>
-<li>Using <em>badges</em> well</li>
-<li>Writing <em>runnable code samples</em></li>
-<li>Automating the <em>table of contents</em></li>
-<li>A <em>translation</em> strategy</li>
+<li>What information does a first-time visitor look for first?</li>
+<li>Why are the title, one-line summary, installation, usage example, and license the core sections?</li>
+<li>When do badges and screenshots help, and when do they get in the way?</li>
+<li>Where is the boundary between the README and the contribution guide?</li>
+<li>How do you design a document that helps people start quickly rather than admire the project from afar?</li>
 </ul>
+<blockquote>
+<p>A README is not a repository introduction. It is an onboarding script for the first five minutes.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>The README is the face of your project.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[Title] --&gt; D[Description]
-    D --&gt; I[Install]
-    I --&gt; U[Usage]
-    U --&gt; L[License]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>README</strong>: Entry-point document.</li>
-<li><strong>badge</strong>: Status indicator.</li>
-<li><strong>TOC</strong>: Table of contents.</li>
-<li><strong>quickstart</strong>: Fast getting-started path.</li>
-<li><strong>CONTRIBUTING</strong>: Contribution guide.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "The README is empty."</p>
-<p><strong>After</strong>: "A user can install and run within five minutes."</p>
-<h2>Hands-on: Build a README</h2>
+<p>People often say the README is the face of the project. In practice it is even more operational than that. A weak README makes users drop off before installation, contributors miss the rules, and maintainers answer the same questions repeatedly.</p>
+<p>Good README quality lowers support cost and builds trust. Small projects especially get judged through their documentation maturity. Great code is still easy to abandon if the starting path is invisible.</p>
+<h2>Follow the Reader's Order</h2>
+<p><img alt="Follow the Reader's Order" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png"></p>
+<p><em>The order most first-time visitors follow from title to install and usage when reading a README</em><br>
+That flow matters because the reader's attention usually moves in that order. First they want to know what the project is. Then whether it is installable. Then how to use it. License and contribution details come after that.</p>
+<p>Long READMEs are not automatically bad. The key is whether the first five minutes of necessary information live near the top. If you front-load architecture detail and internal design before the user can even run the tool, the README becomes a barrier instead of an entrance.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>The <em>README</em> is the entry document, not the entire design archive. A <em>badge</em> is a quick status indicator, but too many badges turn into noise. A <em>TOC</em> lowers navigation cost when the document grows. A <em>quickstart</em> is the shortest successful path. <code>CONTRIBUTING.md</code> is where you place contribution rules that do not belong in the main onboarding path.</p>
+<p>The README should get people started. Deeper details can live behind links.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>Many people treat the README as decoration they will write later. In reality it is often the first interface users have with the project.</p>
+<p>A strong README does not exist to make the repository look impressive. It exists to help someone install, run, and understand the tool quickly. Once you adopt that view, section priority changes immediately.</p>
+<h2>Hands-on: Build the Basic README Skeleton</h2>
 <p><strong>Step 1 — Title and One-Line Summary</strong></p>
+<p>The title states identity. The one-line summary states user value. Aim for clarity about who it is for and what it does.</p>
 <pre><code class="language-markdown"># my-project
 
 &gt; A tiny tool that does X in one command.
 </code></pre>
 <p><strong>Step 2 — Badges</strong></p>
+<p>Badges can summarize useful status, but decoration that no one reads only adds noise.</p>
 <pre><code class="language-markdown">![CI](https://github.com/user/repo/actions/workflows/ci.yml/badge.svg)
 </code></pre>
 <p><strong>Step 3 — Install</strong></p>
+<p>If the install command is missing, the document is asking the user to guess.</p>
 <pre><code class="language-markdown">## Install
 
 \`\`\`bash
@@ -111,6 +102,7 @@ pip install my-project
 \`\`\`
 </code></pre>
 <p><strong>Step 4 — Usage Example</strong></p>
+<p>Examples are usually stronger than explanations. One command that actually runs is often more valuable than a long paragraph.</p>
 <pre><code class="language-markdown">## Usage
 
 \`\`\`bash
@@ -118,49 +110,48 @@ my-project --help
 \`\`\`
 </code></pre>
 <p><strong>Step 5 — License</strong></p>
+<p>Even if the rest of the README is strong, missing license information can stop adoption and reuse immediately.</p>
 <pre><code class="language-markdown">## License
 
 MIT © 2026 Author Name
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>The title is unambiguous.</li>
-<li>The example actually runs.</li>
-<li>The license is explicit.</li>
-</ul>
+<h2>What to Notice in This Walkthrough</h2>
+<p>The title should be unambiguous. The example should actually run. Install and usage should be separated so the reader can scan faster. License information can sit near the bottom, but it cannot be omitted.</p>
+<p>The best README experience is not verbal elegance. It is a fast first success. If the user can install and run the project within minutes, the document already did half of its job.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Forgetting the install command.</strong></li>
-<li><strong>Examples that no longer run.</strong></li>
-<li><strong>Screenshots with no explanation.</strong></li>
-<li><strong>Skipping the license.</strong></li>
-<li><strong>A README that is too long.</strong></li>
+<li>Forgetting the install command.</li>
+<li>Leaving examples that no longer run.</li>
+<li>Using screenshots without explanation.</li>
+<li>Skipping the license section.</li>
+<li>Trying to place every design detail in the README.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Companies use the README of internal libraries as onboarding documentation.</p>
+<p>The same pattern shows up in internal tooling. When a new teammate can boot a library or service from the README alone, support cost drops. When they cannot, chat messages become an expensive replacement for documentation.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A README is an advertisement.</li>
-<li>Five minutes is the target.</li>
-<li>Examples are king.</li>
-<li>Short sentences are kindness.</li>
-<li>Links provide depth.</li>
+<li>A README is an onboarding interface.</li>
+<li>Five minutes is a useful target.</li>
+<li>Runnable examples beat decorative prose.</li>
+<li>Short sentences reduce friction.</li>
+<li>Separate links give depth without blocking entry.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Title plus one-line summary.</li>
-<li>[ ] Install command.</li>
-<li>[ ] Usage example.</li>
-<li>[ ] License section.</li>
+<li>[ ] I have a title and one-line summary.</li>
+<li>[ ] The install command is immediately visible.</li>
+<li>[ ] There is a runnable usage example.</li>
+<li>[ ] The license section is present.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: target time for a quickstart.</li>
-<li>One line: purpose of a badge.</li>
-<li>One line: why CONTRIBUTING.md is a separate file.</li>
+<li>Explain the target time of a quickstart in one sentence.</li>
+<li>Explain the purpose of a badge in one sentence.</li>
+<li>Explain why <code>CONTRIBUTING.md</code> should often be separate from the README.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>Release and Versioning</em>.</p>
+<p>In this post, we reframed the README as a first-five-minutes onboarding document rather than a repository description. The practical goal is to help a reader move, not just understand.</p>
+<p>Next, we will look at release and versioning. Once people can start using your project, they also need a reliable way to understand updates.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -179,6 +170,7 @@ MIT © 2026 Author Name
 <li><a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes">GitHub README guide</a></li>
 <li><a href="https://github.com/matiassingers/awesome-readme">Awesome README</a></li>
 <li><a href="https://shields.io/">Shields.io</a></li>
+<li><a href="https://github.com/github/docs">GitHub Docs repository README style examples</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, README, Documentation, GitHub, Beginner</p>
 </body>

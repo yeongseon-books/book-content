@@ -54,104 +54,111 @@
 </head>
 <body>
 <h1>Creating Pull Requests</h1>
+<p>In open source, the pull request is the most visible output of contribution. That is why beginners often feel like the work is done once the PR is open. From a maintainer's point of view, though, a pull request is not a blob of code. It is a change proposal that must be easy to review, easy to trust, and safe to merge.</p>
 <p>This is post 4 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does a Pull Request that maintainers <em>welcome</em> actually look like?</p>
-<blockquote>
-<p>Small change, clear description, passing tests.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will walk through the full contribution path from fork and branch to commit history, description, review response, and post-merge cleanup.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>fork → branch → PR</em> flow</li>
-<li><em>Commit message</em> conventions</li>
-<li>Writing a <em>PR description</em></li>
-<li>Responding to <em>reviews</em></li>
-<li>Cleanup <em>after merge</em></li>
+<li>What does a pull request that maintainers welcome actually look like?</li>
+<li>Why should fork, branch, commit, and PR each stay separate?</li>
+<li>What roles do commit messages and the PR description play?</li>
+<li>What should you explain, and what should you change, when review feedback arrives?</li>
+<li>Why does cleanup after merge still count as part of contribution?</li>
 </ul>
+<blockquote>
+<p>A pull request is not a button for uploading code. It is the conversation channel where you package a change into a reviewable unit.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>PR quality decides whether your contribution lands.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[Fork] --&gt; B[Branch]
-    B --&gt; C[Commit]
-    C --&gt; P[Push]
-    P --&gt; O[Open PR]
-    O --&gt; R[Review]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>fork</strong>: Your copy of an upstream repo.</li>
-<li><strong>branch</strong>: A working line of commits.</li>
-<li><strong>commit</strong>: A unit of change.</li>
-<li><strong>PR</strong>: A merge request.</li>
-<li><strong>review</strong>: Code inspection.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "I push directly to main."</p>
-<p><strong>After</strong>: "I follow fork, branch, PR, every time."</p>
-<h2>Hands-on: Your First PR</h2>
+<p>Correct code can still produce slow review if the pull request is hard to read. On the other hand, even a modest change becomes easier to merge when the branch is scoped well, the description is clear, and the verification path is obvious. For beginners, collaboration habits are often judged before technical depth.</p>
+<p>The same is true inside companies. Pull requests are the default unit of code review in many teams. The ability to take a small change and explain it as a crisp story travels well between open source and production work.</p>
+<h2>Put the Flow in Your Head First</h2>
+<p><img alt="Put the flow in your head first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png"></p>
+<p><em>The contribution flow from fork to review that keeps a change small, isolated, and reviewable</em><br>
+If you treat that flow as paperwork, every step feels annoying. If you see the role split, it starts to make sense. The fork is your private workspace. The branch is the change boundary. The commit is the history unit. The pull request is the request for review. Keeping them separate lowers confusion.</p>
+<p>Good pull requests are not only well implemented. They are well shaped. When the branch is isolated, the scope is small, the related issue is linked, and the test path is visible, review gets much easier.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>A <em>fork</em> is your safe personal copy of the upstream repository. A <em>branch</em> is a single-purpose change line. A <em>commit</em> is the smallest reliable history unit. A <em>pull request</em> is the formal request to merge into upstream. <em>Review</em> is not only correctness checking. It is also a check for clarity, safety, and fit with the repository's direction.</p>
+<p>Once those concepts click, opening pull requests stops feeling mysterious.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, it may seem simpler to work directly on <code>main</code>. Open source contribution works better when you optimize for reviewability instead. That means forking, branching, committing in small units, and opening a pull request with clear context every time.</p>
+<p>That habit gives even a beginner's first contribution a higher trust baseline.</p>
+<h2>Hands-on: Open Your First Clean Pull Request</h2>
 <p><strong>Step 1 — Fork and Clone</strong></p>
+<p>Separate your workspace from the upstream repository. That keeps failure local and experimentation safe.</p>
 <pre><code class="language-bash">gh repo fork owner/repo --clone
 cd repo
 </code></pre>
 <p><strong>Step 2 — Create a Branch</strong></p>
+<p>Try to make the branch name reveal the intent of the change. One bug or one feature per branch is usually a healthy default.</p>
 <pre><code class="language-bash">git checkout -b fix/login-safari
 </code></pre>
 <p><strong>Step 3 — Commit</strong></p>
+<p>Commit messages matter because they become part of both the history and the review context. Intent beats vagueness.</p>
 <pre><code class="language-bash">git commit -m &quot;fix: handle Safari 15 cookie quirk&quot;
 </code></pre>
 <p><strong>Step 4 — Push</strong></p>
+<p>Push is not just an upload step. It is the point where you publish a reviewable state. The more trimmed your local history is before this step, the better.</p>
 <pre><code class="language-bash">git push origin fix/login-safari
 </code></pre>
 <p><strong>Step 5 — Open the PR</strong></p>
+<p>The title is the summary. The body is the context. Link the issue so maintainers can recover the earlier discussion quickly.</p>
 <pre><code class="language-bash">gh pr create --title &quot;fix: Safari 15 login&quot; \
   --body &quot;Closes #42&quot;
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>Keep commits small.</li>
-<li>The title is a summary.</li>
-<li>The body is context.</li>
-</ul>
+<h2>A Practical PR Body Template</h2>
+<pre><code class="language-markdown">## Summary
+
+- Fix Safari 15 login failure caused by cookie handling
+
+## Why this change
+
+- Existing login flow worked in Chrome but failed in Safari 15
+
+## Verification
+
+- Added regression test for Safari cookie branch
+- Confirmed login works in local manual test
+
+Closes #42
+</code></pre>
+<h2>What to Notice in This Walkthrough</h2>
+<p>Small branches create small reviews. Commit messages and pull request titles may look similar, but they do different jobs. One becomes history. The other guides the reviewer. A linked issue saves the reviewer from reconstructing the earlier problem statement.</p>
+<p>That is the real convenience you provide. Maintainers are often seeing the code for the first time. A well-shaped PR lowers their context-switch cost before they even read the diff.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Working on main.</strong></li>
-<li><strong>Vague commit messages.</strong></li>
-<li><strong>Opening a PR with no tests.</strong></li>
-<li><strong>Not linking the related issue.</strong></li>
-<li><strong>Ignoring review feedback.</strong></li>
+<li>Working directly on <code>main</code>.</li>
+<li>Writing commit messages that do not explain intent.</li>
+<li>Opening a PR with no test or verification story.</li>
+<li>Forgetting to link the related issue.</li>
+<li>Ignoring review feedback instead of responding clearly.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Companies on trunk-based development also use PRs as the basic review unit.</p>
+<p>Senior engineers treat pull requests as collaboration interfaces, not upload events. If the scope is too large, review slows down. If the context is missing, reviewers become defensive because they have to infer too much. Small PRs, explicit verification, and quick feedback response reduce that cost.</p>
+<p>Review is not an exam you either pass or fail. A good review conversation is about finding the choice that fits the repository's existing direction best. Beginners usually earn more trust through clarity and fast iteration than through self-defense.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>A PR is a conversation.</li>
-<li>Small PRs merge fast.</li>
-<li>Tests are evidence.</li>
-<li>Description is courtesy.</li>
-<li>Review is learning.</li>
+<li>A PR is a review conversation.</li>
+<li>Scope is a design choice.</li>
+<li>Tests and commands are evidence.</li>
+<li>Description is part of engineering quality.</li>
+<li>Review is how repository norms become visible.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Branch separated.</li>
-<li>[ ] Tests pass.</li>
-<li>[ ] Issue linked.</li>
-<li>[ ] Description clear.</li>
+<li>[ ] I created a separate working branch.</li>
+<li>[ ] My commit history explains the change.</li>
+<li>[ ] I prepared a test result or verification method.</li>
+<li>[ ] My PR body explains context and links the related issue.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: difference between fork and clone.</li>
-<li>One line: effect of the <em>Closes #N</em> keyword.</li>
-<li>One line: advantage of a small PR.</li>
+<li>Explain the difference between <em>fork</em> and <em>clone</em> in one sentence.</li>
+<li>Explain what <code>Closes #N</code> does in one sentence.</li>
+<li>Explain why a small pull request is easier to merge.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>A Good README</em>.</p>
+<p>In this post, we reframed pull requests as reviewable change proposals rather than code uploads. Well-shaped pull requests reduce collaboration cost before anyone debates implementation details.</p>
+<p>Next, we will move into README quality. In a repository that expects contributors, documentation is often as important as the code itself.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -170,6 +177,7 @@ cd repo
 <li><a href="https://www.conventionalcommits.org/">Conventional Commits</a></li>
 <li><a href="https://cbea.ms/git-commit/">How to write a Git commit message</a></li>
 <li><a href="https://cli.github.com/manual/gh_pr_create">gh CLI</a></li>
+<li><a href="https://github.com/github/docs/tree/main/.github">GitHub pull request templates</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, PullRequest, Git, GitHub, Beginner</p>
 </body>

@@ -54,54 +54,45 @@
 </head>
 <body>
 <h1>Reading Issues</h1>
+<p>One of the most common beginner mistakes in open source is trying to fix a problem before understanding it. People read only the title, skip the full comment thread, or open a pull request without noticing that someone else is already working on the issue.</p>
 <p>This is post 3 in the Open Source 101 series.</p>
-<blockquote>
-<p>Open Source 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How should you <em>read</em> an <em>issue</em> to find a <em>real entry point</em> for contribution?</p>
-<blockquote>
-<p>Read <em>title</em>, <em>labels</em>, then <em>comments</em> — in that order.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here, we will treat a GitHub issue not as a generic to-do item, but as a shared record of problem definition, reproduction evidence, and team agreement.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
-<li>The <em>anatomy</em> of an issue</li>
-<li>The <em>label</em> system</li>
-<li>Finding <em>good first issue</em> tasks</li>
-<li>Verifying <em>reproduction steps</em></li>
-<li>Following the <em>comment thread</em></li>
+<li>Why do contributions drift when you judge an issue by the title alone?</li>
+<li>What roles do labels, reproduction steps, assignees, and comment threads each play?</li>
+<li>When is a <code>good first issue</code> still a poor first contribution choice?</li>
+<li>How do you avoid repeating a discussion that is already settled in comments?</li>
+<li>How can you decide whether this issue is safe for you to take on right now?</li>
 </ul>
+<blockquote>
+<p>An issue is not just a bug report. It is a shared working record that defines the problem and narrows the solution space.</p>
+</blockquote>
 <h2>Why It Matters</h2>
-<p>A misread issue produces a misaligned PR.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[Title] --&gt; B[Body]
-    B --&gt; R[Repro]
-    R --&gt; L[Labels]
-    L --&gt; C[Comments]
-</code></pre>
-<h2>Key Terms</h2>
-<ul>
-<li><strong>issue</strong>: A reported problem or proposal.</li>
-<li><strong>label</strong>: A classification tag.</li>
-<li><strong>triage</strong>: The act of sorting issues.</li>
-<li><strong>repro</strong>: Reproduction steps.</li>
-<li><strong>assignee</strong>: The owner of the work.</li>
-</ul>
-<h2>Before/After</h2>
-<p><strong>Before</strong>: "I do not know what an issue is asking for."</p>
-<p><strong>After</strong>: "I follow title, body, labels, comments to build context."</p>
-<h2>Hands-on: Analyze an Issue</h2>
+<p>If you misread the issue, your pull request is likely to miss the point. When you start coding without reproducing the problem, it is easy to confuse symptoms with root cause. When you propose a fix without seeing the earlier decisions, you raise review cost for everyone involved.</p>
+<p>The upside is equally real. Once you can read issues patiently, even a small contribution lands more smoothly. You know what the problem is, who already discussed it, and where the scope ends. That skill transfers directly to internal trackers at work.</p>
+<h2>Fix the Reading Order First</h2>
+<p><img alt="Fix the reading order first" src="https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png"></p>
+<p><em>The safest reading order from title to comments when you want the full issue context</em><br>
+That order matters because issue information accumulates in that order. If you read only the title, you see a symptom. If you jump straight into comments, you lose the framing. Move from broad context to detailed context and you will make far fewer mistakes.</p>
+<p>Once you adopt that view, an issue stops looking like a loose discussion post. You start noticing what information is missing, whose confirmation is still needed, and whether implementation is even the right next step.</p>
+<h2>Five Concepts Worth Knowing</h2>
+<p>An <em>issue</em> can be a bug, a feature request, a question, or a task. A <em>label</em> tells you how the project classifies the work by type, difficulty, or ownership. <em>Triage</em> is the process of sorting and prioritizing incoming work. A <em>repro</em> is the sequence that makes a bug happen again. An <em>assignee</em> shows whether someone has already taken responsibility.</p>
+<p>With just those five concepts, an issue becomes easier to evaluate as a real engineering document instead of a fuzzy conversation.</p>
+<h2>How Your Mental Model Should Change</h2>
+<p>At first, issues often feel vague. Once you learn to read title, body, labels, and comments in order, the decision becomes clearer: not “What is this project talking about?” but “Can I safely contribute here?”</p>
+<p>That shift matters because contribution quality often fails before the code even starts.</p>
+<h2>Hands-on: Analyze an Issue Before You Touch the Code</h2>
 <p><strong>Step 1 — Read the Title</strong></p>
+<p>The title is the shortest summary. First decide whether this is a bug, a feature request, or an environment-specific problem.</p>
 <pre><code class="language-text">[Bug] login fails on Safari 15
 </code></pre>
 <p><strong>Step 2 — Inspect Labels</strong></p>
+<p>Labels tell you how the project itself classifies the issue. For beginners, they can be a stronger hint than the prose.</p>
 <pre><code class="language-text">labels: bug, good first issue, help wanted
 </code></pre>
 <p><strong>Step 3 — Verify Repro Steps</strong></p>
+<p>For bug reports, reproducibility matters most. If the bug cannot be reproduced, the fix direction will stay blurry.</p>
 <pre><code class="language-markdown">1. open https://example.com/login
 2. enter valid credentials
 3. click submit
@@ -109,54 +100,54 @@ expected: dashboard
 actual: 500 error
 </code></pre>
 <p><strong>Step 4 — Follow Comments</strong></p>
+<p>Comments often tell you whether maintainers already requested more information, rejected one solution, or linked a related pull request.</p>
 <pre><code class="language-text">maintainer: can you share browser version?
 reporter: Safari 15.1 on macOS 12
 </code></pre>
 <p><strong>Step 5 — Decide Whether to Contribute</strong></p>
+<p>Even if <code>good first issue</code> is present, an assignee or missing reproduction can still make the issue a bad first choice.</p>
 <pre><code class="language-text">- label has good first issue ✓
 - repro reproducible ✓
 - no assignee ✓
 → attempt the contribution
 </code></pre>
-<h2>What to Notice in This Code</h2>
-<ul>
-<li>The title is a summary.</li>
-<li>Labels carry context.</li>
-<li>Comments record agreement.</li>
-</ul>
+<h2>What to Notice in This Walkthrough</h2>
+<p>The title compresses the symptom. Labels expose the project's internal classification system. Reproduction steps make the bug discussable. Comments preserve decisions that already happened.</p>
+<p>Reading an issue well is not just scanning text. It is checking whether the problem statement is strong enough that you will not start from a false assumption.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Opening a PR after reading only the title.</strong></li>
-<li><strong>Skipping reproduction steps.</strong></li>
-<li><strong>Working on an issue that has an assignee.</strong></li>
-<li><strong>Ignoring labels.</strong></li>
-<li><strong>Missing decisions buried in comments.</strong></li>
+<li>Opening a pull request after reading only the title.</li>
+<li>Skipping the reproduction steps.</li>
+<li>Taking an issue that already has an assignee without checking.</li>
+<li>Ignoring the label system and misjudging difficulty.</li>
+<li>Missing decisions buried in the comment thread.</li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>Internal trackers also run a triage rotation to prioritize issues weekly.</p>
+<p>Internal issue trackers work the same way. Titles summarize. Bodies frame the problem. Comments record decisions. That is why reading open source issues carefully turns into better triage instincts at work.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li>An issue is an agreement.</li>
-<li>A label is a protocol.</li>
-<li>Repro is evidence.</li>
-<li>An assignee is responsibility.</li>
-<li>Comments are history.</li>
+<li>An issue is a shared problem statement.</li>
+<li>Reproduction is evidence, not optional detail.</li>
+<li>Labels are part of the protocol.</li>
+<li>Comments are decision history.</li>
+<li>Scope clarity is often more valuable than coding speed.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] Title read.</li>
-<li>[ ] Repro confirmed.</li>
-<li>[ ] Labels checked.</li>
-<li>[ ] Assignee checked.</li>
+<li>[ ] I read the title and the full body.</li>
+<li>[ ] I checked the reproduction steps or tried them myself.</li>
+<li>[ ] I checked labels and assignee state.</li>
+<li>[ ] I scanned comments for already-settled decisions.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>One line: meaning of the <em>good first issue</em> label.</li>
-<li>One line: define triage.</li>
-<li>One line: the risk of an issue with no repro.</li>
+<li>Explain the meaning of <code>good first issue</code> in one sentence.</li>
+<li>Define triage in one sentence.</li>
+<li>Explain the risk of a bug report with no reproduction steps.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post covers <em>Creating Pull Requests</em>.</p>
+<p>In this post, we established a reliable order for reading issues and a better way to treat them: not as loose posts, but as shared engineering records. Once you read issues this way, you make fewer false starts and pick better contribution entry points.</p>
+<p>Next, we will turn that context into a pull request. The next step is learning how to package a small change so maintainers can actually review it cleanly.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/01-what-is-open-source.md">What Is Open Source</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/open-source-101/en/02-understanding-licenses.md">Understanding Licenses</a></li>
@@ -175,6 +166,7 @@ reporter: Safari 15.1 on macOS 12
 <li><a href="https://github.blog/2020-01-22-how-we-built-good-first-issues/">good first issue</a></li>
 <li><a href="https://opensource.guide/best-practices/">Triage guide</a></li>
 <li><a href="https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests">Issue templates</a></li>
+<li><a href="https://github.com/github/issue-labeler">github/issue-labeler</a></li>
 </ul>
 <p class="tags-line">Tags: OpenSource, Issues, GitHub, Triage, Beginner</p>
 </body>
