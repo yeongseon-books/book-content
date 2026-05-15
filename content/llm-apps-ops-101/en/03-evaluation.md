@@ -14,21 +14,24 @@ tags:
 - Observability
 - Python
 - LLM
-last_reviewed: '2026-05-01'
-seo_description: The first useful evaluation layer is not a perfect semantic judge.
-  It is a cheap filter that catches obviously bad answers quickly and consistently.
+last_reviewed: '2026-05-14'
+seo_description: The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 ---
 
 # Evaluating LLM output quality
 
-As traffic grows, nobody can read every model response by hand. Early in an ops pipeline, the pragmatic move is to catch obvious failures cheaply and consistently before reaching for heavier evaluation machinery.
+As traffic grows, nobody can read every model response by hand.
 
 This is the third post in the LLM Apps Ops 101 series. Here, we will build a minimal quality gate around length, keyword coverage, and format checks.
 
+Early in an ops pipeline, the pragmatic move is not to build a brilliant judge. It is to fail obvious bad output cheaply, consistently, and with enough detail to act on it.
+
 ## Questions this post answers
+
 - How do you automate max-length checks for model output?
 - When does keyword coverage become a useful quality gate?
 - How far should format validation go before you add schema validation?
+- What should a batch evaluation report include so failures are actionable?
 
 > The first useful evaluation layer is not a perfect semantic judge. It is a cheap filter that catches obviously bad answers quickly and consistently.
 
@@ -36,10 +39,12 @@ This is the third post in the LLM Apps Ops 101 series. Here, we will build a min
 ![LLM output quality evaluation pipeline](../../../assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
 
 *LLM output quality evaluation pipeline*
+
 ## Why this layer matters
 ![Rule checks catch obvious failures first](../../../assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)
 
 *Rule checks catch obvious failures first*
+
 Before adding complex judges, build a rule layer that catches obviously bad output cheaply and consistently.
 
 At scale, nobody reads every answer. A practical pipeline starts by blocking machine-detectable failures: malformed JSON, missing keywords, and answers that are far too short or too long.
@@ -132,6 +137,97 @@ if __name__ == "__main__":
 - Returning `missing_keywords` makes failures actionable instead of mysterious.
 - Length thresholds should reflect the product, not an abstract best practice.
 
+## What changes when you add JSON Schema
+
+If you want format validation to survive real team usage, do not stop at “the keys exist.” Add schema validation so the response contract becomes explicit.
+
+```python
+from jsonschema import ValidationError, validate
+
+ANSWER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "answer": {"type": "string", "minLength": 60, "maxLength": 280},
+        "keywords": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+        },
+    },
+    "required": ["answer", "keywords"],
+    "additionalProperties": False,
+}
+
+def validate_schema(payload: dict) -> tuple[bool, str | None]:
+    try:
+        validate(instance=payload, schema=ANSWER_SCHEMA)
+        return True, None
+    except ValidationError as exc:
+        return False, exc.message
+```
+
+This is the difference between “the model usually behaves” and “the downstream pipeline can trust the contract.” Schema drift is a quiet way to break batch jobs, dashboards, and storage.
+
+## Connect it to a batch report
+
+Operations work is rarely about one answer. You want to compare prompt versions, model versions, and release candidates across a stable case set.
+
+```python
+TEST_CASES = [
+    {"topic": "Python's GIL", "expected_keywords": ["CPython", "thread", "lock"]},
+    {"topic": "asyncio.gather", "expected_keywords": ["coroutine", "concurrent", "await"]},
+]
+
+def run_batch(client: Groq) -> list[dict]:
+    batch_results = []
+    for case in TEST_CASES:
+        raw = ask_for_json(client, case["topic"])
+        result = evaluate(raw, case["expected_keywords"])
+        batch_results.append(
+            {
+                "topic": case["topic"],
+                "passed": result.passed,
+                "missing_keywords": result.missing_keywords,
+                "answer_length": result.answer_length,
+            }
+        )
+    return batch_results
+
+print(json.dumps(run_batch(client), indent=2, ensure_ascii=False))
+```
+
+**Expected output:**
+
+```text
+[
+  {
+    "topic": "Python's GIL",
+    "passed": true,
+    "missing_keywords": [],
+    "answer_length": 148
+  },
+  {
+    "topic": "asyncio.gather",
+    "passed": false,
+    "missing_keywords": ["await"],
+    "answer_length": 81
+  }
+]
+```
+
+That result is useful because the failure is replayable. The second case did not just “score badly.” It missed `await`, which points you directly toward prompt design, model choice, or task phrasing.
+
+## What comes after the rule layer
+
+In practice, the sequence usually looks like this:
+
+1. **Format checks** keep the pipeline stable.
+2. **Length and keyword checks** catch obvious failures cheaply.
+3. **Small batch reports** detect regressions across releases.
+4. **Human review or LLM-as-judge** is reserved for ambiguous cases.
+
+The point is cost control as much as quality control. Cheap gates should protect expensive ones.
+
 ## Where engineers get confused
 ![Rule checks layer before judge models](../../../assets/llm-apps-ops-101/03/03-03-where-engineers-get-confused.en.png)
 
@@ -139,15 +235,34 @@ if __name__ == "__main__":
 - Passing format checks does not mean the answer is good. Failing format checks usually means the answer is unusable.
 - Keyword checks work best in domains with explicit terminology, not creative tasks.
 - Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.
+- If length thresholds are too rigid, they can reject useful answers for the wrong reason.
+
+## When failures rise, narrow them this way
+
+```bash
+# 1) Pull only failed cases from the latest run
+python3 -m scripts.eval_report --only-failed
+
+# 2) Group failures by reason
+python3 -m scripts.eval_report --group-by reason
+
+# 3) Compare two prompt versions
+python3 -m scripts.eval_report --compare prompt_v12 prompt_v13
+```
+
+The core questions stay simple. Did failures rise because of format, because of length, or because one keyword family keeps disappearing?
 
 ## Checklist
 - [ ] Force JSON-only output
 - [ ] Define numeric length thresholds
-- [ ] Set expected_keywords per test case
-- [ ] Log missing keywords on failure
+- [ ] Set `expected_keywords` per test case
+- [ ] Log missing keywords and failure reasons
+- [ ] Store batch results with prompt and model versions
 
 ## Summary
 Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look.
+
+The next layer is not always a smarter judge. Often it is better reporting, better test cases, and better comparison discipline. In the next post, we will connect this quality layer to the security layer, where even well-formed output can still be operationally unsafe.
 
 <!-- toc:begin -->
 ## In this series
@@ -165,8 +280,14 @@ Evaluation becomes operationally useful when it fails fast on obvious mistakes b
 
 ## References
 
-- [Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs)
+### Official Docs
+
+- [OpenAI Structured Outputs guide](https://platform.openai.com/docs/guides/structured-outputs)
 - [JSON Schema](https://json-schema.org/)
+
+### Verification-friendly resources
+
 - [G-Eval paper](https://arxiv.org/abs/2303.16634)
+- [Promptfoo docs](https://www.promptfoo.dev/docs/)
 
 Tags: LLMOps, Observability, Python, LLM
