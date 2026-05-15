@@ -84,12 +84,14 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM decides whether to use tools
 )
 ```
+
+이런 예제에서는 `gpt-4.1`처럼 현재 tool calling을 지원하는 모델을 쓰는 편이 안전합니다. `gpt-4`는 legacy 맥락을 명시적으로 설명할 때만 남겨 두는 것이 좋습니다.
 
 첫 단계는 도구 정의를 모델에 보여 주는 것입니다. 이때 이름, 설명, 파라미터 스키마가 곧 모델이 보는 전체 인터페이스입니다. 설명이 약하면 라우팅이 흔들리고, 타입이 약하면 인자 품질이 흔들립니다.
 
@@ -148,7 +150,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4.1",
     messages=messages
 )
 
@@ -177,7 +179,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=messages,
             tools=tools,
             tool_choice="auto"

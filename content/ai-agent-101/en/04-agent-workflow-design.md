@@ -73,7 +73,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -142,7 +142,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": plan_prompt}]
     )
     
@@ -177,7 +177,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
     
     final_response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": summary_prompt}]
     )
     
@@ -243,7 +243,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         """
         
         reflection_response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": reflection_prompt}]
         )
         
@@ -309,7 +309,7 @@ def decompose_task_topdown(task: str) -> List[Dict[str, Any]]:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -355,7 +355,7 @@ def decompose_task_bottomup(task: str, available_tools: List[str]) -> List[str]:
     """
     
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4.1",
         messages=[{"role": "user", "content": prompt}]
     )
     
@@ -437,7 +437,7 @@ def dynamic_decomposition(task: str, initial_context: Dict) -> str:
         """
         
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[{"role": "user", "content": next_step_prompt}]
         )
         
