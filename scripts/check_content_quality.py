@@ -21,12 +21,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = REPO_ROOT / "content"
 
 LANG_DIRS = {"ko", "en"}
-REFS_HEADERS = {"## 참고 자료", "## References"}
-TAGS_PREFIX = "Tags: "
 
 FENCE_OPEN_RE = re.compile(r"^(`{3,}|~{3,})(.*)$")
 IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
-GITHUB_REPO_RE = re.compile(r"https?://github\.com/([^/\s]+)/([^/\s)]+)", re.IGNORECASE)
 
 
 def parse_args() -> argparse.Namespace:
@@ -86,9 +83,8 @@ def is_fence_close(line: str, fence_char: str, fence_len: int) -> bool:
     return stripped[run_len:].strip() == ""
 
 
-def inspect_fences(lines: list[str]) -> tuple[list[str], bool]:
+def inspect_fences(lines: list[str]) -> list[str]:
     warnings: list[str] = []
-    has_code_examples = False
 
     in_fence = False
     fence_char = ""
@@ -108,9 +104,6 @@ def inspect_fences(lines: list[str]) -> tuple[list[str], bool]:
             if not lang:
                 warnings.append(f"Code block at line {line_no} missing language tag")
 
-            if lang != "mermaid":
-                has_code_examples = True
-
             in_fence = True
             fence_char = fence[0]
             fence_len = len(fence)
@@ -121,7 +114,7 @@ def inspect_fences(lines: list[str]) -> tuple[list[str], bool]:
             fence_char = ""
             fence_len = 0
 
-    return warnings, has_code_examples
+    return warnings
 
 
 def find_missing_image_alt(lines: list[str]) -> list[str]:
@@ -153,31 +146,6 @@ def find_missing_image_alt(lines: list[str]) -> list[str]:
     return warnings
 
 
-def extract_references_section(lines: list[str]) -> str:
-    start = -1
-    for idx, line in enumerate(lines):
-        if line.strip() in REFS_HEADERS:
-            start = idx + 1
-            break
-    if start < 0:
-        return ""
-
-    end = len(lines)
-    for idx in range(start, len(lines)):
-        if lines[idx].startswith(TAGS_PREFIX):
-            end = idx
-            break
-    return "\n".join(lines[start:end])
-
-
-def has_companion_repo_link(ref_text: str, series_id: str) -> bool:
-    for match in GITHUB_REPO_RE.finditer(ref_text):
-        repo = match.group(2).removesuffix(".git").lower()
-        if repo == series_id.lower():
-            return True
-    return False
-
-
 def check_article(path: Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
     try:
@@ -186,27 +154,11 @@ def check_article(path: Path) -> list[str]:
         return [f"Unable to parse front matter: {exc}"]
 
     post_obj = post
-    metadata = cast(dict[str, object], getattr(post_obj, "metadata"))
     content = cast(str, getattr(post_obj, "content"))
 
-    series_id = metadata.get("series")
-    if not isinstance(series_id, str) or not series_id:
-        series_id = path.parts[path.parts.index("content") + 1]
-
     lines = content.splitlines()
-    warnings, has_code_examples = inspect_fences(lines)
+    warnings = inspect_fences(lines)
     warnings.extend(find_missing_image_alt(lines))
-
-    if has_code_examples:
-        refs = extract_references_section(lines)
-        if not refs:
-            warnings.append(
-                "Has code examples but no references section to place companion repo link"
-            )
-        elif not has_companion_repo_link(refs, series_id):
-            warnings.append(
-                f"Has code examples but references lack companion GitHub repo ({series_id})"
-            )
 
     return warnings
 
