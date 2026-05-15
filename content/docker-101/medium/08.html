@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Running with a Database</h1>
-<p>This is post 8 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you run your containerized <em>Python app</em> together with <em>PostgreSQL</em> properly?</p>
-<blockquote>
-<p><em>The heart of a DB container is the </em>three-step rhythm<em> of </em>persistence, readiness, and migrations<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The app-database boundary is where container demos turn into real systems. A web container can start successfully while the database is still warming up, migrations can lag behind the runtime schema, and seed data can quietly stop being repeatable once several environments exist.</p>
+<p>That is why a dependable database setup has a rhythm: persist the data, wait for honest readiness, then apply migrations in a controlled place before the application begins serving traffic.</p>
+<p>This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Running <em>PostgreSQL with Compose</em></li>
@@ -80,11 +71,8 @@
 <p><em>The app-DB seam is the </em>most common incident site<em> and the </em>biggest automation opportunity<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Compose[&quot;compose.yaml&quot;] --&gt; Db[&quot;postgres + healthcheck&quot;]
-    Db --&gt;|service_healthy| Mig[&quot;alembic upgrade head&quot;]
-    Mig --&gt; Web[&quot;fastapi&quot;]
-</code></pre>
+<p><img alt="Database readiness gating migrations before the web application starts serving traffic" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>PostgreSQL becomes healthy first, migrations run once, and only then does the web app start against the expected schema</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Migration</strong>: schema <em>versioning</em>.</li>
@@ -154,6 +142,16 @@ curl http://localhost:8000/users
 <p><strong>Step 5 — Backup</strong></p>
 <pre><code class="language-bash">docker compose exec db pg_dump -U postgres app &gt; app.sql
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li><code>docker compose exec db psql -U postgres -d app -c "\dt"</code> should show the migrated tables, and <code>curl http://localhost:8000/users</code> should prove that the web service can read through the database boundary.</li>
+<li>Run the seed twice and confirm that records do not duplicate; that is the operational test for idempotency.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If the web service crashes on startup, inspect <code>docker compose logs migrate</code> before the web logs; schema drift is often the first failure.</li>
+<li>If backups look empty, verify that data actually landed in the named volume before debugging <code>pg_dump</code> flags.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>condition: service_healthy</em> guarantees <em>real</em> readiness.</li>
@@ -206,11 +204,16 @@ curl http://localhost:8000/users
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://hub.docker.com/_/postgres">PostgreSQL official image</a></li>
 <li><a href="https://docs.docker.com/compose/compose-file/05-services/#depends_on">Compose - service_completed_successfully</a></li>
 <li><a href="https://alembic.sqlalchemy.org/">Alembic documentation</a></li>
 <li><a href="https://www.postgresql.org/docs/current/app-pg-isready.html">pg_isready</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/reference/cli/docker/compose/run/">docker compose run reference</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Postgres, Compose, Migration, Healthcheck</p>
 </body>

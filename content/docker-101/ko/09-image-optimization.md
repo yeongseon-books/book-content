@@ -17,17 +17,16 @@ tags:
   - Alpine
   - Distroless
 seo_description: 멀티스테이지와 BuildKit으로 이미지 크기와 빌드 시간을 줄이는 방법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Image 최적화
-
-이 글은 Docker 101 시리즈의 아홉 번째 글입니다.
 
 같은 애플리케이션인데 어떤 이미지는 1GB가 넘고, 어떤 이미지는 100MB도 되지 않는 경우가 있습니다. 처음에는 단순히 "작을수록 좋다" 정도로 이해하기 쉽지만, 실제로는 배포 시간, CI 속도, 보안 표면, 디버깅 방식까지 함께 달라집니다. 이미지 크기는 미적 취향이 아니라 운영 지표에 가깝습니다.
 
 좋은 최적화는 한 가지 트릭으로 끝나지 않습니다. 베이스 이미지 선택, 멀티스테이지 빌드, 캐시 전략이 함께 맞물려야 효과가 큽니다. 이 글에서는 그 세 가지를 한 번에 묶어 보겠습니다.
 
+이 글은 Docker 101 시리즈의 9번째 글입니다. 여기서는 이미지 크기와 빌드 시간이 왜 팀 속도와 보안에 직접 연결되는지 보고, 멀티스테이지 빌드·BuildKit 캐시·베이스 이미지 선택을 함께 설계하는 방법을 살펴봅니다.
 ## 이 글에서 다룰 문제
 
 - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?
@@ -46,11 +45,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Builder["builder stage (deps + build)"] --> Final["final stage (runtime only)"]
-    Final --> Slim["80MB image"]
-```
+![builder 단계와 runtime 단계를 분리해 가벼운 최종 이미지를 만드는 멀티스테이지 흐름](../../../assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
+
+*빌드 도구는 builder 단계에 남기고 runtime 단계에는 실행에 필요한 산출물만 남기는 멀티스테이지 전략*
 
 ## 핵심 용어
 
@@ -134,6 +131,16 @@ docker history myapp:opt
 
 최적화는 추측보다 측정이 중요합니다. `docker history`와 `dive`를 함께 보면 어느 레이어가 비대해졌는지, 어떤 명령이 비용을 키우는지 더 분명하게 보입니다.
 
+### 실행 뒤 바로 확인할 것
+
+- `DOCKER_BUILDKIT=1 docker build`를 두 번 실행했을 때 두 번째 빌드에서 캐시 단계가 눈에 띄게 빨라져야 합니다.
+- `docker images myapp`와 `docker history myapp:opt`를 함께 보고 builder 도구가 runtime 이미지에 남지 않았는지 확인합니다.
+
+### 잘 안 될 때 먼저 볼 것
+
+- alpine이나 distroless에서 런타임 오류가 나면 이미지 크기보다 먼저 glibc/musl 호환성과 셸 부재를 점검합니다.
+- 최적화 후에도 이미지가 크게 줄지 않으면 `.dockerignore`와 멀티스테이지 복사 범위가 과도하지 않은지 봅니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - wheels stage를 따로 두어 런타임에는 컴파일 결과물만 남겼습니다.
@@ -202,9 +209,15 @@ docker history myapp:opt
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 - [BuildKit cache mounts](https://docs.docker.com/build/cache/optimize/)
 - [Distroless images](https://github.com/GoogleContainerTools/distroless)
 - [dive - layer analysis](https://github.com/wagoodman/dive)
+
+### 검증과 트러블슈팅
+
+- [Optimize cache usage in builds](https://docs.docker.com/build/cache/optimize/)
 
 Tags: Docker, Multistage, BuildKit, Alpine, Distroless

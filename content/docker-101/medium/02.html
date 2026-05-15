@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Images and Containers</h1>
-<p>This is post 2 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Images are immutable; containers change</em> — what does that <em>actually</em> mean in practice?</p>
-<blockquote>
-<p><em>An image is a </em>class<em>; a container is an </em>instance<em>. Keeping them separate makes debugging tractable.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>The first serious confusion in Docker usually appears between images and containers. Teams pull an image, change files inside a running container, restart it, and then wonder why the change disappeared. The failure is not mysterious; it comes from mixing up a deployable artifact with a disposable runtime instance.</p>
+<p>Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.</p>
+<p>This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>lifecycle</em> of <em>images</em> and <em>containers</em></li>
@@ -80,12 +71,8 @@
 <p><em>Half of "non-reproducible" bugs come from </em>misunderstanding container state<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Image[&quot;Image (immutable)&quot;] --&gt; Run[&quot;docker run&quot;]
-    Run --&gt; Container[&quot;Container (mutable)&quot;]
-    Container --&gt; Stop[&quot;Stopped&quot;]
-    Stop --&gt; Rm[&quot;Removed&quot;]
-</code></pre>
+<p><img alt="Immutable image flowing into a mutable container lifecycle from run to stop to removal" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>An immutable image becomes a mutable container instance that can be created, run, stopped, and removed without changing the source artifact</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Layer</strong>: a <em>read-only filesystem slice</em> inside an image.</li>
@@ -124,6 +111,16 @@ docker exec web2 ls /tmp/hello   # No such file
 <pre><code class="language-bash">docker image prune -f          # remove dangling
 docker image rm nginx:1.27
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li><code>docker history nginx:1.27</code> should show a list of image layers, and <code>docker exec web2 ls /tmp/hello</code> should fail because the file lived only in the first container instance.</li>
+<li>Those two observations together confirm the difference between image state and container state.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If <code>docker exec -it web bash</code> fails, the image may not include <code>bash</code>; retry with <code>sh</code>.</li>
+<li>If image cleanup fails, check <code>docker ps -a</code> first and make sure no running container still references the image.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>docker history</code> shows the <em>commands behind each layer</em>.</li>
@@ -176,11 +173,16 @@ docker image rm nginx:1.27
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/engine/reference/commandline/image/">Docker images</a></li>
 <li><a href="https://docs.docker.com/engine/reference/commandline/container/">Docker container lifecycle</a></li>
 <li><a href="https://docs.docker.com/storage/storagedriver/">Storage drivers and layers</a></li>
 <li><a href="https://docs.docker.com/engine/reference/commandline/pull/#pull-an-image-by-digest-immutable-identifier">Image digests</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/engine/reference/commandline/exec/">docker exec reference</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Image, Container, Layer, Lifecycle</p>
 </body>

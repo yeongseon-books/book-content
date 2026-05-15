@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Volumes and Networks</h1>
-<p>This is post 4 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you keep <em>data alive across restarts</em> and let containers <em>talk to each other</em>?</p>
-<blockquote>
-<p><em>Volumes decide </em>data lifetime<em>; networks decide </em>paths between containers<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Running one container is the easy part. The real operational questions begin as soon as you need data to survive a restart and one container to reach another container without guessing IP addresses. Those two requirements show up almost immediately in real applications.</p>
+<p>Docker gives you separate tools for the two problems on purpose. Volumes control data lifetime. Networks control communication paths. Keeping those concerns separate is what prevents “the database disappeared” and “the app cannot find the database” from becoming routine incidents.</p>
+<p>This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>volume / bind mount / tmpfs</em></li>
@@ -80,12 +71,8 @@
 <p><em>The moment </em>state leaks<em> into a stateless container, an incident begins.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Host[&quot;Host disk&quot;] --&gt;|bind mount| C1[&quot;Container A&quot;]
-    Vol[&quot;Docker volume&quot;] --&gt;|named| C2[&quot;Container B&quot;]
-    C1 --- Net[&quot;bridge network&quot;]
-    C2 --- Net
-</code></pre>
+<p><img alt="Host storage, Docker volumes, and a bridge network connecting containers for data and service discovery" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Persistent data lives outside the container while a bridge network provides name-based communication between services</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Volume</strong>: a <em>persistent store</em> managed by Docker.</li>
@@ -122,6 +109,16 @@ docker exec api curl http://db:5432
   -v &quot;$PWD&quot;:/backup \
   alpine tar czf /backup/data.tgz -C /data .
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li><code>docker volume inspect app-data</code> should show a named volume that exists independently of any one container, and <code>docker exec api ping -c 1 db</code> should prove name-based resolution on the bridge network.</li>
+<li>If you ran the backup step, confirm that <code>data.tgz</code> was actually created in the working directory.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If the app still tries to reach the database on <code>localhost</code>, inspect the injected <code>DB_HOST</code> value before troubleshooting Docker networking.</li>
+<li>Permission failures on a bind mount usually come from a mismatch between host ownership and the UID inside the container.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A <em>named volume</em> lives <em>independent of containers</em>.</li>
@@ -174,11 +171,16 @@ docker exec api curl http://db:5432
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/storage/volumes/">Volumes</a></li>
 <li><a href="https://docs.docker.com/storage/bind-mounts/">Bind mounts</a></li>
 <li><a href="https://docs.docker.com/network/">Networking overview</a></li>
 <li><a href="https://docs.docker.com/network/bridge/">Use bridge networks</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/reference/cli/docker/volume/inspect/">docker volume inspect reference</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Volume, Network, BindMount, Bridge</p>
 </body>

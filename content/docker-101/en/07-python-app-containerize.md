@@ -2,7 +2,7 @@
 series: docker-101
 episode: 7
 title: Containerizing a Python App
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Uvicorn
   - PID1
 seo_description: Containerize a FastAPI app to production grade with Dockerfile, healthcheck, non-root user, and proper PID 1 signal handling.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Containerizing a Python App
 
-This is post 7 in the Docker 101 series.
+A Python app running inside a container is not the same thing as a production-ready Python container. The difference shows up when the process receives SIGTERM during deployment, when healthchecks ask whether the app is really ready, and when a compromised process should not be running as root.
 
-> Docker 101 series (7/10)
+Those details are easy to skip because the app still starts without them. They only become visible when a deployment drains live traffic, a container hangs on shutdown, or an orchestrator keeps restarting something that looked healthy on a laptop.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
 
-**Core question**: What do you actually have to handle to containerize a *FastAPI app* at *production grade*?
-
-> *Python containerization becomes *real* the moment you handle *PID 1, signals, healthcheck, and non-root*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Containerizing *FastAPI + uvicorn*
 - *Signal handling at PID 1* (SIGTERM)
@@ -50,12 +44,9 @@ This is post 7 in the Docker 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Build["Dockerfile (slim, deps cache)"] --> Run["uvicorn app:app"]
-    Run --> HC["healthcheck"]
-    HC --> Sig["graceful SIGTERM"]
-```
+![Python container flow from Dockerfile build to uvicorn runtime, healthcheck, and graceful SIGTERM handling](../../../assets/docker-101/07/07-01-concept-at-a-glance.en.png)
+
+*A production-grade Python container includes PID 1 handling, an honest healthcheck, and graceful shutdown behavior*
 
 ## Key Terms
 
@@ -140,6 +131,16 @@ docker stop api    # sends SIGTERM, uvicorn drains in-flight requests
 docker logs api | tail
 ```
 
+### Verify right after you run it
+
+- `curl http://localhost:8000/healthz` should return `{"status":"ok"}`, and `docker stop api` should produce graceful shutdown logs rather than a forced termination pattern.
+- It is also worth checking `docker exec api id` once to confirm the process is not running as root.
+
+### If it does not work, check this first
+
+- If the container exits immediately, confirm that `tini` is actually installed in the image and not just referenced in `ENTRYPOINT`.
+- If the healthcheck keeps failing, verify that uvicorn is bound to `0.0.0.0:8000` and that `/healthz` exists exactly as declared.
+
 ## What to Notice in This Code
 
 - *Deps -> code* ordering for *cache efficiency*.
@@ -198,9 +199,15 @@ The real difficulty of Python containers is *signals and healthcheck*. Next, we 
 
 ## References
 
+### Official docs
+
 - [FastAPI in containers](https://fastapi.tiangolo.com/deployment/docker/)
 - [Uvicorn deployment](https://www.uvicorn.org/deployment/)
 - [tini - a tiny init for containers](https://github.com/krallin/tini)
 - [Dockerfile HEALTHCHECK](https://docs.docker.com/engine/reference/builder/#healthcheck)
+
+### Verification and troubleshooting
+
+- [Docker stop signal behavior](https://docs.docker.com/reference/cli/docker/container/stop/)
 
 Tags: Docker, Python, FastAPI, Uvicorn, PID1

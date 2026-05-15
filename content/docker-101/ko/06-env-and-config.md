@@ -17,17 +17,16 @@ tags:
   - Secret
   - 12Factor
 seo_description: 하나의 이미지에 환경별 설정과 비밀값을 안전하게 주입하는 원칙을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 환경변수와 설정
-
-이 글은 Docker 101 시리즈의 여섯 번째 글입니다.
 
 컨테이너를 만들기 시작하면 곧 이런 요구가 생깁니다. 개발 환경에서는 디버그 로그를 켜고 싶고, 스테이징과 운영에서는 다른 데이터베이스 주소를 써야 하며, 비밀번호와 토큰은 코드나 이미지 안에 넣고 싶지 않습니다. 그런데 이때 환경마다 다른 이미지를 따로 빌드하기 시작하면 재현성은 금방 무너집니다.
 
 좋은 컨테이너 운영의 핵심은 이미지와 환경을 분리하는 것입니다. 이미지는 불변 산출물로 유지하고, 환경별 차이는 런타임 설정으로 주입해야 합니다. 이 원칙이 바로 Twelve-Factor의 config 원칙과도 맞닿아 있습니다.
 
+이 글은 Docker 101 시리즈의 6번째 글입니다. 여기서는 하나의 이미지를 여러 환경에서 재사용하려면 설정과 secret을 어떻게 분리해야 하는지, `ENV`와 `ARG`를 어디까지 써야 하는지, 런타임 검증은 어떻게 붙여야 하는지 정리합니다.
 ## 이 글에서 다룰 문제
 
 - 하나의 이미지로 여러 환경을 어떻게 지원할 수 있을까요?
@@ -46,12 +45,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Image["app:1.0 (immutable)"] --> Dev["dev env vars"]
-    Image --> Stg["staging env vars"]
-    Image --> Prd["prod env vars"]
-```
+![하나의 불변 이미지에 환경별 설정과 secret이 런타임에 주입되는 구조](../../../assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
+
+*같은 이미지를 유지한 채 dev·staging·prod가 서로 다른 환경변수와 secret만 주입하는 방식*
 
 ## 핵심 용어
 
@@ -130,6 +126,16 @@ envconsul -secret secret/app -- docker compose up -d
 
 이 단계가 실제 운영 품질을 가릅니다. secret을 Compose 파일이나 Dockerfile에 직접 넣지 않고, 외부 secret 제공자를 통해 런타임에 주입해야 노출 면적을 줄일 수 있습니다.
 
+### 실행 뒤 바로 확인할 것
+
+- `docker run --env-file .env.staging myapp:1.0`로 실행했을 때 로그나 진단 엔드포인트에서 `LOG_LEVEL`, `DB_URL` 같은 값이 의도한 환경으로 들어왔는지 확인합니다.
+- 필수 변수를 비워 실행해 보면 애플리케이션이 조용히 진행하지 않고 빠르게 실패해야 합니다.
+
+### 잘 안 될 때 먼저 볼 것
+
+- 값이 비어 들어가면 `${VAR:-default}` 기본값 문법보다 `.env` 파일 경로와 shell export 상태를 먼저 확인합니다.
+- secret이 이미지에 남았는지 의심되면 `docker history`와 Dockerfile의 `ENV` 사용 위치를 다시 봅니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `${VAR:-default}` 같은 기본값은 값 누락을 완화해 줍니다.
@@ -198,9 +204,15 @@ envconsul -secret secret/app -- docker compose up -d
 
 ## 참고 자료
 
+### 공식 문서
+
 - [The Twelve-Factor App - Config](https://12factor.net/config)
 - [Set environment variables in containers](https://docs.docker.com/engine/reference/commandline/run/#env)
 - [Compose - environment variables](https://docs.docker.com/compose/environment-variables/)
 - [Manage secrets with Docker](https://docs.docker.com/engine/swarm/secrets/)
+
+### 검증과 트러블슈팅
+
+- [Environment variables in Compose](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/)
 
 Tags: Docker, Config, EnvVar, Secret, 12Factor

@@ -2,7 +2,7 @@
 series: docker-101
 episode: 5
 title: Docker Compose
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - MultiContainer
   - Dev
 seo_description: Define and run multi-container environments from a single YAML file with Docker Compose, including healthchecks and profiles.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Docker Compose
 
-This is post 5 in the Docker 101 series.
+A few `docker run` commands are manageable when you have only one service. The moment you need a web app, a database, a cache, and maybe a worker, that command-line memory game stops scaling. Teams start depending on tribal knowledge instead of a reproducible environment definition.
 
-> Docker 101 series (5/10)
+Compose matters because it turns that memory into a checked-in declaration. Services, ports, volumes, healthchecks, and optional profiles become reviewable configuration instead of setup folklore.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
 
-**Core question**: How do you start many containers *reproducibly* and *all at once*?
-
-> *Compose codifies a *multi-container environment* into *one YAML file*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Defining *services / networks / volumes*
 - *depends_on* and healthchecks
@@ -50,15 +44,9 @@ New-hire setup finishes in *under five minutes*. The *README setup section* simp
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Compose["compose.yaml"] --> Web["web service"]
-    Compose --> Db["db service"]
-    Compose --> Cache["cache service"]
-    Web --> Net["app-net"]
-    Db --> Net
-    Cache --> Net
-```
+![One Compose file declaring web, database, and cache services on a shared network](../../../assets/docker-101/05/05-01-concept-at-a-glance.en.png)
+
+*Compose turns a multi-container environment into one reviewable declaration of services, networks, volumes, and health checks*
 
 ## Key Terms
 
@@ -144,6 +132,16 @@ docker compose down            # remove containers
 docker compose down -v         # also remove volumes
 ```
 
+### Verify right after you run it
+
+- In `docker compose ps`, the database should become `healthy` before the web service settles into its running state.
+- `docker compose logs -f web` should show the application starting without immediate database connection errors.
+
+### If it does not work, check this first
+
+- If the web container exits too early, verify that `depends_on` uses `condition: service_healthy` rather than plain start order.
+- If test data vanished after `down -v`, that is expected; make sure disposable and persistent data do not share the same volume strategy.
+
 ## What to Notice in This Code
 
 - *healthcheck + condition: service_healthy* waits for *real readiness*.
@@ -202,9 +200,15 @@ Compose is your team's *first piece of infrastructure as code*. Next, the patter
 
 ## References
 
+### Official docs
+
 - [Compose specification](https://docs.docker.com/compose/compose-file/)
 - [Overview of Compose](https://docs.docker.com/compose/)
 - [Compose profiles](https://docs.docker.com/compose/profiles/)
 - [Healthcheck in Compose](https://docs.docker.com/compose/compose-file/05-services/#healthcheck)
+
+### Verification and troubleshooting
+
+- [Compose startup order and dependency conditions](https://docs.docker.com/compose/how-tos/startup-order/)
 
 Tags: Docker, Compose, YAML, MultiContainer, Dev

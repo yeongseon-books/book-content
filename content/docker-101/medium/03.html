@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Writing a Dockerfile</h1>
-<p>This is post 3 in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: To make images <em>reproducible</em>, <em>which commands</em> go in <em>what order</em>?</p>
-<blockquote>
-<p><em>A Dockerfile is both a </em>build recipe<em> and </em>documentation<em>. The </em>order of instructions<em> drives both </em>cache efficiency<em> and </em>debugging difficulty<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A Dockerfile is easy to underestimate because it looks like a short text file with a few instructions. In practice, it decides whether your team gets fast, repeatable builds or slow, noisy rebuilds that waste CI time and hide security mistakes inside oversized images.</p>
+<p>The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.</p>
+<p>This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, <code>.dockerignore</code>, and non-root execution.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What <em>FROM / RUN / COPY / CMD</em> mean</li>
@@ -80,11 +71,8 @@
 <p><em>Slow builds are a </em>quiet cost<em>. At 50 builds a day, you lose </em>hundreds of hours per year<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Base[&quot;FROM python:3.12-slim&quot;] --&gt; Deps[&quot;COPY requirements + RUN pip install&quot;]
-    Deps --&gt; Code[&quot;COPY .&quot;]
-    Code --&gt; Cmd[&quot;CMD&quot;]
-</code></pre>
+<p><img alt="Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>A cache-friendly Dockerfile keeps low-change dependency steps above high-change application code</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>FROM</strong>: pick a <em>base image</em>.</li>
@@ -134,6 +122,16 @@ USER appuser
 docker run --rm myapp:1.0
 docker history myapp:1.0
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li>Rebuild after changing only application code. The dependency install step should be cached and complete quickly.</li>
+<li><code>docker history myapp:1.0</code> should make the dependency layer and the application layer clearly separate.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If cache misses happen on every build, make sure <code>COPY . .</code> is not placed above the requirements copy step.</li>
+<li>If <code>.env</code> or <code>.git</code> appears inside the image, review <code>.dockerignore</code> and the build-context path before anything else.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Requirements copied first</em> -&gt; the <em>deps layer caches</em>.</li>
@@ -186,11 +184,16 @@ docker history myapp:1.0
 <li>Production-Ready Docker (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile reference</a></li>
 <li><a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Best practices for writing Dockerfiles</a></li>
 <li><a href="https://docs.docker.com/engine/reference/builder/#dockerignore-file">Use a .dockerignore file</a></li>
 <li><a href="https://docs.docker.com/build/buildkit/">BuildKit</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/engine/reference/commandline/build/">docker build reference</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Dockerfile, Build, Layer, Cache</p>
 </body>

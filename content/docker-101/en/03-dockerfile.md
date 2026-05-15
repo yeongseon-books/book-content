@@ -2,7 +2,7 @@
 series: docker-101
 episode: 3
 title: Writing a Dockerfile
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,17 @@ tags:
   - Layer
   - Cache
 seo_description: FROM, RUN, COPY, and CMD plus layer-cache friendly ordering for fast, reproducible image builds with non-root execution.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Writing a Dockerfile
 
-This is post 3 in the Docker 101 series.
+A Dockerfile is easy to underestimate because it looks like a short text file with a few instructions. In practice, it decides whether your team gets fast, repeatable builds or slow, noisy rebuilds that waste CI time and hide security mistakes inside oversized images.
 
-> Docker 101 series (3/10)
+The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: To make images *reproducible*, *which commands* go in *what order*?
-
-> *A Dockerfile is both a *build recipe* and *documentation*. The *order of instructions* drives both *cache efficiency* and *debugging difficulty*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
+## What you will learn
 
 - What *FROM / RUN / COPY / CMD* mean
 - An *ordering strategy* for the *layer cache*
@@ -50,12 +43,9 @@ This is post 3 in the Docker 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Base["FROM python:3.12-slim"] --> Deps["COPY requirements + RUN pip install"]
-    Deps --> Code["COPY ."]
-    Code --> Cmd["CMD"]
-```
+![Dockerfile layer flow that stacks the base image, dependency layer, application code, and startup command](../../../assets/docker-101/03/03-01-concept-at-a-glance.en.png)
+
+*A cache-friendly Dockerfile keeps low-change dependency steps above high-change application code*
 
 ## Key Terms
 
@@ -125,6 +115,16 @@ docker run --rm myapp:1.0
 docker history myapp:1.0
 ```
 
+### Verify right after you run it
+
+- Rebuild after changing only application code. The dependency install step should be cached and complete quickly.
+- `docker history myapp:1.0` should make the dependency layer and the application layer clearly separate.
+
+### If it does not work, check this first
+
+- If cache misses happen on every build, make sure `COPY . .` is not placed above the requirements copy step.
+- If `.env` or `.git` appears inside the image, review `.dockerignore` and the build-context path before anything else.
+
 ## What to Notice in This Code
 
 - *Requirements copied first* -> the *deps layer caches*.
@@ -183,9 +183,15 @@ A good Dockerfile *saves your team time every day*. Next, *volumes and networks*
 
 ## References
 
+### Official docs
+
 - [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 - [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [Use a .dockerignore file](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
 - [BuildKit](https://docs.docker.com/build/buildkit/)
+
+### Verification and troubleshooting
+
+- [docker build reference](https://docs.docker.com/engine/reference/commandline/build/)
 
 Tags: Docker, Dockerfile, Build, Layer, Cache

@@ -17,17 +17,16 @@ tags:
   - Migration
   - Healthcheck
 seo_description: FastAPI와 PostgreSQL을 Compose로 함께 띄우는 운영 기본 구성을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 데이터베이스와 함께 실행하기
-
-이 글은 Docker 101 시리즈의 여덟 번째 글입니다.
 
 애플리케이션 컨테이너만 잘 만들었다고 해서 실제 서비스 구성이 끝난 것은 아닙니다. 대부분의 애플리케이션은 결국 데이터베이스와 함께 움직입니다. 문제는 여기서부터 훨씬 현실적이 됩니다. 앱이 먼저 떠 버리면 DB가 아직 준비되지 않아 실패하고, 스키마 변경이 자동화되지 않으면 배포마다 사람이 개입해야 하며, 시드 데이터가 중복으로 들어가면 환경이 점점 더 지저분해집니다.
 
 그래서 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 중요합니다. 데이터의 영속성, 준비 상태 확인, 그리고 마이그레이션 자동화입니다. 이 세 가지가 맞물려야 로컬 개발, CI, 운영 전환이 부드러워집니다.
 
+이 글은 Docker 101 시리즈의 8번째 글입니다. 여기서는 앱과 PostgreSQL을 함께 띄울 때 persistence·readiness·migration이라는 세 리듬을 어떻게 맞춰야 하는지, 그리고 migration과 seed를 어떤 순서로 검증해야 하는지 정리합니다.
 ## 이 글에서 다룰 문제
 
 - Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?
@@ -46,12 +45,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Compose["compose.yaml"] --> Db["postgres + healthcheck"]
-    Db -->|service_healthy| Mig["alembic upgrade head"]
-    Mig --> Web["fastapi"]
-```
+![데이터베이스 readiness 뒤 migration이 실행되고 그 다음 웹 앱이 시작되는 순서](../../../assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
+
+*PostgreSQL이 준비된 뒤 migration 컨테이너가 스키마를 맞추고 마지막에 앱이 올라오는 시작 순서*
 
 ## 핵심 용어
 
@@ -157,11 +153,21 @@ docker compose exec db pg_dump -U postgres app > app.sql
 
 영속성을 확보했다고 해서 끝이 아닙니다. 백업 명령이 문서화되어 있어야 사고 이후 복구 가능성까지 확보됩니다. volume만 믿는 것은 운영 기준으로는 부족합니다.
 
+### 실행 뒤 바로 확인할 것
+
+- `docker compose exec db psql -U postgres -d app -c "\dt"`에서 마이그레이션 결과 테이블이 보여야 하고, `curl http://localhost:8000/users`가 DB 기반 응답을 반환해야 합니다.
+- seed를 두 번 실행해도 레코드가 중복되지 않아야 같은 seed를 다시 실행해도 환경이 흔들리지 않습니다.
+
+### 잘 안 될 때 먼저 볼 것
+
+- web이 바로 죽으면 DB readiness보다 migration 성공 여부를 먼저 확인합니다. `docker compose logs migrate`가 가장 빠른 단서입니다.
+- `pg_dump` 백업이 비어 있으면 DB 이름이나 권한보다 먼저 실제 volume에 데이터가 쌓였는지 확인합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `condition: service_healthy`가 실제 준비 상태를 보장합니다.
 - `migrate`는 한 번만 실행되는 init container 역할을 합니다.
-- seed는 반드시 idempotent해야 합니다.
+- seed는 반드시 여러 번 실행해도 같은 상태를 유지해야 합니다.
 
 특히 migration을 web entrypoint에서 함께 돌리지 않는 점이 중요합니다. 웹 서버가 여러 개라면 같은 migration이 중복 실행될 수 있고, 실패 모드도 훨씬 복잡해집니다.
 
@@ -225,9 +231,15 @@ docker compose exec db pg_dump -U postgres app > app.sql
 
 ## 참고 자료
 
+### 공식 문서
+
 - [PostgreSQL official image](https://hub.docker.com/_/postgres)
 - [Compose - service_completed_successfully](https://docs.docker.com/compose/compose-file/05-services/#depends_on)
 - [Alembic documentation](https://alembic.sqlalchemy.org/)
 - [pg_isready](https://www.postgresql.org/docs/current/app-pg-isready.html)
+
+### 검증과 트러블슈팅
+
+- [docker compose run reference](https://docs.docker.com/reference/cli/docker/compose/run/)
 
 Tags: Docker, Postgres, Compose, Migration, Healthcheck

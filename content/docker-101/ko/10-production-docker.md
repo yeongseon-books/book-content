@@ -17,17 +17,16 @@ tags:
   - Logging
   - Capstone
 seo_description: 프로덕션용 Docker에서 태그, 서명, 보안, 로그, 메트릭의 기준을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 배포용 Docker 구성
-
-이 글은 Docker 101 시리즈의 마지막 글입니다.
 
 시리즈 내내 이미지를 만들고, 컨테이너를 실행하고, 데이터와 네트워크를 다루고, 설정과 최적화까지 살펴봤습니다. 그런데 프로덕션은 이 모든 요소가 한꺼번에 검증되는 장소입니다. 이미지 태그 정책이 느슨하면 무엇이 배포됐는지 모르게 되고, 로그가 컨테이너 안 파일로 남아 있으면 수집이 깨지며, 런타임 보안이 약하면 운영 전체가 불안정해집니다.
 
 즉, 프로덕션은 개별 기술 체크리스트의 합이 아니라 시스템입니다. 이미지를 어떻게 만들었는지, 어디에 저장하는지, 어떤 권한으로 실행하는지, 실패를 어떻게 관찰하는지가 동시에 맞물려야 합니다. 이 글은 그 마지막 기준선을 정리합니다.
 
+이 글은 Docker 101 시리즈의 마지막 글입니다. 여기서는 시리즈에서 만든 모든 구성 요소를 프로덕션 기준으로 묶어, 태그 정책·이미지 서명·런타임 보안·로그·메트릭을 어떤 순서로 점검해야 하는지 정리합니다.
 ## 이 글에서 다룰 문제
 
 - 프로덕션에서는 어떤 이미지 태그 정책을 가져가야 할까요?
@@ -46,13 +45,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    CI["build (multistage)"] --> Sign["sign + push registry"]
-    Sign --> Run["run (read-only, non-root)"]
-    Run --> Logs["json logs to stdout"]
-    Run --> Metrics["prometheus metrics"]
-```
+![빌드·서명·레지스트리 push 뒤 최소 권한 런타임과 로그·메트릭 수집으로 이어지는 프로덕션 흐름](../../../assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
+
+*이미지를 빌드하고 서명한 뒤 최소 권한으로 실행하고 표준 로그·메트릭 채널로 관측하는 프로덕션 운영 흐름*
 
 ## 핵심 용어
 
@@ -140,6 +135,16 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 프로덕션에서는 로그만으로는 부족합니다. 상태를 계속 관찰하려면 메트릭이 필요합니다. 특히 요청 수, 지연 시간, 오류율은 운영에서 가장 먼저 보게 되는 신호입니다.
 
+### 실행 뒤 바로 확인할 것
+
+- push 뒤에는 semver 태그와 sha 태그가 둘 다 레지스트리에 올라가 있어야 하고, 서명 검증 명령이 성공해야 합니다.
+- 런타임에서는 `/metrics` 엔드포인트가 열리고, 로그가 컨테이너 파일이 아니라 stdout으로 나오는지까지 확인합니다.
+
+### 잘 안 될 때 먼저 볼 것
+
+- `--read-only` 적용 뒤 앱이 실패하면 `/tmp` 같은 쓰기 경로를 tmpfs로 따로 열어 두었는지 먼저 확인합니다.
+- 배포 추적이 흐리면 태그보다 digest 고정과 실제 배포 매니페스트가 일치하는지부터 확인합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 이미지 서명은 공급망 신뢰를 추가합니다.
@@ -209,9 +214,15 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 ## 참고 자료
 
+### 공식 문서
+
 - [Docker security](https://docs.docker.com/engine/security/)
 - [Sigstore Cosign](https://docs.sigstore.dev/cosign/overview/)
 - [Read-only filesystem](https://docs.docker.com/engine/reference/run/#read-only)
 - [12-factor - logs](https://12factor.net/logs)
+
+### 검증과 트러블슈팅
+
+- [Image digests and immutable pulls](https://docs.docker.com/reference/cli/docker/image/pull/)
 
 Tags: Docker, Production, Security, Logging, Capstone

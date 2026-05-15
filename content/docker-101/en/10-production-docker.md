@@ -2,7 +2,7 @@
 series: docker-101
 episode: 10
 title: Production-Ready Docker
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Logging
   - Capstone
 seo_description: A capstone covering image tags, signed registries, runtime security, logging, and metrics for production-grade Docker deployments.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Production-Ready Docker
 
-This is the final post in the Docker 101 series.
+Production is where every shortcut from the earlier chapters becomes visible at once. A vague tag policy makes rollback harder, an oversized image carries extra attack surface, and a runtime that still writes logs to local files becomes painful the moment you need consistent collection.
 
-> Docker 101 series (10/10)
+That is why production readiness is not one Docker flag. It is the alignment of image identity, registry trust, runtime permissions, health signals, and observability channels into one operating standard.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Docker 101 series. It ties the earlier image, runtime, configuration, and optimization topics into a production checklist you can actually use for tagging, signing, hardening, and observing a deployed container.
 
-**Core question**: To take everything you have learned *into production*, *what else* do you need?
-
-> *Production containers require *image, security, logging, registry, and tagging* to align *all at once*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - An *image tag policy* (semver + sha)
 - *Registries* and *signed images*
@@ -50,13 +44,9 @@ Every prior decision is *validated together in production*. One weak link makes 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    CI["build (multistage)"] --> Sign["sign + push registry"]
-    Sign --> Run["run (read-only, non-root)"]
-    Run --> Logs["json logs to stdout"]
-    Run --> Metrics["prometheus metrics"]
-```
+![Production container flow from build and signing to least-privilege runtime, logs, and metrics](../../../assets/docker-101/10/10-01-concept-at-a-glance.en.png)
+
+*A production image is built, signed, pushed, then run with minimal privileges and standard observability channels*
 
 ## Key Terms
 
@@ -130,6 +120,16 @@ from prometheus_fastapi_instrumentator import Instrumentator
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 ```
 
+### Verify right after you run it
+
+- After pushing, both the semver tag and the SHA tag should exist in the registry, and the Cosign verification step should succeed.
+- At runtime, `/metrics` should be exposed and logs should flow to stdout rather than to files inside the container.
+
+### If it does not work, check this first
+
+- If `--read-only` breaks startup, confirm that writable paths such as `/tmp` were explicitly provided via tmpfs or another safe mount.
+- If deployment tracking is still vague, compare the deployed digest with the manifest and release metadata before looking at logs.
+
 ## What to Notice in This Code
 
 - *Signing* gives you *supply-chain trust*.
@@ -189,9 +189,15 @@ If you followed along, you can handle *95% of Docker* in the wild. From here, le
 
 ## References
 
+### Official docs
+
 - [Docker security](https://docs.docker.com/engine/security/)
 - [Sigstore Cosign](https://docs.sigstore.dev/cosign/overview/)
 - [Read-only filesystem](https://docs.docker.com/engine/reference/run/#read-only)
 - [12-factor - logs](https://12factor.net/logs)
+
+### Verification and troubleshooting
+
+- [Image digests and immutable pulls](https://docs.docker.com/reference/cli/docker/image/pull/)
 
 Tags: Docker, Production, Security, Logging, Capstone

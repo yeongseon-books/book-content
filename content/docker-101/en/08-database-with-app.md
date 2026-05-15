@@ -2,7 +2,7 @@
 series: docker-101
 episode: 8
 title: Running with a Database
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - Migration
   - Healthcheck
 seo_description: Run PostgreSQL and FastAPI together with Compose, including healthchecks, automated Alembic migrations, and idempotent seeding.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Running with a Database
 
-This is post 8 in the Docker 101 series.
+The app-database boundary is where container demos turn into real systems. A web container can start successfully while the database is still warming up, migrations can lag behind the runtime schema, and seed data can quietly stop being repeatable once several environments exist.
 
-> Docker 101 series (8/10)
+That is why a dependable database setup has a rhythm: persist the data, wait for honest readiness, then apply migrations in a controlled place before the application begins serving traffic.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”
 
-**Core question**: How do you run your containerized *Python app* together with *PostgreSQL* properly?
-
-> *The heart of a DB container is the *three-step rhythm* of *persistence, readiness, and migrations*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - Running *PostgreSQL with Compose*
 - *Healthchecks* and *startup order*
@@ -50,12 +44,9 @@ If the app starts *before* the DB is ready, you get *cold-start incidents*. If m
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Compose["compose.yaml"] --> Db["postgres + healthcheck"]
-    Db -->|service_healthy| Mig["alembic upgrade head"]
-    Mig --> Web["fastapi"]
-```
+![Database readiness gating migrations before the web application starts serving traffic](../../../assets/docker-101/08/08-01-concept-at-a-glance.en.png)
+
+*PostgreSQL becomes healthy first, migrations run once, and only then does the web app start against the expected schema*
 
 ## Key Terms
 
@@ -147,6 +138,16 @@ curl http://localhost:8000/users
 docker compose exec db pg_dump -U postgres app > app.sql
 ```
 
+### Verify right after you run it
+
+- `docker compose exec db psql -U postgres -d app -c "\dt"` should show the migrated tables, and `curl http://localhost:8000/users` should prove that the web service can read through the database boundary.
+- Run the seed twice and confirm that records do not duplicate; that is the operational test for idempotency.
+
+### If it does not work, check this first
+
+- If the web service crashes on startup, inspect `docker compose logs migrate` before the web logs; schema drift is often the first failure.
+- If backups look empty, verify that data actually landed in the named volume before debugging `pg_dump` flags.
+
 ## What to Notice in This Code
 
 - *condition: service_healthy* guarantees *real* readiness.
@@ -205,9 +206,15 @@ A clean app-DB seam drops *team setup cost* toward *zero*. Next, *image optimiza
 
 ## References
 
+### Official docs
+
 - [PostgreSQL official image](https://hub.docker.com/_/postgres)
 - [Compose - service_completed_successfully](https://docs.docker.com/compose/compose-file/05-services/#depends_on)
 - [Alembic documentation](https://alembic.sqlalchemy.org/)
 - [pg_isready](https://www.postgresql.org/docs/current/app-pg-isready.html)
+
+### Verification and troubleshooting
+
+- [docker compose run reference](https://docs.docker.com/reference/cli/docker/compose/run/)
 
 Tags: Docker, Postgres, Compose, Migration, Healthcheck

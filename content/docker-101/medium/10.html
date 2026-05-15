@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Production-Ready Docker</h1>
-<p>This is the final post in the Docker 101 series.</p>
-<blockquote>
-<p>Docker 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: To take everything you have learned <em>into production</em>, <em>what else</em> do you need?</p>
-<blockquote>
-<p><em>Production containers require </em>image, security, logging, registry, and tagging<em> to align </em>all at once<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Production is where every shortcut from the earlier chapters becomes visible at once. A vague tag policy makes rollback harder, an oversized image carries extra attack surface, and a runtime that still writes logs to local files becomes painful the moment you need consistent collection.</p>
+<p>That is why production readiness is not one Docker flag. It is the alignment of image identity, registry trust, runtime permissions, health signals, and observability channels into one operating standard.</p>
+<p>This is the final post in the Docker 101 series. It ties the earlier image, runtime, configuration, and optimization topics into a production checklist you can actually use for tagging, signing, hardening, and observing a deployed container.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>An <em>image tag policy</em> (semver + sha)</li>
@@ -80,12 +71,8 @@
 <p><em>Production is a </em>system, not a checklist<em>. Everything must work </em>at the same time<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    CI[&quot;build (multistage)&quot;] --&gt; Sign[&quot;sign + push registry&quot;]
-    Sign --&gt; Run[&quot;run (read-only, non-root)&quot;]
-    Run --&gt; Logs[&quot;json logs to stdout&quot;]
-    Run --&gt; Metrics[&quot;prometheus metrics&quot;]
-</code></pre>
+<p><img alt="Production container flow from build and signing to least-privilege runtime, logs, and metrics" src="https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>A production image is built, signed, pushed, then run with minimal privileges and standard observability channels</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Tag policy</strong>: <code>semver</code> + <code>git sha</code> dual tagging.</li>
@@ -139,6 +126,16 @@ cosign verify --certificate-identity-regexp '.*' \
 <pre><code class="language-python">from prometheus_fastapi_instrumentator import Instrumentator
 Instrumentator().instrument(app).expose(app, endpoint=&quot;/metrics&quot;)
 </code></pre>
+<p><strong>Verify right after you run it</strong></p>
+<ul>
+<li>After pushing, both the semver tag and the SHA tag should exist in the registry, and the Cosign verification step should succeed.</li>
+<li>At runtime, <code>/metrics</code> should be exposed and logs should flow to stdout rather than to files inside the container.</li>
+</ul>
+<p><strong>If it does not work, check this first</strong></p>
+<ul>
+<li>If <code>--read-only</code> breaks startup, confirm that writable paths such as <code>/tmp</code> were explicitly provided via tmpfs or another safe mount.</li>
+<li>If deployment tracking is still vague, compare the deployed digest with the manifest and release metadata before looking at logs.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Signing</em> gives you <em>supply-chain trust</em>.</li>
@@ -192,11 +189,16 @@ Instrumentator().instrument(app).expose(app, endpoint=&quot;/metrics&quot;)
 <li><strong>Production-Ready Docker (current)</strong></li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs</strong></p>
 <ul>
 <li><a href="https://docs.docker.com/engine/security/">Docker security</a></li>
 <li><a href="https://docs.sigstore.dev/cosign/overview/">Sigstore Cosign</a></li>
 <li><a href="https://docs.docker.com/engine/reference/run/#read-only">Read-only filesystem</a></li>
 <li><a href="https://12factor.net/logs">12-factor - logs</a></li>
+</ul>
+<p><strong>Verification and troubleshooting</strong></p>
+<ul>
+<li><a href="https://docs.docker.com/reference/cli/docker/image/pull/">Image digests and immutable pulls</a></li>
 </ul>
 <p class="tags-line">Tags: Docker, Production, Security, Logging, Capstone</p>
 </body>
