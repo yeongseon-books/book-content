@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 1
 title: What Is Data Science?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Analytics
   - Beginner
 seo_description: A practical definition of data science, the differences between analyst, scientist and engineer roles, and the workflow that ties everything together
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Data Science?
 
-> Data Science 101 series (1/10)
+People usually enter data science through tools. They install pandas, copy a scikit-learn tutorial, and learn a dashboard product. A few weeks later, the vocabulary gets blurry. Analytics, experimentation, forecasting, ML engineering, and BI all sound adjacent, but not identical.
 
-<!-- a-grade-intro:begin -->
+That confusion matters because the field only starts to make sense when you see the job as a decision pipeline rather than a pile of techniques. If you cannot explain how a question becomes data, how data becomes evidence, and how evidence changes an action, every later chapter feels like isolated syntax.
 
-**Core question**: What is *data science*, and how is it different from *analysis* — and why has it become its own *job*?
+This is the first post in the Data Science 101 series. Here we build the mental model for the rest of the series: data science is the work of turning a fuzzy business question into a repeatable decision loop.
 
-> *Data science is the *job of bridging* a problem and the data behind it.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- What practical definition keeps data science from collapsing into a vague umbrella term?
+- Where do analyst, scientist, engineer, and EDA work split apart in a real team?
+- Why does the workflow have to end in a decision instead of a notebook or dashboard?
+- Which misconceptions make beginners learn tools in the wrong order?
 
-This is the first post in the Data Science 101 series.
+> Data science is the discipline of translating a business problem into evidence strong enough to change a decision.
 
 ## What You Will Learn
 
@@ -50,13 +53,9 @@ In a field full of *overlapping titles*, the boundaries blur fast. A clear *big 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Problem["Business Problem"] --> Data["Data"]
-    Data --> Model["Model / Insight"]
-    Model --> Decision["Decision"]
-```
+![The core data science loop from problem framing to data, insight, and decision](../../../assets/data-science-101/01/01-01-concept-at-a-glance.en.png)
 
+*The core data science loop from problem framing to data, insight, and decision*
 ## Key Terms
 
 - **Data Analyst**: answers *business questions* through *metrics and dashboards*.
@@ -112,6 +111,8 @@ candidates = (
 ```text
 Email campaign for 100 users → measure conversion → adjust next week
 ```
+
+**Expected output:** a compact workflow note that connects the problem statement, the key data, and the final decision in one line of reasoning.
 
 ## What to Notice in This Code
 

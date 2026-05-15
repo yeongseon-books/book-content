@@ -17,7 +17,7 @@ tags:
   - Decision
   - Beginner
 seo_description: 숫자 결과에 맥락과 불확실성을 더해 과장 없는 의사결정 문장으로 바꾸는 5단계 해석 프레임워크를 상세히 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 결과 해석
@@ -56,14 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Result["숫자"] --> Context["맥락"]
-    Context --> Uncertain["불확실성"]
-    Uncertain --> Story["이야기"]
-    Story --> Decide["의사결정"]
-```
+![숫자에 맥락과 불확실성을 더해 의사결정으로 닫는 해석 흐름](../../../assets/data-science-101/09/09-01-concept-at-a-glance.ko.png)
 
+*숫자에 맥락과 불확실성을 더해 의사결정으로 닫는 해석 흐름*
 ## 핵심 용어
 
 - **Confidence Interval**: 추정치 주변의 불확실성 범위입니다.
@@ -120,6 +115,8 @@ Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 ```
 
 좋은 보고서는 마지막에 행동을 제안합니다. 무엇을 할지, 누가 볼지, 언제 다시 검토할지까지 쓰면 결과가 실행으로 이어집니다.
+
+**Expected output:** 숫자, 신뢰구간, 대상 세그먼트, 권장 행동이 한 문단 안에 함께 적힌 결정 문장을 남깁니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

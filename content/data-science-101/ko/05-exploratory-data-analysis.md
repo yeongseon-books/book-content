@@ -17,7 +17,7 @@ tags:
   - Statistics
   - Beginner
 seo_description: 모델링 전에 데이터의 모양과 결측, 관계를 읽는 EDA 기본 흐름을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 탐색적 데이터 분석
@@ -56,14 +56,9 @@ EDA가 약하면 잘못된 모델을 만들 가능성이 큽니다. 데이터가
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Shape["모양과 타입"] --> Dist["1차원 분포"]
-    Dist --> Pair["2차원 관계"]
-    Pair --> Miss["결측 패턴"]
-    Miss --> Corr["상관관계"]
-```
+![모양 확인에서 상관관계 확인까지 이어지는 EDA 읽기 순서](../../../assets/data-science-101/05/05-01-concept-at-a-glance.ko.png)
 
+*모양 확인에서 상관관계 확인까지 이어지는 EDA 읽기 순서*
 ## 핵심 용어
 
 - **Skewness**: 분포가 한쪽으로 얼마나 치우쳐 있는지 나타내는 정도입니다.
@@ -127,6 +122,8 @@ print(df.select_dtypes("number").corr().round(2))
 ```
 
 결측률은 어떤 컬럼이 불안정한지 보여 주고, 상관관계는 어떤 변수들이 함께 움직이는지 알려 줍니다. 다만 상관관계는 원인을 설명하지 않습니다. 여기서 읽을 수 있는 것은 관계의 방향과 강도이지 인과가 아닙니다.
+
+**Expected output:** 분포 요약, 높은 cardinality 컬럼, 결측률 상위 컬럼을 한 번에 검토할 EDA 메모를 만듭니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

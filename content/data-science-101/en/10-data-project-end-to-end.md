@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 10
 title: End-to-End Data Project Flow
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Workflow
   - Beginner
 seo_description: A churn prediction capstone that walks one data project from problem framing to a decision, connecting all nine prior episodes into a single flow
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # End-to-End Data Project Flow
 
-> Data Science 101 series (10/10)
+After learning each stage in isolation, the hardest remaining step is orchestration. Problem framing, collection, cleaning, EDA, modeling, evaluation, and interpretation all make sense individually, but real work rarely arrives one chapter at a time. It arrives as one messy project that has to move from question to action.
 
-<!-- a-grade-intro:begin -->
+That is why the capstone matters. The value of the series is not that you can name every stage. It is that you can connect them into a loop with a deliverable, an owner, and a follow-up review.
 
-**Core question**: How do the nine steps we have learned look when *connected into one project*?
+This is the final post in the Data Science 101 series. In this chapter, we turn the earlier episodes into one churn-prediction project so the full workflow feels operational, not just conceptual.
 
-> *The final episode is the assembly episode.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- How do the earlier chapters connect inside one real project?
+- What deliverable should each stage leave behind for the next one?
+- Why is a short problem-to-decision loop often more valuable than a more complex model?
+- Where do ownership and monitoring fit once the first analysis ships?
 
-This is the final post in the Data Science 101 series.
+> A complete project closes the loop only when each stage hands the next stage a concrete artifact and a clear decision point.
 
 ## What You Will Learn
 
@@ -50,15 +53,9 @@ Looking at parts in isolation gives you *fragments*; following one project from 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Problem["1. Problem"] --> Data["2-3. Collect/Clean"]
-    Data --> EDA["4-5. EDA/Viz"]
-    EDA --> Model["6-7. Model/Eval"]
-    Model --> Decide["8-9. Interpret/Decide"]
-    Decide --> Ship["Ship & Monitor"]
-```
+![The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery](../../../assets/data-science-101/10/10-01-concept-at-a-glance.en.png)
 
+*The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery*
 ## Key Terms
 
 - **Churn Prediction**: predicting which users are *about to leave*.
@@ -122,6 +119,8 @@ Expected churn reduction = 12% (95% CI ±3%)
 Decision: send the re-engagement campaign this Friday
 Owner: Growth team / Review: in 2 weeks
 ```
+
+**Expected output:** a project action memo with segment size, projected lift, execution date, owner, and review date.
 
 ## What to Notice in This Code
 

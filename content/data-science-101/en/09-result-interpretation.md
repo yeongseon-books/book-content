@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 9
 title: Result Interpretation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Decision
   - Beginner
 seo_description: A 5-step interpretation framework for turning model output and analysis results into business decisions, plus five common cognitive traps to avoid
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Result Interpretation
 
-> Data Science 101 series (9/10)
+The model score is not the finish line. Someone still has to explain what changed, how certain that change is, who it applies to, and what action the team should take next. That translation step is where strong technical work often becomes weak communication.
 
-<!-- a-grade-intro:begin -->
+Interpretation is not about making numbers sound impressive. It is about adding context, uncertainty, and practical significance until the result is honest enough to trust and clear enough to act on.
 
-**Core question**: How do we turn analysis results *into a decision* — without inflating or underselling what we found?
+This is post 9 in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.
 
-> *Interpretation overlays numbers and context.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- How do you move from a metric change to a decision sentence?
+- Why must uncertainty travel with the result instead of appearing in a footnote?
+- Which interpretation traps make teams overclaim or underclaim?
+- How do context and segmentation keep a result from being overgeneralized?
 
-This is post 9 in the Data Science 101 series.
+> Interpretation is the act of carrying numbers, context, and uncertainty together into one actionable statement.
 
 ## What You Will Learn
 
@@ -50,14 +53,9 @@ When interpretation is *exaggerated*, it leads to *bad decisions*; when it is *u
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Result["Numbers"] --> Context["Context"]
-    Context --> Uncertain["Uncertainty"]
-    Uncertain --> Story["Story"]
-    Story --> Decide["Decision"]
-```
+![How numbers gain context and uncertainty before they become a decision](../../../assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
 
+*How numbers gain context and uncertainty before they become a decision*
 ## Key Terms
 
 - **Confidence Interval**: an *uncertainty range* around an estimate.
@@ -104,6 +102,8 @@ campaign window: 2 weeks; segment: paid users; device: desktop only
 ```text
 Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 ```
+
+**Expected output:** a decision-ready paragraph that includes the result, the confidence interval, the affected segment, and the next action.
 
 ## What to Notice in This Code
 

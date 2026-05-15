@@ -17,7 +17,7 @@ tags:
   - Workflow
   - Beginner
 seo_description: 이탈 예측 예제로 문제 정의부터 결정까지 데이터 프로젝트 전체 흐름을 묶어 봅니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 데이터 프로젝트 전체 흐름
@@ -56,15 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Problem["1. 문제"] --> Data["2-3. 수집/정제"]
-    Data --> EDA["4-5. EDA/시각화"]
-    EDA --> Model["6-7. 모델/평가"]
-    Model --> Decide["8-9. 해석/결정"]
-    Decide --> Ship["배포 및 모니터링"]
-```
+![문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프](../../../assets/data-science-101/10/10-01-concept-at-a-glance.ko.png)
 
+*문제 정의부터 배포와 모니터링까지 이어지는 데이터 프로젝트 전체 루프*
 ## 핵심 용어
 
 - **Churn Prediction**: 곧 이탈할 사용자를 예측하는 문제입니다.
@@ -138,6 +132,8 @@ Owner: Growth team / Review: in 2 weeks
 ```
 
 이제 결과는 행동 문장으로 닫힙니다. 누구에게 무엇을 언제 할지, 누가 책임지고 언제 다시 볼지까지 써야 프로젝트가 실제로 움직입니다.
+
+**Expected output:** 대상자 수, 예상 개선 폭, 실행 시점, 오너, 재검토 날짜가 포함된 프로젝트 액션 메모를 완성합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

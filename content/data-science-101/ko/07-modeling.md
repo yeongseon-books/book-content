@@ -17,7 +17,7 @@ tags:
   - MachineLearning
   - Beginner
 seo_description: 베이스라인부터 첫 분류 모델까지 안전하게 시작하는 모델링 기본 흐름을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 모델링
@@ -56,15 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Data["정제된 데이터"] --> Split["Train / Test 분리"]
-    Split --> Base["베이스라인"]
-    Split --> Model["모델"]
-    Base --> Compare["비교"]
-    Model --> Compare
-```
+![정제된 데이터를 학습·평가로 나누고 베이스라인과 모델을 비교하는 흐름](../../../assets/data-science-101/07/07-01-concept-at-a-glance.ko.png)
 
+*정제된 데이터를 학습·평가로 나누고 베이스라인과 모델을 비교하는 흐름*
 ## 핵심 용어
 
 - **Baseline**: 항상 다수 클래스만 예측하는 것처럼 가장 단순한 기준선입니다.
@@ -148,6 +142,8 @@ print(scores.mean(), "+/-", scores.std())
 ```
 
 한 번의 분할 결과는 운이 섞일 수 있습니다. 교차 검증은 평균뿐 아니라 분산도 보여 주기 때문에, 모델이 얼마나 안정적인지 읽는 데 도움이 됩니다.
+
+**Expected output:** 베이스라인 점수, 첫 모델 점수, 교차 검증 평균과 표준편차를 한 화면에서 비교합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

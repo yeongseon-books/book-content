@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 3
 title: Data Collection
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Database
   - Beginner
 seo_description: Four common paths for collecting data — files, APIs, databases, and event logs — plus the provenance habits that keep analyses reproducible
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Collection
 
-> Data Science 101 series (3/10)
+The easiest way to lose trust in an analysis is to lose the origin story of the data. A CSV arrives in Slack, an API export gets copied into a notebook, or someone hand-edits an Excel file “just for now.” Weeks later the team still has charts, but nobody can explain where the rows came from or whether the result is reproducible.
 
-<!-- a-grade-intro:begin -->
+Collection is where reliability starts. Before cleaning or modeling ever matter, someone has to decide which source is authoritative, which copy is disposable, and what metadata must be recorded so the same dataset can be reconstructed later.
 
-**Core question**: *Where* and *how* do you actually collect the data your analysis needs — and how do you tell the *original* from a *copy*?
+This is post 3 in the Data Science 101 series. Here we treat collection as an engineering discipline: source selection, provenance, and repeatability come first, and the code that fetches the rows comes second.
 
-> *Every analysis starts by writing down *where the data came from*.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- Which collection paths are most common in analytics and ML projects?
+- Why should original sources, copies, and snapshots be treated differently?
+- What provenance metadata makes a dataset reproducible later?
+- How do collection mistakes leak all the way into the final report?
 
-This is post 3 in the Data Science 101 series.
+> Collection is not just retrieval; it is the first reproducibility checkpoint in the project.
 
 ## What You Will Learn
 
@@ -50,15 +53,9 @@ A missing record at the *collection step* haunts you all the way to the final re
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    File["File / CSV"] --> Stage["Staging"]
-    API["API"] --> Stage
-    DB["Database"] --> Stage
-    Log["Event Log"] --> Stage
-    Stage --> Analysis["Analysis"]
-```
+![Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis](../../../assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
 
+*Common collection paths that move files, APIs, databases, and logs into a staging layer for analysis*
 ## Key Terms
 
 - **Source of truth**: the *authoritative origin* of the data.
@@ -128,6 +125,8 @@ meta = {
 }
 print(meta)
 ```
+
+**Expected output:** one provenance record containing `source`, `fetched_at`, `row_count`, and `sha256` for the pulled dataset.
 
 ## What to Notice in This Code
 

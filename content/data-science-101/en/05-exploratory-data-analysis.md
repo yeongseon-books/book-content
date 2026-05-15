@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 5
 title: Exploratory Data Analysis
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Statistics
   - Beginner
 seo_description: A 5-step EDA workflow that quickly reveals shape, distribution, missingness, correlation, and outliers before any modeling
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Exploratory Data Analysis
 
-> Data Science 101 series (5/10)
+Exploratory data analysis is the stage where the dataset stops being an abstraction and starts behaving like evidence. Before EDA, you mostly have assumptions: which variables matter, what “typical” looks like, and whether the data is even shaped the way the problem statement implied.
 
-<!-- a-grade-intro:begin -->
+EDA is how you replace those assumptions with observations. If you skip it, you often build a model that is technically correct for the wrong picture of the data. If you do it well, you discover the distributions, gaps, and relationships that should shape every later decision.
 
-**Core question**: Before you build any model, how do you read the *shape of the data* — *quickly* and *correctly*?
+This is post 5 in the Data Science 101 series. Here we walk through a compact but production-friendly EDA loop that helps you read the dataset before you try to optimize it.
 
-> *EDA is the *data's self-introduction* you must read before any model.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- What should you inspect before building any model or dashboard?
+- Why are distribution shape and missingness often more important than the mean?
+- How do cardinality and pairwise relationships shape later modeling choices?
+- What does correlation tell you, and what can it never prove?
 
-This is post 5 in the Data Science 101 series.
+> EDA is the fastest way to replace assumptions about the dataset with observations you can verify.
 
 ## What You Will Learn
 
@@ -50,14 +53,9 @@ Weak EDA produces *the wrong model*. Skipping the *data's self-introduction* and
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Shape["Shape & dtypes"] --> Dist["1D Distribution"]
-    Dist --> Pair["2D Relations"]
-    Pair --> Miss["Missing Patterns"]
-    Miss --> Corr["Correlation"]
-```
+![The EDA reading order from dataset shape through distributions, missingness, and correlation](../../../assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
 
+*The EDA reading order from dataset shape through distributions, missingness, and correlation*
 ## Key Terms
 
 - **Skewness**: how *asymmetric* a distribution is.
@@ -111,6 +109,8 @@ sns.scatterplot(data=df.sample(2000), x="quantity", y="amount")
 print(df.isna().mean().sort_values(ascending=False).head())
 print(df.select_dtypes("number").corr().round(2))
 ```
+
+**Expected output:** an EDA note that lists the core distribution summary, high-cardinality columns, and the top missingness signals.
 
 ## What to Notice in This Code
 

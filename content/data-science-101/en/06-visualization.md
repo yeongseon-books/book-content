@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 6
 title: Visualization
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Seaborn
   - Beginner
 seo_description: A practical map from message to chart — distributions, comparisons, trends, relations, and parts of a whole, with rules that keep them honest
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Visualization
 
-> Data Science 101 series (6/10)
+Charts are not the decorative end of analysis. They are the moment when your conclusions become fast enough for other people to consume. A good chart compresses a page of explanation into one glance. A bad chart makes a bad decision look reasonable.
 
-<!-- a-grade-intro:begin -->
+That is why visualization is really about judgment, not software. The core skill is picking a visual form that matches the message, then removing the distortions that exaggerate or hide what the data is actually saying.
 
-**Core question**: *Which chart* fits *which message*, and how do you keep the picture *honest*?
+This is post 6 in the Data Science 101 series. In this chapter, we connect common analytical messages to chart choices, and we treat axes, color, labels, and annotations as decision-support tools rather than styling details.
 
-> *One good picture beats *three pages* of writing.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- How do you choose a chart from the message instead of from habit?
+- Which chart choices most often create misleading comparisons or trends?
+- Why do axis scale, labels, and annotations change the decision a chart supports?
+- How can one chart remain readable and honest for more than one audience?
 
-This is post 6 in the Data Science 101 series.
+> The right chart is the one that makes the intended decision easier without exaggerating the pattern.
 
 ## What You Will Learn
 
@@ -50,15 +53,9 @@ Data is fastest to read as a *picture*. The wrong chart leads to the *wrong deci
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dist["Distribution"] --> Hist["Histogram / Box"]
-    Comp["Comparison"] --> Bar["Bar Chart"]
-    Trend["Trend"] --> Line["Line Chart"]
-    Rel["Relation"] --> Scatter["Scatter"]
-    Part["Part of Whole"] --> Stack["Stacked Bar"]
-```
+![A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views](../../../assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
 
+*A message-to-chart map for distributions, comparisons, trends, relationships, and part-to-whole views*
 ## Key Terms
 
 - **Encoding**: mapping data to *position, length, color*.
@@ -122,6 +119,8 @@ ax = df.groupby("order_date")["amount"].sum().plot()
 ax.axvline(pd.Timestamp("2026-04-01"), color="red", linestyle="--", label="campaign")
 ax.legend()
 ```
+
+**Expected output:** a first-pass chart choice tied to the message, plus the annotation points needed to keep the chart honest.
 
 ## What to Notice in This Code
 

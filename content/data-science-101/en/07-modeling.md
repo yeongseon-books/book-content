@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 7
 title: Modeling
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - MachineLearning
   - Beginner
 seo_description: From baseline to a first classifier with scikit-learn — five safe steps to build your first supervised model without leaking data
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Modeling
 
-> Data Science 101 series (7/10)
+Modeling gets the spotlight, but it is easiest to misuse precisely because it looks sophisticated. A first model can produce a clean metric and still teach you nothing if you do not know what baseline it beat, whether preprocessing leaked information, or whether a different data split would change the story.
 
-<!-- a-grade-intro:begin -->
+The safe way to start modeling is to reduce the room for self-deception. Build the simplest reference first, keep training and evaluation cleanly separated, and only then ask whether a more capable model is actually earning its complexity.
 
-**Core question**: How do you build a *first model* — and why must you start with a *baseline*?
+This is post 7 in the Data Science 101 series. Here we build that safer path: baseline first, pipeline second, and only then a model you can compare and trust.
 
-> *A model without a baseline has *nothing to stand on*.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- Why is the baseline the real starting point of modeling?
+- What does train/test separation protect you from in practice?
+- Why is preprocessing outside the pipeline such a common leakage source?
+- What extra signal does cross-validation variance add beyond a single score?
 
-This is post 7 in the Data Science 101 series.
+> A model only earns trust after it beats a baseline under a leakage-safe evaluation path.
 
 ## What You Will Learn
 
@@ -50,15 +53,9 @@ A *good baseline* is the real starting line — much more than a fancy model. Wi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Data["Cleaned Data"] --> Split["Train / Test Split"]
-    Split --> Base["Baseline"]
-    Split --> Model["Model"]
-    Base --> Compare["Compare"]
-    Model --> Compare
-```
+![How cleaned data splits into train and test so a baseline and a model can be compared fairly](../../../assets/data-science-101/07/07-01-concept-at-a-glance.en.png)
 
+*How cleaned data splits into train and test so a baseline and a model can be compared fairly*
 ## Key Terms
 
 - **Baseline**: the *simplest possible* prediction (e.g., always majority class).
@@ -132,6 +129,8 @@ from sklearn.model_selection import cross_val_score
 scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
 print(scores.mean(), "+/-", scores.std())
 ```
+
+**Expected output:** one comparison view that shows baseline score, first-model score, and cross-validation mean plus variance.
 
 ## What to Notice in This Code
 

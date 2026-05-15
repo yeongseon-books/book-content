@@ -17,7 +17,7 @@ tags:
   - Analytics
   - Beginner
 seo_description: 데이터 사이언스의 정의와 역할 구분, 문제-데이터-결정 흐름을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Science란 무엇인가?
@@ -56,13 +56,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Problem["비즈니스 문제"] --> Data["데이터"]
-    Data --> Model["모델 / 인사이트"]
-    Model --> Decision["의사결정"]
-```
+![문제, 데이터, 인사이트, 의사결정으로 이어지는 데이터 사이언스의 기본 흐름](../../../assets/data-science-101/01/01-01-concept-at-a-glance.ko.png)
 
+*문제, 데이터, 인사이트, 의사결정으로 이어지는 데이터 사이언스의 기본 흐름*
 ## 핵심 용어
 
 - **Data Analyst**: 지표와 대시보드를 통해 비즈니스 질문에 답하는 역할입니다.
@@ -128,6 +124,8 @@ Email campaign for 100 users → measure conversion → adjust next week
 ```
 
 마지막 단계가 빠지면 데이터 작업은 자주 보고서에서 멈춥니다. 결과는 반드시 “무엇을 할 것인가”로 닫혀야 합니다. 그래야 다음 주에 다시 측정하고, 개선하고, 같은 루프를 돌릴 수 있습니다.
+
+**Expected output:** 문제 문장, 핵심 데이터, 최종 의사결정이 한 줄 흐름으로 이어진 작은 워크플로 메모를 얻습니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

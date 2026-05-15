@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>End-to-End Data Project Flow</h1>
+<p>After learning each stage in isolation, the hardest remaining step is orchestration. Problem framing, collection, cleaning, EDA, modeling, evaluation, and interpretation all make sense individually, but real work rarely arrives one chapter at a time. It arrives as one messy project that has to move from question to action.</p>
+<p>That is why the capstone matters. The value of the series is not that you can name every stage. It is that you can connect them into a loop with a deliverable, an owner, and a follow-up review.</p>
+<p>This is the final post in the Data Science 101 series. In this chapter, we turn the earlier episodes into one churn-prediction project so the full workflow feels operational, not just conceptual.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>How do the earlier chapters connect inside one real project?</li>
+<li>What deliverable should each stage leave behind for the next one?</li>
+<li>Why is a short problem-to-decision loop often more valuable than a more complex model?</li>
+<li>Where do ownership and monitoring fit once the first analysis ships?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (10/10)</p>
+<p>A complete project closes the loop only when each stage hands the next stage a concrete artifact and a clear decision point.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do the nine steps we have learned look when <em>connected into one project</em>?</p>
-<blockquote>
-<p><em>The final episode is the assembly episode.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the final post in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A <em>churn prediction</em> project end to end</li>
@@ -80,13 +81,8 @@
 <p><em>Whoever has built the whole once builds the next project faster.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Problem[&quot;1. Problem&quot;] --&gt; Data[&quot;2-3. Collect/Clean&quot;]
-    Data --&gt; EDA[&quot;4-5. EDA/Viz&quot;]
-    EDA --&gt; Model[&quot;6-7. Model/Eval&quot;]
-    Model --&gt; Decide[&quot;8-9. Interpret/Decide&quot;]
-    Decide --&gt; Ship[&quot;Ship &amp; Monitor&quot;]
-</code></pre>
+<p><img alt="The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>The end-to-end loop that connects framing, data work, modeling, interpretation, and delivery</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Churn Prediction</strong>: predicting which users are <em>about to leave</em>.</li>
@@ -132,6 +128,7 @@ Expected churn reduction = 12% (95% CI ±3%)
 Decision: send the re-engagement campaign this Friday
 Owner: Growth team / Review: in 2 weeks
 </code></pre>
+<p><strong>Expected output:</strong> a project action memo with segment size, projected lift, execution date, owner, and review date.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The flow <em>closes</em> from <em>problem to decision</em>.</li>

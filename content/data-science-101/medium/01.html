@@ -54,18 +54,19 @@
 </head>
 <body>
 <h1>What Is Data Science?</h1>
+<p>People usually enter data science through tools. They install pandas, copy a scikit-learn tutorial, and learn a dashboard product. A few weeks later, the vocabulary gets blurry. Analytics, experimentation, forecasting, ML engineering, and BI all sound adjacent, but not identical.</p>
+<p>That confusion matters because the field only starts to make sense when you see the job as a decision pipeline rather than a pile of techniques. If you cannot explain how a question becomes data, how data becomes evidence, and how evidence changes an action, every later chapter feels like isolated syntax.</p>
+<p>This is the first post in the Data Science 101 series. Here we build the mental model for the rest of the series: data science is the work of turning a fuzzy business question into a repeatable decision loop.</p>
+<h2>Questions This Post Answers</h2>
+<ul>
+<li>What practical definition keeps data science from collapsing into a vague umbrella term?</li>
+<li>Where do analyst, scientist, engineer, and EDA work split apart in a real team?</li>
+<li>Why does the workflow have to end in a decision instead of a notebook or dashboard?</li>
+<li>Which misconceptions make beginners learn tools in the wrong order?</li>
+</ul>
 <blockquote>
-<p>Data Science 101 series (1/10)</p>
+<p>Data science is the discipline of translating a business problem into evidence strong enough to change a decision.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What is <em>data science</em>, and how is it different from <em>analysis</em> — and why has it become its own <em>job</em>?</p>
-<blockquote>
-<p><em>Data science is the </em>job of bridging<em> a problem and the data behind it.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the first post in the Data Science 101 series.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A working <em>definition</em> of data science</li>
@@ -80,11 +81,8 @@
 <p><em>Learning without a </em>big picture<em> is just a pile of fragments.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Problem[&quot;Business Problem&quot;] --&gt; Data[&quot;Data&quot;]
-    Data --&gt; Model[&quot;Model / Insight&quot;]
-    Model --&gt; Decision[&quot;Decision&quot;]
-</code></pre>
+<p><img alt="The core data science loop from problem framing to data, insight, and decision" src="https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>The core data science loop from problem framing to data, insight, and decision</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Data Analyst</strong>: answers <em>business questions</em> through <em>metrics and dashboards</em>.</li>
@@ -122,6 +120,7 @@ print(df[&quot;days_since_login&quot;].describe())
 <p><strong>Step 5 — Tie back to a decision</strong></p>
 <pre><code class="language-text">Email campaign for 100 users → measure conversion → adjust next week
 </code></pre>
+<p><strong>Expected output:</strong> a compact workflow note that connects the problem statement, the key data, and the final decision in one line of reasoning.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>One sentence of problem</em> sets the direction for <em>every line</em>.</li>

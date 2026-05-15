@@ -2,7 +2,7 @@
 series: data-science-101
 episode: 4
 title: Data Cleaning
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,25 @@ tags:
   - Quality
   - Beginner
 seo_description: A 5-step guide to spotting and fixing missing values, duplicates, outliers, and type mismatches in real-world tabular data
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Data Cleaning
 
-> Data Science 101 series (4/10)
+Cleaning is where data projects quietly win or lose. Most teams do not fail because the final model was mathematically weak. They fail because dates were still strings, duplicates were silently kept, or a fill rule changed the distribution without anybody noticing.
 
-<!-- a-grade-intro:begin -->
+That is why cleaning should feel less like “tidying up” and more like quality control. You are not polishing data for presentation. You are deciding which evidence is safe enough to carry into EDA, metrics, and models.
 
-**Core question**: In what *order* should we find and fix *missing values, duplicates, outliers, and type mismatches*?
+This is post 4 in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.
 
-> *80% of the time goes into cleaning — good cleaning makes the other 20% *real* analysis.*
+## Questions This Post Answers
 
-<!-- a-grade-intro:end -->
+- Which quality problems should you inspect first in tabular data?
+- Why do type fixes, missingness, duplicates, and outliers need different treatment?
+- How do simple fill rules distort later analysis if you apply them blindly?
+- What should a cleaning report capture before you move on?
 
-This is post 4 in the Data Science 101 series.
+> Cleaning is the stage where you decide which rows are trustworthy enough to become evidence.
 
 ## What You Will Learn
 
@@ -50,15 +53,9 @@ This is post 4 in the Data Science 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Raw["Raw Data"] --> Type["Fix Types"]
-    Type --> Dup["Drop Duplicates"]
-    Dup --> Null["Handle Missing"]
-    Null --> Out["Detect Outliers"]
-    Out --> Clean["Clean Data"]
-```
+![A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review](../../../assets/data-science-101/04/04-01-concept-at-a-glance.en.png)
 
+*A basic cleaning order that moves from type fixes through duplicates, missingness, and outlier review*
 ## Key Terms
 
 - **Missing**: a value is *empty* (`NaN`, `None`, `''`).
@@ -123,6 +120,8 @@ report = {
 }
 print(report)
 ```
+
+**Expected output:** a validation report with remaining row count, null counts by column, and the outlier rate after cleaning.
 
 ## What to Notice in This Code
 
