@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 9
 title: System Calls
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Kernel
   - User Space
 seo_description: read, write, open, fork — how user code asks the kernel to do work through system calls, and what each call actually costs.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # System Calls
 
-This is post 9 in the Operating Systems 101 series.
+User code cannot touch the disk controller or network card directly. Every request goes through a narrow kernel entry point, and the cost of crossing that boundary explains why two equivalent programs can differ in runtime by orders of magnitude.
 
-> Operating Systems 101 series (9/10)
+System calls are also where performance, debugging, and security meet. Once you can see them, many OS-level mysteries stop being mysterious.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What route does user code take to use kernel resources (files, network, processes), and what is the cost of that route?
-
-> User code never touches the disk or the network card directly. Every request flows through a narrow door called a system call into the kernel. The door is safe but expensive. Once you understand what a system call is and why it costs, you can predict which of two equivalent programs will be faster.
-
-<!-- a-grade-intro:end -->
+This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ Two programs processing the same 100MB of data can be many times faster or slowe
 ## Concept at a Glance
 
 > User space is where ordinary programs run; kernel space is where the OS core runs. There is a privilege boundary between them, and user code can only enter the kernel through the narrow entry of a system call. Each entry pays for context switching and security checks, which is why it costs.
+
+### The privilege boundary a syscall crosses
+
+![The privilege boundary a syscall crosses](../../../assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
+*A syscall is the only door into kernel work, which is why both performance cost and security policy accumulate there.*
 
 ```text
 [user space]

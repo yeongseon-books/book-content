@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 8
 title: File Systems
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Fsync
   - Journaling
 seo_description: Inodes, the directory tree, the page cache, fsync, and journaling — how the file system makes sure your data survives a crash.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # File Systems
 
-This is post 8 in the Operating Systems 101 series.
+Calling `write()` does not mean your data is safe yet. Between the page cache, the journal, the disk cache, and the storage device itself, there are several layers where a crash can still turn "saved" into "partially written" or "gone."
 
-> Operating Systems 101 series (8/10)
+That is why storage bugs are rarely about syntax. They are about knowing exactly which guarantee the file system is making at each step.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: If the power dies right after you write a file, what promises must the OS and disk keep so the data still survives?
-
-> "I called write, so I am done" is a lie. The file system has to keep promises across the page cache, the journal, fsync, and even the disk's own cache before data is truly safe. Without that mental model you will never find the real cause of "I clearly saved it but it disappeared."
-
-<!-- a-grade-intro:end -->
+This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ Half of all data-loss incidents trace back to "we did not call fsync" or "we ass
 ## Concept at a Glance
 
 > A file is a combination of an inode (metadata) and data blocks. A directory is just a mapping from name to inode number. write() typically lands in the page cache, and the data hits disk later. fsync is the call that asks the OS to push it to disk now.
+
+### The path from write to durable storage
+
+![The path from write to durable storage](../../../assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
+*A successful write and durable storage are different milestones, which is why fsync and journaling matter.*
 
 ```text
 path: /var/log/app.log

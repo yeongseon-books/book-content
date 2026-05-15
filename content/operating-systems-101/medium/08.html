@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>File Systems</h1>
-<p>This is post 8 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If the power dies right after you write a file, what promises must the OS and disk keep so the data still survives?</p>
-<blockquote>
-<p>"I called write, so I am done" is a lie. The file system has to keep promises across the page cache, the journal, fsync, and even the disk's own cache before data is truly safe. Without that mental model you will never find the real cause of "I clearly saved it but it disappeared."</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Calling <code>write()</code> does not mean your data is safe yet. Between the page cache, the journal, the disk cache, and the storage device itself, there are several layers where a crash can still turn "saved" into "partially written" or "gone."</p>
+<p>That is why storage bugs are rarely about syntax. They are about knowing exactly which guarantee the file system is making at each step.</p>
+<p>This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The structure of inodes and the directory tree</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>A file is a combination of an inode (metadata) and data blocks. A directory is just a mapping from name to inode number. write() typically lands in the page cache, and the data hits disk later. fsync is the call that asks the OS to push it to disk now.</p>
 </blockquote>
+<p><strong>The path from write to durable storage</strong></p>
+<p><img alt="The path from write to durable storage" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png"><br>
+<em>A successful write and durable storage are different milestones, which is why fsync and journaling matter.</em></p>
 <pre><code class="language-text">path: /var/log/app.log
    ↓ directory lookup
  inode #1234 (metadata: perms, size, block pointers)

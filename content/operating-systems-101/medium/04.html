@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Concurrency and Race Conditions</h1>
-<p>This is post 4 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does code that works perfectly with one thread break in strange, hard-to-reproduce ways once you go multi-threaded?</p>
-<blockquote>
-<p>A race condition happens when two or more flows touch the same data at the same time, and the result depends on who got there first. Even a single line like <code>count += 1</code> is read-modify-write, and another thread can sneak in between those steps. This article explains why concurrency bugs hide so well, what kinds exist, and which design principles keep them out.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Concurrency bugs are usually quiet in development and loud in production. They pass tests for days, then corrupt data only under load, which makes them feel random even when the mechanism is precise.</p>
+<p>What makes race conditions hard is not that they fail once, but that the result depends on interleaving you did not explicitly write.</p>
+<p>This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A precise definition of race conditions and why they are hard to reproduce</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.</p>
 </blockquote>
+<p><strong>How one increment gets lost</strong></p>
+<p><img alt="How one increment gets lost" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png"><br>
+<em>A race condition often looks like two flows reading the same old value and then overwriting each other's work.</em></p>
 <pre><code class="language-text">Initial: count = 0   (both threads want to add 1)
 
 Ideal                          Real

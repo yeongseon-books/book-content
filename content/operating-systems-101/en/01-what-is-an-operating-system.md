@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 1
 title: What Is an Operating System?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Kernel
   - Abstraction
 seo_description: How an operating system manages hardware and exposes clean abstractions like processes, files, and sockets to application code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is an Operating System?
 
-This is the first post in the Operating Systems 101 series.
+When people first hear "operating system," they often picture the software that boots a computer and launches applications. In production, the more useful question is different: why does the same code run fine on one machine, fail to open a file on another, and die with an out-of-memory kill somewhere else?
 
-> Operating Systems 101 series (1/10)
+To answer that, you have to stop treating the OS as background scenery. It is the execution environment that constantly decides how CPU, memory, disks, and the network are shared.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do all the programs on a single computer coexist without trampling each other's CPU, memory, and files?
-
-> An operating system (OS) sits between hardware and applications. It coordinates how CPU, memory, disks, and the network are shared, and it wraps raw hardware in clean abstractions like processes, files, and sockets that application code can use. This series follows both roles end to end and explains the machinery that you depend on every day but rarely see.
-
-<!-- a-grade-intro:end -->
+This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ The OS is invisible until something breaks. Out-of-memory kills, zombie processe
 ## Concept at a Glance
 
 > The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.
+
+### Where the operating system sits
+
+![Where the operating system sits](../../../assets/operating-systems-101/01/01-01-where-the-operating-system-sits.en.png)
+*Where the operating system sits between application code and hardware*
 
 ```text
 +---------------------------------------------+

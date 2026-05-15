@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Containers and the Operating System</h1>
-<p>This is the final post in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do containers differ from virtual machines, and how do they make a shared kernel look like an isolated system?</p>
-<blockquote>
-<p>Containers are not magic. They are a combination of plain Linux features — namespaces, cgroups, and overlayfs. Every concept from this series — processes, memory, file systems, system calls — reappears inside a container. This article closes the series and bridges OS fundamentals to modern infrastructure.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Containers did not invent a new operating system. They recombine existing OS features so one kernel can host many isolated execution environments, which is why container incidents are usually OS incidents wearing a different label.</p>
+<p>That is also why this chapter works as the series finale: every concept we covered earlier — processes, memory, file systems, system calls — reappears here in a more operational form.</p>
+<p>This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between containers and virtual machines</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.</p>
 </blockquote>
+<p><strong>The layers that create container isolation</strong></p>
+<p><img alt="The layers that create container isolation" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png"><br>
+<em>Container isolation is the combined effect of visibility boundaries, resource limits, and reduced privilege on top of one shared kernel.</em></p>
 <pre><code class="language-text">[VM]                          [Container]
 +-----------+                 +-----------+
 | Guest OS  |                 |   App     |
@@ -148,6 +142,24 @@ docker image inspect alpine | grep -i layer
 # Even as root, the capability set is restricted
 </code></pre>
 <p>The "root" inside a default container is weaker than the host root. Capabilities and seccomp slice privilege finely.</p>
+<h2>First triage: which OS layer failed first?</h2>
+<p>When a containerized service breaks, asking only "did the app crash?" is too coarse. A faster question is which OS layer failed first.</p>
+<p><strong>Container exits suddenly</strong><br>
+- First check: <code>docker ps -a</code>, exit code, OOM evidence<br>
+- Underlying OS layer: cgroup memory limit</p>
+<p><strong>Works inside, not outside</strong><br>
+- First check: port mapping, network namespace, policy<br>
+- Underlying OS layer: namespace / network stack</p>
+<p><strong>CPU is available but latency jitters</strong><br>
+- First check: <code>docker stats</code>, throttling, CPU quota<br>
+- Underlying OS layer: cgroup CPU scheduling</p>
+<p><strong>Files disappear or feel slow</strong><br>
+- First check: overlayfs layers, bind mounts, volumes<br>
+- Underlying OS layer: file system / overlayfs</p>
+<p><strong>Root still cannot do something</strong><br>
+- First check: capabilities, seccomp, rootless mode<br>
+- Underlying OS layer: privilege model</p>
+<p>This table turns the vague statement "the container is weird" into a sequence of OS-level first checks. In production, that change in framing usually saves more time than any one command.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Isolation is the sum of namespaces, cgroups, seccomp, and capabilities</li>
@@ -223,6 +235,8 @@ docker image inspect alpine | grep -i layer
 <li><a href="https://man7.org/linux/man-pages/man7/cgroups.7.html">Linux cgroups(7)</a></li>
 <li><a href="https://opencontainers.org/">Open Container Initiative</a></li>
 <li><a href="https://docs.docker.com/get-started/overview/">Docker — Overview</a></li>
+<li><a href="https://docs.docker.com/engine/security/rootless/">Docker rootless mode</a></li>
+<li><a href="https://github.com/opencontainers/runtime-spec">OCI Runtime Specification</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Operating Systems, Containers, Namespace, Cgroup, Isolation</p>
 </body>

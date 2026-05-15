@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Virtual Memory</h1>
-<p>This is post 7 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Every process appears to own its own enormous memory, yet the machine has only a few GB of RAM — how does the OS construct that illusion?</p>
-<blockquote>
-<p>Virtual memory is the biggest illusion the OS produces. It promises every process its own 4GB while the machine has only 8 or 16. Pages, page tables, the TLB, and page faults hold up that illusion. Once you understand the mechanism, you can see why "the process looks fine but the system freezes" actually happens.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Every process appears to own a huge private memory space even though the machine has only a limited amount of RAM. That illusion is powerful, but it becomes painfully real when page faults climb, swap starts filling, and response time collapses.</p>
+<p>To understand those failures, you have to understand the machinery that builds the illusion in the first place.</p>
+<p>This is post 7 in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The split between virtual addresses and physical addresses</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>Each process has its own virtual address space. Virtual addresses are split into pages (typically 4KB) and translated to physical addresses through a page table. The CPU caches recent translations in a TLB. When a translation is missing or the page is on disk, a page fault triggers and the OS handles it.</p>
 </blockquote>
+<p><strong>How a virtual address reaches RAM</strong></p>
+<p><img alt="How a virtual address reaches RAM" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png"><br>
+<em>The cost of virtual memory depends on whether translation stays hot in cache or falls through to a page fault.</em></p>
 <pre><code class="language-text">virtual addr  →  [TLB hit]  →  physical addr  →  RAM
                    ↓ miss
               page table walk

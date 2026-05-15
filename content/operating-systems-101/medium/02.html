@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Processes and Threads</h1>
-<p>This is post 2 in the Operating Systems 101 series.</p>
-<blockquote>
-<p>Operating Systems 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: "A running program" is too vague. From the OS's point of view, what exactly is it made of?</p>
-<blockquote>
-<p>A process is the OS's basic unit for handling an application. Memory, open files, permissions, and CPU state are bundled together, and each process is isolated from the others. A thread is a flow of execution that lives inside one process and shares its memory with sibling threads. This article walks through what is inside a process, how threads differ, and when to reach for one over the other.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>"A running program" sounds obvious until you have to debug shared-state bugs, zombie children, or a worker model that scales badly. At that point, the vague phrase stops helping and the OS's real unit boundaries start to matter.</p>
+<p>Processes and threads look like two ways to do concurrency, but they answer different questions about memory sharing, isolation, and failure blast radius.</p>
+<p>This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The four resources a process owns (memory, fds, permissions, CPU state)</li>
@@ -82,6 +73,9 @@
 <blockquote>
 <p>Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.</p>
 </blockquote>
+<p><strong>What the process shares and what each thread keeps</strong></p>
+<p><img alt="What the process shares and what each thread keeps" src="https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png"><br>
+<em>A process bundles resources for isolation, while threads multiply execution flows inside that boundary.</em></p>
 <pre><code class="language-text">+-----------------------------------------+
 |  Process                                |
 |  +----------+ +-----------+ +--------+  |

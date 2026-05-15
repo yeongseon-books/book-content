@@ -18,7 +18,7 @@ tags:
   - TLB
   - swap
 seo_description: 페이지, 페이지 테이블, TLB, 스왑, 페이지 폴트의 핵심을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 가상 메모리
@@ -40,6 +40,11 @@ last_reviewed: '2026-05-12'
 
 ## 기본 모델
 > 모든 프로세스는 자신만의 가상 주소 공간을 가집니다. 가상 주소는 페이지 단위(보통 4KB)로 잘려 페이지 테이블을 통해 물리 주소로 매핑됩니다. CPU는 이 변환을 빠르게 하기 위해 TLB라는 캐시를 가집니다. 매핑이 없거나 페이지가 디스크에 있으면 page fault가 발생합니다.
+
+### 가상 주소가 실제 RAM으로 가는 길
+
+![가상 주소가 실제 RAM으로 가는 길](../../../assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
+*가상 메모리의 비용은 주소 변환이 캐시에 있느냐, page fault로 내려가느냐에서 갈립니다.*
 
 ```text
 virtual addr  →  [TLB hit]  →  physical addr  →  RAM
@@ -181,6 +186,12 @@ print('col-major', time.time() - t)
 - [ ] mmap이 언제 유용한지 안다
 - [ ] copy-on-write의 의미를 설명할 수 있다
 - [ ] swap이 보이기 시작하면 위험 신호임을 안다
+
+## 연습 문제
+
+1. 같은 2차원 배열을 row-major와 column-major로 채우고, 실행 시간 차이가 나는 이유를 페이지 지역성 관점에서 설명해 보세요.
+2. 1GB 파일을 `read()`와 `mmap` 두 방식으로 처리해 RSS와 시간을 비교해 보세요.
+3. 같은 메모리 부하를 swap on/off 환경에서 실행하고 응답성 차이를 기록해 보세요.
 
 ## 마무리와 다음 글
 

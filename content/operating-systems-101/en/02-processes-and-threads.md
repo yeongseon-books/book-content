@@ -2,7 +2,7 @@
 series: operating-systems-101
 episode: 2
 title: Processes and Threads
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Concurrency
   - Systems
 seo_description: What a process actually contains, how a thread differs from a process, the fork/exec model, and how to choose between them in practice.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Processes and Threads
 
-This is post 2 in the Operating Systems 101 series.
+"A running program" sounds obvious until you have to debug shared-state bugs, zombie children, or a worker model that scales badly. At that point, the vague phrase stops helping and the OS's real unit boundaries start to matter.
 
-> Operating Systems 101 series (2/10)
+Processes and threads look like two ways to do concurrency, but they answer different questions about memory sharing, isolation, and failure blast radius.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: "A running program" is too vague. From the OS's point of view, what exactly is it made of?
-
-> A process is the OS's basic unit for handling an application. Memory, open files, permissions, and CPU state are bundled together, and each process is isolated from the others. A thread is a flow of execution that lives inside one process and shares its memory with sibling threads. This article walks through what is inside a process, how threads differ, and when to reach for one over the other.
-
-<!-- a-grade-intro:end -->
+This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
 
 ## What You Will Learn
 
@@ -51,6 +45,11 @@ Processes and threads are the two basic building blocks of concurrency. Mixing t
 ## Concept at a Glance
 
 > Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.
+
+### What the process shares and what each thread keeps
+
+![What the process shares and what each thread keeps](../../../assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
+*A process bundles resources for isolation, while threads multiply execution flows inside that boundary.*
 
 ```text
 +-----------------------------------------+

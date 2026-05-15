@@ -18,7 +18,7 @@ tags:
   - cgroup
   - 격리
 seo_description: namespace, cgroup, overlayfs로 컨테이너 격리가 만들어지는 방식을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 컨테이너와 운영체제
@@ -27,7 +27,7 @@ last_reviewed: '2026-05-12'
 
 그래서 컨테이너를 제대로 이해하려면 결국 프로세스, 메모리, 파일 시스템, 시스템 콜을 다시 운영체제 관점에서 읽어야 합니다. 이 글은 그 연결을 한 번에 묶는 시리즈의 마무리입니다.
 
-이 글은 Operating Systems 101 시리즈의 10번째 글입니다.
+이 글은 Operating Systems 101 시리즈의 마지막 글입니다.
 
 ## 이 글에서 다룰 문제
 
@@ -40,6 +40,11 @@ last_reviewed: '2026-05-12'
 
 ## 기본 모델
 > VM은 하이퍼바이저 위에 게스트 OS를 통째로 올립니다. 컨테이너는 호스트 커널을 그대로 쓰고, namespace로 "보이는 것"을 격리하고, cgroup으로 "쓸 수 있는 자원"을 제한합니다. 따라서 컨테이너는 가볍고 빠르게 시작하지만, 커널 취약점은 호스트와 공유합니다.
+
+### 컨테이너 격리를 이루는 층
+
+![컨테이너 격리를 이루는 층](../../../assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
+*컨테이너 격리는 한 기능이 아니라 namespace, cgroup, 권한 축소 장치가 겹쳐서 만들어집니다.*
 
 ```text
 [VM]                          [Container]
@@ -127,6 +132,20 @@ docker run --rm alpine sh -c "
 
 기본 컨테이너의 root는 호스트 root보다 약합니다. capability와 seccomp가 권한을 잘게 자릅니다.
 
+## 컨테이너 장애를 볼 때 먼저 나누는 기준
+
+컨테이너 장애를 볼 때는 "애플리케이션이 죽었는가"만 묻지 말고, 어느 OS 계층에서 문제가 시작됐는지를 먼저 나누는 편이 빠릅니다.
+
+| 증상 | 먼저 볼 것 | 연결되는 OS 계층 |
+| --- | --- | --- |
+| 컨테이너가 갑자기 종료됨 | `docker ps -a`, 종료 코드, OOM 여부 | cgroup 메모리 한도 |
+| 안에서는 되는데 외부 통신이 안 됨 | 포트 매핑, 네트워크 namespace, 정책 | namespace / 네트워크 스택 |
+| CPU는 남는데 응답이 들쭉날쭉함 | `docker stats`, throttling, CPU quota | cgroup CPU 스케줄링 |
+| 파일이 사라지거나 느림 | overlayfs 레이어, bind mount, volume | 파일 시스템 / overlayfs |
+| root인데도 어떤 명령이 실패 | capability, seccomp, rootless 여부 | 권한 모델 |
+
+이 표를 기준으로 보면 "컨테이너가 이상하다"는 막연한 표현이 OS의 어떤 하위 계층을 먼저 점검해야 하는지로 바로 바뀝니다. 운영에서는 이 질문 순서가 문제 해결 시간을 크게 줄입니다.
+
 ## 여기서 먼저 볼 점
 
 - 격리는 "namespace + cgroup + seccomp + capabilities"의 합입니다
@@ -160,6 +179,12 @@ docker run --rm alpine sh -c "
 - [ ] overlayfs가 디스크 공유에 어떻게 기여하는지 안다
 - [ ] 격리의 한계와 추가 보호 수단을 안다
 
+## 연습 문제
+
+1. 같은 베이스 이미지를 공유하는 컨테이너 두 개를 만들고, 실제 디스크 사용량이 어떻게 절약되는지 확인해 보세요.
+2. 64MB 메모리 한도가 있는 컨테이너에서 안전한 캐시 상한을 계산하고, 어느 값에서 OOM-kill이 나는지 비교해 보세요.
+3. 기본 seccomp 프로파일이 있을 때와 없을 때 `strace`로 어떤 시스템 콜이 차단되는지 비교해 보세요.
+
 ## 마무리와 다음 글
 
 컨테이너는 새로운 운영체제가 아니라 리눅스 커널을 namespace, cgroup, overlayfs로 정밀하게 나누는 도구입니다. 이 시리즈에서 본 운영체제 개념이 컨테이너 위에서 다시 등장합니다. 컨테이너를 이해하면 운영체제가 더 선명해집니다.
@@ -185,5 +210,7 @@ docker run --rm alpine sh -c "
 - [Linux cgroups(7)](https://man7.org/linux/man-pages/man7/cgroups.7.html)
 - [Open Container Initiative](https://opencontainers.org/)
 - [Docker — Overview](https://docs.docker.com/get-started/overview/)
+- [Rootless mode (Docker Docs)](https://docs.docker.com/engine/security/rootless/)
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)
 
 Tags: Computer Science, 운영체제, 컨테이너, namespace, cgroup, 격리
