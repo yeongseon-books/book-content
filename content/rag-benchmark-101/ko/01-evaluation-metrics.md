@@ -16,13 +16,15 @@ tags:
 - Precision
 - Recall
 - MRR
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 정답 문서 집합과 검색 결과 목록을 분리해서 보면 Precision@k, Recall@k, MRR가 무엇을 말하는지 훨씬 선명해집니다.
 ---
 
 # RAG 평가 지표 이해
 
-정답 문서 집합과 검색 결과 목록을 분리해서 보면 Precision@k, Recall@k, MRR가 각각 무엇을 드러내는지 훨씬 선명해집니다. 이 글은 RAG Benchmark 101 시리즈의 첫 번째 글입니다. 여기서는 생성 품질을 붙이기 전에 검색 품질을 독립적으로 읽는 법부터 정리하겠습니다.
+정답 문서 집합과 검색 결과 목록을 분리해서 보면 Precision@k, Recall@k, MRR가 각각 무엇을 드러내는지 훨씬 선명해집니다.
+
+이 글은 RAG 평가와 벤치마크 101 시리즈의 첫 번째 글입니다. 여기서는 생성 품질을 붙이기 전에 검색 품질을 독립적으로 읽는 법부터 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -145,6 +147,13 @@ def reciprocal_rank(case: QueryCase) -> float:
         if doc_id in case.relevant_ids:
             return 1.0 / i
     return 0.0
+
+def evaluate_case(case: QueryCase, k: int) -> dict[str, float]:
+    return {
+        f"precision@{k}": round(precision_at_k(case, k), 2),
+        f"recall@{k}": round(recall_at_k(case, k), 2),
+        "mrr": round(reciprocal_rank(case), 2),
+    }
 ```
 
 이 코드는 세 지표가 실제로 무엇을 세는지 그대로 보여 줍니다. Precision과 Recall은 모두 상위 k개에서 관련 문서 개수를 세지만, 분모가 다릅니다. MRR은 첫 관련 문서를 발견하는 순간 계산을 끝냅니다.
@@ -178,6 +187,53 @@ cd en/01-evaluation-metrics
 python3 main.py
 ```
 
+```text
+Q1: P@3=0.67, R@3=0.67, MRR=1.00
+Q2: P@3=0.33, R@3=1.00, MRR=1.00
+Q3: P@3=1.00, R@3=0.60, MRR=1.00
+AVG: P@3=0.67, R@3=0.76, MRR=1.00
+```
+
+이 출력은 평균만으로는 잘 보이지 않는 차이를 바로 드러냅니다. Q2는 **정답은 찾았지만 잡음이 많고**, Q3는 **상위 슬롯은 깨끗하지만 전체 정답을 다 가져오지 못합니다.** 둘 다 평균 P@3만 보면 비슷해 보일 수 있지만, 실제로는 개선 방향이 전혀 다릅니다.
+
+### 4단계 — 질문별 리포트를 남기기
+
+실험이 조금만 커지면 `print()` 한 줄로는 해석이 막힙니다. 질문별 점수를 구조화해 남겨 두어야 어느 쿼리에서 회귀가 났는지 바로 찾을 수 있습니다.
+
+```python
+report_rows = []
+for case in cases:
+    metrics = evaluate_case(case, k=3)
+    report_rows.append({
+        "question": case.question,
+        "retrieved_ids": case.retrieved_ids,
+        "relevant_ids": sorted(case.relevant_ids),
+        **metrics,
+    })
+
+for row in report_rows:
+    print(row)
+```
+
+```text
+{'question': 'Q1', 'retrieved_ids': ['A', 'X', 'B'], 'relevant_ids': ['A', 'B', 'C'], 'precision@3': 0.67, 'recall@3': 0.67, 'mrr': 1.0}
+{'question': 'Q2', 'retrieved_ids': ['A', 'X', 'Y'], 'relevant_ids': ['A'], 'precision@3': 0.33, 'recall@3': 1.0, 'mrr': 1.0}
+{'question': 'Q3', 'retrieved_ids': ['A', 'B', 'C'], 'relevant_ids': ['A', 'B', 'C', 'D', 'E'], 'precision@3': 1.0, 'recall@3': 0.6, 'mrr': 1.0}
+```
+
+이 정도 정보만 있어도 다음 질문이 자연스럽게 나옵니다. Q2는 reranker를 붙일 문제인지, Q3는 청크 전략이나 임베딩을 바꿔야 하는 문제인지 구분할 수 있기 때문입니다.
+
+### 5단계 — 점수 조합으로 실패를 분류하기
+
+| 패턴 | 해석 | 먼저 의심할 것 |
+| --- | --- | --- |
+| Precision 낮음, Recall 높음 | 정답은 가져왔지만 잡음이 많음 | reranker, top-k 축소, 필터링 |
+| Precision 높음, Recall 낮음 | 상위 결과는 깨끗하지만 정답 일부를 놓침 | 청크 크기, 임베딩, 쿼리 확장 |
+| MRR 낮음 | 첫 정답이 너무 뒤에 있음 | 순위화 품질, 하이브리드 검색 |
+| Recall@k = 0 | 상위 k 안에 정답이 전혀 없음 | 검색 파이프라인 자체 |
+
+실무에서는 이 표가 의외로 유용합니다. 점수를 본 직후 "다음에 무엇을 바꿔야 하는가"를 빠르게 연결해 주기 때문입니다.
+
 ![Precision@k와 Recall@k가 갈리는 판단 축](../../../assets/rag-benchmark-101/01/01-03-precision-k-versus-recall-k-decision-axe.ko.png)
 
 *Precision@k와 Recall@k가 갈리는 판단 축*
@@ -201,6 +257,8 @@ python3 main.py
 그다음에는 여러 k 값을 함께 봅니다. Recall@1, Recall@3, Recall@5, Recall@10을 같이 보면 검색기가 상위 순위에서 얼마나 빨리 정답을 끌어올리는지 보입니다. 특히 Recall@10이 0인 질문은 매우 중요합니다. 상위 10개 안에도 정답이 없다면, 이 경우는 재순위화 문제가 아니라 검색 자체가 틀린 경우이기 때문입니다.
 
 이런 평가는 가능하면 CI에 붙이는 편이 좋습니다. 임베딩 모델, 청크 크기, 인덱스 설정을 바꿀 때마다 같은 질문 세트로 자동 측정하면 회귀를 빨리 발견할 수 있습니다. 나중에는 nDCG 같은 더 정교한 지표도 고려할 수 있지만, 그 전에 Precision@k, Recall@k, MRR를 정확히 읽는 습관을 먼저 갖추는 편이 훨씬 중요합니다.
+
+또 한 가지 권장할 점은 **평가 결과를 JSON으로 남기는 것**입니다. Markdown 표는 읽기 좋지만, CI 회귀 비교에는 구조화된 산출물이 훨씬 유리합니다. 예를 들어 질문별 점수와 평균 점수를 한 JSON 파일에 저장해 두면, 다음 실행과 diff를 만들어 PR에 바로 붙일 수 있습니다.
 
 ## 체크리스트
 
@@ -248,9 +306,10 @@ python3 main.py
 
 ## 참고 자료
 
-- [Wikipedia: Mean reciprocal rank](https://en.wikipedia.org/wiki/Mean_reciprocal_rank)
-- [Stanford IR book: Evaluation in information retrieval](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html)
+- [Stanford IR Book — Evaluation of ranked retrieval results](https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html)
+- [PyTerrier documentation — Evaluation and experiment analysis](https://pyterrier.readthedocs.io/en/latest/experiments.html)
+- [ranx documentation — Metrics reference](https://amenra.github.io/ranx/metrics/)
 - [BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models](https://arxiv.org/abs/2104.08663)
-- [MTEB: Massive Text Embedding Benchmark](https://arxiv.org/abs/2210.07316)
+- [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

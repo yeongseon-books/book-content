@@ -55,7 +55,7 @@
 <body>
 <h1>Measuring retrieval performance</h1>
 <p>A retrieval benchmark works only when questions, gold documents, ranked results, and metrics stay in the same loop. Fix those inputs and you can tell whether a retriever change improved the system or just changed the feel of a few examples.</p>
-<p>This is the 2nd article in the RAG Evaluation and Benchmarking 101 series.</p>
+<p>This is post 2 in the RAG Evaluation and Benchmarking 101 series.</p>
 <h2>Questions this post answers</h2>
 <p><img alt="Questions this post answers" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-questions-this-post-answers.en.png"></p>
 <p><em>Questions this post answers</em></p>
@@ -121,10 +121,14 @@ latency_ms                                       hit_rate / MRR
 python3 main.py
 </code></pre>
 <pre><code class="language-python">import time
+import numpy as np
 
 retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 3})
 latencies_ms = []
 all_ranked = []
+
+for question, _ in QUERIES[:1]:
+    retriever.invoke(question)  # warm-up
 
 for question, relevant_ids in QUERIES:
     started_at = time.perf_counter()
@@ -133,7 +137,10 @@ for question, relevant_ids in QUERIES:
     ranked_ids = [doc.metadata[&quot;id&quot;] for doc in docs]
     latencies_ms.append(elapsed_ms)
     all_ranked.append((question, ranked_ids, relevant_ids))
+
+p95_latency_ms = float(np.percentile(latencies_ms, 95))
 </code></pre>
+<p>The warm-up call is not cosmetic. The first call often includes model load, cache misses, or lazy initialization. If you skip warm-up, your numbers describe startup behavior instead of the steady-state path users hit all day.</p>
 <p><strong>Step 3 — Compute the metrics</strong></p>
 <p><img alt="Retrieval quality axes with hit rate and MRR" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-02-retrieval-quality-axes-with-hit-rate-and.en.png"></p>
 <p><em>Retrieval quality axes with hit rate and MRR</em></p>
@@ -152,9 +159,50 @@ rrs = [reciprocal_rank(r, g) for _, r, g in all_ranked]
 print(f&quot;hit_rate@3 = {sum(hits)/len(hits):.2f}&quot;)
 print(f&quot;MRR        = {sum(rrs)/len(rrs):.2f}&quot;)
 print(f&quot;avg latency = {sum(latencies_ms)/len(latencies_ms):.1f} ms&quot;)
+print(f&quot;p95 latency = {p95_latency_ms:.1f} ms&quot;)
 </code></pre>
 <p><strong>Step 4 — Record the result</strong></p>
 <p>Keep the per-query ranked ids in the log. Storing only averages makes regressions impossible to debug — you cannot tell which query collapsed.</p>
+<pre><code class="language-python">report_rows = []
+for question, ranked_ids, relevant_ids in all_ranked:
+    report_rows.append({
+        &quot;question&quot;: question,
+        &quot;ranked_ids&quot;: ranked_ids,
+        &quot;relevant_ids&quot;: sorted(relevant_ids),
+        &quot;hit&quot;: hit_rate(ranked_ids, relevant_ids),
+        &quot;rr&quot;: reciprocal_rank(ranked_ids, relevant_ids),
+    })
+
+summary = {
+    &quot;hit_rate@3&quot;: round(sum(hits) / len(hits), 2),
+    &quot;MRR&quot;: round(sum(rrs) / len(rrs), 2),
+    &quot;avg_latency_ms&quot;: round(sum(latencies_ms) / len(latencies_ms), 1),
+    &quot;p95_latency_ms&quot;: round(p95_latency_ms, 1),
+}
+
+print(summary)
+for row in report_rows:
+    print(row)
+</code></pre>
+<pre><code class="language-text">{'hit_rate@3': 0.67, 'MRR': 0.56, 'avg_latency_ms': 4.8, 'p95_latency_ms': 6.1}
+{'question': 'What distance does FAISS use by default?', 'ranked_ids': ['doc-faiss-basics', 'doc-ann-overview', 'doc-chunking'], 'relevant_ids': ['doc-faiss-basics'], 'hit': 1.0, 'rr': 1.0}
+{'question': 'What does MRR measure?', 'ranked_ids': ['doc-bm25', 'doc-mrr-intro', 'doc-ranking'], 'relevant_ids': ['doc-mrr-intro'], 'hit': 1.0, 'rr': 0.5}
+</code></pre>
+<p>That output already tells you what to try next. If hit rate is 1.0 but reciprocal rank is 0.5, the retriever is finding the right document but ranking it too low. That points to ranking quality, not coverage.</p>
+<p><strong>Step 5 — Turn benchmark output into a triage order</strong></p>
+<p><strong>Low hit rate, healthy latency</strong><br>
+- First thing to inspect: embedding model, chunking, query formulation<br>
+- Common root cause: relevant docs are missing entirely</p>
+<p><strong>High hit rate, low MRR</strong><br>
+- First thing to inspect: reranker, score fusion, top-k order<br>
+- Common root cause: the right doc is present but too low</p>
+<p><strong>Healthy quality, bad p95</strong><br>
+- First thing to inspect: infrastructure, caching, network path<br>
+- Common root cause: a tail-latency issue rather than retrieval quality</p>
+<p><strong>Good average, one broken query</strong><br>
+- First thing to inspect: per-query rows<br>
+- Common root cause: domain mismatch or gold-set labeling issue</p>
+<p>This is where the benchmark becomes operationally useful. It stops being just a scoreboard and starts acting like a debugger.</p>
 <h2>Common mistakes</h2>
 <p><img alt="High hit rate with weak ranking" src="https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-03-high-hit-rate-with-weak-ranking.en.png"></p>
 <p><em>High hit rate with weak ranking</em></p>
