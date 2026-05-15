@@ -154,6 +154,34 @@ print(f&quot;index vector count: {vectorstore.index.ntotal}&quot;)
 <!-- injected-output:end -->
 
 <hr>
+<h2>Inspect retrieval before blaming the model</h2>
+<p>The fastest way to debug an integrated RAG chain is to inspect the retrieved chunks before rewriting the prompt. If the wrong documents come back, the model never had a fair chance.</p>
+<pre><code class="language-python">queries = [
+    &quot;Where was FAISS developed?&quot;,
+    &quot;How does vector search differ from keyword search?&quot;,
+]
+
+for query in queries:
+    print(f&quot;\nquery: {query}&quot;)
+    hits = vectorstore.similarity_search_with_score(query, k=2)
+    for idx, (doc, score) in enumerate(hits, start=1):
+        preview = doc.page_content.replace(&quot;\n&quot;, &quot; &quot;)[:90]
+        print(f&quot;  [{idx}] score={score:.4f} text={preview}...&quot;)
+</code></pre>
+<!-- injected-output:start -->
+<p><strong>Output</strong></p>
+<pre><code>query: Where was FAISS developed?
+  [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
+  [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
+
+query: How does vector search differ from keyword search?
+  [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
+  [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
+</code></pre>
+<!-- injected-output:end -->
+
+<p>That one inspection step lets you separate three failure modes quickly: wrong top-k documents means a retrieval problem, correct documents with a bad answer means a prompt or model problem, and too many noisy documents means <code>k</code> or chunking needs work.</p>
+<hr>
 <h2>Assembling the RAG chain</h2>
 <p><img alt="Retriever prompt llm parser assembly" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-assembling-the-rag-chain.en.png"></p>
 <p><em>Retriever prompt llm parser assembly</em></p>
@@ -193,6 +221,37 @@ rag_chain = (
 )
 </code></pre>
 <hr>
+<h2>Guard against empty or noisy context</h2>
+<p>In a real application, "no useful documents found" should not look the same as "here are ten barely related chunks." Add one guardrail before the prompt so the chain can fail cleanly when retrieval quality drops.</p>
+<pre><code class="language-python">from langchain_core.runnables import RunnableLambda
+
+def format_docs_guarded(docs: list) -&gt; str:
+    if not docs:
+        return &quot;NO_CONTEXT_FOUND&quot;
+
+    selected = docs[:2]
+    return &quot;\n\n&quot;.join(doc.page_content for doc in selected)
+
+guarded_chain = (
+    {
+        &quot;context&quot;: retriever | RunnableLambda(format_docs_guarded),
+        &quot;question&quot;: RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(guarded_chain.invoke(&quot;What does the corpus say about LangSmith?&quot;))
+</code></pre>
+<!-- injected-output:start -->
+<p><strong>Output</strong></p>
+<pre><code>The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
+</code></pre>
+<!-- injected-output:end -->
+
+<p>This guard looks small, but it removes one of the most common failure patterns in demo RAG apps: forcing the model to guess when the index does not actually contain the answer.</p>
+<hr>
 <h2>Running with streaming</h2>
 <p><img alt="Integrated RAG streaming execution path" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-03-running-with-streaming.en.png"></p>
 <p><em>Integrated RAG streaming execution path</em></p>
@@ -210,6 +269,7 @@ for question in questions:
         print(chunk, end=&quot;&quot;, flush=True)
     print()
 </code></pre>
+<p>That is useful beyond UX. Running the same question once with <code>invoke()</code> and once with <code>stream()</code> proves that retrieval, prompting, and generation stayed the same while only the delivery path changed.</p>
 <hr>
 <h2>Multi-turn RAG with conversation history</h2>
 <p><img alt="Multi turn RAG with history flow" src="https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-04-multi-turn-rag-with-conversation-history.en.png"></p>
@@ -368,7 +428,9 @@ if __name__ == &quot;__main__&quot;:
 <h2>What to notice in this code</h2>
 <ul>
 <li>Separating the indexing pipeline from the query pipeline makes document preparation costs and request-time costs easier to reason about.</li>
+<li>A quick <code>similarity_search_with_score()</code> check tells you whether to debug retrieval, prompting, or generation first.</li>
 <li>Even the integrated chain is still built from small LCEL pieces such as <code>retriever | format_docs</code> and <code>prompt | llm | parser</code>.</li>
+<li>A small context guard is often enough to turn "hallucinate anyway" into a clean, verifiable refusal.</li>
 <li><code>MessagesPlaceholder</code> is the insertion point that lets multi-turn history enter the prompt without collapsing the structure.</li>
 <li>The full application is long, but the maintainable pattern is still to split small Runnable assemblies into focused helper functions.</li>
 </ul>
@@ -402,6 +464,12 @@ if __name__ == &quot;__main__&quot;:
 <li><a href="https://python.langchain.com/docs/use_cases/question_answering/">LangChain RAG tutorial</a></li>
 <li><a href="https://python.langchain.com/docs/expression_language/">LCEL reference</a></li>
 <li><a href="https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder">MessagesPlaceholder</a></li>
+<li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/">FAISS VectorStore integration</a></li>
+<li><a href="https://python.langchain.com/docs/how_to/recursive_text_splitter/">RecursiveCharacterTextSplitter</a></li>
+</ul>
+<p><strong>Related Series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/01-graph-basics.md">LangGraph 101</a> — this is the natural next step once a single RAG chain grows into branching workflows, approvals, or long-lived state.</li>
 </ul>
 <p class="tags-line">Tags: LangChain, LCEL, Python, LLM</p>
 </body>

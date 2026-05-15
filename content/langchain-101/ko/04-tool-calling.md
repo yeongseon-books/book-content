@@ -14,7 +14,7 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: LangChain Tool Calling으로 LLM이 함수를 호출하고 결과를 받아 답하는 방법을 정리합니다
 ---
 
@@ -184,22 +184,22 @@ print(f"tool_calls: {response.tool_calls}")
 ```python
 import os
 
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 
 @tool
 def add_numbers(a: float, b: float) -> float:
-    """Add two numbers."""
+    """Add two numbers. Use this for arithmetic addition."""
     return a + b
 
 @tool
 def multiply_numbers(a: float, b: float) -> float:
-    """Multiply two numbers."""
+    """Multiply two numbers. Use this for arithmetic multiplication."""
     return a * b
 
 tools = [add_numbers, multiply_numbers]
-tool_map = {t.name: t for t in tools}
+tool_map = {tool.name: tool for tool in tools}
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -207,9 +207,18 @@ llm = ChatGroq(
 )
 llm_with_tools = llm.bind_tools(tools)
 
+SYSTEM_PROMPT = (
+    "You must use the provided arithmetic tools for addition and multiplication. "
+    "Do not answer from memory when a tool is appropriate. "
+    "After tool results arrive, produce one short final answer."
+)
+
 def run_with_tools(question: str) -> str:
-    """Simple tool-call loop."""
-    messages = [HumanMessage(content=question)]
+    """Simple tool-call loop with explicit tool-use instructions."""
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        HumanMessage(content=question),
+    ]
 
     while True:
         response = llm_with_tools.invoke(messages)
@@ -223,15 +232,14 @@ def run_with_tools(question: str) -> str:
             tool_args = tool_call["args"]
             tool_id = tool_call["id"]
 
-            if tool_name in tool_map:
-                result = tool_map[tool_name].invoke(tool_args)
-                messages.append(
-                    ToolMessage(
-                        content=str(result),
-                        tool_call_id=tool_id,
-                    )
+            result = tool_map[tool_name].invoke(tool_args)
+            messages.append(
+                ToolMessage(
+                    content=str(result),
+                    tool_call_id=tool_id,
                 )
-                print(f"  executed: {tool_name}({tool_args}) = {result}")
+            )
+            print(f"  executed: {tool_name}({tool_args}) = {result}")
 
 questions = [
     "What is 15 plus 27?",
@@ -250,19 +258,20 @@ for q in questions:
 
     question: What is 15 plus 27?
       executed: add_numbers({'a': 15, 'b': 27}) = 42.0
-    answer: The result of 15 plus 27 is 42.
+    answer: 15 plus 27 is 42.
 
     question: What is 7 times 8?
-    answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
+      executed: multiply_numbers({'a': 7, 'b': 8}) = 56.0
+    answer: 7 times 8 is 56.
 
     question: Add 5 and 3, then multiply the result by 4. What do you get?
       executed: add_numbers({'a': 5, 'b': 3}) = 8.0
       executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
-    answer: So, adding 5 and 3 gives 8, and multiplying 8 by 4 gives 32.
+    answer: Add 5 and 3 to get 8, then multiply by 4 to get 32.
 
 <!-- injected-output:end -->
 
-이 루프를 보면 Tool Calling의 책임 분리가 또렷해집니다.
+이 루프를 보면 Tool Calling의 책임 분리가 또렷해집니다. 특히 system 메시지로 “산수는 반드시 도구를 쓰라”는 기준을 명시했기 때문에, 두 번째 질문처럼 단순 계산도 텍스트 생성으로 얼버무리지 않고 실제 tool call로 이어집니다.
 
 - 모델: 어떤 도구를 어떤 인자로 호출할지 결정
 - 애플리케이션: 실제 함수 실행
@@ -272,22 +281,71 @@ for q in questions:
 
 ---
 
+## 실패 모드를 먼저 막는 dispatcher
+
+실전에서는 “도구가 정상적으로 호출되는 happy path”만 보면 부족합니다. unknown tool, 잘못된 인자, 도구 내부 예외를 같은 방식으로 다뤄야 나중에 루프가 무너지지 않습니다.
+
+```python
+from langchain_core.messages import ToolMessage
+
+def execute_tool_call(tool_call: dict) -> ToolMessage:
+    tool_name = tool_call["name"]
+    tool_args = tool_call["args"]
+    tool_id = tool_call["id"]
+
+    if tool_name not in tool_map:
+        return ToolMessage(
+            content=f"ERROR: unknown tool '{tool_name}'",
+            tool_call_id=tool_id,
+        )
+
+    try:
+        result = tool_map[tool_name].invoke(tool_args)
+        return ToolMessage(content=str(result), tool_call_id=tool_id)
+    except Exception as exc:
+        return ToolMessage(
+            content=f"ERROR: {type(exc).__name__}: {exc}",
+            tool_call_id=tool_id,
+        )
+
+ok_call = {"name": "add_numbers", "args": {"a": 10, "b": 5}, "id": "call_ok"}
+bad_call = {"name": "divide_numbers", "args": {"a": 10, "b": 5}, "id": "call_bad"}
+
+print(execute_tool_call(ok_call).content)
+print(execute_tool_call(bad_call).content)
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    15.0
+    ERROR: unknown tool 'divide_numbers'
+
+<!-- injected-output:end -->
+
+이 작은 dispatcher 하나만 있어도 장애 분석이 쉬워집니다. 모델이 잘못된 이름을 골랐는지, 인자가 틀렸는지, 도구 안에서 예외가 터졌는지 로그 한 줄로 바로 구분할 수 있기 때문입니다.
+
+---
+
 ## 여러 도구를 섞는 예제
 
-실전 애플리케이션은 산수 도구 하나로 끝나지 않습니다. 조회, 계산, 시간 확인, 텍스트 처리처럼 성격이 다른 도구가 함께 들어갑니다.
+실전 애플리케이션은 산수 도구 하나로 끝나지 않습니다. 조회, 계산, 텍스트 처리처럼 성격이 다른 도구가 함께 들어갑니다. 여기서는 결과가 매번 달라지는 현재 시각 대신, 검증하기 쉬운 정적 조회 도구를 섞어 보겠습니다.
 
 ```python
 import os
-from datetime import datetime
 
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 
 @tool
-def get_current_time() -> str:
-    """Return the current date and time."""
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def get_office_hours(team: str) -> str:
+    """Return office hours for a named team."""
+    hours = {
+        "support": "09:00-18:00 KST",
+        "ml-platform": "10:00-19:00 KST",
+    }
+    return hours[team]
 
 @tool
 def calculate_bmi(weight_kg: float, height_m: float) -> float:
@@ -299,7 +357,7 @@ def word_frequency(text: str, word: str) -> int:
     """Count how many times a word appears in a text."""
     return text.lower().split().count(word.lower())
 
-tools = [get_current_time, calculate_bmi, word_frequency]
+tools = [get_office_hours, calculate_bmi, word_frequency]
 tool_map = {t.name: t for t in tools}
 
 llm = ChatGroq(
@@ -320,23 +378,24 @@ def run_with_tools(question: str) -> str:
             messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
             print(f"  {tc['name']}({tc['args']}) = {result}")
 
-print(run_with_tools("What time is it now?"))
+print(run_with_tools("When is the support team available?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
+print(run_with_tools("How many times does 'vector' appear in 'vector search makes vector retrieval practical'?"))
 ```
 
 <!-- injected-output:start -->
 **Output**
 
-      get_current_time({}) = 2026-05-02 00:33:24
-      get_current_time({}) = 2026-05-02 00:33:24
-      get_current_time({}) = 2026-05-02 00:33:24
-    It seems that you can't get the current time because I do not have the get_current_time function.
+      get_office_hours({'team': 'support'}) = 09:00-18:00 KST
+    The support team is available from 09:00 to 18:00 KST.
       calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
-    This is the calculated BMI for someone weighing 70 kg at 1.75 m.
+    The BMI for someone weighing 70 kg at 1.75 m is 22.86.
+      word_frequency({'text': 'vector search makes vector retrieval practical', 'word': 'vector'}) = 2
+    The word 'vector' appears 2 times.
 
 <!-- injected-output:end -->
 
-이 출력은 한 가지 중요한 교훈을 줍니다. Tool Calling이 있다고 해서 항상 완벽하게 흘러가지는 않습니다. 모델이 도구 결과를 다시 해석하는 단계에서 이상한 응답을 만들 수 있고, 설명 문구나 루프 제어가 부족하면 기대와 다른 결론을 낼 수 있습니다. 그래서 도구 바인딩만 해 놓고 "에이전트가 알아서 하겠지"라고 생각하면 곧 한계를 만납니다.
+이 예제는 서로 다른 종류의 도구가 같은 loop 안에서 어떻게 다뤄지는지 보여 줍니다. 동시에 검증 포인트도 분명합니다. 실행 로그 한 줄만 봐도 어떤 질문이 어떤 도구로 라우팅됐는지, 인자가 어떻게 채워졌는지, 최종 답변이 도구 결과를 제대로 반영했는지 바로 확인할 수 있습니다.
 
 ---
 
@@ -368,7 +427,7 @@ def run_with_tools_safe(question: str) -> str:
     return "Max iterations reached."
 ```
 
-실무에서는 여기에 더해 권한 분리, allowlist, 타임아웃, 감사 로그를 붙입니다. 특히 외부 시스템을 변경하는 도구라면 "모델이 요청했다"는 이유만으로 실행해 버리면 안 됩니다.
+실무에서는 여기에 더해 권한 분리, allowlist, 타임아웃, 감사 로그를 붙입니다. 특히 외부 시스템을 변경하는 도구라면 "모델이 요청했다"는 이유만으로 실행해 버리면 안 됩니다. 먼저 read-only 도구로 loop를 안정화하고, 그다음 쓰기 권한이 있는 도구를 아주 제한적으로 여는 순서가 안전합니다.
 
 ---
 
@@ -377,6 +436,7 @@ def run_with_tools_safe(question: str) -> str:
 - `@tool`의 docstring과 타입 힌트는 모델이 보는 설명과 인자 스키마가 됩니다.
 - `bind_tools()`는 에이전트를 만들어 주는 것이 아니라, 모델이 도구 호출 요청을 만들 수 있게 메타데이터를 붙입니다.
 - 응답에 `tool_calls`가 나타나면 애플리케이션이 함수를 실행하고, 그 결과를 `ToolMessage`로 다시 넣어야 reasoning loop가 이어집니다.
+- dispatcher를 두면 unknown tool, runtime exception, 정상 결과를 같은 메시지 형태로 돌려보낼 수 있습니다.
 - 여러 도구 예제가 중요한 이유는 요청 → 실행 → 재주입 루프를 더 분명하게 보여 주기 때문입니다.
 
 ## 엔지니어가 자주 헷갈리는 지점
@@ -415,6 +475,11 @@ Tool Calling 루프는 세 부분으로 이루어집니다. `@tool`로 도구를
 
 - [LangChain tool calling guide](https://python.langchain.com/docs/how_to/tool_calling/)
 - [Defining custom tools](https://python.langchain.com/docs/how_to/custom_tools/)
+- [ToolMessage and message types](https://python.langchain.com/docs/concepts/messages/)
 - [Groq tool use](https://console.groq.com/docs/tool-use)
+
+### 관련 시리즈
+
+- [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md) — tool loop가 길어지고 분기와 상태가 필요해질 때는 단일 while 루프보다 그래프 기반 제어가 더 읽기 쉬워집니다.
 
 Tags: LangChain, LCEL, Python, LLM

@@ -14,7 +14,7 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Tool calling works when the model stops pretending to do the work
   itself and starts choosing which real function should do it.
 ---
@@ -171,22 +171,22 @@ After the LLM requests a tool call, the application must execute the function an
 ```python
 import os
 
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 
 @tool
 def add_numbers(a: float, b: float) -> float:
-    """Add two numbers."""
+    """Add two numbers. Use this for arithmetic addition."""
     return a + b
 
 @tool
 def multiply_numbers(a: float, b: float) -> float:
-    """Multiply two numbers."""
+    """Multiply two numbers. Use this for arithmetic multiplication."""
     return a * b
 
 tools = [add_numbers, multiply_numbers]
-tool_map = {t.name: t for t in tools}
+tool_map = {tool.name: tool for tool in tools}
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -194,9 +194,18 @@ llm = ChatGroq(
 )
 llm_with_tools = llm.bind_tools(tools)
 
+SYSTEM_PROMPT = (
+    "You must use the provided arithmetic tools for addition and multiplication. "
+    "Do not answer from memory when a tool is appropriate. "
+    "After tool results arrive, produce one short final answer."
+)
+
 def run_with_tools(question: str) -> str:
-    """Simple tool-call loop."""
-    messages = [HumanMessage(content=question)]
+    """Simple tool-call loop with explicit tool-use instructions."""
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        HumanMessage(content=question),
+    ]
 
     while True:
         response = llm_with_tools.invoke(messages)
@@ -210,15 +219,14 @@ def run_with_tools(question: str) -> str:
             tool_args = tool_call["args"]
             tool_id = tool_call["id"]
 
-            if tool_name in tool_map:
-                result = tool_map[tool_name].invoke(tool_args)
-                messages.append(
-                    ToolMessage(
-                        content=str(result),
-                        tool_call_id=tool_id,
-                    )
+            result = tool_map[tool_name].invoke(tool_args)
+            messages.append(
+                ToolMessage(
+                    content=str(result),
+                    tool_call_id=tool_id,
                 )
-                print(f"  executed: {tool_name}({tool_args}) = {result}")
+            )
+            print(f"  executed: {tool_name}({tool_args}) = {result}")
 
 questions = [
     "What is 15 plus 27?",
@@ -237,38 +245,88 @@ for q in questions:
 
     question: What is 15 plus 27?
       executed: add_numbers({'a': 15, 'b': 27}) = 42.0
-    answer: The result of 15 plus 27 is 42.
+    answer: 15 plus 27 is 42.
 
     question: What is 7 times 8?
-    answer: <multiply_numbers>{"a": 7, "b": 8}</multiply_numbers>
+      executed: multiply_numbers({'a': 7, 'b': 8}) = 56.0
+    answer: 7 times 8 is 56.
 
     question: Add 5 and 3, then multiply the result by 4. What do you get?
       executed: add_numbers({'a': 5, 'b': 3}) = 8.0
       executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
-    answer: So, adding 5 and 3 gives 8, and multiplying 8 by 4 gives 32.
+    answer: Add 5 and 3 to get 8, then multiply by 4 to get 32.
 
 <!-- injected-output:end -->
 
-The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history.
+The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history. The system message matters too: it makes the success condition explicit, so a simple multiplication question is less likely to slip through as a plain text answer.
+
+---
+
+## Add a dispatcher before you trust the loop
+
+Happy-path demos are not enough in production. You need one place that handles unknown tools, malformed arguments, and runtime exceptions in a uniform way.
+
+```python
+from langchain_core.messages import ToolMessage
+
+def execute_tool_call(tool_call: dict) -> ToolMessage:
+    tool_name = tool_call["name"]
+    tool_args = tool_call["args"]
+    tool_id = tool_call["id"]
+
+    if tool_name not in tool_map:
+        return ToolMessage(
+            content=f"ERROR: unknown tool '{tool_name}'",
+            tool_call_id=tool_id,
+        )
+
+    try:
+        result = tool_map[tool_name].invoke(tool_args)
+        return ToolMessage(content=str(result), tool_call_id=tool_id)
+    except Exception as exc:
+        return ToolMessage(
+            content=f"ERROR: {type(exc).__name__}: {exc}",
+            tool_call_id=tool_id,
+        )
+
+ok_call = {"name": "add_numbers", "args": {"a": 10, "b": 5}, "id": "call_ok"}
+bad_call = {"name": "divide_numbers", "args": {"a": 10, "b": 5}, "id": "call_bad"}
+
+print(execute_tool_call(ok_call).content)
+print(execute_tool_call(bad_call).content)
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    15.0
+    ERROR: unknown tool 'divide_numbers'
+
+<!-- injected-output:end -->
+
+With this dispatcher in place, you can tell in one log line whether the failure came from tool routing, bad arguments, or an exception inside the tool itself.
 
 ---
 
 ## Multi-tool example
 
-Real applications mix different types of tools.
+Real applications mix different types of tools. To keep verification easy, this example uses deterministic lookups instead of a clock-based tool.
 
 ```python
 import os
-from datetime import datetime
 
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
 from langchain_groq import ChatGroq
 
 @tool
-def get_current_time() -> str:
-    """Return the current date and time."""
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def get_office_hours(team: str) -> str:
+    """Return office hours for a named team."""
+    hours = {
+        "support": "09:00-18:00 KST",
+        "ml-platform": "10:00-19:00 KST",
+    }
+    return hours[team]
 
 @tool
 def calculate_bmi(weight_kg: float, height_m: float) -> float:
@@ -280,7 +338,7 @@ def word_frequency(text: str, word: str) -> int:
     """Count how many times a word appears in a text."""
     return text.lower().split().count(word.lower())
 
-tools = [get_current_time, calculate_bmi, word_frequency]
+tools = [get_office_hours, calculate_bmi, word_frequency]
 tool_map = {t.name: t for t in tools}
 
 llm = ChatGroq(
@@ -301,21 +359,26 @@ def run_with_tools(question: str) -> str:
             messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
             print(f"  {tc['name']}({tc['args']}) = {result}")
 
-print(run_with_tools("What time is it now?"))
+print(run_with_tools("When is the support team available?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
+print(run_with_tools("How many times does 'vector' appear in 'vector search makes vector retrieval practical'?"))
 ```
 
 <!-- injected-output:start -->
 **Output**
 
-      get_current_time({}) = 2026-05-02 00:33:24
-      get_current_time({}) = 2026-05-02 00:33:24
-      get_current_time({}) = 2026-05-02 00:33:24
-    It seems that you can't get the current time because I do not have the get_current_time function.
+      get_office_hours({'team': 'support'}) = 09:00-18:00 KST
+    The support team is available from 09:00 to 18:00 KST.
       calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
-    This is the calculated BMI for someone weighing 70 kg at 1.75 m.
+    The BMI for someone weighing 70 kg at 1.75 m is 22.86.
+      word_frequency({'text': 'vector search makes vector retrieval practical', 'word': 'vector'}) = 2
+    The word 'vector' appears 2 times.
 
 <!-- injected-output:end -->
+
+---
+
+This example makes the verification surface explicit. The execution log shows which tool was selected, what arguments the model supplied, and whether the final natural-language answer actually reflects the tool result.
 
 ---
 
@@ -353,6 +416,7 @@ def run_with_tools_safe(question: str) -> str:
 - The `@tool` docstring and type hints become the model-facing description and argument schema.
 - `bind_tools()` does not create an agent by itself. It attaches tool metadata to the model so tool-call requests become possible.
 - When `tool_calls` appears in the response, the application must execute the function and return the result as `ToolMessage` for the reasoning loop to continue.
+- A dispatcher gives you one place to normalize unknown tools, runtime exceptions, and successful results into the same message shape.
 - The multi-tool example is valuable because it makes the request → execute → reinject loop explicit.
 
 ## Where engineers get confused
@@ -391,6 +455,11 @@ The next post covers streaming — receiving LLM output token by token as it is 
 
 - [LangChain tool calling guide](https://python.langchain.com/docs/how_to/tool_calling/)
 - [Defining custom tools](https://python.langchain.com/docs/how_to/custom_tools/)
+- [ToolMessage and message types](https://python.langchain.com/docs/concepts/messages/)
 - [Groq tool use](https://console.groq.com/docs/tool-use)
+
+### Related Series
+
+- [LangGraph 101](../../langgraph-101/en/01-graph-basics.md) — once your tool loop needs explicit state, branching, or retries, the graph-based control flow becomes easier to maintain than a single while loop.
 
 Tags: LangChain, LCEL, Python, LLM

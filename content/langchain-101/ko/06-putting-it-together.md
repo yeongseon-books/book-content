@@ -14,7 +14,7 @@ tags:
 - LCEL
 - Python
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: Prompt와 Retriever, Tool, Streaming을 하나의 LCEL 체인으로 묶는 실전 조립 패턴을 정리합니다
 ---
 
@@ -147,6 +147,41 @@ print(f"index vector count: {vectorstore.index.ntotal}")
 
 ---
 
+## 모델을 탓하기 전에 retrieval부터 검증하기
+
+RAG 통합 예제에서 가장 흔한 실수는 답이 이상하면 곧바로 프롬프트 문구를 바꾸는 것입니다. 하지만 실제로는 top-k에 어떤 청크가 들어왔는지 먼저 확인해야 원인을 빨리 좁힐 수 있습니다.
+
+```python
+queries = [
+    "Where was FAISS developed?",
+    "How does vector search differ from keyword search?",
+]
+
+for query in queries:
+    print(f"\nquery: {query}")
+    hits = vectorstore.similarity_search_with_score(query, k=2)
+    for idx, (doc, score) in enumerate(hits, start=1):
+        preview = doc.page_content.replace("\n", " ")[:90]
+        print(f"  [{idx}] score={score:.4f} text={preview}...")
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    query: Where was FAISS developed?
+      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
+      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
+
+    query: How does vector search differ from keyword search?
+      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
+      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
+
+<!-- injected-output:end -->
+
+이 검증을 먼저 해 두면 문제를 세 갈래로 나눌 수 있습니다. 상위 문서가 틀리면 retrieval 문제이고, 문서는 맞는데 답이 틀리면 prompt나 model 문제이며, 문서 수가 너무 많아 잡음이 섞이면 `k`와 chunking 문제입니다. 통합 예제일수록 이 순서가 중요합니다.
+
+---
+
 ## RAG 체인 조립하기
 
 ![retriever prompt llm parser 조립 흐름](../../../assets/langchain-101/06/06-02-assembling-the-rag-chain.ko.png)
@@ -194,6 +229,44 @@ rag_chain = (
 
 ---
 
+## 빈 컨텍스트와 잡음을 먼저 차단하기
+
+실전에서는 "문서를 못 찾은 경우"와 "문서는 찾았지만 잡음이 너무 많은 경우"를 같은 프롬프트로 넘기지 않는 편이 낫습니다. 최소한 컨텍스트가 비어 있을 때는 조기 종료하고, 너무 긴 문맥은 잘라 내는 지점이 필요합니다.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def format_docs_guarded(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
+
+    selected = docs[:2]
+    return "\n\n".join(doc.page_content for doc in selected)
+
+guarded_chain = (
+    {
+        "context": retriever | RunnableLambda(format_docs_guarded),
+        "question": RunnablePassthrough(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
+
+<!-- injected-output:end -->
+
+이 가드는 사소해 보이지만 효과가 큽니다. 근거가 없는 답변을 억지로 만들게 하기보다, "지금 인덱스에는 없는 내용"이라고 빨리 말하게 만드는 편이 운영 품질에 훨씬 유리합니다.
+
+---
+
 ## 스트리밍으로 실행하기
 
 ![통합 RAG 스트리밍 실행 경로](../../../assets/langchain-101/06/06-03-running-with-streaming.ko.png)
@@ -216,7 +289,7 @@ for question in questions:
     print()
 ```
 
-여기서 좋은 점은 스트리밍 때문에 체인을 다시 설계할 필요가 없다는 것입니다. 앞선 글에서 본 대로, 통합 체인도 `stream()`으로 소비하는 것만으로 충분합니다. 즉, **통합 예제가 길어져도 스트리밍은 출력 소비 계층의 문제**라는 사실이 유지됩니다.
+여기서 좋은 점은 스트리밍 때문에 체인을 다시 설계할 필요가 없다는 것입니다. 앞선 글에서 본 대로, 통합 체인도 `stream()`으로 소비하는 것만으로 충분합니다. 즉, **통합 예제가 길어져도 스트리밍은 출력 소비 계층의 문제**라는 사실이 유지됩니다. 또한 같은 질문을 `invoke()`와 `stream()` 둘 다 돌려 보면, retrieval·prompt·generation은 같고 전달 방식만 달라진다는 점을 직접 확인할 수 있습니다.
 
 ---
 
@@ -392,7 +465,9 @@ if __name__ == "__main__":
 ## 이 코드에서 주목할 점
 
 - 인덱싱 파이프라인과 질의 파이프라인을 분리하면 문서 준비 비용과 요청당 비용을 따로 이해하기 쉬워집니다.
+- `similarity_search_with_score()` 같은 점검 코드를 먼저 돌리면, 문제를 retrieval·prompt·generation 중 어디로 좁혀야 하는지 빨리 판단할 수 있습니다.
 - 통합 체인도 결국 `retriever | format_docs`와 `prompt | llm | parser` 같은 작은 LCEL 조각으로 구성됩니다.
+- 빈 컨텍스트를 조기에 처리하는 guard는 "근거 없는 답변"을 줄이는 가장 싼 안전장치입니다.
 - `MessagesPlaceholder`는 멀티턴 이력이 프롬프트 구조를 무너뜨리지 않고 들어오는 삽입 지점입니다.
 - 전체 애플리케이션이 길어 보여도, 유지보수 가능한 패턴은 여전히 작은 helper 함수로 책임을 나누는 것입니다.
 
@@ -433,5 +508,11 @@ if __name__ == "__main__":
 - [LangChain RAG tutorial](https://python.langchain.com/docs/use_cases/question_answering/)
 - [LCEL reference](https://python.langchain.com/docs/expression_language/)
 - [MessagesPlaceholder](https://python.langchain.com/docs/modules/model_io/prompts/quick_start/#messagesplaceholder)
+- [FAISS VectorStore integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
+- [RecursiveCharacterTextSplitter](https://python.langchain.com/docs/how_to/recursive_text_splitter/)
+
+### 관련 시리즈
+
+- [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md) — 단일 RAG chain을 넘어 분기, 사람 승인, 장기 상태가 필요해질 때 다음 단계로 이어집니다.
 
 Tags: LangChain, LCEL, Python, LLM
