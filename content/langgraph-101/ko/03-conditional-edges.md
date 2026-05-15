@@ -14,13 +14,15 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 조건부 엣지로 상태에 따라 다음 노드를 런타임에 선택하는 분기 그래프 패턴을 정리합니다
 ---
 
 # 조건부 엣지와 분기 흐름
 
-이 글은 LangGraph 101 시리즈의 세 번째 글입니다. 에이전트가 언제나 한 경로만 따른다면 그래프는 생각보다 단순합니다. 하지만 실제 시스템은 거의 그렇지 않습니다. 어떤 요청은 코드 생성으로 가야 하고, 어떤 요청은 개념 설명으로, 어떤 요청은 오류 분석으로 보내야 합니다. 이 분기 판단을 긴 `if/elif/else` 안에 묻어 두면 실행은 되지만, 왜 그 길을 탔는지는 바로 흐려집니다.
+에이전트가 언제나 한 경로만 따른다면 그래프는 생각보다 단순합니다. 하지만 실제 시스템은 거의 그렇지 않습니다. 어떤 요청은 코드 생성으로 가야 하고, 어떤 요청은 개념 설명으로, 어떤 요청은 오류 분석으로 보내야 합니다. 이 분기 판단을 긴 `if/elif/else` 안에 묻어 두면 실행은 되지만, 왜 그 길을 탔는지는 바로 흐려집니다.
+
+이 글은 LangGraph 101 시리즈의 세 번째 글입니다. 여기서는 조건부 엣지를 단순한 분기 문법이 아니라, 상태를 읽고 다음 경로를 공개적으로 결정하는 라우팅 계층으로 봅니다.
 
 운영에서 더 까다로운 순간은 분기 실패가 조용히 시작될 때입니다. 분류 라벨 하나가 비어 있고, 예상 밖 문자열 하나가 흘러들어오고, default 경로 하나가 빠져 있는 순간 겉으로는 “가끔 이상한 입력에서만 실패하는 시스템”처럼 보이기 쉽습니다. 하지만 실제로는 모델 품질보다 **라우팅 계약이 약한 구조 문제**인 경우가 더 많습니다.
 
@@ -162,6 +164,70 @@ if __name__ == "__main__":
 
 ---
 
+## default route를 코드로 고정해 두기
+
+입문 예제는 `code`, `concept`, `debug` 세 경로만 있어도 충분하지만, 운영 예제라면 fallback을 함께 보여 주는 편이 좋습니다. 예상 밖 문자열이 들어왔을 때 그래프가 어디로 가야 하는지 구조에 남겨 두지 않으면, branch는 되는데 복구는 어려운 상태가 생기기 쉽습니다.
+
+```python
+from typing import Literal
+
+def route_question(state: RouterState) -> Literal["code", "concept", "debug", "fallback"]:
+    route = state.get("route", "").strip().lower()
+    if route in {"code", "concept", "debug"}:
+        return route
+    return "fallback"
+
+def answer_fallback(_: RouterState) -> RouterState:
+    return {
+        "answer": (
+            "Route: fallback. The classifier returned an unknown label, "
+            "so the graph is taking the safest explanatory path first."
+        )
+    }
+
+graph.add_node("fallback", answer_fallback)
+graph.add_conditional_edges(
+    "classify",
+    route_question,
+    {
+        "code": "code",
+        "concept": "concept",
+        "debug": "debug",
+        "fallback": "fallback",
+    },
+)
+graph.add_edge("fallback", END)
+```
+
+**Expected output:**
+
+```text
+Question: Explain LangGraph with an unknown route label.
+Route: fallback
+Answer: Route: fallback. The classifier returned an unknown label, so the graph is taking the safest explanatory path first.
+```
+
+이 코드는 분기 구조를 과하게 복잡하게 만들지 않으면서도, “정의되지 않은 route는 어디로 가는가?”라는 운영 질문에 바로 답을 줍니다. 분기가 늘어날수록 이 fallback 경로는 선택지가 아니라 안전장치에 가까워집니다.
+
+---
+
+## 분기 실패를 운영에서 어떻게 읽을까
+
+조건부 엣지에서 장애가 생길 때, 실제 원인은 대개 모델 성능보다 계약 부재에서 나옵니다. 아래 세 가지는 특히 자주 보입니다.
+
+1. **분기 근거는 있는데 fallback이 없는 경우**  
+   `route="other"` 같은 값이 한 번만 나와도 그래프가 갑자기 예외로 끝날 수 있습니다. 이 문제는 classifier 품질이 아니라 path map 완성도 문제입니다.
+
+2. **라우터 함수가 부작용을 함께 떠안는 경우**  
+   라우팅 함수 안에서 외부 API를 부르거나 상태를 추가로 갱신하면, 분기 판단과 실행 작업이 섞입니다. 그러면 “왜 이 route가 나왔는가”와 “라우팅 중 무슨 일이 있었는가”가 같은 디버깅 문제로 붙어 버립니다.
+
+3. **loop 종료와 branch 선택을 같은 문제로 다루는 경우**  
+   route는 다음 단계를 정하는 문제이고, 종료 조건은 언제 멈출지를 정하는 문제입니다. 둘을 한 덩어리로 다루면 어떤 요청은 지나치게 빨리 끝나고, 어떤 요청은 이유 없이 반복되기 쉽습니다.
+
+제가 실무에서 branch-heavy 그래프를 볼 때 먼저 확인하는 것도 비슷합니다. route 필드가 상태에 남는지, unknown route가 안전하게 수습되는지, 종료 규칙이 분기 규칙과 분리되어 있는지 봅니다. 이 세 가지가 선명하면 희귀한 라우팅 장애도 훨씬 빨리 설명됩니다.
+
+---
+
 ## 이 코드에서 먼저 봐야 할 점
 
 코드 전체를 한 번에 읽기보다, 아래 세 지점부터 보는 편이 이해가 빠릅니다.
@@ -272,6 +338,10 @@ if __name__ == "__main__":
 - [LangGraph branching guide](https://langchain-ai.github.io/langgraph/how-tos/branching/)
 - [LangGraph low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/)
 - [LangGraph recursion limit guide](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
+
+### 소스 코드와 예제
+- [langchain-ai/langgraph GitHub repository](https://github.com/langchain-ai/langgraph)
+- [LangGraph quickstart with routing](https://langchain-ai.github.io/langgraph/tutorials/get-started/4-add-tools/)
 
 ### 관련 시리즈
 - [상태 관리와 체크포인트](./02-state-and-checkpoints.md)

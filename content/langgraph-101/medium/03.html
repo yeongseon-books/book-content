@@ -172,6 +172,62 @@ if __name__ == &quot;__main__&quot;:
 <p>There is another useful contrast here. This code shows the difference between “a function that contains branching” and “a graph whose branching can be explained.” Once that difference lands, fallback routes, defaults, and recursion limits start to feel like natural safety controls instead of awkward extras.</p>
 <p>Example code: <a href="https://github.com/yeongseon-books/langgraph-101/tree/main/en/03-conditional-edges">github.com/yeongseon-books/langgraph-101</a></p>
 <hr>
+<h2>Make the default route explicit in code</h2>
+<p>The introductory example is enough to show routing, but an operational branch should also show what happens when the classifier returns something unexpected. Otherwise the graph has happy paths but no safe recovery path.</p>
+<pre><code class="language-python">from typing import Literal
+
+def route_question(state: RouterState) -&gt; Literal[&quot;code&quot;, &quot;concept&quot;, &quot;debug&quot;, &quot;fallback&quot;]:
+    route = state.get(&quot;route&quot;, &quot;&quot;).strip().lower()
+    if route in {&quot;code&quot;, &quot;concept&quot;, &quot;debug&quot;}:
+        return route
+    return &quot;fallback&quot;
+
+def answer_fallback(_: RouterState) -&gt; RouterState:
+    return {
+        &quot;answer&quot;: (
+            &quot;Route: fallback. The classifier returned an unknown label, &quot;
+            &quot;so the graph is taking the safest explanatory path first.&quot;
+        )
+    }
+
+graph.add_node(&quot;fallback&quot;, answer_fallback)
+graph.add_conditional_edges(
+    &quot;classify&quot;,
+    route_question,
+    {
+        &quot;code&quot;: &quot;code&quot;,
+        &quot;concept&quot;: &quot;concept&quot;,
+        &quot;debug&quot;: &quot;debug&quot;,
+        &quot;fallback&quot;: &quot;fallback&quot;,
+    },
+)
+graph.add_edge(&quot;fallback&quot;, END)
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">Question: Explain LangGraph with an unknown route label.
+Route: fallback
+Answer: Route: fallback. The classifier returned an unknown label, so the graph is taking the safest explanatory path first.
+</code></pre>
+<p>That change keeps the example small while still answering an important production question: where does undefined routing go? The more paths a graph grows, the less this looks like a convenience and the more it looks like a safety boundary.</p>
+<hr>
+<h2>How branch failures usually begin</h2>
+<p>Branching failures are often described as model unpredictability, but the underlying causes are usually structural.</p>
+<ol>
+<li>
+<p><strong>Routing evidence exists, but no fallback exists.</strong><br>
+   One unexpected route label is enough to turn a rare input into a graph failure.</p>
+</li>
+<li>
+<p><strong>The router accumulates side effects.</strong><br>
+   Once the routing function starts mutating business state or calling external services, “why did we choose this branch?” becomes tangled with “what else happened while routing?”</p>
+</li>
+<li>
+<p><strong>Branch selection and loop termination are treated as the same concern.</strong><br>
+   Picking the next node and deciding when to stop are related, but they are not identical. Blending them often creates workflows that either stop too early or repeat too long.</p>
+</li>
+</ol>
+<p>This is why I recommend reading branch-heavy graphs in a fixed order: inspect the route field, inspect the fallback path, then inspect the termination rule. If those three are visible, rare routing incidents become much easier to reconstruct.</p>
+<hr>
 <h2>What to notice in this code</h2>
 <p>Do not read every line with equal weight on a first pass. Three details matter first.</p>
 <p><img alt="Question to route field flow" src="https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-02-what-to-notice-in-this-code.en.png"></p>
@@ -246,6 +302,9 @@ if __name__ == &quot;__main__&quot;:
 - <a href="https://langchain-ai.github.io/langgraph/how-tos/branching/">LangGraph branching guide</a><br>
 - <a href="https://langchain-ai.github.io/langgraph/concepts/low_level/">LangGraph low-level concepts: edges</a><br>
 - <a href="https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/">LangGraph recursion limit guide</a></p>
+<p><strong>Source code and examples</strong><br>
+- <a href="https://github.com/langchain-ai/langgraph">langchain-ai/langgraph GitHub repository</a><br>
+- <a href="https://langchain-ai.github.io/langgraph/tutorials/get-started/4-add-tools/">LangGraph quickstart with routing</a></p>
 <p><strong>Related Series</strong><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/02-state-and-checkpoints.md">State management and checkpoints</a><br>
 - <a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/langgraph-101/en/01-graph-basics.md">LangGraph introduction and graph basics</a></p>

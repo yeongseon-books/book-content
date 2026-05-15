@@ -14,13 +14,15 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 체크포인터로 그래프 상태를 저장하고 thread_id로 다시 이어 실행하는 방법을 정리합니다
 ---
 
 # 상태 관리와 체크포인트
 
-이 글은 LangGraph 101 시리즈의 두 번째 글입니다. 에이전트가 한 번의 요청으로 끝날 때는 상태를 대충 넘겨도 크게 문제가 없을 수 있습니다. 하지만 워크플로가 두 번째 턴까지 살아남아야 하는 순간부터 상황이 완전히 달라집니다. 첫 번째 턴에서 사용자가 무엇을 말했는지, 어떤 도구 결과가 아직 유효한지, 지금이 몇 번째 응답인지가 모두 중요해지기 때문입니다.
+에이전트가 한 번의 요청으로 끝날 때는 상태를 대충 넘겨도 크게 문제가 없을 수 있습니다. 하지만 워크플로가 두 번째 턴까지 살아남아야 하는 순간부터 상황이 완전히 달라집니다. 첫 번째 턴에서 사용자가 무엇을 말했는지, 어떤 도구 결과가 아직 유효한지, 지금이 몇 번째 응답인지가 모두 중요해지기 때문입니다.
+
+이 글은 LangGraph 101 시리즈의 두 번째 글입니다. 여기서는 체크포인트를 대화형 편의 기능이 아니라, 같은 상태 타임라인을 다음 호출까지 이어 주는 저장 계층으로 읽습니다.
 
 운영에서는 이 문제가 더 거칠게 드러납니다. 어떤 세션은 잘 이어지는데 프로세스가 한 번 재시작되자 맥락이 끊기고, 어떤 요청은 부분 실패 뒤 다시 돌렸더니 이미 비용을 낸 작업을 또 수행합니다. 체크포인트가 없는 장기 실행 에이전트는 실패 자체보다도, **실패 뒤에 질서 있게 복구할 수 없다는 점**이 더 위험한 경우가 많습니다.
 
@@ -156,6 +158,67 @@ if __name__ == "__main__":
 
 ---
 
+## 저장이 실제로 됐는지 로컬에서 검증하기
+
+체크포인트 글에서 중요한 건 “코드가 실행됐다”가 아니라 “정말 저장됐는가”입니다. 그래서 두 번째 턴까지 실행한 뒤에는 답변 문장만 보지 말고, 저장된 상태가 기대한 필드를 포함하는지 바로 확인하는 편이 좋습니다.
+
+```python
+app = build_graph()
+config = {"configurable": {"thread_id": "memory-demo"}}
+
+app.invoke(
+    {"messages": [HumanMessage(content="My project is about LangGraph.")], "turn_count": 0},
+    config=config,
+)
+app.invoke(
+    {"messages": [HumanMessage(content="What did I say my project was about?")]},
+    config=config,
+)
+
+snapshot = app.get_state(config)
+
+assert snapshot.values["turn_count"] == 2
+assert len(snapshot.values["messages"]) == 4
+assert any("LangGraph" in message.content for message in snapshot.values["messages"])
+
+print(snapshot.values)
+```
+
+**Expected output:**
+
+```text
+{
+  'messages': [
+    HumanMessage(content='My project is about LangGraph.'),
+    AIMessage(content='Turn 1. Latest user message: My project is about LangGraph. ...'),
+    HumanMessage(content='What did I say my project was about?'),
+    AIMessage(content='Turn 2. Latest user message: What did I say my project was about?. Earlier user turns: My project is about LangGraph.')
+  ],
+  'turn_count': 2
+}
+```
+
+이 검증이 중요한 이유는 checkpoint를 감성적 비유가 아니라 데이터 구조로 확인하게 해 주기 때문입니다. 저장된 메시지 수와 `turn_count`를 직접 보면, 무엇이 누적되고 무엇이 갱신되는지 곧바로 읽힙니다.
+
+---
+
+## MemorySaver 예제에서 반드시 짚고 넘어갈 한계
+
+입문 예제는 `MemorySaver`로 충분합니다. 하지만 운영에서는 이 예제가 보여 주는 한계를 같이 이해해야 합니다.
+
+- **프로세스를 재시작하면 메모리 저장소는 비어 있습니다.**  
+  지금 예제는 checkpoint 개념을 설명하기엔 좋지만, 재시작 뒤에도 복구돼야 하는 서비스의 최종 형태는 아닙니다.
+
+- **`thread_id`가 약하면 다른 세션이 섞입니다.**  
+  사용자 ID, 대화 ID, workflow ID 같은 경계를 어떻게 매핑할지 먼저 정하지 않으면 저장 계층이 있어도 복구가 불안정합니다.
+
+- **필드별 병합 전략이 같지 않습니다.**  
+  `messages`는 누적 필드지만 `turn_count`는 최신 값으로 갱신되는 필드입니다. 이 둘을 같은 방식으로 다루면 기억은 남는데 대화 규칙은 깨진 상태가 생깁니다.
+
+그래서 checkpoint를 붙인 뒤에는 항상 두 가지를 같이 봐야 합니다. 첫째, 지금 저장된 값이 맞는가. 둘째, 이 저장 방식이 실제 운영 경계에서도 유지될 수 있는가. 전자는 `get_state()`로 바로 확인하고, 후자는 세션 키 설계와 저장소 선택에서 결정됩니다.
+
+---
+
 ## 이 코드에서 먼저 봐야 할 점
 
 처음부터 모든 라인을 해석하기보다, 아래 세 지점부터 잡는 편이 이해가 빠릅니다.
@@ -266,6 +329,10 @@ if __name__ == "__main__":
 - [LangGraph persistence guide](https://langchain-ai.github.io/langgraph/how-tos/persistence/)
 - [MemorySaver reference](https://langchain-ai.github.io/langgraph/reference/checkpoints/)
 - [Working with messages in graph state](https://langchain-ai.github.io/langgraph/concepts/low_level/#working-with-messages-in-graph-state)
+
+### 소스 코드와 예제
+- [LangGraph checkpoint package source](https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint)
+- [LangGraph memory tutorial](https://langchain-ai.github.io/langgraph/tutorials/get-started/3-add-memory/)
 
 ### 관련 시리즈
 - [LangGraph 소개와 그래프 기초](./01-graph-basics.md)

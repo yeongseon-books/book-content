@@ -14,7 +14,7 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-14'
 seo_description: A checkpointer snapshots graph state so the next invocation can continue
   from the same conversation timeline instead of starting from zero.
 ---
@@ -157,6 +157,67 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 ---
 
+## Verify what was actually persisted
+
+The important checkpointing question is not “did the code run?” but “did the graph really save the state we think it saved?” The easiest way to answer that is to inspect the stored snapshot directly after the second turn.
+
+```python
+app = build_graph()
+config = {"configurable": {"thread_id": "memory-demo"}}
+
+app.invoke(
+    {"messages": [HumanMessage(content="My project is about LangGraph.")], "turn_count": 0},
+    config=config,
+)
+app.invoke(
+    {"messages": [HumanMessage(content="What did I say my project was about?")]},
+    config=config,
+)
+
+snapshot = app.get_state(config)
+
+assert snapshot.values["turn_count"] == 2
+assert len(snapshot.values["messages"]) == 4
+assert any("LangGraph" in message.content for message in snapshot.values["messages"])
+
+print(snapshot.values)
+```
+
+**Expected output:**
+
+```text
+{
+  'messages': [
+    HumanMessage(content='My project is about LangGraph.'),
+    AIMessage(content='Turn 1. Latest user message: My project is about LangGraph. ...'),
+    HumanMessage(content='What did I say my project was about?'),
+    AIMessage(content='Turn 2. Latest user message: What did I say my project was about?. Earlier user turns: My project is about LangGraph.')
+  ],
+  'turn_count': 2
+}
+```
+
+That small check is doing real operational work. It confirms that message history accumulated, that `turn_count` advanced, and that the graph is persisting a session timeline instead of merely returning nice-looking answers.
+
+---
+
+## The limits of the in-memory example
+
+`MemorySaver` is a good teaching tool, but it also helps to say out loud what it does **not** guarantee.
+
+- **A process restart clears the in-memory checkpoint store.**  
+  That is fine for learning. It is not the final persistence shape for a long-lived service.
+
+- **A weak `thread_id` strategy still produces confusing recovery.**  
+  If session keys are unstable or too broad, the graph may either fail to resume or resume the wrong conversation.
+
+- **Different fields need different merge behavior.**  
+  `messages` should accumulate. `turn_count` should overwrite with the latest value. Treating every field the same way produces graphs that “remember” in a shallow sense while still corrupting the timeline.
+
+That is why I encourage readers to ask two questions together: is the saved value correct, and would this storage pattern still hold up under the service boundary we actually care about? `get_state()` answers the first one immediately. Session-key and storage design answer the second.
+
+---
+
 ## What to notice in this code
 
 Do not try to interpret every line at once. Three observations matter first.
@@ -267,6 +328,10 @@ In the next post, we will use that saved state to decide which node should run n
 - [LangGraph persistence guide](https://langchain-ai.github.io/langgraph/how-tos/persistence/)
 - [MemorySaver reference](https://langchain-ai.github.io/langgraph/reference/checkpoints/)
 - [Working with messages in graph state](https://langchain-ai.github.io/langgraph/concepts/low_level/#working-with-messages-in-graph-state)
+
+### Source code and examples
+- [LangGraph checkpoint package source](https://github.com/langchain-ai/langgraph/tree/main/libs/checkpoint)
+- [LangGraph memory tutorial](https://langchain-ai.github.io/langgraph/tutorials/get-started/3-add-memory/)
 
 ### Related Series
 - [LangGraph introduction and graph basics](./01-graph-basics.md)

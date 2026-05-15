@@ -14,7 +14,7 @@ tags:
 - Agent
 - Python
 - LLM
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-14'
 seo_description: A conditional edge inspects state and returns the next node name,
   so routing becomes an explicit runtime decision instead of hidden control flow.
 ---
@@ -163,6 +163,70 @@ Example code: [github.com/yeongseon-books/langgraph-101](https://github.com/yeon
 
 ---
 
+## Make the default route explicit in code
+
+The introductory example is enough to show routing, but an operational branch should also show what happens when the classifier returns something unexpected. Otherwise the graph has happy paths but no safe recovery path.
+
+```python
+from typing import Literal
+
+def route_question(state: RouterState) -> Literal["code", "concept", "debug", "fallback"]:
+    route = state.get("route", "").strip().lower()
+    if route in {"code", "concept", "debug"}:
+        return route
+    return "fallback"
+
+def answer_fallback(_: RouterState) -> RouterState:
+    return {
+        "answer": (
+            "Route: fallback. The classifier returned an unknown label, "
+            "so the graph is taking the safest explanatory path first."
+        )
+    }
+
+graph.add_node("fallback", answer_fallback)
+graph.add_conditional_edges(
+    "classify",
+    route_question,
+    {
+        "code": "code",
+        "concept": "concept",
+        "debug": "debug",
+        "fallback": "fallback",
+    },
+)
+graph.add_edge("fallback", END)
+```
+
+**Expected output:**
+
+```text
+Question: Explain LangGraph with an unknown route label.
+Route: fallback
+Answer: Route: fallback. The classifier returned an unknown label, so the graph is taking the safest explanatory path first.
+```
+
+That change keeps the example small while still answering an important production question: where does undefined routing go? The more paths a graph grows, the less this looks like a convenience and the more it looks like a safety boundary.
+
+---
+
+## How branch failures usually begin
+
+Branching failures are often described as model unpredictability, but the underlying causes are usually structural.
+
+1. **Routing evidence exists, but no fallback exists.**  
+   One unexpected route label is enough to turn a rare input into a graph failure.
+
+2. **The router accumulates side effects.**  
+   Once the routing function starts mutating business state or calling external services, “why did we choose this branch?” becomes tangled with “what else happened while routing?”
+
+3. **Branch selection and loop termination are treated as the same concern.**  
+   Picking the next node and deciding when to stop are related, but they are not identical. Blending them often creates workflows that either stop too early or repeat too long.
+
+This is why I recommend reading branch-heavy graphs in a fixed order: inspect the route field, inspect the fallback path, then inspect the termination rule. If those three are visible, rare routing incidents become much easier to reconstruct.
+
+---
+
 ## What to notice in this code
 
 Do not read every line with equal weight on a first pass. Three details matter first.
@@ -273,6 +337,10 @@ In the next post, we will connect this branching structure to a real tool-callin
 - [LangGraph branching guide](https://langchain-ai.github.io/langgraph/how-tos/branching/)
 - [LangGraph low-level concepts: edges](https://langchain-ai.github.io/langgraph/concepts/low_level/)
 - [LangGraph recursion limit guide](https://langchain-ai.github.io/langgraph/how-tos/recursion-limit/)
+
+### Source code and examples
+- [langchain-ai/langgraph GitHub repository](https://github.com/langchain-ai/langgraph)
+- [LangGraph quickstart with routing](https://langchain-ai.github.io/langgraph/tutorials/get-started/4-add-tools/)
 
 ### Related Series
 - [State management and checkpoints](./02-state-and-checkpoints.md)
