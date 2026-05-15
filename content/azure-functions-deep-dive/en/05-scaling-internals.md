@@ -284,7 +284,8 @@ Flex Consumption is the successor to Consumption and, in practice, a different p
 > Source: [Flex Consumption per-function scaling](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan#per-function-scaling)
 
 - **Always ready instances**: you can set a non-zero floor, configurable per group or per function. This is the main lever for cutting cold starts.
-- **Default quota of up to 1000 instances / 250 cores per region.**
+- **Default per-app maximum of 100 instances**, configurable up to 1000.
+- **Regional subscription quota remains separate**: the default regional quota is 250 cores, so you can hit that limit before the app-level ceiling.
 - **Selectable instance memory**: 512 / 2048 / 4096 MB. A larger instance can absorb more concurrency within the same function group.
 - VNet integration and Azure Files mounts are supported.
 
@@ -310,7 +311,7 @@ Flex Consumption is the successor to Consumption and, in practice, a different p
 | Plan | Scale decided by | Scale to zero | Max instances | Per-function | Always ready | VNet |
 |---|---|---|---|---|---|---|
 | Consumption | Scale Controller | Yes | 200 | No | No | No |
-| Flex Consumption | Scale Controller (new) | Yes | 1000 | Yes | Yes | Yes |
+| Flex Consumption | Scale Controller (new) | Yes | 100 default; configurable to 1000 | Yes | Yes | Yes |
 | Premium | Scale Controller (+ option) | No (min 1) | Varies by SKU/region | No | pre-warmed | Yes |
 | Dedicated | App Service Auto-Scale | No | Depends on plan | No | Always On available | Yes |
 
