@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-05-12'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: Kudu, Oryx, run-from-package, slot warm-up으로 App Service 배포 경로를 해부합니다.
 ---
 
 # 배포와 Kudu — 빌드·동기화·릴리스의 안쪽
@@ -55,7 +54,7 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 
 따라서 "배포가 성공했는데 앱이 안 뜬다"는 상황은 모순이 아닙니다. 배포 파이프라인의 앞단은 성공했지만, runtime readiness라는 마지막 경계가 아직 실패한 것일 수 있습니다.
 
-> App Service 배포를 잘 이해한다는 것은 Kudu 로그가 끝나는 자리와 앱 startup 책임이 시작되는 자리를 구분할 줄 안다는 뜻입니다.
+> App Service 배포를 잘 이해한다는 것은 Kudu 로그가 끝나는 자리와 앱 startup 책임이 시작되는 자리를 분리해서 읽는 일입니다.
 
 ## 핵심 개념
 
@@ -85,11 +84,11 @@ Kudu는 App Service의 SCM 사이트이며, 배포와 진단을 담당하는 com
 
 Windows code app의 고전적인 경로는 비교적 직선적입니다. Git push 또는 zipdeploy 요청이 들어오고, Kudu가 사이트 유형과 설정을 확인한 뒤, 필요하면 deployment logic을 실행하고, 결과물을 `wwwroot`에 동기화하며, worker가 새 파일을 보게 됩니다. 이 경로에서 `deploy.cmd`나 `deploy.sh`가 자주 등장하는 이유도 자동 생성 또는 사용자 지정 deployment script가 실제로 이 흐름 한가운데 있기 때문입니다.
 
-핵심은 배포 엔진이 artifact 수신과 파일 배치의 책임을 진다는 점입니다. 그러나 이 단계가 끝났다고 해서 곧바로 앱 프로세스가 healthy 상태라는 뜻은 아닙니다. Kudu가 새 파일을 올바른 경로에 놓는 일과, 런타임이 그 새 파일을 들고 정상 기동하는 일은 여전히 서로 다른 질문입니다.
+배포 엔진은 artifact 수신과 파일 배치를 맡습니다. 그러나 이 단계가 끝났다고 해서 앱 프로세스가 바로 정상 상태로 올라오는 것은 아닙니다. Kudu가 새 파일을 올바른 경로에 놓는 일과, 런타임이 그 새 파일을 들고 정상 기동하는 일은 여전히 서로 다른 질문입니다.
 
 ### Linux code app에서는 Oryx가 detect-build-startup 역할을 맡을 수 있습니다
 
-Oryx의 공개 README는 자신을 source repo를 runnable artifact로 바꾸는 build system이라고 설명합니다. 또한 codebase를 분석해 build script와 startup script를 생성한다고 분명히 밝힙니다. 이 문장을 App Service 문맥으로 번역하면, Linux code app에서는 Kudu 또는 App Service build service가 Oryx를 호출하고, Oryx가 language와 repository shape를 감지해 dependency restore와 build, startup behavior를 만들어 낼 수 있다는 뜻입니다.
+Oryx의 공개 README는 자신을 source repo를 runnable artifact로 바꾸는 build system이라고 설명합니다. 또한 codebase를 분석해 build script와 startup script를 생성한다고 분명히 밝힙니다. 이 문장을 App Service 문맥으로 번역하면, Linux code app에서는 Kudu 또는 App Service build service가 Oryx를 호출하고, Oryx가 language와 repository shape를 감지해 dependency restore와 build, startup behavior를 만들어 낸다고 볼 수 있습니다.
 
 ![Linux 코드 앱 배포 중 Oryx가 끼는 지점](../../../assets/azure-app-service-deep-dive/04/04-03-where-oryx-enters-for-linux-code-apps.ko.png)
 

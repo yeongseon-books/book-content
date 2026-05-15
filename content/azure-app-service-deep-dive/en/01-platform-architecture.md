@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Understand how App Service Front-End, Worker, shared storage, and Kudu fit together into one operating model.
 ---
 
 # App Service platform architecture — Front-End, Worker, File Server
@@ -326,6 +325,32 @@ az appservice plan show -n my-plan -g my-rg \
 
 az webapp list --plan my-plan -g my-rg \
   --query "[].{name:name, state:state, hostNames:defaultHostName}" -o table
+```
+
+### Read the public surface as evidence, not just inventory
+
+If you want to verify the architecture model against something concrete, read the ARM resource shape directly. These two commands show that the plan owns capacity while the app points at that capacity through `serverFarmId`.
+
+```bash
+PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
+
+az resource show --ids "$PLAN_ID" \
+  --query "{name:name, sku:sku.name, reserved:properties.reserved, workers:properties.numberOfWorkers, perSiteScaling:properties.perSiteScaling}"
+
+az webapp show -n my-app -g my-rg \
+  --query "{serverFarmId:serverFarmId, state:state, hostNames:hostNames, kind:kind}"
+```
+
+**Expected output:** the plan document shows worker count and Linux/Windows shape, while the app document shows which `serverFarmId` the app is attached to. That makes the platform model visible: the plan owns capacity, and the app consumes it.
+
+```json
+{
+  "name": "my-plan",
+  "sku": "P1v3",
+  "reserved": true,
+  "workers": 3,
+  "perSiteScaling": false
+}
 ```
 
 ## Operational checklist

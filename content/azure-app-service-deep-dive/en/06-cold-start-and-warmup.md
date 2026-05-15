@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Reduce App Service first-request latency by separating Always On, warm-up readiness, health checks, and slot warm-up.
 ---
 
 # Cold start and warmup — why the first request is expensive

@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-05-12'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: Autoscale 규칙이 plan 인스턴스 수를 worker 확장으로 바꾸는 과정을 설명합니다.
 ---
 
 # 스케일링 내부 동작 — Scale Out 결정과 워커 추가 경로
@@ -73,7 +72,7 @@ Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진
 
 ![scale up과 scale out이 바꾸는 대상 비교](../../../assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.ko.png)
 
-이 구분은 느림의 원인을 읽을 때 특히 중요합니다. memory bottleneck과 concurrency bottleneck은 모두 "느리다"로 보일 수 있지만, 전자는 scale-up이 더 적절할 수 있고 후자는 scale-out이 더 적절할 수 있습니다. 확장 방향이 다르다는 뜻입니다.
+이 구분은 느림의 원인을 읽을 때 특히 중요합니다. 메모리 부족과 동시성 병목은 둘 다 "느리다"로 보일 수 있지만, 전자는 scale-up이 더 맞고 후자는 scale-out이 더 맞을 수 있습니다. 같은 증상처럼 보여도 대응 축이 다릅니다.
 
 ### autoscale rule은 app이 아니라 plan에 붙습니다
 
@@ -97,7 +96,7 @@ autoscale rule은 단순 threshold만 보지 않습니다. `timeGrain`, `timeWin
 
 그리고 cooldown은 속도를 늦추기 위한 부작용이 아니라 안정성을 위한 장치입니다. worker를 하나 추가한 직후 metrics가 안정될 시간을 주고, 막 줄인 capacity를 다시 바로 늘리는 oscillation을 줄이며, App Service 특유의 startup and warm-up 지연을 고려하도록 만듭니다. 그래서 실제 scale latency는 threshold crossing 시점 하나가 아니라 `timeWindow + evaluation cadence + cooldown + worker readiness` 전체로 봐야 정확합니다.
 
-### 새 worker가 추가된다는 말은 desired count가 실제 capacity로 반영된다는 뜻입니다
+### 새 worker가 추가된다는 말은 desired count가 실제 capacity로 반영된다는 이야기입니다
 
 공개 문서는 내부 배치 알고리즘을 모두 드러내지 않지만, 운영에 필요한 멘탈 모델은 충분히 제공합니다. autoscale 또는 수동 설정이 plan의 desired instance count를 올리고, App Service control plane이 그 상태를 반영하며, 해당 plan은 더 많은 worker capacity를 얻게 되고, Front-End는 새 worker가 healthy 상태에 들어온 뒤에야 그쪽으로 요청을 보내기 시작합니다.
 

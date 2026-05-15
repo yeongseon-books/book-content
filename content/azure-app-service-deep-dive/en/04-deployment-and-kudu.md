@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-04-29'
-seo_description: Microsoft doesn't publicly document the full implementation details
-  of the App Service Front-End, Worker, and File Server layers.
+last_reviewed: '2026-05-15'
+seo_description: Trace App Service deployment from Kudu upload through Oryx build, run-from-package, slot warm-up, and runtime readiness.
 ---
 
 # Deployment and Kudu — build, sync, release from the inside

@@ -14,9 +14,8 @@ tags:
 - App Service
 - Distributed Systems
 - Platform Engineering
-last_reviewed: '2026-05-12'
-seo_description: App Service의 Front-End, Worker, File Server 구현 세부사항은 Microsoft가 공개하지
-  않았습니다.
+last_reviewed: '2026-05-15'
+seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 App Service 실행 제약을 정리합니다.
 ---
 
 # Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가
@@ -124,6 +123,38 @@ cat /home/LogFiles/eventlog.xml 2>/dev/null | tail -40
 ```
 
 이 명령은 정답을 한 번에 주지 않지만, 실행 중인 프로세스와 파일시스템 관찰 지점을 빠르게 확보하게 해 줍니다. 특히 Linux에서는 container 안의 실제 프로세스 상태를, Windows에서는 로그와 파일 경로 힌트를 통해 sandbox 제약의 흔적을 찾는 출발점이 됩니다.
+
+### 진단 엔드포인트를 두면 실행 경계를 더 빨리 분리할 수 있습니다
+
+"로컬에서는 되는데 App Service에서는 안 된다"는 상황에서는 앱이 실제로 어떤 실행 표면을 보고 있는지 먼저 출력해 보는 편이 빠릅니다. 아래 엔드포인트는 worker 식별자, `/home` storage 설정, 포트 계약을 한 번에 노출합니다.
+
+```python
+from flask import Flask, jsonify
+import os
+import socket
+
+app = Flask(__name__)
+
+@app.get("/diag/runtime")
+def diag_runtime():
+    return jsonify(
+        hostname=socket.gethostname(),
+        instance_id=os.environ.get("WEBSITE_INSTANCE_ID", "unknown"),
+        site_name=os.environ.get("WEBSITE_SITE_NAME", "unknown"),
+        storage=os.environ.get("WEBSITES_ENABLE_APP_SERVICE_STORAGE", "unset"),
+        port=os.environ.get("PORT", "unset"),
+    )
+```
+
+이 값을 app settings 조회와 나란히 보면 진단 속도가 훨씬 빨라집니다.
+
+```bash
+az webapp config appsettings list -n my-app -g my-rg \
+  --query "[?name=='WEBSITES_ENABLE_APP_SERVICE_STORAGE' || name=='WEBSITES_PORT' || name=='PORT'].{name:name,value:value}" \
+  -o table
+```
+
+**Expected output:** Linux custom container인데 `WEBSITES_ENABLE_APP_SERVICE_STORAGE`가 `false`로 보이면 `/home`을 영구 공유 저장소처럼 가정하면 안 됩니다. `PORT` 또는 `WEBSITES_PORT`가 기대와 다르면 startup contract 문제를 먼저 의심해야 합니다.
 
 ## 흔히 헷갈리는 지점
 
