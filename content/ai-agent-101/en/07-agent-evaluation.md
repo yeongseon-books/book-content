@@ -143,7 +143,7 @@ class CostTracker:
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
-        "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
+        "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -172,6 +172,8 @@ class CostTracker:
 ```
 
 Cost metrics are critical in production. Even with high accuracy, if each task costs over $1, the business won't work.
+
+If you still keep `gpt-3.5-turbo` in an existing system, treat it as a legacy model. Its current legacy pricing is $0.50 per 1M input tokens and $1.50 per 1M output tokens, but for new low-cost budgeting examples `gpt-4o-mini` is the better default.
 
 ### Latency
 

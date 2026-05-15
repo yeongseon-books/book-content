@@ -133,7 +133,7 @@ class CostTracker:
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
-        "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
+        "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -160,6 +160,8 @@ class CostTracker:
             "estimated_usd": round(self.metrics.estimated_usd, 4)
         }
 ```
+
+기존 시스템에서 `gpt-3.5-turbo`를 계속 써야 한다면 legacy 모델로 보고 계산해야 합니다. 현재 legacy 단가는 입력 1M tokens당 $0.50, 출력 1M tokens당 $1.50이며, 새 저비용 예시는 `gpt-4o-mini`를 기본값으로 두는 편이 더 적절합니다.
 
 ```python
 import time

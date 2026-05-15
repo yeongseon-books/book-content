@@ -226,7 +226,7 @@ class BudgetEnforcer:
 
     PRICING = {
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
-        "gpt-3.5-turbo": {"prompt": 0.0015 / 1000, "completion": 0.002 / 1000}
+        "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
     }
 
     def __init__(self):
@@ -273,6 +273,8 @@ budget.set_limit("user_123", daily_limit_usd=5.0)
 if not budget.check_and_record("user_123", "gpt-4", 1500, 500):
     raise RuntimeError("daily budget exceeded")
 ```
+
+If you still run a legacy `gpt-3.5-turbo` workload, budget it with the current legacy rates of $0.50 per 1M input tokens and $1.50 per 1M output tokens. For new cost-sensitive production defaults, `gpt-4o-mini` is the better example.
 
 Without cost limits, one user can drain the entire budget.
 
