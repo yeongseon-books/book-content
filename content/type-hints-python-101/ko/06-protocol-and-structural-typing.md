@@ -18,7 +18,7 @@ tags:
   - 덕 타이핑
   - 인터페이스
 seo_description: Protocol로 상속 없이 인터페이스를 정의하고 structural typing을 활용하는 방법을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Protocol과 structural typing
@@ -53,6 +53,10 @@ class Closeable(Protocol):     class FileHandler:
         └──── 구조가 맞으므로 호환됨 ───────────┘
                  (상속 필요 없음)
 ```
+
+![Protocol과 ABC가 계약을 해석하는 방식](../../../assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Protocol과 ABC가 계약을 해석하는 방식*
 
 ## 핵심 용어
 
@@ -242,6 +246,35 @@ class Executable(Protocol):
 
 공통 구현이 필요하면 ABC가 맞고, 느슨한 인터페이스 계약이 필요하면 Protocol이 더 잘 맞습니다.
 
+## 실무 마이그레이션 패턴
+
+기존 저장소에는 이미 `S3Storage`, `LocalStorage`, `FakeStorage` 같은 구현이 흩어져 있고, 그 위에 서비스 코드가 구체 클래스 이름을 직접 물고 있는 경우가 많습니다. 이때 가장 안전한 시작점은 모든 구현을 당장 상속 구조로 묶는 일이 아니라, **지금 공통으로 쓰이는 최소 시그니처를 Protocol로 먼저 추출하는 것**입니다.
+
+예를 들어 업로드 서비스가 실제로 쓰는 기능이 `save()`와 `open()`뿐이라면, 먼저 그 둘만 가진 `StorageBackend` Protocol을 만들고 서비스 함수의 매개변수를 그 타입으로 바꿉니다. 그다음 테스트 더블, 로컬 구현, 클라우드 구현이 모두 통과하는지 mypy나 pyright로 확인합니다. 이렇게 하면 구현 클래스를 뜯어고치지 않고도 의존성 방향을 뒤집을 수 있습니다.
+
+```python
+from typing import Protocol
+
+
+class StorageBackend(Protocol):
+    def save(self, path: str, data: bytes) -> None: ...
+    def open(self, path: str) -> bytes: ...
+
+
+def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
+    storage.save(path, data)
+    return storage.open(path)
+```
+
+이 방식의 장점은 리뷰 범위를 작게 유지한다는 점입니다. 호출부는 계약만 바꾸고, 각 구현체는 구조가 맞는지만 확인하면 됩니다. Protocol 도입 초기에 저장소 전체를 한 번에 일반화하려고 들면 오히려 메서드 수만 불필요하게 늘고 계약이 흐려지기 쉽습니다.
+
+## 호환성 문제가 생기면 먼저 볼 점
+
+- Protocol 속성 타입이 실제 구현보다 더 좁지 않은지 확인합니다.
+- 메서드 이름은 같지만 반환 타입이 다르면 structural typing도 통과하지 못합니다.
+- `@runtime_checkable` 결과와 정적 검사 결과가 다를 수 있다는 점을 구분합니다. 런타임 `isinstance()`는 시그니처 전체를 보지 않습니다.
+- Protocol이 너무 커져서 대부분 구현이 일부 메서드만 쓰는 상태라면, 읽기 전용/쓰기 전용처럼 더 작은 계약으로 분리합니다.
+
 ## 여기서 먼저 봐야 할 점
 
 - Protocol은 구현보다 시그니처를 정의하는 도구입니다.
@@ -310,7 +343,9 @@ class Executable(Protocol):
 ## 참고 자료
 
 - [Python 공식 문서 — typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [Python typing specification — Protocols](https://typing.python.org/en/latest/spec/protocol.html)
 - [PEP 544 — Protocols: Structural subtyping](https://peps.python.org/pep-0544/)
+- [Python 공식 문서 — abc 모듈](https://docs.python.org/3/library/abc.html)
 - [mypy 문서 — Protocols and structural subtyping](https://mypy.readthedocs.io/en/stable/protocols.html)
 - [Real Python — Structural Typing](https://realpython.com/python-protocol/)
 

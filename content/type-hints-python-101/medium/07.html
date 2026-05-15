@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Understanding Generics</h1>
-<p>This is post 7 in the Type Hints in Python 101 series.</p>
-<blockquote>
-<p>Type Hints in Python 101 Series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Can a function accept multiple types while preserving the relationship between input and output types?</p>
-<blockquote>
-<p>Consider a function that returns the first element of a list. If you pass <code>list[int]</code>, you want <code>int</code> back. If you pass <code>list[str]</code>, you want <code>str</code> back. Using <code>Any</code> erases type information. Writing separate functions duplicates code. Generics solve this by letting you parameterize types — "the return type is the same as the element type of the input." This article covers TypeVar, Generic classes, bounds, constraints, and the Python 3.12 syntax.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Reusable Python code often fails at exactly one point: you can make it accept many types, but you accidentally erase the relationship between the input type and the output type. <code>Any</code> makes the code flexible but blind.</p>
+<p>This is post 7 in the Type Hints in Python 101 series. In this article, we will use <code>TypeVar</code> and <code>Generic</code> to preserve those type relationships, then look at where Generics help in real service code and where they become unnecessary abstraction.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>TypeVar definition and usage</li>
@@ -87,10 +77,12 @@
                      │
               call: f([1, 2, 3])
                      │
-              T = int (resolved)
-                     │
-              return type = int
+               T = int (resolved)
+                      │
+               return type = int
 </code></pre>
+<p><img alt="How Generic preserves the input-output type relationship" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>How Generic preserves the input-output type relationship</em></p>
 <h2>Key Concepts</h2>
 <p><strong>TypeVar</strong><br>
 - Description: Declares a type variable for generic functions and classes</p>
@@ -210,6 +202,29 @@ class Stack[T]:
         return self._items.pop()
 </code></pre>
 <p>Python 3.12 eliminates the need to declare <code>TypeVar</code> explicitly. The <code>[T]</code> syntax declares the type parameter inline.</p>
+<h2>Real Migration Pattern: Wrapper Types First</h2>
+<p>The biggest payoff from Generics in a real repository usually comes from wrapper types, not toy helper functions. Pagination responses, cache entries, <code>Repository[T]</code>, and <code>Result[T]</code> all repeat the same structure while varying only in the payload type.</p>
+<p>The key question is simple: does the payload type flow through the API unchanged? If yes, Generic is usually the right fit. If the return type no longer depends on the input type, a concrete return type or a Protocol is often clearer.</p>
+<pre><code class="language-python">from typing import Generic, TypeVar
+
+T = TypeVar(&quot;T&quot;)
+
+class Page(Generic[T]):
+    def __init__(self, items: list[T], total: int) -&gt; None:
+        self.items = items
+        self.total = total
+
+def first_item(page: Page[T]) -&gt; T:
+    return page.items[0]
+</code></pre>
+<p>With this contract, <code>Page[int]</code> produces <code>int</code>, and <code>Page[str]</code> produces <code>str</code>. That is the signal that the abstraction is earning its keep.</p>
+<h2>First Checks When Inference Looks Wrong</h2>
+<ul>
+<li>Confirm that one <code>TypeVar</code> is not trying to represent two unrelated roles in the same function.</li>
+<li>Remember that mutable containers like <code>list[T]</code> are invariant. <code>list[Child]</code> is not assignable to <code>list[Parent]</code>.</li>
+<li>If type parameters keep multiplying, split the API before you end up with <code>T</code>, <code>U</code>, <code>V</code>, and <code>W</code> everywhere.</li>
+<li>Do not use Generic as a prettier <code>Any</code>. If no relationship is preserved, a concrete type is often better.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>TypeVar resolves to the same concrete type within a single function call</li>
@@ -283,7 +298,9 @@ class Stack[T]:
 <ul>
 <li><a href="https://docs.python.org/3/library/typing.html#typing.TypeVar">Python docs — typing.TypeVar</a></li>
 <li><a href="https://docs.python.org/3/library/typing.html#typing.Generic">Python docs — typing.Generic</a></li>
+<li><a href="https://typing.python.org/en/latest/spec/generics.html">Python typing specification — Generics</a></li>
 <li><a href="https://peps.python.org/pep-0695/">PEP 695 — Type Parameter Syntax</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/generics.html#variance-of-generic-types">mypy docs — Variance of generic types</a></li>
 <li><a href="https://mypy.readthedocs.io/en/stable/generics.html">mypy docs — Generics</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Type Hints, Generic, TypeVar, Type Parameters, Generic Programming</p>

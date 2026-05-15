@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Using mypy and pyright</h1>
-<p>This is post 8 in the Type Hints in Python 101 series.</p>
-<blockquote>
-<p>Type Hints in Python 101 Series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: You have written type hints — but how do you verify they are correct without running the code?</p>
-<blockquote>
-<p>Type hints are not enforced at runtime. You can pass an <code>int</code> where <code>str</code> is expected, and Python will happily execute until it crashes. The real value of type hints comes from static analysis tools that check your code before it runs. mypy and pyright are the two dominant tools in the Python ecosystem. This article covers installation, configuration, gradual adoption, and CI integration for both.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Writing type hints is only the first half of the job. Until a checker runs, a wrong return type and a missing <code>None</code> check are still just one merge away from production.</p>
+<p>This is post 8 in the Type Hints in Python 101 series. In this article, we will turn type hints into an actual engineering gate with mypy and pyright, then walk through the repository-scale rollout patterns that keep teams from drowning in hundreds of new errors.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Differences between mypy and pyright and how to choose</li>
@@ -91,6 +81,8 @@
               │
          VS Code real-time display
 </code></pre>
+<p><img alt="Type-check feedback loop from local editing to the CI gate" src="https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Type-check feedback loop from local editing to the CI gate</em></p>
 <h2>Key Concepts</h2>
 <p><strong>mypy</strong><br>
 - Description: The official Python type checker, maintained by the mypy team</p>
@@ -202,6 +194,52 @@ jobs:
       - run: mypy src/
 </code></pre>
 <p>Adding type checking to CI prevents type errors from being merged into the main branch.</p>
+<p><strong>Step 6: Ratchet Strictness One Directory at a Time</strong></p>
+<p>The most common migration failure is enabling strict mode for the entire repository in one shot. The error count spikes, the team loses trust, and type checking becomes "that thing we will clean up later." A better pattern is to measure the current baseline, then tighten one high-value directory at a time.</p>
+<pre><code class="language-bash"># Measure the current state
+mypy src/
+
+# Inspect only the modules you want to harden next
+mypy src/core src/api
+</code></pre>
+<pre><code class="language-toml">[tool.mypy]
+python_version = &quot;3.11&quot;
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = &quot;src.core.*&quot;
+strict = true
+
+[[tool.mypy.overrides]]
+module = &quot;src.integrations.*&quot;
+disallow_any_generics = true
+
+[[tool.mypy.overrides]]
+module = &quot;src.legacy.*&quot;
+ignore_errors = true
+</code></pre>
+<p>The important part is governance, not just config. <code>legacy</code> should be a temporary quarantine zone, not a permanent hiding place. Teams that succeed revisit which package graduates to strict next instead of leaving the rollout frozen for months.</p>
+<p><strong>Step 7: Quarantine <code>type: ignore</code> and Record Why</strong></p>
+<p>Some ignores are legitimate: a third-party package has no stubs yet, a plugin uses dynamic metaprogramming, or a framework pattern defeats the checker. The mistake is leaving bare <code>type: ignore</code> comments with no explanation.</p>
+<pre><code class="language-python">from third_party_sdk import build_client
+
+client = build_client()  # type: ignore[no-untyped-call]  # SDK v2 has no stubs yet
+</code></pre>
+<p>Treat these as debt items with metadata.</p>
+<ul>
+<li>Include the error code so the suppression scope is explicit.</li>
+<li>Note the reason in the code review or PR body.</li>
+<li>Keep <code>warn_unused_ignores = true</code> enabled so stale ignores do not accumulate silently.</li>
+</ul>
+<p><strong>Step 8: Triage False Positives in a Fixed Order</strong></p>
+<p>When a checker reports something suspicious, do not jump straight to suppression. The safest order is:</p>
+<ol>
+<li>Confirm whether it is a real bug.</li>
+<li>Check whether the signature is too broad (<code>Any</code>, <code>object</code>, oversized Union).</li>
+<li>Verify whether missing stubs or a version mismatch caused the noise.</li>
+<li>Only then add the narrowest possible ignore.</li>
+</ol>
+<p>When mypy and pyright disagree, the operational question is not "which tool is philosophically correct?" It is "which tool is our merge gate?" Pick one standard for CI, then use the other as editor support if it still adds value.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>mypy uses <code>pyproject.toml</code>; pyright uses <code>pyrightconfig.json</code></li>
@@ -276,6 +314,8 @@ jobs:
 <li><a href="https://mypy.readthedocs.io/en/stable/">mypy documentation</a></li>
 <li><a href="https://github.com/microsoft/pyright">pyright documentation</a></li>
 <li><a href="https://mypy.readthedocs.io/en/stable/config_file.html">mypy configuration reference</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/existing_code.html">mypy docs — Using mypy with an existing codebase</a></li>
+<li><a href="https://mypy.readthedocs.io/en/stable/error_codes.html">mypy docs — Error codes and ignores</a></li>
 <li><a href="https://realpython.com/python-type-checking/">Real Python — Python Type Checking</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Type Hints, mypy, pyright, Static Analysis, CI</p>
