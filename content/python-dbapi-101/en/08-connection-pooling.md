@@ -70,20 +70,28 @@ Once you internalize this, "pool connections to save handshake cost" becomes a s
 *Core concepts*
 ### SQLite's three thread-safety modes
 
-The SQLite C library is compiled in one of three modes:
+The SQLite C library is compiled in one of three native modes:
 
-- **Single-thread (0)**: no thread concurrency at all. Embedded only.
-- **Multi-thread (1)**: separate connections in separate threads is fine. Sharing one connection between threads is not.
-- **Serialized (2)**: even one connection can be shared across threads safely; an internal mutex serializes calls.
+- **Single-thread**: no thread concurrency at all. Embedded only.
+- **Multi-thread**: separate connections in separate threads is fine. Sharing one connection between threads is not.
+- **Serialized**: even one connection can be shared across threads safely; an internal mutex serializes calls.
 
-Python's `sqlite3` exposes the active mode:
+Those native mode names are not the same numbering as Python's DB-API `sqlite3.threadsafety` value. Python exposes this DB-API mapping instead:
+
+- **0** -> SQLite single-thread
+- **1** -> SQLite multi-thread
+- **3** -> SQLite serialized
+
+The SQLite compile-time `SQLITE_THREADSAFE` numbers are different again (`0`, `2`, `1` in that same order).
+
+Python's `sqlite3` exposes the DB-API value like this:
 
 ```python
 import sqlite3
-print(sqlite3.threadsafety)  # 0, 1, 2, or 3
+print(sqlite3.threadsafety)  # 0, 1, or 3
 ```
 
-Most distros report `1` or `3`. In Python 3.11+, `3` means `serialized` and you can share a connection across threads safely.
+Most distros report `1` or `3`. In Python 3.11+, `3` maps to SQLite's `serialized` mode; `1` maps to `multi-thread`, which still does not mean one connection should be shared across threads.
 
 ### What `check_same_thread` actually does
 
@@ -100,7 +108,7 @@ def worker():
 threading.Thread(target=worker).start()
 ```
 
-Setting `check_same_thread=False` removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So `check_same_thread=False` alone is **not** enough. You need `sqlite3.threadsafety >= 1` and you must guarantee at the code level that only one thread uses a given connection at a time.
+Setting `check_same_thread=False` removes the Python guard. From that point on safety depends entirely on which thread-safety mode the underlying SQLite C library was compiled with. So `check_same_thread=False` alone is **not** enough. If you intend to share one connection across threads, first verify that `sqlite3.threadsafety == 3`. Otherwise keep the safer rule: do not share one connection across threads.
 
 ### Per-thread vs shared
 
@@ -108,7 +116,7 @@ Setting `check_same_thread=False` removes the Python guard. From that point on s
 |----------|------|------|-----|
 | New connection per request | Simplest. Boundary aligns with request. | Connection churn (cheap in SQLite, but not zero) | Short requests, low concurrency |
 | Per-thread connection (`threading.local`) | Reused within a thread. Keeps the `check_same_thread` guard. | Connection count grows with thread pool | Traditional WSGI/Flask |
-| Single shared connection | Smallest footprint | Requires `serialized` mode + `check_same_thread=False`; writes serialize anyway | Embedded, single worker |
+| Single shared connection | Smallest footprint | Requires `sqlite3.threadsafety == 3` + `check_same_thread=False`; writes serialize anyway | Embedded, single worker |
 | External async pool (`aiosqlite`) | Plays nicely with coroutines | Single-writer model still applies | FastAPI/aiohttp |
 
 ### Why a big connection pool does not fit SQLite
