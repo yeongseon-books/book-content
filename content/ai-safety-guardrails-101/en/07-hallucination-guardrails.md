@@ -47,7 +47,7 @@ This episode focuses on **closed-domain**, because most production guardrails ar
 
 ## What Grounding Actually Means
 
-![What Grounding Actually Means](../../../assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
+![what grounding actually means](../../../assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
 *Grounding verification becomes manageable once the answer is decomposed into claims and checked in increasing-cost stages.*
 
 Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.
