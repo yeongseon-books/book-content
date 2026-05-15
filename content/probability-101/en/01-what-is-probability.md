@@ -2,7 +2,7 @@
 series: probability-101
 episode: 1
 title: What Is Probability?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,61 +16,53 @@ tags:
   - Intuition
   - DataScience
   - Beginner
-seo_description: A beginner-friendly look at probability, the frequentist and Bayesian views, and why probability is the foundation of data analysis and ML
-last_reviewed: '2026-05-04'
+seo_description: Understand what probability measures, how frequentist and Bayesian views differ, and why the idea sits under statistics and machine learning.
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Probability?
 
-This is the first post in the Probability 101 series.
+The first definition most people hear is that probability is “how likely something is to happen.” That is not wrong, but it runs out of room quickly. It does not tell you why a coin gets probability 0.5, what “70% chance of rain” actually means, or how much trust to place in a model score of 0.8.
 
-> Probability 101 series (1/10)
+To understand probability well, you need to look past the number itself and ask what kind of uncertainty that number is describing. Once that clicks, the same language starts to work across statistics, data analysis, and machine learning.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Probability 101 series. It sets up the core idea of probability, contrasts the frequentist and Bayesian views, and gives you a small code experiment you can use as a mental anchor for the rest of the series.
 
-**Core question**: Is *probability* a *property of the world*, or a *measure of our uncertainty*?
+## What you will learn
 
-> *Probability can be a *long-run frequency* or a *degree of belief*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *definition* of probability
-- The *frequentist* and *Bayesian* views
-- Why probability *matters* in *data and ML*
-- A 5-step intuition exercise
-- Five common mistakes
+- What probability is actually measuring
+- Why sample space and events come before any calculation
+- How the frequentist and Bayesian views answer different questions
+- Why probability keeps showing up in data work and machine learning
+- How a small simulation sharpens your intuition faster than definitions alone
 
 ## Why It Matters
 
-Probability is the *shared language* of ML, statistics, and decision-making. *Weak probability skills* mean you *cannot interpret model output*.
+In production systems, probability does not stay inside a textbook. Spam filters estimate whether a message is junk, recommendation systems estimate whether a user will click, and medical models estimate the risk of a diagnosis. The numbers look different, but the real question is the same every time: what does this score mean, and how far should I trust it?
 
-> *Probability is the foundation of statistical reasoning.*
+Weak probability intuition leads to predictable mistakes. People mix up likelihood and probability, generalize from tiny samples, and read 0.99 as if it were certainty. Strong probability intuition does the opposite: it makes you ask about assumptions, interpretation, and limits before you act on the number.
+
+> Probability is not a way to predict the future with certainty. It is a language for quantifying uncertainty given a set of possible outcomes and the information you have right now.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Sample["Sample space"] --> Event["Event"]
-    Event --> P["P(event) in [0,1]"]
-    P --> Freq["Frequentist: long-run frequency"]
-    P --> Bayes["Bayesian: degree of belief"]
-```
+![Concept at a Glance](../../../assets/probability-101/01/01-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
-- **Sample space Ω**: the set of *all possible outcomes*.
-- **Event**: a *subset* of the sample space.
-- **Probability P(A)**: a number between *0 and 1*; *all outcomes sum to 1*.
-- **Frequentist**: the *limit of relative frequency* under *repeated trials*.
-- **Bayesian**: a *degree of belief* given the *available information*.
+- **Sample space Ω**: the set of all possible outcomes.
+- **Event**: a subset of the sample space.
+- **Probability P(A)**: a number between 0 and 1 assigned to event A.
+- **Frequentist view**: probability understood through long-run relative frequency.
+- **Bayesian view**: probability understood as a degree of belief under current information.
 
 ## Before / After
 
-**Before**: *“A coin lands heads 50% of the time”* — *why* is unclear.
+**Before**: “A coin lands heads 50% of the time.” That sounds familiar, but it hides the assumptions.
 
-**After**: *“Sample space {H,T}, symmetric, so P(H)=0.5 — or, Bayesian, our *prior belief* about the coin.”*
+**After**: “The sample space is {H, T}, we assume a symmetric coin, so P(H)=0.5 — or, from a Bayesian view, 0.5 is our prior belief before we see data.”
 
 ## Hands-on: 5-step Probability Intuition
 
@@ -114,46 +106,46 @@ print("bayesian: updated belief")
 
 ## What to Notice in This Code
 
-- Probability rests on *axioms* (Kolmogorov) — values in *[0, 1]*; *total mass = 1*.
-- The frequentist and Bayesian views *complement* each other.
-- *Simulation* is the fastest way to *validate intuition*.
+- Probability rests on axioms (Kolmogorov) — values in [0, 1]; total mass = 1.
+- The frequentist and Bayesian views complement each other.
+- Simulation is the fastest way to validate intuition.
 
 ## Five Common Mistakes
 
-1. **Confusing *probability* with *likelihood*.**
-2. **Failing to *state the sample space*.**
-3. **Drawing *probability conclusions* from *tiny samples*.**
-4. **Dismissing *subjective probability* as *unscientific*.**
-5. **Reading *probability 0 or 1* as *deterministic*.**
+1. **Confusing probability with likelihood.**
+2. **Failing to state the sample space.**
+3. **Drawing probability conclusions from tiny samples.**
+4. **Dismissing subjective probability as unscientific.**
+5. **Reading probability 0 or 1 as deterministic.**
 
 ## How This Shows Up in Production
 
-Spam filters, recommender systems, fraud detection, medical diagnosis — *probability scores* drive *decisions*. *Bayesian A/B testing* and *probabilistic ML* depend on it.
+Spam filters, recommender systems, fraud detection, medical diagnosis — probability scores drive decisions. Bayesian A/B testing and probabilistic ML depend on it.
 
 ## How a Senior Engineer Thinks
 
-- Always names the *sample space*.
-- Uses *both* frequentist and Bayesian thinking.
-- *Simulates* to validate.
-- Distinguishes *probability* from *likelihood*.
-- Quantifies *uncertainty*.
+- Always names the sample space.
+- Uses both frequentist and Bayesian thinking.
+- Simulates to validate.
+- Distinguishes probability from likelihood.
+- Quantifies uncertainty.
 
 ## Checklist
 
-- [ ] I can define *sample space, event, probability*.
-- [ ] I know both *interpretations*.
-- [ ] I can *simulate*.
-- [ ] I know the *Kolmogorov axioms*.
+- [ ] I can define sample space, event, probability.
+- [ ] I know both interpretations.
+- [ ] I can simulate.
+- [ ] I know the Kolmogorov axioms.
 
 ## Practice Problems
 
-1. Write the sample space for *the sum of two dice* and find *P(sum = 7)*.
-2. Give the *frequentist and Bayesian readings* of one event in two lines.
-3. State the *practical difference* between *probability 0.99* and *probability 1*.
+1. Write the sample space for the sum of two dice and find P(sum = 7).
+2. Give the frequentist and Bayesian readings of one event in two lines.
+3. State the practical difference between probability 0.99 and probability 1.
 
 ## Wrap-up and Next Steps
 
-Probability is the *language of uncertainty*. The next episode defines *events and the sample space* more precisely.
+Probability is the language of uncertainty. The next episode defines events and the sample space more precisely.
 
 <!-- toc:begin -->
 - **What Is Probability? (current)**

@@ -2,7 +2,7 @@
 series: probability-101
 episode: 8
 title: Continuous Distributions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,60 +16,53 @@ tags:
   - Normal
   - Exponential
   - Beginner
-seo_description: A tour of uniform normal exponential and gamma continuous distributions with PDFs, mean and variance, and why the normal appears everywhere in ML
-last_reviewed: '2026-05-04'
+seo_description: Learn how continuous distributions model measurements, waiting times, and uncertainty with Uniform, Normal, Exponential, and Gamma examples.
+last_reviewed: '2026-05-15'
 ---
 
 # Continuous Distributions
 
-This is post 8 in the Probability 101 series.
+In discrete distributions, you can count the possible values one by one. Many real variables do not behave that way. Height, response time, measurement error, weight, and price move along a continuous scale, so they need a different language. That language is the continuous distribution.
 
-> Probability 101 series (8/10)
+Once continuous distributions click, several things become easier at once: why a PDF value is not itself a probability, why the normal distribution appears so often, and why standardization is such a common move in analysis and machine learning.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
 
-**Core question**: How do we model *continuous quantities* like *height, time, error*?
+## What you will learn
 
-> *The normal distribution is the *most frequently encountered* distribution in the world.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- *Uniform / Normal / Exponential / Gamma*
-- The *PDF, E, Var* of each
-- *Why the normal* appears so often
-- A 5-step continuous-distribution exercise
-- Five common mistakes
+- What it means to model a continuous quantity probabilistically
+- Why a density is not the same thing as a probability
+- When Uniform, Normal, Exponential, and Gamma distributions make sense
+- What the memoryless property of the Exponential distribution tells you
+- Why standardization is useful when comparing different scales
 
 ## Why It Matters
 
-In *ML, signal processing, measurement error*, *continuous distributions* are the *default assumption*. The *normal* arises *naturally* via the *CLT*.
+Much of the data you see in production is continuous: sensor readings, latency, error magnitudes, temperatures, prices, and model residuals. A distribution gives you a way to reason not just about a single measurement, but about typical ranges, rare regions, and the shape of the uncertainty.
 
-> *Continuous distributions model the analog world.*
+The practical payoff is that a good continuous model turns loose numbers into decisions you can reason about. You can talk about tail probability, expected wait time, standard deviations from the mean, or whether a normal approximation is reasonable at all.
+
+> In continuous probability, the key habit is to think in intervals. Probability lives in area, not in a single point.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    U["Uniform(a,b)"] --> N["Normal(mu, sigma)"]
-    N --> Std["Standardize Z = (X-mu)/sigma"]
-    E["Exponential(lambda)"] --> G["Gamma(k, theta)"]
-```
+![Concept at a Glance](../../../assets/probability-101/08/08-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
 - **Uniform(a,b)**: equal density on the interval. E=(a+b)/2.
 - **Normal(μ,σ)**: bell shape. E=μ, Var=σ².
-- **Exponential(λ)**: *waiting time*. E=1/λ.
-- **Gamma(k,θ)**: *generalization of exponential*.
+- **Exponential(λ)**: waiting time. E=1/λ.
+- **Gamma(k,θ)**: generalization of exponential.
 - **Standardization**: Z = (X-μ)/σ → N(0,1).
 
 ## Before / After
 
-**Before**: *“Height data”* — hard to analyze.
+**Before**: “Height data” is just a column of numbers.
 
-**After**: assume *Normal(170, 7)* → *top 5%* of heights from a *formula*.
+**After**: “Approximate it as Normal(170, 7)” immediately lets you estimate percentiles, tails, and standardized comparisons.
 
 ## Hands-on: 5-step Continuous Distributions
 
@@ -117,46 +110,46 @@ print("Z mean ~ 0:", z.mean(), "std ~ 1:", z.std())
 
 ## What to Notice in This Code
 
-- A *PDF value* is *not a probability* — *integrate* to get one.
-- The *exponential* is *memoryless*.
-- The *normal* arises from *sums and averages* (CLT).
+- A PDF value is not a probability — integrate to get one.
+- The exponential is memoryless.
+- The normal arises from sums and averages (CLT).
 
 ## Five Common Mistakes
 
-1. **Reading *PDF values as probabilities*.**
-2. **Assuming *normality* without checking.**
-3. **Forgetting the *units* of standard deviation.**
-4. **Forgetting the *memorylessness* of the exponential.**
-5. **Ignoring *skewed* shapes like *log-normal*.**
+1. **Reading PDF values as probabilities.**
+2. **Assuming normality without checking.**
+3. **Forgetting the units of standard deviation.**
+4. **Forgetting the memorylessness of the exponential.**
+5. **Ignoring skewed shapes like log-normal.**
 
 ## How This Shows Up in Production
 
-The *normal* model for measurement error, *exponential* waiting times, *log-normal* prices, the *foundation* distributions for confidence intervals and tests — *continuous distributions* are the *vocabulary of modeling*.
+The normal model for measurement error, exponential waiting times, log-normal prices, the foundation distributions for confidence intervals and tests — continuous distributions are the vocabulary of modeling.
 
 ## How a Senior Engineer Thinks
 
-- *Visualizes* every distribution assumption.
-- Uses *Q-Q plots* to check *normality*.
-- Tries *log transforms* on *skewed* data.
-- Exploits *standardization*.
-- Acknowledges the *limits* of distributions.
+- Visualizes every distribution assumption.
+- Uses Q-Q plots to check normality.
+- Tries log transforms on skewed data.
+- Exploits standardization.
+- Acknowledges the limits of distributions.
 
 ## Checklist
 
-- [ ] I know each *PDF* and its *E/Var*.
-- [ ] I can *standardize*.
-- [ ] I know *PDF ≠ probability*.
-- [ ] I can draw a *Q-Q plot*.
+- [ ] I know each PDF and its E/Var.
+- [ ] I can standardize.
+- [ ] I know PDF ≠ probability.
+- [ ] I can draw a Q-Q plot.
 
 ## Practice Problems
 
-1. For *N(0,1)*, compute *P(|X| > 2)*.
-2. For *Exponential(λ=2)*, find the *median*.
-3. Describe how *log-normal* differs in *shape* from *normal*.
+1. For N(0,1), compute P(|X| > 2).
+2. For Exponential(λ=2), find the median.
+3. Describe how log-normal differs in shape from normal.
 
 ## Wrap-up and Next Steps
 
-Continuous distributions are the *priors of measurement*. The next episode shows *why the normal appears everywhere* via the LLN and CLT.
+Continuous distributions are the priors of measurement. The next episode shows why the normal appears everywhere via the LLN and CLT.
 
 <!-- toc:begin -->
 - [What Is Probability?](./01-what-is-probability.md)

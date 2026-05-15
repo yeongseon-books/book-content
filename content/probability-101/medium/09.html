@@ -54,48 +54,37 @@
 </head>
 <body>
 <h1>Law of Large Numbers and CLT</h1>
-<p>This is post 9 in the Probability 101 series.</p>
-<blockquote>
-<p>Probability 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why does the normal distribution show up everywhere</em>? <em>Why does the sample mean</em> converge to the <em>true mean</em>?</p>
-<blockquote>
-<p><em>The two pillars of statistics: the </em>LLN<em> and the </em>CLT<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Statistics and machine learning lean on averages constantly: average response time, average loss, average conversion, average error. But those averages only become trustworthy once you understand why sample means stabilize, and why the distribution of those means often starts to look normal even when the original data is not.</p>
+<p>The Law of Large Numbers and the Central Limit Theorem are the two main answers. One explains where the mean goes. The other explains what shape its error takes while it is getting there.</p>
+<p>This is post 9 in the Probability 101 series. Here we build intuition for the LLN and the CLT, connect them to standard error, and show with simulations why non-normal populations can still produce nearly normal sample means.</p>
+<h2>What you will learn</h2>
 <ul>
-<li>The <em>Law of Large Numbers (LLN)</em></li>
-<li>The <em>Central Limit Theorem (CLT)</em></li>
-<li>The <em>distribution of the sample mean</em></li>
-<li>A 5-step LLN/CLT exercise</li>
-<li>Five common mistakes</li>
+<li>Why sample means stabilize as the sample grows</li>
+<li>How the LLN and CLT answer different questions</li>
+<li>Why standard error is not the same thing as standard deviation</li>
+<li>Why non-normal populations can still yield nearly normal sample means</li>
+<li>When a CLT-based approximation becomes risky</li>
 </ul>
 <h2>Why It Matters</h2>
-<p><em>Confidence intervals, hypothesis tests, A/B tests</em> all rest on the <em>CLT</em>. Without the <em>LLN</em>, <em>sample statistics</em> are meaningless.</p>
+<p>Confidence intervals, hypothesis tests, A/B tests, dashboard summaries, and training metrics all depend on these two theorems. The Law of Large Numbers explains why the average becomes more reliable. The Central Limit Theorem explains why we can often use a normal approximation for the average's error.</p>
+<p>Without this distinction, people either trust means too quickly or fail to explain why means matter at all. The confusion gets even worse when standard error and standard deviation are treated as interchangeable.</p>
 <blockquote>
-<p><em>LLN gives accuracy; CLT gives shape.</em></p>
+<p>The Law of Large Numbers tells you the mean heads in the right direction. The Central Limit Theorem tells you how the remaining error is shaped.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Sample[&quot;i.i.d. samples&quot;] --&gt; Mean[&quot;Sample mean Xbar&quot;]
-    Mean --&gt; LLN[&quot;LLN: Xbar -&gt; mu&quot;]
-    Mean --&gt; CLT[&quot;CLT: sqrt(n)(Xbar - mu) -&gt; N(0, sigma^2)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>i.i.d.</strong>: independent and identically distributed.</li>
 <li><strong>Sample mean X̄</strong>: (X₁+...+Xₙ)/n.</li>
-<li><strong>LLN</strong>: <em>X̄ → μ</em> as n→∞.</li>
-<li><strong>CLT</strong>: <em>√n·(X̄ - μ) → N(0, σ²)</em>.</li>
+<li><strong>LLN</strong>: X̄ → μ as n→∞.</li>
+<li><strong>CLT</strong>: √n·(X̄ - μ) → N(0, σ²).</li>
 <li><strong>Standard error SE</strong>: σ/√n.</li>
 </ul>
 <h2>Before / After</h2>
-<p><strong>Before</strong>: <em>“Sample mean equals population mean.”</em> — <em>Unclear when or why</em>.</p>
-<p><strong>After</strong>: the <em>LLN</em> guarantees <em>convergence</em>; the <em>CLT</em> gives the <em>distribution of the error</em>.</p>
+<p><strong>Before</strong>: “The sample mean equals the population mean.” That sounds nice, but it hides the conditions.</p>
+<p><strong>After</strong>: the LLN explains convergence toward the population mean, while the CLT explains why the error around that mean is often close to normal.</p>
 <h2>Hands-on: 5-step LLN / CLT</h2>
 <p><strong>Step 1 — LLN simulation</strong></p>
 <pre><code class="language-python">import numpy as np
@@ -136,43 +125,43 @@ for dist in [&quot;uniform&quot;, &quot;exponential&quot;, &quot;binomial&quot;]
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>As <em>n</em> grows, the <em>standard error</em> of <em>X̄</em> shrinks like <em>1/√n</em>.</li>
-<li>A <em>non-normal population</em> still gives <em>approximately normal</em> sample means.</li>
-<li>The <em>CLT</em> applies to <em>sums and averages</em> — <em>not</em> to <em>maxima</em> (use EVT).</li>
+<li>As n grows, the standard error of X̄ shrinks like 1/√n.</li>
+<li>A non-normal population still gives approximately normal sample means.</li>
+<li>The CLT applies to sums and averages — not to maxima (use EVT).</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Ignoring the <em>i.i.d.</em> assumption.</strong></li>
-<li><strong>Forcing CLT on <em>small n</em>.</strong></li>
-<li><strong>Ignoring <em>outliers and heavy tails</em>.</strong></li>
-<li><strong>Confusing <em>standard deviation</em> with <em>standard error</em>.</strong></li>
-<li><strong>Confusing the <em>LLN</em> with the <em>gambler’s fallacy</em>.</strong></li>
+<li><strong>Ignoring the i.i.d. assumption.</strong></li>
+<li><strong>Forcing CLT on small n.</strong></li>
+<li><strong>Ignoring outliers and heavy tails.</strong></li>
+<li><strong>Confusing standard deviation with standard error.</strong></li>
+<li><strong>Confusing the LLN with the gambler’s fallacy.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>CIs for <em>A/B conversion deltas</em>, <em>average response times</em> in monitoring, <em>training-loss averages</em> in ML — all rest on the <em>CLT</em>.</p>
+<p>CIs for A/B conversion deltas, average response times in monitoring, training-loss averages in ML — all rest on the CLT.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Validates</em> the i.i.d. assumption.</li>
-<li>Asks whether <em>n is enough</em>.</li>
-<li>Switches to the <em>bootstrap</em> for heavy tails.</li>
-<li>Always reports the <em>standard error</em>.</li>
-<li>Knows the <em>misreadings</em> of the LLN.</li>
+<li>Validates the i.i.d. assumption.</li>
+<li>Asks whether n is enough.</li>
+<li>Switches to the bootstrap for heavy tails.</li>
+<li>Always reports the standard error.</li>
+<li>Knows the misreadings of the LLN.</li>
 </ul>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] I understand the <em>LLN</em>.</li>
-<li>[ ] I understand the <em>CLT</em> and its limits.</li>
-<li>[ ] I know the <em>standard error</em>.</li>
-<li>[ ] I know the <em>bootstrap</em> exists.</li>
+<li>[ ] I understand the LLN.</li>
+<li>[ ] I understand the CLT and its limits.</li>
+<li>[ ] I know the standard error.</li>
+<li>[ ] I know the bootstrap exists.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Compute the <em>SE</em> for <em>n = 4 vs n = 400</em>.</li>
-<li>Show via simulation why <em>exponential averages</em> go normal.</li>
-<li>Explain why the <em>gambler’s fallacy</em> is a misreading of the <em>LLN</em>.</li>
+<li>Compute the SE for n = 4 vs n = 400.</li>
+<li>Show via simulation why exponential averages go normal.</li>
+<li>Explain why the gambler’s fallacy is a misreading of the LLN.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>The LLN gives <em>convergence</em>; the CLT gives <em>shape</em>. The final episode wraps everything into <em>probability for machine learning</em>.</p>
+<p>The LLN gives convergence; the CLT gives shape. The final episode wraps everything into probability for machine learning.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/01-what-is-probability.md">What Is Probability?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/probability-101/en/02-events-and-sample-space.md">Events and Sample Space</a></li>

@@ -17,7 +17,7 @@ tags:
   - Binomial
   - Beginner
 seo_description: 베르누이, 이항, 포아송 등 대표적 이산 확률 분포의 정의와 활용 상황을 분석하여 현실 문제를 확률 모델로 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 이산분포
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Bern["Bernoulli(p)"] --> Bin["Binomial(n,p)"]
-    Bern --> Geo["Geometric(p)"]
-    Bin --> Pois["Poisson(lambda)"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/07/07-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 

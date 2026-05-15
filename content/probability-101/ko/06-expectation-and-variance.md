@@ -17,7 +17,7 @@ tags:
   - Moments
   - Beginner
 seo_description: 확률 분포의 중심인 기대값과 데이터가 흩어진 정도인 분산의 통계적 의미를 배우고, 필수적인 수학적 성질을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 기대값과 분산
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    X["확률변수 X"] --> E["E[X] = sum x*p(x)"]
-    E --> Var["Var(X) = E[(X - E[X])^2]"]
-    Var --> SD["SD = sqrt(Var)"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/06/06-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 

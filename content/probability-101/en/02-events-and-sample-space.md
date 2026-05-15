@@ -2,7 +2,7 @@
 series: probability-101
 episode: 2
 title: Events and Sample Space
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,52 +16,43 @@ tags:
   - Events
   - SetTheory
   - Beginner
-seo_description: A clear set-theoretic definition of sample spaces and events, with union, intersection, and complement worked end to end in code
-last_reviewed: '2026-05-04'
+seo_description: Learn how sample spaces and events turn probability questions into set problems, with unions, intersections, complements, and code examples.
+last_reviewed: '2026-05-15'
 ---
 
 # Events and Sample Space
 
-This is post 2 in the Probability 101 series.
+People often miss probability questions not because the arithmetic is hard, but because they start from a vague picture of the problem. If you jump straight to the calculation without writing down all possible outcomes, two people can read the same sentence and quietly solve two different problems.
 
-> Probability 101 series (2/10)
+In probability, the sample space and the event are closer to grammar than to decoration. If that grammar is shaky, the final number can look clean while meaning something else entirely.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Probability 101 series. Here we define sample spaces and events in set language, then use unions, intersections, complements, and independence to show why a careful setup often does half the work for you.
 
-**Core question**: *Before computing a probability*, what must we *define*? Get *sets* right and you have *half the answer*.
+## What you will learn
 
-> *Half of every probability problem is solved the moment you *write down the sample space*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The definition of *sample space Ω* and *events*
-- *Union*, *intersection*, *complement*
-- *Mutually exclusive* vs *independent*
-- A 5-step events exercise
-- Five common mistakes
+- Why the sample space must come before the probability
+- How events become subsets once the setup is explicit
+- What union, intersection, and complement mean in practice
+- Why mutually exclusive and independent are easy to confuse
+- How ordered versus unordered outcomes change the answer
 
 ## Why It Matters
 
-*90% of wrong probability answers* trace back to a *wrong sample space*. Writing it *cleanly as a set* makes many problems *self-evident*.
+Many wrong answers in probability come from the wrong sample space. If you treat (1,6) and (6,1) as the same outcome in one step and different outcomes in the next, everything after that can be numerically tidy and conceptually wrong.
 
-> *Define before you compute.*
+Once the sample space is explicit, many probability problems turn into set problems. Events become subsets. “A or B” becomes a union. “A and B” becomes an intersection. That shift makes the structure of the problem much more stable.
+
+> In many probability problems, the moment you write down the sample space carefully, half the solution is already visible.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Omega["Sample space Omega"] --> A["Event A"]
-    Omega --> B["Event B"]
-    A --> Union["A or B"]
-    B --> Inter["A and B"]
-    A --> Comp["not A"]
-```
+![Concept at a Glance](../../../assets/probability-101/02/02-01-concept-at-a-glance.en.png)
+
+*Concept at a Glance*
 
 ## Key Terms
 
-- **Sample space Ω**: the set of *all outcomes*.
+- **Sample space Ω**: the set of all outcomes.
 - **Event A**: a subset of Ω.
 - **Union A∪B**: A or B.
 - **Intersection A∩B**: A and B.
@@ -71,9 +62,9 @@ flowchart LR
 
 ## Before / After
 
-**Before**: *“What is P(sum is even) for two dice?”* — Where do we start?
+**Before**: “What is the probability that the sum of two dice is even?” The question feels simple, but the setup is often left implicit.
 
-**After**: Ω = {(i,j) : 1≤i,j≤6} (36 outcomes); A = {sum is even} → 18/36 = 1/2.
+**After**: Ω = {(i,j) : 1≤i,j≤6} gives 36 ordered outcomes, A = {sum is even} gives 18 of them, so the answer is 18/36 = 1/2.
 
 ## Hands-on: 5-step Events
 
@@ -115,46 +106,46 @@ print("indep?", round(P(set(A) & set(B)) - P(A) * P(B), 6))
 
 ## What to Notice in This Code
 
-- Stating *Ω explicitly* turns probability into *set arithmetic*.
-- *Mutually exclusive ≠ independent* — a frequent confusion.
-- A *fair die* assumption means *uniform probability*.
+- Stating Ω explicitly turns probability into set arithmetic.
+- Mutually exclusive ≠ independent — a frequent confusion.
+- A fair die assumption means uniform probability.
 
 ## Five Common Mistakes
 
-1. **Computing *without writing Ω*.**
-2. **Mixing up *mutually exclusive* and *independent*.**
-3. **Mixing *ordered* and *unordered* outcomes.**
-4. **Ignoring *with-* vs *without-replacement* draws.**
-5. **Failing to *state symmetry* assumptions.**
+1. **Computing without writing Ω.**
+2. **Mixing up mutually exclusive and independent.**
+3. **Mixing ordered and unordered outcomes.**
+4. **Ignoring with- vs without-replacement draws.**
+5. **Failing to state symmetry assumptions.**
 
 ## How This Shows Up in Production
 
-A/B test *group definitions*, fraud-detection *rule events*, search-evaluation *relevance events* — *defining the event set* is the starting point of *every metric*.
+A/B test group definitions, fraud-detection rule events, search-evaluation relevance events — defining the event set is the starting point of every metric.
 
 ## How a Senior Engineer Thinks
 
-- *Always writes Ω*.
-- Reasons in *set operations*.
-- Distinguishes *independent* and *mutually exclusive*.
-- States *symmetry* assumptions.
-- Verifies with *code*.
+- Always writes Ω.
+- Reasons in set operations.
+- Distinguishes independent and mutually exclusive.
+- States symmetry assumptions.
+- Verifies with code.
 
 ## Checklist
 
 - [ ] I can define Ω.
-- [ ] I know *union/intersection/complement*.
-- [ ] I separate *mutually exclusive* from *independent*.
-- [ ] I verify with a *simulation*.
+- [ ] I know union/intersection/complement.
+- [ ] I separate mutually exclusive from independent.
+- [ ] I verify with a simulation.
 
 ## Practice Problems
 
-1. Write the sample space of a *card draw* (52) and find P(face card).
-2. Give an example that is *mutually exclusive* but *not independent*.
-3. Show the size difference between *ordered* and *unordered* sampling spaces.
+1. Write the sample space of a card draw (52) and find P(face card).
+2. Give an example that is mutually exclusive but not independent.
+3. Show the size difference between ordered and unordered sampling spaces.
 
 ## Wrap-up and Next Steps
 
-Sample spaces and events are the *grammar of probability*. The next episode covers *conditional probability* — what changes when we are *given new information*.
+Sample spaces and events are the grammar of probability. The next episode covers conditional probability — what changes when we are given new information.
 
 <!-- toc:begin -->
 - [What Is Probability?](./01-what-is-probability.md)

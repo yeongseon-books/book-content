@@ -17,7 +17,7 @@ tags:
   - Inference
   - Beginner
 seo_description: 조건부확률과 곱셈정리를 배우고, 기저율 오류를 방지하며 정보를 업데이트하는 논리적 과정을 학습합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 조건부확률
@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    Joint["P(A and B)"] --> CondAB["P(A|B) = P(A and B) / P(B)"]
-    CondAB --> Mult["P(A and B) = P(A|B) * P(B)"]
-    Mult --> Total["전체확률법칙"]
-```
+![핵심 개념 한눈에 보기](../../../assets/probability-101/03/03-01-diagram.ko.png)
+
+*핵심 개념 한눈에 보기*
 
 ## 핵심 용어
 
