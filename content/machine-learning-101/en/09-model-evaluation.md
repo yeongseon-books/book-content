@@ -2,7 +2,7 @@
 series: machine-learning-101
 episode: 9
 title: Model Evaluation
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,30 +17,22 @@ tags:
   - ROC
   - scikit-learn
 seo_description: How to choose the right metric for classification and regression, read confusion matrices, and compare ROC and PR curves with scikit-learn
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Model Evaluation
 
-> Machine Learning 101 series (9/10)
+“Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
 
-**Core question**: When someone asks which model is better and you do not push back with "by which metric," you are already in trouble.
+## Questions this post answers
 
-> *Model evaluation is where you prove, in code, that picking the metric comes before picking the model.*
-
-<!-- a-grade-intro:end -->
-
-This is post 9 in the Machine Learning 101 series.
-
-## What You Will Learn
-
-- Classification metrics: accuracy, precision, recall, F1, ROC-AUC, PR-AUC
-- Regression metrics: MAE, MSE, RMSE, R-squared
-- The anatomy of a confusion matrix
-- When to choose ROC over PR (and vice versa)
-- Five common pitfalls
+- Which metrics belong to classification versus regression?
+- What does each cell of the confusion matrix tell you operationally?
+- When should PR outrank ROC in your analysis?
+- Why do MAE, RMSE, and `R^2` answer different questions?
+- Which evaluation mistakes quietly leak into model selection?
 
 ## Why It Matters
 
@@ -48,15 +40,9 @@ Wrong metric, wrong decision. When business cost and metric drift apart, the mod
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Pred["predictions"] --> CM["confusion matrix"]
-    CM --> P["precision"]
-    CM --> R["recall"]
-    CM --> F["F1"]
-    Prob["probabilities"] --> ROC["ROC-AUC"]
-    Prob --> PR["PR-AUC"]
-```
+![Concept at a Glance](../../../assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
+
+*Predicted classes feed confusion-matrix metrics, while probability outputs support threshold-free views such as ROC-AUC and PR-AUC.*
 
 ## Key Terms
 
@@ -119,11 +105,19 @@ print("RMSE:", mean_squared_error(yt, yp) ** 0.5)
 print("R^2:", r2_score(yt, yp))
 ```
 
+**Expected output:** the confusion matrix should expose the actual error mix, while ROC-AUC and PR-AUC summarize ranking quality across thresholds. In the regression toy example, MAE and RMSE stay close only because the errors are small and fairly even.
+
 ## What to Notice in This Code
 
 - AUC is independent of the threshold.
 - PR-AUC is more informative on imbalanced data.
 - RMSE and MAE differ in their sensitivity to outliers.
+
+## Read the first failure signal this way
+
+- If metric debates drag on, translate the disagreement into the cost of false positives versus false negatives.
+- If the dataset is imbalanced, do not stop at ROC-AUC before checking PR behavior and threshold sensitivity.
+- If a model looks good by one metric and bad by another, that is not a contradiction; it is a prompt to clarify which failure matters.
 
 ## Five Common Mistakes
 

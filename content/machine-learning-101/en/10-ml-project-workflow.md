@@ -2,7 +2,7 @@
 series: machine-learning-101
 episode: 10
 title: The ML Project Workflow
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,30 +17,22 @@ tags:
   - MLOps
   - Beginner
 seo_description: From problem framing to data, modeling, evaluation, deployment, and monitoring, the full ML project workflow with sklearn Pipeline in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # The ML Project Workflow
 
-> Machine Learning 101 series (10/10)
+Many ML projects die after the notebook victory lap. The score looked good, the demo worked, and then the real system exposed everything the notebook had hidden: missing reproducibility, scattered preprocessing, undefined monitoring, and no clear path from experiment to deployment.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Machine Learning 101 series. Here we will connect problem framing, data preparation, modeling, evaluation, deployment, and monitoring into one workflow so the model score becomes only one checkpoint in a larger loop.
 
-**Core question**: If accuracy is everything, why do 90% of ML projects fail to ship?
+## Questions this post answers
 
-> *ML success means completing the loop from problem framing to monitoring, not just maximizing a score.*
-
-<!-- a-grade-intro:end -->
-
-This is the final post in the Machine Learning 101 series.
-
-## What You Will Learn
-
-- The seven-step ML workflow
-- How `Pipeline` glues preprocessing and model
-- Reproducibility and model cards
-- Why post-deployment monitoring matters
-- Five common pitfalls
+- Why do so many ML projects fail even after promising offline scores?
+- Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?
+- How does `Pipeline` protect you from preprocessing leakage?
+- Why do reproducibility and model cards matter after the experiment phase?
+- Why is monitoring the beginning of operations rather than the end of modeling?
 
 ## Why It Matters
 
@@ -48,16 +40,9 @@ A 0.95 score in a notebook is worth zero if the model never reaches users. Ownin
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P["1.problem"] --> D["2.data"]
-    D --> F["3.feature"]
-    F --> M["4.model"]
-    M --> E["5.evaluate"]
-    E --> Dep["6.deploy"]
-    Dep --> Mon["7.monitor"]
-    Mon --> P
-```
+![Concept at a Glance](../../../assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
+
+*An ML project is a loop, not a notebook milestone: problem framing, data, modeling, deployment, and monitoring all feed back into each other.*
 
 ## Key Terms
 
@@ -120,11 +105,19 @@ fresh = Xte + np.random.normal(0, 0.1, Xte.shape)
 print("drifted:", loaded.score(fresh, yte))
 ```
 
+**Expected output:** the saved pipeline should reload and reproduce the same test score, while the drifted input score should usually fall. That gap is a simple but useful reminder that deployment success depends on watching the input distribution, not just archiving the model artifact.
+
 ## What to Notice in This Code
 
 - `Pipeline` blocks preprocessing leakage at the source.
 - `joblib` enables reproducible deployment.
 - Even small input noise drops the score, illustrating drift.
+
+## Read the first failure signal this way
+
+- If the production score drops right after deployment, compare live preprocessing with the training pipeline before blaming the model weights.
+- If nobody can reproduce the shipped result from a clean environment, the workflow is broken even if the notebook was convincing.
+- If monitoring only tracks latency and uptime, you still do not know whether the model is healthy.
 
 ## Five Common Mistakes
 

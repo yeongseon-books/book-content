@@ -2,7 +2,7 @@
 series: machine-learning-101
 episode: 4
 title: Linear Regression
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,30 +17,22 @@ tags:
   - scikit-learn
   - Beginner
 seo_description: The intuition behind linear regression, the least-squares loss, R-squared, and residual diagnostics, with runnable scikit-learn examples
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Linear Regression
 
-> Machine Learning 101 series (4/10)
+When people call linear regression “too simple,” they usually mean “easy to underestimate.” A straight line that explains most of the variation is already an operationally strong baseline, and it often teaches you more about the data than a more complex model that scores slightly higher but hides why.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
 
-**Core question**: If a single line can explain 80% of the variation, why bother with anything more complex?
+## Questions this post answers
 
-> *Linear regression is the simplest model and the strongest baseline. It is also the gold standard for interpretability.*
-
-<!-- a-grade-intro:end -->
-
-This is post 4 in the Machine Learning 101 series.
-
-## What You Will Learn
-
-- The equation and intuition of linear regression
-- Mean squared error and the least-squares solution
-- The meaning of R-squared
-- How residual analysis validates model assumptions
-- Five common pitfalls
+- How does the linear regression equation produce a prediction?
+- What does least squares actually minimize?
+- What does `R^2` explain, and what does it hide?
+- Why are residuals the fastest way to test the model story?
+- Which failure modes show up before you ever need a more complex model?
 
 ## Why It Matters
 
@@ -48,12 +40,9 @@ Linear regression is interpretable, fast, and surprisingly strong. Always run it
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    X["features X"] --> Lin["y_hat = X w + b"]
-    Lin --> Loss["MSE(y, y_hat)"]
-    Loss --> Fit["minimize w, b"]
-```
+![Concept at a Glance](../../../assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
+
+*Linear regression combines features into a prediction, then adjusts the weights by minimizing a loss such as mean squared error.*
 
 ## Key Terms
 
@@ -108,11 +97,19 @@ for name, coef in zip(range(Xtr.shape[1]), model.coef_):
     print(f"x{name}: {coef:.3f}")
 ```
 
+**Expected output:** you should see an MSE value, an `R^2` value, and a list of signed coefficients. The important part is not a perfect score. It is whether the coefficient directions make sense and whether the residual story suggests the line is missing structure.
+
 ## What to Notice in This Code
 
 - Sign and magnitude of `coef_` drive interpretation.
 - A low R-squared often signals nonlinearity.
 - MSE squares the error, so it reacts strongly to outliers.
+
+## Read the first failure signal this way
+
+- If `R^2` is weak and residuals curve, suspect missing nonlinear features before abandoning regression entirely.
+- If coefficients flip sign run to run, inspect multicollinearity and feature scaling.
+- If a few points dominate the error, treat outliers as a modeling decision, not a cleanup footnote.
 
 ## Five Common Mistakes
 

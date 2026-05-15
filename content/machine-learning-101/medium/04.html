@@ -54,34 +54,21 @@
 </head>
 <body>
 <h1>Linear Regression</h1>
-<blockquote>
-<p>Machine Learning 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: If a single line can explain 80% of the variation, why bother with anything more complex?</p>
-<blockquote>
-<p><em>Linear regression is the simplest model and the strongest baseline. It is also the gold standard for interpretability.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 4 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>When people call linear regression “too simple,” they usually mean “easy to underestimate.” A straight line that explains most of the variation is already an operationally strong baseline, and it often teaches you more about the data than a more complex model that scores slightly higher but hides why.</p>
+<p>This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and <code>R^2</code> together.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The equation and intuition of linear regression</li>
-<li>Mean squared error and the least-squares solution</li>
-<li>The meaning of R-squared</li>
-<li>How residual analysis validates model assumptions</li>
-<li>Five common pitfalls</li>
+<li>How does the linear regression equation produce a prediction?</li>
+<li>What does least squares actually minimize?</li>
+<li>What does <code>R^2</code> explain, and what does it hide?</li>
+<li>Why are residuals the fastest way to test the model story?</li>
+<li>Which failure modes show up before you ever need a more complex model?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Linear regression is interpretable, fast, and surprisingly strong. Always run it first. Without a baseline, no complex model is justified.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    X[&quot;features X&quot;] --&gt; Lin[&quot;y_hat = X w + b&quot;]
-    Lin --&gt; Loss[&quot;MSE(y, y_hat)&quot;]
-    Loss --&gt; Fit[&quot;minimize w, b&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Linear regression combines features into a prediction, then adjusts the weights by minimizing a loss such as mean squared error.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Weights w</strong>: feature contributions.</li>
@@ -116,11 +103,18 @@ print(&quot;R^2:&quot;, r2_score(yte, pred))
 <pre><code class="language-python">for name, coef in zip(range(Xtr.shape[1]), model.coef_):
     print(f&quot;x{name}: {coef:.3f}&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> you should see an MSE value, an <code>R^2</code> value, and a list of signed coefficients. The important part is not a perfect score. It is whether the coefficient directions make sense and whether the residual story suggests the line is missing structure.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Sign and magnitude of <code>coef_</code> drive interpretation.</li>
 <li>A low R-squared often signals nonlinearity.</li>
 <li>MSE squares the error, so it reacts strongly to outliers.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If <code>R^2</code> is weak and residuals curve, suspect missing nonlinear features before abandoning regression entirely.</li>
+<li>If coefficients flip sign run to run, inspect multicollinearity and feature scaling.</li>
+<li>If a few points dominate the error, treat outliers as a modeling decision, not a cleanup footnote.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

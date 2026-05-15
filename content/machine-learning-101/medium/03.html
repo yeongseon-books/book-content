@@ -54,34 +54,21 @@
 </head>
 <body>
 <h1>Train/Test Split</h1>
-<blockquote>
-<p>Machine Learning 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: A model with 99% training accuracy can still fail in production. Why?</p>
-<blockquote>
-<p><em>A train/test split is the minimum apparatus for measuring how a model behaves on data it has never seen.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>A model can brag about 99% training accuracy and still be useless the moment it sees live traffic. That gap is not a minor detail. It is the core reason ML teams separate fitting from evaluation and guard the test set so aggressively.</p>
+<p>This is post 3 in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The roles of train, validation, and test sets</li>
-<li>Why <code>random_state</code> matters for reproducibility</li>
-<li>How <code>stratify</code> handles imbalanced classes</li>
-<li>The intuition behind K-fold cross-validation</li>
-<li>Five common pitfalls</li>
+<li>What do the train, validation, and test sets each protect?</li>
+<li>Why should <code>random_state</code> be fixed even in small experiments?</li>
+<li>How does <code>stratify</code> help on imbalanced classes?</li>
+<li>When does K-fold cross-validation add signal over a single split?</li>
+<li>Which leakage patterns usually show up before model tuning even begins?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    All[&quot;all data&quot;] --&gt; Tr[&quot;train (fit)&quot;]
-    All --&gt; Va[&quot;valid (tune)&quot;]
-    All --&gt; Te[&quot;test (final)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Separating training, tuning, and final evaluation is what lets you measure generalization instead of self-confirmation.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Train</strong>: data used for fitting the model.</li>
@@ -116,11 +103,18 @@ print(&quot;test :&quot;, model.score(Xte, yte))
 <pre><code class="language-python">from sklearn.model_selection import cross_val_score
 print(cross_val_score(model, X, y, cv=5).mean())
 </code></pre>
+<p><strong>Expected output:</strong> the training score should usually come out a bit higher than the test score, and the cross-validation mean should land in the same neighborhood rather than wildly disagree. If those numbers diverge sharply, your split strategy deserves suspicion before the model does.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>stratify=y</code> preserves class ratios in both splits.</li>
 <li>A fixed <code>random_state</code> makes results reproducible.</li>
 <li><code>cross_val_score</code> repeats train and evaluate K times.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If the test score jumps around every run, check whether the sample is too small or the seed was left floating.</li>
+<li>If train and test both look suspiciously perfect, inspect preprocessing leakage before celebrating.</li>
+<li>If the problem is time-series or user-grouped data, random splitting is often the bug, not the metric.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

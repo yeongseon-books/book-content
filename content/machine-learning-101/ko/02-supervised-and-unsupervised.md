@@ -17,7 +17,7 @@ tags:
   - Classification
   - Clustering
 seo_description: 지도학습과 비지도학습의 차이, 분류·회귀·군집의 경계, 그리고 문제 프레이밍의 중요성을 코드와 함께 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 지도학습과 비지도학습
@@ -42,12 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Problem["problem"] --> Labeled{"labels?"}
-    Labeled -->|yes| Sup["supervised (clf / reg)"]
-    Labeled -->|no| Unsup["unsupervised (cluster / DR)"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/02/02-01-diagram.ko.png)
+
+*레이블이 있으면 지도학습으로, 없으면 구조 탐색 중심의 비지도학습으로 출발점이 갈린다는 점을 한 장에 정리한 그림입니다.*
 
 ## 핵심 용어
 
@@ -103,11 +100,19 @@ km = KMeans(n_clusters=3, n_init=10).fit(X)
 print("inertia:", km.inertia_)
 ```
 
+**예상 출력:** 분류 예제는 정확도, 회귀 예제는 `R^2`, 군집화 예제는 inertia를 출력합니다. 숫자가 모두 성능처럼 보이지만 **서로 같은 의미가 아니며 직접 비교할 수도 없습니다.**
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `clf.score`는 정확도, `reg.score`는 결정계수(R-squared), `km.inertia_`는 군집 응집도를 뜻합니다. **지표가 다르면 숫자의 의미도 달라집니다.**
 - `KMeans(n_init=...)`는 재현성과 안정성에 직접 영향을 줍니다.
 - 비지도학습은 정답이 없기 때문에 결과 해석이 더 어렵습니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 팀이 레이블이 무엇인지 답하지 못하면, 알고리즘보다 먼저 **예측 결과가 바꾸려는 행동**이 무엇인지 다시 물어야 합니다.
+- 군집 결과를 곧바로 정답 클래스처럼 쓰려 하면, 먼저 **후속 검증 방법**을 정해야 합니다.
+- 지표 해석이 자꾸 꼬인다면, 감독된 문제의 점수와 비지도학습의 응집도 숫자를 같은 표에서 읽고 있지 않은지 확인해야 합니다.
 
 ## 자주 하는 실수 5가지
 

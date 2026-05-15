@@ -54,36 +54,21 @@
 </head>
 <body>
 <h1>Clustering</h1>
-<blockquote>
-<p>Machine Learning 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: With no labels to score against, how do you know the clusters are any good?</p>
-<blockquote>
-<p><em>Clustering reveals latent structure in data through similarity. Validation requires both metrics and judgment.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 7 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Clustering feels less certain than classification because there is no answer sheet waiting in the test set. That uncertainty is exactly why teams misuse it. A clean-looking cluster plot can tempt you into believing you discovered truth when you may only have discovered the geometry created by scaling choices.</p>
+<p>This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The difference between KMeans and DBSCAN</li>
-<li>How to choose K with elbow and silhouette</li>
-<li>Why standardization is decisive</li>
-<li>The responsibility of interpreting clusters</li>
-<li>Five common pitfalls</li>
+<li>Without labels, how do you judge whether the clusters are any good?</li>
+<li>When should you prefer KMeans over DBSCAN?</li>
+<li>How do you choose <code>K</code> without pretending the metric picks it for you?</li>
+<li>Why does standardization change the result so dramatically?</li>
+<li>Why should cluster labels be treated as hypotheses rather than truth?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;X (no y)&quot;] --&gt; Std[&quot;standardize&quot;]
-    Std --&gt; KM[&quot;KMeans (K)&quot;]
-    Std --&gt; DB[&quot;DBSCAN (eps)&quot;]
-    KM --&gt; Out[&quot;clusters&quot;]
-    DB --&gt; Out
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>Once the inputs are standardized, KMeans and DBSCAN expose different kinds of structure: centroid-based groups versus density-based regions.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>KMeans</strong>: K centroids minimizing within-cluster distance.</li>
@@ -120,11 +105,18 @@ print(list(zip(ks, scores)))
 db = DBSCAN(eps=0.5, min_samples=5).fit(X)
 print(&quot;labels:&quot;, set(db.labels_))
 </code></pre>
+<p><strong>Expected output:</strong> KMeans produces inertia and silhouette values, while DBSCAN returns a set of labels that may include <code>-1</code> for noise. If that label appears, the algorithm is telling you some points do not belong cleanly to any dense region.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>KMeans needs <code>K</code>; DBSCAN needs <code>eps</code>.</li>
 <li>Standardization changes the entire result.</li>
 <li>A label of <code>-1</code> from DBSCAN means noise.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If the cluster assignment changes wildly after scaling, the distance geometry was doing more work than your intuition.</li>
+<li>If elbow and silhouette disagree, plot the clusters and ask which decision would survive contact with the business context.</li>
+<li>If DBSCAN labels almost everything as noise, revisit <code>eps</code>, <code>min_samples</code>, and feature scale before concluding the data has no structure.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

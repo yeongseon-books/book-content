@@ -17,7 +17,7 @@ tags:
   - scikit-learn
   - Beginner
 seo_description: 선형 회귀의 직관, 평균제곱오차와 R-squared, 잔차 해석까지 scikit-learn 예제로 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Linear Regression
@@ -42,12 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    X["features X"] --> Lin["y_hat = X w + b"]
-    Lin --> Loss["MSE(y, y_hat)"]
-    Loss --> Fit["minimize w, b"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/04/04-01-diagram.ko.png)
+
+*선형 회귀는 입력을 선형 결합해 예측값을 만들고, 손실 함수 기준으로 가중치와 절편을 조정합니다.*
 
 ## 핵심 용어
 
@@ -102,11 +99,19 @@ for name, coef in zip(range(Xtr.shape[1]), model.coef_):
     print(f"x{name}: {coef:.3f}")
 ```
 
+**예상 출력:** MSE, `R^2`, 그리고 부호가 있는 계수 목록이 출력됩니다. 여기서 먼저 볼 것은 절대적인 점수보다 **계수 방향이 상식과 맞는지**, 그리고 잔차가 직선 모델로 설명되지 않는 패턴을 보이는지입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `coef_`의 부호와 크기가 해석의 중심입니다.
 - R-squared가 낮다면 비선형성이 숨어 있다는 신호일 수 있습니다.
 - MSE는 오차를 제곱하기 때문에 이상치에 특히 민감합니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- `R^2`가 낮고 잔차에 곡선 패턴이 보이면, 선형 모델을 버리기 전에 **비선형 피처**가 빠졌는지 봐야 합니다.
+- 계수가 실행마다 크게 흔들리면 **다중공선성**과 **스케일 차이**를 먼저 점검해야 합니다.
+- 일부 샘플이 오차를 지배하면, 이상치를 치울지 남길지 자체가 모델링 결정이라는 점을 드러내야 합니다.
 
 ## 자주 하는 실수 5가지
 

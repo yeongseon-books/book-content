@@ -54,34 +54,21 @@
 </head>
 <body>
 <h1>What Is Machine Learning?</h1>
-<blockquote>
-<p>Machine Learning 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>machine learning</em> just <em>a new name for statistics</em>, or <em>a new programming paradigm</em>?</p>
-<blockquote>
-<p><em>Machine learning </em>learns a function from data<em> and uses it to </em>predict on new inputs<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the first post in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Recommendation systems, fraud filters, and medical triage tools all get called “machine learning,” but that label hides the real operating question. Are you writing smarter rules, doing statistics with a new library, or building a system that learns a reusable function from data? If that distinction stays fuzzy, every later discussion about models, metrics, and deployment turns into memorizing API names.</p>
+<p>This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The <em>definition</em> of <em>machine learning</em></li>
-<li>The intuition of <em>learning, generalization, prediction</em></li>
-<li>The <em>difference</em> from <em>statistics</em> and <em>rule-based code</em></li>
-<li>A 5-step first ML hands-on</li>
-<li>Five common mistakes</li>
+<li>What exactly is the model learning when we say “machine learning”?</li>
+<li>Why is generalization different from scoring well on the training set?</li>
+<li>Where does machine learning diverge from statistics and rule-based code?</li>
+<li>What do <code>fit</code>, <code>predict</code>, and <code>score</code> really mean in scikit-learn?</li>
+<li>Which beginner mistakes break this mental model first?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Recommendation, medicine, finance, autonomous driving — <em>every industry</em> is being <em>reshaped</em> by ML. Weak fundamentals make <em>every model collapse</em> later.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;data (X, y)&quot;] --&gt; Train[&quot;train: learn f&quot;]
-    Train --&gt; Model[&quot;model f̂&quot;]
-    Model --&gt; Predict[&quot;predict y_hat for new X&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Machine learning starts by fitting a function on data, then reuses that function on inputs the model has never seen before.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Learning</strong>: <em>estimating a function</em> from data.</li>
@@ -112,11 +99,18 @@ model = LogisticRegression(max_iter=1000)
 <p><strong>Step 5 — Score</strong></p>
 <pre><code class="language-python">print(&quot;acc:&quot;, model.score(X, y))
 </code></pre>
+<p><strong>Expected output:</strong> <code>X.shape</code> and <code>y.shape</code> should report a small tabular dataset such as <code>(150, 4)</code> and <code>(150,)</code>, <code>model.predict(X[:5])</code> should print class IDs, and the training accuracy will usually look very high. That last number is a teaching device, not proof that the model generalizes.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>fit / predict / score</em> is the <em>scikit-learn standard interface</em>.</li>
 <li><em>score</em> here is only <em>training accuracy</em> — not generalization.</li>
 <li><em>Model choice</em> depends on <em>problem type</em>.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If training accuracy looks excellent but live data fails, check whether the input distribution changed or whether the target was defined too loosely.</li>
+<li>If the team cannot explain what <code>X</code> and <code>y</code> represent in one sentence, the project is not ready for model comparison yet.</li>
+<li>If a notebook demo works only on the sample rows you kept reusing, suspect leakage or accidental memorization before you blame the algorithm.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

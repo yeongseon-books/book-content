@@ -54,35 +54,21 @@
 </head>
 <body>
 <h1>Decision Tree and Random Forest</h1>
-<blockquote>
-<p>Machine Learning 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How can a giant pile of if-else rules outperform a neural network on tabular data?</p>
-<blockquote>
-<p><em>Decision trees are interpretable nonlinear models. Random forests turn many trees into a robust ensemble.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 6 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>On tabular data, a stack of well-chosen <code>if-else</code> rules often beats more fashionable models. That feels counterintuitive until you remember what trees do well: they capture nonlinear structure, handle mixed feature behavior naturally, and produce a baseline that is hard to embarrass.</p>
+<p>This is post 6 in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>Splitting criteria (Gini and entropy)</li>
-<li>Overfitting and pruning</li>
-<li>Bagging and the random forest construction</li>
-<li>Feature importance and its limits</li>
-<li>Five common pitfalls</li>
+<li>How does a decision tree split the feature space?</li>
+<li>What do Gini and entropy actually measure?</li>
+<li>Why does a single deep tree overfit so quickly?</li>
+<li>What does bagging fix when we move to a random forest?</li>
+<li>How far can you trust feature importance numbers?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Random forests and gradient-boosted trees still dominate tabular data. They belong in every baseline before you reach for deep learning.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Tree[&quot;1 tree&quot;] --&gt;|deep| Over[&quot;overfit&quot;]
-    Tree --&gt;|shallow| Under[&quot;underfit&quot;]
-    Many[&quot;many trees&quot;] --&gt; Forest[&quot;Random Forest&quot;]
-    Forest --&gt; Stable[&quot;stable + accurate&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>A single deep tree can overfit quickly, while a random forest reduces that variance by averaging many differently sampled trees.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Split</strong>: separates data using a feature and threshold.</li>
@@ -118,11 +104,18 @@ print(&quot;rf  :&quot;, rf.score(Xte, yte))
 order = np.argsort(rf.feature_importances_)[::-1][:5]
 print(&quot;top:&quot;, order)
 </code></pre>
+<p><strong>Expected output:</strong> the single tree and the forest both print test accuracy, but the forest should usually be more stable. The feature-importance list is useful as a ranking hint, not as a proof of causality.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>max_depth</code> is the main lever against overfitting.</li>
 <li>More <code>n_estimators</code> is more stable, with diminishing returns.</li>
 <li><code>feature_importances_</code> splits credit across correlated features.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If the training score is perfect and the test score drops, cap tree depth before trying a more exotic model.</li>
+<li>If feature importance seems to contradict domain knowledge, check for correlated predictors and compare with permutation importance.</li>
+<li>If the forest wins only by a tiny margin, keep the simpler baseline in the conversation because interpretability may matter more than the last point of accuracy.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

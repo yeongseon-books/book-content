@@ -17,7 +17,7 @@ tags:
   - CrossValidation
   - scikit-learn
 seo_description: 일반화를 측정하기 위한 train/test split의 의미와 누수, stratify, random_state, 교차검증까지 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Train/Test Split
@@ -42,12 +42,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    All["all data"] --> Tr["train (fit)"]
-    All --> Va["valid (tune)"]
-    All --> Te["test (final)"]
-```
+![한눈에 보는 개념](../../../assets/machine-learning-101/03/03-01-diagram.ko.png)
+
+*학습, 튜닝, 최종 검증을 서로 다른 데이터 조각에 나눠 맡겨야 일반화 성능을 따로 측정할 수 있습니다.*
 
 ## 핵심 용어
 
@@ -102,11 +99,19 @@ from sklearn.model_selection import cross_val_score
 print(cross_val_score(model, X, y, cv=5).mean())
 ```
 
+**예상 출력:** 훈련 점수는 테스트 점수보다 약간 높게 나오고, 교차검증 평균은 그 주변 값에 모이는 편이 자연스럽습니다. 세 숫자가 크게 벌어지면 모델보다 먼저 **분할 전략**을 의심해야 합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `stratify=y`는 두 분할 모두에서 클래스 비율을 유지합니다.
 - 고정된 `random_state`는 결과를 재현 가능하게 만듭니다.
 - `cross_val_score`는 훈련과 평가를 K번 반복합니다.
+
+## 실패 신호를 먼저 이렇게 읽습니다
+
+- 테스트 점수가 실행할 때마다 크게 흔들리면 표본 수가 너무 작거나 시드가 떠 있는지 먼저 봐야 합니다.
+- train과 test가 모두 지나치게 좋다면, 성능보다 먼저 **전처리 누수**를 점검해야 합니다.
+- 시계열이나 사용자 그룹 데이터인데 무작위 분할을 썼다면, 지표가 아니라 **분할 방식 자체가 버그**일 수 있습니다.
 
 ## 자주 하는 실수 5가지
 

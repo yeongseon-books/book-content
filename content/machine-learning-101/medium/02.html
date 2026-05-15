@@ -54,34 +54,21 @@
 </head>
 <body>
 <h1>Supervised and Unsupervised Learning</h1>
-<blockquote>
-<p>Machine Learning 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When labels are present versus absent, do we reach for the same algorithms?</p>
-<blockquote>
-<p><em>Supervised learning fits a function to labeled examples; unsupervised learning discovers structure on its own.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 2 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Most beginner ML mistakes are not model mistakes. They are framing mistakes. Teams jump into logistic regression or KMeans before agreeing on the more important question: do we have labels, do we need a numeric prediction, or are we only trying to surface structure in the data?</p>
+<p>This is post 2 in the Machine Learning 101 series. Here we will separate supervised learning from unsupervised learning and use that split to clarify where classification, regression, and clustering actually belong.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The boundaries between supervised, unsupervised, semi-supervised, and reinforcement learning</li>
-<li>How to tell classification from regression</li>
-<li>The role of clustering versus dimensionality reduction</li>
-<li>A 5-step paradigm comparison</li>
-<li>Five common pitfalls</li>
+<li>When labels are present versus absent, do we reach for the same algorithms?</li>
+<li>How do classification and regression differ if both are supervised learning?</li>
+<li>Why is clustering not just “classification without labels”?</li>
+<li>What should you do when only part of the dataset is labeled?</li>
+<li>Which framing checks belong at the beginning of the project?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Problem[&quot;problem&quot;] --&gt; Labeled{&quot;labels?&quot;}
-    Labeled --&gt;|yes| Sup[&quot;supervised (clf / reg)&quot;]
-    Labeled --&gt;|no| Unsup[&quot;unsupervised (cluster / DR)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>The first branch in the workflow is whether labels exist; that choice determines whether you are predicting targets or discovering structure.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Supervised learning</strong>: learn a function from <code>(X, y)</code> pairs.</li>
@@ -117,11 +104,18 @@ print(&quot;R^2:&quot;, reg.score(Xr, yr))
 km = KMeans(n_clusters=3, n_init=10).fit(X)
 print(&quot;inertia:&quot;, km.inertia_)
 </code></pre>
+<p><strong>Expected output:</strong> the classifier prints a training accuracy, the regression example prints an <code>R^2</code> score, and KMeans returns an inertia value. Those numbers are not comparable, which is exactly the point: changing the paradigm changes the success criterion too.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><code>clf.score</code> returns accuracy, <code>reg.score</code> returns R-squared, <code>km.inertia_</code> measures cluster cohesion. Different metrics, different meaning.</li>
 <li><code>KMeans(n_init=...)</code> matters for reproducibility and stability.</li>
 <li>Unsupervised results are harder to interpret because there is no ground truth.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If the team cannot say what the label is, start by asking what action the prediction should change downstream.</li>
+<li>If clustering output gets treated like a true class label, stop and decide how you will validate it with business or experimental outcomes.</li>
+<li>If a metric discussion becomes confusing, verify whether people are comparing a supervised score to an unsupervised cohesion number.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

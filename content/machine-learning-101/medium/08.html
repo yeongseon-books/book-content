@@ -54,34 +54,21 @@
 </head>
 <body>
 <h1>Overfitting and Regularization</h1>
-<blockquote>
-<p>Machine Learning 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: 99% on training and 60% on test. Is the model to blame, or the data?</p>
-<blockquote>
-<p><em>Overfitting means memorizing noise. Regularization shrinks model freedom and brings generalization back.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 8 in the Machine Learning 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>When the train score soars and the test score collapses, “the model is smart” is usually the wrong interpretation. More often, the model found ways to memorize noise, shortcut the split, or overreact to feature quirks that do not survive new data.</p>
+<p>This is post 8 in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The signals of overfitting and underfitting</li>
-<li>The bias-variance trade-off</li>
-<li>Differences between Ridge, Lasso, and ElasticNet</li>
-<li>How learning curves diagnose problems</li>
-<li>Five common pitfalls</li>
+<li>Which signals separate overfitting from underfitting?</li>
+<li>What does the bias-variance trade-off actually mean in practice?</li>
+<li>How do Ridge, Lasso, and ElasticNet differ?</li>
+<li>What can learning curves tell you that one score cannot?</li>
+<li>Which regularization mistakes show up first in beginner workflows?</li>
 </ul>
 <h2>Why It Matters</h2>
 <p>Half of every model improvement is regularization. The more capacity a model has, the more regularization keeps it alive.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Cap[&quot;model capacity&quot;] --&gt;|low| Under[&quot;underfit (high bias)&quot;]
-    Cap --&gt;|high| Over[&quot;overfit (high variance)&quot;]
-    Cap --&gt;|right| Good[&quot;generalize&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Too little capacity underfits, too much capacity overfits, and regularization helps move the model back toward a generalizing middle ground.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Overfitting</strong>: training looks great, test does not.</li>
@@ -123,11 +110,18 @@ for a in np.logspace(-3, 2, 6):
     s = Ridge(alpha=a).fit(Xtr, ytr).score(Xte, yte)
     print(f&quot;alpha={a:.3g}  R^2={s:.3f}&quot;)
 </code></pre>
+<p><strong>Expected output:</strong> linear, Ridge, and Lasso each produce a test score, and the alpha sweep shows that regularization strength has a real trade-off curve. If every alpha performs badly, the issue may be feature quality or model family, not only regularization.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Lasso doubles as feature selection by zeroing coefficients.</li>
 <li>Ridge shrinks all coefficients smoothly.</li>
 <li>Choose <code>alpha</code> by cross-validation, not by guessing.</li>
+</ul>
+<h2>Read the first failure signal this way</h2>
+<ul>
+<li>If the train-test gap widens as capacity grows, regularization and data volume deserve attention before architecture changes.</li>
+<li>If Lasso keeps selecting unstable feature sets, check for correlated inputs and try ElasticNet or Ridge.</li>
+<li>If both train and test are weak, stop calling it overfitting and reconsider feature design or model capacity.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
