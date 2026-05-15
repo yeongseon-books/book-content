@@ -245,14 +245,19 @@ FastAPI calls the generator per dependency injection, so each request gets its o
 ```python
 @app.post("/users", status_code=201)
 def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
-    with db:  # context manager handles BEGIN/COMMIT
+    db.execute("BEGIN IMMEDIATE")
+    try:
         cur = db.execute(
             "INSERT INTO users(email) VALUES (?)", (payload.email,)
         )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {"id": cur.lastrowid}
 ```
 
-`with db:` defines the transaction boundary. Exceptions roll it back; success commits. With `isolation_level=None` you keep the freedom to issue `BEGIN IMMEDIATE` explicitly when you want a writer lock up front.
+Because `open_conn()` sets `isolation_level=None`, SQLite stays in autocommit mode until you issue `BEGIN ...` yourself. Here `BEGIN IMMEDIATE` defines the write transaction boundary, `commit()` closes it on success, and `rollback()` handles exceptions.
 
 ### Step 5. Simulate concurrent writes
 
@@ -260,8 +265,16 @@ def create_user(payload: UserCreate, db: sqlite3.Connection = Depends(get_db)):
 import concurrent.futures, sqlite3
 
 def writer(i):
-    with open_conn() as conn:
+    conn = open_conn()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
         conn.execute("INSERT INTO log(msg) VALUES (?)", (f"msg-{i}",))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=20) as ex:
     list(ex.map(writer, range(200)))
