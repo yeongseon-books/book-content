@@ -71,7 +71,7 @@ Now put the differences on one table.
 | **Cold starts** | Present | Reduced when needed via Always Ready | Usually avoidable | Effectively absent when always running |
 | **OS** | Windows-first; Linux Consumption availability varies by region | Linux only | Windows / Linux | Windows / Linux |
 | **VNet integration** | No | Yes | Yes | Yes |
-| **Max instances** | Roughly 200; lower in some OS and platform cases | Up to 1000, subject to regional 250-core default quota | Roughly 20-100+, depending on OS, region, and restrictions | Defined by App Service Plan SKU and autoscale rules |
+| **Max instances** | Roughly 200; lower in some OS and platform cases | Default 100 per app; configurable up to 1000, still subject to regional 250-core default quota | Roughly 20-100+, depending on OS, region, and restrictions | Defined by App Service Plan SKU and autoscale rules |
 | **Event-driven autoscale** | Yes (event-driven) | Yes (per-function, target-based) | Yes (target-based optional) | Manual via App Service autoscale rules |
 | **Per-function scaling** | No | Yes | No | No |
 | **Instance memory** | Fixed at 1.5 GB | 512 / 2048 / 4096 MB | Varies by SKU | Depends on App Service Plan SKU |
@@ -117,7 +117,7 @@ Flex Consumption is the plan Microsoft now recommends for new serverless workloa
 - **Selectable memory sizes** at 512 MB, 2048 MB, and 4096 MB
 - **Always Ready** for keeping chosen function groups warm; the default is still 0
 - **Per-function scaling** instead of scaling the whole app as one unit
-- **Large scale range** up to 1000 instances per app, though regional core quota can become the real limit earlier
+- **Default per-app cap of 100 instances**, configurable up to 1000; regional core quota can still become the real limit earlier
 
 **Important caveats:**
 

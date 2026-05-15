@@ -86,7 +86,7 @@ Azure Functions 플랜은 “더 싸다/더 비싸다”로만 보면 거의 항
 | **콜드 스타트** | 있음 | Always Ready로 줄일 수 있음 | 대체로 회피 가능 | 상시 실행이면 사실상 없음 |
 | **OS** | Windows 중심. Linux 가용성은 지역에 따라 다름 | Linux only | Windows / Linux | Windows / Linux |
 | **VNet 통합** | 없음 | 있음 | 있음 | 있음 |
-| **최대 인스턴스 수** | 대략 200, 조건에 따라 더 낮을 수 있음 | 최대 1000, 지역별 코어 쿼터 영향 | 대략 20~100+, 조건에 따라 달라짐 | App Service Plan SKU와 autoscale 설정에 따름 |
+| **최대 인스턴스 수** | 대략 200, 조건에 따라 더 낮을 수 있음 | 앱 기본값 100, 최대 1000까지 구성 가능. 여전히 지역별 250코어 기본 쿼터 영향 가능 | 대략 20~100+, 조건에 따라 달라짐 | App Service Plan SKU와 autoscale 설정에 따름 |
 | **이벤트 기반 자동 스케일** | 지원 | 지원 (per-function, target-based) | 지원 | App Service autoscale 규칙 기반 |
 | **Per-function scaling** | 없음 | 있음 | 없음 | 없음 |
 | **인스턴스 메모리** | 1.5 GB 고정 | 512 / 2048 / 4096 MB 선택 | SKU별 상이 | App Service Plan SKU 기준 |
@@ -127,7 +127,7 @@ Flex Consumption은 현재 Azure Functions에서 가장 먼저 검토해야 할 
 - **메모리 크기 선택** 가능
 - **Always Ready** 사용 가능
 - **Per-function scaling** 지원
-- **큰 스케일 범위** 제공
+- **앱 기본 최대 100 인스턴스**, 필요 시 최대 1000까지 구성 가능
 
 하지만 강점만 보면 안 됩니다.
 
