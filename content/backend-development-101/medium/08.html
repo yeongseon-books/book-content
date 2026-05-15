@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Testing the Backend</h1>
-<blockquote>
-<p>Backend Development 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is "no time to write tests" the <em>biggest</em> time waste of all?</p>
-<blockquote>
-<p>Without tests, every change is a <em>bet</em>. A single unit test prevents <em>hours</em> of debugging later.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Changing backend code without tests is a bet every single time. As a system grows, the real skill is not writing perfect code once, but making sure you can change it later without breaking the parts that already matter.</p>
+<p>This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The difference between unit, integration, and E2E tests</li>
 <li>How to test a service with pytest</li>
@@ -79,13 +70,9 @@
 <p>Tests are the <em>insurance</em> of code — invisible day to day, decisive in incidents.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Unit[&quot;Unit&quot;] --&gt; Int[&quot;Integration&quot;]
-    Int --&gt; E2E[&quot;E2E&quot;]
-    Unit --&gt;|&quot;fast and many&quot;| Pyramid
-    E2E --&gt;|&quot;slow and few&quot;| Pyramid
-</code></pre>
-<p>The test pyramid — <em>many</em> at the bottom, <em>few</em> at the top.</p>
+<p><img alt="test pyramid from unit to integration and end-to-end coverage" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>test pyramid from unit to integration and end-to-end coverage</em><br>
+The test pyramid — <em>many</em> at the bottom, <em>few</em> at the top.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Unit test</strong>: verifies a <em>single</em> function or class.</li>
@@ -158,6 +145,14 @@ def test_create_user(client, engine):
     assert r.status_code == 200
 </code></pre>
 <p>FastAPI's <code>dependency_overrides</code> lets you test <em>without a real database</em>.</p>
+<h2>Verification points</h2>
+<p><strong>Expected output:</strong> <code>pytest -q</code> should pass the basic unit test, <code>/health</code> via <code>TestClient</code> should return <code>200</code>, and the bad-login path should return <code>401</code>.</p>
+<p><strong>First failure modes to check</strong></p>
+<ul>
+<li>If tests interfere with each other, revisit fixture scope and database reset strategy first.</li>
+<li>If mocks replace too much behavior, add one integration test on the real path.</li>
+<li>When you use <code>dependency_overrides</code>, clear them after the test so later cases do not inherit hidden state.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Unit tests <em>cut external dependencies</em> with mocks.</li>
@@ -211,11 +206,15 @@ def test_create_user(client, engine):
 <li>A Production-Ready Backend Structure (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://docs.pytest.org/en/stable/">pytest documentation</a></li>
 <li><a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI testing</a></li>
-<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Testing pyramid (Martin Fowler)</a></li>
 <li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock</a></li>
+</ul>
+<p><strong>Further Reading</strong></p>
+<ul>
+<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Testing pyramid (Martin Fowler)</a></li>
 </ul>
 <p class="tags-line">Tags: Backend, Testing, Pytest, Python, QualityAssurance</p>
 </body>

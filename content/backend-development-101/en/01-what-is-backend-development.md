@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 1
 title: What Is Backend Development?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - Architecture
   - Python
 seo_description: A clear map of backend development — HTTP servers, routing, services, databases, auth, and deployment for engineers starting their first backend role.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Backend Development?
 
-> Backend Development 101 series (1/10)
+Users only see the screen, but the part that keeps a service trustworthy is the code behind it. If you cannot explain where a request enters, where rules live, and where data stops being trustworthy, you can add features quickly but you cannot operate the system for long.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Backend Development 101 series. Here, we define backend development as a set of responsibilities — receiving requests, applying rules, touching data, and returning responses — instead of treating it as one vague technical label.
 
-**Core question**: Users only see the screen. So what is the *backend* actually doing behind it?
-
-> It receives a request, applies rules, touches data, and returns a response. The backend is a *set of responsibilities*.
-
-This is post 1 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The role and the boundaries of a backend
 - The five layers that form a backend system
@@ -50,19 +42,9 @@ Building only the frontend lets you ship *what the user sees*. Building the back
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] --> HTTP["HTTP server"]
-    HTTP --> Route["Router"]
-    Route --> Service["Service"]
-    Service --> DB["Database"]
-    Service --> Ext["External API"]
-    DB --> Service
-    Service --> Route
-    Route --> HTTP
-    HTTP --> Client
-```
+![client request path across HTTP server, router, service, and database](../../../assets/backend-development-101/01/01-01-concept-at-a-glance.en.png)
 
+*client request path across HTTP server, router, service, and database*
 Requests flow left to right; responses retrace the same path.
 
 ## Key Terms
@@ -158,6 +140,16 @@ curl -X POST -H "Content-Type: application/json" \
 
 You get JSON back.
 
+## Verification points
+
+**Expected output:** after `uvicorn 1_app:app --reload`, `/` should return `{"message": "hello"}` and `POST /users` should return JSON for the new user.
+
+### First failure modes to check
+
+- If `uvicorn` cannot import `1_app:app`, confirm the filename and app object name match.
+- If `POST /users` returns `422`, verify the payload still includes the `name` field.
+- An empty `GET /users` response is fine here; the point is verifying the request path reaches the handler and returns data.
+
 ## What to Notice in This Code
 
 - A server is a *path-to-function* mapping.
@@ -217,9 +209,14 @@ The backend is a *set of responsibilities*. Next, we open up the lowest layer an
 
 ## References
 
+### Official Docs
+
 - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
 - [HTTP overview (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
 - [The Twelve-Factor App](https://12factor.net/)
+
+### Further Reading
+
 - [Backend roadmap](https://roadmap.sh/backend)
 
 Tags: Backend, WebDevelopment, HTTP, Architecture, Python

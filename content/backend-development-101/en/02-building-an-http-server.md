@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 2
 title: Building an HTTP Server
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - FastAPI
   - Networking
 seo_description: Build an HTTP server from a raw socket up to FastAPI to truly understand requests, responses, status codes, and headers.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Building an HTTP Server
 
-> Backend Development 101 series (2/10)
+After using frameworks for a while, it is easy to forget what an HTTP server is actually doing. The moment a response gets truncated, a header disappears, or behavior changes behind a proxy, you have to go back down to raw requests and responses.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
 
-**Core question**: What does an HTTP server *actually do* under the hood?
-
-> It reads text from a TCP socket, parses it as a request, and writes text back. An HTTP server is a *read-and-write* program.
-
-This is post 2 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The actual shape of an HTTP request and response
 - How HTTP rides on top of TCP
@@ -50,16 +42,9 @@ Once you have *seen* what frameworks hide, every future debugging session gets f
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["Client"] -->|"GET / HTTP/1.1"| Sock["TCP socket"]
-    Sock --> Parser["Parser"]
-    Parser --> App["Handler"]
-    App --> Resp["Response builder"]
-    Resp --> Sock2["TCP socket"]
-    Sock2 -->|"HTTP/1.1 200 OK"| Client
-```
+![raw HTTP request and response flow between client and server](../../../assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
 
+*raw HTTP request and response flow between client and server*
 Both request and response are just *blocks of text*.
 
 ## Key Terms
@@ -160,6 +145,18 @@ curl -i http://127.0.0.1:9000/
 
 `-i` shows the *headers and status line* alongside the body.
 
+## Verification points
+
+**Expected output:** the raw socket server should print the incoming request text in the terminal, and the browser or `curl -i` should show `HTTP/1.1 200 OK` plus `hello`.
+
+### First failure modes to check
+
+- If the browser hangs, inspect `Content-Length` and whether the connection gets closed.
+- If the response parses oddly, confirm the line endings are `
+` rather than plain `
+`.
+- If the FastAPI example does not boot, re-check the import path in `uvicorn 2_fastapi:app --port 9000`.
+
 ## What to Notice in This Code
 
 - Without `Content-Length`, the client cannot know where the body ends.
@@ -219,9 +216,14 @@ An HTTP server is a *text-protocol program*. Next, we add the layer that decides
 
 ## References
 
+### Official Docs
+
 - [HTTP messages (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)
 - [HTTP status codes (MDN)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
 - [FastAPI responses](https://fastapi.tiangolo.com/advanced/response-directly/)
+
+### Further Reading
+
 - [curl manual](https://curl.se/docs/manual.html)
 
 Tags: Backend, HTTP, Python, FastAPI, Networking

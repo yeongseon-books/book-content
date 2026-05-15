@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 5
 title: The Database Layer
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - SQLAlchemy
   - Python
 seo_description: Use the repository pattern to isolate database access — transactions, migrations, and the N+1 query problem covered in one place.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # The Database Layer
 
-> Backend Development 101 series (5/10)
+The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
 
-**Core question**: Why should services *not* write SQL directly?
-
-> Because the database might change, the same query gets duplicated everywhere, and maintenance turns into hell. The repository sits between them.
-
-This is post 5 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The role of the repository pattern
 - Why we use an ORM and where its *traps* live
@@ -50,14 +42,9 @@ Databases are *what changes most often* and *what should change least*. Splittin
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Svc["Service"] --> Repo["Repository"]
-    Repo --> ORM["ORM"]
-    ORM --> DB[("Database")]
-    Repo --> Cache[("Cache")]
-```
+![database layer boundary between service, repository, ORM, cache, and database](../../../assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
 
+*database layer boundary between service, repository, ORM, cache, and database*
 The service does not know SQL — only the repository does.
 
 ## Key Terms
@@ -168,6 +155,16 @@ orders = session.scalars(stmt).all()
 
 Loading the children in *one shot* eliminates N+1.
 
+## Verification points
+
+**Expected output:** after `Base.metadata.create_all(engine)`, the `users` table should exist, and both `add()` calls inside one transaction block should commit together unless an exception triggers rollback.
+
+### First failure modes to check
+
+- Long-lived sessions often show up later as leaked connections or lock contention.
+- Manual schema edits start environment drift immediately when no migration records the change.
+- If list endpoints suddenly slow down, check for repeated relation fetches before looking anywhere else.
+
 ## What to Notice in This Code
 
 - Sessions stay *short* — one per request is standard.
@@ -227,9 +224,14 @@ A repository is a *translator over the database*. Next, we look at *who can see 
 
 ## References
 
+### Official Docs
+
 - [SQLAlchemy ORM](https://docs.sqlalchemy.org/en/20/orm/)
 - [Alembic Tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+- [SQLAlchemy relationship loading techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html)
+
+### Further Reading
+
 - [Repository pattern (Martin Fowler)](https://martinfowler.com/eaaCatalog/repository.html)
-- [N+1 queries explained](https://www.sqlshack.com/n1-query-problem/)
 
 Tags: Backend, Database, SQL, SQLAlchemy, Python

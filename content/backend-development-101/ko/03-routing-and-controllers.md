@@ -17,12 +17,14 @@ tags:
   - REST
   - Python
 seo_description: 라우터와 컨트롤러를 분리하여 백엔드 엔드포인트를 깔끔하게 설계하고, 입력 파라미터와 REST 스타일의 설계를 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Routing과 Controller
 
-이 글은 Backend Development 101 시리즈의 세 번째 글입니다. 엔드포인트가 몇 개 안 될 때는 한 파일에 몰아넣어도 돌아가지만, 기능이 늘어나는 순간 코드가 급격히 읽기 어려워집니다. 여기서는 router와 controller를 분리해 요청을 정리하는 기본 구조를 잡아 보겠습니다.
+엔드포인트가 몇 개 안 될 때는 한 파일에 몰아넣어도 돌아갑니다. 하지만 기능이 늘어나는 순간 코드는 급격히 읽기 어려워지고, 새 경로를 어디에 두어야 하는지부터 다시 고민하게 됩니다.
+
+이 글은 Backend Development 101 시리즈의 세 번째 글입니다. 여기서는 router와 controller를 분리해 요청 입구를 정리하고, path·query·body parameter를 어떤 기준으로 나눠야 하는지 함께 살펴보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -34,7 +36,7 @@ last_reviewed: '2026-05-12'
 
 ## 왜 중요한가
 
-작은 프로젝트에서는 한 파일도 충분해 보입니다. 하지만 엔드포인트 수가 늘어나면 그 한 파일이 곧 지옥이 됩니다. 새 기능이 들어올 때마다 “이 코드를 어디에 두지?”라는 질문이 생기면, 이미 구조가 약한 것입니다.
+작은 프로젝트에서는 한 파일도 충분해 보입니다. 하지만 엔드포인트 수가 늘어나면 그 한 파일이 곧 지옥이 됩니다. 새 기능이 들어올 때마다 “이 코드를 어디에 두지?”라는 질문이 생기면, 이미 구조가 약하다는 신호입니다.
 
 좋은 구조는 매번 위치를 고민하지 않게 해 줍니다. router는 경로의 지도 역할을 하고, controller는 입력을 받고 다음 레이어로 넘기는 접수창구 역할을 합니다. 이 둘을 분리하면 기능이 커져도 코드가 스스로 정리되기 시작합니다.
 
@@ -42,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Router["Router"]
-    Router --> Ctrl["Controller"]
-    Ctrl --> Service["Service"]
-    Service --> Repo["Repository"]
-```
+![라우터에서 컨트롤러, 서비스, 리포지토리로 이어지는 요청 처리 흐름](../../../assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png)
 
+*라우터에서 컨트롤러, 서비스, 리포지토리로 이어지는 요청 처리 흐름*
 router는 지도를, controller는 접수창구를, service는 실제 규칙을 처리하는 전문가를 떠올리면 이해하기 쉽습니다. 이 비유가 중요한 이유는, 요청이 복잡해져도 각 층이 맡아야 할 일이 달라지지 않기 때문입니다.
 
 ## 핵심 용어
@@ -184,6 +181,16 @@ class UserController:
 
 controller는 얇게 유지해야 합니다. 입력을 받고 필요한 검증을 거친 뒤, 실제 비즈니스 규칙은 service에 넘기는 것이 핵심입니다.
 
+## 검증 포인트
+
+**Expected output:** `/users/10`은 `{"id": 10}`을, `GET /users?active=false&limit=5`는 필터 값이 반영된 JSON을 반환해야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- path parameter 타입이 맞지 않으면 FastAPI가 `422`를 반환합니다.
+- `APIRouter`를 분리한 뒤 경로가 안 보이면 `include_router()` 호출 여부를 먼저 봅니다.
+- controller가 비대해지면 service 호출과 입력 변환만 남도록 다시 나눕니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - path는 주로 identity, query는 주로 filtering에 씁니다.
@@ -247,9 +254,14 @@ router는 지도이고 controller는 접수창구입니다. 다음 글에서는 
 
 ## 참고 자료
 
+### 공식 문서
+
 - [FastAPI Path operations](https://fastapi.tiangolo.com/tutorial/path-params/)
 - [FastAPI APIRouter](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
-- [REST API Tutorial](https://restfulapi.net/)
 - [Pydantic Models](https://docs.pydantic.dev/latest/concepts/models/)
+
+### 추가 읽을거리
+
+- [REST API Tutorial](https://restfulapi.net/)
 
 Tags: Backend, FastAPI, Architecture, REST, Python

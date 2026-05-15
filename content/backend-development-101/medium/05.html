@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>The Database Layer</h1>
-<blockquote>
-<p>Backend Development 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why should services <em>not</em> write SQL directly?</p>
-<blockquote>
-<p>Because the database might change, the same query gets duplicated everywhere, and maintenance turns into hell. The repository sits between them.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.</p>
+<p>This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>The role of the repository pattern</li>
 <li>Why we use an ORM and where its <em>traps</em> live</li>
@@ -79,13 +70,9 @@
 <p>A repository is the <em>translator between the database and the service</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Svc[&quot;Service&quot;] --&gt; Repo[&quot;Repository&quot;]
-    Repo --&gt; ORM[&quot;ORM&quot;]
-    ORM --&gt; DB[(&quot;Database&quot;)]
-    Repo --&gt; Cache[(&quot;Cache&quot;)]
-</code></pre>
-<p>The service does not know SQL — only the repository does.</p>
+<p><img alt="database layer boundary between service, repository, ORM, cache, and database" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>database layer boundary between service, repository, ORM, cache, and database</em><br>
+The service does not know SQL — only the repository does.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Repository</strong>: an object that wraps database access in <em>function-like</em> methods.</li>
@@ -168,6 +155,14 @@ stmt = select(Order).options(selectinload(Order.items))
 orders = session.scalars(stmt).all()
 </code></pre>
 <p>Loading the children in <em>one shot</em> eliminates N+1.</p>
+<h2>Verification points</h2>
+<p><strong>Expected output:</strong> after <code>Base.metadata.create_all(engine)</code>, the <code>users</code> table should exist, and both <code>add()</code> calls inside one transaction block should commit together unless an exception triggers rollback.</p>
+<p><strong>First failure modes to check</strong></p>
+<ul>
+<li>Long-lived sessions often show up later as leaked connections or lock contention.</li>
+<li>Manual schema edits start environment drift immediately when no migration records the change.</li>
+<li>If list endpoints suddenly slow down, check for repeated relation fetches before looking anywhere else.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Sessions stay <em>short</em> — one per request is standard.</li>
@@ -221,11 +216,15 @@ orders = session.scalars(stmt).all()
 <li>A Production-Ready Backend Structure (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://docs.sqlalchemy.org/en/20/orm/">SQLAlchemy ORM</a></li>
 <li><a href="https://alembic.sqlalchemy.org/en/latest/tutorial.html">Alembic Tutorial</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html">SQLAlchemy relationship loading techniques</a></li>
+</ul>
+<p><strong>Further Reading</strong></p>
+<ul>
 <li><a href="https://martinfowler.com/eaaCatalog/repository.html">Repository pattern (Martin Fowler)</a></li>
-<li><a href="https://www.sqlshack.com/n1-query-problem/">N+1 queries explained</a></li>
 </ul>
 <p class="tags-line">Tags: Backend, Database, SQL, SQLAlchemy, Python</p>
 </body>

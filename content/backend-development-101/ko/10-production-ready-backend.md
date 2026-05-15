@@ -17,12 +17,14 @@ tags:
   - Python
   - Production
 seo_description: 운영 가능한 백엔드 프로젝트의 구조와 설정 전략, 관측성(Observability)을 프로젝트에 녹여내는 기준을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 운영 가능한 백엔드 구조
 
-이 글은 Backend Development 101 시리즈의 마지막 글입니다. 지금까지 배운 HTTP 서버, 라우팅, 서비스, 데이터베이스, 인증, 로깅, 테스트, 배포를 실제 프로젝트 구조 안에 어떻게 묶을지가 마지막 퍼즐입니다. 여기서는 운영 가능한 백엔드가 왜 결국 구조의 문제로 귀결되는지 정리해 보겠습니다.
+지금까지 배운 HTTP 서버, 라우팅, 서비스, 데이터베이스, 인증, 로깅, 테스트, 배포를 실제 프로젝트 구조 안에 묶는 순간부터 코드의 성격이 달라집니다. 기능이 동작하는 것과 운영 가능한 구조를 갖추는 것은 서로 다른 문제이기 때문입니다.
+
+이 글은 Backend Development 101 시리즈의 마지막 글입니다. 여기서는 운영 가능한 백엔드가 왜 결국 구조의 문제로 귀결되는지 정리하고, 지금까지 배운 레이어를 하나의 프로젝트에 배치하는 기준을 살펴보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,18 +44,10 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Mid["Middleware"]
-    Mid --> Ctl["Controller"]
-    Ctl --> Svc["Service"]
-    Svc --> Repo["Repository"]
-    Repo --> DB["Database"]
-    Svc --> Log["Logs/Metrics"]
-    Log --> Obs["Observability"]
-```
+![운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조](../../../assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
 
-각 화살표는 물리적인 디렉터리 경계와 맞물려야 합니다. 구조가 좋다는 말은 요청 흐름이 파일 구조에서도 비슷하게 읽힌다는 뜻입니다.
+*운영 환경에서 요청 흐름과 observability가 각 레이어에 붙는 구조*
+각 화살표는 물리적인 디렉터리 경계와 맞물려야 합니다. 구조가 좋다면 요청 흐름도 파일 구조를 따라 자연스럽게 읽힙니다.
 
 ## 핵심 용어
 
@@ -120,7 +114,7 @@ class Settings(BaseSettings):
 settings = Settings()
 ```
 
-운영에서는 `.env` 대신 secret manager가 환경 변수를 주입하는 방식이 더 자연스럽습니다. 핵심은 설정이 코드가 아니라 환경에 있어야 한다는 점입니다.
+운영에서는 `.env` 대신 secret manager가 환경 변수를 주입하는 방식이 더 자연스럽습니다. 핵심은 설정을 코드에 넣지 않고 환경에서 주입하는 구조를 지키는 데 있습니다.
 
 ### Step 3 — main.py is wiring only
 
@@ -179,10 +173,20 @@ def setup_metrics(app):
 
 숫자로 적어 두어야 알람과 용량 계획이 자연스럽게 따라옵니다. “빠르게”나 “안정적으로” 같은 표현만으로는 운영 기준이 되지 못합니다.
 
+## 검증 포인트
+
+**Expected output:** 새 팀원이 `api`, `services`, `repositories`, `config`, `observability` 디렉터리 이름만 보고 요청 흐름을 따라갈 수 있어야 하고, `main.py`는 wiring 코드만 남아 있어야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- `main.py`에 비즈니스 규칙이 들어가면 테스트 단위가 곧바로 무거워집니다.
+- 환경별 차이를 코드 조건문으로 처리하기 시작하면 config layering을 다시 설계합니다.
+- 로그와 메트릭이 나중에 붙는 구조라면 운영 준비보다 기능 추가를 먼저 선택한 신호입니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - `main.py`가 얇을수록 테스트가 쉬워집니다.
-- 설정은 코드가 아니라 환경에 있어야 합니다.
+- 설정은 코드에 박아 두지 않고 환경에서 주입합니다.
 - observability는 처음부터 있어야 나중에 빠르게 디버깅할 수 있습니다.
 
 프로젝트 구조는 단순한 취향 문제가 아닙니다. 디버깅 속도, 새 팀원의 적응 속도, 리뷰 기준, 운영 안정성이 모두 여기에 영향을 받습니다.
@@ -251,9 +255,14 @@ def setup_metrics(app):
 
 ## 참고 자료
 
-- [Twelve-Factor App](https://12factor.net/)
-- [Google SRE Book](https://sre.google/books/)
+### 공식 문서
+
 - [FastAPI Bigger Applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
 - [Prometheus Python client](https://github.com/prometheus/client_python)
+- [The Twelve-Factor App](https://12factor.net/)
+
+### 추가 읽을거리
+
+- [Google SRE Book](https://sre.google/books/)
 
 Tags: Backend, Architecture, BestPractices, Python, Production

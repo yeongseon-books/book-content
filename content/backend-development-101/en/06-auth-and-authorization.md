@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 6
 title: Authentication and Authorization
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - JWT
   - Python
 seo_description: Understand the difference between authentication and authorization and build a safe FastAPI login flow with bcrypt, JWT, and role checks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Authentication and Authorization
 
-> Backend Development 101 series (6/10)
+Login looks small from the UI, but the server has to answer two separate questions on every protected request. It must know who the user is, and it must decide what that user is allowed to do right now.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
 
-**Core question**: From the *server* point of view, what does "logged in" actually mean?
-
-> A user has *proven who they are* and the server now knows *what they can do* on this request. Authentication and authorization are *two different problems*.
-
-This is post 6 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The difference between authentication and authorization
 - Minimum safe practices for password storage
@@ -50,16 +42,9 @@ Auth is the *one area* where a single mistake can sink a company. A line that st
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User"] -->|"id+pw"| Login["/login"]
-    Login -->|"token / cookie"| User
-    User -->|"Authorization header"| API["/api"]
-    API --> Verify["Verify"]
-    Verify --> Authz["Check role"]
-    Authz --> Handler["Handler"]
-```
+![authentication and authorization flow from login to token verification and role check](../../../assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
 
+*authentication and authorization flow from login to token verification and role check*
 Authentication asks *who*; authorization asks *can you*.
 
 ## Key Terms
@@ -161,6 +146,16 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
     return {"deleted": uid}
 ```
 
+## Verification points
+
+**Expected output:** a correct password should issue a token, a wrong password should return `401`, and a user without the required role should hit `403` on the protected admin path.
+
+### First failure modes to check
+
+- If password verification always fails, confirm hashing and verification still use the same algorithm path.
+- If expired JWTs still pass, inspect whether `exp` validation is really happening in decode.
+- If permissions exist only in the frontend, the server has not actually enforced the rule yet.
+
 ## What to Notice in This Code
 
 - Passwords are *never* stored as plain text.
@@ -220,9 +215,14 @@ Authentication is *identity*; authorization is *permission*. Next, we look at th
 
 ## References
 
+### Official Docs
+
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [FastAPI Security](https://fastapi.tiangolo.com/tutorial/security/)
-- [JWT Introduction](https://jwt.io/introduction)
 - [Passlib bcrypt docs](https://passlib.readthedocs.io/en/stable/lib/passlib.hash.bcrypt.html)
+
+### Further Reading
+
+- [JWT Introduction](https://jwt.io/introduction)
 
 Tags: Backend, Auth, Security, JWT, Python

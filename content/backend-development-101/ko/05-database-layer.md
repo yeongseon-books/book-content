@@ -17,12 +17,14 @@ tags:
   - SQLAlchemy
   - Python
 seo_description: Repository 패턴과 트랜잭션, migration, N+1 핵심을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Database Layer
 
-이 글은 Backend Development 101 시리즈의 다섯 번째 글입니다. service가 직접 SQL을 쓰기 시작하면 쿼리 중복과 데이터 접근 규칙의 분산이 빠르게 커집니다. 여기서는 repository pattern을 중심으로 database layer를 분리하고, ORM·migration·transaction·N+1까지 함께 정리해 보겠습니다.
+service가 직접 SQL을 쓰기 시작하면 쿼리 중복과 데이터 접근 규칙의 분산이 빠르게 커집니다. 처음에는 편해 보여도 성능 조정, 캐시 추가, 테스트 격리 같은 작업이 모두 어려워집니다.
+
+이 글은 Backend Development 101 시리즈의 다섯 번째 글입니다. 여기서는 repository pattern을 중심으로 database layer를 분리하고, ORM·migration·transaction·N+1까지 함께 정리해 보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,14 +44,9 @@ repository는 데이터베이스와 service 사이의 번역기 역할을 합니
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Svc["Service"] --> Repo["Repository"]
-    Repo --> ORM["ORM"]
-    ORM --> DB[("Database")]
-    Repo --> Cache[("Cache")]
-```
+![서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계](../../../assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
 
+*서비스와 데이터베이스 사이에서 repository, ORM, cache가 놓이는 경계*
 service는 SQL을 몰라도 되고, repository만 데이터 접근 세부 구현을 알면 됩니다. 이 단순한 분리가 데이터 계층을 교체 가능한 형태로 만들어 줍니다.
 
 ## 핵심 용어
@@ -166,6 +163,16 @@ orders = session.scalars(stmt).all()
 
 자식 데이터를 한 번에 가져오면 N+1 문제를 피할 수 있습니다. ORM을 쓸 때 가장 자주 만나는 성능 함정 중 하나라서 초기에 꼭 감을 잡아 두는 편이 좋습니다.
 
+## 검증 포인트
+
+**Expected output:** `Base.metadata.create_all(engine)` 뒤에는 `users` 테이블이 생기고, transaction 블록 안의 두 `add()` 호출은 예외가 없을 때만 함께 commit되어야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- 같은 요청에서 session을 오래 붙잡고 있으면 연결 누수와 lock 경합이 생기기 쉽습니다.
+- migration 없이 수동으로 스키마를 바꾸면 환경 간 drift가 바로 시작됩니다.
+- 목록 조회가 갑자기 느려지면 eager loading 없이 relation을 반복 조회하고 있지 않은지 먼저 봅니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - session은 보통 요청 단위로 짧게 유지합니다.
@@ -229,9 +236,14 @@ repository는 데이터베이스 위에 놓인 번역기입니다. 다음 글에
 
 ## 참고 자료
 
+### 공식 문서
+
 - [SQLAlchemy ORM](https://docs.sqlalchemy.org/en/20/orm/)
 - [Alembic Tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+- [SQLAlchemy relationship loading techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html)
+
+### 추가 읽을거리
+
 - [Repository pattern (Martin Fowler)](https://martinfowler.com/eaaCatalog/repository.html)
-- [N+1 queries explained](https://www.sqlshack.com/n1-query-problem/)
 
 Tags: Backend, Database, SQL, SQLAlchemy, Python

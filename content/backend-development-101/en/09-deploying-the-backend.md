@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 9
 title: Deploying the Backend
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - DevOps
   - Python
 seo_description: Use Docker, environment variables, healthchecks, and rolling updates to ship a Python backend safely to production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Deploying the Backend
 
-> Backend Development 101 series (9/10)
+The reason code works on your laptop and fails in production is usually not the code alone. It is the difference in operating system, dependencies, secrets, networking, and startup assumptions that never got frozen into something reproducible.
 
-<!-- a-grade-intro:begin -->
+This is post 9 in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.
 
-**Core question**: Why does "it works on my laptop" so often *break* in production?
-
-> Production has different OS, dependencies, secrets, and networks. Deployment is the work of *freezing* those differences in code.
-
-This is post 9 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - The pieces that make up a deployment environment
 - How a Dockerfile creates a *reproducible environment*
@@ -50,16 +42,9 @@ When deploys become *scary*, release frequency drops, and rare deploys carry *mo
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Source"] --> Build["Build"]
-    Build --> Image["Container image"]
-    Image --> Reg["Registry"]
-    Reg --> Run["Runner"]
-    Run --> LB["Load balancer"]
-    LB --> Users["Users"]
-```
+![deployment flow from source code to container image, runtime, and users](../../../assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
 
+*deployment flow from source code to container image, runtime, and users*
 Code becomes an *image*; the image runs the same way *everywhere*.
 
 ## Key Terms
@@ -154,6 +139,16 @@ healthcheck:
 
 The key is to *prove the new version is healthy* before traffic moves.
 
+## Verification points
+
+**Expected output:** `docker build` should produce the same runnable image from the same Dockerfile, `/healthz` should return `{"status": "ok"}`, and traffic should move only after the new version passes its healthcheck.
+
+### First failure modes to check
+
+- If the container exits immediately, inspect the `CMD` path and port binding first.
+- If behavior changes across environments, secrets or config may still be baked into the image.
+- If errors spike during rollout, confirm traffic is not shifting before healthchecks succeed.
+
 ## What to Notice in This Code
 
 - Secrets *do not* go inside the image.
@@ -213,9 +208,14 @@ Deployment is a *reproducibility* problem. In the final chapter, we tie all the 
 
 ## References
 
+### Official Docs
+
 - [Docker get-started](https://docs.docker.com/get-started/)
-- [The Twelve-Factor App](https://12factor.net/)
 - [Kubernetes probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 - [GitHub Actions for Python](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python)
+
+### Further Reading
+
+- [The Twelve-Factor App](https://12factor.net/)
 
 Tags: Backend, Deployment, Docker, DevOps, Python

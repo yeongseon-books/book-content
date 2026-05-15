@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Logging and Error Handling</h1>
-<blockquote>
-<p>Backend Development 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: At 3 a.m. when the pager fires, what does it take to find the <em>cause</em> in 30 minutes?</p>
-<blockquote>
-<p>Structured logs, meaningful status codes, and a global exception handler. With those three, the answer is in the logs — not in re-reading the code.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>When the pager goes off at 3 a.m., re-reading the code is rarely the fastest path to an answer. What matters in production is whether the system leaves enough evidence behind to explain a failed request from logs and error responses alone.</p>
+<p>This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.</p>
+<h2>What you will learn</h2>
 <ul>
 <li>Why we use a logger instead of <code>print</code></li>
 <li>The shape of a structured log</li>
@@ -79,16 +70,9 @@
 <p>Good logs are read more often than the code itself.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Req[&quot;Request&quot;] --&gt; Mw[&quot;Middleware&quot;]
-    Mw --&gt;|&quot;add request_id&quot;| App[&quot;Handler&quot;]
-    App --&gt; Err{&quot;Error?&quot;}
-    Err --&gt;|&quot;yes&quot;| Handler[&quot;Global handler&quot;]
-    Err --&gt;|&quot;no&quot;| OK[&quot;200&quot;]
-    Handler --&gt; Log[&quot;Logger&quot;]
-    OK --&gt; Log
-</code></pre>
-<p>Every path leads to the <em>log</em>.</p>
+<p><img alt="request ID middleware and global exception handling flow into logs" src="https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>request ID middleware and global exception handling flow into logs</em><br>
+Every path leads to the <em>log</em>.</p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Logger</strong>: object that emits log records.</li>
@@ -177,6 +161,14 @@ log.warning(&quot;retrying upstream call&quot;)
 log.error(&quot;payment failed&quot;)
 log.critical(&quot;database is down&quot;)
 </code></pre>
+<h2>Verification points</h2>
+<p><strong>Expected output:</strong> log lines produced during the same request should share one <code>request_id</code>, and <code>DomainError</code> should always become the same JSON error shape.</p>
+<p><strong>First failure modes to check</strong></p>
+<ul>
+<li>If logs are hard to search, confirm the JSON formatter still emits one line per event.</li>
+<li>If <code>X-Request-ID</code> is missing from responses, inspect the middleware where the response header is set.</li>
+<li>If stack traces never appear, some exception path is swallowing errors before they reach the logger.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A log line stays on <em>one line</em> so search works.</li>
@@ -230,10 +222,14 @@ log.critical(&quot;database is down&quot;)
 <li>A Production-Ready Backend Structure (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
 <ul>
 <li><a href="https://docs.python.org/3/howto/logging.html">Python logging HOWTO</a></li>
 <li><a href="https://fastapi.tiangolo.com/tutorial/handling-errors/">FastAPI exception handlers</a></li>
 <li><a href="https://12factor.net/logs">Twelve-Factor logs</a></li>
+</ul>
+<p><strong>Further Reading</strong></p>
+<ul>
 <li><a href="https://www.structlog.org/en/stable/">structlog docs</a></li>
 </ul>
 <p class="tags-line">Tags: Backend, Logging, Observability, Python, ErrorHandling</p>

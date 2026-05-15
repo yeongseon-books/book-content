@@ -2,7 +2,7 @@
 series: backend-development-101
 episode: 10
 title: A Production-Ready Backend Structure
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,16 @@ tags:
   - Python
   - Production
 seo_description: Combine the nine backend layers into one project structure — directories, config layering, observability, and a growth roadmap.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # A Production-Ready Backend Structure
 
-> Backend Development 101 series (10/10)
+Once you try to fit HTTP handling, routing, services, databases, auth, logging, testing, and deployment into one project, structure stops being an aesthetic preference. It becomes the thing that determines whether the code is merely working or genuinely operable.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Backend Development 101 series. Here, we tie the earlier layers together into one production-ready backend shape and turn those ideas into directory boundaries, configuration rules, and observability defaults.
 
-**Core question**: How do you combine the nine layers you have learned into *one coherent project*?
-
-> Writing code that works and writing a backend that *runs in production* are different jobs. Production-readiness starts with structure.
-
-This is post 10 in the Backend Development 101 series.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## What you will learn
 
 - A *project directory layout* that hosts all nine layers
 - A strategy for splitting config across dev/staging/prod
@@ -50,17 +42,9 @@ A good structure lets *a new teammate find anything in 30 minutes*. A bad struct
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Req["Request"] --> Mid["Middleware"]
-    Mid --> Ctl["Controller"]
-    Ctl --> Svc["Service"]
-    Svc --> Repo["Repository"]
-    Repo --> DB["Database"]
-    Svc --> Log["Logs/Metrics"]
-    Log --> Obs["Observability"]
-```
+![production request flow with observability attached to each layer](../../../assets/backend-development-101/10/10-01-concept-at-a-glance.en.png)
 
+*production request flow with observability attached to each layer*
 Each arrow should align with a *directory boundary*.
 
 ## Key Terms
@@ -181,6 +165,16 @@ def setup_metrics(app):
 
 Once written down, alerts and capacity planning *follow naturally*.
 
+## Verification points
+
+**Expected output:** a new teammate should be able to follow the request path by directory names alone, and `main.py` should contain wiring only.
+
+### First failure modes to check
+
+- Once business rules enter `main.py`, test setup becomes heavier immediately.
+- If environment differences live in conditionals across the codebase, config layering has already started to fail.
+- If logs and metrics are added only after incidents, the structure is still prioritizing features over operations.
+
 ## What to Notice in This Code
 
 - The thinner `main.py` is, the easier testing becomes.
@@ -249,9 +243,14 @@ Thank you for staying with this series. The ability to *take a small backend and
 
 ## References
 
-- [Twelve-Factor App](https://12factor.net/)
-- [Google SRE Book](https://sre.google/books/)
+### Official Docs
+
 - [FastAPI Bigger Applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
 - [Prometheus Python client](https://github.com/prometheus/client_python)
+- [The Twelve-Factor App](https://12factor.net/)
+
+### Further Reading
+
+- [Google SRE Book](https://sre.google/books/)
 
 Tags: Backend, Architecture, BestPractices, Python, Production

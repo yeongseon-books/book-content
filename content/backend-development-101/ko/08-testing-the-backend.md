@@ -17,12 +17,14 @@ tags:
   - Python
   - QualityAssurance
 seo_description: pytest와 TestClient로 안전한 백엔드 변경 환경을 만드는 방법입니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 백엔드 테스트
 
-이 글은 Backend Development 101 시리즈의 여덟 번째 글입니다. 테스트 없이 코드를 바꾸는 일은 매번 도박에 가깝습니다. 여기서는 unit, integration, E2E 테스트를 어떻게 나눠 생각해야 하는지, 그리고 pytest와 FastAPI TestClient로 변경에 안전한 백엔드를 만드는 방법을 살펴보겠습니다.
+테스트 없이 코드를 바꾸는 일은 매번 도박에 가깝습니다. 기능이 늘수록 중요한 것은 코드를 한 번에 완벽하게 쓰는 능력이 아니라, 나중에 바꿔도 무너지지 않게 만드는 안전망입니다.
+
+이 글은 Backend Development 101 시리즈의 여덟 번째 글입니다. 여기서는 unit·integration·E2E 테스트를 어떻게 나눠 생각해야 하는지, 그리고 pytest와 FastAPI TestClient로 변경에 안전한 백엔드를 만드는 방법을 살펴보겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Unit["Unit"] --> Int["Integration"]
-    Int --> E2E["E2E"]
-    Unit -->|"fast and many"| Pyramid
-    E2E -->|"slow and few"| Pyramid
-```
+![unit, integration, E2E 테스트가 쌓이는 테스트 피라미드](../../../assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
 
+*unit, integration, E2E 테스트가 쌓이는 테스트 피라미드*
 테스트 피라미드의 핵심은 아래쪽에 빠르고 많은 테스트를 두고, 위쪽에 느리고 적은 테스트를 두는 것입니다. 이 비율이 깨지면 팀의 개발 속도도 함께 무너집니다.
 
 ## 핵심 용어
@@ -159,6 +156,16 @@ def test_create_user(client, engine):
 
 FastAPI의 `dependency_overrides`를 쓰면 실제 운영용 데이터베이스 없이도 꽤 많은 경로를 검증할 수 있습니다. 빠른 테스트를 만드는 핵심 포인트 중 하나입니다.
 
+## 검증 포인트
+
+**Expected output:** `pytest -q`는 기본 unit test를 통과해야 하고, `TestClient`로 호출한 `/health`는 `200`, 잘못된 로그인은 `401`을 돌려줘야 합니다.
+
+### 먼저 확인할 실패 지점
+
+- 테스트끼리 DB 상태가 섞이면 fixture scope와 초기화 위치를 다시 봅니다.
+- mock이 너무 많아 실제 경로를 안 탄다면 integration test를 한 단계 추가합니다.
+- `dependency_overrides`를 썼다면 테스트 끝에서 반드시 원복하는 습관을 들입니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - unit test는 mock으로 외부 의존성을 끊습니다.
@@ -222,9 +229,14 @@ CI에서는 보통 모든 PR마다 `pytest`가 실행됩니다. unit test는 수
 
 ## 참고 자료
 
+### 공식 문서
+
 - [pytest documentation](https://docs.pytest.org/en/stable/)
 - [FastAPI testing](https://fastapi.tiangolo.com/tutorial/testing/)
-- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [unittest.mock](https://docs.python.org/3/library/unittest.mock.html)
+
+### 추가 읽을거리
+
+- [Testing pyramid (Martin Fowler)](https://martinfowler.com/articles/practical-test-pyramid.html)
 
 Tags: Backend, Testing, Pytest, Python, QualityAssurance
