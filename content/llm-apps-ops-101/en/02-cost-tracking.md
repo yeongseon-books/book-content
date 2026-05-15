@@ -55,7 +55,8 @@ from dataclasses import asdict, dataclass
 from groq import Groq
 
 MODEL = "llama-3.1-8b-instant"
-PRICE_PER_MILLION_TOKENS = 0.05
+INPUT_PRICE_PER_MILLION_TOKENS = 0.05
+OUTPUT_PRICE_PER_MILLION_TOKENS = 0.08
 
 @dataclass
 class CostRecord:
@@ -65,8 +66,10 @@ class CostRecord:
     total_tokens: int
     cost_usd: float
 
-def estimate_cost(total_tokens: int) -> float:
-    return round((total_tokens / 1_000_000) * PRICE_PER_MILLION_TOKENS, 8)
+def estimate_cost(prompt_tokens: int, completion_tokens: int) -> float:
+    prompt_cost = (prompt_tokens / 1_000_000) * INPUT_PRICE_PER_MILLION_TOKENS
+    completion_cost = (completion_tokens / 1_000_000) * OUTPUT_PRICE_PER_MILLION_TOKENS
+    return round(prompt_cost + completion_cost, 8)
 
 def run_prompt(client: Groq, prompt: str) -> CostRecord:
     response = client.chat.completions.create(
@@ -85,7 +88,7 @@ def run_prompt(client: Groq, prompt: str) -> CostRecord:
         prompt_tokens=usage.prompt_tokens,
         completion_tokens=usage.completion_tokens,
         total_tokens=usage.total_tokens,
-        cost_usd=estimate_cost(usage.total_tokens),
+        cost_usd=estimate_cost(usage.prompt_tokens, usage.completion_tokens),
     )
 
 def main() -> None:
@@ -97,7 +100,8 @@ def main() -> None:
     ]
     records = [run_prompt(client, prompt) for prompt in prompts]
     report = {
-        "price_per_million_tokens": PRICE_PER_MILLION_TOKENS,
+        "input_price_per_million_tokens": INPUT_PRICE_PER_MILLION_TOKENS,
+        "output_price_per_million_tokens": OUTPUT_PRICE_PER_MILLION_TOKENS,
         "total_calls": len(records),
         "total_tokens": sum(record.total_tokens for record in records),
         "total_cost_usd": round(sum(record.cost_usd for record in records), 8),
@@ -113,7 +117,7 @@ if __name__ == "__main__":
 ![Repeated prompts become cache candidates](../../../assets/llm-apps-ops-101/02/02-02-what-to-notice-in-this-code.en.png)
 
 *Repeated prompts become cache candidates*
-- A single `PRICE_PER_MILLION_TOKENS` constant keeps the math obvious and easy to replace later.
+- Separate input and output pricing constants keep the example aligned with how Groq bills this model.
 - Persisting one `CostRecord` per call lets you analyze outliers without recomputing reports.
 - Repeating one prompt on purpose gives you a baseline for later cache experiments.
 
@@ -121,7 +125,7 @@ if __name__ == "__main__":
 ![Optimization levers need quality checks](../../../assets/llm-apps-ops-101/02/02-03-where-engineers-get-confused.en.png)
 
 *Optimization levers need quality checks*
-- Many vendors price input and output tokens differently. Even if the example is simple, design for that split mentally.
+- Many vendors price input and output tokens differently. Model your cost records that way from the start.
 - A total-cost number alone hides spikes. You also need call count and token distribution.
 - Cost optimization without quality checks often means quietly making the product worse.
 
