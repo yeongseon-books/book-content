@@ -75,7 +75,7 @@ Now put the differences on one table.
 | **Event-driven autoscale** | Yes (event-driven) | Yes (per-function, target-based) | Yes (target-based optional) | Manual via App Service autoscale rules |
 | **Per-function scaling** | No | Yes | No | No |
 | **Instance memory** | Fixed at 1.5 GB | 512 / 2048 / 4096 MB | Varies by SKU | Depends on App Service Plan SKU |
-| **Deployment slots** | Limited | No; use the rolling update path | Yes | Yes |
+| **Deployment slots** | Limited | No; only a rolling update path (preview, not recommended for production) | Yes | Yes |
 | **Warmup trigger** | No | Yes | Yes | Yes |
 
 > Sources: Microsoft Learn — [Function scale and hosting options](https://learn.microsoft.com/en-us/azure/azure-functions/functions-scale), [Flex Consumption plan](https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-plan), [Event-driven scaling](https://learn.microsoft.com/en-us/azure/azure-functions/event-driven-scaling), and [Target-based scaling](https://learn.microsoft.com/en-us/azure/azure-functions/functions-target-based-scaling). Instance ceilings vary by plan, OS, region, and platform restrictions.
@@ -123,7 +123,7 @@ Flex Consumption is the plan Microsoft now recommends for new serverless workloa
 
 - It is **Linux only**.
 - **Blob trigger support requires the Event Grid source.** Do not assume the same polling-based blob trigger behavior you may be used to on classic Consumption.
-- **Some bindings and platform features have Flex-specific constraints.** No deployment slots and no in-place migration from another hosting plan are examples.
+- **Some bindings and platform features have Flex-specific constraints.** No deployment slots, only a rolling update path that is still preview and not recommended for production, and no in-place migration from another hosting plan are examples.
 - **Per-function scaling still uses scale groups.** HTTP triggers scale together, Blob Event Grid triggers scale together, and Durable Functions scale together. It is not “every function always gets fully isolated scale behavior.”
 
 **Pick it when:**
@@ -133,7 +133,7 @@ Flex Consumption is the plan Microsoft now recommends for new serverless workloa
 - You want better scaling flexibility than classic Consumption
 - Linux is acceptable
 
-This is the first candidate for a new build. The safe mental model is “Flex fixes many of Consumption's practical limits,” not “Flex removes every meaningful constraint.”
+This is the first candidate for a new build. The safe mental model is “Flex fixes many of Consumption's practical limits,” not “Flex removes every meaningful constraint.” If your production rollout depends on a mature slot-based swap workflow, treat that as a Premium or Dedicated requirement instead of assuming the Flex rolling update path is a production-ready substitute.
 
 ---
 
