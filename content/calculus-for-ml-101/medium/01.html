@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>What Is a Derivative</h1>
+<p>When people first meet derivatives, they often memorize rules before they build a working mental model. In ML, that order tends to fail quickly. The useful question is simpler: if you nudge a parameter a little, does the loss go up or down, and how sharply?</p>
+<p>This is the first post in the Calculus for ML 101 series.</p>
+<p>In this post, we'll connect average rate of change, tangent lines, limits, and numerical differentiation into one practical picture. Once that picture is clear, a gradient stops looking like a mysterious number and starts looking like a directional signal for training.</p>
 <blockquote>
-<p>Calculus for ML 101 series (1/10)</p>
+<p>A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When we say an ML model <em>learns</em>, what <em>exactly</em> is happening through <em>calculus</em>?</p>
-<blockquote>
-<p>A <em>derivative</em> is a <em>rate of change</em>, and <em>training</em> uses derivatives of <em>loss</em> to pick a <em>direction</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>intuition</em> behind a derivative</li>
@@ -76,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Gradient descent</em>, <em>backprop</em>, and <em>learning rate</em> are all defined on top of derivatives.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F[Function] --&gt; S[Slope]
-    S --&gt; L[Limit]
-    L --&gt; D[Derivative]
-    D --&gt; M[ML Training]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept flow: changes in a function become limits, derivatives, and finally an ML training signal.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>derivative</strong>: <em>instantaneous rate of change</em>.</li>

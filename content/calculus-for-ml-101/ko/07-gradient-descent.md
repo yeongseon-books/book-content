@@ -60,14 +60,9 @@ last_reviewed: '2026-05-12'
 
 경사하강법의 흐름은 다음과 같습니다.
 
-```mermaid
-flowchart LR
-    W[가중치] --> G[Gradient]
-    G --> S[스텝]
-    S --> W
-    W --> L[손실 감소]
-```
+![핵심 개념](../../../assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
 
+*경사하강법 루프: 현재 가중치에서 gradient를 계산하고 반대 방향 step으로 손실을 줄입니다.*
 ### 가장 단순한 손실과 gradient부터 봅시다
 
 ```python

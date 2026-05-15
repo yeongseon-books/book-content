@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 4
 title: Gradient
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Vector
   - Beginner
 seo_description: A beginner-friendly tour of gradient vectors, direction, magnitude, contour lines, and the steepest-ascent direction for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Gradient
 
-> Calculus for ML 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When we collect *all partial derivatives* into a *single vector*, what does it *mean*?
-
-> A *gradient* is the *vector* pointing in the direction of *steepest loss increase*.
+Once you have one partial derivative per variable, the next question is operational: how do you use all of them together? A model rarely updates one parameter in isolation. Training moves the whole parameter state at once, so you need a representation that preserves both per-coordinate responsibility and overall direction.
 
 This is post 4 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll treat the gradient as a direction vector on a loss landscape rather than as a bag of numbers. That makes it much easier to understand why gradient descent follows the negative gradient, why gradient norm matters, and why contour-line intuition is so useful in practice.
+
+> A gradient is not just a list of slopes. It is the direction-and-strength signal that tells an optimizer how the loss surface is pushing back at the current point.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ This is post 4 in the Calculus for ML 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Partials] --> G[Gradient Vector]
-    G --> D[Direction]
-    G --> M[Magnitude]
-    D --> S[Steepest Ascent]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
 
+*Gradient flow: multiple partial derivatives combine into one vector with direction and magnitude.*
 ## Key Terms
 
 - **gradient**: vector of *partial derivatives*.

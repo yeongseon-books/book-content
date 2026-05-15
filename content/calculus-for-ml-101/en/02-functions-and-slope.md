@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 2
 title: Functions and Slope
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Slope
   - Beginner
 seo_description: A beginner-friendly tour of functions, slope, linear and nonlinear shapes, and the graphical meaning of derivatives for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Functions and Slope
 
-> Calculus for ML 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do the *shape* of a function and its *slope* relate?
-
-> A *function* is a *contract* from input to output, and a *slope* is the *direction and speed* of change.
+An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.
 
 This is post 2 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.
+
+> A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ ML models are *function compositions*, and training pushes signals through *each
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    I[Input] --> F[Function]
-    F --> O[Output]
-    F --> S[Slope]
-    S --> D[Derivative]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.en.png)
 
+*Concept flow: the input-function-output contract gains meaning once slope and derivative are layered onto it.*
 ## Key Terms
 
 - **function**: maps *input* to *output*.

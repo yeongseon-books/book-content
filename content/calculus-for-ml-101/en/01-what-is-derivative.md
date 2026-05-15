@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 1
 title: What Is a Derivative
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Math
   - Beginner
 seo_description: A beginner-friendly tour of derivatives, rate of change, tangent lines, limits, and numerical differentiation for ML
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is a Derivative
 
-> Calculus for ML 101 series (1/10)
+When people first meet derivatives, they often memorize rules before they build a working mental model. In ML, that order tends to fail quickly. The useful question is simpler: if you nudge a parameter a little, does the loss go up or down, and how sharply?
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Calculus for ML 101 series.
 
-**Core question**: When we say an ML model *learns*, what *exactly* is happening through *calculus*?
+In this post, we'll connect average rate of change, tangent lines, limits, and numerical differentiation into one practical picture. Once that picture is clear, a gradient stops looking like a mysterious number and starts looking like a directional signal for training.
 
-> A *derivative* is a *rate of change*, and *training* uses derivatives of *loss* to pick a *direction*.
-
-This is post 1 in the Calculus for ML 101 series.
-
-<!-- a-grade-intro:end -->
+> A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.
 
 ## What You Will Learn
 
@@ -48,14 +44,9 @@ This is post 1 in the Calculus for ML 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Function] --> S[Slope]
-    S --> L[Limit]
-    L --> D[Derivative]
-    D --> M[ML Training]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
 
+*Concept flow: changes in a function become limits, derivatives, and finally an ML training signal.*
 ## Key Terms
 
 - **derivative**: *instantaneous rate of change*.

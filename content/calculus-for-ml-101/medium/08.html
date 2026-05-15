@@ -54,17 +54,12 @@
 </head>
 <body>
 <h1>Optimization</h1>
+<p>Plain gradient descent gives you the basic learning loop, but real deep learning losses are rougher than that simple picture suggests. Valleys can be long and narrow, gradient scale can vary by coordinate, and the first few hundred steps may need very different behavior from the last few thousand.</p>
+<p>This is post 8 in the Calculus for ML 101 series.</p>
+<p>In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization as one optimization toolkit. The goal is not to memorize optimizer names, but to see which weakness of plain gradient descent each tool is trying to fix.</p>
 <blockquote>
-<p>Calculus for ML 101 series (8/10)</p>
+<p>Modern optimizers do not replace gradient descent with unrelated magic. They are gradient descent with extra machinery for stability, scale mismatch, and stage-specific control.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we <em>patch</em> the <em>weaknesses</em> of plain gradient descent?</p>
-<blockquote>
-<p><em>Momentum</em>, <em>adaptive learning rates</em>, and <em>schedules</em> boost both <em>speed</em> and <em>stability</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>Momentum</em></li>
@@ -76,13 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Modern optimizers like <em>Adam</em> work well — and you should <em>understand why</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    G[Gradient] --&gt; M[Momentum]
-    G --&gt; R[RMSProp]
-    M --&gt; A[Adam]
-    R --&gt; A
-    A --&gt; S[Schedule]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Optimization flow: gradient signals are shaped by momentum, adaptive scaling, and scheduling.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>momentum</strong>: a <em>running mean of gradients</em>.</li>

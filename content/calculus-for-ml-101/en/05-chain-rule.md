@@ -2,7 +2,7 @@
 series: calculus-for-ml-101
 episode: 5
 title: Chain Rule
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,18 @@ tags:
   - Backprop
   - Beginner
 seo_description: A beginner-friendly tour of the chain rule, function composition, outer and inner functions, gradient products, and backprop foundations
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Chain Rule
 
-> Calculus for ML 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a function is *inside another*, how do we *propagate* the gradient?
-
-> The *chain rule* is *outer derivative times inner derivative*, and it is the *math foundation of backprop*.
+Neural networks are not single functions. They are functions composed inside other functions, layer after layer, until a final loss is produced. In that setting, the key question is no longer "can I differentiate this formula?" but "how does a change at one stage travel through the whole path?"
 
 This is post 5 in the Calculus for ML 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll use outer and inner functions, stage-by-stage derivatives, and broken gradient paths to explain the chain rule. The point is not to memorize a formula, but to see why backpropagation is fundamentally a disciplined application of local derivatives.
+
+> The chain rule says you do not differentiate the whole system in one mysterious jump. You differentiate each local stage and connect those local sensitivities in the right order.
 
 ## What You Will Learn
 
@@ -48,13 +44,9 @@ A *neural network* is a *long composition* of functions, and only the chain rule
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    X[x] --> G[g x]
-    G --> F[f g]
-    F --> D[df dx = df dg times dg dx]
-```
+![Concept at a Glance](../../../assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.en.png)
 
+*Chain-rule flow: local derivatives from each stage connect to produce the full derivative.*
 ## Key Terms
 
 - **composition**: a *function of a function*.

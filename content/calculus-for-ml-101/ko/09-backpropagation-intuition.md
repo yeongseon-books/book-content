@@ -60,15 +60,9 @@ PyTorch, TensorFlow, JAX는 모두 gradient를 자동으로 계산해 줍니다.
 
 역전파의 전체 흐름은 아래처럼 볼 수 있습니다.
 
-```mermaid
-flowchart LR
-    X[입력] --> H[은닉 표현]
-    H --> Y[출력]
-    Y --> L[손실]
-    L --> H
-    H --> X
-```
+![핵심 개념](../../../assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
 
+*역전파 흐름: 손실에서 시작한 gradient가 계산 그래프를 따라 입력 방향으로 누적됩니다.*
 ### 가장 작은 계산 그래프 노드부터 시작합니다
 
 ```python
@@ -129,9 +123,36 @@ backward(y)
 
 순전파에서 `add(a, b)`가 먼저 계산되고, 그 결과가 `c`와 곱해집니다. 역전파에서는 출력에서 시작해 곱셈 노드의 local derivative를 적용하고, 다시 덧셈 노드의 local derivative를 따라 `a`, `b`, `c` 각각의 gradient를 얻습니다. 작은 예제지만 연쇄 법칙과 gradient accumulation의 핵심이 모두 들어 있습니다.
 
+### shared node를 보면 gradient accumulation이 왜 필요한지 더 분명해집니다
+
+```python
+a = Node(2.0)
+b = add(a, a)
+y = mul(b, a)
+backward(y)
+
+# y = (a + a) * a = 2a^2
+# dy/da = 4a, so at a=2 the gradient is 8
+print(a.grad)
+```
+
+**Expected output:** `8.0`
+
+이 예제는 하나의 노드가 그래프에서 여러 번 재사용될 수 있다는 사실을 보여 줍니다. `a`는 `add(a, a)` 안에서 두 번 등장하고, 그 결과가 다시 `a`와 곱해집니다. 그래서 backward에서는 한 경로의 미분만 저장하면 안 되고, 여러 경로에서 내려온 기여도를 모두 더해야 합니다. 프레임워크에서 gradient가 누적되는 기본 동작도 바로 이 구조와 연결됩니다.
+
 ### autograd를 이해할 때 기억할 점
 
 프레임워크는 이 과정을 자동으로 해 줍니다. 하지만 `zero_grad`를 호출하지 않으면 gradient가 누적되고, 필요 없는 그래프를 유지하면 메모리가 늘어나며, detach를 잘못 쓰면 학습 경로가 끊깁니다. 즉 autograd를 안다는 것은 내부 수학을 아는 것뿐 아니라, 그래프 수명과 gradient 버퍼를 운영 관점에서 이해하는 것이기도 합니다.
+
+```python
+optimizer.zero_grad()
+pred = model(x)
+loss = criterion(pred, y)
+loss.backward()
+optimizer.step()
+```
+
+이 순서를 지키는 이유는 backward가 보통 gradient를 덮어쓰지 않고 누적하기 때문입니다. 따라서 이전 step의 흔적을 지우지 않으면 현재 batch의 신호만 반영되는 것이 아니라 과거 gradient까지 섞여 들어갑니다. 작은 실습 코드에서는 티가 덜 나도, 실제 학습에서는 loss curve 해석과 디버깅을 어렵게 만드는 흔한 원인입니다.
 
 ## 흔히 헷갈리는 지점
 
@@ -180,6 +201,7 @@ backward(y)
 - [Calculus on Computational Graphs - Olah](https://colah.github.io/posts/2015-08-Backprop/)
 - [PyTorch Autograd](https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html)
 - [JAX Autograd Cookbook](https://jax.readthedocs.io/en/latest/notebooks/autodiff_cookbook.html)
+- [Zeroing out gradients in PyTorch](https://pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)
