@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Volume
-  - Storage
-  - DevOps
+- Containers
+- Docker
+- Volume
+- Storage
+- DevOps
 seo_description: volume, bind mount, tmpfs 차이와 데이터 보존 원칙을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Volume
 
+컨테이너는 빨리 만들고 지울 수 있어야 하지만, 데이터는 그러면 안 됩니다. 이 차이를 구분하지 못하면 실습 단계에서는 편해 보여도 운영에서는 백업 실패, 권한 충돌, 데이터 유실이 바로 드러납니다.
+
 이 글은 Containers 101 시리즈의 다섯 번째 글입니다.
+
+여기서는 named volume, bind mount, tmpfs가 각각 어떤 수명주기와 위험을 가지는지, 백업과 복구를 어떤 절차로 표준화해야 하는지 설명합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Container["container"] --> Volume["named volume"]
-    Container --> Bind["bind mount"]
-    Container --> Tmpfs["tmpfs"]
-    Volume --> Disk["host disk"]
-```
+![volume, bind mount, tmpfs의 저장 경로 차이](../../../assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
 
+*volume, bind mount, tmpfs의 저장 경로 차이*
 세 가지는 모두 마운트 방식이지만 목적이 다릅니다. named volume은 지속성, bind mount는 호스트 경로 연결, tmpfs는 메모리 기반 임시 저장이 중심입니다.
 
 ## 핵심 용어
@@ -141,6 +140,25 @@ def remove(name):
 
 이 포인트를 이해하면 개발 편의용 마운트와 운영용 영속 저장소를 구분하는 감각이 생깁니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+docker volume create pgdata
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+docker volume inspect pgdata
+docker rm -f pg
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+```
+
+**Expected output:**
+- `docker volume inspect`에 Docker가 관리하는 마운트 지점이 보입니다.
+- 같은 volume을 다시 붙이면 컨테이너를 지워도 데이터 디렉터리가 유지됩니다.
+
+**먼저 확인할 것:**
+- DB가 안 뜨면 volume 권한과 초기화 로그를 먼저 봅니다.
+- bind mount라면 호스트 경로 소유권이 컨테이너 사용자와 맞는지 확인합니다.
+- 백업은 복구 절차까지 시험해야 의미가 있습니다.
+
 ## 자주 하는 실수 5가지
 
 1. **DB 데이터를 컨테이너 내부에 저장합니다.**
@@ -187,6 +205,8 @@ def remove(name):
 다음 글에서는 데이터가 아니라 통신 관점으로 넘어가, 컨테이너들이 서로를 어떻게 찾고 연결하는지 Network를 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - [Image와 Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -195,8 +215,9 @@ def remove(name):
 - Network (예정)
 - Registry (예정)
 - Container Security (예정)
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -206,4 +227,4 @@ def remove(name):
 - [tmpfs](https://docs.docker.com/storage/tmpfs/)
 - [Volume plugins](https://docs.docker.com/engine/extend/plugins_volume/)
 
-Tags: Containers, Docker, Volume, Storage, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

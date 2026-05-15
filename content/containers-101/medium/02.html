@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Image and Layer</h1>
-<blockquote>
-<p>Containers 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why are images split into <em>layers</em> in the first place?</p>
-<blockquote>
-<p><em>Layered images give you reuse, caching, and small transfers all at once — they are the central design of containers.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>An image can look like one opaque artifact until build time starts to hurt. Then layer order, cache reuse, transfer size, and vulnerability surface suddenly become operational concerns instead of implementation detail.</p>
 <p>This is post 2 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we unpack why images are split into layers, how OverlayFS makes the stack look like one filesystem, and why Dockerfile optimization and digest-based reproducibility both depend on that structure.</p>
+<blockquote>
+<p>Layers are the reason images can be reused, cached, and transferred efficiently at the same time.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The physical structure of an image</li>
 <li>The job of a layer</li>
@@ -77,11 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Base[&quot;base layer (os)&quot;] --&gt; Lib[&quot;lib layer&quot;]
-    Lib --&gt; Code[&quot;app code&quot;]
-    Code --&gt; Container[&quot;container (rw layer)&quot;]
-</code></pre>
+<p><img alt="Layer stack with a writable container layer on top" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Layer stack with a writable container layer on top</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Layer</strong>: a read-only bundle of changes.</li>
@@ -131,6 +122,20 @@ def inspect(image):
 <li><code>history</code> traces the command behind each layer.</li>
 <li>The digest guarantees content equality.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker pull python:3.12-slim
+docker image inspect python:3.12-slim --format &quot;{{json .RootFS.Layers}}&quot;
+docker history python:3.12-slim
+docker inspect --format &quot;{{index .RepoDigests 0}}&quot; python:3.12-slim
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>RootFS.Layers</code> prints an ordered array of layer hashes.<br>
+- <code>docker history</code> shows the commands and sizes behind the layers.<br>
+- <code>RepoDigests</code> gives you the immutable identity after push.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If layer count grows too quickly, review how the Dockerfile splits <code>RUN</code>.<br>
+- If the digest is empty, confirm you are inspecting a pushed image.<br>
+- If the image is too large, inspect build context size and multi-stage usage first.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Splitting commands across many RUN statements — layer explosion.</strong></li>
@@ -164,6 +169,7 @@ def inspect(image):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>You can see how an image is built. Next, look at what runs it. The next post covers Runtime.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><strong>Image and Layer (current)</strong></li>
@@ -183,6 +189,6 @@ def inspect(image):
 <li><a href="https://github.com/opencontainers/image-spec/blob/main/manifest.md">OCI Image Spec — manifest</a></li>
 <li><a href="https://docs.docker.com/build/building/multi-stage/">Multi-stage builds</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Image, Layer, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>

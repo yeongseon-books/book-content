@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Volume</h1>
-<blockquote>
-<p>Containers 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When the container disappears, where does the data go?</p>
-<blockquote>
-<p><em>Keep state in volumes, not in containers. Knowing volume vs bind mount vs tmpfs is what prevents data loss.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.</p>
 <p>This is post 5 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle and failure mode, then turn that model into backup and restore habits you can keep in operations.</p>
+<blockquote>
+<p>Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Volumes vs bind mounts vs tmpfs</li>
 <li>Guaranteeing data persistence</li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Container[&quot;container&quot;] --&gt; Volume[&quot;named volume&quot;]
-    Container --&gt; Bind[&quot;bind mount&quot;]
-    Container --&gt; Tmpfs[&quot;tmpfs&quot;]
-    Volume --&gt; Disk[&quot;host disk&quot;]
-</code></pre>
+<p><img alt="Storage paths for volumes, bind mounts, and tmpfs" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Storage paths for volumes, bind mounts, and tmpfs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Volume</strong>: a Docker-managed persistent store.</li>
@@ -137,6 +127,20 @@ def create(name):
 <li>A tar-runner container standardizes backups.</li>
 <li>Bind mounts are path-dependent — be careful.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker volume create pgdata
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+docker volume inspect pgdata
+docker rm -f pg
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>docker volume inspect</code> shows the Docker-managed mount point.<br>
+- Re-creating the container against the same volume preserves the database directory.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If Postgres fails, inspect volume permissions and initialization logs first.<br>
+- If you are using a bind mount, confirm host ownership matches the container user.<br>
+- A backup plan is incomplete until you test a restore path.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Storing DB data inside the container.</strong></li>
@@ -170,6 +174,7 @@ def create(name):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once data has a home, communication is next. The next post covers Network.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -189,6 +194,6 @@ def create(name):
 <li><a href="https://docs.docker.com/storage/tmpfs/">tmpfs</a></li>
 <li><a href="https://docs.docker.com/engine/extend/plugins_volume/">Volume plugins</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Volume, Storage, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>

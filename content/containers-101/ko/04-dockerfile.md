@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Dockerfile
-  - Build
-  - DevOps
+- Containers
+- Docker
+- Dockerfile
+- Build
+- DevOps
 seo_description: Dockerfile 작성 순서, 캐시 활용, 보안 기본값을 실전 감각으로 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Dockerfile
 
+Dockerfile은 단순히 이미지가 빌드되도록 만드는 텍스트 파일이 아닙니다. 명령 순서 하나가 캐시 적중률을 바꾸고, 베이스 이미지 선택 하나가 취약점 수와 전송 크기를 바꾸며, 실행 사용자 설정 하나가 기본 보안 수준을 바꿉니다.
+
 이 글은 Containers 101 시리즈의 네 번째 글입니다.
+
+여기서는 캐시 친화적인 작성 순서, multi-stage build, 비root 실행, 비밀값 처리 같은 운영 기본값을 실제 Dockerfile 설계 관점에서 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,13 +46,9 @@ Dockerfile 하나가 팀의 생산성과 보안 수준을 동시에 좌우합니
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Dockerfile["dockerfile"] --> Builder["builder stage"]
-    Builder --> Runtime["runtime stage"]
-    Runtime --> Image["final image"]
-```
+![빌더 스테이지와 런타임 스테이지 분리 흐름](../../../assets/containers-101/04/04-01-concept-at-a-glance.ko.png)
 
+*빌더 스테이지와 런타임 스테이지 분리 흐름*
 빌드용 스테이지와 실행용 스테이지를 분리하면, 최종 이미지는 필요한 결과물만 포함하고 불필요한 도구는 버릴 수 있습니다.
 
 ## 핵심 용어
@@ -142,6 +142,22 @@ def finalize():
 
 이 세 가지를 이해하면 작은 Dockerfile에서도 성능, 크기, 보안을 함께 개선할 수 있습니다. 실무에서는 이 세 지점이 리뷰의 기본 체크포인트가 됩니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+docker build -t demo-app:dev .
+docker image inspect demo-app:dev --format "user={{.Config.User}} size={{.Size}}"
+```
+
+**Expected output:**
+- 의존성 레이어가 소스 코드 레이어보다 먼저 배치됩니다.
+- `Config.User`가 비어 있지 않으면 비root 기본값이 들어간 상태입니다.
+
+**먼저 확인할 것:**
+- 의존성이 매번 다시 깔리면 `COPY requirements.txt` 위치를 먼저 봅니다.
+- root로 뜨면 `USER`가 최종 스테이지에 있는지 확인합니다.
+- 이미지가 크면 빌드 도구가 최종 스테이지에 남았는지 점검합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **`COPY .`를 너무 먼저 써서 캐시를 죽입니다.**
@@ -188,6 +204,8 @@ Dockerfile은 이미지 빌드 결과를 규정하는 핵심 설계 문서입니
 다음 글에서는 이미지가 아니라 상태를 어디에 둘 것인지, 즉 Volume 설계를 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - [Image와 Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -196,8 +214,9 @@ Dockerfile은 이미지 빌드 결과를 규정하는 핵심 설계 문서입니
 - Network (예정)
 - Registry (예정)
 - Container Security (예정)
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -207,4 +226,4 @@ Dockerfile은 이미지 빌드 결과를 규정하는 핵심 설계 문서입니
 - [Dockerfile 모범 사례](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [BuildKit secrets](https://docs.docker.com/build/building/secrets/)
 
-Tags: Containers, Docker, Dockerfile, Build, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

@@ -2,7 +2,7 @@
 series: containers-101
 episode: 10
 title: Build a Container App
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Compose
-  - FastAPI
-  - DevOps
-seo_description: A hands-on guide to shipping a FastAPI app with Dockerfile, Compose, healthcheck, secrets, and logs as one runnable stack
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Compose
+- FastAPI
+- DevOps
+seo_description: A hands-on guide to shipping a FastAPI app with Dockerfile, Compose,
+  healthcheck, secrets, and logs as one runnable stack
+last_reviewed: '2026-05-15'
 ---
 
 # Build a Container App
 
-> Containers 101 series (10/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When everything you have learned is wrapped into *one app*, *what flow* does it form?
-
-> *Dockerfile + Compose + healthcheck + secrets + logs* working from one *single command* is the *finish line* of the basics.
-
-<!-- a-grade-intro:end -->
+The earlier chapters only become operationally useful when they collapse into one reproducible application workflow. A single command that brings up the stack, verifies health, and tears it down cleanly is where container basics stop being vocabulary and start being practice.
 
 This is the final post in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we assemble a FastAPI app and Postgres into one stack with Dockerfile, Compose, health checks, secret boundaries, and log inspection as one repeatable flow.
+
+> A one-command stack is where container theory becomes an operational habit you can repeat.
+
+## Questions this chapter answers
 
 - A *Dockerfile* for a *FastAPI* app
 - *Compose* with a *DB* connection
@@ -48,15 +45,9 @@ Every concept above only sticks once you *integrate* it into *one running result
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["app code"] --> Image["docker build"]
-    Image --> Compose["compose up"]
-    Compose --> App["app"]
-    Compose --> DB["db"]
-    App --> Log["logs"]
-```
+![Compose bringing up the app and database as one flow](../../../assets/containers-101/10/10-01-concept-at-a-glance.en.png)
 
+*Compose bringing up the app and database as one flow*
 ## Key Terms
 
 - **Dockerfile**: a *recipe* for building an image.
@@ -95,8 +86,7 @@ def users():
 
 ### Step 2 — Dockerfile
 
-```python
-"""
+```dockerfile
 FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
@@ -106,13 +96,11 @@ USER 1000
 EXPOSE 8080
 HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
-"""
 ```
 
 ### Step 3 — docker-compose.yml
 
-```python
-"""
+```yaml
 services:
   app:
     build: .
@@ -120,7 +108,8 @@ services:
     environment:
       DB_URL: postgresql://app:secret@db:5432/app
     depends_on:
-      db: { condition: service_healthy }
+      db:
+        condition: service_healthy
     restart: unless-stopped
   db:
     image: postgres:16
@@ -131,7 +120,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app"]
       interval: 5s
-"""
+      timeout: 3s
+      retries: 10
 ```
 
 ### Step 4 — Automate startup
@@ -158,6 +148,26 @@ def down():
 - *USER 1000* enforces *non-root*.
 - The *healthcheck* drives *Compose* dependency ordering.
 - *depends_on + service_healthy* is a paired pattern.
+
+## Quick verification and failure signals
+
+```bash
+docker compose up -d --build
+docker compose ps
+curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:8080/users
+docker compose logs --tail=100
+```
+
+**Expected output:**
+- `docker compose ps` shows both app and db as running.
+- `/health` returns `{"ok": true}`.
+- `/users` proves the app can reach Postgres through the service name.
+
+**Check first if it fails:**
+- If the app crashes early, inspect `depends_on` and health-check logic together.
+- If DB access fails, verify the Compose network still resolves `db` by name.
+- If secrets are still plain text, split them out before calling the stack production-ready.
 
 ## Five Common Mistakes
 
@@ -197,6 +207,8 @@ def down():
 This is the *finale* of *Containers 101*. The next step is *Kubernetes 101*, where you enter the world of *orchestration*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -207,6 +219,7 @@ This is the *finale* of *Containers 101*. The next step is *Kubernetes 101*, whe
 - [Container Security](./08-container-security.md)
 - [Containers vs VMs](./09-container-vs-vm.md)
 - **Build a Container App (current)**
+
 <!-- toc:end -->
 
 ## References
@@ -216,4 +229,4 @@ This is the *finale* of *Containers 101*. The next step is *Kubernetes 101*, whe
 - [Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [HEALTHCHECK reference](https://docs.docker.com/engine/reference/builder/#healthcheck)
 
-Tags: Containers, Docker, Compose, FastAPI, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

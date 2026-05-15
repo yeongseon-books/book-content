@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Registry
-  - ECR
-  - DevOps
+- Containers
+- Docker
+- Registry
+- ECR
+- DevOps
 seo_description: 레지스트리의 역할과 push, pull, digest, 서명 기본 원리를 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Registry
 
+이미지를 잘 빌드해도 어디엔가 안정적으로 올리고 다시 가져올 수 없다면 배포는 완성되지 않습니다. 배포 파이프라인이 흔들리는 팀을 보면 대개 tag와 digest를 구분하지 못하거나, 누가 push 권한을 가지는지 설계하지 못한 경우가 많습니다.
+
 이 글은 Containers 101 시리즈의 일곱 번째 글입니다.
+
+여기서는 레지스트리를 단순한 저장소가 아니라 배포 동일성을 보장하는 시스템으로 보고, push와 pull, digest pin, 서명 정책의 출발점을 함께 설명합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,15 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Dev["dev"] --> Build["docker build"]
-    Build --> Push["docker push"]
-    Push --> Reg["registry"]
-    Reg --> Pull["docker pull"]
-    Pull --> Prod["prod"]
-```
+![빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름](../../../assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
 
+*빌드 결과를 레지스트리로 push하고 다시 pull하는 흐름*
 개발 환경에서 만든 이미지는 레지스트리에 올라가고, 운영 환경은 다시 그 이미지를 당겨 옵니다. 이 흐름이 일관되어야 같은 아티팩트를 여러 환경에서 재사용할 수 있습니다.
 
 ## 핵심 용어
@@ -135,6 +133,24 @@ digest 기준으로 다시 pull 해 보면 실제 배포가 어떤 대상을 가
 
 이 세 가지를 놓치면 배포 동일성과 공급망 보안이 동시에 흔들릴 수 있습니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+docker tag myapp:dev ghcr.io/example/myapp:1.0.0
+docker push ghcr.io/example/myapp:1.0.0
+docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
+```
+
+**Expected output:**
+- push 이후 `RepoDigests`에 `@sha256:` 형태 digest가 생깁니다.
+- 같은 digest로 pull 하면 어떤 환경에서도 같은 내용을 다시 받습니다.
+
+**먼저 확인할 것:**
+- 인증 실패 시 토큰 권한을 먼저 점검합니다.
+- digest가 기대와 다르면 push 직전 tag 대상이 맞는지 봅니다.
+- 운영 배포에서는 `latest`만 남기지 말고 digest를 기록합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **운영에서 `latest`를 사용합니다.**
@@ -179,6 +195,8 @@ digest 기준으로 다시 pull 해 보면 실제 배포가 어떤 대상을 가
 다음 글에서는 이 이미지를 어떻게 더 안전하게 실행할지, 즉 Container Security를 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - [Container란 무엇인가?](./01-what-is-a-container.md)
 - [Image와 Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -187,8 +205,9 @@ digest 기준으로 다시 pull 해 보면 실제 배포가 어떤 대상을 가
 - [Network](./06-network.md)
 - **Registry (현재 글)**
 - Container Security (예정)
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -198,4 +217,4 @@ digest 기준으로 다시 pull 해 보면 실제 배포가 어떤 대상을 가
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - [Cosign](https://docs.sigstore.dev/cosign/overview/)
 
-Tags: Containers, Docker, Registry, ECR, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

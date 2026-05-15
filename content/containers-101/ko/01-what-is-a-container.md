@@ -11,18 +11,22 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Containers
-  - Docker
-  - Linux
-  - DevOps
-  - Architecture
+- Containers
+- Docker
+- Linux
+- DevOps
+- Architecture
 seo_description: 컨테이너의 정의와 VM과의 차이, 기본 실행 흐름을 입문자 기준으로 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Container란 무엇인가?
 
+처음 컨테이너를 배우면 VM을 더 작고 빠르게 만든 기술이라고 이해하기 쉽습니다. 하지만 실제 운영에서 중요한 질문은 “무엇을 복제하는가”가 아니라 “무엇을 공유한 채 어디까지를 격리하는가”입니다.
+
 이 글은 Containers 101 시리즈의 첫 번째 글입니다.
+
+여기서는 컨테이너를 호스트 커널을 공유하는 격리된 프로세스 묶음으로 정의하고, VM과의 차이와 `docker run`이 실제로 만드는 실행 단위를 함께 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -42,14 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Host["host os kernel"] --> C1["container 1"]
-    Host --> C2["container 2"]
-    Host --> C3["container 3"]
-    C1 --> App1["app process"]
-```
+![호스트 커널을 공유하는 컨테이너 실행 구조](../../../assets/containers-101/01/01-01-concept-at-a-glance.ko.png)
 
+*호스트 커널을 공유하는 컨테이너 실행 구조*
 호스트 운영 체제의 커널 하나 위에 여러 컨테이너가 올라가고, 각 컨테이너 안에서는 애플리케이션 프로세스가 격리된 것처럼 보입니다. 핵심은 “프로세스 격리”이지 “운영 체제 복제”가 아니라는 점입니다.
 
 ## 핵심 용어
@@ -132,6 +131,25 @@ def cleanup(name):
 
 여기서 가장 중요한 포인트는 컨테이너가 결국 “프로세스를 감싼 실행 단위”라는 사실이 그대로 드러난다는 점입니다. 포트도 열고, 이름도 붙이고, 종료도 합니다. VM을 만드는 것보다 훨씬 가볍지만, 그렇다고 추상적인 개념만은 아닙니다.
 
+## 빠른 검증과 장애 신호
+
+```bash
+docker --version
+docker run -d --name web -p 8080:80 nginx:1.27-alpine
+curl -I http://127.0.0.1:8080
+docker ps --filter name=web
+```
+
+**Expected output:**
+- `docker --version`이 정상 버전을 반환합니다.
+- `curl -I` 결과에 `HTTP/1.1 200 OK`가 보입니다.
+- `docker ps`에 `web`과 `0.0.0.0:8080->80/tcp` 매핑이 보입니다.
+
+**먼저 확인할 것:**
+- `docker run`이 실패하면 먼저 로컬 포트 `8080` 충돌을 확인합니다.
+- `curl`이 실패하면 `docker logs web`로 컨테이너가 즉시 종료됐는지 확인합니다.
+- 서비스 포트가 다른 이미지를 썼다면 컨테이너 내부 리스닝 포트를 다시 점검합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **포트 매핑을 빼먹어서 컨테이너에 접근하지 못합니다.**
@@ -178,6 +196,8 @@ def cleanup(name):
 다음 글에서는 이 컨테이너가 어떤 정적 템플릿, 즉 이미지와 레이어 구조 위에서 만들어지는지 살펴보겠습니다.
 
 <!-- toc:begin -->
+## 시리즈 목차
+
 - **Container란 무엇인가? (현재 글)**
 - Image와 Layer (예정)
 - Runtime (예정)
@@ -186,8 +206,9 @@ def cleanup(name):
 - Network (예정)
 - Registry (예정)
 - Container Security (예정)
-- Container와 VM 차이 (예정)
+- Containers vs VMs (예정)
 - 실전 컨테이너 앱 만들기 (예정)
+
 <!-- toc:end -->
 
 ## 참고 자료
@@ -197,4 +218,4 @@ def cleanup(name):
 - [Linux namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)
 - [cgroups v2](https://www.kernel.org/doc/Documentation/admin-guide/cgroup-v2.rst)
 
-Tags: Containers, Docker, Linux, DevOps, Architecture
+Tags: Containers, Docker, Kubernetes, DevOps

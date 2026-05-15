@@ -2,7 +2,7 @@
 series: containers-101
 episode: 5
 title: Volume
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Volume
-  - Storage
-  - DevOps
-seo_description: Volumes, bind mounts, and tmpfs compared by lifecycle and use case — taught with runnable docker volume examples for beginners.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Volume
+- Storage
+- DevOps
+seo_description: Volumes, bind mounts, and tmpfs compared by lifecycle and use case
+  — taught with runnable docker volume examples for beginners.
+last_reviewed: '2026-05-15'
 ---
 
 # Volume
 
-> Containers 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When the container disappears, where does the data go?
-
-> *Keep state in volumes, not in containers. Knowing volume vs bind mount vs tmpfs is what prevents data loss.*
-
-<!-- a-grade-intro:end -->
+Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.
 
 This is post 5 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle and failure mode, then turn that model into backup and restore habits you can keep in operations.
+
+> Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.
+
+## Questions this chapter answers
 
 - Volumes vs bind mounts vs tmpfs
 - Guaranteeing data persistence
@@ -48,14 +45,9 @@ Containers are immutable, but the data they manage must survive. A bad volume de
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Container["container"] --> Volume["named volume"]
-    Container --> Bind["bind mount"]
-    Container --> Tmpfs["tmpfs"]
-    Volume --> Disk["host disk"]
-```
+![Storage paths for volumes, bind mounts, and tmpfs](../../../assets/containers-101/05/05-01-concept-at-a-glance.en.png)
 
+*Storage paths for volumes, bind mounts, and tmpfs*
 ## Key Terms
 
 - **Volume**: a Docker-managed persistent store.
@@ -129,6 +121,25 @@ def remove(name):
 - A tar-runner container standardizes backups.
 - Bind mounts are path-dependent — be careful.
 
+## Quick verification and failure signals
+
+```bash
+docker volume create pgdata
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+docker volume inspect pgdata
+docker rm -f pg
+docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=secret postgres:16
+```
+
+**Expected output:**
+- `docker volume inspect` shows the Docker-managed mount point.
+- Re-creating the container against the same volume preserves the database directory.
+
+**Check first if it fails:**
+- If Postgres fails, inspect volume permissions and initialization logs first.
+- If you are using a bind mount, confirm host ownership matches the container user.
+- A backup plan is incomplete until you test a restore path.
+
 ## Five Common Mistakes
 
 1. **Storing DB data inside the container.**
@@ -167,6 +178,8 @@ Developers use bind mounts for code hot-reload. Databases use named volumes. Sen
 Once data has a home, communication is next. The next post covers Network.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -177,6 +190,7 @@ Once data has a home, communication is next. The next post covers Network.
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -186,4 +200,4 @@ Once data has a home, communication is next. The next post covers Network.
 - [tmpfs](https://docs.docker.com/storage/tmpfs/)
 - [Volume plugins](https://docs.docker.com/engine/extend/plugins_volume/)
 
-Tags: Containers, Docker, Volume, Storage, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

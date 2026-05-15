@@ -2,7 +2,7 @@
 series: containers-101
 episode: 9
 title: Containers vs VMs
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - VM
-  - Linux
-  - Hypervisor
-  - DevOps
-seo_description: A beginner guide comparing containers and VMs across kernel sharing, isolation level, startup speed, and the right use cases for each
-last_reviewed: '2026-05-04'
+- Containers
+- VM
+- Linux
+- Hypervisor
+- DevOps
+seo_description: A beginner guide comparing containers and VMs across kernel sharing,
+  isolation level, startup speed, and the right use cases for each
+last_reviewed: '2026-05-15'
 ---
 
 # Containers vs VMs
 
-> Containers 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: If both provide *isolation*, *when* should you choose a *container* and *when* a *VM*?
-
-> *Containers* are *light* because they *share a kernel*; *VMs* offer *strong isolation* with their *own kernel*.
-
-<!-- a-grade-intro:end -->
+The container-versus-VM decision is not a speed contest. It is a boundary decision about isolation strength, boot cost, density, and which workloads deserve a harder separation line.
 
 This is post 9 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we compare shared-kernel isolation with hypervisor-based isolation, then map those differences to service workloads, multi-tenant boundaries, and hybrid options such as microVMs.
+
+> Containers and VMs solve different boundary problems. Choosing well means matching the boundary to the workload.
+
+## Questions this chapter answers
 
 - *Kernel sharing* vs *hypervisor*
 - Differences in *isolation level*
@@ -48,15 +45,9 @@ Choosing *isolation that fits the workload* keeps both *cost* and *security* und
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    HW["hardware"] --> Hyp["hypervisor"]
-    Hyp --> VM1["VM (kernel)"]
-    HW --> Host["host kernel"]
-    Host --> C1["container"]
-    Host --> C2["container"]
-```
+![VM isolation through a hypervisor versus shared-kernel containers](../../../assets/containers-101/09/09-01-concept-at-a-glance.en.png)
 
+*VM isolation through a hypervisor versus shared-kernel containers*
 ## Key Terms
 
 - **hypervisor**: the *virtualization layer* that boots VMs.
@@ -130,6 +121,22 @@ def report(stats):
 - VMs start in *seconds to minutes*.
 - Measurements are *automated and reproducible*.
 
+## Quick verification and failure signals
+
+```bash
+/usr/bin/time -p docker run --rm nginx:1.27-alpine true
+/usr/bin/time -p qemu-system-x86_64 -m 1024 -display none -daemonize -hda vm.img
+```
+
+**Expected output:**
+- Containers usually finish startup in milliseconds to seconds.
+- VMs pay a visibly larger boot cost because they bring their own kernel.
+
+**Check first if it fails:**
+- Repeat the comparison on the same host under the same load before drawing conclusions.
+- If QEMU fails, verify virtualization support and whether the VM disk image exists.
+- In strong multi-tenant settings, isolation strength may matter more than the startup delta.
+
 ## Five Common Mistakes
 
 1. **Putting everything in *containers* — weak *multi-tenant* isolation.**
@@ -168,6 +175,8 @@ def report(stats):
 It is time to *apply* every concept you have learned to *one real app*. The next post covers *building a real container app*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -178,6 +187,7 @@ It is time to *apply* every concept you have learned to *one real app*. The next
 - [Container Security](./08-container-security.md)
 - **Containers vs VMs (current)**
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -187,4 +197,4 @@ It is time to *apply* every concept you have learned to *one real app*. The next
 - [Kata Containers](https://katacontainers.io/)
 - [gVisor](https://gvisor.dev/)
 
-Tags: Containers, VM, Linux, Hypervisor, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

@@ -2,7 +2,7 @@
 series: containers-101
 episode: 6
 title: Network
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Networking
-  - Bridge
-  - DevOps
-seo_description: Container network modes (bridge, host, overlay) and DNS-based service discovery — explained with hands-on docker network examples.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Networking
+- Bridge
+- DevOps
+seo_description: Container network modes (bridge, host, overlay) and DNS-based service
+  discovery — explained with hands-on docker network examples.
+last_reviewed: '2026-05-15'
 ---
 
 # Network
 
-> Containers 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do containers on the same host find each other by *name*?
-
-> *Container networking is mode selection (bridge, host, overlay) plus DNS-based service discovery.*
-
-<!-- a-grade-intro:end -->
+Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.
 
 This is post 6 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we compare bridge, host, overlay, and none, then explain why user-defined networks and DNS names are the stable foundation behind both Compose and Kubernetes.
+
+> Stable container networking starts with names and boundaries, not with memorized IP addresses.
+
+## Questions this chapter answers
 
 - The bridge / host / overlay / none modes
 - Container-to-container DNS
@@ -48,14 +45,9 @@ Both Compose and Kubernetes ride on top of these abstractions. Get the basics ri
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Host["host"] --> Bridge["bridge"]
-    Bridge --> C1["web"]
-    Bridge --> C2["db"]
-    C1 -. dns .-> C2
-```
+![Name-based connectivity on a user-defined bridge network](../../../assets/containers-101/06/06-01-concept-at-a-glance.en.png)
 
+*Name-based connectivity on a user-defined bridge network*
 ## Key Terms
 
 - **bridge**: the default virtual L2 network.
@@ -128,6 +120,24 @@ def cleanup(net):
 - User-defined networks beat the default bridge.
 - `-p` only when you actually want external exposure.
 
+## Quick verification and failure signals
+
+```bash
+docker network create app-net
+docker run -d --name db --network app-net -e POSTGRES_PASSWORD=secret postgres:16
+docker run --rm --network app-net busybox nslookup db
+docker network inspect app-net
+```
+
+**Expected output:**
+- `nslookup db` resolves through the user-defined network DNS.
+- `docker network inspect` shows the attached container membership.
+
+**Check first if it fails:**
+- If name resolution fails, verify both containers are on the same network.
+- If outside access fails, inspect published ports and the app bind address together.
+- If host mode is involved, check port collisions and firewall policy first.
+
 ## Five Common Mistakes
 
 1. **Using the default bridge — no DNS.**
@@ -166,6 +176,8 @@ Compose creates a per-project user-defined network. Kubernetes uses a CNI to giv
 Once connectivity is solved, the next question is *where to keep images*. The next post covers Registry.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -176,6 +188,7 @@ Once connectivity is solved, the next question is *where to keep images*. The ne
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -185,4 +198,4 @@ Once connectivity is solved, the next question is *where to keep images*. The ne
 - [Overlay networks](https://docs.docker.com/network/overlay/)
 - [DNS in Docker](https://docs.docker.com/network/network-tutorial-standalone/)
 
-Tags: Containers, Docker, Networking, Bridge, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Network</h1>
-<blockquote>
-<p>Containers 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do containers on the same host find each other by <em>name</em>?</p>
-<blockquote>
-<p><em>Container networking is mode selection (bridge, host, overlay) plus DNS-based service discovery.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.</p>
 <p>This is post 6 in the Containers 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>In this chapter, we compare bridge, host, overlay, and none, then explain why user-defined networks and DNS names are the stable foundation behind both Compose and Kubernetes.</p>
+<blockquote>
+<p>Stable container networking starts with names and boundaries, not with memorized IP addresses.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The bridge / host / overlay / none modes</li>
 <li>Container-to-container DNS</li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Both Compose and Kubernetes ride on top of these abstractions. Get the basics right and the rest is easy.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Host[&quot;host&quot;] --&gt; Bridge[&quot;bridge&quot;]
-    Bridge --&gt; C1[&quot;web&quot;]
-    Bridge --&gt; C2[&quot;db&quot;]
-    C1 -. dns .-&gt; C2
-</code></pre>
+<p><img alt="Name-based connectivity on a user-defined bridge network" src="https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Name-based connectivity on a user-defined bridge network</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>bridge</strong>: the default virtual L2 network.</li>
@@ -136,6 +126,19 @@ def create_net(name):
 <li>User-defined networks beat the default bridge.</li>
 <li><code>-p</code> only when you actually want external exposure.</li>
 </ul>
+<h2>Quick verification and failure signals</h2>
+<pre><code class="language-bash">docker network create app-net
+docker run -d --name db --network app-net -e POSTGRES_PASSWORD=secret postgres:16
+docker run --rm --network app-net busybox nslookup db
+docker network inspect app-net
+</code></pre>
+<p><strong>Expected output:</strong><br>
+- <code>nslookup db</code> resolves through the user-defined network DNS.<br>
+- <code>docker network inspect</code> shows the attached container membership.</p>
+<p><strong>Check first if it fails:</strong><br>
+- If name resolution fails, verify both containers are on the same network.<br>
+- If outside access fails, inspect published ports and the app bind address together.<br>
+- If host mode is involved, check port collisions and firewall policy first.</p>
 <h2>Five Common Mistakes</h2>
 <ol>
 <li><strong>Using the default bridge — no DNS.</strong></li>
@@ -169,6 +172,7 @@ def create_net(name):
 </ol>
 <h2>Wrap-up and Next Steps</h2>
 <p>Once connectivity is solved, the next question is <em>where to keep images</em>. The next post covers Registry.</p>
+<h2>In this series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/01-what-is-a-container.md">What is a Container?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/containers-101/en/02-image-and-layer.md">Image and Layer</a></li>
@@ -188,6 +192,6 @@ def create_net(name):
 <li><a href="https://docs.docker.com/network/overlay/">Overlay networks</a></li>
 <li><a href="https://docs.docker.com/network/network-tutorial-standalone/">DNS in Docker</a></li>
 </ul>
-<p class="tags-line">Tags: Containers, Docker, Networking, Bridge, DevOps</p>
+<p class="tags-line">Tags: Containers, Docker, Kubernetes, DevOps</p>
 </body>
 </html>

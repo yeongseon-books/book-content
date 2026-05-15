@@ -2,7 +2,7 @@
 series: containers-101
 episode: 2
 title: Image and Layer
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Image
-  - Layer
-  - DevOps
-seo_description: How container images split into layers, how OverlayFS stacks them, and how layer caching speeds up builds — with docker history examples.
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Image
+- Layer
+- DevOps
+seo_description: How container images split into layers, how OverlayFS stacks them,
+  and how layer caching speeds up builds — with docker history examples.
+last_reviewed: '2026-05-15'
 ---
 
 # Image and Layer
 
-> Containers 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why are images split into *layers* in the first place?
-
-> *Layered images give you reuse, caching, and small transfers all at once — they are the central design of containers.*
-
-<!-- a-grade-intro:end -->
+An image can look like one opaque artifact until build time starts to hurt. Then layer order, cache reuse, transfer size, and vulnerability surface suddenly become operational concerns instead of implementation detail.
 
 This is post 2 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we unpack why images are split into layers, how OverlayFS makes the stack look like one filesystem, and why Dockerfile optimization and digest-based reproducibility both depend on that structure.
+
+> Layers are the reason images can be reused, cached, and transferred efficiently at the same time.
+
+## Questions this chapter answers
 
 - The physical structure of an image
 - The job of a layer
@@ -48,13 +45,9 @@ Without layers, you cannot really optimize a Dockerfile. The difference between 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Base["base layer (os)"] --> Lib["lib layer"]
-    Lib --> Code["app code"]
-    Code --> Container["container (rw layer)"]
-```
+![Layer stack with a writable container layer on top](../../../assets/containers-101/02/02-01-concept-at-a-glance.en.png)
 
+*Layer stack with a writable container layer on top*
 ## Key Terms
 
 - **Layer**: a read-only bundle of changes.
@@ -123,6 +116,25 @@ def diff(a, b):
 - `history` traces the command behind each layer.
 - The digest guarantees content equality.
 
+## Quick verification and failure signals
+
+```bash
+docker pull python:3.12-slim
+docker image inspect python:3.12-slim --format "{{json .RootFS.Layers}}"
+docker history python:3.12-slim
+docker inspect --format "{{index .RepoDigests 0}}" python:3.12-slim
+```
+
+**Expected output:**
+- `RootFS.Layers` prints an ordered array of layer hashes.
+- `docker history` shows the commands and sizes behind the layers.
+- `RepoDigests` gives you the immutable identity after push.
+
+**Check first if it fails:**
+- If layer count grows too quickly, review how the Dockerfile splits `RUN`.
+- If the digest is empty, confirm you are inspecting a pushed image.
+- If the image is too large, inspect build context size and multi-stage usage first.
+
 ## Five Common Mistakes
 
 1. **Splitting commands across many RUN statements — layer explosion.**
@@ -161,6 +173,8 @@ Multi-stage builds split build tools from runtime. `.dockerignore` keeps the bui
 You can see how an image is built. Next, look at what runs it. The next post covers Runtime.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - **Image and Layer (current)**
 - Runtime (upcoming)
@@ -171,6 +185,7 @@ You can see how an image is built. Next, look at what runs it. The next post cov
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -180,4 +195,4 @@ You can see how an image is built. Next, look at what runs it. The next post cov
 - [OCI Image Spec — manifest](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
 - [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/)
 
-Tags: Containers, Docker, Image, Layer, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps

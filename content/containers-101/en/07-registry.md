@@ -2,7 +2,7 @@
 series: containers-101
 episode: 7
 title: Registry
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,30 +11,27 @@ targets:
   ebook: true
 language: en
 tags:
-  - Containers
-  - Docker
-  - Registry
-  - ECR
-  - DevOps
-seo_description: A beginner guide to container registries (Docker Hub, ECR, GHCR), push and pull flow, tagging strategy, and signed images with Cosign
-last_reviewed: '2026-05-04'
+- Containers
+- Docker
+- Registry
+- ECR
+- DevOps
+seo_description: A beginner guide to container registries (Docker Hub, ECR, GHCR),
+  push and pull flow, tagging strategy, and signed images with Cosign
+last_reviewed: '2026-05-15'
 ---
 
 # Registry
 
-> Containers 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Where does your *built image* live, and *how* do you pull it back later?
-
-> A *registry* is the *remote home* of an image and the *center* of every deployment flow.
-
-<!-- a-grade-intro:end -->
+A well-built image is still useless if no one can pull the exact same artifact back later. Teams usually feel this when tags drift, push permissions are too broad, or deployment history can no longer prove what actually ran.
 
 This is post 7 in the Containers 101 series.
 
-## What You Will Learn
+In this chapter, we treat the registry as the center of deployment identity, covering push and pull flow, digest pinning, permission separation, and the first steps toward image signing.
+
+> A registry is not just storage. It is the identity system for what actually gets deployed.
+
+## Questions this chapter answers
 
 - The role of a *registry*
 - The *push / pull* flow
@@ -48,15 +45,9 @@ A reproducible image is useless if there is *no place to fetch it from*. *Deploy
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dev["dev"] --> Build["docker build"]
-    Build --> Push["docker push"]
-    Push --> Reg["registry"]
-    Reg --> Pull["docker pull"]
-    Pull --> Prod["prod"]
-```
+![Push and pull flow between build output and a registry](../../../assets/containers-101/07/07-01-concept-at-a-glance.en.png)
 
+*Push and pull flow between build output and a registry*
 ## Key Terms
 
 - **registry**: an *image storage server*.
@@ -123,6 +114,24 @@ def verify_pull(remote_digest):
 - *password-stdin* avoids leaking secrets.
 - Push happens *after role separation* only.
 
+## Quick verification and failure signals
+
+```bash
+docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+docker tag myapp:dev ghcr.io/example/myapp:1.0.0
+docker push ghcr.io/example/myapp:1.0.0
+docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
+```
+
+**Expected output:**
+- After push, `RepoDigests` exposes an immutable `@sha256:` reference.
+- Pulling by digest later resolves the exact same content in every environment.
+
+**Check first if it fails:**
+- If auth fails, inspect token scope or registry-specific permissions.
+- If the digest is unexpected, verify the tag points at the intended image.
+- Never leave production with only a mutable tag and no recorded digest.
+
 ## Five Common Mistakes
 
 1. **Using *latest* in production.**
@@ -161,6 +170,8 @@ def verify_pull(remote_digest):
 Once you know *where* to fetch images, the next question is *how to run them safely*. The next post covers *container security*.
 
 <!-- toc:begin -->
+## In this series
+
 - [What is a Container?](./01-what-is-a-container.md)
 - [Image and Layer](./02-image-and-layer.md)
 - [Runtime](./03-runtime.md)
@@ -171,6 +182,7 @@ Once you know *where* to fetch images, the next question is *how to run them saf
 - Container Security (upcoming)
 - Containers vs VMs (upcoming)
 - Build a Container App (upcoming)
+
 <!-- toc:end -->
 
 ## References
@@ -180,4 +192,4 @@ Once you know *where* to fetch images, the next question is *how to run them saf
 - [GitHub Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 - [Cosign](https://docs.sigstore.dev/cosign/overview/)
 
-Tags: Containers, Docker, Registry, ECR, DevOps
+Tags: Containers, Docker, Kubernetes, DevOps
