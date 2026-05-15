@@ -85,7 +85,7 @@ This structure means inserting an adapter does not change model behavior at the 
 
 **After** — You inspect GPT-2 and see attention modules are named `c_attn` (Q, K, V fused) and `c_proj`, then change to:
 
-```
+```text
 trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 ```
 

@@ -53,7 +53,7 @@ Without polymorphism, `if isinstance(payment, CreditCard): ...` branches multipl
 
 > Three approaches to polymorphism in Python
 
-```
+```text
 1. Inheritance-based polymorphism
    Animal -> Dog.speak(), Cat.speak()
 

@@ -71,7 +71,7 @@ multimodal 시스템의 품질은 결국 image encoder가 만들어내는 repres
 
 CNN은 이미지를 작은 receptive field부터 점점 키워가며 처리합니다. ViT는 정반대로 시작합니다. 이미지를 16x16 patch로 자르고, 각 patch를 token으로 취급해 Transformer에 그대로 넣습니다.
 
-```
+```text
 [224x224 image] -> 14x14 = 196 patches -> linear projection -> 196 tokens (+ CLS)
                                                                 |
                                                                 v

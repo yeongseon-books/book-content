@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 > 클로저의 핵심은 안쪽 함수가 바깥 변수에 대한 참조를 들고 있다는 점입니다.
 
-```
+```text
 outer_func(x)
   |
   +-- local variable x (becomes a free variable)

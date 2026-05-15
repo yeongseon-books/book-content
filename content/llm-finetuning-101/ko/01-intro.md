@@ -83,7 +83,7 @@ one fine-tune  =  │ ② With what? (dataset)                 │
 
 1편을 읽고 나면 최소한 아래 표를 바로 꺼낼 수 있습니다.
 
-```
+```text
 Model size                       124M params (GPT-2 small class)
 Full fine-tuning trainable        ≈ 124M (100%)
 LoRA(r=8) trainable               ≈ 1.8M (≈ 1.5%)

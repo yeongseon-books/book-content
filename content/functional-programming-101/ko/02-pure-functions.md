@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 > 순수 함수인지 판단할 때는 두 질문이면 충분합니다. 같은 입력이 항상 같은 결과를 내는가? 함수 바깥 상태를 바꾸는가?
 
-```
+```text
 Call f(x)
   |
   +-- Same x always gives same result? -- No --> Impure

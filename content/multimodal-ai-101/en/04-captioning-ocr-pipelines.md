@@ -179,7 +179,7 @@ Cost runs around USD 0.05-0.065 per page. At 1M pages per month, self-hosted Pad
 
 The pattern that works in practice has five stages.
 
-```
+```text
 [Image]
    |
    v

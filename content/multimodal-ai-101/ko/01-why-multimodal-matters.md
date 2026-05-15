@@ -92,7 +92,7 @@ multimodal 모델 설계는 결국 "서로 다른 modality를 어떻게 같은 r
 
 다음 다이어그램이 hybrid fusion의 전형적인 흐름입니다.
 
-```
+```text
 [Image] -> Vision Encoder (ViT) -> visual tokens
                                         |
                                         v

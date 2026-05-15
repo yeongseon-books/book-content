@@ -45,7 +45,7 @@ last_reviewed: '2026-05-12'
 
 > 트리 = 루트에서 시작해 자식 노드로 분기하는 계층 구조
 
-```
+```text
         [root]
        /      \
     [child]  [child]

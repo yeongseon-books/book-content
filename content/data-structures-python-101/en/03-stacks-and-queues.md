@@ -53,7 +53,7 @@ Web server request handling, message brokers, and undo functionality are all bui
 
 > Stack = LIFO (Last In, First Out), Queue = FIFO (First In, First Out)
 
-```
+```text
 [Stack — LIFO]            [Queue — FIFO]
   push -> | C |           enqueue -> | A | B | C | -> dequeue
           | B |                     ^               ^

@@ -83,7 +83,7 @@ Separating the three layers lets you diagnose "filtering problems," "token lengt
 
 **After** — Every sample passes through the same instruction template and becomes one string:
 
-```
+```text
 ### Instruction:
 Explain two ways to reverse a Python list.
 

@@ -240,7 +240,7 @@ for query in queries:
 
 Expected output:
 
-```
+```text
 total chunks: 8
 vector shape: (8, 384)
 saved: faiss.index, chunks.json

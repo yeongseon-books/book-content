@@ -51,7 +51,7 @@ There is a clear reason to make serving its own stage. Training thinks in batche
 
 A serving system decomposes into four layers.
 
-```
+```text
 [client] -> HTTP -> [API layer] -> [model layer] -> [weights store]
                        |              |              |
                     FastAPI      tokenizer +     base model

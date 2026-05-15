@@ -95,7 +95,7 @@ seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
 
 가장 널리 쓰이는 거리 척도는 코사인 유사도입니다. 코사인 유사도는 벡터의 크기보다 방향을 비교하므로, 길이가 다른 입력끼리 비교할 때도 비교적 안정적입니다.
 
-```
+```text
 cosine similarity = (A · B) / (|A| × |B|)
 ```
 

@@ -47,7 +47,7 @@ last_reviewed: '2026-05-12'
 
 > `compose`와 `pipe`의 차이는 방향입니다. 계산 자체는 같아도 읽는 순서가 달라집니다.
 
-```
+```text
 compose(f, g, h)(x)  =  f(g(h(x)))     <- right to left
 pipe(h, g, f)(x)     =  f(g(h(x)))     <- left to right
 

@@ -63,7 +63,7 @@ flowchart LR
 
 **Before (reference only)**
 
-```
+```text
 - /users (GET, POST, ...)
 - /orders (GET, POST, ...)
 ```
@@ -72,7 +72,7 @@ The names alone don't tell you what to do.
 
 **After (all five axes)**
 
-```
+```text
 1. Getting Started — first call in five minutes
 2. Tutorials — checkout flow, sign-up flow
 3. Reference — every endpoint
@@ -94,7 +94,7 @@ The names alone don't tell you what to do.
      -H "Authorization: Bearer <YOUR_KEY>"
    ```
 3. Seeing `{"status": "ok"}` means success.
-```
+```text
 
 The *five-minute rule* — the user must have *something working* in five minutes.
 
@@ -126,7 +126,7 @@ Errors:
 |------|--------|---------|
 | validation_error | 422 | name or email missing |
 | email.duplicate | 409 | email already registered |
-```
+```text
 
 Every reference page needs *examples + an error table*.
 

@@ -97,7 +97,7 @@ Think of these numbers as coordinates in a high-dimensional space. Sentences wit
 
 The most common distance measure is cosine similarity. It ignores vector magnitude and compares direction only, which makes it relatively stable across inputs of different lengths.
 
-```
+```text
 cosine similarity = (A · B) / (|A| × |B|)
 ```
 

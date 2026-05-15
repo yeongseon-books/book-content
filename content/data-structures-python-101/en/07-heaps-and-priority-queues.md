@@ -53,7 +53,7 @@ Core algorithms like Dijkstra's shortest path, job schedulers, and event simulat
 
 > Heap = a complete binary tree where the parent is always smaller than its children (min-heap)
 
-```
+```text
 [Min-Heap]               [Array Representation]
       1                   index: 0  1  2  3  4  5
     /   \                  value: [1, 3, 5, 7, 4, 8]

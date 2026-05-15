@@ -420,7 +420,7 @@ print([(c.name, c.type) for c in users_r.columns])
 
 실무 application에서는 `MetaData`를 단일 모듈에 두고, `Table` 정의를 도메인별로 분리해서 import합니다.
 
-```
+```text
 app/
   db/
     __init__.py        # metadata, engine, get_conn

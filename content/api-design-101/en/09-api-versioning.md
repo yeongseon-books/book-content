@@ -68,7 +68,7 @@ PATCH /users/42  → response date format changes one day
 
 **After (explicit version)**
 
-```
+```text
 PATCH /v2/users/42
 Sunset: Wed, 31 Jan 2027 23:59:59 GMT  (set on v1 responses)
 ```
@@ -132,7 +132,7 @@ Standard headers send a *quiet notice* — paired with release notes.
 
 ### Step 5 — Sunset procedure
 
-```
+```text
 1. Ship the new version + start sending Deprecation
 2. Monitor usage (identify clients)
 3. Announce sunset 6-12 months out by email

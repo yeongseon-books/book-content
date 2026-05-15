@@ -37,7 +37,7 @@ The quality of any multimodal system ultimately rides on the quality of the repr
 
 CNNs process images by growing receptive fields from small to large. ViT does the opposite. It cuts the image into 16x16 patches, treats each patch as a token, and feeds the sequence straight into a Transformer.
 
-```
+```text
 [224x224 image] -> 14x14 = 196 patches -> linear projection -> 196 tokens (+ CLS)
                                                                 |
                                                                 v

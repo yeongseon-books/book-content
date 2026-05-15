@@ -61,7 +61,7 @@ flowchart LR
 
 **Before (reference만 있음)**
 
-```
+```text
 - /users (GET, POST, ...)
 - /orders (GET, POST, ...)
 ```
@@ -70,7 +70,7 @@ flowchart LR
 
 **After (다섯 축이 모두 있음)**
 
-```
+```text
 1. Getting Started — first call in five minutes
 2. Tutorials — checkout flow, sign-up flow
 3. Reference — every endpoint

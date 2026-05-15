@@ -78,7 +78,7 @@ URL만 읽어도 무엇을 의미하는지 이해할 수 있어야 합니다.
 
 ### Step 1 — Start with Nouns
 
-```
+```text
 /users
 /orders
 /articles
@@ -88,7 +88,7 @@ URL만 읽어도 무엇을 의미하는지 이해할 수 있어야 합니다.
 
 ### Step 2 — Attach Identifiers
 
-```
+```text
 /users/42
 /orders/9
 /articles/python-logging
@@ -98,7 +98,7 @@ URL만 읽어도 무엇을 의미하는지 이해할 수 있어야 합니다.
 
 ### Step 3 — Sub-resources
 
-```
+```text
 /users/42/orders          # the orders that belong to user 42
 /users/42/orders/9        # order 9 within that scope
 ```
@@ -125,7 +125,7 @@ def get_user(uid): return jsonify(USERS[uid])
 
 ### Step 5 — Restraint on Depth
 
-```
+```text
 # Good
 /users/42/orders
 

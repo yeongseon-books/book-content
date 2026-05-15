@@ -63,7 +63,7 @@ flowchart LR
 
 **Before (hand-written docs)**
 
-```
+```text
 README.md "GET /users/{id} returns user. id is integer."
 ```
 

@@ -53,7 +53,7 @@ You cannot make every function pure in practice, but writing business logic as p
 
 > Pure Function Decision Flow
 
-```
+```text
 Call f(x)
   |
   +-- Same x always gives same result? -- No --> Impure

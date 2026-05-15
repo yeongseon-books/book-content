@@ -122,7 +122,7 @@ print(tokenize("3 + 4 * 2"))
 
 BNF에 가까운 표기로 적으면 다음과 같습니다.
 
-```
+```text
 expr    = term  ("+" term  | "-" term)*
 term    = factor ("*" factor | "/" factor)*
 factor  = NUM | "(" expr ")"

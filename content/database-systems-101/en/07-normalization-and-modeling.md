@@ -71,7 +71,7 @@ Each stage builds on the previous one with one extra rule. 3NF is usually enough
 
 **Before — everything in one table**
 
-```
+```text
 orders(id, user_id, user_email, product_id, product_name, product_price, quantity)
 ```
 
@@ -79,7 +79,7 @@ orders(id, user_id, user_email, product_id, product_name, product_price, quantit
 
 **After — split**
 
-```
+```text
 users(id, email)
 products(id, name, price)
 orders(id, user_id, product_id, quantity)

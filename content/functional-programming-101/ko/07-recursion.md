@@ -48,7 +48,7 @@ last_reviewed: '2026-05-12'
 
 > 재귀를 읽을 때는 내려가는 과정보다 base case에 도달한 뒤 값이 어떻게 되돌아오는지를 보는 것이 중요합니다.
 
-```
+```text
 factorial(4)
   -> 4 * factorial(3)
        -> 3 * factorial(2)

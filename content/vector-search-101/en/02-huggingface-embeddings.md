@@ -113,7 +113,7 @@ print(f"first 5 values: {vector[:5]}")
 
 <!-- injected-output:end -->
 
-```
+```text
 type: <class 'list'>
 dimension: 384
 first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]

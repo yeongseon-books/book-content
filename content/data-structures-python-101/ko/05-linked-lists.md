@@ -45,7 +45,7 @@ last_reviewed: '2026-05-12'
 
 > 연결 리스트 = 노드들이 참조로 연결된 선형 구조
 
-```
+```text
 [Singly Linked List]
   head -> [A|->] -> [B|->] -> [C|->] -> None
 

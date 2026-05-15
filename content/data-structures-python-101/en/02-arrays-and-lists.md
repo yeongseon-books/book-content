@@ -53,7 +53,7 @@ list is also the building block for other data structures. Stacks use append/pop
 
 > Dynamic array = an array that grows automatically as elements are added
 
-```
+```text
 [static array]     fixed size, determined at declaration
   +---+---+---+---+
   | 1 | 2 | 3 | 4 |  <- 4 slots, fixed

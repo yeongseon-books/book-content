@@ -89,7 +89,7 @@ LoRA forward:      y = W · x + (alpha / r) · B · A · x
 
 GPT-2의 실제 모듈 이름이 `c_attn`, `c_proj`라는 것을 확인하고 다음처럼 바꿉니다.
 
-```
+```text
 trainable params: 1,478,656 || all params: 125,917,184 || trainable%: 1.1745
 ```
 

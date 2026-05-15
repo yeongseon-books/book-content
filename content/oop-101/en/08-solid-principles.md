@@ -53,7 +53,7 @@ You do not need to apply every principle perfectly from the start. Apply them wh
 
 > SOLID five principles summary
 
-```
+```text
 S — Single Responsibility    One class changes for only one reason
 O — Open/Closed             Open for extension, closed for modification
 L — Liskov Substitution     Children must be substitutable for parents
