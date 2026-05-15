@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Source Data Collection and Cataloging</h1>
+<p>The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.</p>
+<p>This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>What metadata must exist the moment a dataset lands on disk?</li>
+<li>How do public datasets, web scraping, and vendor feeds differ in operational risk?</li>
+<li>Why should collection and dataset-card creation happen in one transaction?</li>
+<li>When is a filesystem catalog enough, and when do you need SQLite or a metadata platform?</li>
+<li>Which provenance fields make later audits and retraining requests cheap instead of painful?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (2/10)</p>
+<p>Collection is not just pulling bytes from a source. It is the first reproducibility contract: if you cannot prove where the data came from and under what permission, the rest of the pipeline already stands on sand.</p>
 </blockquote>
 <hr>
 <h2>"I Don't Remember Where This Data Came From"</h2>
@@ -267,6 +277,14 @@ def register(conn, card: DatasetCard):
 <li>Episode 3 covers cleaning and deduplication.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Create the dataset card in the same function that writes the raw data</li>
+<li>[ ] Store source URL, license, snapshot date, sha256, schema, and owner for every dataset version</li>
+<li>[ ] Treat scraping as policy-sensitive work with robots.txt, throttling, and a clear User-Agent</li>
+<li>[ ] Record transform lineage with input/output hashes and code commit for every stage</li>
+<li>[ ] Decide in advance when the catalog should move from flat files to SQLite or a metadata platform</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>

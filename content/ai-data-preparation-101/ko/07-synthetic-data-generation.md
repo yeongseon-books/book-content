@@ -3,7 +3,7 @@ episode: 7
 
 language: ko
 
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 
 series: ai-data-preparation-101
 
@@ -39,11 +39,9 @@ seo_description: production LLM fine-tuning에서 가장 흔한 병목은 labele
 
 운영에서는 Self-Instruct, Evol-Instruct, RAG eval pair generation, distillation이 서로 다른 문제를 푸는 패턴으로 쓰입니다. instruction tuning을 늘리고 싶은지, retrieval 평가셋을 만들고 싶은지, 작은 student 모델을 가르치고 싶은지에 따라 선택이 달라집니다.
 
-핵심은 생성량이 아니라 검증입니다. 합성 데이터는 겉보기에는 그럴듯해도 diversity 부족, 근거 hallucination, teacher bias 전이 같은 문제가 쉽게 숨어듭니다.
+이 글은 AI Data Preparation 101 시리즈의 7번째 글입니다. 여기서는 대표적인 synthetic data generation 패턴 네 가지와, 생성된 샘플이 실제 학습에 도움이 되는지 검증하는 기준을 정리하겠습니다.
 
-이 글은 AI Data Preparation 101 시리즈의 7번째 글입니다.
-
-여기서는 대표적인 synthetic data generation 패턴 네 가지와, 생성된 샘플이 실제 학습에 도움이 되는지 검증하는 기준을 정리하겠습니다.
+무엇보다 중요한 것은 생성량이 아니라 검증입니다. 합성 데이터는 겉보기에는 그럴듯해도 다양성 부족, 근거 없는 답변, teacher 편향 전이 같은 문제가 쉽게 숨어듭니다.
 
 ## 이 글에서 다룰 문제
 

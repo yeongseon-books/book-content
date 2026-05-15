@@ -1,9 +1,9 @@
 ---
 episode: 7
 language: en
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 series: ai-data-preparation-101
-status: content-ready
+status: publish-ready
 tags:
 - Synthetic Data
 - Self-Instruct
@@ -23,11 +23,19 @@ seo_description: The most common bottleneck in production LLM fine-tuning is a s
 
 # Synthetic Data Generation - From Self-Instruct to Distillation
 
-> AI Data Preparation 101 series (7/10)
-
 In production LLM fine-tuning, the bottleneck is often labeled data rather than model capacity. When annotation is too slow or too expensive, synthetic generation becomes the practical way to expand supervision.
 
 This is post 7 in the AI Data Preparation 101 series. Here we cover common synthetic data generation patterns, from Self-Instruct to distillation.
+
+## Questions this chapter answers
+
+- Which synthetic-data pattern fits instruction tuning, RAG evaluation, or distillation best?
+- How do Self-Instruct and Evol-Instruct expand supervision in different ways?
+- Why must synthetic QA pairs be verified against the source evidence?
+- What license checks belong in a distillation workflow before data generation even starts?
+- Which quality metrics reveal that your synthetic set is large but not actually useful?
+
+> Synthetic data is not free accuracy. It is a controlled way to expand supervision, and its value depends more on verification and mixing strategy than on raw sample count.
 
 ---
 ## "If we run out of data, can't we just generate more?"
@@ -209,6 +217,14 @@ A unique_ratio below 0.7 signals a diversity problem. A high refusal_ratio means
 - Episode 8 covers data augmentation.
 
 ---
+
+## Operational checklist
+
+- [ ] Pick the synthetic-data pattern that matches the downstream objective instead of defaulting to one prompt style
+- [ ] Measure diversity, schema validity, and refusal rate for every generation batch
+- [ ] Verify evidence strings for RAG evaluation pairs against the original chunk
+- [ ] Review teacher-model license and output-usage constraints before distillation
+- [ ] Mix synthetic and human data deliberately rather than fine-tuning on synthetic only
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

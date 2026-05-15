@@ -1,9 +1,9 @@
 ---
 episode: 8
 language: en
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 series: ai-data-preparation-101
-status: content-ready
+status: publish-ready
 tags:
 - Data Augmentation
 - EDA
@@ -23,11 +23,19 @@ seo_description: The previous episode generated samples "from scratch" by callin
 
 # Data Augmentation - From EDA to Back-Translation
 
-> AI Data Preparation 101 series (8/10)
-
 Generating brand-new samples and transforming existing ones solve different problems. When you need broader coverage without paying the full cost of new annotation, augmentation is often the more controlled lever.
 
 This is post 8 in the AI Data Preparation 101 series. Here we cover when to use augmentation techniques such as EDA, back-translation, and paraphrasing.
+
+## Questions this chapter answers
+
+- How is augmentation different from synthetic generation in the problem it solves?
+- Which token-level transforms are safe enough for label-preserving text augmentation?
+- Why is back-translation helpful for diversity but risky for fact-critical domains?
+- What makes AST-level transforms safer than token edits for code corpora?
+- How do you verify that augmentation improved robustness rather than just adding noise?
+
+> Augmentation should widen the training distribution without breaking the original label semantics. If meaning does not survive, the new sample is just noise with extra compute attached.
 
 ---
 ## "How is augmentation different from synthetic generation?"
@@ -199,6 +207,14 @@ If delta is negative or below 0.005, augmentation is likely just noise. Try a di
 - Episode 9 covers train/eval/test splitting and contamination control.
 
 ---
+
+## Operational checklist
+
+- [ ] Define whether augmentation targets minority-class support or robustness before choosing a technique
+- [ ] Keep augmentation train-only and protect validation and test sets from leakage
+- [ ] Tune augmentation rate and paraphrase count against held-out metrics
+- [ ] Deduplicate augmented samples that are too close to their source examples
+- [ ] Maintain a short list of domain-specific transformations that change meaning and must stay banned
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

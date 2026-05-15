@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 대규모 코퍼스 작업자들이 가장 효과 큰 단계로 꼽는 정제와 중복 제거를, 패턴별 처리 전략과 함께 정리합니다.
 series: ai-data-preparation-101
 status: publish-ready
@@ -54,7 +54,7 @@ title: 데이터 정제와 중복 제거
 
 중복 제거는 세 단계로 생각하면 쉽습니다. exact dedup은 완전히 같은 문서를 제거하고, MinHash 기반 near dedup은 거의 같은 문서를 잡고, semantic dedup은 의미상 같은 패러프레이즈까지 다룹니다. 대부분의 운영 파이프라인은 앞의 두 단계까지만으로도 큰 효과를 얻습니다.
 
-핵심은 순서입니다. 정제 없이 dedup을 하면 공백과 대소문자 차이로 같은 문서가 살아남고, split 전에 cross-dedup 규칙을 세우지 않으면 평가 정의가 흔들립니다.
+무엇보다 중요한 것은 순서입니다. 정제 없이 dedup을 하면 공백과 대소문자 차이만 있는 문서가 그대로 남고, split 전에 cross-dedup 규칙을 세우지 않으면 평가 기준 자체가 흔들립니다.
 
 > 정제와 dedup의 목적은 텍스트를 아름답게 만드는 것이 아니라, 모델이 같은 정보를 반복해서 외우거나 평가셋을 미리 보는 일을 최대한 줄이는 것입니다.
 

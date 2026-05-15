@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 모델 선택보다 데이터 준비 단계가 LLM 품질을 더 크게 좌우하는 이유와, 운영에서 반복되는 데이터 문제 패턴을 정리합니다.
 series: ai-data-preparation-101
 status: publish-ready
@@ -178,6 +178,45 @@ def quick_quality_report(df: pd.DataFrame, text_col: str) -> dict:
 df = pd.DataFrame({"text": ["hello", "hello", "안녕", None, "world"]})
 print(quick_quality_report(df, "text"))
 ```
+
+**Expected output:**
+
+```text
+Raw:     0.93xx
+Cleaned: 0.94xx
+{'total_rows': 5, 'null_ratio': 0.2, 'duplicate_ratio': 0.25, ...}
+```
+
+숫자는 데이터셋과 시드에 따라 달라지지만, 패턴은 달라지지 않습니다. 정제만 바꿔도 지표가 움직여야 하고, 품질 리포트는 학습 전에 중복률·결측치·길이 이상치를 먼저 드러내야 합니다.
+
+## 모델을 의심하기 전에 먼저 볼 실패 신호
+
+실험이 잘못됐을 때 항상 모델부터 의심하면 원인 분석이 늦어집니다. 아래 세 가지는 데이터 단계에서 바로 볼 수 있는 경고 신호입니다.
+
+1. **중복률 급증**: 데이터셋 버전이 바뀌었는데 duplicate ratio가 뛰면 평가 점수 부풀림 가능성을 먼저 봐야 합니다.
+2. **길이 분포 붕괴**: `p99_length`가 갑자기 커지거나 줄면 tokenizer와 chunk 설정 비용이 함께 흔들립니다.
+3. **언어·소스 비중 쏠림**: 특정 소스가 급증하면 한 세그먼트에서만 좋아 보이는 착시가 자주 생깁니다.
+
+```python
+def compare_reports(prev: dict, curr: dict) -> dict[str, float]:
+    return {
+        "duplicate_ratio_delta": curr["duplicate_ratio"] - prev["duplicate_ratio"],
+        "p99_length_delta": curr["p99_length"] - prev["p99_length"],
+        "null_ratio_delta": curr["null_ratio"] - prev["null_ratio"],
+    }
+
+prev = {"duplicate_ratio": 0.04, "p99_length": 820, "null_ratio": 0.01}
+curr = {"duplicate_ratio": 0.13, "p99_length": 1410, "null_ratio": 0.03}
+print(compare_reports(prev, curr))
+```
+
+**Expected output:**
+
+```text
+{'duplicate_ratio_delta': 0.09, 'p99_length_delta': 590, 'null_ratio_delta': 0.02}
+```
+
+수치가 이렇게 뛰면 먼저 데이터 버전 차이부터 확인해야 합니다. GPU 시간을 더 쓰기 전에 입력 데이터가 어디서 달라졌는지부터 좁혀 보는 편이 안전합니다.
 
 이 보고서는 단순해 보여도 강력합니다. null 비율, 중복 비율, 길이 분포, 언어 분포를 이전 버전과 비교하면 학습을 시작하기 전에 이상 징후를 잡을 수 있습니다. 좋은 팀일수록 GPU를 켜기 전에 데이터 리포트를 먼저 봅니다.
 

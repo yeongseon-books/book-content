@@ -3,7 +3,7 @@ title: Train/Eval/Test Splitting and Contamination Control
 series: ai-data-preparation-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,18 +16,26 @@ tags:
 - Stratification
 - Temporal Split
 - scikit-learn
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 'The pattern of train_test_split(data, test_size=0.2) failing in
   production repeats every year. Two reasons:'
 ---
 
 # Train/Eval/Test Splitting and Contamination Control
 
-> AI Data Preparation 101 series (9/10)
-
 Many experiments look healthy right up until they meet production traffic because a simple random split hid the real failure mode. If your split ignores time, users, or benchmark contamination, validation scores can tell the wrong story.
 
 This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.
+
+## Questions this chapter answers
+
+- When does a random split stop representing the production problem you actually care about?
+- How do stratified, group, and temporal splits protect against different leakage patterns?
+- Why is contamination now a first-class evaluation problem for LLMs?
+- What can a simple 13-gram overlap check tell you before you trust a benchmark score?
+- How should teams keep the test set separate from tuning in everyday workflow?
+
+> A split strategy is an evaluation simulator. If it does not mirror the real deployment constraints, even beautiful validation numbers can still be answers to the wrong question.
 
 ---
 ## "Doesn't random_split cover it?"
@@ -215,6 +223,14 @@ This function covers nearly all production cases.
 - Episode 10 covers production data pipeline construction.
 
 ---
+
+## Operational checklist
+
+- [ ] Document why the current problem needs random, stratified, group, temporal, or hybrid splitting
+- [ ] Verify that no user, session, or patient identifiers cross the train/test boundary
+- [ ] Run contamination overlap checks on LLM evaluation sets before publishing scores
+- [ ] Keep the test set out of hyperparameter tuning and define who may access it
+- [ ] Record the time cutoff and backtest strategy whenever temporal split is in use
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

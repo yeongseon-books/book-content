@@ -54,8 +54,18 @@
 </head>
 <body>
 <h1>Cleaning and Deduplication</h1>
+<p>Teams that have processed large corpora tend to agree on one point: deduplication is one of the highest-leverage quality steps in the pipeline. You can change nothing about the model and still see better results by cleaning and removing repeated data correctly.</p>
+<p>This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cleaning transforms for raw text and the deduplication methods that keep training quality honest.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Which text-cleaning transforms are worth keeping because they solve measurable problems?</li>
+<li>Why is exact dedup not enough for web-scale corpora?</li>
+<li>How should you tune MinHash thresholds without creating too many false positives?</li>
+<li>Why does train/eval cross-dedup matter more than raw corpus size?</li>
+<li>In what order should cleaning, dedup, and splitting happen to avoid leakage?</li>
+</ul>
 <blockquote>
-<p>AI Data Preparation 101 series (3/10)</p>
+<p>Cleaning removes noise the model should never spend capacity on, while dedup removes repeated information the model would otherwise memorize. Both are quality controls, not cosmetic cleanup.</p>
 </blockquote>
 <hr>
 <h2>"Is Deduplication Really That Important?"</h2>
@@ -232,6 +242,14 @@ def semantic_dedup(docs: list[str], threshold: float = 0.93) -&gt; list[str]:
 <li>Episode 4 covers PII detection and anonymization.</li>
 </ul>
 <hr>
+<h2>Operational checklist</h2>
+<ul>
+<li>[ ] Keep cleaning transforms small enough that each one targets an explainable noise pattern</li>
+<li>[ ] Log rows in/out and character reduction whenever cleaning rules change</li>
+<li>[ ] Normalize text before hashing so exact dedup catches whitespace-only variants</li>
+<li>[ ] Run MinHash near-dedup before splitting the corpus</li>
+<li>[ ] Cross-dedup train against every evaluation set and delete only from train</li>
+</ul>
 <h2>AI Data Preparation 101 series</h2>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-data-preparation-101/en/01-why-data-preparation-matters.md">Why Data Preparation Determines Model Quality</a></li>

@@ -3,7 +3,7 @@ title: Building a Production Data Pipeline
 series: ai-data-preparation-101
 episode: 10
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,18 +16,26 @@ tags:
 - Airflow
 - pandera
 - MLOps
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Episodes 1-9 covered cleaning, dedup, PII redaction, tokenization,
   chunking, quality filtering, synthesis, augmentation, and splitting.
 ---
 
 # Building a Production Data Pipeline
 
-> AI Data Preparation 101 series (10/10)
-
 Cleaning, deduplication, PII handling, tokenization, filtering, and splitting all matter on their own, but production requires them to run as one repeatable system. The hard part is not knowing each step in isolation, but wiring them into a pipeline you can rerun and trust.
 
 This is the final post in the AI Data Preparation 101 series. Here we cover how to turn the earlier stages into a production data pipeline with reproducibility and observability built in.
+
+## Questions this chapter answers
+
+- Which system properties turn a set of preprocessing scripts into a production pipeline?
+- How do versioning, fingerprints, and cache keys work together to preserve reproducibility?
+- What operational value do orchestrators such as Airflow add beyond a cron job?
+- Which per-stage statistics reveal drift or stage failures early enough to act?
+- Why should schema validation and early PII handling be pipeline defaults rather than afterthoughts?
+
+> A production data pipeline is a chain of rerunnable contracts. Each stage should describe its inputs, outputs, parameters, and evidence well enough that rerunning it is boring rather than scary.
 
 ---
 ## "How do I tie everything we learned into one pipeline?"
@@ -256,6 +264,14 @@ Stages fail loudly when the schema breaks. Better than silently producing a brok
 This concludes the series. We started from GIGO in Ep1 and ended at a production pipeline. Next up: multimodal data preparation, or model evaluation.
 
 ---
+
+## Operational checklist
+
+- [ ] Give every stage explicit inputs, outputs, parameters, and a fingerprinted manifest
+- [ ] Tie dataset versions to code commits through DVC or an equivalent mechanism
+- [ ] Collect rows in/out, drop rate, duration, and timestamp metrics for every stage
+- [ ] Place PII handling close to ingest so raw identifiers do not spread downstream
+- [ ] Fail loudly on schema drift and support stage-level reruns from the orchestrator
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

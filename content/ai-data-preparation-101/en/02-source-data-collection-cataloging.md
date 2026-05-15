@@ -3,7 +3,7 @@ title: Source Data Collection and Cataloging
 series: ai-data-preparation-101
 episode: 2
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,18 +14,26 @@ tags:
 - Data Collection
 - Cataloging
 - Provenance
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: 'A request lands: re-train the model from three months ago. You open
   the directory and find files like dataset_v2_final_real.csv with no record of…'
 ---
 
 # Source Data Collection and Cataloging
 
-> AI Data Preparation 101 series (2/10)
-
 The painful moment usually comes months later: you need to retrain a model, but all that remains is a directory full of vaguely named files. Once the source, license, and collection context are gone, reproducibility is already broken.
 
 This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.
+
+## Questions this chapter answers
+
+- What metadata must exist the moment a dataset lands on disk?
+- How do public datasets, web scraping, and vendor feeds differ in operational risk?
+- Why should collection and dataset-card creation happen in one transaction?
+- When is a filesystem catalog enough, and when do you need SQLite or a metadata platform?
+- Which provenance fields make later audits and retraining requests cheap instead of painful?
+
+> Collection is not just pulling bytes from a source. It is the first reproducibility contract: if you cannot prove where the data came from and under what permission, the rest of the pipeline already stands on sand.
 
 ---
 ## "I Don't Remember Where This Data Came From"
@@ -262,6 +270,14 @@ Start with SQLite under 50 datasets and migrate when your search needs grow. Pre
 - Episode 3 covers cleaning and deduplication.
 
 ---
+
+## Operational checklist
+
+- [ ] Create the dataset card in the same function that writes the raw data
+- [ ] Store source URL, license, snapshot date, sha256, schema, and owner for every dataset version
+- [ ] Treat scraping as policy-sensitive work with robots.txt, throttling, and a clear User-Agent
+- [ ] Record transform lineage with input/output hashes and code commit for every stage
+- [ ] Decide in advance when the catalog should move from flat files to SQLite or a metadata platform
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series

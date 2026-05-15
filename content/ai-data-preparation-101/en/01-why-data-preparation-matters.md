@@ -3,7 +3,7 @@ title: Why Data Preparation Determines Model Quality
 series: ai-data-preparation-101
 episode: 1
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -14,18 +14,26 @@ tags:
 - ML Foundations
 - Data Quality
 - Pipelines
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: This is the question every ML beginner asks. You download a Kaggle
   dataset, run pandas.read_csv(), and shove it into a model. Done, right?
 ---
 
 # Why Data Preparation Determines Model Quality
 
-> AI Data Preparation 101 series (1/10)
-
 It is easy to think the job ends once you download a dataset, run `pandas.read_csv()`, and feed it into a model. In production, though, model failures usually trace back to data preparation decisions long before they trace back to architecture choices.
 
 This is the first post in the AI Data Preparation 101 series. Here we cover why data preparation has outsized impact on model quality and which early mistakes tend to compound later.
+
+## Questions this chapter answers
+
+- When does data preparation create more lift than another round of model tuning?
+- Which data failures make offline metrics look healthy while production quality degrades?
+- Why is data preparation better treated as one pipeline than as a few disconnected preprocessing scripts?
+- What minimum dataset report should exist before training starts?
+- Which signals tell you the problem is still in the data layer, not in the model layer?
+
+> Treat data preparation as the quality contract that decides what the model is allowed to learn, what the evaluation numbers actually mean, and which failures you can still debug later.
 
 ---
 ## "Can't I Just Grab Some Data and Train?"
@@ -156,6 +164,45 @@ df = pd.DataFrame({"text": ["hello", "hello", "안녕", None, "world"]})
 print(quick_quality_report(df, "text"))
 ```
 
+**Expected output:**
+
+```text
+Raw:     0.93xx
+Cleaned: 0.94xx
+{'total_rows': 5, 'null_ratio': 0.2, 'duplicate_ratio': 0.25, ...}
+```
+
+The exact numbers vary by dataset version and random seed, but the pattern should not. Cleaning should move the metric in a measurable direction, and the quick report should expose duplicate rate, missing values, and length outliers before training starts.
+
+## Failure modes to check before you blame the model
+
+A model experiment should stop early when the data report already looks suspicious. Three checks catch many bad runs:
+
+1. **Unexpected duplicate ratio spike**: if duplicates jump between dataset versions, evaluation inflation is a more likely culprit than model weakness.
+2. **Length distribution drift**: if `p99_length` doubles or collapses, your tokenizer and chunk settings are about to change cost and quality together.
+3. **Language or source imbalance**: when one source suddenly dominates, the model will often look better on one segment while degrading everywhere else.
+
+```python
+def compare_reports(prev: dict, curr: dict) -> dict[str, float]:
+    return {
+        "duplicate_ratio_delta": curr["duplicate_ratio"] - prev["duplicate_ratio"],
+        "p99_length_delta": curr["p99_length"] - prev["p99_length"],
+        "null_ratio_delta": curr["null_ratio"] - prev["null_ratio"],
+    }
+
+prev = {"duplicate_ratio": 0.04, "p99_length": 820, "null_ratio": 0.01}
+curr = {"duplicate_ratio": 0.13, "p99_length": 1410, "null_ratio": 0.03}
+print(compare_reports(prev, curr))
+```
+
+**Expected output:**
+
+```text
+{'duplicate_ratio_delta': 0.09, 'p99_length_delta': 590, 'null_ratio_delta': 0.02}
+```
+
+That kind of jump is operationally actionable. It tells you to inspect the dataset refresh before you spend time tuning the model.
+
 Generate this report for every dataset version, diff against the previous version, and you catch quality regressions before training even starts.
 
 ## Common Mistakes
@@ -175,6 +222,14 @@ Generate this report for every dataset version, diff against the previous versio
 - The next nine episodes go deep on each stage. Episode 2 starts with collection and cataloging.
 
 ---
+
+## Operational checklist
+
+- [ ] Record dataset version, provenance, and license before starting training
+- [ ] Generate a quick quality report for every dataset refresh and diff it against the previous version
+- [ ] Check duplicates, leakage risk, and language mix before trusting accuracy numbers
+- [ ] Make tokenization and split design explicit instead of leaving them as hidden defaults
+- [ ] Write down which quality signals would tell you to revisit the data before the model
 
 <!-- toc:begin -->
 ## AI Data Preparation 101 series
