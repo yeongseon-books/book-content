@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Layered Architecture</h1>
+<p>Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.</p>
 <p>This is post 6 in the Software Design 101 series.</p>
+<p>In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.</p>
 <blockquote>
-<p>Software Design 101 series (6/10)</p>
+<p>Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why bother with layers, and what do you split them on?</p>
-<blockquote>
-<p>So that code with different reasons and rates of change does not sit in the same box.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The classic four-layer structure</li>
@@ -80,12 +74,8 @@
 <p>Group together what changes for the same reason.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    UI[&quot;Presentation&quot;] --&gt; APP[&quot;Application&quot;]
-    APP --&gt; DOM[&quot;Domain&quot;]
-    APP --&gt; INF[&quot;Infrastructure&quot;]
-    INF --&gt; DOM
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>Layered architecture protects the stable domain by isolating presentation, application flow, and infrastructure details</em></p>
 <p>The domain is the stable core that nothing points away from.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -152,6 +142,23 @@ def to_domain_user(external_json):
     return User(id=external_json[&quot;uid&quot;], name=external_json[&quot;nm&quot;])
 </code></pre>
 <p>The external schema cannot pollute the domain.</p>
+<h2>Quick Verification</h2>
+<p>Open one router and count how many lines belong to HTTP handling, use-case orchestration, domain rules, and repository access. Collapsed layers usually show all four in one function.</p>
+<pre><code class="language-text">router lines: input parsing, status code, JSON response
+use-case lines: orchestration, transaction boundary
+domain lines: validation, policy, invariant
+infra lines: ORM call, SQL, SDK
+</code></pre>
+<p><strong>Expected output:</strong> the separation target becomes clear — presentation should keep the HTTP mechanics, while domain code should keep the rules.</p>
+<p>In a very small project you do not need four formal layers. You do need to avoid stacking unrelated rates of change into the same function.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>The router is long and hard to test</strong><br>
+- First check: Check whether use-case flow is still trapped in presentation</p>
+<p><strong>The domain model is full of ORM details</strong><br>
+- First check: Check whether infrastructure leaked inward</p>
+<p><strong>Third-party field names appear all over the domain</strong><br>
+- First check: Check whether you need an anti-corruption layer</p>
+<p>Layers are not for pretty folder trees. They exist to prevent outside churn from shaking the inside rules directly.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Dependencies always point toward the domain.</li>
@@ -210,6 +217,11 @@ def to_domain_user(external_json):
 <li><a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Domain-Driven Design — Layered Architecture</a></li>
 <li><a href="https://martinfowler.com/eaaCatalog/">Patterns of Enterprise Application Architecture</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer">Anti-Corruption Layer Pattern</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://flask.palletsprojects.com/en/stable/quickstart/">Flask Quickstart</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">dataclasses — Data Classes</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture</p>
 </body>

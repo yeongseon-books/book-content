@@ -18,22 +18,18 @@ tags:
   - Layers
   - Architecture
 seo_description: How layered architecture is structured, what dependency directions are allowed, and where the anti-corruption layer fits.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Layered Architecture
 
+Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.
+
 This is post 6 in the Software Design 101 series.
 
-> Software Design 101 series (6/10)
+In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why bother with layers, and what do you split them on?
-
-> So that code with different reasons and rates of change does not sit in the same box.
-
-<!-- a-grade-intro:end -->
+> Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.
 
 ## What You Will Learn
 
@@ -51,13 +47,8 @@ Layers separate units of change. The UI, the domain, and the infrastructure all 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    UI["Presentation"] --> APP["Application"]
-    APP --> DOM["Domain"]
-    APP --> INF["Infrastructure"]
-    INF --> DOM
-```
+![Concept at a Glance](../../../assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
+*Layered architecture protects the stable domain by isolating presentation, application flow, and infrastructure details*
 
 The domain is the stable core that nothing points away from.
 
@@ -155,6 +146,31 @@ def to_domain_user(external_json):
 
 The external schema cannot pollute the domain.
 
+## Quick Verification
+
+Open one router and count how many lines belong to HTTP handling, use-case orchestration, domain rules, and repository access. Collapsed layers usually show all four in one function.
+
+```text
+router lines: input parsing, status code, JSON response
+use-case lines: orchestration, transaction boundary
+domain lines: validation, policy, invariant
+infra lines: ORM call, SQL, SDK
+```
+
+**Expected output:** the separation target becomes clear — presentation should keep the HTTP mechanics, while domain code should keep the rules.
+
+In a very small project you do not need four formal layers. You do need to avoid stacking unrelated rates of change into the same function.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| The router is long and hard to test | Check whether use-case flow is still trapped in presentation |
+| The domain model is full of ORM details | Check whether infrastructure leaked inward |
+| Third-party field names appear all over the domain | Check whether you need an anti-corruption layer |
+
+Layers are not for pretty folder trees. They exist to prevent outside churn from shaking the inside rules directly.
+
 ## What to Notice in This Code
 
 - Dependencies always point toward the domain.
@@ -218,5 +234,11 @@ Layers absorb the shock of change. Next up we look at the data that moves betwee
 - [Domain-Driven Design — Layered Architecture](https://martinfowler.com/bliki/DomainDrivenDesign.html)
 - [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
 - [Anti-Corruption Layer Pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/anti-corruption-layer)
+
+### Practical Docs
+
+- [Flask Quickstart](https://flask.palletsprojects.com/en/stable/quickstart/)
+- [dataclasses — Data Classes](https://docs.python.org/3/library/dataclasses.html)
+
 
 Tags: Computer Science, SoftwareDesign, LayeredArchitecture, CleanArchitecture, Layers, Architecture

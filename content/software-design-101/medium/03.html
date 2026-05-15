@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Modules and Boundaries</h1>
+<p>A code base can have many files and still have weak module boundaries. If callers must understand the internals to use a module safely, the boundary is mostly theater.</p>
 <p>This is post 3 in the Software Design 101 series.</p>
+<p>In this post, we focus on deep modules, small public surfaces, and information hiding. The practical question is how to keep internal changes inside the module instead of leaking them into every caller.</p>
 <blockquote>
-<p>Software Design 101 series (3/10)</p>
+<p>A strong boundary lets the caller know less while still getting more useful work done.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What makes a module boundary good?</p>
-<blockquote>
-<p>A small surface area and the absence of leaks from internal changes to external callers.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>A definition of a module</li>
@@ -80,11 +74,8 @@
 <p>A good boundary permits ignorance.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[&quot;Public API&quot;] -. small .-&gt; M[&quot;Module&quot;]
-    M -. deep .-&gt; I[&quot;Internal&quot;]
-    I --&gt; R[&quot;Rich behavior&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>A deep module keeps a small public surface while hiding rich internal behavior behind it</em></p>
 <p>Small surface, deep interior.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -141,6 +132,25 @@ def public_user(u): return {&quot;id&quot;: u.id, &quot;name&quot;: u.name}
 # Infra imports the domain.
 </code></pre>
 <p>Direction reinforces the boundary.</p>
+<h2>Quick Verification</h2>
+<p>Pick one module and write down its public symbols separately from its internal helpers. That single inventory usually exposes whether the boundary is doing any real work.</p>
+<pre><code class="language-python">__all__ = [
+    &quot;read_file&quot;,
+    &quot;read_chunk&quot;,
+    &quot;open_file&quot;,
+    &quot;close_file&quot;,
+]
+</code></pre>
+<p><strong>Expected output:</strong> if callers truly need only one or two entry points, the rest are candidates to hide behind the boundary.</p>
+<p>Then inspect data exposure as well. More leaks come from returning internal structures directly than from having one extra function.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>Internal refactors force caller changes</strong><br>
+- First check: Check whether the public API exposes too much procedure</p>
+<p><strong>External code knows your internal dict layout</strong><br>
+- First check: Check whether internal models escaped without DTOs</p>
+<p><strong>There are many modules but little abstraction value</strong><br>
+- First check: Check whether you created only shallow modules</p>
+<p>The best boundaries let callers know little and still get meaningful work done.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The surface is small and intentional.</li>
@@ -199,6 +209,11 @@ def public_user(u): return {&quot;id&quot;: u.id, &quot;name&quot;: u.name}
 <li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design — Deep Modules</a></li>
 <li><a href="https://www.oracle.com/technical-resources/articles/java/bloch-effective-08-qa.html">Effective Java — API Design</a></li>
 <li><a href="https://martinfowler.com/bliki/BoundedContext.html">Domain-Driven Design — Bounded Context</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/modules.html">The Python Tutorial — Modules</a></li>
+<li><a href="https://docs.python.org/3/reference/simple_stmts.html#import">Python Reference — import statement</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign</p>
 </body>

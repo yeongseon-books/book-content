@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Reducing Change Impact</h1>
+<p>A change feels scary when one new branch, one schema update, or one pricing tweak can rattle the whole system. Good design does not stop change. It narrows the blast radius.</p>
 <p>This is post 8 in the Software Design 101 series.</p>
+<p>In this post, we connect the open/closed principle with expand-contract and feature flags. The aim is to make live changes observable, reversible, and small enough to ship without turning every deployment into a cliff edge.</p>
 <blockquote>
-<p>Software Design 101 series (8/10)</p>
+<p>The safest evolution path is usually: expand, compare, migrate, and only then clean up.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it take to change one line without rattling the whole system?</p>
-<blockquote>
-<p>Design that limits the blast radius of change — open/closed, expand-contract, and feature flags are the practical tools.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The blast radius of a change</li>
@@ -80,9 +74,8 @@
 <p>Code is good when it is good at being changed.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Add new path&quot;] --&gt; B[&quot;Run side by side&quot;] --&gt; C[&quot;Migrate readers&quot;] --&gt; D[&quot;Remove old path&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>Expand-contract keeps live changes safe by adding a new path, comparing it, migrating traffic, and cleaning up</em></p>
 <p>Expand → switch → contract.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -143,6 +136,23 @@ def price(item, kind):
 # Once everyone is on v2, remove v1 and the flag.
 </code></pre>
 <p>Cleanup is part of the change.</p>
+<h2>Quick Verification</h2>
+<p>For live code, define the comparison before you write the new path. Spell out what the old and new behavior will be compared on.</p>
+<pre><code class="language-text">Comparison target: pricing result
+Comparison point: right after request handling
+Tolerance: 0
+Switch-over rule: zero drift logs and regression suite pass
+</code></pre>
+<p><strong>Expected output:</strong> before enabling the new implementation, you can explain exactly which signals qualify it as safe.</p>
+<p>With that in place, the feature flag stops being a mere switch and becomes part of a verification plan.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>The new path ships before anyone compares outputs</strong><br>
+- First check: Check whether side-by-side drift logging existed</p>
+<p><strong>A feature flag lives for months</strong><br>
+- First check: Check whether it had an expiration date and cleanup plan</p>
+<p><strong>Even tiny changes trigger expand-contract</strong><br>
+- First check: Re-evaluate whether the operational risk justifies the ceremony</p>
+<p>Reducing change impact is not about using more patterns. It is about slicing the risky changes into safe, observable steps.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Adding a new path does not touch the old one.</li>
@@ -201,6 +211,11 @@ def price(item, kind):
 <li><a href="https://martinfowler.com/bliki/ParallelChange.html">ParallelChange (Expand-Contract) — Danilo Sato</a></li>
 <li><a href="https://martinfowler.com/articles/feature-toggles.html">Feature Toggles — Pete Hodgson</a></li>
 <li><a href="https://martinfowler.com/bliki/StranglerFigApplication.html">Strangler Fig Application — Martin Fowler</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/library/logging.html">logging — Logging facility for Python</a></li>
+<li><a href="https://docs.python.org/3/library/enum.html">enum — Support for enumerations</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring</p>
 </body>

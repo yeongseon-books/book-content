@@ -18,22 +18,18 @@ tags:
   - DesignPrinciples
   - Maintainability
 seo_description: Define software design, distinguish it from clean coding, and learn signals of good and failing design across a code base.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Software Design?
 
+Changing one line is easy. Changing a feature without dragging half the code base with it is where software design starts to matter.
+
 This is the first post in the Software Design 101 series.
 
-> Software Design 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How is good design different from good coding?
+In this post, we treat software design not as code prettiness but as a bundle of decisions that determines the cost of the next change. The working question is simple: what signals tell you that a structure will stay changeable six months from now?
 
 > Good code makes one line easier to read; good design makes the whole code base easier to change.
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -51,14 +47,8 @@ Design is invisible. But it shows itself every time the next change is more expe
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["Requirements"] --> D["Design decisions"]
-    D --> C["Code"]
-    C --> M["Change cost"]
-    M --> R2["New requirements"]
-    R2 --> D
-```
+![Concept at a Glance](../../../assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
+*How requirements become design decisions and eventually turn into change cost*
 
 Design determines change cost.
 
@@ -140,6 +130,31 @@ Can a new teammate understand a module in 30 minutes?
 
 Design is, in the end, a human task.
 
+## Quick Verification
+
+The fastest way to evaluate design is to replay a real change against the code base. Pick a frequent request and write down the actual change footprint, dependency shape, and test scope.
+
+```text
+Change scenario: add a payment method
+Files touched: 1 / 4 / 9
+Dependency cycle: no / yes
+Test scope: domain only / domain+DB / full regression
+```
+
+**Expected output:** the healthier design touches fewer files, avoids cycles, and keeps the verification scope narrow.
+
+That simple exercise moves the conversation away from “is the code clean?” and toward “how expensive is the next change?”
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| One feature request forces you through many folders | Find the module boundary where the change leaks |
+| A tiny change still demands full regression | Check whether domain rules are glued to IO |
+| A new teammate cannot explain the structure quickly | Ask for a one-sentence responsibility per module |
+
+Once you learn to read these early signals, design stops being an abstract aesthetic debate and becomes a cost-control tool.
+
 ## What to Notice in This Code
 
 - Change footprint, dependencies, responsibility, and testability viewed together.
@@ -202,5 +217,11 @@ Design decides the cost of the next change. Next we start with the most fundamen
 - [Software Architecture Guide (Martin Fowler)](https://martinfowler.com/architecture/)
 - [Architecture Decision Records (ADR)](https://adr.github.io/)
 - [Designing Data-Intensive Applications](https://dataintensive.net/)
+
+### Practical Docs
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [unittest.mock — mock object library](https://docs.python.org/3/library/unittest.mock.html)
+
 
 Tags: Computer Science, SoftwareDesign, Architecture, Modularity, DesignPrinciples, Maintainability

@@ -18,22 +18,18 @@ tags:
   - LSP
   - Polymorphism
 seo_description: What separates a good interface, how to set the right level of abstraction, polymorphism, and the Liskov Substitution Principle.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Interfaces and Abstraction
 
+Interface design usually breaks long before the implementation does. You can see it the moment the caller needs to know too much about channels, protocols, or internal branching.
+
 This is post 5 in the Software Design 101 series.
 
-> Software Design 101 series (5/10)
+In this post, we treat interfaces as contracts written in the caller's language. The focus is on abstraction level, polymorphism, and the signals that tell you when a contract is leaking implementation detail.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What makes one interface clearly better than another?
-
-> It speaks the caller's intent and survives even when the implementation changes underneath.
-
-<!-- a-grade-intro:end -->
+> A good interface speaks in user intent and stays stable while implementations change underneath.
 
 ## What You Will Learn
 
@@ -51,12 +47,8 @@ An interface is a promise. When the promise is small and clear, both sides stay 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    C["Caller"] --> I["Interface"]
-    I --> A["Impl A"]
-    I --> B["Impl B"]
-```
+![Concept at a Glance](../../../assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
+*A good interface lets callers depend on one contract while multiple implementations sit behind it*
 
 The caller knows one shape; multiple implementations sit behind it.
 
@@ -151,6 +143,29 @@ class Writer:
 
 Do not force a read-only caller to depend on writes.
 
+## Quick Verification
+
+The fastest way to inspect an interface is to read only the method names and parameters. If the caller's intent is still obvious with the implementation stripped away, the abstraction level is probably right.
+
+```python
+class Notifier:
+    def send(self, user, msg): ...
+```
+
+**Expected output:** the name alone should tell you what the caller wants, and swapping implementations should not force caller rewrites.
+
+Then pick one subtype and verify that it really honors the contract. The moment it starts throwing `NotImplementedError`, the interface itself is suspect.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| Method names are full of implementation terms | Check whether the interface is speaking in the implementer's language |
+| Parameter lists keep growing | Check whether the interface is carrying too many responsibilities |
+| A subtype escapes through exceptions | Redesign the supertype contract itself |
+
+A strong interface is less about hiding implementation and more about expressing caller intent in a short, stable shape.
+
 ## What to Notice in This Code
 
 - The interface name reads in the caller's vocabulary.
@@ -214,5 +229,11 @@ A good interface is a unit of freedom. Next up we look at how interfaces compose
 - [Interface Segregation Principle](https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/isp.pdf)
 - [Joshua Bloch — How to Design a Good API](https://www.youtube.com/watch?v=heh4OeB9A-c)
 - [Designing Data-Intensive Applications — Abstractions](https://dataintensive.net/)
+
+### Practical Docs
+
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
+
 
 Tags: Computer Science, SoftwareDesign, Interfaces, Abstraction, LSP, Polymorphism

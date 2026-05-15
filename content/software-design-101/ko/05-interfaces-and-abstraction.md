@@ -18,7 +18,7 @@ tags:
   - LSP
   - Polymorphism
 seo_description: 인터페이스의 조건과 추상화 설계법을 학습하고 다형성으로 분기를 줄입니다. LSP, ISP 원칙으로 유연한 구조를 만드는 실무 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 인터페이스와 추상화
@@ -47,12 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    C["Caller"] --> I["Interface"]
-    I --> A["Impl A"]
-    I --> B["Impl B"]
-```
+![전체 그림](../../../assets/software-design-101/05/05-01-concept-at-a-glance.ko.png)
+*호출자는 하나의 인터페이스만 알고, 여러 구현이 같은 계약 뒤에서 교체되는 구조*
 
 호출자는 하나의 모양만 알고, 여러 구현은 그 뒤에 놓입니다. 이 구조가 잘 작동하려면 인터페이스가 호출자의 관심사와 같은 높이에서 설계되어야 합니다.
 
@@ -147,6 +143,29 @@ class Writer:
 
 읽기만 필요한 호출자에게 쓰기 메서드까지 강요하면 불필요한 결합이 생깁니다. 인터페이스도 책임별로 나뉘는 편이 좋습니다.
 
+## 빠르게 검증해 보기
+
+인터페이스 품질을 빠르게 보려면 메서드 이름과 인자 목록만 따로 빼서 읽어 보세요. 구현 설명 없이도 호출 의도가 보이면 추상화 높이가 맞을 가능성이 큽니다.
+
+```python
+class Notifier:
+    def send(self, user, msg): ...
+```
+
+**Expected output:** 이름만 봐도 호출자가 무엇을 원하는지 읽히고, 구현 교체가 필요할 때도 호출 코드가 크게 바뀌지 않아야 합니다.
+
+그다음 하위 구현 하나를 골라 상위 계약을 깨지 않는지 확인합니다. `NotImplementedError`를 던지기 시작하면 인터페이스 설계를 다시 봐야 합니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 메서드 이름이 구현 용어로 가득하다 | 호출자 언어가 아니라 구현자 언어인지 봅니다 |
+| 인자가 계속 늘어난다 | 인터페이스가 여러 책임을 품고 있는지 확인합니다 |
+| 하위 타입이 예외로 계약을 회피한다 | 상위 타입의 약속 자체를 다시 설계합니다 |
+
+좋은 인터페이스는 구현을 감추는 것보다, 호출자의 의도를 짧고 안정적으로 표현하는 데 더 가깝습니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 이름이 구현이 아니라 호출자의 어휘에 맞춰져 있습니다.
@@ -204,5 +223,11 @@ class Writer:
 - [Interface Segregation Principle](https://web.archive.org/web/20150905081110/http://www.objectmentor.com/resources/articles/isp.pdf)
 - [Joshua Bloch — How to Design a Good API](https://www.youtube.com/watch?v=heh4OeB9A-c)
 - [Designing Data-Intensive Applications — Abstractions](https://dataintensive.net/)
+
+### 실전 확인용 문서
+
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
+
 
 Tags: Computer Science, SoftwareDesign, Interfaces, Abstraction, LSP, Polymorphism

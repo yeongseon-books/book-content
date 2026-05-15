@@ -18,7 +18,7 @@ tags:
   - FeatureFlags
   - Refactoring
 seo_description: 한 번의 변경이 시스템을 흔들지 않게 하는 설계 — 개방 폐쇄 원칙과 확장-수축 패턴을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 변경 영향 줄이기
@@ -47,10 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    A["Add new path"] --> B["Run side by side"] --> C["Migrate readers"] --> D["Remove old path"]
-```
+![전체 그림](../../../assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
+*새 경로를 추가하고 병행 검증한 뒤 점진적으로 전환하고 정리하는 expand-contract 흐름*
 
 흐름은 보통 확장하고, 나란히 돌려 보고, 점진적으로 갈아탄 뒤, 마지막에 옛 경로를 정리하는 순서로 갑니다. 정리까지 끝나야 변경이 완료됩니다.
 
@@ -142,6 +140,31 @@ def price(item, kind):
 
 새 경로가 안정화되면 옛 코드와 플래그를 지워야 합니다. 정리를 미루면 운영 부채가 쌓입니다.
 
+## 빠르게 검증해 보기
+
+운영 중 코드라면 새 경로를 넣기 전에 비교 기준부터 적어 두는 편이 좋습니다. 아래처럼 옛 경로와 새 경로를 어떤 값으로 비교할지 정리해 보세요.
+
+```text
+비교 대상: 가격 계산 결과
+비교 시점: 요청 처리 직후
+허용 오차: 0
+전환 기준: 불일치 로그 0건, 회귀 테스트 통과
+```
+
+**Expected output:** 새 구현을 켜기 전에 어떤 신호가 안전한 전환 근거가 되는지 문장으로 설명할 수 있습니다.
+
+이 단계가 있으면 기능 플래그는 단순 스위치가 아니라 검증 계획의 일부가 됩니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 새 구현을 켠 뒤 결과 차이를 뒤늦게 발견한다 | 병렬 비교 로그가 있었는지 확인합니다 |
+| 기능 플래그가 몇 달째 남아 있다 | 만료일과 제거 계획이 있는지 봅니다 |
+| 작은 변경에도 expand-contract를 강제한다 | 정말 운영 위험이 큰 변경인지 다시 판단합니다 |
+
+변경 영향 줄이기의 핵심은 패턴을 많이 쓰는 것이 아니라, 필요한 변화만 작은 단계로 나누어 안전하게 넘기는 데 있습니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 새 경로가 기존 경로를 바로 덮어쓰지 않습니다.
@@ -199,5 +222,11 @@ def price(item, kind):
 - [ParallelChange (Expand-Contract) — Danilo Sato](https://martinfowler.com/bliki/ParallelChange.html)
 - [Feature Toggles — Pete Hodgson](https://martinfowler.com/articles/feature-toggles.html)
 - [Strangler Fig Application — Martin Fowler](https://martinfowler.com/bliki/StranglerFigApplication.html)
+
+### 실전 확인용 문서
+
+- [logging — Logging facility for Python](https://docs.python.org/3/library/logging.html)
+- [enum — Support for enumerations](https://docs.python.org/3/library/enum.html)
+
 
 Tags: Computer Science, SoftwareDesign, ChangeImpact, OpenClosed, FeatureFlags, Refactoring

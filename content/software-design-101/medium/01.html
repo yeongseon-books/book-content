@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>What Is Software Design?</h1>
+<p>Changing one line is easy. Changing a feature without dragging half the code base with it is where software design starts to matter.</p>
 <p>This is the first post in the Software Design 101 series.</p>
-<blockquote>
-<p>Software Design 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How is good design different from good coding?</p>
+<p>In this post, we treat software design not as code prettiness but as a bundle of decisions that determines the cost of the next change. The working question is simple: what signals tell you that a structure will stay changeable six months from now?</p>
 <blockquote>
 <p>Good code makes one line easier to read; good design makes the whole code base easier to change.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>A working definition of software design</li>
@@ -80,13 +74,8 @@
 <p>Design debt always charges interest.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;Requirements&quot;] --&gt; D[&quot;Design decisions&quot;]
-    D --&gt; C[&quot;Code&quot;]
-    C --&gt; M[&quot;Change cost&quot;]
-    M --&gt; R2[&quot;New requirements&quot;]
-    R2 --&gt; D
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>How requirements become design decisions and eventually turn into change cost</em></p>
 <p>Design determines change cost.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -137,6 +126,23 @@ def can_test_alone(module):
 Can a new teammate understand a module in 30 minutes?
 </code></pre>
 <p>Design is, in the end, a human task.</p>
+<h2>Quick Verification</h2>
+<p>The fastest way to evaluate design is to replay a real change against the code base. Pick a frequent request and write down the actual change footprint, dependency shape, and test scope.</p>
+<pre><code class="language-text">Change scenario: add a payment method
+Files touched: 1 / 4 / 9
+Dependency cycle: no / yes
+Test scope: domain only / domain+DB / full regression
+</code></pre>
+<p><strong>Expected output:</strong> the healthier design touches fewer files, avoids cycles, and keeps the verification scope narrow.</p>
+<p>That simple exercise moves the conversation away from “is the code clean?” and toward “how expensive is the next change?”</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>One feature request forces you through many folders</strong><br>
+- First check: Find the module boundary where the change leaks</p>
+<p><strong>A tiny change still demands full regression</strong><br>
+- First check: Check whether domain rules are glued to IO</p>
+<p><strong>A new teammate cannot explain the structure quickly</strong><br>
+- First check: Ask for a one-sentence responsibility per module</p>
+<p>Once you learn to read these early signals, design stops being an abstract aesthetic debate and becomes a cost-control tool.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Change footprint, dependencies, responsibility, and testability viewed together.</li>
@@ -194,6 +200,11 @@ Can a new teammate understand a module in 30 minutes?
 <li><a href="https://martinfowler.com/architecture/">Software Architecture Guide (Martin Fowler)</a></li>
 <li><a href="https://adr.github.io/">Architecture Decision Records (ADR)</a></li>
 <li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/tutorial/modules.html">The Python Tutorial — Modules</a></li>
+<li><a href="https://docs.python.org/3/library/unittest.mock.html">unittest.mock — mock object library</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, Architecture, Modularity, DesignPrinciples, Maintainability</p>
 </body>

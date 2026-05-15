@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Design Principles</h1>
+<p>Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.</p>
 <p>This is post 9 in the Software Design 101 series.</p>
+<p>In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.</p>
 <blockquote>
-<p>Software Design 101 series (9/10)</p>
+<p>Principles earn their keep when they turn vague discomfort into a concrete next move.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Are SOLID, KISS, YAGNI… really worth memorizing?</p>
-<blockquote>
-<p>The point is not to memorize them but to know <em>when</em> to reach for each. Every principle is a response to a code smell.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The five SOLID principles in plain terms</li>
@@ -80,11 +74,8 @@
 <p>Principles make you ask "why?"</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    S[&quot;Smell&quot;] --&gt; P[&quot;Principle&quot;]
-    P --&gt; R[&quot;Refactor&quot;]
-    R --&gt; C[&quot;Cleaner code&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Design principles are most useful when they translate a code smell into a refactoring direction</em></p>
 <p>Smell → principle → refactor.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -132,6 +123,24 @@ class SignupService:
 <pre><code class="language-python"># 5_dip.py
 # Move the abstraction to the domain side.
 </code></pre>
+<h2>Quick Verification</h2>
+<p>Knowing the names is less important than knowing which question to ask when a smell appears. Take one recent review example and map it like this.</p>
+<pre><code class="language-text">giant class -&gt; SRP
+growing branch chain -&gt; OCP
+subtype throws -&gt; LSP
+read-only implementation still exposes write -&gt; ISP
+domain imports DB -&gt; DIP
+</code></pre>
+<p><strong>Expected output:</strong> if the smell, the principle, and the next refactoring move line up in one sentence, the principle is doing real work.</p>
+<p>That is what makes code review sharper. Instead of “this feels wrong,” you can say “this looks like an SRP split candidate.”</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>You know the principle name but not the next move</strong><br>
+- First check: Map the smell to the principle first</p>
+<p><strong>DRY increases coupling instead of lowering it</strong><br>
+- First check: Check whether the duplicated code truly changes for the same reason</p>
+<p><strong>A tiny script becomes ceremonially heavy</strong><br>
+- First check: Recalibrate with YAGNI and KISS</p>
+<p>Principles are not universal rules. They are diagnostic cards that help you choose the next question and the next cut.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Each principle points at a different smell.</li>
@@ -190,6 +199,11 @@ class SignupService:
 <li><a href="https://en.wikipedia.org/wiki/Law_of_Demeter">Law of Demeter</a></li>
 <li><a href="https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction">The Wrong Abstraction (Sandi Metz)</a></li>
 <li><a href="https://martinfowler.com/bliki/Yagni.html">YAGNI (Martin Fowler)</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/library/abc.html">abc — Abstract Base Classes</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">typing.Protocol</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, SOLID, KISS, YAGNI, Principles</p>
 </body>

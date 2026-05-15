@@ -18,22 +18,18 @@ tags:
   - YAGNI
   - Principles
 seo_description: A tour of SOLID, KISS, YAGNI, DRY, and the Law of Demeter, with notes on when to actually reach for each.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Design Principles
 
+Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.
+
 This is post 9 in the Software Design 101 series.
 
-> Software Design 101 series (9/10)
+In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Are SOLID, KISS, YAGNI… really worth memorizing?
-
-> The point is not to memorize them but to know *when* to reach for each. Every principle is a response to a code smell.
-
-<!-- a-grade-intro:end -->
+> Principles earn their keep when they turn vague discomfort into a concrete next move.
 
 ## What You Will Learn
 
@@ -51,12 +47,8 @@ Principles are diagnostic tools, not commandments. When the code smells, they po
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    S["Smell"] --> P["Principle"]
-    P --> R["Refactor"]
-    R --> C["Cleaner code"]
-```
+![Concept at a Glance](../../../assets/software-design-101/09/09-01-concept-at-a-glance.en.png)
+*Design principles are most useful when they translate a code smell into a refactoring direction*
 
 Smell → principle → refactor.
 
@@ -130,6 +122,32 @@ SRP applied — small collaborators in place of one giant class.
 # Move the abstraction to the domain side.
 ```
 
+## Quick Verification
+
+Knowing the names is less important than knowing which question to ask when a smell appears. Take one recent review example and map it like this.
+
+```text
+giant class -> SRP
+growing branch chain -> OCP
+subtype throws -> LSP
+read-only implementation still exposes write -> ISP
+domain imports DB -> DIP
+```
+
+**Expected output:** if the smell, the principle, and the next refactoring move line up in one sentence, the principle is doing real work.
+
+That is what makes code review sharper. Instead of “this feels wrong,” you can say “this looks like an SRP split candidate.”
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| You know the principle name but not the next move | Map the smell to the principle first |
+| DRY increases coupling instead of lowering it | Check whether the duplicated code truly changes for the same reason |
+| A tiny script becomes ceremonially heavy | Recalibrate with YAGNI and KISS |
+
+Principles are not universal rules. They are diagnostic cards that help you choose the next question and the next cut.
+
 ## What to Notice in This Code
 
 - Each principle points at a different smell.
@@ -193,5 +211,11 @@ Principles are guides. In the final episode we apply every tool from this series
 - [Law of Demeter](https://en.wikipedia.org/wiki/Law_of_Demeter)
 - [The Wrong Abstraction (Sandi Metz)](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
 - [YAGNI (Martin Fowler)](https://martinfowler.com/bliki/Yagni.html)
+
+### Practical Docs
+
+- [abc — Abstract Base Classes](https://docs.python.org/3/library/abc.html)
+- [typing.Protocol](https://docs.python.org/3/library/typing.html#typing.Protocol)
+
 
 Tags: Computer Science, SoftwareDesign, SOLID, KISS, YAGNI, Principles

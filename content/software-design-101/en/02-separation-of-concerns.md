@@ -18,22 +18,18 @@ tags:
   - Cohesion
   - Coupling
 seo_description: Define separation of concerns, distinguish coupling and cohesion, and split responsibilities with a step-by-step practice.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Separation of Concerns
 
+A request handler that parses input, validates rules, writes to the database, sends notifications, and shapes the HTTP response may still work today. The problem is how expensive tomorrow's small change becomes.
+
 This is post 2 in the Software Design 101 series.
 
-> Software Design 101 series (2/10)
+In this post, we look at separation of concerns as a way to split code by reasons to change. The goal is not more files. The goal is keeping pricing, persistence, and communication from shaking each other every time one of them moves.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How can you tell that a module is doing too much?
-
-> When it changes for more than one reason, it already does too much.
-
-<!-- a-grade-intro:end -->
+> When one module changes for more than one reason, it already does too much.
 
 ## What You Will Learn
 
@@ -51,13 +47,8 @@ When concerns blend together you must understand everything to change one thing.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    M["Giant module"] --> A["UI concern"]
-    M --> B["Domain concern"]
-    M --> C["Infra concern"]
-    A & B & C --> R["Freedom to change"]
-```
+![Concept at a Glance](../../../assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
+*How separating UI, domain, and infrastructure concerns gives each concern its own pace of change*
 
 Three concerns separated, three independent timelines.
 
@@ -154,6 +145,32 @@ def app(req):
 
 Seams should be few and explicit.
 
+## Quick Verification
+
+Take one request handler and color each line by responsibility. The overlap becomes obvious very quickly.
+
+```text
+parse_request()      -> input
+validate_order()     -> domain rule
+save_order()         -> persistence
+send_notification()  -> external communication
+to_response()        -> output
+```
+
+**Expected output:** if one function still contains input, domain, infrastructure, and output logic, you have a clear separation candidate.
+
+Then add one more line for each step: “why does this step change?” Different reasons to change usually mean different boundaries.
+
+## Failure Signals and First Checks
+
+| Failure signal | First check |
+| --- | --- |
+| A validation change also alters HTTP responses | Check whether input and domain handling are fused |
+| A logging change touches core business logic | Check whether cross-cutting concerns leaked into the domain |
+| There are many files but changes still spread widely | Verify that responsibilities were truly separated, not just renamed |
+
+Separation of concerns is not about producing more files. It is about placing code with different reasons to change behind different seams.
+
 ## What to Notice in This Code
 
 - Each module has one reason to change.
@@ -217,5 +234,11 @@ Separation of concerns is the starting point of all design. Next: the unit of se
 - [A Philosophy of Software Design](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Hexagonal Architecture (Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Clean Architecture (Uncle Bob)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+
+### Practical Docs
+
+- [functools — Higher-order functions and operations on callable objects](https://docs.python.org/3/library/functools.html)
+- [Logging Cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
+
 
 Tags: Computer Science, SoftwareDesign, SeparationOfConcerns, Modularity, Cohesion, Coupling

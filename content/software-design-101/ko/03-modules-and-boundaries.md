@@ -18,7 +18,7 @@ tags:
   - Encapsulation
   - PackageDesign
 seo_description: 모듈의 정의, 좋은 경계의 조건, 공개 API와 캡슐화 원칙을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 모듈과 경계
@@ -47,12 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 전체 그림
 
-```mermaid
-flowchart LR
-    P["Public API"] -. small .-> M["Module"]
-    M -. deep .-> I["Internal"]
-    I --> R["Rich behavior"]
-```
+![전체 그림](../../../assets/software-design-101/03/03-01-concept-at-a-glance.ko.png)
+*작은 공개 표면 뒤에 내부 복잡도를 숨기는 깊은 모듈의 형태*
 
 좋은 모듈은 표면이 작고 내부가 깊습니다. 외부에는 간단한 약속만 보이지만, 내부에서는 의미 있는 일을 많이 처리합니다.
 
@@ -140,6 +136,33 @@ def public_user(u): return {"id": u.id, "name": u.name}
 
 경계는 의존성 방향으로 강화됩니다. 도메인이 인프라를 모를수록 내부 규칙을 더 오래 안정적으로 유지할 수 있습니다.
 
+## 빠르게 검증해 보기
+
+모듈 하나를 고른 뒤 공개 심볼과 내부 헬퍼를 나눠 적어 보세요. 공개 심볼이 많은데 외부 호출자가 꼭 그만큼 알아야 하는지 검토하면 경계 품질이 바로 보입니다.
+
+```python
+__all__ = [
+    "read_file",
+    "read_chunk",
+    "open_file",
+    "close_file",
+]
+```
+
+**Expected output:** 호출자가 실제로 필요한 진입점이 1~2개뿐이라면, 나머지는 내부로 숨길 수 있는 후보라는 사실이 드러납니다.
+
+그다음 내부 자료구조가 외부로 그대로 새는지 함께 확인해 보세요. 표면적보다 데이터 노출이 더 큰 누수를 만들 때가 많습니다.
+
+## 실패 신호와 먼저 볼 것
+
+| 실패 신호 | 먼저 볼 것 |
+| --- | --- |
+| 구현 세부를 고칠 때 호출자까지 같이 수정한다 | 공개 API가 내부 절차를 너무 많이 드러내는지 봅니다 |
+| 외부 코드가 내부 dict 구조를 직접 안다 | DTO 없이 내부 모델을 그대로 노출했는지 확인합니다 |
+| 함수는 많은데 추상화 이익이 작다 | 얕은 모듈만 늘어난 것은 아닌지 점검합니다 |
+
+좋은 경계는 외부 호출자에게 “적게 알고도 많이 하게” 만들어 줍니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 공개 표면이 작고 의도적으로 관리됩니다.
@@ -197,5 +220,11 @@ def public_user(u): return {"id": u.id, "name": u.name}
 - [A Philosophy of Software Design — Deep Modules](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Effective Java — API Design](https://www.oracle.com/technical-resources/articles/java/bloch-effective-08-qa.html)
 - [Domain-Driven Design — Bounded Context](https://martinfowler.com/bliki/BoundedContext.html)
+
+### 실전 확인용 문서
+
+- [The Python Tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
+- [Python Reference — import statement](https://docs.python.org/3/reference/simple_stmts.html#import)
+
 
 Tags: Computer Science, SoftwareDesign, Modules, Boundaries, Encapsulation, PackageDesign

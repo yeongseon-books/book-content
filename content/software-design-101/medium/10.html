@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Small Design Practice</title>
+<title>Practicing Design with a Small Project</title>
 <style>
   /* Preview-only styles. Medium strips CSS on paste; this is for
      the author's local preview in Chrome before copying. */
@@ -53,19 +53,13 @@
 </style>
 </head>
 <body>
-<h1>Small Design Practice</h1>
+<h1>Practicing Design with a Small Project</h1>
+<p>A small project is where design habits either become real or stay theoretical. If you cannot keep the seams clean in a URL shortener, they will not stay clean in a larger system either.</p>
 <p>This is the final post in the Software Design 101 series.</p>
+<p>In this post, we pull the whole toolkit together in one small Python service: domain rules, ports, adapters, layering, and one-way data flow. The goal is not framework ceremony. The goal is seeing how these design ideas cooperate when the code is still small enough to hold in your head.</p>
 <blockquote>
-<p>Software Design 101 series (10/10)</p>
+<p>A small code base is the best place to practice putting the domain in the center and the changing details at the edge.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you actually use all the tools from this series in one project?</p>
-<blockquote>
-<p>By building a small URL shortener and unfolding separation of concerns, dependency direction, layers, and data flow line by line.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to start design on a small project</li>
@@ -80,12 +74,8 @@
 <p>Good habits get built in small systems.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HTTP[&quot;HTTP layer&quot;] --&gt; APP[&quot;shorten_use_case&quot;]
-    APP --&gt; DOM[&quot;ShortLink domain&quot;]
-    APP --&gt; REPO[&quot;LinkRepo (port)&quot;]
-    REPO --&gt; SQL[&quot;SqlLinkRepo (adapter)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>The URL shortener example brings presentation, use case, domain, ports, and adapters together in one flow</em></p>
 <p>Domain → port → adapter → infrastructure.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -178,6 +168,20 @@ def redirect_view(key):
     return (&quot;not found&quot;, 404) if not link else (&quot;&quot;, 302, {&quot;Location&quot;: link.target})
 </code></pre>
 <p>Composition at the edge, view stays thin.</p>
+<h2>Quick Verification</h2>
+<p>For a small project, the best verification is to run the happy path end to end. Start with the shortest useful check.</p>
+<pre><code class="language-bash">curl -X POST http://localhost:5000/   -H &quot;Content-Type: application/json&quot;   -d '{&quot;url&quot;: &quot;https://example.com/docs&quot;}'
+</code></pre>
+<p><strong>Expected output:</strong> you get a response shaped like <code>{"short": "/r/xxxxxx"}</code>, and a follow-up <code>GET /r/&lt;key&gt;</code> returns <code>302</code> with a <code>Location</code> header. That proves presentation, use case, and repository collaboration are all wired correctly.</p>
+<p>Run the same check against an in-memory adapter and a SQL adapter, and the value of ports and adapters becomes very concrete.</p>
+<h2>Failure Signals and First Checks</h2>
+<p><strong>The view hashes the URL and writes to the DB itself</strong><br>
+- First check: Pull that work into the use case and adapters</p>
+<p><strong>Swapping storage shakes both the view and the domain</strong><br>
+- First check: Check whether the port is defined on the domain side</p>
+<p><strong>URL validation requires Flask to test</strong><br>
+- First check: Check whether the rule truly lives in the domain</p>
+<p>When these three seams stay clean in a tiny project, the whole series stops being theory and starts feeling like one connected toolkit.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The domain has no external dependencies.</li>
@@ -238,6 +242,12 @@ def redirect_view(key):
 <li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
 <li><a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture (Uncle Bob)</a></li>
 <li><a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Domain-Driven Design (Eric Evans)</a></li>
+</ul>
+<p><strong>Practical Docs</strong></p>
+<ul>
+<li><a href="https://flask.palletsprojects.com/en/stable/quickstart/">Flask Quickstart</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html#typing.Protocol">typing.Protocol</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">dataclasses — Data Classes</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, SoftwareDesign, Practice, Project, Modularity, Architecture</p>
 </body>
