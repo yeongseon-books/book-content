@@ -404,3 +404,4 @@ The next post covers **row factories and type adapters** — returning rows as d
 
 Tags: Python, DB-API, PEP 249, Database
 
+
