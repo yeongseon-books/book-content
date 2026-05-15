@@ -17,22 +17,16 @@ tags:
   - OIDC
   - CICD
 seo_description: Environments, approval, and OIDC. From PR merge to staging and production with safe automated deployment.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Deployment Automation
 
-> GitHub Actions 101 series (8/10)
+Teams that deploy by hand usually end up with the same blind spots. Staging is automatic but production still depends on a message in chat. Someone can run the command, but no one can reconstruct the exact sequence later. Rollback exists in a document somewhere, yet nobody wants to search for it during an incident.
 
-<!-- a-grade-intro:begin -->
+Good deployment automation is not about removing every human decision. It is about automating the safe, repeatable path while making the risky path explicit through approval rules, environment policy, and short-lived credentials.
 
-**Core question**: How do you express the policy "*staging is automatic, production needs approval*" in code?
-
-> *Deploy frequently and small*; gate the *risky parts*.
-
-<!-- a-grade-intro:end -->
-
-This is post 8 in the GitHub Actions 101 series.
+This is post 8 in the GitHub Actions 101 series. In this post, we will design a deployment flow around GitHub Environments, required reviewers, OIDC, and codified rollback.
 
 ## What You Will Learn
 
@@ -50,12 +44,9 @@ This is post 8 in the GitHub Actions 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Merge["main merge"] --> Stg["staging deploy"]
-    Stg --> Approve["required reviewer"]
-    Approve --> Prod["production deploy"]
-```
+![A deployment path from main merge to automatic staging and approval-gated production](../../../assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)
+
+*A deployment path from main merge to automatic staging and approval-gated production*
 
 ## Key Terms
 
@@ -135,6 +126,26 @@ jobs:
     steps:
       - run: ./deploy.sh ${{ inputs.sha }}
 ```
+
+## What success looks like at this point
+
+```text
+deploy-staging  Pass
+waiting on environment protection rules for production
+deploy-production  Pending approval
+```
+
+That pattern is usually what you want. Staging finishes automatically, while production stops because environment rules are actually active. After approval, the production job should continue with the same artifact and the same deployment definition rather than rebuilding or improvising a second path.
+
+## If deploy blocks or fails, check these first
+
+- **Production runs immediately**: the environment exists in the repository, but the protection rules are not actually configured.
+- **OIDC authentication fails**: verify both `id-token: write` and the cloud-side trust policy conditions such as audience and subject.
+- **Staging and production behave differently**: confirm both environments consume the same artifact and only the environment-specific values differ.
+
+## Keep automatic zones and approval zones intentionally separate
+
+Staging is usually your fast feedback lane, so automatic deployment makes sense there. Production is different: required reviewers, wait timers, environment-scoped secrets, and deployment URLs all belong there. If both environments share the same policy, staging often becomes too slow and production too casual.
 
 ## What to Notice in This Code
 

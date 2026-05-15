@@ -17,22 +17,16 @@ tags:
   - Mypy
   - QualityGate
 seo_description: Automate code-quality gates with ruff, mypy, and pre-commit so PR review focuses on logic, not style.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Lint and Type Check
 
-> GitHub Actions 101 series (5/10)
+If code review keeps starting with import order, line length, and obvious type errors, the team is spending expensive human attention on work a machine can do faster and more consistently. That is usually a sign that the quality gate is either missing or too soft to be trusted.
 
-<!-- a-grade-intro:begin -->
+The goal of lint and type checks is not to slow developers down. It is to remove low-value review noise so humans can focus on design, failure modes, and the operational consequences of a change.
 
-**Core question**: How do you *stop spending review time* on style and type nits?
-
-> *Let machines catch* what *machines should catch*.
-
-<!-- a-grade-intro:end -->
-
-This is post 5 in the GitHub Actions 101 series.
+This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff, Mypy, and pre-commit to turn style and type rules into an explicit CI gate instead of an informal team habit.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ This is post 5 in the GitHub Actions 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["code"] --> Ruff["ruff"]
-    Code --> Mypy["mypy"]
-    Ruff --> CI["CI gate"]
-    Mypy --> CI
-```
+![Code changes passing through Ruff and Mypy before they reach the CI quality gate](../../../assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
+
+*Code changes passing through Ruff and Mypy before they reach the CI quality gate*
 
 ## Key Terms
 

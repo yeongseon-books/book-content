@@ -17,22 +17,16 @@ tags:
   - Testing
   - CICD
 seo_description: pytest, coverage, and matrix in one workflow. Run your Python tests automatically on every PR with confidence.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Python Test Automation
 
-> GitHub Actions 101 series (4/10)
+Teams that run `pytest` only on local machines keep hitting the same failures. One developer passes on 3.12, another breaks on 3.10, someone skips the test suite under deadline pressure, and the problem surfaces only after merge when the cost of recovery is already higher.
 
-<!-- a-grade-intro:begin -->
+The important line is not “tests exist.” It is “the repository runs the same tests in the same environment every time.” That shift is what turns test code into an actual safety mechanism for the team.
 
-**Core question**: How do you make *pytest run automatically and reliably* on every PR?
-
-> A test only becomes a *real test* once it *runs automatically*.
-
-<!-- a-grade-intro:end -->
-
-This is post 4 in the GitHub Actions 101 series.
+This is post 4 in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around `setup-python`, caching, reports, coverage, and version matrices.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ Manual tests get *forgotten*. Only automation guarantees *the same trust* on eve
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    PR["PR open"] --> Setup["setup python"]
-    Setup --> Install["pip install"]
-    Install --> Test["pytest"]
-    Test --> Cov["coverage"]
-```
+![A Python test workflow moving from PR open to setup, install, pytest, and coverage](../../../assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
+
+*A Python test workflow moving from PR open to setup, install, pytest, and coverage*
 
 ## Key Terms
 

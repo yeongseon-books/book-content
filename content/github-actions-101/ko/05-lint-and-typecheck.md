@@ -17,7 +17,7 @@ tags:
   - Mypy
   - QualityGate
 seo_description: ruff, mypy, pre-commit으로 코드 품질 게이트를 자동화하는 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Lint와 Type Check
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 품질 게이트
 
-```mermaid
-flowchart LR
-    Code["code"] --> Ruff["ruff"]
-    Code --> Mypy["mypy"]
-    Ruff --> CI["CI gate"]
-    Mypy --> CI
-```
+![코드 변경이 Ruff와 Mypy를 거쳐 CI 품질 게이트로 이어지는 흐름](../../../assets/github-actions-101/05/05-01-diagram.ko.png)
+
+*코드 변경이 Ruff와 Mypy를 거쳐 CI 품질 게이트로 이어지는 흐름*
 
 이 구조에서 핵심은 분명합니다. 코드가 들어오면 먼저 기계가 스타일과 정적 타입을 확인하고, 그 결과가 CI 게이트로 이어집니다. 사람의 리뷰는 그 다음입니다.
 

@@ -17,7 +17,7 @@ tags:
   - Release
   - CICD
 seo_description: 빌드 결과물을 업로드하고 다음 잡과 릴리스까지 연결하는 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 빌드 아티팩트
@@ -44,13 +44,9 @@ CI를 돌려서 빌드까지 성공했는데 결과물이 그대로 사라진다
 
 ## 한눈에 보는 아티팩트 흐름
 
-```mermaid
-flowchart LR
-    Build["build job"] --> Up["upload-artifact"]
-    Up --> Store["GitHub storage"]
-    Store --> Down["download-artifact"]
-    Down --> Deploy["deploy job"]
-```
+![build 잡이 만든 산출물이 upload-artifact를 거쳐 저장되고 deploy 잡에서 다시 내려받는 흐름](../../../assets/github-actions-101/06/06-01-diagram.ko.png)
+
+*build 잡이 만든 산출물이 upload-artifact를 거쳐 저장되고 deploy 잡에서 다시 내려받는 흐름*
 
 이 흐름이 중요한 이유는 빌드와 배포를 같은 러너에 묶지 않아도 된다는 점입니다. 저장된 산출물을 다음 잡이 읽기만 하면 되므로, 파이프라인 구조가 훨씬 유연해집니다.
 

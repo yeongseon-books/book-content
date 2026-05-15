@@ -17,7 +17,7 @@ tags:
   - Schedule
   - CICD
 seo_description: push, PR, schedule, workflow_dispatch 트리거 설계를 실무 기준으로 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Trigger 이해하기
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 트리거 구조
 
-```mermaid
-flowchart LR
-    Push["push"] --> WF["workflow"]
-    PR["pull_request"] --> WF
-    Cron["schedule"] --> WF
-    Manual["workflow_dispatch"] --> WF
-```
+![push, pull_request, schedule, workflow_dispatch가 하나의 워크플로우로 연결되는 트리거 구조](../../../assets/github-actions-101/03/03-01-diagram.ko.png)
+
+*push, pull_request, schedule, workflow_dispatch가 하나의 워크플로우로 연결되는 트리거 구조*
 
 이 그림은 GitHub Actions가 단일 입력만 받는 도구가 아니라는 점을 보여 줍니다. 같은 워크플로우라도 어떤 이벤트에서 시작되느냐에 따라 역할이 완전히 달라질 수 있습니다.
 

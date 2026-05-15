@@ -17,22 +17,16 @@ tags:
   - OIDC
   - CICD
 seo_description: Repository, environment, and organization secrets with OIDC, masking, and rotation policy for safe handling of sensitive values in workflows.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Secret Management
 
-> GitHub Actions 101 series (9/10)
+As automation becomes more capable, more sensitive values start flowing through the pipeline: package tokens, cloud credentials, database passwords, certificates, and service keys. The hard part is that once one of them lands in a log or commit history, the recovery cost is far higher than a normal CI failure.
 
-<!-- a-grade-intro:begin -->
+That makes secret handling a design problem rather than a convenience feature. You need to decide where secrets live, which environments can read them, how much power `GITHUB_TOKEN` gets, and how to avoid turning one careless debug command into a permanent leak.
 
-**Core question**: How do you handle *passwords, API keys, and certificates* — *sensitive values* — *safely* inside a workflow?
-
-> *Secrets are not code; they are *runtime resources*. Design storage, exposure, and rotation as separate concerns.*
-
-<!-- a-grade-intro:end -->
-
-This is post 9 in the GitHub Actions 101 series.
+This is post 9 in the GitHub Actions 101 series. In this post, we will use scope, least privilege, OIDC, and runtime masking to treat secrets as operational resources instead of YAML variables.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ This is post 9 in the GitHub Actions 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Org["Organization secret"] --> Repo["Repository secret"]
-    Repo --> Env["Environment secret"]
-    Env --> Job["Job runtime"]
-    Job --> Mask["::add-mask::"]
-```
+![A flow from organization, repository, and environment secrets into job runtime and masking](../../../assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
+
+*A flow from organization, repository, and environment secrets into job runtime and masking*
 
 ## Key Terms
 

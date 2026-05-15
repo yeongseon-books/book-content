@@ -17,22 +17,16 @@ tags:
   - DevOps
   - Workflow
 seo_description: Core concepts of GitHub Actions and your first workflow. The starting line for replacing manual steps with automation.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is GitHub Actions?
 
-> GitHub Actions 101 series (1/10)
+At first glance, GitHub Actions looks like “CI built into GitHub.” That is a fair starting point, but it does not explain why some teams move faster with better release discipline while others just accumulate more YAML and still rely on manual steps.
 
-<!-- a-grade-intro:begin -->
+The more useful way to think about GitHub Actions is as an execution platform that lives next to your repository. Once a push, pull request, or tag becomes the trigger for test, lint, build, and deploy, the team stops depending on memory and starts depending on repeatable code.
 
-**Core question**: Where do you start so that *one push* triggers *test, lint, and deploy* automatically?
-
-> Automation belongs in *code, not in hands*.
-
-<!-- a-grade-intro:end -->
-
-This is the first post in the GitHub Actions 101 series.
+This is the first post in the GitHub Actions 101 series. In this post, we will frame GitHub Actions as an execution platform for repository events rather than a convenient automation button.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ CI/CD determines *team speed and quality*. *GitHub Actions* runs *next to your c
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Push["git push"] --> Trigger["event"]
-    Trigger --> Workflow["workflow.yml"]
-    Workflow --> Job["job: test"]
-    Job --> Step["step: pytest"]
-```
+![A GitHub Actions run flowing from a push event to a workflow, job, and step](../../../assets/github-actions-101/01/01-01-concept-at-a-glance.en.png)
+
+*A GitHub Actions run flowing from a push event to a workflow, job, and step*
 
 ## Key Terms
 

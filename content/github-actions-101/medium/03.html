@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Understanding Triggers</h1>
-<blockquote>
-<p>GitHub Actions 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you build a <em>nightly job</em> that runs <em>automatically at 2 AM on weekends</em>?</p>
-<blockquote>
-<p><em>When</em> a workflow runs matters as much as <em>why</em> it runs.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 3 in the GitHub Actions 101 series.</p>
+<p>As automation grows, a new kind of waste appears. Why did a docs-only edit trigger a full build? Why did three quick pushes to the same PR queue three identical runs? Why did the nightly job fire at the wrong local time even though the cron expression looked correct?</p>
+<p>Trigger design is where GitHub Actions stops being just syntax and becomes policy. The practical question is not only when a workflow should run, but when it should stay silent so cost, queue time, and alert noise remain under control.</p>
+<p>This is post 3 in the GitHub Actions 101 series. In this post, we will use <code>push</code>, <code>pull_request</code>, <code>schedule</code>, <code>workflow_dispatch</code>, path filters, and <code>concurrency</code> to make workflows run at the right moment and only at the right moment.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The difference between <em>push</em> and <em>pull_request</em></li>
@@ -80,12 +71,8 @@
 <p>A <em>good workflow</em> runs <em>only at the right moment</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Push[&quot;push&quot;] --&gt; WF[&quot;workflow&quot;]
-    PR[&quot;pull_request&quot;] --&gt; WF
-    Cron[&quot;schedule&quot;] --&gt; WF
-    Manual[&quot;workflow_dispatch&quot;] --&gt; WF
-</code></pre>
+<p><img alt="A workflow triggered by push, pull_request, schedule, and workflow_dispatch events" src="https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>A workflow triggered by push, pull_request, schedule, and workflow_dispatch events</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>push</strong>: when <em>commits land</em> on a branch.</li>

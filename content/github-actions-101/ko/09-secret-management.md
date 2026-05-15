@@ -17,7 +17,7 @@ tags:
   - OIDC
   - CICD
 seo_description: GitHub Actions에서 secret, 권한, OIDC를 안전하게 다루는 기준을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Secret 관리
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 secret 흐름
 
-```mermaid
-flowchart LR
-    Org["Organization secret"] --> Repo["Repository secret"]
-    Repo --> Env["Environment secret"]
-    Env --> Job["Job runtime"]
-    Job --> Mask["::add-mask::"]
-```
+![조직, 저장소, 환경 secret이 잡 런타임으로 전달되고 add-mask로 보호되는 흐름](../../../assets/github-actions-101/09/09-01-secret.ko.png)
+
+*조직, 저장소, 환경 secret이 잡 런타임으로 전달되고 add-mask로 보호되는 흐름*
 
 이 그림은 secret이 한 군데에만 존재하는 값이 아니라는 점을 보여 줍니다. 어디서 저장하고, 어느 환경에서만 열어 주고, 런타임에 어떻게 가리는지가 모두 별도 결정입니다.
 

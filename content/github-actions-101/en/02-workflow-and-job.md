@@ -17,22 +17,16 @@ tags:
   - Matrix
   - CICD
 seo_description: Workflow, Job, and Step structure with dependencies. Master parallelism and ordering in your CI graph.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Workflows and Jobs
 
-> GitHub Actions 101 series (2/10)
+Once you start using GitHub Actions, the next question is rarely about YAML syntax. It is about structure. Should lint and test live in one job? Should deploy wait for build only, or for every earlier check? When does a single workflow become harder to reason about than several smaller ones?
 
-<!-- a-grade-intro:begin -->
+Those questions are really about pipeline design. A workflow file is only the container. The actual pipeline is the graph of jobs inside it, and the quality of that graph determines both feedback speed and operational safety.
 
-**Core question**: How do you say "*deploy* runs only after *test* passes"?
-
-> The *graph of jobs* is your *pipeline*.
-
-<!-- a-grade-intro:end -->
-
-This is post 2 in the GitHub Actions 101 series.
+This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use `needs`, `matrix`, and `outputs` to design a graph that is fast without becoming fragile.
 
 ## What You Will Learn
 
@@ -50,12 +44,9 @@ A fully *serial* CI is slow; a fully *parallel* one *breaks ordering*. Drawing t
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Lint["lint"] --> Build["build"]
-    Test["test"] --> Build
-    Build --> Deploy["deploy"]
-```
+![A job graph where lint and test run in parallel before build and deploy](../../../assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
+
+*A job graph where lint and test run in parallel before build and deploy*
 
 ## Key Terms
 
