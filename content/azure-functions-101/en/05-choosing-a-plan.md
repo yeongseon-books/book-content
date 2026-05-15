@@ -43,7 +43,7 @@ This is the fifth post in the Azure Functions 101 series. Here, we compare the h
 
 | Plan | One-line definition |
 |---|---|
-| **Consumption** | The simplest pay-per-use serverless plan. An older path, and Windows-first in practice. |
+| **Consumption** | The original pay-per-use serverless plan. Important for existing apps, but now a legacy path for new applications. |
 | **Flex Consumption** | Microsoft's recommended Linux-based pay-per-use plan for new serverless apps, with VNet support, selectable memory, and per-function scaling. |
 | **Premium** | A higher-end plan that reduces or avoids cold starts through Always Ready and prewarmed capacity, with VNet support and larger SKUs. |
 | **Dedicated (App Service Plan)** | Functions running on regular App Service infrastructure, where scaling is managed through App Service rules instead of event-driven platform scaling. |
@@ -65,11 +65,11 @@ Now put the differences on one table.
 
 | Feature | Consumption | Flex Consumption | Premium | Dedicated |
 |---|---|---|---|---|
-| **Current status** | Older path | Default serverless recommendation | Advanced serverless | App Service family |
+| **Current status** | Legacy for new apps | Default serverless recommendation | Advanced serverless | App Service family |
 | **Billing model** | Execution-based pay-per-use | Execution-based pay-per-use, plus Always Ready capacity if enabled | Instance time and provisioned capacity | App Service Plan SKU |
 | **Cost at zero traffic** | 0 | 0 if Always Ready stays at 0 | Minimum instance cost remains | Always billed |
 | **Cold starts** | Present | Reduced when needed via Always Ready | Usually avoidable | Effectively absent when always running |
-| **OS** | Windows-first; Linux Consumption availability varies by region | Linux only | Windows / Linux | Windows / Linux |
+| **OS** | Windows supported; Linux Consumption is retired | Linux only | Windows / Linux | Windows / Linux |
 | **VNet integration** | No | Yes | Yes | Yes |
 | **Max instances** | Roughly 200; lower in some OS and platform cases | Up to 1000, subject to regional 250-core default quota | Roughly 20-100+, depending on OS, region, and restrictions | Defined by App Service Plan SKU and autoscale rules |
 | **Event-driven autoscale** | Yes (event-driven) | Yes (per-function, target-based) | Yes (target-based optional) | Manual via App Service autoscale rules |
@@ -100,10 +100,10 @@ Consumption is still easy to explain. No traffic means no bill, and the setup pa
 - Cold starts
 - No VNet integration
 - Fixed 1.5 GB memory
-- Long-term migration risk if Microsoft guidance continues shifting away from this plan
-- Linux Consumption availability varies by region, making it a less stable target for new architecture decisions
+- Legacy positioning for new apps, so long-term platform direction is no longer centered on this plan
+- Linux Consumption is retired, which removes it as a viable target for new Linux-based architecture decisions
 
-That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere.
+That is why the deployment chapter included Consumption only as a reference path for those with specific constraints. For a new production design, start with Flex unless a concrete requirement points elsewhere. For new apps, treat classic Consumption as the legacy branch you choose deliberately, not the neutral default.
 
 ---
 
@@ -192,7 +192,7 @@ The short version is straightforward.
 
 1. **For a new serverless app, start with Flex Consumption.** That is the current official direction.
 2. **If you need Windows or tighter cold-start control, evaluate Premium.**
-3. **Use Consumption only for the simplest demo path or for existing assets you are intentionally keeping.**
+3. **Use Consumption only for the simplest demo path, for Windows-specific legacy cases, or for existing assets you are intentionally keeping.**
 
 One more qualifier matters. Flex Consumption is strong, but **Blob triggers require the Event Grid source, some bindings and features have Flex-specific constraints, and scaling behavior should be understood in terms of per-function scale groups.** The accurate message is not “always use Flex.” It is “Flex is the default candidate, then validate the plan-specific constraints.”
 
