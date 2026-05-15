@@ -18,12 +18,18 @@ tags:
   - Refactoring
   - SoftwareEngineering
 seo_description: 좋은 이름의 신호와 검색 가능성, 도메인 용어 활용법을 배웁니다. 이름만으로 의도가 전달되게 고쳐 가독성과 유지보수성을 높이는 방법을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 이름 짓기
 
-코드에서 가장 자주 읽히는 것은 로직보다 이름입니다. 이 글은 Clean Code 101 시리즈의 2번째 글입니다. 여기서는 좋은 이름이 왜 주석을 줄이고 검색 비용을 낮추는지, 그리고 변수·함수·클래스 이름을 어떻게 다르게 다뤄야 하는지 정리하겠습니다.
+코드에서 가장 자주 읽히는 것은 로직보다 이름입니다.
+
+이 글은 Clean Code 101 시리즈의 2번째 글입니다.
+
+여기서는 좋은 이름이 왜 주석을 줄이고 검색 비용을 낮추는지, 그리고 변수·함수·클래스 이름을 어떻게 다르게 다뤄야 하는지 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    I["Intent"] --> N["Name"]
-    N --> S["Search"]
-    N --> R["Read"]
-    N --> D["Doc"]
-```
+![이름 짓기](../../../assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
+
+*좋은 이름의 흐름: 의도가 이름으로 드러나면 검색, 읽기, 문서화가 함께 쉬워집니다.*
 
 이름은 의도를 보이게 만들고, 그 의도는 검색과 읽기와 문서화를 동시에 돕습니다.
 
@@ -129,6 +131,23 @@ customer_balance_cents           # domain names can be long
 
 좁은 범위에서는 짧아도 되지만, 넓은 범위에서는 정확해야 합니다. 이름 길이는 미학이 아니라 범위와 책임에 대한 판단입니다.
 
+## 검증 방법
+
+```bash
+ruff check app/ --select N
+python -m pytest -q tests/test_naming_examples.py
+```
+
+**기대 결과**
+
+- 축약어와 일관성 없는 명명 규칙이 먼저 드러납니다.
+- 이름을 바꾼 뒤에도 테스트가 그대로 초록이어야 합니다.
+
+## 실패하기 쉬운 지점
+
+- 타입 이름만 바꾸고 도메인 용어는 그대로 놓칩니다.
+- 리네임 뒤 호출 지점 전체를 함께 검증하지 않습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 이름은 호출 지점에서 의미를 만듭니다.
@@ -192,5 +211,6 @@ customer_balance_cents           # domain names can be long
 - [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design-tackling/0321125215/)
 - [Google Style Guide — Naming](https://google.github.io/styleguide/pyguide.html#316-naming)
 - [PEP 8 — Naming Conventions](https://peps.python.org/pep-0008/#naming-conventions)
-
+- [Ruff pep8-naming rules](https://docs.astral.sh/ruff/rules/#pep8-naming-n)
+- [PEP 8 naming conventions](https://peps.python.org/pep-0008/#naming-conventions)
 Tags: Computer Science, CleanCode, Naming, Readability, Refactoring, SoftwareEngineering

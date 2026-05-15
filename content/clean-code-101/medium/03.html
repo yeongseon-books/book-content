@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>Small Functions</h1>
-<blockquote>
-<p>Clean Code 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How small is small enough?</p>
-<blockquote>
-<p>Small enough that "does one thing" is visible. The name carries that one thing.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.</p>
+<p>This is post 3 in the Clean Code 101 series.</p>
+<p>Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Four effects of small functions</li>
@@ -79,12 +72,8 @@
 <p>When functions shrink, names do the work.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    B[&quot;Giant function&quot;] --&gt; E[&quot;Extract&quot;]
-    E --&gt; S[&quot;Does one thing&quot;]
-    S --&gt; N[&quot;Good name&quot;]
-    N --&gt; R[&quot;Reuse and test&quot;]
-</code></pre>
+<p><img alt="Small Functions" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Small-function flow: extraction enables names, and names enable reuse and testing.</em></p>
 <p>Extraction enables names; names enable reuse.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -148,6 +137,20 @@ def discount(price: int, rate: float) -&gt; int:
     return int(price * (1 - rate))
 </code></pre>
 <p>Pure functions are one-line tests.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">radon cc app/ -a -s
+python -m pytest -q tests/test_checkout.py
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>You can compare complexity before and after extraction while keeping tests stable.</li>
+<li>The function body should read like a table of contents.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Argument count explodes after extraction.</li>
+<li>Query-style functions still mutate hidden state.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The body reads like a table of contents.</li>
@@ -206,6 +209,7 @@ def discount(price: int, rate: float) -&gt; int:
 <li><a href="https://refactoring.com/catalog/extractFunction.html">Refactoring — Extract Function</a></li>
 <li><a href="https://martinfowler.com/bliki/CommandQuerySeparation.html">Martin Fowler — Command Query Separation</a></li>
 <li><a href="https://refactoring.com/catalog/introduceParameterObject.html">Refactoring — Introduce Parameter Object</a></li>
+<li><a href="https://docs.python.org/3/library/dataclasses.html">Python dataclasses documentation</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, Functions, SRP, Refactoring, Readability</p>
 </body>

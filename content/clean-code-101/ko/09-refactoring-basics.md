@@ -18,12 +18,18 @@ tags:
   - LegacyCode
   - Quality
 seo_description: 안전한 리팩토링을 위한 특성화 테스트 활용법과 마틴 파울러의 핵심 기법을 통해 레거시 코드를 점진적으로 개선하는 절차를 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 리팩토링 기초
 
-리팩토링은 코드를 다시 쓰는 작업처럼 보이기 쉽지만, 실제로는 훨씬 더 작은 단위의 개선을 반복하는 일입니다. 이 글은 Clean Code 101 시리즈의 9번째 글입니다. 여기서는 리팩토링이 무엇이고 무엇이 아닌지, 그리고 레거시 코드에서도 안전하게 적용하는 절차를 정리하겠습니다.
+리팩토링은 코드를 다시 쓰는 작업처럼 보이기 쉽지만, 실제로는 훨씬 더 작은 단위의 개선을 반복하는 일입니다.
+
+이 글은 Clean Code 101 시리즈의 9번째 글입니다.
+
+여기서는 리팩토링이 무엇이고 무엇이 아닌지, 그리고 레거시 코드에서도 안전하게 적용하는 절차를 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,12 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    T["Tests pass"] --> R["Tiny refactor"]
-    R --> T2["Tests pass"]
-    T2 --> R2["Next step"]
-```
+![리팩토링 기초](../../../assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
+
+*리팩토링의 기본 리듬: 초록 테스트 사이를 작은 단계로 이동하며 구조를 바꿉니다.*
 
 작은 초록 상태에서 다음 초록 상태로 옮겨 가는 것이 리팩토링의 기본 리듬입니다.
 
@@ -144,6 +147,23 @@ class OrderPricing:
 
 리팩토링 PR과 기능 PR을 분리해야 리뷰도 쉬워지고, 문제 발생 시 원인도 빨리 좁힐 수 있습니다.
 
+## 검증 방법
+
+```bash
+python -m pytest -q tests/test_order_total.py
+python -m pytest -q tests/test_legacy_characterization.py
+```
+
+**기대 결과**
+
+- 현재 동작을 고정한 테스트가 먼저 초록이어야 합니다.
+- 추출, 이름 변경, 이동 뒤에도 테스트 결과가 같아야 합니다.
+
+## 실패하기 쉬운 지점
+
+- 기능 변경이 리팩토링 커밋 안에 함께 섞입니다.
+- 이름만 바꾸고 잘못 놓인 책임은 그대로 남아 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 매 단계 뒤에 테스트가 계속 초록 상태를 유지합니다.
@@ -207,5 +227,6 @@ class OrderPricing:
 - [Refactoring Catalog](https://refactoring.com/catalog/)
 - [Working Effectively with Legacy Code (M. Feathers)](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
 - [The Mikado Method](https://mikadomethod.info/)
-
+- [Refactoring catalog](https://refactoring.com/catalog/)
+- [Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
 Tags: Computer Science, CleanCode, Refactoring, Patterns, LegacyCode, Quality

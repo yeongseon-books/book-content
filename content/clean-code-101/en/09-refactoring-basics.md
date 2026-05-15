@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 9
 title: Refactoring Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - LegacyCode
   - Quality
 seo_description: Apply safe refactoring steps, the Fowler catalog, characterization tests, and incremental improvement to legacy code.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Refactoring Basics
 
-> Clean Code 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When should you stop refactoring?
-
-> When the next change is easier — not when the code looks cleaner.
+Refactoring looks risky when it is approached as a rewrite. It becomes manageable when every step is small enough that a failing test can tell you exactly where the move went wrong.
 
 This is post 9 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.
+
+---
 
 ## What You Will Learn
 
@@ -51,12 +47,9 @@ Refactoring is not rewriting. It improves internal structure while preserving ex
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    T["Tests pass"] --> R["Tiny refactor"]
-    R --> T2["Tests pass"]
-    T2 --> R2["Next step"]
-```
+![Refactoring Basics](../../../assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
+
+*Refactoring rhythm: move from one green test state to the next through small, reversible steps.*
 
 Small steps between green and green.
 
@@ -152,6 +145,23 @@ Raise cohesion.
 
 Make the change reviewable.
 
+## How to Verify This in a Real Codebase
+
+```bash
+python -m pytest -q tests/test_order_total.py
+python -m pytest -q tests/test_legacy_characterization.py
+```
+
+**Expected output**
+
+- Characterization tests should go green before structural changes begin.
+- Extraction, rename, and move steps must preserve the same result set.
+
+## Failure Modes to Watch
+
+- Feature changes slip into the same refactoring commit.
+- Names improve but misplaced responsibilities stay where they were.
+
 ## What to Notice in This Code
 
 - Tests stay green after every step.
@@ -215,5 +225,6 @@ Refactoring is an investment that lowers the next change's cost. The final episo
 - [Refactoring Catalog](https://refactoring.com/catalog/)
 - [Working Effectively with Legacy Code (M. Feathers)](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
 - [The Mikado Method](https://mikadomethod.info/)
-
+- [Refactoring catalog](https://refactoring.com/catalog/)
+- [Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
 Tags: Computer Science, CleanCode, Refactoring, Patterns, LegacyCode, Quality

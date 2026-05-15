@@ -54,17 +54,10 @@
 </head>
 <body>
 <h1>What Is Clean Code?</h1>
-<blockquote>
-<p>Clean Code 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How is working code different from clean code?</p>
-<blockquote>
-<p>Working is the minimum bar. Clean is consideration for the next person.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Most code problems do not show up when the code first runs. They show up a few weeks later, when someone tries to change it without breaking a nearby path.</p>
+<p>This is the first post in the Clean Code 101 series.</p>
+<p>Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.</p>
+<hr>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of clean code and four signals</li>
@@ -79,11 +72,8 @@
 <p>Clean code is the act of saving the next person's time.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    W[&quot;Works&quot;] --&gt; R[&quot;Readable&quot;]
-    R --&gt; C[&quot;Easy to change&quot;]
-    C --&gt; T[&quot;Trust&quot;]
-</code></pre>
+<p><img alt="What Is Clean Code?" src="https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Core clean-code flow: working code becomes readable code, then code that stays easy to change.</em></p>
 <p>Working is the start, trust is the end.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -138,6 +128,20 @@ def calculate_invoice_total(line_items):
 radon cc app/ -a -s
 </code></pre>
 <p>Cyclomatic complexity 10+ is a candidate for decomposition.</p>
+<h2>How to Verify This in a Real Codebase</h2>
+<pre><code class="language-bash">radon cc app/ -a -s
+ruff check app/
+</code></pre>
+<p><strong>Expected output</strong></p>
+<ul>
+<li>You can see which functions already sit in the high-complexity range.</li>
+<li>Naming, branching, and function-shape issues show up in one pass.</li>
+</ul>
+<h2>Failure Modes to Watch</h2>
+<ul>
+<li>Treating complexity as the only signal and ignoring naming or responsibility.</li>
+<li>Letting noisy lint debt hide the truly expensive design problems.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Names speak intent.</li>
@@ -196,6 +200,8 @@ radon cc app/ -a -s
 <li><a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php">A Philosophy of Software Design — John Ousterhout</a></li>
 <li><a href="https://martinfowler.com/books/refactoring.html">Refactoring — Martin Fowler</a></li>
 <li><a href="https://testing.googleblog.com/search/label/Code%20Health">Google — Code Health Articles</a></li>
+<li><a href="https://docs.astral.sh/ruff/rules/">Ruff rule reference</a></li>
+<li><a href="https://radon.readthedocs.io/en/latest/">radon documentation</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, CleanCode, Readability, SoftwareEngineering, CodeQuality, Refactoring</p>
 </body>

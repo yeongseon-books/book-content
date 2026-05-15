@@ -18,12 +18,18 @@ tags:
   - Refactoring
   - Readability
 seo_description: 가드 절과 조기 반환으로 중첩 조건문을 평평하게 고칩니다. 다형성으로 분기를 분리하고 복잡한 분기를 단순화해 가독성을 높이는 기법을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 조건문 줄이기
 
-조건문은 작은 기능을 빠르게 만들 때는 편하지만, 책임이 섞이기 시작하면 가장 먼저 복잡도를 폭발시키는 지점이 됩니다. 이 글은 Clean Code 101 시리즈의 4번째 글입니다. 여기서는 중첩된 if를 평평하게 만들고, 분기 자체를 다른 구조로 옮기는 방법을 정리하겠습니다.
+조건문은 작은 기능을 빠르게 만들 때는 편하지만, 책임이 섞이기 시작하면 가장 먼저 복잡도를 폭발시키는 지점이 됩니다.
+
+이 글은 Clean Code 101 시리즈의 4번째 글입니다.
+
+여기서는 중첩된 if를 평평하게 만들고, 분기 자체를 다른 구조로 옮기는 방법을 정리하겠습니다.
+
+---
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    N["Nested if"] --> G["Guard clause"]
-    G --> P["Polymorphism"]
-    P --> T["Table driven"]
-    T --> R["Flat flow"]
-```
+![조건문 줄이기](../../../assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
+
+*조건문 단순화의 흐름: 가드 절, 다형성, 테이블 방식이 분기 깊이를 줄여 핵심 흐름을 드러냅니다.*
 
 도구가 늘어날수록 분기 수는 줄고, 흐름은 더 평평해집니다.
 
@@ -138,7 +140,7 @@ class Square(Shape):
 def total_area(shapes): return sum(s.area() for s in shapes)
 ```
 
-타입에 따라 분기하는 if가 반복된다면, 대개 각 타입이 자기 행동을 가져가야 할 시점입니다.
+타입 분기가 반복되면, 각 타입이 자기 동작을 맡아야 할 때가 많습니다.
 
 ### Step 4 — Strategy pattern
 
@@ -165,6 +167,23 @@ def grade(score):
 ```
 
 분기가 사실상 데이터라면, 데이터 구조로 올리는 편이 맞습니다. 정책 테이블은 코드보다 변경이 덜 위험한 경우가 많습니다.
+
+## 검증 방법
+
+```bash
+radon cc app/pricing.py -s
+python -m pytest -q tests/test_pricing.py
+```
+
+**기대 결과**
+
+- 중첩을 줄인 뒤 복잡도와 테스트 안정성이 함께 확인됩니다.
+- 분기 정책을 테이블로 옮겨도 결과가 같아야 합니다.
+
+## 실패하기 쉬운 지점
+
+- 가드 절로 바꾸면서 예외 순서가 달라집니다.
+- 타입 분기를 감춘 채 이름만 더 예쁘게 바꿉니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
@@ -229,5 +248,4 @@ def grade(score):
 - [Refactoring — Replace Conditional with Polymorphism](https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html)
 - [Strategy Pattern (Refactoring Guru)](https://refactoring.guru/design-patterns/strategy)
 - [Clean Code (Ch. 3 Functions, Ch. 6 Objects)](https://www.oreilly.com/library/view/clean-code-a/9780136083238/)
-
 Tags: Computer Science, CleanCode, Conditionals, GuardClauses, Refactoring, Readability

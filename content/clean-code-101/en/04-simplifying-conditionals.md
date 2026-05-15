@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 4
 title: Simplifying Conditionals
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Refactoring
   - Readability
 seo_description: Use guard clauses, early return, polymorphism, and strategy to flatten nested if statements and reduce branching.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Simplifying Conditionals
 
-> Clean Code 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do nested if statements grow so fast?
-
-> Because one function carries more than one responsibility. Splitting responsibilities reduces depth.
+Nested conditionals usually reveal a deeper problem than awkward indentation. They show one function is carrying validation, policy, and type dispatch at the same time.
 
 This is post 4 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will flatten the easy cases with guard clauses, then move the harder cases into polymorphism, strategy objects, and tables so the main path stays visible.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ Nested conditionals are the most common source of complexity. Reducing depth by 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    N["Nested if"] --> G["Guard clause"]
-    G --> P["Polymorphism"]
-    P --> T["Table driven"]
-    T --> R["Flat flow"]
-```
+![Simplifying Conditionals](../../../assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
+
+*Conditional-simplification flow: guard clauses, polymorphism, and tables reduce branch depth and expose the main path.*
 
 More tools, fewer branches.
 
@@ -174,6 +166,23 @@ def grade(score):
 
 The if/elif chain becomes data.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/pricing.py -s
+python -m pytest -q tests/test_pricing.py
+```
+
+**Expected output**
+
+- Complexity should drop while tests keep the branch behavior stable.
+- Table-driven or strategy-based rules must produce the same result set.
+
+## Failure Modes to Watch
+
+- Reordering conditions changes the semantics while flattening.
+- Type checks are only renamed, not actually removed from the design.
+
 ## What to Notice in This Code
 
 - Guard clauses cut indentation.
@@ -237,5 +246,4 @@ Fewer conditions, clearer code. Next we tackle the second great enemy: duplicati
 - [Refactoring — Replace Conditional with Polymorphism](https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html)
 - [Strategy Pattern (Refactoring Guru)](https://refactoring.guru/design-patterns/strategy)
 - [Clean Code (Ch. 3 Functions, Ch. 6 Objects)](https://www.oreilly.com/library/view/clean-code-a/9780136083238/)
-
 Tags: Computer Science, CleanCode, Conditionals, GuardClauses, Refactoring, Readability

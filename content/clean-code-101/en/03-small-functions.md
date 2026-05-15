@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 3
 title: Small Functions
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - Refactoring
   - Readability
 seo_description: Why small functions help, doing one thing only, the extract function procedure, and how to remove side effects.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Small Functions
 
-> Clean Code 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How small is small enough?
-
-> Small enough that "does one thing" is visible. The name carries that one thing.
+Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.
 
 This is post 3 in the Clean Code 101 series.
 
-<!-- a-grade-intro:end -->
+Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
+
+---
 
 ## What You Will Learn
 
@@ -51,13 +47,9 @@ A small function explains itself by name. A large function asks for comments, an
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    B["Giant function"] --> E["Extract"]
-    E --> S["Does one thing"]
-    S --> N["Good name"]
-    N --> R["Reuse and test"]
-```
+![Small Functions](../../../assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
+
+*Small-function flow: extraction enables names, and names enable reuse and testing.*
 
 Extraction enables names; names enable reuse.
 
@@ -152,6 +144,23 @@ def discount(price: int, rate: float) -> int:
 
 Pure functions are one-line tests.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/ -a -s
+python -m pytest -q tests/test_checkout.py
+```
+
+**Expected output**
+
+- You can compare complexity before and after extraction while keeping tests stable.
+- The function body should read like a table of contents.
+
+## Failure Modes to Watch
+
+- Argument count explodes after extraction.
+- Query-style functions still mutate hidden state.
+
 ## What to Notice in This Code
 
 - The body reads like a table of contents.
@@ -215,5 +224,5 @@ Small functions enable names and tests. Next, the chief reason for big functions
 - [Refactoring — Extract Function](https://refactoring.com/catalog/extractFunction.html)
 - [Martin Fowler — Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html)
 - [Refactoring — Introduce Parameter Object](https://refactoring.com/catalog/introduceParameterObject.html)
-
+- [Python dataclasses documentation](https://docs.python.org/3/library/dataclasses.html)
 Tags: Computer Science, CleanCode, Functions, SRP, Refactoring, Readability

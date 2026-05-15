@@ -2,7 +2,7 @@
 series: clean-code-101
 episode: 1
 title: What Is Clean Code?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,18 @@ tags:
   - CodeQuality
   - Refactoring
 seo_description: What clean code actually means, the link between readability, intent, and the cost of change, and a small set of measurable signals.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Clean Code?
 
-> Clean Code 101 series (1/10)
+Most code problems do not show up when the code first runs. They show up a few weeks later, when someone tries to change it without breaking a nearby path.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Clean Code 101 series.
 
-**Core question**: How is working code different from clean code?
+Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.
 
-> Working is the minimum bar. Clean is consideration for the next person.
-
-This is post 1 in the Clean Code 101 series.
-
-<!-- a-grade-intro:end -->
+---
 
 ## What You Will Learn
 
@@ -51,12 +47,9 @@ Code is written once and read a hundred times. Readability decides the cost of c
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    W["Works"] --> R["Readable"]
-    R --> C["Easy to change"]
-    C --> T["Trust"]
-```
+![defining clean code](../../../assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
+
+*Core clean-code flow: working code becomes readable code, then code that stays easy to change.*
 
 Working is the start, trust is the end.
 
@@ -142,6 +135,23 @@ radon cc app/ -a -s
 
 Cyclomatic complexity 10+ is a candidate for decomposition.
 
+## How to Verify This in a Real Codebase
+
+```bash
+radon cc app/ -a -s
+ruff check app/
+```
+
+**Expected output**
+
+- You can see which functions already sit in the high-complexity range.
+- Naming, branching, and function-shape issues show up in one pass.
+
+## Failure Modes to Watch
+
+- Treating complexity as the only signal and ignoring naming or responsibility.
+- Letting noisy lint debt hide the truly expensive design problems.
+
 ## What to Notice in This Code
 
 - Names speak intent.
@@ -205,5 +215,6 @@ Clean code is the sum of small, measurable principles. Next, we look at the sing
 - [A Philosophy of Software Design — John Ousterhout](https://web.stanford.edu/~ouster/cgi-bin/aposd.php)
 - [Refactoring — Martin Fowler](https://martinfowler.com/books/refactoring.html)
 - [Google — Code Health Articles](https://testing.googleblog.com/search/label/Code%20Health)
-
+- [Ruff rule reference](https://docs.astral.sh/ruff/rules/)
+- [radon documentation](https://radon.readthedocs.io/en/latest/)
 Tags: Computer Science, CleanCode, Readability, SoftwareEngineering, CodeQuality, Refactoring
