@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 7
 title: Identity and Security
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - AWS
   - Architecture
 seo_description: IAM users, roles, policies, MFA, and KMS — cloud security fundamentals taught with least-privilege boto3 examples for beginners.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Identity and Security
 
-> Cloud Computing 101 series (7/10)
+Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When and how do IAM *users* and *roles* differ in practice?
-
-> *Cloud security starts with least privilege, runs on role-based delegation, and protects data with encryption plus key management.*
+That is why IAM matters so much. In API-driven infrastructure, identity is not a side concern. It is the operating model that decides who may call what, from where, and for how long.
 
 This is post 7 in the Cloud Computing 101 series.
 
-<!-- a-grade-intro:end -->
+In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.
 
-## What You Will Learn
+> Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.
+
+## Questions This Chapter Answers
 
 - IAM users, groups, roles, and policies
 - The least privilege principle
@@ -48,14 +46,9 @@ Most security incidents start with excessive permissions and forgotten keys. Sol
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["user"] --> Group["group"]
-    Group --> Policy["policy"]
-    App["app/ec2"] --> Role["role"]
-    Role --> Policy
-    Policy --> Resource["resource"]
-```
+![Core IAM relationship between users, roles, policies, and protected resources](../../../assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
+
+*Core IAM relationship between users, roles, policies, and protected resources*
 
 ## Key Terms
 
@@ -134,6 +127,27 @@ def attach(role_name, policy_arn):
 - A role needs both a *trust* policy and a *permissions* policy.
 - Keep `Resource` as narrow as possible.
 - Avoid wildcards in `Action`.
+
+## How to Verify This Example
+
+In IAM, the most useful verification step is reading the trust relationship and the attached permission scope separately. That is where the conceptual difference between roles and policies becomes operationally obvious.
+
+```bash
+aws iam get-role --role-name my-app-role
+aws iam list-attached-role-policies --role-name my-app-role
+```
+
+**Expected output:**
+
+- `AssumeRolePolicyDocument` should show `ec2.amazonaws.com` as the trusted principal.
+- The attached-policy list should include the least-privilege policy ARN you created.
+- You need both outputs to answer the two different questions: who may assume the role, and what may the role do after assumption.
+
+### Where teams usually get stuck
+
+- A permissions policy without the right trust policy creates a role that nobody can actually use.
+- `Action: *` feels fast today and expensive during every later audit.
+- Long-lived user keys become an operational liability long before they become a public incident.
 
 ## Five Common Mistakes
 

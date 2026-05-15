@@ -2,7 +2,7 @@
 series: cloud-computing-101
 episode: 10
 title: Cloud Architecture Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,22 @@ tags:
   - AWS
   - DevOps
 seo_description: The five Well-Architected pillars and a layered web architecture pattern — closing out Cloud Computing 101 with a practical reference design.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Cloud Architecture Basics
 
-> Cloud Computing 101 series (10/10)
+By the end of a cloud fundamentals series, the risk is thinking in product lists instead of systems. Compute, storage, networking, security, monitoring, and cost all make sense individually, but production architecture begins when those pieces reinforce each other inside one design.
 
-<!-- a-grade-intro:begin -->
+That is why architecture basics matter. Strong cloud systems are not impressive because they use many services. They are impressive because change is safe, failure stays localized, and the operating model can be repeated by the team.
 
-**Core question**: How do all the pieces from this series stitch together into one well-built cloud system?
+This is the final post in the Cloud Computing 101 series.
 
-> *Anchor on the five Well-Architected pillars (operations, security, reliability, performance, cost), then assemble a layered, loosely coupled design.*
+In this post, we'll pull the series together through the Well-Architected pillars and a layered reference design you can reuse as a review lens.
 
-This is post 10 in the Cloud Computing 101 series.
+> Cloud architecture is the discipline of turning separate service choices into one coherent operating system for reliability, security, performance, and cost.
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The five Well-Architected pillars
 - A layered web architecture pattern
@@ -48,15 +46,9 @@ The same feature can cost ten times more or ten times less depending on the arch
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Client["client"] --> CDN["cdn"]
-    CDN --> ALB["load balancer"]
-    ALB --> App["app (asg)"]
-    App --> Cache["cache"]
-    App --> DB["rds (multi-az)"]
-    App --> S3["s3"]
-```
+![A layered web architecture with CDN, load balancer, stateless app tier, and data services](../../../assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
+
+*A layered web architecture with CDN, load balancer, stateless app tier, and data services*
 
 ## Key Terms
 
@@ -112,6 +104,22 @@ def alb(): return {"listeners": [{"port": 443, "tls": True}], "target": "asg"}
 - Multi-AZ is the default, not a feature flag.
 - A DLQ is your retry safety net.
 - Stateless is the precondition for ASG to actually work.
+
+## How to Verify This Design
+
+In an architecture chapter, verification is mostly about whether the design explains safe behavior under change, failure, and recovery. Read each layer and ask what it protects you from operationally.
+
+**Expected output:**
+
+- You should be able to explain why the app tier can scale horizontally without breaking user state.
+- You should be able to point to which resources absorb retries, which preserve data, and which carry Multi-AZ responsibility.
+- You should be able to justify the queue and DLQ as failure-isolation tools rather than decorative components.
+
+### Questions to ask in a real review
+
+- Where does a single point of failure still remain?
+- Which changes still require manual intervention, and how would IaC reduce that risk?
+- When reliability and cost goals pull in opposite directions, which principle wins for this workload?
 
 ## Five Common Mistakes
 

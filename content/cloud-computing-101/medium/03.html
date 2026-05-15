@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Region and Availability Zone</h1>
+<p>Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.</p>
+<p>In cloud systems, choosing where something runs is not a cosmetic decision. It sets the floor for latency, shapes your failover blast radius, and determines how expensive replication will become later.</p>
+<p>This is post 3 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.</p>
 <blockquote>
-<p>Cloud Computing 101 series (3/10)</p>
+<p>A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the same AWS service stay alive when one region fails for some teams but go down for others?</p>
-<blockquote>
-<p><em>A region is a geographic location, an AZ is a physically isolated cluster of data centers — distributing across AZs is the foundation of high availability.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>Region vs AZ vs Edge</li>
 <li>What Multi-AZ really means</li>
@@ -76,14 +72,8 @@
 <h2>Why It Matters</h2>
 <p>If everything sits in one AZ, a single data center fire takes down your service. Distribution is the <em>prerequisite</em> for availability.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[&quot;us-east-1 region&quot;] --&gt; A[&quot;az a&quot;]
-    R --&gt; B[&quot;az b&quot;]
-    R --&gt; C[&quot;az c&quot;]
-    A --&gt; DC1[&quot;data center&quot;]
-    B --&gt; DC2[&quot;data center&quot;]
-    C --&gt; DC3[&quot;data center&quot;]
-</code></pre>
+<p><img alt="A Region contains multiple Availability Zones that separate failure boundaries" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>A Region contains multiple Availability Zones that separate failure boundaries</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Region</strong>: a continent- or city-scale location.</li>
@@ -130,6 +120,23 @@ print(placement([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 5))
 <li>AZ names are mapped <em>per account</em> — your <code>az a</code> may not be mine.</li>
 <li>RTT has a hard physical floor.</li>
 <li>Round-robin spreading is dumb but effective.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>Placement concepts become easier to trust once you inspect your own account. AZ names are especially important to verify because the labels are account-mapped and should not be treated as a universal physical coordinate.</p>
+<pre><code class="language-bash">python -c 'import boto3; print([z[&quot;ZoneName&quot;] for z in boto3.client(&quot;ec2&quot;, region_name=&quot;us-east-1&quot;).describe_availability_zones()[&quot;AvailabilityZones&quot;]])'
+python -c 'import boto3; print([r[&quot;RegionName&quot;] for r in boto3.client(&quot;ec2&quot;).describe_regions()[&quot;Regions&quot;]][:5])'
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>The first command should return AZ names such as <code>us-east-1a</code>, <code>us-east-1b</code>, and <code>us-east-1c</code>.</li>
+<li>The second should list accessible AWS Regions.</li>
+<li>Seeing both outputs side by side makes the Region/AZ hierarchy much more concrete than the definition alone.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>A service is not really Multi-AZ if the database, cache, or queue still sits behind a single failure boundary.</li>
+<li>Multi-Region is not automatically better. Replication and operational overhead have to be worth it.</li>
+<li>The RTT helper is a back-of-the-envelope floor, not a production benchmark.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

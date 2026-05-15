@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Storage</h1>
+<p>S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data, but they are optimized for very different access patterns, durability expectations, and recovery trade-offs.</p>
+<p>Storage mistakes often stay hidden at first. The system seems fine until backup, restore, sharing, or long-term retention turns into the expensive part of the design. Picking the right storage tier early prevents a surprising amount of later rework.</p>
+<p>This is post 5 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll compare object, block, file, and archive storage and connect each one to the workload shape it actually fits.</p>
 <blockquote>
-<p>Cloud Computing 101 series (5/10)</p>
+<p>Storage is not just where data sits. It is part of the operating contract for latency, recovery time, cost, and sharing semantics.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why do S3, EBS, EFS, and Glacier all exist <em>separately</em>?</p>
-<blockquote>
-<p><em>Cloud storage splits into object, block, file, and archive based on access pattern and durability/cost tradeoffs.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The four storage types</li>
 <li>Durability vs availability</li>
@@ -76,12 +72,8 @@
 <h2>Why It Matters</h2>
 <p>The wrong storage choice is <em>expensive, slow, and fragile</em>. The right one quietly works for years.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Block[&quot;block (EBS)&quot;] --&gt; VM[&quot;vm disk&quot;]
-    Object[&quot;object (S3)&quot;] --&gt; Web[&quot;web/api&quot;]
-    File[&quot;file (EFS)&quot;] --&gt; Share[&quot;multi-host share&quot;]
-    Archive[&quot;archive (Glacier)&quot;] --&gt; Cold[&quot;compliance&quot;]
-</code></pre>
+<p><img alt="Block, object, file, and archive storage split by access pattern and operating need" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Block, object, file, and archive storage split by access pattern and operating need</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Object</strong>: key-value with metadata (S3).</li>
@@ -129,6 +121,22 @@ s3 = boto3.client(&quot;s3&quot;)
 <li>Prefixes group objects under a policy.</li>
 <li>Transitions are how you actually save money.</li>
 <li>EBS is typically attached to a single VM at a time.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>A lifecycle policy only matters when it is truly attached to the bucket and scoped to the intended object prefix. Otherwise the cost optimization story exists in code review but never reaches production data.</p>
+<pre><code class="language-bash">aws s3api get-bucket-lifecycle-configuration --bucket my-test-bucket-2026
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>You should see a rule ID such as <code>to-glacier-after-90d</code>.</li>
+<li>The <code>logs/</code> prefix and <code>GLACIER</code> transition should both be present.</li>
+<li>That confirmation is what turns lifecycle from documentation into an operating control.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>Bucket policy and lifecycle policy solve different problems: access control versus storage-tier movement.</li>
+<li>Glacier is cheap because retrieval is slower. Restore time belongs in the design conversation.</li>
+<li>EFS is a shared file system, not a drop-in replacement for high-IOPS block storage.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

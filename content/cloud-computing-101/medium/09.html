@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Cost Management</h1>
+<p>Cloud lets you create infrastructure quickly, which also means you can create cost quickly. Surprise invoices are common not because the cloud is mysterious, but because visibility, ownership, and cleanup policies were weak from the start.</p>
+<p>Cost control works best when engineers treat it as a design signal instead of a finance report. If the bill is invisible, no one can improve it. If ownership is unclear, drift becomes normal.</p>
+<p>This is post 9 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a practical framework for engineering-led cost control.</p>
 <blockquote>
-<p>Cloud Computing 101 series (9/10)</p>
+<p>FinOps starts with visibility, not discounts. Make cost attributable first, then automate alerts, commitments, and cleanup around real usage patterns.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the cloud bill always come in higher than predicted?</p>
-<blockquote>
-<p><em>Cloud cost is tamed in four steps — visibility (tags), budgets (alerts), commitments (Savings), and optimization (rightsizing).</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>Cloud cost basics</li>
 <li>Cost allocation through tags</li>
@@ -76,12 +72,8 @@
 <h2>Why It Matters</h2>
 <p>A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Tag[&quot;tag&quot;] --&gt; Visibility[&quot;visibility&quot;]
-    Budget[&quot;budget&quot;] --&gt; Alert[&quot;alert&quot;]
-    Savings[&quot;savings plan&quot;] --&gt; Discount[&quot;discount&quot;]
-    Right[&quot;right-size&quot;] --&gt; Saving[&quot;saving&quot;]
-</code></pre>
+<p><img alt="The basic cost-control loop of visibility, alerts, commitments, and optimization" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>The basic cost-control loop of visibility, alerts, commitments, and optimization</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Tag</strong>: a key-value label attached to a resource.</li>
@@ -139,6 +131,22 @@ account_id = boto3.client(&quot;sts&quot;).get_caller_identity()[&quot;Account&q
 <li>An 80% alert gives you reaction time.</li>
 <li>A tag-enforcement policy is a precondition for cost tracking.</li>
 <li>Budgets can be scoped per team.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>Budgets and tag enforcement are easy to declare and easy to forget. Verify that the budget exists with the right threshold and remember that alerts are only useful when ownership for the response is also clear.</p>
+<pre><code class="language-bash">aws budgets describe-budget --account-id &quot;$ACCOUNT_ID&quot; --budget-name monthly-cap
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li>The budget should show a <code>500 USD</code> monthly limit.</li>
+<li>The 80% notification threshold should be visible in the response.</li>
+<li>Without a tag-enforcement policy, the report may still tell you what cost happened without telling you who created it.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>Budgets warn; they do not automatically block spend.</li>
+<li>Savings Plans are safest after you have observed stable demand instead of guessed it.</li>
+<li>NAT and data-transfer charges often grow outside the application code path, so architecture review has to surface them deliberately.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>

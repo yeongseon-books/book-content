@@ -54,18 +54,14 @@
 </head>
 <body>
 <h1>Monitoring</h1>
+<p>If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.</p>
+<p>Good monitoring is not about collecting everything. It is about connecting three questions quickly: what changed, why it changed, and who should respond first.</p>
+<p>This is post 8 in the Cloud Computing 101 series.</p>
+<p>In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.</p>
 <blockquote>
-<p>Cloud Computing 101 series (8/10)</p>
+<p>Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When do you reach for metrics, logs, or traces — and which tool answers each question?</p>
-<blockquote>
-<p><em>Monitoring makes a system observable through three axes — numbers (metrics), text (logs), and flow (traces).</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>Metrics vs logs vs traces</li>
 <li>CloudWatch basics</li>
@@ -76,13 +72,8 @@
 <h2>Why It Matters</h2>
 <p>Without monitoring, your <em>customers</em> tell you about outages first. A single well-tuned alarm protects entire weekends.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;app&quot;] --&gt; Logs[&quot;log&quot;]
-    App --&gt; Metric[&quot;metric&quot;]
-    Metric --&gt; Alarm[&quot;alarm&quot;]
-    Alarm --&gt; SNS[&quot;sns/email&quot;]
-    Logs --&gt; Insight[&quot;query&quot;]
-</code></pre>
+<p><img alt="Monitoring flow from application signals to alarms, notifications, and log analysis" src="https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Monitoring flow from application signals to alarms, notifications, and log analysis</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a numeric time series (CPU, latency).</li>
@@ -136,6 +127,22 @@ sns = boto3.client(&quot;sns&quot;)
 <li><code>Period</code> and <code>EvaluationPeriods</code> together set sensitivity.</li>
 <li>Custom metrics let you alert on business signals.</li>
 <li>Topics decouple alarms from recipients.</li>
+</ul>
+<h2>How to Verify This Example</h2>
+<p>The interesting part of an alarm is not that it exists. It is whether you can explain exactly when it fires. Reading <code>Period</code>, <code>EvaluationPeriods</code>, and <code>Threshold</code> together is what separates a useful alarm from either noise or silence.</p>
+<pre><code class="language-bash">aws cloudwatch describe-alarms --alarm-names high-cpu-demo
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<ul>
+<li><code>MetricName</code> should be <code>CPUUtilization</code>.</li>
+<li>You should see <code>Period=60</code>, <code>EvaluationPeriods=5</code>, and <code>Threshold=80</code>.</li>
+<li>If the SNS email subscription was never confirmed, the alarm may exist while notifications still never reach a human.</li>
+</ul>
+<p><strong>Where teams usually get stuck</strong></p>
+<ul>
+<li>More alarms do not automatically create better observability. Unactionable alerts train teams to ignore the system.</li>
+<li>Log retention defaults can quietly turn into a cost problem.</li>
+<li>Infrastructure metrics alone can miss a business outage that is obvious in application signals.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
