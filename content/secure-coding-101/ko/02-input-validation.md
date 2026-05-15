@@ -17,7 +17,7 @@ tags:
   - OWASP
   - AppSec
 seo_description: Allowlist, schema 기반 검증, 경계 정책 그리고 안전한 입력 처리의 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 입력값 검증
@@ -46,14 +46,9 @@ OWASP Top 10의 상당수 항목은 결국 서버가 입력을 너무 쉽게 신
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Client["Client"] --> Edge["Edge checks"]
-    Edge --> Schema["Schema validation"]
-    Schema --> Business["Business rules"]
-    Business --> Storage["Storage"]
-```
+![입력 검증을 경계, 스키마, 비즈니스 규칙으로 나눈 흐름](../../../assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png)
 
+*입력 검증을 경계, 스키마, 비즈니스 규칙으로 나눈 흐름*
 이 흐름에서 핵심은 검증이 한 번에 끝나는 단일 필터가 아니라는 점입니다. 경계에서 기본 형식을 걸러 내고, 스키마에서 payload의 모양을 고정하고, 그다음 비즈니스 규칙에서 도메인 제약을 확인합니다. 세 층이 분리돼야 각 단계의 책임이 분명해집니다.
 
 ## 핵심 용어
@@ -198,5 +193,6 @@ def handle_signup(payload: dict):
 - [Pydantic docs](https://docs.pydantic.dev/)
 - [OWASP — Mass Assignment](https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html)
 - [PortSwigger — Input validation](https://portswigger.net/web-security)
+- [Unicode Technical Standard #39 — Unicode Security Mechanisms](https://unicode.org/reports/tr39/)
 
 Tags: InputValidation, SecureCoding, Pydantic, OWASP, AppSec

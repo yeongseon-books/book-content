@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Managing Dependency Vulnerabilities</h1>
+<p>Modern services depend more on external code than on code written directly by the team shipping the feature. HTTP clients, template engines, ORM layers, CLI tooling, and build dependencies all become part of the runtime we are responsible for. When one of them fails, the incident does not belong to a vendor anymore. It belongs to the service that deployed it.</p>
 <p>This is post 9 in the Secure Coding 101 series.</p>
+<p>Here, we will frame dependency management as supply-chain control rather than occasional version cleanup. Lockfiles, SBOMs, SCA gates, and small automated updates all serve one goal: keeping the build reproducible and the incident blast radius knowable.</p>
 <blockquote>
-<p>Secure Coding 101 series (9/10)</p>
+<p>Dependencies are not attachments around our code. Once deployed, they are part of our codebase and part of our responsibility.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Most of our code was <em>written by someone else</em>. Who is responsible for <em>its security</em>?</p>
-<blockquote>
-<p><em>Dependencies are </em>part of our code<em>. Their flaws </em>become our flaws<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>What <em>SCA</em> (Software Composition Analysis) means</li>
 <li>The role of an <em>SBOM</em></li>
@@ -80,12 +74,8 @@
 <p><em>Dependencies are </em>assets that will leak someday<em>. Tracking them is the start of defense.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Manifest[&quot;pyproject.toml&quot;] --&gt; Lock[&quot;lockfile&quot;]
-    Lock --&gt; SCA[&quot;SCA scan&quot;]
-    SCA --&gt; Alerts[&quot;Vulnerability alerts&quot;]
-    Alerts --&gt; Update[&quot;Update PRs&quot;]
-</code></pre>
+<p><img alt="The supply-chain defense flow from manifest to lockfile, SCA, and update PRs" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>The supply-chain defense flow from manifest to lockfile, SCA, and update PRs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SCA</strong>: scanning dependencies for <em>known vulnerabilities</em>.</li>
@@ -177,6 +167,7 @@ updates:
 <li><a href="https://github.com/pypa/pip-audit">pip-audit</a></li>
 <li><a href="https://osv.dev/">OSV.dev</a></li>
 <li><a href="https://cyclonedx.org/">CycloneDX SBOM</a></li>
+<li><a href="https://pip.pypa.io/en/stable/topics/repeatable-installs/">PyPA — Repeatable Installs</a></li>
 </ul>
 <p class="tags-line">Tags: Dependencies, SCA, SBOM, SupplyChain, SecureCoding</p>
 </body>

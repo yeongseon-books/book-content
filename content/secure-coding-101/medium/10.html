@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Safe Logging and Audit</h1>
+<p>When an incident lands, the team's first questions are usually simple: when did it start, who touched the resource, what changed first, and what spread next? If the logs cannot answer those questions, recovery slows down immediately. If the logs answer them by leaking passwords, tokens, or internal secrets, the evidence turns into a second incident.</p>
 <p>This is the final post in the Secure Coding 101 series.</p>
+<p>Here, we will treat logging as an evidence system rather than a convenience feature. That means designing for structured search, sensitive-field masking, audit-log separation, append-only storage, and retention rules that keep investigations possible without turning logs into a long-lived liability.</p>
 <blockquote>
-<p>Secure Coding 101 series (10/10)</p>
+<p>Logs are evidence and risk at the same time. Safe logging requires precise records, deliberate non-recording of secrets, and storage that resists tampering.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When an incident hits, can we <em>reconstruct exactly what happened</em>? And does that record <em>avoid becoming the attacker's ladder</em>?</p>
-<blockquote>
-<p><em>Logs are </em>evidence and risk<em>. Real logging needs </em>masking<em> and </em>tamper evidence<em> together.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The difference between <em>application log</em> and <em>audit log</em></li>
 <li><em>Sensitive-field masking</em> policy</li>
@@ -80,12 +74,8 @@
 <p><em>Record everything precisely. Never record secrets.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    App[&quot;App&quot;] --&gt;|JSON log| Mask[&quot;Masking&quot;]
-    Mask --&gt; Storage[&quot;Immutable storage&quot;]
-    Storage --&gt; SIEM[&quot;SIEM / alerts&quot;]
-    Audit[&quot;Auth / authz / payments&quot;] --&gt; Storage
-</code></pre>
+<p><img alt="The audit flow across structured logs, masking, immutable storage, and SIEM" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>The audit flow across structured logs, masking, immutable storage, and SIEM</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Application log</strong>: ordinary logs for <em>debugging and operations</em>.</li>
@@ -127,6 +117,13 @@ aws s3api put-object-lock-configuration ...
 - audit log: 1+ year (per regulation)
 - integrity check every quarter
 </code></pre>
+<h2>Building an investigation timeline from real events</h2>
+<p>The most useful logging pattern is one that lets you reconstruct a sequence quickly, not one that merely stores a lot of text.</p>
+<pre><code class="language-json">{&quot;ts&quot;:&quot;2026-05-15T09:00:11Z&quot;,&quot;event&quot;:&quot;login&quot;,&quot;user_id&quot;:&quot;u-42&quot;,&quot;request_id&quot;:&quot;r-100&quot;}
+{&quot;ts&quot;:&quot;2026-05-15T09:00:15Z&quot;,&quot;event&quot;:&quot;role_change&quot;,&quot;actor_id&quot;:&quot;admin-7&quot;,&quot;target_user_id&quot;:&quot;u-42&quot;,&quot;request_id&quot;:&quot;r-101&quot;}
+{&quot;ts&quot;:&quot;2026-05-15T09:01:02Z&quot;,&quot;event&quot;:&quot;export_started&quot;,&quot;user_id&quot;:&quot;u-42&quot;,&quot;request_id&quot;:&quot;r-102&quot;}
+</code></pre>
+<p>With stable IDs and UTC timestamps, the incident question changes from "what even happened?" to "was this role change expected, and which export followed it?" That is exactly the kind of reader value an audit log is supposed to provide.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Audit log</em> is <em>separate</em> from the application log.</li>
@@ -184,6 +181,7 @@ aws s3api put-object-lock-configuration ...
 <li><a href="https://csrc.nist.gov/publications/detail/sp/800-92/final">NIST 800-92 — Log Management</a></li>
 <li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Logging</a></li>
 <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html">AWS S3 Object Lock</a></li>
+<li><a href="https://opentelemetry.io/docs/specs/otel/logs/data-model/">OpenTelemetry Logs Data Model</a></li>
 </ul>
 <p class="tags-line">Tags: Logging, AuditLog, SecureCoding, Compliance, SIEM</p>
 </body>

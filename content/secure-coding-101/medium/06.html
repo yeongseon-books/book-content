@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Secret and Key Management</h1>
+<p>Secrets tend to stay invisible right up to the moment they become the most expensive line in the incident report. A database password in a repository, a signing key copied across environments, or a CI job that prints environment variables can leave a system operational on the surface while making it extremely fragile to recover once something leaks.</p>
 <p>This is post 6 in the Secure Coding 101 series.</p>
+<p>In this chapter, we will treat secret handling as an operating model rather than a storage trick: separation from code, central secret storage, access control, masking, rotation, and post-leak recovery. That wider frame is what distinguishes a merely hidden secret from a recoverable one.</p>
 <blockquote>
-<p>Secure Coding 101 series (6/10)</p>
+<p>Secrets belong outside the codebase, with short lifetimes, explicit access control, and a rotation path you can execute under pressure.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Where do we put secrets so we can <em>rotate them anytime</em> and <em>never leak them by accident</em>?</p>
-<blockquote>
-<p><em>Secrets must live </em>outside the code<em>, stay </em>short-lived<em>, and be </em>rotatable any time<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>What counts as a <em>secret</em></li>
 <li>Why <em>hard-coded</em> secrets are dangerous</li>
@@ -80,11 +74,8 @@
 <p><em>Design every secret on the assumption that it </em>will leak someday<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;Code&quot;] --&gt;|read| Env[&quot;Env vars&quot;]
-    Env --&gt;|fetch| Vault[&quot;Secret manager&quot;]
-    Vault --&gt; Rotate[&quot;Periodic rotation&quot;]
-</code></pre>
+<p><img alt="The flow that keeps secrets outside the code and under managed rotation" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>The flow that keeps secrets outside the code and under managed rotation</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Secret</strong>: API keys, DB passwords, tokens — <em>values that are dangerous when known</em>.</li>
@@ -118,6 +109,21 @@ aws secretsmanager rotate-secret --secret-id prod/db
     return s[:keep] + &quot;*&quot; * (len(s) - keep)
 print(&quot;API key:&quot;, mask(API_KEY))
 </code></pre>
+<h2>When rotation fails in production</h2>
+<p>Rotation usually breaks not because the secret manager cannot mint a new value, but because the surrounding system still assumes the old one.</p>
+<pre><code class="language-text">Failure mode: new DB password issued, app still uses pooled old connections
+What to verify:
+1. connection pool recycle / reload timing
+2. rollout order across workers and jobs
+3. old credential revocation delay
+
+Failure mode: JWT signing key changed, old tokens fail immediately
+What to verify:
+1. overlapping key IDs (kid) during transition
+2. grace period for active sessions
+3. cache invalidation in API gateways
+</code></pre>
+<p>These checks matter because secret rotation is successful only when the application can survive it without guesswork. A secret that is easy to create but hard to rotate is still operational debt.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A <em>secret manager</em> makes <em>access auditing</em> the default.</li>
@@ -175,6 +181,7 @@ print(&quot;API key:&quot;, mask(API_KEY))
 <li><a href="https://developer.hashicorp.com/vault/docs">HashiCorp Vault</a></li>
 <li><a href="https://docs.aws.amazon.com/secretsmanager/">AWS Secrets Manager</a></li>
 <li><a href="https://docs.github.com/en/code-security/secret-scanning">GitHub — Secret scanning</a></li>
+<li><a href="https://12factor.net/config">The Twelve-Factor App — Config</a></li>
 </ul>
 <p class="tags-line">Tags: Secrets, KeyManagement, Vault, SecureCoding, DevSecOps</p>
 </body>

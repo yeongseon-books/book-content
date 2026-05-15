@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>SQL Injection and Safe ORM Usage</h1>
+<p>SQL injection is old, but it remains expensive because one mistake can hand over not just a page or a user account, but the entire database behind the application. A single f-string in the wrong place can become an authentication bypass, a data dump, and a destructive write path at the same time.</p>
 <p>This is post 7 in the Secure Coding 101 series.</p>
+<p>Here, we will treat SQL injection as a structural error in how code combines syntax and data, not as a problem that disappears automatically once an ORM is in place. That distinction is what helps you reason clearly about raw SQL, dynamic identifiers, ORM escape hatches, and database account permissions.</p>
 <blockquote>
-<p>Secure Coding 101 series (7/10)</p>
+<p>SQL injection almost always comes from the same root cause: building SQL by string composition instead of sending data as data.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Twenty-five years on, why is <em>SQL injection still the top issue</em>?</p>
-<blockquote>
-<p><em>The cause is always the same — </em>building SQL by string concatenation<em>. So is the fix — </em>use parameters<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>How <em>SQL injection</em> works</li>
 <li>Why <em>parameterized queries</em> matter</li>
@@ -80,12 +74,8 @@
 <p><em>If SQL is built from string concatenation, it </em>will leak<em> one day.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Input[&quot;User input&quot;] --&gt;|concat| Bad[&quot;SQL string&quot;]
-    Bad --&gt; Vuln[&quot;Vulnerable (SQLi)&quot;]
-    Input --&gt;|parameter| Good[&quot;Prepared statement&quot;]
-    Good --&gt; Safe[&quot;Safe&quot;]
-</code></pre>
+<p><img alt="The difference between string-built SQL and parameterized SQL" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>The difference between string-built SQL and parameterized SQL</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>SQL Injection</strong>: input that <em>changes the meaning</em> of the SQL.</li>
@@ -123,6 +113,17 @@ def order_by(field):
 <pre><code class="language-sql">-- The app account does DML only; DDL belongs to a separate account.
 GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 </code></pre>
+<h2>How to verify the query path before production</h2>
+<p>It is worth checking the dangerous cases explicitly instead of assuming the ORM got everything right.</p>
+<pre><code class="language-python">payload = &quot;' OR 1=1 --&quot;
+
+# Safe path: returns only matching rows for the literal payload value
+cursor.execute(&quot;SELECT id FROM users WHERE name=%s&quot;, (payload,))
+
+# Unsafe path: payload changes the SQL itself
+sql = f&quot;SELECT id FROM users WHERE name='{payload}'&quot;
+</code></pre>
+<p><strong>Expected result:</strong> the parameterized version treats the payload as a string value and returns either zero or legitimate matches. The interpolated version changes the query meaning and can return unintended rows. This is the fastest possible demonstration to keep in a team code review.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>String concatenation</em> into SQL is a <em>red flag</em> every time.</li>
@@ -180,6 +181,7 @@ GRANT SELECT, INSERT, UPDATE ON db.* TO 'app'@'%';
 <li><a href="https://portswigger.net/web-security/sql-injection">PortSwigger — SQL injection</a></li>
 <li><a href="https://docs.sqlalchemy.org/">SQLAlchemy security</a></li>
 <li><a href="https://www.psycopg.org/psycopg3/docs/basic/params.html">psycopg parameter binding</a></li>
+<li><a href="https://docs.sqlalchemy.org/en/20/tutorial/dbapi_transactions.html">SQLAlchemy — Selecting with textual SQL</a></li>
 </ul>
 <p class="tags-line">Tags: SQLInjection, ORM, Database, SecureCoding, OWASP</p>
 </body>

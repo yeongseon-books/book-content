@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>What Is Secure Coding?</h1>
+<p>A feature can behave exactly as intended in happy-path testing and still fail the first time someone sends hostile input, replays a token, or calls an API out of order. In practice, many security incidents begin not with exotic cryptography failures but with ordinary development shortcuts: trusting a payload too early, logging a secret, or skipping a permission check in one code path.</p>
 <p>This is the first post in the Secure Coding 101 series.</p>
+<p>Here, we will treat secure coding not as a final review step but as a development habit that keeps the attack surface small from the first route handler to the final audit log. That mental model matters because the rest of the series builds on it: input validation, authentication, authorization, storage, browser defense, dependency hygiene, and logging only make sense when you see them as one connected system.</p>
 <blockquote>
-<p>Secure Coding 101 series (1/10)</p>
+<p>Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Code is not finished when the <em>feature works</em>. It is finished when it <em>survives an attacker</em>. How do we close that gap?</p>
-<blockquote>
-<p><em>Secure coding is the daily habit of </em>shrinking the attack surface<em> without slowing the feature down.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>What <em>secure coding</em> means and <em>why</em> it matters</li>
 <li>The idea of a <em>threat model</em> and how to apply it</li>
@@ -80,13 +74,8 @@
 <p><em>Security is not a </em>coating on top<em> of the feature. It is </em>part of the structure<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User input&quot;] --&gt; Validate[&quot;Validation&quot;]
-    Validate --&gt; Logic[&quot;App logic&quot;]
-    Logic --&gt; Storage[&quot;Storage (encrypted)&quot;]
-    Logic --&gt; Logs[&quot;Safe logs&quot;]
-    Auth[&quot;AuthN / AuthZ&quot;] --&gt; Logic
-</code></pre>
+<p><img alt="The basic secure-coding flow across input, auth, storage, and logs" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>The basic secure-coding flow across input, auth, storage, and logs</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Threat model</strong>: a <em>map</em> of who attacks, from where, and what they want.</li>
@@ -184,6 +173,7 @@ def render(name: str) -&gt; str:
 <li><a href="https://owasp.org/www-pdf-archive/OWASP_SCP_Quick_Reference_Guide_v2.pdf">OWASP Secure Coding Practices Quick Reference</a></li>
 <li><a href="https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool">Microsoft Threat Modeling</a></li>
 <li><a href="https://security.googleblog.com/2024/01/secure-by-design.html">Google — Secure by Design</a></li>
+<li><a href="https://www.cisa.gov/resources-tools/resources/shifting-balance-cybersecurity-risk-principles-and-approaches-secure-design">CISA and International Partners — Shifting the Balance of Cybersecurity Risk</a></li>
 </ul>
 <p class="tags-line">Tags: SecureCoding, Security, OWASP, DevSecOps, AppSec</p>
 </body>

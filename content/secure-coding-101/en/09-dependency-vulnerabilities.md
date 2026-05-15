@@ -17,24 +17,20 @@ tags:
   - SupplyChain
   - SecureCoding
 seo_description: SCA, SBOM, lockfiles, Dependabot, and a five-step playbook for safe dependency management against supply-chain risk.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Managing Dependency Vulnerabilities
 
+Modern services depend more on external code than on code written directly by the team shipping the feature. HTTP clients, template engines, ORM layers, CLI tooling, and build dependencies all become part of the runtime we are responsible for. When one of them fails, the incident does not belong to a vendor anymore. It belongs to the service that deployed it.
+
 This is post 9 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (9/10)
+Here, we will frame dependency management as supply-chain control rather than occasional version cleanup. Lockfiles, SBOMs, SCA gates, and small automated updates all serve one goal: keeping the build reproducible and the incident blast radius knowable.
 
-<!-- a-grade-intro:begin -->
+> Dependencies are not attachments around our code. Once deployed, they are part of our codebase and part of our responsibility.
 
-**Core question**: Most of our code was *written by someone else*. Who is responsible for *its security*?
-
-> *Dependencies are *part of our code*. Their flaws *become our flaws*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - What *SCA* (Software Composition Analysis) means
 - The role of an *SBOM*
@@ -50,14 +46,9 @@ Log4j, event-stream, ua-parser-js — *supply-chain attacks* succeed with *zero 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Manifest["pyproject.toml"] --> Lock["lockfile"]
-    Lock --> SCA["SCA scan"]
-    SCA --> Alerts["Vulnerability alerts"]
-    Alerts --> Update["Update PRs"]
-```
+![The supply-chain defense flow from manifest to lockfile, SCA, and update PRs](../../../assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
 
+*The supply-chain defense flow from manifest to lockfile, SCA, and update PRs*
 ## Key Terms
 
 - **SCA**: scanning dependencies for *known vulnerabilities*.
@@ -173,5 +164,6 @@ Other people's code is *our code*. The last post covers *safe logging and audit*
 - [pip-audit](https://github.com/pypa/pip-audit)
 - [OSV.dev](https://osv.dev/)
 - [CycloneDX SBOM](https://cyclonedx.org/)
+- [PyPA — Repeatable Installs](https://pip.pypa.io/en/stable/topics/repeatable-installs/)
 
 Tags: Dependencies, SCA, SBOM, SupplyChain, SecureCoding

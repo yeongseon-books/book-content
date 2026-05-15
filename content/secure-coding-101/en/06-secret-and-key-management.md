@@ -17,24 +17,20 @@ tags:
   - SecureCoding
   - DevSecOps
 seo_description: Environment variables, secret managers, key rotation, secret scanning, and a five-step playbook for safe key management.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Secret and Key Management
 
+Secrets tend to stay invisible right up to the moment they become the most expensive line in the incident report. A database password in a repository, a signing key copied across environments, or a CI job that prints environment variables can leave a system operational on the surface while making it extremely fragile to recover once something leaks.
+
 This is post 6 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (6/10)
+In this chapter, we will treat secret handling as an operating model rather than a storage trick: separation from code, central secret storage, access control, masking, rotation, and post-leak recovery. That wider frame is what distinguishes a merely hidden secret from a recoverable one.
 
-<!-- a-grade-intro:begin -->
+> Secrets belong outside the codebase, with short lifetimes, explicit access control, and a rotation path you can execute under pressure.
 
-**Core question**: Where do we put secrets so we can *rotate them anytime* and *never leak them by accident*?
-
-> *Secrets must live *outside the code*, stay *short-lived*, and be *rotatable any time*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - What counts as a *secret*
 - Why *hard-coded* secrets are dangerous
@@ -50,13 +46,9 @@ The most common incident is a *secret committed to git*. Once pushed, it is *for
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Code"] -->|read| Env["Env vars"]
-    Env -->|fetch| Vault["Secret manager"]
-    Vault --> Rotate["Periodic rotation"]
-```
+![The flow that keeps secrets outside the code and under managed rotation](../../../assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
 
+*The flow that keeps secrets outside the code and under managed rotation*
 ## Key Terms
 
 - **Secret**: API keys, DB passwords, tokens — *values that are dangerous when known*.
@@ -108,6 +100,26 @@ def mask(s, keep=4):
     return s[:keep] + "*" * (len(s) - keep)
 print("API key:", mask(API_KEY))
 ```
+
+## When rotation fails in production
+
+Rotation usually breaks not because the secret manager cannot mint a new value, but because the surrounding system still assumes the old one.
+
+```text
+Failure mode: new DB password issued, app still uses pooled old connections
+What to verify:
+1. connection pool recycle / reload timing
+2. rollout order across workers and jobs
+3. old credential revocation delay
+
+Failure mode: JWT signing key changed, old tokens fail immediately
+What to verify:
+1. overlapping key IDs (kid) during transition
+2. grace period for active sessions
+3. cache invalidation in API gateways
+```
+
+These checks matter because secret rotation is successful only when the application can survive it without guesswork. A secret that is easy to create but hard to rotate is still operational debt.
 
 ## What to Notice in This Code
 
@@ -171,5 +183,6 @@ Safe secrets keep *recovery cost* small. Next we tackle the oldest attack — *S
 - [HashiCorp Vault](https://developer.hashicorp.com/vault/docs)
 - [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/)
 - [GitHub — Secret scanning](https://docs.github.com/en/code-security/secret-scanning)
+- [The Twelve-Factor App — Config](https://12factor.net/config)
 
 Tags: Secrets, KeyManagement, Vault, SecureCoding, DevSecOps

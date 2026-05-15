@@ -17,24 +17,20 @@ tags:
   - SecureCoding
   - WebSecurity
 seo_description: Output escaping, CSP, SameSite cookies, CSRF tokens, and a five-step playbook to defend against browser-side attacks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # XSS and CSRF Defense
 
+The browser is a convenience layer for legitimate users, but it is also one of the most effective execution environments available to an attacker. A single comment rendered unsafely can become script execution, and a state-changing endpoint that trusts cookies alone can turn a different site into a trigger for actions the user never intended to perform.
+
 This is post 8 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (8/10)
+In this chapter, we will treat browser security as a system of output escaping, CSP, cookie policy, and request verification rather than as a single sanitization trick. That framing makes it easier to see when the browser is acting on the application's behalf and when it has effectively become the attacker's tool.
 
-<!-- a-grade-intro:begin -->
+> XSS runs attacker-controlled code in our page. CSRF abuses the user's existing authority to send a request they did not mean to send.
 
-**Core question**: How do we tell whether the *user's browser* is *on our side* or has been turned into the *attacker's weapon*?
-
-> *XSS runs the *attacker's code on our page*. CSRF triggers *unintended requests with the user's authority*.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The three flavors of *XSS*
 - The role of *output escaping* and *CSP*
@@ -50,14 +46,9 @@ A single *XSS* can hijack the session. *CSRF* triggers transfers and deletes *wi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Input["User input"] --> Store["Storage"]
-    Store --> Render["Render (escape!)"]
-    Form["Form on another site"] -->|cookies auto-sent| API["Our API"]
-    API --> Csrf["CSRF token / SameSite check"]
-```
+![The browser attack path that requires output escaping and CSRF verification](../../../assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
 
+*The browser attack path that requires output escaping and CSRF verification*
 ## Key Terms
 
 - **Reflected XSS**: input from the URL *echoed straight back*.
@@ -114,6 +105,26 @@ def verify_csrf(form_token, session_token):
 // element.innerHTML = userInput;  // forbidden
 element.textContent = userInput;    // safe
 ```
+
+## Failure signals and quick verification
+
+Browser-side issues often surface as "random logout," "weird popup," or "an action happened by itself." Those are vague symptoms unless you already know what to inspect.
+
+```text
+Symptom: CSP reports spike after a frontend release
+Check first:
+1. new inline scripts or third-party widget injection
+2. nonce / hash mismatch in templates
+3. report-only violations that should become blocking
+
+Symptom: CSRF failures increase for a single form
+Check first:
+1. token not included on the rendered page
+2. SameSite behavior during cross-site redirect flow
+3. Origin / Referer mismatch at the proxy layer
+```
+
+Writing these checks down is practical security work. It shortens the path from an ambiguous user complaint to a concrete browser-side cause.
 
 ## What to Notice in This Code
 

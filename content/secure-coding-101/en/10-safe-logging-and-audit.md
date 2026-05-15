@@ -17,24 +17,20 @@ tags:
   - Compliance
   - SIEM
 seo_description: Sensitive-field masking, audit logs, tamper evidence, retention policy, and a five-step playbook for safe logging.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Safe Logging and Audit
 
+When an incident lands, the team's first questions are usually simple: when did it start, who touched the resource, what changed first, and what spread next? If the logs cannot answer those questions, recovery slows down immediately. If the logs answer them by leaking passwords, tokens, or internal secrets, the evidence turns into a second incident.
+
 This is the final post in the Secure Coding 101 series.
 
-> Secure Coding 101 series (10/10)
+Here, we will treat logging as an evidence system rather than a convenience feature. That means designing for structured search, sensitive-field masking, audit-log separation, append-only storage, and retention rules that keep investigations possible without turning logs into a long-lived liability.
 
-<!-- a-grade-intro:begin -->
+> Logs are evidence and risk at the same time. Safe logging requires precise records, deliberate non-recording of secrets, and storage that resists tampering.
 
-**Core question**: When an incident hits, can we *reconstruct exactly what happened*? And does that record *avoid becoming the attacker's ladder*?
-
-> *Logs are *evidence and risk*. Real logging needs *masking* and *tamper evidence* together.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The difference between *application log* and *audit log*
 - *Sensitive-field masking* policy
@@ -50,14 +46,9 @@ The first question in incident response is *when, who, what*. If you cannot answ
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    App["App"] -->|JSON log| Mask["Masking"]
-    Mask --> Storage["Immutable storage"]
-    Storage --> SIEM["SIEM / alerts"]
-    Audit["Auth / authz / payments"] --> Storage
-```
+![The audit flow across structured logs, masking, immutable storage, and SIEM](../../../assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
 
+*The audit flow across structured logs, masking, immutable storage, and SIEM*
 ## Key Terms
 
 - **Application log**: ordinary logs for *debugging and operations*.
@@ -117,6 +108,18 @@ aws s3api put-object-lock-configuration ...
 - audit log: 1+ year (per regulation)
 - integrity check every quarter
 ```
+
+## Building an investigation timeline from real events
+
+The most useful logging pattern is one that lets you reconstruct a sequence quickly, not one that merely stores a lot of text.
+
+```json
+{"ts":"2026-05-15T09:00:11Z","event":"login","user_id":"u-42","request_id":"r-100"}
+{"ts":"2026-05-15T09:00:15Z","event":"role_change","actor_id":"admin-7","target_user_id":"u-42","request_id":"r-101"}
+{"ts":"2026-05-15T09:01:02Z","event":"export_started","user_id":"u-42","request_id":"r-102"}
+```
+
+With stable IDs and UTC timestamps, the incident question changes from "what even happened?" to "was this role change expected, and which export followed it?" That is exactly the kind of reader value an audit log is supposed to provide.
 
 ## What to Notice in This Code
 
@@ -180,5 +183,6 @@ That closes *Secure Coding 101*: validation → auth → authz → storage → s
 - [NIST 800-92 — Log Management](https://csrc.nist.gov/publications/detail/sp/800-92/final)
 - [Google SRE — Logging](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [AWS S3 Object Lock](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html)
+- [OpenTelemetry Logs Data Model](https://opentelemetry.io/docs/specs/otel/logs/data-model/)
 
 Tags: Logging, AuditLog, SecureCoding, Compliance, SIEM

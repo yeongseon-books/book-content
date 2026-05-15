@@ -17,24 +17,20 @@ tags:
   - DevSecOps
   - AppSec
 seo_description: A practical introduction to secure coding — threat modeling, OWASP Top 10, and the daily habits that keep your code safe under attack.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is Secure Coding?
 
+A feature can behave exactly as intended in happy-path testing and still fail the first time someone sends hostile input, replays a token, or calls an API out of order. In practice, many security incidents begin not with exotic cryptography failures but with ordinary development shortcuts: trusting a payload too early, logging a secret, or skipping a permission check in one code path.
+
 This is the first post in the Secure Coding 101 series.
 
-> Secure Coding 101 series (1/10)
+Here, we will treat secure coding not as a final review step but as a development habit that keeps the attack surface small from the first route handler to the final audit log. That mental model matters because the rest of the series builds on it: input validation, authentication, authorization, storage, browser defense, dependency hygiene, and logging only make sense when you see them as one connected system.
 
-<!-- a-grade-intro:begin -->
+> Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.
 
-**Core question**: Code is not finished when the *feature works*. It is finished when it *survives an attacker*. How do we close that gap?
-
-> *Secure coding is the daily habit of *shrinking the attack surface* without slowing the feature down.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - What *secure coding* means and *why* it matters
 - The idea of a *threat model* and how to apply it
@@ -50,15 +46,9 @@ Most security incidents are *known patterns* repeated. *Skipped input validation
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    User["User input"] --> Validate["Validation"]
-    Validate --> Logic["App logic"]
-    Logic --> Storage["Storage (encrypted)"]
-    Logic --> Logs["Safe logs"]
-    Auth["AuthN / AuthZ"] --> Logic
-```
+![The basic secure-coding flow across input, auth, storage, and logs](../../../assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
 
+*The basic secure-coding flow across input, auth, storage, and logs*
 ## Key Terms
 
 - **Threat model**: a *map* of who attacks, from where, and what they want.
@@ -180,5 +170,6 @@ Secure coding is a *habit*. The next post goes deep on the place that leaks most
 - [OWASP Secure Coding Practices Quick Reference](https://owasp.org/www-pdf-archive/OWASP_SCP_Quick_Reference_Guide_v2.pdf)
 - [Microsoft Threat Modeling](https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool)
 - [Google — Secure by Design](https://security.googleblog.com/2024/01/secure-by-design.html)
+- [CISA and International Partners — Shifting the Balance of Cybersecurity Risk](https://www.cisa.gov/resources-tools/resources/shifting-balance-cybersecurity-risk-principles-and-approaches-secure-design)
 
 Tags: SecureCoding, Security, OWASP, DevSecOps, AppSec

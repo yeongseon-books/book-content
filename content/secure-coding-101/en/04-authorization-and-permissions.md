@@ -17,24 +17,20 @@ tags:
   - LeastPrivilege
   - SecureCoding
 seo_description: RBAC, ABAC, IDOR defenses, least privilege, and a five-step playbook for safe authorization on every request.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Authorization and Permissions
 
+Logging in does not answer the question that matters most to a secure application: may this user touch this resource right now? Reading another person's order, editing a document, or downloading an internal report all need a separate decision. Broken access control keeps ranking near the top of real-world incident lists because teams often stop at authentication and never finish the authorization model behind it.
+
 This is post 4 in the Secure Coding 101 series.
 
-> Secure Coding 101 series (4/10)
+In this chapter, we will treat authorization as a server-side decision over actor, action, and resource, not as a UI rule or a handful of role names. That framing makes RBAC, ABAC, IDOR defense, list filtering, and default-deny behavior fit together cleanly.
 
-<!-- a-grade-intro:begin -->
+> Authorization is not a visibility rule. It is a repeated server-side decision over who wants to do what to which resource.
 
-**Core question**: The user is logged in. But *who decides whether they may touch this resource*?
-
-> *Authorization is decided per *action and resource*, not just per *role*. The server decides — every time.*
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions This Chapter Answers
 
 - The difference between *RBAC* and *ABAC*
 - What *IDOR* is and how to defend
@@ -50,14 +46,9 @@ OWASP Top 10 is often led by *Broken Access Control*. Hiding a button in the UI 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Request["Request"] --> AuthN["AuthN (who)"]
-    AuthN --> Resource["Load resource"]
-    Resource --> AuthZ["AuthZ check"]
-    AuthZ --> Action["Perform action"]
-```
+![The flow from authentication to resource loading, authorization, and action execution](../../../assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
 
+*The flow from authentication to resource loading, authorization, and action execution*
 ## Key Terms
 
 - **RBAC**: *role-based* (admin, editor, viewer).
@@ -179,5 +170,6 @@ Once authorization is *explicit*, incidents stay *short*. Next we make the *reso
 - [OWASP Authorization Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
 - [NIST RBAC](https://csrc.nist.gov/projects/role-based-access-control)
 - [Open Policy Agent](https://www.openpolicyagent.org/)
+- [NIST SP 800-162 — Guide to Attribute Based Access Control](https://csrc.nist.gov/pubs/sp/800/162/upd2/final)
 
 Tags: Authorization, RBAC, ABAC, LeastPrivilege, SecureCoding

@@ -17,7 +17,7 @@ tags:
   - SecureCoding
   - WebSecurity
 seo_description: Output escaping, CSP, SameSite cookie, CSRF token 그리고 브라우저 공격 방어 5단계
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # XSS와 CSRF 방어
@@ -46,14 +46,9 @@ XSS 한 번이면 세션 탈취, 화면 변조, 피싱 삽입, 관리자 권한 
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Input["User input"] --> Store["Storage"]
-    Store --> Render["Render (escape!)"]
-    Form["Form on another site"] -->|cookies auto-sent| API["Our API"]
-    API --> Csrf["CSRF token / SameSite check"]
-```
+![출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름](../../../assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
 
+*출력 이스케이프와 CSRF 검증이 필요한 브라우저 공격 흐름*
 사용자 입력은 저장된 뒤 다시 출력될 수 있고, 그 출력이 브라우저에서 실행될 수도 있습니다. 동시에 브라우저는 다른 사이트에서 보낸 요청에도 쿠키를 자동 첨부할 수 있습니다. 그래서 출력 방어와 요청 출처 검증이 각각 필요합니다.
 
 ## 핵심 용어
@@ -120,6 +115,26 @@ def verify_csrf(form_token, session_token):
 // element.innerHTML = userInput;  // 금지
 element.textContent = userInput;    // 안전
 ```
+
+## 실패 징후와 빠른 확인 포인트
+
+브라우저 계층 문제는 사용자 제보가 대체로 모호합니다. “갑자기 이상한 팝업이 떠요”, “내가 누르지 않았는데 요청이 갔어요” 같은 증상을 빠르게 좁히려면 먼저 볼 항목을 정해 두는 편이 좋습니다.
+
+```text
+증상: 프런트엔드 배포 뒤 CSP report가 급증합니다
+먼저 볼 항목:
+1. 새 inline script 추가 여부
+2. nonce 또는 hash 불일치
+3. report-only 정책을 실제 차단 정책으로 올려야 하는지
+
+증상: 특정 폼에서만 CSRF 실패가 늘어납니다
+먼저 볼 항목:
+1. 렌더링된 페이지에 토큰이 포함됐는지
+2. cross-site redirect에서 SameSite 동작이 깨졌는지
+3. 프록시 계층에서 Origin 또는 Referer가 바뀌는지
+```
+
+브라우저 공격 방어는 구현 자체도 중요하지만, 실패했을 때 원인을 빠르게 좁히는 운영 감각도 함께 필요합니다.
 
 클라이언트 코드에서도 같은 원칙이 적용됩니다. 문자열을 HTML로 해석하게 만드는 API는 기본적으로 금지하고, 텍스트로만 넣는 API를 기본값으로 삼아야 합니다. DOM 기반 XSS는 서버 템플릿만 본다고 막히지 않습니다.
 

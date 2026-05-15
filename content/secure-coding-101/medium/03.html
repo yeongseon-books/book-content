@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Authentication and Session</h1>
+<p>When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.</p>
 <p>This is post 3 in the Secure Coding 101 series.</p>
+<p>Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.</p>
 <blockquote>
-<p>Secure Coding 101 series (3/10)</p>
+<p>Authentication proves identity. Session management preserves that proof across requests. Both need explicit failure handling, not just a happy-path login screen.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a request asks <em>who are you</em>, how should the <em>code answer</em> without leaking?</p>
-<blockquote>
-<p><em>Authentication confirms identity. The session remembers it. Both leak quietly when you are not looking.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<h2>Questions This Chapter Answers</h2>
 <ul>
 <li>The difference between <em>authentication</em> and <em>authorization</em></li>
 <li>The principles of <em>password hashing</em></li>
@@ -80,12 +74,8 @@
 <p><em>Auth is the </em>door<em>. The session is the </em>hallway badge<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Login[&quot;Login&quot;] --&gt; Verify[&quot;Verify password (hash)&quot;]
-    Verify --&gt; Issue[&quot;Issue session&quot;]
-    Issue --&gt; Cookie[&quot;Cookie (HttpOnly, Secure)&quot;]
-    Cookie --&gt; Request[&quot;Subsequent requests&quot;]
-</code></pre>
+<p><img alt="The flow from password verification to session issuance and subsequent requests" src="https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>The flow from password verification to session issuance and subsequent requests</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>AuthN</strong>: <em>who are you</em> (authentication).</li>
@@ -126,6 +116,21 @@ ok = argon2.verify(&quot;user-password&quot;, hashed)
     redis.expire(f&quot;login:{user_id}&quot;, 60)
     return n &lt;= 5
 </code></pre>
+<h2>Failure signals and what to verify first</h2>
+<p>The auth path usually looks healthy until a real incident starts. That is why it helps to define the first checks ahead of time.</p>
+<pre><code class="language-text">Symptom: users say they were logged out unexpectedly
+First checks:
+1. cookie max_age / expiry changes
+2. session-store eviction or Redis restart
+3. clock skew across app nodes
+
+Symptom: login errors spike after deployment
+First checks:
+1. password-hash library version change
+2. missing secret used for cookie signing
+3. MFA callback or email provider failure
+</code></pre>
+<p>This kind of runbook turns "auth is broken" into a bounded investigation. In production, that shortens recovery time more than another generic best-practice bullet ever will.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>A safe hash is <em>intentionally slow</em>.</li>
@@ -183,6 +188,7 @@ ok = argon2.verify(&quot;user-password&quot;, hashed)
 <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html">OWASP Session Management Cheat Sheet</a></li>
 <li><a href="https://datatracker.ietf.org/doc/rfc9106/">Argon2 — RFC 9106</a></li>
 <li><a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST 800-63B — Digital Identity</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Practical_implementation_guides/Cookies">MDN — Secure cookie configuration</a></li>
 </ul>
 <p class="tags-line">Tags: Authentication, Session, Cookie, JWT, SecureCoding</p>
 </body>
