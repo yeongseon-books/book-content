@@ -17,7 +17,7 @@ tags:
   - 연결 리스트
   - 노드
 seo_description: 연결 리스트의 구조와 배열 대비 장단점을 Python 코드로 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 연결 리스트
@@ -52,6 +52,12 @@ last_reviewed: '2026-05-12'
 [Doubly Linked List]
   None <- [<-|A|->] <-> [<-|B|->] <-> [<-|C|->] -> None
 ```
+
+## 연결 구조를 그림으로 보면
+
+![연결 구조를 그림으로 보면](../../../assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
+
+*단일 연결 리스트와 이중 연결 리스트에서 참조가 어떻게 이어지는지 보여 주는 그림*
 
 ## 핵심 개념
 
@@ -261,6 +267,10 @@ print(has_cycle(a))  # True
 
 연결 리스트는 “무조건 빠른 구조”가 아닙니다. 배열보다 느린 점도 많습니다. 대신 참조를 바꿔 구조를 재배열하는 문제에서는 매우 강력합니다. 결국 핵심은 메모리 배치가 아니라 연결 관계를 조작하는 능력입니다.
 
+실무 관점에서는 이론 복잡도만 보면 오해하기 쉽습니다. Python `list`는 연속 메모리 덕분에 CPU 캐시 친화적이라 순차 순회와 인덱스 접근에서 매우 강합니다. 반면 연결 리스트는 노드 객체가 흩어져 있어 포인터를 따라가야 하므로, 삽입 자체가 O(1)이어도 전체 처리량은 기대보다 낮을 수 있습니다.
+
+또한 `append`조차 tail 참조가 없으면 O(n)으로 늘어납니다. 즉, 연결 리스트를 도입할 때는 “중간 삽입이 많다”만 볼 것이 아니라, 탐색 비용·메모리 오버헤드·구현 복잡도까지 함께 계산해야 합니다. 그래서 Python 실무에서는 직접 구현한 연결 리스트보다 `deque`, `OrderedDict`, 라이브러리 내부 구현을 더 자주 만납니다.
+
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
@@ -318,9 +328,9 @@ Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다.
 
 ## 참고 자료
 
+- [Python 공식 문서 — collections.deque](https://docs.python.org/3/library/collections.html#collections.deque)
+- [CPython 소스 — collections 모듈 구현](https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c)
 - [Real Python — Linked Lists in Python](https://realpython.com/linked-lists-python/)
-- [GeeksforGeeks — Linked List Data Structure](https://www.geeksforgeeks.org/data-structures/linked-list/)
-- [Visualgo — Linked List Visualization](https://visualgo.net/en/list)
-- [LeetCode — Linked List Problems](https://leetcode.com/tag/linked-list/)
+- [Runestone Academy — Linked Lists](https://runestone.academy/ns/books/published/pythonds3/BasicDS/ImplementinganUnorderedListLinkedLists.html)
 
 Tags: Python, 자료구조, Linked List, 연결 리스트, 노드

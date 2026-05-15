@@ -17,7 +17,7 @@ tags:
   - Performance Optimization
   - Data Structure Comparison
 seo_description: Learn how to choose the right Python data structure for each situation with a decision framework and benchmarks.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Choosing the Right Data Structure
@@ -68,6 +68,12 @@ Need priority? -> heapq
 Hierarchical structure? -> tree
 Relationship network? -> graph
 ```
+
+## Decision Flow at a Glance
+
+![Decision Flow at a Glance](../../../assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.en.png)
+
+*A quick decision flow for choosing between list, dict, set, deque, and heapq*
 
 ## Key Concepts
 
@@ -260,6 +266,10 @@ for scenario, choice in scenarios.items():
 - Benchmarks with real data back up theoretical analysis
 - Python's built-in data structures cover the vast majority of situations
 
+Memory footprint and conversion cost belong in the decision, too. If you rebuild a set from a list on every request just to speed up membership checks, the O(n) conversion can erase the benefit. The question is not only "what is fast?" but also "how long does this structure live, and how often do I rebuild it?"
+
+Failure modes are often clearer than big-O tables. If ordering is mandatory, set can introduce nondeterministic behavior. If priority is central, repeatedly sorting a list causes latency spikes as volume grows. If writes happen mostly at both ends, list turns into needless element shifting. Senior engineers choose data structures by the operation that is most expensive to get wrong.
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -318,8 +328,8 @@ This series covered list, dict, set, deque, stacks, queues, linked lists, trees,
 ## References
 
 - [Python Docs — Data Structures](https://docs.python.org/3/tutorial/datastructures.html)
-- [Big-O Cheat Sheet](https://www.bigocheatsheet.com/)
+- [Python Docs — collections](https://docs.python.org/3/library/collections.html)
+- [Python Docs — heapq](https://docs.python.org/3/library/heapq.html)
 - [Python TimeComplexity — Python Wiki](https://wiki.python.org/moin/TimeComplexity)
-- [Real Python — Common Python Data Structures](https://realpython.com/python-data-structures/)
 
 Tags: Python, Data Structures, Time Complexity, Performance Optimization, Data Structure Comparison

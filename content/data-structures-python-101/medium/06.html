@@ -96,6 +96,9 @@ Binary Search Tree (BST):
     /   \      \
   [1]   [6]   [14]
 </code></pre>
+<h2>Tree Shape at a Glance</h2>
+<p><img alt="Tree Shape at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png"></p>
+<p><em>A simple tree shape and the BST ordering pattern from root to leaves</em></p>
 <h2>Key Concepts</h2>
 <p><strong>root</strong><br>
 - Description: The topmost node in a tree</p>
@@ -255,6 +258,8 @@ print(f&quot;node count: {count_nodes(bst.root)}&quot;)   # 6
 <li>Level-order traversal uses a queue (deque) — this is the BFS pattern</li>
 <li>BST search discards half the tree at each step, achieving O(log n)</li>
 </ul>
+<p>That O(log n) story holds only while the tree stays reasonably balanced. Insert already-sorted data into a naive BST and it degenerates into a linked-list-shaped structure, pushing search and insert back toward O(n). Production systems avoid that failure mode with self-balancing trees or B-Tree variants.</p>
+<p>There is also a Python-specific constraint: recursion depth. Recursive traversal is elegant, but very deep trees can trigger RecursionError and large node graphs can add heavy object overhead. In production, the right question is not just "is a tree correct?" but also "how deep can it get, and who maintains balance?"</p>
 <h2>5 Common Mistakes</h2>
 <p><strong>Missing recursive base case</strong><br>
 - Why It Is a Problem: Causes infinite recursion and RecursionError<br>
@@ -312,10 +317,10 @@ print(f&quot;node count: {count_nodes(bst.root)}&quot;)   # 6
 </ul>
 <h2>References</h2>
 <ul>
+<li><a href="https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html">Runestone Academy — Trees</a></li>
+<li><a href="https://docs.python.org/3/library/bisect.html">Python Docs — bisect</a></li>
+<li><a href="https://www.sqlite.org/fileformat.html#b_tree_pages">SQLite File Format — B-Tree Pages</a></li>
 <li><a href="https://realpython.com/binary-search-python/">Real Python — Binary Trees in Python</a></li>
-<li><a href="https://www.geeksforgeeks.org/binary-search-tree-data-structure/">GeeksforGeeks — Binary Search Tree</a></li>
-<li><a href="https://visualgo.net/en/bst">Visualgo — Binary Search Tree Visualization</a></li>
-<li><a href="https://runestone.academy/ns/books/published/pythonds3/Trees/toctree.html">Problem Solving with Algorithms — Trees</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Data Structures, Tree, Binary Tree, BST</p>
 </body>

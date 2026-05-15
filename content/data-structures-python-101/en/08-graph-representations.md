@@ -17,7 +17,7 @@ tags:
   - BFS
   - DFS
 seo_description: Represent graphs as adjacency lists and adjacency matrices in Python and implement BFS and DFS traversals.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Graph Representations
@@ -60,6 +60,12 @@ Graph problems appear at medium-to-hard difficulty in coding interviews. You nee
   |  /  |                  C: [A, B]
   C --- D                  D: [B]
 ```
+
+## Graph Representation at a Glance
+
+![Graph Representation at a Glance](../../../assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)
+
+*The same relationship data shown as an undirected graph and as an adjacency list view*
 
 ## Key Concepts
 
@@ -265,6 +271,10 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 - BFS guarantees shortest paths in unweighted graphs
 - Dijkstra finds shortest paths in weighted graphs using a heap
 
+In production, representation choice is often a memory decision before it becomes an algorithm decision. An adjacency matrix gives constant-time edge checks, but it burns O(V^2) space even when the graph has very few edges. Adjacency lists scale far better for sparse graphs, but frequent edge-existence checks can still add noticeable traversal cost.
+
+Failure modes matter too. BFS can explode memory on wide graphs because the frontier grows level by level. Recursive DFS can blow the call stack on deep graphs. And Dijkstra quietly becomes the wrong tool the moment negative edges enter the model. A good graph design starts by naming those constraints, not just by picking BFS or DFS from habit.
+
 ## 5 Common Mistakes
 
 | Mistake | Why It Is a Problem | Fix |
@@ -322,9 +332,9 @@ Graphs are general-purpose data structures for representing relationships. You r
 
 ## References
 
-- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
-- [GeeksforGeeks — Graph Data Structure](https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/)
-- [Visualgo — Graph Traversal](https://visualgo.net/en/dfsbfs)
 - [NetworkX Documentation](https://networkx.org/documentation/stable/)
+- [Python Docs — heapq](https://docs.python.org/3/library/heapq.html)
+- [Runestone Academy — Graphs](https://runestone.academy/ns/books/published/pythonds3/Graphs/toctree.html)
+- [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
 
 Tags: Python, Data Structures, Graph, BFS, DFS

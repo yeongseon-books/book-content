@@ -17,7 +17,7 @@ tags:
   - 성능 최적화
   - 자료구조 비교
 seo_description: 데이터 특성과 연산 빈도에 따른 Python 자료구조 선택 기준을 정리합니다. 시간 복잡도 비교, 벤치마크, 복합 구조 활용 패턴을 익힙니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 자료구조 선택 기준
@@ -60,6 +60,12 @@ Need priority? -> heapq
 Hierarchical structure? -> tree
 Relationship network? -> graph
 ```
+
+## 선택 흐름을 그림으로 보면
+
+![선택 흐름을 그림으로 보면](../../../assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
+
+*조회·순서·우선순위 같은 요구를 기준으로 기본 자료구조를 고르는 흐름도*
 
 ## 핵심 개념
 
@@ -256,6 +262,10 @@ for scenario, choice in scenarios.items():
 
 여기서 중요한 태도는 “고급 구조를 쓰는 것이 곧 좋은 설계”라는 오해를 버리는 것입니다. 대부분의 경우는 list, dict, set, deque의 올바른 조합만으로 충분합니다. 복잡도보다 적합도가 더 중요합니다.
 
+추가로 메모리 비용과 변환 비용도 설계의 일부입니다. 예를 들어 membership test를 빠르게 하려고 매 요청마다 list를 set으로 바꾸면, 조회는 빨라져도 변환 O(n)이 누적되어 오히려 느려질 수 있습니다. 데이터가 오래 살아남는지, 한 번만 순회하는지, 지속적으로 갱신되는지도 함께 봐야 합니다.
+
+실패 패턴도 미리 떠올려야 합니다. 순서를 유지해야 하는데 set을 쓰면 재현하기 어려운 버그가 생기고, 우선순위가 핵심인데 list 정렬을 반복하면 부하가 커질 때 지연이 급증합니다. 좋은 선택 기준은 “평균적으로 빠른 구조”가 아니라 “내 워크로드에서 가장 비싼 연산을 안전하게 낮추는 구조”입니다.
+
 ## 흔한 실수 5가지
 
 | 실수 | 왜 문제인가 | 해결 방법 |
@@ -313,9 +323,9 @@ for scenario, choice in scenarios.items():
 
 ## 참고 자료
 
-- [Python Docs — Data Structures](https://docs.python.org/3/tutorial/datastructures.html)
-- [Big-O Cheat Sheet](https://www.bigocheatsheet.com/)
+- [Python 공식 문서 — Data Structures](https://docs.python.org/3/tutorial/datastructures.html)
+- [Python 공식 문서 — collections](https://docs.python.org/3/library/collections.html)
+- [Python 공식 문서 — heapq](https://docs.python.org/3/library/heapq.html)
 - [Python TimeComplexity — Python Wiki](https://wiki.python.org/moin/TimeComplexity)
-- [Real Python — Common Python Data Structures](https://realpython.com/python-data-structures/)
 
 Tags: Python, 자료구조, 시간 복잡도, 성능 최적화, 자료구조 비교
