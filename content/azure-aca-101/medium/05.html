@@ -143,9 +143,9 @@ For user-facing synchronous APIs, prefer <code>min-replicas 1</code>. For async 
   --name my-api --resource-group $RG --environment $ACA_ENV \
   --image $IMAGE --ingress external --target-port 8000
 </code></pre>
-<p>Without explicit rules, ACA applies a default HTTP scale rule (concurrency 10).<br>
-<code>min-replicas</code> defaults to 0, so idle is free but the first request hits a cold start.<br>
-Under load, it can scale up to 100 replicas — an unexpected cost ceiling.</p>
+<p>Without explicit rules, ACA applies a default HTTP scale rule (concurrency 10) with <code>min-replicas 0</code> and <code>max-replicas 10</code>.<br>
+That keeps idle cost at zero but still means the first request hits a cold start.<br>
+ACA can be configured with a much higher replica ceiling, but the default envelope is 0 to 10 replicas unless you override it.</p>
 <p><strong>After (explicit HTTP rule)</strong></p>
 <pre><code class="language-bash">az containerapp create \
   --name my-api --resource-group $RG --environment $ACA_ENV \

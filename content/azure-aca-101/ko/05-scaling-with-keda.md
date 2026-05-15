@@ -16,7 +16,7 @@ tags:
 - Autoscaling
 - Scale-to-Zero
 - Serverless
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 스케일링은 신호, 규칙, 범위라는 세 단계 선언형 흐름으로 이해하면 단순해집니다.
 ---
 
@@ -102,9 +102,9 @@ az containerapp create \
   --image $IMAGE --ingress external --target-port 8000
 ```
 
-명시적인 규칙이 없으면 ACA는 기본 HTTP 스케일 규칙(concurrency 10)을 적용합니다.
-`min-replicas` 기본값은 0이므로 유휴 비용은 없지만 첫 요청은 cold start를 맞습니다.
-부하가 걸리면 최대 100 replica까지 커질 수 있어서 비용 상한이 예상보다 높아질 수 있습니다.
+명시적인 규칙이 없으면 ACA는 기본 HTTP 스케일 규칙(concurrency 10)과 함께 `min-replicas 0`, `max-replicas 10`을 적용합니다.
+덕분에 유휴 비용은 없지만 첫 요청은 cold start를 맞습니다.
+ACA는 더 높은 replica 상한으로 구성할 수 있지만, 별도 설정이 없다면 기본 스케일 범위는 0~10 replica입니다.
 
 ### After (명시적인 HTTP 규칙을 둔 경우)
 
