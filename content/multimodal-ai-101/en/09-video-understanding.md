@@ -3,7 +3,7 @@ title: Video Understanding - From Frame Sampling to Video-LLaVA
 series: multimodal-ai-101
 episode: 9
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,7 +17,7 @@ tags:
 - Temporal Modeling
 - VideoMAE
 - Action Recognition
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: An image is a single frame; a video is a frame sequence with a time
   axis.
 ---
@@ -185,6 +185,14 @@ input video ──► frame sampler (8-16) ──► VideoMAE / X-CLIP ──►
 - **Aggregation**: smooth clip-level scores over a 5-second window
 - **Threshold**: 0.7+ if precision matters, 0.4 if recall matters
 
+## Operations checklist
+
+- [ ] We choose sampling strategy based on question type, not just clip length
+- [ ] We test codec and container fallbacks before videos hit the main pipeline
+- [ ] We separate event-detection workloads from broad-summary workloads
+- [ ] We decide explicitly whether audio is part of the evidence set
+- [ ] We enforce frame-resize and batch-memory limits before GPU inference starts
+
 ## Five Common Pitfalls
 
 ### 1. Confusing fps with sampling rate
@@ -242,9 +250,20 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 
 ## References
 
+### Official Docs
+
+- [PyAV cookbook: decoding video streams](https://pyav.org/docs/stable/cookbook/basics.html)
+- [Hugging Face Transformers video-classification tasks](https://huggingface.co/docs/transformers/en/tasks/video_classification)
+- [FFmpeg documentation](https://ffmpeg.org/documentation.html)
+
+### Papers and model references
+
 - [Tong et al. - VideoMAE: Masked Autoencoders Are Data-Efficient Learners for Video](https://arxiv.org/abs/2203.12602)
 - [Bertasius et al. - Is Space-Time Attention All You Need for Video Understanding? (TimeSformer)](https://arxiv.org/abs/2102.05095)
 - [Lin et al. - Video-LLaVA: Learning United Visual Representation by Alignment Before Projection](https://arxiv.org/abs/2311.10122)
-- [PyAV Documentation - Decoding Video Streams](https://pyav.org/docs/stable/cookbook/basics.html)
+
+### Related series
+
+- [AI Agent 101 - Production operations](../../ai-agent-101/en/09-production-operations.md)
 
 Tags: Video Understanding, Video-LLaVA, Frame Sampling, Temporal Modeling, VideoMAE, Action Recognition

@@ -54,11 +54,20 @@
 </head>
 <body>
 <h1>Image Captioning and OCR Pipelines</h1>
+<p>Teams new to document and screenshot understanding often think OCR is the whole problem. In practice, OCR gives you strings, but it does not preserve scene meaning, emphasis, layout hierarchy, or the fact that two nearby labels belonged to the same visual unit.</p>
 <p>This is post 4 in the Multimodal AI 101 series.</p>
+<p>Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?</li>
+<li>When should you use a lightweight captioner, and when does a full VLM call earn its cost?</li>
+<li>How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?</li>
+<li>What does a pragmatic OCR-plus-VLM hybrid look like?</li>
+<li>Where do rotation, confidence thresholds, accessibility, and PII controls most often break?</li>
+</ul>
 <blockquote>
-<p>Multimodal AI 101 series (4/10)</p>
+<p>OCR compresses an image into strings. Captioning compresses it into scene meaning. Production document understanding needs both because each one throws away information the other one needs.</p>
 </blockquote>
-<hr>
 <h2>"Doesn't pulling text out of an image cover it?"</h2>
 <p>Two requests show up constantly in production multimodal systems:</p>
 <ol>
@@ -226,6 +235,8 @@ def extract_tables(img_path: str) -&gt; list:
    v
 [Structured output]
 </code></pre>
+<p><img alt="OCR + VLM hybrid pipeline" src="https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png"><br>
+<em>OCR recovers exact strings and locations. Captioning and VLM description recover scene meaning. The fusion stage is where production quality is decided.</em></p>
 <p>Below is a minimal implementation of that hybrid.</p>
 <pre><code class="language-python">from PIL import Image
 from paddleocr import PaddleOCR
@@ -273,6 +284,14 @@ def auto_rotate(path: str) -&gt; Image.Image:
 <p>BLIP captions are short and generic ("a person sitting"). They lack the context required by alt-text standards (WCAG 1.1.1). For SEO or accessibility, post-process BLIP output or call a VLM separately.</p>
 <p><strong>5. PII leaking through caption/OCR output</strong></p>
 <p>Card numbers on receipts, phone numbers on business cards, and ID numbers on passport photos are all readable by OCR. Run a PII filter on caption/OCR output (see ai-data-preparation-101 Episode 4).</p>
+<h2>Operations checklist</h2>
+<ul>
+<li>[ ] We normalize rotation and resolution before OCR or captioning starts</li>
+<li>[ ] We load the correct language pack or model weights for the actual document language</li>
+<li>[ ] We route low-confidence OCR output to fallback or review instead of trusting it blindly</li>
+<li>[ ] We do not reuse raw BLIP output as final accessibility or SEO text without review</li>
+<li>[ ] We re-run PII filtering after OCR and caption text have been generated</li>
+</ul>
 <h2>Key Takeaways</h2>
 <ul>
 <li>Image captioning needs both fast BLIP-family models and reasoning-strong VLMs. Split by task character.</li>

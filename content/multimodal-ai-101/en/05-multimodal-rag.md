@@ -3,7 +3,7 @@ title: 'Multimodal RAG: Searching Images and Text Together'
 series: multimodal-ai-101
 episode: 5
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,18 +16,28 @@ tags:
 - FAISS
 - LangChain
 - Vector Search
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: A typical RAG system splits documents into chunks, embeds them into
   a vector DB, and retrieves the nearest chunks for a query embedding.
 ---
 
 # Multimodal RAG: Searching Images and Text Together
 
+Classic text RAG starts to wobble the moment the answer depends on layout, iconography, or visual resemblance. Asking for "the slide where the red warning icon appears" or "the invoice that looks like this photo" is not a chunking problem. It is a representation problem.
+
 This is post 5 in the Multimodal AI 101 series.
 
-> Multimodal AI 101 series (5/10)
+Here we treat multimodal RAG as a retrieval redesign: what to index, what to keep out of the prompt, and how to keep image-aware search from becoming an expensive latency trap.
 
----
+## Questions this chapter answers
+
+- Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?
+- What are the trade-offs between image-only, text-only, and hybrid indexing strategies?
+- How should retrieval outputs be packaged before a VLM sees them?
+- Which metrics tell you whether failure came from retrieval or generation?
+- Why do score mixing, base64 overuse, and missing metadata filters keep recurring in production?
+
+> Multimodal RAG is not mainly about attaching a VLM to the end of a RAG stack. It is about deciding which representations become searchable evidence in the first place.
 
 ## Questions text RAG cannot answer
 
@@ -142,6 +152,9 @@ class HybridIndex:
 
 Pick `alpha` dynamically by query intent: 0.7 for visual queries, 0.2 for fact/numeric queries.
 
+![Strategy 3: hybrid (both image and text vectors)](../../../assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
+*The production win in multimodal RAG usually comes from separating evidence by modality first, then fusing scores and prompt context deliberately rather than treating every artifact as one giant index.*
+
 ## Generation: feeding retrieval into a VLM
 
 RAG rarely stops at retrieval. The retrieved images go into a VLM for the final answer.
@@ -171,6 +184,16 @@ def answer(question: str, top_paths: list[str]) -> str:
 
 Retrieve, take top-K images, inline into a VLM, generate. Same shape as text RAG, but the context now contains images.
 
+The prompt-packaging rule matters as much as retrieval itself. If the question is mostly about numbers, OCR text and a caption may be enough, with only one or two images attached. If the question is explicitly visual, shipping the full image evidence becomes worth the extra cost. The mistake is treating every multimodal query as if it needs every representation at once.
+
+```python
+def choose_alpha(query: str) -> float:
+    visual_terms = ["looks like", "icon", "shape", "color", "layout"]
+    return 0.7 if any(t in query.lower() for t in visual_terms) else 0.2
+```
+
+**Expected output:** queries about appearance should lean toward the CLIP index and return visually similar items near the top. Queries about exact amounts, dates, or field values should lean toward OCR-plus-caption text and surface evidence with stronger lexical grounding.
+
 ## Evaluation: how to measure multimodal RAG
 
 Measure retrieval accuracy and generation quality separately.
@@ -194,6 +217,15 @@ def mrr(predictions: list[list[str]], gold: list[str]) -> float:
 
 The ai-evaluation-101 series covers this evaluation framework in depth.
 
+In practice, keep the eval set split by failure mode:
+
+- **visual match queries**: "find the screen with the red alert badge"
+- **layout queries**: "which PDF page has the table in the lower-right"
+- **text extraction queries**: "what amount is shown in the invoice total"
+- **mixed queries**: "find the slide with this chart and explain the drop in Q3"
+
+If one strategy wins all four categories, great. In most real systems it does not, which is exactly why hybrid retrieval exists.
+
 ## Five common pitfalls
 
 ### 1. Mixing CLIP vectors with text-embedding vectors in one index
@@ -215,6 +247,14 @@ Production indexes commonly grow past 10M images. Running ANN search without fil
 ### 5. Eval set with text queries only
 
 Multimodal RAG must be evaluated on text queries, image-by-image search, and image+text mixed queries. Include multimodal queries when designing the eval set.
+
+## Operations checklist
+
+- [ ] We decided explicitly which artifacts become searchable evidence: image vectors, OCR text, captions, or all three
+- [ ] We keep image-space and text-space indexes separate and document the score-fusion rule
+- [ ] We cap inline images in the final VLM prompt instead of sending every top-K artifact blindly
+- [ ] We apply metadata and authorization filters before ANN retrieval returns candidates
+- [ ] We evaluate visual, layout, text-extraction, and mixed queries as separate slices
 
 ## Key Takeaways
 

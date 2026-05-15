@@ -230,6 +230,14 @@ print(processor.batch_decode(out, skip_special_tokens=True)[0])
 <li><strong>Aggregation</strong>: smooth clip-level scores over a 5-second window</li>
 <li><strong>Threshold</strong>: 0.7+ if precision matters, 0.4 if recall matters</li>
 </ul>
+<h2>Operations checklist</h2>
+<ul>
+<li>[ ] We choose sampling strategy based on question type, not just clip length</li>
+<li>[ ] We test codec and container fallbacks before videos hit the main pipeline</li>
+<li>[ ] We separate event-detection workloads from broad-summary workloads</li>
+<li>[ ] We decide explicitly whether audio is part of the evidence set</li>
+<li>[ ] We enforce frame-resize and batch-memory limits before GPU inference starts</li>
+</ul>
 <h2>Five Common Pitfalls</h2>
 <p><strong>1. Confusing fps with sampling rate</strong></p>
 <p>Without checking whether the source is 30fps or 60fps, the meaning of "8 frames" changes. Uniform sampling counts frame indices, but the real semantic is "how many seconds apart". Read video metadata first and sample by <code>total_seconds</code>.</p>
@@ -268,11 +276,21 @@ print(processor.batch_decode(out, skip_special_tokens=True)[0])
 <li>Building a Production Multimodal Application (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs</strong></p>
+<ul>
+<li><a href="https://pyav.org/docs/stable/cookbook/basics.html">PyAV cookbook: decoding video streams</a></li>
+<li><a href="https://huggingface.co/docs/transformers/en/tasks/video_classification">Hugging Face Transformers video-classification tasks</a></li>
+<li><a href="https://ffmpeg.org/documentation.html">FFmpeg documentation</a></li>
+</ul>
+<p><strong>Papers and model references</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/2203.12602">Tong et al. - VideoMAE: Masked Autoencoders Are Data-Efficient Learners for Video</a></li>
 <li><a href="https://arxiv.org/abs/2102.05095">Bertasius et al. - Is Space-Time Attention All You Need for Video Understanding? (TimeSformer)</a></li>
 <li><a href="https://arxiv.org/abs/2311.10122">Lin et al. - Video-LLaVA: Learning United Visual Representation by Alignment Before Projection</a></li>
-<li><a href="https://pyav.org/docs/stable/cookbook/basics.html">PyAV Documentation - Decoding Video Streams</a></li>
+</ul>
+<p><strong>Related series</strong></p>
+<ul>
+<li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/ai-agent-101/en/09-production-operations.md">AI Agent 101 - Production operations</a></li>
 </ul>
 <p class="tags-line">Tags: Video Understanding, Video-LLaVA, Frame Sampling, Temporal Modeling, VideoMAE, Action Recognition</p>
 </body>
