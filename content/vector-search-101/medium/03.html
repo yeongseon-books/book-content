@@ -54,12 +54,8 @@
 </head>
 <body>
 <h1>Cosine similarity and vector search — computing sentence distances</h1>
-<blockquote>
-<p>Vector Search 101 (3/6)</p>
-</blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity">github.com/yeongseon-books/vector-search-101</a></p>
-<p>This is the 3rd article in the Vector Search 101 series.</p>
 <p>Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.</p>
+<p>This is post 3 in the Vector Search 101 series.</p>
 <p>This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.</p>
 <ul>
 <li>implementing cosine similarity, dot product, and Euclidean distance</li>
@@ -68,6 +64,7 @@
 <li>running a real query and examining the results</li>
 <li>when to use each metric</li>
 </ul>
+<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity">github.com/yeongseon-books/vector-search-101</a></p>
 <p><img alt="Cosine dot and euclidean comparison structure" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png"></p>
 <p><em>Cosine dot and euclidean comparison structure</em></p>
 <!-- ebook-only:start -->

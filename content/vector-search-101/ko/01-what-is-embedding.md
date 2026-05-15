@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,16 +15,18 @@ targets:
   mkdocs: true
   tistory: true
 title: 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
-seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
+seo_description: 임베딩이 의미 기반 검색을 가능하게 하는 원리와 첫 벡터 실습을 설명합니다.
 ---
 
 # 임베딩이란 무엇인가 — 텍스트를 벡터로 변환하기
 
-이 글은 Vector Search 101 시리즈의 첫 번째 글입니다. 검색 엔진은 오랫동안 키워드를 비교해 왔지만, 표현이 달라도 의미가 같은 문장을 연결하는 일에는 한계가 있습니다. 예를 들어 "Python async programming"과 "handling concurrency in Python"은 같은 뜻이지만, 키워드 기반 검색만으로는 두 문장을 자연스럽게 이어 주기 어렵습니다.
+검색 엔진은 오랫동안 키워드를 비교해 왔지만, 표현이 달라도 의미가 같은 문장을 연결하는 일에는 한계가 있습니다. 예를 들어 "Python async programming"과 "handling concurrency in Python"은 같은 뜻이지만, 키워드 기반 검색만으로는 두 문장을 자연스럽게 이어 주기 어렵습니다.
 
 임베딩은 이 문제를 다른 방식으로 풉니다. 텍스트를 숫자 벡터로 바꿔서 의미가 비슷한 문장이 고차원 공간에서 가깝게 놓이도록 만듭니다. 즉, 벡터 사이의 거리를 의미의 대리 지표로 사용하는 것입니다. 이 성질 덕분에 정확히 같은 단어가 없어도 의미 기반 검색이 가능해집니다.
 
-이 글은 임베딩의 개념과 직관을 잡는 데 집중합니다. 코드는 최소한만 사용합니다. 여기서는 다음 다섯 가지를 다룹니다.
+이 글은 Vector Search 101 시리즈의 첫 번째 글입니다.
+
+여기서는 임베딩의 개념과 직관을 잡는 데 집중합니다. 코드는 최소한만 사용하되, 실제로 벡터를 만들고 점수를 읽는 첫 실습까지 연결합니다. 다음 다섯 가지를 다룹니다.
 
 - 임베딩이 무엇이며 왜 등장했는가
 - 의미가 벡터 공간의 거리로 표현되는 방식
@@ -194,6 +196,75 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
 
 ---
 
+## 작은 코퍼스에서 랭킹이 어떻게 바뀌는가
+
+벡터 숫자를 하나 보는 것만으로는 아직 감이 부족할 수 있습니다. 같은 쿼리에 대해 키워드 겹침 기반 점수와 임베딩 기반 점수를 나란히 놓아 보겠습니다. 이 실험은 "왜 의미 기반 검색이 필요한가"를 가장 짧게 확인하는 방법입니다.
+
+```python
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def keyword_overlap_score(query: str, document: str) -> int:
+    query_terms = set(query.lower().split())
+    doc_terms = set(document.lower().split())
+    return len(query_terms & doc_terms)
+
+query = "python async programming"
+documents = [
+    "Python async programming patterns for web APIs",
+    "Handling concurrency in Python with asyncio tasks",
+    "Beginner recipe for homemade dog treats",
+    "Distributed tracing for Java microservices",
+]
+
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+query_vector = model.encode(query)
+doc_vectors = model.encode(documents)
+
+results = []
+for document, vector in zip(documents, doc_vectors):
+    results.append(
+        {
+            "document": document,
+            "keyword_overlap": keyword_overlap_score(query, document),
+            "cosine": cosine_similarity(query_vector, vector),
+        }
+    )
+
+for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"])):
+    print(
+        f"keyword={item['keyword_overlap']} cosine={item['cosine']:.4f} | {item['document']}"
+    )
+```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    keyword=3 cosine=0.8551 | Python async programming patterns for web APIs
+    keyword=1 cosine=0.6934 | Handling concurrency in Python with asyncio tasks
+    keyword=0 cosine=0.0848 | Distributed tracing for Java microservices
+    keyword=0 cosine=0.0124 | Beginner recipe for homemade dog treats
+
+<!-- injected-output:end -->
+
+두 번째 문서는 쿼리와 단어를 거의 공유하지 않지만, 임베딩 점수는 높게 나옵니다. 이 차이가 바로 의미 기반 검색의 실전 가치입니다. 사용자 표현과 문서 표현이 다를수록 이런 효과는 더 커집니다.
+
+## 임베딩 품질을 빠르게 점검하는 방법
+
+처음 모델을 붙였을 때는 "점수가 0.69면 높은가?" 같은 질문이 바로 나옵니다. 이때는 추상적인 평균값보다, 실제 서비스에서 자주 나오는 질의를 몇 개 골라 손으로 확인하는 편이 빠릅니다.
+
+- 같은 뜻인데 표현만 다른 질의-문서 쌍을 5~10개 고릅니다.
+- 정확 문자열이 중요한 질의도 따로 5개 정도 고릅니다.
+- 관련 없는 문장 쌍의 점수가 충분히 낮은지 확인합니다.
+- 상위 3개 결과를 사람이 읽고 "정말 관련 있는가"를 표시합니다.
+
+이 정도만 해도 모델 선택이 완전히 잘못되었는지, 아니면 청킹과 인덱스 튜닝 단계로 넘어가도 되는지 빠르게 판단할 수 있습니다.
+
+---
+
 ## 임베딩이 잘 작동하지 않는 경우
 
 ![Limits with exact strings and long documents](../../../assets/vector-search-101/01/01-05-where-embeddings-fall-short.ko.png)
@@ -260,6 +331,7 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
 - [sentence-transformers documentation](https://www.sbert.net/)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 - [The Illustrated Word2Vec — Jay Alammar](https://jalammar.github.io/illustrated-word2vec/)
 
 ### 관련 시리즈

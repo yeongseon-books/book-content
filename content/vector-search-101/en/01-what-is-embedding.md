@@ -1,7 +1,7 @@
 ---
 episode: 1
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,23 +20,21 @@ seo_description: Learn how text embeddings transform natural language into numer
 
 # What is an embedding — converting text into vectors
 
-> Vector Search 101 (1/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
-
-This is the first article in the Vector Search 101 series.
-
 Search engines have compared keywords for decades. A user types "python async", and the engine checks how often those words appear in each document and where. This works well when the query and the document share exact terms, but it breaks down when meaning is preserved while wording changes. "Handling concurrency in Python" and "Python async programming" mean the same thing, but a keyword engine may not connect them.
 
 Embeddings approach the problem differently. They convert text into numeric vectors so that semantically similar sentences end up geometrically close in a high-dimensional space. The distance between those vectors becomes a proxy for meaning. That property makes keyword-free, meaning-based retrieval possible.
 
-This post focuses on the concept and intuition behind embeddings. Code is minimal. We will cover five things:
+This is the first post in the Vector Search 101 series.
+
+This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores. We will cover five things:
 
 - what embeddings are and why they emerged
 - how meaning is represented as distance in vector space
 - how embedding models learn that representation
 - a first hands-on example that produces real vectors
 - where embeddings fall short and what to watch for
+
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/01-what-is-embedding)
 
 ![Keyword search and embedding search contrast](../../../assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
 
@@ -192,7 +190,76 @@ print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddin
 
 <!-- injected-output:end -->
 
-"Python async programming" and "handling concurrency in Python" score 0.81 despite sharing no common words. "Homemade dog treats" scores 0.05. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
+"Python async programming" and "handling concurrency in Python" score highly despite sharing no exact words. "Homemade dog treats" lands near zero. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
+
+---
+
+## How ranking changes on a tiny corpus
+
+One similarity score is useful, but ranking behavior is what matters in practice. Put keyword overlap next to embedding similarity for the same query, and the reason vector search matters becomes easier to see.
+
+```python
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def keyword_overlap_score(query: str, document: str) -> int:
+    query_terms = set(query.lower().split())
+    doc_terms = set(document.lower().split())
+    return len(query_terms & doc_terms)
+
+query = "python async programming"
+documents = [
+    "Python async programming patterns for web APIs",
+    "Handling concurrency in Python with asyncio tasks",
+    "Beginner recipe for homemade dog treats",
+    "Distributed tracing for Java microservices",
+]
+
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+query_vector = model.encode(query)
+doc_vectors = model.encode(documents)
+
+results = []
+for document, vector in zip(documents, doc_vectors):
+    results.append(
+        {
+            "document": document,
+            "keyword_overlap": keyword_overlap_score(query, document),
+            "cosine": cosine_similarity(query_vector, vector),
+        }
+    )
+
+for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"])):
+    print(
+        f"keyword={item['keyword_overlap']} cosine={item['cosine']:.4f} | {item['document']}"
+    )
+```
+
+<!-- injected-output:start -->
+**Output**
+
+    keyword=3 cosine=0.8551 | Python async programming patterns for web APIs
+    keyword=1 cosine=0.6934 | Handling concurrency in Python with asyncio tasks
+    keyword=0 cosine=0.0848 | Distributed tracing for Java microservices
+    keyword=0 cosine=0.0124 | Beginner recipe for homemade dog treats
+
+<!-- injected-output:end -->
+
+The second document shares almost none of the query vocabulary, yet the embedding score is still strong. That is the practical value of semantic retrieval: useful matches survive wording changes.
+
+## A fast sanity check for embedding quality
+
+Once a model is wired in, the next question is usually "is 0.69 good or bad?" The fastest answer is not a benchmark suite. It is a small hand-built evaluation set drawn from the actual product vocabulary.
+
+- Pick 5–10 query-document pairs that mean the same thing with different wording.
+- Add 5 exact-string queries where identifiers must survive intact.
+- Add a few clearly unrelated pairs and verify their scores stay low.
+- Read the top 3 results for each query and mark whether they are genuinely useful.
+
+That small pass tells you whether the model is directionally right or whether you should stop and rethink model choice before tuning chunking and indexing.
 
 ---
 
@@ -262,6 +329,7 @@ The next post moves from concept to practice. We will use `HuggingFaceEmbeddings
 - [sentence-transformers documentation](https://www.sbert.net/)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 - [The Illustrated Word2Vec — Jay Alammar](https://jalammar.github.io/illustrated-word2vec/)
 
 ### Related Series

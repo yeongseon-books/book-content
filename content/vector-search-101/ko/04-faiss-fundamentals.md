@@ -1,7 +1,7 @@
 ---
 episode: 4
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,16 +15,18 @@ targets:
   mkdocs: true
   tistory: true
 title: FAISS 입문 — 고속 근사 최근접 이웃 검색
-seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
+seo_description: FAISS로 벡터 인덱스를 만들고 저장하고 검색하는 기본 패턴을 설명합니다.
 ---
 
 # FAISS 입문 — 고속 근사 최근접 이웃 검색
 
-이 글은 Vector Search 101 시리즈의 4번째 글입니다. 문서 수가 수천, 수만 건으로 늘어나면 NumPy 기반 브루트 포스 검색은 금방 느려집니다. 차원이 384인 벡터 10만 개를 쿼리 하나와 비교하려면 쿼리마다 3,840만 번의 곱셈이 필요합니다. 이 정도 규모에서는 검색 지연이 수백 밀리초 이상으로 올라가며, 대화형 애플리케이션에는 너무 느립니다.
+문서 수가 수천, 수만 건으로 늘어나면 NumPy 기반 브루트 포스 검색은 금방 느려집니다. 차원이 384인 벡터 10만 개를 쿼리 하나와 비교하려면 쿼리마다 3,840만 번의 곱셈이 필요합니다. 이 정도 규모에서는 검색 지연이 수백 밀리초 이상으로 올라가며, 대화형 애플리케이션에는 너무 느립니다.
 
 FAISS(Facebook AI Similarity Search)는 바로 이 문제를 풀기 위해 만들어졌습니다. 작은 정확도 손실과 큰 속도 향상을 맞바꾸는 근사 최근접 이웃 검색을 지원하고, 수십억 개 규모의 벡터도 처리할 수 있으며, CPU와 GPU 모두에서 빠르게 동작합니다.
 
-이 글에서는 다음 다섯 가지를 다룹니다.
+이 글은 Vector Search 101 시리즈의 4번째 글입니다.
+
+여기서는 검색 속도를 올릴 때 가장 먼저 만나는 FAISS의 기본 패턴을 정리합니다. 다음 다섯 가지를 다룹니다.
 
 - FAISS 설치와 인덱스 유형 선택
 - `IndexFlatL2`와 `IndexFlatIP`를 사용한 정확 검색

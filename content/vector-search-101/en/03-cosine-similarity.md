@@ -1,7 +1,7 @@
 ---
 episode: 3
 language: en
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -20,13 +20,9 @@ seo_description: Compare cosine similarity, dot product, and Euclidean distance 
 
 # Cosine similarity and vector search — computing sentence distances
 
-> Vector Search 101 (3/6)
-
-Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
-
-This is the 3rd article in the Vector Search 101 series.
-
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
+
+This is post 3 in the Vector Search 101 series.
 
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.
 
@@ -35,6 +31,8 @@ This post implements all three metrics from scratch, shows why normalization mat
 - building a brute-force nearest-neighbor search
 - running a real query and examining the results
 - when to use each metric
+
+Example code: [github.com/yeongseon-books/vector-search-101](https://github.com/yeongseon-books/vector-search-101/tree/main/en/03-cosine-similarity)
 
 ![Cosine dot and euclidean comparison structure](../../../assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
 

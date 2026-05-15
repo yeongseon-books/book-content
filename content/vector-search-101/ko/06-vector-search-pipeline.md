@@ -1,7 +1,7 @@
 ---
 episode: 6
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,16 +15,18 @@ targets:
   mkdocs: true
   tistory: true
 title: 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
-seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
+seo_description: 문서 수집부터 FAISS 검색과 하이브리드 검색까지 벡터 검색 전체 흐름을 설명합니다.
 ---
 
 # 벡터 검색 파이프라인 — 문서 수집부터 쿼리까지
 
-이 글은 Vector Search 101 시리즈의 마지막 글입니다. 앞선 다섯 편에서는 임베딩, 유사도 척도, FAISS, 청킹을 각각 따로 봤습니다. 이번 글에서는 그 부품들을 하나의 실행 가능한 파이프라인으로 조립합니다. 문서를 불러오고, 청크로 나누고, 임베딩하고, FAISS 인덱스에 저장한 뒤, 자연어 쿼리로 결과를 검색하는 전체 흐름입니다.
+앞선 다섯 편에서는 임베딩, 유사도 척도, FAISS, 청킹을 각각 따로 봤습니다. 이번 글에서는 그 부품들을 하나의 실행 가능한 파이프라인으로 조립합니다. 문서를 불러오고, 청크로 나누고, 임베딩하고, FAISS 인덱스에 저장한 뒤, 자연어 쿼리로 결과를 검색하는 전체 흐름입니다.
 
 마지막에는 벡터 검색과 키워드 검색을 결합하는 하이브리드 검색의 기초도 정리합니다.
 
-이 글에서 다루는 주제는 다음과 같습니다.
+이 글은 Vector Search 101 시리즈의 마지막 글입니다.
+
+여기서는 "각 부품이 무엇인가"보다 "전체 검색 시스템이 어떤 순서로 움직이는가"에 초점을 맞춥니다. 다루는 주제는 다음과 같습니다.
 
 - 텍스트에서 문서 불러오기
 - 청킹 → 임베딩 → FAISS로 이어지는 전체 인덱싱 흐름
@@ -238,22 +240,7 @@ for query in queries:
 
 <!-- injected-output:end -->
 
-Expected output:
-
-```text
-total chunks: 8
-vector shape: (8, 384)
-saved: faiss.index, chunks.json
-loaded: 8 vectors
-
-query: 'how vector search differs from keyword search'
-  [1] 0.8123 — Vector search converts text into numeric vectors for meaning-based...
-  [2] 0.7234 — Unlike keyword search, it matches content even when phrasing differs.
-
-query: 'FAISS index types'
-  [1] 0.8412 — IndexFlatIP is an exact inner-product index equivalent to cosine...
-  [2] 0.7891 — FAISS is a high-speed vector search library developed at Facebook...
-```
+위 예제에서 청크 수가 4개로 끝나는 이유는 입력 문서 자체가 짧기 때문입니다. 실제 운영에서는 문서 길이와 `chunk_size`, `chunk_overlap` 설정에 따라 결과 청크 수가 크게 달라집니다. 따라서 출력 숫자 하나를 외우기보다, **문서 수 → 청크 수 → 인덱스 벡터 수가 일관되게 연결되는지**를 확인하는 편이 더 중요합니다.
 
 ---
 
@@ -307,6 +294,77 @@ def hybrid_search(
 
 `alpha=0.5`는 두 방식에 같은 가중치를 둡니다. 의미 기반 가중치를 더 높이고 싶다면 1.0 쪽으로 올리고, 키워드 일치를 더 중시하고 싶다면 0.0 쪽으로 낮추면 됩니다.
 
+바로 실행해 보면 하이브리드 검색이 어떤 문제를 푸는지 더 분명해집니다.
+
+```python
+bm25_ready_chunks = [
+    "FAISS IndexFlatIP supports exact inner-product search on normalized vectors.",
+    "Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.",
+    "Chunking strategy changes how much context each vector carries.",
+]
+
+bm25_index = BM25Okapi([chunk.split() for chunk in bm25_ready_chunks])
+vector_index, _ = build_index(bm25_ready_chunks)
+
+for query in ["IndexFlatIP cosine search", "ERR_CONNECTION_REFUSED"]:
+    results = hybrid_search(query, vector_index, bm25_ready_chunks, top_k=2, alpha=0.5)
+    print(f"\nquery: {query}")
+    for score, text in results:
+        print(f"  {score:.4f} — {text}")
+```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    query: IndexFlatIP cosine search
+      0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+      0.2173 — Chunking strategy changes how much context each vector carries.
+
+    query: ERR_CONNECTION_REFUSED
+      0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
+      0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+
+<!-- injected-output:end -->
+
+첫 번째 질의는 의미 기반과 키워드 기반이 같은 결과를 밀어 올립니다. 두 번째 질의는 정확 문자열이 핵심이라 BM25 쪽 신호가 더 강하게 작동합니다. 하이브리드 검색이 필요한 이유가 이 두 쿼리의 차이에 그대로 드러납니다.
+
+## 재인덱싱을 언제 트리거할 것인가
+
+운영에서 자주 놓치는 지점은 인덱스를 "한 번 만들고 끝"이라고 생각하는 것입니다. 실제로는 다음 같은 이벤트가 생기면 재인덱싱 기준을 분명히 정해 두어야 합니다.
+
+- 임베딩 모델 이름이나 버전이 바뀌었을 때
+- 청크 규칙(`chunk_size`, `chunk_overlap`, 분리자)이 바뀌었을 때
+- 문서 원본이 수정되었을 때
+- 메타데이터 스키마가 바뀌었을 때
+
+아래처럼 작은 매니페스트 파일을 함께 저장해 두면, 파이프라인이 시작될 때 현재 설정과 기존 인덱스가 호환되는지 바로 비교할 수 있습니다.
+
+```python
+import json
+
+manifest = {
+    "embedding_model": EMBED_MODEL,
+    "chunk_size": CHUNK_SIZE,
+    "chunk_overlap": CHUNK_OVERLAP,
+    "document_count": len(documents),
+    "index_type": "IndexFlatIP",
+}
+
+with open("index-manifest.json", "w") as f:
+    json.dump(manifest, f, indent=2)
+
+print(manifest)
+```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    {'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
+
+<!-- injected-output:end -->
+
+이 매니페스트는 거창한 기능이 아닙니다. 하지만 운영 중 "왜 검색 결과가 어제와 다르지?"라는 질문이 나왔을 때 가장 먼저 비교할 근거를 만들어 줍니다.
+
 ---
 
 ## 운영 관점에서 볼 점
@@ -356,5 +414,6 @@ def hybrid_search(
 - [LangChain FAISS integration](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
 - [rank-bm25 library](https://github.com/dorianbrown/rank_bm25)
 - [Hybrid search introduction — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
 Tags: Vector Search, FAISS, Embeddings, Python

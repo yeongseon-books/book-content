@@ -1,7 +1,7 @@
 ---
 episode: 2
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,16 +15,18 @@ targets:
   mkdocs: true
   tistory: true
 title: HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
-seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
+seo_description: HuggingFace 임베딩을 로컬에서 만들고 저장하고 다시 불러오는 실습을 다룹니다.
 ---
 
 # HuggingFace 임베딩 실습 — sentence-transformers로 첫 벡터 만들기
 
-이 글은 Vector Search 101 시리즈의 2번째 글입니다. 1편에서 개념을 다뤘다면, 이번 글은 실제 코드를 실행하는 단계입니다. 이론에서 실제 임베딩으로 넘어가면 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장하고 효율적으로 다시 불러오려면 어떻게 해야 할지 같은 실무 질문이 바로 등장합니다.
+1편에서 개념을 다뤘다면, 이번 글은 실제 코드를 실행하는 단계입니다. 이론에서 실제 임베딩으로 넘어가면 모델 로딩 시간을 어떻게 줄일지, 배치를 어떻게 구성할지, 벡터를 디스크에 저장하고 효율적으로 다시 불러오려면 어떻게 해야 할지 같은 실무 질문이 바로 등장합니다.
 
 `langchain-huggingface`의 `HuggingFaceEmbeddings`는 `sentence-transformers`를 LangChain 호환 인터페이스 뒤에 감싼 래퍼입니다. LangChain 파이프라인을 직접 만들지 않더라도 이 래퍼 패턴은 이해할 가치가 있습니다. 실제 애플리케이션에서 임베딩 모델이 더 큰 스택 안에 어떻게 통합되는지를 보여 주기 때문입니다.
 
-이 글에서는 다음 다섯 가지를 다룹니다.
+이 글은 Vector Search 101 시리즈의 2번째 글입니다.
+
+여기서는 로컬 임베딩을 만들고, 배치로 처리하고, 저장 후 다시 불러오는 흐름까지 한 번에 묶어 봅니다. 다음 다섯 가지를 다룹니다.
 
 - `HuggingFaceEmbeddings` 설치와 초기화
 - 단일 쿼리 임베딩과 배치 임베딩의 차이
@@ -110,12 +112,6 @@ print(f"first 5 values: {vector[:5]}")
     first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
 
 <!-- injected-output:end -->
-
-```text
-type: <class 'list'>
-dimension: 384
-first 5 values: [0.0523, -0.1847, 0.3012, 0.0934, -0.0721]
-```
 
 `embed_query()`는 입력 하나를 처리하고 일반 Python 리스트를 반환합니다. NumPy 연산이 필요할 때는 `np.array()`로 바꿔 쓰면 됩니다.
 

@@ -1,7 +1,7 @@
 ---
 episode: 5
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 series: vector-search-101
 status: publish-ready
 tags:
@@ -15,16 +15,18 @@ targets:
   mkdocs: true
   tistory: true
 title: 청크 전략 — 긴 문서를 어떻게 나눌 것인가
-seo_description: '예제 코드: github.com/yeongseon-books/vector-search-101'
+seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향과 실전 분할 전략을 설명합니다.
 ---
 
 # 청크 전략 — 긴 문서를 어떻게 나눌 것인가
 
-이 글은 Vector Search 101 시리즈의 5번째 글입니다. 임베딩 모델에는 하드 토큰 한도가 있습니다. `all-MiniLM-L6-v2`는 최대 256 서브워드 토큰만 처리합니다. PDF 한 페이지도 이 한계를 쉽게 넘깁니다. 긴 문서를 한 번에 넣으면 경계 뒤의 내용이 잘리거나, 너무 많은 정보가 하나의 벡터에 압축되어 검색 정밀도가 떨어집니다.
+임베딩 모델에는 하드 토큰 한도가 있습니다. `all-MiniLM-L6-v2`는 최대 256 서브워드 토큰만 처리합니다. PDF 한 페이지도 이 한계를 쉽게 넘깁니다. 긴 문서를 한 번에 넣으면 경계 뒤의 내용이 잘리거나, 너무 많은 정보가 하나의 벡터에 압축되어 검색 정밀도가 떨어집니다.
 
 청킹은 긴 문서를 임베딩 가능한 크기의 조각으로 나누는 작업입니다. 어떻게 나누느냐가 검색 품질에 직접 영향을 줍니다. 청크가 너무 작으면 문맥을 잃고, 너무 크면 서로 무관한 내용이 섞입니다.
 
-이 글에서는 다음 다섯 가지를 다룹니다.
+이 글은 Vector Search 101 시리즈의 5번째 글입니다.
+
+여기서는 단순히 텍스트를 자르는 법이 아니라, 검색 시스템이 어떤 문맥 단위를 기억하게 만들지 설계하는 관점으로 청킹을 봅니다. 다음 다섯 가지를 다룹니다.
 
 - 핵심 파라미터인 청크 크기와 오버랩
 - 고정 길이 청킹을 직접 구현하는 방법
@@ -305,6 +307,116 @@ for query in ["how vector search works", "FAISS library features", "setting chun
 
 ---
 
+## 청크에 메타데이터를 함께 저장하기
+
+검색 결과를 사용자에게 보여 주려면 텍스트 조각만 있어서는 부족한 경우가 많습니다. 어느 문서에서 왔는지, 몇 번째 섹션인지, 원문 안에서 어느 위치인지 같은 정보가 함께 있어야 인용과 디버깅이 쉬워집니다.
+
+```python
+from dataclasses import asdict, dataclass
+
+@dataclass
+class ChunkRecord:
+    chunk_id: str
+    source: str
+    section: str
+    offset: int
+    text: str
+
+def build_chunk_records(chunks: list[str]) -> list[dict]:
+    records = []
+    for idx, chunk in enumerate(chunks):
+        records.append(
+            asdict(
+                ChunkRecord(
+                    chunk_id=f"doc-001-{idx}",
+                    source="vector-search-notes.md",
+                    section="FAISS basics" if idx < 2 else "chunking",
+                    offset=idx * 170,
+                    text=chunk,
+                )
+            )
+        )
+    return records
+
+records = build_chunk_records(chunks)
+print(records[0])
+```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    {'chunk_id': 'doc-001-0', 'source': 'vector-search-notes.md', 'section': 'FAISS basics', 'offset': 0, 'text': 'Vector search converts text into numeric vectors for meaning-based retrieval.\nUnlike keyword search, it matches content even when phrasing differs.'}
+
+<!-- injected-output:end -->
+
+이런 메타데이터는 검색 정확도를 직접 올리지는 않지만, 운영 품질을 크게 높입니다. 같은 결과라도 "어디에서 왔는지"가 보이면 사람이 훨씬 빠르게 검토할 수 있기 때문입니다.
+
+## chunk_size를 바꾸면 결과가 어떻게 달라지는가
+
+청킹 전략은 결국 검색 결과로 검증해야 합니다. 작은 예제로 `chunk_size`를 두 개만 바꿔도 어떤 차이가 나는지 확인해 보겠습니다.
+
+```python
+import faiss
+import numpy as np
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+document = """
+Vector search converts text into numeric vectors for meaning-based retrieval.
+Unlike keyword search, it matches content even when phrasing differs.
+
+FAISS is a high-speed vector search library developed at Facebook AI Research.
+It supports both exact and approximate search.
+
+Chunking strategies decide how much context each vector should carry.
+Large chunks preserve context but can mix unrelated details.
+Small chunks are precise but may lose the sentence that explains the point.
+"""
+
+embedding_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True},
+)
+
+def run_experiment(chunk_size: int) -> None:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=30,
+        separators=["\n\n", "\n", ". ", " ", ""],
+    )
+    chunks = splitter.split_text(document)
+    vectors = np.array(embedding_model.embed_documents(chunks), dtype=np.float32)
+    index = faiss.IndexFlatIP(vectors.shape[1])
+    index.add(vectors)
+
+    query = "why chunk size affects retrieval quality"
+    q_vec = np.array([embedding_model.embed_query(query)], dtype=np.float32)
+    scores, indices = index.search(q_vec, 2)
+
+    print(f"\nchunk_size={chunk_size}, chunks={len(chunks)}")
+    for score, idx in zip(scores[0], indices[0]):
+        print(f"  {score:.4f} | {chunks[idx][:70]}")
+
+run_experiment(120)
+run_experiment(260)
+```
+
+<!-- injected-output:start -->
+**출력 결과**
+
+    chunk_size=120, chunks=5
+      0.6908 | Chunking strategies decide how much context each vector should carry.
+      0.3707 | Large chunks preserve context but can mix unrelated details.
+
+    chunk_size=260, chunks=3
+      0.6402 | Chunking strategies decide how much context each vector should carry.
+      0.4684 | FAISS is a high-speed vector search library developed at Facebook AI Research.
+
+<!-- injected-output:end -->
+
+작은 청크는 더 직접적인 답을 올려 주지만, 큰 청크는 주변 문맥을 더 많이 끌고 옵니다. 실제 데이터에서 어느 쪽이 더 좋은지는 질문 유형에 따라 달라집니다. FAQ처럼 짧고 정확한 답을 찾는 시스템과 정책 문서를 길게 읽는 시스템은 최적값이 다를 수밖에 없습니다.
+
 ## 청크 크기가 검색 품질에 미치는 영향
 
 ![Retrieval quality across chunk sizes](../../../assets/vector-search-101/05/05-05-how-chunk-size-affects-retrieval.ko.png)
@@ -356,5 +468,6 @@ for query in ["how vector search works", "FAISS library features", "setting chun
 
 - [LangChain RecursiveCharacterTextSplitter](https://python.langchain.com/docs/modules/data_connection/document_transformers/recursive_text_splitter/)
 - [Chunking strategies for LLM applications — Pinecone](https://www.pinecone.io/learn/chunking-strategies/)
+- [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
 Tags: Vector Search, FAISS, Embeddings, Python

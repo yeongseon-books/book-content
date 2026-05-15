@@ -54,14 +54,10 @@
 </head>
 <body>
 <h1>Vector search pipeline — from document ingestion to query</h1>
-<blockquote>
-<p>Vector Search 101 (6/6)</p>
-</blockquote>
-<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline">github.com/yeongseon-books/vector-search-101</a></p>
-<p>This is the final article in the Vector Search 101 series.</p>
 <p>The previous five posts each covered one component in isolation: embeddings, similarity metrics, FAISS, and chunking. This post assembles them into one executable pipeline that loads documents, splits them into chunks, embeds those chunks, stores them in a FAISS index, and retrieves results for natural-language queries.</p>
 <p>The post closes with the basics of hybrid search, which combines vector retrieval with keyword search.</p>
-<p>Topics:</p>
+<p>This is the final post in the Vector Search 101 series.</p>
+<p>The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers. Topics:</p>
 <ul>
 <li>loading documents from text</li>
 <li>the full indexing flow: chunking → embedding → FAISS</li>
@@ -69,6 +65,7 @@
 <li>querying and displaying results</li>
 <li>hybrid search concept and a minimal implementation</li>
 </ul>
+<p>Example code: <a href="https://github.com/yeongseon-books/vector-search-101/tree/main/en/06-vector-search-pipeline">github.com/yeongseon-books/vector-search-101</a></p>
 <p><img alt="End to end indexing and retrieval flow" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png"></p>
 <p><em>End to end indexing and retrieval flow</em></p>
 <!-- ebook-only:start -->
@@ -249,20 +246,7 @@ query: 'role of retrieval in RAG'
 </code></pre>
 <!-- injected-output:end -->
 
-<p>Expected output:</p>
-<pre><code>total chunks: 8
-vector shape: (8, 384)
-saved: faiss.index, chunks.json
-loaded: 8 vectors
-
-query: 'how vector search differs from keyword search'
-  [1] 0.8123 — Vector search converts text into numeric vectors for meaning-based...
-  [2] 0.7234 — Unlike keyword search, it matches content even when phrasing differs.
-
-query: 'FAISS index types'
-  [1] 0.8412 — IndexFlatIP is an exact inner-product index equivalent to cosine...
-  [2] 0.7891 — FAISS is a high-speed vector search library developed at Facebook...
-</code></pre>
+<p>This example ends with 4 chunks because the input corpus is intentionally small. In real systems, the absolute number is not what matters. The real check is whether <strong>document count → chunk count → index vector count</strong> changes in the way you expect after a pipeline update.</p>
 <hr>
 <h2>Hybrid search</h2>
 <p><img alt="Combining vector scores with BM25 scores" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-04-hybrid-search.en.png"></p>
@@ -307,6 +291,63 @@ def hybrid_search(
     return [(combined[i], chunks[i]) for i in top_indices]
 </code></pre>
 <p><code>alpha=0.5</code> weights both methods equally. Increase toward 1.0 for more semantic weight; decrease toward 0.0 for more keyword weight.</p>
+<p>Running it makes the benefit clearer.</p>
+<pre><code class="language-python">bm25_ready_chunks = [
+    &quot;FAISS IndexFlatIP supports exact inner-product search on normalized vectors.&quot;,
+    &quot;Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.&quot;,
+    &quot;Chunking strategy changes how much context each vector carries.&quot;,
+]
+
+for query in [&quot;IndexFlatIP cosine search&quot;, &quot;ERR_CONNECTION_REFUSED&quot;]:
+    results = hybrid_search(query, build_index(bm25_ready_chunks)[0], bm25_ready_chunks, top_k=2, alpha=0.5)
+    print(f&quot;\nquery: {query}&quot;)
+    for score, text in results:
+        print(f&quot;  {score:.4f} — {text}&quot;)
+</code></pre>
+<!-- injected-output:start -->
+<p><strong>Output</strong></p>
+<pre><code>query: IndexFlatIP cosine search
+  0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+  0.2173 — Chunking strategy changes how much context each vector carries.
+
+query: ERR_CONNECTION_REFUSED
+  0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
+  0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
+</code></pre>
+<!-- injected-output:end -->
+
+<p>The first query benefits from both semantic and lexical signals pointing at the same chunk. The second depends much more on exact token matching. That contrast is exactly why hybrid search exists.</p>
+<h2>When should reindexing run?</h2>
+<p>One common operational mistake is treating the index as a one-time artifact. In practice, you need an explicit reindex trigger whenever one of these changes:</p>
+<ul>
+<li>the embedding model name or version</li>
+<li>chunking rules such as <code>chunk_size</code>, <code>chunk_overlap</code>, or separators</li>
+<li>the source documents themselves</li>
+<li>metadata fields stored alongside chunks</li>
+</ul>
+<p>Persisting a small manifest next to the index gives you a fast compatibility check at startup.</p>
+<pre><code class="language-python">import json
+
+manifest = {
+    &quot;embedding_model&quot;: EMBED_MODEL,
+    &quot;chunk_size&quot;: CHUNK_SIZE,
+    &quot;chunk_overlap&quot;: CHUNK_OVERLAP,
+    &quot;document_count&quot;: len(documents),
+    &quot;index_type&quot;: &quot;IndexFlatIP&quot;,
+}
+
+with open(&quot;index-manifest.json&quot;, &quot;w&quot;) as f:
+    json.dump(manifest, f, indent=2)
+
+print(manifest)
+</code></pre>
+<!-- injected-output:start -->
+<p><strong>Output</strong></p>
+<pre><code>{'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
+</code></pre>
+<!-- injected-output:end -->
+
+<p>This is not glamorous infrastructure, but it gives you the first thing to compare when someone asks why retrieval quality changed after a deployment.</p>
 <hr>
 <h2>Operational considerations</h2>
 <p><img alt="Index update and deletion constraint path" src="https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-05-operational-considerations.en.png"></p>
@@ -342,6 +383,7 @@ def hybrid_search(
 <li><a href="https://python.langchain.com/docs/integrations/vectorstores/faiss/">LangChain FAISS integration</a></li>
 <li><a href="https://github.com/dorianbrown/rank_bm25">rank-bm25 library</a></li>
 <li><a href="https://www.pinecone.io/learn/hybrid-search-intro/">Hybrid search introduction — Pinecone</a></li>
+<li><a href="https://www.sbert.net/docs/sentence_transformer/pretrained_models.html">Sentence Transformers pretrained models</a></li>
 </ul>
 <p class="tags-line">Tags: Vector Search, FAISS, Embeddings, Python</p>
 </body>
