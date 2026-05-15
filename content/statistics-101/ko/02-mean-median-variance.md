@@ -47,14 +47,9 @@ last_reviewed: '2026-05-12'
 
 데이터를 요약할 때는 중심과 퍼짐을 함께 봐야 합니다. 중심은 데이터가 어디에 몰려 있는지를, 퍼짐은 그 주변에서 얼마나 흔들리는지를 말합니다. 둘 중 하나만 보면 숫자의 성격을 절반만 읽게 됩니다.
 
-```mermaid
-flowchart LR
-    Data["Data"] --> Center["Center: mean/median/mode"]
-    Data --> Spread["Spread: variance/std/IQR"]
-    Center --> Story["Summary Story"]
-    Spread --> Story
-```
+![멘탈 모델](../../../assets/statistics-101/02/02-01-concept-at-a-glance.ko.png)
 
+*중심을 설명하는 지표와 퍼짐을 설명하는 지표를 함께 봐야 데이터 요약이 균형을 잡습니다.*
 평균과 중앙값은 중심을 설명하지만, 데이터 모양에 따라 신뢰할 만한 정도가 다릅니다. 분산, 표준편차, IQR은 퍼짐을 설명하며, 어느 지표를 붙이느냐에 따라 보고서가 말하는 위험 수준도 달라집니다.
 
 ## 핵심 용어

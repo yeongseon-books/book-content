@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Sample and Population
 
-This is post 4 in the Statistics 101 series.
+Statistics usually begins without complete information. We cannot survey every customer, destructively test every manufactured item, or run every user through the same experiment. So we look at a part and try to say something about the whole.
 
-> Statistics 101 series (4/10)
+The hard part is representativeness. If the sample does not resemble the population closely enough, even a careful analysis starts from the wrong place.
 
-<!-- a-grade-intro:begin -->
+This is post 4 in the Statistics 101 series. Here we will clarify the relationship between population, sample, parameter, and statistic, then explain why random sampling and sampling bias sit at the foundation of statistical work.
 
-**Core question**: We almost never see the *whole population* — yet we draw confident conclusions. *How can a sample resemble the population* well enough to make that work?
+## Questions this post answers
 
-> *Inference is the art of speaking about the whole through a part.*
+- How do population and sample differ?
+- What makes a sample representative enough to trust?
+- Why does random sampling appear so often in statistics?
+- Why should response rate and segment distribution be reported together?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The relationship between *population, sample, and estimate*
-- The *power* of *random sampling*
-- *Five sources* of sampling bias
-- A 5-step sample design exercise
-- Five common mistakes
+> If the sample design tilts, the conclusion goes off course before the analysis even starts.
 
 ## Why It Matters
 
@@ -50,13 +45,9 @@ This is post 4 in the Statistics 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Pop["Population"] --> Sample["Sample"]
-    Sample --> Stat["Statistic"]
-    Stat --> Estimate["Estimate of Parameter"]
-```
+![Concept at a Glance](../../../assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
 
+*Statistics speaks about the population through a sample, so the sample design determines how trustworthy the estimate is.*
 ## Key Terms
 
 - **Population**: the *whole group* we want to learn about.

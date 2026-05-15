@@ -54,38 +54,27 @@
 </head>
 <body>
 <h1>Estimation</h1>
-<p>This is post 5 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How <em>accurate</em> is it to estimate the <em>population mean</em> with the <em>sample mean</em>? How should we report the <em>error</em>?</p>
-<blockquote>
-<p><em>An estimate is a pair: value and error.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Computing a sample mean is not the end of the analysis. The more important question is how far that number might be from the true value in the population. Estimation is the part of statistics that turns that gap into something we can talk about explicitly.</p>
+<p>That is why a good estimate never reports only the value. It reports the value together with its uncertainty. Once the error disappears from the report, the estimate starts to look more certain than it really is.</p>
+<p>This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li><em>Point estimation</em> vs <em>interval estimation</em></li>
-<li>The meaning of <em>standard error (SE)</em></li>
-<li><em>Unbiased</em> and <em>consistent</em> estimators</li>
-<li>A 5-step estimation exercise</li>
-<li>Five common mistakes</li>
+<li>How well can a sample mean stand in for a population mean?</li>
+<li>What is the difference between point estimation and interval estimation?</li>
+<li>How is standard error different from standard deviation?</li>
+<li>What changes when the sample size grows?</li>
 </ul>
+<blockquote>
+<p>An estimate is not a single number. It is a pair: value and error.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Reporting a mean is not the end. <em>How close it is</em> must be reported <em>together</em> so decision makers can read the <em>risk</em>.</p>
 <blockquote>
 <p><em>An estimate always carries error with it.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Sample[&quot;Sample x̄&quot;] --&gt; Estimate[&quot;Point Estimate&quot;]
-    Sample --&gt; SE[&quot;Standard Error&quot;]
-    Estimate --&gt; Interval[&quot;Interval Estimate&quot;]
-    SE --&gt; Interval
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Point estimates become interval estimates only after you add the estimator's uncertainty through standard error.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Point Estimate</strong>: a <em>single value</em> estimate of a parameter (x̄).</li>

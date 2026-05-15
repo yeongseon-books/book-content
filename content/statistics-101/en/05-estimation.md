@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Estimation
 
-This is post 5 in the Statistics 101 series.
+Computing a sample mean is not the end of the analysis. The more important question is how far that number might be from the true value in the population. Estimation is the part of statistics that turns that gap into something we can talk about explicitly.
 
-> Statistics 101 series (5/10)
+That is why a good estimate never reports only the value. It reports the value together with its uncertainty. Once the error disappears from the report, the estimate starts to look more certain than it really is.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.
 
-**Core question**: How *accurate* is it to estimate the *population mean* with the *sample mean*? How should we report the *error*?
+## Questions this post answers
 
-> *An estimate is a pair: value and error.*
+- How well can a sample mean stand in for a population mean?
+- What is the difference between point estimation and interval estimation?
+- How is standard error different from standard deviation?
+- What changes when the sample size grows?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- *Point estimation* vs *interval estimation*
-- The meaning of *standard error (SE)*
-- *Unbiased* and *consistent* estimators
-- A 5-step estimation exercise
-- Five common mistakes
+> An estimate is not a single number. It is a pair: value and error.
 
 ## Why It Matters
 
@@ -50,14 +45,9 @@ Reporting a mean is not the end. *How close it is* must be reported *together* s
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Sample["Sample x̄"] --> Estimate["Point Estimate"]
-    Sample --> SE["Standard Error"]
-    Estimate --> Interval["Interval Estimate"]
-    SE --> Interval
-```
+![Concept at a Glance](../../../assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
 
+*Point estimates become interval estimates only after you add the estimator's uncertainty through standard error.*
 ## Key Terms
 
 - **Point Estimate**: a *single value* estimate of a parameter (x̄).

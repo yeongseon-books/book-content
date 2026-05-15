@@ -54,38 +54,27 @@
 </head>
 <body>
 <h1>Understanding p-value</h1>
-<p>This is post 9 in the Statistics 101 series.</p>
-<blockquote>
-<p>Statistics 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does <em>p &lt; 0.05</em> really mean? <em>Why</em> is it <em>misread so often</em>?</p>
-<blockquote>
-<p><em>A p-value is not the probability that a hypothesis is true. It is only how surprising the data is.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>If you read enough statistical reports, you will keep running into lines like p &lt; 0.05. The problem is that this single line is often overloaded. Some readers treat it as the probability that the hypothesis is true, others treat it as the size of the effect, and others read p &gt; 0.05 as proof that nothing is happening.</p>
+<p>The p-value does none of those jobs. It only answers one question: assuming the null hypothesis is true, how surprising is the observed data?</p>
+<p>This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.</p>
+<h2>Questions this post answers</h2>
 <ul>
-<li>The <em>precise definition</em> of a p-value</li>
-<li><em>Five common misreadings</em></li>
-<li><em>p-hacking</em> and <em>pre-registration</em></li>
-<li>A 5-step p-value exercise</li>
-<li>The core of the <em>ASA 2016 statement</em></li>
+<li>What does the p-value actually mean?</li>
+<li>Why is it so often misread?</li>
+<li>How is p-value different from effect size?</li>
+<li>Why does repeated peeking at the data create trouble?</li>
 </ul>
+<blockquote>
+<p>A p-value is not the truth probability of a hypothesis. It is a measure of how surprising the data would be under the null.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Most papers and reports collapse a <em>conclusion</em> into one line: <em>p &lt; 0.05</em>. Yet <em>most readers misread that line</em>. <em>A misread p-value leads to wrong decisions</em>.</p>
 <blockquote>
 <p><em>A p-value is not an answer; it is the </em>start of a question<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    H0[&quot;H0 (null)&quot;] --&gt; Sample[&quot;Observed sample&quot;]
-    Sample --&gt; Stat[&quot;Test statistic&quot;]
-    Stat --&gt; P[&quot;p = P(stat &gt;= obs | H0)&quot;]
-    P --&gt; Decide[&quot;Compare with alpha&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>A p-value measures how surprising the observed data would be if the null hypothesis were true.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>p-value</strong>: under the <em>assumption that H0 is true</em>, the probability of seeing a <em>result at least as extreme</em> as the observed one.</li>
@@ -183,7 +172,7 @@ print(&quot;False alarms in 20 looks:&quot;, hits)
 <li><a href="https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf">ASA Statement on p-Values (2016)</a></li>
 <li><a href="https://www.nature.com/articles/d41586-019-00857-9">Nature — Scientists rise up against statistical significance</a></li>
 <li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html">scipy.stats — ttest_1samp</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Misuse_of_p-values">Wikipedia — Misuse of p-values</a></li>
+<li><a href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc2.htm">NIST/SEMATECH e-Handbook — Hypothesis Tests</a></li>
 </ul>
 <p class="tags-line">Tags: Statistics, PValue, Inference, Misconceptions, Beginner</p>
 </body>

@@ -47,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 신뢰구간은 표본에서 얻은 추정값과 표준오차, 그리고 임계값을 결합해 만듭니다. 표본이 작을수록 정규분포 대신 t-분포를 쓰는 이유는 꼬리를 조금 더 두껍게 잡아 불확실성을 더 보수적으로 반영하기 위해서입니다.
 
-```mermaid
-flowchart LR
-    Sample["Sample"] --> SE["Standard Error"]
-    SE --> Critical["t / z critical value"]
-    Critical --> CI["Confidence Interval"]
-```
+![멘탈 모델](../../../assets/statistics-101/06/06-01-concept-at-a-glance.ko.png)
 
+*신뢰구간은 추정값, 표준오차, 임계값이 결합된 결과이며 신뢰는 개별 구간이 아니라 절차에 붙습니다.*
 같은 데이터라도 어떤 방법으로 구간을 만들었는지에 따라 결과가 조금 달라질 수 있습니다. 그래서 신뢰구간은 숫자 자체보다 절차를 함께 이해해야 합니다.
 
 ## 핵심 용어
@@ -92,6 +88,8 @@ t_crit = stats.t.ppf(0.975, df)
 print("t*:", t_crit)
 ```
 
+**예상 출력:** 표본 수 64라면 `t*`가 대략 `2.0` 근처로 나옵니다. 작은 표본일수록 이 값은 1.96보다 조금 더 커집니다.
+
 작은 표본일수록 이 임계값 선택이 중요합니다.
 
 ### 3단계 — 표준오차와 오차한계를 계산한다
@@ -108,6 +106,8 @@ mean = sample.mean()
 print(f"95% CI: [{mean - moe:.2f}, {mean + moe:.2f}]")
 ```
 
+**예상 출력:** `95% CI: [95.xx, 104.xx]`처럼 추정값 주변의 범위가 출력됩니다.
+
 ### 5단계 — bootstrap 구간과 비교한다
 
 ```python
@@ -116,6 +116,8 @@ rng = default_rng(0)
 boots = [rng.choice(sample, len(sample), replace=True).mean() for _ in range(2000)]
 print("Bootstrap CI:", np.percentile(boots, [2.5, 97.5]))
 ```
+
+**예상 출력:** 정규 근사 구간과 비슷하지만 완전히 같지는 않은 두 경계값이 배열 형태로 나옵니다.
 
 정규 가정이 약한 상황에서는 bootstrap이 좋은 보완책이 됩니다.
 

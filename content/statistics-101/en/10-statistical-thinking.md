@@ -22,25 +22,20 @@ last_reviewed: '2026-05-04'
 
 # Statistical Thinking
 
-This is the final post in the Statistics 101 series.
+When you learn statistics chapter by chapter, means, variances, distributions, hypothesis tests, and p-values can feel like separate tools. In real work, they rarely move separately. A single question leads into data collection, distribution checks, estimation, testing, and finally a decision.
 
-> Statistics 101 series (10/10)
+So the last step in the series is not one more formula. It is seeing how the earlier pieces connect into one repeatable flow from question to action.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Statistics 101 series. Here we will rewrite the series as a mindset rather than a list of tools and walk once more through the practical flow from question to decision.
 
-**Core question**: Is statistics a *toolkit* or a *way of thinking*? What appears when we *fold the whole series* into *one continuous flow*?
+## Questions this post answers
 
-> *Statistics is the language of *handling uncertainty*.*
+- Is statistics a collection of formulas or a way of thinking?
+- How do question, data, distribution, estimation, and testing connect?
+- How should p-value, effect size, and business cost come together in one decision?
+- What should we document to improve data-driven decisions over time?
 
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
-
-- The *statistical flow* from *question to decision*
-- A *capstone walk-through* of the entire series
-- A *mindset* for *uncertainty* and *context*
-- A 5-step *statistical thinking* exercise
-- Five common mistakes
+> Statistical thinking is not a trick for producing numbers. It is a flow for making decisions under uncertainty.
 
 ## Why It Matters
 
@@ -50,16 +45,9 @@ Knowing the tools is meaningless without knowing *when and how to use them*. *St
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Q["Question"] --> D["Data"]
-    D --> Dist["Distribution"]
-    Dist --> Est["Estimate + CI"]
-    Est --> Test["Hypothesis Test"]
-    Test --> Eff["Effect Size"]
-    Eff --> Dec["Decision"]
-```
+![Concept at a Glance](../../../assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
 
+*Statistical thinking is one connected flow: question, data, distribution, estimation, testing, effect size, then decision.*
 ## Key Terms
 
 - **Question-first**: *Sharpen the question* before *touching the data*.
@@ -176,9 +164,9 @@ Statistics is the *language of uncertainty*, and statistical thinking is the *fl
 
 ## References
 
-- [Nate Silver — The Signal and the Noise](https://en.wikipedia.org/wiki/The_Signal_and_the_Noise)
-- [Hans Rosling — Factfulness](https://en.wikipedia.org/wiki/Factfulness)
+- [OpenIntro Statistics](https://www.openintro.org/book/os/)
+- [NIST/SEMATECH e-Handbook of Statistical Methods](https://www.itl.nist.gov/div898/handbook/)
 - [ASA Statement on p-Values (2016)](https://www.amstat.org/asa/files/pdfs/p-valuestatement.pdf)
-- [Wikipedia — Statistical Thinking](https://en.wikipedia.org/wiki/Statistical_thinking)
+- [Seeing Theory — A Visual Introduction to Probability and Statistics](https://seeing-theory.brown.edu/)
 
 Tags: Statistics, Thinking, Mindset, Decision, Beginner
