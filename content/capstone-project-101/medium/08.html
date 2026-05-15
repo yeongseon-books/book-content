@@ -54,17 +54,20 @@
 </head>
 <body>
 <h1>Schedule Management</h1>
+<p>Most capstone schedules do not collapse in the final week without warning. They drift gradually, and the team notices too late because nothing made the gap visible early enough.</p>
+<p>A good schedule is not a beautiful timeline. It is a system that repeatedly exposes the difference between plan and reality through milestones, weekly commitments, blockers, and explicit buffer.</p>
+<p>This is post 8 in the Capstone Project 101 series. It explains how to combine milestones, weekly planning, standups, and risk buffer into a realistic execution rhythm.</p>
+<h2>Questions this chapter answers</h2>
+<ul>
+<li>Why do polished-looking plans still fail in practice?</li>
+<li>How do milestones differ from weekly plans?</li>
+<li>Why should blockers be exposed as early as possible?</li>
+<li>How much risk buffer is reasonable?</li>
+<li>Why should progress be measured numerically?</li>
+</ul>
 <blockquote>
-<p>Capstone Project 101 series (8/10)</p>
+<p>A good schedule is not perfect prediction. It is an operating rhythm that reveals drift quickly enough to allow correction.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> does the <em>perfect plan</em> fall apart?</p>
-<blockquote>
-<p><em>Reality</em> is <em>slower</em> and <em>more uncertain</em> than <em>estimates</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>Defining <em>milestones</em></li>
@@ -74,14 +77,26 @@
 <li>Measuring <em>progress</em></li>
 </ul>
 <h2>Why It Matters</h2>
-<p>A <em>clear schedule</em> enables <em>focus</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    M[Milestones] --&gt; W[Weekly Plan]
-    W --&gt; S[Standup]
-    S --&gt; R[Risk Buffer]
-    R --&gt; P[Progress]
+<p>Milestones without weekly plans stay abstract, while weekly plans without milestones easily turn into busy work with no visible destination.</p>
+<p>Buffer matters because student projects absorb many external shocks at once: exams, conflicting calendars, and surprise bugs. Without spare capacity, small slips turn into schedule-wide failure very quickly.</p>
+<h2>The flow at a glance</h2>
+<p><img alt="The flow at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png"><br>
+<em>A scheduling loop from milestones to buffer adjustment</em></p>
+<h2>Practical artifact: a weekly execution board</h2>
+<p>A board like this often shows reality faster than a polished Gantt chart.</p>
+<pre><code class="language-text">Week | Goal | Done condition | Blocker | Buffer used
+Week 1 | freeze requirements | Must stories approved | none | 0 days
+Week 2 | implement core flow | input and result view connected | CSV cleanup delay | 1 day
+Week 3 | rehearse demo | 60-second run succeeds | login bug reproduced | 2 days
+Week 4 | finalize deck | Q&amp;A ready | none | 0.5 day
 </code></pre>
+<h2>What to validate first</h2>
+<ul>
+<li>Keep each weekly goal readable in one line.</li>
+<li>Define done conditions as outcomes, not activities.</li>
+<li>Record blockers explicitly instead of hiding them in chat.</li>
+<li>Track buffer consumption separately so schedule health stays visible.</li>
+</ul>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>milestone</strong>: a <em>major step</em>.</li>
@@ -147,7 +162,7 @@
 <li>State the <em>three</em> standup items in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next post: <em>Building Presentation Materials</em>.</p>
+<p>Schedule management is about surfacing drift, not documenting busyness. When milestones, weekly plans, blockers, and buffer are managed together, late-semester uncertainty becomes far easier to absorb. The next post shows how to turn that work into presentation materials.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/01-what-is-capstone.md">What is a Capstone Project</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/capstone-project-101/en/02-choosing-a-topic.md">Choosing a Topic</a></li>
@@ -161,11 +176,12 @@
 <li>Project Retrospective (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official docs and practical guides</strong></p>
 <ul>
-<li><a href="https://scrumguides.org/">Scrum Guide</a></li>
+<li><a href="https://scrumguides.org/scrum-guide.html">Scrum Guide</a></li>
+<li><a href="https://www.atlassian.com/agile/tutorials/burndown-charts">Burndown chart tutorial</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Critical_path_method">Critical Path Method</a></li>
-<li><a href="https://www.atlassian.com/agile/tutorials/burndown-charts">Burndown Chart - Atlassian</a></li>
-<li><a href="https://stevemcconnell.com/sea/">Estimation - Steve McConnell</a></li>
+<li><a href="https://stevemcconnell.com/sea/">Software Estimation resources — Steve McConnell</a></li>
 </ul>
 <p class="tags-line">Tags: Capstone, Schedule, Planning, Project, Beginner</p>
 </body>

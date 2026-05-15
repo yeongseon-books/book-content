@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 8
 title: Schedule Management
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Project
   - Beginner
 seo_description: A beginner-friendly tour of capstone schedule management with milestones, weekly plans, and a risk buffer.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Schedule Management
 
-> Capstone Project 101 series (8/10)
+Most capstone schedules do not collapse in the final week without warning. They drift gradually, and the team notices too late because nothing made the gap visible early enough.
 
-<!-- a-grade-intro:begin -->
+A good schedule is not a beautiful timeline. It is a system that repeatedly exposes the difference between plan and reality through milestones, weekly commitments, blockers, and explicit buffer.
 
-**Core question**: *Why* does the *perfect plan* fall apart?
+This is post 8 in the Capstone Project 101 series. It explains how to combine milestones, weekly planning, standups, and risk buffer into a realistic execution rhythm.
 
-> *Reality* is *slower* and *more uncertain* than *estimates*.
+## Questions this chapter answers
 
-This is post 8 in the Capstone Project 101 series.
+- Why do polished-looking plans still fail in practice?
+- How do milestones differ from weekly plans?
+- Why should blockers be exposed as early as possible?
+- How much risk buffer is reasonable?
+- Why should progress be measured numerically?
 
-<!-- a-grade-intro:end -->
+> A good schedule is not perfect prediction. It is an operating rhythm that reveals drift quickly enough to allow correction.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,33 @@ This is post 8 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-A *clear schedule* enables *focus*.
+Milestones without weekly plans stay abstract, while weekly plans without milestones easily turn into busy work with no visible destination.
 
-## Concept at a Glance
+Buffer matters because student projects absorb many external shocks at once: exams, conflicting calendars, and surprise bugs. Without spare capacity, small slips turn into schedule-wide failure very quickly.
 
-```mermaid
-flowchart LR
-    M[Milestones] --> W[Weekly Plan]
-    W --> S[Standup]
-    S --> R[Risk Buffer]
-    R --> P[Progress]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
+*A scheduling loop from milestones to buffer adjustment*
+
+## Practical artifact: a weekly execution board
+
+A board like this often shows reality faster than a polished Gantt chart.
+
+```text
+Week | Goal | Done condition | Blocker | Buffer used
+Week 1 | freeze requirements | Must stories approved | none | 0 days
+Week 2 | implement core flow | input and result view connected | CSV cleanup delay | 1 day
+Week 3 | rehearse demo | 60-second run succeeds | login bug reproduced | 2 days
+Week 4 | finalize deck | Q&A ready | none | 0.5 day
 ```
+
+## What to validate first
+
+- Keep each weekly goal readable in one line.
+- Define done conditions as outcomes, not activities.
+- Record blockers explicitly instead of hiding them in chat.
+- Track buffer consumption separately so schedule health stays visible.
 
 ## Key Terms
 
@@ -143,7 +164,7 @@ Company teams use *two-week sprints* and *burndown* charts.
 
 ## Wrap-up and Next Steps
 
-Next post: *Building Presentation Materials*.
+Schedule management is about surfacing drift, not documenting busyness. When milestones, weekly plans, blockers, and buffer are managed together, late-semester uncertainty becomes far easier to absorb. The next post shows how to turn that work into presentation materials.
 
 <!-- toc:begin -->
 - [What is a Capstone Project](./01-what-is-capstone.md)
@@ -160,9 +181,11 @@ Next post: *Building Presentation Materials*.
 
 ## References
 
-- [Scrum Guide](https://scrumguides.org/)
+### Official docs and practical guides
+
+- [Scrum Guide](https://scrumguides.org/scrum-guide.html)
+- [Burndown chart tutorial](https://www.atlassian.com/agile/tutorials/burndown-charts)
 - [Critical Path Method](https://en.wikipedia.org/wiki/Critical_path_method)
-- [Burndown Chart - Atlassian](https://www.atlassian.com/agile/tutorials/burndown-charts)
-- [Estimation - Steve McConnell](https://stevemcconnell.com/sea/)
+- [Software Estimation resources — Steve McConnell](https://stevemcconnell.com/sea/)
 
 Tags: Capstone, Schedule, Planning, Project, Beginner

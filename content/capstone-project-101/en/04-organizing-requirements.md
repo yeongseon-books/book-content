@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 4
 title: Organizing Requirements
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Scope
   - Beginner
 seo_description: A beginner-friendly tour of organizing capstone requirements through user stories, non functional needs, and priorities.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Organizing Requirements
 
-> Capstone Project 101 series (4/10)
+A feature list alone does not help when the schedule slips. It does not tell the team what can be cut first or what done actually means.
 
-<!-- a-grade-intro:begin -->
+A useful requirements document behaves more like a compact delivery contract. It links user stories, acceptance criteria, non-functional constraints, and priority labels in one place.
 
-**Core question**: *Why* is a *feature list alone* not enough?
+This is post 4 in the Capstone Project 101 series. It turns the problem statement into implementable requirements and explicit verification criteria.
 
-> Without *non-functional* needs and *priorities*, *decisions* will *shake*.
+## Questions this chapter answers
 
-This is post 4 in the Capstone Project 101 series.
+- Why is a feature list alone not enough?
+- How should user stories pair with acceptance criteria?
+- Why should non-functional constraints live in a separate table?
+- How do priority labels help scheduling decisions?
+- What does requirement traceability make easier later?
 
-<!-- a-grade-intro:end -->
+> A requirements document is not storage for feature ideas. It is a traceable agreement about what will be built and how it will be verified.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,34 @@ This is post 4 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-Requirements must become a *spec* so *changes* can be *traced*.
+Without acceptance criteria, teams can finish implementation and still disagree about whether the requirement is actually done. Once criteria and priority live together, scope cuts become far less emotional.
 
-## Concept at a Glance
+Non-functional constraints deserve their own space too. Requirements such as mobile usability, no-sign-up flow, or response-time targets disappear quickly when they are buried inside generic feature bullets.
 
-```mermaid
-flowchart LR
-    U[User Story] --> A[Accept]
-    A --> N[Non-Functional]
-    N --> P[Priority]
-    P --> T[Trace]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
+*Connecting requirements to criteria, priority, and trace links*
+
+## Practical artifact: a requirements sheet
+
+Adding IDs like the sheet below makes it much easier to connect implementation tasks and later test checks.
+
+```text
+ID: ST-1
+User story: as a student, I want to confirm schedule conflicts immediately
+Acceptance criteria: input within 5 seconds, results within 1 second, clear error messages
+Non-functional needs: mobile-first, usable without sign-up, Korean-first copy
+Priority: Must
+Linked features: F-1 timetable input, F-2 conflict engine, F-3 results view
 ```
+
+## What to validate first
+
+- Make acceptance criteria observable rather than subjective.
+- Separate non-functional needs from the user story itself.
+- Check that not every line has been promoted to Must.
+- Ensure the requirement ID can later map to features or tests.
 
 ## Key Terms
 
@@ -143,7 +165,7 @@ Startup PMs use *Must/Should/Could* labels every week.
 
 ## Wrap-up and Next Steps
 
-Next post: *Splitting Team Roles*.
+Requirement organization is about traceable scope, not prettier feature bullets. Once stories, criteria, non-functional needs, and priority labels live together, design and schedule decisions get much faster. The next post shows how that work should be split across the team.
 
 <!-- toc:begin -->
 - [What is a Capstone Project](./01-what-is-capstone.md)
@@ -160,8 +182,10 @@ Next post: *Splitting Team Roles*.
 
 ## References
 
-- [User Stories Applied - Mike Cohn](https://www.mountaingoatsoftware.com/books/user-stories-applied)
-- [MoSCoW Method - Atlassian](https://www.atlassian.com/agile/product-management/requirements)
+### Official docs and practical guides
+
+- [Atlassian requirements guide](https://www.atlassian.com/agile/product-management/requirements)
+- [User Stories Applied](https://www.mountaingoatsoftware.com/books/user-stories-applied)
 - [Specification by Example](https://gojko.net/books/specification-by-example/)
 - [INVEST in Good Stories](https://www.agilealliance.org/glossary/invest/)
 

@@ -2,7 +2,7 @@
 series: capstone-project-101
 episode: 9
 title: Building Presentation Materials
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,27 @@ tags:
   - Storytelling
   - Beginner
 seo_description: A beginner-friendly tour of capstone presentation materials with a problem solution result narrative and demo script.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-14'
 ---
 
 # Building Presentation Materials
 
-> Capstone Project 101 series (9/10)
+Presentation decks usually become bloated because teams try to show every feature they built. Audiences, however, care much more about why the project mattered and what changed as a result.
 
-<!-- a-grade-intro:begin -->
+A strong deck is not a catalog of screens. It is a concise story about the problem, the chosen solution, the demonstrated result, and the next insight the team gained.
 
-**Core question**: *Why* are *feature list* presentations *boring*?
+This is post 9 in the Capstone Project 101 series. It uses a problem-solution-result arc for the deck and folds in demo fallback planning plus Q&A preparation.
 
-> They lack the *problem solution result* *narrative*.
+## Questions this chapter answers
 
-This is post 9 in the Capstone Project 101 series.
+- Why do feature-list presentations lose attention quickly?
+- What should survive on each slide?
+- Why does the demo need a written script?
+- How should demo fallback material be prepared?
+- How does Q&A preparation raise the quality of the talk?
 
-<!-- a-grade-intro:end -->
+> A good presentation is not the place to show everything. It is the place to compress problem, choice, and result into a story the audience can grasp immediately.
+
 
 ## What You Will Learn
 
@@ -44,17 +49,34 @@ This is post 9 in the Capstone Project 101 series.
 
 ## Why It Matters
 
-*Delivery* matters as much as *results*.
+A problem-solution-result arc gives the audience context immediately, which means feature details can appear only where they support the story.
 
-## Concept at a Glance
+Separating demo planning and Q&A planning also makes the talk more resilient. Presentation-week failures are often caused less by missing features than by broken flow, time overruns, or unprepared questions.
 
-```mermaid
-flowchart LR
-    P[Problem] --> S[Solution]
-    S --> D[Demo]
-    D --> R[Result]
-    R --> N[Next]
+## The flow at a glance
+
+![The flow at a glance](../../../assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
+*A presentation narrative from problem to next step*
+
+## Practical artifact: a presentation run sheet
+
+Creating a run sheet like this before polishing slides often improves the talk more than visual tweaks do.
+
+```text
+Segment | Time | Key message | Backup material
+Problem framing | 2 min | why the pain matters | one user-interview slide
+Solution choice | 3 min | why this flow was selected | one requirements table
+Demo | 4 min | 60-second core-flow walkthrough | three screenshots, recorded clip
+Results and learning | 2 min | what was validated and what remains | feedback summary table
+Q&A | 4 min | explain stack, testing, and scope cuts | ADR and retrospective notes
 ```
+
+## What to validate first
+
+- Keep one message per slide.
+- Prepare backup material that can replace a failed live demo immediately.
+- Rehearse against the real time limit.
+- Attach evidence documents to likely Q&A topics.
 
 ## Key Terms
 
@@ -143,7 +165,7 @@ Investor pitches also use the *problem solution result* arc.
 
 ## Wrap-up and Next Steps
 
-Next post: *Project Retrospective*.
+The job of presentation materials is not to show everything but to create understanding quickly. When the story arc, demo script, fallback assets, and Q&A evidence are prepared together, the talk becomes far more resilient. The next post closes the project with a retrospective.
 
 <!-- toc:begin -->
 - [What is a Capstone Project](./01-what-is-capstone.md)
@@ -160,9 +182,11 @@ Next post: *Project Retrospective*.
 
 ## References
 
-- [Presentation Zen - Garr Reynolds](https://www.presentationzen.com/)
-- [The Cognitive Style of PowerPoint - Edward Tufte](https://www.edwardtufte.com/tufte/powerpoint)
-- [TED Talks - Chris Anderson](https://www.ted.com/playlists/574/how_to_make_a_great_presentation)
-- [Pyramid Principle - Barbara Minto](https://en.wikipedia.org/wiki/Pyramid_principle)
+### Official docs and practical guides
+
+- [Presentation Zen](https://www.presentationzen.com/)
+- [The Cognitive Style of PowerPoint](https://www.edwardtufte.com/tufte/powerpoint)
+- [TED guide to public speaking](https://www.ted.com/playlists/574/how_to_make_a_great_presentation)
+- [Pyramid Principle](https://en.wikipedia.org/wiki/Pyramid_principle)
 
 Tags: Capstone, Presentation, Demo, Storytelling, Beginner

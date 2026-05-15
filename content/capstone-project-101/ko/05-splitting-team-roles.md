@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Collaboration
   - Beginner
 seo_description: 캡스톤 프로젝트 팀 역할을 주 책임자와 백업 담당자 중심으로 나누어 협업 속도를 높이고 책임 소재를 명확히 하는 방법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 팀 역할 나누기
 
-팀 역할은 작업 분배표가 아니라 의사결정 구조입니다. 누가 주도하고 누가 백업하는지 분명해야 속도도 나고 책임도 살아납니다. 이 글은 Capstone Project 101 시리즈의 5번째 글입니다. 여기서는 역할이 겹칠 때 왜 팀이 느려지는지, 그리고 주 책임자와 백업을 어떻게 나눠야 하는지 살펴보겠습니다.
+역할이 모호한 팀은 모두가 바빠 보이는데도 결정이 느립니다. 누가 최종 판단을 내리고 누가 백업하는지가 분명하지 않기 때문입니다.
 
-> 멘탈 모델: 역할 분담의 목적은 사람을 칸에 넣는 일이 아니라, 일이 막혔을 때 누가 결정하고 누가 이어받을지 명확하게 만드는 것입니다.
+캡스톤에서 역할 분담은 사람을 칸에 넣는 일이 아니라 병목을 줄이는 구조를 만드는 일입니다. 특히 짧은 일정에서는 주 책임자와 백업 구조가 없으면 일정 충격이 바로 전체 팀에 퍼집니다.
+
+이 글은 Capstone Project 101 시리즈의 5번째 글입니다. 여기서는 주 책임자, 백업 담당자, 결정 권한을 나눠 팀 협업 속도를 높이는 기본 구조를 정리합니다.
+
+> 멘탈 모델: 역할 분담의 핵심은 사람을 분류하는 것이 아니라, 일이 막혔을 때 누가 결정하고 누가 이어받을지 미리 정하는 데 있습니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,29 @@ last_reviewed: '2026-05-12'
 
 특히 캡스톤처럼 일정이 짧은 프로젝트에서는 한 사람이 빠지거나 막히는 순간 전체 속도가 흔들릴 수 있습니다. 그래서 주 책임자만큼 백업 지정도 중요합니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    L[Lead] --> B[Backend]
-    L --> F[Frontend]
-    L --> D[Data]
-    L --> Q[QA]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/05/05-01-the-flow-at-a-glance.ko.png)
+*주 책임자와 영역 책임을 연결한 기본 역할 구조*
+
+## 실전 문서 예시: 역할 책임 매트릭스
+
+작은 팀이라도 아래처럼 책임 문장을 적어 두면 회의 시간이 크게 줄어듭니다.
+
+```text
+업무 | 주 책임자 | 백업 | 결정 권한
+요구사항 변경 | 팀 리드 | 프런트엔드 담당 | 리드 승인
+API 설계 | 백엔드 담당 | 데이터 담당 | 백엔드 제안, 리드 승인
+데모 시나리오 | QA 담당 | 팀 리드 | QA 제안, 팀 합의
+배포 점검 | 백엔드 담당 | 프런트엔드 담당 | 배포 체크리스트 기준
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 각 영역에 한 명의 주 책임자가 있는지 확인합니다.
+- 백업이 없는 핵심 업무가 남아 있지 않은지 점검합니다.
+- 결정 권한이 모호한 항목을 따로 표시합니다.
+- 역할 변경 날짜와 이유를 남길 자리도 함께 둡니다.
 
 ## 핵심 용어
 
@@ -156,7 +174,7 @@ review = "weekly"
 
 ## 정리와 다음 글
 
-팀 역할을 나눈다는 것은 사람을 분류하는 일이 아니라 책임 경계를 정하는 일입니다. 주 책임자와 백업이 분명해야 협업 속도도 안정됩니다. 다음 글에서는 이렇게 정리한 역할을 바탕으로 MVP 범위를 어떻게 설계할지 살펴보겠습니다.
+팀 역할 분담은 업무를 예쁘게 나누는 일이 아니라 병목을 줄이는 설계입니다. 주 책임자, 백업, 결정 권한이 분명해야 캡스톤 일정 충격을 견딜 수 있습니다. 다음 글에서는 이 구조를 바탕으로 MVP 범위를 어떻게 자를지 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +191,11 @@ review = "weekly"
 
 ## 참고 자료
 
-- [RACI Matrix - PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
+### 공식 문서와 실무 자료
+
+- [RACI Matrix — PMI](https://www.pmi.org/learning/library/raci-responsibility-matrix-9410)
 - [Team Topologies](https://teamtopologies.com/)
+- [Code Ownership — Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)
 - [The Mythical Man-Month](https://en.wikipedia.org/wiki/The_Mythical_Man-Month)
-- [Code Ownership - Martin Fowler](https://martinfowler.com/bliki/CodeOwnership.html)
 
 Tags: Capstone, Team, Roles, Collaboration, Beginner

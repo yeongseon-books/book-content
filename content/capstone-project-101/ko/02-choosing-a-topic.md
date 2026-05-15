@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Scope
   - Beginner
 seo_description: 캡스톤 주제를 고를 때 범위와 실현 가능성을 함께 보는 기준을 정리합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 주제 선정
 
-주제 선정은 흥미로운 아이디어를 뽑는 과정이 아니라, 한 학기 안에 끝까지 책임질 수 있는 문제를 고르는 과정입니다. 이 글은 Capstone Project 101 시리즈의 2번째 글입니다. 여기서는 좋은 주제가 어떤 조건을 갖춰야 하는지, 그리고 후보를 어떻게 비교해야 하는지 차분히 정리해 보겠습니다.
+좋아 보이는 아이디어는 많지만, 한 학기 안에 끝까지 밀 수 있는 아이디어는 훨씬 적습니다. 캡스톤 주제 선정이 어려운 이유도 여기에 있습니다.
 
-> 멘탈 모델: 좋은 주제는 멋있어 보이는 주제가 아니라, 작고 측정 가능하며 팀이 실제로 끝까지 가져갈 수 있는 주제입니다.
+좋은 주제는 멋있어 보이는 주제가 아니라 팀이 끝까지 책임질 수 있는 주제입니다. 그래서 주제를 고를 때는 흥미, 사용자 가치, 구현 가능성, 발표 난도를 함께 봐야 합니다.
+
+이 글은 Capstone Project 101 시리즈의 2번째 글입니다. 여기서는 후보를 비교하는 기준을 만들고, 범위가 큰 아이디어를 학기 안에 맞는 주제로 줄이는 방법을 설명합니다.
+
+> 멘탈 모델: 좋은 주제는 새롭기만 한 주제가 아니라, 팀이 시간 안에 설명하고 구현하고 발표할 수 있는 범위로 정리된 주제입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,30 @@ last_reviewed: '2026-05-12'
 
 좋은 팀은 유행보다 완주 가능성을 먼저 봅니다. 캡스톤은 아이디어 경연이 아니라, 제한된 시간 안에 작지만 설득력 있는 결과물을 만드는 과정이기 때문입니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    I[Ideas] --> F[Filter]
-    F --> M[Matrix]
-    M --> S[Score]
-    S --> P[Pick]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/02/02-01-the-flow-at-a-glance.ko.png)
+*주제 후보를 필터링해 최종 선택으로 좁히는 흐름*
+
+## 실전 문서 예시: 주제 비교 매트릭스
+
+후보를 세 개 이상 두고 아래처럼 같은 축으로 점수를 매기면, 감으로 정한 결정인지 근거가 있는 결정인지 바로 드러납니다.
+
+```text
+후보 | 사용자 문제 | 영향 | 구현 가능성 | 데이터 접근성 | 데모 선명도
+수강 충돌 검사기 | 높음 | 5 | 5 | 4 | 5
+감정 일기 추천기 | 중간 | 3 | 4 | 3 | 3
+캠퍼스 길찾기 | 중간 | 4 | 2 | 2 | 4
+
+결론: 수강 충돌 검사기가 가장 작고, 가장 빨리 데모 가치가 드러난다.
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 점수축이 서로 겹치지 않는지 확인합니다.
+- 데이터 접근성처럼 뒤늦게 터지는 리스크를 별도 축으로 둡니다.
+- 최종 결론 옆에 한두 문장 이유를 남깁니다.
+- 탈락한 후보도 보존해 두면 범위 조정 때 대안으로 되살릴 수 있습니다.
 
 ## 핵심 용어
 
@@ -156,7 +175,7 @@ pick = max(total, key=total.get)
 
 ## 정리와 다음 글
 
-좋은 주제는 화려한 주제가 아니라, 팀이 끝까지 책임질 수 있는 주제입니다. 사용자 문제를 설명할 수 있어야 하고, 범위를 줄일 수 있어야 하며, 비교 가능한 기준 위에서 선택되어야 합니다. 다음 글에서는 선택한 주제를 실제 문제 문장으로 바꾸는 과정을 살펴보겠습니다.
+주제 선정은 흥미 경쟁이 아니라 완주 가능성을 고르는 일입니다. 비교 기준을 먼저 세우고, 작은 데모 가치가 가장 빨리 드러나는 후보를 고르면 이후 요구사항과 MVP도 훨씬 안정적으로 정리됩니다. 다음 글에서는 선택한 주제를 문제 문장으로 바꾸는 방법을 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +192,11 @@ pick = max(total, key=total.get)
 
 ## 참고 자료
 
-- [The Mom Test](http://momtestbook.com/)
-- [Jobs to be Done](https://strategyn.com/jobs-to-be-done/)
-- [How to Get Startup Ideas - Paul Graham](http://paulgraham.com/startupideas.html)
+### 공식 문서와 실무 자료
+
 - [Atlassian Decision Matrix](https://www.atlassian.com/work-management/project-management/decision-matrix)
+- [The Mom Test](http://momtestbook.com/)
+- [Jobs to Be Done overview](https://strategyn.com/jobs-to-be-done/)
+- [How to Get Startup Ideas — Paul Graham](http://paulgraham.com/startupideas.html)
 
 Tags: Capstone, Topic, Ideation, Scope, Beginner

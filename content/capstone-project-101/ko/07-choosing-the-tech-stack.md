@@ -6,7 +6,6 @@ status: publish-ready
 targets:
   tistory: true
   medium: false
-  hashnode: false
   mkdocs: true
   ebook: true
 language: ko
@@ -17,14 +16,19 @@ tags:
   - Architecture
   - Beginner
 seo_description: 캡스톤 프로젝트 기술 스택을 팀의 친숙도, 학습 비용, 운영 부담 관점에서 현실적으로 비교 분석하고 최선의 의사결정을 내리는 기준을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 기술 스택 선택
 
-기술 스택은 새로워 보이는 조합을 자랑하는 일이 아니라, 현재 팀이 일정 안에 완주할 수 있는 조합을 고르는 일입니다. 이 글은 Capstone Project 101 시리즈의 7번째 글입니다. 여기서는 친숙도, 학습 비용, 운영 부담을 함께 보며 현실적인 선택을 하는 법을 정리하겠습니다.
+기술 스택 선택이 어렵다는 말에는 보통 두 가지가 섞여 있습니다. 새로운 기술을 써 보고 싶은 마음과, 학기 안에 반드시 끝내야 한다는 현실입니다.
 
-> 멘탈 모델: 좋은 스택은 가장 최신인 스택이 아니라, 지금 팀이 가장 안정적으로 배우고 만들고 운영할 수 있는 스택입니다.
+캡스톤에서는 이 둘이 자주 충돌합니다. 그래서 좋은 기술보다 지금 우리 팀이 무리 없이 다룰 수 있는 기술을 먼저 정의해야 합니다.
+
+이 글은 Capstone Project 101 시리즈의 7번째 글입니다. 여기서는 친숙도, 학습 비용, 운영 부담, 문서 품질을 함께 보며 현실적인 기술 선택 기준을 정리합니다.
+
+> 멘탈 모델: 좋은 기술 스택은 가장 화려한 조합이 아니라, 지금 팀이 일정 안에 배우고 구현하고 운영할 수 있는 조합입니다.
+
 
 ## 이 글에서 다룰 문제
 
@@ -48,15 +52,30 @@ last_reviewed: '2026-05-12'
 
 좋은 선택은 집중을 만듭니다. 반대로 과하게 욕심낸 선택은 학습 비용과 운영 부담이 일정 전체를 잠식하게 만듭니다.
 
-## 한눈에 보는 개념
+## 한눈에 보는 흐름
 
-```mermaid
-flowchart LR
-    R[Requirements] --> F[Familiar]
-    F --> L[Learning Cost]
-    L --> O[Ops]
-    O --> D[Decide]
+![한눈에 보는 흐름](../../../assets/capstone-project-101/07/07-01-the-flow-at-a-glance.ko.png)
+*요구사항에서 ADR 기록까지 이어지는 기술 선택 흐름*
+
+## 실전 문서 예시: 간단한 ADR
+
+기술 선택은 말로만 합의하면 나중에 다시 흔들리기 쉽습니다. 아래처럼 한 장짜리 ADR을 남기면 변경 판단이 빨라집니다.
+
+```text
+제목: 백엔드 프레임워크로 Flask를 선택한다
+문맥: 팀원 4명 중 3명이 Flask 경험이 있고, 6주 안에 데모를 만들어야 한다
+대안: FastAPI, Django
+선택 이유: 학습 비용이 가장 낮고, 배포 절차가 단순하며, 문서가 충분하다
+감수할 단점: 자동 문서화와 구조화 기능은 FastAPI보다 약하다
+재검토 조건: 인증, 비동기 API, 관리자 기능 범위가 크게 늘어날 때
 ```
+
+## 이 문서로 먼저 확인할 것
+
+- 친숙도와 학습 비용을 분리해서 적었는지 확인합니다.
+- 운영 부담에 배포와 장애 대응이 포함되어 있는지 봅니다.
+- 대안이 두세 개 수준으로 정리되어 있는지 점검합니다.
+- 재검토 조건이 있으면 나중에 감정적 논쟁을 줄일 수 있습니다.
 
 ## 핵심 용어
 
@@ -156,7 +175,7 @@ score = {k: familiar[k] - learning_cost[k] - ops[k] for k in candidates}
 
 ## 정리와 다음 글
 
-기술 스택 선택은 취향 경쟁이 아니라 일정과 리스크를 줄이는 의사결정입니다. 친숙도, 학습 비용, 운영 부담을 함께 보면 왜 어떤 기술이 지금 팀에 맞는지 더 선명해집니다. 다음 글에서는 이렇게 정한 기술과 범위를 실제 일정으로 어떻게 관리할지 이어서 살펴보겠습니다.
+기술 스택 선택은 취향 경쟁이 아니라 리스크 조정입니다. 친숙도, 학습 비용, 운영 부담을 함께 보고 기록까지 남기면 기술 결정이 프로젝트를 돕는 방향으로 움직입니다. 다음 글에서는 이 선택을 일정으로 어떻게 관리할지 다룹니다.
 
 <!-- toc:begin -->
 - [캡스톤 프로젝트란 무엇인가](./01-what-is-capstone.md)
@@ -173,9 +192,11 @@ score = {k: familiar[k] - learning_cost[k] - ops[k] for k in candidates}
 
 ## 참고 자료
 
+### 공식 문서와 실무 자료
+
 - [Architecture Decision Records](https://adr.github.io/)
-- [Choose Boring Technology - Dan McKinley](https://boringtechnology.club/)
+- [Choose Boring Technology](https://boringtechnology.club/)
 - [The Twelve-Factor App](https://12factor.net/)
-- [Tech Radar - Thoughtworks](https://www.thoughtworks.com/radar)
+- [Thoughtworks Technology Radar](https://www.thoughtworks.com/radar)
 
 Tags: Capstone, TechStack, Decision, Architecture, Beginner
