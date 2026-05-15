@@ -14,9 +14,8 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: See how KEDA turns ScaledObjects into generated HPAs, feeds external metrics, and directly owns the 0-to-1 scale boundary in AKS.
 ---
 
 # KEDA internals — how a ScaledObject builds an HPA

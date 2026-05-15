@@ -14,9 +14,8 @@ tags:
 - Kubernetes
 - Distributed Systems
 - Containers
-last_reviewed: '2026-04-29'
-seo_description: AKS control plane is managed by Microsoft, so the upstream code here
-  is a behavioral comparison baseline, not a statement about the exact binaries…
+last_reviewed: '2026-05-15'
+seo_description: Compare Azure CNI Pod Subnet, Node Subnet, and Overlay in AKS by Pod IP source, VNet pressure, SNAT path, and first-response diagnostics.
 ---
 
 # CNI and Azure CNI Overlay — where Pod IPs come from
@@ -24,6 +23,8 @@ seo_description: AKS control plane is managed by Microsoft, so the upstream code
 AKS networking gets confusing fast if every design is still called simply “Azure CNI.” The real operational questions are more specific: which address space gives the Pod its IP, what consumes scarce VNet space, and what path outbound traffic takes after the Pod comes up.
 
 This is the third post in the Azure Kubernetes Service Deep Dive series. Here, I separate Azure CNI Pod Subnet, Node Subnet, and Overlay so the source of Pod IPs becomes concrete.
+
+The goal is not to re-list networking product names. It is to give you a cleaner operator map: where the Pod IP is allocated, what burns scarce VNet space, what an external firewall actually sees, and which symptom usually appears first when the address plan starts to hurt.
 
 ## Source Version
 
@@ -52,6 +53,14 @@ and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mo
 - Where in the data plane does a NetworkPolicy (Azure NPM, Cilium) actually drop packets?
 - What is the first signal of subnet IP exhaustion, and what is the recovery playbook?
 
+## Why this matters in real AKS operations
+
+AKS networking is not a one-time cluster-creation checkbox. The chosen model keeps shaping later decisions about new node pools, peering, firewall rules, NAT, private endpoints, and how many Pods the cluster can add before address pressure becomes a production issue.
+
+That is why teams often get surprised twice. First, they treat all Azure CNI modes as the same design and underestimate how differently they consume IP space. Second, they debug outbound failures, IP exhaustion, or policy mismatches as if they were generic Kubernetes problems when the root cause is actually the network model chosen on day one.
+
+The practical payoff of this chapter is simple. Once you can answer “where did this Pod IP come from?” and “what source IP does the outside world see?”, most AKS networking incidents narrow down much faster.
+
 ## Put the three models side by side
 
 ![Comparison of three AKS network models](../../../assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
@@ -67,6 +76,8 @@ assigns IPs,
 and installs routes and rules.
 That means part 2's `RunPodSandbox` path and part 3's Pod IP story are tightly connected.
 
+For operators, that also means Pod startup and Pod networking should not be debugged as unrelated phases. A sandbox that never receives a usable interface can surface as a startup failure, even when the container image and process entrypoint are completely fine.
+
 ---
 
 ## Azure CNI Pod Subnet, Node Subnet, and Overlay
@@ -79,6 +90,12 @@ For 2026 AKS operations, the practical comparison is this:
 
 Pod Subnet and Node Subnet both preserve direct pod reachability from connected networks because Pod IPs still live in VNet space. Overlay conserves VNet IPs best, but direct inter-cluster pod-to-pod routing through native pod IPs is not the model there.
 
+The design trade-off becomes clearer if you phrase it operationally:
+
+- **Pod Subnet** keeps flat networking while separating node growth from Pod growth.
+- **Node Subnet** is easiest to picture, but it is also the quickest path to subnet exhaustion.
+- **Overlay** preserves VNet IP space best, but you must reason about egress and external policy through node-facing addresses rather than native Pod-IP reachability.
+
 ![IP path differences across three AKS network models](../../../assets/azure-aks-deep-dive/03/03-02-azure-cni-versus-overlay.en.png)
 
 *IP path differences across three AKS network models*
@@ -89,6 +106,18 @@ Pod Subnet and Node Subnet both preserve direct pod reachability from connected 
 AKS documentation now carries a kubenet retirement timeline.
 That means kubenet is no longer a safe long-term default for new designs.
 The official networking direction in AKS is moving toward Azure CNI Overlay.
+
+That does not mean every existing kubenet cluster is wrong. It means new designs should treat kubenet as a constrained legacy path, not the default mental model for future AKS networking decisions.
+
+## What tends to fail first in each model
+
+The first visible symptom is not identical across the three models.
+
+- **Pod Subnet** usually fails as pod-subnet sizing pressure, route-policy mismatches, or surprise reachability assumptions between connected networks.
+- **Node Subnet** often shows pain earliest as subnet exhaustion because node count and Pod density burn the same address pool together.
+- **Overlay** more often shifts the first debugging step toward outbound SNAT, firewall expectations, or external systems assuming Pod IPs are directly routable.
+
+This is why “the Pod cannot reach X” is not a diagnosis yet. You need to know whether you are investigating address allocation, node-based SNAT, or external routing assumptions.
 
 ---
 
@@ -121,6 +150,35 @@ az aks show -n my-cluster -g my-rg \
 kubectl get nodes -o wide
 kubectl get pods -A -o wide | head -20
 ```
+
+### Check IP pressure and outbound path before changing the cluster
+
+```bash
+az network vnet subnet show -g my-network-rg \
+  --vnet-name my-vnet \
+  --name my-node-subnet \
+  --query "{prefix:addressPrefix, available:ipConfigurations}" -o json
+
+kubectl describe pod my-pod -n my-ns | tail -40
+kubectl get events -A --sort-by=.lastTimestamp | tail -30
+```
+
+Use the Azure-side subnet view to verify address-planning assumptions, then use Pod events to confirm whether the symptom is allocation failure, sandbox setup failure, or a later connectivity problem.
+
+## Failure signatures worth recognizing early
+
+- A Pod that stays in `ContainerCreating` while sandbox setup or CNI attachment keeps retrying points you toward node-local networking setup, not application code.
+- Repeated Pending or creation failures during scale events can be the first practical sign that the subnet math was too tight for the expected Pod and node growth.
+- Overlay clusters that work internally but fail against external systems often expose policy or firewall assumptions about source IP visibility rather than a generic Kubernetes networking bug.
+- Outbound instability under burst traffic can reflect SNAT pressure even when Pod-to-Service communication inside the cluster looks healthy.
+
+## Common points of confusion
+
+- **Azure CNI is not one single design.** Pod Subnet, Node Subnet, and Overlay differ in address source and what the outside world sees.
+- **Overlay does not mean “less real” Kubernetes networking.** It means Pod IPs come from a different address space and egress is interpreted differently outside the cluster.
+- **CNI is not a decorative add-on after the container starts.** It is part of making the Pod sandbox usable in the first place.
+- **Native Pod-IP reachability is an architectural choice, not a guaranteed property of every AKS networking mode.**
+- **Address planning is an operations policy decision, not only a cluster-bootstrap step.**
 
 ## Operational checklist
 
