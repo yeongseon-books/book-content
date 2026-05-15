@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 2
 title: Understanding Roles
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Roles
-  - Frontend
-  - Backend
-  - Beginner
-seo_description: A beginner-friendly tour comparing frontend, backend, data, SRE, and ML developer roles.
-last_reviewed: '2026-05-04'
+- Career
+- Roles
+- Frontend
+- Backend
+- Beginner
+seo_description: A beginner-friendly tour comparing frontend, backend, data, SRE,
+  and ML developer roles.
+last_reviewed: '2026-05-14'
 ---
 
 # Understanding Roles
 
+Saying "I want to be a developer" is still too broad to guide real decisions. Frontend, backend, data, SRE, ML, and mobile roles all ship software, but they optimize for different outcomes, carry different failure modes, and measure success with different signals.
+
 This is post 2 in the Developer Career 101 series.
 
-> Developer Career 101 series (2/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What actually differs across frontend, backend, data, SRE, ML, and mobile roles?
+- Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?
+- How can you tell whether your current role fits you or whether a transition is worth exploring?
+- What should you inspect first before moving toward a different role?
 
-**Core question**: How do you decide which developer *role* fits you?
-
-> Compare responsibilities, tools, and metrics — three axes.
-
-<!-- a-grade-intro:end -->
+> Good role choices start with the responsibility you are willing to own, not with the tool you want to learn next.
 
 ## What You Will Learn
 
@@ -48,14 +50,9 @@ A bad role fit shortens the path to burnout.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F[Frontend] --> B[Backend]
-    B --> D[Data]
-    D --> S[SRE]
-    S --> M[ML]
-    M --> Mo[Mobile]
-```
+![Comparison flow across common developer roles](../../../assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
+
+*Comparison flow across common developer roles*
 
 ## Key Terms
 
@@ -112,6 +109,15 @@ responsibility: model quality
 tools: PyTorch, MLflow
 metrics: AUC, latency
 ```
+
+## Decision frame for comparing roles
+
+| Lens | Frontend | Backend | Data / SRE / ML |
+| --- | --- | --- | --- |
+| Frequent failure mode | Slow or broken user flow | Error rate, data integrity, service instability | Stale data, incident load, weak model quality |
+| What success feels like | Users move with less friction | Systems stay predictable under change | Reliability, freshness, or model quality improves measurably |
+| Evidence to inspect early | Performance metrics, design collaboration | API contracts, storage boundaries, production metrics | Pipeline shape, on-call expectations, reproducibility tooling |
+| Fit question | Do you enjoy polishing interaction details? | Do you enjoy data flow and edge cases? | Do you like operating with metrics and explicit risk? |
 
 ## What to Notice in This Code
 
@@ -170,9 +176,9 @@ Next post covers *Building a Learning Plan*.
 
 ## References
 
-- [Web Vitals](https://web.dev/vitals/)
+- [web.dev — Web Vitals](https://web.dev/vitals/)
 - [Google SRE Book](https://sre.google/books/)
-- [State of Data Engineering](https://www.lakefs.io/blog/state-of-data-engineering-2024/)
-- [MLOps Maturity](https://ml-ops.org/)
+- [MLOps Community](https://mlops.community/)
+- [roadmap.sh — Developer roadmaps](https://roadmap.sh/)
 
 Tags: Career, Roles, Frontend, Backend, Beginner

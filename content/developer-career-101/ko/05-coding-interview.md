@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Interview
-  - Algorithms
-  - Practice
-  - Beginner
+- Career
+- Interview
+- Algorithms
+- Practice
+- Beginner
 seo_description: 효율적인 코딩 인터뷰 준비를 위한 알고리즘 학습 패턴과 실전 감각을 익히는 모의 면접 및 커뮤니케이션 기술을 공유합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 코딩 인터뷰 준비
@@ -49,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    P[Pattern] --> S[Solve]
-    S --> C[Communicate]
-    C --> M[Mock]
-    M --> F[Feedback]
-```
+![패턴 학습에서 피드백까지 이어지는 인터뷰 연습 루프](../../../assets/developer-career-101/05/05-01-concept-at-a-glance.ko.png)
+
+*패턴 학습에서 피드백까지 이어지는 인터뷰 연습 루프*
 
 코딩 인터뷰는 문제 풀이 시험이면서 동시에 커뮤니케이션 시험입니다. 패턴으로 접근하고, 절차에 따라 풀고, 말로 설명하고, 모의 면접과 피드백으로 다듬는 흐름이 함께 돌아야 합니다.
 
@@ -125,6 +121,33 @@ def two_sum(nums, target):
 
 회고는 약한 패턴을 드러내고 다음 주 계획을 구체화합니다. 특히 말하기가 약했다면 음성 녹음까지 붙여 보는 편이 좋습니다.
 
+## 코딩 인터뷰 채점표를 의식하며 연습하기
+
+| 평가 축 | 면접관이 보는 신호 | 준비 루틴 |
+| --- | --- | --- |
+| 문제 이해 | 제약과 예외를 먼저 확인하는가 | 풀이 전 질문 2개를 습관화합니다. |
+| 알고리즘 선택 | 왜 이 패턴을 골랐는지 설명하는가 | 패턴별 대표 문제와 대안을 짝지어 기록합니다. |
+| 구현 안정성 | 경계 조건, 변수명, 실수 복구가 되는가 | 제한 시간 안에 다시 읽는 3분을 남깁니다. |
+| 커뮤니케이션 | 생각을 중간중간 공유하는가 | 음성 녹음으로 풀이 설명을 복기합니다. |
+
+## 코딩 인터뷰 채점표를 의식하며 연습하기
+
+| 평가 축 | 면접관이 보는 신호 | 준비 루틴 |
+| --- | --- | --- |
+| 문제 이해 | 제약과 예외를 먼저 확인하는가 | 풀이 전 질문 2개를 습관화합니다. |
+| 알고리즘 선택 | 왜 이 패턴을 골랐는지 설명하는가 | 패턴별 대표 문제와 대안을 짝지어 기록합니다. |
+| 구현 안정성 | 경계 조건, 변수명, 실수 복구가 되는가 | 제한 시간 안에 다시 읽는 3분을 남깁니다. |
+| 커뮤니케이션 | 생각을 중간중간 공유하는가 | 음성 녹음으로 풀이 설명을 복기합니다. |
+
+## 코딩 인터뷰 채점표를 의식하며 연습하기
+
+| 평가 축 | 면접관이 보는 신호 | 준비 루틴 |
+| --- | --- | --- |
+| 문제 이해 | 제약과 예외를 먼저 확인하는가 | 풀이 전 질문 2개를 습관화합니다. |
+| 알고리즘 선택 | 왜 이 패턴을 골랐는지 설명하는가 | 패턴별 대표 문제와 대안을 짝지어 기록합니다. |
+| 구현 안정성 | 경계 조건, 변수명, 실수 복구가 되는가 | 제한 시간 안에 다시 읽는 3분을 남깁니다. |
+| 커뮤니케이션 | 생각을 중간중간 공유하는가 | 음성 녹음으로 풀이 설명을 복기합니다. |
+
 ## 이 예시에서 먼저 볼 점
 
 - 패턴은 지름길입니다.
@@ -183,9 +206,9 @@ def two_sum(nums, target):
 
 ## 참고 자료
 
+- [LeetCode problem patterns](https://seanprashad.com/leetcode-patterns/)
 - [Cracking the Coding Interview](http://www.crackingthecodinginterview.com/)
-- [LeetCode patterns](https://seanprashad.com/leetcode-patterns/)
-- [Pramp](https://www.pramp.com/)
-- [Interviewing.io](https://interviewing.io/)
+- [Pramp mock interviews](https://www.pramp.com/)
+- [Interviewing.io engineering interview practice](https://interviewing.io/)
 
 Tags: Career, Interview, Algorithms, Practice, Beginner

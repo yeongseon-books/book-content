@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 7
 title: Settling into the First Job
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - FirstJob
-  - Onboarding
-  - Junior
-  - Beginner
-seo_description: A beginner-friendly tour of the first ninety days at your first developer job.
-last_reviewed: '2026-05-04'
+- Career
+- FirstJob
+- Onboarding
+- Junior
+- Beginner
+seo_description: A beginner-friendly tour of the first ninety days at your first developer
+  job.
+last_reviewed: '2026-05-14'
 ---
 
 # Settling into the First Job
 
+The first developer job often creates pressure to prove yourself immediately. Most teams are not looking for instant mastery in the first ninety days. They are looking for how fast you learn the context, how clearly you ask for help, and whether you can turn that help into small reliable contributions.
+
 This is post 7 in the Developer Career 101 series.
 
-> Developer Career 101 series (7/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What should a new developer focus on during the first ninety days?
+- Why do questions, notes, and feedback loops matter more than pretending to know everything?
+- How can your first PR and your 1:1s build trust quickly?
+- What onboarding mistakes show up most often, and how can you avoid them?
 
-**Core question**: What do you do in the *first ninety days* to last for the long run?
-
-> Ask, record, and ship small contributions.
-
-<!-- a-grade-intro:end -->
+> The first ninety days are less about proving finished skill and more about proving a reliable learning loop.
 
 ## What You Will Learn
 
@@ -48,12 +50,9 @@ The first impression frames the next eighteen months.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    L[Learn] --> A[Ask]
-    A --> C[Contribute]
-    C --> F[Feedback]
-```
+![Onboarding loop from learning to feedback](../../../assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
+
+*Onboarding loop from learning to feedback*
 
 ## Key Terms
 
@@ -107,6 +106,33 @@ weekly with manager, biweekly with mentor
 - gap: question frequency
 - next: one question per day
 ```
+
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
+
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
+
+## A simple ninety-day operating plan
+
+| Window | Priority | Useful artifact |
+| --- | --- | --- |
+| Days 0-30 | Build context and language | Team glossary, system notes |
+| Days 31-60 | Improve question quality | Question notebook, 1:1 agenda |
+| Days 61-90 | Ship small and learn fast | First PR, retro notes |
+| Entire period | Surface confusion early | Check-in rhythm and help requests |
 
 ## What to Notice in This Code
 
@@ -167,8 +193,8 @@ Next post covers *Side Projects and Learning*.
 ## References
 
 - [The First 90 Days](https://hbr.org/books/watkins)
-- [Stripe Engineering Onboarding](https://stripe.com/blog/engineering-principles)
-- [Will Larson — Onboarding](https://lethain.com/onboarding-checklist/)
-- [Psychological Safety](https://rework.withgoogle.com/blog/five-keys-to-a-successful-google-team/)
+- [Will Larson — Onboarding checklist](https://lethain.com/onboarding-checklist/)
+- [GitHub Docs — Pull requests](https://docs.github.com/en/pull-requests)
+- [re:Work — Psychological safety](https://rework.withgoogle.com/guides/understanding-team-effectiveness/steps/introduction/)
 
 Tags: Career, FirstJob, Onboarding, Junior, Beginner

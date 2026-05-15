@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 5
 title: Preparing for Coding Interviews
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Interview
-  - Algorithms
-  - Practice
-  - Beginner
-seo_description: A beginner-friendly tour of patterns, mock interviews, and time management for coding interviews.
-last_reviewed: '2026-05-04'
+- Career
+- Interview
+- Algorithms
+- Practice
+- Beginner
+seo_description: A beginner-friendly tour of patterns, mock interviews, and time management
+  for coding interviews.
+last_reviewed: '2026-05-14'
 ---
 
 # Preparing for Coding Interviews
 
+Solving lots of problems does not automatically translate into strong interview performance. In a live coding interview, you are also being scored on how you narrow ambiguity, explain your plan, recover from mistakes, and manage the clock while still producing correct code.
+
 This is post 5 in the Developer Career 101 series.
 
-> Developer Career 101 series (5/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- Why is raw problem count alone a weak preparation strategy?
+- How do recurring patterns reduce wasted time in unfamiliar questions?
+- Why do communication, complexity analysis, and time management change the score so much?
+- How should mock interviews and retrospectives feed back into your practice loop?
 
-**Core question**: Is *practice problems* alone enough to be ready for the interview?
-
-> Patterns, communication, and time management must move together.
-
-<!-- a-grade-intro:end -->
+> Coding interview skill rises when pattern recognition, communication, and timing improve together.
 
 ## What You Will Learn
 
@@ -48,13 +50,9 @@ Without patterns, you waste time.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Pattern] --> S[Solve]
-    S --> C[Communicate]
-    C --> M[Mock]
-    M --> F[Feedback]
-```
+![Interview practice loop from patterns to feedback](../../../assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
+
+*Interview practice loop from patterns to feedback*
 
 ## Key Terms
 
@@ -111,6 +109,33 @@ def two_sum(nums, target):
 - stuck pattern: dp
 - next week: 5 dp problems + voice recording
 ```
+
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
+
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
+
+## Practice against the rubric, not just the problem set
+
+| Evaluation axis | Signal interviewers notice | Training habit |
+| --- | --- | --- |
+| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
+| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
+| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
+| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
 
 ## What to Notice in This Code
 
@@ -170,9 +195,9 @@ Next post covers *System Design Interviews*.
 
 ## References
 
+- [LeetCode problem patterns](https://seanprashad.com/leetcode-patterns/)
 - [Cracking the Coding Interview](http://www.crackingthecodinginterview.com/)
-- [LeetCode patterns](https://seanprashad.com/leetcode-patterns/)
-- [Pramp](https://www.pramp.com/)
-- [Interviewing.io](https://interviewing.io/)
+- [Pramp mock interviews](https://www.pramp.com/)
+- [Interviewing.io engineering interview practice](https://interviewing.io/)
 
 Tags: Career, Interview, Algorithms, Practice, Beginner

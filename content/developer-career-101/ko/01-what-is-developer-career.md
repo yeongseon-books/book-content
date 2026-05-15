@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Developer
-  - Growth
-  - Junior
-  - Beginner
+- Career
+- Developer
+- Growth
+- Junior
+- Beginner
 seo_description: 개발자 커리어의 단계별 성장 과정과 필수 역량 축을 분석하고, 지속 가능한 성장을 이루기 위한 핵심 로드맵을 제시합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 개발자 커리어란 무엇인가
@@ -49,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    J[Junior] --> M[Mid]
-    M --> S[Senior]
-    S --> L[Lead]
-    S --> P[Principal]
-```
+![커리어 단계와 영향 범위 확장 흐름](../../../assets/developer-career-101/01/01-01-concept-at-a-glance.ko.png)
+
+*커리어 단계와 영향 범위 확장 흐름*
 
 커리어 단계는 칸막이처럼 끊겨 있지 않습니다. 주니어의 실행력이 미드의 자기 주도성으로 이어지고, 시니어에서는 문제 정의와 판단으로 넓어집니다. 그래서 커리어를 직함의 계단보다 여러 축이 함께 누적되는 구조로 이해하는 편이 더 정확합니다.
 
@@ -125,6 +121,15 @@ one of: junior / mid / senior
 
 회고는 감상문이 아니라 다음 행동을 정하는 문서입니다. 잘된 점, 빈틈, 다음 분기에 바꿀 한 가지를 적기만 해도 방향 감각이 훨씬 선명해집니다.
 
+## 커리어 판단 프레임
+
+| 축 | 지금 스스로 점검할 질문 | 다음 행동 예시 |
+| --- | --- | --- |
+| 역할 | 지금 맡는 일은 지시 수행 중심인가, 문제 정의까지 포함하는가 | 최근 4주간 맡은 일을 적고 "정의"가 들어간 항목 수를 세어 봅니다. |
+| 역량 | 기술, 협업, 도메인 이해 중 어느 축이 가장 약한가 | 약한 축 하나를 정하고 다음 분기 결과물을 연결합니다. |
+| 영향력 | 내 판단이 나 말고 누구의 속도와 품질에 영향을 주는가 | 문서, 리뷰, 자동화처럼 재사용 가능한 흔적을 하나 남깁니다. |
+| 기록 | 다음 평가나 이직 때 꺼낼 증거가 남아 있는가 | 주간 로그 한 개, 월간 회고 한 개를 고정합니다. |
+
 ## 이 예시에서 먼저 볼 점
 
 - 단계는 끊어진 칸이 아니라 연속적인 성장 흐름입니다.
@@ -183,9 +188,9 @@ one of: junior / mid / senior
 
 ## 참고 자료
 
-- [Career Ladders for Software Engineers](https://www.progression.fyi/)
+- [Progression.fyi — Engineering career ladders](https://www.progression.fyi/)
 - [Dropbox Engineering Career Framework](https://dropbox.github.io/dbx-career-framework/)
-- [Staff Engineer's Path](https://noidea.dog/staff)
-- [Developer roadmap](https://roadmap.sh/)
+- [Staff Engineer: The Path](https://staffeng.com/guides/staff-engineer-path/)
+- [The Pragmatic Engineer — Career ladders and scope](https://newsletter.pragmaticengineer.com/)
 
 Tags: Career, Developer, Growth, Junior, Beginner

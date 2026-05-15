@@ -11,13 +11,13 @@ targets:
   ebook: true
 language: ko
 tags:
-  - Career
-  - Resume
-  - Portfolio
-  - Hiring
-  - Beginner
+- Career
+- Resume
+- Portfolio
+- Hiring
+- Beginner
 seo_description: 채용 담당자가 30초 안에 이해하는 이력서와 포트폴리오 작성 원칙을 정리한 글
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 ---
 
 # 이력서와 포트폴리오
@@ -49,13 +49,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    H[Header] --> S[Summary]
-    S --> E[Experience]
-    E --> P[Projects]
-    P --> Sk[Skills]
-```
+![이력서에서 포트폴리오로 이어지는 검토 흐름](../../../assets/developer-career-101/04/04-01-concept-at-a-glance.ko.png)
+
+*이력서에서 포트폴리오로 이어지는 검토 흐름*
 
 좋은 이력서는 위에서 아래로 읽히는 흐름이 자연스럽습니다. 누구인지, 무엇을 잘하는지, 어떤 결과를 냈는지, 그 결과를 어디서 검증할 수 있는지가 짧은 시간 안에 이어져야 합니다.
 
@@ -115,6 +111,33 @@ Python, PostgreSQL, AWS, Kubernetes
 
 기술 스택은 경험과 분리되어 떠 있으면 약합니다. 앞선 경력과 프로젝트 섹션에서 실제로 등장한 기술만 묶어 적는 편이 훨씬 강합니다.
 
+## 서류 검토 흐름에서 먼저 보는 지점
+
+| 검토 단계 | 읽는 사람이 보는 것 | 내가 준비할 증거 |
+| --- | --- | --- |
+| 30초 스캔 | 역할, 연차, 가장 강한 숫자 | 요약문 3줄, 대표 성과 1개 |
+| 3분 정독 | 결과 문장의 밀도와 재현 가능성 | STAR 구조 불릿, 수치 근거 |
+| 포트폴리오 검증 | 링크가 실제로 열리고 주장과 맞는가 | README, 배포 링크, 발표 자료 |
+| 면접 연결 | 어떤 질문을 던지면 될지가 보이는가 | 장애 대응, 성능 개선, 협업 사례 |
+
+## 서류 검토 흐름에서 먼저 보는 지점
+
+| 검토 단계 | 읽는 사람이 보는 것 | 내가 준비할 증거 |
+| --- | --- | --- |
+| 30초 스캔 | 역할, 연차, 가장 강한 숫자 | 요약문 3줄, 대표 성과 1개 |
+| 3분 정독 | 결과 문장의 밀도와 재현 가능성 | STAR 구조 불릿, 수치 근거 |
+| 포트폴리오 검증 | 링크가 실제로 열리고 주장과 맞는가 | README, 배포 링크, 발표 자료 |
+| 면접 연결 | 어떤 질문을 던지면 될지가 보이는가 | 장애 대응, 성능 개선, 협업 사례 |
+
+## 서류 검토 흐름에서 먼저 보는 지점
+
+| 검토 단계 | 읽는 사람이 보는 것 | 내가 준비할 증거 |
+| --- | --- | --- |
+| 30초 스캔 | 역할, 연차, 가장 강한 숫자 | 요약문 3줄, 대표 성과 1개 |
+| 3분 정독 | 결과 문장의 밀도와 재현 가능성 | STAR 구조 불릿, 수치 근거 |
+| 포트폴리오 검증 | 링크가 실제로 열리고 주장과 맞는가 | README, 배포 링크, 발표 자료 |
+| 면접 연결 | 어떤 질문을 던지면 될지가 보이는가 | 장애 대응, 성능 개선, 협업 사례 |
+
 ## 이 예시에서 먼저 볼 점
 
 - 불릿은 결과 문장입니다.
@@ -173,9 +196,9 @@ Python, PostgreSQL, AWS, Kubernetes
 
 ## 참고 자료
 
-- [Tech Resume Inside Out](https://thetechresume.com/)
-- [Google Resume Tips](https://careers.google.com/how-we-hire/)
-- [STAR method](https://en.wikipedia.org/wiki/Situation,_task,_action,_result)
-- [ATS-friendly resume](https://www.jobscan.co/resume-writing-guide)
+- [Google Careers — Resume tips](https://careers.google.com/how-we-hire/)
+- [LinkedIn Talent Blog](https://business.linkedin.com/talent-solutions/blog)
+- [The Muse — STAR method overview](https://www.themuse.com/advice/star-interview-method)
+- [GitHub Docs — Profile README basics](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/about-your-profile)
 
 Tags: Career, Resume, Portfolio, Hiring, Beginner

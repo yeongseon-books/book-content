@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 4
 title: Resume and Portfolio
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Resume
-  - Portfolio
-  - Hiring
-  - Beginner
-seo_description: A beginner-friendly tour of writing a resume and portfolio that recruiters grasp in thirty seconds.
-last_reviewed: '2026-05-04'
+- Career
+- Resume
+- Portfolio
+- Hiring
+- Beginner
+seo_description: A beginner-friendly tour of writing a resume and portfolio that recruiters
+  grasp in thirty seconds.
+last_reviewed: '2026-05-14'
 ---
 
 # Resume and Portfolio
 
+Strong experience still gets ignored if it is hard to scan. Hiring teams usually decide within the first minute whether to keep reading, so the first job of a resume is not to tell your whole story. It is to make your role, your best evidence, and your likely interview topics obvious at a glance.
+
 This is post 4 in the Developer Career 101 series.
 
-> Developer Career 101 series (4/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What structure lets a recruiter understand you quickly without guessing?
+- How do you rewrite responsibilities into outcome-oriented bullets with evidence?
+- Why are numbers and a compact STAR structure such strong hiring signals?
+- How should a portfolio support a resume instead of duplicating it?
 
-**Core question**: How do you make a recruiter understand you in *thirty seconds*?
-
-> Express role, results, and impact with numbers.
-
-<!-- a-grade-intro:end -->
+> A good resume is not a biography. It is a short, credible argument for why you deserve the next conversation.
 
 ## What You Will Learn
 
@@ -48,13 +50,9 @@ A resume is the ticket into the interview.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    H[Header] --> S[Summary]
-    S --> E[Experience]
-    E --> P[Projects]
-    P --> Sk[Skills]
-```
+![Resume flow from summary to supporting portfolio evidence](../../../assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
+
+*Resume flow from summary to supporting portfolio evidence*
 
 ## Key Terms
 
@@ -101,6 +99,15 @@ Backend, 3 yrs. Cut payment p95 from 200ms to 80ms.
 ```text
 Python, PostgreSQL, AWS, Kubernetes
 ```
+
+## What the screening flow actually looks for
+
+| Stage | What the reviewer wants fast | Evidence you should provide |
+| --- | --- | --- |
+| 30-second scan | Role, level, strongest number | Three-line summary and one headline outcome |
+| 3-minute read | Dense, credible result bullets | STAR-shaped bullets with quantified change |
+| Portfolio check | Do the links support the claims? | README, demo, repo, slides, shipped artifact |
+| Interview bridge | What should we ask next? | Incidents, performance wins, collaboration stories |
 
 ## What to Notice in This Code
 
@@ -160,9 +167,9 @@ Next post covers *Preparing for Coding Interviews*.
 
 ## References
 
-- [Tech Resume Inside Out](https://thetechresume.com/)
-- [Google Resume Tips](https://careers.google.com/how-we-hire/)
-- [STAR method](https://en.wikipedia.org/wiki/Situation,_task,_action,_result)
-- [ATS-friendly resume](https://www.jobscan.co/resume-writing-guide)
+- [Google Careers — Resume tips](https://careers.google.com/how-we-hire/)
+- [LinkedIn Talent Blog](https://business.linkedin.com/talent-solutions/blog)
+- [The Muse — STAR method overview](https://www.themuse.com/advice/star-interview-method)
+- [GitHub Docs — Profile README basics](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/about-your-profile)
 
 Tags: Career, Resume, Portfolio, Hiring, Beginner

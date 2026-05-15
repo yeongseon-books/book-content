@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 8
 title: Side Projects and Learning
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - SideProject
-  - Learning
-  - Portfolio
-  - Beginner
-seo_description: A beginner-friendly tour of running a side project alongside a full-time job.
-last_reviewed: '2026-05-04'
+- Career
+- SideProject
+- Learning
+- Portfolio
+- Beginner
+seo_description: A beginner-friendly tour of running a side project alongside a full-time
+  job.
+last_reviewed: '2026-05-14'
 ---
 
 # Side Projects and Learning
 
+The hardest part of side projects is usually not finding ideas. It is choosing a scope that can survive real life. A project that competes with your day job, drifts without a finish line, or ignores IP boundaries often becomes a source of fatigue instead of a source of growth.
+
 This is post 8 in the Developer Career 101 series.
 
-> Developer Career 101 series (8/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What makes a side project compatible with a full-time job?
+- Why does a small MVP beat a grand vision for long-term learning?
+- How do time boxes, public releases, and feedback loops keep the work sustainable?
+- Why should IP, company assets, and conflict-of-interest rules be checked early?
 
-**Core question**: What does a *side project* compatible with a day job look like?
-
-> Small scope, clear purpose, sustainable time.
-
-<!-- a-grade-intro:end -->
+> The value of a side project comes from finishing small, learning fast, and keeping the boundaries clean.
 
 ## What You Will Learn
 
@@ -48,12 +50,9 @@ A side project leaves both learning and evidence behind.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P[Pick] --> T[Time-box]
-    T --> S[Ship]
-    S --> F[Feedback]
-```
+![Side-project flow from idea selection to release and feedback](../../../assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
+
+*Side-project flow from idea selection to release and feedback*
 
 ## Key Terms
 
@@ -107,6 +106,33 @@ gh repo create --public
 - no company assets
 - IP review with employer
 ```
+
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
+
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
+
+## A scorecard for choosing side projects
+
+| Criterion | High score looks like | Warning sign |
+| --- | --- | --- |
+| Learning value | Closes a real career gap | Repeats only what you already know |
+| Finishability | MVP fits in four to six weeks | Core scope already has three major features |
+| Publishability | Easy to explain with README and demo | Output stays invisible |
+| Boundary safety | Clean separation from employer assets and IP | Contract language is unclear |
 
 ## What to Notice in This Code
 
@@ -166,9 +192,9 @@ Next post covers *Mentoring and Networking*.
 
 ## References
 
-- [Side Project Marketing](https://sideprojectmarketing.com/)
+- [GitHub Docs — Licensing a repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)
+- [Open Source Guides — Legal](https://opensource.guide/legal/)
 - [Indie Hackers](https://www.indiehackers.com/)
-- [Open Source IP policy](https://opensource.guide/legal/)
-- [Time blocking](https://todoist.com/productivity-methods/time-blocking)
+- [Time blocking method](https://todoist.com/productivity-methods/time-blocking)
 
 Tags: Career, SideProject, Learning, Portfolio, Beginner

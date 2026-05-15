@@ -2,7 +2,7 @@
 series: developer-career-101
 episode: 6
 title: System Design Interviews
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -11,28 +11,30 @@ targets:
   ebook: true
 language: en
 tags:
-  - Career
-  - Interview
-  - SystemDesign
-  - Architecture
-  - Beginner
-seo_description: A beginner-friendly tour of the four-step system design interview procedure and evaluation criteria.
-last_reviewed: '2026-05-04'
+- Career
+- Interview
+- SystemDesign
+- Architecture
+- Beginner
+seo_description: A beginner-friendly tour of the four-step system design interview
+  procedure and evaluation criteria.
+last_reviewed: '2026-05-14'
 ---
 
 # System Design Interviews
 
+System design interviews can look like a whiteboard drawing exercise from the outside. What interviewers actually value is whether you can frame requirements, make rough estimates, propose a plausible architecture, and explain trade-offs in a way that shows judgment under constraints.
+
 This is post 6 in the Developer Career 101 series.
 
-> Developer Career 101 series (6/10)
+## Questions this chapter answers
 
-<!-- a-grade-intro:begin -->
+- What are interviewers truly evaluating in a system design round?
+- In what order should you move through requirements, estimates, high-level design, and deep dives?
+- Why do trade-offs and bottlenecks separate shallow answers from senior ones?
+- How can you use a classic problem such as a URL shortener to keep your answer stable?
 
-**Core question**: What does the interviewer actually look for in a *system design* interview?
-
-> Requirement framing, trade-offs, and a scaling strategy.
-
-<!-- a-grade-intro:end -->
+> A system design interview is not a test of pretty diagrams. It is a test of judgment explained under real constraints.
 
 ## What You Will Learn
 
@@ -48,12 +50,9 @@ Design is the senior-level filter.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R[Requirements] --> E[Estimate]
-    E --> H[High level]
-    H --> D[Deep dive]
-```
+![Four-stage flow for system design interview answers](../../../assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
+
+*Four-stage flow for system design interview answers*
 
 ## Key Terms
 
@@ -105,6 +104,33 @@ analytics → Kafka → DW
 ```text
 SQL vs KV: consistency vs performance
 ```
+
+## Questions that make a design answer feel senior
+
+| Phase | Question to ask yourself | What must stay in the answer |
+| --- | --- | --- |
+| Requirements | Which user path matters most right now? | Functional vs non-functional split |
+| Estimate | How do read/write ratios change the storage choice? | QPS, storage, growth assumptions |
+| High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
+| Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
+
+## Questions that make a design answer feel senior
+
+| Phase | Question to ask yourself | What must stay in the answer |
+| --- | --- | --- |
+| Requirements | Which user path matters most right now? | Functional vs non-functional split |
+| Estimate | How do read/write ratios change the storage choice? | QPS, storage, growth assumptions |
+| High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
+| Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
+
+## Questions that make a design answer feel senior
+
+| Phase | Question to ask yourself | What must stay in the answer |
+| --- | --- | --- |
+| Requirements | Which user path matters most right now? | Functional vs non-functional split |
+| Estimate | How do read/write ratios change the storage choice? | QPS, storage, growth assumptions |
+| High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
+| Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
 
 ## What to Notice in This Code
 
@@ -166,7 +192,7 @@ Next post covers *Settling into the First Job*.
 
 - [Designing Data-Intensive Applications](https://dataintensive.net/)
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
-- [Grokking the System Design Interview](https://www.educative.io/courses/grokking-the-system-design-interview)
 - [High Scalability](http://highscalability.com/)
+- [Google SRE Book](https://sre.google/books/)
 
 Tags: Career, Interview, SystemDesign, Architecture, Beginner
