@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>ConfigMap and Secret</h1>
-<blockquote>
-<p>Kubernetes 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you <em>inject</em> settings and <em>passwords</em> without <em>baking them into the image</em>?</p>
-<blockquote>
-<p><em>ConfigMap</em> delivers <em>non-secret config</em>; <em>Secret</em> delivers <em>sensitive values</em> — both safely into a <em>Pod</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.</p>
 <p>This is post 6 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will use ConfigMap and Secret to split environment-specific values from the image and connect that split to injection methods, restart behavior, and external secret managers.</p>
+<blockquote>
+<p>Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Splitting <em>ConfigMap</em> and <em>Secret</em></li>
 <li><em>Env vars</em> vs <em>file mounts</em></li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>Pulling <em>environment differences</em> out of the image is what makes things <em>reproducible</em>. <em>Secrets</em> must be tracked <em>separately</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    CM[&quot;configmap&quot;] --&gt; Pod[&quot;pod&quot;]
-    Sec[&quot;secret&quot;] --&gt; Pod
-    Pod --&gt; Env[&quot;env&quot;]
-    Pod --&gt; File[&quot;mounted file&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>ConfigMap and Secret can both enter the same Pod, but they intentionally represent different operational and security boundaries.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ConfigMap</strong>: a bundle of <em>non-secret key/value</em>.</li>
@@ -145,6 +135,18 @@ def restart(dep):
         check=True,
     )
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl get configmap app-config -o yaml
+kubectl get secret app-secret -o yaml
+kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
+</code></pre>
+<p><strong>Expected output:</strong> ConfigMap data should remain readable, Secret data should appear base64-encoded, and the <code>exec</code> check should confirm that the injected values reached the running process environment inside the container.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>If Secret data looks plain, revisit <code>stringData</code> vs <code>data</code> and how the manifest was rendered.</li>
+<li>If the object changed but the app still sees the old value, check whether a rollout restart was skipped.</li>
+<li>If the app expects files rather than env vars, the mount path matters more than <code>envFrom</code>.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>stringData</em> handles <em>base64 encoding for you</em>.</li>
@@ -202,6 +204,7 @@ def restart(dep):
 <li><a href="https://kubernetes.io/docs/concepts/configuration/secret/">Secret</a></li>
 <li><a href="https://external-secrets.io/">External Secrets Operator</a></li>
 <li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">RBAC</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/">Distribute credentials securely using Secrets</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, ConfigMap, Secret, Configuration, DevOps</p>
 </body>

@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 6
 title: ConfigMap and Secret
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - Configuration
   - DevOps
 seo_description: A beginner guide to Kubernetes ConfigMap and Secret — splitting config from secrets and injecting them via env vars or file mounts
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # ConfigMap and Secret
 
-> Kubernetes 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do you *inject* settings and *passwords* without *baking them into the image*?
-
-> *ConfigMap* delivers *non-secret config*; *Secret* delivers *sensitive values* — both safely into a *Pod*.
-
-<!-- a-grade-intro:end -->
+It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.
 
 This is post 6 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will use ConfigMap and Secret to split environment-specific values from the image and connect that split to injection methods, restart behavior, and external secret managers.
+
+> Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.
+
+## Questions this chapter answers
 
 - Splitting *ConfigMap* and *Secret*
 - *Env vars* vs *file mounts*
@@ -48,13 +44,9 @@ Pulling *environment differences* out of the image is what makes things *reprodu
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    CM["configmap"] --> Pod["pod"]
-    Sec["secret"] --> Pod
-    Pod --> Env["env"]
-    Pod --> File["mounted file"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
+*ConfigMap and Secret can both enter the same Pod, but they intentionally represent different operational and security boundaries.*
+
 
 ## Key Terms
 
@@ -137,6 +129,22 @@ def restart(dep):
     )
 ```
 
+## Verification workflow
+
+```bash
+kubectl get configmap app-config -o yaml
+kubectl get secret app-secret -o yaml
+kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
+```
+
+**Expected output:** ConfigMap data should remain readable, Secret data should appear base64-encoded, and the `exec` check should confirm that the injected values reached the running process environment inside the container.
+
+**Failure modes to check first:**
+
+- If Secret data looks plain, revisit `stringData` vs `data` and how the manifest was rendered.
+- If the object changed but the app still sees the old value, check whether a rollout restart was skipped.
+- If the app expects files rather than env vars, the mount path matters more than `envFrom`.
+
 ## What to Notice in This Code
 
 - *stringData* handles *base64 encoding for you*.
@@ -199,5 +207,6 @@ Config is solved. The next post covers persisting *state data* with *Volumes*.
 - [Secret](https://kubernetes.io/docs/concepts/configuration/secret/)
 - [External Secrets Operator](https://external-secrets.io/)
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- [Distribute credentials securely using Secrets](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
 
 Tags: Kubernetes, ConfigMap, Secret, Configuration, DevOps

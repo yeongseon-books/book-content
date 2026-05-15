@@ -17,7 +17,7 @@ tags:
   - YAML
   - DevOps
 seo_description: 쿠버네티스 최소 배포 단위인 Pod를 컨테이너와 비교 정의하고, 사이드카 패턴과 네트워크 공유, 수명 주기를 통해 Pod의 구조를 이해합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Pod
@@ -46,13 +46,9 @@ Kubernetes를 처음 배우면 가장 먼저 헷갈리는 지점이 있습니다
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Pod["pod"] --> C1["app container"]
-    Pod --> C2["sidecar"]
-    Pod --> Vol["shared volume"]
-    Pod --> Net["shared network ns"]
-```
+![한눈에 보는 구조](../../../assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
+*Pod는 앱 컨테이너, 사이드카, 공유 볼륨, 공유 네트워크를 하나의 실행 묶음으로 다룹니다.*
+
 
 이 구조에서 핵심은 Pod 안의 컨테이너가 완전히 독립적이지 않다는 점입니다. 같은 Pod에 들어간 컨테이너는 네트워크 네임스페이스와 볼륨을 공유합니다. 그래서 하나의 애플리케이션 본체와 그 옆에서 돕는 보조 컨테이너를 함께 묶는 패턴이 자연스럽게 나옵니다.
 
@@ -136,6 +132,22 @@ def delete(name):
 
 직접 만든 Pod는 지우면 끝입니다. 다시 살아나지 않습니다. 이 지점이 바로 "Pod를 직접 만들지 말라"는 조언의 핵심과 이어집니다. 자동 복구와 재시작은 Pod 자체가 아니라 상위 컨트롤러의 책임입니다.
 
+## 검증 흐름
+
+```bash
+kubectl get pod web -o wide
+kubectl describe pod web
+kubectl logs web
+```
+
+**예상되는 결과:** `get pod`에서는 `Running` 또는 준비 직전 상태가 보여야 하고, `describe`에서는 이미지 풀·스케줄링·컨테이너 시작 이벤트가 시간순으로 보여야 합니다. 로그는 애플리케이션이 표준 출력으로 남긴 초기화 메시지를 확인하는 용도로 읽습니다.
+
+**먼저 의심할 실패 모드:**
+
+- `Pending`이 길면 이미지가 아니라 스케줄링 자원 부족이나 taint를 먼저 봅니다.
+- `ImagePullBackOff`면 YAML 문법보다 레지스트리 인증과 이미지 태그를 우선 확인합니다.
+- 로그가 비어 있으면 애플리케이션이 파일 로그만 쓰는지, 혹은 컨테이너가 시작 직후 죽는지 나눠서 봐야 합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - Pod 이름은 고유해야 합니다.
@@ -196,5 +208,6 @@ def delete(name):
 - [Pod lifecycle](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/)
 - [Init containers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
 - [Sidecar containers](https://kubernetes.io/blog/2023/08/25/native-sidecar-containers/)
+- [Debug Pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/)
 
 Tags: Kubernetes, Pod, Containers, YAML, DevOps

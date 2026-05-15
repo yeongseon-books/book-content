@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Deployment</h1>
-<blockquote>
-<p>Kubernetes 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When a <em>Pod dies</em>, <em>who</em> brings one back?</p>
-<blockquote>
-<p>A <em>Deployment</em> keeps the <em>desired number</em> of <em>Pods</em> alive and owns <em>zero-downtime rollout</em> and <em>rollback</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.</p>
 <p>This is post 3 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat Deployment as the default stateless workload controller that keeps replica count stable, rolls new versions gradually, and gives you a rollback path when a release goes wrong.</p>
+<blockquote>
+<p>Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li><em>Deployment</em> and <em>ReplicaSet</em> relationship</li>
 <li>The meaning of <em>replicas</em></li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Zero-downtime deploy</em> and <em>self-healing</em> are the <em>biggest reasons</em> to adopt <em>Kubernetes</em>. The object that owns them is the <em>Deployment</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Dep[&quot;deployment&quot;] --&gt; RS[&quot;replicaset&quot;]
-    RS --&gt; P1[&quot;pod&quot;]
-    RS --&gt; P2[&quot;pod&quot;]
-    RS --&gt; P3[&quot;pod&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>Deployment uses ReplicaSets to keep the target Pod count stable while swapping versions in a controlled rollout sequence.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>deployment</strong>: declares the <em>desired state</em> of a <em>Pod set</em>.</li>
@@ -139,6 +129,18 @@ def apply(path):
         check=True,
     )
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl get deploy,rs,pods -l app=web
+kubectl rollout status deployment/web
+kubectl rollout history deployment/web
+</code></pre>
+<p><strong>Expected output:</strong> the Deployment, ReplicaSet, and Pod counts should line up, <code>rollout status</code> should wait until the new revision is actually ready, and <code>rollout history</code> should show revision entries that make rollback decisions tractable under pressure.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>A Deployment with zero Pods often means selector and template labels do not match.</li>
+<li>A rollout that stalls is more often a readiness failure than a pure image-change failure.</li>
+<li>If revision history is too thin, the release process itself is the rollback risk.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>selector</em> and <em>labels</em> must <em>match exactly</em>.</li>
@@ -196,6 +198,7 @@ def apply(path):
 <li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/">ReplicaSet</a></li>
 <li><a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/">Rolling update strategy</a></li>
 <li><a href="https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#rollout">kubectl rollout</a></li>
+<li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment">Updating a Deployment</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Deployment, ReplicaSet, RollingUpdate, DevOps</p>
 </body>

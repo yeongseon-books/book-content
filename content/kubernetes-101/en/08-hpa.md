@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 8
 title: HPA
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - Metrics
   - DevOps
 seo_description: A beginner tour of Kubernetes HPA covering CPU and memory targets, metrics-server, custom metrics, and pairing with Cluster Autoscaler.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # HPA
 
-> Kubernetes 101 series (8/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: should a *human* resize *Pod count* every time *traffic* shifts?
-
-> *HorizontalPodAutoscaler* watches *metrics* and scales *Pods* in and out *automatically*.
-
-<!-- a-grade-intro:end -->
+Traffic rarely stays flat. If humans resize replicas by hand, they react too late during spikes and waste money during quiet periods. Autoscaling helps, but only if the metrics and resource requests underneath it are trustworthy.
 
 This is post 8 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will treat HPA as a control loop that adjusts Deployment replica count from metrics, then connect that loop to requests, metrics-server, and node-level capacity limits.
+
+> HPA is only as good as the metrics it can trust and the cluster capacity that can satisfy the scaling decision.
+
+## Questions this chapter answers
 
 - where *HPA* fits
 - why *metrics-server* matters
@@ -48,12 +44,9 @@ This is post 8 in the Kubernetes 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Metrics["metrics-server"] --> HPA["hpa"]
-    HPA --> Dep["deployment"]
-    Dep --> Pods["pods"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
+*HPA reads metrics and changes the Deployment replica target; the Deployment still owns the actual Pod creation and replacement work.*
+
 
 ## Key Terms
 
@@ -139,6 +132,22 @@ def hpa_status(name):
     return res.stdout
 ```
 
+## Verification workflow
+
+```bash
+kubectl top pods
+kubectl get hpa web -w
+kubectl describe hpa web
+```
+
+**Expected output:** `kubectl top pods` must return CPU and memory numbers, `get hpa -w` should show current/target metrics and replica changes under load, and `describe hpa` should reveal recent scaling events and controller conditions.
+
+**Failure modes to check first:**
+
+- If `top pods` fails, fix metrics-server before tuning the HPA manifest.
+- If HPA wants more replicas but Pods do not appear, the bottleneck is often node capacity rather than HPA logic.
+- If scaling thrashes, revisit requests sizing and traffic shape before only changing the target percentage.
+
 ## What to Notice in This Code
 
 - *HPA* does *nothing* without *resource requests*.
@@ -201,5 +210,6 @@ With autoscaling in place, you need a *repeatable deploy unit*. The next post is
 - [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 - [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler)
 - [VPA](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
+- [Horizontal Pod Autoscaler walkthrough](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/)
 
 Tags: Kubernetes, HPA, Autoscaling, Metrics, DevOps

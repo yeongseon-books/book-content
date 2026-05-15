@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>HPA</h1>
-<blockquote>
-<p>Kubernetes 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: should a <em>human</em> resize <em>Pod count</em> every time <em>traffic</em> shifts?</p>
-<blockquote>
-<p><em>HorizontalPodAutoscaler</em> watches <em>metrics</em> and scales <em>Pods</em> in and out <em>automatically</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Traffic rarely stays flat. If humans resize replicas by hand, they react too late during spikes and waste money during quiet periods. Autoscaling helps, but only if the metrics and resource requests underneath it are trustworthy.</p>
 <p>This is post 8 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will treat HPA as a control loop that adjusts Deployment replica count from metrics, then connect that loop to requests, metrics-server, and node-level capacity limits.</p>
+<blockquote>
+<p>HPA is only as good as the metrics it can trust and the cluster capacity that can satisfy the scaling decision.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>where <em>HPA</em> fits</li>
 <li>why <em>metrics-server</em> matters</li>
@@ -77,11 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Manual scaling</em> causes <em>lag</em> and <em>over-provisioning</em>. <em>Autoscaling</em> protects both <em>cost</em> and <em>availability</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Metrics[&quot;metrics-server&quot;] --&gt; HPA[&quot;hpa&quot;]
-    HPA --&gt; Dep[&quot;deployment&quot;]
-    Dep --&gt; Pods[&quot;pods&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>HPA reads metrics and changes the Deployment replica target; the Deployment still owns the actual Pod creation and replacement work.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>HPA</strong>: scales <em>Pod count</em> <em>automatically</em>.</li>
@@ -147,6 +138,18 @@ def apply(path):
     )
     return res.stdout
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl top pods
+kubectl get hpa web -w
+kubectl describe hpa web
+</code></pre>
+<p><strong>Expected output:</strong> <code>kubectl top pods</code> must return CPU and memory numbers, <code>get hpa -w</code> should show current/target metrics and replica changes under load, and <code>describe hpa</code> should reveal recent scaling events and controller conditions.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>If <code>top pods</code> fails, fix metrics-server before tuning the HPA manifest.</li>
+<li>If HPA wants more replicas but Pods do not appear, the bottleneck is often node capacity rather than HPA logic.</li>
+<li>If scaling thrashes, revisit requests sizing and traffic shape before only changing the target percentage.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>HPA</em> does <em>nothing</em> without <em>resource requests</em>.</li>
@@ -204,6 +207,7 @@ def apply(path):
 <li><a href="https://github.com/kubernetes-sigs/metrics-server">metrics-server</a></li>
 <li><a href="https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler">Cluster Autoscaler</a></li>
 <li><a href="https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler">VPA</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/">Horizontal Pod Autoscaler walkthrough</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, HPA, Autoscaling, Metrics, DevOps</p>
 </body>

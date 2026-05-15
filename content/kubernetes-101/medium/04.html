@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Service</h1>
-<blockquote>
-<p>Kubernetes 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When <em>Pod IPs change all the time</em>, <em>how</em> do you call them <em>reliably</em>?</p>
-<blockquote>
-<p>A <em>Service</em> gives a <em>Pod set selected by labels</em> a <em>stable virtual IP</em> and a <em>DNS name</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Once several Pods are running, their IP addresses stop being a stable integration surface. Pods restart, move, and get recreated, but callers still need one name and one contract that keeps working.</p>
 <p>This is post 4 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will look at Service as the networking contract that hides changing Pod membership behind a stable virtual IP and DNS name for both internal and external traffic patterns.</p>
+<blockquote>
+<p>A Service is the answer to “how do I keep calling this workload after the Pods behind it change?”</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The problem a <em>Service</em> solves</li>
 <li><em>ClusterIP / NodePort / LoadBalancer</em></li>
@@ -77,12 +71,8 @@
 <h2>Why It Matters</h2>
 <p>For <em>microservices</em> to call each other by <em>name</em>, a <em>Service</em> is mandatory.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Client[&quot;client&quot;] --&gt; Svc[&quot;service (vip)&quot;]
-    Svc --&gt; P1[&quot;pod&quot;]
-    Svc --&gt; P2[&quot;pod&quot;]
-    Svc --&gt; P3[&quot;pod&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Service stabilizes calling patterns by placing one virtual IP and DNS name in front of a changing Pod set.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>ClusterIP</strong>: an internal <em>virtual IP</em> (default).</li>
@@ -136,6 +126,18 @@ def apply_and_get(path):
 <pre><code class="language-python">def delete(svc):
     subprocess.run([&quot;kubectl&quot;, &quot;delete&quot;, &quot;svc&quot;, svc], check=True)
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">kubectl get svc web
+kubectl get endpoints web
+kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.default.svc.cluster.local
+</code></pre>
+<p><strong>Expected output:</strong> the Service should have a ClusterIP, the Endpoints object should list one or more Pod IPs, and DNS lookup should resolve the service name from inside the cluster. Those three checks tell you whether naming, backend selection, and internal discovery all line up.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>A Service with empty Endpoints almost always means selector/label mismatch.</li>
+<li>DNS success with request failure usually means <code>targetPort</code> and the container listen port disagree.</li>
+<li>Calls from another namespace often fail because the caller dropped the namespace part of the service name.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The <em>selector</em> must match <em>Deployment labels</em>.</li>
@@ -193,6 +195,7 @@ def apply_and_get(path):
 <li><a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">DNS for Services and Pods</a></li>
 <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types">Service types</a></li>
 <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">Headless Services</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/debug/debug-application/debug-service/">Debug Services</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Service, Networking, DNS, DevOps</p>
 </body>

@@ -17,7 +17,7 @@ tags:
   - Configuration
   - DevOps
 seo_description: ConfigMap과 Secret으로 설정과 비밀 값을 분리하는 기본 방식을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # ConfigMap과 Secret
@@ -46,13 +46,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    CM["configmap"] --> Pod["pod"]
-    Sec["secret"] --> Pod
-    Pod --> Env["env"]
-    Pod --> File["mounted file"]
-```
+![한눈에 보는 구조](../../../assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
+*ConfigMap과 Secret은 같은 파드로 들어가더라도 일반 설정과 민감한 값을 다른 운영 경계로 다루게 합니다.*
+
 
 ConfigMap과 Secret은 모두 파드 안으로 들어갈 수 있지만, 같은 방식으로 다뤄도 된다는 뜻은 아닙니다. 주입 방식과 접근 제어, 변경 반영 전략까지 같이 봐야 실제 운영 모델이 완성됩니다.
 
@@ -147,6 +143,22 @@ def restart(dep):
 
 설정값을 바꿨다고 애플리케이션이 항상 자동 반영되는 것은 아닙니다. 특히 환경 변수 기반 주입은 새 파드가 떠야 적용되므로, 설정 변경과 재시작을 함께 생각해야 합니다.
 
+## 검증 흐름
+
+```bash
+kubectl get configmap app-config -o yaml
+kubectl get secret app-secret -o yaml
+kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
+```
+
+**예상되는 결과:** ConfigMap에는 사람이 읽을 수 있는 일반 설정이, Secret에는 base64 인코딩된 데이터가 보여야 합니다. `exec` 결과에서는 환경 변수 주입이 실제 컨테이너 프로세스까지 전달됐는지 확인할 수 있어야 합니다.
+
+**먼저 의심할 실패 모드:**
+
+- Secret 값이 평문처럼 보이면 `stringData`와 `data` 구분을 다시 확인해야 합니다.
+- 객체 값은 바뀌었는데 앱이 예전 값을 쓰면 rollout restart가 빠졌을 가능성이 큽니다.
+- 환경 변수 대신 파일을 읽는 앱이라면 `envFrom` 자체보다 volume mount 여부가 문제일 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `stringData`를 쓰면 base64 인코딩을 직접 만들 필요가 없습니다.
@@ -207,5 +219,6 @@ def restart(dep):
 - [Secret](https://kubernetes.io/docs/concepts/configuration/secret/)
 - [External Secrets Operator](https://external-secrets.io/)
 - [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- [Distribute credentials securely using Secrets](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
 
 Tags: Kubernetes, ConfigMap, Secret, Configuration, DevOps

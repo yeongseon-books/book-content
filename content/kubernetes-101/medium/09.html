@@ -54,19 +54,13 @@
 </head>
 <body>
 <h1>Helm</h1>
-<blockquote>
-<p>Kubernetes 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: should you <em>copy/paste</em> dozens of <em>manifests</em> across <em>environments</em>?</p>
-<blockquote>
-<p><em>Helm</em> separates <em>templates</em> from <em>values</em> through a unit called a <em>chart</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Kubernetes YAML usually starts tidy and then multiplies across environments. Before long, the real problem is no longer writing manifests but keeping the right differences in the right places without copying entire files forever.</p>
 <p>This is post 9 in the Kubernetes 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Here, we will frame Helm as a repeatable deployment unit that separates shared structure from environment-specific values and gives you install, upgrade, and rollback workflows that are easier to reason about.</p>
+<blockquote>
+<p>Helm becomes valuable when the chart expresses the common contract and the values file is the only place where environments diverge.</p>
+</blockquote>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>the layout of a <em>Chart</em></li>
 <li>how <em>values.yaml</em> works</li>
@@ -77,11 +71,8 @@
 <h2>Why It Matters</h2>
 <p><em>Per-environment copies</em> create <em>drift</em>. <em>Helm</em> lets you reuse the <em>same template</em> and only swap <em>values</em>.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Values[&quot;values.yaml&quot;] --&gt; Tmpl[&quot;templates/*.yaml&quot;]
-    Tmpl --&gt; Render[&quot;rendered manifests&quot;]
-    Render --&gt; API[&quot;kubernetes api&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Helm renders shared templates with environment-specific values so you can keep one deployment shape across many environments.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Chart</strong>: the <em>package unit</em> of <em>Helm</em>.</li>
@@ -132,6 +123,18 @@ service:
         check=True,
     )
 </code></pre>
+<h2>Verification workflow</h2>
+<pre><code class="language-bash">helm template web ./chart -f values.yaml
+helm lint ./chart
+helm history web
+</code></pre>
+<p><strong>Expected output:</strong> <code>helm template</code> should show the exact manifests you are about to apply, <code>helm lint</code> should catch structural issues in the chart early, and <code>helm history</code> should prove that a release has revision history available for rollback.</p>
+<p><strong>Failure modes to check first:</strong></p>
+<ul>
+<li>If the rendered YAML is already wrong, the problem is chart/value separation rather than the cluster.</li>
+<li>A chart that lints clean can still be operationally unsafe if secrets remain as plain values.</li>
+<li>If rollback is missing, inspect release-history behavior in the install/upgrade workflow before the next incident.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>--atomic</em> triggers an <em>automatic rollback</em> on failure.</li>
@@ -189,6 +192,7 @@ service:
 <li><a href="https://helm.sh/docs/topics/charts/">Chart structure</a></li>
 <li><a href="https://helm.sh/docs/chart_best_practices/">Helm best practices</a></li>
 <li><a href="https://artifacthub.io/">Artifact Hub</a></li>
+<li><a href="https://helm.sh/docs/helm/helm_lint/">helm lint</a></li>
 </ul>
 <p class="tags-line">Tags: Kubernetes, Helm, Chart, PackageManager, DevOps</p>
 </body>

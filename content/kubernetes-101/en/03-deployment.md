@@ -2,7 +2,7 @@
 series: kubernetes-101
 episode: 3
 title: Deployment
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,20 @@ tags:
   - RollingUpdate
   - DevOps
 seo_description: A beginner guide to Kubernetes Deployments — ReplicaSet management, rolling updates, rollback, and strategy options with kubectl examples
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Deployment
 
-> Kubernetes 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When a *Pod dies*, *who* brings one back?
-
-> A *Deployment* keeps the *desired number* of *Pods* alive and owns *zero-downtime rollout* and *rollback*.
-
-<!-- a-grade-intro:end -->
+A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.
 
 This is post 3 in the Kubernetes 101 series.
 
-## What You Will Learn
+Here, we will treat Deployment as the default stateless workload controller that keeps replica count stable, rolls new versions gradually, and gives you a rollback path when a release goes wrong.
+
+> Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.
+
+## Questions this chapter answers
 
 - *Deployment* and *ReplicaSet* relationship
 - The meaning of *replicas*
@@ -48,13 +44,9 @@ This is post 3 in the Kubernetes 101 series.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Dep["deployment"] --> RS["replicaset"]
-    RS --> P1["pod"]
-    RS --> P2["pod"]
-    RS --> P3["pod"]
-```
+![Concept at a Glance](../../../assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
+*Deployment uses ReplicaSets to keep the target Pod count stable while swapping versions in a controlled rollout sequence.*
+
 
 ## Key Terms
 
@@ -131,6 +123,22 @@ def rollback(dep):
     )
 ```
 
+## Verification workflow
+
+```bash
+kubectl get deploy,rs,pods -l app=web
+kubectl rollout status deployment/web
+kubectl rollout history deployment/web
+```
+
+**Expected output:** the Deployment, ReplicaSet, and Pod counts should line up, `rollout status` should wait until the new revision is actually ready, and `rollout history` should show revision entries that make rollback decisions tractable under pressure.
+
+**Failure modes to check first:**
+
+- A Deployment with zero Pods often means selector and template labels do not match.
+- A rollout that stalls is more often a readiness failure than a pure image-change failure.
+- If revision history is too thin, the release process itself is the rollback risk.
+
 ## What to Notice in This Code
 
 - *selector* and *labels* must *match exactly*.
@@ -193,5 +201,6 @@ Even with *Pods* up, *external access* needs an *address*. The next post covers 
 - [ReplicaSet](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/)
 - [Rolling update strategy](https://kubernetes.io/docs/tutorials/kubernetes-basics/update/update-intro/)
 - [kubectl rollout](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#rollout)
+- [Updating a Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment)
 
 Tags: Kubernetes, Deployment, ReplicaSet, RollingUpdate, DevOps
