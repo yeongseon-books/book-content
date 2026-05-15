@@ -22,7 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 코딩 테스트 문제 접근법
 
-알고리즘을 안다는 것과 시간 제한 안에서 적용하는 것은 다른 문제입니다. 코딩 테스트의 진짜 난점은 구현 전에 제약을 빠르게 읽고, 문제를 적절한 패턴에 연결하는 데 있습니다. 이 글은 Algorithms with Python 101 시리즈의 마지막 글입니다. 여기서는 앞선 글의 내용을 실제 문제 풀이 흐름으로 연결해 보겠습니다.
+알고리즘을 안다는 것과 시간 제한 안에서 적용하는 것은 다른 문제입니다. 코딩 테스트의 진짜 난점은 구현 전에 제약을 빠르게 읽고, 문제를 적절한 패턴에 연결하는 데 있습니다.
+
+이 글은 Algorithms with Python 101 시리즈의 마지막 글입니다. 여기서는 앞선 글의 내용을 실제 문제 풀이 흐름으로 연결해 보겠습니다.
 
 반복 가능한 접근법이 중요한 이유는 시간을 아끼고, 불필요한 실수를 줄이고, 처음 보는 문제에서도 다시 복구할 수 있게 해 주기 때문입니다.
 
@@ -343,9 +345,15 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 ## 참고 자료
 
-- [LeetCode — Top Interview Questions](https://leetcode.com/problem-list/top-interview-questions/)
-- [Baekjoon Online Judge — Step-by-Step Problems](https://www.acmicpc.net/step)
-- [Programmers — Coding Test Practice](https://programmers.co.kr/learn/challenges)
-- [Real Python — Python Practice Problems](https://realpython.com/python-practice-problems/)
+### 언어와 라이브러리 레퍼런스
+
+- [Python Documentation — collections](https://docs.python.org/3/library/collections.html)
+- [Python Documentation — heapq](https://docs.python.org/3/library/heapq.html)
+- [Python Documentation — itertools](https://docs.python.org/3/library/itertools.html)
+
+### 연습 문제 모음
+
+- [Baekjoon Online Judge — 단계별로 풀어보기](https://www.acmicpc.net/step)
+- [Programmers — 코딩테스트 연습](https://programmers.co.kr/learn/challenges)
 
 Tags: Python, Algorithms, Coding Test, Problem Solving, Interview

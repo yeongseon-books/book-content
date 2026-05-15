@@ -57,6 +57,10 @@ Make change for 1,260:
 Total: 6 coins — optimal via greedy
 ```
 
+![Greedy rule selection and counterexample validation flow](../../../assets/algorithms-python-101/09/09-01-concept-overview.en.png)
+
+*A greedy algorithm is not “pick the biggest thing.” It is a rule that still has to survive counterexamples.*
+
 ## Key Concepts
 
 | Term | Description |
@@ -257,6 +261,13 @@ print(f"DP:     {coin_change_dp(coins, amount)} coins")            # 2 (3+3)
 Greedy is not a "try it and see" algorithm. Without verifying correctness, you get code that passes most inputs but fails on specific edge cases.
 
 In a coding interview, if you propose a greedy solution, you should be able to explain in one sentence why greedy is optimal. If you cannot, consider DP instead.
+
+## How to validate a greedy rule before shipping it
+
+- Write the selection rule in one sentence first. If you cannot state it clearly, you cannot verify it.
+- Construct small counterexamples on purpose. Passing a few happy-path inputs is not evidence that the greedy rule is correct.
+- In production systems, compare more than optimality. A slightly less optimal greedy rule may still win on implementation simplicity, recomputation cost, and predictability.
+- If you keep adding exceptions to rescue the rule, step back and reclassify the problem. It may be a DP or graph-optimization problem instead.
 
 ## Checklist
 

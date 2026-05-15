@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Shortest Path Basics</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: How do you find the shortest distance from one node to every other node in a weighted graph?</p>
-<blockquote>
-<p>BFS guarantees shortest paths only on unweighted graphs. When edges have weights, you need Dijkstra's algorithm. This article implements Dijkstra's algorithm using Python's heapq module.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Route planning, network latency, and logistics optimization all come down to the same question: what is the cheapest path from here to there?</p>
+<p>Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.</p>
+<p>This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with <code>heapq</code>.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The shortest-path problem on weighted graphs</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Shortest path = the path from source to destination with the minimum total edge weight</p>
 </blockquote>
-<pre><code>Weighted graph:
+<pre><code class="language-text">Weighted graph:
 A --4-- B --3-- D
 |       |
 2       1
@@ -92,6 +84,8 @@ C --5-- E
 A→D shortest path: A→B→D (cost 7)
 A→E shortest path: A→B→E (cost 5)
 </code></pre>
+<p><img alt="Priority queue and relaxation flow in Dijkstra's algorithm" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png"></p>
+<p><em>Dijkstra keeps pulling the nearest candidate first, then updates distances whenever it discovers a cheaper path.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Weighted graph</strong><br>
 - Description: A graph where each edge has an associated cost (weight)</p>
@@ -301,6 +295,13 @@ for condition, algorithm in comparison:
 <h2>How Senior Engineers Think About This</h2>
 <p>You rarely implement Dijkstra yourself, but recognizing that a problem is a shortest-path problem is the critical skill. Once you make that connection, you can reach for the right library or algorithm.</p>
 <p>In production, you use NetworkX's shortest_path() or a mapping API. But understanding the internals helps you diagnose performance issues and select the right algorithm.</p>
+<h2>What to check when Dijkstra looks wrong or slow</h2>
+<ul>
+<li>Verify the graph has no negative edges before debugging the implementation. That one assumption breaks the whole algorithm.</li>
+<li>Skip stale heap entries aggressively. Many “Dijkstra is too slow” reports are really about reprocessing outdated candidates.</li>
+<li>If reconstructed paths look wrong, inspect when <code>prev</code> changes. It should only move when you discover a genuinely shorter route.</li>
+<li>In systems with constantly changing topology, the operational trade-off is not just correctness. Rebuild cost, cache invalidation, and acceptable staleness matter too.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Explain how Dijkstra's algorithm works</li>

@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Sorting Algorithms</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Why do different sorting algorithms have such different performance on the same data?</p>
-<blockquote>
-<p>Sorting is a prerequisite for binary search, deduplication, ranking, and many other operations. This article implements O(n^2) sorts (bubble, selection, insertion) and O(n log n) sorts (merge, quick), then compares them with Python's built-in sorted().</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Sorting sits underneath far more problems than most beginners expect. Binary search, ranking, grouping, and deduplication all become easier once data is in order.</p>
+<p>Even if you use Python's built-in <code>sorted()</code> in practice, understanding the trade-offs behind classic sorting algorithms helps you reason about performance, stability, and data shape.</p>
+<p>This is post 4 in the Algorithms with Python 101 series. Here, we'll implement several classic sorting algorithms in Python and compare how their strategies affect performance.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The principles and implementations of three O(n^2) sorting algorithms</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Comparison-based sorting determines order by comparing pairs of elements</p>
 </blockquote>
-<pre><code>Bubble sort:    compare and swap adjacent elements → O(n^2)
+<pre><code class="language-text">Bubble sort:    compare and swap adjacent elements → O(n^2)
 Selection sort: find the minimum and move it to front → O(n^2)
 Insertion sort: insert each element at its correct position → O(n^2), fast on nearly sorted data
 Merge sort:     split in half, sort, merge → O(n log n), stable
@@ -263,6 +255,12 @@ for n in [1_000, 5_000]:
 <h2>How Senior Engineers Think About This</h2>
 <p>In practice, you almost never implement a sorting algorithm yourself. sorted() and list.sort() cover virtually every case. The real skill is designing the key function correctly.</p>
 <p>Still, knowing the principles matters. Understanding "why this sort is slow" or "why stability matters here" helps you choose the right tool.</p>
+<h2>Sorting decisions in production systems</h2>
+<ul>
+<li>If you sort once and read many times, spending O(n log n) up front may simplify everything downstream.</li>
+<li>If equal items must preserve arrival order for pagination, logs, or event playback, stability is a correctness issue, not just a nice-to-have.</li>
+<li>If sorting becomes a bottleneck, the first check is usually whether you are sorting too much data too often, not whether Python's built-in sort is inadequate.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Explain the differences among the three O(n^2) sorts</li>

@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Coding Test Problem-Solving Strategies</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: How do you systematically analyze and solve a problem you have never seen before?</p>
-<blockquote>
-<p>Knowing many algorithms is not what matters in coding tests. What matters is looking at a problem and deciding which algorithm to apply. This article covers problem-type classification, approach strategies, and time management — the practical skills that separate passing candidates from the rest.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Knowing algorithms is not the same as applying them under time pressure. In a coding test, the real challenge is reading constraints quickly and mapping the problem to the right pattern before you get lost in implementation.</p>
+<p>A repeatable approach matters because it saves time, reduces avoidable mistakes, and helps you recover even when the problem is unfamiliar.</p>
+<p>This is the final post in the Algorithms with Python 101 series. Here, we'll connect the ideas from earlier posts into a practical framework for analyzing and solving coding test problems.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to map problem types to algorithms</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Reverse-engineer the allowed time complexity from input size</p>
 </blockquote>
-<pre><code>Allowed time complexity by input size N (1-second limit):
+<pre><code class="language-text">Allowed time complexity by input size N (1-second limit):
 N ≤ 10        → O(N!)       — brute force / permutations
 N ≤ 20        → O(2^N)      — bitmask, backtracking
 N ≤ 500       → O(N³)       — Floyd-Warshall
@@ -315,6 +307,12 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <h2>How Senior Engineers Think About This</h2>
 <p>The essence of a coding test is "choosing the right algorithm and implementing it correctly within a time limit." Solving many problems matters, but systematizing your approach is far more effective.</p>
 <p>The same mindset applies in production work. "Is this algorithm fast enough for this data size?" is a fundamental question in system design.</p>
+<h2>Why this matters beyond interviews</h2>
+<ul>
+<li>Production incidents often start with the same mistake as a failed coding test: choosing an algorithm that does not match the input scale.</li>
+<li>Constraint-first thinking transfers directly to batch jobs, API latency budgets, and memory-sensitive data pipelines.</li>
+<li>A reusable problem-solving checklist is valuable because it reduces debugging time even when the task is not presented as an “algorithm problem.”</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] I can reverse-engineer allowed time complexity from input size</li>
@@ -344,11 +342,16 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 <li><strong>Coding Test Problem-Solving Strategies (current)</strong></li>
 </ul>
 <h2>References</h2>
+<p><strong>Language and library references</strong></p>
 <ul>
-<li><a href="https://leetcode.com/problem-list/top-interview-questions/">LeetCode — Top Interview Questions</a></li>
+<li><a href="https://docs.python.org/3/library/collections.html">Python Documentation — collections</a></li>
+<li><a href="https://docs.python.org/3/library/heapq.html">Python Documentation — heapq</a></li>
+<li><a href="https://docs.python.org/3/library/itertools.html">Python Documentation — itertools</a></li>
+</ul>
+<p><strong>Practice sets</strong></p>
+<ul>
 <li><a href="https://www.acmicpc.net/step">Baekjoon Online Judge — Step-by-Step Problems</a></li>
 <li><a href="https://programmers.co.kr/learn/challenges">Programmers — Coding Test Practice</a></li>
-<li><a href="https://realpython.com/python-practice-problems/">Real Python — Python Practice Problems</a></li>
 </ul>
 <p class="tags-line">Tags: Python, Algorithms, Coding Test, Problem Solving, Interview</p>
 </body>

@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Time Complexity and Big-O</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: How can you tell whether your code will be fast enough before running it on real data?</p>
-<blockquote>
-<p>Time complexity describes how an algorithm's running time grows as the input size increases. Big-O notation gives us a language to express that growth rate objectively. This article teaches you to analyze and compare algorithms by their time complexity.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Wall-clock time on your laptop is not a reliable way to judge an algorithm. Hardware, runtime, and test data all change, but the growth pattern of the algorithm stays the same.</p>
+<p>Big-O gives you a practical language for comparing that growth before the code ever reaches production or an interview whiteboard.</p>
+<p>This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>What time complexity means and why wall-clock time is insufficient</li>
@@ -240,6 +232,12 @@ for n in sizes:
 <h2>How Senior Engineers Think About This</h2>
 <p>You do not need to memorize every complexity class. What matters is building intuition: "If I double the input, does the runtime double (linear), quadruple (quadratic), or barely change (logarithmic)?"</p>
 <p>In code reviews, a senior engineer spots nested loops over large data and immediately asks about the complexity. This single habit prevents most performance problems before they reach production.</p>
+<h2>Quick complexity triage in production</h2>
+<ul>
+<li>If latency jumps only after a dataset crosses a threshold, suspect an O(n²) path that stayed hidden on smaller fixtures.</li>
+<li>If a request handler repeatedly scans the same collection, look for a data-structure change before reaching for lower-level optimization.</li>
+<li>If performance work stalls, count the dominant operations first. Complexity mistakes usually outweigh constant-factor wins.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Explain what Big-O notation represents</li>

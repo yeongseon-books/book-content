@@ -249,6 +249,12 @@ You rarely implement binary search from scratch. The bisect module or database i
 
 "Find the first/last value satisfying a condition in sorted data" is the core application of binary search and a staple of coding interviews.
 
+## When not to reach for binary search
+
+- If the data is not already sorted and updates constantly, the sorting cost may erase the theoretical gain.
+- If you only run the query once on a tiny list, a linear scan is usually simpler and easier to debug.
+- If requirements are really about range indexing or repeated lookups, the better fix may be a database index, tree structure, or cached lookup table rather than handwritten search code.
+
 ## Checklist
 
 - [ ] Compare the time complexity of linear search and binary search

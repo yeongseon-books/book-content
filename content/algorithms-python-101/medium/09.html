@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Greedy Algorithms</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Can always choosing the best option at each step guarantee the overall best outcome?</p>
-<blockquote>
-<p>A greedy algorithm makes the locally optimal choice at each step, aiming for the globally optimal solution. It does not always work, but when certain conditions are met, it is faster and simpler than DP. This article covers when greedy applies and solves classic problems.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Greedy algorithms are appealing because they often turn a hard-looking problem into a short implementation with strong performance. In the right setting, a single smart choice at each step is enough.</p>
+<p>The catch is that greedy logic is not universally safe. You need to know why it works for one problem and fails for another, or the simplicity becomes a trap.</p>
+<p>This is post 9 in the Algorithms with Python 101 series. Here, we'll examine the conditions that make greedy strategies valid and test them on classic Python examples.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The conditions under which greedy algorithms produce optimal solutions</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Greedy choice property = the locally optimal choice is part of the globally optimal solution</p>
 </blockquote>
-<pre><code>Coin change (denominations: 500, 100, 50, 10):
+<pre><code class="language-text">Coin change (denominations: 500, 100, 50, 10):
 Make change for 1,260:
 → 500 × 2 = 1,000 (remaining: 260)
 → 100 × 2 = 200   (remaining: 60)
@@ -90,6 +82,8 @@ Make change for 1,260:
 →  10 × 1 = 10    (remaining: 0)
 Total: 6 coins — optimal via greedy
 </code></pre>
+<p><img alt="Greedy rule selection and counterexample validation flow" src="https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.en.png"></p>
+<p><em>A greedy algorithm is not “pick the biggest thing.” It is a rule that still has to survive counterexamples.</em></p>
 <h2>Key Concepts</h2>
 <p><strong>Greedy choice property</strong><br>
 - Description: The local optimum is part of the global optimum</p>
@@ -273,6 +267,13 @@ print(f&quot;DP:     {coin_change_dp(coins, amount)} coins&quot;)            # 2
 <h2>How Senior Engineers Think About This</h2>
 <p>Greedy is not a "try it and see" algorithm. Without verifying correctness, you get code that passes most inputs but fails on specific edge cases.</p>
 <p>In a coding interview, if you propose a greedy solution, you should be able to explain in one sentence why greedy is optimal. If you cannot, consider DP instead.</p>
+<h2>How to validate a greedy rule before shipping it</h2>
+<ul>
+<li>Write the selection rule in one sentence first. If you cannot state it clearly, you cannot verify it.</li>
+<li>Construct small counterexamples on purpose. Passing a few happy-path inputs is not evidence that the greedy rule is correct.</li>
+<li>In production systems, compare more than optimality. A slightly less optimal greedy rule may still win on implementation simplicity, recomputation cost, and predictability.</li>
+<li>If you keep adding exceptions to rescue the rule, step back and reclassify the problem. It may be a DP or graph-optimization problem instead.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Explain the conditions under which greedy produces optimal solutions</li>

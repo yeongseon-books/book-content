@@ -255,6 +255,12 @@ Recursion makes code concise, but you must watch for performance and stack depth
 
 The real value is learning to recognize the divide-and-conquer pattern. Habitually asking "Can I split this problem in half?" leads to efficient solutions faster.
 
+## Signs recursion should become iteration
+
+- If the input depth depends on user data or external payloads, recursion depth can turn into an operational incident.
+- If profiling shows most work comes from repeated subcalls, the fix is often memoization or a bottom-up rewrite rather than minor cleanup.
+- If the recursive version is elegant but hard to observe, an explicit stack may be easier to log, test, and recover in production code.
+
 ## Checklist
 
 - [ ] Explain the role of the base case in a recursive function

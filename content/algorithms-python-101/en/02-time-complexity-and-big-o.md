@@ -227,6 +227,12 @@ You do not need to memorize every complexity class. What matters is building int
 
 In code reviews, a senior engineer spots nested loops over large data and immediately asks about the complexity. This single habit prevents most performance problems before they reach production.
 
+## Quick complexity triage in production
+
+- If latency jumps only after a dataset crosses a threshold, suspect an O(n²) path that stayed hidden on smaller fixtures.
+- If a request handler repeatedly scans the same collection, look for a data-structure change before reaching for lower-level optimization.
+- If performance work stalls, count the dominant operations first. Complexity mistakes usually outweigh constant-factor wins.
+
 ## Checklist
 
 - [ ] Explain what Big-O notation represents

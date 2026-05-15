@@ -245,6 +245,12 @@ In day-to-day work, you rarely implement algorithms from scratch. Libraries and 
 
 Answering "Why is this code slow?" or "Is there a better approach?" requires a solid grasp of algorithm fundamentals.
 
+## What this changes in production code reviews
+
+- When input size grows, the first question is usually not “Can this code be cleaner?” but “What algorithm is hidden underneath this loop?”
+- Replacing a sort-plus-scan with a single pass or a repeated scan with a set lookup often matters more than micro-optimizing syntax.
+- Edge-case handling is part of algorithm quality. Empty input, duplicated values, and invalid states are where production bugs surface first.
+
 ## Checklist
 
 - [ ] Explain the definition and five properties of an algorithm

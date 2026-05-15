@@ -57,6 +57,10 @@ After DP: each fib(n) computed only once
 fib(1)=1 → fib(2)=1 → fib(3)=2 → fib(4)=3 → fib(5)=5
 ```
 
+![Naive recursion versus DP state reuse](../../../assets/algorithms-python-101/06/06-01-concept-overview.en.png)
+
+*Naive recursion recomputes the same states, while DP fills each state once and reuses it.*
+
 ## Key Concepts
 
 | Term | Description |
@@ -249,6 +253,13 @@ print(knapsack(weights, values, capacity))  # 10
 You rarely implement DP from scratch in production, but DP thinking is invaluable. "Can I cache this computation?" and "Does this problem have optimal substructure?" are questions that drive performance optimization.
 
 In coding interviews, when you see a DP problem, define the recurrence first and implement bottom-up. Top-down is more intuitive but risks stack overflow.
+
+## How to decide whether a problem is really DP
+
+- If the same computation repeats across requests, records, or subtrees, caching or a DP formulation is worth testing first.
+- If the current answer depends on a small, well-defined set of previous states, you can often convert the problem into a table or rolling-state update.
+- If the state space explodes or inputs change continuously in real time, a greedy heuristic or approximation may be cheaper to operate than a full DP table.
+- Before coding, write down the state, recurrence, and base cases in plain language. That usually exposes bugs earlier than the implementation does.
 
 ## Checklist
 

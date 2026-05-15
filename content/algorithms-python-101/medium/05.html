@@ -54,17 +54,9 @@
 </head>
 <body>
 <h1>Recursion and Divide and Conquer</h1>
-<blockquote>
-<p>Algorithms with Python 101 Series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Key Question</strong>: Why does breaking a big problem into smaller pieces make it easier to solve?</p>
-<blockquote>
-<p>Recursion is a technique where a function calls itself. Divide and conquer is a strategy that uses recursion to systematically split problems into smaller sub-problems. This article explains how recursion works and applies the divide-and-conquer pattern to real problems.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Recursion is one of those ideas that looks simple on the surface and confusing in practice. Once it clicks, though, a lot of algorithm patterns start to feel much more consistent.</p>
+<p>Divide and conquer is one of the most important of those patterns. It shows up in binary search, merge sort, quick sort, and many problems that become manageable only after you split them into smaller parts.</p>
+<p>This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How recursive functions work and what the call stack looks like</li>
@@ -82,7 +74,7 @@
 <blockquote>
 <p>Recursion = a function that calls itself to perform repetitive work</p>
 </blockquote>
-<pre><code>factorial(4) call trace:
+<pre><code class="language-text">factorial(4) call trace:
 factorial(4) → 4 × factorial(3)
                → 3 × factorial(2)
                     → 2 × factorial(1)
@@ -267,6 +259,12 @@ print(f&quot;Max recursion depth: {sys.getrecursionlimit()}&quot;)  # default 10
 <h2>How Senior Engineers Think About This</h2>
 <p>Recursion makes code concise, but you must watch for performance and stack depth. For inherently recursive structures like trees, recursion is natural. For simple iteration, a for loop is better.</p>
 <p>The real value is learning to recognize the divide-and-conquer pattern. Habitually asking "Can I split this problem in half?" leads to efficient solutions faster.</p>
+<h2>Signs recursion should become iteration</h2>
+<ul>
+<li>If the input depth depends on user data or external payloads, recursion depth can turn into an operational incident.</li>
+<li>If profiling shows most work comes from repeated subcalls, the fix is often memoization or a bottom-up rewrite rather than minor cleanup.</li>
+<li>If the recursive version is elegant but hard to observe, an explicit stack may be easier to log, test, and recover in production code.</li>
+</ul>
 <h2>Checklist</h2>
 <ul>
 <li>[ ] Explain the role of the base case in a recursive function</li>
