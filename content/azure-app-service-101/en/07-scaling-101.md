@@ -272,7 +272,7 @@ Scale In: CPU < 35% ← Gap prevents oscillation
 ### 3. Set Minimum/Maximum Instances
 
 ```text
-Minimum: 2 ← Ensures availability (Health Check needs this)
+Minimum: 2 ← Availability baseline and full Health Check benefit
 Maximum: 10 ← Cost control
 ```
 
