@@ -72,7 +72,9 @@ flowchart LR
 
 ## Hands-on: Modeling Cost
 
-### Step 1 — Invocation cost
+The constants in the sample below are an **AWS Lambda pricing example**, not a provider-neutral serverless default. Azure Functions and Google Cloud Functions use different pricing rules, free tiers, and billing details, so treat the numbers as one worked example rather than a universal formula.
+
+### Step 1 — Invocation cost (AWS Lambda example)
 
 ```python
 def calls_cost(n, unit_price=0.0000002):
@@ -86,14 +88,14 @@ def gb_seconds(memory_mb, duration_ms, n):
     return (memory_mb / 1024) * (duration_ms / 1000) * n
 ```
 
-### Step 3 — Egress
+### Step 3 — Egress (example rate)
 
 ```python
 def egress_cost(gb, price_per_gb=0.09):
     return gb * price_per_gb
 ```
 
-### Step 4 — Scenario comparison
+### Step 4 — Scenario comparison (AWS-shaped sample)
 
 ```python
 def total(n, mem_mb, dur_ms, gb_out):
@@ -114,13 +116,14 @@ for s in sizes:
 
 ## What to Notice in This Code
 
+- The numeric constants are **provider-specific example values**, not universal serverless defaults.
 - *Memory* sets both *CPU* and *cost*.
 - *Data transfer* is a *hidden* line item.
 - Compare alternatives at the *scenario* level, not the unit level.
 
 ## Five Common Mistakes
 
-1. **Estimating *total cost* from the *per-call price* only.**
+1. **Treating one provider's published constants as if they were generic *serverless* defaults.**
 2. **Pinning *memory* at the *minimum* without measuring duration.**
 3. **Ignoring *egress*.**
 4. **Forgetting *DB* and *queue* charges.**
