@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 9
 title: WebSocket and Real-Time Communication
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - SSE
   - Streaming
 seo_description: How WebSocket upgrades from HTTP, when to choose it over SSE or long-polling, and the operational realities of long-lived connections in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # WebSocket and Real-Time Communication
@@ -50,19 +50,8 @@ Dashboards, chat, games, market feeds, collaborative editing — all of them dep
 
 ## Concept at a Glance
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    C->>S: GET /chat (Upgrade: websocket)
-    S-->>C: 101 Switching Protocols
-    Note over C,S: Bidirectional frames over the same TCP connection
-    C->>S: text frame "hello"
-    S->>C: text frame "hi"
-    S->>C: text frame "you have 1 new message"
-    C->>S: ping
-    S->>C: pong
-```
+![From HTTP Upgrade to a long-lived WebSocket stream](../../../assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png)
+*After the HTTP upgrade succeeds, the same TCP connection becomes a long-lived bidirectional frame channel.*
 
 The pivot is **101 Switching Protocols**. The connection starts as HTTP and, after the response, behaves as a stream of WebSocket frames instead.
 

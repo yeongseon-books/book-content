@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 10
 title: Debugging Network Problems
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Troubleshooting
   - Diagnostics
 seo_description: How to narrow a network problem layer by layer with ping, dig, nc, openssl, curl, ss, and tcpdump, and how to read what each tool tells you.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Debugging Network Problems
@@ -50,15 +50,8 @@ Under pressure, the first instinct is "what did we just change?" That is necessa
 
 ## Concept at a Glance
 
-```mermaid
-flowchart TB
-    A["User: the site is down"] --> B["1. Link/path: ping, traceroute"]
-    B --> C["2. Name resolution: dig"]
-    C --> D["3. TCP connect: nc, ss"]
-    D --> E["4. TLS: openssl s_client"]
-    E --> F["5. HTTP: curl -v"]
-    F --> G["6. Packets: tcpdump"]
-```
+![Layer-by-layer order for narrowing a network incident](../../../assets/computer-networks-101/10/10-01-concept-at-a-glance.en.png)
+*Start with the simplest tools, mark healthy layers off quickly, and leave packet capture for the few hypotheses that survive.*
 
 Each step you confirm as healthy cuts the hypothesis space roughly in half.
 
@@ -165,6 +158,20 @@ curl -v https://api.example.com/health
 
 `-v` is the point. It shows DNS, TCP connect, TLS negotiation, request headers, and response headers in one go. If you reach a 4xx or 5xx response, the problem is no longer the network — it is the application. If everything looks healthy here, suspicion shifts to the client environment.
 
+## Step 6: Use the failure shape to guess the layer immediately
+
+Even before you run all five commands, the failure shape tells you which layer deserves the next minute.
+
+| Symptom | Most likely layer | Immediate next action |
+| --- | --- | --- |
+| `Could not resolve host` | DNS | `dig +short`, then `dig +trace` |
+| `Connection refused` | TCP / process | Check `ss -tlnp` on the server |
+| `Operation timed out` | Firewall / path | Check `traceroute`, security groups, ACLs |
+| `SSL certificate problem` | TLS | Run `openssl s_client -servername ...` |
+| `HTTP/1.1 502` or `503` | App / LB | Check `/health`, upstream status, app logs |
+
+The goal is not to memorize canned answers. It is to recognize **which layer's language** the error message is written in. Once that habit forms, half the hypotheses disappear before `tcpdump` even enters the conversation.
+
 ## What to Notice in This Code
 
 - Each tool eliminates a different hypothesis: `ping` for link, `dig` for name, `nc` for port, `openssl` for cert, `curl` for application behavior.
@@ -240,5 +247,7 @@ That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS
 - [Wireshark User's Guide](https://www.wireshark.org/docs/wsug_html_chunked/)
 - [`ss(8)` Linux Manual](https://man7.org/linux/man-pages/man8/ss.8.html)
 - [Julia Evans — Networking debugging zines](https://wizardzines.com/zines/networking/)
+- [curl Manual](https://curl.se/docs/manpage.html)
+- [OpenSSL `s_client` documentation](https://docs.openssl.org/master/man1/openssl-s_client/)
 
 Tags: Computer Science, Networking, Debugging, tcpdump, Troubleshooting, Diagnostics

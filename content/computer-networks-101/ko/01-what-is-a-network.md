@@ -18,7 +18,7 @@ tags:
   - 계층모델
   - OSI
 seo_description: 패킷, 프로토콜, 계층 모델을 중심으로 현대 네트워크의 기본 동작 원리와 인터넷 통신 과정을 상세히 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 네트워크란 무엇인가?
@@ -44,13 +44,8 @@ last_reviewed: '2026-05-12'
 
 > 데이터는 패킷이라는 작은 단위로 잘려 네트워크를 흐릅니다. 그리고 각 층은 서로 다른 책임을 맡습니다. 물리 신호를 보내는 층, 바로 옆 장비와 프레임을 주고받는 층, 전 세계 경로를 찾는 층, 신뢰성 있는 전송을 맡는 층, 마지막으로 HTTP 같은 의미 있는 메시지를 다루는 층이 나뉘어 있습니다. 이 책임 분리가 바로 계층 모델입니다.
 
-```text
-[애플리케이션] HTTP, DNS, SMTP, gRPC ...
-[전송]         TCP / UDP
-[네트워크]     IP, ICMP, 라우팅
-[링크]         Ethernet, Wi-Fi
-[물리]         전기/광/전파 신호
-```
+![네트워크 계층 모델과 패킷 이동](../../../assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
+*패킷이 계층을 따라 캡슐화되고, 중간 장비를 거쳐 목적지까지 이동하는 흐름*
 
 ## 핵심 용어
 
@@ -216,5 +211,6 @@ loopback driver                      ← link + physical layer
 - [Kurose & Ross — Computer Networking: A Top-Down Approach](https://gaia.cs.umass.edu/kurose_ross/)
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/)
 - [Cloudflare Learning — What is the Internet?](https://www.cloudflare.com/learning/network-layer/what-is-the-internet/)
+- [RFC 1122 — Internet Host Requirements](https://www.rfc-editor.org/rfc/rfc1122)
 
 Tags: Computer Science, 네트워크, 인터넷, 패킷, 계층모델, OSI

@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 2
 title: IP and Subnet
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - CIDR
   - Routing
 seo_description: IP addresses and subnets explained — how CIDR splits an address into network and host parts and why routing, NAT, and firewall rules all start here.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # IP and Subnet
@@ -52,14 +52,8 @@ If you memorize an IP address as "the number for one machine", routing, NAT, and
 
 > An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (`/24`, `/16`, etc.) writes the length of that ruler in bits.
 
-```text
-IP        : 192.168.10.42
-CIDR      : 192.168.10.0/24
-mask      : 255.255.255.0
-network   : 192.168.10.0
-broadcast : 192.168.10.255
-hosts     : 192.168.10.1 ~ 192.168.10.254 (254 hosts)
-```
+![How CIDR splits an address into network and host parts](../../../assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)
+*The prefix defines where the network part ends and where the host part begins, which is exactly what routers use to pick the next hop.*
 
 ## Key Terms
 

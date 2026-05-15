@@ -82,12 +82,8 @@
 <blockquote>
 <p>Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.</p>
 </blockquote>
-<pre><code class="language-text">[Application] HTTP, DNS, SMTP, gRPC ...
-[Transport]   TCP / UDP
-[Network]     IP, ICMP, routing
-[Link]        Ethernet, Wi-Fi
-[Physical]    electrical / optical / radio signals
-</code></pre>
+<p><img alt="Layered model and packet travel across a network" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png"><br>
+<em>Packets are encapsulated layer by layer, traverse intermediate devices, and are reassembled at the destination.</em></p>
 <h2>Key Terms</h2>
 <p><strong>Packet</strong><br>
 - Meaning: The basic unit of data flowing across a network</p>
@@ -226,6 +222,7 @@ loopback driver                      ← link + physical layer
 <li><a href="https://gaia.cs.umass.edu/kurose_ross/">Kurose &amp; Ross — Computer Networking: A Top-Down Approach</a></li>
 <li><a href="https://beej.us/guide/bgnet/">Beej's Guide to Network Programming</a></li>
 <li><a href="https://www.cloudflare.com/learning/network-layer/what-is-the-internet/">Cloudflare Learning — What is the Internet?</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc1122">RFC 1122 — Requirements for Internet Hosts</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Networking, Internet, Packet, Layered Model, OSI</p>
 </body>

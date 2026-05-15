@@ -18,7 +18,7 @@ tags:
   - L7
   - 헬스체크
 seo_description: 부하 분산과 신뢰성의 핵심인 로드밸런서의 동작 원리와 L4, L7의 차이점 및 헬스체크와 분산 알고리즘 활용 방법을 상세히 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # Load Balancer
@@ -42,12 +42,8 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 그림
 
-```text
-client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
-            ├─ health check (HTTP / TCP)
-            ├─ algorithm   (round-robin / least conn / hash)
-            └─ TLS terminate (optional)
-```
+![로드밸런서가 살아 있는 백엔드로 트래픽을 보내는 방식](../../../assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
+*로드밸런서는 단순 분산기보다, 헬스체크와 알고리즘으로 살아 있는 서버만 트래픽 풀에 남기는 제어 장치에 가깝습니다.*
 
 L4 로드밸런서는 TCP 흐름만 보고, L7 로드밸런서는 HTTP 요청 단위로 판단합니다.
 
@@ -163,6 +159,27 @@ upstream backend {
 
 `ip_hash`는 같은 클라이언트 IP를 같은 백엔드로 보냅니다. 세션이 메모리에 있을 때 잠깐 버티는 용도일 뿐, 장기적으로는 서비스를 stateless하게 만드는 편이 낫습니다.
 
+## 6단계: graceful drain과 canary를 함께 설계하기
+
+로드밸런서가 진짜 빛나는 순간은 장애 평상시가 아니라 **배포 순간**입니다. 새 버전으로 한 번에 바꾸지 말고, 먼저 새 연결만 소량 보내고 기존 연결은 자연스럽게 빠지게 만들어야 합니다.
+
+```nginx
+upstream backend {
+    server 127.0.0.1:9001 weight=19;
+    server 127.0.0.1:9002 weight=1;
+}
+```
+
+위처럼 weight를 19:1로 두면 대략 5% 수준의 canary 트래픽을 새 버전으로 보낼 수 있습니다. 그다음 절차는 보통 다음 순서를 따릅니다.
+
+1. 새 버전을 풀에 넣되 낮은 비율로만 받게 합니다.
+2. 에러율과 p95/p99 지연을 짧게 관찰합니다.
+3. 문제가 없으면 비율을 점진적으로 올립니다.
+4. 종료할 인스턴스는 먼저 헬스체크에서 빠지게 하고, 진행 중인 요청이 끝난 뒤 프로세스를 내립니다.
+
+sticky session에 의존하는 서비스일수록 이 절차가 어려워집니다. 같은 사용자가 계속 같은 백엔드에 묶여 있으니, 비율 조정이 곧바로 실제 사용자 비율로 이어지지 않기 때문입니다.
+
+
 ## 이 코드에서 먼저 볼 점
 
 - 로드밸런서의 진짜 가치는 분산 자체보다 헬스체크와 배포 전략에 있습니다.
@@ -233,5 +250,6 @@ upstream backend {
 - [HAProxy Documentation](https://docs.haproxy.org/)
 - [Envoy Proxy Docs](https://www.envoyproxy.io/docs)
 - [AWS ELB User Guide](https://docs.aws.amazon.com/elasticloadbalancing/)
+- [Google SRE Book — Handling Overload](https://sre.google/sre-book/handling-overload/)
 
 Tags: Computer Science, 네트워크, LoadBalancer, L4, L7, 헬스체크

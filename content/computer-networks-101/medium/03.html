@@ -82,11 +82,8 @@
 <blockquote>
 <p>TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.</p>
 </blockquote>
-<pre><code class="language-text">TCP: handshake → stream → retransmit → flow control → close
-     &quot;if I do not know it arrived, I will resend&quot;
-UDP: just send()
-     &quot;I sent it. You check whether it arrived.&quot;
-</code></pre>
+<p><img alt="TCP and UDP split responsibility in different ways" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png"><br>
+<em>TCP puts reliability in the operating system, while UDP leaves it to the application so you can pay only for what the workload needs.</em></p>
 <h2>Key Terms</h2>
 <p><strong>3-way handshake</strong><br>
 - Meaning: TCP connection setup with SYN, SYN-ACK, ACK</p>

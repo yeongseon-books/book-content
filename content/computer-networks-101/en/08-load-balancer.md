@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 8
 title: Load Balancer
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - L7
   - Health Check
 seo_description: How a load balancer distributes traffic and isolates failures, the differences between L4 and L7, and the cost of sticky sessions in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Load Balancer
@@ -50,12 +50,8 @@ A load balancer is more than a distributor — it is the device that decides rel
 
 ## Concept at a Glance
 
-```text
-client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
-            ├─ health check (HTTP / TCP)
-            ├─ algorithm   (round-robin / least conn / hash)
-            └─ TLS terminate (optional)
-```
+![How a load balancer keeps traffic on healthy backends](../../../assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)
+*The load balancer is less a traffic splitter than a control point that keeps only healthy, ready backends in the active pool.*
 
 An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.
 
@@ -171,6 +167,26 @@ upstream backend {
 
 `ip_hash` sends the same client IP to the same backend. It is a temporary fix when sessions live in memory; the right answer is to make the service stateless.
 
+## Step 6: Design graceful drain and canary together
+
+The load balancer matters most during a deploy, not during a demo. Instead of flipping all traffic at once, let only a small share of new connections hit the new version while old connections drain naturally.
+
+```nginx
+upstream backend {
+    server 127.0.0.1:9001 weight=19;
+    server 127.0.0.1:9002 weight=1;
+}
+```
+
+A 19:1 split is roughly a 5% canary. The usual sequence looks like this.
+
+1. Add the new version to the pool at a low weight.
+2. Watch error rate plus p95/p99 latency for a short window.
+3. Raise the weight gradually if the signals stay clean.
+4. Mark the old instance unhealthy for new traffic, let in-flight requests finish, then stop it.
+
+Sticky sessions make this harder because traffic weight no longer maps cleanly to user weight. The same users stay pinned to the same backends, so you lose control over who actually experiences the canary.
+
 ## What to Notice in This Code
 
 - The value of an LB is in health checks and deployment strategy, not just distribution
@@ -243,5 +259,6 @@ Next we move from request/response to bidirectional streams — WebSocket and re
 - [HAProxy Documentation](https://docs.haproxy.org/)
 - [Envoy Proxy Docs](https://www.envoyproxy.io/docs)
 - [AWS ELB User Guide](https://docs.aws.amazon.com/elasticloadbalancing/)
+- [Google SRE Book — Handling Overload](https://sre.google/sre-book/handling-overload/)
 
 Tags: Computer Science, Networking, Load Balancer, L4, L7, Health Check

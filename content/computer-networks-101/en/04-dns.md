@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 4
 title: DNS
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Caching
   - TTL
 seo_description: How a domain name turns into an IP address — the DNS hierarchy, recursive resolvers, record types, and what TTL really means in production.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # DNS
@@ -52,14 +52,8 @@ Half of "the Internet does not work" turns out to be DNS, and a large share of t
 
 > A client asks the OS stub resolver, which usually asks the ISP or company recursive resolver. The recursive resolver walks root → TLD → authoritative, finds the answer, and caches it for the TTL.
 
-```text
-browser
-  └─ stub resolver (OS)
-       └─ recursive resolver (ISP / 8.8.8.8 / 1.1.1.1)
-            ├─ root server      (".")
-            ├─ TLD server       (".com")
-            └─ authoritative    ("example.com.")
-```
+![DNS lookup path from the stub resolver to the authoritative server](../../../assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png)
+*The recursive resolver walks the delegation chain, finds the answer, and caches it for the TTL so the next lookup is faster.*
 
 ## Key Terms
 

@@ -18,7 +18,7 @@ tags:
   - default gateway
   - 사설IP
 seo_description: 라우팅 테이블의 결정 원리와 NAT가 사설 IP와 공인 IP 사이를 연결하는 방식을 통해 패킷이 목적지까지 도달하는 과정을 상세히 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 라우팅과 NAT
@@ -42,13 +42,8 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 그림
 
-```text
-my laptop (192.168.0.10/24)
-  └─ same /24? yes  → direct delivery
-  └─ same /24? no   → default gateway (192.168.0.1)
-                        └─ ISP router → ... → destination AS
-NAT rewrites source (192.168.0.10:54321) to (203.0.113.5:60000)
-```
+![라우팅과 NAT가 사설 IP를 인터넷으로 내보내는 과정](../../../assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
+*라우팅은 다음 홉을 고르고, NAT는 사설 IP와 포트를 공인 주소로 바꿔 응답이 다시 원래 호스트로 돌아오게 만듭니다.*
 
 ## 핵심 용어
 
@@ -131,6 +126,24 @@ sudo ip route del 192.168.50.0/24
 
 라우팅 테이블이 바뀌면 패킷의 목적지 처리 방식도 즉시 달라진다는 점을 직접 볼 수 있습니다.
 
+## 6단계: longest-prefix와 NAT 상태를 함께 읽기
+
+같은 증상처럼 보여도, 라우팅 오류와 NAT 오류는 출력 모양이 다릅니다.
+
+| 관찰한 현상 | 먼저 의심할 것 | 왜 그렇게 보이는가 |
+| --- | --- | --- |
+| `ip route get 1.1.1.1`이 예상과 다른 인터페이스를 고름 | longest-prefix match 충돌 | 더 구체적인 prefix 규칙이 default route를 이겼기 때문입니다 |
+| 내부에서 외부로는 연결되지만, 오래 idle 뒤 응답이 끊김 | NAT 세션 타임아웃 | 출발지 변환 상태가 사라져 돌아오는 패킷을 원래 호스트에 매핑하지 못합니다 |
+| 특정 원격 대역만 VPN으로 가야 하는데 전부 로컬 게이트웨이로 나감 | 정적 라우트 누락 | 더 구체적인 기업망 prefix가 라우팅 테이블에 없기 때문입니다 |
+
+```bash
+ip route get 1.1.1.1
+# 1.1.1.1 via 192.168.0.1 dev wlan0 src 192.168.0.10
+```
+
+이 명령은 "이 목적지로 지금 패킷을 보내면 어떤 인터페이스와 어떤 출발지 주소를 쓸까"를 바로 보여 줍니다. `traceroute`보다 앞에서, 운영 체제가 첫 번째 결정을 어떻게 내리는지 확인할 때 특히 유용합니다.
+
+
 ## 이 코드에서 먼저 볼 점
 
 - 라우팅 결정은 매 홉마다 독립적으로 내려집니다.
@@ -201,5 +214,6 @@ sudo ip route del 192.168.50.0/24
 - [Cloudflare Learning — What is BGP?](https://www.cloudflare.com/learning/security/glossary/what-is-bgp/)
 - [Linux ip-route(8) man page](https://man7.org/linux/man-pages/man8/ip-route.8.html)
 - [Tanenbaum & Wetherall — Computer Networks](https://www.pearson.com/store/p/computer-networks/P100000875375)
+- [RFC 4271 — Border Gateway Protocol 4 (BGP-4)](https://www.rfc-editor.org/rfc/rfc4271)
 
 Tags: Computer Science, 네트워크, 라우팅, NAT, default gateway, 사설IP

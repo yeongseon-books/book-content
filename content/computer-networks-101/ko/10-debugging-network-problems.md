@@ -18,7 +18,7 @@ tags:
   - 트러블슈팅
   - 진단
 seo_description: 계층별 진단 도구를 활용하여 네트워크 장애 원인을 체계적으로 좁혀 가는 실전 디버깅 절차와 주요 도구 사용법을 상세히 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 네트워크 문제 디버깅
@@ -42,15 +42,8 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 그림
 
-```mermaid
-flowchart TB
-    A["사용자: 사이트가 안 돼요"] --> B["1. 링크/경로: ping, traceroute"]
-    B --> C["2. 이름 해석: dig"]
-    C --> D["3. TCP 연결: nc, ss"]
-    D --> E["4. TLS: openssl s_client"]
-    E --> F["5. HTTP: curl -v"]
-    F --> G["6. 패킷: tcpdump"]
-```
+![네트워크 장애를 계층별로 줄여 가는 진단 순서](../../../assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
+*간단한 도구부터 순서대로 써서 정상인 층을 빠르게 지우면, 마지막에 남는 층이 실제 장애 후보가 됩니다.*
 
 한 단계씩 정상으로 판정할 때마다 가능한 원인 후보가 크게 줄어듭니다.
 
@@ -147,7 +140,7 @@ openssl s_client -connect api.example.com:443 \
                  -servername api.example.com </dev/null
 ```
 
-핵심은 `-servername`입니다. SNI 없이 연결하면 잘못된 인증서를 받고 엉뚱한 오류를 추적할 수 있습니다. `Verify return code: 0 (ok)`가 나오면 TLS 층은 정상입니다.
+여기서 꼭 봐야 할 것은 `-servername` 옵션입니다. SNI 없이 연결하면 잘못된 인증서를 받고 엉뚱한 오류를 추적할 수 있습니다. `Verify return code: 0 (ok)`가 나오면 TLS 층은 정상입니다.
 
 ### 5단계 — HTTP 응답을 직접 보기
 
@@ -156,6 +149,21 @@ curl -v https://api.example.com/health
 ```
 
 `-v`는 DNS, TCP 연결, TLS 협상, 요청 헤더, 응답 헤더를 한 번에 보여 줍니다. 여기서 4xx나 5xx가 나오면 더 이상 네트워크 문제가 아니라 애플리케이션 문제일 가능성이 큽니다.
+
+## 6단계: 증상 모양으로 바로 층을 가늠하기
+
+다섯 명령을 다 치기 전에, 출력 모양만으로도 다음 단계의 우선순위를 조정할 수 있습니다.
+
+| 관찰한 증상 | 흔한 원인 층 | 바로 이어서 할 일 |
+| --- | --- | --- |
+| `Could not resolve host` | DNS | `dig +short`, `dig +trace` |
+| `Connection refused` | TCP / 프로세스 | 서버에서 `ss -tlnp`로 listen 여부 확인 |
+| `Operation timed out` | 방화벽 / 경로 | `traceroute`, 보안 그룹, ACL 확인 |
+| `SSL certificate problem` | TLS | `openssl s_client -servername ...`로 인증서 체인 확인 |
+| `HTTP/1.1 502` 또는 `503` | 애플리케이션/LB | `/health`, upstream 상태, 애플리케이션 로그 확인 |
+
+이 표의 목적은 정답을 외우는 데 있지 않습니다. **실패 메시지가 어느 층 언어로 쓰였는지 먼저 읽는 습관**을 만드는 데 있습니다. 그러면 `tcpdump`를 켜기 전에 이미 절반은 줄어듭니다.
+
 
 ## 이 코드에서 먼저 볼 점
 
@@ -232,5 +240,7 @@ sudo tcpdump -i eth0 -n -s 0 'host api.example.com and tcp port 443' -w cap.pcap
 - [Wireshark User's Guide](https://www.wireshark.org/docs/wsug_html_chunked/)
 - [`ss(8)` Linux Manual](https://man7.org/linux/man-pages/man8/ss.8.html)
 - [Julia Evans — Networking debugging zines](https://wizardzines.com/zines/networking/)
+- [curl Manual](https://curl.se/docs/manpage.html)
+- [OpenSSL `s_client` 문서](https://docs.openssl.org/master/man1/openssl-s_client/)
 
 Tags: Computer Science, 네트워크, 디버깅, tcpdump, 트러블슈팅, 진단

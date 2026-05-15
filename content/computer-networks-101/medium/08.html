@@ -79,11 +79,8 @@
 <p>A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-text">client → LB (1 virtual IP) → [backend 1, 2, 3, ...]
-            ├─ health check (HTTP / TCP)
-            ├─ algorithm   (round-robin / least conn / hash)
-            └─ TLS terminate (optional)
-</code></pre>
+<p><img alt="How a load balancer keeps traffic on healthy backends" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png"><br>
+<em>The load balancer is less a traffic splitter than a control point that keeps only healthy, ready backends in the active pool.</em></p>
 <p>An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.</p>
 <h2>Key Terms</h2>
 <p><strong>Virtual IP (VIP)</strong><br>
@@ -167,6 +164,21 @@ for i in 1 2 3 4; do curl -s localhost:8080/; done
 }
 </code></pre>
 <p><code>ip_hash</code> sends the same client IP to the same backend. It is a temporary fix when sessions live in memory; the right answer is to make the service stateless.</p>
+<h2>Step 6: Design graceful drain and canary together</h2>
+<p>The load balancer matters most during a deploy, not during a demo. Instead of flipping all traffic at once, let only a small share of new connections hit the new version while old connections drain naturally.</p>
+<pre><code class="language-nginx">upstream backend {
+    server 127.0.0.1:9001 weight=19;
+    server 127.0.0.1:9002 weight=1;
+}
+</code></pre>
+<p>A 19:1 split is roughly a 5% canary. The usual sequence looks like this.</p>
+<ol>
+<li>Add the new version to the pool at a low weight.</li>
+<li>Watch error rate plus p95/p99 latency for a short window.</li>
+<li>Raise the weight gradually if the signals stay clean.</li>
+<li>Mark the old instance unhealthy for new traffic, let in-flight requests finish, then stop it.</li>
+</ol>
+<p>Sticky sessions make this harder because traffic weight no longer maps cleanly to user weight. The same users stay pinned to the same backends, so you lose control over who actually experiences the canary.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The value of an LB is in health checks and deployment strategy, not just distribution</li>
@@ -242,6 +254,7 @@ for i in 1 2 3 4; do curl -s localhost:8080/; done
 <li><a href="https://docs.haproxy.org/">HAProxy Documentation</a></li>
 <li><a href="https://www.envoyproxy.io/docs">Envoy Proxy Docs</a></li>
 <li><a href="https://docs.aws.amazon.com/elasticloadbalancing/">AWS ELB User Guide</a></li>
+<li><a href="https://sre.google/sre-book/handling-overload/">Google SRE Book — Handling Overload</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Networking, Load Balancer, L4, L7, Health Check</p>
 </body>

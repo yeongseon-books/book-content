@@ -82,13 +82,8 @@
 <blockquote>
 <p>A client asks the OS stub resolver, which usually asks the ISP or company recursive resolver. The recursive resolver walks root → TLD → authoritative, finds the answer, and caches it for the TTL.</p>
 </blockquote>
-<pre><code class="language-text">browser
-  └─ stub resolver (OS)
-       └─ recursive resolver (ISP / 8.8.8.8 / 1.1.1.1)
-            ├─ root server      (&quot;.&quot;)
-            ├─ TLD server       (&quot;.com&quot;)
-            └─ authoritative    (&quot;example.com.&quot;)
-</code></pre>
+<p><img alt="DNS lookup path from the stub resolver to the authoritative server" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>The recursive resolver walks the delegation chain, finds the answer, and caches it for the TTL so the next lookup is faster.</em></p>
 <h2>Key Terms</h2>
 <p><strong>A / AAAA</strong><br>
 - Meaning: Domain → IPv4 / IPv6 address</p>

@@ -2,7 +2,7 @@
 series: computer-networks-101
 episode: 3
 title: TCP and UDP
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,7 +18,7 @@ tags:
   - Transport Layer
   - Reliability
 seo_description: TCP and UDP compared along four axes — reliability, order, connection, and speed — with guidance on which one to pick for which workload.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # TCP and UDP
@@ -52,12 +52,8 @@ The transport-protocol choice directly affects system performance and user exper
 
 > TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.
 
-```text
-TCP: handshake → stream → retransmit → flow control → close
-     "if I do not know it arrived, I will resend"
-UDP: just send()
-     "I sent it. You check whether it arrived."
-```
+![TCP and UDP split responsibility in different ways](../../../assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
+*TCP puts reliability in the operating system, while UDP leaves it to the application so you can pay only for what the workload needs.*
 
 ## Key Terms
 

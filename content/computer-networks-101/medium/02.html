@@ -82,13 +82,8 @@
 <blockquote>
 <p>An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (<code>/24</code>, <code>/16</code>, etc.) writes the length of that ruler in bits.</p>
 </blockquote>
-<pre><code class="language-text">IP        : 192.168.10.42
-CIDR      : 192.168.10.0/24
-mask      : 255.255.255.0
-network   : 192.168.10.0
-broadcast : 192.168.10.255
-hosts     : 192.168.10.1 ~ 192.168.10.254 (254 hosts)
-</code></pre>
+<p><img alt="How CIDR splits an address into network and host parts" src="https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png"><br>
+<em>The prefix defines where the network part ends and where the host part begins, which is exactly what routers use to pick the next hop.</em></p>
 <h2>Key Terms</h2>
 <p><strong>IPv4 / IPv6</strong><br>
 - Meaning: 32-bit / 128-bit address spaces</p>
