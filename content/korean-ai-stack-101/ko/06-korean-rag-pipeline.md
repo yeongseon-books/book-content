@@ -16,7 +16,7 @@ tags:
 - Retrieval
 - LLM
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: RAG 품질은 한 번의 마법 같은 호출이 아니라, 청크 경계와 검색 후보와 문맥 전달 방식이 함께 만드는 결과입니다.
 ---
 
@@ -232,6 +232,138 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 
 평가 세트가 열 개 정도만 있어도 청킹과 임베딩을 바꿨을 때 영향이 숫자로 보이기 시작합니다.
 
+### Step 5 — 하나의 실행 함수로 묶기
+
+실무에서 RAG가 갑자기 추상적으로 느껴지는 순간은 각 단계가 따로는 이해되는데, 한 번에 묶으면 어디서 무엇을 출력해야 하는지 사라질 때입니다. 그래서 최소 실행 스크립트에도 **중간 상태를 남기는 `run_pipeline()`** 하나를 두는 편이 좋습니다.
+
+```python
+import json
+import re
+
+def mask_pii(text: str) -> str:
+    text = re.sub(r'\b\d{6}-\d{7}\b', '[RRN]', text)
+    text = re.sub(r'\b\d{2,3}-\d{3,4}-\d{4}\b', '[PHONE]', text)
+    return text
+
+def run_pipeline(question: str) -> dict:
+    masked_question = mask_pii(question)
+    hits = retrieve(masked_question, top_k=2)
+    answer = generate(masked_question, hits)
+    result = {
+        'question': masked_question,
+        'hit_ids': [h['id'] for h in hits],
+        'hit_scores': [round(h['score'], 3) for h in hits],
+        'answer': answer,
+    }
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return result
+
+run_pipeline('결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?')
+```
+
+**Expected output:**
+
+```json
+{
+  "question": "결제는 됐는데 주문 내역이 없을 때 어떤 순서로 점검해야 하나요?",
+  "hit_ids": [0, 1],
+  "hit_scores": [0.873, 0.522],
+  "answer": "먼저 주문 동기화 지연 여부를 확인하고, 그다음 결제 성공과 주문 저장 실패가 분리된 상황인지 점검해야 합니다. [sources: 0,1]"
+}
+```
+
+이 출력이 중요한 이유는 두 가지입니다. 첫째, 답변만이 아니라 **선택된 청크와 점수**가 같이 남습니다. 둘째, 나중에 사용자 피드백이 들어왔을 때 “검색이 틀렸는지, 생성이 틀렸는지”를 로그 한 줄로 다시 열어 볼 수 있습니다.
+
+### Step 6 — 문맥이 없을 때 실패를 확인하기
+
+RAG 글에서 빠지기 쉬운 검증이 하나 있습니다. **답할 수 없는 질문**도 일부러 넣어 봐야 한다는 점입니다. 그래야 추측 금지 프롬프트가 실제로 작동하는지 확인할 수 있습니다.
+
+```python
+unknown_question = '우리 회사 포인트 만료 정책은 몇 개월인가요?'
+unknown_result = run_pipeline(unknown_question)
+print(unknown_result['answer'])
+```
+
+**Expected output:**
+
+```text
+I could not find a relevant policy [sources: 1,3]
+```
+
+이 검증을 생략하면, 검색은 빈약한데 답변은 그럴듯한 상태가 얼마든지 남습니다. 한국어 RAG에서 특히 위험한 패턴입니다.
+
+---
+
+## 어느 단계가 병목인지 빨리 가르는 방법
+
+RAG를 디버깅할 때는 문제를 길게 설명하기보다, 먼저 아래 표처럼 **증상과 첫 점검 포인트를 대응**시키는 편이 훨씬 빠릅니다.
+
+| 증상 | 흔한 원인 | 가장 먼저 볼 로그 |
+| --- | --- | --- |
+| 답변은 자연스러운데 사실이 틀림 | Retrieve 실패 또는 Generate 추측 | `hit_ids`, `hit_scores`, 인용 라인 |
+| 검색 점수가 모두 비슷함 | 청크가 너무 짧거나 너무 일반적 | chunk 길이 분포, 상위 5개 점수 |
+| top-1은 맞는데 답변이 엉뚱함 | context formatting 부족 | `Context:` 문자열 길이, system prompt |
+| 특정 질문만 계속 실패 | 평가 세트 편향 또는 코퍼스 누락 | gold chunk 존재 여부, 질문 표현 |
+| 긴 문서에서만 품질 저하 | chunk 경계가 의미 단위를 끊음 | 문단 기반 vs 고정 토큰 비교 결과 |
+
+이 표를 팀 위키에 그대로 붙여 두면, 운영 중 “LLM이 이상하다”는 막연한 표현이 훨씬 빨리 구체화됩니다.
+
+---
+
+## 한국어 문맥을 LLM에 넘길 때의 포맷 규칙
+
+생성 단계에서 흔한 실수는 검색된 청크를 그냥 이어 붙이는 것입니다. 한국어 문맥에서는 아래 세 가지를 같이 지키는 편이 안정적입니다.
+
+1. **청크 ID를 앞에 붙입니다.** 인용과 디버깅이 쉬워집니다.
+2. **문맥 사이에 빈 줄을 둡니다.** 청크 경계가 흐려지지 않습니다.
+3. **질문보다 문맥을 먼저 읽게 합니다.** system 메시지에서 우선순위를 고정합니다.
+
+```python
+def build_context(hits: list[dict]) -> str:
+    return '\n\n'.join(
+        f"[chunk:{hit['id']}]\n{hit['text']}"
+        for hit in hits
+    )
+```
+
+아주 작은 함수처럼 보이지만, 이 포맷이 없으면 인용 라인도 쉽게 어긋나고, 같은 청크를 다시 찾기도 어려워집니다.
+
+---
+
+## 운영 전 점검용 미니 평가 루프
+
+첫 버전이라도 질문 열 개 정도는 반드시 쌓아 두는 편이 좋습니다. 여기서 중요한 것은 화려한 평가 프레임워크보다 **회귀를 빨리 감지하는 작은 루프**입니다.
+
+```python
+def evaluate_retrieval(eval_set):
+    failures = []
+    hits = 0
+
+    for case in eval_set:
+        result = retrieve(case['q'], top_k=3)
+        hit_ids = [item['id'] for item in result]
+        ok = case['expected_chunk'] in hit_ids
+        hits += int(ok)
+        if not ok:
+            failures.append({'question': case['q'], 'hit_ids': hit_ids})
+
+    recall = hits / len(eval_set)
+    return recall, failures
+
+recall, failures = evaluate_retrieval(eval_set)
+print('Recall@3 =', round(recall, 2))
+print('Failures =', failures)
+```
+
+**Expected output:**
+
+```text
+Recall@3 = 1.0
+Failures = []
+```
+
+실패 케이스가 생기면 그 질문을 그대로 다음 회귀 세트에 남겨 두세요. 좋은 RAG 팀은 평가 세트가 멋지기보다 **작아도 계속 누적**됩니다.
+
 ---
 
 ## 자주 하는 실수
@@ -247,6 +379,30 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 5. **청크가 너무 길거나 짧은 것** — 1000토큰을 넘기면 LLM이 무관한 부분에 끌리고, 50토큰보다 짧으면 맥락을 잃습니다. 200~500토큰이 실용적인 출발점입니다.
 6. **민감 데이터를 마스킹하지 않고 보내는 것** — 주민등록번호, 카드번호, 계정 ID는 외부 LLM 호출 전에 가려야 합니다.
 7. **평가 세트 없이 튜닝하는 것** — “느낌상 좋아졌다”는 회귀를 부릅니다. 열 개라도 적고 매번 측정해야 합니다.
+
+---
+
+## 실무에서는 이렇게 확장합니다
+
+작은 예제가 실무로 넘어갈 때 가장 먼저 붙는 요소는 보통 세 가지입니다.
+
+1. **입력 경로 분리** — HTML, PDF, OCR 결과가 같은 `chunks` 구조로 들어오게 맞춥니다.
+2. **검색 후 재정렬** — top-20을 가져온 뒤 cross-encoder로 top-3을 다시 고릅니다.
+3. **답변 감사 로그** — 질문, 청크 ID, 점수, 인용, 사용자 피드백을 한 줄 JSON으로 남깁니다.
+
+예를 들면 아래 정도의 로그만 있어도 다음 개선 방향이 뚜렷해집니다.
+
+```python
+audit_log = {
+    'question': question,
+    'retrieved': hits,
+    'answer': answer,
+    'citations_present': '[sources:' in answer,
+}
+print(json.dumps(audit_log, ensure_ascii=False))
+```
+
+이 로그는 장애 대응에도 그대로 도움이 됩니다. “왜 틀렸지?”라는 질문에 답변만 보여 주는 팀보다, 검색 후보와 인용까지 함께 보여 주는 팀이 훨씬 빨리 원인을 좁힙니다.
 
 ---
 
@@ -272,6 +428,7 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 - [ ] 최소 열 개의 질문/정답 청크 평가 세트를 만들고 Recall@k를 측정했습니다.
 - [ ] 민감 정보 마스킹을 `generate` 직전에 적용합니다.
 - [ ] top-k는 3~5에서 시작하고 LLM context 예산에 맞춰 조정합니다.
+- [ ] 답할 수 없는 질문 세 개 이상으로 anti-speculation 동작을 검증했습니다.
 
 ---
 
@@ -287,6 +444,8 @@ print(f'Recall@3 = {recall_hits}/{len(eval_set)}')
 ## 정리
 
 이 시리즈가 남기는 더 깊은 교훈은 특정 도구 선택보다 **한국어 문서 처리 단계를 분명히 분리하는 습관**입니다. 임베딩 비교(1편), 문장 유사도(2편), 다국어 검색(3편), OCR(4편), 생성 API(5편)를 차례로 쌓아 오면, 한국어 RAG 파이프라인도 훨씬 차분하게 설계할 수 있습니다.
+
+마지막으로 남길 포인트는 세 가지입니다. 첫째, 검색과 생성을 같은 블랙박스로 두지 않는 것. 둘째, 검색 후보와 점수를 항상 남기는 것. 셋째, 답할 수 없는 질문으로도 파이프라인을 검증하는 것입니다. 이 세 가지만 지켜도 작은 한국어 RAG는 훨씬 빨리 운영 가능한 형태로 가까워집니다.
 
 이 글로 시리즈를 마칩니다. 다음에 이어서 보면 좋은 시리즈는 두 가지입니다.
 
