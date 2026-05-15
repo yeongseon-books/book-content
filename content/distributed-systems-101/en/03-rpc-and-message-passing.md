@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 3
 title: RPC and Message Passing
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Async
   - Idempotency
 seo_description: We compare two communication models between nodes — RPC and message passing — and the tradeoffs that decide where each fits.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # RPC and Message Passing
 
+Once a system is split into services, the next hard question is no longer "what code should I write?" but "how should these parts talk?" The answer determines whether latency piles up in a synchronous chain or gets absorbed behind a queue boundary.
+
 This is post 3 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (3/10)
+Here we compare RPC and message passing as two different contracts: one optimized for immediate answers, the other for decoupling time, failure, and load.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: RPC feels like a function call and a queue feels like a mailbox. They do similar work, so why do they end up in different places?
-
-> RPC follows the intuition of synchronous function calls. Message passing follows the intuition of asynchronous mailboxes. That single intuition gap drives big differences in latency, coupling, and resilience.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The definitions and differences of RPC and message passing
 - Synchronous vs asynchronous, request/response vs publish/subscribe
@@ -51,17 +45,9 @@ Once you split services, the next decision is "how do they talk?" That decision 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    subgraph RPC[RPC]
-        A1["client"] -->|request| A2["server"]
-        A2 -->|response| A1
-    end
-    subgraph MSG[Message Passing]
-        B1["producer"] -->|publish| BQ["queue / topic"]
-        BQ -->|consume| B2["consumer"]
-    end
-```
+![RPC and message-passing communication models](../../../assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
+
+*RPC and message-passing communication models*
 
 RPC is a two-way contract. Message passing is a one-way flow with an intermediary store.
 

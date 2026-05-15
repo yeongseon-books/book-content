@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 4
 title: Consistency and CAP
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Linearizability
   - Eventual Consistency
 seo_description: We map the consistency spectrum, the CAP theorem, and PACELC so you can read documentation and pick the right model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Consistency and CAP
 
+The instant one value exists in more than one place, "read the latest version" stops being a trivial promise. Now the answer depends on replica lag, partition policy, and how much waiting you are willing to buy with user-facing latency.
+
 This is post 4 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (4/10)
+Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tradeoff into a concrete design vocabulary.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: The moment data lives in more than one place, why does "what is the latest value?" suddenly become hard?
-
-> CAP says that during a partition you must give up either consistency or availability. The shape of that compromise is the consistency model you choose.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The many meanings of consistency (different from the C in transactions)
 - The spectrum from linearizable to sequential to causal to eventual
@@ -51,13 +45,9 @@ A one-line difference like "this DB is strongly consistent" or "eventual" reshap
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["linearizable"] --> B["sequential"]
-    B --> C["causal"]
-    C --> D["eventual"]
-    A -.->|stronger| D
-```
+![Consistency spectrum from linearizable to eventual](../../../assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
+
+*Consistency spectrum from linearizable to eventual*
 
 Toward the left is intuitive but expensive. Toward the right is cheap and available but further from intuition.
 

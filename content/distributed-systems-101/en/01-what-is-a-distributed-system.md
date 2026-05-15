@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 1
 title: What Is a Distributed System?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Failure
   - Coordination
 seo_description: We frame distributed systems around three axes that bend single-machine intuition — latency, failure, and coordination.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is a Distributed System?
 
+The moment one service calls another service, or one database replica trails another, you are already outside the world where local intuition works. The code may look familiar, but latency, partial failure, and independent clocks quietly change the contract underneath it.
+
 This is the first post in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (1/10)
+Here we build the mental model for the rest of the series: a distributed system is not "many computers" in the abstract, but a system whose core behavior is shaped by latency, failure, and coordination.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why is running the same code on one machine so different from running it on a hundred?
-
-> A distributed system is not just "many computers." Three essential differences — latency, failure, and coordination — bend every intuition you carry from single-machine programming.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The definition of a distributed system and how it really differs from a single machine
 - The meaning of the three axes: latency, failure, and coordination
@@ -51,15 +45,9 @@ Almost every service you build today is effectively a distributed system. A sing
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["client"] --> B["service A"]
-    B --> C["service B"]
-    B --> D["database"]
-    C --> E["replica"]
-    D --> E
-    B -.->|network failure| C
-```
+![Core distributed-system topology and failure points](../../../assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png)
+
+*Core distributed-system topology and failure points*
 
 Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.
 

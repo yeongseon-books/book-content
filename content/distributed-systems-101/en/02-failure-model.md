@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 2
 title: Failure Models
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Byzantine
   - Reliability
 seo_description: We classify the ways nodes and networks break in a distributed system using crash, omission, timing, and Byzantine models.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Failure Models
 
+When an incident channel says "the service is down," that sentence hides several very different realities. A node may be dead, the network may be dropping packets, or the node may simply be so slow that every peer mistakes it for dead.
+
 This is post 2 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (2/10)
+Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you say "the server is down," what exactly do you mean? How many flavors does that have?
-
-> Distributed systems design starts with one question: which kinds of failure do you assume? Crash, omission, and Byzantine are the standard vocabulary used to write that assumption down.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - What a failure model is and why we model failure
 - The differences between crash, omission, timing, and Byzantine
@@ -51,13 +45,9 @@ If your algorithm does not state how nodes break, you cannot reason about its co
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["fail-stop / crash"] --> B["omission"]
-    B --> C["timing"]
-    C --> D["byzantine"]
-    A -.->|weaker assumption| D
-```
+![Failure-model spectrum from crash to Byzantine](../../../assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
+
+*Failure-model spectrum from crash to Byzantine*
 
 The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.
 

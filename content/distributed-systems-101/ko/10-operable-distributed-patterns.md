@@ -18,12 +18,16 @@ tags:
   - Backpressure
   - Observability
 seo_description: bulkhead, circuit breaker, backpressure, 관측성 패턴을 묶어 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 운영 가능한 분산 시스템 패턴
 
+마지막 질문은 장애를 없애는 방법이 아닙니다. 느린 upstream 하나가 전체 장애로 번지지 않게 막고, 운영자가 사용자보다 먼저 이상 신호를 읽게 만드는 방법이 핵심입니다.
+
 이 글은 Distributed Systems 101 시리즈의 마지막 글입니다.
+
+여기서는 분산 시스템 이론을 day-2 운영으로 바꾸는 패턴들, 즉 timeout budget, circuit breaker, load shedding, observability를 하나의 운영 경계로 묶어 봅니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,14 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Cl["client"] -->|timeout| LB["load balancer"]
-    LB --> S1["service A"]
-    LB --> S2["service B (isolated pool)"]
-    S1 -->|circuit breaker| Up["upstream"]
-    S2 -->|backpressure| Q["queue"]
-```
+![timeout, breaker, bulkhead, backpressure 경계](../../../assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
+
+*timeout, breaker, bulkhead, backpressure 경계*
 
 호출 경계마다 timeout, breaker, bulkhead, backpressure를 조합해야 한 곳의 실패가 옆 경계로 번지지 않습니다.
 
@@ -154,6 +153,19 @@ def enqueue(msg):
 
 큐가 가득 찼다면 거절해야 합니다. 조용히 멎는 시스템보다 빠르게 거절하는 시스템이 훨씬 안전합니다.
 
+## 운영 시나리오: retry storm를 어디서 끊을 것인가
+
+대표적인 day-2 사고는 느린 upstream 하나가 모든 보호 장치를 늦게 깨우는 상황입니다.
+
+1. upstream 지연이 80ms에서 3초로 급등합니다.
+2. 타임아웃이 느슨한 클라이언트는 blocked socket을 계속 쌓습니다.
+3. 재시도가 시작되며 이미 느린 upstream에 부하를 몇 배로 더 얹습니다.
+4. circuit breaker가 임계값을 넘긴 뒤 열리면서 추가 호출을 막습니다.
+5. bulkhead는 다른 경로가 같은 자원 고갈에 휘말리지 않게 지킵니다.
+6. backpressure는 끝없이 쌓는 대신 새 작업을 거절해 장애를 밖으로 드러냅니다.
+
+여기서 중요한 것은 순서입니다. timeout만 있고 retry budget이 없으면 부하 증폭을 못 막습니다. breaker만 있고 observability가 없으면 이유 없는 거절처럼 보입니다. queue만 있고 backpressure가 없으면 장애를 늦출 뿐 사라지게 하지는 못합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - timeout < retry budget < user-facing latency라는 부등식이 깨지면 운영 전체가 무너집니다.
@@ -218,5 +230,6 @@ Hystrix의 역사적 패턴, resilience4j, Envoy와 Istio의 retry 및 circuit b
 - [Circuit Breaker — Martin Fowler](https://martinfowler.com/bliki/CircuitBreaker.html)
 - [Google SRE Book](https://sre.google/sre-book/table-of-contents/)
 - [AWS Well-Architected — Reliability Pillar](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html)
+- [Resilience4j CircuitBreaker guide](https://resilience4j.readme.io/docs/circuitbreaker)
 
 Tags: Computer Science, Distributed Systems, Resilience, CircuitBreaker, Backpressure, Observability

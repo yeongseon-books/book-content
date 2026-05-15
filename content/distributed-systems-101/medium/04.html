@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Consistency and CAP</h1>
+<p>The instant one value exists in more than one place, "read the latest version" stops being a trivial promise. Now the answer depends on replica lag, partition policy, and how much waiting you are willing to buy with user-facing latency.</p>
 <p>This is post 4 in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: The moment data lives in more than one place, why does "what is the latest value?" suddenly become hard?</p>
-<blockquote>
-<p>CAP says that during a partition you must give up either consistency or availability. The shape of that compromise is the consistency model you choose.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tradeoff into a concrete design vocabulary.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The many meanings of consistency (different from the C in transactions)</li>
 <li>The spectrum from linearizable to sequential to causal to eventual</li>
@@ -80,12 +71,8 @@
 <p>A consistency model is data's social contract.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;linearizable&quot;] --&gt; B[&quot;sequential&quot;]
-    B --&gt; C[&quot;causal&quot;]
-    C --&gt; D[&quot;eventual&quot;]
-    A -.-&gt;|stronger| D
-</code></pre>
+<p><img alt="Consistency spectrum from linearizable to eventual" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>Consistency spectrum from linearizable to eventual</em></p>
 <p>Toward the left is intuitive but expensive. Toward the right is cheap and available but further from intuition.</p>
 <h2>Key Terms</h2>
 <ul>

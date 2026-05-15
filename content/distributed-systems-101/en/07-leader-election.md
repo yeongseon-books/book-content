@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 7
 title: Leader Election
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Coordination
   - Liveness
 seo_description: We cover how distributed systems pick and keep a leader using lease, fencing, and split-brain prevention - patterns from etcd and ZooKeeper.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Leader Election
 
+The dangerous moment in leader election is not the happy path where one node wins. It is the messy moment where the old leader wakes up late, still thinks it owns the world, and tries to write after a new leader has already taken over.
+
 This is post 7 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (7/10)
+Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What happens when a leader you thought was dead comes back to life?
-
-> Leader election is not just about deciding "who is the leader" — it is about safely cutting off the influence of the previous one.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - Why leader election is needed and what its safety conditions are
 - The roles of lease and heartbeat
@@ -51,13 +45,9 @@ Many distributed-system bugs happen the moment "there are two leaders." When two
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    C1["candidate 1"] -->|request lease| L["lock service (etcd)"]
-    C2["candidate 2"] -->|request lease| L
-    L -->|grant lease| C1
-    C1 -->|heartbeat| L
-```
+![Lease-based leader election and heartbeat renewal](../../../assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
+
+*Lease-based leader election and heartbeat renewal*
 
 Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.
 
@@ -153,6 +143,19 @@ This single line stops an old leader from writing.
 
 In a design without tokens, A's write would land and corrupt the data.
 
+## Operational walkthrough: lease expiry under a GC pause
+
+The failure mode worth rehearsing is not "a node cleanly dies" but "a node stalls long enough to miss renewals." A practical sequence looks like this:
+
+1. Leader A acquires lease `ttl=5s` and gets fencing token `41`.
+2. A long GC pause or CPU starvation freezes A for 8 seconds.
+3. The lock service sees no heartbeat, expires the lease, and elects leader B.
+4. B receives fencing token `42` and starts handling writes.
+5. A wakes up and tries to write with token `41`.
+6. The resource server rejects A because `41 < 42`.
+
+That last comparison is the real safety boundary. The lease service decides who may lead, but the resource server decides which writes are still legal. If you only log leadership changes and never validate tokens at the write target, you have observability but not protection.
+
 ## What to Notice in This Code
 
 - A lease expires automatically — it handles network partitions naturally.
@@ -217,5 +220,6 @@ Leader election is the work of keeping the promise of "one leader at a time" wit
 - [How to do distributed locking — Martin Kleppmann](https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html)
 - [etcd lease and leader election](https://etcd.io/docs/v3.5/learning/lock/)
 - [Kubernetes leader election library](https://pkg.go.dev/k8s.io/client-go/tools/leaderelection)
+- [ZooKeeper recipes and solutions — Leader Election](https://zookeeper.apache.org/doc/current/recipes.html#sc_leaderElection)
 
 Tags: Computer Science, Distributed Systems, LeaderElection, Lease, Coordination, Liveness

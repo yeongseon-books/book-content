@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 5
 title: Replication
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - QuorumWrites
   - Durability
 seo_description: We cover the replication models behind distributed data — leader-follower, multi-leader, leaderless, sync vs async, and quorum tuning.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Replication
 
+Copying data sounds easy until you ask the operational questions that follow. Which copy is authoritative? How long can replicas trail? What is acceptable to lose after a crash? The answers are not implementation details; they are the promises your system makes.
+
 This is post 5 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (5/10)
+Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Putting the same data on more than one node sounds simple — why does it produce so many modes and knobs?
-
-> Replication is the basic tool for durability and availability. But sync vs async, leader count, and quorum settings change visible behavior dramatically.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - Why we replicate, what kinds exist, and the tradeoffs
 - The leader-follower, multi-leader, and leaderless models
@@ -51,21 +45,9 @@ Replication is the lowest layer in any distributed data system. The choices here
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    subgraph LF[leader-follower]
-        L["leader"] --> F1["follower 1"]
-        L --> F2["follower 2"]
-    end
-    subgraph ML[multi-leader]
-        M1["leader A"] <--> M2["leader B"]
-    end
-    subgraph LL[leaderless]
-        N1["node"] --- N2["node"]
-        N2 --- N3["node"]
-        N3 --- N1
-    end
-```
+![Comparison of common replication topologies](../../../assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
+
+*Comparison of common replication topologies*
 
 These three topologies cover more than ninety percent of real systems.
 

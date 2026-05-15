@@ -8,42 +8,42 @@ episodes:
 - number: 2
   slug: failure-model
   title:
-    ko: failure model
+    ko: 장애 모델
     en: Failure Models
 - number: 3
   slug: rpc-and-message-passing
   title:
-    ko: "RPC\uC640 message passing"
+    ko: RPC와 메시지 전달
     en: RPC and Message Passing
 - number: 4
   slug: consistency-and-cap
   title:
-    ko: "consistency\uC640 CAP"
+    ko: 일관성과 CAP
     en: Consistency and CAP
 - number: 5
   slug: replication
   title:
-    ko: replication
+    ko: 복제
     en: Replication
 - number: 6
   slug: consensus-and-raft
   title:
-    ko: "consensus\uC640 Raft"
+    ko: 합의와 Raft
     en: Consensus and Raft
 - number: 7
   slug: leader-election
   title:
-    ko: leader election
+    ko: 리더 선출
     en: Leader Election
 - number: 8
   slug: message-queue-and-event-sourcing
   title:
-    ko: "message queue\uC640 event sourcing"
+    ko: 메시지 큐와 이벤트 소싱
     en: Message Queues and Event Sourcing
 - number: 9
   slug: distributed-transaction
   title:
-    ko: distributed transaction
+    ko: 분산 트랜잭션
     en: Distributed Transactions
 - number: 10
   slug: operable-distributed-patterns

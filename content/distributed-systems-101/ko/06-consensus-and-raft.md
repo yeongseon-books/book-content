@@ -18,12 +18,16 @@ tags:
   - Paxos
   - Replication
 seo_description: 분산 시스템의 핵심인 합의 문제와 Raft 알고리즘의 작동 원리, 로그 복제 및 커밋 구조를 예제 코드로 상세히 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 합의와 Raft
 
+"클러스터가 동의하면 된다"는 말은 쉽지만, 실제로는 가장 까다로운 요구 사항 중 하나입니다. 리더가 중간에 사라지고 메시지가 늦게 도착하는 상황에서도 모두가 같은 로그를 본다고 약속해야 하기 때문입니다.
+
 이 글은 Distributed Systems 101 시리즈의 여섯 번째 글입니다.
+
+여기서는 Raft를 통해 합의 문제를 사람이 읽을 수 있는 수준으로 풀어 보고, term, log, quorum, commit이 어떤 약속을 만드는지 짚습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,15 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    F1["follower"] --> L["leader"]
-    F2["follower"] --> L
-    F3["follower"] --> L
-    L -->|append entries| F1
-    L -->|append entries| F2
-    L -->|append entries| F3
-```
+![Raft의 리더 중심 로그 복제](../../../assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
+
+*Raft의 리더 중심 로그 복제*
 
 하나의 leader가 로그를 받고 follower에게 복제합니다. 다수에게 도달한 엔트리만 commit으로 인정됩니다.
 

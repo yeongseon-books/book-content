@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Consensus and Raft</h1>
+<p>It is easy to say "the cluster should agree." It is much harder to make that sentence survive crashes, lost messages, and a leader that disappears in the middle of a write. Consensus is where distributed systems stop being intuitive and start being disciplined.</p>
 <p>This is post 6 in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What does it actually take for five nodes to agree on a single decision?</p>
-<blockquote>
-<p>Consensus is the hardest problem in distributed systems, and Raft is the algorithm that finally made the answer human-readable.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we use Raft to make the consensus problem concrete: terms, logs, quorums, and the exact point where a value becomes durable enough to trust.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The definition of the consensus problem and its safety/liveness properties</li>
 <li>The three roles in Raft (leader, follower, candidate)</li>
@@ -80,14 +71,8 @@
 <p>Consensus is the value of agreement in a distributed system.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    F1[&quot;follower&quot;] --&gt; L[&quot;leader&quot;]
-    F2[&quot;follower&quot;] --&gt; L
-    F3[&quot;follower&quot;] --&gt; L
-    L --&gt;|append entries| F1
-    L --&gt;|append entries| F2
-    L --&gt;|append entries| F3
-</code></pre>
+<p><img alt="Leader-centered log replication in Raft" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Leader-centered log replication in Raft</em></p>
 <p>A single leader receives the log and replicates it to followers. Only entries received by a majority count as committed.</p>
 <h2>Key Terms</h2>
 <ul>

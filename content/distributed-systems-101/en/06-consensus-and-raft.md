@@ -2,7 +2,7 @@
 series: distributed-systems-101
 episode: 6
 title: Consensus and Raft
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,24 +18,18 @@ tags:
   - Paxos
   - Replication
 seo_description: Consensus is the hardest problem in distributed systems. We walk through Raft - terms, logs, commit, and quorums - in code-sized pieces.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Consensus and Raft
 
+It is easy to say "the cluster should agree." It is much harder to make that sentence survive crashes, lost messages, and a leader that disappears in the middle of a write. Consensus is where distributed systems stop being intuitive and start being disciplined.
+
 This is post 6 in the Distributed Systems 101 series.
 
-> Distributed Systems 101 series (6/10)
+Here we use Raft to make the consensus problem concrete: terms, logs, quorums, and the exact point where a value becomes durable enough to trust.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: What does it actually take for five nodes to agree on a single decision?
-
-> Consensus is the hardest problem in distributed systems, and Raft is the algorithm that finally made the answer human-readable.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The definition of the consensus problem and its safety/liveness properties
 - The three roles in Raft (leader, follower, candidate)
@@ -51,15 +45,9 @@ A consensus algorithm sits at the heart of etcd, ZooKeeper, Consul, and Cockroac
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F1["follower"] --> L["leader"]
-    F2["follower"] --> L
-    F3["follower"] --> L
-    L -->|append entries| F1
-    L -->|append entries| F2
-    L -->|append entries| F3
-```
+![Leader-centered log replication in Raft](../../../assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
+
+*Leader-centered log replication in Raft*
 
 A single leader receives the log and replicates it to followers. Only entries received by a majority count as committed.
 

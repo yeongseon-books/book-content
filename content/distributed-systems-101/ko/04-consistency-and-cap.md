@@ -18,12 +18,16 @@ tags:
   - Linearizability
   - Eventual Consistency
 seo_description: 일관성 스펙트럼과 CAP, PACELC를 한 번에 읽는 기준을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 일관성과 CAP
 
+데이터가 한 군데에만 있을 때는 "최신값을 읽는다"는 말이 별일 아닙니다. 하지만 복제본이 둘 이상이 되는 순간부터는 어느 복제본을 읽는지, 파티션 중 무엇을 포기하는지에 따라 그 문장이 완전히 다른 뜻을 갖게 됩니다.
+
 이 글은 Distributed Systems 101 시리즈의 네 번째 글입니다.
+
+여기서는 일관성 모델을 스펙트럼으로 보고, CAP와 PACELC를 통해 설계 문서와 데이터베이스 문장을 읽는 기준을 만듭니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,13 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    A["linearizable"] --> B["sequential"]
-    B --> C["causal"]
-    C --> D["eventual"]
-    A -.->|stronger| D
-```
+![일관성 모델의 강도 스펙트럼](../../../assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
+
+*일관성 모델의 강도 스펙트럼*
 
 왼쪽으로 갈수록 직관적이지만 비싸고, 오른쪽으로 갈수록 싸고 가용성이 높지만 직관에서 멀어집니다.
 

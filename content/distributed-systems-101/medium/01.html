@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>What Is a Distributed System?</h1>
+<p>The moment one service calls another service, or one database replica trails another, you are already outside the world where local intuition works. The code may look familiar, but latency, partial failure, and independent clocks quietly change the contract underneath it.</p>
 <p>This is the first post in the Distributed Systems 101 series.</p>
-<blockquote>
-<p>Distributed Systems 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why is running the same code on one machine so different from running it on a hundred?</p>
-<blockquote>
-<p>A distributed system is not just "many computers." Three essential differences — latency, failure, and coordination — bend every intuition you carry from single-machine programming.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Here we build the mental model for the rest of the series: a distributed system is not "many computers" in the abstract, but a system whose core behavior is shaped by latency, failure, and coordination.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The definition of a distributed system and how it really differs from a single machine</li>
 <li>The meaning of the three axes: latency, failure, and coordination</li>
@@ -80,14 +71,8 @@
 <p>Distributed systems live exactly where the assumptions of a single-machine program break.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;client&quot;] --&gt; B[&quot;service A&quot;]
-    B --&gt; C[&quot;service B&quot;]
-    B --&gt; D[&quot;database&quot;]
-    C --&gt; E[&quot;replica&quot;]
-    D --&gt; E
-    B -.-&gt;|network failure| C
-</code></pre>
+<p><img alt="Core distributed-system topology and failure points" src="https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Core distributed-system topology and failure points</em></p>
 <p>Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.</p>
 <h2>Key Terms</h2>
 <ul>

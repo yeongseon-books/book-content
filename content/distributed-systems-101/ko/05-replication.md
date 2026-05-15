@@ -18,12 +18,16 @@ tags:
   - QuorumWrites
   - Durability
 seo_description: 데이터 복제 모델인 리더 기반, 리더리스 구조와 쿼럼 합의, 복제 지연의 원인과 해결 방안을 상세히 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 복제
 
+데이터를 여러 노드에 복사해 두면 안전할 것 같지만, 실제 운영 질문은 그 다음부터 시작됩니다. 어떤 복제본이 기준인지, 얼마만큼의 지연을 허용할지, 리더가 죽을 때 최근 쓰기를 얼마나 잃을 수 있는지가 모두 복제 설정에서 갈립니다.
+
 이 글은 Distributed Systems 101 시리즈의 다섯 번째 글입니다.
+
+여기서는 복제를 저장소의 뒷단 구현이 아니라, 시스템이 사용자에게 약속하는 안전성과 지연 특성을 결정하는 설계 레이어로 봅니다.
 
 ## 이 글에서 다룰 문제
 
@@ -43,21 +47,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    subgraph LF[leader-follower]
-        L["leader"] --> F1["follower 1"]
-        L --> F2["follower 2"]
-    end
-    subgraph ML[multi-leader]
-        M1["leader A"] <--> M2["leader B"]
-    end
-    subgraph LL[leaderless]
-        N1["node"] --- N2["node"]
-        N2 --- N3["node"]
-        N3 --- N1
-    end
-```
+![대표적인 복제 토폴로지 비교](../../../assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
+
+*대표적인 복제 토폴로지 비교*
 
 이 세 가지 토폴로지만 이해해도 현실 시스템의 대부분을 설명할 수 있습니다.
 
