@@ -90,7 +90,7 @@ Azure Functions 플랜은 “더 싸다/더 비싸다”로만 보면 거의 항
 | **이벤트 기반 자동 스케일** | 지원 | 지원 (per-function, target-based) | 지원 | App Service autoscale 규칙 기반 |
 | **Per-function scaling** | 없음 | 있음 | 없음 | 없음 |
 | **인스턴스 메모리** | 1.5 GB 고정 | 512 / 2048 / 4096 MB 선택 | SKU별 상이 | App Service Plan SKU 기준 |
-| **배포 슬롯** | 제한적 | 없음, rolling update 경로 사용 | 있음 | 있음 |
+| **배포 슬롯** | 제한적 | 없음, rolling update 경로만 있음 (preview, 프로덕션 비권장) | 있음 | 있음 |
 | **Warmup 트리거** | 없음 | 있음 | 있음 | 있음 |
 
 이 표를 볼 때는 비용보다 먼저 **OS, VNet, 스케일 방식**을 보는 편이 좋습니다. 실제로는 이 세 조건에서 후보가 빨리 갈리는 경우가 많습니다.
@@ -136,10 +136,10 @@ Flex Consumption은 현재 Azure Functions에서 가장 먼저 검토해야 할 
 - **Linux 전용**입니다.
 - **Blob trigger는 Event Grid 기반만 지원**합니다.
 - **일부 바인딩과 기능 차이**가 있습니다.
-- **배포 슬롯이 없습니다.**
+- **배포 슬롯이 없고 rolling update 경로만 있지만, 이 경로는 아직 preview이며 프로덕션에는 권장되지 않습니다.**
 - **스케일은 함수별 완전 독립이 아니라 scale group 단위**로 이해해야 합니다.
 
-즉 Flex는 “Consumption의 약점을 거의 다 고친 플랜”이라고 볼 수는 있어도, “제약이 없는 만능 기본값”으로 보면 위험합니다. 기본 후보라는 말과 무조건 정답이라는 말은 다릅니다.
+즉 Flex는 “Consumption의 약점을 거의 다 고친 플랜”이라고 볼 수는 있어도, “제약이 없는 만능 기본값”으로 보면 위험합니다. 기본 후보라는 말과 무조건 정답이라는 말은 다릅니다. 특히 프로덕션 배포에서 성숙한 슬롯 교체 워크플로가 필요하다면, Flex의 rolling update 경로를 동급 대안으로 보지 말고 Premium이나 Dedicated 요구사항으로 분류하는 편이 안전합니다.
 
 ### Premium: 콜드 스타트 제어와 Windows 요구사항이 같이 중요할 때
 
