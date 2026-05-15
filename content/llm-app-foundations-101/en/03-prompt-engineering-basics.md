@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Learn how to structure LLM prompts effectively by separating system, user, and assistant roles to ensure consistent, controllable model behavior.
 ---
 
@@ -562,9 +562,17 @@ The next post goes deeper into few-shot prompting and chain-of-thought.
 
 ## References
 
-- Groq Docs, "Text chat"
-- Groq Python Library: <https://github.com/groq/groq-python>
-- OpenAI Platform Docs, "Messages and roles": <https://platform.openai.com/docs/guides/text>
-- Anthropic Docs, "Prompt engineering overview": <https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview>
+### Official docs
+
+- [Groq Docs: Text chat](https://console.groq.com/docs/text-chat)
+- [Groq Python SDK](https://github.com/groq/groq-python)
+- [OpenAI Platform Docs: Text generation and messages](https://platform.openai.com/docs/guides/text)
+- [Anthropic Docs: Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+### Related series
+
+- [Few-shot and chain-of-thought — steering better answers](./04-few-shot-and-cot.md)
+- [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
+- [Tool calling — connecting functions to the model](../../llm-api-production-101/en/02-tool-calling.md)
 
 Tags: LLM, OpenAI, Prompt Engineering, Python

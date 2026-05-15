@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: '예제 코드: github.com/yeongseon-books/llm-app-foundations-101'
 ---
 
@@ -119,6 +119,22 @@ print("[with system]")
 print(with_system.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 예시**
+
+    [without system]
+    A dictionary stores key-value pairs, while a list stores items by position. Lists are useful when order matters, and dictionaries are useful when lookup by key matters more than numeric indexing.
+
+    [with system]
+    A Python dictionary stores values under named keys, while a list stores values by numeric position. Beginners usually reach for a list when they care about order, and a dictionary when they care about looking values up by meaning.
+    - list: ordered by index
+    - dictionary: accessed by key
+    - use a dictionary when names matter more than positions
+
+<!-- injected-output:end -->
+
+이 비교에서 봐야 할 것은 “더 마음에 드는 답”이 아닙니다. system 메시지를 넣었을 때 언어, 분량, 불릿 수, 톤 같은 출력 계약이 얼마나 덜 흔들리는지입니다. 프롬프트를 운영 자산으로 보려면 바로 이 재현성이 중요합니다.
+
 여기서 중요한 점은 system이 절대 명령은 아니지만 가장 강한 조향 입력이라는 사실입니다.
 
 멀티턴 이력은 모델의 숨은 기억이 아니라 애플리케이션이 재구성한 메시지 배열입니다.
@@ -174,6 +190,22 @@ print("[assistant turn 2]")
 print(second.choices[0].message.content)
 ```
 
+<!-- injected-output:start -->
+**출력 예시**
+
+    [assistant turn 1]
+    Lists are mutable, so you can change elements after creation. Tuples are immutable, so their contents stay fixed once created. In practice, lists fit data that changes, while tuples fit data that should remain stable.
+
+    [assistant turn 2]
+    ```python
+    numbers = [1, 2, 3]
+    point = (10, 20)
+    numbers.append(4)
+    print(numbers, point)
+    ```
+
+<!-- injected-output:end -->
+
 이 append 단계가 바로 챗봇 메모리의 핵심입니다. 다음 글에서 더 다루겠지만, 대화 상태는 모델 바깥의 자료구조입니다.
 
 샘플링 파라미터도 프롬프트 설계의 일부입니다.
@@ -208,6 +240,17 @@ for temperature in (0.0, 0.9):
     print(completion.choices[0].message.content)
     print()
 ```
+
+<!-- injected-output:start -->
+**출력 예시**
+
+    [temperature=0.0]
+    FastAPI is a Python web framework for building APIs with type hints and automatic documentation. It supports asynchronous request handling and helps teams build predictable API servers quickly. It is a strong fit when you want validation, docs, and modern Python ergonomics together.
+
+    [temperature=0.9]
+    FastAPI is a fast Python framework that feels lightweight but gives you powerful features such as validation and generated docs. It works especially well for modern backend services that mix developer speed with async I/O. Many teams choose it when they want an API-first stack without a lot of boilerplate.
+
+<!-- injected-output:end -->
 
 입문 단계에서는 두 가지 원칙이면 충분합니다. 형식 안정성이 중요하면 `temperature`를 낮게 시작하고, `temperature`와 `top_p`를 동시에 크게 흔들지 않는 것입니다.
 
@@ -244,6 +287,37 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
+
+역할 분리를 코드에서 반복 가능하게 만들려면 메시지 조립 함수를 두는 편이 좋습니다.
+
+```python
+from typing import Iterable
+
+def build_messages(
+    system_prompt: str,
+    user_prompt: str,
+    history: Iterable[dict[str, str]],
+) -> list[dict[str, str]]:
+    messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_prompt})
+    return messages
+
+history = [
+    {"role": "assistant", "content": "Lists are mutable, while tuples are immutable."},
+]
+
+messages = build_messages(
+    system_prompt="You are a concise Python tutor.",
+    user_prompt="Add one short example that shows when a tuple is safer.",
+    history=history,
+)
+
+for message in messages:
+    print(message)
+```
+
+이렇게 구조를 고정해 두면 실패 모드도 더 빨리 읽힙니다. 예를 들어 공통 정책이 흔들리면 `system`을 보고, 이전 턴을 잊으면 `assistant` 재주입 로직을 보고, 출력 형식이 들쭉날쭉하면 `user` 안의 출력 규칙과 `temperature`를 함께 보면 됩니다. 역할을 분리하지 않은 프롬프트는 문제 원인도 함께 섞어 버립니다.
 
 few-shot 예시도 같은 `messages` 배열 안에 들어갑니다.
 

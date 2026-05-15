@@ -14,7 +14,7 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-05-15'
 seo_description: Improve LLM performance on complex tasks using few-shot prompting for style consistency and chain-of-thought reasoning for logical accuracy.
 ---
 
@@ -641,10 +641,21 @@ The next post moves from static prompt design to dynamic conversation state. Few
 
 ## References
 
-- Groq Docs, "Text chat": <https://console.groq.com/docs/text-chat>
-- Groq Python Library: <https://github.com/groq/groq-python>
-- OpenAI, "Prompt engineering": <https://platform.openai.com/docs/guides/prompt-engineering>
-- Anthropic Docs, "Prompt engineering overview": <https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview>
-- Jason Wei et al., "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models": <https://arxiv.org/abs/2201.11903>
+### Official docs
+
+- [Groq Docs: Text chat](https://console.groq.com/docs/text-chat)
+- [Groq Python SDK](https://github.com/groq/groq-python)
+- [OpenAI Platform Docs: Prompt engineering](https://platform.openai.com/docs/guides/prompt-engineering)
+- [Anthropic Docs: Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
+
+### Research
+
+- [Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
+
+### Related series
+
+- [Managing conversation state — building a multi-turn chatbot](./05-conversation-state.md)
+- [Prompt engineering basics — system, user, and assistant roles](./03-prompt-engineering-basics.md)
+- [Tool calling — connecting functions to the model](../../llm-api-production-101/en/02-tool-calling.md)
 
 Tags: LLM, OpenAI, Prompt Engineering, Python
