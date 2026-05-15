@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Test Double</h1>
-<p>This is post 5 in the Testing 101 series.</p>
+<p>The moment you start writing unit tests seriously, real dependencies show up: email delivery, payment APIs, clocks, databases, queues. Calling all of them for every test makes the suite slow, noisy, and hard to trust. Replacing them is necessary. Replacing them carelessly is how false confidence starts.</p>
+<p>“Test double” is the umbrella term, but the umbrella hides important differences. Returning a canned answer, recording a call, and behaving like a lightweight real implementation are not the same job.</p>
+<p>This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.</p>
 <blockquote>
-<p>Testing 101 series (5/10)</p>
+<p>A good double reduces external cost without distorting the contract you are trying to verify.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Can we <em>verify behavior</em> without <em>really calling</em> the DB or external API?</p>
-<blockquote>
-<p>Test doubles swap <em>real dependencies</em> for <em>stand-ins</em>. Each kind has <em>a different role</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of a <em>test double</em> and the five kinds</li>
@@ -79,10 +73,8 @@
 <p>Used well: <em>fast trust</em>. Used poorly: <em>false trust</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    SUT[&quot;System under test&quot;] --&gt; Double[&quot;Test Double&quot;]
-    Double -.-&gt;|replaces| Real[(&quot;Real dependency&quot;)]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms (Meszaros' five)</h2>
 <ul>
 <li><strong>Dummy</strong>: a placeholder object that is <em>only passed around</em>.</li>
@@ -158,6 +150,19 @@ def test_mock_with_expectation():
 <li><strong>Verifying only the <em>call count</em> of a Spy.</strong> Also check <em>the result</em>.</li>
 <li><strong>Building a Stub <em>where a Dummy</em> would do.</strong> <em>Wasted effort</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Check whether <code>FakeMailer</code> follows the same method name and argument shape as the real mailer. A fake that drifts from the real contract only buys test-only confidence.</li>
+<li>Write the same scenario once with a Stub/Fake and once with a Mock, then compare which version explains the behavior more directly.</li>
+<li>When using a Spy or Mock, inspect not only the call count but also the final outcome. The interaction can look right while the result is still wrong.</li>
+</ol>
+<p><strong>Expected output:</strong> the double-based version should run much faster than the real dependency path while still making the verified behavior easier—not harder—to read.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If the fake no longer matches the real contract, production-only bugs are waiting for you.</li>
+<li>If every test needs a long Mock setup, you are probably asserting implementation details.</li>
+<li>If a Dummy would suffice, introducing a Spy or Mock only adds noise.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most unit tests get by with just <em>Stubs and Fakes</em>. <em>Mocks</em> are reserved for cases where <em>the interaction itself</em> is the thing being verified (sending email, calling payments, ...).</p>
 <h2>How a Senior Engineer Thinks</h2>

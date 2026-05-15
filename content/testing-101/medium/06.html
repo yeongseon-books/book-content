@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Mock and Stub</h1>
-<p>This is post 6 in the Testing 101 series.</p>
+<p>After learning the broader test-double family, many engineers still blur together <em>Mock</em> and <em>Stub</em>. That confusion is costly because it changes what the test is actually proving. A result-focused test can quietly turn into an interaction-focused test, and a once-flexible suite becomes brittle during refactoring.</p>
+<p>The distinction is smaller than a new tool and bigger than a naming preference: it is a choice about whether the core signal is the system’s output or the dependency call itself.</p>
+<p>This is post 6 in the Testing 101 series. Here we use <code>unittest.mock</code> to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.</p>
 <blockquote>
-<p>Testing 101 series (6/10)</p>
+<p>Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Stub</em> and <em>Mock</em> look similar. <em>What is the actual difference</em>?</p>
-<blockquote>
-<p>Same kind of <em>fake object</em> — when you verify <em>the result</em> it is a Stub; when you verify <em>the call itself</em> it is a Mock.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The precise definition difference between <em>Stub and Mock</em></li>
@@ -80,10 +74,8 @@
 <p>A good test tells you <em>"what broke"</em> in <em>one line</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Stub[&quot;Stub: canned answers&quot;] --&gt; State[&quot;Verify state (result)&quot;]
-    Mock[&quot;Mock: pre-set expectations&quot;] --&gt; Interact[&quot;Verify interaction (calls)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>State verification</strong>: verifying the SUT's <em>final state or return value</em>.</li>
@@ -157,6 +149,19 @@ def test_patch_function():
 <li><strong>Hitting <em>real money/email/SMS</em> instead of mocking.</strong></li>
 <li><strong>Mocking <em>every line</em>.</strong> That is <em>not a test anymore</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Write the same scenario once as result verification and once as interaction verification. The difference in intent should be obvious when you read the test names and assertions.</li>
+<li>Compare a narrow <code>patch</code> scoped to one function with a broad patch that spans a module. You should feel the contamination risk immediately.</li>
+<li>Use <code>side_effect</code> to force an error path and confirm that the failure output explains the external dependency problem clearly.</li>
+</ol>
+<p><strong>Expected output:</strong> Fake/Stub-based tests should read better when the result is what matters, and Mock-based checks should remain only where the call itself is the requirement.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If one test mixes outcome and interaction assertions heavily, the failure story becomes muddy.</li>
+<li>If a patch leaks outside the smallest possible scope, neighboring tests can start failing for the wrong reason.</li>
+<li>If the Mock setup is longer than the behavior under test, step back and revisit the design or the layer choice.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>In most new tests, <em>Stubs/Fakes come first</em>, and Mocks appear only where <em>the interaction is the essence</em> (email/payment/push notifications, where <em>the side effect itself</em> is what you verify).</p>
 <h2>How a Senior Engineer Thinks</h2>

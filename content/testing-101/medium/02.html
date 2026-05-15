@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Unit Test</h1>
-<p>This is post 2 in the Testing 101 series.</p>
+<p>When people first hear “unit test,” they often agree on the word <em>test</em> but not on the word <em>unit</em>. Is the unit a function, a method, a class, or a whole module? If that boundary stays fuzzy, tests quickly become too large, too slow, and too vague to diagnose.</p>
+<p>Unit testing is mostly an exercise in shrinking the problem. Remove external dependencies, isolate one behavior, and get feedback in seconds instead of minutes.</p>
+<p>This is post 2 in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core <code>pytest</code> features, and show what makes a unit test genuinely useful in a growing codebase.</p>
 <blockquote>
-<p>Testing 101 series (2/10)</p>
+<p>A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How small is the <em>smallest unit</em> of a test? One function? One class?</p>
-<blockquote>
-<p>A unit test verifies <em>one small piece of behavior</em> with <em>no external dependencies</em>. They are fast, plentiful, and run often.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and <em>scope</em> of a unit test</li>
@@ -80,10 +74,8 @@
 <p>Many fast unit tests are the <em>foundation of the whole strategy</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart TB
-    Unit[&quot;Unit tests (thousands, fast)&quot;] --&gt; Integ[&quot;Integration tests (tens to hundreds)&quot;]
-    Integ --&gt; E2E[&quot;E2E tests (a few to dozens)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Unit</strong>: a <em>minimal piece</em> such as a single function, method, or class.</li>
@@ -163,6 +155,19 @@ def test_with_fixture(base_price: int):
 <li><strong>Meaningless <code>assert True</code>.</strong> It only adds noise.</li>
 <li><strong>Test names like <em>test_1, test_2</em>.</strong> The name is <em>the documentation</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Run the boundary cases <code>apply_discount(1000, 0)</code> and <code>apply_discount(1000, 100)</code> and confirm both still match the contract.</li>
+<li>Try <code>apply_discount(1000, 150)</code> and make sure the exception path is explicit and easy to read in the test output.</li>
+<li>Check that no real DB, network, filesystem, or clock dependency has slipped into the test file. The moment that happens, you are paying integration-test cost for unit-test feedback.</li>
+</ol>
+<p><strong>Expected output:</strong> normal cases should stay green in milliseconds, and invalid percentages should fail with a clear <code>ValueError</code> contract.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If exception cases are not wrapped in <code>pytest.raises(...)</code>, the failure story is usually incomplete.</li>
+<li>If fixtures share mutable state, the suite may only fail when test order changes.</li>
+<li>If one unit test needs too many setup steps, it is often exposing a design problem rather than a testing problem.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Core domain logic (pricing, authorization, state machines) is <em>always</em> covered by thick unit tests. The more incident-prone the code, the <em>higher the ROI of unit tests</em>.</p>
 <h2>How a Senior Engineer Thinks</h2>

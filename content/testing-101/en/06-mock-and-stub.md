@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Mock and Stub
 
-This is post 6 in the Testing 101 series.
+After learning the broader test-double family, many engineers still blur together *Mock* and *Stub*. That confusion is costly because it changes what the test is actually proving. A result-focused test can quietly turn into an interaction-focused test, and a once-flexible suite becomes brittle during refactoring.
 
-> Testing 101 series (6/10)
+The distinction is smaller than a new tool and bigger than a naming preference: it is a choice about whether the core signal is the system’s output or the dependency call itself.
 
-<!-- a-grade-intro:begin -->
+This is post 6 in the Testing 101 series. Here we use `unittest.mock` to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.
 
-**Core question**: *Stub* and *Mock* look similar. *What is the actual difference*?
-
-> Same kind of *fake object* — when you verify *the result* it is a Stub; when you verify *the call itself* it is a Mock.
-
-<!-- a-grade-intro:end -->
+> Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.
 
 ## What You Will Learn
 
@@ -50,12 +46,9 @@ Confusing Mock and Stub leads to *over-mocking* and *brittle tests*. Knowing the
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Stub["Stub: canned answers"] --> State["Verify state (result)"]
-    Mock["Mock: pre-set expectations"] --> Interact["Verify interaction (calls)"]
-```
+![Concept at a Glance](../../../assets/testing-101/06/06-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **State verification**: verifying the SUT's *final state or return value*.
@@ -151,6 +144,20 @@ def test_not_called_when_disabled():
 3. **Mixing return-value and call verification *into one test*.**
 4. **Hitting *real money/email/SMS* instead of mocking.**
 5. **Mocking *every line*.** That is *not a test anymore*.
+
+## Verification Points
+
+1. Write the same scenario once as result verification and once as interaction verification. The difference in intent should be obvious when you read the test names and assertions.
+2. Compare a narrow `patch` scoped to one function with a broad patch that spans a module. You should feel the contamination risk immediately.
+3. Use `side_effect` to force an error path and confirm that the failure output explains the external dependency problem clearly.
+
+**Expected output:** Fake/Stub-based tests should read better when the result is what matters, and Mock-based checks should remain only where the call itself is the requirement.
+
+## Failure Signals and First Checks
+
+- If one test mixes outcome and interaction assertions heavily, the failure story becomes muddy.
+- If a patch leaks outside the smallest possible scope, neighboring tests can start failing for the wrong reason.
+- If the Mock setup is longer than the behavior under test, step back and revisit the design or the layer choice.
 
 ## How This Shows Up in Production
 

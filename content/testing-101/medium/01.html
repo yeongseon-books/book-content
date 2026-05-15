@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>What Is Testing?</h1>
-<p>This is the first post in the Testing 101 series.</p>
+<p>At first, testing often looks like a manual ritual: start the server, open the browser, click through signup and login, and decide that things seem fine. That works once or twice. It breaks down the moment the codebase, the team, or the release frequency grows.</p>
+<p>Manual confirmation also has a short memory. It tells you what happened this afternoon, but it does not protect the same path tomorrow, next week, or after another engineer refactors the code.</p>
+<p>This is the first post in the Testing 101 series. Here we define what a test is, why automated checks matter, and where unit, integration, and end-to-end tests fit in the larger picture.</p>
 <blockquote>
-<p>Testing 101 series (1/10)</p>
+<p>A test is executable memory for a codebase. It keeps the team from re-learning the same failure by hand.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Why</em> do we write tests? Is one click in the browser not <em>enough</em>?</p>
-<blockquote>
-<p>A test is code that automatically checks whether <em>your code behaves as intended</em>. A human hand forgets in <em>three days</em>; an automated test still runs <em>three years from now</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>definition</em> and purpose of a test</li>
@@ -80,11 +74,8 @@
 <p>Tests turn <em>slow hands</em> into <em>fast code</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Code[&quot;Production code&quot;] --&gt; Test[&quot;Test code&quot;]
-    Test --&gt; Run[&quot;Test runner&quot;]
-    Run --&gt; Result[&quot;Pass / Fail + error location&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Test</strong>: a check that expresses <em>expected behavior</em> in <em>code</em>.</li>
@@ -148,6 +139,19 @@ pytest -v
 <li><strong>Test code <em>more complex than production</em>.</strong> That itself is a bug.</li>
 <li><strong>Treating green <code>pytest</code> as <em>proof of correctness</em>.</strong> Tests cover <em>only the cases you wrote</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Change <code>add</code> to <code>return a - b</code> and run <code>pytest -v</code> again. If nothing fails, the test is not actually guarding the behavior you care about.</li>
+<li>Read only the test names and check whether you can infer the contract of <code>add</code>. If you cannot, the test is also failing as documentation.</li>
+<li>Record how long <code>pytest -q</code> takes. If the very first tests already feel slow, the team will stop running them habitually once the suite grows.</li>
+</ol>
+<p><strong>Expected output:</strong> the intentionally broken version should fail immediately, and the restored implementation should return to a fully green run.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If tests stay green after a deliberate bug, your assertions are probably too weak or too narrow.</li>
+<li>If failure messages say only <code>test_case_1</code>, rename the tests before the suite grows any further.</li>
+<li>If a beginner example already runs slowly, check for hidden file I/O, network calls, or shared global state.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most teams run tests <em>automatically on every PR</em> (CI). When a test fails, <em>the merge is blocked</em>. That pressure makes teams <em>write smaller PRs</em> and <em>add tests alongside changes</em>.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -186,12 +190,12 @@ pytest -v
 <li>Building a Test Strategy (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://docs.pytest.org/">pytest docs</a></li>
-<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — Testing Strategies</a></li>
-<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
-<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">The Practical Test Pyramid (article)</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://docs.pytest.org/">pytest documentation</a><br>
+- <a href="https://docs.python.org/3/library/unittest.html">Python <code>unittest</code> documentation</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — The Practical Test Pyramid</a><br>
+- <a href="https://testing.googleblog.com/">Google Testing Blog</a></p>
 <p class="tags-line">Tags: Testing, Quality, Software, Basics, Engineering</p>
 </body>
 </html>

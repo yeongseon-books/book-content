@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Regression Test</h1>
-<p>This is post 8 in the Testing 101 series.</p>
+<p>A bug is rarely expensive only once. The real cost comes when the same failure returns months later, after the original context has faded and a different engineer has to reconstruct why the system was fragile in the first place. Software does not remember fixes unless you encode the lesson.</p>
+<p>Regression tests are that encoded lesson. They turn a bug report into a failing example, then keep the example around so the same path cannot silently break again.</p>
+<p>This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.</p>
 <blockquote>
-<p>Testing 101 series (8/10)</p>
+<p>A regression test is a bug report that learned how to execute itself.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does a bug you fixed <em>six months ago</em> keep coming back?</p>
-<blockquote>
-<p>Regression tests <em>freeze the fix into code</em>. If it ever breaks again, the alarm rings <em>immediately</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition and purpose of <em>regression tests</em></li>
@@ -80,12 +74,8 @@
 <p>A team without regression tests fixes <em>the same bug forever</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Bug[&quot;Bug report&quot;] --&gt; Repro[&quot;Repro test (failing)&quot;]
-    Repro --&gt; Fix[&quot;Code fix&quot;]
-    Fix --&gt; Pass[&quot;Test passes&quot;]
-    Pass --&gt; CI[&quot;Locked into CI&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Regression</strong>: a <em>previously fixed behavior</em> that <em>breaks again</em>.</li>
@@ -148,6 +138,19 @@ git commit -m &quot;fix(cart): reject negative price (PROJ-1234)&quot;
 <li><strong>Refreshing snapshots <em>without thinking</em>.</strong> If you do not check <em>why it changed</em>, the snapshot is <em>meaningless paperwork</em>.</li>
 <li><strong>Pushing regression tests into <em>slow E2E suites</em>.</strong> Keep them at the <em>lowest layer</em> possible.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Run the reproduction test against the pre-fix code first and confirm that it really goes red. Without that step, the “regression test” may be decorative.</li>
+<li>Keep the bug ID in the test name or docstring so later readers can trace why the case exists.</li>
+<li>Compare whether the regression belongs best as a unit test, integration test, or E2E scenario. The lowest effective layer is usually the cheapest long-term home.</li>
+</ol>
+<p><strong>Expected output:</strong> the pre-fix version should fail deterministically, and the fixed version should make the same test pass without broadening the scenario unnecessarily.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>Adding only a green test after the fix leaves the real regression risk unproven.</li>
+<li>If the repro is too large, unrelated moving parts will blur the failure cause.</li>
+<li>Blind snapshot refreshes turn regression tests into paperwork.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most teams enforce the <em>issue -&gt; repro test -&gt; fix</em> flow through their <em>default PR template</em>. When the <em>same module produces repeated regressions</em>, they treat it as a <em>signal of a design problem</em>.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -186,12 +189,12 @@ git commit -m &quot;fix(cart): reject negative price (PROJ-1234)&quot;
 <li>Building a Test Strategy (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — Regression Testing</a></li>
-<li><a href="https://docs.pytest.org/">pytest docs</a></li>
-<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
-<li><a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer — Bug fixing chapter</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://docs.pytest.org/">pytest documentation</a><br>
+- <a href="https://docs.github.com/en/issues">GitHub Issues documentation</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — The Practical Test Pyramid</a><br>
+- <a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/">The Pragmatic Programmer — Bug fixing chapter</a></p>
 <p class="tags-line">Tags: Testing, Regression, Bugfix, Quality, pytest</p>
 </body>
 </html>

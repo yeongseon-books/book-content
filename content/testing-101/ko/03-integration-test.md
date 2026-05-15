@@ -48,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    HTTP["HTTP route"] --> Service["Service"]
-    Service --> Repo["Repository"]
-    Repo --> DB[("Real DB (test)")]
-```
+![한눈에 보는 구조](../../../assets/testing-101/03/03-01-diagram.ko.png)
 
+*한눈에 보는 구조*
 이 그림에서 중요한 지점은 테스트 대상이 함수 하나가 아니라 흐름이라는 점입니다. 라우트, 서비스, 저장소, 데이터베이스가 함께 맞물릴 때 어떤 응답이 나오는지 봅니다. 그래서 통합 테스트는 로직 검증과 계약 검증을 동시에 수행합니다.
 
 ## 핵심 용어
@@ -179,6 +175,20 @@ pytest -m slow         # 야간 실행
 
 세 번째 실수는 모든 통합 테스트를 매번 돌려 PR 시간을 30분 이상으로 늘리는 경우입니다. 느린 테스트를 구분하고 실행 계층을 나누는 운영 감각이 필요합니다.
 
+## 직접 검증해 볼 것
+
+1. 첫 번째 `POST /users` 호출 뒤에 실제로 `users` 테이블에 한 행이 생겼는지 조회해 봅니다. HTTP 응답만 보고 끝내면 저장 계층 오류를 놓칠 수 있습니다.
+2. 같은 이메일을 두 번 보냈을 때 어떤 상태 코드로 실패시킬지 팀 정책을 정하고, 테스트도 그 정책에 맞춰 좁혀 둡니다. `400, 409, 500`처럼 넓은 허용 범위는 경고 신호입니다.
+3. `pytest -m "not slow"`와 `pytest -m slow`를 각각 실행해, 빠른 기본 경로와 무거운 검증 경로가 실제로 분리되는지 확인합니다.
+
+**예상 결과:** 정상 경로에서는 사용자 생성과 영속화가 모두 확인되고, 중복 입력은 팀이 정한 단일 실패 정책으로 고정되어야 합니다.
+
+## 실패 신호와 첫 점검
+
+- 테스트가 운영 DB 연결 문자열을 재사용하면 가장 먼저 실행을 멈추고 격리 환경부터 분리해야 합니다.
+- 테스트 순서를 바꿨을 때만 실패하면 스키마 재생성이나 시드 데이터 정리가 부족한 경우가 많습니다.
+- 실패 상태 코드를 너무 느슨하게 허용하면 회귀가 생겨도 테스트가 초록색으로 남을 수 있습니다.
+
 ## 실무에서는 이렇게 생각합니다
 
 대부분의 백엔드 팀은 핵심 시나리오에 대해 실제 DB를 붙인 통합 테스트를 유지합니다. Postgres와 testcontainers 조합이 자주 쓰이고, 외부 API는 VCR이나 목 서버로 대체하는 식으로 경계를 조정합니다.
@@ -217,9 +227,13 @@ pytest -m slow         # 야간 실행
 
 ## 참고 자료
 
-- [FastAPI — TestClient](https://fastapi.tiangolo.com/tutorial/testing/)
+### 공식 문서
+- [FastAPI testing guide](https://fastapi.tiangolo.com/tutorial/testing/)
+- [SQLAlchemy Session basics](https://docs.sqlalchemy.org/en/20/orm/session_basics.html)
+- [pytest markers](https://docs.pytest.org/en/stable/example/markers.html)
+
+### 실무 참고
 - [Testcontainers](https://testcontainers.com/)
 - [Martin Fowler — Integration Test](https://martinfowler.com/bliki/IntegrationTest.html)
-- [pytest — markers](https://docs.pytest.org/en/stable/example/markers.html)
 
 Tags: Testing, Integration, pytest, Database, HTTP

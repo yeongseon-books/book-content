@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # What Is Testing?
 
-This is the first post in the Testing 101 series.
+At first, testing often looks like a manual ritual: start the server, open the browser, click through signup and login, and decide that things seem fine. That works once or twice. It breaks down the moment the codebase, the team, or the release frequency grows.
 
-> Testing 101 series (1/10)
+Manual confirmation also has a short memory. It tells you what happened this afternoon, but it does not protect the same path tomorrow, next week, or after another engineer refactors the code.
 
-<!-- a-grade-intro:begin -->
+This is the first post in the Testing 101 series. Here we define what a test is, why automated checks matter, and where unit, integration, and end-to-end tests fit in the larger picture.
 
-**Core question**: *Why* do we write tests? Is one click in the browser not *enough*?
-
-> A test is code that automatically checks whether *your code behaves as intended*. A human hand forgets in *three days*; an automated test still runs *three years from now*.
-
-<!-- a-grade-intro:end -->
+> A test is executable memory for a codebase. It keeps the team from re-learning the same failure by hand.
 
 ## What You Will Learn
 
@@ -50,13 +46,9 @@ Without tests, *every change is a gamble*. You fix signup and *payments* break; 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Production code"] --> Test["Test code"]
-    Test --> Run["Test runner"]
-    Run --> Result["Pass / Fail + error location"]
-```
+![Concept at a Glance](../../../assets/testing-101/01/01-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Test**: a check that expresses *expected behavior* in *code*.
@@ -144,6 +136,20 @@ Restore `add` and run `pytest` again — *all green*.
 4. **Test code *more complex than production*.** That itself is a bug.
 5. **Treating green `pytest` as *proof of correctness*.** Tests cover *only the cases you wrote*.
 
+## Verification Points
+
+1. Change `add` to `return a - b` and run `pytest -v` again. If nothing fails, the test is not actually guarding the behavior you care about.
+2. Read only the test names and check whether you can infer the contract of `add`. If you cannot, the test is also failing as documentation.
+3. Record how long `pytest -q` takes. If the very first tests already feel slow, the team will stop running them habitually once the suite grows.
+
+**Expected output:** the intentionally broken version should fail immediately, and the restored implementation should return to a fully green run.
+
+## Failure Signals and First Checks
+
+- If tests stay green after a deliberate bug, your assertions are probably too weak or too narrow.
+- If failure messages say only `test_case_1`, rename the tests before the suite grows any further.
+- If a beginner example already runs slowly, check for hidden file I/O, network calls, or shared global state.
+
 ## How This Shows Up in Production
 
 Most teams run tests *automatically on every PR* (CI). When a test fails, *the merge is blocked*. That pressure makes teams *write smaller PRs* and *add tests alongside changes*.
@@ -188,9 +194,12 @@ Tests turn *fear of change* into *confidence in change*. The next post starts at
 
 ## References
 
-- [pytest docs](https://docs.pytest.org/)
-- [Martin Fowler — Testing Strategies](https://martinfowler.com/articles/practical-test-pyramid.html)
+### Official Docs
+- [pytest documentation](https://docs.pytest.org/)
+- [Python `unittest` documentation](https://docs.python.org/3/library/unittest.html)
+
+### Practical Reading
+- [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [Google Testing Blog](https://testing.googleblog.com/)
-- [The Practical Test Pyramid (article)](https://martinfowler.com/articles/practical-test-pyramid.html)
 
 Tags: Testing, Quality, Software, Basics, Engineering

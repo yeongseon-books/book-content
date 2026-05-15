@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Regression Test
 
-This is post 8 in the Testing 101 series.
+A bug is rarely expensive only once. The real cost comes when the same failure returns months later, after the original context has faded and a different engineer has to reconstruct why the system was fragile in the first place. Software does not remember fixes unless you encode the lesson.
 
-> Testing 101 series (8/10)
+Regression tests are that encoded lesson. They turn a bug report into a failing example, then keep the example around so the same path cannot silently break again.
 
-<!-- a-grade-intro:begin -->
+This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.
 
-**Core question**: Why does a bug you fixed *six months ago* keep coming back?
-
-> Regression tests *freeze the fix into code*. If it ever breaks again, the alarm rings *immediately*.
-
-<!-- a-grade-intro:end -->
+> A regression test is a bug report that learned how to execute itself.
 
 ## What You Will Learn
 
@@ -50,14 +46,9 @@ Software has *no memory*. A bug fixed once can be *reintroduced by the next cont
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Bug["Bug report"] --> Repro["Repro test (failing)"]
-    Repro --> Fix["Code fix"]
-    Fix --> Pass["Test passes"]
-    Pass --> CI["Locked into CI"]
-```
+![Concept at a Glance](../../../assets/testing-101/08/08-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Regression**: a *previously fixed behavior* that *breaks again*.
@@ -143,6 +134,20 @@ git commit -m "fix(cart): reject negative price (PROJ-1234)"
 4. **Refreshing snapshots *without thinking*.** If you do not check *why it changed*, the snapshot is *meaningless paperwork*.
 5. **Pushing regression tests into *slow E2E suites*.** Keep them at the *lowest layer* possible.
 
+## Verification Points
+
+1. Run the reproduction test against the pre-fix code first and confirm that it really goes red. Without that step, the “regression test” may be decorative.
+2. Keep the bug ID in the test name or docstring so later readers can trace why the case exists.
+3. Compare whether the regression belongs best as a unit test, integration test, or E2E scenario. The lowest effective layer is usually the cheapest long-term home.
+
+**Expected output:** the pre-fix version should fail deterministically, and the fixed version should make the same test pass without broadening the scenario unnecessarily.
+
+## Failure Signals and First Checks
+
+- Adding only a green test after the fix leaves the real regression risk unproven.
+- If the repro is too large, unrelated moving parts will blur the failure cause.
+- Blind snapshot refreshes turn regression tests into paperwork.
+
 ## How This Shows Up in Production
 
 Most teams enforce the *issue -> repro test -> fix* flow through their *default PR template*. When the *same module produces repeated regressions*, they treat it as a *signal of a design problem*.
@@ -187,9 +192,12 @@ Regression tests are *the team's memory*. In the next post we move all of these 
 
 ## References
 
-- [Martin Fowler — Regression Testing](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [pytest docs](https://docs.pytest.org/)
-- [Google Testing Blog](https://testing.googleblog.com/)
+### Official Docs
+- [pytest documentation](https://docs.pytest.org/)
+- [GitHub Issues documentation](https://docs.github.com/en/issues)
+
+### Practical Reading
+- [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [The Pragmatic Programmer — Bug fixing chapter](https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/)
 
 Tags: Testing, Regression, Bugfix, Quality, pytest

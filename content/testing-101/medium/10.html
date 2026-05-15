@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Building a Test Strategy</h1>
-<p>This is the final post in the Testing 101 series.</p>
+<p>A team can accumulate a large number of tests and still operate poorly. If every screen gets an E2E scenario, every helper gets a unit test, and CI stretches to half an hour, the suite starts protecting itself more than it protects the product. At that point, the missing piece is not effort. It is strategy.</p>
+<p>Strategy is how a team decides where to spend testing cost: which flows deserve E2E coverage, which contracts belong in integration tests, and which logic should be guarded by fast unit tests that run on every change.</p>
+<p>This is the final post in the Testing 101 series. Here we connect the earlier layers into one operating model and focus on how to keep test investment aligned with risk, team speed, and maintenance reality.</p>
 <blockquote>
-<p>Testing 101 series (10/10)</p>
+<p>Test strategy is not about proving you test a lot. It is about proving you spend testing effort where failure would hurt most.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>more tests</em> always <em>better</em>?</p>
-<blockquote>
-<p>A good strategy is <em>write less, catch more</em>. The real question is <em>where to invest</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The meaning and distribution of the <em>test pyramid</em></li>
@@ -80,10 +74,8 @@
 <p>A good strategy <em>catches bugs while protecting development speed</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart TB
-    E2E[&quot;E2E (tens)&quot;] --&gt; Int[&quot;Integration (hundreds)&quot;]
-    Int --&gt; Unit[&quot;Unit (thousands)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Test pyramid</strong>: a distribution model with <em>many unit / fewer integration / even fewer E2E</em> tests.</li>
@@ -147,6 +139,19 @@ def test_payment_response_schema():
 <li><strong>No contract tests.</strong> External API changes get caught <em>in production</em>.</li>
 <li><strong>Setting the strategy <em>once and forgetting it</em>.</strong> Revisit <em>quarterly</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>Write down the current counts and runtime for unit, integration, and E2E tests. A strategy cannot improve a distribution you have never measured.</li>
+<li>Pick three business-critical flows—such as login, payment, and password reset—and mark which layer protects each one today.</li>
+<li>Review the last quarter’s flaky tests and CI duration together to decide whether any layer is overgrown or misplaced.</li>
+</ol>
+<p><strong>Expected output:</strong> the strategy discussion should produce explicit investment priorities, not a generic desire to increase tests everywhere.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If all code gets the same test intensity, teams eventually work around the cost instead of benefiting from the protection.</li>
+<li>If E2E count keeps rising without reducing major incidents, the layer placement is probably wrong.</li>
+<li>If flaky rate and CI duration are not measured, there is no feedback loop to tell you whether the strategy is improving.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Mature teams record their <em>target distribution</em> and <em>flaky budget</em> in an <em>Engineering Excellence</em> document. Every new service follows that baseline, and <em>quarterly OKRs</em> include <em>CI duration</em> and <em>flaky ratio</em>.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -185,12 +190,13 @@ def test_payment_response_schema():
 <li><strong>Building a Test Strategy (current)</strong></li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — The Practical Test Pyramid</a></li>
-<li><a href="https://testing.googleblog.com/">Google Testing Blog</a></li>
-<li><a href="https://itrevolution.com/product/accelerate/">Accelerate (Forsgren, Humble, Kim)</a></li>
-<li><a href="https://www.thoughtworks.com/insights/blog/testing-strategy">ThoughtWorks — Test Strategy</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-issue-and-pull-request-templates">GitHub documentation for pull request templates</a><br>
+- <a href="https://docs.pact.io/">Pact contract testing guides</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://martinfowler.com/articles/practical-test-pyramid.html">Martin Fowler — The Practical Test Pyramid</a><br>
+- <a href="https://itrevolution.com/product/accelerate/">Accelerate (Forsgren, Humble, Kim)</a><br>
+- <a href="https://www.thoughtworks.com/insights/blog/testing-strategy">ThoughtWorks — Test Strategy</a></p>
 <p class="tags-line">Tags: Testing, Strategy, Quality, Capstone, Engineering</p>
 </body>
 </html>

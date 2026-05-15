@@ -48,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Code["Production code"] --> Test["Test code"]
-    Test --> Run["Test runner"]
-    Run --> Result["Pass / Fail + error location"]
-```
+![한눈에 보는 구조](../../../assets/testing-101/01/01-01-diagram.ko.png)
 
+*한눈에 보는 구조*
 가장 단순한 흐름은 이렇습니다. 프로덕션 코드가 있고, 그 코드를 검증하는 테스트 코드가 있습니다. 테스트 러너는 테스트를 모아서 실행하고, 통과 여부와 실패 위치를 알려 줍니다. 중요한 점은 테스트도 코드라는 사실입니다. 즉, 기대하는 동작을 사람이 말로 설명하는 대신 실행 가능한 형태로 남겨 둔 것입니다.
 
 ## 핵심 용어
@@ -148,6 +144,20 @@ pytest -v
 
 세 번째 오해는 테스트를 나중에 몰아서 써도 된다고 생각하는 경우입니다. 실제로는 기능을 구현한 맥락이 머릿속에 남아 있을 때 같이 적는 편이 훨씬 저렴합니다. 미루면 테스트는 자주 빠지고, 빠진 테스트는 다시 채워지지 않는 경우가 많습니다.
 
+## 직접 검증해 볼 것
+
+1. `add` 함수를 일부러 `return a - b`로 바꾼 뒤 `pytest -v`를 다시 실행해 봅니다. 실패가 바로 보이지 않으면 테스트가 실제 버그를 감시하지 못하고 있다는 뜻입니다.
+2. 두 테스트 이름만 읽고도 함수 계약이 떠오르는지 확인합니다. 이름이 동작을 설명하지 못하면 테스트는 문서 역할도 못 합니다.
+3. `pytest -q` 실행 시간을 적어 둡니다. 입문 단계의 테스트가 이미 오래 걸린다면, 이후 시리즈에서 더 많은 테스트를 추가할수록 습관으로 굳기 어렵습니다.
+
+**예상 결과:** 의도적으로 넣은 버그에서는 최소 1개 테스트가 즉시 실패하고, 원래 구현으로 되돌리면 다시 모두 통과해야 합니다.
+
+## 실패 신호와 첫 점검
+
+- 코드를 깨뜨렸는데도 테스트가 모두 통과하면 단언문이 약하거나 검증 경로가 빠졌을 가능성이 큽니다.
+- 테스트 이름이 `test_case_1`처럼 모호하면 실패 메시지에서 바로 원인을 읽기 어렵습니다.
+- 입문 예제인데도 실행 시간이 길다면 파일 I/O, 네트워크, 전역 상태 같은 외부 의존이 섞였는지 먼저 봅니다.
+
 ## 실무에서는 이렇게 생각합니다
 
 현업에서는 테스트를 단순한 검사 도구보다 변경 비용을 낮추는 장치로 봅니다. 팀이 코드를 자주 배포하려면, 사람의 기억과 수동 체크리스트 대신 자동 검증이 먼저 갖춰져야 합니다.
@@ -186,9 +196,12 @@ pytest -v
 
 ## 참고 자료
 
-- [pytest docs](https://docs.pytest.org/)
-- [Martin Fowler — Testing Strategies](https://martinfowler.com/articles/practical-test-pyramid.html)
+### 공식 문서
+- [pytest documentation](https://docs.pytest.org/)
+- [Python `unittest` documentation](https://docs.python.org/3/library/unittest.html)
+
+### 실무 참고
+- [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [Google Testing Blog](https://testing.googleblog.com/)
-- [The Practical Test Pyramid (article)](https://martinfowler.com/articles/practical-test-pyramid.html)
 
 Tags: Testing, Quality, Software, Basics, Engineering

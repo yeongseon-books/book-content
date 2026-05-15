@@ -54,18 +54,12 @@
 </head>
 <body>
 <h1>Integration Test</h1>
-<p>This is post 3 in the Testing 101 series.</p>
+<p>A fully green unit-test suite can still leave you staring at a production 500. The reason is simple: most incidents do not live <em>inside</em> one function. They live at the seams where HTTP handlers, services, repositories, and databases have to agree on shape, timing, and state.</p>
+<p>Integration tests exist to exercise those seams on purpose. They cost more than unit tests, but they catch the exact kinds of contract drift that only appear once components start touching each other.</p>
+<p>This is post 3 in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.</p>
 <blockquote>
-<p>Testing 101 series (3/10)</p>
+<p>Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: All your unit tests pass — <em>why does it still break</em> in the real environment?</p>
-<blockquote>
-<p>An integration test verifies <em>what happens when several parts work together</em>. Each part may be correct, yet <em>fitting them together</em> exposes the real problem.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The definition of an <em>integration test</em> and how it differs from a unit test</li>
@@ -80,11 +74,8 @@
 <p>Unit tests look at <em>parts</em>; integration tests look at <em>the assembly</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HTTP[&quot;HTTP route&quot;] --&gt; Service[&quot;Service&quot;]
-    Service --&gt; Repo[&quot;Repository&quot;]
-    Repo --&gt; DB[(&quot;Real DB (test)&quot;)]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Integration test</strong>: a test that exercises <em>two or more components</em> <em>together</em>.</li>
@@ -178,6 +169,19 @@ pytest -m slow         # nightly
 <li><strong>Mocking <em>down to the DB</em>.</strong> That is <em>not an integration test</em>.</li>
 <li><strong>Testing <em>only happy paths</em>.</strong> Failure cases prevent more <em>expensive bugs</em>.</li>
 </ol>
+<h2>Verification Points</h2>
+<ol>
+<li>After the first <code>POST /users</code>, query the test database and confirm that the row truly exists. An HTTP 200 alone does not prove persistence worked.</li>
+<li>Decide what duplicate-email failure should look like in your system and narrow the assertion to that policy. Leaving <code>400</code>, <code>409</code>, and <code>500</code> all acceptable hides regressions.</li>
+<li>Run both <code>pytest -m "not slow"</code> and <code>pytest -m slow</code> so you know the fast PR path and the heavier verification path are genuinely separated.</li>
+</ol>
+<p><strong>Expected output:</strong> the happy path should confirm both response and persistence, and the duplicate path should be pinned to one deliberate failure policy.</p>
+<h2>Failure Signals and First Checks</h2>
+<ul>
+<li>If the suite can point at a production DB by accident, stop and fix isolation before doing anything else.</li>
+<li>If tests fail only when reordered, the reset or seeding strategy is still leaking state.</li>
+<li>If the status-code assertion is too broad, a real regression may stay green.</li>
+</ul>
 <h2>How This Shows Up in Production</h2>
 <p>Most backend teams stand up a <em>real DB</em> with combinations like <em>Postgres + testcontainers</em>. External APIs are usually replaced by <em>VCR or mock servers</em>.</p>
 <h2>How a Senior Engineer Thinks</h2>
@@ -216,12 +220,13 @@ pytest -m slow         # nightly
 <li>Building a Test Strategy (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI — TestClient</a></li>
-<li><a href="https://testcontainers.com/">Testcontainers</a></li>
-<li><a href="https://martinfowler.com/bliki/IntegrationTest.html">Martin Fowler — Integration Test</a></li>
-<li><a href="https://docs.pytest.org/en/stable/example/markers.html">pytest — markers</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI testing guide</a><br>
+- <a href="https://docs.sqlalchemy.org/en/20/orm/session_basics.html">SQLAlchemy Session basics</a><br>
+- <a href="https://docs.pytest.org/en/stable/example/markers.html">pytest markers</a></p>
+<p><strong>Practical Reading</strong><br>
+- <a href="https://testcontainers.com/">Testcontainers</a><br>
+- <a href="https://martinfowler.com/bliki/IntegrationTest.html">Martin Fowler — Integration Test</a></p>
 <p class="tags-line">Tags: Testing, Integration, pytest, Database, HTTP</p>
 </body>
 </html>

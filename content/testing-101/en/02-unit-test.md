@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Unit Test
 
-This is post 2 in the Testing 101 series.
+When people first hear “unit test,” they often agree on the word *test* but not on the word *unit*. Is the unit a function, a method, a class, or a whole module? If that boundary stays fuzzy, tests quickly become too large, too slow, and too vague to diagnose.
 
-> Testing 101 series (2/10)
+Unit testing is mostly an exercise in shrinking the problem. Remove external dependencies, isolate one behavior, and get feedback in seconds instead of minutes.
 
-<!-- a-grade-intro:begin -->
+This is post 2 in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core `pytest` features, and show what makes a unit test genuinely useful in a growing codebase.
 
-**Core question**: How small is the *smallest unit* of a test? One function? One class?
-
-> A unit test verifies *one small piece of behavior* with *no external dependencies*. They are fast, plentiful, and run often.
-
-<!-- a-grade-intro:end -->
+> A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.
 
 ## What You Will Learn
 
@@ -50,12 +46,9 @@ Unit tests are *the base of the pyramid*. Because they are fast, *thousands* of 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart TB
-    Unit["Unit tests (thousands, fast)"] --> Integ["Integration tests (tens to hundreds)"]
-    Integ --> E2E["E2E tests (a few to dozens)"]
-```
+![Concept at a Glance](../../../assets/testing-101/02/02-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Unit**: a *minimal piece* such as a single function, method, or class.
@@ -157,6 +150,20 @@ def test_with_fixture(base_price: int):
 3. **Waiting via `time.sleep`.** Unit tests *do not wait*.
 4. **Meaningless `assert True`.** It only adds noise.
 5. **Test names like *test_1, test_2*.** The name is *the documentation*.
+
+## Verification Points
+
+1. Run the boundary cases `apply_discount(1000, 0)` and `apply_discount(1000, 100)` and confirm both still match the contract.
+2. Try `apply_discount(1000, 150)` and make sure the exception path is explicit and easy to read in the test output.
+3. Check that no real DB, network, filesystem, or clock dependency has slipped into the test file. The moment that happens, you are paying integration-test cost for unit-test feedback.
+
+**Expected output:** normal cases should stay green in milliseconds, and invalid percentages should fail with a clear `ValueError` contract.
+
+## Failure Signals and First Checks
+
+- If exception cases are not wrapped in `pytest.raises(...)`, the failure story is usually incomplete.
+- If fixtures share mutable state, the suite may only fail when test order changes.
+- If one unit test needs too many setup steps, it is often exposing a design problem rather than a testing problem.
 
 ## How This Shows Up in Production
 

@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Test Double
 
-This is post 5 in the Testing 101 series.
+The moment you start writing unit tests seriously, real dependencies show up: email delivery, payment APIs, clocks, databases, queues. Calling all of them for every test makes the suite slow, noisy, and hard to trust. Replacing them is necessary. Replacing them carelessly is how false confidence starts.
 
-> Testing 101 series (5/10)
+“Test double” is the umbrella term, but the umbrella hides important differences. Returning a canned answer, recording a call, and behaving like a lightweight real implementation are not the same job.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.
 
-**Core question**: Can we *verify behavior* without *really calling* the DB or external API?
-
-> Test doubles swap *real dependencies* for *stand-ins*. Each kind has *a different role*.
-
-<!-- a-grade-intro:end -->
+> A good double reduces external cost without distorting the contract you are trying to verify.
 
 ## What You Will Learn
 
@@ -49,12 +45,9 @@ Tests must be *fast and deterministic*. Calling a real payment API is *slow and 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    SUT["System under test"] --> Double["Test Double"]
-    Double -.->|replaces| Real[("Real dependency")]
-```
+![Concept at a Glance](../../../assets/testing-101/05/05-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms (Meszaros' five)
 
 - **Dummy**: a placeholder object that is *only passed around*.
@@ -152,6 +145,20 @@ class InMemoryUserRepo:
 3. **A *Fake too far from the real thing* — bugs found in tests differ from production.**
 4. **Verifying only the *call count* of a Spy.** Also check *the result*.
 5. **Building a Stub *where a Dummy* would do.** *Wasted effort*.
+
+## Verification Points
+
+1. Check whether `FakeMailer` follows the same method name and argument shape as the real mailer. A fake that drifts from the real contract only buys test-only confidence.
+2. Write the same scenario once with a Stub/Fake and once with a Mock, then compare which version explains the behavior more directly.
+3. When using a Spy or Mock, inspect not only the call count but also the final outcome. The interaction can look right while the result is still wrong.
+
+**Expected output:** the double-based version should run much faster than the real dependency path while still making the verified behavior easier—not harder—to read.
+
+## Failure Signals and First Checks
+
+- If the fake no longer matches the real contract, production-only bugs are waiting for you.
+- If every test needs a long Mock setup, you are probably asserting implementation details.
+- If a Dummy would suffice, introducing a Spy or Mock only adds noise.
 
 ## How This Shows Up in Production
 

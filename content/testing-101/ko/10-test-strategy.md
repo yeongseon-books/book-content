@@ -48,12 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart TB
-    E2E["E2E (tens)"] --> Int["Integration (hundreds)"]
-    Int --> Unit["Unit (thousands)"]
-```
+![한눈에 보는 구조](../../../assets/testing-101/10/10-01-diagram.ko.png)
 
+*한눈에 보는 구조*
 테스트 피라미드는 단순한 그림이 아니라 비용 구조를 보여 줍니다. 아래층일수록 빠르고 많아야 하고, 위층일수록 비싸고 적어야 합니다. 이 분포가 무너지면 피드백 속도와 신뢰가 함께 흔들립니다.
 
 ## 핵심 용어
@@ -147,6 +144,20 @@ def test_payment_response_schema():
 
 셋째, 커버리지 숫자만 보고 전략이 잘 굴러간다고 판단하는 경우입니다. 어떤 코드를 덮고 있는지가 더 중요합니다. 시스템 경계에서 계약 테스트가 빠지면 외부 API 변경은 운영에서 처음 드러날 수 있습니다.
 
+## 직접 검증해 볼 것
+
+1. 현재 저장소의 단위/통합/E2E 테스트 수와 각 잡의 실행 시간을 표로 적어 봅니다. 전략은 감이 아니라 현재 분포를 알아야 시작할 수 있습니다.
+2. 로그인, 결제, 비밀번호 재설정처럼 사용자 피해가 큰 핵심 경로를 세 개만 골라 현재 어떤 계층이 보호하는지 표시합니다.
+3. 지난 분기 플래키 테스트 목록과 CI 평균 시간을 같이 놓고, 어떤 계층을 줄이거나 옮겨야 하는지 회고합니다.
+
+**예상 결과:** 모든 테스트를 늘리는 계획이 아니라, 위험이 큰 경로를 어떤 계층에서 어떻게 보호할지 우선순위가 드러나야 합니다.
+
+## 실패 신호와 첫 점검
+
+- 모든 코드에 같은 강도로 테스트를 요구하면 비용 대비 효과가 낮은 계층부터 팀이 우회하기 시작합니다.
+- E2E 수가 계속 늘어나는데도 핵심 사고가 줄지 않으면 계층 배치가 잘못된 경우가 많습니다.
+- 플래키 비율과 CI 시간을 재지 않으면 전략이 실제로 좋아지는지 판단할 근거가 없습니다.
+
 ## 실무에서는 이렇게 생각합니다
 
 성숙한 팀은 목표 분포와 플래키 예산을 아예 운영 기준으로 문서화합니다. 새 서비스가 생겨도 같은 기준으로 출발하고, 분기마다 CI 시간과 불안정 비율을 점검합니다.
@@ -185,8 +196,12 @@ def test_payment_response_schema():
 
 ## 참고 자료
 
+### 공식 문서
+- [GitHub documentation for pull request templates](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-issue-and-pull-request-templates)
+- [Pact contract testing guides](https://docs.pact.io/)
+
+### 실무 참고
 - [Martin Fowler — The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
-- [Google Testing Blog](https://testing.googleblog.com/)
 - [Accelerate (Forsgren, Humble, Kim)](https://itrevolution.com/product/accelerate/)
 - [ThoughtWorks — Test Strategy](https://www.thoughtworks.com/insights/blog/testing-strategy)
 

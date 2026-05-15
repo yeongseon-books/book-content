@@ -22,17 +22,13 @@ last_reviewed: '2026-05-04'
 
 # Test Coverage
 
-This is post 7 in the Testing 101 series.
+Ask a team how much they tested, and someone will usually answer with a percentage. That number is useful—but only up to the point where people start mistaking execution for verification. A line can run without the test proving anything meaningful about it.
 
-> Testing 101 series (7/10)
+Coverage helps when it reveals blind spots. It hurts when it becomes a vanity metric that rewards shallow tests and distracts from risky branches or exception paths.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run `pytest-cov`, and focus on how to turn a report into better decisions rather than prettier dashboards.
 
-**Core question**: *How much* did you test? Is 100% *enough*?
-
-> Coverage is a *measurement tool*. The moment it becomes *a target* it loses meaning.
-
-<!-- a-grade-intro:end -->
+> Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.
 
 ## What You Will Learn
 
@@ -50,13 +46,9 @@ If you do not know *where tests reach*, incidents happen in the *blind spots*. A
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Code["Production code"] --> Cov["Coverage tool"]
-    Cov --> Report["Line/branch report"]
-    Report --> Action["Add tests for gaps"]
-```
+![Concept at a Glance](../../../assets/testing-101/07/07-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **Line coverage**: ratio of *executed lines / total lines*.
@@ -145,6 +137,20 @@ pytest --cov=src
 3. **Including *generated/migration/experimental code* in measurement.** Just noise.
 4. **Ignoring *branch coverage*.** Testing only one side of an if-else still gives *100% line*.
 5. **Holding *new code and legacy code* to the *same gate*.** Improvement becomes hard.
+
+## Verification Points
+
+1. Run `pytest --cov=src --cov-report=term-missing` and inspect two or three uncovered lines in the source itself. The point is to read the gap, not just the percentage.
+2. Re-run the same suite with `--cov-branch` and compare the numbers. The distance between line and branch coverage usually teaches more than the headline percentage.
+3. Add a small new exception path and confirm that the coverage report notices it. That is how you verify the CI gate is watching real change.
+
+**Expected output:** the report should make missing branches and exception paths more visible than the total percentage alone.
+
+## Failure Signals and First Checks
+
+- High line coverage with recurring incidents often means weak assertions or missing branch checks.
+- Measuring generated files or migrations together with core logic inflates the number and lowers the signal.
+- If one hard gate blocks both new and legacy code indiscriminately, teams often start gaming the metric instead of improving it.
 
 ## How This Shows Up in Production
 
