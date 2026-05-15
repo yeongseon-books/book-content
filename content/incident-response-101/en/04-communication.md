@@ -2,7 +2,7 @@
 series: incident-response-101
 episode: 4
 title: Communication
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,61 +16,56 @@ tags:
   - Statuspage
   - OnCall
   - Operations
-seo_description: A beginner-friendly guide to incident communication covering audience separation, update cadence, statuspages, templates, and customer notices
-last_reviewed: '2026-05-04'
+seo_description: Learn how to send incident updates to responders, customers, and executives with separate templates and a clear cadence.
+last_reviewed: '2026-05-15'
 ---
 
 # Communication
 
-> Incident Response 101 series (4/10)
+Many teams assume incident communication is secondary work that can wait until the technical situation is clearer. In practice, trust often erodes faster from silence than from a slightly slower recovery.
 
-<!-- a-grade-intro:begin -->
+Customers, executives, and responders do not need the same message. They need the same facts translated into different levels of detail and delivered on a predictable cadence.
 
-**Core question**: During an *incident*, *who* should hear *what*, and *when*?
+This is post 4 in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.
 
-> *Communication* sends *different messages* to *different audiences* on a *fixed cadence*.
+## Questions this chapter answers
 
-<!-- a-grade-intro:end -->
+Communication breaks when teams try to reuse the same sentence for customers, responders, and executives. Those audiences care about different things even when the underlying facts are identical.
 
-This is post 4 in the Incident Response 101 series.
+> Incident communication is not about saying more. It is about sending the right level of detail to the right audience on a predictable rhythm.
 
-## What You Will Learn
+- Who needs updates during an incident, and what should each audience hear?
+- Why is a fast imperfect first update usually better than a delayed perfect one?
+- How should severity shape the update cadence?
+- What belongs on a status page versus an internal chat channel?
+- What needs to happen after technical recovery is complete?
 
-- *Audience separation*
-- *Update cadence*
-- *Statuspages*
-- *Templated messages*
-- *When to notify customers*
+## Why this topic matters
 
-## Why It Matters
+Customers do not need raw logs. They need impact, scope, and the next promised update. Executives need business context, decision risk, and timing. Responders need technical detail and precise ownership.
 
-A *failed announcement* damages *trust* more than a slow technical recovery.
+When those streams are mixed together, everyone gets either too little or too much. Separating them early keeps trust higher and lets the technical team keep moving.
 
-## Concept at a Glance
+## Diagram at a glance
 
-```mermaid
-flowchart LR
-    Incident["incident"] --> Internal["internal"]
-    Incident --> External["external"]
-    Incident --> Exec["exec"]
-    Internal --> Slack["slack"]
-    External --> Status["statuspage"]
-    Exec --> Email["email"]
-```
+![Diagram at a glance](../../../assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
+
+*Diagram at a glance*
+The important idea is audience branching. One incident can require three communication streams, each with its own channel, level of detail, and timing expectation.
 
 ## Key Terms
 
-- **internal**: shared *inside the response team*.
-- **external**: addressed to *customers*.
-- **exec**: *executive summary*.
-- **cadence**: the *update interval*.
-- **statuspage**: the *official status page*.
+- **internal**: shared inside the response team.
+- **external**: addressed to customers.
+- **exec**: executive summary.
+- **cadence**: the update interval.
+- **statuspage**: the official status page.
 
 ## Before/After
 
-**Before**: everything mixed into *one channel*.
+**Before**: everything mixed into one channel.
 
-**After**: *separate channels* and *templates* per audience.
+**After**: separate channels and templates per audience.
 
 ## Hands-on: Build Per-Audience Messages
 
@@ -110,46 +105,63 @@ def queue(messages):
 
 ## What to Notice in This Code
 
-- *Audience* is the *key* in the data structure.
-- *Cadence* is *tied to SEV*.
-- *Templates* are *functions* — reusable.
+- Audience is the key in the data structure.
+- Cadence is tied to SEV.
+- Templates are functions — reusable.
 
 ## Five Common Mistakes
 
-1. **Sending the *same message* to everyone.**
-2. **Believing the first *update* must be *perfect*.**
-3. **Updating *irregularly* without a cadence.**
-4. **Sending *raw technical jargon* to executives.**
-5. **Forgetting the *resolution* announcement.**
+1. **Sending the same message to everyone.**
+2. **Believing the first update must be perfect.**
+3. **Updating irregularly without a cadence.**
+4. **Sending raw technical jargon to executives.**
+5. **Forgetting the resolution announcement.**
 
 ## How This Shows Up in Production
 
-*Statuspage* + *Slack* + an *email broadcaster* are wired together so *one input* fans out to *three channels*.
+Statuspage + Slack + an email broadcaster are wired together so one input fans out to three channels.
 
 ## How a Senior Engineer Thinks
 
-- *Silence* is the *worst* option.
-- *Short and frequent* beats long and rare.
-- *Executives* hear *impact*, not internals.
-- *Customers* hear *what to do*.
-- Send *one more* note after *resolution*.
+- Silence is the worst option.
+- Short and frequent beats long and rare.
+- Executives hear impact, not internals.
+- Customers hear what to do.
+- Send one more note after resolution.
+
+## Example message templates
+
+Audience separation works best when the templates already exist before the incident.
+
+```text
+[internal]
+SEV2 incident on checkout. Error rate increased after the 14:05 deploy. IC: Mina. Next update in 30 minutes.
+
+[external]
+We are investigating elevated checkout failures for some customers. Our next update will be shared in 30 minutes.
+
+[exec]
+Checkout incident, currently SEV2. Payment conversion is affected. Rollback is in progress; next executive update in 30 minutes.
+```
+
+The goal of the first update is not total completeness. It is to establish that the team sees the issue, has started acting, and will update again on a fixed schedule.
 
 ## Checklist
 
-- [ ] *Audience definition*.
-- [ ] *Template repository*.
-- [ ] *Cadence table*.
-- [ ] *Statuspage permissions*.
+- [ ] Audience definition.
+- [ ] Template repository.
+- [ ] Cadence table.
+- [ ] Statuspage permissions.
 
 ## Practice Problems
 
-1. Define *cadence* in one line.
-2. Define *statuspage* in one line.
-3. Summarize the core of an *exec* message in one line.
+1. Define cadence in one line.
+2. Define statuspage in one line.
+3. Summarize the core of an exec message in one line.
 
 ## Wrap-up and Next Steps
 
-Next, we cover *writing the timeline*.
+Next, we cover writing the timeline.
 
 <!-- toc:begin -->
 - [What is an Incident?](./01-what-is-incident.md)
@@ -166,9 +178,13 @@ Next, we cover *writing the timeline*.
 
 ## References
 
-- [Incident Communication - Atlassian](https://www.atlassian.com/incident-management/incident-communication)
-- [Statuspage Best Practices](https://www.atlassian.com/software/statuspage/best-practices)
-- [Communicating During Incidents - PagerDuty](https://response.pagerduty.com/during/external_comms/)
-- [Incident Comms Playbook - Increment](https://increment.com/on-call/communication/)
+### Official Docs
+- [External communication during incidents - PagerDuty](https://response.pagerduty.com/during/external_comms/)
+- [Incident communication - Atlassian](https://www.atlassian.com/incident-management/incident-communication)
+- [Statuspage best practices](https://www.atlassian.com/software/statuspage/best-practices)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
+- [Managing Incidents - Google SRE Book](https://sre.google/sre-book/managing-incidents/)
 
 Tags: Incident, Communication, Statuspage, OnCall, Operations

@@ -2,7 +2,7 @@
 series: incident-response-101
 episode: 1
 title: What is an Incident?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,58 +16,56 @@ tags:
   - SRE
   - Operations
   - OnCall
-seo_description: A beginner-friendly guide to incidents covering definitions, impact measurement, the difference from regular bugs, and an on-call starting point
-last_reviewed: '2026-05-04'
+seo_description: Learn how to distinguish a real incident from a routine bug by using customer impact, duration, and paging thresholds.
+last_reviewed: '2026-05-15'
 ---
 
 # What is an Incident?
 
-> Incident Response 101 series (1/10)
+The first hard question in on-call work is rarely technical. When an alert fires, you have to decide whether you are looking at a real incident, a routine bug, or a noisy warning that only needs follow-up during business hours.
 
-<!-- a-grade-intro:begin -->
+Without a shared threshold, teams drift in opposite directions. Some page everyone for minor symptoms and burn out the rotation. Others wait too long while customer impact is already spreading.
 
-**Core question**: *Which* problems count as an *incident*?
+This is the first post in the Incident Response 101 series. This post explains how to define an incident around customer impact, duration, and response thresholds so the rest of the incident process has a stable starting point.
 
-> An *incident* is an *abnormal* condition with *customer impact* above a *threshold*.
+## Questions this chapter answers
 
-<!-- a-grade-intro:end -->
+The hard part is not noticing that something looks wrong. The hard part is deciding whether the symptoms have crossed the line from routine engineering work into incident response. If that line is vague, paging and escalation stay vague too.
 
-This is the first post in the Incident Response 101 series.
+> An incident is not “anything unusual.” It is an abnormal condition whose customer impact has crossed an agreed threshold.
 
-## What You Will Learn
+- Which problems should count as an incident instead of a regular bug?
+- How is an alert different from an incident?
+- What metrics make customer impact concrete enough to page people?
+- Where should a new on-call engineer look first before escalating?
+- How do you keep the threshold strict without becoming slow?
 
-- The *definition* of an *incident*
-- *Impact* measurement
-- The difference from a *regular bug*
-- A starting point for *on-call*
-- The *cultural* dimension
+## Why this topic matters
 
-## Why It Matters
+If the definition is too loose, the team pages on noise and the rotation stops trusting alerts. If the definition is too strict, the team waits while customers are already affected. Both failure modes are expensive.
 
-Without a *threshold*, response is either *too slow* or *too aggressive*.
+A usable incident definition reduces argument during the first minutes of response. It tells responders which channel to open, which severity system to use, and when leadership communication has to begin.
 
-## Concept at a Glance
+## Diagram at a glance
 
-```mermaid
-flowchart LR
-    Event["event"] --> Filter{"impact?"}
-    Filter -->|yes| Inc["incident"]
-    Filter -->|no| Bug["bug ticket"]
-```
+![Diagram at a glance](../../../assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
+
+*Diagram at a glance*
+The diagram below shows the first decision cut. Events arrive all day, but only the subset with meaningful customer impact should cross into the incident path.
 
 ## Key Terms
 
-- **incident**: an *abnormal* event with *customer impact*.
-- **alert**: an *action-required* signal.
-- **outage**: a *service interruption*.
-- **degradation**: a *performance drop*.
-- **on-call**: a *standby duty rotation*.
+- **incident**: an abnormal event with customer impact.
+- **alert**: an action-required signal.
+- **outage**: a service interruption.
+- **degradation**: a performance drop.
+- **on-call**: a standby duty rotation.
 
 ## Before/After
 
-**Before**: every *alert* is treated like an *incident*.
+**Before**: every alert is treated like an incident.
 
-**After**: alerts are *classified by impact* before action.
+**After**: alerts are classified by impact before action.
 
 ## Hands-on: Incident Decision
 
@@ -108,46 +106,66 @@ def channel(kind):
 
 ## What to Notice in This Code
 
-- The *threshold* is the result of an *agreement*.
-- The *classification* picks the *path*.
-- *Code* removes *subjectivity*.
+- The threshold is the result of an agreement.
+- The classification picks the path.
+- Code removes subjectivity.
 
 ## Five Common Mistakes
 
-1. **Confusing *alerts* with *incidents*.**
-2. **No agreed *threshold*.**
-3. **Estimating *impact* *subjectively*.**
-4. **Insufficient *on-call* *training* material.**
-5. **Returning to work *without records*.**
+1. **Confusing alerts with incidents.**
+2. **No agreed threshold.**
+3. **Estimating impact subjectively.**
+4. **Insufficient on-call training material.**
+5. **Returning to work without records.**
 
 ## How This Shows Up in Production
 
-*PagerDuty's severity rules* automate the *classification*.
+PagerDuty's severity rules automate the classification.
 
 ## How a Senior Engineer Thinks
 
-- *Customer impact* is the *yardstick*.
-- *Alerts* are *raw material*; *judgment* is *human*.
-- *Over-response* is also a *cost*.
-- *Records* are the *fuel for learning*.
-- *On-call* matures through *training*.
+- Customer impact is the yardstick.
+- Alerts are raw material; judgment is human.
+- Over-response is also a cost.
+- Records are the fuel for learning.
+- On-call matures through training.
+
+## First questions to ask before declaring an incident
+
+Before you declare an incident, run through a small set of questions that force evidence over instinct.
+
+- Who is affected right now, and roughly how many users are involved?
+- Which metric best expresses the impact: error rate, latency, failed checkouts, or something else?
+- Was there a deployment, configuration change, or upstream dependency issue in the last 30 minutes?
+- Is there a customer-visible workaround, or is the path fully blocked?
+- If the condition lasts five more minutes, who should be paged next?
+
+```bash
+# Example: quick declaration checklist
+checklist=(error-rate latency saturation deploy-feed statuspage)
+for item in "${checklist[@]}"; do
+  printf 'check: %s\n' "$item"
+done
+```
+
+You are not trying to prove the full root cause yet. You are gathering enough evidence to justify whether the incident process should start.
 
 ## Checklist
 
-- [ ] *Threshold* agreed.
-- [ ] *Classification* code.
-- [ ] *Alert routing*.
-- [ ] *Training* material.
+- [ ] Threshold agreed.
+- [ ] Classification code.
+- [ ] Alert routing.
+- [ ] Training material.
 
 ## Practice Problems
 
-1. Define *incident* in one line.
-2. Define *outage* in one line.
-3. Define *degradation* in one line.
+1. Define incident in one line.
+2. Define outage in one line.
+3. Define degradation in one line.
 
 ## Wrap-up and Next Steps
 
-Next, we cover *severity classification*.
+Next, we cover severity classification.
 
 <!-- toc:begin -->
 - **What is an Incident? (current)**
@@ -164,9 +182,13 @@ Next, we cover *severity classification*.
 
 ## References
 
-- [Incident Response - PagerDuty](https://response.pagerduty.com/)
+### Official Docs
+- [PagerDuty Incident Response Documentation](https://response.pagerduty.com/)
 - [Managing Incidents - Google SRE Book](https://sre.google/sre-book/managing-incidents/)
-- [Atlassian Incident Handbook](https://www.atlassian.com/incident-management/handbook)
-- [Incident Definition - ITIL](https://wiki.en.it-processmaps.com/index.php/Incident_Management)
+- [Incident management overview - Atlassian](https://www.atlassian.com/incident-management)
+- [NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Response, SRE, Operations, OnCall

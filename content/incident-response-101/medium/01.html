@@ -54,45 +54,39 @@
 </head>
 <body>
 <h1>What is an Incident?</h1>
+<p>The first hard question in on-call work is rarely technical. When an alert fires, you have to decide whether you are looking at a real incident, a routine bug, or a noisy warning that only needs follow-up during business hours.</p>
+<p>Without a shared threshold, teams drift in opposite directions. Some page everyone for minor symptoms and burn out the rotation. Others wait too long while customer impact is already spreading.</p>
+<p>This is the first post in the Incident Response 101 series. This post explains how to define an incident around customer impact, duration, and response thresholds so the rest of the incident process has a stable starting point.</p>
+<h2>Questions this chapter answers</h2>
+<p>The hard part is not noticing that something looks wrong. The hard part is deciding whether the symptoms have crossed the line from routine engineering work into incident response. If that line is vague, paging and escalation stay vague too.</p>
 <blockquote>
-<p>Incident Response 101 series (1/10)</p>
+<p>An incident is not “anything unusual.” It is an abnormal condition whose customer impact has crossed an agreed threshold.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Which</em> problems count as an <em>incident</em>?</p>
-<blockquote>
-<p>An <em>incident</em> is an <em>abnormal</em> condition with <em>customer impact</em> above a <em>threshold</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the first post in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li>The <em>definition</em> of an <em>incident</em></li>
-<li><em>Impact</em> measurement</li>
-<li>The difference from a <em>regular bug</em></li>
-<li>A starting point for <em>on-call</em></li>
-<li>The <em>cultural</em> dimension</li>
+<li>Which problems should count as an incident instead of a regular bug?</li>
+<li>How is an alert different from an incident?</li>
+<li>What metrics make customer impact concrete enough to page people?</li>
+<li>Where should a new on-call engineer look first before escalating?</li>
+<li>How do you keep the threshold strict without becoming slow?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Without a <em>threshold</em>, response is either <em>too slow</em> or <em>too aggressive</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Event[&quot;event&quot;] --&gt; Filter{&quot;impact?&quot;}
-    Filter --&gt;|yes| Inc[&quot;incident&quot;]
-    Filter --&gt;|no| Bug[&quot;bug ticket&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>If the definition is too loose, the team pages on noise and the rotation stops trusting alerts. If the definition is too strict, the team waits while customers are already affected. Both failure modes are expensive.</p>
+<p>A usable incident definition reduces argument during the first minutes of response. It tells responders which channel to open, which severity system to use, and when leadership communication has to begin.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+The diagram below shows the first decision cut. Events arrive all day, but only the subset with meaningful customer impact should cross into the incident path.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>incident</strong>: an <em>abnormal</em> event with <em>customer impact</em>.</li>
-<li><strong>alert</strong>: an <em>action-required</em> signal.</li>
-<li><strong>outage</strong>: a <em>service interruption</em>.</li>
-<li><strong>degradation</strong>: a <em>performance drop</em>.</li>
-<li><strong>on-call</strong>: a <em>standby duty rotation</em>.</li>
+<li><strong>incident</strong>: an abnormal event with customer impact.</li>
+<li><strong>alert</strong>: an action-required signal.</li>
+<li><strong>outage</strong>: a service interruption.</li>
+<li><strong>degradation</strong>: a performance drop.</li>
+<li><strong>on-call</strong>: a standby duty rotation.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: every <em>alert</em> is treated like an <em>incident</em>.</p>
-<p><strong>After</strong>: alerts are <em>classified by impact</em> before action.</p>
+<p><strong>Before</strong>: every alert is treated like an incident.</p>
+<p><strong>After</strong>: alerts are classified by impact before action.</p>
 <h2>Hands-on: Incident Decision</h2>
 <p><strong>Step 1 — Capture impact</strong></p>
 <pre><code class="language-python">def impact(users, minutes):
@@ -116,43 +110,59 @@
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li>The <em>threshold</em> is the result of an <em>agreement</em>.</li>
-<li>The <em>classification</em> picks the <em>path</em>.</li>
-<li><em>Code</em> removes <em>subjectivity</em>.</li>
+<li>The threshold is the result of an agreement.</li>
+<li>The classification picks the path.</li>
+<li>Code removes subjectivity.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Confusing <em>alerts</em> with <em>incidents</em>.</strong></li>
-<li><strong>No agreed <em>threshold</em>.</strong></li>
-<li><strong>Estimating <em>impact</em> <em>subjectively</em>.</strong></li>
-<li><strong>Insufficient <em>on-call</em> <em>training</em> material.</strong></li>
-<li><strong>Returning to work <em>without records</em>.</strong></li>
+<li><strong>Confusing alerts with incidents.</strong></li>
+<li><strong>No agreed threshold.</strong></li>
+<li><strong>Estimating impact subjectively.</strong></li>
+<li><strong>Insufficient on-call training material.</strong></li>
+<li><strong>Returning to work without records.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p><em>PagerDuty's severity rules</em> automate the <em>classification</em>.</p>
+<p>PagerDuty's severity rules automate the classification.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Customer impact</em> is the <em>yardstick</em>.</li>
-<li><em>Alerts</em> are <em>raw material</em>; <em>judgment</em> is <em>human</em>.</li>
-<li><em>Over-response</em> is also a <em>cost</em>.</li>
-<li><em>Records</em> are the <em>fuel for learning</em>.</li>
-<li><em>On-call</em> matures through <em>training</em>.</li>
+<li>Customer impact is the yardstick.</li>
+<li>Alerts are raw material; judgment is human.</li>
+<li>Over-response is also a cost.</li>
+<li>Records are the fuel for learning.</li>
+<li>On-call matures through training.</li>
 </ul>
+<h2>First questions to ask before declaring an incident</h2>
+<p>Before you declare an incident, run through a small set of questions that force evidence over instinct.</p>
+<ul>
+<li>Who is affected right now, and roughly how many users are involved?</li>
+<li>Which metric best expresses the impact: error rate, latency, failed checkouts, or something else?</li>
+<li>Was there a deployment, configuration change, or upstream dependency issue in the last 30 minutes?</li>
+<li>Is there a customer-visible workaround, or is the path fully blocked?</li>
+<li>If the condition lasts five more minutes, who should be paged next?</li>
+</ul>
+<pre><code class="language-bash"># Example: quick declaration checklist
+checklist=(error-rate latency saturation deploy-feed statuspage)
+for item in &quot;${checklist[@]}&quot;; do
+  printf 'check: %s\n' &quot;$item&quot;
+done
+</code></pre>
+<p>You are not trying to prove the full root cause yet. You are gathering enough evidence to justify whether the incident process should start.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Threshold</em> agreed.</li>
-<li>[ ] <em>Classification</em> code.</li>
-<li>[ ] <em>Alert routing</em>.</li>
-<li>[ ] <em>Training</em> material.</li>
+<li>[ ] Threshold agreed.</li>
+<li>[ ] Classification code.</li>
+<li>[ ] Alert routing.</li>
+<li>[ ] Training material.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>incident</em> in one line.</li>
-<li>Define <em>outage</em> in one line.</li>
-<li>Define <em>degradation</em> in one line.</li>
+<li>Define incident in one line.</li>
+<li>Define outage in one line.</li>
+<li>Define degradation in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover <em>severity classification</em>.</p>
+<p>Next, we cover severity classification.</p>
 <ul>
 <li><strong>What is an Incident? (current)</strong></li>
 <li>Severity Classification (upcoming)</li>
@@ -166,12 +176,13 @@
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://response.pagerduty.com/">Incident Response - PagerDuty</a></li>
-<li><a href="https://sre.google/sre-book/managing-incidents/">Managing Incidents - Google SRE Book</a></li>
-<li><a href="https://www.atlassian.com/incident-management/handbook">Atlassian Incident Handbook</a></li>
-<li><a href="https://wiki.en.it-processmaps.com/index.php/Incident_Management">Incident Definition - ITIL</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://response.pagerduty.com/">PagerDuty Incident Response Documentation</a><br>
+- <a href="https://sre.google/sre-book/managing-incidents/">Managing Incidents - Google SRE Book</a><br>
+- <a href="https://www.atlassian.com/incident-management">Incident management overview - Atlassian</a><br>
+- <a href="https://csrc.nist.gov/pubs/sp/800/61/r2/final">NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide</a></p>
+<p><strong>Example source</strong><br>
+- <a href="https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101">incident-response-101 canonical source in book-content</a></p>
 <p class="tags-line">Tags: Incident, Response, SRE, Operations, OnCall</p>
 </body>
 </html>

@@ -2,7 +2,7 @@
 series: incident-response-101
 episode: 5
 title: Writing the Timeline
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,60 +16,56 @@ tags:
   - Postmortem
   - Logging
   - Operations
-seo_description: A beginner-friendly guide to writing an incident timeline covering live logging, channel scraping, ordering, and fact vs interpretation
-last_reviewed: '2026-05-04'
+seo_description: Learn how to build an incident timeline from live notes, channel exports, and anchor timestamps without mixing facts and theory.
+last_reviewed: '2026-05-15'
 ---
 
 # Writing the Timeline
 
-> Incident Response 101 series (5/10)
+One of the most expensive mistakes after an incident is trusting memory more than recorded evidence. Everyone thinks they saw the same thing, but a few days later the sequence of events, the basis for decisions, and even the time of mitigation start to blur.
 
-<!-- a-grade-intro:begin -->
+A useful timeline is not a polished story reconstructed after the fact. It is a fact log captured during the response and cleaned up later without mixing observation and interpretation.
 
-**Core question**: After an *incident* ends, how do you *reconstruct* what happened *and when*?
+This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.
 
-> A *timeline* is captured *during* the response and ordered by *time*, with *facts only*.
+## Questions this chapter answers
 
-<!-- a-grade-intro:end -->
+A timeline becomes unreliable the moment it mixes memory, hindsight, and interpretation. By the time a team writes a postmortem days later, everyone already knows more than they knew while the incident was live.
 
-This is post 5 in the Incident Response 101 series.
+> A trustworthy timeline records what the team observed and when it observed it. Interpretation can be useful, but it must stay visibly separate from the facts.
 
-## What You Will Learn
+- Why should timeline work begin during the incident instead of after it?
+- Which channels need to be collected besides the main response chat?
+- How do you separate recorded facts from later theories?
+- Why do anchor moments like detected and mitigated matter so much?
+- How should time zones be handled in shared documentation?
 
-- *Contemporaneous logging*
-- *Channel scraping*
-- *Time ordering*
-- Separating *fact vs interpretation*
-- Feeding the *postmortem*
+## Why this topic matters
 
-## Why It Matters
+Memory drifts fast, especially after a stressful outage. People remember the final explanation and unconsciously pull it backward into earlier moments where it did not yet exist.
 
-*Memory* drifts. The *one line* you write *now* saves *tomorrow's RCA*.
+A clear timeline protects the team from that distortion. It creates a fact base that later RCA and postmortem work can trust without rewriting history.
 
-## Concept at a Glance
+## Diagram at a glance
 
-```mermaid
-flowchart LR
-    Slack["slack"] --> Scrape["scrape"]
-    Pager["pager"] --> Scrape
-    Deploy["deploy log"] --> Scrape
-    Scrape --> Sort["sort by time"]
-    Sort --> Doc["timeline doc"]
-```
+![Diagram at a glance](../../../assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
+
+*Diagram at a glance*
+The shape matters: collect from more than one source, normalize the timestamps, then sort into one document that preserves the real order of events.
 
 ## Key Terms
 
-- **timestamp**: a *UTC* time stamp.
-- **scrape**: gathering events from *multiple channels*.
-- **fact**: a *recorded observation*.
-- **interpretation**: *guesses* and *opinions*.
-- **anchor**: reference moments like *Detection* or *Mitigation*.
+- **timestamp**: a UTC time stamp.
+- **scrape**: gathering events from multiple channels.
+- **fact**: a recorded observation.
+- **interpretation**: guesses and opinions.
+- **anchor**: reference moments like Detection or Mitigation.
 
 ## Before/After
 
-**Before**: reconstruct from *memory*.
+**Before**: reconstruct from memory.
 
-**After**: reconstruct from *contemporaneous logs* and *channel scrapes*.
+**After**: reconstruct from contemporaneous logs and channel scrapes.
 
 ## Hands-on: A Tiny Timeline Builder
 
@@ -114,46 +110,60 @@ def mark(event):
 
 ## What to Notice in This Code
 
-- Every *event* has *three fields*.
-- *Interpretation* is split off by a *prefix*.
-- *Anchors* are the *dashboard* reference points.
+- Every event has three fields.
+- Interpretation is split off by a prefix.
+- Anchors are the dashboard reference points.
 
 ## Five Common Mistakes
 
-1. **Writing the timeline *after* the incident ends.**
-2. **Treating *interpretation* as *fact*.**
-3. **Mixing *time zones* (KST/UTC).**
-4. **Scraping only *one channel*.**
-5. **Pasting *sensitive data* directly.**
+1. **Writing the timeline after the incident ends.**
+2. **Treating interpretation as fact.**
+3. **Mixing time zones (KST/UTC).**
+4. **Scraping only one channel.**
+5. **Pasting sensitive data directly.**
 
 ## How This Shows Up in Production
 
-A *Slack bot* collects events with `!ts <text>` and *exports* them into a *postmortem doc*.
+A Slack bot collects events with `!ts <text>` and exports them into a postmortem doc.
 
 ## How a Senior Engineer Thinks
 
-- *Contemporaneous logging* is the rule.
-- Standardize on *UTC*.
-- *Short, frequent* lines.
-- *Speculation* goes elsewhere.
-- If the *anchors* are right, you can recover the rest.
+- Contemporaneous logging is the rule.
+- Standardize on UTC.
+- Short, frequent lines.
+- Speculation goes elsewhere.
+- If the anchors are right, you can recover the rest.
+
+## Example timeline entries
+
+A timeline becomes much more useful when facts and interpretation are visibly separated.
+
+```text
+2026-05-15T00:03Z fact: error rate exceeded 12%
+2026-05-15T00:05Z fact: primary on-call acknowledged page
+2026-05-15T00:08Z note: ?possible DB connection pool exhaustion
+2026-05-15T00:11Z fact: rollback initiated
+2026-05-15T00:19Z fact: error rate returned below 1%
+```
+
+The `fact` lines preserve what the team knew at the time. The `note` line preserves a hypothesis without rewriting it into truth.
 
 ## Checklist
 
-- [ ] *Recording owner*.
-- [ ] *Bot command*.
-- [ ] *UTC enforcement*.
-- [ ] *Anchor definitions*.
+- [ ] Recording owner.
+- [ ] Bot command.
+- [ ] UTC enforcement.
+- [ ] Anchor definitions.
 
 ## Practice Problems
 
-1. Define *anchor* in one line.
-2. Distinguish *fact* and *interpretation* in one line.
-3. Explain why *UTC* matters in one line.
+1. Define anchor in one line.
+2. Distinguish fact and interpretation in one line.
+3. Explain why UTC matters in one line.
 
 ## Wrap-up and Next Steps
 
-Next, we cover *root cause analysis*.
+Next, we cover root cause analysis.
 
 <!-- toc:begin -->
 - [What is an Incident?](./01-what-is-incident.md)
@@ -170,9 +180,13 @@ Next, we cover *root cause analysis*.
 
 ## References
 
-- [Postmortem Timeline - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
-- [Building an Incident Timeline - PagerDuty](https://response.pagerduty.com/after/post_mortem_process/)
-- [Incident Documentation - Atlassian](https://www.atlassian.com/incident-management/postmortem)
-- [Time and Postmortems - Increment](https://increment.com/postmortems/)
+### Official Docs
+- [Postmortem Culture - Google SRE Book](https://sre.google/sre-book/postmortem-culture/)
+- [Postmortem Process - PagerDuty](https://response.pagerduty.com/after/post_mortem_process/)
+- [Postmortem guide - Atlassian](https://www.atlassian.com/incident-management/postmortem)
+- [OpenTelemetry Semantic Conventions](https://github.com/open-telemetry/semantic-conventions)
+
+### Example source
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Timeline, Postmortem, Logging, Operations

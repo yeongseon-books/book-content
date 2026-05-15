@@ -1,8 +1,8 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-12'
-seo_description: 장애 재발을 코드와 테스트, 자동화 가드레일로 남겨 같은 실수를 반복하지 않도록 만드는 실무 방법을 정리합니다.
+last_reviewed: '2026-05-15'
+seo_description: incident 학습을 회귀 테스트, guardrail, chaos 실험으로 바꿔 재발 가능성을 줄이는 예방 방법을 설명합니다.
 series: incident-response-101
 status: publish-ready
 tags:
@@ -22,9 +22,11 @@ title: 재발 방지
 
 # 재발 방지
 
-이 글은 Incident Response 101 시리즈의 9번째 글입니다.
+사후 분석 문서까지 마쳤다고 해서 incident 대응이 끝난 것은 아닙니다. 그 문서가 다시 코드, 테스트, 운영 규칙으로 돌아가지 않으면 조직은 같은 실수를 반복합니다.
 
-사후 분석 문서까지 마쳤다고 해서 incident 대응이 끝난 것은 아닙니다. 그 문서가 다시 코드, 테스트, 운영 규칙으로 돌아가지 않으면 조직은 같은 실수를 반복합니다. 그래서 재발 방지는 “좋은 회고를 남기는 일”이 아니라, 학습을 시스템에 박아 넣는 일에 가깝습니다.
+그래서 재발 방지는 좋은 회고를 남기는 일이 아니라, 학습을 시스템에 박아 넣는 일에 가깝습니다. 기억보다 테스트와 guardrail이 먼저 막아 주는 상태를 만들어야 합니다.
+
+이 글은 Incident Response 101 시리즈의 9번째 글입니다. 여기서는 후속 조치 추적, 회귀 테스트, guardrail, chaos 실험을 하나의 예방 루프로 묶는 방법을 다룹니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,15 +48,9 @@ incident는 한 번 해결했다고 사라지지 않습니다. 같은 조건이 
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Action["후속 조치"] --> Test["회귀 테스트"]
-    Test --> Guard["안전 장치"]
-    Guard --> Chaos["카오스 실험"]
-    Chaos --> Learn["학습"]
-    Learn --> Action
-```
+![한눈에 보는 구조](../../../assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
 
+*한눈에 보는 구조*
 이 흐름은 선형이 아니라 반복 루프입니다. action item이 테스트로 바뀌고, 테스트가 guardrail로 이어지며, chaos 실험이 실제로 잘 막히는지 확인합니다. 그 결과를 다시 학습으로 돌려 다음 action item을 만듭니다.
 
 ## 핵심 용어
@@ -147,6 +143,19 @@ def closed(action):
 
 시니어 엔지니어는 예방을 문서가 아니라 코드로 봅니다. 사후 분석은 출발점이고, 실제 예방은 테스트와 안전 장치에 남아야 한다고 생각합니다.
 
+## 예방 항목 우선순위 정하기
+
+incident 뒤에는 할 일이 한꺼번에 많아집니다. 그래서 예방 항목을 모두 같은 급으로 다루기보다, 재발 위험과 구현 비용을 함께 보는 표가 도움이 됩니다.
+
+| 항목 | 재발 위험 감소 | 구현 비용 | 우선순위 |
+| --- | --- | --- | --- |
+| 회귀 테스트 추가 | 높음 | 낮음 | 즉시 |
+| feature flag 추가 | 높음 | 중간 | 높음 |
+| 장기 아키텍처 개편 | 높음 | 높음 | 분기 계획 |
+| 위키 문서 보강 | 낮음 | 낮음 | 보조 |
+
+문서 보강도 필요하지만, 같은 버그를 직접 막는 테스트와 guardrail이 보통 더 앞에 와야 합니다.
+
 ## 체크리스트
 
 - [ ] 사후 분석 후속 조치를 추적하는 도구가 있다.
@@ -181,9 +190,13 @@ def closed(action):
 
 ## 참고 자료
 
-- [Action Items - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
-- [Chaos Engineering Principles](https://principlesofchaos.org/)
-- [Guardrails vs Gates - Thoughtworks](https://www.thoughtworks.com/insights/blog/guardrails-not-gates)
-- [Preventing Recurrence - PagerDuty](https://response.pagerduty.com/after/preventing/)
+### 공식 문서
+- [Postmortem Action Items - Google SRE Workbook](https://sre.google/workbook/postmortem-culture/)
+- [Preventing recurrence - PagerDuty](https://response.pagerduty.com/after/preventing/)
+- [Principles of Chaos Engineering](https://principlesofchaos.org/)
+- [Guardrails, not gates - Thoughtworks](https://www.thoughtworks.com/insights/blog/guardrails-not-gates)
+
+### 예제 소스
+- [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Prevention, Reliability, Testing, Operations

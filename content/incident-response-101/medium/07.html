@@ -54,46 +54,39 @@
 </head>
 <body>
 <h1>Mitigation and Resolution</h1>
+<p>Stopping customer pain is not the same as fixing the system. That distinction sounds obvious in calm conversation, but during a live incident teams often announce “resolved” when they have only bought a temporary reduction in impact.</p>
+<p>Mitigation and resolution have different goals, different owners, and sometimes different timelines. Confusing them creates both technical and communication risk.</p>
+<p>This is post 7 in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.</p>
+<h2>Questions this chapter answers</h2>
+<p>Teams under pressure often collapse mitigation and resolution into a single recovery concept. That makes it easy to communicate too aggressively, or to close the incident before the real risk is gone.</p>
 <blockquote>
-<p>Incident Response 101 series (7/10)</p>
+<p>Mitigation reduces impact now. Resolution removes the condition that caused the impact. Both matter, but they should not be announced or verified in the same way.</p>
 </blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is <em>putting the fire out</em> the <em>same thing</em> as <em>removing the cause</em>?</p>
-<blockquote>
-<p><em>Mitigation</em> stops the <em>damage</em>. <em>Resolution</em> removes the <em>cause</em>. Different <em>order</em>, different <em>owners</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 7 in the Incident Response 101 series.</p>
-<h2>What You Will Learn</h2>
 <ul>
-<li><em>Mitigation vs resolution</em></li>
-<li><em>Rollback</em> tactics</li>
-<li><em>Scaling out</em></li>
-<li><em>Throttling</em> and <em>kill switches</em></li>
-<li><em>Recovery verification</em></li>
+<li>What makes rollback such a powerful mitigation tool?</li>
+<li>When should you scale out, throttle, or use a kill switch instead?</li>
+<li>Why is “impact reduced” not enough to declare resolution?</li>
+<li>How do you verify recovery with numbers instead of intuition?</li>
+<li>Which post-mitigation events still need to be recorded?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>If you confuse <em>mitigation</em> with <em>resolution</em>, the <em>same incident</em> erupts again at <em>night</em>.</p>
-<h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Incident[&quot;incident&quot;] --&gt; Mit[&quot;mitigation&quot;]
-    Mit --&gt; Stable[&quot;stable&quot;]
-    Stable --&gt; Res[&quot;resolution&quot;]
-    Res --&gt; Closed[&quot;closed&quot;]
-</code></pre>
+<h2>Why this topic matters</h2>
+<p>A service can look calmer while the underlying cause is still present. That is why incidents often reopen at night or after traffic shifts if the team stops at temporary containment.</p>
+<p>Separating mitigation from resolution keeps the response honest. It improves communication, clarifies ownership, and prevents teams from skipping the verification step.</p>
+<h2>Diagram at a glance</h2>
+<p><img alt="Diagram at a glance" src="https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png"></p>
+<p><em>Diagram at a glance</em><br>
+The response path moves from impact containment to stability and then to root removal. If those states are not separated, both operations and communication get fuzzy.</p>
 <h2>Key Terms</h2>
 <ul>
-<li><strong>mitigation</strong>: <em>stop</em> the <em>damage</em>.</li>
-<li><strong>resolution</strong>: <em>remove</em> the <em>cause</em>.</li>
-<li><strong>rollback</strong>: revert to the <em>previous version</em>.</li>
-<li><strong>kill switch</strong>: turn a <em>feature</em> off <em>immediately</em>.</li>
-<li><strong>throttle</strong>: <em>limit</em> incoming traffic.</li>
+<li><strong>mitigation</strong>: stop the damage.</li>
+<li><strong>resolution</strong>: remove the cause.</li>
+<li><strong>rollback</strong>: revert to the previous version.</li>
+<li><strong>kill switch</strong>: turn a feature off immediately.</li>
+<li><strong>throttle</strong>: limit incoming traffic.</li>
 </ul>
 <h2>Before/After</h2>
-<p><strong>Before</strong>: announce only after a <em>full fix</em>.</p>
-<p><strong>After</strong>: announce <em>as soon as</em> damage is <em>contained</em>; announce <em>resolution</em> separately.</p>
+<p><strong>Before</strong>: announce only after a full fix.</p>
+<p><strong>After</strong>: announce as soon as damage is contained; announce resolution separately.</p>
 <h2>Hands-on: A Mini Mitigation Kit</h2>
 <p><strong>Step 1 — Rollback</strong></p>
 <pre><code class="language-python">def rollback(version):
@@ -120,43 +113,53 @@ def kill(feature):
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
-<li><em>Mitigation</em> is a <em>small</em> action.</li>
-<li>A <em>kill switch</em> is <em>one flag</em> line.</li>
-<li><em>Verification</em> is <em>quantitative</em>.</li>
+<li>Mitigation is a small action.</li>
+<li>A kill switch is one flag line.</li>
+<li>Verification is quantitative.</li>
 </ul>
 <h2>Five Common Mistakes</h2>
 <ol>
-<li><strong>Only <em>rolling forward</em>, never <em>back</em>.</strong></li>
-<li><strong>No prepared <em>kill switch</em>.</strong></li>
-<li><strong>Announcing <em>mitigation</em> as <em>resolution</em>.</strong></li>
-<li><strong>Closing without <em>verification</em>.</strong></li>
-<li><strong>Forgetting to <em>unthrottle</em>.</strong></li>
+<li><strong>Only rolling forward, never back.</strong></li>
+<li><strong>No prepared kill switch.</strong></li>
+<li><strong>Announcing mitigation as resolution.</strong></li>
+<li><strong>Closing without verification.</strong></li>
+<li><strong>Forgetting to unthrottle.</strong></li>
 </ol>
 <h2>How This Shows Up in Production</h2>
-<p>A <em>feature flag</em> system and an <em>autoscaler</em> are wired into a single <em>runbook</em> command, so <em>mitigation</em> takes <em>under two minutes</em>.</p>
+<p>A feature flag system and an autoscaler are wired into a single runbook command, so mitigation takes under two minutes.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
-<li><em>Mitigation first</em>.</li>
-<li><em>Resolution</em> during <em>business hours</em>.</li>
-<li>A <em>kill switch</em> on <em>every feature</em>.</li>
-<li><em>Verify</em> with numbers.</li>
-<li><em>Unthrottling</em> is also an <em>event</em>.</li>
+<li>Mitigation first.</li>
+<li>Resolution during business hours.</li>
+<li>A kill switch on every feature.</li>
+<li>Verify with numbers.</li>
+<li>Unthrottling is also an event.</li>
 </ul>
+<h2>Example mitigation order</h2>
+<p>During a live incident, the team should usually scan mitigation options in the order below.</p>
+<ol>
+<li>Is there a clean rollback to the previous known-good state?</li>
+<li>Can a feature flag or kill switch disable only the broken path?</li>
+<li>If the issue is capacity-related, can you scale out immediately?</li>
+<li>If the problem is traffic amplification, can throttling protect the critical path?</li>
+<li>After each action, which metric proves that recovery is real?</li>
+</ol>
+<p>That order keeps the team focused on the fastest credible reduction in customer impact instead of the most elegant long-term repair.</p>
 <h2>Checklist</h2>
 <ul>
-<li>[ ] <em>Rollback procedure</em>.</li>
-<li>[ ] <em>Kill switch inventory</em>.</li>
-<li>[ ] <em>Throttling policy</em>.</li>
-<li>[ ] <em>Recovery verification metric</em>.</li>
+<li>[ ] Rollback procedure.</li>
+<li>[ ] Kill switch inventory.</li>
+<li>[ ] Throttling policy.</li>
+<li>[ ] Recovery verification metric.</li>
 </ul>
 <h2>Practice Problems</h2>
 <ol>
-<li>Define <em>mitigation</em> in one line.</li>
-<li>Define <em>resolution</em> in one line.</li>
-<li>Define <em>kill switch</em> in one line.</li>
+<li>Define mitigation in one line.</li>
+<li>Define resolution in one line.</li>
+<li>Define kill switch in one line.</li>
 </ol>
 <h2>Wrap-up and Next Steps</h2>
-<p>Next, we cover the <em>postmortem</em>.</p>
+<p>Next, we cover the postmortem.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/01-what-is-incident.md">What is an Incident?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/incident-response-101/en/02-severity.md">Severity Classification</a></li>
@@ -170,12 +173,11 @@ def kill(feature):
 <li>Building an Incident Runbook (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://response.pagerduty.com/during/mitigation/">Mitigation vs Resolution - PagerDuty</a></li>
-<li><a href="https://sre.google/sre-book/release-engineering/">Rollback Strategies - Google SRE Book</a></li>
-<li><a href="https://martinfowler.com/articles/feature-toggles.html">Feature Flags - Martin Fowler</a></li>
-<li><a href="https://increment.com/reliability/throttling/">Throttling and Backpressure - Increment</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://response.pagerduty.com/during/mitigation/">Mitigation during incidents - PagerDuty</a><br>
+- <a href="https://sre.google/sre-book/release-engineering/">Release Engineering - Google SRE Book</a><br>
+- <a href="https://martinfowler.com/articles/feature-toggles.html">Feature Toggles - Martin Fowler</a><br>
+- <a href="https://www.atlassian.com/incident-management">Incident management guide - Atlassian</a></p>
 <p class="tags-line">Tags: Incident, Mitigation, Resolution, Rollback, Operations</p>
 </body>
 </html>
