@@ -2,7 +2,7 @@
 series: observability-101
 episode: 7
 title: Alerts and On-Call
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - OnCall
   - Monitoring
 seo_description: What makes an alert worth a 3am page, how to avoid alert fatigue, and the first steps of running on-call sustainably.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Alerts and On-Call
 
+More alerts do not make a system safer by default. Once the team stops trusting the pager, even the alert that matters most arrives already discounted.
+
+That is why alerting design is partly a technical problem and partly a human one. It spends sleep, focus, and trust, so it must be tied to user impact and clear action.
+
 This is post 7 in the Observability 101 series.
-
-> Observability 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: What separates an alert that is *worth waking you at 3am* from one that is *not*?
-
-> *Good alerts are *actionable* and reflect *user impact*. Anything else just leaves *fatigue*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,13 +44,8 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    M["metric"] --> Rule["alert rule"]
-    Rule --> AM["alertmanager"]
-    AM --> Page["pager"]
-    AM --> Slack["chat"]
-```
+![Concept at a Glance](../../../assets/observability-101/07/07-01-concept-at-a-glance.en.png)
+*A metric condition becomes an alert rule, then routes either to a pager or to a lower-urgency coordination channel.*
 
 ## Key Terms
 
@@ -121,6 +110,24 @@ route:
 ```text
 Every alert MUST have a runbook URL.
 The runbook covers: meaning, first 3 actions, escalation, related dashboards.
+```
+
+## How to Check Alert Quality
+
+Before adding a new page-level alert, replay it against recent data and verify that a human should actually receive it.
+
+```text
+1) Replay the rule against the last 30 days.
+2) Confirm that the `for` clause filters short spikes.
+3) Verify every `severity=page` rule has a runbook and owner.
+4) Trigger a test event and confirm routing to PagerDuty or chat.
+```
+
+```text
+Expected output:
+- Page-level alerts stay rare enough that responders still trust them.
+- Ticket-level alerts land in business-hours channels only.
+- Every alert message includes summary, owner, and runbook context.
 ```
 
 ## What to Notice in This Code

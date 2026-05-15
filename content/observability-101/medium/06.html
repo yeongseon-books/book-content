@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Dashboard Design</h1>
+<p>Large dashboards often look impressive right until an incident starts. The screen is full, but the first person on call still does not know where to look, what changed first, or whether the problem is user-facing or internal.</p>
+<p>Good dashboard design fixes that. The first screen should compress the system into a small number of questions that lead directly to the next action.</p>
 <p>This is post 6 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What separates a <em>good</em> dashboard from one that is <em>wallpaper</em>?</p>
-<blockquote>
-<p><em>Good dashboards answer </em>one question<em>. Patterns like </em>USE<em> and </em>RED<em> turn panels into </em>units of meaning<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li><em>USE</em> (Utilization, Saturation, Errors)</li>
@@ -80,11 +71,8 @@
 <p><em>A dashboard is a </em>tool that answers<em>. If it does not answer, delete it.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Q[&quot;question&quot;] --&gt; RED[&quot;RED: rate, error, duration&quot;]
-    Q --&gt; USE[&quot;USE: util, saturation, error&quot;]
-    Q --&gt; Golden[&quot;Golden: latency, traffic, error, saturation&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>The first dashboard screen should route the operator from a question to RED, USE, and the golden signals in a predictable order.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>USE</strong>: the <em>resource</em> lens.</li>
@@ -127,6 +115,18 @@ avg(rate(node_cpu_seconds_total{mode!=&quot;idle&quot;}[1m]))
 <p><strong>Step 5 — Variables to switch environment</strong></p>
 <pre><code class="language-text">$env = staging | production
 $service = api | worker | scheduler
+</code></pre>
+<h2>How to Validate the First Screen</h2>
+<p>The real test is whether the first 30 seconds change your next action. Imagine checkout latency rising right after a deploy.</p>
+<pre><code class="language-text">1) Check latency p95/p99 on the summary row.
+2) Check whether 5xx rises at the same time.
+3) Check saturation: queue depth, CPU, memory.
+4) Align the anomaly with deploy annotations.
+</code></pre>
+<pre><code class="language-text">Expected output:
+- The summary row distinguishes latency regression from error spikes.
+- Healthy saturation suggests the bottleneck is inside the app or a dependency, not the host.
+- A deploy marker overlapping the change makes rollback or config review the next obvious step.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
@@ -185,6 +185,7 @@ $service = api | worker | scheduler
 <li><a href="https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/">Tom Wilkie — RED Method</a></li>
 <li><a href="https://sre.google/sre-book/monitoring-distributed-systems/">Google SRE — Golden Signals</a></li>
 <li><a href="https://grafana.com/docs/grafana/latest/best-practices/">Grafana dashboard best practices</a></li>
+<li><a href="https://grafana.com/docs/grafana/latest/panels-visualizations/">Grafana panels and visualizations</a></li>
 </ul>
 <p class="tags-line">Tags: Observability, Dashboard, Grafana, SRE, Monitoring</p>
 </body>

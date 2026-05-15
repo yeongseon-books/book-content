@@ -2,7 +2,7 @@
 series: observability-101
 episode: 5
 title: Distributed Tracing Basics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - SRE
   - Microservices
 seo_description: Spans, traces, context propagation, and your first OpenTelemetry trace — how a single request flows across many services.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Distributed Tracing Basics
 
+Metrics can tell you a request got slower, and logs can tell you a timeout happened somewhere. But once one request crosses several services, that still leaves the central question unanswered: where did the time go?
+
+Distributed tracing answers that by breaking one request into spans, preserving parent-child relationships, and carrying context across service boundaries.
+
 This is post 5 in the Observability 101 series.
-
-> Observability 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When one request crosses *five services*, how do you tell *where it slowed down*?
-
-> *Distributed tracing binds *every span of a single request* under *one trace_id* and shows it as a *flow graph*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,13 +44,8 @@ In a microservice world, finding the cause of a *slow request* with logs and met
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    R["request"] --> A["service A (span)"]
-    A --> B["service B (span)"]
-    A --> C["service C (span)"]
-    B --> D["DB span"]
-```
+![Concept at a Glance](../../../assets/observability-101/05/05-01-concept-at-a-glance.en.png)
+*One request becomes a trace tree whose spans show where latency accumulated across services and storage.*
 
 ## Key Terms
 
@@ -119,6 +108,25 @@ ctx = extract(incoming_headers)  # at receiver: restore from headers
 ```python
 from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% only
+```
+
+## How to Verify a Slow Request
+
+Tracing becomes valuable when you can point to one slow span instead of blaming the whole service.
+
+```text
+trace_id=9f3c...
+handle_request  2450ms
+├─ auth_check    120ms
+├─ payment_call 1980ms
+└─ db_write      210ms
+```
+
+```text
+Expected output:
+- The root span shows total request time.
+- One child span stands out as the bottleneck.
+- Matching logs with the same `trace_id` explain whether the issue was a timeout, retry storm, or upstream dependency failure.
 ```
 
 ## What to Notice in This Code

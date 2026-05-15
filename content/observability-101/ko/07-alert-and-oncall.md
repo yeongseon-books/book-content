@@ -17,7 +17,7 @@ tags:
   - OnCall
   - Monitoring
 seo_description: 새벽 호출을 감수할 만한 경보의 조건과 경보 피로를 줄이는 온콜 운영 원칙을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 경보와 온콜
@@ -46,13 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    M["메트릭"] --> Rule["경보 규칙"]
-    Rule --> AM["경보 관리자"]
-    AM --> Page["호출"]
-    AM --> Chat["대화 채널"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/07/07-01-concept-at-a-glance.ko.png)
+*메트릭 조건이 경보 규칙을 거쳐 호출과 채팅 채널로 라우팅되는 기본 온콜 흐름*
 
 ## 핵심 용어
 
@@ -128,6 +123,24 @@ The runbook covers: meaning, first 3 actions, escalation, related dashboards.
 ```
 
 경보가 울린 뒤 처음 세 행동을 적어 두지 않으면, 받는 사람은 매번 처음부터 생각해야 합니다. 경보 없는 런북도 약하지만, 런북 없는 경보는 더 위험합니다.
+
+## 경보 품질을 이렇게 확인합니다
+
+새 경보를 넣을 때는 쿼리 정확성보다 먼저 사람이 받을 만한 신호인지 검증해야 합니다. 가장 단순한 점검 순서는 아래와 같습니다.
+
+```text
+1) 최근 30일 데이터로 규칙을 재생해 오경보 빈도 확인
+2) for 값이 짧은 튐을 충분히 걸러 주는지 확인
+3) severity=page 인 경보마다 runbook 링크와 소유 팀이 있는지 확인
+4) 실제 호출 테스트에서 PagerDuty 또는 채팅 채널로 올바르게 라우팅되는지 확인
+```
+
+```text
+Expected output:
+- page 등급 경보는 주간 몇 건 수준으로 유지됩니다.
+- ticket 등급 경보는 업무 시간 채널로만 전달됩니다.
+- 경보 메시지 안에 summary, runbook, owner 정보가 모두 들어 있습니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 

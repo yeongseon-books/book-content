@@ -17,7 +17,7 @@ tags:
   - SRE
   - Microservices
 seo_description: span, trace, context propagation과 OpenTelemetry로 첫 추적을 만드는 흐름을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 분산 트레이싱 기초
@@ -46,13 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    R["요청"] --> A["서비스 A 스팬"]
-    A --> B["서비스 B 스팬"]
-    A --> C["서비스 C 스팬"]
-    B --> D["데이터베이스 스팬"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/05/05-01-concept-at-a-glance.ko.png)
+*요청 하나가 여러 서비스와 데이터베이스 스팬으로 나뉘어 기록되는 분산 트레이스 구조*
 
 ## 핵심 용어
 
@@ -126,6 +121,27 @@ TracerProvider(sampler=TraceIdRatioBased(0.1))   # 10% only
 ```
 
 모든 트레이스를 100% 저장하면 비용이 빠르게 커집니다. 샘플링은 부끄러운 절충이 아니라, 분산 트레이싱을 오래 운영하기 위한 기본 장치입니다.
+
+## 느린 요청을 이렇게 검증합니다
+
+분산 트레이싱은 단순히 예쁜 그래프를 보는 도구가 아닙니다. 느린 요청 하나를 고르고, 어떤 스팬이 시간을 가장 많이 썼는지 확인하는 절차가 있어야 값이 생깁니다.
+
+```text
+trace_id=9f3c...
+handle_request  2450ms
+├─ auth_check    120ms
+├─ payment_call 1980ms
+└─ db_write      210ms
+```
+
+이 정도만 보여도 병목이 애플리케이션 전체인지, 특정 하위 호출인지 바로 갈립니다. 여기에 같은 trace_id 로그를 붙이면 원인 후보를 더 빠르게 좁힐 수 있습니다.
+
+```text
+Expected output:
+- 루트 스팬과 하위 스팬의 시간 차이가 보입니다.
+- 가장 긴 payment_call 스팬이 병목 후보로 드러납니다.
+- 같은 trace_id 로그에서 timeout, retry, upstream status 같은 맥락을 확인할 수 있습니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 

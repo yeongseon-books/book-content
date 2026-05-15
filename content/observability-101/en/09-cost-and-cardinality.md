@@ -2,7 +2,7 @@
 series: observability-101
 episode: 9
 title: Cost and Cardinality
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,22 +17,16 @@ tags:
   - Metrics
   - Sampling
 seo_description: How cardinality explosions, retention tiers, and sampling decisions actually drive — and tame — observability cost.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Cost and Cardinality
 
+Observability rarely looks expensive at the beginning. A few counters, a few logs, a bit of tracing, and the bill seems harmless. Then one month later the cost curve changes shape and nobody can explain why.
+
+The answer is usually structural, not accidental: too many unique labels, too much retention, and too little sampling discipline.
+
 This is post 9 in the Observability 101 series.
-
-> Observability 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does observability cost *suddenly* go up *10x*?
-
-> *Cardinality explosion, retention, and missing sampling — these three account for *99% of cost bombs*.*
-
-<!-- a-grade-intro:end -->
 
 ## What You Will Learn
 
@@ -50,13 +44,8 @@ In young companies the *#1 line on the AWS bill* is often *observability*. When 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Labels["label combinations"] --> Series["time series count"]
-    Series --> Storage["storage cost"]
-    Logs["log volume"] --> Index["index cost"]
-    Traces["trace count"] --> Sample["sampling"]
-```
+![Concept at a Glance](../../../assets/observability-101/09/09-01-concept-at-a-glance.en.png)
+*Observability cost is largely determined by label combinations, log volume, and how aggressively trace volume is sampled and retained.*
 
 ## Key Terms
 
@@ -122,6 +111,22 @@ processors:
 metric:  <= X million series
 log:     <= Y GB per day
 trace:   <= Z traces per minute after sampling
+```
+
+## How to Start a Cost Review
+
+Do not wait for the invoice. Review high-cardinality metrics directly in the monitoring system.
+
+```promql
+count({__name__=~".+"})
+topk(10, count by (__name__) ({__name__=~".+"}))
+```
+
+```text
+Expected output:
+- A small set of metrics accounts for most time series.
+- Finite labels such as `path` and `status` stay, while identifiers such as `user_id` and `request_id` get removed from metrics.
+- Teams can act before budgets are exceeded by cutting labels, retention, or sampling volume.
 ```
 
 ## What to Notice in This Code

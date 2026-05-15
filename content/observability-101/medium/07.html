@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Alerts and On-Call</h1>
+<p>More alerts do not make a system safer by default. Once the team stops trusting the pager, even the alert that matters most arrives already discounted.</p>
+<p>That is why alerting design is partly a technical problem and partly a human one. It spends sleep, focus, and trust, so it must be tied to user impact and clear action.</p>
 <p>This is post 7 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What separates an alert that is <em>worth waking you at 3am</em> from one that is <em>not</em>?</p>
-<blockquote>
-<p><em>Good alerts are </em>actionable<em> and reflect </em>user impact<em>. Anything else just leaves </em>fatigue<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>The three conditions of a <em>good alert</em></li>
@@ -80,12 +71,8 @@
 <p><em>Alerts have a </em>wake-up cost<em>. If you do not know it, you go </em>bankrupt<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    M[&quot;metric&quot;] --&gt; Rule[&quot;alert rule&quot;]
-    Rule --&gt; AM[&quot;alertmanager&quot;]
-    AM --&gt; Page[&quot;pager&quot;]
-    AM --&gt; Slack[&quot;chat&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png"><br>
+<em>A metric condition becomes an alert rule, then routes either to a pager or to a lower-urgency coordination channel.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Alert rule</strong>: a condition plus a <em>duration</em>.</li>
@@ -131,6 +118,18 @@
 <p><strong>Step 5 — Runbook link</strong></p>
 <pre><code class="language-text">Every alert MUST have a runbook URL.
 The runbook covers: meaning, first 3 actions, escalation, related dashboards.
+</code></pre>
+<h2>How to Check Alert Quality</h2>
+<p>Before adding a new page-level alert, replay it against recent data and verify that a human should actually receive it.</p>
+<pre><code class="language-text">1) Replay the rule against the last 30 days.
+2) Confirm that the `for` clause filters short spikes.
+3) Verify every `severity=page` rule has a runbook and owner.
+4) Trigger a test event and confirm routing to PagerDuty or chat.
+</code></pre>
+<pre><code class="language-text">Expected output:
+- Page-level alerts stay rare enough that responders still trust them.
+- Ticket-level alerts land in business-hours channels only.
+- Every alert message includes summary, owner, and runbook context.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>

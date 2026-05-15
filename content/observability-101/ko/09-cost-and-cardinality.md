@@ -17,7 +17,7 @@ tags:
   - Metrics
   - Sampling
 seo_description: 카디널리티 폭발, 보존 기간, 샘플링이 관측성 비용을 어떻게 키우고 줄이는지 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 비용과 카디널리티
@@ -46,13 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Labels["라벨 조합"] --> Series["시계열 개수"]
-    Series --> Storage["저장 비용"]
-    Logs["로그 양"] --> Index["색인 비용"]
-    Traces["트레이스 수"] --> Sample["샘플링"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
+*라벨 조합, 로그 양, 트레이스 수가 각각 시계열 수와 색인 비용, 샘플링 정책으로 이어지는 비용 구조*
 
 ## 핵심 용어
 
@@ -129,6 +124,22 @@ trace:   <= Z traces per minute after sampling
 ```
 
 비용은 팀의 책임이어야 합니다. 신호별 상한선을 정해 두면 데이터 설계가 훨씬 신중해지고, 청구서가 나오기 전에 위험을 조정할 수 있습니다.
+
+## 비용 점검은 이렇게 시작합니다
+
+카디널리티 문제는 청구서가 나온 뒤에 보는 것보다, 시계열 상위 항목을 주기적으로 확인하는 편이 훨씬 낫습니다.
+
+```promql
+count({__name__=~".+"})
+topk(10, count by (__name__) ({__name__=~".+"}))
+```
+
+```text
+Expected output:
+- 상위 메트릭 몇 개가 전체 시계열 대부분을 만들고 있는지 보입니다.
+- path, status 같은 유한 라벨은 유지하고 user_id, request_id 같은 라벨은 제거해야 할지 판단할 수 있습니다.
+- 팀별 예산선을 넘는 경우 즉시 라벨 축소나 보존 정책 조정을 논의할 수 있습니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 

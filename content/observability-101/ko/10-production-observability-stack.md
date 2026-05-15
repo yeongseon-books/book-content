@@ -17,7 +17,7 @@ tags:
   - Grafana
   - Prometheus
 seo_description: OpenTelemetry, Prometheus, Loki, Tempo, Grafana로 작은 팀의 첫 관측성 스택을 구성하는 법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 운영 가능한 관측성 스택
@@ -46,16 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    App["애플리케이션"] --> Otel["OpenTelemetry 수집기"]
-    Otel --> Prom["Prometheus 메트릭"]
-    Otel --> Loki["Loki 로그"]
-    Otel --> Tempo["Tempo 트레이스"]
-    Prom --> Grafana
-    Loki --> Grafana
-    Tempo --> Grafana
-```
+![한눈에 보는 구조](../../../assets/observability-101/10/10-01-concept-at-a-glance.ko.png)
+*애플리케이션 신호가 OpenTelemetry 수집기를 거쳐 Prometheus, Loki, Tempo에 저장되고 Grafana에서 다시 만나는 구조*
 
 ## 핵심 용어
 
@@ -135,6 +127,23 @@ Loki  -> Tempo: log "trace_id" -> trace view
 ```
 
 관측성 시스템도 운영 대상입니다. 스택 자체가 느리거나 자주 끊기면 정작 장애 순간에 가장 먼저 배신합니다. 그래서 운영자 목표를 별도로 두는 편이 좋습니다.
+
+## 스택 연결은 이렇게 검증합니다
+
+작은 팀의 첫 스택은 기능 수보다 연결 상태가 더 중요합니다. 아래 세 가지가 모두 통과해야 "메트릭, 로그, 트레이스가 한 스택"이라고 말할 수 있습니다.
+
+```bash
+docker compose ps
+curl -s http://localhost:9464/metrics | grep otelcol
+curl -s http://localhost:3000/api/health
+```
+
+```text
+Expected output:
+- collector, prometheus, loki, tempo, grafana 컨테이너가 모두 running 입니다.
+- collector metrics 에서 exporter/send 관련 카운터가 증가합니다.
+- Grafana health 가 ok 를 반환하고, trace_id 기준으로 로그와 트레이스를 오갈 수 있습니다.
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 

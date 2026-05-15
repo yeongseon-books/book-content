@@ -17,7 +17,7 @@ tags:
   - SRE
   - Reliability
 seo_description: SLI, SLO, 오류 예산으로 신뢰성을 감각이 아닌 숫자로 다루는 방법을 설명합니다
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 서비스 수준 지표와 목표 기초
@@ -46,13 +46,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 구조
 
-```mermaid
-flowchart LR
-    Req["요청"] --> SLI["서비스 수준 지표 = 정상 / 전체"]
-    SLI --> SLO["서비스 수준 목표"]
-    SLO --> Budget["오류 예산 = 1 - 목표"]
-    Budget --> Burn["소진 속도 경보"]
-```
+![한눈에 보는 구조](../../../assets/observability-101/08/08-01-concept-at-a-glance.ko.png)
+*정상 요청 비율이 서비스 수준 지표가 되고 목표와 오류 예산, 소진 속도 경보로 이어지는 구조*
 
 ## 핵심 용어
 
@@ -121,6 +116,27 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 
 월간 보고는 지표를 조직 언어로 바꾸는 자리입니다. 숫자가 있어야 다음 달의 기능 우선순위와 안정화 계획도 설득력을 갖습니다.
 
+## 오류 예산을 이렇게 운영합니다
+
+서비스 수준 목표는 문서에 써 두는 것만으로는 힘이 없습니다. 배포 속도와 안정화 우선순위를 실제로 바꾸는지 확인해야 합니다.
+
+```text
+30-day SLO target: 99.9%
+allowed downtime: 43.2m
+this month burned: 31.4m (72.7%)
+current burn rate: 2.1x
+decision: 신규 배포는 유지, 고위험 변경은 보류
+```
+
+이런 보고가 있어야 "지금은 기능을 더 내도 되는가"를 감으로 말하지 않게 됩니다. 소진 속도가 급격히 오르면 경보가 울리고, 월간 보고에서는 남은 예산이 다음 배포 판단 기준이 됩니다.
+
+```text
+Expected output:
+- 팀이 목표값, 남은 오류 예산, 최근 소진 속도를 같은 숫자로 봅니다.
+- burn-rate 경보가 빠른 사고와 느린 악화를 모두 잡습니다.
+- 월간 리뷰에서 기능 출시 속도와 안정화 우선순위를 데이터로 조정합니다.
+```
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 서비스 수준 지표는 비율이어야 합니다.
@@ -177,5 +193,6 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 - [The SRE Workbook — Implementing SLOs](https://sre.google/workbook/implementing-slos/)
 - [Multi-window burn rate](https://sre.google/workbook/alerting-on-slos/)
 - [Sloth — SLO generator](https://sloth.dev/)
+- [Google Cloud — Service monitoring SLO overview](https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring)
 
 Tags: Observability, SLO, SLI, SRE, Reliability

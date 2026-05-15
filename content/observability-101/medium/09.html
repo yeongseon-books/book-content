@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Cost and Cardinality</h1>
+<p>Observability rarely looks expensive at the beginning. A few counters, a few logs, a bit of tracing, and the bill seems harmless. Then one month later the cost curve changes shape and nobody can explain why.</p>
+<p>The answer is usually structural, not accidental: too many unique labels, too much retention, and too little sampling discipline.</p>
 <p>This is post 9 in the Observability 101 series.</p>
-<blockquote>
-<p>Observability 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does observability cost <em>suddenly</em> go up <em>10x</em>?</p>
-<blockquote>
-<p><em>Cardinality explosion, retention, and missing sampling — these three account for </em>99% of cost bombs<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What You Will Learn</h2>
 <ul>
 <li>How <em>cardinality</em> drives cost</li>
@@ -80,12 +71,8 @@
 <p><em>If you do not know the cost of measurement, </em>measurement becomes the enemy<em>.</em></p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Labels[&quot;label combinations&quot;] --&gt; Series[&quot;time series count&quot;]
-    Series --&gt; Storage[&quot;storage cost&quot;]
-    Logs[&quot;log volume&quot;] --&gt; Index[&quot;index cost&quot;]
-    Traces[&quot;trace count&quot;] --&gt; Sample[&quot;sampling&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png"><br>
+<em>Observability cost is largely determined by label combinations, log volume, and how aggressively trace volume is sampled and retained.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Cardinality</strong>: number of <em>unique label combinations</em>.</li>
@@ -132,6 +119,16 @@ thanos:      retention.resolution-raw: 30d
 <pre><code class="language-text">metric:  &lt;= X million series
 log:     &lt;= Y GB per day
 trace:   &lt;= Z traces per minute after sampling
+</code></pre>
+<h2>How to Start a Cost Review</h2>
+<p>Do not wait for the invoice. Review high-cardinality metrics directly in the monitoring system.</p>
+<pre><code class="language-promql">count({__name__=~&quot;.+&quot;})
+topk(10, count by (__name__) ({__name__=~&quot;.+&quot;}))
+</code></pre>
+<pre><code class="language-text">Expected output:
+- A small set of metrics accounts for most time series.
+- Finite labels such as `path` and `status` stay, while identifiers such as `user_id` and `request_id` get removed from metrics.
+- Teams can act before budgets are exceeded by cutting labels, retention, or sampling volume.
 </code></pre>
 <h2>What to Notice in This Code</h2>
 <ul>
