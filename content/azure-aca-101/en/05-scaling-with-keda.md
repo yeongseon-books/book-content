@@ -16,7 +16,7 @@ tags:
 - Autoscaling
 - Scale-to-Zero
 - Serverless
-last_reviewed: '2026-04-29'
+last_reviewed: '2026-05-15'
 seo_description: Master Azure Container Apps (ACA) scaling with KEDA. Learn to configure HTTP/TCP rules, custom scalers, and manage cold-start and cost policies.
 ---
 
@@ -105,9 +105,9 @@ az containerapp create \
   --image $IMAGE --ingress external --target-port 8000
 ```
 
-Without explicit rules, ACA applies a default HTTP scale rule (concurrency 10).
-`min-replicas` defaults to 0, so idle is free but the first request hits a cold start.
-Under load, it can scale up to 100 replicas — an unexpected cost ceiling.
+Without explicit rules, ACA applies a default HTTP scale rule (concurrency 10) with `min-replicas 0` and `max-replicas 10`.
+That keeps idle cost at zero but still means the first request hits a cold start.
+ACA can be configured with a much higher replica ceiling, but the default envelope is 0 to 10 replicas unless you override it.
 
 ### After (explicit HTTP rule)
 
