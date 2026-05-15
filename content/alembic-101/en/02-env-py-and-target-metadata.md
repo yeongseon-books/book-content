@@ -50,7 +50,7 @@ The point is: it runs every time. Environment variables are re-read on every com
 
 ### Diagram: where `env.py` assembles metadata and connectivity
 
-![Diagram: where `env.py` assembles metadata and connectivity](../../../assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.en.png)
+![where env.py assembles metadata and connectivity](../../../assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.en.png)
 *Every Alembic invocation passes through `env.py` to decide URL, metadata, and execution mode.*
 
 ## Core concepts

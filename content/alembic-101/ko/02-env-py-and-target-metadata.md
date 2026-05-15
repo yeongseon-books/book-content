@@ -49,7 +49,7 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 ### 다이어그램: `env.py`가 metadata와 연결을 조립하는 위치
 
-![다이어그램: `env.py`가 metadata와 연결을 조립하는 위치](../../../assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
+![env.py가 metadata와 연결을 조립하는 위치](../../../assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
 *Alembic 실행마다 `env.py`가 URL, metadata, 실행 모드를 조립하는 순서*
 
 ## 핵심 개념
