@@ -244,6 +244,7 @@ print({
 
 ## 참고 자료
 
+- [예제 저장소 — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [Perplexity of fixed-length models](https://huggingface.co/docs/transformers/perplexity)
 - [Evaluation best practices for language models](https://huggingface.co/docs/evaluate/index)
 - [LLM-as-a-judge survey](https://arxiv.org/abs/2306.05685)

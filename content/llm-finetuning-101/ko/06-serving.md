@@ -97,7 +97,7 @@ curl -X POST http://localhost:8000/generate -d '{"prompt":"Python function examp
 {"completion":"Python function example: def add(a, b): return a + b"}
 ```
 
-핵심은 세 가지입니다. 모델이 HTTP 계약 뒤에 있고, `TestClient`로 CI 검증이 가능하며, 어댑터만 바꿔 같은 인프라에서 다른 모델로 전환할 수 있다는 점입니다.
+여기서 확인할 것은 세 가지입니다. 모델이 HTTP 계약 뒤에 있는지, `TestClient`로 CI 검증이 가능한지, 그리고 어댑터만 바꿔 같은 인프라에서 다른 모델로 전환할 수 있는지입니다.
 
 ## 이 데모가 의도적으로 분리하는 것
 
@@ -246,6 +246,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 ## 참고 자료
 
+- [예제 저장소 — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
 - [Starlette TestClient reference](https://www.starlette.io/testclient/)
 - [PEFT — Multiple adapters](https://huggingface.co/docs/peft/main/en/developer_guides/lora#multiple-adapters)

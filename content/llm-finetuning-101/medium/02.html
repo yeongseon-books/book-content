@@ -102,7 +102,7 @@
 <h2>Before vs. after</h2>
 <p><strong>Before</strong> — You collected data, but some rows use <code>prompt/response</code>, others <code>q/a</code>, others jam everything into a single column. Training runs, but in evaluation answers cut off mid-sentence or repeat the same phrase.</p>
 <p><strong>After</strong> — Every sample passes through the same instruction template and becomes one string:</p>
-<pre><code>### Instruction:
+<pre><code class="language-text">### Instruction:
 Explain two ways to reverse a Python list.
 
 ### Input:
@@ -230,6 +230,7 @@ print(len(tokenized[0][&quot;input_ids&quot;]))   # 64
 <hr>
 <h2>References</h2>
 <ul>
+<li><a href="https://github.com/yeongseon-books/llm-finetuning-101">Example repository — llm-finetuning-101</a></li>
 <li><a href="https://huggingface.co/docs/datasets">Hugging Face Datasets documentation</a></li>
 <li><a href="https://arxiv.org/abs/2203.02155">Instruction tuning overview</a></li>
 <li><a href="https://github.com/tatsu-lab/stanford_alpaca#data-release">Alpaca dataset format</a></li>

@@ -23,9 +23,11 @@ seo_description: 'A fine-tuning experiment is a decision about how to slice thre
 
 # LLM Fine-tuning Primer
 
-Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact. This article frames that decision around three variables so the rest of the series has a stable mental model.
+Fine-tuning looks like a training task, but the real first step is deciding what changes, what stays fixed, and how those choices interact.
 
 This is the first post in the LLM Fine-tuning 101 series.
+
+This article frames that decision around three variables so the rest of the series has a stable mental model. If you skip this framing and jump straight into GPUs and loss curves, learning rate, dataset format, and adapter rank all start wobbling at once.
 
 ## Questions this post answers
 
@@ -60,7 +62,7 @@ one fine-tune  =  │ ② With what? (dataset)                 │
                   ├───────────────────────────────────────┤
                   │ ③ How? (optimizer)                     │
                   └───────────────────────────────────────┘
-```
+```text
 
 Full fine-tuning sets ① to "everything," which inflates ② and ③. LoRA narrows ① to "small adapters strapped onto a few linear layers," which simultaneously lightens ② (small datasets work) and ③ (tiny optimizer state). For the same dataset and learning rate, the GPU memory requirement can differ by 10× depending only on how ① is defined.
 
@@ -154,6 +156,81 @@ print(f"ratio = {lora_params / base_linear_params:.4%}")
 
 You will see a ratio around 1.5%. Try `rank` 16 and 32 to feel how the number scales — that intuition pays off when estimating training time in post 4.
 
+## Runnable verification script
+
+If you want one copy-paste check instead of reading the math in pieces, run the whole calculation as a tiny standalone script.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class TransformerShape:
+    hidden_size: int
+    intermediate_size: int
+    num_layers: int
+
+def total_linear_params(shape: TransformerShape) -> int:
+    return shape.num_layers * (
+        4 * shape.hidden_size * shape.hidden_size
+        + 2 * shape.hidden_size * shape.intermediate_size
+    )
+
+def lora_params_per_layer(hidden_size: int, intermediate_size: int, rank: int) -> int:
+    attention = 4 * rank * (hidden_size + hidden_size)
+    mlp = rank * (hidden_size + intermediate_size) + rank * (intermediate_size + hidden_size)
+    return attention + mlp
+
+shape = TransformerShape(hidden_size=768, intermediate_size=3072, num_layers=12)
+base_linear_params = total_linear_params(shape)
+
+for rank in [4, 8, 16, 32]:
+    trainable = shape.num_layers * lora_params_per_layer(
+        shape.hidden_size,
+        shape.intermediate_size,
+        rank,
+    )
+    ratio = trainable / base_linear_params
+    print(
+        f"rank={rank:<2} trainable={trainable:,} "
+        f"ratio={ratio:.4%}"
+    )
+```
+
+Run it with:
+
+```bash
+python main.py
+```
+
+**Expected output:**
+
+```text
+rank=4  trainable=884,736   ratio=0.7812%
+rank=8  trainable=1,769,472 ratio=1.5625%
+rank=16 trainable=3,538,944 ratio=3.1250%
+rank=32 trainable=7,077,888 ratio=6.2500%
+```
+
+The exact commas and spacing can vary, but the slope should not: doubling rank should almost double the trainable parameter count. That is the operational point to retain before you even open PEFT.
+
+## Failure modes to catch before post 2
+
+- **The ratio is much larger than expected** — you probably counted embeddings or every model weight instead of the linear layers LoRA actually targets.
+- **The ratio looks tiny but the base model still does not fit** — LoRA reduces trainable parameters, not the inference footprint of the frozen base model.
+- **You conclude that LoRA solves knowledge gaps** — it helps style, format, and domain behavior, but it is a poor substitute for retrieval when the missing problem is fresh facts.
+- **You compare ranks without fixing everything else** — change one variable at a time. Rank, dataset shape, and learning rate all move quality in different ways.
+
+## Decision frame: prompt, LoRA, RAG, or full fine-tuning?
+
+Use post 1 to make the first branching decision before you spend GPU time.
+
+| Situation | Default move | Why |
+| --- | --- | --- |
+| Tone, format, response style drift | LoRA | Small behavior shift with cheap trainable state |
+| Missing product facts or frequently changing data | RAG | The issue is knowledge freshness, not model behavior |
+| Narrow domain wording + stable output schema | LoRA + curated dataset | The model needs repeated examples, not a whole new base |
+| Deep capability shift across many tasks | Full fine-tuning or a stronger base model | The requested change exceeds what a small adapter usually carries |
+
 ## What to notice in this code
 
 ![LoRA's surface area per linear layer measured by the script](../../../assets/llm-finetuning-101/01/01-03-what-to-notice-in-this-code.en.png)
@@ -219,6 +296,7 @@ Post 2 covers dataset preparation. We compare three formats — instruction, cha
 
 ## References
 
+- [Example repository — llm-finetuning-101](https://github.com/yeongseon-books/llm-finetuning-101)
 - [LoRA paper](https://arxiv.org/abs/2106.09685)
 - [Hugging Face PEFT documentation](https://huggingface.co/docs/peft)
 - [QLoRA paper](https://arxiv.org/abs/2305.14314)
