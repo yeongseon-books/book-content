@@ -17,7 +17,7 @@ tags:
   - DataScience
   - Beginner
 seo_description: 고유값과 고유벡터를 변환의 축과 확대율 관점에서 정의하고 PCA나 페이지랭크 같은 실무 문제와 어떻게 연결되는지 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 고유값과 고유벡터
@@ -43,13 +43,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["Matrix A"] --> Eq["A v = lambda v"]
-    Eq --> Vec["Eigenvector v"]
-    Eq --> Lam["Eigenvalue lambda"]
-    Vec --> Use["PCA, dynamics, PageRank"]
-```
+![핵심 개념 한눈에 보기](../../../assets/linear-algebra-101/07/07-01-concept-at-a-glance.ko.png)
+
+*고유값 문제에서 고유벡터와 응용 주제로 뻗어 가는 연결 구조를 요약한 그림입니다.*
 
 `A v = lambda v`는 고유값 문제의 핵심 문장입니다. 행렬 `A`를 적용해도 방향은 `v` 그대로이고 길이만 `lambda`배 바뀝니다.
 
@@ -121,6 +117,12 @@ print("steady state:", v / np.linalg.norm(v, 1))
 ```
 
 행렬을 반복해서 곱하면 보통 가장 큰 고유값 방향이 두드러집니다. 이 감각은 페이지랭크나 반복 알고리즘을 이해할 때 중요합니다.
+
+## 작은 수치 예시로 다시 보기
+
+- `[[2, 1], [0, 3]]`의 고유값은 `2`와 `3`입니다. 변환이 특별히 보존하는 축이 둘 있다는 뜻입니다.
+- `np.allclose(A @ v, lambda * v)`가 `True`로 나오면 계산된 벡터가 실제 고유벡터라는 뜻입니다.
+- 거듭제곱 반복을 계속하면 벡터는 지배적인 방향으로 수렴합니다. 이 예제에서는 대략 `[0.5, 0.5]` 근처 방향이 드러납니다.
 
 ## 이 코드에서 먼저 볼 점
 

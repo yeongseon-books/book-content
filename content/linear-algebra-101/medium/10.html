@@ -54,38 +54,24 @@
 </head>
 <body>
 <h1>Linear Algebra in Machine Learning</h1>
-<blockquote>
-<p>Linear Algebra 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Where does the <em>linear algebra</em> you have learned actually <em>show up in ML</em>?</p>
-<blockquote>
-<p><em>Linear algebra is the common language of </em>data representation<em>, </em>model definition<em>, and </em>training algorithms<em>.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the final post in the Linear Algebra 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>If you have followed the series this far, one question remains: where does all of this actually surface in machine learning? The short answer is that it shows up almost everywhere. Data representation, model definition, loss computation, and optimization all run on top of vectors and matrices.</p>
+<p>This is the final post in the Linear Algebra 101 series. Here we will pull linear regression, neural-network layers, embeddings, gradients, and PCA into one closing picture.</p>
+<h2>Questions This Post Answers</h2>
 <ul>
-<li>The <em>normal equations</em> of <em>linear regression</em></li>
-<li><em>Matrix multiplications</em> inside <em>neural network layers</em></li>
-<li><em>Inner product / cosine</em> in <em>embedding spaces</em></li>
-<li>A 5-step capstone hands-on</li>
-<li>Five common pitfalls</li>
+<li>Where do vectors and matrices appear across an ML pipeline?</li>
+<li>How can linear regression and neural networks be read in linear-algebra terms?</li>
+<li>Why are embedding similarity and gradient updates both linear-algebra problems?</li>
+<li>How do the ideas from the earlier posts connect inside real ML systems?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>An <em>ML engineer with weak linear algebra</em> cannot <em>debug or optimize</em>. They lose the <em>eye for what's inside the model</em>.</p>
 <blockquote>
-<p><em>Every ML algorithm has linear algebra inside.</em></p>
+<p>Linear algebra is not background trivia for machine learning. It is the skeleton. Data is represented as vectors and matrices, models are defined as transformations, and training keeps adjusting that structure.</p>
 </blockquote>
+<h2>Why It Matters</h2>
+<p>Without linear-algebra intuition, the inside of a model stays opaque. Shape mismatches, strange embedding behavior, unstable gradients, and PCA outputs all feel like unrelated failures.</p>
+<p>With the right mental model, the internals get much less mysterious. A layer becomes matrix multiplication plus a nonlinearity. Embedding retrieval becomes a vector-comparison problem. Optimization becomes repeated updates to a parameter vector. That intuition survives even when the framework changes.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;Data X (matrix)&quot;] --&gt; Model[&quot;Model = matrices&quot;]
-    Model --&gt; Loss[&quot;Loss&quot;]
-    Loss --&gt; Grad[&quot;Gradient = vectors/matrices&quot;]
-    Grad --&gt; Update[&quot;Weight update&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>This diagram shows the linear-algebra backbone of an ML workflow from data matrix to gradient updates.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Design matrix X</strong>: rows = samples, columns = features.</li>
@@ -139,6 +125,12 @@ U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
 X_2d = Xc @ Vt[:2].T
 print(&quot;compressed:&quot;, X_2d.shape)
 </code></pre>
+<h2>Read One Numeric Pass</h2>
+<ul>
+<li><code>np.linalg.lstsq</code> recovers weights close to <code>[1, -2, 0.5]</code>, which is exactly the hidden linear rule used to generate the target.</li>
+<li>The hidden layer has shape <code>(100, 4)</code>, and the embedding similarity matrix has shape <code>(5, 5)</code>. Even the shapes already tell you what kind of transformation happened.</li>
+<li>Gradient descent moves <code>w</code> toward the same neighborhood as the least-squares solution, which connects optimization back to the same linear-algebra backbone.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Every layer</em> is <em>matrix product + nonlinearity</em>.</li>
@@ -193,9 +185,9 @@ print(&quot;compressed:&quot;, X_2d.shape)
 <h2>References</h2>
 <ul>
 <li><a href="https://www.deeplearningbook.org/contents/linear_algebra.html">Deep Learning Book — Linear Algebra</a></li>
-<li><a href="https://github.com/fastai/numerical-linear-algebra">fast.ai — Computational Linear Algebra</a></li>
 <li><a href="https://cs229.stanford.edu/section/cs229-linalg.pdf">Stanford CS229 — Linear Algebra Review</a></li>
-<li><a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown — Essence of Linear Algebra</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html">NumPy — linalg.lstsq</a></li>
+<li><a href="https://github.com/fastai/numerical-linear-algebra">fast.ai — Computational Linear Algebra</a></li>
 </ul>
 <p class="tags-line">Tags: LinearAlgebra, MachineLearning, DeepLearning, DataScience, Beginner</p>
 </body>

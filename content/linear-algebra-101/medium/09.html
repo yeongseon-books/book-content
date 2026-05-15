@@ -54,38 +54,24 @@
 </head>
 <body>
 <h1>PCA</h1>
-<blockquote>
-<p>Linear Algebra 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you find the <em>most important directions</em> in <em>high-dimensional data</em>?</p>
-<blockquote>
-<p><em>PCA finds the </em>axes of greatest variance<em> and </em>projects the data<em> onto them.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 9 in the Linear Algebra 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.</p>
+<p>This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.</p>
+<h2>Questions This Post Answers</h2>
 <ul>
-<li>The <em>definition and intuition</em> behind <em>PCA</em></li>
-<li>The two views: <em>SVD-based</em> and <em>covariance-based</em></li>
-<li><em>Variance preservation</em> and <em>dimensionality reduction</em></li>
-<li>A 5-step hands-on</li>
-<li>Five common pitfalls</li>
+<li>Why is PCA allowed to call some directions more important than others?</li>
+<li>How do the covariance view and the SVD view connect?</li>
+<li>Why is centering mandatory before you trust the result?</li>
+<li>How do you decide how many principal components to keep?</li>
 </ul>
-<h2>Why It Matters</h2>
-<p>Dimensionality reduction, visualization, denoising, <em>feature compression</em> — <em>PCA</em> is the most fundamental and powerful tool.</p>
 <blockquote>
-<p><em>PCA finds the directions that explain the most variance.</em></p>
+<p>PCA finds a new set of orthogonal axes that explain the data well, then keeps only the axes that carry the most of the story.</p>
 </blockquote>
+<h2>Why It Matters</h2>
+<p>Dimensionality reduction, visualization, denoising, and feature compression show up constantly in practice. PCA is often the first reliable linear-algebra tool for that job.</p>
+<p>It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;High-dim data X&quot;] --&gt; Center[&quot;Center&quot;]
-    Center --&gt; Cov[&quot;Covariance or SVD&quot;]
-    Cov --&gt; PC[&quot;Principal components&quot;]
-    PC --&gt; Proj[&quot;Project to top-k axes&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>This diagram captures the PCA flow from centering to principal components and projection onto the top axes.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>PC (principal component)</strong>: <em>orthogonal axes</em> sorted by <em>variance</em>.</li>
@@ -123,6 +109,12 @@ print(&quot;projected shape:&quot;, X_2d.shape)
 err = np.linalg.norm(Xc - X_rec) / np.linalg.norm(Xc)
 print(&quot;relative reconstruction error:&quot;, err)
 </code></pre>
+<h2>Read One Numeric Pass</h2>
+<ul>
+<li><code>X_2d.shape</code> becomes <code>(100, 2)</code>, so the representation really did shrink from three dimensions to two.</li>
+<li>The explained-variance ratio comes from squared singular values. Large components are not just bigger numbers; they are bigger shares of the story.</li>
+<li>Reconstruction error stays non-zero because one axis was dropped, but a small error means the compressed view still keeps most of the structure.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li><em>Centering</em> is <em>mandatory</em>.</li>
@@ -176,10 +168,10 @@ print(&quot;relative reconstruction error:&quot;, err)
 </ul>
 <h2>References</h2>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Wikipedia — Principal component analysis</a></li>
 <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html">scikit-learn — PCA</a></li>
-<li><a href="https://setosa.io/ev/principal-component-analysis/">Setosa — Principal Component Analysis</a></li>
 <li><a href="https://cs229.stanford.edu/notes2020spring/cs229-notes10.pdf">Stanford CS229 — Notes on PCA</a></li>
+<li><a href="https://setosa.io/ev/principal-component-analysis/">Setosa — Principal Component Analysis</a></li>
+<li><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html">NumPy — linalg.svd</a></li>
 </ul>
 <p class="tags-line">Tags: LinearAlgebra, PCA, DimensionalityReduction, DataScience, Beginner</p>
 </body>
