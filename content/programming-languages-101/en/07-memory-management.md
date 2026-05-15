@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 7
 title: Memory Management
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Stack
   - Heap
 seo_description: Watch objects appear and disappear with one line of code. Trace stack vs heap, reference counting, and garbage collection in real Python.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Memory Management
 
+Writing `del x` does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.
+
 This is post 7 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (7/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: When you write `del x`, does the object actually vanish on that line?
-
-> Memory management is the rule that decides "when is this object alive, and when is it gone?" Languages answer differently — manual free, reference counting, garbage collection — but they all solve the same problem: keep what is alive, reclaim what is dead.
-
-<!-- a-grade-intro:end -->
+In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
 
 ## What You Will Learn
 
@@ -51,16 +45,9 @@ Long-running services often slowly creep up in memory. Finding the cause means b
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["function call"] --> B["stack frame"]
-    B --> C["locals (auto freed)"]
-    A --> D["heap allocation"]
-    D --> E["refcount"]
-    D --> F["GC tracing"]
-    E -->|drops to 0| G["freed"]
-    F -->|cycle collected| G
-```
+![The lifetime flow from stack frames to heap objects, refcounts, and tracing GC](../../../assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
+
+*The lifetime flow from stack frames to heap objects, refcounts, and tracing GC*
 
 The stack is reclaimed when the function returns. The heap needs someone to collect it.
 

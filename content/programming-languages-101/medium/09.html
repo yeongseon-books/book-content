@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Static vs Dynamic Languages</h1>
+<p>People often say static typing is safer, but the moment you ask what that safety really covers, the answer gets fuzzy. The same thing happens on the other side: dynamic languages are called faster, when the real question is faster in what sense and for which stage of work.</p>
 <p>This is post 9 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (9/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is static typing really "safer" than dynamic typing — and what does that safety actually cover?</p>
-<blockquote>
-<p>Static and dynamic are not good and bad. They are a choice between <strong>checking at compile time or at run time</strong>. Both catch the same kinds of errors, but at different moments and at different costs. Neither stops every bug.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>A one-line definition of static vs dynamic</li>
@@ -80,13 +71,8 @@
 <p>A type is a promise about the shape of data. Where that promise is checked is what static vs dynamic comes down to.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;source&quot;] --&gt; B{&quot;when is type checked?&quot;}
-    B --&gt;|compile time| C[&quot;static: errors blocked before run&quot;]
-    B --&gt;|run time| D[&quot;dynamic: only known when hit&quot;]
-    C --&gt; E[&quot;TypeError breaks the build&quot;]
-    D --&gt; F[&quot;TypeError fires in production&quot;]
-</code></pre>
+<p><img alt="The same type error surfacing at build time in static typing and at runtime in dynamic typing" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png"></p>
+<p><em>The same type error surfacing at build time in static typing and at runtime in dynamic typing</em></p>
 <p>The same kind of bug — caught by static at build time, by dynamic at run time.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -174,6 +160,25 @@ ops = {
 call_all(ops, 3, 4)
 </code></pre>
 <p>Metaprogramming and plugin patterns are possible in static typing too, but usually with more boilerplate. Dynamic expressiveness shows up here.</p>
+<p><strong>Step 6 — Combine boundary validation with static checking</strong></p>
+<pre><code class="language-python"># 6_boundary_validation.py
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Item:
+    price: int
+
+def parse_item(raw: dict[str, object]) -&gt; Item:
+    price = raw.get(&quot;price&quot;)
+    if not isinstance(price, int):
+        raise ValueError(&quot;price must be int&quot;)
+    return Item(price=price)
+
+payload = {&quot;price&quot;: 10}
+item = parse_item(payload)
+print(item.price + 5)  # 15
+</code></pre>
+<p>This is the common production pattern. Runtime validation narrows uncertain external input first, then static typing takes over inside the codebase and gives you stronger refactoring support.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Static typing's guarantee ends where external input begins.</li>
@@ -232,8 +237,10 @@ call_all(ops, 3, 4)
 <ul>
 <li><a href="https://peps.python.org/pep-0484/">PEP 484 — Type Hints</a></li>
 <li><a href="https://mypy.readthedocs.io/">mypy documentation</a></li>
+<li><a href="https://docs.python.org/3/library/typing.html">Python typing documentation</a></li>
+<li><a href="https://microsoft.github.io/pyright/">Pyright documentation</a></li>
 <li><a href="https://www.typescriptlang.org/docs/handbook/2/basic-types.html">TypeScript Handbook — Basic Types</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Gradual_typing">Gradual typing (Wikipedia)</a></li>
+<li><a href="https://peps.python.org/pep-0589/">PEP 589 — TypedDict</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, Programming Languages, StaticTyping, DynamicTyping, Tradeoffs, Safety</p>
 </body>

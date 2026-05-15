@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 1
 title: What Is a Programming Language?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Abstraction
   - Expressiveness
 seo_description: A programming language is not just a way to talk to a machine. It frames how we think. Walk through the abstraction layers and four core paradigms.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # What Is a Programming Language?
 
+When you write Python every day, it is easy to treat the language as nothing more than a convenient tool. But solving the same problem in assembly changes more than line count. It changes how you break the problem apart, how you name things, and how you manage state.
+
 This is the first post in the Programming Languages 101 series.
 
-> Programming Languages 101 series (1/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do we use Python instead of assembly, and why do we keep inventing new languages even when Python already works?
-
-> A programming language is not just "syntax for telling a machine what to do." It is a frame that shapes **how we decompose a problem and how we express it**. The fact that the same problem can be solved imperatively, with objects, functionally, or declaratively shows how a language both constrains and expands our thinking. This first episode lays that foundation.
-
-<!-- a-grade-intro:end -->
+In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.
 
 ## What You Will Learn
 
@@ -50,13 +44,9 @@ If you treat a language as just a tool, every new language feels like starting o
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["High-level (Python, Java)"] --> B["Bytecode / IR"]
-    B --> C["Assembly"]
-    C --> D["Machine code (CPU)"]
-    E["Source code"] --> A
-```
+![Abstraction layers from high-level code down to machine code](../../../assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
+
+*Abstraction layers from high-level code down to machine code*
 
 The higher up, the easier for humans to read; the lower down, the closer to what the CPU executes directly. A programming language picks a layer and decides what abstractions to offer there. One line of Python can correspond to dozens of lines of assembly.
 

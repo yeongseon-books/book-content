@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 6
 title: Objects and Prototypes
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Class
   - Inheritance
 seo_description: Class-based and prototype-based OOP are two expressions of the same object idea. Trace how method lookup actually works in each model.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Objects and Prototypes
 
+Java classes and JavaScript prototypes are both called object-oriented, but their surfaces look very different. The interesting question is not whether one is “real OOP.” It is what both systems are actually trying to solve underneath.
+
 This is post 6 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (6/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: We call both Java classes and JavaScript prototypes "OOP," so why do they look so different?
-
-> An object bundles **state and the methods that operate on it**. There are two ways to make that bundle — **class-based**, where you stamp out instances from a blueprint, and **prototype-based**, where you make new objects by extending an existing one. The decisive difference is how method lookup happens.
-
-<!-- a-grade-intro:end -->
+In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
 
 ## What You Will Learn
 
@@ -51,14 +45,9 @@ Once you understand the object model precisely, "why is this method being called
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["instance"] -->|not found| B["class"]
-    B -->|not found| C["parent class"]
-    C -->|not found| D["object (root)"]
-    E["JS instance"] -->|prototype chain| F["prototype object"]
-    F --> G["Object.prototype"]
-```
+![Class-based lookup and prototype chains meeting at the same delegation idea](../../../assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
+
+*Class-based lookup and prototype chains meeting at the same delegation idea*
 
 Class-based on top, prototype-based below. Same idea: **delegate one level up when not found**.
 

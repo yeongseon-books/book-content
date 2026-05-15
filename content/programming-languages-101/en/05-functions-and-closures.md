@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 5
 title: Functions and Closures
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - FirstClass
   - Capture
 seo_description: A closure is not magic. It is what lexical scope and first-class functions naturally produce together. Walk through the mechanism end to end.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Functions and Closures
 
+A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.
+
 This is post 5 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: A function seems to "remember" the variables of the place it was defined in. How is that possible?
-
-> Closures are not magic. They are the natural result of combining **lexical scope** with **first-class functions** — the ability to treat a function as a value. When a function is created, it captures references to the bindings of the scope it grew up in. That is a closure.
-
-<!-- a-grade-intro:end -->
+In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
 
 ## What You Will Learn
 
@@ -51,13 +45,9 @@ Closures are the foundation of callbacks, decorators, partial application, and m
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["make_adder(10)"] --> B["function add"]
-    B --> C["captured: x = 10"]
-    D["caller"] --> B
-    B --> E["return x + n"]
-```
+![A closure carrying both function logic and the binding it captured](../../../assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
+
+*A closure carrying both function logic and the binding it captured*
 
 The `add` returned by `make_adder` carries the binding `x = 10` along with it. The caller cannot see inside, but `add` computes on top of that environment.
 

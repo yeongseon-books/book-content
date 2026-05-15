@@ -1,7 +1,7 @@
 ---
 episode: 8
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 인터프리터와 컴파일러가 소스 코드 번역 시점을 달리하는 방식과 실행 성능, 디버깅 경험에 미치는 영향을 비교합니다.
 series: programming-languages-101
 status: publish-ready
@@ -44,15 +44,9 @@ Python을 흔히 인터프리터 언어라고 부릅니다. 그런데 `.pyc` 파
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["source code"] --> B["lexer/parser"]
-    B --> C["AST"]
-    C --> D["bytecode"]
-    D --> E["interpreter loop (VM)"]
-    D -->|hot path detected| F["JIT compile to native"]
-    C -->|AOT compile| G["machine code"]
-```
+![소스 코드가 바이트코드와 JIT, AOT 경로로 갈라지는 실행 전략 비교](../../../assets/programming-languages-101/08/08-01-concept-at-a-glance.ko.png)
+
+*소스 코드가 바이트코드와 JIT, AOT 경로로 갈라지는 실행 전략 비교*
 
 CPython은 보통 소스 코드를 바이트코드로 만든 뒤 가상 머신이 한 명령씩 실행합니다. JVM 계열은 자주 실행되는 경로를 JIT로 네이티브 코드로 올리고, C나 Rust는 아예 미리 기계어로 컴파일합니다.
 

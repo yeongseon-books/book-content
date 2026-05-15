@@ -18,7 +18,7 @@ tags:
   - Grammar
   - 파싱
 seo_description: 렉서, 파서, AST, 평가기로 이어지는 흐름을 통해 구문 합법성과 의미 해석의 차이를 명확히 구분하고 에러의 층위를 이해하는 법을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 구문과 의미
@@ -44,14 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["Source: total = 3 + 4"] --> B["Lexer (tokens)"]
-    B --> C["Parser (grammar)"]
-    C --> D["AST"]
-    D --> E["Type check / IR"]
-    E --> F["Execute"]
-```
+![토큰화부터 실행까지 이어지는 구문과 의미의 처리 흐름](../../../assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png)
+
+*토큰화부터 실행까지 이어지는 구문과 의미의 처리 흐름*
 
 렉서는 문자를 토큰으로 자르고, 파서는 토큰 순서가 문법에 맞는지 확인한 뒤 AST를 만듭니다. 여기까지가 구문 단계입니다. 그 다음 AST를 어떻게 해석할지, 어떤 타입 규칙을 적용할지, 실행하면 무슨 결과가 나올지를 정하는 단계가 의미입니다.
 

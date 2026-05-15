@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Interpreters and Compilers</h1>
+<p>Python is often called an interpreted language, yet it still produces <code>.pyc</code> files. That tension is a useful clue. It means the common “interpreted vs compiled” contrast is too blunt to describe what actually happens at runtime.</p>
 <p>This is post 8 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Python is called an "interpreted language" — so what exactly is a <code>.pyc</code> file?</p>
-<blockquote>
-<p>Interpreters and compilers are not different species. They are two strategies that differ in <strong>when</strong> translation happens. Compilers translate ahead of time; interpreters translate as they run; JIT sits in the middle and translates only the hottest paths in real time.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat interpreters and compilers as two strategies for the same translation problem. We will use Python bytecode as the concrete example, then connect that path to AOT and JIT so the execution model feels like an engineering choice instead of a slogan.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The one-line distinction between interpreter and compiler</li>
@@ -80,14 +71,8 @@
 <p>The same algorithm can run 100x faster or slower depending on the execution model.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;source code&quot;] --&gt; B[&quot;lexer/parser&quot;]
-    B --&gt; C[&quot;AST&quot;]
-    C --&gt; D[&quot;bytecode&quot;]
-    D --&gt; E[&quot;interpreter loop (VM)&quot;]
-    D --&gt;|hot path detected| F[&quot;JIT compile to native&quot;]
-    C --&gt;|AOT compile| G[&quot;machine code&quot;]
-</code></pre>
+<p><img alt="Source code splitting into bytecode, JIT, and ahead-of-time compilation paths" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Source code splitting into bytecode, JIT, and ahead-of-time compilation paths</em></p>
 <p>Python takes <code>A → ... → D → E</code>. JVM bumps hot code to <code>F</code>. C and Rust go straight to <code>G</code>.</p>
 <h2>Key Terms</h2>
 <ul>

@@ -18,7 +18,7 @@ tags:
   - Class
   - Inheritance
 seo_description: 상태와 동작을 묶는 객체지향의 본질을 정의하고, 클래스와 프로토타입 기반 모델의 메서드 탐색 차이를 위임과 MRO 관점에서 비교 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 객체와 프로토타입
@@ -44,14 +44,9 @@ Java의 클래스도 객체지향이고, JavaScript의 프로토타입도 객체
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["instance"] -->|not found| B["class"]
-    B -->|not found| C["parent class"]
-    C -->|not found| D["object (root)"]
-    E["JS instance"] -->|prototype chain| F["prototype object"]
-    F --> G["Object.prototype"]
-```
+![클래스 기반 탐색과 프로토타입 체인이 위임으로 만나는 구조](../../../assets/programming-languages-101/06/06-01-concept-at-a-glance.ko.png)
+
+*클래스 기반 탐색과 프로토타입 체인이 위임으로 만나는 구조*
 
 위쪽은 클래스 기반 탐색, 아래쪽은 프로토타입 체인입니다. 공통 구조는 단순합니다. 현재 객체에 없으면 한 단계 위로 위임합니다. 객체 모델의 핵심은 이 위임 규칙을 어디에 두느냐입니다.
 

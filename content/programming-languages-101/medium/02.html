@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Syntax and Semantics</h1>
+<p>Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.</p>
 <p>This is post 2 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does the build pass yet the program misbehave, and why does a single missing comma break the whole compilation?</p>
-<blockquote>
-<p>Every programming language stands on two axes. <strong>Syntax</strong> answers which arrangements of characters are legal. <strong>Semantics</strong> answers what those legal arrangements actually mean. They get blurred together in everyday talk, but separating them is the moment compile errors and runtime bugs stop looking like the same animal.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The exact boundary between syntax and semantics</li>
@@ -79,13 +70,8 @@
 <p>"It builds" only means syntax passed. It does not mean the meaning matches your intent.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;Source: total = 3 + 4&quot;] --&gt; B[&quot;Lexer (tokens)&quot;]
-    B --&gt; C[&quot;Parser (grammar)&quot;]
-    C --&gt; D[&quot;AST&quot;]
-    D --&gt; E[&quot;Type check / IR&quot;]
-    E --&gt; F[&quot;Execute&quot;]
-</code></pre>
+<p><img alt="The pipeline from tokenization to execution, split into syntax and semantics" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>The pipeline from tokenization to execution, split into syntax and semantics</em></p>
 <p>The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.</p>
 <h2>Key Terms</h2>
 <ul>

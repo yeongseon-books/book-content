@@ -54,18 +54,9 @@
 </head>
 <body>
 <h1>Memory Management</h1>
+<p>Writing <code>del x</code> does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.</p>
 <p>This is post 7 in the Programming Languages 101 series.</p>
-<blockquote>
-<p>Programming Languages 101 series (7/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: When you write <code>del x</code>, does the object actually vanish on that line?</p>
-<blockquote>
-<p>Memory management is the rule that decides "when is this object alive, and when is it gone?" Languages answer differently — manual free, reference counting, garbage collection — but they all solve the same problem: keep what is alive, reclaim what is dead.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Stack vs heap in one sentence</li>
@@ -80,15 +71,8 @@
 <p>Most leaks start with one forgotten reference.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    A[&quot;function call&quot;] --&gt; B[&quot;stack frame&quot;]
-    B --&gt; C[&quot;locals (auto freed)&quot;]
-    A --&gt; D[&quot;heap allocation&quot;]
-    D --&gt; E[&quot;refcount&quot;]
-    D --&gt; F[&quot;GC tracing&quot;]
-    E --&gt;|drops to 0| G[&quot;freed&quot;]
-    F --&gt;|cycle collected| G
-</code></pre>
+<p><img alt="The lifetime flow from stack frames to heap objects, refcounts, and tracing GC" src="https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png"></p>
+<p><em>The lifetime flow from stack frames to heap objects, refcounts, and tracing GC</em></p>
 <p>The stack is reclaimed when the function returns. The heap needs someone to collect it.</p>
 <h2>Key Terms</h2>
 <ul>

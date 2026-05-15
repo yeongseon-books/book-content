@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 4
 title: Scope and Binding
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Lexical
   - Dynamic
 seo_description: Where a name resolves to which value is one of the most foundational language design decisions. Compare lexical and dynamic scope.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Scope and Binding
 
+The same variable name can refer to different values inside and outside a function, and yet the program still behaves predictably. That ordinary-looking fact rests on one of the most important rule sets in language design.
+
 This is post 4 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (4/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How does the same variable name end up referring to different values inside and outside a function, in a way that is consistent and predictable?
-
-> Every language has to decide, at every position in the source, **which value a name refers to**. The rule for that decision is called **scope**, and the act of attaching a value to a name is called **binding**. Almost every modern language picks lexical scope, but what that choice means and what it costs is easy to forget.
-
-<!-- a-grade-intro:end -->
+In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
 
 ## What You Will Learn
 
@@ -51,12 +45,9 @@ Without a grasp of scope, "why isn't this variable updating?" or "why am I sudde
 
 ## Concept at a Glance
 
-```mermaid
-flowchart TB
-    A["Built-in (print, len)"] --> B["Global (module)"]
-    B --> C["Enclosing (outer function)"]
-    C --> D["Local (inner function)"]
-```
+![The LEGB lookup path from local names out to built-ins](../../../assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
+
+*The LEGB lookup path from local names out to built-ins*
 
 Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.
 

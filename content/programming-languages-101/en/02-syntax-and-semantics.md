@@ -2,7 +2,7 @@
 series: programming-languages-101
 episode: 2
 title: Syntax and Semantics
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -18,22 +18,16 @@ tags:
   - Grammar
   - Parsing
 seo_description: Whether characters form a legal program (syntax) and what they mean (semantics) are different questions. This episode separates the two axes.
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Syntax and Semantics
 
+Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.
+
 This is post 2 in the Programming Languages 101 series.
 
-> Programming Languages 101 series (2/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why does the build pass yet the program misbehave, and why does a single missing comma break the whole compilation?
-
-> Every programming language stands on two axes. **Syntax** answers which arrangements of characters are legal. **Semantics** answers what those legal arrangements actually mean. They get blurred together in everyday talk, but separating them is the moment compile errors and runtime bugs stop looking like the same animal.
-
-<!-- a-grade-intro:end -->
+In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
 
 ## What You Will Learn
 
@@ -50,14 +44,9 @@ Reading errors quickly, picking up new language syntax fast, and understanding w
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    A["Source: total = 3 + 4"] --> B["Lexer (tokens)"]
-    B --> C["Parser (grammar)"]
-    C --> D["AST"]
-    D --> E["Type check / IR"]
-    E --> F["Execute"]
-```
+![The pipeline from tokenization to execution, split into syntax and semantics](../../../assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
+
+*The pipeline from tokenization to execution, split into syntax and semantics*
 
 The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.
 

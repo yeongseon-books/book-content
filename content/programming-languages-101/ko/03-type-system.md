@@ -18,7 +18,7 @@ tags:
   - Dynamic
   - Inference
 seo_description: 정적/동적 타입과 강한/약한 타입의 차이를 정리하고, 제네릭과 타입 추론이 안전성과 생산성을 어떻게 동시에 보장하는지 코드 예시로 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 타입 시스템
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["Source code"] --> B["Type checker"]
-    B -->|pass| C["Compile / Run"]
-    B -->|fail| D["Error before run"]
-    E["Types as docs"] --> F["IDE: completion, refactor"]
-```
+![타입 검사와 IDE 지원이 하나의 타입 정보에 기대는 구조](../../../assets/programming-languages-101/03/03-01-concept-at-a-glance.ko.png)
+
+*타입 검사와 IDE 지원이 하나의 타입 정보에 기대는 구조*
 
 타입 검사는 실행 전에 불가능한 호출을 먼저 걸러 냅니다. 동시에 IDE는 타입 정보를 바탕으로 자동 완성, 호출 추적, 안전한 이름 바꾸기 같은 기능을 제공합니다. 타입은 검사 규칙이면서 문서이자 도구 입력이기도 합니다.
 
@@ -152,6 +148,37 @@ def total_price(items: list[dict]) -> int:
 
 정확한 타입을 적으려다 보면 데이터 모델의 애매함이 먼저 드러납니다. 실제 버그는 대개 그 애매한 경계에 숨어 있습니다.
 
+### 6단계 — 경계에서는 입력을 검증하고, 안쪽에서는 구체 타입으로 좁히기
+
+```python
+# 6_boundary.py
+from typing import TypedDict
+
+
+class LineItem(TypedDict):
+    price: int
+    quantity: int
+
+
+def parse_line_item(raw: dict[str, object]) -> LineItem:
+    price = raw.get("price")
+    quantity = raw.get("quantity")
+    if not isinstance(price, int) or not isinstance(quantity, int):
+        raise ValueError("price and quantity must be integers")
+    return {"price": price, "quantity": quantity}
+
+
+def subtotal(item: LineItem) -> int:
+    return item["price"] * item["quantity"]
+
+
+payload = {"price": 1200, "quantity": 3}
+item = parse_line_item(payload)
+print(subtotal(item))  # 3600
+```
+
+정적 타입이 강해지는 지점은 보통 함수 경계 안쪽입니다. 외부 JSON이나 폼 입력처럼 동적으로 들어오는 값은 먼저 런타임 검증으로 좁히고, 그 결과를 `TypedDict`나 dataclass로 넘겨야 타입 검사기의 이점이 제대로 살아납니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 타입은 검사 규칙이면서 문서이면서 도구 입력입니다.
@@ -207,7 +234,9 @@ def total_price(items: list[dict]) -> int:
 ## 참고 자료
 
 - [Types and Programming Languages (Pierce)](https://www.cis.upenn.edu/~bcpierce/tapl/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/)
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 

@@ -18,7 +18,7 @@ tags:
   - FirstClass
   - Capture
 seo_description: 일급 함수와 렉시컬 스코프가 결합된 클로저 원리를 정리합니다. 캡처와 늦은 바인딩 함정, 데코레이터로 함수가 환경을 보존하는 법을 정리합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 함수와 클로저
@@ -44,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["make_adder(10)"] --> B["function add"]
-    B --> C["captured: x = 10"]
-    D["caller"] --> B
-    B --> E["return x + n"]
-```
+![클로저가 함수와 캡처한 바인딩을 함께 들고 가는 구조](../../../assets/programming-languages-101/05/05-01-concept-at-a-glance.ko.png)
+
+*클로저가 함수와 캡처한 바인딩을 함께 들고 가는 구조*
 
 `make_adder(10)`이 반환한 `add`는 단순한 함수 객체가 아닙니다. `x = 10`이라는 바인딩까지 함께 들고 다닙니다. 호출자는 안쪽을 볼 수 없지만, `add`는 그 환경을 바탕으로 계속 계산할 수 있습니다.
 

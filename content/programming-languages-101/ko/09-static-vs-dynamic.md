@@ -1,7 +1,7 @@
 ---
 episode: 9
 language: ko
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 정적 언어와 동적 언어가 타입 검사 시점을 달리하는 방식과 안정성, 표현력의 트레이드오프를 비교 분석합니다.
 series: programming-languages-101
 status: publish-ready
@@ -44,14 +44,9 @@ title: 정적 언어와 동적 언어
 
 ## 핵심 개념 한눈에 보기
 
-```mermaid
-flowchart LR
-    A["source"] --> B{"when is type checked?"}
-    B -->|compile time| C["static: errors blocked before run"]
-    B -->|run time| D["dynamic: only known when hit"]
-    C --> E["TypeError breaks the build"]
-    D --> F["TypeError fires in production"]
-```
+![같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교](../../../assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
+
+*같은 타입 오류가 정적 검사와 동적 검사에서 드러나는 시점 비교*
 
 같은 유형의 오류라도 어느 시점에 드러나는지가 다릅니다. 정적 타입은 실행 전에 막고, 동적 타입은 실행 흐름이 그 지점에 도달했을 때 드러냅니다.
 
@@ -171,6 +166,32 @@ call_all(ops, 3, 4)
 
 플러그인이나 메타프로그래밍 같은 영역에서는 동적 언어의 표현력이 여전히 매력적입니다. 정적 언어로도 할 수 있지만 보일러플레이트가 늘어나는 경우가 많습니다.
 
+### 6단계 — 경계 검증과 정적 검사를 함께 쓰기
+
+```python
+# 6_boundary_validation.py
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Item:
+    price: int
+
+
+def parse_item(raw: dict[str, object]) -> Item:
+    price = raw.get("price")
+    if not isinstance(price, int):
+        raise ValueError("price must be int")
+    return Item(price=price)
+
+
+payload = {"price": 10}
+item = parse_item(payload)
+print(item.price + 5)  # 15
+```
+
+실무에서는 이 조합이 가장 자주 쓰입니다. 경계에서는 런타임 검증으로 데이터를 좁히고, 그다음부터는 정적 타입으로 도구 지원과 리팩터링 안전망을 얻습니다. 정적과 동적은 보통 경쟁자가 아니라 연속된 두 단계입니다.
+
 ## 이 코드에서 먼저 볼 점
 
 - 정적 타입의 보장은 외부 입력이 들어오는 경계에서 끝나는 경우가 많습니다.
@@ -227,7 +248,9 @@ call_all(ops, 3, 4)
 
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/)
 - [mypy documentation](https://mypy.readthedocs.io/)
+- [Python typing documentation](https://docs.python.org/3/library/typing.html)
+- [Pyright documentation](https://microsoft.github.io/pyright/)
 - [TypeScript Handbook — Basic Types](https://www.typescriptlang.org/docs/handbook/2/basic-types.html)
-- [Gradual typing (Wikipedia)](https://en.wikipedia.org/wiki/Gradual_typing)
+- [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 
 Tags: Computer Science, Programming Languages, StaticTyping, DynamicTyping, Tradeoffs, Safety
