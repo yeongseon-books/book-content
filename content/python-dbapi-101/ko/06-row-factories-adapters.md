@@ -48,7 +48,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 ![Mental Model - 두 단계 변환](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental Model - 두 단계 변환*
-```'
+
 ---
 
 # Row factories and type adapters (sqlite3, PEP 249)
@@ -97,7 +97,6 @@ This post unifies row factories and type adapters so your repository layer survi
 ![Mental model - two-step conversion](../../../assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
 
 *Mental model - two-step conversion*
-```
 
 - **adapter / converter** = **단일 값**의 타입 변환 (Python ↔ SQLite storage class).
 - **row_factory** = **행 전체**의 shape 변환 (tuple → 원하는 형태).
@@ -115,8 +114,6 @@ This post unifies row factories and type adapters so your repository layer survi
 
 가장 가벼운 row factory. tuple처럼 인덱스로도, dict처럼 이름으로도 접근됩니다.
 
-```
-
 - **adapter / converter** = type conversion of a **single value** (Python ↔ SQLite storage class).
 - **row_factory** = shape conversion of an **entire row** (tuple → desired form).
 
@@ -133,15 +130,11 @@ Separating these two concerns naturally separates where they live in code.
 
 The lightest row factory. Accessible by index like a tuple AND by name like a dict.
 
-```
-
 dict는 아니지만 80% 케이스에 충분합니다.
 
 ### dict factory
 
 진짜 dict가 필요하면:
-
-```
 
 It is not a real dict, but it covers ~80% of cases.
 
@@ -149,39 +142,25 @@ It is not a real dict, but it covers ~80% of cases.
 
 For a true dict:
 
-```
-
 ### dataclass factory
 
 타입 안전성과 IDE 자동완성을 원하면:
-
-```
 
 ### dataclass factory
 
 For type safety and IDE autocomplete:
 
-```
-
 ### Pydantic factory
 
 검증과 직렬화가 함께 필요하면:
-
-```
 
 ### Pydantic factory
 
 For combined validation and serialisation:
 
-```
-
 ### `detect_types`
 
-```
-
 ### `detect_types`
-
-```
 
 - `PARSE_DECLTYPES` — `CREATE TABLE`의 컬럼 declared type(예: `created_at TIMESTAMP`)을 보고 등록된 converter 호출.
 - `PARSE_COLNAMES` — `SELECT created_at AS "ts [timestamp]"`처럼 컬럼 별칭에 `[type-name]`을 붙여 강제 변환.
@@ -192,8 +171,6 @@ For combined validation and serialisation:
 
 ### Before — raw tuple + 컬럼 인덱스
 
-```
-
 - `PARSE_DECLTYPES` — looks at the column's declared type from `CREATE TABLE` (e.g., `created_at TIMESTAMP`) and dispatches the registered converter.
 - `PARSE_COLNAMES` — forces conversion via aliases like `SELECT created_at AS "ts [timestamp]"`.
 
@@ -203,19 +180,13 @@ For combined validation and serialisation:
 
 ### Before — raw tuple + column index
 
-```
-
 `SELECT` 컬럼 순서가 바뀌면 가격이 갑자기 name으로 곱해집니다.
 
 ### After — Pydantic + Decimal converter
 
-```
-
 If the SELECT column order changes, you suddenly multiply the name string.
 
 ### After — Pydantic + Decimal converter
-
-```
 
 컬럼 순서가 바뀌어도 안전하고, 가격은 `Decimal`로 정확합니다.
 
@@ -228,8 +199,6 @@ If the SELECT column order changes, you suddenly multiply the name string.
 *단계별 실습*
 ### 단계 1 — `sqlite3.Row`
 
-```
-
 Order-independent and precise.
 
 ---
@@ -241,51 +210,29 @@ Order-independent and precise.
 *Step-by-step walkthrough*
 ### Step 1 — `sqlite3.Row`
 
-```
-
 ### 단계 2 — `Decimal` adapter/converter
-
-```
 
 ### Step 2 — `Decimal` adapter / converter
 
-```
-
 ### 단계 3 — `Enum` adapter
-
-```
 
 ### Step 3 — `Enum` adapter
 
-```
-
 ### 단계 4 — JSON adapter
 
-```
-
 ### Step 4 — JSON adapter
-
-```
 
 ### 단계 5 — `[type-name]` 컬럼 별칭
 
 declared type을 못 쓰는 view나 임시 컬럼에서는 SELECT 별칭으로 강제할 수 있습니다.
 
-```
-
 ### Step 5 — `[type-name]` column aliases
 
 For views or computed columns where declared type is unavailable, force conversion via aliases.
 
-```
-
 ### 단계 6 — Pydantic + adapter 통합
 
-```
-
 ### Step 6 — Pydantic + adapters together
-
-```
 
 이제 repository는 `Order` 객체만 다루며, SQLite의 storage class는 외부에 새지 않습니다.
 
@@ -308,8 +255,6 @@ For views or computed columns where declared type is unavailable, force conversi
 
 ### Repository 레이어 패턴
 
-```
-
 The repository now deals only in `Order` objects; SQLite storage classes never leak outward.
 
 ---
@@ -331,8 +276,6 @@ The repository now deals only in `Order` objects; SQLite storage classes never l
 
 ### Repository layer pattern
 
-```
-
 호출자는 dict 키 오타나 컬럼 순서를 신경 쓸 필요가 없습니다.
 
 ### 마이그레이션과 타입
@@ -343,8 +286,6 @@ The repository now deals only in `Order` objects; SQLite storage classes never l
 
 view나 join 결과는 declared type이 사라집니다. 별칭에 `[type-name]`을 붙이는 패턴을 운영에서 자주 씁니다.
 
-```
-
 Callers no longer need to remember dict keys or column order.
 
 ### Migration and types
@@ -354,8 +295,6 @@ Adopting `Decimal` requires migrating `REAL` columns to `TEXT`. Wrap it in `BEGI
 ### Handling views with column aliases
 
 Views and join results lose declared types. The `[type-name]` alias pattern is widely used in production.
-
-```
 
 ### 성능 vs 안전 균형
 
