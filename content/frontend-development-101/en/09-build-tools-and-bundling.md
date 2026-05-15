@@ -22,17 +22,9 @@ last_reviewed: '2026-05-04'
 
 # Build Tools and Bundling
 
-This is post 9 in the Frontend Development 101 series.
+During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.
 
-> Frontend Development 101 series (9/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do the *hundreds* of files we write turn into the *one or two* files the browser actually downloads?
-
-> Build tools *collect modules, compress them, and split them*. The shape of that output decides the *user experience*.
-
-<!-- a-grade-intro:end -->
+This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
 
 ## What You Will Learn
 
@@ -50,13 +42,9 @@ Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of 
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Src["src/*.{js,ts,jsx}"] --> Resolver["Module resolver"]
-    Resolver --> Trans["Transformer (Babel/SWC/esbuild)"]
-    Trans --> Bundle["Bundler"]
-    Bundle --> Out["dist/*.js + assets"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
+
+*How source files move through resolve, transform, bundle, and output stages*
 
 ## Key Terms
 
@@ -133,6 +121,16 @@ VITE_API_URL=https://api.example.com
 const url = import.meta.env.VITE_API_URL;
 ```
 
+## Verification
+
+- Run `npm run build` and confirm that `dist/assets` contains hashed output files rather than raw source names.
+- Run the bundle analyzer and identify the largest module so you have a concrete optimization target before tuning anything else.
+
+## If It Fails, Check This First
+
+- If `import.meta.env` is undefined, confirm the `VITE_` prefix and the location of `.env.production`.
+- If the bundle is unexpectedly large, inspect full-library imports, large images, and source-map exposure before chasing smaller details.
+
 ## What to Notice in This Code
 
 - The dev server serves *ESM directly*, so *startup is fast*.
@@ -187,14 +185,19 @@ Build tools decide *how fast the first screen the user sees becomes interactive*
 - [Forms and Validation](./07-forms-and-validation.md)
 - [Styling and Design Systems](./08-styling-and-design-system.md)
 - **Build Tools and Bundling (current)**
+
 - Building a Small Frontend App (upcoming)
 <!-- toc:end -->
 
 ## References
 
-- [Vite docs](https://vitejs.dev/)
-- [esbuild docs](https://esbuild.github.io/)
-- [web.dev: Reduce JavaScript payloads](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+### Official Docs
+- [Vite guide](https://vite.dev/guide/)
+- [esbuild documentation](https://esbuild.github.io/)
+- [web.dev: Tree shaking and code splitting](https://web.dev/reduce-javascript-payloads-with-tree-shaking/)
+
+### Verification and Further Reading
 - [Bundlephobia](https://bundlephobia.com/)
+- [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer)
 
 Tags: Frontend, Build, Vite, Bundling, Performance

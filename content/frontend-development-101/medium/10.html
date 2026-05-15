@@ -54,18 +54,8 @@
 </head>
 <body>
 <h1>Building a Small Frontend App</h1>
-<p>This is the final post in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we tie all the <em>pieces</em> we have learned into <em>one living app</em>?</p>
-<blockquote>
-<p>Building one small app <em>from scratch to deployment</em> turns the concepts in a book into <em>tools in your hand</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Knowing each concept in isolation is very different from tying those concepts into one app that someone can actually open and use. Routing, forms, API calls, styling, and build steps all look manageable on their own. The challenge appears when you have to decide where files live, how pieces connect, and what the deployment path looks like end to end.</p>
+<p>This is the final post in the Frontend Development 101 series. Here we assemble a small notes app that pulls together the earlier chapters. The goal is not perfection. The goal is to turn separate concepts into one living product flow and ship it all the way to a public URL.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>How to pick a <em>folder structure</em> for a small project</li>
@@ -79,14 +69,8 @@
 <p>Polish does not have to be high. The experience of <em>shipping all the way to deployment</em> is <em>more powerful than any book</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User&quot;] --&gt; Page[&quot;Pages (routing)&quot;]
-    Page --&gt; Comp[&quot;Components + state&quot;]
-    Comp --&gt; API[&quot;API calls&quot;]
-    API --&gt; Backend[&quot;Backend / external API&quot;]
-    Comp --&gt; Style[&quot;Styles + design system&quot;]
-    Build[&quot;Build (Vite)&quot;] --&gt; Deploy[&quot;Deploy (Netlify/Vercel)&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>The end-to-end picture that ties pages, components, APIs, styles, build, and deployment into one app</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Project structure</strong>: a <em>folder layout split by role</em>.</li>
@@ -193,6 +177,16 @@ npm install -g netlify-cli
 netlify deploy --dir=dist --prod
 </code></pre>
 <p>When the deploy finishes you have a <em>public URL</em>. Share that URL <em>with the next person</em>.</p>
+<h2>Verification</h2>
+<ul>
+<li>Create a note, return to the list, and confirm that routing, form handling, and API updates all work together as one product flow.</li>
+<li>Run <code>npm run build</code>, deploy the result, and verify that the public URL still supports refresh and client-side routing.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If the deployed app cannot reach the API, check <code>VITE_API_URL</code>, CORS configuration, and the visible fetch error path first.</li>
+<li>If another person cannot rerun the project quickly, treat the README and <code>.env.example</code> as broken parts of the product, not as optional extras.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The folder layout is split <em>by role</em>, so you instantly know <em>where to edit</em>.</li>
@@ -254,12 +248,13 @@ netlify deploy --dir=dist --prod
 <li><strong>Building a Small Frontend App (current)</strong></li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://vitejs.dev/">Vite docs</a></li>
-<li><a href="https://reactrouter.com/">React Router docs</a></li>
-<li><a href="https://docs.netlify.com/">Netlify docs</a></li>
-<li><a href="https://vercel.com/docs">Vercel docs</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://vite.dev/guide/">Vite guide</a><br>
+- <a href="https://reactrouter.com/home">React Router documentation</a><br>
+- <a href="https://docs.netlify.com/site-deploys/create-deploys/">Netlify deploy docs</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://vercel.com/docs/frameworks">Vercel framework guides</a><br>
+- <a href="https://react.dev/learn/start-a-new-react-project">Create React App alternatives on react.dev</a></p>
 <p class="tags-line">Tags: Frontend, Project, Capstone, React, Web</p>
 </body>
 </html>

@@ -54,22 +54,16 @@
 </head>
 <body>
 <h1>JavaScript Basics</h1>
-<p>This is post 3 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (3/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: <em>Where</em> should you start with JavaScript to learn it efficiently?</p>
-<blockquote>
-<p>Don't memorize every feature. <em>Variables, functions, arrays/objects, DOM, events</em> — those five cover <em>80%</em> of JavaScript.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>JavaScript feels endless when you first meet it. There are many array methods, multiple ways to declare functions, and a long list of DOM APIs that all look important. Many beginners lose momentum because they try to memorize the whole language before building anything real.</p>
+<p>This is post 3 in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.</p>
 <h2>What You Will Learn</h2>
 <ul>
-<li><code>let</code>/<code>const</code> and <em>immutable thinking</em></li>
-<li>Functions, arrow functions, and a <em>minimal grasp</em> of closures</li>
+<li>
+<p><code>let</code>/<code>const</code> and <em>immutable thinking</em></p>
+</li>
+<li>
+<p>Functions, arrow functions, and a <em>minimal grasp</em> of closures</p>
+</li>
 <li>Array/object methods (<code>map</code>, <code>filter</code>, <code>reduce</code>)</li>
 <li>Reading and updating the DOM</li>
 <li><em>The standard pattern</em> for event listeners</li>
@@ -80,12 +74,8 @@
 <p>Good JavaScript is a sum of <em>small, separated functions</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Var[&quot;let/const&quot;] --&gt; Fn[&quot;Functions&quot;]
-    Fn --&gt; Coll[&quot;Array/Object methods&quot;]
-    Coll --&gt; DOM[&quot;DOM&quot;]
-    DOM --&gt; Evt[&quot;Events&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png"></p>
+<p><em>The core JavaScript flow from variables and functions to DOM updates and events</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong><code>const</code></strong>: cannot be reassigned. Use it <em>by default</em>.</li>
@@ -137,6 +127,16 @@ const doubled = arr.map(n =&gt; n * 2);
   }
 });
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Confirm that clicking Add appends an item without a reload and that clicking an item removes it through event delegation.</li>
+<li>Use DevTools Console to verify that the <code>todos</code> array stays in sync with what is rendered in the DOM.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If the UI does not update, check whether <code>render()</code> is called after each state change and whether <code>getElementById()</code> returned <code>null</code>.</li>
+<li>If deletion removes the wrong item, inspect the event target and confirm that the index calculation still matches the current DOM structure.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>State (<code>todos</code>) and rendering (<code>render</code>) are <em>separated</em>.</li>
@@ -180,8 +180,12 @@ const doubled = arr.map(n =&gt; n * 2);
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/02-html-and-css-basics.md">HTML and CSS Basics</a></li>
-<li><strong>JavaScript Basics (current)</strong></li>
-<li>Components and State (upcoming)</li>
+<li>
+<p><strong>JavaScript Basics (current)</strong></p>
+</li>
+<li>
+<p>Components and State (upcoming)</p>
+</li>
 <li>Routing and Pages (upcoming)</li>
 <li>API Calls and Async (upcoming)</li>
 <li>Forms and Validation (upcoming)</li>
@@ -190,12 +194,13 @@ const doubled = arr.map(n =&gt; n * 2);
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide">MDN JavaScript Guide</a></li>
-<li><a href="https://javascript.info/">JavaScript.info</a></li>
-<li><a href="https://eloquentjavascript.net/">Eloquent JavaScript</a></li>
-<li><a href="https://github.com/tc39/proposals">TC39 Proposals</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide">MDN: JavaScript guide</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction">MDN: Introduction to the DOM</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling">MDN: Event bubbling</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://javascript.info/">JavaScript.info</a><br>
+- <a href="https://github.com/tc39/proposals">TC39 proposals</a></p>
 <p class="tags-line">Tags: Frontend, JavaScript, DOM, Web, Beginner</p>
 </body>
 </html>

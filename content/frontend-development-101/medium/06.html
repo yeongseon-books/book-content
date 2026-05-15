@@ -54,23 +54,17 @@
 </head>
 <body>
 <h1>API Calls and Async</h1>
-<p>This is post 6 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What do you show the user <em>during the brief moment</em> a server fetch is in flight?</p>
-<blockquote>
-<p>Async code requires you to keep three states in mind at all times: <em>loading, success, failure</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing <code>fetch</code>. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.</p>
+<p>This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>minimum usage</em> of <code>fetch</code> and <code>async/await</code></li>
-<li>Handling loading/error states <em>explicitly</em></li>
-<li>Cancellation and race conditions</li>
+<li>
+<p>Handling loading/error states <em>explicitly</em></p>
+</li>
+<li>
+<p>Cancellation and race conditions</p>
+</li>
 <li>Caching and stale-while-revalidate</li>
 <li><em>Why React Query / SWR</em> became standard</li>
 </ul>
@@ -80,12 +74,8 @@
 <p>Good async code <em>assumes the worst network</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Idle[&quot;idle&quot;] --&gt; Loading[&quot;loading&quot;]
-    Loading --&gt; Success[&quot;success&quot;]
-    Loading --&gt; Error[&quot;error&quot;]
-    Error --&gt; Loading
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png"></p>
+<p><em>The async UI state machine moving between idle, loading, success, and error</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong><code>fetch</code></strong>: the browser-built-in HTTP client.</li>
@@ -158,6 +148,16 @@ function Users() {
   return &lt;ul&gt;{data.map(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;;
 }
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>With a working API, verify that the UI shows loading first and then renders the user list; with a broken endpoint, verify that a user-facing error appears.</li>
+<li>Switch DevTools to Slow 3G and confirm that requests can be canceled cleanly when the component unmounts or the screen changes.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If errors disappear into the console, make sure <code>res.ok</code> is checked and the <code>catch</code> path updates visible UI state.</li>
+<li>If older responses overwrite newer ones, inspect your <code>AbortController</code> cleanup or the logic that decides which response is still current.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The state is <em>explicit</em>: <code>idle/loading/success/error</code>.</li>
@@ -204,19 +204,24 @@ function Users() {
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/03-javascript-basics.md">JavaScript Basics</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/04-components-and-state.md">Components and State</a></li>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/05-routing-and-pages.md">Routing and Pages</a></li>
-<li><strong>API Calls and Async (current)</strong></li>
-<li>Forms and Validation (upcoming)</li>
+<li>
+<p><strong>API Calls and Async (current)</strong></p>
+</li>
+<li>
+<p>Forms and Validation (upcoming)</p>
+</li>
 <li>Styling and Design Systems (upcoming)</li>
 <li>Build Tools and Bundling (upcoming)</li>
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">MDN Fetch API</a></li>
-<li><a href="https://tanstack.com/query/latest">TanStack Query</a></li>
-<li><a href="https://swr.vercel.app/">SWR docs</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController">MDN AbortController</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">MDN: Fetch API</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController">MDN: AbortController</a><br>
+- <a href="https://tanstack.com/query/latest">TanStack Query docs</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://swr.vercel.app/">SWR documentation</a><br>
+- <a href="https://web.dev/articles/fetch-api-error-handling">web.dev: Fetch API error handling</a></p>
 <p class="tags-line">Tags: Frontend, API, Async, Fetch, JavaScript</p>
 </body>
 </html>

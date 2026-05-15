@@ -54,24 +54,18 @@
 </head>
 <body>
 <h1>HTML and CSS Basics</h1>
-<p>This is post 2 in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you keep the <em>skeleton</em> and the <em>clothes</em> of a page cleanly apart?</p>
-<blockquote>
-<p>HTML carries <em>meaning</em>. CSS carries <em>appearance</em>. Future-you will <em>thank you</em> for keeping that line clear.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>One lesson shows up quickly when you study frontend work: building a screen fast and building a screen that survives real product growth are not the same thing. You can ship something quickly with random tags and one-off styles, but maintenance gets expensive as soon as the layout changes, accessibility matters, or another teammate joins the codebase.</p>
+<p>This is post 2 in the Frontend Development 101 series. Here we treat HTML as the page skeleton and CSS as the rule system layered on top of that skeleton. Keeping meaning in HTML and appearance in CSS is what makes layout, accessibility, and SEO improve together instead of fighting each other later.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>Building <em>meaningful structure</em> with semantic HTML</li>
 <li>The CSS box model</li>
-<li><em>Where Flexbox shines and where Grid shines</em></li>
-<li>A <em>minimal pattern</em> for responsive design</li>
+<li>
+<p><em>Where Flexbox shines and where Grid shines</em></p>
+</li>
+<li>
+<p>A <em>minimal pattern</em> for responsive design</p>
+</li>
 <li>The <em>starting point</em> for accessibility</li>
 </ul>
 <h2>Why It Matters</h2>
@@ -80,12 +74,8 @@
 <p>Semantic HTML is code that <em>search engines and screen readers can read together</em>.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    HTML[&quot;Semantic HTML&quot;] --&gt; Box[&quot;Box model&quot;]
-    Box --&gt; Layout[&quot;Flexbox/Grid&quot;]
-    Layout --&gt; Resp[&quot;Responsive&quot;]
-    Resp --&gt; A11y[&quot;Accessibility&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>The learning sequence from semantic structure to layout, responsiveness, and accessibility</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Semantic HTML</strong>: tags like <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;article&gt;</code> that <em>carry meaning</em>.</li>
@@ -143,6 +133,16 @@
   main { grid-template-columns: 1fr; }
 }
 </code></pre>
+<h2>Verification</h2>
+<ul>
+<li>Resize the browser under 600px and verify that the card layout collapses to a single column.</li>
+<li>Inspect the DOM in DevTools Elements to confirm that semantic tags such as <code>&lt;main&gt;</code> and <code>&lt;article&gt;</code> describe the page structure you intended.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If the layout does not change, verify that the media query condition and selector names match the actual HTML.</li>
+<li>If spacing feels wrong, inspect <code>gap</code>, <code>padding</code>, and <code>margin</code> in the box model instead of guessing from the visual result.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Use <em>role-based class names</em> like <code>card</code>, not <code>red</code>.</li>
@@ -185,8 +185,12 @@
 <p>HTML is <em>the skeleton</em>; CSS is <em>the clothes</em>. With the two clearly separated, behavior — JavaScript — slots in cleanly. We tackle JavaScript fundamentals next.</p>
 <ul>
 <li><a href="https://github.com/yeongseon-books/book-content/blob/6cdcb0e/content/frontend-development-101/en/01-what-is-frontend-development.md">What Is Frontend Development?</a></li>
-<li><strong>HTML and CSS Basics (current)</strong></li>
-<li>JavaScript Basics (upcoming)</li>
+<li>
+<p><strong>HTML and CSS Basics (current)</strong></p>
+</li>
+<li>
+<p>JavaScript Basics (upcoming)</p>
+</li>
 <li>Components and State (upcoming)</li>
 <li>Routing and Pages (upcoming)</li>
 <li>API Calls and Async (upcoming)</li>
@@ -196,12 +200,14 @@
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">MDN HTML elements</a></li>
-<li><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/">CSS Tricks Flexbox guide</a></li>
-<li><a href="https://css-tricks.com/snippets/css/complete-guide-grid/">CSS Tricks Grid guide</a></li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Learn/Accessibility/WAI-ARIA_basics">WAI ARIA basics</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">MDN: HTML elements reference</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model">MDN: CSS box model</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox">MDN: Basic concepts of flexbox</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout">MDN: CSS grid layout</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://web.dev/articles/responsive-web-design-basics">web.dev: Responsive web design basics</a><br>
+- <a href="https://www.w3.org/WAI/tutorials/images/">WAI: Images and alt decisions</a></p>
 <p class="tags-line">Tags: Frontend, HTML, CSS, Web, Beginner</p>
 </body>
 </html>

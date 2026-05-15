@@ -22,11 +22,9 @@ last_reviewed: '2026-05-12'
 
 # 컴포넌트와 상태
 
-이 글은 Frontend Development 101 시리즈의 네 번째 글입니다.
+화면이 작을 때는 JavaScript 몇 줄과 DOM 조작만으로도 충분합니다. 하지만 화면이 커지고 기능이 늘어나면 금방 한 파일에 모든 로직이 몰립니다. 그 순간부터는 코드를 실행하는 것보다 읽는 일이 더 힘들어집니다.
 
-화면이 작을 때는 JavaScript 몇 줄과 DOM 조작만으로도 충분합니다. 하지만 화면이 커지고 기능이 늘어나면 금방 한 파일에 모든 로직이 몰리기 시작합니다. 그 순간부터는 코드를 실행하는 것보다 읽는 일이 더 힘들어집니다.
-
-이 글에서는 이 복잡도를 줄이는 가장 기본적인 모델인 컴포넌트와 상태를 설명하겠습니다. 한 가지 관점이 중요합니다. 화면은 작은 함수 단위로 나누고, 각 함수는 자신에게 들어오는 값과 자신이 들고 있는 상태만 책임져야 한다는 점입니다.
+이 글은 Frontend Development 101 시리즈의 네 번째 글입니다. 여기서는 이 복잡도를 줄이는 가장 기본적인 모델인 컴포넌트와 상태를 설명합니다. 화면은 작은 함수 단위로 나누고, 각 함수는 자신에게 들어오는 값과 자신이 들고 있는 상태만 책임져야 구조가 오래 버팁니다.
 
 ## 이 글에서 다룰 문제
 
@@ -46,13 +44,9 @@ last_reviewed: '2026-05-12'
 
 ## 개념 한눈에 보기
 
-```mermaid
-flowchart TD
-    App["App (state)"] --> Header["Header"]
-    App --> List["List (props)"]
-    List --> Item["Item (props)"]
-    Item -->|event| App
-```
+![개념 한눈에 보기](../../../assets/frontend-development-101/04/04-01-diagram.ko.png)
+
+*상태는 위에서 아래로 흐르고 이벤트는 아래에서 위로 올라오는 컴포넌트 구조*
 
 상태는 위에서 아래로 흐르고, 이벤트는 아래에서 위로 올라옵니다. 이 단순한 규칙 하나만 제대로 잡아도 복잡한 화면의 절반은 정리됩니다.
 
@@ -142,6 +136,16 @@ function App() {
 
 이 예제는 작지만 중요한 차이를 보여 줍니다. `props`는 외부에서 들어오고, `state`는 내부에서 바뀌며, 같은 컴포넌트도 여러 인스턴스로 독립 동작합니다. 그리고 여러 조각이 같은 상태를 봐야 할 때는 상태를 공통 부모로 끌어올립니다.
 
+## 검증 포인트
+
+- 카운터 두 개를 렌더링했을 때 각 버튼이 서로 독립적으로 증가하는지 확인합니다.
+- 상태 끌어올리기 버전에서는 공통 부모가 가진 값이 화면 여러 곳에서 동시에 갱신되는지 확인합니다.
+
+## 문제가 생기면 먼저 볼 것
+
+- 상태가 안 바뀌면 `useState` import와 `setCount` 호출 위치를 먼저 확인합니다.
+- 부모-자식 동기화가 꼬이면 상태를 어디에 두었는지, props 이름이 일치하는지 다시 봅니다.
+
 ## 이 코드에서 주목할 점
 
 - `props`는 입력이고 `state`는 내부 기억입니다.
@@ -195,6 +199,7 @@ function App() {
 - [HTML과 CSS 기본](./02-html-and-css-basics.md)
 - [JavaScript 기본](./03-javascript-basics.md)
 - **컴포넌트와 상태 (현재 글)**
+
 - 라우팅과 페이지 (예정)
 - API 호출과 비동기 (예정)
 - 폼과 유효성 검사 (예정)
@@ -205,9 +210,13 @@ function App() {
 
 ## 참고 자료
 
-- [React docs](https://react.dev/)
-- [Thinking in React](https://react.dev/learn/thinking-in-react)
-- [Vue Components](https://vuejs.org/guide/essentials/component-basics.html)
+### 공식 문서
+- [React: Thinking in React](https://react.dev/learn/thinking-in-react)
+- [React: Sharing state between components](https://react.dev/learn/sharing-state-between-components)
+- [Vue: Component basics](https://vuejs.org/guide/essentials/component-basics.html)
+
+### 확인용 자료
 - [Svelte tutorial](https://svelte.dev/tutorial)
+- [React: State as a snapshot](https://react.dev/learn/state-as-a-snapshot)
 
 Tags: Frontend, React, Components, State, JavaScript

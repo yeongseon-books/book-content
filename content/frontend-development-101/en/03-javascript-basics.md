@@ -22,21 +22,14 @@ last_reviewed: '2026-05-04'
 
 # JavaScript Basics
 
-This is post 3 in the Frontend Development 101 series.
+JavaScript feels endless when you first meet it. There are many array methods, multiple ways to declare functions, and a long list of DOM APIs that all look important. Many beginners lose momentum because they try to memorize the whole language before building anything real.
 
-> Frontend Development 101 series (3/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: *Where* should you start with JavaScript to learn it efficiently?
-
-> Don't memorize every feature. *Variables, functions, arrays/objects, DOM, events* — those five cover *80%* of JavaScript.
-
-<!-- a-grade-intro:end -->
+This is post 3 in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.
 
 ## What You Will Learn
 
 - `let`/`const` and *immutable thinking*
+
 - Functions, arrow functions, and a *minimal grasp* of closures
 - Array/object methods (`map`, `filter`, `reduce`)
 - Reading and updating the DOM
@@ -50,13 +43,9 @@ JavaScript stays the same *across frameworks*. Inside React components, inside V
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Var["let/const"] --> Fn["Functions"]
-    Fn --> Coll["Array/Object methods"]
-    Coll --> DOM["DOM"]
-    DOM --> Evt["Events"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)
+
+*The core JavaScript flow from variables and functions to DOM updates and events*
 
 ## Key Terms
 
@@ -132,6 +121,16 @@ document.getElementById("list").addEventListener("click", (e) => {
 });
 ```
 
+## Verification
+
+- Confirm that clicking Add appends an item without a reload and that clicking an item removes it through event delegation.
+- Use DevTools Console to verify that the `todos` array stays in sync with what is rendered in the DOM.
+
+## If It Fails, Check This First
+
+- If the UI does not update, check whether `render()` is called after each state change and whether `getElementById()` returned `null`.
+- If deletion removes the wrong item, inspect the event target and confirm that the index calculation still matches the current DOM structure.
+
 ## What to Notice in This Code
 
 - State (`todos`) and rendering (`render`) are *separated*.
@@ -180,6 +179,7 @@ Plain JavaScript can build small apps on its own. As the screen grows, you need 
 - [What Is Frontend Development?](./01-what-is-frontend-development.md)
 - [HTML and CSS Basics](./02-html-and-css-basics.md)
 - **JavaScript Basics (current)**
+
 - Components and State (upcoming)
 - Routing and Pages (upcoming)
 - API Calls and Async (upcoming)
@@ -191,9 +191,13 @@ Plain JavaScript can build small apps on its own. As the screen grows, you need 
 
 ## References
 
-- [MDN JavaScript Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide)
+### Official Docs
+- [MDN: JavaScript guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide)
+- [MDN: Introduction to the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)
+- [MDN: Event bubbling](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Event_bubbling)
+
+### Verification and Further Reading
 - [JavaScript.info](https://javascript.info/)
-- [Eloquent JavaScript](https://eloquentjavascript.net/)
-- [TC39 Proposals](https://github.com/tc39/proposals)
+- [TC39 proposals](https://github.com/tc39/proposals)
 
 Tags: Frontend, JavaScript, DOM, Web, Beginner

@@ -54,25 +54,19 @@
 </head>
 <body>
 <h1>What Is Frontend Development?</h1>
-<p>This is the first post in the Frontend Development 101 series.</p>
-<blockquote>
-<p>Frontend Development 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Where is <em>everything the user can see</em> actually built?</p>
-<blockquote>
-<p>The frontend is <em>a tiny operating system that runs inside the browser</em>. HTML, CSS, and JavaScript are the <em>languages</em> of that OS.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
+<p>Most people enter frontend development through the visual door. They see buttons, colors, and layouts, so the work looks like "making screens pretty." That is part of the job, but it is not the whole job. In production, frontend work also includes understanding how the browser renders, how user input becomes state changes, and where the boundary with the backend actually lives.</p>
+<p>This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.</p>
 <h2>What You Will Learn</h2>
 <ul>
 <li>The <em>clear boundary</em> between frontend and backend</li>
 <li><em>How a browser draws</em> a page</li>
 <li>The <em>distinct roles</em> of HTML, CSS, and JavaScript</li>
-<li>A bird's-eye view of <em>modern frontend tooling</em></li>
-<li>A learning roadmap</li>
+<li>
+<p>A bird's-eye view of <em>modern frontend tooling</em></p>
+</li>
+<li>
+<p>A learning roadmap</p>
+</li>
 </ul>
 <h2>Why It Matters</h2>
 <p><em>Everything users feel</em> passes through the frontend. A perfect backend with a slow frontend is <em>judged as a slow product</em>. The frontend is the <em>first and last impression</em> of your product.</p>
@@ -80,13 +74,8 @@
 <p>A great frontend is <em>invisible</em>: users just <em>use it</em> without thinking.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    User[&quot;User&quot;] --&gt; Browser[&quot;Browser&quot;]
-    Browser --&gt; HTML[&quot;HTML (structure)&quot;]
-    Browser --&gt; CSS[&quot;CSS (style)&quot;]
-    Browser --&gt; JS[&quot;JavaScript (behavior)&quot;]
-    JS --&gt; API[&quot;Backend API&quot;]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>How the browser, HTML, CSS, JavaScript, and API calls combine into one user-facing flow</em></p>
 <p>The browser <em>combines</em> the three languages to draw the screen.</p>
 <h2>Key Terms</h2>
 <ul>
@@ -132,6 +121,16 @@ button { padding: .5rem 1rem; cursor: pointer; }
 </code></pre>
 <p><strong>Step 5 — Open DevTools</strong></p>
 <p>Press <code>F12</code> and inspect the Elements, Console, and Network tabs to see <em>what the browser actually received</em>.</p>
+<h2>Verification</h2>
+<ul>
+<li>Run <code>python3 -m http.server 8000</code>, open the page, and confirm that clicking the button changes the heading text to <code>Hello, frontend!</code>.</li>
+<li>Open DevTools Network and verify that the browser really downloads <code>index.html</code>, <code>app.js</code>, and the related static assets.</li>
+</ul>
+<h2>If It Fails, Check This First</h2>
+<ul>
+<li>If the button does nothing, check the <code>app.js</code> path first and confirm that <code>id="b"</code> and <code>id="t"</code> still match the DOM.</li>
+<li>If the page looks fine but the interaction fails, inspect the Console for syntax errors or <code>null</code> selector references.</li>
+</ul>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>HTML is <em>structure</em>, CSS is <em>appearance</em>, JS is <em>behavior</em>.</li>
@@ -173,8 +172,12 @@ button { padding: .5rem 1rem; cursor: pointer; }
 <h2>Wrap-up and Next Steps</h2>
 <p>The frontend is <em>the layer where the product meets the user inside the browser</em>. Next, we dig into the <em>foundation</em> of that layer: HTML and CSS.</p>
 <ul>
-<li><strong>What Is Frontend Development? (current)</strong></li>
-<li>HTML and CSS Basics (upcoming)</li>
+<li>
+<p><strong>What Is Frontend Development? (current)</strong></p>
+</li>
+<li>
+<p>HTML and CSS Basics (upcoming)</p>
+</li>
 <li>JavaScript Basics (upcoming)</li>
 <li>Components and State (upcoming)</li>
 <li>Routing and Pages (upcoming)</li>
@@ -185,12 +188,13 @@ button { padding: .5rem 1rem; cursor: pointer; }
 <li>Building a Small Frontend App (upcoming)</li>
 </ul>
 <h2>References</h2>
-<ul>
-<li><a href="https://developer.mozilla.org/">MDN Web Docs</a></li>
-<li><a href="https://web.dev/">web.dev</a></li>
-<li><a href="https://roadmap.sh/frontend">Frontend Roadmap</a></li>
-<li><a href="https://html.spec.whatwg.org/">HTML Living Standard</a></li>
-</ul>
+<p><strong>Official Docs</strong><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Performance/How_browsers_work">MDN: How browsers work</a><br>
+- <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Introduction">MDN: Client-side web APIs</a><br>
+- <a href="https://web.dev/learn/html/">web.dev: Learn HTML</a></p>
+<p><strong>Verification and Further Reading</strong><br>
+- <a href="https://developer.chrome.com/docs/devtools/">Chrome DevTools documentation</a><br>
+- <a href="https://roadmap.sh/frontend">Frontend Developer Roadmap</a></p>
 <p class="tags-line">Tags: Frontend, Web, JavaScript, HTML, Beginner</p>
 </body>
 </html>

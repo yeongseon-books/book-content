@@ -22,17 +22,9 @@ last_reviewed: '2026-05-04'
 
 # Routing and Pages
 
-This is post 5 in the Frontend Development 101 series.
+A one-screen app is easy to reason about. Real products are not. As soon as you add a home page, detail page, settings, and search results, users expect refresh, back navigation, and shareable links to work as if those screens were always separate places. Routing is the layer that makes that expectation feel natural.
 
-> Frontend Development 101 series (5/10)
-
-<!-- a-grade-intro:begin -->
-
-**Core question**: How does a *single-page* app render *multiple screens*?
-
-> URLs are *state*. The router reads the URL and decides *which component to render*.
-
-<!-- a-grade-intro:end -->
+This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.
 
 ## What You Will Learn
 
@@ -50,12 +42,9 @@ Routing makes *refresh-safe screens*, *shareable links*, and *back-button behavi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    URL["/users/42"] --> Router["Router"]
-    Router --> Match["Match path"]
-    Match --> Comp["UserDetail({id: 42})"]
-```
+![Concept at a Glance](../../../assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
+
+*The SPA routing flow in which the router reads the URL and selects the screen component*
 
 ## Key Terms
 
@@ -132,6 +121,16 @@ const Settings = lazy(() => import("./Settings"));
 { path: "/settings", element: <Suspense><Settings /></Suspense> }
 ```
 
+## Verification
+
+- Navigate between `/`, `/about`, and `/users/42` and confirm that the screen changes without a full reload while the param value renders correctly.
+- In the Network tab, confirm that the lazy-loaded route downloads as a separate chunk rather than inflating the initial bundle.
+
+## If It Fails, Check This First
+
+- If the detail page is empty, check that the route pattern `/users/:id` matches the `useParams()` lookup exactly.
+- If refresh fails after deployment, verify whether your host needs SPA history-fallback configuration.
+
 ## What to Notice in This Code
 
 - `<Link>` updates router state *without a full page reload*.
@@ -182,6 +181,7 @@ URLs decide what users see. Next, we look at how those screens *fetch data from 
 - [JavaScript Basics](./03-javascript-basics.md)
 - [Components and State](./04-components-and-state.md)
 - **Routing and Pages (current)**
+
 - API Calls and Async (upcoming)
 - Forms and Validation (upcoming)
 - Styling and Design Systems (upcoming)
@@ -191,9 +191,13 @@ URLs decide what users see. Next, we look at how those screens *fetch data from 
 
 ## References
 
-- [React Router docs](https://reactrouter.com/)
+### Official Docs
+- [React Router documentation](https://reactrouter.com/home)
 - [Next.js routing](https://nextjs.org/docs/app/building-your-application/routing)
-- [URL Living Standard](https://url.spec.whatwg.org/)
-- [MDN History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
+- [MDN: History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)
+
+### Verification and Further Reading
+- [URL Standard](https://url.spec.whatwg.org/)
+- [Vite guide: Deploying a static site](https://vite.dev/guide/static-deploy.html)
 
 Tags: Frontend, Routing, SPA, React, Web
