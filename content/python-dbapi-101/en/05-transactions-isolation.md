@@ -260,7 +260,7 @@ import sqlite3
 assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
-con.execute('BEGIN IMMEDIATE')
+print(con.in_transaction)   # → True
 try:
     con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
     con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
@@ -270,7 +270,7 @@ except Exception:
     raise
 ```
 
-With `autocommit=False`, you write BEGIN explicitly and the driver does not interfere.
+With `autocommit=False`, sqlite3 keeps a transaction open for you and uses `BEGIN DEFERRED` implicitly after `connect()`, `commit()`, and `rollback()`. In the normal 3.12+ PEP 249 flow, do not pair `autocommit=False` with a redundant manual `BEGIN`.
 
 ---
 
@@ -353,9 +353,9 @@ with dst:
 - [ ] Functions that write start with `isolation_level='IMMEDIATE'`.
 - [ ] Production databases default to WAL + `synchronous=NORMAL` + `busy_timeout=5000`.
 - [ ] Read-only queries use a separate connection or do not begin a transaction explicitly.
-- [ ] `autocommit=None` (legacy) is never used for batch inserts.
+- [ ] `sqlite3.LEGACY_TRANSACTION_CONTROL` legacy mode is never used for batch inserts.
 - [ ] Nested behaviour uses explicit `SAVEPOINT`.
-- [ ] New code on Python 3.12+ uses `autocommit=False` plus explicit BEGIN.
+- [ ] New code on Python 3.12+ uses `autocommit=False` for PEP 249 semantics and does not add a redundant manual `BEGIN`.
 
 ---
 

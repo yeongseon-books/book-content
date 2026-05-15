@@ -242,7 +242,7 @@ import sqlite3
 assert sqlite3.sqlite_version_info >= (3, 24)   # SAVEPOINT stable
 
 con = sqlite3.connect('shop.db', autocommit=False)
-con.execute('BEGIN IMMEDIATE')
+print(con.in_transaction)   # → True
 try:
     con.execute('UPDATE accounts SET balance = balance - 1000 WHERE id = 1')
     con.execute('UPDATE accounts SET balance = balance + 1000 WHERE id = 2')
@@ -252,7 +252,7 @@ except Exception:
     raise
 ```
 
-`autocommit=False`로 두면 BEGIN을 명시적으로 작성해야 하며, driver가 자동으로 끼어들지 않습니다.
+`autocommit=False`로 두면 sqlite3가 `connect()`, `commit()`, `rollback()` 뒤에 `BEGIN DEFERRED` 트랜잭션을 암묵적으로 다시 열어 둡니다. 따라서 Python 3.12+의 일반적인 PEP 249 흐름에서는 `autocommit=False`에 수동 `BEGIN`을 덧붙이지 않습니다.
 
 ---
 
@@ -335,9 +335,9 @@ with dst:
 - [ ] write가 포함된 함수는 `isolation_level='IMMEDIATE'`로 시작한다.
 - [ ] 운영 DB는 WAL mode + `synchronous=NORMAL` + `busy_timeout=5000`을 기본값으로 둔다.
 - [ ] read-only 쿼리는 별도 connection 또는 명시적 `BEGIN`을 쓰지 않는다.
-- [ ] `autocommit=None` (legacy)을 batch insert에 쓰지 않는다.
+- [ ] `sqlite3.LEGACY_TRANSACTION_CONTROL` legacy 모드를 batch insert에 쓰지 않는다.
 - [ ] nested 동작이 필요하면 `SAVEPOINT`를 명시적으로 작성한다.
-- [ ] Python 3.12+ 신규 코드는 `autocommit=False` + 명시적 BEGIN으로 작성한다.
+- [ ] Python 3.12+ 신규 코드는 `autocommit=False`로 PEP 249 의미를 따르고, 중복되는 수동 `BEGIN`을 덧붙이지 않는다.
 
 ---
 
