@@ -14,7 +14,7 @@ tags:
 - Content Moderation
 - Output Filtering
 - Llama Guard
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Implement independent output filtering and content moderation using the OpenAI Moderation API, Llama Guard, and custom policy-based LLM judges.
 ---
 
@@ -27,7 +27,14 @@ Model vendors ship safety training, but the output is still untrusted data. A su
 This is post 3 in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Why is vendor-side safety training not enough for application safety?
+- How should moderation categories turn into domain-specific thresholds?
+- Where do open-source classifiers fit next to managed moderation APIs?
+- How do company-specific policies stay separate from generic harm categories?
+- What changes once the response is streamed token by token?
 
 ## The Model Does Not Promise Safety
 
@@ -303,6 +310,14 @@ If FP rate exceeds 5%, retune thresholds or revisit category coverage.
 - Company-specific policies require a **custom LLM judge**.
 - **Streaming** needs chunk buffers or delayed delivery.
 - Tailor block messages by category and monitor **false positive rate**.
+
+## Operational Checklist
+
+- [ ] Keep vendor moderation and company-policy judging as separate decisions.
+- [ ] Set thresholds per category instead of trusting one global score.
+- [ ] Decide whether each streaming endpoint uses buffering or delayed delivery.
+- [ ] Return category-aware fallback messages without exposing bypass hints.
+- [ ] Track false positives and user complaints every week.
 
 ---
 

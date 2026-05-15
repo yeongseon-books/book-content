@@ -54,13 +54,20 @@
 </head>
 <body>
 <h1>Building a Production Guardrail System</h1>
-<blockquote>
-<p>AI Safety &amp; Guardrails 101 Series (10/10)</p>
-</blockquote>
 <p>The guardrails in Episodes 1 through 9 are useful on their own, but production depends on how they fit together. You need one pipeline that makes ordering, fallback behavior, and auditability explicit.</p>
 <p>This is the final post in the AI Safety &amp; Guardrails 101 series. It turns the earlier guardrails into a single production architecture you can reason about end to end.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>How should the earlier guardrails be grouped into a single production pipeline?</li>
+<li>Which checks should fail open, fail closed, or degrade with warnings?</li>
+<li>How do you keep guardrails inside a latency budget instead of serializing everything?</li>
+<li>Which metrics prove the system is both safe and usable?</li>
+<li>How do you ship a new guardrail without blocking healthy traffic by mistake?</li>
+</ul>
+<blockquote>
+<p>A production guardrail system is not a list of detectors. It is a boundary-by-boundary operating model with explicit ordering, failure policy, observability, and rollout discipline.</p>
+</blockquote>
 <h2>Wiring Nine Components Into One System</h2>
 <p>Episodes 1 through 9 covered guardrails as independent components. In production you need a single architecture diagram that shows where each one sits, the order they run in, and what happens when they fail. This capstone builds that architecture.</p>
 <p>Goals:</p>
@@ -72,6 +79,8 @@
 </ul>
 <h2>Four-Layer Architecture</h2>
 <p>Guardrails live in four positions in an LLM system.</p>
+<p><img alt="Four-Layer Architecture" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png"><br>
+<em>A production guardrail pipeline separates pre-input, pre-prompt, post-output, and audit responsibilities so that every block and bypass has a visible stage.</em></p>
 <p><strong>Pre-input</strong><br>
 - When it runs: Right after the user request arrives<br>
 - Guardrails: rate limit, jailbreak detection, prompt injection normalization</p>
@@ -134,6 +143,20 @@ class GuardrailPipeline:
         return {&quot;answer&quot;: &quot;We can't process that request.&quot;, &quot;blocked&quot;: True, &quot;stage&quot;: res.stage}
 </code></pre>
 <p>The key is that audit records every stage, allowed or blocked, so you can reconstruct any decision later.</p>
+<p><strong>Example audit event emitted by the pipeline</strong></p>
+<p>The architecture becomes operational only when every stage leaves a machine-readable trace:</p>
+<pre><code class="language-json">{
+  &quot;request_id&quot;: &quot;req_01J9Y3J5M2A4G1K8H0T3V7X9&quot;,
+  &quot;stage&quot;: &quot;post-output.moderation&quot;,
+  &quot;allowed&quot;: false,
+  &quot;reason&quot;: &quot;self_harm_instructions&quot;,
+  &quot;model&quot;: &quot;gpt-4o-mini&quot;,
+  &quot;latency_ms&quot;: 84,
+  &quot;guardrail_overhead_ms&quot;: 121,
+  &quot;fallback&quot;: &quot;generic_block_message&quot;
+}
+</code></pre>
+<p>That record is the difference between "the app blocked something" and "we can explain exactly which layer blocked it and why."</p>
 <h2>Fail-Open vs Fail-Closed</h2>
 <p>What happens when a guardrail itself errors? Decide policy in advance.</p>
 <p><strong>Rate limiter Redis down</strong><br>
@@ -161,6 +184,14 @@ class GuardrailPipeline:
             return GuardrailResult(allowed=True, stage=check_fn.__name__, reason=&quot;degraded&quot;)
         return GuardrailResult(allowed=False, stage=check_fn.__name__, reason=&quot;error&quot;)
 </code></pre>
+<p><strong>Failure-mode drill</strong></p>
+<p>Run at least one rehearsal for each policy before rollout:</p>
+<ol>
+<li>turn off Redis and confirm rate limiting degrades with an alert instead of taking the whole product down,</li>
+<li>force the moderation provider to time out and confirm the endpoint blocks safely, and</li>
+<li>drop the audit sink and verify production blocks while non-production only reports degraded mode.</li>
+</ol>
+<p>If you have not simulated those cases, your <code>on_error</code> table is documentation, not an operating guarantee.</p>
 <h2>Performance Budget</h2>
 <p>Running every guardrail serially adds large latency. Control cost with these patterns.</p>
 <ol>
@@ -170,6 +201,25 @@ class GuardrailPipeline:
 <li><strong>Sample expensive checks</strong>: do not run full grounding on every request; sample a fraction as a regression signal.</li>
 </ol>
 <p>Example target: P95 guardrail overhead under 300 ms, excluding the model call.</p>
+<p><strong>Parallel execution for independent checks</strong></p>
+<p>The biggest latency win is to stop pretending every step depends on every other step.</p>
+<pre><code class="language-python">import asyncio
+
+async def run_pre_input(request: dict) -&gt; list[GuardrailResult]:
+    return await asyncio.gather(
+        rate_limit_async(request),
+        jailbreak_async(request[&quot;prompt&quot;]),
+        authz_async(request),
+    )
+
+async def run_post_output(answer: str, chunks: list[dict]) -&gt; list[GuardrailResult]:
+    return await asyncio.gather(
+        moderate_async(answer),
+        grounding_async(answer, chunks),
+        pii_recheck_async(answer),
+    )
+</code></pre>
+<p>Use serial order only where later work genuinely depends on earlier output. Otherwise you pay latency for no safety gain.</p>
 <h2>Observability</h2>
 <p>Always show on the dashboard:</p>
 <p><strong>Traffic</strong><br>
@@ -208,6 +258,13 @@ class GuardrailPipeline:
 <li>PII recall &lt; 0.98</li>
 <li>Grounding precision &lt; 0.85</li>
 </ul>
+<p><strong>Verification command that operators can run manually</strong></p>
+<p>Keep one human-scale verification entrypoint in addition to CI:</p>
+<pre><code class="language-bash">python3 scripts/run_guardrail_regression.py \
+  --suite jailbreak_attacks,benign_prompts,pii_examples,moderation_cases,rag_grounding \
+  --format summary
+</code></pre>
+<p><strong>Expected output:</strong> a single summary table with recall, false-positive rate, latency, and Pass/Fail per suite. If that table is not easy to read, the system will be hard to operate during an incident.</p>
 <h2>Gradual Rollout</h2>
 <p>Never enable a guardrail change for 100 percent of traffic in one step.</p>
 <ol>
@@ -240,6 +297,14 @@ class GuardrailPipeline:
 <li>Hold P95 guardrail overhead under 300 ms with parallelization, cost ordering, caching, and sampling.</li>
 <li>Wire a regression suite into CI and gate merges on jailbreak recall, PII recall, grounding precision, and similar SLOs.</li>
 <li>Combine technical layers with on-call, red team, and compliance reviews, and roll changes out shadow → canary → full.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Assign every guardrail module to pre-input, pre-prompt, post-output, or audit.</li>
+<li>[ ] Document and test <code>on_error</code> behavior for every external dependency.</li>
+<li>[ ] Keep a visible latency budget for guardrails separate from model latency.</li>
+<li>[ ] Gate changes on a regression suite that includes both attacks and benign traffic.</li>
+<li>[ ] Roll out new blocking logic through shadow, canary, and full phases with feature flags.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>

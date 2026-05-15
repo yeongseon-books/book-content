@@ -14,7 +14,7 @@ tags:
 - Toxicity
 - Bias
 - Fairness
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-14'
 seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audit로 나누어 설계합니다.
 ---
 
@@ -179,7 +179,7 @@ if max(rates.values()) - min(rates.values()) > 0.1:
 - **Labeling**: a human reviewer marks "valid block" or "false positive"
 - **Threshold signal**: if false positive rate climbs above 5 percent, raise the threshold by 0.05 increments
 
-블록 비율, false positive율, 사용자 불만 건수는 항상 대시보드에 있어야 합니다.
+블록 비율, false positive율, 사용자 불만 건수는 대시보드에서 계속 추적해야 합니다.
 
 ## 흔히 헷갈리는 지점
 
@@ -202,7 +202,7 @@ if max(rates.values()) - min(rates.values()) > 0.1:
 
 독성 레이어는 빠르고 보수적이어야 하며, 편향 감사는 느리지만 설명 가능해야 합니다. 이 둘을 분리하면 실시간 보호와 장기 품질 개선을 동시에 얻을 수 있습니다.
 
-핵심은 한 문장으로 요약됩니다. 사용자에게 지금 해를 끼칠 수 있는 것은 막고, 시스템이 장기적으로 특정 집단에 불리하게 작동하는지는 측정해서 고칩니다.
+한 문장으로 줄이면 이렇습니다. 사용자에게 지금 해를 끼칠 수 있는 것은 막고, 시스템이 장기적으로 특정 집단에 불리하게 작동하는지는 측정해서 고칩니다.
 
 <!-- toc:begin -->
 ## AI Safety & Guardrails 101 시리즈

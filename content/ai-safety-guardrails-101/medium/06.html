@@ -60,7 +60,14 @@
 <p>Toxicity and bias often get grouped together, but they are not the same operational problem. Toxicity is an inline blocking decision; bias is a measurement and audit problem that shows up over many responses.</p>
 <p>This is post 6 in the AI Safety &amp; Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why do toxicity and bias need different operational workflows?</li>
+<li>Which classifier families are practical for inline toxicity blocking?</li>
+<li>How should streaming responses be buffered to avoid leaking toxic tokens?</li>
+<li>Why does bias evaluation require counterfactual sets instead of single examples?</li>
+<li>Which fairness metrics matter once the model influences decisions?</li>
+</ul>
 <h2>Toxicity and Bias Are Different Problems</h2>
 <p>The two terms travel together but require different operational treatments.</p>
 <ul>
@@ -205,6 +212,14 @@ if max(rates.values()) - min(rates.values()) &gt; 0.1:
 <li>Combine Detoxify, Perspective API, OpenAI Moderation, or Llama Guard with per-category thresholds.</li>
 <li>Protect streaming output with chunk buffering or delayed delivery.</li>
 <li>Measure bias with counterfactual sets that compare length, sentiment, and recommendation distributions, then track the gap as a regression metric.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Keep inline toxicity blocking separate from offline bias evaluation.</li>
+<li>[ ] Tune thresholds per toxicity category instead of using one global score.</li>
+<li>[ ] Protect streaming endpoints with buffering or delayed delivery.</li>
+<li>[ ] Maintain counterfactual test sets for protected attributes.</li>
+<li>[ ] Review false positives and fairness gaps on a regular schedule.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>

@@ -60,7 +60,14 @@
 <p>Model vendors ship safety training, but the output is still untrusted data. A subtle jailbreak, quoted profanity, or unsafe advice can slip through unless you moderate the response as a separate step.</p>
 <p>This is post 3 in the AI Safety &amp; Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Why is vendor-side safety training not enough for application safety?</li>
+<li>How should moderation categories turn into domain-specific thresholds?</li>
+<li>Where do open-source classifiers fit next to managed moderation APIs?</li>
+<li>How do company-specific policies stay separate from generic harm categories?</li>
+<li>What changes once the response is streamed token by token?</li>
+</ul>
 <h2>The Model Does Not Promise Safety</h2>
 <p>OpenAI and Anthropic train their models with RLHF and built-in guardrails. Yet:</p>
 <ul>
@@ -285,6 +292,14 @@ def fp_rate(logs: list[ModerationLog], window_days: int = 7) -&gt; float:
 <li>Company-specific policies require a <strong>custom LLM judge</strong>.</li>
 <li><strong>Streaming</strong> needs chunk buffers or delayed delivery.</li>
 <li>Tailor block messages by category and monitor <strong>false positive rate</strong>.</li>
+</ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Keep vendor moderation and company-policy judging as separate decisions.</li>
+<li>[ ] Set thresholds per category instead of trusting one global score.</li>
+<li>[ ] Decide whether each streaming endpoint uses buffering or delayed delivery.</li>
+<li>[ ] Return category-aware fallback messages without exposing bypass hints.</li>
+<li>[ ] Track false positives and user complaints every week.</li>
 </ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>

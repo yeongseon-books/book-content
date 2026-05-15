@@ -14,7 +14,7 @@ tags:
 - Hallucination
 - RAG
 - Grounding
-last_reviewed: '2026-05-03'
+last_reviewed: '2026-05-14'
 seo_description: Reduce LLM hallucinations in RAG systems by implementing grounding checks, claim extraction, and NLI-based verification against source context.
 ---
 
@@ -27,7 +27,14 @@ People use "hallucination" for any confident mistake, but production guardrails 
 This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
 
 ---
-## Section 1
+
+## Questions this post answers
+
+- Why should a production guardrail focus on closed-domain hallucinations first?
+- What is the difference between citation, source, and semantic grounding?
+- Why does claim-level verification catch errors that sentence-level checks miss?
+- When should NLI stop and a judge model take over?
+- What fallback works better than simply blocking every failed answer?
 
 ## The Trap in the Word "Hallucination"
 
@@ -39,6 +46,9 @@ People call any confidently wrong LLM output a hallucination, but for operations
 This episode focuses on **closed-domain**, because most production guardrails are RAG-based and grounding checks are the most reliable defense.
 
 ## What Grounding Actually Means
+
+![what grounding actually means](../../../assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
+*Grounding verification becomes manageable once the answer is decomposed into claims and checked in increasing-cost stages.*
 
 Grounding is the property that every factual claim in an output is entailed by the provided context. Split it into three levels.
 
@@ -216,6 +226,14 @@ Example targets: claim recall 0.90, precision 0.85, average latency under 800 ms
 - Order checks by cost: claim extraction, NLI first pass, LLM judge only for the grey zone.
 - Enforce citation format so chunk-ID matching can verify source grounding automatically.
 - Track claim-level precision and recall on public and internal regression sets to tune thresholds with data.
+
+## Operational Checklist
+
+- [ ] Require a stable citation format in every grounded answer.
+- [ ] Decompose answers into atomic claims before semantic verification.
+- [ ] Reserve the judge model for grey-zone claims to control cost.
+- [ ] Choose a fallback policy for failed grounding before launch.
+- [ ] Track claim precision, recall, latency, and cost on regression sets.
 
 ---
 

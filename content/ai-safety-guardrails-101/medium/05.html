@@ -60,7 +60,14 @@
 <p>A jailbreak does more than override a system instruction. It tries to peel back the model's safety alignment itself, and once a successful prompt escapes into the wild it gets copied at scale.</p>
 <p>This is post 5 in the AI Safety &amp; Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.</p>
 <hr>
-<h2>Section 1</h2>
+<h2>Questions this post answers</h2>
+<ul>
+<li>Where does jailbreak overlap with prompt injection, and where does it differ?</li>
+<li>Which known patterns are worth catching with the cheapest detector?</li>
+<li>Why do encoded payloads and multilingual variants force a normalization stage?</li>
+<li>How do embeddings and judge models divide the detection workload?</li>
+<li>What kind of regression set proves that a detector is really improving?</li>
+</ul>
 <h2>What a Jailbreak Is</h2>
 <p>A jailbreak is an attack that bypasses the safety alignment a model learned during training, coaxing it into producing policy-violating output. While prompt injection (Ep2) overwrites system instructions through user input, jailbreak goes one step further and unlocks the alignment itself.</p>
 <p>Common patterns include:</p>
@@ -261,6 +268,14 @@ def multilingual_check(text: str) -&gt; bool:
 <li>Quantify detection with separate attack, red-team, and benign sets, and track recall against false positive rate on every change.</li>
 <li>Order layers by cost so that cheap checks fire first and the expensive judge only sees survivors.</li>
 </ul>
+<h2>Operational Checklist</h2>
+<ul>
+<li>[ ] Keep known-pattern matching, normalization, embeddings, and judge steps separate.</li>
+<li>[ ] Evaluate on both attack prompts and benign traffic before adjusting thresholds.</li>
+<li>[ ] Re-check non-English traffic through translation or a multilingual judge path.</li>
+<li>[ ] Keep the judge on a separate model from the response path.</li>
+<li>[ ] Review missed jailbreaks weekly and add them to regression suites.</li>
+</ul>
 <hr>
 <h2>AI Safety &amp; Guardrails 101 Series</h2>
 <ul>
@@ -276,11 +291,17 @@ def multilingual_check(text: str) -&gt; bool:
 <li>Ep10 Building a Production Guardrail System (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Official Docs and Papers</strong></p>
 <ul>
 <li><a href="https://arxiv.org/abs/2404.01318">JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models</a></li>
 <li><a href="https://arxiv.org/abs/2307.15043">AdvBench: Universal and Transferable Adversarial Attacks on Aligned Language Models</a></li>
 <li><a href="https://arxiv.org/abs/2308.03825">In-The-Wild Jailbreak Prompts on LLMs</a></li>
-<li><a href="https://www.anthropic.com/research/many-shot-jailbreaking">Anthropic - Many-shot jailbreaking</a></li>
+<li><a href="https://www.anthropic.com/research/many-shot-jailbreaking">Anthropic — Many-shot jailbreaking</a></li>
+<li><a href="https://learn.microsoft.com/azure/ai-services/content-safety/concepts/jailbreak-detection">Azure AI Content Safety — jailbreak risk overview</a></li>
+</ul>
+<p><strong>Verification-Friendly Sources</strong></p>
+<ul>
+<li><a href="https://github.com/JailbreakBench/jailbreakbench">JailbreakBench dataset repository</a></li>
 </ul>
 <p class="tags-line">Tags: AI Safety, Jailbreak, Red Team, Detection</p>
 </body>
