@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 1
 title: What Are Design Patterns?
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - GoF
   - Architecture
   - Foundations
-seo_description: A clear definition of design patterns, the GoF classification of 23 patterns, and the real problems patterns are trying to solve.
-last_reviewed: '2026-05-04'
+seo_description: A practical introduction to design patterns, the GoF families, and the recurring design problems patterns help teams name and solve.
+last_reviewed: '2026-05-15'
 ---
 
 # What Are Design Patterns?
 
+When people first learn design patterns, they usually start by memorizing the names. Strategy, Adapter, and Observer stand out quickly. In production code, though, the value does not show up as trivia. It shows up when the same design problem keeps returning.
+
 This is the first post in the Design Patterns 101 series.
 
-> Design Patterns 101 series (1/10)
+In this post, we'll treat design patterns not as an answer catalog but as shared vocabulary for recurring design problems. The goal is to understand the problem shape, the solution shape, and the tradeoffs that come with the pattern name.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do we even need design patterns?
-
-> Because solving the same problem from scratch every time is exhausting. Patterns are name tags for solutions that have already been proven.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - A working definition of a design pattern
 - The GoF classification of 23 patterns
@@ -51,14 +45,8 @@ Patterns are vocabulary, not answers. The biggest payoff is that "let's pull thi
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    P["Problem"] --> N["Pattern Name"]
-    N --> S["Solution structure"]
-    S --> T["Tradeoffs"]
-```
-
-The name calls up the solution.
+![Concept at a Glance](../../../assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
+*A pattern becomes useful when the name brings back the problem shape, the solution shape, and the tradeoffs together.*
 
 ## Key Terms
 
@@ -155,6 +143,16 @@ Patterns are always trades.
 
 Patterns earn their keep most often as code-review vocabulary — "drop an Adapter here", "pull this into a Strategy". The name is the agreement.
 
+## Quick verification
+
+Use this quick pass before you declare that a piece of code “needs a pattern.”
+
+- Look for the same branching, notification, or construction shape in at least three places.
+- Write the problem in one sentence before naming a pattern.
+- Confirm that the pattern makes the design easier to explain, not just more abstract.
+
+**Expected outcome:** after this pass, you should be able to say both **why** the pattern helps and **what complexity it adds**.
+
 ## How a Senior Engineer Thinks
 
 - They treat patterns as vocabulary.
@@ -196,9 +194,15 @@ Patterns are vocabulary. From the next article on we tour the 23 GoF patterns in
 
 ## References
 
+### Core references
+
 - [Design Patterns: Elements of Reusable Object-Oriented Software (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
 - [refactoring.guru — Design Patterns](https://refactoring.guru/design-patterns)
 - [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
+
+### Practical follow-up
+
 - [Head First Design Patterns](https://www.oreilly.com/library/view/head-first-design/9781492077992/)
+- [Refactoring (Martin Fowler)](https://martinfowler.com/books/refactoring.html)
 
 Tags: Computer Science, DesignPatterns, SoftwareDesign, GoF, Architecture, Foundations

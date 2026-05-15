@@ -1,8 +1,8 @@
 ---
 episode: 10
 language: ko
-last_reviewed: '2026-05-12'
-seo_description: Python의 일급 함수, 데코레이터, 컨텍스트 매니저로 GoF 패턴을 더 가볍게 표현하는 방법을 정리합니다.
+last_reviewed: '2026-05-15'
+seo_description: Python의 모듈, 함수, Protocol, 데코레이터로 GoF 패턴의 의도를 더 가볍게 표현하는 방법을 정리합니다.
 series: design-patterns-101
 status: publish-ready
 tags:
@@ -47,17 +47,8 @@ Python은 모듈 로딩, 함수 전달, 구조적 타이핑, 데코레이터 문
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    GoF["GoF form"] --> Trans["Pythonic translation"]
-    Trans --> Mod["module = Singleton"]
-    Trans --> Fn["function = Strategy / Command"]
-    Trans --> Proto["Protocol = interface"]
-    Trans --> Deco["@decorator = Decorator"]
-    Trans --> DC["@dataclass = Value Object"]
-```
-
-같은 의도라도 Python에서는 더 가벼운 표현이 가능합니다. 패턴의 이름은 같아도 구현 무게는 훨씬 달라질 수 있습니다.
+![한눈에 보는 개념](../../../assets/design-patterns-101/10/10-01-concept-at-a-glance.ko.png)
+*같은 패턴 의도라도 Python에서는 모듈, 함수, Protocol, 데코레이터로 훨씬 가볍게 표현할 수 있습니다.*
 
 ## 핵심 용어
 
@@ -185,6 +176,16 @@ def work(): time.sleep(0.1)
 
 `logging` 모듈은 모듈 Singleton처럼 읽히고, `sorted(key=...)`는 함수 Strategy이며, `typing.Protocol`은 인터페이스 역할을 하고, `@app.route(...)`는 Decorator의 일상적인 예입니다. Python 표준 라이브러리와 주요 프레임워크 자체가 Pythonic 패턴의 살아 있는 예시입니다.
 
+## 빠르게 검증해 보기
+
+Pythonic 표현이 더 나은지 아래 기준으로 비교해 보세요.
+
+- 모듈, 함수, Protocol, 데코레이터, dataclass 중 이미 같은 의도를 담을 수 있는 도구가 있는지 먼저 봅니다.
+- 교과서식 GoF 구조와 Python다운 표현을 나란히 두고 줄 수와 가독성을 비교합니다.
+- 더 가벼운 표현이 필요한 확장 지점까지 그대로 남겨 두는지 확인합니다.
+
+**기대 결과:** Python다운 형태가 패턴의 의도는 유지하면서도 상속, 클래스 수, 보일러플레이트를 눈에 띄게 줄여야 합니다.
+
 ## 시니어 엔지니어는 이렇게 판단합니다
 
 - 패턴보다 언어 도구를 먼저 봅니다.
@@ -226,9 +227,15 @@ GoF 패턴은 어휘이지 매뉴얼이 아닙니다. Python에서는 언어가 
 
 ## 참고 자료
 
+### 핵심 자료
+
 - [PEP 544 — Protocols](https://peps.python.org/pep-0544/)
 - [dataclasses (Python docs)](https://docs.python.org/3/library/dataclasses.html)
 - [functools.wraps (Python docs)](https://docs.python.org/3/library/functools.html#functools.wraps)
+
+### 실무 확장 읽을거리
+
 - [Python 3 Patterns, Recipes and Idioms (Bruce Eckel)](https://python-3-patterns-idioms-test.readthedocs.io/)
+- [PEP 20 — The Zen of Python](https://peps.python.org/pep-0020/)
 
 Tags: Computer Science, DesignPatterns, Python, Idioms, Protocols, Decorators

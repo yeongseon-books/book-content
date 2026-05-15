@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>The Adapter Pattern</h1>
+<p>Production systems rarely talk only to interfaces we designed ourselves. Payment SDKs, storage clients, mail providers, and third-party APIs all arrive with their own method names, error models, and data shapes. The trouble begins when those external details leak through the domain.</p>
 <p>This is post 6 in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (6/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do we use an interface we <em>cannot change</em> in the shape we <em>want</em>?</p>
-<blockquote>
-<p>By placing a thin translator object — an Adapter — between us and it.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll use the Adapter pattern as a thin translation layer at the boundary. The aim is to let the domain speak in its own contract while the adapter absorbs SDK-specific calls, types, and exceptions.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The problem Adapter solves</li>
 <li>Define a domain interface, then wrap external calls</li>
@@ -80,12 +71,8 @@
 <p>An Adapter is a <em>thin coat</em> at the boundary.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Domain[&quot;Domain code&quot;] --&gt; Iface[&quot;Domain interface&quot;]
-    Iface --&gt; Adapter[&quot;Adapter&quot;]
-    Adapter --&gt; Lib[&quot;External library&quot;]
-</code></pre>
-<p>The domain knows only the interface; the Adapter takes the external call.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png"><br>
+<em>The Adapter keeps the domain on its own contract while infrastructure-specific calls stay behind the boundary.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Target</strong>: the interface the domain wants.</li>
@@ -177,6 +164,14 @@ class InMemoryFileStore:
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>S3/GCS/Local behind one FileStore, payment gateways (Stripe/Toss/PortOne) behind one PaymentGateway, mail senders (SES/SendGrid/SMTP) behind one Mailer — all Adapters. The freedom to swap operational backends comes from here.</p>
+<h2>Quick verification</h2>
+<p>Check these points before and after introducing an Adapter.</p>
+<ul>
+<li>Search the domain layer for imports of third-party SDK types or clients.</li>
+<li>Swap the production adapter for an in-memory fake in one test and confirm the domain code does not change.</li>
+<li>Verify that external exceptions, identifiers, and payload shapes stop crossing the application boundary.</li>
+</ul>
+<p><strong>Expected outcome:</strong> the domain keeps a stable contract, while infrastructure-specific details move behind one replaceable boundary class or function.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Sketch the <em>domain</em> interface first.</li>
@@ -214,11 +209,16 @@ class InMemoryFileStore:
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://refactoring.guru/design-patterns/adapter">Adapter Pattern (refactoring.guru)</a></li>
 <li><a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture (Alistair Cockburn)</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)">Ports and Adapters (Wikipedia)</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
+<li><a href="https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html">Boto3 S3 <code>put_object</code> reference</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Adapter, Structural, Compatibility, Wrapper</p>
 </body>

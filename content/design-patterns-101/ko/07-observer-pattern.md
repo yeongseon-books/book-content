@@ -17,8 +17,8 @@ tags:
   - PubSub
   - Events
   - Behavioral
-seo_description: 객체 간의 직접 호출을 통지로 바꾸어 결합도를 낮추는 Observer 패턴의 핵심 원리와 실무 활용법을 설명합니다.
-last_reviewed: '2026-05-12'
+seo_description: Observer 패턴으로 직접 호출을 통지 구조로 바꾸어 결합도를 낮추고 확장 지점을 분리하는 방법을 설명합니다.
+last_reviewed: '2026-05-15'
 ---
 
 # Observer 패턴
@@ -47,15 +47,8 @@ Observer는 이 연결을 약하게 만듭니다. 발행자는 “무슨 일이 
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    Subject["Subject"] --> Notify["notify(event)"]
-    Notify --> ObsA["Observer A"]
-    Notify --> ObsB["Observer B"]
-    Notify --> ObsC["Observer C"]
-```
-
-Subject는 메시지를 밀어 넣고, Observer는 원할 때 구독합니다. 이 단순한 구조가 확장 지점을 깔끔하게 나눠 줍니다.
+![한눈에 보는 개념](../../../assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
+*Observer의 핵심은 발행자가 직접 호출 대신 통지만 하고, 구독자는 필요한 반응만 선택적으로 붙이는 데 있습니다.*
 
 ## 핵심 용어
 
@@ -104,7 +97,7 @@ class EventBus:
             fn(event)
 ```
 
-핵심은 복잡한 프레임워크가 아닙니다. “토픽에 대해 함수 목록을 보관하고 순회한다”는 최소 구조만 있어도 Observer의 본질을 볼 수 있습니다.
+복잡한 프레임워크가 꼭 필요한 것은 아닙니다. 토픽별 구독자 목록을 저장하고 순회하는 최소 구조만으로도 Observer의 핵심이 드러납니다.
 
 ### 2단계 — 구독자를 등록합니다
 
@@ -174,6 +167,16 @@ def unsubscribe(bus, topic, fn):
 
 Django signals, Kafka/Redis pub-sub, GitHub Webhook, Spring의 이벤트 발행기는 전부 Observer의 확장판으로 볼 수 있습니다. 특히 도메인 이벤트를 설계할 때 Observer를 이해하고 있으면, “무슨 일이 일어났는가”와 “그 뒤에 무엇을 할 것인가”를 명확히 분리하기 쉬워집니다.
 
+## 빠르게 검증해 보기
+
+Observer가 결합을 제대로 줄이고 있는지 다음 기준으로 확인해 보세요.
+
+- 발행자가 현재 몇 개의 후속 작업을 직접 호출하는지 셉니다.
+- 구독자 하나를 잠시 비활성화해도 발행자의 핵심 책임이 그대로 끝나는지 확인합니다.
+- 이벤트 이름과 payload만 봐도 “무슨 일이 일어났는지” 설명되는지 점검합니다.
+
+**기대 결과:** 구독자는 선택적인 확장 지점이 되고, 발행자는 누가 듣는지 몰라도 자신의 일을 마칠 수 있어야 합니다.
+
 ## 시니어 엔지니어는 이렇게 판단합니다
 
 - 통지 흐름을 한 방향으로만 흘리게 합니다.
@@ -215,9 +218,15 @@ Observer는 직접 호출을 통지로 바꿔 결합을 녹여 냅니다. 다음
 
 ## 참고 자료
 
+### 핵심 자료
+
 - [Observer Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/observer)
 - [Domain Events (Martin Fowler)](https://martinfowler.com/eaaDev/DomainEvent.html)
 - [Django Signals](https://docs.djangoproject.com/en/stable/topics/signals/)
+
+### 실무 확장 읽을거리
+
 - [Publish-Subscribe Pattern (Wikipedia)](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern)
+- [dataclasses — Data Classes (Python docs)](https://docs.python.org/3/library/dataclasses.html)
 
 Tags: Computer Science, DesignPatterns, Observer, PubSub, Events, Behavioral

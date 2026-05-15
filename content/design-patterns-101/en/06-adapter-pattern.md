@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 6
 title: The Adapter Pattern
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Structural
   - Compatibility
   - Wrapper
-seo_description: The Adapter pattern translates an external interface into the shape the domain wants. Boundary protection and testability explained for engineers.
-last_reviewed: '2026-05-04'
+seo_description: How the Adapter pattern protects domain boundaries by translating external interfaces into contracts the application can own.
+last_reviewed: '2026-05-15'
 ---
 
 # The Adapter Pattern
 
+Production systems rarely talk only to interfaces we designed ourselves. Payment SDKs, storage clients, mail providers, and third-party APIs all arrive with their own method names, error models, and data shapes. The trouble begins when those external details leak through the domain.
+
 This is post 6 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (6/10)
+In this post, we'll use the Adapter pattern as a thin translation layer at the boundary. The aim is to let the domain speak in its own contract while the adapter absorbs SDK-specific calls, types, and exceptions.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How do we use an interface we *cannot change* in the shape we *want*?
-
-> By placing a thin translator object — an Adapter — between us and it.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem Adapter solves
 - Define a domain interface, then wrap external calls
@@ -51,14 +45,8 @@ When external library calls scatter through the domain, every library tweak shak
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Domain["Domain code"] --> Iface["Domain interface"]
-    Iface --> Adapter["Adapter"]
-    Adapter --> Lib["External library"]
-```
-
-The domain knows only the interface; the Adapter takes the external call.
+![Concept at a Glance](../../../assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
+*The Adapter keeps the domain on its own contract while infrastructure-specific calls stay behind the boundary.*
 
 ## Key Terms
 
@@ -182,6 +170,16 @@ A fake Adapter makes unit tests fast and deterministic.
 
 S3/GCS/Local behind one FileStore, payment gateways (Stripe/Toss/PortOne) behind one PaymentGateway, mail senders (SES/SendGrid/SMTP) behind one Mailer — all Adapters. The freedom to swap operational backends comes from here.
 
+## Quick verification
+
+Check these points before and after introducing an Adapter.
+
+- Search the domain layer for imports of third-party SDK types or clients.
+- Swap the production adapter for an in-memory fake in one test and confirm the domain code does not change.
+- Verify that external exceptions, identifiers, and payload shapes stop crossing the application boundary.
+
+**Expected outcome:** the domain keeps a stable contract, while infrastructure-specific details move behind one replaceable boundary class or function.
+
 ## How a Senior Engineer Thinks
 
 - Sketch the *domain* interface first.
@@ -223,9 +221,15 @@ Adapter is the *thin coat* at the boundary. The next post moves to inter-object 
 
 ## References
 
+### Core references
+
 - [Adapter Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/adapter)
 - [Hexagonal Architecture (Alistair Cockburn)](https://alistair.cockburn.us/hexagonal-architecture/)
 - [Ports and Adapters (Wikipedia)](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
+
+### Practical follow-up
+
 - [PEP 544 — Protocols](https://peps.python.org/pep-0544/)
+- [Boto3 S3 `put_object` reference](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)
 
 Tags: Computer Science, DesignPatterns, Adapter, Structural, Compatibility, Wrapper

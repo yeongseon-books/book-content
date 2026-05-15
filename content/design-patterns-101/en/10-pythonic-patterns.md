@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 10
 title: Pythonic Patterns
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Idioms
   - Protocols
   - Decorators
-seo_description: Modules, first-class functions, Protocols, and decorators dissolve many GoF patterns. Pythonic design thinking explained for working engineers.
-last_reviewed: '2026-05-04'
+seo_description: How Python modules, functions, Protocols, and decorators express classic pattern intent with less ceremony than direct GoF translations.
+last_reviewed: '2026-05-15'
 ---
 
 # Pythonic Patterns
 
+It is tempting to copy GoF structures directly into every language. In Python, that often produces more ceremony than value. Modules, first-class functions, Protocols, decorators, and dataclasses already carry much of the same intent in lighter forms.
+
 This is the final post in the Design Patterns 101 series.
 
-> Design Patterns 101 series (10/10)
+In this post, we'll look at how Python's own tools can express classic pattern ideas with less code and less inheritance. The point is not to reject patterns, but to translate their intent into forms that read naturally in Python.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Is it always right to *port GoF patterns* directly into Python?
-
-> No. Python's first-class functions, modules, Protocols, and decorators dissolve many GoF patterns into *less code*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - Why a module is already a Singleton
 - Strategy and Command expressed as functions
@@ -51,17 +45,8 @@ Python's basic tools — modules, functions, Protocols — already provide *runt
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    GoF["GoF form"] --> Trans["Pythonic translation"]
-    Trans --> Mod["module = Singleton"]
-    Trans --> Fn["function = Strategy / Command"]
-    Trans --> Proto["Protocol = interface"]
-    Trans --> Deco["@decorator = Decorator"]
-    Trans --> DC["@dataclass = Value Object"]
-```
-
-Same pattern, lighter expression.
+![Concept at a Glance](../../../assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
+*In Python, the same pattern intent often survives best when expressed through modules, functions, Protocols, and decorators instead of heavier class scaffolding.*
 
 ## Key Terms
 
@@ -189,6 +174,16 @@ def work(): time.sleep(0.1)
 
 `logging` is a module Singleton, `sorted(key=...)` is a function Strategy, `typing.Protocol` is an interface, `@app.route(...)` is a Decorator. The standard library and popular frameworks are *living examples* of Pythonic patterns.
 
+## Quick verification
+
+Use this check before porting a textbook GoF structure straight into Python.
+
+- Ask whether a module, function, Protocol, decorator, or dataclass already covers the same intent.
+- Compare the direct GoF translation and the Pythonic form side by side for line count and readability.
+- Verify that the lighter version still preserves the extension seam you actually need.
+
+**Expected outcome:** the Pythonic form should keep the pattern's intent while reducing ceremony, inheritance, and incidental code.
+
 ## How a Senior Engineer Thinks
 
 - Reach for the *language's* tools first.
@@ -230,9 +225,15 @@ GoF is a *vocabulary*, not a *manual*. Look at Python's tools first, and reach f
 
 ## References
 
+### Core references
+
 - [PEP 544 — Protocols](https://peps.python.org/pep-0544/)
 - [dataclasses (Python docs)](https://docs.python.org/3/library/dataclasses.html)
 - [functools.wraps (Python docs)](https://docs.python.org/3/library/functools.html#functools.wraps)
+
+### Practical follow-up
+
 - [Python 3 Patterns, Recipes and Idioms (Bruce Eckel)](https://python-3-patterns-idioms-test.readthedocs.io/)
+- [PEP 20 — The Zen of Python](https://peps.python.org/pep-0020/)
 
 Tags: Computer Science, DesignPatterns, Python, Idioms, Protocols, Decorators

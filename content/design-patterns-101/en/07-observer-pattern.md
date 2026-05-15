@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 7
 title: The Observer Pattern
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - PubSub
   - Events
   - Behavioral
-seo_description: The Observer pattern notifies many subscribers when one object changes. Domain events and pub/sub thinking explained for working engineers.
-last_reviewed: '2026-05-04'
+seo_description: How the Observer pattern turns direct calls into notifications so systems can grow handlers without tightening coupling.
+last_reviewed: '2026-05-15'
 ---
 
 # The Observer Pattern
 
+Code hardens quickly when one object directly calls every downstream action. A submitted order sends mail, posts to Slack, reserves inventory, and maybe queues analytics. As those side effects grow, the original object spends more time coordinating neighbors than doing its own work.
+
 This is post 7 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (7/10)
+In this post, we'll look at Observer as a way to turn direct calls into notifications. The goal is to let a publisher announce what happened while subscribers decide whether and how to react.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: When A changes, how do B, C, and D follow naturally?
-
-> A only announces "I changed". B, C, and D *choose* to listen. That is Observer.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem Observer solves (tight coupling)
 - Subject, Observer, subscribe, notify
@@ -51,15 +45,8 @@ If A *directly calls* B, C, and D when it changes, A knows all three. Observer t
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Subject["Subject"] --> Notify["notify(event)"]
-    Notify --> ObsA["Observer A"]
-    Notify --> ObsB["Observer B"]
-    Notify --> ObsC["Observer C"]
-```
-
-Subject pushes a message; Observers listen at will.
+![Concept at a Glance](../../../assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
+*Observer separates publication from reaction so a publisher can announce change without knowing which listeners will respond.*
 
 ## Key Terms
 
@@ -178,6 +165,16 @@ Tests and dynamic handlers must be able to detach.
 
 Django signals, Spring's `ApplicationEventPublisher`, Kafka/Redis pub-sub, GitHub Webhooks — all bigger siblings of Observer. They often appear under the name *domain event*.
 
+## Quick verification
+
+Use this checklist when deciding whether Observer is improving the design.
+
+- Count how many downstream actions the publisher currently calls directly.
+- Temporarily disable one subscriber and confirm the publisher still completes its main responsibility.
+- Check whether the event name and payload make sense without reading subscriber code.
+
+**Expected outcome:** subscribers become optional extensions, and the publisher can describe the event without depending on who is listening.
+
 ## How a Senior Engineer Thinks
 
 - Force notifications to flow one direction.
@@ -219,9 +216,15 @@ Observer dissolves coupling into notification. The next post moves to object cre
 
 ## References
 
+### Core references
+
 - [Observer Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/observer)
 - [Domain Events (Martin Fowler)](https://martinfowler.com/eaaDev/DomainEvent.html)
 - [Django Signals](https://docs.djangoproject.com/en/stable/topics/signals/)
+
+### Practical follow-up
+
 - [Publish-Subscribe Pattern (Wikipedia)](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern)
+- [dataclasses — Data Classes (Python docs)](https://docs.python.org/3/library/dataclasses.html)
 
 Tags: Computer Science, DesignPatterns, Observer, PubSub, Events, Behavioral

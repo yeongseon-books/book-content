@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Behavioral Patterns</h1>
+<p>Splitting objects well is not enough when the hard part is how they collaborate. Who notifies whom, which algorithm gets selected, how a request becomes queueable, and where state transitions live all shape the cost of change. In real systems, those flow decisions are often where complexity hides.</p>
 <p>This is post 4 in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do objects coordinate their <em>behavior</em>?</p>
-<blockquote>
-<p>By swapping algorithms, propagating notifications, or making requests into objects — the named ways are the behavioral patterns.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll use behavioral patterns as a shared language for object cooperation. The key move is to turn scattered flow into named structures so that algorithms, notifications, requests, and states are easier to test and reason about.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>The problem behavioral patterns solve</li>
 <li>Strategy, Observer, Command</li>
@@ -80,14 +71,8 @@
 <p>Turn flow into objects and the flow becomes testable.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    S[&quot;Strategy (swap algo)&quot;] --&gt; Ctx[&quot;Context&quot;]
-    O[&quot;Observer (notify)&quot;] --&gt; Sub[&quot;Subject&quot;]
-    Cmd[&quot;Command (request as object)&quot;] --&gt; Inv[&quot;Invoker&quot;]
-    St[&quot;State (per-state behavior)&quot;] --&gt; Obj[&quot;Object&quot;]
-    It[&quot;Iterator (traversal)&quot;] --&gt; Col[&quot;Collection&quot;]
-</code></pre>
-<p>Five styles of cooperation.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png"><br>
+<em>Behavioral patterns organize cooperation by separating algorithms, notifications, requests, states, and traversal into named structures.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Strategy</strong>: turn an algorithm into an object so it can be swapped.</li>
@@ -193,6 +178,14 @@ for x in Bag([1, 2, 3]):
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p>Django signals are Observer. Celery tasks are Command. FSM libraries are State. Every Python collection implements Iterator. Behavioral patterns sit beneath the daily tools.</p>
+<h2>Quick verification</h2>
+<p>Use this pass to check whether a behavioral refactor is earning its keep.</p>
+<ul>
+<li>Trace one business action from trigger to side effects and count how many branches or direct calls it fans into.</li>
+<li>Verify whether the collaboration can be named clearly as an algorithm, notification, request, state transition, or traversal contract.</li>
+<li>Test whether one behavior can change without forcing edits in unrelated callers.</li>
+</ul>
+<p><strong>Expected outcome:</strong> the main flow becomes easier to trace, and one kind of behavior can change without reopening a long chain of conditionals.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>The first candidate for Strategy is a <em>function</em>.</li>
@@ -230,11 +223,16 @@ for x in Bag([1, 2, 3]):
 <li>Pythonic Patterns (upcoming)</li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://refactoring.guru/design-patterns/strategy">Strategy Pattern (refactoring.guru)</a></li>
 <li><a href="https://refactoring.guru/design-patterns/observer">Observer Pattern (refactoring.guru)</a></li>
 <li><a href="https://refactoring.guru/design-patterns/command">Command Pattern (refactoring.guru)</a></li>
 <li><a href="https://refactoring.guru/design-patterns/state">State Pattern (refactoring.guru)</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
+<li><a href="https://docs.python.org/3/reference/datamodel.html">The Python Language Reference — Data model (<code>__iter__</code>) </a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Behavioral, Strategy, Observer, Command</p>
 </body>

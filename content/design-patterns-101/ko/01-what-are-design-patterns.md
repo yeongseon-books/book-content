@@ -17,8 +17,8 @@ tags:
   - GoF
   - Architecture
   - Foundations
-seo_description: 디자인 패턴의 정의와 GoF 분류, 반복되는 설계 문제를 해결하기 위한 공통 어휘로서의 가치를 상세히 설명합니다.
-last_reviewed: '2026-05-12'
+seo_description: 디자인 패턴을 정답집이 아니라 반복되는 설계 문제를 설명하고 합의하는 공통 어휘로 이해하도록 돕는 입문 글입니다.
+last_reviewed: '2026-05-15'
 ---
 
 # 디자인 패턴이란 무엇인가?
@@ -47,14 +47,8 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 개념
 
-```mermaid
-flowchart LR
-    P["Problem"] --> N["Pattern Name"]
-    N --> S["Solution structure"]
-    S --> T["Tradeoffs"]
-```
-
-좋은 패턴 학습 순서는 늘 같습니다. 먼저 문제를 알아보고, 그다음 이름을 붙이고, 구조를 이해한 뒤, 마지막으로 트레이드오프까지 함께 기억해야 합니다.
+![한눈에 보는 개념](../../../assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png)
+*문제를 먼저 알아보고, 패턴 이름을 붙인 뒤, 구조와 트레이드오프까지 함께 읽어야 패턴이 실전에 남습니다.*
 
 ## 핵심 용어
 
@@ -151,6 +145,16 @@ processor.charge(...)
 
 패턴은 보통 코드 리뷰 어휘로 가장 자주 등장합니다. “여긴 Adapter 경계가 필요합니다”, “이 분기는 Strategy 모양입니다” 같은 말이 팀 안에서 자연스럽게 통하면, 설계 대화의 해상도가 훨씬 높아집니다. 결국 패턴은 구현 세부보다 합의를 빠르게 만드는 도구입니다.
 
+## 빠르게 검증해 보기
+
+패턴을 붙이기 전에 아래 세 가지를 먼저 확인해 보세요.
+
+- 같은 분기, 생성, 알림 구조가 실제 코드에 세 번 이상 반복되는지 셉니다.
+- 패턴 이름을 붙이기 전에 문제를 한 문장으로 적어 봅니다.
+- 패턴을 도입했을 때 설명이 쉬워지는지, 아니면 추상화만 늘어나는지 비교합니다.
+
+**기대 결과:** 패턴이 도움이 되는 경우, “왜 이 패턴이 필요한지”와 “무슨 비용이 생기는지”를 동시에 설명할 수 있어야 합니다.
+
 ## 시니어 엔지니어는 이렇게 판단합니다
 
 - 패턴을 해법이 아니라 공통 어휘로 다룹니다.
@@ -192,9 +196,15 @@ processor.charge(...)
 
 ## 참고 자료
 
+### 핵심 자료
+
 - [Design Patterns: Elements of Reusable Object-Oriented Software (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
 - [refactoring.guru — Design Patterns](https://refactoring.guru/design-patterns)
 - [Patterns of Enterprise Application Architecture](https://martinfowler.com/eaaCatalog/)
+
+### 실무 확장 읽을거리
+
 - [Head First Design Patterns](https://www.oreilly.com/library/view/head-first-design/9781492077992/)
+- [Refactoring (Martin Fowler)](https://martinfowler.com/books/refactoring.html)
 
 Tags: Computer Science, DesignPatterns, SoftwareDesign, GoF, Architecture, Foundations

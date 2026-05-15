@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 9
 title: Avoiding Pattern Overuse
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Simplicity
   - YAGNI
   - Refactoring
-seo_description: Patterns are tools, not answers. When patterns become harmful, what simpler alternatives exist, and how to avoid overuse — explained for engineers.
-last_reviewed: '2026-05-04'
+seo_description: How to avoid pattern overuse by starting simple, waiting for repeated change, and letting abstractions emerge from refactoring.
+last_reviewed: '2026-05-15'
 ---
 
 # Avoiding Pattern Overuse
 
+After learning design patterns, many engineers go through a phase where almost every piece of code looks like a pattern candidate. A tiny function starts to resemble a Strategy, a simple constructor wants to become a Factory, and one wrapper invites the Decorator label. The danger is that imagined future complexity can erase present-day clarity.
+
 This is post 9 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (9/10)
+In this post, we'll focus on the difference between knowing patterns and using them well. The right direction is not “apply patterns first,” but “let repeated change justify the abstraction.”
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: How does a *good pattern* turn into *bad code*?
-
-> When the pattern arrives before the problem. Patterns are *vocabulary*, not *answers*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The antipattern that "patterns first" creates
 - The power of the simpler alternative
@@ -51,14 +45,8 @@ Pre-applied patterns easily become misapplied patterns. A simple piece of code c
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Need["Real need"] --> Refactor["Refactor"]
-    Refactor --> Pattern["Pattern emerges"]
-    Premature["Pre-applied"] --> Junk["Just more complexity"]
-```
-
-Need *summons* a pattern. The reverse direction is risky.
+![Concept at a Glance](../../../assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
+*A healthy pattern emerges from repeated pain and refactoring; a premature one usually leaves behind only extra complexity.*
 
 ## Key Terms
 
@@ -156,6 +144,16 @@ Unused abstraction is *debt*.
 
 Good libraries use *few* patterns *precisely*. Look at requests, FastAPI, or pytest — they solve hard problems with small composition, not vast abstraction. The difference between a junior and a senior is not how many patterns they know, but knowing *when to wait*.
 
+## Quick verification
+
+Run this check when a proposed abstraction feels suspicious.
+
+- Count whether the change has actually repeated in production code, not just in design discussions.
+- Try extracting a function or small module first and see whether the intent is already clear.
+- Remove the pattern mentally and ask what concrete pain would return immediately.
+
+**Expected outcome:** if the pain is still hypothetical, the simplest code usually remains the better design for now.
+
 ## How a Senior Engineer Thinks
 
 - Start with *functions*.
@@ -197,9 +195,15 @@ Patterns are *vocabulary*. The final post looks at how Python's first-class func
 
 ## References
 
+### Core references
+
 - [YAGNI (Martin Fowler)](https://martinfowler.com/bliki/Yagni.html)
 - [Refactoring to Patterns (Joshua Kerievsky)](https://www.industriallogic.com/xp/refactoring/)
 - [Premature Abstraction (C2 wiki)](https://wiki.c2.com/?PrematureGeneralization)
+
+### Practical follow-up
+
 - [Worse Is Better (Richard Gabriel)](https://www.dreamsongs.com/RiseOfWorseIsBetter.html)
+- [PEP 20 — The Zen of Python](https://peps.python.org/pep-0020/)
 
 Tags: Computer Science, DesignPatterns, Antipatterns, Simplicity, YAGNI, Refactoring

@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 8
 title: Factory and Dependency Injection
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - DependencyInjection
   - Composition
   - IoC
-seo_description: Factory and Dependency Injection separate object construction from use. Composition Root thinking explained for working engineers.
-last_reviewed: '2026-05-04'
+seo_description: How Factory and Dependency Injection separate assembly from use so teams can test, swap, and reason about object graphs more easily.
+last_reviewed: '2026-05-15'
 ---
 
 # Factory and Dependency Injection
 
+Object creation and object composition eventually collapse into one practical question: who builds this thing, where is it wired together, and who passes it in? When domain code starts creating its own repositories, mailers, or event buses, usage and assembly get tangled together.
+
 This is post 8 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (8/10)
+In this post, we'll look at Factory and Dependency Injection as two parts of the same move. Assembly should happen at an outside entry point, while domain code should receive collaborators and focus on using them.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: *When, where, and who* should create the objects in our system?
-
-> Not inside the domain. Assemble them in *one outside place* and inject them. That place is the Composition Root, and the tools are Factory and DI.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The cost of scattered creation responsibility
 - The role of the Factory
@@ -51,15 +45,8 @@ When the domain creates its own dependencies, it learns *how to make* them. Fact
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Root["Composition Root (main)"] --> F["Factory"]
-    F --> Obj["Object graph"]
-    Root --> Inj["Inject into domain"]
-    Inj --> Domain["Domain code"]
-```
-
-Assemble in one place; use in many.
+![Concept at a Glance](../../../assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
+*Factory and DI keep assembly in one place so services can focus on using collaborators instead of constructing them.*
 
 ## Key Terms
 
@@ -177,6 +164,16 @@ For most projects, hand-wiring is simpler.
 
 FastAPI's `Depends`, Spring's `@Autowired`, Guice/Dagger, backend selection in Django settings — all DI/Factory in shape. Composition Root thinking carries straight into microservice bootstraps.
 
+## Quick verification
+
+Use this pass to see whether assembly is really outside the domain.
+
+- Search for environment variable reads, SDK constructors, or infrastructure imports inside domain services.
+- Build one test that assembles the service entirely from in-memory collaborators.
+- Verify that production and test wiring differ only at the Composition Root, not inside business methods.
+
+**Expected outcome:** application services become easy to instantiate in tests, and environment-specific choices stay at the bootstrapping edge.
+
 ## How a Senior Engineer Thinks
 
 - Always ask "who builds this object?"
@@ -218,9 +215,15 @@ Factory and DI separate "assembly" from "use". The next post turns the lens on t
 
 ## References
 
+### Core references
+
 - [Factory Method (refactoring.guru)](https://refactoring.guru/design-patterns/factory-method)
 - [Inversion of Control Containers and the Dependency Injection pattern (Martin Fowler)](https://martinfowler.com/articles/injection.html)
 - [Composition Root (Mark Seemann)](https://blog.ploeh.dk/2011/07/28/CompositionRoot/)
+
+### Practical follow-up
+
 - [FastAPI Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
+- [Dependency Injector providers overview](https://python-dependency-injector.ets-labs.org/providers/index.html)
 
 Tags: Computer Science, DesignPatterns, Factory, DependencyInjection, Composition, IoC

@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Pythonic Patterns</h1>
+<p>It is tempting to copy GoF structures directly into every language. In Python, that often produces more ceremony than value. Modules, first-class functions, Protocols, decorators, and dataclasses already carry much of the same intent in lighter forms.</p>
 <p>This is the final post in the Design Patterns 101 series.</p>
-<blockquote>
-<p>Design Patterns 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is it always right to <em>port GoF patterns</em> directly into Python?</p>
-<blockquote>
-<p>No. Python's first-class functions, modules, Protocols, and decorators dissolve many GoF patterns into <em>less code</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>In this post, we'll look at how Python's own tools can express classic pattern ideas with less code and less inheritance. The point is not to reject patterns, but to translate their intent into forms that read naturally in Python.</p>
+<h2>Questions this chapter answers</h2>
 <ul>
 <li>Why a module is already a Singleton</li>
 <li>Strategy and Command expressed as functions</li>
@@ -80,15 +71,8 @@
 <p>Reach for the language's tools first; pull out a pattern only when those fall short.</p>
 </blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    GoF[&quot;GoF form&quot;] --&gt; Trans[&quot;Pythonic translation&quot;]
-    Trans --&gt; Mod[&quot;module = Singleton&quot;]
-    Trans --&gt; Fn[&quot;function = Strategy / Command&quot;]
-    Trans --&gt; Proto[&quot;Protocol = interface&quot;]
-    Trans --&gt; Deco[&quot;@decorator = Decorator&quot;]
-    Trans --&gt; DC[&quot;@dataclass = Value Object&quot;]
-</code></pre>
-<p>Same pattern, lighter expression.</p>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png"><br>
+<em>In Python, the same pattern intent often survives best when expressed through modules, functions, Protocols, and decorators instead of heavier class scaffolding.</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Module-as-singleton</strong>: a module is loaded once and acts like a Singleton.</li>
@@ -184,6 +168,14 @@ def work(): time.sleep(0.1)
 </ol>
 <h2>How This Shows Up in Production</h2>
 <p><code>logging</code> is a module Singleton, <code>sorted(key=...)</code> is a function Strategy, <code>typing.Protocol</code> is an interface, <code>@app.route(...)</code> is a Decorator. The standard library and popular frameworks are <em>living examples</em> of Pythonic patterns.</p>
+<h2>Quick verification</h2>
+<p>Use this check before porting a textbook GoF structure straight into Python.</p>
+<ul>
+<li>Ask whether a module, function, Protocol, decorator, or dataclass already covers the same intent.</li>
+<li>Compare the direct GoF translation and the Pythonic form side by side for line count and readability.</li>
+<li>Verify that the lighter version still preserves the extension seam you actually need.</li>
+</ul>
+<p><strong>Expected outcome:</strong> the Pythonic form should keep the pattern's intent while reducing ceremony, inheritance, and incidental code.</p>
 <h2>How a Senior Engineer Thinks</h2>
 <ul>
 <li>Reach for the <em>language's</em> tools first.</li>
@@ -221,11 +213,16 @@ def work(): time.sleep(0.1)
 <li><strong>Pythonic Patterns (current)</strong></li>
 </ul>
 <h2>References</h2>
+<p><strong>Core references</strong></p>
 <ul>
 <li><a href="https://peps.python.org/pep-0544/">PEP 544 — Protocols</a></li>
 <li><a href="https://docs.python.org/3/library/dataclasses.html">dataclasses (Python docs)</a></li>
 <li><a href="https://docs.python.org/3/library/functools.html#functools.wraps">functools.wraps (Python docs)</a></li>
+</ul>
+<p><strong>Practical follow-up</strong></p>
+<ul>
 <li><a href="https://python-3-patterns-idioms-test.readthedocs.io/">Python 3 Patterns, Recipes and Idioms (Bruce Eckel)</a></li>
+<li><a href="https://peps.python.org/pep-0020/">PEP 20 — The Zen of Python</a></li>
 </ul>
 <p class="tags-line">Tags: Computer Science, DesignPatterns, Python, Idioms, Protocols, Decorators</p>
 </body>

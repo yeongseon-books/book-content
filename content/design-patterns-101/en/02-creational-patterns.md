@@ -2,7 +2,7 @@
 series: design-patterns-101
 episode: 2
 title: Creational Patterns
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,25 +17,19 @@ tags:
   - Factory
   - Singleton
   - Builder
-seo_description: A tour of creational patterns that separate object construction from use — Factory, Builder, Singleton, and Prototype.
-last_reviewed: '2026-05-04'
+seo_description: How creational patterns separate object construction from use so teams can reduce coupling, simplify tests, and control object assembly.
+last_reviewed: '2026-05-15'
 ---
 
 # Creational Patterns
 
+There is a point where object creation becomes more noticeable than the code using those objects. `new SomeService()` starts appearing everywhere, environment-specific construction branches spread, and constructor arguments keep growing. At that point, the real problem is not business logic. It is who owns creation.
+
 This is post 2 in the Design Patterns 101 series.
 
-> Design Patterns 101 series (2/10)
+In this post, we'll look at creational patterns as tools for concentrating construction responsibility in one place. The important question is not just what gets built, but who builds it and how much the caller needs to know.
 
-<!-- a-grade-intro:begin -->
-
-**Core question**: Why do we need patterns just for *creating* objects?
-
-> Because who builds an object, when, and in what shape decides how tightly the rest of the system gets coupled.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this chapter answers
 
 - The problem creational patterns solve
 - Factory Method and Abstract Factory
@@ -51,15 +45,8 @@ When `new SomeService()` is sprinkled throughout the code, coupling is already l
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    F["Factory"] --> P["Product A or B"]
-    B["Builder"] --> C["Complex object"]
-    S["Singleton"] --> O["One instance"]
-    R["Prototype"] --> Cl["Cloned instance"]
-```
-
-Four ways to separate the responsibility of construction.
+![Concept at a Glance](../../../assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
+*Creational patterns give four common ways to pull construction responsibility away from callers and into a safer assembly boundary.*
 
 ## Key Terms
 
@@ -183,6 +170,16 @@ Use Prototype when cloning is cheaper than creating.
 
 DI containers, ORM query builders, UI widget libraries — creational patterns sit at the bones of many frameworks.
 
+## Quick verification
+
+Before introducing a creational pattern, test these checkpoints.
+
+- Count how many call sites construct the same family of objects directly.
+- Check whether tests need awkward monkey-patching just to replace collaborators.
+- Verify whether the caller really needs to know the concrete class, constructor shape, or environment split.
+
+**Expected outcome:** a successful refactor reduces direct knowledge of concrete construction in callers and makes test doubles easier to inject.
+
 ## How a Senior Engineer Thinks
 
 - They concentrate the construction responsibility.
@@ -224,9 +221,15 @@ Once you control creation, coupling loosens. Next up — how objects get *compos
 
 ## References
 
+### Core references
+
 - [Factory Method (refactoring.guru)](https://refactoring.guru/design-patterns/factory-method)
 - [Abstract Factory (refactoring.guru)](https://refactoring.guru/design-patterns/abstract-factory)
 - [Builder (refactoring.guru)](https://refactoring.guru/design-patterns/builder)
+
+### Practical follow-up
+
 - [Singleton — Why You Should Use It Sparingly](https://martinfowler.com/bliki/InversionOfControl.html)
+- [copy — Shallow and deep copy operations (Python docs)](https://docs.python.org/3/library/copy.html)
 
 Tags: Computer Science, DesignPatterns, Creational, Factory, Singleton, Builder
