@@ -17,13 +17,15 @@ tags:
 - py.typed
 - Static Analysis
 - Typing
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하는 것이고, mypy는 코드를 실행하지 않고 타입 오류를 찾아주는 도구입니다.
 ---
 
 # 타입 힌트와 정적 검사
 
-패키지를 다른 사람이 쓰는 순간부터 “이 함수에는 무엇을 넘겨야 하나”, “반환값은 어떤 구조인가” 같은 질문이 생깁니다. 타입 힌트는 이 질문에 코드 수준에서 답하게 해 주고, 정적 분석기는 실행 전에 실수를 잡아 줍니다. 이 글은 Python Package 101 시리즈의 8번째 글입니다. 여기서는 타입 힌트의 기본 문법, `mypy` 검사 흐름, `py.typed` 마커 파일의 의미를 정리하겠습니다.
+패키지를 다른 사람이 쓰는 순간부터 “이 함수에는 무엇을 넘겨야 하나”, “반환값은 어떤 구조인가” 같은 질문이 생깁니다. 타입 힌트는 이 질문에 코드 수준에서 답하게 해 주고, 정적 분석기는 실행 전에 실수를 잡아 줍니다.
+
+이 글은 Python Package 101 시리즈의 8번째 글입니다. 여기서는 타입 힌트의 기본 문법, `mypy` 검사 흐름, `py.typed` 마커 파일의 의미를 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -57,6 +59,9 @@ mypy checks:
   greet(42)    # Error: expected str, got int
   x: int = greet("Alice")  # Error: str assigned to int
 ```
+
+![멘탈 모델](../../../assets/python-package-101/08/08-01-mental-model.ko.png)
+*타입 힌트가 정적 검사와 패키지 소비자 경험으로 이어지는 흐름*
 
 ## 핵심 개념
 
@@ -286,4 +291,4 @@ mypy src/  # resolves import type errors for requests
 - [PEP 561 - Distributing and Packaging Type Information](https://peps.python.org/pep-0561/)
 - [Python typing documentation](https://docs.python.org/3/library/typing.html)
 
-Tags: Python, Type Hints, mypy, py.typed, Static Analysis, Typing
+Tags: Python, Packaging, PyPI, pyproject.toml

@@ -54,13 +54,8 @@
 </head>
 <body>
 <h1>Production Package Template</h1>
-<p>This is the final post in the Python Package 101 series.</p>
-<blockquote>
-<p>Python Package 101 series (10/10)</p>
-</blockquote>
-<hr>
-<!-- a-grade-intro:begin -->
-
+<p>Repeating the same package setup by hand is where team standards drift. A good template turns one-off setup decisions into defaults that every new project inherits on day one.</p>
+<p>This is the final post in the Python Package 101 series. Here we combine structure, testing, typing, documentation, and CI into a reusable template that can produce a production-ready package skeleton in minutes.</p>
 <h2>Key Questions</h2>
 <ul>
 <li>How do you automate the repetitive setup that comes with every new package?</li>
@@ -71,8 +66,6 @@
 <blockquote>
 <p>A package template automates the repetitive setup work when starting a project, and cookiecutter and copier are the tools that make it happen.</p>
 </blockquote>
-<!-- a-grade-intro:end -->
-
 <h2>What you will learn</h2>
 <ul>
 <li>How to create project templates with cookiecutter and copier</li>
@@ -101,6 +94,8 @@
     README.md
     ...
 </code></pre>
+<p><img alt="Mental Model" src="https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.en.png"><br>
+<em>How template inputs expand into a standard package skeleton and validation setup</em></p>
 <h2>Core Concepts</h2>
 <p><strong>cookiecutter</strong><br>
 - Description: Jinja2-based project template tool<br>

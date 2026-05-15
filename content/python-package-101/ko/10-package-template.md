@@ -17,13 +17,15 @@ tags:
 - copier
 - GitHub Template
 - Best Practices
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: 패키지 템플릿은 프로젝트를 시작할 때 반복되는 설정 작업을 자동화하는 것이고, cookiecutter와 copier는 그 도구입니다.
 ---
 
 # 실전 패키지 템플릿 만들기
 
-이 시리즈에서 다룬 구조, 의존성, 빌드, 배포, 타입 힌트, 문서화까지를 매번 처음부터 다시 설정하는 것은 비효율적입니다. 좋은 템플릿 하나는 팀의 베스트 프랙티스를 반복 가능한 기본값으로 바꿔 줍니다. 이 글은 Python Package 101 시리즈의 마지막 글입니다. 여기서는 `cookiecutter`, `copier`, GitHub Template Repository를 활용해 프로덕션 수준 패키지 템플릿을 만드는 방법을 정리하겠습니다.
+이 시리즈에서 다룬 구조, 의존성, 빌드, 배포, 타입 힌트, 문서화까지를 매번 처음부터 다시 설정하는 것은 비효율적입니다. 좋은 템플릿 하나는 팀의 베스트 프랙티스를 반복 가능한 기본값으로 바꿔 줍니다.
+
+이 글은 Python Package 101 시리즈의 마지막 글입니다. 여기서는 `cookiecutter`, `copier`, GitHub Template Repository를 활용해 프로덕션 수준 패키지 템플릿을 만드는 방법을 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -64,6 +66,9 @@ cookiecutter/copier + template
     README.md
     ...
 ```
+
+![멘탈 모델](../../../assets/python-package-101/10/10-01-mental-model.ko.png)
+*템플릿 입력값이 표준 프로젝트 골격과 검증 체계로 확장되는 흐름*
 
 ## 핵심 개념
 
@@ -345,4 +350,4 @@ GitHub Template Repository는 저장소를 복사할 뿐 파일 내용의 변수
 - [Hypermodern Python - Claudio Jolowicz](https://cjolowicz.github.io/posts/hypermodern-python-01-setup/)
 - [GitHub - Creating a template repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository)
 
-Tags: Python, Template, cookiecutter, copier, GitHub Template, Best Practices
+Tags: Python, Packaging, PyPI, pyproject.toml

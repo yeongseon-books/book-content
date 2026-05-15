@@ -3,7 +3,7 @@ title: Versioning and Releases
 series: python-package-101
 episode: 6
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - Release
 - CHANGELOG
 - Git Tag
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: SemVer assigns meaning to version numbers, and Git tags mark specific
   commits as release points.
 ---
 
 # Versioning and Releases
 
-This is post 6 in the Python Package 101 series.
+After the first public release, users stop asking only “does it work?” and start asking “is this update safe?” Version numbers, tags, and changelogs are the signals they rely on.
 
-> Python Package 101 series (6/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 6 in the Python Package 101 series. Here we translate code changes into SemVer decisions, keep package metadata in sync, and turn release history into something users can trust.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 6 in the Python Package 101 series.
 - Why is a CHANGELOG needed and how do you write one?
 
 > SemVer assigns meaning to version numbers, and Git tags mark specific commits as release points.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -68,6 +62,9 @@ PATCH  (1.2.3 → 1.2.4): Bug fix, no API changes
 MINOR  (1.2.4 → 1.3.0): New feature, existing API preserved
 MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 ```
+
+![Mental Model](../../../assets/python-package-101/06/06-01-mental-model.en.png)
+*How a code change becomes a version bump, a changelog entry, a tag, and a release*
 
 ## Core Concepts
 
@@ -233,7 +230,7 @@ If managing versions in two places is tedious, use `setuptools-scm`. Just tag a 
 The next post covers **CLI packages** — entry points and click.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -255,4 +252,4 @@ The next post covers **CLI packages** — entry points and click.
 - [PEP 440 - Version Identification and Dependency Specification](https://peps.python.org/pep-0440/)
 - [setuptools-scm](https://setuptools-scm.readthedocs.io/)
 
-Tags: Python, Versioning, SemVer, Release, CHANGELOG, Git Tag
+Tags: Python, Packaging, PyPI, pyproject.toml

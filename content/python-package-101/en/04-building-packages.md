@@ -3,7 +3,7 @@ title: Building Packages — wheel and sdist
 series: python-package-101
 episode: 4
 language: en
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,20 +17,16 @@ tags:
 - Build
 - Packaging
 - Distribution
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 seo_description: A wheel is a pre-built package file and an sdist is a source archive.
   You need both so your package can be installed anywhere.
 ---
 
 # Building Packages — wheel and sdist
 
-This is post 4 in the Python Package 101 series.
+Once your package structure is stable, the next question is whether you can produce artifacts that install cleanly outside your repository. That is where wheel, sdist, and post-build verification start to matter.
 
-> Python Package 101 series (4/10)
-
----
-
-<!-- a-grade-intro:begin -->
+This is post 4 in the Python Package 101 series. Here we compare wheel and sdist, inspect what `python -m build` actually produces, and validate the output in a fresh environment before publishing anything.
 
 ## Key Questions
 
@@ -40,8 +36,6 @@ This is post 4 in the Python Package 101 series.
 - Which files should you upload to PyPI?
 
 > A wheel is a pre-built package file and an sdist is a source archive. You need both so your package can be installed anywhere.
-
-<!-- a-grade-intro:end -->
 
 ## What you will learn
 
@@ -65,6 +59,9 @@ source code → python -m build → dist/
                                 ├── mylib-0.1.0.tar.gz     (sdist)
                                 └── mylib-0.1.0-py3-none-any.whl  (wheel)
 ```
+
+![Mental Model](../../../assets/python-package-101/04/04-01-mental-model.en.png)
+*How source turns into build artifacts and then into an installation check*
 
 ## Core Concepts
 
@@ -226,7 +223,7 @@ Most application developers only create pure Python packages, so a `py3-none-any
 The next post covers **publishing to PyPI** — from TestPyPI to production.
 
 <!-- toc:begin -->
-## Series Table of Contents
+## In this series
 
 - [What Is a Python Package?](./01-what-is-a-python-package.md)
 - [Project Structure — src layout and pyproject.toml](./02-project-structure.md)
@@ -248,4 +245,4 @@ The next post covers **publishing to PyPI** — from TestPyPI to production.
 - [PyPA build - A simple PEP 517 build frontend](https://build.pypa.io/en/stable/)
 - [Real Python - Python Wheels](https://realpython.com/python-wheels/)
 
-Tags: Python, wheel, sdist, Build, Packaging, Distribution
+Tags: Python, Packaging, PyPI, pyproject.toml

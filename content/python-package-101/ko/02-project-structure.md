@@ -17,13 +17,15 @@ tags:
 - Project Structure
 - Packaging
 - setuptools
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: src layout과 pyproject.toml로 Python 프로젝트 구조를 잡는 방법을 설명합니다.
 ---
 
 # 프로젝트 구조 잡기 — src layout과 pyproject.toml
 
-패키징은 파일 몇 개를 묶는 수준에서 끝나지 않습니다. 어디에 소스를 두고, 어떤 파일에 메타데이터를 적고, 테스트가 실제 설치된 패키지를 검증하도록 구조를 어떻게 잡을지까지 함께 결정해야 합니다. 이 글은 Python Package 101 시리즈의 2번째 글입니다. 여기서는 flat layout과 src layout의 차이, `pyproject.toml`이 `setup.py`를 대체한 이유, 그리고 패키지 프로젝트의 최소 표준 구조를 정리하겠습니다.
+패키징은 파일 몇 개를 묶는 수준에서 끝나지 않습니다. 어디에 소스를 두고, 어떤 파일에 메타데이터를 적고, 테스트가 실제 설치된 패키지를 검증하도록 구조를 어떻게 잡을지까지 함께 결정해야 합니다.
+
+이 글은 Python Package 101 시리즈의 2번째 글입니다. 여기서는 flat layout과 src layout의 차이, `pyproject.toml`이 `setup.py`를 대체한 이유, 그리고 패키지 프로젝트의 최소 표준 구조를 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -49,7 +51,7 @@ src layout은 이런 착시를 구조적으로 막아 줍니다.
 
 ## 멘탈 모델
 
-flat layout은 가게 앞 진열대에 상품을 바로 올려두는 방식이고, src layout은 상품을 창고(`src/`)에 넣고 선반(설치)을 통해서만 꺼내는 방식입니다. 창고를 거치면 “설치하지 않아도 잘 되네”라는 착각이 원천적으로 줄어듭니다.
+flat layout은 가게 앞 진열대에 상품을 바로 올려두는 방식이고, src layout은 상품을 창고(`src/`)에 넣고 선반(설치)으로만 꺼내는 방식입니다. 창고를 거치면 “설치하지 않아도 잘 되네”라는 착각이 원천적으로 줄어듭니다.
 
 ```text
 flat layout              src layout
@@ -61,6 +63,9 @@ tests/                      core.py
 pyproject.toml          tests/
                         pyproject.toml
 ```
+
+![멘탈 모델](../../../assets/python-package-101/02/02-01-mental-model.ko.png)
+*src layout이 소스, 메타데이터, 설치 검증을 분리하는 구조*
 
 ## 핵심 개념
 
@@ -287,4 +292,4 @@ where = ["src"]
 - [setuptools - src layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html)
 - [Hynek Schlawack - Testing & Packaging](https://hynek.me/articles/testing-packaging/)
 
-Tags: Python, pyproject.toml, src layout, Project Structure, Packaging, setuptools
+Tags: Python, Packaging, PyPI, pyproject.toml

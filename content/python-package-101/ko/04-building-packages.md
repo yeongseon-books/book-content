@@ -17,13 +17,15 @@ tags:
 - Build
 - Packaging
 - Distribution
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: wheel은 이미 빌드된 패키지 파일이고, sdist는 소스 코드를 묶은 원본 아카이브입니다. 둘 다 만들어야 어디서든 설치할 수 있습니다.
 ---
 
 # 패키지 빌드하기 — wheel과 sdist
 
-패키지를 구조화하고 의존성을 정리했다면, 이제 실제로 배포 가능한 파일을 만들어야 합니다. `pip install`은 소스 저장소를 직접 읽는 것이 아니라 배포판 아카이브를 설치하기 때문입니다. 이 글은 Python Package 101 시리즈의 4번째 글입니다. 여기서는 wheel과 sdist의 차이, `python -m build`가 생성하는 결과물, 그리고 빌드 후 반드시 확인해야 할 검증 포인트를 정리하겠습니다.
+패키지를 구조화하고 의존성을 정리했다면, 이제 실제로 배포 가능한 파일을 만들어야 합니다. `pip install`은 소스 저장소를 직접 읽는 것이 아니라 배포판 아카이브를 설치하기 때문입니다.
+
+이 글은 Python Package 101 시리즈의 4번째 글입니다. 여기서는 wheel과 sdist의 차이, `python -m build`가 생성하는 결과물, 그리고 빌드 후 반드시 확인해야 할 검증 포인트를 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -54,6 +56,9 @@ source code → python -m build → dist/
                                 ├── mylib-0.1.0.tar.gz     (sdist)
                                 └── mylib-0.1.0-py3-none-any.whl  (wheel)
 ```
+
+![멘탈 모델](../../../assets/python-package-101/04/04-01-mental-model.ko.png)
+*소스 코드가 sdist와 wheel로 빌드된 뒤 설치 검증으로 이어지는 흐름*
 
 ## 핵심 개념
 
@@ -237,4 +242,4 @@ python -m build    # build from a clean state
 - [PyPA build - A simple PEP 517 build frontend](https://build.pypa.io/en/stable/)
 - [Real Python - Python Wheels](https://realpython.com/python-wheels/)
 
-Tags: Python, wheel, sdist, Build, Packaging, Distribution
+Tags: Python, Packaging, PyPI, pyproject.toml

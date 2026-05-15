@@ -17,13 +17,15 @@ tags:
 - Import
 - pip
 - Library
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른 사람과 공유하는 단위입니다. import로 불러오는 모든 것이 패키지입니다.
 ---
 
 # Python Package란 무엇인가?
 
-프로젝트가 조금만 커져도 파일을 여러 개로 나누고, 다른 파일의 코드를 `import`해서 쓰게 됩니다. 여기서부터 Python 패키징의 기본 개념이 시작됩니다. 이 글은 Python Package 101 시리즈의 첫 번째 글입니다. 여기서는 모듈, 패키지, 배포판이 각각 무엇이고 `pip install`이 실제로 무엇을 설치하는지, 그리고 왜 여러분의 코드를 패키지로 만들어야 하는지를 먼저 정리하겠습니다.
+프로젝트가 조금만 커져도 파일을 여러 개로 나누고, 다른 파일의 코드를 `import`해서 쓰게 됩니다. 여기서부터 Python 패키징의 기본 개념이 시작됩니다.
+
+이 글은 Python Package 101 시리즈의 첫 번째 글입니다. 여기서는 모듈, 패키지, 배포판이 각각 무엇이고 `pip install`이 실제로 무엇을 설치하는지, 그리고 왜 여러분의 코드를 패키지로 만들어야 하는지를 먼저 정리하겠습니다.
 
 ## 이 글에서 다룰 문제
 
@@ -59,6 +61,9 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
                      utils.py
                      models.py
 ```
+
+![멘탈 모델](../../../assets/python-package-101/01/01-01-mental-model.ko.png)
+*모듈이 패키지와 배포판을 거쳐 설치되는 흐름*
 
 ## 핵심 개념
 
@@ -275,4 +280,4 @@ import my_package           # Import name: underscore
 - [Real Python - Python Packages](https://realpython.com/python-modules-packages/)
 - [PyPI - Python Package Index](https://pypi.org/)
 
-Tags: Python, Package, Module, Import, pip, Library
+Tags: Python, Packaging, PyPI, pyproject.toml
