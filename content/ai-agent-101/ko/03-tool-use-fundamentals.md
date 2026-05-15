@@ -56,6 +56,9 @@ function calling은 모델이 직접 API를 호출하는 기능이 아닙니다.
 
 > 좋은 tool use 설계는 모델에게 더 많은 자유를 주는 것이 아니라, 모델의 선택을 코드가 안전하게 실행할 수 있는 형태로 제한하는 것입니다.
 
+### 도구 호출 루프
+
+![도구 호출 루프](../../../assets/ai-agent-101/03/03-01-tool-calling-loop.ko.png)
 ## 핵심 개념
 
 ### function calling의 기본 흐름은 네 단계입니다
@@ -84,7 +87,11 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
+<<<<<<< HEAD
     model="gpt-4.1",
+=======
+    model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=[{"role": "user", "content": "What's the weather in Seoul?"}],
     tools=tools,
     tool_choice="auto"  # LLM decides whether to use tools
@@ -150,7 +157,11 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
+<<<<<<< HEAD
     model="gpt-4.1",
+=======
+    model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     messages=messages
 )
 
@@ -179,7 +190,11 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
+<<<<<<< HEAD
             model="gpt-4.1",
+=======
+            model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"

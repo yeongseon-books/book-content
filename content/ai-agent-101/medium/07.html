@@ -74,7 +74,9 @@
 
 <h2>Agent Evaluation Metrics</h2>
 <p>Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.</p>
-<p><strong>Task Success Rate</strong></p>
+<p><strong>Evaluation signal path</strong></p>
+<p><img alt="Evaluation signal path" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png"><br>
+<strong>Task Success Rate</strong></p>
 <p>The percentage of user requests the agent completes successfully.</p>
 <pre><code class="language-python">from dataclasses import dataclass
 from typing import List, Callable
@@ -162,8 +164,8 @@ class CostTracker:
     &quot;&quot;&quot;Tracks API call cost.&quot;&quot;&quot;
 
     PRICING = {
-        &quot;gpt-4&quot;: {&quot;prompt&quot;: 0.03 / 1000, &quot;completion&quot;: 0.06 / 1000},
-        &quot;gpt-3.5-turbo&quot;: {&quot;prompt&quot;: 0.0015 / 1000, &quot;completion&quot;: 0.002 / 1000}
+        &quot;gpt-4o&quot;: {&quot;prompt&quot;: 0.0025 / 1000, &quot;completion&quot;: 0.01 / 1000},
+        &quot;gpt-4o-mini&quot;: {&quot;prompt&quot;: 0.00015 / 1000, &quot;completion&quot;: 0.0006 / 1000}
     }
 
     def __init__(self):

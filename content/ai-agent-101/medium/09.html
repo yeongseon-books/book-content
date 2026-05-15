@@ -74,9 +74,15 @@
 
 <h2>Observability</h2>
 <p>Production agents must be traceable: "why did it answer this way?" must be answerable. Logs, metrics, and traces are the three core axes.</p>
+<<<<<<< HEAD
 <p><img alt="Observability" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png"><br>
 <em>Production operations start when a single request can be followed across planning, tool execution, observability, and safety controls without guesswork.</em></p>
 <p><strong>Structured Logging</strong></p>
+=======
+<p><strong>Operations feedback loop</strong></p>
+<p><img alt="Operations feedback loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-operations-feedback-loop.en.png"><br>
+<strong>Structured Logging</strong></p>
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 <p>Plaintext logs are hard to parse and query. JSON-structured logs are the standard.</p>
 <pre><code class="language-python">import logging
 import json
@@ -167,13 +173,13 @@ class TraceContext:
 trace = TraceContext()
 
 with trace.span(&quot;agent_request&quot;, user_id=&quot;u_456&quot;):
-    with trace.span(&quot;llm_planning&quot;, model=&quot;gpt-4&quot;):
+    with trace.span(&quot;llm_planning&quot;, model=&quot;gpt-4o&quot;):
         plan = call_llm(user_input)
 
     with trace.span(&quot;tool_execution&quot;, tool=&quot;search&quot;):
         result = search_tool(plan[&quot;query&quot;])
 
-    with trace.span(&quot;llm_synthesis&quot;, model=&quot;gpt-4&quot;):
+    with trace.span(&quot;llm_synthesis&quot;, model=&quot;gpt-4o&quot;):
         answer = call_llm(result)
 
 # Send trace.spans to OpenTelemetry, Jaeger, etc.
@@ -226,7 +232,7 @@ metrics = MetricsCollector()
 metrics.increment(&quot;agent.requests&quot;, status=&quot;success&quot;)
 metrics.increment(&quot;agent.tool_calls&quot;, tool=&quot;search&quot;)
 metrics.increment(&quot;agent.errors&quot;, type=&quot;timeout&quot;)
-metrics.timing(&quot;agent.request.duration&quot;, 1234, model=&quot;gpt-4&quot;)
+metrics.timing(&quot;agent.request.duration&quot;, 1234, model=&quot;gpt-4o&quot;)
 metrics.timing(&quot;agent.tool.duration&quot;, 234, tool=&quot;search&quot;)
 </code></pre>
 <p>Core metrics: request count, success/failure rate, latency p50/p95/p99, token usage, cost.</p>
@@ -238,8 +244,8 @@ class BudgetEnforcer:
     &quot;&quot;&quot;Budget enforcement.&quot;&quot;&quot;
 
     PRICING = {
-        &quot;gpt-4&quot;: {&quot;prompt&quot;: 0.03 / 1000, &quot;completion&quot;: 0.06 / 1000},
-        &quot;gpt-3.5-turbo&quot;: {&quot;prompt&quot;: 0.0015 / 1000, &quot;completion&quot;: 0.002 / 1000}
+        &quot;gpt-4o&quot;: {&quot;prompt&quot;: 0.0025 / 1000, &quot;completion&quot;: 0.01 / 1000},
+        &quot;gpt-4o-mini&quot;: {&quot;prompt&quot;: 0.00015 / 1000, &quot;completion&quot;: 0.0006 / 1000}
     }
 
     def __init__(self):
@@ -283,7 +289,7 @@ class BudgetEnforcer:
 budget = BudgetEnforcer()
 budget.set_limit(&quot;user_123&quot;, daily_limit_usd=5.0)
 
-if not budget.check_and_record(&quot;user_123&quot;, &quot;gpt-4&quot;, 1500, 500):
+if not budget.check_and_record(&quot;user_123&quot;, &quot;gpt-4o&quot;, 1500, 500):
     raise RuntimeError(&quot;daily budget exceeded&quot;)
 </code></pre>
 <p>Without cost limits, one user can drain the entire budget.</p>

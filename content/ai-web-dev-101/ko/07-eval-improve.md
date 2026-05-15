@@ -110,6 +110,33 @@ print(f"품질 점수: {evaluate_response(ai_response, expected) * 100}%")
 
 키워드 기반 평가는 단순하지만 출발점으로는 충분합니다. 최소한 “이 답변이 꼭 포함해야 할 정보는 들어갔는가”를 빠르게 체크할 수 있기 때문입니다.
 
+여기서 한 단계 더 가면, 질문 세트를 한 번에 돌려 평균 점수와 실패 사례를 함께 볼 수 있습니다.
+
+```python
+test_cases = [
+    {
+        "question": "가격 알려줘",
+        "response": "월 9,900원이며 첫 달은 무료 체험이 제공됩니다.",
+        "expected": ["월 9,900원", "무료 체험"],
+    },
+    {
+        "question": "비밀번호를 잊어버렸어요",
+        "response": "로그인 화면에서 비밀번호 재설정을 진행하세요.",
+        "expected": ["비밀번호 재설정", "이메일 인증"],
+    },
+]
+
+scores = []
+for case in test_cases:
+    score = evaluate_response(case["response"], case["expected"])
+    scores.append(score)
+    print(case["question"], score)
+
+print("average", sum(scores) / len(scores))
+```
+
+이 정도만 있어도 프롬프트를 바꾸기 전과 후를 비교하는 회귀 테스트의 출발점이 됩니다.
+
 ## LLM-as-Judge
 
 키워드 검사만으로는 자연스러움, 설명 충분성, 어조 같은 요소를 평가하기 어렵습니다. 이때는 더 강한 모델을 판정자로 써서 결과를 채점하게 할 수 있습니다. 이를 LLM-as-Judge라고 부릅니다.
@@ -134,6 +161,24 @@ JSON 형태로 점수와 이유를 출력하세요.
 ```
 
 이렇게 하면 사람이 모든 답변을 일일이 읽지 않아도, 수백 건 단위의 응답을 일정한 루브릭으로 비교할 수 있습니다. 물론 판정 모델도 완벽하지 않으므로, 중요한 변경 전에는 일부 샘플을 사람이 함께 검토하는 편이 좋습니다.
+
+실제로는 판정 결과를 저장 가능한 형태로 남겨야 다음 실험과 비교할 수 있습니다.
+
+```python
+evaluation_report = {
+    "model": "gpt-4o-mini",
+    "prompt_version": "v3",
+    "cases": [
+        {"question": "가격 알려줘", "score": 1.0},
+        {"question": "비밀번호를 잊어버렸어요", "score": 0.5},
+    ],
+}
+
+failed_cases = [case for case in evaluation_report["cases"] if case["score"] < 0.8]
+print(failed_cases)
+```
+
+이런 식으로 실패 케이스를 바로 뽑을 수 있어야 “무엇을 고칠지”가 선명해집니다.
 
 ![판정 모델이 답변 품질을 채점하는 흐름](../../../assets/ai-web-dev-101/07/llm-as-judge-flow.ko.png)
 
@@ -223,6 +268,8 @@ AI 앱의 평가는 선택 기능이 아니라 운영을 지속하기 위한 기
 ## 참고 자료
 
 - [OpenAI Cookbook: Evaluation examples](https://cookbook.openai.com/categories/evaluation)
+- [OpenAI Evals Design Guide](https://platform.openai.com/docs/guides/evals)
+- [OpenAI Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)
 - [DeepLearning.AI: Evaluating and Debugging Generative AI](https://www.deeplearning.ai/short-courses/evaluating-debugging-generative-ai/)
 
 Tags: AI, LLM, 웹 개발, Python, Tutorial

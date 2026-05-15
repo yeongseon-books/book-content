@@ -59,6 +59,9 @@ AI Agent를 가장 안정적으로 이해하는 방법은 agent를 하나의 앱
 
 > Agent의 핵심은 "LLM이 똑똑한가"보다 "목표를 향해 관찰·판단·행동·검증을 반복하는 제어 루프를 안전하게 만들었는가"에 있습니다.
 
+### agent 루프 한눈에 보기
+
+![agent 루프 한눈에 보기](../../../assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
 ## 핵심 개념
 
 ### Chatbot과 Agent를 먼저 분리해야 합니다

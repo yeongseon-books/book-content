@@ -56,6 +56,9 @@ agent 운영은 모델 응답을 모니터링하는 일이 아닙니다. 요청 
 
 > production agent 운영의 핵심은 "모델이 무엇을 답했는가"보다 "요청이 어떤 경로와 비용으로 처리되었는가"를 관측 가능하게 만드는 데 있습니다.
 
+### 운영 피드백 루프
+
+![운영 피드백 루프](../../../assets/ai-agent-101/09/09-01-operations-feedback-loop.ko.png)
 ## 핵심 개념
 
 ### 운영 관측은 요청 하나의 흐름을 끝까지 따라갈 수 있어야 합니다
@@ -188,8 +191,13 @@ class BudgetEnforcer:
     """Budget enforcement."""
 
     PRICING = {
+<<<<<<< HEAD
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
         "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
+=======
+        "gpt-4o": {"prompt": 0.0025 / 1000, "completion": 0.01 / 1000},
+        "gpt-4o-mini": {"prompt": 0.00015 / 1000, "completion": 0.0006 / 1000}
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     }
 ```
 

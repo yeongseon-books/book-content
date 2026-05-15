@@ -74,7 +74,9 @@
 
 <h2>Function Calling Basic Flow</h2>
 <p>The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). Let's explore how this works step-by-step.</p>
-<p><strong>The Four-Step Flow</strong></p>
+<p><strong>Tool-calling loop</strong></p>
+<p><img alt="Tool-calling loop" src="https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png"><br>
+<strong>The Four-Step Flow</strong></p>
 <p><strong>Step 1: Provide Tool Definitions to LLM</strong></p>
 <p>When calling the LLM API, you register available tools in JSON Schema format.</p>
 <pre><code class="language-python">import openai
@@ -100,7 +102,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM decides whether to use tools
@@ -158,7 +160,7 @@ messages = [
 
 # Get final answer
 final_response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=messages
 )
 
@@ -183,7 +185,7 @@ def agent_with_tools(
     for iteration in range(max_iterations):
         # Call LLM
         response = openai.chat.completions.create(
-            model=&quot;gpt-4&quot;,
+            model=&quot;gpt-4o&quot;,
             messages=messages,
             tools=tools,
             tool_choice=&quot;auto&quot;
@@ -404,7 +406,7 @@ tools = [
 
 # Pass tool information to LLM
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM automatically selects tool
@@ -587,7 +589,7 @@ tools = [
 
 # Strategy 1: Automatic selection (LLM decides)
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;auto&quot;  # LLM uses tools when needed
@@ -595,7 +597,7 @@ response = openai.chat.completions.create(
 
 # Strategy 2: Force tool use
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;required&quot;  # Must call one tool
@@ -603,7 +605,7 @@ response = openai.chat.completions.create(
 
 # Strategy 3: Specify tool
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice={&quot;type&quot;: &quot;function&quot;, &quot;function&quot;: {&quot;name&quot;: &quot;get_weather&quot;}}
@@ -611,7 +613,7 @@ response = openai.chat.completions.create(
 
 # Strategy 4: Disable tools
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools,
     tool_choice=&quot;none&quot;  # No tool use
@@ -692,7 +694,7 @@ def select_relevant_tools(
     &quot;&quot;&quot;
 
     response = openai.chat.completions.create(
-        model=&quot;gpt-4&quot;,
+        model=&quot;gpt-4o&quot;,
         messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: summary_prompt}]
     )
 
@@ -899,7 +901,7 @@ tools = [
 ]
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What's the weather in Seoul?&quot;}],
     tools=tools  # Token waste, reduced selection accuracy
 )
@@ -922,7 +924,7 @@ response = openai.chat.completions.create(
 relevant_tools = get_relevant_tools(user_query, all_tools)
 
 response = openai.chat.completions.create(
-    model=&quot;gpt-4&quot;,
+    model=&quot;gpt-4o&quot;,
     messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: user_query}],
     tools=relevant_tools  # 3-5 tools only
 )

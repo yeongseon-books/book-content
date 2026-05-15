@@ -56,6 +56,9 @@ workflow 패턴은 모델의 성격 설명이 아니라 **제어 흐름 패턴**
 
 > 좋은 workflow 설계는 agent를 더 복잡하게 만드는 일이 아니라, 어떤 종류의 작업에서 어떤 종류의 제어 흐름이 가장 예측 가능하게 동작하는지 고르는 일입니다.
 
+### 워크플로 패턴 지도
+
+![워크플로 패턴 지도](../../../assets/ai-agent-101/04/04-01-workflow-pattern-map.ko.png)
 ## 핵심 개념
 
 ### workflow를 먼저 그림으로 고정하면 설계가 쉬워집니다
@@ -87,7 +90,11 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     for step in range(max_steps):
         # Request next action from LLM
         response = openai.chat.completions.create(
+<<<<<<< HEAD
             model="gpt-4.1",
+=======
+            model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=messages,
             tools=tools,
             tool_choice="auto"
@@ -142,7 +149,11 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
 
     response = openai.chat.completions.create(
+<<<<<<< HEAD
         model="gpt-4.1",
+=======
+        model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": plan_prompt}]
     )
 
@@ -180,7 +191,11 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """
 
     final_response = openai.chat.completions.create(
+<<<<<<< HEAD
         model="gpt-4.1",
+=======
+        model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
         messages=[{"role": "user", "content": summary_prompt}]
     )
 
@@ -233,7 +248,11 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         """
 
         reflection_response = openai.chat.completions.create(
+<<<<<<< HEAD
             model="gpt-4.1",
+=======
+            model="gpt-4o",
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
             messages=[{"role": "user", "content": reflection_prompt}]
         )
 

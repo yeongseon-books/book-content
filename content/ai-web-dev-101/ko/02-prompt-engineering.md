@@ -103,6 +103,36 @@ System Prompt와 User Prompt의 역할
 
 생성 다양성과 답변 길이를 조절하는 두 설정
 
+실무에서는 이 값을 추상적으로만 이해하지 말고, 실제 요청 코드에 붙여 보는 편이 좋습니다.
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    temperature=0.2,
+    max_tokens=180,
+    messages=[
+        {
+            "role": "system",
+            "content": "너는 보안과 유지보수성을 중시하는 코드 리뷰어다.",
+        },
+        {
+            "role": "user",
+            "content": "아래 함수를 5줄 이내 bullet point로 리뷰해줘.",
+        },
+    ],
+)
+
+print(response.choices[0].message.content)
+print(response.usage)
+```
+
+이 코드에서 중요한 것은 답변 본문만이 아닙니다. `usage`를 함께 보면 프롬프트를 길게 늘릴수록 실제 토큰이 얼마나 늘어나는지도 곧바로 확인할 수 있습니다. 프롬프트 엔지니어링은 결과 품질과 함께 비용을 같이 봐야 하는 작업이라는 뜻입니다.
+
 ## 실습 1: 상품 설명 자동 생성기
 
 마케팅 문구 생성처럼 톤과 형식이 중요한 작업은 프롬프트 차이가 특히 크게 드러납니다.
@@ -134,6 +164,23 @@ function login(user, pass) {
 ```
 
 이 프롬프트가 유용한 이유는 출력 평가 기준이 이미 포함되어 있기 때문입니다. 잠재적 버그, 성능, 가독성이라는 세 축을 먼저 정해 두면 모델 응답도 그 틀 안에서 조직되기 쉽습니다.
+
+형식이 중요한 작업이라면 아예 출력 계약을 JSON으로 고정하는 편이 더 안전합니다.
+
+```python
+review_prompt = """
+다음 JavaScript 코드를 리뷰해서 JSON으로 답해줘.
+
+반드시 아래 형식을 지켜:
+{
+  "bugs": ["..."],
+  "performance": ["..."],
+  "readability": ["..."]
+}
+"""
+```
+
+이런 식의 명시는 이후 서버 코드가 답변을 다시 파싱해 UI에 보여 주거나 저장할 때 특히 큰 차이를 만듭니다. 사람이 읽기 좋은 문장과 시스템이 소비하기 좋은 형식은 다를 수 있기 때문입니다.
 
 ## 프롬프트 디버깅 체크리스트
 
@@ -184,6 +231,8 @@ function login(user, pass) {
 ## 참고 자료
 
 - [OpenAI Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)
+- [OpenAI Text Generation Guide](https://platform.openai.com/docs/guides/text-generation)
+- [OpenAI Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs)
 - [PromptingGuide.ai (DeepLearning.AI)](https://www.promptingguide.ai/kr)
 
 Tags: AI, LLM, 웹 개발, Python, Tutorial

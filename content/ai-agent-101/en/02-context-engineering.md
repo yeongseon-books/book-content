@@ -43,6 +43,9 @@ This is post 2 in the AI Agent 101 series. Here we cover context components, sys
 
 <!-- a-grade-intro:end -->
 
+## Context map
+
+![diagram](../../../assets/ai-agent-101/02/02-01-context-map.en.png)
 ## Context Components
 
 An agent's context refers to all information the LLM considers when making decisions. Context consists of four main components.

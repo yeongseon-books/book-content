@@ -46,9 +46,15 @@ This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, i
 
 There are several patterns for handling complex tasks through cooperation among multiple agents.
 
+<<<<<<< HEAD
 ![Multi-Agent Patterns](../../../assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
 *Multi-agent systems are easier to reason about when you draw them as delegation graphs: who routes work, who writes to shared state, and who is allowed to return the final answer.*
 
+=======
+### Multi-agent handoff graph
+
+![Multi-agent handoff graph](../../../assets/ai-agent-101/06/06-01-multi-agent-handoff-graph.en.png)
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
 ### Orchestrator Pattern (Centralized Coordination)
 
 A single Orchestrator agent coordinates everything and delegates work to specialized Worker agents.
@@ -68,7 +74,7 @@ class WorkerAgent:
     def execute(self, task: str) -> str:
         """Execute a task."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are a {self.role}."},
                 {"role": "user", "content": task}
@@ -108,7 +114,7 @@ Respond in JSON format:
 ]
 """
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
@@ -184,7 +190,7 @@ Message from {sender.name}: {message}
 Respond appropriately. If you need help from another peer, mention it."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
@@ -224,7 +230,7 @@ Respond appropriately. If you need help from another peer, mention it."""
     def _handle_alone(self, task: str) -> str:
         """Handle the task alone."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are {self.name}, a {self.role}."},
                 {"role": "user", "content": task}
@@ -304,7 +310,7 @@ Child agents:
 Respond with one subtask per line, in the same order as the child agents."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
@@ -317,7 +323,7 @@ Respond with one subtask per line, in the same order as the child agents."""
     def _do_work(self, task: str) -> str:
         """Execute the task directly (leaf nodes)."""
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": f"You are {self.name}, a {self.role}."},
                 {"role": "user", "content": task}
@@ -339,7 +345,7 @@ Subtask results:
 Synthesize the results into a coherent final answer."""
 
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5
         )

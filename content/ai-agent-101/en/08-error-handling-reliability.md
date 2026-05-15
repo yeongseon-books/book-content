@@ -46,6 +46,9 @@ This is post 8 in the AI Agent 101 series. Here we cover common agent failure mo
 
 Agents tangle together LLMs, tools, external APIs, and user input, so error sources are diverse.
 
+### Reliability control loop
+
+![Reliability control loop](../../../assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
 ### LLM Response Errors
 
 The LLM's own non-determinism, format errors, and hallucinations are the most common error source.

@@ -54,6 +54,9 @@ In this episode, you build a small research assistant agent end to end. The user
 
 This example is small but it pulls together every concept covered in episodes 1 through 9: context setup, tool definition, workflow design, memory, error handling, evaluation, and operations.
 
+## End-to-end build map
+
+![diagram](../../../assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
 ---
 
 ## Prerequisites

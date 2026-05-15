@@ -46,6 +46,9 @@ This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metric
 
 Agent evaluation must look beyond "did it answer well" to multiple dimensions. The core metrics are below.
 
+### Evaluation signal path
+
+![Evaluation signal path](../../../assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
 ### Task Success Rate
 
 The percentage of user requests the agent completes successfully.
@@ -142,8 +145,13 @@ class CostTracker:
     """Tracks API call cost."""
 
     PRICING = {
+<<<<<<< HEAD
         "gpt-4": {"prompt": 0.03 / 1000, "completion": 0.06 / 1000},
         "gpt-4o-mini": {"prompt": 0.15 / 1_000_000, "completion": 0.60 / 1_000_000}
+=======
+        "gpt-4o": {"prompt": 0.0025 / 1000, "completion": 0.01 / 1000},
+        "gpt-4o-mini": {"prompt": 0.00015 / 1000, "completion": 0.0006 / 1000}
+>>>>>>> f529af6b (Raise AI series editorial quality and align agent examples with current surfaces)
     }
 
     def __init__(self):

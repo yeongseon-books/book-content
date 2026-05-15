@@ -66,6 +66,9 @@ This sentence is impossible for a chatbot. The model has to call external system
 
 A dictionary opens, hands you a definition, and closes. An intern is different. They do not know the answer up front. They look around (observe), decide what to try (think), do something (act), and check whether the result is good (check). If not, they try again. That loop is the essence of an Agent.
 
+### Agent loop at a glance
+
+![Agent loop at a glance](../../../assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
 ## Concept 1 - Chatbot vs Agent
 
 | | Chatbot | Agent |

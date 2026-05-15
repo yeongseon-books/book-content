@@ -45,6 +45,9 @@ This is post 5 in the AI Agent 101 series. Here we cover the difference between 
 
 ## Short-term Memory vs Long-term Memory
 
+### Memory and state split
+
+![Memory and state split](../../../assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
 ## Short-term Memory vs Long-term Memory
 
 Agent memory is divided into short-term memory and long-term memory based on retention period and purpose.
@@ -543,7 +546,7 @@ from typing import List, Dict
 class TokenAwareMemory:
     """Token-tracking memory"""
     
-    def __init__(self, system_prompt: str, model: str = "gpt-4", max_tokens: int = 8000):
+    def __init__(self, system_prompt: str, model: str = "gpt-4o", max_tokens: int = 8000):
         self.model = model
         self.max_tokens = max_tokens
         self.encoding = tiktoken.encoding_for_model(model)
@@ -589,7 +592,7 @@ class TokenAwareMemory:
 # Usage example
 memory = TokenAwareMemory(
     system_prompt="You are a helpful assistant.",
-    model="gpt-4",
+    model="gpt-4o",
     max_tokens=8000
 )
 
@@ -626,7 +629,7 @@ class LengthControlledAgent:
         self.max_response_tokens = max_response_tokens
         self.memory = TokenAwareMemory(
             system_prompt="You are a helpful assistant. Keep responses concise.",
-            model="gpt-4",
+            model="gpt-4o",
             max_tokens=max_context_tokens
         )
     
@@ -635,7 +638,7 @@ class LengthControlledAgent:
         self.memory.add_message("user", user_message)
         
         response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=self.memory.get_context(),
             max_tokens=self.max_response_tokens,  # Response length limit
             temperature=0.7
@@ -677,7 +680,7 @@ class ChunkedProcessor:
     def __init__(self, api_key: str, chunk_size: int = 3000):
         self.client = OpenAI(api_key=api_key)
         self.chunk_size = chunk_size
-        self.encoding = tiktoken.encoding_for_model("gpt-4")
+        self.encoding = tiktoken.encoding_for_model("gpt-4o")
     
     def split_into_chunks(self, text: str) -> List[str]:
         """Split text into chunks by token count"""
@@ -698,7 +701,7 @@ class ChunkedProcessor:
         
         for i, chunk in enumerate(chunks):
             response = self.client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "Answer the query based on the given text chunk."},
                     {"role": "user", "content": f"Query: {query}\n\nChunk {i+1}/{len(chunks)}:\n{chunk}"}
@@ -710,7 +713,7 @@ class ChunkedProcessor:
         
         # Combine final results
         final_response = self.client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "Combine the following answers into a coherent response."},
                 {"role": "user", "content": "\n\n".join(results)}
@@ -760,7 +763,7 @@ print(answer)
 ```python
 # Token usage logging example
 response = client.chat.completions.create(
-    model="gpt-4",
+    model="gpt-4o",
     messages=messages
 )
 
@@ -1144,7 +1147,7 @@ recent_summaries = structured_store.get_recent_summaries(
 ```python
 # Add messages without checking token count
 messages.append({"role": "user", "content": user_input})
-response = client.chat.completions.create(model="gpt-4", messages=messages)
+response = client.chat.completions.create(model="gpt-4o", messages=messages)
 # Error when context window exceeded
 ```
 
@@ -1152,7 +1155,7 @@ response = client.chat.completions.create(model="gpt-4", messages=messages)
 ```python
 import tiktoken
 
-encoding = tiktoken.encoding_for_model("gpt-4")
+encoding = tiktoken.encoding_for_model("gpt-4o")
 
 def count_tokens(messages):
     total = sum(len(encoding.encode(msg["content"])) for msg in messages)
