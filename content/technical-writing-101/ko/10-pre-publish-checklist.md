@@ -17,12 +17,16 @@ tags:
   - Quality
   - Beginner
 seo_description: 발행 전 제목 검토, 링크 검증, 코드 실행 등 품질을 보장하는 최종 체크리스트를 살펴봅니다. 수정 비용을 줄이는 실전 점검 루틴을 다룹니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 발행 전 체크리스트
 
-이 글은 Technical Writing 101 시리즈의 마지막 글입니다.
+글을 다 썼을 때 가장 위험한 순간은 거의 끝났다고 느끼는 순간입니다. 이때는 제목 오탈자, 끊어진 링크, 실행되지 않는 명령, 빠진 캡션 같은 작은 흠을 대충 넘기기 쉽습니다. 하지만 독자는 바로 그 작은 흠에서 글 전체의 신뢰도를 판단합니다.
+
+발행 전 점검은 글을 완벽하게 꾸미는 과정이 아니라 수정 비용을 앞당겨 줄이는 운영 루틴입니다. 한 번의 자동 검증과 한 번의 사람 눈 검토가 있으면, 발행 뒤 급하게 고칠 일을 상당수 줄일 수 있습니다.
+
+이 글은 Technical Writing 101 시리즈의 마지막 글입니다. 여기서는 제목, 링크, 코드, 이미지, 발행 후 대응까지 한 번에 점검하는 마지막 루틴을 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -47,14 +51,9 @@ last_reviewed: '2026-05-12'
 
 > 멘탈 모델: 발행 전 체크리스트는 완벽주의가 아니라 운영 습관입니다. 제목에서 시작해 링크와 코드와 이미지를 확인하고, 발행 뒤까지 이어지는 작은 루틴이 큰 수정 비용을 막습니다.
 
-```mermaid
-flowchart LR
-    T[Title] --> L[Links]
-    L --> C[Code]
-    C --> I[Images]
-    I --> P[Publish]
-```
+![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/10/10-01-concept-at-a-glance.ko.png)
 
+*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **link rot**: 시간이 지나며 생기는 깨진 링크입니다.
@@ -68,6 +67,28 @@ flowchart LR
 **Before**: A broken link found right after publish.
 
 **After**: The checklist passes before publish.
+
+## 체크리스트를 릴리스 루틴으로 고정합니다
+
+이 저장소처럼 글을 시리즈 단위로 관리한다면 발행 직전 점검도 명령으로 굳혀 두는 편이 좋습니다. 예를 들어 아래 순서는 사람이 빠뜨리기 쉬운 항목을 꽤 잘 잡아 줍니다.
+
+```bash
+python3 .sisyphus/medium/finalize-posts.py
+bash .sisyphus/style/check-ko.sh content/technical-writing-101/ko
+python3 scripts/check_frontmatter.py
+python3 scripts/check_links.py
+python3 scripts/check_article_structure.py
+make check
+```
+
+**Expected output:**
+
+```text
+hard failures: 0
+warnings: 0
+```
+
+사람 검토도 여기서 끝나지 않습니다. 자동 검증이 통과한 뒤에는 제목과 첫 세 단락만 따로 다시 읽어 보는 편이 좋습니다. 독자는 그 부분만 읽고도 글의 신뢰도를 판단하는 경우가 많기 때문입니다.
 
 ## 실습: 다섯 단계로 점검하기
 

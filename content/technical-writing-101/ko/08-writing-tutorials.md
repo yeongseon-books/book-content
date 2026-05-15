@@ -17,12 +17,16 @@ tags:
   - HandsOn
   - Beginner
 seo_description: 독자가 따라 하기만 해도 첫 성공을 경험하도록 돕는 튜토리얼 작성법을 배웁니다. 전제 조건, 단계별 설계, 오류 복구 등 실전 팁을 담았습니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 튜토리얼 작성하기
 
-이 글은 Technical Writing 101 시리즈의 8번째 글입니다.
+튜토리얼을 쓰다 보면 설명을 더해야 안심이 됩니다. 그런데 독자는 지금 모든 배경을 배우러 온 것이 아니라, 손을 움직여 첫 성공을 확인하러 온 경우가 많습니다. 그래서 튜토리얼은 설명의 완전성보다 성공 경로의 안정성을 먼저 설계해야 합니다.
+
+좋은 튜토리얼은 단계가 짧고, 검증 지점이 분명하고, 막히는 지점에서 바로 복구 힌트를 줍니다. 독자가 중간에 실패하더라도 무엇을 다시 확인해야 하는지 한 줄이라도 보여 주면 완주율이 크게 달라집니다.
+
+이 글은 Technical Writing 101 시리즈의 8번째 글입니다. 여기서는 첫 성공을 빠르게 만들고 검증 가능한 단계로 나누는 튜토리얼 설계법을 정리합니다.
 
 ## 이 글에서 다룰 문제
 
@@ -47,13 +51,9 @@ last_reviewed: '2026-05-12'
 
 > 멘탈 모델: 튜토리얼은 강의문이 아니라 안내선입니다. 전제 조건을 먼저 밝히고, 한 단계씩 따라가게 하고, 작은 성공을 빠르게 보여 준 뒤, 다음 학습으로 넘깁니다.
 
-```mermaid
-flowchart LR
-    P[Prereq] --> S[Step]
-    S --> W[Win]
-    W --> N[Next]
-```
+![한눈에 보는 멘탈 모델](../../../assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)
 
+*한눈에 보는 멘탈 모델*
 ## 핵심 용어
 
 - **tutorial**: 학습 지향 글입니다.
@@ -67,6 +67,32 @@ flowchart LR
 **Before**: "Let us learn about FastAPI." (lecture)
 
 **After**: "Run Hello World in five minutes." (tutorial)
+
+## 튜토리얼 단계마다 검증 지점을 심어 둡니다
+
+튜토리얼이 잘 작동하는지 확인하려면 각 단계가 독립적인 테스트처럼 보여야 합니다. 예를 들어 FastAPI 예제라면 아래처럼 파일 저장, 실행, 검증, 복구 힌트를 함께 둘 수 있습니다.
+
+```bash
+cat > main.py <<'PY'
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"hello": "world"}
+PY
+
+fastapi dev main.py
+```
+
+**Expected output:**
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+복구 힌트도 한 줄은 있어야 합니다. 예를 들어 `fastapi: command not found`가 보이면 `python3 -m pip install "fastapi[standard]"`를 다시 실행하라고 바로 적어 두면 독자는 검색창으로 새어나가지 않고 튜토리얼 안에서 문제를 풀 수 있습니다.
 
 ## 실습: 5분 튜토리얼 만들기
 

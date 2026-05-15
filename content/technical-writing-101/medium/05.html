@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Explaining Example Code</h1>
-<p>This is post 5 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (5/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why does pasting <em>code</em> still leave the <em>reader</em> lost?</p>
-<blockquote>
-<p>One <em>callout line</em> matters more than the <em>code</em> itself.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Long code samples often look generous, but they are one of the fastest ways to lose a reader. If the post does not show where to focus, what to run, and what success looks like, the example becomes a copy-paste gamble instead of a teaching tool.</p>
+<p>Good code walkthroughs are intentionally small. They isolate the interesting lines, pair them with a short callout, and close the loop with an actual command and visible output. That is what turns a snippet into a reusable learning step.</p>
+<p>This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>A <em>minimal</em> example</li>
 <li>Where to place <em>comments</em></li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>A <em>runnable</em> example must reach the reader's <em>hands</em> to teach.</p>
+<blockquote>
+<p>Mental model: show the smallest runnable snippet, point at the key line, then prove the output.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    M[Minimal] --&gt; H[Highlight]
-    H --&gt; R[Run]
-    R --&gt; O[Output]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>MWE</strong>: A <em>Minimal Working Example</em>.</li>
@@ -93,6 +84,23 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: A 200 line code dump.</p>
 <p><strong>After</strong>: An 8 line <em>MWE</em> with a 2 line <em>callout</em>.</p>
+<h2>A better walkthrough gives setup, focus, and proof</h2>
+<p>Here is a slightly more realistic example.</p>
+<pre><code class="language-python">from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(&quot;/add&quot;)
+def add(a: int, b: int) -&gt; dict[str, int]:
+    return {&quot;result&quot;: a + b}
+</code></pre>
+<pre><code class="language-bash">uvicorn main:app --reload
+curl &quot;http://127.0.0.1:8000/add?a=2&amp;b=3&quot;
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-json">{&quot;result&quot;:5}
+</code></pre>
+<p>The first line many readers need is not the function body. It is the route declaration and the verification command. One shows the entry point. The other proves that the example really works. A code walkthrough is stronger when it exposes both.</p>
 <h2>Hands-on: One Example</h2>
 <p><strong>Step 1 — Minimal code</strong></p>
 <pre><code class="language-python">def add(a, b):

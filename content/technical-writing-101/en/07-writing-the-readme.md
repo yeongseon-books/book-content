@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 7
 title: Writing the README
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - OpenSource
   - Documentation
   - Beginner
-seo_description: A beginner-friendly tour of writing a README that lets a first-time visitor run the project in five minutes.
-last_reviewed: '2026-05-04'
+seo_description: Write a README that gives first-time visitors a five-minute path to install, run, and verify the project.
+last_reviewed: '2026-05-15'
 ---
 
 # Writing the README
 
-This is post 7 in the Technical Writing 101 series.
+Most readers decide whether to stay in a repository before they inspect a single source file. If the README hides the purpose, the install path, or the first success, the project already feels expensive to approach.
 
-> Technical Writing 101 series (7/10)
+A strong README does not try to explain everything. It lowers entry friction. It tells the reader what this project is, why it exists, how to try it quickly, and what result should appear when the happy path works.
 
-<!-- a-grade-intro:begin -->
+This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
 
-**Core question**: Can a *first-time visitor* run the project in *five minutes* using only the *README*?
-
-> A *kind entrance* makes the whole *house* feel *kind*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - The *five part* structure
 - Writing the *Quick Start*
@@ -46,16 +40,13 @@ This is post 7 in the Technical Writing 101 series.
 
 The *README* is the *first impression* of a project.
 
+> Mental model: the README should get a first-time visitor to a visible success with minimal scrolling.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    W[What] --> Y[Why]
-    Y --> H[How]
-    H --> D[Demo]
-    D --> L[License]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **What**: What it *is*.
@@ -69,6 +60,29 @@ flowchart LR
 **Before**: "A *Python* package called *Hello*."
 
 **After**: A README with all *five* parts.
+
+## Treat the README like a five-minute contract
+
+You can compress the first-run path near the top of the README like this.
+
+~~~markdown
+## Quick Start
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+~~~
+
+**Expected output:**
+
+```text
+Uvicorn running on http://127.0.0.1:8000
+```
+
+This pattern works because install, run, and proof live in one screen. The reader does not need to absorb the whole backstory before seeing a first success. Once the project feels runnable, the rest of the README becomes easier to trust.
 
 ## Hands-on: Five README Parts
 

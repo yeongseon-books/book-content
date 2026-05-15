@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 3
 title: Title and Structure
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Structure
   - Outline
   - Beginner
-seo_description: A beginner-friendly tour of writing search-friendly titles and readable structures for technical posts.
-last_reviewed: '2026-05-04'
+seo_description: Design technical titles and post structure together so the title promise matches the reader's path through the article.
+last_reviewed: '2026-05-15'
 ---
 
 # Title and Structure
 
-This is post 3 in the Technical Writing 101 series.
+Some posts earn the click and lose the reader two scrolls later. Others contain useful material but hide it behind a vague title, so the right reader never opens them in the first place. Those failures look different, but they come from the same source: the title promised one thing while the structure delivered another.
 
-> Technical Writing 101 series (3/10)
+A strong title is not just marketing copy. It compresses the reader action and the payoff. The structure is the route that gets the reader there with the least friction. That is why these two pieces should be designed together, not fixed separately at the end.
 
-<!-- a-grade-intro:begin -->
+This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
 
-**Core question**: Why must a *good title* and a *good structure* travel *together*?
-
-> The *title* is a *promise*, and the *structure* is the *delivery*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - *SEO* titles
 - *H heading* hierarchy
@@ -46,15 +40,13 @@ This is post 3 in the Technical Writing 101 series.
 
 The *title* earns the *click*, and the *structure* earns the *time*.
 
+> Mental model: the title makes the promise, and the section order delivers it.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    T[Title] --> O[Outline]
-    O --> B[Body]
-    B --> S[Summary]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **SEO title**: A *search-friendly title*.
@@ -68,6 +60,31 @@ flowchart LR
 **Before**: "*FastAPI* notes".
 
 **After**: "*Ship your first FastAPI endpoint in five minutes*".
+
+## Run a quick scannability test on the outline
+
+Compare these two skeletons.
+
+```markdown
+# FastAPI notes
+
+## Overview
+## Part 1
+## Part 2
+## Summary
+```
+
+```markdown
+# Ship your first FastAPI endpoint in five minutes
+
+## Why this matters
+## Install
+## Write the code
+## Run and verify
+## Common blockers
+```
+
+The second outline is stronger because the headings expose the route. The title promise continues into the H2s, the verification point is visible, and the likely blocker is named early. A simple test works well here: if a reader can skim only the title and H2s and still predict the next action, the structure is probably doing its job.
 
 ## Hands-on: A Skeleton for One Post
 

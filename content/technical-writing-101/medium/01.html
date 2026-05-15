@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>What Is Technical Writing</h1>
-<p>This is the first post in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How is <em>technical writing</em> different from <em>everyday writing</em>?</p>
-<blockquote>
-<p>The reader must be able to <em>act</em> on it.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>When beginners hear <em>technical writing</em>, they often picture polish first: clean grammar, nice headings, maybe a few screenshots. In real engineering teams, the harder problem is direction. If the writer does not know who the reader is, what action should follow, and what counts as success, even elegant prose turns into a slow document.</p>
+<p>Technical writing matters because it keeps working after the meeting ends. A README, runbook, tutorial, or migration note gets read by someone who still has to install, run, compare, debug, or decide something. That operational handoff is what separates it from everyday explanatory prose.</p>
+<p>This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>A definition of <em>technical writing</em></li>
 <li>The difference from <em>everyday</em> prose</li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>Writing tends to <em>outlive</em> the <em>code</em> it describes.</p>
+<blockquote>
+<p>Mental model: the post only works when a reader can turn the explanation into an action.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    R[Reader] --&gt; Q[Question]
-    Q --&gt; A[Answer]
-    A --&gt; X[Action]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>technical writing</strong>: Prose that <em>delivers technical information</em>.</li>
@@ -93,6 +84,20 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "<em>Python</em> is a <em>great language</em>."</p>
 <p><strong>After</strong>: "A <em>beginner</em> can <em>run Hello World</em> in <em>five minutes</em>."</p>
+<h2>One frame that sharpens the whole paragraph</h2>
+<p><strong>Reader</strong><br>
+- Weak version: Developers<br>
+- Stronger version: A junior backend engineer building a first FastAPI endpoint</p>
+<p><strong>Task</strong><br>
+- Weak version: Environment setup<br>
+- Stronger version: Create a virtual environment and install dependencies</p>
+<p><strong>Output</strong><br>
+- Weak version: Success<br>
+- Stronger version: <code>(.venv)</code> appears and <code>pip list</code> shows the package</p>
+<p><strong>Boundary</strong><br>
+- Weak version: Python basics<br>
+- Stronger version: Local setup only, not deployment</p>
+<p>This table matters because technical vagueness usually begins in the opening promise. If the reader is broad, the task widens, the output becomes invisible, and the post starts to sound friendly while remaining hard to execute. Filling in these four cells before writing often fixes the paragraph before the prose stage even begins.</p>
 <h2>Hands-on: One Technical Paragraph</h2>
 <p><strong>Step 1 — Pick the audience</strong></p>
 <pre><code class="language-python">audience = &quot;Python beginners&quot;

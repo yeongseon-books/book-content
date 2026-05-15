@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 10
 title: Pre-publish Checklist
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Publishing
   - Quality
   - Beginner
-seo_description: A beginner-friendly tour of the final pre-publish checklist for any technical post before hitting the publish button.
-last_reviewed: '2026-05-04'
+seo_description: Use a repeatable pre-publish checklist for titles, links, code, visuals, and final verification before readers see the post.
+last_reviewed: '2026-05-15'
 ---
 
 # Pre-publish Checklist
 
-This is the final post in the Technical Writing 101 series.
+The riskiest moment in writing is often the moment when the draft feels almost done. That is when broken links, stale commands, missing captions, and title typos get waved through as small details. Readers usually notice those details first.
 
-> Technical Writing 101 series (10/10)
+A pre-publish pass is not perfectionism. It is a cost-control routine. One round of automated checks plus one round of human review can remove a surprising number of expensive fixes before the post reaches real readers.
 
-<!-- a-grade-intro:begin -->
+This is the final post in the Technical Writing 101 series. It turns that last-pass review into a repeatable workflow for titles, links, code, visuals, and post-publish follow-up.
 
-**Core question**: What is the *last* thing to *review* before you hit *publish*?
-
-> Re-reading with the *eyes of a first-time visitor*.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - *Title* review
 - *Link* validation
@@ -46,16 +40,13 @@ This is the final post in the Technical Writing 101 series.
 
 A *fix after publish* is far more expensive than a *check before publish*.
 
+> Mental model: the final pass is an operating routine for titles, links, code, visuals, and follow-up.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    T[Title] --> L[Links]
-    L --> C[Code]
-    C --> I[Images]
-    I --> P[Publish]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **link rot**: A *broken link* over time.
@@ -69,6 +60,28 @@ flowchart LR
 **Before**: A *broken link* found right after publish.
 
 **After**: The *checklist* passes before publish.
+
+## Turn the checklist into a repeatable release routine
+
+For a repository like this one, the final pass is stronger when it becomes a command sequence instead of a memory exercise.
+
+```bash
+python3 .sisyphus/medium/finalize-posts.py
+bash .sisyphus/style/check-ko.sh content/technical-writing-101/ko
+python3 scripts/check_frontmatter.py
+python3 scripts/check_links.py
+python3 scripts/check_article_structure.py
+make check
+```
+
+**Expected output:**
+
+```text
+hard failures: 0
+warnings: 0
+```
+
+Automation does not replace human review. After the commands pass, it is still worth rereading the title and first three paragraphs as if you were a first-time visitor. Readers often decide whether to trust the whole post from that narrow slice alone.
 
 ## Hands-on: A Five Step Review
 

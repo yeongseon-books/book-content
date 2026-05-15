@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Pre-publish Checklist</h1>
-<p>This is the final post in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (10/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: What is the <em>last</em> thing to <em>review</em> before you hit <em>publish</em>?</p>
-<blockquote>
-<p>Re-reading with the <em>eyes of a first-time visitor</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>The riskiest moment in writing is often the moment when the draft feels almost done. That is when broken links, stale commands, missing captions, and title typos get waved through as small details. Readers usually notice those details first.</p>
+<p>A pre-publish pass is not perfectionism. It is a cost-control routine. One round of automated checks plus one round of human review can remove a surprising number of expensive fixes before the post reaches real readers.</p>
+<p>This is the final post in the Technical Writing 101 series. It turns that last-pass review into a repeatable workflow for titles, links, code, visuals, and post-publish follow-up.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li><em>Title</em> review</li>
 <li><em>Link</em> validation</li>
@@ -76,13 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>A <em>fix after publish</em> is far more expensive than a <em>check before publish</em>.</p>
+<blockquote>
+<p>Mental model: the final pass is an operating routine for titles, links, code, visuals, and follow-up.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    T[Title] --&gt; L[Links]
-    L --&gt; C[Code]
-    C --&gt; I[Images]
-    I --&gt; P[Publish]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>link rot</strong>: A <em>broken link</em> over time.</li>
@@ -94,6 +84,20 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: A <em>broken link</em> found right after publish.</p>
 <p><strong>After</strong>: The <em>checklist</em> passes before publish.</p>
+<h2>Turn the checklist into a repeatable release routine</h2>
+<p>For a repository like this one, the final pass is stronger when it becomes a command sequence instead of a memory exercise.</p>
+<pre><code class="language-bash">python3 .sisyphus/medium/finalize-posts.py
+bash .sisyphus/style/check-ko.sh content/technical-writing-101/ko
+python3 scripts/check_frontmatter.py
+python3 scripts/check_links.py
+python3 scripts/check_article_structure.py
+make check
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">hard failures: 0
+warnings: 0
+</code></pre>
+<p>Automation does not replace human review. After the commands pass, it is still worth rereading the title and first three paragraphs as if you were a first-time visitor. Readers often decide whether to trust the whole post from that narrow slice alone.</p>
 <h2>Hands-on: A Five Step Review</h2>
 <p><strong>Step 1 — Title review</strong></p>
 <pre><code class="language-python">title_ok = [&quot;has a verb&quot;, &quot;fits 55 chars&quot;, &quot;uses reader words&quot;]

@@ -2,7 +2,7 @@
 series: technical-writing-101
 episode: 5
 title: Explaining Example Code
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -16,25 +16,19 @@ tags:
   - Examples
   - Walkthrough
   - Beginner
-seo_description: A beginner-friendly tour of presenting example code with minimal snippets, callouts, and visible output.
-last_reviewed: '2026-05-04'
+seo_description: Walk readers through example code with minimal snippets, callouts, runnable commands, and visible output.
+last_reviewed: '2026-05-15'
 ---
 
 # Explaining Example Code
 
-This is post 5 in the Technical Writing 101 series.
+Long code samples often look generous, but they are one of the fastest ways to lose a reader. If the post does not show where to focus, what to run, and what success looks like, the example becomes a copy-paste gamble instead of a teaching tool.
 
-> Technical Writing 101 series (5/10)
+Good code walkthroughs are intentionally small. They isolate the interesting lines, pair them with a short callout, and close the loop with an actual command and visible output. That is what turns a snippet into a reusable learning step.
 
-<!-- a-grade-intro:begin -->
+This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
 
-**Core question**: Why does pasting *code* still leave the *reader* lost?
-
-> One *callout line* matters more than the *code* itself.
-
-<!-- a-grade-intro:end -->
-
-## What You Will Learn
+## Questions this post answers
 
 - A *minimal* example
 - Where to place *comments*
@@ -46,15 +40,13 @@ This is post 5 in the Technical Writing 101 series.
 
 A *runnable* example must reach the reader's *hands* to teach.
 
+> Mental model: show the smallest runnable snippet, point at the key line, then prove the output.
+
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    M[Minimal] --> H[Highlight]
-    H --> R[Run]
-    R --> O[Output]
-```
+![Concept at a Glance](../../../assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
 
+*Concept at a Glance*
 ## Key Terms
 
 - **MWE**: A *Minimal Working Example*.
@@ -68,6 +60,33 @@ flowchart LR
 **Before**: A 200 line code dump.
 
 **After**: An 8 line *MWE* with a 2 line *callout*.
+
+## A better walkthrough gives setup, focus, and proof
+
+Here is a slightly more realistic example.
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/add")
+def add(a: int, b: int) -> dict[str, int]:
+    return {"result": a + b}
+```
+
+```bash
+uvicorn main:app --reload
+curl "http://127.0.0.1:8000/add?a=2&b=3"
+```
+
+**Expected output:**
+
+```json
+{"result":5}
+```
+
+The first line many readers need is not the function body. It is the route declaration and the verification command. One shows the entry point. The other proves that the example really works. A code walkthrough is stronger when it exposes both.
 
 ## Hands-on: One Example
 

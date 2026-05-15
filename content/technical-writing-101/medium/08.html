@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Writing Tutorials</h1>
-<p>This is post 8 in the Technical Writing 101 series.</p>
-<blockquote>
-<p>Technical Writing 101 series (8/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: How do you make a <em>tutorial</em> that simply <em>works</em> when the reader <em>follows</em> it?</p>
-<blockquote>
-<p>Every <em>step</em> must be <em>verified</em>.</p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<h2>What You Will Learn</h2>
+<p>Writers often respond to uncertainty by adding more explanation. Tutorial readers usually need the opposite. They need a short path, clear checkpoints, and quick recovery when one step fails.</p>
+<p>A tutorial earns trust by making success predictable. Each step should leave behind a visible proof, and each likely failure should have at least one short recovery note. That is what keeps a hands-on chapter from turning into a lecture transcript.</p>
+<p>This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>Where a tutorial sits in <em>Diátaxis</em></li>
 <li>Stating <em>prerequisites</em></li>
@@ -76,12 +67,12 @@
 </ul>
 <h2>Why It Matters</h2>
 <p>A <em>first success</em> creates the will to keep <em>learning</em>.</p>
+<blockquote>
+<p>Mental model: every tutorial step needs a checkpoint the reader can verify before moving on.</p>
+</blockquote>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    P[Prereq] --&gt; S[Step]
-    S --&gt; W[Win]
-    W --&gt; N[Next]
-</code></pre>
+<p><img alt="Concept at a Glance" src="https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png"></p>
+<p><em>Concept at a Glance</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>tutorial</strong>: A <em>learning</em> oriented post.</li>
@@ -93,6 +84,24 @@
 <h2>Before/After</h2>
 <p><strong>Before</strong>: "Let us learn about <em>FastAPI</em>." (lecture)</p>
 <p><strong>After</strong>: "<em>Run Hello World in five minutes</em>." (tutorial)</p>
+<h2>Make every tutorial step behave like a test case</h2>
+<p>A tutorial is easier to trust when each step leaves behind a visible checkpoint. For a FastAPI hello-world, that can look like this.</p>
+<pre><code class="language-bash">cat &gt; main.py &lt;&lt;'PY'
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+def root():
+    return {&quot;hello&quot;: &quot;world&quot;}
+PY
+
+fastapi dev main.py
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre><code class="language-text">Uvicorn running on http://127.0.0.1:8000
+</code></pre>
+<p>Recovery notes matter too. If the reader sees <code>fastapi: command not found</code>, tell them to rerun <code>python3 -m pip install "fastapi[standard]"</code> and retry. That single line often keeps the tutorial self-contained instead of sending the reader into search results.</p>
 <h2>Hands-on: A Five Minute Tutorial</h2>
 <p><strong>Step 1 — Prerequisites</strong></p>
 <pre><code class="language-bash">python3 --version  # 3.11 or newer
