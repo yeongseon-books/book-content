@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Precision and Recall</h1>
-<blockquote>
-<p>Model Evaluation 101 series (4/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is "being correct" or "missing nothing" more important?</p>
-<blockquote>
-<p><em>Precision reduces false alarms. Recall reduces misses. Each problem ranks them differently.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 4 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Not every classifier is afraid of the same mistake. A spam filter wants to avoid punishing a legitimate email, while a cancer screen would rather catch more suspicious cases even if that creates extra follow-up work. The same model can look good or bad depending on which error the business can actually afford.</p>
+<p>That is where accuracy becomes too blunt and precision and recall start to sound like real operating language. One tells you how many alarms were trustworthy. The other tells you how many true cases you failed to miss.</p>
+<p>This is post 4 in the Model Evaluation 101 series. In this post, we read both metrics through the confusion matrix and show how threshold choice shifts the trade-off.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The formulas and intuitions of precision and recall</li>
 <li>How to read a confusion matrix</li>
@@ -74,14 +65,14 @@
 <li>The PR curve and average precision</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Precision measures false alarms. Recall measures misses. Most production classifiers are really arguments about which side should hurt more.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A spam filter and a cancer screen can use the same model, yet must prioritize different metrics.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Pred[&quot;positive prediction&quot;] --&gt; Prec[&quot;precision = TP/(TP+FP)&quot;]
-    Actual[&quot;actual positive&quot;] --&gt; Rec[&quot;recall = TP/(TP+FN)&quot;]
-    Threshold[&quot;threshold&quot;] --&gt; Tradeoff[&quot;precision/recall trade-off&quot;]
-</code></pre>
+<p><img alt="precision and recall moving as the threshold changes" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png"></p>
+<p><em>precision and recall moving as the threshold changes</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>TP/FP/FN/TN</strong>: the four cells of the confusion matrix.</li>
@@ -123,6 +114,7 @@ for t in [0.3, 0.5, 0.7]:
 prec, rec, _ = precision_recall_curve(yte, proba)
 print(&quot;AP:&quot;, average_precision_score(yte, proba))
 </code></pre>
+<p><strong>Expected output:</strong> You should see precision rise while recall falls as the threshold gets stricter, plus an average-precision summary that is often more informative than ROC-based summaries on imbalanced data.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>The threshold is the most important post-training knob.</li>

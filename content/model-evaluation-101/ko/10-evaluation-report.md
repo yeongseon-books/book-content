@@ -17,7 +17,7 @@ tags:
   - Reproducibility
   - scikit-learn
 seo_description: 프로덕션 배포 결정의 근거가 되는 종합적인 모델 평가 리포트 구성 요소와 자동화된 파이프라인 구축 방법을 설명합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 평가 리포트 만들기
@@ -48,15 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Data["data section"] --> Report
-    Metric["metrics + threshold"] --> Report
-    Slice["slice scores"] --> Report
-    Repro["reproducibility"] --> Report
-    Risk["known risks"] --> Report
-```
+![지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조](../../../assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
 
+*지표 슬라이스 재현성 리스크를 모으는 평가 리포트 구조*
 이 다섯 요소가 한곳에 모여야 리포트가 완성됩니다. 데이터, 지표, 슬라이스, 재현성, 리스크 중 하나라도 빠지면 배포 판단의 근거가 비어 버립니다.
 
 ## 핵심 용어
@@ -142,6 +136,8 @@ def to_md(rep):
 
 print(to_md(report))
 ```
+
+**예상 결과:** 먼저 기계가 읽기 좋은 JSON 리포트가 나오고, 그다음 사람이 바로 리뷰할 수 있는 마크다운 요약이 나와야 합니다. 지표, 임계값, 슬라이스, 재현성 메타데이터, 알려진 리스크가 한 번에 모이면 리포트의 최소 골격이 갖춰진 것입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

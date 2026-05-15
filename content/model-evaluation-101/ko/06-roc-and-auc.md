@@ -17,7 +17,7 @@ tags:
   - PRCurve
   - scikit-learn
 seo_description: 임계값 변화에 따른 모델의 변별력을 나타내는 ROC 곡선과 AUC 지표의 의미를 이해하고, 모델 성능을 객관적으로 측정합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # ROC와 AUC 이해하기
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Score["score by model"] --> Sort["rank samples"]
-    Sort --> ROC["ROC: TPR vs FPR"]
-    Sort --> PR["PR: precision vs recall"]
-    ROC --> AUC["AUC = ranking ability"]
-```
+![점수 순위에서 ROC와 PR 비교로 이어지는 평가 흐름](../../../assets/model-evaluation-101/06/06-01-concept-at-a-glance.ko.png)
 
+*점수 순위에서 ROC와 PR 비교로 이어지는 평가 흐름*
 이 그림이 보여 주는 핵심은 점수의 역할입니다. ROC와 PR은 둘 다 확률 점수나 결정 함수 점수를 정렬해 만든 곡선입니다. 즉 이 단계에서는 아직 최종 클래스 예측을 고정하지 않았습니다.
 
 ## 핵심 용어
@@ -116,6 +111,8 @@ target_fpr = 0.05
 idx = np.searchsorted(fpr, target_fpr)
 print("threshold for FPR<=0.05:", thr[idx], "TPR:", tpr[idx])
 ```
+
+**예상 결과:** ROC-AUC는 순위 성능을 요약해 주고, PR-AUC는 불균형 환경에서 더 민감한 경고를 줍니다. 마지막 단계에서는 `FPR <= 0.05` 같은 운영 제약을 실제 임계값으로 연결하는 흐름까지 확인해야 합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

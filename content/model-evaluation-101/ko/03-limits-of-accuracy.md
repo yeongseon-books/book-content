@@ -17,7 +17,7 @@ tags:
   - BaselineModel
   - scikit-learn
 seo_description: 불균형 데이터에서 정확도 지표가 초래하는 오해를 분석하고, 베이스라인 설정을 통해 모델 성능을 객관적으로 파악합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 정확도의 한계
@@ -48,13 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Bal["balanced data"] --> AccOK["accuracy is fair"]
-    Imb["imbalanced data"] --> AccBad["accuracy is misleading"]
-    Imb --> BAcc["balanced accuracy"]
-```
+![균형 데이터와 불균형 데이터에서 달라지는 정확도 해석](../../../assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
 
+*균형 데이터와 불균형 데이터에서 달라지는 정확도 해석*
 이 그림이 말하는 바는 단순합니다. 정확도가 나쁜 지표라는 뜻이 아니라, 공정하게 읽을 조건이 있다는 뜻입니다. 클래스 비율이 크게 기울면 정확도 대신 기준선 비교와 균형 정확도가 먼저 나와야 합니다.
 
 ## 핵심 용어
@@ -113,6 +109,8 @@ print("bacc:", balanced_accuracy_score(yte, pred))
 from sklearn.metrics import classification_report
 print(classification_report(yte, pred))
 ```
+
+**예상 결과:** 정확도는 꽤 높게 나오는데도 더미 기준선과 큰 차이가 없거나, 소수 클래스 재현율이 크게 무너지는 모습을 볼 수 있습니다. 이때 균형 정확도와 클래스별 리포트가 정확도의 착시를 걷어내는 역할을 합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

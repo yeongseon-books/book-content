@@ -17,7 +17,7 @@ tags:
   - Foundations
   - Beginner
 seo_description: 머신러닝 모델 평가가 비즈니스 목표와 일치해야 하는 이유를 설명하고, 올바른 평가 지표 설정을 위한 접근법을 제시합니다.
-last_reviewed: '2026-05-12'
+last_reviewed: '2026-05-15'
 ---
 
 # 모델 평가는 왜 어려운가?
@@ -48,14 +48,9 @@ last_reviewed: '2026-05-12'
 
 ## 한눈에 보는 멘탈 모델
 
-```mermaid
-flowchart LR
-    Data["data"] --> Pred["predictions"]
-    Pred --> Metric["metric(s)"]
-    Cost["business cost"] --> Metric
-    Metric --> Decide["decision"]
-```
+![예측에서 지표와 결정으로 이어지는 평가 흐름](../../../assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
 
+*예측에서 지표와 결정으로 이어지는 평가 흐름*
 이 그림에서 중요한 점은 지표가 종착점이 아니라는 사실입니다. 예측은 지표로 요약되지만, 그 지표는 다시 실제 결정으로 이어집니다. 그리고 그 결정의 기준은 늘 비용 구조와 연결됩니다.
 
 ## 핵심 용어
@@ -114,6 +109,8 @@ def cost(tp, fp, fn, c_fp=1, c_fn=10):
     return c_fp * fp + c_fn * fn
 print("cost:", cost(tp=5, fp=10, fn=2))
 ```
+
+**예상 결과:** 더미 모델은 정확도만 보면 그럴듯해 보여도 재현율과 비용 기준에서는 금방 한계를 드러냅니다. 같은 예측 점수라도 임계값과 비용 가정을 바꾸면 어떤 결정이 더 낫다는 결론이 달라지는 흐름을 확인하면 됩니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

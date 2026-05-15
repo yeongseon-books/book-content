@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 6
 title: ROC and AUC
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - PRCurve
   - scikit-learn
 seo_description: ROC curves and AUC for threshold-free evaluation, how PR curves differ on imbalanced data, and how to pick an operating threshold in code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # ROC and AUC
 
-> Model Evaluation 101 series (6/10)
+Sometimes you want to compare models before you commit to one production threshold. That is the main job of ROC curves and AUC. They let you inspect how well a model ranks positives ahead of negatives across many possible cutoffs.
 
-<!-- a-grade-intro:begin -->
+That convenience can also mislead teams. Production never runs on "all thresholds." It runs on one threshold with one false-positive budget and one recall target. ROC and AUC are comparison tools, not deployment decisions.
 
-**Core question**: Can you grade a model's ranking ability without picking a threshold?
+This is post 6 in the Model Evaluation 101 series. In this post, we separate ranking quality from operating policy and show why PR-AUC often has to sit next to ROC-AUC.
 
-> *ROC plots TPR against FPR over all thresholds. AUC summarizes a model's ranking ability into a single number.*
-
-<!-- a-grade-intro:end -->
-
-This is post 6 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The axes and meaning of the ROC curve
 - The probabilistic interpretation of AUC
@@ -42,20 +36,17 @@ This is post 6 in the Model Evaluation 101 series.
 - The AUC trap on imbalanced data
 - Five common pitfalls
 
+> ROC and AUC summarize ranking quality across thresholds. Production still has to choose one threshold and live with its actual false-positive and recall trade-offs.
+
 ## Why It Matters
 
 AUC is convenient because it avoids picking a threshold, but production decisions live at one specific threshold.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Score["score by model"] --> Sort["rank samples"]
-    Sort --> ROC["ROC: TPR vs FPR"]
-    Sort --> PR["PR: precision vs recall"]
-    ROC --> AUC["AUC = ranking ability"]
-```
+![ranking flow from model scores to roc and pr views](../../../assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
 
+*ranking flow from model scores to roc and pr views*
 ## Key Terms
 
 - **TPR**: same as recall.
@@ -114,6 +105,8 @@ target_fpr = 0.05
 idx = np.searchsorted(fpr, target_fpr)
 print("threshold for FPR<=0.05:", thr[idx], "TPR:", tpr[idx])
 ```
+
+**Expected output:** You should get one threshold-free ranking summary from ROC-AUC, a more imbalance-sensitive summary from PR-AUC, and a concrete threshold you can defend once an FPR budget is fixed.
 
 ## What to Notice in This Code
 

@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Why Model Evaluation Is Hard</h1>
-<blockquote>
-<p>Model Evaluation 101 series (1/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Is a model with 99% accuracy actually a good model?</p>
-<blockquote>
-<p><em>Evaluation is not one number. It is the intersection of data distribution, cost structure, and the decision the model supports.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is the first post in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Model evaluation tends to feel easier in a notebook than it does in production. A single score can look clean, yet the decision behind it is rarely clean. The same 95% accuracy means very different things depending on the data distribution, the cost of mistakes, and the threshold that turns scores into action.</p>
+<p>When evaluation gets shaky, model selection gets shaky with it. The real danger is not one bad number, but a whole team optimizing toward the wrong number. That is why evaluation is less about metric calculation and more about decision design.</p>
+<p>This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>Four reasons evaluation is hard</li>
 <li>Why metrics are not business value</li>
@@ -74,15 +65,14 @@
 <li>How thresholds drive decisions</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Evaluation is not one number. It is the meeting point of data distribution, cost structure, thresholds, and the decision the model is supposed to support.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>Evaluation is the language of model selection. When the language is wrong, the entire team aims at the wrong target.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    Data[&quot;data&quot;] --&gt; Pred[&quot;predictions&quot;]
-    Pred --&gt; Metric[&quot;metric(s)&quot;]
-    Cost[&quot;business cost&quot;] --&gt; Metric
-    Metric --&gt; Decide[&quot;decision&quot;]
-</code></pre>
+<p><img alt="evaluation flow from predictions to metrics and decisions" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png"></p>
+<p><em>evaluation flow from predictions to metrics and decisions</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Metric</strong>: a numerical summary of performance.</li>
@@ -121,6 +111,7 @@ for t in [0.3, 0.5, 0.7]:
     return c_fp * fp + c_fn * fn
 print(&quot;cost:&quot;, cost(tp=5, fp=10, fn=2))
 </code></pre>
+<p><strong>Expected output:</strong> You should see that the dummy model can look strong on accuracy while still collapsing on recall, and that the "best" threshold changes once you price false positives and false negatives differently.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>95% accuracy can be completely useless.</li>

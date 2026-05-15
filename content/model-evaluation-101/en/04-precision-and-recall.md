@@ -2,7 +2,7 @@
 series: model-evaluation-101
 episode: 4
 title: Precision and Recall
-status: content-ready
+status: publish-ready
 targets:
   tistory: false
   medium: true
@@ -17,24 +17,18 @@ tags:
   - ConfusionMatrix
   - scikit-learn
 seo_description: Precision and recall, their trade-off, the confusion matrix, threshold tuning, and PR curves explained with runnable code
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Precision and Recall
 
-> Model Evaluation 101 series (4/10)
+Not every classifier is afraid of the same mistake. A spam filter wants to avoid punishing a legitimate email, while a cancer screen would rather catch more suspicious cases even if that creates extra follow-up work. The same model can look good or bad depending on which error the business can actually afford.
 
-<!-- a-grade-intro:begin -->
+That is where accuracy becomes too blunt and precision and recall start to sound like real operating language. One tells you how many alarms were trustworthy. The other tells you how many true cases you failed to miss.
 
-**Core question**: Is "being correct" or "missing nothing" more important?
+This is post 4 in the Model Evaluation 101 series. In this post, we read both metrics through the confusion matrix and show how threshold choice shifts the trade-off.
 
-> *Precision reduces false alarms. Recall reduces misses. Each problem ranks them differently.*
-
-<!-- a-grade-intro:end -->
-
-This is post 4 in the Model Evaluation 101 series.
-
-## What You Will Learn
+## Questions this post answers
 
 - The formulas and intuitions of precision and recall
 - How to read a confusion matrix
@@ -42,19 +36,17 @@ This is post 4 in the Model Evaluation 101 series.
 - The PR curve and average precision
 - Five common pitfalls
 
+> Precision measures false alarms. Recall measures misses. Most production classifiers are really arguments about which side should hurt more.
+
 ## Why It Matters
 
 A spam filter and a cancer screen can use the same model, yet must prioritize different metrics.
 
 ## Concept at a Glance
 
-```mermaid
-flowchart LR
-    Pred["positive prediction"] --> Prec["precision = TP/(TP+FP)"]
-    Actual["actual positive"] --> Rec["recall = TP/(TP+FN)"]
-    Threshold["threshold"] --> Tradeoff["precision/recall trade-off"]
-```
+![precision and recall moving as the threshold changes](../../../assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
 
+*precision and recall moving as the threshold changes*
 ## Key Terms
 
 - **TP/FP/FN/TN**: the four cells of the confusion matrix.
@@ -114,6 +106,8 @@ from sklearn.metrics import precision_recall_curve, average_precision_score
 prec, rec, _ = precision_recall_curve(yte, proba)
 print("AP:", average_precision_score(yte, proba))
 ```
+
+**Expected output:** You should see precision rise while recall falls as the threshold gets stricter, plus an average-precision summary that is often more informative than ROC-based summaries on imbalanced data.
 
 ## What to Notice in This Code
 

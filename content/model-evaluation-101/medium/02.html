@@ -54,19 +54,10 @@
 </head>
 <body>
 <h1>Train, Validation, and Test</h1>
-<blockquote>
-<p>Model Evaluation 101 series (2/10)</p>
-</blockquote>
-<!-- a-grade-intro:begin -->
-
-<p><strong>Core question</strong>: Why must validation and test be separate?</p>
-<blockquote>
-<p><em>Train fits, validation tunes, and test is touched exactly once. The discipline of three roles is the foundation of all evaluation.</em></p>
-</blockquote>
-<!-- a-grade-intro:end -->
-
-<p>This is post 2 in the Model Evaluation 101 series.</p>
-<h2>What You Will Learn</h2>
+<p>Model quality is often decided long before you compute the first metric. If the split is wrong, every number that follows can still look polished while being untrustworthy. Leakage from preprocessing, random splits on time-series data, or the same user showing up in multiple splits can all inflate performance fast.</p>
+<p>That is why train, validation, and test are not textbook ceremony. They are a discipline for separating learning, selection, and final verification. Once those roles blur together, evaluation stops being evidence and starts becoming wishful thinking.</p>
+<p>This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.</p>
+<h2>Questions this post answers</h2>
 <ul>
 <li>The role of each dataset</li>
 <li>Different forms of data leakage</li>
@@ -74,14 +65,14 @@
 <li>Group-aware splitting to prevent group leakage</li>
 <li>Five common pitfalls</li>
 </ul>
+<blockquote>
+<p>Train fits, validation tunes, and test is touched exactly once. When those roles mix together, evaluation stops being trustworthy.</p>
+</blockquote>
 <h2>Why It Matters</h2>
 <p>A wrong split invalidates every measurement that follows. Model comparisons become misleading.</p>
 <h2>Concept at a Glance</h2>
-<pre><code class="language-mermaid">flowchart LR
-    All[&quot;all data&quot;] --&gt; Tr[&quot;train (fit)&quot;]
-    All --&gt; Va[&quot;valid (tune)&quot;]
-    All --&gt; Te[&quot;test (final)&quot;]
-</code></pre>
+<p><img alt="dataset split into train validation and test roles" src="https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png"></p>
+<p><em>dataset split into train validation and test roles</em></p>
 <h2>Key Terms</h2>
 <ul>
 <li><strong>Train</strong>: data used for fitting.</li>
@@ -127,6 +118,7 @@ sc = StandardScaler().fit(Xtr)
 m = LogisticRegression(max_iter=1000).fit(sc.transform(Xtr), ytr)
 print(&quot;valid:&quot;, m.score(sc.transform(Xva), yva))
 </code></pre>
+<p><strong>Expected output:</strong> You should see that fitting transforms on the full dataset quietly leaks statistics, while time-aware and group-aware splits preserve the boundary between what the model is allowed to know and what it must still prove.</p>
 <h2>What to Notice in This Code</h2>
 <ul>
 <li>Fitting on the full dataset leaks statistics.</li>
