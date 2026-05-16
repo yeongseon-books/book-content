@@ -29,6 +29,13 @@ Synchronization primitives are simple only on the surface. Safety depends on the
 
 This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
 
+## Questions this article answers
+
+- What are the actual differences between mutexes, reentrant locks, semaphores, and condition variables?
+- Under what conditions does deadlock form?
+- Why do throughput and latency both get worse when locks are held too long?
+- What alternatives can preserve safety while reducing the amount of locking?
+
 ## What You Will Learn
 
 - The differences between mutex, RLock, semaphore, and condition variable

@@ -29,6 +29,13 @@ To understand those failures, you have to understand the machinery that builds t
 
 This is post 7 in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.
 
+## Questions this article answers
+
+- Why are virtual addresses and physical addresses separated at all?
+- How do pages, page tables, and the TLB divide the work?
+- How does the cost of a minor fault differ from the cost of a major fault?
+- Why do `mmap` and copy-on-write show up so often in real systems?
+
 ## What You Will Learn
 
 - The split between virtual addresses and physical addresses

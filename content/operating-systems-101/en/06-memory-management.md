@@ -29,6 +29,13 @@ That is why memory management is really a conversation about ownership and relea
 
 This is post 6 in the Operating Systems 101 series. It connects process memory layout, leaks, fragmentation, and container memory limits into one practical model.
 
+## Questions this article answers
+
+- What regions make up a process's memory layout?
+- What do `malloc` and `free` handle, and what does garbage collection handle instead?
+- How are memory leaks and fragmentation different problems?
+- Inside container limits, how should you size caches and pools?
+
 ## What You Will Learn
 
 - The process memory layout — text, data, heap, stack

@@ -29,6 +29,13 @@ That is why storage bugs are rarely about syntax. They are about knowing exactly
 
 This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
 
+## Questions this article answers
+
+- How do inodes and directory entries represent a file?
+- What do the page cache and `fsync` each guarantee?
+- What kinds of recovery does journaling make possible after a crash?
+- Why is the atomic rename pattern so common when saving configuration files?
+
 ## What You Will Learn
 
 - The structure of inodes and the directory tree
