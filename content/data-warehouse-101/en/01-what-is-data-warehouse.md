@@ -28,6 +28,14 @@ This is the first post in the Data Warehouse 101 series.
 
 In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.
 
+## Questions this article answers
+
+- What exactly is a data warehouse, and why should it live separately?
+- Where do the limits show up when you try to do analytics directly on the service database?
+- How do OLTP and OLAP differ in what they need from a system?
+- Why do time-based analysis and aggregation become the default in an analytical store?
+- What problems do early teams run into when they try to operate without a warehouse?
+
 ## What You Will Learn
 
 - The *definition* and *purpose* of a data warehouse

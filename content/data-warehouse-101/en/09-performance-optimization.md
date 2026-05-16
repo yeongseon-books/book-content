@@ -28,6 +28,14 @@ This is post 9 in the Data Warehouse 101 series.
 
 In this post, we treat optimization as a measurement discipline instead of a bag of tricks. The goal is to read the plan, locate the expensive stage, and change the query shape before cost becomes a surprise.
 
+## Questions this article answers
+
+- Which patterns create the biggest performance differences in a warehouse?
+- How do you get the same answer at lower cost?
+- Why should bytes scanned, shuffle, and spill be the first signals you inspect?
+- When do approximate aggregations and materialized views pay off?
+- Why does tuning so often miss the mark when you skip the query plan?
+
 ## What You Will Learn
 
 - The *main patterns* that drive performance

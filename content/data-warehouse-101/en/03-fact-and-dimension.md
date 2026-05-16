@@ -28,6 +28,14 @@ This is post 3 in the Data Warehouse 101 series.
 
 In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.
 
+## Questions this article answers
+
+- What do fact tables and dimension tables each hold?
+- What do you gain by separating measures from descriptive attributes?
+- Why do you need to define the grain first in an analytical model?
+- Why do surrogate keys and conformed dimensions appear so often in warehouse design?
+- What is the first sentence you should write before you start OLAP modeling?
+
 ## What You Will Learn
 
 - The definition of a *fact* table

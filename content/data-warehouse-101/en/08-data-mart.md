@@ -28,6 +28,14 @@ This is post 8 in the Data Warehouse 101 series.
 
 In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
 
+## Questions this article answers
+
+- How is a data mart different from the warehouse itself?
+- Why separate organization-wide shared data from team-specific analytical space?
+- What gets better when you reflect domain vocabulary directly in the data model?
+- What role do conformed dimensions play across multiple marts?
+- Why do access boundaries and self-service analysis matter so much in mart design?
+
 ## What You Will Learn
 
 - The definition of a *data mart*
