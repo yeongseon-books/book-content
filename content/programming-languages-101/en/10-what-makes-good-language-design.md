@@ -29,13 +29,12 @@ This is the final post in the Programming Languages 101 series.
 
 In this post, we will treat language design as an explicit tradeoff problem. The concepts from the earlier chapters — syntax, types, scope, closures, objects, memory, execution, and static vs dynamic checking — all become easier to compare once we place them on a handful of design axes.
 
-## What You Will Learn
+## Questions this article answers
 
-- Five axes for evaluating a language design
-- Tradeoffs among consistency, simplicity, expressiveness, safety, and performance
-- How Python, Go, and Rust answered the same problems differently
-- Why the concepts in this series ended up the way they are
-- The five questions to ask first when meeting any new language
+- What axes should you use to evaluate a language design?
+- Why do consistency, simplicity, expressiveness, safety, and performance conflict with each other?
+- Why do Python, Go, and Rust give different answers to the same problems?
+- What should you ask first when you meet a new language?
 
 ## Why It Matters
 

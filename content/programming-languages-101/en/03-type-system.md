@@ -29,13 +29,12 @@ This is post 3 in the Programming Languages 101 series.
 
 In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
 
-## What You Will Learn
+## Questions this article answers
 
-- The roles a type plays — checking, documentation, tool support
-- The tradeoffs between static and dynamic typing
-- How strong/weak differs from static/dynamic
-- What type inference actually buys you
-- The intuition behind generics and union/intersection types
+- What role does a type actually play?
+- What do static types and dynamic types check, and when do they check it?
+- Why are strong vs weak typing and static vs dynamic typing different axes?
+- Why do type inference and generics improve productivity?
 
 ## Why It Matters
 

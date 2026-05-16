@@ -29,12 +29,12 @@ This is the first post in the Programming Languages 101 series.
 
 In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.
 
-## What You Will Learn
+## Questions this article answers
 
-- The abstraction layers from machine code up to high-level languages
-- What a programming language fundamentally does (translation and expression)
-- The four paradigms — imperative, object-oriented, functional, declarative
-- What "a good language" actually means
+- Why do we use high-level languages instead of machine code?
+- What abstractions does a programming language actually provide?
+- What changes when you solve the same problem in imperative, object-oriented, functional, and declarative styles?
+- What does it really mean to evaluate whether a language is good?
 
 ## Why It Matters
 
