@@ -16,156 +16,327 @@ tags:
   - Event
   - EventDriven
   - Cloud
-seo_description: A beginner-friendly tour of serverless triggers and event sources, covering invocation types, retries, DLQs, and idempotency.
-last_reviewed: '2026-05-04'
+seo_description: A practical trigger guide following one HTTP-to-queue workflow with idempotency, DLQ routing, replay, and duplicate troubleshooting.
+last_reviewed: '2026-05-16'
 ---
 
 # Trigger and Event
 
-Serverless functions do not wake themselves. Something invokes them, on a schedule, in response to an HTTP request, because a queue received a message, or because storage emitted an event. If you miss the meaning of that invocation path, clean function code still turns into duplicate processing or retry storms in production.
+This is the third post in the Serverless 101 series.
 
-In practice, trigger semantics matter at least as much as handler logic. *Sync* and *async* invocation change who sees failure, who retries, and what “success” even means.
+Serverless functions do not wake themselves up. Something invokes them, possibly more than once, possibly as a batch, possibly after a delay, and possibly again after a failure. If you do not understand that invocation path, clean handler code still turns into duplicate side effects, invisible retries, and messy incident response.
 
-This is post 3 in the Serverless 101 series.
+So this post avoids a taxonomy-only approach. Instead, we will follow one complete flow: **an HTTP request becomes a queue message, a consumer processes it, duplicates are blocked through an external idempotency store, repeated failures are routed to a DLQ, and operators replay from that payload**. Once this path is clear, trigger semantics stop feeling abstract.
 
 ## What You Will Learn
 
-- categories of *triggers*
-- shapes of *event* payloads
-- *sync* vs *async* differences
-- *retries* and *DLQ*
-- the importance of *idempotency*
+- how HTTP, queue, and schedule triggers differ as delivery contracts
+- why idempotency is a default assumption for async consumers
+- why a DLQ is not a nice-to-have but an operational observation point
+- what to inspect first when duplicate processing or retry storms appear
+
+> A trigger is the connection that turns an event into a function invocation, and each trigger type carries its own latency expectation, retry behavior, and failure visibility.
 
 ## Why It Matters
 
-Many production failures are not caused by the handler body at all. They come from misunderstanding the trigger contract: whether the event is delivered at least once, whether records arrive as a batch, whether retries are automatic, and whether ordering is guaranteed.
+Beginners usually focus on the function body first. In production, the bigger source of failure is often the **invocation contract**. HTTP requests center around user latency and explicit responses. Queue messages center around retries, duplication, and eventual completion. Scheduled triggers center around overlap and re-entrancy.
 
-That is why a trigger discussion should start with failure semantics. The most useful question is often not “how do I parse this payload?” but “what happens when the same payload comes back again?”
+If you ignore those differences, code that looks perfectly reasonable in a single local run breaks down quickly in production. Real event systems introduce network delay, batch delivery, at-least-once redelivery, out-of-order arrival, and poison messages all at once.
 
 ## Concept at a Glance
 
 ![Concept at a Glance](../../../assets/serverless-101/03/03-01-concept-at-a-glance.en.png)
 
-*Each trigger type adds its own delivery contract, retry behavior, and failure path.*
-This separation is operationally important. The event source produces the signal, the trigger converts that signal into invocation behavior, and the DLQ captures work that keeps failing after the normal retry path is exhausted. Faster debugging starts when you know which of those three layers is actually failing.
+*The fastest debugging starts when you separate the event source, the invocation path, and the failure-isolation path instead of treating “the function” as one black box.*
 
-## Key Terms
+Operationally, this is about role separation. The HTTP endpoint accepts work. The queue creates the async boundary. The consumer performs the actual side effect. The DLQ preserves repeated failures as inspectable payloads. Troubleshooting gets faster when you narrow the problem down in that order.
 
-- **trigger**: connects an *event* to a *function*.
-- **event source**: *queues, storage, HTTP, schedules,* etc.
-- **invocation type**: *sync / async / stream*.
-- **DLQ**: a *dead-letter queue* for *failed messages*.
-- **idempotency**: *same input* → *same outcome*.
+## The scenario for this post
 
-## Before/After
+We will continue the same order example again.
 
-**Before**: *cron* + *script* + *manual retry*.
+1. An HTTP request arrives at `/orders`.
+2. The ingress handler validates it, emits a queue message, and returns `202 Accepted`.
+3. A queue consumer reads the message, records an `idempotency_key` in an external store, and performs fulfillment work.
+4. If the same message shows up again, the consumer skips the side effect.
+5. If the message keeps failing, the system shapes it into a DLQ payload that an operator can replay.
 
-**After**: *scheduled trigger* + *DLQ* + *automatic retry*.
+The important idea is not “one function does everything.” It is **separating sync from async work, and separating success paths from failure paths**.
 
-## Hands-on: HTTP / Queue / Schedule
+## HTTP → queue → consumer → idempotency → DLQ
 
-### Step 1 — HTTP event
-
-```python
-def http_handler(event, context):
-    body = event.get("body", "")
-    return {"statusCode": 200, "body": f"echo:{body}"}
-```
-
-### Step 2 — Queue event
+The example is shown in one file for learning convenience. In production, the HTTP ingress and the queue consumer would usually be separate functions.
 
 ```python
-def queue_handler(event, context):
-    for rec in event["records"]:
-        process(rec["body"])
+import json
+import sqlite3
+from dataclasses import dataclass
+from datetime import UTC, datetime
 
-def process(msg):
-    print("got", msg)
-```
 
-### Step 3 — Schedule event
+DB_PATH = "idempotency.db"
 
-```python
-import datetime as dt
 
-def cron_handler(event, context):
-    now = dt.datetime.utcnow().isoformat()
-    return {"ran_at": now}
-```
+def build_response(status_code: int, body: dict) -> dict:
+    return {
+        "statusCode": status_code,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body, ensure_ascii=False),
+    }
 
-### Step 4 — Apply an idempotency key
 
-```python
-seen = set()
+def init_store() -> None:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS processed_messages (
+                idempotency_key TEXT PRIMARY KEY,
+                processed_at TEXT NOT NULL,
+                order_id TEXT NOT NULL
+            )
+            """
+        )
 
-def idempotent(handler):
-    def wrap(event, ctx):
-        key = event.get("id")
-        if key in seen:
-            return {"skipped": True}
-        seen.add(key)
-        return handler(event, ctx)
-    return wrap
-```
 
-### Step 5 — Decide what goes to DLQ
+def already_processed(idempotency_key: str) -> bool:
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute(
+            "SELECT 1 FROM processed_messages WHERE idempotency_key = ?",
+            (idempotency_key,),
+        ).fetchone()
+    return row is not None
 
-```python
-def safe(handler, dlq):
-    def wrap(event, ctx):
+
+def mark_processed(idempotency_key: str, order_id: str) -> None:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "INSERT INTO processed_messages VALUES (?, ?, ?)",
+            (idempotency_key, datetime.now(UTC).isoformat(), order_id),
+        )
+        conn.commit()
+
+
+@dataclass
+class QueueMessage:
+    message_id: str
+    retry_count: int
+    body: dict
+
+
+QUEUE: list[QueueMessage] = []
+DLQ: list[dict] = []
+
+
+def http_ingress_handler(event: dict, context) -> dict:
+    payload = json.loads(event.get("body") or "{}")
+    order_id = payload.get("order_id")
+    items = payload.get("items", [])
+
+    if not order_id or not items:
+        return build_response(400, {"ok": False, "error": "invalid order payload"})
+
+    message = QueueMessage(
+        message_id=f"msg-{order_id}",
+        retry_count=0,
+        body={
+            "order_id": order_id,
+            "items": items,
+            "idempotency_key": payload.get("idempotency_key", f"order:{order_id}"),
+        },
+    )
+    QUEUE.append(message)
+
+    return build_response(
+        202,
+        {
+            "ok": True,
+            "order_id": order_id,
+            "queued": True,
+            "message_id": message.message_id,
+        },
+    )
+
+
+def apply_fulfillment(order_id: str, items: list[dict]) -> None:
+    if any(item["sku"] == "poison-pill" for item in items):
+        raise RuntimeError("downstream inventory reservation failed")
+
+
+def send_to_dlq(message: QueueMessage, error: Exception) -> None:
+    DLQ.append(
+        {
+            "message_id": message.message_id,
+            "order_id": message.body["order_id"],
+            "idempotency_key": message.body["idempotency_key"],
+            "retry_count": message.retry_count,
+            "error": str(error),
+            "failed_at": datetime.now(UTC).isoformat(),
+        }
+    )
+
+
+def queue_consumer_handler(event: dict, context) -> dict:
+    processed = []
+    skipped = []
+    failed = []
+
+    for record in event["records"]:
+        message = QueueMessage(**record)
+        key = message.body["idempotency_key"]
+        order_id = message.body["order_id"]
+
+        if already_processed(key):
+            skipped.append({"message_id": message.message_id, "reason": "duplicate"})
+            continue
+
         try:
-            return handler(event, ctx)
-        except Exception as e:
-            dlq.append({"event": event, "error": str(e)})
-            raise
-    return wrap
+            apply_fulfillment(order_id, message.body["items"])
+            mark_processed(key, order_id)
+            processed.append({"message_id": message.message_id, "order_id": order_id})
+        except Exception as exc:
+            message.retry_count += 1
+            if message.retry_count >= 3:
+                send_to_dlq(message, exc)
+                failed.append({"message_id": message.message_id, "sent_to": "dlq"})
+            else:
+                QUEUE.append(message)
+                failed.append({"message_id": message.message_id, "sent_to": "retry-queue"})
+
+    return {
+        "processed": processed,
+        "skipped": skipped,
+        "failed": failed,
+    }
 ```
 
-## What to Notice in This Code
+This example makes three operational points concrete.
 
-- *records* may be a *batch*.
-- *Idempotency keys* are a *retry safety net*.
-- *DLQs* are the *starting point* for *debugging*.
+- The HTTP handler responds quickly with `202 Accepted`; real work moves behind the queue.
+- Idempotency is handled through an external-store contract, not an in-memory set. SQLite is only a local stand-in here; production systems would use something like DynamoDB, Redis, or Cloud SQL.
+- The DLQ is not a place to hide errors. It is a place to preserve replayable failure context.
 
-## Five Common Mistakes
+## Three expected outcomes
 
-1. **Assuming *retries* will not happen.**
-2. **Assuming *order* is *guaranteed*.**
-3. **Doing *payment-like* work without *idempotency*.**
-4. **Skipping *DLQ* configuration.**
-5. **Setting *schedule ticks* too *short*.**
+### 1) First successful consume
 
-## How This Shows Up in Production
+Start with a request like this:
 
-Common flows include *upload → thumbnail, payment event → email, queue → batch ingest* — *async pipelines*.
+```python
+http_event = {
+    "body": json.dumps(
+        {
+            "order_id": "ord-1001",
+            "idempotency_key": "order:ord-1001",
+            "items": [{"sku": "keyboard", "quantity": 1}],
+        }
+    )
+}
+```
 
-## How a Senior Engineer Thinks
+After `http_ingress_handler(http_event, None)` and one queue-consumer pass, the expected result is:
 
-- Assume *every trigger* is *at-least-once*.
-- *Idempotency* protects *cost*.
-- Without a *DLQ*, you do not see *problems*.
-- Use a *FIFO queue* if *order* matters.
-- *Schedules* must prevent *overlap*.
+```json
+{
+  "processed": [
+    {
+      "message_id": "msg-ord-1001",
+      "order_id": "ord-1001"
+    }
+  ],
+  "skipped": [],
+  "failed": []
+}
+```
+
+### 2) Duplicate message skipped
+
+If the same `idempotency_key` is delivered again, the result should change to:
+
+```json
+{
+  "processed": [],
+  "skipped": [
+    {
+      "message_id": "msg-ord-1001",
+      "reason": "duplicate"
+    }
+  ],
+  "failed": []
+}
+```
+
+The point is not “retries never happen.” The point is **retries can happen without duplicate side effects**.
+
+### 3) Poison message routed to the DLQ
+
+The example intentionally fails when an item uses the SKU `poison-pill`. After the third failed attempt, the stored DLQ payload should look like this:
+
+```json
+{
+  "message_id": "msg-ord-9999",
+  "order_id": "ord-9999",
+  "idempotency_key": "order:ord-9999",
+  "retry_count": 3,
+  "error": "downstream inventory reservation failed",
+  "failed_at": "2026-05-16T10:20:00+00:00"
+}
+```
+
+That payload is what makes replay and incident response practical. It tells the operator what failed, on which retry attempt, under which idempotency key, and why.
+
+## Trigger-selection matrix
+
+This is where trigger discussions usually stay too abstract. A trigger is not just an entry point choice. It is a delivery contract.
+
+| Trigger | Latency expectation | Retry default | Ordering expectation | Best-fit workloads |
+| --- | --- | --- | --- | --- |
+| HTTP | Immediate response, user-visible latency | Often combined with client or API-gateway retries | Not guaranteed | APIs, synchronous validation, fast acceptance paths |
+| Queue | Seconds to minutes are acceptable | Assume at-least-once redelivery | Weak by default; use FIFO if needed | Async post-processing, batch consumers, burst buffering |
+| Schedule | Time-window execution | Platform retry or next tick may re-run work | Overlap control matters more than strict order | Cleanup jobs, aggregation, sync tasks |
+
+The practical lesson is simple. Choose HTTP and latency becomes the center of the design. Choose a queue and duplication plus DLQ handling become the center. Choose a schedule and re-entrancy plus overlap prevention become the center.
+
+## Duplicate-processing troubleshooting flow
+
+“The same order was processed twice” is one of the most common serverless incident reports. The fastest path is not to start by reading handler code line by line. Start here instead.
+
+1. **Inspect the message ID.**
+   - Was it truly the same message redelivered, or a different message with similar business data?
+2. **Inspect the idempotency record.**
+   - Was the key missing, or was it written too late in the processing flow?
+3. **Inspect retry count and last error.**
+   - Was this a transient failure followed by a redelivery, or a repeated hard failure?
+4. **Inspect the DLQ payload.**
+   - If the message has already been isolated, the payload often contains the fastest route to root cause and replay.
+
+Following that order narrows the failure domain quickly: trigger semantics, idempotency-store timing, or downstream dependency behavior.
+
+## Common Confusions
+
+### Do retries really happen that often?
+
+Yes. Network faults, platform timeouts, and downstream transient errors make redelivery routine enough that async triggers should usually be designed with at-least-once assumptions.
+
+### Is ordering guaranteed by default?
+
+Usually not. If order matters, you need to choose an explicit mechanism such as FIFO delivery, partitioning, or a single-consumer design.
+
+### Is a DLQ alone enough for safe operations?
+
+No. A DLQ only preserves failed work. Replay requires the payload to carry enough context: idempotency key, retry count, message identity, and error reason.
 
 ## Checklist
 
-- [ ] *Idempotency* ensured.
-- [ ] *DLQ* configured.
-- [ ] *Retry count* explicit.
-- [ ] *Ordering* requirement explicit.
-
-## Practice Problems
-
-1. In one line, the meaning of *at-least-once*.
-2. In one line, the *purpose* of a *DLQ*.
-3. In one line, the *risk* of missing *idempotency keys*.
+- [ ] HTTP and queue triggers have different success semantics by design
+- [ ] Idempotency keys are persisted through an external-store contract
+- [ ] Retry limits and DLQ routing rules are explicit
+- [ ] Operators know what to inspect first in duplicate-processing incidents
 
 ## Wrap-up and Next Steps
 
-Once you understand triggers and events, a function invocation stops looking like a simple entry point. It becomes a delivery contract with retry rules, batching behavior, and failure paths attached.
+Understanding triggers and events is not about memorizing invocation syntax. It is about understanding that **delivery semantics become failure semantics, and failure semantics become retry, idempotency, and DLQ design**.
 
-Next, we look at the causes and mitigations of *Cold Start*.
+The key pattern in this post is simple: accept quickly at the HTTP edge, move real work behind a queue, stop duplicates at the idempotency boundary, and preserve repeated failures as replayable DLQ payloads. In the next post, we will build on that path and look at why *cold start* changes latency expectations in serverless systems.
 
 <!-- toc:begin -->
 - [What is Serverless?](./01-what-is-serverless.md)
@@ -186,11 +357,12 @@ Next, we look at the causes and mitigations of *Cold Start*.
 
 - [AWS Lambda event source mappings](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html)
 - [Amazon SQS dead-letter queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
-- [Amazon EventBridge schedules](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html)
+- [Azure Functions triggers and bindings overview](https://learn.microsoft.com/azure/azure-functions/functions-triggers-bindings)
 
-### Delivery Guarantees and Patterns
+### Delivery Patterns and Code
 
 - [Idempotency pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html)
-- [AWS Powertools idempotency utility (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)
+- [AWS Powertools for Lambda Python - Idempotency](https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/)
+- [Azure Architecture Center - Queue-based load leveling pattern](https://learn.microsoft.com/azure/architecture/patterns/queue-based-load-leveling)
 
 Tags: Serverless, Trigger, Event, EventDriven, Cloud

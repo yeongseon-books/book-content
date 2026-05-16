@@ -16,179 +16,327 @@ tags:
   - Event
   - EventDriven
   - Cloud
-seo_description: 서버리스 트리거와 이벤트 소스, 재시도, DLQ, 멱등성의 의미를 입문자 관점에서 설명합니다
-last_reviewed: '2026-05-12'
+seo_description: HTTP 요청에서 큐 소비, 멱등성, DLQ, 재처리까지 이어지는 실제 트리거 흐름을 예제로 설명합니다
+last_reviewed: '2026-05-16'
 ---
 
 # 트리거와 이벤트
 
-서버리스 함수는 스스로 실행되지 않습니다. 누군가가, 어떤 규칙으로, 어떤 입력을 들고 함수를 깨웁니다. 이 호출 의미를 놓치면 함수 본문이 아무리 깔끔해도 운영에서 중복 처리, 메시지 유실, 재시도 폭주가 생깁니다.
+이 글은 Serverless 101 시리즈의 세 번째 글입니다.
 
-이 글은 Serverless 101 시리즈의 3번째 글입니다.
+서버리스 함수는 스스로 실행되지 않습니다. 누가 함수를 깨우는지, 같은 이벤트가 다시 들어오면 무엇이 달라지는지, 반복 실패 메시지는 어디로 가는지를 이해하지 못하면 함수 본문이 아무리 깔끔해도 운영은 빠르게 흔들립니다.
+
+그래서 이번 글은 이벤트 분류표만 나열하지 않습니다. 대신 하나의 운영 흐름을 끝까지 따라가 보겠습니다. **HTTP 요청이 큐 메시지로 바뀌고, 소비자가 이를 처리하고, 중복 메시지는 멱등성 저장소에서 건너뛰고, 반복 실패 메시지는 DLQ로 보내고, 운영자는 그 메시지를 다시 재처리하는 흐름**입니다. 이 한 흐름을 이해하면 트리거 이야기가 더 이상 추상적이지 않습니다.
 
 ## 이 글에서 다룰 문제
 
-- 함수는 누가, 언제, 어떤 방식으로 깨울까요?
-- HTTP 요청, 큐 메시지, 스케줄 이벤트는 왜 서로 다르게 다뤄야 할까요?
-- 재시도는 편의 기능이 아니라 왜 설계 전제가 될까요?
-- DLQ와 멱등성은 왜 늘 함께 이야기될까요?
+- HTTP, 큐, 스케줄 트리거는 호출 의미가 어떻게 다를까요?
+- 비동기 소비자에서는 왜 멱등성이 기본 전제가 될까요?
+- DLQ는 단순한 보조 기능이 아니라 왜 운영의 핵심 관찰 지점일까요?
+- 중복 처리나 재시도 폭주가 생겼을 때 운영자는 무엇부터 확인해야 할까요?
 
-> 트리거는 이벤트를 함수 호출로 바꾸는 연결점이며, 호출 의미와 재시도 규칙은 트리거 종류에 따라 달라집니다.
+> 트리거는 이벤트를 함수 호출로 바꾸는 연결점이고, 트리거 종류에 따라 지연 시간 기대치·재시도 규칙·실패 관찰 방식이 달라집니다.
 
 ## 왜 이 주제가 중요한가
 
-서버리스 입문자는 함수 코드에 먼저 시선이 갑니다. 하지만 운영에서는 코드보다 호출 방식이 더 큰 문제를 만들 때가 많습니다. 같은 함수라도 HTTP로 동기 호출될 때와 큐 메시지로 비동기 호출될 때 실패의 의미, 사용자 영향, 재시도 규칙이 전부 달라집니다.
+입문자는 함수 코드에 먼저 시선이 갑니다. 하지만 실무에서 더 큰 문제를 만드는 것은 종종 함수 본문이 아니라 **호출 계약**입니다. HTTP 요청은 지연 시간과 사용자 응답이 핵심이고, 큐 메시지는 중복 처리와 재시도가 핵심이며, 스케줄 트리거는 실행 겹침과 재진입성이 핵심입니다.
 
-특히 비동기 호출은 로컬 테스트에서 문제를 감추기 쉽습니다. 한 번만 실행해 보면 멀쩡해 보이기 때문입니다. 그러나 실제 운영에서는 네트워크 지연, 플랫폼 재시도, 메시지 배치 처리, 순서 뒤바뀜이 동시에 일어납니다. 그래서 트리거를 이해하려면 호출 진입점만 볼 것이 아니라, 같은 입력이 다시 들어와도 안전하게 처리되는 구조까지 함께 봐야 합니다.
+이 차이를 무시하면 로컬에서는 그럴듯해 보이는 코드가 운영에서 무너지기 쉽습니다. 한 번만 실행하면 잘 돌아가는 함수라도, 실제 환경에서는 네트워크 지연, 배치 전달, at-least-once 재전달, 순서 뒤바뀜, 독성 메시지(poison message)가 동시에 들어오기 때문입니다.
 
 ## 한눈에 보는 구조
 
 ![한눈에 보는 구조](../../../assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
 
-*이벤트 소스, 트리거, 함수, DLQ를 분리해 보면 실패 경로를 더 빨리 찾을 수 있습니다.*
-이 그림은 역할 분리를 잘 보여 줍니다. 이벤트 소스는 신호를 만들고, 트리거는 그 신호를 함수 호출로 바꾸며, 함수가 반복 실패하면 메시지는 DLQ 같은 격리 경로로 이동합니다. 문제 해결도 이 세 지점을 분리해서 봐야 빨라집니다.
+*트리거를 이해할 때는 이벤트 소스, 함수 호출, 실패 격리 경로를 함께 봐야 디버깅이 빨라집니다.*
 
-## 핵심 용어 먼저 정리하기
+이 그림에서 운영상 중요한 것은 역할 분리입니다. HTTP 엔드포인트는 요청을 받고, 큐는 비동기 경계를 만들고, 소비자는 실제 작업을 수행하고, DLQ는 반복 실패 메시지를 격리합니다. 문제 해결도 같은 순서로 좁혀 가야 합니다.
 
-| 용어 | 뜻 | 실무에서 왜 중요한가 |
-| --- | --- | --- |
-| 트리거 | 이벤트를 함수 호출로 연결하는 장치 | 호출 의미와 재시도 규칙이 여기서 정해집니다 |
-| 이벤트 소스 | HTTP, 큐, 스토리지, 스케줄 같은 신호 발생 지점 | 입력 구조가 이벤트 종류마다 달라집니다 |
-| 호출 유형 | 동기, 비동기, 스트림 방식의 실행 | 실패를 누가 보고 누가 재시도하는지 달라집니다 |
-| 데드 레터 큐 | 반복 실패 메시지를 격리하는 큐 | 실패를 숨기지 않고 관찰할 수 있습니다 |
-| 멱등성 | 같은 입력이 여러 번 와도 결과가 같게 만드는 성질 | 재시도를 안전하게 만드는 핵심입니다 |
+## 이번 글의 예제 시나리오
 
-실무에서 가장 안전한 기본 가정은 대부분의 비동기 트리거를 at-least-once로 보는 것입니다. 즉, 같은 이벤트가 한 번 더 올 수 있다고 전제하는 편이 좋습니다.
+이번 글도 같은 주문 예제를 이어 갑니다. 시나리오는 아래와 같습니다.
 
-## 직접 실행해 보기 전에 알아둘 차이
+1. HTTP 요청이 `/orders`로 들어옵니다.
+2. 요청 핸들러는 검증 후 큐에 메시지를 넣고 `202 Accepted`를 반환합니다.
+3. 큐 소비자는 메시지를 읽고, `idempotency_key`를 외부 저장소에 기록한 뒤 주문 후처리를 수행합니다.
+4. 같은 메시지가 다시 오면 소비자는 중복 처리를 건너뜁니다.
+5. 반복 실패 메시지는 DLQ 이벤트로 바꿔 저장하고, 운영자는 그 페이로드를 기준으로 재처리합니다.
 
-**기존 방식**에서는 크론 스크립트와 수동 재시도, 수동 로그 확인이 흔했습니다.
+여기서 핵심은 “함수 하나가 모든 것을 처리한다”가 아닙니다. **동기 경계와 비동기 경계, 성공 경로와 실패 경로를 분리한다**는 점입니다.
 
-**서버리스 방식**에서는 스케줄 트리거, 자동 재시도, DLQ를 조합해 실패 경로를 구조적으로 분리합니다.
+## HTTP → queue → consumer → idempotency → DLQ 워크플로
 
-이 차이는 운영 품질을 크게 바꿉니다. 실패한 메시지를 다시 처리할 수 있는 통로가 생기고, 일시 실패와 영구 실패를 구분할 수 있으며, 재시도 전략 일부를 코드 바깥 정책으로 옮길 수 있기 때문입니다.
-
-## HTTP, 큐, 스케줄 이벤트를 코드로 보기
-
-### 1단계 — HTTP 이벤트
+아래 예제는 학습용으로 파일 하나에 모았지만, 실제 운영에서는 HTTP 핸들러와 소비자 핸들러를 보통 별도 함수로 분리합니다.
 
 ```python
-def http_handler(event, context):
-    body = event.get("body", "")
-    return {"statusCode": 200, "body": f"echo:{body}"}
-```
+import json
+import sqlite3
+from dataclasses import dataclass
+from datetime import UTC, datetime
 
-HTTP 트리거는 요청 하나에 응답 하나를 돌려주는 모델입니다. 실패는 즉시 사용자에게 드러나고, 지연 시간에 민감합니다.
 
-### 2단계 — 큐 이벤트
+DB_PATH = "idempotency.db"
 
-```python
-def queue_handler(event, context):
-    for rec in event["records"]:
-        process(rec["body"])
 
-def process(msg):
-    print("got", msg)
-```
+def build_response(status_code: int, body: dict) -> dict:
+    return {
+        "statusCode": status_code,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body, ensure_ascii=False),
+    }
 
-큐 기반 이벤트는 보통 `records`처럼 배치 형태로 들어옵니다. 이 순간부터 함수는 요청 처리기보다 메시지 소비자에 가깝게 동작합니다.
 
-### 3단계 — 스케줄 이벤트
+def init_store() -> None:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS processed_messages (
+                idempotency_key TEXT PRIMARY KEY,
+                processed_at TEXT NOT NULL,
+                order_id TEXT NOT NULL
+            )
+            """
+        )
 
-```python
-import datetime as dt
 
-def cron_handler(event, context):
-    now = dt.datetime.utcnow().isoformat()
-    return {"ran_at": now}
-```
+def already_processed(idempotency_key: str) -> bool:
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute(
+            "SELECT 1 FROM processed_messages WHERE idempotency_key = ?",
+            (idempotency_key,),
+        ).fetchone()
+    return row is not None
 
-스케줄 트리거는 단순해 보이지만 겹침 문제가 자주 생깁니다. 이전 실행이 끝나기 전에 다음 주기가 오면 같은 작업이 동시에 실행될 수 있기 때문입니다.
 
-### 4단계 — 멱등 키 적용
+def mark_processed(idempotency_key: str, order_id: str) -> None:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            "INSERT INTO processed_messages VALUES (?, ?, ?)",
+            (idempotency_key, datetime.now(UTC).isoformat(), order_id),
+        )
+        conn.commit()
 
-```python
-seen = set()
 
-def idempotent(handler):
-    def wrap(event, ctx):
-        key = event.get("id")
-        if key in seen:
-            return {"skipped": True}
-        seen.add(key)
-        return handler(event, ctx)
-    return wrap
-```
+@dataclass
+class QueueMessage:
+    message_id: str
+    retry_count: int
+    body: dict
 
-이 코드는 개념 설명용입니다. 실제 시스템에서는 메모리 집합 대신 외부 저장소에 키를 남겨야 합니다. 중요한 점은 같은 입력이 다시 들어왔을 때 이미 처리한 일인지 판별할 수 있어야 한다는 사실입니다.
 
-### 5단계 — 무엇을 DLQ로 보낼지 결정하기
+QUEUE: list[QueueMessage] = []
+DLQ: list[dict] = []
 
-```python
-def safe(handler, dlq):
-    def wrap(event, ctx):
+
+def http_ingress_handler(event: dict, context) -> dict:
+    payload = json.loads(event.get("body") or "{}")
+    order_id = payload.get("order_id")
+    items = payload.get("items", [])
+
+    if not order_id or not items:
+        return build_response(400, {"ok": False, "error": "invalid order payload"})
+
+    message = QueueMessage(
+        message_id=f"msg-{order_id}",
+        retry_count=0,
+        body={
+            "order_id": order_id,
+            "items": items,
+            "idempotency_key": payload.get("idempotency_key", f"order:{order_id}"),
+        },
+    )
+    QUEUE.append(message)
+
+    return build_response(
+        202,
+        {
+            "ok": True,
+            "order_id": order_id,
+            "queued": True,
+            "message_id": message.message_id,
+        },
+    )
+
+
+def apply_fulfillment(order_id: str, items: list[dict]) -> None:
+    if any(item["sku"] == "poison-pill" for item in items):
+        raise RuntimeError("downstream inventory reservation failed")
+
+
+def send_to_dlq(message: QueueMessage, error: Exception) -> None:
+    DLQ.append(
+        {
+            "message_id": message.message_id,
+            "order_id": message.body["order_id"],
+            "idempotency_key": message.body["idempotency_key"],
+            "retry_count": message.retry_count,
+            "error": str(error),
+            "failed_at": datetime.now(UTC).isoformat(),
+        }
+    )
+
+
+def queue_consumer_handler(event: dict, context) -> dict:
+    processed = []
+    skipped = []
+    failed = []
+
+    for record in event["records"]:
+        message = QueueMessage(**record)
+        key = message.body["idempotency_key"]
+        order_id = message.body["order_id"]
+
+        if already_processed(key):
+            skipped.append({"message_id": message.message_id, "reason": "duplicate"})
+            continue
+
         try:
-            return handler(event, ctx)
-        except Exception as e:
-            dlq.append({"event": event, "error": str(e)})
-            raise
-    return wrap
+            apply_fulfillment(order_id, message.body["items"])
+            mark_processed(key, order_id)
+            processed.append({"message_id": message.message_id, "order_id": order_id})
+        except Exception as exc:
+            message.retry_count += 1
+            if message.retry_count >= 3:
+                send_to_dlq(message, exc)
+                failed.append({"message_id": message.message_id, "sent_to": "dlq"})
+            else:
+                QUEUE.append(message)
+                failed.append({"message_id": message.message_id, "sent_to": "retry-queue"})
+
+    return {
+        "processed": processed,
+        "skipped": skipped,
+        "failed": failed,
+    }
 ```
 
-DLQ는 실패를 숨기는 장치가 아니라 실패를 보이게 하는 장치입니다. 재시도로 해결되지 않는 메시지를 격리해 두어야 원인 분석과 재처리가 가능합니다.
+이 예제는 세 가지를 동시에 보여 줍니다.
 
-## 이 코드에서 먼저 봐야 할 점
+- HTTP 핸들러는 빠르게 `202 Accepted`를 반환하고, 실제 작업은 큐 뒤로 넘깁니다.
+- 멱등성은 메모리 집합이 아니라 외부 저장소 계약으로 처리합니다. 여기서는 SQLite로 시뮬레이션했지만, 실제 운영에서는 DynamoDB, Redis, Cloud SQL 같은 관리형 저장소를 둡니다.
+- DLQ는 “에러를 숨기는 곳”이 아니라 재처리 가능한 실패 페이로드를 남기는 곳입니다.
 
-- `records`는 한 건이 아니라 배치일 수 있습니다.
-- 멱등 키는 재시도 안전망입니다.
-- DLQ는 디버깅의 출발점입니다.
+## 기대 결과 세 가지
 
-트리거를 이해할 때는 성공 경로보다 실패 경로를 먼저 떠올리는 편이 좋습니다. 메시지가 두 번 오면 어떤 일이 생기는지, 순서가 뒤집히면 어떤 상태 오염이 생기는지, 반복 실패 메시지를 어디서 다시 볼 수 있는지가 핵심입니다.
+### 1) 첫 번째 정상 소비
+
+HTTP 요청 예시는 아래처럼 둘 수 있습니다.
+
+```python
+http_event = {
+    "body": json.dumps(
+        {
+            "order_id": "ord-1001",
+            "idempotency_key": "order:ord-1001",
+            "items": [{"sku": "keyboard", "quantity": 1}],
+        }
+    )
+}
+```
+
+먼저 `http_ingress_handler(http_event, None)`를 실행하고, 그 뒤 큐 메시지를 소비하면 기대 결과는 아래와 같습니다.
+
+```json
+{
+  "processed": [
+    {
+      "message_id": "msg-ord-1001",
+      "order_id": "ord-1001"
+    }
+  ],
+  "skipped": [],
+  "failed": []
+}
+```
+
+### 2) 같은 메시지가 다시 들어온 경우
+
+같은 `idempotency_key`로 한 번 더 소비하면 기대 결과는 아래처럼 바뀝니다.
+
+```json
+{
+  "processed": [],
+  "skipped": [
+    {
+      "message_id": "msg-ord-1001",
+      "reason": "duplicate"
+    }
+  ],
+  "failed": []
+}
+```
+
+여기서 핵심은 “재시도가 일어나지 않는다”가 아닙니다. 핵심은 **재시도가 일어나도 중복 부작용이 없게 만든다**는 것입니다.
+
+### 3) 독성 메시지가 DLQ로 가는 경우
+
+`sku`가 `poison-pill`인 메시지는 의도적으로 실패하게 만들었습니다. 세 번째 시도까지 실패하면 결과는 아래처럼 남습니다.
+
+```json
+{
+  "message_id": "msg-ord-9999",
+  "order_id": "ord-9999",
+  "idempotency_key": "order:ord-9999",
+  "retry_count": 3,
+  "error": "downstream inventory reservation failed",
+  "failed_at": "2026-05-16T10:20:00+00:00"
+}
+```
+
+이 페이로드가 있어야 운영자는 단순히 “실패했다”가 아니라 **무엇이, 몇 번째 재시도에서, 어떤 키로 실패했는지**를 기준으로 재처리할 수 있습니다.
+
+## 트리거 선택 매트릭스
+
+개념 설명만으로는 늘 부족한 지점이 바로 여기입니다. 트리거는 문법이 아니라 운영 계약이므로, 선택 기준을 표로 보는 편이 좋습니다.
+
+| 트리거 | 지연 시간 기대치 | 재시도 기본값 | 순서 기대치 | 잘 맞는 작업 |
+| --- | --- | --- | --- | --- |
+| HTTP | 즉시 응답, 사용자 체감이 중요 | 보통 클라이언트나 API 게이트웨이 재시도와 결합 | 보장하지 않음 | API 요청, 동기 검증, 빠른 승인 응답 |
+| Queue | 수 초~수 분 지연 허용 | at-least-once 재전달을 기본 가정 | 기본적으로 약함, 별도 FIFO 필요 | 비동기 후처리, 배치 소비, 버퍼링 |
+| Schedule | 주기 기준 실행 | 플랫폼 재시도 또는 다음 주기 재실행 가능 | 순서보다 겹침 방지가 중요 | 정기 집계, 정리 작업, 동기화 |
+
+이 표의 핵심은 트리거가 단순한 진입점 선택이 아니라는 사실입니다. HTTP를 고르면 사용자 지연 시간이 설계 중심이 되고, 큐를 고르면 중복 처리와 DLQ가 설계 중심이 되며, 스케줄을 고르면 재진입성과 겹침 방지가 설계 중심이 됩니다.
+
+## 중복 처리 문제가 생겼을 때 운영자가 보는 순서
+
+“같은 주문이 두 번 처리됐다”는 보고는 서버리스 운영에서 매우 흔합니다. 이때 막연히 코드부터 뜯어보면 느립니다. 아래 순서가 더 빠릅니다.
+
+1. **메시지 ID를 확인합니다.**
+   - 정말 같은 메시지가 재전달된 것인지, 비슷하지만 다른 메시지인지 구분합니다.
+2. **멱등성 키 기록을 조회합니다.**
+   - 키가 저장되지 않았는지, 저장 시점이 작업 후여서 너무 늦었는지 봅니다.
+3. **재시도 횟수와 마지막 오류를 확인합니다.**
+   - 일시 실패 후 재전달된 것인지, 영구 실패가 반복된 것인지 구분합니다.
+4. **DLQ 페이로드를 읽습니다.**
+   - 실패 메시지가 이미 격리되어 있다면 원인 파악과 재처리를 여기서 시작하는 편이 빠릅니다.
+
+이 순서를 지키면 “트리거 문제인지, 멱등성 저장소 문제인지, 다운스트림 장애 문제인지”를 훨씬 빨리 좁힐 수 있습니다.
 
 ## 실무에서 자주 헷갈리는 지점
 
-### 재시도는 정말 그렇게 흔할까
+### 재시도는 정말 그렇게 자주 일어나나요?
 
-매우 흔합니다. 네트워크 오류, 일시적인 다운스트림 실패, 플랫폼 내부 재시도만으로도 같은 메시지는 여러 번 들어올 수 있습니다.
+그렇습니다. 네트워크 오류, 플랫폼 타임아웃, 다운스트림 일시 실패만으로도 같은 메시지는 쉽게 다시 들어옵니다. 그래서 비동기 트리거는 기본적으로 at-least-once라고 가정하는 편이 안전합니다.
 
-### 순서 보장은 기본일까
+### 순서 보장은 기본 제공인가요?
 
-대부분의 이벤트 시스템은 그렇지 않습니다. 순서가 중요하다면 FIFO 같은 별도 보장 모델을 의도적으로 선택해야 합니다.
+대부분 그렇지 않습니다. 순서가 중요하다면 FIFO 큐, 파티션 키, 단일 소비자 전략 같은 별도 설계를 명시적으로 선택해야 합니다.
 
-### 결제나 재고 차감도 그냥 함수 하나로 처리해도 될까
+### DLQ만 있으면 운영이 안전한가요?
 
-가능은 하지만 멱등성과 상태 기록 없이 처리하면 매우 위험합니다. 같은 이벤트가 다시 들어왔을 때 중복 부과나 중복 차감이 생길 수 있기 때문입니다.
-
-## 자주 하는 실수 다섯 가지
-
-1. 재시도가 없을 것이라고 가정합니다.
-2. 메시지 순서가 항상 보장된다고 믿습니다.
-3. 멱등성 없이 결제 같은 작업을 처리합니다.
-4. DLQ를 설정하지 않고 운영을 시작합니다.
-5. 스케줄 주기를 지나치게 짧게 잡아 실행 겹침을 만듭니다.
-
-이 실수들은 모두 요청-응답 중심 사고를 그대로 비동기 시스템에 가져올 때 생깁니다. 이벤트 기반 시스템은 한 번 호출되면 끝나는 세계가 아니라, 다시 오고 늦게 오고 순서가 바뀔 수 있는 세계입니다.
-
-## 실무에서는 이렇게 생각합니다
-
-- 대부분의 트리거는 at-least-once를 기본 가정으로 둡니다.
-- 멱등성은 안정성뿐 아니라 비용 보호 장치이기도 합니다.
-- DLQ가 없으면 운영자는 문제를 관찰할 창을 잃습니다.
-- 순서가 중요하면 그 요구사항을 플랫폼 수준에서 분명히 드러내야 합니다.
-- 스케줄 작업은 실행 겹침 방지 전략까지 함께 설계해야 합니다.
+아닙니다. DLQ는 실패를 보이게 해 주는 장치일 뿐입니다. 멱등성 키, 재시도 횟수, 원본 메시지 정보가 함께 남아야 재처리가 가능합니다.
 
 ## 체크리스트
 
-- [ ] 멱등성을 보장했는가
-- [ ] DLQ를 설정했는가
-- [ ] 재시도 횟수와 정책을 명시했는가
-- [ ] 순서 보장 요구사항을 문서화했는가
+- [ ] HTTP와 큐 트리거의 성공 의미를 분리해서 설계했는가
+- [ ] 멱등성 키를 외부 저장소에 기록하는 계약이 있는가
+- [ ] 재시도 한도와 DLQ 이동 기준이 명시되어 있는가
+- [ ] 중복 처리 사고 시 무엇부터 확인할지 운영 순서를 알고 있는가
 
 ## 정리
 
-트리거와 이벤트를 이해하면 함수 호출을 더 이상 단순한 진입점으로 보지 않게 됩니다. 호출 방식은 곧 실패 방식이고, 실패 방식은 곧 재시도와 중복 처리 설계로 이어집니다. 그래서 멱등성, DLQ, 순서 보장은 모두 트리거 의미에서 출발합니다.
+트리거와 이벤트를 이해한다는 것은 함수 진입점을 외우는 일이 아닙니다. **호출 방식이 곧 실패 방식이고, 실패 방식이 곧 재시도·멱등성·DLQ 설계로 이어진다**는 사실을 이해하는 일입니다.
 
-다음 글에서는 콜드 스타트의 원인과 완화 방법을 살펴보겠습니다.
+이번 글의 핵심은 하나입니다. HTTP 요청은 빠르게 받아들이고, 실제 작업은 큐 뒤로 넘기고, 중복은 멱등성 저장소에서 막고, 반복 실패는 DLQ에 남겨 운영 가능한 형태로 격리해야 합니다. 다음 글에서는 이 흐름 위에서 왜 콜드 스타트가 지연 시간에 큰 영향을 주는지 살펴보겠습니다.
 
 <!-- toc:begin -->
 - [서버리스란 무엇인가?](./01-what-is-serverless.md)
@@ -208,12 +356,13 @@ DLQ는 실패를 숨기는 장치가 아니라 실패를 보이게 하는 장치
 ### 공식 문서
 
 - [Lambda 이벤트 소스 매핑](https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html)
-- [SQS 데드 레터 큐](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
-- [EventBridge 스케줄](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html)
+- [Amazon SQS 데드 레터 큐](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html)
+- [Azure Functions 트리거와 바인딩 개요](https://learn.microsoft.com/azure/azure-functions/functions-triggers-bindings)
 
 ### 패턴과 코드
 
 - [멱등성 패턴](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/idempotency.html)
-- [AWS Powertools for Lambda Python (GitHub)](https://github.com/aws-powertools/powertools-lambda-python)
+- [AWS Powertools for Lambda Python - Idempotency](https://docs.powertools.aws.dev/lambda/python/latest/utilities/idempotency/)
+- [Azure Architecture Center - Queue-based load leveling pattern](https://learn.microsoft.com/azure/architecture/patterns/queue-based-load-leveling)
 
 Tags: Serverless, Trigger, Event, EventDriven, Cloud
