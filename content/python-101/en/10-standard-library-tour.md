@@ -246,11 +246,11 @@ This wraps up the Python 101 series. The functions, modules, classes, and standa
 
 ## References
 
-- [Python tutorial — Brief tour of the standard library](https://docs.python.org/3/tutorial/stdlib.html)
-- [Python library — datetime](https://docs.python.org/3/library/datetime.html)
-- [Python library — pathlib](https://docs.python.org/3/library/pathlib.html)
-- [Python library — json](https://docs.python.org/3/library/json.html)
-- [Python library — collections](https://docs.python.org/3/library/collections.html)
-- [Python library — itertools](https://docs.python.org/3/library/itertools.html)
+- [Python tutorial — Brief Tour of the Standard Library](https://docs.python.org/3/tutorial/stdlib.html) — Frames the standard library as Python’s default toolbox and motivates when to reach for it first.
+- [Python docs — `datetime`](https://docs.python.org/3/library/datetime.html) — Canonical reference for date/time objects, `timedelta`, and formatting/parsing helpers.
+- [Python docs — `pathlib`](https://docs.python.org/3/library/pathlib.html) — Documents object-oriented path handling and convenience file APIs.
+- [Python docs — `json`](https://docs.python.org/3/library/json.html) — Covers `dump`/`load`/`dumps`/`loads` and the standard encoder/decoder behavior.
+- [Python docs — `collections`](https://docs.python.org/3/library/collections.html) — Primary reference for `Counter`, `defaultdict`, and `deque`.
+- [Python docs — `itertools`](https://docs.python.org/3/library/itertools.html) — Explains the lazy iterator tools highlighted in the chapter.
 
 Tags: standard-library, datetime-module, pathlib-module, json-module, collections-module, itertools-module

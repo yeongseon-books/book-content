@@ -357,10 +357,11 @@ hello-python/
 
 ## 참고 자료
 
-- Python 공식 문서 — venv: https://docs.python.org/3/library/venv.html
-- Python 공식 문서 — pip user guide: https://pip.pypa.io/en/stable/user_guide/
-- PEP 405 — Python Virtual Environments: https://peps.python.org/pep-0405/
-- Python.org 다운로드: https://www.python.org/downloads/
-- Real Python — Python Virtual Environments Primer: https://realpython.com/python-virtual-environments-a-primer/
+- [Python 공식 문서 — venv](https://docs.python.org/3/library/venv.html) — `python -m venv`, 활성화 스크립트, 격리 원리를 직접 확인할 수 있습니다.
+- [PEP 405 — Python Virtual Environments](https://peps.python.org/pep-0405/) — venv가 `sys.prefix`와 site-packages를 어떻게 분리하는지 배경 설명을 제공합니다.
+- [pip User Guide](https://pip.pypa.io/en/stable/user_guide/) — `python -m pip`, `-r requirements.txt`, `pip freeze` 같은 실무 명령의 기준 문서입니다.
+- [Python Packaging User Guide — Install packages in a virtual environment using pip and venv](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/) — 프로젝트별 `.venv` 생성·활성화·설치 흐름을 단계별로 정리합니다.
+- [Python.org Downloads](https://www.python.org/downloads/) — 공식 설치 경로와 지원 버전 확인에 적합합니다.
+- [Python 공식 문서 — Using Python on Windows](https://docs.python.org/3/using/windows.html) — Windows에서 `python`/`py` 명령, 설치 관리자, venv 사용 규칙을 확인할 수 있습니다.
 
 Tags: Python, virtual-environments, environment-isolation, python-installation, package-management, developer-setup

@@ -391,10 +391,10 @@ The next chapter covers functions and arguments. We will pin down `def`, `*args`
 
 ## References
 
-- Python tutorial — More Control Flow Tools: https://docs.python.org/3/tutorial/controlflow.html
-- Python docs — Truth Value Testing: https://docs.python.org/3/library/stdtypes.html#truth-value-testing
-- Python docs — `enumerate`: https://docs.python.org/3/library/functions.html#enumerate
-- Python docs — `zip` (including the strict option): https://docs.python.org/3/library/functions.html#zip
-- PEP 202 — List Comprehensions: https://peps.python.org/pep-0202/
+- [Python tutorial — More Control Flow Tools](https://docs.python.org/3/tutorial/controlflow.html) — Covers `if`, `for`, `while`, `break`, `continue`, loop `else`, and function-level examples in one place.
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Canonical source for truth-value testing, chained comparisons, and boolean operator behavior.
+- [Python docs — Built-in Functions](https://docs.python.org/3/library/functions.html) — Documents `range`, `enumerate`, and `zip`, including the `strict` behavior referenced in the chapter.
+- [PEP 202 — List Comprehensions](https://peps.python.org/pep-0202/) — Historical and syntactic source for comprehension syntax as a control-flow shortcut.
+- [Python docs — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — Language-reference view of `if`, `for`, `while`, and loop `else` semantics.
 
 Tags: control-flow, if-statement, for-loop, while-loop, comprehensions, enumerate-zip

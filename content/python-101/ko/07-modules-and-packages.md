@@ -378,9 +378,10 @@ def total(items):
 
 ## 참고 자료
 
-- [Python tutorial — Modules](https://docs.python.org/3/tutorial/modules.html)
-- [Python tutorial — Packages](https://docs.python.org/3/tutorial/modules.html#packages)
-- [Python reference — The import system](https://docs.python.org/3/reference/import.html)
-- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/)
+- [Python 튜토리얼 — Modules](https://docs.python.org/3/tutorial/modules.html) — 모듈 실행, import 캐시, `sys.path` 탐색 순서를 입문 관점에서 설명합니다.
+- [Python Language Reference — The import system](https://docs.python.org/3/reference/import.html) — import가 finder/loader와 module cache를 거쳐 동작하는 방식을 공식 정의합니다.
+- [Python 공식 문서 — `__main__`](https://docs.python.org/3/library/__main__.html) — `if __name__ == "__main__"` 가드와 패키지 엔트리 포인트의 의미를 보완합니다.
+- [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/) — 절대/상대 import와 leading dot 문법의 배경입니다.
+- [PEP 420 — Implicit Namespace Packages](https://peps.python.org/pep-0420/) — `__init__.py` 없는 namespace package 개념을 확인할 수 있습니다.
 
 Tags: import-system, module-vs-package, init-py, name-main-guard, relative-imports, namespace-packages

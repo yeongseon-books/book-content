@@ -368,10 +368,11 @@ The next chapter covers modules and packages — `import`, `__init__.py`, and `_
 
 ## References
 
-- Python tutorial — Defining Functions: https://docs.python.org/3/tutorial/controlflow.html#defining-functions
-- Python docs — Function Definitions: https://docs.python.org/3/reference/compound_stmts.html#function-definitions
-- PEP 3102 — Keyword-Only Arguments: https://peps.python.org/pep-3102/
-- PEP 570 — Python Positional-Only Parameters: https://peps.python.org/pep-0570/
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
+- [Python tutorial — More on Defining Functions](https://docs.python.org/3/tutorial/controlflow.html) — Practical overview of defaults, keyword arguments, `*args`, `**kwargs`, and `lambda`.
+- [Python docs — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — Formal reference for function definitions, parameter kinds, and `return` behavior.
+- [Python docs — Expressions](https://docs.python.org/3/reference/expressions.html) — Documents `lambda` as an expression form and clarifies its limitations.
+- [PEP 3102 — Keyword-Only Arguments](https://peps.python.org/pep-3102/) — Design rationale for forcing options to be passed by name.
+- [PEP 570 — Python Positional-Only Parameters](https://peps.python.org/pep-0570/) — Explains the `/` separator and its API design benefits.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — Standard basis for annotating function signatures with types.
 
 Tags: function-definition, default-arguments, args-kwargs, keyword-only, lambda, type-hints

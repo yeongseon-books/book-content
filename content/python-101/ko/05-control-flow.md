@@ -385,10 +385,10 @@ def fetch_users(ids):
 
 ## 참고 자료
 
-- Python 공식 튜토리얼 — More Control Flow Tools: https://docs.python.org/3/tutorial/controlflow.html
-- Python 공식 문서 — Truth Value Testing: https://docs.python.org/3/library/stdtypes.html#truth-value-testing
-- Python 공식 문서 — `enumerate`: https://docs.python.org/3/library/functions.html#enumerate
-- Python 공식 문서 — `zip` (strict 옵션 포함): https://docs.python.org/3/library/functions.html#zip
-- PEP 202 — List Comprehensions: https://peps.python.org/pep-0202/
+- [Python 공식 튜토리얼 — More Control Flow Tools](https://docs.python.org/3/tutorial/controlflow.html) — `if`, `for`, `while`, `break`, `continue`, `else`, comprehension까지 이 장의 핵심 구문을 모두 다룹니다.
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — truthy/falsy, short-circuit, 비교 연쇄의 기준 규칙이 모여 있습니다.
+- [Python 공식 문서 — Built-in Functions](https://docs.python.org/3/library/functions.html) — `range`, `enumerate`, `zip`의 시그니처와 동작을 함께 확인할 수 있습니다.
+- [PEP 202 — List Comprehensions](https://peps.python.org/pep-0202/) — comprehension이 반복/필터링을 어떻게 표현식으로 압축하는지 보여 주는 원문입니다.
+- [Python 공식 문서 — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — `if`, `while`, `for`의 정확한 문법과 `else` 의미를 언어 명세 수준에서 확인할 수 있습니다.
 
 Tags: control-flow, if-statement, for-loop, while-loop, comprehensions, enumerate-zip

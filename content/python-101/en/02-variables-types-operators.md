@@ -310,10 +310,11 @@ The next chapter dives into strings: f-strings and format specs, the difference 
 
 ## References
 
-- Python docs — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python docs — `decimal`: https://docs.python.org/3/library/decimal.html
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
-- PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
-- mypy documentation: https://mypy.readthedocs.io/
+- [Python docs — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — Primary reference for `int`, `float`, `bool`, `None`, truth-value testing, and sequence behavior.
+- [Python docs — Expressions](https://docs.python.org/3/reference/expressions.html) — Defines arithmetic, comparison, identity, and boolean operator semantics and precedence.
+- [Python tutorial — Floating-Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html) — Official explanation for representation error behind examples like `0.1 + 0.2`.
+- [Python docs — `decimal`](https://docs.python.org/3/library/decimal.html) — Covers exact decimal arithmetic, which is the chapter’s recommended alternative for money-like values.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — Source for Python’s standard type-hinting model and its static-analysis intent.
+- [Python Data Model](https://docs.python.org/3/reference/datamodel.html) — Reinforces the object model behind identity, mutability, and names bound to objects.
 
 Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints

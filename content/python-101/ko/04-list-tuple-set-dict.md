@@ -374,10 +374,11 @@ counts = Counter(words)
 
 ## 참고 자료
 
-- Python 공식 문서 — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python 공식 문서 — `collections` 모듈: https://docs.python.org/3/library/collections.html
-- Python 공식 문서 — Data Structures 튜토리얼: https://docs.python.org/3/tutorial/datastructures.html
-- PEP 274 — Dict Comprehensions: https://peps.python.org/pep-0274/
-- TimeComplexity (CPython 자료구조 시간 복잡도): https://wiki.python.org/moin/TimeComplexity
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — list, tuple, set, dict의 공식 동작과 해시 가능성 제약을 한곳에서 확인할 수 있습니다.
+- [Python 튜토리얼 — Data Structures](https://docs.python.org/3/tutorial/datastructures.html) — list 메서드, tuple, set, dict, comprehension을 입문 수준 예제로 설명합니다.
+- [PEP 274 — Dict Comprehensions](https://peps.python.org/pep-0274/) — dict comprehension 문법과 의도를 직접 확인할 수 있습니다.
+- [Python Wiki — TimeComplexity](https://wiki.python.org/moin/TimeComplexity) — list의 선형 탐색과 dict/set의 평균 O(1) 조회를 비교할 때 참고할 수 있습니다.
+- [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `namedtuple`, `deque` 같은 표준 보조 자료구조를 소개해 자료구조 선택 기준을 넓혀 줍니다.
+- [Python 공식 문서 — Data Model](https://docs.python.org/3/reference/datamodel.html) — 변경 가능 객체와 불변 객체의 차이를 언어 모델 차원에서 보강합니다.
 
 Tags: list-and-tuple, dict, set, mutability, comprehensions, hashable

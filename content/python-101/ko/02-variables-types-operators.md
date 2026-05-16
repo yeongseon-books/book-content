@@ -295,10 +295,11 @@ class Order:
 
 ## 참고 자료
 
-- Python 공식 문서 — Built-in Types: https://docs.python.org/3/library/stdtypes.html
-- Python 공식 문서 — `decimal`: https://docs.python.org/3/library/decimal.html
-- PEP 484 — Type Hints: https://peps.python.org/pep-0484/
-- PEP 8 — Style Guide for Python Code: https://peps.python.org/pep-0008/
-- mypy 공식 문서: https://mypy.readthedocs.io/
+- [Python 공식 문서 — Built-in Types](https://docs.python.org/3/library/stdtypes.html) — `int`, `float`, `bool`, `None`, truthy/falsy, 시퀀스 공통 규칙의 기준 문서입니다.
+- [Python 공식 문서 — Expressions](https://docs.python.org/3/reference/expressions.html) — 산술·비교·`is`·논리 연산의 문법과 평가 순서를 정확히 확인할 수 있습니다.
+- [Python 튜토리얼 — Floating-Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html) — `0.1 + 0.2` 같은 부동소수 표현 오차를 설명하는 공식 입문 자료입니다.
+- [Python 공식 문서 — `decimal`](https://docs.python.org/3/library/decimal.html) — 금액 계산처럼 정확한 십진 연산이 필요한 경우의 대안을 다룹니다.
+- [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 타입 힌트가 런타임 강제가 아니라 정적 분석용 계약이라는 점의 출처입니다.
+- [Python Data Model](https://docs.python.org/3/reference/datamodel.html) — 객체 정체성, 변경 가능성, 이름이 객체를 가리킨다는 모델을 더 깊게 보완합니다.
 
 Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints
