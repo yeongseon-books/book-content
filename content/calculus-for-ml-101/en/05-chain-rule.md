@@ -30,13 +30,13 @@ In this post, we'll use outer and inner functions, stage-by-stage derivatives, a
 
 > The chain rule says you do not differentiate the whole system in one mysterious jump. You differentiate each local stage and connect those local sensitivities in the right order.
 
-## What You Will Learn
+## Questions this article answers
 
-- *Function composition*
-- The *chain rule formula*
-- *Outer / inner* intuition
-- *Gradient products*
-- The link to *backpropagation*
+- When one function is nested inside another, why is the full derivative connected by multiplication rather than simple addition?
+- What is the most practical way to distinguish the outer function from the inner function?
+- In a multi-stage composite function, in what order does the gradient propagate?
+- Why can one zero-gradient stage block the entire path?
+- How does the chain rule connect directly to backpropagation?
 
 ## Why It Matters
 

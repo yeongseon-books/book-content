@@ -30,13 +30,13 @@ In this post, we'll look at the update rule itself, the role of the learning rat
 
 > Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.
 
-## What You Will Learn
+## Questions this article answers
 
-- The *gradient descent* algorithm
-- The role of the *learning rate*
-- *Convergence* and *divergence*
-- *Stochastic* gradient descent (SGD)
-- Intuition for *mini-batches*
+- Why does moving in the direction opposite the gradient reduce the loss?
+- What does the learning rate do beyond acting as a simple multiplier?
+- How can you tell the difference between convergence and divergence in gradient descent?
+- What changes when you use the full-dataset gradient versus SGD or mini-batch gradients?
+- How do initialization and gradient noise affect the optimization path?
 
 ## Why It Matters
 

@@ -30,13 +30,13 @@ In this post, we'll use MSE, cross entropy, and gradient-based training signals 
 
 > A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of *loss*
-- *MSE* for regression
-- *Cross entropy* for classification
-- The meaning of the *gradient*
-- *Training signal* intuition
+- How is a loss function different from a simple evaluation metric?
+- Why is MSE common in regression and cross entropy common in classification?
+- Why is the gradient of a loss function called a training signal?
+- How does the choice between averaging and summing affect optimization scale?
+- How can a numerically unstable loss implementation break training?
 
 ## Why It Matters
 

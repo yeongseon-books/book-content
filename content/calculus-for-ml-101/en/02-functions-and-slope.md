@@ -30,13 +30,13 @@ In this post, we'll treat a function as both an input-output contract and a geom
 
 > A function tells you what output you get. Its slope tells you how sensitive that output is at the point you currently care about.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of a *function*
-- *Slope* of a *linear* function
-- *Local slope* of a *nonlinear* function
-- The *graphical meaning* of a derivative
-- Intuition for ML *activations*
+- Why should a function be understood as an input-output contract rather than just a formula?
+- How does the slope of a linear function differ from the local slope of a nonlinear one?
+- How does the slope difference between ReLU and sigmoid affect learning?
+- Why does the graph-level meaning of a derivative make activation design easier to reason about?
+- How do input scale and function shape affect the way you interpret gradients?
 
 ## Why It Matters
 

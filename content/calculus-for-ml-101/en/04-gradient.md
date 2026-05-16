@@ -30,13 +30,13 @@ In this post, we'll treat the gradient as a direction vector on a loss landscape
 
 > A gradient is not just a list of slopes. It is the direction-and-strength signal that tells an optimizer how the loss surface is pushing back at the current point.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of a *gradient*
-- *Direction* and *magnitude*
-- Intuition for *contour lines*
-- The *steepest ascent* direction
-- The meaning of the *opposite* direction
+- What does it actually mean to bundle multiple partial derivatives into one gradient vector?
+- What do the direction and magnitude of a gradient each mean in practice?
+- Why does the gradient point in the direction of steepest increase in the loss?
+- Why does gradient descent move in the opposite direction of the gradient?
+- Why do contour lines make gradient intuition easier to build?
 
 ## Why It Matters
 

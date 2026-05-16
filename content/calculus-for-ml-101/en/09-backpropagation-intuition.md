@@ -30,13 +30,13 @@ In this post, we'll use computation graphs, forward and backward passes, local d
 
 > Backpropagation is not new math. It is the chain rule executed systematically over a computation graph, with cached forward values and accumulated backward signals.
 
-## What You Will Learn
+## Questions this article answers
 
-- The *computation graph*
-- The *forward pass*
-- The *backward pass*
-- *Gradient accumulation*
-- Intuition for *autograd*
+- Why can backpropagation compute gradients for so many weights in a single pass?
+- In computation-graph terms, what does the forward pass leave behind, and what does the backward pass do with it?
+- What does it really mean to store a local derivative?
+- Why does gradient accumulation matter, and why is `zero_grad` so important?
+- How does understanding autograd help you find training bugs faster?
 
 ## Why It Matters
 
