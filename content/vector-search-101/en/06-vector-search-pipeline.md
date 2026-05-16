@@ -51,6 +51,8 @@ The previous chapter covered **Chunking strategies — how to split long documen
 
 ---
 
+> A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.
+
 ## Questions this chapter answers
 
 - How do you cleanly separate ingest, embedding, indexing, and search stages?

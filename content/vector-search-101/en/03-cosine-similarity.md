@@ -50,6 +50,8 @@ After this chapter, the next one moves on to **FAISS fundamentals — fast appro
 
 ---
 
+> In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.
+
 ## Questions this chapter answers
 
 - Do cosine similarity, dot product, and Euclidean distance produce the same ranking or different ones?

@@ -52,6 +52,8 @@ After this chapter, the next one moves on to **Vector search pipeline — from d
 
 ---
 
+> Chunking is not just extra preprocessing work. It is a design step where you decide what unit of context your retrieval system will remember.
+
 ## Questions this chapter answers
 
 - Why is embedding a long document as a single chunk a bad idea?

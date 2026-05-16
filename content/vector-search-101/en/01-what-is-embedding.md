@@ -51,6 +51,8 @@ After this chapter, the next one moves on to **HuggingFace embeddings in practic
 
 ---
 
+> An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.
+
 ## Questions this chapter answers
 
 - What is an embedding mathematically, and why convert text into a numeric vector at all?
