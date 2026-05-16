@@ -28,6 +28,14 @@ This is post 4 in the Data Warehouse 101 series.
 
 In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.
 
+## Questions this article answers
+
+- Why does the star schema show up so often in analytics?
+- How is it different from a snowflake schema?
+- Why do join hops matter so much for both performance and readability?
+- Why do BI tools prefer star-shaped models?
+- How do you decide when a snowflake schema is still the right choice?
+
 ## What You Will Learn
 
 - The structure of a *star schema*

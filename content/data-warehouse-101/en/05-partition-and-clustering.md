@@ -28,6 +28,14 @@ This is post 5 in the Data Warehouse 101 series.
 
 In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.
 
+## Questions this article answers
+
+- What problem does partitioning solve, and what problem does clustering solve?
+- How does pruning reduce query cost in practice?
+- What should guide your choice of partition key and cluster key?
+- What kind of cost does bad partitioning create on a large fact table?
+- Why do experienced teams check bytes scanned before almost anything else?
+
 ## What You Will Learn
 
 - The definition and effect of *partitioning*

@@ -28,6 +28,14 @@ This is post 6 in the Data Warehouse 101 series.
 
 In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
 
+## Questions this article answers
+
+- Where do ETL and ELT differ in where transformation happens?
+- Why do modern warehouse teams tend to prefer ELT?
+- What breaks when you skip a staging layer?
+- Why are idempotent pipelines so closely tied to operational stability?
+- What team problems do tools like dbt help reduce?
+
 ## What You Will Learn
 
 - The difference between *ETL* and *ELT*

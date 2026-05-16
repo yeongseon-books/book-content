@@ -28,6 +28,14 @@ This is post 2 in the Data Warehouse 101 series.
 
 In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.
 
+## Questions this article answers
+
+- How do OLTP and OLAP differ in the workloads they are built to handle?
+- Where does the gap between row storage and column storage become most visible?
+- Why does one engine become a bad compromise when you ask it to serve both workloads?
+- How should you think about CDC and replication lag in a split architecture?
+- What practical criteria do teams use to decide when to separate OLTP from OLAP?
+
 ## What You Will Learn
 
 - The workload difference between *OLTP* and *OLAP*

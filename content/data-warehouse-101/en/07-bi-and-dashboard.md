@@ -28,6 +28,14 @@ This is post 7 in the Data Warehouse 101 series.
 
 In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.
 
+## Questions this article answers
+
+- Why do different teams reach different conclusions even when they look at the same number?
+- What role should BI tools play, and what role should dashboards play?
+- What question structure does a good dashboard need?
+- In what order should KPI, trend, and drill-down appear on the screen?
+- When a dashboard keeps failing, is the problem often the design rather than the data?
+
 ## What You Will Learn
 
 - The role of *BI tools*

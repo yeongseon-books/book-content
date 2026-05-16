@@ -28,6 +28,14 @@ This is the final post in the Data Warehouse 101 series.
 
 In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.
 
+## Questions this article answers
+
+- Why should warehouse design start with a single line that defines the grain?
+- In what order do fact, dimension, schema, partitioning, ETL, and marts connect?
+- Which dimensions become shared assets in an e-commerce domain?
+- Why does a design fall apart quickly when the team works without documentation?
+- How do you explain the path from a finished warehouse to the dashboard it supports?
+
 ## What You Will Learn
 
 - An *e-commerce* example designed *end to end*
