@@ -28,13 +28,13 @@ A good incident process reduces cognitive load before the alert even fires. Seve
 
 This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
 
-## What You Will Learn
+## Questions this article answers
 
-- How to classify *severity (SEV)*
-- How to design an *on-call rotation*
-- How to write a *runbook*
-- How to run a *blameless postmortem*
-- The meaning of *MTTR/MTTD*
+- When an *alert* fires at *3 AM*, who should do what first?
+- How should teams define incident *severity (SEV)* levels so everyone responds with the same language?
+- Why is an *on-call rotation* an operating design decision rather than just a schedule?
+- How do *runbooks* and the *incident commander* role change real recovery speed?
+- How does a *blameless postmortem* actually connect to preventing recurrence?
 
 ## Why It Matters
 

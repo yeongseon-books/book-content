@@ -28,13 +28,13 @@ Good configuration management prevents that drift. The code stays the same, the 
 
 This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
 
-## What You Will Learn
+## Questions this article answers
 
-- The meaning of *dev / stage / prod* environments
-- The *Twelve-Factor* *Config* principle
-- The difference between *environment variables* and *secrets*
-- A comparison of *.env*, *Vault*, and *AWS Secrets Manager*
-- Five common pitfalls
+- Why should *dev*, *stage*, and *prod* be separated?
+- To deploy the same *codebase* to multiple environments, what needs to live *outside the code*?
+- How are *environment variables* different from *secrets*, and why should they be managed separately?
+- When is *.env*, *Vault*, or *AWS Secrets Manager* the right fit?
+- What mistakes do teams make most often in *configuration management*?
 
 ## Why It Matters
 

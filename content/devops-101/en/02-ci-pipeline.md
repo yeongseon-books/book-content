@@ -28,13 +28,13 @@ A strong CI pipeline turns quality rules into an executable contract. Every PR s
 
 This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition and stages of a *CI pipeline*
-- *Separation of responsibility* per stage (build/test/lint/scan)
-- Designing for *fast feedback*
-- Clear signals for *failed builds*
-- Five common pitfalls
+- How is a *CI pipeline* different from simple *test automation*?
+- Why should *build*, *test*, *lint*, and *scan* be combined into one *flow*?
+- In what order should you design a pipeline to deliver *fast feedback*?
+- What does it take for a *failed build* to send a clear signal to the whole team?
+- What are the common ways *CI* still breaks down in day-to-day work even after adoption?
 
 ## Why It Matters
 

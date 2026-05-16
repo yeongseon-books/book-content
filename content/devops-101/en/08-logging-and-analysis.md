@@ -28,13 +28,13 @@ That is why logging is not just about emitting more text. It is about structure,
 
 This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
 
-## What You Will Learn
+## Questions this article answers
 
-- The difference between *structured* and *unstructured* logs
-- Why *central log aggregation* matters
-- *Loki* vs *ELK* at a glance
-- How to use a *correlation ID*
-- Five common pitfalls
+- What practical difference is there between *structured* and *unstructured* logs?
+- Why do logs from many servers need to be collected in one place?
+- From what perspective is it useful to compare *Loki* and *ELK*?
+- Why is a *correlation ID* considered a basic requirement for debugging distributed systems?
+- What mistakes do teams miss most often when defining a *logging strategy*?
 
 ## Why It Matters
 

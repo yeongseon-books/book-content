@@ -28,13 +28,13 @@ DevOps is the attempt to remove that handoff cost. It gives one team a shared fe
 
 This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of *DevOps* and the context that produced it
-- The *pain* of the era when *Dev* and *Ops* were separated
-- The *three principles* of DevOps
-- The *minimum tools* to start with
-- Five common pitfalls
+- What is *DevOps*, and why did treating *development* and *operations* as separate worlds start to hit its limits?
+- Why is *DevOps* described as a *culture* rather than just a collection of *tools*?
+- What roles do terms like *CI*, *CD*, and *SRE* play inside the *DevOps* flow?
+- If you want to start *DevOps* in practice, which kinds of *automation* should you usually add first?
+- What are the most common traps that make teams think they are doing *DevOps* when they are not?
 
 ## Why It Matters
 
