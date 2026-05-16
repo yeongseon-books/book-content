@@ -31,13 +31,15 @@ Here we will define what “small enough” really means, walk through a safe ex
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- Four effects of small functions
-- The Extract Function procedure
-- Patterns that remove side effects
-- Command-Query Separation
-- Parameter objects to simplify signatures
+- What do you gain when functions stay small?
+- In what order should you apply Extract Function to keep the refactor safe?
+- What common patterns help reduce side effects?
+- Why does Command-Query Separation cut debugging time?
+- When is it worth introducing a parameter object?
+
+> As functions get smaller, names do more of the work than comments, and tests become much easier to write.
 
 ## Why It Matters
 

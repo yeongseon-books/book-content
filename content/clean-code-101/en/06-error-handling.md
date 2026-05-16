@@ -31,13 +31,15 @@ Here we will set boundaries for validation, typed exceptions, return-value failu
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- When to use exceptions vs return values
-- The Fail Fast principle
-- The "errors as values" pattern
-- Retry with exponential backoff
-- Try/except anti-patterns
+- How do you decide between raising an exception and returning a value?
+- When is Fail Fast especially important?
+- When is the "errors as values" pattern the better fit?
+- Under what conditions is retry with exponential backoff actually safe?
+- What try/except anti-patterns show up most often?
+
+> If the caller can make a reasonable local decision, return a value. If not, raise a meaningful exception.
 
 ## Why It Matters
 

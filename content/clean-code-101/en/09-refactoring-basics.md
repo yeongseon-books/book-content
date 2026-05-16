@@ -31,13 +31,15 @@ Here we will use characterization tests, rename and extraction moves, and the â€
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- What refactoring is and what it is not
-- Core techniques from the Fowler catalog
-- Characterization tests
-- A safe step-by-step refactoring process
-- Strategies for legacy code
+- What is refactoring exactly, and how is it different from rewriting?
+- Which techniques from Fowler's catalog matter most in day-to-day work?
+- Why are characterization tests so important in legacy code?
+- What small steps make a refactoring safe?
+- How do you break a large change into smaller pieces you can actually review?
+
+> Refactoring is not about making code prettier. It is an investment that makes the next change easier.
 
 ## Why It Matters
 

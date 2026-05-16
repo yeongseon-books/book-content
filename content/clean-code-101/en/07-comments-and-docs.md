@@ -31,13 +31,15 @@ Here we will separate the explanations that belong in naming and structure from 
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- When not to write a comment
-- Intent comments and warning comments
-- Docstring conventions in Python
-- Documenting public APIs
-- Managing TODO and FIXME
+- When is it better not to write a comment at all?
+- What is the difference between an intent comment and a warning comment?
+- What rules make Python docstrings effective?
+- How much of a public API should you document?
+- How should TODO and FIXME items be managed so they stay traceable?
+
+> Good comments explain only the "why" that code cannot show on its own. The "what" should stay visible in the code.
 
 ## Why It Matters
 

@@ -31,13 +31,15 @@ Here we will convert the themes from the series into a practical review checklis
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- PR size and reviewability
-- A clean-code review checklist
-- The shape of a good review comment
-- Roles of the reviewer and the author
-- What to push into automation
+- What size makes a PR realistically reviewable?
+- What belongs on a clean-code review checklist?
+- What does a strong review comment actually look like?
+- What responsibilities belong to the reviewer, and which belong to the author?
+- What should be pushed into automation, and what still needs human judgment?
+
+> A good review is not just time spent catching defects. It is the moment the team turns intent and structure into a better answer than automation can produce alone.
 
 ## Why It Matters
 

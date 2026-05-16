@@ -31,13 +31,15 @@ Here we will flatten the easy cases with guard clauses, then move the harder cas
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- Guard clauses and early return
-- Avoiding negative and double-negative conditions
-- Removing if/else chains with polymorphism
-- Separating branches with the Strategy pattern
-- Table-driven branching
+- When are guard clauses and early returns most effective?
+- Why do negative conditions and double negatives make code harder to read?
+- When should an if/else chain become polymorphism instead?
+- What kinds of branching does the Strategy pattern separate well?
+- How does a table-driven approach simplify policy-heavy branching?
+
+> Conditional depth is cognitive load. Reduce it by one level and readability improves more than most teams expect.
 
 ## Why It Matters
 

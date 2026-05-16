@@ -31,13 +31,15 @@ Here we will separate working code from readable code and from code that stays c
 
 ---
 
-## What You Will Learn
+## Questions this article answers
 
-- The definition of clean code and four signals
-- Working vs readable vs cheap-to-change
-- How small principles compound
-- The objective markers of "clean"
-- The map of this whole series
+- What signals should you inspect first when deciding whether code is clean?
+- What separates working code from readable code, and readable code from code that stays easy to change?
+- Why do small principles create such a large difference in real maintenance cost?
+- How far can the feeling that code is "clean" be turned into objective criteria?
+- How does the rest of this series build on that foundation?
+
+> Working code is the starting point. Clean code is the discipline of making the next person faster at understanding and changing it.
 
 ## Why It Matters
 
