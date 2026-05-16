@@ -28,13 +28,13 @@ Observability is what closes that gap. It is the difference between watching a k
 
 This is the first post in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- The difference between *monitoring* and *observability*
-- The three pillars: *metrics, logs, traces*
-- *Known unknowns* vs *unknown unknowns*
-- Five steps to your first signals
-- Five common pitfalls
+- How is observability different from monitoring?
+- What question does each signal — metrics, logs, and traces — answer?
+- Why do you need to read the three signals together?
+- Why is `trace_id` the connective tissue of observability?
+- Where should a small service start when adding its first signals?
 
 ## Why It Matters
 

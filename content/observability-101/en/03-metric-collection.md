@@ -28,13 +28,13 @@ Once you understand that path, Prometheus and Grafana stop looking like tools yo
 
 This is post 3 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- *Pull* vs *push* models
-- *Exporters* and the `/metrics` endpoint
-- A one-line *Prometheus* config
-- Your first *Grafana* dashboard
-- Five common pitfalls
+- How does a metric get collected and turned into a graph?
+- What is the difference between pull and push collection models?
+- What role does the `/metrics` endpoint play?
+- How does PromQL turn raw metrics into operational questions?
+- What should a good first dashboard show?
 
 ## Why It Matters
 

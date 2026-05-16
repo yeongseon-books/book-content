@@ -28,13 +28,13 @@ Structured logging fixes that by turning log lines into data with fields you can
 
 This is post 4 in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- *Unstructured* vs *structured* logs
-- *Log levels* and when to use them
-- Propagating *context* (request_id, user_id)
-- Emitting *JSON* with Python `logging`
-- Five common pitfalls
+- Why do free-form logs hit a limit so quickly in production?
+- What changes when logs become structured data?
+- How should you choose between log levels?
+- How should a per-request correlation ID flow through the system?
+- How should you handle sensitive data in logs?
 
 ## Why It Matters
 

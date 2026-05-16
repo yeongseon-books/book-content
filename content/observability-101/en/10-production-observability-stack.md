@@ -28,13 +28,13 @@ A good first stack is less about completeness and more about operability. Collec
 
 This is the final post in the Observability 101 series.
 
-## What You Will Learn
+## Questions this article answers
 
-- The simple flow *collect → store → query*
-- An open-source *baseline stack*
-- *Correlation* on one screen
-- Five *operator SLOs*
-- Five common pitfalls
+- What does the minimum viable observability stack for a small team look like?
+- Why is it better to put the OpenTelemetry Collector at the center?
+- What do you need to connect metrics, logs, and traces on one screen?
+- Why should operators define service-level objectives for the observability stack itself?
+- What should you evaluate when you want practical choices without deep vendor lock-in?
 
 ## Why It Matters
 
