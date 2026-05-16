@@ -52,6 +52,8 @@ After this chapter, the next one moves on to **Chunking strategies — how to sp
 
 ---
 
+> The best way to understand FAISS is not as a smarter database, but as a compute engine dedicated to vector search.
+
 ## Questions this chapter answers
 
 - When is each of FAISS IndexFlat, IVF, and HNSW the right pick?

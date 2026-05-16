@@ -52,6 +52,8 @@ After this chapter, the next one moves on to **Cosine similarity and vector sear
 
 ---
 
+> The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.
+
 ## Questions this chapter answers
 
 - What are the real tradeoffs between Hugging Face `sentence-transformers` and the OpenAI Embeddings API?
