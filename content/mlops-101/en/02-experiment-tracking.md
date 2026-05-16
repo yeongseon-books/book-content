@@ -30,7 +30,7 @@ This is post 2 in the MLOps 101 series.
 
 Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
 
-## What This Post Answers
+## Questions this article answers
 
 - Why does the same model become hard to reproduce without run tracking?
 - Which pieces of metadata must always be captured: params, metrics, artifacts, environment, or data version?

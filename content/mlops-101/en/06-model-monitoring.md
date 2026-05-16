@@ -30,7 +30,7 @@ This is post 6 in the MLOps 101 series.
 
 Here, we will treat monitoring as the observation layer where system metrics, model metrics, and business metrics meet, starting from a practical Prometheus-based baseline.
 
-## What This Post Answers
+## Questions this article answers
 
 - Why is accuracy alone too slow as a production signal?
 - How should you think about metrics, logs, and traces?

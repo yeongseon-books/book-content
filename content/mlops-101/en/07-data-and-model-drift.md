@@ -30,7 +30,7 @@ This is post 7 in the MLOps 101 series.
 
 Here, we will separate data drift from model drift and connect statistical signals such as PSI and KS to concrete operating thresholds.
 
-## What This Post Answers
+## Questions this article answers
 
 - What is the difference between data drift and model drift in practice?
 - Why does a weak baseline make drift hard to see?

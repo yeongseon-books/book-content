@@ -30,7 +30,7 @@ This is post 4 in the MLOps 101 series.
 
 Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.
 
-## What This Post Answers
+## Questions this article answers
 
 - Why split a single training script into multiple pipeline stages?
 - How is a DAG different from a plain execution order?

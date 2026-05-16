@@ -30,7 +30,7 @@ This is post 8 in the MLOps 101 series.
 
 Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.
 
-## What This Post Answers
+## Questions this article answers
 
 - Which signals should trigger retraining in the first place?
 - How do schedule-based, drift-based, and performance-based triggers differ?

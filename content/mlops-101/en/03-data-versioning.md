@@ -30,7 +30,7 @@ This is post 3 in the MLOps 101 series.
 
 Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.
 
-## What This Post Answers
+## Questions this article answers
 
 - Why can code versioning alone never reproduce an ML result?
 - How should you think about DVC versus git-LFS?
