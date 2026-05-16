@@ -29,6 +29,13 @@ To answer that, you have to stop treating the OS as background scenery. It is th
 
 This is the first post in the Operating Systems 101 series. It sets up the mental model for the rest of the series by framing the OS as both a resource manager and an abstraction layer.
 
+## Questions this article answers
+
+- What problem does an operating system actually exist to solve?
+- Why are kernel mode and user mode separated in the first place?
+- What do abstractions like processes, files, and sockets actually hide?
+- Why does understanding the operating system make production troubleshooting easier for developers?
+
 ## What You Will Learn
 
 - A working definition of an operating system and its two main roles

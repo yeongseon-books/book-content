@@ -29,6 +29,13 @@ That is also why this chapter works as the series finale: every concept we cover
 
 This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.
 
+## Questions this article answers
+
+- How do containers and virtual machines differ in the way they provide isolation?
+- How do namespaces split "what is visible" from cgroups limiting "how much can be used"?
+- Why does overlayfs make container images feel lightweight?
+- If you understand the limits of container isolation, what extra protections should you design on top?
+
 ## What You Will Learn
 
 - The difference between containers and virtual machines

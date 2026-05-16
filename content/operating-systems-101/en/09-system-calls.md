@@ -29,6 +29,13 @@ System calls are also where performance, debugging, and security meet. Once you 
 
 This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
 
+## Questions this article answers
+
+- What is the real difference between user space and kernel space?
+- What transition cost is paid for each system call?
+- Why is `strace` often the fastest tool for understanding OS-level problems?
+- How do buffering, batching, and `vDSO` reduce syscall overhead?
+
 ## What You Will Learn
 
 - The split between user space and kernel space

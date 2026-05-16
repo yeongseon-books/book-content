@@ -29,6 +29,13 @@ Processes and threads look like two ways to do concurrency, but they answer diff
 
 This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
 
+## Questions this article answers
+
+- Which resources does a process actually own?
+- What do threads share, and what stays private to each thread?
+- Why are `fork` and `exec` split into two separate steps?
+- In CPU-bound and I/O-bound work, when should you choose processes and when should you choose threads?
+
 ## What You Will Learn
 
 - The four resources a process owns (memory, fds, permissions, CPU state)

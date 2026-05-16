@@ -29,6 +29,13 @@ That is why scheduler behavior matters long before you start reading kernel code
 
 This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.
 
+## Questions this article answers
+
+- What goals is the scheduler trying to balance against each other?
+- What practical differences do preemption, time slices, and priority actually create?
+- Why are context switches expensive even when you do not see them directly?
+- When should you tune `nice`, priority, or CPU affinity?
+
 ## What You Will Learn
 
 - The scheduler's goals and the trade-offs between them

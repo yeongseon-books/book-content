@@ -29,6 +29,13 @@ What makes race conditions hard is not that they fail once, but that the result 
 
 This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
 
+## Questions this article answers
+
+- When can you say a race condition is actually happening?
+- How do atomicity, visibility, and ordering produce different kinds of failures?
+- Why is even a single line of code not automatically safe?
+- Besides locks, what design techniques reduce race conditions?
+
 ## What You Will Learn
 
 - A precise definition of race conditions and why they are hard to reproduce
