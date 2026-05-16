@@ -339,9 +339,11 @@ export default function Chat() {
 
 ## 참고 자료
 
-- [Vercel AI SDK docs: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot)
-- [Vercel AI SDK docs: useChat](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat)
-- [Next.js docs: Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
-- [Vercel AI SDK examples repository](https://github.com/vercel/ai/tree/main/examples)
+- [Vercel AI SDK: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot) — `useChat` + 라우트 핸들러 조합의 정식 안내
+- [Vercel AI SDK: `useChat` reference](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat) — 메시지 상태와 `status` 값의 정확한 의미
+- [Vercel AI SDK: `streamText` reference](https://sdk.vercel.ai/docs/reference/ai-sdk-core/stream-text) — 본문에서 사용한 서버 측 스트리밍 API의 옵션과 반환값
+- [Next.js: Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) — `app/api/chat/route.ts`가 따르는 App Router 규약
+- [Next.js: Edge Runtime](https://nextjs.org/docs/app/api-reference/edge) — `export const runtime = "edge"`가 의미하는 실행 환경과 제한
+- [Vercel AI SDK examples repository](https://github.com/vercel/ai/tree/main/examples) — 더 다양한 챗봇/툴 사용 예제
 
 Tags: AI, LLM, 웹 개발, Python, Tutorial
